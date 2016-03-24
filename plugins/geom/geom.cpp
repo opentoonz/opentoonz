@@ -49,10 +49,10 @@ void do_compute(toonz::node_handle_t node, const toonz::rendering_setting_t *rs,
 			auto pif = grab_interf<toonz::param_interface_t>(TOONZ_UUID_PARAM);
 			if (pif) {
 				int type, counts;
-				pif->get_type(param, frame, &type, &counts);
+				pif->get_type(node, param, frame, &type, &counts);
 				printf("do_compute: get value type:%d\n", type);
 				toonz_param_traits_point_t::iovaluetype v;
-				pif->get_value(param, frame, &counts, &v);
+				pif->get_value(node, param, frame, &counts, &v);
 
 				printf("do_compute: value:[%g, %g]\n", v.x, v.y);
 			}

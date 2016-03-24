@@ -639,7 +639,7 @@ Param *RasterFxPluginHost::createParam(const toonz_param_desc_t *desc, bool from
 		}
 		if (!param) {
 			pi_->params_.push_back(nullptr);
-			pi_->params_.back() = new Param(this, desc->key, toonz_param_type_enum(desc->traits_tag), desc);
+			pi_->params_.back() = new Param(desc->key, toonz_param_type_enum(desc->traits_tag), desc);
 			param = pi_->params_.back();
 		}
 		return param;
@@ -925,21 +925,21 @@ void RasterFxPluginHost::createParamsByDesc()
 
 					r = bind_param(page, p, v);
 
-					set_param_default<tpbind_dbl_t>(p, desc);
-					set_param_default<tpbind_int_t>(p, desc);
-					set_param_default<tpbind_rng_t>(p, desc);
-					set_param_default<tpbind_pnt_t>(p, desc);
-					set_param_default<tpbind_enm_t>(p, desc);
-					set_param_default<tpbind_col_t>(p, desc);
-					set_param_default<tpbind_bool_t>(p, desc);
-					set_param_default<tpbind_str_t>(p, desc);
-					set_param_default<tpbind_spc_t>(p, desc);
-					set_param_default<tpbind_tcv_t>(p, desc);
+					set_param_default<tpbind_dbl_t>(this, p, desc);
+					set_param_default<tpbind_int_t>(this, p, desc);
+					set_param_default<tpbind_rng_t>(this, p, desc);
+					set_param_default<tpbind_pnt_t>(this, p, desc);
+					set_param_default<tpbind_enm_t>(this, p, desc);
+					set_param_default<tpbind_col_t>(this, p, desc);
+					set_param_default<tpbind_bool_t>(this, p, desc);
+					set_param_default<tpbind_str_t>(this, p, desc);
+					set_param_default<tpbind_spc_t>(this, p, desc);
+					set_param_default<tpbind_tcv_t>(this, p, desc);
 
-					set_param_range<tpbind_dbl_t>(p, desc);
-					set_param_range<tpbind_int_t>(p, desc);
-					set_param_range<tpbind_rng_t>(p, desc);
-					set_param_range<tpbind_pnt_t>(p, desc);
+					set_param_range<tpbind_dbl_t>(this, p, desc);
+					set_param_range<tpbind_int_t>(this, p, desc);
+					set_param_range<tpbind_rng_t>(this, p, desc);
+					set_param_range<tpbind_pnt_t>(this, p, desc);
 
 					printf("RasterFxPluginHost::createParam: bind_param: r:0x%x\n", r);
 				}
