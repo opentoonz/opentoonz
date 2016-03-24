@@ -110,13 +110,13 @@ bool get_and_check(toonz::node_handle_t node, const char *nm, double frame, doub
 
 	int type = 0;
 	int cnt = 0;
-	pif->get_type(p1, frame, &type, &cnt);
+	pif->get_type(node, p1, frame, &type, &cnt);
 	printf("parameter(ret:%d): name:%s (type:%d count:%d) expect:(type:%d) typesize:%ld\n", ret, nm, type, cnt, T::E, sizeof(typename T::iovaluetype));
 	if (type != T::E)
 		return false;
 
 	typename T::iovaluetype v;
-	ret = pif->get_value(p1, frame, &cnt, &v);
+	ret = pif->get_value(node, p1, frame, &cnt, &v);
 	printf("get_value: ret:%d count:%d\n", ret, cnt);
 	dump_value<typename T::iovaluetype>(v);
 	return true;
@@ -134,13 +134,13 @@ bool get_and_check<toonz_param_traits_string_t>(toonz::node_handle_t node, const
 
 	int type = 0;
 	int cnt = 0;
-	ret = pif->get_type(p1, frame, &type, &cnt);
+	ret = pif->get_type(node, p1, frame, &type, &cnt);
 	printf("parameter(ret:%d): name:%s (type:%d count:%d) expect:(type:%d) typesize:-\n", ret, nm, type, cnt, toonz_param_traits_string_t::E);
 	if (type != toonz_param_traits_string_t::E)
 		return false;
 
 	std::vector<toonz_param_traits_string_t::iovaluetype> v(cnt);
-	ret = pif->get_value(p1, frame, &cnt, v.data());
+	ret = pif->get_value(node, p1, frame, &cnt, v.data());
 	printf("get_value: ret:%d count:%d\n", ret, cnt);
 	//dump_value< toonz_param_traits_string_t::iovaluetype* >(v);
 	printf("value: type:%s {%s}\n", typeid(toonz_param_traits_string_t::iovaluetype).name(), v.begin());
@@ -158,14 +158,14 @@ bool get_and_check<toonz_param_traits_spectrum_t>(toonz::node_handle_t node, con
 	printf("get_param(%s): ret:%d\n", nm, ret);
 	int type = 0;
 	int cnt = 0;
-	ret = pif->get_type(p1, frame, &type, &cnt);
+	ret = pif->get_type(node, p1, frame, &type, &cnt);
 	printf("parameter(ret:%d): name:%s (type:%d count:%d) expect:(type:%d) typesize:-\n", ret, nm, type, cnt, toonz_param_traits_spectrum_t::E);
 	if (type != toonz_param_traits_spectrum_t::E)
 		return false;
 
 	toonz_param_traits_spectrum_t::iovaluetype v;
 	v.w = opt;
-	ret = pif->get_value(p1, frame, &cnt, &v);
+	ret = pif->get_value(node, p1, frame, &cnt, &v);
 	printf("get_value: ret:%d count:%d\n", ret, cnt);
 	dump_value<toonz_param_traits_spectrum_t::iovaluetype>(v);
 	return true;
@@ -183,13 +183,13 @@ bool get_and_check<toonz_param_traits_tonecurve_t>(toonz::node_handle_t node, co
 
 	int type = 0;
 	int cnt = 0;
-	ret = pif->get_type(p1, frame, &type, &cnt);
+	ret = pif->get_type(node, p1, frame, &type, &cnt);
 	printf("parameter)(ret:%d): name:%s (type:%d count:%d) expect:(type:%d) sz:-\n", ret, nm, type, cnt, toonz_param_traits_tonecurve_t::E);
 	if (type != toonz_param_traits_tonecurve_t::E)
 		return false;
 
 	std::vector<toonz_param_traits_tonecurve_t::iovaluetype> v(cnt);
-	ret = pif->get_value(p1, frame, &cnt, v.data());
+	ret = pif->get_value(node, p1, frame, &cnt, v.data());
 	printf("get_value: ret:%d count:%d\n", ret, cnt);
 	for (int i = 0; i < cnt; i++) {
 		dump_value<toonz_param_traits_tonecurve_t::iovaluetype>(v[i]);
@@ -232,21 +232,21 @@ void do_compute(toonz::node_handle_t node, const toonz::rendering_setting_t *rs,
 			auto pif = grab_interf<toonz::param_interface_t>(TOONZ_UUID_PARAM);
 			if (pif) {
 				int t, l;
-				pif->get_type(str, frame, &t, &l);
+				pif->get_type(node, str, frame, &t, &l);
 				int sz;
 				std::vector<char> shortage_buf(l / 2 + 1);
-				int ret = pif->get_string_value(str, &sz, l / 2 + 1, shortage_buf.data());
+				int ret = pif->get_string_value(node, str, &sz, l / 2 + 1, shortage_buf.data());
 				printf("get_string_value(string): {%s} (length:%d) ret:%d\n", shortage_buf.data(), sz, ret);
 
-				ret = pif->get_string_value(notstr, &sz, l / 2 + 1, shortage_buf.data()); // must be error
+				ret = pif->get_string_value(node, notstr, &sz, l / 2 + 1, shortage_buf.data()); // must be error
 				printf("get_string_value(not string): sz:%d ret:%d\n", sz, ret);		  // size must be not changed
 
-				pif->get_type(spec, frame, &t, &l);
+				pif->get_type(node, spec, frame, &t, &l);
 				toonz_param_spectrum_t spc;
-				ret = pif->get_spectrum_value(spec, frame, 0, &spc);
+				ret = pif->get_spectrum_value(node, spec, frame, 0, &spc);
 				printf("get_spectrum_value(spec): ret:%d\n", ret);
 				dump_value(spc);
-				ret = pif->get_spectrum_value(str, frame, 0, &spc);
+				ret = pif->get_spectrum_value(node, str, frame, 0, &spc);
 				printf("get_spectrum_value(str): ret:%d\n", ret); // must be error
 			}
 		}

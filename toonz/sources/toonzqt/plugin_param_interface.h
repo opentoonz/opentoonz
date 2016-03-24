@@ -19,8 +19,8 @@ class Param
 public:
 	//inline Param(TFx* fx, const std::string& name, toonz_param_type_enum type, std::shared_ptr< toonz_param_desc_t >&& desc)
 	//	: fx_(fx), name_(name), type_(type), desc_(std::move(desc)) {
-	inline Param(TFx *fx, const std::string &name, toonz_param_type_enum type, const toonz_param_desc_t *desc)
-		: fx_(fx), name_(name), type_(type), desc_(const_cast<toonz_param_desc_t *>(desc))
+	inline Param(const std::string &name, toonz_param_type_enum type, const toonz_param_desc_t *desc)
+		: name_(name), type_(type), desc_(const_cast<toonz_param_desc_t *>(desc))
 	{
 	}
 
@@ -34,9 +34,9 @@ public:
 		return type_;
 	}
 
-	inline TParamP param() const
+	inline TParamP param(TFx* fx) const
 	{
-		return fx_->getParams()->getParam(name_);
+		return fx->getParams()->getParam(name_);
 	}
 
 	inline const toonz_param_desc_t *desc() const { return desc_; }
@@ -49,12 +49,12 @@ int hint_unit(toonz_param_handle_t param, int unit);
 int hint_item(toonz_param_handle_t param, int item, const char *caption);
 int set_description(toonz_param_handle_t param, const char *description);
 
-int get_type(toonz_param_handle_t param, double, int *, int *);
+int get_type(toonz_node_handle_t node, toonz_param_handle_t param, double, int *, int *);
 int get_value_type(toonz_param_handle_t param, int *pvalue_type);
-int get_value(toonz_param_handle_t param, double frame, int *psize_in_bytes, void *pvalue);
+int get_value(toonz_node_handle_t node, toonz_param_handle_t param, double frame, int *psize_in_bytes, void *pvalue);
 int set_value(toonz_param_handle_t param, double frame, int size_in_bytes, const void *pvalue);
 
-int get_string_value(toonz_param_handle_t param, int *wholesize, int rcvbufsize, char *pvalue);
-int get_spectrum_value(toonz_param_handle_t param, double frame, double x, toonz_param_spectrum_t *pvalue);
+int get_string_value(toonz_node_handle_t node, toonz_param_handle_t param, int *wholesize, int rcvbufsize, char *pvalue);
+int get_spectrum_value(toonz_node_handle_t node, toonz_param_handle_t param, double frame, double x, toonz_param_spectrum_t *pvalue);
 
 #endif

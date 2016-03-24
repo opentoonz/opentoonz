@@ -104,9 +104,9 @@ struct set_param_range_t {
 /* ranged complextype */
 template <typename Bind>
 struct set_param_range_t<Bind, std::true_type, 1> {
-	static bool set_param_range(Param *param, const toonz_param_desc_t *desc)
+	static bool set_param_range(TFx* fx, Param *param, const toonz_param_desc_t *desc)
 	{
-		auto smartptr = param->param();
+		auto smartptr = param->param(fx);
 		typename Bind::realtype *p = reinterpret_cast<typename Bind::realtype *>(smartptr.getPointer());
 		if (p) {
 			const typename Bind::traittype &t = *reinterpret_cast<const typename Bind::traittype *>(&desc->traits.d);
@@ -131,9 +131,9 @@ struct set_param_range_t<Bind, std::true_type, 1> {
    このため range に対しても特殊版を用意するハメになった. */
 template <>
 struct set_param_range_t<tpbind_rng_t, std::true_type, 1> {
-	static bool set_param_range(Param *param, const toonz_param_desc_t *desc)
+	static bool set_param_range(TFx* fx, Param *param, const toonz_param_desc_t *desc)
 	{
-		auto smartptr = param->param();
+		auto smartptr = param->param(fx);
 		tpbind_rng_t::realtype *p = reinterpret_cast<tpbind_rng_t::realtype *>(smartptr.getPointer());
 		if (p) {
 			const tpbind_rng_t::traittype &t = desc->traits.rd;
@@ -176,11 +176,11 @@ struct set_param_range_t< tpbind_pnt_t, std::true_type, 1 >  {
 /* ranged primitive: */
 template <typename Bind>
 struct set_param_range_t<Bind, std::false_type, 1> {
-	static bool set_param_range(Param *param, const toonz_param_desc_t *desc)
+	static bool set_param_range(TFx* fx, Param *param, const toonz_param_desc_t *desc)
 	{
 		if (!is_type_of<typename Bind::traittype>(desc))
 			return false;
-		auto smartptr = param->param();
+		auto smartptr = param->param(fx);
 		typename Bind::realtype *p = reinterpret_cast<typename Bind::realtype *>(smartptr.getPointer());
 		if (p) {
 			const typename Bind::traittype &t = *reinterpret_cast<const typename Bind::traittype *>(&desc->traits.d);
@@ -192,16 +192,16 @@ struct set_param_range_t<Bind, std::false_type, 1> {
 };
 
 template <typename Bind>
-bool set_param_range(Param *param, const toonz_param_desc_t *desc)
+bool set_param_range(TFx* fx, Param *param, const toonz_param_desc_t *desc)
 {
 	if (!is_type_of<typename Bind::traittype>(desc))
 		return false;
-	return set_param_range_t<Bind>::set_param_range(param, desc);
+	return set_param_range_t<Bind>::set_param_range(fx, param, desc);
 }
 
 template <typename Bind, typename Comp = typename std::is_compound<typename Bind::valuetype>::type>
 struct set_param_default_t {
-	static bool set_param_default(Param *param, const toonz_param_desc_t *desc)
+	static bool set_param_default(TFx* fx, Param *param, const toonz_param_desc_t *desc)
 	{
 		return false;
 	}
@@ -211,9 +211,9 @@ struct set_param_default_t {
 /* Point/Range */
 template <typename Bind>
 struct set_param_default_t<Bind, std::true_type> {
-	static bool set_param_default(Param *param, const toonz_param_desc_t *desc)
+	static bool set_param_default(TFx* fx, Param *param, const toonz_param_desc_t *desc)
 	{
-		auto smartptr = param->param();
+		auto smartptr = param->param(fx);
 		typename Bind::realtype *p = reinterpret_cast<typename Bind::realtype *>(smartptr.getPointer());
 		if (p) {
 			const typename Bind::traittype &t = *reinterpret_cast<const typename Bind::traittype *>(&desc->traits.d);
@@ -232,9 +232,9 @@ struct set_param_default_t<Bind, std::true_type> {
 /* Default Color */
 template <>
 struct set_param_default_t<tpbind_col_t, std::true_type> {
-	static bool set_param_default(Param *param, const toonz_param_desc_t *desc)
+	static bool set_param_default(TFx* fx, Param *param, const toonz_param_desc_t *desc)
 	{
-		auto smartptr = param->param();
+		auto smartptr = param->param(fx);
 		tpbind_col_t::realtype *p = reinterpret_cast<tpbind_col_t::realtype *>(smartptr.getPointer());
 		if (p) {
 			const tpbind_col_t::traittype &t = *reinterpret_cast<const tpbind_col_t::traittype *>(&desc->traits.d);
@@ -247,9 +247,9 @@ struct set_param_default_t<tpbind_col_t, std::true_type> {
 /* Default String */
 template <>
 struct set_param_default_t<tpbind_str_t, std::true_type> {
-	static bool set_param_default(Param *param, const toonz_param_desc_t *desc)
+	static bool set_param_default(TFx* fx, Param *param, const toonz_param_desc_t *desc)
 	{
-		auto smartptr = param->param();
+		auto smartptr = param->param(fx);
 		tpbind_str_t::realtype *p = reinterpret_cast<tpbind_str_t::realtype *>(smartptr.getPointer());
 		if (p) {
 			const tpbind_str_t::traittype &t = *reinterpret_cast<const tpbind_str_t::traittype *>(&desc->traits.d);
@@ -265,7 +265,7 @@ struct set_param_default_t<tpbind_str_t, std::true_type> {
 /* Default Spectrum */
 template <>
 struct set_param_default_t<tpbind_spc_t, std::true_type> {
-	static bool set_param_default(Param *param, const toonz_param_desc_t *desc)
+	static bool set_param_default(TFx* fx, Param *param, const toonz_param_desc_t *desc)
 	{
 		/* unfortunatly, TSpectrumParam's default values must be set within the constructor, for now.
 		 see param_factory_< TSpectrumParam >() */
@@ -276,7 +276,7 @@ struct set_param_default_t<tpbind_spc_t, std::true_type> {
 /* Default ToneCurve */
 template <>
 struct set_param_default_t<tpbind_tcv_t, std::true_type> {
-	static bool set_param_default(Param *param, const toonz_param_desc_t *desc)
+	static bool set_param_default(TFx* fx, Param *param, const toonz_param_desc_t *desc)
 	{
 		/*
 		auto smartptr = param->param();
@@ -298,9 +298,9 @@ struct set_param_default_t<tpbind_tcv_t, std::true_type> {
 /* primitive: TDoubleParam */
 template <>
 struct set_param_default_t<tpbind_dbl_t, std::false_type> {
-	static bool set_param_default(Param *param, const toonz_param_desc_t *desc)
+	static bool set_param_default(TFx* fx, Param *param, const toonz_param_desc_t *desc)
 	{
-		auto smartptr = param->param();
+		auto smartptr = param->param(fx);
 		tpbind_dbl_t::realtype *p = reinterpret_cast<tpbind_dbl_t::realtype *>(smartptr.getPointer());
 		if (p) {
 			const tpbind_dbl_t::traittype &t = *reinterpret_cast<const tpbind_dbl_t::traittype *>(&desc->traits.d);
@@ -314,9 +314,9 @@ struct set_param_default_t<tpbind_dbl_t, std::false_type> {
 /* primitive: TNotAnimatableParam */
 template <typename Bind>
 struct set_param_default_t<Bind, std::false_type> {
-	static bool set_param_default(Param *param, const toonz_param_desc_t *desc)
+	static bool set_param_default(TFx* fx, Param *param, const toonz_param_desc_t *desc)
 	{
-		auto smartptr = param->param();
+		auto smartptr = param->param(fx);
 		typename Bind::realtype *p = reinterpret_cast<typename Bind::realtype *>(smartptr.getPointer());
 		if (p) {
 			const typename Bind::traittype &t = *reinterpret_cast<const typename Bind::traittype *>(&desc->traits.d);
@@ -331,9 +331,9 @@ struct set_param_default_t<Bind, std::false_type> {
 /* Default Enum */
 template <>
 struct set_param_default_t<tpbind_enm_t, std::false_type> {
-	static bool set_param_default(Param *param, const toonz_param_desc_t *desc)
+	static bool set_param_default(TFx* fx, Param *param, const toonz_param_desc_t *desc)
 	{
-		auto smartptr = param->param();
+		auto smartptr = param->param(fx);
 		tpbind_enm_t::realtype *p = reinterpret_cast<tpbind_enm_t::realtype *>(smartptr.getPointer());
 		if (p) {
 			const tpbind_enm_t::traittype &t = *reinterpret_cast<const tpbind_enm_t::traittype *>(&desc->traits.d);
@@ -347,11 +347,11 @@ struct set_param_default_t<tpbind_enm_t, std::false_type> {
 };
 
 template <typename Bind>
-bool set_param_default(Param *param, const toonz_param_desc_t *desc)
+bool set_param_default(TFx* fx, Param *param, const toonz_param_desc_t *desc)
 {
 	if (!is_type_of<typename Bind::traittype>(desc))
 		return false;
-	return set_param_default_t<Bind>::set_param_default(param, desc);
+	return set_param_default_t<Bind>::set_param_default(fx, param, desc);
 }
 
 template <typename T>

@@ -48,15 +48,17 @@ struct toonz_rect_t_ {
 
 typedef struct toonz_rect_t_ toonz_rect_t;
 
+typedef void *toonz_node_handle_t;
+
 typedef void *toonz_param_handle_t;
 
 struct toonz_param_interface_t_ {
 	toonz_if_version_t ver;
-	int (*get_type)(toonz_param_handle_t param, double frame, int *type, int *counts);
-	int (*get_value)(toonz_param_handle_t param, double frame, int *pcounts, void *pvalue);
-	int (*set_value)(toonz_param_handle_t param, double frame, int counts, const void *pvalue);
-	int (*get_string_value)(toonz_param_handle_t param, int *wholesize, int rcvbufsize, char *pvalue);
-	int (*get_spectrum_value)(toonz_param_handle_t param, double frame, double x, toonz_param_spectrum_t *pvalue);
+	int (*get_type)(toonz_node_handle_t node, toonz_param_handle_t param, double frame, int *type, int *counts);
+	int (*get_value)(toonz_node_handle_t node, toonz_param_handle_t param, double frame, int *pcounts, void *pvalue);
+	int (*set_value)(toonz_node_handle_t node, toonz_param_handle_t param, double frame, int counts, const void *pvalue);
+	int (*get_string_value)(toonz_node_handle_t node, toonz_param_handle_t param, int *wholesize, int rcvbufsize, char *pvalue);
+	int (*get_spectrum_value)(toonz_node_handle_t node, toonz_param_handle_t param, double frame, double x, toonz_param_spectrum_t *pvalue);
 } TOONZ_PACK;
 
 typedef toonz_param_interface_t_ toonz_param_interface_t;
@@ -102,8 +104,6 @@ enum {
 	TOONZ_TILE_TYPE_GRDP,
 	TOONZ_TILE_TYPE_YUV422P,
 };
-
-typedef void *toonz_node_handle_t;
 
 struct toonz_node_interface_t_ {
 	toonz_if_version_t ver;
