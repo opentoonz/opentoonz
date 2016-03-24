@@ -89,7 +89,6 @@ public:
 	toonz_param_page_t *param_pages_;
 
 	std::vector<UIPage *> ui_pages_;
-	std::vector<Param *> params_;
 	std::vector<ParamView *> param_views_;
 	std::map<std::string, port_description_t> port_mapper_;
 
@@ -146,6 +145,7 @@ class RasterFxPluginHost : public TZeraryFx, public TPluginInterface
 	PluginInformation *pi_;
 
 	std::vector<std::shared_ptr<TFxPort>> inputs_;
+	std::vector<std::shared_ptr<Param>> params_;
 	void *user_data_;
 
 	static bool validateKeyName(const char *name);
