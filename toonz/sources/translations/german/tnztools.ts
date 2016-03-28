@@ -151,7 +151,7 @@
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Abbruch</translation>
+        <translation>Abbrechen</translation>
     </message>
 </context>
 <context>
@@ -492,7 +492,7 @@ Do you want to continue?</source>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Abbruch</translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <source>Copy Skeleton</source>
@@ -750,7 +750,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Abbruch</translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <source>Paste</source>

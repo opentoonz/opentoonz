@@ -85,7 +85,7 @@
     <name>ShadowStyle2</name>
     <message>
         <source>Plain Shadow</source>
-        <translation>Schatten (Standar)</translation>
+        <translation>Schatten (Standard)</translation>
     </message>
     <message>
         <source>Angle</source>
@@ -384,8 +384,8 @@
 <context>
     <name>TLinGradFillStyle</name>
     <message>
-        <source>Linear Gradient</source>
-        <translation>Linearer Gradient</translation>
+        <source>Linear Verlauf</source>
+        <translation>Linearer Verlauf</translation>
     </message>
     <message>
         <source>Angle</source>
@@ -543,8 +543,8 @@
 <context>
     <name>TRadGradFillStyle</name>
     <message>
-        <source>Radial Gradient</source>
-        <translation>Radialer Gradient</translation>
+        <source>Radial Verlauf</source>
+        <translation>Radialer Verlauf</translation>
     </message>
     <message>
         <source>X Position</source>
