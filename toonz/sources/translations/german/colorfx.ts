@@ -1,84 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ja_JP">
+<TS version="2.1" language="de_DE">
 <context>
     <name>ArtisticSolidColor</name>
     <message>
         <source>Irregular</source>
-        <translation>不規則</translation>
+        <translation>Unregelmäßig</translation>
     </message>
     <message>
         <source>Horiz Offset</source>
-        <translation>水平オフセット</translation>
+        <translation>Horizontalter Offset</translation>
     </message>
     <message>
         <source>Vert Offset</source>
-        <translation>垂直オフセット</translation>
+        <translation>Vertikaler Offset</translation>
     </message>
     <message>
         <source>Noise</source>
-        <translation>ノイズ</translation>
+        <translation>Rauschen</translation>
     </message>
 </context>
 <context>
     <name>MovingSolidColor</name>
     <message>
         <source>Offset</source>
-        <translation>オフセット</translation>
+        <translation>Offset</translation>
     </message>
     <message>
         <source>Horiz Offset</source>
-        <translation>水平オフセット</translation>
+        <translation>Horizontalter Offset</translation>
     </message>
     <message>
         <source>Vert Offset</source>
-        <translation>垂直オフセット</translation>
+        <translation>Vertikaler Offset</translation>
     </message>
 </context>
 <context>
     <name>OutlineViewerStyle</name>
     <message>
         <source>OutlineViewer(OnlyDebug)</source>
-        <translation>アウトラインビューア（デバッグのみ）</translation>
+        <translation>UmrissBetrachter (NurDebug)</translation>
     </message>
     <message>
         <source>Control Point</source>
-        <translation>コントロールポイント</translation>
+        <translation>Kontrollpunkt</translation>
     </message>
     <message>
         <source>Center Line</source>
-        <translation>中心線</translation>
+        <translation>Mittellinie</translation>
     </message>
     <message>
         <source>Outline Mode</source>
-        <translation>アウトラインモード</translation>
+        <translation>Umriss-Modus</translation>
     </message>
     <message>
         <source>Distance</source>
-        <translation>距離</translation>
+        <translation>Distanz</translation>
     </message>
     <message>
         <source>distance</source>
-        <translation>距離</translation>
+        <translation>Abstand</translation>
     </message>
 </context>
 <context>
     <name>ShadowStyle</name>
     <message>
         <source>Hatched Shading</source>
-        <translation>ハッチシェード</translation>
+        <translation>Schraffur</translation>
     </message>
     <message>
         <source>Angle</source>
-        <translation>角度</translation>
+        <translation>Winkel</translation>
     </message>
     <message>
         <source>Density</source>
-        <translation>密度</translation>
+        <translation>Dichte</translation>
     </message>
     <message>
         <source>Length</source>
-        <translation>長さ</translation>
+        <translation>Länge</translation>
     </message>
 </context>
 <context>
