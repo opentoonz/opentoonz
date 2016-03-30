@@ -395,9 +395,6 @@ if (APPLE)
   	add_custom_command(TARGET OpenToonz_${VERSION}
 		POST_BUILD COMMAND
 	    ${CMAKE_INSTALL_NAME_TOOL} -add_rpath @executable_path/. ${bin})
-  	add_custom_command(TARGET OpenToonz_${VERSION}
-		POST_BUILD COMMAND
-	    ${CMAKE_INSTALL_NAME_TOOL} -add_rpath ${CMAKE_INSTALL_RPATH} ${bin})
 	add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz_${VERSION}.app/Contents/Resources)
 
 	add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz_${VERSION}.app/Contents/Resources)

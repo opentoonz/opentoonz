@@ -28,7 +28,7 @@ elseif (APPLE)
     endif()
     message("PLATFORM:" ${PLATFORM})
     if (PLATFORM EQUAL 64)
-        set(QT_PATH "~/Qt/5.5/clang_64/lib/")
+        set(QT_PATH "/usr/local/opt/qt5/lib/")
         set(QT_LIB_PATH ${QT_PATH})
         set(CMAKE_PREFIX_PATH "${QT_PATH}cmake/")
 

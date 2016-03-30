@@ -18,7 +18,8 @@
 ### brew で必要なパッケージをインストール
 
 ```
-$ brew install glew lz4 libjpeg libpng lzo pkg-config
+$ brew install glew lz4 libjpeg libpng lzo pkg-config libusb qt5
+$ brew link --force qt5
 ```
 
 ### リポジトリを clone
@@ -58,8 +59,9 @@ $ tar xjvf boost_1_55_0.tar.bz2
 $ cd ../../toonz
 $ mkdir build
 $ cd build
-$ cmake ../sources
+$ cmake -Wno-dev ../sources
 $ make
+$ brew unlink qt5
 ```
 
 ビルドが長いので気長に待ちます。
