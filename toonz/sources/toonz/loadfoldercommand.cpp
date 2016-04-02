@@ -379,7 +379,7 @@ TFilePath dstPath(const TFilePath &dstDir, const Resource::Component &comp)
 
 struct import_Locals {
 	const ToonzScene &m_scene;
-	std::auto_ptr<OverwriteDialog> m_overwriteDialog;
+	std::shared_ptr<OverwriteDialog> m_overwriteDialog;
 
 	void switchToDst(Resource::Path &path)
 	{
