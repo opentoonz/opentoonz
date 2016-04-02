@@ -1,5 +1,5 @@
 # looks for libtiff(4.0.3 modified)
-find_path(TIFF_INCLUDE_DIR NAMES tiffio.h HINTS ${SDKROOT} PATH_SUFFIXES tiff-4.0.3/libtiff/)
+find_path(TIFF_INCLUDE_DIR NAMES tiffio.h HINTS ${SDKROOT} PATH_SUFFIXES tiff-4.0.3/libtiff/ NO_DEFAULT_PATH)
 find_library(TIFF_LIBRARY NAMES libtiff.a HINTS ${SDKROOT} PATH_SUFFIXES tiff-4.0.3/libtiff/.libs NO_DEFAULT_PATH)
 
 message("***** libtiff Header path:" ${TIFF_INCLUDE_DIR})
