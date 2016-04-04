@@ -4209,7 +4209,7 @@ Do you want to create it?</source>
         <translation>閉じる</translation>
     </message>
     <message>
-        <source>&amp;Abount OpenToonz...</source>
+        <source>&amp;About OpenToonz...</source>
         <translation>OpenToonzについて (&amp;A)...</translation>
     </message>
     <message>
