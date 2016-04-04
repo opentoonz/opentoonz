@@ -1850,7 +1850,7 @@ void MainWindow::defineActions()
 
 	createMenuWindowsAction(MI_ResetRoomLayout, tr("&Reset to Default Rooms"), "");
 
-	createMenuWindowsAction(MI_About, tr("&Abount OpenToonz..."), "");
+	createMenuWindowsAction(MI_About, tr("&About OpenToonz..."), "");
 
 	createRightClickMenuAction(MI_BlendColors, tr("&Blend colors"), "");
 
