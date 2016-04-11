@@ -73,7 +73,7 @@
     </message>
     <message>
         <source>Center Position</source>
-        <translation>Mitte-Position</translation>
+        <translation>Mittlere Position</translation>
     </message>
 </context>
 <context>
@@ -228,7 +228,7 @@
     </message>
     <message>
         <source>E/W and N/S Positions</source>
-        <translation>E/W und N/S Positionen</translation>
+        <translation>X und Y Positionen</translation>
     </message>
     <message>
         <source>Z Position</source>
@@ -256,11 +256,11 @@
     </message>
     <message>
         <source>Center Position</source>
-        <translation>Mitte-Position</translation>
+        <translation>Mittlere Position</translation>
     </message>
     <message>
         <source>Active Axis</source>
-        <translation>Aktive Axe</translation>
+        <translation>Aktive Achse</translation>
     </message>
 </context>
 <context>
@@ -291,7 +291,7 @@
     </message>
     <message>
         <source>Frame Range</source>
-        <translation>Frame-Reichweite</translation>
+        <translation>Frame-Bereich</translation>
     </message>
     <message>
         <source>Pencil Mode</source>
@@ -427,7 +427,7 @@
     </message>
     <message>
         <source>Corner:</source>
-        <translation>Ecke</translation>
+        <translation>Ecke:</translation>
     </message>
     <message>
         <source>Manual</source>
@@ -442,7 +442,7 @@
     </message>
     <message>
         <source>Paint Rigid</source>
-        <translation>Rigide bemalen</translation>
+        <translation>Starr malen</translation>
     </message>
     <message>
         <source>Animate</source>
@@ -462,7 +462,7 @@
     </message>
     <message>
         <source>Vertex Name:</source>
-        <translation>Vertex-Name</translation>
+        <translation>Vertex-Name:</translation>
     </message>
     <message>
         <source>Allow Stretching</source>
@@ -484,7 +484,9 @@
         <source>A group of skeletons already exists for current column. Replacing it will also substitute any existing vertex animation.
 
 Do you want to continue?</source>
-        <translation>Eine Gruppe Skelette existiert bereits für die aktuelle Spalte. Sie zu ersetzen, wird jegliche vorhandene Vertex-Animationen austauschen.</translation>
+        <translation>Eine Gruppe Skelette existiert bereits für die aktuelle Spalte. Sie zu ersetzen, wird jegliche vorhandenen Vertex-Animationen austauschen.
+
+Möchten Sie fortfahren?</translation>
     </message>
     <message>
         <source>Ok</source>
@@ -528,7 +530,7 @@ Do you want to continue?</source>
     </message>
     <message>
         <source>Show Rigidity</source>
-        <translation>Steifheit zeigen</translation>
+        <translation>Starrheit zeigen</translation>
     </message>
     <message>
         <source>Show SO</source>
@@ -542,7 +544,9 @@ Do you want to continue?</source>
         <source>The previous vertex name will be discarded, and all associated keys will be lost.
 
 Do you want to proceed?</source>
-        <translation>Der vorherige Vertex-Name wird verworfen, und all assoziierten Tasten gehen verloren.</translation>
+        <translation>Der vorherige Vertex-Name wird verworfen, und all zugewiesenen Tasten gehen verloren.
+
+Möchten Sie fortfahren?</translation>
     </message>
     <message>
         <source>Edit Mesh</source>
@@ -616,7 +620,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Polygon Sides:</source>
-        <translation>Polygon-Seiten</translation>
+        <translation>Polygon-Seiten:</translation>
     </message>
     <message>
         <source>Auto Group</source>
@@ -624,7 +628,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Auto Fill</source>
-        <translation>Autmatisches Füllen</translation>
+        <translation>Automatisches Füllen</translation>
     </message>
     <message>
         <source>Selective</source>
@@ -670,7 +674,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Max:</source>
-        <translation>Maximum</translation>
+        <translation>Maximum:</translation>
     </message>
     <message>
         <source>Yes</source>
@@ -690,7 +694,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>The current column is not visible in Camera Stand.</source>
-        <translation type="vanished">Die aktuelle Spalte ist nicht sichtbar im Kamera Stand</translation>
+        <translation type="vanished">Die aktuelle Spalte ist nicht sichtbar im Kamera Stand.</translation>
     </message>
     <message>
         <source>It is not possible to edit the audio column.</source>
@@ -698,23 +702,23 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>It is not possible to edit the Magpie column.</source>
-        <translation>Es ist nicht möglich die Magpie-Spalte zu bearbeiten</translation>
+        <translation>Es ist nicht möglich die Magpie-Spalte zu bearbeiten.</translation>
     </message>
     <message>
         <source>The current tool cannot be used on a Level column.</source>
-        <translation>Das aktuelle Werkzeug kann nicht mit einer Level-Spalte genutzt werden.</translation>
+        <translation>Das aktuelle Werkzeug kann nicht mit einer Level-Spalte angewendet werden.</translation>
     </message>
     <message>
         <source>The current tool cannot be used on a Mesh column.</source>
-        <translation>Das aktuelle Werkzeug kann nicht mit einer Mesh-Spalte genutzt werden.</translation>
+        <translation>Das aktuelle Werkzeug kann nicht mit einer Mesh-Spalte angewendet werden.</translation>
     </message>
     <message>
         <source>The current tool cannot be used in Level Strip mode.</source>
-        <translation>Das aktuelle Werkzeug kann nicht im Level Strip Modus genutzt werden.</translation>
+        <translation>Das aktuelle Werkzeug kann nicht im Level Strip Modus angewendet werden.</translation>
     </message>
     <message>
         <source>The current tool cannot be used to edit a motion path.</source>
-        <translation>Das aktuelle Werkzeug kann nicht zum bearbeiten eines Bewegungspfad genutzt werden.</translation>
+        <translation>Das aktuelle Werkzeug kann nicht zum Bearbeiten eines Bewegungspfads angewendet werden.</translation>
     </message>
     <message>
         <source>The current level is not editable.</source>
@@ -722,23 +726,23 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>The current tool cannot be used on a Vector Level.</source>
-        <translation>Das aktuelle Werkzeug kann nicht auf einer Vector-Ebene genutzt werden.</translation>
+        <translation>Das aktuelle Werkzeug kann nicht auf einer Vector-Ebene angewendet werden.</translation>
     </message>
     <message>
         <source>The current tool cannot be used on a Toonz Level.</source>
-        <translation>Das aktuelle Werkzeug kann nicht auf einer Toonz-Ebene genutzt werden.</translation>
+        <translation>Das aktuelle Werkzeug kann nicht auf einer Toonz-Ebene angewendet werden.</translation>
     </message>
     <message>
         <source>The current tool cannot be used on a Raster Level.</source>
-        <translation>Das aktuelle Werkzeug kann nicht auf einer Raster-Ebene genutzt werden.</translation>
+        <translation>Das aktuelle Werkzeug kann nicht auf einer Raster-Ebene angewendet werden.</translation>
     </message>
     <message>
         <source>The current tool cannot be used on a Mesh Level.</source>
-        <translation>Das aktuelle Werkzeug kann nicht auf einer Mesh-Ebene genutzt werden.</translation>
+        <translation>Das aktuelle Werkzeug kann nicht auf einer Mesh-Ebene angewendet werden.</translation>
     </message>
     <message>
         <source>The current tool cannot be used on a mesh-deformed level</source>
-        <translation>Das aktuelle Werkzeug kann nicht auf einer Mesh-verformten-Ebene genutzt werden.</translation>
+        <translation>Das aktuelle Werkzeug kann nicht auf einer Mesh-verformten-Ebene angewendet werden.</translation>
     </message>
     <message>
         <source>The current frame is locked: any editing is forbidden.</source>
@@ -746,7 +750,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Ok</source>
-        <translation>OK</translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -758,7 +762,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Move Center</source>
-        <translation>Mitte-Position bewegen</translation>
+        <translation>Mittlere Position bewegen</translation>
     </message>
     <message>
         <source>RGB Picker (R%1, G%2, B%3)</source>
@@ -798,7 +802,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Transform Raster</source>
-        <translation>Raster wandeln</translation>
+        <translation>Raster transformieren</translation>
     </message>
     <message>
         <source>Set Save Box : (X%1,Y%2,W%3,H%4)-&gt;(X%5,Y%6,W%7,H%8)</source>
@@ -884,11 +888,11 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>E/W:</source>
-        <translation>E/W:</translation>
+        <translation>X:</translation>
     </message>
     <message>
         <source>N/S:</source>
-        <translation>N/S:</translation>
+        <translation>Y:</translation>
     </message>
     <message>
         <source>Thickness</source>
@@ -896,7 +900,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Link</source>
-        <translation>Verbinden</translation>
+        <translation>Seitenverhältnis festlegen</translation>
     </message>
 </context>
 <context>
@@ -987,7 +991,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Join Vectors</source>
-        <translation>Vectoren vereinen</translation>
+        <translation>Vectoren verbinden</translation>
     </message>
     <message>
         <source>Mode:</source>

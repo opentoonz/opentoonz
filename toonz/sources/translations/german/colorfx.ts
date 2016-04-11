@@ -5,11 +5,11 @@
     <name>ArtisticSolidColor</name>
     <message>
         <source>Irregular</source>
-        <translation>Unregelmäßig</translation>
+        <translation>Unregelmäßigkeit</translation>
     </message>
     <message>
         <source>Horiz Offset</source>
-        <translation>Horizontalter Offset</translation>
+        <translation>Horizontaler Offset</translation>
     </message>
     <message>
         <source>Vert Offset</source>
@@ -28,7 +28,7 @@
     </message>
     <message>
         <source>Horiz Offset</source>
-        <translation>Horizontalter Offset</translation>
+        <translation>Horizontaler Offset</translation>
     </message>
     <message>
         <source>Vert Offset</source>
@@ -39,7 +39,7 @@
     <name>OutlineViewerStyle</name>
     <message>
         <source>OutlineViewer(OnlyDebug)</source>
-        <translation>UmrissBetrachter (NurDebug)</translation>
+        <translation>Umriss-Betrachter (Nur Debug)</translation>
     </message>
     <message>
         <source>Control Point</source>
@@ -104,7 +104,7 @@
     </message>
     <message>
         <source>Blur value</source>
-        <translation>Unschärfe-Wert</translation>
+        <translation>Schattierungsgrad</translation>
     </message>
 </context>
 <context>
@@ -384,8 +384,8 @@
 <context>
     <name>TLinGradFillStyle</name>
     <message>
-        <source>Linear Verlauf</source>
-        <translation>Linearer Verlauf</translation>
+        <source>Linear Gradient</source>
+        <translation>Linearer Gradient</translation>
     </message>
     <message>
         <source>Angle</source>
@@ -543,8 +543,8 @@
 <context>
     <name>TRadGradFillStyle</name>
     <message>
-        <source>Radial Verlauf</source>
-        <translation>Radialer Verlauf</translation>
+        <source>Radial Gradient</source>
+        <translation>Radialer Gradient</translation>
     </message>
     <message>
         <source>X Position</source>
