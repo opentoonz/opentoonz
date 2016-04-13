@@ -46,6 +46,8 @@
 
 #include <stack>
 
+#include <cmath>
+
 // For Qt translation support
 #include <QCoreApplication>
 
@@ -1722,7 +1724,7 @@ public:
 		/*--- 線分上にある全ての点でdoFillを行う ---*/
 		double dx = m_mousePosition.x - m_startPosition.x;
 		double dy = m_mousePosition.y - m_startPosition.y;
-		if (abs(dx) > abs(dy)) /*-- 横長の線分の場合 --*/
+		if (std::fabs(dx) > std::fabs(dy)) /*-- 横長の線分の場合 --*/
 		{
 			double k = dy / dx; /*-- 直線の傾き --*/
 			/*--- roundでは負値のときにうまく繋がらない ---*/
