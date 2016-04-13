@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="es" sourcelanguage="en">
+<TS version="2.1" language="es" sourcelanguage="en">
 <context>
     <name>ArrowToolOptionsBox</name>
     <message>
@@ -57,11 +57,11 @@
     </message>
     <message>
         <source>Center</source>
-        <translation>Centrar</translation>
+        <translation type="vanished">Centrar</translation>
     </message>
     <message>
         <source>Lock</source>
-        <translation>Bloquear</translation>
+        <translation type="vanished">Bloquear</translation>
     </message>
     <message>
         <source>(</source>
@@ -80,7 +80,7 @@
     <name>BrushTool</name>
     <message>
         <source>Thickness</source>
-        <translation>Grosor</translation>
+        <translation type="vanished">Grosor</translation>
     </message>
     <message>
         <source>Hardness:</source>
@@ -100,15 +100,15 @@
     </message>
     <message>
         <source>Break Sharp Angles</source>
-        <translation>Quebrar ángulos agudos</translation>
+        <translation type="vanished">Quebrar ángulos agudos</translation>
     </message>
     <message>
         <source>Pencil Mode</source>
-        <translation>Modo de la pluma</translation>
+        <translation type="vanished">Modo de la pluma</translation>
     </message>
     <message>
         <source>Pressure Sensitivity</source>
-        <translation>Sensibilidad a la presión</translation>
+        <translation type="vanished">Sensibilidad a la presión</translation>
     </message>
     <message>
         <source>Cap</source>
@@ -694,7 +694,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>The current column is not visible in Camera Stand.</source>
-        <translation>La columna actual no se encuentra visible en la vista de cámara.</translation>
+        <translation type="vanished">La columna actual no se encuentra visible en la vista de cámara.</translation>
     </message>
     <message>
         <source>It is not possible to edit the audio column.</source>
@@ -803,6 +803,10 @@ Do you want to proceed?</source>
     <message>
         <source>Transform Raster</source>
         <translation>Transformar imagen</translation>
+    </message>
+    <message>
+        <source>Set Save Box : (X%1,Y%2,W%3,H%4)-&gt;(X%5,Y%6,W%7,H%8)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
