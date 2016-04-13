@@ -803,6 +803,10 @@ Procedere?</translation>
         <source>Transform Raster</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Set Save Box : (X%1,Y%2,W%3,H%4)-&gt;(X%5,Y%6,W%7,H%8)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RGBPickerTool</name>

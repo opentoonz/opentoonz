@@ -1677,7 +1677,7 @@ For more information visit the %1 site:</source>
     </message>
     <message>
         <source>Toonz 7.1</source>
-        <translation>OpenToonz</translation>
+        <translation type="vanished">OpenToonz</translation>
     </message>
     <message>
         <source>The file name cannot be empty or contain any of the following characters: (new line) \ / : * ? &quot; |</source>
@@ -1844,6 +1844,10 @@ Are you sure?</source>
         <source>Set</source>
         <translation>設定</translation>
     </message>
+    <message>
+        <source>OpenToonz 1.0</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QPushButton</name>
@@ -1900,6 +1904,10 @@ Are you sure?</source>
     <message>
         <source>&amp;Schematic Toggle</source>
         <translation type="vanished">スキマティック切り替え</translation>
+    </message>
+    <message>
+        <source>&amp;Swtich output port display mode</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
