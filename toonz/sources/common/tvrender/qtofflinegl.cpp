@@ -105,22 +105,22 @@ void QtOfflineGL::createContext(TDimension rasterSize, const TOfflineGL::Imp *sh
 {
 	// Imposto il formato dei Pixel (pixelFormat)
 	/*
-	 32,                    // 32-bit color depth 
-	 0, 0, 0, 0, 0, 0,      // color bits ignored 
-	 8,                     // no alpha buffer 
-	 0,                     // shift bit ignored 
-	 0,                     // no accumulation buffer 
-	 0, 0, 0, 0,            // accum bits ignored 
-	 32,                    // 32-bit z-buffer 
-	 32,                    // max stencil buffer 
-	 0,                     // no auxiliary buffer 
-	 PFD_MAIN_PLANE,        // main layer 
-	 0,                     // reserved 
-	 0, 0, 0                // layer masks ignored 
+	 32,                    // 32-bit color depth
+	 0, 0, 0, 0, 0, 0,      // color bits ignored
+	 8,                     // no alpha buffer
+	 0,                     // shift bit ignored
+	 0,                     // no accumulation buffer
+	 0, 0, 0, 0,            // accum bits ignored
+	 32,                    // 32-bit z-buffer
+	 32,                    // max stencil buffer
+	 0,                     // no auxiliary buffer
+	 PFD_MAIN_PLANE,        // main layer
+	 0,                     // reserved
+	 0, 0, 0                // layer masks ignored
 
 	 ATTENZIONE !! SU MAC IL FORMATO E' DIVERSO (casomai possiamo mettere un ifdef)
 
-	 SPECIFICHE  MAC = depth_size 24, stencil_size 8, alpha_size 1 
+	 SPECIFICHE  MAC = depth_size 24, stencil_size 8, alpha_size 1
 
   */
 
@@ -153,29 +153,33 @@ void QtOfflineGL::createContext(TDimension rasterSize, const TOfflineGL::Imp *sh
   fmt.setDirectRendering(false);
 #endif
 #endif
-	/* FIXME: ここでいう QPixmap は Level Strip のセルに相当する. 
+	/* FIXME: ここでいう QPixmap は Level Strip のセルに相当する.
 	 QPixmap に GLContext を生成して bind できれば描画したベクタのラスタ画像がそこに反映されるはずだが
 	 QLContext の生成ができないためにうまくいかない.
    */
 	printf("QPixmap(%d, %d)\n", rasterSize.lx, rasterSize.ly);
-	//QPixmap *m_pixmap = new QPixmap(rasterSize.lx, rasterSize.ly);
 
-	// Inizializzo un contesto openGL utilizzando una QPixmap
-
-	m_context = new QOpenGLContext();
-	//m_context = new QGLContext(fmt);
+	QSurfaceFormat format;
+	format.setProfile(QSurfaceFormat::CompatibilityProfile);
 
 	m_surface = new QOffscreenSurface();
-	m_surface->setFormat(m_context->format());
-	//QSurfaceFormat sfmt = QGuiApplication::focusWindow()->format();
+	m_surface->setFormat(format);
 	m_surface->create();
 
+	m_context = new QOpenGLContext();
+	m_context->setFormat(format);
+	m_context->create();
+	m_context->makeCurrent(m_surface);
+
+	QOpenGLFramebufferObjectFormat fbo_format;
+	m_fbo = new QOpenGLFramebufferObject(rasterSize.lx, rasterSize.ly, fbo_format);
+	m_fbo->bind();
+
 	printf("create context:%p [thread:0x%x]\n", m_context, QThread::currentThreadId());
-	//m_context->setFormat(sfmt);
 
 	// Creo il contesto OpenGL - assicurandomi che sia effettivamente creato
 	// NOTA: Se il contesto non viene creato, di solito basta ritentare qualche volta.
-	bool ret = m_context->create();
+
 }
 //-----------------------------------------------------------------------------
 
@@ -223,14 +227,12 @@ void QtOfflineGL::getRaster(TRaster32P raster)
 	int ly = raster->getLy();
 
 	raster->lock();
-	glReadPixels(0, 0, lx, ly,
-				 GL_RGBA /*GL_BGRA_EXT*/, GL_UNSIGNED_BYTE,
-				 raster->getRawData());
+	raster->copy( TRaster32P(lx, ly, lx, (TPixelRGBM32 *)m_fbo->toImage().mirrored().bits(), false) );
 
 #ifdef WIN32
 	swapRedBlueChannels(raster->getRawData(), lx * ly);
 #elif MACOSX
-	rightRotateBits(raster->getRawData(), lx * ly);
+	//rightRotateBits(raster->getRawData(), lx * ly);
 #endif
 	raster->unlock();
 }
@@ -267,22 +269,22 @@ void QtOfflineGLPBuffer::createContext(TDimension rasterSize)
 {
 	// Imposto il formato dei Pixel (pixelFormat)
 	/*
-      32,                    // 32-bit color depth 
-      0, 0, 0, 0, 0, 0,      // color bits ignored 
-      8,                     // no alpha buffer 
-      0,                     // shift bit ignored 
-      0,                     // no accumulation buffer 
-      0, 0, 0, 0,            // accum bits ignored 
-      32,                    // 32-bit z-buffer 
-      32,                    // max stencil buffer 
-      0,                     // no auxiliary buffer 
-      PFD_MAIN_PLANE,        // main layer 
-      0,                     // reserved 
-      0, 0, 0                // layer masks ignored 
-      
+      32,                    // 32-bit color depth
+      0, 0, 0, 0, 0, 0,      // color bits ignored
+      8,                     // no alpha buffer
+      0,                     // shift bit ignored
+      0,                     // no accumulation buffer
+      0, 0, 0, 0,            // accum bits ignored
+      32,                    // 32-bit z-buffer
+      32,                    // max stencil buffer
+      0,                     // no auxiliary buffer
+      PFD_MAIN_PLANE,        // main layer
+      0,                     // reserved
+      0, 0, 0                // layer masks ignored
+
       ATTENZIONE !! SU MAC IL FORMATO E' DIVERSO (casomai possiamo mettere un ifdef)
 
-      SPECIFICHE  MAC = depth_size 24, stencil_size 8, alpha_size 1 
+      SPECIFICHE  MAC = depth_size 24, stencil_size 8, alpha_size 1
 
     */
 

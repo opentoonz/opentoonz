@@ -7,6 +7,7 @@
 #include <QGLFormat>
 #include <QGLContext>
 #include <QGLPixelBuffer>
+#include <QOpenGLFramebufferObject>
 
 #include "tofflinegl.h"
 
@@ -16,6 +17,8 @@ public:
 	QOpenGLContext *m_context;
 	QOpenGLContext *m_oldContext;
 	QOffscreenSurface *m_surface;
+        QOpenGLFramebufferObject *m_fbo;
+
 
 	QtOfflineGL(TDimension rasterSize, const TOfflineGL::Imp *shared = 0);
 	~QtOfflineGL();
