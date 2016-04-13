@@ -150,7 +150,7 @@ void Ruler::compute()
 	// and m_labelPeriod (number of ticks between two adjacent labels)
 
 	// the distance (world units) between two labels must be >= minLabelWorldDistance
-	const double absUnit = abs(m_unit);
+	const double absUnit = std::abs(m_unit);
 	const double minLabelWorldDistance = m_minLabelDistance / absUnit;
 	const double minWorldDistance = m_minDistance / absUnit;
 
@@ -363,7 +363,7 @@ int FunctionPanel::getCurveDistance(TDoubleParam *curve, const QPoint &winPos)
 	double frame = xToFrame(winPos.x());
 	double value = curve->getValue(frame);
 	double curveY = valueToY(curve, value);
-	return abs(curveY - winPos.y());
+	return std::abs(curveY - winPos.y());
 }
 
 //-----------------------------------------------------------------------------
@@ -1308,7 +1308,7 @@ void FunctionPanel::mouseMoveEvent(QMouseEvent *e)
 		}
 
 		double currentFrame = m_frameHandle ? m_frameHandle->getFrame() : 0;
-		if (m_highlighted.handle == None && abs(e->pos().x() - frameToX(currentFrame)) < 5)
+		if (m_highlighted.handle == None && std::abs(e->pos().x() - frameToX(currentFrame)) < 5)
 			m_currentFrameStatus = 1;
 		else
 			m_currentFrameStatus = 0;

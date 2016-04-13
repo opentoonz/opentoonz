@@ -135,9 +135,9 @@ set(MOC_HEADERS
     xsheetviewer.h
     xshnoteviewer.h
     xshrowviewer.h
-	comboviewerpane.h
-	historypane.h
-	cleanupsettingspane.h
+    comboviewerpane.h
+    historypane.h
+    cleanupsettingspane.h
 # Tracker file
     dummyprocessor.h
     metnum.h
@@ -292,9 +292,9 @@ set(SOURCES
     selectionutils.cpp
     antialiaspopup.cpp
     mergecmapped.cpp
-	comboviewerpane.cpp
-	historypane.cpp
-	cleanupsettingspane.cpp
+    comboviewerpane.cpp
+    historypane.cpp
+    cleanupsettingspane.cpp
 # Tracker file
     dummyprocessor.cpp
     metnum.cpp
@@ -324,7 +324,7 @@ endif()
 qt5_wrap_cpp(SOURCES ${MOC_HEADERS})
 
 if(WIN32)
-    add_executable(OpenToonz_${VERSION} WIN32 ${HEADERS} ${SOURCES} ${OBJCSOURCES} ${RC_FILE})
+    add_executable(OpenToonz_${VERSION} WIN32 ${HEADERS} ${SOURCES} ${OBJCSOURCES} ${RESOURCES} ${RC_FILE})
 else()
     set(MACOSX_BUNDLE_ICON_FILE "OpenToonz.icns")
     set_source_files_properties(OpenToonz.icns PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
@@ -381,9 +381,9 @@ elseif(UNIX)
     target_link_libraries(OpenToonz_${VERSION} Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml Qt5::Script Qt5::Widgets Qt5::PrintSupport ${GL_LIB} ${GLUT_LIB} ${GLU_LIB} ${EXTRA_LIBS})
 endif()
 
-if (APPLE OR UNIX)
-	# CMAKE_RUNTIME_OUTPUT_DIRECTORY should be equivalent to usage on windows despite empty
-	# OSX だと CMAKE_RUNTIME_OUTPUT_DIRECTORY が空だが Windows 版と同じ使い方ができるようにしておく
+if (APPLE)
+    # CMAKE_RUNTIME_OUTPUT_DIRECTORY should be equivalent to usage on windows despite empty
+    # OSX だと CMAKE_RUNTIME_OUTPUT_DIRECTORY が空だが Windows 版と同じ使い方ができるようにしておく
     get_target_property(bin OpenToonz_${VERSION} LOCATION)
     get_filename_component(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${bin} DIRECTORY)
 endif()
@@ -403,18 +403,18 @@ if (APPLE)
         add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND cp ${lib} ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz_${VERSION}.app/Contents/MacOS/)
     endforeach ()
 
-  	add_custom_command(TARGET OpenToonz_${VERSION}
-		POST_BUILD COMMAND
-	    ${CMAKE_INSTALL_NAME_TOOL} -add_rpath @executable_path/. ${bin})
-  	add_custom_command(TARGET OpenToonz_${VERSION}
-		POST_BUILD COMMAND
-	    ${CMAKE_INSTALL_NAME_TOOL} -add_rpath ${CMAKE_INSTALL_RPATH} ${bin})
-	add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz_${VERSION}.app/Contents/Resources)
+    add_custom_command(TARGET OpenToonz_${VERSION}
+        POST_BUILD COMMAND
+        ${CMAKE_INSTALL_NAME_TOOL} -add_rpath @executable_path/. ${bin})
+    add_custom_command(TARGET OpenToonz_${VERSION}
+        POST_BUILD COMMAND
+        ${CMAKE_INSTALL_NAME_TOOL} -add_rpath ${CMAKE_INSTALL_RPATH} ${bin})
+    add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz_${VERSION}.app/Contents/Resources)
 
-	add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz_${VERSION}.app/Contents/Resources)
-	add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/qss)
+    add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz_${VERSION}.app/Contents/Resources)
+    add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/qss)
 
-	add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ../../install/SystemVar.ini ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz_${VERSION}.app/Contents/Resources)
+    add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ../../install/SystemVar.ini ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz_${VERSION}.app/Contents/Resources)
 
 
 endif (APPLE)

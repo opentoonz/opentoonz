@@ -825,7 +825,7 @@ void IKTool::initEngine(const TPointD &pos)
 				Skeleton::Bone *next = m_skeleton->getBoneByColumnIndex(*it++);
 				for (; it != links.end(); ++it)
 					stack.push_back(std::make_pair(*it, prev));
-				if (links.size() > 1 || prev && next && prev->getParent() == bone && next->getParent() == bone) {
+				if (links.size() > 1 || (prev && next && (prev->getParent() == bone && next->getParent() == bone))) {
 					bone = next;
 				} else {
 					m_joints.push_back(Joint(bone, prev, sign));

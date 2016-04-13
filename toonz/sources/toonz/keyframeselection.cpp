@@ -48,7 +48,7 @@ bool shiftKeyframesWithoutUndo(int r0, int r1, int c0, int c1, bool cut)
 		return false;
 	TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
 	bool isShifted = false;
-	int x, y;
+	int x;
 	for (x = c0; x <= c1; x++) {
 		TStageObject *stObj = xsh->getStageObject(x >= 0 ? TStageObjectId::ColumnId(x) : TStageObjectId::CameraId(0));
 		std::set<int> keyToShift;

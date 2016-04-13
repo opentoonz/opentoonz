@@ -3851,36 +3851,31 @@ TThickCubic *TCubicStroke::generateCubic3D(const T3DPointD pointsArrayBegin[],
 										   const T3DPointD &tangentLeft,
 										   const T3DPointD &tangentRight)
 {
-	// estendere a dim = 3 (cioe' +thik...)
-	typedef T3DPointD TwoPoints[2];
-
-	TwoPoints *A = new TwoPoints[size];
-
 	double X[2], C[2][2];
 	int i;
 
 	T3DPointD p0 = *pointsArrayBegin;
 	T3DPointD p3 = *(pointsArrayBegin + size - 1);
 
-	for (i = 0; i < size; i++) {
-		A[i][0] = tangentLeft * B1(uPrime[i]);
-		A[i][1] = tangentRight * B2(uPrime[i]);
-	}
-
 	C[0][0] = C[0][1] = X[0] = 0;
 	C[1][0] = C[1][1] = X[1] = 0;
 
 	for (i = 0; i < size; i++) {
-		C[0][0] += A[i][0] * A[i][0];
-		C[0][1] += A[i][0] * A[i][1];
-		C[1][1] += A[i][1] * A[i][1];
+		const T3DPointD A[2] = {
+			tangentLeft  * B1(uPrime[i]),
+			tangentRight * B2(uPrime[i]),
+		};
+
+		C[0][0] += A[0] * A[0];
+		C[0][1] += A[0] * A[1];
+		C[1][1] += A[1] * A[1];
 
 		C[1][0] = C[0][1];
 
 		T3DPointD tmp = *(pointsArrayBegin + i) - (B0plusB1(uPrime[i]) * p0) +
 						B2plusB3(uPrime[i]) * p3;
-		X[0] += A[i][0] * tmp;
-		X[1] += A[i][1] * tmp;
+		X[0] += A[0] * tmp;
+		X[1] += A[1] * tmp;
 	}
 
 	double detC0C1 = C[0][0] * C[1][1] - C[0][1] * C[1][0];
@@ -3968,8 +3963,6 @@ TThickCubic *TCubicStroke::generateCubic3D(const T3DPointD pointsArrayBegin[],
 											  TThickPoint(p1.x, p1.y, p1.z),
 											  TThickPoint(p2.x, p2.y, p2.z),
 											  TThickPoint(p3.x, p3.y, p3.z));
-
-	delete[] A;
 
 	return thickCubic;
 }

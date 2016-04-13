@@ -2096,7 +2096,6 @@ Slider_int::Slider_int(QWidget *parent, QString name, TIntParamP const &param)
 
 	int minvalue;
 	int maxvalue;
-	int valuestep;
 	if (param->getValueRange(minvalue, maxvalue)) {
 		value_->setRange(minvalue, maxvalue);
 	} else {
@@ -2155,7 +2154,6 @@ SpinBox_int::SpinBox_int(QWidget *parent, QString name, TIntParamP const &param)
 
 	int minvalue;
 	int maxvalue;
-	int valuestep;
 	if (param->getValueRange(minvalue, maxvalue)) {
 		value_->setRange(minvalue, maxvalue);
 	} else {

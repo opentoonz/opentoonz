@@ -368,7 +368,7 @@ static int get_param(toonz_node_handle_t node, const char *name, toonz_param_han
 			printf("get_param: invalid type");
 			return TOONZ_ERROR_NOT_FOUND;
 		}
-	} catch (const std::exception &e) {
+	} catch (const std::exception&) {
 	}
 	return TOONZ_OK;
 }

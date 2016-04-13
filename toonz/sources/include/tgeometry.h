@@ -885,7 +885,7 @@ template <>
 inline TRectT<double>::TRectT(const TDimensionT<double> &d)
 	: x0(0.0), y0(0.0), x1(d.lx), y1(d.ly){};
 template <>
-inline bool TRectT<double>::isEmpty() const { return x0 == x1 && y0 == y1 || x0 > x1 || y0 > y1; }
+inline bool TRectT<double>::isEmpty() const { return (x0 == x1 && y0 == y1) || x0 > x1 || y0 > y1; }
 template <>
 inline void TRectT<double>::empty() { x0 = y0 = x1 = y1 = 0; }
 template <>

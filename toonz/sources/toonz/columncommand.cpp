@@ -1245,7 +1245,6 @@ public:
 	void undo() const
 	{
 		TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
-		int r0, r1;
 		for (int i = 0; i < (int)m_oldFrames.size(); i++) {
 			xsh->setCell(m_r0 + i, m_col, m_oldFrames[i]);
 		}

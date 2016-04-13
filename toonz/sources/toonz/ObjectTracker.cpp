@@ -598,9 +598,6 @@ float CObjectTracker::Matching(TRaster32P *frame, TRaster32P *frame_temp)
 	float dist = 0.0;
 	float min_dist = MAX_FLOAT;
 
-	ValuePixel pixelValues_temp;
-	ValuePixel pixelValues;
-
 	ValuePixel *pixel_temp;
 	ValuePixel *area_ricerca;
 

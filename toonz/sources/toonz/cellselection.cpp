@@ -994,7 +994,6 @@ public:
 	void undo() const
 	{
 		int cellsToRemove = m_frameIds.size();
-		int i;
 		m_xsheet->removeCells(m_r0, m_c0, cellsToRemove);
 		TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
 	}

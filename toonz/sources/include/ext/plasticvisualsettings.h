@@ -33,4 +33,4 @@ public:
 		: m_applyPlasticDeformation(true), m_showOriginalColumn(), m_drawMeshesWireframe(true), m_drawRigidity(false), m_drawSO(false) {}
 };
 
-#endif PLASTICVISUALSETTINGS_H
+#endif //PLASTICVISUALSETTINGS_H

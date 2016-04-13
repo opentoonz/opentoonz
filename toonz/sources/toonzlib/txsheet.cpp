@@ -939,7 +939,6 @@ int TXsheet::reframeCells(int r0, int r1, int col, int type)
 		removeCells(r0 + nrows, col, nr - nrows);
 	}
 
-	int k;
 	for (int i = r0, k = 0; i < r0 + nrows; k++) {
 		for (int i1 = 0; i1 < type; i1++) {
 			if (cells[k].isEmpty())

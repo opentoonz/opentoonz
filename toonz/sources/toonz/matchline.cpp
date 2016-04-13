@@ -881,7 +881,6 @@ QString indexes2string(const set<TFrameId> fids)
 		return "";
 
 	QString str;
-	int i;
 
 	set<TFrameId>::const_iterator it = fids.begin();
 

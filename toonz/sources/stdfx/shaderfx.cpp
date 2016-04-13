@@ -837,9 +837,6 @@ void ShaderFx::getInputData(const TRectD &rect, double frame, const TRenderSetti
 		auto conv = [](const std::string &i) { return i.c_str(); };
 		std::transform(varyingStrings.begin(), varyingStrings.end(), varyingNames.begin(), conv);
 #else
-		tcg::function<const char *(std::string::*)() const,
-					  &std::string::c_str> c_str;
-
 		std::vector<const GLchar *> varyingNames(
 			boost::make_transform_iterator(varyingStrings.begin(), std::mem_fun_ref(&std::string::c_str)),
 			boost::make_transform_iterator(varyingStrings.end(), std::mem_fun_ref(&std::string::c_str)));

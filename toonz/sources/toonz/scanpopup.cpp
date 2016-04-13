@@ -112,7 +112,7 @@ bool defineScanner(const QString &scannerType)
 
 	ret = true;
 
-end:
+//end:
 	QApplication::restoreOverrideCursor();
 	return ret;
 }

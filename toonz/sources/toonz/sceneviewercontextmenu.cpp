@@ -201,8 +201,6 @@ void SceneViewerContextMenu::addEnterGroupCommands(const TPointD &pos)
 	if (!vi)
 		return;
 
-	QAction *action;
-
 	if (vi->isInsideGroup() > 0) {
 		addAction(CommandManager::instance()->getAction(MI_ExitGroup));
 	}

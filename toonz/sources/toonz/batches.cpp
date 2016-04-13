@@ -246,7 +246,7 @@ void TaskRunner::doRun(TFarmTask *task)
 		return;
 	}
 
-	int exitCode;
+	//int exitCode;
 
 	/*QString commandline = task->getCommandLine();
   
@@ -346,7 +346,7 @@ void BatchesController::addCleanupTask(const TFilePath &taskFilePath)
 
 	try {
 		BatchesController::instance()->addTask(id, taskGroup);
-	} catch (TException &e) {
+	} catch (TException&) {
 	}
 }
 
@@ -423,7 +423,7 @@ void BatchesController::addComposerTask(const TFilePath &_taskFilePath)
 
 	try {
 		BatchesController::instance()->addTask(id, taskGroup);
-	} catch (TException &e) {
+	} catch (TException&) {
 		//TMessage::error(toString(e.getMessage()));
 	}
 	//m_data->m_scene.setProject( mainprogramProj);

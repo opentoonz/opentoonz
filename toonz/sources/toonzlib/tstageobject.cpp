@@ -1925,11 +1925,11 @@ void TStageObject::loadData(TIStream &is)
 	if (tnzVersion < VersionNumber(1, 16) && !keyframes.empty()) {
 		std::map<int, TStageObject::Keyframe>::iterator itKf = keyframes.begin();
 		std::set<int> keyframeIndexSet;
-		for (itKf; itKf != keyframes.end(); itKf++)
+		for (; itKf != keyframes.end(); itKf++)
 			if (is52FullKeyframe(itKf->first))
 				keyframeIndexSet.insert(itKf->first);
 		std::set<int>::iterator itKfInd = keyframeIndexSet.begin();
-		for (itKfInd; itKfInd != keyframeIndexSet.end(); itKfInd++)
+		for (; itKfInd != keyframeIndexSet.end(); itKfInd++)
 			setkey(m_scale, *itKfInd);
 	}
 	updateKeyframes();

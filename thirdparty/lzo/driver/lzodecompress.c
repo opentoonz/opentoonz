@@ -17,6 +17,10 @@
 
 #include <stdio.h>
 #include <fcntl.h>
+#include <stdlib.h>
+#if defined(_WIN32)
+#include <io.h>
+#endif
 
 int main(int argc, char *argv[])
 {

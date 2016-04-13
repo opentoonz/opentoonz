@@ -382,10 +382,10 @@ void MoveHandleDragTool::drag(QMouseEvent *e)
 	if (m_nSpeed != QPointF(0, 0)) {
 		QPointF delta = posF - p0;
 		posF -= m_nSpeed * (delta.x() * m_nSpeed.x() + delta.y() * m_nSpeed.y());
-		if (m_handle == FunctionPanel::SpeedIn && posF.x() > p0.x() || m_handle == FunctionPanel::SpeedOut && posF.x() < p0.x())
+		if ((m_handle == FunctionPanel::SpeedIn && posF.x() > p0.x()) || (m_handle == FunctionPanel::SpeedOut && posF.x() < p0.x()))
 			posF = p0;
 	} else {
-		if (m_handle == FunctionPanel::SpeedIn && posF.x() > p0.x() || m_handle == FunctionPanel::SpeedOut && posF.x() < p0.x())
+		if ((m_handle == FunctionPanel::SpeedIn && posF.x() > p0.x()) || (m_handle == FunctionPanel::SpeedOut && posF.x() < p0.x()))
 			posF.setX(p0.x());
 	}
 

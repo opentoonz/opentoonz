@@ -396,11 +396,12 @@ int intersect(const TQuadratic &q,
 		return 0;
 	}
 
-	if (q.getP2() - q.getP1() == q.getP1() - q.getP0()) //pure il secondo e' unsegmento....
+	if (q.getP2() - q.getP1() == q.getP1() - q.getP0()) {//pure il secondo e' unsegmento....
 		if (firstIsQuad)
 			return intersect(TSegment(q.getP0(), q.getP2()), s, intersections);
 		else
 			return intersect(s, TSegment(q.getP0(), q.getP2()), intersections);
+	}
 
 	vector<TPointD> bez, pol;
 	bez.push_back(q.getP0());

@@ -516,9 +516,11 @@ void Particle::get_image_gravity(TTile *ctrl1, const particles_values &values,
 	int radius = 4;
 	gx = 0;
 	gy = 0;
-	int i;
-	raster32->lock();
 //#define OLDSTUFF
+#ifdef OLDSTUFF
+	int i;
+#endif
+	raster32->lock();
 #ifdef OLDSTUFF
 	if (!values.gravity_radius_val) {
 		radius = 4;

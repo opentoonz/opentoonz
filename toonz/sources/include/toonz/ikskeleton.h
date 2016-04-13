@@ -89,4 +89,4 @@ private:
 	void computeSkeleton(IKNode *);
 };
 
-#endif IKSKELETON_H
+#endif //IKSKELETON_H

@@ -1,3 +1,4 @@
+
 # Setting Up the Development Environment on MacOSX
 
 ## Necessary Software
@@ -15,19 +16,26 @@
 
 ## Building on MacOSX
 
-### Using brew to Install Necessary Packages
+### 0. Install Qt
+
+### 1. Install Dependent Packages
+
+With homebrew, you can install them with following command.
 
 ```
-$ brew install glew lz4 libjpeg libpng lzo pkg-config
+$ brew install glew lz4 libjpeg libpng lzo pkg-config libusb
 ```
 
-### Cloning the Repository
+Or, you should build and install them manually.
+
+
+### 2. Clone the Repository
 
 ```
 $ git clone https://github.com/opentoonz/opentoonz
 ```
 
-### (Optional) Creating the stuff Directory
+### (Optional) Create the stuff Directory
 
 If the directory `/Applications/OpenToonz/OpenToonz_1.0_stuff` does not exist, enter the following command:
 
@@ -35,14 +43,14 @@ If the directory `/Applications/OpenToonz/OpenToonz_1.0_stuff` does not exist, e
 $ sudo cp -r opentoonz/stuff /Applications/OpenToonz/OpenToonz_1.0_stuff
 ```
 
-### Building tiff in thirdparty
+### 3. Build tiff in thirdparty
 
 ```
 $ cd opentoonz/thirdparty/tiff-4.0.3
 $ ./configure && make
 ```
 
-### Installing boost to thirdpaty
+### 4. Put Boost library into thirdpaty directory
 The following assumes `boost_1_55_0.tar.bz2` was downloaded to `~/Downloads`.
 
 ```
@@ -51,13 +59,13 @@ $ mv ~/Downloads/boost_1_55_0.tar.bz2 .
 $ tar xjvf boost_1_55_0.tar.bz2
 ```
 
-### Building Everything Together
+### 5. Build Everything Together
 
 ```
 $ cd ../../toonz
 $ mkdir build
 $ cd build
-$ cmake ../sources
+  CMAKE_PREFIX_PATH=~/Qt5.5.1/5.5/clang_64 cmake ../sources
 $ make
 ```
 

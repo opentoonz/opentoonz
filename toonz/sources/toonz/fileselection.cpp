@@ -572,7 +572,7 @@ int importScene(TFilePath scenePath)
 
 	try {
 		scene.save(scene.getScenePath());
-	} catch (TException &e) {
+	} catch (TException&) {
 		MsgBox(CRITICAL, QObject::tr("There was an error saving the %1 scene.").arg(toQString(scenePath)));
 		return 0;
 	}

@@ -290,7 +290,7 @@ void RenderController::generateMovie(TFilePath outPath, bool emitSignal)
 			scene.load(fp);
 			try {
 				movieGenerator.addSoundtrack(scene, frameOffset, sceneFrames);
-			} catch (const TException &e) {
+			} catch (const TException&) {
 				QString text = tr("The %1 scene contains an audio file with different characteristics from the one used in the first exported scene.\nThe audio file will not be included in the rendered clip.").arg(QString::fromStdWString(fp.getLevelNameW()));
 				DVGui::MsgBox(DVGui::WARNING, text);
 			}

@@ -590,8 +590,8 @@ void FunctionSelection::doCut()
 				if (i + 1 < n && kk.contains(i + 1) && !cellsSelection)
 					delta += curve->keyframeIndexToFrame(i) - curve->keyframeIndexToFrame(i + 1);
 			} else {
-				if (cellsSelection && bottomRow <= curve->keyframeIndexToFrame(i) ||
-					!cellsSelection && delta != 0)
+				if ((cellsSelection && bottomRow <= curve->keyframeIndexToFrame(i)) ||
+					(!cellsSelection && delta != 0))
 					moveUndo->addMovement(curve, j, delta);
 				j++;
 			}

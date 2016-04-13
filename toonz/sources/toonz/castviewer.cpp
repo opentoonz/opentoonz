@@ -822,8 +822,6 @@ QMenu *CastBrowser::getContextMenu(QWidget *parent, int index)
 
 void CastBrowser::expose()
 {
-	int i;
-
 	std::set<int> selectedIndices = m_itemViewer->getPanel()->getSelectedIndices();
 	std::set<int>::iterator it = selectedIndices.begin();
 	TUndoManager::manager()->beginBlock();

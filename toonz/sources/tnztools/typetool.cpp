@@ -1218,13 +1218,14 @@ void TypeTool::leftButtonDown(const TPointD &pos, const TMouseEvent &)
 	if (!vi && !ti)
 		return;
 
-	if (m_isFrameCreated)
+	if (m_isFrameCreated) {
 		if (vi)
 			m_undo = new UndoTypeTool(0, 0, getApplication()->getCurrentLevel()->getSimpleLevel(),
 									  getCurrentFid(), m_isFrameCreated, m_isLevelCreated);
 		else
 			m_undo = new RasterUndoTypeTool(0, 0, getApplication()->getCurrentLevel()->getSimpleLevel(),
 											getCurrentFid(), m_isFrameCreated, m_isLevelCreated);
+	}
 
 	//  closeImeWindow();
 	//  if(m_viewer) m_viewer->enableIme(true);

@@ -736,4 +736,4 @@ private:
 	static const double BaseMaxTargetDist;
 };
 
-#endif JACOBIAN_H
+#endif //JACOBIAN_H

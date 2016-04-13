@@ -549,7 +549,6 @@ float Iwa_Particle::get_image_gravity(TTile *ctrl1, const particles_values &valu
 
 	float norm = 1.0f;
 
-	int i;
 	if (raster32) {
 		raster32->lock();
 		if (raster32 &&

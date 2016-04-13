@@ -313,7 +313,7 @@ public:
 			(m_cellsMover.getQualifiers() & CellsMover::eOverwriteCells) == 0)
 			m_cellsMover.undoMoveCells(m_cellsMover.getStartPos());
 		if (m_cellsMover.getQualifiers() & CellsMover::eOverwriteCells) { //rimuove le celle vecchie
-			int c, r, ra = m_cellsMover.getStartPos().y, rowCount = m_cellsMover.getRowCount();
+			int c, ra = m_cellsMover.getStartPos().y, rowCount = m_cellsMover.getRowCount();
 			TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
 			for (c = ca; c < ca + colCount; c++)
 				xsh->clearCells(ra, c, rowCount);

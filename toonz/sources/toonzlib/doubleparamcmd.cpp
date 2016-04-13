@@ -250,14 +250,14 @@ void KeyframeSetter::getRotatingSpeedHandles(
 		}
 	}
 	// SpeedInOut * Linear *
-	if (ty[0] == 2 && ty[1] == 1 || ty[1] == 2 && ty[2] == 1) {
+	if ((ty[0] == 2 && ty[1] == 1) || (ty[1] == 2 && ty[2] == 1)) {
 		int k = ty[1] == 1 ? kIndex - 1 : kIndex;
 		double speed = getNorm(param->getSpeedIn(k));
 		if (speed > epsilon)
 			rotatingSpeeds.push_back(std::make_pair(-speed, k));
 	}
 	// * Linear * SpeedInOut
-	if (ty[1] == 1 && ty[2] == 2 || ty[2] == 1 && ty[3] == 2) {
+	if ((ty[1] == 1 && ty[2] == 2) || (ty[2] == 1 && ty[3] == 2)) {
 		int k = ty[2] == 2 ? kIndex : kIndex + 1;
 		double speed = getNorm(param->getSpeedOut(k));
 		if (speed > epsilon)
@@ -623,7 +623,7 @@ void KeyframeSetter::setSpeedIn(const TPointD &speedIn)
 		double outNorm = getNorm(m_keyframe.m_speedOut);
 		if (m_kIndex + 1 == m_param->getKeyframeCount() ||
 			isSpeedInOut(m_kIndex) ||
-			m_keyframe.m_type == TDoubleKeyframe::Expression && m_keyframe.m_expressionText.find("cycle") != string::npos) {
+			(m_keyframe.m_type == TDoubleKeyframe::Expression && m_keyframe.m_expressionText.find("cycle") != string::npos)) {
 			// update next segment speed vector
 			double inNorm = getNorm(m_keyframe.m_speedIn);
 			if (inNorm < eps)

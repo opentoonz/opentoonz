@@ -3,7 +3,7 @@ project(OpenToonz)
 
 get_filename_component(SDKROOT ../../thirdparty/ ABSOLUTE)
 message("SDK Root:" ${SDKROOT})
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake")
 if(APPLE)
     set(THIRDPARTY_LIBS_HINTS "/usr/local/Cellar/" "/opt/include" ${SDKROOT})
 elseif(WIN32 OR UNIX)

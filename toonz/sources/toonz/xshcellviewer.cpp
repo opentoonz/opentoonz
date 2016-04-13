@@ -1788,7 +1788,6 @@ void CellArea::contextMenuEvent(QContextMenuEvent *event)
 	int y1 = m_viewer->rowToY(row) - 1;
 	int x = pos.x - x0;
 	TStageObject *pegbar = xsh->getStageObject(m_viewer->getObjectId(col));
-	int k0, k1;
 	int r0, r1, c0, c1;
 	if (col >= 0)
 		m_viewer->getCellSelection()->getSelectedCells(r0, c0, r1, c1);

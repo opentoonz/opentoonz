@@ -277,7 +277,6 @@ AdjustLevelsPopup::AdjustLevelsPopup()
 
 	//------------------------- Mark Bars ---------------------------
 
-	MarksBar *histogramMarksBar, *colorBarMarksBar;
 	QVBoxLayout *histogramViewLayout;
 
 	for (i = 0; i < 5; ++i) {

@@ -83,7 +83,6 @@ void TasksViewer::hideEvent(QHideEvent *)
 
 QWidget *TasksViewer::createToolBar()
 {
-	QAction *action;
 	//Create toolbar. It is an horizontal layout with three internal toolbar.
 	QWidget *toolBarWidget = new QWidget(this);
 	QToolBar *cmdToolbar = new QToolBar(toolBarWidget);

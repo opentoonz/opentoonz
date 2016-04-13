@@ -98,4 +98,4 @@ private:
 	bool freezed; // Se vero l'angolo è blocccato
 };
 
-#endif IKNODE_H
+#endif //IKNODE_H

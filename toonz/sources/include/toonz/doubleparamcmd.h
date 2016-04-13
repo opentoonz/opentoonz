@@ -109,4 +109,4 @@ public:
 	static void enableCycle(TDoubleParam *curve, bool enabled);
 };
 
-#endif;
+#endif
