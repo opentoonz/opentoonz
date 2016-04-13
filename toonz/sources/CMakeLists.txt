@@ -14,7 +14,13 @@ message("Thirdpary Library Search path:" ${THIRDPARTY_LIBS_HINTS})
 
 if (WIN32)
     message("Windows System")
-    set(QT_PATH "C:/Qt/Qt5.5.1/5.5/msvc2013_64" CACHE PATH "Qt instlattion directory")
+    if(NOT QT_PATH)
+        if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+            set(QT_PATH "C:/Qt/Qt5.5.1_32/5.5/msvc2013")
+        else()
+            set(QT_PATH "C:/Qt/Qt5.5.1/5.5/msvc2013_64")
+        endif()
+    endif()
     if(NOT EXISTS ${QT_PATH})
         message("Specify QT_PATH properly")
         return()
@@ -221,9 +227,9 @@ function(add_translation module)
 
     qt5_create_translation(message ${translation} ${ARGN})
 
-    add_custom_target("translation_${module}" DEPENDS ${message})
-    set_target_properties("translation_${module}" PROPERTIES
-        EXCLUDE_FROM_DEFAULT_BUILD TRUE)
+    add_custom_target("translation_${module}" ALL DEPENDS ${message})
+#    set_target_properties("translation_${module}" PROPERTIES
+#        EXCLUDE_FROM_DEFAULT_BUILD TRUE)
 endfunction()
 
 add_subdirectory(tnzcore)
