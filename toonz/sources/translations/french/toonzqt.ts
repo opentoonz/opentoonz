@@ -1661,7 +1661,7 @@ Pour plus d&apos;informations visitez le site %1:</translation>
     </message>
     <message>
         <source>Toonz 7.1</source>
-        <translation>Toonz 7.1</translation>
+        <translation type="vanished">Toonz 7.1</translation>
     </message>
     <message>
         <source>The file name cannot be empty or contain any of the following characters: (new line) \ / : * ? &quot; |</source>
@@ -1826,6 +1826,10 @@ Are you sure?</source>
         <source>Set</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>OpenToonz 1.0</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QPushButton</name>
@@ -1882,6 +1886,10 @@ Are you sure?</source>
     <message>
         <source>&amp;Schematic Toggle</source>
         <translation type="vanished">&amp;Toggle du Schématique</translation>
+    </message>
+    <message>
+        <source>&amp;Swtich output port display mode</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

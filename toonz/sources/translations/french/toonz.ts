@@ -4205,6 +4205,26 @@ Voulez-vous le créer?</translation>
         <source>Type - Polyline</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>About OpenToonz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished">Fermer</translation>
+    </message>
+    <message>
+        <source>&amp;ComboViewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;About OpenToonz...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MatchlinesDialog</name>
@@ -5180,10 +5200,6 @@ Que voulez-vous faire?</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Replace Level after SaveLevelAs command</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>* Changes will take effect the next time you run Toonz</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5305,6 +5321,58 @@ Que voulez-vous faire?</translation>
     </message>
     <message>
         <source>Paint Color:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Replace Toonz Level after SaveLevelAs command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mouse Cursor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Viewer Center</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On Demand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Icons</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Icons &amp; Images</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>At Once</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pick Every Colors as Different Styles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Integrate Similar Colors as One Style</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Xsheet as Animation Sheet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Palette Type on Loading Raster Image as Color Model</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6711,7 +6779,7 @@ Are you sure to </source>
     </message>
     <message>
         <source>Palette Gizmo</source>
-        <translation type="unfinished">Palette Gizmo</translation>
+        <translation type="obsolete">Palette Gizmo</translation>
     </message>
     <message>
         <source>Create Level %1  at Column %2</source>
@@ -6840,6 +6908,22 @@ Are you sure to </source>
     </message>
     <message>
         <source>Apply Matchline  : Column%1 &lt; Column%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Palette Gizmo  %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Palette is locked.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>History</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8320,6 +8404,10 @@ Attribuer à  &apos;3%&apos;?</translation>
     <message>
         <source>Level</source>
         <translation type="unfinished">Niveau</translation>
+    </message>
+    <message>
+        <source>Help</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
