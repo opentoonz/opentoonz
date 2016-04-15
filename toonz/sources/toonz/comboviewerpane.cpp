@@ -105,6 +105,16 @@ ComboViewerPanel::ComboViewerPanel(QWidget *parent, Qt::WFlags flags)
 	ImageUtils::FullScreenWidget *fsWidget = new ImageUtils::FullScreenWidget(this);
 	fsWidget->setWidget(m_sceneViewer = new SceneViewer(fsWidget));
 
+#ifdef Q_OS_WIN
+	//  Workaround for QTBUG-48288
+	//  This code should be removed after updating Qt.
+	//  Qt may crash in handling WM_SIZE of m_sceneViewer in splash.finish(&w)
+	//  in main.cpp. To suppress sending WM_SIZE, set window position here.
+	//  WM_SIZE will not be sent if window poistion is not changed.
+	::SetWindowPos(reinterpret_cast<HWND>(m_sceneViewer->winId()),
+		HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+#endif
+
 	m_vRuler = new Ruler(this, m_sceneViewer, true);
 	m_hRuler = new Ruler(this, m_sceneViewer, false);
 

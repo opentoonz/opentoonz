@@ -2,9 +2,7 @@
 
 #include "tscannerutil.h"
 
-#ifdef LINUX
 #include <cstring>
-#endif
 
 #define BUFBYTE(X, Y, BUF, BYTEWRAP, BITOFFS) \
 	(((UCHAR *)(BUF))[(((X) + (BITOFFS)) >> 3) + (Y) * (BYTEWRAP)])

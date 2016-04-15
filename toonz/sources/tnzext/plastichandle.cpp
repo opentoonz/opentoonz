@@ -18,9 +18,7 @@ using namespace tcg::bgl;
 
 #include "ext/plastichandle.h"
 
-#if defined(LINUX)
 #include <cstring>
-#endif
 
 //***********************************************************************************************
 //    Distance building

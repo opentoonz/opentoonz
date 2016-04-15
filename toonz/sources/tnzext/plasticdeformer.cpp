@@ -12,9 +12,7 @@
 
 #include "ext/plasticdeformer.h"
 
-#if defined(LINUX)
 #include <cstring>
-#endif
 
 /*! \file plasticdeformer.cpp
 

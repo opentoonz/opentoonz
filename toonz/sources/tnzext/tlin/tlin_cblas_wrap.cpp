@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <memory>
+#include <cstring>
 
 #if defined(LINUX)
 #include <cstring>

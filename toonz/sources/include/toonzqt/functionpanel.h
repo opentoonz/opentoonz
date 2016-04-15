@@ -8,6 +8,7 @@
 
 #include <QDialog>
 #include <set>
+#include <cmath>
 
 #undef DVAPI
 #undef DVVAR

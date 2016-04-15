@@ -15,7 +15,7 @@
 
 #include <set>
 
-#ifdef LINUX
+#if defined(LINUX)
 #include <typeinfo>
 #endif
 
