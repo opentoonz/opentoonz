@@ -153,11 +153,6 @@ void QtOfflineGL::createContext(TDimension rasterSize, const TOfflineGL::Imp *sh
   fmt.setDirectRendering(false);
 #endif
 #endif
-	/* FIXME: ここでいう QPixmap は Level Strip のセルに相当する.
-	 QPixmap に GLContext を生成して bind できれば描画したベクタのラスタ画像がそこに反映されるはずだが
-	 QLContext の生成ができないためにうまくいかない.
-   */
-	printf("QPixmap(%d, %d)\n", rasterSize.lx, rasterSize.ly);
 
 	QSurfaceFormat format;
 	format.setProfile(QSurfaceFormat::CompatibilityProfile);
@@ -186,6 +181,7 @@ void QtOfflineGL::createContext(TDimension rasterSize, const TOfflineGL::Imp *sh
 void QtOfflineGL::makeCurrent()
 {
 	if (m_context) {
+	        m_context->moveToThread(QThread::currentThread());
 		m_context->makeCurrent(m_surface);
 	}
 	// else
@@ -328,8 +324,9 @@ void QtOfflineGLPBuffer::createContext(TDimension rasterSize)
 
 void QtOfflineGLPBuffer::makeCurrent()
 {
-	if (m_context)
+        if (m_context){
 		m_context->makeCurrent();
+	}
 }
 
 //-----------------------------------------------------------------------------
