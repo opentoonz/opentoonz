@@ -32,7 +32,7 @@
     <name>AdjustLevelsPopup</name>
     <message>
         <source>Adjust Levels</source>
-        <translation>Tonwertkorrektur justieren</translation>
+        <translation>Tonwertkorrektur anpassen</translation>
     </message>
     <message>
         <source>Clamp</source>
@@ -55,7 +55,7 @@
     <name>AdjustThicknessPopup</name>
     <message>
         <source>Adjust Thickness</source>
-        <translation>Dicke justieren</translation>
+        <translation>Dicke anpassen</translation>
     </message>
     <message>
         <source>Mode:</source>
@@ -509,8 +509,8 @@ Möchten Sie fortfahren?</translation>
 
 Please choose to delete the existing level and create a new one
 when running the cleanup process.</source>
-        <translation>既存Ebene &quot;%1&quot; öffnen時にエラーが発生しました。
-Säubernの処理時に、「既存Ebene löschenして、Neue Ebene erstellenする」OptionenをWählenして下さい。</translation>
+        <translation>既存Ebene &quot;%1&quot; öffnen時にFehlerが発生しました.
+Säubernの処理時に、「既存Ebene löschenして、Neue Ebene erstellenする」Optionen wählenして下さい.</translation>
     </message>
     <message>
         <source>Couldn&apos;t create directory &quot;%1&quot;</source>
@@ -597,7 +597,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Toggle Opacity Check</source>
-        <translation>不透明チェック</translation>
+        <translation>Opazitäts-Check</translation>
     </message>
     <message>
         <source>Save Settings</source>
@@ -742,7 +742,7 @@ What do you want to do?</source>
     </message>
 </context>
 <context>
-    <name>CloneLevelUndo::LevelNamePopup</name>
+    <name>CloneLevelUndo:: LevelNamePopup</name>
     <message>
         <source>Clone Level</source>
         <translation>Ebene duplizieren</translation>
@@ -815,11 +815,11 @@ What do you want to do?</source>
     </message>
     <message>
         <source>   ::   Frame: </source>
-        <translation>::Frame:</translation>
+        <translation>:: Frame:</translation>
     </message>
     <message>
         <source>   ::   Level: </source>
-        <translation>::Ebene:</translation>
+        <translation>:: Ebene:</translation>
     </message>
     <message>
         <source>Level: </source>
@@ -1187,7 +1187,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Refresh</source>
-        <translation>Erneuern</translation>
+        <translation>Aktualisieren</translation>
     </message>
     <message>
         <source>Cleanup</source>
@@ -1208,7 +1208,7 @@ What do you want to do?</source>
     <message>
         <source>Refresh operation failed:
 </source>
-        <translation>Erneuern ist fehlgeschlagen:</translation>
+        <translation>aktualisieren ist fehlgeschlagen:</translation>
     </message>
     <message>
         <source>Purge</source>
@@ -1220,7 +1220,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Refreshing...</source>
-        <translation>Erneuern...</translation>
+        <translation>aktualisieren...</translation>
     </message>
     <message>
         <source>There was an error copying %1 to %2</source>
@@ -1363,7 +1363,7 @@ What do you want to do?</source>
     </message>
 </context>
 <context>
-    <name>ExportLevelPopup::ExportOptions</name>
+    <name>ExportLevelPopup:: ExportOptions</name>
     <message>
         <source>Background Color:</source>
         <translation>Hintergrundfarbe:</translation>
@@ -1602,7 +1602,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Revert</source>
-        <translation>Zurückstellen</translation>
+        <translation>Zurücksetzen</translation>
     </message>
     <message>
         <source>Get</source>
@@ -1786,7 +1786,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Rendered Frames  ::  From %1 To %2  ::  Step %3</source>
-        <translation>Gerenderte Frames :: Frame %1 bis %2 :: Schritt %3</translation>
+        <translation>Gerenderte Framess :: Frame %1 bis %2 :: Schritt %3</translation>
     </message>
     <message>
         <source>  ::  Shrink </source>
@@ -1916,7 +1916,7 @@ Möchten Sie sie überschreiben?</translation>
     </message>
     <message>
         <source>  ::  Zoom : </source>
-        <translation>::Vergrößerung:</translation>
+        <translation>:: Vergrößerung:</translation>
     </message>
     <message>
         <source>Load / Append Images</source>
@@ -2161,7 +2161,7 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>Premultiply</source>
-        <translation>Premultiply</translation>
+        <translation>Premultiply [Schwarz-Matte]</translation>
     </message>
     <message>
         <source>White As Transparent</source>
@@ -2299,11 +2299,11 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>   ::   Frame: </source>
-        <translation>::Frame:</translation>
+        <translation>:: Frame:</translation>
     </message>
     <message>
         <source>   ::   Level: </source>
-        <translation>::Ebene:</translation>
+        <translation>:: Ebene:</translation>
     </message>
     <message>
         <source>Level: </source>
@@ -2698,7 +2698,7 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>&amp;Project Settings...</source>
-        <translation>ProjektEinstellungen (&amp;P)...</translation>
+        <translation>Projekt-Einstellungen (&amp;P)...</translation>
     </message>
     <message>
         <source>&amp;Save Default Settings</source>
@@ -3310,7 +3310,7 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>Convert...</source>
-        <translation>Datei umwandlung...</translation>
+        <translation>Datei umwandeln...</translation>
     </message>
     <message>
         <source>Collect Assets</source>
@@ -3326,7 +3326,7 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>Premultiply</source>
-        <translation type="vanished">Premultiply [Schwarz-Matte]］</translation>
+        <translation type="vanished">Premultiply [Schwarz-Matte]</translation>
     </message>
     <message>
         <source>Convert to Vectors...</source>
@@ -3410,179 +3410,179 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>Activate this column only</source>
-        <translation type="vanished">Ansicht［列・Aktueller み］</translation>
+        <translation type="vanished">Nur diese Spalte aktivieren</translation>
     </message>
     <message>
         <source>Activate selected columns</source>
-        <translation type="vanished">Ansicht［列・Wählenのみ］</translation>
+        <translation type="vanished">Gewählte Spalten aktivieren</translation>
     </message>
     <message>
         <source>Activate all columns</source>
-        <translation type="vanished">Ansicht［列・すべて］</translation>
+        <translation type="vanished">Alle Spalten aktivieren</translation>
     </message>
     <message>
         <source>Deactivate selected columns</source>
-        <translation type="vanished">非Ansicht［列・Wählenのみ］</translation>
+        <translation type="vanished">Gewählte Spalten deaktivieren</translation>
     </message>
     <message>
         <source>Deactivate all columns</source>
-        <translation type="vanished">非Ansicht［列・すべて］</translation>
+        <translation type="vanished">Alle Spalten deaktivieren</translation>
     </message>
     <message>
         <source>Toggle columns activation</source>
-        <translation type="vanished">Ansichtと非Ansichtを切り替え</translation>
+        <translation type="vanished">Spalten-Ansicht umschalten</translation>
     </message>
     <message>
         <source>Enable this column only</source>
-        <translation type="vanished">Ansicht［列・Aktueller み］</translation>
+        <translation type="vanished">Nur diese Spalte aktivieren</translation>
     </message>
     <message>
         <source>Enable selected columns</source>
-        <translation type="vanished">Ansicht［列・Wählenのみ］</translation>
+        <translation type="vanished">Gewählte Spalte aktivieren</translation>
     </message>
     <message>
         <source>Enable all columns</source>
-        <translation type="vanished">Ansicht［列・すべて］</translation>
+        <translation type="vanished">Alle Spalten aktivieren</translation>
     </message>
     <message>
         <source>Disable all columns</source>
-        <translation type="vanished">非Ansicht［列・すべて］</translation>
+        <translation type="vanished">Alle Spalten deaktivieren</translation>
     </message>
     <message>
         <source>Disable selected columns</source>
-        <translation type="vanished">非Ansicht［列・Wählenのみ］</translation>
+        <translation type="vanished">Gewählte Spalten deaktivieren</translation>
     </message>
     <message>
         <source>Swap enabled columns</source>
-        <translation type="vanished">Ansichtと非Ansicht列を切り替え</translation>
+        <translation type="vanished">Aktivierte Spalten tauschen</translation>
     </message>
     <message>
         <source>Lock this column only</source>
-        <translation type="vanished">ロック［列・Aktueller み］</translation>
+        <translation type="vanished">Nur diese Spalte sperren</translation>
     </message>
     <message>
         <source>Lock selected columns</source>
-        <translation type="vanished">ロック［列・Wählenのみ］</translation>
+        <translation type="vanished">Gewählte Spalten sperren</translation>
     </message>
     <message>
         <source>Lock all columns</source>
-        <translation type="vanished">ロック［列・すべて］</translation>
+        <translation type="vanished">Alle Spalten sperren</translation>
     </message>
     <message>
         <source>Unlock selected columns</source>
-        <translation type="vanished">Entsperren［列・Wählenのみ］</translation>
+        <translation type="vanished">Gewählte Spalten entsperren</translation>
     </message>
     <message>
         <source>Unlock all columns</source>
-        <translation type="vanished">Entsperren［列・すべて］</translation>
+        <translation type="vanished">Alle Spalten entsperren</translation>
     </message>
     <message>
         <source>Swap locked columns</source>
-        <translation type="vanished">ロックされている列を切り替え</translation>
+        <translation type="vanished">Gesperrte Spalten tauschen</translation>
     </message>
     <message>
         <source>Edit Tool</source>
-        <translation>Bearbeitenツール</translation>
+        <translation>Bearbeitungstool</translation>
     </message>
     <message>
         <source>Selection Tool</source>
-        <translation>Wählenツール</translation>
+        <translation>Auswahl-Tool</translation>
     </message>
     <message>
         <source>Brush Tool</source>
-        <translation>ブラシツール</translation>
+        <translation>Pinsel-Tool</translation>
     </message>
     <message>
         <source>Geometric Tool</source>
-        <translation>図形ツール</translation>
+        <translation>Geometrisches Tool</translation>
     </message>
     <message>
         <source>Type Tool</source>
-        <translation>文字ツール</translation>
+        <translation>Schreib-Tool</translation>
     </message>
     <message>
         <source>Fill Tool</source>
-        <translation>塗りつぶしツール</translation>
+        <translation>Füll-Tool</translation>
     </message>
     <message>
         <source>Paint Brush Tool</source>
-        <translation>ペイントブラシツール</translation>
+        <translation>Farbpinsel-Tool</translation>
     </message>
     <message>
         <source>Eraser Tool</source>
-        <translation>消しゴムツール</translation>
+        <translation>Radierer-Tool</translation>
     </message>
     <message>
         <source>Tape Tool</source>
-        <translation>線つなぎツール</translation>
+        <translation>Verbindungs-Tool</translation>
     </message>
     <message>
         <source>Style Picker Tool</source>
-        <translation>スポイトツール</translation>
+        <translation>Stil-Auswahl-Tool</translation>
     </message>
     <message>
         <source>RGB Picker Tool</source>
-        <translation>RGBスポイトツール</translation>
+        <translation>RGBStil-Auswahl-Tool</translation>
     </message>
     <message>
         <source>Control Point Editor Tool</source>
-        <translation>PfadBearbeitenツール</translation>
+        <translation>Pfad bearbeitungs-Tool</translation>
     </message>
     <message>
         <source>Pinch Tool</source>
-        <translation>線つまみツール</translation>
+        <translation>Distorsions-Tool</translation>
     </message>
     <message>
         <source>Pump Tool</source>
-        <translation>線幅変更ツール</translation>
+        <translation>Aufblas-Tool</translation>
     </message>
     <message>
         <source>Magnet Tool</source>
-        <translation>磁石ツール</translation>
+        <translation>Magnet-Tool</translation>
     </message>
     <message>
         <source>Bender Tool</source>
-        <translation>曲げ変形ツール</translation>
+        <translation>Verformen-Tool</translation>
     </message>
     <message>
         <source>Iron Tool</source>
-        <translation>アイロンツール</translation>
+        <translation>Eisen-Tool</translation>
     </message>
     <message>
         <source>Cutter Tool</source>
-        <translation>ナイフツール</translation>
+        <translation>Schneid-Tool</translation>
     </message>
     <message>
         <source>Skeleton Tool</source>
-        <translation>ボーンツール</translation>
+        <translation>Skelett-Tool</translation>
     </message>
     <message>
         <source>Tracker Tool</source>
-        <translation>追跡ツール</translation>
+        <translation>Tracker-Tool</translation>
     </message>
     <message>
         <source>HoOk Tool</source>
-        <translation>フックツール</translation>
+        <translation>Haken-Tool</translation>
     </message>
     <message>
         <source>Zoom Tool</source>
-        <translation>Vergrößerungツール</translation>
+        <translation>Vergrößerungs-Tool</translation>
     </message>
     <message>
         <source>Rotate Tool</source>
-        <translation>Rotierenツール</translation>
+        <translation>Rotations-Tool</translation>
     </message>
     <message>
         <source>Hand Tool</source>
-        <translation>手のひらツール</translation>
+        <translation>Hand-Tool</translation>
     </message>
     <message>
         <source>Zoom In</source>
-        <translation>Vergrößerungイン</translation>
+        <translation>Vergrößerung [+]</translation>
     </message>
     <message>
         <source>Zoom Out</source>
-        <translation>Vergrößerungアウト</translation>
+        <translation>Vergrößerung [-]</translation>
     </message>
     <message>
         <source>Reset View</source>
@@ -3594,11 +3594,11 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>Actual Pixel Size</source>
-        <translation>ピクCells等倍</translation>
+        <translation>Tatsächliche Bildgröße</translation>
     </message>
     <message>
         <source>Show//Hide Full Screen</source>
-        <translation>全画面のAnsicht/非Ansicht</translation>
+        <translation>Vollbild anzeigen//verbergen</translation>
     </message>
     <message>
         <source>Full Screen Mode</source>
@@ -3606,27 +3606,27 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>Exit Full Screen Mode</source>
-        <translation>Vollbild-Modusを抜ける</translation>
+        <translation>Vollbild-Modus beenden</translation>
     </message>
     <message>
         <source>Global Key</source>
-        <translation>グローバルKeys</translation>
+        <translation>Globale Keys</translation>
     </message>
     <message>
         <source>Increase brush hardness</source>
-        <translation type="vanished">ブラシを硬くする</translation>
+        <translation type="vanished">Pinselhärte erhöhen</translation>
     </message>
     <message>
         <source>Decrease brush hardness</source>
-        <translation type="vanished">ブラシを軟らかくする</translation>
+        <translation type="vanished">Pinselhärte verringern</translation>
     </message>
     <message>
         <source>Auto Group</source>
-        <translation>Automatischグループ</translation>
+        <translation>Automatische Gruppe</translation>
     </message>
     <message>
         <source>Break sharp angles</source>
-        <translation>鋭角で線を分割</translation>
+        <translation>Spitze Winkel spalten</translation>
     </message>
     <message>
         <source>Frame range</source>
@@ -3634,7 +3634,7 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>Inverse kinematics</source>
-        <translation>逆運動学(IK)</translation>
+        <translation>Inverse Kinematics (IK)</translation>
     </message>
     <message>
         <source>Invert</source>
@@ -3650,79 +3650,79 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>Orientation</source>
-        <translation>方向</translation>
+        <translation>Orientierung</translation>
     </message>
     <message>
         <source>Pencil Mode</source>
-        <translation>鉛筆モード</translation>
+        <translation>Bleistift-Modus</translation>
     </message>
     <message>
         <source>Preserve Thickness</source>
-        <translation>Dickeを保持</translation>
+        <translation>Dicke erhalten</translation>
     </message>
     <message>
         <source>Pressure sensibility</source>
-        <translation>圧力感度</translation>
+        <translation>Druckempfindlichkeit</translation>
     </message>
     <message>
         <source>Segment Ink</source>
-        <translation>線分のAutomatisch検出</translation>
+        <translation>Segmentierte Tinte</translation>
     </message>
     <message>
         <source>Selective</source>
-        <translation>塗りの保護</translation>
+        <translation>Farbe erhalten</translation>
     </message>
     <message>
         <source>Smooth</source>
-        <translation>カーブで連結</translation>
+        <translation>Glätten</translation>
     </message>
     <message>
         <source>Snap</source>
-        <translation>スナップ</translation>
+        <translation>Einrasten</translation>
     </message>
     <message>
         <source>Auto Select Drawing</source>
-        <translation>クリックでEbeneを切り替える</translation>
+        <translation>Ebene automatisch wählen</translation>
     </message>
     <message>
         <source>Auto Fill</source>
-        <translation>Automatisch塗りつぶし</translation>
+        <translation>Automatisches Füllen</translation>
     </message>
     <message>
         <source>Join Vectors</source>
-        <translation>ベクター vereinen</translation>
+        <translation>Vektoren vereinen</translation>
     </message>
     <message>
         <source>Show Only Active Skeleton</source>
-        <translation>有効なボーンのみAnsicht</translation>
+        <translation>Nur aktives Skelett anzeigen</translation>
     </message>
     <message>
         <source>Brush Preset</source>
-        <translation>ブラシプZurücksetzen</translation>
+        <translation>Pinsel-Vorlagen</translation>
     </message>
     <message>
         <source>Geometric Shape</source>
-        <translation>図形シェイプ</translation>
+        <translation>Geometrische Form</translation>
     </message>
     <message>
         <source>Geometric Edge</source>
-        <translation>頂点数</translation>
+        <translation>Geometrische Kante</translation>
     </message>
     <message>
         <source>Mode</source>
-        <translation>モード</translation>
+        <translation> Modus</translation>
     </message>
     <message>
         <source>Areas Mode</source>
-        <translation type="vanished">領域モード</translation>
+        <translation type="vanished">Flächen-Modus</translation>
     </message>
     <message>
         <source>Lines Mode</source>
-        <translation type="vanished">線モード</translation>
+        <translation type="vanished">Linien-Modus</translation>
     </message>
     <message>
         <source>Lines &amp; Areas Mode</source>
-        <translation type="vanished">線と領域モード</translation>
+        <translation type="vanished">Linien- und Flächen-Modus</translation>
     </message>
     <message>
         <source>Type</source>
@@ -3734,63 +3734,63 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>Rectangular Type</source>
-        <translation type="vanished">長方形</translation>
+        <translation type="vanished">Rechteckig</translation>
     </message>
     <message>
         <source>Freehand Type</source>
-        <translation type="vanished">手書き</translation>
+        <translation type="vanished">Freihändig</translation>
     </message>
     <message>
         <source>Polyline Type</source>
-        <translation type="vanished">ポリライン</translation>
+        <translation type="vanished">Polygon</translation>
     </message>
     <message>
         <source>TypeTool Font</source>
-        <translation>文字ツールのフォント</translation>
+        <translation>Schriftsatz für Schreib-Tool</translation>
     </message>
     <message>
         <source>TypeTool Size</source>
-        <translation>文字ツールのサイズ</translation>
+        <translation>Größe für Schreib-Tool</translation>
     </message>
     <message>
         <source>TypeTool Style</source>
-        <translation>文字ツールのStil</translation>
+        <translation>Stil für Schreib-Tool</translation>
     </message>
     <message>
         <source>Build Skeleton Mode</source>
-        <translation>ボーンErstellenモード</translation>
+        <translation>Skelett-Erstellungs-Modus</translation>
     </message>
     <message>
         <source>Animate Mode</source>
-        <translation>アニメートモード</translation>
+        <translation>Animations Modus</translation>
     </message>
     <message>
         <source>Inverse Kinematics Mode</source>
-        <translation>逆運動学（IK)モード</translation>
+        <translation>Inverse Kinematics（IK) Modus</translation>
     </message>
     <message>
         <source>None Pick Mode</source>
-        <translation>無し</translation>
+        <translation>Nichts</translation>
     </message>
     <message>
         <source>Column Pick Mode</source>
-        <translation>列</translation>
+        <translation>Spalte</translation>
     </message>
     <message>
         <source>Pegbar Pick Mode</source>
-        <translation>タップ</translation>
+        <translation>Haltestift</translation>
     </message>
     <message>
         <source>&amp;Reset Step</source>
-        <translation>ステップ zurücksetzen (&amp;R)</translation>
+        <translation>Schritt zurücksetzen (&amp;R)</translation>
     </message>
     <message>
         <source>&amp;Increase Step</source>
-        <translation>ステップを上げる (&amp;I)</translation>
+        <translation>Schritt erhöhen (&amp;I)</translation>
     </message>
     <message>
         <source>&amp;Decrease Step</source>
-        <translation>ステップを下げる (&amp;D)</translation>
+        <translation>Schritt verringern (&amp;D)</translation>
     </message>
     <message>
         <source>Drawing</source>
@@ -3798,11 +3798,11 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>Animation</source>
-        <translation type="vanished">合成</translation>
+        <translation type="vanished">Animation/Montage</translation>
     </message>
     <message>
         <source>Browser</source>
-        <translation type="vanished">ブラウザ</translation>
+        <translation type="vanished">Browser</translation>
     </message>
     <message>
         <source>Pltedit</source>
@@ -3814,7 +3814,7 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>Reload qss</source>
-        <translation>StilXsheetを再Laden</translation>
+        <translation>Stil-Xsheet neu Laden</translation>
     </message>
     <message>
         <source>&amp;Autocenter...</source>
@@ -3822,27 +3822,27 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>&amp;Field Guide in Capture Window</source>
-        <translation>CaptureFenster内のPraktische Anleitung (&amp;F)</translation>
+        <translation>Praktische Anleitung im Capture-Fenster (&amp;F)</translation>
     </message>
     <message>
         <source>&amp;Guide</source>
-        <translation>ガイド (&amp;G)</translation>
+        <translation>Hilfslinie (&amp;G)</translation>
     </message>
     <message>
         <source>&amp;Ruler</source>
-        <translation>定規 (&amp;R)</translation>
+        <translation>Lineal (&amp;R)</translation>
     </message>
     <message>
         <source>Next Drawing</source>
-        <translation>Nächster Bild</translation>
+        <translation>Nächstes Bild</translation>
     </message>
     <message>
         <source>Prev Drawing</source>
-        <translation>Vorheriger Bild</translation>
+        <translation>Vorheriges Bild</translation>
     </message>
     <message>
         <source>Toggle Autofill on Current Palette Color</source>
-        <translation>Aktueller Palette色でAutomatisch塗りつぶしOptionenを切り替え</translation>
+        <translation>Automatisches Füllen an aktueller Palette umschalten</translation>
     </message>
     <message>
         <source>&amp;Export</source>
@@ -3850,39 +3850,39 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>&amp;Autorenumber</source>
-        <translation>配置Frameに合わせ動画Nummerieren (&amp;A)</translation>
+        <translation>Automatisches Umnummerieren (&amp;A)</translation>
     </message>
     <message>
         <source>Shift and Trace</source>
-        <translation>ライトTabelle</translation>
+        <translation>Lichttisch</translation>
     </message>
     <message>
         <source>Edit Shift</source>
-        <translation>オフセット位置を変更</translation>
+        <translation>Offset-Position ändern</translation>
     </message>
     <message>
         <source>No Shift</source>
-        <translation>オフセット無し</translation>
+        <translation>Kein Offset</translation>
     </message>
     <message>
         <source>Reset Shift</source>
-        <translation>オフセット zurücksetzen</translation>
+        <translation>Offset zurücksetzen</translation>
     </message>
     <message>
         <source>Increase max brush thickness</source>
-        <translation type="vanished">ブラシの最大Dickeを増加する</translation>
+        <translation type="vanished">Maximale Pinseldicke erhöhen</translation>
     </message>
     <message>
         <source>Decrease max brush thickness</source>
-        <translation type="vanished">ブラシの最大Dickeを減少する</translation>
+        <translation type="vanished">Maximale Pinseldicke verringern</translation>
     </message>
     <message>
         <source>Increase min brush thickness</source>
-        <translation type="vanished">ブラシの最小Dickeを増加する</translation>
+        <translation type="vanished">Minimale Pinseldicke erhöhen</translation>
     </message>
     <message>
         <source>Decrease min brush thickness</source>
-        <translation type="vanished">ブラシの最小Dickeを減少する</translation>
+        <translation type="vanished">Minimale Pinseldicke verringern</translation>
     </message>
     <message>
         <source>&amp;Binarize...</source>
@@ -3890,31 +3890,31 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>Pick Screen</source>
-        <translation>スSäubern上から拾う</translation>
+        <translation>Bildschrim wählen</translation>
     </message>
     <message>
         <source>&amp;Blend colors</source>
-        <translation>色をブレンド (&amp;B)</translation>
+        <translation>Farben mischen (&amp;B)</translation>
     </message>
     <message>
         <source>Linetest</source>
-        <translation type="vanished">線条試験</translation>
+        <translation type="vanished">Linien-Test</translation>
     </message>
     <message>
         <source>&amp;Load As Sub-xsheet...</source>
-        <translation>Szene sub-XsheetとしてLaden (&amp;L)...</translation>
+        <translation>Szene als Sub-Xsheet laden (&amp;L)...</translation>
     </message>
     <message>
         <source>&amp;Convert File...</source>
-        <translation>Datei umwandlung (&amp;C)...</translation>
+        <translation>Datei umwandeln (&amp;C)...</translation>
     </message>
     <message>
         <source>Run Script...</source>
-        <translation>スクリプトを実行...</translation>
+        <translation>Script ausführen...</translation>
     </message>
     <message>
         <source>Open Script Console...</source>
-        <translation>スクリプトKonsole öffnen...</translation>
+        <translation>Script-Konsole öffnen...</translation>
     </message>
     <message>
         <source>&amp;Antialias...</source>
@@ -3922,19 +3922,19 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>Adjust Levels...</source>
-        <translation>Ebeneの色調整...</translation>
+        <translation>Tonwertkorrektur anpassen...</translation>
     </message>
     <message>
         <source>&amp;Raster Bounding Box</source>
-        <translation>ラスターのバウンディングボックス (&amp;R)</translation>
+        <translation>Raster-Bounding-Box (&amp;R)</translation>
     </message>
     <message>
         <source>Link FlipboOks</source>
-        <translation>Flipbookをリンク</translation>
+        <translation>Flipbook verlinken</translation>
     </message>
     <message>
         <source>&amp;Message Center</source>
-        <translation>メッセージセンター (&amp;M)</translation>
+        <translation>Nachrichten-Center (&amp;M)</translation>
     </message>
     <message>
         <source>&amp;Cleanup Settings</source>
@@ -3942,11 +3942,11 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>Plastic Tool</source>
-        <translation>プラスチックツール</translation>
+        <translation>Plastik-Tool</translation>
     </message>
     <message>
         <source>Create Mesh</source>
-        <translation>メッシュ erstellen</translation>
+        <translation>Mesh erstellen</translation>
     </message>
     <message>
         <source>&amp;Merge Tlv Levels...</source>
@@ -3954,11 +3954,11 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>Adjust Thickness...</source>
-        <translation>Dicke justieren...</translation>
+        <translation>Dicke anpassen...</translation>
     </message>
     <message>
         <source>Toggle &amp;Opacity Check</source>
-        <translation type="vanished">トグル＆不透明チェック</translation>
+        <translation type="vanished">Umschalt- &amp; Opazitäts-Check</translation>
     </message>
     <message>
         <source>&amp;Load Folder...</source>
@@ -3966,15 +3966,15 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>Inks &amp;Only</source>
-        <translation>線のみAnsicht (&amp;O)</translation>
+        <translation>Nur Linien-Ansicht (&amp;O)</translation>
     </message>
     <message>
         <source>Next Step</source>
-        <translation>1ステップWeiter</translation>
+        <translation>1 Schritt weiter</translation>
     </message>
     <message>
         <source>Prev Step</source>
-        <translation>1ステップZurück</translation>
+        <translation>1 Schritt zurück</translation>
     </message>
     <message>
         <source>Untitled</source>
@@ -3986,43 +3986,43 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>PltEdit</source>
-        <translation>色指定</translation>
+        <translation>Palette bearbeiten</translation>
     </message>
     <message>
         <source>InknPaint</source>
-        <translation>仕上</translation>
+        <translation>Einfärbung</translation>
     </message>
     <message>
         <source>Xsheet</source>
-        <translation>撮影</translation>
+        <translation>Aufnahme/Xsheet</translation>
     </message>
     <message>
         <source>&amp;Load Recent Image Files</source>
-        <translation>Vorherige Bildを読み込む(&amp;L)</translation>
+        <translation>Vorheriges Bild laden(&amp;L)</translation>
     </message>
     <message>
         <source>&amp;Clear Recent FlipboOk Image List</source>
-        <translation>最近開いたBildリスト（Flipbook）を消去 (&amp;C)</translation>
+        <translation>Vorherige Flipbook Bild-Liste leeren (&amp;C)</translation>
     </message>
     <message>
         <source>Preview Fx</source>
-        <translation>FXVorschau</translation>
+        <translation>FX-Vorschau</translation>
     </message>
     <message>
         <source>&amp;Insert Paste</source>
-        <translation>EinfügenしてEinfügen (&amp;I)</translation>
+        <translation>Hinzufügen/Einfügen (&amp;I)</translation>
     </message>
     <message>
         <source>&amp;Paste Color &amp;&amp; Name</source>
-        <translation>色と名前 einfügen (&amp;P)</translation>
+        <translation>Farbe und Name einfügen (&amp;P)</translation>
     </message>
     <message>
         <source>Paste Color</source>
-        <translation>色 einfügen</translation>
+        <translation>Farbe einfügen</translation>
     </message>
     <message>
         <source>Paste Name</source>
-        <translation>名前 einfügen</translation>
+        <translation>Name einfügen</translation>
     </message>
     <message>
         <source>Get Color from Studio Palette</source>
@@ -4030,151 +4030,151 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>&amp;Opacity Check</source>
-        <translation>不透明チェック (&amp;O)</translation>
+        <translation>Opazitäts-Check (&amp;O)</translation>
     </message>
     <message>
         <source>&amp;Replace Parent Directory...</source>
-        <translation>親フォルダPfadのErsetzen (&amp;R)...</translation>
+        <translation>Hauptverzeichnispfad ersetzen (&amp;R)...</translation>
     </message>
     <message>
         <source>1&apos;s</source>
-        <translation>1コマ</translation>
+        <translation>1er Frame</translation>
     </message>
     <message>
         <source>2&apos;s</source>
-        <translation>2コマ</translation>
+        <translation>2er Frames</translation>
     </message>
     <message>
         <source>3&apos;s</source>
-        <translation>3コマ</translation>
+        <translation>3er Frames</translation>
     </message>
     <message>
         <source>4&apos;s</source>
-        <translation>4コマ</translation>
+        <translation>4er Frames</translation>
     </message>
     <message>
         <source>&amp;Ink#1 Check</source>
-        <translation>実Tinten-Check (&amp;I)</translation>
+        <translation>Tinten#1-Check (&amp;I)</translation>
     </message>
     <message>
         <source>Compare to Snapshot</source>
-        <translation>スナップショットと比較</translation>
+        <translation>Mit Schnappschuss vergleichen</translation>
     </message>
     <message>
         <source>Show This Only</source>
-        <translation>この列のみAnsicht</translation>
+        <translation>Nur dies anzeigen</translation>
     </message>
     <message>
         <source>Show Selected</source>
-        <translation>Wählen列 anzeigen</translation>
+        <translation>Auswahl anzeigen</translation>
     </message>
     <message>
         <source>Show All</source>
-        <translation>全ての列 anzeigen</translation>
+        <translation>Alle anzeigen</translation>
     </message>
     <message>
         <source>Hide Selected</source>
-        <translation>Wählen列を隠す</translation>
+        <translation>Auswahl verbergen</translation>
     </message>
     <message>
         <source>Hide All</source>
-        <translation>全ての列を隠す</translation>
+        <translation>Alle verbergen</translation>
     </message>
     <message>
         <source>Toggle Show/Hide</source>
-        <translation>Ansicht/非Ansicht切り替え</translation>
+        <translation>Ansicht umschalten</translation>
     </message>
     <message>
         <source>ON This Only</source>
-        <translation>この列のみ有効化</translation>
+        <translation>Nur dieses ist AN</translation>
     </message>
     <message>
         <source>ON Selected</source>
-        <translation>Wählen列を有効化</translation>
+        <translation>Auswahl ist AN</translation>
     </message>
     <message>
         <source>ON All</source>
-        <translation>全ての列を有効化</translation>
+        <translation>Alle sind AN</translation>
     </message>
     <message>
         <source>OFF All</source>
-        <translation>全ての列を無効化</translation>
+        <translation>Alle sind AUS</translation>
     </message>
     <message>
         <source>OFF Selected</source>
-        <translation>Wählen列を無効化</translation>
+        <translation>Auswahl ist AUS</translation>
     </message>
     <message>
         <source>Swap ON/OFF</source>
-        <translation>有効/無効切り替え</translation>
+        <translation>AN/AUS umschalten</translation>
     </message>
     <message>
         <source>Lock This Only</source>
-        <translation>この列のみロック</translation>
+        <translation>Nur dieses sperren</translation>
     </message>
     <message>
         <source>Lock Selected</source>
-        <translation>Wählen列をロック</translation>
+        <translation>Auswahl sperren</translation>
     </message>
     <message>
         <source>Lock All</source>
-        <translation>全ての列をロック</translation>
+        <translation>Alle sperren</translation>
     </message>
     <message>
         <source>Unlock Selected</source>
-        <translation>Wählen列をアンロック</translation>
+        <translation>Auswahl entsperren</translation>
     </message>
     <message>
         <source>Unlock All</source>
-        <translation>全ての列をアンロック</translation>
+        <translation>Alle entsperren</translation>
     </message>
     <message>
         <source>Swap Lock/Unlock</source>
-        <translation>ロック切り替え</translation>
+        <translation>Sperre umschalten</translation>
     </message>
     <message>
         <source>Ruler Tool</source>
-        <translation>ものさしツール</translation>
+        <translation>Lineal-Tool</translation>
     </message>
     <message>
         <source>Finger Tool</source>
-        <translation>塗りのばしツール</translation>
+        <translation>Finger-Tool</translation>
     </message>
     <message>
         <source>Brush size - Increase max</source>
-        <translation>ブラシサイズ - 最大値を増加</translation>
+        <translation>Pinselgröße - Maximum erhöhen</translation>
     </message>
     <message>
         <source>Brush size - Decrease max</source>
-        <translation>ブラシサイズ - 最大値を減少</translation>
+        <translation>Pinselgröße - Maximum verringern</translation>
     </message>
     <message>
         <source>Brush size - Increase min</source>
-        <translation>ブラシサイズ - 最小値を増加</translation>
+        <translation>Pinselgröße - Minimum erhöhen</translation>
     </message>
     <message>
         <source>Brush size - Decrease min</source>
-        <translation>ブラシサイズ - 最小値を減少</translation>
+        <translation>Pinselgröße - Minimum verringern</translation>
     </message>
     <message>
         <source>Brush hardness - Increase</source>
-        <translation>ブラシ硬さ - 増加</translation>
+        <translation>Pinselhärte - erhöhen</translation>
     </message>
     <message>
         <source>Brush hardness - Decrease</source>
-        <translation>ブラシ硬さ - 減少</translation>
+        <translation>Pinselhärte - verringern</translation>
     </message>
     <message>
         <source>Mode - Areas</source>
-        <translation>モード - 塗り</translation>
+        <translation> Modus - Flächen</translation>
     </message>
     <message>
         <source>Mode - Lines</source>
-        <translation>モード - 線</translation>
+        <translation> Modus - Linien</translation>
     </message>
     <message>
         <source>Mode - Lines &amp; Areas</source>
-        <translation>モード - 線と塗り</translation>
+        <translation> Modus - Linien und Flächen</translation>
     </message>
     <message>
         <source>Type - Normal</source>
@@ -4182,19 +4182,19 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>Type - Rectangular</source>
-        <translation>Typ - 長方形</translation>
+        <translation>Typ - Rechteckig</translation>
     </message>
     <message>
         <source>Type - Freehand</source>
-        <translation>Typ - なげなわ</translation>
+        <translation>Typ - Freihand</translation>
     </message>
     <message>
         <source>Type - Polyline</source>
-        <translation>Typ - 多角形</translation>
+        <translation>Typ - Polygon</translation>
     </message>
     <message>
         <source>About OpenToonz</source>
-        <translation>OpenToonzについて</translation>
+        <translation>Über OpenToonz</translation>
     </message>
     <message>
         <source>Close</source>
@@ -4202,7 +4202,7 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>&amp;Abount OpenToonz...</source>
-        <translation>OpenToonzについて (&amp;A)...</translation>
+        <translation>Über OpenToonz (&amp;A)...</translation>
     </message>
     <message>
         <source>&amp;ComboViewer</source>
@@ -4210,26 +4210,26 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>&amp;History</source>
-        <translation>ヒストリー (&amp;H)</translation>
+        <translation>Verlauf (&amp;H)</translation>
     </message>
 </context>
 <context>
     <name>MatchlinesDialog</name>
     <message>
         <source> Apply Match Lines</source>
-        <translation type="vanished">Match-Linien合成</translation>
+        <translation type="vanished">Match-Linien anwenden</translation>
     </message>
     <message>
         <source>Add Match Line Styles</source>
-        <translation type="vanished">Match-LinienのStilを保持</translation>
+        <translation type="vanished">Match-Linien-Stil hinzufügen</translation>
     </message>
     <message>
         <source>Use Style: </source>
-        <translation type="vanished">Match-LinienのStil verwenden:</translation>
+        <translation type="vanished">Match-Linien-Stil verwenden:</translation>
     </message>
     <message>
         <source>Line Prevalence</source>
-        <translation>合成線のIntensität</translation>
+        <translation>Linien-Intensität</translation>
     </message>
     <message>
         <source>Apply</source>
@@ -4245,54 +4245,54 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>Add Match Line Inks</source>
-        <translation>Match-Linienの線に用いたStil hinzufügenする</translation>
+        <translation>Tinte für Match-Linien hinzufügen</translation>
     </message>
     <message>
         <source>Use Ink: </source>
-        <translation>既存のStil番号を指定して使用 :</translation>
+        <translation>Tinte benutzen :</translation>
     </message>
     <message>
         <source>Ink Usage</source>
-        <translation>線に用いるStil</translation>
+        <translation>Tinten-Gebrauch</translation>
     </message>
     <message>
         <source>Line Stacking Order</source>
-        <translation>Match-Linienの食い込み方-Einstellungen</translation>
+        <translation>Match-Linien-Stapel-Reihenfolge</translation>
     </message>
     <message>
         <source>L-Up R-Down</source>
-        <translation>左列が上 右列が下</translation>
+        <translation>L-Hoch R-Runter</translation>
     </message>
     <message>
         <source>L-Down R-Up</source>
-        <translation>左列が下 右列が上</translation>
+        <translation>L-Runter R-Hoch</translation>
     </message>
     <message>
         <source>Keep
 Halftone</source>
-        <translation>アンチエイリ
-アスを保持</translation>
+        <translation>Halbton
+beibehalten</translation>
     </message>
     <message>
         <source>Fill
 Gaps</source>
-        <translation>線を食い
-込ませる</translation>
+        <translation>Lücken
+Füllen</translation>
     </message>
 </context>
 <context>
     <name>MergeCmappedCommand</name>
     <message>
         <source>It is not possible to merge tlv columns because no column was selected.</source>
-        <translation>列がWählenされていないため、TLVEbene列 vereinenできません。</translation>
+        <translation>TLV-Spalten können nicht vereint werden, da keine Spalten gewählt wurden.</translation>
     </message>
     <message>
         <source>It is not possible to merge tlv columns because at least two columns have to be selected.</source>
-        <translation>少なくとも2列以上をWählenしなくてJaけません。TLVEbene列 vereinenできません。</translation>
+        <translation>TLV-Spalten können nicht vereint werden, da mindestens zwei Spalten gewählt werden müssen.</translation>
     </message>
     <message>
         <source>Merging Tlv Levels...</source>
-        <translation>TLVEbene vereinen中...</translation>
+        <translation>TLV-Ebenen weden vereint...</translation>
     </message>
 </context>
 <context>
@@ -4319,18 +4319,18 @@ Gaps</source>
     </message>
     <message>
         <source> Merge Tlv Levels</source>
-        <translation>TLVEbene vereinen</translation>
+        <translation>TLV-Ebenen vereinen</translation>
     </message>
 </context>
 <context>
     <name>MergeColumnsCommand</name>
     <message>
         <source>It is not possible to execute the merge column command because no column was selected.</source>
-        <translation>列がWählenされていないので、列 vereinenできません。</translation>
+        <translation>Es können keine Spalten vereint werden, da keine Spalten gewählt wurden.</translation>
     </message>
     <message>
         <source>It is not possible to execute the merge column command  because only one columns is  selected.</source>
-        <translation>2つの列がWählenされていないので、列 vereinenできません。</translation>
+        <translation>Es können keine Spalten vereint werden, da nur eine Spalte gewählt wurde.</translation>
     </message>
 </context>
 <context>
@@ -4338,37 +4338,37 @@ Gaps</source>
     <message>
         <source>A level with the preferred path &quot;%1&quot; already exists.
 What do you want to do?</source>
-        <translation>指定されたPfad&quot;%1&quot;には既にEbeneDateiが存在します。
-どうしますか？</translation>
+        <translation>Eine Ebene mit dem bevorzugten Pfad&quot;%1&quot; existiert bereits.
+Was möchten Sie tun?</translation>
     </message>
     <message>
         <source>Delete the old level entirely</source>
-        <translation>既存のEbeneを完全にLöschen
+        <translation>Die alte Ebene komplett entfernen
 </translation>
     </message>
     <message>
         <source>Keep the old level and overwrite processed frames</source>
-        <translation>既存のEbeneを維持し、処理されたFrameを上書き</translation>
+        <translation>Die alte Ebene behalten und bearbeitete Frames überschreiben</translation>
     </message>
     <message>
         <source>Choose a different path (%1)</source>
-        <translation>別のPfad (%1) をWählenする</translation>
+        <translation>Wählen Sie ein anderen Pfad (%1)</translation>
     </message>
     <message>
         <source>Create Mesh</source>
-        <translation>メッシュ erstellen</translation>
+        <translation>Mesh erstellen</translation>
     </message>
     <message>
         <source>Mesh Edges Length:</source>
-        <translation>メッシュのエッジの長さ:</translation>
+        <translation>Mesh-Kantenlänge:</translation>
     </message>
     <message>
         <source>Rasterization DPI:</source>
-        <translation>ラスタライズDPI:</translation>
+        <translation>Rasterisierungs-DPI:</translation>
     </message>
     <message>
         <source>Mesh Margin (pixels):</source>
-        <translation>メッシュのマージン（ピクCells）:</translation>
+        <translation>Mesh-Abstand（Pixel）:</translation>
     </message>
     <message>
         <source>Apply</source>
@@ -4376,42 +4376,42 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Mesh Creation in progress...</source>
-        <translation>メッシュ erstellen中...</translation>
+        <translation>Mesh wird erstellt...</translation>
     </message>
     <message>
         <source>Current selection contains mixed image and mesh level types</source>
-        <translation>Aktueller WählenBereichには、BildおよびメッシュのEbeneが混在しています</translation>
+        <translation>Die aktuelle Auswahl enthält gemischte Bild- und Ebenen-Typen</translation>
     </message>
     <message>
         <source>Current selection contains no image or mesh level types</source>
-        <translation>Aktueller WählenBereichには、BildまたはメッシュのEbeneがどちらも含まれていません</translation>
+        <translation>Die aktuelle Auswahl enthält keine Bild- und Ebenen-Typen</translation>
     </message>
 </context>
 <context>
     <name>MyScannerListener</name>
     <message>
         <source>Scanning in progress: </source>
-        <translation>Scanしています:</translation>
+        <translation>Es wird gescanned:</translation>
     </message>
     <message>
         <source>The scanning process is completed.</source>
-        <translation>Scanが終了しました。</translation>
+        <translation>Der Scan-Vorgang ist abgeschlossen.</translation>
     </message>
     <message>
         <source>There was an error during the scanning process.</source>
-        <translation>Scan処理中にエラーが発生しました。</translation>
+        <translation>Scan処理MittelにFehlerが発生しました.</translation>
     </message>
     <message>
         <source>Please, place the next paper drawing on the scanner flatbed, then select the relevant command in the TWAIN interface.</source>
-        <translation>Nächster 紙をスキャナのフラットベッドに置き、TWAINインタフェースの関連するコマンドを実行してください。</translation>
+        <translation>Legen Sie die nächste Seite auf den Scanner-Flatbed, und wählen Sie den entsprechenden Befehl im TWIN-Interface.</translation>
     </message>
     <message>
         <source>Please, place the next paper drawing on the scanner flatbed, then click the Scan button.</source>
-        <translation>Nächster 紙をスキャナのフラットベッドに置き、Scanボタンをクリックしてください。</translation>
+        <translation>Legen Sie die nächste Seite auf den Scanner-Flatbed, und drücken Sie den Scan-Knopf-</translation>
     </message>
     <message>
         <source>The pixel type is not supported.</source>
-        <translation>ピクCellsFormatがübereinstimmendされていません。</translation>
+        <translation>Das Pixel-Format wird nicht unterstützt.</translation>
     </message>
 </context>
 <context>
@@ -4430,7 +4430,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Output Camera:</source>
-        <translation>Output-に用いるKamera:</translation>
+        <translation>Output-Kamera:</translation>
     </message>
     <message>
         <source>To Frame:</source>
@@ -4450,19 +4450,19 @@ What do you want to do?</source>
     </message>
     <message>
         <source>None</source>
-        <translation>なし</translation>
+        <translation>Nichts</translation>
     </message>
     <message>
         <source>Fx Schematic Flows</source>
-        <translation>FXSchaubildの各ノード</translation>
+        <translation>FX-Schaubild Nodes</translation>
     </message>
     <message>
         <source>Fx Schematic Terminal Nodes</source>
-        <translation>FXSchaubildでXsheetに接続している各ノード</translation>
+        <translation>FX-Schaubild-Terminal-Nodes</translation>
     </message>
     <message>
         <source>Multiple Rendering: </source>
-        <translation type="vanished">複数Render:</translation>
+        <translation type="vanished">Multiples Rendern:</translation>
     </message>
     <message>
         <source>Standard</source>
@@ -4470,75 +4470,75 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Improved</source>
-        <translation>改良</translation>
+        <translation>Verbessert</translation>
     </message>
     <message>
         <source>High</source>
-        <translation>高い</translation>
+        <translation>Hoch</translation>
     </message>
     <message>
         <source>Resample Balance:</source>
-        <translation>BildInterpolation方式:</translation>
+        <translation>Bild-Interpolations-Methode:</translation>
     </message>
     <message>
         <source>Channel Width:</source>
-        <translation>チャンネルBreite:</translation>
+        <translation>Kanal-Breite:</translation>
     </message>
     <message>
         <source>Gamma:</source>
-        <translation>ガンマ:</translation>
+        <translation>Gamma:</translation>
     </message>
     <message>
         <source>Odd (NTSC)</source>
-        <translation>奇数フィールドから（NTSC）</translation>
+        <translation>Ungerade (NTSC)</translation>
     </message>
     <message>
         <source>Even (PAL)</source>
-        <translation>偶数フィールドから（PAL）</translation>
+        <translation>Gerade (PAL)</translation>
     </message>
     <message>
         <source>Dominant Field:</source>
-        <translation>フィールドRender:</translation>
+        <translation>Feld-Render:</translation>
     </message>
     <message>
         <source>to FPS:</source>
-        <translation type="vanished">FPS引き延ばし後:</translation>
+        <translation type="vanished">FPS-Verschiebung zu:</translation>
     </message>
     <message>
         <source>Stretch from FPS:</source>
-        <translation>FPS引き延ばし前:</translation>
+        <translation>FPS-Verschiebung von:</translation>
     </message>
     <message>
         <source>Single</source>
-        <translation>シングル</translation>
+        <translation>Einzeln</translation>
     </message>
     <message>
         <source>Half</source>
-        <translation>半分</translation>
+        <translation>Halb</translation>
     </message>
     <message>
         <source>All</source>
-        <translation>すべて</translation>
+        <translation>Alles</translation>
     </message>
     <message>
         <source>Dedicated CPUs:</source>
-        <translation>使用 CPU 数:</translation>
+        <translation>Zugehörige CPUs:</translation>
     </message>
     <message>
         <source>Large</source>
-        <translation>大</translation>
+        <translation>Groß</translation>
     </message>
     <message>
         <source>Medium</source>
-        <translation>中</translation>
+        <translation>Mittel</translation>
     </message>
     <message>
         <source>Small</source>
-        <translation>小</translation>
+        <translation>Klein</translation>
     </message>
     <message>
         <source>Render Tile:</source>
-        <translation>Renderタイル:</translation>
+        <translation>Render-Kachel:</translation>
     </message>
     <message>
         <source>Options</source>
@@ -4550,11 +4550,11 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Apply Shrink to Main Viewer</source>
-        <translation>BetrachterにBildのSchrumpfen anwenden</translation>
+        <translation>Schrumpfen am Haupt-Betrachter anwenden</translation>
     </message>
     <message>
         <source>Preview Settings</source>
-        <translation>VorschauEinstellungen</translation>
+        <translation>Vorschau-Einstellungen</translation>
     </message>
     <message>
         <source>Output Settings</source>
@@ -4562,23 +4562,23 @@ What do you want to do?</source>
     </message>
     <message>
         <source>8 bits</source>
-        <translation type="vanished">8 ビット</translation>
+        <translation type="vanished">8-bit</translation>
     </message>
     <message>
         <source>16 bits</source>
-        <translation type="vanished">16 ビット</translation>
+        <translation type="vanished">16-bit</translation>
     </message>
     <message>
         <source>Columns</source>
-        <translation>列</translation>
+        <translation>Spalten</translation>
     </message>
     <message>
         <source>Camera Shift:</source>
-        <translation>Kameraシフト:</translation>
+        <translation>Kamera-Verschiebung:</translation>
     </message>
     <message>
         <source>Stereoscopic Render:</source>
-        <translation type="vanished">立体視Render:</translation>
+        <translation type="vanished">Stereoskopischer Render:</translation>
     </message>
     <message>
         <source>Camera Settings</source>
@@ -4586,11 +4586,11 @@ What do you want to do?</source>
     </message>
     <message>
         <source>File Settings</source>
-        <translation>DateiEinstellungen</translation>
+        <translation>Datei-Einstellungen</translation>
     </message>
     <message>
         <source>Other Settings</source>
-        <translation>その他-Einstellungen</translation>
+        <translation>Andere einstellen</translation>
     </message>
     <message>
         <source>Add</source>
@@ -4602,7 +4602,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Triangle filter</source>
-        <translation></translation>
+        <translation>Dreieck-Filter</translation>
     </message>
     <message>
         <source>Mitchell-Netravali filter</source>
@@ -4650,23 +4650,23 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Closest Pixel (Nearest Neighbor)</source>
-        <translation>ニアレストネイバー</translation>
+        <translation>Nächstes Pixel (Nächster Nachbar)</translation>
     </message>
     <message>
         <source>Bilinear</source>
-        <translation>バイリニア</translation>
+        <translation>Bilinear</translation>
     </message>
     <message>
         <source>8 bit</source>
-        <translation>8 ビット</translation>
+        <translation>8-bit</translation>
     </message>
     <message>
         <source>16 bit</source>
-        <translation>16 ビット</translation>
+        <translation>16-bit</translation>
     </message>
     <message>
         <source>Presets:</source>
-        <translation>プZurücksetzen :</translation>
+        <translation>Vorgaben :</translation>
     </message>
     <message>
         <source>Frame Start:</source>
@@ -4682,39 +4682,39 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Frame Rate (linked to Scene Settings):</source>
-        <translation>FPS （SzeneEinstellungen）:</translation>
+        <translation>FPS （Szenen-Einstellungen）:</translation>
     </message>
     <message>
         <source>  To:</source>
-        <translation>Umwandlung後:</translation>
+        <translation>Umwandlung zu:</translation>
     </message>
     <message>
         <source>Multiple Rendering:</source>
-        <translation>複数Render:</translation>
+        <translation>Multipler Render:</translation>
     </message>
     <message>
         <source>Add preset</source>
-        <translation>プZurücksetzen hinzufügen</translation>
+        <translation>Vorgabe hinzufügen</translation>
     </message>
     <message>
         <source>Enter the name for the output settings preset.</source>
-        <translation>Output-EinstellungenのプZurücksetzen名を入力してください。</translation>
+        <translation>Geben Sie den Namen für die Vorgabe der Output-Einstellungen an.</translation>
     </message>
     <message>
         <source>Add output settings preset</source>
-        <translation>Output-EinstellungenのプZurücksetzen hinzufügen</translation>
+        <translation>Vorgabe für Output-Einstellungen hinzufügen</translation>
     </message>
     <message>
         <source>&lt;custom&gt;</source>
-        <translation>&lt;カスタム&gt;</translation>
+        <translation>&lt;Eigenes&gt;</translation>
     </message>
     <message>
         <source>Remove preset</source>
-        <translation>プZurücksetzen löschen</translation>
+        <translation>Vorgabe löschen</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation>警告</translation>
+        <translation>Warnung</translation>
     </message>
 </context>
 <context>
@@ -4725,15 +4725,15 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Keep existing file</source>
-        <translation>既存Dateiを保持</translation>
+        <translation>Bestehende Datei behalten</translation>
     </message>
     <message>
         <source>Overwrite the existing file with the new one</source>
-        <translation>Neue Dateiに既存Dateiを上書き</translation>
+        <translation>Die bestehende Datei mit einer neuen Datei überschreiben</translation>
     </message>
     <message>
         <source>Rename the new file adding the suffix</source>
-        <translation>Neue Dateiの名前を変更して、接尾語を付ける</translation>
+        <translation>Die neue Datei umbenennen und das Suffix hinzufügen</translation>
     </message>
     <message>
         <source>Apply</source>
@@ -4741,7 +4741,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Apply to All</source>
-        <translation>すべてAnwenden</translation>
+        <translation>An alle anwenden</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -4750,35 +4750,35 @@ What do you want to do?</source>
     <message>
         <source>File %1 already exists.
 What do you want to do?</source>
-        <translation>Datei %1 は既に存在します。
-どうしますか？</translation>
+        <translation>Datei %1 existiert bereits.
+Was möchten Sie tun?</translation>
     </message>
     <message>
         <source>The suffix field is empty. Please specify a suffix.</source>
-        <translation>接尾語フィールドが空です。接尾語を指定してください。
+        <translation>Das Suffix-Feld ist leer. Bitte geben Sie ein Suffix an.
 </translation>
     </message>
     <message>
         <source>File %1 exists as well; please choose a different suffix.</source>
-        <translation>Datei %1 は既に存在します。異なる接尾語を選んでください。</translation>
+        <translation>Datei %1 existiert bereits. Bitte wählen Sie ein anderes Suffix.</translation>
     </message>
     <message>
         <source>Level &quot;%1&quot; already exists.
 
 What do you want to do?</source>
-        <translation>Ebene&quot;%1&quot;は既に存在します。
+        <translation>Ebene &quot;%1&quot;existiert bereits.
 
-どうしますか？</translation>
+Was möchten Sie tun?</translation>
     </message>
     <message>
         <source>File &quot;%1&quot; already exists.
 What do you want to do?</source>
-        <translation>Datei&quot;%1&quot;は既に存在します。
-どうしますか？</translation>
+        <translation>Datei&quot;%1&quot;existiert bereits.
+Was möchten Sie tun?</translation>
     </message>
     <message>
         <source>Overwrite</source>
-        <translation>上書き</translation>
+        <translation>Überschreiben</translation>
     </message>
     <message>
         <source>Skip</source>
@@ -4787,75 +4787,75 @@ What do you want to do?</source>
     <message>
         <source>File &quot;%1&quot; already exists.
 Do you want to overwrite it?</source>
-        <translation>Datei&quot;%1&quot;は既に存在します。
-上書きしますか？ </translation>
+        <translation>Datei &quot;%1&quot;existiert bereits.
+Überschreiben?</translation>
     </message>
 </context>
 <context>
     <name>PltGizmoPopup</name>
     <message>
         <source>Palette Gizmo</source>
-        <translation>Paletten-Gizmo</translation>
+        <translation>Palette bearbeiten</translation>
     </message>
     <message>
         <source>Luminance:</source>
-        <translation type="vanished">輝度:</translation>
+        <translation type="vanished">Luminanz:</translation>
     </message>
     <message>
         <source>Saturation:</source>
-        <translation type="vanished">彩度:</translation>
+        <translation type="vanished">Sättigung:</translation>
     </message>
     <message>
         <source>Hue:</source>
-        <translation type="vanished">色相:</translation>
+        <translation type="vanished">Farbton:</translation>
     </message>
     <message>
         <source>Transparency:</source>
-        <translation type="vanished">不透明度:</translation>
+        <translation type="vanished">Transparenz:</translation>
     </message>
     <message>
         <source>Fade to Color</source>
-        <translation>指定色にフェード</translation>
+        <translation>Zur Farbe verblassen</translation>
     </message>
     <message>
         <source>              Color:</source>
-        <translation type="vanished">　　　　　 色:</translation>
+        <translation type="vanished">　　　　　 Farbe:</translation>
     </message>
     <message>
         <source>Fade</source>
-        <translation>フェード</translation>
+        <translation>Verblassen</translation>
     </message>
     <message>
         <source>Blend</source>
-        <translation>ブレンド</translation>
+        <translation>Füllung</translation>
     </message>
     <message>
         <source>Full Matte</source>
-        <translation>不透明化</translation>
+        <translation>Voller Hintergrund</translation>
     </message>
     <message>
         <source>Zero Matte</source>
-        <translation>透明化</translation>
+        <translation>Kein Hintergrund</translation>
     </message>
     <message>
         <source>Scale (%)</source>
-        <translation>スケーリング(%)</translation>
+        <translation>Skalierung (%)</translation>
     </message>
     <message>
         <source>Shift (value)</source>
-        <translation>シフト（値を入力）</translation>
+        <translation>Verschiebung (Wert)</translation>
     </message>
     <message>
         <source>Value</source>
-        <translation>明度</translation>
+        <translation>Helligkeitsgrad</translation>
     </message>
     <message>
         <source>Saturation</source>
-        <translation>彩度</translation>
+        <translation>Sättigung</translation>
     </message>
     <message>
         <source>Hue</source>
-        <translation>色相</translation>
+        <translation>Farbton</translation>
     </message>
     <message>
         <source>Matte</source>
@@ -4863,42 +4863,42 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Color</source>
-        <translation>色</translation>
+        <translation>Farbe</translation>
     </message>
 </context>
 <context>
     <name>PreferencesPopup</name>
     <message>
         <source>Preferences</source>
-        <translation>環境Einstellungen</translation>
+        <translation>Einstellungen</translation>
     </message>
     <message>
         <source>General</source>
-        <translation>一般</translation>
+        <translation>Allgemein</translation>
     </message>
     <message>
         <source>Use Default Viewer for Movie Formats</source>
-        <translation>動画FormatをAbspielenするとき、既定のメディアプレーヤー verwenden</translation>
+        <translation>Standard-Player für Film-Formate verwenden</translation>
     </message>
     <message>
         <source>Minimize Raster Memory Fragmentation*</source>
-        <translation type="vanished">ラスターメモリのフラグメンテーションを最小化する*</translation>
+        <translation type="vanished">Raster-Speicher-Fragmentierung minimieren*</translation>
     </message>
     <message>
         <source>Save Automatically Every Minutes</source>
-        <translation>分間隔でAutomatisch保存</translation>
+        <translation>Nach Anzahl Minuten automatisch speichern</translation>
     </message>
     <message>
         <source>Backup Animation Levels when Saving</source>
-        <translation>Speichern時にEbeneのバックアップをとる</translation>
+        <translation>Beim Speichern ein Backup der Ebenen erstellen</translation>
     </message>
     <message>
         <source>Cell-dragging Behaviour:</source>
-        <translation>Cellsのドラッグ動作:</translation>
+        <translation>Cell-Bewegungsverhalten:</translation>
     </message>
     <message>
         <source>Interface</source>
-        <translation>インターフェイス</translation>
+        <translation>Interface</translation>
     </message>
     <message>
         <source>Style:</source>
@@ -4906,7 +4906,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Open FlipboOk after Rendering</source>
-        <translation>Render後にFlipbook öffnen</translation>
+        <translation>Nach dem Rendern Flipbook öffnen</translation>
     </message>
     <message>
         <source>Unit:</source>
@@ -4914,11 +4914,11 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Camera Unit:</source>
-        <translation>KameraEinheit:</translation>
+        <translation>Kamera-Einheit:</translation>
     </message>
     <message>
         <source>FlipboOk Shrink:</source>
-        <translation type="vanished">フリップビューアの縮小:</translation>
+        <translation type="vanished">Flipbook schrumpfen:</translation>
     </message>
     <message>
         <source>Step:</source>
@@ -4934,47 +4934,47 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Expose Loaded Levels in Xsheet</source>
-        <translation>SzeneAssetにEbeneを読み込む時、Xsheetにも配置</translation>
+        <translation>Geladenen Ebenen in Xsheet anzeigen</translation>
     </message>
     <message>
         <source>Create Sub-folder when Importing Sub-xsheet</source>
-        <translation>Sub-Xsheetをインポートして読み込む時、Sub-フォルダ erstellenする</translation>
+        <translation>Beim importieren von Sub-Xsheets Unterordner erstellen</translation>
     </message>
     <message>
         <source>Drawing</source>
-        <translation>作画</translation>
+        <translation>Zeichnung</translation>
     </message>
     <message>
         <source>Keep Original Cleaned Up Drawings As Backup</source>
-        <translation>Säubern直後のTLVをバックアップとして保持する</translation>
+        <translation>Gesäuberte TLVs direkt als Backup speichern</translation>
     </message>
     <message>
         <source>Animation</source>
-        <translation>アニメーション</translation>
+        <translation>Animation</translation>
     </message>
     <message>
         <source>Default Interpolation: </source>
-        <translation type="vanished">BildInterpolation方式の既定値:</translation>
+        <translation type="vanished">Standard Bild-Interpolation:</translation>
     </message>
     <message>
         <source>Linear</source>
-        <translation>リニア</translation>
+        <translation>Linear</translation>
     </message>
     <message>
         <source>Speed In / Speed Out</source>
-        <translation>スピードイン/スピードアウト</translation>
+        <translation>Speed-In/Speed-Out</translation>
     </message>
     <message>
         <source>Ease In / Ease Out</source>
-        <translation>スローイン/スローアウト</translation>
+        <translation>Ease-In/Ease-Out</translation>
     </message>
     <message>
         <source>Ease In / Ease Out %</source>
-        <translation>スローイン/スローアウト（%）</translation>
+        <translation>Ease-In/Ease-Out（%）</translation>
     </message>
     <message>
         <source>Animation Step:</source>
-        <translation>アニメーションSchritt:</translation>
+        <translation>Animations-Schritt:</translation>
     </message>
     <message>
         <source>Preview</source>
@@ -4982,19 +4982,19 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Blank Frames:</source>
-        <translation>ブランクFrame数:</translation>
+        <translation>Leere Frames:</translation>
     </message>
     <message>
         <source>Blank Frames Color:</source>
-        <translation>ブランクFrameの色:</translation>
+        <translation>Leere Frame-Farbe:</translation>
     </message>
     <message>
         <source>Display in a New FlipboOk Window</source>
-        <translation>Neue Flipbookを開いてAnsicht</translation>
+        <translation>In einem neue Flipbook anzeigen</translation>
     </message>
     <message>
         <source>Rewind after Playback</source>
-        <translation>Abspielen後に巻き戻す</translation>
+        <translation>Nach dem Abspielen zurückspulen</translation>
     </message>
     <message>
         <source>Onion Skin</source>
@@ -5002,51 +5002,51 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>   Following Frames Correction: </source>
-        <translation type="vanished">先頭Frameの色Einstellungen:</translation>
+        <translation type="vanished">Farb-Einstellungen der folgenden Frames:</translation>
     </message>
     <message>
         <source>   Previous  Frames Correction: </source>
-        <translation type="vanished">後続Frameの色Einstellungen:</translation>
+        <translation type="vanished">Farb-Einstellungen der vorherigen Frames:</translation>
     </message>
     <message>
         <source>Display Lines Only </source>
-        <translation>線のみAnsicht</translation>
+        <translation>Nur Linien anzeigen</translation>
     </message>
     <message>
         <source>Version Control</source>
-        <translation>バージョン管理</translation>
+        <translation>Versionskontrolle</translation>
     </message>
     <message>
         <source>Automatically Refresh Folder Contents</source>
-        <translation>Ordner-InhaltのAutomatischErneuern</translation>
+        <translation>Ordner-Inhalte automatisch aktualisieren</translation>
     </message>
     <message>
         <source>Cells Only</source>
-        <translation>Xsheetのコマのみ</translation>
+        <translation>Nur Xsheet Cells</translation>
     </message>
     <message>
         <source>Cells and Column Data</source>
-        <translation>Xsheetのコマと列のデータ</translation>
+        <translation>Daten der Spalten und Reihen</translation>
     </message>
     <message>
         <source>Language*:</source>
-        <translation type="vanished">言語*:</translation>
+        <translation type="vanished">Sprache*:</translation>
     </message>
     <message>
         <source>Undo Memory Size (MB):</source>
-        <translation type="vanished">「Rückgängig」のメガバイト記憶容量:</translation>
+        <translation type="vanished">Speichergröße (MB) zurücksetzen:</translation>
     </message>
     <message>
         <source>Render Task Chunk Size:</source>
-        <translation>RenderAufgabeのチャンクサイズ:</translation>
+        <translation>Stückgröße der Render-Aufgaben:</translation>
     </message>
     <message>
         <source>Show Info in Rendered Frames</source>
-        <translation>Gerenderte Frame内に情報 anzeigen</translation>
+        <translation>Informationen in gerenderten Frames anzeigen</translation>
     </message>
     <message>
         <source>*Changes will take effect the next time you run Toonz</source>
-        <translation type="vanished">［*］TOONZの再起動が必要</translation>
+        <translation type="vanished">*Änderungen werden wirksam beim nächsten Start von Toonz</translation>
     </message>
     <message>
         <source>cm</source>
@@ -5062,15 +5062,15 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>field</source>
-        <translation>フィールド</translation>
+        <translation>Feld</translation>
     </message>
     <message>
         <source>Xsheet Autopan during Playback</source>
-        <translation>Abspielen中にXsheetをオートスクロール</translation>
+        <translation>Auto-Scroll beim Abspielen des Xsheets</translation>
     </message>
     <message>
         <source>Level Strip Frames Width*:</source>
-        <translation type="vanished">Ebenen BetrachterFrame　幅*:</translation>
+        <translation type="vanished">Breite der Ebenen-Frames*:</translation>
     </message>
     <message>
         <source>Capture</source>
@@ -5078,11 +5078,11 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>        Frame Rate:</source>
-        <translation type="vanished">Frameレート:</translation>
+        <translation type="vanished">Framerate:</translation>
     </message>
     <message>
         <source>Scan File Format:</source>
-        <translation>ScanDatei-Format:</translation>
+        <translation>Scan-Datei-Format:</translation>
     </message>
     <message>
         <source>Width:</source>
@@ -5098,27 +5098,27 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Minimize Savebox after Editing</source>
-        <translation>BildBearbeitenの後、セーブボックスを最小化する</translation>
+        <translation>Nach der Bildbearbeitung die Savebox minimieren</translation>
     </message>
     <message>
         <source>Use the TLV Savebox to Limit Filling Operations</source>
-        <translation>TLVのセーブボックスを塗りつぶしの境界線として用いる</translation>
+        <translation>Die TLV-Savebox benutzen um Füll-Operationen zu beschränken</translation>
     </message>
     <message>
         <source>Paper Thickness:</source>
-        <translation>紙厚:</translation>
+        <translation>Papier-Dicke:</translation>
     </message>
     <message>
         <source>Enable Version Control *</source>
-        <translation type="vanished">バージョン管理 aktivieren*</translation>
+        <translation type="vanished">Versionskontrolle aktivieren*</translation>
     </message>
     <message>
         <source>Default Level Type:</source>
-        <translation>既定のEbeneFormat:</translation>
+        <translation>Standard Ebenen-Format:</translation>
     </message>
     <message>
         <source>Autocreation:</source>
-        <translation>AutomatischErstellen:</translation>
+        <translation>Automatisches Erstellen:</translation>
     </message>
     <message>
         <source>Transparency Check</source>
@@ -5126,35 +5126,35 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>   Ink Color on White Bg: </source>
-        <translation type="vanished">　白背景に線とVectorの色:</translation>
+        <translation type="vanished">　Linien und Vektor-Farbe auf weißem Hintergrund:</translation>
     </message>
     <message>
         <source>   Ink Color on Black Bg: </source>
-        <translation type="vanished">　黒背景に線とVectorの色:</translation>
+        <translation type="vanished">　Linien und Vektor-Farbe auf schwarzem Hintergrund:</translation>
     </message>
     <message>
         <source> Paint Color: </source>
-        <translation type="vanished">塗りつぶし色:</translation>
+        <translation type="vanished">Flächen-Farbe:</translation>
     </message>
     <message>
         <source>Fit to FlipboOk</source>
-        <translation>Flipbookに全体 anzeigen</translation>
+        <translation>Alles im Flipbook anzeigen</translation>
     </message>
     <message>
         <source>New Level Format</source>
-        <translation>Neue EbeneFormat</translation>
+        <translation>Neues Ebenen-Format</translation>
     </message>
     <message>
         <source>Assign the new level format name:</source>
-        <translation>Neue EbeneFormatの名前をアサイン:</translation>
+        <translation>Neuen Ebenen-Format-Namen zuordnen:</translation>
     </message>
     <message>
         <source>New Format</source>
-        <translation>Neue Format</translation>
+        <translation>Neues Format</translation>
     </message>
     <message>
         <source>Level Settings by File Format:</source>
-        <translation>Datei-Format毎のEbenen-Einstellungen:</translation>
+        <translation>Ebenen-Einstellungen nach Datei-Format:</translation>
     </message>
     <message>
         <source>Edit</source>
@@ -5166,24 +5166,24 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Visualization</source>
-        <translation>視覚化</translation>
+        <translation>Visualisierung</translation>
     </message>
     <message>
         <source>Show Lines with Thickness 0</source>
-        <translation>Dicke0の線 anzeigen</translation>
+        <translation>Linien mit Dicke 0 anzeigen</translation>
     </message>
     <message>
         <source>Antialiased region boundaries</source>
-        <translatorcomment>元訳:KantenglättungBereichの境界線</translatorcomment>
+        <translatorcomment>Kantenglättung an Bereichsrändern</translatorcomment>
         <translation></translation>
     </message>
     <message>
         <source>Next/Previous Step Frames:</source>
-        <translation>Nächster /Vorheriger ステップのFrame</translation>
+        <translation>Nächster/Vorheriger Schritt-Frame</translation>
     </message>
     <message>
         <source>Ignore Alpha Channel on Levels in Column 1</source>
-        <translation>列１のEbeneのAlphaを無視する</translation>
+        <translation>Alpha-Kanal auf Ebenen in Spalte 1 ignorieren</translation>
     </message>
     <message>
         <source>pixel</source>
@@ -5191,63 +5191,63 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Minimize Raster Memory Fragmentation *</source>
-        <translation>ラスターメモリのフラグメンテーションを最小化する*</translation>
+        <translation>Raster-Speicher-Fragmentierung minimieren*</translation>
     </message>
     <message>
         <source>Replace Level after SaveLevelAs command</source>
-        <translation type="vanished">Ebene speichern alsした後、Ebene ersetzenる</translation>
+        <translation type="vanished">Ebene nach dem "Speichern als"-Befehl ersetzen</translation>
     </message>
     <message>
         <source>* Changes will take effect the next time you run Toonz</source>
-        <translation>*印の項目は、次回OpenToonz起動時に反映されます</translation>
+        <translation>*Änderungen werden wirksam beim nächsten Start von Toonz</translation>
     </message>
     <message>
         <source>Move Current Frame by Clicking on Xsheet / Numerical Columns Cell Area</source>
-        <translation>XsheetまたはファンクションEditorのエリアをクリックした時、カレントFrameを移動する</translation>
+        <translation>Beim clicken auf das Xsheet oder den Funktions-Editor wird der aktuelle Frame verschoben</translation>
     </message>
     <message>
         <source>Enable Actual Pixel View on Scene Editing Mode</source>
-        <translation>SzeneBearbeitenモードのとき、ピクCells等倍Ansicht aktivieren</translation>
+        <translation>Im Szene-Bearbeitungs-Modus die tatsächliche Bildgröße der Pixel anzeigen</translation>
     </message>
     <message>
         <source>Display Level Name on Each Marker</source>
-        <translation>Xsheetの各マーカー上にName der Ebene anzeigenする</translation>
+        <translation>An jedem Marker den Ebenen-Namen anzeigen</translation>
     </message>
     <message>
         <source>Show Raster Images Darken Blended in Camstand View</source>
-        <translation>KameraスタンドAnsicht時、ラスターBildを「比較暗」合成してAnsichtする</translation>
+        <translation>In der Kamera-Stand-Ansicht die Raster-Bilder (dunkel gemischt) anzeigen</translation>
     </message>
     <message>
-        <source>Show &quot;ABC&quot; Appendix to the Frame Number in Xsheet Cell</source>
-        <translation>XsheetのCells内で、Frame番号下一ケタを「A,B,C…」の文字にErsetzenてAnsichtする</translation>
+        <source>Show &quot;ABC&quot;  to the Frame Number in Xsheet Cell</source>
+        <translation>Den Anhang &quot;ABC&quot; an der Frame-Nummer im Xsheet anzeigen</translation>
     </message>
     <message>
         <source>Automatically Remove Scene Number from Loaded Level Name</source>
-        <translation>読み込んだName der EbeneからSzene番号(&quot;c####_&quot;) automatisch的に消去する</translation>
+        <translation>Die Szenen-Nummer automatisch von geladenen Ebenen-Namen entfernen</translation>
     </message>
     <message>
         <source>Multi Layer Style Picker : Switch Levels by Picking</source>
-        <translation>多層スポイトツールを有効化:Stilを拾うと同時にカレントEbeneを切り替える</translation>
+        <translation>Multi Ebenen-Stil-Wähler : Ebenen durch Wählen wechseln</translation>
     </message>
     <message>
         <source>Onion Skin ON</source>
-        <translation>Onion Skin verwendenする</translation>
+        <translation>Onion Skin verwenden</translation>
     </message>
     <message>
         <source>Enable Version Control*</source>
-        <translation>バージョン管理 aktivieren*</translation>
+        <translation>Versionskontrolle aktivieren*</translation>
     </message>
     <message>
         <source>Category</source>
-        <translation>カテゴリー</translation>
+        <translation>Kategorie</translation>
     </message>
     <message>
         <source>Undo Memory Size (MB)</source>
-        <translation>「Rückgängig」の記憶容量（MB）</translation>
+        <translation>Speichergröße (MB) zurücksetzen</translation>
     </message>
     <message>
         <source>Icon Size *</source>
-        <translation>アイコンサイズ *</translation>
+        <translation>Icon-Größe *</translation>
     </message>
     <message>
         <source>X</source>
@@ -5255,43 +5255,43 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Viewer  Shrink</source>
-        <translation>BetrachterのBildSchrumpfen</translation>
+        <translation>Betrachter schrumpfen</translation>
     </message>
     <message>
         <source>Step</source>
-        <translation>ステップ</translation>
+        <translation>Schritt</translation>
     </message>
     <message>
         <source>Viewer BG Color</source>
-        <translation>Betrachter hintergrundfarbe</translation>
+        <translation>Betrachter Hintergrundfarbe</translation>
     </message>
     <message>
         <source>Preview BG Color</source>
-        <translation>Vorschau hintergrundfarbe</translation>
+        <translation>Vorschau Hintergrundfarbe</translation>
     </message>
     <message>
         <source>ChessBoard Color 1</source>
-        <translation>チェックボード色 1</translation>
+        <translation>Schachbrett-Farbe 1</translation>
     </message>
     <message>
         <source>Chessboard Color 2</source>
-        <translation>チェックボード色 2</translation>
+        <translation>Schachbrett-Farbe 2</translation>
     </message>
     <message>
         <source>Viewer Zoom Center</source>
-        <translation>ビューア上のVergrößerungの中心位置</translation>
+        <translation>Betrachter-Zoom-Zentrum</translation>
     </message>
     <message>
         <source>Language *:</source>
-        <translation>言語*:</translation>
+        <translation>Sprache*:</translation>
     </message>
     <message>
         <source>Default TLV Caching Behavior</source>
-        <translation>TLVBildデータのキャッシュ（既定値）</translation>
+        <translation>Standard TLV-Caching-Verhalten</translation>
     </message>
     <message>
         <source>Column Icon</source>
-        <translation>列アイコンAnsichtのタイミング</translation>
+        <translation>Spalten-Icon</translation>
     </message>
     <message>
         <source>  Height:</source>
@@ -5299,86 +5299,86 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Default Interpolation:</source>
-        <translation>KeysFrameInterpolation方式の既定値 :</translation>
+        <translation>Standard Keyframe-Interpolation:</translation>
     </message>
     <message>
         <source>Following Frames Correction:</source>
-        <translation>後Frameの色 :</translation>
+        <translation>Farbe der folgenden Frames:</translation>
     </message>
     <message>
         <source>Previous  Frames Correction:</source>
-        <translation>前Frameの色 :</translation>
+        <translation>Farbe der vorherigen Frames:</translation>
     </message>
     <message>
         <source>Ink Color on White Bg:</source>
-        <translation>線の色 :</translation>
+        <translation>Linien-Farbe auf weißem Hintergrund:</translation>
     </message>
     <message>
         <source>Ink Color on Black Bg:</source>
-        <translation>Hintergrund Schwarz-Check時の線の色 :</translation>
+        <translation>Linien-Farbe auf schwarzem Hintergrund:</translation>
     </message>
     <message>
         <source>Paint Color:</source>
-        <translation>塗りの色 :</translation>
+        <translation>Flächen-Farbe:</translation>
     </message>
     <message>
         <source>On Demand</source>
-        <translation>必要に応じて読み込む</translation>
+        <translation>Bei Bedarf</translation>
     </message>
     <message>
         <source>All Icons</source>
-        <translation>全Frameのアイコンを最初に読み込む</translation>
+        <translation>Alle Icons laden</translation>
     </message>
     <message>
         <source>All Icons &amp; Images</source>
-        <translation>全FrameのアイコンとBildを最初に読み込む</translation>
+        <translation>Alle Icons und Bilder laden</translation>
     </message>
     <message>
         <source>At Once</source>
-        <translation>ロード時に全てAnsicht</translation>
+        <translation>Beim Laden Alle anzeigen</translation>
     </message>
     <message>
         <source>Pick Every Colors as Different Styles</source>
-        <translation>Bildの全ての異なる色を別々のStilにする</translation>
+        <translation>Jede Farbe als einzelnen Stil wählen</translation>
     </message>
     <message>
         <source>Integrate Similar Colors as One Style</source>
-        <translation>近似色を１つのStilとして統合する</translation>
+        <translation>Ähnliche Farben als eine Stil wählen</translation>
     </message>
     <message>
         <source>Palette Type on Loading Raster Image as Color Model</source>
-        <translation>FarbmodellにラスターBildを読み込む際の、Palette生成方法</translation>
+        <translation>Paletten-Typ beim Laden von Raster-Bildern als Farbmodell</translation>
     </message>
     <message>
         <source>Mouse Cursor</source>
-        <translation>マウスカーソル位置</translation>
+        <translation>Mouse-Cursor-Position</translation>
     </message>
     <message>
         <source>Viewer Center</source>
-        <translation>Betrachterの中心</translation>
+        <translation>Betrachter-Zentrum</translation>
     </message>
     <message>
         <source>Disabled</source>
-        <translation>無効</translation>
+        <translation>Deaktiviert</translation>
     </message>
     <message>
         <source>Enabled</source>
-        <translation>有効</translation>
+        <translation>Aktiviert</translation>
     </message>
     <message>
         <source>Use Xsheet as Animation Sheet</source>
-        <translation>Xsheetを動画Xsheetとして用いる</translation>
+        <translation>Xsheet als Animations-Sheet verwenden</translation>
     </message>
     <message>
         <source>Replace Toonz Level after SaveLevelAs command</source>
-        <translation>ToonzEbene speichern alsした後、Ebene ersetzenる</translation>
+        <translation>Toonz-Ebene nach dem "Speichern als"-Befehl ersetzen</translation>
     </message>
 </context>
 <context>
-    <name>PreferencesPopup::FormatProperties</name>
+    <name>PreferencesPopup:: FormatProperties</name>
     <message>
         <source>Level Settings by File Format</source>
-        <translation>Datei-Format毎のEbenen-Einstellungen</translation>
+        <translation>Ebenen-Einstellungen nach Datei-Format</translation>
     </message>
     <message>
         <source>Name:</source>
@@ -5386,24 +5386,24 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Regular Expression:</source>
-        <translation>Datei-Format（正規表現）:</translation>
+        <translation>Datei-Format（Reguläre Ausdrücke）:</translation>
     </message>
     <message>
         <source>Priority</source>
-        <translation>優先順位</translation>
+        <translation>Priorität</translation>
     </message>
 </context>
 <context>
     <name>Previewer</name>
     <message>
         <source>The file name cannot be empty or contain any of the following characters:(new line)  \ / : * ? &quot;  |</source>
-        <translation>Datei名は空であることができません。また、Nächster 記号のどれかを含むことができません: \ / : * ? &quot;  |</translation>
+        <translation>Der Dateiname darf nicht leer sein oder folgende Zeichen enthalten: (new line)  \ / : * ? &quot;  |</translation>
     </message>
     <message>
         <source>File %1 already exists.
 Do you want to overwrite it?</source>
-        <translation>Datei %1 は、既に存在します。
-上書きしてもよろしいですか？</translation>
+        <translation>Datei %1 existiert bereits. 
+Möchte Sie sie überschreiben?</translation>
     </message>
 </context>
 <context>
@@ -5414,7 +5414,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>None</source>
-        <translation>なし</translation>
+        <translation>Keine</translation>
     </message>
     <message>
         <source>Greyscale</source>
@@ -5422,7 +5422,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Color</source>
-        <translation>色Säubern</translation>
+        <translation>Farbe</translation>
     </message>
     <message>
         <source>Antialias:</source>
@@ -5438,7 +5438,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Autoadjust:</source>
-        <translation>Automatisch調整:</translation>
+        <translation>Automatische Anpassung:</translation>
     </message>
     <message>
         <source>Sharpness:</source>
@@ -5446,7 +5446,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Despeckling:</source>
-        <translation>ドットノイズ automatisch除去:</translation>
+        <translation>Störungen entfernen:</translation>
     </message>
     <message>
         <source>MLAA Intensity:</source>
@@ -5469,58 +5469,57 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>It is not possible to create the %1 project.</source>
-        <translation>Projekt %1  es konnte nicht erstellt werden.</translation>
+        <translation>Projekt %1 konnte nicht erstellt werden.</translation>
     </message>
     <message>
         <source>Project Name cannot be empty or contain any of the following characters:
  \ / : * ? &quot; &lt; &gt; |</source>
-        <translation>Projekt名は空であることができません。また、Nächster 記号のいずれかを含むことができません:
- \ / : * ? &quot; &lt; &gt; |</translation>
+        <translation>Der Projektname darf nicht leer sein oder folgende Zeichen enthalten:  \ / : * ? &quot; &lt; &gt; |</translation>
     </message>
     <message>
         <source>Bad project name: &apos;%1&apos; loOks like an absolute file path</source>
-        <translation>不正なProjekt名: &apos;%1&apos; は絶対Pfadのように見えます</translation>
+        <translation>Ungültiger Projektname: &apos;%1&apos; scheint ein absoluter Pfad zu sein</translation>
     </message>
     <message>
         <source>Project &apos;%1&apos; already exists</source>
-        <translation>Projekt &apos;%1&apos; は、既に存在します</translation>
+        <translation>Projekt &apos;%1&apos; existiert bereits</translation>
     </message>
 </context>
 <context>
     <name>ProjectPopup</name>
     <message>
         <source>Project Name:</source>
-        <translation>Projekt名:</translation>
+        <translation>Projektname:</translation>
     </message>
     <message>
         <source>Append $scenepath to +drawings</source>
-        <translation>$scenepath を +drawings PfadにHinzufügen</translation>
+        <translation>$scenepath an +drawings hinzufügen</translation>
     </message>
     <message>
         <source>Append $scenepath to +inputs</source>
-        <translation>$scenepath を +inputs PfadにHinzufügen</translation>
+        <translation>$scenepath an +inputs hinzufügen</translation>
     </message>
     <message>
         <source>Append $scenepath to +extras</source>
-        <translation>$scenepath を +extras PfadにHinzufügen</translation>
+        <translation>$scenepath an +extras hinzufügen</translation>
     </message>
     <message>
         <source>Project:</source>
-        <translation>Projekt :</translation>
+        <translation>Projekt:</translation>
     </message>
 </context>
 <context>
     <name>ProjectSettingsPopup</name>
     <message>
         <source>Project Settings</source>
-        <translation>ProjektEinstellungen</translation>
+        <translation>Projekt-Einstellungen</translation>
     </message>
 </context>
 <context>
     <name>PsdSettingsPopup</name>
     <message>
         <source>Load PSD File</source>
-        <translation>PSDDateiを読み込む</translation>
+        <translation>PSD-Datei laden</translation>
     </message>
     <message>
         <source>Name:</source>
@@ -5532,34 +5531,34 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Expose in a Sub-xsheet</source>
-        <translation>Sub-Xsheetとして配置</translation>
+        <translation>Als Sub-Xsheet anordnen</translation>
     </message>
     <message>
         <source>Load As:</source>
-        <translation>LadenFormat:</translation>
+        <translation>Laden als:</translation>
     </message>
     <message>
         <source>Group Option</source>
-        <translation>グループOptionen</translation>
+        <translation>Gruppen-Optionen</translation>
     </message>
     <message>
         <source>Ignore groups</source>
-        <translation>グループを無視</translation>
+        <translation>Gruppe ignorieren</translation>
     </message>
     <message>
         <source>Expose layers in a group as columns in a sub-xsheet</source>
-        <translation>グループ内の各レイヤー sub-Xsheetの各列に配置する</translation>
+        <translation>Ebenen in Gruppen als Spalten in einem Xsheet anordnen</translation>
     </message>
     <message>
         <source>Expose layers in a group as frames in a column</source>
-        <translation>グループ内の各レイヤーを１つの列の各Frameに配置</translation>
+        <translation>Ebenen in Gruppen als Frames in einem Xsheet anordnen</translation>
     </message>
 </context>
 <context>
     <name>QApplication</name>
     <message>
         <source>Quit</source>
-        <translation>終了</translation>
+        <translation>Beenden</translation>
     </message>
     <message>
         <source>New Scene</source>
@@ -5574,19 +5573,19 @@ Do you want to overwrite it?</source>
     <name>QObject</name>
     <message>
         <source>No data to paste.</source>
-        <translation>Einfügenるデータがありません。</translation>
+        <translation>Keine Daten zum Einfügen vorhanden.</translation>
     </message>
     <message>
         <source>It is not possible to paste the cells: there is a circular reference.</source>
-        <translation>Cellsを貼る付けできません:循環参照があります。</translation>
+        <translation>Die Cells können nicht eingefügt werden: Es besteht eine zirkulare Referenz.</translation>
     </message>
     <message>
         <source>Overwrite</source>
-        <translation>上書き</translation>
+        <translation>Überschreiben</translation>
     </message>
     <message>
         <source>Don&apos;t Overwrite</source>
-        <translation>上書きしない</translation>
+        <translation>Nicht überschreiben</translation>
     </message>
     <message>
         <source>Save</source>
@@ -5603,28 +5602,28 @@ Do you want to overwrite it?</source>
     <message>
         <source>The color model palette is different from the destination palette.
 What do you want to do? </source>
-        <translation>FarbmodellのPaletteは対象のPaletteと異なります。
-どうしますか？</translation>
+        <translation>Die Farbmodell-Palette unterscheidet sich von der Zeil-Palette.
+Was möchten Sie tun?</translation>
     </message>
     <message>
         <source>Overwrite the destination palette.</source>
-        <translation>対象のPaletteを上書きする。</translation>
+        <translation>Die Ziel-Palette überschreiben.</translation>
     </message>
     <message>
         <source>Keep the destination palette and apply it to the color model.</source>
-        <translation>対象のPaletteを保持して、FarbmodellにもAnwendenする。</translation>
+        <translation>Die Ziel-Palette behalten und an das Farbmodell anwenden.</translation>
     </message>
     <message>
         <source>It is not possible to paste the columns: there is a circular reference.</source>
-        <translation>列 einfügenできません:循環参照があります。</translation>
+        <translation>Die Spalten können nicht eingefügt werden: Es besteht eine zirkulare Referenz.</translation>
     </message>
     <message>
         <source>None</source>
-        <translation>なし</translation>
+        <translation>Keine</translation>
     </message>
     <message>
         <source>Edited</source>
-        <translation>Bearbeiten済み</translation>
+        <translation>Bearbeitet</translation>
     </message>
     <message>
         <source>Normal</source>
@@ -5632,36 +5631,36 @@ What do you want to do? </source>
     </message>
     <message>
         <source>To Update</source>
-        <translation>アップデートが必要</translation>
+        <translation>Aktualisierung benötigt</translation>
     </message>
     <message>
         <source>Modified</source>
-        <translation>変更済み</translation>
+        <translation>Modifiziert</translation>
     </message>
     <message>
         <source>Locked</source>
-        <translation>ロック中</translation>
+        <translation>Gesperrt</translation>
     </message>
     <message>
         <source>Unversioned</source>
-        <translation>バージョンなし</translation>
+        <translation>Ohne Version</translation>
     </message>
     <message>
         <source>Missing</source>
-        <translation>不明</translation>
+        <translation>Unbekannt</translation>
     </message>
     <message>
         <source>Duplicate</source>
-        <translation>Duplizierenする</translation>
+        <translation>Duplizieren</translation>
     </message>
     <message>
         <source>Don&apos;t Duplicate</source>
-        <translation>Duplizierenしない</translation>
+        <translation>Nicht duplizieren</translation>
     </message>
     <message numerus="yes">
         <source>Deleting %n files. Are you sure?</source>
         <translation>
-            <numerusform>%n 個のDatei löschenします。よろしいですか？</numerusform>
+            <numerusform>%n Dateien zum Löschen. Sind Sie sich sicher?</numerusform>
         </translation>
     </message>
     <message>
@@ -5671,71 +5670,69 @@ What do you want to do? </source>
     <message>
         <source>You are going to premultiply selected files.
 The operation cannot be undone: are you sure?</source>
-        <translation>WählenしたDateiをチャンネル合成します。
-この操作はRückgängigことができません:よろしいですか？</translation>
+        <translation>Premultiply wird an gewählte Dateien angewandt. Dieser Vorgang kann nicht rückgängig gemacht werden: Sind Sie sich sicher?</translation>
     </message>
     <message>
         <source>Premultiply</source>
-        <translation>チャンネル合成（黒マット）</translation>
+        <translation>Premultiply [Schwarz-Matte]</translation>
     </message>
     <message>
         <source>%1  has an invalid extension format.</source>
-        <translation>%1 には、Ungültige 拡張Formatがあります。</translation>
+        <translation>%1 hat ein ungültiges Erweiterungsformat.</translation>
     </message>
     <message>
         <source>File %1 doesn&apos;t belong to the current project.
 Do you want to import it or load it from its original location?</source>
-        <translation>Datei %1 はAktueller Projektに属していません。
-Dateiをインポート（Projekt内にKopierenしてLaden）しますか、
-それとも元の場所からLadenますか？</translation>
+        <translation>Die Datei %1 gehört nicht in das aktuelle Projekt.
+Möchten Sie sie importieren oder von ihrem ursprünglichen Standort laden.</translation>
     </message>
     <message>
         <source>Import</source>
-        <translation>インポートする</translation>
+        <translation>Importieren</translation>
     </message>
     <message>
         <source>Load</source>
-        <translation>元の場所から読み込む</translation>
+        <translation>Vom ursprünglichen Standort laden</translation>
     </message>
     <message>
         <source>The camera settings of the scene you are loading as sub-xsheet are different from those of your current scene. What you want to do?</source>
-        <translation>Sub-Xsheetとして読み込むSzeneのKameraEinstellungenがAktueller Szeneと異なります。どうしますか？</translation>
+        <translation>Die Kamera-Einstellungen von der, als Sub-Xsheet zu ladenden, Szene unterscheiden sich von Ihrer aktuellen Szene. Was möchten Sie tun?</translation>
     </message>
     <message>
         <source>Keep the sub-xsheet original camera settings.</source>
-        <translation>Sub-XsheetのKameraEinstellungenを保持する。</translation>
+        <translation>Die ursprünglichen Sub-Xsheet Kamera-Einstellungen behalten.</translation>
     </message>
     <message>
         <source>Apply the current scene camera settings to the sub-xsheet.</source>
-        <translation>Sub-Xsheetに、Aktueller SzeneのKameraEinstellungen anwendenする。</translation>
+        <translation>Die Kamera-Einstellungen der aktuellen Szene and das Sub-Xsheet anwenden.</translation>
     </message>
     <message>
         <source>%1 has an invalid file extension.</source>
-        <translation>%1 のDatei拡張子は無効です。</translation>
+        <translation>%1 hat eine ungültige Dateiendung.</translation>
     </message>
     <message>
         <source>%1 is an invalid path.</source>
-        <translation>%1 はUngültige Pfadです。</translation>
+        <translation>%1 ist ein ungültiger Pfad.</translation>
     </message>
     <message>
         <source>Import Scene</source>
-        <translation>Szeneをインポートする</translation>
+        <translation>Szene importieren</translation>
     </message>
     <message>
         <source>Change Project</source>
-        <translation>Projektを切り替える</translation>
+        <translation>Projekt ändern</translation>
     </message>
     <message>
         <source>No cleaned up drawings available for the current selection.</source>
-        <translation>Aktueller WählenBereichに、使用可能なSäubern後のBildがありません。</translation>
+        <translation>Für die aktuelle Auswahl sind keine gesäuberten Bilder vorhanden.</translation>
     </message>
     <message>
         <source>No saved drawings available for the current selection.</source>
-        <translation>Aktueller WählenBereichに、使用可能な保存されたBildがありません。</translation>
+        <translation>Für die aktuelle Auswahl sind keine gespeicherten Bilder vorhanden.</translation>
     </message>
     <message>
         <source>The current selection is invalid.</source>
-        <translation>Aktueller WählenBereichは無効です。</translation>
+        <translation>Die aktuelle Auswahl ist ungültig.</translation>
     </message>
     <message>
         <source>Yes</source>
@@ -5747,25 +5744,25 @@ Dateiをインポート（Projekt内にKopierenしてLaden）しますか、
     </message>
     <message>
         <source>System date tampered.</source>
-        <translation>システムの日時が不正に変更されました。</translation>
+        <translation>Das System-Datum wurde manipuliert.</translation>
     </message>
     <message>
         <source>No more Undo operations available.</source>
-        <translation>これ以上Rückgängig操作はありません。</translation>
+        <translation>Es sind keine weiteren Rückgängig-Schritte vorhanden.</translation>
     </message>
     <message>
         <source>No more Redo operations available.</source>
-        <translation>これ以上Wiederholen操作はありません。</translation>
+        <translation>Es sind keine weiteren Wiederhol-Schritte vorhanden.</translation>
     </message>
     <message>
         <source>An update is available for this software.
 Visit the Web site for more information.</source>
-        <translation>ソフトウェアのアップデートがあります。
-詳細はWebseiteをご覧下さい。</translation>
+        <translation>Ein Update für diese Software ist verfügbar.
+Bitte besuchen Sie die Webseite für mehr Informationen.</translation>
     </message>
     <message>
         <source>Quit</source>
-        <translation>終了</translation>
+        <translation>Beenden</translation>
     </message>
     <message>
         <source>Scan</source>
@@ -5773,127 +5770,127 @@ Visit the Web site for more information.</source>
     </message>
     <message>
         <source>Don&apos;t Scan</source>
-        <translation>Scanしない</translation>
+        <translation>Nicht Scannen</translation>
     </message>
     <message>
         <source>Select an empty cell or a sub-xsheet cell.</source>
-        <translation type="vanished">空のCells、又はSub-SzeneのCellsをWählenして下さい。</translation>
+        <translation type="vanished">Wählen Sie eine leere Cell oder eine Sub-Xsheet-Cell.</translation>
     </message>
     <message>
         <source>Collapsing columns: what you want to do?</source>
-        <translation>列 sub-Xsheetに畳む:どうしますか？</translation>
+        <translation>Spalten einklappen: Was möchten Sie tun?</translation>
     </message>
     <message>
         <source>Include relevant pegbars in the sub-xsheet as well.</source>
-        <translation>関連するタップ情報もSub-Xsheet内に持ち込む。</translation>
+        <translation>Die relevanten Haltestifte auch dem Sub-Xsheet beifügen.</translation>
     </message>
     <message>
         <source>Include only selected columns in the sub-xsheet.</source>
-        <translation>Wählenした列のみSub-Xsheet内に持ち込む。</translation>
+        <translation>Nur gewählte Spalten dem Sub-Xsheet beifügen.</translation>
     </message>
     <message>
         <source>Exploding Sub-xsheet: what you want to do?</source>
-        <translation>Sub-Xsheetを展開する:どのように展開しますか？</translation>
+        <translation>Sub-Xsheet entfalten: Was möchten Sie tun?</translation>
     </message>
     <message>
         <source>Bring relevant pegbars in the main xsheet.</source>
-        <translation>親XsheetにSub-Xsheetのタップ情報も持ち出す。</translation>
+        <translation>Die relevanten Haltestifte dem Haupt-Xsheet beifügen.</translation>
     </message>
     <message>
         <source>Bring only columns in the main xsheet.</source>
-        <translation>親XsheetにSub-Xsheetの列のみ持ち出す。</translation>
+        <translation>Nur gewählte Spalten dem Haupt-Xsheet beifügen.</translation>
     </message>
     <message>
         <source>Are you sure you want to override </source>
-        <translation>次を優先的に実行してもよろしいですか </translation>
+        <translation>Sind Sie sicher, dass Sie überbrücken möchten? </translation>
     </message>
     <message>
         <source>Override</source>
-        <translation>優先して実行する</translation>
+        <translation>Überbrücken</translation>
     </message>
     <message>
         <source>It is not possible to track the level:
 allocation error.</source>
-        <translation>Ebeneを追跡できません:
-アロケーション・エラー。</translation>
+        <translation>Die Ebene kann nicht getrackt werden:
+Zuweisungsfehler.</translation>
     </message>
     <message>
         <source>It is not possible to track the level:
 no region defined.</source>
-        <translation>Ebeneを追跡できません:
-領域が指定されていません。</translation>
+        <translation>Die Ebene kann nicht getrackt werden:
+Flächen sind nicht definiert.</translation>
     </message>
     <message>
         <source>It is not possible to track specified regions:
 more than 30 regions defined.</source>
-        <translation>指定された領域を追跡できません:
-30 以上の領域が指定されています。</translation>
+        <translation>Die designierten Flächen können nicht getrackt werden:
+Über 30 Flächen wurden designiert.</translation>
     </message>
     <message>
         <source>It is not possible to track specified regions:
 defined regions are not valid.</source>
-        <translation>指定された領域を追跡できません:
-指定された領域は無効です。</translation>
+        <translation>Die designierten Flächen können nicht getrackt werden:
+Die designierten Flächen sind ungültig.</translation>
     </message>
     <message>
         <source>It is not possible to track specified regions:
 some regions are too wide.</source>
-        <translation>指定された領域を追跡できません:
-いくつかの領域が広すぎます。</translation>
+        <translation>Die designierten Flächen können nicht getrackt werden:
+Einige Flächen sind zu breit.</translation>
     </message>
     <message>
         <source>It is not possible to track specified regions:
 some regions are too high.</source>
-        <translation>指定された領域を追跡できません:
-いくつかの領域が高すぎます。</translation>
+        <translation>Die designierten Flächen können nicht getrackt werden:
+Einige Flächen sind zu hoch.</translation>
     </message>
     <message>
         <source>Frame Start Error</source>
-        <translation>開始Frameのエラー</translation>
+        <translation>Frame-Start-Fehler</translation>
     </message>
     <message>
         <source>Frame End Error</source>
-        <translation>終了Frameのエラー</translation>
+        <translation>Frame-End-Fehler</translation>
     </message>
     <message>
         <source>Threshold Distance Error</source>
-        <translation>Abstandしきい値のエラー</translation>
+        <translation>Abstand-Schwellwert-Fehler</translation>
     </message>
     <message>
         <source>Sensibility Error</source>
-        <translation>感度のエラー</translation>
+        <translation>Empfindlichkeit-Fehler</translation>
     </message>
     <message>
         <source>No Frame Found</source>
-        <translation>Frameが見つかりません</translation>
+        <translation>Kein Frame gefunden</translation>
     </message>
     <message>
         <source>It is not possible to track specified regions:
 the selected level is not valid.</source>
-        <translation>指定された領域を追跡できません:
-WählenされたEbeneは無効です。</translation>
+        <translation>Die designierten Flächen können nicht getrackt werden:
+Die gewählte Ebene ist ungültig.</translation>
     </message>
     <message>
         <source>It is not possible to track the level:
 no level selected.</source>
-        <translation>Ebeneを追跡できません:
-EbeneがWählenされていません。</translation>
+        <translation>Die Ebene kann nicht getrackt werden:
+Es wurde keine Ebene gewählt.</translation>
     </message>
     <message>
         <source>It is not possible to track specified regions:
 the level has to be saved first.</source>
-        <translation>指定された領域を追跡できません:
-先にEbene speichernして下さい。</translation>
+        <translation>Die designierten Flächen können nicht getrackt werden:
+Speichern Sie die Ebene vorher.</translation>
     </message>
     <message>
         <source>It is not possible to track the level:
 undefinied error.</source>
-        <translation>Ebeneを追跡できません:
-未定義のエラー。</translation>
+        <translation>Die Ebene kann nicht getrackt werden:
+Undefinierter Fehler.</translation>
     </message>
     <message>
         <source>Invalid selection: each selected column must contain one single level with increasing frame numbering.</source>
-        <translation>Wählenは無効です:それぞれのWählenした列は、ただ一つのEbeneを含まなければなりません。</translation>
+        <translation>Ungültiger Auswahl: Jede gewählte Spalte muss eine Ebene mit steigender Frame-Nummerierung beinhalten.</translation>
     </message>
     <message>
         <source>Viewer</source>
@@ -5905,7 +5902,7 @@ undefinied error.</source>
     </message>
     <message>
         <source>Scene Cast</source>
-        <translation>SzeneAsset</translation>
+        <translation>Szenen-Asset</translation>
     </message>
     <message>
         <source>Color Model</source>
@@ -5937,7 +5934,7 @@ undefinied error.</source>
     </message>
     <message>
         <source>Style Editor</source>
-        <translation>StilEditor</translation>
+        <translation>Stil-Editor</translation>
     </message>
     <message>
         <source>Tool Options</source>
@@ -5957,75 +5954,75 @@ undefinied error.</source>
     </message>
     <message>
         <source>Deactivate Onion Skin</source>
-        <translation>Onion Skinを無効化</translation>
+        <translation>Onion Skin ist deaktiviert</translation>
     </message>
     <message>
         <source>Limit Onion Skin To Level</source>
-        <translation>Onion Skin ebeneに制限</translation>
+        <translation>Onion Skin auf Ebene begrenzen</translation>
     </message>
     <message>
         <source>Extend Onion Skin To Scene</source>
-        <translation>Onion Skin szeneにもAnwenden</translation>
+        <translation>Onion Skin an Szene anwenden</translation>
     </message>
     <message>
         <source>Activate Onion Skin</source>
-        <translation>Onion Skinを有効化</translation>
+        <translation>Onion Skin ist aktiviert</translation>
     </message>
     <message>
         <source>Are you sure you want to save the Default Settings?</source>
-        <translation>Projekt既定のSzeneEinstellungenを上書きしてもよろしいですか？</translation>
+        <translation>Sind Sie sich sicher, dass Sie die Standard-Einstellungen überschreiben möchten?</translation>
     </message>
     <message>
         <source>Choose Folder</source>
-        <translation>フォルダをWählen</translation>
+        <translation>Ordner wählen</translation>
     </message>
     <message>
         <source>Revert: the current scene has been modified.
 Are you sure you want to revert to previous version?</source>
-        <translation>Szene zurückstellen:Aktueller Szeneは変更されています。
-最後に保存されたバージョンに戻してもよろしいですか？</translation>
+        <translation>Szene zurücksetzen: Die aktuelle Szene wurde geändert.
+Sind Sie sich sicher, dass Sie zur vorher gespeicherten Version zurücksetzen möchten??</translation>
     </message>
     <message>
         <source>Revert</source>
-        <translation>Zurückstellen</translation>
+        <translation>Zurücksetzen</translation>
     </message>
     <message>
         <source>Deleting %1. Are you sure?</source>
-        <translation>%1  löschenします。よろしいですか？</translation>
+        <translation>%1 wird gelöscht. Sind Sie sich sicher?</translation>
     </message>
     <message>
         <source>The %1 file has been generated</source>
-        <translation>%1 DateiがErstellenされました</translation>
+        <translation>Die %1 Datei wurde erstellt</translation>
     </message>
     <message>
         <source>%1: the current scene has been modified.
 Do you want to save your changes?</source>
-        <translation>%1 : Aktueller Szeneは変更されました。
-変更 speichernしますか？</translation>
+        <translation>%1: Die aktuelle Szene wurde geändert.
+Möchten Sie die Änderungen speichern?</translation>
     </message>
     <message>
         <source>The scene %1 already exists.
 Do you want to overwrite it?</source>
-        <translation>Szene %1 は既に存在します。
-上書きしてもよろしいですか？</translation>
+        <translation>Szene %1 existiert bereits.
+Sind Sie sich sicher, dass Sie überschreiben möchten?</translation>
     </message>
     <message>
         <source>The Scene &apos;%1&apos; belongs to project &apos;%2&apos;.
 What do you want to do?</source>
-        <translation>Szene &apos;%1&apos; は、別のProjekt &apos;%2&apos; に属しています。
-どうしますか？</translation>
+        <translation>Die Szene &apos;%1&apos; gehört zu Projekt &apos;%2&apos;.
+Was möchten Sie tun?</translation>
     </message>
     <message>
         <source>No unused levels</source>
-        <translation>Ungenutzte Ebeneはありません。</translation>
+        <translation>Keine ungenutzten Ebenen.</translation>
     </message>
     <message>
         <source>Rendered Frames  ::  From %1 To %2  ::  Step %3</source>
-        <translation>Gerenderte Frame:: %1 から %2 まで::ステップ %3</translation>
+        <translation>Gerenderte Frames:: Von %1 bis %2 :: Schritt %3</translation>
     </message>
     <message>
         <source>Preview FX :: %1 </source>
-        <translation>FXVorschau:: %1</translation>
+        <translation>FX-Vorschau :: %1</translation>
     </message>
     <message>
         <source>Batch Servers</source>
@@ -6033,104 +6030,104 @@ What do you want to do?</source>
     </message>
     <message>
         <source> Task added to the Batch Render List.</source>
-        <translation>AufgabeはバッチRenderリストにHinzufügenされました。</translation>
+        <translation>Die Aufgabe wurde der Batch-Render-Liste hinzugefügt.</translation>
     </message>
     <message>
         <source> Task added to the Batch Cleanup List.</source>
-        <translation>AufgabeはバッチSäubernリストにHinzufügenされました。</translation>
+        <translation>Die Aufgabe wurde der Batch-Säuberungs-Liste hinzugefügt.</translation>
     </message>
     <message>
         <source>There are no assets to collect</source>
-        <translation>インポートする必要のあるAssetはありません</translation>
+        <translation>Es gibt keine Assets zum importieren</translation>
     </message>
     <message>
         <source>One asset imported</source>
-        <translation>1つのAssetをインポートしました</translation>
+        <translation>Ein Asset wurde importiert</translation>
     </message>
     <message>
         <source>%1 assets imported</source>
-        <translation>%1 個のAssetをインポートしました</translation>
+        <translation>%1 Assets wurden importiert</translation>
     </message>
     <message>
         <source>Converting %1 images to tlv format...</source>
-        <translation>%1 個のBildをTLVFormatにUmwandlungしています...</translation>
+        <translation>Wandle %1 Bilder ins TLV-Format um...</translation>
     </message>
     <message>
         <source>No scene imported</source>
-        <translation>インポートされたSzeneはありません。</translation>
+        <translation>Es wurde keine Szene importiert.</translation>
     </message>
     <message>
         <source>One scene imported</source>
-        <translation>１つのSzeneがインポートされました。</translation>
+        <translation>Ein Szene wurde importiert.</translation>
     </message>
     <message>
         <source>%1 scenes imported</source>
-        <translation>%1 個のSzeneがインポートされました</translation>
+        <translation>%1 Szenen wurden importiert</translation>
     </message>
     <message>
         <source>It is not possible to delete lines because no column, cell or level strip frame was selected.</source>
-        <translation>描線 löschenすることができません:列、コマ又はEbenen BetrachterのFrameのいずれもWählenされていません。</translation>
+        <translation>Es kann keine Linie gelöscht werden, da kein Spalte, Cell oder Ebenen-Strip-Frame gewählt wurde.</translation>
     </message>
     <message>
         <source>The rooms will be reset the next time you run Toonz.</source>
-        <translation>Toonzを次回起動するとき、ワークスペースが初期化されます。</translation>
+        <translation>Die Arbeitsflächen werden beim nächsten Start von Toonz zurückgesetzt.</translation>
     </message>
     <message>
         <source>The license validation process was not able to confirm the right to use this software on this computer.
  Please contact [ support@toonz.com ] for assistance.</source>
-        <translation>ライセンス確認プロセスは、このコンピュータ上で本ソフトウェア verwendenする権利を確認できませんでした。
-support@toonz.com に連絡してください。</translation>
+        <translation>Der Lizenz-Validierungsprozess konnte die Rechte zum nutzen der Software auf diesem Computer nicht bestätigen.
+Bitte verbinden Sie sich mit support@toonz.com für Ünterstützung.</translation>
     </message>
     <message>
         <source>Saving previewed frames....</source>
-        <translation>VorschauしたFrame speichern中...</translation>
+        <translation>Vorgeschaute Frames werden gespeichert...</translation>
     </message>
     <message>
         <source>The command cannot be executed because the scene is empty.</source>
-        <translation>Szeneが空なので、コマンドを実行できません。</translation>
+        <translation>Der Befehl konnte nicht ausgeführt werden, da die Szene leer ist.</translation>
     </message>
     <message>
         <source>Change project</source>
-        <translation type="vanished">Projektを変更</translation>
+        <translation type="vanished">Projekt ändern</translation>
     </message>
     <message>
         <source>It is not possible to delete the selection.</source>
-        <translation>WählenBereichkann nicht gelöscht werden.</translation>
+        <translation>Den gewählten Bereich kann nicht gelöscht werden.</translation>
     </message>
     <message>
         <source>It is not possible to paste vectors in the current cell.</source>
-        <translation>Aktueller コマにベクター einfügenできません。</translation>
+        <translation>Vektoren können nicht in die aktuelle Cell eingefügt werden.</translation>
     </message>
     <message>
         <source>It is not possible to paste data: there is nothing to paste.</source>
-        <translation>データ einfügenできません:Einfügenるものがありません。</translation>
+        <translation>Es können keine Daten eingefügt werden: Es gibt nichts zum Einfügen.</translation>
     </message>
     <message>
         <source>The copied selection cannot be pasted in the current drawing.</source>
-        <translation>KopierenしたWählenBereichはAktueller BildにEinfügenられません。</translation>
+        <translation>Die kopierte Auswahl kann nicht in das aktuelle Bild eingefügt werden.</translation>
     </message>
     <message>
         <source>A filename cannot be empty or contain any of the following characters:
  \ / : * ? &quot; &lt; &gt; |</source>
-        <translation>Datei名は空であることができません。また、Nächster 記号のいずれかを含むことができません:
+        <translation>Ein Dateiname darf nicht leer sein oder folgende Zeichen beinhalten:
  \ / : * ? &quot; &lt; &gt; |</translation>
     </message>
     <message>
         <source>The palette %1 already exists.
 Do you want to overwrite it?</source>
-        <translation>Palette %1 は既に存在します。上書きしてもよろしいですか？</translation>
+        <translation>Palette %1 existiert bereits. Sind Sie sich sicher, dass Sie überschreiben möchten?</translation>
     </message>
     <message>
         <source>Cannot load Color Model in current palette.</source>
-        <translation>Aktueller PaletteにFarbmodellを読み込めません。</translation>
+        <translation>Das Farbmodell kann in der aktuellen Palette nicht geladen werden.</translation>
     </message>
     <message>
         <source>Image DPI</source>
-        <translation>BildのDPI</translation>
+        <translation>Bild-DPI</translation>
     </message>
     <message>
         <source>Custom DPI</source>
-        <translation>カスタムDPI</translation>
+        <translation>Eigene DPI</translation>
     </message>
     <message>
         <source>Create project</source>
@@ -6138,79 +6135,79 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>There are no frames to scan.</source>
-        <translation>ScanするFrameがありません。</translation>
+        <translation>Es gibt keine Frame zum Scannen.</translation>
     </message>
     <message>
         <source>TWAIN is not available.</source>
-        <translation>TWAINは利用できません。</translation>
+        <translation>TWAIN ist nicht verfügbar.</translation>
     </message>
     <message>
         <source>Couldn&apos;t save %1</source>
-        <translation>%1  speichernできませんでした</translation>
+        <translation>%1 konnte nicht gespeichert werden</translation>
     </message>
     <message>
         <source>No level selected!</source>
-        <translation>EbeneがWählenされていません!</translation>
+        <translation>Es wurde keine Ebene gewählt!</translation>
     </message>
     <message>
         <source>Exporting level of %1 frames in %2</source>
-        <translation> %2 に %1 FrameのEbene exportieren中...</translation>
+        <translation>Exportiere Ebene von %1 Frames in %2...</translation>
     </message>
     <message>
         <source>Warning: file %1 already exists.</source>
-        <translation>Warnung:  Datei %1 は既に存在します。</translation>
+        <translation>Warnung: Datei %1 existiert bereits.</translation>
     </message>
     <message>
         <source>Continue Exporting</source>
-        <translation>Exportierenを続ける</translation>
+        <translation>Exportieren fortsetzen</translation>
     </message>
     <message>
         <source>Stop Exporting</source>
-        <translation>Exportierenを止める</translation>
+        <translation>Exportieren anhalten</translation>
     </message>
     <message>
         <source>The level %1 already exists.
 Do you want to overwrite it?</source>
-        <translation>Ebene %1 は既に存在します。
-上書きしてもよろしいですか？</translation>
+        <translation>Ebene %1 existiert bereits.
+Sind Sie sich sicher, dass Sie überschreiben möchten?</translation>
     </message>
     <message>
         <source>The soundtrack %1 already exists.
 Do you want to overwrite it?</source>
-        <translation>サウンドトラック %1 は既に存在します。
-上書きしてもよろしいですか？</translation>
+        <translation>Soundtrack %1 existiert bereits.
+Sind Sie sich sicher, dass Sie überschreiben möchten?</translation>
     </message>
     <message>
         <source>File %1 doesn&apos;t loOk like a TOONZ Scene</source>
-        <translation>Datei %1 はToonzSzeneDateiと認識されませんでした</translation>
+        <translation>Datei %1 scheint keine Toonz-Szene zu sein</translation>
     </message>
     <message>
         <source>It is not possible to load the scene %1 because it does not belong to any project.</source>
-        <translation>Szene %1  importierenできません。どのProjektにも属していません。</translation>
+        <translation>Szene %1 konnte nicht importiert werden. Es gehört zu keinem Projekt.</translation>
     </message>
     <message>
         <source>There were problems loading the scene %1.
  Some files may be missing.</source>
-        <translation>Szene %1  laden中に問題が発生しました。
-いくつかのDateiが見つかりませんでした。</translation>
+        <translation>Es gab Probleme beim Öffnen von Szene %1.
+Einige Dateien wurden nicht gefunden.</translation>
     </message>
     <message>
         <source>There were problems loading the scene %1.
 Some levels have not been loaded because their version is not supported</source>
-        <translation>Szene %1  laden中に問題が発生しました。
-いくつかのEbeneがバージョンübereinstimmend外のため読み込まれませんでした</translation>
+        <translation>Es gab Probleme beim Öffnen von Szene %1.
+Einige Ebenen wurden nicht geladen, da ihre Version nicht unterstützt wird</translation>
     </message>
     <message>
         <source>It is not possible to load the level %1</source>
-        <translation>Ebene %1 を読み込めません</translation>
+        <translation>Ebene %1 kann nicht geladen werden</translation>
     </message>
     <message>
         <source>Save the scene first</source>
-        <translation>先にSzene speichernしてください</translation>
+        <translation>Speichen Sie die Szene vorher</translation>
     </message>
     <message>
         <source>It is not possible to load the %1 level.</source>
-        <translation>Ebene %1 を読み込めません。</translation>
+        <translation>Ebene %1 kann nicht geladen werden.</translation>
     </message>
     <message>
         <source>The scene %1 doesn&apos;t exist.</source>
@@ -6218,39 +6215,39 @@ Some levels have not been loaded because their version is not supported</source>
     </message>
     <message>
         <source>It is not possible to delete the used level %1.</source>
-        <translation>使用されているEbene %1 kann nicht gelöscht werden.</translation>
+        <translation>Die genutzte Ebene %1 kann nicht gelöscht werden.</translation>
     </message>
     <message>
         <source>The Revert to Last Saved command is not supported for the current selection.</source>
-        <translation>「最後に保存されたバージョンに戻す」コマンドは、Aktueller WählenBereichにübereinstimmendしていません。</translation>
+        <translation>Der "Zur zuletzt gespeicherten Version zurücksetzen" Befehl wird nicht für die aktuelle Auswahl unterstützt.</translation>
     </message>
     <message>
         <source>The selected column is empty.</source>
-        <translation>Wählenした列は空です。</translation>
+        <translation>Die gewählte Spalte ist leer.</translation>
     </message>
     <message>
         <source>Selected cells must be in the same column.</source>
-        <translation>同じ列のコマをWählenしなければなりません。</translation>
+        <translation>Die gewählten Cells müssen in der gleichen Spalte sein.</translation>
     </message>
     <message>
         <source>Match lines can be deleted from Toonz raster levels only</source>
-        <translation>Match-Linien löschenはToonzラスターEbeneのみ可能です。</translation>
+        <translation>Match-Linien können nur von Toonz-Raster-Ebenen gelöscht werden.</translation>
     </message>
     <message>
         <source>Partially Edited</source>
-        <translation>一部Bearbeiten済み</translation>
+        <translation>Teilweise bearbeitet</translation>
     </message>
     <message>
         <source>Partially Locked</source>
-        <translation>一部ロック</translation>
+        <translation>Teilweise gesperrt</translation>
     </message>
     <message>
         <source>Partially Modified</source>
-        <translation>一部変更済み</translation>
+        <translation>Teilweise modifiziert</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation>名前</translation>
+        <translation>Name</translation>
     </message>
     <message>
         <source>Path</source>
@@ -6258,15 +6255,15 @@ Some levels have not been loaded because their version is not supported</source>
     </message>
     <message>
         <source>Date Created</source>
-        <translation>Erstellen日</translation>
+        <translation>Erstellungs-Datum</translation>
     </message>
     <message>
         <source>Date Modified</source>
-        <translation>変更日</translation>
+        <translation>Datum der letzten Änderung</translation>
     </message>
     <message>
         <source>Size</source>
-        <translation>サイズ</translation>
+        <translation>Größe</translation>
     </message>
     <message>
         <source>Frames</source>
@@ -6274,95 +6271,95 @@ Some levels have not been loaded because their version is not supported</source>
     </message>
     <message>
         <source>Version Control</source>
-        <translation>バージョン管理</translation>
+        <translation>Versionskontrolle</translation>
     </message>
     <message>
         <source>Warning: level %1 already exists; overwrite?</source>
-        <translation>Warnung: Ebene %1 は既に存在します。上書きしますか？</translation>
+        <translation>Warnung: Ebene %1 existiert bereits. Möchten Sie überschreiben?</translation>
     </message>
     <message>
         <source>It is not possible to paste image on the current cell.</source>
-        <translation>Aktueller コマにBild einfügenられません。</translation>
+        <translation>Es kann kein Bild im aktuellen Cell eingefügt werden.</translation>
     </message>
     <message>
         <source>Are you sure you want to delete the selected cleanup color?</source>
-        <translation>WählenされたSäubern色 löschenしてもよろしいですか？</translation>
+        <translation>Sind Sie sich sicher, dass Sie die gewählte Säuberungs-Farbe löschen möchten?</translation>
     </message>
     <message>
         <source>Installing %1 again could fix the problem.</source>
-        <translation>%1 を再インストールすると、問題が解決できることがあります。</translation>
+        <translation>%1 erneut installieren könnte das Problem beheben.</translation>
     </message>
     <message>
         <source>It is not possible to apply match lines to a column containing more than one level.</source>
-        <translation>Multiple Ebeneを含む列にMatch-Linienを合成することはできません。</translation>
+        <translation>Es können keine Match-Linien an einer Spalte mit mehr als einer Ebene angewandt werden.</translation>
     </message>
     <message>
         <source>It is not possible to use a match lines column containing more than one level.</source>
-        <translation>Multiple Ebeneを含む列をMatch-Linien列として使用することはできません。</translation>
+        <translation>Es kann keine Match-Linien-Spalte mit mehr als einer Ebene benutzt werden.</translation>
     </message>
     <message>
         <source>Match lines can be applied to Toonz raster levels only.</source>
-        <translation>Match-LinienはToonzラスターEbeneだけにAnwendenすることができます。</translation>
+        <translation>Match-Linien können nur an Toonz-Raster-Ebenen angewandt werden.</translation>
     </message>
     <message>
         <source>The style index you specified is not available in the palette of the destination level.</source>
-        <translation>指定されたStil番号は対象EbeneのPalette内にexistiert nicht.</translation>
+        <translation>Der designierte Stil-Index ist nicht für die Palette der Ziel-Ebene verfügbar.</translation>
     </message>
     <message>
         <source>The style index range you specified is not valid: please separate values with a comma (e.g. 1,2,5) or with a dash (e.g. 4-7 will refer to indexes 4, 5, 6 and 7).</source>
-        <translation>指定されたStil番号のBereichは無効です:カンマ(例:1,2,5)、またはダッシュ(例:4-7は4,5,6,7を示す)を用いて下さい。</translation>
+        <translation>Der gewählte Stil-Index-Bereich ist ungültig: Bitte die einzelnen Werte mit einem Komma (z.B. 1,2,5) oder mit einem Bindestrich (z.B. 4-7 betrifft 4,5,6,7) trennen.</translation>
     </message>
     <message>
         <source>The frame range you specified is not valid: please separate values with a comma (e.g. 1,2,5) or with a dash (e.g. 4-7 will refer to frames 4, 5, 6 and 7).</source>
-        <translation>指定されたFrame-Bereichは無効です:カンマ(例:1,2,5)、またはダッシュ(例:4-7は4,5,6,7を示す)を用いて下さい。</translation>
+        <translation>Der designierte Frame-Bereich ist ungültig: Bitte die einzelnen Werte mit einem Komma (z.B. 1,2,5) oder mit einem Bindestrich (z.B. 4-7 betrifft 4,5,6,7) trennen.</translation>
     </message>
     <message>
         <source>No drawing is available in the frame range you specified.</source>
-        <translation>指定されたFrame-Bereichには利用可能なBildがありません。</translation>
+        <translation>Im designierten Frame-Bereich ist kein Bild verfügbar.</translation>
     </message>
     <message>
         <source>It is not possible to perform a merging involving more than one level per column.</source>
-        <translation>複数Ebeneを含む列 vereinenできません。</translation>
+        <translation>Spalten mit mehr als einer Ebene pro Spalte können nicht vereint werden.</translation>
     </message>
     <message>
         <source>Only raster levels can be merged to a raster level.</source>
-        <translation>ラスターEbeneはラスターEbeneにのみVereinenできます。</translation>
+        <translation>Nur Raster-Ebenen können zu einer Raster-Ebene vereint werden.</translation>
     </message>
     <message>
         <source>Only vector levels can be merged to a vector level.</source>
-        <translation>ベクターEbeneはベクﾀｰEbeneにのみVereinenできます。</translation>
+        <translation>Nur Vektor-Ebenen können zu einer Vektor-Ebene vereint werden.</translation>
     </message>
     <message>
         <source>It is possible to merge only Toonz vector levels or standard raster levels.</source>
-        <translation>ToonzベクターEbeneまたは汎用ラスターEbeneのみVereinenが可能です。</translation>
+        <translation>Es können nur Toonz-Vektor-Ebenen oder Standard-Raste-Ebenen vereint werden.</translation>
     </message>
     <message>
         <source>It is not possible to display the file %1: no player associated with its format</source>
-        <translation>Datei %1  anzeigenできません:このDatei-Formatにübereinstimmendしたプレーヤーがありません。</translation>
+        <translation>Datei %1 kann nicht angezeigt werden: Kein Player ist mit diesem Format assoziiert.</translation>
     </message>
     <message>
         <source>The specified name is already assigned to the %1 file.</source>
-        <translation>指定された名前は、 既に %1 Dateiに割り当てられています。</translation>
+        <translation>Der designierte Name ist schon der %1 Datei zugewiesen.</translation>
     </message>
     <message>
         <source>It is not possible to rename the %1 file.</source>
-        <translation>%1 Datei umbenennenできません。</translation>
+        <translation>%1 Datei kann nicht umbenannt werden.</translation>
     </message>
     <message>
         <source>It is not possible to copy the %1 file.</source>
-        <translation>%1 DateiをKopierenできません。</translation>
+        <translation>%1 Datei kann nicht kopiert werden.</translation>
     </message>
     <message>
         <source>It is not possible to save the curve.</source>
-        <translation>パラメータ speichernできません。</translation>
+        <translation>Die Kurve kann nicht gespeichert werden.</translation>
     </message>
     <message>
         <source>It is not possible to load the curve.</source>
-        <translation>パラメータ importierenできません。</translation>
+        <translation>Die Kurve konnte nicht importiert werden.</translation>
     </message>
     <message>
         <source>It is not possible to export data.</source>
-        <translation>データ exportierenできません。</translation>
+        <translation>Die Daten können nicht exportiert werden.</translation>
     </message>
     <message>
         <source>Export</source>
@@ -6370,79 +6367,79 @@ Some levels have not been loaded because their version is not supported</source>
     </message>
     <message>
         <source>LineTest Capture</source>
-        <translation>LineTest キャプチャ</translation>
+        <translation>Linien-Test-Capture</translation>
     </message>
     <message>
         <source>It is not possible to save images in camera stand view.</source>
-        <translation>KameraスタンドAnsicht中はBild speichernことができません。</translation>
+        <translation>In der Kamera-Stand-Ansicht können keine Bilder gespeichert werden.</translation>
     </message>
     <message>
         <source>The preview images are not ready yet.</source>
-        <translation>VorschauBildがまだありません。</translation>
+        <translation>Es gibt noch keine Vorschau-Bilder.</translation>
     </message>
     <message>
         <source>A convertion task is in progress! wait until it stops or cancel it</source>
-        <translation>UmwandlungAufgabeの処理中です! 完了まで待つか、またはAbbrechenして下さい</translation>
+        <translation>Eine Umwandlungs-Aufgabe wird durchgeführt! Warten Sie bis sie beendet wird oder brechen Sie ab</translation>
     </message>
     <message>
         <source>Error loading scene %1 :%2</source>
-        <translation>Szene %1 を読み込む時にエラーが発生しました: %2</translation>
+        <translation>Es gab einen Fehler beim Laden von Szene %1: %2</translation>
     </message>
     <message>
         <source>Error loading scene %1</source>
-        <translation>Szene %1 を読み込む時にエラーが発生しました</translation>
+        <translation>Es gab einen Fehler beim Laden von Szene %1</translation>
     </message>
     <message>
         <source>There was an error saving the %1 scene.</source>
-        <translation>Szene %1  speichern時にエラーが発生しました。</translation>
+        <translation>Es gab einen Fehler beim Speichern von Szene %1.</translation>
     </message>
     <message>
         <source>It is not possible to export the scene %1 because it does not belong to any project.</source>
-        <translation>Szene %1  exportierenできません。どのProjektにも属していません。</translation>
+        <translation>Szene %1 kann nicht exportiert werden. Sie gehört zu keinem Projekt.</translation>
     </message>
     <message>
         <source>Continue to All</source>
-        <translation>すべてにAnwenden</translation>
+        <translation>An Alle anwenden</translation>
     </message>
     <message>
         <source>The selected paper format is not available for %1.</source>
-        <translation>Wählenされた紙フォーマットは、%1 に使用できません。</translation>
+        <translation>Das gewählte Papierformat ist nicht für %1 verfügbar.</translation>
     </message>
     <message>
         <source>No TWAIN scanner is available</source>
-        <translation>使用可能なTWAINスキャナがありません</translation>
+        <translation>Es ist kein TWAIN-Scanner verfügbar</translation>
     </message>
     <message>
         <source>No scanner is available</source>
-        <translation>使用可能なスキャナがありません</translation>
+        <translation>Es ist kein Scanner verfügbar</translation>
     </message>
     <message>
         <source>The autocentering failed on the current drawing.</source>
-        <translation>Aktueller Bildに対するAutomatisches Zentrierenが失敗しました。</translation>
+        <translation>Die automatische Zentrierung ist beim aktuellen Bild fehlgeschlagen.</translation>
     </message>
     <message>
         <source>Some of the selected drawings were already scanned. Do you want to scan them again?</source>
-        <translation>WählenされたBildのうちのいくつかは既にScanされています。再Scanします？</translation>
+        <translation>Einige der gewählten Bilder wurden schon gescanned. Möchten Sie sie noch einmal scannen?</translation>
     </message>
     <message>
         <source>There was an error saving frames for the %1 level.</source>
-        <translation>Ebene %1  speichern時、エラーが発生しました。</translation>
+        <translation>Es gab einen Fehler beim Speichen von Frames für Ebene %1.</translation>
     </message>
     <message>
         <source>It is not possible to create folder : %1</source>
-        <translation>%1 :フォルダ es konnte nicht erstellt werden.</translation>
+        <translation>Ordner %1 konnte nicht erstellt werden.</translation>
     </message>
     <message>
         <source>It is not possible to create a folder.</source>
-        <translation>フォルダ es konnte nicht erstellt werden.</translation>
+        <translation>Ein Ordner konnte nicht erstellt werden.</translation>
     </message>
     <message>
         <source>The resolution of the output camera does not fit with the options chosen for the output file format.</source>
-        <translation>Output-KameraのPixel-GrößeはOutput-Datei-FormatとしてWählenされたOptionenと一致しません。</translation>
+        <translation>Die Auflösung der Output-Kamera stimmt nicht mit den Optionen des gewählten Output-Formates überein.</translation>
     </message>
     <message>
         <source>It is not possible to complete the rendering.</source>
-        <translation>Renderを完了することができません。</translation>
+        <translation>Das Rendern kann nicht abgeschlossen werden.</translation>
     </message>
     <message>
         <source>Type</source>
@@ -6451,19 +6448,19 @@ Some levels have not been loaded because their version is not supported</source>
     <message>
         <source>The cleanup settings file for the %1 level already exists.
  Do you want to overwrite it?</source>
-        <translation>Ebene %1 のSäuberungs-Einstellungenは既に存在します。上書きしてもよろしいですか？</translation>
+        <translation>Die Säuberungs-Einstellungen für Ebene %1 existieren bereits. Sind Sie sich sicher, dass Sie sie überschreiben möchten?</translation>
     </message>
     <message>
         <source>The merge command is not available for greytones images.</source>
-        <translation>VereinenコマンドはGrautonのBildに利用できません。</translation>
+        <translation>Der "Vereinen"-Befehl ist nicht für Grauton-Bilder verfügbar.</translation>
     </message>
     <message>
         <source>The cleanup settings for the current level have been modified...
 
 Do you want to save your changes?</source>
-        <translation>Aktueller EbeneのSäuberungs-Einstellungenが変更されています...
+        <translation>Die Säuberungs-Einstellungen der aktuellen Ebene wurden geändert...
 
-変更 speichernしますか？</translation>
+Möchten Sie die Änderungen speichern?</translation>
     </message>
     <message>
         <source>Cleanup Settings</source>
@@ -6471,29 +6468,29 @@ Do you want to save your changes?</source>
     </message>
     <message>
         <source>The scene %1 was created with Toonz and cannot be loaded in LineTest.</source>
-        <translation>Szene %1 はToonzでErstellenされ、LINETESTにLadenできません。</translation>
+        <translation>Szene %1 wurde mit Toonz erstellt und kann nicht im Linien-Test geladen werden.</translation>
     </message>
     <message>
         <source>File %1 already exists.
 Do you want to overwrite it?</source>
-        <translation>Datei %1 は既に存在します。
-上書きしてもよろしいですか？</translation>
+        <translation>Datei %1 existiert bereits.
+Möchten Sie sie überschreiben?</translation>
     </message>
     <message>
         <source>The level you are using has not a valid palette.</source>
-        <translation>使用中のEbeneには有効なPaletteがありません。</translation>
+        <translation>Die benutzte Ebene hat keine gültige Palette.</translation>
     </message>
     <message>
         <source>Message Center</source>
-        <translation>メッセージセンター</translation>
+        <translation>Nachrichten-Center</translation>
     </message>
     <message>
         <source>Script Console</source>
-        <translation>スクリプトKonsole</translation>
+        <translation>Script-Konsole</translation>
     </message>
     <message>
         <source>Run script</source>
-        <translation>スクリプトを実行</translation>
+        <translation>Script ausführen</translation>
     </message>
     <message>
         <source>Level </source>
@@ -6501,11 +6498,11 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source> already exists! Are you sure you want to overwrite it?</source>
-        <translation>は既に存在します! 上書きしてもよろしいですか？</translation>
+        <translation> existiert bereits! Sind Sie sich sicher, dass Sie überschreiben möchten?</translation>
     </message>
     <message>
         <source>It is not possible to merge tlv columns containing more than one level</source>
-        <translation>TLVEbene列 vereinenできません:1つの列にMultiple Ebeneが含まれています</translation>
+        <translation>Es können keine TLV-Spalten mit mehr als einer Ebene vereint werden</translation>
     </message>
     <message>
         <source>Ok</source>
@@ -6514,22 +6511,22 @@ Do you want to overwrite it?</source>
     <message>
         <source>Selected folders don&apos;t belong to the current project.
 Do you want to import them or load from their original location?</source>
-        <translation>Wählenされたフォルダーは、Aktueller Projektに属していません。
-インポートしますか、それとも元の場所からLadenますか？</translation>
+        <translation>Die gewählten Ordner gehören nicht zum aktuellen Projekt.
+Möchten Sie sie importieren oder von ihrem ursprünglichem Standort laden?</translation>
     </message>
     <message>
         <source>Move Cleanup Camera</source>
-        <translation>SäubernKameraを移動</translation>
+        <translation>Säuberungs-Kamera verschieben</translation>
     </message>
     <message>
         <source>Scale Cleanup Camera</source>
-        <translation>SäubernKameraを拡大縮小</translation>
+        <translation>Säuberungs-Kamera skalieren</translation>
     </message>
     <message>
         <source>Delete and Re-cleanup : The following files will be deleted.
 
 </source>
-        <translation>消去して再Säubern : 以下のDateiは消去されます。
+        <translation>Löschen und neu säubern : Die folgenden Dateien werden gelöscht.
 
 </translation>
     </message>
@@ -6537,35 +6534,35 @@ Do you want to import them or load from their original location?</source>
         <source>
 Are you sure ?</source>
         <translation>
-よろしいですか？</translation>
+Sind Sie sich sicher?</translation>
     </message>
     <message>
         <source>Replace with copied palette</source>
-        <translation>KopierenされたPaletteでErsetzenる</translation>
+        <translation>Mit kopierter Palette ersetzen</translation>
     </message>
     <message>
         <source>Keep original palette</source>
-        <translation>オリジナルのPaletteを保持する</translation>
+        <translation>Original Palette behalten</translation>
     </message>
     <message>
         <source>Insert Frame  at Frame %1</source>
-        <translation>Frame %1 にFrame einfügen</translation>
+        <translation>Frame in Frame %1 einfügen</translation>
     </message>
     <message>
         <source>Remove Frame  at Frame %1</source>
-        <translation>Frame %1 のFrameを消去</translation>
+        <translation>Frame bei Frame %1 entfernen</translation>
     </message>
     <message>
         <source>Insert Multiple Keys  at Frame %1</source>
-        <translation>Frame %1 にMultiple Keys einfügen</translation>
+        <translation>Multiple Keys bei Frame %1 einfügen</translation>
     </message>
     <message>
         <source>Remove Multiple Keys  at Frame %1</source>
-        <translation>Frame %1 のMultiple Keys löschen</translation>
+        <translation>Multiple Keys bei Frame %1 entfernen</translation>
     </message>
     <message>
         <source>Set Keyframe : %1</source>
-        <translation>KeysFrame einstellungen : %1</translation>
+        <translation>Keyframe setzen : %1</translation>
     </message>
     <message>
         <source>Close SubXsheet</source>
@@ -6573,45 +6570,45 @@ Are you sure ?</source>
     </message>
     <message>
         <source>Select a sub-xsheet cell.</source>
-        <translation>Sub-XsheetのコマをWählenして下さい。</translation>
+        <translation>Einen Sub-Xsheet-Cell wählen.</translation>
     </message>
     <message>
         <source>Collapse</source>
-        <translation>Sub-Xsheetに畳む</translation>
+        <translation>Sub-Xsheet einklappen</translation>
     </message>
     <message>
         <source>Collapse (Fx)</source>
-        <translation>Sub-Xsheetに畳む（FXSchaubild内）</translation>
+        <translation>Sub-Xsheet einklappen（FX-Schaubild）</translation>
     </message>
     <message>
         <source>Explode</source>
-        <translation>Sub-Xsheetを展開する</translation>
+        <translation>Sub-Xsheet entfalten</translation>
     </message>
     <message>
         <source>Delete Level  : %1</source>
-        <translation>Ebeneを消去 : %1</translation>
+        <translation>Ebene löschen : %1</translation>
     </message>
     <message>
         <source>Revert To %1  : Level %2</source>
-        <translation>%1 に戻す : Ebene %2</translation>
+        <translation>Zu %1 zurücksetzen : Ebene %2</translation>
     </message>
     <message>
         <source>Load Level  %1</source>
-        <translation>Ebene importieren %1</translation>
+        <translation>Ebene %1 importieren</translation>
     </message>
     <message>
         <source>Load and Replace Level  %1</source>
-        <translation>Ebeneを読み込んでErsetzen %1</translation>
+        <translation>Ebene %1 laden und ersetzen</translation>
     </message>
     <message>
         <source>Expose Level  %1</source>
-        <translation>Ebeneの配置 %1</translation>
+        <translation>Ebene %1 zeigen</translation>
     </message>
     <message>
         <source> Following file(s) are modified.
 
 </source>
-        <translation>以下のDateiは変更されました。
+        <translation>Die folgenden Dateien sind modifiziert.
 
 </translation>
     </message>
@@ -6619,11 +6616,11 @@ Are you sure ?</source>
         <source>
 Are you sure to </source>
         <translation>
-それでも </translation>
+Sind Sie sicher </translation>
     </message>
     <message>
         <source> anyway ?</source>
-        <translation> してよろしいですか？</translation>
+        <translation> das Sie trotzdem?</translation>
     </message>
     <message>
         <source>Ok</source>
@@ -6631,27 +6628,27 @@ Are you sure to </source>
     </message>
     <message>
         <source>Overwrite Palette</source>
-        <translation>Paletteを上書きする</translation>
+        <translation>Palette überschreiben</translation>
     </message>
     <message>
         <source>Don&apos;t Overwrite Palette</source>
-        <translation>Paletteを上書きしない</translation>
+        <translation>Palette nicht überschreiben</translation>
     </message>
     <message>
         <source>No Current Level</source>
-        <translation>カレントEbeneがありません</translation>
+        <translation>Keine aktuelle Ebene</translation>
     </message>
     <message>
         <source>Toonz cannot Save this Level</source>
-        <translation>このEbene speichernできません</translation>
+        <translation>Diese Ebene kann nicht gespeichert werden</translation>
     </message>
     <message>
         <source>No Current Scene</source>
-        <translation>Aktueller Szeneがありません</translation>
+        <translation>Keine aktuelle Szene</translation>
     </message>
     <message>
         <source>Save level Failed</source>
-        <translation>Ebeneの保存 ist fehlgeschlagen</translation>
+        <translation>Ebene speichern ist fehlgeschlagen</translation>
     </message>
     <message>
         <source>Paste  : Level %1 : Frame </source>
@@ -6659,11 +6656,11 @@ Are you sure to </source>
     </message>
     <message>
         <source>Delete Frames  : Level %1 : Frame </source>
-        <translation>Frame löschen : Ebene %1 : Frame</translation>
+        <translation>Frames löschen : Ebene %1 : Frame</translation>
     </message>
     <message>
         <source>Cut Frames  : Level %1 : Frame </source>
-        <translation>Frameのカット : Ebene %1 : Frame</translation>
+        <translation>Frames ausschneiden : Ebene %1 : Frame</translation>
     </message>
     <message>
         <source>Add Frames  : Level %1 : Frame </source>
@@ -6671,27 +6668,27 @@ Are you sure to </source>
     </message>
     <message>
         <source>Renumber  : Level %1</source>
-        <translation>動画番号を振り直す : Ebene %1</translation>
+        <translation>Umnummerieren : Ebene %1</translation>
     </message>
     <message>
         <source>Insert  : Level %1</source>
-        <translation>動画FrameのEinfügen : Level %1</translation>
+        <translation>Frames einfügen : Level %1</translation>
     </message>
     <message>
         <source>Reverse  : Level %1</source>
-        <translation>順番 umkehren : Ebene %1</translation>
+        <translation>Reihenfolge umkehren : Ebene %1</translation>
     </message>
     <message>
         <source>Swing  : Level %1</source>
-        <translation>スウィング : Ebene %1</translation>
+        <translation>Swing : Ebene %1</translation>
     </message>
     <message>
         <source>Step %1  : Level %2</source>
-        <translation>%1 コマ打ち : Ebene %2</translation>
+        <translation>Schritt %1 : Ebene %2</translation>
     </message>
     <message>
         <source>Each %1  : Level %2</source>
-        <translation>%1 コマ毎に詰める : Ebene %2</translation>
+        <translation>Jeden %1. Schritt : Ebene %2</translation>
     </message>
     <message>
         <source>Duplicate  : Level %1</source>
@@ -6699,27 +6696,27 @@ Are you sure to </source>
     </message>
     <message>
         <source>Move Level to Scene  : Level %1</source>
-        <translation>Ebene szeneに移動 : Ebene %1</translation>
+        <translation>Ebene zu Szene verschieben : Ebene %1</translation>
     </message>
     <message>
         <source>Inbeteween  : Level %1,  </source>
-        <translation>中割り : Ebene %1</translation>
+        <translation>Dazwischen : Ebene %1</translation>
     </message>
     <message>
         <source>Paste Column :  </source>
-        <translation>列 einfügen : </translation>
+        <translation>Spalte einfügen : </translation>
     </message>
     <message>
         <source>Delete Column :  </source>
-        <translation>列 löschen : </translation>
+        <translation>Spalte löschen : </translation>
     </message>
     <message>
         <source>Insert Column :  </source>
-        <translation>列 einfügen : </translation>
+        <translation>Spalte einfügen : </translation>
     </message>
     <message>
         <source>Resequence :  Col%1</source>
-        <translation>Sub-XsheetのFrameを再整列 : Col %1</translation>
+        <translation>Sub-Xsheet-Frames neu ausrichten : Col%1</translation>
     </message>
     <message>
         <source>Clone Sub-xsheet :  Col%1</source>
@@ -6727,7 +6724,7 @@ Are you sure to </source>
     </message>
     <message>
         <source>Clear Cells :  Col%1</source>
-        <translation>Cellsのクリア : Col%1</translation>
+        <translation>Cells leeren : Col%1</translation>
     </message>
     <message>
         <source>Reverse</source>
@@ -6739,7 +6736,7 @@ Are you sure to </source>
     </message>
     <message>
         <source>Autoexpose</source>
-        <translation>Automatisch配置</translation>
+        <translation>Automatisch anzeigen</translation>
     </message>
     <message>
         <source>Random</source>
@@ -6747,19 +6744,19 @@ Are you sure to </source>
     </message>
     <message>
         <source>Step %1</source>
-        <translation>%1 コマ打ち</translation>
+        <translation>Schritt %1</translation>
     </message>
     <message>
         <source>Each %1</source>
-        <translation>コマを詰める %1</translation>
+        <translation>Jeden %1. Schritt</translation>
     </message>
     <message>
         <source>Reframe to %1&apos;s</source>
-        <translation>%1コマ毎にリFrame</translation>
+        <translation>Frames zu %2er ändern</translation>
     </message>
     <message>
         <source>Roll Up</source>
-        <translation>Hochrollen</translation>
+        <translation>Hoch rollen</translation>
     </message>
     <message>
         <source>Roll Down</source>
@@ -6771,7 +6768,7 @@ Are you sure to </source>
     </message>
     <message>
         <source>Clone  Levels : </source>
-        <translation>Ebene duplizieren : </translation>
+        <translation>Ebenen duplizieren : </translation>
     </message>
     <message>
         <source>Time Stretch</source>
@@ -6779,35 +6776,35 @@ Are you sure to </source>
     </message>
     <message>
         <source>Palette Gizmo</source>
-        <translation type="obsolete">PaletteBearbeiten</translation>
+        <translation type="obsolete">Palette bearbeiten</translation>
     </message>
     <message>
         <source>Create Level %1  at Column %2</source>
-        <translation>列 %2 に Ebene %1  erstellen</translation>
+        <translation>Ebene %1 bei Spalte %2  erstellen</translation>
     </message>
     <message>
         <source>Do you want to expose the renamed level ?</source>
-        <translation>UmbenennenしたEbeneをXsheet上に配置しますか？</translation>
+        <translation>Möchten Sie die umbenannte Ebene anzeigen?</translation>
     </message>
     <message>
         <source>Expose</source>
-        <translation>配置する</translation>
+        <translation>Anzeigen</translation>
     </message>
     <message>
         <source>Don&apos;t expose</source>
-        <translation>配置しない</translation>
+        <translation>Nicht anzeigen</translation>
     </message>
     <message>
         <source>Paste Key Frames</source>
-        <translation>KeysFrame einfügen</translation>
+        <translation>Keyframes einfügen</translation>
     </message>
     <message>
         <source>Delete Key Frames</source>
-        <translation>KeysFrame löschen</translation>
+        <translation>Keyframes löschen</translation>
     </message>
     <message>
         <source>Copy File</source>
-        <translation>DateiのKopieren</translation>
+        <translation>Datei kopieren</translation>
     </message>
     <message>
         <source>Paste  File  : </source>
@@ -6815,27 +6812,27 @@ Are you sure to </source>
     </message>
     <message>
         <source>Duplicate  File  : </source>
-        <translation>DateiをDuplizieren : </translation>
+        <translation>Datei duplizieren : </translation>
     </message>
     <message>
         <source>Paste Cells</source>
-        <translation>コマのEinfügen</translation>
+        <translation>CellsEinfügen</translation>
     </message>
     <message>
         <source>Delete Cells</source>
-        <translation>コマ löschen</translation>
+        <translation>Cells löschen</translation>
     </message>
     <message>
         <source>Cut Cells</source>
-        <translation>コマのカット</translation>
+        <translation>Cells ausschneiden</translation>
     </message>
     <message>
         <source>Insert Cells</source>
-        <translation>空白コマのEinfügen</translation>
+        <translation>Leere Cells Einfügen</translation>
     </message>
     <message>
         <source>Paste (StrOkes)</source>
-        <translation>Einfügen（ストローク）</translation>
+        <translation>Einfügen（Strich）</translation>
     </message>
     <message>
         <source>Paste</source>
@@ -6843,53 +6840,53 @@ Are you sure to </source>
     </message>
     <message>
         <source>Paste (Raster)</source>
-        <translation>Einfügen（ラスター）</translation>
+        <translation>Einfügen（Raster）</translation>
     </message>
     <message>
         <source>Overwrite Paste Cells</source>
-        <translation>コマを上書きしてEinfügen</translation>
+        <translation>Eingefügte Cells überschreiben</translation>
     </message>
     <message>
         <source>Cannot paste data 
  Nothing to paste</source>
-        <translation>Einfügenできません
-クリップボードにEinfügen可能なデータがありません</translation>
+        <translation>Kann nicht einfügen
+Im Clipboard sind keine Daten zum einfügen</translation>
     </message>
     <message>
         <source>Modify Play Range  : %1 - %2</source>
-        <translation>AbspielenBereichの変更 : %1 - %2</translation>
+        <translation>Abspiel-Bereich ändern : %1 - %2</translation>
     </message>
     <message>
         <source>Modify Play Range  : %1 - %2  &gt;  %3 - %4</source>
-        <translation>AbspielenBereichの変更 : %1 - %2  &gt;  %3 - %4</translation>
+        <translation>Abspiel-Bereich ändern : %1 - %2  &gt;  %3 - %4</translation>
     </message>
     <message>
         <source>Use Level Extender</source>
-        <translation>スマートタブ verwenden</translation>
+        <translation>Smart-Tab verwenden</translation>
     </message>
     <message>
         <source>Modify Sound Level</source>
-        <translation>サウンドEbene bearbeiten</translation>
+        <translation>Sound-Ebene bearbeiten</translation>
     </message>
     <message>
         <source>Set Keyframe  : %1  at Frame %2</source>
-        <translation>KeysFrame einstellungen : %1  Frame %2</translation>
+        <translation>Keyframe setzen : %1  Frame %2</translation>
     </message>
     <message>
         <source>Move Columns</source>
-        <translation>列を移動</translation>
+        <translation>Spalte verschieben</translation>
     </message>
     <message>
         <source>Change Pegbar</source>
-        <translation>タップを変更</translation>
+        <translation>Haltestift ändern</translation>
     </message>
     <message>
         <source>Rename Cell  at Column %1  Frame %2</source>
-        <translation>列 %1 Frame %2のコマ umbenennen</translation>
+        <translation>Cell bei Spalte %1 Frame %2 umbennen</translation>
     </message>
     <message>
         <source>Move Level</source>
-        <translation>Ebeneを移動</translation>
+        <translation>Ebene verschieben</translation>
     </message>
     <message>
         <source>Combo Viewer</source>
@@ -6901,42 +6898,42 @@ Are you sure to </source>
     </message>
     <message>
         <source>Move Level to Cast Folder</source>
-        <translation>Ebene szeneAssetに移動</translation>
+        <translation>Ebene zu Szenen-Assets verschieben</translation>
     </message>
     <message>
         <source>Merge Raster Levels</source>
-        <translation>ラスターEbene vereinen</translation>
+        <translation>Raster-Ebene vereinen</translation>
     </message>
     <message>
         <source>Delete Matchline  : Level %1</source>
-        <translation>Match-Linienを消去 : Ebene %1</translation>
+        <translation>Match-Linien löschen : Ebene %1</translation>
     </message>
     <message>
         <source>Apply Matchline  : Column%1 &lt; Column%2</source>
-        <translation>Match-Linien anwenden : 列 %1 &lt; 列 %2</translation>
+        <translation>Match-Linien anwenden : Spalte %1 &lt; Spalte %2</translation>
     </message>
     <message>
         <source>Palette Gizmo  %1</source>
-        <translation>Paletten-Gizmo %1</translation>
+        <translation>Palette bearbeiten %1</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation>警告</translation>
+        <translation>Warnung</translation>
     </message>
     <message>
         <source>Palette is locked.</source>
-        <translation>Paletteがロックされています。</translation>
+        <translation>Palette ist gesperrt.</translation>
     </message>
     <message>
         <source>History</source>
-        <translation>ヒストリー</translation>
+        <translation>Verlauf</translation>
     </message>
 </context>
 <context>
     <name>RenameAsToonzPopup</name>
     <message>
         <source>Delete Original Files</source>
-        <translation>元のDatei löschen</translation>
+        <translation>Original-Datei löschen</translation>
     </message>
     <message>
         <source>Level Name:</source>
@@ -6952,15 +6949,15 @@ Are you sure to </source>
     </message>
     <message>
         <source>Renaming File </source>
-        <translation>Datei umbenennen中...</translation>
+        <translation>Datei am umbenennen...</translation>
     </message>
     <message>
         <source>Creating an animation level of %1 frames</source>
-        <translation>%1 FrameのGeneriere Ebene...</translation>
+        <translation>Generiere Ebene mit %1 Frames...</translation>
     </message>
     <message>
         <source>The file name cannot be empty or contain any of the following characters:(new line)  \ / : * ? &quot;  |</source>
-        <translation>Datei名は空であることができません。また、Nächster 記号のいずれかを含むことができません:
+        <translation>Ein Dateiname darf nicht leer sein oder folgende Zeichen beinhalten:
  \ / : * ? &quot;  |</translation>
     </message>
 </context>
@@ -6968,7 +6965,7 @@ Are you sure to </source>
     <name>RenderController</name>
     <message>
         <source>Continue</source>
-        <translation>続ける</translation>
+        <translation>Fortsetzen</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -6976,7 +6973,7 @@ Are you sure to </source>
     </message>
     <message>
         <source>Exporting ...</source>
-        <translation>Exportieren中...</translation>
+        <translation>Am Exportieren...</translation>
     </message>
     <message>
         <source>Abort</source>
@@ -6984,26 +6981,26 @@ Are you sure to </source>
     </message>
     <message>
         <source>Exporting</source>
-        <translation>Exportieren中</translation>
+        <translation>Am Exportieren</translation>
     </message>
     <message>
         <source>The %1 scene contains an audio file with different characteristics from the one used in the first exported scene.
 The audio file will not be included in the rendered clip.</source>
-        <translation>Szene %1 には、最初にExportierenたSzeneのオーディオ・Dateiと異なる特性を持つオーディオ・Dateiが含まれています。
-Renderするクリップにはそのオーディオ・Dateiが含まれません。</translation>
+        <translation>Szene %1 beinhaltet eine Audio-Datei mit anderen Eigenschaften als die aus der zuerst exportierten Szene.
+Die Audio-Datei wird nicht im gerenderten Clip enthalten sein.</translation>
     </message>
     <message>
         <source>The %1  scene has a different resolution from the %2 scene.
                            The output result may differ from what you expect. What do you want to do?</source>
-        <translation>Szene %1 はSzene %2 と異なるPixel-GrößeにEinstellungenされています。
-期待するものと異なる結果がOutput-されるかもしれません。どうしますか？</translation>
+        <translation>Szene %1 hat eine andere Auflösung als Szene %2.
+Das Ergebnis des Outputs könnte anders sein als erwartet. Was möchten Sie tun?</translation>
     </message>
 </context>
 <context>
     <name>RenumberPopup</name>
     <message>
         <source>Renumber</source>
-        <translation>Nummerieren</translation>
+        <translation>Umnummerieren</translation>
     </message>
     <message>
         <source>Start:</source>
@@ -7026,16 +7023,16 @@ Renderするクリップにはそのオーディオ・Dateiが含まれません
     </message>
     <message>
         <source>Replace</source>
-        <translation>Ersetzenる</translation>
+        <translation>Ersetzen</translation>
     </message>
     <message>
         <source>Nothing to replace: no cells selected.</source>
-        <translation>Ersetzenることができません:Wählenされているコマがありません。</translation>
+        <translation>Es gibt  nichts zum ersetzen: Es wurden keine Cells gewählt.</translation>
     </message>
     <message>
         <source>File not found
 </source>
-        <translation>Dateiが見つかりません
+        <translation>Datei nicht gefunden
 </translation>
     </message>
 </context>
@@ -7043,60 +7040,60 @@ Renderするクリップにはそのオーディオ・Dateiが含まれません
     <name>ReplaceParentDirectoryPopup</name>
     <message>
         <source>Replace Parent Directory</source>
-        <translation>親フォルダPfadのErsetzen</translation>
+        <translation>Hauptverzeichnis ersetzen</translation>
     </message>
     <message>
         <source>Replace</source>
-        <translation>Ersetzenる</translation>
+        <translation>Ersetzen</translation>
     </message>
     <message>
         <source>Nothing to replace: no cells or columns selected.</source>
-        <translation>Ersetzenることができません:Wählenされているコマまたは列がありません。</translation>
+        <translation>Es gibt  nichts zum ersetzen: Es wurden weder Cells noch Spalten gewählt.</translation>
     </message>
 </context>
 <context>
     <name>RoomTabWidget</name>
     <message>
         <source>New Room</source>
-        <translation type="vanished">Neue ワークスペース</translation>
+        <translation type="vanished">Neue Arbeitsfläche</translation>
     </message>
     <message>
         <source>Delete Room</source>
-        <translation type="vanished">ワークスペ－ス löschen</translation>
+        <translation type="vanished">Arbeitsfläche löschen</translation>
     </message>
     <message>
         <source>Room</source>
-        <translation type="vanished">ワークスペース</translation>
+        <translation type="vanished">Arbeitsfläche</translation>
     </message>
     <message>
         <source>Are you sure you want to remove room %1</source>
-        <translation type="vanished">%1 ワークスペース löschenしてもよろしいですか？</translation>
+        <translation type="vanished">Sind Sie sich sicher, dass Sie Arbeitsfläche %1 löschen möchten?</translation>
     </message>
 </context>
 <context>
     <name>Ruler</name>
     <message>
         <source>Click to create an horizontal guide</source>
-        <translation>［クリック］水平ガイド erstellen</translation>
+        <translation>[Click] Horizontale Hilfslinie erstellen</translation>
     </message>
     <message>
         <source>Click to create a vertical guide</source>
-        <translation>［クリック］垂直ガイド erstellen</translation>
+        <translation>[Click] Vertikale Hilfslinie erstellen</translation>
     </message>
     <message>
         <source>Click and drag to move guide</source>
-        <translation>［ドラッグ］ガイドを移動</translation>
+        <translation>[Ziehen] Hilfslinie verschieben</translation>
     </message>
 </context>
 <context>
     <name>SVNCleanupDialog</name>
     <message>
         <source>Version Control: Cleanup</source>
-        <translation>バージョン管理:Säubern</translation>
+        <translation>Versionskontrolle: Säubern</translation>
     </message>
     <message>
         <source>Cleaning up %1...</source>
-        <translation>%1  säubernしています...</translation>
+        <translation>%1  wird gesäubert...</translation>
     </message>
     <message>
         <source>Close</source>
@@ -7104,38 +7101,38 @@ Renderするクリップにはそのオーディオ・Dateiが含まれません
     </message>
     <message>
         <source>Cleanup done.</source>
-        <translation>Säubernが完了しました。</translation>
+        <translation>Säubern beendet.</translation>
     </message>
 </context>
 <context>
     <name>SVNCommitDialog</name>
     <message>
         <source>Version Control: Put changes</source>
-        <translation>バージョン管理:変更 ersetzenる</translation>
+        <translation>Versionskontrolle: Änderungen ersetzen</translation>
     </message>
     <message>
         <source>Select / Deselect All</source>
-        <translation>全てをWählen/Wählen解除</translation>
+        <translation>Alles wählen/Auswahl aufheben</translation>
     </message>
     <message>
         <source>0 Selected / 0 Total</source>
-        <translation>0 個Wählen / 合計 0 個中</translation>
+        <translation>0 gewählt / 0 gesamt</translation>
     </message>
     <message>
         <source>Getting repository status...</source>
-        <translation>リポジトリの状態を取得中...</translation>
+        <translation>Repository-Status wird ermittelt...</translation>
     </message>
     <message>
         <source>Comment:</source>
-        <translation>コメント:</translation>
+        <translation>Kommentar:</translation>
     </message>
     <message>
         <source>Put Scene Contents</source>
-        <translation>Szene内容を登録する</translation>
+        <translation>Szenen-Inhalt eintragen</translation>
     </message>
     <message>
         <source>Put</source>
-        <translation>登録する</translation>
+        <translation>Eintragung</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -7143,35 +7140,35 @@ Renderするクリップにはそのオーディオ・Dateiが含まれません
     </message>
     <message>
         <source>Adding %1 items...</source>
-        <translation>%1 項目 hinzufügen中...</translation>
+        <translation>%1 Posten werden hinzugefügt...</translation>
     </message>
     <message>
         <source>Set needs-lock property...</source>
-        <translation>「ロックが必要」の属性 einstellungen...</translation>
+        <translation>"Sperre nötig"-Eigenschaft setzen...</translation>
     </message>
     <message>
         <source>Committing %1 items...</source>
-        <translation>%1 項目をコミットしています...</translation>
+        <translation>%1 Posten werden übergeben...</translation>
     </message>
     <message>
         <source>Put done successfully.</source>
-        <translation>登録が完了しました。</translation>
+        <translation>Eintragung beendet.</translation>
     </message>
     <message>
         <source>Putting %1 items...</source>
-        <translation>%1 項目を登録中...</translation>
+        <translation>%1 Posten werden eingetragen...</translation>
     </message>
     <message>
         <source>No items to put.</source>
-        <translation>登録する必要のある項目がありません。</translation>
+        <translation>Es gibt keine Posten zum eintragen.</translation>
     </message>
     <message>
         <source>%1 items to put.</source>
-        <translation>%1 個の登録するDateiがあります。</translation>
+        <translation>Es gibt %1 Posten zum eintragen.</translation>
     </message>
     <message>
         <source>%1 Selected / %2 Total</source>
-        <translation>%1 個Wählen / 合計 %2 個中</translation>
+        <translation>%1 gewählt / %2 gesamt</translation>
     </message>
     <message>
         <source>Close</source>
@@ -7182,19 +7179,19 @@ Renderするクリップにはそのオーディオ・Dateiが含まれません
     <name>SVNCommitFrameRangeDialog</name>
     <message>
         <source>Version Control: Put</source>
-        <translation>バージョン管理:登録する</translation>
+        <translation>Versionskontrolle: Eintragen</translation>
     </message>
     <message>
         <source>Note: the file will be updated too.</source>
-        <translation>注意:DateiもErneuernされます。</translation>
+        <translation>Vorsicht: Die Datei wird auch aktualisiert.</translation>
     </message>
     <message>
         <source>Comment:</source>
-        <translation>コメント:</translation>
+        <translation>Kommentar:</translation>
     </message>
     <message>
         <source>Put</source>
-        <translation>登録</translation>
+        <translation>Eintragung</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -7202,78 +7199,78 @@ Renderするクリップにはそのオーディオ・Dateiが含まれません
     </message>
     <message>
         <source>Put done successfully.</source>
-        <translation>登録が完了しました。</translation>
+        <translation>Eintragung beendet.</translation>
     </message>
     <message>
         <source>Locking file...</source>
-        <translation>Dateiをロックしています...</translation>
+        <translation>Datei wird gesperrt...</translation>
     </message>
     <message>
         <source>Getting frame range edit information...</source>
-        <translation>Frame-BereichのBearbeiten情報を取得中...</translation>
+        <translation>Frame-Bereich-Bearbeitungs-Information wird ermittelt...</translation>
     </message>
     <message>
         <source>No frame range edited.</source>
-        <translation>BearbeitenされているFrame-Bereichはありません。</translation>
+        <translation>Es wurde kein Frame-Bereich bearbeitet.</translation>
     </message>
     <message>
         <source>Updating frame range edit information...</source>
-        <translation>Frame-BereichのBearbeiten情報 erneuern中...</translation>
+        <translation>Frame-Bereich-Bearbeitungs-Information werden aktualisiert...</translation>
     </message>
     <message>
         <source>Putting changes...</source>
-        <translation>変更点を登録中...</translation>
+        <translation>Änderungen werden eingetragen...</translation>
     </message>
     <message>
         <source>Updating file...</source>
-        <translation>Datei erneuern中...</translation>
+        <translation>Datei wird aktualisiert...</translation>
     </message>
     <message>
         <source>Adding hoOk file to repository...</source>
-        <translation>フックDateiをリポジトリにHinzufügen中...</translation>
+        <translation>Haken-Datei wird zum Repository hinzugefügt...</translation>
     </message>
     <message>
         <source>Setting the needs-lock property to hoOk file...</source>
-        <translation>「ロックが必要」の属性をフックDateiにEinstellungen中...</translation>
+        <translation>Die "Sperre nötig"-Eigenschaft wird in der Haken-Datei eingestellt...</translation>
     </message>
 </context>
 <context>
     <name>SVNDeleteDialog</name>
     <message>
         <source>Version Control: Delete</source>
-        <translation>バージョン管理:Löschen</translation>
+        <translation>Versionskontrolle: Löschen</translation>
     </message>
     <message>
         <source>Delete folder that contains %1 items.</source>
-        <translation>%1 個の項目を含むOrdner löschenする。</translation>
+        <translation>Ordner löschen der %1 Gegenstände enthält.</translation>
     </message>
     <message>
         <source>Delete empty folder.</source>
-        <translation>空のOrdner löschenする。</translation>
+        <translation>Leeren Ordner löschen.</translation>
     </message>
     <message>
         <source>Delete %1 items.</source>
-        <translation>%1 個の項目 löschenする。</translation>
+        <translation>%1 Gegenstände löschen.</translation>
     </message>
     <message>
         <source>Comment:</source>
-        <translation>コメント:</translation>
+        <translation>Kommentar:</translation>
     </message>
     <message>
         <source>Delete Scene Contents</source>
-        <translation>Szeneの内容 löschen</translation>
+        <translation>Szenen-Inhalt löschen</translation>
     </message>
     <message>
         <source> Keep Local Copy</source>
-        <translation>UmgebungKopierenを保持</translation>
+        <translation>Lokale Kopie behalten</translation>
     </message>
     <message>
         <source>Delete Local Copy </source>
-        <translation>UmgebungKopieren löschen</translation>
+        <translation>Lokale Kopie löschen</translation>
     </message>
     <message>
         <source>Delete on Server </source>
-        <translation>サーバーのDatei löschen</translation>
+        <translation>Datei auf dem Server löschen</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -7281,7 +7278,7 @@ Renderするクリップにはそのオーディオ・Dateiが含まれません
     </message>
     <message>
         <source>Deleting %1 items...</source>
-        <translation>%1 項目 löschen中...</translation>
+        <translation>%1 Gegenstände werden gelöscht...</translation>
     </message>
     <message>
         <source>Delete</source>
@@ -7289,18 +7286,18 @@ Renderするクリップにはそのオーディオ・Dateiが含まれません
     </message>
     <message>
         <source>You are deleting items also on repository. Are you sure ?</source>
-        <translation>リポジトリ上の項目もLöschenされます。よろしいですか？</translation>
+        <translation>Es werden auch Gegenstände im Repository gelöscht. Sind Sie sich sicher?</translation>
     </message>
 </context>
 <context>
     <name>SVNFrameRangeLockInfoDialog</name>
     <message>
         <source>Version Control: Edit Info</source>
-        <translation>バージョン管理:Bearbeiten情報</translation>
+        <translation>Versionskontrolle: Bearbeitungs-Information</translation>
     </message>
     <message>
         <source>Getting repository status...</source>
-        <translation>リポジトリの状態を取得中...</translation>
+        <translation>Repository-Status wird ermittelt...</translation>
     </message>
     <message>
         <source>Close</source>
@@ -7308,38 +7305,38 @@ Renderするクリップにはそのオーディオ・Dateiが含まれません
     </message>
     <message>
         <source>No frame range edited.</source>
-        <translation>BearbeitenされているFrame-Bereichはありません。</translation>
+        <translation>Es wurde kein Frame-Bereich bearbeitet.</translation>
     </message>
     <message>
         <source>%1 on %2 is editing frames from %3 to %4.</source>
-        <translation>%1 が %2 に %3 から %4 までのFrame bearbeitenしています。</translation>
+        <translation>%1 auf %2 bearbeitet Frames von %3 bis %4.</translation>
     </message>
 </context>
 <context>
     <name>SVNLockDialog</name>
     <message>
         <source>Version Control: Edit</source>
-        <translation>バージョン管理:Bearbeiten</translation>
+        <translation>Versionskontrolle: Bearbeiten</translation>
     </message>
     <message>
         <source>Version Control: Unlock</source>
-        <translation>バージョン管理:Entsperren</translation>
+        <translation>Versionskontrolle: Entsperren</translation>
     </message>
     <message>
         <source>Getting repository status...</source>
-        <translation>リポジトリの状態を取得中...</translation>
+        <translation>Repository-Status wird ermittelt...</translation>
     </message>
     <message>
         <source>Comment:</source>
-        <translation>コメント:</translation>
+        <translation>Kommentar:</translation>
     </message>
     <message>
         <source>Edit Scene Contents</source>
-        <translation>Szeneの内容 bearbeiten</translation>
+        <translation>Szenen-Inhalt bearbeiten</translation>
     </message>
     <message>
         <source>Unlock Scene Contents</source>
-        <translation>Szene内容 entsperren</translation>
+        <translation>Szenen-Inhalt entsperren</translation>
     </message>
     <message>
         <source>Edit</source>
@@ -7355,38 +7352,38 @@ Renderするクリップにはそのオーディオ・Dateiが含まれません
     </message>
     <message>
         <source>No items to edit.</source>
-        <translation>Bearbeitenする項目がありません。</translation>
+        <translation>Es gibt keine Gegenstände zum bearbeiten.</translation>
     </message>
     <message>
         <source>No items to unlock.</source>
-        <translation>ロックを解除する項目がありません。</translation>
+        <translation>Es gibt keine Gegenstände zum entsperren.</translation>
     </message>
     <message>
         <source>%1 items to edit.</source>
-        <translation>%1 個のBearbeitenする項目があります。</translation>
+        <translation>Es gibt %1 Gegenstände zum bearbeiten.</translation>
     </message>
     <message>
         <source>%1 items to unlock.</source>
-        <translation>%1 個 entsperrenする項目があります。</translation>
+        <translation>Es gibt %1 Gegenstände zum entsperren.</translation>
     </message>
     <message>
         <source>Editing %1 items...</source>
-        <translation>%1 個の項目 bearbeitenしています...</translation>
+        <translation>%1 Gegenstände werden bearbeitet...</translation>
     </message>
     <message>
         <source>Unlocking %1 items...</source>
-        <translation>%1 個の項目 entsperren中...</translation>
+        <translation>%1 Gegenstände werden entsperrt...</translation>
     </message>
 </context>
 <context>
     <name>SVNLockFrameRangeDialog</name>
     <message>
         <source>Version Control: Edit Frame Range</source>
-        <translation>バージョン管理:Frame-Bereich bearbeiten</translation>
+        <translation>Versionskontrolle: Frame-Bereich bearbeiten</translation>
     </message>
     <message>
         <source>Temporary Lock file...</source>
-        <translation>一時的にDateiをロックする...</translation>
+        <translation>Vorübergehend Datei sperren...</translation>
     </message>
     <message>
         <source>From:</source>
@@ -7398,7 +7395,7 @@ Renderするクリップにはそのオーディオ・Dateiが含まれません
     </message>
     <message>
         <source>Comment:</source>
-        <translation>コメント:</translation>
+        <translation>Kommentar:</translation>
     </message>
     <message>
         <source>Edit</source>
@@ -7410,38 +7407,38 @@ Renderするクリップにはそのオーディオ・Dateiが含まれません
     </message>
     <message>
         <source>No frame range edited.</source>
-        <translation>BearbeitenされているFrame-Bereichがありません。</translation>
+        <translation>Es wurde kein Frame-Bereich bearbeitet.</translation>
     </message>
     <message>
         <source>Getting frame range edit information...</source>
-        <translation>Frame-BereichのBearbeiten情報を取得中...</translation>
+        <translation>Frame-Bereich-Bearbeitungs-Information wird ermittelt...</translation>
     </message>
     <message>
         <source>%1 on %2 is editing frames from %3 to %4.</source>
-        <translation>%1 が %2 に %3 から %4 までFrame bearbeitenしています。</translation>
+        <translation>%1 auf %2 bearbeitet Frames von %3 bis %4.</translation>
     </message>
 </context>
 <context>
     <name>SVNLockInfoDialog</name>
     <message>
         <source>Version Control: Edit Info</source>
-        <translation>バージョン管理:Bearbeiten情報</translation>
+        <translation>Versionskontrolle: Bearbeitungs-Information</translation>
     </message>
     <message>
         <source>&lt;b&gt;Edited By:&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Bearbeiten者:&lt;/b&gt;</translation>
+        <translation>&lt;b&gt;Bearbeitet von:&lt;/b&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;Host:&lt;/b&gt;</source>
-        <translation>&lt;b&gt;ホスト:&lt;/b&gt;</translation>
+        <translation>&lt;b&gt;Host:&lt;/b&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;Comment:&lt;/b&gt;</source>
-        <translation>&lt;b&gt;コメント:&lt;/b&gt;</translation>
+        <translation>&lt;b&gt;Kommentar:&lt;/b&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;Date:&lt;/b&gt;</source>
-        <translation>&lt;b&gt;日時:&lt;/b&gt;</translation>
+        <translation>&lt;b&gt;Datum:&lt;/b&gt;</translation>
     </message>
     <message>
         <source>Close</source>
@@ -7452,11 +7449,11 @@ Renderするクリップにはそのオーディオ・Dateiが含まれません
     <name>SVNLockMultiFrameRangeDialog</name>
     <message>
         <source>Version Control: Edit Frame Range</source>
-        <translation>バージョン管理:Frame-Bereich bearbeiten</translation>
+        <translation>Versionskontrolle: Frame-Bereich bearbeiten</translation>
     </message>
     <message>
         <source>Getting repository status...</source>
-        <translation>リポジトリの状態を取得中...</translation>
+        <translation>Repository-Status wird ermittelt...</translation>
     </message>
     <message>
         <source>From:</source>
@@ -7468,7 +7465,7 @@ Renderするクリップにはそのオーディオ・Dateiが含まれません
     </message>
     <message>
         <source>Comment:</source>
-        <translation>コメント:</translation>
+        <translation>Kommentar:</translation>
     </message>
     <message>
         <source>Edit</source>
@@ -7480,26 +7477,26 @@ Renderするクリップにはそのオーディオ・Dateiが含まれません
     </message>
     <message>
         <source>No frame range edited.</source>
-        <translation>BearbeitenされているFrame-Bereichはありません。</translation>
+        <translation>Es wurde kein Frame-Bereich bearbeitet.</translation>
     </message>
     <message>
         <source>Editing %1 items...</source>
-        <translation>%1 項目 bearbeitenしています...</translation>
+        <translation>%1 Gegenstände werden bearbeitet...</translation>
     </message>
     <message>
         <source>%1 is editing frames from %2 to %3</source>
-        <translation>%1 が %2 から %3 までFrame bearbeitenしています</translation>
+        <translation>%1 bearbeitet Frames von %2 bis %3</translation>
     </message>
 </context>
 <context>
     <name>SVNMultiFrameRangeLockInfoDialog</name>
     <message>
         <source>Version Control: Edit Info</source>
-        <translation>バージョン管理:Bearbeiten情報</translation>
+        <translation>Versionskontrolle: Bearbeitungs-Information</translation>
     </message>
     <message>
         <source>Getting repository status...</source>
-        <translation>リポジトリの状態を取得中...</translation>
+        <translation>Repository-Status wird ermittelt...</translation>
     </message>
     <message>
         <source>Close</source>
@@ -7507,26 +7504,26 @@ Renderするクリップにはそのオーディオ・Dateiが含まれません
     </message>
     <message>
         <source>No frame range edited.</source>
-        <translation>BearbeitenされているFrame-Bereichはありません。</translation>
+        <translation>Es wurde kein Frame-Bereich bearbeitet.</translation>
     </message>
     <message>
         <source>%1 is editing frames from %2 to %3</source>
-        <translation>%1 が %2 から %3 までFrame bearbeitenしています。</translation>
+        <translation>%1 bearbeitet Frames von %2 bis %3.</translation>
     </message>
 </context>
 <context>
     <name>SVNPurgeDialog</name>
     <message>
         <source>Version Control: Purge</source>
-        <translation>バージョン管理:Verwerfenする</translation>
+        <translation>Versionskontrolle: Verwerfen</translation>
     </message>
     <message>
         <source>Note: the file will be updated too.</source>
-        <translation>注意:DateiもErneuernされます。</translation>
+        <translation>Vorsicht: Die Datei wird auch aktualisiert.</translation>
     </message>
     <message>
         <source>Getting repository status...</source>
-        <translation>リポジトリの状態を取得中...</translation>
+        <translation>Repository-Status wird ermittelt...</translation>
     </message>
     <message>
         <source>Purge</source>
@@ -7538,34 +7535,34 @@ Renderするクリップにはそのオーディオ・Dateiが含まれません
     </message>
     <message>
         <source>No items to purge.</source>
-        <translation>Verwerfenする項目はありません。</translation>
+        <translation>Es gibt keine Gegenstände zum verwerfen.</translation>
     </message>
     <message>
         <source>%1 items to purge.</source>
-        <translation>%1 個のVerwerfenする項目があります。</translation>
+        <translation>%1 Gegenstände werden verworfen.</translation>
     </message>
     <message>
         <source>Purging files...</source>
-        <translation>Datei verwerfen中...</translation>
+        <translation>Dateien werden verworfen...</translation>
     </message>
 </context>
 <context>
     <name>SVNRevertDialog</name>
     <message>
         <source>Version Control: Revert changes</source>
-        <translation>バージョン管理:変更 zurücksetzen</translation>
+        <translation>Versionskontrolle: Änderungen zurücksetzen</translation>
     </message>
     <message>
         <source>Getting repository status...</source>
-        <translation>リポジトリの状態を取得中...</translation>
+        <translation>Repository-Status wird ermittelt...</translation>
     </message>
     <message>
         <source>Revert Scene Contents</source>
-        <translation>Szeneの内容 zurückstellenする</translation>
+        <translation>Szenen-Inhalt zurücksetzen</translation>
     </message>
     <message>
         <source>Revert</source>
-        <translation>Zurückstellen</translation>
+        <translation>Zurücksetzen</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -7573,34 +7570,34 @@ Renderするクリップにはそのオーディオ・Dateiが含まれません
     </message>
     <message>
         <source>No items to revert.</source>
-        <translation>Zurückstellenする項目がありません。</translation>
+        <translation>Es gibt keine Gegenstände zum zurücksetzen.</translation>
     </message>
     <message>
         <source>%1 items to revert.</source>
-        <translation>%1 個のZurückstellenする項目があります。</translation>
+        <translation>%1 Gegenstände zum zurücksetzen.</translation>
     </message>
     <message>
         <source>Reverting %1 items...</source>
-        <translation>%1 個の項目 zurückstellenしています...</translation>
+        <translation>%1 Gegenstände werden zurückgesetzt...</translation>
     </message>
     <message>
         <source>Revert done successfully.</source>
-        <translation>Zurückstellenが完了しました。</translation>
+        <translation>Zurücksetzung beendet.</translation>
     </message>
 </context>
 <context>
     <name>SVNRevertFrameRangeDialog</name>
     <message>
         <source>Version Control: Revert Frame Range changes</source>
-        <translation>バージョン管理:Frame-Bereichの変更 zurückstellenする</translation>
+        <translation>Versionskontrolle: Frame-Bereich-Änderungen zurücksetzen</translation>
     </message>
     <message>
         <source>1 item to revert.</source>
-        <translation>1個のZurückstellenする項目があります。</translation>
+        <translation>Es gibt 1 Gegenstand zum zurücksetzen.</translation>
     </message>
     <message>
         <source>Revert</source>
-        <translation>Zurückstellen</translation>
+        <translation>Zurücksetzen</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -7608,42 +7605,42 @@ Renderするクリップにはそのオーディオ・Dateiが含まれません
     </message>
     <message>
         <source>Reverting 1 item...</source>
-        <translation>1つの項目 zurückstellen中...</translation>
+        <translation>1 Gegenstand wird zurückgesetzt...</translation>
     </message>
     <message>
         <source>Revert done successfully.</source>
-        <translation>Zurückstellenが完了しました。</translation>
+        <translation>Zurücksetzung beendet.</translation>
     </message>
     <message>
         <source>Reverting %1 items...</source>
-        <translation>%1 個の項目 zurückstellen中...</translation>
+        <translation>%1 Gegenstände werden zurückgesetzt...</translation>
     </message>
     <message>
         <source>It is not possible to revert the file.</source>
-        <translation>Datei zurückstellenすることができません。</translation>
+        <translation>Die Datei kann nicht zurückgesetzt werden.</translation>
     </message>
 </context>
 <context>
     <name>SVNTimeline</name>
     <message>
         <source>Version Control: Timeline </source>
-        <translation>バージョン管理:タイムライン</translation>
+        <translation>Versionskontrolle: Zeitstrahl</translation>
     </message>
     <message>
         <source>Getting file history...</source>
-        <translation>Datei履歴を取得中...</translation>
+        <translation>Datei-Verlauf wird ermittelt...</translation>
     </message>
     <message>
         <source>Get Scene Contents</source>
-        <translation>Szene内容を取得する</translation>
+        <translation>Szenen-Inhalt wird geholt</translation>
     </message>
     <message>
         <source>Get Last Revision</source>
-        <translation>最新バージョンを取得する</translation>
+        <translation>Die neuste Version wird geholt</translation>
     </message>
     <message>
         <source>Get Selected Revision</source>
-        <translation>Wählenしたバージョンを取得する</translation>
+        <translation>Die gewählte Version wird geholt</translation>
     </message>
     <message>
         <source>Close</source>
@@ -7651,58 +7648,58 @@ Renderするクリップにはそのオーディオ・Dateiが含まれません
     </message>
     <message>
         <source>Getting repository status...</source>
-        <translation>リポジトリの状態を取得中...</translation>
+        <translation>Repository-Status wird ermittelt...</translation>
     </message>
     <message>
         <source>Date</source>
-        <translation>日時</translation>
+        <translation>Datum</translation>
     </message>
     <message>
         <source>Author</source>
-        <translation>作者</translation>
+        <translation>Autor</translation>
     </message>
     <message>
         <source>Comment</source>
-        <translation>コメント</translation>
+        <translation>Kommentar</translation>
     </message>
     <message>
         <source>Revision</source>
-        <translation>改訂</translation>
+        <translation>Revision</translation>
     </message>
     <message>
         <source>Getting the status for %1...</source>
-        <translation>%1 の状態を取得中...</translation>
+        <translation>Der Status für %1 wird ermittelt...</translation>
     </message>
     <message>
         <source>Getting %1 to revision %2...</source>
-        <translation>%1を %2 Revisionenまで取得中...</translation>
+        <translation>%1 für Revision %2 wird geholt...</translation>
     </message>
     <message>
         <source>Getting %1 items to revision %2...</source>
-        <translation>%1 個の項目を %2 Revisionenまで取得中...</translation>
+        <translation>%1 Gegenstände für Revision %2 werden geholt...</translation>
     </message>
     <message>
         <source>Getting %1...</source>
-        <translation>%1 を取得中...</translation>
+        <translation>%1 wird geholt...</translation>
     </message>
     <message>
         <source>Getting %1 items...</source>
-        <translation>%1 個の項目を取得中...</translation>
+        <translation>%1 Gegenstände werden geholt...</translation>
     </message>
 </context>
 <context>
     <name>SVNUnlockFrameRangeDialog</name>
     <message>
         <source>Version Control: Unlock Frame Range</source>
-        <translation>バージョン管理:Frame-Bereich entsperren</translation>
+        <translation>Versionskontrolle: Frame-Bereich entsperren</translation>
     </message>
     <message>
         <source>Note: the file will be updated too. Are you sure ?</source>
-        <translation>注意:DateiもErneuernされます。よろしいですか？</translation>
+        <translation>Vorsicht: Die Datei wird auch aktualisiert. Sind Sie sich sicher?</translation>
     </message>
     <message>
         <source>Unlock</source>
-        <translation>ロックを解除</translation>
+        <translation>Entsperren</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -7710,31 +7707,31 @@ Renderするクリップにはそのオーディオ・Dateiが含まれません
     </message>
     <message>
         <source>Unlock done successfully.</source>
-        <translation>ロックの解除が完了しました。</translation>
+        <translation>Entsperrung beendet.</translation>
     </message>
     <message>
         <source>Locking file...</source>
-        <translation>Dateiをロックしています...</translation>
+        <translation>Datei wird gesperrt...</translation>
     </message>
     <message>
         <source>Getting frame range edit information...</source>
-        <translation>Frame-BereichのBearbeiten情報を取得しています...</translation>
+        <translation>Frame-Bereich-Bearbeitungs-Information holen...</translation>
     </message>
     <message>
         <source>No frame range edited.</source>
-        <translation>BearbeitenされたFrame-Bereichはありません。</translation>
+        <translation>Es wurde kein Frame-Bereich bearbeitet.</translation>
     </message>
     <message>
         <source>Updating frame range edit information...</source>
-        <translation>Frame-BereichのBearbeiten情報 erneuernしています...</translation>
+        <translation>Frame-Bereich-Bearbeitungs-Information wird aktualisiert...</translation>
     </message>
     <message>
         <source>Putting changes...</source>
-        <translation>変更を登録中...</translation>
+        <translation>Änderungen werden eingetragen...</translation>
     </message>
     <message>
         <source>Updating file...</source>
-        <translation>Datei erneuern中...</translation>
+        <translation>Datei wird aktualisiert...</translation>
     </message>
     <message>
         <source>Close</source>
@@ -7745,15 +7742,15 @@ Renderするクリップにはそのオーディオ・Dateiが含まれません
     <name>SVNUnlockMultiFrameRangeDialog</name>
     <message>
         <source>Version Control: Unlock Frame Range</source>
-        <translation>バージョン管理:Frame-Bereich entsperren</translation>
+        <translation>Versionskontrolle: Frame-Bereich entsperren</translation>
     </message>
     <message>
         <source>Getting repository status...</source>
-        <translation>リポジトリの状態を取得しています...</translation>
+        <translation>Repository-Status holen...</translation>
     </message>
     <message>
         <source>Unlock</source>
-        <translation>ロックを解除</translation>
+        <translation>Entsperren</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -7761,34 +7758,34 @@ Renderするクリップにはそのオーディオ・Dateiが含まれません
     </message>
     <message>
         <source>Unlocking %1 items...</source>
-        <translation>%1 個の項目 entsperrenしています...</translation>
+        <translation>%1 Gegenstände werden entsperrt...</translation>
     </message>
     <message>
         <source>No items to unlock.</source>
-        <translation>ロックを解除する項目がありません。</translation>
+        <translation>Es gibt keine Gegenstände zum entsperren.</translation>
     </message>
     <message>
         <source>%1 items to unlock.</source>
-        <translation>%1 個 entsperrenする項目があります。</translation>
+        <translation>Es gibt %1 Gegenstände zum entsperren.</translation>
     </message>
 </context>
 <context>
     <name>SVNUpdateAndLockDialog</name>
     <message>
         <source>Version Control: Edit</source>
-        <translation>バージョン管理:Bearbeiten</translation>
+        <translation>Versionskontrolle: Bearbeiten</translation>
     </message>
     <message>
         <source>Comment:</source>
-        <translation>コメント:</translation>
+        <translation>Kommentar:</translation>
     </message>
     <message>
         <source>Edit Scene Contents</source>
-        <translation>Szeneの内容 bearbeiten</translation>
+        <translation>Szenen-Inhalt bearbeiten</translation>
     </message>
     <message>
         <source>Get And Edit </source>
-        <translation>取得してBearbeitenする</translation>
+        <translation>Holen und bearbeiten</translation>
     </message>
     <message>
         <source>Edit</source>
@@ -7800,38 +7797,38 @@ Renderするクリップにはそのオーディオ・Dateiが含まれません
     </message>
     <message>
         <source>No items to edit.</source>
-        <translation>Bearbeitenする項目がありません。</translation>
+        <translation>Es gibt keine Gegenstände zum bearbeiten.</translation>
     </message>
     <message>
         <source>%1 items to edit.</source>
-        <translation>%1 個のBearbeitenする項目があります。</translation>
+        <translation>%1 Gegenstand zum bearbeiten.</translation>
     </message>
     <message>
         <source>Updating %1 items...</source>
-        <translation>%1 個の項目 erneuern中...</translation>
+        <translation>%1 Gegenstände werden aktualisiert...</translation>
     </message>
     <message>
         <source>Editing %1 items...</source>
-        <translation>%1 個の項目 bearbeiten中...</translation>
+        <translation>%1 Gegenstände werden bearbeitet...</translation>
     </message>
 </context>
 <context>
     <name>SVNUpdateDialog</name>
     <message>
         <source>Version Control: Update</source>
-        <translation>バージョン管理:Erneuern</translation>
+        <translation>Versionskontrolle: Aktualisiern</translation>
     </message>
     <message>
         <source>Getting repository status...</source>
-        <translation>リポジトリの状態を取得しています...</translation>
+        <translation>Repository-Status holen...</translation>
     </message>
     <message>
         <source>Get Scene Contents</source>
-        <translation>Szeneの内容を取得する</translation>
+        <translation>Szenen-Inhalt wird geholt</translation>
     </message>
     <message>
         <source>Update</source>
-        <translation>Erneuern</translation>
+        <translation>Aktualisieren</translation>
     </message>
     <message>
         <source>Close</source>
@@ -7843,55 +7840,55 @@ Renderするクリップにはそのオーディオ・Dateiが含まれません
     </message>
     <message>
         <source>%1 items to update.</source>
-        <translation>%1 個のErneuernするアイテムがあります。</translation>
+        <translation>Es gibt %1 Gegenstände zum aktualisieren.</translation>
     </message>
     <message>
         <source>Update to:</source>
-        <translation>ErneuernするBereich:</translation>
+        <translation>Aktualisieren zu:</translation>
     </message>
     <message>
         <source>Some conflict found. Select..</source>
-        <translation>コンフリクトが見つかりました。Wählenする...</translation>
+        <translation>Es wurde ein Widerspruch gefunden. Wählen Sie...</translation>
     </message>
     <message>
         <source>No items to update.</source>
-        <translation>Erneuernする項目がありません。</translation>
+        <translation>Es gibt keine Gegenstände zum aktualisieren.</translation>
     </message>
     <message>
         <source>Some items are currently modified in your working copy.
 Please commit or revert changes first.</source>
-        <translation>あなたの作業用Kopierenの中で、いくつかの項目が変更されています。
-先に変更をコミットするか、または元に戻して下さい。</translation>
+        <translation>In Ihrer Bearbeitungskopie wurden einige Gegenstände geändert.
+Bitte tragen Sie die Änderungen ein oder setzen sie zurück.</translation>
     </message>
     <message>
         <source>Updating items...</source>
-        <translation>項目 erneuern中...</translation>
+        <translation>Gegenstände werden aktualisiert...</translation>
     </message>
     <message>
         <source>Updating to their items...</source>
-        <translation>これらの項目にErneuern中...</translation>
+        <translation>Es wird zu deren Gegenstände aktualisiert...</translation>
     </message>
 </context>
 <context>
     <name>SaveCurvePopup</name>
     <message>
         <source>Save Curve</source>
-        <translation>パラメータ speichern</translation>
+        <translation>Die Kurve speichern</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>保存</translation>
+        <translation>Speichern</translation>
     </message>
 </context>
 <context>
     <name>SaveImagesPopup</name>
     <message>
         <source>Save FlipboOk Images</source>
-        <translation>Flipbook上のBild speichern</translation>
+        <translation>Flipbook-Bilder speichern</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>保存</translation>
+        <translation>Speichern</translation>
     </message>
 </context>
 <context>
@@ -7902,7 +7899,7 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Save</source>
-        <translation>保存</translation>
+        <translation>Speichern</translation>
     </message>
 </context>
 <context>
@@ -7913,22 +7910,22 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Save</source>
-        <translation>保存</translation>
+        <translation>Speichern</translation>
     </message>
 </context>
 <context>
     <name>SavePresetPopup</name>
     <message>
         <source>Save Preset</source>
-        <translation>プZurücksetzen speichern</translation>
+        <translation>Vorgaben speichern</translation>
     </message>
     <message>
         <source>Preset Name:</source>
-        <translation>プZurücksetzenのName:</translation>
+        <translation>Vorgaben-Name:</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>保存</translation>
+        <translation>Speichern</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -7936,11 +7933,11 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>It is not possible to create the preset folder %1.</source>
-        <translation>%1 プZurücksetzenフォルダ es konnte nicht erstellt werden.</translation>
+        <translation>Der Vorgaben-Ordner %1 konnte nicht erstellt werden.</translation>
     </message>
     <message>
         <source>Do you want to overwrite?</source>
-        <translation>上書きしてもよろしいですか？</translation>
+        <translation>Sind Sie sich sicher, dass Sie überschreiben möchten?</translation>
     </message>
     <message>
         <source>Yes</source>
@@ -7955,11 +7952,11 @@ Please commit or revert changes first.</source>
     <name>SavePreviewedPopup</name>
     <message>
         <source>Save Previewed Images</source>
-        <translation>VorschauBild speichern</translation>
+        <translation>Vorgeschaute Bilder speichern</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>保存</translation>
+        <translation>Speichern</translation>
     </message>
 </context>
 <context>
@@ -7970,25 +7967,25 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Save</source>
-        <translation>保存</translation>
+        <translation>Speichern</translation>
     </message>
 </context>
 <context>
     <name>SaveSettingsPopup</name>
     <message>
         <source>Save Cleanup Settings</source>
-        <translation>SäubernEinstellungen speichern</translation>
+        <translation>Säuberungs-Einstellungen speichern</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>保存</translation>
+        <translation>Speichern</translation>
     </message>
 </context>
 <context>
     <name>SaveSubSceneAsPopup</name>
     <message>
         <source>Save</source>
-        <translation>保存</translation>
+        <translation>Speichern</translation>
     </message>
     <message>
         <source>Sub-xsheet</source>
@@ -7999,34 +7996,34 @@ Please commit or revert changes first.</source>
     <name>SaveTaskListPopup</name>
     <message>
         <source>Save Task List</source>
-        <translation>Aufgabeリスト speichern</translation>
+        <translation>Aufgaben-Liste speichern</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>保存</translation>
+        <translation>Speichern</translation>
     </message>
 </context>
 <context>
     <name>ScanSettingsPopup</name>
     <message>
         <source>Scan Settings</source>
-        <translation>ScanEinstellungen</translation>
+        <translation>Scan-Einstellungen</translation>
     </message>
     <message>
         <source>[no scanner]</source>
-        <translation>[スキャナーがありません]</translation>
+        <translation>[kein Scanner]</translation>
     </message>
     <message>
         <source>Paper Format:</source>
-        <translation>紙のフォーマット:</translation>
+        <translation>Papierformat:</translation>
     </message>
     <message>
         <source>Reverse Order</source>
-        <translation>Umkehren</translation>
+        <translation>Reihenfolge umkehren</translation>
     </message>
     <message>
         <source>Paper Feeder</source>
-        <translation>Automatisch原稿送り装置（ADF）</translation>
+        <translation>Automatischer Vorlagenwechsler (ADF)</translation>
     </message>
     <message>
         <source>Mode:</source>
@@ -8049,55 +8046,55 @@ Please commit or revert changes first.</source>
     <name>SceneSettingsPopup</name>
     <message>
         <source>Scene Settings</source>
-        <translation>SzeneEinstellungen</translation>
+        <translation>Szenen-Einstellungen</translation>
     </message>
     <message>
         <source>          Frame Rate:</source>
-        <translation type="vanished">Frameレート:</translation>
+        <translation type="vanished">Framerate:</translation>
     </message>
     <message>
         <source>Camera BG Color:</source>
-        <translation>KameraHintergrundfarbe:</translation>
+        <translation>Kamera-Hintergrundfarbe:</translation>
     </message>
     <message>
         <source>Viewer BG Color:</source>
-        <translation type="vanished">Betrachter hintergrundfarbe:</translation>
+        <translation type="vanished">Betrachter-Hintergrundfarbe:</translation>
     </message>
     <message>
         <source>   Preview BG Color:</source>
-        <translation type="vanished">Vorschau hintergrundfarbe:</translation>
+        <translation type="vanished">Vorschau-Hintergrundfarbe:</translation>
     </message>
     <message>
         <source>Checkerboard Color 1:</source>
-        <translation type="vanished">チェックボード色 1:</translation>
+        <translation type="vanished">Schachbrett-Farbe 1:</translation>
     </message>
     <message>
         <source>Checkerboard Color 2:</source>
-        <translation type="vanished">チェックボード色 2:</translation>
+        <translation type="vanished">Schachbrett-Farbe 2:</translation>
     </message>
     <message>
         <source>Image Subsampling:</source>
-        <translation>サンプリング画質:</translation>
+        <translation>Bild-Abtastung:</translation>
     </message>
     <message>
         <source>      Marker Interval:</source>
-        <translation type="vanished">マーカー間隔:</translation>
+        <translation type="vanished">Marker-Interval:</translation>
     </message>
     <message>
         <source>A/R:</source>
-        <translation>縦横比:</translation>
+        <translation>Seitenverhältnis:</translation>
     </message>
     <message>
         <source>Safe Area Box 2:</source>
-        <translation type="vanished">サーフエリアボックス 2:</translation>
+        <translation type="vanished">Safe-Area-Rahmen 2:</translation>
     </message>
     <message>
         <source>Safe Area Box 1:</source>
-        <translation type="vanished">サーフエリアボックス 1:</translation>
+        <translation type="vanished">Safe-Area-Rahmen 1:</translation>
     </message>
     <message>
         <source>TLV Subsampling:</source>
-        <translation>TLVのサンプリング画質:</translation>
+        <translation>TLV-Bild-Abtastung:</translation>
     </message>
     <message>
         <source>Start Frame:</source>
@@ -8105,19 +8102,19 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Level And Column Icon:</source>
-        <translation type="vanished">Ebeneと列のアイコン:</translation>
+        <translation type="vanished">Ebenen- und Spalten-Icon:</translation>
     </message>
     <message>
         <source>Field Guide Size:</source>
-        <translation>Praktische Anleitungサイズ:</translation>
+        <translation>Größe der praktischen Anleitung:</translation>
     </message>
     <message>
         <source>Frame Rate:</source>
-        <translation>Frameレート:</translation>
+        <translation>Framerate:</translation>
     </message>
     <message>
         <source>Marker Interval:</source>
-        <translation>マーカー間隔:</translation>
+        <translation>Marker-Interval:</translation>
     </message>
     <message>
         <source>  Start Frame:</source>
@@ -8128,11 +8125,11 @@ Please commit or revert changes first.</source>
     <name>SceneViewerContextMenu</name>
     <message>
         <source>Swap Compared Images</source>
-        <translation>比較Bildの位置を入れ替え</translation>
+        <translation>Verglichene Bilder tauschen</translation>
     </message>
     <message>
         <source>Save Previewed Frames</source>
-        <translation>VorschauしたFrame speichern</translation>
+        <translation>Vorgeschaute Frames speichern</translation>
     </message>
     <message>
         <source>Regenerate Preview</source>
@@ -8140,7 +8137,7 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Regenerate Frame Preview</source>
-        <translation>Vorschau neu berechnen（Aktueller Frameのみ）</translation>
+        <translation>Vorschau neu berechnen（nur aktueller Frame）</translation>
     </message>
     <message>
         <source>Select</source>
@@ -8152,15 +8149,15 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Select Camera</source>
-        <translation>KameraをWählen</translation>
+        <translation>Kamera wählen</translation>
     </message>
     <message>
         <source>Select Pegbar</source>
-        <translation>タップをWählen</translation>
+        <translation>Haltestift wählen</translation>
     </message>
     <message>
         <source>Select Column</source>
-        <translation>列をWählen</translation>
+        <translation>Spalte wählen</translation>
     </message>
 </context>
 <context>
@@ -8171,7 +8168,7 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Sub-camera Preview</source>
-        <translation>Sub-KameraVorschau</translation>
+        <translation>Sub-Kamera-Vorschau</translation>
     </message>
     <message>
         <source>Untitled</source>
@@ -8183,11 +8180,11 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>   ::   Frame: </source>
-        <translation>::Frame:</translation>
+        <translation>:: Frame:</translation>
     </message>
     <message>
         <source>   ::   Level: </source>
-        <translation>::Ebene:</translation>
+        <translation>:: Ebene:</translation>
     </message>
     <message>
         <source>Level: </source>
@@ -8195,23 +8192,23 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Freeze</source>
-        <translation>フリーズ</translation>
+        <translation>Einfrieren</translation>
     </message>
     <message>
         <source>Camera Stand View</source>
-        <translation>KameraスタンドAnsicht</translation>
+        <translation>Kamera-Stand-Ansicht</translation>
     </message>
     <message>
         <source>3D View</source>
-        <translation>３DAnsicht</translation>
+        <translation>3D-Ansicht</translation>
     </message>
     <message>
         <source>Camera View</source>
-        <translation>KameraAnsicht</translation>
+        <translation>Kamera-Ansicht</translation>
     </message>
     <message>
         <source>  ::  Zoom : </source>
-        <translation>::Vergrößerung:</translation>
+        <translation>:: Vergrößerung :</translation>
     </message>
 </context>
 <context>
@@ -8222,14 +8219,14 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Remove</source>
-        <translation>消去</translation>
+        <translation>Entfernen</translation>
     </message>
 </context>
 <context>
     <name>ShortcutTree</name>
     <message>
         <source>Menu Commands</source>
-        <translation>メニューコマンド</translation>
+        <translation>Menü-Befehle</translation>
     </message>
     <message>
         <source>File</source>
@@ -8241,7 +8238,7 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Scan &amp; Cleanup</source>
-        <translation>Säubern</translation>
+        <translation>Scan säubern</translation>
     </message>
     <message>
         <source>Level</source>
@@ -8253,7 +8250,7 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Cells</source>
-        <translation>コマ</translation>
+        <translation>Cells</translation>
     </message>
     <message>
         <source>View</source>
@@ -8265,11 +8262,11 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Right-click Menu Commands</source>
-        <translation>右クリックメニュー項目</translation>
+        <translation>Rechts-Klick-Menü-Gegenstände</translation>
     </message>
     <message>
         <source>Tools</source>
-        <translation>ツール</translation>
+        <translation>Werkzeuge</translation>
     </message>
     <message>
         <source>Tool Modifiers</source>
@@ -8277,23 +8274,23 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Visualization</source>
-        <translation>視覚化</translation>
+        <translation>Visualisierung</translation>
     </message>
     <message>
         <source>Playback Controls</source>
-        <translation>Abspielenコントロール</translation>
+        <translation>Abspiel-Kontrollen</translation>
     </message>
     <message>
         <source>RGBA Channels</source>
-        <translation>RGBAチャンネル</translation>
+        <translation>RGBA-Kanäle</translation>
     </message>
     <message>
         <source>Fill</source>
-        <translation>塗りつぶし</translation>
+        <translation>Fläche füllen</translation>
     </message>
     <message>
         <source>Misc</source>
-        <translation>その他</translation>
+        <translation>Anderes</translation>
     </message>
 </context>
 <context>
@@ -8301,8 +8298,8 @@ Please commit or revert changes first.</source>
     <message>
         <source>%1 is already assigned to &apos;%2&apos;
 Assign to &apos;%3&apos;?</source>
-        <translation>%1　は既に %2 に割り当てられています。
-%3 に割り当てますか？</translation>
+        <translation>%1 ist schon zu %2 zugewiesen.
+Zu %3 zuweisen?</translation>
     </message>
     <message>
         <source>Yes</source>
@@ -8341,7 +8338,7 @@ Assign to &apos;%3&apos;?</source>
     </message>
     <message>
         <source>Other Windows</source>
-        <translation>その他のFenster</translation>
+        <translation>AnderesのFenster</translation>
     </message>
     <message>
         <source>Customize</source>
@@ -8353,11 +8350,11 @@ Assign to &apos;%3&apos;?</source>
     </message>
     <message>
         <source>Tools</source>
-        <translation>ツール</translation>
+        <translation>-Tool</translation>
     </message>
     <message>
         <source>More Tools</source>
-        <translation>その他のツール</translation>
+        <translation>Anderesの-Tool</translation>
     </message>
     <message>
         <source>Checks</source>
@@ -8369,7 +8366,7 @@ Assign to &apos;%3&apos;?</source>
     </message>
     <message>
         <source>Draw</source>
-        <translation>作画</translation>
+        <translation>Zeichnung</translation>
     </message>
     <message>
         <source>Xsheet</source>
@@ -8385,19 +8382,19 @@ Assign to &apos;%3&apos;?</source>
     </message>
     <message>
         <source>Cells</source>
-        <translation>コマ</translation>
+        <translation>Cells</translation>
     </message>
     <message>
         <source>Reframe</source>
-        <translation>リFrame</translation>
+        <translation>Frame erneuern</translation>
     </message>
     <message>
         <source>Step</source>
-        <translation>コマ打ち</translation>
+        <translation>Schritte</translation>
     </message>
     <message>
         <source>Each</source>
-        <translation>コマを詰める</translation>
+        <translation>Einzelne Cells</translation>
     </message>
     <message>
         <source>File</source>
@@ -8413,7 +8410,7 @@ Assign to &apos;%3&apos;?</source>
     </message>
     <message>
         <source>Help</source>
-        <translation>ヘルプ</translation>
+        <translation>Hilfe</translation>
     </message>
 </context>
 <context>
@@ -8421,46 +8418,46 @@ Assign to &apos;%3&apos;?</source>
     <message>
         <source>Sub-scene controls: 
 Click the arrow button to create a new sub-xsheet</source>
-        <translation type="vanished">［クリック］Neue Sub-Szene erstellen</translation>
+        <translation type="vanished">[Click] Neue Sub-Szene erstellen</translation>
     </message>
     <message>
         <source>Disable Edit in Place</source>
-        <translation type="vanished">適所でBearbeitenを無効</translation>
+        <translation type="vanished">Lokales Bearbeiten deaktiviert</translation>
     </message>
     <message>
         <source>Enable Edit in Place</source>
-        <translation type="vanished">適所でBearbeitenを有効</translation>
+        <translation type="vanished">Lokales Bearbeiten aktiviert</translation>
     </message>
     <message>
         <source>Exit Sub-xsheet (1 Level Up)</source>
-        <translation type="vanished">この下のSub-Szene schließen</translation>
+        <translation type="vanished">Untere Sub-Szene schließen (1 Ebene)</translation>
     </message>
     <message>
         <source>Exit Sub-xsheet (2 Levels Up)</source>
-        <translation type="vanished">この下のSub-Szene schließen</translation>
+        <translation type="vanished">Untere Sub-Szene schließen (2 Ebenen)</translation>
     </message>
     <message>
         <source>Exit Sub-xsheet (3 or More Levels Up)</source>
-        <translation type="vanished">この下のSub-Szene schließen</translation>
+        <translation type="vanished">Untere Sub-Szene schließen (3 Ebenen)</translation>
     </message>
     <message>
         <source>Enter Sub-xsheet</source>
-        <translation type="vanished">Sub-SzeneBearbeitenモード</translation>
+        <translation type="vanished">Sub-Szene bearbeiten</translation>
     </message>
     <message>
         <source>Current Scene</source>
-        <translation type="vanished">Aktueller Szene</translation>
+        <translation type="vanished">Aktuelle Szene</translation>
     </message>
 </context>
 <context>
     <name>TApp</name>
     <message>
         <source>Error allocating memory: not enough memory.</source>
-        <translation>メモリー割り当てエラー: メモリーが不足しています。</translation>
+        <translation>Fehler beim zuweisen des Speichers: Nicht genügend Speicher vorhanden.</translation>
     </message>
     <message>
         <source>It is not possible to save automatically an untitled scene.</source>
-        <translation>UnbenanntのSzene automatisch保存できません。</translation>
+        <translation>Eine unbenannte Szene kann nicht gespeichert werden.</translation>
     </message>
 </context>
 <context>
@@ -8471,63 +8468,63 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
     <message>
         <source>Status:</source>
-        <translation>状況:</translation>
+        <translation>Status:</translation>
     </message>
     <message>
         <source>Command Line:</source>
-        <translation>コマンドライン:</translation>
+        <translation>Kommandozeile:</translation>
     </message>
     <message>
         <source>Server:</source>
-        <translation>サーバー:</translation>
+        <translation>Server:</translation>
     </message>
     <message>
         <source>Submitted By:</source>
-        <translation>送信者:</translation>
+        <translation>Absender:</translation>
     </message>
     <message>
         <source>Submitted On:</source>
-        <translation>送信先:</translation>
+        <translation>Sender:</translation>
     </message>
     <message>
         <source>Submission Date:</source>
-        <translation>送信日:</translation>
+        <translation>Sende-Datum:</translation>
     </message>
     <message>
         <source>Start Date:</source>
-        <translation>開始日:</translation>
+        <translation>Start-Datum:</translation>
     </message>
     <message>
         <source>Completion Date:</source>
-        <translation>完了日:</translation>
+        <translation>Tag der Fertigstellung:</translation>
     </message>
     <message>
         <source>Duration:</source>
-        <translation>処理時間:</translation>
+        <translation>Bearbeitungsdauer:</translation>
     </message>
     <message>
         <source>Step Count:</source>
-        <translation>ステップ数:</translation>
+        <translation>Schritt-Anzahl:</translation>
     </message>
     <message>
         <source>Failed Steps:</source>
-        <translation>失敗ステップ数:</translation>
+        <translation>Anzahl fehlgeschlagener Schritte:</translation>
     </message>
     <message>
         <source>Successfull Steps:</source>
-        <translation>成功ステップ数:</translation>
+        <translation>Anzahl erfolgreicher Schritte:</translation>
     </message>
     <message>
         <source>Priority:</source>
-        <translation>優先順位:</translation>
+        <translation>Priorität:</translation>
     </message>
     <message>
         <source>Output:</source>
-        <translation>Output-:</translation>
+        <translation>Output:</translation>
     </message>
     <message>
         <source>Frames per Chunk:</source>
-        <translation>1 チャンクあたりのFrame数:</translation>
+        <translation>Frames pro Stück:</translation>
     </message>
     <message>
         <source>From:</source>
@@ -8547,7 +8544,7 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
     <message>
         <source>Multiple Rendering:</source>
-        <translation type="vanished">複数Render:</translation>
+        <translation type="vanished">Multiples Rendern:</translation>
     </message>
     <message>
         <source>None</source>
@@ -8555,55 +8552,55 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
     <message>
         <source>Fx Schematic Flows</source>
-        <translation>FXSchaubildの各ノード</translation>
+        <translation>FX-Schaubild-Nodes</translation>
     </message>
     <message>
         <source>Fx Schematic Terminal Nodes</source>
-        <translation>FXSchaubildでXsheetに接続している各ノード</translation>
+        <translation>FX-Schaubild Terminal-Nodes</translation>
     </message>
     <message>
         <source>Dedicated CPUs:</source>
-        <translation>使用 CPU 数:</translation>
+        <translation>Zugehörige CPUs:</translation>
     </message>
     <message>
         <source>Single</source>
-        <translation>シングル</translation>
+        <translation>Einzeln</translation>
     </message>
     <message>
         <source>Half</source>
-        <translation>半分</translation>
+        <translation>Halb</translation>
     </message>
     <message>
         <source>All</source>
-        <translation>すべて</translation>
+        <translation>Alle</translation>
     </message>
     <message>
         <source>Render Tile:</source>
-        <translation>Renderタイル:</translation>
+        <translation>Render-Kachel:</translation>
     </message>
     <message>
         <source>Large</source>
-        <translation>大</translation>
+        <translation>Groß</translation>
     </message>
     <message>
         <source>Medium</source>
-        <translation>中</translation>
+        <translation>Mittel</translation>
     </message>
     <message>
         <source>Small</source>
-        <translation>小</translation>
+        <translation>Klein</translation>
     </message>
     <message>
         <source>Visible Only</source>
-        <translation>可視のみ</translation>
+        <translation>Nur Sichtbare</translation>
     </message>
     <message>
         <source>Overwrite</source>
-        <translation>上書き-Einstellungen</translation>
+        <translation>Überschreiben</translation>
     </message>
     <message>
         <source>Dependencies:</source>
-        <translation>処理するVorheriger 優先Aufgabe:</translation>
+        <translation>Abhängigkeiten:</translation>
     </message>
     <message>
         <source>Remove -&gt;</source>
@@ -8611,19 +8608,19 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
     <message>
         <source>&lt;- Add</source>
-        <translation type="vanished">&lt;-Hinzufügen</translation>
+        <translation type="vanished">&lt;- Hinzufügen</translation>
     </message>
     <message>
         <source>Multimedia:</source>
-        <translation>素材毎に複数Render :</translation>
+        <translation>Multiples Rendern:</translation>
     </message>
     <message>
         <source>NoPaint</source>
-        <translation>NoPaintのみ上書き</translation>
+        <translation>Nur NoPaint Überschreiben</translation>
     </message>
     <message>
         <source>Off</source>
-        <translation>上書きしない</translation>
+        <translation>Nicht überschreiben</translation>
     </message>
     <message>
         <source>Remove &gt;&gt;</source>
@@ -8638,11 +8635,11 @@ Click the arrow button to create a new sub-xsheet</source>
     <name>TaskTreeModel</name>
     <message>
         <source>Are you sure you want to remove ALL tasks?</source>
-        <translation>すべてのAufgabe löschenしてもよろしいですか？</translation>
+        <translation>Sind Sie sich sicher, dass Sie alle Aufgaben löschen möchten?</translation>
     </message>
     <message>
         <source>Remove All</source>
-        <translation>すべてLöschen</translation>
+        <translation>Alles löschen</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -8653,11 +8650,11 @@ Click the arrow button to create a new sub-xsheet</source>
     <name>TaskTreeView</name>
     <message>
         <source>Start</source>
-        <translation>開始</translation>
+        <translation>Start</translation>
     </message>
     <message>
         <source>Stop</source>
-        <translation>停止</translation>
+        <translation>Stop</translation>
     </message>
     <message>
         <source>Remove</source>
@@ -8668,31 +8665,31 @@ Click the arrow button to create a new sub-xsheet</source>
     <name>TasksViewer</name>
     <message>
         <source>&amp;Start</source>
-        <translation>開始 (&amp;S)</translation>
+        <translation>Start (&amp;S)</translation>
     </message>
     <message>
         <source>&amp;Stop</source>
-        <translation>停止 (&amp;S)</translation>
+        <translation>Stop (&amp;S)</translation>
     </message>
     <message>
         <source>&amp;Add Render Task</source>
-        <translation>RenderAufgabe hinzufügen (&amp;A)</translation>
+        <translation>Render-Aufgabe hinzufügen (&amp;A)</translation>
     </message>
     <message>
         <source>&amp;Add Cleanup Task</source>
-        <translation>SäubernAufgabe hinzufügen (&amp;A)</translation>
+        <translation>Säuberungs-Aufgabe hinzufügen (&amp;A)</translation>
     </message>
     <message>
         <source>&amp;Save Task List</source>
-        <translation>Aufgabeリスト speichern (&amp;S)</translation>
+        <translation>Aufgaben-Liste speichern (&amp;S)</translation>
     </message>
     <message>
         <source>&amp;Save Task List As</source>
-        <translation>Aufgabeリスト speichern als (&amp;S)</translation>
+        <translation>Aufgaben-Liste speichern als (&amp;S)</translation>
     </message>
     <message>
         <source>&amp;Load Task List</source>
-        <translation>Aufgabeリスト öffnen (&amp;L)</translation>
+        <translation>Aufgaben-Liste öffnen (&amp;L)</translation>
     </message>
     <message>
         <source>&amp;Remove</source>
@@ -8700,31 +8697,31 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
     <message>
         <source>Start</source>
-        <translation>開始</translation>
+        <translation>Start</translation>
     </message>
     <message>
         <source>Stop</source>
-        <translation>停止</translation>
+        <translation>Stop</translation>
     </message>
     <message>
         <source>Add Render</source>
-        <translation>RenderAufgabe hinzufügen</translation>
+        <translation>Render-Aufgabe hinzufügen</translation>
     </message>
     <message>
         <source>Add Cleanup</source>
-        <translation>SäubernAufgabe hinzufügen</translation>
+        <translation>Säuberungs-Aufgabe hinzufügen</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>Aufgabeリスト speichern</translation>
+        <translation>Aufgaben-Liste speichern</translation>
     </message>
     <message>
         <source>Save As</source>
-        <translation>Aufgabeリスト speichern als</translation>
+        <translation>Aufgaben-Liste speichern als</translation>
     </message>
     <message>
         <source>Load</source>
-        <translation>Aufgabeリスト importieren</translation>
+        <translation>Aufgaben-Liste importieren</translation>
     </message>
     <message>
         <source>Remove</source>
@@ -8735,11 +8732,11 @@ Click the arrow button to create a new sub-xsheet</source>
     <name>TestPanel</name>
     <message>
         <source>Left:</source>
-        <translation>左:</translation>
+        <translation>Links:</translation>
     </message>
     <message>
         <source>Right:</source>
-        <translation>右:</translation>
+        <translation>Rechts:</translation>
     </message>
 </context>
 <context>
@@ -8750,27 +8747,27 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
     <message>
         <source>Selected Cells</source>
-        <translation>Wählenしたコマ</translation>
+        <translation>Die gewählten Cells</translation>
     </message>
     <message>
         <source>Selected Frame Range</source>
-        <translation>WählenしたFrame-Bereich</translation>
+        <translation>Der gewählte Frame-Bereich</translation>
     </message>
     <message>
         <source>Whole Xsheet</source>
-        <translation>Xsheet全体</translation>
+        <translation>Der ganze Xsheet</translation>
     </message>
     <message>
         <source>Stretch:</source>
-        <translation>引き延ばし:</translation>
+        <translation>Strecken:</translation>
     </message>
     <message>
         <source>Old Range:</source>
-        <translation>AnwendenVorheriger Bereich:</translation>
+        <translation>Vorheriger Bereich:</translation>
     </message>
     <message>
         <source>Stretch</source>
-        <translation>引き延ばし</translation>
+        <translation>Strecken</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -8778,25 +8775,25 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
     <message>
         <source>New Range:</source>
-        <translation>Neue Bereich:</translation>
+        <translation>Neuer Bereich:</translation>
     </message>
 </context>
 <context>
     <name>TimelineWidget</name>
     <message>
         <source>Recent Version</source>
-        <translation>最近のバージョン</translation>
+        <translation>Aktuelle Version</translation>
     </message>
     <message>
         <source>Older Version</source>
-        <translation>過去のバージョン</translation>
+        <translation>Alte Version</translation>
     </message>
 </context>
 <context>
     <name>TrackerPopup</name>
     <message>
         <source>Tracking Settings</source>
-        <translation>TrackingEinstellungen</translation>
+        <translation>Tracking-Einstellungen</translation>
     </message>
     <message>
         <source>Threshold:</source>
@@ -8804,19 +8801,19 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
     <message>
         <source>Sensibility:</source>
-        <translation>検出感度:</translation>
+        <translation>Empfindlichkeit:</translation>
     </message>
     <message>
         <source>Variable Region Size</source>
-        <translation>可変Bereichのサイズ</translation>
+        <translation>Variable Bereich-Größe</translation>
     </message>
     <message>
         <source>Include Background</source>
-        <translation>背景を含む</translation>
+        <translation>Hintergrund beinhalten</translation>
     </message>
     <message>
         <source>Processing...</source>
-        <translation>処理をしています...</translation>
+        <translation>Am bearbeiten...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -8824,22 +8821,22 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
     <message>
         <source>Track</source>
-        <translation>追跡</translation>
+        <translation>Tracker</translation>
     </message>
 </context>
 <context>
     <name>VectorizerPopup</name>
     <message>
         <source>Convert-to-Vector Settings</source>
-        <translation>Zu Vektoren umwandeln -Einstellungen</translation>
+        <translation>Vektorenumwandlungs-Einstellungen</translation>
     </message>
     <message>
         <source>The current selection is invalid.</source>
-        <translation>Aktueller WählenBereichは無効です。</translation>
+        <translation>Die aktuelle Auswahl ist ungültig.</translation>
     </message>
     <message>
         <source>Cannot convert to vector the current selection.</source>
-        <translation>Aktueller WählenBereichをZu Vektoren umwandelnできません。</translation>
+        <translation>Der gewählte Bereich kann nicht zu Vektoren umgewandelt werden.</translation>
     </message>
     <message>
         <source>Centerline</source>
@@ -8847,15 +8844,15 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
     <message>
         <source>Outline</source>
-        <translation>アウトライン</translation>
+        <translation>Umriss</translation>
     </message>
     <message>
         <source>Preserve Painted Areas</source>
-        <translation>塗りつぶした領域を保持</translation>
+        <translation>Gefüllte Flächen erhalten</translation>
     </message>
     <message>
         <source>TLV Levels</source>
-        <translation>TLV Ebene</translation>
+        <translation>TLV-Ebene</translation>
     </message>
     <message>
         <source>Convert</source>
@@ -8863,27 +8860,27 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
     <message>
         <source>Add Border</source>
-        <translation>周囲に境界線 hinzufügen（塗りもれ防止）</translation>
+        <translation>Begrenzung hinzufügen</translation>
     </message>
     <message>
         <source>Conversion in progress: </source>
-        <translation>Umwandlungの処理中:</translation>
+        <translation>Umwandlung wird durchgeführt:</translation>
     </message>
     <message>
         <source>Raster Levels</source>
-        <translation>ラスターEbene</translation>
+        <translation>Raster-Ebenen</translation>
     </message>
     <message>
         <source>Toggle Swatch Preview</source>
-        <translation>VorschauAnsicht/非Ansicht</translation>
+        <translation>Swatch-Vorschau umschalten</translation>
     </message>
     <message>
         <source>Toggle Centerlines Check</source>
-        <translation>Mittellinieチェック anzeigen/非Ansicht</translation>
+        <translation>Mittellinien-Check umschalten</translation>
     </message>
     <message>
         <source>Corners</source>
-        <translation>角:</translation>
+        <translation>Ecken:</translation>
     </message>
     <message>
         <source>Start:</source>
@@ -8895,11 +8892,11 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
     <message>
         <source>Full color non-AA images</source>
-        <translation>フルカラー二値化Bild</translation>
+        <translation>Voll-Farbe Nicht-AA Bilder</translation>
     </message>
     <message>
         <source>Enhanced ink recognition</source>
-        <translation>高度な線の識別</translation>
+        <translation>Verbesserte Tinten-Erkennung</translation>
     </message>
     <message>
         <source>Save Settings</source>
@@ -8915,47 +8912,47 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
     <message>
         <source>File could not be opened for read</source>
-        <translation>Dateiを読み込めませんでした</translation>
+        <translation>Datei konnte nicht zum Lesen geladen werden</translation>
     </message>
     <message>
         <source>File could not be opened for write</source>
-        <translation>Dateiを書き込めませんでした</translation>
+        <translation>Datei konnte nicht zum Schreiben geöffnet werden</translation>
     </message>
     <message>
         <source>Save Vectorizer Parameters</source>
-        <translation>ベクターUmwandlungのパラメータ speichern</translation>
+        <translation>Parameter der Vektor-Umwandlung speichern</translation>
     </message>
     <message>
         <source>Load Vectorizer Parameters</source>
-        <translation>ベクターUmwandlungのEinstellungen laden</translation>
+        <translation>Parameter der Vektor-Umwandlung laden</translation>
     </message>
     <message>
         <source>Mode</source>
-        <translation>モード</translation>
+        <translation> Modus</translation>
     </message>
     <message>
         <source>Threshold</source>
-        <translation>しきい値</translation>
+        <translation>Grenzwert</translation>
     </message>
     <message>
         <source>Accuracy</source>
-        <translation>精度</translation>
+        <translation>Genauigkeit</translation>
     </message>
     <message>
         <source>Despeckling</source>
-        <translation>ドットノイズ automatisch除去</translation>
+        <translation>Störungen entfernen</translation>
     </message>
     <message>
         <source>Max Thickness</source>
-        <translation>最大のDicke</translation>
+        <translation>Maximale Dicke</translation>
     </message>
     <message>
         <source>Thickness Calibration</source>
-        <translation>Dickeの調整</translation>
+        <translation>Kalibrierung der Dicke</translation>
     </message>
     <message>
         <source>Adherence</source>
-        <translation>角に沿わせる度合い</translation>
+        <translation>Einhaltung</translation>
     </message>
     <message>
         <source>Angle</source>
@@ -8963,19 +8960,19 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
     <message>
         <source>Curve Radius</source>
-        <translation>カーブ半径</translation>
+        <translation>Kurven-Radius</translation>
     </message>
     <message>
         <source>Max Colors</source>
-        <translation>最大色数</translation>
+        <translation>Maximale Farben</translation>
     </message>
     <message>
         <source>Transparent Color</source>
-        <translation>透明にする色</translation>
+        <translation>Transparente Farbe</translation>
     </message>
     <message>
         <source>Tone Threshold</source>
-        <translation>トーンのしきい値</translation>
+        <translation>Farbton-Grenzwert</translation>
     </message>
 </context>
 <context>
@@ -8983,175 +8980,175 @@ Click the arrow button to create a new sub-xsheet</source>
     <message>
         <source>The version control configuration file is empty or wrongly defined.
 Please refer to the user guide for details.</source>
-        <translation>バージョン管理の構成Dateiは、空であるか誤って定義されています。 
-詳細はユーザーガイドを参照してください。</translation>
+        <translation>Die Konfigurationsdatei der Versionkontrolle ist leer oder falsch definiert. 
+Genaueres können Sie aus der Nutzerhilfe entnehmen.</translation>
     </message>
     <message>
         <source>The version control client application specified on the configuration file cannot be found.
 Please refer to the user guide for details.</source>
-        <translation>構成Dateiで指定されたバージョン管理のクライアントアプリケーションが見つかりません。
-詳細はユーザーガイドを参照してください。</translation>
+        <translation>Die, in der Konfigurationsdatei genannten, Versionskontroll-Klient-Applikation kann nicht gefunden werden.
+Genaueres können Sie aus der Nutzerhilfe entnehmen.</translation>
     </message>
     <message>
         <source>The version control client application is not installed on your computer.
 Subversion 1.5 or later is required.
 Please refer to the user guide for details.</source>
-        <translation>バージョン管理のクライアントアプリケーションはコンピュータにインストールされていません。 
-Sub-バージョン1.5又はそれ以降のバージョンが必要です。
-詳細はユーザーガイドを参照してください。</translation>
+        <translation>Die Versionskontroll-Klient-Applikation ist auf Ihrem Computer nicht installiert. 
+Subversion 1.5 oder später wird benötigt.
+Genaueres können Sie aus der Nutzerhilfe entnehmen.</translation>
     </message>
     <message>
         <source>The version control client application installed on your computer needs to be updated, otherwise some features may not be available.
 Subversion 1.5 or later is required.
 Please refer to the user guide for details.</source>
-        <translation>コンピュータにインストールされたバージョン管理のクライアントアプリケーションは、Erneuernする必要があります。さもなければ、いくつかの機能は利用できなくなるかもしれません。
-Sub-バージョン1.5又はそれ以降のバージョンが必要です。
-詳細についてユーザーガイドを参照してください。</translation>
+        <translation>Die, auf ihrem Computer, installierte Versionskontroll-Klient-Applikation muss aktualisiert werden. Ansonsten werden einige Funktionen nicht verfügbar sein..
+Subversion 1.5 oder später wird benötigt.
+Genaueres können Sie aus der Nutzerhilfe entnehmen.</translation>
     </message>
 </context>
 <context>
     <name>ViewerHistogramPopup</name>
     <message>
         <source>Viewer Histogram</source>
-        <translation>Histogrammビューア</translation>
+        <translation>Histogramm-Betrachter</translation>
     </message>
 </context>
 <context>
     <name>XsheetGUI::CellArea</name>
     <message>
         <source>Click to select keyframe, drag to move it</source>
-        <translation type="vanished">［クリック］KeysFrameをWählen、［ドラッグ］移動</translation>
+        <translation type="vanished">[Click] Keyframe wählen, [Ziehen] Verschieben</translation>
     </message>
     <message>
         <source>Click and drag to set the acceleration range</source>
-        <translation type="vanished">［ドラッグ］加速Bereich einstellungen</translation>
+        <translation type="vanished">[Ziehen] Beschleunigungs-Bereich einstellen</translation>
     </message>
     <message>
         <source>Click and drag to set the deceleration range</source>
-        <translation type="vanished">［ドラッグ］減速Bereich einstellungen</translation>
+        <translation type="vanished">[Ziehen] Verzögerungs-Bereich einstellen</translation>
     </message>
     <message>
         <source>Set the cycle of previous keyframes</source>
-        <translation type="vanished">Vorheriger KeysFrameのサイクル einstellungen</translation>
+        <translation type="vanished">Zyklus der vorherigen Keyframes einstellen</translation>
     </message>
     <message>
         <source>Click and drag to move the selection</source>
-        <translation>［ドラッグ］WählenBereichを移動</translation>
+        <translation>[Ziehen] Den gewählten Bereich verschieben</translation>
     </message>
     <message>
         <source>Click and drag to play</source>
-        <translation>［ドラッグ］WählenBereichをAbspielen</translation>
+        <translation>[Ziehen] Den gewählten Bereich abspielen</translation>
     </message>
     <message>
         <source>Click and drag to repeat selected cells</source>
-        <translation>［ドラッグ］WählenされているCellsを繰り返す</translation>
+        <translation>[Ziehen] Gewählte Cells wiederholen</translation>
     </message>
     <message>
         <source>Open Memo</source>
-        <translation>メモ öffnen</translation>
+        <translation>Memo öffnen</translation>
     </message>
     <message>
         <source>Delete Memo</source>
-        <translation>メモ löschen</translation>
+        <translation>Memo löschen</translation>
     </message>
     <message>
         <source>Reframe</source>
-        <translation>リFrame</translation>
+        <translation>Frame erneuern</translation>
     </message>
     <message>
         <source>Step</source>
-        <translation>コマ打ち</translation>
+        <translation>Schritte</translation>
     </message>
     <message>
         <source>Each</source>
-        <translation>コマを詰める</translation>
+        <translation>Einzelne Cells</translation>
     </message>
     <message>
         <source>Replace</source>
-        <translation>Ersetzenる</translation>
+        <translation>Ersetzen</translation>
     </message>
 </context>
 <context>
     <name>XsheetGUI::ColumnArea</name>
     <message>
         <source>Click to select camera</source>
-        <translation>［クリック］KameraをWählen</translation>
+        <translation>[Click] Kamera wählen</translation>
     </message>
     <message>
         <source>Camera Stand Toggle</source>
-        <translation type="vanished">BetrachterにAnsicht/非Ansicht</translation>
+        <translation type="vanished">Kamera-Stand umschalten</translation>
     </message>
     <message>
         <source>Render Toggle</source>
-        <translation type="vanished">RenderでAnsicht/非Ansicht</translation>
+        <translation type="vanished">Render-Ansicht umschalten</translation>
     </message>
     <message>
         <source>Lock Toggle</source>
-        <translation>ロック切り替え</translation>
+        <translation>Sperre umschalten</translation>
     </message>
     <message>
         <source>Click to play the soundtrack back</source>
-        <translation>［クリック］サウンドトラックをAbspielen</translation>
+        <translation>[Click] Soundtrack abspielen</translation>
     </message>
     <message>
         <source>Set the volume of the soundtrack</source>
-        <translation>サウンドトラックの音量Einstellungen</translation>
+        <translation>Soundtrack-Lautstärke einstellen</translation>
     </message>
     <message>
         <source>Click to select the type of motion path</source>
-        <translation type="vanished">［クリック］モーションPfad型式をWählen</translation>
+        <translation type="vanished">[Click] Bewegungs-Pfad-Stil wählen</translation>
     </message>
     <message>
         <source>Click to select column, drag to move it</source>
-        <translation>［クリック］列をWählen、［ドラッグ］列を移動</translation>
+        <translation>[Click] Spalte wählen, [Ziehen] Spalte verschieben</translation>
     </message>
     <message>
         <source>Click to unlink column</source>
-        <translation type="vanished">［クリック］列を分離</translation>
+        <translation type="vanished">[Click] Spalte trennen</translation>
     </message>
     <message>
         <source>Click and drag to link column</source>
-        <translation type="vanished">［ドラッグ］列を連結</translation>
+        <translation type="vanished">[Ziehen] Spalte verbinden</translation>
     </message>
     <message>
         <source>Master column of linked columns</source>
-        <translation type="vanished">連結された列のマスター列</translation>
+        <translation type="vanished">Master-Spalte der verbundenen Spalten</translation>
     </message>
     <message>
         <source>&amp;Subsampling 1</source>
-        <translation>離散サンプリング 1 (&amp;S)</translation>
+        <translation>Subsampling 1 (&amp;S)</translation>
     </message>
     <message>
         <source>&amp;Subsampling 2</source>
-        <translation>離散サンプリング 2 (&amp;S)</translation>
+        <translation>Subsampling 2 (&amp;S)</translation>
     </message>
     <message>
         <source>&amp;Subsampling 3</source>
-        <translation>離散サンプリング 3 (&amp;S)</translation>
+        <translation>Subsampling 3 (&amp;S)</translation>
     </message>
     <message>
         <source>&amp;Subsampling 4</source>
-        <translation>離散サンプリング 4 (&amp;S)</translation>
+        <translation>Subsampling 4 (&amp;S)</translation>
     </message>
     <message>
         <source>Preview Visibility Toggle</source>
-        <translation>有効/無効を切り替え</translation>
+        <translation>Vorschau-Ansicht umschalten</translation>
     </message>
     <message>
         <source>Camera Stand Visibility Toggle</source>
-        <translation>BetrachterにAnsicht/非Ansichtを切り替え</translation>
+        <translation>Kamera-Stand-Ansicht umschalten</translation>
     </message>
     <message>
         <source>Alt + Click to Toggle Thumbnail</source>
-        <translation>[Alt+クリック] アイコン anzeigen/非Ansicht</translation>
+        <translation>[Alt+Klick] Thumbnail umschalten</translation>
     </message>
     <message>
         <source>Reframe</source>
-        <translation>リFrame</translation>
+        <translation>Frame erneuern</translation>
     </message>
     <message>
         <source>Subsampling</source>
-        <translation>離散サンプリング</translation>
+        <translation>Subsampling</translation>
     </message>
 </context>
 <context>
@@ -9162,37 +9159,37 @@ Sub-バージョン1.5又はそれ以降のバージョンが必要です。
     </message>
     <message>
         <source>Sec Frame</source>
-        <translation>秒 コマ</translation>
+        <translation>Sekunden-Cells</translation>
     </message>
     <message>
         <source>6sec Sheet</source>
-        <translation>6秒Xsheet</translation>
+        <translation>6 Sekunden Xsheet</translation>
     </message>
     <message>
         <source>3sec Sheet</source>
-        <translation>3秒Xsheet</translation>
+        <translation>3 Sekunden Xsheet</translation>
     </message>
 </context>
 <context>
     <name>XsheetGUI::NotePopup</name>
     <message>
         <source>Memo</source>
-        <translation>メモ</translation>
+        <translation>Memo</translation>
     </message>
     <message>
         <source>Post</source>
-        <translation>Hinzufügenする</translation>
+        <translation>Hinzufügen</translation>
     </message>
     <message>
         <source>Discard</source>
-        <translation>破棄する</translation>
+        <translation>Verwerfen</translation>
     </message>
 </context>
 <context>
     <name>XsheetGUI::RowArea</name>
     <message>
         <source>Onion Skin Toggle</source>
-        <translation type="vanished">Onion SkinAnsicht/非Ansicht</translation>
+        <translation type="vanished">Onion Skin umschalten</translation>
     </message>
     <message>
         <source>Current Frame</source>
@@ -9200,31 +9197,31 @@ Sub-バージョン1.5又はそれ以降のバージョンが必要です。
     </message>
     <message>
         <source>Relative Onion Skin Toggle</source>
-        <translation type="vanished">Onion SkinAnsicht/非Ansicht［連結］</translation>
+        <translation type="vanished">Onion Skin umschalten [relativ]</translation>
     </message>
     <message>
         <source>Fixed Onion Skin Toggle</source>
-        <translation type="vanished">Onion SkinAnsicht/非Ansicht［固定］</translation>
+        <translation type="vanished">Onion Skin umschalten [fixiert]</translation>
     </message>
     <message>
         <source>Playback Start Marker</source>
-        <translation>Abspielen開始マーカー</translation>
+        <translation>Start-Marker abspielen</translation>
     </message>
     <message>
         <source>Playback End Marker</source>
-        <translation>Abspielen終了マーカー</translation>
+        <translation>End-Marker abspielen</translation>
     </message>
     <message>
         <source>Set Start Marker</source>
-        <translation>開始マーカー-Einstellungen</translation>
+        <translation>Start-Marker setzen</translation>
     </message>
     <message>
         <source>Set Stop Marker</source>
-        <translation>停止マーカー-Einstellungen</translation>
+        <translation>Stop-Marker setzen</translation>
     </message>
     <message>
         <source>Remove Markers</source>
-        <translation>マーカー löschen</translation>
+        <translation>Marker löschen</translation>
     </message>
     <message>
         <source>Curren Frame</source>
@@ -9232,7 +9229,7 @@ Sub-バージョン1.5又はそれ以降のバージョンが必要です。
     </message>
     <message>
         <source>Preview This</source>
-        <translation>このFrameのみVorschau</translation>
+        <translation>Nur Vorschau dieses Frames</translation>
     </message>
 </context>
 <context>
@@ -9259,7 +9256,7 @@ Sub-バージョン1.5又はそれ以降のバージョンが必要です。
     </message>
     <message>
         <source>   Selected: </source>
-        <translation>   Wählen: </translation>
+        <translation>   Gewählt: </translation>
     </message>
     <message>
         <source> frame : </source>
@@ -9271,11 +9268,11 @@ Sub-バージョン1.5又はそれ以降のバージョンが必要です。
     </message>
     <message>
         <source> column</source>
-        <translation>列</translation>
+        <translation>Spalte</translation>
     </message>
     <message>
         <source> columns</source>
-        <translation> 列</translation>
+        <translation> Spalte</translation>
     </message>
 </context>
 </TS>
