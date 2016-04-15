@@ -5,7 +5,7 @@
     <name>AddFilmstripFramesPopup</name>
     <message>
         <source>Add Frames</source>
-        <translation>Frame hinzufügen</translation>
+        <translation>Frames hinzufügen</translation>
     </message>
     <message>
         <source>From Frame:</source>
@@ -71,7 +71,7 @@
     </message>
     <message>
         <source>Constant Thickness</source>
-        <translation>konstante Dicke</translation>
+        <translation>Konstante Dicke</translation>
     </message>
     <message>
         <source>Start:</source>
@@ -124,7 +124,7 @@
     </message>
     <message>
         <source>Pegbar Holes:</source>
-        <translation>Gewindelöcher</translation>
+        <translation>Haltestift-Löscher</translation>
     </message>
     <message>
         <source>Field Guide:</source>
@@ -139,7 +139,7 @@
     </message>
     <message>
         <source>Local</source>
-        <translation>Umgebung</translation>
+        <translation>Lokales</translation>
     </message>
     <message>
         <source>Render Farm</source>
@@ -201,12 +201,13 @@ Please create this folder before using the render farm.</source>
     </message>
     <message>
         <source>The Task List is empty!</source>
-        <translation>Die Liste der Aufgaben ist leer!</translation>
+        <translation>Die Aufaben-Liste ist leer!</translation>
     </message>
     <message>
         <source>The current task list has been modified.
 Do you want to save your changes?</source>
-        <translation>Die aktuelle Liste der Aufgaben wurde geändert. Möchten Sie Ihre Änderungen speichern?</translation>
+        <translation>Die aktuelle Aufaben-Liste wurde geändert.
+Möchten Sie Ihre Änderungen speichern?</translation>
     </message>
     <message>
         <source>Save</source>
@@ -223,7 +224,8 @@ Do you want to save your changes?</source>
     <message>
         <source>The %1 task is currently active.
 Stop it or wait for its completion before removing it.</source>
-        <translation>Der %1 Arbeitsschritt ist momentan aktiv. Halten Sie ihn an oder warten Sie auf seine Beendung bevor Sie ihn entwenden.</translation>
+        <translation>Die %1 Aufgabe ist momentan aktiv.
+Halten Sie sie an oder warten Sie auf ihre Beendung bevor Sie sie entwenden.</translation>
     </message>
 </context>
 <context>
@@ -343,7 +345,8 @@ Stop it or wait for its completion before removing it.</source>
     <message>
         <source>The new canvas size is smaller than the current one.
 Do you want to crop the canvas?</source>
-        <translation>Die neue Arbeitsfläche ist kleiner als die Aktuelle. Möchten sie die Arbeitsfläche freistellen?</translation>
+        <translation>Die neue Arbeitsfläche ist kleiner als die Aktuelle.
+Möchten sie die Arbeitsfläche freistellen?</translation>
     </message>
     <message>
         <source>Crop</source>
@@ -509,8 +512,9 @@ Möchten Sie fortfahren?</translation>
 
 Please choose to delete the existing level and create a new one
 when running the cleanup process.</source>
-        <translation>既存Ebene &quot;%1&quot; öffnen時にFehlerが発生しました.
-Säubernの処理時に、「既存Ebene löschenして、Neue Ebene erstellenする」Optionen wählenして下さい.</translation>
+        <translation>Es traten Fehler beim öffnen der vorhandenen Ebene &quot;%1&quot; auf.
+
+Bitte löschen Sie die vorhandene Ebene und erstellen eine Neue wenn Sie den Säuberungsprozess durchführen.</translation>
     </message>
     <message>
         <source>Couldn&apos;t create directory &quot;%1&quot;</source>
@@ -593,7 +597,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Toggle Swatch Preview</source>
-        <translation>VorschauAnsicht/非Ansicht</translation>
+        <translation>Swatch-Vorschau umschalten</translation>
     </message>
     <message>
         <source>Toggle Opacity Check</source>
@@ -707,7 +711,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Pegbar Holes:</source>
-        <translation>Gewindelöcher</translation>
+        <translation>Haltestift-Löscher</translation>
     </message>
     <message>
         <source>Field Guide:</source>
@@ -869,7 +873,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Convert... </source>
-        <translation>Umwandeln....</translation>
+        <translation>Umwandeln...</translation>
     </message>
     <message>
         <source>Bg Color:</source>
@@ -1033,7 +1037,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Unpainted tlv from non AA source</source>
-        <translation>カラー二値Bild から 線画TLVに変換??</translation>
+        <translation>TLV von unbemalter Nicht-AA Quelle</translation>
     </message>
     <message>
         <source>Remove dot before frame number</source>
@@ -2193,7 +2197,7 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>Name &amp;&amp; Path</source>
-        <translation>Name der EbeneとDatei-Pfad</translation>
+        <translation>Ebenen-Name und Datei-Pfad</translation>
     </message>
     <message>
         <source>DPI &amp;&amp; Resolution</source>
@@ -2252,7 +2256,7 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source> Connection</source>
-        <translation> 接続</translation>
+        <translation> Verbindung</translation>
     </message>
     <message>
         <source>       Capture       </source>
@@ -2894,7 +2898,7 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>&amp;Add Frames...</source>
-        <translation>Frame hinzufügen (&amp;A)...</translation>
+        <translation>Frames hinzufügen (&amp;A)...</translation>
     </message>
     <message>
         <source>&amp;Renumber...</source>
@@ -4026,7 +4030,7 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>Get Color from Studio Palette</source>
-        <translation>Studio-Paletteから色を取得</translation>
+        <translation>Farbe aus Studio-Palette beziehen</translation>
     </message>
     <message>
         <source>&amp;Opacity Check</source>
@@ -4399,7 +4403,7 @@ Was möchten Sie tun?</translation>
     </message>
     <message>
         <source>There was an error during the scanning process.</source>
-        <translation>Scan処理MittelにFehlerが発生しました.</translation>
+        <translation>Es trat ein Fehler während des Scan-Prozesses auf.</translation>
     </message>
     <message>
         <source>Please, place the next paper drawing on the scanner flatbed, then select the relevant command in the TWAIN interface.</source>
@@ -6664,7 +6668,7 @@ Sind Sie sicher </translation>
     </message>
     <message>
         <source>Add Frames  : Level %1 : Frame </source>
-        <translation>Frame hinzufügen : Ebene %1 : Frame</translation>
+        <translation>Frames hinzufügen : Ebene %1 : Frame</translation>
     </message>
     <message>
         <source>Renumber  : Level %1</source>
@@ -8298,8 +8302,8 @@ Bitte tragen Sie die Änderungen ein oder setzen sie zurück.</translation>
     <message>
         <source>%1 is already assigned to &apos;%2&apos;
 Assign to &apos;%3&apos;?</source>
-        <translation>%1 ist schon zu %2 zugewiesen.
-Zu %3 zuweisen?</translation>
+        <translation>%1 ist schon zu &apos;%2&apos; zugewiesen.
+Zu &apos;%3&apos; zuweisen?</translation>
     </message>
     <message>
         <source>Yes</source>
@@ -8342,7 +8346,7 @@ Zu %3 zuweisen?</translation>
     </message>
     <message>
         <source>Customize</source>
-        <translation>カスタマイズ</translation>
+        <translation>Anpassen</translation>
     </message>
     <message>
         <source>View</source>
@@ -8350,15 +8354,15 @@ Zu %3 zuweisen?</translation>
     </message>
     <message>
         <source>Tools</source>
-        <translation>-Tool</translation>
+        <translation>Tools</translation>
     </message>
     <message>
         <source>More Tools</source>
-        <translation>Anderesの-Tool</translation>
+        <translation>Andere Tools</translation>
     </message>
     <message>
         <source>Checks</source>
-        <translation>チェック</translation>
+        <translation>Checks</translation>
     </message>
     <message>
         <source>Render</source>
