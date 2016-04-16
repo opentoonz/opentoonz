@@ -9,6 +9,7 @@
 //#include FT_FREETYPE_H
 
 
+#include <QStringList>
 #include <QFont>
 #include <QFontDatabase>
 #include <QFontMetrics>
