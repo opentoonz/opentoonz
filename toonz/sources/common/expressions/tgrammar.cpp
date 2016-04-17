@@ -16,15 +16,12 @@
 #include <map>
 #include <math.h>
 #include <functional>
+#include <memory>
 
 // Qt includes
 #include <QString>
 
 #include "tgrammar.h"
-
-#ifdef LINUX
-#include <memory>
-#endif
 
 const double PI = 4 * atan(1.0);
 const double toDeg(double rad) { return rad * 180.0 / PI; }

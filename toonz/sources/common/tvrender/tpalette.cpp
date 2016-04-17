@@ -1,7 +1,4 @@
 
-#ifdef LINUX
-#include <memory>
-#endif
 
 // TnzCore includes
 #include "tsimplecolorstyles.h"
@@ -16,6 +13,8 @@
 #include <QMutexLocker>
 
 #include "tpalette.h"
+
+#include <memory>
 
 PERSIST_IDENTIFIER(TPalette, "palette")
 

@@ -52,9 +52,7 @@
 // tcg includes
 #include "tcg/tcg_function_types.h"
 
-#ifdef LINUX
 #include <memory>
-#endif
 
 //*************************************************************************
 //    Local Namespace  stuff

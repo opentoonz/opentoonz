@@ -23,9 +23,7 @@
 #pragma warning(disable : 4251)
 #endif
 
-#ifdef LINUX
 #include <memory>
-#endif
 
 #include <QAction>
 #include <QMouseEvent>

@@ -9,9 +9,7 @@
 //STD includes
 #include <vector>
 
-#if defined(LINUX)
 #include <memory>
-#endif
 
 //**************************************************************************************
 //    TPersistSet  declaration

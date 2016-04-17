@@ -5,7 +5,9 @@
 #include "tconvert.h"
 #include "tfilepath_io.h"
 
+#ifdef LINUX
 #include <QDir>
+#endif
 #include <QSettings>
 
 #ifdef LEVO_MACOSX

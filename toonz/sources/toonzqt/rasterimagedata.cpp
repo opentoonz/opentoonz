@@ -12,9 +12,7 @@
 #include "toonz/sceneproperties.h"
 #include "toonz/fullcolorpalette.h"
 
-#ifdef LINUX
 #include <memory>
-#endif
 
 namespace
 {
