@@ -3,7 +3,7 @@ find_path(SUPERLU_INCLUDE_DIR NAMES slu_Cnames.h HINTS "/usr/include/SuperLU" PA
 find_library(SUPERLU_LIBRARY NAMES libsuperlu.so HINTS PATH_SUFFIXES superlu43/4.3_1/lib superlu)
 
 message("***** SuperLU Header path:" ${SUPERLU_INCLUDE_DIR})
-message("***** SuperLU Library path:" ${SUPERLU_LIBRARY})
+message("***** SuperLU Libarary path:" ${SUPERLU_LIBRARY})
 
 set(SUPERLU_NAMES ${SUPERLU_NAMES} SuperLU)
 

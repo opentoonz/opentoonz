@@ -11,7 +11,7 @@ unset(_search_INC_DIR)
 unset(_search_LIB_DIR)
 
 message("***** libtiff Header path:" ${TIFF_INCLUDE_DIR})
-message("***** libtiff Library path:" ${TIFF_LIBRARY})
+message("***** libtiff Libarary path:" ${TIFF_LIBRARY})
 
 set(TIFF_NAMES ${TIFF_NAMES} TIFF)
 
