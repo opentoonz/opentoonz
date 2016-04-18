@@ -96,7 +96,9 @@ QtOfflineGL::QtOfflineGL(TDimension rasterSize, const TOfflineGL::Imp *shared)
 
 QtOfflineGL::~QtOfflineGL()
 {
-	delete m_context;
+        delete m_context;
+	delete m_surface;
+	delete m_fbo;
 }
 
 //-----------------------------------------------------------------------------
