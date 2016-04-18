@@ -98,7 +98,6 @@ QtOfflineGL::QtOfflineGL(TDimension rasterSize, std::shared_ptr<TOfflineGL::Imp>
 
 QtOfflineGL::~QtOfflineGL()
 {
-	delete m_context;
 }
 
 //-----------------------------------------------------------------------------
@@ -107,22 +106,22 @@ void QtOfflineGL::createContext(TDimension rasterSize, std::shared_ptr<TOfflineG
 {
 	// Imposto il formato dei Pixel (pixelFormat)
 	/*
-	 32,                    // 32-bit color depth 
-	 0, 0, 0, 0, 0, 0,      // color bits ignored 
-	 8,                     // no alpha buffer 
-	 0,                     // shift bit ignored 
-	 0,                     // no accumulation buffer 
-	 0, 0, 0, 0,            // accum bits ignored 
-	 32,                    // 32-bit z-buffer 
-	 32,                    // max stencil buffer 
-	 0,                     // no auxiliary buffer 
-	 PFD_MAIN_PLANE,        // main layer 
-	 0,                     // reserved 
-	 0, 0, 0                // layer masks ignored 
+	 32,                    // 32-bit color depth
+	 0, 0, 0, 0, 0, 0,      // color bits ignored
+	 8,                     // no alpha buffer
+	 0,                     // shift bit ignored
+	 0,                     // no accumulation buffer
+	 0, 0, 0, 0,            // accum bits ignored
+	 32,                    // 32-bit z-buffer
+	 32,                    // max stencil buffer
+	 0,                     // no auxiliary buffer
+	 PFD_MAIN_PLANE,        // main layer
+	 0,                     // reserved
+	 0, 0, 0                // layer masks ignored
 
 	 ATTENZIONE !! SU MAC IL FORMATO E' DIVERSO (casomai possiamo mettere un ifdef)
 
-	 SPECIFICHE  MAC = depth_size 24, stencil_size 8, alpha_size 1 
+	 SPECIFICHE  MAC = depth_size 24, stencil_size 8, alpha_size 1
 
   */
 
@@ -155,36 +154,36 @@ void QtOfflineGL::createContext(TDimension rasterSize, std::shared_ptr<TOfflineG
   fmt.setDirectRendering(false);
 #endif
 #endif
-	/* FIXME: ここでいう QPixmap は Level Strip のセルに相当する. 
-	 QPixmap に GLContext を生成して bind できれば描画したベクタのラスタ画像がそこに反映されるはずだが
-	 QLContext の生成ができないためにうまくいかない.
-   */
-	printf("QPixmap(%d, %d)\n", rasterSize.lx, rasterSize.ly);
-	//QPixmap *m_pixmap = new QPixmap(rasterSize.lx, rasterSize.ly);
 
-	// Inizializzo un contesto openGL utilizzando una QPixmap
+	QSurfaceFormat format;
+	format.setProfile(QSurfaceFormat::CompatibilityProfile);
 
-	m_context = new QOpenGLContext();
-	//m_context = new QGLContext(fmt);
-
-	m_surface = new QOffscreenSurface();
-	m_surface->setFormat(m_context->format());
-	//QSurfaceFormat sfmt = QGuiApplication::focusWindow()->format();
+	m_surface = std::make_shared<QOffscreenSurface>();
+	m_surface->setFormat(format);
 	m_surface->create();
 
-	printf("create context:%p [thread:0x%x]\n", m_context, QThread::currentThreadId());
-	//m_context->setFormat(sfmt);
+	m_context = std::make_shared<QOpenGLContext>();
+	m_context->setFormat(format);
+	m_context->create();
+	m_context->makeCurrent(m_surface.get());
+
+	QOpenGLFramebufferObjectFormat fbo_format;
+	m_fbo = std::make_shared<QOpenGLFramebufferObject>(rasterSize.lx, rasterSize.ly, fbo_format);
+	m_fbo->bind();
+
+	printf("create context:%p [thread:0x%x]\n", m_context.get(), QThread::currentThreadId());
 
 	// Creo il contesto OpenGL - assicurandomi che sia effettivamente creato
 	// NOTA: Se il contesto non viene creato, di solito basta ritentare qualche volta.
-	bool ret = m_context->create();
+
 }
 //-----------------------------------------------------------------------------
 
 void QtOfflineGL::makeCurrent()
 {
 	if (m_context) {
-		m_context->makeCurrent(m_surface);
+	        m_context->moveToThread(QThread::currentThread());
+		m_context->makeCurrent(m_surface.get());
 	}
 	// else
 	//  m_oldContext = 0;
@@ -225,14 +224,12 @@ void QtOfflineGL::getRaster(TRaster32P raster)
 	int ly = raster->getLy();
 
 	raster->lock();
-	glReadPixels(0, 0, lx, ly,
-				 GL_RGBA /*GL_BGRA_EXT*/, GL_UNSIGNED_BYTE,
-				 raster->getRawData());
+	raster->copy( TRaster32P(lx, ly, m_fbo->width(), (TPixelRGBM32 *)m_fbo->toImage(false).bits(), false) );
 
 #ifdef WIN32
 	swapRedBlueChannels(raster->getRawData(), lx * ly);
 #elif MACOSX
-	rightRotateBits(raster->getRawData(), lx * ly);
+	//rightRotateBits(raster->getRawData(), lx * ly);
 #endif
 	raster->unlock();
 }
@@ -260,7 +257,6 @@ QtOfflineGLPBuffer::QtOfflineGLPBuffer(TDimension rasterSize)
 
 QtOfflineGLPBuffer::~QtOfflineGLPBuffer()
 {
-	delete m_context;
 }
 
 //-----------------------------------------------------------------------------
@@ -269,22 +265,22 @@ void QtOfflineGLPBuffer::createContext(TDimension rasterSize)
 {
 	// Imposto il formato dei Pixel (pixelFormat)
 	/*
-      32,                    // 32-bit color depth 
-      0, 0, 0, 0, 0, 0,      // color bits ignored 
-      8,                     // no alpha buffer 
-      0,                     // shift bit ignored 
-      0,                     // no accumulation buffer 
-      0, 0, 0, 0,            // accum bits ignored 
-      32,                    // 32-bit z-buffer 
-      32,                    // max stencil buffer 
-      0,                     // no auxiliary buffer 
-      PFD_MAIN_PLANE,        // main layer 
-      0,                     // reserved 
-      0, 0, 0                // layer masks ignored 
-      
+      32,                    // 32-bit color depth
+      0, 0, 0, 0, 0, 0,      // color bits ignored
+      8,                     // no alpha buffer
+      0,                     // shift bit ignored
+      0,                     // no accumulation buffer
+      0, 0, 0, 0,            // accum bits ignored
+      32,                    // 32-bit z-buffer
+      32,                    // max stencil buffer
+      0,                     // no auxiliary buffer
+      PFD_MAIN_PLANE,        // main layer
+      0,                     // reserved
+      0, 0, 0                // layer masks ignored
+
       ATTENZIONE !! SU MAC IL FORMATO E' DIVERSO (casomai possiamo mettere un ifdef)
 
-      SPECIFICHE  MAC = depth_size 24, stencil_size 8, alpha_size 1 
+      SPECIFICHE  MAC = depth_size 24, stencil_size 8, alpha_size 1
 
     */
 
@@ -321,15 +317,16 @@ void QtOfflineGLPBuffer::createContext(TDimension rasterSize)
 	while (pBufferSize < sizeMax)
 		pBufferSize *= 2;
 
-	m_context = new QGLPixelBuffer(QSize(pBufferSize, pBufferSize), fmt);
+	m_context = std::make_shared<QGLPixelBuffer>(QSize(pBufferSize, pBufferSize), fmt);
 }
 
 //-----------------------------------------------------------------------------
 
 void QtOfflineGLPBuffer::makeCurrent()
 {
-	if (m_context)
+        if (m_context){
 		m_context->makeCurrent();
+	}
 }
 
 //-----------------------------------------------------------------------------
