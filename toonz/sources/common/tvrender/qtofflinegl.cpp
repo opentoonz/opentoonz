@@ -98,9 +98,6 @@ QtOfflineGL::QtOfflineGL(TDimension rasterSize, std::shared_ptr<TOfflineGL::Imp>
 
 QtOfflineGL::~QtOfflineGL()
 {
-        delete m_context;
-	delete m_surface;
-	delete m_fbo;
 }
 
 //-----------------------------------------------------------------------------
@@ -161,20 +158,21 @@ void QtOfflineGL::createContext(TDimension rasterSize, std::shared_ptr<TOfflineG
 	QSurfaceFormat format;
 	format.setProfile(QSurfaceFormat::CompatibilityProfile);
 
-	m_surface = new QOffscreenSurface();
+	//m_surface = new QOffscreenSurface();
+	m_surface = std::make_shared<QOffscreenSurface>();
 	m_surface->setFormat(format);
 	m_surface->create();
 
-	m_context = new QOpenGLContext();
+	m_context = std::make_shared<QOpenGLContext>();
 	m_context->setFormat(format);
 	m_context->create();
-	m_context->makeCurrent(m_surface);
+	m_context->makeCurrent(m_surface.get());
 
 	QOpenGLFramebufferObjectFormat fbo_format;
-	m_fbo = new QOpenGLFramebufferObject(rasterSize.lx, rasterSize.ly, fbo_format);
+	m_fbo = std::make_shared<QOpenGLFramebufferObject>(rasterSize.lx, rasterSize.ly, fbo_format);
 	m_fbo->bind();
 
-	printf("create context:%p [thread:0x%x]\n", m_context, QThread::currentThreadId());
+	printf("create context:%p [thread:0x%x]\n", m_context.get(), QThread::currentThreadId());
 
 	// Creo il contesto OpenGL - assicurandomi che sia effettivamente creato
 	// NOTA: Se il contesto non viene creato, di solito basta ritentare qualche volta.
@@ -186,7 +184,7 @@ void QtOfflineGL::makeCurrent()
 {
 	if (m_context) {
 	        m_context->moveToThread(QThread::currentThread());
-		m_context->makeCurrent(m_surface);
+		m_context->makeCurrent(m_surface.get());
 	}
 	// else
 	//  m_oldContext = 0;
@@ -260,7 +258,6 @@ QtOfflineGLPBuffer::QtOfflineGLPBuffer(TDimension rasterSize)
 
 QtOfflineGLPBuffer::~QtOfflineGLPBuffer()
 {
-	delete m_context;
 }
 
 //-----------------------------------------------------------------------------
@@ -321,7 +318,7 @@ void QtOfflineGLPBuffer::createContext(TDimension rasterSize)
 	while (pBufferSize < sizeMax)
 		pBufferSize *= 2;
 
-	m_context = new QGLPixelBuffer(QSize(pBufferSize, pBufferSize), fmt);
+	m_context = std::make_shared<QGLPixelBuffer>(QSize(pBufferSize, pBufferSize), fmt);
 }
 
 //-----------------------------------------------------------------------------
