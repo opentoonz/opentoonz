@@ -158,7 +158,6 @@ void QtOfflineGL::createContext(TDimension rasterSize, std::shared_ptr<TOfflineG
 	QSurfaceFormat format;
 	format.setProfile(QSurfaceFormat::CompatibilityProfile);
 
-
 	m_surface = std::make_shared<QOffscreenSurface>();
 	m_surface->setFormat(format);
 	m_surface->create();
@@ -173,7 +172,6 @@ void QtOfflineGL::createContext(TDimension rasterSize, std::shared_ptr<TOfflineG
 	m_fbo->bind();
 
 	printf("create context:%p [thread:0x%x]\n", m_context.get(), QThread::currentThreadId());
-
 
 	// Creo il contesto OpenGL - assicurandomi che sia effettivamente creato
 	// NOTA: Se il contesto non viene creato, di solito basta ritentare qualche volta.
