@@ -223,12 +223,7 @@ void QtOfflineGL::getRaster(TRaster32P raster)
 	int ly = raster->getLy();
 
 	raster->lock();
-
-	if(lx == m_fbo->width() && ly == m_fbo->height()){
-	  raster->copy( TRaster32P(lx, ly, lx, (TPixelRGBM32 *)m_fbo->toImage(false).bits(), false) );
-	}else{
-	  raster->copy( TRaster32P(lx, ly, m_fbo->width(), (TPixelRGBM32 *)m_fbo->toImage(false).bits(), false) );
-	}
+	raster->copy( TRaster32P(lx, ly, m_fbo->width(), (TPixelRGBM32 *)m_fbo->toImage(false).bits(), false) );
 
 #ifdef WIN32
 	swapRedBlueChannels(raster->getRawData(), lx * ly);
