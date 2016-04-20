@@ -194,7 +194,7 @@ public:
 #ifdef _DEBUG
 	void checkIntersections();
 	void checkRegions(const vector<TRegion *> &regions);
-	void printStrokes(ofstream &os);
+	void printStrokes(std::ofstream &os);
 	void checkGroups();
 
 #endif
