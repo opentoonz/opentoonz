@@ -729,7 +729,7 @@ void XsheetViewer::wheelEvent(QWheelEvent *event)
 	int scrollPixels =(event->angleDelta().y()>0 ? 1 : -1) *markerDistance *XsheetGUI::RowHeight;
 	scroll(QPoint(0, -scrollPixels));
       }else{                             //horizontal scroll
-	int scrollPixels =(event->angleDelta().x()>0 ? 1 : -1) *markerDistance *XsheetGUI::ColumnWidth;
+	int scrollPixels =(event->angleDelta().x()>0 ? 1 : -1) *XsheetGUI::ColumnWidth;
 	scroll(QPoint(-scrollPixels, 0));
       }
       event->accept();
