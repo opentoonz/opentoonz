@@ -720,34 +720,32 @@ void XsheetViewer::wheelEvent(QWheelEvent *event)
 
   switch(event->source()){
 
-  case Qt::MouseEventNotSynthesized: //mouse wheel device
+  case Qt::MouseEventNotSynthesized:
     {
       int markerDistance=6, markerOffset=0;
       TApp::instance()->getCurrentScene()->getScene()->getProperties()->getMarkers(markerDistance, markerOffset);
 
       if (event->angleDelta().x() == 0){ //vertical scroll
-	int scrollPixels =(event->angleDelta().y()>0 ? 1 : -1) *markerDistance *XsheetGUI::RowHeight;
-	scroll(QPoint(0, -scrollPixels));
+      	int scrollPixels =(event->angleDelta().y()>0 ? 1 : -1) *markerDistance *XsheetGUI::RowHeight;
+      	scroll(QPoint(0, -scrollPixels));
       }else{                             //horizontal scroll
-	int scrollPixels =(event->angleDelta().x()>0 ? 1 : -1) *XsheetGUI::ColumnWidth;
-	scroll(QPoint(-scrollPixels, 0));
+      	int scrollPixels =(event->angleDelta().x()>0 ? 1 : -1) *XsheetGUI::ColumnWidth;
+      	scroll(QPoint(-scrollPixels, 0));
       }
-      event->accept();
       break;
     }
 
-  case Qt::MouseEventSynthesizedBySystem: //touch scroll device
+  case Qt::MouseEventSynthesizedBySystem: //macbook touch-pad
     {
       QPoint numPixels = event->pixelDelta();
       QPoint numDegrees = event->angleDelta() / 8;
 
       if (!numPixels.isNull()) {
-        scroll(numPixels);
+        scroll(-numPixels);
       } else if (!numDegrees.isNull()) {
         QPoint numSteps = numDegrees / 15;
-        scroll(numSteps);
+        scroll(-numSteps);
       }
-
       event->accept();
       break;
     }
