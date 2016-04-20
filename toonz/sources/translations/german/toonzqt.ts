@@ -4,16 +4,16 @@
 <context>
     <name>AddFxContextMenu</name>
     <message>
-        <source>Insert FX</source>
+        <source>Insert Fx</source>
         <translation>FX einsetzen</translation>
     </message>
     <message>
         <source>Add FX</source>
-        <translation>FX hinzufügen</translation>
+        <translation>Effekt hinzufügen</translation>
     </message>
     <message>
         <source>Replace FX</source>
-        <translation>FX ersetzen</translation>
+        <translation>Effekt ersetzen</translation>
     </message>
     <message>
         <source>Insert </source>
@@ -595,7 +595,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Unlink Handles</source>
-        <translation>Griff-Verlinkung aufheben</translation>
+        <translation>Griff-Verlinkung auflösen</translation>
     </message>
     <message>
         <source>Reset Handles</source>
@@ -913,11 +913,11 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>&amp;Uncache Fx</source>
-        <translation>FX-Cache löschen (&amp;U)</translation>
+        <translation>Effekt-Cache löschen (&amp;U)</translation>
     </message>
     <message>
         <source>&amp;Cache FX</source>
-        <translation>Cache (&amp;C)</translation>
+        <translation>Cache für Effekte erstellen (&amp;C)</translation>
     </message>
 </context>
 <context>
@@ -967,23 +967,23 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>&amp;Create Linked FX</source>
-        <translation>Gelinkte FX erstellen (&amp;C)</translation>
+        <translation>Gelinkte Effekt erstellen (&amp;C)</translation>
     </message>
     <message>
         <source>&amp;Unlink</source>
-        <translation>Link aufheben (&amp;U)</translation>
+        <translation>Link auflösen (&amp;U)</translation>
     </message>
     <message>
         <source>&amp;Make Macro FX</source>
-        <translation>Makro-FX erstellen (&amp;M)</translation>
+        <translation>Makro-Effekt erstellen (&amp;M)</translation>
     </message>
     <message>
         <source>&amp;Explode Macro FX</source>
-        <translation>Makro-FX entfalten (&amp;E)</translation>
+        <translation>Makro-Effekt entfalten (&amp;E)</translation>
     </message>
     <message>
         <source>&amp;Open Macro FX</source>
-        <translation>Makro-FX öffnen (&amp;O)</translation>
+        <translation>Makro-Effekt öffnen (&amp;O)</translation>
     </message>
     <message>
         <source>&amp;Save As Preset...</source>
@@ -995,11 +995,11 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>&amp;Uncache FX</source>
-        <translation>Cache löschen (&amp;U)</translation>
+        <translation>Effekt aus dem Cache löschen (&amp;U)</translation>
     </message>
     <message>
         <source>&amp;Cache FX</source>
-        <translation>Cache (&amp;C)</translation>
+        <translation>Cache für Effekt erstellen (&amp;C)</translation>
     </message>
 </context>
 <context>
@@ -1044,20 +1044,20 @@ Possibly the preset file has been corrupted</source>
     <message>
         <source>Cannot Paste Insert a selection of unconnected FX nodes.
 Select FX nodes and related links before copying or cutting the selection you want to paste.</source>
-        <translation>Kann keine Auswahl von unverbundenen FX-Nodes einfügen (Insert??).
-Wählen Sie FX-Nodes und verwandte Links, die Sie einfügen möchten, bevor Sie die Auswahl kopieren oder ausschneiden.</translation>
+        <translation>Kann keine Auswahl von unverbundenen Effekt-Nodes einfügen (Insert??).
+Wählen Sie Effekt-Nodes und verwandte Links, die Sie einfügen möchten, bevor Sie die Auswahl kopieren oder ausschneiden.</translation>
     </message>
     <message>
         <source>Cannot Paste Add a selection of unconnected FX nodes.
 Select FX nodes and related links before copying or cutting the selection you want to paste.</source>
-        <translation>Kann keine Auswahl von unverbundenen FX-Nodes einfügen/hinzufügen.
-Wählen Sie FX-Nodes und verwandte Links, die Sie einfügen möchten, bevor Sie die Auswahl kopieren oder ausschneiden.</translation>
+        <translation>Kann keine Auswahl von unverbundenen Effekt-Nodes einfügen/hinzufügen.
+Wählen Sie Effekt-Nodes und verwandte Links, die Sie einfügen möchten, bevor Sie die Auswahl kopieren oder ausschneiden.</translation>
     </message>
     <message>
         <source>Cannot Paste Replace a selection of unconnected FX nodes.
 Select FX nodes and related links before copying or cutting the selection you want to paste.</source>
-        <translation>Kann keine Auswahl von unverbundenen FX-Nodes einfügen/ersetzen.
-Wählen Sie FX-Nodes und verwandte Links, die Sie einfügen möchten, bevor Sie die Auswahl kopieren oder ausschneiden.</translation>
+        <translation>Kann keine Auswahl von unverbundenen Effekt-Nodes einfügen/ersetzen.
+Wählen Sie Effekt-Nodes und verwandte Links, die Sie einfügen möchten, bevor Sie die Auswahl kopieren oder ausschneiden.</translation>
     </message>
 </context>
 <context>
@@ -1445,12 +1445,12 @@ Wählen Sie FX-Nodes und verwandte Links, die Sie einfügen möchten, bevor Sie 
         <translation>Bühnen-Schaubild</translation>
     </message>
     <message>
-        <source>FX Schematic</source>
-        <translation>FX-Schaubild</translation>
+        <source>Fx Schematic</source>
+        <translation>Effekt-Schaubild</translation>
     </message>
     <message>
         <source>Fx Schematic</source>
-        <translation type="vanished">Schaubild[FX]</translation>
+        <translation type="vanished">Schaubild[Effekt]</translation>
     </message>
     <message>
         <source>Save Motion Path</source>
@@ -1775,15 +1775,15 @@ Sind Sie sicher?</translation>
     </message>
     <message>
         <source>Modify Fx Param : %1</source>
-        <translation>FX-Paramter ändern : %1</translation>
+        <translation>Effekt-Paramter ändern : %1</translation>
     </message>
     <message>
         <source>Modify Fx Param : %1 : %2 -&gt; %3</source>
-        <translation>FX-Parameter ändern  %1 : %2 -&gt; %3</translation>
+        <translation>Effekt-Parameter ändern  %1 : %2 -&gt; %3</translation>
     </message>
     <message>
         <source>Modify Fx Param : </source>
-        <translation>FX-Parameter ändern : </translation>
+        <translation>Effekt-Parameter ändern : </translation>
     </message>
     <message>
         <source>ON : %1</source>
@@ -1795,7 +1795,7 @@ Sind Sie sicher?</translation>
     </message>
     <message>
         <source>Modify Fx Param : %1 : %2 Key</source>
-        <translation>FX-Parameter ändern : %1 : %2 Key</translation>
+        <translation>Effekt-Parameter ändern : %1 : %2 Key</translation>
     </message>
     <message>
         <source>Add</source>
@@ -1807,7 +1807,7 @@ Sind Sie sicher?</translation>
     </message>
     <message>
         <source>Modify Fx Param : %1 : %2 Point</source>
-        <translation>FX-Parameter ändern : %1 : %2 Punkt auf Toon-Kurve</translation>
+        <translation>Effekt-Parameter ändern : %1 : %2 Punkt auf Toon-Kurve</translation>
     </message>
     <message>
         <source>%1 : Linear ON</source>
@@ -1837,7 +1837,7 @@ Sind Sie sicher?</translation>
     </message>
     <message>
         <source>Modify Fx Param : %1 Key : %2  Frame %3</source>
-        <translation>FX-Parameter ändern : Key %1 : %2  Frame %3</translation>
+        <translation>Effekt-Parameter ändern : Key %1 : %2  Frame %3</translation>
     </message>
     <message>
         <source>Set</source>
@@ -2019,11 +2019,11 @@ Sind Sie sicher?</translation>
     </message>
     <message>
         <source>Merge to Current Palette</source>
-        <translation>Mit aktueller Palette vereinen</translation>
+        <translation>Durch aktuelle Palette vereinen</translation>
     </message>
     <message>
         <source>Replace with Current Palette</source>
-        <translation>Mit aktueller Palette ersetzen</translation>
+        <translation>Durch aktuelle Palette ersetzen</translation>
     </message>
     <message>
         <source>Delete Palette</source>

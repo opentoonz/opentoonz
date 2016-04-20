@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ja_JP">
+<TS version="2.1" language="de_DE">
 <context>
     <name>ArrowToolOptionsBox</name>
     <message>
         <source>Pick:</source>
-        <translation>選択オブジェクト：</translation>
+        <translation>Objekt wählen：</translation>
     </message>
     <message>
         <source>Position</source>
@@ -49,7 +49,7 @@
     </message>
     <message>
         <source>Maintain:</source>
-        <translation>値を固定:</translation>
+        <translation>Beibehalten:</translation>
     </message>
     <message>
         <source>Shear</source>
@@ -192,7 +192,7 @@
     </message>
     <message>
         <source>Lock Center N/S</source>
-        <translation>Mitte［Y］ sperren</translation>
+        <translation>Mitte ［Y］ sperren</translation>
     </message>
     <message>
         <source>Lock Position E/W</source>
@@ -200,7 +200,7 @@
     </message>
     <message>
         <source>Lock Position N/S</source>
-        <translation>Position［Y］ sperren</translation>
+        <translation>Position ［Y］ sperren</translation>
     </message>
     <message>
         <source>Lock Rotation</source>
@@ -228,7 +228,7 @@
     </message>
     <message>
         <source>E/W and N/S Positions</source>
-        <translation>X und Y Positionen</translation>
+        <translation>X- und Y-Positionen</translation>
     </message>
     <message>
         <source>Z Position</source>
@@ -348,7 +348,7 @@
     </message>
     <message>
         <source>Pressure Sensitivity</source>
-        <translation>Druck</translation>
+        <translation>Druckempfindlichkeit</translation>
     </message>
     <message>
         <source>Opacity:</source>
@@ -387,7 +387,7 @@
     </message>
     <message>
         <source>Frame Range</source>
-        <translation>Frame-Reichweite</translation>
+        <translation>Frame-Bereich</translation>
     </message>
 </context>
 <context>
@@ -514,7 +514,7 @@ Möchten Sie fortfahren?</translation>
     </message>
     <message>
         <source>Set Rest Key</source>
-        <translation>Rast-Taste setzen</translation>
+        <translation>Ruhepositions-Key setzen</translation>
     </message>
     <message>
         <source>Set Global Key</source>
@@ -544,13 +544,13 @@ Möchten Sie fortfahren?</translation>
         <source>The previous vertex name will be discarded, and all associated keys will be lost.
 
 Do you want to proceed?</source>
-        <translation>Der vorherige Vertex-Name wird verworfen, und all zugewiesenen Tasten gehen verloren.
+        <translation>Der vorherige Vertex-Name wird verworfen und alle zugewiesenen Tasten gehen verloren.
 
 Möchten Sie fortfahren?</translation>
     </message>
     <message>
         <source>Edit Mesh</source>
-        <translation>Mesh editieren</translation>
+        <translation>Mesh bearbeiten</translation>
     </message>
     <message>
         <source>Snap To Mesh</source>
@@ -581,7 +581,7 @@ Möchten Sie fortfahren?</translation>
     <name>PlasticToolOptionsBox</name>
     <message>
         <source>Create Mesh</source>
-        <translation>Mesh erschaffen</translation>
+        <translation>Mesh erstellen</translation>
     </message>
     <message>
         <source>Skeleton:</source>
@@ -624,7 +624,7 @@ Möchten Sie fortfahren?</translation>
     </message>
     <message>
         <source>Auto Group</source>
-        <translation>Automatische Gruppe</translation>
+        <translation>Automatisches Gruppieren</translation>
     </message>
     <message>
         <source>Auto Fill</source>
@@ -694,7 +694,7 @@ Möchten Sie fortfahren?</translation>
     </message>
     <message>
         <source>The current column is not visible in Camera Stand.</source>
-        <translation type="vanished">Die aktuelle Spalte ist nicht sichtbar im Kamera Stand.</translation>
+        <translation type="vanished">Die aktuelle Spalte ist nicht sichtbar im Kamera-Stand.</translation>
     </message>
     <message>
         <source>It is not possible to edit the audio column.</source>
@@ -726,7 +726,7 @@ Möchten Sie fortfahren?</translation>
     </message>
     <message>
         <source>The current tool cannot be used on a Vector Level.</source>
-        <translation>Das aktuelle Werkzeug kann nicht auf einer Vector-Ebene angewendet werden.</translation>
+        <translation>Das aktuelle Werkzeug kann nicht auf einer Vektor-Ebene angewendet werden.</translation>
     </message>
     <message>
         <source>The current tool cannot be used on a Toonz Level.</source>
@@ -774,7 +774,7 @@ Möchten Sie fortfahren?</translation>
     </message>
     <message>
         <source>Ungroup</source>
-        <translation>Entgruppieren</translation>
+        <translation>Gruppe auflösen</translation>
     </message>
     <message>
         <source>Move Group</source>
@@ -782,7 +782,7 @@ Möchten Sie fortfahren?</translation>
     </message>
     <message>
         <source>Modify Fx Gadget  </source>
-        <translation>FX Gadget modifizieren</translation>
+        <translation>Effekt-Gadget modifizieren</translation>
     </message>
     <message>
         <source>%1   Level : %2  Frame : %3</source>
@@ -790,7 +790,7 @@ Möchten Sie fortfahren?</translation>
     </message>
     <message>
         <source>Modify Stroke Tool</source>
-        <translation>Streich-Werkzeug modifizieren</translation>
+        <translation>Kontur-Werkzeug modifizieren</translation>
     </message>
     <message>
         <source>Modify Spline</source>
@@ -945,7 +945,7 @@ Möchten Sie fortfahren?</translation>
     <name>TypeTool</name>
     <message>
         <source>Font:</source>
-        <translation>Schriftsatz:</translation>
+        <translation>Schriftart:</translation>
     </message>
     <message>
         <source>Style:</source>
@@ -953,7 +953,7 @@ Möchten Sie fortfahren?</translation>
     </message>
     <message>
         <source>Vertical Orientation</source>
-        <translation>Vertikale Orientierung</translation>
+        <translation>Vertikale Ausrichtung</translation>
     </message>
     <message>
         <source>Size:</source>
@@ -991,7 +991,7 @@ Möchten Sie fortfahren?</translation>
     </message>
     <message>
         <source>Join Vectors</source>
-        <translation>Vectoren verbinden</translation>
+        <translation>Vektoren verbinden</translation>
     </message>
     <message>
         <source>Mode:</source>

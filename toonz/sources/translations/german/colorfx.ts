@@ -104,7 +104,7 @@
     </message>
     <message>
         <source>Blur value</source>
-        <translation>Schattierungsgrad</translation>
+        <translation>Weiheitsgrad</translation>
     </message>
 </context>
 <context>
@@ -118,7 +118,7 @@
     <name>TBlendRasterStyle</name>
     <message>
         <source>Blend</source>
-        <translation>Mengung</translation>
+        <translation>Mischen</translation>
     </message>
 </context>
 <context>
@@ -144,7 +144,7 @@
     <name>TBraidStrokeStyle</name>
     <message>
         <source>Plait</source>
-        <translation>Flechte</translation>
+        <translation>Geflochten</translation>
     </message>
     <message>
         <source>Twirl</source>
@@ -196,7 +196,7 @@
     </message>
     <message>
         <source>Fade In</source>
-        <translation>Einblende</translation>
+        <translation>Einblenden</translation>
     </message>
     <message>
         <source>Fade Out</source>
@@ -261,11 +261,11 @@
     </message>
     <message>
         <source>X Position</source>
-        <translation>X Position</translation>
+        <translation>X-Position</translation>
     </message>
     <message>
         <source>Y Position</source>
-        <translation>Y Position</translation>
+        <translation>Y-Position</translation>
     </message>
     <message>
         <source>Distance</source>
@@ -374,7 +374,7 @@
     <name>TGraphicPenStrokeStyle</name>
     <message>
         <source>Dashes</source>
-        <translation>Bindestriche</translation>
+        <translation>Strichelung</translation>
     </message>
     <message>
         <source>Density</source>
@@ -385,7 +385,7 @@
     <name>TLinGradFillStyle</name>
     <message>
         <source>Linear Gradient</source>
-        <translation>Linearer Gradient</translation>
+        <translation>Linearer Verlauf</translation>
     </message>
     <message>
         <source>Angle</source>
@@ -393,11 +393,11 @@
     </message>
     <message>
         <source>X Position</source>
-        <translation>X Position</translation>
+        <translation>X-Position</translation>
     </message>
     <message>
         <source>Y Position</source>
-        <translation>Y Position</translation>
+        <translation>Y-Position</translation>
     </message>
     <message>
         <source>Smoothness</source>
@@ -415,7 +415,7 @@
     <name>TMatrioskaStrokeStyle</name>
     <message>
         <source>Toothpaste</source>
-        <translation>Zahnpast</translation>
+        <translation>Zahnpasta</translation>
     </message>
     <message>
         <source>Stripes</source>
@@ -483,11 +483,11 @@
     </message>
     <message>
         <source>Light X Pos</source>
-        <translation>Licht X Position</translation>
+        <translation>Licht X-Position</translation>
     </message>
     <message>
         <source>Light Y Pos</source>
-        <translation>Licht Y Position</translation>
+        <translation>Licht Y-Position</translation>
     </message>
     <message>
         <source>Shininess</source>
@@ -544,15 +544,15 @@
     <name>TRadGradFillStyle</name>
     <message>
         <source>Radial Gradient</source>
-        <translation>Radialer Gradient</translation>
+        <translation>Radialer Verlauf</translation>
     </message>
     <message>
         <source>X Position</source>
-        <translation>X Position</translation>
+        <translation>X-Position</translation>
     </message>
     <message>
         <source>Y Position</source>
-        <translation>Y Position</translation>
+        <translation>Y-Position</translation>
     </message>
     <message>
         <source>Radius</source>

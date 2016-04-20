@@ -12,19 +12,19 @@
     <name>QObject</name>
     <message>
         <source>No restrictions for uncompressed avi video</source>
-        <translation>非圧縮AVIビデオに制限はありません</translation>
+        <translation>Keine Einschränkungen für unkompromiertes avi-Video</translation>
     </message>
     <message>
         <source>video width must be a multiple of %1</source>
-        <translation>ビデオ幅は %1 の倍数でなければなりません</translation>
+        <translation>Video-Breite muss ein mehrfaches von %1 sein</translation>
     </message>
     <message>
         <source>video lenght must be a multiple of %1</source>
-        <translation>ビデオの長さは %1 の倍数でなければなりません</translation>
+        <translation>Video-Länge muss ein mehrfaches von %1 sein</translation>
     </message>
     <message>
         <source>No restrictions for this codec</source>
-        <translation>このコーデックに制限はありません</translation>
+        <translation>Keine Einschränkungen für diesen Codec</translation>
     </message>
     <message>
         <source>Resolution restrictions:</source>
@@ -33,8 +33,8 @@
     <message>
         <source>It is not possible to communicate with the codec.
  Probably the codec cannot work correctly.</source>
-        <translation>コーデックの呼び出しができません。
-このコーデックは正常に動作しない恐れがあります。</translation>
+        <translation>Mit dem Codec kann nicht kommuniziert werden.
+Wahrscheinlich funktioniert der Codec nicht korrekt.</translation>
     </message>
     <message>
         <source>%1-%2</source>
@@ -82,7 +82,7 @@
     </message>
     <message>
         <source>New Pegbar  %1</source>
-        <translation>Neue Pegleiste %1</translation>
+        <translation>Neue Haltestift-Leiste %1</translation>
     </message>
     <message>
         <source>Set Active Camera  %1 &gt; %2</source>
@@ -94,11 +94,11 @@
     </message>
     <message>
         <source>New Motion Path  %1</source>
-        <translation>Neueer Motion-Path  %1</translation>
+        <translation>Neuer Bewegungspfad  %1</translation>
     </message>
     <message>
         <source>Link Motion Path  %1 &gt; %2</source>
-        <translation>Motion-Path %1 &gt; %2 verbinden</translation>
+        <translation>Bewegungspfad %1 &gt; %2 verbinden</translation>
     </message>
     <message>
         <source>Remove Object  %1</source>
@@ -114,10 +114,10 @@
     </message>
     <message>
         <source>Replace with Current Palette  &gt; %1</source>
-        <translation>Mit aktueller Palette  &gt; %1 ersetzen</translation>
+        <translation>Durch aktuelle Palette  &gt; %1 ersetzen</translation>
     </message>
     <message>
-        <source>Delete Studio-Palette  : %1</source>
+        <source>Delete Studio Palette  : %1</source>
         <translation>Studio-Palette löschen  : %1</translation>
     </message>
     <message>
@@ -126,15 +126,15 @@
     </message>
     <message>
         <source>Delete Studio Palette Folder  : %1</source>
-        <translation>Studio-Palette Ordner löschen  : %1</translation>
+        <translation>Ordner für Studio-Paletten löschen  : %1</translation>
     </message>
     <message>
         <source>Create Studio Palette Folder  : %1</source>
-        <translation>Studio-Palette Ordner erstellen  : %1</translation>
+        <translation>Ordner für Studio-Paletten erstellen  : %1</translation>
     </message>
     <message>
         <source>Move Studio Palette Folder  : %1 : %2 &gt; %3</source>
-        <translation>Studio-Palette Ordner verschieben  : %1 : %2 &gt; %3</translation>
+        <translation>Ordner für Studio-Paletten verschieben  : %1 : %2 &gt; %3</translation>
     </message>
     <message>
         <source>Arrange Styles  in Palette %1</source>
@@ -158,7 +158,7 @@
     </message>
     <message>
         <source>Load Color Model %1  to Palette %2</source>
-        <translation>Farbmodel %1 in Palette %2 laden</translation>
+        <translation>Farbmodell %1 in Palette %2 laden</translation>
     </message>
     <message>
         <source>Move Page</source>
@@ -174,35 +174,35 @@
     </message>
     <message>
         <source>Add Fx  : </source>
-        <translation>FX hinzufügen  : </translation>
+        <translation>Effekt hinzufügen  : </translation>
     </message>
     <message>
         <source>Insert Fx  : </source>
-        <translation>FX einfügen  : </translation>
+        <translation>Effekt einfügen  : </translation>
     </message>
     <message>
         <source>Create Linked Fx  : %1</source>
-        <translation>Verbundenen FX erstellen : %1</translation>
+        <translation>Verbundenen Effekt erstellen : %1</translation>
     </message>
     <message>
         <source>Replace Fx  : </source>
-        <translation>FX ersetzen  : </translation>
+        <translation>Effekt ersetzen  : </translation>
     </message>
     <message>
         <source>Unlink Fx  : %1 - - %2</source>
-        <translation>Verbundenen FX auflösen  : %1 - - %2</translation>
+        <translation>Verbundenen Effekt auflösen  : %1 - - %2</translation>
     </message>
     <message>
         <source>Make Macro Fx  : %1</source>
-        <translation>Makro-FX erstellen  : %1</translation>
+        <translation>Makro-Effekt erstellen  : %1</translation>
     </message>
     <message>
         <source>Explode Macro Fx  : %1</source>
-        <translation>Makro-FX entfalten  : %1</translation>
+        <translation>Makro-Effekt entfalten  : %1</translation>
     </message>
     <message>
         <source>Create Output Fx</source>
-        <translation>Output-FX erstellen</translation>
+        <translation>Output-Effekt erstellen</translation>
     </message>
     <message>
         <source>Connect to Xsheet  : </source>
@@ -218,31 +218,31 @@
     </message>
     <message>
         <source>Delete Fx Node : %1</source>
-        <translation>FX-Node löschen : %1</translation>
+        <translation>Effekt-Node löschen : %1</translation>
     </message>
     <message>
         <source>Paste Fx  :  </source>
-        <translation>FX einfügen : </translation>
+        <translation>Effekt einfügen : </translation>
     </message>
     <message>
         <source>Disconnect Fx</source>
-        <translation>FX trennen</translation>
+        <translation>Effekt trennen</translation>
     </message>
     <message>
         <source>Connect Fx : %1 - %2</source>
-        <translation>FX verbinden : %1 - %2</translation>
+        <translation>Effekt verbinden : %1 - %2</translation>
     </message>
     <message>
         <source>Rename Fx : %1 &gt; %2</source>
-        <translation>FX umbenennen: %1 &gt; %2</translation>
+        <translation>Effekt umbenennen: %1 &gt; %2</translation>
     </message>
     <message>
         <source>Group Fx</source>
-        <translation>FX gruppieren</translation>
+        <translation>Effekt gruppieren</translation>
     </message>
     <message>
         <source>Ungroup Fx</source>
-        <translation>FX-Gruppe aufheben</translation>
+        <translation>Effekt-Gruppe auflösen</translation>
     </message>
     <message>
         <source>Rename Group  : %1 &gt; %2</source>
@@ -286,7 +286,7 @@
     </message>
     <message>
         <source>Edit Stack Order</source>
-        <translation>Stack-Reihenfolge bearbeiten</translation>
+        <translation>Stapel-Reihenfolge bearbeiten</translation>
     </message>
     <message>
         <source>Edit Scale W</source>
@@ -326,7 +326,7 @@
     </message>
     <message>
         <source>Move Center   %1  Frame %2</source>
-        <translation>Verschiebe Mittlere-Position %1 Frame %2</translation>
+        <translation>Verschiebe Zentrum %1 Frame %2</translation>
     </message>
 </context>
 <context>
@@ -425,7 +425,7 @@
     </message>
     <message>
         <source>Exception loading level (%1)</source>
-        <translation>Ausnahme beim laden von Ebene (%1)</translation>
+        <translation>Ausnahme beim Laden von Ebene (%1)</translation>
     </message>
     <message>
         <source>File %1 doesn&apos;t exist</source>
@@ -437,7 +437,7 @@
     </message>
     <message>
         <source>Exception reading %1</source>
-        <translation>Ausnahme beim lesen von %1</translation>
+        <translation>Ausnahme beim Lesen von %1</translation>
     </message>
     <message>
         <source>Can&apos;t save an empty level</source>
@@ -453,7 +453,7 @@
     </message>
     <message>
         <source>Exception writing %1</source>
-        <translation>Ausnahme beim schreiben von %1</translation>
+        <translation>Ausnahme beim Schreiben von %1</translation>
     </message>
     <message>
         <source>frame index (%1) must be a number</source>
@@ -469,11 +469,11 @@
     </message>
     <message>
         <source>can not insert a %1 image into a level</source>
-        <translation>kann nicht ein %1 Bild in eine Ebene einfügen</translation>
+        <translation>kann kein %1 Bild in eine Ebene einfügen</translation>
     </message>
     <message>
         <source>can not insert a %1 image to a %2 level</source>
-        <translation>kann nicht ein %1 Bild in eine %2 Ebene einfügen</translation>
+        <translation>kann kein %1 Bild in eine %2 Ebene einfügen</translation>
     </message>
 </context>
 <context>
@@ -526,15 +526,15 @@
     </message>
     <message>
         <source>Exception reading %1</source>
-        <translation>Ausnahme beim lesen von %1</translation>
+        <translation>Ausnahme beim Lesen von %1</translation>
     </message>
     <message>
         <source>Exception writing %1</source>
-        <translation>Ausnahme beim schreiben von %1</translation>
+        <translation>Ausnahme beim Schreiben von %1</translation>
     </message>
     <message>
         <source>Bad level type (%1): must be Vector,Raster or ToonzRaster</source>
-        <translation>Inkorrekter Ebenentyp (%1): Es muss ein Vektor, Raster oder ToonzRaster sein</translation>
+        <translation>Inkorrekter Ebenentyp (%1): Es muss vom Typ Vektor, Raster oder ToonzRaster sein</translation>
     </message>
     <message>
         <source>Can&apos;t add the level: name(%1) is already used</source>
@@ -554,7 +554,7 @@
     </message>
     <message>
         <source>%1 : Expected a Level instance or a level name</source>
-        <translation>%1 : Es ist keine Ebenen-Instanz oder ein Ebenen-Name</translation>
+        <translation>%1 : Ist weder eine Ebenen-Instanz noch ein Ebenen-Namen</translation>
     </message>
     <message>
         <source>Level &apos;%1&apos; is not included in the scene</source>

@@ -1378,7 +1378,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Vectors Export Box</source>
-        <translation>VectorExport-Einstellungen</translation>
+        <translation>Vektor-Export-Einstellungen</translation>
     </message>
     <message>
         <source>Width:</source>
@@ -1818,7 +1818,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>It is not possible to take or compare snapshots for Toonz vector levels.</source>
-        <translation>Es ist nicht möglich Snapshots von Toonz Vector-Ebenen zu erstellen oder zu vergleichen.</translation>
+        <translation>Es ist nicht möglich Snapshots von Toonz Vektor-Ebenen zu erstellen oder zu vergleichen.</translation>
     </message>
     <message>
         <source>File %1 already exists.
@@ -1853,7 +1853,7 @@ Möchten Sie sie überschreiben?</translation>
     <name>FxParamEditorPopup</name>
     <message>
         <source>Fx Settings</source>
-        <translation>FX-Einstellungen</translation>
+        <translation>Effekt-Einstellungen</translation>
     </message>
 </context>
 <context>
@@ -1977,7 +1977,7 @@ Möchten Sie sie überschreiben?</translation>
     <name>InsertFxPopup</name>
     <message>
         <source>FX Browser</source>
-        <translation>Neue FX</translation>
+        <translation>Neue Effekt</translation>
     </message>
     <message>
         <source>Insert</source>
@@ -1997,7 +1997,7 @@ Möchten Sie sie überschreiben?</translation>
     </message>
     <message>
         <source>Remove Macro FX</source>
-        <translation>Makro-FX löschen</translation>
+        <translation>Makro-Effekt löschen</translation>
     </message>
     <message>
         <source>Remove Preset</source>
@@ -2356,7 +2356,7 @@ Möchten Sie einen erstellen?</translation>
     <name>LoadCurvePopup</name>
     <message>
         <source>Load Curve</source>
-        <translation>FX-Parameter importieren</translation>
+        <translation>Effekt-Parameter importieren</translation>
     </message>
     <message>
         <source>Load</source>
@@ -2830,7 +2830,7 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>&amp;Ungroup</source>
-        <translation>Gruppierung aufheben (&amp;U)</translation>
+        <translation>Gruppierung auflösen (&amp;U)</translation>
     </message>
     <message>
         <source>&amp;Bring to Front</source>
@@ -3010,7 +3010,7 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>&amp;New FX...</source>
-        <translation>Neuer FX (&amp;N)...</translation>
+        <translation>Neuer Effekt (&amp;N)...</translation>
     </message>
     <message>
         <source>&amp;New Output</source>
@@ -3018,7 +3018,7 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>&amp;Edit FX...</source>
-        <translation>FX bearbeiten (&amp;E)...</translation>
+        <translation>Effekt bearbeiten (&amp;E)...</translation>
     </message>
     <message>
         <source>Insert Frame</source>
@@ -3150,7 +3150,7 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>&amp;Visualize Vector As Raster</source>
-        <translation>Vector-Bild als Raster einzeigen (&amp;V)</translation>
+        <translation>Vektor-Bild als Raster einzeigen (&amp;V)</translation>
     </message>
     <message>
         <source>&amp;Histogram</source>
@@ -3626,7 +3626,7 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>Auto Group</source>
-        <translation>Automatische Gruppe</translation>
+        <translation>Automatisches Gruppieren</translation>
     </message>
     <message>
         <source>Break sharp angles</source>
@@ -3654,7 +3654,7 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>Orientation</source>
-        <translation>Orientierung</translation>
+        <translation>Ausrichtung</translation>
     </message>
     <message>
         <source>Pencil Mode</source>
@@ -3750,7 +3750,7 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>TypeTool Font</source>
-        <translation>Schriftsatz für Schreib-Tool</translation>
+        <translation>Schriftart für Schreib-Tool</translation>
     </message>
     <message>
         <source>TypeTool Size</source>
@@ -4010,7 +4010,7 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>Preview Fx</source>
-        <translation>FX-Vorschau</translation>
+        <translation>Effekt-Vorschau</translation>
     </message>
     <message>
         <source>&amp;Insert Paste</source>
@@ -4458,11 +4458,11 @@ Was möchten Sie tun?</translation>
     </message>
     <message>
         <source>Fx Schematic Flows</source>
-        <translation>FX-Schaubild Nodes</translation>
+        <translation>Effekt-Schaubild Nodes</translation>
     </message>
     <message>
         <source>Fx Schematic Terminal Nodes</source>
-        <translation>FX-Schaubild-Terminal-Nodes</translation>
+        <translation>Effekt-Schaubild-Terminal-Nodes</translation>
     </message>
     <message>
         <source>Multiple Rendering: </source>
@@ -6026,7 +6026,7 @@ Was möchten Sie tun?</translation>
     </message>
     <message>
         <source>Preview FX :: %1 </source>
-        <translation>FX-Vorschau :: %1</translation>
+        <translation>Effekt-Vorschau :: %1</translation>
     </message>
     <message>
         <source>Batch Servers</source>
@@ -6582,7 +6582,7 @@ Sind Sie sich sicher?</translation>
     </message>
     <message>
         <source>Collapse (Fx)</source>
-        <translation>Sub-Xsheet einklappen（FX-Schaubild）</translation>
+        <translation>Sub-Xsheet einklappen（Effekt-Schaubild）</translation>
     </message>
     <message>
         <source>Explode</source>
@@ -8556,11 +8556,11 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
     <message>
         <source>Fx Schematic Flows</source>
-        <translation>FX-Schaubild-Nodes</translation>
+        <translation>Effekt-Schaubild-Nodes</translation>
     </message>
     <message>
         <source>Fx Schematic Terminal Nodes</source>
-        <translation>FX-Schaubild Terminal-Nodes</translation>
+        <translation>Effekt-Schaubild Terminal-Nodes</translation>
     </message>
     <message>
         <source>Dedicated CPUs:</source>
