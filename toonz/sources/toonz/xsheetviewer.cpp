@@ -12,6 +12,7 @@
 #include "toonz/tobjecthandle.h"
 #include "toonz/txshpalettelevel.h"
 #include "toonz/preferences.h"
+#include "toonz/sceneproperties.h"
 #include "toonzqt/tselectionhandle.h"
 #include "toonzqt/icongenerator.h"
 #include "cellselection.h"
@@ -716,11 +717,48 @@ void XsheetViewer::resizeEvent(QResizeEvent *event)
 
 void XsheetViewer::wheelEvent(QWheelEvent *event)
 {
-	int delta = event->delta() > 0 ? 120 : -120;
-	if (event->orientation() == Qt::Vertical)
-		scroll(QPoint(0, -delta));
-	else
-		scroll(QPoint(-delta, 0));
+
+  switch(event->source()){
+
+  case Qt::MouseEventNotSynthesized: //mouse wheel device
+    {
+      int markerDistance=6, markerOffset=0;
+      TApp::instance()->getCurrentScene()->getScene()->getProperties()->getMarkers(markerDistance, markerOffset);
+
+      if (event->angleDelta().x() == 0){ //vertical scroll
+	int scrollPixels =(event->angleDelta().y()>0 ? 1 : -1) *markerDistance *XsheetGUI::RowHeight;
+	scroll(QPoint(0, -scrollPixels));
+      }else{                             //horizontal scroll
+	int scrollPixels =(event->angleDelta().x()>0 ? 1 : -1) *markerDistance *XsheetGUI::ColumnWidth;
+	scroll(QPoint(-scrollPixels, 0));
+      }
+      event->accept();
+      break;
+    }
+
+  case Qt::MouseEventSynthesizedBySystem: //touch scroll device
+    {
+      QPoint numPixels = event->pixelDelta();
+      QPoint numDegrees = event->angleDelta() / 8;
+
+      if (!numPixels.isNull()) {
+        scroll(numPixels);
+      } else if (!numDegrees.isNull()) {
+        QPoint numSteps = numDegrees / 15;
+        scroll(numSteps);
+      }
+
+      event->accept();
+      break;
+    }
+
+  default: //Qt::MouseEventSynthesizedByQt, Qt::MouseEventSynthesizedByApplication
+    {
+      assert(!"not supported event: Qt::MouseEventSynthesizedByQt, Qt::MouseEventSynthesizedByApplication");
+      break;
+    }
+  }
+
 }
 
 //-----------------------------------------------------------------------------
