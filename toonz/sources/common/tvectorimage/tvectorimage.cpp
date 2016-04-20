@@ -2035,21 +2035,21 @@ void computeEdgeList(TStroke *newS, const list<TEdge *> &edgeList1, bool join1At
 //#include "tpalette.h"
 #include "tcolorstyles.h"
 
-void printEdges(ofstream &os, char *str, TPalette *plt, const list<TEdge *> &edges)
+void printEdges(std::ofstream &os, char *str, TPalette *plt, const list<TEdge *> &edges)
 {
 	list<TEdge *>::const_iterator it;
 
-	os << str << endl;
+	os << str << std::endl;
 
 	for (it = edges.begin(); it != edges.end(); ++it) {
 		TColorStyle *style = plt->getStyle((*it)->m_styleId);
 		TPixel32 color = style->getMainColor();
-		os << "w0-w1:(" << (*it)->m_w0 << "-->" << (*it)->m_w1 << ")" << endl;
-		os << "color=(" << color.r << "," << color.g << "," << color.b << ")" << endl;
+		os << "w0-w1:(" << (*it)->m_w0 << "-->" << (*it)->m_w1 << ")" << std::endl;
+		os << "color=(" << color.r << "," << color.g << "," << color.b << ")" << std::endl;
 	}
-	os << endl
-	   << endl
-	   << endl;
+	os << std::endl
+	   << std::endl
+	   << std::endl;
 }
 #else
 #define printEdges
@@ -2058,7 +2058,7 @@ void printEdges(ofstream &os, char *str, TPalette *plt, const list<TEdge *> &edg
 //-----------------------------------------------------------------------------
 
 #ifdef _DEBUG
-void TVectorImage::Imp::printStrokes(ofstream &os)
+void TVectorImage::Imp::printStrokes(std::ofstream &os)
 {
 	for (int i = 0; i < (int)m_strokes.size(); i++) {
 		os << "*****stroke #" << i << " *****";
@@ -2814,8 +2814,8 @@ TGroupId::TGroupId(TVectorImage *vi, bool isGhost)
 void TVectorImage::Imp::checkGroups()
 {
 	TGroupId currGroupId;
-	set<TGroupId> groupSet;
-	set<TGroupId>::iterator it;
+	std::set<TGroupId> groupSet;
+	std::set<TGroupId>::iterator it;
 	UINT i = 0;
 
 	while (i < m_strokes.size()) {
