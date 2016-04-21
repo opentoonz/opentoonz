@@ -6,6 +6,8 @@
 #include "tscanner.h"
 #include "TScannerIO/TScannerIO.h"
 
+#include <memory>
+
 /*
 PLEASE DO NOT REMOVE unreferenced methods... they are useful for debugging  :)
 max

@@ -8,6 +8,8 @@
 #include "tropcm.h"
 #include "tpixelutils.h"
 
+#include <memory>
+
 #define TMIN(a, b) (a < b ? a : b)
 #define TMAX(a, b) (a > b ? a : b)
 

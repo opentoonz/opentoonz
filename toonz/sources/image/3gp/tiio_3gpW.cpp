@@ -3,16 +3,15 @@
 #ifndef x64
 
 #include "texception.h"
-#include "tiio_3gp.h"
 #include "tsound.h"
 #include "tconvert.h"
 #include "tpropertytype.h"
-//#include "trop.h"
 #include "../mov/tiio_mov.h"
-//#include "timageinfo.h"
 #include "movsettings.h"
 #include "trasterimage.h"
 #include "tsystem.h"
+
+#include "tiio_3gp.h"
 
 namespace
 {
