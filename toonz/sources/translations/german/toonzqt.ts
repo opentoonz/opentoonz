@@ -119,7 +119,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Force Squared Pixel</source>
-        <translation>正方ピクセルを保持</translation>
+        <translation>Quadratische Pixel erzwingen</translation>
     </message>
 </context>
 <context>
