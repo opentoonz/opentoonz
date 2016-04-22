@@ -717,46 +717,42 @@ void XsheetViewer::resizeEvent(QResizeEvent *event)
 
 void XsheetViewer::wheelEvent(QWheelEvent *event)
 {
+	switch(event->source()){
 
-  switch(event->source()){
+	case Qt::MouseEventNotSynthesized:
+	{
+		int markerDistance=6, markerOffset=0;
+		TApp::instance()->getCurrentScene()->getScene()->getProperties()->getMarkers(markerDistance, markerOffset);
+		if (event->angleDelta().x() == 0){ //vertical scroll
+			int scrollPixels =(event->angleDelta().y()>0 ? 1 : -1) *markerDistance *XsheetGUI::RowHeight;
+			scroll(QPoint(0, -scrollPixels));
+		}else{                             //horizontal scroll
+			int scrollPixels =(event->angleDelta().x()>0 ? 1 : -1) *XsheetGUI::ColumnWidth;
+			scroll(QPoint(-scrollPixels, 0));
+		}
+		break;
+	}
 
-  case Qt::MouseEventNotSynthesized:
-    {
-      int markerDistance=6, markerOffset=0;
-      TApp::instance()->getCurrentScene()->getScene()->getProperties()->getMarkers(markerDistance, markerOffset);
+	case Qt::MouseEventSynthesizedBySystem: //macbook touch-pad
+	{
+		QPoint numPixels = event->pixelDelta();
+		QPoint numDegrees = event->angleDelta() / 8;
+		if (!numPixels.isNull()) {
+			scroll(-numPixels);
+		} else if (!numDegrees.isNull()) {
+			QPoint numSteps = numDegrees / 15;
+			scroll(-numSteps);
+		}
+		break;
+	}
 
-      if (event->angleDelta().x() == 0){ //vertical scroll
-      	int scrollPixels =(event->angleDelta().y()>0 ? 1 : -1) *markerDistance *XsheetGUI::RowHeight;
-      	scroll(QPoint(0, -scrollPixels));
-      }else{                             //horizontal scroll
-      	int scrollPixels =(event->angleDelta().x()>0 ? 1 : -1) *XsheetGUI::ColumnWidth;
-      	scroll(QPoint(-scrollPixels, 0));
-      }
-      break;
-    }
+	default: //Qt::MouseEventSynthesizedByQt, Qt::MouseEventSynthesizedByApplication
+	{
+		std::cout << "not supported event: Qt::MouseEventSynthesizedByQt, Qt::MouseEventSynthesizedByApplication" << std::endl;
+		break;
+	}
 
-  case Qt::MouseEventSynthesizedBySystem: //macbook touch-pad
-    {
-      QPoint numPixels = event->pixelDelta();
-      QPoint numDegrees = event->angleDelta() / 8;
-
-      if (!numPixels.isNull()) {
-        scroll(-numPixels);
-      } else if (!numDegrees.isNull()) {
-        QPoint numSteps = numDegrees / 15;
-        scroll(-numSteps);
-      }
-      event->accept();
-      break;
-    }
-
-  default: //Qt::MouseEventSynthesizedByQt, Qt::MouseEventSynthesizedByApplication
-    {
-      assert(!"not supported event: Qt::MouseEventSynthesizedByQt, Qt::MouseEventSynthesizedByApplication");
-      break;
-    }
-  }
-
+	}// end switch
 }
 
 //-----------------------------------------------------------------------------
