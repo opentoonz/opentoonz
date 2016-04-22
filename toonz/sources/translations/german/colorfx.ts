@@ -104,7 +104,7 @@
     </message>
     <message>
         <source>Blur value</source>
-        <translation>Weiheitsgrad</translation>
+        <translation>Weichheitsgrad</translation>
     </message>
 </context>
 <context>
