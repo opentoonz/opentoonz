@@ -131,12 +131,12 @@ void sdl_fill_audio(void *udata, Uint8 *stream, int len)
 	if ( audio_len <= 0 ) {
 		delete[] myData->entireFileBuffer;
 		myData->entireFileBuffer = 0;
-		/*
-  {
-  TThread::ScopedLock sl(MutexOut);
-  *(myData->isPlaying) = false;   //questo lo faccio nel main thread
-  }
-*/
+#if 0
+		{
+			TThread::ScopedLock sl(MutexOut);
+			*(myData->isPlaying) = false;   //questo lo faccio nel main thread
+		}
+#endif
 		PlayCompletedMsg(myData).send();
 		return;
 	}
@@ -183,14 +183,14 @@ bool TSoundOutputDeviceImp::doOpenDevice(const TSoundTrackFormat &format)
 	wanted.callback = sdl_fill_audio;
 	wanted.userdata = this;
 
-    /* Open the audio device, forcing the desired format */
-    if ( SDL_OpenAudio(&wanted, NULL) < 0 ) {
+	/* Open the audio device, forcing the desired format */
+	if ( SDL_OpenAudio(&wanted, NULL) < 0 ) {
 		std::string msg("Couldn't open audio: ");
 		msg += SDL_GetError();
 		throw TSoundDeviceException(
 			TSoundDeviceException::UnableOpenDevice, msg);
-        return false;
-    }
+		return false;
+	}
 
 	m_opened = true;
 	return m_opened;
@@ -440,13 +440,17 @@ TSoundTrackFormat TSoundOutputDevice::getPreferredFormat(
 
 TSoundTrackFormat TSoundOutputDevice::getPreferredFormat(const TSoundTrackFormat &format)
 {
-	// try {
+#if 0
+	try {
+#endif
 	return getPreferredFormat(
 		format.m_sampleRate, format.m_channelCount, format.m_bitPerSample);
-	/*}
-  catch (TSoundDeviceException &e) {
-    throw TSoundDeviceException( e.getType(), e.getMessage());
-  }*/
+#if 0
+	}
+	catch (TSoundDeviceException &e) {
+		throw TSoundDeviceException( e.getType(), e.getMessage());
+	}
+#endif
 }
 
 //==============================================================================
@@ -519,21 +523,21 @@ TSoundInputDevice::TSoundInputDevice() : m_imp(new TSoundInputDeviceImp)
 
 TSoundInputDevice::~TSoundInputDevice()
 {
-	/*
-  if(m_imp->m_port)
-    alClosePort(m_imp->m_port);
-  delete m_imp;
-  */
+#if 0
+	if(m_imp->m_port)
+		alClosePort(m_imp->m_port);
+	delete m_imp;
+#endif
 }
 
 //------------------------------------------------------------------------------
 
 bool TSoundInputDevice::installed()
 {
-	/*
-	if (alQueryValues(AL_SYSTEM, AL_DEFAULT_INPUT, 0, 0, 0, 0) <=0)
-    return false;
-    */
+#if 0
+	if (alQueryValues(AL_SYSTEM, AL_DEFAULT_INPUT, 0, 0, 0, 0) <= 0)
+		return false;
+#endif
 	return true;
 }
 
@@ -591,17 +595,17 @@ TSoundTrackFormat TSoundInputDevice::getPreferredFormat(
 
 TSoundTrackFormat TSoundInputDevice::getPreferredFormat(const TSoundTrackFormat &format)
 {
-	/*
-  try {
-  */
+#if 0
+	try {
+#endif
 	return getPreferredFormat(
 		format.m_sampleRate, format.m_channelCount, format.m_bitPerSample);
-	/*}
-  
-  catch (TSoundDeviceException &e) {
-    throw TSoundDeviceException( e.getType(), e.getMessage());
-  }
-  */
+#if 0
+	}
+	catch (TSoundDeviceException &e) {
+		throw TSoundDeviceException( e.getType(), e.getMessage());
+	}
+#endif
 }
 
 //------------------------------------------------------------------------------
