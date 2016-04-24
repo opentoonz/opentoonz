@@ -212,7 +212,7 @@ qt5_wrap_cpp(SOURCES ${MOC_HEADERS} OPTIONS ${incs})
 
 add_library(toonzqt SHARED ${HEADERS} ${SOURCES} ${RESOURCES})
 if (APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtoonzqt.dylib")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtoonzqt${CMAKE_SHARED_LIBRARY_SUFFIX}")
 endif (APPLE)
 
 add_definitions(-DQT_WIDGETS_LIB -DTOONZQT_EXPORTS)

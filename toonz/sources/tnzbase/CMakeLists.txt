@@ -137,11 +137,16 @@ if (WIN32)
         ../common/twain/ttwain_stateW.c
         ../common/twain/ttwain_utilW.c
         ../common/twain/ttwain_winW.c)
-else ()
+elseif (APPLE)
     set(OBJCSOURCES ${OBJCSOURCES}
         ../common/twain/ttwain_stateM.c
         ../common/twain/ttwain_utilM.c
         ../common/twain/ttwain_winM.c)
+elseif (UNIX)
+    set(OBJCSOURCES ${OBJCSOURCES}
+        ../common/twain/ttwain_stateX.c
+        ../common/twain/ttwain_utilX.c
+        ../common/twain/ttwain_winX.c)
 endif ()
 
 if(APPLE)
@@ -154,7 +159,7 @@ qt5_wrap_cpp(SOURCES ${MOC_HEADERS})
 add_library(tnzbase SHARED ${HEADERS} ${SOURCES} ${OBJCSOURCES})
 
 if (APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnzbase.dylib")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnzbase${CMAKE_SHARED_LIBRARY_SUFFIX}")
 endif (APPLE)
 
 add_definitions(-DTNZBASE_EXPORTS -DTPARAM_EXPORTS -DTXSHEET_EXPORTS -DTFX_EXPORTS -DTAPPTOOLS_EXPORTS -DTTEST_EXPORTS)
@@ -170,17 +175,23 @@ include_directories(../common/flash ${SDKROOT}/libusb/libusb-1.0.9/include)
 if(WIN32)
     set(EXTRA_LIBS
         tnzcore)
-else()
+elseif(APPLE)
     find_library(TWAIN_LIB TWAIN)
     find_library(IOKIT_LIB IOKit)
     find_library(COCOA_LIB Cocoa)
 
     set(EXTRA_LIBS
-        ${CMAKE_CURRENT_BINARY_DIR}/../tnzcore/libtnzcore.dylib
+        ${CMAKE_CURRENT_BINARY_DIR}/../tnzcore/libtnzcore${CMAKE_SHARED_LIBRARY_SUFFIX}
         ${USB_LIB}
         ${TWAIN_LIB}
         ${IOKIT_LIB}
         ${COCOA_LIB})
+
+    target_link_libraries(tnzbase Qt5::Core Qt5::Gui)
+elseif(UNIX)
+    _find_toonz_library(EXTRA_LIBS "tnzcore")
+    set(EXTRA_LIBS ${EXTRA_LIBS}
+        ${SDL_LIB_LIBRARIES})
 
     target_link_libraries(tnzbase Qt5::Core Qt5::Gui)
 endif()
