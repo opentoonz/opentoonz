@@ -1,7 +1,7 @@
-
-
 #ifndef TSOUND_INCLUDED
 #define TSOUND_INCLUDED
+
+#include <memory>
 
 #include "tsmartpointer.h"
 #include "texception.h"
@@ -285,7 +285,7 @@ class TSoundInputDeviceImp;
 */
 class DVAPI TSoundInputDevice
 {
-	TSoundInputDeviceImp *m_imp;
+	std::shared_ptr<TSoundInputDeviceImp> m_imp;
 
 public:
 	enum Source {
@@ -360,7 +360,7 @@ class TSoundOutputDeviceImp;
 */
 class DVAPI TSoundOutputDevice
 {
-	TSoundOutputDeviceImp *m_imp;
+	std::unique_ptr<TSoundOutputDeviceImp> m_imp;
 
 public:
 	TSoundOutputDevice();

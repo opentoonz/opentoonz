@@ -1,7 +1,7 @@
-
-
 #ifndef TSTREAM_H
 #define TSTREAM_H
+
+#include <memory>
 
 // TnzCore includes
 #include "tpixel.h"
@@ -44,7 +44,7 @@ typedef std::pair<int, int> VersionNumber; //!< Integer pair storing the major a
 class DVAPI TIStream
 {
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 public:
 	/*!
@@ -168,10 +168,10 @@ TIStream &operator>>(TIStream &is, T *&v)
 class DVAPI TOStream
 {
 	class Imp;
-	Imp *m_imp;
+	std::shared_ptr<Imp> m_imp;
 
 private:
-	TOStream(Imp *imp); //!< deprecated
+	TOStream(std::shared_ptr<Imp> imp); //!< deprecated
 
 public:
 	/*!
@@ -208,7 +208,7 @@ public:
 									   //!  to the reimplemented TPersist::saveData.
 
 	//! \deprecated Use openChild(string) instead
-	TOStream child(string tagName);
+	TOStream &child(string tagName);
 
 	void openChild(string tagName); //!< Writes a <tagName> to the stream, opening a tag.
 	void openChild(string tagName,
@@ -238,8 +238,8 @@ public:
 
 private:
 	// Not copyable
-	TOStream(const TOStream &);			   //!< Not implemented
-	TOStream &operator=(const TOStream &); //!< Not implemented
+	TOStream(const TOStream &) = delete;			      //!< Not implemented
+	TOStream &operator=(const TOStream &) = delete; //!< Not implemented
 };
 
 #endif // TSTREAM_H

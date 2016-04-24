@@ -181,7 +181,6 @@ ImageManager::ImageManager()
 
 ImageManager::~ImageManager()
 {
-	delete m_imp;
 }
 
 //-----------------------------------------------------------------------------

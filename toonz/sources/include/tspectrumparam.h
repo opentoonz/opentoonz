@@ -1,7 +1,7 @@
-
-
 #ifndef TSPECTRUMPARAM_H
 #define TSPECTRUMPARAM_H
+
+#include <memory>
 
 #include "tspectrum.h"
 #include "tparamset.h"
@@ -37,7 +37,7 @@ class DVAPI TSpectrumParam : public TParam
 {
 	PERSIST_DECLARATION(TSpectrumParam)
 
-	TSpectrumParamImp *m_imp;
+	std::unique_ptr<TSpectrumParamImp> m_imp;
 
 public:
 	TSpectrumParam();

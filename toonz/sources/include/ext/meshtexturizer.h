@@ -1,7 +1,7 @@
-
-
 #ifndef MESHTEXTURIZER_H
 #define MESHTEXTURIZER_H
+
+#include <memory>
 
 // TnzCore includes
 #include "traster.h"
@@ -95,7 +95,7 @@ public:
 
 private:
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 private:
 	// Not copyable

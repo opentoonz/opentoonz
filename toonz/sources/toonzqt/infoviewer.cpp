@@ -116,13 +116,13 @@ public slots:
 
 InfoViewer::InfoViewer(QWidget *parent)
 	: Dialog()
+	, m_imp(new InfoViewerImp())
 {
 	setWindowTitle(tr("File Info"));
 	setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 	//setAttribute(Qt::WA_DeleteOnClose);
 
 	m_parent = parent;
-	m_imp = new InfoViewerImp();
 
 	int i;
 	for (i = 0; i < (int)m_imp->m_labels.size(); i++) {
@@ -143,7 +143,6 @@ InfoViewer::InfoViewer(QWidget *parent)
 
 InfoViewer::~InfoViewer()
 {
-	delete m_imp;
 }
 
 //----------------------------------------------------------------

@@ -1,10 +1,8 @@
-
-
 #ifndef TFARMSERVER_H
 #define TFARMSERVER_H
 
-//#include "texception.h"
-//#include "tconvert.h"
+#include <memory>
+
 #include "tcommon.h"
 
 #include <QString>
@@ -87,7 +85,7 @@ public:
 
 private:
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 };
 
 #endif

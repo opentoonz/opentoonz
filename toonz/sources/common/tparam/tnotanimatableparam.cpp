@@ -133,7 +133,7 @@ class TEnumParamImp
 {
 public:
 	vector<pair<int, string>> m_items;
-	void copy(TEnumParamImp *src)
+	void copy(std::unique_ptr<TEnumParamImp>& src)
 	{
 		m_items.clear();
 		std::back_insert_iterator<std::vector<pair<int, string>>> bii(m_items);
@@ -171,7 +171,6 @@ void TEnumParam::copy(TParam *src)
 
 TEnumParam::~TEnumParam()
 {
-	delete m_imp;
 }
 
 //---------------------------------------------------------

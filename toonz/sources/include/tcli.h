@@ -1,7 +1,7 @@
-
-
 #ifndef TCLI_INCLUDED
 #define TCLI_INCLUDED
+
+#include <memory>
 
 //#include "tcommon.h"   contenuto in tconvert.h
 #include "tconvert.h"
@@ -342,7 +342,7 @@ class UsageImp;
 
 class DVAPI Usage
 {
-	UsageImp *m_imp;
+	std::unique_ptr<UsageImp> m_imp;
 
 public:
 	Usage(string progName);

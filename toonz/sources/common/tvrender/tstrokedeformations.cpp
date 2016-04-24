@@ -189,8 +189,8 @@ struct TStrokePointDeformation::Imp {
 
 TStrokePointDeformation::TStrokePointDeformation(const TPointD &center,
 												 double radius)
+												 : m_imp(new Imp(center, radius))
 {
-	m_imp = new Imp(center, radius);
 }
 
 //-----------------------------------------------------------------------------
@@ -198,15 +198,14 @@ TStrokePointDeformation::TStrokePointDeformation(const TPointD &center,
 TStrokePointDeformation::TStrokePointDeformation(const TPointD &vect,
 												 const TPointD &center,
 												 double radius)
+												 : m_imp(new Imp(vect, center, radius))
 {
-	m_imp = new Imp(vect, center, radius);
 }
 
 //-----------------------------------------------------------------------------
 
 TStrokePointDeformation::~TStrokePointDeformation()
 {
-	delete m_imp;
 }
 
 //-----------------------------------------------------------------------------

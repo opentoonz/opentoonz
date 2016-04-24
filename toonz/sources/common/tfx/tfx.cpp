@@ -292,8 +292,7 @@ DEFINE_CLASS_CODE(TFx, 3)
 
 TFx::TFx()
 	: TSmartObject(m_classCode) // TPersist(TFxImp::m_instances)
-	  ,
-	  m_imp(new TFxImp(this))
+	, m_imp(new TFxImp(this))
 {
 }
 

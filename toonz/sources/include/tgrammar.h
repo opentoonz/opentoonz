@@ -1,7 +1,7 @@
-
-
 #ifndef TGRAMMAR_INCLUDED
 #define TGRAMMAR_INCLUDED
+
+#include <memory>
 
 // TnzCore includes
 #include "tcommon.h"
@@ -198,7 +198,7 @@ public:
 class DVAPI Grammar
 {
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 public:
 	Grammar();

@@ -201,7 +201,6 @@ TUserLog::TUserLog(const TFilePath &fp) : m_imp(new Imp(fp))
 
 TUserLog::~TUserLog()
 {
-	delete m_imp;
 }
 
 //------------------------------------------------------------------------------

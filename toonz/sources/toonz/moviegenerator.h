@@ -1,7 +1,7 @@
-
-
 #ifndef MOVIEGENERATOR_INCLUDED
 #define MOVIEGENERATOR_INCLUDED
+
+#include <memory>
 
 #include "tfilepath.h"
 #include "tpixel.h"
@@ -26,7 +26,7 @@ public:
 	class Imp;
 
 private:
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 public:
 	class Listener

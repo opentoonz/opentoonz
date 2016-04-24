@@ -37,7 +37,6 @@ TParamContainer::TParamContainer()
 
 TParamContainer::~TParamContainer()
 {
-	delete m_imp;
 }
 
 void TParamContainer::setParamObserver(TParamObserver *observer)

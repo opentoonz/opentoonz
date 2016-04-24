@@ -1,7 +1,7 @@
-
-
 #ifndef TFX_INCLUDED
 #define TFX_INCLUDED
+
+#include <memory>
 
 // TnzCore includes
 #include "tsmartpointer.h"

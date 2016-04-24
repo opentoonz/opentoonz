@@ -1144,8 +1144,8 @@ return 0;
 /*=============================================================================*/
 
 TAutocloser::TAutocloser(const TRasterP &r, int distance, double angle, int index, int opacity)
+	: m_imp(new Imp(r, distance, angle, index, opacity))
 {
-	m_imp = new Imp(r, distance, angle, index, opacity);
 }
 
 //...............................
@@ -1161,7 +1161,6 @@ void TAutocloser::exec()
 
 TAutocloser::~TAutocloser()
 {
-	delete m_imp;
 }
 
 //-------------------------------------------------

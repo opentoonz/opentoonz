@@ -529,8 +529,6 @@ TL2LAutocloser::TL2LAutocloser()
 
 TL2LAutocloser::~TL2LAutocloser()
 {
-	delete m_imp;
-	m_imp = 0;
 }
 
 //-----------------------------------------------------------------------------

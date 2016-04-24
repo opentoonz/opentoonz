@@ -46,7 +46,6 @@ TExpression::TExpression()
 
 TExpression::~TExpression()
 {
-	delete m_imp;
 }
 
 //--------------------------------------------------------------------------

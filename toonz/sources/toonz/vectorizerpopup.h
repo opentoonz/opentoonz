@@ -1,7 +1,7 @@
-
-
 #ifndef VECTORIZERPOPUP_H
 #define VECTORIZERPOPUP_H
+
+#include <memory>
 
 // TnzCore includes
 #include "tvectorimage.h"
@@ -12,9 +12,6 @@
 
 // TnzQt includes
 #include "toonzqt/dvdialog.h"
-
-// boost includes
-#include <boost/scoped_ptr.hpp>
 
 // Qt includes
 #include <QWidget>
@@ -301,7 +298,7 @@ private:
 	TXshSimpleLevelP m_vLevel;	//!< Output vectorized level
 	std::vector<TFrameId> m_fids; //!< Frame ids of the input \b m_level
 
-	boost::scoped_ptr<OverwriteDialog>
+	std::unique_ptr<OverwriteDialog>
 		m_dialog; //!< Dialog to be shown for overwrite resolution.
 
 	bool m_isCanceled, //!< User cancels set this flag to true

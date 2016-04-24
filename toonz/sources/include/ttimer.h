@@ -1,7 +1,7 @@
-
-
 #ifndef TTIMER_INCLUDED
 #define TTIMER_INCLUDED
+
+#include <memory>
 
 #include "tcommon.h"
 
@@ -98,7 +98,7 @@ public:
 	class Imp;
 
 private:
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 	TTimer(const TTimer &);
 	void operator=(const TTimer &);

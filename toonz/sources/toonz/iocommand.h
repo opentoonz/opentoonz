@@ -1,7 +1,7 @@
-
-
 #ifndef IOCOMMAND_H
 #define IOCOMMAND_H
+
+#include <memory>
 
 // TnzLib includes
 #include "toonz/preferences.h"
@@ -14,7 +14,6 @@
 #include <QDialog>
 
 // boost includes
-#include <boost/scoped_ptr.hpp>
 #include <boost/optional.hpp>
 
 // STD includes
@@ -73,7 +72,7 @@ struct LoadResourceArguments {
 		Data &data() const { return *m_data; } //!< Internal data used by the loading procedure.
 
 	private:
-		boost::scoped_ptr<Data> m_data;
+		std::unique_ptr<Data> m_data;
 	};
 
 	struct ResourceData //!  Data about a single resource to be loaded.

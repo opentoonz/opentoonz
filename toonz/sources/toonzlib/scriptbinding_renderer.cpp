@@ -212,8 +212,6 @@ Renderer::Renderer()
 
 Renderer::~Renderer()
 {
-	delete m_imp;
-	m_imp = 0;
 }
 
 QScriptValue Renderer::ctor(QScriptContext *context, QScriptEngine *engine)

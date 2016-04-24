@@ -113,9 +113,8 @@ PERSIST_IDENTIFIER(TSpectrumParam, "spectrumParam")
 
 //---------------------------------------------------------
 
-TSpectrumParam::TSpectrumParam()
+TSpectrumParam::TSpectrumParam(): m_imp(new TSpectrumParamImp(this)) //brutto...
 {
-	m_imp = new TSpectrumParamImp(this); //brutto...
 	ColorKeyParam ck1(TDoubleParamP(0.0), TPixelParamP(TPixel32::Black));
 	ColorKeyParam ck2(TDoubleParamP(1.0), TPixelParamP(TPixel32::White));
 	m_imp->addKey(ck1);
@@ -126,8 +125,8 @@ TSpectrumParam::TSpectrumParam()
 
 TSpectrumParam::TSpectrumParam(const TSpectrumParam &src)
 	: TParam(src.getName())
+	, m_imp(new TSpectrumParamImp(*src.m_imp))
 {
-	m_imp = new TSpectrumParamImp(*src.m_imp);
 }
 
 //---------------------------------------------------------
@@ -147,8 +146,8 @@ void TSpectrumParam::removeObserver(TParamObserver *obs)
 //---------------------------------------------------------
 
 TSpectrumParam::TSpectrumParam(int keyCount, TSpectrum::ColorKey keys[])
+	: m_imp(new TSpectrumParamImp(this))
 {
-	m_imp = new TSpectrumParamImp(this);
 	for (int i = 0; i < keyCount; i++) {
 		double v = keys[i].first;
 		TPixel32 pix = keys[i].second;
@@ -175,7 +174,6 @@ void TSpectrumParam::copy(TParam *src)
 
 TSpectrumParam::~TSpectrumParam()
 {
-	delete m_imp;
 }
 
 //---------------------------------------------------------

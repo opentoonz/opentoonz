@@ -1,7 +1,7 @@
-
-
 #ifndef TROP_BORDERS_H
 #define TROP_BORDERS_H
+
+#include <memory>
 
 // TnzCore includes
 #include "tsmartpointer.h"
@@ -159,7 +159,7 @@ typedef TSmartPointerT<ImageMesh> ImageMeshP;
 class DVAPI ImageMeshesReader
 {
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 public:
 	ImageMeshesReader();

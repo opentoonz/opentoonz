@@ -103,8 +103,6 @@ TStageObjectTree::TStageObjectTree() : m_imp(new TStageObjectTreeImp)
 
 TStageObjectTree::~TStageObjectTree()
 {
-	delete m_imp;
-	m_imp = 0;
 }
 
 //-----------------------------------------------------------------------------

@@ -1,7 +1,7 @@
-
-
 #ifndef TLOGGER_INCLUDED
 #define TLOGGER_INCLUDED
+
+#include <memory>
 
 //
 // TLogger
@@ -34,7 +34,7 @@ class TFilePath;
 class DVAPI TLogger
 { // singleton
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 	TLogger();
 

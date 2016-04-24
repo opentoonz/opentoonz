@@ -123,7 +123,6 @@ TService::TService(const string &name, const string &displayName)
 
 TService::~TService()
 {
-	delete m_imp;
 }
 
 //------------------------------------------------------------------------------

@@ -1,7 +1,7 @@
-
-
 #ifndef T_UNDO_INCLUDED
 #define T_UNDO_INCLUDED
+
+#include <memory>
 
 // TnzCore includes
 #include "tsmartpointer.h"
@@ -103,7 +103,7 @@ public:
 
 private:
 	struct TUndoManagerImp;
-	TUndoManagerImp *m_imp;
+	std::unique_ptr<TUndoManagerImp> m_imp;
 
 private:
 	// Noncopyable

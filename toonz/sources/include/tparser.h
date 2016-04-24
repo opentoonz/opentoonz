@@ -1,7 +1,7 @@
-
-
 #ifndef TPARSER_INCLUDED
 #define TPARSER_INCLUDED
+
+#include <memory>
 
 #include "tcommon.h"
 #include "tgrammar.h"
@@ -27,7 +27,7 @@ struct DVAPI SyntaxToken {
 class DVAPI Parser
 {
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 public:
 	Parser(const Grammar *grammar);

@@ -330,8 +330,8 @@ TMeshImage::TMeshImage()
 
 //-----------------------------------------------------------------------
 
-TMeshImage::TMeshImage(Imp *imp)
-	: m_imp(imp)
+TMeshImage::TMeshImage(std::shared_ptr<Imp> imp)
+	: m_imp(std::move(imp))
 {
 }
 
@@ -339,7 +339,6 @@ TMeshImage::TMeshImage(Imp *imp)
 
 TMeshImage::~TMeshImage()
 {
-	delete m_imp;
 }
 
 //-----------------------------------------------------------------------

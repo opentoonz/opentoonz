@@ -103,12 +103,8 @@ public:
 	Imp(const Imp &other);
 	Imp &operator=(const Imp &other);
 
-#ifndef BOOST_NO_RVALUE_REFERENCES
-
 	Imp(Imp &&other);
 	Imp &operator=(Imp &&other);
-
-#endif
 };
 
 //===============================================================================
@@ -127,9 +123,6 @@ PlasticSkeleton::Imp &PlasticSkeleton::Imp::operator=(const Imp &other)
 }
 
 //-------------------------------------------------------------------------------
-
-#ifndef BOOST_NO_RVALUE_REFERENCES
-
 PlasticSkeleton::Imp::Imp(Imp &&other)
 	: m_numbersPool(std::move(other.m_numbersPool))
 {
@@ -142,8 +135,6 @@ PlasticSkeleton::Imp &PlasticSkeleton::Imp::operator=(Imp &&other)
 	m_numbersPool = std::move(other.m_numbersPool);
 	return *this;
 }
-
-#endif
 
 //************************************************************************************
 //    PlasticSkeleton  implementation
@@ -158,7 +149,6 @@ PlasticSkeleton::PlasticSkeleton()
 
 PlasticSkeleton::~PlasticSkeleton()
 {
-	delete m_imp;
 }
 
 //------------------------------------------------------------------
@@ -181,9 +171,6 @@ PlasticSkeleton &PlasticSkeleton::operator=(const PlasticSkeleton &other)
 }
 
 //------------------------------------------------------------------
-
-#ifndef BOOST_NO_RVALUE_REFERENCES
-
 PlasticSkeleton::PlasticSkeleton(PlasticSkeleton &&other)
 	: mesh_type(std::forward<mesh_type>(other)), m_imp(new Imp(std::move(*other.m_imp)))
 {
@@ -200,8 +187,6 @@ PlasticSkeleton &PlasticSkeleton::operator=(PlasticSkeleton &&other)
 
 	return *this;
 }
-
-#endif
 
 //------------------------------------------------------------------
 

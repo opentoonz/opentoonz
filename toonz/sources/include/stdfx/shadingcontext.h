@@ -1,7 +1,7 @@
-
-
 #ifndef SHADINGCONTEXT_H
 #define SHADINGCONTEXT_H
+
+#include <memory>
 
 // Glew include
 #include <GL/glew.h>
@@ -89,7 +89,7 @@ public:
 
 private:
 	struct Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 	// Not copyable
 	ShadingContext(const ShadingContext &);

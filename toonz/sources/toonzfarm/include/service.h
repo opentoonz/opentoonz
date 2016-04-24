@@ -1,9 +1,7 @@
-
-
 #ifndef SERVICE_H
 #define SERVICE_H
 
-//#include "tfilepath.h"
+#include <memory>
 
 class TFilePath;
 
@@ -86,7 +84,7 @@ public:
 
 private:
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 	static TService *m_instance;
 };

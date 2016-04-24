@@ -1,7 +1,7 @@
-
-
 #ifndef IMAGEMANAGER_H
 #define IMAGEMANAGER_H
+
+#include <memory>
 
 // TnzCore includes
 #include "timage.h"
@@ -170,7 +170,7 @@ public:
 
 private:
 	struct Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 private:
 	ImageManager();

@@ -1,7 +1,7 @@
-
-
 #ifndef TVECTORIMAGE_INCLUDED
 #define TVECTORIMAGE_INCLUDED
+
+#include <memory>
 
 #include "timage.h"
 
@@ -60,7 +60,7 @@ class DVAPI TVectorImage : public TImage
 	int pickGroup(const TPointD &pos, bool onEnteredGroup) const;
 
 public:
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 	struct IntersectionBranch {
 		int m_strokeIndex;

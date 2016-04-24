@@ -1,7 +1,7 @@
-
-
 #ifndef TNOTANIMATABLEPARAM_H
 #define TNOTANIMATABLEPARAM_H
+
+#include <memory>
 
 #include "tparam.h"
 #include "tparamchange.h"
@@ -331,7 +331,7 @@ public:
 	void saveData(TOStream &os);
 
 private:
-	TEnumParamImp *m_imp;
+	std::unique_ptr<TEnumParamImp> m_imp;
 };
 
 typedef TEnumParam TIntEnumParam;

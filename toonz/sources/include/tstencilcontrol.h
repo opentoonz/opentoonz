@@ -1,7 +1,7 @@
-
-
 #ifndef TSTENCILCONTROL_H
 #define TSTENCILCONTROL_H
+
+#include <memory>
 
 #include "tcommon.h"
 
@@ -34,7 +34,7 @@ public:
 
 private:
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 public:
 	static TStencilControl *instance();

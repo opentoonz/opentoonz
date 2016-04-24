@@ -351,7 +351,7 @@ public:
 
 	~Imp() {}
 
-	void copy(Imp *src)
+	void copy(std::unique_ptr<Imp> const& src)
 	{
 		m_grammar = src->m_grammar;
 		m_measureName = src->m_measureName;
@@ -503,7 +503,6 @@ TDoubleParam::TDoubleParam(const TDoubleParam &src)
 
 TDoubleParam::~TDoubleParam()
 {
-	delete m_imp;
 }
 
 //---------------------------------------------------------

@@ -83,11 +83,11 @@ public:
 
 	//-----------------------------------------------------------------------------
 
-	WIN32Implementation(TDimension rasterSize, const TOfflineGL::Imp *shared = 0)
+	WIN32Implementation(TDimension rasterSize, std::shared_ptr<TOfflineGL::Imp> shared)
 		: TOfflineGL::Imp(rasterSize.lx, rasterSize.ly)
 	{
 		m_offData = 0;
-		createContext(rasterSize, shared); //makeCurrent is called at the end of this
+		createContext(rasterSize, std::move(shared)); //makeCurrent is called at the end of this
 
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -157,7 +157,7 @@ public:
 
 	//-----------------------------------------------------------------------------
 
-	void createContext(TDimension rasterSize, const TOfflineGL::Imp *shared)
+	void createContext(TDimension rasterSize, std::shared_ptr<TOfflineGL::Imp> shared)
 	{
 		QMutexLocker locker(&win32ImpMutex);
 
@@ -221,7 +221,7 @@ public:
 
 		if (shared) {
 			// Share shared's display lists
-			const WIN32Implementation *sharedImp = dynamic_cast<const WIN32Implementation *>(shared);
+			const WIN32Implementation *sharedImp = dynamic_cast<const WIN32Implementation *>(shared.get());
 			assert(sharedImp);
 
 			bool ok = wglShareLists(sharedImp->m_hglRC, m_hglRC);
@@ -298,9 +298,9 @@ public:
 };
 
 // default imp generator
-TOfflineGL::Imp *defaultOfflineGLGenerator(const TDimension &dim, const TOfflineGL::Imp *shared)
+std::shared_ptr<TOfflineGL::Imp> defaultOfflineGLGenerator(const TDimension &dim, std::shared_ptr<TOfflineGL::Imp> shared)
 {
-	return new WIN32Implementation(dim, shared);
+	return std::make_shared<WIN32Implementation>(dim, shared);
 }
 
 //=============================================================================
@@ -510,18 +510,16 @@ public:
 	}
 };
 
-TOfflineGL::Imp *defaultOfflineGLGenerator(const TDimension &dim, const TOfflineGL::Imp *shared)
+std::shared_ptr<TOfflineGL::Imp> defaultOfflineGLGenerator(const TDimension &dim, std::shared_ptr<TOfflineGL::Imp> shared)
 {
-	//return new XImplementation(dim); // XXX
-	return new QtOfflineGL(dim, shared);
-	//return NULL;
+	return std::make_shared<QtOfflineGL>(dim, shared);
 }
 
 #elif MACOSX
 
-TOfflineGL::Imp *defaultOfflineGLGenerator(const TDimension &dim, const TOfflineGL::Imp *shared)
+std::shared_ptr<TOfflineGL::Imp> defaultOfflineGLGenerator(const TDimension &dim, std::shared_ptr<TOfflineGL::Imp> shared)
 {
-	return new QtOfflineGL(dim, shared);
+	return std::make_shared<QtOfflineGL>(dim, shared);
 }
 
 #endif
@@ -548,7 +546,7 @@ class MessageCreateContext : public TThread::Message
 
 	TOfflineGL *m_ogl;
 	TDimension m_size;
-	const TOfflineGL::Imp *m_shared;
+	std::shared_ptr<TOfflineGL::Imp> m_shared;
 
 public:
 	MessageCreateContext(TOfflineGL *ogl, const TDimension &size, const TOfflineGL::Imp *shared)
@@ -576,13 +574,11 @@ TOfflineGL::TOfflineGL(TDimension dim, const TOfflineGL *shared)
 	QMutexLocker locker(&linuxImpMutex);
 #endif
 
-	const TOfflineGL::Imp *sharedImp = shared ? shared->m_imp : 0;
-
 	/*
 	元のコードは(別スレッドから呼び出すための) offline renderer を作って main thread に dispatch するという訳のわからないことをしていたが Q*GLContext は thread context を超えられないので直接生成してこのコンテキストで閉じる.
 	別スレッドには dispatch しない.
    */
-	m_imp = currentImpGenerator(dim, sharedImp);
+	m_imp = currentImpGenerator(dim, shared ? shared->m_imp : 0);
 
 	initMatrix();
 }
@@ -611,7 +607,7 @@ TOfflineGL::TOfflineGL(const TRaster32P &raster, const TOfflineGL *shared)
 
 TOfflineGL::~TOfflineGL()
 {
-	delete m_imp;
+	// delete m_imp;
 }
 
 //-----------------------------------------------------------------------------

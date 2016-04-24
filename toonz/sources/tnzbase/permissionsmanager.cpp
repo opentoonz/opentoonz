@@ -161,15 +161,14 @@ void PermissionsManager::Imp::loadPermissions()
 //=========================================================
 
 PermissionsManager::PermissionsManager()
+	: m_imp(new Imp())
 {
-	m_imp = new Imp();
 }
 
 //---------------------------------------------------------
 
 PermissionsManager::~PermissionsManager()
 {
-	delete m_imp;
 }
 
 //---------------------------------------------------------

@@ -210,7 +210,6 @@ TUserLogAppend::TUserLogAppend(const TFilePath &fp) : m_imp(new Imp(fp))
 
 TUserLogAppend::~TUserLogAppend()
 {
-	//delete m_imp;
 }
 
 //------------------------------------------------------------------------------

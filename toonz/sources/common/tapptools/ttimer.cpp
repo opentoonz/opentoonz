@@ -293,15 +293,14 @@ public:
 //===============================================================================
 
 TTimer::TTimer(const string &name, UINT timerRes, Type type)
+	: m_imp(new TTimer::Imp(name, timerRes, type, this))
 {
-	m_imp = new TTimer::Imp(name, timerRes, type, this);
 }
 
 //--------------------------------------------------------------------------------
 
 TTimer::~TTimer()
 {
-	delete m_imp;
 }
 
 //--------------------------------------------------------------------------------

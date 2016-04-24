@@ -78,10 +78,12 @@ void rightRotateBits(UCHAR *buf, int bufferSize)
 
 //-----------------------------------------------------------------------------
 
-QtOfflineGL::QtOfflineGL(TDimension rasterSize, const TOfflineGL::Imp *shared)
-	: TOfflineGL::Imp(rasterSize.lx, rasterSize.ly), m_context(0), m_oldContext(0)
+QtOfflineGL::QtOfflineGL(TDimension rasterSize, std::shared_ptr<TOfflineGL::Imp> shared)
+	: TOfflineGL::Imp(rasterSize.lx, rasterSize.ly)
+	, m_context(0)
+	, m_oldContext(0)
 {
-	createContext(rasterSize, shared);
+	createContext(rasterSize, std::move(shared));
 	/*
   makeCurrent();
 
@@ -101,7 +103,7 @@ QtOfflineGL::~QtOfflineGL()
 
 //-----------------------------------------------------------------------------
 
-void QtOfflineGL::createContext(TDimension rasterSize, const TOfflineGL::Imp *shared)
+void QtOfflineGL::createContext(TDimension rasterSize, std::shared_ptr<TOfflineGL::Imp> shared)
 {
 	// Imposto il formato dei Pixel (pixelFormat)
 	/*

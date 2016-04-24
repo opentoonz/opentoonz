@@ -1018,7 +1018,6 @@ Previewer::Previewer(bool subcamera)
 
 Previewer::~Previewer()
 {
-	delete m_imp;
 }
 
 //-----------------------------------------------------------------------------

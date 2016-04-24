@@ -174,7 +174,6 @@ TUndoManager *TUndoManager::manager()
 TUndoManager::TUndoManager()
 	: m_imp(new TUndoManagerImp)
 {
-	//  cout << "Creato undo manager" << endl;
 }
 
 //-----------------------------------------------------------------------------
@@ -184,7 +183,6 @@ TUndoManager::~TUndoManager()
 	//cout << "Distrutto undo manager" << endl;
 	assert(m_imp->m_blockStack.empty());
 	reset();
-	delete m_imp;
 }
 
 //-----------------------------------------------------------------------------

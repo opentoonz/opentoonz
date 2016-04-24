@@ -1,7 +1,7 @@
-
-
 #ifndef TXSHSIMPLELEVEL_INCLUDED
 #define TXSHSIMPLELEVEL_INCLUDED
+
+#include <memory>
 
 // TnzLib includes
 #include "toonz/txshlevel.h"
@@ -17,7 +17,6 @@
 #include <QStringList>
 
 // boost includes
-#include <boost/scoped_ptr.hpp>
 #include <boost/container/flat_set.hpp>
 #include <boost/container/flat_map.hpp>
 
@@ -322,10 +321,8 @@ private:
 	typedef boost::container::flat_set<TFrameId> FramesSet;
 
 private:
-	boost::
-		scoped_ptr<LevelProperties> m_properties;
-	boost::
-		scoped_ptr<TContentHistory> m_contentHistory;
+	std::unique_ptr<LevelProperties> m_properties;
+	std::unique_ptr<TContentHistory> m_contentHistory;
 
 	TPalette *m_palette;
 

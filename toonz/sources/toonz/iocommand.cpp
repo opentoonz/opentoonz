@@ -1,4 +1,4 @@
-
+#include <memory>
 
 #include "iocommand.h"
 
@@ -2177,7 +2177,7 @@ int loadPSDResource(IoCmd::LoadResourceArguments &args, bool updateRecentFile, P
 typedef IoCmd::LoadResourceArguments::ScopedBlock LoadScopedBlock;
 
 struct LoadScopedBlock::Data {
-	boost::scoped_ptr<DVGui::ProgressDialog>
+	std::unique_ptr<DVGui::ProgressDialog>
 		m_progressDialog; //!< Progress dialog displayed on multiple paths.
 	int m_loadedCount;	//!< Number of loaded levels.
 	bool m_hasSoundLevel; //!< Whether a sound level was loaded.

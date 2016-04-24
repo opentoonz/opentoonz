@@ -1,7 +1,7 @@
-
-
 #ifndef TPARAMCONTAINER_INCLUDED
 #define TPARAMCONTAINER_INCLUDED
+
+#include <memory>
 
 #include "tparam.h"
 //#include "tfx.h"
@@ -69,7 +69,7 @@ public:
 class DVAPI TParamContainer
 {
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 public:
 	TParamContainer();

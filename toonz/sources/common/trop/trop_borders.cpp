@@ -201,7 +201,6 @@ ImageMeshesReader::ImageMeshesReader()
 
 ImageMeshesReader::~ImageMeshesReader()
 {
-	delete m_imp;
 }
 
 //--------------------------------------------------------------------------------

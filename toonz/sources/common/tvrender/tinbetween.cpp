@@ -709,7 +709,6 @@ TInbetween::TInbetween(const TVectorImageP firstImage, const TVectorImageP lastI
 
 TInbetween::~TInbetween()
 {
-	delete m_imp;
 }
 
 //-------------------------------------------------------------------

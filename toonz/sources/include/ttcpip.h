@@ -1,7 +1,7 @@
-
-
 #ifndef TTCPIP_H
 #define TTCPIP_H
+
+#include <memory>
 
 #include "tcommon.h"
 
@@ -48,7 +48,7 @@ public:
 	int getExitCode() const;
 
 private:
-	TTcpIpServerImp *m_imp;
+	std::shared_ptr<TTcpIpServerImp> m_imp;
 };
 
 //---------------------------------------------------------------------

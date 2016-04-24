@@ -1,7 +1,7 @@
-
-
 #ifndef _TAUTOCLOSE_H_
 #define _TAUTOCLOSE_H_
+
+#include <memory>
 
 #include "tgeometry.h"
 #include "traster.h"
@@ -35,7 +35,7 @@ public:
 
 private:
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 	//not implemented
 	TAutocloser();

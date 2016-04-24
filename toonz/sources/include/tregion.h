@@ -1,10 +1,10 @@
-
-
 //-----------------------------------------------------------------------------
 // tregion.h: interface for the TRegion class.
 //-----------------------------------------------------------------------------
 #if !defined(TREGION_H)
 #define TREGION_H
+
+#include <memory>
 
 #if _MSC_VER > 1000
 #pragma once
@@ -165,7 +165,7 @@ typedef TSmartPointerT<TEdge> TEdgeP;
 class DVAPI TRegion
 {
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 public:
 	TRegion();

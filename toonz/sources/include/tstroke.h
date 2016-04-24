@@ -1,7 +1,7 @@
-
-
 #ifndef TSTROKE_H
 #define TSTROKE_H
+
+#include <memory>
 
 #include "tsmartpointer.h"
 #include "tgeometry.h"
@@ -50,7 +50,7 @@ class DVAPI TStroke : public TSmartObject
 private:
 	//! Pimpl of a TStroke
 	struct Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 public:
 	struct OutlineOptions;

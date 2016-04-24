@@ -1,7 +1,7 @@
-
-
 #ifndef TIMAGECACHE_H
 #define TIMAGECACHE_H
+
+#include <memory>
 
 // TnzCore includes
 #include "tcommon.h"
@@ -55,7 +55,7 @@ of system memory. This is especially true on 32-bit OSes.
 class DVAPI TImageCache
 {
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 public:
 	static TImageCache *instance();

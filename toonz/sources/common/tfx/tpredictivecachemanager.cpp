@@ -68,17 +68,28 @@ public:
 	QMutex m_mutex;
 
 public:
-	//Active getResource(..) callback
-	typedef void (TPredictiveCacheManager::Imp::*GetResourceFuncPtr)(TCacheResourceP &resource, const string &alias,
-																	 const TFxP &fx, double frame, const TRenderSettings &rs,
-																	 ResourceDeclaration *resData);
-
-	GetResourceFuncPtr m_getResFuncPtr;
-
-public:
 	Imp()
-		: m_renderStatus(TRenderer::IDLE), m_getResFuncPtr(&Imp::getResourceComputing), m_enabled(TRenderer::instance().isPrecomputingEnabled()) {}
+		: m_renderStatus(TRenderer::IDLE)
+		, m_enabled(TRenderer::instance().isPrecomputingEnabled())
+	{
+	}
 
+	void run(TCacheResourceP &resource, const string &alias,
+		const TFxP &fx, double frame, const TRenderSettings &rs,
+		ResourceDeclaration *resData)
+	{
+		switch (m_renderStatus) {
+		case TRenderer::IDLE:
+		case TRenderer::COMPUTING:
+			getResourceComputing(resource, alias, fx, frame, rs, resData);
+			break;
+		case TRenderer::TESTRUN:
+			getResourceTestRun(resource, alias, fx, frame, rs, resData);
+			break;
+		}
+	}
+
+private:
 	void getResourceTestRun(
 		TCacheResourceP &resource, const string &alias,
 		const TFxP &fx, double frame, const TRenderSettings &rs,
@@ -103,7 +114,6 @@ TPredictiveCacheManager::TPredictiveCacheManager()
 
 TPredictiveCacheManager::~TPredictiveCacheManager()
 {
-	delete m_imp;
 }
 
 //---------------------------------------------------------------------------
@@ -128,7 +138,7 @@ void TPredictiveCacheManager::getResource(
 	if (!m_imp->m_enabled)
 		return;
 
-	(m_imp->*(m_imp->m_getResFuncPtr))(resource, alias, fx, frame, rs, resData);
+	m_imp->run(resource, alias, fx, frame, rs, resData);
 }
 
 //************************************************************************************************
@@ -207,11 +217,6 @@ void TPredictiveCacheManager::Imp::getResourceComputing(
 void TPredictiveCacheManager::onRenderStatusStart(int renderStatus)
 {
 	m_imp->m_renderStatus = renderStatus;
-	switch (renderStatus) {
-	case TRenderer::TESTRUN:
-		m_imp->m_getResFuncPtr = &TPredictiveCacheManager::Imp::getResourceTestRun;
-		CASE TRenderer::COMPUTING : m_imp->m_getResFuncPtr = &TPredictiveCacheManager::Imp::getResourceComputing;
-	}
 }
 
 //---------------------------------------------------------------------------

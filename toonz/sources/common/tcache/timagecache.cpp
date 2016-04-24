@@ -1127,7 +1127,6 @@ TImageCache::~TImageCache()
 {
 	assert(check == magic);
 	check = -1;
-	delete m_imp;
 	CacheInstance = 0;
 }
 

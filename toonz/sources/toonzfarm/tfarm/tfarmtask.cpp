@@ -697,7 +697,6 @@ TFarmTaskGroup::TFarmTaskGroup(const TFarmTaskGroup &src)
 
 TFarmTaskGroup::~TFarmTaskGroup()
 {
-	delete m_imp;
 }
 
 //------------------------------------------------------------------------------

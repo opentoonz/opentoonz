@@ -1,7 +1,7 @@
-
-
 #ifndef TSYSLOG_H
 #define TSYSLOG_H
+
+#include <memory>
 
 #include "tcommon.h"
 class TFilePath;
@@ -39,7 +39,7 @@ public:
 
 private:
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 };
 
 #endif

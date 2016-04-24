@@ -165,7 +165,10 @@ TXsheet::TXsheetImp::~TXsheetImp()
 // TXsheet
 
 TXsheet::TXsheet()
-	: TSmartObject(m_classCode), m_player(0), m_imp(new TXsheet::TXsheetImp), m_notes(new TXshNoteSet())
+	: TSmartObject(m_classCode)
+	, m_player(0)
+	, m_imp(new TXsheet::TXsheetImp)
+	, m_notes(new TXshNoteSet())
 {
 	//extern TSyntax::Grammar *createXsheetGrammar(TXsheet*);
 	m_soundProperties = new TXsheet::SoundProperties();
@@ -181,7 +184,6 @@ TXsheet::~TXsheet()
 	texture_utils::invalidateTextures(this);
 
 	assert(m_imp);
-	delete m_imp;
 	if (m_notes)
 		delete m_notes;
 	if (m_soundProperties)

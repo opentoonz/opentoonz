@@ -1,7 +1,7 @@
-
-
 #ifndef QTOFFLINEGL_H
 #define QTOFFLINEGL_H
+
+#include <memory>
 
 #include <QtOpenGL>
 #include <QGLFormat>
@@ -17,10 +17,10 @@ public:
 	QOpenGLContext *m_oldContext;
 	QOffscreenSurface *m_surface;
 
-	QtOfflineGL(TDimension rasterSize, const TOfflineGL::Imp *shared = 0);
+	QtOfflineGL(TDimension rasterSize, std::shared_ptr<TOfflineGL::Imp> shared);
 	~QtOfflineGL();
 
-	void createContext(TDimension rasterSize, const TOfflineGL::Imp *shared);
+	void createContext(TDimension rasterSize, std::shared_ptr<TOfflineGL::Imp> shared);
 	void makeCurrent();
 	void doneCurrent();
 

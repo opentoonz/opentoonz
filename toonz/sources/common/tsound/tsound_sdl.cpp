@@ -215,7 +215,6 @@ TSoundOutputDevice::~TSoundOutputDevice()
 {
 	stop();
 	close();
-	delete m_imp;
 }
 
 //------------------------------------------------------------------------------

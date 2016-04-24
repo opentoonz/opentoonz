@@ -1,16 +1,13 @@
-
-
 #ifndef DRAWABLEMESHIMAGE_H
 #define DRAWABLEMESHIMAGE_H
+
+#include <memory>
 
 // TnzExt includes
 #include "meshtexturizer.h"
 
 // TnzCore includes
 #include "tgldisplaylistsmanager.h"
-
-// Boost includes
-#include <boost/shared_ptr.hpp>
 
 #undef DVAPI
 #undef DVVAR
@@ -48,7 +45,7 @@ private:
 	DrawableTextureData &operator=(const DrawableTextureData &);
 };
 
-typedef boost::shared_ptr<DrawableTextureData> DrawableTextureDataP;
+typedef std::shared_ptr<DrawableTextureData> DrawableTextureDataP;
 
 //***************************************************************************************
 //    TexturesStorage declaration

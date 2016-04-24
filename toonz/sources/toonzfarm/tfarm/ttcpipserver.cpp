@@ -268,7 +268,6 @@ TTcpIpServer::~TTcpIpServer()
 		std::cout << "closing socket" << std::endl;
 	close(m_imp->m_s);
 #endif
-	delete m_imp;
 }
 
 //---------------------------------------------------------------------
@@ -290,14 +289,13 @@ static void shutdown_cb(int)
 class DataReader : public TThread::Runnable
 {
 public:
-	DataReader(int clientSocket, TTcpIpServer *server, TTcpIpServerImp *serverImp)
-		: m_clientSocket(clientSocket), m_server(server), m_serverImp(serverImp) {}
+	DataReader(int clientSocket, std::shared_ptr<TTcpIpServerImp> serverImp)
+		: m_clientSocket(clientSocket), m_serverImp(std::move(serverImp)) {}
 
 	void run();
 
 	int m_clientSocket;
-	TTcpIpServer *m_server;
-	TTcpIpServerImp *m_serverImp;
+	std::shared_ptr<TTcpIpServerImp> m_serverImp;
 };
 
 void DataReader::run()
@@ -322,15 +320,14 @@ void DataReader::run()
 class DataReceiver : public TThread::Runnable
 {
 public:
-	DataReceiver(int clientSocket, const QString &data, TTcpIpServer *server, TTcpIpServerImp *serverImp)
-		: m_clientSocket(clientSocket), m_data(data), m_server(server), m_serverImp(serverImp) {}
+	DataReceiver(int clientSocket, const QString &data, std::shared_ptr<TTcpIpServerImp> serverImp)
+		: m_clientSocket(clientSocket), m_data(data), m_serverImp(std::move(serverImp)) {}
 
 	void run();
 
 	int m_clientSocket;
 	QString m_data;
-	TTcpIpServer *m_server;
-	TTcpIpServerImp *m_serverImp;
+	std::shared_ptr<TTcpIpServerImp> m_serverImp;
 };
 
 //---------------------------------------------------------------------
@@ -374,7 +371,7 @@ void TTcpIpServer::run()
 					} else {
 						// creo un nuovo thread per la gestione dei dati ricevuti
 						TThread::Executor executor;
-						executor.addTask(new DataReceiver(t, data, this, m_imp));
+						executor.addTask(new DataReceiver(t, data, m_imp));
 					}
 				} else {
 					::shutdown(t, 1);
@@ -413,7 +410,7 @@ void TTcpIpServer::run()
 				}
 
 				TThread::Executor executor;
-				executor.addTask(new DataReader(t, this, m_imp));
+				executor.addTask(new DataReader(t, m_imp));
 			}
 		} else {
 			m_exitCode = err;

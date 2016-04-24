@@ -120,7 +120,6 @@ ShadingContext::ShadingContext()
 
 ShadingContext::~ShadingContext()
 {
-	delete m_imp;
 }
 
 //--------------------------------------------------------

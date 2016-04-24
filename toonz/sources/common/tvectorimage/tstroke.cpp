@@ -1276,7 +1276,7 @@ TStroke::TStroke()
 	p[1] = p[0];
 	p[2] = p[1];
 
-	m_imp = new TStroke::Imp(p);
+	m_imp.reset(new TStroke::Imp(p));
 
 	/*
   // da fissare deve trovarsi prima della init
@@ -1289,32 +1289,30 @@ TStroke::TStroke()
 // Build a stroke from a set of ThickPoint
 TStroke::TStroke(const vector<TThickPoint> &v)
 	: TSmartObject(m_classCode)
+	, m_imp(new TStroke::Imp(v))
 {
-	m_imp = new TStroke::Imp(v);
 }
 
 //-----------------------------------------------------------------------------
 
 TStroke::TStroke(const vector<TPointD> &v)
 	: TSmartObject(m_classCode)
+	, m_imp(new TStroke::Imp(v))
 {
-	m_imp = new TStroke::Imp(v);
 }
 
 //-----------------------------------------------------------------------------
 
 TStroke::~TStroke()
 {
-	delete m_imp;
 }
 
 //-----------------------------------------------------------------------------
 
 TStroke::TStroke(const TStroke &other)
 	: TSmartObject(m_classCode)
+	, m_imp(new TStroke::Imp())
 {
-	m_imp = new TStroke::Imp();
-
 	m_imp->m_bBox = other.getBBox();
 	m_imp->m_isValidLength = other.m_imp->m_isValidLength;
 	m_imp->m_isOutlineValid = other.m_imp->m_isOutlineValid;

@@ -1,7 +1,7 @@
-
-
 #ifndef PREFERENCES_H
 #define PREFERENCES_H
+
+#include <memory>
 
 // TnzCore includes
 #include "tcommon.h"
@@ -16,9 +16,6 @@
 #include <QObject>
 #include <QMap>
 #include <QRegExp>
-
-// boost includes
-#include <boost/scoped_ptr.hpp>
 
 #undef DVAPI
 #undef DVVAR
@@ -431,7 +428,7 @@ public:
 	void startAutoSave();
 
 private:
-	boost::scoped_ptr<QSettings> m_settings;
+	std::unique_ptr<QSettings> m_settings;
 
 	QMap<int, QString> m_languageMaps,
 		m_styleSheetMaps;

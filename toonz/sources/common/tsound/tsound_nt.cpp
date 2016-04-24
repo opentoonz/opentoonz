@@ -647,7 +647,6 @@ TSoundOutputDevice::~TSoundOutputDevice()
 	close();
 	WaitForSingleObject(m_imp->m_closeDevice, INFINITE);
 	CloseHandle(m_imp->m_closeDevice);
-	delete m_imp;
 }
 
 //------------------------------------------------------------------------------
@@ -1111,14 +1110,14 @@ void WinSoundInputDevice::stop()
 class RecordTask : public TThread::Runnable
 {
 public:
-	RecordTask(TSoundInputDeviceImp *dev)
-		: Runnable(), m_dev(dev) {}
+	RecordTask(std::shared_ptr<TSoundInputDeviceImp> dev)
+		: Runnable(), m_dev(std::move(dev)) {}
 
 	~RecordTask() {}
 
 	void run();
 
-	TSoundInputDeviceImp *m_dev;
+	std::shared_ptr<TSoundInputDeviceImp> m_dev;
 };
 
 #endif
@@ -1268,7 +1267,6 @@ TSoundInputDevice::TSoundInputDevice() : m_imp(new TSoundInputDeviceImp())
 
 TSoundInputDevice::~TSoundInputDevice()
 {
-	delete m_imp;
 }
 
 //------------------------------------------------------------------------------

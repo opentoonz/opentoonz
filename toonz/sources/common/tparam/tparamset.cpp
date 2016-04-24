@@ -103,23 +103,22 @@ public:
 
 TParamSet::TParamSet(string name)
 	: TParam(name)
+	, m_imp(new TParamSetImp(this))
 {
-	m_imp = new TParamSetImp(this);
 }
 
 //---------------------------------------------------------
 
 TParamSet::TParamSet(const TParamSet &src)
 	: TParam(src.getName())
+	, m_imp(new TParamSetImp(this))
 {
-	m_imp = new TParamSetImp(this);
 }
 
 //---------------------------------------------------------
 
 TParamSet::~TParamSet()
 {
-	delete m_imp;
 }
 
 //---------------------------------------------------------

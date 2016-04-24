@@ -1320,7 +1320,6 @@ Grammar::Grammar()
 
 Grammar::~Grammar()
 {
-	delete m_imp;
 }
 
 void Grammar::addPattern(Pattern *pattern)

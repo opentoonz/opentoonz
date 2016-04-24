@@ -785,13 +785,12 @@ void UsageImp::resetValues()
 //---------------------------------------------------------
 
 Usage::Usage(string progName)
+	: m_imp(new UsageImp(progName))
 {
-	m_imp = new UsageImp(progName);
 }
 
 Usage::~Usage()
 {
-	delete m_imp;
 }
 
 void Usage::add(const UsageLine &ul)

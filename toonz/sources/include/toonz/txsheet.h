@@ -1,7 +1,7 @@
-
-
 #ifndef XSHEET_INCLUDED
 #define XSHEET_INCLUDED
+
+#include <memory>
 
 // TnzCore includes
 #include "traster.h"
@@ -118,7 +118,7 @@ private:
 	The TXsheetImp struct provides all objects necessary to define the \b TXsheet class.
 */
 	struct TXsheetImp;
-	TXsheetImp *m_imp;
+	std::unique_ptr<TXsheetImp> m_imp;
 	TXshNoteSet *m_notes;
 	SoundProperties *m_soundProperties;
 

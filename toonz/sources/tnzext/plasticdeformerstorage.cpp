@@ -1,4 +1,4 @@
-
+#include <memory>
 
 // TnzExt includes
 #include "ext/plasticskeleton.h"
@@ -10,9 +10,6 @@
 #include <algorithm>
 
 // Boost includes
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/member.hpp>
@@ -42,7 +39,7 @@ struct Key {
 	const TMeshImage *m_mi;
 	DeformedSkeleton m_ds;
 
-	boost::shared_ptr<DataGroup> m_dataGroup;
+	std::shared_ptr<DataGroup> m_dataGroup;
 
 public:
 	Key(const TMeshImage *mi, const SkD *sd, int skelId)
@@ -448,7 +445,6 @@ PlasticDeformerStorage::PlasticDeformerStorage()
 
 PlasticDeformerStorage::~PlasticDeformerStorage()
 {
-	delete m_imp;
 }
 
 //----------------------------------------------------------------------------------
@@ -472,7 +468,7 @@ PlasticDeformerDataGroup *PlasticDeformerStorage::deformerData(
 	DeformersByKey::iterator dt = m_imp->m_deformers.find(key);
 	if (dt == m_imp->m_deformers.end()) {
 		// No deformer was found. Allocate it.
-		key.m_dataGroup = boost::make_shared<PlasticDeformerDataGroup>();
+		key.m_dataGroup = std::make_shared<PlasticDeformerDataGroup>();
 		initializeDeformersData(key.m_dataGroup.get(), meshImage);
 
 		dt = m_imp->m_deformers.insert(key).first;

@@ -1,7 +1,7 @@
-
-
 #ifndef TPREDICTIVECACHEMANAGER_H
 #define TPREDICTIVECACHEMANAGER_H
+
+#include <memory>
 
 #include "tfxcachemanager.h"
 
@@ -35,7 +35,7 @@ class DVAPI TPredictiveCacheManager
 	T_RENDER_RESOURCE_MANAGER
 
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 public:
 	TPredictiveCacheManager();

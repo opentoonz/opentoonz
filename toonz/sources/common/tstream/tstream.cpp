@@ -257,8 +257,8 @@ TOStream::TOStream(const TFilePath &fp, bool compressed)
 
 //---------------------------------------------------------------
 
-TOStream::TOStream(Imp *imp)
-	: m_imp(imp)
+TOStream::TOStream(std::shared_ptr<Imp> imp)
+	: m_imp(std::move(imp))
 {
 	assert(!imp->m_tagStack.empty());
 	ostream &os = *m_imp->m_os;
@@ -315,7 +315,6 @@ TOStream::~TOStream()
 			}
 			if (m_imp->m_chanOwner)
 				delete m_imp->m_os;
-			delete m_imp;
 		}
 	} catch (...) {
 	}
@@ -498,12 +497,11 @@ TOStream::operator bool() const
 }
 
 //---------------------------------------------------------------
-
-TOStream TOStream::child(string tagName)
+TOStream &TOStream::child(string tagName)
 {
 	assert(tagName != "");
 	m_imp->m_tagStack.push_back(tagName);
-	return TOStream(m_imp);
+	return *this;
 }
 
 //---------------------------------------------------------------
@@ -982,7 +980,6 @@ TIStream::~TIStream()
 {
 	if (m_imp->m_chanOwner)
 		delete m_imp->m_is;
-	delete m_imp;
 }
 
 //---------------------------------------------------------------

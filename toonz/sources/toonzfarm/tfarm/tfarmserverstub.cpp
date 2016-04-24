@@ -106,7 +106,6 @@ TFarmServerStub::TFarmServerStub(TFarmServer *farmServer, int port)
 
 TFarmServerStub::~TFarmServerStub()
 {
-	delete m_imp;
 }
 
 //------------------------------------------------------------------------------

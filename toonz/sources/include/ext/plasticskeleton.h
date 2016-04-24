@@ -1,7 +1,7 @@
-
-
 #ifndef PLASTICSKELETON_H
 #define PLASTICSKELETON_H
+
+#include <memory>
 
 // TnzCore includes
 #include "tsmartpointer.h"
@@ -102,7 +102,7 @@ class DVAPI PlasticSkeleton : public TSmartObject, public tcg::Mesh<PlasticSkele
 
 private:
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 public:
 	typedef tcg::Mesh<PlasticSkeletonVertex, tcg::Edge, tcg::FaceN<3>> mesh_type;
@@ -139,13 +139,9 @@ public:
 	std::vector<PlasticHandle> verticesToHandles() const;
 
 public:
-// RValues-related functions
-#ifndef BOOST_NO_RVALUE_REFERENCES
-
+	// RValues-related functions
 	PlasticSkeleton(PlasticSkeleton &&other);
 	PlasticSkeleton &operator=(PlasticSkeleton &&other);
-
-#endif
 
 private:
 	friend class PlasticSkeletonDeformation; // Skeleton deformations can register to be notified

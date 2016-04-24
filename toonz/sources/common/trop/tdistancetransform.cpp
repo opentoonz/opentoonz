@@ -1,12 +1,9 @@
-
+#include <memory>
 
 #include "tropcm.h"
 
 // TnzCore includes
 #include "traster.h"
-
-// boost includes
-#include <boost/scoped_array.hpp>
 
 // STD includes
 #include <limits>
@@ -113,7 +110,7 @@ void expand(int lineLength, int linesCount,
 	// Allocate a buffer equivalent to a dt line. It will store the original
 	// dt values. Final dt values will be written directly on the dt raster.
 	// This is necessary since read and write intervals overlap.
-	boost::scoped_array<unsigned int> dtOriginalLine(new unsigned int[lineLength]);
+	std::unique_ptr<unsigned[]> dtOriginalLine(new unsigned[lineLength]);
 
 	unsigned int *odtLineStart = dtOriginalLine.get(),
 				 *odtLineEnd = odtLineStart + lineLength;

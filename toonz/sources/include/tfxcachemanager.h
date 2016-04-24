@@ -1,7 +1,7 @@
-
-
 #ifndef TFXCACHEMANAGER_H
 #define TFXCACHEMANAGER_H
+
+#include <memory>
 
 #include "trenderresourcemanager.h"
 #include "tcacheresource.h"
@@ -182,7 +182,7 @@ private:
 	std::set<std::string> m_staticCacheIds;
 
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 public:
 	TFxCacheManager();

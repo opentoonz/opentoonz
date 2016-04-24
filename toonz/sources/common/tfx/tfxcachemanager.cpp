@@ -162,8 +162,6 @@ TFxCacheManager::~TFxCacheManager()
 	std::set<std::string>::iterator it;
 	for (it = m_staticCacheIds.begin(); it != m_staticCacheIds.end(); ++it)
 		TImageCache::instance()->remove(*it);
-
-	delete m_imp;
 }
 
 //-----------------------------------------------------------------------------------

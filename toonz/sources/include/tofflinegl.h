@@ -1,10 +1,8 @@
-
-
 #ifndef TOFFLINEGL_INCLUDED
 #define TOFFLINEGL_INCLUDED
 
-//#include "trasterimage.h"
-//#include "tvectorimage.h"
+#include <memory>
+
 #include "tgl.h"
 
 #undef DVAPI
@@ -47,12 +45,12 @@ public:
 		virtual ~Imp(){};
 		virtual void makeCurrent() = 0;
 		virtual void doneCurrent() = 0; // Da implementare in Imp
-		virtual void createContext(TDimension rasterSize, const TOfflineGL::Imp *shared) = 0;
+		virtual void createContext(TDimension rasterSize, std::shared_ptr<Imp> shared) = 0;
 		virtual void getRaster(TRaster32P) = 0;
 		virtual int getLx() const { return m_lx; }
 		virtual int getLy() const { return m_ly; }
 	};
-	typedef Imp *ImpGenerator(const TDimension &dim, const TOfflineGL::Imp *shared);
+	typedef std::shared_ptr<Imp> ImpGenerator(const TDimension &dim, std::shared_ptr<Imp> shared);
 	static ImpGenerator *defineImpGenerator(ImpGenerator *impGenerator);
 
 	TOfflineGL(TDimension dim, const TOfflineGL *shared = 0);
@@ -87,7 +85,7 @@ public:
 	static TOfflineGL *getStock(TDimension dim);
 	// si usa cosi': TOfflineGL *ogl = TOfflineGL::getStock(d);
 	// non bisogna liberare ogl
-	Imp *m_imp;
+	std::shared_ptr<Imp> m_imp;
 
 private:
 private:

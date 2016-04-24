@@ -1,7 +1,7 @@
-
-
 #ifndef TFARMTASK_H
 #define TFARMTASK_H
+
+#include <memory>
 
 #include <QDateTime>
 #include "tpersist.h"
@@ -196,7 +196,7 @@ public:
 
 private:
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 };
 
 #endif

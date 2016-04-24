@@ -1,7 +1,7 @@
-
-
 #ifndef TDOUBLEPARAM_H
 #define TDOUBLEPARAM_H
+
+#include <memory>
 
 // TnzCore includes
 #include "tgeometry.h"
@@ -55,7 +55,7 @@ class DVAPI TDoubleParam : public TParam
 	PERSIST_DECLARATION(TDoubleParam)
 
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 public:
 	TDoubleParam(double v = 0.0);

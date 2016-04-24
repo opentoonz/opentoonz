@@ -92,7 +92,6 @@ Parser::Parser(const Grammar *grammar)
 
 Parser::~Parser()
 {
-	delete m_imp;
 }
 
 //-------------------------------------------------------------------

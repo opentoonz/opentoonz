@@ -1,7 +1,7 @@
-
-
 #ifndef STROKE_SELECTION_H
 #define STROKE_SELECTION_H
+
+#include <memory>
 
 // TnzQt includes
 #include "toonzqt/selection.h"
@@ -9,9 +9,6 @@
 // TnzCore includes
 #include "tcommon.h"
 #include "tvectorimage.h"
-
-// boost includes
-#include <boost/scoped_ptr.hpp>
 
 // STD includes
 #include <set>
@@ -88,7 +85,7 @@ private:
 	TVectorImageP m_vi;			//!< Selected vector image.
 	IndexesContainer m_indexes; //!< Selected stroke indexes in m_vi.
 
-	boost::scoped_ptr<TGroupCommand> m_groupCommand; //!< Groups commands wrapper.
+	std::unique_ptr<TGroupCommand> m_groupCommand; //!< Groups commands wrapper.
 	TSceneHandle *m_sceneHandle;					 //!< Global scene handle. \deprecated  Use TApplication instead.
 
 	/*!Set this boolean to true before call tool->notifyImageChanged() when you want to reset strokes bbox.

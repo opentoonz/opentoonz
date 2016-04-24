@@ -1,7 +1,7 @@
-
-
 #ifndef TSMARTPOINTER_INCLUDED
 #define TSMARTPOINTER_INCLUDED
+
+#include <memory>
 
 #include "tutil.h"
 #include "tatomicvar.h"
@@ -115,7 +115,7 @@ class DVAPI TSmartPointerT
 {
 
 protected:
-	T *m_pointer;
+	T* m_pointer;
 
 public:
 	TSmartPointerT() : m_pointer(0) {}
@@ -126,7 +126,7 @@ public:
 			m_pointer->addRef();
 	}
 
-	TSmartPointerT(T *pointer) : m_pointer(pointer)
+	TSmartPointerT(T* pointer) : m_pointer(pointer)
 	{
 		if (m_pointer)
 			m_pointer->addRef();

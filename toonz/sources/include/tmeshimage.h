@@ -1,7 +1,7 @@
-
-
 #ifndef TMESHIMAGE_INCLUDED
 #define TMESHIMAGE_INCLUDED
+
+#include <memory>
 
 // TnzCore includes
 #include "tsmartpointer.h"
@@ -172,14 +172,14 @@ struct graph_traits<TTextureMesh>
 class DVAPI TMeshImage : public TImage
 {
 	class Imp;
-	Imp *m_imp;
+	std::shared_ptr<Imp> m_imp;
 
 public:
 	typedef std::vector<TTextureMeshP> meshes_container;
 
 public:
 	TMeshImage();
-	TMeshImage(Imp *imp);
+	TMeshImage(std::shared_ptr<Imp> imp);
 	~TMeshImage();
 
 	TMeshImage(const TMeshImage &other);

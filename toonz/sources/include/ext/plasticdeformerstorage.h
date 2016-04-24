@@ -1,7 +1,7 @@
-
-
 #ifndef PLASTIDEFORMERSTORAGE_H
 #define PLASTIDEFORMERSTORAGE_H
+
+#include <memory>
 
 // TnzExt includes
 #include "ext/plasticdeformer.h"
@@ -158,7 +158,7 @@ private:
 class DVAPI PlasticDeformerStorage
 {
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 public:
 	enum DataType {
