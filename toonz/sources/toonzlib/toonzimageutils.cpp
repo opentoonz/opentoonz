@@ -344,9 +344,9 @@ TRect ToonzImageUtils::eraseRect(const TToonzImageP &ti, const TRectD &area, int
 
 //-------------------------------------------------------------------
 
-vector<TRect> ToonzImageUtils::paste(const TToonzImageP &ti, const TTileSetCM32 *tileSet)
+std::vector<TRect> ToonzImageUtils::paste(const TToonzImageP &ti, const TTileSetCM32 *tileSet)
 {
-	vector<TRect> rects;
+	std::vector<TRect> rects;
 	TRasterCM32P raster = ti->getRaster();
 	//for(int i=0;i<tileSet->getTileCount();i++)
 	for (int i = tileSet->getTileCount() - 1; i >= 0; i--) {
@@ -378,7 +378,7 @@ vector<TRect> ToonzImageUtils::paste(const TToonzImageP &ti, const TTileSetCM32 
 TToonzImageP ToonzImageUtils::vectorToToonzImage(
 	const TVectorImageP &vimage, const TAffine &aff, TPalette *palette,
 	const TPointD &outputPos, const TDimension &outputSize,
-	const vector<TRasterFxRenderDataP> *fxs, bool transformThickness)
+	const std::vector<TRasterFxRenderDataP> *fxs, bool transformThickness)
 {
 	if (!vimage || !palette)
 		return 0;
@@ -397,8 +397,8 @@ TToonzImageP ToonzImageUtils::vectorToToonzImage(
 	vi->transform(TTranslation(-outputPos));
 
 	int strokeCount = vi->getStrokeCount();
-	vector<int> strokeIndex(strokeCount);
-	vector<TStroke *> strokes(strokeCount);
+	std::vector<int> strokeIndex(strokeCount);
+	std::vector<TStroke *> strokes(strokeCount);
 	int maxStyleId = palette->getStyleCount() - 1;
 
 	int i;
@@ -417,8 +417,8 @@ TToonzImageP ToonzImageUtils::vectorToToonzImage(
 		for (i = 0; i < (int)fxs->size(); i++) {
 			SandorFxRenderData *sandorData = dynamic_cast<SandorFxRenderData *>((*fxs)[i].getPointer());
 			if (sandorData && sandorData->m_type == BlendTz) {
-				string indexes = toString(sandorData->m_blendParams.m_colorIndex);
-				vector<string> items;
+				std::string indexes = toString(sandorData->m_blendParams.m_colorIndex);
+				std::vector<std::string> items;
 				parseIndexes(indexes, items);
 				PaletteFilterFxRenderData paletteFilterData;
 				insertIndexes(items, &paletteFilterData);
@@ -484,8 +484,8 @@ TPalette *ToonzImageUtils::loadTzPalette(const TFilePath &pltFile)
 	if (!rasPlt)
 		return 0;
 
-	map<int, pair<string, string>> pltColorNames;
-	map<int, pair<string, string>>::iterator it;
+	std::map<int, std::pair<std::string, std::string>> pltColorNames;
+	std::map<int, std::pair<std::string, std::string>>::iterator it;
 	loader.getTzpPaletteColorNames(pltColorNames);
 
 	TPalette *palette = new TPalette();
@@ -501,7 +501,7 @@ TPalette *ToonzImageUtils::loadTzPalette(const TFilePath &pltFile)
 	for (; x < rasPlt->getLx(); ++x) {
 		TSolidColorStyle *style = new TSolidColorStyle(pixelRow[x]);
 		if ((it = pltColorNames.find(x)) != pltColorNames.end()) {
-			string styleName = it->second.second;
+			std::string styleName = it->second.second;
 			style->setName(toWideString(styleName));
 		}
 		if (x < count)
@@ -518,13 +518,13 @@ TPalette *ToonzImageUtils::loadTzPalette(const TFilePath &pltFile)
 	// tolgo quest'ultimo
 	page->removeStyle(1);
 	// aggiungo gli altri
-	map<wstring, int> pages;
-	map<wstring, int>::iterator itpage;
+	std::map<std::wstring, int> pages;
+	std::map<std::wstring, int>::iterator itpage;
 
 	pixelRow = rasPlt->pixels(1);
 	for (x = 0; x < rasPlt->getLx(); ++x) {
 		if ((it = pltColorNames.find(x)) != pltColorNames.end()) {
-			wstring pageName;
+			std::wstring pageName;
 			pageName = toWideString(it->second.first);
 			if (x == 0) {
 				page = palette->getPage(0);
@@ -749,7 +749,7 @@ void ToonzImageUtils::eraseImage(const TToonzImageP &ti, const TRaster32P &image
 
 //-----------------------------------------------------------------------
 
-string ToonzImageUtils::premultiply(const TFilePath &levelPath)
+std::string ToonzImageUtils::premultiply(const TFilePath &levelPath)
 {
 	assert(0);
 	/*

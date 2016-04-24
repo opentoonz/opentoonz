@@ -92,8 +92,8 @@ namespace
 {
 //=============================================================================
 
-const string layoutsFileName = "layouts.txt";
-const string currentRoomFileName = "currentRoom.txt";
+const std::string layoutsFileName = "layouts.txt";
+const std::string currentRoomFileName = "currentRoom.txt";
 bool scrambledRooms = false;
 
 //=============================================================================
@@ -108,7 +108,7 @@ bool readRoomList(std::vector<TFilePath> &roomPaths,
 	if (!argumentLayoutFileName.isEmpty()) {
 		fp = ToonzFolder::getModuleFile(argumentLayoutFileName.toStdString());
 		if (!TFileStatus(fp).doesExist()) {
-			MsgBox(WARNING, "Room layout file " + argumentLayoutFileName + " not found!");
+			DVGui::warning("Room layout file " + argumentLayoutFileName + " not found!");
 			fp = ToonzFolder::getModuleFile(layoutsFileName);
 			if (!TFileStatus(fp).doesExist())
 				return false;
@@ -176,6 +176,7 @@ void makePrivate(Room *room)
 {
 	TFilePath layoutDir = ToonzFolder::getMyModuleDir();
 	TFilePath roomPath = room->getPath();
+	std::string mbSrcFileName = roomPath.getName() + "_menubar.xml";
 	if (roomPath == TFilePath() || roomPath.getParentDir() != layoutDir) {
 		int count = 1;
 		for (;;) {
@@ -186,6 +187,23 @@ void makePrivate(Room *room)
 		room->setPath(roomPath);
 		TSystem::touchParentDir(roomPath);
 		room->save();
+	}
+	/*- create private menubar settings if not exists -*/
+	std::string mbDstFileName = roomPath.getName() + "_menubar.xml";
+	TFilePath myMBPath = layoutDir + mbDstFileName;
+	if (!TFileStatus(myMBPath).isReadable())
+	{
+		TFilePath templateRoomMBPath = ToonzFolder::getTemplateModuleDir() + mbSrcFileName;
+		if (TFileStatus(templateRoomMBPath).doesExist())
+			TSystem::copyFile(myMBPath, templateRoomMBPath);
+		else
+		{
+			TFilePath templateFullMBPath = ToonzFolder::getTemplateModuleDir() + "menubar_template.xml";
+			if (TFileStatus(templateFullMBPath).doesExist())
+				TSystem::copyFile(myMBPath, templateFullMBPath);
+			else
+				DVGui::warning(QObject::tr("Cannot open menubar settings template file. Re-installing Toonz will solve this problem."));
+		}
 	}
 }
 
@@ -370,10 +388,10 @@ MainWindow::MainWindow(const QString &argumentLayoutFileName, QWidget *parent, Q
 	changeWindowTitle();
 
 	//Connetto i comandi che sono in RoomTabWidget
-	//connect(roomTabWidget, SIGNAL(indexSwapped(int , int )), SLOT(onIndexSwapped(int ,int )));
-	//connect(roomTabWidget, SIGNAL(insertNewTabRoom()), SLOT(insertNewRoom()));
-	//connect(roomTabWidget, SIGNAL(deleteTabRoom(int)), SLOT(deleteRoom(int)));
-	//connect(roomTabWidget, SIGNAL(renameTabRoom(int, const QString)), SLOT(renameRoom(int, const QString)));
+	connect(roomTabWidget, SIGNAL(indexSwapped(int , int )), SLOT(onIndexSwapped(int ,int )));
+	connect(roomTabWidget, SIGNAL(insertNewTabRoom()), SLOT(insertNewRoom()));
+	connect(roomTabWidget, SIGNAL(deleteTabRoom(int)), SLOT(deleteRoom(int)));
+	connect(roomTabWidget, SIGNAL(renameTabRoom(int, const QString)), SLOT(renameRoom(int, const QString)));
 
 	setCommandHandler("MI_Quit", this, &MainWindow::onQuit);
 	setCommandHandler("MI_Undo", this, &MainWindow::onUndo);
@@ -518,7 +536,9 @@ void MainWindow::readSettings(const QString &argumentLayoutFileName)
 			m_stackedWidget->addWidget(room);
 			roomTabWidget->addTab(room->getName());
 
-			stackedMenuBar->createMenuBarByName(room->getName());
+			/*- ここでMenuBarファイルをロードする -*/
+			std::string mbFileName = roomPath.getName() + "_menubar.xml";
+			stackedMenuBar->loadAndAddMenubar(ToonzFolder::getModuleFile(mbFileName));
 
 			//room->setDockOptions(QMainWindow::DockOptions(
 			//  (QMainWindow::AnimatedDocks | QMainWindow::AllowNestedDocks) & ~QMainWindow::AllowTabbedDocks));
@@ -529,6 +549,7 @@ void MainWindow::readSettings(const QString &argumentLayoutFileName)
 	//Read the flipbook history
 	FlipBookPool::instance()->load(ToonzFolder::getMyModuleDir() + TFilePath("fliphistory.ini"));
 
+	/*- レイアウト設定ファイルが見つからなかった場合、初期Roomの生成 -*/
 	//Se leggendo i settings non ho inizializzato le stanze lo faccio ora.
 	// Puo' accadere se si buttano i file di inizializzazione.
 	if (rooms.empty()) {
@@ -567,15 +588,16 @@ void MainWindow::readSettings(const QString &argumentLayoutFileName)
 		m_stackedWidget->addWidget(browserRoom);
 		rooms.push_back(browserRoom);
 		stackedMenuBar->createMenuBarByName(browserRoom->getName());
-
-		makePrivate(rooms);
-		writeRoomList(rooms);
 	}
 
+	/*- If the layout files were loaded from template, then save them as private ones -*/
+	makePrivate(rooms);
+	writeRoomList(rooms);
+	
 	// Imposto la stanza corrente
 	fp = ToonzFolder::getModuleFile(currentRoomFileName);
 	Tifstream is(fp);
-	string currentRoomName;
+	std::string currentRoomName;
 	is >> currentRoomName;
 	if (currentRoomName != "") {
 		int count = m_stackedWidget->count();
@@ -651,6 +673,7 @@ void MainWindow::writeSettings()
 		rooms.push_back(room);
 		room->save();
 	}
+	writeRoomList(rooms);
 
 	//Current room settings
 	Tofstream os(ToonzFolder::getMyModuleDir() + currentRoomFileName);
@@ -1050,7 +1073,7 @@ void MainWindow::resetRoomsLayout()
 		}
 	}
 
-	MsgBox(INFORMATION, QObject::tr("The rooms will be reset the next time you run Toonz."));
+	DVGui::info(QObject::tr("The rooms will be reset the next time you run Toonz."));
 }
 
 //-----------------------------------------------------------------------------
@@ -1122,6 +1145,11 @@ void MainWindow::deleteRoom(int index)
 		m_topBar->getRoomTabWidget()->insertTab(index, room->getName());
 		return;
 	}
+
+	/*- delete menubar settings file as well -*/
+	std::string mbFileName = fp.getName() + "_menubar.xml";
+	TFilePath mbFp = fp.getParentDir() + mbFileName;
+	TSystem::deleteFile(mbFp);
 
 	//The old room index must be updated if index < of it
 	if (index < m_oldRoomIndex)
@@ -1269,7 +1297,7 @@ void MainWindow::onUpdateCheckerDone(bool error)
 				std::vector<QString> buttons;
 				buttons.push_back(QString(tr("Visit Web Site")));
 				buttons.push_back(QString(tr("Cancel")));
-				int ret = MsgBox(INFORMATION, QObject::tr("An update is available for this software.\nVisit the Web site for more information."), buttons);
+				int ret = DVGui::MsgBox(DVGui::INFORMATION, QObject::tr("An update is available for this software.\nVisit the Web site for more information."), buttons);
 				if (ret == 1)
 					QDesktopServices::openUrl(webPageUrl);
 
@@ -1296,8 +1324,7 @@ void MainWindow::onLicenseCheckerDone(bool error)
 {
 	if (!error) {
 		if (!m_licenseChecker->isLicenseValid()) {
-			MsgBox(CRITICAL,
-				   QObject::tr("The license validation process was not able to confirm the right to use this software on this computer.\n Please contact [ support@toonz.com ] for assistance."));
+			DVGui::error(QObject::tr("The license validation process was not able to confirm the right to use this software on this computer.\n Please contact [ support@toonz.com ] for assistance."));
 			qApp->exit(0);
 		}
 	}
@@ -1322,7 +1349,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 #ifdef BRAVODEMO
 	QString question;
 	question = "Quit: are you sure you want to quit?";
-	int ret = MsgBox(question, QObject::tr("Quit"), QObject::tr("Cancel"), 0);
+	int ret = DVGui::MsgBox(question, QObject::tr("Quit"), QObject::tr("Cancel"), 0);
 	if (ret == 0 || ret == 2) {
 		event->ignore();
 		return;

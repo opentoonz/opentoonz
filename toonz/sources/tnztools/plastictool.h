@@ -188,7 +188,7 @@ public:
 
 	void reset();
 
-	bool onPropertyChanged(string propertyName);
+	bool onPropertyChanged(std::string propertyName);
 
 public:
 	// Methods reimplemented in each interaction mode

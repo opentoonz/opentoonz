@@ -74,7 +74,7 @@ public:
 	{
 	}
 
-	void run(TCacheResourceP &resource, const string &alias,
+	void run(TCacheResourceP &resource, const std::string &alias,
 		const TFxP &fx, double frame, const TRenderSettings &rs,
 		ResourceDeclaration *resData)
 	{
@@ -91,12 +91,12 @@ public:
 
 private:
 	void getResourceTestRun(
-		TCacheResourceP &resource, const string &alias,
+		TCacheResourceP &resource, const std::string &alias,
 		const TFxP &fx, double frame, const TRenderSettings &rs,
 		ResourceDeclaration *resData);
 
 	void getResourceComputing(
-		TCacheResourceP &resource, const string &alias,
+		TCacheResourceP &resource, const std::string &alias,
 		const TFxP &fx, double frame, const TRenderSettings &rs,
 		ResourceDeclaration *resData);
 };
@@ -131,7 +131,7 @@ void TPredictiveCacheManager::setBPP(int bpp)
 //---------------------------------------------------------------------------
 
 void TPredictiveCacheManager::getResource(
-	TCacheResourceP &resource, const string &alias,
+	TCacheResourceP &resource, const std::string &alias,
 	const TFxP &fx, double frame, const TRenderSettings &rs,
 	ResourceDeclaration *resData)
 {
@@ -146,7 +146,7 @@ void TPredictiveCacheManager::getResource(
 //************************************************************************************************
 
 void TPredictiveCacheManager::Imp::getResourceTestRun(
-	TCacheResourceP &resource, const string &alias,
+	TCacheResourceP &resource, const std::string &alias,
 	const TFxP &fx, double frame, const TRenderSettings &rs,
 	ResourceDeclaration *resData)
 {
@@ -180,7 +180,7 @@ void TPredictiveCacheManager::Imp::getResourceTestRun(
 //---------------------------------------------------------------------------
 
 void TPredictiveCacheManager::Imp::getResourceComputing(
-	TCacheResourceP &resource, const string &alias,
+	TCacheResourceP &resource, const std::string &alias,
 	const TFxP &fx, double frame, const TRenderSettings &rs,
 	ResourceDeclaration *resData)
 {

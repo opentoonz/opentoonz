@@ -1,7 +1,8 @@
-
-
 #ifndef PERLINNOISE_H
 #define PERLINOISE_H
+
+#include <memory>
+
 #include "tfxparam.h"
 #include "tspectrumparam.h"
 
@@ -17,12 +18,11 @@ class PerlinNoise
 	static int TimeSize;
 	static int Offset;
 	static double Pixel_size;
-	float *Noise;
+	std::unique_ptr<float[]> Noise;
 	double LinearNoise(double x, double y, double t);
 
 public:
 	PerlinNoise();
-	~PerlinNoise() { delete[] Noise; };
 	double Turbolence(double u, double v, double k, double grain);
 	double Turbolence(double u, double v, double k, double grain, double min, double max);
 	double Marble(double u, double v, double k, double grain);

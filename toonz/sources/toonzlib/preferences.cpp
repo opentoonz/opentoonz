@@ -845,7 +845,7 @@ void Preferences::setViewValues(int shrink, int step)
 
 //-----------------------------------------------------------------
 
-void setCurrentUnits(string measureName, string units)
+void setCurrentUnits(std::string measureName, std::string units)
 {
 	TMeasure *m = TMeasureManager::instance()->get(measureName);
 	if (!m)
@@ -858,7 +858,7 @@ void setCurrentUnits(string measureName, string units)
 
 //-----------------------------------------------------------------
 
-void Preferences::setUnits(string units)
+void Preferences::setUnits(std::string units)
 {
 	m_units = QString::fromStdString(units);
 	m_settings->setValue("linearUnits", m_units);
@@ -873,7 +873,7 @@ void Preferences::setUnits(string units)
 
 //-----------------------------------------------------------------
 
-void Preferences::setCameraUnits(string units)
+void Preferences::setCameraUnits(std::string units)
 {
 	m_cameraUnits = QString::fromStdString(units);
 	m_settings->setValue("cameraUnits", m_cameraUnits);
@@ -882,7 +882,7 @@ void Preferences::setCameraUnits(string units)
 }
 //-----------------------------------------------------------------
 
-void Preferences::setScanLevelType(string type)
+void Preferences::setScanLevelType(std::string type)
 {
 	m_scanLevelType = QString::fromStdString(type);
 	m_settings->setValue("scanLevelType", m_scanLevelType);

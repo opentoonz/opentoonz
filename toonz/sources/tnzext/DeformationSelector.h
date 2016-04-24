@@ -22,7 +22,7 @@ namespace ToonzExt
 class DeformationSelector
 {
 	typedef std::pair<StrokeDeformationImpl *, int> Deformation;
-	vector<Deformation> ref_;
+	std::vector<Deformation> ref_;
 
 	DeformationSelector();
 	DeformationSelector(const DeformationSelector &);

@@ -25,7 +25,7 @@ DEFINE_CLASS_CODE(TLevelWriter, 9)
 typedef std::pair<QString, int> LevelReaderKey;
 std::map<LevelReaderKey, TLevelReaderCreateProc *> LevelReaderTable;
 std::map<QString, std::pair<TLevelWriterCreateProc *, bool>> LevelWriterTable;
-//std::map<string, TLevelReaderWriterCreateProc*> LevelReaderWriterTable;
+//std::map<std::string, TLevelReaderWriterCreateProc*> LevelReaderWriterTable;
 
 //-----------------------------------------------------------
 

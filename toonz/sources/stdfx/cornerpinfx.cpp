@@ -374,8 +374,8 @@ void CornerPinFx::doDryCompute(TRectD &rect, double frame, const TRenderSettings
 	if (!m_input.isConnected())
 		return;
 
-	vector<string> items;
-	string indexes = toString(m_string->getValue());
+	std::vector<std::string> items;
+	std::string indexes = toString(m_string->getValue());
 	parseIndexes(indexes, items);
 	TRenderSettings ri2(ri);
 	PaletteFilterFxRenderData *PaletteFilterData = new PaletteFilterFxRenderData;
@@ -430,8 +430,8 @@ void CornerPinFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri
 	TTile invertMaskTile;
 
 	//carico il vettore items con gli indici dei colori
-	vector<string> items;
-	string indexes = toString(m_string->getValue());
+	std::vector<std::string> items;
+	std::string indexes = toString(m_string->getValue());
 	parseIndexes(indexes, items);
 
 	//genero il tile il cui raster contiene l'immagine in input a cui sono stati tolti i pixel

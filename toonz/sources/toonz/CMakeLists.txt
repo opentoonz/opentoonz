@@ -72,6 +72,7 @@ set(MOC_HEADERS
     mainwindow.h
     matchline.h
     menubar.h
+	menubarpopup.h
     menubarcommandids.h
     meshifypopup.h
     messagepanel.h
@@ -159,6 +160,7 @@ set(SOURCES
     mainwindow.cpp
     matchline.cpp
     menubar.cpp
+	menubarpopup.cpp
     mergecolumns.cpp
     moviegenerator.cpp
     pane.cpp
@@ -361,10 +363,7 @@ elseif(APPLE)
     _find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase;toonzlib;colorfx;tnzext;image;sound;toonzqt;tnztools")
 
     # 変なところにライブラリ生成するカスども
-    get_target_property(TNZSTDFX_Location tnzstdfx LOCATION)
-    get_target_property(TFARM_Location tfarm LOCATION)
-
-    set(EXTRA_LIBS ${EXTRA_LIBS} ${TNZSTDFX_Location} ${TFARM_Location})
+    set(EXTRA_LIBS ${EXTRA_LIBS} "$<TARGET_FILE:tnzstdfx>" "$<TARGET_FILE:tfarm>")
 
     target_link_libraries(OpenToonz_${VERSION} Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml Qt5::Script Qt5::Widgets Qt5::PrintSupport ${GL_LIB} ${GLUT_LIB} ${COCOA_LIB} ${EXTRA_LIBS})
 elseif(UNIX)
@@ -389,7 +388,7 @@ if (APPLE)
 endif()
 
 # copy utilty executables onto the directory after build
-if(LZODRIVER-FOUND)
+if(LZODRIVER_FOUND)
     add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:lzocompress> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DEPENDS lzocompress)
     add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:lzodecompress> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DEPENDS lzodecompress)
 endif()

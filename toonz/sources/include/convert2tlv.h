@@ -27,7 +27,7 @@ private:
 	TLevelReaderP m_lr1;
 	TLevelReaderP m_lr2;
 	TLevelWriterP m_lw;
-	map<TPixel, int> m_colorMap;
+	std::map<TPixel, int> m_colorMap;
 	TDimension m_size;
 	int m_count;
 	int m_from, m_to;
@@ -42,7 +42,7 @@ private:
 	void buildToonzRaster(TRasterCM32P &rout, const TRasterP &rin1, const TRasterP &rin2);
 	void doFill(TRasterCM32P &rout, const TRaster32P &rin);
 	void buildInksFromGrayTones(TRasterCM32P &rout, const TRasterP &rin);
-	map<TPixel, int>::const_iterator findNearestColor(const TPixel &color);
+	std::map<TPixel, int>::const_iterator findNearestColor(const TPixel &color);
 	void buildInks(TRasterCM32P &rout, const TRaster32P &rin);
 	TPalette *buildPalette();
 	void removeAntialias(TRasterCM32P &r);
@@ -62,10 +62,10 @@ public:
 				int from, int to, bool doAutoclose, const TFilePath &palettePath, int colorTolerance,
 				int antialiasType, int antialiasValue, bool isUnpaintedFromNAA);
 
-	bool init(string &errorMessage);
+	bool init(std::string &errorMessage);
 	int getFramesToConvertCount();
 	bool abort();
-	bool convertNext(string &errorMessage);
+	bool convertNext(std::string &errorMessage);
 };
 
 // gmt, 3/1/2013; making raster>toonzraster conversion available to scripts

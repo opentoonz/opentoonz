@@ -1,7 +1,7 @@
-
-
 #ifndef TTIO_PLI_INCLUDED
 #define TTIO_PLI_INCLUDED
+
+#include <memory>
 
 #include "tlevel_io.h"
 
@@ -16,7 +16,7 @@ class TWriterInfoPli : public TWriterInfo {
 
 public:
  ~TWriterInfoPli() {}
-  static TWriterInfo *create(const string &ext) { return new TWriterInfoPli(); }
+  static TWriterInfo *create(const std::string &ext) { return new TWriterInfoPli(); }
   TWriterInfo *clone() const {
   return new TWriterInfoPli(*this); }
 
@@ -33,13 +33,13 @@ private:
 class TLevelWriterPli : public TLevelWriter
 {
 	//! object to manage a pli
-	ParsedPli *m_pli;
+	std::unique_ptr<ParsedPli> m_pli;
 
 	//! number of frame in pli
 	UINT m_frameNumber;
 
 	//  vettore da utilizzare per il calcolo della palette
-	vector<TPixel> m_colorArray;
+	std::vector<TPixel> m_colorArray;
 
 public:
 	TLevelWriterPli(const TFilePath &path, TPropertyGroup *winfo);

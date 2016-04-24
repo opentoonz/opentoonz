@@ -23,7 +23,7 @@
 #include <string>
 using namespace std;
 
-#ifndef WIN32
+#ifndef _WIN32
 #include <sys/param.h>
 #include <unistd.h>
 #include <sys/timeb.h>
@@ -39,14 +39,14 @@ int inline STRICMP(const char *a, const char *b)
 	return str.compare(QString(b), Qt::CaseSensitive);
 }
 /*
-#ifdef WIN32
+#ifdef _WIN32
 #define STRICMP stricmp
 #else
 #define STRICMP strcasecmp
 #endif
 */
 
-#ifndef WIN32
+#ifndef _WIN32
 #define NO_ERROR 0
 #endif
 
@@ -59,7 +59,7 @@ TFilePath getGlobalRoot()
 {
 	TFilePath rootDir;
 
-#ifdef WIN32
+#ifdef _WIN32
 	TFilePath name(L"SOFTWARE\\OpenToonz\\OpenToonz\\1.0\\FARMROOT");
 	rootDir = TFilePath(TSystem::getSystemValue(name).toStdString());
 #else
@@ -94,7 +94,7 @@ TFilePath getLocalRoot()
 {
 	TFilePath lroot;
 
-#ifdef WIN32
+#ifdef _WIN32
 	TFilePath name(L"SOFTWARE\\OpenToonz\\OpenToonz\\1.0\\TOONZROOT");
 	lroot = TFilePath(TSystem::getSystemValue(name).toStdString()) + TFilePath("toonzfarm");
 #else
@@ -132,7 +132,7 @@ TFilePath getLocalRoot()
 bool myDoesExists(const TFilePath &fp)
 {
 	bool exists = false;
-#ifdef WIN32
+#ifdef _WIN32
 	TFileStatus fs(fp);
 	exists = fs.doesExist();
 #else
@@ -147,7 +147,7 @@ bool myDoesExists(const TFilePath &fp)
 bool dirExists(const TFilePath &dirFp)
 {
 	bool exists = false;
-#ifdef WIN32
+#ifdef _WIN32
 	TFileStatus fs(dirFp);
 	exists = fs.isDirectory();
 #else
@@ -179,7 +179,7 @@ bool isAScript(TFarmTask *task)
 {
 	return false; //todo per gli script
 				  /*
-#ifdef WIN32
+#ifdef _WIN32
    return task->m_cmdline.contains(".bat");
 #else
   return (task->m_cmdline.contains(".csh")|| 
@@ -235,7 +235,7 @@ namespace
 class TFarmTaskDeclaration : public TPersistDeclaration
 {
 public:
-	TFarmTaskDeclaration(const string &id)
+	TFarmTaskDeclaration(const std::string &id)
 		: TPersistDeclaration(id) {}
 
 	TPersist *create() const
@@ -483,7 +483,7 @@ bool doTestConnection(const QString &hostName, const QString &addr, int port)
 	int sock;
 	int ret = client.connect(hostName, addr, port, sock);
 	if (ret == OK) {
-#ifdef WIN32
+#ifdef _WIN32
 		closesocket(sock);
 #else
 		close(sock);
@@ -494,7 +494,7 @@ bool doTestConnection(const QString &hostName, const QString &addr, int port)
 }
 
 //------------------------------------------------------------------------------
-#ifdef WIN32
+#ifdef _WIN32
 class ConnectionTest : public TThread::Runnable
 {
 public:
@@ -521,7 +521,7 @@ void ConnectionTest::run()
 
 bool FarmServerProxy::testConnection(int timeout)
 {
-#ifdef WIN32
+#ifdef _WIN32
 
 	HANDLE hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 	if (!hEvent) {
@@ -550,7 +550,7 @@ bool FarmServerProxy::testConnection(int timeout)
 	int sock;
 	int ret = client.connect(m_hostName, m_addr, m_port, sock);
 	if (ret == OK) {
-#ifdef WIN32
+#ifdef _WIN32
 		closesocket(sock);
 #else
 		close(sock);
@@ -1728,10 +1728,10 @@ void FarmController::getTasks(const QString &parentId, vector<TaskShortInfo> &ta
   if (it != m_tasks.end())
   {
     CtrlFarmTask *task = it->second;
-    vector<string>::iterator itSubTakId = task->m_subTasks.begin();
+    vector<std::string>::iterator itSubTakId = task->m_subTasks.begin();
     for ( ; itSubTakId != task->m_subTasks.end(); ++itSubTakId)
     {
-      map<string, CtrlFarmTask*>::iterator itSubTask = m_tasks.find(*itSubTakId);
+      map<std::string, CtrlFarmTask*>::iterator itSubTask = m_tasks.find(*itSubTakId);
       if (itSubTask != m_tasks.end())
       {
         CtrlFarmTask *subTask = itSubTask->second;
@@ -2263,7 +2263,7 @@ void FarmController::save(const TFilePath &fp) const
 {
 	TOStream os(fp);
 
-	map<string, string> attributes;
+	map<std::string, string> attributes;
 	attributes.insert(make_pair("ver", "1.0"));
 	os.openChild("tfarmdata", attributes);
 	os.openChild("tfarmtasks");
@@ -2524,7 +2524,7 @@ int main(int argc, char **argv)
 		if (!usage.parse(argc, argv))
 			exit(1);
 
-#ifdef WIN32
+#ifdef _WIN32
 		if (installQualifier.isSelected()) {
 			char szPath[512];
 

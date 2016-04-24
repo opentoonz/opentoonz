@@ -53,14 +53,14 @@ public:
 	class DVAPI Message
 	{
 		MessageType m_type;
-		string m_timestamp;
-		string m_text;
+		std::string m_timestamp;
+		std::string m_text;
 
 	public:
-		Message(MessageType type, string text);
+		Message(MessageType type, std::string text);
 		MessageType getType() const { return m_type; }
-		string getTimestamp() const { return m_timestamp; }
-		string getText() const { return m_text; }
+		std::string getTimestamp() const { return m_timestamp; }
+		std::string getText() const { return m_text; }
 	};
 
 	class Listener
@@ -81,13 +81,13 @@ public:
 	class DVAPI Stream
 	{
 		MessageType m_type;
-		string m_text;
+		std::string m_text;
 
 	public:
 		Stream(MessageType type);
 		~Stream();
 
-		Stream &operator<<(string v);
+		Stream &operator<<(std::string v);
 		Stream &operator<<(int v);
 		Stream &operator<<(double v);
 		Stream &operator<<(const TFilePath &v);
@@ -99,7 +99,7 @@ public:
 		NullStream() {}
 		~NullStream() {}
 
-		NullStream &operator<<(string) { return *this; }
+		NullStream &operator<<(std::string) { return *this; }
 		NullStream &operator<<(int) { return *this; }
 		NullStream &operator<<(double) { return *this; }
 		NullStream &operator<<(const TFilePath &) { return *this; }

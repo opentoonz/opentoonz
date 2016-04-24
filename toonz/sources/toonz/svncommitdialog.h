@@ -10,8 +10,6 @@
 #include <QMap>
 #include <QDir>
 
-using namespace DVGui;
-
 class QLabel;
 class QPushButton;
 class QTreeWidget;
@@ -24,7 +22,7 @@ class TXshLevel;
 
 //-----------------------------------------------------------------------------
 
-class SVNCommitDialog : public Dialog
+class SVNCommitDialog : public DVGui::Dialog
 {
 	Q_OBJECT
 
@@ -119,7 +117,7 @@ signals:
 
 //-----------------------------------------------------------------------------
 
-class SVNCommitFrameRangeDialog : public Dialog
+class SVNCommitFrameRangeDialog : public DVGui::Dialog
 {
 	Q_OBJECT
 

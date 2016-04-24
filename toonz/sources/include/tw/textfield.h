@@ -47,14 +47,14 @@ protected:
 	bool m_mouseDown;
 	int xToIndex(int x);
 
-	vector<Action *> m_actions;
-	vector<Action *> m_commitActions;
+	std::vector<Action *> m_actions;
+	std::vector<Action *> m_commitActions;
 	Listener *m_listener;
 
 	void updateOffset();
 
 public:
-	TTextField(TWidget *parent, string name = "textfield");
+	TTextField(TWidget *parent, std::string name = "textfield");
 	~TTextField();
 
 	virtual void commit() {}
@@ -90,7 +90,7 @@ public:
 
 	virtual void drawFieldText(
 		const TPoint &origin,
-		wstring text);
+		std::wstring text);
 
 #ifndef MACOSX
 	// pezza dovuta al baco del gcc3.3.1. Togliere quando lo si aggiorna al 3.3.2 o superiori
@@ -111,18 +111,18 @@ public:
 template <class T>
 class TTextFieldAction : public TTextField::Action
 {
-	typedef void (T::*Method)(wstring text);
+	typedef void (T::*Method)(std::wstring text);
 	T *m_target;
 	Method m_method;
 
 public:
 	TTextFieldAction(T *target, Method method)
 		: m_target(target), m_method(method) {}
-	void sendCommand(wstring s) { (m_target->*m_method)(s); }
+	void sendCommand(std::wstring s) { (m_target->*m_method)(s); }
 };
 
 template <class T>
-void tconnect(TTextField *fld, T *target, void (T::*method)(wstring s))
+void tconnect(TTextField *fld, T *target, void (T::*method)(std::wstring s))
 {
 	fld->addCommitAction(new TTextFieldAction<T>(target, method));
 }
@@ -156,7 +156,7 @@ public:
 
 private:
 	double m_minValue, m_maxValue;
-	vector<Action *> m_numActions;
+	std::vector<Action *> m_numActions;
 	bool m_isInteger;
 	int m_precision;
 
@@ -168,7 +168,7 @@ protected:
 	void sendCommand();
 
 public:
-	TNumField(TWidget *parent, string name = "numfield");
+	TNumField(TWidget *parent, std::string name = "numfield");
 	~TNumField();
 
 	void keyDown(int, TUINT32, const TPoint &);
@@ -189,7 +189,7 @@ public:
 	void addAction(Action *action);
 
 	void onFocusChange(bool status);
-	void pasteText(wstring text);
+	void pasteText(std::wstring text);
 };
 
 template <class T>
@@ -227,13 +227,13 @@ public:
 
 private:
 	TMeasuredValue *m_value;
-	vector<Action *> m_actions;
+	std::vector<Action *> m_actions;
 
 public:
-	TMeasuredValueField(TWidget *parent, string name = "numfield");
+	TMeasuredValueField(TWidget *parent, std::string name = "numfield");
 	~TMeasuredValueField();
 
-	void setMeasure(string name);
+	void setMeasure(std::string name);
 
 	TMeasuredValue *getMeasuredValue() const { return m_value; }
 

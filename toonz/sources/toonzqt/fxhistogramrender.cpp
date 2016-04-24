@@ -109,7 +109,7 @@ void FxHistogramRender::computeHistogram(TFxP fx, int frame)
 	TRasterFxP rasterFx(buildedFx);
 	if (!rasterFx)
 		return;
-	string alias = rasterFx->getAlias(frame, rs);
+	std::string alias = rasterFx->getAlias(frame, rs);
 	if (!TImageCache::instance()->isCached(alias + ".noext" + toString(frame))) {
 		TDimension size = m_scene->getCurrentCamera()->getRes();
 		TRectD area(TPointD(-0.5 * size.lx, -0.5 * size.ly), TDimensionD(size.lx, size.ly));
@@ -124,7 +124,7 @@ void FxHistogramRender::computeHistogram(TFxP fx, int frame)
 		m_lastFrameInfo.m_fx = fx;
 		m_lastFrameInfo.m_fxAlias = alias;
 	} else {
-		string id = toString(fx->getIdentifier()) + ".noext" + toString(frame);
+		std::string id = toString(fx->getIdentifier()) + ".noext" + toString(frame);
 		TRasterImageP img = TImageCache::instance()->get(id, false);
 		m_histograms->setRaster(img->getRaster());
 	}
@@ -157,7 +157,7 @@ void FxHistogramRender::updateRenderer(int frame)
 
 	int i;
 	for (i = 0; i < m_scene->getFrameCount(); i++) {
-		string id = toString(m_lastFrameInfo.m_fx->getIdentifier()) + ".noext" + toString(i);
+		std::string id = toString(m_lastFrameInfo.m_fx->getIdentifier()) + ".noext" + toString(i);
 		TImageCache::instance()->remove(id);
 	}
 	m_lastFrameInfo.m_frame = frame;
@@ -182,7 +182,7 @@ void FxHistogramRender::remakeRender()
 	TRasterFxP rasterFx(buildedFx);
 	if (!rasterFx)
 		return;
-	string alias = rasterFx->getAlias(m_lastFrameInfo.m_frame, rs);
+	std::string alias = rasterFx->getAlias(m_lastFrameInfo.m_frame, rs);
 	TFxPair fxPair;
 	fxPair.m_frameA = buildedFx;
 	m_lastFrameInfo.m_renderId = m_renderer.startRendering((double)m_lastFrameInfo.m_frame, rs, fxPair);
@@ -203,7 +203,7 @@ void FxHistogramRender::onRenderCompleted(const TRasterP &raster, UINT renderId)
 
 	QMutexLocker sl(&m_mutex);
 	TRasterImageP img(raster);
-	string id = toString(m_lastFrameInfo.m_fx->getIdentifier()) + ".noext" + toString(m_lastFrameInfo.m_frame);
+	std::string id = toString(m_lastFrameInfo.m_fx->getIdentifier()) + ".noext" + toString(m_lastFrameInfo.m_frame);
 	TImageCache::instance()->add(id, img, true);
 
 	m_histograms->setRaster(raster);

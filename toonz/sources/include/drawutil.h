@@ -62,14 +62,14 @@ DVAPI void drawStrokeCenterline(const TStroke &stroke,
 								double from = 0.0,
 								double to = 1.0);
 
-DVAPI void stroke2polyline(vector<TPointD> &pnts,
+DVAPI void stroke2polyline(std::vector<TPointD> &pnts,
 						   const TStroke &stroke,
 						   double pixelSize,
 						   double w0 = 0.0,
 						   double w1 = 1.0,
 						   bool lastRepeatable = false);
 
-DVAPI void region2polyline(vector<T3DPointD> &pnts,
+DVAPI void region2polyline(std::vector<T3DPointD> &pnts,
 						   const TRegion *region,
 						   double pixeSize);
 

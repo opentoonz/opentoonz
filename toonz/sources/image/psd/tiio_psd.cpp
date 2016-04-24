@@ -78,7 +78,7 @@ TLevelP TLevelReaderPsd::loadInfo()
 	m_frameTable.clear();
 	for (int i = 0; i < framesCount; i++) {
 		TFrameId frame(i + 1);
-		m_frameTable.insert(make_pair(frame, psdparser->getFrameId(m_layerId, i)));
+		m_frameTable.insert(std::make_pair(frame, psdparser->getFrameId(m_layerId, i)));
 		level->setFrame(frame, TImageP());
 	}
 	return level;

@@ -21,7 +21,7 @@
 namespace
 {
 
-const string firstFrameKey = "frst";			// First frame atom id
+const std::string firstFrameKey = "frst";			// First frame atom id
 const int firstFrameKeySize = 4 * sizeof(char); //
 
 //------------------------------------------------------------------------------
@@ -212,8 +212,8 @@ TimeScale frameRateToTimeScale(double frameRate)
 
 //-------------------------------------------------------------------------------
 
-//const string CodecNamesId   = "PU_CodecName";
-//const string CodecQualityId = "PU_CodecQuality";
+//const std::string CodecNamesId   = "PU_CodecName";
+//const std::string CodecQualityId = "PU_CodecQuality";
 
 } //namespace
 
@@ -290,7 +290,7 @@ void copy(TRasterP rin, PixelXRGB *bufout, int lx, int ly)
 
 //-----------------------------------------------------------
 /*
-TWriterInfo *TWriterInfoMov::create(const string &)
+TWriterInfo *TWriterInfoMov::create(const std::string &)
 {
 return new TWriterInfoMov();
 }
@@ -326,7 +326,7 @@ Tiio::TifWriterProperties::TifWriterProperties()
 {
     m_byteOrdering.addValue(L"IBM PC");
     m_byteOrdering.addValue(L"Mac");
-#ifdef WIN32
+#ifdef _WIN32
   m_byteOrdering.setValue(L"IBM PC");
 #else
   m_byteOrdering.setValue(L"Mac");

@@ -314,7 +314,7 @@ protected:
 	//! return the column indexes of the drawings intersecting point \b p
 	//! (window coordinate, pixels, bottom-left origin)
 	int posToColumnIndex(const TPoint &p, double distance, bool includeInvisible = true) const;
-	void posToColumnIndexes(const TPoint &p, vector<int> &indexes, double distance, bool includeInvisible = true) const;
+	void posToColumnIndexes(const TPoint &p, std::vector<int> &indexes, double distance, bool includeInvisible = true) const;
 
 	//! return the row of the drawings intersecting point \b p (used with onion skins)
 	//! (window coordinate, pixels, bottom-left origin)

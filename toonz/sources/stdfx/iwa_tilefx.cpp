@@ -280,14 +280,14 @@ void Iwa_TileFx::makeTile(const TTile &inputTile, const TTile &tile)
 	tile.getRaster()->clear();
 
 	//Build the mirroring pattern. It obviously repeats itself out of 2x2 tile blocks.
-	map<pair<bool, bool>, TRasterP> mirrorRaster;
-	mirrorRaster[pair<bool, bool>(false, false)] = inputTile.getRaster();
-	mirrorRaster[pair<bool, bool>(false, true)] = inputTile.getRaster()->clone();
-	mirrorRaster[pair<bool, bool>(false, true)]->yMirror();
-	mirrorRaster[pair<bool, bool>(true, false)] = inputTile.getRaster()->clone();
-	mirrorRaster[pair<bool, bool>(true, false)]->xMirror();
-	mirrorRaster[pair<bool, bool>(true, true)] = mirrorRaster[pair<bool, bool>(true, false)]->clone();
-	mirrorRaster[pair<bool, bool>(true, true)]->yMirror();
+	std::map<std::pair<bool, bool>, TRasterP> mirrorRaster;
+	mirrorRaster[std::pair<bool, bool>(false, false)] = inputTile.getRaster();
+	mirrorRaster[std::pair<bool, bool>(false, true)] = inputTile.getRaster()->clone();
+	mirrorRaster[std::pair<bool, bool>(false, true)]->yMirror();
+	mirrorRaster[std::pair<bool, bool>(true, false)] = inputTile.getRaster()->clone();
+	mirrorRaster[std::pair<bool, bool>(true, false)]->xMirror();
+	mirrorRaster[std::pair<bool, bool>(true, true)] = mirrorRaster[std::pair<bool, bool>(true, false)]->clone();
+	mirrorRaster[std::pair<bool, bool>(true, true)]->yMirror();
 
 	TPoint animatedPos = convert(inputTile.m_pos - tile.m_pos);
 	TDimension inSize = inputTile.getRaster()->getSize();
@@ -346,7 +346,7 @@ void Iwa_TileFx::makeTile(const TTile &inputTile, const TTile &tile)
 	do {
 		do {
 			if (checkIfThisTileShouldBeComptedOrNot(horizIndex, vertIndex)) {
-				pair<bool, bool> doMirror(doMirroX && m_xMirror->getValue(), doMirroY && m_yMirror->getValue());
+				std::pair<bool, bool> doMirror(doMirroX && m_xMirror->getValue(), doMirroY && m_yMirror->getValue());
 				tile.getRaster()->copy(mirrorRaster[doMirror], startTilingPos);
 			}
 

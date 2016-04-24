@@ -130,7 +130,7 @@ bool PlasticDeformerFx::canHandle(const TRenderSettings &info, double frame)
 
 //-----------------------------------------------------------------------------------
 
-string PlasticDeformerFx::getAlias(double frame, const TRenderSettings &info) const
+std::string PlasticDeformerFx::getAlias(double frame, const TRenderSettings &info) const
 {
 	std::string alias(getFxType());
 	alias += "[";

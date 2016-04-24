@@ -23,8 +23,6 @@ class MySortFilterProxyModel;
 class QCheckBox;
 class QStandardItemModel;
 
-using namespace DVGui;
-
 class DVAPI TMessageRepository : public QObject
 {
 	QStandardItemModel *m_sim;
@@ -50,7 +48,7 @@ class DVAPI TMessageViewer : public QFrame
 	Q_OBJECT
 
 protected:
-	static vector<TMessageViewer *> m_tmsgViewers;
+	static std::vector<TMessageViewer *> m_tmsgViewers;
 	MySortFilterProxyModel *m_proxyModel;
 	void rowsInserted(const QModelIndex &parent, int start, int end);
 

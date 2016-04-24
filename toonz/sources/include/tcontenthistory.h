@@ -10,7 +10,6 @@
 #include <map>
 #include <set>
 
-using namespace std;
 #undef DVAPI
 #undef DVVAR
 #ifdef TNZCORE_EXPORTS

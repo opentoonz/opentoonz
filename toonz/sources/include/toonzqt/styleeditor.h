@@ -76,8 +76,6 @@ class StyleEditor;
 
 //=============================================
 
-using namespace DVGui;
-
 //=============================================================================
 namespace StyleEditorGUI
 {
@@ -337,7 +335,7 @@ signals:
 /*! \brief The ChannelLineEdit is a cutomized version of IntLineEdit for channel value.
     It calls selectAll() at the moment of the first click.
 */
-class ChannelLineEdit : public IntLineEdit
+class ChannelLineEdit : public DVGui::IntLineEdit
 {
 	Q_OBJECT
 
@@ -591,11 +589,11 @@ class DVAPI StyleEditor : public QWidget
 
 	TXshLevelHandle *m_levelHandle; //!< for clearing the level cache when the color changed
 
-	TabBar *m_styleBar;
+	DVGui::TabBar *m_styleBar;
 	QStackedWidget *m_styleChooser;
 
-	StyleSample *m_newColor; //!< New style viewer (lower-right panel side).
-	StyleSample *m_oldColor; //!< Old style viewer (lower-right panel side).
+	DVGui::StyleSample *m_newColor; //!< New style viewer (lower-right panel side).
+	DVGui::StyleSample *m_oldColor; //!< Old style viewer (lower-right panel side).
 
 #ifndef STUDENT
 	QPushButton *m_autoButton;  //!< "Auto Apply" checkbox on the right panel side.

@@ -335,8 +335,8 @@ public:
 
 	bool aborted() const { return m_importStrategy.aborted(); }
 
-	static string extractPsdSuffix(TFilePath &path);
-	static TFilePath buildPsd(const TFilePath &path, const string &suffix);
+	static std::string extractPsdSuffix(TFilePath &path);
+	static TFilePath buildPsd(const TFilePath &path, const std::string &suffix);
 
 private:
 	ToonzScene *m_scene;

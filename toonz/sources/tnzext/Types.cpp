@@ -5,7 +5,7 @@
 #endif
 #include "ext/Types.h"
 
-#if defined(WIN32) && (_MSC_VER <= 1200)
+#if defined(_WIN32) && (_MSC_VER <= 1200)
 // to avoid annoying warning
 #pragma warning(push)
 #pragma warning(disable : 4290)
@@ -85,7 +85,7 @@ bool ToonzExt::EvenInt::isEven() const
 
 //-----------------------------------------------------------------------------
 
-#if defined(WIN32) && (_MSC_VER <= 1200)
+#if defined(_WIN32) && (_MSC_VER <= 1200)
 #pragma warning(pop)
 #endif
 

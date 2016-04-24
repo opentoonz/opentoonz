@@ -35,8 +35,8 @@ class PlasticSkeletonDeformation;
 struct DVAPI PlasticDeformerData {
 	PlasticDeformer m_deformer; //!< The mesh deformer itself
 
-	double *m_so;	 //!< (owned) Faces' stacking order
-	double *m_output; //!< (owned) Output vertex coordinates
+	std::unique_ptr<double[]> m_so;	 //!< (owned) Faces' stacking order
+	std::unique_ptr<double[]> m_output; //!< (owned) Output vertex coordinates
 
 	std::vector<int> m_faceHints; //!< Handles' face hints
 
@@ -56,7 +56,7 @@ private:
 //***********************************************************************************************
 
 struct DVAPI PlasticDeformerDataGroup {
-	PlasticDeformerData *m_datas;		  //!< (owned) The deformer datas array. One per mesh.
+	std::unique_ptr<PlasticDeformerData[]> m_datas;		  //!< (owned) The deformer datas array. One per mesh.
 	std::vector<PlasticHandle> m_handles; //!< Source handles (emanated from skeleton vertices).
 	std::vector<TPointD> m_dstHandles;	//!< Corresponding destination handle positions
 

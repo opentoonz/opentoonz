@@ -29,7 +29,7 @@ class DVAPI TToonzImage : public TImage
 		m_dpiy;
 	int m_subsampling;
 	//! The name of the image
-	string m_name;
+	std::string m_name;
 	//! The savebox of the image
 	TRect m_savebox;
 	//double m_hPos;
@@ -120,7 +120,7 @@ private:
 
 //-------------------------------------------------------------------
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DVAPI TSmartPointerT<TToonzImage>;
 template class DVAPI TDerivedSmartPointerT<TToonzImage, TImage>;
 #endif

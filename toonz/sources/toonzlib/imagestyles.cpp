@@ -40,7 +40,7 @@ PointPair computeTexParameters(const TPointD &p1,
 	// texture points
 	static PointPair tex;
 
-	// set std::vector of movement
+	// set vector of movement
 	TPointD v = (newP.first + newP.second) * 0.5 - (p2 + p1) * 0.5;
 
 	// compute length of opposite segment
@@ -192,7 +192,7 @@ void TTextureStyle::computeOutline(const TStroke *stroke,
 								   TOutlineUtil::OutlineParameter param) const
 {
 	TOutlineStyle::computeOutline(stroke, outline, param);
-	vector<TOutlinePoint> &v = outline.getArray();
+	std::vector<TOutlinePoint> &v = outline.getArray();
 	PointPair newPnt;
 	TDimension size = m_texture->getSize();
 	UINT i = 0;
@@ -235,7 +235,7 @@ void TTextureStyle::drawStroke(const TColorFunction *cf, TStrokeOutline *outline
 
 	UINT i;
 
-	vector<TOutlinePoint> &v = outline->getArray();
+	std::vector<TOutlinePoint> &v = outline->getArray();
 	if (v.empty())
 		return;
 
@@ -807,7 +807,7 @@ void TTextureStyle::loadData(TInputStreamInterface &is)
 		return;
 	}
 
-	string path;
+	std::string path;
 	is >> path;
 	m_texturePath = TFilePath(path);
 
@@ -844,8 +844,8 @@ void TTextureStyle::saveData(TOutputStreamInterface &os) const
 {
 	//TOutlineStyle::saveData(os);
 	//os << m_texture;
-	wstring wstr = m_texturePath.getWideString();
-	string str;
+	std::wstring wstr = m_texturePath.getWideString();
+	std::string str;
 	str.assign(wstr.begin(), wstr.end());
 	os << str;
 

@@ -31,10 +31,10 @@ IntPairField::IntPairField(QWidget *parent, bool isMaxRangeLimited)
 	setFixedHeight(WidgetHeight);
 
 	m_leftLabel = new QLabel("", this);
-	m_leftLineEdit = new IntLineEdit(this);
+	m_leftLineEdit = new DVGui::IntLineEdit(this);
 
 	m_rightLabel = new QLabel("", this);
-	m_rightLineEdit = new IntLineEdit(this);
+	m_rightLineEdit = new DVGui::IntLineEdit(this);
 
 	m_leftLineEdit->setFixedWidth(40);
 	m_rightLineEdit->setFixedWidth(40);

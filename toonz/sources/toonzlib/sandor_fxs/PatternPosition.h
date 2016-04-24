@@ -18,8 +18,6 @@
 #include "SError.h"
 #include "SDef.h"
 
-using namespace std;
-
 class CPatternPosition
 {
 	bool isInSet(const int nbSet, const int *set, const int val);
@@ -33,12 +31,12 @@ class CPatternPosition
 	bool findEmptyPos(const int lX, const int lY, const UCHAR *lSel,
 					  int &xPos, int &yPos, SRECT &bb);
 	void eraseCurrentArea(const int lX, const int lY, UCHAR *lSel,
-						  vector<SPOINT> &ddc, const int xx, const int yy);
+						  std::vector<SPOINT> &ddc, const int xx, const int yy);
 	void sel0255To01(const int lX, const int lY, UCHAR *sel, SRECT &bb);
-	void prepareCircle(vector<SPOINT> &v, const double r);
+	void prepareCircle(std::vector<SPOINT> &v, const double r);
 
 public:
-	vector<SPOINT> m_pos;
+	std::vector<SPOINT> m_pos;
 
 	CPatternPosition() : m_pos(0){};
 	virtual ~CPatternPosition();
@@ -55,10 +53,10 @@ public:
 				//			nbPat= nbPat>(int)(0.9*nbPixel) ?  (int)(0.9*nbPixel) : nbPat;
 				nbPat = nbPat > nbPixel ? nbPixel : nbPat;
 				if (nbPat > 0)
-					makeRandomPositions(nbPat, nbPixel, p.m_lX, p.m_lY, p.m_sel);
+					makeRandomPositions(nbPat, nbPixel, p.m_lX, p.m_lY, p.m_sel.get());
 			} else {
 				// Distance-driven position
-				makeDDPositions(p.m_lX, p.m_lY, p.m_sel, minD, maxD);
+				makeDDPositions(p.m_lX, p.m_lY, p.m_sel.get(), minD, maxD);
 			}
 		} catch (SMemAllocError) {
 			throw;
@@ -68,7 +66,7 @@ public:
 	template <class P>
 	void drawTest(CSTColSelPic<P> &pic)
 	{
-		for (vector<SPOINT>::iterator pv = m_pos.begin();
+		for (std::vector<SPOINT>::iterator pv = m_pos.begin();
 			 pv != m_pos.end();
 			 pv++) {
 			int xx = pv->x;

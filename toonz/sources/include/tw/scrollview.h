@@ -27,7 +27,7 @@ class DVAPI TScrollView : public TWidget
 	int m_autopanningOldT;
 
 public:
-	TScrollView(TWidget *parent, string name = "scrollview");
+	TScrollView(TWidget *parent, std::string name = "scrollview");
 	~TScrollView();
 
 	void middleButtonDown(const TMouseEvent &e);

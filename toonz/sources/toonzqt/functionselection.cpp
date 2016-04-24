@@ -558,7 +558,7 @@ void FunctionSelection::doPaste()
 	/*--- カーブの貼り付け時に循環参照をチェックして、駄目ならアラートを返す ---*/
 	for (int c = 0; c < columnCount; c++) {
 		if (!data->isCircularReferenceFree(c, params[c])) {
-			DVGui::MsgBox(DVGui::WARNING, tr("There is a circular reference in the definition of the interpolation."));
+			DVGui::warning(tr("There is a circular reference in the definition of the interpolation."));
 			return;
 		}
 	}

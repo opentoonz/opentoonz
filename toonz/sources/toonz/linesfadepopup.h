@@ -7,8 +7,6 @@
 #include "toonz/txshsimplelevel.h"
 #include "traster.h"
 
-using namespace std;
-
 class QSlider;
 class ImageViewer;
 class TSelection;

@@ -13,8 +13,6 @@
 class TSceneProperties;
 class QComboBox;
 
-using namespace DVGui;
-
 //=============================================================================
 // SceneSettingsPopup
 //-----------------------------------------------------------------------------
@@ -23,17 +21,17 @@ class SceneSettingsPopup : public QDialog
 {
 	Q_OBJECT
 
-	DoubleLineEdit *m_frameRateFld;
-	ColorField *m_bgColorFld;
+	DVGui::DoubleLineEdit *m_frameRateFld;
+	DVGui::ColorField *m_bgColorFld;
 
-	IntLineEdit *m_fieldGuideFld;
-	DoubleLineEdit *m_aspectRatioFld;
+	DVGui::IntLineEdit *m_fieldGuideFld;
+	DVGui::DoubleLineEdit *m_aspectRatioFld;
 
-	IntLineEdit *m_fullcolorSubsamplingFld;
-	IntLineEdit *m_tlvSubsamplingFld;
+	DVGui::IntLineEdit *m_fullcolorSubsamplingFld;
+	DVGui::IntLineEdit *m_tlvSubsamplingFld;
 
-	IntLineEdit *m_markerIntervalFld;
-	IntLineEdit *m_startFrameFld;
+	DVGui::IntLineEdit *m_markerIntervalFld;
+	DVGui::IntLineEdit *m_startFrameFld;
 
 	TSceneProperties *getProperties() const;
 

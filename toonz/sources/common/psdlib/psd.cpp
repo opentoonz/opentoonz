@@ -1235,11 +1235,11 @@ int TPSDParser::getLevelIndexById(int layerId)
 		throw TImageException(m_path, "Layer ID not exists");
 	return layerIndex;
 }
-int TPSDParser::getLevelIdByName(string levelName)
+int TPSDParser::getLevelIdByName(std::string levelName)
 {
 	int pos = levelName.find_last_of(LEVEL_NAME_INDEX_SEP);
 	int counter = 0;
-	if (pos != string::npos) {
+	if (pos != std::string::npos) {
 		counter = atoi(levelName.substr(pos + 1).c_str());
 		levelName = levelName.substr(0, pos);
 	}
@@ -1265,15 +1265,15 @@ int TPSDParser::getFramesCount(int levelId)
 	assert(levelIndex >= 0 && levelIndex < (int)m_levels.size());
 	return m_levels[levelIndex].getFrameCount();
 }
-string TPSDParser::getLevelName(int levelId)
+std::string TPSDParser::getLevelName(int levelId)
 {
 	int levelIndex = getLevelIndexById(levelId);
 	assert(levelIndex >= 0 && levelIndex < (int)m_levels.size());
 	return m_levels[levelIndex].getName();
 }
-string TPSDParser::getLevelNameWithCounter(int levelId)
+std::string TPSDParser::getLevelNameWithCounter(int levelId)
 {
-	string levelName = getLevelName(levelId);
+	std::string levelName = getLevelName(levelId);
 	int count = 0;
 	for (int i = 0; i < (int)m_levels.size(); i++) {
 		if (m_levels[i].getName() == levelName) {
@@ -1285,7 +1285,7 @@ string TPSDParser::getLevelNameWithCounter(int levelId)
 	}
 	if (count > 0) {
 		levelName.append(LEVEL_NAME_INDEX_SEP);
-		string c = QString::number(count).toStdString();
+		std::string c = QString::number(count).toStdString();
 		levelName.append(c);
 	}
 	return levelName;

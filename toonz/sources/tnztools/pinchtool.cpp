@@ -48,6 +48,7 @@
 #include "ext/StrokeDeformation.h"
 
 #include <memory>
+#include <algorithm>
 
 using namespace ToolUtils;
 using namespace ToonzExt;
@@ -273,7 +274,7 @@ void PinchTool::leftButtonDrag(const TPointD &pos,
 			val_in_range = m_selector.getLength();
 
 		// set value in range
-		val_in_range = max(min(val_in_range, prop_range.second), prop_range.first);
+		val_in_range = std::max(std::min(val_in_range, prop_range.second), prop_range.first);
 		try {
 			m_toolRange.setValue(val_in_range);
 			TTool::getApplication()->getCurrentTool()->notifyToolChanged();
@@ -347,7 +348,7 @@ void PinchTool::leftButtonUp(const TPointD &pos,
 		m_undo = 0;
 
 // to avoid red line tool on stroke
-#ifdef WIN32
+#ifdef _WIN32
 		invalidate(status->stroke2change_->getBBox().enlarge(status->pixelSize_ * 13));
 #else
 		invalidate();

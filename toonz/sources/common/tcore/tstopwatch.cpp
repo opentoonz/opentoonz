@@ -17,7 +17,7 @@
 #include <time.h>
 
 #ifndef STW_TICKS_PER_SECOND
-#ifndef WIN32
+#ifndef _WIN32
 extern "C" long sysconf(int);
 #define STW_TICKS_PER_SECOND sysconf(_SC_CLK_TCK)
 #else
@@ -36,7 +36,7 @@ enum TimerType { TTUUnknown,
 				 TTUTickCount };
 static void determineTimer();
 
-#ifdef WIN32
+#ifdef _WIN32
 
 static TimerType timerToUse = TTUUnknown;
 
@@ -52,7 +52,7 @@ using namespace std;
 
 //-----------------------------------------------------------
 
-TStopWatch::TStopWatch(string name)
+TStopWatch::TStopWatch(std::string name)
 	: m_name(name), m_active(false), m_isRunning(false)
 {
 	if (timerToUse == TTUUnknown)
@@ -150,7 +150,7 @@ static void checkTime(START start, START_USER startUser, START_SYSTEM startSyste
 {
 	assert(timerToUse == TTUTickCount);
 
-#ifdef WIN32
+#ifdef _WIN32
 
 	DWORD tm_stop;
 	FILETIME creationTime, exitTime, stopSystem, stopUser;
@@ -166,7 +166,7 @@ static void checkTime(START start, START_USER startUser, START_SYSTEM startSyste
 	tmUser += FileTimeToInt64(&stopUser) - FileTimeToInt64(&startUser);		  //user elapsed time
 	tmSystem += FileTimeToInt64(&stopSystem) - FileTimeToInt64(&startSystem); //system elapsed time
 
-#else //WIN32
+#else // _WIN32
 
 	struct tms clk;
 	clock_t tm_stop;
@@ -176,12 +176,12 @@ static void checkTime(START start, START_USER startUser, START_SYSTEM startSyste
 	tmUser += clk.tms_utime - startUser;
 	tmSystem += clk.tms_stime - startSystem;
 
-#endif //WIN32
+#endif // _WIN32
 }
 
 //-----------------------------------------------------------
 
-#ifdef WIN32
+#ifdef _WIN32
 
 //
 // come checkTime, ma usa i timer ad alta risoluzione
@@ -255,7 +255,7 @@ void hrCheckTime(LARGE_INTEGER start, START_USER startUser, START_SYSTEM startSy
 
 } //namespace
 
-#endif //WIN32
+#endif // _WIN32
 
 //-----------------------------------------------------------
 
@@ -264,7 +264,7 @@ void TStopWatch::stop()
 	if (!m_isRunning)
 		return;
 	m_isRunning = false;
-#ifdef WIN32
+#ifdef _WIN32
 	if (timerToUse == TTUTickCount)
 		checkTime(m_start, m_startUser, m_startSystem, m_tm, m_tmUser, m_tmSystem);
 	else
@@ -283,7 +283,7 @@ void TStopWatch::getElapsedTime(TM_TOTAL &tm, TM_USER &user, TM_SYSTEM &system)
 		TM_USER cur_tmUser = 0;
 		TM_SYSTEM cur_tmSystem = 0;
 
-#ifdef WIN32
+#ifdef _WIN32
 		if (timerToUse == TTUTickCount)
 			checkTime(m_start, m_startUser, m_startSystem, cur_tm, cur_tmUser, cur_tmSystem);
 		else
@@ -390,7 +390,7 @@ void TStopWatch::printGlobals()
 }
 
 //-----------------------------------------------------------
-#ifdef WIN32
+#ifdef _WIN32
 
 void dummyFunction()
 {

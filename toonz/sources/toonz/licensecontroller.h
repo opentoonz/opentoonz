@@ -39,10 +39,10 @@ enum ActivateStatus {
 std::string getFirstValidMacAddress();
 
 //Restituisce tutti i mac address valido delle interfacce di rete della macchine corrente
-void getAllValidMacAddresses(std::vector<string> &addresses);
+void getAllValidMacAddresses(std::vector<std::string> &addresses);
 // restituisce il machineCode della iesima interfaccia di rete della macchina corrente
 // Il machine code e' costituito dagli ultimi 8 caratteri del macAdress
-string getCodeFromMacAddress(string macAddress);
+std::string getCodeFromMacAddress(std::string macAddress);
 
 // restituisce la licenza corrente (installata sulla macchina)
 std::string getInstalledLicense();
@@ -101,7 +101,7 @@ TFilePath getMacAddressFilePath();
 std::string readSentinelDate(std::string regKey);
 //Dando in input la sentinella(criptata) ritorna true se la data di
 //prima installazione(memorizzata nella sentinella) e' minore della data corrente.
-bool isValidSentinel(string license);
+bool isValidSentinel(std::string license);
 std::string createClsid(std::string fullMacAddress, char *licenseType);
 //Controlla se la licenza e' del tipo STORYPLANNERPRO
 bool isStoryPlannerPro();

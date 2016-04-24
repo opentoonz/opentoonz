@@ -55,7 +55,7 @@ public:
 	TImageLocation(int row, int col); // XsheetImage
 	// TImageLocation(const TStageObjectId &pid); // PathImage
 	TImageLocation(TStageObjectSpline *spline);				// PathImage
-	TImageLocation(wstring levelName, const TFrameId &fid); // LevelStripImage
+	TImageLocation(std::wstring levelName, const TFrameId &fid); // LevelStripImage
 };
 
 #endif

@@ -340,7 +340,7 @@ int Picker::getColumnIndex() const
 
 //-----------------------------------------------------------------------------
 
-void Picker::getColumnIndexes(vector<int> &indexes) const
+void Picker::getColumnIndexes(std::vector<int> &indexes) const
 {
 	indexes = m_columnIndexes;
 }
@@ -696,12 +696,12 @@ void RasterPainter::drawRasterImages(QPainter &p, QPolygon cameraPol)
 }
 
 void buildAutocloseImage(TVectorImage *vaux, TVectorImage *vi,
-						 const vector<pair<int, double>> &startPoints, const vector<pair<int, double>> &endPoints)
+						 const std::vector<std::pair<int, double>> &startPoints, const std::vector<std::pair<int, double>> &endPoints)
 {
 	for (UINT i = 0; i < startPoints.size(); i++) {
 		TThickPoint p1 = vi->getStroke(startPoints[i].first)->getThickPoint(startPoints[i].second);
 		TThickPoint p2 = vi->getStroke(endPoints[i].first)->getThickPoint(endPoints[i].second);
-		vector<TThickPoint> points(3);
+		std::vector<TThickPoint> points(3);
 		points[0] = p1;
 		points[1] = 0.5 * (p1 + p2);
 		points[2] = p2;
@@ -722,7 +722,7 @@ void drawAutocloses(TVectorImage *vi, TVectorRenderData &rd)
 		plt->addStyle(TPixel::Magenta);
 	}
 
-	vector<pair<int, double>> startPoints, endPoints;
+	std::vector<std::pair<int, double>> startPoints, endPoints;
 	getClosingPoints(vi->getBBox(), AutocloseFactor, vi, startPoints, endPoints);
 	TVectorImage *vaux = new TVectorImage();
 
@@ -1058,7 +1058,7 @@ void OpenGlPainter::onRasterImage(TRasterImage *ri, const Stage::Player &player)
 		assert(false);					// dealing with tlv stuff!
 
 	bool premultiplied = tlvFlag;  // xD
-	static vector<char> matteChan; // Wtf this is criminal. Altough probably this
+	static std::vector<char> matteChan; // Wtf this is criminal. Altough probably this
 								   // stuff is used only in the main thread... hmmm....
 	TRaster32P r = (TRaster32P)ri->getRaster();
 	r->lock();

@@ -73,7 +73,7 @@ DVAPI TRect changeColorStroke(const TToonzImageP &ti, const ChangeColorStrokeSet
 // Se lo styleId!=-1, cancella solo se sono uguali a questo stile
 DVAPI TRect eraseRect(const TToonzImageP &ti, const TRectD &area, int maskId, bool onInk, bool onPaint);
 
-DVAPI vector<TRect> paste(const TToonzImageP &ti, const TTileSetCM32 *tileSet);
+DVAPI std::vector<TRect> paste(const TToonzImageP &ti, const TTileSetCM32 *tileSet);
 
 //DVAPI  void updateRas32(const TToonzImageP &img, TRect clipRect=TRect());
 //DVAPI  void updateRas32(const TToonzImageP &img, const TTileSetCM32 *tileSet);
@@ -82,14 +82,14 @@ const TVectorPalette *getTCheckPalette();
 
 DVAPI TToonzImageP vectorToToonzImage(const TVectorImageP &vi, const TAffine &aff, TPalette *palette,
 									  const TPointD &outputPos, const TDimension &outputSize,
-									  const vector<TRasterFxRenderDataP> *fxs = 0,
+										const std::vector<TRasterFxRenderDataP> *fxs = 0,
 									  bool transformThickness = false);
 
 DVAPI TPalette *loadTzPalette(const TFilePath &pltFile);
 
 DVAPI void getUsedStyles(std::set<int> &styles, const TToonzImageP &ti);
 DVAPI void scrambleStyles(const TToonzImageP &ti, std::map<int, int> styleTable);
-DVAPI string premultiply(const TFilePath &levelPath);
+DVAPI std::string premultiply(const TFilePath &levelPath);
 //DVAPI bool convertToTlv(const TFilePath& levelPathIn);
 DVAPI void eraseImage(const TToonzImageP &ti, const TRaster32P &image, const TPoint &pos,
 					  bool invert, bool eraseInk, bool erasePaint, bool selective, int styleId);

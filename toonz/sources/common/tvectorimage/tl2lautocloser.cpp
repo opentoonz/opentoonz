@@ -10,7 +10,7 @@
 #include <QDebug>
 
 //=============================================================================
-#ifdef WIN32
+#ifdef _WIN32
 
 class MyTimer
 {
@@ -393,7 +393,7 @@ void TL2LAutocloser::Imp::search(
 	if (strokea == 0 || strokeb == 0)
 		return;
 	/*
-#ifdef WIN32
+#ifdef _WIN32
   MyTimer timer;
   qDebug() << "search started";
   timer.start();
@@ -511,7 +511,7 @@ void TL2LAutocloser::Imp::search(
 		segments.push_back(segment);
 	}
 	/*
-#ifdef WIN32
+#ifdef _WIN32
   double elapsed = timer.elapsedSeconds();
   qDebug() << "search completed. time=" << elapsed << "s";
 #endif

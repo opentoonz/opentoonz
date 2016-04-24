@@ -68,15 +68,15 @@ enum SelectionTarget //! Possible selection targets in a SelectionTool.
 class VectorFreeDeformer : public FreeDeformer
 {
 	TVectorImageP m_vi;
-	set<int> m_strokeIndexes;
-	vector<TStroke *> m_originalStrokes;
+	std::set<int> m_strokeIndexes;
+	std::vector<TStroke *> m_originalStrokes;
 
 	bool m_preserveThickness, m_computeRegion, m_flip;
 
 	TThickPoint deform(TThickPoint point);
 
 public:
-	VectorFreeDeformer(TVectorImageP vi, set<int> strokeIndexes);
+	VectorFreeDeformer(TVectorImageP vi, std::set<int> strokeIndexes);
 	~VectorFreeDeformer();
 
 	void setPreserveThickness(bool preserveThickness);
@@ -248,7 +248,7 @@ public:
 class VectorChangeThicknessTool : public DragTool
 {
 	TPointD m_curPos, m_firstPos;
-	std::map<int, vector<double>> m_strokesThickness;
+	std::map<int, std::vector<double>> m_strokesThickness;
 	double m_thicknessChange;
 
 	tcg::unique_ptr<UndoChangeStrokes> m_undo;
@@ -340,7 +340,7 @@ protected:
 	void updateAction(TPointD pos, const TMouseEvent &e);
 	void onSelectedFramesChanged();
 
-	bool onPropertyChanged(string propertyName);
+	bool onPropertyChanged(std::string propertyName);
 	void onImageChanged();
 
 private:

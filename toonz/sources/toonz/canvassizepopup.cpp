@@ -44,7 +44,7 @@ class ResizeCanvasUndo : public TUndo
 {
 	TXshSimpleLevelP m_level;
 	TFrameId m_fid;
-	string m_oldImageId, m_newImageId;
+	std::string m_oldImageId, m_newImageId;
 	TDimension m_oldDim, m_newDim;
 	static int m_idCount;
 	int m_undoSize;
@@ -104,7 +104,7 @@ public:
 		m_level->setFrame(m_fid, img);
 		IconGenerator::instance()->invalidate(m_level.getPointer(), m_fid);
 		m_level->touchFrame(m_fid);
-		vector<TFrameId> fids;
+		std::vector<TFrameId> fids;
 		m_level->getFids(fids);
 		if (fids.back() == m_fid) {
 			m_level->getProperties()->setImageRes(m_newDim);
@@ -672,7 +672,7 @@ void CanvasSizePopup::onOkBtn()
 		pos.y = newDim.ly - dim.ly;
 
 	int i;
-	vector<TFrameId> fids;
+	std::vector<TFrameId> fids;
 	m_sl->getFids(fids);
 	TUndoManager::manager()->beginBlock();
 	for (i = 0; i < (int)fids.size(); i++) {

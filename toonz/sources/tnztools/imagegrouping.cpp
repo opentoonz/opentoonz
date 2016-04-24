@@ -159,11 +159,11 @@ class MoveGroupUndo : public ToolUtils::TToolUndo
 
 	UCHAR m_moveType;
 	int m_refStroke, m_count, m_moveBefore;
-	vector<pair<TStroke *, int>> m_selectedGroups;
+	std::vector<std::pair<TStroke *, int>> m_selectedGroups;
 
 public:
 	MoveGroupUndo(TXshSimpleLevel *level, const TFrameId &frameId, UCHAR moveType,
-				  int refStroke, int count, int moveBefore, const vector<pair<TStroke *, int>> &selectedGroups)
+				  int refStroke, int count, int moveBefore, const std::vector<std::pair<TStroke *, int>> &selectedGroups)
 		: ToolUtils::TToolUndo(level, frameId), m_moveType(moveType), m_refStroke(refStroke), m_count(count), m_moveBefore(moveBefore), m_selectedGroups(selectedGroups)
 	{
 	}
@@ -267,21 +267,21 @@ public:
 namespace
 {
 
-vector<pair<TStroke *, int>> getSelectedGroups(TVectorImage *vimg, StrokeSelection *sel)
+std::vector<std::pair<TStroke *, int>> getSelectedGroups(TVectorImage *vimg, StrokeSelection *sel)
 {
 	UINT i, j;
-	vector<pair<TStroke *, int>> ret;
+	std::vector<std::pair<TStroke *, int>> ret;
 
 	for (i = 0; i < vimg->getStrokeCount(); i++)
 		if (sel->isSelected(i)) {
 			if (vimg->isStrokeGrouped(i)) {
 				for (j = i + 1; j < vimg->getStrokeCount() && vimg->sameSubGroup(i, j); j++)
 					if (!sel->isSelected(j))
-						return vector<pair<TStroke *, int>>();
-				ret.push_back(pair<TStroke *, int>(vimg->getStroke(i), j - i));
+						return std::vector<std::pair<TStroke *, int>>();
+				ret.push_back(std::pair<TStroke *, int>(vimg->getStroke(i), j - i));
 				i = j - 1;
 			} else
-				ret.push_back(pair<TStroke *, int>(vimg->getStroke(i), 1));
+				ret.push_back(std::pair<TStroke *, int>(vimg->getStroke(i), 1));
 		}
 	return ret;
 }
@@ -305,7 +305,7 @@ UCHAR TGroupCommand::getGroupingOptions()
 
 	//spostamento: si possono  spostare solo gruppi interi  oppure  stroke   non gruppate
 
-	vector<pair<TStroke *, int>> strokeIndexes = getSelectedGroups(vimg, m_sel);
+	std::vector<std::pair<TStroke *, int>> strokeIndexes = getSelectedGroups(vimg, m_sel);
 
 	/*
 	//spostamento: si puo' spostare solo un gruppo(e uno solo per volta) oppure una stroke singola  non gruppata
@@ -424,7 +424,7 @@ UCHAR TGroupCommand::getGroupingOptions()
 	UINT i, j;
 	bool valid = true;
 	//spostamento: si puo' spostare solo un gruppo(e uno solo per volta) oppure una stroke singola  non gruppata
-	vector<pair<int, int>> groups;
+	std::vector<pair<int, int>> groups;
 
 	for (i = 0; i < vimg->getStrokeCount() && valid;)
 		if (m_sel->isSelected(i)) {
@@ -666,7 +666,7 @@ bool cantMove1(TVectorImage* vimg, int refStroke, int count, int moveBefore, boo
   if(count==0) return;
   */
 
-int doMoveGroup(UCHAR moveType, TVectorImage *vimg, const vector<pair<TStroke *, int>> &selectedGroups, int index)
+int doMoveGroup(UCHAR moveType, TVectorImage *vimg, const std::vector<std::pair<TStroke *, int>> &selectedGroups, int index)
 {
 	int refStroke = vimg->getStrokeIndex(selectedGroups[index].first);
 	int count = selectedGroups[index].second;
@@ -722,7 +722,7 @@ void TGroupCommand::moveGroup(UCHAR moveType)
 	if (!vimg)
 		return;
 
-	vector<pair<TStroke *, int>> selectedGroups = getSelectedGroups(vimg, m_sel);
+	std::vector<std::pair<TStroke *, int>> selectedGroups = getSelectedGroups(vimg, m_sel);
 	if (selectedGroups.empty())
 		return;
 

@@ -328,7 +328,7 @@ typedef TChangeObserverT<TFxDagChange> TFxDagObserver;
 
 class DVAPI TNotifier
 {
-	vector<TObserverList *> m_obsList;
+	std::vector<TObserverList *> m_obsList;
 	TObserverListT<TGlobalChange> m_globalObs;
 	TObserverListT<TSceneNameChange> m_sceneNameObs;
 	TObserverListT<TDirectoryChange> m_directoryObs;

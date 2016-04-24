@@ -17,7 +17,7 @@
 //#include "tspecialstyleid.h"
 #include <set>
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(disable : 4996)
 #include "windows.h"
 #endif
@@ -36,7 +36,7 @@ class TzpReader : public Tiio::Reader
 	UCHAR *m_stripBuffer;
 	int m_x, m_y, m_lx, m_ly;
 	bool m_isCmap24;
-	string m_history;
+	std::string m_history;
 	int m_nColor;
 	int m_nPencil;
 	bool m_isBigEndian;
@@ -158,7 +158,7 @@ void TzpReader::open(FILE *file)
 	char *data;
 	uint32 count;
 	TIFFGetField(m_tiff, TIFFTAG_TOONZHISTORY, &count, &data);
-	string history(data);
+	std::string history(data);
 
 	uint16 planarconfig;
 	TIFFGetField(m_tiff, TIFFTAG_PLANARCONFIG, &planarconfig);
@@ -192,7 +192,7 @@ void TzpReader::readLine(char *buffer, int x0, int x1, int shrink)
 
 	if (m_isCmap24) {
 		if (m_y <= y && y < m_y + m_ly) {
-			vector<TUINT32> line(m_lx);
+			std::vector<TUINT32> line(m_lx);
 			TIFFReadScanline(m_tiff, (char *)&line[0], y - m_y, 0);
 			if (m_isFirstLineRead) {
 				m_isFirstLineRead = false;
@@ -220,7 +220,7 @@ void TzpReader::readLine(char *buffer, int x0, int x1, int shrink)
 		}
 	} else {
 		if (m_y <= y && y < m_y + m_ly) {
-			vector<unsigned short> line(m_lx);
+			std::vector<unsigned short> line(m_lx);
 			TIFFReadScanline(m_tiff, (char *)&line[0], y - m_y, 0);
 			pix += m_x;
 			static std::set<int> table;

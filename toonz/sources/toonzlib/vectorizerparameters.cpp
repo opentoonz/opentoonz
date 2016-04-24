@@ -74,7 +74,7 @@ void saveData(const VectorizerConfiguration &conf, TOStream &os)
 
 void loadData(VectorizerConfiguration &conf, TIStream &is)
 {
-	string tagName;
+	std::string tagName;
 	while (is.matchTag(tagName)) {
 		if (tagName == s_threshold)
 			is >> conf.m_threshold, is.matchEndTag();
@@ -110,7 +110,7 @@ void saveData(const CenterlineConfiguration &conf, TOStream &os)
 
 void loadData(CenterlineConfiguration &conf, TIStream &is)
 {
-	string tagName;
+	std::string tagName;
 	while (is.matchTag(tagName)) {
 		if (tagName == s_generalConfiguration)
 			loadData(static_cast<VectorizerConfiguration &>(conf), is), is.matchEndTag();
@@ -157,7 +157,7 @@ void saveData(const NewOutlineConfiguration &conf, TOStream &os)
 
 void loadData(NewOutlineConfiguration &conf, TIStream &is)
 {
-	string tagName;
+	std::string tagName;
 	while (is.matchTag(tagName)) {
 		if (tagName == s_generalConfiguration)
 			loadData(static_cast<VectorizerConfiguration &>(conf), is), is.matchEndTag();

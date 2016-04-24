@@ -130,7 +130,7 @@ void cloneNotColumnLinkedFxsAndOutputsFx(TXsheet *xsh, TXsheet *newXsh)
 	FxDag *newFxDag = newXsh->getFxDag();
 
 	//aggiungo nel mapping tutti gli effetti che non sono connessi da un cammino con una colonna
-	vector<TFx *> fxs, newFxs;
+	std::vector<TFx *> fxs, newFxs;
 	fxDag->getFxs(fxs);
 	newFxDag->getFxs(newFxs);
 	QList<TFx *> notColumnLinkedClonedFxs;
@@ -271,7 +271,7 @@ bool pasteColumnsWithoutUndo(std::set<int> *indices, bool doClone, const StageOb
 		return false;
 	}
 
-	list<int> restoredSplineIds;
+	std::list<int> restoredSplineIds;
 	data->restoreObjects(*indices, restoredSplineIds, xsh, doClone ? StageObjectsData::eDoClone : 0);
 	app->getCurrentXsheet()->notifyXsheetChanged();
 	app->getCurrentObject()->notifyObjectIdSwitched();
@@ -343,8 +343,8 @@ void deleteColumnsWithoutUndo(std::set<int> *indices, bool onlyColumns = false)
 			if (TZeraryFx *zeraryFx = dynamic_cast<TZeraryFx *>(outFx))
 				outFx = zeraryFx->getColumnFx();
 
-			vector<TFx *>::iterator it = std::find(fxsToKill.begin(), fxsToKill.end(), outFx);
-			set<TFx *>::iterator it2 = std::find(leaves.begin(), leaves.end(), outFx);
+			std::vector<TFx *>::iterator it = std::find(fxsToKill.begin(), fxsToKill.end(), outFx);
+			std::set<TFx *>::iterator it2 = std::find(leaves.begin(), leaves.end(), outFx);
 
 			if (it == fxsToKill.end() && it2 == leaves.end())
 				port->setFx(0);
@@ -376,7 +376,7 @@ void resetColumns(const QMimeData *mimeData, std::set<int> *indices, const QMap<
 		return;
 	TApp *app = TApp::instance();
 	TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
-	list<int> restoredSplineIds;
+	std::list<int> restoredSplineIds;
 	data->restoreObjects(*indices, restoredSplineIds, xsh, 0);
 	QMap<TFxPort *, TFx *>::const_iterator it;
 	for (it = columnFxLinks.begin(); it != columnFxLinks.end(); it++)
@@ -424,7 +424,7 @@ TXshChildLevel *cloneChildLevel(TXshChildLevel *cl)
 	StageObjectsData *data = new StageObjectsData();
 	data->storeColumns(indices, childXsh, 0);
 	data->storeColumnFxs(indices, childXsh, 0);
-	list<int> restoredSplineIds;
+	std::list<int> restoredSplineIds;
 	data->restoreObjects(indices, restoredSplineIds, newChildXsh, StageObjectsData::eDoClone);
 	delete data;
 
@@ -1152,7 +1152,7 @@ void ColumnCmd::cloneChild(int index)
 	StageObjectsData *data = new StageObjectsData();
 	data->storeColumns(indices, childXsh, 0);
 	data->storeColumnFxs(indices, childXsh, 0);
-	list<int> restoredSplineIds;
+	std::list<int> restoredSplineIds;
 	data->restoreObjects(indices, restoredSplineIds, newChildXsh, StageObjectsData::eDoClone);
 	delete data;
 

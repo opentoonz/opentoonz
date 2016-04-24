@@ -73,7 +73,7 @@ TEnv::IntVar FillRange("InknpaintFillRange", 0);
 namespace
 {
 
-inline int vectorFill(const TVectorImageP &img, const wstring &type, const TPointD &point, int style, bool emptyOnly = false)
+inline int vectorFill(const TVectorImageP &img, const std::wstring &type, const TPointD &point, int style, bool emptyOnly = false)
 {
 	if (type == ALL || type == LINES) {
 		int oldStyleId = img->fillStrokes(point, style);
@@ -96,7 +96,7 @@ class VectorFillUndo : public TToolUndo
 	int m_oldColorStyle;
 	int m_newColorStyle;
 	TPointD m_point;
-	wstring m_type;
+	std::wstring m_type;
 	int m_row;
 	int m_column;
 
@@ -104,7 +104,7 @@ public:
 	VectorFillUndo(
 		int newColorStyle,
 		int oldColorStyle,
-		wstring fillType,
+		std::wstring fillType,
 		TPointD clickPoint,
 		TXshSimpleLevel *sl,
 		const TFrameId &fid)
@@ -190,8 +190,8 @@ public:
 
 class VectorRectFillUndo : public TToolUndo
 {
-	vector<TFilledRegionInf> *m_regionFillInformation;
-	vector<pair<int, int>> *m_strokeFillInformation;
+	std::vector<TFilledRegionInf> *m_regionFillInformation;
+	std::vector<std::pair<int, int>> *m_strokeFillInformation;
 	TRectD m_selectionArea;
 	int m_styleId;
 	bool m_unpaintedOnly;
@@ -209,8 +209,8 @@ public:
 	}
 
 	VectorRectFillUndo(
-		vector<TFilledRegionInf> *regionFillInformation,
-		vector<pair<int, int>> *strokeFillInformation,
+		std::vector<TFilledRegionInf> *regionFillInformation,
+		std::vector<std::pair<int, int>> *strokeFillInformation,
 		TRectD selectionArea,
 		TStroke *stroke,
 		int styleId,
@@ -300,7 +300,7 @@ class RasterFillUndo : public TRasterUndo
 public:
 	/*RasterFillUndo(TTileSetCM32 *tileSet, TPoint fillPoint,
 								 int paintId, int fillDepth,
-								 wstring fillType, bool isSegment,
+								 std::wstring fillType, bool isSegment,
 								 bool selective, bool isShiftFill,
 								 TXshSimpleLevel* sl, const TFrameId& fid)*/
 	RasterFillUndo(TTileSetCM32 *tileSet, const FillParameters &params,
@@ -370,7 +370,7 @@ class RasterRectFillUndo : public TRasterUndo
 {
 	TRect m_fillArea;
 	int m_paintId;
-	wstring m_colorType;
+	std::wstring m_colorType;
 	TStroke *m_s;
 	bool m_onlyUnfilled;
 	TPalette *m_palette;
@@ -385,7 +385,7 @@ public:
 	RasterRectFillUndo(TTileSetCM32 *tileSet, TStroke *s,
 					   TRect fillArea, int paintId,
 					   TXshSimpleLevel *level,
-					   wstring colorType, bool onlyUnfilled,
+					   std::wstring colorType, bool onlyUnfilled,
 					   const TFrameId &fid, TPalette *palette)
 		: TRasterUndo(tileSet, level, fid, false, false, 0), m_fillArea(fillArea), m_paintId(paintId), m_colorType(colorType), m_onlyUnfilled(onlyUnfilled), m_palette(palette)
 	{
@@ -548,7 +548,7 @@ public:
 
 class VectorAutoFillUndo : public TToolUndo
 {
-	vector<TFilledRegionInf> *m_regionFillInformation;
+	std::vector<TFilledRegionInf> *m_regionFillInformation;
 	TRectD m_selectionArea;
 	TStroke *m_selectingStroke;
 	bool m_unpaintedOnly;
@@ -566,7 +566,7 @@ public:
 	}
 
 	VectorAutoFillUndo(
-		vector<TFilledRegionInf> *regionFillInformation,
+		std::vector<TFilledRegionInf> *regionFillInformation,
 		TRectD selectionArea,
 		TStroke *selectingStroke,
 		bool unpaintedOnly,
@@ -692,7 +692,7 @@ void doRectAutofill(const TImageP &img, const TRectD selectingRect, bool onlyUnf
 		TVectorImageP onionImg(sl->getFrame(onionFid, false));
 		if (!onionImg)
 			return;
-		vector<TFilledRegionInf> *regionFillInformation = new vector<TFilledRegionInf>;
+		std::vector<TFilledRegionInf> *regionFillInformation = new std::vector<TFilledRegionInf>;
 		ImageUtils::getFillingInformationInArea(vi, *regionFillInformation, selectingRect);
 		onionImg->findRegions();
 		vi->findRegions();
@@ -781,7 +781,7 @@ void doStrokeAutofill(const TImageP &img, TStroke *selectingStroke, bool onlyUnf
 		TVectorImageP onionImg(sl->getFrame(onionFid, false));
 		if (!onionImg)
 			return;
-		vector<TFilledRegionInf> *regionFillInformation = new vector<TFilledRegionInf>;
+		std::vector<TFilledRegionInf> *regionFillInformation = new std::vector<TFilledRegionInf>;
 		ImageUtils::getFillingInformationInArea(vi, *regionFillInformation, selectingStroke->getBBox());
 		onionImg->findRegions();
 		vi->findRegions();
@@ -812,7 +812,7 @@ void fillAreaWithUndo(
 	const TRectD &area,
 	TStroke *stroke,
 	bool onlyUnfilled,
-	wstring colorType,
+	std::wstring colorType,
 	TXshSimpleLevel *sl,
 	const TFrameId &fid,
 	int cs)
@@ -871,14 +871,14 @@ void fillAreaWithUndo(
 
 		vi->findRegions();
 
-		vector<TFilledRegionInf> *regionFillInformation = 0;
-		vector<pair<int, int>> *strokeFillInformation = 0;
+		std::vector<TFilledRegionInf> *regionFillInformation = 0;
+		std::vector<std::pair<int, int>> *strokeFillInformation = 0;
 		if (colorType != LINES) {
-			regionFillInformation = new vector<TFilledRegionInf>;
+			regionFillInformation = new std::vector<TFilledRegionInf>;
 			ImageUtils::getFillingInformationInArea(vi, *regionFillInformation, selArea);
 		}
 		if (colorType != AREAS) {
-			strokeFillInformation = new vector<pair<int, int>>;
+			strokeFillInformation = new std::vector<std::pair<int, int>>;
 			ImageUtils::getStrokeStyleInformationInArea(vi, *strokeFillInformation, selArea);
 		}
 
@@ -1030,7 +1030,7 @@ void SequencePainter::processSequence(TXshSimpleLevel *sl, TFrameId firstFid, TF
 		backward = true;
 	}
 	assert(firstFid <= lastFid);
-	vector<TFrameId> allFids;
+	std::vector<TFrameId> allFids;
 	sl->getFids(allFids);
 
 	std::vector<TFrameId>::iterator i0 = allFids.begin();
@@ -1042,7 +1042,7 @@ void SequencePainter::processSequence(TXshSimpleLevel *sl, TFrameId firstFid, TF
 	while (i1 != allFids.end() && *i1 <= lastFid)
 		i1++;
 	assert(i0 < i1);
-	vector<TFrameId> fids(i0, i1);
+	std::vector<TFrameId> fids(i0, i1);
 	int m = fids.size();
 	assert(m > 0);
 
@@ -1076,7 +1076,7 @@ class MultiAreaFiller : public SequencePainter
 {
 	TRectD m_firstRect, m_lastRect;
 	bool m_unfilledOnly;
-	wstring m_colorType;
+	std::wstring m_colorType;
 	TVectorImageP m_firstImage, m_lastImage;
 	int m_styleIndex;
 
@@ -1085,7 +1085,7 @@ public:
 		const TRectD &firstRect,
 		const TRectD &lastRect,
 		bool unfilledOnly,
-		wstring colorType,
+		std::wstring colorType,
 		int styleIndex)
 		: m_firstRect(firstRect), m_lastRect(lastRect), m_unfilledOnly(unfilledOnly), m_colorType(colorType), m_firstImage(), m_lastImage(), m_styleIndex(styleIndex)
 	{
@@ -1103,7 +1103,7 @@ public:
 		TStroke *&firstStroke,
 		TStroke *&lastStroke,
 		bool unfilledOnly,
-		wstring colorType,
+		std::wstring colorType,
 		int styleIndex)
 		: m_firstRect(), m_lastRect(), m_unfilledOnly(unfilledOnly), m_colorType(colorType), m_styleIndex(styleIndex)
 	{
@@ -1188,7 +1188,7 @@ public:
 // AreaFillTool
 //-----------------------------------------------------------------------------
 
-void drawPolyline(const vector<TPointD> &points)
+void drawPolyline(const std::vector<TPointD> &points)
 {
 	if (points.empty())
 		return;
@@ -1221,10 +1221,10 @@ private:
 	TXshSimpleLevelP m_level;
 	TFrameId m_firstFrameId, m_veryFirstFrameId;
 	TTool *m_parent;
-	wstring m_colorType;
+	std::wstring m_colorType;
 	std::pair<int, int> m_currCell;
 	StrokeGenerator m_track;
-	vector<TPointD> m_polyline;
+	std::vector<TPointD> m_polyline;
 	bool m_isPath;
 	bool m_active;
 	bool m_enabled;
@@ -1368,7 +1368,7 @@ public:
 			m_polyline.push_back(pos);
 		if (m_polyline.back() != m_polyline.front())
 			m_polyline.push_back(m_polyline.front());
-		vector<TThickPoint> strokePoints;
+		std::vector<TThickPoint> strokePoints;
 		for (UINT i = 0; i < m_polyline.size() - 1; i++) {
 			strokePoints.push_back(TThickPoint(m_polyline[i], 1));
 			strokePoints.push_back(TThickPoint(0.5 * (m_polyline[i] + m_polyline[i + 1]), 1));
@@ -1615,7 +1615,7 @@ public:
 	}
 
 	/*--Normal以外のTypeが選択された場合に呼ばれる--*/
-	bool onPropertyChanged(bool multi, bool onlyUnfilled, bool onion, Type type, wstring colorType)
+	bool onPropertyChanged(bool multi, bool onlyUnfilled, bool onion, Type type, std::wstring colorType)
 	{
 		m_frameRange = multi;
 		m_onlyUnfilled = onlyUnfilled;
@@ -1722,7 +1722,7 @@ public:
 		/*--- 線分上にある全ての点でdoFillを行う ---*/
 		double dx = m_mousePosition.x - m_startPosition.x;
 		double dy = m_mousePosition.y - m_startPosition.y;
-		if (abs(dx) > abs(dy)) /*-- 横長の線分の場合 --*/
+		if (std::abs(dx) > std::abs(dy)) /*-- 横長の線分の場合 --*/
 		{
 			double k = dy / dx; /*-- 直線の傾き --*/
 			/*--- roundでは負値のときにうまく繋がらない ---*/
@@ -1807,7 +1807,7 @@ class FillTool : public TTool
 	TPropertyGroup m_prop;
 	std::pair<int, int> m_currCell;
 #ifdef _DEBUG
-	vector<TRect> m_rects;
+	std::vector<TRect> m_rects;
 #endif
 
 public:
@@ -1828,7 +1828,7 @@ public:
 	void leftButtonDoubleClick(const TPointD &pos, const TMouseEvent &e);
 	void resetMulti();
 
-	bool onPropertyChanged(string propertyName);
+	bool onPropertyChanged(std::string propertyName);
 	void onImageChanged();
 
 	void draw();
@@ -2112,7 +2112,7 @@ void FillTool::resetMulti()
 
 //-----------------------------------------------------------------------------
 
-bool FillTool::onPropertyChanged(string propertyName)
+bool FillTool::onPropertyChanged(std::string propertyName)
 {
 	/*--- m_rectFill->onPropertyChangedを呼ぶかどうかのフラグ
 			fillType, frameRange, selective, colorTypeが変わったときに呼ぶ---*/

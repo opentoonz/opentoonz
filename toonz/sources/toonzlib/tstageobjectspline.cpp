@@ -115,7 +115,7 @@ TStageObjectSpline::TStageObjectSpline()
 	: TSmartObject(m_classCode), m_stroke(0), m_dagNodePos(TConst::nowhere), m_id(-1), m_idBase(toString(idBaseCode++)), m_name(""), m_isOpened(false)
 {
 	double d = 30;
-	vector<TThickPoint> points;
+	std::vector<TThickPoint> points;
 	points.push_back(TPointD(0, 0));
 	points.push_back(TPointD(d, 0));
 	points.push_back(TPointD(2.0 * d, 0));
@@ -180,7 +180,7 @@ void TStageObjectSpline::setStroke(TStroke *stroke)
 
 void TStageObjectSpline::loadData(TIStream &is)
 {
-	vector<TThickPoint> points;
+	std::vector<TThickPoint> points;
 	VersionNumber tnzVersion = is.getVersion();
 	if (tnzVersion < VersionNumber(1, 16)) {
 		while (!is.eos()) {
@@ -189,7 +189,7 @@ void TStageObjectSpline::loadData(TIStream &is)
 			points.push_back(p);
 		}
 	} else {
-		string tagName;
+		std::string tagName;
 		while (is.matchTag(tagName)) {
 			if (tagName == "splineId")
 				is >> m_id;
@@ -253,7 +253,7 @@ int TStageObjectSpline::getId() const
 
 //-----------------------------------------------------------------------------
 
-string TStageObjectSpline::getName() const
+std::string TStageObjectSpline::getName() const
 {
 	if (m_name == "")
 		return "Path" + toString(m_id + 1);
@@ -262,7 +262,7 @@ string TStageObjectSpline::getName() const
 
 //-----------------------------------------------------------------------------
 
-string TStageObjectSpline::getIconId()
+std::string TStageObjectSpline::getIconId()
 {
 	return "spline" + m_idBase;
 }

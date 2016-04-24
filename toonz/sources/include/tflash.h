@@ -54,9 +54,9 @@ public:
 class DVAPI TFlash
 {
 public:
-        static const wstring ConstantLines;
-        static const wstring MixedLines;
-        static const wstring VariableLines;
+	static const std::wstring ConstantLines;
+	static const std::wstring MixedLines;
+	static const std::wstring VariableLines;
         
 	TFlash(int lx, int ly, int frameCount, int frameRate, TPropertyGroup *properties, bool keepImages = true) {}
 	~TFlash() {}
@@ -70,19 +70,19 @@ public:
 	void setFillStyleMatrix(const TAffine &aff) {}
 	void setGradientFill(bool isLinear, const TPixel &color1, const TPixel &color2, double smooth) {}
 	void drawLine(const TPointD &a, const TPointD &b) {}
-	void drawPolygon(vector<vector<TQuadratic *>> &quads, int clippedShapes = 0) {}
+	void drawPolygon(std::vector<std::vector<TQuadratic *>> &quads, int clippedShapes = 0) {}
 	int drawRaster(TRaster32P r) { return 0; }
 	void drawRegion(const TRegion &r, int clippedShapes = 0) {}
 	void drawCenterline(const TStroke *s, bool drawAll) {}
 	bool drawOutline(TStroke *s) { return false; }
-	void drawSegments(const vector<TSegment> segmentArray, bool isGradientColor);
-	void drawquads(const vector<TQuadratic> quadsArray);
+	void drawSegments(const std::vector<TSegment> segmentArray, bool isGradientColor);
+	void drawquads(const std::vector<TQuadratic> quadsArray);
 	USHORT buildImage(const TImageP img, bool isMask) { return 0; }
 	void draw(const TImageP vi, const TColorFunction *cf) {}
 	void beginFrame(int frameIndex) {}
 	int endFrame(bool isLast, int frameCountLoader, bool lastScene) { return 0; }
 	int drawRectangle(const TRectD &rect) { return 0; }
-	int drawPolyline(vector<TPointD> &poly) { return 0; }
+	int drawPolyline(std::vector<TPointD> &poly) { return 0; }
 	int drawEllipse(const TPointD &center, double radiusX, double radiusY) { return 0; }
 	void drawDot(const TPointD &center, double radius) {}
 	void pushMatrix() {}
@@ -90,8 +90,8 @@ public:
 	void multMatrix(const TAffine &aff) {}
 	void putSound(TSoundTrackP st, int offset) {}
 	void writeMovie(FILE *fp) {}
-	void drawPolygon(const list<TQuadratic *> &poly, bool isOutline) {}
-	wstring getLineQuality() { return nullptr; }
+	void drawPolygon(const std::list<TQuadratic *> &poly, bool isOutline) {}
+	std::wstring getLineQuality() { return nullptr; }
 	void cleanCachedImages() {}
 	void enableMask() {} 
 	void disableMask() {}

@@ -160,7 +160,7 @@ bool ImageBuilder::setImageInfo(TImageInfo &info, TImageReader *ir)
 
 struct ImageManager::Imp {
 	QReadWriteLock m_tableLock;					//!< Lock for the builders table
-	std::map<string, ImageBuilderP> m_builders; //!< identifier -> ImageBuilder table
+	std::map<std::string, ImageBuilderP> m_builders; //!< identifier -> ImageBuilder table
 
 public:
 	Imp() : m_tableLock(QReadWriteLock::Recursive) {}
@@ -194,7 +194,7 @@ ImageManager *ImageManager::instance()
 
 //-----------------------------------------------------------------------------
 
-void ImageManager::bind(const string &id, ImageBuilder *builderPtr)
+void ImageManager::bind(const std::string &id, ImageBuilder *builderPtr)
 {
 	if (!builderPtr) {
 		unbind(id);
@@ -212,7 +212,7 @@ void ImageManager::bind(const string &id, ImageBuilder *builderPtr)
 
 //-----------------------------------------------------------------------------
 
-bool ImageManager::unbind(const string &id)
+bool ImageManager::unbind(const std::string &id)
 {
 	QWriteLocker locker(&m_imp->m_tableLock);
 
@@ -230,7 +230,7 @@ bool ImageManager::unbind(const string &id)
 
 //-----------------------------------------------------------------------------
 
-bool ImageManager::isBound(const string &id) const
+bool ImageManager::isBound(const std::string &id) const
 {
 	QReadLocker locker(&m_imp->m_tableLock);
 	return m_imp->m_builders.find(id) != m_imp->m_builders.end();
@@ -238,11 +238,11 @@ bool ImageManager::isBound(const string &id) const
 
 //-----------------------------------------------------------------------------
 
-bool ImageManager::rebind(const string &srcId, const string &dstId)
+bool ImageManager::rebind(const std::string &srcId, const std::string &dstId)
 {
 	QWriteLocker locker(&m_imp->m_tableLock);
 
-	std::map<string, ImageBuilderP>::iterator st = m_imp->m_builders.find(srcId);
+	std::map<std::string, ImageBuilderP>::iterator st = m_imp->m_builders.find(srcId);
 	if (st == m_imp->m_builders.end())
 		return false;
 
@@ -268,12 +268,12 @@ void ImageManager::clear()
 
 //-----------------------------------------------------------------------------
 
-TImageInfo *ImageManager::getInfo(const string &id, int imFlags, void *extData)
+TImageInfo *ImageManager::getInfo(const std::string &id, int imFlags, void *extData)
 {
 	// Lock for table read and try to find data in the cache
 	QReadLocker tableLocker(&m_imp->m_tableLock);
 
-	std::map<string, ImageBuilderP>::iterator it = m_imp->m_builders.find(id);
+	std::map<std::string, ImageBuilderP>::iterator it = m_imp->m_builders.find(id);
 	if (it == m_imp->m_builders.end())
 		return 0;
 
@@ -302,7 +302,7 @@ TImageInfo *ImageManager::getInfo(const string &id, int imFlags, void *extData)
 
 //-----------------------------------------------------------------------------
 
-TImageP ImageManager::getImage(const string &id, int imFlags, void *extData)
+TImageP ImageManager::getImage(const std::string &id, int imFlags, void *extData)
 {
 	assert(!((imFlags & ImageManager::toBeModified) && (imFlags & ImageManager::dontPutInCache)));
 	assert(!((imFlags & ImageManager::toBeModified) && (imFlags & ImageManager::toBeSaved)));
@@ -310,7 +310,7 @@ TImageP ImageManager::getImage(const string &id, int imFlags, void *extData)
 	// Lock for table read and try to find data in the cache
 	QReadLocker tableLocker(&m_imp->m_tableLock);
 
-	std::map<string, ImageBuilderP>::iterator it = m_imp->m_builders.find(id);
+	std::map<std::string, ImageBuilderP>::iterator it = m_imp->m_builders.find(id);
 	if (it == m_imp->m_builders.end())
 		return TImageP();
 
@@ -373,7 +373,7 @@ TImageP ImageManager::getImage(const string &id, int imFlags, void *extData)
 
 //-----------------------------------------------------------------------------
 // load icon (and image) data of all frames into cache
-void ImageManager::loadAllTlvIconsAndPutInCache(TXshSimpleLevel *level, vector<TFrameId> fids, vector<string> iconIds, bool cacheImagesAsWell)
+void ImageManager::loadAllTlvIconsAndPutInCache(TXshSimpleLevel *level, std::vector<TFrameId> fids, std::vector<std::string> iconIds, bool cacheImagesAsWell)
 {
 	if (fids.empty() || iconIds.empty())
 		return;
@@ -383,7 +383,7 @@ void ImageManager::loadAllTlvIconsAndPutInCache(TXshSimpleLevel *level, vector<T
 
 	//obtain ImageLoader with the first fId
 	TImageInfo info;
-	std::map<string, ImageBuilderP>::iterator it = m_imp->m_builders.find(level->getImageId(fids[0]));
+	std::map<std::string, ImageBuilderP>::iterator it = m_imp->m_builders.find(level->getImageId(fids[0]));
 	if (it != m_imp->m_builders.end()) {
 		const ImageBuilderP &builder = it->second;
 		assert(builder);
@@ -401,7 +401,7 @@ void ImageManager::loadAllTlvIconsAndPutInCache(TXshSimpleLevel *level, vector<T
 
 		// put flags to all builders
 		for (int f = 0; f < fids.size(); f++) {
-			std::map<string, ImageBuilderP>::iterator it = m_imp->m_builders.find(level->getImageId(fids[f]));
+			std::map<std::string, ImageBuilderP>::iterator it = m_imp->m_builders.find(level->getImageId(fids[f]));
 			if (it != m_imp->m_builders.end()) {
 				const ImageBuilderP &builder = it->second;
 				builder->setImageCachedAndModified();
@@ -413,11 +413,11 @@ void ImageManager::loadAllTlvIconsAndPutInCache(TXshSimpleLevel *level, vector<T
 
 //-----------------------------------------------------------------------------
 
-bool ImageManager::invalidate(const string &id)
+bool ImageManager::invalidate(const std::string &id)
 {
 	QWriteLocker locker(&m_imp->m_tableLock);
 
-	std::map<string, ImageBuilderP>::iterator it = m_imp->m_builders.find(id);
+	std::map<std::string, ImageBuilderP>::iterator it = m_imp->m_builders.find(id);
 	if (it == m_imp->m_builders.end())
 		return false;
 
@@ -433,14 +433,14 @@ bool ImageManager::invalidate(const string &id)
 
 //-----------------------------------------------------------------------------
 
-bool ImageManager::setImage(const string &id, const TImageP &img)
+bool ImageManager::setImage(const std::string &id, const TImageP &img)
 {
 	if (!img)
 		return invalidate(id);
 
 	QWriteLocker locker(&m_imp->m_tableLock);
 
-	std::map<string, ImageBuilderP>::iterator it = m_imp->m_builders.find(id);
+	std::map<std::string, ImageBuilderP>::iterator it = m_imp->m_builders.find(id);
 	if (it == m_imp->m_builders.end())
 		return false;
 
@@ -457,30 +457,30 @@ bool ImageManager::setImage(const string &id, const TImageP &img)
 
 //-----------------------------------------------------------------------------
 
-ImageBuilder *ImageManager::getBuilder(const string &id)
+ImageBuilder *ImageManager::getBuilder(const std::string &id)
 {
 	QWriteLocker locker(&m_imp->m_tableLock);
 
-	std::map<string, ImageBuilderP>::iterator it = m_imp->m_builders.find(id);
+	std::map<std::string, ImageBuilderP>::iterator it = m_imp->m_builders.find(id);
 	return (it == m_imp->m_builders.end()) ? (ImageBuilder *)0 : it->second.getPointer();
 }
 
 //-----------------------------------------------------------------------------
 
-bool ImageManager::isCached(const string &id)
+bool ImageManager::isCached(const std::string &id)
 {
 	QWriteLocker locker(&m_imp->m_tableLock);
 
-	std::map<string, ImageBuilderP>::iterator it = m_imp->m_builders.find(id);
+	std::map<std::string, ImageBuilderP>::iterator it = m_imp->m_builders.find(id);
 	return (it == m_imp->m_builders.end()) ? false : it->second->m_cached;
 }
 
 //-----------------------------------------------------------------------------
 
-bool ImageManager::isModified(const string &id)
+bool ImageManager::isModified(const std::string &id)
 {
 	QWriteLocker locker(&m_imp->m_tableLock);
 
-	std::map<string, ImageBuilderP>::iterator it = m_imp->m_builders.find(id);
+	std::map<std::string, ImageBuilderP>::iterator it = m_imp->m_builders.find(id);
 	return (it == m_imp->m_builders.end()) ? false : it->second->m_modified;
 }

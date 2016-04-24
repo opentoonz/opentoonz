@@ -264,7 +264,7 @@ bool isValidFileName(const QString &fileName)
 
 bool isValidFileName_message(const QString &fileName)
 {
-	return isValidFileName(fileName) ? true : (MsgBox(CRITICAL, QObject::tr("The file name cannot be empty or contain any of the following "
+	return isValidFileName(fileName) ? true : (DVGui::error(QObject::tr("The file name cannot be empty or contain any of the following "
 																			"characters: (new line) \\ / : * ? \" |")),
 											   false);
 }

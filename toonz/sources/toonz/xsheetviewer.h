@@ -13,7 +13,7 @@
 #include "cellkeyframeselection.h"
 #include "toonzqt/spreadsheetviewer.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #define XSHEET_FONT_SIZE 9
 #define H_ADJUST 2
 #else
@@ -97,6 +97,7 @@ const QColor SoundTextColumnBorderColor(140, 140, 140);
 
 const QColor MeshColumnColor(200, 130, 255);
 const QColor MeshColumnBorderColor(105, 70, 135);
+const QColor SelectedMeshColumnColor(216, 180, 245);
 
 //Empty column
 const QColor EmptyColumnColor(124, 124, 124);
@@ -252,7 +253,14 @@ class XsheetViewer : public QFrame, public Spreadsheet::FrameScroller
 	Q_PROPERTY(QColor PaletteColumnColor READ getPaletteColumnColor WRITE setPaletteColumnColor)
 	Q_PROPERTY(QColor PaletteColumnBorderColor READ getPaletteColumnBorderColor WRITE setPaletteColumnBorderColor)
 	Q_PROPERTY(QColor SelectedPaletteColumnColor READ getSelectedPaletteColumnColor WRITE setSelectedPaletteColumnColor)
-
+	//Mesh column
+	QColor m_meshColumnColor;
+	QColor m_meshColumnBorderColor;
+	QColor m_selectedMeshColumnColor;
+	Q_PROPERTY(QColor MeshColumnColor READ getMeshColumnColor WRITE setMeshColumnColor)
+	Q_PROPERTY(QColor MeshColumnBorderColor READ getMeshColumnBorderColor WRITE setMeshColumnBorderColor)
+	Q_PROPERTY(QColor SelectedMeshColumnColor READ getSelectedMeshColumnColor WRITE setSelectedMeshColumnColor)
+	
 	//for making the column head lighter (255,255,255,50);
 	QColor m_columnHeadPastelizer;
 	Q_PROPERTY(QColor ColumnHeadPastelizer READ getColumnHeadPastelizer WRITE setColumnHeadPastelizer)
@@ -391,7 +399,7 @@ public:
 	QList<XsheetGUI::NoteWidget *> getNotesWidget() const;
 	void addNoteWidget(XsheetGUI::NoteWidget *w);
 	int getCurrentNoteIndex() const;
-	//! Clear notes widgets vector.
+	//! Clear notes widgets std::vector.
 	void clearNoteWidgets();
 	//! Update notes widgets and update cell.
 	void updateNoteWidgets();
@@ -488,7 +496,14 @@ public:
 	QColor getPaletteColumnColor() const { return m_paletteColumnColor; }
 	QColor getPaletteColumnBorderColor() const { return m_paletteColumnBorderColor; }
 	QColor getSelectedPaletteColumnColor() const { return m_selectedPaletteColumnColor; }
-
+	//Mesh column
+	void setMeshColumnColor(const QColor &color) { m_meshColumnColor = color; }
+	void setMeshColumnBorderColor(const QColor &color) { m_meshColumnBorderColor = color; }
+	void setSelectedMeshColumnColor(const QColor &color) { m_selectedMeshColumnColor = color; }
+	QColor getMeshColumnColor() const { return m_meshColumnColor; }
+	QColor getMeshColumnBorderColor() const { return m_meshColumnBorderColor; }
+	QColor getSelectedMeshColumnColor() const { return m_selectedMeshColumnColor; }
+	
 	void setColumnHeadPastelizer(const QColor &color) { m_columnHeadPastelizer = color; }
 	QColor getColumnHeadPastelizer() const { return m_columnHeadPastelizer; }
 	void setSelectedColumnHead(const QColor &color) { m_selectedColumnHead = color; }

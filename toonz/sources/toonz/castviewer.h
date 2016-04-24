@@ -1,7 +1,7 @@
-
-
 #ifndef CAST_VIEWER_INCLUDED
 #define CAST_VIEWER_INCLUDED
+
+#include <memory>
 
 #include <QSplitter>
 #include <QTreeWidget>
@@ -74,7 +74,7 @@ class CastBrowser : public QSplitter, public DvItemListModel
 	QLabel *m_folderName;
 	DvItemViewer *m_itemViewer;
 
-	CastItems *m_castItems;
+	std::unique_ptr<CastItems> m_castItems;
 
 public:
 #if QT_VERSION >= 0x050500
@@ -84,7 +84,7 @@ public:
 #endif
 	~CastBrowser();
 
-	CastItems *getCastItems() const { return m_castItems; }
+	CastItems const& getCastItems() const { return *m_castItems; }
 
 	void sortByDataModel(DataType dataType, bool isDiscendent);
 

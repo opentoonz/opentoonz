@@ -117,7 +117,7 @@ TXshColumn *TXshLevelColumn::clone() const
 
 void TXshLevelColumn::loadData(TIStream &is)
 {
-	string tagName;
+	std::string tagName;
 	while (is.openChild(tagName)) {
 		if (tagName == "status") {
 			int status;

@@ -16,12 +16,10 @@
 
 #include "SDef.h"
 
-using namespace std;
-
 class SError
 {
 protected:
-	string m_msg;
+	std::string m_msg;
 
 public:
 	SError() : m_msg(""){};

@@ -34,13 +34,13 @@ class DVAPI TXshSoundLevel : public TXshLevel
 	/*!Integer is horizontal value of row pixel.
      DoublePair is computed according to frameRate, frameCount
      and soundtrack pressure.*/
-	map<int, DoublePair> m_values;
+	std::map<int, DoublePair> m_values;
 
 	TFilePath m_path;
 
 	DECLARE_CLASS_CODE
 public:
-	TXshSoundLevel(wstring name = L"", int startOffset = 0, int endOffset = 0);
+	TXshSoundLevel(std::wstring name = L"", int startOffset = 0, int endOffset = 0);
 	~TXshSoundLevel();
 
 	TXshSoundLevel *clone() const;
@@ -93,7 +93,7 @@ private:
 	TXshSoundLevel &operator=(const TXshSoundLevel &);
 };
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DV_EXPORT_API TSmartPointerT<TXshSoundLevel>;
 #endif
 typedef TSmartPointerT<TXshSoundLevel> TXshSoundLevelP;

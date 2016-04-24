@@ -37,7 +37,7 @@ class TreeStageNode
 	//! The node to replace in the window
 	StageSchematicNode *m_node;
 	//! The childre of the node
-	vector<TreeStageNode *> m_cildren;
+	std::vector<TreeStageNode *> m_cildren;
 
 public:
 	TreeStageNode(StageSchematicNode *node)
@@ -144,7 +144,7 @@ private:
 
 	//! Search nodes in the TStageObjectTree that are roots of a tree.
 	//! Roots are placed in the container \b roots
-	void findRoots(vector<TreeStageNode *> &roots);
+	void findRoots(std::vector<TreeStageNode *> &roots);
 
 	//! Build the tree starting from \b treenode.
 	//! The tree is build recursively on each children of \b treeNode.

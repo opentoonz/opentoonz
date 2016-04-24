@@ -526,7 +526,7 @@ void loadControllerData(const TFilePath &fp, ControllerData &data)
 		is.getline(line, 1024);
 
 		if (line[0] != '#' && QString(line) != "") {
-			istrstream iss(line);
+			std::istrstream iss(line);
 
 			char hostName[512];
 			char ipAddr[80];

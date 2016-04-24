@@ -10,7 +10,7 @@
 
 #include <QList>
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(disable : 4251)
 #endif
 
@@ -80,7 +80,7 @@ public:
 	//  virtual void enableNotification(bool on) {}
 	//  virtual bool isNotificationEnabled() const { return true;}
 
-	string getValueAlias(double frame, int precision);
+	std::string getValueAlias(double frame, int precision);
 
 	bool isAnimatable() const { return true; };
 	bool isKeyframe(double frame) const;
@@ -99,7 +99,7 @@ public:
 	void saveData(TOStream &os);
 };
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DVAPI TSmartPointerT<TToneCurveParam>;
 template class DVAPI TDerivedSmartPointerT<TToneCurveParam, TParam>;
 #endif

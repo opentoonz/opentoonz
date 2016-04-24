@@ -25,6 +25,7 @@
  *       - i punti di cui e' nota la posizione corrente non sono
  *         allineati, ovvero non giacciono su un'unica retta
  ---------------------------------------------------------------------*/
+#include <memory>
 
 #include "predict3d.h"
 #include "metnum.h"
@@ -59,8 +60,6 @@ bool Predict3D::Predict(int k, Point initial[], Point current[], bool visible[])
 	/* Definizione e allocazione delle variabili */
 	int n, m, kvis;
 	double **x;
-	double *y;
-	double *c;
 	int i, ii, j, l;
 	kvis = 0;
 	for (i = 0; i < k; i++)
@@ -74,8 +73,8 @@ bool Predict3D::Predict(int k, Point initial[], Point current[], bool visible[])
 	x = AllocMatrix(m, n);
 	if (x == 0)
 		return false;
-	y = new double[n];
-	c = new double[m];
+	std::unique_ptr<double[]> y(new double[n]);
+	std::unique_ptr<double[]> c(new double[m]);
 
 	/* Costruzione dei coefficienti del sistema */
 
@@ -108,11 +107,9 @@ bool Predict3D::Predict(int k, Point initial[], Point current[], bool visible[])
 
 	/* Soluzione del sistema */
 
-	int status = Approx(n, m, x, y, c);
+	int status = Approx(n, m, x, y.get(), c.get());
 	if (status != 0) {
 		FreeMatrix(m, x);
-		delete[] y;
-		delete[] c;
 		return false;
 	}
 
@@ -130,8 +127,6 @@ bool Predict3D::Predict(int k, Point initial[], Point current[], bool visible[])
 	}
 
 	FreeMatrix(m, x);
-	delete[] y;
-	delete[] c;
 
 	return true;
 }

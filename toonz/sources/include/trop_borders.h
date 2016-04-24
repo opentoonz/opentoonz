@@ -147,7 +147,7 @@ class ImageMesh : public TSmartObject, public tcg::Mesh<Vertex, Edge, Face>
 
 //--------------------------------------------------------------------------------
 
-#ifdef WIN32
+#ifdef _WIN32
 template class TSmartPointerT<ImageMesh>;
 #endif
 typedef TSmartPointerT<ImageMesh> ImageMeshP;

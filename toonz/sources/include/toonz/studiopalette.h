@@ -58,12 +58,12 @@ public:
 
 	// ritorna il nome del folder creato
 	TFilePath createFolder(const TFilePath &parentFolderPath);
-	void createFolder(const TFilePath &parentFolderPath, wstring name);
+	void createFolder(const TFilePath &parentFolderPath, std::wstring name);
 
 	// ritorna il nome della palette creata;
 	// se paletteName != "" prova ad assegnare quel nome. Se esiste gia'
 	// aggiunge un suffisso
-	TFilePath createPalette(const TFilePath &folderPath, string paletteName = "");
+	TFilePath createPalette(const TFilePath &folderPath, std::string paletteName = "");
 
 	// DOESN'T get ownership
 	void setPalette(const TFilePath &palettePath, const TPalette *palette, bool notifyPaletteChanged);
@@ -85,10 +85,10 @@ public:
 	bool updateLinkedColors(TPalette *palette);
 	void setStylesGlobalNames(TPalette *palette);
 
-	TFilePath getPalettePath(wstring paletteId);
-	TPalette *getPalette(wstring paletteId);
+	TFilePath getPalettePath(std::wstring paletteId);
+	TPalette *getPalette(std::wstring paletteId);
 
-	TColorStyle *getStyle(wstring styleId);
+	TColorStyle *getStyle(std::wstring styleId);
 
 	// se lo stile ha un nome globale restituisce il nome della studio palette e l'indice
 	// dello stile linkato
@@ -111,7 +111,7 @@ public:
 private:
 	StudioPalette();
 	TFilePath m_root;
-	std::map<wstring, TFilePath> m_table;
+	std::map<std::wstring, TFilePath> m_table;
 	std::vector<Listener *> m_listeners;
 
 	TPalette *load(const TFilePath &path);

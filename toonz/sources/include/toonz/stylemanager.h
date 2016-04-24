@@ -38,7 +38,7 @@ class DVAPI CustomStyleManager : public QObject
 public:
 	struct DVAPI PatternData {
 		QImage *m_image;
-		string m_patternName;
+		std::string m_patternName;
 		bool m_isVector;
 
 		PatternData() : m_image(0), m_patternName(""), m_isVector(false) {}

@@ -116,13 +116,13 @@ public:
 
 //-----------------------------------------------------------------------------
 
-ostream &operator<<(ostream &out, const TStageObjectId &id);
+std::ostream &operator<<(std::ostream &out, const TStageObjectId &id);
 
 //-----------------------------------------------------------------------------
 
 /*!
   Return a \b TStageObjectId from \b string \b s.
 */
-TStageObjectId toStageObjectId(string s);
+TStageObjectId toStageObjectId(std::string s);
 
 #endif

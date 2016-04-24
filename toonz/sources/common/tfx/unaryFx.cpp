@@ -78,12 +78,12 @@ bool TGeometryFx::doGetBBox(double frame, TRectD &bBox, const TRenderSettings &i
 
 //--------------------------------------------------
 
-string TGeometryFx::getAlias(double frame, const TRenderSettings &info) const
+std::string TGeometryFx::getAlias(double frame, const TRenderSettings &info) const
 {
 	TGeometryFx *tthis = const_cast<TGeometryFx *>(this);
 	TAffine affine = tthis->getPlacement(frame);
 
-	string alias = getFxType();
+	std::string alias = getFxType();
 	alias += "[";
 
 	// alias degli effetti connessi alle porte di input separati da virgole

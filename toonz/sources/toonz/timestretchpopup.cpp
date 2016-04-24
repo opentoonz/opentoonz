@@ -1,4 +1,4 @@
-
+#include <memory>
 
 #include "timestretchpopup.h"
 
@@ -44,7 +44,7 @@ class TimeStretchUndo : public TUndo
 	int m_r0, m_r1;
 	int m_c0, m_c1;
 	int m_newRange;
-	TXshCell *m_cells;
+	std::unique_ptr<TXshCell[]> m_cells;
 
 	//servono per modificare la selezione
 	TimeStretchPopup::STRETCH_TYPE m_type;
@@ -53,12 +53,12 @@ class TimeStretchUndo : public TUndo
 
 public:
 	TimeStretchUndo(int r0, int c0, int r1, int c1, int newRange, TimeStretchPopup::STRETCH_TYPE type)
-		: m_r0(r0), m_c0(c0), m_r1(r1), m_c1(c1), m_newRange(newRange), m_cells(0), m_type(type), m_c0Old(0), m_c1Old(0)
+		: m_r0(r0), m_c0(c0), m_r1(r1), m_c1(c1), m_newRange(newRange), m_type(type), m_c0Old(0), m_c1Old(0)
 	{
 		int nr = m_r1 - m_r0 + 1;
 		int nc = m_c1 - m_c0 + 1;
 		assert(nr > 0 && nc > 0);
-		m_cells = new TXshCell[nr * nc];
+		m_cells.reset(new TXshCell[nr * nc]);
 		assert(m_cells);
 		int k = 0;
 		for (int c = c0; c <= c1; c++)
@@ -68,8 +68,6 @@ public:
 
 	~TimeStretchUndo()
 	{
-		delete[] m_cells;
-		m_cells = 0;
 	}
 
 	void setOldColumnRange(int c0, int c1)
@@ -235,7 +233,7 @@ TimeStretchPopup::TimeStretchPopup()
 	m_oldRange->setFixedSize(43, DVGui::WidgetHeight);
 	rangeLayout->addWidget(m_oldRange);
 	rangeLayout->addSpacing(10);
-	m_newRangeFld = new IntLineEdit(this);
+	m_newRangeFld = new DVGui::IntLineEdit(this);
 	rangeLayout->addWidget(new QLabel(tr("New Range:")), 1, Qt::AlignRight);
 	rangeLayout->addWidget(m_newRangeFld, 0, Qt::AlignRight);
 	addLayout(tr("Old Range:"), rangeLayout);

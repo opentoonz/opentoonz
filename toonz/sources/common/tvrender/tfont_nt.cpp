@@ -72,13 +72,12 @@ TFont::Impl::Impl(const LOGFONTW &logfont, HDC hdc)
 	DWORD pairsCount = GetKerningPairsW(hdc, 0, 0);
 	if (pairsCount) {
 		m_hasKerning = true;
-		KERNINGPAIR *tempKernPairs = new KERNINGPAIR[pairsCount];
-		GetKerningPairsW(hdc, pairsCount, tempKernPairs);
+		std::unique_ptr<KERNINGPAIR[]> tempKernPairs(new KERNINGPAIR[pairsCount]);
+		GetKerningPairsW(hdc, pairsCount, tempKernPairs.get());
 		for (UINT i = 0; i < pairsCount; i++) {
 			pair<unsigned short, unsigned short> key = make_pair(tempKernPairs[i].wFirst, tempKernPairs[i].wSecond);
 			m_kerningPairs[key] = tempKernPairs[i].iKernAmount;
 		}
-		delete[] tempKernPairs;
 	} else
 		m_hasKerning = false;
 
@@ -132,17 +131,17 @@ TPoint TFont::drawChar(TVectorImageP &image, wchar_t charcode, wchar_t nextCharC
 		return TPoint();
 	}
 
-	LPVOID lpvBuffer = new char[charMemorySize];
+	std::unique_ptr<char[]> lpvBuffer(new char[charMemorySize]);
 
-	charMemorySize = GetGlyphOutlineW(m_pimpl->m_hdc, charcode, GGO_NATIVE, &gm, charMemorySize, lpvBuffer, &mat2);
+	charMemorySize = GetGlyphOutlineW(m_pimpl->m_hdc, charcode, GGO_NATIVE, &gm, charMemorySize, lpvBuffer.get(), &mat2);
 	if (charMemorySize == GDI_ERROR) {
 		assert(0);
 		return TPoint();
 	}
 
-	TTPOLYGONHEADER *header = (TTPOLYGONHEADER *)lpvBuffer;
+	TTPOLYGONHEADER *header = (TTPOLYGONHEADER *)lpvBuffer.get();
 
-	while ((char *)header < (char *)lpvBuffer + charMemorySize) {
+	while ((char *)header < (char *)lpvBuffer.get() + charMemorySize) {
 		points.clear();
 		TThickPoint startPoint = toThickPoint(header->pfxStart);
 		points.push_back(startPoint);
@@ -203,8 +202,6 @@ TPoint TFont::drawChar(TVectorImageP &image, wchar_t charcode, wchar_t nextCharC
 
 		header = (TTPOLYGONHEADER *)curve;
 	}
-
-	delete[] lpvBuffer;
 
 	image->group(0, image->getStrokeCount());
 

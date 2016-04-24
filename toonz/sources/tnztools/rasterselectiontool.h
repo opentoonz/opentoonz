@@ -49,9 +49,9 @@ class UndoRasterDeform : public TUndo
 {
 	static int m_id;
 	RasterSelectionTool *m_tool;
-	string m_oldFloatingImageId, m_newFloatingImageId;
-	vector<TStroke> m_newStrokes;
-	vector<TStroke> m_oldStrokes;
+	std::string m_oldFloatingImageId, m_newFloatingImageId;
+	std::vector<TStroke> m_newStrokes;
+	std::vector<TStroke> m_oldStrokes;
 	DragSelectionTool::DeformValues m_oldDeformValues, m_newDeformValues;
 	FourPoints m_oldBBox, m_newBBox;
 	TPointD m_oldCenter, m_newCenter;
@@ -251,7 +251,7 @@ public:
 			return &m_modifySavebox;
 		return 0;
 	}
-	bool onPropertyChanged(string propertyName);
+	bool onPropertyChanged(std::string propertyName);
 	bool getNoAntialiasingValue() { return m_noAntialiasing.getValue(); }
 
 protected:

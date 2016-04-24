@@ -132,10 +132,10 @@ public:
 	QString getStyleSheet(int index) const;
 	int getStyleSheetCount() const;
 
-	void setUnits(string s);
+	void setUnits(std::string s);
 	QString getUnits() const { return m_units; }
 
-	void setCameraUnits(string s);
+	void setCameraUnits(std::string s);
 	QString getCameraUnits() const { return m_cameraUnits; }
 
 	void enableGeneratedMovieView(bool on);
@@ -266,7 +266,7 @@ public:
 
 	// Drawing  tab
 
-	void setScanLevelType(string s);
+	void setScanLevelType(std::string s);
 	QString getScanLevelType() const { return m_scanLevelType; }
 
 	void setDefLevelType(int levelType);

@@ -100,31 +100,28 @@ struct SelectionData {
 // using raw bits and bitwise operators, and use just the double of the space required with bit arrays.
 class SelectionArrayPtr
 {
-	SelectionData *m_buffer;
+	std::unique_ptr<SelectionData[]> m_buffer;
 
 public:
-	SelectionArrayPtr() : m_buffer(0) {}
-
 	inline void allocate(unsigned int count)
 	{
-		m_buffer = new SelectionData[count];
-		memset(m_buffer, 0, count * sizeof(SelectionData));
+		m_buffer.reset(new SelectionData[count]);
+		memset(m_buffer.get(), 0, count * sizeof(SelectionData));
 	}
 
 	inline void destroy()
 	{
-		delete[] m_buffer;
-		m_buffer = 0;
+		m_buffer.reset();
 	}
 
 	inline SelectionData *data() const
 	{
-		return m_buffer;
+		return m_buffer.get();
 	}
 
 	inline SelectionData *data()
 	{
-		return m_buffer;
+		return m_buffer.get();
 	}
 };
 

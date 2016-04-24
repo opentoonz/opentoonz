@@ -289,7 +289,7 @@ void FileSelection::addToBatchRenderList()
 	for (i = 0; i < files.size(); i++)
 		BatchesController::instance()->addComposerTask(files[i]);
 
-	MsgBox(INFORMATION, QObject::tr(" Task added to the Batch Render List."));
+	DVGui::info(QObject::tr(" Task added to the Batch Render List."));
 #endif
 #endif
 }
@@ -305,7 +305,7 @@ void FileSelection::addToBatchCleanupList()
 	for (i = 0; i < files.size(); i++)
 		BatchesController::instance()->addCleanupTask(files[i]);
 
-	MsgBox(INFORMATION, QObject::tr(" Task added to the Batch Cleanup List."));
+	DVGui::info(QObject::tr(" Task added to the Batch Cleanup List."));
 #endif
 }
 
@@ -325,7 +325,7 @@ void FileSelection::deleteFiles()
 	} else {
 		question = QObject::tr("Deleting %n files. Are you sure?", "", (int)files.size());
 	}
-	int ret = MsgBox(question, QObject::tr("Delete"), QObject::tr("Cancel"), 1);
+	int ret = DVGui::MsgBox(question, QObject::tr("Delete"), QObject::tr("Cancel"), 1);
 	if (ret == 2 || ret == 0)
 		return;
 
@@ -456,7 +456,7 @@ void FileSelection::convertFiles()
 
 	static ConvertPopup *popup = new ConvertPopup(false);
 	if (popup->isConverting()) {
-		DVGui::MsgBox(INFORMATION, QObject::tr("A convertion task is in progress! wait until it stops or cancel it"));
+		DVGui::info(QObject::tr("A convertion task is in progress! wait until it stops or cancel it"));
 		return;
 	}
 	popup->setFiles(files);
@@ -468,7 +468,7 @@ void FileSelection::convertFiles()
 void FileSelection::premultiplyFiles()
 {
 	QString question = QObject::tr("You are going to premultiply selected files.\nThe operation cannot be undone: are you sure?");
-	int ret = MsgBox(question, QObject::tr("Premultiply"), QObject::tr("Cancel"), 1);
+	int ret = DVGui::MsgBox(question, QObject::tr("Premultiply"), QObject::tr("Cancel"), 1);
 	if (ret == 2 || ret == 0)
 		return;
 
@@ -545,11 +545,11 @@ void FileSelection::collectAssets()
 		collectedAssets = ::collectAssets(files[0]);
 	}
 	if (collectedAssets == 0)
-		DVGui::MsgBox(INFORMATION, QObject::tr("There are no assets to collect"));
+		DVGui::info(QObject::tr("There are no assets to collect"));
 	else if (collectedAssets == 1)
-		DVGui::MsgBox(INFORMATION, QObject::tr("One asset imported"));
+		DVGui::info(QObject::tr("One asset imported"));
 	else
-		DVGui::MsgBox(INFORMATION, QObject::tr("%1 assets imported").arg(collectedAssets));
+		DVGui::info(QObject::tr("%1 assets imported").arg(collectedAssets));
 	DvDirModel::instance()->refreshFolder(TProjectManager::instance()->getCurrentProjectPath().getParentDir());
 }
 
@@ -562,18 +562,18 @@ int importScene(TFilePath scenePath)
 	try {
 		IoCmd::loadScene(scene, scenePath, true);
 	} catch (TException &e) {
-		MsgBox(CRITICAL, QObject::tr("Error loading scene %1 :%2").arg(toQString(scenePath)).arg(QString::fromStdWString(e.getMessage())));
+		DVGui::error(QObject::tr("Error loading scene %1 :%2").arg(toQString(scenePath)).arg(QString::fromStdWString(e.getMessage())));
 		return 0;
 	} catch (...) {
 		// TNotifier::instance()->notify(TGlobalChange(true));
-		MsgBox(CRITICAL, QObject::tr("Error loading scene %1").arg(toQString(scenePath)));
+		DVGui::error(QObject::tr("Error loading scene %1").arg(toQString(scenePath)));
 		return 0;
 	}
 
 	try {
 		scene.save(scene.getScenePath());
 	} catch (TException&) {
-		MsgBox(CRITICAL, QObject::tr("There was an error saving the %1 scene.").arg(toQString(scenePath)));
+		DVGui::error(QObject::tr("There was an error saving the %1 scene.").arg(toQString(scenePath)));
 		return 0;
 	}
 
@@ -618,11 +618,11 @@ void FileSelection::importScenes()
 		importedSceneCount += ret;
 	}
 	if (importedSceneCount == 0)
-		DVGui::MsgBox(INFORMATION, QObject::tr("No scene imported"));
+		DVGui::info(QObject::tr("No scene imported"));
 	else if (importedSceneCount == 1)
-		DVGui::MsgBox(INFORMATION, QObject::tr("One scene imported"));
+		DVGui::info(QObject::tr("One scene imported"));
 	else
-		DVGui::MsgBox(INFORMATION, QString::number(importedSceneCount) + QObject::tr("%1 scenes imported").arg(importedSceneCount));
+		DVGui::info(QString::number(importedSceneCount) + QObject::tr("%1 scenes imported").arg(importedSceneCount));
 #endif
 }
 //------------------------------------------------------------------------

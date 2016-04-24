@@ -208,7 +208,7 @@ void SkVD::saveData(TOStream &os)
 
 void SkVD::loadData(TIStream &is)
 {
-	string tagName;
+	std::string tagName;
 
 	while (is.matchTag(tagName)) {
 		int p;

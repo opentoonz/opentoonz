@@ -36,7 +36,7 @@ using namespace DVGui;
 
 namespace
 {
-bool isMovieType(string type)
+bool isMovieType(std::string type)
 {
 	return (type == "mov" || type == "avi" || type == "3gp");
 }
@@ -44,7 +44,7 @@ bool isMovieType(string type)
 
 //=============================================================================
 
-const vector<QAction *> &TasksViewer::getActions() const
+const std::vector<QAction *> &TasksViewer::getActions() const
 {
 	return m_actions;
 }
@@ -1106,7 +1106,7 @@ void TaskTreeView::openContextMenu(TreeModel::Item *gItem, const QPoint &globalP
 	if (item->getDepth() == 1) {
 		static QMenu globalMenu;
 		if (globalMenu.isEmpty()) {
-			const vector<QAction *> &actions = m_mainViewer->getActions();
+			const std::vector<QAction *> &actions = m_mainViewer->getActions();
 			assert(!actions.empty());
 			int i;
 			for (i = 0; i < actions.size(); i++) {
@@ -1271,7 +1271,7 @@ void TaskTreeModel::start(bool)
 				BatchesController::instance()->start(task->m_id);
 			}
 	} catch (TException &e) {
-		MsgBox(WARNING, QString::fromStdString(toString(e.getMessage())));
+		DVGui::warning(QString::fromStdString(toString(e.getMessage())));
 	}
 
 	emit layoutChanged();
@@ -1304,7 +1304,7 @@ void TaskTreeModel::stop(bool)
 				BatchesController::instance()->stop(task->m_id);
 			}
 	} catch (TException &e) {
-		MsgBox(WARNING, QString::fromStdString(toString(e.getMessage())));
+		DVGui::warning(QString::fromStdString(toString(e.getMessage())));
 	}
 
 	emit layoutChanged();

@@ -56,7 +56,7 @@ namespace
 class ParamChannelGroup : public FunctionTreeModel::ParamWrapper, public FunctionTreeModel::ChannelGroup
 {
 public:
-	ParamChannelGroup(TParam *param, const wstring &fxId, string &paramName);
+	ParamChannelGroup(TParam *param, const std::wstring &fxId, std::string &paramName);
 
 	void refresh();
 	void *getInternalPointer() const;
@@ -285,8 +285,8 @@ StageObjectChannelGroup::~StageObjectChannelGroup()
 QVariant StageObjectChannelGroup::data(int role) const
 {
 	if (role == Qt::DisplayRole) {
-		string name = m_stageObject->getName();
-		string id = m_stageObject->getId().toString();
+		std::string name = m_stageObject->getName();
+		std::string id = m_stageObject->getId().toString();
 
 		return (name == id) ? QString::fromStdString(name) : QString::fromStdString(id + " (" + name + ")");
 
@@ -406,8 +406,8 @@ QVariant FxChannelGroup::data(int role) const
 			return isAnimated ? isOpen() ? folderAnimOpen : folderAnimClose : isOpen() ? folderOpen : folderClose;
 		}
 	} else if (role == Qt::DisplayRole) {
-		wstring name = m_fx->getName();
-		wstring id = m_fx->getFxId();
+		std::wstring name = m_fx->getName();
+		std::wstring id = m_fx->getFxId();
 		if (name == id)
 			return QString::fromStdWString(name);
 		else
@@ -457,7 +457,7 @@ void FxChannelGroup::refresh()
 		{
 			TParamContainer *paramContainer = 0;
 			if (macroFx) {
-				const wstring &fxId = wrap->getFxId();
+				const std::wstring &fxId = wrap->getFxId();
 				TFx *subFx = macroFx->getFxById(fxId);
 				if (!subFx)
 					continue;
@@ -484,7 +484,7 @@ void FxChannelGroup::refresh()
 //
 //-----------------------------------------------------------------------------
 
-ParamChannelGroup::ParamChannelGroup(TParam *param, const wstring &fxId, string &paramName)
+ParamChannelGroup::ParamChannelGroup(TParam *param, const std::wstring &fxId, std::string &paramName)
 	: ParamWrapper(param, fxId), ChannelGroup(param->hasUILabel() ? QString::fromStdString(param->getUILabel()) : QString::fromStdWString(TStringTable::translate(paramName)))
 {
 }
@@ -563,7 +563,7 @@ QVariant SkVDChannelGroup::data(int role) const
 //-----------------------------------------------------------------------------
 
 FunctionTreeModel::Channel::Channel(FunctionTreeModel *model, TDoubleParam *param,
-									string paramNamePref, wstring fxId)
+									std::string paramNamePref, std::wstring fxId)
 	: ParamWrapper(param, fxId), m_model(model), m_group(0), m_isActive(false), m_paramNamePref(paramNamePref)
 {
 }
@@ -606,8 +606,8 @@ QVariant FunctionTreeModel::Channel::data(int role) const
 		if (m_param->hasUILabel()) {
 			return QString::fromStdString(m_param->getUILabel());
 		}
-		string name = m_paramNamePref + m_param->getName();
-		wstring translatedName = TStringTable::translate(name);
+		std::string name = m_paramNamePref + m_param->getName();
+		std::wstring translatedName = TStringTable::translate(name);
 		if (m_fxId.size() > 0)
 			return QString::fromStdWString(translatedName + L" (" + m_fxId + L")");
 		return QString::fromStdWString(translatedName);
@@ -632,8 +632,8 @@ QString FunctionTreeModel::Channel::getShortName() const
 	if (m_param->hasUILabel()) {
 		return QString::fromStdString(m_param->getUILabel());
 	}
-	string name = m_paramNamePref + m_param->getName();
-	wstring translatedName = TStringTable::translate(name);
+	std::string name = m_paramNamePref + m_param->getName();
+	std::wstring translatedName = TStringTable::translate(name);
 	return QString::fromStdWString(translatedName);
 }
 
@@ -986,7 +986,7 @@ void FunctionTreeModel::refreshFxs(TXsheet *xsh)
 			continue;
 		TMacroFx *macroFx = dynamic_cast<TMacroFx *>(fx);
 		if (macroFx) {
-			const vector<TFxP> &macroFxs = macroFx->getFxs();
+			const std::vector<TFxP> &macroFxs = macroFx->getFxs();
 			int j;
 			for (j = 0; j < (int)macroFxs.size(); j++) {
 				TParamContainer *params = macroFxs[j]->getParams();
@@ -1127,12 +1127,12 @@ void FunctionTreeModel::addChannels(TFx *fx, ChannelGroup *groupItem, TParamCont
 {
 	FxChannelGroup *fxItem = static_cast<FxChannelGroup *>(groupItem);
 
-	wstring fxId = L"";
+	std::wstring fxId = L"";
 	TMacroFx *macro = dynamic_cast<TMacroFx *>(fxItem->getFx());
 	if (macro)
 		fxId = fx->getFxId();
 
-	const string &paramNamePref = fx->getFxType() + ".";
+	const std::string &paramNamePref = fx->getFxType() + ".";
 
 	int p, pCount = params->getParamCount();
 	for (p = 0; p != pCount; ++p)

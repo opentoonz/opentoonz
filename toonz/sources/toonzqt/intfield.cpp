@@ -248,7 +248,7 @@ IntField::IntField(QWidget *parent, bool isMaxRangeLimited, bool isRollerHide)
 	vLayout->setMargin(0);
 	vLayout->setSpacing(0);
 
-	m_lineEdit = new IntLineEdit(field);
+	m_lineEdit = new DVGui::IntLineEdit(field);
 	bool ret = connect(m_lineEdit, SIGNAL(editingFinished()), this, SLOT(onEditingFinished()));
 	vLayout->addWidget(m_lineEdit);
 

@@ -1225,7 +1225,7 @@ void StageSchematicNodeDock::onModifyHandle(int increase)
 	int min = (getNode()->getStageObject()->getId().isColumn()) ? -HookSet::maxHooksCount : 0;
 	index = tcrop(index, min, 25);
 
-	if (index >= 0) handle = string(1, (char)('A' + index));
+	if (index >= 0) handle = std::string(1, (char)('A' + index));
 	else handle = "H" + toString(-index);
 
 	if (m_isParentPort)
@@ -1233,7 +1233,7 @@ void StageSchematicNodeDock::onModifyHandle(int increase)
 	else
 	{
 		int i, linkCount = getPort()->getLinkCount();
-		vector<TStageObjectId> ids;
+		std::vector<TStageObjectId> ids;
 		for (i = 0; i<linkCount; i++)
 		{
 			StageSchematicNode* node = dynamic_cast<StageSchematicNode*>(getPort()->getLinkedNode(i));
@@ -1662,8 +1662,8 @@ void StageSchematicNode::onHandleReleased()
 StageSchematicPegbarNode::StageSchematicPegbarNode(StageSchematicScene *scene, TStageObject *pegbar)
 	: StageSchematicNode(scene, pegbar, 90, 18)
 {
-	string name = m_stageObject->getFullName();
-	string id = m_stageObject->getId().toString();
+	std::string name = m_stageObject->getFullName();
+	std::string id = m_stageObject->getId().toString();
 	m_name = QString::fromStdString(name);
 	m_nameItem = new SchematicName(this, 72, 20);
 	m_nameItem->setName(m_name);
@@ -1724,8 +1724,8 @@ void StageSchematicPegbarNode::onNameChanged()
 	setFlag(QGraphicsItem::ItemIsSelectable, true);
 
 	TStageObjectId id = m_stageObject->getId();
-	string strId = id.toString();
-	string name = m_name.toStdString();
+	std::string strId = id.toString();
+	std::string name = m_name.toStdString();
 	QString toolTip = name == strId ? m_name : m_name + " (" + QString::fromStdString(strId) + ")";
 	setToolTip(toolTip);
 	if (id.isPegbar())
@@ -1784,7 +1784,7 @@ StageSchematicColumnNode::StageSchematicColumnNode(StageSchematicScene *scene, T
 	bool ret = true;
 
 	assert(pegbar && pegbar->getId().isColumn());
-	string name = m_stageObject->getName();
+	std::string name = m_stageObject->getName();
 
 	m_name = QString::fromStdString(name);
 	m_resizeItem = new SchematicThumbnailToggle(this, m_stageObject->isOpened());
@@ -2073,7 +2073,7 @@ StageSchematicCameraNode::StageSchematicCameraNode(StageSchematicScene *scene, T
 	: StageSchematicNode(scene, pegbar, 90, 18)
 {
 
-	string name = m_stageObject->getFullName();
+	std::string name = m_stageObject->getFullName();
 	m_name = QString::fromStdString(name);
 
 	m_nameItem = new SchematicName(this, 54, 20);
@@ -2166,7 +2166,7 @@ StageSchematicSplineNode::StageSchematicSplineNode(StageSchematicScene *scene, T
 	m_resizeItem->setZValue(2);
 	connect(m_resizeItem, SIGNAL(toggled(bool)), this, SLOT(onChangedSize(bool)));
 
-	string name = m_spline->getName();
+	std::string name = m_spline->getName();
 	m_splineName = QString::fromStdString(name);
 	m_nameItem = new SchematicName(this, 72, 20);
 	m_nameItem->setName(m_splineName);
@@ -2291,7 +2291,7 @@ StageSchematicGroupNode::StageSchematicGroupNode(StageSchematicScene *scene, TSt
 	for (i = 0; i < m_groupedObj.size(); i++)
 		m_groupedObj[i]->addRef();
 	bool ret = true;
-	wstring name = m_stageObject->getGroupName(false);
+	std::wstring name = m_stageObject->getGroupName(false);
 	m_name = QString::fromStdWString(name);
 
 	m_nameItem = new SchematicName(this, 72, 20);

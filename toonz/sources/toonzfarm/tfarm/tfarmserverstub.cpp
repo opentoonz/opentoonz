@@ -21,14 +21,14 @@ public:
 	}
 
 	// TFarmExecutor overrides
-	QString execute(const vector<QString> &argv);
+	QString execute(const std::vector<QString> &argv);
 
 	TFarmServer *m_server;
 };
 
 //------------------------------------------------------------------------------
 
-QString TFarmServerStub::Imp::execute(const vector<QString> &argv)
+QString TFarmServerStub::Imp::execute(const std::vector<QString> &argv)
 {
 #ifdef DEBUG
 	std::cout << "executing " << argv[0].c_str() << endl;
@@ -47,13 +47,13 @@ QString TFarmServerStub::Imp::execute(const vector<QString> &argv)
 			int ret = m_server->terminateTask(argv[1]);
 			return QString::number(ret);
 		} else if (argv[0] == "getTasks") {
-			vector<QString> tasks;
+			std::vector<QString> tasks;
 			int ret = m_server->getTasks(tasks);
 
 			QString reply(QString::number(ret));
 			reply += ",";
 
-			vector<QString>::iterator it = tasks.begin();
+			std::vector<QString>::iterator it = tasks.begin();
 			for (; it != tasks.end(); ++it) {
 				reply += *it;
 				reply += ",";

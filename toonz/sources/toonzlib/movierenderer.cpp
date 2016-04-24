@@ -113,7 +113,7 @@ public:
 	TSoundTrackP m_st;
 
 	std::map<double, std::pair<TRasterP, TRasterP>> m_toBeSaved;
-	std::vector<pair<double, TFxPair>> m_framesToBeRendered;
+	std::vector<std::pair<double, TFxPair>> m_framesToBeRendered;
 	std::string m_renderCacheId;
 	/*--- 同じラスタのキャッシュを使いまわすとき、
 		最初のものだけガンマをかけ、以降はそれを使いまわすようにする。

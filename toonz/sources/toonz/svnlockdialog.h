@@ -8,8 +8,6 @@
 
 #include <QList>
 
-using namespace DVGui;
-
 class QLabel;
 class QPushButton;
 class QCheckBox;
@@ -19,7 +17,7 @@ class QFile;
 
 //-----------------------------------------------------------------------------
 
-class SVNLockDialog : public Dialog
+class SVNLockDialog : public DVGui::Dialog
 {
 	Q_OBJECT
 
@@ -79,7 +77,7 @@ signals:
 
 //-----------------------------------------------------------------------------
 
-class SVNLockInfoDialog : public Dialog
+class SVNLockInfoDialog : public DVGui::Dialog
 {
 	Q_OBJECT
 	SVNStatus m_status;

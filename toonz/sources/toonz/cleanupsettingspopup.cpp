@@ -68,10 +68,10 @@ CleanupTab::CleanupTab()
 	int row = 0;
 
 	//  AutoCenter
-	m_autoCenter = new CheckBox(tr("Autocenter"), this);
+	m_autoCenter = new DVGui::CheckBox(tr("Autocenter"), this);
 	settingsLayout->addWidget(m_autoCenter, row++, 1, Qt::AlignLeft);
 
-	m_autoCenter->setFixedSize(150, WidgetHeight);
+	m_autoCenter->setFixedSize(150, DVGui::WidgetHeight);
 
 	//  Pegbar Holes
 	settingsLayout->addWidget(new QLabel(tr("Pegbar Holes:")), row, 0, Qt::AlignRight);
@@ -79,7 +79,7 @@ CleanupTab::CleanupTab()
 	m_pegHolesOm = new QComboBox(this);
 	settingsLayout->addWidget(m_pegHolesOm, row++, 1, Qt::AlignLeft);
 
-	m_pegHolesOm->setFixedHeight(WidgetHeight);
+	m_pegHolesOm->setFixedHeight(DVGui::WidgetHeight);
 	m_pegHolesOm->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
 
 	QStringList pegbarHoles;
@@ -95,16 +95,16 @@ CleanupTab::CleanupTab()
 	m_fieldGuideOm = new QComboBox(this);
 	settingsLayout->addWidget(m_fieldGuideOm, row++, 1, Qt::AlignLeft);
 
-	m_fieldGuideOm->setFixedHeight(WidgetHeight);
+	m_fieldGuideOm->setFixedHeight(DVGui::WidgetHeight);
 	m_fieldGuideOm->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
 
-	std::vector<string> fdgNames;
+	std::vector<std::string> fdgNames;
 	CleanupParameters::getFdgNames(fdgNames);
 
 	for (int i = 0; i < (int)fdgNames.size(); i++)
 		m_fieldGuideOm->addItem(QString(fdgNames[i].c_str()));
 
-	settingsLayout->addWidget(new Separator(), row++, 0, 1, 2);
+	settingsLayout->addWidget(new DVGui::Separator(), row++, 0, 1, 2);
 
 	//  Rotate
 	settingsLayout->addWidget(new QLabel(tr("Rotate:")), row, 0, Qt::AlignRight);
@@ -112,7 +112,7 @@ CleanupTab::CleanupTab()
 	m_rotateOm = new QComboBox(this);
 	settingsLayout->addWidget(m_rotateOm, row++, 1, Qt::AlignLeft);
 
-	m_rotateOm->setFixedHeight(WidgetHeight);
+	m_rotateOm->setFixedHeight(DVGui::WidgetHeight);
 	m_rotateOm->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
 
 	QStringList rotate;
@@ -134,25 +134,25 @@ CleanupTab::CleanupTab()
 	flipLayout->setSizeConstraint(QLayout::SetFixedSize);
 	flipLayout->setMargin(0);
 
-	m_flipX = new CheckBox(tr("Horizontal"), flipWidget);
+	m_flipX = new DVGui::CheckBox(tr("Horizontal"), flipWidget);
 	flipLayout->addWidget(m_flipX, 0, Qt::AlignLeft);
 
-	m_flipX->setFixedHeight(WidgetHeight);
+	m_flipX->setFixedHeight(DVGui::WidgetHeight);
 
-	m_flipY = new CheckBox(tr("Vertical"), flipWidget);
+	m_flipY = new DVGui::CheckBox(tr("Vertical"), flipWidget);
 	flipLayout->addWidget(m_flipY, 0, Qt::AlignLeft);
 
-	m_flipY->setFixedHeight(WidgetHeight);
+	m_flipY->setFixedHeight(DVGui::WidgetHeight);
 
 	flipLayout->addStretch(1);
 
 	//  Save In
 	settingsLayout->addWidget(new QLabel(tr("Save in:")), row, 0, Qt::AlignRight);
 
-	m_pathField = new FileField(this, QString(""));
+	m_pathField = new DVGui::FileField(this, QString(""));
 	settingsLayout->addWidget(m_pathField, row++, 1);
 
-	m_pathField->setFixedHeight(WidgetHeight);
+	m_pathField->setFixedHeight(DVGui::WidgetHeight);
 
 	//  Connections
 	bool ret = true;
@@ -256,7 +256,7 @@ ProcessingTab::ProcessingTab()
 	settingsLayout->addWidget(new QLabel(tr("Line Processing:")), row, 0, Qt::AlignRight);
 
 	m_lineProcessing = new QComboBox(this);
-	m_lineProcessing->setFixedHeight(WidgetHeight);
+	m_lineProcessing->setFixedHeight(DVGui::WidgetHeight);
 	m_lineProcessing->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
 
 	QStringList items;
@@ -270,7 +270,7 @@ ProcessingTab::ProcessingTab()
 	settingsLayout->addWidget(m_antialiasLabel, row, 0, Qt::AlignRight);
 
 	m_antialias = new QComboBox(this);
-	m_antialias->setFixedHeight(WidgetHeight);
+	m_antialias->setFixedHeight(DVGui::WidgetHeight);
 	m_antialias->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
 
 	items.clear();
@@ -284,7 +284,7 @@ ProcessingTab::ProcessingTab()
 	settingsLayout->addWidget(m_autoadjustLabel, row, 0, Qt::AlignRight);
 
 	m_autoadjustOm = new QComboBox(this);
-	m_autoadjustOm->setFixedHeight(WidgetHeight);
+	m_autoadjustOm->setFixedHeight(DVGui::WidgetHeight);
 	m_autoadjustOm->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
 
 	items.clear();
@@ -299,30 +299,30 @@ ProcessingTab::ProcessingTab()
 	//  Sharpness
 	m_sharpLabel = new QLabel(tr("Sharpness:"));
 	settingsLayout->addWidget(m_sharpLabel, row, 0, Qt::AlignRight);
-	m_sharpness = new DoubleField(this);
-	m_sharpness->setFixedHeight(WidgetHeight);
+	m_sharpness = new DVGui::DoubleField(this);
+	m_sharpness->setFixedHeight(DVGui::WidgetHeight);
 	m_sharpness->setValues(90, 0, 100);
 	settingsLayout->addWidget(m_sharpness, row++, 1);
 
 	//  Despeckling
 	m_despeckLabel = new QLabel(tr("Despeckling:"));
 	settingsLayout->addWidget(m_despeckLabel, row, 0, Qt::AlignRight);
-	m_despeckling = new IntField(this);
-	m_despeckling->setFixedHeight(WidgetHeight);
+	m_despeckling = new DVGui::IntField(this);
+	m_despeckling->setFixedHeight(DVGui::WidgetHeight);
 	m_despeckling->setValues(2, 0, 20);
 	settingsLayout->addWidget(m_despeckling, row++, 1);
 
 	//  MLAA Value
 	m_aaValueLabel = new QLabel(tr("MLAA Intensity:"));
 	settingsLayout->addWidget(m_aaValueLabel, row, 0, Qt::AlignRight);
-	m_aaValue = new IntField(this);
-	m_aaValue->setFixedHeight(WidgetHeight);
+	m_aaValue = new DVGui::IntField(this);
+	m_aaValue->setFixedHeight(DVGui::WidgetHeight);
 	m_aaValue->setValues(70, 0, 100);
 	settingsLayout->addWidget(m_aaValue, row++, 1);
 
 	//---------------------- Palette ----------------------------
 
-	m_paletteSep = new Separator();
+	m_paletteSep = new DVGui::Separator();
 	mainLayout->addWidget(m_paletteSep);
 	m_paletteViewer = new CleanupPaletteViewer(this);
 	mainLayout->addWidget(m_paletteViewer, 1); // The palette viewer dominates on the stretch below

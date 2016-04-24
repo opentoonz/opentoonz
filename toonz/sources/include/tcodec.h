@@ -20,7 +20,7 @@
 class DVAPI TRasterCodec
 {
 public:
-	TRasterCodec(const string &name) : m_name(name) {}
+	TRasterCodec(const std::string &name) : m_name(name) {}
 	virtual ~TRasterCodec() {}
 
 	//virtual int getMaxCompressionSize(int size) = 0;
@@ -30,10 +30,10 @@ public:
 	//virtual int getHeaderSize() = 0;
 	//virtual UCHAR *removeHeader(const UCHAR* inData, TINT32 inDataSize, TINT32 &outDataSize, int &lx, int &ly) = 0;
 
-	static TRasterCodec *create(const string &name);
+	static TRasterCodec *create(const std::string &name);
 
 private:
-	string m_name;
+	std::string m_name;
 };
 
 //------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ class DVAPI TRasterCodecDummy : public TRasterCodec
 {
 
 public:
-	TRasterCodecDummy(const string &name) : TRasterCodec(name) {}
+	TRasterCodecDummy(const std::string &name) : TRasterCodec(name) {}
 	~TRasterCodecDummy() {}
 
 	//int getMaxCompressionSize(int size);
@@ -53,7 +53,7 @@ public:
 
 	//UCHAR *removeHeader(const UCHAR* inData, TINT32 inDataSize, TINT32 &outDataSize, int &lx, int &ly);
 
-	//static TRasterCodec *create(const string &name);
+	//static TRasterCodec *create(const std::string &name);
 };
 
 //------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ class DVAPI TRasterCodecQTL : public TRasterCodec
 {
 
 public:
-	TRasterCodecQTL(const string &name) : TRasterCodec(name) {}
+	TRasterCodecQTL(const std::string &name) : TRasterCodec(name) {}
 	~TRasterCodecQTL() {}
 
 	//int getMaxCompressionSize(int size);
@@ -73,7 +73,7 @@ public:
 
 	//int getHeaderSize();
 
-	//static TRasterCodec *create(const string &name);
+	//static TRasterCodec *create(const std::string &name);
 };
 
 //------------------------------------------------------------------------------
@@ -82,7 +82,7 @@ public:
 {
 public:
 
-  TRasterCodecSnappy(const string &name, bool useCache);
+  TRasterCodecSnappy(const std::string &name, bool useCache);
   ~TRasterCodecSnappy();
 
   TRasterP compress(const TRasterP &inRas, int allocUnit, TINT32 &outDataSize);
@@ -107,7 +107,7 @@ private:
 class DVAPI TRasterCodecLz4 : public TRasterCodec
 {
 public:
-	TRasterCodecLz4(const string &name, bool useCache);
+	TRasterCodecLz4(const std::string &name, bool useCache);
 	~TRasterCodecLz4();
 
 	TRasterP compress(const TRasterP &inRas, int allocUnit, TINT32 &outDataSize);
@@ -123,7 +123,7 @@ public:
 
 private:
 	TRasterGR8P m_raster;
-	string m_cacheId;
+	std::string m_cacheId;
 	bool m_useCache;
 
 private:
@@ -135,7 +135,7 @@ private:
 class DVAPI TRasterCodecLZO : public TRasterCodec
 {
 public:
-	TRasterCodecLZO(const string &name, bool useCache);
+	TRasterCodecLZO(const std::string &name, bool useCache);
 	~TRasterCodecLZO();
 
 	TRasterP compress(const TRasterP &inRas, int allocUnit, TINT32 &outDataSize);
@@ -151,7 +151,7 @@ public:
 
 private:
 	TRasterGR8P m_raster;
-	string m_cacheId;
+	std::string m_cacheId;
 	bool m_useCache;
 
 private:

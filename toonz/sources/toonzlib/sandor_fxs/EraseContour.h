@@ -11,6 +11,9 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+#include <memory>
+#include <array>
+
 #include "STColSelPic.h"
 #include "toonz4.6/raster.h"
 #include "SDef.h"
@@ -22,10 +25,10 @@ class CEraseContour
 	UC_PIXEL *m_picUC;
 	US_PIXEL *m_picUS;
 	const RASTER *m_ras;
-	UCHAR *m_sel;
+	std::shared_ptr<UCHAR> m_sel;
 	int m_lX, m_lY;
 	CCIL m_cil;
-	SXYDW m_neighbours[MAXNB_NEIGHBOURS];
+	std::array<SXYDW, MAXNB_NEIGHBOURS> m_neighbours;
 	int m_nbNeighbours;
 
 	void null();
@@ -37,8 +40,15 @@ class CEraseContour
 	void sel0123To01();
 
 public:
-	CEraseContour() : m_picUC(0), m_picUS(0), m_ras(0), m_sel(0),
-					  m_lX(0), m_lY(0), m_cil(){};
+	CEraseContour()
+		: m_picUC(0)
+		, m_picUS(0)
+		, m_ras(0)
+		, m_lX(0)
+		, m_lY(0)
+		, m_cil()
+	{
+	}
 	virtual ~CEraseContour();
 	int makeSelection(const CCIL &iil);
 	int doIt(const CCIL &iil);

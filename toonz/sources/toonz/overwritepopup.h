@@ -41,7 +41,7 @@ class QPushButton;
   Additionally, the dialog could be \t CANCELED, either by closing it
   or pressing the "Cancel" button.
 */
-class OverwriteDialog : public Dialog
+class OverwriteDialog : public DVGui::Dialog
 {
 	Q_OBJECT
 
@@ -112,7 +112,7 @@ private:
 	QRadioButton *m_overwrite;
 	QRadioButton *m_keep;
 	QRadioButton *m_rename;
-	LineEdit *m_suffix;
+	DVGui::LineEdit *m_suffix;
 	QPushButton *m_okBtn, *m_okToAllBtn, *m_cancelBtn;
 
 private:

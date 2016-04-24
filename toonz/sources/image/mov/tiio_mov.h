@@ -119,7 +119,7 @@ class DVAPI TLevelReaderMov : public TLevelReader
 	Track m_track;
 	MediaHandler m_timecodeHandler;
 	long m_depth;
-	map<int, TimeValue> currentTimes;
+	std::map<int, TimeValue> currentTimes;
 	int m_lx, m_ly;
 	int m_hh, m_mm, m_ss, m_ff;
 	TThread::Mutex m_mutex;

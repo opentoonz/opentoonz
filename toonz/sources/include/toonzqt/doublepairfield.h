@@ -203,7 +203,7 @@ public:
 	MeasuredDoublePairField(QWidget *parent = 0, bool isMaxRangeLimited = true);
 	~MeasuredDoublePairField() {}
 
-	void setMeasure(string measureName);
+	void setMeasure(std::string measureName);
 
 	void setPrecision(int precision);
 };

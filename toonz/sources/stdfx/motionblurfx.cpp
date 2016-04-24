@@ -1,4 +1,4 @@
-
+#include <memory>
 
 #include "tpixel.h"
 #include <stdio.h>
@@ -252,7 +252,6 @@ void doDirectionalBlur(TRasterPT<T> r, double blur, bool bidirectional)
 {
 	int i, lx, ly, brad;
 	double coeff, coeffq, diff, globmatte;
-	T *row, *buffer;
 
 	brad = tfloor(blur); /* number of pixels involved in the filtering.          */
 	if (bidirectional) {
@@ -268,24 +267,23 @@ void doDirectionalBlur(TRasterPT<T> r, double blur, bool bidirectional)
 	if ((lx == 0) || (ly == 0))
 		return;
 
-	row = new T[lx + 2 * brad + 2];
+	std::unique_ptr<T[]> row(new T[lx + 2 * brad + 2]);
 	if (!row)
 		return;
-	memset(row, 0, (lx + 2 * brad + 2) * sizeof(T));
+	memset(row.get(), 0, (lx + 2 * brad + 2) * sizeof(T));
 
 	globmatte = 0.8; /* a little bit of transparency is also added */
 
 	r->lock();
 	for (i = 0; i < ly; i++) {
-		buffer = (T *)r->pixels(i);
-		takeRow(buffer, row + brad, lx, brad, bidirectional);
+		T *buffer = (T *)r->pixels(i);
+		takeRow(buffer, row.get() + brad, lx, brad, bidirectional);
 		if (bidirectional)
-			blur_code<T>(row + brad, buffer, lx, coeff, coeffq, brad, diff, globmatte);
+			blur_code<T>(row.get() + brad, buffer, lx, coeff, coeffq, brad, diff, globmatte);
 		else
-			do_filtering<T>(row + brad, buffer, lx, coeff, brad, blur, globmatte);
+			do_filtering<T>(row.get() + brad, buffer, lx, coeff, brad, blur, globmatte);
 	}
 
-	free(row);
 	r->unlock();
 }
 
@@ -447,7 +445,7 @@ public:
 	{
 	}
 
-	string getAlias(double frame, const TRenderSettings &info) const
+	std::string getAlias(double frame, const TRenderSettings &info) const
 	{
 		unsigned long id = getIdentifier();
 		double value = m_intensity->getValue(frame);

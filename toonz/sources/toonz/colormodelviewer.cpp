@@ -115,7 +115,7 @@ void ColorModelViewer::dragEnterEvent(QDragEnterEvent *event)
 
 	foreach (QUrl url, mimeData->urls()) {
 		TFilePath fp(url.toLocalFile().toStdWString());
-		string type = fp.getType();
+		std::string type = fp.getType();
 		if (type == "scr" || type == "tpl")
 			return;
 	}
@@ -156,7 +156,7 @@ void ColorModelViewer::loadImage(const TFilePath &fp)
 	QList<QString> list;
 	list.append(QObject::tr("Overwrite the destination palette."));
 	list.append(QObject::tr("Keep the destination palette and apply it to the color model."));
-	int ret = RadioButtonMsgBox(DVGui::WARNING, question, list);
+	int ret = DVGui::RadioButtonMsgBox(DVGui::WARNING, question, list);
 	if (ret == 0)
 		return;
 	bool replace = false;
@@ -558,7 +558,7 @@ void ColorModelViewer::removeColorModel()
 
 void ColorModelViewer::onRefImageNotFound()
 {
-	MsgBox(DVGui::INFORMATION, tr("It is not possible to retrieve the color model set for the current level."));
+	DVGui::info(tr("It is not possible to retrieve the color model set for the current level."));
 }
 
 //=============================================================================

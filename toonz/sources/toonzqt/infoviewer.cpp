@@ -74,14 +74,14 @@ public:
 
 	TFilePath m_path;
 	TLevelP m_level;
-	vector<TFrameId> m_fids;
+	std::vector<TFrameId> m_fids;
 	QStringList m_formats;
 	int m_currentIndex;
 	int m_frameCount;
 	TPalette *m_palette;
 	QLabel m_framesLabel;
 	IntField m_framesSlider;
-	vector<pair<QLabel *, QLabel *>> m_labels;
+	std::vector<std::pair<QLabel *, QLabel *>> m_labels;
 	QLabel m_historyLabel;
 	QTextEdit m_history;
 	Separator m_separator1, m_separator2;
@@ -98,7 +98,7 @@ public:
 	InfoViewerImp();
 	~InfoViewerImp();
 	void clear();
-	bool setLabel(TPropertyGroup *pg, int index, string type);
+	bool setLabel(TPropertyGroup *pg, int index, std::string type);
 	void create(int index, QString str);
 	void loadPalette(const TFilePath &path);
 
@@ -197,7 +197,7 @@ void setLabelStyle(QLabel *l)
 
 void InfoViewerImp::create(int index, QString str)
 {
-	m_labels[index] = pair<QLabel *, QLabel *>(new QLabel(str), new QLabel(""));
+	m_labels[index] = std::pair<QLabel *, QLabel *>(new QLabel(str), new QLabel(""));
 	setLabelStyle(m_labels[index].first);
 }
 
@@ -345,7 +345,7 @@ void InfoViewerImp::setGeneralFileInfo(const TFilePath &path)
 
 //----------------------------------------------------------------
 
-bool InfoViewerImp::setLabel(TPropertyGroup *pg, int index, string type)
+bool InfoViewerImp::setLabel(TPropertyGroup *pg, int index, std::string type)
 {
 	TProperty *p = pg->getProperty(type);
 	if (!p)
@@ -584,7 +584,7 @@ bool InfoViewerImp::setItem(const TLevelP &level, TPalette *palette, const TFile
 		assert(!m_level);
 
 		if (!TSystem::doesExistFileOrLevel(m_path)) {
-			MsgBox(WARNING, QObject::tr("The file %1 does not exist.").arg(QString::fromStdWString(path.getWideString())));
+			DVGui::warning(QObject::tr("The file %1 does not exist.").arg(QString::fromStdWString(path.getWideString())));
 
 			return false;
 		}

@@ -102,7 +102,7 @@ public:
 		m_temporaryPinnedColumns.clear();
 	}
 
-	bool onPropertyChanged(string propertyName);
+	bool onPropertyChanged(std::string propertyName);
 
 	void draw();
 

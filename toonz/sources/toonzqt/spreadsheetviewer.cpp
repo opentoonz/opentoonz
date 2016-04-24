@@ -285,7 +285,7 @@ DragTool *RowPanel::createDragTool(QMouseEvent *)
 
 void RowPanel::drawRows(QPainter &p, int r0, int r1)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	static QFont font("Arial", 9, QFont::Bold);
 #else
 	static QFont font("Helvetica", 9, QFont::Bold);

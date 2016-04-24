@@ -27,7 +27,7 @@ public:
 	{
 	public:
 		QDate m_timeStamp;
-		string getDate() const;
+		std::string getDate() const;
 		std::set<Item> m_items;
 		Day(const QDate &t) : m_timeStamp(t){};
 		void getFiles(std::vector<TFilePath> &files) const;
@@ -39,13 +39,13 @@ public:
 	int getDayCount() const { return m_days.size(); };
 	const Day *getDay(int i) const;
 	const Day *getDay(const QDate &time) const;
-	const Day *getDay(string dateString) const; // getDay(dateString)->getDate() == dateString
+	const Day *getDay(std::string dateString) const; // getDay(dateString)->getDate() == dateString
 
 	// nota. ritorna il giorno (se c'e') che ha un timeStamp IDENTICO a time
 	void addItem(const TFilePath &fp);
 
 private:
-	vector<Day *> m_days;
+	std::vector<Day *> m_days;
 
 	History();
 	void load();

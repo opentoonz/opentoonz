@@ -8,19 +8,19 @@
 namespace
 {
 
-wstring getLocation(TIStream &is)
+	std::wstring getLocation(TIStream &is)
 {
 	return L"File: " +
 		   is.getFilePath().getWideString() +
 		   L":" + toWideString(is.getLine());
 }
 
-wstring message(TIStream &is, wstring msg)
+std::wstring message(TIStream &is, std::wstring msg)
 {
 	return getLocation(is) + L"\n" + msg;
 }
 
-wstring message(TIStream &is, string msg)
+std::wstring message(TIStream &is, std::string msg)
 {
 	return message(is, toWideString(msg));
 }
@@ -37,12 +37,12 @@ TIStreamException::TIStreamException(TIStream &is, const TException &e)
 {
 }
 
-TIStreamException::TIStreamException(TIStream &is, wstring msg)
+TIStreamException::TIStreamException(TIStream &is, std::wstring msg)
 	: TException(message(is, msg))
 {
 }
 
-TIStreamException::TIStreamException(TIStream &is, string msg)
+TIStreamException::TIStreamException(TIStream &is, std::string msg)
 	: TException(message(is, msg))
 {
 }

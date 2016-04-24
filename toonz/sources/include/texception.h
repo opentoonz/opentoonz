@@ -20,8 +20,8 @@ class DVAPI TException
 	TString m_msg;
 
 public:
-	explicit TException(const string &msg = "Toonz Exception");
-	explicit TException(const wstring &msg) : m_msg(msg) {}
+	explicit TException(const std::string &msg = "Toonz Exception");
+	explicit TException(const std::wstring &msg) : m_msg(msg) {}
 	virtual ~TException() {}
 	virtual TString getMessage() const { return m_msg; }
 };

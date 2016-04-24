@@ -100,7 +100,7 @@ public:
 
 		savePath = savePath.withNoFrame().withType("cln"); //Just to be sure
 		if (TFileStatus(savePath).doesExist()) {
-			int ret = MsgBox(QObject::tr("The cleanup settings file for the %1 level already exists.\n Do you want to overwrite it?")
+			int ret = DVGui::MsgBox(QObject::tr("The cleanup settings file for the %1 level already exists.\n Do you want to overwrite it?")
 								 .arg(toQString(savePath.withoutParentDir())),
 							 QObject::tr("Overwrite"), QObject::tr("Don't Overwrite"), 0);
 
@@ -135,7 +135,7 @@ public:
 			return false;
 
 		if (!TSystem::doesExistFileOrLevel(loadPath)) {
-			error(tr("%1 does not exist.").arg(toQString(loadPath)));
+			DVGui::error(tr("%1 does not exist.").arg(toQString(loadPath)));
 			return false;
 		}
 
@@ -452,7 +452,7 @@ void CleanupSettingsModel::processFrame(TXshSimpleLevel *sl, TFrameId fid)
 			m_cameraTestTransformed = cl->autocenterOnly(m_original.getPointer(), true, autocentered);
 
 			if (params->m_autocenterType != CleanupTypes::AUTOCENTER_NONE && !autocentered)
-				MsgBox(DVGui::WARNING, QObject::tr("The autocentering failed on the current drawing."));
+				DVGui::warning(QObject::tr("The autocentering failed on the current drawing."));
 		}
 	}
 }
@@ -640,7 +640,7 @@ bool CleanupSettingsModel::loadSettings(CleanupParameters *params, const TFilePa
 	CleanupParameters defaultParameters;
 	params->assign(&defaultParameters);
 
-	string tagName;
+	std::string tagName;
 	is->matchTag(tagName);
 	if (tagName == "version") {
 		int minor, major;

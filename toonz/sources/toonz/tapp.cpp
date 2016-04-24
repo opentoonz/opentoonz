@@ -183,7 +183,7 @@ TApp::TApp()
 
 	if (preferences->isRasterOptimizedMemory()) {
 		if (!TBigMemoryManager::instance()->init((int)(/*15*1024*/ TSystem::getFreeMemorySize(true) * .8)))
-			MsgBox(DVGui::WARNING, tr("Error allocating memory: not enough memory."));
+			DVGui::warning(tr("Error allocating memory: not enough memory."));
 	}
 	ret = ret && connect(preferences, SIGNAL(stopAutoSave()), SLOT(onStopAutoSave()));
 	ret = ret && connect(preferences, SIGNAL(startAutoSave()), SLOT(onStartAutoSave()));
@@ -606,7 +606,7 @@ void TApp::onLevelColorStyleSwitched()
 			if (!sl)
 				return;
 
-			vector<TFrameId> fids;
+			std::vector<TFrameId> fids;
 			sl->getFids(fids);
 
 			for (int i = 0; i < (int)fids.size(); i++)
@@ -672,7 +672,7 @@ void TApp::autosave()
 		m_autosaveSuspended = false;
 
 	if (scene->isUntitled()) {
-		MsgBox(DVGui::WARNING, tr("It is not possible to save automatically an untitled scene."));
+		DVGui::warning(tr("It is not possible to save automatically an untitled scene."));
 		return;
 	}
 

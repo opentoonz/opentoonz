@@ -31,21 +31,21 @@ typedef struct {
 	double dbl2;
 } PointAnd2Double;
 
-typedef vector<TPointD> Points;
+typedef std::vector<TPointD> Points;
 
 typedef struct {
 	float blend;
 	Points points;
 } BlendAndPoint;
 
-typedef vector<pair<TPointD, TPixel32>> PointsAndColors;
-typedef vector<Points> PointMatrix;
-typedef vector<pair<TPointD, double>> PointsAndDoubles;
-typedef vector<pair<GLenum, Points>> DrawmodePointsMatrix;
-typedef vector<TRectD> RectVector;
-typedef vector<PointAnd2Double> PointsAnd2Doubles;
-typedef vector<double> Doubles;
-typedef vector<BlendAndPoint> BlendAndPoints;
+typedef std::vector<std::pair<TPointD, TPixel32>> PointsAndColors;
+typedef std::vector<Points> PointMatrix;
+typedef std::vector<std::pair<TPointD, double>> PointsAndDoubles;
+typedef std::vector<std::pair<GLenum, Points>> DrawmodePointsMatrix;
+typedef std::vector<TRectD> RectVector;
+typedef std::vector<PointAnd2Double> PointsAnd2Doubles;
+typedef std::vector<double> Doubles;
+typedef std::vector<BlendAndPoint> BlendAndPoints;
 //=============================================================================
 
 template <class T>
@@ -376,7 +376,7 @@ public:
 	bool isSaveSupported() { return true; }
 
 	int getTagId() const { return 136; };
-	void getObsoleteTagIds(vector<int> &ids) const { ids.push_back(112); }
+	void getObsoleteTagIds(std::vector<int> &ids) const { ids.push_back(112); }
 };
 
 //-------------------------------------------------------------------
@@ -455,7 +455,7 @@ public:
 	bool isSaveSupported() { return true; }
 
 	int getTagId() const { return 114; };
-	void getObsoleteTagIds(vector<int> &ids) const { ids.push_back(137); }
+	void getObsoleteTagIds(std::vector<int> &ids) const { ids.push_back(137); }
 };
 
 //-------------------------------------------------------------------
@@ -539,7 +539,7 @@ public:
 	}
 
 	int getTagId() const { return 135; };
-	void getObsoleteTagIds(vector<int> &ids) const
+	void getObsoleteTagIds(std::vector<int> &ids) const
 	{
 		ids.push_back(115);
 		ids.push_back(119);
@@ -587,7 +587,7 @@ public:
 														 << m_shininess << m_metal << m_bend; }
 
 	int getTagId() const { return 120; };
-	void getObsoleteTagIds(vector<int> &ids) const { ids.push_back(121); }
+	void getObsoleteTagIds(std::vector<int> &ids) const { ids.push_back(121); }
 };
 
 //-------------------------------------------------------------------
@@ -626,7 +626,7 @@ public:
 	void saveData(TOutputStreamInterface &os) const { os << m_color << m_blend << m_intensity << m_in
 														 << m_out << m_noise; }
 	int getTagId() const { return 123; };
-	void getObsoleteTagIds(vector<int> &ids) const { ids.push_back(105); }
+	void getObsoleteTagIds(std::vector<int> &ids) const { ids.push_back(105); }
 };
 
 //-------------------------------------------------------------------
@@ -667,7 +667,7 @@ public:
 	bool isSaveSupported() { return true; }
 
 	int getTagId() const { return 125; };
-	void getObsoleteTagIds(vector<int> &ids) const { ids.push_back(110); }
+	void getObsoleteTagIds(std::vector<int> &ids) const { ids.push_back(110); }
 };
 
 //-------------------------------------------------------------------
@@ -804,7 +804,7 @@ public:
 	bool isSaveSupported() { return true; }
 
 	int getTagId() const { return 138; };
-	void getObsoleteTagIds(vector<int> &ids) const
+	void getObsoleteTagIds(std::vector<int> &ids) const
 	{
 		ids.push_back(118);
 		ids.push_back(128);
@@ -927,8 +927,8 @@ public:
 	double getParamValue(TColorStyle::double_tag, int index) const;
 	void setParamValue(int index, double value);
 
-	void computeData(vector<TPointD> &positions, const TStroke *stroke, const TColorFunction *cf) const;
-	void drawStroke(const TColorFunction *cf, vector<TPointD> &positions, const TStroke *stroke) const;
+	void computeData(std::vector<TPointD> &positions, const TStroke *stroke, const TColorFunction *cf) const;
+	void drawStroke(const TColorFunction *cf, std::vector<TPointD> &positions, const TStroke *stroke) const;
 	//void drawStroke(const TColorFunction *cf, const TStroke *stroke) const;
 	void drawStroke(TFlash &flash, const TStroke *stroke) const;
 
@@ -936,7 +936,7 @@ public:
 	void loadData(int oldId, TInputStreamInterface &);
 	void saveData(TOutputStreamInterface &os) const { os << m_color << m_parameter << m_thick; }
 	int getTagId() const { return 133; };
-	void getObsoleteTagIds(vector<int> &ids) const { ids.push_back(102); }
+	void getObsoleteTagIds(std::vector<int> &ids) const { ids.push_back(102); }
 };
 
 //-------------------------------------------------------------------
@@ -1122,9 +1122,9 @@ protected:
 	double m_outlinePixelSize;
 	TMatrioskaStrokeStyle *m_colorStyle;
 
-	vector<TStrokeOutline> m_outline;
+	std::vector<TStrokeOutline> m_outline;
 
-	vector<TStroke *> m_appStrokes;
+	std::vector<TStroke *> m_appStrokes;
 
 public:
 	TMatrioskaStrokeProp(const TStroke *stroke, TMatrioskaStrokeStyle *style);

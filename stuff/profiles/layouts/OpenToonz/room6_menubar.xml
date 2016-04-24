@@ -1,0 +1,22 @@
+<menubar>
+  <menu title="File">
+    <command>MI_NewProject</command>
+    <command>MI_ProjectSettings</command>
+    <command>MI_SaveDefaultSettings</command>
+    <separator/>
+    <command>MI_Quit</command>
+  </menu>
+  <menu title="Customize">
+    <command>MI_Preferences</command>
+    <command>MI_ShortcutPopup</command>
+    <separator/>
+    <command>MI_DockingCheck</command>
+    <separator/>
+    <command>"MI_RunScript"</command>
+    <command>"MI_OpenScriptConsole"</command>
+    <command_debug>"MI_ReloadStyle"</command_debug>
+  </menu>
+  <menu title="Help">
+    <command>MI_About</command>
+  </menu>
+</menubar>

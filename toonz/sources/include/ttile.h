@@ -21,7 +21,7 @@ class DVAPI TTile
 {
 
 private:
-	string m_rasterId;
+	std::string m_rasterId;
 	TRect m_subRect;
 	TTile(const TTile &);
 	TTile &operator=(const TTile &);

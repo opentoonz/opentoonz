@@ -161,7 +161,7 @@ public:
 	bool canHandle(const TRenderSettings &info, double frame) { return true; }
 	bool allowUserCacheOnPort(int port);
 
-	string getAlias(double frame, const TRenderSettings &info) const;
+	std::string getAlias(double frame, const TRenderSettings &info) const;
 	bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info);
 	TFxTimeRegion getTimeRegion() const { return TFxTimeRegion::createUnlimited(); }
 

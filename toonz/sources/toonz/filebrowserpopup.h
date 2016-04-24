@@ -89,7 +89,7 @@ protected:
 	FileBrowser *m_browser;
 
 	QLabel *m_nameFieldLabel;
-	LineEdit *m_nameField;
+	DVGui::LineEdit *m_nameField;
 
 	//QLabel*               m_fromFrameLabel;
 	//LineEdit*	            m_fromFrame;
@@ -275,17 +275,17 @@ class LoadLevelPopup : public FileBrowserPopup
 	Q_OBJECT
 
 	QFrame *m_subsequenceFrame;
-	LineEdit *m_fromFrame;
-	LineEdit *m_toFrame;
+	DVGui::LineEdit *m_fromFrame;
+	DVGui::LineEdit *m_toFrame;
 
 	QFrame *m_arrangementFrame;
-	LineEdit *m_xFrom;
-	LineEdit *m_xTo;
+	DVGui::LineEdit *m_xFrom;
+	DVGui::LineEdit *m_xTo;
 	QComboBox *m_stepCombo;
 	QComboBox *m_incCombo;
-	LineEdit *m_levelName;
-	LineEdit *m_posFrom;
-	LineEdit *m_posTo;
+	DVGui::LineEdit *m_levelName;
+	DVGui::LineEdit *m_posFrom;
+	DVGui::LineEdit *m_posTo;
 
 	QLabel *m_notExistLabel;
 	QComboBox *m_loadTlvBehaviorComboBox;
@@ -384,7 +384,7 @@ class LoadColorModelPopup : public FileBrowserPopup
 {
 	Q_OBJECT
 
-	LineEdit *m_paletteFrame;
+	DVGui::LineEdit *m_paletteFrame;
 
 public:
 	LoadColorModelPopup();

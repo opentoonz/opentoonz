@@ -128,12 +128,12 @@ inline void notifySelectionChanged()
 //    VectorFreeDeformer  implementation
 //********************************************************************************
 
-VectorFreeDeformer::VectorFreeDeformer(TVectorImageP vi, set<int> strokeIndexes)
+VectorFreeDeformer::VectorFreeDeformer(TVectorImageP vi, std::set<int> strokeIndexes)
 	: FreeDeformer(), m_vi(vi), m_strokeIndexes(strokeIndexes), m_preserveThickness(false), m_computeRegion(false), m_flip(false)
 {
 	TRectD r;
 
-	set<int>::iterator it, iEnd = m_strokeIndexes.end();
+	std::set<int>::iterator it, iEnd = m_strokeIndexes.end();
 	for (it = m_strokeIndexes.begin(); it != iEnd; ++it) {
 		TStroke *stroke = m_vi->getStroke(*it);
 		r += stroke->getBBox();
@@ -433,10 +433,10 @@ int DragSelectionTool::UndoChangeStrokes::getSize() const
 
 class UndoChangeOutlineStyle : public ToolUtils::TToolUndo
 {
-	vector<TStroke::OutlineOptions> m_oldOptions, m_newOptions;
+	std::vector<TStroke::OutlineOptions> m_oldOptions, m_newOptions;
 	FourPoints m_oldBBox, m_newBBox;
 	VectorSelectionTool *m_tool;
-	vector<int> m_indexes;
+	std::vector<int> m_indexes;
 	int m_selectionCount;
 
 public:
@@ -1953,7 +1953,7 @@ TPropertyGroup *VectorSelectionTool::getProperties(int idx)
 
 //-----------------------------------------------------------------------------
 
-bool VectorSelectionTool::onPropertyChanged(string propertyName)
+bool VectorSelectionTool::onPropertyChanged(std::string propertyName)
 {
 	if (SelectionTool::onPropertyChanged(propertyName))
 		return true;

@@ -60,16 +60,16 @@ void doBlur(CHANNEL_TYPE *greymap, const TRasterPT<PIXEL> &rin, int blur)
 	//First, blur each column independently
 
 	//We'll need a temporary col for storing sums
-	unsigned long *tempCol = new unsigned long[rin->getLy()];
+	std::unique_ptr<unsigned long[]> tempCol(new unsigned long[rin->getLy()]);
 	int edge = tmin(blur + 1, rin->getLy());
 
 	for (i = 0; i < rin->getLx(); ++i) {
 		PIXEL *lineSrcPix = rin->pixels(0) + i;
 		CHANNEL_TYPE *lineOutPix = greymap + i;
 		PIXEL *pixin = lineSrcPix;
-		unsigned long *pixsum = tempCol;
+		unsigned long *pixsum = tempCol.get();
 
-		memset(tempCol, 0, rin->getLy() * sizeof(unsigned long));
+		memset(tempCol.get(), 0, rin->getLy() * sizeof(unsigned long));
 
 		//Build up to blur with retro-sums
 		sum = 0;
@@ -88,7 +88,7 @@ void doBlur(CHANNEL_TYPE *greymap, const TRasterPT<PIXEL> &rin, int blur)
 		//Now, the same in reverse
 		lineSrcPix = lineSrcPix + (rin->getLy() - 1) * wrapSrc;
 		pixin = lineSrcPix;
-		pixsum = tempCol + rin->getLy() - 1;
+		pixsum = tempCol.get() + rin->getLy() - 1;
 
 		sum = 0;
 		for (j = 0; j < edge; ++j, pixin -= wrapSrc, --pixsum) {
@@ -104,27 +104,25 @@ void doBlur(CHANNEL_TYPE *greymap, const TRasterPT<PIXEL> &rin, int blur)
 		}
 
 		//Finally, transfer sums to the output greymap, divided by the blur.
-		pixsum = tempCol;
+		pixsum = tempCol.get();
 		CHANNEL_TYPE *pixout = lineOutPix;
 		for (j = 0; j < rin->getLy(); ++j, pixout += wrapOut, ++pixsum)
 			*pixout = (*pixsum) / blurDiameter;
 	}
 
-	delete[] tempCol;
-
 	//Then, the same for all greymap rows
 
 	//We'll need a temporary row for sums
-	unsigned long *tempRow = new unsigned long[rin->getLx()];
+	std::unique_ptr<unsigned long[]> tempRow(new unsigned long[rin->getLx()]);
 	edge = tmin(blur + 1, rin->getLx());
 
 	for (j = 0; j < rin->getLy(); ++j) {
 		CHANNEL_TYPE *lineSrcPix = greymap + j * wrapOut;
 		CHANNEL_TYPE *lineOutPix = lineSrcPix;
-		unsigned long *pixsum = tempRow;
+		unsigned long *pixsum = tempRow.get();
 		CHANNEL_TYPE *pixin = lineSrcPix;
 
-		memset(tempRow, 0, rin->getLx() * sizeof(unsigned long));
+		memset(tempRow.get(), 0, rin->getLx() * sizeof(unsigned long));
 
 		//Build up to blur with retro-sums
 		sum = 0;
@@ -144,7 +142,7 @@ void doBlur(CHANNEL_TYPE *greymap, const TRasterPT<PIXEL> &rin, int blur)
 		//Now, the same in reverse
 		lineSrcPix = lineSrcPix + rin->getLx() - 1;
 		pixin = lineSrcPix;
-		pixsum = tempRow + rin->getLx() - 1;
+		pixsum = tempRow.get() + rin->getLx() - 1;
 
 		sum = 0;
 		for (i = 0; i < edge; ++i, --pixin, --pixsum) {
@@ -161,12 +159,10 @@ void doBlur(CHANNEL_TYPE *greymap, const TRasterPT<PIXEL> &rin, int blur)
 
 		//Finally, transfer sums to the output greymap, divided by the blur.
 		CHANNEL_TYPE *pixout = lineOutPix;
-		pixsum = tempRow;
+		pixsum = tempRow.get();
 		for (i = 0; i < rin->getLx(); ++i, ++pixout, ++pixsum)
 			*pixout = (*pixsum) / blurDiameter;
 	}
-
-	delete[] tempRow;
 }
 
 //------------------------------------------------------------------------------

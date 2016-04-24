@@ -287,7 +287,7 @@ void ControlPointEditorStroke::updatePoints()
 	}
 
 	//Se e' self loop  devo aggiungere un punto in piu' al cpCount
-	vector<TThickPoint> points;
+	std::vector<TThickPoint> points;
 
 	int cpCount = selfLoop ? m_controlPoints.size() + 1 : m_controlPoints.size();
 	if (cpCount == 1)
@@ -341,7 +341,7 @@ void ControlPointEditorStroke::updateDependentPoint(int index)
 	if (!stroke)
 		return;
 
-	vector<std::pair<int, TThickPoint>> points;
+	std::vector<std::pair<int, TThickPoint>> points;
 	getDependentPoints(index, points);
 
 	int i;
@@ -692,7 +692,7 @@ int ControlPointEditorStroke::addControlPoint(const TPointD &pos)
 
 	ControlPoint precCp = m_controlPoints[index];
 	assert(precCp.m_pointIndex >= 0);
-	vector<TThickPoint> points;
+	std::vector<TThickPoint> points;
 
 	for (i = 0; i < cpCount; i++) {
 		if (i != precCp.m_pointIndex + 1 && i != precCp.m_pointIndex + 2 && i != precCp.m_pointIndex + 3)

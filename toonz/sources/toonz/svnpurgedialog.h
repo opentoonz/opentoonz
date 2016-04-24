@@ -7,14 +7,12 @@
 #include "versioncontrol.h"
 #include <QList>
 
-using namespace DVGui;
-
 class QPushButton;
 class QLabel;
 
 //-----------------------------------------------------------------------------
 
-class SVNPurgeDialog : public Dialog
+class SVNPurgeDialog : public DVGui::Dialog
 {
 	Q_OBJECT
 
@@ -48,7 +46,5 @@ protected slots:
 signals:
 	void done(const QStringList &);
 };
-
-using namespace DVGui;
 
 #endif // SVN_PURGE_DIALOG_H

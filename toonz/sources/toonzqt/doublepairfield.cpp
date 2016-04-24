@@ -352,7 +352,7 @@ MeasuredDoublePairField::MeasuredDoublePairField(QWidget *parent, bool isMaxRang
 
 //-----------------------------------------------------------------------------
 
-void MeasuredDoublePairField::setMeasure(string measureName)
+void MeasuredDoublePairField::setMeasure(std::string measureName)
 {
 	MeasuredDoubleLineEdit *leftLineEdit = dynamic_cast<MeasuredDoubleLineEdit *>(m_leftLineEdit);
 	assert(leftLineEdit);

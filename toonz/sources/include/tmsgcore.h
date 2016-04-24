@@ -41,8 +41,6 @@ void DVAPI warning(const QString &msg);
 void DVAPI info(const QString &msg);
 };
 
-using namespace DVGui;
-
 class DVAPI TMsgCore : public QObject
 {
 	Q_OBJECT
@@ -59,7 +57,7 @@ public:
 
 	//client side
 	// 'send' returns false if the tmessage is not active in the application (tipically, in console applications such as tcomposer)
-	bool send(MsgType type, const QString &message);
+	bool send(DVGui::MsgType type, const QString &message);
 	void connectTo(const QString &address = "");
 
 	//server side

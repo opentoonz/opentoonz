@@ -62,7 +62,7 @@ private:
 	void loadFxs();
 	void loadFxGroup(TIStream *is);
 	void loadFx(TIStream *is, QMenu *insertFxGroup, QMenu *addFxGroup, QMenu *replaceFxGroup);
-	bool loadPreset(const string &name, QMenu *insertFxGroup, QMenu *addFxGroup, QMenu *replaceFxGroup);
+	bool loadPreset(const std::string &name, QMenu *insertFxGroup, QMenu *addFxGroup, QMenu *replaceFxGroup);
 	void loadMacro();
 	void loadFxPluginGroup();
 	void loadFxPlugins(QMenu *insertFxGroup, QMenu *addFxGroup, QMenu *replaceFxGroup);
@@ -78,4 +78,4 @@ public slots:
 	void fixup();
 };
 
-#endif; // ADDFXCONTEXTMENU_H
+#endif // ADDFXCONTEXTMENU_H

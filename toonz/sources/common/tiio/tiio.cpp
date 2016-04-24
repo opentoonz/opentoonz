@@ -13,7 +13,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(disable : 4786)
 #include <io.h>
 #endif
@@ -205,7 +205,7 @@ void Tiio::defineWriterProperties(const char *ext, TPropertyGroup *prop)
 }
 
 /*
-#ifdef WIN32
+#ifdef _WIN32
 int Tiio::openForReading(char *fn)
 {
   int fd = _open(fn, _O_BINARY|_O_RDONLY);

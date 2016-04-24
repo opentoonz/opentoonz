@@ -37,9 +37,9 @@ void TScanParam::update(const TScanParam &model)
 //
 //-------------------------------------------------------------------
 
-const string BlackAndWhite = "Black & White";
-const string Graytones = "Graytones";
-const string Rgbcolors = "RGB Color";
+const std::string BlackAndWhite = "Black & White";
+const std::string Graytones = "Graytones";
+const std::string Rgbcolors = "RGB Color";
 
 //-------------------------------------------------------------------
 
@@ -149,7 +149,7 @@ void TScannerParameters::setMaxPaperSize(double maxWidth, double maxHeight)
 
 //-----------------------------------------------------------------------------
 
-void TScannerParameters::setPaperFormat(string paperFormat)
+void TScannerParameters::setPaperFormat(std::string paperFormat)
 {
 	TPaperFormatManager *formatManager = TPaperFormatManager::instance();
 	assert(formatManager->isValidFormat(paperFormat));
@@ -198,7 +198,7 @@ void TScannerParameters::adaptToCurrentScanner()
 
 void TScannerParameters::saveData(TOStream &os) const
 {
-	std::map<string, string> attr;
+	std::map<std::string, std::string> attr;
 	attr["fmt"] = m_paperFormat;
 	os.openCloseChild("paper", attr);
 
@@ -213,7 +213,7 @@ void TScannerParameters::saveData(TOStream &os) const
 	}
 
 	if (m_scanType != None) {
-		string scanTypeString = Rgbcolors;
+		std::string scanTypeString = Rgbcolors;
 		switch (m_scanType) {
 		case BW:
 			scanTypeString = BlackAndWhite;
@@ -259,22 +259,22 @@ void TScannerParameters::saveData(TOStream &os) const
 
 void TScannerParameters::loadData(TIStream &is)
 {
-	string tagName;
+	std::string tagName;
 	while (is.matchTag(tagName)) {
 		if (tagName == "dpi") {
-			string s = is.getTagAttribute("value");
+			std::string s = is.getTagAttribute("value");
 			if (isDouble(s))
 				m_dpi.m_value = (float)toDouble(s);
 		} else if (tagName == "brightness") {
-			string s = is.getTagAttribute("value");
+			std::string s = is.getTagAttribute("value");
 			if (isDouble(s))
 				m_brightness.m_value = (float)toDouble(s);
 		} else if (tagName == "threshold") {
-			string s = is.getTagAttribute("value");
+			std::string s = is.getTagAttribute("value");
 			if (isDouble(s))
 				m_threshold.m_value = (float)toDouble(s);
 		} else if (tagName == "contrast") {
-			string s = is.getTagAttribute("value");
+			std::string s = is.getTagAttribute("value");
 			if (isDouble(s))
 				m_contrast.m_value = (float)toDouble(s);
 		} else if (tagName == "autoFeeder") {
@@ -282,7 +282,7 @@ void TScannerParameters::loadData(TIStream &is)
 		} else if (tagName == "reverseOrder") {
 			m_reverseOrder = true;
 		} else if (tagName == "mode") {
-			string scanTypeString = is.getTagAttribute("value");
+			std::string scanTypeString = is.getTagAttribute("value");
 			m_scanType = None;
 			if (scanTypeString == BlackAndWhite)
 				m_scanType = BW;
@@ -291,7 +291,7 @@ void TScannerParameters::loadData(TIStream &is)
 			else if (scanTypeString == Rgbcolors)
 				m_scanType = RGB24;
 		} else if (tagName == "paper") {
-			string paperFormat = is.getTagAttribute("fmt");
+			std::string paperFormat = is.getTagAttribute("fmt");
 			if (paperFormat != "")
 				setPaperFormat(paperFormat);
 		}
@@ -486,7 +486,7 @@ bool TScanner::isScanningCanceled()
 
 namespace
 {
-const std::pair<string, TDimensionD> defaultPaperFormat("A4 paper", TDimensionD(210.00, 297.00));
+const std::pair<std::string, TDimensionD> defaultPaperFormat("A4 paper", TDimensionD(210.00, 297.00));
 }
 
 //-----------------------------------------------------------------------------
@@ -509,7 +509,7 @@ TPaperFormatManager *TPaperFormatManager::instance()
 
 //-----------------------------------------------------------------------------
 
-void TPaperFormatManager::getFormats(std::vector<string> &names) const
+void TPaperFormatManager::getFormats(std::vector<std::string> &names) const
 {
 	for (FormatTable::const_iterator it = m_formats.begin();
 		 it != m_formats.end(); ++it)
@@ -518,7 +518,7 @@ void TPaperFormatManager::getFormats(std::vector<string> &names) const
 
 //-----------------------------------------------------------------------------
 
-TDimensionD TPaperFormatManager::getSize(string name) const
+TDimensionD TPaperFormatManager::getSize(std::string name) const
 {
 	FormatTable::const_iterator it = m_formats.find(name);
 	if (it == m_formats.end())
@@ -529,7 +529,7 @@ TDimensionD TPaperFormatManager::getSize(string name) const
 
 //-----------------------------------------------------------------------------
 
-bool TPaperFormatManager::isValidFormat(string name) const
+bool TPaperFormatManager::isValidFormat(std::string name) const
 {
 	FormatTable::const_iterator it = m_formats.find(name);
 	return it != m_formats.end();
@@ -537,7 +537,7 @@ bool TPaperFormatManager::isValidFormat(string name) const
 
 //-----------------------------------------------------------------------------
 
-string TPaperFormatManager::getDefaultFormat() const
+std::string TPaperFormatManager::getDefaultFormat() const
 {
 	return defaultPaperFormat.first;
 }
@@ -549,7 +549,7 @@ void TPaperFormatManager::readPaperFormat(const TFilePath &path)
 	if (path.getType() != "pap")
 		return;
 	Tifstream is(path);
-	string name;
+	std::string name;
 	TDimensionD size(0, 0);
 	while (is) {
 		char buffer[1024];
@@ -573,17 +573,17 @@ void TPaperFormatManager::readPaperFormat(const TFilePath &path)
 		for (k = j; k < i && buffer[k] == ' '; k++) {
 		}
 
-		string value;
+		std::string value;
 		if (k < i)
-			value = string(buffer + k, i - k);
+			value = std::string(buffer + k, i - k);
 
 		if (buffer[0] == '#') {
 			if (k < i && name == "")
 				name = value;
-		} else if (string(buffer).find("WIDTH") == 0) {
+		} else if (std::string(buffer).find("WIDTH") == 0) {
 			if (isDouble(value))
 				size.lx = toDouble(value);
-		} else if (string(buffer).find("LENGTH") == 0) {
+		} else if (std::string(buffer).find("LENGTH") == 0) {
 			if (isDouble(value))
 				size.ly = toDouble(value);
 		}

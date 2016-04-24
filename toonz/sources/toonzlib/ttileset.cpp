@@ -41,7 +41,7 @@ void TTileSet::add(Tile *tile)
 
 //------------------------------------------------------------------------------------------
 
-void TTileSet::getRects(vector<TRect> &rects) const
+void TTileSet::getRects(std::vector<TRect> &rects) const
 {
 	for (Tiles::const_iterator it = m_tiles.begin(); it != m_tiles.end(); ++it)
 		rects.push_back((*it)->m_rasterBounds);

@@ -12,7 +12,7 @@
   - http://download.qt.io/official_releases/qt/5.5/5.5.1/
     - qt-opensource-mac-x64-clang-5.5.1.dmg
 - boost
-  - http://www.boost.org/users/history/version_1_55_0.html
+  - http://www.boost.org/users/history/version_1_55_0.html (or later, though only 1.55.0 is supported)
 
 ## Building on MacOSX
 

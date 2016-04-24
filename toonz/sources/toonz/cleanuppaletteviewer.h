@@ -22,8 +22,6 @@ namespace DVGui
 class CleanupColorField;
 }
 
-using namespace DVGui;
-
 //------------------------------------------------------------------
 
 //********************************************************************************
@@ -38,7 +36,7 @@ class CleanupPaletteViewer : public QWidget
 
 	QFrame *m_scrollWidget;
 	QScrollArea *m_scrollArea;
-	std::vector<CleanupColorField *> m_colorFields;
+	std::vector<DVGui::CleanupColorField *> m_colorFields;
 	QPushButton *m_remove, *m_add;
 
 	bool m_greyMode;

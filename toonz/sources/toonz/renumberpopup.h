@@ -10,20 +10,18 @@
 // forward declaration
 class QPushButton;
 
-using namespace DVGui;
-
 //=============================================================================
 // RenumberPopup
 //-----------------------------------------------------------------------------
 
-class RenumberPopup : public Dialog
+class RenumberPopup : public DVGui::Dialog
 {
 	Q_OBJECT
 
 	QPushButton *m_okBtn;
 	QPushButton *m_cancelBtn;
 
-	IntLineEdit *m_startFld, *m_stepFld;
+	DVGui::IntLineEdit *m_startFld, *m_stepFld;
 
 public:
 	RenumberPopup();

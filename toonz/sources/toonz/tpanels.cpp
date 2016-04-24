@@ -274,7 +274,7 @@ public:
 	{
 		TFx *currentFx = TApp::instance()->getCurrentFx()->getFx();
 		if (!currentFx) {
-			MsgBox(WARNING, "Preview Fx : No Current Fx !");
+			DVGui::warning("Preview Fx : No Current Fx !");
 			return;
 		}
 		/*-- 
@@ -284,7 +284,7 @@ public:
 		TPaletteColumnFx *pfx = dynamic_cast<TPaletteColumnFx *>(currentFx);
 		TOutputFx *ofx = dynamic_cast<TOutputFx *>(currentFx);
 		if (pfx || ofx) {
-			MsgBox(WARNING, "Preview Fx command is not available on Palette or Output node !");
+			DVGui::warning("Preview Fx command is not available on Palette or Output node !");
 			return;
 		}
 
@@ -306,7 +306,7 @@ FunctionViewerPanel::FunctionViewerPanel(QWidget *parent)
 
 	attachHandles();
 
-	bool ret = connect(m_functionViewer, SIGNAL(curveIo(int, TDoubleParam *, const string &)), this, SLOT(onIoCurve(int, TDoubleParam *, const string &)));
+	bool ret = connect(m_functionViewer, SIGNAL(curveIo(int, TDoubleParam *, const std::string &)), this, SLOT(onIoCurve(int, TDoubleParam *, const std::string &)));
 	ret &&connect(m_functionViewer, SIGNAL(editObject()), this, SLOT(onEditObject()));
 
 	assert(ret);
@@ -364,7 +364,7 @@ bool FunctionViewerPanel::widgetInThisPanelIsFocused()
 
 //------------------------------------------
 
-void FunctionViewerPanel::onIoCurve(int type, TDoubleParam *curve, const string &name)
+void FunctionViewerPanel::onIoCurve(int type, TDoubleParam *curve, const std::string &name)
 {
 	switch ((FunctionViewer::IoType)type) {
 	case FunctionViewer::eSaveCurve:
@@ -652,7 +652,7 @@ ColorFieldEditorController::ColorFieldEditorController()
 	m_colorFieldHandle = new TPaletteHandle();
 	m_palette = new TPalette();
 	TColorStyle *style = m_palette->getStyle(1);
-	wstring name = L"EmptyColorFieldPalette";
+	std::wstring name = L"EmptyColorFieldPalette";
 	m_palette->setPaletteName(name);
 	m_colorFieldHandle->setPalette(m_palette.getPointer(), 1);
 	DVGui::ColorField::setEditorController(this);
@@ -660,7 +660,7 @@ ColorFieldEditorController::ColorFieldEditorController()
 
 //-----------------------------------------------------------------------------
 
-void ColorFieldEditorController::edit(ColorField *colorField)
+void ColorFieldEditorController::edit(DVGui::ColorField *colorField)
 {
 	if (m_currentColorField && m_currentColorField->isEditing())
 		m_currentColorField->setIsEditing(false);
@@ -721,7 +721,7 @@ ColorFieldEditorController colorFieldEditorController;
 CleanupColorFieldEditorController::CleanupColorFieldEditorController()
 	: m_currentColorField(0), m_colorFieldHandle(new TPaletteHandle), m_palette(new TPalette)
 {
-	wstring name = L"EmptyColorFieldPalette";
+	std::wstring name = L"EmptyColorFieldPalette";
 	m_palette->setPaletteName(name);
 	m_colorFieldHandle->setPalette(m_palette.getPointer(), 1);
 	DVGui::CleanupColorField::setEditorController(this);
@@ -729,7 +729,7 @@ CleanupColorFieldEditorController::CleanupColorFieldEditorController()
 
 //-----------------------------------------------------------------------------
 
-void CleanupColorFieldEditorController::edit(CleanupColorField *colorField)
+void CleanupColorFieldEditorController::edit(DVGui::CleanupColorField *colorField)
 {
 	if (m_currentColorField && m_currentColorField->isEditing())
 		m_currentColorField->setIsEditing(false);

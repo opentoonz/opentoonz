@@ -1,3 +1,4 @@
+#include <memory>
 
 #include <cstring>
 #include "trop.h"
@@ -6,16 +7,16 @@
 
 class HalfCord
 {
-	int *m_array;
+	std::unique_ptr<int[]> m_array;
 	int m_radius;
 
 public:
 	HalfCord(int radius)
+		: m_radius(radius)
+		, m_array(new int[radius + 1])
 	{
 		assert(radius >= 0);
-		m_radius = radius;
-		m_array = new int[m_radius + 1];
-		memset(m_array, 0, (m_radius + 1) * sizeof(int));
+		memset(m_array.get(), 0, (m_radius + 1) * sizeof(int));
 
 		float dCircle = 1.25f - m_radius; //  inizializza decision variable
 		int y = m_radius;				  //  inizializzazione indice scanline
@@ -34,10 +35,6 @@ public:
 		} while (y >= x);
 	}
 
-	~HalfCord()
-	{
-		delete[] m_array;
-	}
 	inline int getCord(int x)
 	{
 		assert(0 <= x && x <= m_radius);

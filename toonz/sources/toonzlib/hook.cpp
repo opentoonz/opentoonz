@@ -195,7 +195,7 @@ void Hook::saveData(TOStream &os)
 void Hook::loadData(TIStream &is)
 {
 	m_frames.clear();
-	string tagName;
+	std::string tagName;
 	while (is.matchTag(tagName)) {
 		if (tagName == "frame") {
 			Frame f;
@@ -402,7 +402,7 @@ void HookSet::saveData(TOStream &os)
 
 void HookSet::loadData(TIStream &is)
 {
-	string tagName;
+	std::string tagName;
 	while (is.matchTag(tagName)) {
 		if (tagName == "hook") {
 			Hook *hook = new Hook();
@@ -522,7 +522,7 @@ void TrackerObjectsSet::clearAll()
 
 //=========================================================
 
-string getHookName(int code)
+std::string getHookName(int code)
 {
 	assert(0 <= code && code < 10);
 	if (code == 0)

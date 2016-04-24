@@ -101,7 +101,7 @@ public:
 	void forceInvalidate();
 
 	void getResource(
-		TCacheResourceP &resource, const string &alias,
+		TCacheResourceP &resource, const std::string &alias,
 		const TFxP &fx, double frame, const TRenderSettings &rs,
 		ResourceDeclaration *resData);
 

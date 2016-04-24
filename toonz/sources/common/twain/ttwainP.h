@@ -25,7 +25,7 @@ typedef enum TWAINSTATE {
 	TWAIN_TRANSFERRING	/* image in transit	      */
 } TWAINSTATE;
 
-#ifdef WIN32
+#ifdef _WIN32
 #ifdef x64
 #define DSM_FILENAME "TWAINDSM.DLL"
 #else

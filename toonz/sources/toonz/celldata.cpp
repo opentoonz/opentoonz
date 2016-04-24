@@ -160,7 +160,7 @@ void TCellData::cloneZeraryFx(int index, std::vector<TXshCell> &cells) const
 	assert(fxColumn);
 	TFx *zeraryFx = fxColumn->getZeraryColumnFx()->getZeraryFx();
 	if (zeraryFx) {
-		wstring fxName = zeraryFx->getName();
+		std::wstring fxName = zeraryFx->getName();
 		TFx *newZeraryFx = zeraryFx->clone(false);
 		fxColumn->getXsheet()->getFxDag()->assignUniqueId(newZeraryFx);
 		newZeraryFx->setName(fxName);

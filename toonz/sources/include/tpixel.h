@@ -160,7 +160,7 @@ public:
 undefined machine order !!!!
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 	TPixelRGBM64() : r(0), g(0), b(0), m(maxChannelValue){};
 	TPixelRGBM64(int rr, int gg, int bb, int mm = maxChannelValue)
 		: r(rr), g(gg), b(bb), m(mm){};

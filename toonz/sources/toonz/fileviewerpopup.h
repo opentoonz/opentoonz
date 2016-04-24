@@ -29,7 +29,7 @@ class FileViewer : public QWidget
 	TLevelReaderP m_lr;
 	TPaletteP m_palette;
 	int m_fileSize;
-	string m_fileDate;
+	std::string m_fileDate;
 	wstring m_levelName;
 	TSoundOutputDevice *m_player;
 	TSoundTrack *m_snd;

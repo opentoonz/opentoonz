@@ -45,7 +45,7 @@ public:
 	/* FX nodeが無効のときの、表示port番号 */
 	int getPreferredInputPort() { return 1; }
 
-	string getPluginId() const { return PLUGIN_PREFIX; }
+	std::string getPluginId() const { return PLUGIN_PREFIX; }
 };
 
 #endif /* !ino_common_h */

@@ -294,7 +294,7 @@ TXshSimpleLevel *createMeshLevel(TXshLevel *texturesLevel)
 						<< MeshifyPopup::tr("Keep the old level and overwrite processed frames")
 						<< MeshifyPopup::tr("Choose a different path (%1)").arg(QString::fromStdWString(codedDstPath.getWideString()));
 
-			answer = DVGui::RadioButtonMsgBox(QUESTION, question, optionsList, TApp::instance()->getMainWindow());
+			answer = DVGui::RadioButtonMsgBox(DVGui::QUESTION, question, optionsList, TApp::instance()->getMainWindow());
 		}
 
 		// Apply decision
@@ -637,7 +637,7 @@ MeshifyPopup::MeshifyPopup()
 	QLabel *edgesLengthLabel = new QLabel(tr("Mesh Edges Length:"));
 	topLayout->addWidget(edgesLengthLabel, row, 0, Qt::AlignRight | Qt::AlignVCenter);
 
-	m_edgesLength = new MeasuredDoubleField;
+	m_edgesLength = new DVGui::MeasuredDoubleField;
 	m_edgesLength->setMeasure("length.x");
 	m_edgesLength->setRange(0.0, 1.0); // In inches (standard unit)
 	m_edgesLength->setValue(0.2);
@@ -647,7 +647,7 @@ MeshifyPopup::MeshifyPopup()
 	QLabel *rasterizationDpiLabel = new QLabel(tr("Rasterization DPI:"));
 	topLayout->addWidget(rasterizationDpiLabel, row, 0, Qt::AlignRight | Qt::AlignVCenter);
 
-	m_rasterizationDpi = new DoubleLineEdit;
+	m_rasterizationDpi = new DVGui::DoubleLineEdit;
 	m_rasterizationDpi->setRange(1.0, (std::numeric_limits<double>::max)());
 	m_rasterizationDpi->setValue(300.0);
 
@@ -656,7 +656,7 @@ MeshifyPopup::MeshifyPopup()
 	QLabel *shapeMarginLabel = new QLabel(tr("Mesh Margin (pixels):"));
 	topLayout->addWidget(shapeMarginLabel, row, 0, Qt::AlignRight | Qt::AlignVCenter);
 
-	m_margin = new IntLineEdit;
+	m_margin = new DVGui::IntLineEdit;
 	m_margin->setRange(2, (std::numeric_limits<int>::max)());
 	m_margin->setValue(5);
 
@@ -979,6 +979,8 @@ void createMeshifiedLevels(std::map<TXshLevel *, TXshSimpleLevel *> &meshLevels,
 
 			progressDialog->setValue(progressDialog->value() + 1);
 		}
+
+		ml->setDirtyFlag(true);
 	}
 }
 
@@ -1277,13 +1279,13 @@ bool meshifySelection(const MeshifyOptions &options)
 		CASE HAS_LEVEL_COLUMNS | HAS_MESH_COLUMNS :
 
 			// Error message
-			DVGui::MsgBox(DVGui::CRITICAL, MeshifyPopup::tr("Current selection contains mixed image and mesh level types"));
+			DVGui::error(MeshifyPopup::tr("Current selection contains mixed image and mesh level types"));
 		return false;
 
 	DEFAULT:
 
 		// Error message
-		DVGui::MsgBox(DVGui::CRITICAL, MeshifyPopup::tr("Current selection contains no image or mesh level types"));
+		DVGui::error(MeshifyPopup::tr("Current selection contains no image or mesh level types"));
 		return false;
 	}
 

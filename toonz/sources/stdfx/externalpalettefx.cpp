@@ -40,7 +40,7 @@ public:
 		}
 	}
 
-	string getAlias(double frame, const TRenderSettings &info) const;
+	std::string getAlias(double frame, const TRenderSettings &info) const;
 
 	void doDryCompute(TRectD &rect, double frame, const TRenderSettings &info);
 	void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
@@ -97,9 +97,9 @@ TPalette *getPalette(TFx *fx, double frame)
 
 //-------------------------------------------------------------------
 
-string ExternalPaletteFx::getAlias(double frame, const TRenderSettings &info) const
+std::string ExternalPaletteFx::getAlias(double frame, const TRenderSettings &info) const
 {
-	string alias(TRasterFx::getAlias(frame, info));
+	std::string alias(TRasterFx::getAlias(frame, info));
 
 	if (m_expalette.isConnected()) {
 		TFx *fx = m_expalette.getFx();
@@ -120,7 +120,7 @@ void ExternalPaletteFx::doDryCompute(TRectD &rect, double frame, const TRenderSe
 
 	if (m_expalette.isConnected()) {
 		TFx *fx = m_expalette.getFx();
-		string pltAlias = m_expalette->getAlias(frame, ri);
+		std::string pltAlias = m_expalette->getAlias(frame, ri);
 
 		TPaletteP palette(getPalette(fx, frame));
 		if (palette && palette->isAnimated())
@@ -146,7 +146,7 @@ void ExternalPaletteFx::doCompute(TTile &tile, double frame, const TRenderSettin
 
 	if (m_expalette.isConnected()) {
 		TFx *fx = m_expalette.getFx();
-		string pltAlias = m_expalette->getAlias(frame, ri);
+		std::string pltAlias = m_expalette->getAlias(frame, ri);
 
 		TPaletteP palette(getPalette(fx, frame));
 		if (palette && palette->isAnimated())

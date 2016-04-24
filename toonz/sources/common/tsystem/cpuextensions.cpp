@@ -1,7 +1,7 @@
 
 
 #include "tsystem.h"
-#ifdef WIN32
+#ifdef _WIN32
 #include <wtypes.h>
 #include <winnt.h>
 #include <emmintrin.h>
@@ -16,7 +16,7 @@ long TSystem::getCPUExtensions()
 }
 
 #else
-#ifndef WIN32
+#ifndef _WIN32
 long TSystem::getCPUExtensions()
 {
 	return TSystem::CPUExtensionsNone;
@@ -29,7 +29,7 @@ long CPUExtensionsAvailable = TSystem::CPUExtensionsNone;
 bool CPUExtensionsEnabled = true;
 bool FistTime = true;
 
-//#ifdef WIN32
+//#ifdef _WIN32
 
 //------------------------------------------------------------------------------
 

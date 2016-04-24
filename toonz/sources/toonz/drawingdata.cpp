@@ -351,7 +351,7 @@ bool DrawingData::getLevelFrames(TXshSimpleLevel *sl,
 			message = "NOTICE: Some styles were added from copied palette.";
 		else
 			message = "NOTICE: Some styles were added from original palette.";
-		DVGui::MsgBox(DVGui::INFORMATION, message);
+		DVGui::info(message);
 	}
 
 	QApplication::restoreOverrideCursor();

@@ -31,7 +31,7 @@ private:
 	int m_layersCount;
 	TPSDReader *m_psdreader;
 	int m_layerId;
-	map<TFrameId, int> m_frameTable; // frameID, layerId
+	std::map<TFrameId, int> m_frameTable; // frameID, layerId
 public:
 	static TLevelReader *create(const TFilePath &f);
 	TThread::Mutex m_mutex;

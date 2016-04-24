@@ -119,7 +119,7 @@ void TreeStageNode::sortChildren(int startIndex, int lastIndex)
 {
 	if (startIndex == lastIndex)
 		return;
-	vector<TreeStageNode *>::iterator begin, end;
+	std::vector<TreeStageNode *>::iterator begin, end;
 	begin = m_cildren.begin() + startIndex;
 	end = m_cildren.begin() + lastIndex;
 	std::sort(begin, end, CompareNodes());
@@ -670,7 +670,7 @@ void StageSchematicScene::reorderScene()
 void StageSchematicScene::placeNodes()
 {
 	// search all possible roots
-	vector<TreeStageNode *> roots;
+	std::vector<TreeStageNode *> roots;
 	findRoots(roots);
 
 	//sorts the roots container. Sortijg rules are specified by CompareNodes class
@@ -720,7 +720,7 @@ void StageSchematicScene::placeNodes()
 
 //------------------------------------------------------------------
 
-void StageSchematicScene::findRoots(vector<TreeStageNode *> &roots)
+void StageSchematicScene::findRoots(std::vector<TreeStageNode *> &roots)
 {
 	TStageObjectTree *pegTree = m_xshHandle->getXsheet()->getStageObjectTree();
 	int i;
@@ -1021,7 +1021,7 @@ void StageSchematicScene::onSaveSpline()
 			os << p.x << p.y << p.thick;
 		}
 	} catch (...) {
-		DVGui::MsgBox(DVGui::WARNING, QObject::tr("It is not possible to save the motion path."));
+		DVGui::warning(QObject::tr("It is not possible to save the motion path."));
 	}
 #endif
 }
@@ -1043,7 +1043,7 @@ void StageSchematicScene::onLoadSpline()
 		if (!TFileStatus(fp).doesExist()) {
 			QString msg;
 			msg = "Motion path " + toQString(fp) + " doesn't exists.";
-			MsgBox(DVGui::INFORMATION, msg);
+			DVGui::info(msg);
 			return;
 		}
 		assert(m_objHandle->isSpline());
@@ -1063,7 +1063,7 @@ void StageSchematicScene::onLoadSpline()
 			IconGenerator::instance()->invalidate(spline);
 		}
 	} catch (...) {
-		DVGui::MsgBox(DVGui::WARNING, QObject::tr("It is not possible to load the motion path."));
+		DVGui::warning(QObject::tr("It is not possible to load the motion path."));
 	}
 }
 

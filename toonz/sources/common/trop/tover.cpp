@@ -7,7 +7,7 @@
 #include "tropcm.h"
 #include "tpalette.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <emmintrin.h> // per SSE2
 #endif
 
@@ -171,7 +171,7 @@ void do_overT2(TRasterPT<T> rout, const TRasterPT<T> &rup)
 
 //-----------------------------------------------------------------------------
 
-#ifdef WIN32
+#ifdef _WIN32
 
 void do_over_SSE2(TRaster32P rout, const TRaster32P &rup)
 {
@@ -345,7 +345,7 @@ void TRop::over(const TRasterP &rout, const TRasterP &rup, const TPoint &pos)
 
 	// TRaster64P rout64 = rout, rin64 = rin;
 	if (rout32 && rup32) {
-#ifdef WIN32
+#ifdef _WIN32
 		if (TSystem::getCPUExtensions() & TSystem::CpuSupportsSse2)
 			do_over_SSE2(rout32, rup32);
 		else

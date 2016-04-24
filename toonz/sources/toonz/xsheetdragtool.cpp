@@ -354,7 +354,7 @@ class LevelExtenderUndo : public TUndo
 	int m_colCount;
 	int m_rowCount;
 	int m_col, m_row, m_deltaRow;
-	vector<TXshCell> m_cells; // righe x colonne
+	std::vector<TXshCell> m_cells; // righe x colonne
 
 	bool m_invert; // upper-directional
 
@@ -671,7 +671,7 @@ class LevelExtenderTool : public XsheetGUI::DragTool
 	int m_colCount;
 	int m_rowCount;
 	int m_c0, m_r0, m_r1;
-	vector<CellBuilder> m_columns;
+	std::vector<CellBuilder> m_columns;
 	LevelExtenderUndo *m_undo;
 
 	bool m_invert; //upper directional smart tab

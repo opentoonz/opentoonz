@@ -212,7 +212,7 @@ private:
 // Smart Pointer a TRaster
 //
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DVAPI TSmartPointerT<TRaster>;
 #endif
 
@@ -440,7 +440,7 @@ inline TRasterPT<T>::TRasterPT(int lx, int ly, int wrap, T *buffer, bool bufferO
 
 //---------------------------------------------------------
 
-#ifdef WIN32
+#ifdef _WIN32
 // su NT e' necessario per evitare un warning nelle classi
 // esportate che si riferiscono a TRaster32P/TRaster64P
 // su IRIX non compila perche' non riesce ad instanziare le

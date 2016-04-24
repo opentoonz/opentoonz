@@ -34,7 +34,7 @@ TPixelParam::TPixelParam(const TPixel32 &p)
 	addParam(m_data->m_g, "Green");
 	addParam(m_data->m_b, "Blue");
 	addParam(m_data->m_m, "Alpha");
-	string measureName("colorChannel");
+	std::string measureName("colorChannel");
 	m_data->m_r->setMeasureName(measureName);
 	m_data->m_g->setMeasureName(measureName);
 	m_data->m_b->setMeasureName(measureName);
@@ -50,7 +50,7 @@ TPixelParam::TPixelParam(const TPixelParam &src)
 	addParam(m_data->m_g, "Green");
 	addParam(m_data->m_b, "Blue");
 	addParam(m_data->m_m, "Alpha");
-	string measureName("colorChannel");
+	std::string measureName("colorChannel");
 	m_data->m_r->setMeasureName(measureName);
 	m_data->m_g->setMeasureName(measureName);
 	m_data->m_b->setMeasureName(measureName);
@@ -69,7 +69,7 @@ void TPixelParam::copy(TParam *src)
 	m_data->m_g->copy(p->m_data->m_g.getPointer());
 	m_data->m_b->copy(p->m_data->m_b.getPointer());
 	m_data->m_m->copy(p->m_data->m_m.getPointer());
-	string measureName("colorChannel");
+	std::string measureName("colorChannel");
 
 	m_data->m_r->setMeasureName(measureName);
 	m_data->m_g->setMeasureName(measureName);
@@ -167,7 +167,7 @@ bool TPixelParam::setValue64(double frame, const TPixel64 &pix)
 
 void TPixelParam::loadData(TIStream &is)
 {
-	string childName;
+	std::string childName;
 	while (is.openChild(childName)) {
 		if (childName == "red")
 			m_data->m_r->loadData(is);

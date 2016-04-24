@@ -11,8 +11,6 @@
 // forward declaration
 class QPushButton;
 
-using namespace DVGui;
-
 //=============================================================================
 // DuplicatePopup
 //-----------------------------------------------------------------------------
@@ -25,7 +23,7 @@ class DuplicatePopup : public QDialog
 	QPushButton *m_cancelBtn;
 	QPushButton *m_applyBtn;
 
-	IntLineEdit *m_countFld, *m_upToFld;
+	DVGui::IntLineEdit *m_countFld, *m_upToFld;
 
 	int m_count, m_upTo;
 

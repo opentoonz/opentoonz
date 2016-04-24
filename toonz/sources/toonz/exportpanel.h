@@ -116,7 +116,7 @@ class RenderController : public QObject, public MovieGenerator::Listener
 	bool m_rendering;
 	bool m_cancelled;
 
-	string m_movieExt;
+	std::string m_movieExt;
 	bool m_useMarkers;
 	TOutputProperties *m_properties;
 	std::vector<TFilePath> m_clipList;
@@ -137,8 +137,8 @@ public:
 		return &_instance;
 	}
 
-	void setMovieExt(string ext);
-	string getMovieExt() const { return m_movieExt; }
+	void setMovieExt(std::string ext);
+	std::string getMovieExt() const { return m_movieExt; }
 
 	void setOutputPropertites(TOutputProperties *properties) { m_properties = properties; }
 	TOutputProperties *getOutputPropertites() { return m_properties; }

@@ -5,7 +5,7 @@
 #include "tfilepath_io.h"
 #include <QDateTime>
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(disable : 4996)
 #include <windows.h>
 #include <stdio.h>
@@ -33,7 +33,7 @@ enum LEVEL {
 	LEVEL_INFO
 };
 
-#ifdef WIN32
+#ifdef _WIN32
 WORD Level2WinEventType(LEVEL level)
 {
 	switch (level) {
@@ -71,7 +71,7 @@ int Level2XPriority(LEVEL level)
 
 void notify(LEVEL level, const QString &msg)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	TCHAR buf[_MAX_PATH + 1];
 
 	GetModuleFileName(0, buf, _MAX_PATH);

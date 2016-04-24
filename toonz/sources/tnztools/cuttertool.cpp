@@ -40,8 +40,8 @@ class UndoCutter : public ToolUtils::TToolUndo
 
 	VIStroke *m_oldStroke;
 
-	vector<TFilledRegionInf> *m_fillInformation;
-	vector<DoublePair> *m_sortedWRanges;
+	std::vector<TFilledRegionInf> *m_fillInformation;
+	std::vector<DoublePair> *m_sortedWRanges;
 
 	int m_row;
 	int m_column;
@@ -53,8 +53,8 @@ public:
 			   int pos,
 			   int newStrokeId1,
 			   int newStrokeId2,
-			   vector<TFilledRegionInf> *fillInformation,
-			   vector<DoublePair> *sortedWRanges)
+			   std::vector<TFilledRegionInf> *fillInformation,
+			   std::vector<DoublePair> *sortedWRanges)
 		: TToolUndo(level, frameId), m_oldStroke(oldStroke), m_newStrokeId1(newStrokeId1), m_newStrokeId2(newStrokeId2), m_pos(pos), m_fillInformation(fillInformation), m_sortedWRanges(sortedWRanges)
 	{
 		TTool::Application *app = TTool::getApplication();
@@ -253,21 +253,21 @@ public:
 				w = strokeRef->getParameterAtLength(len);
 			}
 
-			vector<DoublePair> *sortedWRanges = new vector<DoublePair>;
+			std::vector<DoublePair> *sortedWRanges = new std::vector<DoublePair>;
 
 			if (strokeRef->isSelfLoop()) {
-				sortedWRanges->push_back(make_pair(0, w));
-				sortedWRanges->push_back(make_pair(w, 1));
+				sortedWRanges->push_back(std::make_pair(0, w));
+				sortedWRanges->push_back(std::make_pair(w, 1));
 			} else {
 				if (w == 0 || w == 1)
-					sortedWRanges->push_back(make_pair(0, 1));
+					sortedWRanges->push_back(std::make_pair(0, 1));
 				else {
-					sortedWRanges->push_back(make_pair(0, w));
-					sortedWRanges->push_back(make_pair(w, 1));
+					sortedWRanges->push_back(std::make_pair(0, w));
+					sortedWRanges->push_back(std::make_pair(w, 1));
 				}
 			}
 
-			vector<TFilledRegionInf> *fillInformation = new vector<TFilledRegionInf>;
+			std::vector<TFilledRegionInf> *fillInformation = new std::vector<TFilledRegionInf>;
 			ImageUtils::getFillingInformationOverlappingArea(vi, *fillInformation, strokeRef->getBBox());
 
 			VIStroke *oldStroke = cloneVIStroke(vi->getVIStroke(strokeIndex));

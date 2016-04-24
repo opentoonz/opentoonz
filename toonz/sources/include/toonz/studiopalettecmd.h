@@ -45,7 +45,7 @@ DVAPI void updateAllLinkedStyles(TPaletteHandle *paletteHandle,
 DVAPI void deletePalette(const TFilePath &fp);
 DVAPI void movePalette(const TFilePath &dstPath, const TFilePath &srcPath);
 DVAPI TFilePath createPalette(const TFilePath &folderPath,
-							  string paletteName,
+							  std::string paletteName,
 							  const TPalette *palette);
 
 DVAPI TFilePath addFolder(const TFilePath &parentFolderPath);

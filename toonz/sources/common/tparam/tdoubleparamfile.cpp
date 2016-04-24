@@ -30,7 +30,7 @@ bool parseDouble(double &value, char *&s)
 				s++;
 		}
 	}
-	string w(t, s - t);
+	std::string w(t, s - t);
 	value = toDouble(w);
 	return true;
 }

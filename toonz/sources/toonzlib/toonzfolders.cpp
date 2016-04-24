@@ -95,7 +95,7 @@ TFilePath ToonzFolder::getModuleFile(TFilePath filename)
 	return fp;
 }
 
-TFilePath ToonzFolder::getModuleFile(string fn)
+TFilePath ToonzFolder::getModuleFile(std::string fn)
 {
 	return ToonzFolder::getModuleFile(TFilePath(fn));
 }

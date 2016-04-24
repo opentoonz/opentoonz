@@ -40,7 +40,7 @@ class Grammar;
 class CalculatorNodeVisitor;
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DVAPI TPersistDeclarationT<TDoubleParam>;
 #endif
 
@@ -67,8 +67,8 @@ public:
 	TParam *clone() const { return new TDoubleParam(*this); }
 	void copy(TParam *src);
 
-	string getMeasureName() const;
-	void setMeasureName(string name);
+	std::string getMeasureName() const;
+	void setMeasureName(std::string name);
 	TMeasure *getMeasure() const;
 
 	void setValueRange(double min, double max, double step = 1.0);
@@ -147,9 +147,9 @@ public:
 
 	void loadData(TIStream &is);
 	void saveData(TOStream &os);
-	string getStreamTag() const;
+	std::string getStreamTag() const;
 
-	string getValueAlias(double frame, int precision);
+	std::string getValueAlias(double frame, int precision);
 };
 
 //---------------------------------------------------------

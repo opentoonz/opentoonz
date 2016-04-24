@@ -46,15 +46,15 @@ private:
 	TPropertyGroup *m_props;
 	TFilePath m_levelPath;
 
-	QMap<std::string, PropertyWidget *> m_widgets; //!< Property name -> PropertyWidget
+	QMap<std::string, DVGui::PropertyWidget *> m_widgets; //!< Property name -> PropertyWidget
 
 	QGridLayout *m_mainLayout;
 
-#ifdef WIN32
+#ifdef _WIN32
 
 	// AVI codec - related members
 	QLabel *m_codecRestriction;
-	PropertyComboBox *m_codecComboBox;
+	DVGui::PropertyComboBox *m_codecComboBox;
 	QPushButton *m_configureCodec;
 
 #endif
@@ -66,7 +66,7 @@ private:
 	void buildPropertyLineEdit(int index, TPropertyGroup *props);
 	void showEvent(QShowEvent *se);
 
-#ifdef WIN32
+#ifdef _WIN32
 
 private slots:
 

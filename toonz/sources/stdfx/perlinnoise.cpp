@@ -146,9 +146,9 @@ double PerlinNoise::Marble(double u, double v, double k, double grain, double mi
 }
 
 PerlinNoise::PerlinNoise()
+	: Noise(new float[Size * Size * TimeSize])
 {
 	TRandom random(1);
-	Noise = new float[Size * Size * TimeSize];
 	for (int i = 0; i < Size; i++) {
 		for (int j = 0; j < Size; j++) {
 			for (int k = 0; k < TimeSize; k++) {

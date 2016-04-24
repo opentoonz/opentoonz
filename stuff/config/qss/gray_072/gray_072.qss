@@ -936,6 +936,9 @@ XsheetViewer {
   qproperty-PaletteColumnColor: #3a655f;
   qproperty-PaletteColumnBorderColor: #86aca7;
   qproperty-SelectedPaletteColumnColor: #5f8581;
+  qproperty-MeshColumnColor: #684d86;
+  qproperty-MeshColumnBorderColor: #ba92ef;
+  qproperty-SelectedMeshColumnColor: #8a75a2;
   qproperty-ColumnHeadPastelizer: #000000;
   qproperty-SelectedColumnHead: #506082;
   qproperty-LightLightBGColor: #fafafa;

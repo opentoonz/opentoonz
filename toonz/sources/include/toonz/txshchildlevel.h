@@ -38,14 +38,14 @@ class DVAPI TXshChildLevel : public TXshLevel
 	PERSIST_DECLARATION(TXshChildLevel)
 
 	TXsheet *m_xsheet;
-	string m_iconId;
+	std::string m_iconId;
 
 	DECLARE_CLASS_CODE
 public:
 	/*!
     Constructs a TXshChildLevel with \b TXshLevel name \b name
   */
-	TXshChildLevel(wstring name = L"");
+	TXshChildLevel(std::wstring name = L"");
 
 	/*!
     Destroys the TXshChildLevel object.
@@ -92,7 +92,7 @@ private:
 	TXshChildLevel &operator=(const TXshChildLevel &);
 };
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DV_EXPORT_API TSmartPointerT<TXshChildLevel>;
 #endif
 typedef TSmartPointerT<TXshChildLevel> TXshChildLevelP;

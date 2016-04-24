@@ -110,29 +110,27 @@
 	}
 
 #define QUANTEL_FILL_LINE_OF_RGB(xmarg, xsize, rbuf, gbuf, bbuf, RGBbuf) \
-	{                                                                    \
-		register int i;                                                  \
-                                                                         \
-		QUANTEL_FILL_LINE_OF_BLACK(rbuf, gbuf, bbuf, xmarg)              \
-		for (i = xmarg; i < xsize + xmarg; i++) {                        \
-			rbuf[i] = (USHORT)RGBbuf->r;                                 \
-			gbuf[i] = (USHORT)RGBbuf->g;                                 \
-			bbuf[i] = (USHORT)RGBbuf->b;                                 \
-			RGBbuf++;                                                    \
-		}                                                                \
-		QUANTEL_FILL_LINE_OF_BLACK(rbuf + i, gbuf + i, bbuf + i, xmarg)  \
+	{                                                                      \
+	  int i;                                                               \
+		QUANTEL_FILL_LINE_OF_BLACK(rbuf, gbuf, bbuf, xmarg)                  \
+		for (i = xmarg; i < xsize + xmarg; i++) {                            \
+			rbuf[i] = (USHORT)RGBbuf->r;                                       \
+			gbuf[i] = (USHORT)RGBbuf->g;                                       \
+			bbuf[i] = (USHORT)RGBbuf->b;                                       \
+			RGBbuf++;                                                          \
+		}                                                                    \
+		QUANTEL_FILL_LINE_OF_BLACK(rbuf + i, gbuf + i, bbuf + i, xmarg)      \
 	}
 
-#define QUANTEL_FILL_LINE_OF_RGB2(xmarg, rbuf, gbuf, bbuf, RGBbuf)      \
-	{                                                                   \
-		register i, _dx;                                                \
-                                                                        \
+#define QUANTEL_FILL_LINE_OF_RGB2(xmarg, rbuf, gbuf, bbuf, RGBbuf)  \
+	{                                                                 \
+	  int i;                                                          \
 		QUANTEL_FILL_LINE_OF_BLACK(rbuf, gbuf, bbuf, xmarg)             \
 		for (i = xmarg; i < (QUANTEL_XSIZE - xmarg); i++) {             \
-			rbuf[i] = (USHORT)RGBbuf->r;                                \
-			gbuf[i] = (USHORT)RGBbuf->g;                                \
-			bbuf[i] = (USHORT)RGBbuf->b;                                \
-			RGBbuf++;                                                   \
+			rbuf[i] = (USHORT)RGBbuf->r;                                  \
+			gbuf[i] = (USHORT)RGBbuf->g;                                  \
+			bbuf[i] = (USHORT)RGBbuf->b;                                  \
+			RGBbuf++;                                                     \
 		}                                                               \
 		QUANTEL_FILL_LINE_OF_BLACK(rbuf + i, gbuf + i, bbuf + i, xmarg) \
 	}

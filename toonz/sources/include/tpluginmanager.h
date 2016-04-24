@@ -43,19 +43,19 @@ class TFilePath;
 
 class DVAPI TPluginInfo
 {
-	string m_name;
+	std::string m_name;
 
 public:
-	TPluginInfo(string name = "") : m_name(name){};
+	TPluginInfo(std::string name = "") : m_name(name){};
 	~TPluginInfo(){};
-	string getName() const { return m_name; };
+	std::string getName() const { return m_name; };
 };
 
 //-----------------------------------------------------------------------------
 //
 // L'entry point del plugin e' TLIBMAIN {....}
 //
-#ifdef WIN32
+#ifdef _WIN32
 #define TLIBMAIN                     \
 	extern "C" __declspec(dllexport) \
 		const TPluginInfo *          \
@@ -72,7 +72,7 @@ class DVAPI TPluginManager
 
 	class Plugin;
 
-	std::set<string> m_ignoreList;
+	std::set<std::string> m_ignoreList;
 	typedef std::vector<const Plugin *> PluginTable;
 	PluginTable m_pluginTable;
 	std::set<TFilePath> m_loadedPlugins;
@@ -84,15 +84,15 @@ public:
 	static TPluginManager *instance();
 
 	// the name should be ignored? (name only; case insensitive. e.g. "tnzimage")
-	bool isIgnored(string name) const;
+	bool isIgnored(std::string name) const;
 
 	// set names to ignore; clear previous list
-	void setIgnoredList(const std::set<string> &lst);
+	void setIgnoredList(const std::set<std::string> &lst);
 
 	// helper method.
-	void setIgnored(string name)
+	void setIgnored(std::string name)
 	{
-		std::set<string> lst;
+		std::set<std::string> lst;
 		lst.insert(name);
 		setIgnoredList(lst);
 	}

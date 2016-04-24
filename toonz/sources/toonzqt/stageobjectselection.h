@@ -95,4 +95,4 @@ signals:
 	void doExplodeChild(QList<TStageObjectId>);
 };
 
-#endif;
+#endif

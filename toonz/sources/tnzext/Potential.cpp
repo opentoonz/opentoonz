@@ -3,7 +3,7 @@
 #include "ext/Potential.h"
 #include <algorithm>
 
-#if defined(WIN32) && (_MSC_VER <= 1200)
+#if defined(_WIN32) && (_MSC_VER <= 1200)
 #pragma warning(push)
 #pragma warning(disable : 4290)
 #endif
@@ -67,6 +67,6 @@ ToonzExt::Potential::value(double at) const
 //  End Of File
 //-----------------------------------------------------------------------------
 
-#if defined(WIN32) && (_MSC_VER <= 1200)
+#if defined(_WIN32) && (_MSC_VER <= 1200)
 #pragma warning(pop)
 #endif

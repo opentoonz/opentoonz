@@ -291,7 +291,7 @@ void ImageViewer::contextMenuEvent(QContextMenuEvent *event)
 	fit->setShortcut(QKeySequence(CommandManager::instance()->getKeyFromId(V_ZoomFit)));
 	connect(fit, SIGNAL(triggered()), SLOT(fitView()));
 
-#ifdef WIN32
+#ifdef _WIN32
 
 	if (ImageUtils::FullScreenWidget *fsWidget =
 			dynamic_cast<ImageUtils::FullScreenWidget *>(parentWidget())) {

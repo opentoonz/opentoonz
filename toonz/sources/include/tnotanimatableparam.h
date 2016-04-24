@@ -26,7 +26,7 @@
 //  TNotAnimatableParamChange
 //-----------------------------------------------------------------------------
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(push)
 #pragma warning(disable : 4251)
 #endif
@@ -169,7 +169,7 @@ public:
 		const TSmartPointerT<TParam> &, double,
 		bool) {}
 
-	string getValueAlias(double, int)
+	std::string getValueAlias(double, int)
 	{
 		return toString(getValue());
 	}
@@ -185,7 +185,7 @@ public:
 //
 //=========================================================
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DVAPI TNotAnimatableParam<int>;
 class TIntParam;
 template class DVAPI TPersistDeclarationT<TIntParam>;
@@ -220,7 +220,7 @@ DEFINE_PARAM_SMARTPOINTER(TIntParam, int)
 //
 //=========================================================
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DVAPI TNotAnimatableParam<bool>;
 class TBoolParam;
 template class DVAPI TPersistDeclarationT<TBoolParam>;
@@ -248,7 +248,7 @@ DEFINE_PARAM_SMARTPOINTER(TBoolParam, bool)
 //
 //=========================================================
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DVAPI TNotAnimatableParam<TFilePath>;
 class TFilePathParam;
 template class DVAPI TPersistDeclarationT<TFilePathParam>;
@@ -274,7 +274,7 @@ DEFINE_PARAM_SMARTPOINTER(TFilePathParam, TFilePath)
 //
 //=========================================================
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DVAPI TNotAnimatableParam<std::wstring>;
 class TStringParam;
 template class DVAPI TPersistDeclarationT<TStringParam>;
@@ -285,14 +285,14 @@ class DVAPI TStringParam : public TNotAnimatableParam<std::wstring>
 	PERSIST_DECLARATION(TStringParam);
 
 public:
-	TStringParam(wstring v = L"") : TNotAnimatableParam<std::wstring>(v) {}
-	TStringParam(const TStringParam &src) : TNotAnimatableParam<wstring>(src) {}
+	TStringParam(std::wstring v = L"") : TNotAnimatableParam<std::wstring>(v) {}
+	TStringParam(const TStringParam &src) : TNotAnimatableParam<std::wstring>(src) {}
 	TParam *clone() const { return new TStringParam(*this); }
 	void loadData(TIStream &is);
 	void saveData(TOStream &os);
 };
 
-DEFINE_PARAM_SMARTPOINTER(TStringParam, wstring)
+DEFINE_PARAM_SMARTPOINTER(TStringParam, std::wstring)
 
 //=========================================================
 //
@@ -308,7 +308,7 @@ class DVAPI TEnumParam : public TNotAnimatableParam<int>
 	PERSIST_DECLARATION(TEnumParam)
 
 public:
-	TEnumParam(const int &v, const string &caption);
+	TEnumParam(const int &v, const std::string &caption);
 
 	TEnumParam();
 
@@ -319,12 +319,12 @@ public:
 	void copy(TParam *src);
 
 	void setValue(int v, bool undoing = false);
-	void setValue(const string &caption, bool undoing = false);
+	void setValue(const std::string &caption, bool undoing = false);
 
-	void addItem(const int &item, const string &caption);
+	void addItem(const int &item, const std::string &caption);
 
 	int getItemCount() const;
-	void getItem(int i, int &item, string &caption) const;
+	void getItem(int i, int &item, std::string &caption) const;
 
 	// TPersist methods
 	void loadData(TIStream &is);
@@ -344,7 +344,7 @@ class DVAPI TIntEnumParamP : public TDerivedSmartPointerT<TIntEnumParam, TParam>
 {
 public:
 	TIntEnumParamP(TIntEnumParam *p = 0) : DerivedSmartPointer(p) {}
-	TIntEnumParamP(int v, const string &caption) : DerivedSmartPointer(new TEnumParam(v, caption)) {}
+	TIntEnumParamP(int v, const std::string &caption) : DerivedSmartPointer(new TEnumParam(v, caption)) {}
 	TIntEnumParamP(TParamP &p) : DerivedSmartPointer(p) {}
 	TIntEnumParamP(const TParamP &p) : DerivedSmartPointer(p) {}
 	operator TParamP() const { return TParamP(m_pointer); }
@@ -358,7 +358,7 @@ public:
 //
 //=========================================================
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DVAPI TNotAnimatableParam<double>;
 class TNADoubleParam;
 template class DVAPI TPersistDeclarationT<TNADoubleParam>;
@@ -457,7 +457,7 @@ TUndo *TNotAnimatableParamChange<T>::createUndo() const
 
 //-----------------------------------------------------------------------------
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(pop)
 #endif
 

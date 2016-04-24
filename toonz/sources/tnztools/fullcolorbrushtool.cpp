@@ -142,7 +142,7 @@ public:
 //    FullColor Brush Tool implementation
 //************************************************************************
 
-FullColorBrushTool::FullColorBrushTool(string name)
+FullColorBrushTool::FullColorBrushTool(std::string name)
 	: TTool(name), m_thickness("Thickness", 1, 100, 1, 5, false), m_pressure("Pressure Sensitivity", true), m_opacity("Opacity:", 0, 100, 100, 100, true), m_hardness("Hardness:", 0, 100, 100), m_preset("Preset:"), m_styleId(0), m_oldOpacity(1), m_brush(0), m_tileSet(0), m_tileSaver(0), m_notifier(0), m_presetsLoaded(false), m_firstTime(true)
 {
 	bind(TTool::RasterImage | TTool::EmptyTarget);
@@ -351,7 +351,7 @@ void FullColorBrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e
 	if (m == 3) {
 		// ho appena cominciato. devo disegnare un segmento
 		TThickPoint pa = m_points.front();
-		vector<TThickPoint> points;
+		std::vector<TThickPoint> points;
 		points.push_back(pa);
 		points.push_back(mid);
 		invalidateRect = ToolUtils::getBounds(points, maxThickness);
@@ -362,7 +362,7 @@ void FullColorBrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e
 		m_lastRect += bbox;
 	} else {
 		// caso generale: disegno un arco
-		vector<TThickPoint> points;
+		std::vector<TThickPoint> points;
 		points.push_back(m_points[m - 4]);
 		points.push_back(old);
 		points.push_back(mid);
@@ -397,7 +397,7 @@ void FullColorBrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e)
 		TThickPoint point(pos + rasCenter, thickness);
 		m_points.push_back(point);
 		int m = m_points.size();
-		vector<TThickPoint> points;
+		std::vector<TThickPoint> points;
 		points.push_back(m_points[m - 3]);
 		points.push_back(m_points[m - 2]);
 		points.push_back(m_points[m - 1]);
@@ -571,7 +571,7 @@ void FullColorBrushTool::setWorkAndBackupImages()
 
 //------------------------------------------------------------------
 
-bool FullColorBrushTool::onPropertyChanged(string propertyName)
+bool FullColorBrushTool::onPropertyChanged(std::string propertyName)
 {
 	m_minThick = m_thickness.getValue().first;
 	m_maxThick = m_thickness.getValue().second;
@@ -677,7 +677,7 @@ void FullColorBrushTool::addPreset(QString name)
 
 void FullColorBrushTool::removePreset()
 {
-	wstring name(m_preset.getValue());
+	std::wstring name(m_preset.getValue());
 	if (name == CUSTOM_WSTR)
 		return;
 

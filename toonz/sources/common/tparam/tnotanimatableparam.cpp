@@ -87,7 +87,7 @@ void TFilePathParam::saveData(TOStream &os)
 //=========================================================
 void TStringParam::loadData(TIStream &is)
 {
-	wstring def, value;
+	std::wstring def, value;
 	is >> def >> value;
 	setDefaultValue(def);
 	setValue(value, false);
@@ -123,7 +123,7 @@ class matchesValue
 
 public:
 	matchesValue(T v) : m_v(v) {}
-	bool operator()(const pair<T, string> &p) { return m_v == p.first; }
+	bool operator()(const std::pair<T, std::string> &p) { return m_v == p.first; }
 };
 }
 
@@ -132,16 +132,16 @@ public:
 class TEnumParamImp
 {
 public:
-	vector<pair<int, string>> m_items;
+	std::vector<std::pair<int, std::string>> m_items;
 	void copy(std::unique_ptr<TEnumParamImp>& src)
 	{
 		m_items.clear();
-		std::back_insert_iterator<std::vector<pair<int, string>>> bii(m_items);
+		std::back_insert_iterator<std::vector<std::pair<int, std::string>>> bii(m_items);
 		std::copy(src->m_items.begin(), src->m_items.end(), bii);
 	}
 	bool checkValue(int v)
 	{
-		std::vector<pair<int, string>>::iterator it =
+		std::vector<std::pair<int, std::string>>::iterator it =
 			std::find_if(m_items.begin(), m_items.end(), matchesValue<int>(v));
 		return it != m_items.end();
 	}
@@ -149,7 +149,7 @@ public:
 
 //---------------------------------------------------------
 
-TEnumParam::TEnumParam(const int &v, const string &caption)
+TEnumParam::TEnumParam(const int &v, const std::string &caption)
 	: TNotAnimatableParam<int>(v), m_imp(new TEnumParamImp())
 {
 	addItem(v, caption);
@@ -193,7 +193,7 @@ TEnumParam::TEnumParam()
 void TEnumParam::setValue(int v, bool undoing)
 {
 	bool valid = false;
-	std::vector<pair<int, string>>::iterator it = m_imp->m_items.begin();
+	std::vector<std::pair<int, std::string>>::iterator it = m_imp->m_items.begin();
 	for (; it != m_imp->m_items.end(); ++it) {
 		if (it->first == v) {
 			valid = true;
@@ -209,11 +209,11 @@ void TEnumParam::setValue(int v, bool undoing)
 
 //---------------------------------------------------------
 
-void TEnumParam::setValue(const string &caption, bool undoing)
+void TEnumParam::setValue(const std::string &caption, bool undoing)
 {
 	bool valid = false;
 	int v = 0;
-	std::vector<pair<int, string>>::iterator it = m_imp->m_items.begin();
+	std::vector<std::pair<int, std::string>>::iterator it = m_imp->m_items.begin();
 	for (; it != m_imp->m_items.end(); ++it) {
 		if (it->second == caption) {
 			v = it->first;
@@ -230,7 +230,7 @@ void TEnumParam::setValue(const string &caption, bool undoing)
 
 //---------------------------------------------------------
 
-void TEnumParam::addItem(const int &item, const string &caption)
+void TEnumParam::addItem(const int &item, const std::string &caption)
 {
 	m_imp->m_items.push_back(std::make_pair(item, caption));
 }
@@ -244,7 +244,7 @@ int TEnumParam::getItemCount() const
 
 //---------------------------------------------------------
 
-void TEnumParam::getItem(int i, int &item, string &caption) const
+void TEnumParam::getItem(int i, int &item, std::string &caption) const
 {
 	assert(i >= 0 && i < m_imp->m_items.size());
 	item = m_imp->m_items[i].first;

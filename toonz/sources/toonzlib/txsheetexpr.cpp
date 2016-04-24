@@ -173,20 +173,20 @@ public:
 	XsheetReferencePattern(TXsheet *xsh) : m_xsh(xsh)
 	{
 		setDescription(
-			string("object.action\nTransformation reference\n") +
+			std::string("object.action\nTransformation reference\n") +
 			"object can be: tab, table, cam<n>, camera<n>, col<n>, peg<n>, pegbar<n>\n" +
 			"action can be: ns,ew,rot,ang,angle,z,zdepth,sx,sy,sc,scale,scalex,scaley,path,pos,shx,shy");
 	}
 
 	TStageObjectId matchObjectName(const Token &token) const
 	{
-		string s = toLower(token.getText());
+		std::string s = toLower(token.getText());
 		int len = (int)s.length(), i, j;
 		for (i = 0; i < len && isascii(s[i]) && isalpha(s[i]); i++) {
 		}
 		if (i == 0)
 			return TStageObjectId::NoneId;
-		string a = s.substr(0, i);
+		std::string a = s.substr(0, i);
 		int index = 0;
 		for (j = i; j < len && isascii(s[j]) && isdigit(s[j]); j++)
 			index = index * 10 + (s[j] - '0');
@@ -208,7 +208,7 @@ public:
 
 	TStageObject::Channel matchChannelName(const Token &token) const
 	{
-		string s = toLower(token.getText());
+		std::string s = toLower(token.getText());
 		if (s == "ns")
 			return TStageObject::T_Y;
 		else if (s == "ew")
@@ -268,7 +268,7 @@ public:
 
 	void getAcceptableKeywords(std::vector<std::string> &keywords) const
 	{
-		const string ks[] = {"table", "tab", "col", "cam", "camera", "peg", "pegbar"};
+		const std::string ks[] = { "table", "tab", "col", "cam", "camera", "peg", "pegbar" };
 		for (int i = 0; i < tArrayCount(ks); i++)
 			keywords.push_back(ks[i]);
 	}
@@ -284,7 +284,7 @@ public:
 
 		TStageObjectId objectId = matchObjectName(tokens[0]);
 
-		string field = toLower(tokens[2].getText());
+		std::string field = toLower(tokens[2].getText());
 		if (field == "cell" || field == "cel" || field == "cels") {
 			int columnIndex = objectId.getIndex();
 			stack.push_back(new XsheetDrawingCalculatorNode(calc, m_xsh, columnIndex, frameNode));
@@ -316,13 +316,13 @@ public:
 		int i;
 		for (i = 0; i < fx->getParams()->getParamCount(); i++) {
 			TParam *param = fx->getParams()->getParam(i);
-			string paramName = toString(TStringTable::translate(fx->getFxType() + "." + param->getName()));
+			std::string paramName = toString(TStringTable::translate(fx->getFxType() + "." + param->getName()));
 			int i = paramName.find(" ");
-			while (i != string::npos) {
+			while (i != std::string::npos) {
 				paramName.erase(i, 1);
 				i = paramName.find(" ");
 			}
-			string paramNameToCheck = token.getText();
+			std::string paramNameToCheck = token.getText();
 			if (paramName == paramNameToCheck || toLower(paramName) == toLower(paramNameToCheck))
 				return param;
 		}
@@ -333,19 +333,19 @@ public:
 		int i;
 		for (i = 0; i < paramSet->getParamCount(); i++) {
 			TParam *param = paramSet->getParam(i).getPointer();
-			string paramName = param->getName();
+			std::string paramName = param->getName();
 			int i = paramName.find(" ");
-			while (i != string::npos) {
+			while (i != std::string::npos) {
 				paramName.erase(i, 1);
 				i = paramName.find(" ");
 			}
-			string paramNameToCheck = token.getText();
+			std::string paramNameToCheck = token.getText();
 			if (paramName == paramNameToCheck || toLower(paramName) == toLower(paramNameToCheck))
 				return param;
 		}
 		return 0;
 	}
-	string getFirstKeyword() const { return "fx"; }
+	std::string getFirstKeyword() const { return "fx"; }
 	bool expressionExpected(const std::vector<Token> &previousTokens) const
 	{
 		return !previousTokens.empty() && previousTokens.back().getText() == "(";
@@ -353,7 +353,7 @@ public:
 	bool matchToken(const std::vector<Token> &previousTokens, const Token &token) const
 	{
 		int i = (int)previousTokens.size();
-		string s = toLower(token.getText());
+		std::string s = toLower(token.getText());
 		if (i == 0 && s == "fx")
 			return true;
 		else if (i == 1)
@@ -470,7 +470,7 @@ public:
 			"action must be one of the parameter names available for a Plastic Skeleton vertex");
 	}
 
-	virtual string getFirstKeyword() const { return "vertex"; }
+	virtual std::string getFirstKeyword() const { return "vertex"; }
 
 	bool expressionExpected(const std::vector<Token> &previousTokens) const
 	{

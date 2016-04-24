@@ -20,9 +20,9 @@ class TStringTableImp : public TStringTable
 public:
 	bool m_initialized;
 
-	map<string, Item> m_table;
-	std::pair<string, int> m_defaultFontNameAndSize;
-	string m_defaultMacFontName;
+	std::map<std::string, Item> m_table;
+	std::pair<std::string, int> m_defaultFontNameAndSize;
+	std::string m_defaultMacFontName;
 
 	TStringTableImp();
 	~TStringTableImp();
@@ -34,12 +34,12 @@ public:
 	void loadCoded(const TFilePath &);
 	void saveCoded(const TFilePath &);
 
-	const Item *getItem(string name) const;
-	std::pair<string, int> getDefaultFontNameAndSize() const
+	const Item *getItem(std::string name) const;
+	std::pair<std::string, int> getDefaultFontNameAndSize() const
 	{
 		return m_defaultFontNameAndSize;
 	}
-	string getDefaultMacFontName() const;
+	std::string getDefaultMacFontName() const;
 };
 
 //-------------------------------------------------------------------
@@ -74,7 +74,7 @@ void TStringTableImp::init()
 
 //-------------------------------------------------------------------
 
-string TStringTableImp::getDefaultMacFontName() const
+std::string TStringTableImp::getDefaultMacFontName() const
 {
 	return m_defaultMacFontName;
 }
@@ -99,7 +99,7 @@ int readShort(Tifstream &is)
 
 //-------------------------------------------------------------------
 
-void writeString(Tofstream &os, string s)
+void writeString(Tofstream &os, std::string s)
 {
 	int len = s.length();
 	writeShort(os, len);
@@ -111,7 +111,7 @@ void writeString(Tofstream &os, string s)
 
 //-------------------------------------------------------------------
 
-string readString(Tifstream &is)
+std::string readString(Tifstream &is)
 {
 	int len = readShort(is);
 	int len2 = len;
@@ -120,12 +120,12 @@ string readString(Tifstream &is)
 	char buffer[1204];
 	assert(len2 <= (int)(sizeof(buffer)));
 	is.read(buffer, len2);
-	return string(buffer, len);
+	return std::string(buffer, len);
 }
 
 //-------------------------------------------------------------------
 
-void writeStringW(Tofstream &os, wstring s)
+void writeStringW(Tofstream &os, std::wstring s)
 {
 	int len = s.length();
 	writeShort(os, len);
@@ -134,13 +134,13 @@ void writeStringW(Tofstream &os, wstring s)
 
 //-------------------------------------------------------------------
 
-wstring readStringW(Tifstream &is)
+std::wstring readStringW(Tifstream &is)
 {
 	int len = readShort(is);
 	wchar_t buffer[1204];
 	assert(len <= (int)(sizeof(buffer)));
 	is.read(reinterpret_cast<char *>(buffer), sizeof(wchar_t) * len);
-	return wstring(buffer, len);
+	return std::wstring(buffer, len);
 }
 
 //-------------------------------------------------------------------
@@ -148,7 +148,7 @@ wstring readStringW(Tifstream &is)
 class TMagic //singleton
 {
 public:
-	string m_magic;
+	std::string m_magic;
 
 private:
 	TMagic()
@@ -166,7 +166,7 @@ public:
 };
 
 #else
-const string magic = "stab.001";
+const std::string magic = "stab.001";
 #endif
 
 void TStringTableImp::loadCoded(const TFilePath &fp)
@@ -187,7 +187,7 @@ void TStringTableImp::loadCoded(const TFilePath &fp)
 		for (int i = 0; i < count; i++) {
 			int m = readShort(is);
 			assert(1 <= m && m <= 3);
-			string id = readString(is);
+			std::string id = readString(is);
 			Item &item = m_table[id];
 			item.m_name = readStringW(is);
 			if (m >= 2) {
@@ -221,7 +221,7 @@ void TStringTableImp::saveCoded(const TFilePath &fp)
     writeString(os, m_defaultFontNameAndSize.first);
     writeShort(os, m_defaultFontNameAndSize.second);
     writeShort(os, m_table.size());
-    for(std::map<string, Item>::iterator it = m_table.begin();
+    for(std::map<std::string, Item>::iterator it = m_table.begin();
         it != m_table.end(); ++it)
       {
        Item &item = it->second;
@@ -256,7 +256,7 @@ void TStringTableImp::load(const TFilePath &fp)
 	if (!is)
 		throw TException("can't read string table ");
 
-	string tagName;
+	std::string tagName;
 	if (!is.matchTag(tagName) || tagName != "stringtable")
 		throw TException("not a string table file");
 
@@ -264,7 +264,7 @@ void TStringTableImp::load(const TFilePath &fp)
 		if (!is.matchTag(tagName))
 			throw TException("expected tag");
 		if (tagName == "item") {
-			string id, name, help, tip;
+			std::string id, name, help, tip;
 			is >> id >> name;
 			if (!is.matchEndTag()) {
 				is >> help;
@@ -279,14 +279,14 @@ void TStringTableImp::load(const TFilePath &fp)
 			item.m_help = toWideString(help);
 			item.m_tip = toWideString(tip);
 		} else if (tagName == "defaultFont") {
-			string fontName;
+			std::string fontName;
 			int fontSize = 0;
 			is >> fontName >> fontSize;
 			if (!is.matchEndTag())
 				throw TException("Expected end tag");
 			m_defaultFontNameAndSize = std::make_pair(fontName, fontSize);
 		} else if (tagName == "defaultMacFont") {
-			string macFontName;
+			std::string macFontName;
 			is >> macFontName;
 			if (!is.matchEndTag())
 				throw TException("Expected end tag");
@@ -299,9 +299,9 @@ void TStringTableImp::load(const TFilePath &fp)
 
 //-------------------------------------------------------------------
 
-const TStringTable::Item *TStringTableImp::getItem(string name) const
+const TStringTable::Item *TStringTableImp::getItem(std::string name) const
 {
-	std::map<string, Item>::const_iterator it;
+	std::map<std::string, Item>::const_iterator it;
 	it = m_table.find(name);
 	if (it == m_table.end())
 		return 0;
@@ -327,7 +327,7 @@ TStringTable::~TStringTable()
 
 //-------------------------------------------------------------------
 
-wstring TStringTable::translate(string name)
+std::wstring TStringTable::translate(std::string name)
 {
 	const TStringTable::Item *item = instance()->getItem(name);
 	if (item)

@@ -429,14 +429,14 @@ public:
 		CommandManager *cm = CommandManager::instance();
 		QAction *action = cm->getAction(m_cmdId);
 		bool checked = action->isChecked();
-		if (string(m_cmdId) == MI_ShiftTrace) {
+		if (std::string(m_cmdId) == MI_ShiftTrace) {
 			cm->enable(MI_EditShift, checked);
 			cm->enable(MI_NoShift, checked);
 			if (!checked) {
 				cm->setChecked(MI_EditShift, false);
 			}
 			//     cm->getAction(MI_NoShift)->setChecked(false);
-		} else if (string(m_cmdId) == MI_EditShift) {
+		} else if (std::string(m_cmdId) == MI_EditShift) {
 			if (checked) {
 				QAction *noShiftAction = CommandManager::instance()->getAction(MI_NoShift);
 				if (noShiftAction)
@@ -446,7 +446,7 @@ public:
 				TApp::instance()->getCurrentTool()->unsetPseudoTool();
 			}
 			CommandManager::instance()->enable(MI_NoShift, !checked);
-		} else if (string(m_cmdId) == MI_NoShift) {
+		} else if (std::string(m_cmdId) == MI_NoShift) {
 		}
 		updateShiftTraceStatus();
 	}
@@ -1015,7 +1015,7 @@ void SceneViewer::drawBackground()
 	if (glGetError() == GL_INVALID_FRAMEBUFFER_OPERATION) {
 		/* 起動時一回目になぜか GL_FRAMEBUFFER_COMPLETE なのに invalid operation が出る  */
 		GLenum status = 0;
-#if WIN32
+#ifdef _WIN32
 		PROC proc = wglGetProcAddress("glCheckFramebufferStatusEXT");
 		if (proc != nullptr)
 			status = reinterpret_cast<PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC>(proc)(GL_FRAMEBUFFER);
@@ -1030,7 +1030,7 @@ void SceneViewer::drawBackground()
 
 bool check_framebuffer_status()
 {
-#if WIN32
+#ifdef _WIN32
 	PROC proc = wglGetProcAddress("glCheckFramebufferStatusEXT");
 	if (proc == nullptr)
 		return true;
@@ -2301,14 +2301,14 @@ int SceneViewer::pick(const TPoint &point)
 
 int SceneViewer::posToColumnIndex(const TPoint &p, double distance, bool includeInvisible) const
 {
-	vector<int> ret;
+	std::vector<int> ret;
 	posToColumnIndexes(p, ret, distance, includeInvisible);
 	return ret.empty() ? -1 : ret.back();
 }
 
 //-----------------------------------------------------------------------------
 
-void SceneViewer::posToColumnIndexes(const TPoint &p, vector<int> &indexes, double distance, bool includeInvisible) const
+void SceneViewer::posToColumnIndexes(const TPoint &p, std::vector<int> &indexes, double distance, bool includeInvisible) const
 {
 	int oldRasterizePli = TXshSimpleLevel::m_rasterizePli;
 	TApp *app = TApp::instance();

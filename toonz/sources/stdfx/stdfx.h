@@ -12,13 +12,13 @@
 
 class PaletteFilterFxRenderData;
 
-static const string PLUGIN_PREFIX("STD");
+static const std::string PLUGIN_PREFIX("STD");
 
 #define FX_PLUGIN_DECLARATION(T) \
 public:                          \
 	const TPersistDeclaration *getDeclaration() const;
 
-#ifdef WIN32
+#ifdef _WIN32
 
 #ifdef TNZSTDFX_EXPORTS
 
@@ -50,7 +50,7 @@ public:                          \
 class TStandardRasterFx : public TRasterFx
 {
 public:
-	string getPluginId() const { return PLUGIN_PREFIX; }
+	std::string getPluginId() const { return PLUGIN_PREFIX; }
 };
 
 //-------------------------------------------------------------------
@@ -58,7 +58,7 @@ public:
 class TStandardZeraryFx : public TZeraryFx
 {
 public:
-	string getPluginId() const { return PLUGIN_PREFIX; }
+	std::string getPluginId() const { return PLUGIN_PREFIX; }
 };
 
 //-------------------------------------------------------------------

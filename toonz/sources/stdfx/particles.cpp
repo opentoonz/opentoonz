@@ -26,14 +26,14 @@ void Particle::create_Animation(const particles_values &values,
 }
 
 //------------------------------------------------------------------
-Particle::Particle(int g_lifetime, int seed, map<int, TTile *> porttiles, const particles_values &values,
-				   const particles_ranges &ranges, vector<vector<TPointD>> &myregions,
+Particle::Particle(int g_lifetime, int seed, std::map<int, TTile *> porttiles, const particles_values &values,
+				   const particles_ranges &ranges, std::vector<std::vector<TPointD>> &myregions,
 				   int howmany, int first, int level, int last,
-				   vector<vector<int>> &myHistogram,
-				   vector<float> &myWeight)
+					 std::vector<std::vector<int>> &myHistogram,
+					 std::vector<float> &myWeight)
 {
 	double random_s_a_range, random_speed;
-	map<int, double> imagereferences;
+	std::map<int, double> imagereferences;
 	random = TRandom(seed);
 	double randomxreference = 0.0;
 	double randomyreference = 0.0;
@@ -230,7 +230,7 @@ void Particle::create_Swing(const particles_values &values,
 
 void Particle::create_Colors(const particles_values &values,
 							 const particles_ranges &ranges,
-							 map<int, TTile *> porttiles)
+							 std::map<int, TTile *> porttiles)
 {
 	//TPixel32 color;
 
@@ -599,7 +599,7 @@ void Particle::spread_color(TPixel32 &color, double range)
 }
 /*-----------------------------------------------------------------*/
 
-void Particle::move(map<int, TTile *> porttiles, const particles_values &values, const particles_ranges &ranges,
+void Particle::move(std::map<int, TTile *> porttiles, const particles_values &values, const particles_ranges &ranges,
 					float windx,
 					float windy, float xgravity, float ygravity,
 					float dpicorr, int lastframe)
@@ -607,7 +607,7 @@ void Particle::move(map<int, TTile *> porttiles, const particles_values &values,
 	struct pos_dummy dummy;
 	float frictx, fricty;
 	//int time;
-	map<int, double> imagereferences;
+	std::map<int, double> imagereferences;
 	dummy.x = dummy.y = dummy.a = 0.0;
 	frictx = fricty = 0.0;
 

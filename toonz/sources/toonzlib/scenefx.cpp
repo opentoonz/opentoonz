@@ -85,7 +85,7 @@ public:
 
 	bool canHandle(const TRenderSettings &info, double frame) { return true; }
 
-	string getPluginId() const { return string(); }
+	std::string getPluginId() const { return std::string(); }
 
 	void compute(TFlash &flash, int frame)
 	{
@@ -114,7 +114,7 @@ public:
 		return TRasterFxP(m_port.getFx())->doGetBBox(m_frame, bbox, info);
 	}
 
-	string getAlias(double frame, const TRenderSettings &info) const
+	std::string getAlias(double frame, const TRenderSettings &info) const
 	{
 		return TRasterFx::getAlias(m_frame, info);
 	}
@@ -204,7 +204,7 @@ public:
 
 	TAffine getParentPlacement(double frame) { return m_stageObject->getPlacement(frame); }
 
-	string getPluginId() const { return string(); }
+	std::string getPluginId() const { return std::string(); }
 
 private:
 	// not implemented

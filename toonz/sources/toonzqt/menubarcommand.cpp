@@ -317,7 +317,7 @@ void CommandManager::setShortcut(QAction *action, std::string shortcutString)
 	assert(ks.count() == 1 || ks.count() == 0 && shortcut == "");
 
 	if (node->m_type == ZoomCommandType && ks.count() > 1) {
-		MsgBox(WARNING, QObject::tr("It is not possible to assing a shortcut with modifiers to the visualization commands."));
+		DVGui::warning(QObject::tr("It is not possible to assing a shortcut with modifiers to the visualization commands."));
 		return;
 	}
 	// lo shortcut e' gia' assegnato?
@@ -422,6 +422,17 @@ void CommandManager::setToggleTexts(CommandId id, const QString &onText, const Q
 		node->m_onText = onText;
 		node->m_offText = offText;
 	}
+}
+
+//---------------------------------------------------------
+
+std::string CommandManager::getIdFromAction(QAction* action)
+{
+	std::map<QAction *, Node *>::iterator it = m_qactionTable.find(action);
+	if (it != m_qactionTable.end())
+		return it->second->m_id;
+	else
+		return "";
 }
 
 /*

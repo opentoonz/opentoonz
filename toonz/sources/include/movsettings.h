@@ -15,7 +15,7 @@
 
 #if !(defined(x64) || defined(__LP64__) || defined(LINUX))
 
-#ifdef WIN32
+#ifdef _WIN32
 
 #define list List
 #define map Map
@@ -44,7 +44,7 @@
 //#include "tlevel_io.h"
 #include "tproperty.h"
 
-#else //WIN32
+#else // _WIN32
 
 #define list List
 #define map Map
@@ -60,7 +60,7 @@
 #undef iterator
 #undef float_t
 
-#endif //!WIN32
+#endif // !_WIN32
 
 void DVAPI fromPropertiesToAtoms(TPropertyGroup &pg, QTAtomContainer &atoms);
 void DVAPI fromAtomsToProperties(const QTAtomContainer &atoms, TPropertyGroup &pg);

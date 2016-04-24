@@ -24,7 +24,7 @@ struct TStageObjectTree::TStageObjectTreeImp {
 							eSmall = 1 };
 
 	//!The map contains generic pegbar of pegbar tree.
-	map<TStageObjectId, TStageObject *> m_pegbarTable;
+	std::map<TStageObjectId, TStageObject *> m_pegbarTable;
 
 	//!Define pegbar tree current camera .
 	TStageObjectId m_currentCameraId;
@@ -389,7 +389,7 @@ void TStageObjectTree::swapColumns(int i, int j)
 
 void TStageObjectTree::loadData(TIStream &is)
 {
-	string tagName;
+	std::string tagName;
 	while (is.matchTag(tagName)) {
 		if (tagName == "splines") {
 			while (!is.eos()) {
@@ -400,7 +400,7 @@ void TStageObjectTree::loadData(TIStream &is)
 			}
 			is.matchEndTag();
 		} else if (tagName == "pegbar") {
-			string idStr = is.getTagAttribute("id");
+			std::string idStr = is.getTagAttribute("id");
 			if (idStr == "") // vecchio formato
 			{
 				is >> idStr;
@@ -421,7 +421,7 @@ void TStageObjectTree::loadData(TIStream &is)
 				m_imp->m_groupIdCount = pegbar->getGroupId();
 			is.matchEndTag();
 
-			string name = pegbar->getName();
+			std::string name = pegbar->getName();
 		} else if (tagName == "grid_dimension") {
 			is >> m_imp->m_dagGridDimension;
 			is.matchEndTag();
@@ -455,7 +455,7 @@ void TStageObjectTree::saveData(TOStream &os, int occupiedColumnCount)
 		if (objectId.isColumn() && objectId.getIndex() >= occupiedColumnCount)
 			continue;
 
-		std::map<string, string> attr;
+		std::map<std::string, std::string> attr;
 		attr["id"] = objectId.toString();
 		if (objectId == m_imp->m_currentCameraId && objectId == m_imp->m_currentPreviewCameraId)
 			attr["activeboth"] = "yes";
@@ -559,7 +559,7 @@ void TStageObjectTree::setHandleManager(HandleManager *hm)
 
 //-----------------------------------------------------------------------------
 
-TPointD TStageObjectTree::getHandlePos(const TStageObjectId &id, string handle, int row) const
+TPointD TStageObjectTree::getHandlePos(const TStageObjectId &id, std::string handle, int row) const
 {
 	if (m_imp->m_handleManager)
 		return m_imp->m_handleManager->getHandlePos(id, handle, row);
@@ -579,7 +579,7 @@ int TStageObjectTree::getSplineCount() const
 TStageObjectSpline *TStageObjectTree::getSpline(int index) const
 {
 	assert(0 <= index && index < getSplineCount());
-	map<int, TStageObjectSpline *>::iterator it = m_imp->m_splines.begin();
+	std::map<int, TStageObjectSpline *>::iterator it = m_imp->m_splines.begin();
 	for (int i = 0; i < index; i++)
 		it++;
 	return it->second;
@@ -589,7 +589,7 @@ TStageObjectSpline *TStageObjectTree::getSpline(int index) const
 
 TStageObjectSpline *TStageObjectTree::getSplineById(int splineId) const
 {
-	map<int, TStageObjectSpline *>::iterator it = m_imp->m_splines.find(splineId);
+	std::map<int, TStageObjectSpline *>::iterator it = m_imp->m_splines.find(splineId);
 	if (it != m_imp->m_splines.end())
 		return it->second;
 	return 0;

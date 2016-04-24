@@ -14,10 +14,10 @@ protected:
 	bool m_isResizable;
 	bool m_isTopMost;
 	virtual void create();
-	wstring m_caption;
+	std::wstring m_caption;
 
 public:
-	TPopup(TWidget *parent, string name, bool hasCaption = true, bool isResizable = true, bool isTopMost = false);
+	TPopup(TWidget *parent, std::string name, bool hasCaption = true, bool isResizable = true, bool isTopMost = false);
 	~TPopup();
 
 	virtual void openPopup();
@@ -42,10 +42,10 @@ public:
 	bool isResizable() const { return m_isResizable; }
 	bool isTopMost() const { return m_isTopMost; }
 
-	void setCaption(const string &name);
-	void setCaption(const wstring &name);
+	void setCaption(const std::string &name);
+	void setCaption(const std::wstring &name);
 
-	wstring getCaption() const { return m_caption; };
+	std::wstring getCaption() const { return m_caption; };
 
 	virtual TDimension getPreferredSize() const;
 	virtual TDimension getMinimumSize() const { return TDimension(1, 1); };
@@ -62,7 +62,7 @@ protected:
 	virtual void create();
 
 public:
-	TModalPopup(TWidget *parent, string name, bool hasCaption = true, bool isResizable = true, bool isTopMost = true);
+	TModalPopup(TWidget *parent, std::string name, bool hasCaption = true, bool isResizable = true, bool isTopMost = true);
 	~TModalPopup();
 
 	// virtual void popup(const TPoint &pos);

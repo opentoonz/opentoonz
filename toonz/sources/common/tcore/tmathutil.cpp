@@ -7,7 +7,7 @@
 
 using TConsts::epsilon;
 
-TMathException::TMathException(string msg)
+TMathException::TMathException(std::string msg)
 	: m_msg(toWideString(msg))
 {
 }
@@ -57,7 +57,7 @@ int modrf(int ord, double *coef, double a, double b, double *val);
 
 //-------------------------------------------------------------------------
 
-void convert(const vector<double> &v, poly &p)
+void convert(const std::vector<double> &v, poly &p)
 {
 	assert((int)v.size() <= MAX_ORDER);
 	if ((int)v.size() > MAX_ORDER)
@@ -69,7 +69,7 @@ void convert(const vector<double> &v, poly &p)
 }
 //-------------------------------------------------------------------------
 
-void convert(const poly &p, vector<double> &v)
+void convert(const poly &p, std::vector<double> &v)
 {
 	v.resize(p.ord);
 	std::copy(p.coef, p.coef + p.ord, v.begin());
@@ -440,8 +440,7 @@ int modrf(int ord, double *coef, double a, double b, double *val)
       poly[1] = b
       poly[2] = a 
     */
-int rootForQuadraticEquation(const vector<double> &v,
-							 vector<double> &sol)
+int rootForQuadraticEquation(const std::vector<double> &v, std::vector<double> &sol)
 {
 	double q, delta;
 
@@ -505,8 +504,7 @@ int rootForQuadraticEquation(const vector<double> &v,
       poly[2] = b 
       poly[3] = a 
     */
-int rootForCubicEquation(const vector<double> &p,
-						 vector<double> &sol)
+int rootForCubicEquation(const std::vector<double> &p, std::vector<double> &sol)
 {
 	/*
     if( isAlmostZero(p[3]) )
@@ -515,7 +513,7 @@ int rootForCubicEquation(const vector<double> &p,
 
 	if (isAlmostZero(p[0])) {
 		int numberOfSol;
-		vector<double> redPol(3);
+		std::vector<double> redPol(3);
 		redPol[0] = p[1];
 		redPol[1] = p[2];
 		redPol[2] = p[3];
@@ -568,8 +566,7 @@ int rootForCubicEquation(const vector<double> &p,
 
 //-----------------------------------------------------------------------------
 
-int rootForGreaterThanThreeEquation(const vector<double> &p,
-									vector<double> &sol)
+int rootForGreaterThanThreeEquation(const std::vector<double> &p, std::vector<double> &sol)
 {
 	poly sseq[MAX_ORDER];
 
@@ -734,7 +731,7 @@ double tdet(double *LUa, int n, double d)
 double tdet(double *a, int n)
 {
 	double d;
-	vector<int> indx(n);
+	std::vector<int> indx(n);
 
 	tLUDecomposition(a, n, &indx[0], d);
 	for (int i = 1; i <= n; ++i)
@@ -748,7 +745,7 @@ double tdet(double *a, int n)
 void tsolveSistem(double *a, int n, double *res)
 {
 	double d;
-	vector<int> indx(n);
+	std::vector<int> indx(n);
 
 	tLUDecomposition(a, n, &indx[0], d);
 	assert(tdet(a, n, d) != 0);
@@ -761,8 +758,7 @@ void tsolveSistem(double *a, int n, double *res)
 
 //-----------------------------------------------------------------------------
 
-int rootFinding(const vector<double> &in_poly,
-				vector<double> &sol)
+int rootFinding(const std::vector<double> &in_poly, std::vector<double> &sol)
 {
 	// per ora risolvo solo i polinomi di grado al piu' pari a 3
 	assert((int)in_poly.size() <= MAX_ORDER);

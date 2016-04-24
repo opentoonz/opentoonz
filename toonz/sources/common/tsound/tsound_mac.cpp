@@ -22,7 +22,7 @@ namespace
 TThread::Mutex MutexOut;
 }
 
-class TSoundOutputDeviceImp
+class TSoundOutputDeviceImp : public std::enable_shared_from_this<TSoundOutputDeviceImp>
 {
 public:
 	bool m_isPlaying;
@@ -65,10 +65,18 @@ struct MyData {
 
 	void *sourceBuffer;
 	AudioConverterRef converter;
-	TSoundOutputDeviceImp *imp;
+	std::shared_ptr<TSoundOutputDeviceImp> imp;
 	bool isLooping;
 	MyData()
-		: entireFileBuffer(0), totalPacketCount(0), fileByteCount(0), maxPacketSize(0), packetOffset(0), byteOffset(0), sourceBuffer(0), isLooping(false), imp(0), m_doNotify(true)
+		: entireFileBuffer(0)
+		, totalPacketCount(0)
+		, fileByteCount(0)
+		, maxPacketSize(0)
+		, packetOffset(0)
+		, byteOffset(0)
+		, sourceBuffer(0)
+		, isLooping(false)
+		, m_doNotify(true)
 	{
 	}
 };
@@ -341,7 +349,6 @@ TSoundOutputDevice::~TSoundOutputDevice()
 {
 	stop();
 	close();
-	delete m_imp;
 }
 
 //------------------------------------------------------------------------------
@@ -415,7 +422,7 @@ void TSoundOutputDeviceImp::play(const TSoundTrackP &st, TINT32 s0, TINT32 s1, b
 	OSStatus err = noErr;
 	MyData *myData = new MyData();
 
-	myData->imp = this;
+	myData->imp = shared_from_this();
 	UInt32 magicCookieSize = 0;
 	//PrintStreamDesc(&outputASBD);
 	err = AudioConverterNew(&fileASBD, &outputASBD, &converter);
@@ -710,11 +717,6 @@ TSoundInputDevice::TSoundInputDevice() : m_imp(new TSoundInputDeviceImp)
 
 TSoundInputDevice::~TSoundInputDevice()
 {
-	/*
-  if(m_imp->m_port)
-    alClosePort(m_imp->m_port);
-  delete m_imp;
-  */
 }
 
 //------------------------------------------------------------------------------

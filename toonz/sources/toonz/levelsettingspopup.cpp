@@ -134,7 +134,7 @@ LevelSettingsPopup::LevelSettingsPopup()
 
 	//subsampling
 	m_subsamplingLabel = new QLabel(tr("Subsampling:"));
-	m_subsamplingFld = new IntLineEdit(this);
+	m_subsamplingFld = new DVGui::IntLineEdit(this);
 
 	m_doPremultiply = new CheckBox(tr("Premultiply"), this);
 
@@ -143,7 +143,7 @@ LevelSettingsPopup::LevelSettingsPopup()
 #endif
 
 	m_doAntialias = new CheckBox(tr("Add Antialiasing"), this);
-	m_antialiasSoftness = new IntLineEdit(0, 10, 0, 100);
+	m_antialiasSoftness = new DVGui::IntLineEdit(0, 10, 0, 100);
 
 	//----
 
@@ -675,7 +675,7 @@ void LevelSettingsPopup::onPathChanged()
 
 		question = "The path you entered for the level " + QString(toString(sl->getName()).c_str()) +
 				   "is already used: this may generate some conflicts in the file management.\nAre you sure you want to assign the same path to two different levels?";
-		int ret = MsgBox(question, QObject::tr("Yes"), QObject::tr("No"));
+		int ret = DVGui::MsgBox(question, QObject::tr("Yes"), QObject::tr("No"));
 		if (ret == 0 || ret == 2) {
 			m_pathFld->setPath(toQString(m_sl->getPath()));
 			return;
@@ -759,7 +759,7 @@ void LevelSettingsPopup::onScanPathChanged()
 	if (TSystem::doesExistFileOrLevel(settingsPath)) {
 		TIStream is(settingsPath);
 		TFilePath cleanupLevelPath;
-		string tagName;
+		std::string tagName;
 		while (is.matchTag(tagName)) {
 			if (tagName == "cleanupPalette" || tagName == "cleanupCamera" || tagName == "autoCenter" || tagName == "transform" || tagName == "lineProcessing" || tagName == "closestField" || tagName == "fdg") {
 				is.skipCurrentTag();
@@ -773,11 +773,11 @@ void LevelSettingsPopup::onScanPathChanged()
 		if (cleanupLevelPath != TFilePath()) {
 			TFilePath codedCleanupLevelPath = TApp::instance()->getCurrentScene()->getScene()->codeFilePath(cleanupLevelPath);
 			if (m_sl->getPath().getParentDir() != cleanupLevelPath && m_sl->getPath().getParentDir() != codedCleanupLevelPath)
-				MsgBox(WARNING, "\"Save In\" path of the Cleanup Settings does not match.");
+				DVGui::warning("\"Save In\" path of the Cleanup Settings does not match.");
 		} else
-			MsgBox(WARNING, "Loading Cleanup Settings failed.");
+			DVGui::warning("Loading Cleanup Settings failed.");
 	} else
-		MsgBox(WARNING, ".cln file for the Scanned Level not found.");
+		DVGui::warning(".cln file for the Scanned Level not found.");
 
 	m_sl->setScannedPath(newScanPath);
 
@@ -819,7 +819,7 @@ void LevelSettingsPopup::onDpiFieldChanged()
 	if (!m_sl || m_sl->getType() == PLI_XSHLEVEL)
 		return;
 
-	string s = w.toStdString();
+	std::string s = w.toStdString();
 	TPointD dpi;
 
 	int i = 0, len = s.length();

@@ -1334,7 +1334,7 @@ void FlipConsole::onLoadBox(bool isDefine)
 	Preferences::instance()->getViewValues(shrink, dummy);
 
 	if (shrink != 1) {
-#ifdef WIN32
+#ifdef _WIN32
 		MessageBox(0, "Cannot use loading box with a shrink factor! ", "Warning", MB_OK);
 #endif
 		setChecked(eUseLoadBox, false);
@@ -1545,7 +1545,7 @@ QFrame *FlipConsole::createFrameSlider()
 {
 	QFrame *frameSliderFrame = new QFrame(this);
 
-	m_editCurrFrame = new IntLineEdit(frameSliderFrame, m_currentFrame);
+	m_editCurrFrame = new DVGui::IntLineEdit(frameSliderFrame, m_currentFrame);
 	m_editCurrFrame->setToolTip(tr("Set the current frame"));
 	m_editCurrFrame->setFixedWidth(40);
 
@@ -1595,7 +1595,7 @@ QFrame *FlipConsole::createFpsSlider()
 	//frame per second
 	m_fpsLabel = new QLabel(QString(" FPS -- /"), fpsSliderFrame);
 	m_fpsSlider = new QScrollBar(Qt::Horizontal, fpsSliderFrame);
-	m_fpsField = new IntLineEdit(fpsSliderFrame, m_fps, -60, 60);
+	m_fpsField = new DVGui::IntLineEdit(fpsSliderFrame, m_fps, -60, 60);
 	m_fpsField->setFixedWidth(40);
 
 	m_fpsLabel->setMinimumWidth(m_fpsLabel->fontMetrics().width("_FPS_24___"));

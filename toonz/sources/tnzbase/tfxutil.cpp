@@ -12,7 +12,7 @@
 
 void TFxUtil::setParam(
 	const TFxP &fx,
-	string paramName,
+	std::string paramName,
 	double value)
 {
 	TDoubleParamP param = TParamP(fx->getParams()->getParam(paramName));
@@ -24,7 +24,7 @@ void TFxUtil::setParam(
 
 void TFxUtil::setParam(
 	const TFxP &fx,
-	string paramName,
+	std::string paramName,
 	TPixel32 color)
 {
 	TPixelParamP param = TParamP(fx->getParams()->getParam(paramName));

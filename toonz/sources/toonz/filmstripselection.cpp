@@ -398,7 +398,7 @@ void TFilmstripSelection::renumberFrames()
 	int startFrame = 0, stepFrame = 0;
 	popup.getValues(startFrame, stepFrame);
 	if (startFrame < 1 || stepFrame < 1) {
-		error(("Bad renumber values"));
+		DVGui::error(("Bad renumber values"));
 		return;
 	}
 	FilmstripCmd::renumber(sl, m_selectedFrames, startFrame, stepFrame);

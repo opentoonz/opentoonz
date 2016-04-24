@@ -29,6 +29,8 @@
 #include <QMenu>
 #include <QSettings>
 
+#include <cmath>
+
 namespace
 {
 

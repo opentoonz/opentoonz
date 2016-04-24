@@ -37,7 +37,7 @@ bool RasterStrokeGenerator::add(const TThickPoint &p)
 //Disegna il tratto interamente
 void RasterStrokeGenerator::generateStroke(bool isPencil) const
 {
-	vector<TThickPoint> points(m_points);
+	std::vector<TThickPoint> points(m_points);
 	int size = points.size();
 	//Prende un buffer trasparente di appoggio
 	TRect box = getBBox(points);
@@ -48,12 +48,12 @@ void RasterStrokeGenerator::generateStroke(bool isPencil) const
 	//Trasla i punti secondo il nuovo sitema di riferimento
 	translatePoints(points, newOrigin);
 
-	vector<TThickPoint> partialPoints;
+	std::vector<TThickPoint> partialPoints;
 	if (size == 1) {
 		rasterBrush(rasBuffer, points, m_styleId, !isPencil);
 		placeOver(m_raster, rasBuffer, newOrigin);
 	} else if (size <= 3) {
-		vector<TThickPoint> partialPoints;
+		std::vector<TThickPoint> partialPoints;
 		partialPoints.push_back(points[0]);
 		partialPoints.push_back(points[1]);
 		rasterBrush(rasBuffer, partialPoints, m_styleId, !isPencil);
@@ -61,7 +61,7 @@ void RasterStrokeGenerator::generateStroke(bool isPencil) const
 	} else if (size % 2 == 1) /*-- 奇数の場合 --*/
 	{
 		int strokeCount = (size - 1) / 2 - 1;
-		vector<TThickPoint> partialPoints;
+		std::vector<TThickPoint> partialPoints;
 		partialPoints.push_back(points[0]);
 		partialPoints.push_back(points[1]);
 		rasterBrush(rasBuffer, partialPoints, m_styleId, !isPencil);
@@ -79,14 +79,14 @@ void RasterStrokeGenerator::generateStroke(bool isPencil) const
 			placeOver(m_raster, rasBuffer, newOrigin);
 		}
 	} else {
-		vector<TThickPoint> partialPoints;
+		std::vector<TThickPoint> partialPoints;
 		partialPoints.push_back(points[0]);
 		partialPoints.push_back(points[1]);
 		rasterBrush(rasBuffer, partialPoints, m_styleId, !isPencil);
 		placeOver(m_raster, rasBuffer, newOrigin);
 		if (size > 2) {
 			partialPoints.clear();
-			vector<TThickPoint>::iterator it = points.begin();
+			std::vector<TThickPoint>::iterator it = points.begin();
 			it++;
 			partialPoints.insert(partialPoints.begin(), it, points.end());
 			rasterBrush(rasBuffer, partialPoints, m_styleId, !isPencil);
@@ -99,7 +99,7 @@ void RasterStrokeGenerator::generateStroke(bool isPencil) const
 
 TRect RasterStrokeGenerator::generateLastPieceOfStroke(bool isPencil, bool closeStroke)
 {
-	vector<TThickPoint> points;
+	std::vector<TThickPoint> points;
 	int size = m_points.size();
 
 	if (size == 3) {
@@ -131,7 +131,7 @@ TRect RasterStrokeGenerator::generateLastPieceOfStroke(bool isPencil, bool close
 //-----------------------------------------------------------
 
 //Ritorna il rettangolo contenente i dischi generati con centri in "points" e diametro "points.thick" +3 pixel a bordo
-TRect RasterStrokeGenerator::getBBox(const vector<TThickPoint> &points) const
+TRect RasterStrokeGenerator::getBBox(const std::vector<TThickPoint> &points) const
 {
 	double x0 = (std::numeric_limits<double>::max)(), y0 = (std::numeric_limits<double>::max)(),
 		   x1 = -(std::numeric_limits<double>::max)(), y1 = -(std::numeric_limits<double>::max)();
@@ -152,7 +152,7 @@ TRect RasterStrokeGenerator::getBBox(const vector<TThickPoint> &points) const
 //-----------------------------------------------------------
 
 //Ricalcola i punti in un nuovo sistema di riferimento
-void RasterStrokeGenerator::translatePoints(vector<TThickPoint> &points, const TPoint &newOrigin) const
+void RasterStrokeGenerator::translatePoints(std::vector<TThickPoint> &points, const TPoint &newOrigin) const
 {
 	TPointD p(newOrigin.x, newOrigin.y);
 	for (int i = 0; i < (int)points.size(); i++)
@@ -303,7 +303,7 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out, const TRasterCM32
 
 TRect RasterStrokeGenerator::getLastRect() const
 {
-	vector<TThickPoint> points;
+	std::vector<TThickPoint> points;
 	int size = m_points.size();
 
 	if (size == 3) {

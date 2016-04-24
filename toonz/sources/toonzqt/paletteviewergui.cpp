@@ -529,7 +529,7 @@ void PageViewer::drawColorName(QPainter &p, QRect &nameRect, TColorStyle *style,
 */
 void PageViewer::drawToggleLink(QPainter &p, QRect &chipRect, TColorStyle *style)
 {
-	wstring globalName = style->getGlobalName();
+	std::wstring globalName = style->getGlobalName();
 	if (globalName != L"" &&
 		(globalName[0] == L'-' || globalName[0] == L'+')) {
 		TPixel32 c = style->getMainColor();
@@ -716,8 +716,8 @@ void PageViewer::paintEvent(QPaintEvent *e)
 					p.setFont(tmpFont);
 				}
 
-				wstring name = style->getName();
-				wstring origName = style->getOriginalName();
+				std::wstring name = style->getName();
+				std::wstring origName = style->getOriginalName();
 
 				//display the name (style name and original name) according to the name display mode
 				if (m_nameDisplayMode == Style)
@@ -934,7 +934,7 @@ void PageViewer::mouseDoubleClickEvent(QMouseEvent *e)
 	if (m_viewMode != SmallChips) {
 		QRect nameRect = getColorNameRect(index);
 		if (nameRect.contains(e->pos())) {
-			wstring styleName = style->getName();
+			std::wstring styleName = style->getName();
 			LineEdit *fld = m_renameTextField;
 			fld->setText(QString::fromStdWString(styleName));
 			fld->setGeometry(nameRect);
@@ -956,8 +956,8 @@ void PageViewer::createMenuAction(QMenu &menu, const char *id, QString name, con
 {
 	bool ret = true;
 	QAction *act = menu.addAction(name);
-	string slotName(slot);
-	slotName = string("1") + slotName;
+	std::string slotName(slot);
+	slotName = std::string("1") + slotName;
 	ret = connect(act, SIGNAL(triggered()), slotName.c_str());
 	assert(ret);
 }
@@ -1253,7 +1253,7 @@ bool PageViewer::event(QEvent *e)
 
 				int shortcutKey = m_page->getPalette()->getStyleShortcut(styleIndex);
 				if (shortcutKey > 0)
-					toolTip += QString::fromStdWString(wstring(L" (") + (wchar_t)shortcutKey + L")");
+					toolTip += QString::fromStdWString(std::wstring(L" (") + (wchar_t)shortcutKey + L")");
 			}
 		}
 		if (toolTip != "")
@@ -1372,7 +1372,7 @@ void PageViewer::onFrameChanged()
 void PageViewer::onStyleRenamed()
 {
 	m_renameTextField->hide();
-	wstring newName = m_renameTextField->text().toStdWString();
+	std::wstring newName = m_renameTextField->text().toStdWString();
 	assert(getPaletteHandle());
 	PaletteCmd::renamePaletteStyle(getPaletteHandle(), newName);
 }

@@ -74,7 +74,7 @@ inline bool strokeIsConnected(const TStroke *s, double toll = TConsts::epsilon)
 /*
 Extract an value of a pair.
 */
-void extract(const vector<DoublePair> &s, ArrayOfDouble &d, bool isFirstOrSecond = true)
+void extract(const std::vector<DoublePair> &s, ArrayOfDouble &d, bool isFirstOrSecond = true)
 {
 	if (isFirstOrSecond)
 		std::transform(s.begin(), s.end(), back_inserter(d), _extractFirst);
@@ -113,9 +113,9 @@ inline bool isEven(UINT val)
 	return !isOdd(val);
 }
 
-void clearPointerMap(map<TStroke *, vector<int> *> &corners)
+void clearPointerMap(std::map<TStroke *, std::vector<int> *> &corners)
 {
-	map<TStroke *, vector<int> *>::iterator it = corners.begin();
+	std::map<TStroke *, std::vector<int> *>::iterator it = corners.begin();
 	for (; it != corners.end(); ++it) {
 		delete it->second;
 	}
@@ -132,8 +132,8 @@ private:
 	TUndo *m_undo;
 	bool m_atLeastOneIsChanged;
 
-	vector<bool> m_directionIsChanged;
-	vector<TPointD> m_accumulator;
+	std::vector<bool> m_directionIsChanged;
+	std::vector<TPointD> m_accumulator;
 
 	void increaseCP(TStroke *, int);
 	bool m_active;
@@ -162,8 +162,8 @@ private:
 
 	// contains information about stroke which have
 	//  intersection with benderSegment
-	map<TStroke *, ArrayOfStroke> m_metaStroke;
-	map<TStroke *, vector<int> *> m_hitStrokeCorners;
+	std::map<TStroke *, ArrayOfStroke> m_metaStroke;
+	std::map<TStroke *, std::vector<int> *> m_hitStrokeCorners;
 
 	bool m_showTangents;
 
@@ -181,7 +181,7 @@ private:
 	//!
 	ArrayOfStroke m_strokesToBend;
 
-	vector<int> m_changedStrokes;
+	std::vector<int> m_changedStrokes;
 
 	bool m_enableDragSelection;
 
@@ -258,7 +258,7 @@ void BenderTool::leftButtonUp(const TPointD &pos, const TMouseEvent &)
 
 	m_active = true;
 
-	vector<TStroke *> oldStrokesArray(m_changedStrokes.size());
+	std::vector<TStroke *> oldStrokesArray(m_changedStrokes.size());
 
 	int i;
 	for (i = 0; i < (int)m_changedStrokes.size(); i++)
@@ -523,7 +523,7 @@ void BenderTool::findCurves(TVectorImageP &vi)
 
 		TStroke *s = vi->getStroke(i); // a useful reference
 
-		vector<DoublePair> pair_intersection; // informations about extremes
+		std::vector<DoublePair> pair_intersection; // informations about extremes
 
 		// if there is interesection between stroke and bender tool
 
@@ -663,7 +663,7 @@ void BenderTool::findCurves(TVectorImageP &vi)
 			}
 
 			TStroke *tempForCorners = merge(tempAS);
-			vector<int> *corners = new vector<int>;
+			std::vector<int> *corners = new std::vector<int>;
 			corners->push_back(0);
 			detectCorners(tempForCorners, 20, *corners);
 			corners->push_back(tempForCorners->getChunkCount());

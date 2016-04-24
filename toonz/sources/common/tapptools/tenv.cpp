@@ -48,12 +48,12 @@ namespace
 class EnvGlobals
 { // singleton
 
-	string m_applicationName;
-	string m_applicationVersion;
-	string m_applicationFullName;
-	string m_moduleName;
-	string m_rootVarName;
-	string m_systemVarPrefix;
+	std::string m_applicationName;
+	std::string m_applicationVersion;
+	std::string m_applicationFullName;
+	std::string m_moduleName;
+	std::string m_rootVarName;
+	std::string m_systemVarPrefix;
 	TFilePath m_registryRoot;
 	TFilePath m_envFile;
 	TFilePath *m_stuffDir;
@@ -70,9 +70,9 @@ public:
 		return &_instance;
 	}
 
-	TFilePath getSystemVarPath(string varName)
+	TFilePath getSystemVarPath(std::string varName)
 	{
-#ifdef WIN32
+#ifdef _WIN32
 		return m_registryRoot + varName;
 #else
   #ifdef APPLE
@@ -99,9 +99,9 @@ public:
 		return getSystemVarPath(m_rootVarName);
 	}
 
-	string getSystemVarValue(string varName)
+	std::string getSystemVarValue(std::string varName)
 	{
-#ifdef WIN32
+#ifdef _WIN32
 		return TSystem::getSystemValue(getSystemVarPath(varName)).toStdString();
 #else
 		TFilePath systemVarPath = getSystemVarPath(varName);
@@ -150,49 +150,49 @@ public:
 		m_envFile = profilesDir + "env" + (TSystem::getUserName().toStdString() + ".env");
 	}
 
-	void setApplication(string applicationName, string applicationVersion)
+	void setApplication(std::string applicationName, std::string applicationVersion)
 	{
 		m_applicationName = applicationName;
 		m_applicationVersion = applicationVersion;
 		m_applicationFullName = m_applicationName + " " + m_applicationVersion;
 		m_moduleName = m_applicationName;
 		m_rootVarName = toUpper(m_applicationName) + "ROOT";
-#ifdef WIN32
+#ifdef _WIN32
 		m_registryRoot = TFilePath("SOFTWARE\\OpenToonz\\") + m_applicationName + m_applicationVersion;
 #endif
 		m_systemVarPrefix = m_applicationName;
 		updateEnvFile();
 	}
 
-	string getApplicationName() { return m_applicationName; }
-	string getApplicationVersion() { return m_applicationVersion; }
+	std::string getApplicationName() { return m_applicationName; }
+	std::string getApplicationVersion() { return m_applicationVersion; }
 
 	TFilePath getEnvFile() { return m_envFile; }
 
-	void setApplicationFullName(string applicationFullName)
+	void setApplicationFullName(std::string applicationFullName)
 	{
 		m_applicationFullName = applicationFullName;
 	}
-	string getApplicationFullName() { return m_applicationFullName; }
+	std::string getApplicationFullName() { return m_applicationFullName; }
 
-	void setModuleName(string moduleName) { m_moduleName = moduleName; }
-	string getModuleName() { return m_moduleName; }
+	void setModuleName(std::string moduleName) { m_moduleName = moduleName; }
+	std::string getModuleName() { return m_moduleName; }
 
-	void setRootVarName(string varName)
+	void setRootVarName(std::string varName)
 	{
 		m_rootVarName = varName;
 		updateEnvFile();
 	}
-	string getRootVarName()
+	std::string getRootVarName()
 	{
 		return m_rootVarName;
 	}
 
-	void setSystemVarPrefix(string prefix)
+	void setSystemVarPrefix(std::string prefix)
 	{
 		m_systemVarPrefix = prefix;
 	}
-	string getSystemVarPrefix() { return m_systemVarPrefix; }
+	std::string getSystemVarPrefix() { return m_systemVarPrefix; }
 
 	void setDllRelativeDir(const TFilePath &dllRelativeDir)
 	{
@@ -239,11 +239,11 @@ void EnvGlobals::setSystemPath(int id, const TFilePath &fp)
 class Variable::Imp
 {
 public:
-	string m_name;
-	string m_value;
+	std::string m_name;
+	std::string m_value;
 	bool m_loaded, m_defaultDefined, m_assigned;
 
-	Imp(string name)
+	Imp(std::string name)
 		: m_name(name), m_value(""), m_loaded(false), m_defaultDefined(false), m_assigned(false) {}
 };
 
@@ -259,7 +259,7 @@ namespace
 class VariableSet
 {
 
-	std::map<string, Variable::Imp *> m_variables;
+	std::map<std::string, Variable::Imp *> m_variables;
 	bool m_loaded;
 
 public:
@@ -267,7 +267,7 @@ public:
 
 	~VariableSet()
 	{
-		std::map<string, Variable::Imp *>::iterator it;
+		std::map<std::string, Variable::Imp *>::iterator it;
 		for (it = m_variables.begin(); it != m_variables.end(); ++it)
 			delete it->second;
 	}
@@ -278,9 +278,9 @@ public:
 		return &instance;
 	}
 
-	Variable::Imp *getImp(string name)
+	Variable::Imp *getImp(std::string name)
 	{
-		std::map<string, Variable::Imp *>::iterator it;
+		std::map<std::string, Variable::Imp *>::iterator it;
 		it = m_variables.find(name);
 		if (it == m_variables.end()) {
 			Variable::Imp *imp = new Variable::Imp(name);
@@ -331,7 +331,7 @@ void VariableSet::load()
 		char *t = s;
 		while ('a' <= *s && *s <= 'z' || 'A' <= *s && *s <= 'Z' || '0' <= *s && *s <= '9' || *s == '_')
 			s++;
-		string name(t, s - t);
+		std::string name(t, s - t);
 		if (name.size() == 0)
 			continue;
 		while (*s == ' ')
@@ -339,7 +339,7 @@ void VariableSet::load()
 		if (*s != '\"')
 			continue;
 		s++;
-		string value;
+		std::string value;
 		while (*s != '\n' && *s != '\0' && *s != '\"') {
 			if (*s != '\\')
 				value.push_back(*s);
@@ -380,10 +380,10 @@ void VariableSet::save()
 	Tofstream os(fp);
 	if (!os)
 		return;
-	std::map<string, Variable::Imp *>::iterator it;
+	std::map<std::string, Variable::Imp *>::iterator it;
 	for (it = m_variables.begin(); it != m_variables.end(); ++it) {
 		os << it->first << " \"";
-		string s = it->second->m_value;
+		std::string s = it->second->m_value;
 		for (int i = 0; i < (int)s.size(); i++)
 			if (s[i] == '\"')
 				os << "\\\"";
@@ -403,14 +403,14 @@ void VariableSet::save()
 
 //=========================================================
 
-Variable::Variable(string name)
+Variable::Variable(std::string name)
 	: m_imp(VariableSet::instance()->getImp(name))
 {
 }
 
 //-------------------------------------------------------------------
 
-Variable::Variable(string name, string defaultValue)
+Variable::Variable(std::string name, std::string defaultValue)
 	: m_imp(VariableSet::instance()->getImp(name))
 {
 	//assert(!m_imp->m_defaultDefined);
@@ -427,14 +427,14 @@ Variable::~Variable()
 
 //-------------------------------------------------------------------
 
-string Variable::getName() const
+std::string Variable::getName() const
 {
 	return m_imp->m_name;
 }
 
 //-------------------------------------------------------------------
 
-string Variable::getValue() const
+std::string Variable::getValue() const
 {
 	VariableSet::instance()->loadIfNeeded();
 	return m_imp->m_value;
@@ -442,7 +442,7 @@ string Variable::getValue() const
 
 //-------------------------------------------------------------------
 
-void Variable::assignValue(string value)
+void Variable::assignValue(std::string value)
 {
 	VariableSet *vs = VariableSet::instance();
 	vs->loadIfNeeded();
@@ -455,7 +455,7 @@ void Variable::assignValue(string value)
 
 //===================================================================
 
-void TEnv::setApplication(string applicationName, string applicationVersion)
+void TEnv::setApplication(std::string applicationName, std::string applicationVersion)
 {
 	EnvGlobals::instance()->setApplication(applicationName, applicationVersion);
 
@@ -464,42 +464,42 @@ void TEnv::setApplication(string applicationName, string applicationVersion)
 #endif
 }
 
-string TEnv::getApplicationName()
+std::string TEnv::getApplicationName()
 {
 	return EnvGlobals::instance()->getApplicationName();
 }
 
-string TEnv::getApplicationVersion()
+std::string TEnv::getApplicationVersion()
 {
 	return EnvGlobals::instance()->getApplicationVersion();
 }
 
-void TEnv::setApplicationFullName(string applicationFullName)
+void TEnv::setApplicationFullName(std::string applicationFullName)
 {
 	EnvGlobals::instance()->setApplicationFullName(applicationFullName);
 }
 
-string TEnv::getApplicationFullName()
+std::string TEnv::getApplicationFullName()
 {
 	return EnvGlobals::instance()->getApplicationFullName();
 }
 
-void TEnv::setModuleName(string moduleName)
+void TEnv::setModuleName(std::string moduleName)
 {
 	EnvGlobals::instance()->setModuleName(moduleName);
 }
 
-string TEnv::getModuleName()
+std::string TEnv::getModuleName()
 {
 	return EnvGlobals::instance()->getModuleName();
 }
 
-void TEnv::setRootVarName(string varName)
+void TEnv::setRootVarName(std::string varName)
 {
 	EnvGlobals::instance()->setRootVarName(varName);
 }
 
-string TEnv::getRootVarName()
+std::string TEnv::getRootVarName()
 {
 	return EnvGlobals::instance()->getRootVarName();
 }
@@ -509,26 +509,26 @@ TFilePath TEnv::getRootVarPath()
 	return EnvGlobals::instance()->getRootVarPath();
 }
 
-string TEnv::getSystemVarStringValue(string varName)
+std::string TEnv::getSystemVarStringValue(std::string varName)
 {
 	return EnvGlobals::instance()->getSystemVarValue(varName);
 }
 
-TFilePath TEnv::getSystemVarPathValue(string varName)
+TFilePath TEnv::getSystemVarPathValue(std::string varName)
 {
 	EnvGlobals *eg = EnvGlobals::instance();
 	return TFilePath(eg->getSystemVarValue(varName));
 }
 
-TFilePathSet TEnv::getSystemVarPathSetValue(string varName)
+TFilePathSet TEnv::getSystemVarPathSetValue(std::string varName)
 {
 	TFilePathSet lst;
-	string value = EnvGlobals::instance()->getSystemVarValue(varName);
+	std::string value = EnvGlobals::instance()->getSystemVarValue(varName);
 	int len = (int)value.size();
 	int i = 0;
 	int j = value.find(';');
-	while (j != string::npos) {
-		string s = value.substr(i, j - i);
+	while (j != std::string::npos) {
+		std::string s = value.substr(i, j - i);
 		lst.push_back(TFilePath(s));
 		i = j + 1;
 		if (i >= len)
@@ -540,12 +540,12 @@ TFilePathSet TEnv::getSystemVarPathSetValue(string varName)
 	return lst;
 }
 
-void TEnv::setSystemVarPrefix(string varName)
+void TEnv::setSystemVarPrefix(std::string varName)
 {
 	EnvGlobals::instance()->setSystemVarPrefix(varName);
 }
 
-string TEnv::getSystemVarPrefix()
+std::string TEnv::getSystemVarPrefix()
 {
 	return EnvGlobals::instance()->getSystemVarPrefix();
 }
@@ -619,49 +619,48 @@ TFilePath TEnv::getSystemPath(SystemFileId id)
 namespace
 {
 
-istream &operator>>(istream &is, TFilePath &path)
+std::istream &operator>>(std::istream &is, TFilePath &path)
 {
-	string s;
+	std::string s;
 	is >> s;
-	//path = TFilePath(s);
 	return is;
 }
 
-istream &operator>>(istream &is, TRect &rect)
+std::istream &operator>>(std::istream &is, TRect &rect)
 {
 	return is >> rect.x0 >> rect.y0 >> rect.x1 >> rect.y1;
 }
 
 template <class T>
-string toString2(T value)
+std::string toString2(T value)
 {
-	ostrstream ss;
+	std::ostrstream ss;
 	ss << value << '\0';
-	string s(ss.str());
+	std::string s(ss.str());
 	ss.freeze(false);
 	return s;
 }
 
 template <>
-string toString2(TRect value)
+std::string toString2(TRect value)
 {
-	ostrstream ss;
+	std::ostrstream ss;
 	ss << value.x0 << " " << value.y0 << " " << value.x1 << " " << value.y1 << '\0';
-	string s = ss.str();
+	std::string s = ss.str();
 	ss.freeze(false);
 	return s;
 }
 
 template <class T>
-void fromString(string s, T &value)
+void fromString(std::string s, T &value)
 {
 	if (s.empty())
 		return;
-	istrstream is(s.c_str(), s.size());
+	std::istrstream is(s.c_str(), s.size());
 	is >> value;
 }
 
-void fromString(string s, string &value)
+void fromString(std::string s, std::string &value)
 {
 	value = s;
 }
@@ -670,8 +669,8 @@ void fromString(string s, string &value)
 
 //-------------------------------------------------------------------
 
-IntVar::IntVar(string name, int defValue) : Variable(name, toString(defValue)) {}
-IntVar::IntVar(string name) : Variable(name) {}
+IntVar::IntVar(std::string name, int defValue) : Variable(name, toString(defValue)) {}
+IntVar::IntVar(std::string name) : Variable(name) {}
 IntVar::operator int() const
 {
 	int v;
@@ -682,8 +681,8 @@ void IntVar::operator=(int v) { assignValue(toString(v)); }
 
 //-------------------------------------------------------------------
 
-DoubleVar::DoubleVar(string name, double defValue) : Variable(name, toString(defValue)) {}
-DoubleVar::DoubleVar(string name) : Variable(name) {}
+DoubleVar::DoubleVar(std::string name, double defValue) : Variable(name, toString(defValue)) {}
+DoubleVar::DoubleVar(std::string name) : Variable(name) {}
 DoubleVar::operator double() const
 {
 	double v;
@@ -694,23 +693,23 @@ void DoubleVar::operator=(double v) { assignValue(toString(v)); }
 
 //-------------------------------------------------------------------
 
-StringVar::StringVar(string name, const string &defValue) : Variable(name, defValue) {}
-StringVar::StringVar(string name) : Variable(name) {}
-StringVar::operator string() const
+StringVar::StringVar(std::string name, const std::string &defValue) : Variable(name, defValue) {}
+StringVar::StringVar(std::string name) : Variable(name) {}
+StringVar::operator std::string() const
 {
-	string v;
+	std::string v;
 	fromString(getValue(), v);
 	return v;
 }
-void StringVar::operator=(const string &v) { assignValue(v); }
+void StringVar::operator=(const std::string &v) { assignValue(v); }
 
 //-------------------------------------------------------------------
 
-FilePathVar::FilePathVar(string name, const TFilePath &defValue) : Variable(name, toString(defValue)) {}
-FilePathVar::FilePathVar(string name) : Variable(name) {}
+FilePathVar::FilePathVar(std::string name, const TFilePath &defValue) : Variable(name, toString(defValue)) {}
+FilePathVar::FilePathVar(std::string name) : Variable(name) {}
 FilePathVar::operator TFilePath() const
 {
-	string v;
+	std::string v;
 	fromString(getValue(), v);
 	return TFilePath(v);
 }
@@ -718,8 +717,8 @@ void FilePathVar::operator=(const TFilePath &v) { assignValue(toString(v)); }
 
 //-------------------------------------------------------------------
 
-RectVar::RectVar(string name, const TRect &defValue) : Variable(name, toString2(defValue)) {}
-RectVar::RectVar(string name) : Variable(name) {}
+RectVar::RectVar(std::string name, const TRect &defValue) : Variable(name, toString2(defValue)) {}
+RectVar::RectVar(std::string name) : Variable(name) {}
 RectVar::operator TRect() const
 {
 	TRect v;

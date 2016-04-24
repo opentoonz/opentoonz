@@ -71,7 +71,7 @@ void RowArea::drawRows(QPainter &p, int r0, int r1)
 		playR0 = 0;
 	}
 
-#ifdef WIN32
+#ifdef _WIN32
 	static QFont font("Arial", XSHEET_FONT_SIZE, QFont::Bold);
 #else
 	static QFont font("Helvetica", XSHEET_FONT_SIZE, QFont::Normal);

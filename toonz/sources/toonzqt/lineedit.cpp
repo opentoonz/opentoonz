@@ -45,7 +45,7 @@ void LineEdit::keyPressEvent(QKeyEvent *event)
 			switch (event->key()) {
 				CASE Qt::Key_Backslash : __OR Qt::Key_Slash : __OR Qt::Key_Colon : __OR Qt::Key_Asterisk : __OR Qt::Key_Question : __OR Qt::Key_QuoteDbl : __OR Qt::Key_Greater : __OR Qt::Key_Less : __OR Qt::Key_Bar : __OR Qt::Key_Period:
 				{
-					DVGui::MsgBox(INFORMATION, tr("A file name cannot contains any of the following chracters: /\\:*?\"<>|."));
+					DVGui::info(tr("A file name cannot contains any of the following chracters: /\\:*?\"<>|."));
 					return;
 				}
 			default:

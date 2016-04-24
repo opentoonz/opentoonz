@@ -3,7 +3,7 @@
 #ifndef PARAMFIELD_H
 #define PARAMFIELD_H
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(disable : 4251)
 #endif
 
@@ -119,7 +119,7 @@ private:
 	bool m_highlighted;
 
 public:
-	ParamFieldKeyToggle(QWidget *parent, string name = "ParamFieldKeyToggle");
+	ParamFieldKeyToggle(QWidget *parent, std::string name = "ParamFieldKeyToggle");
 
 	void setStatus(Status status);
 	Status getStatus() const;

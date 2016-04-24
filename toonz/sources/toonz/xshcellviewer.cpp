@@ -137,7 +137,7 @@ bool selectionContainLevelImage(TCellSelection *selection, TXsheet *xsheet)
 			if (!level)
 				continue;
 
-			string ext = level->getPath().getType();
+			std::string ext = level->getPath().getType();
 			int type = level->getType();
 			if (type == TZP_XSHLEVEL || type == PLI_XSHLEVEL || (type == OVL_XSHLEVEL && ext != "psd"))
 				return true;
@@ -150,7 +150,7 @@ bool selectionContainLevelImage(TCellSelection *selection, TXsheet *xsheet)
 /*! convert the last one digit of the frame number to alphabet
     Ex.  12 -> 1B    21 -> 2A   30 -> 3
 */
-void parse_with_letter(const QString &text, wstring &levelName, TFrameId &fid)
+void parse_with_letter(const QString &text, std::wstring &levelName, TFrameId &fid)
 {
 	QRegExp spaces("\\t|\\s");
 	QRegExp numbers("\\d+");
@@ -276,7 +276,7 @@ void parse_with_letter(const QString &text, wstring &levelName, TFrameId &fid)
 
 //-----------------------------------------------------------------------------
 
-void parse(const QString &text, wstring &levelName, TFrameId &fid)
+void parse(const QString &text, std::wstring &levelName, TFrameId &fid)
 {
 	QRegExp spaces("\\t|\\s");
 	QRegExp numbers("\\d+");
@@ -487,7 +487,7 @@ void RenameCellField::showInRowCol(int row, int col)
 	TXshCell cell = xsh->getCell(row, col);
 	if (!cell.isEmpty()) {
 		TFrameId fid = cell.getFrameId();
-		wstring levelName = cell.m_level->getName();
+		std::wstring levelName = cell.m_level->getName();
 
 		// convert the last one digit of the frame number to alphabet
 		// Ex.  12 -> 1B    21 -> 2A   30 -> 3
@@ -495,7 +495,7 @@ void RenameCellField::showInRowCol(int row, int col)
 			setText((fid.isEmptyFrame() || fid.isNoFrame()) ? QString::fromStdWString(levelName)
 															: QString::fromStdWString(levelName) + QString(" ") + m_viewer->getFrameNumberWithLetters(fid.getNumber()));
 		else {
-			string frameNumber("");
+			std::string frameNumber("");
 			if (fid.getNumber() > 0)
 				frameNumber = toString(fid.getNumber());
 			if (fid.getLetter() != 0)
@@ -519,11 +519,11 @@ void RenameCellField::showInRowCol(int row, int col)
 void RenameCellField::renameCell()
 {
 	QString s = text();
-	wstring newName = s.toStdWString();
+	std::wstring newName = s.toStdWString();
 
 	setText("");
 
-	wstring levelName;
+	std::wstring levelName;
 	TFrameId fid;
 
 	// convert the last one digit of the frame number to alphabet
@@ -756,9 +756,7 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated)
 		//check if the column is reference
 		bool isReference = true;
 		if (column) { // Verifico se la colonna e' una mask
-			if (column->isControl())
-				isReference = false;
-			if (column->isRendered())
+			if (column->isControl() || column->isRendered() || column->getMeshColumn())
 				isReference = false;
 		}
 
@@ -1048,7 +1046,7 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference)
 		isRed = true;
 	p.setPen(isRed ? m_viewer->getSelectedColumnTextColor() : m_viewer->getTextColor());
 
-#ifdef WIN32
+#ifdef _WIN32
 	static QFont font("Arial", XSHEET_FONT_SIZE, QFont::Normal);
 #else
 	static QFont font("Helvetica", XSHEET_FONT_SIZE, QFont::Normal);
@@ -1069,7 +1067,7 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference)
 		if (Preferences::instance()->isShowFrameNumberWithLettersEnabled())
 			p.drawText(nameRect, Qt::AlignRight, m_viewer->getFrameNumberWithLetters(fid.getNumber()));
 		else {
-			string frameNumber("");
+			std::string frameNumber("");
 			//set number
 			if (fid.getNumber() > 0)
 				frameNumber = toString(fid.getNumber());
@@ -1083,7 +1081,7 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference)
 	//draw level name
 	if (!sameLevel ||
 		(isAfterMarkers && Preferences::instance()->isLevelNameOnEachMarkerEnabled())) {
-		wstring levelName = cell.m_level->getName();
+		std::wstring levelName = cell.m_level->getName();
 		QString text = QString::fromStdWString(levelName);
 #if QT_VERSION >= 0x050500
 		QFontMetrics fm(font);
@@ -1240,8 +1238,8 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col, bool isReference)
 	} else {
 		TFrameId fid = cell.m_frameId;
 
-		wstring levelName = cell.m_level->getName();
-		string frameNumber("");
+		std::wstring levelName = cell.m_level->getName();
+		std::string frameNumber("");
 		if (fid.getNumber() > 0)
 			frameNumber = toString(fid.getNumber());
 		if (fid.getLetter() != 0)
@@ -1256,7 +1254,7 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col, bool isReference)
 		p.setPen(isRed ? m_viewer->getSelectedColumnTextColor() : m_viewer->getTextColor());
 // il nome va scritto se e' diverso dalla cella precedente oppure se
 // siamo su una marker line
-#ifndef WIN32
+#ifndef _WIN32
 		static QFont font("Arial", XSHEET_FONT_SIZE, QFont::Normal);
 #else
 		static QFont font("Helvetica", XSHEET_FONT_SIZE, QFont::Normal);
@@ -1678,14 +1676,14 @@ void CellArea::mouseMoveEvent(QMouseEvent *event)
 	else if ((!xsh->getCell(row, col).isEmpty() && !isSoundColumn) && x > 6 && x < ColumnWidth) {
 		TXshCell cell = xsh->getCell(row, col);
 		TFrameId fid = cell.getFrameId();
-		wstring levelName = cell.m_level->getName();
+		std::wstring levelName = cell.m_level->getName();
 
 		// convert the last one digit of the frame number to alphabet
 		// Ex.  12 -> 1B    21 -> 2A   30 -> 3
 		if (Preferences::instance()->isShowFrameNumberWithLettersEnabled()) {
 			m_tooltip = (fid.isEmptyFrame() || fid.isNoFrame()) ? QString::fromStdWString(levelName) : QString::fromStdWString(levelName) + QString(" ") + m_viewer->getFrameNumberWithLetters(fid.getNumber());
 		} else {
-			string frameNumber("");
+			std::string frameNumber("");
 			if (fid.getNumber() > 0)
 				frameNumber = toString(fid.getNumber());
 			if (fid.getLetter() != 0)

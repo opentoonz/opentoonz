@@ -17,22 +17,22 @@ namespace
 class User
 {
 public:
-	string m_name;
-	std::vector<string> m_svnUsernames;
-	std::vector<string> m_svnPasswords;
-	User(string name) : m_name(name) {}
+	std::string m_name;
+	std::vector<std::string> m_svnUsernames;
+	std::vector<std::string> m_svnPasswords;
+	User(std::string name) : m_name(name) {}
 
-	void addSvnUsername(string username) { m_svnUsernames.push_back(username); }
-	void addSvnPassword(string password) { m_svnPasswords.push_back(password); }
+	void addSvnUsername(std::string username) { m_svnUsernames.push_back(username); }
+	void addSvnPassword(std::string password) { m_svnPasswords.push_back(password); }
 
-	string getSvnUsername(int index)
+	std::string getSvnUsername(int index)
 	{
 		if (index < 0 || index >= (int)m_svnUsernames.size())
 			return "";
 		return m_svnUsernames.at(index);
 	}
 
-	string getSvnPassword(int index)
+	std::string getSvnPassword(int index)
 	{
 		if (index < 0 || index >= (int)m_svnPasswords.size())
 			return "";
@@ -47,7 +47,7 @@ public:
 class PermissionsManager::Imp
 {
 public:
-	std::map<string, User *> m_users;
+	std::map<std::string, User *> m_users;
 
 	// utente corrente
 	User *m_user;
@@ -63,14 +63,14 @@ public:
 
 	~Imp()
 	{
-		for (std::map<string, User *>::iterator u = m_users.begin();
+		for (std::map<std::string, User *>::iterator u = m_users.begin();
 			 u != m_users.end(); ++u)
 			delete u->second;
 	}
 
-	User *findUser(string userName, bool create = true)
+	User *findUser(std::string userName, bool create = true)
 	{
-		std::map<string, User *>::iterator i = m_users.find(userName);
+		std::map<std::string, User *>::iterator i = m_users.find(userName);
 		if (i != m_users.end())
 			return i->second;
 		if (!create)
@@ -80,7 +80,7 @@ public:
 		return user;
 	}
 
-	string getSVNUserName(int index)
+	std::string getSVNUserName(int index)
 	{
 		User *user = findUser(TSystem::getUserName().toStdString(), false);
 		if (!user)
@@ -90,7 +90,7 @@ public:
 		return user->getSvnUsername(index);
 	}
 
-	string getSVNPassword(int index)
+	std::string getSVNPassword(int index)
 	{
 		User *user = findUser(TSystem::getUserName().toStdString(), false);
 		if (!user)
@@ -116,7 +116,7 @@ void PermissionsManager::Imp::loadPermissions()
 	if (!is)
 		return;
 
-	string tagName;
+	std::string tagName;
 	if (!is.matchTag(tagName) || tagName != "permissions")
 		return;
 
@@ -125,7 +125,7 @@ void PermissionsManager::Imp::loadPermissions()
 			while (is.matchTag(tagName)) {
 				if (tagName != "user")
 					return;
-				string userName;
+				std::string userName;
 				is.getTagParam("name", userName);
 				if (userName == "")
 					return;
@@ -135,9 +135,9 @@ void PermissionsManager::Imp::loadPermissions()
 						//  <roles> is no longer used
 						is.skipCurrentTag();
 					} else if (tagName == "svn") {
-						string name;
+						std::string name;
 						is.getTagParam("name", name);
-						string password;
+						std::string password;
 						is.getTagParam("password", password);
 						user->addSvnUsername(name);
 						user->addSvnPassword(password);

@@ -1,6 +1,6 @@
 
 
-#ifdef WIN32
+#ifdef _WIN32
 #include "Windows.h"
 #endif
 #include <vector>
@@ -66,9 +66,9 @@ void patternmapUC(const RASTER *iras, RASTER *oras, CPatternMapParam &pmP,
 		}
 		if (nbContourPixel > 0) {
 			if (!pmP.m_isRandomDir) {
-				CSDirection dir(ipUC.m_lX, ipUC.m_lY, ipUC.m_sel, DIRACCURACY);
+				CSDirection dir(ipUC.m_lX, ipUC.m_lY, ipUC.m_sel.get(), DIRACCURACY);
 				dir.doDir();
-				dir.getResult(ipUC.m_sel);
+				dir.getResult(ipUC.m_sel.get());
 			}
 			CPatternPosition pPos(ipUC, nbContourPixel, pmP.m_density, pmP.m_minDist, pmP.m_maxDist);
 			// Reads the pattern
@@ -84,7 +84,7 @@ void patternmapUC(const RASTER *iras, RASTER *oras, CPatternMapParam &pmP,
 					angle = pmP.m_minDirAngle + (double)(rand() % 1001) * 0.001 * (pmP.m_maxDirAngle - pmP.m_minDirAngle);
 				else {
 					if (pp->x >= 0 && pp->y >= 0 && pp->x < ipUC.m_lX && pp->y < ipUC.m_lY) {
-						UCHAR *sel = ipUC.m_sel + pp->y * ipUC.m_lX + pp->x;
+						UCHAR *sel = ipUC.m_sel.get() + pp->y * ipUC.m_lX + pp->x;
 						if (*sel > (UCHAR)0)
 							angle = (double)(*sel) - 50.0;
 					}
@@ -139,9 +139,9 @@ void patternmapUS(const RASTER *iras, RASTER *oras, CPatternMapParam &pmP,
 		}
 		if (nbContourPixel > 0) {
 			if (!pmP.m_isRandomDir) {
-				CSDirection dir(ipUS.m_lX, ipUS.m_lY, ipUS.m_sel, DIRACCURACY);
+				CSDirection dir(ipUS.m_lX, ipUS.m_lY, ipUS.m_sel.get(), DIRACCURACY);
 				dir.doDir();
-				dir.getResult(ipUS.m_sel);
+				dir.getResult(ipUS.m_sel.get());
 			}
 			CPatternPosition pPos(ipUS, nbContourPixel, pmP.m_density, pmP.m_minDist, pmP.m_maxDist);
 			// Reads the pattern
@@ -157,7 +157,7 @@ void patternmapUS(const RASTER *iras, RASTER *oras, CPatternMapParam &pmP,
 					angle = pmP.m_minDirAngle + (double)(rand() % 1001) * 0.001 * (pmP.m_maxDirAngle - pmP.m_minDirAngle);
 				else {
 					if (pp->x >= 0 && pp->y >= 0 && pp->x < ipUS.m_lX && pp->y < ipUS.m_lY) {
-						UCHAR *sel = ipUS.m_sel + pp->y * ipUS.m_lX + pp->x;
+						UCHAR *sel = ipUS.m_sel.get() + pp->y * ipUS.m_lX + pp->x;
 						if (*sel > (UCHAR)0)
 							angle = (double)(*sel) - 50.0;
 					}

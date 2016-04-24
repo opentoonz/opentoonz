@@ -6,7 +6,7 @@
 //#include "tgeometry.h"
 #include "tmachine.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 //#endif
 
@@ -107,12 +107,12 @@ DVAPI double tglGetPixelSize2();
 
 //! Draw text in string s at position p.
 
-DVAPI void tglDrawText(const TPointD &p, const string &s, void *font = GLUT_STROKE_ROMAN);
-DVAPI void tglDrawText(const TPointD &p, const wstring &s, void *font = GLUT_STROKE_ROMAN);
+DVAPI void tglDrawText(const TPointD &p, const std::string &s, void *font = GLUT_STROKE_ROMAN);
+DVAPI void tglDrawText(const TPointD &p, const std::wstring &s, void *font = GLUT_STROKE_ROMAN);
 
 //! Returns text width
 
-DVAPI double tglGetTextWidth(const string &s, void *font = GLUT_STROKE_ROMAN);
+DVAPI double tglGetTextWidth(const std::string &s, void *font = GLUT_STROKE_ROMAN);
 
 /*!
  Draw circle of radius r with center c.
@@ -253,7 +253,7 @@ void DVAPI tglBuildMipmaps(std::vector<TRaster32P> &rasters,
 
 //-----------------------------------------------------------------------------
 
-#ifdef WIN32
+#ifdef _WIN32
 typedef std::pair<HDC, HGLRC> TGlContext;
 #else
 typedef void *TGlContext;

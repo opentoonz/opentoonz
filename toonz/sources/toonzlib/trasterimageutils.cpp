@@ -237,7 +237,7 @@ TRectD TRasterImageUtils::convertRasterToWorld(const TRect &area, const TRasterI
 TRasterImageP TRasterImageUtils::vectorToFullColorImage(
 	const TVectorImageP &vimage, const TAffine &aff, TPalette *palette,
 	const TPointD &outputPos, const TDimension &outputSize,
-	const vector<TRasterFxRenderDataP> *fxs, bool transformThickness)
+	const std::vector<TRasterFxRenderDataP> *fxs, bool transformThickness)
 {
 	if (!vimage || !palette)
 		return 0;
@@ -256,8 +256,8 @@ TRasterImageP TRasterImageUtils::vectorToFullColorImage(
 	vi->transform(TTranslation(-outputPos));
 
 	int strokeCount = vi->getStrokeCount();
-	vector<int> strokeIndex(strokeCount);
-	vector<TStroke *> strokes(strokeCount);
+	std::vector<int> strokeIndex(strokeCount);
+	std::vector<TStroke *> strokes(strokeCount);
 	int i;
 	for (i = 0; i < strokeCount; ++i) {
 		strokeIndex[i] = i;
@@ -276,8 +276,8 @@ TRasterImageP TRasterImageUtils::vectorToFullColorImage(
 		for (i = 0; i < (int)fxs->size(); i++) {
 			SandorFxRenderData *sandorData = dynamic_cast<SandorFxRenderData *>((*fxs)[i].getPointer());
 			if (sandorData && sandorData->m_type == BlendTz) {
-				string indexes = toString(sandorData->m_blendParams.m_colorIndex);
-				vector<string> items;
+				std::string indexes = toString(sandorData->m_blendParams.m_colorIndex);
+				std::vector<std::string> items;
 				parseIndexes(indexes, items);
 				PaletteFilterFxRenderData paletteFilterData;
 				insertIndexes(items, &paletteFilterData);
@@ -334,9 +334,9 @@ TRect TRasterImageUtils::eraseRect(const TRasterImageP &ri, const TRectD &area)
 
 //-------------------------------------------------------------------
 
-vector<TRect> TRasterImageUtils::paste(const TRasterImageP &ri, const TTileSetFullColor *tileSet)
+std::vector<TRect> TRasterImageUtils::paste(const TRasterImageP &ri, const TTileSetFullColor *tileSet)
 {
-	vector<TRect> rects;
+	std::vector<TRect> rects;
 	TRasterP raster = ri->getRaster();
 	for (int i = 0; i < tileSet->getTileCount(); i++) {
 		const TTileSetFullColor::Tile *tile = tileSet->getTile(i);
@@ -351,7 +351,7 @@ vector<TRect> TRasterImageUtils::paste(const TRasterImageP &ri, const TTileSetFu
 //-------------------------------------------------------------------
 
 void TRasterImageUtils::addSceneNumbering(const TRasterImageP &ri, int globalIndex,
-										  const wstring &sceneName, int sceneIndex)
+										  const std::wstring &sceneName, int sceneIndex)
 {
 	if (!ri)
 		return;
@@ -403,7 +403,7 @@ void TRasterImageUtils::addSceneNumbering(const TRasterImageP &ri, int globalInd
 
 //-------------------------------------------------------------------
 
-void TRasterImageUtils::addGlobalNumbering(const TRasterImageP &ri, const wstring &sceneName, int globalIndex)
+void TRasterImageUtils::addGlobalNumbering(const TRasterImageP &ri, const std::wstring &sceneName, int globalIndex)
 {
 	if (!ri)
 		return;

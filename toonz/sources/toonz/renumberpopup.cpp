@@ -21,9 +21,9 @@ RenumberPopup::RenumberPopup()
 	setWindowTitle(tr("Renumber"));
 
 	beginHLayout();
-	addWidget(tr("Start:"), m_startFld = new IntLineEdit(this));
+	addWidget(tr("Start:"), m_startFld = new DVGui::IntLineEdit(this));
 	addSpacing(10);
-	addWidget(tr("Step:"), m_stepFld = new IntLineEdit(this));
+	addWidget(tr("Step:"), m_stepFld = new DVGui::IntLineEdit(this));
 	endHLayout();
 
 	m_okBtn = new QPushButton(tr("Renumber"), this);

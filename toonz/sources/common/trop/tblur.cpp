@@ -3,7 +3,7 @@
 #include "traster.h"
 #include "trop.h"
 #include "tpixelgr.h"
-#ifdef WIN32
+#ifdef _WIN32
 #include <emmintrin.h>
 #include <malloc.h>
 #endif
@@ -11,7 +11,7 @@
 namespace
 {
 
-#ifdef WIN32
+#ifdef _WIN32
 template <class T>
 struct BlurPixel {
 	T b;
@@ -231,7 +231,7 @@ inline void blur_code(
 
 //-------------------------------------------------------------------
 
-#ifdef WIN32
+#ifdef _WIN32
 
 //-------------------------------------------------------------------
 template <class T, class P>
@@ -484,7 +484,7 @@ inline void blur_code_SSE2(
 	}
 }
 
-#endif // WIN32
+#endif // _WIN32
 
 //-------------------------------------------------------------------
 
@@ -574,7 +574,7 @@ template <class T, class Q, class P>
 void do_filtering_chan(BlurPixel<P> *row1, T *row2, int length,
 					   float coeff, float coeffq, int brad, float diff, bool useSSE)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	if (useSSE && T::maxChannelValue == 255)
 		blur_code_SSE2<T, P>(row1, row2, length, coeff, coeffq, brad, diff, 0.5);
 	else
@@ -769,7 +769,7 @@ void do_filtering_floatRgb(T *row1, BlurPixel<P> *row2, int length,
   BLUR_CODE(0, unsigned char)
 */
 
-#ifdef WIN32
+#ifdef _WIN32
 	if (useSSE)
 		blur_code_SSE2<T, P>(row1, row2, length, coeff, coeffq, brad, diff, 0);
 	else
@@ -805,7 +805,7 @@ void doBlurRgb(TRasterPT<T> &dstRas, TRasterPT<T> &srcRas, double blur, int dx, 
 	BlurPixel<P> *row2, *col1, *fbuffer;
 	TRasterGR8P r1;
 
-#ifdef WIN32
+#ifdef _WIN32
 	if (useSSE) {
 		fbuffer = (BlurPixel<P> *)_aligned_malloc(llx * ly * sizeof(BlurPixel<P>), 16);
 		row1 = (T *)_aligned_malloc((llx + 2 * brad) * sizeof(T), 16);
@@ -853,7 +853,7 @@ void doBlurRgb(TRasterPT<T> &dstRas, TRasterPT<T> &srcRas, double blur, int dx, 
 		dstRas->clear();
 	}
 
-#ifdef WIN32
+#ifdef _WIN32
 	if (useSSE) {
 		_aligned_free(col2);
 		_aligned_free(col1);
@@ -866,7 +866,6 @@ void doBlurRgb(TRasterPT<T> &dstRas, TRasterPT<T> &srcRas, double blur, int dx, 
 		delete[] col1;
 		delete[] row1;
 		r1->unlock();
-		//delete[]fbuffer;
 	}
 }
 

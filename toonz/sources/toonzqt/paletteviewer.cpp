@@ -160,7 +160,7 @@ void PaletteViewer::setPaletteHandle(TPaletteHandle *paletteHandle)
 
 	bool ret = true;
 	if (m_paletteHandle)
-		ret = ret && disconnect(m_paletteHandle);
+		ret = ret && disconnect(m_paletteHandle,0,this,0);
 
 	m_paletteHandle = paletteHandle;
 
@@ -470,7 +470,7 @@ void PaletteViewer::updateTabBar()
 	//Aggiungo i tab in funzione delle pagine di m_palette
 	for (i = 0; i < palette->getPageCount(); i++) {
 		TPalette::Page *page = palette->getPage(i);
-		wstring ws = page->getName();
+		std::wstring ws = page->getName();
 		QString pageName = QString::fromStdWString(ws);
 		m_pagesBar->addTab(tabIcon, pageName);
 	}
@@ -833,7 +833,7 @@ void PaletteViewer::deletePage()
 		return;
 
 	if (m_xsheetHandle) {
-		vector<int> styleIds;
+		std::vector<int> styleIds;
 		TPalette::Page *page = palette->getPage(m_indexPageToDelete);
 		if (!page)
 			return; //La pagina dovrebbe esserci sempre
@@ -866,19 +866,19 @@ void PaletteViewer::saveStudioPalette()
 	StudioPalette *sp = StudioPalette::instance();
 	TPalette *palette = getPalette();
 	if (!palette) {
-		DVGui::MsgBox(DVGui::WARNING, "No current palette");
+		DVGui::warning("No current palette");
 		return;
 	}
-	wstring gname = palette->getGlobalName();
+	std::wstring gname = palette->getGlobalName();
 	if (gname.empty()) {
 		StudioPaletteViewer *parentSPV = qobject_cast<StudioPaletteViewer *>(parentWidget());
 		if (!parentSPV) {
-			DVGui::MsgBox(DVGui::WARNING, "No GlobalName");
+			DVGui::warning("No GlobalName");
 			return;
 		} else {
 			TFilePath palettePath = parentSPV->getCurrentItemPath();
 			if (palettePath.isEmpty())
-				DVGui::MsgBox(DVGui::WARNING, "No GlobalName, No Filepath");
+				DVGui::warning("No GlobalName, No Filepath");
 			else {
 				QString question;
 				question = "Do you want to overwrite current palette to " + toQString(palettePath) + " ?";

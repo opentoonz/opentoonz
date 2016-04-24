@@ -14,14 +14,11 @@ class TFx;
 
 #include <QIcon>
 
-using namespace DVGui;
-using namespace std;
-
 //=============================================================================
 // InsertFxPopup
 //-----------------------------------------------------------------------------
 
-class InsertFxPopup : public Dialog
+class InsertFxPopup : public DVGui::Dialog
 {
 	Q_OBJECT
 
@@ -40,7 +37,7 @@ public:
 private:
 	TFx *createFx();
 
-	void makeItem(QTreeWidgetItem *parent, string fxid);
+	void makeItem(QTreeWidgetItem *parent, std::string fxid);
 
 	void loadFolder(QTreeWidgetItem *parent);
 	/*!Return true if preset is loaded.*/

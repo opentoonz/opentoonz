@@ -1,6 +1,6 @@
 
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(disable : 4996)
 #endif
 
@@ -782,7 +782,7 @@ l'immagine)
 					if (!handle)
 						return TRUE; /*non sono semplicamente riuscito a prendere info riguardo
 	               il pixelFlavor, ma setPixelType e' andato a buon fine */
-#ifdef WIN32
+#ifdef _WIN32
 					container = (TW_ENUMERATION *)handle;
 #else
 				container = (TW_ENUMERATION *)GLOBAL_LOCK(handle);

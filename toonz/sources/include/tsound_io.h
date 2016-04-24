@@ -54,7 +54,7 @@ public:
 		TSoundTrackReaderCreateProc *proc);
 };
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DVAPI TSmartPointerT<TSoundTrackReader>;
 #endif
 
@@ -98,7 +98,7 @@ public:
 		TSoundTrackWriterCreateProc *proc);
 };
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DVAPI TSmartPointerT<TSoundTrackWriter>;
 #endif
 

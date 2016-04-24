@@ -124,7 +124,7 @@ void TFontManager::loadFontNames()
 
 //!\note Throws TFontCreationError if the font could not be created, and
 //!leaves the old font as current.
-void TFontManager::setFamily(const wstring family)
+void TFontManager::setFamily(const std::wstring family)
 {
 	QLocalSocket socket;
 	tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1, t32bitsrv::srvCmdline());
@@ -141,7 +141,7 @@ void TFontManager::setFamily(const wstring family)
 
 //!\note Throws TFontCreationError if the font could not be created, and
 //!leaves the old font as current.
-void TFontManager::setTypeface(const wstring typeface)
+void TFontManager::setTypeface(const std::wstring typeface)
 {
 	QLocalSocket socket;
 	tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1, t32bitsrv::srvCmdline());
@@ -159,7 +159,7 @@ void TFontManager::setTypeface(const wstring typeface)
 
 //--------------------------------------------------------------
 
-wstring TFontManager::getCurrentFamily() const
+std::wstring TFontManager::getCurrentFamily() const
 {
 	QLocalSocket socket;
 	tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1, t32bitsrv::srvCmdline());
@@ -178,7 +178,7 @@ wstring TFontManager::getCurrentFamily() const
 
 //--------------------------------------------------------------
 
-wstring TFontManager::getCurrentTypeface() const
+std::wstring TFontManager::getCurrentTypeface() const
 {
 	QLocalSocket socket;
 	tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1, t32bitsrv::srvCmdline());
@@ -197,7 +197,7 @@ wstring TFontManager::getCurrentTypeface() const
 
 //--------------------------------------------------------------
 
-void TFontManager::getAllFamilies(vector<wstring> &families) const
+void TFontManager::getAllFamilies(std::vector<std::wstring> &families) const
 {
 	QLocalSocket socket;
 	tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1, t32bitsrv::srvCmdline());
@@ -214,7 +214,7 @@ void TFontManager::getAllFamilies(vector<wstring> &families) const
 
 //--------------------------------------------------------------
 
-void TFontManager::getAllTypefaces(vector<wstring> &typefaces) const
+void TFontManager::getAllTypefaces(std::vector<std::wstring> &typefaces) const
 {
 	QLocalSocket socket;
 	tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1, t32bitsrv::srvCmdline());

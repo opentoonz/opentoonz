@@ -35,7 +35,7 @@ class DVAPI TRasterImage : public TImage
 		//! dpi value for y axis
 		m_dpiy;
 	//! The name of the image
-	string m_name;
+	std::string m_name;
 	//! The savebox of the image
 	TRect m_savebox;
 	//double m_hPos;
@@ -67,9 +67,9 @@ public:
 
 	// image info
 	//! Return the name of the image
-	string getName() const { return m_name; }
+	std::string getName() const { return m_name; }
 	//! Set the name of the image
-	void setName(string name) { m_name = name; }
+	void setName(std::string name) { m_name = name; }
 
 	//! Get the \b dpi image
 	void getDpi(double &dpix, double &dpiy) const
@@ -146,7 +146,7 @@ public:
 
 //-------------------------------------------------------------------
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DVAPI TSmartPointerT<TRasterImage>;
 template class DVAPI TDerivedSmartPointerT<TRasterImage, TImage>;
 #endif

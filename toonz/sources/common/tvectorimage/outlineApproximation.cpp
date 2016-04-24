@@ -240,7 +240,7 @@ TQuadratic *makeOutlineForThickQuadratic(const TThickQuadratic *tq, int upOrDown
 	} catch (TMathException &) {
 		return new TQuadratic((upOrDown) ? p0aux : p2aux, (p0aux + p2aux) * 0.5, (upOrDown) ? p2aux : p0aux);
 	} catch (std::exception &e) {
-		string s(e.what());
+		std::string s(e.what());
 		abort();
 	} catch (...) {
 		abort();
@@ -318,7 +318,7 @@ void makeOutline(/*std::ofstream& cout,*/
 void splitCircularArcIntoQuadraticCurves(const TPointD &Center,
 										 const TPointD &Pstart,
 										 const TPointD &Pend,
-										 vector<TQuadratic *> &quadArray)
+										 std::vector<TQuadratic *> &quadArray)
 {
 	// It splits a circular anticlockwise arc into a sequence of quadratic bezier curves
 	// Every quadratic curve can approximate an arc no TLonger than 45 degrees (or 60).
@@ -409,8 +409,8 @@ void splitCircularArcIntoQuadraticCurves(const TPointD &Center,
 // minore di quadratiche viene riempito con quadratiche degeneri
 // con i punti di controllo coincidenti nell'ultimo estremo valido
 void copy(/*std::ofstream& cout,*/
-		  const vector<TQuadratic *> &arrayUp,
-		  const vector<TQuadratic *> &arrayDown,
+		  const std::vector<TQuadratic *> &arrayUp,
+		  const std::vector<TQuadratic *> &arrayDown,
 		  outlineBoundary &ob)
 {
 	int minSize = tmin(arrayUp.size(), arrayDown.size());
@@ -425,8 +425,8 @@ void copy(/*std::ofstream& cout,*/
 		ob.push_back(outlineEdge(arrayUp[i], arrayDown[i]));
 	}
 	if (arrayUp.size() != arrayDown.size()) {
-		const vector<TQuadratic *> &vMaxSize = arrayUp.size() > arrayDown.size() ? arrayUp : arrayDown;
-		const vector<TQuadratic *> &vMinSize = arrayUp.size() < arrayDown.size() ? arrayUp : arrayDown;
+		const std::vector<TQuadratic *> &vMaxSize = arrayUp.size() > arrayDown.size() ? arrayUp : arrayDown;
+		const std::vector<TQuadratic *> &vMinSize = arrayUp.size() < arrayDown.size() ? arrayUp : arrayDown;
 
 		int delta = vMaxSize.size() - vMinSize.size();
 
@@ -645,7 +645,7 @@ void drawOutline(const outlineBoundary &ob, double pixelSize)
 }
 
 void computeOutlines(const TStroke *stroke, int startQuad, int endQuad,
-					 vector<TQuadratic *> &quadArray, double error2)
+					 std::vector<TQuadratic *> &quadArray, double error2)
 {
 	outlineBoundary ob;
 	makeOutline(stroke, startQuad, endQuad, ob, error2);

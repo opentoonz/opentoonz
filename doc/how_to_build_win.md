@@ -33,10 +33,12 @@ They will have to be installed seperately as follows.
   - qt-opensource-windows-x86-msvc2013_64-5.5.1.exe
 
 ### boost
+- boost 1.55.0 or later is required (tested up to 1.60.0), but the support build is using 1.55.0 exactly.
 - http://www.boost.org/users/history/version_1_55_0.html
 - Download boost_1_55_0.zip from the above link.  Extract all contents to the '$opentoonz/thirdparty/boost' directory.
 - Install the following path for Visual Studio 2013
   - https://svn.boost.org/trac/boost/attachment/ticket/9369/vc12_fix_has_member_function_callable_with.patch
+
 
 ## Building
 

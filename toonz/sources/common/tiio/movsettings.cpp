@@ -13,8 +13,8 @@
 //    32-bit version
 //*******************************************************************************
 
-#ifdef WIN32
-#ifdef WIN32
+#ifdef _WIN32
+#ifdef _WIN32
 #pragma warning(disable : 4996)
 #endif
 
@@ -299,7 +299,7 @@ static Boolean QTCmpr_FilterProc
 
 void openMovSettingsPopup(TPropertyGroup *props, bool macBringToFront)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	if (InitializeQTML(0) != noErr)
 		return;
 #endif

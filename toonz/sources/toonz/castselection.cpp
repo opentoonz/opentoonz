@@ -41,16 +41,15 @@ CastSelection::~CastSelection()
 void CastSelection::getSelectedLevels(std::vector<TXshLevel *> &levels)
 {
 	assert(m_browser);
-	CastItems *castItems = m_browser->getCastItems();
-	int i;
-	for (i = 0; i < castItems->getItemCount(); i++) {
+	CastItems const& castItems = m_browser->getCastItems();
+	for (int i = 0; i < castItems.getItemCount(); i++) {
 		if (!isSelected(i))
 			continue;
-		TXshLevel *level = castItems->getItem(i)->getSimpleLevel();
+		TXshLevel *level = castItems.getItem(i)->getSimpleLevel();
 		if (!level)
-			level = castItems->getItem(i)->getPaletteLevel();
+			level = castItems.getItem(i)->getPaletteLevel();
 		if (!level)
-			level = castItems->getItem(i)->getSoundLevel();
+			level = castItems.getItem(i)->getSoundLevel();
 		if (level)
 			levels.push_back(level);
 	}

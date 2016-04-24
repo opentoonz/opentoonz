@@ -4,7 +4,7 @@
 #include "tpixel.h"
 #include "tpixelutils.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <emmintrin.h> // per SSE2
 #endif
 

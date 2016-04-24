@@ -3,7 +3,7 @@
 #ifndef TIIO_AVI_H
 #define TIIO_AVI_H
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #include <vfw.h>
 #endif
@@ -33,7 +33,7 @@ public:
 
 private:
 	TThread::Mutex m_mutex;
-#ifdef WIN32
+#ifdef _WIN32
 	PAVIFILE m_aviFile;
 	PAVISTREAM m_videoStream;
 	PAVISTREAM m_audioStream;
@@ -53,7 +53,7 @@ private:
 
 	void doSaveSoundTrack();
 	void searchForCodec();
-#ifdef WIN32
+#ifdef _WIN32
 	int compressFrame(BITMAPINFOHEADER *outHeader, void **bufferOut, int frameIndex,
 					  DWORD flagsIn, DWORD &flagsOut);
 #endif
@@ -80,7 +80,7 @@ public:
 	TThread::Mutex m_mutex;
 	void *m_decompressedBuffer;
 
-#ifdef WIN32
+#ifdef _WIN32
 private:
 	PAVISTREAM m_videoStream;
 	BITMAPINFO *m_srcBitmapInfo, *m_dstBitmapInfo;

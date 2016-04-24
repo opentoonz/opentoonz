@@ -97,10 +97,10 @@ void collectParams(TMacroFx *macroFx)
 
 //--------------------------------------------------
 
-bool TMacroFx::analyze(const vector<TFxP> &fxs,
+bool TMacroFx::analyze(const std::vector<TFxP> &fxs,
 					   TFxP &root,
-					   vector<TFxP> &roots,
-					   vector<TFxP> &leafs)
+					   std::vector<TFxP> &roots,
+					   std::vector<TFxP> &leafs)
 {
 	if (fxs.size() == 1)
 		return false;
@@ -172,7 +172,7 @@ bool TMacroFx::analyze(const vector<TFxP> &fxs,
 
 //--------------------------------------------------
 
-bool TMacroFx::analyze(const vector<TFxP> &fxs)
+bool TMacroFx::analyze(const std::vector<TFxP> &fxs)
 {
 	TFxP root = 0;
 	std::vector<TFxP> leafs;
@@ -219,7 +219,7 @@ TMacroFx::~TMacroFx() {}
 TFx *TMacroFx::clone(bool recursive) const
 {
 	int n = m_fxs.size();
-	vector<TFxP> clones(n);
+	std::vector<TFxP> clones(n);
 	std::map<TFx *, int> table;
 	std::map<TFx *, int>::iterator it;
 	int i, rootIndex = -1;
@@ -307,7 +307,7 @@ TFxTimeRegion TMacroFx::getTimeRegion() const
 
 //--------------------------------------------------
 
-string TMacroFx::getPluginId() const
+std::string TMacroFx::getPluginId() const
 {
 	return "Base";
 }
@@ -329,7 +329,7 @@ TFx *TMacroFx::getRoot() const
 
 //--------------------------------------------------
 
-TFx *TMacroFx::getFxById(const wstring &id) const
+TFx *TMacroFx::getFxById(const std::wstring &id) const
 {
 	int i;
 	for (i = 0; i < (int)m_fxs.size(); i++) {
@@ -342,16 +342,16 @@ TFx *TMacroFx::getFxById(const wstring &id) const
 
 //--------------------------------------------------
 
-const vector<TFxP> &TMacroFx::getFxs() const
+const std::vector<TFxP> &TMacroFx::getFxs() const
 {
 	return m_fxs;
 }
 
 //--------------------------------------------------
 
-string TMacroFx::getMacroFxType() const
+std::string TMacroFx::getMacroFxType() const
 {
-	string name = getFxType() + "(";
+	std::string name = getFxType() + "(";
 	for (int i = 0; i < (int)m_fxs.size(); i++) {
 		if (i > 0)
 			name += ",";
@@ -365,13 +365,13 @@ string TMacroFx::getMacroFxType() const
 
 //--------------------------------------------------
 
-TMacroFx *TMacroFx::create(const vector<TFxP> &fxs)
+TMacroFx *TMacroFx::create(const std::vector<TFxP> &fxs)
 {
 	std::vector<TFxP> leafs;
 	std::vector<TFxP> roots;
 	TFxP root = 0;
 
-	vector<TFxP> orederedFxs = sortFxs(fxs);
+	std::vector<TFxP> orederedFxs = sortFxs(fxs);
 
 	// verifica che gli effetti selezionati siano idonei ad essere raccolti
 	// in una macro. Ci deve essere un solo nodo terminale
@@ -397,8 +397,8 @@ TMacroFx *TMacroFx::create(const vector<TFxP> &fxs)
 		int count = fx->getInputPortCount();
 		for (; k < count; k++) {
 			TFxPort *port = fx->getInputPort(k);
-			string portName = fx->getInputPortName(k);
-			string fxId = toString(fx->getFxId());
+			std::string portName = fx->getInputPortName(k);
+			std::string fxId = toString(fx->getFxId());
 			portName += "_" + toString(macroFx->getInputPortCount()) + "_" + fxId;
 			TFx *portFx = port->getFx();
 			if (portFx) {
@@ -436,9 +436,9 @@ bool TMacroFx::canHandle(const TRenderSettings &info, double frame)
 
 //--------------------------------------------------
 
-string TMacroFx::getAlias(double frame, const TRenderSettings &info) const
+std::string TMacroFx::getAlias(double frame, const TRenderSettings &info) const
 {
-	string alias = getFxType();
+	std::string alias = getFxType();
 	alias += "[";
 
 	// alias degli effetti connessi alle porte di input separati da virgole
@@ -491,7 +491,7 @@ void TMacroFx::compatibilityTranslatePort(int major, int minor, std::string &por
 	if (VersionNumber(major, minor) == VersionNumber(1, 16)) {
 		for (int i = 0; i < getInputPortCount(); ++i) {
 			const std::string &name = getInputPortName(i);
-			if (name.find(portName) != string::npos) {
+			if (name.find(portName) != std::string::npos) {
 				portName = name;
 				break;
 			}
@@ -504,7 +504,7 @@ void TMacroFx::compatibilityTranslatePort(int major, int minor, std::string &por
 void TMacroFx::loadData(TIStream &is)
 {
 	VersionNumber tnzVersion = is.getVersion();
-	string tagName;
+	std::string tagName;
 	while (is.openChild(tagName)) {
 		if (tagName == "root") {
 			TPersist *p = 0;
@@ -526,7 +526,7 @@ void TMacroFx::loadData(TIStream &is)
 			int i = 0;
 			while (is.matchTag(tagName)) {
 				if (tagName == "port") {
-					string name = is.getTagAttribute("name");
+					std::string name = is.getTagAttribute("name");
 					if (tnzVersion < VersionNumber(1, 16) && name != "") {
 						TRasterFxPort *port = new TRasterFxPort();
 						addInputPort(name, *port);
@@ -537,14 +537,14 @@ void TMacroFx::loadData(TIStream &is)
 
 						compatibilityTranslatePort(tnzVersion.first, tnzVersion.second, name);
 
-						string inPortName = name;
+						std::string inPortName = name;
 						inPortName.erase(inPortName.find("_"), inPortName.size() - 1);
 
-						string inFxId = name;
+						std::string inFxId = name;
 						inFxId.erase(0, inFxId.find_last_of("_") + 1);
 
 						for (int i = 0; i < (int)m_fxs.size(); i++) {
-							wstring fxId = m_fxs[i]->getFxId();
+							std::wstring fxId = m_fxs[i]->getFxId();
 							if (fxId == toWideString(inFxId)) {
 								if (TFxPort *port = m_fxs[i]->getInputPort(inPortName))
 									addInputPort(name, *port);
@@ -583,7 +583,7 @@ void TMacroFx::saveData(TOStream &os)
 	os.openChild("ports");
 	for (i = 0; i < getInputPortCount(); i++) {
 		std::string portName = getInputPortName(i);
-		std::map<string, string> attr;
+		std::map<std::string, std::string> attr;
 		attr["name_inFx"] = portName;
 		os.openCloseChild("port", attr);
 	}

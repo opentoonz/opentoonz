@@ -66,7 +66,7 @@ public:
 	bool isNoFrame() const { return m_frame == NO_FRAME; };
 
 	//operator string() const;
-	string expand(FrameFormat format = FOUR_ZEROS) const;
+	std::string expand(FrameFormat format = FOUR_ZEROS) const;
 	int getNumber() const { return m_frame; };
 	char getLetter() const { return m_letter; };
 };
@@ -74,7 +74,7 @@ public:
 //-----------------------------------------------------------------------------
 /*! \relates TFrameId*/
 
-inline ostream &operator<<(ostream &out, const TFrameId &f)
+inline std::ostream &operator<<(std::ostream &out, const TFrameId &f)
 {
 	if (f.isNoFrame())
 		out << "<noframe>";
@@ -92,8 +92,8 @@ inline ostream &operator<<(ostream &out, const TFrameId &f)
 class DVAPI TFilePath
 {
 	static bool m_underscoreFormatAllowed;
-	wstring m_path;
-	void setPath(wstring path);
+	std::wstring m_path;
+	void setPath(std::wstring path);
 
 public:
 	/*! this static method allows correct reading of levels in the form pippo_0001.tif (represented  always as pippo..tif) */
@@ -105,7 +105,7 @@ public:
       If the path is "<alpha>:" a slash will be added*/
 
 	explicit TFilePath(const char *path = "");
-	explicit TFilePath(const string &path);
+	explicit TFilePath(const std::string &path);
 	explicit TFilePath(const std::wstring &path);
 	explicit TFilePath(const QString &path);
 
@@ -128,28 +128,28 @@ public:
 	 a.  "" if there is no filename extension
 	 b. "." if there is a filename extension but no frame
 	 c.".." if there are both filename extension and frame */
-	string getDots() const; // ritorna ""(no estensione), "."(estensione, no frame) o ".."(estensione e frame)
+	std::string getDots() const; // ritorna ""(no estensione), "."(estensione, no frame) o ".."(estensione e frame)
 
 	/*!Returns the filename extension, including leading period (.).
 	    Returns "" if there is no filename extension.*/
-	string getDottedType() const; // ritorna l'estensione con il PUNTO (se non c'e' estensione ritorna "")
+	std::string getDottedType() const; // ritorna l'estensione con il PUNTO (se non c'e' estensione ritorna "")
 
 	/*!Returns the filename extension, escluding leading period (.).
 	    Returns "" if there is no filename extension.*/
-	string getUndottedType() const; // ritorna l'estensione senza PUNTO
+	std::string getUndottedType() const; // ritorna l'estensione senza PUNTO
 
 	/*!It is equal to getUndottedType():
 	    Returns the filename extension, excluding leading period (.).
 	    Returns "" if there is no filename extension.*/
-	string getType() const { return getUndottedType(); }; // ritorna l'estensione SENZA PUNTO
+	std::string getType() const { return getUndottedType(); }; // ritorna l'estensione SENZA PUNTO
 	/*!Returns the base filename (no extension, no dots, no slash)*/
-	string getName() const;		 // noDot! noSlash!
-	wstring getWideName() const; // noDot! noSlash!
+	std::string getName() const;		 // noDot! noSlash!
+	std::wstring getWideName() const; // noDot! noSlash!
 
 	/*!Returns the filename (with extension, escluding in case the frame number).
 	    ex.: TFilePath("/pippo/pluto.0001.gif").getLevelName() == "pluto..gif"
 	 */
-	string getLevelName() const;		// es. TFilePath("/pippo/pluto.0001.gif").getLevelName() == "pluto..gif"
+	std::string getLevelName() const;		// es. TFilePath("/pippo/pluto.0001.gif").getLevelName() == "pluto..gif"
 	std::wstring getLevelNameW() const; // es. TFilePath("/pippo/pluto.0001.gif").getLevelName() == "pluto..gif"
 
 	/*!Returns the parent directory escluding the eventual final slash.*/
@@ -164,9 +164,9 @@ public:
 
 	/*!Return a TFilePath with extension type.
    type is a string that indicate the filename extension(ex:. bmp or .bmp)*/
-	TFilePath withType(const string &type) const;
+	TFilePath withType(const std::string &type) const;
 	/*!Return a TFilePath with filename "name".*/
-	TFilePath withName(const string &name) const;
+	TFilePath withName(const std::string &name) const;
 	/*!Return a TFilePath with filename "name". Unicode*/
 	TFilePath withName(const std::wstring &name) const;
 	/*!Return a TFilePath with parent directory "dir".*/
@@ -186,11 +186,11 @@ public:
 	TFilePath operator+(const TFilePath &fp) const;
 	TFilePath &operator+=(const TFilePath &fp) /*{*this=*this+fp;return *this;}*/;
 
-	inline TFilePath operator+(const string &s) const
+	inline TFilePath operator+(const std::string &s) const
 	{
 		return operator+(TFilePath(s));
 	};
-	inline TFilePath &operator+=(const string &s)
+	inline TFilePath &operator+=(const std::string &s)
 	{
 		return operator+=(TFilePath(s));
 	};
@@ -210,7 +210,7 @@ public:
 	bool match(const TFilePath &fp) const; // sono uguali a meno del numero di digits del frame
 
 	// '/a/b/c.txt' => head='a' tail='b/c.txt'
-	void split(wstring &head, TFilePath &tail) const;
+	void split(std::wstring &head, TFilePath &tail) const;
 };
 
 //-----------------------------------------------------------------------------
@@ -218,7 +218,7 @@ public:
 class TMalformedFrameException : public TException
 {
 public:
-	TMalformedFrameException(const TFilePath &fp, const wstring &msg = wstring())
+	TMalformedFrameException(const TFilePath &fp, const std::wstring &msg = std::wstring())
 		: TException(fp.getWideName() + L":" + msg)
 	{
 	}
@@ -229,8 +229,8 @@ private:
 
 //-----------------------------------------------------------------------------
 
-DVAPI ostream &operator<<(ostream &out, const TFilePath &path);
+DVAPI std::ostream &operator<<(std::ostream &out, const TFilePath &path);
 
-typedef list<TFilePath> TFilePathSet;
+typedef std::list<TFilePath> TFilePathSet;
 
 #endif //T_FILEPATH_INCLUDED

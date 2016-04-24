@@ -23,7 +23,7 @@ using namespace std;
 #include <QCoreApplication>
 #include <QUuid>
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <qdesktopservices>
 #include <qhostinfo>
 #include <shlobj.h>
@@ -165,7 +165,7 @@ QString TSystem::getUserName()
 	for (j = 0; j < list.size(); j++) {
 		QString value = list.at(j);
 		QString user;
-#ifdef WIN32
+#ifdef _WIN32
 		if (value.startsWith("USERNAME="))
 			user = value.right(value.size() - 9);
 #else
@@ -364,7 +364,7 @@ else
 */
 //------------------------------------------------------------
 /*
-#ifdef WIN32
+#ifdef _WIN32
 
 wstring getFormattedMessage(DWORD lastError)
 {
@@ -446,7 +446,7 @@ void TSystem::deleteFile(const TFilePath &fp)
 
 void TSystem::hideFile(const TFilePath &fp)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	if (!SetFileAttributesW(fp.getWideString().c_str(), FILE_ATTRIBUTE_HIDDEN))
 		throw TSystemException(fp, "can't hide file!");
 #else // MACOSX, and others
@@ -931,7 +931,7 @@ bool TSystem::touchParentDir(const TFilePath &fp)
 
 bool TSystem::showDocument(const TFilePath &path)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	int ret = (int)
 		ShellExecuteW(0, L"open", path.getWideString().c_str(), 0, 0, SW_SHOWNORMAL);
 	if (ret <= 32) {
@@ -998,7 +998,7 @@ TSystemException::TSystemException(const TFilePath &fname, int err)
 
 //--------------------------------------------------------------
 
-TSystemException::TSystemException(const TFilePath &fname, const string &msg)
+TSystemException::TSystemException(const TFilePath &fname, const std::string &msg)
 	: m_fname(fname), m_err(-1), m_msg(toWideString(msg))
 {
 }
@@ -1011,7 +1011,7 @@ TSystemException::TSystemException(const TFilePath &fname, const wstring &msg)
 
 //--------------------------------------------------------------
 
-TSystemException::TSystemException(const string &msg)
+TSystemException::TSystemException(const std::string &msg)
 	: m_fname(""), m_err(-1), m_msg(toWideString(msg))
 {
 }

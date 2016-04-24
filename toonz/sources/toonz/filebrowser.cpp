@@ -148,7 +148,7 @@ QMutex levelFileMutex;
 
 } // namespace
 
-inline bool isMultipleFrameType(string type)
+inline bool isMultipleFrameType(std::string type)
 {
 	return (type == "tlv" || type == "tzl" || type == "pli" || type == "mov" || type == "avi" ||
 			type == "3gp");
@@ -742,7 +742,7 @@ void FileBrowser::setUnregisteredFolder(const TFilePath &fp)
 
 //-----------------------------------------------------------------------------
 
-void FileBrowser::setHistoryDay(string dayDateString)
+void FileBrowser::setHistoryDay(std::string dayDateString)
 {
 	m_folder = TFilePath();
 	m_dayDateString = dayDateString;
@@ -805,7 +805,7 @@ void FileBrowser::readInfo(Item &item)
 	{
 		try {
 			//Find this level's item
-			map<TFilePath, Item>::iterator it = m_multiFileItemMap.find(TFilePath(item.m_path.getLevelName()));
+			std::map<TFilePath, Item>::iterator it = m_multiFileItemMap.find(TFilePath(item.m_path.getLevelName()));
 			if (it == m_multiFileItemMap.end())
 				throw "";
 
@@ -920,7 +920,7 @@ QVariant FileBrowser::getItemData(int index, DataType dataType, bool isSelected)
 			readFrameCount(item);
 		return item.m_frameCount;
 	} else if (dataType == PlayAvailable) {
-		string type = item.m_path.getType();
+		std::string type = item.m_path.getType();
 		if (item.m_frameCount > 1 && type != "tzp" && type != "tzu")
 			return true;
 		return false;
@@ -1012,14 +1012,14 @@ bool FileBrowser::renameFile(TFilePath &fp, QString newName)
 
 	TFilePath newFp(newName.toStdWString());
 	if (newFp.getType() != "" && newFp.getType() != fp.getType()) {
-		MsgBox(CRITICAL, tr("Can't change file extension"));
+		DVGui::error(tr("Can't change file extension"));
 		return false;
 	}
 	if (newFp.getType() == "")
 		newFp = newFp.withType(fp.getType());
 	if (newFp.getFrame() != TFrameId::EMPTY_FRAME &&
 		newFp.getFrame() != TFrameId::NO_FRAME) {
-		MsgBox(CRITICAL, tr("Can't set a drawing number"));
+		DVGui::error(tr("Can't set a drawing number"));
 		return false;
 	}
 	if (newFp.getDots() != fp.getDots()) {
@@ -1035,7 +1035,7 @@ bool FileBrowser::renameFile(TFilePath &fp, QString newName)
 		return false;
 
 	if (TSystem::doesExistFileOrLevel(newFp)) {
-		MsgBox(CRITICAL, tr("Can't rename. File already exists: ") + toQString(newFp));
+		DVGui::error(tr("Can't rename. File already exists: ") + toQString(newFp));
 		return false;
 	}
 
@@ -1057,7 +1057,7 @@ bool FileBrowser::renameFile(TFilePath &fp, QString newName)
 		}
 
 	} catch (...) {
-		MsgBox(CRITICAL, tr("Couldn't rename ") + toQString(fp) + " to " + toQString(newFp));
+		DVGui::error(tr("Couldn't rename ") + toQString(fp) + " to " + toQString(newFp));
 		return false;
 	}
 
@@ -1091,7 +1091,7 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index)
 		menu->addAction(cm->getAction(MI_LoadScene));
 	}
 
-#ifdef WIN32
+#ifdef _WIN32
 	else if (files.size() == 1 && files[0].getType() == "scr") {
 		QAction *action;
 		action = new QAction(tr("Preview Screensaver"), menu);
@@ -1492,11 +1492,11 @@ bool FileBrowser::drop(const QMimeData *mimeData)
 		if (!sl)
 			return false;
 
-		wstring levelName = sl->getName();
+		std::wstring levelName = sl->getName();
 		folderPath += TFilePath(levelName + toWideString(sl->getPath().getDottedType()));
 		if (TSystem::doesExistFileOrLevel(folderPath)) {
 			QString question = "Level " + toQString(folderPath) + " already exists\nDo you want to duplicate it?";
-			int ret = MsgBox(question, QObject::tr("Duplicate"), QObject::tr("Don't Duplicate"), 0);
+			int ret = DVGui::MsgBox(question, QObject::tr("Duplicate"), QObject::tr("Don't Duplicate"), 0);
 			if (ret == 2 || ret == 0)
 				return false;
 			TFilePath path = folderPath;
@@ -1529,7 +1529,7 @@ bool FileBrowser::drop(const QMimeData *mimeData)
 			TFilePath dstFp = srcFp.withParentDir(folderPath);
 			if (dstFp != srcFp) {
 				if (!TSystem::copyFileOrLevel(dstFp, srcFp))
-					MsgBox(CRITICAL, tr("There was an error copying %1 to %2").arg(toQString(srcFp)).arg(toQString(dstFp)));
+					DVGui::error(tr("There was an error copying %1 to %2").arg(toQString(srcFp)).arg(toQString(dstFp)));
 			}
 		}
 		refreshFolder(folderPath);
@@ -1563,7 +1563,7 @@ void FileBrowser::loadResources()
 void RenameAsToonzPopup::onOk()
 {
 	if (!isValidFileName(m_name->text())) {
-		MsgBox(CRITICAL, tr("The file name cannot be empty or contain any of the following characters:(new line)  \\ / : * ? \"  |"));
+		DVGui::error(tr("The file name cannot be empty or contain any of the following characters:(new line)  \\ / : * ? \"  |"));
 		return;
 	}
 	accept();
@@ -1727,10 +1727,10 @@ void renameSingleFileOrToonzLevel(const QString &fullpath)
 	if (popup.exec() != QDialog::Accepted)
 		return;
 
-	string name = popup.getName().toStdString();
+	std::string name = popup.getName().toStdString();
 
 	if (name == fpin.getName()) {
-		MsgBox(CRITICAL, QString(QObject::tr("The specified name is already assigned to the %1 file.").arg(fullpath)));
+		DVGui::error(QString(QObject::tr("The specified name is already assigned to the %1 file.").arg(fullpath)));
 		return;
 	}
 
@@ -1772,7 +1772,7 @@ void doRenameAsToonzLevel(const QString &fullpath)
 	TFilePath levelOut(levelOutStr.toStdWString());
 	if (TSystem::doesExistFileOrLevel(levelOut)) {
 		QApplication::restoreOverrideCursor();
-		int ret = MsgBox(QObject::tr("Warning: level %1 already exists; overwrite?").arg(toQString(levelOut)), QObject::tr("Yes"), QObject::tr("No"), 1);
+		int ret = DVGui::MsgBox(QObject::tr("Warning: level %1 already exists; overwrite?").arg(toQString(levelOut)), QObject::tr("Yes"), QObject::tr("No"), 1);
 		QApplication::setOverrideCursor(Qt::WaitCursor);
 		if (ret == 2 || ret == 0)
 			return;
@@ -1789,12 +1789,12 @@ void doRenameAsToonzLevel(const QString &fullpath)
 		if (popup.doOverwrite()) {
 			if (!QFile::rename(parentPath + "/" + pathIn[i], pathOut)) {
 				QString tmp(parentPath + "/" + pathIn[i]);
-				MsgBox(CRITICAL, QString(QObject::tr("It is not possible to rename the %1 file.").arg(tmp)));
+				DVGui::error(QString(QObject::tr("It is not possible to rename the %1 file.").arg(tmp)));
 				return;
 			}
 		} else if (!QFile::copy(parentPath + "/" + pathIn[i], pathOut)) {
 			QString tmp(parentPath + "/" + pathIn[i]);
-			MsgBox(CRITICAL, QString(QObject::tr("It is not possible to copy the %1 file.").arg(tmp)));
+			DVGui::error(QString(QObject::tr("It is not possible to copy the %1 file.").arg(tmp)));
 
 			return;
 		}
@@ -1843,13 +1843,13 @@ void FileBrowser::convertToUnpaintedTlv()
 	QApplication::setOverrideCursor(Qt::WaitCursor);
 
 	int i, totFrames = 0;
-	vector<Convert2Tlv *> converters;
+	std::vector<Convert2Tlv *> converters;
 	for (i = 0; i < filePaths.size(); i++) {
 		Convert2Tlv *converter = new Convert2Tlv(filePaths[i], TFilePath(), TFilePath(), -1, -1, autoclose == sl.at(0), TFilePath(), 0, 0, 0);
 
 		if (TSystem::doesExistFileOrLevel(converter->m_levelOut)) {
 			QApplication::restoreOverrideCursor();
-			int ret = MsgBox(tr("Warning: level %1 already exists; overwrite?").arg(toQString(converter->m_levelOut)), tr("Yes"), tr("No"), 1);
+			int ret = DVGui::MsgBox(tr("Warning: level %1 already exists; overwrite?").arg(toQString(converter->m_levelOut)), tr("Yes"), tr("No"), 1);
 			QApplication::setOverrideCursor(Qt::WaitCursor);
 			if (ret == 2 || ret == 0) {
 				delete converter;
@@ -1870,10 +1870,10 @@ void FileBrowser::convertToUnpaintedTlv()
 	ProgressDialog pb("", "Cancel", 0, totFrames);
 	int j, l, k = 0;
 	for (i = 0; i < converters.size(); i++) {
-		string errorMessage;
+		std::string errorMessage;
 		if (!converters[i]->init(errorMessage)) {
 			converters[i]->abort();
-			MsgBox(CRITICAL, QString::fromStdString(errorMessage));
+			DVGui::error(QString::fromStdString(errorMessage));
 			delete converters[i];
 			converters[i] = 0;
 			continue;
@@ -1885,7 +1885,7 @@ void FileBrowser::convertToUnpaintedTlv()
 		pb.show();
 
 		for (j = 0; j < count; j++) {
-			string errorMessage = "";
+			std::string errorMessage = "";
 			if (!converters[i]->convertNext(errorMessage) || pb.wasCanceled()) {
 				for (l = i; l < converters.size(); l++) {
 					converters[l]->abort();
@@ -1893,7 +1893,7 @@ void FileBrowser::convertToUnpaintedTlv()
 					converters[i] = 0;
 				}
 				if (errorMessage != "")
-					MsgBox(CRITICAL, QString::fromStdString(errorMessage));
+					DVGui::error(QString::fromStdString(errorMessage));
 				QApplication::restoreOverrideCursor();
 				FileBrowser::refreshFolder(filePaths[0].getParentDir());
 				return;
@@ -1909,7 +1909,7 @@ void FileBrowser::convertToUnpaintedTlv()
 
 	QApplication::restoreOverrideCursor();
 	pb.hide();
-	MsgBox(INFORMATION, tr("Done: All Levels  converted to TLV Format"));
+	DVGui::info(tr("Done: All Levels  converted to TLV Format"));
 
 	FileBrowser::refreshFolder(filePaths[0].getParentDir());
 }
@@ -1941,7 +1941,7 @@ void FileBrowser::convertToPaintedTlv()
 
 	if (TSystem::doesExistFileOrLevel(converter->m_levelOut)) {
 		QApplication::restoreOverrideCursor();
-		int ret = MsgBox(tr("Warning: level %1 already exists; overwrite?").arg(toQString(converter->m_levelOut)), tr("Yes"), tr("No"), 1);
+		int ret = DVGui::MsgBox(tr("Warning: level %1 already exists; overwrite?").arg(toQString(converter->m_levelOut)), tr("Yes"), tr("No"), 1);
 		QApplication::setOverrideCursor(Qt::WaitCursor);
 		if (ret == 2 || ret == 0) {
 			QApplication::restoreOverrideCursor();
@@ -1950,11 +1950,11 @@ void FileBrowser::convertToPaintedTlv()
 		TSystem::removeFileOrLevel(converter->m_levelOut);
 	}
 
-	string errorMessage;
+	std::string errorMessage;
 	if (!converter->init(errorMessage)) {
 		converter->abort();
 		delete converter;
-		MsgBox(CRITICAL, QString::fromStdString(errorMessage));
+		DVGui::error(QString::fromStdString(errorMessage));
 		QApplication::restoreOverrideCursor();
 		return;
 	}
@@ -1969,7 +1969,7 @@ void FileBrowser::convertToPaintedTlv()
 			converter->abort();
 			delete converter;
 			if (errorMessage != "")
-				MsgBox(CRITICAL, QString::fromStdString(errorMessage));
+				DVGui::error(QString::fromStdString(errorMessage));
 			QApplication::restoreOverrideCursor();
 			FileBrowser::refreshFolder(filePaths[0].getParentDir());
 			return;
@@ -1984,7 +1984,7 @@ void FileBrowser::convertToPaintedTlv()
 
 	QApplication::restoreOverrideCursor();
 	pb.hide();
-	MsgBox(INFORMATION, tr("Done: 2 Levels  converted to TLV Format"));
+	DVGui::info(tr("Done: 2 Levels  converted to TLV Format"));
 
 	fs->selectNone();
 	FileBrowser::refreshFolder(filePaths[0].getParentDir());
@@ -2115,7 +2115,7 @@ void FileBrowser::newFolder()
 	if (parentFolder == TFilePath() || !TFileStatus(parentFolder).isDirectory())
 		return;
 	QString tempName(tr("New Folder"));
-	wstring folderName = tempName.toStdWString();
+	std::wstring folderName = tempName.toStdWString();
 	TFilePath folderPath = parentFolder + folderName;
 	int i = 1;
 	while (TFileStatus(folderPath).doesExist())
@@ -2125,7 +2125,7 @@ void FileBrowser::newFolder()
 		TSystem::mkDir(folderPath);
 
 	} catch (...) {
-		MsgBox(CRITICAL, tr("It is not possible to create the %1 folder.").arg(toQString(folderPath)));
+		DVGui::error(tr("It is not possible to create the %1 folder.").arg(toQString(folderPath)));
 		return;
 	}
 
@@ -2135,7 +2135,7 @@ void FileBrowser::newFolder()
 	model->refresh(parentFolderIndex);
 	m_folderTreeView->expand(parentFolderIndex);
 
-	wstring newFolderName = folderPath.getWideName();
+	std::wstring newFolderName = folderPath.getWideName();
 	QModelIndex newFolderIndex = model->childByName(parentFolderIndex, newFolderName);
 	if (newFolderIndex.isValid()) {
 		m_folderTreeView->setCurrentIndex(newFolderIndex);

@@ -573,7 +573,7 @@ CleanupPreprocessedImage *TCleanupper::process(
 	bool isSameDpi = false;
 	bool autocentered = getResampleValues(image, aff, blur, outDim, outDpi, isCameraTest, isSameDpi);
 	if (m_parameters->m_autocenterType != AUTOCENTER_NONE && !autocentered)
-		DVGui::MsgBox(DVGui::WARNING, QObject::tr("The autocentering failed on the current drawing."));
+		DVGui::warning(QObject::tr("The autocentering failed on the current drawing."));
 
 	bool fromGr8 = (bool)TRasterGR8P(image->getRaster());
 	bool toGr8 = (m_parameters->m_lineProcessingMode == lpGrey);

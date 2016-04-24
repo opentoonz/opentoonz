@@ -8,15 +8,13 @@
 
 #include <QList>
 
-using namespace DVGui;
-
 class QPushButton;
 class QTreeWidget;
 class QCheckBox;
 
 //-----------------------------------------------------------------------------
 
-class SVNRevertDialog : public Dialog
+class SVNRevertDialog : public DVGui::Dialog
 {
 	Q_OBJECT
 
@@ -75,7 +73,7 @@ signals:
 
 //-----------------------------------------------------------------------------
 
-class SVNRevertFrameRangeDialog : public Dialog
+class SVNRevertFrameRangeDialog : public DVGui::Dialog
 {
 	Q_OBJECT
 

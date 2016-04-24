@@ -21,20 +21,20 @@ class DVAPI TStringTable
 {
 public:
 	static const TStringTable *instance();
-	static wstring translate(string);
+	static std::wstring translate(std::string);
 
 	class Item
 	{
 	public:
-		wstring m_name, m_help, m_tip;
+		std::wstring m_name, m_help, m_tip;
 		Item() : m_name(), m_help(), m_tip(){};
 	};
 
-	virtual const Item *getItem(string name) const = 0;
+	virtual const Item *getItem(std::string name) const = 0;
 
-	virtual std::pair<string, int> getDefaultFontNameAndSize() const = 0;
+	virtual std::pair<std::string, int> getDefaultFontNameAndSize() const = 0;
 
-	virtual string getDefaultMacFontName() const = 0;
+	virtual std::string getDefaultMacFontName() const = 0;
 
 protected:
 	TStringTable();

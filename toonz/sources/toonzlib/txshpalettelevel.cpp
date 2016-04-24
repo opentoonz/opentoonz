@@ -17,7 +17,7 @@ PERSIST_IDENTIFIER(TXshPaletteLevel, "paletteLevel")
 //=============================================================================
 // TXshPaletteLevel
 
-TXshPaletteLevel::TXshPaletteLevel(wstring name)
+TXshPaletteLevel::TXshPaletteLevel(std::wstring name)
 	: TXshLevel(m_classCode, name), m_palette(0)
 {
 	m_type = PLT_XSHLEVEL;
@@ -60,10 +60,10 @@ void TXshPaletteLevel::setPath(const TFilePath &path)
 
 void TXshPaletteLevel::loadData(TIStream &is)
 {
-	string tagName;
+	std::string tagName;
 	while (is.matchTag(tagName)) {
 		if (tagName == "name") {
-			wstring name;
+			std::wstring name;
 			is >> name;
 			setName(name);
 		} else if (tagName == "path") {

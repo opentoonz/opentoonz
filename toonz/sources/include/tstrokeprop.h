@@ -53,7 +53,7 @@ class DVAPI TRasterImagePatternStrokeProp : public TStrokeProp
 {
 protected:
 	TRasterImagePatternStrokeStyle *m_colorStyle;
-	vector<TAffine> m_transformations;
+	std::vector<TAffine> m_transformations;
 
 public:
 	TRasterImagePatternStrokeProp(const TStroke *stroke, TRasterImagePatternStrokeStyle *style);
@@ -72,7 +72,7 @@ class DVAPI TVectorImagePatternStrokeProp : public TStrokeProp
 {
 protected:
 	TVectorImagePatternStrokeStyle *m_colorStyle;
-	vector<TAffine> m_transformations;
+	std::vector<TAffine> m_transformations;
 
 public:
 	TVectorImagePatternStrokeProp(const TStroke *stroke, TVectorImagePatternStrokeStyle *style);

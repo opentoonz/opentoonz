@@ -22,14 +22,14 @@ class CCallCircle
 {
 	double m_r;
 	int m_nb;
-	SXYDW *m_c;
+	std::unique_ptr<SXYDW[]> m_c;
 
 	void draw(UCHAR *drawB, const int lX, const int lY,
 			  const int xx, const int yy, const double r);
 	void null();
 
 public:
-	CCallCircle() : m_r(0.0), m_nb(0), m_c(0){};
+	CCallCircle() : m_r(0.0), m_nb(0) {}
 	CCallCircle(const double r);
 	virtual ~CCallCircle();
 	void print();
@@ -38,7 +38,7 @@ public:
 	void getCC(CSTColSelPic<P> &pic, P &col)
 	{
 		int xy = pic.m_lX * pic.m_lY;
-		UCHAR *pSel = pic.m_sel;
+		UCHAR *pSel = pic.m_sel.get();
 		for (int i = 0; i < xy; i++, pSel++)
 			if (*pSel > (UCHAR)0) {
 				P *pPic = pic.m_pic + i;
@@ -57,7 +57,7 @@ public:
 			int x = xx + m_c[i].x;
 			int y = yy + m_c[i].y;
 			if (x >= 0 && y >= 0 && x < pic.m_lX && y < pic.m_lY) {
-				UCHAR *pSel = pic.m_sel + y * pic.m_lX + x;
+				UCHAR *pSel = pic.m_sel.get() + y * pic.m_lX + x;
 				if (*pSel > (UCHAR)0) {
 					P *pPic = pic.m_pic + y * pic.m_lX + x;
 					col.r = pPic->r;
@@ -128,15 +128,14 @@ public:
 			return;
 
 		try {
-			UCHAR *drawB = 0;
 			CSTColSelPic<P> picOri;
 			picOri = pic;
 			if (pic.m_lX > 0 && pic.m_lY > 0) {
-				drawB = new UCHAR[pic.m_lX * pic.m_lY];
+				std::unique_ptr<UCHAR[]> drawB(new UCHAR[pic.m_lX * pic.m_lY]);
 				if (!drawB)
 					throw SMemAllocError("in callCircle");
-				memset(drawB, 0, pic.m_lX * pic.m_lY);
-				UCHAR *pSel = pic.m_sel;
+				memset(drawB.get(), 0, pic.m_lX * pic.m_lY);
+				UCHAR *pSel = pic.m_sel.get();
 				for (int y = 0; y < pic.m_lY; y++)
 					for (int x = 0; x < pic.m_lX; x++, pSel++)
 						if (*pSel > (UCHAR)0) {
@@ -144,10 +143,9 @@ public:
 							int rani = I_ROUND(random);
 							int ranii = rani > 0 ? rand() % (2 * rani) - 15 * rani / 8 : 0;
 							q = q * (1.0 + (double)ranii / 100.0);
-							draw(drawB, pic.m_lX, pic.m_lY, x, y, q);
+							draw(drawB.get(), pic.m_lX, pic.m_lY, x, y, q);
 						}
-				setNewContour(picOri, pic, drawB, isOneCC);
-				delete[] drawB;
+				setNewContour(picOri, pic, drawB.get(), isOneCC);
 			}
 		} catch (SMemAllocError) {
 			throw;

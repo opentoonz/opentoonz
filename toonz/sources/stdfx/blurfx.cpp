@@ -1,9 +1,3 @@
-
-
-#ifdef WIN32
-#define NOMINMAX
-#endif
-
 #include "texception.h"
 #include "tfxparam.h"
 #include "trop.h"

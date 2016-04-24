@@ -65,7 +65,7 @@ public:
     and grammar-recognized patterns that is able to calculate the
     expression's value at a given frame.
   */
-	void setText(string text);
+	void setText(std::string text);
 	std::string getText() const;
 
 	TSyntax::Calculator *getCalculator();

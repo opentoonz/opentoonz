@@ -66,7 +66,7 @@ public:
 
 private:
 	TStageObject *m_stageObject;
-	vector<Range> m_ranges;
+	std::vector<Range> m_ranges;
 	TAffine m_placement;
 	int getRangeIndex(int frame) const;
 };

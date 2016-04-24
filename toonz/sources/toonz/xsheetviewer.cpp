@@ -97,8 +97,8 @@ void XsheetViewer::getCellTypeAndColors(
 			sideColor = XsheetGUI::SoundTextColumnBorderColor;
 			break;
 		case MESH_XSHLEVEL:
-			cellColor = XsheetGUI::MeshColumnColor;
-			sideColor = XsheetGUI::MeshColumnBorderColor;
+			cellColor = (isSelected) ? getSelectedMeshColumnColor() : getMeshColumnColor();
+			sideColor = getMeshColumnBorderColor();
 			break;
 		case UNKNOWN_XSHLEVEL:
 		case NO_XSHLEVEL:

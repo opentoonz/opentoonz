@@ -80,8 +80,8 @@ void doConvolve_row_9_i(PIXOUT *pixout, int n, PIXIN *pixarr[], long w[])
 template <class PIXOUT>
 void doConvolve_cm32_row_9_i(PIXOUT *pixout, int n,
 							 TPixelCM32 *pixarr[], long w[],
-							 const vector<TPixel32> &paints,
-							 const vector<TPixel32> &inks)
+							 const std::vector<TPixel32> &paints,
+							 const std::vector<TPixel32> &inks)
 {
 	long w1, w2, w3, w4, w5, w6, w7, w8, w9;
 	TPixelCM32 *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9;
@@ -181,8 +181,8 @@ void doConvolve_row_i(PIXOUT *pixout, int n,
 template <class PIXOUT>
 void doConvolve_cm32_row_i(PIXOUT *pixout, int n,
 						   TPixelCM32 *pixarr[], long w[], int pixn,
-						   const vector<TPixel32> &paints,
-						   const vector<TPixel32> &inks)
+						   const std::vector<TPixel32> &paints,
+						   const std::vector<TPixel32> &inks)
 {
 	long ar, ag, ab, am;
 	int i;
@@ -304,8 +304,8 @@ void doConvolve_i(TRasterPT<PIXOUT> rout,
 	PIXOUT *pixout;
 
 	int radiusSquare = sq(radius);
-	PIXIN **pixarr = new PIXIN *[radiusSquare];
-	long *w = new long[radiusSquare];
+	std::unique_ptr<PIXIN*[]> pixarr(new PIXIN *[radiusSquare]);
+	std::unique_ptr<long[]> w(new long[radiusSquare]);
 	int pixn;
 	int wrapin, wrapout;
 	int x, y, n;
@@ -356,7 +356,7 @@ void doConvolve_i(TRasterPT<PIXOUT> rout,
 					pixn++;
 				}
 
-			doConvolve_row_i<PIXOUT, PIXIN>(pixout, n, pixarr, w, pixn);
+			doConvolve_row_i<PIXOUT, PIXIN>(pixout, n, pixarr.get(), w.get(), pixn);
 
 			x += n;
 			pixin += n;
@@ -366,9 +366,6 @@ void doConvolve_i(TRasterPT<PIXOUT> rout,
 
 	rin->unlock();
 	rout->unlock();
-
-	delete[] w;
-	delete[] pixarr;
 }
 
 //------------------------------------------------------------------------------
@@ -465,8 +462,8 @@ void doConvolve_cm32_i(TRasterPT<PIXOUT> rout,
 	TPixelCM32 *pixin;
 	PIXOUT *pixout;
 	int radiusSquare = sq(radius);
-	TPixelCM32 **pixarr = new TPixelCM32 *[radiusSquare];
-	long *w = new long[radiusSquare];
+	std::unique_ptr<TPixelCM32*[]> pixarr(new TPixelCM32*[radiusSquare]);
+	std::unique_ptr<long[]> w(new long[radiusSquare]);
 	int pixn;
 	int wrapin, wrapout;
 	int x, y, n;
@@ -526,7 +523,7 @@ void doConvolve_cm32_i(TRasterPT<PIXOUT> rout,
 					pixn++;
 				}
 
-			doConvolve_cm32_row_i<PIXOUT>(pixout, n, pixarr, w, pixn, paints, inks);
+			doConvolve_cm32_row_i<PIXOUT>(pixout, n, pixarr.get(), w.get(), pixn, paints, inks);
 
 			x += n;
 			pixin += n;
@@ -536,9 +533,6 @@ void doConvolve_cm32_i(TRasterPT<PIXOUT> rout,
 
 	rin->unlock();
 	rout->unlock();
-
-	delete[] pixarr;
-	delete[] w;
 }
 
 } // anonymous namespace

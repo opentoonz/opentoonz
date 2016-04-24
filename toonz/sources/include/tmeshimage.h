@@ -145,7 +145,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DVAPI TSmartPointerT<TTextureMesh>;
 #endif
 
@@ -204,7 +204,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DVAPI TSmartPointerT<TMeshImage>;
 template class DVAPI TDerivedSmartPointerT<TMeshImage, TImage>;
 #endif
@@ -215,7 +215,7 @@ public:
 	TMeshImageP() {}
 	TMeshImageP(TMeshImage *image) : DerivedSmartPointer(image) {}
 	TMeshImageP(TImageP image) : DerivedSmartPointer(image) {}
-#if !defined(WIN32)
+#if !defined(_WIN32)
 	TMeshImageP(TImage *image) : DerivedSmartPointer(TImageP(image))
 	{
 	}

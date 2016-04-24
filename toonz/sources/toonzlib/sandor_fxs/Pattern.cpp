@@ -3,7 +3,7 @@
 // Pattern.cpp: implementation of the CPattern class.
 //
 //////////////////////////////////////////////////////////////////////
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(disable : 4996)
 #endif
 
@@ -30,7 +30,7 @@
 
 //#define P(a) tmsg_warning("-- %d --",a)
 
-CPattern::CPattern(RASTER *imgContour) : m_lX(0), m_lY(0), m_pat(0)
+CPattern::CPattern(RASTER *imgContour) : m_lX(0), m_lY(0)
 {
 	if (!readPattern(imgContour)) {
 		throw SFileReadError();
@@ -50,10 +50,7 @@ CPattern::~CPattern()
 void CPattern::null()
 {
 	m_lX = m_lY = 0;
-	if (m_pat) {
-		delete[] m_pat;
-		m_pat = 0;
-	}
+	m_pat.reset();
 	m_fn[0] = '\0';
 }
 
@@ -130,7 +127,7 @@ bool CPattern::readPattern(RASTER *imgContour)
 			if (lpic.m_lX > 0 && lpic.m_lY > 0 && lpic.m_pic) {
 				m_lX = lpic.m_lX;
 				m_lY = lpic.m_lY;
-				m_pat = new UC_PIXEL[m_lX * m_lY];
+				m_pat.reset(new UC_PIXEL[m_lX * m_lY]);
 				if (!m_pat) {
 					m_lX = m_lY = 0;
 					lpic.null();
@@ -140,7 +137,7 @@ bool CPattern::readPattern(RASTER *imgContour)
 				for (int y = 0; y < m_lY; y++)
 					for (int x = 0; x < m_lX; x++) {
 						UC_PIXEL *plp = lpic.m_pic + y * lpic.m_lX + x;
-						UC_PIXEL *ucp = m_pat + y * m_lX + x;
+						UC_PIXEL *ucp = m_pat.get() + y * m_lX + x;
 						ucp->r = plp->r;
 						ucp->g = plp->g;
 						ucp->b = plp->b;
@@ -169,7 +166,7 @@ void CPattern::getMapPixel(const int xx, const int yy, const double invScale,
 	int x = I_ROUND(d2xx);
 	int y = I_ROUND(d2yy);
 	if (x >= 0 && x < m_lX && y >= 0 && y < m_lY) {
-		pucp = m_pat + y * m_lX + x;
+		pucp = m_pat.get() + y * m_lX + x;
 		pucp = (pucp->m) == (UCHAR)0 ? 0 : pucp;
 	}
 }
@@ -183,7 +180,7 @@ void CPattern::getMapPixel(const int xx, const int yy, const double invScale,
 	int x = I_ROUND(dxx);
 	int y = I_ROUND(dyy);
 	if (x >= 0 && x < m_lX && y >= 0 && y < m_lY) {
-		pucp = m_pat + y * m_lX + x;
+		pucp = m_pat.get() + y * m_lX + x;
 		pucp = (pucp->m) == (UCHAR)0 ? 0 : pucp;
 	}
 }
@@ -194,7 +191,7 @@ void CPattern::getBBox(SRECT &bb)
 	bb.y0 = m_lY;
 	bb.x1 = -1;
 	bb.y1 = -1;
-	UC_PIXEL *pPic = m_pat;
+	UC_PIXEL *pPic = m_pat.get();
 	for (int y = 0; y < m_lY; y++)
 		for (int x = 0; x < m_lX; x++, pPic++)
 			if (pPic->m > (UCHAR)0) {
@@ -213,7 +210,7 @@ void CPattern::optimalizeSize()
 	if (bb.x0 <= bb.x1 && bb.y0 <= bb.y1) {
 		int nLX = bb.x1 - bb.x0 + 1;
 		int nLY = bb.y1 - bb.y0 + 1;
-		UC_PIXEL *nPat = new UC_PIXEL[nLX * nLY];
+		std::unique_ptr<UC_PIXEL[]> nPat(new UC_PIXEL[nLX * nLY]);
 		if (!nPat) {
 			char s[200];
 			sprintf(s, "in Pattern Optimalization \n");
@@ -221,8 +218,8 @@ void CPattern::optimalizeSize()
 		}
 		for (int y = bb.y0; y <= bb.y1; y++)
 			for (int x = bb.x0; x <= bb.x1; x++) {
-				UC_PIXEL *pPat = m_pat + y * m_lX + x;
-				UC_PIXEL *pNPat = nPat + (y - bb.y0) * nLX + x - bb.x0;
+				UC_PIXEL *pPat = m_pat.get() + y * m_lX + x;
+				UC_PIXEL *pNPat = nPat.get() + (y - bb.y0) * nLX + x - bb.x0;
 				pNPat->r = pPat->r;
 				pNPat->g = pPat->g;
 				pNPat->b = pPat->b;
@@ -230,8 +227,7 @@ void CPattern::optimalizeSize()
 			}
 		m_lX = nLX;
 		m_lY = nLY;
-		delete[] m_pat;
-		m_pat = nPat;
+		m_pat = std::move(nPat);
 	}
 }
 
@@ -255,15 +251,15 @@ void CPattern::rotate(const double angle)
 	double co = cos(-DEG2RAD(angle));
 	double si = sin(-DEG2RAD(angle));
 
-	UC_PIXEL *nPat = new UC_PIXEL[nLXY * nLXY];
+	std::unique_ptr<UC_PIXEL[]> nPat(new UC_PIXEL[nLXY * nLXY]);
 	if (!nPat) {
 		char s[200];
 		sprintf(s, "in Pattern Rotation \n");
 		throw SMemAllocError(s);
 	}
-	eraseBuffer(nLXY, nLXY, nPat);
+	eraseBuffer(nLXY, nLXY, nPat.get());
 
-	UC_PIXEL *pNPat = nPat;
+	UC_PIXEL *pNPat = nPat.get();
 	for (int y = 0; y < nLXY; y++)
 		for (int x = 0; x < nLXY; x++, pNPat++) {
 			UC_PIXEL *pucp = 0;
@@ -276,8 +272,7 @@ void CPattern::rotate(const double angle)
 			}
 		}
 	m_lX = m_lY = nLXY;
-	delete[] m_pat;
-	m_pat = nPat;
+	m_pat = std::move(nPat);
 
 	try {
 		optimalizeSize();

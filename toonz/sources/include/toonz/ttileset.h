@@ -66,7 +66,7 @@ public:
 	// Nota: clona il raster!
 	virtual void add(const TRasterP &ras, TRect rect) = 0;
 
-	void getRects(vector<TRect> &rects) const;
+	void getRects(std::vector<TRect> &rects) const;
 	TRect getBBox() const;
 
 	int getTileCount() const { return (int)m_tiles.size(); }

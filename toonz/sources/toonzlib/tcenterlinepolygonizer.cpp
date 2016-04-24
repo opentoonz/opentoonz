@@ -166,13 +166,12 @@ inline unsigned char PixelEvaluator<TPixelCM32>::getBlackOrWhite(int x, int y)
 
 class Signaturemap
 {
-	unsigned char *m_array;
+	std::unique_ptr<unsigned char[]> m_array;
 	int m_rowSize;
 	int m_colSize;
 
 public:
 	Signaturemap(const TRasterP &ras, int threshold);
-	~Signaturemap() { delete[] m_array; }
 
 	template <typename T>
 	void readRasterData(const TRasterPT<T> &ras, int threshold);
@@ -238,11 +237,11 @@ void Signaturemap::readRasterData(const TRasterPT<T> &ras, int threshold)
 
 	m_rowSize = ras->getLx() + 2;
 	m_colSize = ras->getLy() + 2;
-	m_array = new unsigned char[m_rowSize * m_colSize];
+	m_array.reset(new unsigned char[m_rowSize * m_colSize]);
 
-	memset(m_array, none << 1, m_rowSize);
+	memset(m_array.get(), none << 1, m_rowSize);
 
-	currByte = m_array + m_rowSize;
+	currByte = m_array.get() + m_rowSize;
 	for (y = 0; y < ras->getLy(); ++y) {
 		*currByte = none << 1;
 		currByte++;
@@ -398,8 +397,8 @@ BorderList *extractBorders(const TRasterP &ras, int threshold, int despeckling)
 	Signaturemap byteImage(ras, threshold);
 
 	BorderList *borderHierarchy = new BorderList;
-	vector<RawBorder *> outerBorders;
-	list<RawBorder *> innerBorders;
+	std::vector<RawBorder *> outerBorders;
+	std::list<RawBorder *> innerBorders;
 	RawBorder *foundPath;
 
 	int x, y;
@@ -443,7 +442,7 @@ BorderList *extractBorders(const TRasterP &ras, int threshold, int despeckling)
 	//Now, we have all borders found, but no hierarchy between them.
 
 	unsigned int i;
-	list<RawBorder *>::iterator l;
+	std::list<RawBorder *>::iterator l;
 
 	//Build hierarchy
 
@@ -512,14 +511,13 @@ inline bool isCircular(int a, int b, int c)
 //--------------------------------------------------------------------------
 
 //Extracts a 'next corner' array - helps improving overall speed
-inline int *findNextCorners(RawBorder &path)
+inline std::unique_ptr<int[]> findNextCorners(RawBorder &path)
 {
-	int i, currentCorner;
-	int *corners = new int[path.size()];
+	std::unique_ptr<int[]> corners(new int[path.size()]);
 
 	//NOTE: 0 is a corner, due to the path extraction procedure.
-	currentCorner = 0;
-	for (i = path.size() - 1; i >= 0; --i) {
+	int currentCorner = 0;
+	for (int i = path.size() - 1; i >= 0; --i) {
 		if (path[currentCorner].x() != path[i].x() &&
 			path[currentCorner].y() != path[i].y())
 			currentCorner = i + 1;
@@ -532,11 +530,11 @@ inline int *findNextCorners(RawBorder &path)
 //--------------------------------------------------------------------------
 
 //Calculate furthest k satisfying 1) for all fixed i.
-inline int *furthestKs(RawBorder &path, int *&nextCorners)
+inline std::unique_ptr<int[]> furthestKs(RawBorder &path, std::unique_ptr<int[]>& nextCorners)
 {
 
 	int n = path.size();
-	int *kVector = new int[n];
+	std::unique_ptr<int[]> kVector(new int[n]);
 
 	enum { left,
 		   up,
@@ -650,17 +648,18 @@ inline int *furthestKs(RawBorder &path, int *&nextCorners)
 // arcs approximating the given raw border:
 //    for every a in [i,res[i]], the arc connecting border[i] and
 //    border[a] will be a possible one.
-inline int *calculateForwardArcs(RawBorder &border, bool ambiguitiesCheck)
+inline std::unique_ptr<int[]> calculateForwardArcs(RawBorder &border, bool ambiguitiesCheck)
 {
-	int i, j, n = (int)border.size();
+	int const n = (int)border.size();
 
-	int *nextCorners;
-	int *k = furthestKs(border, nextCorners);
-	int *K = new int[n];
-	int *res = new int[n];
+	std::unique_ptr<int[]> nextCorners;
+	std::unique_ptr<int[]> k = furthestKs(border, nextCorners);
+	std::unique_ptr<int[]> K(new int[n]);
+	std::unique_ptr<int[]> res(new int[n]);
 
 	//find K[i]= min {k[j]}, j=i..n-1.
-	for (i = 0; i < n; ++i) {
+	for (int i = 0; i < n; ++i) {
+		int j;
 		for (j = i, K[i] = k[i]; isCircular(i, j, K[i]); j = (j + 1) % n)
 			if (isCircular(j, k[j], K[i]))
 				K[i] = k[j];
@@ -672,7 +671,7 @@ inline int *calculateForwardArcs(RawBorder &border, bool ambiguitiesCheck)
 	//    square);
 	//  second, arcs of the kind [i,j] with j<i, become [i,n].
 
-	for (i = n - 1, j = 0; j < n; i = j, ++j) {
+	for (int i = n - 1, j = 0; j < n; i = j, ++j) {
 		res[j] = K[i] < j ? (K[i] == 0 ? n - 1 : n) : K[i] - 1;
 	}
 
@@ -680,14 +679,14 @@ inline int *calculateForwardArcs(RawBorder &border, bool ambiguitiesCheck)
 	//straight-skeleton thinning process.
 
 	if (ambiguitiesCheck) {
-		for (i = 1; nextCorners[i] > 0; i = nextCorners[i]) {
+		for (int i = 1; nextCorners[i] > 0; i = nextCorners[i]) {
 			if (border[i].getAmbiguous() == RawBorderPoint::right) {
 				//Check vertices from i (excluded) to res[res[i]]; if in it there exists vertex k so that pos(k)==pos(i)...
 				//This prevents the existence of 0 degree angles in the optimal polygon.
 
 				int rrPlus1 = (res[res[i] % n] + 1) % n;
 
-				for (j = nextCorners[i];
+				for (int j = nextCorners[i];
 					 isCircular(i, j, rrPlus1) && j != i; //remember that isCircular(a,a,b) == 1 ...
 					 j = nextCorners[j]) {
 					if (border[j].getAmbiguous() && (border[j].pos() == border[i].pos())) {
@@ -706,10 +705,6 @@ inline int *calculateForwardArcs(RawBorder &border, bool ambiguitiesCheck)
 			}
 		}
 	}
-
-	delete[] k;
-	delete[] K;
-	delete[] nextCorners;
 
 	return res;
 }
@@ -772,16 +767,15 @@ inline double penalty(RawBorder &path, int a, int b)
 
 inline void reduceBorder(RawBorder &border, Contour &res, bool ambiguitiesCheck)
 {
-	int i, j, k, a, *b, n = border.size(), m;
-	double newPenalty;
+	int n = border.size();
 	int minPenaltyNext;
-	int *minPenaltyNextArray = new int[n];
+	std::unique_ptr<int[]> minPenaltyNextArray(new int[n]);
 
 	//Calculate preliminary infos
-	int *longestArcFrom = calculateForwardArcs(border, ambiguitiesCheck);
+	std::unique_ptr<int[]> longestArcFrom = calculateForwardArcs(border, ambiguitiesCheck);
 	calculateSums(border);
 
-	double *penaltyToEnd = new double[n + 1];
+	std::unique_ptr<double[]> penaltyToEnd(new double[n + 1]);
 
 	//EXPLANATION:
 	//The fastest way to extract the optimal reduced border is based on the
@@ -793,24 +787,26 @@ inline void reduceBorder(RawBorder &border, Contour &res, bool ambiguitiesCheck)
 	//longestArc[a[i-1]-1]<a[i], and a[m]=n.
 
 	//Calculate m
-	for (i = 0, m = 0; i < n; i = longestArcFrom[i])
+	int m = 0;
+	for (int i = 0; i < n; i = longestArcFrom[i])
 		++m;
 
 	//Calculate b[]
-	b = new int[m + 1];
+	std::unique_ptr<int[]> b(new int[m + 1]);
 	b[m] = n;
-	for (i = 0, j = 0; j < m; i = longestArcFrom[i], ++j)
+	for (int i = 0, j = 0; j < m; i = longestArcFrom[i], ++j)
 		b[j] = i;
 
 	//NOTE: a[] need not be completely found - we just remember the
 	//a=a[j+1] currently needed.
 
 	//Now, build the optimal polygon
-	for (j = m - 1, a = n; j >= 0; --j) {
+	for (int j = m - 1, a = n; j >= 0; --j) {
+		int k;
 		for (k = b[j]; k >= 0 && longestArcFrom[k] >= a; --k) {
 			penaltyToEnd[k] = infinity;
-			for (i = a; i <= longestArcFrom[k]; ++i) {
-				newPenalty = penaltyToEnd[i] + penalty(border, k, i);
+			for (int i = a; i <= longestArcFrom[k]; ++i) {
+				double newPenalty = penaltyToEnd[i] + penalty(border, k, i);
 				if (newPenalty < penaltyToEnd[k])
 					penaltyToEnd[k] = newPenalty;
 				minPenaltyNext = i;
@@ -823,7 +819,7 @@ inline void reduceBorder(RawBorder &border, Contour &res, bool ambiguitiesCheck)
 	//Finally, read off the optimal polygon
 
 	res.resize(m);
-	for (i = j = 0; i < n; i = minPenaltyNextArray[i], ++j) {
+	for (int i = 0, j = 0; i < n; i = minPenaltyNextArray[i], ++j) {
 		res[j] = ContourNode(border[i].x(), border[i].y());
 
 		//Ambiguities are still remembered in the output polygon.
@@ -833,13 +829,9 @@ inline void reduceBorder(RawBorder &border, Contour &res, bool ambiguitiesCheck)
 			res[j].setAttribute(ContourNode::AMBIGUOUS_RIGHT);
 	}
 
-	delete[] longestArcFrom;
-	delete[] minPenaltyNextArray;
 	delete[] border.sums();
 	delete[] border.sums2();
 	delete[] border.sumsMix();
-	delete[] penaltyToEnd;
-	delete[] b;
 }
 
 //--------------------------------------------------------------------------

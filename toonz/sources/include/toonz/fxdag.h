@@ -31,8 +31,8 @@ class DVAPI FxDag
 	TFxSet *m_internalFxs, *m_terminalFxs;
 	TFx *m_xsheetFx;
 	std::vector<TOutputFx *> m_outputFxs;
-	std::map<string, int> m_typeTable;
-	std::map<wstring, TFx *> m_idTable;
+	std::map<std::string, int> m_typeTable;
+	std::map<std::wstring, TFx *> m_idTable;
 	int m_groupIdCount;
 	int m_dagGridDimension;
 
@@ -70,7 +70,7 @@ public:
 
 	void getFxs(std::vector<TFx *> &fxs) const;
 
-	TFx *getFxById(wstring id) const;
+	TFx *getFxById(std::wstring id) const;
 
 	void setDagGridDimension(int dim) { m_dagGridDimension = dim; }
 	int getDagGridDimension() const { return m_dagGridDimension; }

@@ -36,7 +36,7 @@ SavePresetPopup::SavePresetPopup()
 	: Dialog(TApp::instance()->getMainWindow(), true, true, "SavePreset")
 {
 	setWindowTitle(tr("Save Preset"));
-	addWidget(tr("Preset Name:"), m_nameFld = new LineEdit(this));
+	addWidget(tr("Preset Name:"), m_nameFld = new DVGui::LineEdit(this));
 	m_nameFld->setMinimumWidth(170);
 
 	QPushButton *okBtn = new QPushButton(tr("Save"), this);
@@ -67,7 +67,7 @@ bool SavePresetPopup::apply()
 
 	TMacroFx *macroFx = dynamic_cast<TMacroFx *>(fx);
 	bool isMacro = macroFx != 0;
-	wstring name = m_nameFld->text().toStdWString();
+	std::wstring name = m_nameFld->text().toStdWString();
 	if (name.empty())
 		return 0;
 	TFilePath fp = ToonzFolder::getFxPresetFolder() + "presets" + fx->getFxType() + (name + (isMacro ? L".macrofx" : L".fx"));
@@ -77,12 +77,12 @@ bool SavePresetPopup::apply()
 			TSystem::mkDir(parent);
 			DvDirModel::instance()->refreshFolder(parent.getParentDir());
 		} catch (...) {
-			error(tr("It is not possible to create the preset folder %1.").arg(QString::fromStdString(fp.getParentDir().getName())));
+			DVGui::error(tr("It is not possible to create the preset folder %1.").arg(QString::fromStdString(fp.getParentDir().getName())));
 			return 0;
 		}
 	}
 	if (TFileStatus(fp).doesExist()) {
-		if (MsgBox(tr("Do you want to overwrite?"), tr("Yes"), tr("No")) == 2)
+		if (DVGui::MsgBox(tr("Do you want to overwrite?"), tr("Yes"), tr("No")) == 2)
 			return 0;
 	}
 	if (isMacro) {

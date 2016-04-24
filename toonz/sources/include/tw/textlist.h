@@ -48,15 +48,15 @@ private:
 class DVAPI TTextListItem
 {
 public:
-	TTextListItem(const string &id, const string &caption);
+	TTextListItem(const std::string &id, const std::string &caption);
 	virtual ~TTextListItem() {}
 
-	string getId() { return m_id; }
-	string getCaption() { return m_caption; }
+	std::string getId() { return m_id; }
+	std::string getCaption() { return m_caption; }
 
 private:
-	string m_id;
-	string m_caption;
+	std::string m_id;
+	std::string m_caption;
 };
 
 //-------------------------------------------------------------------
@@ -64,29 +64,29 @@ private:
 class DVAPI TTextList : public TWidget
 {
 public:
-	TTextList(TWidget *parent, string name = "textlist");
+	TTextList(TWidget *parent, std::string name = "textlist");
 	~TTextList();
 
 	void addItem(TTextListItem *item);
-	void removeItem(const string &itemId);
+	void removeItem(const std::string &itemId);
 	void clearAll();
 
 	int getItemCount() const;
 	TTextListItem *getItem(int i) const;
 
 	// returns the index of item, -1 if not present
-	int itemToIndex(const string &itemId);
+	int itemToIndex(const std::string &itemId);
 
 	int getSelectedItemCount() const;
 	TTextListItem *getSelectedItem(int i) const;
-	string getSelectedItemId(int i) const; // returns the id of the i-th item selected
+	std::string getSelectedItemId(int i) const; // returns the id of the i-th item selected
 
 	void select(int i, bool on);
-	void select(const string &itemId, bool on);
+	void select(const std::string &itemId, bool on);
 	void unselectAll();
 
 	bool isSelected(int i) const;
-	bool isSelected(const string &itemId) const;
+	bool isSelected(const std::string &itemId) const;
 
 	void setSelAction(TGenericTextListAction *action);
 	void setDblClickAction(TGenericTextListAction *action);

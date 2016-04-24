@@ -34,7 +34,7 @@ class QLabel;
 class TXsheetHandle;
 class TPalette;
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(disable : 4251)
 #endif
 
@@ -244,7 +244,7 @@ signals:
     0 -> Cancel or Close Popup,
     1,2,3,... -> checkbox clicked.
 */
-class DVAPI RadioButtonDialog : public Dialog
+class DVAPI RadioButtonDialog : public DVGui::Dialog
 {
 	Q_OBJECT
 
@@ -267,7 +267,7 @@ int DVAPI RadioButtonMsgBox(MsgType type, const QString &labelText,
 
 //-----------------------------------------------------------------------------
 
-class DVAPI ProgressDialog : public Dialog
+class DVAPI ProgressDialog : public DVGui::Dialog
 {
 	Q_OBJECT
 

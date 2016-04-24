@@ -17,7 +17,7 @@
 #include <math.h>
 
 //Platform-specific includes
-#ifdef WIN32
+#ifdef _WIN32
 
 #ifndef x64
 #define float_t Float_t
@@ -155,14 +155,14 @@ void initImageIo(bool lightVersion)
 
 	if (!lightVersion) {
 
-#ifdef WIN32
+#ifdef _WIN32
 
 		TLevelWriter::define("avi", TLevelWriterAvi::create, true);
 		TLevelReader::define("avi", TLevelReaderAvi::create);
 		TFileType::declare("avi", TFileType::RASTER_LEVEL);
 		Tiio::defineWriterProperties("avi", new Tiio::AviWriterProperties());
 
-#endif // WIN32
+#endif // _WIN32
 
 		if (IsQuickTimeInstalled()) {
 			TLevelWriter::define("mov", TLevelWriterMov::create, true);
@@ -177,7 +177,7 @@ void initImageIo(bool lightVersion)
 		}
 
 		/*
-#if (defined(WIN32) && !defined(x64))
+#if (defined(_WIN32) && !defined(x64))
 
     TLevelWriter::define("pct", TLevelWriterPicPct::create, true);
     TLevelReader::define("pct", TLevelReaderPicPct::create);
@@ -192,7 +192,7 @@ void initImageIo(bool lightVersion)
     TFileType::declare("pict", TFileType::RASTER_LEVEL);
     Tiio::defineWriterProperties("pict", new Tiio::PctWriterProperties());
 
-#endif    // WIN32 && 32-bit
+#endif    // _WIN32 && 32-bit
 */
 	}
 }

@@ -24,7 +24,7 @@ class TPropertyGroup;
 
 class DVAPI CaptureParameters
 {
-	wstring m_deviceName;
+	std::wstring m_deviceName;
 	TDimension m_resolution;
 	int m_brightness;
 	int m_contranst;
@@ -34,15 +34,15 @@ class DVAPI CaptureParameters
 	int m_step;
 
 	TFilePath m_filePath;
-	string m_format;
-	std::map<string, TPropertyGroup *> m_formatProperties;
+	std::string m_format;
+	std::map<std::string, TPropertyGroup *> m_formatProperties;
 
 public:
 	CaptureParameters();
 	~CaptureParameters() {}
 
-	wstring getDeviceName() const { return m_deviceName; }
-	void setDeviceName(wstring name) { m_deviceName = name; }
+	std::wstring getDeviceName() const { return m_deviceName; }
+	void setDeviceName(std::wstring name) { m_deviceName = name; }
 
 	TDimension getResolution() const { return m_resolution; }
 	void setResolution(TDimension res) { m_resolution = res; }
@@ -68,16 +68,16 @@ public:
 	int getStep() const { return m_step; }
 	void setStep(int value) { m_step = value; }
 
-	string getFileFormat() const { return m_format; }
-	void setFileFormat(string value) { m_format = value; }
+	std::string getFileFormat() const { return m_format; }
+	void setFileFormat(std::string value) { m_format = value; }
 
-	TPropertyGroup *getFileFormatProperties(string ext);
+	TPropertyGroup *getFileFormatProperties(std::string ext);
 
 	void assign(const CaptureParameters *params);
 	void saveData(TOStream &os);
 	void loadData(TIStream &is);
 
 protected:
-	void getFileFormatPropertiesExtensions(std::vector<string> &v) const;
+	void getFileFormatPropertiesExtensions(std::vector<std::string> &v) const;
 };
 #endif // CAPTUREPARAMETERS_H

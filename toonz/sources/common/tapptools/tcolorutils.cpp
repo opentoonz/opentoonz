@@ -10,7 +10,7 @@
 typedef float KEYER_FLOAT;
 
 //------------------------------------------------------------------------------
-#ifdef WIN32
+#ifdef _WIN32
 #define ISNAN _isnan
 #else
 extern "C" int isnan(double);

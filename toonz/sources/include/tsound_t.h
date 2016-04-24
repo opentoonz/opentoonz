@@ -164,7 +164,7 @@ public:
 //!Applies a trasformation (echo, reverb, ect) to the object and returns the transformed soundtrack
 #if defined(MACOSX) || defined(LINUX)
 	TSoundTrackP apply(TSoundTransform *transform);
-#else // WIN32
+#else // _WIN32
 	TSoundTrackP apply(TSoundTransform *transform)
 	{
 		assert(transform);
@@ -392,7 +392,7 @@ public:
 
 //==============================================================================
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DVAPI TSoundTrackT<TMono8SignedSample>;
 template class DVAPI TSoundTrackT<TMono8UnsignedSample>;
 template class DVAPI TSoundTrackT<TStereo8SignedSample>;

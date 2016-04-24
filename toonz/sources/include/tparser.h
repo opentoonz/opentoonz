@@ -35,16 +35,16 @@ public:
 
 	//! parse the input string and create the corresponding calculator
 	//! (returns 0 if the text contains mistakes)
-	Calculator *parse(string text);
+	Calculator *parse(std::string text);
 
 	//! return true if the last parsed string was correct
 	bool isValid() const;
 
 	//! return the last parsed string
-	string getText() const;
+	std::string getText() const;
 
 	//! return the last error code (if the last parsed string was correct then returns "")
-	string getError() const;
+	std::string getError() const;
 
 	//! if getError() != "" returns the position of the last parsed token
 	//! the pair contains the indices of the first and the last characters of the token
@@ -56,10 +56,10 @@ public:
 		Error,
 		ExtraIgnored
 	};
-	SyntaxStatus checkSyntax(std::vector<SyntaxToken> &tokens, string text);
+	SyntaxStatus checkSyntax(std::vector<SyntaxToken> &tokens, std::string text);
 
-	void getSuggestions(Grammar::Suggestions &suggestions, string text);
-	string getCurrentPatternString(string text);
+	void getSuggestions(Grammar::Suggestions &suggestions, std::string text);
+	std::string getCurrentPatternString(std::string text);
 
 private:
 	// not implemented

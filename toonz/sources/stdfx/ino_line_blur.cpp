@@ -6818,10 +6818,6 @@ void igs::line_blur::convert(
 
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
 
-#if defined _WIN32 && !defined NOMINMAX
-#define NOMINMAX
-#endif
-
 #include <sstream> /* std::ostringstream */
 #include "tfxparam.h"
 #include "stdfx.h"

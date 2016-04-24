@@ -3,7 +3,7 @@
 // YOMBParam.cpp: implementation of the CYOMBParam class.
 //
 //////////////////////////////////////////////////////////////////////
-#ifdef WIN32
+#ifdef _WIN32
 #include "Windows.h"
 #endif
 #include <iostream>
@@ -72,7 +72,7 @@ void CYOMBParam::null()
 	m_color.resize(0);
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 bool CYOMBParam::read(basic_ifstream<char> &in)
 {
 	char token[1000] = "";

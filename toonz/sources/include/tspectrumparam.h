@@ -26,7 +26,7 @@ class TPixelParamP;
 
 //=============================================================
 
-#ifdef WIN32
+#ifdef _WIN32
 class TSpectrumParam;
 template class DVAPI TPersistDeclarationT<TSpectrumParam>;
 #endif
@@ -85,7 +85,7 @@ public:
 	void enableMatte(bool on);
 
 	bool isMatteEnabled() const;
-	string getValueAlias(double frame, int precision);
+	std::string getValueAlias(double frame, int precision);
 	bool hasKeyframes() const;
 	void getKeyframes(std::set<double> &frames) const;
 	int getNextKeyframe(double frame) const;
@@ -93,7 +93,7 @@ public:
 	double keyframeIndexToFrame(int index) const;
 };
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DVAPI TSmartPointerT<TSpectrumParam>;
 template class DVAPI TDerivedSmartPointerT<TSpectrumParam, TParam>;
 #endif

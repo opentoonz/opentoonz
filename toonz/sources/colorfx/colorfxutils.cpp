@@ -11,7 +11,7 @@ RubberDeform::RubberDeform() : m_pPolyOri(0), m_polyLoc()
 {
 }
 
-RubberDeform::RubberDeform(vector<T3DPointD> *pPolyOri, const double rf) : m_pPolyOri(pPolyOri),
+RubberDeform::RubberDeform(std::vector<T3DPointD> *pPolyOri, const double rf) : m_pPolyOri(pPolyOri),
 																		   m_polyLoc()
 {
 	copyOri2Loc();
@@ -28,11 +28,11 @@ RubberDeform::~RubberDeform()
 
 void RubberDeform::deformStep()
 {
-	vector<T3DPointD> tmpv;
-	vector<T3DPointD>::iterator itb = m_polyLoc.begin();
-	vector<T3DPointD>::iterator ite = m_polyLoc.end();
-	for (vector<T3DPointD>::iterator it = itb; it != ite; ++it) {
-		vector<T3DPointD>::iterator it1 = it == (ite - 1) ? itb : it + 1;
+	std::vector<T3DPointD> tmpv;
+	std::vector<T3DPointD>::iterator itb = m_polyLoc.begin();
+	std::vector<T3DPointD>::iterator ite = m_polyLoc.end();
+	for (std::vector<T3DPointD>::iterator it = itb; it != ite; ++it) {
+		std::vector<T3DPointD>::iterator it1 = it == (ite - 1) ? itb : it + 1;
 		double q = 0.5;
 		double qq = 1.0 - q;
 		tmpv.push_back(T3DPointD(qq * it->x + q * it1->x, qq * it->y + q * it1->y, qq * it->z + q * it1->z));
@@ -63,10 +63,10 @@ double RubberDeform::avgLength()
 		return 0.0;
 
 	double avgD = 0.0;
-	vector<T3DPointD>::iterator itb = m_polyLoc.begin();
-	vector<T3DPointD>::iterator ite = m_polyLoc.end();
-	for (vector<T3DPointD>::iterator it = itb; it != ite; ++it) {
-		vector<T3DPointD>::iterator it1 = it == (ite - 1) ? itb : it + 1;
+	std::vector<T3DPointD>::iterator itb = m_polyLoc.begin();
+	std::vector<T3DPointD>::iterator ite = m_polyLoc.end();
+	for (std::vector<T3DPointD>::iterator it = itb; it != ite; ++it) {
+		std::vector<T3DPointD>::iterator it1 = it == (ite - 1) ? itb : it + 1;
 		avgD += tdistance(*it, *it1);
 	}
 	return avgD / (double)m_polyLoc.size();
@@ -93,7 +93,7 @@ void RubberDeform::refinePoly(const double rf)
 {
 
 	double refineL = rf <= 0.0 ? avgLength() : rf;
-	vector<T3DPointD> tmpv;
+	std::vector<T3DPointD> tmpv;
 	int nb = m_polyLoc.size();
 	for (int j = 0; j < nb; j++) {
 		T3DPointD a(m_polyLoc[j]);
@@ -125,7 +125,7 @@ void SFlashUtils::computeOutline(const TRegion *region,
 	const double pixelSize = 1.0;
 	polyline.clear();
 
-	vector<TPointD> polyline2d;
+	std::vector<TPointD> polyline2d;
 
 	int edgeSize = region->getEdgeCount();
 
@@ -163,13 +163,13 @@ void SFlashUtils::computeRegionOutline()
 	m_ro.m_bbox = m_r->getBBox();
 }
 
-void SFlashUtils::PointVector2QuadsArray(const vector<T3DPointD> &pv,
-										 vector<TQuadratic *> &quadArray,
-										 vector<TQuadratic *> &toBeDeleted,
+void SFlashUtils::PointVector2QuadsArray(const std::vector<T3DPointD> &pv,
+										 std::vector<TQuadratic *> &quadArray,
+										 std::vector<TQuadratic *> &toBeDeleted,
 										 const bool isRounded) const
 {
-	vector<T3DPointD>::const_iterator ipv = pv.begin();
-	vector<T3DPointD>::const_iterator ipve = pv.end();
+	std::vector<T3DPointD>::const_iterator ipv = pv.begin();
+	std::vector<T3DPointD>::const_iterator ipve = pv.end();
 	int nbPv = pv.size();
 	quadArray.clear();
 
@@ -231,9 +231,9 @@ void SFlashUtils::drawRegionOutline(TFlash &flash, const bool isRounded) const
 	if (!m_r)
 		return;
 
-	vector<vector<TQuadratic *>> quads;
-	vector<TQuadratic *> toBeDeleted;
-	vector<TQuadratic *> quadArray;
+	std::vector<std::vector<TQuadratic *>> quads;
+	std::vector<TQuadratic *> toBeDeleted;
+	std::vector<TQuadratic *> quadArray;
 	PointVector2QuadsArray(*(m_ro.m_exterior.begin()), quadArray, toBeDeleted, isRounded);
 	quads.push_back(quadArray);
 
@@ -248,9 +248,9 @@ void SFlashUtils::drawRegionOutline(TFlash &flash, const bool isRounded) const
 	clearPointerContainer(toBeDeleted);
 }
 
-int SFlashUtils::nbDiffVerts(const vector<TPointD> &pv) const
+int SFlashUtils::nbDiffVerts(const std::vector<TPointD> &pv) const
 {
-	vector<TPointD> lpv;
+	std::vector<TPointD> lpv;
 	bool isMissing[4] = {true, true, true, true};
 	if (pv.size() == 0)
 		return 0;
@@ -323,7 +323,7 @@ int SFlashUtils::nbDiffVerts(const vector<TPointD> &pv) const
 	double d1=tdistance(up1,p[2]);
 	double d2=tdistance(up2,p[2]);
 
-	vector<TPointD> lpv;
+	std::vector<TPointD> lpv;
 	if ( d1>d2 ) {
 		lpv=pv;
 	} else {
@@ -355,7 +355,7 @@ int SFlashUtils::nbDiffVerts(const vector<TPointD> &pv) const
 	TScale sM(m/flashGrad,2*tmax(x,a-x)/flashGrad);
 
     flash.setFillStyleMatrix(tM*rM*sM);
-	vector<TPointD> pp;
+	std::vector<TPointD> pp;
 	pp.push_back(p[0]);
 	pp.push_back(p[1]);
 	pp.push_back(p[2]);
@@ -365,7 +365,7 @@ int SFlashUtils::nbDiffVerts(const vector<TPointD> &pv) const
 
 */
 
-void SFlashUtils::Triangle2Quad(vector<TPointD> &p) const
+void SFlashUtils::Triangle2Quad(std::vector<TPointD> &p) const
 {
 	TPointD e;
 	int i, j;
@@ -395,11 +395,11 @@ void SFlashUtils::Triangle2Quad(vector<TPointD> &p) const
 }
 
 void SFlashUtils::drawGradedPolyline(TFlash &flash,
-									 vector<TPointD> &pvv,
+									 std::vector<TPointD> &pvv,
 									 const TPixel32 &c1,
 									 const TPixel32 &c2) const
 {
-	vector<TPointD> pv;
+	std::vector<TPointD> pv;
 	pv = pvv;
 	int nbDV = nbDiffVerts(pv);
 	if (nbDV < 3 || nbDV > 4)
@@ -417,7 +417,7 @@ void SFlashUtils::drawGradedPolyline(TFlash &flash,
 	double d1 = (tdistance(up1, pv[2]) + tdistance(up1, pv[3])) * 0.5;
 	double d2 = (tdistance(up2, pv[2]) + tdistance(up2, pv[3])) * 0.5;
 
-	vector<TPointD> lpv;
+	std::vector<TPointD> lpv;
 	if (d1 > d2) {
 		lpv = pv;
 	} else {
@@ -451,11 +451,11 @@ void SFlashUtils::drawGradedPolyline(TFlash &flash,
 
 //------------------------------------------------------------
 void SFlashUtils::drawGradedRegion(TFlash &flash,
-								   vector<TPointD> &pvv,
+								   std::vector<TPointD> &pvv,
 								   const TPixel32 &c1,
 								   const TPixel32 &c2, const TRegion &r) const
 {
-	vector<TPointD> pv;
+	std::vector<TPointD> pv;
 	pv = pvv;
 	int nbDV = nbDiffVerts(pv);
 	if (nbDV < 3 || nbDV > 4)
@@ -473,7 +473,7 @@ void SFlashUtils::drawGradedRegion(TFlash &flash,
 	double d1 = (tdistance(up1, pv[2]) + tdistance(up1, pv[3])) * 0.5;
 	double d2 = (tdistance(up2, pv[2]) + tdistance(up2, pv[3])) * 0.5;
 
-	vector<TPointD> lpv;
+	std::vector<TPointD> lpv;
 	if (d1 > d2) {
 		lpv = pv;
 	} else {

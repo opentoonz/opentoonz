@@ -92,8 +92,8 @@ protected:
 	//TTimer *m_timer;
 
 	TWidget *m_parent, *m_sonKeeper;
-	string m_name, m_contextHelpReference;
-	wstring m_shortHelp, m_longHelp;
+	std::string m_name, m_contextHelpReference;
+	std::wstring m_shortHelp, m_longHelp;
 
 	int m_cursorIdx;
 
@@ -108,7 +108,7 @@ protected:
 
 	TDragDropListener *m_dragDropListener;
 
-	string m_fontName;
+	std::string m_fontName;
 	int m_fontSize;
 	int m_fontOrientation;
 
@@ -127,7 +127,7 @@ protected:
 	void createSons();
 
 public:
-	TWidget(TWidget *parent = 0, string name = "unnamed");
+	TWidget(TWidget *parent = 0, std::string name = "unnamed");
 	virtual ~TWidget();
 
 	//
@@ -179,7 +179,7 @@ public:
 	// name, parent & sons
 	//
 	inline TWidget *getParent() const { return m_parent; }
-	inline string getName() const { return m_name; }
+	inline std::string getName() const { return m_name; }
 	virtual void setParent(TWidget *p);
 	virtual void addSon(TWidget *son);
 	virtual void removeSon(TWidget *son);
@@ -189,25 +189,25 @@ public:
 	//
 	// help messages
 	//
-	wstring getLongHelp() const;
-	wstring getShortHelp() const;
+	std::wstring getLongHelp() const;
+	std::wstring getShortHelp() const;
 
-	void setHelp(string shortHelp, string longHelp);
-	void setHelp(wstring shortHelp, wstring longHelp);
+	void setHelp(std::string shortHelp, std::string longHelp);
+	void setHelp(std::wstring shortHelp, std::wstring longHelp);
 
-	virtual string getContextHelpReference(const TPoint &)
+	virtual std::string getContextHelpReference(const TPoint &)
 	{
 		return m_contextHelpReference;
 	}
 
-	void setContextHelpReference(string s)
+	void setContextHelpReference(std::string s)
 	{
 		m_contextHelpReference = s;
 	}
 
 	//void delegateHelpToParent();
 
-	virtual wstring getTooltipString(const TPoint &) { return getShortHelp(); }
+	virtual std::wstring getTooltipString(const TPoint &) { return getShortHelp(); }
 
 	//
 	// misc
@@ -239,7 +239,7 @@ public:
 
 	virtual void paste();
 
-	virtual void startDragAndDrop(string stringToDrop);
+	virtual void startDragAndDrop(std::string stringToDrop);
 
 	typedef unsigned int CursorIndex;
 
@@ -276,19 +276,19 @@ public:
 
 	virtual void clear();
 
-	virtual void drawText(const TPoint &p, string text);
-	virtual void drawText(const TPoint &p, wstring text);
+	virtual void drawText(const TPoint &p, std::string text);
+	virtual void drawText(const TPoint &p, std::wstring text);
 
-	virtual void drawText(const TRect &r, string text, Alignment alignment = CENTER);
-	virtual void drawText(const TRect &r, wstring text, Alignment alignment = CENTER);
-	virtual void drawMultiLineText(const TRect &r, string text);
-	virtual void drawMultiLineText(const TRect &r, wstring text);
+	virtual void drawText(const TRect &r, std::string text, Alignment alignment = CENTER);
+	virtual void drawText(const TRect &r, std::wstring text, Alignment alignment = CENTER);
+	virtual void drawMultiLineText(const TRect &r, std::string text);
+	virtual void drawMultiLineText(const TRect &r, std::wstring text);
 
-	virtual TDimension getTextSize(string text);
-	virtual TDimension getTextSize(wstring text);
+	virtual TDimension getTextSize(std::string text);
+	virtual TDimension getTextSize(std::wstring text);
 
-	virtual TDimension getTextSize(string text, string font, int fontSize);
-	virtual TDimension getTextSize(wstring text, string font, int fontSize);
+	virtual TDimension getTextSize(std::string text, std::string font, int fontSize);
+	virtual TDimension getTextSize(std::wstring text, std::string font, int fontSize);
 
 	inline void drawPoint(int x, int y) { drawLine(x, y, x, y); }
 
@@ -357,7 +357,7 @@ public:
 	virtual void rectwrite(const TRaster32P &, const TPoint &);
 
 	virtual void setFontSize(int size);
-	virtual void setFont(string name, int size = 0, int orientation = 0);
+	virtual void setFont(std::string name, int size = 0, int orientation = 0);
 
 	//
 	// events
@@ -386,13 +386,13 @@ public:
 
 	virtual void configureNotify(const TDimension &) {}
 
-	virtual void onPaste(string) {}
+	virtual void onPaste(std::string) {}
 
 	// virtual void close() {unmap();}
 
-	virtual void onDrop(string) {}
+	virtual void onDrop(std::string) {}
 
-	virtual string getToolTip() { return ""; }
+	virtual std::string getToolTip() { return ""; }
 
 	virtual void onTimer(int) {}
 
@@ -441,7 +441,7 @@ public:
 	//void paintRegion(const TRect &rect);
 
 	static TDimension getScreenSize();
-	static void getScreenPlacement(vector<TRectI> &);
+	static void getScreenPlacement(std::vector<TRectI> &);
 };
 
 #endif

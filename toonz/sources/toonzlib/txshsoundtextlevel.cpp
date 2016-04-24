@@ -12,7 +12,7 @@ PERSIST_IDENTIFIER(TXshSoundTextLevel, "soundTextLevel")
 
 //=============================================================================
 
-TXshSoundTextLevel::TXshSoundTextLevel(wstring name)
+TXshSoundTextLevel::TXshSoundTextLevel(std::wstring name)
 	: TXshLevel(m_classCode, name), m_framesText()
 {
 }
@@ -55,11 +55,11 @@ void TXshSoundTextLevel::loadData(TIStream &is)
 {
 	is >> m_name;
 	setName(m_name);
-	string tagName;
+	std::string tagName;
 	int type = UNKNOWN_XSHLEVEL;
 	while (is.matchTag(tagName)) {
 		if (tagName == "type") {
-			string v;
+			std::string v;
 			is >> v;
 			if (v == "textSound")
 				type = SND_TXT_XSHLEVEL;

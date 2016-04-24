@@ -143,15 +143,15 @@ bool readVersion(FILE *chan, int &version)
 	char magic[8];
 	memset(magic, 0, sizeof(magic));
 	fread(&magic, sizeof(char), 8, chan);
-	if (string(magic).substr(0, 5) == "TLV10")
+	if (std::string(magic).substr(0, 5) == "TLV10")
 		version = 10;
-	else if (string(magic, 5) == "TLV11")
+	else if (std::string(magic, 5) == "TLV11")
 		version = 11;
-	else if (string(magic, 5) == "TLV12")
+	else if (std::string(magic, 5) == "TLV12")
 		version = 12;
-	else if (string(magic, 5) == "TLV13")
+	else if (std::string(magic, 5) == "TLV13")
 		version = 13;
-	else if (string(magic, 5) == "TLV14")
+	else if (std::string(magic, 5) == "TLV14")
 		version = 14;
 	else {
 		fclose(chan);
@@ -414,7 +414,7 @@ public:
 //-------------------------------------------------------------------
 
 
-TWriterInfo *TWriterInfoTzl::create(const string &ext) 
+TWriterInfo *TWriterInfoTzl::create(const std::string &ext) 
 { 
   return new TWriterInfoTzl(); 
 }
@@ -633,7 +633,7 @@ TLevelWriterTzl::~TLevelWriterTzl()
 		TFilePath historyFp = m_path.withNoFrame().withType("hst");
 		FILE *historyChan = fopen(historyFp, "w");
 		if (historyChan) {
-			string historyData = m_contentHistory->serialize().toStdString();
+			std::string historyData = m_contentHistory->serialize().toStdString();
 			fwrite(&historyData[0], 1, historyData.length(), historyChan);
 			fclose(historyChan);
 		}
@@ -1484,7 +1484,7 @@ TLevelReaderTzl::TLevelReaderTzl(const TFilePath &path)
 		fseek(historyChan, 0, SEEK_END);
 		long lSize = ftell(historyChan);
 		rewind(historyChan);
-		string historyData(lSize, '\0');
+		std::string historyData(lSize, '\0');
 		fread(&historyData[0], 1, lSize, historyChan);
 		fclose(historyChan);
 

@@ -366,7 +366,10 @@ void NotePopup::onXsheetSwitched()
 //-----------------------------------------------------------------------------
 
 NoteWidget::NoteWidget(XsheetViewer *parent, int noteIndex)
-	: QWidget(parent), m_viewer(parent), m_noteIndex(noteIndex), m_noteEditor(0), m_isHovered(false)
+	: QWidget(parent)
+	, m_viewer(parent)
+	, m_noteIndex(noteIndex)
+	, m_isHovered(false)
 {
 	int width = (m_noteIndex < 0) ? 40 : NoteWidth;
 	setFixedSize(width, NoteHeight);
@@ -427,13 +430,16 @@ void NoteWidget::paint(QPainter *painter, QPoint pos, bool isCurrent)
 
 void NoteWidget::openNotePopup()
 {
-	if (!m_noteEditor)
-		m_noteEditor = new XsheetGUI::NotePopup(m_viewer, m_noteIndex);
+	if (!m_noteEditor) {
+		m_noteEditor.reset(new XsheetGUI::NotePopup(m_viewer, m_noteIndex));
+	}
 
-	if (m_noteEditor->isVisible())
+	if (m_noteEditor->isVisible()) {
 		m_noteEditor->activateWindow();
-	else
+	}
+	else {
 		m_noteEditor->show();
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -453,7 +459,8 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WindowFlags flags)
 #else
 NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
 #endif
-	: QFrame(parent), m_newNotePopup(0), m_viewer(parent)
+	: QFrame(parent)
+	, m_viewer(parent)
 {
 	setFrameStyle(QFrame::StyledPanel);
 	setObjectName("cornerWidget");
@@ -558,12 +565,14 @@ void NoteArea::updateButtons()
 void NoteArea::toggleNewNote()
 {
 	if (!m_newNotePopup)
-		m_newNotePopup = new XsheetGUI::NotePopup(m_viewer, -1);
+		m_newNotePopup.reset(new XsheetGUI::NotePopup(m_viewer, -1));
 
-	if (m_newNotePopup->isVisible())
+	if (m_newNotePopup->isVisible()) {
 		m_newNotePopup->activateWindow();
-	else
+	}
+	else {
 		m_newNotePopup->show();
+	}
 }
 
 //-----------------------------------------------------------------------------

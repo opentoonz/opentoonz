@@ -7,7 +7,7 @@
    PER ORA SI PUO' USARE LA CACHE SOLO CON WINDOWS
  */
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #endif
 
@@ -292,7 +292,7 @@ private:
 	int m_viewFrameMin,
 		m_viewFrameMax;
 
-#ifdef WIN32
+#ifdef _WIN32
 	HANDLE m_hFile, m_hMap;
 	LPVOID m_fileMapAddress;
 

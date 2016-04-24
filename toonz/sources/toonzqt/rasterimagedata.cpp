@@ -94,8 +94,8 @@ ToonzImageData::~ToonzImageData()
 //-------------------------------------------------------------------
 
 void ToonzImageData::setData(const TRasterP &copiedRaster, const TPaletteP &palette, double dpiX, double dpiY, const TDimension &dim,
-							 const vector<TRectD> &rects, const vector<TStroke> &strokes,
-							 const vector<TStroke> &originalStrokes,
+							 const std::vector<TRectD> &rects, const std::vector<TStroke> &strokes,
+							 const std::vector<TStroke> &originalStrokes,
 							 const TAffine &transformation)
 {
 	m_copiedRaster = copiedRaster;
@@ -116,7 +116,7 @@ void ToonzImageData::setData(const TRasterP &copiedRaster, const TPaletteP &pale
 //-------------------------------------------------------------------
 
 void ToonzImageData::getData(TRasterP &copiedRaster, double &dpiX, double &dpiY,
-							 vector<TRectD> &rects, vector<TStroke> &strokes, vector<TStroke> &originalStrokes,
+							 std::vector<TRectD> &rects, std::vector<TStroke> &strokes, std::vector<TStroke> &originalStrokes,
 							 TAffine &transformation, TPalette *targetPalette) const
 {
 	if (!m_copiedRaster || (m_rects.empty() && m_strokes.empty()))
@@ -235,8 +235,8 @@ FullColorImageData::~FullColorImageData()
 //-------------------------------------------------------------------
 
 void FullColorImageData::setData(const TRasterP &copiedRaster, const TPaletteP &palette, double dpiX, double dpiY, const TDimension &dim,
-								 const vector<TRectD> &rects, const vector<TStroke> &strokes,
-								 const vector<TStroke> &originalStrokes,
+								 const std::vector<TRectD> &rects, const std::vector<TStroke> &strokes,
+								 const std::vector<TStroke> &originalStrokes,
 								 const TAffine &transformation)
 {
 	m_copiedRaster = copiedRaster;
@@ -253,7 +253,7 @@ void FullColorImageData::setData(const TRasterP &copiedRaster, const TPaletteP &
 //-------------------------------------------------------------------
 
 void FullColorImageData::getData(TRasterP &copiedRaster, double &dpiX, double &dpiY,
-								 vector<TRectD> &rects, vector<TStroke> &strokes, vector<TStroke> &originalStrokes,
+								 std::vector<TRectD> &rects, std::vector<TStroke> &strokes, std::vector<TStroke> &originalStrokes,
 								 TAffine &transformation, TPalette *targetPalette) const
 {
 	if (!m_copiedRaster || (m_rects.empty() && m_strokes.empty()))

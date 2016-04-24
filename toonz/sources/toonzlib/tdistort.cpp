@@ -1,4 +1,5 @@
-
+#include <memory>
+#include <array>
 
 #include "toonz/tdistort.h"
 #include "traster.h"
@@ -115,7 +116,7 @@ void resample(const TRasterCM32P &rasIn, TRasterCM32P &rasOut, const TDistorter 
 	if (rasOut->getLx() < 1 || rasOut->getLy() < 1 || rasIn->getLx() < 1 || rasIn->getLy() < 1)
 		return;
 
-	TPointD *preImages = new TPointD[distorter.maxInvCount()];
+	std::unique_ptr<TPointD[]> preImages(new TPointD[distorter.maxInvCount()]);
 
 	int x, y;
 	int i;
@@ -126,7 +127,7 @@ void resample(const TRasterCM32P &rasIn, TRasterCM32P &rasOut, const TDistorter 
 		for (x = 0; pix != endPix; pix++, x++) {
 			TPixelCM32 pixDown;
 
-			int count = distorter.invMap(convert(p) + TPointD(x + 0.5, y + 0.5), preImages);
+			int count = distorter.invMap(convert(p) + TPointD(x + 0.5, y + 0.5), preImages.get());
 			for (i = count - 1; i >= 0; --i) {
 				TPixelCM32 pixUp;
 				TPointD preImage(preImages[i].x - 0.5, preImages[i].y - 0.5);
@@ -141,8 +142,6 @@ void resample(const TRasterCM32P &rasIn, TRasterCM32P &rasOut, const TDistorter 
 			*pix = pixDown;
 		}
 	}
-
-	delete[] preImages;
 }
 
 //---------------------------------------------------------------------------------
@@ -165,7 +164,7 @@ void resampleClosestPixel(const TRasterPT<T> &rasIn, TRasterPT<T> &rasOut,
 	if (rasOut->getLx() < 1 || rasOut->getLy() < 1 || rasIn->getLx() < 1 || rasIn->getLy() < 1)
 		return;
 
-	TPointD *preImages = new TPointD[distorter.maxInvCount()];
+	std::unique_ptr<TPointD[]> preImages(new TPointD[distorter.maxInvCount()]);
 
 	int x, y;
 	int i;
@@ -178,7 +177,7 @@ void resampleClosestPixel(const TRasterPT<T> &rasIn, TRasterPT<T> &rasOut,
 			T pixDown(0, 0, 0, 0);
 
 			//preImages.clear();
-			int count = distorter.invMap(convert(p) + TPointD(x + 0.5, y + 0.5), preImages);
+			int count = distorter.invMap(convert(p) + TPointD(x + 0.5, y + 0.5), preImages.get());
 			for (i = count - 1; i >= 0; --i) {
 				T pixUp(0, 0, 0, 0);
 				TPointD preImage(preImages[i].x - 0.5, preImages[i].y - 0.5);
@@ -191,8 +190,6 @@ void resampleClosestPixel(const TRasterPT<T> &rasIn, TRasterPT<T> &rasOut,
 			*pix = pixDown;
 		}
 	}
-
-	delete[] preImages;
 }
 
 //---------------------------------------------------------------------------------
@@ -213,7 +210,7 @@ void resampleClosestPixel(const TRasterCM32P &rasIn, TRasterCM32P &rasOut,
 	if (rasOut->getLx() < 1 || rasOut->getLy() < 1 || rasIn->getLx() < 1 || rasIn->getLy() < 1)
 		return;
 
-	TPointD *preImages = new TPointD[distorter.maxInvCount()];
+	std::unique_ptr<TPointD[]> preImages(new TPointD[distorter.maxInvCount()]);
 
 	int x, y;
 	int i;
@@ -225,7 +222,7 @@ void resampleClosestPixel(const TRasterCM32P &rasIn, TRasterCM32P &rasOut,
 		for (; pix != endPix; pix++, x++) {
 			TPixelCM32 pixDown(0, 0, 255);
 
-			int count = distorter.invMap(convert(p) + TPointD(x + 0.5, y + 0.5), preImages);
+			int count = distorter.invMap(convert(p) + TPointD(x + 0.5, y + 0.5), preImages.get());
 			for (i = count - 1; i >= 0; --i) {
 				TPixelCM32 pixUp(0, 0, 255);
 				TPointD preImage(preImages[i].x - 0.5, preImages[i].y - 0.5);
@@ -238,8 +235,6 @@ void resampleClosestPixel(const TRasterCM32P &rasIn, TRasterCM32P &rasOut,
 			*pix = pixDown;
 		}
 	}
-
-	delete[] preImages;
 }
 
 //=================================================================================
@@ -359,51 +354,55 @@ void resample(const TRasterPT<T> &rasIn, TRasterPT<T> &rasOut, const TDistorter 
 	int invsCount = distorter.maxInvCount();
 
 	//Allocate buffers
-	TPointD *invs[2];
-	invs[0] = new TPointD[invsCount * (rasOut->getLx() + 1)];
-	invs[1] = new TPointD[invsCount * (rasOut->getLx() + 1)];
-	int *counts[2];
-	counts[0] = new int[rasOut->getLx() + 1];
-	counts[1] = new int[rasOut->getLx() + 1];
-	T *temp = new T[rasIn->getLx()];
-	TPointD *newInvs, *oldInvs, *currOldInv, *currNewInv;
-	int x, y, i, *newCounts, *oldCounts;
+	std::array<std::unique_ptr<TPointD[]>, 2> invs = {
+		std::unique_ptr<TPointD[]>(new TPointD[invsCount * (rasOut->getLx() + 1)]),
+		std::unique_ptr<TPointD[]>(new TPointD[invsCount * (rasOut->getLx() + 1)]),
+	};
+	std::array<std::unique_ptr<int[]>, 2> counts = {
+		std::unique_ptr<int[]>(new int[rasOut->getLx() + 1]),
+		std::unique_ptr<int[]>(new int[rasOut->getLx() + 1]),
+	};
+	std::unique_ptr<T[]> temp(new T[rasIn->getLx()]);
 	TPointD shift(convert(p) + TPointD(0.5, 0.5));
 
 	//Fill in the first inverses (lower edge of output image)
-	currOldInv = invs[0];
-	oldCounts = counts[0];
-	for (x = 0; x <= rasOut->getLx(); currOldInv += invsCount, ++x)
-		oldCounts[x] = distorter.invMap(shift + TPointD(x, 0.0), currOldInv);
+	{
+		TPointD* currOldInv = invs[0].get();
+		int* oldCounts = counts[0].get();
+		for (int x = 0; x <= rasOut->getLx(); currOldInv += invsCount, ++x)
+			oldCounts[x] = distorter.invMap(shift + TPointD(x, 0.0), currOldInv);
+	}
 
 	//For each output row
-	for (y = 0; y < rasOut->getLy(); ++y) {
+	for (int y = 0; y < rasOut->getLy(); ++y) {
 		//Alternate inverse buffers
-		oldInvs = invs[y % 2];
-		newInvs = invs[(y + 1) % 2];
-		oldCounts = counts[y % 2];
-		newCounts = counts[(y + 1) % 2];
+		TPointD* oldInvs = invs[y % 2].get();
+		TPointD* newInvs = invs[(y + 1) % 2].get();
+		int* oldCounts = counts[y % 2].get();
+		int* newCounts = counts[(y + 1) % 2].get();
 
 		//Build the new inverses
-		currNewInv = newInvs;
-		for (x = 0; x <= rasOut->getLx(); currNewInv += invsCount, ++x)
-			newCounts[x] = distorter.invMap(shift + TPointD(x, y + 1.0), currNewInv);
+		{
+			TPointD* currNewInv = newInvs;
+			for (int x = 0; x <= rasOut->getLx(); currNewInv += invsCount, ++x)
+				newCounts[x] = distorter.invMap(shift + TPointD(x, y + 1.0), currNewInv);
+		}
 
 		//Filter each pixel in the row
 		T *pix = rasOut->pixels(y);
-		currOldInv = oldInvs;
-		currNewInv = newInvs;
-		for (x = 0; x < rasOut->getLx(); currOldInv += invsCount, currNewInv += invsCount, ++x, ++pix) {
+		TPointD* currOldInv = oldInvs;
+		TPointD* currNewInv = newInvs;
+		for (int x = 0; x < rasOut->getLx(); currOldInv += invsCount, currNewInv += invsCount, ++x, ++pix) {
 			T pixDown(0, 0, 0, 0);
 
 			int count = tmin(oldCounts[x], oldCounts[x + 1], newCounts[x]);
-			for (i = 0; i < count; ++i) {
+			for (int i = 0; i < count; ++i) {
 				T pixUp(0, 0, 0, 0);
 
 				pixUp = filterPixel<T, CHANNEL_TYPE>(
 					currOldInv[i].x - 0.5, (currOldInv + invsCount)[i].x - 0.5,
 					currOldInv[i].y - 0.5, currNewInv[i].y - 0.5,
-					rasIn, temp);
+					rasIn, temp.get());
 
 				pixDown = overPix(pixDown, pixUp);
 			}
@@ -411,12 +410,6 @@ void resample(const TRasterPT<T> &rasIn, TRasterPT<T> &rasOut, const TDistorter 
 			*pix = pixDown;
 		}
 	}
-
-	delete[] invs[0];
-	delete[] invs[1];
-	delete[] counts[0];
-	delete[] counts[1];
-	delete[] temp;
 }
 
 } // namespace

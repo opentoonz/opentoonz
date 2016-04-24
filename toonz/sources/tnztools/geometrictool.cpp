@@ -124,7 +124,7 @@ TRect drawBluredBrush(const TRasterImageP &ri, TStroke *stroke, int thick, doubl
 	int i, chunkCount = s->getChunkCount();
 	for (i = 0; i < chunkCount; i++) {
 		const TThickQuadratic *q = s->getChunk(i);
-		vector<TThickPoint> points;
+		std::vector<TThickPoint> points;
 		points.push_back(q->getThickP0());
 		points.push_back(q->getThickP1());
 		points.push_back(q->getThickP2());
@@ -166,7 +166,7 @@ TRect drawBluredBrush(const TToonzImageP &ti, TStroke *stroke, int thick, double
 	int i, chunkCount = s->getChunkCount();
 	for (i = 0; i < chunkCount; i++) {
 		const TThickQuadratic *q = s->getChunk(i);
-		vector<TThickPoint> points;
+		std::vector<TThickPoint> points;
 		points.push_back(q->getThickP0());
 		points.push_back(q->getThickP1());
 		points.push_back(q->getThickP2());
@@ -187,12 +187,12 @@ TRect drawBluredBrush(const TToonzImageP &ti, TStroke *stroke, int thick, double
 
 class MultilinePrimitiveUndo : public TUndo
 {
-	vector<TPointD> m_oldVertex;
-	vector<TPointD> m_newVertex;
+	std::vector<TPointD> m_oldVertex;
+	std::vector<TPointD> m_newVertex;
 	MultiLinePrimitive *m_tool;
 
 public:
-	MultilinePrimitiveUndo(const vector<TPointD> &vertex, MultiLinePrimitive *tool)
+	MultilinePrimitiveUndo(const std::vector<TPointD> &vertex, MultiLinePrimitive *tool)
 		: TUndo(), m_oldVertex(vertex), m_tool(tool), m_newVertex()
 	{
 	}
@@ -201,7 +201,7 @@ public:
 
 	void undo() const;
 	void redo() const;
-	void setNewVertex(const vector<TPointD> &vertex)
+	void setNewVertex(const std::vector<TPointD> &vertex)
 	{
 		m_newVertex = vertex;
 	}
@@ -268,7 +268,7 @@ class CMBluredPrimitiveUndo : public UndoRasterPencil
 public:
 	CMBluredPrimitiveUndo(TXshSimpleLevel *level, const TFrameId &frameId, TStroke *stroke, int thickness,
 						  double hardness, bool selective, bool doAntialias, bool createdFrame, bool createdLevel,
-						  string primitiveName)
+						  std::string primitiveName)
 		: UndoRasterPencil(level, frameId, stroke, selective, false, doAntialias, createdFrame, createdLevel,
 						   primitiveName),
 		  m_thickness(thickness), m_hardness(hardness), m_selective(selective)
@@ -423,7 +423,7 @@ public:
 
 	void setIsPrompting(bool value) { m_isPrompting = value; }
 
-	virtual string getName() const = 0;
+	virtual std::string getName() const = 0;
 
 	virtual ~Primitive() {}
 
@@ -460,7 +460,7 @@ public:
 	{
 	}
 
-	virtual string getName() const { return "Rectangle"; } // W_ToolOptions_ShapeRect"; }
+	virtual std::string getName() const { return "Rectangle"; } // W_ToolOptions_ShapeRect"; }
 
 	TStroke *makeStroke() const;
 	void draw();
@@ -488,7 +488,7 @@ public:
 	{
 	}
 
-	virtual string getName() const { return "Circle"; } // W_ToolOptions_ShapeCircle";}
+	virtual std::string getName() const { return "Circle"; } // W_ToolOptions_ShapeCircle";}
 
 	void draw();
 	void leftButtonDown(const TPointD &pos, const TMouseEvent &);
@@ -508,7 +508,7 @@ const double joinDistance = 5.0;
 class MultiLinePrimitive : public Primitive
 {
 protected:
-	vector<TPointD> m_vertex;
+	std::vector<TPointD> m_vertex;
 	TPointD m_mousePosition;
 	TPixel32 m_color;
 	bool m_closed, m_isSingleLine;
@@ -523,7 +523,7 @@ public:
 	{
 	}
 
-	virtual string getName() const { return "Polyline"; } // W_ToolOptions_ShapePolyline";}
+	virtual std::string getName() const { return "Polyline"; } // W_ToolOptions_ShapePolyline";}
 
 	void addVertex(const TPointD &pos);
 	void moveSpeed(const TPointD &delta);
@@ -545,7 +545,7 @@ public:
 	}
 	void onEnter();
 	void onImageChanged();
-	void setVertexes(const vector<TPointD> &vertex)
+	void setVertexes(const std::vector<TPointD> &vertex)
 	{
 		m_vertex = vertex;
 	};
@@ -598,7 +598,7 @@ public:
 		m_isSingleLine = true;
 	}
 
-	string getName() const { return "Line"; } // W_ToolOptions_ShapePolyline";}
+	std::string getName() const { return "Line"; } // W_ToolOptions_ShapePolyline";}
 
 	void draw();
 	void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
@@ -624,7 +624,7 @@ public:
 	{
 	}
 
-	virtual string getName() const { return "Ellipse"; } // W_ToolOptions_ShapeEllipse";}
+	virtual std::string getName() const { return "Ellipse"; } // W_ToolOptions_ShapeEllipse";}
 
 	void draw();
 	void leftButtonDown(const TPointD &pos, const TMouseEvent &);
@@ -658,7 +658,7 @@ public:
 			delete m_stroke;
 	}
 
-	virtual string getName() const { return "Arc"; } // _ToolOptions_ShapeArc";}
+	virtual std::string getName() const { return "Arc"; } // _ToolOptions_ShapeArc";}
 
 	TStroke *makeStroke() const;
 	void draw();
@@ -683,7 +683,7 @@ public:
 	{
 	}
 
-	virtual string getName() const { return "Polygon"; } // W_ToolOptions_ShapePolygon";}
+	virtual std::string getName() const { return "Polygon"; } // W_ToolOptions_ShapePolygon";}
 
 	TStroke *makeStroke() const;
 	void draw();
@@ -700,9 +700,9 @@ class GeometricTool : public TTool
 {
 protected:
 	Primitive *m_primitive;
-	map<wstring, Primitive *> m_primitiveTable;
+	std::map<std::wstring, Primitive *> m_primitiveTable;
 	PrimitiveParam m_param;
-	wstring m_typeCode;
+	std::wstring m_typeCode;
 	bool m_active;
 	bool m_firstTime;
 
@@ -735,7 +735,7 @@ public:
 
 	~GeometricTool()
 	{
-		map<wstring, Primitive *>::iterator it;
+		std::map<std::wstring, Primitive *>::iterator it;
 		for (it = m_primitiveTable.begin(); it != m_primitiveTable.end(); ++it)
 			delete it->second;
 	}
@@ -750,16 +750,16 @@ public:
 	void addPrimitive(Primitive *p)
 	{
 		// TODO: aggiungere il controllo per evitare nomi ripetuti
-		wstring name = toWideString(p->getName());
+		std::wstring name = toWideString(p->getName());
 		//wstring name = TStringTable::translate(p->getName());
 
 		m_primitiveTable[name] = p;
 		m_param.m_type.addValue(name);
 	}
 
-	void changeType(wstring name)
+	void changeType(std::wstring name)
 	{
-		map<wstring, Primitive *>::iterator it = m_primitiveTable.find(name);
+		std::map<std::wstring, Primitive *>::iterator it = m_primitiveTable.find(name);
 		if (it != m_primitiveTable.end())
 			m_primitive = it->second;
 	}
@@ -838,7 +838,7 @@ public:
 			m_param.m_selective.setValue(GeometricSelective ? 1 : 0);
 			m_param.m_autogroup.setValue(GeometricGroupIt ? 1 : 0);
 			m_param.m_autofill.setValue(GeometricAutofill ? 1 : 0);
-			wstring typeCode = toWideString((GeometricType.getValue()));
+			std::wstring typeCode = toWideString((GeometricType.getValue()));
 			m_param.m_type.setValue(typeCode);
 			GeometricType = toString(typeCode);
 			m_typeCode = typeCode;
@@ -886,7 +886,7 @@ public:
 		return &m_param.m_prop[idx];
 	}
 
-	bool onPropertyChanged(string propertyName)
+	bool onPropertyChanged(std::string propertyName)
 	{
 		/*---	変更されたPropertyごとに処理を分ける。
 			注意：m_toolSizeとm_rasterToolSizeは同じName(="Size:")なので、
@@ -899,7 +899,7 @@ public:
 			else
 				GeometricSize = m_param.m_toolSize.getValue();
 		} else if (propertyName == m_param.m_type.getName()) {
-			wstring typeCode = m_param.m_type.getValue();
+			std::wstring typeCode = m_param.m_type.getValue();
 			GeometricType = toString(typeCode);
 			if (typeCode != m_typeCode) {
 				m_typeCode = typeCode;
@@ -1006,7 +1006,7 @@ public:
 				if (styleId >= 0)
 					stroke->setStyle(styleId);
 				QMutexLocker lock(vi->getMutex());
-				vector<TFilledRegionInf> *fillInformation = new vector<TFilledRegionInf>;
+				std::vector<TFilledRegionInf> *fillInformation = new std::vector<TFilledRegionInf>;
 				ImageUtils::getFillingInformationOverlappingArea(vi, *fillInformation, stroke->getBBox());
 				vi->addStroke(stroke);
 				TUndoManager::manager()->add(new UndoPencil(vi->getStroke(vi->getStrokeCount() - 1), fillInformation, sl, id,
@@ -1162,7 +1162,7 @@ TStroke *RectanglePrimitive::makeStroke() const
 
 	TStroke *stroke = 0;
 	if (m_param->m_targetType & TTool::Vectors) {
-		vector<TThickPoint> points(17);
+		std::vector<TThickPoint> points(17);
 
 		points[0] = TThickPoint(selArea.x1, selArea.y1, thick);
 		points[1] = TThickPoint(selArea.x1, selArea.y1, thick) + TPointD(-0.01, 0);
@@ -1189,7 +1189,7 @@ TStroke *RectanglePrimitive::makeStroke() const
 
 		stroke = new TStroke(points);
 	} else if (m_param->m_targetType & TTool::ToonzImage || m_param->m_targetType & TTool::RasterImage) {
-		vector<TThickPoint> points(9);
+		std::vector<TThickPoint> points(9);
 		double middleX = (selArea.x0 + selArea.x1) * 0.5;
 		double middleY = (selArea.y0 + selArea.y1) * 0.5;
 
@@ -1620,7 +1620,7 @@ TStroke *MultiLinePrimitive::makeStroke() const
 		TUndoManager::manager()->popUndo((size - 1) / 4 + 1);
 
 	TStroke *stroke = 0;
-	vector<TThickPoint> points;
+	std::vector<TThickPoint> points;
 	int i;
 	for (i = 0; i < (int)size; i++) {
 		TPointD vertex = m_vertex[i];
@@ -1962,7 +1962,7 @@ void ArcPrimitive::leftButtonUp(const TPointD &pos, const TMouseEvent &)
 	if (!app)
 		return;
 
-	vector<TThickPoint> points(9);
+	std::vector<TThickPoint> points(9);
 	double thick = getThickness();
 
 	switch (m_clickNumber) {
@@ -2150,7 +2150,7 @@ TStroke *PolygonPrimitive::makeStroke() const
 
 	TStroke *stroke = 0;
 	if (m_param->m_targetType & TTool::Vectors) {
-		vector<TThickPoint> points(4 * edgeCount + 1);
+		std::vector<TThickPoint> points(4 * edgeCount + 1);
 		int i;
 		//Posiziono gli angoli
 		for (i = 0; i <= (int)points.size(); i += 4) {
@@ -2171,7 +2171,7 @@ TStroke *PolygonPrimitive::makeStroke() const
 		}
 		stroke = new TStroke(points);
 	} else if (m_param->m_targetType & TTool::ToonzImage || m_param->m_targetType & TTool::RasterImage) {
-		vector<TThickPoint> points(edgeCount + edgeCount + 1);
+		std::vector<TThickPoint> points(edgeCount + edgeCount + 1);
 		points[0] = TThickPoint(m_centre + TPointD(cos(angle) * m_radius, sin(angle) * m_radius), thick);
 		for (int i = 1; i <= edgeCount; i++) {
 			angle += angleDiff;

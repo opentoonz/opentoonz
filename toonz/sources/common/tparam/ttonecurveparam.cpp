@@ -239,7 +239,7 @@ void TToneCurveParam::setDefaultValue(const QList<TPointD> &value)
 
 //---------------------------------------------------------
 
-string TToneCurveParam::getValueAlias(double frame, int precision)
+std::string TToneCurveParam::getValueAlias(double frame, int precision)
 {
 	return getCurrentParamSet()->getValueAlias(frame, precision) + m_isLinear->getValueAlias(frame, precision);
 }
@@ -357,7 +357,7 @@ double TToneCurveParam::keyframeIndexToFrame(int index) const
 
 void TToneCurveParam::loadData(TIStream &is)
 {
-	string tagName;
+	std::string tagName;
 	is.openChild(tagName);
 	assert(tagName == "tonecurve");
 	m_rgbaParamSet->removeAllParam();

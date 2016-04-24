@@ -839,7 +839,7 @@ PreferencesPopup::PreferencesPopup()
 	CheckBox *useDefaultViewerCB = new CheckBox(tr("Use Default Viewer for Movie Formats"), this);
 	CheckBox *minimizeRasterMemoryCB = new CheckBox(tr("Minimize Raster Memory Fragmentation *"), this);
 	CheckBox *autoSaveCB = new CheckBox(tr("Save Automatically Every Minutes"));
-	m_minuteFld = new IntLineEdit(this, 15, 1, 60);
+	m_minuteFld = new DVGui::IntLineEdit(this, 15, 1, 60);
 	CheckBox *replaceAfterSaveLevelAsCB = new CheckBox(tr("Replace Toonz Level after SaveLevelAs command"), this);
 
 	m_cellsDragBehaviour = new QComboBox();
@@ -872,10 +872,10 @@ PreferencesPopup::PreferencesPopup()
 	QComboBox *styleSheetType = new QComboBox(this);
 	QComboBox *unitOm = new QComboBox(this);
 	QComboBox *cameraUnitOm = new QComboBox(this);
-	m_iconSizeLx = new IntLineEdit(this, 80, 10, 400);
-	m_iconSizeLy = new IntLineEdit(this, 60, 10, 400);
-	m_viewShrink = new IntLineEdit(this, 1, 1, 20);
-	m_viewStep = new IntLineEdit(this, 1, 1, 20);
+	m_iconSizeLx = new DVGui::IntLineEdit(this, 80, 10, 400);
+	m_iconSizeLy = new DVGui::IntLineEdit(this, 60, 10, 400);
+	m_viewShrink = new DVGui::IntLineEdit(this, 1, 1, 20);
+	m_viewStep = new DVGui::IntLineEdit(this, 1, 1, 20);
 
 	CheckBox *moveCurrentFrameCB = new CheckBox(tr("Move Current Frame by Clicking on Xsheet / Numerical Columns Cell Area"), this);
 	//Viewer BG color
@@ -948,12 +948,12 @@ PreferencesPopup::PreferencesPopup()
 	categoryList->addItem(tr("Animation"));
 
 	m_keyframeType = new QComboBox(this);
-	m_animationStepField = new IntLineEdit(this, 1, 1, 500);
+	m_animationStepField = new DVGui::IntLineEdit(this, 1, 1, 500);
 
 	//--- Preview ------------------------------
 	categoryList->addItem(tr("Preview"));
 
-	m_blanksCount = new IntLineEdit(this, 0, 0, 1000);
+	m_blanksCount = new DVGui::IntLineEdit(this, 0, 0, 1000);
 	m_blankColor = new ColorField(this, false, TPixel::Black);
 	CheckBox *rewindAfterPlaybackCB = new CheckBox(tr("Rewind after Playback"), this);
 	CheckBox *displayInNewFlipBookCB = new CheckBox(tr("Display in a New Flipbook Window"), this);
@@ -972,7 +972,7 @@ PreferencesPopup::PreferencesPopup()
 	m_inksOnly->setChecked(onlyInks);
 
 	int thickness = m_pref->getOnionPaperThickness();
-	m_onionPaperThickness = new IntLineEdit(this, thickness, 0, 100);
+	m_onionPaperThickness = new DVGui::IntLineEdit(this, thickness, 0, 100);
 
 	//--- Transparency Check ------------------------------
 	categoryList->addItem(tr("Transparency Check"));

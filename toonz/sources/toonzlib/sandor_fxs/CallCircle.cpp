@@ -27,7 +27,7 @@ int callcircle_xydwCompare(const void *a, const void *b)
 	return 0;
 }
 
-CCallCircle::CCallCircle(const double r) : m_r(r), m_nb(0), m_c(0)
+CCallCircle::CCallCircle(const double r) : m_r(r), m_nb(0)
 {
 	int rr = (int)r + 1;
 	rr *= 2;
@@ -39,7 +39,7 @@ CCallCircle::CCallCircle(const double r) : m_r(r), m_nb(0), m_c(0)
 		return;
 	}
 
-	m_c = new SXYDW[dd2];
+	m_c.reset(new SXYDW[dd2]);
 	if (!m_c)
 		throw SMemAllocError("in callCircle");
 	for (int y = -rr; y <= rr; y++)
@@ -52,17 +52,14 @@ CCallCircle::CCallCircle(const double r) : m_r(r), m_nb(0), m_c(0)
 				m_nb++;
 			}
 		}
-	qsort(m_c, m_nb, sizeof(SXYDW), callcircle_xydwCompare);
+	qsort(m_c.get(), m_nb, sizeof(SXYDW), callcircle_xydwCompare);
 }
 
 void CCallCircle::null()
 {
 	m_nb = 0;
 	m_r = 0.0;
-	if (m_c) {
-		delete[] m_c;
-		m_c = 0;
-	}
+	m_c.reset();
 }
 
 CCallCircle::~CCallCircle()

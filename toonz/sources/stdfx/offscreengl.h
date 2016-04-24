@@ -14,7 +14,7 @@ public:
 // ----------------------------------------------------------------------------------- //
 // creo il contesto openGL                                                             //
 // ----------------------------------------------------------------------------------- //
-#ifdef WIN32
+#ifdef _WIN32
 		initBITMAPINFO(m_info, width, height, bpp);
 
 		m_offData = 0; // a pointer to buffer
@@ -80,7 +80,7 @@ public:
 // ----------------------------------------------------------------------------------- //
 // cancello il contesto openGL                                                         //
 // ----------------------------------------------------------------------------------- //
-#ifdef WIN32
+#ifdef _WIN32
 		wglDeleteContext(m_hglRC);
 
 		// release object
@@ -99,7 +99,7 @@ public:
 
 public:
 // init a BITMAPINFO structure
-#ifdef WIN32
+#ifdef _WIN32
 	void initBITMAPINFO(BITMAPINFO &info, int width, int height, int bpp)
 	{
 		memset(&info, 0, sizeof(BITMAPINFOHEADER));

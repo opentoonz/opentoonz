@@ -89,8 +89,8 @@ TEnv::DoubleVar RasterBrushHardness("RasterBrushHardness", 100);
 
 void split(
 	TStroke *stroke,
-	const vector<double> &parameterValues,
-	vector<TStroke *> &strokes)
+	const std::vector<double> &parameterValues,
+	std::vector<TStroke *> &strokes)
 {
 	TThickPoint p2;
 	std::vector<TThickPoint> points;
@@ -218,7 +218,7 @@ void findMaxCurvPoints(
 	TStroke *stroke,
 	const float &angoloLim,
 	const float &curvMaxLim,
-	vector<double> &parameterValues)
+	std::vector<double> &parameterValues)
 {
 	TPointD tg1, tg2; // Tangent vectors
 
@@ -343,7 +343,7 @@ void addStroke(TTool::Application *application, const TVectorImageP &vi, TStroke
 
 		TUndoManager::manager()->beginBlock();
 		for (int i = 0; i < n; i++) {
-			vector<TFilledRegionInf> *fillInformation = new vector<TFilledRegionInf>;
+			std::vector<TFilledRegionInf> *fillInformation = new std::vector<TFilledRegionInf>;
 			ImageUtils::getFillingInformationOverlappingArea(vi, *fillInformation, stroke->getBBox());
 			TStroke *str = new TStroke(*strokes[i]);
 			vi->addStroke(str);
@@ -351,7 +351,7 @@ void addStroke(TTool::Application *application, const TVectorImageP &vi, TStroke
 		}
 		TUndoManager::manager()->endBlock();
 	} else {
-		vector<TFilledRegionInf> *fillInformation = new vector<TFilledRegionInf>;
+		std::vector<TFilledRegionInf> *fillInformation = new std::vector<TFilledRegionInf>;
 		ImageUtils::getFillingInformationOverlappingArea(vi, *fillInformation, stroke->getBBox());
 		TStroke *str = new TStroke(*stroke);
 		vi->addStroke(str);
@@ -395,14 +395,14 @@ void addStrokeToImage(TTool::Application *application, const TVectorImageP &vi, 
 
 class RasterBrushUndo : public TRasterUndo
 {
-	vector<TThickPoint> m_points;
+	std::vector<TThickPoint> m_points;
 	int m_styleId;
 	bool m_selective;
 	bool m_isPencil;
 
 public:
 	RasterBrushUndo(TTileSetCM32 *tileSet,
-					const vector<TThickPoint> &points,
+					const std::vector<TThickPoint> &points,
 					int styleId, bool selective,
 					TXshSimpleLevel *level, const TFrameId &frameId, bool isPencil,
 					bool isFrameCreated, bool isLevelCreated)
@@ -442,14 +442,14 @@ public:
 
 class RasterBluredBrushUndo : public TRasterUndo
 {
-	vector<TThickPoint> m_points;
+	std::vector<TThickPoint> m_points;
 	int m_styleId;
 	bool m_selective;
 	int m_maxThick;
 	double m_hardness;
 
 public:
-	RasterBluredBrushUndo(TTileSetCM32 *tileSet, const vector<TThickPoint> &points,
+	RasterBluredBrushUndo(TTileSetCM32 *tileSet, const std::vector<TThickPoint> &points,
 						  int styleId, bool selective, TXshSimpleLevel *level, const TFrameId &frameId,
 						  int maxThick, double hardness, bool isFrameCreated, bool isLevelCreated)
 		: TRasterUndo(tileSet, level, frameId, isFrameCreated, isLevelCreated, 0), m_points(points), m_styleId(styleId), m_selective(selective), m_maxThick(maxThick), m_hardness(hardness)
@@ -469,7 +469,7 @@ public:
 		workRaster->clear();
 		BluredBrush brush(workRaster, m_maxThick, brushPad, false);
 
-		vector<TThickPoint> points;
+		std::vector<TThickPoint> points;
 		points.push_back(m_points[0]);
 		TRect bbox = brush.getBoundFromPoints(points);
 		brush.addPoint(m_points[0], 1);
@@ -548,7 +548,7 @@ int computeThickness(int pressure, const TIntPairProperty &property, bool isPath
 //
 //-----------------------------------------------------------------------------
 
-BrushTool::BrushTool(string name, int targetType)
+BrushTool::BrushTool(std::string name, int targetType)
 	: TTool(name), m_thickness("Size", 0, 100, 0, 5), m_rasThickness("Size", 1, 100, 1, 5), m_accuracy("Accuracy:", 1, 100, 20), m_hardness("Hardness:", 0, 100, 100), m_preset("Preset:"), m_selective("Selective", false), m_breakAngles("Break", true), m_pencil("Pencil", false), m_pressure("Pressure", true), m_capStyle("Cap"), m_joinStyle("Join"), m_miterJoinLimit("Miter:", 0, 100, 4), m_rasterTrack(0), m_styleId(0), m_modifiedRegion(), m_bluredBrush(0), m_active(false), m_enabled(false), m_isPrompting(false), m_firstTime(true), m_presetsLoaded(false), m_workingFrameId(TFrameId())
 {
 	bind(targetType);
@@ -573,6 +573,7 @@ BrushTool::BrushTool(string name, int targetType)
 #ifndef STUDENT
 	m_prop[0].bind(m_preset);
 	m_preset.setId("BrushPreset");
+	m_preset.addValue(CUSTOM_WSTR);
 #endif
 	m_pressure.setId("PressureSensibility");
 
@@ -927,9 +928,9 @@ void BrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e)
 			if (isAdded) {
 				m_tileSaver->save(m_rasterTrack->getLastRect());
 				m_rasterTrack->generateLastPieceOfStroke(m_pencil.getValue());
-				vector<TThickPoint> brushPoints = m_rasterTrack->getPointsSequence();
+				std::vector<TThickPoint> brushPoints = m_rasterTrack->getPointsSequence();
 				int m = (int)brushPoints.size();
-				vector<TThickPoint> points;
+				std::vector<TThickPoint> points;
 				if (m == 3) {
 					points.push_back(brushPoints[0]);
 					points.push_back(brushPoints[1]);
@@ -955,7 +956,7 @@ void BrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e)
 
 			TRect bbox;
 			int m = (int)m_points.size();
-			vector<TThickPoint> points;
+			std::vector<TThickPoint> points;
 			if (m == 3) {
 				// ho appena cominciato. devo disegnare un segmento
 				TThickPoint pa = m_points.front();
@@ -1107,9 +1108,9 @@ void BrushTool::finishRasterBrush(const TPointD &pos, int pressureVal)
 			m_tileSaver->save(m_rasterTrack->getLastRect());
 			m_rasterTrack->generateLastPieceOfStroke(m_pencil.getValue(), true);
 
-			vector<TThickPoint> brushPoints = m_rasterTrack->getPointsSequence();
+			std::vector<TThickPoint> brushPoints = m_rasterTrack->getPointsSequence();
 			int m = (int)brushPoints.size();
-			vector<TThickPoint> points;
+			std::vector<TThickPoint> points;
 			if (m == 3) {
 				points.push_back(brushPoints[0]);
 				points.push_back(brushPoints[1]);
@@ -1143,7 +1144,7 @@ void BrushTool::finishRasterBrush(const TPointD &pos, int pressureVal)
 			TThickPoint point(pos + rasCenter, thickness);
 			m_points.push_back(point);
 			int m = m_points.size();
-			vector<TThickPoint> points;
+			std::vector<TThickPoint> points;
 			points.push_back(m_points[m - 3]);
 			points.push_back(m_points[m - 2]);
 			points.push_back(m_points[m - 1]);
@@ -1207,6 +1208,8 @@ void BrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e)
 
 		void addMinMax(TDoublePairProperty &prop, double add)
 		{
+			if (add == 0.0)
+				return;
 			const TDoublePairProperty::Range &range = prop.getRange();
 
 			TDoublePairProperty::Value value = prop.getValue();
@@ -1369,7 +1372,7 @@ void BrushTool::setWorkAndBackupImages()
 
 //------------------------------------------------------------------
 
-bool BrushTool::onPropertyChanged(string propertyName)
+bool BrushTool::onPropertyChanged(std::string propertyName)
 {
 	//Set the following to true whenever a different piece of interface must
 	//be refreshed - done once at the end.
@@ -1395,15 +1398,9 @@ bool BrushTool::onPropertyChanged(string propertyName)
 
 			m_minThick = m_thickness.getValue().first;
 			m_maxThick = m_thickness.getValue().second;
-		}
-
-		if (m_preset.getValue() != L"<custom>")
-			m_preset.setValue(L"<custom>");
-
+		}		
 	} else if (propertyName == m_accuracy.getName()) {
 		BrushAccuracy = m_accuracy.getValue();
-		if (m_preset.getValue() != L"<custom>")
-			m_preset.setValue(L"<custom>");
 	} else if (propertyName == m_preset.getName()) {
 		loadPreset();
 		notifyTool = true;
@@ -1438,7 +1435,7 @@ bool BrushTool::onPropertyChanged(string propertyName)
 		}
 	}
 
-	if (m_preset.getValue() != CUSTOM_WSTR) {
+	if (propertyName != m_preset.getName() && m_preset.getValue() != CUSTOM_WSTR) {
 		m_preset.setValue(CUSTOM_WSTR);
 		notifyTool = true;
 	}
@@ -1547,7 +1544,7 @@ void BrushTool::addPreset(QString name)
 
 void BrushTool::removePreset()
 {
-	wstring name(m_preset.getValue());
+	std::wstring name(m_preset.getValue());
 	if (name == CUSTOM_WSTR)
 		return;
 
@@ -1742,7 +1739,7 @@ void BrushPresetManager::addPreset(const BrushData &data)
 
 //------------------------------------------------------------------
 
-void BrushPresetManager::removePreset(const wstring &name)
+void BrushPresetManager::removePreset(const std::wstring &name)
 {
 	m_presets.erase(BrushData(name));
 	save();

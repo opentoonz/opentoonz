@@ -3,7 +3,7 @@
 /*max@home*/
 #ifndef __GLOBAL_DEF_H__
 #define __GLOBAL_DEF_H__
-#ifdef WIN32
+#ifdef _WIN32
 #define GLOBAL_LOCK(P) GlobalLock(P)
 #define GLOBAL_ALLOC(T, S) GlobalAlloc(T, S)
 #define GLOBAL_FREE(P) GlobalFree(P)

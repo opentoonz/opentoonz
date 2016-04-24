@@ -7,7 +7,6 @@ class TFilePath;
 
 #include <string>
 #include <QString>
-using namespace std;
 
 //------------------------------------------------------------------------------
 
@@ -15,7 +14,7 @@ using namespace std;
 #undef TFARMAPI
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 #ifdef TFARM_EXPORTS
 #define TFARMAPI __declspec(dllexport)
 #else
@@ -35,14 +34,14 @@ void AddToMessageLog(char *msg);
 
 //------------------------------------------------------------------------------
 
-TFARMAPI string getLastErrorText();
+TFARMAPI std::string getLastErrorText();
 
 //------------------------------------------------------------------------------
 
 class TFARMAPI TService
 {
 public:
-	TService(const string &name, const string &displayName);
+	TService(const std::string &name, const std::string &displayName);
 	virtual ~TService();
 
 	static TService *instance();
@@ -59,8 +58,8 @@ public:
 
 	void setStatus(Status status, long exitCode, long waitHint);
 
-	string getName() const;
-	string getDisplayName() const;
+	std::string getName() const;
+	std::string getDisplayName() const;
 
 	void run(int argc, char *argv[], bool console = false);
 
@@ -69,17 +68,17 @@ public:
 
 	bool isRunningAsConsoleApp() const;
 
-	static void start(const string &name);
-	static void stop(const string &name);
+	static void start(const std::string &name);
+	static void stop(const std::string &name);
 
 	static void install(
-		const string &name,
-		const string &displayName,
+		const std::string &name,
+		const std::string &displayName,
 		const TFilePath &appPath);
 
-	static void remove(const string &name);
+	static void remove(const std::string &name);
 
-	static void addToMessageLog(const string &msg);
+	static void addToMessageLog(const std::string &msg);
 	static void addToMessageLog(const QString &msg);
 
 private:

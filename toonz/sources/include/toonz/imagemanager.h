@@ -120,7 +120,7 @@ public:
 	void clear();
 
 	// load icon (and image) data of all frames into cache
-	void loadAllTlvIconsAndPutInCache(TXshSimpleLevel *, vector<TFrameId>, vector<string>, bool);
+	void loadAllTlvIconsAndPutInCache(TXshSimpleLevel *, std::vector<TFrameId>, std::vector<std::string>, bool);
 
 	/*!
     Returns the image built by the object associated with the specified identifier, using the
@@ -262,7 +262,7 @@ private:
 
 //-----------------------------------------------------------------------------
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DV_EXPORT_API TSmartPointerT<ImageBuilder>;
 #endif
 

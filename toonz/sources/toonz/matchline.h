@@ -26,7 +26,7 @@ class TXsheet;
 
 //==================================================
 
-class MergeCmappedDialog : public Dialog
+class MergeCmappedDialog : public DVGui::Dialog
 {
 	Q_OBJECT
 
@@ -47,13 +47,13 @@ protected slots:
 
 //----------------------------------------------------------------
 
-class MatchlinesDialog : public Dialog
+class MatchlinesDialog : public DVGui::Dialog
 {
 	Q_OBJECT
 
 	QRadioButton *m_button1, *m_button2;
-	StyleIndexLineEdit *m_inkIndex;
-	IntField *m_inkPrevalence;
+	DVGui::StyleIndexLineEdit *m_inkIndex;
+	DVGui::IntField *m_inkPrevalence;
 	TPaletteHandle *m_pltHandle;
 
 	QPushButton *m_lup_noGapButton;
@@ -82,20 +82,20 @@ public:
 
 //----------------------------------------------------------------
 
-class DeleteInkDialog : public Dialog
+class DeleteInkDialog : public DVGui::Dialog
 {
 	Q_OBJECT
 
-	LineEdit *m_inkIndex;
-	LineEdit *m_frames;
+	DVGui::LineEdit *m_inkIndex;
+	DVGui::LineEdit *m_frames;
 
 public:
 	DeleteInkDialog(const QString &str, int inkIndex);
 
 	void setRange(const QString &str);
 
-	vector<int> getInkIndexes();
-	vector<TFrameId> getFrames();
+	std::vector<int> getInkIndexes();
+	std::vector<TFrameId> getFrames();
 };
 
 //==========================================================================
@@ -106,4 +106,4 @@ void mergeColumns(int dstColumn, int srcColumn, bool isRedo);
 void mergeColumns(const std::set<int> &columns);
 void doMatchlines(int column, int mColumn, int index, int inkPrevalence, int MatchlineSessionId = 0);
 void mergeCmapped(int dstColumn, int srcColumn, const QString &fullpath, bool isRedo);
-vector<int> string2Indexes(const QString &values);
+std::vector<int> string2Indexes(const QString &values);

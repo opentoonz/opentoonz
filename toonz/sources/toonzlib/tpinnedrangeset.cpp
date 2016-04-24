@@ -45,7 +45,7 @@ int TPinnedRangeSet::getRangeIndex(int frame) const
 
 void TPinnedRangeSet::setRange(int first, int second)
 {
-	vector<Range>::iterator it;
+	std::vector<Range>::iterator it;
 	// finds the range which could possibly be merged before : range.second+1 >= first
 	for (it = m_ranges.begin(); it != m_ranges.end(); ++it)
 		if (it->second + 1 >= first)
@@ -62,7 +62,7 @@ void TPinnedRangeSet::setRange(int first, int second)
 		if (first < it->first)
 			it->first = first;
 		// update it->second, and find all the ranges which should be deleted
-		vector<Range>::iterator it2 = it;
+		std::vector<Range>::iterator it2 = it;
 		for (++it2; it2 != m_ranges.end(); ++it2)
 			if (it2->first > second + 1)
 				break;
@@ -80,7 +80,7 @@ void TPinnedRangeSet::setRange(int first, int second)
 
 void TPinnedRangeSet::removeRange(int first, int second)
 {
-	vector<Range>::iterator it;
+	std::vector<Range>::iterator it;
 	// finds the first range which could possibly overlap [first,second] : range.second>=first
 	for (it = m_ranges.begin(); it != m_ranges.end(); ++it)
 		if (it->second >= first)
@@ -94,7 +94,7 @@ void TPinnedRangeSet::removeRange(int first, int second)
 		it->first = second + 1;
 		m_ranges.insert(it, range);
 	} else {
-		vector<Range>::iterator it2;
+		std::vector<Range>::iterator it2;
 		if (it->first < first) {
 			it->second = first - 1;
 			++it;
@@ -141,7 +141,7 @@ void TPinnedRangeSet::loadData(TIStream &is)
 	m_ranges.clear();
 	int prevFrame = 0;
 	int i = 0;
-	string tagName;
+	std::string tagName;
 	int count = 0;
 	while (is.matchTag(tagName) && count < 3) {
 		if (tagName == "permanent") {

@@ -1,6 +1,6 @@
 
 
-#ifdef WIN32
+#ifdef _WIN32
 #ifndef UNICODE
 #define UNICODE
 #endif
@@ -35,7 +35,7 @@ TRaster::TRaster(int lx, int ly, int pixelSize)
 		//m_buffer = new UCHAR[lx*ly*pixelSize];
 
 		if (!m_buffer) {
-#ifdef WIN32
+#ifdef _WIN32
 			static bool firstTime = true;
 			if (firstTime) {
 				firstTime = false;
@@ -57,7 +57,7 @@ TRaster::TRaster(int lx, int ly, int pixelSize)
     m_buffer = BigMemoryManager.getMemoryChunk(lx*ly*pixelSize, this);
     //m_buffer = new UCHAR[lx*ly*pixelSize];
     m_totalMemory += ((lx*ly*pixelSize)>>10);
-    #ifdef WIN32
+    #ifdef _WIN32
     MessageBox( NULL, "Run out of contiguos phisical memory: please save all and restart toonz!", "Warning", MB_OK);
     #endif
     }*/
@@ -296,19 +296,18 @@ void TRaster::yMirror()
 {
 	const int rowSize = m_lx * m_pixelSize;
 	const int wrapSize = m_wrap * m_pixelSize;
-	UCHAR *auxBuf = new UCHAR[rowSize];
+	std::unique_ptr<UCHAR[]> auxBuf(new UCHAR[rowSize]);
 	lock();
 	UCHAR *buff1 = getRawData();
 	UCHAR *buff2 = getRawData(0, (m_ly - 1));
 	while (buff1 < buff2) {
-		::memcpy(auxBuf, buff1, rowSize);
+		::memcpy(auxBuf.get(), buff1, rowSize);
 		::memcpy(buff1, buff2, rowSize);
-		::memcpy(buff2, auxBuf, rowSize);
+		::memcpy(buff2, auxBuf.get(), rowSize);
 		buff1 += wrapSize;
 		buff2 -= wrapSize;
 	}
 	unlock();
-	delete[] auxBuf;
 }
 
 //------------------------------------------------------------
@@ -317,22 +316,21 @@ void TRaster::xMirror()
 {
 	const int wrapSize = m_wrap * m_pixelSize;
 	const int lastPixelOffset = (m_lx - 1) * m_pixelSize;
-	UCHAR *auxBuf = new UCHAR[m_pixelSize];
+	std::unique_ptr<UCHAR[]> auxBuf(new UCHAR[m_pixelSize]);
 	lock();
 	UCHAR *row = getRawData();
 	for (int i = 0; i < m_ly; i++) {
 		UCHAR *a = row, *b = row + lastPixelOffset;
 		while (a < b) {
-			::memcpy(auxBuf, a, m_pixelSize);
+			::memcpy(auxBuf.get(), a, m_pixelSize);
 			::memcpy(a, b, m_pixelSize);
-			::memcpy(b, auxBuf, m_pixelSize);
+			::memcpy(b, auxBuf.get(), m_pixelSize);
 			a += m_pixelSize;
 			b -= m_pixelSize;
 		}
 		row += wrapSize;
 	}
 	unlock();
-	delete[] auxBuf;
 }
 
 //------------------------------------------------------------
@@ -341,15 +339,15 @@ void TRaster::rotate180()
 {
 	//const int rowSize = m_lx * m_pixelSize;
 	const int wrapSize = m_wrap * m_pixelSize;
-	UCHAR *auxBuf = new UCHAR[m_pixelSize];
+	std::unique_ptr<UCHAR[]> auxBuf(new UCHAR[m_pixelSize]);
 	lock();
 	UCHAR *buff1 = getRawData();
 	UCHAR *buff2 = buff1 + wrapSize * (m_ly - 1) + m_pixelSize * (m_lx - 1);
 	if (m_wrap == m_lx) {
 		while (buff1 < buff2) {
-			::memcpy(auxBuf, buff1, m_pixelSize);
+			::memcpy(auxBuf.get(), buff1, m_pixelSize);
 			::memcpy(buff1, buff2, m_pixelSize);
-			::memcpy(buff2, auxBuf, m_pixelSize);
+			::memcpy(buff2, auxBuf.get(), m_pixelSize);
 			buff1 += m_pixelSize;
 			buff2 -= m_pixelSize;
 		}
@@ -357,9 +355,9 @@ void TRaster::rotate180()
 		for (int y = 0; y < m_ly / 2; y++) {
 			UCHAR *a = buff1, *b = buff2;
 			for (int x = 0; x < m_lx; x++) {
-				::memcpy(auxBuf, a, m_pixelSize);
+				::memcpy(auxBuf.get(), a, m_pixelSize);
 				::memcpy(a, b, m_pixelSize);
-				::memcpy(b, auxBuf, m_pixelSize);
+				::memcpy(b, auxBuf.get(), m_pixelSize);
 				a += m_pixelSize;
 				b -= m_pixelSize;
 			}
@@ -368,7 +366,6 @@ void TRaster::rotate180()
 		}
 	}
 	unlock();
-	delete[] auxBuf;
 }
 
 //------------------------------------------------------------

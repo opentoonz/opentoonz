@@ -28,10 +28,10 @@ public:
 	void exec();
 
 	// non modifica il raster. Si limita a calcolare i segmenti
-	void compute(vector<Segment> &segments);
+	void compute(std::vector<Segment> &segments);
 
 	// disegna sul raster i segmenti
-	void draw(const vector<Segment> &segments);
+	void draw(const std::vector<Segment> &segments);
 
 private:
 	class Imp;

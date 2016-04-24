@@ -6,8 +6,6 @@
 #include "toonzqt/dvdialog.h"
 #include "versioncontrol.h"
 
-using namespace DVGui;
-
 class QLabel;
 class QPushButton;
 class QCheckBox;
@@ -17,7 +15,7 @@ class QFile;
 
 //-----------------------------------------------------------------------------
 
-class SVNDeleteDialog : public Dialog
+class SVNDeleteDialog : public DVGui::Dialog
 {
 	Q_OBJECT
 

@@ -1,6 +1,6 @@
 
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(disable : 4996)
 #endif
 
@@ -203,7 +203,7 @@ int TTWAIN_MessageHook(void *lpmsg)
 	//printf("%s\n", __PRETTY_FUNCTION__);
 	if (TTWAIN_GetState() >= TWAIN_SOURCE_ENABLED) {
 /* source enabled */
-#ifdef WIN32
+#ifdef _WIN32
 		TW_EVENT twEvent;
 		twEvent.pEvent = (TW_MEMREF)lpmsg;
 		twEvent.TWMessage = MSG_NULL;
@@ -639,7 +639,7 @@ void *TTWAIN_AcquireNative(void *hwnd)
 	return hnative;
 }
 /*---------------------------------------------------------------------------*/
-#ifdef WIN32
+#ifdef _WIN32
 
 typedef void(MyFun)(HWND);
 

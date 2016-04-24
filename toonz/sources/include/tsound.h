@@ -35,7 +35,7 @@ const int RIGHT = LEFT + 1;
 class TSoundTrack;
 class TSoundTransform;
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DVAPI TSmartPointerT<TSoundTrack>;
 #endif
 
@@ -260,9 +260,9 @@ public:
 						   // un play od una registrazione
 	};
 
-	TSoundDeviceException(Type type, const string &msg)
+	TSoundDeviceException(Type type, const std::string &msg)
 		: TException(msg), m_type(type) {}
-	TSoundDeviceException(Type type, const wstring &msg)
+	TSoundDeviceException(Type type, const std::wstring &msg)
 		: TException(msg), m_type(type) {}
 
 	Type getType()
@@ -360,7 +360,7 @@ class TSoundOutputDeviceImp;
 */
 class DVAPI TSoundOutputDevice
 {
-	std::unique_ptr<TSoundOutputDeviceImp> m_imp;
+	std::shared_ptr<TSoundOutputDeviceImp> m_imp;
 
 public:
 	TSoundOutputDevice();

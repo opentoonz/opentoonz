@@ -7,7 +7,7 @@
 #include "tofflinegl.h"
 
 //------------------------------------------------------------------------------
-#ifdef WIN32
+#ifdef _WIN32
 #define ISNAN _isnan
 #else
 extern "C" int isnan(double);
@@ -141,7 +141,7 @@ void subCompute(TRasterFxPort &m_input, TTile &tile, double frame, const TRender
 	assert(ret == TRUE);
 #else
 	TOfflineGL offScreenRendering(TDimension(rasterWidth, rasterHeight));
-	//#ifdef WIN32
+	//#ifdef _WIN32
 	offScreenRendering.makeCurrent();
 //#else
 //#if defined(LINUX) || defined(MACOSX)

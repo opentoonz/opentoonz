@@ -98,7 +98,7 @@ bool TFxAttributes::isContainedInGroup(int groupId)
 
 //----------------------------------------------------------------------
 
-void TFxAttributes::setGroupName(const wstring &name, int position)
+void TFxAttributes::setGroupName(const std::wstring &name, int position)
 {
 	int groupSelector = position < 0 ? m_groupSelector : position;
 	assert(groupSelector >= 0 && groupSelector <= m_groupName.size());
@@ -107,7 +107,7 @@ void TFxAttributes::setGroupName(const wstring &name, int position)
 
 //----------------------------------------------------------------------
 
-wstring TFxAttributes::getGroupName(bool fromEditor)
+std::wstring TFxAttributes::getGroupName(bool fromEditor)
 {
 	int groupSelector = fromEditor ? m_groupSelector + 1 : m_groupSelector;
 	return m_groupName.isEmpty() ||
@@ -119,7 +119,7 @@ wstring TFxAttributes::getGroupName(bool fromEditor)
 
 //----------------------------------------------------------------------
 
-QStack<wstring> TFxAttributes::getGroupNameStack()
+QStack<std::wstring> TFxAttributes::getGroupNameStack()
 {
 	return m_groupName;
 }
@@ -181,7 +181,7 @@ int TFxAttributes::getEditingGroupId()
 
 //----------------------------------------------------------------------
 
-wstring TFxAttributes::getEditingGroupName()
+std::wstring TFxAttributes::getEditingGroupName()
 {
 	if (!isGrouped() || m_groupSelector + 1 >= m_groupName.size())
 		return L"";

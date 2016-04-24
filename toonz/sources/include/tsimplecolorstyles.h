@@ -240,13 +240,13 @@ class DVAPI TRasterImagePatternStrokeStyle : public TColorStyle
 
 protected:
 	TLevelP m_level;
-	string m_name;
+	std::string m_name;
 	double m_space,
 		m_rotation;
 
 public:
 	TRasterImagePatternStrokeStyle();
-	TRasterImagePatternStrokeStyle(const string &patternName);
+	TRasterImagePatternStrokeStyle(const std::string &patternName);
 
 	bool isRegionStyle() const { return false; }
 	bool isStrokeStyle() const { return true; }
@@ -275,9 +275,9 @@ public:
 	};
 
 	int getTagId() const { return 2000; };
-	void getObsoleteTagIds(vector<int> &ids) const;
+	void getObsoleteTagIds(std::vector<int> &ids) const;
 
-	void loadLevel(const string &patternName);
+	void loadLevel(const std::string &patternName);
 	static TFilePath getRootDir();
 	static void setRootDir(const TFilePath &path) { m_rootDir = path + "custom styles"; }
 
@@ -312,12 +312,12 @@ class DVAPI TVectorImagePatternStrokeStyle : public TColorStyle
 
 protected:
 	TLevelP m_level;
-	string m_name;
+	std::string m_name;
 	double m_space, m_rotation;
 
 public:
 	TVectorImagePatternStrokeStyle();
-	TVectorImagePatternStrokeStyle(const string &patternName);
+	TVectorImagePatternStrokeStyle(const std::string &patternName);
 
 	bool isRegionStyle() const { return false; }
 	bool isStrokeStyle() const { return true; }
@@ -346,9 +346,9 @@ public:
 	};
 
 	int getTagId() const { return 2800; };
-	void getObsoleteTagIds(vector<int> &ids) const;
+	void getObsoleteTagIds(std::vector<int> &ids) const;
 
-	void loadLevel(const string &patternName);
+	void loadLevel(const std::string &patternName);
 	static TFilePath getRootDir();
 	static void setRootDir(const TFilePath &path) { m_rootDir = path + "custom styles"; }
 

@@ -33,12 +33,12 @@ public:
 
 	void addPoint(const TThickPoint &p, double opacity);
 	void addArc(const TThickPoint &pa, const TThickPoint &pb, const TThickPoint &pc, double opacityA, double opacityC);
-	TRect getBoundFromPoints(const vector<TThickPoint> &points) const;
+	TRect getBoundFromPoints(const std::vector<TThickPoint> &points) const;
 	//colormapped
 	void updateDrawing(const TRasterCM32P rasCM, const TRasterCM32P rasBackupCM, const TRect &bbox,
 					   int styleId, bool selective) const;
 	void eraseDrawing(const TRasterCM32P rasCM, const TRasterCM32P rasBackupCM, const TRect &bbox,
-					  bool selective, int selectedStyleId, const wstring &mode) const;
+					  bool selective, int selectedStyleId, const std::wstring &mode) const;
 
 	//fullcolor
 	void updateDrawing(const TRasterP ras, const TRasterP rasBackup, const TPixel32 &color,

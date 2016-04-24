@@ -18,10 +18,10 @@ class TFilePath;
 
 namespace TSysLog
 {
-void success(const string &msg);
-void warning(const string &msg);
-void error(const string &msg);
-void info(const string &msg);
+void success(const std::string &msg);
+void warning(const std::string &msg);
+void error(const std::string &msg);
+void info(const std::string &msg);
 }
 
 //------------------------------------------------------------------------------
@@ -33,9 +33,9 @@ public:
 	TUserLogAppend(const TFilePath &fp);
 	~TUserLogAppend();
 
-	void warning(const string &msg);
-	void error(const string &msg);
-	void info(const string &msg);
+	void warning(const std::string &msg);
+	void error(const std::string &msg);
+	void info(const std::string &msg);
 
 private:
 	class Imp;

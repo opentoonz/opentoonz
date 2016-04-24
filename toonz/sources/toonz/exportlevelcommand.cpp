@@ -65,7 +65,7 @@ struct BusyCursorOverride {
 struct ExportOverwriteCB : public IoCmd::OverwriteCallbacks {
 	bool overwriteRequest(const TFilePath &fp)
 	{
-		int ret = MsgBox(QObject::tr("Warning: file %1 already exists.").arg(toQString(fp)),
+		int ret = DVGui::MsgBox(QObject::tr("Warning: file %1 already exists.").arg(toQString(fp)),
 						 QObject::tr("Continue Exporting"), QObject::tr("Stop Exporting"), 1);
 		return (ret == 1);
 	}
@@ -530,7 +530,7 @@ bool IoCmd::exportLevel(const TFilePath &path, TXshSimpleLevel *sl,
 		sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
 
 		if (!sl) {
-			MsgBox(CRITICAL, QObject::tr("No level selected!"));
+			DVGui::error(QObject::tr("No level selected!"));
 			return false;
 		}
 	}

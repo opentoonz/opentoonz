@@ -118,20 +118,20 @@ void TMessageRepository::messageReceived(int type, const QString &message)
 	}
 
 	switch (type) {
-	case INFORMATION:
+	case DVGui::INFORMATION:
 		m_sim->appendRow(new QStandardItem(gGreenIcon, message));
-		CASE WARNING : m_sim->appendRow(new QStandardItem(gYellowIcon, message));
-		CASE CRITICAL : m_sim->appendRow(new QStandardItem(gRedIcon, message));
+		CASE DVGui::WARNING : m_sim->appendRow(new QStandardItem(gYellowIcon, message));
+		CASE DVGui::CRITICAL : m_sim->appendRow(new QStandardItem(gRedIcon, message));
 	DEFAULT:;
 	}
 
-	if (type == CRITICAL || (type == WARNING && !TMessageViewer::isTMsgVisible()))
-		MsgBoxInPopup(MsgType(type), message);
+	if (type == DVGui::CRITICAL || (type == DVGui::WARNING && !TMessageViewer::isTMsgVisible()))
+		DVGui::MsgBoxInPopup(DVGui::MsgType(type), message);
 }
 
 //---------------------------------------------------------------------------------
 
-vector<TMessageViewer *> TMessageViewer::m_tmsgViewers;
+std::vector<TMessageViewer *> TMessageViewer::m_tmsgViewers;
 
 bool TMessageViewer::isTMsgVisible()
 {

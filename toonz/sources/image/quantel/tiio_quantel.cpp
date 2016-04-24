@@ -10,7 +10,7 @@
 
 //------------------------------------------------------------
 namespace {
-  int getTypeFromExt(const string &ext)
+  int getTypeFromExt(const std::string &ext)
     {
     if (ext == "qnt")
       return QNT_FORMAT;

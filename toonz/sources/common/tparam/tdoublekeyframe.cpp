@@ -16,7 +16,7 @@ TDoubleKeyframe::~TDoubleKeyframe()
 
 void TDoubleKeyframe::saveData(TOStream &os) const
 {
-	static std::map<TDoubleKeyframe::Type, string> typeCodes;
+	static std::map<TDoubleKeyframe::Type, std::string> typeCodes;
 	if (typeCodes.empty()) {
 		typeCodes[None] = "n";
 		typeCodes[Constant] = "C";
@@ -29,7 +29,7 @@ void TDoubleKeyframe::saveData(TOStream &os) const
 		typeCodes[File] = "F";
 		typeCodes[SimilarShape] = "SimShape";
 	};
-	map<string, string> attr;
+	std::map<std::string, std::string> attr;
 	if (!m_linkedHandles)
 		attr["lnk"] = "no";
 	if (m_step > 1)
@@ -47,7 +47,7 @@ void TDoubleKeyframe::saveData(TOStream &os) const
 		os.child("prev") << m_value << m_speedIn.x;
 		break;
 	}
-	string unitName = m_unitName != "" ? m_unitName : "default";
+	std::string unitName = m_unitName != "" ? m_unitName : "default";
 	switch (m_type) {
 	case Constant:
 	case Exponential:
@@ -78,7 +78,7 @@ void TDoubleKeyframe::saveData(TOStream &os) const
 
 void TDoubleKeyframe::loadData(TIStream &is)
 {
-	static std::map<string, TDoubleKeyframe::Type> typeCodes;
+	static std::map<std::string, TDoubleKeyframe::Type> typeCodes;
 	if (typeCodes.empty()) {
 		typeCodes["n"] = None;
 		typeCodes["C"] = Constant;
@@ -92,17 +92,17 @@ void TDoubleKeyframe::loadData(TIStream &is)
 		typeCodes["SimShape"] = SimilarShape;
 	};
 
-	string tagName;
+	std::string tagName;
 	if (!is.matchTag(tagName))
 		return;
-	std::map<string, TDoubleKeyframe::Type>::iterator it =
+	std::map<std::string, TDoubleKeyframe::Type>::iterator it =
 		typeCodes.find(tagName);
 	if (it == typeCodes.end()) {
 		throw TException(tagName + " : unexpected tag");
 	}
 	m_type = it->second;
 	is.getTagParam("step", m_step);
-	string lnkValue;
+	std::string lnkValue;
 	if (is.getTagParam("lnk", lnkValue) && lnkValue == "no")
 		m_linkedHandles = false;
 	if (is.matchTag(tagName)) {

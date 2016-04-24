@@ -6,7 +6,7 @@
 #include <QStringList>
 #include <QProcess>
 #include <QTextStream>
-#ifdef WIN32
+#ifdef _WIN32
 #include <Windows.h>
 #endif
 #include <map>

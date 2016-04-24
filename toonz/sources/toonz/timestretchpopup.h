@@ -14,13 +14,11 @@ class QLabel;
 class QComboBox;
 class TSelection;
 
-using namespace DVGui;
-
 //=============================================================================
 // TimeStretchPopup
 //-----------------------------------------------------------------------------
 
-class TimeStretchPopup : public Dialog
+class TimeStretchPopup : public DVGui::Dialog
 {
 	Q_OBJECT
 
@@ -28,7 +26,7 @@ class TimeStretchPopup : public Dialog
 	QPushButton *m_cancelBtn;
 
 	QComboBox *m_stretchType;
-	IntLineEdit *m_newRangeFld;
+	DVGui::IntLineEdit *m_newRangeFld;
 	QLabel *m_oldRange;
 
 public:

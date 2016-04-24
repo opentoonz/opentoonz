@@ -21,7 +21,7 @@ class FillParameters
 {
 public:
 	int m_styleId;
-	wstring m_fillType;
+	std::wstring m_fillType;
 	bool m_emptyOnly, m_segment;
 	int m_minFillDepth;
 	int m_maxFillDepth;

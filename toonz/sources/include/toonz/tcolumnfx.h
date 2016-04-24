@@ -49,8 +49,8 @@ public:
 	TColumnFx() : TRasterFx() {}
 
 	virtual int getColumnIndex() const = 0;
-	virtual wstring getColumnName() const = 0;
-	virtual wstring getColumnId() const = 0;
+	virtual std::wstring getColumnName() const = 0;
+	virtual std::wstring getColumnId() const = 0;
 	virtual TXshColumn *getXshColumn() const = 0;
 
 	int getReferenceColumnIndex() const { return getColumnIndex(); }
@@ -80,8 +80,8 @@ public:
 	void setColumn(TXshLevelColumn *column);
 	TXshLevelColumn *getColumn() const { return m_levelColumn; }
 
-	wstring getColumnName() const;
-	wstring getColumnId() const;
+	std::wstring getColumnName() const;
+	std::wstring getColumnId() const;
 	int getColumnIndex() const;
 	TXshColumn *getXshColumn() const;
 
@@ -93,7 +93,7 @@ public:
 
 	TFxTimeRegion getTimeRegion() const;
 	bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info);
-	string getAlias(double frame, const TRenderSettings &info) const;
+	std::string getAlias(double frame, const TRenderSettings &info) const;
 	int getMemoryRequirement(const TRectD &rect, double frame, const TRenderSettings &info);
 
 	void doDryCompute(TRectD &rect, double frame, const TRenderSettings &info);
@@ -104,7 +104,7 @@ public:
 	void loadData(TIStream &is);
 
 	const TPersistDeclaration *getDeclaration() const;
-	string getPluginId() const;
+	std::string getPluginId() const;
 
 private:
 	void getImageInfo(TImageInfo &imageInfo, TXshSimpleLevel *sl, TFrameId frameId);
@@ -139,8 +139,8 @@ public:
 	void setColumn(TXshPaletteColumn *column) { m_paletteColumn = column; }
 	TXshPaletteColumn *getColumn() const { return m_paletteColumn; }
 
-	wstring getColumnName() const;
-	wstring getColumnId() const;
+	std::wstring getColumnName() const;
+	std::wstring getColumnId() const;
 	int getColumnIndex() const;
 	TXshColumn *getXshColumn() const;
 
@@ -150,14 +150,14 @@ public:
 
 	TFxTimeRegion getTimeRegion() const;
 	bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info);
-	string getAlias(double frame, const TRenderSettings &info) const;
+	std::string getAlias(double frame, const TRenderSettings &info) const;
 	TAffine getDpiAff(int frame);
 
 	void doCompute(TTile &tile, double frame, const TRenderSettings &);
 	void compute(TFlash &flash, int frame);
 
 	const TPersistDeclaration *getDeclaration() const;
-	string getPluginId() const;
+	std::string getPluginId() const;
 
 private:
 	// not implemented
@@ -184,8 +184,8 @@ public:
 	void setColumn(TXshZeraryFxColumn *column);
 	TXshZeraryFxColumn *getColumn() const { return m_zeraryFxColumn; }
 
-	wstring getColumnName() const;
-	wstring getColumnId() const;
+	std::wstring getColumnName() const;
+	std::wstring getColumnId() const;
 	int getColumnIndex() const;
 	TXshColumn *getXshColumn() const;
 
@@ -193,7 +193,7 @@ public:
 
 	TFxTimeRegion getTimeRegion() const;
 	bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info);
-	string getAlias(double frame, const TRenderSettings &info) const;
+	std::string getAlias(double frame, const TRenderSettings &info) const;
 
 	void doCompute(TTile &tile, double frame, const TRenderSettings &);
 
@@ -201,7 +201,7 @@ public:
 	void loadData(TIStream &is);
 
 	const TPersistDeclaration *getDeclaration() const;
-	string getPluginId() const;
+	std::string getPluginId() const;
 
 private:
 	// not implemented
@@ -224,13 +224,13 @@ public:
 
 	bool canHandle(const TRenderSettings &info, double frame) { return false; }
 
-	string getAlias(double frame, const TRenderSettings &info) const;
+	std::string getAlias(double frame, const TRenderSettings &info) const;
 
 	void doCompute(TTile &tile, double frame, const TRenderSettings &);
 	bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info);
 
 	const TPersistDeclaration *getDeclaration() const;
-	string getPluginId() const;
+	std::string getPluginId() const;
 
 private:
 	friend class FxDag;
@@ -259,7 +259,7 @@ public:
 	void doCompute(TTile &tile, double frame, const TRenderSettings &);
 
 	const TPersistDeclaration *getDeclaration() const;
-	string getPluginId() const;
+	std::string getPluginId() const;
 
 private:
 	// not implemented

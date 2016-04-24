@@ -7,8 +7,6 @@
 #include "timage.h"
 #include "tpixel.h"
 
-using namespace DVGui;
-
 class ComboHistogram;
 
 //=============================================================================

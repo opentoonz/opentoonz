@@ -12,7 +12,7 @@
 
 //#include "tlevel_io.h"
 
-#ifndef WIN32
+#ifndef _WIN32
 #define CALLBACK
 #endif
 // To avoid linking problems with HP ZX2000
@@ -93,7 +93,7 @@ extern "C" void CALLBACK myCombine(GLdouble coords[3], GLdouble *d[4],
 
 //-------------------------------------------------------------------
 
-#ifdef WIN32
+#ifdef _WIN32
 typedef GLvoid(CALLBACK *GluCallback)(void);
 #endif
 
@@ -307,7 +307,7 @@ void TglTessellator::tessellate(const TColorFunction *cf, const bool antiAliasin
 		tglEnableLineSmooth();
 
 		for (TRegionOutline::Boundary::iterator poly_it = outline.m_exterior.begin(); poly_it != outline.m_exterior.end(); ++poly_it) {
-			vector<GLdouble> v;
+			std::vector<GLdouble> v;
 			if (poly_it->size() == 0)
 				continue;
 			v.resize(poly_it->size() * 2);
@@ -326,7 +326,7 @@ void TglTessellator::tessellate(const TColorFunction *cf, const bool antiAliasin
 		}
 
 		for (TRegionOutline::Boundary::iterator poly_it = outline.m_interior.begin(); poly_it != outline.m_interior.end(); ++poly_it) {
-			vector<GLdouble> v;
+			std::vector<GLdouble> v;
 			v.resize(poly_it->size() * 2);
 			int i = 0;
 			for (TRegionOutline::PointVector::iterator it = poly_it->begin(); it != poly_it->end(); ++it) {

@@ -9,7 +9,7 @@
 #include "tcurves.h"
 
 #ifndef __sgi
-#ifdef WIN32
+#ifdef _WIN32
 #include <GL/glut.h>
 #elif defined(LINUX)
 #include <GL/glut.h>
@@ -77,7 +77,7 @@ double tglGetPixelSize2()
 
 //-----------------------------------------------------------------------------
 
-double tglGetTextWidth(const string &s, void *font)
+double tglGetTextWidth(const std::string &s, void *font)
 {
 	double factor = 0.07;
 	double w = 0;
@@ -88,7 +88,7 @@ double tglGetTextWidth(const string &s, void *font)
 
 //-----------------------------------------------------------------------------
 
-void tglDrawText(const TPointD &p, const string &s, void *character)
+void tglDrawText(const TPointD &p, const std::string &s, void *character)
 {
 #ifndef __sgi
 	glPushMatrix();
@@ -106,7 +106,7 @@ void tglDrawText(const TPointD &p, const string &s, void *character)
 
 //-----------------------------------------------------------------------------
 
-void tglDrawText(const TPointD &p, const wstring &s, void *character)
+void tglDrawText(const TPointD &p, const std::wstring &s, void *character)
 {
 #ifndef __sgi
 	glPushMatrix();
@@ -322,7 +322,7 @@ public:
 	static GlFontManager *instance();
 	bool setFont(void *font = GLUT_BITMAP_TIMES_ROMAN_10);
 	void drawText(/*const TRectD bBox,*/
-				  wstring wtext /*,
+				  std::wstring wtext /*,
                 TDimensionD scale = TDimensionD(1.0, 1.0)*/);
 
 private:
@@ -407,13 +407,13 @@ bool GlFontManager::setFont(void *font)
 //----------------------------------------------------------------------------
 
 void GlFontManager::drawText(/*const TRectD bBox,*/
-							 wstring wtext /*,
+							 std::wstring wtext /*,
                              TDimensionD scale*/)
 {
 	if (!m_currentFont)
 		return;
 
-	string text = toString(wtext);
+	std::string text = toString(wtext);
 	const char *textString = text.c_str();
 	glListBase(m_base);
 	/*
@@ -435,8 +435,7 @@ void tglDraw(const TCubic &cubic, int precision, GLenum pointOrLine)
 {
 	CHECK_ERRORS_BY_GL;
 	assert(pointOrLine == GL_POINT || pointOrLine == GL_LINE);
-	float(*ctrlPts)[3];
-	ctrlPts = new float[4][3];
+	float ctrlPts[4][3];
 
 	ctrlPts[0][0] = cubic.getP0().x;
 	ctrlPts[0][1] = cubic.getP0().y;
@@ -463,8 +462,6 @@ void tglDraw(const TCubic &cubic, int precision, GLenum pointOrLine)
 	CHECK_ERRORS_BY_GL;
 	glEvalMesh1(pointOrLine, 0, precision);
 	CHECK_ERRORS_BY_GL;
-
-	delete[] ctrlPts;
 }
 
 //-----------------------------------------------------------------------------
@@ -669,7 +666,7 @@ void tglBuildMipmaps(std::vector<TRaster32P> &rasters,
 
 //-----------------------------------------------------------------------------
 //Forse si potrebbe togliere l'ifdef ed usare QT
-#if defined(WIN32)
+#if defined(_WIN32)
 
 TGlContext tglGetCurrentContext()
 {

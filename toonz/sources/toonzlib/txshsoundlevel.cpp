@@ -18,7 +18,7 @@ PERSIST_IDENTIFIER(TXshSoundLevel, "soundLevel")
 
 //=============================================================================
 
-TXshSoundLevel::TXshSoundLevel(wstring name, int startOffset, int endOffset)
+TXshSoundLevel::TXshSoundLevel(std::wstring name, int startOffset, int endOffset)
 	: TXshLevel(m_classCode, name), m_soundTrack(0), m_duration(0), m_samplePerFrame(0), m_frameSoundCount(0), m_fps(12), m_path()
 {
 }
@@ -120,7 +120,7 @@ void TXshSoundLevel::loadData(TIStream &is)
 	is >> m_name;
 	setName(m_name);
 
-	string tagName;
+	std::string tagName;
 	bool flag = false;
 
 	int type = UNKNOWN_XSHLEVEL;
@@ -131,7 +131,7 @@ void TXshSoundLevel::loadData(TIStream &is)
 				is >> m_path;
 				is.matchEndTag();
 			} else if (tagName == "type") {
-				string v;
+				std::string v;
 				is >> v;
 				if (v == "sound")
 					type = SND_XSHLEVEL;
@@ -150,7 +150,7 @@ void TXshSoundLevel::saveData(TOStream &os)
 {
 	os << m_name;
 
-	map<string, string> attr;
+	std::map<std::string, std::string> attr;
 	os.child("type") << L"sound";
 	os.child("path") << m_path;
 }
@@ -202,7 +202,7 @@ void TXshSoundLevel::computeValues(int frameHeight)
 				(TINT32)(i * m_samplePerFrame + j * samplePerPixel),
 				(TINT32)(i * m_samplePerFrame + (j + 1) * samplePerPixel - 1),
 				TSound::MONO, min, max);
-			m_values.insert(pair<int, pair<double, double>>(p + j, pair<double, double>(min * weightA, max * weightA)));
+			m_values.insert(std::pair<int, std::pair<double, double>>(p + j, std::pair<double, double>(min * weightA, max * weightA)));
 		}
 
 		double min = 0.0;
@@ -211,7 +211,7 @@ void TXshSoundLevel::computeValues(int frameHeight)
 			(TINT32)(i * m_samplePerFrame + j * samplePerPixel),
 			(TINT32)((i + 1) * m_samplePerFrame - 1),
 			TSound::MONO, min, max);
-		m_values.insert(pair<int, pair<double, double>>(p + j, pair<double, double>(min * weightA, max * weightA)));
+		m_values.insert(std::pair<int, std::pair<double, double>>(p + j, std::pair<double, double>(min * weightA, max * weightA)));
 
 		++i;
 		p += frameHeight;

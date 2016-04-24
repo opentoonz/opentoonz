@@ -197,8 +197,8 @@ string long2fourchar(TINT32 fcc)
 	return s;
 }
 
-const string CodecNamesId = "PU_CodecName";
-const string CodecQualityId = "PU_CodecQuality";
+const std::string CodecNamesId = "PU_CodecName";
+const std::string CodecQualityId = "PU_CodecQuality";
 
 } //namespace
 

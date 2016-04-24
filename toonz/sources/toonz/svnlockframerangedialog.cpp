@@ -66,12 +66,12 @@ SVNLockFrameRangeDialog::SVNLockFrameRangeDialog(QWidget *parent,
 	m_toLabel->setMaximumWidth(60);
 	m_toLabel->hide();
 
-	m_fromLineEdit = new IntLineEdit;
+	m_fromLineEdit = new DVGui::IntLineEdit;
 	m_fromLineEdit->setRange(1, frameCount);
 	m_fromLineEdit->hide();
 	connect(m_fromLineEdit, SIGNAL(textChanged(const QString &)), this, SLOT(onFromLineEditTextChanged()));
 
-	m_toLineEdit = new IntLineEdit;
+	m_toLineEdit = new DVGui::IntLineEdit;
 	m_toLineEdit->setRange(1, frameCount);
 	m_toLineEdit->hide();
 	m_toLineEdit->setValue(frameCount);
@@ -391,12 +391,12 @@ SVNLockMultiFrameRangeDialog::SVNLockMultiFrameRangeDialog(QWidget *parent,
 
 	int frameCount = m_files.size();
 
-	m_fromLineEdit = new IntLineEdit;
+	m_fromLineEdit = new DVGui::IntLineEdit;
 	m_fromLineEdit->setRange(1, frameCount);
 	m_fromLineEdit->hide();
 	connect(m_fromLineEdit, SIGNAL(textChanged(const QString &)), this, SLOT(onFromLineEditTextChanged()));
 
-	m_toLineEdit = new IntLineEdit;
+	m_toLineEdit = new DVGui::IntLineEdit;
 	m_toLineEdit->setRange(1, frameCount);
 	m_toLineEdit->hide();
 	m_toLineEdit->setValue(frameCount);
