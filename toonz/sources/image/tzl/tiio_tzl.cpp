@@ -1,7 +1,5 @@
 
 
-#ifndef BRAVO
-
 #include "tiio_tzl.h"
 #include "tmachine.h"
 #include "tsystem.h"
@@ -2519,4 +2517,3 @@ TRect TImageReaderTzl::getBBox() const
 	return TRect(getSize());
 }
 
-#endif

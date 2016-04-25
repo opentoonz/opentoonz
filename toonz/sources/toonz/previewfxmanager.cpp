@@ -1173,11 +1173,6 @@ PreviewFxManager *PreviewFxManager::instance()
 
 FlipBook *PreviewFxManager::showNewPreview(TFxP fx, bool forceFlipbook)
 {
-#ifdef BRAVODEMO
-	DVGui::featureNotAvelaible();
-	return 0;
-#else
-
 	if (!fx)
 		return 0;
 
@@ -1218,8 +1213,6 @@ FlipBook *PreviewFxManager::showNewPreview(TFxP fx, bool forceFlipbook)
 		previewInstance->refreshViewRects();
 
 	return result;
-
-#endif
 }
 
 //-----------------------------------------------------------------------------

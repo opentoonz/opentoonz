@@ -6015,12 +6015,6 @@ Are you sure you want to revert to previous version?</source>
         <translation>L&apos;espace de travail sera remis lors de la prochaine exécution de Toonz.</translation>
     </message>
     <message>
-        <source>The license validation process was not able to confirm the right to use this software on this computer.
- Please contact [ support@toonz.com ] for assistance.</source>
-        <translation>La procédure de validation de la licence n&apos;a pas été capable de confirmer le droit d&apos;utiliser ce logiciel sur cet ordinateur.
-S&apos;il vous plaît contactez [support@toonz.com] pour avoir de l&apos;assistance.</translation>
-    </message>
-    <message>
         <source>Saving previewed frames....</source>
         <translation>Enrestrement des images de preview en cours</translation>
     </message>

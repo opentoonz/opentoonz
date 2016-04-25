@@ -1851,7 +1851,6 @@ DvItemViewerButtonBar::DvItemViewerButtonBar(DvItemViewer *itemViewer, QWidget *
 	QAction *newFolder = new QAction(newFolderIcon, tr("New Folder"), this);
 	newFolder->setIconText("New");
 	addAction(newFolder);
-#ifndef STUDENT
 	addSeparator();
 
 	//view mode
@@ -1881,7 +1880,6 @@ DvItemViewerButtonBar::DvItemViewerButtonBar(DvItemViewer *itemViewer, QWidget *
 //  tableView->setCheckable(true);
 //  actions->addAction(tableView);
 //  addAction(tableView);
-#endif
 	addSeparator();
 
 	// button to export file list to csv
@@ -1892,12 +1890,10 @@ DvItemViewerButtonBar::DvItemViewerButtonBar(DvItemViewer *itemViewer, QWidget *
 
 	connect(folderUp, SIGNAL(triggered()), SIGNAL(folderUp()));
 	connect(newFolder, SIGNAL(triggered()), SIGNAL(newFolder()));
-#ifndef STUDENT
 	connect(thumbView, SIGNAL(triggered()), itemViewer->getPanel(), SLOT(setThumbnailsView()));
 	connect(listView, SIGNAL(triggered()), itemViewer->getPanel(), SLOT(setTableView()));
 //	connect(listView      , SIGNAL(triggered()), itemViewer->getPanel(), SLOT(setListView()));
 //	connect(tableView     , SIGNAL(triggered()), itemViewer->getPanel(), SLOT(setTableView()));
-#endif
 
 	connect(m_folderBack, SIGNAL(triggered()), SIGNAL(folderBack()));
 	connect(m_folderFwd, SIGNAL(triggered()), SIGNAL(folderFwd()));

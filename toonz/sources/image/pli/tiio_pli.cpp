@@ -1,7 +1,5 @@
 
 
-#ifndef XPRESS
-
 #include "tiio_pli.h"
 //#include "tstrokeoutline.h"
 #include "tsystem.h"
@@ -829,5 +827,3 @@ GroupTag *makeGroup(TVectorImageP &vi, int &currStyleId, int &index, int currDep
 }
 
 //=============================================================================
-
-#endif
