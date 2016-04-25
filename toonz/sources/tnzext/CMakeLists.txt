@@ -95,9 +95,13 @@ if(WIN32)
         ${GLUT_LIB} ${GL_LIB} ${SUPERLU_LIB} ${OPENBLAS_LIB} ${EXTRA_LIBS}
         tnzcore tnzbase)
 else()
-	_find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase")
+    if(APPLE)
+        set(EXTRA_LIBS
+            ${CMAKE_CURRENT_BINARY_DIR}/../tnzcore/libtnzcore.${LIB_SUFFIX}
+            ${CMAKE_CURRENT_BINARY_DIR}/../tnzbase/libtnzbase.${LIB_SUFFIX})
+    else()
+        _find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase")
 
-    if (UNIX AND NOT APPLE)
         set(EXTRA_LIBS ${EXTRA_LIBS} ${OPENBLAS_LIB})
     endif()
 
