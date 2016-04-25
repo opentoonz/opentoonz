@@ -500,7 +500,7 @@ TOONZ_DEFINE_NEW_COMPONENT(newCheckBox, make_checkbox);
 TOONZ_DEFINE_NEW_COMPONENT(newRadioButton, make_radiobutton);
 TOONZ_DEFINE_NEW_COMPONENT(newComboBox, make_combobox);
 
-#undef TOONZ_DEFINE_NEW_COMPONENT;
+#undef TOONZ_DEFINE_NEW_COMPONENT
 
 //-----------------------------------------------------------------------------
 

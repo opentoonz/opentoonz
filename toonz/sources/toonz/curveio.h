@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef CURVEIO_H
 #define CURVEIO_H

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FUNCTION_SEGMENT_VIEWER_H
 #define FUNCTION_SEGMENT_VIEWER_H

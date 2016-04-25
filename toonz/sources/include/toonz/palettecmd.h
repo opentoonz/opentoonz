@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef PALETTECMD_INCLUDED
 #define PALETTECMD_INCLUDED

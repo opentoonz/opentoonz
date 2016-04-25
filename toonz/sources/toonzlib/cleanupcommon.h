@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef CLEANUPCOMMON_INCLUDED
 #define CLEANUPCOMMON_INCLUDED

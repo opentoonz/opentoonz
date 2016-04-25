@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SCREENBOARD_H
 #define SCREENBOARD_H

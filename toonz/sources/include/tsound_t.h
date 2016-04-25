@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TSOUND_T__INCLUDED
 #define TSOUND_T__INCLUDED

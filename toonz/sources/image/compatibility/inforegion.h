@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef __INFO_REGION_H__
 #define __INFO_REGION_H__

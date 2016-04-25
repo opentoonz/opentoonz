@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SCRIPTBINDING_FILES_H
 #define SCRIPTBINDING_FILES_H

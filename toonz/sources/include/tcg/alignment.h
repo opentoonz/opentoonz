@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCG_ALIGNMENT_H
 #define TCG_ALIGNMENT_H

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SELECTION_COMMANDS_IDS_H
 #define SELECTION_COMMANDS_IDS_H

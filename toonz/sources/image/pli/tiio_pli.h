@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TTIO_PLI_INCLUDED
 #define TTIO_PLI_INCLUDED
 

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef LINETESTVIEWER_H
 #define LINETESTVIEWER_H

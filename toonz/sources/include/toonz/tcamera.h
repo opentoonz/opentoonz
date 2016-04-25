@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCAMERA_INCLUDED
 #define TCAMERA_INCLUDED

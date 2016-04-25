@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TSERVERPROXY_H
 #define TSERVERPROXY_H

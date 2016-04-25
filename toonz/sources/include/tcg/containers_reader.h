@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCG_CONTAINERS_READER_H
 #define TCG_CONTAINERS_READER_H

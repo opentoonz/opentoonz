@@ -1,3 +1,5 @@
+#pragma once
+
 /*------------------------------------------------------------
  Iwa_PNPerspectiveFx
  PerlinNoise/SimplexNoiseパターンを生成、透視投影する

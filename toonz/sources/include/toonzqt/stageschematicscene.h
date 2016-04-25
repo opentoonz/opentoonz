@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef STAGESCHEMATIC_H
 #define STAGESCHEMATIC_H

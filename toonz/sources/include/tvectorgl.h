@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TVECTORGL_INCLUDED
 #define TVECTORGL_INCLUDED

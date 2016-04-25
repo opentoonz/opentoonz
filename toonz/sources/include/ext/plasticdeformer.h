@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef PLASTICDEFORMER_H
 #define PLASTICDEFORMER_H
 

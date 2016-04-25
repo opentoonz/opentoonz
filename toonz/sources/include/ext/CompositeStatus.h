@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef COMPOSITESTATUS_H
 #define COMPOSITESTATUS_H

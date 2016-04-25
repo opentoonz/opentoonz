@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FXPARAMEDITORPOPUP_H
 #define FXPARAMEDITORPOPUP_H

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef STROKEDEFORMATION_IMPL_H
 #define STROKEDEFORMATION_IMPL_H

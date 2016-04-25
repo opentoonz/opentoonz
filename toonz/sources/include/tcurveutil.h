@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCURVES_UTIL_INCLUDED
 #define TCURVES_UTIL_INCLUDED

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef OUTPUT_PROPERTIES_INCLUDED
 #define OUTPUT_PROPERTIES_INCLUDED

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef VECTORSELECTIONTOOL_H
 #define VECTORSELECTIONTOOL_H

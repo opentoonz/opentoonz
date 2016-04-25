@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TOONZ_HOSTIF_H__
 #define TOONZ_HOSTIF_H__
 

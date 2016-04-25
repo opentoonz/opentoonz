@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef _TRANGE_DATA_INCLUDED_
 #define _TRANGE_DATA_INCLUDED_

@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TCLI_INCLUDED
 #define TCLI_INCLUDED
 

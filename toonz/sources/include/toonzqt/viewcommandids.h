@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef VIEWCOMMANDIDS_H
 #define VIEWCOMMANDIDS_H

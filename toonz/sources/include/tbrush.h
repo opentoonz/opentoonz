@@ -1,4 +1,4 @@
-
+#pragma once
 
 //-----------------------------------------------------------------------------
 //  tbrush.h: class to define an abstract brush

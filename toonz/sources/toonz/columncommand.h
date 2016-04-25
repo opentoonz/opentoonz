@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef COLUMN_COMMAND_INCLUDED
 #define COLUMN_COMMAND_INCLUDED

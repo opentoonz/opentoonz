@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef PICK_RGB_UTILS_H
 #define PICK_RGB_UTILS_H

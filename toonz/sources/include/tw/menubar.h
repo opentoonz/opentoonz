@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TNZ_MENUBAR_INCLUDED
 #define TNZ_MENUBAR_INCLUDED

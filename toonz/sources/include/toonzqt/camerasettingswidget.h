@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef CAMERASETTINGSWIDGET_H
 #define CAMERASETTINGSWIDGET_H

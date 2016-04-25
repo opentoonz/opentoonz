@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef HSVUTIL_H
 #define HSVUTIL_H

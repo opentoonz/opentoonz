@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FULLCOLORBRUSHTOOL_H
 #define FULLCOLORBRUSHTOOL_H

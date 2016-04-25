@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef FLIPCONSOLEOWNER_H
 #define FLIPCONSOLEOWNER_H
 

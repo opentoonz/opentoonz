@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TEXTUREUTILS_H
 #define TEXTUREUTILS_H

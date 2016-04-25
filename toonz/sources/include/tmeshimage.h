@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TMESHIMAGE_INCLUDED
 #define TMESHIMAGE_INCLUDED
 

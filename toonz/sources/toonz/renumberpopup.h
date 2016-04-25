@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef RENUMBERPOPUP_H
 #define RENUMBERPOPUP_H

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef STRINGTABLE_INCLUDED
 #define STRINGTABLE_INCLUDED

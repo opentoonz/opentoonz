@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef MENUBAR_COMMAND_H
 #define MENUBAR_COMMAND_H

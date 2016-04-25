@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FUNCTIONPANELTOOLS_H
 #define FUNCTIONPANELTOOLS_H

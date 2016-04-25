@@ -1,3 +1,5 @@
+#pragma once
+
 /*------------------------------------
  Iwa_GradientWarpFx
  参照画像の勾配方向にWarpするエフェクト

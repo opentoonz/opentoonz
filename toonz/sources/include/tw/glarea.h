@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef GLAREA_INCLUDED
 #define GLAREA_INCLUDED

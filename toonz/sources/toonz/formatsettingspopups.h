@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FORMATSETTINGSPOPUPS_H
 #define FORMATSETTINGSPOPUPS_H

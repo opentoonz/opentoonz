@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef COLORMODELVIEWER_H
 #define COLORMODELVIEWER_H

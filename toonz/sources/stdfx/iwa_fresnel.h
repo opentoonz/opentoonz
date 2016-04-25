@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef IWA_FRESNEL_H
 #define IWA_FRESNEL_H
 

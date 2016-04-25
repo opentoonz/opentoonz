@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SWATCHVIEWER_H
 #define SWATCHVIEWER_H

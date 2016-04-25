@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TNZ_ACTION_INCLUDED
 #define TNZ_ACTION_INCLUDED

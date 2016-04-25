@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TESTCUSTOMTAB_H
 #define TESTCUSTOMTAB_H

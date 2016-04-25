@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TNZSOUND_INCLUDED
 #define TNZSOUND_INCLUDED

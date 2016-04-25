@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef STROKE_SELECTION_H
 #define STROKE_SELECTION_H
 

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef MORPH_TOOOL
 #define MORPH_TOOOL

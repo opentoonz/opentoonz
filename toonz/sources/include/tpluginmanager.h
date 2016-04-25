@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TPLUGINMANAGER_INCLUDED
 #define TPLUGINMANAGER_INCLUDED

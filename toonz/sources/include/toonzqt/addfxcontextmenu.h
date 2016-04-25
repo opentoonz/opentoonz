@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef ADDFXCONTEXTMENU_H
 #define ADDFXCONTEXTMENU_H

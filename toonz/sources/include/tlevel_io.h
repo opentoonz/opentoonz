@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TLEVEL_IO_INCLUDED
 #define TLEVEL_IO_INCLUDED

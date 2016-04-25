@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TLIN_VECTOR_H
 #define TLIN_VECTOR_H

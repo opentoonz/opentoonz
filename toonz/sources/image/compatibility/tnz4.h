@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TNZ4_H
 #define TNZ4_H

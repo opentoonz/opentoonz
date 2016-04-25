@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef CONTEXTSTATUS_H
 #define CONTEXTSTATUS_H

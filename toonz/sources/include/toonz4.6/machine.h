@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef MACHINE_DEFINED
 #define MACHINE_DEFINED

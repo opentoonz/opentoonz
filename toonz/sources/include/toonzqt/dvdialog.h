@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef DVDIALOG_INCLUDED
 #define DVDIALOG_INCLUDED

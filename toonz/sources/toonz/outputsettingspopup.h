@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef OUTPUTSETTINGSPOPUP_H
 #define OUTPUTSETTINGSPOPUP_H

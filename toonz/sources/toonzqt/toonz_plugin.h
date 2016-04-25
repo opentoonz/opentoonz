@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TOONZ_PLUGIN_H__
 #define TOONZ_PLUGIN_H__
 

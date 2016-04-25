@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef T_SEGMENTADJUSTER_H
 #define T_SEGMENTADJUSTER_H

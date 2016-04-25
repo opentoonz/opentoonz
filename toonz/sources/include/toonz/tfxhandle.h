@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TFFXHANDLE_H
 #define TFFXHANDLE_H

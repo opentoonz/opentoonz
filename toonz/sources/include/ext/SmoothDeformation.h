@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SMOOTH_DEFORMATION_H
 #define SMOOTH_DEFORMATION_H

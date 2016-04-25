@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef KEYFRAMEMOVER_H
 #define KEYFRAMEMOVER_H

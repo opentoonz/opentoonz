@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef STROKES_DATA_H
 #define STROKES_DATA_H

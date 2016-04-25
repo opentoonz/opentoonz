@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef EXPRESSIONFIELD_H
 #define EXPRESSIONFIELD_H

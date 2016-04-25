@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef STAGEOBJECT_DATA_H
 #define STAGEOBJECT_DATA_H

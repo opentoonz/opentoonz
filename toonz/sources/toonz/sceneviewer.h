@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SCENEVIEWER_H
 #define SCENEVIEWER_H

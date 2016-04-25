@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TW_POPUP_INCLUDED
 #define TW_POPUP_INCLUDED

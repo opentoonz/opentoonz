@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef igs_maxmin_lens_matrix_h
 #define igs_maxmin_lens_matrix_h
 

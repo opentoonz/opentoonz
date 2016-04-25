@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FUNCTIONPANEL_H
 #define FUNCTIONPANEL_H

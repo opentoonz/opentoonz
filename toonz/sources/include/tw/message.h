@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TW_MESSAGE_INCLUDED
 #define TW_MESSAGE_INCLUDED

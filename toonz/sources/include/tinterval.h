@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef T_INTERVAL_INCLUDED
 #define T_INTERVAL_INCLUDED

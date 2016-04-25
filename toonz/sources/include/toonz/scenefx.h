@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SCENEFX_INCLUDED
 #define SCENEFX_INCLUDED

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TPROJECT_INCLUDED
 #define TPROJECT_INCLUDED

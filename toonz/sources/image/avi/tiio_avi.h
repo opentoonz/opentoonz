@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TIIO_AVI_H
 #define TIIO_AVI_H

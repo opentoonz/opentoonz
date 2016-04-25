@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef IMAGEVIEWER_INCLUDE
 #define IMAGEVIEWER_INCLUDE

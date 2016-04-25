@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef _QT_MOVIE_H_
 #define _QT_MOVIE_H_

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TFXUTIL_INCLUDED
 #define TFXUTIL_INCLUDED

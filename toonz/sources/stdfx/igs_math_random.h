@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef igs_math_random_h
 #define igs_math_random_h
 

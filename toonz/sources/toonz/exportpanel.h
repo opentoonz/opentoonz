@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef EXPORTPANEL_H
 #define EXPORTPANEL_H

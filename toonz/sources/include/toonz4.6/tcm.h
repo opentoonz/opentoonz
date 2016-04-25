@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef _TCM_H_
 #define _TCM_H_

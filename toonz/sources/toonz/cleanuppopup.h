@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef CLEANUPPOPUP_H
 #define CLEANUPPOPUP_H
 

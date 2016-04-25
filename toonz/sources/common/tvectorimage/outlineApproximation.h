@@ -1,4 +1,4 @@
-
+#pragma once
 
 // outlineApproximation.h: interface for the outlineApproximation class.
 //

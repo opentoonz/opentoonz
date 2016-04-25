@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef ONION_SKIN_MASK_INCLUDED
 #define ONION_SKIN_MASK_INCLUDED

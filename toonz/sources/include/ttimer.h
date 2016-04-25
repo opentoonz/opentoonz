@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TTIMER_INCLUDED
 #define TTIMER_INCLUDED
 

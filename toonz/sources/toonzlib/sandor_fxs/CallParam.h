@@ -1,4 +1,4 @@
-
+#pragma once
 
 // CallParam.h: interface for the CCallParam class.
 //
@@ -6,10 +6,6 @@
 
 #if !defined(AFX_CALLPARAM_H__2B094D95_25D9_11D6_B9C6_0040F674BE6A__INCLUDED_)
 #define AFX_CALLPARAM_H__2B094D95_25D9_11D6_B9C6_0040F674BE6A__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
 
 #include "CIL.h"
 

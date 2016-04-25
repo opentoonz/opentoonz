@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TPARAM_UI_CONCEPT_H
 #define TPARAM_UI_CONCEPT_H

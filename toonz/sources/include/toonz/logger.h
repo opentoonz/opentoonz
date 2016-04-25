@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef LOGGER_INCLUDED
 #define LOGGER_INCLUDED

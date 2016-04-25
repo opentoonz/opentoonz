@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef PALETTE_DATA_INCLUDED
 #define PALETTE_DATA_INCLUDED

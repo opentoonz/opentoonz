@@ -1,4 +1,4 @@
-
+#pragma once
 
 #include "tgeometry.h"
 #include "trasterimage.h"

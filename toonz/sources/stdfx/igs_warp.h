@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef igs_warp_h
 #define igs_warp_h
 

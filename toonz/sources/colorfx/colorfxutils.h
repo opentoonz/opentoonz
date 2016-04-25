@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef COLORFXUTILS_H
 #define COLORFXUTILS_H

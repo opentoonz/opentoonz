@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef MAINSHELL_INCLUDED
 #define MAINSHELL_INCLUDED

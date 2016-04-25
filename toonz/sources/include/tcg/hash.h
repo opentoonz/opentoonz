@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCG_HASH_H
 #define TCG_HASH_H

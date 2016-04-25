@@ -1,4 +1,4 @@
-
+#pragma once
 
 #include "trastercm.h"
 #include "ttilesaver.h"

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef VIEWER_H
 #define VIEWER_H

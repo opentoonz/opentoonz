@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef STROKE_PARAMETRIC_DEFORMER_H
 #define STROKE_PARAMETRIC_DEFORMER_H

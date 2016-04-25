@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef STYLEINDEXLINEEDIT_H
 #define STYLEINDEXLINEEDIT_H

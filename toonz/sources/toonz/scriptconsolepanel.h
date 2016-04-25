@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SCRIPTCONSOLEPANEL_H
 #define SCRIPTCONSOLEPANEL_H

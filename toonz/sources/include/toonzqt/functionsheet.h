@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FUNCTIONSHEET_H
 #define FUNCTIONSHEET_H

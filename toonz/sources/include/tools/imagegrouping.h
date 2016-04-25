@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef IMAGE_GROUPING_INCLUDED
 #define IMAGE_GROUPING_INCLUDED

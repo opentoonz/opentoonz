@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FREE_LAYOUT_H
 #define FREE_LAYOUT_H

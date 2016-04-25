@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef COLUMNFAN_INCLUDED
 #define COLUMNFAN_INCLUDED

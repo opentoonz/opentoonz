@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef T32BITSRV_WRAP
 #define T32BITSRV_WRAP

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef XSHEETVIEWER_H
 #define XSHEETVIEWER_H

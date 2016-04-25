@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCLEANUPPER_H
 #define TCLEANUPPER_H

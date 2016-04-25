@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TSYSLOG_H
 #define TSYSLOG_H
 

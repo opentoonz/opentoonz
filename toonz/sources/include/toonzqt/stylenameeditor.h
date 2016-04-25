@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef STYLENAMEEDITOR_H
 #define STYLENAMEEDITOR_H
 

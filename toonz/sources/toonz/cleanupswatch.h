@@ -1,4 +1,4 @@
-
+#pragma once
 
 #include "traster.h"
 #include <QWidget>

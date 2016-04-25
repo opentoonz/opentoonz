@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef PEGBARCMD_INCLUDED
 #define PEGBARCMD_INCLUDED

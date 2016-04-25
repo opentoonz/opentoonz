@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TFRAMEHANDLE_H
 #define TFRAMEHANDLE_H

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef RGB_PICKER_H
 #define RGB_PICKER_H

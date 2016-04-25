@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef PARTICLESENGINE_H
 #define PARTICLESENGINE_H

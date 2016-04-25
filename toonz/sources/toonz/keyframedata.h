@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef KEYFRAMEDATA_INCLUDED
 #define KEYFRAMEDATA_INCLUDED

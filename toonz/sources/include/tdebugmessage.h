@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TDEBUGMESSAGE_INCLUDED
 #define TDEBUGMESSAGE_INCLUDED

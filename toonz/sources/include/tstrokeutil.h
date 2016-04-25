@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TSTROKE_UTIL_H
 #define TSTROKE_UTIL_H

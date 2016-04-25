@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef RASTER_SELECTION_H
 #define RASTER_SELECTION_H

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FLIPBOOK_H
 #define FLIPBOOK_H

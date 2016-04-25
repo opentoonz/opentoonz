@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef PARAMFIELD_H
 #define PARAMFIELD_H

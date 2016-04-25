@@ -1,3 +1,4 @@
+#pragma once
 
 #ifndef TCG_IMAGE_ITERATOR_HPP
 #define TCG_IMAGE_ITERATOR_HPP

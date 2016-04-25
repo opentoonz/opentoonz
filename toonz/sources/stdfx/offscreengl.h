@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef OFFSCREENGL_H
 #define OFFSCREENGL_H

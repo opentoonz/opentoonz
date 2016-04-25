@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SCHEMATICVIEWER_H
 #define SCHEMATICVIEWER_H

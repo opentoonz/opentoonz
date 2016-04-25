@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TSPECTRUMPARAM_H
 #define TSPECTRUMPARAM_H
 

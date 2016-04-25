@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef HISTORYTYPES_H
 #define HISTORYTYPES_H
 

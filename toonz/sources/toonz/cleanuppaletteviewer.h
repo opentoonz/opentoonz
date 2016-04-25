@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef CLEANUP_PALETTE_VIEWER_H
 #define CLEANUP_PALETTE_VIEWER_H

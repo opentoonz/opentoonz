@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef MARKSBAR_H
 #define MARKSBAR_H

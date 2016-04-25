@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef MESHIFYPOPUP_H
 #define MESHIFYPOPUP_H

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TNZ_TW_CONTROL_PANEL_INCLUDED
 #define TNZ_TW_CONTROL_PANEL_INCLUDED

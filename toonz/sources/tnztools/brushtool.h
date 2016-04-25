@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef BRUSHTOOL_H
 #define BRUSHTOOL_H

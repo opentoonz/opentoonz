@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef PREVIEWER_INCLUDED
 #define PREVIEWER_INCLUDED
 

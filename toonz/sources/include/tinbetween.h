@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TINBETWEEN_H
 #define TINBETWEEN_H
 

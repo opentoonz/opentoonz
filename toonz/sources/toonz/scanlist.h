@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SCANLIST_INCLUDED
 #define SCANLIST_INCLUDED

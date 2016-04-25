@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SHADERINTERFACE_H
 #define SHADERINTERFACE_H

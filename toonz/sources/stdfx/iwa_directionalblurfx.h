@@ -1,3 +1,5 @@
+#pragma once
+
 /*------------------------------------
  Iwa_DirectionalBlurFx
  ボケ足の伸ばし方を選択でき、参照画像を追加した DirectionalBlur

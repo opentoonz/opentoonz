@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef CANVAS_INCLUDED
 #define CANVAS_INCLUDED

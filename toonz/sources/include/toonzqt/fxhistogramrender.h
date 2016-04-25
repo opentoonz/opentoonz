@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FXHISTOGRAMRENDER_H
 #define FXHISTOGRAMRENDER_H

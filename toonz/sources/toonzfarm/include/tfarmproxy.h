@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TFARMPROXY_H
 #define TFARMPROXY_H

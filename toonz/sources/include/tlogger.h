@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TLOGGER_INCLUDED
 #define TLOGGER_INCLUDED
 

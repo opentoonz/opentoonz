@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef igs_os_type_h
 #define igs_os_type_h
 

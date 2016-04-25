@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FILEDATA_H
 #define FILEDATA_H

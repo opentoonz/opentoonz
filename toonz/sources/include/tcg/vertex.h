@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCG_VERTEX_H
 #define TCG_VERTEX_H

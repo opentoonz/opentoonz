@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SCENE_PROPERTIES_INCLUDED
 #define SCENE_PROPERTIES_INCLUDED

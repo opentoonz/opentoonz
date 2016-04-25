@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef PLUGIN_UI_PAGE_INTERFACE
 #define PLUGIN_UI_PAGE_INTERFACE
 

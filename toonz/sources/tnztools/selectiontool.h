@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SELECTIONTOOL_INCLUDED
 #define SELECTIONTOOL_INCLUDED
