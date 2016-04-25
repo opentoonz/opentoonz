@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TSOP_INCLUDED
 #define TSOP_INCLUDED

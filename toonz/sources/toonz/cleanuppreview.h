@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef CLEANUPPREVIEW_H
 #define CLEANUPPREVIEW_H

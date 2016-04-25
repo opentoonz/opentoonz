@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TIDENTIFIABLE_INCLUDED
 #define TIDENTIFIABLE_INCLUDED

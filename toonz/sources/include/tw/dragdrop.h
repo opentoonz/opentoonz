@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TDRAGDROP_INCLUDED
 #define TDRAGDROP_INCLUDED

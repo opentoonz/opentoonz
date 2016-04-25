@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef EXPORT_LEVEL_COMMAND_H
 #define EXPORT_LEVEL_COMMAND_H

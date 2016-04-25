@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TSIO_WAV_INCLUDED
 #define TSIO_WAV_INCLUDED

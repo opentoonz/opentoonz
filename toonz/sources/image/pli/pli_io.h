@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef _PLI_IO_H
 #define _PLI_IO_H
 

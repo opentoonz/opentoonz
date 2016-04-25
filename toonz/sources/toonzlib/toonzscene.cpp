@@ -228,9 +228,9 @@ void saveBackup(const TFilePath &fp)
   {
     int id = oldBackups.rbegin()->first + 1;
     if(fp.getType() == "tnz")
-      bckFp = bckDir + TFilePath(sceneName + L"_" + toWideString(id) + L".tnz");
+      bckFp = bckDir + TFilePath(sceneName + L"_" + ::to_wstring(id) + L".tnz");
     else if(fp.getType() == "tab")
-      bckFp = bckDir + TFilePath(sceneName + L"_" + toWideString(id) + L".tab");
+      bckFp = bckDir + TFilePath(sceneName + L"_" + ::to_wstring(id) + L".tab");
   }
 
   TSystem::renameFile(bckFp, fp);
@@ -511,8 +511,8 @@ void ToonzScene::loadTnzFile(const TFilePath &fp)
 			VersionNumber versionNumber(0, 0);
 			int k = v.find(".");
 			if (k != (int)std::string::npos && 0 < k && k < (int)v.length()) {
-				versionNumber.first = toInt(v.substr(0, k));
-				versionNumber.second = toInt(v.substr(k + 1));
+				versionNumber.first = std::stoi(v.substr(0, k));
+				versionNumber.second = std::stoi(v.substr(k + 1));
 			}
 			if (versionNumber == VersionNumber(0, 0))
 				throw TException("Bad version number :" + v);
@@ -607,7 +607,7 @@ void ToonzScene::setUntitled()
 	if (TFileStatus(tempDir + name).doesExist()) {
 		int count = 2;
 		do {
-			name = baseName + toString(count++);
+			name = baseName + std::to_string(count++);
 		} while (TFileStatus(tempDir + name).doesExist());
 	}
 	TFilePath fp = tempDir + name + (name + ".tnz");
@@ -1048,7 +1048,7 @@ TFilePath ToonzScene::getImportedLevelPath(const TFilePath path) const
 					  &dots = path.getDots();
 
 	TFilePath importedLevelPath =
-		getDefaultLevelPath(ltype.m_ltype, levelName).getParentDir() + (levelName + toWideString(dots + ext));
+		getDefaultLevelPath(ltype.m_ltype, levelName).getParentDir() + (levelName + ::to_wstring(dots + ext));
 
 	if (dots == "..")
 		importedLevelPath = importedLevelPath.withFrame(TFrameId::EMPTY_FRAME);
@@ -1271,7 +1271,7 @@ TFilePath ToonzScene::decodeFilePath(const TFilePath &path) const
 				return dir + tail;
 		}
 		if (project) {
-			h = toString(head.substr(1));
+			h = ::to_string(head.substr(1));
 			TFilePath f = project->getFolder(h);
 			if (f != TFilePath())
 				s = f.getWideString();
@@ -1412,7 +1412,7 @@ TFilePath ToonzScene::codeSavePath(TFilePath path) const
 		head == TFilePath() ||
 		head.getWideString()[0] != L'+')
 		return originalPath;
-	std::string folderName = toString(head.getWideString().substr(1));
+	std::string folderName = ::to_string(head.getWideString().substr(1));
 	if (!getProject()->getUseScenePath(folderName))
 		return originalPath;
 	return head + savePathString + filename;

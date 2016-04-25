@@ -602,7 +602,7 @@ TRectD TVectorImage::getBBox() const
 		if (dynamic_cast<TRasterImagePatternStrokeStyle *>(style) ||
 			dynamic_cast<TVectorImagePatternStrokeStyle *>(style)) //con i pattern style, il render a volte taglia sulla bbox dello stroke....
 																   //aumento la bbox della meta' delle sue dimensioni:pezzaccia.
-			r = r.enlarge(tmax(r.getLx() * 0.25, r.getLy() * 0.25));
+			r = r.enlarge(std::max(r.getLx() * 0.25, r.getLy() * 0.25));
 		bbox = ((i == 0) ? r : bbox + r);
 	}
 
@@ -1026,13 +1026,13 @@ list<TEdge*>::const_iterator it1;
 			if (isStrokeChanged) {
 				double totLenght1 = (*it1)->m_s->getLength();
 
-				_l0 = (*it1)->m_s->getLength(tmin((*it1)->m_w0, (*it1)->m_w1)) / totLenght1;
-				_l1 = (*it1)->m_s->getLength(tmax((*it1)->m_w0, (*it1)->m_w1)) / totLenght1;
+				_l0 = (*it1)->m_s->getLength(std::min((*it1)->m_w0, (*it1)->m_w1)) / totLenght1;
+				_l1 = (*it1)->m_s->getLength(std::max((*it1)->m_w0, (*it1)->m_w1)) / totLenght1;
 			} else {
-				_l0 = tmin((*it1)->m_w0, (*it1)->m_w1);
-				_l1 = tmax((*it1)->m_w0, (*it1)->m_w1);
+				_l0 = std::min((*it1)->m_w0, (*it1)->m_w1);
+				_l1 = std::max((*it1)->m_w0, (*it1)->m_w1);
 			}
-			double delta = tmin(l1, _l1) - tmax(l0, _l0);
+			double delta = std::min(l1, _l1) - std::max(l0, _l0);
 			if (delta > deltaMax) {
 				deltaMax = delta;
 				newStyle = (*it1)->m_styleId;
@@ -1395,12 +1395,12 @@ void TVectorImage::Imp::reindexGroups(TVectorImage::Imp &img)
 		if (s->m_groupId.m_id[0] > 0)
 			for (j = 0; j < s->m_groupId.m_id.size(); j++) {
 				s->m_groupId.m_id[j] += img.m_maxGroupId;
-				newMax = tmax(newMax, s->m_groupId.m_id[j]);
+				newMax = std::max(newMax, s->m_groupId.m_id[j]);
 			}
 		else
 			for (j = 0; j < s->m_groupId.m_id.size(); j++) {
 				s->m_groupId.m_id[j] -= img.m_maxGhostGroupId;
-				newMaxGhost = tmax(newMaxGhost, -s->m_groupId.m_id[j]);
+				newMaxGhost = std::max(newMaxGhost, -s->m_groupId.m_id[j]);
 			}
 	}
 	m_maxGroupId = img.m_maxGroupId = newMax;
@@ -1881,8 +1881,8 @@ if (vs->m_s->isSelfLoop())
 
 		std::list<TEdge *>::const_iterator it = origEdgeList.begin(), it_e = origEdgeList.end();
 		for (; it != it_e; ++it) {
-			double wMin = tmin((*it)->m_w0, (*it)->m_w1);
-			double wMax = tmax((*it)->m_w0, (*it)->m_w1);
+			double wMin = std::min((*it)->m_w0, (*it)->m_w1);
+			double wMax = std::max((*it)->m_w0, (*it)->m_w1);
 
 			if (wMin >= sortedWRanges[i].second || wMax <= sortedWRanges[i].first)
 				continue;
@@ -2713,7 +2713,7 @@ int TGroupId::getCommonParentDepth(const TGroupId &id) const
 	int size2 = id.m_id.size();
 	int count;
 
-	for (count = 0; count < tmin(size1, size2); count++)
+	for (count = 0; count < std::min(size1, size2); count++)
 		if (m_id[size1 - count - 1] != id.m_id[size2 - count - 1])
 			break;
 
@@ -2784,7 +2784,7 @@ bool TGroupId::operator<(const TGroupId &id) const
 	int size1 = m_id.size();
 	int size2 = id.m_id.size();
 	int i;
-	for (i = 0; i < tmin(size1, size2); i++)
+	for (i = 0; i < std::min(size1, size2); i++)
 		if (m_id[size1 - i - 1] != id.m_id[size2 - i - 1])
 			return m_id[size1 - i - 1] < id.m_id[size2 - i - 1];
 

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TMACROFX_INCLUDED
 #define TMACROFX_INCLUDED

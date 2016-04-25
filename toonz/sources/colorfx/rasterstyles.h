@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef _RASTERSTYLES_H_
 #define _RASTERSTYLES_H_

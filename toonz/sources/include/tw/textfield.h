@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TNZ_TEXTFIELD_INCLUDED
 #define TNZ_TEXTFIELD_INCLUDED

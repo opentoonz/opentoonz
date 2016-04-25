@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef DEPENDEDLIST_H
 #define DEPENDEDLIST_H

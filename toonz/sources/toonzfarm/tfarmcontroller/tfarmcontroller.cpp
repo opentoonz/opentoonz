@@ -20,6 +20,7 @@
 
 #include "tthread.h"
 
+#include <strstream>
 #include <string>
 using namespace std;
 
@@ -136,7 +137,7 @@ bool myDoesExists(const TFilePath &fp)
 	TFileStatus fs(fp);
 	exists = fs.doesExist();
 #else
-	int acc = access(toString(fp.getWideString()).c_str(), 00); // 00 == solo esistenza
+	int acc = access(::to_string(fp).c_str(), 00); // 00 == solo esistenza
 	exists = acc != -1;
 #endif
 	return exists;
@@ -151,7 +152,7 @@ bool dirExists(const TFilePath &dirFp)
 	TFileStatus fs(dirFp);
 	exists = fs.isDirectory();
 #else
-	int acc = access(toString(dirFp.getWideString()).c_str(), 00); // 00 == solo esistenza
+	int acc = access(::to_string(dirFp).c_str(), 00); // 00 == solo esistenza
 	exists = acc != -1;
 #endif
 	return exists;

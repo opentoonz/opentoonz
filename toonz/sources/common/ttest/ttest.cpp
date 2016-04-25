@@ -14,6 +14,7 @@
 #include "tcolorstyles.h"
 
 #include <set>
+#include <strstream>
 
 #if defined(LINUX)
 #include <typeinfo>
@@ -172,7 +173,7 @@ void TTest::runTests(string name)
 	cout << "Test file : '" << testFile << "'" << endl;
 	char buffer[1024];
 	while (is.getline(buffer, sizeof(buffer))) {
-		istrstream ss(buffer);
+		std::istrstream ss(buffer);
 		while (ss) {
 			string s;
 			ss >> s;

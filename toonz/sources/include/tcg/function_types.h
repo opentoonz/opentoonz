@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCG_FUNCTION_TYPES_H
 #define TCG_FUNCTION_TYPES_H

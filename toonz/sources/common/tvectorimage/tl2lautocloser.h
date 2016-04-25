@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef T_L2LAUTOCLOSER_H
 #define T_L2LAUTOCLOSER_H
 

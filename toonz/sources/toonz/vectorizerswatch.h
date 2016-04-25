@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef VECTORIZER_SWATCH_H
 #define VECTORIZER_SWATCH_H

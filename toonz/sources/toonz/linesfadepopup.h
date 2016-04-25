@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef LINESFADEPOPUP_H
 #define LINESFADEPOPUP_H

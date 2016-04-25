@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef _BRAVOMARK_
 #define _BRAVOMARK_

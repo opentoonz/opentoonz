@@ -615,7 +615,7 @@ void SpreadsheetViewer::setAutoPanSpeed(const QPoint &speed)
 int getAutoPanSpeed(int pixels)
 {
 	int f = 40;
-	return tmin(100, (f - 1 + pixels * f) / 100);
+	return std::min(100, (f - 1 + pixels * f) / 100);
 }
 
 //-----------------------------------------------------------------------------

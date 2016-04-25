@@ -220,7 +220,7 @@ void DragSelectionTool::FourPoints::empty()
 
 bool DragSelectionTool::FourPoints::contains(TPointD p)
 {
-	double maxDistance = tmax(tdistance2(getP00(), getP11()), tdistance2(getP10(), getP01()));
+	double maxDistance = std::max(tdistance2(getP00(), getP11()), tdistance2(getP10(), getP01()));
 	TPointD outP = p + maxDistance * TPointD(1, 1);
 	TSegment segment(outP, p);
 	std::vector<DoublePair> d;
@@ -235,10 +235,10 @@ bool DragSelectionTool::FourPoints::contains(TPointD p)
 
 TRectD DragSelectionTool::FourPoints::getBox() const
 {
-	double x0 = tmin(getP00().x, getP10().x, getP01().x, getP11().x);
-	double y0 = tmin(getP00().y, getP10().y, getP01().y, getP11().y);
-	double x1 = tmax(getP00().x, getP10().x, getP01().x, getP11().x);
-	double y1 = tmax(getP00().y, getP10().y, getP01().y, getP11().y);
+	double x0 = std::min({getP00().x, getP10().x, getP01().x, getP11().x});
+	double y0 = std::min({getP00().y, getP10().y, getP01().y, getP11().y});
+	double x1 = std::max({getP00().x, getP10().x, getP01().x, getP11().x});
+	double y1 = std::max({getP00().y, getP10().y, getP01().y, getP11().y});
 	return TRectD(TPointD(x0, y0), TPointD(x1, y1));
 }
 
@@ -846,10 +846,8 @@ void DragSelectionTool::Scale::leftButtonDrag(const TPointD &pos, const TMouseEv
 SelectionTool::SelectionTool(int targetType)
 	: TTool("T_Selection"), m_firstTime(true), m_dragTool(0), m_what(Outside), m_leftButtonMousePressed(false), m_shiftPressed(false), m_selecting(false), m_mousePosition(TPointD()), m_stroke(0), m_justSelected(false), m_strokeSelectionType("Type:"), m_deformValues(), m_cursorId(ToolCursor::CURSOR_ARROW)
 {
-#ifndef STUDENT
 	bind(targetType);
 	m_prop.bind(m_strokeSelectionType);
-#endif
 
 	m_strokeSelectionType.addValue(RECT_SELECTION);
 	m_strokeSelectionType.addValue(FREEHAND_SELECTION);
@@ -1262,7 +1260,7 @@ void SelectionTool::drawCommandHandle(const TImage *image)
 void SelectionTool::onActivate()
 {
 	if (m_firstTime) {
-		m_strokeSelectionType.setValue(toWideString(SelectionType.getValue()));
+		m_strokeSelectionType.setValue(::to_wstring(SelectionType.getValue()));
 		m_firstTime = false;
 	}
 	if (isLevelType() || isSelectedFramesType())
@@ -1295,7 +1293,7 @@ void SelectionTool::onSelectionChanged()
 bool SelectionTool::onPropertyChanged(std::string propertyName)
 {
 	if (propertyName == m_strokeSelectionType.getName()) {
-		SelectionType = toString(m_strokeSelectionType.getValue());
+		SelectionType = ::to_string(m_strokeSelectionType.getValue());
 		return true;
 	}
 	return false;

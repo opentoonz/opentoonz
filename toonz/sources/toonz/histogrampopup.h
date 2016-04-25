@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef HISTOGRAMPOPUP_H
 #define HISTOGRAMPOPUP_H

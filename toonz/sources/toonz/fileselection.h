@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FILESELECTION_H
 #define FILESELECTION_H

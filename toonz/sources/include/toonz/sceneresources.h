@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SCENERESOURCES_INCLUDED
 #define SCENERESOURCES_INCLUDED

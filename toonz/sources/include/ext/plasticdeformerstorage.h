@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef PLASTIDEFORMERSTORAGE_H
 #define PLASTIDEFORMERSTORAGE_H
 

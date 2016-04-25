@@ -1,4 +1,4 @@
-
+#pragma once
 
 #include "tlevel_io.h"
 #include "tfile.h"

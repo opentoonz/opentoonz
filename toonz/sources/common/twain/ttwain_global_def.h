@@ -1,4 +1,4 @@
-
+#pragma once
 
 /*max@home*/
 #ifndef __GLOBAL_DEF_H__

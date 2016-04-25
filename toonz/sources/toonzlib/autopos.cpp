@@ -3,6 +3,8 @@
 #include "autopos.h"
 #include "cleanupcommon.h"
 
+#include <strstream>
+
 using namespace CleanupTypes;
 
 /*

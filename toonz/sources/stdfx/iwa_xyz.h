@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef XYZ_H
 #define XYZ_H
 

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef DVMIMEDATA_INCLUDED
 #define DVMIMEDATA_INCLUDED

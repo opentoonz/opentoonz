@@ -103,12 +103,12 @@ namespace
 
 template <typename Chan>
 struct MaxFunc {
-	inline Chan operator()(const Chan &a, const Chan &b) { return tmax(a, b); }
+	inline Chan operator()(const Chan &a, const Chan &b) { return std::max(a, b); }
 };
 
 template <typename Chan>
 struct MinFunc {
-	inline Chan operator()(const Chan &a, const Chan &b) { return tmin(a, b); }
+	inline Chan operator()(const Chan &a, const Chan &b) { return std::min(a, b); }
 };
 
 //--------------------------------------------------------------
@@ -132,11 +132,11 @@ void erodilate_row(int len, const Chan *src, int sIncr, Chan *dst, int dIncr,
 	double one_radR = (1.0 - radR);
 
 	for (w = 0; w != wCount; ++w) {
-		Chan *dwBegin = dst + w * dwIncr, *dwEnd = tmin(dwBegin + dwIncr, dEnd);
+		Chan *dwBegin = dst + w * dwIncr, *dwEnd = std::min(dwBegin + dwIncr, dEnd);
 
 		// Compute prefixes
-		const Chan *swBegin = src + tmax(w * swIncr - srIncr - sIncr, 0),
-				   *swEnd = src + tmin(w * swIncr + srIncr + sIncr, len * sIncr);
+		const Chan *swBegin = src + std::max(w * swIncr - srIncr - sIncr, 0),
+				   *swEnd = src + std::min(w * swIncr + srIncr + sIncr, len * sIncr);
 
 		s = swEnd - sIncr, d = dst + ((s - src) / sIncr) * dIncr + drIncr; // d already decremented by dIncr
 
@@ -165,7 +165,7 @@ void erodilate_row(int len, const Chan *src, int sIncr, Chan *dst, int dIncr,
 			*d = (oldVal == val) ? val : one_radR * oldVal + radR * val;
 		}
 
-		for (d = tmin(d, dEnd - dIncr); d >= dwBegin; d -= dIncr) {
+		for (d = std::min(d, dEnd - dIncr); d >= dwBegin; d -= dIncr) {
 			assert(d >= dst);
 			assert(d < dEnd);
 			assert((d - dst) % dIncr == 0);
@@ -175,7 +175,7 @@ void erodilate_row(int len, const Chan *src, int sIncr, Chan *dst, int dIncr,
 		}
 
 		// Compute suffixes
-		swBegin = src + w * swIncr + srIncr, swEnd = tmin(swBegin + swIncr + sIncr, sEnd);
+		swBegin = src + w * swIncr + srIncr, swEnd = std::min(swBegin + swIncr + sIncr, sEnd);
 		if (swBegin >= swEnd)
 			continue;
 

@@ -1062,7 +1062,7 @@ void EraserTool::mouseMove(const TPointD &pos, const TMouseEvent &e)
 
 bool EraserTool::onPropertyChanged(std::string propertyName)
 {
-	EraseVectorType = toString(m_eraseType.getValue());
+	EraseVectorType = ::to_string(m_eraseType.getValue());
 	EraseVectorSize = m_toolSize.getValue();
 	EraseVectorSelective = m_selective.getValue();
 	EraseVectorInvert = m_invertOption.getValue();
@@ -1088,7 +1088,7 @@ void EraserTool::onEnter()
 {
 	if (m_firstTime) {
 		m_toolSize.setValue(EraseVectorSize);
-		m_eraseType.setValue(toWideString((EraseVectorType.getValue())));
+		m_eraseType.setValue(::to_wstring(EraseVectorType.getValue()));
 		m_selective.setValue(EraseVectorSelective ? 1 : 0);
 		m_invertOption.setValue(EraseVectorInvert ? 1 : 0);
 		m_multi.setValue(EraseVectorRange ? 1 : 0);

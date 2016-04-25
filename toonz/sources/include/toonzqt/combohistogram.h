@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef COMBOHISTOGRAM_H
 #define COMBOHISTOGRAM_H
 

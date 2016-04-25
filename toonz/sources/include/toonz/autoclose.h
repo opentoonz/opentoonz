@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef _TAUTOCLOSE_H_
 #define _TAUTOCLOSE_H_
 

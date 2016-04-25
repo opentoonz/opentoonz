@@ -82,10 +82,10 @@ void RubberDeform::getBBox(TRectD &bbox)
 	bbox.x0 = bbox.x1 = m_polyLoc[0].x;
 	bbox.y0 = bbox.y1 = m_polyLoc[0].y;
 	for (int i = 1; i < (int)m_polyLoc.size(); i++) {
-		bbox.x0 = tmin(bbox.x0, m_polyLoc[i].x);
-		bbox.x1 = tmax(bbox.x1, m_polyLoc[i].x);
-		bbox.y0 = tmin(bbox.y0, m_polyLoc[i].y);
-		bbox.y1 = tmax(bbox.y1, m_polyLoc[i].y);
+		bbox.x0 = std::min(bbox.x0, m_polyLoc[i].x);
+		bbox.x1 = std::max(bbox.x1, m_polyLoc[i].x);
+		bbox.y0 = std::min(bbox.y0, m_polyLoc[i].y);
+		bbox.y1 = std::max(bbox.y1, m_polyLoc[i].y);
 	}
 }
 
@@ -267,103 +267,6 @@ int SFlashUtils::nbDiffVerts(const std::vector<TPointD> &pv) const
 	}
 	return lpv.size();
 }
-
-/*
-	TPointD p[3];
-	TPixel32 col[2];
-//	TPixel32 lc1,lc2;
-	if ( pv[0]==pv[1] ) {
-		p[0]=pv[0];
-		p[1]=pv[2];
-		p[2]=pv[3];
-		col[0]=c1;
-		col[1]=c2;
-	} else if ( pv[0]==pv[2] ) {
-		p[0]=pv[3];
-		p[1]=pv[0];
-		p[2]=pv[1];
-		col[0]=c2;
-		col[1]=c1;
-	} else if ( pv[0]==pv[3] ) {
-		p[0]=pv[2];
-		p[1]=pv[0];
-		p[2]=pv[1];
-		col[0]=c2;
-		col[1]=c1;
-	} else if ( pv[1]==pv[2] ) {
-		p[0]=pv[3];
-		p[1]=pv[0];
-		p[2]=pv[1];
-		col[0]=c2;
-		col[1]=c1;
-	} else if ( pv[1]==pv[3] ) {
-		p[0]=pv[2];
-		p[1]=pv[0];
-		p[2]=pv[1];
-		col[0]=c2;
-		col[1]=c1;
-	} else if ( pv[2]==pv[3] ) {
-		p[0]=pv[2];
-		p[1]=pv[0];
-		p[2]=pv[1];
-		col[0]=c2;
-		col[1]=c1;
-	} 
-
-
-	TPointD pt1[4]={pv[0],pv[1],pv[2],pv[3]};	
-	TPointD pt2[3]={p[0],p[1],p[2]};	
-
-	TPointD uu=p[0]-p[1];
-	TPointD up=(p[0]+p[1])*0.5;
-	uu=normalize(uu);
-	uu=rotate90(uu);
-	TPointD up1=up+uu;
-	TPointD up2=up-uu;
-	double d1=tdistance(up1,p[2]);
-	double d2=tdistance(up2,p[2]);
-
-	std::vector<TPointD> lpv;
-	if ( d1>d2 ) {
-		lpv=pv;
-	} else {
-		TPointD sw=p[1];
-		p[1]=p[2];
-		p[2]=sw;
-	}
-
-
-	double a=tdistance(p[1],p[2]);
-	double b=tdistance(p[2],p[0]);
-	double c=tdistance(p[0],p[1]);
-	double x=(b*b-c*c-a*a)/(-2.0*a);
-	double m=sqrt(c*c-x*x);
-	TPointD u=p[2]-p[1];
-	u=normalize(u);
-	TPointD q(p[1]+u*x);
-
-    const double flashGrad=16384.0;  // size of gradient square
-    flash.setGradientFill(true,col[0],col[1]);
-//	TPointD center=pv[0]*0.75+((p[1]+p[2])*0.5)*0.25;
-	TPointD center=pv[0];
-	TPointD e(p[2]-p[1]);
-
-	double angle=rad2degree(atan(e));
-	angle= angle<=0 ? 270+angle : angle-90;
-    TRotation rM(angle);
-	TTranslation tM(center.x,center.y);
-	TScale sM(m/flashGrad,2*tmax(x,a-x)/flashGrad);
-
-    flash.setFillStyleMatrix(tM*rM*sM);
-	std::vector<TPointD> pp;
-	pp.push_back(p[0]);
-	pp.push_back(p[1]);
-	pp.push_back(p[2]);
-
-    flash.drawPolyline(pp);	
-
-
-*/
 
 void SFlashUtils::Triangle2Quad(std::vector<TPointD> &p) const
 {

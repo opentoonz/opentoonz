@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef MESHBUILDER_H
 #define MESHBUILDER_H

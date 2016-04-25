@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SCREEN_PICKER_H
 #define SCREEN_PICKER_H

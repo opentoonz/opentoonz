@@ -697,7 +697,7 @@ void BmpWriter::open(FILE *file, const TImageInfo &info)
 
 	TEnumProperty *p = (TEnumProperty *)(m_properties->getProperty("Bits Per Pixel"));
 	assert(p);
-	std::string str = toString(p->getValue());
+	std::string str = ::to_string(p->getValue());
 	m_bitPerPixel = atoi(str.c_str());
 
 	int cmapSize = 0;

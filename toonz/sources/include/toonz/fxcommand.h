@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FXCOMMAND_INCLUDED
 #define FXCOMMAND_INCLUDED

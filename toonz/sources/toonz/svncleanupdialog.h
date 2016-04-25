@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SVN_CLEANUP_DIALOG_H
 #define SVN_CLEANUP_DIALOG_H

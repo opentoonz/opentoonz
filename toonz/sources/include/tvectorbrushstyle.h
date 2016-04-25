@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef T_VECTOR_BRUSH_STYLE_H
 #define T_VECTOR_BRUSH_STYLE_H

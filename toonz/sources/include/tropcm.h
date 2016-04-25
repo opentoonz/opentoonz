@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TROPCM_INCLUDED
 #define TROPCM_INCLUDED

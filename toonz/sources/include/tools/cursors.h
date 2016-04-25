@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef CURSORS_INCLUDED
 #define CURSORS_INCLUDED

@@ -248,10 +248,10 @@ bool FreeDistortBaseFx::doGetBBox(double frame, TRectD &bBox, const TRenderSetti
 		}*/
 
 		/*TRectD source;
-    source.x0 = tmin(p00_b.x, p10_b.x, p01_b.x, p11_b.x);
-    source.y0 = tmin(p00_b.y, p10_b.y, p01_b.y, p11_b.y);
-    source.x1 = tmax(p00_b.x, p10_b.x, p01_b.x, p11_b.x);
-    source.y1 = tmax(p00_b.y, p10_b.y, p01_b.y, p11_b.y);
+    source.x0 = std::min(p00_b.x, p10_b.x, p01_b.x, p11_b.x);
+    source.y0 = std::min(p00_b.y, p10_b.y, p01_b.y, p11_b.y);
+    source.x1 = std::max(p00_b.x, p10_b.x, p01_b.x, p11_b.x);
+    source.y1 = std::max(p00_b.y, p10_b.y, p01_b.y, p11_b.y);
     bBox *= source;
     
     int distortType = m_distortType->getValue();
@@ -276,10 +276,10 @@ bool FreeDistortBaseFx::doGetBBox(double frame, TRectD &bBox, const TRenderSetti
 		//Further, we will also avoid the assumption that the bbox
 		//is defined by that of destination points...
 		/*TRectD result;
-    result.x0 = tmin(p00_a.x, p10_a.x, p01_a.x, p11_a.x);
-    result.y0 = tmin(p00_a.y, p10_a.y, p01_a.y, p11_a.y);
-    result.x1 = tmax(p00_a.x, p10_a.x, p01_a.x, p11_a.x);
-    result.y1 = tmax(p00_a.y, p10_a.y, p01_a.y, p11_a.y);
+    result.x0 = std::min(p00_a.x, p10_a.x, p01_a.x, p11_a.x);
+    result.y0 = std::min(p00_a.y, p10_a.y, p01_a.y, p11_a.y);
+    result.x1 = std::max(p00_a.x, p10_a.x, p01_a.x, p11_a.x);
+    result.y1 = std::max(p00_a.y, p10_a.y, p01_a.y, p11_a.y);
     bBox = result;    //bBox *= result;*/
 	} else {
 		bBox = TRectD();
@@ -287,7 +287,7 @@ bool FreeDistortBaseFx::doGetBBox(double frame, TRectD &bBox, const TRenderSetti
 	}
 
 	if (m_upBlur->getValue(frame) > 0 || m_downBlur->getValue(frame) > 0) {
-		int brad = tmax((int)m_upBlur->getValue(frame), (int)m_downBlur->getValue(frame));
+		int brad = std::max((int)m_upBlur->getValue(frame), (int)m_downBlur->getValue(frame));
 		bBox.x0 -= brad;
 		bBox.x1 += brad;
 		bBox.y0 -= brad;
@@ -327,10 +327,10 @@ void FreeDistortBaseFx::transform(
 	infoOnInput = infoOnOutput;
 
 	double scale = 0;
-	scale = tmax(scale, norm(p10_a - p00_a) / norm(p10_b - p00_b));
-	scale = tmax(scale, norm(p01_a - p00_a) / norm(p01_b - p00_b));
-	scale = tmax(scale, norm(p11_a - p10_a) / norm(p11_b - p10_b));
-	scale = tmax(scale, norm(p11_a - p01_a) / norm(p11_b - p01_b));
+	scale = std::max(scale, norm(p10_a - p00_a) / norm(p10_b - p00_b));
+	scale = std::max(scale, norm(p01_a - p00_a) / norm(p01_b - p00_b));
+	scale = std::max(scale, norm(p11_a - p10_a) / norm(p11_b - p10_b));
+	scale = std::max(scale, norm(p11_a - p01_a) / norm(p11_b - p01_b));
 
 	scale *= sqrt(fabs(infoOnInput.m_affine.det()));
 
@@ -419,10 +419,10 @@ void FreeDistortBaseFx::safeTransform(
 		TPointD affP11_b(infoOnInput.m_affine * m_p11_b->getValue(frame));
 
 		TRectD source;
-		source.x0 = tmin(affP00_b.x, affP10_b.x, affP01_b.x, affP11_b.x);
-		source.y0 = tmin(affP00_b.y, affP10_b.y, affP01_b.y, affP11_b.y);
-		source.x1 = tmax(affP00_b.x, affP10_b.x, affP01_b.x, affP11_b.x);
-		source.y1 = tmax(affP00_b.y, affP10_b.y, affP01_b.y, affP11_b.y);
+		source.x0 = std::min({affP00_b.x, affP10_b.x, affP01_b.x, affP11_b.x});
+		source.y0 = std::min({affP00_b.y, affP10_b.y, affP01_b.y, affP11_b.y});
+		source.x1 = std::max({affP00_b.x, affP10_b.x, affP01_b.x, affP11_b.x});
+		source.y1 = std::max({affP00_b.y, affP10_b.y, affP01_b.y, affP11_b.y});
 
 		rectOnInput *= source;
 	}
@@ -627,7 +627,7 @@ void doBlur(TRasterPT<PIX> &r,
 	lx = r->getLx();
 	ly = r->getLy();
 	wrap = r->getWrap();
-	blur_max = (int)tmax(blur0, blur1);
+	blur_max = (int)std::max(blur0, blur1);
 	brad = tceil(blur_max);
 
 	//assert(y0 <= brad && y1 >= r->getLy()-1 - 2 * brad + y0);
@@ -637,12 +637,12 @@ void doBlur(TRasterPT<PIX> &r,
 	blur_incr = (blur1 - blur0) / den;
 	transp_incr = (transp0 - transp1) / den;
 
-	row = new PIX[tmax(lx, ly)];
+	row = new PIX[std::max(lx, ly)];
 	r->lock();
 	bufin = r->pixels(0);
-	for (i = 0, cur_blur = blur0 + (blur1 - blur0) * (i - y0) / den, 0.0, actual_blur = tmax(cur_blur, 0.0);
+	for (i = 0, cur_blur = blur0 + (blur1 - blur0) * (i - y0) / den, 0.0, actual_blur = std::max(cur_blur, 0.0);
 		 i < ly;
-		 i++, bufin += wrap, cur_blur += blur_incr, actual_blur = tmax(cur_blur, 0.0)) {
+		 i++, bufin += wrap, cur_blur += blur_incr, actual_blur = std::max(cur_blur, 0.0)) {
 		pixin = bufin;
 		for (j = 0; j < lx; j++, pixin++) {
 			if (cur_blur > 1.0)
@@ -660,9 +660,9 @@ void doBlur(TRasterPT<PIX> &r,
 		pixin = bufin;
 		pixout = bufout;
 
-		for (j = 0, cur_blur = blur0 + (blur1 - blur0) * (j - y0) / den, actual_blur = tmax(cur_blur, 0.0);
+		for (j = 0, cur_blur = blur0 + (blur1 - blur0) * (j - y0) / den, actual_blur = std::max(cur_blur, 0.0);
 			 j < ly;
-			 j++, pixin += wrap, cur_blur += blur_incr, actual_blur = tmax(cur_blur, 0.0)) {
+			 j++, pixin += wrap, cur_blur += blur_incr, actual_blur = std::max(cur_blur, 0.0)) {
 			if (cur_blur > 1.0)
 				filterPixel(pixin, wrap, row + j, actual_blur, j, ly);
 			else
@@ -670,9 +670,9 @@ void doBlur(TRasterPT<PIX> &r,
 		}
 
 		if (transp0 > 0 || transp1 > 0)
-			for (j = 0, cur_transp = 1 - transp0 + (transp0 - transp1) * (j - y0) / den, actual_transp = tmax(cur_transp, 0.0);
+			for (j = 0, cur_transp = 1 - transp0 + (transp0 - transp1) * (j - y0) / den, actual_transp = std::max(cur_transp, 0.0);
 				 j < ly;
-				 j++, pixout += wrap, cur_transp += transp_incr, actual_transp = tmax(cur_transp, 0.0)) {
+				 j++, pixout += wrap, cur_transp += transp_incr, actual_transp = std::max(cur_transp, 0.0)) {
 				pixout->r = troundp(row[j].r * actual_transp);
 				pixout->g = troundp(row[j].g * actual_transp);
 				pixout->b = troundp(row[j].b * actual_transp);
@@ -767,7 +767,7 @@ void FreeDistortBaseFx::doCompute(TTile &tile, double frame, const TRenderSettin
 
 	double downBlur = m_downBlur->getValue(frame) * scale;
 	double upBlur = m_upBlur->getValue(frame) * scale;
-	int brad = tceil(tmax(downBlur, upBlur));
+	int brad = tceil(std::max(downBlur, upBlur));
 
 	inRect = inRect.enlarge(brad);
 

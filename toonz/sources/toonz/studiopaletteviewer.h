@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef STUDIOPALETTEVIEWER_H
 #define STUDIOPALETTEVIEWER_H

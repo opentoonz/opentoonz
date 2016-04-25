@@ -352,10 +352,10 @@ TImageP TImageReader::load0()
 		if (!m_region.isEmpty()) {
 			// Intersect with the externally specified loading region
 
-			x0 = tmax(x0, m_region.x0);
-			y0 = tmax(y0, m_region.y0);
-			x1 = tmin(x1, m_region.x1);
-			y1 = tmin(y1, m_region.y1);
+			x0 = std::max(x0, m_region.x0);
+			y0 = std::max(y0, m_region.y0);
+			x1 = std::min(x1, m_region.x1);
+			y1 = std::min(y1, m_region.y1);
 
 			if (x0 >= x1 || y0 >= y1)
 				return TImageP();
@@ -589,7 +589,7 @@ void TImageWriter::save(const TImageP &img)
 			p->setValue(range[2]); // Horrible. See tiio_tif.cpp (732 or near)     -.-'
 		}
 
-		int bpp = p ? atoi((toString(p->getValue()).c_str())) : 32;
+		int bpp = p ? std::stoi(p->getValue()) : 32;
 
 		//  bpp       1  8  16 24 32 40  48 56  64
 		int spp[] = {1, 1, 1, 4, 4, 0, 4, 0, 4};	// 0s are for pixel sizes which are normally unsupported

@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TXSHSIMPLELEVEL_INCLUDED
 #define TXSHSIMPLELEVEL_INCLUDED
 

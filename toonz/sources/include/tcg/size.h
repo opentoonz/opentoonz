@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCG_SIZE_H
 #define TCG_SIZE_H

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SCENESETTINGSPOPUP_H
 #define SCENESETTINGSPOPUP_H

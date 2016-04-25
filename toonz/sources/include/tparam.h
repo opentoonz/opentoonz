@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef T_PARAM_INCLUDED
 #define T_PARAM_INCLUDED

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TFILE_H
 #define TFILE_H

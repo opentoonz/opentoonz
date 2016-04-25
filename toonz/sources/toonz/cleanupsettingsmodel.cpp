@@ -367,8 +367,8 @@ void CleanupSettingsModel::commitChanges(int action)
 	}
 
 	// Perform actions
-	int maxAction = tmax(action, m_action);				 // Add previuosly required actions
-	action = tmin(maxAction, m_allowedActions);			 // But only up to the allowed action
+	int maxAction = std::max(action, m_action);				 // Add previuosly required actions
+	action = std::min(maxAction, m_allowedActions);			 // But only up to the allowed action
 	m_action = (action == maxAction) ? NONE : maxAction; // Then, update the previously required action
 
 	if (action >= FULLPROCESS)

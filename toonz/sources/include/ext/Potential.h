@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef POTENTIAL_H
 #define POTENTIAL_H

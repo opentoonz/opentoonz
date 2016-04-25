@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef _EDITTOOLGADGETS_H_
 #define _EDITTOOLGADGETS_H_

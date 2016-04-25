@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TOOLSUTILS_H
 #define TOOLSUTILS_H

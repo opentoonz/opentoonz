@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef T_OBSERVER_INCLUDED
 #define T_OBSERVER_INCLUDED

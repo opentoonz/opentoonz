@@ -203,7 +203,7 @@ bool ExportCurvePopup::execute()
 		TSystem::touchParentDir(fp);
 		Tofstream os(fp);
 		os << "# RELEASE:      5.0" << std::endl;
-		os << "# FILE NAME:    " << toString(fp.getWideString()) << std::endl;
+		os << "# FILE NAME:    " << ::to_string(fp) << std::endl;
 		os << "# COMPOSED BY:  " << TSystem::getUserName().toStdString() << std::endl;
 		os << "# MACHINE NAME: " << TSystem::getHostName().toStdString() << std::endl;
 		// os << "# DATE:         " << TSystem::getCurrentTime() << endl;
@@ -238,10 +238,6 @@ bool ExportCurvePopup::execute()
 
 void saveCurve(TDoubleParam *curve)
 {
-#ifdef BRAVODEMO
-	DVGui::featureNotAvelaible();
-	return false;
-#endif
 	TFilePath folderPath = TProjectManager::instance()->getCurrentProject()->getScenesPath();
 	SaveCurvePopup popup(folderPath, curve);
 	popup.exec();
@@ -251,10 +247,6 @@ void saveCurve(TDoubleParam *curve)
 
 void loadCurve(TDoubleParam *curve)
 {
-#ifdef BRAVODEMO
-	DVGui::featureNotAvelaible();
-	return false;
-#endif
 	TFilePath folderPath = TProjectManager::instance()->getCurrentProject()->getScenesPath();
 	LoadCurvePopup popup(folderPath, curve);
 	popup.exec();
@@ -264,10 +256,6 @@ void loadCurve(TDoubleParam *curve)
 
 void exportCurve(TDoubleParam *curve, const std::string &name)
 {
-#ifdef BRAVODEMO
-	DVGui::featureNotAvelaible();
-	return false;
-#endif
 	TFilePath folderPath = TProjectManager::instance()->getCurrentProject()->getScenesPath();
 	ExportCurvePopup popup(folderPath, curve, name);
 	popup.exec();

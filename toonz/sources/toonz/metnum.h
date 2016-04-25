@@ -1,4 +1,4 @@
-
+#pragma once
 
 /*-----------------------------------------------------
  * Header della libreria metnum.cpp

@@ -89,7 +89,7 @@ const int notificationDelay = 300;
 
 inline std::string getCacheId(const TFxP &fx, int frame)
 {
-	return toString(fx->getIdentifier()) + ".noext" + toString(frame);
+	return std::to_string(fx->getIdentifier()) + ".noext" + std::to_string(frame);
 }
 
 //----------------------------------------------------------------------------
@@ -351,7 +351,7 @@ PreviewFxInstance::~PreviewFxInstance()
 
 	//Release the user cache about this instance
 	std::string contextName("PFX");
-	contextName += ::toString(m_fx->getIdentifier());
+	contextName += std::to_string(m_fx->getIdentifier());
 	TPassiveCacheManager::instance()->releaseContextNamesWithPrefix(contextName);
 
 	//Clear the cached images
@@ -530,8 +530,8 @@ void PreviewFxInstance::updateFrameRange()
 	//Intersect with the fx active frame range
 	TRasterFxP rasterFx(m_fx);
 	TFxTimeRegion timeRegion(rasterFx->getTimeRegion());
-	m_start = tmax(timeRegion.getFirstFrame(), m_start);
-	m_end = tmin(timeRegion.getLastFrame(), m_end);
+	m_start = std::max(timeRegion.getFirstFrame(), m_start);
+	m_end = std::min(timeRegion.getLastFrame(), m_end);
 
 	//Release all images not in the new frame range
 	std::map<int, FrameInfo>::iterator it, jt;
@@ -545,7 +545,7 @@ void PreviewFxInstance::updateFrameRange()
 	}
 
 	//Build a level to associate the flipbook with the rendered output
-	m_level->setName(toString(m_fx->getIdentifier()) + ".noext");
+	m_level->setName(std::to_string(m_fx->getIdentifier()) + ".noext");
 	int i;
 	for (i = 0; i < frameCount; i++)
 		m_level->setFrame(TFrameId(i), 0);
@@ -588,7 +588,7 @@ void PreviewFxInstance::updateInitialFrame()
 	std::set<FlipBook *>::iterator kt;
 	m_initFrame = (std::numeric_limits<int>::max)();
 	for (kt = m_flipbooks.begin(); kt != m_flipbooks.end(); ++kt)
-		m_initFrame = tmin(m_initFrame, (*kt)->getCurrentFrame() - 1);
+		m_initFrame = std::min(m_initFrame, (*kt)->getCurrentFrame() - 1);
 
 	cropAndStep(m_initFrame);
 }
@@ -936,7 +936,7 @@ void PreviewFxInstance::startRender(bool rebuild)
 	//Retrieve the renderId
 	unsigned long renderId = m_renderer.nextRenderId();
 	std::string contextName("PFX");
-	contextName += ::toString(m_fx->getIdentifier());
+	contextName += std::to_string(m_fx->getIdentifier());
 	TPassiveCacheManager::instance()->setContextName(renderId, contextName);
 
 	//Finally, start rendering all frames which were not found in cache
@@ -1173,11 +1173,6 @@ PreviewFxManager *PreviewFxManager::instance()
 
 FlipBook *PreviewFxManager::showNewPreview(TFxP fx, bool forceFlipbook)
 {
-#ifdef BRAVODEMO
-	DVGui::featureNotAvelaible();
-	return 0;
-#else
-
 	if (!fx)
 		return 0;
 
@@ -1218,8 +1213,6 @@ FlipBook *PreviewFxManager::showNewPreview(TFxP fx, bool forceFlipbook)
 		previewInstance->refreshViewRects();
 
 	return result;
-
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1324,14 +1317,14 @@ void PreviewFxManager::freeze(FlipBook *flipbook)
 
 	//Then, perform the level copy
 	{
-		std::string levelName("freezed" + ::toString(flipbook->getPoolIndex()) + ".noext");
+		std::string levelName("freezed" + std::to_string(flipbook->getPoolIndex()) + ".noext");
 		int i;
 
 		//Clone the preview images
 		for (i = previewInstance->m_start; i <= previewInstance->m_end; i += previewInstance->m_step) {
 			TImageP cachedImage = TImageCache::instance()->get(getCacheId(fx, i), false);
 			if (cachedImage)
-				TImageCache::instance()->add(levelName + ::toString(i), cachedImage->cloneImage());
+				TImageCache::instance()->add(levelName + std::to_string(i), cachedImage->cloneImage());
 		}
 
 		//Associate a level with the cached images
@@ -1402,7 +1395,7 @@ void PreviewFxManager::onLevelChanged()
 		TXshLevel *xl = TApp::instance()->getCurrentLevel()->getLevel();
 		std::string aliasKeyword;
 		TFilePath fp = xl->getPath();
-		aliasKeyword = toString(fp.withType("").getWideString());
+		aliasKeyword = ::to_string(fp.withType(""));
 
 		QMap<unsigned long, PreviewFxInstance *>::iterator it;
 		for (it = m_previewInstances.begin(); it != m_previewInstances.end(); ++it) {

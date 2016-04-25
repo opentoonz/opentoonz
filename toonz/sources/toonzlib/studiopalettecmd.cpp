@@ -352,7 +352,7 @@ public:
 								 const TImageP &oldImage, const TPaletteP &oldPalette, const TPaletteP &newPalette, int tolerance)
 		: TUndo(), m_currentLevelHandle(currentLevelHandle), m_paletteHandle(paletteHandle), m_fid(fid), m_oldPalette(oldPalette), m_newPalette(newPalette), m_tolerance(tolerance)
 	{
-		m_oldImageId = "AdjustIntoCurrentPaletteUndo_oldImage_" + toString(m_idCount++);
+		m_oldImageId = "AdjustIntoCurrentPaletteUndo_oldImage_" + std::to_string(m_idCount++);
 
 		TImageCache::instance()->add(m_oldImageId, (const TImageP)oldImage);
 

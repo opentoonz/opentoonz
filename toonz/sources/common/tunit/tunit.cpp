@@ -461,7 +461,7 @@ void TMeasuredValue::setMeasure(std::string measureName)
 
 bool TMeasuredValue::setValue(std::wstring s, int *pErr)
 {
-	if (s == ::toWideString("")) {
+	if (s == L"") {
 		if (pErr)
 			*pErr = -1;
 		return false;
@@ -471,7 +471,7 @@ bool TMeasuredValue::setValue(std::wstring s, int *pErr)
 	bool valueFlag = false;
 	int i = 0, len = s.length();
 	// skip blanks
-	i = s.find_first_not_of(::toWideString(" \t"));
+	i = s.find_first_not_of(::to_wstring(" \t"));
 	assert(i != (int)std::wstring::npos);
 	int j = i;
 	// match number
@@ -492,10 +492,10 @@ bool TMeasuredValue::setValue(std::wstring s, int *pErr)
 		}
 	}
 	if (i > j) {
-		value = toDouble(s.substr(j, i - j));
+		value = std::stod(s.substr(j, i - j));
 		valueFlag = true;
 		// skip blanks
-		i = s.find_first_not_of(::toWideString(" \t"), i);
+		i = s.find_first_not_of(::to_wstring(" \t"), i);
 		if (i == (int)std::wstring::npos)
 			i = s.length();
 	}
@@ -503,7 +503,7 @@ bool TMeasuredValue::setValue(std::wstring s, int *pErr)
 	// remove trailing blanks
 	if (i < (int)s.length()) {
 		j = i;
-		i = s.find_last_not_of(::toWideString(" \t"));
+		i = s.find_last_not_of(::to_wstring(" \t"));
 		if (i == (int)std::wstring::npos)
 			i = len - 1;
 		if (j <= i) {
@@ -536,7 +536,7 @@ bool TMeasuredValue::setValue(std::wstring s, int *pErr)
 std::wstring TMeasuredValue::toWideString(int decimals) const
 {
 	double v = getValue(CurrentUnit);
-	std::string s = toString(v, decimals);
+	std::string s = ::to_string(v, decimals);
 	if (s.find('.') != std::string::npos) {
 		int i = s.length();
 		while (i > 0 && s[i - 1] == '0')
@@ -548,8 +548,8 @@ std::wstring TMeasuredValue::toWideString(int decimals) const
 	}
 	std::wstring measure = m_measure->getCurrentUnit()->getDefaultExtension();
 	if (measure.empty())
-		return ::toWideString(s);
-	return ::toWideString(s) + ::toWideString(" ") + measure;
+		return ::to_wstring(s);
+	return ::to_wstring(s) + L" " + measure;
 }
 
 //===================================================================

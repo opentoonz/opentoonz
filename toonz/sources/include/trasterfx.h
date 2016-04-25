@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef _TRASTERFX_
 #define _TRASTERFX_

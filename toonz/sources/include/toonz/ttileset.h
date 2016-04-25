@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TTILESET_HEADER
 #define TTILESET_HEADER

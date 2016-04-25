@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TXSH_ZERARYFX_COLUMN_INCLUDED
 #define TXSH_ZERARYFX_COLUMN_INCLUDED

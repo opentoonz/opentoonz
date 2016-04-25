@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef INFOVIEWER_H
 #define INFOVIEWER_H
 

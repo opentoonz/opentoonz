@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TNZ_EXTUTIL_H
 #define TNZ_EXTUTIL_H

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TLIN_H
 #define TLIN_H

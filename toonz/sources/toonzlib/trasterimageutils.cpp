@@ -174,7 +174,7 @@ void fastAddPaintRegion(const TRasterImageP &ri, TRegion *region,
 	UINT i = 0;
 	for (; i < region->getSubregionCount(); ++i) {
 		subregion = region->getSubregion(i);
-		fastAddPaintRegion(ri, subregion, tmin(maxStyleId, subregion->getStyle()), maxStyleId);
+		fastAddPaintRegion(ri, subregion, std::min(maxStyleId, subregion->getStyle()), maxStyleId);
 	}
 }
 }
@@ -268,7 +268,7 @@ TRasterImageP TRasterImageUtils::vectorToFullColorImage(
 	int maxStyleId = palette->getStyleCount() - 1;
 	for (i = 0; i < (int)vi->getRegionCount(); ++i) {
 		TRegion *region = vi->getRegion(i);
-		fastAddPaintRegion(ri, region, tmin(maxStyleId, region->getStyle()), maxStyleId);
+		fastAddPaintRegion(ri, region, std::min(maxStyleId, region->getStyle()), maxStyleId);
 	}
 
 	set<int> colors;
@@ -276,7 +276,7 @@ TRasterImageP TRasterImageUtils::vectorToFullColorImage(
 		for (i = 0; i < (int)fxs->size(); i++) {
 			SandorFxRenderData *sandorData = dynamic_cast<SandorFxRenderData *>((*fxs)[i].getPointer());
 			if (sandorData && sandorData->m_type == BlendTz) {
-				std::string indexes = toString(sandorData->m_blendParams.m_colorIndex);
+				std::string indexes = ::to_string(sandorData->m_blendParams.m_colorIndex);
 				std::vector<std::string> items;
 				parseIndexes(indexes, items);
 				PaletteFilterFxRenderData paletteFilterData;

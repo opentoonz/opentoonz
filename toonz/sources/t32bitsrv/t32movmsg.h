@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef T32MOVMSG_H
 #define T32MOVMSG_H

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TW_SPLASH_INCLUDED
 #define TW_SPLASH_INCLUDED

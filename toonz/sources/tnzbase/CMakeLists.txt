@@ -19,7 +19,6 @@ set(HEADERS ${MOC_HEADERS}
     ../common/twain/twain.h
     ../include/permissionsmanager.h
     ../include/tscanner.h
-    tscanner/tscannerdevice.h
     tscanner/tscannerutil.h
     tscanner/tscannerepson.h
     tscanner/tscannertwain.h
@@ -37,7 +36,6 @@ set(HEADERS ${MOC_HEADERS}
     ../include/tparamcontainer.h
     ../include/tparamset.h
     ../include/tspectrumparam.h
-    ../include/tstepparam.h
     ../include/ttonecurveparam.h
     ../include/tcolumnset.h
     ../include/tbasefx.h
@@ -81,7 +79,6 @@ set(SOURCES
     ../common/tparam/tpointparam.cpp
     ../common/tparam/trangeparam.cpp
     ../common/tparam/tspectrumparam.cpp
-    ../common/tparam/tstepparam.cpp
     ../common/tparam/ttonecurveparam.cpp
     ../common/txsheet/tcolumnset.cpp
     ../common/tfx/binaryFx.cpp

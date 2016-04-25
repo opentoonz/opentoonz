@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef IKNODE_H
 #define IKNODE_H

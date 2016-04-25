@@ -170,7 +170,7 @@ void fastAddPaintRegion(const TToonzImageP &ti, TRegion *region,
 	UINT i = 0;
 	for (; i < region->getSubregionCount(); ++i) {
 		subregion = region->getSubregion(i);
-		fastAddPaintRegion(ti, subregion, tmin(maxStyleId, subregion->getStyle()), maxStyleId);
+		fastAddPaintRegion(ti, subregion, std::min(maxStyleId, subregion->getStyle()), maxStyleId);
 	}
 }
 }
@@ -417,7 +417,7 @@ TToonzImageP ToonzImageUtils::vectorToToonzImage(
 		for (i = 0; i < (int)fxs->size(); i++) {
 			SandorFxRenderData *sandorData = dynamic_cast<SandorFxRenderData *>((*fxs)[i].getPointer());
 			if (sandorData && sandorData->m_type == BlendTz) {
-				std::string indexes = toString(sandorData->m_blendParams.m_colorIndex);
+				std::string indexes = ::to_string(sandorData->m_blendParams.m_colorIndex);
 				std::vector<std::string> items;
 				parseIndexes(indexes, items);
 				PaletteFilterFxRenderData paletteFilterData;
@@ -433,7 +433,7 @@ TToonzImageP ToonzImageUtils::vectorToToonzImage(
 		for (k = 0; k < regionCount; ++k)
 			if (vi->areDifferentGroup(i, false, k, true) == -1) {
 				TRegion *region = vi->getRegion(k);
-				fastAddPaintRegion(ti, region, tmin(maxStyleId, region->getStyle()), maxStyleId);
+				fastAddPaintRegion(ti, region, std::min(maxStyleId, region->getStyle()), maxStyleId);
 			}
 
 		//Find the first stroke which does not belong to the group
@@ -460,7 +460,7 @@ TToonzImageP ToonzImageUtils::vectorToToonzImage(
 				}
 			}
 			if (visible)
-				fastAddInkStroke(ti, stroke, tmin(maxStyleId, stroke->getStyle()), false, false, clip, true, colors);
+				fastAddInkStroke(ti, stroke, std::min(maxStyleId, stroke->getStyle()), false, false, clip, true, colors);
 		}
 		i = k;
 	}
@@ -502,7 +502,7 @@ TPalette *ToonzImageUtils::loadTzPalette(const TFilePath &pltFile)
 		TSolidColorStyle *style = new TSolidColorStyle(pixelRow[x]);
 		if ((it = pltColorNames.find(x)) != pltColorNames.end()) {
 			std::string styleName = it->second.second;
-			style->setName(toWideString(styleName));
+			style->setName(::to_wstring(styleName));
 		}
 		if (x < count)
 			palette->setStyle(x, style);
@@ -525,7 +525,7 @@ TPalette *ToonzImageUtils::loadTzPalette(const TFilePath &pltFile)
 	for (x = 0; x < rasPlt->getLx(); ++x) {
 		if ((it = pltColorNames.find(x)) != pltColorNames.end()) {
 			std::wstring pageName;
-			pageName = toWideString(it->second.first);
+			pageName = ::to_wstring(it->second.first);
 			if (x == 0) {
 				page = palette->getPage(0);
 				page->setName(pageName);
@@ -737,10 +737,10 @@ void ToonzImageUtils::eraseImage(const TToonzImageP &ti, const TRaster32P &image
 			int paint, tone;
 			if (!invert) {
 				paint = inPix->m > 0 && erasePaint && canErasePaint ? 0 : outPix->getPaint();
-				tone = inPix->m > 0 && eraseInk && canEraseInk ? tmax(outPix->getTone(), (int)inPix->m) : outPix->getTone();
+				tone = inPix->m > 0 && eraseInk && canEraseInk ? std::max(outPix->getTone(), (int)inPix->m) : outPix->getTone();
 			} else {
 				paint = inPix->m < 255 && erasePaint && canErasePaint ? 0 : outPix->getPaint();
-				tone = inPix->m < 255 && eraseInk && canEraseInk ? tmax(outPix->getTone(), 255 - (int)inPix->m) : outPix->getTone();
+				tone = inPix->m < 255 && eraseInk && canEraseInk ? std::max(outPix->getTone(), 255 - (int)inPix->m) : outPix->getTone();
 			}
 			*outPix = TPixelCM32(outPix->getInk(), paint, tone);
 		}

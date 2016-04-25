@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef PLASTICDEFORMERFX_H
 #define PLASTICDEFORMERFX_H

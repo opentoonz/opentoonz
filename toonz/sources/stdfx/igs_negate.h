@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef igs_negate_h
 #define igs_negate_h
 

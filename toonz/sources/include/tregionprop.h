@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TREGIONPROP_H
 #define TREGIONPROP_H

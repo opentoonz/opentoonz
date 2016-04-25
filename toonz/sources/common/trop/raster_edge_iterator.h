@@ -1,4 +1,4 @@
-
+// #pragma once // could not use by INCLUDE_HPP
 
 #ifndef RASTER_EDGE_ITERATOR_H
 #define RASTER_EDGE_ITERATOR_H

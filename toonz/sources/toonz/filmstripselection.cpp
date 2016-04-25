@@ -89,9 +89,7 @@ void TFilmstripSelection::enableCommands()
 			enableCommand(this, MI_Insert, &TFilmstripSelection::insertEmptyFrames);
 			enableCommand(this, MI_MergeFrames, &TFilmstripSelection::mergeFrames);
 
-#ifndef STUDENT
 			enableCommand(this, MI_AddFrames, &TFilmstripSelection::addFrames);
-#endif
 		}
 	} else if (isNotEditableFullColorLevel)
 		enableCommand(this, MI_Copy, &TFilmstripSelection::copyFrames);

@@ -2,6 +2,8 @@
 
 #ifndef x64
 
+#include <cstdint>
+
 #include "texception.h"
 #include "tsound.h"
 #include "tconvert.h"
@@ -114,7 +116,7 @@ string buildQTErrorString(int ec)
 		return "unable to set movie box";
 
 	default: {
-		return "unknown error ('" + toString(ec) + "')";
+		return "unknown error ('" + std::to_string(ec) + "')";
 	}
 	}
 }

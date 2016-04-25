@@ -1,4 +1,4 @@
-
+#pragma once
 
 // PatternMapParam.h: interface for the CPatternMapParam class.
 //
@@ -6,10 +6,6 @@
 
 #if !defined(AFX_PATTERNMAPPARAM_H__53513371_34D4_11D6_B9E7_0040F674BE6A__INCLUDED_)
 #define AFX_PATTERNMAPPARAM_H__53513371_34D4_11D6_B9E7_0040F674BE6A__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
 
 #include "CIL.h"
 

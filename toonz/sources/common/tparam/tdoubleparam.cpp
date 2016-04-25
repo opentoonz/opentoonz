@@ -60,7 +60,7 @@ public:
 			m_unitName = "";
 		} else {
 			if (m_unitName != "")
-				m_unit = measure->getUnit(toWideString(m_unitName));
+				m_unit = measure->getUnit(::to_wstring(m_unitName));
 			else
 				m_unit = 0;
 			if (!m_unit) {
@@ -229,8 +229,8 @@ inline double getEaseInOutValue(
 		return k0.m_value;
 	else if (x >= x3)
 		return k1.m_value;
-	double e0 = tmax(k0.m_speedOut.x, 0.0);
-	double e1 = tmax(-k1.m_speedIn.x, 0.0);
+	double e0 = std::max(k0.m_speedOut.x, 0.0);
+	double e1 = std::max(-k1.m_speedIn.x, 0.0);
 	if (percentage) {
 		e0 *= x3 * 0.01;
 		e1 *= x3 * 0.01;
@@ -661,7 +661,7 @@ double TDoubleParam::getValue(double frame, bool leftmost) const
 			tmpKeyframe[2] = *b;
 			b = tmpKeyframe.begin() + 2;
 
-			int relPos = tfloor(b->m_frame - a->m_frame), step = tmin(a->m_step, relPos);
+			int relPos = tfloor(b->m_frame - a->m_frame), step = std::min(a->m_step, relPos);
 
 			tmpKeyframe[2].m_frame = a->m_frame + tfloor(relPos, step);
 			if (frame > b->m_frame)
@@ -1189,7 +1189,7 @@ void TDoubleParam::loadData(TIStream &is)
 				continue;
 			TDoubleKeyframe::FileParams params;
 			params.m_path = TFilePath(is.getTagAttribute("path"));
-			params.m_fieldIndex = toInt(is.getTagAttribute("index"));
+			params.m_fieldIndex = std::stoi(is.getTagAttribute("index"));
 			TActualDoubleKeyframe k1, k2;
 			k1.m_frame = -1000;
 			k2.m_frame = 1000;
@@ -1276,7 +1276,7 @@ string TDoubleParam::getStreamTag() const
 
 string TDoubleParam::getValueAlias(double frame, int precision)
 {
-	return toString(getValue(frame), precision);
+	return ::to_string(getValue(frame), precision);
 }
 
 //-------------------------------------------------------------------

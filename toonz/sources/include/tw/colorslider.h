@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TNZ_COLORSLIDER_INCLUDED
 #define TNZ_COLORSLIDER_INCLUDED

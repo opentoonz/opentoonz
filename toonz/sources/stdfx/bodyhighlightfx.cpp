@@ -61,7 +61,7 @@ void doBlur(CHANNEL_TYPE *greymap, const TRasterPT<PIXEL> &rin, int blur)
 
 	//We'll need a temporary col for storing sums
 	std::unique_ptr<unsigned long[]> tempCol(new unsigned long[rin->getLy()]);
-	int edge = tmin(blur + 1, rin->getLy());
+	int edge = std::min(blur + 1, rin->getLy());
 
 	for (i = 0; i < rin->getLx(); ++i) {
 		PIXEL *lineSrcPix = rin->pixels(0) + i;
@@ -114,7 +114,7 @@ void doBlur(CHANNEL_TYPE *greymap, const TRasterPT<PIXEL> &rin, int blur)
 
 	//We'll need a temporary row for sums
 	std::unique_ptr<unsigned long[]> tempRow(new unsigned long[rin->getLx()]);
-	edge = tmin(blur + 1, rin->getLx());
+	edge = std::min(blur + 1, rin->getLx());
 
 	for (j = 0; j < rin->getLy(); ++j) {
 		CHANNEL_TYPE *lineSrcPix = greymap + j * wrapOut;
@@ -178,9 +178,9 @@ void myOver(PIXEL &pixout, const PIXEL &pixin, const PIXEL &color)
 template <typename PIXEL>
 void myAdd(PIXEL &pixout, const PIXEL &pixin, const PIXEL &color)
 {
-	pixout.r = tmin(pixin.r + color.r, PIXEL::maxChannelValue);
-	pixout.g = tmin(pixin.g + color.g, PIXEL::maxChannelValue);
-	pixout.b = tmin(pixin.b + color.b, PIXEL::maxChannelValue);
+	pixout.r = std::min(pixin.r + color.r, PIXEL::maxChannelValue);
+	pixout.g = std::min(pixin.g + color.g, PIXEL::maxChannelValue);
+	pixout.b = std::min(pixin.b + color.b, PIXEL::maxChannelValue);
 }
 
 //------------------------------------------------------------------------------
@@ -188,9 +188,9 @@ void myAdd(PIXEL &pixout, const PIXEL &pixin, const PIXEL &color)
 template <typename PIXEL>
 void mySub(PIXEL &pixout, const PIXEL &pixin, const PIXEL &color)
 {
-	pixout.r = tmax(pixin.r - color.r, 0);
-	pixout.g = tmax(pixin.g - color.g, 0);
-	pixout.b = tmax(pixin.b - color.b, 0);
+	pixout.r = std::max(pixin.r - color.r, 0);
+	pixout.g = std::max(pixin.g - color.g, 0);
+	pixout.b = std::max(pixin.b - color.b, 0);
 }
 
 //------------------------------------------------------------------------------

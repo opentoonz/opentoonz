@@ -1159,7 +1159,7 @@ void SgiWriter::open(FILE *file, const TImageInfo &info)
 
 	TEnumProperty *p = (TEnumProperty *)(m_properties->getProperty("Bits Per Pixel"));
 	assert(p);
-	string str = toString(p->getValue());
+	string str = ::to_string(p->getValue());
 	int bitPerPixel = atoi(str.c_str());
 	int channelBytesNum = 1;
 	int dim = 3;
@@ -1197,7 +1197,7 @@ void SgiWriter::open(FILE *file, const TImageInfo &info)
 	bool compressed = bp->getValue();
 	p = (TEnumProperty *)(m_properties->getProperty("Endianess"));
 	assert(p);
-	str = toString(p->getValue());
+	str = ::to_string(p->getValue());
 	bool bigEndian = (str == "Big Endian");
 
 	m_header = iopen(fileno(file), OpenWrite, compressed ? RLE(BPP(channelBytesNum)) : VERBATIM(BPP(channelBytesNum)),

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef CURRENTIMAGE_INCLUDED
 #define CURRENTIMAGE_INCLUDED

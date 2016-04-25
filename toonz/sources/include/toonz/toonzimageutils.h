@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TOONZIMAGE_UTILS_INCLUDED
 #define TOONZIMAGE_UTILS_INCLUDED

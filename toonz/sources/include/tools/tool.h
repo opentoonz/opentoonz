@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TOOL_INCLUDED
 #define TOOL_INCLUDED

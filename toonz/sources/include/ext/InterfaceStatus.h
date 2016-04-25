@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef INTERFACESTATUS_H
 #define INTERFACESTATUS_H

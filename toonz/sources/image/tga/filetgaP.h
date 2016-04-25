@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TGA_P_H
 #define TGA_P_H

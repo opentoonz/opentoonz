@@ -362,14 +362,14 @@ bool TCacheResource::checkTile(const TTile &tile) const
 
 inline std::string TCacheResource::getCellName(int idxX, int idxY) const
 {
-	return "cell" + toString(idxX) + "," + toString(idxY);
+	return "cell" + std::to_string(idxX) + "," + std::to_string(idxY);
 }
 
 //----------------------------------------------------------------
 
 inline std::string TCacheResource::getCellCacheId(int idxX, int idxY) const
 {
-	return "TCacheResource" + toString(m_id) + getCellName(idxX, idxY);
+	return "TCacheResource" + std::to_string(m_id) + getCellName(idxX, idxY);
 }
 
 //----------------------------------------------------------------
@@ -765,7 +765,7 @@ void TCacheResource::releaseLock()
 	//DIAGNOSTICS_NUMBEREDSTR(prefix + QString::number((UINT) this) + " | Stack | ",
 	//"crStack", "releaseLock");
 
-	m_locksCount = tmax(m_locksCount - 1, 0);
+	m_locksCount = std::max(m_locksCount - 1, 0);
 
 	if (m_locksCount > 0)
 		return;

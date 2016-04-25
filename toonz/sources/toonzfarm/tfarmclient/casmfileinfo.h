@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef CASMFILEINFO_H
 #define CASMFILEINFO_H

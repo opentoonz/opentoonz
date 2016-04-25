@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef PIXMAPS_INCLUDED
 #define PIXMAPS_INCLUDED

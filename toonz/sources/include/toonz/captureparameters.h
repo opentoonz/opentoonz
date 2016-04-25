@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef CAPTUREPARAMETERS_H
 #define CAPTUREPARAMETERS_H

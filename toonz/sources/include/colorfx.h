@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef COLORFX_INCLUDED
 #define COLORFX_INCLUDED

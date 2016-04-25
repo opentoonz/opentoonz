@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TREPETITION_GUARD
 #define TREPETITION_GUARD

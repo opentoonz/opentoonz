@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TFARMEXECUTOR_H
 #define TFARMEXECUTOR_H

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TIIO_TGA_INCLUDED
 #define TIIO_TGA_INCLUDED

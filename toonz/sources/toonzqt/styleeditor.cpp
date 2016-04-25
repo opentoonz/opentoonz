@@ -149,7 +149,7 @@ ColorModel::ColorModel()
 void ColorModel::rgb2hsv()
 {
 	QColor converter(m_channels[0], m_channels[1], m_channels[2]);
-	m_channels[4] = tmax(converter.hue(), 0); // hue() ritorna -1 per colori acromatici
+	m_channels[4] = std::max(converter.hue(), 0); // hue() ritorna -1 per colori acromatici
 	m_channels[5] = converter.saturation() * 100 / 255;
 	m_channels[6] = converter.value() * 100 / 255;
 }
@@ -177,7 +177,7 @@ void ColorModel::setTPixel(const TPixel32 &pix)
 	m_channels[1] = color.green();
 	m_channels[2] = color.blue();
 	m_channels[3] = color.alpha();
-	m_channels[4] = tmax(color.hue(), 0); // hue() ritorna -1 per colori acromatici
+	m_channels[4] = std::max(color.hue(), 0); // hue() ritorna -1 per colori acromatici
 	m_channels[5] = color.saturation() * 100 / 255;
 	m_channels[6] = color.value() * 100 / 255;
 }
@@ -587,49 +587,29 @@ QPixmap makeSquareShading(
 //*****************************************************************************
 
 HexagonalColorWheel::HexagonalColorWheel(QWidget *parent)
-	: QGLWidget(parent), m_bgColor(128, 128, 128) //defaul value in case this value does not set in the style sheet
-												  //, m_ghibli3DLutUtil(0)//iwsw commented out temporarily
+	: QOpenGLWidget(parent)
+	, m_bgColor(128, 128, 128) //defaul value in case this value does not set in the style sheet
 {
 	setObjectName("HexagonalColorWheel");
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	setFocusPolicy(Qt::NoFocus);
 	m_currentWheel = none;
-
-	//iwsw commented out temporarily
-	/*
-	if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && Ghibli3DLutUtil::m_isValid)
-	{
-	m_ghibli3DLutUtil = new Ghibli3DLutUtil();
-	m_ghibli3DLutUtil->setInvert();
-	}
-	*/
 }
 
 //-----------------------------------------------------------------------------
 
 HexagonalColorWheel::~HexagonalColorWheel()
 {
-	//iwsw commented out temporarily
-	/*
-	if(m_ghibli3DLutUtil)
-	{
-	m_ghibli3DLutUtil->onEnd();
-	delete m_ghibli3DLutUtil;
-	}
-	*/
 }
 
 //-----------------------------------------------------------------------------
 
 void HexagonalColorWheel::initializeGL()
 {
-	qglClearColor(getBGColor());
+	initializeOpenGLFunctions();
 
-	//iwsw commented out temporarily
-	/*
-	if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
-	m_ghibli3DLutUtil->onInit();
-	*/
+	QColor color = getBGColor();
+	glClearColor(color.redF(), color.greenF(), color.blueF(), color.alphaF());
 }
 
 //-----------------------------------------------------------------------------
@@ -679,28 +659,16 @@ void HexagonalColorWheel::resizeGL(int width, int height)
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glOrtho(0.0, (GLdouble)width, (GLdouble)height, 0.0, 1.0, -1.0);
-
-	//iwsw commented out temporarily
-	/*
-	if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
-	m_ghibli3DLutUtil->onResize(width,height);
-	*/
 }
 
 //-----------------------------------------------------------------------------
 
 void HexagonalColorWheel::paintGL()
 {
-	//call ClearColor() here in order to update bg color when the stylesheet is switched
-	qglClearColor(getBGColor());
+	QColor color = getBGColor();
+	glClearColor(color.redF(), color.greenF(), color.blueF(), color.alphaF());
 
 	glMatrixMode(GL_MODELVIEW);
-
-	//iwsw commented out temporarily
-	/*
-	if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
-	m_ghibli3DLutUtil->startDraw();
-	*/
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -746,12 +714,6 @@ void HexagonalColorWheel::paintGL()
 	drawCurrentColorMark();
 
 	glPopMatrix();
-
-	//iwsw commented out temporarily
-	/*
-	if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
-	m_ghibli3DLutUtil->endDraw();
-	*/
 }
 
 //-----------------------------------------------------------------------------
@@ -883,7 +845,7 @@ void HexagonalColorWheel::clickLeftWheel(const QPoint &pos)
 	if (h > 359)
 		h = 359;
 	//clamping
-	int s = (int)(tmin(p.length() / d, 1.0) * 100.0f);
+	int s = (int)(std::min(p.length() / d, 1.0) * 100.0f);
 
 	m_color.setValues(eValue, h, s);
 
@@ -900,10 +862,10 @@ void HexagonalColorWheel::clickRightTriangle(const QPoint &pos)
 		s = 0;
 		v = 0;
 	} else {
-		float v_ratio = tmin((float)(p.ry() / (m_triHeight * 2.0f)), 1.0f);
+		float v_ratio = std::min((float)(p.ry() / (m_triHeight * 2.0f)), 1.0f);
 		float s_f = p.rx() / (m_triEdgeLen * v_ratio);
 		v = (int)(v_ratio * 100.0f);
-		s = (int)(tmin(tmax(s_f, 0.0f), 1.0f) * 100.0f);
+		s = (int)(std::min(std::max(s_f, 0.0f), 1.0f) * 100.0f);
 	}
 	m_color.setValues(eHue, s, v);
 	emit colorChanged(m_color, true);
@@ -3156,7 +3118,7 @@ void StyleEditor::onStyleSwitched()
 	setEditedStyleToStyle(palette->getStyle(styleIndex));
 
 	bool isStyleNull = setStyle(m_editedStyle.getPointer());
-	bool isColorInField = palette->getPaletteName() == toWideString("EmptyColorFieldPalette");
+	bool isColorInField = palette->getPaletteName() == L"EmptyColorFieldPalette";
 	bool isValidIndex = styleIndex > 0 || isColorInField;
 	bool isCleanUpPalette = palette->isCleanupPalette();
 
@@ -3243,7 +3205,7 @@ void StyleEditor::copyEditedStyleToPalette(bool isDragging)
 	if (!isDragging) {
 		if (!(*m_oldStyle == *m_editedStyle)) {
 			//do not register undo if the edited color is special one (e.g. changing the ColorField in the fx settings)
-			if (palette->getPaletteName() != toWideString("EmptyColorFieldPalette"))
+			if (palette->getPaletteName() != L"EmptyColorFieldPalette")
 				TUndoManager::manager()->add(new UndoPaletteChange(
 					m_paletteHandle, styleIndex, *m_oldStyle, *m_editedStyle));
 		}
@@ -3302,9 +3264,7 @@ void StyleEditor::onColorChanged(const ColorModel &color, bool isDragging)
 		m_newColor->setStyle(*m_editedStyle);
 		m_colorParameterSelector->setStyle(*m_editedStyle);
 
-#ifndef STUDENT
 		if (m_autoButton->isChecked())
-#endif
 		{
 			copyEditedStyleToPalette(isDragging);
 		}
@@ -3389,7 +3349,6 @@ void StyleEditor::applyButtonClicked()
 void StyleEditor::autoCheckChanged(bool value)
 {
 
-#ifndef STUDENT
 	m_paletteController->enableColorAutoApply(!!value);
 
 	if (!m_enabled)
@@ -3399,7 +3358,6 @@ void StyleEditor::autoCheckChanged(bool value)
 		m_applyButton->setDisabled(true);
 	else
 		m_applyButton->setDisabled(false);
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -3495,9 +3453,7 @@ void StyleEditor::selectStyle(const TColorStyle &newStyle)
 		m_editedStyle && m_editedStyle->hasMainColor())
 		m_editedStyle->setMainColor(m_oldStyle->getMainColor());
 
-#ifndef STUDENT
 	if (m_autoButton->isChecked())
-#endif
 	{
 		// If the adited style is linked to the studio palette, then activate the edited flag
 		if (m_editedStyle->getGlobalName() != L"" && m_editedStyle->getOriginalName() != L"")

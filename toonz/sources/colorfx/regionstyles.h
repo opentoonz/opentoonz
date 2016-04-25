@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TDERIVEDREGIONSTYLES_H
 #define TDERIVEDREGIONSTYLES_H

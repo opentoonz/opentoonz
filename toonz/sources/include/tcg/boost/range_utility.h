@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCG_BOOST_RANGE_UTILITY_H
 #define TCG_BOOST_RANGE_UTILITY_H

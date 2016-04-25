@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TIPC_SERVER_H
 #define TIPC_SERVER_H

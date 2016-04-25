@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef CLEANUPSETTINGSPOPUP__H
 #define CLEANUPSETTINGSPOPUP__H

@@ -1,3 +1,4 @@
+#pragma once
 
 #ifndef RASTER_EDGE_ITERATOR_HPP
 #define RASTER_EDGE_ITERATOR_HPP

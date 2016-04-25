@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TSPECTRUM_INCLUDED
 #define TSPECTRUM_INCLUDED

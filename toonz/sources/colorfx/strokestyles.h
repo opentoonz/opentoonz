@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef STROKESTYLES_H
 #define STROKESTYLES_H

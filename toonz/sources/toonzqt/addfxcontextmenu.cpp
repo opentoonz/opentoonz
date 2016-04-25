@@ -112,28 +112,6 @@ TFx *createMacroFxByPath(TFilePath path, TXsheet *xsheet)
 				}
 			}
 		}
-		/* QStack<QPair<std::string, TFxPort*> > newPortNames;
-
-      //Devo cambiare il nome alle porte: contengono l'id dei vecchi effetti
-      for(i=fx->getInputPortCount()-1; i>=0; i--)
-      {
-        string oldPortName = fx->getInputPortName(i);
-        string inFxOldId = oldPortName;
-        inFxOldId.erase(0,inFxOldId.find_last_of("_")+1);
-        assert(oldNewId.contains(toWideString(inFxOldId)));
-        string inFxNewId = toString(oldNewId[toWideString(inFxOldId)]);
-        string newPortName = oldPortName;
-        newPortName.erase(newPortName.find_last_of("_")+1,newPortName.size()-1);
-        newPortName.append(inFxNewId);
-        TFxPort* fxPort = fx->getInputPort(i);
-        newPortNames.append(QPair<std::string, TFxPort*>(newPortName,fxPort));
-        fx->removeInputPort(oldPortName);
-      }
-      while(!newPortNames.isEmpty())
-      {
-        QPair<std::string, TFxPort*> newPort = newPortNames.pop();
-        fx->addInputPort(newPort.first,*newPort.second);
-      }*/
 
 		return fx;
 	} catch (...) {

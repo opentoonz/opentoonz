@@ -912,9 +912,7 @@ void FilmstripFrames::contextMenuEvent(QContextMenuEvent *event)
 	}
 	menu->addAction(cm->getAction(MI_ExposeResource));
 	if (!isSubsequenceLevel && !isReadOnly) {
-#ifndef STUDENT
 		menu->addAction(cm->getAction(MI_AddFrames));
-#endif
 		menu->addAction(cm->getAction(MI_Renumber));
 		if (sl && sl->getType() == TZP_XSHLEVEL)
 			menu->addAction(cm->getAction(MI_RevertToCleanedUp));

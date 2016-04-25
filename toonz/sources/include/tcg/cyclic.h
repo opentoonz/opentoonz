@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCG_CYCLIC_H
 #define TCG_CYCLIC_H

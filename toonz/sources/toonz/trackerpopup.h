@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TRACKERPOPUP_H
 #define TRACKERPOPUP_H

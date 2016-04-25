@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef NAA2TLVCONVERTER_H
 #define NAA2TLVCONVERTER_H

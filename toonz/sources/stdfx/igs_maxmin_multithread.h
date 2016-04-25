@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef igs_maxmin_multithread_h
 #define igs_maxmin_multithread_h
 

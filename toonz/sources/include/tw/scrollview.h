@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TNZ_SCROLLVIEW_INCLUDED
 #define TNZ_SCROLLVIEW_INCLUDED

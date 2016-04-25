@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef T_TFILEPATH_IO_INCLUDED
 #define T_TFILEPATH_IO_INCLUDED

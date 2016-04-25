@@ -97,9 +97,7 @@ void initColorFx()
 	add(new TCircleStripeFillStyle(TPixel32::Green));
 	add(new TMosaicFillStyle(TPixel32::Red));
 	add(new TPatchFillStyle(TPixel32::Blue));
-#ifndef BRAVO
 	add(new TAirbrushRasterStyle(TPixel32::Black, 10));
 	add(new TBlendRasterStyle(TPixel32::Black, 10));
 	add(new TNoColorRasterStyle());
-#endif
 }

@@ -1,6 +1,5 @@
 
 
-#include <assert.h>
 #include <errno.h>
 #include "texception.h"
 #include "tscanner.h"
@@ -9,9 +8,13 @@
 #include "tsystem.h"
 #include "tconvert.h"
 #include "trop.h"
-#include <fstream>
-#include <memory>
+
 #include "TScannerIO/TUSBScannerIO.h"
+
+#include <cassert>
+#include <memory>
+#include <fstream>
+#include <strstream>
 
 using namespace TScannerUtil;
 
@@ -81,10 +84,10 @@ public:
 	TScannerExpection(const std::vector<std::string> &notFatal, const std::string &fatal)
 		: TException("Scanner Expection")
 	{
-		m_scannerMsg = toWideString(fatal);
+		m_scannerMsg = ::to_wstring(fatal);
 		for (int i = notFatal.size(); i; i--)
-			m_scannerMsg += toWideString("\n") + toWideString(notFatal[i - 1]);
-		log(std::string("Exception created: ") + toString(m_scannerMsg));
+			m_scannerMsg += L"\n" + ::to_wstring(notFatal[i - 1]);
+		log("Exception created: " + ::to_string(m_scannerMsg));
 	}
 	TString getMessage() const { return m_scannerMsg; }
 };
@@ -171,7 +174,7 @@ void TScannerEpson::updateParameters(TScannerParameters &parameters)
 	char lev0, lev1;
 	unsigned short lowRes, hiRes, hMax, vMax;
 	collectInformation(&lev0, &lev1, &lowRes, &hiRes, &hMax, &vMax);
-	log("collected info. res = " + toString(lowRes) + "/" + toString(hiRes));
+	log("collected info. res = " + std::to_string(lowRes) + "/" + std::to_string(hiRes));
 
 	// non supportiamo black & white
 	parameters.setSupportedTypes(true, true, true);
@@ -225,7 +228,7 @@ void TScannerEpson::acquire(const TScannerParameters &params, int paperCount)
 */
 
 	for (int i = 0; i < paperCount; ++i) {
-		log("paper " + toString(i));
+		log("paper " + std::to_string(i));
 #ifdef _DEBUG
 		m_scannerIO->trace(true);
 #endif

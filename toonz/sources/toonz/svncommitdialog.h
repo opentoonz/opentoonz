@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SVN_COMMIT_DIALOG_H
 #define SVN_COMMIT_DIALOG_H

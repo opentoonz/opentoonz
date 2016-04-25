@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TEXTERNFX_H
 #define TEXTERNFX_H

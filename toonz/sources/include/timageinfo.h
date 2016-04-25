@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TIMAGEINFO_H
 #define TIMAGEINFO_H

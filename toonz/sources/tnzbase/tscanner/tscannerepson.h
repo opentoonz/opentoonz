@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TSCANNER_EPSON_INCLUDED
 #define TSCANNER_EPSON_INCLUDED

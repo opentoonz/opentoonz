@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SQUARE_POTENTIAL_H
 #define SQUARE_POTENTIAL_H

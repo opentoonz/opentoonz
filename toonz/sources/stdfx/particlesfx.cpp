@@ -259,7 +259,7 @@ std::string ParticlesFx::getAlias(double frame, const TRenderSettings &info) con
 		paramalias += param->getName() + "=" + param->getValueAlias(frame, 3);
 	}
 
-	return alias + toString(frame) + "," + toString(getIdentifier()) + paramalias + "]";
+	return alias + std::to_string(frame) + "," + std::to_string(getIdentifier()) + paramalias + "]";
 }
 
 //------------------------------------------------------------------
@@ -286,7 +286,7 @@ void ParticlesFx::doDryCompute(TRectD &rect, double frame, const TRenderSettings
 	infoOnInput.m_bpp = 32;			  // Control ports rendered at 32 bit - since not visible.
 
 	for (i = startframe - 1; i <= curr_frame; ++i) {
-		double frame = tmax(0, i);
+		double frame = std::max(0, i);
 
 		for (j = 0; j < inputPortCount; ++j) {
 			TFxPort *port = getInputPort(j);

@@ -449,7 +449,7 @@ public:
 	{
 		unsigned long id = getIdentifier();
 		double value = m_intensity->getValue(frame);
-		return getFxType() + "[" + toString(id) + "," + toString(frame) + "," + toString(value) + "]";
+		return getFxType() + "[" + std::to_string(id) + "," + std::to_string(frame) + "," + std::to_string(value) + "]";
 	}
 };
 

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef EXPORTLEVELPOPUP_H
 #define EXPORTLEVELPOPUP_H

@@ -1,4 +1,4 @@
-
+#pragma once
 
 // CallCircle.h: interface for the CCallCircle class.
 //
@@ -6,10 +6,6 @@
 
 #if !defined(AFX_CALLCIRCLE_H__D2565814_2151_11D6_B9B8_0040F674BE6A__INCLUDED_)
 #define AFX_CALLCIRCLE_H__D2565814_2151_11D6_B9B8_0040F674BE6A__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
 
 #include <memory.h>
 #include <string.h>

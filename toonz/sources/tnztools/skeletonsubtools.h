@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SKELETON_SUBTOOLS_INCLUDED
 #define SKELETON_SUBTOOLS_INCLUDED

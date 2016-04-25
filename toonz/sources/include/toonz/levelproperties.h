@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef LEVELPROPERTIES_H
 #define LEVELPROPERTIES_H

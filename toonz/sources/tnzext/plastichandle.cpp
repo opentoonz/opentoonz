@@ -149,7 +149,7 @@ void buildSO(double *so, const TTextureMesh &mesh,
 	// Build the interpolant function data
 	const TRectD &bbox = mesh.getBBox();
 
-	const double len = tmax(bbox.getLx(), bbox.getLy()), val = 1e-8;
+	const double len = std::max(bbox.getLx(), bbox.getLy()), val = 1e-8;
 	const double k = -log(val) / len;
 
 	// Allocate / initialize arrays

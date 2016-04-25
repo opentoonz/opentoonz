@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef T_PINNED_RANGE_SET_INCLUDED
 #define T_PINNED_RANGE_SET_INCLUDED

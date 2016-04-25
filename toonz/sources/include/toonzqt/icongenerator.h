@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef ICON_GENERATOR_H
 #define ICON_GENERATOR_H

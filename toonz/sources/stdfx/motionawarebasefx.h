@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef MOTIONAWAREBASEFX_H
 #define MOTIONAWAREBASEFX_H
 

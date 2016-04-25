@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCG_FUNCTIONAL_H
 #define TCG_FUNCTIONAL_H

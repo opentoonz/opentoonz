@@ -1,4 +1,4 @@
-
+#pragma once
 
 //-----------------------------------------------------------------------------
 //  tbezier.h: contains useful function to manipulate bezier polynomious

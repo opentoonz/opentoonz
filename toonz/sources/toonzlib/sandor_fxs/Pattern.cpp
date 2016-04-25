@@ -195,10 +195,10 @@ void CPattern::getBBox(SRECT &bb)
 	for (int y = 0; y < m_lY; y++)
 		for (int x = 0; x < m_lX; x++, pPic++)
 			if (pPic->m > (UCHAR)0) {
-				bb.x0 = MIN(bb.x0, x);
-				bb.y0 = MIN(bb.y0, y);
-				bb.x1 = MAX(bb.x1, x);
-				bb.y1 = MAX(bb.y1, y);
+				bb.x0 = std::min(bb.x0, x);
+				bb.y0 = std::min(bb.y0, y);
+				bb.x1 = std::max(bb.x1, x);
+				bb.y1 = std::max(bb.y1, y);
 			}
 }
 

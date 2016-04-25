@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCG_RECT_H
 #define TCG_RECT_H

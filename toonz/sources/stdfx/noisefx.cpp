@@ -196,7 +196,7 @@ std::string NoiseFx::getAlias(double frame, const TRenderSettings &info) const
 	}
 
 	if (addframe)
-		alias += toString(frame) + ",";
+		alias += std::to_string(frame) + ",";
 	alias += paramalias + "]";
 
 	return alias;

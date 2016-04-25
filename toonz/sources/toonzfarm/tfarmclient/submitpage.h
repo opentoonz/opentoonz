@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SUBMITPAGE_H
 #define SUBMITPAGE_H

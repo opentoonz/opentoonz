@@ -1,3 +1,5 @@
+#pragma once
+
 /* ======================================================================== *\
 
   Copyright (C) 2007 TWAIN Working Group: Adobe Systems Incorporated, 

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TVECTORRENDERDATA_H
 #define TVECTORRENDERDATA_H

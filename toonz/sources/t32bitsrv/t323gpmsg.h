@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef t323gpmsg_h
 #define t323gpmsg_h

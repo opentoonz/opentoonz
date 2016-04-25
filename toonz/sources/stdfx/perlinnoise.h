@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef PERLINNOISE_H
 #define PERLINOISE_H
 

@@ -373,7 +373,7 @@ int Vectorizer::doVectorize()
 			center = ri->getRaster()->getCenterD();
 
 		// Build vectorizer configuration
-		double weight = (ft->getNumber() - 1 - frameRange[0]) / tmax(frameRange[1] - frameRange[0], 1.0);
+		double weight = (ft->getNumber() - 1 - frameRange[0]) / std::max(frameRange[1] - frameRange[0], 1.0);
 		weight = tcrop(weight, 0.0, 1.0);
 
 		locals.updateConfig(weight); // TEMPORARY
@@ -917,7 +917,7 @@ bool VectorizerPopup::apply()
 	for (it; it != levels.end(); it++) {
 		TXshSimpleLevel *sl = dynamic_cast<TXshSimpleLevel *>(*it);
 		if (!sl || !sl->getSimpleLevel() || !isLevelToConvert(sl)) {
-			QString levelName = tr(toString(sl->getName()).c_str());
+			QString levelName = tr(::to_string(sl->getName()).c_str());
 			QString errorMsg = tr("Cannot convert to vector the current selection.") + levelName;
 			error(errorMsg);
 			continue;

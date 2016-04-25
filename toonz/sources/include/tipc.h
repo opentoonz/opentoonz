@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TIPC_H
 #define TIPC_H

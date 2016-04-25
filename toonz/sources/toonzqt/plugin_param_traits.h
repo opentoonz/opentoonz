@@ -1,4 +1,6 @@
-﻿#if !defined(TOONZ_PLUGIN_PARAM_TRAITS_H__)
+﻿#pragma once
+
+#if !defined(TOONZ_PLUGIN_PARAM_TRAITS_H__)
 #define TOONZ_PLUGIN_PARAM_TRAITS_H__
 
 #include <toonz_params.h>

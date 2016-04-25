@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TZERARYFX_H
 #define TZERARYFX_H

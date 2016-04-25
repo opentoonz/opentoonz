@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TSTROKE_H
 #define TSTROKE_H
 

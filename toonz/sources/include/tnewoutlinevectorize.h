@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TNEW_OUTLINE_VECTORIZE_H
 #define TNEW_OUTLINE_VECTORIZE_H

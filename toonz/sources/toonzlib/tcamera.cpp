@@ -126,10 +126,10 @@ void TCamera::setInterestRect(const TRect &rect)
 	//the default (empty) rect. We want to maintain the coordinates instead.
 	//m_interestRect = rect * TRect(m_res);
 
-	m_interestRect.x0 = tmax(rect.x0, 0);
-	m_interestRect.y0 = tmax(rect.y0, 0);
-	m_interestRect.x1 = tmin(rect.x1, m_res.lx - 1);
-	m_interestRect.y1 = tmin(rect.y1, m_res.ly - 1);
+	m_interestRect.x0 = std::max(rect.x0, 0);
+	m_interestRect.y0 = std::max(rect.y0, 0);
+	m_interestRect.x1 = std::min(rect.x1, m_res.lx - 1);
+	m_interestRect.y1 = std::min(rect.y1, m_res.ly - 1);
 }
 
 //-------------------------------------------------------------------

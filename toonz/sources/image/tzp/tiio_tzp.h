@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TTIO_TZP_INCLUDED
 #define TTIO_TZP_INCLUDED

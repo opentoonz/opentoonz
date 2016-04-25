@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TLIN_BASICOPS_H
 #define TLIN_BASICOPS_H

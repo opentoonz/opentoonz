@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCODEC_INCLUDED
 #define TCODEC_INCLUDED

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef DOCKLAYOUT_H
 #define DOCKLAYOUT_H

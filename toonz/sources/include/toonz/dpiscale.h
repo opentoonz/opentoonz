@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef DPISCALE_INCLUDED
 #define DPISCALE_INCLUDED

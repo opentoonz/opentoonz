@@ -28,7 +28,7 @@ TFilePath TSystem::toUNC(const TFilePath &fp)
 	if (isUNC(fp))
 		return fp;
 
-	std::string fpStr = toString(fp.getWideString());
+	std::string fpStr = ::to_string(fp);
 
 	if (fpStr.length() > 1 && fpStr.c_str()[1] == ':') {
 		std::string drive = fpStr.substr(0, 3);
@@ -44,14 +44,14 @@ TFilePath TSystem::toUNC(const TFilePath &fp)
 			// Pointers to head of buffer
 			UNIVERSAL_NAME_INFO *puni = (UNIVERSAL_NAME_INFO *)&szBuff;
 
-			DWORD dwResult = WNetGetUniversalNameW(toWideString(fpStr).c_str(),
+			DWORD dwResult = WNetGetUniversalNameW(::to_wstring(fpStr).c_str(),
 												   UNIVERSAL_NAME_INFO_LEVEL,
 												   (LPVOID)&szBuff,
 												   &cbBuff);
 
 			switch (dwResult) {
 			case NO_ERROR:
-				return TFilePath(toString(puni->lpUniversalName));
+				return TFilePath(::to_string(puni->lpUniversalName));
 
 			case ERROR_NOT_CONNECTED:
 				// The network connection does not exists.
@@ -94,7 +94,7 @@ TFilePath TSystem::toUNC(const TFilePath &fp)
 							//#ifdef IS_DOTNET
 							// shi502_path e' una wstring, aanche se la dichiarazione di PSHARE_INFO_502 non lo sa!
 							std::wstring shareLocalPathW = (LPWSTR)(p->shi502_path);
-							std::string shareLocalPath = toString(shareLocalPathW);
+							std::string shareLocalPath = ::to_string(shareLocalPathW);
 							//#else
 							//string shareLocalPath = toString(p->shi502_path);
 							//#endif
@@ -104,7 +104,7 @@ TFilePath TSystem::toUNC(const TFilePath &fp)
 								//   #ifdef IS_DOTNET
 								// shi502_netname e' una wstring, anche se la dichiarazione di PSHARE_INFO_502 non lo sa!
 								std::wstring shareNetNameW = (LPWSTR)(p->shi502_netname);
-								std::string shareNetName = toString(shareNetNameW);
+								std::string shareNetName = ::to_string(shareNetNameW);
 								//	 #else
 								//string shareNetName = toString(p->shi502_netname);
 								//#endif
@@ -150,7 +150,7 @@ TFilePath TSystem::toLocalPath(const TFilePath &fp)
 	if (!isUNC(fp))
 		return TFilePath(fp);
 
-	std::string pathStr = toString(fp.getWideString());
+	std::string pathStr = ::to_string(fp);
 
 	// estrae hostname e il nome dello share dal path UNC
 	std::string::size_type idx = pathStr.find_first_of("\\", 2);
@@ -186,7 +186,7 @@ TFilePath TSystem::toLocalPath(const TFilePath &fp)
 					//#ifdef IS_DOTNET
 					//shi502_netname e' una wstring, anche se la dichiarazione di PSHARE_INFO_502 non lo sa!
 					std::wstring shareNetNameW = (LPWSTR)(p->shi502_netname);
-					std::string shareNetName = toString(shareNetNameW);
+					std::string shareNetName = ::to_string(shareNetNameW);
 					//	#else
 					//string shareNetName = toString(p->shi502_netname);
 					//#endif
@@ -195,7 +195,7 @@ TFilePath TSystem::toLocalPath(const TFilePath &fp)
 						//#ifdef IS_DOTNET
 						// shi502_path e' una wstring, anche se la dichiarazione di PSHARE_INFO_502 non lo sa!
 						std::wstring shareLocalPathW = (LPWSTR)(p->shi502_path);
-						std::string shareLocalPath = toString(shareLocalPathW);
+						std::string shareLocalPath = ::to_string(shareLocalPathW);
 						//#else
 						//string shareLocalPath = toString(p->shi502_path);
 						//#endif

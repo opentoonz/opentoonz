@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef igs_hsv_noise_in_camera_h
 #define igs_hsv_noise_in_camera_h
 

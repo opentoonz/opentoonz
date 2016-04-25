@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef CAMERASETTINGSPOPUP_H
 #define CAMERASETTINGSPOPUP_H

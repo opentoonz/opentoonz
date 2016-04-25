@@ -1,4 +1,4 @@
-
+#pragma once
 
 // SDirection.h: interface for the CSDirection class.
 //
@@ -6,10 +6,6 @@
 
 #if !defined(AFX_SDIRECTION_H__C672AFF1_1A65_11D6_B99E_0040F674BE6A__INCLUDED_)
 #define AFX_SDIRECTION_H__C672AFF1_1A65_11D6_B99E_0040F674BE6A__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
 
 #include "SDef.h"
 

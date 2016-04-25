@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef BLEND_INCLUDE
 #define BLEND_INCLUDE

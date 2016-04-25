@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TXSHMESHCOLUMN_H
 #define TXSHMESHCOLUMN_H

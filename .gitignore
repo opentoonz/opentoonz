@@ -9,11 +9,16 @@ GeneratedFiles
 *.suo
 *.user
 build*
+
+# bundled thirdparty libraries
+/thirdparty/lzo
+/thirdparty/tiff-4.0.3
+/thirdparty/LibJPEG/jpeg-9
+/thirdparty/Lz4/Lz4_131
+/thirdparty/libusb/libusb-1.0.9
+/thirdparty/glew/glew-1.9.0
 lzo-2.09
-Lz4_131
-libusb-1.0.9
-glew-1.9.0
-jpeg-9
+
 .clang_complete
 Debug/
 Debug Library/

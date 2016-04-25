@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCG_MESH_BGL_H
 #define TCG_MESH_BGL_H

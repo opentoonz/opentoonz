@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TCLI_INCLUDED
 #define TCLI_INCLUDED
 
@@ -32,7 +34,7 @@ namespace TCli
 inline bool fromStr(int &value, std::string s)
 {
 	if (isInt(s)) {
-		value = toInt(s);
+		value = std::stoi(s);
 		return true;
 	} else
 		return false;
@@ -40,7 +42,7 @@ inline bool fromStr(int &value, std::string s)
 inline bool fromStr(double &value, std::string s)
 {
 	if (isDouble(s)) {
-		value = toDouble(s);
+		value = std::stod(s);
 		return true;
 	} else
 		return false;

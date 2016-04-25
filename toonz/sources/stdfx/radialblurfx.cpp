@@ -49,8 +49,8 @@ public:
 		double d3 = p3.x * p3.x + p3.y * p3.y;
 		double d4 = p4.x * p4.x + p4.y * p4.y;
 
-		double maxD = tmax(tmax(tmax(d3, d4), d2), d1);
-		return tround(tmax(sqrt(maxD) - radius, 0.0)) * intensity;
+		double maxD = std::max(std::max(std::max(d3, d4), d2), d1);
+		return tround(std::max(sqrt(maxD) - radius, 0.0)) * intensity;
 	}
 
 	void enlarge(
@@ -204,7 +204,7 @@ void RadialBlurFx::enlarge(
 	double maxRange = getMaxBraid(enlargedBbox, frame, ri.m_affine);
 
 	/*- 最低でも1pixel追加する -*/
-	maxRange = tmax(maxRange, 1.0);
+	maxRange = std::max(maxRange, 1.0);
 
 	enlargedBbox = enlargedBbox.enlarge(maxRange);
 	enlargedGeom = enlargedGeom.enlarge(maxRange);

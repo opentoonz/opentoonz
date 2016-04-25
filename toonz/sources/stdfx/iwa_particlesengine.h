@@ -1,3 +1,5 @@
+#pragma once
+
 //------------------------------------------------------------------
 // Iwa_Particles_Engine for Marnie
 // based on Particles_Engine by Digital Video

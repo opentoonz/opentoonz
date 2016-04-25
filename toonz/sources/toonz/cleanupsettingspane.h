@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef CLEANUPSETTINGSPANE_H
 #define CLEANUPSETTINGSPANE_H
 

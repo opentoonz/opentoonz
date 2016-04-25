@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef STYLEEDITOR_H
 #define STYLEEDITOR_H
@@ -32,7 +32,8 @@
 #include <QSlider>
 #include <QToolButton>
 #include <QScrollArea>
-#include <QGLWidget>
+#include <QOpenGLWidget>
+#include <QOpenGLFunctions_3_0>
 #include <QMouseEvent>
 #include <QPointF>
 
@@ -141,7 +142,7 @@ enum CurrentWheel {
 	rightTriangle
 };
 
-class DVAPI HexagonalColorWheel : public QGLWidget
+class DVAPI HexagonalColorWheel : public QOpenGLWidget, private QOpenGLFunctions_3_0
 {
 	Q_OBJECT
 
@@ -175,17 +176,17 @@ public:
 	QColor getBGColor() const { return m_bgColor; }
 
 protected:
-	void initializeGL();
-	void resizeGL(int width, int height);
-	void paintGL();
+	void initializeGL() override;
+	void resizeGL(int width, int height) override;
+	void paintGL() override;
 	QSize SizeHint() const
 	{
 		return QSize(300, 200);
 	};
 
-	void mousePressEvent(QMouseEvent *event);
-	void mouseMoveEvent(QMouseEvent *event);
-	void mouseReleaseEvent(QMouseEvent *event);
+	void mousePressEvent(QMouseEvent *event) override;
+	void mouseMoveEvent(QMouseEvent *event) override;
+	void mouseReleaseEvent(QMouseEvent *event) override;
 
 signals:
 	void colorChanged(const ColorModel &color, bool isDragging);
@@ -595,10 +596,8 @@ class DVAPI StyleEditor : public QWidget
 	DVGui::StyleSample *m_newColor; //!< New style viewer (lower-right panel side).
 	DVGui::StyleSample *m_oldColor; //!< Old style viewer (lower-right panel side).
 
-#ifndef STUDENT
 	QPushButton *m_autoButton;  //!< "Auto Apply" checkbox on the right panel side.
 	QPushButton *m_applyButton; //!< "Apply" button on the right panel side.
-#endif
 
 	QToolBar *m_toolBar;							  //!< Lower toolbar.
 	ColorParameterSelector *m_colorParameterSelector; //!< Secondary color parameter selector in the lower toolbar.

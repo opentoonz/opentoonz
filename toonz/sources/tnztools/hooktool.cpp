@@ -152,7 +152,7 @@ public:
 		std::string handle = getXsheet()->getStageObject(getObjectId())->getHandle();
 		if (handle.find("H") != 0)
 			return -1;
-		return toInt(handle.substr(1)) - 1;
+		return std::stoi(handle.substr(1)) - 1;
 	}
 	void drawHooks(HookSet *hookSet, const TFrameId &fid, bool isOnion);
 	// other hooks are drawn in the current level reference frame
@@ -347,7 +347,7 @@ void HookTool::draw()
 		}
 		TPixel32 balloonColor(200, 220, 205, 200);
 		TPoint balloonOffset(20, 20);
-		std::string hookName = toString(i + 1);
+		std::string hookName = std::to_string(i + 1);
 		drawBalloon(p0, hookName, balloonColor, balloonOffset, false, &balloons);
 		if (!linked)
 			drawBalloon(p1, hookName, balloonColor, balloonOffset, false, &balloons);
@@ -740,7 +740,7 @@ bool HookTool::snap(TPointD &pos, double &range2)
 		snappedPos = m_otherHooks[k].m_hookPos;
 		m_snappedPos = snappedPos;
 		m_snappedReason =
-			"Col" + toString(m_otherHooks[k].m_columnIndex + 1) + "/" + toString(m_otherHooks[k].m_hookIndex + 1);
+			"Col" + std::to_string(m_otherHooks[k].m_columnIndex + 1) + "/" + std::to_string(m_otherHooks[k].m_hookIndex + 1);
 		ret = true;
 	}
 	pos = snappedPos;

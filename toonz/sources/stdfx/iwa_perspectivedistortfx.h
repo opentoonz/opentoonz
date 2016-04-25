@@ -1,3 +1,5 @@
+#pragma once
+
 /*------------------------------------
  Iwa_PerspectiveDistortFx 
  奥行き方向に台形歪みを行うエフェクト

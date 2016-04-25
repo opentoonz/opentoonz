@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SCRIPTBINDING_IMAGE_H
 #define SCRIPTBINDING_IMAGE_H

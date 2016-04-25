@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FUNCTIONSELECTION_H
 #define FUNCTIONSELECTION_H

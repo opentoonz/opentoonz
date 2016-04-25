@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef RULERTOOL_H
 #define RULERTOOL_H
 

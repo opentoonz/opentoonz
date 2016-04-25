@@ -540,7 +540,7 @@ void FunctionExpressionSegmentPage::refresh()
 	m_expressionFld->setExpression(expression);
 	m_expressionFld->blockSignals(oldBlockSignalsStatus);
 
-	std::wstring unitName = toWideString(kf0.m_unitName);
+	std::wstring unitName = ::to_wstring(kf0.m_unitName);
 	if (unitName == L"" && curve->getMeasure())
 		unitName = curve->getMeasure()->getCurrentUnit()->getDefaultExtension();
 
@@ -737,7 +737,7 @@ public:
 					if (measure) {
 						const TUnit *unit = measure->getCurrentUnit();
 						if (unit)
-							unitName = toString(unit->getDefaultExtension());
+							unitName = ::to_string(unit->getDefaultExtension());
 					}
 				}
 			}
@@ -758,7 +758,7 @@ public:
 		if (measure) {
 			const TUnit *unit = measure->getCurrentUnit();
 			if (unit)
-				unitName = toString(unit->getDefaultExtension());
+				unitName = ::to_string(unit->getDefaultExtension());
 		}
 		m_measureFld->setText(QString::fromStdString(unitName));
 

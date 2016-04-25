@@ -1909,7 +1909,7 @@ void PlasticTool::drawOnionSkinSkeletons_build(double pixelSize)
 		UCHAR &skelAlpha = skelAlphas[skelId];
 
 		UCHAR alpha = 255 - UCHAR(255.0 * OnionSkinMask::getOnionSkinFade(osRows[r] - currentRow));
-		skelAlpha = tmax(skelAlpha, alpha);
+		skelAlpha = std::max(skelAlpha, alpha);
 	}
 
 	std::map<int, UCHAR>::iterator st, sEnd(skelAlphas.end());
@@ -1959,7 +1959,7 @@ void PlasticTool::drawAngleLimits(const SkDP &sd, int skelId, int v, double pixe
 		void drawAnnulusArc(const TPointD &center, double angleStart, double angleEnd,
 							double radiusA, double radiusB, double pixelSize)
 		{
-			double angleDelta = acos(1.0 - pixelSize / tmax(radiusA, radiusB)) *
+			double angleDelta = acos(1.0 - pixelSize / std::max(radiusA, radiusB)) *
 								((angleStart <= angleEnd) ? 1.0 : -1.0);
 
 			int a, aCount = tcg::numeric_ops::grow(fabs((angleEnd - angleStart) / angleDelta));

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TVECTORIMAGE_UTILS_INCLUDED
 #define TVECTORIMAGE_UTILS_INCLUDED

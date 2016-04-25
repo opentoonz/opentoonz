@@ -675,7 +675,7 @@ void TgaWriter::writeLine32rle(char *buffer)
 	while (x < m_info.m_lx) {
 		if (x + 1 < m_info.m_lx && row[x] == row[x + 1]) {
 			int count = 2;
-			int max = tmin(128, m_info.m_lx - x);
+			int max = std::min(128, m_info.m_lx - x);
 			while (count < max && row[x + count - 1] == row[x + count])
 				count++;
 			fputc((count - 1) | 0x80, m_chan);
@@ -683,7 +683,7 @@ void TgaWriter::writeLine32rle(char *buffer)
 			x += count;
 		} else {
 			int count = 1;
-			int max = tmin(128, m_info.m_lx - x);
+			int max = std::min(128, m_info.m_lx - x);
 			while (count < max && row[x + count - 1] != row[x + count])
 				count++;
 			fputc(count - 1, m_chan);
@@ -702,7 +702,7 @@ void TgaWriter::writeLine24rle(char *buffer)
 	while (x < m_info.m_lx) {
 		if (x + 1 < m_info.m_lx && row[x] == row[x + 1]) {
 			int count = 2;
-			int max = tmin(128, m_info.m_lx - x);
+			int max = std::min(128, m_info.m_lx - x);
 			while (count < max && row[x + count - 1] == row[x + count])
 				count++;
 			fputc((count - 1) | 0x80, m_chan);
@@ -710,7 +710,7 @@ void TgaWriter::writeLine24rle(char *buffer)
 			x += count;
 		} else {
 			int count = 1;
-			int max = tmin(128, m_info.m_lx - x);
+			int max = std::min(128, m_info.m_lx - x);
 			while (count < max && row[x + count - 1] != row[x + count])
 				count++;
 			fputc(count - 1, m_chan);
@@ -729,7 +729,7 @@ void TgaWriter::writeLine16rle(char *buffer)
 	while (x < m_info.m_lx) {
 		if (x + 1 < m_info.m_lx && row[x] == row[x + 1]) {
 			int count = 2;
-			int max = tmin(128, m_info.m_lx - x);
+			int max = std::min(128, m_info.m_lx - x);
 			while (count < max && row[x + count - 1] == row[x + count])
 				count++;
 			fputc((count - 1) | 0x80, m_chan);
@@ -737,7 +737,7 @@ void TgaWriter::writeLine16rle(char *buffer)
 			x += count;
 		} else {
 			int count = 1;
-			int max = tmin(128, m_info.m_lx - x);
+			int max = std::min(128, m_info.m_lx - x);
 			while (count < max && row[x + count - 1] != row[x + count])
 				count++;
 			fputc(count - 1, m_chan);

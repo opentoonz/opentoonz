@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef AVI_CODEC_RESTRICTIONS
 #define AVI_CODEC_RESTRICTIONS

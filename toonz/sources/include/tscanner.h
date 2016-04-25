@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TSCANNER_H
 #define TSCANNER_H
 

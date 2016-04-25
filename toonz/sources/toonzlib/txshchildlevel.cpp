@@ -25,8 +25,6 @@ TXshChildLevel::TXshChildLevel(std::wstring name)
 {
 	m_xsheet->addRef();
 	m_type = CHILD_XSHLEVEL;
-	//static int count = 0;
-	//m_name = L"sub" + toWideString(++count);
 }
 
 //-----------------------------------------------------------------------------

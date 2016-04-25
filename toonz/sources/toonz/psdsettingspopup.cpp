@@ -87,7 +87,7 @@ void doPSDInfo(TFilePath psdpath, QTreeWidget *psdTree)
 
 		psdTree->insertTopLevelItems(0, items);
 	} catch (TImageException &e) {
-		error(QString::fromStdString(toString(e.getMessage())));
+		error(QString::fromStdString(::to_string(e.getMessage())));
 		return;
 	}
 }
@@ -295,18 +295,18 @@ void PsdSettingsPopup::doPsdParser()
 	}
 	case FRAMES: {
 		mode = "#frames";
-		std::string name = psdpath.getName() + "#" + toString(1) + mode + psdpath.getDottedType();
+		std::string name = psdpath.getName() + "#1" + mode + psdpath.getDottedType();
 		psdpath = psdpath.getParentDir() + TFilePath(name);
 		break;
 	}
 	case COLUMNS: {
-		std::string name = psdpath.getName() + "#" + toString(1) + psdpath.getDottedType();
+		std::string name = psdpath.getName() + "#1" + psdpath.getDottedType();
 		psdpath = psdpath.getParentDir() + TFilePath(name);
 		break;
 	}
 	case FOLDER: {
 		mode = "#group";
-		std::string name = psdpath.getName() + "#" + toString(1) + mode + psdpath.getDottedType();
+		std::string name = psdpath.getName() + "#1" + mode + psdpath.getDottedType();
 		psdpath = psdpath.getParentDir() + TFilePath(name);
 		break;
 	}
@@ -322,7 +322,7 @@ void PsdSettingsPopup::doPsdParser()
 			int layerId = m_psdparser->getLevelId(i);
 			std::string name = m_path.getName();
 			if (layerId > 0 && m_mode != FRAMES) {
-				name += "#" + toString(layerId);
+				name += "#" + std::to_string(layerId);
 			}
 			if (mode != "")
 				name += mode;
@@ -331,7 +331,7 @@ void PsdSettingsPopup::doPsdParser()
 			m_psdLevelPaths.push_back(psdpath);
 		}
 	} catch (TImageException &e) {
-		error(QString::fromStdString(toString(e.getMessage())));
+		error(QString::fromStdString(::to_string(e.getMessage())));
 		return;
 	}
 }
@@ -346,7 +346,7 @@ TFilePath PsdSettingsPopup::getPsdFramePath(int levelIndex, int frameIndex)
 	int frameId = m_psdparser->getFrameId(layerId, frameIndex);
 	std::string name = m_path.getName();
 	if (frameId > 0)
-		name += "#" + toString(frameId);
+		name += "#" + std::to_string(frameId);
 	name += m_path.getDottedType();
 	TFilePath psdpath =
 		TApp::instance()->getCurrentScene()->getScene()->decodeFilePath(m_path).getParentDir() + TFilePath(name);

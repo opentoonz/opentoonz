@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef __PATTERNMAP_H_
 #define __PATTERNMAP_H_

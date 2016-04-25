@@ -26,6 +26,8 @@
 
 #include "trenderer.h"
 
+#include <strstream>
+
 /*-----------------------------------------------------------------*/
 
 Particles_Engine::Particles_Engine(ParticlesFx *parent, double frame)
@@ -540,7 +542,7 @@ void Particles_Engine::render_particles(
 					partScales.find(ndxPair);
 
 				if (it != partScales.end())
-					it->second = tmax(part.scale, it->second);
+					it->second = std::max(part.scale, it->second);
 				else
 					partScales[ndxPair] = part.scale;
 			}

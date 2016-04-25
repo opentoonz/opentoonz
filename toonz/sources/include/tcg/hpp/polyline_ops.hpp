@@ -1,3 +1,4 @@
+#pragma once
 
 #ifndef TCG_POLYLINE_OPS_HPP
 #define TCG_POLYLINE_OPS_HPP

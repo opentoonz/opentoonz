@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef T_EXCEPTION_INCLUDED
 #define T_EXCEPTION_INCLUDED

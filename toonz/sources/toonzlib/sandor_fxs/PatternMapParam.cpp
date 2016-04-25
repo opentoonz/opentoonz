@@ -38,17 +38,17 @@ CPatternMapParam::CPatternMapParam(const int argc, const char *argv[],
 
 			m_ink.set(argv[0], 4095);
 
-			m_maxScale = MAX(atof(argv[1]) * scale, atof(argv[2]) * scale);
-			m_minScale = MIN(atof(argv[1]) * scale, atof(argv[2]) * scale);
+			m_maxScale = std::max(atof(argv[1]) * scale, atof(argv[2]) * scale);
+			m_minScale = std::min(atof(argv[1]) * scale, atof(argv[2]) * scale);
 
-			m_maxDirAngle = MAX(atof(argv[3]), atof(argv[4]));
-			m_minDirAngle = MIN(atof(argv[3]), atof(argv[4]));
+			m_maxDirAngle = std::max(atof(argv[3]), atof(argv[4]));
+			m_minDirAngle = std::min(atof(argv[3]), atof(argv[4]));
 			m_isRandomDir = atoi(argv[5]) > 0 ? true : false;
 
-			double dmax = MAX(atof(argv[6]) * scale, 1.0);
-			double dmin = MAX(atof(argv[7]) * scale, 1.0);
-			m_maxDist = MAX(dmax, dmin);
-			m_minDist = MIN(dmax, dmin);
+			double dmax = std::max(atof(argv[6]) * scale, 1.0);
+			double dmin = std::max(atof(argv[7]) * scale, 1.0);
+			m_maxDist = std::max(dmax, dmin);
+			m_minDist = std::min(dmax, dmin);
 			m_density = shrink > 0 ? atof(argv[8]) * (double)shrink : atof(argv[8]);
 
 			m_isKeepContour = atoi(argv[9]) > 0 ? true : false;

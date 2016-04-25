@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TIMAGECACHE_H
 #define TIMAGECACHE_H
 

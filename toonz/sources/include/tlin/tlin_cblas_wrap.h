@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TLIN_CBLAS_WRAP
 #define TLIN_CBLAS_WRAP

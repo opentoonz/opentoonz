@@ -51,7 +51,7 @@ TString CantConnectToStub::getMessage() const
 	string msg("Unable to connect to ");
 	msg += m_hostName.toStdString();
 	msg += " on port ";
-	msg += toString(m_port);
+	msg += std::to_string(m_port);
 
-	return toWideString(msg);
+	return ::to_wstring(msg);
 }

@@ -10,7 +10,6 @@
 #include "flipbook.h"
 #include "messagepanel.h"
 #include "iocommand.h"
-#include "licensecontroller.h"
 #include "tapp.h"
 #include "comboviewerpane.h"
 
@@ -24,10 +23,6 @@
 #include "toonzqt/viewcommandids.h"
 #include "toonzqt/updatechecker.h"
 #include "toonzqt/paletteviewer.h"
-
-#ifdef LINETEST
-#include "toonzqt/licensechecker.h"
-#endif
 
 // TnzLib includes
 #include "toonz/toonzfolders.h"
@@ -58,6 +53,7 @@
 #include <QDesktopServices>
 #include <QButtonGroup>
 #include <QPushButton>
+#include <QLabel>
 
 extern const char *applicationFullName;
 
@@ -180,7 +176,7 @@ void makePrivate(Room *room)
 	if (roomPath == TFilePath() || roomPath.getParentDir() != layoutDir) {
 		int count = 1;
 		for (;;) {
-			roomPath = layoutDir + ("room" + toString(count++) + ".ini");
+			roomPath = layoutDir + ("room" + std::to_string(count++) + ".ini");
 			if (!TFileStatus(roomPath).doesExist())
 				break;
 		}
@@ -1012,7 +1008,7 @@ void MainWindow::onUndo()
 {
 	bool ret = TUndoManager::manager()->undo();
 	if (!ret)
-		error(QObject::tr("No more Undo operations available."));
+		DVGui::error(QObject::tr("No more Undo operations available."));
 }
 
 //-----------------------------------------------------------------------------
@@ -1021,7 +1017,7 @@ void MainWindow::onRedo()
 {
 	bool ret = TUndoManager::manager()->redo();
 	if (!ret)
-		error(QObject::tr("No more Redo operations available."));
+		DVGui::error(QObject::tr("No more Redo operations available."));
 }
 
 //-----------------------------------------------------------------------------
@@ -1061,7 +1057,7 @@ void MainWindow::onAbout()
 	QLabel *label = new QLabel();
 	label->setPixmap(QPixmap(":Resources/splash.png"));
 
-	Dialog *dialog = new Dialog(this, true);
+	DVGui::Dialog *dialog = new DVGui::Dialog(this, true);
 	dialog->setWindowTitle(tr("About OpenToonz"));
 	dialog->setTopMargin(0);
 	dialog->addWidget(label);
@@ -1290,25 +1286,11 @@ void MainWindow::checkForUpdates()
 		this, SLOT(onUpdateCheckerDone(bool)));
 }
 //-----------------------------------------------------------------------------
-#ifdef LINETEST
-void MainWindow::checkForLicense()
-{
-	std::string license = License::getInstalledLicense();
-	// If the license is not temporary I will perform the check
-	if (!License::isTemporaryLicense(license)) {
-		QString requestUrl = "http://www.the-tab.com/cgi-shl/check/check.asp";
-
-		m_licenseChecker = new LicenseChecker(requestUrl, LicenseChecker::TAB, License::getInstalledLicense(), applicationName, "6.5");
-		connect(m_licenseChecker, SIGNAL(done(bool)), this, SLOT(onLicenseCheckerDone(bool)));
-	}
-}
-#endif
-//-----------------------------------------------------------------------------
 
 void MainWindow::onUpdateCheckerDone(bool error)
 {
 	if (error) {
-		// Don't bother doing the update if there was an error
+		// Get the last update date
 		return;
 	}
 
@@ -1318,9 +1300,9 @@ void MainWindow::onUpdateCheckerDone(bool error)
 		std::vector<QString> buttons;
 		buttons.push_back(QObject::tr("Visit Web Site"));
 		buttons.push_back(QObject::tr("Cancel"));
-		int ret = MsgBox(INFORMATION, QObject::tr("An update is available for this software.\nVisit the Web site for more information."), buttons);
+		int ret = DVGui::MsgBox(DVGui::INFORMATION, QObject::tr("An update is available for this software.\nVisit the Web site for more information."), buttons);
 		if (ret == 1) {
-			// This URL can be "translated" to give a localised version to non-English users
+			// Write the new last date to file
 			QDesktopServices::openUrl(QObject::tr("https://opentoonz.github.io/e/"));
 		}
 	}
@@ -1328,21 +1310,6 @@ void MainWindow::onUpdateCheckerDone(bool error)
 	disconnect(m_updateChecker);
 	m_updateChecker->deleteLater();
 }
-//-----------------------------------------------------------------------------
-#ifdef LINETEST
-void MainWindow::onLicenseCheckerDone(bool error)
-{
-	if (!error) {
-		if (!m_licenseChecker->isLicenseValid()) {
-			DVGui::error(QObject::tr("The license validation process was not able to confirm the right to use this software on this computer.\n Please contact [ support@toonz.com ] for assistance."));
-			qApp->exit(0);
-		}
-	}
-
-	disconnect(m_licenseChecker);
-	m_licenseChecker->deleteLater();
-}
-#endif
 //-----------------------------------------------------------------------------
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -1356,20 +1323,10 @@ void MainWindow::closeEvent(QCloseEvent *event)
 		return;
 	}
 
-#ifdef BRAVODEMO
-	QString question;
-	question = "Quit: are you sure you want to quit?";
-	int ret = DVGui::MsgBox(question, QObject::tr("Quit"), QObject::tr("Cancel"), 0);
-	if (ret == 0 || ret == 2) {
-		event->ignore();
-		return;
-	}
-#else
 	if (!IoCmd::saveSceneIfNeeded(QApplication::tr("Quit"))) {
 		event->ignore();
 		return;
 	}
-#endif
 
 	// sto facendo quit. interrompo (il prima possibile) le threads
 	IconGenerator::instance()->clearRequests();
@@ -1395,7 +1352,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
 	}
 
 	TImageCache::instance()->clear(true);
-
 #ifdef LINETEST
 	if (TnzCamera::instance()->isCameraConnected())
 		TnzCamera::instance()->cameraDisconnect();
@@ -1621,16 +1577,12 @@ void MainWindow::defineActions()
 	createMenuFileAction(MI_PreviewSettings, tr("&Preview Settings..."), "");
 	createMenuFileAction(MI_Render, tr("&Render"), "");
 	createMenuFileAction(MI_Preview, tr("&Preview"), "Ctrl+R");
-#ifndef BRAVODEMO
 	createRightClickMenuAction(MI_SavePreviewedFrames, tr("&Save Previewed Frames"), "");
-#endif
 	createRightClickMenuAction(MI_RegeneratePreview, tr("&Regenerate Preview"), "");
 	createRightClickMenuAction(MI_RegenerateFramePr, tr("&Regenerate Frame Preview"), "");
 	createRightClickMenuAction(MI_ClonePreview, tr("&Clone Preview"), "");
-#ifndef LINETEST
 	createRightClickMenuAction(MI_FreezePreview, tr("&Freeze//Unfreeze Preview"), "");
 	CommandManager::instance()->setToggleTexts(MI_FreezePreview, tr("Freeze Preview"), tr("Unfreeze Preview"));
-#endif
 	//createAction(MI_SavePreview,         "&Save Preview",		"");
 	createRightClickMenuAction(MI_SavePreset, tr("&Save As Preset"), "");
 	createMenuFileAction(MI_Preferences, tr("&Preferences..."), "");
@@ -1708,22 +1660,18 @@ void MainWindow::defineActions()
 	createMenuLevelAction(MI_ExposeResource, tr("&Expose in Xsheet"), "");
 	createMenuLevelAction(MI_EditLevel, tr("&Display in Level Strip"), "");
 	createMenuLevelAction(MI_LevelSettings, tr("&Level Settings..."), "");
-#ifndef BRAVOEXPRESS
 	createMenuLevelAction(MI_AdjustLevels, tr("Adjust Levels..."), "");
 	createMenuLevelAction(MI_AdjustThickness, tr("Adjust Thickness..."), "");
 	createMenuLevelAction(MI_Antialias, tr("&Antialias..."), "");
 	createMenuLevelAction(MI_Binarize, tr("&Binarize..."), "");
 	createMenuLevelAction(MI_BrightnessAndContrast, tr("&Brightness and Contrast..."), "");
 	createMenuLevelAction(MI_LinesFade, tr("&Color Fade..."), "");
-#endif
 #ifdef LINETEST
 	createMenuLevelAction(MI_Capture, tr("&Capture"), "Space");
 #endif
-#ifndef BRAVOEXPRESS
 	QAction *action = createMenuLevelAction(MI_CanvasSize, tr("&Canvas Size..."), "");
 	if (action)
 		action->setDisabled(true);
-#endif
 	createMenuLevelAction(MI_FileInfo, tr("&Info..."), "");
 	createRightClickMenuAction(MI_ViewFile, tr("&View..."), "");
 	createMenuLevelAction(MI_RemoveUnused, tr("&Remove All Unused Levels"), "");
@@ -1737,6 +1685,7 @@ void MainWindow::defineActions()
 	createMenuXsheetAction(MI_CloseChild, tr("&Close Sub-xsheet"), "");
 	createMenuXsheetAction(MI_ExplodeChild, tr("Explode Sub-xsheet"), "");
 	createMenuXsheetAction(MI_Collapse, tr("Collapse"), "");
+	createMenuXsheetAction(MI_ToggleEditInPlace, tr("Toggle Edit in Place"), "");
 	createMenuXsheetAction(MI_SaveSubxsheetAs, tr("&Save Sub-xsheet As..."), "");
 	createMenuXsheetAction(MI_Resequence, tr("Resequence"), "");
 	createMenuXsheetAction(MI_CloneChild, tr("Clone Sub-xsheet"), "");
@@ -1806,12 +1755,10 @@ void MainWindow::defineActions()
 	createToggle(MI_GCheck, tr("&Fill Check"), "", GCheckToggleAction ? 1 : 0, MenuViewCommandType);
 	createToggle(MI_BCheck, tr("&Black BG Check"), "", BCheckToggleAction ? 1 : 0, MenuViewCommandType);
 	createToggle(MI_ACheck, tr("&Gap Check"), "", ACheckToggleAction ? 1 : 0, MenuViewCommandType);
-#ifndef LINETEST
 	createToggle(MI_ShiftTrace, tr("Shift and Trace"), "", false, MenuViewCommandType);
 	createToggle(MI_EditShift, tr("Edit Shift"), "", false, MenuViewCommandType);
 	createToggle(MI_NoShift, tr("No Shift"), "", false, MenuViewCommandType);
 	createAction(MI_ResetShift, tr("Reset Shift"), "", MenuViewCommandType);
-#endif
 
 	if (QGLPixelBuffer::hasOpenGLPbuffers())
 		createToggle(MI_RasterizePli, tr("&Visualize Vector As Raster"), "", RasterizePliToggleAction ? 1 : 0, MenuViewCommandType);
@@ -1905,9 +1852,7 @@ void MainWindow::defineActions()
 
 	//createRightClickMenuAction(MI_PremultiplyFile,      tr("Premultiply"),					"");
 	createMenuLevelAction(MI_ConvertToVectors, tr("Convert to Vectors..."), "");
-#ifndef BRAVOEXPRESS
 	createMenuLevelAction(MI_Tracking, tr("Tracking..."), "");
-#endif
 	createRightClickMenuAction(MI_RemoveLevel, tr("Remove Level"), "");
 	createRightClickMenuAction(MI_AddToBatchRenderList, tr("Add As Render Task"), "");
 	createRightClickMenuAction(MI_AddToBatchCleanupList, tr("Add As Cleanup Task"), "");
@@ -1989,7 +1934,6 @@ void MainWindow::defineActions()
 
 	createMiscAction(MI_RefreshTree, "Refresh Folder Tree", "");
 
-#ifndef LINETEST
 	createToolOptionsAction("A_ToolOption_GlobalKey", tr("Global Key"), "");
 
 	createToolOptionsAction("A_IncreaseMaxBrushThickness", tr("Brush size - Increase max"), "");
@@ -2051,7 +1995,6 @@ void MainWindow::defineActions()
 	createToolOptionsAction("A_ToolOption_AutoSelect:Pegbar", tr("Pegbar Pick Mode"), "");
 	createToolOptionsAction("A_ToolOption_PickScreen", tr("Pick Screen"), "");
 	createToolOptionsAction("A_ToolOption_Meshify", tr("Create Mesh"), "");
-#endif
 
 	/*-- FillAreas, FillLinesにキー1つで切り替えるためのコマンド --*/
 	createAction(MI_FillAreas, "Fill Tool - Areas", "", ToolCommandType);

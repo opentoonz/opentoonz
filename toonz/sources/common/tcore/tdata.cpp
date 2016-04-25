@@ -6,7 +6,7 @@
 DEFINE_CLASS_CODE(TData, 16)
 
 TTextData::TTextData(std::string text)
-	: m_text(toWideString(text))
+	: m_text(::to_wstring(text))
 {
 }
 

@@ -5,6 +5,8 @@
 
 #include <windows.h>
 
+#include <strstream>
+
 class TUSBScannerIOPD
 {
 public:
@@ -30,7 +32,7 @@ void buf2printable(const unsigned char *buffer, const int size, std::ostrstream 
 		return;
 	}
 	os << std::hex;
-	for (; i < tmin(size, 0x40); ++i) {
+	for (; i < std::min(size, 0x40); ++i) {
 		char c = buffer[i];
 		os << "0x" << (unsigned int)c << " ";
 	}

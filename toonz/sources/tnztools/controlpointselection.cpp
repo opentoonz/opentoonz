@@ -914,9 +914,9 @@ ControlPointEditorStroke::PointType ControlPointEditorStroke::getPointTypeAt(con
 		double distanceIn2 = !isSpeedInLinear(i) ? tdistance2(pos, point - cPoint.m_speedIn) : cpDistance2 + 1;
 		double distanceOut2 = !isSpeedOutLinear(i) ? tdistance2(pos, point + cPoint.m_speedOut) : cpDistance2 + 1;
 		if (i == 0 && !isSelfLoop())
-			distanceIn2 = tmax(cpDistance2, distanceOut2) + 1;
+			distanceIn2 = std::max(cpDistance2, distanceOut2) + 1;
 		if (i == cpCount - 1 && !isSelfLoop())
-			distanceOut2 = tmax(cpDistance2, distanceIn2) + 1;
+			distanceOut2 = std::max(cpDistance2, distanceIn2) + 1;
 
 		if (cpDistance2 < distanceIn2 && cpDistance2 < distanceOut2 && (cpDistance2 < minDistance2 || index < 0)) {
 			minDistance2 = cpDistance2;

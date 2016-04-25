@@ -200,7 +200,7 @@ void chooseLeafToClusterize(ClusterContainer::iterator &itRet,
 		tmpMulteplicity = calcCovarianceEigenValues(clusterCovariance, eigenValues);
 		assert(tmpMulteplicity > 0);
 
-		tmpEigenValue = tmax(eigenValues[0], eigenValues[1], eigenValues[2]);
+		tmpEigenValue = std::max({eigenValues[0], eigenValues[1], eigenValues[2]});
 		cluster->eigenValue = tmpEigenValue;
 
 		// eventuale aggiornamento del cluster da cercare
@@ -250,7 +250,7 @@ void chooseLeafToClusterize(ClusterContainer::iterator &itRet,
 			KEYER_FLOAT u23 = tmpMatrixM[1] * tmpMatrixM[2] - tmpMatrixM[5] * tmpMatrixM[0];
 			KEYER_FLOAT u33 = tmpMatrixM[0] * tmpMatrixM[4] - tmpMatrixM[1] * tmpMatrixM[1];
 
-			KEYER_FLOAT uMax = tmax(tmax(u11, u12, u13), u22, u23, u33);
+			KEYER_FLOAT uMax = std::max({u11, u12, u13, u22, u23, u33});
 
 			if (uMax == u11) {
 				eigenVector[0] = u11;
@@ -284,8 +284,8 @@ void chooseLeafToClusterize(ClusterContainer::iterator &itRet,
 			short int row = -1;
 			short int col = -1;
 
-			KEYER_FLOAT mMax = tmax(tmax(tmpMatrixM[0], tmpMatrixM[1], tmpMatrixM[2]),
-									tmpMatrixM[4], tmpMatrixM[5], tmpMatrixM[8]);
+			KEYER_FLOAT mMax = std::max({tmpMatrixM[0], tmpMatrixM[1], tmpMatrixM[2],
+									tmpMatrixM[4], tmpMatrixM[5], tmpMatrixM[8]});
 
 			if (mMax == tmpMatrixM[0]) {
 				row = 1;

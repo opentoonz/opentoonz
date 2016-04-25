@@ -121,7 +121,7 @@ string buildQTErrorString(int ec)
 		return "unable to set movie box";
 
 	default: {
-		return "unknown error ('" + toString(ec) + "')";
+		return "unknown error ('" + std::to_string(ec) + "')";
 	}
 	}
 }
@@ -435,7 +435,7 @@ void TImageWriterMov::save(const TImageP &img)
 
 void TLevelWriterMov::save(const TImageP &img, int frameIndex)
 {
-	m_firstFrame = tmin(frameIndex, m_firstFrame);
+	m_firstFrame = std::min(frameIndex, m_firstFrame);
 
 	TRasterImageP image(img);
 	if (!image)

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef DVWIDGETS_H
 #define DVWIDGETS_H

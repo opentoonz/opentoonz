@@ -13,6 +13,8 @@
 #include "windows.h"
 #endif
 
+#include <sstream>
+
 class TStringConvertException : public TException
 {
 	std::string m_string;
@@ -21,7 +23,7 @@ public:
 	TStringConvertException(const std::string str) : m_string(str) {}
 };
 
-std::wstring toWideString(std::string s)
+std::wstring to_wstring(std::string s)
 {
 #ifdef TNZCORE_LIGHT
 	std::wstring ws;
@@ -40,64 +42,26 @@ std::wstring toWideString(std::string s)
 #endif
 }
 
-std::string toString(std::wstring ws)
+std::string to_string(std::wstring ws)
 {
 #ifdef TNZCORE_LIGHT
 	std::string s;
 	s.assign(ws.begin(), ws.end());
 	return s;
 #else
+	QString const qString = QString::fromStdWString(ws);
 
-	QString qString = QString::fromStdWString(ws);
-
-// Test if 'ws' is not unicode (UTF-8)
-#if 0
-  if(qString.toAscii() == qString)
-#else
+	// Test if 'ws' is not unicode (UTF-8)
 	if (qString.toLatin1() == qString)
-#endif
-	return qString.toStdString();
+		return qString.toStdString();
 
-	QByteArray a = qString.toUtf8();
-	return std::string(a);
+	return std::string(qString.toUtf8());
 #endif
 }
 
-std::string toString(const TFilePath &fp)
+std::string to_string(const TFilePath &fp)
 {
-	return toString(fp.getWideString());
-}
-
-std::wstring toWideString(int x)
-{
-	return toWideString(toString(x));
-}
-
-std::string toString(int value)
-{
-	std::ostrstream ss;
-	ss << value << '\0';
-	std::string s = ss.str();
-	ss.freeze(false);
-	return s;
-}
-
-std::string toString(unsigned long value)
-{
-	std::ostrstream ss;
-	ss << value << '\0';
-	std::string s = ss.str();
-	ss.freeze(false);
-	return s;
-}
-
-std::string toString(unsigned long long value)
-{
-	std::ostrstream ss;
-	ss << value << '\0';
-	std::string s = ss.str();
-	ss.freeze(false);
-	return s;
+	return ::to_string(fp.getWideString());
 }
 
 /*!
@@ -106,38 +70,24 @@ std::string toString(unsigned long long value)
   part, the remainder is not cut off but rounded.
 */
 
-std::string toString(double value, int prec)
+std::string to_string(double value, int prec)
 {
-	std::ostrstream ss;
-	ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
-	if (prec >= 0)
-		ss.precision(prec);
-	ss << value << '\0';
-	std::string s = ss.str();
-	ss.freeze(0);
-	return s;
+	if (prec < 0) {
+		return std::to_string(value);
+	}
+
+	std::ostringstream out;
+	out.setf(std::ios_base::fixed, std::ios_base::floatfield);
+	out.precision(prec);
+	out << value;
+	return out.str();
 }
 
-std::string toString(void *p)
+std::string to_string(void* p)
 {
-	std::ostrstream ss;
-	ss << p << '\0';
-	std::string s = ss.str();
-	ss.freeze(false);
-	return s;
-}
-
-int toInt(std::string str)
-{
-	int value = 0;
-	for (int i = 0; i < (int)str.size(); i++)
-		value = value * 10 + str[i] - '0';
-	return value;
-}
-
-int toInt(std::wstring str)
-{
-	return toInt(toString(str));
+	std::ostringstream out;
+	out << p;
+	return out.str();
 }
 
 bool isInt(std::string s)
@@ -183,26 +133,8 @@ bool isDouble(std::string s)
 	return true;
 }
 
-bool isInt(std::wstring s) { return isInt(toString(s)); }
-bool isDouble(std::wstring s) { return isDouble(toString(s)); }
-
-double toDouble(std::string str)
-{
-	double value;
-	std::istrstream ss(str.c_str(), (std::streamsize)str.length());
-	ss >> value;
-	return value;
-}
-
-double toDouble(std::wstring str)
-{
-	return toDouble(toString(str));
-}
-
-std::wstring toWideString(double v, int p)
-{
-	return toWideString(toString(v, p));
-}
+bool isInt(std::wstring s) { return isInt(::to_string(s)); }
+bool isDouble(std::wstring s) { return isDouble(::to_string(s)); }
 
 std::string toUpper(std::string a)
 {

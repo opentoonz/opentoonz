@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TRASTERFXRENDERDATA_H
 #define TRASTERFXRENDERDATA_H

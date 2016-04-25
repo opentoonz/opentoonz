@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TTIO_JPG_INCLUDED
 #define TTIO_JPG_INCLUDED

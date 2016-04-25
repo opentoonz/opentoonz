@@ -132,7 +132,7 @@ public:
 		int row = TApp::instance()->getCurrentFrame()->getFrame();
 		int step = Preferences::instance()->getXsheetStep();
 
-		TApp::instance()->getCurrentFrame()->setFrame(tmax(row - step, 0));
+		TApp::instance()->getCurrentFrame()->setFrame(std::max(row - step, 0));
 	}
 };
 

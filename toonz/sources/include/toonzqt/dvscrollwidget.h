@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef DVSCROLLWIDGET_H
 #define DVSCROLLWIDGET_H

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef CLEANUPSETTINGSMODEL_H
 #define CLEANUPSETTINGSMODEL_H

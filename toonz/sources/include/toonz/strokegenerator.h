@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef MOUSETRACKER_INCLUDED
 #define MOUSETRACKER_INCLUDED

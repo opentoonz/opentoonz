@@ -1,4 +1,4 @@
-
+#pragma once
 
 // Params.h: interface for the CParams class.
 //
@@ -6,10 +6,6 @@
 
 #if !defined(AFX_PARAMS_H__40D9A921_F329_11D5_B92E_0040F674BE6A__INCLUDED_)
 #define AFX_PARAMS_H__40D9A921_F329_11D5_B92E_0040F674BE6A__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
 
 #ifdef _WIN32
 #include "Windows.h"

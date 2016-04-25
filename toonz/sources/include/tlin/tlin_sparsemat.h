@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TLIN_SPARSEMAT_H
 #define TLIN_SPARSEMAT_H

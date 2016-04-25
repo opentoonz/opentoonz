@@ -36,14 +36,14 @@
   which can be solved using the Lagrange Multipliers theorem:
 
   <P> \f$
-  
+
   \Rightarrow \left{ \begin{array}{c}
     H v + f = A^t \lambda
     A v + d = 0
   \end{array} \right.
 
   \Rightarrow \left( \begin{array}{c} H \\ A \end{array} \begin{array}{c} -A^t \\ 0 \end{array} \right)
-              \left( \begin{array}{c} v \\ \lambda \end{array} \right) = 
+              \left( \begin{array}{c} v \\ \lambda \end{array} \right) =
               \left( \begin{array}{c} -f \\ -d \end{array} \right)
 
   \f$ </P>
@@ -70,54 +70,15 @@ struct LinearConstraint {
 
 //-------------------------------------------------------------------------------------------
 
-// Forced to implement a sloppy substitute to C++11's std::unique_ptr -- since we're still compiling
-// C++03 on MAC... ARGH !
-template <typename T, typename D>
-class UniquePtr
-{
-	T *m_t;
-
-public:
-	UniquePtr() : m_t() {}
-	UniquePtr(T *t) : m_t(t) {}
-	~UniquePtr() { D::destroy(m_t); }
-
-	void reset(T *t = 0)
-	{
-		D::destroy(m_t);
-		m_t = t;
-	}
-
-	const T *get() const { return m_t; }
-	T *get() { return m_t; }
-
-	const T *operator->() const { return m_t; }
-	T *operator->() { return m_t; }
-
-	const T &operator*() const { return *m_t; }
-	T &operator*() { return *m_t; }
-
-	const T &operator[](size_t i) const { return m_t[i]; }
-	T &operator[](size_t i) { return m_t[i]; }
-};
-
-//-------------------------------------------------------------------------------------------
-
 struct SuperFactors_free {
-	static inline void destroy(tlin::SuperFactors *f) { tlin::freeF(f); }
-};
-struct freer {
-	static inline void destroy(void *d) { free(d); }
-};
-struct deleter {
-	static inline void destroy(void *d) { delete d; }
+  void operator()(tlin::SuperFactors *f) { tlin::freeF(f); }
 };
 
 //-------------------------------------------------------------------------------------------
 
-typedef UniquePtr<tlin::SuperFactors, SuperFactors_free> SuperFactorsPtr;
-typedef UniquePtr<double, freer> DoublePtr;
-typedef UniquePtr<TPointD, deleter> TPointDPtr;
+using SuperFactorsPtr =std::unique_ptr<tlin::SuperFactors, SuperFactors_free>;
+using DoublePtr =std::unique_ptr<double[]>;
+using TPointDPtr =std::unique_ptr<TPointD[]>;
 
 } // namespace
 
@@ -581,8 +542,8 @@ void PlasticDeformer::Imp::compileStep1(const std::vector<PlasticHandle> &handle
 		m_invC.reset(invC);
 
 		// Reallocate arrays
-		m_q.reset((double *)malloc(cSize * sizeof(double)));
-		m_out.reset((double *)malloc(cSize * sizeof(double)));
+		m_q.reset(new double[cSize]);
+		m_out.reset(new double[cSize]);
 
 		memset(m_q.get(), 0, 2 * vCount * sizeof(double)); // Initialize the system's known term with 0
 	} else
@@ -734,14 +695,14 @@ void PlasticDeformer::Imp::deformStep2(const TPointD *dstHandles, double *dstVer
 		fitTri[2] = scale * (fitTri[2] - baricenter) + baricenter;
 
 		// Build f -- note: this should be part of step 3, we're just avoiding the same cycle twice :)
-		add_f_values(v0, v1, fitTri[0].x, fitTri[1].x, tmin(p0.rigidity, p1.rigidity), m_fx.get());
-		add_f_values(v0, v1, fitTri[0].y, fitTri[1].y, tmin(p0.rigidity, p1.rigidity), m_fy.get());
+		add_f_values(v0, v1, fitTri[0].x, fitTri[1].x, std::min(p0.rigidity, p1.rigidity), m_fx.get());
+		add_f_values(v0, v1, fitTri[0].y, fitTri[1].y, std::min(p0.rigidity, p1.rigidity), m_fy.get());
 
-		add_f_values(v1, v2, fitTri[1].x, fitTri[2].x, tmin(p1.rigidity, p2.rigidity), m_fx.get());
-		add_f_values(v1, v2, fitTri[1].y, fitTri[2].y, tmin(p1.rigidity, p2.rigidity), m_fy.get());
+		add_f_values(v1, v2, fitTri[1].x, fitTri[2].x, std::min(p1.rigidity, p2.rigidity), m_fx.get());
+		add_f_values(v1, v2, fitTri[1].y, fitTri[2].y, std::min(p1.rigidity, p2.rigidity), m_fy.get());
 
-		add_f_values(v2, v0, fitTri[2].x, fitTri[0].x, tmin(p2.rigidity, p0.rigidity), m_fx.get());
-		add_f_values(v2, v0, fitTri[2].y, fitTri[0].y, tmin(p2.rigidity, p0.rigidity), m_fy.get());
+		add_f_values(v2, v0, fitTri[2].x, fitTri[0].x, std::min(p2.rigidity, p0.rigidity), m_fx.get());
+		add_f_values(v2, v0, fitTri[2].y, fitTri[0].y, std::min(p2.rigidity, p0.rigidity), m_fy.get());
 	}
 
 #ifdef GL_DEBUG
@@ -784,9 +745,9 @@ void PlasticDeformer::Imp::initializeStep3()
 						 &p1 = mesh.vertex(v1).P(),
 						 &p2 = mesh.vertex(v2).P();
 
-		addHValues(v0, v1, tmin(p0.rigidity, p1.rigidity), m_H);
-		addHValues(v1, v2, tmin(p1.rigidity, p2.rigidity), m_H);
-		addHValues(v2, v0, tmin(p2.rigidity, p0.rigidity), m_H);
+		addHValues(v0, v1, std::min(p0.rigidity, p1.rigidity), m_H);
+		addHValues(v1, v2, std::min(p1.rigidity, p2.rigidity), m_H);
+		addHValues(v2, v0, std::min(p2.rigidity, p0.rigidity), m_H);
 	}
 }
 

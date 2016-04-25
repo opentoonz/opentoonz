@@ -106,7 +106,7 @@ TRaster32P render(const TVectorImageP &vi, double &rasDpi, int margin,
 	// Ensure that the maximum lateral resolution is respected
 	if (scale * bboxD.getLx() > RENDERED_IMAGES_MAX_LATERAL_RESOLUTION ||
 		scale * bboxD.getLy() > RENDERED_IMAGES_MAX_LATERAL_RESOLUTION) {
-		scale = tmin(RENDERED_IMAGES_MAX_LATERAL_RESOLUTION / bboxD.getLx(),
+		scale = std::min(RENDERED_IMAGES_MAX_LATERAL_RESOLUTION / bboxD.getLx(),
 					 RENDERED_IMAGES_MAX_LATERAL_RESOLUTION / bboxD.getLy());
 	}
 
@@ -155,7 +155,7 @@ TRaster32P render(const TXsheet *xsh, int row, double &rasDpi, int margin,
 	// Ensure that the maximum lateral resolution is respected
 	if (scale * bbox.getLx() > RENDERED_IMAGES_MAX_LATERAL_RESOLUTION ||
 		scale * bbox.getLy() > RENDERED_IMAGES_MAX_LATERAL_RESOLUTION) {
-		scale = tmin(RENDERED_IMAGES_MAX_LATERAL_RESOLUTION / bbox.getLx(),
+		scale = std::min(RENDERED_IMAGES_MAX_LATERAL_RESOLUTION / bbox.getLx(),
 					 RENDERED_IMAGES_MAX_LATERAL_RESOLUTION / bbox.getLy());
 	}
 
@@ -1173,8 +1173,8 @@ void meshifySelection(Func func,
 			if (!column || column->isEmpty())
 				continue;
 
-			r0 = tmin(r0, column->getFirstRow());
-			r1 = tmax(r1, column->getMaxFrame());
+			r0 = std::min(r0, column->getFirstRow());
+			r1 = std::max(r1, column->getMaxFrame());
 		}
 
 		(*func)(r0, c0, r1, c1, options);

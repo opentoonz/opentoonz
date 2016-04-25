@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SVN_DELETE_DIALOG_H
 #define SVN_DELETE_DIALOG_H

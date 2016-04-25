@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TSIO_AIFF_INCLUDED
 #define TSIO_AIFF_INCLUDED

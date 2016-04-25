@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TFILMSTRIPSELECTION_H
 #define TFILMSTRIPSELECTION_H

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef RULER_INCLUDED
 #define RULER_INCLUDED

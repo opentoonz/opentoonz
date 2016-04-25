@@ -1,7 +1,6 @@
 set(VERSION 1.0)
 
 set(MOC_HEADERS
-    actioncommand.h
     addfilmstripframespopup.h
     adjustlevelspopup.h
     adjustthicknesspopup.h
@@ -144,9 +143,7 @@ set(MOC_HEADERS
     metnum.h
     ObjectTracker.h
     predict3d.h
-    processor.h
-    viewer.h
-    writer.h)
+    processor.h)
 
 set(HEADERS ${MOC_HEADERS})
 
@@ -301,9 +298,7 @@ set(SOURCES
     dummyprocessor.cpp
     metnum.cpp
     ObjectTracker.cpp
-    predict3d.cpp
-    viewer.cpp
-    writer.cpp)
+    predict3d.cpp)
 
 add_translation(toonz ${HEADERS} ${SOURCES})
 

@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TNOTANIMATABLEPARAM_H
 #define TNOTANIMATABLEPARAM_H
 
@@ -171,7 +173,8 @@ public:
 
 	std::string getValueAlias(double, int)
 	{
-		return toString(getValue());
+		using namespace std;
+		return to_string(getValue());
 	}
 	bool hasKeyframes() const { return 0; };
 	void getKeyframes(std::set<double> &) const {};

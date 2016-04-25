@@ -13,6 +13,8 @@
 #include "SDef.h"
 #include "CIL.h"
 
+#include <algorithm>
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -69,9 +71,9 @@ void CCIL::strToColorIndex(const char *s, CCIL &cil,
 		int begin = getRangeBegin(s);
 		int end = getRangeEnd(s);
 		if (begin >= 0 && end >= 0) {
-			begin = MIN(begin, maxIndex);
-			end = MIN(end, maxIndex);
-			for (int i = MIN(begin, end); i <= MAX(begin, end) && cil.m_nb < MAXNBCI; i++)
+			begin = std::min(begin, maxIndex);
+			end = std::min(end, maxIndex);
+			for (int i = std::min(begin, end); i <= std::max(begin, end) && cil.m_nb < MAXNBCI; i++)
 				cil.m_ci[cil.m_nb++] = i;
 		}
 	} else {

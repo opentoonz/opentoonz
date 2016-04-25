@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TAPPLICATION_H
 #define TAPPLICATION_H

@@ -184,10 +184,8 @@ FileBrowser::FileBrowser(QWidget *parent, Qt::WFlags flags, bool noContextMenu, 
 	viewerPanel->addColumn(DvItemListModel::FileSize, 50);
 	viewerPanel->addColumn(DvItemListModel::CreationDate, 130);
 	viewerPanel->addColumn(DvItemListModel::ModifiedDate, 130);
-#ifndef LINETEST
 	if (Preferences::instance()->isSVNEnabled())
 		viewerPanel->addColumn(DvItemListModel::VersionControlStatus, 120);
-#endif
 
 	viewerPanel->setSelection(new FileSelection());
 	DVItemViewPlayDelegate *itemViewPlayDelegate = new DVItemViewPlayDelegate(viewerPanel);
@@ -571,14 +569,6 @@ void FileBrowser::setFolder(const TFilePath &fp, bool expandNode)
 			if (it->getType() == "plt")
 				continue;
 
-#if defined(LINETEST) || defined(BRAVO)
-			if (it->getType() == "tlv" || it->getType() == "tpl")
-				continue;
-#endif
-#ifdef LINETEST
-			if (it->getType() == "pli")
-				continue;
-#endif
 			//filter the file
 			else if (m_filter.isEmpty()) {
 				if (it->getType() != "tnz" &&
@@ -1183,7 +1173,6 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index)
 	}
 #ifdef LEVO
 
-#ifndef BRAVO
 	if (files.size() == 2 && (files[0].getType() == "tif" || files[0].getType() == "tiff" || files[0].getType() == "png" ||
 							  files[0].getType() == "TIF" || files[0].getType() == "TIFF" || files[0].getType() == "PNG") &&
 		(files[1].getType() == "tif" || files[1].getType() == "tiff" || files[1].getType() == "png" ||
@@ -1198,7 +1187,6 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index)
 		menu->addAction(action);
 		menu->addSeparator();
 	}
-#endif
 #endif
 
 	if (!clickedFile.isEmpty() && (clickedFile.getType() == "tnz")) {
@@ -1493,14 +1481,14 @@ bool FileBrowser::drop(const QMimeData *mimeData)
 			return false;
 
 		std::wstring levelName = sl->getName();
-		folderPath += TFilePath(levelName + toWideString(sl->getPath().getDottedType()));
+		folderPath += TFilePath(levelName + ::to_wstring(sl->getPath().getDottedType()));
 		if (TSystem::doesExistFileOrLevel(folderPath)) {
 			QString question = "Level " + toQString(folderPath) + " already exists\nDo you want to duplicate it?";
 			int ret = DVGui::MsgBox(question, QObject::tr("Duplicate"), QObject::tr("Don't Duplicate"), 0);
 			if (ret == 2 || ret == 0)
 				return false;
 			TFilePath path = folderPath;
-			NameBuilder *nameBuilder = NameBuilder::getBuilder(toWideString(path.getName()));
+			NameBuilder *nameBuilder = NameBuilder::getBuilder(::to_wstring(path.getName()));
 			do
 				levelName = nameBuilder->getNext();
 			while (TSystem::doesExistFileOrLevel(path.withName(levelName)));
@@ -2119,7 +2107,7 @@ void FileBrowser::newFolder()
 	TFilePath folderPath = parentFolder + folderName;
 	int i = 1;
 	while (TFileStatus(folderPath).doesExist())
-		folderPath = parentFolder + (folderName + L" " + toWideString(++i));
+		folderPath = parentFolder + (folderName + L" " + std::to_wstring(++i));
 
 	try {
 		TSystem::mkDir(folderPath);

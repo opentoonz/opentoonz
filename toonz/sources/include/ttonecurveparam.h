@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TTONECURVEPARAM_H
 #define TTONECURVEPARAM_H

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TSIO_INCLUDED
 #define TSIO_INCLUDED

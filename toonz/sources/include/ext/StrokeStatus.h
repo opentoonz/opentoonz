@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef STROKESTATUS_H
 #define STROKESTATUS_H

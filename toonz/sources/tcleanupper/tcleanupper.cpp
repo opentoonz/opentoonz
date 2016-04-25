@@ -51,7 +51,7 @@ using namespace std;
 
 inline ostream &operator<<(ostream &out, const wstring &w)
 {
-	return out << toString(w);
+	return out << ::to_string(w);
 }
 
 //------------------------------------------------------------------------
@@ -408,7 +408,7 @@ void cleanupLevel(TXshSimpleLevel *xl, std::set<TFrameId> fidsInXsheet,
 	TFilePath fp = scene->decodeFilePath(xl->getPath());
 	TSystem::touchParentDir(fp);
 	cout << "cleanupping " << xl->getName() << " path=" << fp << endl;
-	string info = "cleanupping " + toString(xl->getPath());
+	string info = "cleanupping " + ::to_string(xl->getPath());
 	LevelUpdater updater(xl);
 	m_userLog.info(info);
 	DVGui::info(QString::fromStdString(info));
@@ -529,11 +529,7 @@ int main(int argc, char *argv[])
 	TEnv::setStuffDir(stuffDirPath);
 
 /*
-  #ifdef BRAVO
-    TFilePath stuffDir("/Applications/Toonz 7.1 Bravo/Toonz 7.1 Bravo stuff");
-  #else
     TFilePath  stuffDir("/Applications/Toonz 7.1/Toonz 7.1 stuff");
-  #endif
 	
   TEnv::setStuffDir(stuffDir);
 */
@@ -541,9 +537,9 @@ int main(int argc, char *argv[])
 
 	TFilePath fproot = TEnv::getStuffDir();
 	if (fproot == TFilePath())
-		fatalError(string("Undefined: \"") + toString(TEnv::getRootVarPath().getWideString()) + "\"");
+		fatalError(string("Undefined: \"") + ::to_string(TEnv::getRootVarPath()) + "\"");
 	if (!TFileStatus(fproot).isDirectory())
-		fatalError(string("Directory \"") + toString(fproot.getWideString()) + "\" not found or not readable");
+		fatalError(string("Directory \"") + ::to_string(fproot) + "\" not found or not readable");
 
 	TFilePath lRootDir = TEnv::getStuffDir() + "toonzfarm";
 	TFilePath logFilePath = lRootDir + "tcleanup.log";
@@ -588,7 +584,7 @@ int main(int argc, char *argv[])
 		if (pos == string::npos)
 			UseRenderFarm = false;
 		else {
-			FarmControllerPort = toInt(fdata.substr(0, pos));
+			FarmControllerPort = std::stoi(fdata.substr(0, pos));
 			FarmControllerName = fdata.substr(pos + 1);
 		}
 	}
@@ -838,15 +834,7 @@ int main(int argc, char *argv[])
 
 namespace
 {
-#ifdef BRAVO
-#ifdef BRAVODEMO
-const char *toonzVersion = "Bravo 7.1 (demo)";
-#else
-const char *toonzVersion = "Bravo 7.1";
-#endif
-#else
 const char *toonzVersion = "Toonz 7.1";
-#endif
 } // namespace
 
 string getToonzVersion()

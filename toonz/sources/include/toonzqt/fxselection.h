@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FXNODESELECTION_H
 #define FXNODESELECTION_H

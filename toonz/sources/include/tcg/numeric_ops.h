@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCG_NUMERIC_OPS_H
 #define TCG_NUMERIC_OPS_H

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef CELLKEYFRAMEDATA_INCLUDED
 #define CELLKEYFRAMEDATA_INCLUDED

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef T_COLORVALUE_INCLUDED
 #define T_COLORVALUE_INCLUDED
