@@ -1173,7 +1173,7 @@ public:
 
 	QString getHistoryString()
 	{
-		return QObject::tr("Set Keyframe  : %1  at Frame %2")
+		return QObject::tr("Move keyframe handle  : %1  Handle of the keyframe %2")
 			.arg(QString::fromStdString(m_objId.toString()))
 			.arg(QString::number(m_row + 1));
 	}

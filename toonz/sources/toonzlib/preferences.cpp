@@ -227,7 +227,7 @@ bool Preferences::LevelFormat::matches(const TFilePath &fp) const
 //**********************************************************************************
 
 Preferences::Preferences()
-	: m_units("mm"), m_cameraUnits("inch"), m_scanLevelType("tif"), m_defLevelWidth(0.0), m_defLevelHeight(0.0), m_defLevelDpi(0.0), m_iconSize(160, 120), m_blankColor(TPixel32::White), m_frontOnionColor(TPixel::Black), m_backOnionColor(TPixel::Black), m_transpCheckBg(TPixel::White), m_transpCheckInk(TPixel::Black), m_transpCheckPaint(TPixel(127, 127, 127)), m_autosavePeriod(15), m_chunkSize(10), m_rasterOptimizedMemory(0), m_shrink(1), m_step(1), m_blanksCount(0), m_keyframeType(3), m_animationStep(1), m_textureSize(0), m_xsheetStep(10), m_shmmax(-1), m_shmseg(-1), m_shmall(-1), m_shmmni(-1), m_onionPaperThickness(50), m_currentLanguage(0), m_currentStyleSheet(0), m_undoMemorySize(100), m_dragCellsBehaviour(0), m_lineTestFpsCapture(25), m_defLevelType(0), m_autocreationType(1), m_autoExposeEnabled(true), m_autoCreateEnabled(true), m_subsceneFolderEnabled(true), m_generatedMovieViewEnabled(true), m_xsheetAutopanEnabled(true), m_ignoreAlphaonColumn1Enabled(false), m_rewindAfterPlaybackEnabled(true), m_fitToFlipbookEnabled(false), m_previewAlwaysOpenNewFlipEnabled(false), m_autosaveEnabled(false), m_defaultViewerEnabled(false), m_saveUnpaintedInCleanup(true), m_askForOverrideRender(true), m_automaticSVNFolderRefreshEnabled(true), m_SVNEnabled(false), m_minimizeSaveboxAfterEditing(true), m_levelsBackupEnabled(false), m_sceneNumberingEnabled(false), m_animationSheetEnabled(false), m_inksOnly(false), m_fillOnlySavebox(false), m_show0ThickLines(true), m_regionAntialias(false), m_viewerBGColor(128, 128, 128, 255), m_previewBGColor(64, 64, 64, 255), m_chessboardColor1(180, 180, 180), m_chessboardColor2(230, 230, 230), m_showRasterImagesDarkenBlendedInViewer(false), m_actualPixelViewOnSceneEditingMode(false), m_viewerZoomCenter(0), m_initialLoadTlvCachingBehavior(0), m_removeSceneNumberFromLoadedLevelName(false), m_replaceAfterSaveLevelAs(true), m_showFrameNumberWithLetters(false), m_levelNameOnEachMarker(false), m_columnIconLoadingPolicy((int)LoadAtOnce), m_moveCurrentFrameByClickCellArea(true), m_onionSkinEnabled(false), m_multiLayerStylePickerEnabled(false), m_paletteTypeOnLoadRasterImageAsColorModel(0)
+	: m_units("mm"), m_cameraUnits("inch"), m_scanLevelType("tif"), m_defLevelWidth(0.0), m_defLevelHeight(0.0), m_defLevelDpi(0.0), m_iconSize(160, 120), m_blankColor(TPixel32::White), m_frontOnionColor(TPixel::Black), m_backOnionColor(TPixel::Black), m_transpCheckBg(TPixel::White), m_transpCheckInk(TPixel::Black), m_transpCheckPaint(TPixel(127, 127, 127)), m_autosavePeriod(15), m_chunkSize(10), m_rasterOptimizedMemory(0), m_shrink(1), m_step(1), m_blanksCount(0), m_keyframeType(3), m_animationStep(1), m_textureSize(0), m_xsheetStep(10), m_shmmax(-1), m_shmseg(-1), m_shmall(-1), m_shmmni(-1), m_onionPaperThickness(50), m_currentLanguage(0), m_currentStyleSheet(0), m_undoMemorySize(100), m_dragCellsBehaviour(0), m_lineTestFpsCapture(25), m_defLevelType(0), m_autocreationType(1), m_autoExposeEnabled(true), m_autoCreateEnabled(true), m_subsceneFolderEnabled(true), m_generatedMovieViewEnabled(true), m_xsheetAutopanEnabled(true), m_ignoreAlphaonColumn1Enabled(false), m_rewindAfterPlaybackEnabled(true), m_fitToFlipbookEnabled(false), m_previewAlwaysOpenNewFlipEnabled(false), m_autosaveEnabled(false), m_defaultViewerEnabled(false), m_saveUnpaintedInCleanup(true), m_askForOverrideRender(true), m_automaticSVNFolderRefreshEnabled(true), m_SVNEnabled(false), m_minimizeSaveboxAfterEditing(true), m_levelsBackupEnabled(false), m_sceneNumberingEnabled(false), m_animationSheetEnabled(false), m_inksOnly(false), m_fillOnlySavebox(false), m_show0ThickLines(true), m_regionAntialias(false), m_viewerBGColor(128, 128, 128, 255), m_previewBGColor(64, 64, 64, 255), m_chessboardColor1(180, 180, 180), m_chessboardColor2(230, 230, 230), m_showRasterImagesDarkenBlendedInViewer(false), m_actualPixelViewOnSceneEditingMode(false), m_viewerZoomCenter(0), m_initialLoadTlvCachingBehavior(0), m_removeSceneNumberFromLoadedLevelName(false), m_replaceAfterSaveLevelAs(true), m_showFrameNumberWithLetters(false), m_levelNameOnEachMarker(false), m_columnIconLoadingPolicy((int)LoadAtOnce), m_moveCurrentFrameByClickCellArea(true), m_onionSkinEnabled(false), m_multiLayerStylePickerEnabled(false), m_paletteTypeOnLoadRasterImageAsColorModel(0), m_showKeyframesOnXsheetCellArea(true)
 {
 	TCamera camera;
 	m_defLevelType = PLI_XSHLEVEL;
@@ -423,6 +423,7 @@ Preferences::Preferences()
 	getValue(*m_settings, "onionSkinEnabled", m_onionSkinEnabled);
 	getValue(*m_settings, "multiLayerStylePickerEnabled", m_multiLayerStylePickerEnabled);
 	getValue(*m_settings, "paletteTypeOnLoadRasterImageAsColorModel", m_paletteTypeOnLoadRasterImageAsColorModel);
+	getValue(*m_settings, "showKeyframesOnXsheetCellArea", m_showKeyframesOnXsheetCellArea);
 }
 
 //-----------------------------------------------------------------
@@ -478,6 +479,14 @@ void Preferences::enableIgnoreAlphaonColumn1(bool on)
 {
 	m_ignoreAlphaonColumn1Enabled = on;
 	m_settings->setValue("ignoreAlphaonColumn1Enabled", on ? "1" : "0");
+}
+
+//------------------------------------------------------------------
+
+void Preferences::enableShowKeyframesOnXsheetCellArea(bool on)
+{
+	m_showKeyframesOnXsheetCellArea = on;
+	m_settings->setValue("showKeyframesOnXsheetCellArea", on ? "1" : "0");
 }
 
 //-----------------------------------------------------------------
