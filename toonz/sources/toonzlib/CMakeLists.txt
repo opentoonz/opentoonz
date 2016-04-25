@@ -339,16 +339,16 @@ if(WIN32)
         Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Script
         ${GLUT_LIB} ${GL_LIB} vfw32.lib
         tnzcore tnzbase tnzext)
-else()
-    if(APPLE)
-        set(EXTRA_LIBS
-            ${CMAKE_CURRENT_BINARY_DIR}/../tnzcore/libtnzcore.${CMAKE_SHARED_LIBRARY_SUFFIX}
-            ${CMAKE_CURRENT_BINARY_DIR}/../tnzbase/libtnzbase.${CMAKE_SHARED_LIBRARY_SUFFIX}
-            ${CMAKE_CURRENT_BINARY_DIR}/../tnzext/libtnzext.${CMAKE_SHARED_LIBRARY_SUFFIX}
-            ${USB_LIB})
-    else()
-        _find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase;tnzext")
-    endif()
+elseif(APPLE)
+    set(EXTRA_LIBS
+        ${CMAKE_CURRENT_BINARY_DIR}/../tnzcore/libtnzcore.${CMAKE_SHARED_LIBRARY_SUFFIX}
+        ${CMAKE_CURRENT_BINARY_DIR}/../tnzbase/libtnzbase.${CMAKE_SHARED_LIBRARY_SUFFIX}
+        ${CMAKE_CURRENT_BINARY_DIR}/../tnzext/libtnzext.${CMAKE_SHARED_LIBRARY_SUFFIX}
+        ${USB_LIB})
+
+    target_link_libraries(toonzlib Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Script ${GLUT_LIB} ${GL_LIB} ${EXTRA_LIBS})
+elseif(UNIX)
+	_find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase;tnzext")
 
     target_link_libraries(toonzlib Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Script ${GLUT_LIB} ${GL_LIB} ${EXTRA_LIBS})
 endif()
