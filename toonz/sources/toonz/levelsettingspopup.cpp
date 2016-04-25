@@ -138,9 +138,7 @@ LevelSettingsPopup::LevelSettingsPopup()
 
 	m_doPremultiply = new CheckBox(tr("Premultiply"), this);
 
-#ifndef LINETEST
 	m_whiteTransp = new CheckBox(tr("White As Transparent"), this);
-#endif
 
 	m_doAntialias = new CheckBox(tr("Add Antialiasing"), this);
 	m_antialiasSoftness = new DVGui::IntLineEdit(0, 10, 0, 100);
@@ -165,9 +163,7 @@ LevelSettingsPopup::LevelSettingsPopup()
 	m_doAntialias->setChecked(false);
 	m_antialiasSoftness->setEnabled(false);
 
-#ifndef LINETEST
 	m_whiteTransp->setChecked(false);
-#endif
 
 	//----layout
 
@@ -226,9 +222,7 @@ LevelSettingsPopup::LevelSettingsPopup()
 
 		m_topLayout->addWidget(m_doPremultiply);
 
-#ifndef LINETEST
 		m_topLayout->addWidget(m_whiteTransp);
-#endif
 
 		m_topLayout->addWidget(m_doAntialias);
 
@@ -269,9 +263,7 @@ LevelSettingsPopup::LevelSettingsPopup()
 	connect(m_doAntialias, SIGNAL(stateChanged(int)), SLOT(onDoAntialiasChanged(int)));
 	connect(m_antialiasSoftness, SIGNAL(editingFinished()), SLOT(onAntialiasSoftnessChanged()));
 
-#ifndef LINETEST
 	connect(m_whiteTransp, SIGNAL(stateChanged(int)), SLOT(onWhiteTranspChanged(int)));
-#endif
 
 	updateLevelSettings();
 }

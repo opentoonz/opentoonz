@@ -988,9 +988,6 @@ void StageSchematicScene::onRemoveSpline()
 
 void StageSchematicScene::onSaveSpline()
 {
-#ifdef BRAVODEMO
-	DVGui::featureNotAvelaible();
-#else
 	TFilePath projectFolder = m_sceneHandle->getScene()->getProject()->getProjectFolder();
 	QString fileNameStr = QFileDialog::getSaveFileName(this->views()[0],
 													   QObject::tr("Save Motion Path"), QString::fromStdWString(projectFolder.getWideString()),
@@ -1023,7 +1020,6 @@ void StageSchematicScene::onSaveSpline()
 	} catch (...) {
 		DVGui::warning(QObject::tr("It is not possible to save the motion path."));
 	}
-#endif
 }
 
 //------------------------------------------------------------------

@@ -44,8 +44,6 @@ HEADERS += ../../sources/tab30qt/actioncommand.h \
     ../../sources/tab30qt/keyframedata.h \
     ../../sources/tab30qt/keyframenavigator.h \
     ../../sources/tab30qt/keyframeselection.h \
-    ../../sources/tab30qt/license.h \
-    ../../sources/tab30qt/licensecontroller.h \
     ../../sources/tab30qt/menubar.h \
     ../../sources/tab30qt/menubarcommand.h \
     ../../sources/tab30qt/menubarcommandids.h \
@@ -107,8 +105,6 @@ SOURCES += ../../sources/tab30qt/browsermodel.cpp \
     ../../sources/tab30qt/imagedata.cpp \
     ../../sources/tab30qt/imageutils.cpp \
     ../../sources/tab30qt/keyframenavigator.cpp \
-    ../../sources/tab30qt/license.cpp \
-    ../../sources/tab30qt/licensecontroller.cpp \
     ../../sources/tab30qt/main.cpp \
     ../../sources/tab30qt/menubar.cpp \
     ../../sources/tab30qt/menubarcommand.cpp \

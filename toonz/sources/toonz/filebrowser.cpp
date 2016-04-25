@@ -184,10 +184,8 @@ FileBrowser::FileBrowser(QWidget *parent, Qt::WFlags flags, bool noContextMenu, 
 	viewerPanel->addColumn(DvItemListModel::FileSize, 50);
 	viewerPanel->addColumn(DvItemListModel::CreationDate, 130);
 	viewerPanel->addColumn(DvItemListModel::ModifiedDate, 130);
-#ifndef LINETEST
 	if (Preferences::instance()->isSVNEnabled())
 		viewerPanel->addColumn(DvItemListModel::VersionControlStatus, 120);
-#endif
 
 	viewerPanel->setSelection(new FileSelection());
 	DVItemViewPlayDelegate *itemViewPlayDelegate = new DVItemViewPlayDelegate(viewerPanel);
@@ -571,14 +569,6 @@ void FileBrowser::setFolder(const TFilePath &fp, bool expandNode)
 			if (it->getType() == "plt")
 				continue;
 
-#if defined(LINETEST) || defined(BRAVO)
-			if (it->getType() == "tlv" || it->getType() == "tpl")
-				continue;
-#endif
-#ifdef LINETEST
-			if (it->getType() == "pli")
-				continue;
-#endif
 			//filter the file
 			else if (m_filter.isEmpty()) {
 				if (it->getType() != "tnz" &&
@@ -1183,7 +1173,6 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index)
 	}
 #ifdef LEVO
 
-#ifndef BRAVO
 	if (files.size() == 2 && (files[0].getType() == "tif" || files[0].getType() == "tiff" || files[0].getType() == "png" ||
 							  files[0].getType() == "TIF" || files[0].getType() == "TIFF" || files[0].getType() == "PNG") &&
 		(files[1].getType() == "tif" || files[1].getType() == "tiff" || files[1].getType() == "png" ||
@@ -1198,7 +1187,6 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index)
 		menu->addAction(action);
 		menu->addSeparator();
 	}
-#endif
 #endif
 
 	if (!clickedFile.isEmpty() && (clickedFile.getType() == "tnz")) {

@@ -655,8 +655,6 @@ void ConvertPopup::setFiles(const std::vector<TFilePath> &fps)
 		}
 	}
 
-#ifndef BRAVO
-
 	int currIndex = m_fileFormat->currentIndex();
 	int tlvIndex = m_fileFormat->findText(TlvExtension);
 
@@ -679,16 +677,6 @@ void ConvertPopup::setFiles(const std::vector<TFilePath> &fps)
 			m_fileFormat->removeItem(tlvIndex);
 		}
 	}
-#else
-	if (areVector) {
-		int svgIndex = m_fileFormat->findText("svg");
-		if (svgIndex < 0)
-			m_fileFormat->addItem("svg");
-		m_fileFormat->setCurrentIndex(m_fileFormat->findText("svg"));
-		m_fileFormat->setEnabled(false);
-		onFormatSelected("svg");
-	}
-#endif
 
 	m_srcFilePaths = fps;
 	if (m_srcFilePaths.size() == 1) {

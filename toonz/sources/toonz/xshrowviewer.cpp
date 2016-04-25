@@ -262,7 +262,6 @@ void RowArea::drawOnionSkinSelection(QPainter &p)
 	}
 	int lastY;
 	int xc = m_xa - 10;
-#ifndef STUDENT
 	int mosCount = osMask.getMosCount();
 	for (i = 0; i < mosCount; i++) {
 		int mos = osMask.getMos(i);
@@ -289,7 +288,6 @@ void RowArea::drawOnionSkinSelection(QPainter &p)
 			p.drawLine(xc, ya, xc, yb);
 		}
 	}
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -455,8 +453,6 @@ void RowArea::mouseReleaseEvent(QMouseEvent *event)
 
 void RowArea::contextMenuEvent(QContextMenuEvent *event)
 {
-#ifndef STUDENT
-
 	OnionSkinMask osMask = TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
 
 	QMenu *menu = new QMenu(this);
@@ -479,16 +475,13 @@ void RowArea::contextMenuEvent(QContextMenuEvent *event)
 	menu->addAction(cmdManager->getAction(MI_InsertGlobalKeyframe));
 	menu->addAction(cmdManager->getAction(MI_RemoveGlobalKeyframe));
 
-#ifndef LINETEST
 	menu->addSeparator();
 	menu->addAction(cmdManager->getAction(MI_ShiftTrace));
 	menu->addAction(cmdManager->getAction(MI_EditShift));
 	menu->addAction(cmdManager->getAction(MI_NoShift));
 	menu->addAction(cmdManager->getAction(MI_ResetShift));
-#endif
 
 	menu->exec(event->globalPos());
-#endif
 }
 
 //-----------------------------------------------------------------------------

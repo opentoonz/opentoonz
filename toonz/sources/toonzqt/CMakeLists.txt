@@ -37,7 +37,6 @@ set(MOC_HEADERS
     ../include/toonzqt/intpairfield.h
     ../include/toonzqt/keyframenavigator.h
     ../include/toonzqt/lineedit.h
-    ../include/toonzqt/licensechecker.h
     ../include/toonzqt/menubarcommand.h
     ../include/toonzqt/multipleselection.h
     palettedata.h
@@ -124,7 +123,6 @@ set(SOURCES
     intpairfield.cpp
     keyframenavigator.cpp
     lineedit.cpp
-    licensechecker.cpp
     menubarcommand.cpp
     palettesscanpopup.cpp
     paletteviewer.cpp

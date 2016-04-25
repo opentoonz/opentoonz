@@ -1,18 +1,5 @@
-/////////////////////////////////////////////////////////////////////////////
-//
 // Icon
-//
-
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-#if defined(APSTUDIO_INVOKED) || defined(STUDENT)
 #if defined(APSTUDIO_INVOKED)
-IDI_ICON1$(STUDENT)
 ICON "toonz.ico"
-#else
+#endif
 IDI_ICON1 ICON "toonz.ico"
-#endif
-#endif
-#if defined(APSTUDIO_INVOKED) || !defined(STUDENT)
-	IDI_ICON1 ICON "toonz.ico"
-#endif

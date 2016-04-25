@@ -1491,15 +1491,6 @@ Select FX nodes and related links before copying or cutting the selection you wa
         <translation>適用</translation>
     </message>
     <message>
-        <source>This feature is not available in the demo version.
-For more information visit the %1 site:</source>
-        <translation>この機能はデモ版での利用ができません。詳しい情報に関しては、こちらへ： %1</translation>
-    </message>
-    <message>
-        <source>To request a trial license please contact </source>
-        <translation>体験版を試用はこちらへ：</translation>
-    </message>
-    <message>
         <source>For further information visit </source>
         <translation>詳しい情報に関しては、こちらへ：</translation>
     </message>
