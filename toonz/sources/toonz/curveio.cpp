@@ -238,10 +238,6 @@ bool ExportCurvePopup::execute()
 
 void saveCurve(TDoubleParam *curve)
 {
-#ifdef BRAVODEMO
-	DVGui::featureNotAvelaible();
-	return false;
-#endif
 	TFilePath folderPath = TProjectManager::instance()->getCurrentProject()->getScenesPath();
 	SaveCurvePopup popup(folderPath, curve);
 	popup.exec();
@@ -251,10 +247,6 @@ void saveCurve(TDoubleParam *curve)
 
 void loadCurve(TDoubleParam *curve)
 {
-#ifdef BRAVODEMO
-	DVGui::featureNotAvelaible();
-	return false;
-#endif
 	TFilePath folderPath = TProjectManager::instance()->getCurrentProject()->getScenesPath();
 	LoadCurvePopup popup(folderPath, curve);
 	popup.exec();
@@ -264,10 +256,6 @@ void loadCurve(TDoubleParam *curve)
 
 void exportCurve(TDoubleParam *curve, const std::string &name)
 {
-#ifdef BRAVODEMO
-	DVGui::featureNotAvelaible();
-	return false;
-#endif
 	TFilePath folderPath = TProjectManager::instance()->getCurrentProject()->getScenesPath();
 	ExportCurvePopup popup(folderPath, curve, name);
 	popup.exec();

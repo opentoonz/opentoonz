@@ -1333,7 +1333,6 @@ void CellArea::drawKeyframe(QPainter &p, const QRect toBeUpdated)
 				p.drawLine(x + ColumnWidth - 6, y, x + ColumnWidth - 6, y1);
 				if (r1 - r0 > 4) {
 					int rh0, rh1;
-#ifndef STUDENT
 					if (getEaseHandles(r0, r1, e0, e1, rh0, rh1)) {
 						int e0Y = m_viewer->rowToY(rh0);
 						drawArrow(p, QPointF(x1 - 4, e0Y + 2),
@@ -1346,7 +1345,6 @@ void CellArea::drawKeyframe(QPainter &p, const QRect toBeUpdated)
 								  QPointF(x1, e1Y - 6),
 								  true, m_viewer->getLightLineColor());
 					}
-#endif
 				}
 			}
 		}

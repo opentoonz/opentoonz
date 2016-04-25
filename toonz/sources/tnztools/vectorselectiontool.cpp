@@ -1196,10 +1196,8 @@ VectorSelectionTool::VectorSelectionTool(int targetType)
 	: SelectionTool(targetType), m_selectionTarget("Mode:"), m_constantThickness("Preserve Thickness", false), m_levelSelection(m_strokeSelection), m_capStyle("Cap"), m_joinStyle("Join"), m_miterJoinLimit("Miter:", 0, 100, 4), m_selectionCount(0), m_canEnterGroup(true)
 {
 	if (targetType == TTool::Vectors) {
-#ifndef STUDENT
 		m_prop.bind(m_selectionTarget);
 		m_prop.bind(m_constantThickness);
-#endif
 
 		m_selectionTarget.addValue(NORMAL_TYPE);
 		m_selectionTarget.addValue(SELECTED_FRAMES_TYPE);

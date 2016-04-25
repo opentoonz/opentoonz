@@ -803,9 +803,6 @@ StyleEditorPanel::StyleEditorPanel(QWidget *parent)
 	: TPanel(parent)
 {
 	m_styleEditor = new StyleEditor(TApp::instance()->getPaletteController(), this);
-#ifdef BRAVO
-	m_styleEditor->enableAutopaintToggle(false);
-#endif
 	setWidget(m_styleEditor);
 
 	m_styleEditor->setLevelHandle(TApp::instance()->getCurrentLevel());
@@ -1197,8 +1194,6 @@ public:
 
 OpenFloatingPanel openTMessageCommand(MI_OpenTMessage, "TMessage", QObject::tr("Message Center"));
 
-#ifndef BRAVO
-
 //=============================================================================
 // ScriptConsolePanelFactory
 //-----------------------------------------------------------------------------
@@ -1225,7 +1220,6 @@ public:
 } scriptConsolePanelFactory;
 
 OpenFloatingPanel openTScriptConsoleCommand("MI_OpenScriptConsole", "ScriptConsole", QObject::tr("Script Console"));
-#endif
 //------------------------------------------------------------------------------
 
 #ifdef LINETEST

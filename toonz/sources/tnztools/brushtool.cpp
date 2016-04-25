@@ -570,11 +570,9 @@ BrushTool::BrushTool(std::string name, int targetType)
 	}
 
 	m_prop[0].bind(m_pressure);
-#ifndef STUDENT
 	m_prop[0].bind(m_preset);
 	m_preset.setId("BrushPreset");
 	m_preset.addValue(CUSTOM_WSTR);
-#endif
 	m_pressure.setId("PressureSensibility");
 
 	m_capStyle.addValue(BUTT_WSTR);

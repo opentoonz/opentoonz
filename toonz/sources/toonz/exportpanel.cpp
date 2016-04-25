@@ -10,7 +10,6 @@
 #include "menubarcommandids.h"
 #include "fileselection.h"
 #include "iocommand.h"
-#include "licensecontroller.h"
 #include "filebrowser.h"
 #include "flipbook.h"
 #include "formatsettingspopups.h"
@@ -66,6 +65,7 @@
 #include <QAction>
 #include <QMainWindow>
 #include <QMimeData>
+#include <QLabel>
 
 //=============================================================================
 // RenderLocker
@@ -241,10 +241,7 @@ void RenderController::generateMovie(TFilePath outPath, bool emitSignal)
 		}
 	} catch (TException &e) {
 		QString msg;
-		if (e.getMessage() == L"File: " + fp.getWideString() + L":1\nCannot Load Toonz Scene in LineTest")
-			msg = QObject::tr("The scene %1 was created with Toonz and cannot be loaded in LineTest.").arg(QString::fromStdWString(fp.getWideString()));
-		else
-			msg = QObject::tr("There were problems loading the scene %1.\n Some files may be missing.").arg(QString::fromStdWString(fp.getWideString()));
+		msg = QObject::tr("There were problems loading the scene %1.\n Some files may be missing.").arg(QString::fromStdWString(fp.getWideString()));
 
 		DVGui::warning(msg);
 		return;
@@ -756,12 +753,8 @@ ExportPanel::ExportPanel(QWidget *parent, Qt::WFlags flags)
 	mainLayout->setSpacing(0);
 	mainLayout->setAlignment(Qt::AlignTop);
 //ClipList
-#ifdef STUDENT
-	m_clipListViewer = 0;
-#else
 	m_clipListViewer = new ClipListViewer(box);
 	m_clipListViewer->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Expanding);
-#endif
 
 	TSceneHandle *sceneHandle = TApp::instance()->getCurrentScene();
 
@@ -830,12 +823,10 @@ ExportPanel::ExportPanel(QWidget *parent, Qt::WFlags flags)
 	fileFormatLayout->addWidget(fileFormatButton);
 
 // Use Marker checkbox
-#ifndef STUDENT
 	m_useMarker = new QCheckBox(tr("Use Markers"), settingsBox);
 	m_useMarker->setMinimumHeight(30);
 	m_useMarker->setChecked(false);
 	connect(m_useMarker, SIGNAL(toggled(bool)), this, SLOT(onUseMarkerToggled(bool)));
-#endif
 
 	// Export button
 	QFrame *exportBox = new QFrame(box);
@@ -852,9 +843,7 @@ ExportPanel::ExportPanel(QWidget *parent, Qt::WFlags flags)
 	settingsLayout->addLayout(saveIn);
 	settingsLayout->addLayout(fileNname);
 	settingsLayout->addLayout(fileFormatLayout);
-#ifndef STUDENT
 	settingsLayout->addWidget(m_useMarker);
-#endif
 	settingsBox->setLayout(settingsLayout);
 
 	if (m_clipListViewer)
@@ -954,11 +943,7 @@ void ExportPanel::generateMovie()
 
 void ExportPanel::onUseMarkerToggled(bool toggled)
 {
-#ifdef STUDENT
-	RenderController::instance()->setUseMarkers(false);
-#else
 	RenderController::instance()->setUseMarkers(toggled);
-#endif
 }
 
 //-----------------------------------------------------------------------------

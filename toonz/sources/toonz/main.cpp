@@ -87,50 +87,11 @@ TEnv::IntVar EnvSoftwareCurrentFontSize("SoftwareCurrentFontSize", 12);
 const char *applicationFullName = "LineTest 6.4 Beta";
 const char *rootVarName = "LINETESTROOT";
 const char *systemVarPrefix = "LINETEST";
-#elif defined BRAVODEMO
-const char *applicationName = "Toonz Bravo";
-const char *applicationVersion = "6.5";
-const char *dllRelativePath = "./bravo6.app/Contents/Frameworks";
-TEnv::StringVar EnvSoftwareCurrentFont("SoftwareCurrentFont", "MS Sans Serif");
-TEnv::IntVar EnvSoftwareCurrentFontSize("SoftwareCurrentFontSize", 12);
-const char *applicationFullName = "Bravo 6.5 (Demo) Aperta";
-const char *rootVarName = "BRAVOROOT";
-const char *systemVarPrefix = "BRAVO";
-#elif defined BRAVO
-#ifdef BRAVOEXPRESS
-const char *applicationName = "Toonz Bravo Express";
-const char *applicationVersion = "7.1";
-const char *dllRelativePath = "./bravo6.app/Contents/Frameworks";
-TEnv::StringVar EnvSoftwareCurrentFont("SoftwareCurrentFont", "MS Sans Serif");
-TEnv::IntVar EnvSoftwareCurrentFontSize("SoftwareCurrentFontSize", 12);
-const char *applicationFullName = "Bravo Express 7.1";
-const char *rootVarName = "BRAVOEXPRESSROOT";
-const char *systemVarPrefix = "BRAVOEXPRESS";
 #else
-const char *applicationName = "Toonz Bravo";
-const char *applicationVersion = "7.1";
-const char *dllRelativePath = "./bravo6.app/Contents/Frameworks";
-TEnv::StringVar EnvSoftwareCurrentFont("SoftwareCurrentFont", "MS Sans Serif");
-TEnv::IntVar EnvSoftwareCurrentFontSize("SoftwareCurrentFontSize", 12);
-const char *applicationFullName = "Bravo 7.1";
-const char *rootVarName = "BRAVOROOT";
-const char *systemVarPrefix = "BRAVO";
-#endif
-#elif defined XPRESS
-const char *applicationName = "Toonz Xpress";
-const char *applicationVersion = "6.5";
-const char *dllRelativePath = "./xpress.app/Contents/Frameworks";
-TEnv::StringVar EnvSoftwareCurrentFont("SoftwareCurrentFont", "MS Sans Serif");
-TEnv::IntVar EnvSoftwareCurrentFontSize("SoftwareCurrentFontSize", 12);
-const char *applicationFullName = "Express 6.5 Aperta";
-const char *rootVarName = "XPRESSROOT";
-const char *systemVarPrefix = "XPRESS";
-
-#else
-
 const char *applicationName = "OpenToonz";
 const char *applicationVersion = "1.0";
 const char *dllRelativePath = "./toonz6.app/Contents/Frameworks";
+#endif
 
 #ifdef _WIN32
 TEnv::StringVar EnvSoftwareCurrentFont("SoftwareCurrentFont", "Arial");
@@ -143,8 +104,6 @@ TEnv::StringVar EnvSoftwareCurrentFontWeight("SoftwareCurrentFontWeightIsBold", 
 const char *applicationFullName = "OpenToonz 1.0";
 const char *rootVarName = "TOONZROOT";
 const char *systemVarPrefix = "TOONZ";
-#endif
-TCli::StringQualifier selectedFeature("-license", "");
 
 #ifdef MACOSX
 #include "tthread.h"
@@ -172,33 +131,6 @@ void lastWarningError(QString msg)
 }
 //-----------------------------------------------------------------------------
 
-class LicenseMsg : public TThread::Message
-{
-	QString m_msg;
-
-public:
-	LicenseMsg(char *msg) : m_msg(msg) {}
-	void onDeliver()
-	{
-		lastWarningError(m_msg);
-	}
-
-	TThread::Message *clone() const
-	{
-		return new LicenseMsg(*this);
-	}
-};
-
-extern "C" void licenseObserverCB(char *msg)
-{
-	std::cout << __FUNCTION__ << " Begin message>" << std::endl;
-	std::cout << msg << std::endl
-			  << "<End Message" << std::endl;
-	LicenseMsg(msg).send();
-}
-
-//-----------------------------------------------------------------------------
-
 void toonzRunOutOfContMemHandler(unsigned long size)
 {
 #ifdef _WIN32
@@ -214,9 +146,7 @@ void toonzRunOutOfContMemHandler(unsigned long size)
 //-----------------------------------------------------------------------------
 
 // todo.. da mettere in qualche .h
-#ifndef LINETEST
 DV_IMPORT_API void initStdFx();
-#endif
 DV_IMPORT_API void initColorFx();
 
 //-----------------------------------------------------------------------------
@@ -231,25 +161,11 @@ void initToonzEnv()
 	StudioPalette::enable(true);
 
 #ifdef MACOSX
-
 // Stuff dir deve essere assoluta (la rendo tale)
-
-#if defined BRAVODEMO
-	QFileInfo infoStuff(QString("Toonz 7.1 Bravo stuff"));
-#elif defined BRAVO
-#ifdef BRAVOEXPRESS
-	QFileInfo infoStuff(QString("Toonz 7.1 Bravo Express stuff"));
-#else
-	QFileInfo infoStuff(QString("Toonz 7.1 Bravo stuff"));
-#endif
-#elif defined XPRESS
-	QFileInfo infoStuff(QString("Toonz 7.1 Xpress stuff"));
-#elif defined LINETEST
+#if defined LINETEST
 	QFileInfo infoStuff(QString("Toonz 6.4 LineTest stuff"));
 #else
 	QFileInfo infoStuff(QString("Toonz 7.1 stuff"));
-#endif
-
 #endif
 
 	TEnv::setApplication(applicationName, applicationVersion);
@@ -283,9 +199,7 @@ void initToonzEnv()
 	Tiio::defineStd();
 	initImageIo();
 	initSoundIo();
-#ifndef LINETEST
 	initStdFx();
-#endif
 	initColorFx();
 
 	// TPluginManager::instance()->loadStandardPlugins();
@@ -449,8 +363,6 @@ int main(int argc, char *argv[])
 	// Initialize thread components
 	TThread::init();
 
-	std::string feature = selectedFeature.getValue();
-
 	TProjectManager *projectManager = TProjectManager::instance();
 	if (Preferences::instance()->isSVNEnabled()) {
 		// Read Version Control repositories and add it to project manager as "special" svn project root
@@ -508,6 +420,7 @@ int main(int argc, char *argv[])
 #else
 	translator.load("toonz", languagePathString);
 #endif
+
 	// La installo
 	a.installTranslator(&translator);
 
@@ -632,32 +545,6 @@ int main(int argc, char *argv[])
 
 	a.setQuitOnLastWindowClosed(false);
 // a.connect(&a, SIGNAL(lastWindowClosed()), &a, SLOT(quit()));
-/*
-	int *check;
-	check = License::checkLicense();
-	*check = 3;*/
-
-#ifdef LINETEST
-	std::string license = License::getInstalledLicense();
-	License::writeMacAddress();
-	//Controllo che la data della prima installazione contenuta nella sentinella sia minore della data corrente.
-	if (License::isTemporaryLicense(license) && !License::isValidSentinel(license)) {
-		DVGui::error(QObject::tr("System date tampered."));
-		return -1;
-	}
-	if (License::checkLicense(license) == License::INVALID_LICENSE ||
-		(License::isTemporaryLicense(license) && License::getDaysLeft(license) < 31)) {
-		LicenseWizard licenseWizard(0);
-		licenseWizard.setGeometry(splashGeometry);
-		//UpgradeLicense upgradeLicense(&w);
-		//int upgraded = upgradeLicense.exec();
-		int ret = licenseWizard.exec();
-		if (ret == QDialog::Rejected)
-			return -1;
-	}
-
-	w.checkForLicense();
-#endif
 	w.checkForUpdates();
 
 	w.show();

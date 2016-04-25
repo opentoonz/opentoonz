@@ -1,7 +1,5 @@
 #include <memory>
 
-#ifndef XPRESS
-
 #include "tmachine.h"
 #include "pli_io.h"
 #include "tcommon.h"
@@ -2665,5 +2663,3 @@ int &ParsedPli::precisionScale()
 {
 	return imp->m_precisionScale;
 }
-
-#endif
