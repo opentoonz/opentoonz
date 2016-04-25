@@ -1579,6 +1579,7 @@ void MainWindow::defineActions()
 	createMenuFileAction(MI_LoadScene, tr("&Load Scene..."), "Ctrl+L");
 	createMenuFileAction(MI_SaveScene, tr("&Save Scene"), "Ctrl+S");
 	createMenuFileAction(MI_SaveSceneAs, tr("&Save Scene As..."), "Ctrl+Shift+S");
+    createMenuFileAction(MI_SaveAll, tr("&Save All"), "");
 	createMenuFileAction(MI_RevertScene, tr("&Revert Scene"), "");
 
 	QAction *act = CommandManager::instance()->getAction(MI_RevertScene);

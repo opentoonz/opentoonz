@@ -1662,6 +1662,74 @@ bool IoCmd::saveLevel(TXshSimpleLevel *sl)
 }
 
 //===========================================================================
+// IoCmd::saveAll() save current scene and all of its levels
+//---------------------------------------------------------------------------
+
+bool IoCmd::saveAll()
+{
+#ifdef BRAVODEMO
+    return false;
+#else
+    // try to save as much as possible
+    // if anything is wrong, return false
+    bool result = true;
+    // save scene
+    if (!saveScene())
+    {
+        result = false;
+    }
+
+    TApp *app = TApp::instance();
+    ToonzScene* scene = app->getCurrentScene()->getScene();
+    TLevelSet* levelSet = scene->getLevelSet();
+    int numLevels = levelSet->getLevelCount();
+    // save levels of scene
+    for (int i = 0; i < numLevels; ++i)
+    {
+        TXshLevel* level = levelSet->getLevel(i);
+        TXshSimpleLevel *sl = level->getSimpleLevel();
+        if (sl)
+        {
+            if (sl->getPath() == TFilePath())
+            {
+                result = false;
+                continue;
+            }
+                
+            TFilePath path = scene->decodeFilePath(sl->getPath());
+            if (path == TFilePath())
+            {
+                result = false;
+                continue;
+            }
+            if (path.getWideString()[0] == L'+')
+            {
+                result = false;
+                continue;
+            }
+            if (!path.isAbsolute())
+            {
+                result = false;
+                continue;
+            }
+            if (!saveLevel(path, sl, true))
+            {
+                result = false;
+                continue;
+            }
+            sl->setDirtyFlag(false);
+        }
+    }
+
+    // for update title bar
+    // should we call this for all the levels?
+    app->getCurrentLevel()->notifyLevelChange();
+    
+    return result;
+#endif
+}
+
+//===========================================================================
 // IoCmd::saveSound(soundPath, soundColumn, overwrite)
 //---------------------------------------------------------------------------
 
@@ -2829,3 +2897,21 @@ public:
 		TApp::instance()->getPaletteController()->getCurrentLevelPalette()->notifyPaletteDirtyFlagChanged();
 	}
 } overwritePaletteCommandHandler;
+
+
+//=============================================================================
+// Save scene and levels
+//-----------------------------------------------------------------------------
+class SaveAllCommandHandler : public MenuItemHandler
+{
+public:
+    SaveAllCommandHandler() : MenuItemHandler(MI_SaveAll) {}
+    void execute()
+    {
+#ifdef BRAVODEMO
+        DVGui::featureNotAvelaible();
+#else
+        IoCmd::saveAll();
+#endif
+    }
+} saveAllCommandHandler;
