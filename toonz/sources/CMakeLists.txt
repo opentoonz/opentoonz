@@ -242,7 +242,7 @@ elseif(UNIX)
 
     pkg_check_modules(USB_LIB REQUIRED libusb-1.0)
 
-	# TODO: check for them properly in some sane order with pkg-config
+    # TODO: check for them properly in some sane order with pkg-config
     find_library(OPENBLAS_LIB NAMES cblas gslcblas openblas blas)
     message("OpenBLAS:" ${OPENBLAS_LIB})
 
@@ -259,9 +259,9 @@ endif()
 include_directories(BEFORE ${TIFF_INCLUDE_DIR} ${PNG_INCLUDE_DIRS})
 
 if(WIN32 OR APPLE)
-	find_path(BOOST_ROOT include/boost boost HINTS ${THIRDPARTY_LIBS_HINTS}
-		PATH_SUFFIXES boost/boost_1_60_0/ boost/boost_1_59_0/
-		boost/boost_1_58_0/ boost/boost_1_57_0/ boost/boost_1_56_0/ boost155/1.55.0_1/ boost/boost_1_55_0/ )
+    find_path(BOOST_ROOT include/boost boost HINTS ${THIRDPARTY_LIBS_HINTS}
+        PATH_SUFFIXES boost/boost_1_60_0/ boost/boost_1_59_0/
+        boost/boost_1_58_0/ boost/boost_1_57_0/ boost/boost_1_56_0/ boost155/1.55.0_1/ boost/boost_1_55_0/ )
 endif()
 find_package(Boost 1.55 REQUIRED)
 
@@ -276,9 +276,9 @@ if(WIN32)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
 elseif(APPLE)
-	# pass
+    # pass
 elseif(UNIX)
-	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 endif()
 
 if (MSVC AND MSVC_VERSION EQUAL 1800)

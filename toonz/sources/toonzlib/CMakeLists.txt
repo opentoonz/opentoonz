@@ -348,7 +348,7 @@ elseif(APPLE)
 
     target_link_libraries(toonzlib Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Script ${GLUT_LIB} ${GL_LIB} ${EXTRA_LIBS})
 elseif(UNIX)
-	_find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase;tnzext")
+    _find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase;tnzext")
 
     target_link_libraries(toonzlib Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Script ${GLUT_LIB} ${GL_LIB} ${EXTRA_LIBS})
 endif()

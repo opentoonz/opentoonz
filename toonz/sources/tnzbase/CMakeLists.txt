@@ -189,7 +189,7 @@ elseif(APPLE)
 
     target_link_libraries(tnzbase Qt5::Core Qt5::Gui)
 elseif(UNIX)
-	_find_toonz_library(EXTRA_LIBS "tnzcore")
+    _find_toonz_library(EXTRA_LIBS "tnzcore")
     set(EXTRA_LIBS ${EXTRA_LIBS}
         ${SDL_LIB_LIBRARIES})
 

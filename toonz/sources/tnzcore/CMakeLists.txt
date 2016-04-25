@@ -301,7 +301,7 @@ elseif(APPLE)
         ${AUDIOTB_LIB}
         ${CARBON_LIB})
 elseif(UNIX)
-	include_directories(${FREETYPE_INCLUDE_DIRS})
+    include_directories(${FREETYPE_INCLUDE_DIRS})
     set(EXTRA_LIBS
         ${GLU_LIB})
 endif()
