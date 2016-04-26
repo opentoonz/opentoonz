@@ -23,8 +23,7 @@
 //    Screen Picker implementation
 //***********************************************************************************
 
-ScreenPicker::ScreenPicker(QWidget *parent)
-	: m_mousePressed(false), m_mouseGrabbed(false)
+ScreenPicker::ScreenPicker(QWidget *parent) : m_mousePressed(false), m_mouseGrabbed(false)
 {
 }
 
@@ -32,8 +31,8 @@ ScreenPicker::ScreenPicker(QWidget *parent)
 
 bool ScreenPicker::acceptScreenEvents(const QRect &screenRect) const
 {
-	return screenRect.contains(QCursor::pos()) || //Accept mouse events
-		   screenRect.intersects(m_geometry);	 //Accept paint events
+	return screenRect.contains(QCursor::pos()) || // Accept mouse events
+		   screenRect.intersects(m_geometry); // Accept paint events
 }
 
 //------------------------------------------------------------------
@@ -99,8 +98,8 @@ void ScreenPicker::mouseReleaseEvent(QWidget *widget, QMouseEvent *me)
 	QPoint pos(widget->mapToGlobal(me->pos()));
 	m_geometry = QRect(QRect(m_start, QSize(1, 1)) | QRect(pos, QSize(1, 1)));
 
-	//TimerEvents execution is delayed until all other events have been processed.
-	//In particular, we want to pick after the screen refreshes
+	// TimerEvents execution is delayed until all other events have been processed.
+	// In particular, we want to pick after the screen refreshes
 	QTimer::singleShot(0, this, SLOT(pick()));
 }
 
@@ -108,8 +107,8 @@ void ScreenPicker::mouseReleaseEvent(QWidget *widget, QMouseEvent *me)
 
 void ScreenPicker::pick()
 {
-	//Someway, on MACOSX 10.7 (Lion) there may be screen refresh events pending at this point.
-	//Process them before picking.
+	// Someway, on MACOSX 10.7 (Lion) there may be screen refresh events pending at this point.
+	// Process them before picking.
 	QCoreApplication::processEvents();
 
 	QColor color(pickScreenRGB(m_geometry));
@@ -127,9 +126,8 @@ void ScreenPicker::paintEvent(QWidget *widget, QPaintEvent *pe)
 
 	QPainter painter(widget);
 
-	QRect relativeGeom(
-		widget->mapFromGlobal(m_geometry.topLeft()),
-		widget->mapFromGlobal(m_geometry.bottomRight()));
+	QRect relativeGeom(widget->mapFromGlobal(m_geometry.topLeft()),
+					   widget->mapFromGlobal(m_geometry.bottomRight()));
 
 	painter.setPen(QColor(0, 0, 255, 128));
 	painter.setBrush(QColor(0, 0, 255, 64));
@@ -157,7 +155,7 @@ void ScreenPicker::startGrab()
 
 class PickScreenCommandHandler : public MenuItemHandler
 {
-public:
+  public:
 	PickScreenCommandHandler(CommandId cmdId) : MenuItemHandler(cmdId) {}
 	void execute()
 	{

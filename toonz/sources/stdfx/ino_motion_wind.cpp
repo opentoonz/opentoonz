@@ -36,18 +36,21 @@ class ino_motion_wind : public TStandardRasterFx
 	// TBoolParamP m_spread;
 	TIntEnumParamP m_ref_mode;
 
-public:
+  public:
 	ino_motion_wind()
 		: m_direction(new TIntEnumParam(0, "Right")), m_dark(false), m_alpha_rendering(true)
 
 		  ,
-		  m_length_min(0.0), m_length_max(18.0), m_length_bias(1.0 * ino::param_range()), m_length_seed(1.0), m_length_ref(false)
+		  m_length_min(0.0), m_length_max(18.0), m_length_bias(1.0 * ino::param_range()),
+		  m_length_seed(1.0), m_length_ref(false)
 
 		  ,
-		  m_force_min(1.0 * ino::param_range()), m_force_max(1.0 * ino::param_range()), m_force_bias(1.0 * ino::param_range()), m_force_seed(1.0), m_force_ref(false)
+		  m_force_min(1.0 * ino::param_range()), m_force_max(1.0 * ino::param_range()),
+		  m_force_bias(1.0 * ino::param_range()), m_force_seed(1.0), m_force_ref(false)
 
 		  ,
-		  m_density_min(1.0 * ino::param_range()), m_density_max(1.0 * ino::param_range()), m_density_bias(1.0 * ino::param_range()), m_density_seed(1.0), m_density_ref(false)
+		  m_density_min(1.0 * ino::param_range()), m_density_max(1.0 * ino::param_range()),
+		  m_density_bias(1.0 * ino::param_range()), m_density_seed(1.0), m_density_ref(false)
 
 		  // , m_spread(true)
 		  ,
@@ -89,28 +92,23 @@ public:
 
 		this->m_length_min->setValueRange(0.0, 1000.0);
 		this->m_length_max->setValueRange(0.0, 1000.0);
-		this->m_length_bias->setValueRange(
-			0.1 * ino::param_range(), 10.0 * ino::param_range()); /* gamma値 */
-		this->m_length_seed->setValueRange(
-			0, std::numeric_limits<unsigned long>::max());
+		this->m_length_bias->setValueRange(0.1 * ino::param_range(),
+										   10.0 * ino::param_range()); /* gamma値 */
+		this->m_length_seed->setValueRange(0, std::numeric_limits<unsigned long>::max());
 
-		this->m_force_min->setValueRange(
-			0.1 * ino::param_range(), 10.0 * ino::param_range()); /* gamma値 */
-		this->m_force_max->setValueRange(
-			0.1 * ino::param_range(), 10.0 * ino::param_range()); /* gamma値 */
-		this->m_force_bias->setValueRange(
-			0.1 * ino::param_range(), 10.0 * ino::param_range()); /* gamma値 */
-		this->m_force_seed->setValueRange(
-			0, std::numeric_limits<unsigned long>::max());
+		this->m_force_min->setValueRange(0.1 * ino::param_range(),
+										 10.0 * ino::param_range()); /* gamma値 */
+		this->m_force_max->setValueRange(0.1 * ino::param_range(),
+										 10.0 * ino::param_range()); /* gamma値 */
+		this->m_force_bias->setValueRange(0.1 * ino::param_range(),
+										  10.0 * ino::param_range()); /* gamma値 */
+		this->m_force_seed->setValueRange(0, std::numeric_limits<unsigned long>::max());
 
-		this->m_density_min->setValueRange(
-			0.0 * ino::param_range(), 100.0 * ino::param_range());
-		this->m_density_max->setValueRange(
-			0.0 * ino::param_range(), 100.0 * ino::param_range());
-		this->m_density_bias->setValueRange(
-			0.1 * ino::param_range(), 10.0 * ino::param_range()); /* gamma値 */
-		this->m_density_seed->setValueRange(
-			0, std::numeric_limits<unsigned long>::max());
+		this->m_density_min->setValueRange(0.0 * ino::param_range(), 100.0 * ino::param_range());
+		this->m_density_max->setValueRange(0.0 * ino::param_range(), 100.0 * ino::param_range());
+		this->m_density_bias->setValueRange(0.1 * ino::param_range(),
+											10.0 * ino::param_range()); /* gamma値 */
+		this->m_density_seed->setValueRange(0, std::numeric_limits<unsigned long>::max());
 
 		this->m_ref_mode->addItem(1, "Green");
 		this->m_ref_mode->addItem(2, "Blue");
@@ -118,16 +116,14 @@ public:
 		this->m_ref_mode->addItem(4, "Luminance");
 		this->m_ref_mode->addItem(-1, "Nothing");
 	}
-	bool doGetBBox(
-		double frame, TRectD &bBox, const TRenderSettings &info)
+	bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info)
 	{
 		if (this->m_input.isConnected()) {
 			const bool ret = this->m_input->doGetBBox(frame, bBox, info);
 			// if ( this->m_spread->getValue() ) {
 			const double min = this->m_length_min->getValue(frame);
 			const double max = this->m_length_max->getValue(frame);
-			const double margin = ceil(
-				ino::pixel_per_mm() * ((min < max) ? max : min));
+			const double margin = ceil(ino::pixel_per_mm() * ((min < max) ? max : min));
 			if (0.0 < margin) {
 				bBox = bBox.enlarge(margin);
 			}
@@ -140,70 +136,68 @@ public:
 	}
 	bool canHandle(const TRenderSettings &info, double frame)
 	{
-		//return true;
+		// return true;
 		return false;
 	}
-	int getMemoryRequirement(
-		const TRectD &rect, double frame, const TRenderSettings &info)
+	int getMemoryRequirement(const TRectD &rect, double frame, const TRenderSettings &info)
 	{
-		const double mm2scale_shrink_pixel =
-			ino::pixel_per_mm() * sqrt(fabs(info.m_affine.det())) / ((info.m_shrinkX + info.m_shrinkY) / 2.0);
+		const double mm2scale_shrink_pixel = ino::pixel_per_mm() * sqrt(fabs(info.m_affine.det())) /
+											 ((info.m_shrinkX + info.m_shrinkY) / 2.0);
 		const double length_min = this->m_length_min->getValue(frame) * mm2scale_shrink_pixel;
 		const double length_max = this->m_length_max->getValue(frame) * mm2scale_shrink_pixel;
-		const int enlarge_pixel = (int)(ceil(
-											(length_min < length_max) ? length_max : length_min) +
-										0.5);
-		return TRasterFx::memorySize(
-			rect.enlarge(enlarge_pixel), info.m_bpp);
+		const int enlarge_pixel =
+			(int)(ceil((length_min < length_max) ? length_max : length_min) + 0.5);
+		return TRasterFx::memorySize(rect.enlarge(enlarge_pixel), info.m_bpp);
 	}
-	void doCompute(
-		TTile &tile, double frame, const TRenderSettings &rend_sets);
+	void doCompute(TTile &tile, double frame, const TRenderSettings &rend_sets);
 };
 FX_PLUGIN_IDENTIFIER(ino_motion_wind, "inoMotionWindFx");
 //------------------------------------------------------------
 #include "igs_motion_wind.h"
 namespace
 {
-void fx_(
-	const TRasterP in_ras // with margin
-	,
-	const TRasterP refer_ras // with margin
-	,
-	const int ref_mode, const int margin, TRasterP out_ras // no margin
+void fx_(const TRasterP in_ras // with margin
+		 ,
+		 const TRasterP refer_ras // with margin
+		 ,
+		 const int ref_mode, const int margin, TRasterP out_ras // no margin
 
-	,
-	const int direction, const bool dark_sw, const bool alpha_rendering_sw
+		 ,
+		 const int direction, const bool dark_sw, const bool alpha_rendering_sw
 
-	,
-	const double length_min, const double length_max, const double length_bias, const unsigned long length_seed, const bool length_ref_sw
+		 ,
+		 const double length_min, const double length_max, const double length_bias,
+		 const unsigned long length_seed, const bool length_ref_sw
 
-	,
-	const double force_min, const double force_max, const double force_bias, const unsigned long force_seed, const bool force_ref_sw
+		 ,
+		 const double force_min, const double force_max, const double force_bias,
+		 const unsigned long force_seed, const bool force_ref_sw
 
-	,
-	const double density_min, const double density_max, const double density_bias, const unsigned long density_seed, const bool density_ref_sw)
+		 ,
+		 const double density_min, const double density_max, const double density_bias,
+		 const unsigned long density_seed, const bool density_ref_sw)
 {
 	/***std::vector<unsigned char> in_vec;
 	ino::ras_to_vec( in_ras, ino::channels(), in_vec );
 	std::vector<unsigned char> refer_vec;
 	ino::ras_to_vec( refer_ras, ino::channels(), refer_vec );***/
 
-	TRasterGR8P in_gr8(
-		in_ras->getLy(), in_ras->getLx() * ino::channels() *
-							 ((TRaster64P)in_ras ? sizeof(unsigned short) : sizeof(unsigned char)));
+	TRasterGR8P in_gr8(in_ras->getLy(),
+					   in_ras->getLx() * ino::channels() *
+						   ((TRaster64P)in_ras ? sizeof(unsigned short) : sizeof(unsigned char)));
 	in_gr8->lock();
 	ino::ras_to_arr(in_ras, ino::channels(), in_gr8->getRawData());
 
 	if (0 != refer_ras) {
-		TRasterGR8P refer_gr8(
-			refer_ras->getLy(), refer_ras->getLx() * ino::channels() *
-									((TRaster64P)refer_ras ? sizeof(unsigned short) : sizeof(unsigned char)));
+		TRasterGR8P refer_gr8(refer_ras->getLy(),
+							  refer_ras->getLx() * ino::channels() * ((TRaster64P)refer_ras
+																		  ? sizeof(unsigned short)
+																		  : sizeof(unsigned char)));
 		refer_gr8->lock();
-		ino::ras_to_arr(
-			refer_ras, ino::channels(), refer_gr8->getRawData());
+		ino::ras_to_arr(refer_ras, ino::channels(), refer_gr8->getRawData());
 
 		igs::motion_wind::change(
-			//in_ras->getRawData() // BGRA
+			// in_ras->getRawData() // BGRA
 			//&in_vec.at(0) // RGBA
 			in_gr8->getRawData() // BGRA
 
@@ -233,12 +227,11 @@ void fx_(
 		/***ino::vec_to_ras( refer_vec, 0, 0 );
 	ino::vec_to_ras( in_vec, ino::channels(), out_ras, margin );***/
 
-		ino::arr_to_ras(
-			in_gr8->getRawData(), ino::channels(), out_ras, margin);
+		ino::arr_to_ras(in_gr8->getRawData(), ino::channels(), out_ras, margin);
 		refer_gr8->unlock();
 	} else {
 		igs::motion_wind::change(
-			//in_ras->getRawData() // BGRA
+			// in_ras->getRawData() // BGRA
 			//&in_vec.at(0) // RGBA
 			in_gr8->getRawData() // BGRA
 
@@ -268,15 +261,13 @@ void fx_(
 		/***ino::vec_to_ras( refer_vec, 0, 0 );
 	ino::vec_to_ras( in_vec, ino::channels(), out_ras, margin );***/
 
-		ino::arr_to_ras(
-			in_gr8->getRawData(), ino::channels(), out_ras, margin);
+		ino::arr_to_ras(in_gr8->getRawData(), ino::channels(), out_ras, margin);
 	}
 	in_gr8->unlock();
 }
 }
 //------------------------------------------------------------
-void ino_motion_wind::doCompute(
-	TTile &tile, double frame, const TRenderSettings &rend_sets)
+void ino_motion_wind::doCompute(TTile &tile, double frame, const TRenderSettings &rend_sets)
 {
 	/* ------ 接続していなければ処理しない -------------------- */
 	if (!this->m_input.isConnected()) {
@@ -285,8 +276,7 @@ void ino_motion_wind::doCompute(
 	}
 
 	/* ------ サポートしていないPixelタイプはエラーを投げる --- */
-	if (!((TRaster32P)tile.getRaster()) &&
-		!((TRaster64P)tile.getRaster())) {
+	if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster())) {
 		throw TRopException("unsupported input pixel type");
 	}
 
@@ -298,8 +288,9 @@ void ino_motion_wind::doCompute(
 		rend_sets.m_shrinkX // int
 		rend_sets.m_shrinkY // int
 	*/
-	const double mm2scale_shrink_pixel =
-		ino::pixel_per_mm() * sqrt(fabs(rend_sets.m_affine.det())) / ((rend_sets.m_shrinkX + rend_sets.m_shrinkY) / 2.0);
+	const double mm2scale_shrink_pixel = ino::pixel_per_mm() *
+										 sqrt(fabs(rend_sets.m_affine.det())) /
+										 ((rend_sets.m_shrinkX + rend_sets.m_shrinkY) / 2.0);
 
 	/* 動作パラメータを得る */
 	const int direction = this->m_direction->getValue();
@@ -308,31 +299,20 @@ void ino_motion_wind::doCompute(
 
 	const double length_min = this->m_length_min->getValue(frame) * mm2scale_shrink_pixel;
 	const double length_max = this->m_length_max->getValue(frame) * mm2scale_shrink_pixel;
-	const double length_bias = this->m_length_bias->getValue(frame) /
-							   ino::param_range();
-	const unsigned long length_seed =
-		this->m_length_seed->getValue(frame);
+	const double length_bias = this->m_length_bias->getValue(frame) / ino::param_range();
+	const unsigned long length_seed = this->m_length_seed->getValue(frame);
 	const bool length_ref_sw = this->m_length_ref->getValue();
 
-	const double force_min = this->m_force_min->getValue(frame) /
-							 ino::param_range();
-	const double force_max = this->m_force_max->getValue(frame) /
-							 ino::param_range();
-	const double force_bias = this->m_force_bias->getValue(frame) /
-							  ino::param_range();
-	const unsigned long force_seed =
-		this->m_force_seed->getValue(frame);
+	const double force_min = this->m_force_min->getValue(frame) / ino::param_range();
+	const double force_max = this->m_force_max->getValue(frame) / ino::param_range();
+	const double force_bias = this->m_force_bias->getValue(frame) / ino::param_range();
+	const unsigned long force_seed = this->m_force_seed->getValue(frame);
 	const bool force_ref_sw = this->m_force_ref->getValue();
 
-	const double density_min = this->m_density_min->getValue(frame) /
-							   ino::param_range();
-	const double density_max = this->m_density_max->getValue(frame) /
-							   ino::param_range();
-	const double density_bias =
-		this->m_density_bias->getValue(frame) /
-		ino::param_range();
-	const unsigned long density_seed =
-		this->m_density_seed->getValue(frame);
+	const double density_min = this->m_density_min->getValue(frame) / ino::param_range();
+	const double density_max = this->m_density_max->getValue(frame) / ino::param_range();
+	const double density_bias = this->m_density_bias->getValue(frame) / ino::param_range();
+	const unsigned long density_seed = this->m_density_seed->getValue(frame);
 	const bool density_ref_sw = this->m_density_ref->getValue();
 	const int ref_mode = this->m_ref_mode->getValue();
 
@@ -348,20 +328,18 @@ void ino_motion_wind::doCompute(
 			, y1(bottomLeft.y+d.ly)
 		{}
 	*/
-	TRectD enlarge_rect = TRectD(
-		tile.m_pos /* TPointD */
-		,
-		TDimensionD(/* int --> doubleにしてセット */
-					tile.getRaster()->getLx(), tile.getRaster()->getLy()));
+	TRectD enlarge_rect = TRectD(tile.m_pos /* TPointD */
+								 ,
+								 TDimensionD(/* int --> doubleにしてセット */
+											 tile.getRaster()->getLx(), tile.getRaster()->getLy()));
 	/* BBoxの拡大 Pixel単位 */
-	const int enlarge_pixel = (int)(ceil(
-										(length_min < length_max) ? length_max : length_min) +
-									0.5);
+	const int enlarge_pixel =
+		(int)(ceil((length_min < length_max) ? length_max : length_min) + 0.5);
 	enlarge_rect = enlarge_rect.enlarge(enlarge_pixel);
 
 	/*	void TRasterFx::allocateAndCompute(
-			TTile &tile, 
-			const TPointD &pos, const TDimension &size, 
+			TTile &tile,
+			const TPointD &pos, const TDimension &size,
 			const TRasterP &templateRas, double frame,
 			const TRenderSettings &info
 		) {
@@ -376,8 +354,9 @@ void ino_motion_wind::doCompute(
 	*/
 	TTile enlarge_tile;
 	this->m_input->allocateAndCompute(
-		enlarge_tile, enlarge_rect.getP00(), TDimensionI(/* Pixel単位のdouble -> intにしてセット */
-														 (int)(enlarge_rect.getLx() + 0.5), (int)(enlarge_rect.getLy() + 0.5)),
+		enlarge_tile, enlarge_rect.getP00(),
+		TDimensionI(/* Pixel単位のdouble -> intにしてセット */
+					(int)(enlarge_rect.getLx() + 0.5), (int)(enlarge_rect.getLy() + 0.5)),
 		tile.getRaster(), frame, rend_sets);
 
 	/* ------ 保存すべき画像メモリを塗りつぶしクリア ---------- */
@@ -392,8 +371,9 @@ void ino_motion_wind::doCompute(
 			// tile.m_pos,
 			// tile.getRaster()->getSize(),
 			,
-			enlarge_rect.getP00(), TDimensionI(/* Pixel単位のdouble -> intにしてセット */
-											   (int)(enlarge_rect.getLx() + 0.5), (int)(enlarge_rect.getLy() + 0.5)),
+			enlarge_rect.getP00(),
+			TDimensionI(/* Pixel単位のdouble -> intにしてセット */
+						(int)(enlarge_rect.getLx() + 0.5), (int)(enlarge_rect.getLy() + 0.5)),
 			tile.getRaster(), frame, rend_sets);
 	}
 
@@ -403,42 +383,26 @@ void ino_motion_wind::doCompute(
 	if (log_sw) {
 		std::ostringstream os;
 		os << "params"
-		   << "  dir " << direction
-		   << "  dark_sw " << dark_sw
-		   << "  alp_rend_sw " << alp_rend_sw
+		   << "  dir " << direction << "  dark_sw " << dark_sw << "  alp_rend_sw " << alp_rend_sw
 
-		   << "  len_min " << length_min
-		   << "  len_max " << length_max
-		   << "  len_bias " << length_bias
-		   << "  len_seed " << length_seed
-		   << "  len_ref_sw " << length_ref_sw
+		   << "  len_min " << length_min << "  len_max " << length_max << "  len_bias "
+		   << length_bias << "  len_seed " << length_seed << "  len_ref_sw " << length_ref_sw
 
-		   << "  for_min " << force_min
-		   << "  for_max " << force_max
-		   << "  for_bias " << force_bias
-		   << "  for_seed " << force_seed
-		   << "  for_ref_sw " << force_ref_sw
+		   << "  for_min " << force_min << "  for_max " << force_max << "  for_bias " << force_bias
+		   << "  for_seed " << force_seed << "  for_ref_sw " << force_ref_sw
 
-		   << "  den_min " << density_min
-		   << "  den_max " << density_max
-		   << "  den_bias " << density_bias
-		   << "  den_seed " << density_seed
-		   << "  den_ref_sw " << density_ref_sw
+		   << "  den_min " << density_min << "  den_max " << density_max << "  den_bias "
+		   << density_bias << "  den_seed " << density_seed << "  den_ref_sw " << density_ref_sw
 		   << "  reference " << ref_mode
 
-		   << "   tile w " << tile.getRaster()->getLx()
-		   << "  h " << tile.getRaster()->getLy()
+		   << "   tile w " << tile.getRaster()->getLx() << "  h " << tile.getRaster()->getLy()
 		   << "  pixbits " << ino::pixel_bits(tile.getRaster());
 		if (refer_cn_is) {
-			os
-				<< "   rtile w " << refer_tile.getRaster()->getLx()
-				<< "  h " << refer_tile.getRaster()->getLy();
+			os << "   rtile w " << refer_tile.getRaster()->getLx() << "  h "
+			   << refer_tile.getRaster()->getLy();
 		}
-		os
-			<< "   frame " << frame
-			<< "   rand_sets affine_det " << rend_sets.m_affine.det()
-			<< "  shrink x " << rend_sets.m_shrinkX
-			<< "  y " << rend_sets.m_shrinkY;
+		os << "   frame " << frame << "   rand_sets affine_det " << rend_sets.m_affine.det()
+		   << "  shrink x " << rend_sets.m_shrinkX << "  y " << rend_sets.m_shrinkY;
 	}
 	/* ------ fx処理 ------------------------------------------ */
 	try {
@@ -446,8 +410,7 @@ void ino_motion_wind::doCompute(
 		if (refer_cn_is) {
 			refer_tile.getRaster()->lock();
 		}
-		fx_(
-			enlarge_tile.getRaster() // in with margin
+		fx_(enlarge_tile.getRaster() // in with margin
 			,
 			(refer_cn_is ? refer_tile.getRaster() : nullptr) // with margin
 			,

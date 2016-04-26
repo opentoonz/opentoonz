@@ -13,14 +13,15 @@ std::map<QString, TSoundTrackWriterCreateProc *> SoundTrackWriterTable;
 
 //-----------------------------------------------------------
 
-TSoundTrackReader::TSoundTrackReader(const TFilePath &fp)
-	: TSmartObject(m_classCode), m_path(fp)
+TSoundTrackReader::TSoundTrackReader(const TFilePath &fp) : TSmartObject(m_classCode), m_path(fp)
 {
 }
 
 //-----------------------------------------------------------
 
-TSoundTrackReader::~TSoundTrackReader() {}
+TSoundTrackReader::~TSoundTrackReader()
+{
+}
 
 //===========================================================
 
@@ -41,14 +42,15 @@ TSoundTrackReaderP::TSoundTrackReaderP(const TFilePath &path)
 
 //===========================================================
 
-TSoundTrackWriter::TSoundTrackWriter(const TFilePath &fp)
-	: TSmartObject(m_classCode), m_path(fp)
+TSoundTrackWriter::TSoundTrackWriter(const TFilePath &fp) : TSmartObject(m_classCode), m_path(fp)
 {
 }
 
 //-----------------------------------------------------------
 
-TSoundTrackWriter::~TSoundTrackWriter() {}
+TSoundTrackWriter::~TSoundTrackWriter()
+{
+}
 
 //===========================================================
 
@@ -83,9 +85,9 @@ bool TSoundTrackReader::load(const TFilePath &path, TSoundTrackP &st)
 
 void TSoundTrackReader::getSupportedFormats(QStringList &names)
 {
-	for (std::map<QString, TSoundTrackReaderCreateProc *>::iterator it = SoundTrackReaderTable.begin();
-		 it != SoundTrackReaderTable.end();
-		 ++it) {
+	for (std::map<QString, TSoundTrackReaderCreateProc *>::iterator it =
+			 SoundTrackReaderTable.begin();
+		 it != SoundTrackReaderTable.end(); ++it) {
 		names.push_back(it->first);
 	}
 }
@@ -100,9 +102,9 @@ bool TSoundTrackWriter::save(const TFilePath &path, const TSoundTrackP &st)
 
 void TSoundTrackWriter::getSupportedFormats(QStringList &names)
 {
-	for (std::map<QString, TSoundTrackWriterCreateProc *>::iterator it = SoundTrackWriterTable.begin();
-		 it != SoundTrackWriterTable.end();
-		 ++it) {
+	for (std::map<QString, TSoundTrackWriterCreateProc *>::iterator it =
+			 SoundTrackWriterTable.begin();
+		 it != SoundTrackWriterTable.end(); ++it) {
 		names.push_back(it->first);
 	}
 }
@@ -113,18 +115,14 @@ void TSoundTrackWriter::getSupportedFormats(QStringList &names)
 //
 //===========================================================
 
-void TSoundTrackReader::define(
-	QString extension,
-	TSoundTrackReaderCreateProc *proc)
+void TSoundTrackReader::define(QString extension, TSoundTrackReaderCreateProc *proc)
 {
 	SoundTrackReaderTable[extension] = proc;
 }
 
 //-----------------------------------------------------------
 
-void TSoundTrackWriter::define(
-	QString extension,
-	TSoundTrackWriterCreateProc *proc)
+void TSoundTrackWriter::define(QString extension, TSoundTrackWriterCreateProc *proc)
 {
 	SoundTrackWriterTable[extension] = proc;
 }

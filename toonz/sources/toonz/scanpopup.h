@@ -22,8 +22,7 @@ class ProgressDialog;
 // MyScannerListener
 //-----------------------------------------------------------------------------
 
-class MyScannerListener : public QObject,
-						  public TScannerListener
+class MyScannerListener : public QObject, public TScannerListener
 {
 	Q_OBJECT
 
@@ -33,7 +32,7 @@ class MyScannerListener : public QObject,
 	bool m_isCanceled, m_isPreview;
 	DVGui::ProgressDialog *m_progressDialog;
 
-public:
+  public:
 	MyScannerListener(const ScanList &scanList);
 	void onImage(const TRasterImageP &);
 	void onError();
@@ -41,7 +40,7 @@ public:
 	void onAutomaticallyNextPaper();
 	bool isCanceled();
 
-protected slots:
+  protected slots:
 	void cancelButtonPressed();
 };
 
@@ -54,10 +53,10 @@ class DefineScannerPopup : public DVGui::Dialog
 	Q_OBJECT
 	QComboBox *m_scanDriverOm;
 
-public:
+  public:
 	DefineScannerPopup();
 
-public slots:
+  public slots:
 	void accept();
 };
 
@@ -82,16 +81,16 @@ class ScanSettingsPopup : public DVGui::Dialog
 	QLabel *m_brightnessLbl;
 	QLabel *m_dpiLbl;
 
-public:
+  public:
 	ScanSettingsPopup();
 
-protected:
+  protected:
 	void showEvent(QShowEvent *event);
 	void hideEvent(QHideEvent *event);
 	void connectAll();
 	void disconnectAll();
 
-public slots:
+  public slots:
 	void updateUI();
 	void onToggle(int);
 	void onPaperChanged(const QString &format);
@@ -111,16 +110,16 @@ class AutocenterPopup : public DVGui::Dialog
 	QComboBox *m_pegbarHoles;
 	QComboBox *m_fieldGuide;
 
-public:
+  public:
 	AutocenterPopup();
 
-protected:
+  protected:
 	void showEvent(QShowEvent *event);
 
-protected slots:
+  protected slots:
 	void onAutocenterToggled(bool);
 	void onPegbarHolesChanged(const QString &);
 	void onFieldGuideChanged(const QString &);
 };
-#endif //LINETEST
+#endif // LINETEST
 #endif // SCANPOPUP_H

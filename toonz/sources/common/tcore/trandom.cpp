@@ -4,8 +4,7 @@
 
 TRandom::RANDOM_FLOAT_TYPE TRandom::RandomFloatType = TRandom::RANDOM_FLOAT_TYPE_NONE;
 
-TRandom::TRandom(UINT _seed)
-	: seed(_seed)
+TRandom::TRandom(UINT _seed) : seed(_seed)
 {
 	if (RandomFloatType == TRandom::RANDOM_FLOAT_TYPE_NONE)
 		setRandomFloatType();
@@ -168,28 +167,28 @@ double TRandom::getDouble() // [0,1[
 
 /*
 // questa parte e' stata commentata perche' su tutte le piattaforme il tipo
-//di float e' RANDOM_FLOAT_TYPE_1ma su irix c'e' bisogno di eseguire le 
+//di float e' RANDOM_FLOAT_TYPE_1ma su irix c'e' bisogno di eseguire le
 //istruzioni sotto RANDOM_FLOAT_TYPE_2
 switch (RandomFloatType)
   {
   case RANDOM_FLOAT_TYPE_1:
-                             *retH = high;
-                             *retH &= 0x00efffff;
-                             *retH |= 0x3f000000;
+							 *retH = high;
+							 *retH &= 0x00efffff;
+							 *retH |= 0x3f000000;
 
-                             *retL = low ;
+							 *retL = low ;
 // vecchi commenti
 //                             *retH = high;
 //                             *retL = (low >> 5) & 0x007fffff | 0x3ff00000;
 
-                             return value;
-                             break;
+							 return value;
+							 break;
    case RANDOM_FLOAT_TYPE_2: *retH = low;
-                             *retL = (high >> 5) & 0x007fffff | 0x3ff00000;
-                             break;
+							 *retL = (high >> 5) & 0x007fffff | 0x3ff00000;
+							 break;
 										//!!!!!occhio andrebbe sopra il break
-                             return value-1.0;
-  default: assert (0);  
+							 return value-1.0;
+  default: assert (0);
   }
 return -1;
 */

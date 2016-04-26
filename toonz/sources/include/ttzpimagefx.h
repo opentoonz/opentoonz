@@ -34,11 +34,11 @@
 
 class DVAPI ExternalPaletteFxRenderData : public TRasterFxRenderData
 {
-public:
+  public:
 	TPaletteP m_palette;
 	std::string m_name;
 
-public:
+  public:
 	ExternalPaletteFxRenderData(TPaletteP palette, const std::string &name);
 
 	float typeIndex() const { return 0.0f; }
@@ -51,23 +51,25 @@ public:
 //    PaletteFilterFxRenderData  declaration
 //**********************************************************************************************
 
-enum FilterType { eApplyToInksAndPaints = 0,
-				  eApplyToInksKeepingAllPaints,
-				  eApplyToPaintsKeepingAllInks,
-				  eApplyToInksAndPaints_NoGap,
-				  eApplyToInksDeletingAllPaints,
-				  eApplyToPaintsDeletingAllInks };
+enum FilterType {
+	eApplyToInksAndPaints = 0,
+	eApplyToInksKeepingAllPaints,
+	eApplyToPaintsKeepingAllInks,
+	eApplyToInksAndPaints_NoGap,
+	eApplyToInksDeletingAllPaints,
+	eApplyToPaintsDeletingAllInks
+};
 
 //------------------------------------------------------------------------------
 
 class DVAPI PaletteFilterFxRenderData : public TRasterFxRenderData
 {
-public:
+  public:
 	bool m_keep;
 	FilterType m_type;
 	std::set<int> m_colors;
 
-public:
+  public:
 	PaletteFilterFxRenderData();
 
 	float typeIndex() const { return (m_type == eApplyToInksAndPaints) ? 0.5f : 1.0f; }
@@ -85,32 +87,32 @@ void DVAPI parseIndexes(std::string indexes, std::vector<std::string> &items);
 //    SandorFxRenderData  (possible) parameters
 //**********************************************************************************************
 
-enum Type { BlendTz,
-			Calligraphic,
-			ArtAtContour,
-			OutBorder };
+enum Type { BlendTz, Calligraphic, ArtAtContour, OutBorder };
 
 //------------------------------------------------------------------------------
 
 class DVAPI BlendTzParams
 {
-public:
+  public:
 	std::wstring m_colorIndex;
 	bool m_noBlending;
 	double m_amount;
 	double m_smoothness;
 	int m_superSampling;
 
-public:
+  public:
 	BlendTzParams()
-		: m_colorIndex(L""), m_noBlending(false), m_amount(0.0), m_smoothness(0.0), m_superSampling(0) {}
+		: m_colorIndex(L""), m_noBlending(false), m_amount(0.0), m_smoothness(0.0),
+		  m_superSampling(0)
+	{
+	}
 };
 
 //------------------------------------------------------------------------------
 
 class DVAPI CalligraphicParams
 {
-public:
+  public:
 	std::wstring m_colorIndex;
 	double m_thickness;
 	double m_horizontal;
@@ -120,16 +122,19 @@ public:
 	double m_accuracy;
 	double m_noise;
 
-public:
+  public:
 	CalligraphicParams()
-		: m_thickness(0.0), m_horizontal(0.0), m_vertical(0.0), m_upWDiagonal(0.0), m_doWDiagonal(0.0), m_accuracy(0.0), m_noise(0.0), m_colorIndex(L"") {}
+		: m_thickness(0.0), m_horizontal(0.0), m_vertical(0.0), m_upWDiagonal(0.0),
+		  m_doWDiagonal(0.0), m_accuracy(0.0), m_noise(0.0), m_colorIndex(L"")
+	{
+	}
 };
 
 //------------------------------------------------------------------------------
 
 class DVAPI ArtAtContourParams
 {
-public:
+  public:
 	double m_maxSize;
 	double m_minSize;
 	double m_maxOrientation;
@@ -143,9 +148,13 @@ public:
 	bool m_includeAlpha;
 	std::wstring m_colorIndex;
 
-public:
+  public:
 	ArtAtContourParams()
-		: m_maxSize(0.0), m_minSize(0.0), m_maxOrientation(0.0), m_minOrientation(0.0), m_randomness(false), m_maxDistance(0.0), m_minDistance(0.0), m_density(0.0), m_keepLine(false), m_keepColor(false), m_includeAlpha(true), m_colorIndex(L"") {}
+		: m_maxSize(0.0), m_minSize(0.0), m_maxOrientation(0.0), m_minOrientation(0.0),
+		  m_randomness(false), m_maxDistance(0.0), m_minDistance(0.0), m_density(0.0),
+		  m_keepLine(false), m_keepColor(false), m_includeAlpha(true), m_colorIndex(L"")
+	{
+	}
 };
 
 //**********************************************************************************************
@@ -154,7 +163,7 @@ public:
 
 class DVAPI SandorFxRenderData : public TRasterFxRenderData
 {
-public:
+  public:
 	Type m_type;
 	BlendTzParams m_blendParams;
 	CalligraphicParams m_callParams;
@@ -166,9 +175,10 @@ public:
 	TRasterP m_controller;
 	std::string m_controllerAlias;
 
-public:
+  public:
 	SandorFxRenderData(Type type, int argc, const char *argv[], int border, int shrink,
-					   const TRectD &controllerBBox = TRectD(), const TRasterP &controller = TRasterP());
+					   const TRectD &controllerBBox = TRectD(),
+					   const TRasterP &controller = TRasterP());
 
 	float typeIndex() const { return (m_type == BlendTz) ? 2.0f : 3.0f; }
 

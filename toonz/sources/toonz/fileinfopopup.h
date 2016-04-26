@@ -38,7 +38,7 @@ class FileInfoPopup : public DVGui::Dialog
 
 	void drawpair(TPoint p, std::pair<std::string, std::string> &StringPair);
 
-public:
+  public:
 	FileInfoPopup();
 
 	void configureNotify(const TDimension &size);

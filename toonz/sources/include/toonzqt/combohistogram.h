@@ -44,14 +44,14 @@ class DVAPI ComboHistoRGBLabel : public QWidget
 {
 	QColor m_color;
 
-public:
+  public:
 	ComboHistoRGBLabel(QColor color, QWidget *parent);
 
 	~ComboHistoRGBLabel() {}
 
 	void setColorAndUpdate(QColor color);
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *pe);
 };
 
@@ -65,7 +65,7 @@ class DVAPI ChannelHistoGraph : public QWidget
 
 	int m_pickedValue;
 
-public:
+  public:
 	int *m_channelValuePtr;
 
 	ChannelHistoGraph(QWidget *parent = 0, int *channelValue = 0);
@@ -75,7 +75,7 @@ public:
 
 	void showCurrentChannelValue(int val);
 
-protected:
+  protected:
 	virtual void paintEvent(QPaintEvent *event);
 };
 
@@ -89,13 +89,13 @@ class DVAPI RGBHistoGraph : public ChannelHistoGraph
 
 	QImage m_histoImg;
 
-public:
+  public:
 	RGBHistoGraph(QWidget *parent = 0, int *channelValue = 0);
 	~RGBHistoGraph();
 
 	void setValues();
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *event);
 };
 //-----------------------------------------------------------------------------
@@ -105,11 +105,11 @@ class DVAPI ChannelColorBar : public QWidget
 	Q_OBJECT
 	QColor m_color;
 
-public:
+  public:
 	ChannelColorBar(QWidget *parent = 0, QColor m_color = QColor());
 	~ChannelColorBar() {}
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *event);
 };
 
@@ -122,18 +122,15 @@ class DVAPI ChannelHisto : public QWidget
 	ChannelHistoGraph *m_histogramGraph;
 	ChannelColorBar *m_colorBar;
 
-public:
+  public:
 	ChannelHisto(int channelIndex, int *channelValue, QWidget *parent = 0);
 	~ChannelHisto() {}
 
-	void refleshValue()
-	{
-		m_histogramGraph->setValues();
-	}
+	void refleshValue() { m_histogramGraph->setValues(); }
 
 	void showCurrentChannelValue(int val);
 
-protected slots:
+  protected slots:
 	void onShowAlphaButtonToggled(bool visible);
 };
 
@@ -146,10 +143,10 @@ class DVAPI ComboHistogram : public QWidget
 	TRasterP m_raster;
 	TPaletteP m_palette;
 
-	//rgba channels
+	// rgba channels
 	int m_channelValue[4][COMBOHIST_RESOLUTION_W];
 
-	//rgba channels + composited
+	// rgba channels + composited
 	ChannelHisto *m_histograms[5];
 
 	ComboHistoRGBLabel *m_rgbLabel;
@@ -159,7 +156,7 @@ class DVAPI ComboHistogram : public QWidget
 	QLabel *m_xPosLabel;
 	QLabel *m_yPosLabel;
 
-public:
+  public:
 	ComboHistogram(QWidget *parent = 0);
 	~ComboHistogram();
 
@@ -168,7 +165,7 @@ public:
 	void updateInfo(const TPixel32 &pix, const TPointD &imagePos);
 	void updateAverageColor(const TPixel32 &pix);
 
-protected:
+  protected:
 	void computeChannelsValue();
 };
 

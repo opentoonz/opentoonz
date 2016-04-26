@@ -6,13 +6,13 @@ extern "C" {
 #endif
 
 #ifdef NOTE
-ConvertOneValue2Enum()
-		potrebbe essere fonte di errore se DCItemSize[one_value.ItemType] > DCItemSize[TW_INT8] e si utilizzano i bit piu significativi di one_value.Item
-																			ConvertEnumeration2Range()
-																				potrebbe restituire valori di StepSize non appropriati se
-																			enumeration.ItemType e TW_FIX32
-																			potrebbe restituire valori MinValue non corretti se DCItemSize[xxx.ItemType] > DCItemSize[TW_INT8] e si utilizzano i bit piu significativi di xxx.Item
-																																						   ConvertEnum2OneValue ritorna(ovviamente) solo il valore corrente
+ConvertOneValue2Enum() potrebbe essere fonte di errore se DCItemSize[one_value.ItemType] >
+	DCItemSize[TW_INT8] e si utilizzano i bit piu significativi di one_value.Item
+	ConvertEnumeration2Range() potrebbe restituire valori di StepSize non appropriati se
+	enumeration.ItemType e TW_FIX32 potrebbe restituire valori MinValue non corretti se
+	DCItemSize[xxx.ItemType] >
+	DCItemSize[TW_INT8] e si utilizzano i bit piu significativi di xxx.Item ConvertEnum2OneValue
+	ritorna(ovviamente) solo il valore corrente
 #endif
 
 #include <assert.h>
@@ -25,28 +25,17 @@ ConvertOneValue2Enum()
 
 #include "ttwain_global_def.h"
 
-#define CASE \
-	break;   \
+#define CASE                                                                                       \
+	break;                                                                                         \
 	case
-#define DEFAULT \
-	break;      \
+#define DEFAULT                                                                                    \
+	break;                                                                                         \
 	default
-																																						   /*---------------------------------------------------------------------------*/
-																																						   static const size_t DCItemSize[13] =
-	{
-		sizeof(TW_INT8),
-		sizeof(TW_INT16),
-		sizeof(TW_INT32),
-		sizeof(TW_UINT8),
-		sizeof(TW_UINT16),
-		sizeof(TW_UINT32),
-		sizeof(TW_BOOL),
-		sizeof(TW_FIX32),
-		sizeof(TW_FRAME),
-		sizeof(TW_STR32),
-		sizeof(TW_STR64),
-		sizeof(TW_STR128),
-		sizeof(TW_STR255),
+	/*---------------------------------------------------------------------------*/
+	static const size_t DCItemSize[13] = {
+	sizeof(TW_INT8),   sizeof(TW_INT16),  sizeof(TW_INT32),  sizeof(TW_UINT8), sizeof(TW_UINT16),
+	sizeof(TW_UINT32), sizeof(TW_BOOL),   sizeof(TW_FIX32),  sizeof(TW_FRAME), sizeof(TW_STR32),
+	sizeof(TW_STR64),  sizeof(TW_STR128), sizeof(TW_STR255),
 }; /* see twain.h */
 
 /*---------------------------------------------------------------------------*/
@@ -62,14 +51,12 @@ static TUINT32 GetContainerSize(int nFormat, unsigned twty, TW_UINT32 nItems);
 static int TTWAIN_GetCapability(TW_INT16 msgType, TW_UINT16 cap_id, TW_UINT16 conType, void *data,
 								TUINT32 *cont_size);
 /*------------------------------------------------------------------------*/
-int TTWAIN_GetCap(TW_UINT16 cap_id, TW_UINT16 conType, void *data,
-				  TUINT32 *cont_size)
+int TTWAIN_GetCap(TW_UINT16 cap_id, TW_UINT16 conType, void *data, TUINT32 *cont_size)
 {
 	return TTWAIN_GetCapability(MSG_GET, cap_id, conType, data, cont_size);
 }
 /*------------------------------------------------------------------------*/
-int TTWAIN_GetCapCurrent(TW_UINT16 cap_id, TW_UINT16 conType, void *data,
-						 TUINT32 *cont_size)
+int TTWAIN_GetCapCurrent(TW_UINT16 cap_id, TW_UINT16 conType, void *data, TUINT32 *cont_size)
 {
 	return TTWAIN_GetCapability(MSG_GETCURRENT, cap_id, conType, data, cont_size);
 }
@@ -125,18 +112,20 @@ static int TTWAIN_GetCapability(TW_INT16 msgType, TW_UINT16 cap_id, TW_UINT16 co
 
 	if (cont_size) {
 		switch (TWON_TWON(cap.ConType, conType)) {
-			CASE TWON_TWON(TWON_ENUMERATION, TWON_ENUMERATION) :
-																	 *cont_size = GetContainerSize(TWON_ENUMERATION, my_enum->ItemType, my_enum->NumItems);
-			CASE TWON_TWON(TWON_ONEVALUE, TWON_ENUMERATION) :
-																  *cont_size = GetContainerSize(TWON_ENUMERATION, my_one->ItemType, 1);
-			CASE TWON_TWON(TWON_ARRAY, TWON_ARRAY) :
-														 *cont_size = GetContainerSize(TWON_ARRAY, my_array->ItemType, my_array->NumItems);
-			CASE TWON_TWON(TWON_ONEVALUE, TWON_ONEVALUE) :
-															   *cont_size = GetContainerSize(TWON_ONEVALUE, my_one->ItemType, 1);
-			CASE TWON_TWON(TWON_ENUMERATION, TWON_ARRAY) :
-															   *cont_size = GetContainerSize(TWON_ARRAY, my_enum->ItemType, my_enum->NumItems);
+			CASE TWON_TWON(TWON_ENUMERATION, TWON_ENUMERATION)
+				: *cont_size =
+					  GetContainerSize(TWON_ENUMERATION, my_enum->ItemType, my_enum->NumItems);
+			CASE TWON_TWON(TWON_ONEVALUE, TWON_ENUMERATION)
+				: *cont_size = GetContainerSize(TWON_ENUMERATION, my_one->ItemType, 1);
+			CASE TWON_TWON(TWON_ARRAY, TWON_ARRAY)
+				: *cont_size = GetContainerSize(TWON_ARRAY, my_array->ItemType, my_array->NumItems);
+			CASE TWON_TWON(TWON_ONEVALUE, TWON_ONEVALUE)
+				: *cont_size = GetContainerSize(TWON_ONEVALUE, my_one->ItemType, 1);
+			CASE TWON_TWON(TWON_ENUMERATION, TWON_ARRAY)
+				: *cont_size = GetContainerSize(TWON_ARRAY, my_enum->ItemType, my_enum->NumItems);
 		DEFAULT:
-			/*      tmsg_error("Unable to convert type %d to %d (cap 0x%x)\n", cap.ConType, conType,cap_id);*/
+			/*      tmsg_error("Unable to convert type %d to %d (cap 0x%x)\n", cap.ConType,
+			 * conType,cap_id);*/
 			assert(0);
 			GLOBAL_UNLOCK(cap.hContainer);
 			GLOBAL_FREE(cap.hContainer);
@@ -148,25 +137,32 @@ static int TTWAIN_GetCapability(TW_INT16 msgType, TW_UINT16 cap_id, TW_UINT16 co
 	}
 
 	switch (TWON_TWON(cap.ConType, conType)) {
-		CASE TWON_TWON(TWON_ENUMERATION, TWON_ENUMERATION) : size = GetContainerSize(cap.ConType, my_enum->ItemType, my_enum->NumItems);
+		CASE TWON_TWON(TWON_ENUMERATION, TWON_ENUMERATION)
+			: size = GetContainerSize(cap.ConType, my_enum->ItemType, my_enum->NumItems);
 		memcpy(data, my_enum, size);
 
-		CASE TWON_TWON(TWON_ENUMERATION, TWON_RANGE) : ConvertEnumeration2Range(*my_enum, (TW_RANGE *)data);
+		CASE TWON_TWON(TWON_ENUMERATION, TWON_RANGE)
+			: ConvertEnumeration2Range(*my_enum, (TW_RANGE *)data);
 
-		CASE TWON_TWON(TWON_ENUMERATION, TWON_ONEVALUE) : ConvertEnum2OneValue(*my_enum, (TW_ONEVALUE *)data);
+		CASE TWON_TWON(TWON_ENUMERATION, TWON_ONEVALUE)
+			: ConvertEnum2OneValue(*my_enum, (TW_ONEVALUE *)data);
 
-		CASE TWON_TWON(TWON_ARRAY, TWON_ARRAY) : size = GetContainerSize(cap.ConType, my_array->ItemType, my_array->NumItems);
+		CASE TWON_TWON(TWON_ARRAY, TWON_ARRAY)
+			: size = GetContainerSize(cap.ConType, my_array->ItemType, my_array->NumItems);
 		memcpy(data, my_array, size);
 
 		CASE TWON_TWON(TWON_ONEVALUE, TWON_ONEVALUE) : memcpy(data, my_one, sizeof(TW_ONEVALUE));
 
-		CASE TWON_TWON(TWON_ONEVALUE, TWON_RANGE) : ConvertOneValue2Range(*my_one, (TW_RANGE *)data);
+		CASE TWON_TWON(TWON_ONEVALUE, TWON_RANGE)
+			: ConvertOneValue2Range(*my_one, (TW_RANGE *)data);
 
-		CASE TWON_TWON(TWON_ONEVALUE, TWON_ENUMERATION) : ConvertOneValue2Enum(*my_one, (TW_ENUMERATION *)data);
+		CASE TWON_TWON(TWON_ONEVALUE, TWON_ENUMERATION)
+			: ConvertOneValue2Enum(*my_one, (TW_ENUMERATION *)data);
 
 		CASE TWON_TWON(TWON_RANGE, TWON_RANGE) : memcpy(data, my_range, sizeof(TW_RANGE));
 
-		CASE TWON_TWON(TWON_ENUMERATION, TWON_ARRAY) : ConvertEnum2Array(*my_enum, (TW_ARRAY *)data);
+		CASE TWON_TWON(TWON_ENUMERATION, TWON_ARRAY)
+			: ConvertEnum2Array(*my_enum, (TW_ARRAY *)data);
 
 	DEFAULT:
 		assert(0);
@@ -252,8 +248,7 @@ static int ConvertEnum2Array(TW_ENUMERATION tw_enum, TW_ARRAY *array)
 /*---------------------------------------------------------------------------*/
 /*	      SET CAP							     */
 /*---------------------------------------------------------------------------*/
-int TTWAIN_SetCap(TW_UINT16 cap_id, TW_UINT16 conType, TW_UINT16 itemType,
-				  TW_UINT32 *value)
+int TTWAIN_SetCap(TW_UINT16 cap_id, TW_UINT16 conType, TW_UINT16 itemType, TW_UINT32 *value)
 {
 	int rc = FALSE;
 	TUINT32 size;

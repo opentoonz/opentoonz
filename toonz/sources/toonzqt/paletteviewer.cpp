@@ -66,15 +66,20 @@ using namespace PaletteViewerGUI;
 /*!	\fn void PaletteViewer::updateToolBar()
 		Update button bar.
 		*/
-PaletteViewer::PaletteViewer(QWidget *parent, PaletteViewType viewType, bool hasSaveToolBar, bool hasPageCommand, bool hasPasteColors)
-	: QFrame(parent), m_tabBarContainer(0), m_pagesBar(0), m_paletteToolBar(0), m_savePaletteToolBar(0), m_pageViewer(0), m_pageViewerScrollArea(0), m_indexPageToDelete(-1), m_viewType(viewType), m_frameHandle(0), m_paletteHandle(0), m_changeStyleCommand(0), m_xsheetHandle(0), m_hasSavePaletteToolbar(hasSaveToolBar), m_hasPageCommand(hasPageCommand), m_isSaveActionEnabled(true), m_lockPaletteAction(0), m_lockPaletteToolButton(0)
+PaletteViewer::PaletteViewer(QWidget *parent, PaletteViewType viewType, bool hasSaveToolBar,
+							 bool hasPageCommand, bool hasPasteColors)
+	: QFrame(parent), m_tabBarContainer(0), m_pagesBar(0), m_paletteToolBar(0),
+	  m_savePaletteToolBar(0), m_pageViewer(0), m_pageViewerScrollArea(0), m_indexPageToDelete(-1),
+	  m_viewType(viewType), m_frameHandle(0), m_paletteHandle(0), m_changeStyleCommand(0),
+	  m_xsheetHandle(0), m_hasSavePaletteToolbar(hasSaveToolBar), m_hasPageCommand(hasPageCommand),
+	  m_isSaveActionEnabled(true), m_lockPaletteAction(0), m_lockPaletteToolButton(0)
 {
 	setObjectName("OnePixelMarginFrame");
 	setFrameStyle(QFrame::StyledPanel);
 
 	createTabBar();
 
-	//Create pageView
+	// Create pageView
 	m_pageViewerScrollArea = new QScrollArea();
 	m_pageViewerScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_pageViewerScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
@@ -87,7 +92,8 @@ PaletteViewer::PaletteViewer(QWidget *parent, PaletteViewType viewType, bool has
 	// Create toolbar. It is an horizontal layout with three internal toolbar.
 	DvScrollWidget *toolbarScrollWidget = new DvScrollWidget;
 
-	toolbarScrollWidget->setObjectName("ToolBarContainer"); // Toonz's qss files are instructed to leave a
+	toolbarScrollWidget->setObjectName(
+		"ToolBarContainer"); // Toonz's qss files are instructed to leave a
 	// 1px grey margin on top for scroll buttons
 	QWidget *toolBarWidget = new QWidget; // children of this parent name.
 	toolbarScrollWidget->setWidget(toolBarWidget);
@@ -120,8 +126,8 @@ PaletteViewer::PaletteViewer(QWidget *parent, PaletteViewType viewType, bool has
 		// To add 6px (on the left) before the TabBar
 		QHBoxLayout *hLayout = new QHBoxLayout;
 		hLayout->setMargin(0);
-		//hLayout->setAlignment(Qt::AlignLeft);
-		//hLayout->addSpacing(6);
+		// hLayout->setAlignment(Qt::AlignLeft);
+		// hLayout->addSpacing(6);
 		{
 			hLayout->addWidget(m_pagesBar, 0);
 			hLayout->addStretch(1);
@@ -160,18 +166,25 @@ void PaletteViewer::setPaletteHandle(TPaletteHandle *paletteHandle)
 
 	bool ret = true;
 	if (m_paletteHandle)
-		ret = ret && disconnect(m_paletteHandle,0,this,0);
+		ret = ret && disconnect(m_paletteHandle, 0, this, 0);
 
 	m_paletteHandle = paletteHandle;
 
 	if (m_paletteHandle && isVisible()) {
-		ret = ret && connect(m_paletteHandle, SIGNAL(paletteSwitched()), this, SLOT(onPaletteSwitched()));
-		ret = ret && connect(m_paletteHandle, SIGNAL(paletteChanged()), this, SLOT(onPaletteChanged()));
-		ret = ret && connect(m_paletteHandle, SIGNAL(paletteChanged()), this, SLOT(changeWindowTitle()));
-		ret = ret && connect(m_paletteHandle, SIGNAL(paletteTitleChanged()), this, SLOT(changeWindowTitle()));
-		ret = ret && connect(m_paletteHandle, SIGNAL(colorStyleSwitched()), this, SLOT(onColorStyleSwitched()));
-		ret = ret && connect(m_paletteHandle, SIGNAL(colorStyleChanged()), this, SLOT(changeWindowTitle()));
-		ret = ret && connect(m_paletteHandle, SIGNAL(paletteDirtyFlagChanged()), this, SLOT(changeWindowTitle()));
+		ret = ret &&
+			  connect(m_paletteHandle, SIGNAL(paletteSwitched()), this, SLOT(onPaletteSwitched()));
+		ret = ret &&
+			  connect(m_paletteHandle, SIGNAL(paletteChanged()), this, SLOT(onPaletteChanged()));
+		ret = ret &&
+			  connect(m_paletteHandle, SIGNAL(paletteChanged()), this, SLOT(changeWindowTitle()));
+		ret = ret && connect(m_paletteHandle, SIGNAL(paletteTitleChanged()), this,
+							 SLOT(changeWindowTitle()));
+		ret = ret && connect(m_paletteHandle, SIGNAL(colorStyleSwitched()), this,
+							 SLOT(onColorStyleSwitched()));
+		ret = ret && connect(m_paletteHandle, SIGNAL(colorStyleChanged()), this,
+							 SLOT(changeWindowTitle()));
+		ret = ret && connect(m_paletteHandle, SIGNAL(paletteDirtyFlagChanged()), this,
+							 SLOT(changeWindowTitle()));
 	}
 
 	assert(ret);
@@ -275,7 +288,7 @@ void PaletteViewer::createPaletteToolBar()
 	m_paletteToolBar->setIconSize(QSize(23, 20));
 	m_paletteToolBar->setLayoutDirection(Qt::RightToLeft);
 
-	//Lock button to avoid editing the palette by mistake
+	// Lock button to avoid editing the palette by mistake
 	if (m_viewType == LEVEL_PALETTE) {
 		QIcon lockIcon = createQIconOnOffPNG("lockpalette");
 
@@ -353,7 +366,8 @@ void PaletteViewer::createPaletteToolBar()
 	bothDisplayAct->setData(PageViewer::StyleAndOriginal);
 
 	QActionGroup *nameDisplayModeGroup = new QActionGroup(viewMode);
-	connect(nameDisplayModeGroup, SIGNAL(triggered(QAction *)), this, SLOT(onNameDisplayMode(QAction *)));
+	connect(nameDisplayModeGroup, SIGNAL(triggered(QAction *)), this,
+			SLOT(onNameDisplayMode(QAction *)));
 	nameDisplayModeGroup->addAction(styleDisplayAct);
 	nameDisplayModeGroup->addAction(originalDisplayAct);
 	nameDisplayModeGroup->addAction(bothDisplayAct);
@@ -390,7 +404,7 @@ void PaletteViewer::createPaletteToolBar()
 	m_paletteToolBar->addAction(addColor);
 	m_paletteToolBar->addSeparator();
 
-	//KeyFrame button
+	// KeyFrame button
 	if (m_viewType != CLEANUP_PALETTE) {
 		m_keyFrameButton = new PaletteKeyframeNavigator(m_paletteToolBar);
 		m_paletteToolBar->addWidget(m_keyFrameButton);
@@ -415,10 +429,11 @@ void PaletteViewer::createSavePaletteToolBar()
 		return;
 	}
 
-	//save palette as
+	// save palette as
 	QIcon saveAsPaletteIcon = createQIconOnOffPNG("savepaletteas", false);
-	QAction *saveAsPalette = new QAction(saveAsPaletteIcon, tr("&Save Palette As"), m_savePaletteToolBar);
-	//overwrite palette
+	QAction *saveAsPalette =
+		new QAction(saveAsPaletteIcon, tr("&Save Palette As"), m_savePaletteToolBar);
+	// overwrite palette
 	QIcon savePaletteIcon = createQIconOnOffPNG("savepalette", false);
 	QAction *savePalette = new QAction(savePaletteIcon, tr("&Save Palette"), m_savePaletteToolBar);
 
@@ -426,7 +441,7 @@ void PaletteViewer::createSavePaletteToolBar()
 		connect(savePalette, SIGNAL(triggered()), this, SLOT(saveStudioPalette()));
 		m_savePaletteToolBar->addAction(savePalette);
 	} else if (m_viewType == LEVEL_PALETTE) {
-		//save load palette
+		// save load palette
 		PaletteIconWidget *movePalette = new PaletteIconWidget(m_savePaletteToolBar);
 		connect(movePalette, SIGNAL(startDrag()), this, SLOT(startDragDrop()));
 
@@ -434,12 +449,12 @@ void PaletteViewer::createSavePaletteToolBar()
 		act->setText(tr("&Move Palette"));
 		m_savePaletteToolBar->addSeparator();
 
-		//save palette as
+		// save palette as
 		connect(saveAsPalette, SIGNAL(triggered()),
 				CommandManager::instance()->getAction("MI_SavePaletteAs"), SIGNAL(triggered()));
 		m_savePaletteToolBar->addAction(saveAsPalette);
 
-		//overwrite palette
+		// overwrite palette
 		connect(savePalette, SIGNAL(triggered()),
 				CommandManager::instance()->getAction("MI_OverwritePalette"), SIGNAL(triggered()));
 		m_savePaletteToolBar->addAction(savePalette);
@@ -456,7 +471,7 @@ void PaletteViewer::updateTabBar()
 	int tabCount = m_pagesBar->count();
 	int i;
 
-	//Se ci sono tab li butto
+	// Se ci sono tab li butto
 	for (i = tabCount - 1; i >= 0; i--)
 		m_pagesBar->removeTab(i);
 
@@ -467,7 +482,7 @@ void PaletteViewer::updateTabBar()
 	QIcon tabIcon(":Resources/palette_tabicon.png");
 	m_pagesBar->setIconSize(QSize(20, 15));
 
-	//Aggiungo i tab in funzione delle pagine di m_palette
+	// Aggiungo i tab in funzione delle pagine di m_palette
 	for (i = 0; i < palette->getPageCount(); i++) {
 		TPalette::Page *page = palette->getPage(i);
 		std::wstring ws = page->getName();
@@ -489,7 +504,7 @@ void PaletteViewer::updatePaletteToolBar()
 	TPalette *palette = getPalette();
 	bool enable = !palette ? false : true;
 	bool enableNewStyleAct = enable;
-	//limit the number of cleanup styles to 7
+	// limit the number of cleanup styles to 7
 	if (palette && palette->isCleanupPalette())
 		enableNewStyleAct = (palette->getStyleInPagesCount() < 8);
 	if (m_viewType != CLEANUP_PALETTE)
@@ -518,11 +533,10 @@ void PaletteViewer::updateSavePaletteToolBar()
 	int i;
 	for (i = 0; i < actions.count(); i++) {
 		QAction *act = actions[i];
-		if (act->text() == tr("&Save Palette As") ||
-			act->text() == tr("&Save Palette") ||
+		if (act->text() == tr("&Save Palette As") || act->text() == tr("&Save Palette") ||
 			act->text() == tr("&Palette Gizmo"))
 			act->setEnabled(enable);
-		else if (m_viewType != STUDIO_PALETTE && i == 0) //move action
+		else if (m_viewType != STUDIO_PALETTE && i == 0) // move action
 			actions[i]->setVisible(enable);
 		else
 			actions[i]->setEnabled(false);
@@ -610,7 +624,7 @@ void PaletteViewer::showEvent(QShowEvent *)
 
 	if (!m_frameHandle)
 		return;
-	//Connessione necessaria per aggiornare lo stile in caso di palette animate.
+	// Connessione necessaria per aggiornare lo stile in caso di palette animate.
 	connect(m_frameHandle, SIGNAL(frameSwitched()), this, SLOT(onFrameSwitched()));
 }
 
@@ -661,7 +675,7 @@ void PaletteViewer::dragEnterEvent(QDragEnterEvent *event)
 	int count = urls.size();
 	if (count == 0)
 		return;
-	//Accetto l'evento solo se ho tutte palette.
+	// Accetto l'evento solo se ho tutte palette.
 	int i;
 	for (i = 0; i < count; i++) {
 		TFilePath path(urls[i].toLocalFile().toStdWString());
@@ -711,7 +725,8 @@ void PaletteViewer::dropEvent(QDropEvent *event)
 				StudioPaletteCmd::mergeIntoCurrentPalette(m_paletteHandle, path);
 
 			if (loadPalette) {
-				TFilePath refImagePath = StudioPalette::instance()->getPalette(path, true)->getRefImgPath();
+				TFilePath refImagePath =
+					StudioPalette::instance()->getPalette(path, true)->getRefImgPath();
 				if (!refImagePath.isEmpty() && getPalette()->getRefImgPath().isEmpty()) {
 					getPalette()->setRefImgPath(refImagePath);
 					m_paletteHandle->notifyPaletteChanged();
@@ -836,7 +851,7 @@ void PaletteViewer::deletePage()
 		std::vector<int> styleIds;
 		TPalette::Page *page = palette->getPage(m_indexPageToDelete);
 		if (!page)
-			return; //La pagina dovrebbe esserci sempre
+			return; // La pagina dovrebbe esserci sempre
 		int i;
 		for (i = 0; i < page->getStyleCount(); i++)
 			styleIds.push_back(page->getStyleId(i));
@@ -881,8 +896,10 @@ void PaletteViewer::saveStudioPalette()
 				DVGui::warning("No GlobalName, No Filepath");
 			else {
 				QString question;
-				question = "Do you want to overwrite current palette to " + toQString(palettePath) + " ?";
-				int ret = DVGui::MsgBox(question, QObject::tr("Overwrite"), QObject::tr("Don't Overwrite"), 0);
+				question =
+					"Do you want to overwrite current palette to " + toQString(palettePath) + " ?";
+				int ret = DVGui::MsgBox(question, QObject::tr("Overwrite"),
+										QObject::tr("Don't Overwrite"), 0);
 				if (ret == 2 || ret == 0)
 					return;
 				StudioPalette::instance()->save(palettePath, palette);
@@ -942,11 +959,9 @@ void PaletteViewer::onColorStyleSwitched()
 	}
 
 	QRect colorStyleRect = m_pageViewer->getItemRect(indexInPage);
-	m_pageViewerScrollArea->ensureVisible(
-		colorStyleRect.center().x(),
-		colorStyleRect.center().y(),
-		colorStyleRect.size().width() / 2 + 4,
-		colorStyleRect.size().height() / 2 + 4);
+	m_pageViewerScrollArea->ensureVisible(colorStyleRect.center().x(), colorStyleRect.center().y(),
+										  colorStyleRect.size().width() / 2 + 4,
+										  colorStyleRect.size().height() / 2 + 4);
 	m_pageViewer->update();
 }
 
@@ -974,7 +989,8 @@ void PaletteViewer::onPaletteSwitched()
 	updateView();
 
 	// update GUI according to the "lock" property
-	if (getPalette() && m_viewType != CLEANUP_PALETTE && (m_lockPaletteAction || m_lockPaletteToolButton)) {
+	if (getPalette() && m_viewType != CLEANUP_PALETTE &&
+		(m_lockPaletteAction || m_lockPaletteToolButton)) {
 		if (m_lockPaletteAction) {
 			m_lockPaletteAction->setEnabled(true);
 			m_lockPaletteAction->setChecked(getPalette()->isLocked());
@@ -982,7 +998,7 @@ void PaletteViewer::onPaletteSwitched()
 			m_lockPaletteToolButton->setEnabled(true);
 			m_lockPaletteToolButton->setChecked(getPalette()->isLocked());
 		}
-		//update commands
+		// update commands
 		m_pageViewer->updateCommandLocks();
 	} else {
 		if (m_lockPaletteAction)
@@ -1024,7 +1040,7 @@ void PaletteViewer::onViewMode(QAction *action)
 }
 
 //-----------------------------------------------------------------------------
-/*!  Change name display mode on the style chips 
+/*!  Change name display mode on the style chips
 */
 void PaletteViewer::onNameDisplayMode(QAction *action)
 {
@@ -1064,10 +1080,11 @@ void PaletteViewer::changeWindowTitle()
 		titleOwner = parentWidget()->parentWidget();
 	}
 
-	//add color model name, if exists
+	// add color model name, if exists
 	TFilePath refImagePath = (palette) ? palette->getRefImgPath() : TFilePath();
 	if (!refImagePath.isEmpty()) {
-		QString cmName = tr("     (Color Model: ") + QString::fromStdWString(refImagePath.getWideName()) + tr(")");
+		QString cmName = tr("     (Color Model: ") +
+						 QString::fromStdWString(refImagePath.getWideName()) + tr(")");
 		name += cmName;
 	}
 
@@ -1094,6 +1111,6 @@ void PaletteViewer::setIsLocked(bool lock)
 	getPalette()->setIsLocked(lock);
 	getPalette()->setDirtyFlag(true);
 	m_pageViewer->updateCommandLocks();
-	//notify for updating the style editor
+	// notify for updating the style editor
 	m_paletteHandle->notifyPaletteLockChanged();
 }

@@ -32,9 +32,7 @@ TW_FIX32 TTWAIN_FloatToFix32(float fl)
 	return fix;
 }
 /*---------------------------------------------------------------------------*/
-void TTWAIN_ConvertRevStrToRevNum(const char *rev_str,
-								  TW_UINT16 *maj_num,
-								  TW_UINT16 *min_num)
+void TTWAIN_ConvertRevStrToRevNum(const char *rev_str, TW_UINT16 *maj_num, TW_UINT16 *min_num)
 {
 	char *maj_str;
 	char *min_str;

@@ -72,47 +72,46 @@ typedef struct bmpimage {
 #define BMP_GMAP16(x) ((x & 0x60) << 1) | ((x & 0x60) >> 1) | ((x & 0x60) >> 3) | ((x & 0x60) >> 5)
 #define BMP_BMAP16(x) ((x & 0x30) << 2) | ((x & 0x30) << 0) | ((x & 0x30) >> 2) | ((x & 0x30) >> 4)
 
-#define BMP_CUT(a, b, c) \
-	{                    \
-		if (a < b)       \
-			a = b;       \
-		else if (a > c)  \
-			a = c;       \
+#define BMP_CUT(a, b, c)                                                                           \
+	{                                                                                              \
+		if (a < b)                                                                                 \
+			a = b;                                                                                 \
+		else if (a > c)                                                                            \
+			a = c;                                                                                 \
 	}
 
 #define BMP_REDUCE_COLORS(r, g, b) ((r & 0xe0) | ((g & 0xe0) >> 3) | ((b & 0xc0) >> 6))
 
-#define BMP_ADD_ERROR(pix, weight)            \
-	{                                         \
-		tmp = (pix).r + ((r1 * weight) >> 4); \
-		BMP_CUT(tmp, 0, 255);                 \
-		(pix).r = tmp;                        \
-		tmp = (pix).g + ((g1 * weight) >> 4); \
-		BMP_CUT(tmp, 0, 255);                 \
-		(pix).g = tmp;                        \
-		tmp = (pix).b + ((b1 * weight) >> 4); \
-		BMP_CUT(tmp, 0, 255);                 \
-		(pix).b = tmp;                        \
+#define BMP_ADD_ERROR(pix, weight)                                                                 \
+	{                                                                                              \
+		tmp = (pix).r + ((r1 * weight) >> 4);                                                      \
+		BMP_CUT(tmp, 0, 255);                                                                      \
+		(pix).r = tmp;                                                                             \
+		tmp = (pix).g + ((g1 * weight) >> 4);                                                      \
+		BMP_CUT(tmp, 0, 255);                                                                      \
+		(pix).g = tmp;                                                                             \
+		tmp = (pix).b + ((b1 * weight) >> 4);                                                      \
+		BMP_CUT(tmp, 0, 255);                                                                      \
+		(pix).b = tmp;                                                                             \
 	}
 
-#define BMP_ADD_ERROR_BW(pix, error) \
-	{                                \
-		tmp = (pix).r + (error);     \
-		BMP_CUT(tmp, 0, 255);        \
-		(pix).r = tmp;               \
-		tmp = (pix).g + (error);     \
-		BMP_CUT(tmp, 0, 255);        \
-		(pix).g = tmp;               \
-		tmp = (pix).b + (error);     \
-		BMP_CUT(tmp, 0, 255);        \
-		(pix).b = tmp;               \
+#define BMP_ADD_ERROR_BW(pix, error)                                                               \
+	{                                                                                              \
+		tmp = (pix).r + (error);                                                                   \
+		BMP_CUT(tmp, 0, 255);                                                                      \
+		(pix).r = tmp;                                                                             \
+		tmp = (pix).g + (error);                                                                   \
+		BMP_CUT(tmp, 0, 255);                                                                      \
+		(pix).g = tmp;                                                                             \
+		tmp = (pix).b + (error);                                                                   \
+		BMP_CUT(tmp, 0, 255);                                                                      \
+		(pix).b = tmp;                                                                             \
 	}
 
 /*---------------------------------------------------------------------------*/
 /*-- Structures and Enums ---------------------------------------------------*/
 
-typedef struct
-	{
+typedef struct {
 	UINT bfSize;
 	UINT bfOffBits;
 	UINT biSize;
@@ -146,11 +145,9 @@ BMP_SUBTYPE bmp_get_colorstyle(IMAGE *img);
 
 int error_checking_bmp(BMP_HEADER *hd);
 
-int read_bmp_line(FILE *fp, void *line,
-				  UINT w, UINT h, UCHAR **map, BMP_SUBTYPE type);
+int read_bmp_line(FILE *fp, void *line, UINT w, UINT h, UCHAR **map, BMP_SUBTYPE type);
 
-int write_bmp_line(FILE *fp, void *line_buffer,
-				   UINT w, UINT row, UCHAR *map, BMP_SUBTYPE type);
+int write_bmp_line(FILE *fp, void *line_buffer, UINT w, UINT row, UCHAR *map, BMP_SUBTYPE type);
 
 int skip_bmp_lines(FILE *fp, UINT w, UINT rows, int whence, BMP_SUBTYPE type);
 
@@ -164,8 +161,8 @@ static void putint(FILE *fp, int value);
 
 static int img_read_bmp_generic(const MYSTRING fname, int type, IMAGE **);
 #ifndef UNUSED_REDUCE_COLORS
-static UCHAR *reduce_colors(UCHAR *buffin, int xsize, int ysize,
-							UCHAR *rmap, UCHAR *gmap, UCHAR *bmap, int nc);
+static UCHAR *reduce_colors(UCHAR *buffin, int xsize, int ysize, UCHAR *rmap, UCHAR *gmap,
+							UCHAR *bmap, int nc);
 
 #endif
 
@@ -207,8 +204,7 @@ static int skip_rowsBMP24(FILE *fp, UINT w, UINT pad, UINT rows, int whence);
 #define __BMP_READ_LINE_BY_LINE
 
 /*---------------------------------------------------------------------------*/
-int read_bmp_line(FILE *fp, void *line_buffer,
-				  UINT w, UINT row, UCHAR **map, BMP_SUBTYPE type)
+int read_bmp_line(FILE *fp, void *line_buffer, UINT w, UINT row, UCHAR **map, BMP_SUBTYPE type)
 /*---------------------------------------------------------------------------*/
 {
 	LPIXEL *pic = (LPIXEL *)line_buffer;
@@ -251,8 +247,7 @@ int read_bmp_line(FILE *fp, void *line_buffer,
 }
 
 /*---------------------------------------------------------------------------*/
-int write_bmp_line(FILE *fp, void *line_buffer,
-				   UINT w, UINT row, UCHAR *map, BMP_SUBTYPE type)
+int write_bmp_line(FILE *fp, void *line_buffer, UINT w, UINT row, UCHAR *map, BMP_SUBTYPE type)
 /*---------------------------------------------------------------------------*/
 {
 	UCHAR *pic = (UCHAR *)line_buffer;
@@ -311,17 +306,14 @@ int error_checking_bmp(BMP_HEADER *hd)
 {
 
 	/* error checking */
-	if ((hd->biBitCount != 1 &&
-		 hd->biBitCount != 4 &&
-		 hd->biBitCount != 8 &&
+	if ((hd->biBitCount != 1 && hd->biBitCount != 4 && hd->biBitCount != 8 &&
 		 hd->biBitCount != 24) ||
 		hd->biPlanes != 1 || hd->biCompression > BMP_BI_RLE4) {
 		return UNSUPPORTED_BMP_FORMAT;
 	}
 
 	/* error checking */
-	if (((hd->biBitCount == 1 || hd->biBitCount == 24) &&
-		 hd->biCompression != BMP_BI_RGB) ||
+	if (((hd->biBitCount == 1 || hd->biBitCount == 24) && hd->biCompression != BMP_BI_RGB) ||
 		(hd->biBitCount == 4 && hd->biCompression == BMP_BI_RLE8) ||
 		(hd->biBitCount == 8 && hd->biCompression == BMP_BI_RLE4)) {
 		return UNSUPPORTED_BMP_FORMAT;
@@ -384,12 +376,8 @@ int load_bmp_header(FILE *fp, BMP_HEADER **header)
 		hd->biBitCount = getshort(fp);
 
 		/* Not in old versions so have to compute them */
-		hd->biSizeImage = (((hd->biPlanes *
-							 hd->biBitCount *
-							 hd->biWidth) +
-							31) /
-						   32) *
-						  4 * hd->biHeight;
+		hd->biSizeImage =
+			(((hd->biPlanes * hd->biBitCount * hd->biWidth) + 31) / 32) * 4 * hd->biHeight;
 
 		hd->biCompression = BMP_BI_RGB;
 		hd->biXPelsPerMeter = 0;
@@ -399,22 +387,13 @@ int load_bmp_header(FILE *fp, BMP_HEADER **header)
 	}
 
 	if (BMP_DEBUG) {
-		printf("\nLoadBMP:\tbfSize=%u, bfOffBits=%u\n", hd->bfSize,
-			   hd->bfOffBits);
-		printf("\t\tbiSize=%u, biWidth=%u, biHeight=%u, biPlanes=%u\n",
-			   hd->biSize,
-			   hd->biWidth,
-			   hd->biHeight,
-			   hd->biPlanes);
-		printf("\t\tbiBitCount=%u, biCompression=%u, biSizeImage=%u\n",
-			   hd->biBitCount,
-			   hd->biCompression,
-			   hd->biSizeImage);
-		printf("\t\tbiX,YPelsPerMeter=%u,%u  biClrUsed=%u, biClrImp=%u\n",
-			   hd->biXPelsPerMeter,
-			   hd->biYPelsPerMeter,
-			   hd->biClrUsed,
-			   hd->biClrImportant);
+		printf("\nLoadBMP:\tbfSize=%u, bfOffBits=%u\n", hd->bfSize, hd->bfOffBits);
+		printf("\t\tbiSize=%u, biWidth=%u, biHeight=%u, biPlanes=%u\n", hd->biSize, hd->biWidth,
+			   hd->biHeight, hd->biPlanes);
+		printf("\t\tbiBitCount=%u, biCompression=%u, biSizeImage=%u\n", hd->biBitCount,
+			   hd->biCompression, hd->biSizeImage);
+		printf("\t\tbiX,YPelsPerMeter=%u,%u  biClrUsed=%u, biClrImp=%u\n", hd->biXPelsPerMeter,
+			   hd->biYPelsPerMeter, hd->biClrUsed, hd->biClrImportant);
 	}
 
 	if (BMP_FERROR(fp)) {
@@ -474,9 +453,7 @@ static int img_read_bmp_generic(const MYSTRING fname, int type, IMAGE **pimg)
 		goto ERROR;
 
 	/* error checking */
-	if ((hd->biBitCount != 1 &&
-		 hd->biBitCount != 4 &&
-		 hd->biBitCount != 8 &&
+	if ((hd->biBitCount != 1 && hd->biBitCount != 4 && hd->biBitCount != 8 &&
 		 hd->biBitCount != 24) ||
 		hd->biPlanes != 1 || hd->biCompression > BMP_BI_RLE4) {
 		retCode = UNSUPPORTED_BMP_FORMAT;
@@ -484,8 +461,7 @@ static int img_read_bmp_generic(const MYSTRING fname, int type, IMAGE **pimg)
 	}
 
 	/* error checking */
-	if (((hd->biBitCount == 1 || hd->biBitCount == 24) &&
-		 hd->biCompression != BMP_BI_RGB) ||
+	if (((hd->biBitCount == 1 || hd->biBitCount == 24) && hd->biCompression != BMP_BI_RGB) ||
 		(hd->biBitCount == 4 && hd->biCompression == BMP_BI_RLE8) ||
 		(hd->biBitCount == 8 && hd->biCompression == BMP_BI_RLE4)) {
 		retCode = UNSUPPORTED_BMP_FORMAT;
@@ -550,8 +526,8 @@ static int img_read_bmp_generic(const MYSTRING fname, int type, IMAGE **pimg)
 
 	if (hd->biSize != BMP_WIN_OS2_OLD) {
 		/* Waste any unused bytes between the colour map (if present)
-         and the start of the actual bitmap data. 
-     */
+		 and the start of the actual bitmap data.
+	 */
 
 		while (hd->biPad > 0) {
 			(void)getc(fp);
@@ -601,7 +577,8 @@ ERROR:
 
 #endif /* __LIBSIMAGE__ */
 
-static int img_read_bmp_region(const MYSTRING fname, IMAGE **pimg, int x1, int y1, int x2, int y2, int scale)
+static int img_read_bmp_region(const MYSTRING fname, IMAGE **pimg, int x1, int y1, int x2, int y2,
+							   int scale)
 {
 	UCHAR r[256], g[256], b[256] /*  ,*map[3]  */;
 	LPIXEL *line = NULL;
@@ -636,25 +613,22 @@ static int img_read_bmp_region(const MYSTRING fname, IMAGE **pimg, int x1, int y
 		goto ERROR;
 
 	/* error checking */
-	if ((hd->biBitCount != 1 &&
-		 hd->biBitCount != 4 &&
-		 hd->biBitCount != 8 &&
+	if ((hd->biBitCount != 1 && hd->biBitCount != 4 && hd->biBitCount != 8 &&
 		 hd->biBitCount != 24) ||
 		hd->biPlanes != 1 || hd->biCompression > BMP_BI_RLE4) {
-		sprintf(buf, "Bogus BMP File! (bitCount=%d, Planes=%d, Compression=%d)",
-				hd->biBitCount, hd->biPlanes, hd->biCompression);
+		sprintf(buf, "Bogus BMP File! (bitCount=%d, Planes=%d, Compression=%d)", hd->biBitCount,
+				hd->biPlanes, hd->biCompression);
 
 		bmp_error = UNSUPPORTED_BMP_FORMAT;
 		goto ERROR;
 	}
 
 	/* error checking */
-	if (((hd->biBitCount == 1 || hd->biBitCount == 24) &&
-		 hd->biCompression != BMP_BI_RGB) ||
+	if (((hd->biBitCount == 1 || hd->biBitCount == 24) && hd->biCompression != BMP_BI_RGB) ||
 		(hd->biBitCount == 4 && hd->biCompression == BMP_BI_RLE8) ||
 		(hd->biBitCount == 8 && hd->biCompression == BMP_BI_RLE4)) {
-		sprintf(buf, "Bogus BMP File!  (bitCount=%d, Compression=%d)",
-				hd->biBitCount, hd->biCompression);
+		sprintf(buf, "Bogus BMP File!  (bitCount=%d, Compression=%d)", hd->biBitCount,
+				hd->biCompression);
 		bmp_error = UNSUPPORTED_BMP_FORMAT;
 		goto ERROR;
 	}
@@ -714,8 +688,8 @@ static int img_read_bmp_region(const MYSTRING fname, IMAGE **pimg, int x1, int y
 
 	if (hd->biSize != BMP_WIN_OS2_OLD) {
 		/* Waste any unused bytes between the colour map (if present)
-         and the start of the actual bitmap data. 
-     */
+		 and the start of the actual bitmap data.
+	 */
 
 		while (hd->biPad > 0) {
 			(void)getc(fp);
@@ -724,8 +698,7 @@ static int img_read_bmp_region(const MYSTRING fname, IMAGE **pimg, int x1, int y
 	}
 
 	/* get information about the portion of the image to load */
-	get_info_region(&info, x1, y1, x2, y2, scale,
-					(int)hd->biWidth, (int)hd->biHeight, TNZ_BOTLEFT);
+	get_info_region(&info, x1, y1, x2, y2, scale, (int)hd->biWidth, (int)hd->biHeight, TNZ_BOTLEFT);
 
 	/* create 32 bit image buffer */
 	if (!allocate_pixmap(img, info.xsize, info.ysize)) {
@@ -771,51 +744,53 @@ static int img_read_bmp_region(const MYSTRING fname, IMAGE **pimg, int x1, int y
 	/*  print_info_region(&info);      */
 
 	if (info.startScanRow > 0)
-		skip_bmp_lines(fp, hd->biWidth, (unsigned int)(info.startScanRow - 1), (unsigned int)SEEK_CUR, subtype);
+		skip_bmp_lines(fp, hd->biWidth, (unsigned int)(info.startScanRow - 1),
+					   (unsigned int)SEEK_CUR, subtype);
 
 	for (i = 0; i < (UINT)info.scanNrow; i++) {
 		if (load_lineBMP24(fp, line, hd->biWidth, pad))
 			goto ERROR;
 
 		/*  QUESTO SWITCH VA AGGIUSTATO!
-      switch (subtype)
-       {
+	  switch (subtype)
+	   {
 	 CASE BMP_BW:
-	     if (load_lineBMP1(fp, line, hd->biWidth, pad, map))
-	        goto ERROR;
+		 if (load_lineBMP1(fp, line, hd->biWidth, pad, map))
+			goto ERROR;
 	 CASE BMP_GREY16:
 	 __OR BMP_CMAPPED16:
-	     if (load_lineBMP4(fp, line, hd->biWidth, pad, map))
-	        goto ERROR;
+		 if (load_lineBMP4(fp, line, hd->biWidth, pad, map))
+			goto ERROR;
 	 CASE BMP_GREY16C:
 	 __OR BMP_CMAPPED16C:
-	     if (load_lineBMPC4(fp, line, hd->biWidth, i, map)==-1)
-	        goto ERROR;
+		 if (load_lineBMPC4(fp, line, hd->biWidth, i, map)==-1)
+			goto ERROR;
 	 CASE BMP_GREY256:
 	 __OR BMP_CMAPPED256:
-	     if (load_lineBMP8(fp, line, hd->biWidth, pad, map))
-	        goto ERROR;
+		 if (load_lineBMP8(fp, line, hd->biWidth, pad, map))
+			goto ERROR;
 	 CASE BMP_GREY256C:
 	 __OR BMP_CMAPPED256C:
-	     if (load_lineBMPC8(fp, line, hd->biWidth, i, map)==-1)
-	        goto ERROR;
+		 if (load_lineBMPC8(fp, line, hd->biWidth, i, map)==-1)
+			goto ERROR;
 	 CASE BMP_RGB:
-	     if (load_lineBMP24(fp, line, hd->biWidth, pad))
-	        goto ERROR;
+		 if (load_lineBMP24(fp, line, hd->biWidth, pad))
+			goto ERROR;
 }
 */
 		for (appo = pic, j = c = 0; j < (UINT)info.scanNcol; j++, c += info.step)
 			*appo++ = *(line + info.startScanCol + c);
 		pic += info.xsize;
 
-		skip_bmp_lines(fp, hd->biWidth, (unsigned int)(info.step - 1), (unsigned int)SEEK_CUR, subtype);
+		skip_bmp_lines(fp, hd->biWidth, (unsigned int)(info.step - 1), (unsigned int)SEEK_CUR,
+					   subtype);
 	}
 
 	/*
-  if (BMP_FERROR(fp)) 
+  if (BMP_FERROR(fp))
    {
-     bmp_error(fname, "File appears truncated.  Winging it.\n");
-     goto ERROR;
+	 bmp_error(fname, "File appears truncated.  Winging it.\n");
+	 goto ERROR;
    }
 */
 
@@ -940,8 +915,7 @@ static int skip_rowsBMP1(FILE *fp, UINT w, UINT pad, UINT rows, int whence)
 }
 
 /*---------------------------------------------------------------------------*/
-static int loadBMP4(FILE *fp,
-					LPIXEL *pic, UINT w, UINT h, UINT comp, UCHAR *r, UCHAR *g, UCHAR *b)
+static int loadBMP4(FILE *fp, LPIXEL *pic, UINT w, UINT h, UINT comp, UCHAR *r, UCHAR *g, UCHAR *b)
 /*---------------------------------------------------------------------------*/
 {
 	UINT i, j, c, c1, x, y, nybnum, padw, rv;
@@ -1141,7 +1115,7 @@ int load_lineBMPC4(FILE *fp, LPIXEL *pic, UINT w, UINT y, UCHAR **map)
 
 	/*
    *  Codici di ritorno:
-   * 
+   *
    *     -1:   incontrata la file del file       (EOF)
    *     -2:   incontrata la fine della linea    (Escape code 0x00 0x00)
    *     -3:   incontrata la fine dell' immagine (Escape code 0x00 0x01)
@@ -1243,8 +1217,7 @@ static int skip_rowsBMPC4(FILE *fp, UINT rows)
 }
 
 /*---------------------------------------------------------------------------*/
-static int loadBMP8(FILE *fp,
-					LPIXEL *pic, UINT w, UINT h, UINT comp, UCHAR *r, UCHAR *g, UCHAR *b)
+static int loadBMP8(FILE *fp, LPIXEL *pic, UINT w, UINT h, UINT comp, UCHAR *r, UCHAR *g, UCHAR *b)
 /*---------------------------------------------------------------------------*/
 {
 	UINT i, j, c, c1, padw, x, y, rv;
@@ -1425,7 +1398,7 @@ int load_lineBMPC8(FILE *fp, LPIXEL *pic, UINT w, UINT y, UCHAR **map)
 
 	/*
    *  Codici di ritorno:
-   * 
+   *
    *     -1:   incontrata la file del file       (EOF)
    *     -2:   incontrata la fine della linea    (Escape code 0x00 0x00)
    *     -3:   incontrata la fine dell' immagine (Escape code 0x00 0x01)
@@ -1675,7 +1648,8 @@ int img_write_bmp(const MYSTRING fname, IMAGE *img)
 	case BMP_BW:
 		__OR BMP_GREY16 : __OR BMP_GREY16C :
 
-						  __OR BMP_CMAPPED256 : __OR BMP_CMAPPED256C : return UNSUPPORTED_BMP_FORMAT;
+						  __OR BMP_CMAPPED256 : __OR BMP_CMAPPED256C
+												: return UNSUPPORTED_BMP_FORMAT;
 		CASE BMP_GREY256 : __OR BMP_GREY256C : nbits = 8;
 		CASE BMP_RGB : nbits = 24;
 	DEFAULT:
@@ -2176,8 +2150,8 @@ static int line_writeBMP24(FILE *fp, LPIXEL *pp, UINT w, UINT padb)
 
 #ifndef UNUSED_REDUCE_COLORS
 /*---------------------------------------------------------------------------*/
-static UCHAR *reduce_colors(UCHAR *buffin, int xsize, int ysize,
-							UCHAR *rmap, UCHAR *gmap, UCHAR *bmap, int nc)
+static UCHAR *reduce_colors(UCHAR *buffin, int xsize, int ysize, UCHAR *rmap, UCHAR *gmap,
+							UCHAR *bmap, int nc)
 /*---------------------------------------------------------------------------*/
 {
 	LPIXEL *curr_pix, *next_pix, *prev_pix, *buffer;
@@ -2304,8 +2278,7 @@ int make_bmp_palette(int colors, int grey, UCHAR *r, UCHAR *g, UCHAR *b)
 static UINT getshort(FILE *fp)
 /*---------------------------------------------------------------------------*/
 {
-	int c = getc(fp),
-		c1 = getc(fp);
+	int c = getc(fp), c1 = getc(fp);
 
 	return ((UINT)c) + (((UINT)c1) << 8);
 }
@@ -2314,23 +2287,16 @@ static UINT getshort(FILE *fp)
 static UINT getint(FILE *fp)
 /*---------------------------------------------------------------------------*/
 {
-	int c = getc(fp),
-		c1 = getc(fp),
-		c2 = getc(fp),
-		c3 = getc(fp);
+	int c = getc(fp), c1 = getc(fp), c2 = getc(fp), c3 = getc(fp);
 
-	return (((UINT)c) << 0) +
-		   (((UINT)c1) << 8) +
-		   (((UINT)c2) << 16) +
-		   (((UINT)c3) << 24);
+	return (((UINT)c) << 0) + (((UINT)c1) << 8) + (((UINT)c2) << 16) + (((UINT)c3) << 24);
 }
 
 /*---------------------------------------------------------------------------*/
 static void putshort(FILE *fp, int i)
 /*---------------------------------------------------------------------------*/
 {
-	int c = (((UINT)i)) & 0xff,
-		c1 = (((UINT)i) >> 8) & 0xff;
+	int c = (((UINT)i)) & 0xff, c1 = (((UINT)i) >> 8) & 0xff;
 
 	putc(c, fp);
 	putc(c1, fp);
@@ -2340,9 +2306,7 @@ static void putshort(FILE *fp, int i)
 static void putint(FILE *fp, int i)
 /*---------------------------------------------------------------------------*/
 {
-	int c = ((UINT)i) & 0xff,
-		c1 = (((UINT)i) >> 8) & 0xff,
-		c2 = (((UINT)i) >> 16) & 0xff,
+	int c = ((UINT)i) & 0xff, c1 = (((UINT)i) >> 8) & 0xff, c2 = (((UINT)i) >> 16) & 0xff,
 		c3 = (((UINT)i) >> 24) & 0xff;
 
 	putc(c, fp);

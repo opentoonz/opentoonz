@@ -33,7 +33,7 @@ class DVAPI TPaletteHandle : public QObject
 	int m_styleIndex;
 	int m_styleParamIndex;
 
-public:
+  public:
 	TPaletteHandle();
 	~TPaletteHandle();
 
@@ -51,19 +51,19 @@ public:
 
 	void setStyleParamIndex(int index);
 
-public:
+  public:
 	void notifyPaletteSwitched() { emit paletteSwitched(); }
 	void notifyPaletteChanged();
 	void notifyPaletteTitleChanged();
 	void notifyColorStyleSwitched();
-	//unchange the dirty flag when undo operation
+	// unchange the dirty flag when undo operation
 	void notifyColorStyleChanged(bool onDragging = true, bool setDirtyFlag = true);
 
 	void notifyPaletteDirtyFlagChanged() { emit paletteDirtyFlagChanged(); }
 	void notifyPaletteLockChanged() { emit paletteLockChanged(); }
 
-public:
-signals:
+  public:
+  signals:
 
 	void paletteSwitched();
 	void paletteChanged();
@@ -74,14 +74,14 @@ signals:
 	void paletteDirtyFlagChanged();
 	void paletteLockChanged();
 
-private:
+  private:
 	friend class PaletteController;
 
 	bool connectBroadcasts(const QObject *receiver);
 	bool disconnectBroadcasts(const QObject *receiver);
 
-private:
-signals:
+  private:
+  signals:
 
 	// Internal broadcaster signals to multiple palette handles.
 	// Do not connect to user code.
@@ -93,4 +93,4 @@ signals:
 	void broadcastColorStyleChangedOnMouseRelease();
 };
 
-#endif //TPALETTEHANDLE_H
+#endif // TPALETTEHANDLE_H

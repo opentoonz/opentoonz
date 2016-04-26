@@ -24,20 +24,19 @@ class TRendererStartInvoker : public QObject
 {
 	Q_OBJECT
 
-public:
+  public:
 	struct StartInvokerRenderData {
 		unsigned long m_renderId;
 		const RenderDataVector *m_renderDataVector;
 	};
 
-public:
+  public:
 	TRendererStartInvoker()
 	{
 		qRegisterMetaType<StartInvokerRenderData>("StartInvokerRenderData");
 
-		connect(this, SIGNAL(startRender(TRendererImp *, StartInvokerRenderData)),
-				this, SLOT(doStartRender(TRendererImp *, StartInvokerRenderData)),
-				Qt::QueuedConnection);
+		connect(this, SIGNAL(startRender(TRendererImp *, StartInvokerRenderData)), this,
+				SLOT(doStartRender(TRendererImp *, StartInvokerRenderData)), Qt::QueuedConnection);
 	}
 	~TRendererStartInvoker() {}
 
@@ -54,9 +53,9 @@ public:
 		void
 		startRender(TRendererImp *, StartInvokerRenderData);
 
-public Q_SLOTS:
+  public Q_SLOTS:
 
 	void doStartRender(TRendererImp *, StartInvokerRenderData rd);
 };
 
-#endif //TRENDERERP_INCLUDE
+#endif // TRENDERERP_INCLUDE

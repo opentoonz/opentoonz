@@ -39,7 +39,7 @@ class DVAPI TSpectrumParam : public TParam
 
 	std::unique_ptr<TSpectrumParamImp> m_imp;
 
-public:
+  public:
 	TSpectrumParam();
 	TSpectrumParam(int keyCount, TSpectrum::ColorKey keys[]);
 	TSpectrumParam(const TSpectrumParam &);
@@ -71,10 +71,8 @@ public:
 	bool isKeyframe(double frame) const;
 	void deleteKeyframe(double frame);
 	void clearKeyframes();
-	void assignKeyframe(
-		double frame,
-		const TSmartPointerT<TParam> &src, double srcFrame,
-		bool changedOnly = false);
+	void assignKeyframe(double frame, const TSmartPointerT<TParam> &src, double srcFrame,
+						bool changedOnly = false);
 
 	void loadData(TIStream &is);
 	void saveData(TOStream &os);
@@ -100,10 +98,12 @@ template class DVAPI TDerivedSmartPointerT<TSpectrumParam, TParam>;
 
 class DVAPI TSpectrumParamP : public TDerivedSmartPointerT<TSpectrumParam, TParam>
 {
-public:
+  public:
 	TSpectrumParamP() {}
 	TSpectrumParamP(int keyCount, TSpectrum::ColorKey keys[])
-		: TDerivedSmartPointerT<TSpectrumParam, TParam>(new TSpectrumParam(keyCount, keys)) {}
+		: TDerivedSmartPointerT<TSpectrumParam, TParam>(new TSpectrumParam(keyCount, keys))
+	{
+	}
 	TSpectrumParamP(TSpectrumParam *p) : TDerivedSmartPointerT<TSpectrumParam, TParam>(p) {}
 	TSpectrumParamP(const TParamP &p) : TDerivedSmartPointerT<TSpectrumParam, TParam>(p) {}
 	operator TParamP() const { return TParamP(m_pointer); }

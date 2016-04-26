@@ -37,12 +37,7 @@ typedef USHORT UD_CMAPINDEX;
 /**********  USER IMAGE STRUCTURES DECLARATIONS   *************/
 /**************************************************************/
 
-typedef enum UD_IMG_TYPE {
-	UD_NONE = 0,
-	UD_CMAPPED,
-	UD_RGBM32,
-	UD_RGBM64
-} UD_IMG_TYPE;
+typedef enum UD_IMG_TYPE { UD_NONE = 0, UD_CMAPPED, UD_RGBM32, UD_RGBM64 } UD_IMG_TYPE;
 
 typedef union UD_PIXEL_PTR {
 	UD_PIXEL32 p32;
@@ -68,17 +63,14 @@ typedef struct UD_USR_IMAGE {
 /*********  UDIT FUNCTION PROTOTYPES DECLARATIONS   ***********/
 /**************************************************************/
 
-enum UD_GOP_TYPE { UD_GOP_SOURCE_TO_DEST,
-				   UD_GOP_DEST_TO_SOURCE };
+enum UD_GOP_TYPE { UD_GOP_SOURCE_TO_DEST, UD_GOP_DEST_TO_SOURCE };
 
-typedef int UD_GOP_FUNC_TYPE(enum UD_GOP_TYPE type,
-							 int num_rectin, UD_RECT src_rects[], UD_RECT *dst_rect,
-							 int argc, const char *argv[],
+typedef int UD_GOP_FUNC_TYPE(enum UD_GOP_TYPE type, int num_rectin, UD_RECT src_rects[],
+							 UD_RECT *dst_rect, int argc, const char *argv[],
 							 const UD_RENDER_INFO *info);
 
 typedef int UD_ROP_FUNC_TYPE(int num_imgs_in, const UD_USR_IMAGE imgs_in[],
-							 const UD_USR_IMAGE *img_out,
-							 int argc, const char *argv[],
+							 const UD_USR_IMAGE *img_out, int argc, const char *argv[],
 							 const UD_RENDER_INFO *info);
 
 typedef struct UD_DATA_V41U1 {
@@ -154,33 +146,27 @@ typedef struct UD44_USR_IMAGE {
 	double img_x_pos, img_y_pos; /*WARNING: leggi sotto!!! */
 } UD44_USR_IMAGE;
 
-/* WARNING: i due campi img_x_pos, img_y_pos sono stati aggiunti alla fine, 
-            e per questo valgono SOLO per le UDIT dei plugin e fx.
-	    essi rappresentano, insieme a img_lx, img_ly
-	    (che quindi hanno un significato diverso nel caso UDIT user defined), 
-	    il rect che contiene  TUTTA l'immagine di input transformata dagli
-	     fx seguenti alla udit corrente.
-	    Quindi, il rect rappresentato da lx, ly, x_pos, y_pos 
-	    deve essere contenuto  o coincidente con il rect suddetto.  */
+/* WARNING: i due campi img_x_pos, img_y_pos sono stati aggiunti alla fine,
+			e per questo valgono SOLO per le UDIT dei plugin e fx.
+		essi rappresentano, insieme a img_lx, img_ly
+		(che quindi hanno un significato diverso nel caso UDIT user defined),
+		il rect che contiene  TUTTA l'immagine di input transformata dagli
+		 fx seguenti alla udit corrente.
+		Quindi, il rect rappresentato da lx, ly, x_pos, y_pos
+		deve essere contenuto  o coincidente con il rect suddetto.  */
 
 /**************************************************************/
 /*********  UDIT FUNCTION PROTOTYPES DECLARATIONS   ***********/
 /**************************************************************/
 
-enum UD44_GOP_TYPE { UD44_GOP_SOURCE_TO_DEST,
-					 UD44_GOP_DEST_TO_SOURCE };
+enum UD44_GOP_TYPE { UD44_GOP_SOURCE_TO_DEST, UD44_GOP_DEST_TO_SOURCE };
 
-typedef int UD44_GOP_FUNC_TYPE(enum UD44_GOP_TYPE type,
-							   int num_rectin,
-							   UD44_USR_IMAGE src_rects[],
-							   UD44_USR_IMAGE *dst_rect,
-							   int argc, const char *argv[],
+typedef int UD44_GOP_FUNC_TYPE(enum UD44_GOP_TYPE type, int num_rectin, UD44_USR_IMAGE src_rects[],
+							   UD44_USR_IMAGE *dst_rect, int argc, const char *argv[],
 							   const UD44_RENDER_INFO *info);
 
-typedef int UD44_ROP_FUNC_TYPE(int num_imgs_in,
-							   const UD44_USR_IMAGE imgs_in[],
-							   const UD44_USR_IMAGE *img_out,
-							   int argc, const char *argv[],
+typedef int UD44_ROP_FUNC_TYPE(int num_imgs_in, const UD44_USR_IMAGE imgs_in[],
+							   const UD44_USR_IMAGE *img_out, int argc, const char *argv[],
 							   const UD44_RENDER_INFO *info);
 
 typedef struct UDIT_DATA_V44U1 {

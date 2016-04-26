@@ -48,7 +48,7 @@ class DVAPI TTabbedWidget : public TWidget
 	int m_currentPageIndex;
 	TGuiColor m_tabColor, m_tabHlColor;
 
-public:
+  public:
 	TTabbedWidget(TWidget *parent, string name = "tabbedwidget");
 
 	void configureNotify(const TDimension &d);

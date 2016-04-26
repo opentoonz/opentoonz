@@ -21,7 +21,8 @@
 //----------------------------------------------------------------------------------------------
 
 RulerTool::RulerTool()
-	: TTool("T_Ruler"), m_firstPos(TConst::nowhere), m_secondPos(TConst::nowhere), m_mousePos(TConst::nowhere), m_dragMode(MakeNewRuler), m_justClicked(false)
+	: TTool("T_Ruler"), m_firstPos(TConst::nowhere), m_secondPos(TConst::nowhere),
+	  m_mousePos(TConst::nowhere), m_dragMode(MakeNewRuler), m_justClicked(false)
 {
 	bind(TTool::AllTargets);
 }
@@ -231,8 +232,8 @@ void RulerTool::updateToolOption()
 					l = sqrt(w * w + h * h);
 
 					for (int i = 0; i < (int)m_toolOptionsBox.size(); i++) {
-						m_toolOptionsBox[i]->updateValues(true, x, y, w, h, a, l,
-														  xPix, yPix, wPix, hPix);
+						m_toolOptionsBox[i]->updateValues(true, x, y, w, h, a, l, xPix, yPix, wPix,
+														  hPix);
 					}
 					return;
 				}

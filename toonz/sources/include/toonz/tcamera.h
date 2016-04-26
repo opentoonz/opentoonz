@@ -15,13 +15,13 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-//forward declaration
+// forward declaration
 class TIStream;
 class TOStream;
 
 //=============================================================================
-//!The TCamera class provides a camera and allows its management.
-/*!A camera is specified by size, getSize() and resolution, getRes(). 
+//! The TCamera class provides a camera and allows its management.
+/*!A camera is specified by size, getSize() and resolution, getRes().
    It can be changed using the setSize(), setRes() functions.
 
    The class moreover gives methods to know camera Dpi getDpi(), camera aspect ratio
@@ -37,82 +37,82 @@ class DVAPI TCamera
 	bool m_xPrevalence;
 	TRect m_interestRect;
 
-public:
+  public:
 	/*!
-    Constructs TCamera with default value, size (12,9) and resolution (768,576).
+	Constructs TCamera with default value, size (12,9) and resolution (768,576).
   */
 	TCamera();
 
 	/*!
-    Return camera size.
-    \sa setSize()
+	Return camera size.
+	\sa setSize()
   */
 	const TDimensionD &getSize() const { return m_size; }
 	/*!
-    Set camera size to \b size.
-    \sa getSize()
+	Set camera size to \b size.
+	\sa getSize()
   */
 	void setSize(const TDimensionD &size, bool preserveDpi = false, bool preserveAR = false);
 
 	/*!
-    Return camera aspect ratio.
+	Return camera aspect ratio.
   */
 	double getAspectRatio() const;
 
 	/*!
-    Return camera resolution.
-    \sa setRes()
+	Return camera resolution.
+	\sa setRes()
   */
 	const TDimension &getRes() const { return m_res; }
 	/*!
-    Set camera resolution to \b res.
-    \sa getRes()
+	Set camera resolution to \b res.
+	\sa getRes()
   */
 	void setRes(const TDimension &res);
 
 	/*!
-    Return camera Dpi.
+	Return camera Dpi.
   */
 	TPointD getDpi() const;
 
 	/*!
-    Return true if "resolution width per size height" is equal to
-     "resolution height per size width".
+	Return true if "resolution width per size height" is equal to
+	 "resolution height per size width".
   */
 	bool isPixelSquared() const;
 
 	/*!
-    Returns the reference change matrix from stage reference to camera (resolution) reference
+	Returns the reference change matrix from stage reference to camera (resolution) reference
   */
 	TAffine getStageToCameraRef() const;
 
 	/*!
-    Returns the reference change matrix from camera (resolution) reference to stage reference
+	Returns the reference change matrix from camera (resolution) reference to stage reference
   */
 	TAffine getCameraToStageRef() const;
 
 	/*!
-    Return stage rect.
+	Return stage rect.
   */
 	TRectD getStageRect() const;
 
 	/*!
-    Sets the camera's interest rect. Typically used in preview modes.
+	Sets the camera's interest rect. Typically used in preview modes.
   */
 	void setInterestRect(const TRect &rect);
 
 	/*!
-    Returns the camera's interest rect.
+	Returns the camera's interest rect.
   */
 	TRect getInterestRect() const { return m_interestRect; }
 
 	/*!
-    Sets the interest rect from stage coordinates
+	Sets the interest rect from stage coordinates
   */
 	void setInterestStageRect(const TRectD &rect);
 
 	/*!
-    Returns the interest rect in stage coordinates.
+	Returns the interest rect in stage coordinates.
   */
 	TRectD getInterestStageRect() const;
 

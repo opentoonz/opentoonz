@@ -40,13 +40,13 @@ class DVAPI UpdateChecker
 	QDate m_updateDate;
 	QUrl m_webPageUrl;
 
-public:
+  public:
 	UpdateChecker(const QString &requestToServer);
 
 	QDate getUpdateDate() const { return m_updateDate; }
 	QUrl getWebPageUrl() const { return m_webPageUrl; }
 
-protected slots:
+  protected slots:
 	void httpRequestStarted(int requestId) {}
 #if QT_VERSION >= 0x050000
 	void httpRequestFinished(QNetworkReply *);
@@ -55,7 +55,8 @@ protected slots:
 	void readyReadExec(const QHttpResponseHeader &head) {}
 	void readResponseHeader(const QHttpResponseHeader &responseHeader);
 #endif
-	void slotAuthenticationRequired(const QString &hostName, quint16, QAuthenticator *authenticator);
+	void slotAuthenticationRequired(const QString &hostName, quint16,
+									QAuthenticator *authenticator);
 	void httpStateChanged(int state);
 };
 

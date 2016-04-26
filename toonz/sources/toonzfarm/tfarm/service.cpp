@@ -29,20 +29,15 @@ LPTSTR GetLastErrorText(LPTSTR lpszBuf, DWORD dwSize)
 	DWORD dwRet;
 	LPTSTR lpszTemp = NULL;
 
-	dwRet = FormatMessage(
-		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ARGUMENT_ARRAY,
-		NULL,
-		GetLastError(),
-		LANG_NEUTRAL,
-		(LPTSTR)&lpszTemp,
-		0,
-		NULL);
+	dwRet = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
+							  FORMAT_MESSAGE_ARGUMENT_ARRAY,
+						  NULL, GetLastError(), LANG_NEUTRAL, (LPTSTR)&lpszTemp, 0, NULL);
 
 	// supplied buffer is not long enough
 	if (!dwRet || ((long)dwSize < (long)dwRet + 14))
 		lpszBuf[0] = TEXT('\0');
 	else {
-		lpszTemp[lstrlen(lpszTemp) - 2] = TEXT('\0'); //remove cr and newline character
+		lpszTemp[lstrlen(lpszTemp) - 2] = TEXT('\0'); // remove cr and newline character
 		_stprintf(lpszBuf, TEXT("%s (0x%x)"), lpszTemp, GetLastError());
 	}
 
@@ -76,7 +71,7 @@ std::string getLastErrorText()
 
 class TService::Imp
 {
-public:
+  public:
 	Imp() {}
 
 #ifdef _WIN32
@@ -111,8 +106,7 @@ bool TService::Imp::m_console = false;
 
 //------------------------------------------------------------------------------
 
-TService::TService(const std::string &name, const std::string &displayName)
-	: m_imp(new Imp)
+TService::TService(const std::string &name, const std::string &displayName) : m_imp(new Imp)
 {
 	m_imp->m_name = name;
 	m_imp->m_displayName = displayName;
@@ -212,8 +206,8 @@ void WINAPI TService::Imp::serviceMain(DWORD dwArgc, LPTSTR *lpszArgv)
 {
 	// register our service control handler:
 	//
-	m_hService = RegisterServiceCtrlHandler(
-		TService::instance()->getName().c_str(), TService::Imp::serviceCtrl);
+	m_hService = RegisterServiceCtrlHandler(TService::instance()->getName().c_str(),
+											TService::Imp::serviceCtrl);
 
 	if (m_hService == 0)
 		goto cleanup;
@@ -225,18 +219,16 @@ void WINAPI TService::Imp::serviceMain(DWORD dwArgc, LPTSTR *lpszArgv)
 
 	// report the status to the service control manager.
 	//
-	if (!reportStatusToSCMgr(
-			SERVICE_START_PENDING, // service state
-			NO_ERROR,			   // exit code
-			3000))				   // wait hint
+	if (!reportStatusToSCMgr(SERVICE_START_PENDING, // service state
+							 NO_ERROR,				// exit code
+							 3000))					// wait hint
 		goto cleanup;
 
 	// AGGIUNGERE INIZIALIZZAZIONE QUI
 
-	if (!reportStatusToSCMgr(
-			SERVICE_RUNNING, // service state
-			NO_ERROR,		 // exit code
-			0))				 // wait hint
+	if (!reportStatusToSCMgr(SERVICE_RUNNING, // service state
+							 NO_ERROR,		  // exit code
+							 0))			  // wait hint
 		goto cleanup;
 
 	TService::instance()->onStart(dwArgc, lpszArgv);
@@ -276,9 +268,7 @@ BOOL WINAPI TService::Imp::controlHandler(DWORD dwCtrlType)
 
 	case CTRL_BREAK_EVENT: // use Ctrl+C or Ctrl+Break to simulate
 	case CTRL_C_EVENT:	 // SERVICE_CONTROL_STOP in debug mode
-		_tprintf(
-			TEXT("Stopping %s.\n"),
-			TService::instance()->getDisplayName().c_str());
+		_tprintf(TEXT("Stopping %s.\n"), TService::instance()->getDisplayName().c_str());
 
 		TService::instance()->onStop();
 		return TRUE;
@@ -313,7 +303,8 @@ bool TService::Imp::reportStatusToSCMgr(long currentState, long win32ExitCode, l
 	/*
 	SERVICE_STATUS srvStatus;		// Declare a SERVICE_STATUS structure, and fill it in
 
-	srvStatus.dwServiceType  = SERVICE_WIN32_OWN_PROCESS;	// We're a service running in our own process
+	srvStatus.dwServiceType  = SERVICE_WIN32_OWN_PROCESS;	// We're a service running in our own
+	process
 
 	// Set the state of the service from the argument, and save it away
 	// for future use
@@ -321,13 +312,13 @@ bool TService::Imp::reportStatusToSCMgr(long currentState, long win32ExitCode, l
 	srvStatus.dwCurrentState = _dwCurrState = dwState;
 
 	// Which commands will we accept from the SCM? All the common ones...
-	srvStatus.dwControlsAccepted =	SERVICE_ACCEPT_STOP | 
-													SERVICE_ACCEPT_PAUSE_CONTINUE | 
+	srvStatus.dwControlsAccepted =	SERVICE_ACCEPT_STOP |
+													SERVICE_ACCEPT_PAUSE_CONTINUE |
 													SERVICE_ACCEPT_SHUTDOWN;
 
 	srvStatus.dwWin32ExitCode = dwExitCode;	// Set the Win32 exit code for the service
 	srvStatus.dwServiceSpecificExitCode = 0;	// Set the service-specific exit code
-	srvStatus.dwCheckPoint = dwProgress;	// Set the checkpoint value	
+	srvStatus.dwCheckPoint = dwProgress;	// Set the checkpoint value
 	srvStatus.dwWaitHint = __WAIT_TIME_FOR_SERVICE;	// 3 second timeout for waits
 
 	return SetServiceStatus( _hService, &srvStatus); // pass the structure to the SCM
@@ -341,17 +332,15 @@ bool TService::Imp::reportStatusToSCMgr(long currentState, long win32ExitCode, l
 		if (currentState == SERVICE_START_PENDING)
 			m_ssStatus.dwControlsAccepted = 0;
 		else
-			m_ssStatus.dwControlsAccepted = SERVICE_ACCEPT_STOP |
-											SERVICE_ACCEPT_PAUSE_CONTINUE |
-											SERVICE_ACCEPT_SHUTDOWN;
+			m_ssStatus.dwControlsAccepted =
+				SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_PAUSE_CONTINUE | SERVICE_ACCEPT_SHUTDOWN;
 		;
 
 		m_ssStatus.dwCurrentState = currentState;
 		m_ssStatus.dwWin32ExitCode = win32ExitCode;
 		m_ssStatus.dwWaitHint = waitHint;
 
-		if ((currentState == SERVICE_RUNNING) ||
-			(currentState == SERVICE_STOPPED))
+		if ((currentState == SERVICE_RUNNING) || (currentState == SERVICE_STOPPED))
 			m_ssStatus.dwCheckPoint = 0;
 		else
 			m_ssStatus.dwCheckPoint = dwCheckPoint++;
@@ -425,32 +414,31 @@ bool TService::isRunningAsConsoleApp() const
 
 //------------------------------------------------------------------------------
 
-void TService::install(const std::string &name, const std::string &displayName, const TFilePath &appPath)
+void TService::install(const std::string &name, const std::string &displayName,
+					   const TFilePath &appPath)
 {
 #ifdef _WIN32
 	SC_HANDLE schService;
 	SC_HANDLE schSCManager;
 
-	schSCManager = OpenSCManager(
-		NULL,					// machine (NULL == local)
-		NULL,					// database (NULL == default)
-		SC_MANAGER_ALL_ACCESS); // access required
+	schSCManager = OpenSCManager(NULL,					 // machine (NULL == local)
+								 NULL,					 // database (NULL == default)
+								 SC_MANAGER_ALL_ACCESS); // access required
 
 	if (schSCManager) {
-		schService = CreateService(
-			schSCManager,							   // SCManager database
-			name.c_str(),							   // name of service
-			displayName.c_str(),					   // name to display
-			SERVICE_ALL_ACCESS,						   // desired access
-			SERVICE_WIN32_OWN_PROCESS,				   // service type
-			SERVICE_DEMAND_START,					   // start type
-			SERVICE_ERROR_NORMAL,					   // error control type
-			toString(appPath.getWideString()).c_str(), // service's binary
-			NULL,									   // no load ordering group
-			NULL,									   // no tag identifier
-			TEXT(SZDEPENDENCIES),					   // dependencies
-			NULL,									   // LocalSystem account
-			NULL);									   // no password
+		schService = CreateService(schSCManager,							  // SCManager database
+								   name.c_str(),							  // name of service
+								   displayName.c_str(),						  // name to display
+								   SERVICE_ALL_ACCESS,						  // desired access
+								   SERVICE_WIN32_OWN_PROCESS,				  // service type
+								   SERVICE_DEMAND_START,					  // start type
+								   SERVICE_ERROR_NORMAL,					  // error control type
+								   toString(appPath.getWideString()).c_str(), // service's binary
+								   NULL,				 // no load ordering group
+								   NULL,				 // no tag identifier
+								   TEXT(SZDEPENDENCIES), // dependencies
+								   NULL,				 // LocalSystem account
+								   NULL);				 // no password
 
 		if (schService) {
 			_tprintf(TEXT("%s installed.\n"), displayName.c_str());
@@ -475,10 +463,9 @@ void TService::remove(const std::string &name)
 	SC_HANDLE schService;
 	SC_HANDLE schSCManager;
 
-	schSCManager = OpenSCManager(
-		NULL,					// machine (NULL == local)
-		NULL,					// database (NULL == default)
-		SC_MANAGER_ALL_ACCESS); // access required
+	schSCManager = OpenSCManager(NULL,					 // machine (NULL == local)
+								 NULL,					 // database (NULL == default)
+								 SC_MANAGER_ALL_ACCESS); // access required
 
 	if (schSCManager) {
 		schService = OpenService(schSCManager, name.c_str(), SERVICE_ALL_ACCESS);
@@ -543,7 +530,8 @@ void TService::addToMessageLog(const std::string &msg)
 		//
 		hEventSource = RegisterEventSource(NULL, TService::instance()->getName().c_str());
 
-		_stprintf(szMsg, TEXT("%s error: %d"), TService::instance()->getName().c_str(), TService::Imp::m_dwErr);
+		_stprintf(szMsg, TEXT("%s error: %d"), TService::instance()->getName().c_str(),
+				  TService::Imp::m_dwErr);
 		lpszStrings[0] = szMsg;
 		lpszStrings[1] = msg.c_str();
 

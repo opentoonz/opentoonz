@@ -79,7 +79,7 @@ bool selectionContainTlvImage(TCellSelection *selection, TXsheet *xsheet, bool o
 	int r0, r1, c0, c1;
 	selection->getSelectedCells(r0, c0, r1, c1);
 
-	//Verifico se almeno un livello della selezione e' un tlv
+	// Verifico se almeno un livello della selezione e' un tlv
 	int c, r;
 	for (c = c0; c <= c1; c++)
 		for (r = r0; r <= r1; r++) {
@@ -99,12 +99,13 @@ bool selectionContainTlvImage(TCellSelection *selection, TXsheet *xsheet, bool o
 
 //-----------------------------------------------------------------------------
 
-bool selectionContainRasterImage(TCellSelection *selection, TXsheet *xsheet, bool onlyRaster = false)
+bool selectionContainRasterImage(TCellSelection *selection, TXsheet *xsheet,
+								 bool onlyRaster = false)
 {
 	int r0, r1, c0, c1;
 	selection->getSelectedCells(r0, c0, r1, c1);
 
-	//Verifico se almeno un livello della selezione e' un tlv
+	// Verifico se almeno un livello della selezione e' un tlv
 	int c, r;
 	for (c = c0; c <= c1; c++)
 		for (r = r0; r <= r1; r++) {
@@ -128,7 +129,7 @@ bool selectionContainLevelImage(TCellSelection *selection, TXsheet *xsheet)
 {
 	int r0, r1, c0, c1;
 	selection->getSelectedCells(r0, c0, r1, c1);
-	//Verifico se almeno un livello della selezione e' un tlv, un pli o un fullcolor (!= .psd)
+	// Verifico se almeno un livello della selezione e' un tlv, un pli o un fullcolor (!= .psd)
 	int c, r;
 	for (c = c0; c <= c1; c++)
 		for (r = r0; r <= r1; r++) {
@@ -139,7 +140,8 @@ bool selectionContainLevelImage(TCellSelection *selection, TXsheet *xsheet)
 
 			std::string ext = level->getPath().getType();
 			int type = level->getType();
-			if (type == TZP_XSHLEVEL || type == PLI_XSHLEVEL || (type == OVL_XSHLEVEL && ext != "psd"))
+			if (type == TZP_XSHLEVEL || type == PLI_XSHLEVEL ||
+				(type == OVL_XSHLEVEL && ext != "psd"))
 				return true;
 		}
 
@@ -148,7 +150,7 @@ bool selectionContainLevelImage(TCellSelection *selection, TXsheet *xsheet)
 
 //-----------------------------------------------------------------------------
 /*! convert the last one digit of the frame number to alphabet
-    Ex.  12 -> 1B    21 -> 2A   30 -> 3
+	Ex.  12 -> 1B    21 -> 2A   30 -> 3
 */
 void parse_with_letter(const QString &text, std::wstring &levelName, TFrameId &fid)
 {
@@ -157,7 +159,7 @@ void parse_with_letter(const QString &text, std::wstring &levelName, TFrameId &f
 	QRegExp caracters("[^\\d+]");
 	QString str = text;
 
-	//remove final spaces
+	// remove final spaces
 	int size = str.size();
 	while (str.lastIndexOf(spaces) == size - 1 && size > 0)
 		str.remove(str.size() - 1, 1);
@@ -170,12 +172,12 @@ void parse_with_letter(const QString &text, std::wstring &levelName, TFrameId &f
 	int lastSpaceIndex = str.lastIndexOf(spaces);
 	// if input only digits / alphabet
 	if (lastSpaceIndex == -1) {
-		//in case of only level name
+		// in case of only level name
 		if (str.contains(caracters) && !str.contains(numbers)) {
 			levelName = text.toStdWString();
 			fid = TFrameId::NO_FRAME;
 		}
-		//in case of input frame number + alphabet
+		// in case of input frame number + alphabet
 		else if (str.contains(numbers) && str.contains(caracters)) {
 			levelName = L"";
 
@@ -212,21 +214,21 @@ void parse_with_letter(const QString &text, std::wstring &levelName, TFrameId &f
 
 			fid = TFrameId(str.toInt() * 10 + appendNum);
 		}
-		//in case of input only frame number
+		// in case of input only frame number
 		else if (str.contains(numbers)) {
 			levelName = L"";
 			fid = TFrameId(str.toInt() * 10);
 		}
 	}
-	//if input both the level name and frame number
+	// if input both the level name and frame number
 	else {
 		QString lastString = str.right(str.size() - 1 - lastSpaceIndex);
 		if (lastString.contains(numbers)) {
-			//level name
+			// level name
 			QString firstString = str.left(lastSpaceIndex);
 			levelName = firstString.toStdWString();
 
-			//frame number + alphabet
+			// frame number + alphabet
 			if (lastString.contains(caracters)) {
 
 				QString appendix = lastString.right(1);
@@ -262,7 +264,7 @@ void parse_with_letter(const QString &text, std::wstring &levelName, TFrameId &f
 
 				fid = TFrameId(lastString.toInt() * 10 + appendNum);
 			}
-			//only frame number
+			// only frame number
 			else if (lastString.contains(numbers)) {
 				fid = TFrameId(lastString.toInt() * 10);
 			}
@@ -283,7 +285,7 @@ void parse(const QString &text, std::wstring &levelName, TFrameId &fid)
 	QRegExp caracters("[^\\d+]");
 	QString str = text;
 
-	//remove final spaces
+	// remove final spaces
 	int size = str.size();
 	while (str.lastIndexOf(spaces) == size - 1 && size > 0)
 		str.remove(str.size() - 1, 1);
@@ -320,7 +322,8 @@ bool isGlobalKeyFrameWithSameTypeDiffFromLinear(TStageObject *stageObject, int f
 {
 	if (!stageObject->isFullKeyframe(frame))
 		return false;
-	TDoubleKeyframe::Type type = stageObject->getParam(TStageObject::T_Angle)->getKeyframeAt(frame).m_type;
+	TDoubleKeyframe::Type type =
+		stageObject->getParam(TStageObject::T_Angle)->getKeyframeAt(frame).m_type;
 	if (type == TDoubleKeyframe::Linear)
 		return false;
 	if (type != stageObject->getParam(TStageObject::T_X)->getKeyframeAt(frame).m_type ||
@@ -354,7 +357,8 @@ bool isGlobalKeyFrameWithSamePrevTypeDiffFromLinear(TStageObject *stageObject, i
 {
 	if (!stageObject->isFullKeyframe(frame))
 		return false;
-	TDoubleKeyframe::Type type = stageObject->getParam(TStageObject::T_Angle)->getKeyframeAt(frame).m_prevType;
+	TDoubleKeyframe::Type type =
+		stageObject->getParam(TStageObject::T_Angle)->getKeyframeAt(frame).m_prevType;
 	if (type == TDoubleKeyframe::Linear)
 		return false;
 	if (type != stageObject->getParam(TStageObject::T_X)->getKeyframeAt(frame).m_prevType ||
@@ -401,7 +405,7 @@ class RenameCellUndo : public TUndo
 	const TXshCell m_oldCell;
 	const TXshCell m_newCell;
 
-public:
+  public:
 	// indices sono le colonne inserite
 	RenameCellUndo(int row, int col, TXshCell oldCell, TXshCell newCell)
 		: m_row(row), m_col(col), m_oldCell(oldCell), m_newCell(newCell)
@@ -420,20 +424,11 @@ public:
 		app->getCurrentXsheet()->notifyXsheetChanged();
 	}
 
-	void undo() const
-	{
-		setcell(m_oldCell);
-	}
+	void undo() const { setcell(m_oldCell); }
 
-	void redo() const
-	{
-		setcell(m_newCell);
-	}
+	void redo() const { setcell(m_newCell); }
 
-	int getSize() const
-	{
-		return sizeof *this;
-	}
+	int getSize() const { return sizeof *this; }
 
 	QString getHistoryString()
 	{
@@ -441,17 +436,14 @@ public:
 			.arg(QString::number(m_col + 1))
 			.arg(QString::number(m_row + 1));
 	}
-	int getHistoryType()
-	{
-		return HistoryType::Xsheet;
-	}
+	int getHistoryType() { return HistoryType::Xsheet; }
 };
 
 // display upper-directional smart tab only when pressing ctrl key
 bool isCtrlPressed = false;
 
 //-----------------------------------------------------------------------------
-} //namespace
+} // namespace
 //-----------------------------------------------------------------------------
 
 namespace XsheetGUI
@@ -482,7 +474,7 @@ void RenameCellField::showInRowCol(int row, int col)
 	static QFont font("Helvetica", XSHEET_FONT_SIZE, QFont::Normal);
 	setFont(font);
 
-	//Se la cella non e' vuota setto il testo
+	// Se la cella non e' vuota setto il testo
 	TXsheet *xsh = m_viewer->getXsheet();
 	TXshCell cell = xsh->getCell(row, col);
 	if (!cell.isEmpty()) {
@@ -492,8 +484,10 @@ void RenameCellField::showInRowCol(int row, int col)
 		// convert the last one digit of the frame number to alphabet
 		// Ex.  12 -> 1B    21 -> 2A   30 -> 3
 		if (Preferences::instance()->isShowFrameNumberWithLettersEnabled())
-			setText((fid.isEmptyFrame() || fid.isNoFrame()) ? QString::fromStdWString(levelName)
-															: QString::fromStdWString(levelName) + QString(" ") + m_viewer->getFrameNumberWithLetters(fid.getNumber()));
+			setText((fid.isEmptyFrame() || fid.isNoFrame())
+						? QString::fromStdWString(levelName)
+						: QString::fromStdWString(levelName) + QString(" ") +
+							  m_viewer->getFrameNumberWithLetters(fid.getNumber()));
 		else {
 			std::string frameNumber("");
 			if (fid.getNumber() > 0)
@@ -501,7 +495,8 @@ void RenameCellField::showInRowCol(int row, int col)
 			if (fid.getLetter() != 0)
 				frameNumber.append(1, fid.getLetter());
 			setText((frameNumber.empty()) ? QString::fromStdWString(levelName)
-										  : QString::fromStdWString(levelName) + QString(" ") + QString::fromStdString(frameNumber));
+										  : QString::fromStdWString(levelName) + QString(" ") +
+												QString::fromStdString(frameNumber));
 		}
 		selectAll();
 	}
@@ -536,9 +531,8 @@ void RenameCellField::renameCell()
 	TXsheet *xsheet = m_viewer->getXsheet();
 
 	bool animationSheetEnabled = Preferences::instance()->isAnimationSheetEnabled();
-	bool levelDefined =
-		xsheet->getCell(m_row, m_col).getSimpleLevel() != 0 ||
-		m_row > 0 && xsheet->getCell(m_row - 1, m_col).getSimpleLevel() != 0;
+	bool levelDefined = xsheet->getCell(m_row, m_col).getSimpleLevel() != 0 ||
+						m_row > 0 && xsheet->getCell(m_row - 1, m_col).getSimpleLevel() != 0;
 
 	if (animationSheetEnabled && levelDefined) {
 		TXshCell cell = xsheet->getCell(m_row, m_col);
@@ -547,9 +541,11 @@ void RenameCellField::renameCell()
 			QRegExp fidRe("([0-9]+)([a-z]?)");
 			if (fidRe.exactMatch(s)) {
 #if QT_VERSION >= 0x050500
-				fid = TFrameId(fidRe.cap(1).toInt(), fidRe.cap(2) == "" ? 0 : fidRe.cap(2).toLatin1()[0]);
+				fid = TFrameId(fidRe.cap(1).toInt(),
+							   fidRe.cap(2) == "" ? 0 : fidRe.cap(2).toLatin1()[0]);
 #else
-				fid = TFrameId(fidRe.cap(1).toInt(), fidRe.cap(2) == "" ? 0 : fidRe.cap(2).toAscii()[0]);
+				fid = TFrameId(fidRe.cap(1).toInt(),
+							   fidRe.cap(2) == "" ? 0 : fidRe.cap(2).toAscii()[0]);
 #endif
 				FilmstripCmd::renumberDrawing(sl, cell.m_frameId, fid);
 			}
@@ -561,7 +557,8 @@ void RenameCellField::renameCell()
 		// prendo il livello dalla cella precedente. Se non c'e' dalla corrente
 		// (forse sto modificando una cella non vuota)
 
-		// no: faccio il contrario. cfr #6152. celle A-1,B-1. Edito B-1 e la rinomino in 2. Quindi devo prima verificare
+		// no: faccio il contrario. cfr #6152. celle A-1,B-1. Edito B-1 e la rinomino in 2. Quindi
+		// devo prima verificare
 		// che la cella corrente non sia vuota
 
 		TXshCell cell = xsheet->getCell(m_row, m_col);
@@ -569,7 +566,8 @@ void RenameCellField::renameCell()
 			cell = xsheet->getCell(m_row - 1, m_col);
 		}
 		xl = cell.m_level.getPointer();
-		if (!xl || (xl->getType() == OVL_XSHLEVEL && xl->getPath().getFrame() == TFrameId::NO_FRAME))
+		if (!xl ||
+			(xl->getType() == OVL_XSHLEVEL && xl->getPath().getFrame() == TFrameId::NO_FRAME))
 			return;
 		if (fid == TFrameId::NO_FRAME)
 			fid = cell.m_frameId;
@@ -593,7 +591,7 @@ void RenameCellField::renameCell()
 		return;
 	TXshCell cell(xl, fid);
 
-	//register undo only if the cell is modified
+	// register undo only if the cell is modified
 	if (cell == xsheet->getCell(m_row, m_col))
 		return;
 
@@ -648,7 +646,9 @@ CellArea::CellArea(XsheetViewer *parent, Qt::WindowFlags flags)
 #else
 CellArea::CellArea(XsheetViewer *parent, Qt::WFlags flags)
 #endif
-	: QWidget(parent, flags), m_viewer(parent), m_levelExtenderRect(), m_soundLevelModifyRects(), m_isPanning(false), m_isMousePressed(false), m_pos(-1, -1), m_tooltip(tr("")), m_renameCell(new RenameCellField(this, m_viewer))
+	: QWidget(parent, flags), m_viewer(parent), m_levelExtenderRect(), m_soundLevelModifyRects(),
+	  m_isPanning(false), m_isMousePressed(false), m_pos(-1, -1), m_tooltip(tr("")),
+	  m_renameCell(new RenameCellField(this, m_viewer))
 {
 	setAcceptDrops(true);
 	setMouseTracking(true);
@@ -664,8 +664,14 @@ CellArea::~CellArea()
 
 //-----------------------------------------------------------------------------
 
-DragTool *CellArea::getDragTool() const { return m_viewer->getDragTool(); }
-void CellArea::setDragTool(DragTool *dragTool) { m_viewer->setDragTool(dragTool); }
+DragTool *CellArea::getDragTool() const
+{
+	return m_viewer->getDragTool();
+}
+void CellArea::setDragTool(DragTool *dragTool)
+{
+	m_viewer->setDragTool(dragTool);
+}
 
 //-----------------------------------------------------------------------------
 
@@ -695,9 +701,7 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated)
 			if (!currentColumn)
 				continue;
 			if (currentColumn->isEmpty() == false) {
-				p.fillRect(1, 0,
-						   m_viewer->columnToX(filledCol + 1),
-						   m_viewer->rowToY(xshRowCount),
+				p.fillRect(1, 0, m_viewer->columnToX(filledCol + 1), m_viewer->rowToY(xshRowCount),
 						   QBrush(m_viewer->getNotEmptyColumnColor()));
 				break;
 			}
@@ -753,7 +757,7 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated)
 			isPaletteColumn = column->getPaletteColumn() != 0;
 			isSoundTextColumn = column->getSoundTextColumn() != 0;
 		}
-		//check if the column is reference
+		// check if the column is reference
 		bool isReference = true;
 		if (column) { // Verifico se la colonna e' una mask
 			if (column->isControl() || column->isRendered() || column->getMeshColumn())
@@ -763,7 +767,7 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated)
 		x0 = x + 1;
 		x1 = m_viewer->columnToX(col + 1);
 
-		//draw vertical lines
+		// draw vertical lines
 		p.setPen(Qt::black);
 		if (x > 0)
 			p.drawLine(x, y0, x, y1);
@@ -772,8 +776,9 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated)
 			p.drawLine(x - 1, y0, x - 1, y1);
 
 		for (row = r0; row <= r1; row++) {
-			//draw horizontal lines
-			QColor color = ((row - offset) % distance != 0) ? m_viewer->getLightLineColor() : m_viewer->getMarkerLineColor();
+			// draw horizontal lines
+			QColor color = ((row - offset) % distance != 0) ? m_viewer->getLightLineColor()
+															: m_viewer->getMarkerLineColor();
 
 			p.setPen(color);
 			int y = m_viewer->rowToY(row);
@@ -791,31 +796,32 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated)
 				drawLevelCell(p, row, col, isReference);
 		}
 
-		//hide top-most interval line
+		// hide top-most interval line
 		p.setPen(m_viewer->getLightLineColor());
 		p.drawLine(x - 1, 0, x1 - 1, 0);
 	}
 
 	// smart tab
-	int smartTabPosOffset = (Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled()) ? 31 : 20;
+	int smartTabPosOffset =
+		(Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled()) ? 31 : 20;
 	if (!cellSelection->isEmpty() && !m_viewer->areSoundCellsSelected()) {
 		m_levelExtenderRect = QRect(xS1 - smartTabPosOffset, yS1 + 1, 19, 8);
 		p.setPen(Qt::black);
 		p.setBrush(SmartTabColor);
 		p.drawRoundRect(m_levelExtenderRect, 30, 75);
-		QColor color = ((rS1 + 1 - offset) % distance != 0) ? m_viewer->getLightLineColor() : m_viewer->getMarkerLineColor();
+		QColor color = ((rS1 + 1 - offset) % distance != 0) ? m_viewer->getLightLineColor()
+															: m_viewer->getMarkerLineColor();
 		p.setPen(color);
 		p.drawLine(xS1 - smartTabPosOffset, yS1 + 1, xS1 - 1, yS1 + 1);
 
 		// upper-directional smart tab
-		if (isCtrlPressed &&
-			rS0 > 0 &&
-			!m_viewer->areCellsSelectedEmpty()) {
+		if (isCtrlPressed && rS0 > 0 && !m_viewer->areCellsSelectedEmpty()) {
 			m_upperLevelExtenderRect = QRect(xS1 - smartTabPosOffset, yS0 - 8, 19, 8);
 			p.setPen(Qt::black);
 			p.setBrush(SmartTabColor);
 			p.drawRoundRect(m_upperLevelExtenderRect, 30, 75);
-			QColor color = ((rS0 - offset) % distance != 0) ? m_viewer->getLightLineColor() : m_viewer->getMarkerLineColor();
+			QColor color = ((rS0 - offset) % distance != 0) ? m_viewer->getLightLineColor()
+															: m_viewer->getMarkerLineColor();
 			p.setPen(color);
 			p.drawLine(xS1 - smartTabPosOffset, yS0, xS1 - 1, yS0);
 		}
@@ -848,7 +854,8 @@ void CellArea::drawSoundCell(QPainter &p, int row, int col)
 
 	TCellSelection *cellSelection = m_viewer->getCellSelection();
 	TColumnSelection *columnSelection = m_viewer->getColumnSelection();
-	bool isSelected = cellSelection->isCellSelected(row, col) || columnSelection->isColumnSelected(col);
+	bool isSelected =
+		cellSelection->isCellSelected(row, col) || columnSelection->isColumnSelected(col);
 
 	// sfondo celle
 	QRect backgroundRect = QRect(x + 1, y + 1, ColumnWidth - 1, RowHeight - 1);
@@ -958,11 +965,12 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference)
 
 	TCellSelection *cellSelection = m_viewer->getCellSelection();
 	TColumnSelection *columnSelection = m_viewer->getColumnSelection();
-	bool isSelected = cellSelection->isCellSelected(row, col) || columnSelection->isColumnSelected(col);
+	bool isSelected =
+		cellSelection->isCellSelected(row, col) || columnSelection->isColumnSelected(col);
 
 	if (row > 0)
 		prevCell = xsh->getCell(row - 1, col);
-	//nothing to draw
+	// nothing to draw
 	if (cell.isEmpty() && prevCell.isEmpty())
 		return;
 	TXshCell nextCell;
@@ -983,7 +991,8 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference)
 	// get cell colors
 	QColor cellColor, sideColor;
 	if (isReference) {
-		cellColor = (isSelected) ? m_viewer->getSelectedReferenceColumnColor() : m_viewer->getReferenceColumnColor();
+		cellColor = (isSelected) ? m_viewer->getSelectedReferenceColumnColor()
+								 : m_viewer->getReferenceColumnColor();
 		sideColor = m_viewer->getReferenceColumnBorderColor();
 	} else {
 		int levelType;
@@ -999,7 +1008,7 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference)
 		yetToCleanupCell = (frameStatus & mask) == yetToCleanupValue;
 	}
 
-	//paint cell
+	// paint cell
 	p.fillRect(rect, QBrush(cellColor));
 	// paint side bar
 	p.fillRect(QRect(x, y, 7, RowHeight), QBrush(sideColor));
@@ -1008,7 +1017,7 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference)
 		p.fillRect(rect.adjusted(rect.width() / 2, 0, 0, 0),
 				   (isSelected) ? SelectedFullcolorColumnColor : FullcolorColumnColor);
 
-	//draw dot line if the column is locked
+	// draw dot line if the column is locked
 	TXshColumn *column = xsh->getColumn(col);
 	if (column->isLocked()) {
 		p.setPen(QPen(cellColor, 2, Qt::DotLine));
@@ -1031,7 +1040,7 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference)
 		distance = 6;
 	bool isAfterMarkers = (row - offset) % distance == 0;
 
-	//draw marker interval
+	// draw marker interval
 	if (isAfterMarkers) {
 		p.setPen(m_viewer->getMarkerLineColor());
 		p.drawLine(x, y, x + 6, y);
@@ -1039,15 +1048,14 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference)
 
 	QRect nameRect = rect.adjusted(7, 4, -6, 0);
 
-	if (Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled())
-	{
+	if (Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled()) {
 		TStageObject *pegbar = xsh->getStageObject(m_viewer->getObjectId(col));
 		int r0, r1;
-		if (pegbar && pegbar->getKeyframeRange(r0,r1))
+		if (pegbar && pegbar->getKeyframeRange(r0, r1))
 			nameRect.adjust(0, 0, -9, 0);
 	}
 
-	//draw text in red if the file does not exist
+	// draw text in red if the file does not exist
 	bool isRed = false;
 	TXshSimpleLevel *sl = cell.getSimpleLevel();
 	if (sl && !sl->isFid(cell.m_frameId))
@@ -1064,32 +1072,36 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference)
 #endif
 	p.setFont(font);
 
-	//if the same level & same fId with the previous cell, then draw vertical line
-	if (sameLevel && prevCell.m_frameId == cell.m_frameId) { // cella uguale a quella precedente (non sulla marker line):
-		int x = (Preferences::instance()->isLevelNameOnEachMarkerEnabled()) ? rect.right() - 11 : rect.center().x();
+	// if the same level & same fId with the previous cell, then draw vertical line
+	if (sameLevel &&
+		prevCell.m_frameId ==
+			cell.m_frameId) { // cella uguale a quella precedente (non sulla marker line):
+		int x = (Preferences::instance()->isLevelNameOnEachMarkerEnabled()) ? rect.right() - 11
+																			: rect.center().x();
 		p.drawLine(x, rect.top(), x, rect.bottom());
 	}
-	//draw frame number
+	// draw frame number
 	else {
 		TFrameId fid = cell.m_frameId;
 
 		// convert the last one digit of the frame number to alphabet
 		// Ex.  12 -> 1B    21 -> 2A   30 -> 3
 		if (Preferences::instance()->isShowFrameNumberWithLettersEnabled())
-			p.drawText(nameRect, Qt::AlignRight, m_viewer->getFrameNumberWithLetters(fid.getNumber()));
+			p.drawText(nameRect, Qt::AlignRight,
+					   m_viewer->getFrameNumberWithLetters(fid.getNumber()));
 		else {
 			std::string frameNumber("");
-			//set number
+			// set number
 			if (fid.getNumber() > 0)
 				frameNumber = toString(fid.getNumber());
-			//add letter
+			// add letter
 			if (fid.getLetter() != 0)
 				frameNumber.append(1, fid.getLetter());
 			p.drawText(nameRect, Qt::AlignRight, QString::fromStdString(frameNumber));
 		}
 	}
 
-	//draw level name
+	// draw level name
 	if (!sameLevel ||
 		(isAfterMarkers && Preferences::instance()->isLevelNameOnEachMarkerEnabled())) {
 		std::wstring levelName = cell.m_level->getName();
@@ -1204,10 +1216,12 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col, bool isReference)
 
 	QColor cellColor, sideColor;
 	if (isReference) {
-		cellColor = (isSelected) ? m_viewer->getSelectedReferenceColumnColor() : m_viewer->getReferenceColumnColor();
+		cellColor = (isSelected) ? m_viewer->getSelectedReferenceColumnColor()
+								 : m_viewer->getReferenceColumnColor();
 		sideColor = m_viewer->getReferenceColumnBorderColor();
 	} else {
-		cellColor = (isSelected) ? m_viewer->getSelectedPaletteColumnColor() : m_viewer->getPaletteColumnColor();
+		cellColor = (isSelected) ? m_viewer->getSelectedPaletteColumnColor()
+								 : m_viewer->getPaletteColumnColor();
 		sideColor = m_viewer->getPaletteColumnBorderColor();
 	}
 
@@ -1241,8 +1255,9 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col, bool isReference)
 		p.drawLine(x, y, x + 6, y);
 	}
 
-	if (sameLevel && prevCell.m_frameId == cell.m_frameId && !isAfterMarkers) { // cella uguale a quella precedente (non sulla marker line):
-																				// non scrivo nulla e disegno una linea verticale
+	if (sameLevel && prevCell.m_frameId == cell.m_frameId &&
+		!isAfterMarkers) { // cella uguale a quella precedente (non sulla marker line):
+						   // non scrivo nulla e disegno una linea verticale
 		QPen oldPen = p.pen();
 		p.setPen(QPen(m_viewer->getTextColor(), 1));
 		int x = rect.center().x();
@@ -1285,9 +1300,11 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col, bool isReference)
 
 		QString text = QString::fromStdWString(levelName);
 #if QT_VERSION >= 0x050500
-		QString elidaName = elideText(text, fm, nameRect.width() - fm.width(numberStr) - 2, QString("~"));
+		QString elidaName =
+			elideText(text, fm, nameRect.width() - fm.width(numberStr) - 2, QString("~"));
 #else
-		QString elidaName = elideText(text, font, nameRect.width() - fm.width(numberStr) - 2, QString("~"));
+		QString elidaName =
+			elideText(text, font, nameRect.width() - fm.width(numberStr) - 2, QString("~"));
 #endif
 
 		if (!sameLevel || isAfterMarkers)
@@ -1299,7 +1316,7 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col, bool isReference)
 
 void CellArea::drawKeyframe(QPainter &p, const QRect toBeUpdated)
 {
-	int r0, r1, c0, c1; // range of visible rows and columns 
+	int r0, r1, c0, c1; // range of visible rows and columns
 	r0 = m_viewer->yToRow(toBeUpdated.top());
 	r1 = m_viewer->yToRow(toBeUpdated.bottom());
 	c0 = m_viewer->xToColumn(toBeUpdated.left());
@@ -1327,7 +1344,7 @@ void CellArea::drawKeyframe(QPainter &p, const QRect toBeUpdated)
 		int row;
 		row0 = tmax(row0, r0);
 		row1 = tmin(row1, r1);
-		
+
 		/*- first, draw key segments -*/
 		p.setPen(m_viewer->getTextColor());
 		int x_line = x + ColumnWidth - 8;
@@ -1335,28 +1352,25 @@ void CellArea::drawKeyframe(QPainter &p, const QRect toBeUpdated)
 			int hr0, hr1;
 			double e0, e1;
 			if (pegbar->getKeyframeSpan(row, hr0, e0, hr1, e1)) {
-				int y0 = m_viewer->rowToY(hr0+1) - keyPixOffset;
+				int y0 = m_viewer->rowToY(hr0 + 1) - keyPixOffset;
 				int y1 = m_viewer->rowToY(hr1) + keyPixOffset;
 				p.drawLine(x_line, y0, x_line, y1);
 				if (hr1 - hr0 > 4) {
 					int rh0, rh1;
 					if (getEaseHandles(hr0, hr1, e0, e1, rh0, rh1)) {
 						int e0Y = m_viewer->rowToY(rh0) + keyPixOffset;
-						drawArrow(p, QPointF(x_line - 4, e0Y + 2),
-							QPointF(x_line + 4, e0Y + 2),
-							QPointF(x_line, e0Y + 6),
-							true, m_viewer->getLightLineColor(), m_viewer->getTextColor());
+						drawArrow(p, QPointF(x_line - 4, e0Y + 2), QPointF(x_line + 4, e0Y + 2),
+								  QPointF(x_line, e0Y + 6), true, m_viewer->getLightLineColor(),
+								  m_viewer->getTextColor());
 						int e1Y = m_viewer->rowToY(rh1 + 1) - keyPixOffset;
-						drawArrow(p, QPointF(x_line - 4, e1Y - 2),
-							QPointF(x_line + 4, e1Y - 2),
-							QPointF(x_line, e1Y - 6),
-							true, m_viewer->getLightLineColor(), m_viewer->getTextColor());
+						drawArrow(p, QPointF(x_line - 4, e1Y - 2), QPointF(x_line + 4, e1Y - 2),
+								  QPointF(x_line, e1Y - 6), true, m_viewer->getLightLineColor(),
+								  m_viewer->getTextColor());
 					}
 				}
 				// jump to next segment
-				row = hr1-1;
-			}
-			else if (pegbar->isKeyframe(row) && pegbar->isKeyframe(row+1)) {
+				row = hr1 - 1;
+			} else if (pegbar->isKeyframe(row) && pegbar->isKeyframe(row + 1)) {
 				int y0 = m_viewer->rowToY(row + 1);
 				p.drawLine(x_line, y0 - keyPixOffset, x_line, y0 + keyPixOffset);
 			}
@@ -1365,7 +1379,7 @@ void CellArea::drawKeyframe(QPainter &p, const QRect toBeUpdated)
 		/*- then draw keyframe pixmaps -*/
 		int x1 = x + ColumnWidth - 13;
 		for (row = row0; row <= row1; row++) {
-			int y = m_viewer->rowToY(row)+1;
+			int y = m_viewer->rowToY(row) + 1;
 			p.setPen(m_viewer->getTextColor());
 			if (pegbar->isKeyframe(row)) {
 				if (m_viewer->getKeyframeSelection() &&
@@ -1376,7 +1390,7 @@ void CellArea::drawKeyframe(QPainter &p, const QRect toBeUpdated)
 					// keyframe non selezionato
 					p.drawPixmap(x1, y + keyPixOffset, key);
 				}
-			} 
+			}
 		}
 
 		int y1 = m_viewer->rowToY(row1 + 1);
@@ -1454,13 +1468,7 @@ void CellArea::drawNotes(QPainter &p, const QRect toBeUpdated)
 
 //-----------------------------------------------------------------------------
 
-bool CellArea::getEaseHandles(
-	int r0,
-	int r1,
-	double e0,
-	double e1,
-	int &rh0,
-	int &rh1)
+bool CellArea::getEaseHandles(int r0, int r1, double e0, double e1, int &rh0, int &rh1)
 {
 	if (r1 <= r0 + 4) {
 		rh0 = r0;
@@ -1537,7 +1545,7 @@ class CycleUndo : public TUndo
 	TStageObject *m_pegbar;
 	CellArea *m_area;
 
-public:
+  public:
 	// indices sono le colonne inserite
 	CycleUndo(TStageObject *pegbar, CellArea *area) : m_pegbar(pegbar), m_area(area) {}
 	void undo() const
@@ -1552,10 +1560,7 @@ public:
 	{
 		return QObject::tr("Toggle cycle of  %1").arg(QString::fromStdString(m_pegbar->getName()));
 	}
-	int getHistoryType()
-	{
-		return HistoryType::Xsheet;
-	}
+	int getHistoryType() { return HistoryType::Xsheet; }
 };
 //----------------------------------------------------------
 
@@ -1574,13 +1579,14 @@ void CellArea::mousePressEvent(QMouseEvent *event)
 		int y1 = m_viewer->rowToY(row) - 1;
 		int x = pos.x - x0;
 
-		//Verifico se ho cliccato su una nota
+		// Verifico se ho cliccato su una nota
 		TXshNoteSet *notes = m_viewer->getXsheet()->getNotes();
 		int i;
 		for (i = notes->getCount() - 1; i >= 0; i--) {
 			int r = notes->getNoteRow(i);
 			int c = notes->getNoteCol(i);
-			TPointD pos = notes->getNotePos(i) + TPointD(m_viewer->columnToX(c), m_viewer->rowToY(r));
+			TPointD pos =
+				notes->getNotePos(i) + TPointD(m_viewer->columnToX(c), m_viewer->rowToY(r));
 			QRect rect(pos.x, pos.y, NoteWidth, NoteHeight);
 			if (!rect.contains(event->pos()))
 				continue;
@@ -1591,14 +1597,14 @@ void CellArea::mousePressEvent(QMouseEvent *event)
 			update();
 			return;
 		}
-		//Se non ho cliccato su una nota e c'e' una nota selezionata la deseleziono.
+		// Se non ho cliccato su una nota e c'e' una nota selezionata la deseleziono.
 		if (m_viewer->getCurrentNoteIndex() >= 0)
 			m_viewer->setCurrentNoteIndex(-1);
 
 		TXsheet *xsh = m_viewer->getXsheet();
 		TXshColumn *column = xsh->getColumn(col);
 
-		//Verifico se e' una colonna sound
+		// Verifico se e' una colonna sound
 		bool isSoundColumn = false;
 		if (column) {
 			TXshSoundColumn *soundColumn = column->getSoundColumn();
@@ -1619,36 +1625,34 @@ void CellArea::mousePressEvent(QMouseEvent *event)
 
 		TStageObject *pegbar = xsh->getStageObject(m_viewer->getObjectId(col));
 
-		if (Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled())
-		{
+		if (Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled()) {
 			int k0, k1;
-			bool isKeyFrameArea = (pegbar && pegbar->getKeyframeRange(k0, k1) &&
-				(k1 > k0 || k0 == row) && k0 <= row && row <= k1 + 1 &&
-				ColumnWidth - 13 <= x && x <= ColumnWidth)
-				? true
-				: false;
+			bool isKeyFrameArea =
+				(pegbar && pegbar->getKeyframeRange(k0, k1) && (k1 > k0 || k0 == row) &&
+				 k0 <= row && row <= k1 + 1 && ColumnWidth - 13 <= x && x <= ColumnWidth)
+					? true
+					: false;
 
-			if (isKeyFrameArea)
-			{ // They are in the keyframe selection
-				if (pegbar->isKeyframe(row))// in the keyframe
+			if (isKeyFrameArea) {			 // They are in the keyframe selection
+				if (pegbar->isKeyframe(row)) // in the keyframe
 				{
-					m_viewer->setCurrentRow(row); //If you click on the key, change the current row as well
+					m_viewer->setCurrentRow(
+						row); // If you click on the key, change the current row as well
 					setDragTool(XsheetGUI::DragTool::makeKeyframeMoverTool(m_viewer));
-				}
-				else
-				{
+				} else {
 					int r0, r1;
 					double e0, e1;
 					int rh0, rh1;
 					if (pegbar->getKeyframeSpan(row, r0, e0, r1, e1) &&
-						getEaseHandles(r0, r1, e0, e1, rh0, rh1))
-					{
-						if (rh0 == row)      // in a keyframe handle
-							setDragTool(XsheetGUI::DragTool::makeKeyFrameHandleMoverTool(m_viewer, true, r0));
+						getEaseHandles(r0, r1, e0, e1, rh0, rh1)) {
+						if (rh0 == row) // in a keyframe handle
+							setDragTool(XsheetGUI::DragTool::makeKeyFrameHandleMoverTool(m_viewer,
+																						 true, r0));
 						else if (rh1 == row) // in a keyframe handle
-							setDragTool(XsheetGUI::DragTool::makeKeyFrameHandleMoverTool(m_viewer, false, r1));
+							setDragTool(XsheetGUI::DragTool::makeKeyFrameHandleMoverTool(
+								m_viewer, false, r1));
 					}
-					if (row == k1 + 1)       // in the cycle toggle
+					if (row == k1 + 1) // in the cycle toggle
 					{
 						pegbar->enableCycle(!pegbar->isCycleEnabled());
 						TUndoManager::manager()->add(new CycleUndo(pegbar, this));
@@ -1677,14 +1681,16 @@ void CellArea::mousePressEvent(QMouseEvent *event)
 				TApp::instance()->getCurrentSelection()->notifySelectionChanged();
 			}
 			TSelection *selection = TApp::instance()->getCurrentSelection()->getSelection();
-			if (TCellKeyframeSelection *cellKeyframeSelection = dynamic_cast<TCellKeyframeSelection *>(selection))
+			if (TCellKeyframeSelection *cellKeyframeSelection =
+					dynamic_cast<TCellKeyframeSelection *>(selection))
 				setDragTool(XsheetGUI::DragTool::makeCellKeyframeMoverTool(m_viewer));
 			else
 				setDragTool(XsheetGUI::DragTool::makeLevelMoverTool(m_viewer));
 		} else {
 			m_viewer->getKeyframeSelection()->selectNone();
 			if (isSoundColumn && x > ColumnWidth - 6 && x < ColumnWidth)
-				setDragTool(XsheetGUI::DragTool::makeSoundScrubTool(m_viewer, column->getSoundColumn()));
+				setDragTool(
+					XsheetGUI::DragTool::makeSoundScrubTool(m_viewer, column->getSoundColumn()));
 			else if (m_levelExtenderRect.contains(pos.x, pos.y))
 				setDragTool(XsheetGUI::DragTool::makeLevelExtenderTool(m_viewer));
 			else if (event->modifiers() & Qt::ControlModifier &&
@@ -1713,7 +1719,7 @@ void CellArea::mouseMoveEvent(QMouseEvent *event)
 	QPoint pos = event->pos();
 	QRect visibleRect = visibleRegion().boundingRect();
 	if (m_isPanning) {
-		//Pan tasto centrale
+		// Pan tasto centrale
 		m_viewer->scroll(m_pos - pos);
 		return;
 	}
@@ -1736,7 +1742,7 @@ void CellArea::mouseMoveEvent(QMouseEvent *event)
 
 	TXsheet *xsh = m_viewer->getXsheet();
 
-	//Verifico se e' una colonna sound
+	// Verifico se e' una colonna sound
 	TXshColumn *column = xsh->getColumn(col);
 	bool isSoundColumn = false;
 	bool isZeraryColumn = false;
@@ -1747,20 +1753,20 @@ void CellArea::mouseMoveEvent(QMouseEvent *event)
 		isZeraryColumn = (!zeraryColumn) ? false : true;
 	}
 
-	TStageObject* pegbar = xsh->getStageObject(m_viewer->getObjectId(col));
+	TStageObject *pegbar = xsh->getStageObject(m_viewer->getObjectId(col));
 	int k0, k1;
-	if (Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled() && pegbar && pegbar->getKeyframeRange(k0, k1) && k0 <= row && row <= k1 + 1 && ColumnWidth - 13 <= x && x <= ColumnWidth)
-	{
+	if (Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled() && pegbar &&
+		pegbar->getKeyframeRange(k0, k1) && k0 <= row && row <= k1 + 1 && ColumnWidth - 13 <= x &&
+		x <= ColumnWidth) {
 		if (pegbar->isKeyframe(row)) // key frame
 			m_tooltip = tr("Click to select keyframe, drag to move it");
-		else
-		{
+		else {
 			int r0, r1;
 			double e0, e1;
 			int rh0, rh1;
 			if (pegbar->getKeyframeSpan(row, r0, e0, r1, e1) &&
-				getEaseHandles(r0, r1, e0, e1, rh0, rh1))
-			{ // triangles in the segment betweeen key frames
+				getEaseHandles(r0, r1, e0, e1, rh0,
+							   rh1)) { // triangles in the segment betweeen key frames
 				if (rh0 == row)
 					m_tooltip = tr("Click and drag to set the acceleration range");
 				else if (rh1 == row)
@@ -1769,11 +1775,11 @@ void CellArea::mouseMoveEvent(QMouseEvent *event)
 			if (row == k1 + 1) // cycle toggle of key frames
 				m_tooltip = tr("Set the cycle of previous keyframes");
 		}
-	}
-	else if((!xsh->getCell(row, col).isEmpty() || isSoundColumn) && x < 6)
+	} else if ((!xsh->getCell(row, col).isEmpty() || isSoundColumn) && x < 6)
 		m_tooltip = tr("Click and drag to move the selection");
 	else if (isZeraryColumn)
-		m_tooltip = QString::fromStdWString(column->getZeraryFxColumn()->getZeraryColumnFx()->getZeraryFx()->getName());
+		m_tooltip = QString::fromStdWString(
+			column->getZeraryFxColumn()->getZeraryColumnFx()->getZeraryFx()->getName());
 	else if ((!xsh->getCell(row, col).isEmpty() && !isSoundColumn) && x > 6 && x < ColumnWidth) {
 		TXshCell cell = xsh->getCell(row, col);
 		TFrameId fid = cell.getFrameId();
@@ -1782,15 +1788,20 @@ void CellArea::mouseMoveEvent(QMouseEvent *event)
 		// convert the last one digit of the frame number to alphabet
 		// Ex.  12 -> 1B    21 -> 2A   30 -> 3
 		if (Preferences::instance()->isShowFrameNumberWithLettersEnabled()) {
-			m_tooltip = (fid.isEmptyFrame() || fid.isNoFrame()) ? QString::fromStdWString(levelName) : QString::fromStdWString(levelName) + QString(" ") + m_viewer->getFrameNumberWithLetters(fid.getNumber());
+			m_tooltip = (fid.isEmptyFrame() || fid.isNoFrame())
+							? QString::fromStdWString(levelName)
+							: QString::fromStdWString(levelName) + QString(" ") +
+								  m_viewer->getFrameNumberWithLetters(fid.getNumber());
 		} else {
 			std::string frameNumber("");
 			if (fid.getNumber() > 0)
 				frameNumber = toString(fid.getNumber());
 			if (fid.getLetter() != 0)
 				frameNumber.append(1, fid.getLetter());
-			m_tooltip = QString((frameNumber.empty()) ? QString::fromStdWString(levelName)
-													  : QString::fromStdWString(levelName) + QString(" ") + QString::fromStdString(frameNumber));
+			m_tooltip =
+				QString((frameNumber.empty()) ? QString::fromStdWString(levelName)
+											  : QString::fromStdWString(levelName) + QString(" ") +
+													QString::fromStdString(frameNumber));
 		}
 	} else if (isSoundColumn && x > ColumnWidth - 6 && x < ColumnWidth)
 		m_tooltip = tr("Click and drag to play");
@@ -1821,12 +1832,12 @@ void CellArea::mouseDoubleClickEvent(QMouseEvent *event)
 	TPoint pos(event->pos().x(), event->pos().y());
 	int row = m_viewer->yToRow(pos.y);
 	int col = m_viewer->xToColumn(pos.x);
-	//Se la colonna e' sound non devo fare nulla
+	// Se la colonna e' sound non devo fare nulla
 	TXshColumn *column = m_viewer->getXsheet()->getColumn(col);
 	if (column && (column->getSoundColumn() || column->getSoundTextColumn()))
 		return;
 
-	//Se ho cliccato su una nota devo aprire il popup
+	// Se ho cliccato su una nota devo aprire il popup
 	TXshNoteSet *notes = m_viewer->getXsheet()->getNotes();
 	int i;
 	for (i = notes->getCount() - 1; i >= 0; i--) {
@@ -1844,16 +1855,15 @@ void CellArea::mouseDoubleClickEvent(QMouseEvent *event)
 	TObjectHandle *oh = TApp::instance()->getCurrentObject();
 	oh->setObjectId(m_viewer->getObjectId(col));
 
-	if (Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled())
-	{
+	if (Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled()) {
 		int x = pos.x - m_viewer->columnToX(col);
-		TStageObject* pegbar = m_viewer->getXsheet()->getStageObject(m_viewer->getObjectId(col));
-		bool isKeyFrameArea = (pegbar && pegbar->isKeyframe(row) && ColumnWidth - 13 <= x && x <= ColumnWidth)
-			? true
-			: false;
-		//If you are in the keyframe area, open a function editor
-		if (isKeyFrameArea)
-		{
+		TStageObject *pegbar = m_viewer->getXsheet()->getStageObject(m_viewer->getObjectId(col));
+		bool isKeyFrameArea =
+			(pegbar && pegbar->isKeyframe(row) && ColumnWidth - 13 <= x && x <= ColumnWidth)
+				? true
+				: false;
+		// If you are in the keyframe area, open a function editor
+		if (isKeyFrameArea) {
 			QAction *action = CommandManager::instance()->getAction(MI_OpenFunctionEditor);
 			action->trigger();
 			return;
@@ -1865,7 +1875,8 @@ void CellArea::mouseDoubleClickEvent(QMouseEvent *event)
 
 	// in modalita' xsheet as animation sheet non deve essere possibile creare
 	// livelli con doppio click: se la cella e' vuota non bisogna fare nulla
-	if ((Preferences::instance()->isAnimationSheetEnabled() && m_viewer->getXsheet()->getCell(row, col).isEmpty()))
+	if ((Preferences::instance()->isAnimationSheetEnabled() &&
+		 m_viewer->getXsheet()->getCell(row, col).isEmpty()))
 		return;
 
 	m_renameCell->showInRowCol(row, col);
@@ -1881,7 +1892,7 @@ void CellArea::contextMenuEvent(QContextMenuEvent *event)
 
 	QMenu menu(this);
 
-	//Verifico se ho cliccato su una nota
+	// Verifico se ho cliccato su una nota
 	TXshNoteSet *notes = m_viewer->getXsheet()->getNotes();
 	int i;
 	for (i = notes->getCount() - 1; i >= 0; i--) {
@@ -1907,34 +1918,32 @@ void CellArea::contextMenuEvent(QContextMenuEvent *event)
 	int r0, r1, c0, c1;
 	if (col >= 0)
 		m_viewer->getCellSelection()->getSelectedCells(r0, c0, r1, c1);
-	
-	if (pegbar  && pegbar->getKeyframeRange(k0, k1) && k0 <= row && row <= k1 &&
-		ColumnWidth - 13 <= x  && x <= ColumnWidth &&
-		Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled())
-	{
+
+	if (pegbar && pegbar->getKeyframeRange(k0, k1) && k0 <= row && row <= k1 &&
+		ColumnWidth - 13 <= x && x <= ColumnWidth &&
+		Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled()) {
 		TStageObjectId objectId;
-		if (col<0) objectId = TStageObjectId::CameraId(0);
-		else
-		{ //Set the current column and the current object
+		if (col < 0)
+			objectId = TStageObjectId::CameraId(0);
+		else { // Set the current column and the current object
 			objectId = TStageObjectId::ColumnId(col);
 			m_viewer->setCurrentColumn(col);
 		}
 		TApp::instance()->getCurrentObject()->setObjectId(objectId);
 		m_viewer->setCurrentRow(row);
-		if (pegbar->isKeyframe(row))
-		{   //clicking on keyframes
-			TKeyframeSelection* keyframeSelection = m_viewer->getKeyframeSelection();
+		if (pegbar->isKeyframe(row)) { // clicking on keyframes
+			TKeyframeSelection *keyframeSelection = m_viewer->getKeyframeSelection();
 			keyframeSelection->select(row, col);
 			keyframeSelection->makeCurrent();
 			createKeyMenu(menu);
-		}
-		else if (!xsh->getColumn(col) || !xsh->getColumn(col)->isLocked())// on the line between two keyframes
+		} else if (!xsh->getColumn(col) ||
+				   !xsh->getColumn(col)->isLocked()) // on the line between two keyframes
 			createKeyLineMenu(menu, row, col);
-	}
-	else if (col >= 0 &&												  //Non e' la colonna di camera
-		m_viewer->getCellSelection()->isCellSelected(row, col) && //La cella e' selezionata
-		(abs(r1 - r0) > 0 || abs(c1 - c0) > 0))					  //Il numero di celle selezionate e' maggiore di 1
-	{															  //Sono su una selezione di celle
+	} else if (col >= 0 && // Non e' la colonna di camera
+			   m_viewer->getCellSelection()->isCellSelected(row, col) && // La cella e' selezionata
+			   (abs(r1 - r0) > 0 ||
+				abs(c1 - c0) > 0)) // Il numero di celle selezionate e' maggiore di 1
+	{ // Sono su una selezione di celle
 		m_viewer->setCurrentColumn(col);
 		int e, f;
 		bool areCellsEmpty = false;
@@ -1959,7 +1968,7 @@ void CellArea::contextMenuEvent(QContextMenuEvent *event)
 		else
 			createCellMenu(menu, false);
 	}
-	
+
 	if (!menu.isEmpty())
 		menu.exec(event->globalPos());
 }
@@ -2022,7 +2031,8 @@ bool CellArea::event(QEvent *event)
 			QToolTip::hideText();
 	}
 	if (type == QEvent::WindowDeactivate && m_isMousePressed) {
-		QMouseEvent e(QEvent::MouseButtonRelease, m_pos, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+		QMouseEvent e(QEvent::MouseButtonRelease, m_pos, Qt::LeftButton, Qt::NoButton,
+					  Qt::NoModifier);
 		mouseReleaseEvent(&e);
 	}
 	return QWidget::event(event);
@@ -2103,15 +2113,15 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected)
 		menu.addAction(cmdManager->getAction(MI_ReplaceParentDirectory));
 
 		{
-			//replace with another level in scene cast
+			// replace with another level in scene cast
 			std::vector<TXshLevel *> levels;
 			TApp::instance()->getCurrentScene()->getScene()->getLevelSet()->listLevels(levels);
 			if (!levels.empty()) {
 				QMenu *replaceMenu = menu.addMenu(tr("Replace"));
-				connect(replaceMenu, SIGNAL(triggered(QAction *)), this, SLOT(onReplaceByCastedLevel(QAction *)));
+				connect(replaceMenu, SIGNAL(triggered(QAction *)), this,
+						SLOT(onReplaceByCastedLevel(QAction *)));
 				for (int i = 0; i < (int)levels.size(); i++) {
-					if (!levels[i]->getSimpleLevel() &&
-						!levels[i]->getChildLevel())
+					if (!levels[i]->getSimpleLevel() && !levels[i]->getChildLevel())
 						continue;
 
 					if (levels[i]->getChildLevel() &&
@@ -2161,7 +2171,8 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected)
 void CellArea::onReplaceByCastedLevel(QAction *action)
 {
 	std::wstring levelName = action->data().toString().toStdWString();
-	TXshLevel *level = TApp::instance()->getCurrentScene()->getScene()->getLevelSet()->getLevel(levelName);
+	TXshLevel *level =
+		TApp::instance()->getCurrentScene()->getScene()->getLevelSet()->getLevel(levelName);
 
 	if (!level)
 		return;
@@ -2180,8 +2191,7 @@ void CellArea::onReplaceByCastedLevel(QAction *action)
 	for (int c = c0; c <= c1; c++) {
 		for (int r = r0; r <= r1; r++) {
 			TXshCell cell = xsh->getCell(r, c);
-			if (!cell.m_level.getPointer() ||
-				cell.m_level.getPointer() == level)
+			if (!cell.m_level.getPointer() || cell.m_level.getPointer() == level)
 				continue;
 
 			TXshCell oldCell = cell;
@@ -2239,12 +2249,15 @@ void CellArea::createKeyLineMenu(QMenu &menu, int row, int col)
 		menu.addAction(cmdManager->getAction(MI_SetDeceleration));
 		menu.addAction(cmdManager->getAction(MI_SetConstantSpeed));
 	} else {
-		//Se le due chiavi non sono linear aggiungo il comando ResetInterpolation
+		// Se le due chiavi non sono linear aggiungo il comando ResetInterpolation
 		bool isR0FullK = pegbar->isFullKeyframe(r0);
 		bool isR1FullK = pegbar->isFullKeyframe(r1);
-		TDoubleKeyframe::Type r0Type = pegbar->getParam(TStageObject::T_X)->getKeyframeAt(r0).m_type;
-		TDoubleKeyframe::Type r1Type = pegbar->getParam(TStageObject::T_X)->getKeyframeAt(r1).m_prevType;
-		if (isGlobalKeyFrameWithSameTypeDiffFromLinear(pegbar, r0) && isGlobalKeyFrameWithSamePrevTypeDiffFromLinear(pegbar, r1))
+		TDoubleKeyframe::Type r0Type =
+			pegbar->getParam(TStageObject::T_X)->getKeyframeAt(r0).m_type;
+		TDoubleKeyframe::Type r1Type =
+			pegbar->getParam(TStageObject::T_X)->getKeyframeAt(r1).m_prevType;
+		if (isGlobalKeyFrameWithSameTypeDiffFromLinear(pegbar, r0) &&
+			isGlobalKeyFrameWithSamePrevTypeDiffFromLinear(pegbar, r1))
 			menu.addAction(cmdManager->getAction(MI_ResetInterpolation));
 	}
 #ifdef LINETEST
@@ -2307,7 +2320,8 @@ void CellArea::onStepChanged(QAction *act)
 	int frame = list.at(1).toInt();
 	int col = list.at(2).toInt();
 
-	//Siamo in LineTest il keyframe Ã¨ globale quindi basta calcolare l'indice del primo parametro!!!!
+	// Siamo in LineTest il keyframe Ã¨ globale quindi basta calcolare l'indice del primo
+	// parametro!!!!
 	TUndoManager::manager()->beginBlock();
 	TStageObject *stageObject = m_viewer->getXsheet()->getStageObject(m_viewer->getObjectId(col));
 	TDoubleParam *param = stageObject->getParam(TStageObject::T_Angle);

@@ -41,7 +41,7 @@ namespace ImagePainter
 //! Stores generic settings used by Toonz painters to draw images
 class DVAPI VisualSettings
 {
-public:
+  public:
 	int m_colorMask;	   //!< Combination of TRop::rChan, gChan, bChan or mChan.
 						   //!< Note: 0 means rChan | gChan | bChan (draw all channels).
 	bool m_greytones;	  //!< Whether color channels are visualized in greytones
@@ -49,9 +49,11 @@ public:
 	bool m_drawExternalBG; // ... not sure ...
 	bool m_showBBox;	   //!< Show the bounding box of current level
 
-	TSceneProperties *m_sceneProperties; //!< Scene properties reference - which contains further options
+	TSceneProperties
+		*m_sceneProperties; //!< Scene properties reference - which contains further options
 
-	PlasticVisualSettings m_plasticVisualSettings; //!< Settings for mesh images and plastic deformations
+	PlasticVisualSettings
+		m_plasticVisualSettings; //!< Settings for mesh images and plastic deformations
 
 	// Other (misplaced) misc options
 
@@ -65,7 +67,7 @@ public:
 	bool m_recomputeIfNeeded;
 	bool m_drawBlankFrame;
 	bool m_useChecks; //!< whether to consider  paint check and ink check
-public:
+  public:
 	VisualSettings();
 
 	bool needRepaint(const VisualSettings &newVs) const;
@@ -78,7 +80,7 @@ public:
 //! Stores settings used to compare two images
 class DVAPI CompareSettings
 {
-public:
+  public:
 	//! Used to set compared image width
 	double m_compareX;
 	//! Used to set compared image height
@@ -92,7 +94,7 @@ public:
 	//! Used to swap compared images
 	bool m_swapCompared;
 
-public:
+  public:
 	CompareSettings();
 };
 
@@ -103,11 +105,9 @@ const double DefaultCompareValue = 0.01;
 //*************************************************************************************************
 
 DVAPI void paintImage(const TImageP &image, const TDimension &imageSize,
-					  const TDimension &viewerSize,
-					  const TAffine &aff,
-					  const VisualSettings &visualSettings,
-					  const CompareSettings &compareSettings,
+					  const TDimension &viewerSize, const TAffine &aff,
+					  const VisualSettings &visualSettings, const CompareSettings &compareSettings,
 					  const TRect &loadbox);
 }
 
-#endif //IMAGEPAINTER_H
+#endif // IMAGEPAINTER_H

@@ -26,9 +26,9 @@ class BinarizePopup : public DVGui::Dialog
 {
 	Q_OBJECT
 
-protected:
-	//DVGui::IntField* m_brightnessField;
-	//DVGui::IntField* m_contrastField;
+  protected:
+	// DVGui::IntField* m_brightnessField;
+	// DVGui::IntField* m_contrastField;
 	DVGui::CheckBox *m_previewChk, *m_alphaChk;
 	QPushButton *m_okBtn;
 	TRaster32P m_inRas, m_outRas;
@@ -36,15 +36,15 @@ protected:
 	class Swatch;
 	Swatch *m_viewer;
 
-public:
+  public:
 	BinarizePopup();
 	void setSample(const TRasterP &ras);
 
-protected:
+  protected:
 	void showEvent(QShowEvent *e);
 	void hideEvent(QHideEvent *e);
 
-private:
+  private:
 	typedef std::vector<std::pair<TXshSimpleLevel *, TFrameId>> Frames;
 	Frames m_frames;
 	int m_frameIndex;
@@ -54,7 +54,7 @@ private:
 	int getSelectedFrames();
 	void computePreview();
 
-protected slots:
+  protected slots:
 	void onPreviewCheckboxChanged(int);
 	void onAlphaCheckboxChanged(int);
 	void onLevelSwitched(TXshLevel *oldLevel) { fetchSample(); }

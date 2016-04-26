@@ -18,16 +18,16 @@ void ropSharpen(const TRasterPT<T> &rin, TRasterPT<T> &rout, int sharpen_max_cor
 
 	int lapl, out;
 
-#define SET_PIXOUT(X)                                                                     \
-	{                                                                                     \
-		lapl = (cntr_##X << 3) + cntr_##X - (col_west_##X + col_cntr_##X + col_east_##X); \
-		if (lapl < 0) {                                                                   \
-			out = cntr_##X - ((256 * 4 - lapl * sharpen_max_corr) >> (8 + 3));            \
-			pixout->X = (out <= 0) ? 0 : out;                                             \
-		} else {                                                                          \
-			out = cntr_##X + ((256 * 4 + lapl * sharpen_max_corr) >> (8 + 3));            \
-			pixout->X = (out >= maxChanVal) ? maxChanVal : out;                           \
-		}                                                                                 \
+#define SET_PIXOUT(X)                                                                              \
+	{                                                                                              \
+		lapl = (cntr_##X << 3) + cntr_##X - (col_west_##X + col_cntr_##X + col_east_##X);          \
+		if (lapl < 0) {                                                                            \
+			out = cntr_##X - ((256 * 4 - lapl * sharpen_max_corr) >> (8 + 3));                     \
+			pixout->X = (out <= 0) ? 0 : out;                                                      \
+		} else {                                                                                   \
+			out = cntr_##X + ((256 * 4 + lapl * sharpen_max_corr) >> (8 + 3));                     \
+			pixout->X = (out >= maxChanVal) ? maxChanVal : out;                                    \
+		}                                                                                          \
 	}
 	rin->lock();
 	rout->lock();
@@ -62,9 +62,7 @@ void ropSharpen(const TRasterPT<T> &rin, TRasterPT<T> &rout, int sharpen_max_cor
 	east++;
 	northeast++;
 	pixout = bufout;
-	for (count = lx - 1;
-		 count > 0;
-		 count--, east++, northeast++, pixout++) {
+	for (count = lx - 1; count > 0; count--, east++, northeast++, pixout++) {
 		cntr_r = east_r;
 		east_r = east->r;
 		col_west_r = col_cntr_r;
@@ -126,9 +124,7 @@ void ropSharpen(const TRasterPT<T> &rin, TRasterPT<T> &rout, int sharpen_max_cor
 		northeast++;
 		southeast++;
 		pixout = bufout + y * wrapout;
-		for (count = lx - 1;
-			 count > 0;
-			 count--, east++, northeast++, southeast++, pixout++) {
+		for (count = lx - 1; count > 0; count--, east++, northeast++, southeast++, pixout++) {
 			cntr_r = east_r;
 			east_r = east->r;
 			col_west_r = col_cntr_r;
@@ -188,9 +184,7 @@ void ropSharpen(const TRasterPT<T> &rin, TRasterPT<T> &rout, int sharpen_max_cor
 	east++;
 	southeast++;
 	pixout = bufout + y * wrapout;
-	for (count = lx - 1;
-		 count > 0;
-		 count--, east++, southeast++, pixout++) {
+	for (count = lx - 1; count > 0; count--, east++, southeast++, pixout++) {
 		cntr_r = east_r;
 		east_r = east->r;
 		col_west_r = col_cntr_r;
@@ -246,9 +240,8 @@ class SharpenFx : public TStandardRasterFx
 	TRasterFxPort m_input;
 	TDoubleParamP m_intensity;
 
-public:
-	SharpenFx()
-		: m_intensity(50)
+  public:
+	SharpenFx() : m_intensity(50)
 
 	{
 		bindParam(this, "intensity", m_intensity);
@@ -283,8 +276,10 @@ void SharpenFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 
 	int intensity = troundp(m_intensity->getValue(frame));
 
-	TRasterP srcRas = tile.getRaster()->create(tile.getRaster()->getLx(), tile.getRaster()->getLy());
-	//TRaster32P srcRas(tile.getRaster()->getLx() + border*2, tile.getRaster()->getLy() + border*2);
+	TRasterP srcRas =
+		tile.getRaster()->create(tile.getRaster()->getLx(), tile.getRaster()->getLy());
+	// TRaster32P srcRas(tile.getRaster()->getLx() + border*2, tile.getRaster()->getLy() +
+	// border*2);
 	TTile srcTile(srcRas, tile.m_pos);
 
 	m_input->compute(srcTile, frame, ri);
@@ -293,7 +288,8 @@ void SharpenFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 
 	if (raster32)
 		ropSharpen<TPixel32>(srcraster32, raster32, intensity);
-	//doEmboss<TPixel32, TPixelGR8, UCHAR>(raster32, srcraster32, azimuth, elevation, intensity, border);
+	// doEmboss<TPixel32, TPixelGR8, UCHAR>(raster32, srcraster32, azimuth, elevation, intensity,
+	// border);
 	else {
 		TRaster64P raster64 = tile.getRaster();
 		TRaster64P srcraster64 = srcTile.getRaster();

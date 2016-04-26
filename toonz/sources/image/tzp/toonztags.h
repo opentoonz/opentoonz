@@ -3,7 +3,7 @@
 #ifndef TOONZTAGS_H
 #define TOONZTAGS_H
 /*
-              TOONZ 4
+			  TOONZ 4
 */
 
 #define TIFFTAG_TOONZPALETTE 34750

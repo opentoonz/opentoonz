@@ -41,12 +41,12 @@ ToonzCheck *ToonzCheck::instance()
 
 //=============================================================================
 /*! \class CameraTestCheck
-		\brief The CameraTestCheck class allows visualization in "CameraTest" mode, from cleanup menu
+		\brief The CameraTestCheck class allows visualization in "CameraTest" mode, from cleanup
+   menu
 */
 //=============================================================================
 
-CameraTestCheck::CameraTestCheck()
-	: m_toggle(0)
+CameraTestCheck::CameraTestCheck() : m_toggle(0)
 {
 }
 
@@ -90,12 +90,12 @@ void CameraTestCheck::setToggle(QAction *toggle)
 
 //=============================================================================
 /*! \class CleanupViewCheck
-		\brief The CameraTestCheck class allows visualization in "CameraTest" mode, from cleanup menu
+		\brief The CameraTestCheck class allows visualization in "CameraTest" mode, from cleanup
+   menu
 */
 //=============================================================================
 
-CleanupPreviewCheck::CleanupPreviewCheck()
-	: m_toggle(0)
+CleanupPreviewCheck::CleanupPreviewCheck() : m_toggle(0)
 {
 }
 
@@ -135,12 +135,12 @@ void CleanupPreviewCheck::setToggle(QAction *toggle)
 
 //=============================================================================
 /*! \class SetScanCropBoxCheck
-		\brief The SetScanCropBoxCheck class allows visualization in "Set Crop Box" mode, from scan menu
+		\brief The SetScanCropBoxCheck class allows visualization in "Set Crop Box" mode, from scan
+   menu
 */
 //=============================================================================
 
-SetScanCropboxCheck::SetScanCropboxCheck()
-	: m_enabled(false), m_toggle(0)
+SetScanCropboxCheck::SetScanCropboxCheck() : m_enabled(false), m_toggle(0)
 {
 }
 

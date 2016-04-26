@@ -17,7 +17,7 @@ class TStringConvertException : public TException
 {
 	std::string m_string;
 
-public:
+  public:
 	TStringConvertException(const std::string str) : m_string(str) {}
 };
 
@@ -101,7 +101,7 @@ std::string toString(unsigned long long value)
 }
 
 /*!
-  The  default precision is six decimal places. If the 
+  The  default precision is six decimal places. If the
   precision is less than of the decimal places in the fractonal
   part, the remainder is not cut off but rounded.
 */
@@ -183,8 +183,14 @@ bool isDouble(std::string s)
 	return true;
 }
 
-bool isInt(std::wstring s) { return isInt(toString(s)); }
-bool isDouble(std::wstring s) { return isDouble(toString(s)); }
+bool isInt(std::wstring s)
+{
+	return isInt(toString(s));
+}
+bool isDouble(std::wstring s)
+{
+	return isDouble(toString(s));
+}
 
 double toDouble(std::string str)
 {

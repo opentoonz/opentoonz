@@ -57,7 +57,7 @@ class DVAPI TImageCache
 	class Imp;
 	std::unique_ptr<Imp> m_imp;
 
-public:
+  public:
 	static TImageCache *instance();
 
 	std::string getUniqueId();
@@ -72,7 +72,8 @@ public:
 	//! Sets the hard disk swap directory. It is set by default in the \it{stuff\cache} folder.
 	void setRootDir(const TFilePath &fp);
 
-	//! Adds the passed image to the cache, under the specified id. The optional \b overwrite parameter
+	//! Adds the passed image to the cache, under the specified id. The optional \b overwrite
+	//! parameter
 	//! may be specified in case an image with the same id has already been cached.
 	void add(const std::string &id, const TImageP &img, bool overwrite = true);
 
@@ -102,7 +103,8 @@ public:
 	//! Returns the subsampling level of the image under the specified id.
 	bool getSubsampling(const std::string &id, int &subs) const;
 
-	//! Retrieves the image associated to input \b id. Returns an empty pointer if no image was found.
+	//! Retrieves the image associated to input \b id. Returns an empty pointer if no image was
+	//! found.
 	TImageP get(const std::string &id, bool toBeModified) const;
 
 	//! Returns the RAM memory size (KB) occupied by the image cache.
@@ -119,9 +121,10 @@ public:
 
 	void dump(std::ostream &os) const; // per debug
 
-	UCHAR *compressAndMalloc(TUINT32 requestedSize); // compress in the cache till it can allocate the requested memory
+	UCHAR *compressAndMalloc(
+		TUINT32 requestedSize); // compress in the cache till it can allocate the requested memory
 
-	//for debug
+	// for debug
 	void outputMap(UINT chunkRequested, std::string filename);
 
 	bool hasBeenModified(const std::string &id, bool reset) const;
@@ -135,7 +138,7 @@ public:
 	// compress id (in memory)
 	void compress(const std::string &id);
 
-private:
+  private:
 	TImageCache();
 	~TImageCache();
 
@@ -148,14 +151,15 @@ private:
 //    Toonz Image Cache  declaration
 //************************************************************************************************
 
-//! The TCachedImage class implements a shared reference to an image that is stored under TImageCache.
+//! The TCachedImage class implements a shared reference to an image that is stored under
+//! TImageCache.
 class DVAPI TCachedImage : public TSmartObject
 {
 	DECLARE_CLASS_CODE
 
 	std::string m_ref;
 
-public:
+  public:
 	TCachedImage();
 	TCachedImage(const TImageP &img);
 	~TCachedImage();

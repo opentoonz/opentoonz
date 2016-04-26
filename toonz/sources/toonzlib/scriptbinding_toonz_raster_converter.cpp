@@ -8,8 +8,7 @@
 namespace TScriptBinding
 {
 
-ToonzRasterConverter::ToonzRasterConverter()
-	: m_flatSource(false)
+ToonzRasterConverter::ToonzRasterConverter() : m_flatSource(false)
 {
 }
 
@@ -46,7 +45,9 @@ QScriptValue ToonzRasterConverter::convert(QScriptContext *context, QScriptEngin
 		if (type != "Raster")
 			return context->throwError(tr("Can't convert a %1 image").arg(type));
 	} else {
-		return context->throwError(tr("Bad argument (%1): should be a raster Level or a raster Image").arg(arg.toString()));
+		return context->throwError(
+			tr("Bad argument (%1): should be a raster Level or a raster Image")
+				.arg(arg.toString()));
 	}
 	RasterToToonzRasterConverter converter;
 	if (img) {

@@ -33,7 +33,7 @@ class QPoint;
 */
 class SceneViewerInteractiveGadget
 {
-public:
+  public:
 	virtual int getPriority() const { return 0; }
 
 	virtual bool mousePressEvent(SceneViewer *viewer, QMouseEvent *me) { return true; }
@@ -59,7 +59,7 @@ class PreviewSubCameraManager : public SceneViewerInteractiveGadget
 	TPointD m_cameraMousePressPos;
 	bool m_mousePressed;
 
-public:
+  public:
 	enum EditPreviewDrag {
 		NODRAG = 0x0,
 		OUTER_LEFT = 0x1,
@@ -81,7 +81,7 @@ public:
 	PreviewSubCameraManager();
 	~PreviewSubCameraManager();
 
-public:
+  public:
 	static PreviewSubCameraManager *instance();
 
 	UCHAR getDragType() const { return m_dragType; }
@@ -98,7 +98,7 @@ public:
 
 	void deleteSubCamera(SceneViewer *viewer);
 
-private:
+  private:
 	TPointD winToCamera(SceneViewer *viewer, const QPoint &pos) const;
 	TPoint cameraToWin(SceneViewer *viewer, const TPointD &cameraPos) const;
 
@@ -106,4 +106,4 @@ private:
 	TPoint getSubCameraDragDistance(SceneViewer *viewer, const QPoint &mousePos);
 };
 
-#endif //SUBCAMERAMANAGER_INCLUDED
+#endif // SUBCAMERAMANAGER_INCLUDED

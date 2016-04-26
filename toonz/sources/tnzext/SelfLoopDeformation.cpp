@@ -20,16 +20,14 @@ SelfLoopDeformation::~SelfLoopDeformation()
 
 //--------------------------------------------------------------------
 
-void SelfLoopDeformation::activate_impl(Context *,
-										DraggerStatus *)
+void SelfLoopDeformation::activate_impl(Context *, DraggerStatus *)
 {
 	assert(!"SelfLoopDeformation::activate not yet implemented!");
 }
 
 //--------------------------------------------------------------------
 
-bool SelfLoopDeformation::check(Context *dragger,
-								DraggerStatus *status)
+bool SelfLoopDeformation::check(Context *dragger, DraggerStatus *status)
 {
 	assert(status && dragger && "Not dragger or status available");
 	assert(!"SelfLoopDeformation::check not yet implemented!");
@@ -50,8 +48,7 @@ bool SelfLoopDeformation::check(Context *dragger,
 
 //--------------------------------------------------------------------
 
-void SelfLoopDeformation::update_impl(Context *,
-									  const TPointD &delta)
+void SelfLoopDeformation::update_impl(Context *, const TPointD &delta)
 {
 }
 
@@ -69,8 +66,7 @@ void SelfLoopDeformation::draw(Designer *dr)
 
 //--------------------------------------------------------------------
 
-SelfLoopDeformation *
-SelfLoopDeformation::instance()
+SelfLoopDeformation *SelfLoopDeformation::instance()
 {
 	static SelfLoopDeformation singleton;
 	return &singleton;

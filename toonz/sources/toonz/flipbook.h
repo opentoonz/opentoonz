@@ -31,7 +31,7 @@ class SaveImagesPopup : public FileBrowserPopup
 
 	FlipBook *m_flip;
 
-public:
+  public:
 	SaveImagesPopup(FlipBook *flip);
 
 	bool execute();
@@ -54,14 +54,14 @@ class LoadImagesPopup : public FileBrowserPopup
 
 	FlipBook *m_flip;
 
-public:
+  public:
 	LoadImagesPopup(FlipBook *flip);
 
 	bool execute();
 	bool executeApply();
 	bool doLoad(bool append);
 
-public slots:
+  public slots:
 
 	void onFilePathClicked(const TFilePath &);
 	void onEditingFinished();
@@ -81,7 +81,7 @@ class FlipBookPool
 
 	TFilePath m_historyPath;
 
-public:
+  public:
 	FlipBookPool();
 	~FlipBookPool();
 
@@ -112,7 +112,7 @@ class FlipBook : public QWidget, public TSoundOutputDeviceListener, public FlipC
 {
 	Q_OBJECT
 
-protected:
+  protected:
 	int m_poolIndex;
 
 	QString m_viewerTitle;
@@ -124,12 +124,13 @@ protected:
 	int m_framesCount;
 	TRect m_loadbox;
 	TDimension m_dim;
-	std::map<std::string, TRect> m_loadboxes; //id in the cash, rect loaded actually
+	std::map<std::string, TRect> m_loadboxes; // id in the cash, rect loaded actually
 	class Level
 	{
-	public:
+	  public:
 		Level(const TLevelP &level, const TFilePath &fp, int fromIndex, int toIndex, int step)
-			: m_level(level), m_fp(fp), m_fromIndex(fromIndex), m_toIndex(toIndex), m_step(step), m_randomAccessRead(false), m_incrementalIndexing(false)
+			: m_level(level), m_fp(fp), m_fromIndex(fromIndex), m_toIndex(toIndex), m_step(step),
+			  m_randomAccessRead(false), m_incrementalIndexing(false)
 		{
 		}
 		TLevelP m_level;
@@ -151,9 +152,9 @@ protected:
 	TSoundOutputDevice *m_player;
 	TSoundTrack *m_snd;
 
-	//bool m_doCompare;
+	// bool m_doCompare;
 
-	//questi sono per il saving dei frame
+	// questi sono per il saving dei frame
 	TLevelWriterP m_lw;
 	TLevelReaderP m_lr;
 	TXshSimpleLevel *m_xl;
@@ -170,18 +171,21 @@ protected:
 
 	TPanelTitleBarButton *m_freezeButton;
 
-public:
+  public:
 	enum Flags { eDontKeepFilesOpened = 0x1 };
 
-	FlipBook(QWidget *parent = 0,
-			 QString viewerTitle = QString(),
-			 UINT flipConsoleButtonMask = FlipConsole::cFullConsole & (~(FlipConsole::eFilledRaster | FlipConsole::eDefineSubCamera)),
-			 UCHAR flags = 0,
-			 bool isColorModel = false);
+	FlipBook(QWidget *parent = 0, QString viewerTitle = QString(),
+			 UINT flipConsoleButtonMask = FlipConsole::cFullConsole &
+										  (~(FlipConsole::eFilledRaster |
+											 FlipConsole::eDefineSubCamera)),
+			 UCHAR flags = 0, bool isColorModel = false);
 	~FlipBook();
-	void setLevel(const TFilePath &path, TPalette *palette = 0, int from = -1, int to = -1, int step = 1, int shrink = 1,
-				  TSoundTrack *snd = 0, bool append = false, bool isToonzOutput = false);
-	void setLevel(TFx *previewedFx, TXsheet *xsh, TLevel *level, TPalette *palette = 0, int from = -1, int to = -1, int step = 1, int currentFrame = 1, TSoundTrack *snd = 0);
+	void setLevel(const TFilePath &path, TPalette *palette = 0, int from = -1, int to = -1,
+				  int step = 1, int shrink = 1, TSoundTrack *snd = 0, bool append = false,
+				  bool isToonzOutput = false);
+	void setLevel(TFx *previewedFx, TXsheet *xsh, TLevel *level, TPalette *palette = 0,
+				  int from = -1, int to = -1, int step = 1, int currentFrame = 1,
+				  TSoundTrack *snd = 0);
 	void setLevel(TXshSimpleLevel *xl);
 	void onPlayCompleted() {}
 	bool doSaveImages(TFilePath fp);
@@ -204,10 +208,7 @@ public:
 	int getPoolIndex() const { return m_poolIndex; }
 
 	// show / hide the red border line indicating the frame is under rendering
-	void setIsRemakingPreviewFx(bool on)
-	{
-		m_imageViewer->setIsRemakingPreviewFx(on);
-	}
+	void setIsRemakingPreviewFx(bool on) { m_imageViewer->setIsRemakingPreviewFx(on); }
 	void addFreezeButtonToTitleBar();
 
 	void setProgressBarStatus(const std::vector<UCHAR> *pbStatus);
@@ -234,14 +235,14 @@ public:
 	void swapBuffers();
 	void changeSwapBehavior(bool enable);
 
-private:
+  private:
 	// When viewing the tlv, try to cache all frames at the beginning.
 	// NOTE : fromFrame and toFrame are frame numbers displayed on the flipbook
 	void loadAndCacheAllTlvImages(Level level, int fromFrame, int toFrame);
 
 	friend class PreviewFxManager;
 
-protected:
+  protected:
 	void clearCache();
 	void adaptWidGeometry(const TRect &interestWidRect, const TRect &imgWidRect, bool keepPosition);
 
@@ -258,15 +259,16 @@ protected:
 
 	void enterEvent(QEvent *e) { m_flipConsole->makeCurrent(); }
 
-signals:
+  signals:
 
 	void closeFlipBook(FlipBook *);
 	// when freeze button is released, emit the signal to PreviewFxManager for re-rendering
 	void unfreezed(FlipBook *);
-	// when using the flip module, this signal is to show the loaded level names in application's title bar
+	// when using the flip module, this signal is to show the loaded level names in application's
+	// title bar
 	void imageLoaded(QString &);
 
-protected slots:
+  protected slots:
 
 	void onDoubleClick(QMouseEvent *me);
 	void onButtonPressed(FlipConsole::EGadget button);
@@ -275,7 +277,7 @@ protected slots:
 
 	void freeze(bool on);
 
-public slots:
+  public slots:
 
 	void saveImages();
 	void loadImages();
@@ -288,10 +290,10 @@ public slots:
 	void unfreezePreview();
 };
 
-//utility
+// utility
 
 void viewFile(const TFilePath &fp, int from = -1, int to = -1, int step = -1, int shrink = -1,
-			  TSoundTrack *snd = 0, FlipBook *flipbook = 0,
-			  bool append = false, bool isToonzOutput = false);
+			  TSoundTrack *snd = 0, FlipBook *flipbook = 0, bool append = false,
+			  bool isToonzOutput = false);
 
 #endif // FLIPBOOK_H

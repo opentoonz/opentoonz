@@ -24,42 +24,33 @@
 
 namespace ToonzExt
 {
-class DVAPI
-	LinearPotential
-	: public Potential
+class DVAPI LinearPotential : public Potential
 {
-public:
+  public:
 	virtual ~LinearPotential();
 
-	virtual double
-	value_(double radiusToTest) const;
+	virtual double value_(double radiusToTest) const;
 
-	virtual void
-	setParameters_(const TStroke *ref,
-				   double w,
-				   double actionLength);
+	virtual void setParameters_(const TStroke *ref, double w, double actionLength);
 
-	Potential *
-	clone();
+	Potential *clone();
 
-private:
-	double
-	compute_shape(double) const; // funzione ausiliaria per
+  private:
+	double compute_shape(double) const; // funzione ausiliaria per
 	// il calcolo del parametro
 	// da usare
 
-	double
-	compute_value(double) const; // funzione ausiliaria per
+	double compute_value(double) const; // funzione ausiliaria per
 	// il calcolo del potenziale senza
 	// controllo del parametro
 	const TStroke *ref_;
 	double
 		/**
-       * @brief Range of mapping
-       * 
-       * Only an interval of potential function will be used to
-       * map the tranformation.
-       */
+	   * @brief Range of mapping
+	   *
+	   * Only an interval of potential function will be used to
+	   * map the tranformation.
+	   */
 		range_,
 		par_,			//! Parameter of selection.
 		actionLength_,  //! Action length, how many units to move.

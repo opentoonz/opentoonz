@@ -22,16 +22,13 @@ class DVAPI IKSkeleton
 	int numEffector;
 	int numJoint;
 
-public:
+  public:
 	IKSkeleton()
 	{
 		numEffector = 0;
 		numJoint = 0;
 	}
-	~IKSkeleton()
-	{
-		clear();
-	}
+	~IKSkeleton() { clear(); }
 
 	void compute();
 	void clear()
@@ -56,10 +53,7 @@ public:
 	int getNumEffector() const { return numEffector; }
 	int getNumJoint() const { return numJoint; }
 
-	void setRoot(int nodeIndex)
-	{
-		m_nodes[nodeIndex]->setR(m_nodes[nodeIndex]->getPos());
-	}
+	void setRoot(int nodeIndex) { m_nodes[nodeIndex]->setR(m_nodes[nodeIndex]->getPos()); }
 	void setNode(int nodeIndex, const TPointD &pos, IKNode::Purpose purpose)
 	{
 		assert(0 <= nodeIndex && nodeIndex < getNodeCount());
@@ -81,12 +75,12 @@ public:
 
 	IKNode *getParent(const IKNode *node)
 	{
-		//assert(0<=nodeIndex && nodeIndex<getNodeCount());
+		// assert(0<=nodeIndex && nodeIndex<getNodeCount());
 		return node->getParent();
 	}
 
-private:
+  private:
 	void computeSkeleton(IKNode *);
 };
 
-#endif //IKSKELETON_H
+#endif // IKSKELETON_H

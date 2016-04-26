@@ -21,7 +21,7 @@
 namespace
 {
 
-const std::string firstFrameKey = "frst";			// First frame atom id
+const std::string firstFrameKey = "frst";		// First frame atom id
 const int firstFrameKeySize = 4 * sizeof(char); //
 
 //------------------------------------------------------------------------------
@@ -29,7 +29,7 @@ const int firstFrameKeySize = 4 * sizeof(char); //
 class QuickTimeCleanUp;
 class QuickTimeStuff
 {
-public:
+  public:
 	static QuickTimeStuff *instance()
 	{
 		if (!m_singleton)
@@ -37,11 +37,9 @@ public:
 		return m_singleton;
 	}
 	OSErr getStatus() { return m_status; }
-	~QuickTimeStuff()
-	{
-	}
+	~QuickTimeStuff() {}
 
-private:
+  private:
 	QuickTimeStuff() : m_status(noErr)
 	{
 		m_status = InitializeQTML(0);
@@ -51,21 +49,25 @@ private:
 	static QuickTimeStuff *m_singleton;
 
 	OSErr m_status;
-	friend class QuickTimeCleanUp; //questa DEVE essere friend, cosi' posso controllare direttamente
-								   //lo stato del singleton.
+	friend class QuickTimeCleanUp; // questa DEVE essere friend, cosi' posso controllare
+								   // direttamente
+	// lo stato del singleton.
 };
 
 class QuickTimeCleanUp
 {
-public:
+  public:
 	QuickTimeCleanUp() {}
 	~QuickTimeCleanUp()
 	{ /*
-                        Nel caso si arrivasse qui senza il singleton instanziato, e si facesse direttamente
-                        'delete QuickTimeStuff::instance();' Quicktime non farebbe in tempo a terminare le
-                        sue routine di inizializzazione (che sono ANCHE su altri thread) e la chiamata a
-                        TerminateQTML() causerebbe un crash
-                        */
+						Nel caso si arrivasse qui senza il singleton instanziato, e si facesse
+		 direttamente
+						'delete QuickTimeStuff::instance();' Quicktime non farebbe in tempo a
+		 terminare le
+						sue routine di inizializzazione (che sono ANCHE su altri thread) e la
+		 chiamata a
+						TerminateQTML() causerebbe un crash
+						*/
 		if (QuickTimeStuff::m_singleton)
 			delete QuickTimeStuff::m_singleton;
 	}
@@ -212,10 +214,10 @@ TimeScale frameRateToTimeScale(double frameRate)
 
 //-------------------------------------------------------------------------------
 
-//const std::string CodecNamesId   = "PU_CodecName";
-//const std::string CodecQualityId = "PU_CodecQuality";
+// const std::string CodecNamesId   = "PU_CodecName";
+// const std::string CodecQualityId = "PU_CodecQuality";
 
-} //namespace
+} // namespace
 
 //------------------------------------------------------------------------------
 
@@ -231,21 +233,21 @@ bool IsQuickTimeInstalled()
 class TImageWriterMov : public TImageWriter
 {
 
-public:
+  public:
 	TImageWriterMov(const TFilePath &, int frameIndex, TLevelWriterMov *);
 	~TImageWriterMov() { m_lwm->release(); }
 	bool is64bitOutputSupported() { return false; }
 
-private:
-	//not implemented
+  private:
+	// not implemented
 	TImageWriterMov(const TImageWriterMov &);
 	TImageWriterMov &operator=(const TImageWriterMov &src);
 
-public:
+  public:
 	void save(const TImageP &);
 	int m_frameIndex;
 
-private:
+  private:
 	TLevelWriterMov *m_lwm;
 };
 
@@ -298,9 +300,9 @@ return new TWriterInfoMov();
 //-----------------------------------------------------------
 
 TWriterInfoMov::TWriterInfoMov(const TWriterInfoMov&src)
-               :TWriterInfo(src)
-               ,m_codecTable(src.m_codecTable)
-               ,m_qualityTable(src.m_qualityTable)
+			   :TWriterInfo(src)
+			   ,m_codecTable(src.m_codecTable)
+			   ,m_qualityTable(src.m_qualityTable)
 {
 }
 
@@ -320,12 +322,12 @@ public:
 
 
 Tiio::TifWriterProperties::TifWriterProperties()
-                    : m_byteOrdering("Byte Order")
-                    , m_compressionType("Compression Type")
-                    , m_matte("Alpha Channel", true)
+					: m_byteOrdering("Byte Order")
+					, m_compressionType("Compression Type")
+					, m_matte("Alpha Channel", true)
 {
-    m_byteOrdering.addValue(L"IBM PC");
-    m_byteOrdering.addValue(L"Mac");
+	m_byteOrdering.addValue(L"IBM PC");
+	m_byteOrdering.addValue(L"Mac");
 #ifdef _WIN32
   m_byteOrdering.setValue(L"IBM PC");
 #else
@@ -404,7 +406,7 @@ TPropertyGroup* Tiio::MovWriterProperties::clone() const
 	g->m_codec.setValue(m_codec.getValue());
 	g->m_quality.setValue(m_quality.getValue());
 
-return (TPropertyGroup*)g;  
+return (TPropertyGroup*)g;
 }
 */
 
@@ -415,7 +417,8 @@ Tiio::MovWriterProperties::MovWriterProperties()
 	if (InitializeQTML(0) != noErr)
 		return;
 
-	ComponentInstance ci = OpenDefaultComponent(StandardCompressionType, StandardCompressionSubType);
+	ComponentInstance ci =
+		OpenDefaultComponent(StandardCompressionType, StandardCompressionSubType);
 	QTAtomContainer settings;
 
 	if (SCGetSettingsAsAtomContainer(ci, &settings) != noErr)
@@ -481,7 +484,8 @@ void TLevelWriterMov::save(const TImageP &img, int frameIndex)
 		TimeScale timeScale = ::frameRateToTimeScale(m_frameRate);
 		SetMovieTimeScale(m_movie, timeScale);
 
-		m_videoTrack = NewMovieTrack(m_movie, FixRatio((short)lx, 1), FixRatio((short)ly, 1), kNoVolume);
+		m_videoTrack =
+			NewMovieTrack(m_movie, FixRatio((short)lx, 1), FixRatio((short)ly, 1), kNoVolume);
 
 		if ((err = GetMoviesError() != noErr))
 			throw TImageException(getFilePath(), "can't create video track");
@@ -501,11 +505,12 @@ void TLevelWriterMov::save(const TImageP &img, int frameIndex)
 
 		LockPixels(m_gworld->portPixMap);
 		/*
-    if ((err = ImageCodecGetMaxCompressionSize(Ci, m_gworld->portPixMap, &frame, 0, 
-                                               quality, codecType, anyCodec, 
-                                               &max_compressed_size))!=noErr)
-                                               throw TImageException(getFilePath(), "can't get max compression size");
-    */
+	if ((err = ImageCodecGetMaxCompressionSize(Ci, m_gworld->portPixMap, &frame, 0,
+											   quality, codecType, anyCodec,
+											   &max_compressed_size))!=noErr)
+											   throw TImageException(getFilePath(), "can't get max
+	compression size");
+	*/
 
 		if ((err = MemError()) != noErr)
 			throw TImageException(getFilePath(), "can't allocate img handle");
@@ -536,24 +541,21 @@ void TLevelWriterMov::save(const TImageP &img, int frameIndex)
 
 	copy(ras, m_buf, buf_lx, buf_ly);
 
-	if ((err = SCCompressImage(m_ci,
-							   m_gworld->portPixMap,
-							   &frame,
-							   &img_descr,
-							   &compressedData)) != noErr)
+	if ((err = SCCompressImage(m_ci, m_gworld->portPixMap, &frame, &img_descr, &compressedData)) !=
+		noErr)
 		throw TImageException(getFilePath(), "can't compress image");
 
 	/*
-  if ((err = CompressImage(m_gworld->portPixMap, 
-  &frame, 
+  if ((err = CompressImage(m_gworld->portPixMap,
+  &frame,
   quality, codecType,
   img_descr, compressed_data_ptr))!=noErr)
   throw TImageException(getFilePath(), "can't compress image");
   */
 
 	TimeValue sampleTime;
-	if ((err = AddMediaSample(m_videoMedia, compressedData, 0,
-							  (*img_descr)->dataSize, 100,		  // 100 matches the length of 1 frame
+	if ((err = AddMediaSample(m_videoMedia, compressedData, 0, (*img_descr)->dataSize,
+							  100, // 100 matches the length of 1 frame
 							  (SampleDescriptionHandle)img_descr, // in the movie/media's timeScale
 							  1, 0, &sampleTime)) != noErr)
 		throw TImageException(getFilePath(), "can't add image to movie media");
@@ -572,7 +574,9 @@ void TLevelWriterMov::save(const TImageP &img, int frameIndex)
 //-----------------------------------------------------------
 
 TLevelWriterMov::TLevelWriterMov(const TFilePath &path, TPropertyGroup *winfo)
-	: TLevelWriter(path, winfo), m_IOError(QTNoError), m_pixmap(0), m_gworld(0), m_videoMedia(0), m_soundMedia(0), m_videoTrack(0), m_soundTrack(0), m_movie(0), m_firstFrame((std::numeric_limits<int>::max)())
+	: TLevelWriter(path, winfo), m_IOError(QTNoError), m_pixmap(0), m_gworld(0), m_videoMedia(0),
+	  m_soundMedia(0), m_videoTrack(0), m_soundTrack(0), m_movie(0),
+	  m_firstFrame((std::numeric_limits<int>::max)())
 {
 	m_frameRate = 12.;
 
@@ -600,38 +604,38 @@ TLevelWriterMov::TLevelWriterMov(const TFilePath &path, TPropertyGroup *winfo)
 //-----------------------------------------------------------
 
 #ifdef _DEBUG
-#define FailIf(cond, handler)                                 \
-	if (cond) {                                               \
-		DebugStr((ConstStr255Param) #cond " goto " #handler); \
-		goto handler;                                         \
-	} else                                                    \
+#define FailIf(cond, handler)                                                                      \
+	if (cond) {                                                                                    \
+		DebugStr((ConstStr255Param) #cond " goto " #handler);                                      \
+		goto handler;                                                                              \
+	} else                                                                                         \
 	0
 #else
-#define FailIf(cond, handler) \
-	if (cond) {               \
-		goto handler;         \
-	} else                    \
+#define FailIf(cond, handler)                                                                      \
+	if (cond) {                                                                                    \
+		goto handler;                                                                              \
+	} else                                                                                         \
 	0
 #endif
 
 #ifdef _DEBUG
-#define FailWithAction(cond, action, handler)                 \
-	if (cond) {                                               \
-		DebugStr((ConstStr255Param) #cond " goto " #handler); \
-		{                                                     \
-			action;                                           \
-		}                                                     \
-		goto handler;                                         \
-	} else                                                    \
+#define FailWithAction(cond, action, handler)                                                      \
+	if (cond) {                                                                                    \
+		DebugStr((ConstStr255Param) #cond " goto " #handler);                                      \
+		{                                                                                          \
+			action;                                                                                \
+		}                                                                                          \
+		goto handler;                                                                              \
+	} else                                                                                         \
 	0
 #else
-#define FailWithAction(cond, action, handler) \
-	if (cond) {                               \
-		{                                     \
-			action;                           \
-		}                                     \
-		goto handler;                         \
-	} else                                    \
+#define FailWithAction(cond, action, handler)                                                      \
+	if (cond) {                                                                                    \
+		{                                                                                          \
+			action;                                                                                \
+		}                                                                                          \
+		goto handler;                                                                              \
+	} else                                                                                         \
 	0
 #endif
 
@@ -651,7 +655,8 @@ void TLevelWriterMov::saveSoundTrack(TSoundTrack *st)
 
 		FailIf(myErr != noErr, CompressErr);
 
-		m_soundMedia = NewTrackMedia(m_soundTrack, SoundMediaType, st->getSampleRate(), NULL, 0); //track->rate >> 16
+		m_soundMedia = NewTrackMedia(m_soundTrack, SoundMediaType, st->getSampleRate(), NULL,
+									 0); // track->rate >> 16
 		myErr = GetMoviesError();
 
 		FailIf(myErr != noErr, Exit);
@@ -682,9 +687,8 @@ void TLevelWriterMov::saveSoundTrack(TSoundTrack *st)
 	sourceInfo.buffer = (unsigned char *)st->getRawData();
 	sourceInfo.reserved = 0x0;
 
-	destInfo.flags = kNoSampleRateConversion | kNoSampleSizeConversion |
-					 kNoSampleFormatConversion | kNoChannelConversion |
-					 kNoDecompression | kNoVolumeConversion |
+	destInfo.flags = kNoSampleRateConversion | kNoSampleSizeConversion | kNoSampleFormatConversion |
+					 kNoChannelConversion | kNoDecompression | kNoVolumeConversion |
 					 kNoRealtimeProcessing;
 
 	destInfo.format = k16BitNativeEndianFormat;
@@ -700,7 +704,8 @@ void TLevelWriterMov::saveSoundTrack(TSoundTrack *st)
 	myErr = SoundConverterGetInfo(converter, siCompressionFactor, &compressionInfo);
 
 	myErr = SoundConverterGetInfo(converter, siCompressionFactor, &compressionInfo);
-	myErr = GetCompressionInfo(fixedCompression, sourceInfo.format, sourceInfo.numChannels, sourceInfo.sampleSize, &compressionInfo);
+	myErr = GetCompressionInfo(fixedCompression, sourceInfo.format, sourceInfo.numChannels,
+							   sourceInfo.sampleSize, &compressionInfo);
 	FailIf(myErr != noErr, ConverterErr);
 
 	compressionInfo.bytesPerFrame = compressionInfo.bytesPerPacket * destInfo.numChannels;
@@ -712,7 +717,8 @@ void TLevelWriterMov::saveSoundTrack(TSoundTrack *st)
 	//////////
 
 	// use the SoundDescription format 1 because it adds fields for data size information
-	// and is required by AddSoundDescriptionExtension if an extension is required for the compression format
+	// and is required by AddSoundDescriptionExtension if an extension is required for the
+	// compression format
 
 	mySampleDesc = (SoundDescriptionV1Handle)NewHandleClear(sizeof(SoundDescriptionV1));
 	FailWithAction(myErr != noErr, myErr = MemError(), Exit);
@@ -741,14 +747,10 @@ void TLevelWriterMov::saveSoundTrack(TSoundTrack *st)
 	//
 	//////////
 
-	myErr = AddMediaSample(m_soundMedia, myDestHandle,
-						   0,
-						   destInfo.sampleCount * compressionInfo.bytesPerFrame,
-						   1,
+	myErr = AddMediaSample(m_soundMedia, myDestHandle, 0,
+						   destInfo.sampleCount * compressionInfo.bytesPerFrame, 1,
 						   (SampleDescriptionHandle)mySampleDesc,
-						   destInfo.sampleCount * compressionInfo.samplesPerPacket,
-						   0,
-						   NULL);
+						   destInfo.sampleCount * compressionInfo.samplesPerPacket, 0, NULL);
 	FailIf(myErr != noErr, MediaErr);
 
 	myErr = EndMediaEdits(m_soundMedia);
@@ -792,7 +794,8 @@ TLevelWriterMov::~TLevelWriterMov()
 	if (m_videoTrack) {
 		// Insert the saved Frames into the track.
 
-		// NOTE: Holes in the frames sequence will be intended as still frames, rather than left blank.
+		// NOTE: Holes in the frames sequence will be intended as still frames, rather than left
+		// blank.
 		//       I'm quite unsure whether this behavior is actually useful - or used at all.
 		//       In particular, the last frame is an exception, and does NOT drag to the end of the
 		//       movie (see below). I think it's not used - frames are consecutive AFAIK.
@@ -803,25 +806,27 @@ TLevelWriterMov::~TLevelWriterMov()
 		int i;
 		for (i = 0; i < savedFramesSize; ++i) {
 			TimeValue mediaPosition = m_savedFrames[i].second;
-			TimeValue trackPosition = ((m_savedFrames[i].first - m_firstFrame) * movieTimeScale) / m_frameRate;
+			TimeValue trackPosition =
+				((m_savedFrames[i].first - m_firstFrame) * movieTimeScale) / m_frameRate;
 
 			TimeValue duration = m_savedFrames[i + 1].first - m_savedFrames[i].first;
 			Fixed ratio = tround(fixed1 / (double)duration);
 
-			if ((err =
-					 InsertMediaIntoTrack(m_videoTrack, trackPosition, mediaPosition, 100, ratio)) != noErr)
+			if ((err = InsertMediaIntoTrack(m_videoTrack, trackPosition, mediaPosition, 100,
+											ratio)) != noErr)
 				throw TImageException(getFilePath(), "can't insert media into track");
 		}
 
 		if (savedFramesSize >= 0) {
 			TimeValue mediaPosition = m_savedFrames[i].second;
-			TimeValue trackPosition = ((m_savedFrames[i].first - m_firstFrame) * movieTimeScale) / m_frameRate;
+			TimeValue trackPosition =
+				((m_savedFrames[i].first - m_firstFrame) * movieTimeScale) / m_frameRate;
 
 			// The last frame has duration 1 (frame):
 			//   duration = 1  =>  ratio = fixed1
 
-			if ((err =
-					 InsertMediaIntoTrack(m_videoTrack, trackPosition, mediaPosition, 100, fixed1)) != noErr)
+			if ((err = InsertMediaIntoTrack(m_videoTrack, trackPosition, mediaPosition, 100,
+											fixed1)) != noErr)
 				throw TImageException(getFilePath(), "can't insert media into track");
 		}
 
@@ -829,30 +834,26 @@ TLevelWriterMov::~TLevelWriterMov()
 		if ((mderr = QTCopyMovieMetaData(m_movie, &metaDataRef)) != noErr)
 			throw TImageException(getFilePath(), "can't access metadata informations");
 
-		if ((mderr =
-				 QTMetaDataAddItem(
-					 metaDataRef,
-					 kQTMetaDataStorageFormatUserData,
-					 kQTMetaDataKeyFormatUserData,
-					 (const UInt8 *)firstFrameKey.c_str(),
-					 firstFrameKeySize,
-					 (const UInt8 *)(&m_firstFrame),
-					 sizeof(int),
-					 kQTMetaDataTypeUnsignedIntegerBE,
-					 0)) != noErr)
+		if ((mderr = QTMetaDataAddItem(metaDataRef, kQTMetaDataStorageFormatUserData,
+									   kQTMetaDataKeyFormatUserData,
+									   (const UInt8 *)firstFrameKey.c_str(), firstFrameKeySize,
+									   (const UInt8 *)(&m_firstFrame), sizeof(int),
+									   kQTMetaDataTypeUnsignedIntegerBE, 0)) != noErr)
 			throw TImageException(getFilePath(), "can't insert metadata informations");
 
 		QTMetaDataRelease(metaDataRef);
 	}
 
 	if (m_soundTrack) {
-		if (0 != (err = InsertMediaIntoTrack(m_soundTrack, 0, 0, GetMediaDuration(m_soundMedia), fixed1)))
+		if (0 != (err = InsertMediaIntoTrack(m_soundTrack, 0, 0, GetMediaDuration(m_soundMedia),
+											 fixed1)))
 			throw TImageException(getFilePath(), "can't insert sound into track");
 	}
 
 	short resId = movieInDataForkResID;
 	if (m_movie) {
-		if ((err = AddMovieResource(m_movie, m_refNum, &resId, 0)) != noErr) // Why no thrown exception here?
+		if ((err = AddMovieResource(m_movie, m_refNum, &resId, 0)) !=
+			noErr) // Why no thrown exception here?
 		{
 		} // throw TImageException(getFilePath(), "Can't add resource");             //
 	}
@@ -887,7 +888,8 @@ TImageWriterP TLevelWriterMov::getFrameWriter(TFrameId fid)
 //-----------------------------------------------------------
 
 TLevelReaderMov::TLevelReaderMov(const TFilePath &path)
-	: TLevelReader(path), m_IOError(QTNoError), m_track(0), m_movie(0), m_depth(0), m_readAsToonzOutput(false), m_yMirror(true), m_loadTimecode(false)
+	: TLevelReader(path), m_IOError(QTNoError), m_track(0), m_movie(0), m_depth(0),
+	  m_readAsToonzOutput(false), m_yMirror(true), m_loadTimecode(false)
 {
 	FSSpec fspec;
 	QDErr err;
@@ -915,8 +917,7 @@ TLevelReaderMov::TLevelReaderMov(const TFilePath &path)
 
 	short resId = 0;
 	Str255 name;
-	err = NewMovieFromFile(&m_movie, m_refNum, &resId,
-						   name, fsRdPerm, &dataRefWasChanged);
+	err = NewMovieFromFile(&m_movie, m_refNum, &resId, name, fsRdPerm, &dataRefWasChanged);
 
 	int numTracks = GetMovieTrackCount(m_movie);
 	if (numTracks < 1) {
@@ -937,13 +938,14 @@ TLevelReaderMov::TLevelReaderMov(const TFilePath &path)
 	GetMediaSampleDescription(theMedia, index, (SampleDescriptionHandle)imageH);
 	ImageDescriptionPtr imagePtr = *imageH;
 
-	if ((imagePtr->cType >> 16) == 0x4458 /*'DX'*/ && path.getType() == "avi") // DIVX - compressed, QT is unable to read it.
-	{																		   // Done externally with the... AVI reader o_o.
+	if ((imagePtr->cType >> 16) == 0x4458 /*'DX'*/ &&
+		path.getType() == "avi") // DIVX - compressed, QT is unable to read it.
+	{							 // Done externally with the... AVI reader o_o.
 		m_IOError = QTUnableToDoMovieTask;
 		return;
 	}
 
-	//Retrieve the timecode media handler
+	// Retrieve the timecode media handler
 	{
 		Track tcTrack = GetMovieIndTrackType(m_movie, 1, TimeCodeMediaType, movieTrackMediaType);
 		Media tcMedia = GetTrackMedia(tcTrack);
@@ -958,8 +960,9 @@ TLevelReaderMov::TLevelReaderMov(const TFilePath &path)
 
 	m_info->m_lx = m_lx;
 	m_info->m_ly = m_ly;
-	m_info->m_frameRate = GetMediaTimeScale(theMedia) / 100.0; // REMOVE THIS! Not all movs have this
-															   // kind of format - only those from Toonz...
+	m_info->m_frameRate =
+		GetMediaTimeScale(theMedia) / 100.0; // REMOVE THIS! Not all movs have this
+											 // kind of format - only those from Toonz...
 	Tiio::MovWriterProperties *prop = new Tiio::MovWriterProperties();
 	m_info->m_properties = prop;
 
@@ -1016,22 +1019,23 @@ class TImageReaderMov : public TImageReader
 	TLevelReaderMov *m_lrm;
 	TImageInfo *m_info;
 
-public:
+  public:
 	int m_frameIndex;
 
-public:
+  public:
 	TImageReaderMov(const TFilePath &, int frameIndex, TLevelReaderMov *, TImageInfo *);
 	~TImageReaderMov() { m_lrm->release(); }
 
 	TImageP load();
-	void load(const TRasterP &rasP, const TPoint &pos = TPoint(0, 0), int shrinkX = 1, int shrinkY = 1);
+	void load(const TRasterP &rasP, const TPoint &pos = TPoint(0, 0), int shrinkX = 1,
+			  int shrinkY = 1);
 
 	TDimension getSize() const { return m_lrm->getSize(); }
 	TRect getBBox() const { return m_lrm->getBBox(); }
 
 	const TImageInfo *getImageInfo() const { return m_info; }
 
-private:
+  private:
 	// Not copyable
 	TImageReaderMov(const TImageReaderMov &);
 	TImageReaderMov &operator=(const TImageReaderMov &);
@@ -1039,7 +1043,8 @@ private:
 
 //------------------------------------------------
 
-TImageReaderMov::TImageReaderMov(const TFilePath &path, int frameIndex, TLevelReaderMov *lrm, TImageInfo *info)
+TImageReaderMov::TImageReaderMov(const TFilePath &path, int frameIndex, TLevelReaderMov *lrm,
+								 TImageInfo *info)
 	: TImageReader(path), m_lrm(lrm), m_frameIndex(frameIndex), m_info(info)
 {
 	m_lrm->addRef();
@@ -1052,7 +1057,8 @@ TLevelP TLevelReaderMov::loadInfo()
 	if (m_readAsToonzOutput)				// Mov files written with Toonz support special
 		return loadToonzOutputFormatInfo(); // metadata atoms - separate procedure
 
-	// Level is NOT a recognized mov from Toonz. Just read each movie's interesting image as a consecutive
+	// Level is NOT a recognized mov from Toonz. Just read each movie's interesting image as a
+	// consecutive
 	// level frame.
 
 	TLevelP level;
@@ -1067,7 +1073,8 @@ TLevelP TLevelReaderMov::loadInfo()
 	int f = 0; // 0 is the first frame index
 
 	// io vorrei fare '|', ma sul manuale c'e' scritto '+'
-	GetMovieNextInterestingTime(m_movie, nextTimeMediaSample + nextTimeEdgeOK, 1, &mediaType, currentTime, 0, &nextTime, 0);
+	GetMovieNextInterestingTime(m_movie, nextTimeMediaSample + nextTimeEdgeOK, 1, &mediaType,
+								currentTime, 0, &nextTime, 0);
 
 	if (nextTime != -1) {
 		TFrameId frame(f + 1);
@@ -1078,7 +1085,8 @@ TLevelP TLevelReaderMov::loadInfo()
 
 	currentTime = nextTime;
 	while (nextTime != -1) {
-		GetMovieNextInterestingTime(m_movie, nextTimeMediaSample, 1, &mediaType, currentTime, 0, &nextTime, 0);
+		GetMovieNextInterestingTime(m_movie, nextTimeMediaSample, 1, &mediaType, currentTime, 0,
+									&nextTime, 0);
 		if (nextTime != -1) {
 			TFrameId frame(f + 1);
 			level->setFrame(frame, TImageP());
@@ -1109,26 +1117,17 @@ TLevelP TLevelReaderMov::loadToonzOutputFormatInfo()
 	QTMetaDataItem firstFrameItem;
 
 	// Find the metadata atom
-	mderr = QTMetaDataGetNextItem(
-		metaDataRef,
-		kQTMetaDataStorageFormatUserData,
-		kQTMetaDataItemUninitialized,
-		kQTMetaDataKeyFormatUserData,
-		(const UInt8 *)firstFrameKey.c_str(),
-		firstFrameKeySize,
-		&firstFrameItem);
+	mderr = QTMetaDataGetNextItem(metaDataRef, kQTMetaDataStorageFormatUserData,
+								  kQTMetaDataItemUninitialized, kQTMetaDataKeyFormatUserData,
+								  (const UInt8 *)firstFrameKey.c_str(), firstFrameKeySize,
+								  &firstFrameItem);
 
 	// Try to read the value. If the atom was not found, just assume firstFrame = 0.
 	int firstFrame = 0;
 	if (mderr == noErr) {
 		// The atom was found. Then, retrieve the value
-		if ((mderr =
-				 QTMetaDataGetItemValue(
-					 metaDataRef,
-					 firstFrameItem,
-					 (UInt8 *)(&firstFrame),
-					 sizeof(int),
-					 0) != noErr))
+		if ((mderr = QTMetaDataGetItemValue(metaDataRef, firstFrameItem, (UInt8 *)(&firstFrame),
+											sizeof(int), 0) != noErr))
 			throw TImageException(m_path, "can't read metadata informations");
 	}
 
@@ -1144,13 +1143,15 @@ TLevelP TLevelReaderMov::loadToonzOutputFormatInfo()
 	std::vector<TimeValue> interestingTimeValues;
 
 	// io vorrei fare '|', ma sul manuale c'e' scritto '+'
-	GetMovieNextInterestingTime(m_movie, nextTimeMediaSample + nextTimeEdgeOK, 1, &mediaType, currentTime, 0, &nextTime, 0);
+	GetMovieNextInterestingTime(m_movie, nextTimeMediaSample + nextTimeEdgeOK, 1, &mediaType,
+								currentTime, 0, &nextTime, 0);
 	if (nextTime != -1) {
 		interestingTimeValues.push_back(nextTime);
 		currentTime = nextTime;
 	}
 	while (nextTime != -1) {
-		GetMovieNextInterestingTime(m_movie, nextTimeMediaSample, 1, &mediaType, currentTime, 0, &nextTime, 0);
+		GetMovieNextInterestingTime(m_movie, nextTimeMediaSample, 1, &mediaType, currentTime, 0,
+									&nextTime, 0);
 		if (nextTime != -1) {
 			interestingTimeValues.push_back(nextTime);
 			currentTime = nextTime;
@@ -1164,10 +1165,12 @@ TLevelP TLevelReaderMov::loadToonzOutputFormatInfo()
 
 		std::vector<TimeValue>::iterator it;
 		for (it = interestingTimeValues.begin(); it != interestingTimeValues.end(); ++it) {
-			int frame = firstFrame + tround((*it * frameRate) / (double)movieTimeScale); // (Daniele) There was a ceil here,
-			TFrameId frameId(frame + 1);												 // before. But I honestly don't remember
-			level->setFrame(frameId, TImageP());										 // WHY I placed it there. Round seems more
-			currentTimes[frame] = *it;													 // appropriate...
+			int frame =
+				firstFrame + tround((*it * frameRate) /
+									(double)movieTimeScale); // (Daniele) There was a ceil here,
+			TFrameId frameId(frame + 1);		 // before. But I honestly don't remember
+			level->setFrame(frameId, TImageP()); // WHY I placed it there. Round seems more
+			currentTimes[frame] = *it;			 // appropriate...
 		}
 	}
 
@@ -1201,7 +1204,7 @@ inline void setMatteAndYMirror(const TRaster32P &ras)
 	ras->lock();
 	TPixel32 *upRow = ras->pixels();
 	TPixel32 *dwRow = ras->pixels(ras->getLy() - 1);
-	int hLy = (int)(ras->getLy() / 2. + 0.5); //piccola pessimizzazione...
+	int hLy = (int)(ras->getLy() / 2. + 0.5); // piccola pessimizzazione...
 	int wrap = ras->getWrap();
 	int lx = ras->getLx();
 	TPixel32 *upPix = 0;
@@ -1227,7 +1230,8 @@ inline void setMatteAndYMirror(const TRaster32P &ras)
 
 //------------------------------------------------
 
-void TLevelReaderMov::load(const TRasterP &rasP, int frameIndex, const TPoint &pos, int shrinkX, int shrinkY)
+void TLevelReaderMov::load(const TRasterP &rasP, int frameIndex, const TPoint &pos, int shrinkX,
+						   int shrinkY)
 {
 	GWorldPtr offscreenGWorld = 0;
 	{
@@ -1245,9 +1249,8 @@ void TLevelReaderMov::load(const TRasterP &rasP, int frameIndex, const TPoint &p
 
 		OSErr err;
 		ras->lock();
-		err = QTNewGWorldFromPtr(
-			&offscreenGWorld, k32BGRAPixelFormat,
-			&rect, 0, 0, 0, ras->getRawData(), ras->getWrap() * 4);
+		err = QTNewGWorldFromPtr(&offscreenGWorld, k32BGRAPixelFormat, &rect, 0, 0, 0,
+								 ras->getRawData(), ras->getWrap() * 4);
 
 		if (err != noErr) {
 			m_IOError = QTUnableToCreateResource;
@@ -1309,7 +1312,7 @@ void TLevelReaderMov::load(const TRasterP &rasP, int frameIndex, const TPoint &p
 	}
 
 	if (m_loadTimecode) {
-		//Also build current Timecode
+		// Also build current Timecode
 		TimeCodeRecord tc;
 		HandlerError err = TCGetCurrentTimeCode(m_timecodeHandler, 0, 0, &tc, 0);
 
@@ -1350,8 +1353,7 @@ void TLevelReaderMov::timecode(int frameIndex, UCHAR &hh, UCHAR &mm, UCHAR &ss, 
 		TimeValue currentTime = it->second;
 
 		TimeCodeRecord tc;
-		HandlerError err = TCGetTimeCodeAtTime(m_timecodeHandler, currentTime,
-											   0, 0, &tc, 0);
+		HandlerError err = TCGetTimeCodeAtTime(m_timecodeHandler, currentTime, 0, 0, &tc, 0);
 
 		hh = tc.t.hours;
 		mm = tc.t.minutes;
@@ -1399,7 +1401,8 @@ TLevelReader *TLevelReaderMov::create(const TFilePath &f)
 //  next (instead of reverting to the defaults for every image). Note, however, that the data in
 //  that handle is byte-ordered according to the platform the code is running on. As a result, you
 //  should not store that data in a file and expect that file to be valid on other platforms. To
-//  get a handle of data in a platform-independent format, use the function SCGetSettingsAsAtomContainer
+//  get a handle of data in a platform-independent format, use the function
+//  SCGetSettingsAsAtomContainer
 //  (introduced in QuickTime 3); to restore the settings in that handle, use the related function
 //  SCSetSettingsAsAtomContainer.
 //

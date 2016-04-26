@@ -24,34 +24,25 @@
 
 namespace ToonzExt
 {
-class DVAPI
-	SquarePotential
-	: public Potential
+class DVAPI SquarePotential : public Potential
 {
-public:
+  public:
 	virtual ~SquarePotential();
 
 	// chiama compute_value ma effettua un controllo del parametro
-	virtual double
-	value_(double radiusToTest) const;
+	virtual double value_(double radiusToTest) const;
 
 	// chiama compute_value ma effettua un controllo del parametro
-	virtual void
-	setParameters_(const TStroke *ref,
-				   double w,
-				   double actionLength);
+	virtual void setParameters_(const TStroke *ref, double w, double actionLength);
 
-private:
-	Potential *
-	clone();
+  private:
+	Potential *clone();
 
-	double
-	compute_shape(double) const; // funzione ausiliaria per
+	double compute_shape(double) const; // funzione ausiliaria per
 	// il calcolo del parametro
 	// da usare
 
-	double
-	compute_value(double) const; // funzione ausiliaria per
+	double compute_value(double) const; // funzione ausiliaria per
 	// il calcolo del potenziale senza
 	// controllo del parametro
 	const TStroke *ref_;

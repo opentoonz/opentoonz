@@ -98,7 +98,7 @@ QValidator::State SimpleExpValidator::validate(QString &input, int &pos) const
 			return Intermediate;
 	} else if (slashCount >= 2) {
 		return Intermediate;
-	} else //slashCount == 1
+	} else // slashCount == 1
 	{
 		if (input.at(0) == '/' || input.at(input.length() - 1) == '/')
 			return Intermediate;
@@ -122,8 +122,7 @@ QValidator::State SimpleExpValidator::validate(QString &input, int &pos) const
 
 //=============================================================================
 
-SimpleExpField::SimpleExpField(QWidget *parent)
-	: QLineEdit(parent)
+SimpleExpField::SimpleExpField(QWidget *parent) : QLineEdit(parent)
 {
 	m_validator = new SimpleExpValidator(this);
 	setValidator(m_validator);
@@ -393,7 +392,8 @@ void CameraSettingsWidget::savePresetList()
 		out << m_presetListOm->itemText(i) << "\n";
 }
 
-bool CameraSettingsWidget::parsePresetString(const QString &str, QString &name, int &xres, int &yres, QString &ar)
+bool CameraSettingsWidget::parsePresetString(const QString &str, QString &name, int &xres,
+											 int &yres, QString &ar)
 {
 	// str : name, 1024x768, 4/3
 	int b;
@@ -417,28 +417,22 @@ bool CameraSettingsWidget::parsePresetString(const QString &str, QString &name, 
 
 //--------------------------------------------------------------------------
 
-bool CameraSettingsWidget::parsePresetString(const QString &str,
-											 QString &name,
-											 int &xres,
-											 int &yres,
-											 double &fx,
-											 double &fy,
-											 QString &xoffset,
-											 QString &yoffset,
-											 double &ar,
-											 bool forCleanup)
+bool CameraSettingsWidget::parsePresetString(const QString &str, QString &name, int &xres,
+											 int &yres, double &fx, double &fy, QString &xoffset,
+											 QString &yoffset, double &ar, bool forCleanup)
 {
 	/*
 	parsing preset string with QString::split().
-	!NOTE! fx/fy (camera size in inch) and xoffset/yoffset (camera offset used in cleanup camera) are optional,
+	!NOTE! fx/fy (camera size in inch) and xoffset/yoffset (camera offset used in cleanup camera)
+	are optional,
 	in order to keep compatibility with default (Harlequin's) reslist.txt
 	*/
-	
+
 	QStringList tokens = str.split(",", QString::SkipEmptyParts);
 
 	if (!(tokens.count() == 3 ||
-		(!forCleanup && tokens.count() == 4) || /*- with "fx x fy" token -*/
-		(forCleanup && tokens.count() == 6)))	/*- with "fx x fy", xoffset and yoffset tokens -*/
+		  (!forCleanup && tokens.count() == 4) || /*- with "fx x fy" token -*/
+		  (forCleanup && tokens.count() == 6)))   /*- with "fx x fy", xoffset and yoffset tokens -*/
 		return false;
 	/*- name -*/
 	name = tokens[0];
@@ -449,24 +443,26 @@ bool CameraSettingsWidget::parsePresetString(const QString &str,
 		return false;
 	bool ok;
 	xres = values[0].toInt(&ok);
-	if (!ok) return false;
+	if (!ok)
+		return false;
 	yres = values[1].toInt(&ok);
-	if (!ok) return false;
+	if (!ok)
+		return false;
 
-	if (tokens.count() >= 4)
-	{
+	if (tokens.count() >= 4) {
 		/*- fx, fy -*/
 		values = tokens[2].split("x");
 		if (values.count() != 2)
 			return false;
 		fx = values[0].toDouble(&ok);
-		if (!ok) return false;
+		if (!ok)
+			return false;
 		fy = values[1].toDouble(&ok);
-		if (!ok) return false;
+		if (!ok)
+			return false;
 
 		/*- xoffset, yoffset -*/
-		if (forCleanup)
-		{
+		if (forCleanup) {
 			xoffset = tokens[3];
 			yoffset = tokens[4];
 			/*- remove single space -*/
@@ -501,9 +497,11 @@ bool CameraSettingsWidget::eventFilter(QObject *obj, QEvent *e)
 		else if (m_arPrev->isChecked() && obj == m_arFld) // ar-prev, fld=ar
 			m_xPrev->setChecked(true);
 
-		if (m_inchPrev->isChecked() && (obj == m_lxFld || obj == m_lyFld || obj == m_arFld)) // inchPrev, fld = lx|ly|ar
+		if (m_inchPrev->isChecked() &&
+			(obj == m_lxFld || obj == m_lyFld || obj == m_arFld)) // inchPrev, fld = lx|ly|ar
 			m_dotPrev->setChecked(true);
-		else if (m_dotPrev->isChecked() && (obj == m_xResFld || obj == m_yResFld)) // dotPrev, fld = xres|yres
+		else if (m_dotPrev->isChecked() &&
+				 (obj == m_xResFld || obj == m_yResFld)) // dotPrev, fld = xres|yres
 			m_inchPrev->setChecked(true);
 	}
 
@@ -601,29 +599,19 @@ void CameraSettingsWidget::updatePresetListOm()
 	QString xoffset, yoffset;
 	double ar;
 
-	if (parsePresetString(m_presetListOm->currentText(),
-						  name,
-						  xres,
-						  yres,
-						  fx,
-						  fy,
-						  xoffset,
-						  yoffset,
-						  ar,
-						  m_forCleanup)) {
+	if (parsePresetString(m_presetListOm->currentText(), name, xres, yres, fx, fy, xoffset, yoffset,
+						  ar, m_forCleanup)) {
 		double eps = 1.0e-6;
 		if (m_forCleanup && m_offsX && m_offsY) {
-			match = xres == m_xResFld->getValue() &&
-					yres == m_yResFld->getValue() &&
-					(fx<0.0 || fx == m_lxFld->getValue()) &&
-					(fy<0.0 || fy == m_lyFld->getValue()) &&
+			match = xres == m_xResFld->getValue() && yres == m_yResFld->getValue() &&
+					(fx < 0.0 || fx == m_lxFld->getValue()) &&
+					(fy < 0.0 || fy == m_lyFld->getValue()) &&
 					(xoffset.isEmpty() || xoffset == m_offsX->text()) &&
 					(yoffset.isEmpty() || yoffset == m_offsY->text());
 		} else {
-			match = xres == m_xResFld->getValue() &&
-					yres == m_yResFld->getValue() &&
-					(fx<0.0 || fx == m_lxFld->getValue()) &&
-					(fy<0.0 || fy == m_lyFld->getValue());
+			match = xres == m_xResFld->getValue() && yres == m_yResFld->getValue() &&
+					(fx < 0.0 || fx == m_lxFld->getValue()) &&
+					(fy < 0.0 || fy == m_lyFld->getValue());
 		}
 	}
 	if (!match)
@@ -696,7 +684,8 @@ void CameraSettingsWidget::computeYDpi()
 	m_yDpiFld->setValue(m_yResFld->getValue() / m_lyFld->getValue());
 }
 
-// set A/R field, assign m_arValue and compute a nice string representation for the value (e.g. "4/3" instead of 1.3333333)
+// set A/R field, assign m_arValue and compute a nice string representation for the value (e.g.
+// "4/3" instead of 1.3333333)
 void CameraSettingsWidget::setArFld(double ar)
 {
 	m_arValue = ar;
@@ -714,7 +703,7 @@ void CameraSettingsWidget::computeResOrDpi()
 void CameraSettingsWidget::onLxChanged()
 {
 	assert(!m_inchPrev->isChecked());
-	//assert(!(m_fspChk->isChecked() && m_yPrev->isChecked() && m_dotPrev->isChecked()));
+	// assert(!(m_fspChk->isChecked() && m_yPrev->isChecked() && m_dotPrev->isChecked()));
 	if (m_yPrev->isChecked())
 		computeAr();
 	else
@@ -727,7 +716,7 @@ void CameraSettingsWidget::onLxChanged()
 void CameraSettingsWidget::onLyChanged()
 {
 	assert(!m_inchPrev->isChecked());
-	//assert(!(m_fspChk->isChecked() && m_xPrev->isChecked() && m_dotPrev->isChecked()));
+	// assert(!(m_fspChk->isChecked() && m_xPrev->isChecked() && m_dotPrev->isChecked()));
 	if (m_xPrev->isChecked())
 		computeAr();
 	else
@@ -852,40 +841,27 @@ void CameraSettingsWidget::onPresetSelected(const QString &str)
 	QString xoffset = "", yoffset = "";
 	double ar;
 
-	if (parsePresetString(str,
-						  name,
-						  xres,
-						  yres,
-						  fx,
-						  fy,
-						  xoffset,
-						  yoffset,
-						  ar,
-						  m_forCleanup)) {
+	if (parsePresetString(str, name, xres, yres, fx, fy, xoffset, yoffset, ar, m_forCleanup)) {
 		m_xResFld->setValue(xres);
 		m_yResFld->setValue(yres);
 		m_arFld->setValue(ar, tround(xres), tround(yres));
 		m_arValue = ar;
 
-		if (fx > 0.0 && fy > 0.0)
-		{
+		if (fx > 0.0 && fy > 0.0) {
 			m_lxFld->setValue(fx);
 			m_lyFld->setValue(fy);
-		}
-		else
-		{
+		} else {
 			if (m_xPrev->isChecked())
 				hComputeLy();
 			else
 				hComputeLx();
 		}
 
-		if (m_forCleanup && m_offsX && m_offsY && !xoffset.isEmpty() && !yoffset.isEmpty())
-		{
+		if (m_forCleanup && m_offsX && m_offsY && !xoffset.isEmpty() && !yoffset.isEmpty()) {
 			m_offsX->setText(xoffset);
 			m_offsY->setText(yoffset);
-			m_offsX->postSetText(); //calls onEditingFinished()
-			m_offsY->postSetText(); //calls onEditingFinished()
+			m_offsX->postSetText(); // calls onEditingFinished()
+			m_offsY->postSetText(); // calls onEditingFinished()
 		}
 
 		/*--- DPI以外はロードしたままの値を使う ---*/
@@ -918,29 +894,26 @@ void CameraSettingsWidget::addPreset()
 		QString yoffset = (m_offsY) ? m_offsY->text() : QString("0");
 
 		presetString = QString::number(xRes) + "x" + QString::number(yRes) + ", " +
-					   removeZeros(QString::number(lx)) + "x" + removeZeros(QString::number(ly)) + ", " +
-					   xoffset + ", " + yoffset + ", " +
-					   aspectRatioValueToString(ar);
+					   removeZeros(QString::number(lx)) + "x" + removeZeros(QString::number(ly)) +
+					   ", " + xoffset + ", " + yoffset + ", " + aspectRatioValueToString(ar);
 	} else {
 		presetString = QString::number(xRes) + "x" + QString::number(yRes) + ", " +
-					   removeZeros(QString::number(lx)) + "x" + removeZeros(QString::number(ly)) + ", " +
-					   aspectRatioValueToString(ar);
+					   removeZeros(QString::number(lx)) + "x" + removeZeros(QString::number(ly)) +
+					   ", " + aspectRatioValueToString(ar);
 	}
 
 	bool ok;
 	QString qs;
-	while (1)
-	{
-		qs = DVGui::getText(
-			tr("Preset name"),
-			tr("Enter the name for %1").arg(presetString),
-			"", &ok);
+	while (1) {
+		qs = DVGui::getText(tr("Preset name"), tr("Enter the name for %1").arg(presetString), "",
+							&ok);
 
 		if (!ok)
 			return;
 
 		if (qs.indexOf(",") != -1)
-			QMessageBox::warning(this, tr("Error : Preset Name is Invalid"), tr("The preset name must not use ','(comma)."));
+			QMessageBox::warning(this, tr("Error : Preset Name is Invalid"),
+								 tr("The preset name must not use ','(comma)."));
 		else
 			break;
 	}
@@ -962,8 +935,9 @@ void CameraSettingsWidget::removePreset()
 		return;
 
 	// confirmation dialog
-	int ret = DVGui::MsgBox(QObject::tr("Deleting \"%1\".\nAre you sure?").arg(m_presetListOm->currentText()),
-					 QObject::tr("Delete"), QObject::tr("Cancel"));
+	int ret = DVGui::MsgBox(
+		QObject::tr("Deleting \"%1\".\nAre you sure?").arg(m_presetListOm->currentText()),
+		QObject::tr("Delete"), QObject::tr("Cancel"));
 	if (ret == 0 || ret == 2)
 		return;
 

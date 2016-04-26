@@ -32,10 +32,8 @@ class DVAPI TMacroFx : public TRasterFx
 
 	bool isaLeaf(TFx *fx) const;
 
-public:
-	static bool analyze(const std::vector<TFxP> &fxs,
-						TFxP &root,
-						std::vector<TFxP> &roots,
+  public:
+	static bool analyze(const std::vector<TFxP> &fxs, TFxP &root, std::vector<TFxP> &roots,
 						std::vector<TFxP> &leafs);
 
 	static bool analyze(const std::vector<TFxP> &fxs);
@@ -48,9 +46,7 @@ public:
 	TFx *clone(bool recursive = true) const;
 
 	bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info);
-	void doDryCompute(TRectD &rect,
-					  double frame,
-					  const TRenderSettings &info);
+	void doDryCompute(TRectD &rect, double frame, const TRenderSettings &info);
 	void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
 
 	TFxTimeRegion getTimeRegion() const;
@@ -59,8 +55,8 @@ public:
 
 	void setRoot(TFx *root);
 	TFx *getRoot() const;
-	//!Returns the Fx identified by \b id.
-	//!Returns 0 if the macro does not contains an Fx with fxId equals ti \b id.
+	//! Returns the Fx identified by \b id.
+	//! Returns 0 if the macro does not contains an Fx with fxId equals ti \b id.
 	TFx *getFxById(const std::wstring &id) const;
 
 	// restituisce un riferimento al vettore contenente gli effetti contenuti nel macroFx
@@ -79,7 +75,7 @@ public:
 
 	void compatibilityTranslatePort(int majorVersion, int minorVersion, std::string &portName);
 
-private:
+  private:
 	// non implementati
 	TMacroFx(const TMacroFx &);
 	void operator=(const TMacroFx &);

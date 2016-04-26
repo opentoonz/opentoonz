@@ -25,7 +25,7 @@ class DVAPI TStyleControl : public TWidget, public TCommandSource
 	class Data;
 	Data *m_data;
 
-public:
+  public:
 	enum {
 		COLOR_PAGE = 0x01,
 		TEXTURE_PAGE = 0x02,
@@ -37,15 +37,9 @@ public:
 		ALL_PAGES = 0x1F
 	};
 
-	enum {
-		ALL_STYLES = 0x01,
-		VECTOR_SYLES_ONLY = 0x02
-	};
+	enum { ALL_STYLES = 0x01, VECTOR_SYLES_ONLY = 0x02 };
 
-	TStyleControl(
-		TWidget *parent,
-		const TFilePath &rootDir,
-		int styleFilter = ALL_STYLES);
+	TStyleControl(TWidget *parent, const TFilePath &rootDir, int styleFilter = ALL_STYLES);
 	~TStyleControl();
 
 	void setActivePages(unsigned long pageMask);

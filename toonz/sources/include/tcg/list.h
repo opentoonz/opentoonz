@@ -45,8 +45,8 @@
 
 /*! \file     tcg_list.h
 
-    \brief    This file contains the implementation of an <I>indexed list</I>,
-              a list class based on a random access sequential container.
+	\brief    This file contains the implementation of an <I>indexed list</I>,
+			  a list class based on a random access sequential container.
 */
 
 //************************************************************************************
@@ -56,8 +56,7 @@
 namespace tcg
 {
 
-static const size_t _neg = -1,
-					_invalid = -2;
+static const size_t _neg = -1, _invalid = -2;
 
 } // namespace tcg
 
@@ -72,8 +71,7 @@ namespace tcg
   \brief    Internal node class used in the implementation of a tcg::list_base.
 */
 
-template <typename T>
-struct _list_node {
+template <typename T> struct _list_node {
 	TCG_STATIC_ASSERT(sizeof(T) == sizeof(aligned_buffer<T>));
 
 	aligned_buffer<T> m_val;
@@ -81,10 +79,8 @@ struct _list_node {
 
 	TCG_DEBUG(T &m_t;) // Provided for debuggers' convenience
 
-public:
-	_list_node() : m_prev(_neg), m_next(_invalid) TCG_DEBUG2(, m_t(value()))
-	{
-	}
+  public:
+	_list_node() : m_prev(_neg), m_next(_invalid) TCG_DEBUG2(, m_t(value())) {}
 	_list_node(const T &val) : m_prev(_neg), m_next(_neg) TCG_DEBUG2(, m_t(value()))
 	{
 		constructValue(val);
@@ -158,15 +154,12 @@ public:
 
 #endif
 
-public:
+  public:
 	void constructValue(const T &val) { new (m_val.m_buf) T(val); }
 	void destroyValue() { value().~T(); }
 
 #if (TCG_RVALUES_SUPPORT > 0)
-	void constructValue(T &&val)
-	{
-		new (m_val.m_buf) T(std::move(val));
-	}
+	void constructValue(T &&val) { new (m_val.m_buf) T(std::move(val)); }
 #endif
 };
 
@@ -176,30 +169,29 @@ public:
 
 /*!
   \brief    Base class for list-like containers based on <TT>tcg::list</TT>'s
-            indexed list implementation.
+			indexed list implementation.
 
   \details  This class implements a barebone container class which manages
-            a collection of nodes stored in an iternal random access container.
+			a collection of nodes stored in an iternal random access container.
 
-            Nodes management is limited to the \a acquisition and \a release
-            of individual nodes (see the buyNode() and sellNode() functions).
+			Nodes management is limited to the \a acquisition and \a release
+			of individual nodes (see the buyNode() and sellNode() functions).
 
-            Links between list nodes must be managed externally.
+			Links between list nodes must be managed externally.
 
   \sa       Template class \p tcg::list for an explanation of the indexed list
-            container concept.
+			container concept.
 */
 
-template <typename T>
-class list_base
+template <typename T> class list_base
 {
-public:
+  public:
 	typedef T value_type;
 	typedef ::size_t size_t;
 
 	static const size_t _neg = -1;
 
-protected:
+  protected:
 	typedef _list_node<T> list_node;
 
 	std::vector<list_node> m_vector;
@@ -207,22 +199,24 @@ protected:
 	size_t m_size;
 	size_t m_clearedHead;
 
-public:
+  public:
 	struct const_iterator : public std::iterator<std::bidirectional_iterator_tag, const T> {
 		const list_base *m_list;
 		size_t m_idx;
 
 		TCG_DEBUG(const list_node *m_node;) // Provided for debuggers' convenience
 
-	public:
+	  public:
 		typedef const T value_type;
 		typedef const T *pointer;
 		typedef const T &reference;
 
-	public:
+	  public:
 		const_iterator() {}
-		const_iterator(const list_base *list, size_t idx)
-			: m_list(list), m_idx(idx) { TCG_DEBUG(m_node = (m_idx == _neg) ? 0 : &m_list->m_vector[m_idx]); }
+		const_iterator(const list_base *list, size_t idx) : m_list(list), m_idx(idx)
+		{
+			TCG_DEBUG(m_node = (m_idx == _neg) ? 0 : &m_list->m_vector[m_idx]);
+		}
 
 		size_t index() const { return m_idx; }
 
@@ -260,12 +254,12 @@ public:
 	};
 
 	struct iterator : public const_iterator {
-	public:
+	  public:
 		typedef T value_type;
 		typedef T *pointer;
 		typedef T &reference;
 
-	public:
+	  public:
 		iterator() {}
 		iterator(list_base *list, size_t idx) : const_iterator(list, idx) {}
 
@@ -300,7 +294,7 @@ public:
 	friend struct iterator;
 	friend struct const_iterator;
 
-public:
+  public:
 	list_base() : m_size(0), m_clearedHead(_neg) {}
 
 	list_base(size_t count, const T &val)
@@ -327,7 +321,9 @@ public:
 	//-----------------------------------------------------------------------------------------
 
 	list_base(const list_base &other)
-		: m_vector(other.m_vector), m_size(other.m_size), m_clearedHead(other.m_clearedHead) {}
+		: m_vector(other.m_vector), m_size(other.m_size), m_clearedHead(other.m_clearedHead)
+	{
+	}
 
 	list_base &operator=(const list_base &other)
 	{
@@ -350,7 +346,8 @@ public:
 #if (TCG_RVALUES_SUPPORT > 0)
 
 	list_base(list_base &&other)
-		: m_vector(std::move(other.m_vector)), m_size(other.m_size), m_clearedHead(other.m_clearedHead)
+		: m_vector(std::move(other.m_vector)), m_size(other.m_size),
+		  m_clearedHead(other.m_clearedHead)
 	{
 	}
 
@@ -406,18 +403,14 @@ public:
 		a.m_vector.swap(b.m_vector);
 	}
 
-	void _swap(list_base &&a, list_base &b)
-	{
-		swap(b, std::move(a));
-	}
+	void _swap(list_base &&a, list_base &b) { swap(b, std::move(a)); }
 
 #endif
 
 	//-----------------------------------------------------------------------------------------
 
 	//! Constructs from a range of (index, value) pairs
-	template <typename ForIt>
-	list_base(ForIt begin, ForIt end, size_t nodesCount)
+	template <typename ForIt> list_base(ForIt begin, ForIt end, size_t nodesCount)
 	{
 		// Initialize the vector with invalid nodes up to the required nodes count
 		m_vector.resize(nodesCount, list_node());
@@ -432,7 +425,8 @@ public:
 
 			// Further resize the vector with holes if necessary
 			if (idx >= m_vector.size()) {
-				// The nodesCount hint was not sufficient. Thus, we have to readjust the correct minimal
+				// The nodesCount hint was not sufficient. Thus, we have to readjust the correct
+				// minimal
 				// allocation size. Let's do it now with a further single pass toward the end.
 				size_t newSize = m_vector.size();
 
@@ -470,7 +464,7 @@ public:
 
 	//-----------------------------------------------------------------------------------------
 
-protected:
+  protected:
 	TCG_FORWARD_TEMPLATE(T)
 	size_t buyNode(TCG_FORWARD_TYPE(T) val)
 	{
@@ -537,8 +531,8 @@ protected:
 
 	//-----------------------------------------------------------------------------------------
 
-	void move(size_t afterDst, size_t &dstBegin, size_t &dstRBegin,
-			  size_t srcBegin, size_t srcEnd, size_t srcRBegin)
+	void move(size_t afterDst, size_t &dstBegin, size_t &dstRBegin, size_t srcBegin, size_t srcEnd,
+			  size_t srcRBegin)
 	{
 		if (srcBegin == _neg || srcBegin == afterDst)
 			return;
@@ -577,62 +571,61 @@ protected:
   \brief    Double linked list container class with indexed access to elements.
 
   \details  This class is the result of implementing a double linked list using a
-            dynamic random access sequential container as the underlying pool for
-            the list's nodes.
+			dynamic random access sequential container as the underlying pool for
+			the list's nodes.
 
-            This is somewhat different than supplying a custom allocator to an existing
-            list implementation, like \p std::list, since:
+			This is somewhat different than supplying a custom allocator to an existing
+			list implementation, like \p std::list, since:
 
-              <UL>
-              <LI>  No memory model of the underlying container is actually
-                    required.</LI>
-              <LI>  The underlying container provides explicit access to nodes
-                    using their associated <I>insertion indexes</I>, so \p std::list
-                    could not be used as-is.</LI>
-              </UL>
+			  <UL>
+			  <LI>  No memory model of the underlying container is actually
+					required.</LI>
+			  <LI>  The underlying container provides explicit access to nodes
+					using their associated <I>insertion indexes</I>, so \p std::list
+					could not be used as-is.</LI>
+			  </UL>
 \n
-            The nodes pool (see \p list_base) is an internal \a lazy container that
-            saves released nodes \a without actually deallocating them (of course,
-            their content is properly destroyed). They are rather stored into an
-            internal \a stack of released nodes, ready to be reacquired.
-              \par Features
-              \li  Insertion indexes are automatically generated keys with the same
-                   access time of the undelying container (typically super-fast
-                   \p O(1)).
-              \li  Stable indexes and iterators with respect to <I>every operation</I>.
-              \li  Copying an indexed list \a preserves the original indexes.
-              \li  Indexes are <I>process independent</I> - they can be saved
-                   on file and restored later (although you probably want to
-                   \a squeeze the list before saving).
+			The nodes pool (see \p list_base) is an internal \a lazy container that
+			saves released nodes \a without actually deallocating them (of course,
+			their content is properly destroyed). They are rather stored into an
+			internal \a stack of released nodes, ready to be reacquired.
+			  \par Features
+			  \li  Insertion indexes are automatically generated keys with the same
+				   access time of the undelying container (typically super-fast
+				   \p O(1)).
+			  \li  Stable indexes and iterators with respect to <I>every operation</I>.
+			  \li  Copying an indexed list \a preserves the original indexes.
+			  \li  Indexes are <I>process independent</I> - they can be saved
+				   on file and restored later (although you probably want to
+				   \a squeeze the list before saving).
 
-              \par Use cases
-            This class is surprisingly useful for <I>cross-referencing</I>.
-            A graph data structure, for example, can be implemented using a pair of
-            indexed lists for vertexes and edges.
+			  \par Use cases
+			This class is surprisingly useful for <I>cross-referencing</I>.
+			A graph data structure, for example, can be implemented using a pair of
+			indexed lists for vertexes and edges.
 
-              \par Known issues
-            The lazy nature of this container class may require \a squeezing the list's
-            content at strategic places in your code, as noted before.
-            Beware that composite cross-referencing may be hard to track \a precisely
-            during this particular operation.
+			  \par Known issues
+			The lazy nature of this container class may require \a squeezing the list's
+			content at strategic places in your code, as noted before.
+			Beware that composite cross-referencing may be hard to track \a precisely
+			during this particular operation.
 
   \remark   Current implementation explicitly uses an \p std::vector class as the
-            underlying random access container. Future improvements will make the
-            container class a template parameter.
+			underlying random access container. Future improvements will make the
+			container class a template parameter.
 
   \sa       Template class \p tcg::Mesh for a notable use case.
 */
 
-template <typename T>
-class list : public list_base<T>
+template <typename T> class list : public list_base<T>
 {
 	size_t m_begin, m_rbegin;
 
-protected:
+  protected:
 	typedef typename list_base<T>::list_node list_node;
 	using list_base<T>::m_vector;
 
-public:
+  public:
 	struct iterator : public list_base<T>::iterator {
 		iterator() {}
 		iterator(list *l, size_t idx) : list_base<T>::iterator(l, idx) {}
@@ -699,16 +692,21 @@ public:
 		}
 	};
 
-public:
+  public:
 	list() : m_begin(_neg), m_rbegin(_neg) {}
 	list(size_t count, const T &val) : list_base<T>(count, val), m_begin(0), m_rbegin(count - 1) {}
 
 	template <typename InIt>
-	list(InIt begin, InIt end) : list_base<T>(begin, end), m_begin(list_base<T>::m_size ? 0 : _neg), m_rbegin(list_base<T>::m_size - 1) {}
+	list(InIt begin, InIt end)
+		: list_base<T>(begin, end), m_begin(list_base<T>::m_size ? 0 : _neg),
+		  m_rbegin(list_base<T>::m_size - 1)
+	{
+	}
 
 	//! Constructs from a range of (index, value) pairs
 	template <typename BidIt>
-	list(BidIt begin, BidIt end, size_t nodesCount) : list_base<T>(begin, end, nodesCount)
+	list(BidIt begin, BidIt end, size_t nodesCount)
+		: list_base<T>(begin, end, nodesCount)
 	{
 		if (begin != end)
 			m_begin = (*begin).first, m_rbegin = (*--end).first;
@@ -716,17 +714,22 @@ public:
 
 	//-----------------------------------------------------------------------------------------
 
-	list(const list &other) : list_base<T>(other), m_begin(other.m_begin), m_rbegin(other.m_rbegin) {}
+	list(const list &other) : list_base<T>(other), m_begin(other.m_begin), m_rbegin(other.m_rbegin)
+	{
+	}
 
 	/*!
-    \warning  \p tcg::list has a different copy behavior from other container classes, since
-              it is intended to preserve the source's node indices in the process.
-    
-              This means that no value-to-value assignment can take place, and thus <TT>operator=</TT>'s
-              behavior is equivalent to first clearing it, and then copy-constructing each value.
+	\warning  \p tcg::list has a different copy behavior from other container classes, since
+			  it is intended to preserve the source's node indices in the process.
 
-              This typically leads to performance penalties with respect to other container classes that
-              implement value-to-value assignments, like \p std::vector in case its capacity is not exceeded.
+			  This means that no value-to-value assignment can take place, and thus
+	<TT>operator=</TT>'s
+			  behavior is equivalent to first clearing it, and then copy-constructing each value.
+
+			  This typically leads to performance penalties with respect to other container classes
+	that
+			  implement value-to-value assignments, like \p std::vector in case its capacity is not
+	exceeded.
   */
 	list &operator=(const list &other)
 	{
@@ -737,7 +740,9 @@ public:
 
 #if (TCG_RVALUES_SUPPORT > 0)
 
-	list(list &&other) : list_base<T>(std::forward<list_base<T>>(other)), m_begin(other.m_begin), m_rbegin(other.m_rbegin)
+	list(list &&other)
+		: list_base<T>(std::forward<list_base<T>>(other)), m_begin(other.m_begin),
+		  m_rbegin(other.m_rbegin)
 	{
 	}
 
@@ -759,9 +764,9 @@ public:
 		size_t nodeIdx = list_base<T>::buyNode(TCG_FORWARD(T, val));
 		list_node &node = m_vector[nodeIdx];
 
-		//Update links
+		// Update links
 		if (idx != _neg) {
-			//node has a valid next
+			// node has a valid next
 			list_node &next = m_vector[idx];
 
 			node.m_prev = next.m_prev;
@@ -783,8 +788,7 @@ public:
 		return nodeIdx;
 	}
 
-	template <typename Iter>
-	size_t insert(size_t idx, Iter begin, Iter end)
+	template <typename Iter> size_t insert(size_t idx, Iter begin, Iter end)
 	{
 		if (begin == end)
 			return idx;
@@ -841,10 +845,7 @@ public:
 		std::swap(m_rbegin, other.m_rbegin);
 	}
 
-	void swap(list &a, list &b)
-	{
-		a.swap(b);
-	}
+	void swap(list &a, list &b) { a.swap(b); }
 
 #if (TCG_RVALUES_SUPPORT > 0)
 
@@ -855,42 +856,40 @@ public:
 		m_rbegin = other.m_rbegin;
 	}
 
-	void swap(list &a, list &&b)
-	{
-		a.swap(std::move(b));
-	}
+	void swap(list &a, list &&b) { a.swap(std::move(b)); }
 
-	void swap(list &&a, list &b)
-	{
-		b.swap(std::move(a));
-	}
+	void swap(list &&a, list &b) { b.swap(std::move(a)); }
 
 #endif
 
 	//-----------------------------------------------------------------------------------------
 
 	/*!
-    \details  This function is \p tcg::list's counterpart to \p std::list::splice().
-              It moves the specified range to a different part of the list, \a without
-              touching any element elements - just by altering node links.
+	\details  This function is \p tcg::list's counterpart to \p std::list::splice().
+			  It moves the specified range to a different part of the list, \a without
+			  touching any element elements - just by altering node links.
 
-    \note     Unlike \p std::list::splice(), the list must be the same.
+	\note     Unlike \p std::list::splice(), the list must be the same.
   */
-	void move(size_t afterDst, size_t srcBegin, size_t srcEnd) //! Moves range <TT>[srcBegin, srcEnd)</TT> right before afterDst.      \param afterDst  Index right after the destination position. \param srcBegin  Start index of the moved range. \param srcEnd  End index of the moved range.
+	void move(size_t afterDst, size_t srcBegin,
+			  size_t srcEnd) //! Moves range <TT>[srcBegin, srcEnd)</TT> right before afterDst.
+							 //! \param afterDst  Index right after the destination position. \param
+							 //! srcBegin  Start index of the moved range. \param srcEnd  End index
+							 //! of the moved range.
 	{
-		return move(afterDst, m_begin, m_rbegin,
-					srcBegin, srcEnd, m_rbegin);
+		return move(afterDst, m_begin, m_rbegin, srcBegin, srcEnd, m_rbegin);
 	}
 
 	/*!
-    \sa       The equivalent function move(size_t, size_t, size_t).
+	\sa       The equivalent function move(size_t, size_t, size_t).
   */
-	void move(iterator afterDst,
-			  iterator srcBegin, iterator srcEnd) //! Moves range <TT>[srcBegin, srcEnd)</TT> right before afterDst.      \param afterDst  Iterator right after the destination position. \param srcBegin  Start of the moved range. \param srcEnd  End of the moved range.
+	void move(iterator afterDst, iterator srcBegin,
+			  iterator srcEnd) //! Moves range <TT>[srcBegin, srcEnd)</TT> right before afterDst.
+							   //! \param afterDst  Iterator right after the destination position.
+							   //! \param srcBegin  Start of the moved range. \param srcEnd  End of
+							   //! the moved range.
 	{
-		assert(afterDst.m_list == this &&
-			   srcBegin.m_list == this &&
-			   srcEnd.m_list == this);
+		assert(afterDst.m_list == this && srcBegin.m_list == this && srcEnd.m_list == this);
 
 		return move(afterDst.m_idx, srcBegin.m_idx, srcEnd.m_idx);
 	}
@@ -900,9 +899,14 @@ public:
 	iterator insert(iterator it, const T &val) { return iterator(this, insert(it.m_idx, val)); }
 	iterator erase(iterator it) { return iterator(this, erase(it.m_idx)); }
 
-	template <typename Iter>
-	iterator insert(iterator it, Iter begin, Iter end) { return iterator(this, insert(it.m_idx, begin, end)); }
-	iterator erase(iterator begin, iterator end) { return iterator(this, erase(begin.m_idx, end.m_idx)); }
+	template <typename Iter> iterator insert(iterator it, Iter begin, Iter end)
+	{
+		return iterator(this, insert(it.m_idx, begin, end));
+	}
+	iterator erase(iterator begin, iterator end)
+	{
+		return iterator(this, erase(begin.m_idx, end.m_idx));
+	}
 
 	size_t push_front(const T &val) { return insert(m_begin, val); }
 	size_t push_back(const T &val) { return insert(_neg, val); }

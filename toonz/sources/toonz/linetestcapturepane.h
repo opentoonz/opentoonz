@@ -39,7 +39,7 @@ class LineTestImageViewer : public QWidget, public CameraImageViewer
 
 	QPoint m_pos;
 	Qt::MouseButton m_mouseButton;
-	//!Used to zoom and pan
+	//! Used to zoom and pan
 	TAffine m_viewAffine;
 
 	TRasterP m_raster;
@@ -49,7 +49,7 @@ class LineTestImageViewer : public QWidget, public CameraImageViewer
 	bool m_isOnionSkinActive;
 	bool m_isViewFrameActive;
 
-public:
+  public:
 	LineTestImageViewer(QWidget *parent);
 
 	void setImage(TRasterP ras);
@@ -62,14 +62,14 @@ public:
 
 	void zoomQt(bool forward, bool reset);
 
-public slots:
+  public slots:
 	void resetView();
 
-signals:
+  signals:
 	void rasterChanged();
 	void onZoomChanged();
 
-protected:
+  protected:
 	TRasterP getCurrentImage() const;
 	TDimension getImageSize() const;
 
@@ -88,7 +88,7 @@ protected:
 };
 
 //===================================================================
-//ChooseCameraDialog
+// ChooseCameraDialog
 
 class ChooseCameraDialog : public DVGui::Dialog
 {
@@ -96,12 +96,12 @@ class ChooseCameraDialog : public DVGui::Dialog
 
 	int m_cameraIndex;
 
-public:
+  public:
 	ChooseCameraDialog(QList<QString> cameras);
 
 	int getCurrentCameraIndex() const { return m_cameraIndex; }
 
-protected slots:
+  protected slots:
 	void onCurrentRowChanged(int currentRow);
 	void onOkButtonPressed();
 	void onCancelButtonPressed();
@@ -123,20 +123,20 @@ class CaptureSettingsPopup : public DVGui::Dialog
 	DVGui::IntField *m_contrastField;
 	DVGui::CheckBox *m_upsideDown;
 
-public:
+  public:
 	CaptureSettingsPopup();
 
-public slots:
+  public slots:
 	void updateWidgets();
 
-protected:
+  protected:
 	CaptureParameters *getCaptureParameters();
 
-protected:
+  protected:
 	void showEvent(QShowEvent *e);
 	void hideEvent(QHideEvent *e);
 
-protected slots:
+  protected slots:
 	void defineDevice();
 	void onUseWhiteImageStateChanged(int state);
 	void onKeepWhiteImage();
@@ -146,7 +146,7 @@ protected slots:
 	void onBrightnessChanged(bool);
 	void onUpsideDownStateChanged(int);
 
-signals:
+  signals:
 	void newDeviceDefined();
 };
 
@@ -160,16 +160,16 @@ class FileSettingsPopup : public DVGui::Dialog
 	DVGui::FileField *m_pathField;
 	QComboBox *m_fileFormat;
 
-public:
+  public:
 	FileSettingsPopup();
 
-public slots:
+  public slots:
 	void updateWidgets();
 
-protected:
+  protected:
 	CaptureParameters *getCaptureParameters();
 
-protected slots:
+  protected slots:
 	void onPathChanged();
 	void onFormatChanged(const QString &);
 	void openSettingsPopup();
@@ -201,13 +201,11 @@ class LineTestCapturePane : public TPanel
 	int m_timerId;
 	bool m_canCapture;
 
-public:
+  public:
 	LineTestCapturePane(QWidget *parent = 0);
-	~LineTestCapturePane()
-	{
-	}
+	~LineTestCapturePane() {}
 
-protected:
+  protected:
 	CaptureParameters *getCaptureParameters();
 
 	void closeEvent(QCloseEvent *e);
@@ -220,7 +218,7 @@ protected:
 
 	void initializeTitleBar(TPanelTitleBar *titleBar);
 
-protected slots:
+  protected slots:
 	void showCaptureSettings();
 	void showFileSettings();
 	void onSaveModeChanged(int);

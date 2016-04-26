@@ -24,9 +24,8 @@ class ZoomTool : public TTool
 	bool m_dragging;
 	double m_factor;
 
-public:
-	ZoomTool()
-		: TTool("T_Zoom"), m_dragging(false), m_oldY(0), m_factor(1)
+  public:
+	ZoomTool() : TTool("T_Zoom"), m_dragging(false), m_oldY(0), m_factor(1)
 	{
 		bind(TTool::AllTargets);
 	}
@@ -107,12 +106,8 @@ class HandTool : public TTool
 	TStopWatch m_sw;
 	TPoint m_oldPos;
 
-public:
-	HandTool()
-		: TTool("T_Hand")
-	{
-		bind(TTool::AllTargets);
-	}
+  public:
+	HandTool() : TTool("T_Hand") { bind(TTool::AllTargets); }
 
 	ToolType getToolType() const { return TTool::GenericTool; }
 
@@ -166,9 +161,10 @@ class RotateTool : public TTool
 	TBoolProperty m_cameraCentered;
 	TPropertyGroup m_prop;
 
-public:
+  public:
 	RotateTool()
-		: TTool("T_Rotate"), m_dragging(false), m_cameraCentered("Rotate On Camera Center", false), m_angle(0)
+		: TTool("T_Rotate"), m_dragging(false), m_cameraCentered("Rotate On Camera Center", false),
+		  m_angle(0)
 	{
 		bind(TTool::AllTargets);
 		m_prop.bind(m_cameraCentered);
@@ -189,12 +185,12 @@ public:
 		m_dragging = true;
 		m_oldPos = pos;
 		m_oldMousePos = e.m_pos;
-		//m_center = TPointD(0,0);
+		// m_center = TPointD(0,0);
 		m_sw.start(true);
 		invalidate();
 
-		//m_center = viewAffine.inv()*TPointD(0,0);//m_viewer->winToWorld(m_viewer);
-		//virtual TPointD winToWorld(const TPoint &winPos) const = 0;
+		// m_center = viewAffine.inv()*TPointD(0,0);//m_viewer->winToWorld(m_viewer);
+		// virtual TPointD winToWorld(const TPoint &winPos) const = 0;
 	}
 
 	void leftButtonDrag(const TPointD &pos, const TMouseEvent &e)

@@ -2,8 +2,7 @@
 #include <cmath> /* pow(), ceil() */
 #include "igs_motion_wind_table.h"
 
-int igs::motion_wind::table_size(
-	const double length_min, const double length_max)
+int igs::motion_wind::table_size(const double length_min, const double length_max)
 {
 	if (length_min < length_max) {
 		return static_cast<int>(ceil(length_max));
@@ -17,13 +16,17 @@ int igs::motion_wind::table_size(
 同じランダム列にすることができる。
 同じクラスを使う場合は、length,force,densityを混ぜてランダムになる。
 */
-int igs::motion_wind::make_table(
-	std::vector<double> &table, igs::math::random &length_random, igs::math::random &force_random, igs::math::random &density_random, const double length_min, const double length_max, const double length_bias // 0<...1...
-	,
-	const double force_min, const double force_max, const double force_bias // 0<...1...
-	,
-	const double density_min, const double density_max, const double density_bias // 0<...1...
-	)
+int igs::motion_wind::make_table(std::vector<double> &table, igs::math::random &length_random,
+								 igs::math::random &force_random, igs::math::random &density_random,
+								 const double length_min, const double length_max,
+								 const double length_bias // 0<...1...
+								 ,
+								 const double force_min, const double force_max,
+								 const double force_bias // 0<...1...
+								 ,
+								 const double density_min, const double density_max,
+								 const double density_bias // 0<...1...
+								 )
 {
 	/* length_minと、length_maxが同じ値なら固定長 */
 	double length = length_min;
@@ -60,7 +63,7 @@ int igs::motion_wind::make_table(
 
 	const int table_len = static_cast<int>(ceil(length));
 	/* 長さ:リニア減衰列を設定する
-		table.at[0]          [1]            [2]	
+		table.at[0]          [1]            [2]
 	length	ii
 	3.0 --> 3 -->	1.0(3.0/3.0) 0.666(2.0/3.0) 0.333(1.0/3.0)
 	2.5 --> 3 -->	1.0(2.5/2.5) 0.6(1.5/2.5)   0.2(0.5/2.5)

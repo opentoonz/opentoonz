@@ -45,7 +45,7 @@
 
 using namespace DVGui;
 
-//TODO: spostare i comandi in FileBrowser?
+// TODO: spostare i comandi in FileBrowser?
 
 //------------------------------------------------------------------------
 
@@ -61,10 +61,8 @@ class CopyFilesUndo : public TUndo
 	QMimeData *m_oldData;
 	QMimeData *m_newData;
 
-public:
-	CopyFilesUndo(QMimeData *oldData,
-				  QMimeData *newData)
-		: m_oldData(oldData), m_newData(newData)
+  public:
+	CopyFilesUndo(QMimeData *oldData, QMimeData *newData) : m_oldData(oldData), m_newData(newData)
 	{
 	}
 
@@ -80,15 +78,9 @@ public:
 		clipboard->setMimeData(cloneData(m_newData), QClipboard::Clipboard);
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Copy File");
-	}
+	QString getHistoryString() { return QObject::tr("Copy File"); }
 };
 
 //=============================================================================
@@ -100,15 +92,13 @@ class PasteFilesUndo : public TUndo
 	std::vector<TFilePath> m_newFiles;
 	TFilePath m_folder;
 
-public:
+  public:
 	PasteFilesUndo(std::vector<TFilePath> files, TFilePath folder)
 		: m_newFiles(files), m_folder(folder)
 	{
 	}
 
-	~PasteFilesUndo()
-	{
-	}
+	~PasteFilesUndo() {}
 
 	void undo() const
 	{
@@ -129,7 +119,8 @@ public:
 	{
 		if (!TSystem::touchParentDir(m_folder))
 			TSystem::mkDir(m_folder);
-		const FileData *data = dynamic_cast<const FileData *>(QApplication::clipboard()->mimeData());
+		const FileData *data =
+			dynamic_cast<const FileData *>(QApplication::clipboard()->mimeData());
 		if (!data)
 			return;
 		TApp *app = TApp::instance();
@@ -138,10 +129,7 @@ public:
 		FileBrowser::refreshFolder(m_folder);
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 
 	QString getHistoryString()
 	{
@@ -164,15 +152,13 @@ class DuplicateUndo : public TUndo
 	std::vector<TFilePath> m_newFiles;
 	std::vector<TFilePath> m_files;
 
-public:
+  public:
 	DuplicateUndo(std::vector<TFilePath> files, std::vector<TFilePath> newFiles)
 		: m_files(files), m_newFiles(newFiles)
 	{
 	}
 
-	~DuplicateUndo()
-	{
-	}
+	~DuplicateUndo() {}
 
 	void undo() const
 	{
@@ -202,10 +188,7 @@ public:
 		FileBrowser::refreshFolder(m_files[0].getParentDir());
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 
 	QString getHistoryString()
 	{
@@ -231,8 +214,7 @@ public:
 
 //------------------------------------------------------------------------
 
-FileSelection::FileSelection()
-	: m_exportScenePopup(0)
+FileSelection::FileSelection() : m_exportScenePopup(0)
 {
 }
 
@@ -394,7 +376,8 @@ void FileSelection::showFolderContents()
 	if (TSystem::isUNC(folderPath))
 		QDesktopServices::openUrl(QUrl(QString::fromStdWString(folderPath.getWideString())));
 	else
-		QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdWString(folderPath.getWideString())));
+		QDesktopServices::openUrl(
+			QUrl::fromLocalFile(QString::fromStdWString(folderPath.getWideString())));
 }
 
 //------------------------------------------------------------------------
@@ -438,7 +421,8 @@ void FileSelection::viewFile()
 			continue;
 
 		if (Preferences::instance()->isDefaultViewerEnabled() &&
-			(files[i].getType() == "mov" || files[i].getType() == "avi" || files[i].getType() == "3gp"))
+			(files[i].getType() == "mov" || files[i].getType() == "avi" ||
+			 files[i].getType() == "3gp"))
 			QDesktopServices::openUrl(QUrl("file:///" + toQString(files[i])));
 		else
 			::viewFile(files[i]);
@@ -456,7 +440,8 @@ void FileSelection::convertFiles()
 
 	static ConvertPopup *popup = new ConvertPopup(false);
 	if (popup->isConverting()) {
-		DVGui::info(QObject::tr("A convertion task is in progress! wait until it stops or cancel it"));
+		DVGui::info(
+			QObject::tr("A convertion task is in progress! wait until it stops or cancel it"));
 		return;
 	}
 	popup->setFiles(files);
@@ -467,7 +452,8 @@ void FileSelection::convertFiles()
 
 void FileSelection::premultiplyFiles()
 {
-	QString question = QObject::tr("You are going to premultiply selected files.\nThe operation cannot be undone: are you sure?");
+	QString question = QObject::tr("You are going to premultiply selected files.\nThe operation "
+								   "cannot be undone: are you sure?");
 	int ret = DVGui::MsgBox(question, QObject::tr("Premultiply"), QObject::tr("Cancel"), 1);
 	if (ret == 2 || ret == 0)
 		return;
@@ -550,7 +536,8 @@ void FileSelection::collectAssets()
 		DVGui::info(QObject::tr("One asset imported"));
 	else
 		DVGui::info(QObject::tr("%1 assets imported").arg(collectedAssets));
-	DvDirModel::instance()->refreshFolder(TProjectManager::instance()->getCurrentProjectPath().getParentDir());
+	DvDirModel::instance()->refreshFolder(
+		TProjectManager::instance()->getCurrentProjectPath().getParentDir());
 }
 
 //------------------------------------------------------------------------
@@ -562,7 +549,9 @@ int importScene(TFilePath scenePath)
 	try {
 		IoCmd::loadScene(scene, scenePath, true);
 	} catch (TException &e) {
-		DVGui::error(QObject::tr("Error loading scene %1 :%2").arg(toQString(scenePath)).arg(QString::fromStdWString(e.getMessage())));
+		DVGui::error(QObject::tr("Error loading scene %1 :%2")
+						 .arg(toQString(scenePath))
+						 .arg(QString::fromStdWString(e.getMessage())));
 		return 0;
 	} catch (...) {
 		// TNotifier::instance()->notify(TGlobalChange(true));
@@ -572,12 +561,14 @@ int importScene(TFilePath scenePath)
 
 	try {
 		scene.save(scene.getScenePath());
-	} catch (TException&) {
-		DVGui::error(QObject::tr("There was an error saving the %1 scene.").arg(toQString(scenePath)));
+	} catch (TException &) {
+		DVGui::error(
+			QObject::tr("There was an error saving the %1 scene.").arg(toQString(scenePath)));
 		return 0;
 	}
 
-	DvDirModel::instance()->refreshFolder(TProjectManager::instance()->getCurrentProjectPath().getParentDir());
+	DvDirModel::instance()->refreshFolder(
+		TProjectManager::instance()->getCurrentProjectPath().getParentDir());
 
 	// TNotifier::instance()->setDirtyFlag(dirtyFlag);
 	return 1;
@@ -622,7 +613,8 @@ void FileSelection::importScenes()
 	else if (importedSceneCount == 1)
 		DVGui::info(QObject::tr("One scene imported"));
 	else
-		DVGui::info(QString::number(importedSceneCount) + QObject::tr("%1 scenes imported").arg(importedSceneCount));
+		DVGui::info(QString::number(importedSceneCount) +
+					QObject::tr("%1 scenes imported").arg(importedSceneCount));
 #endif
 }
 //------------------------------------------------------------------------

@@ -36,28 +36,28 @@ class PltReader : public Tiio::Reader
 	int m_nColor;
 	int m_nPencil;
 	std::vector<TPixel32> m_infoRow;
-	std::map<int, std::pair<std::string, std::string>> m_pltNames; // colorIndex(<256: paint) , pageName, colorName
-public:
+	std::map<int, std::pair<std::string, std::string>>
+		m_pltNames; // colorIndex(<256: paint) , pageName, colorName
+  public:
 	PltReader();
 	~PltReader();
 
 	void open(FILE *file);
 
-	Tiio::RowOrder getRowOrder() const
-	{
-		return Tiio::BOTTOM2TOP;
-	}
+	Tiio::RowOrder getRowOrder() const { return Tiio::BOTTOM2TOP; }
 
 	int skipLines(int lineCount);
 	void readLine(char *buffer, int x0, int x1, int shrink);
 
-	void getTzpPaletteColorNames(std::map<int, std::pair<std::string, std::string>> &pltColorNames) const;
+	void getTzpPaletteColorNames(
+		std::map<int, std::pair<std::string, std::string>> &pltColorNames) const;
 };
 
 //------------------------------------------------------------
 
 PltReader::PltReader()
-	: m_tiff(0), m_row(0), m_rowsPerStrip(0), m_stripIndex(-1), m_stripBuffer(0), m_rowLength(0), m_x(0), m_y(0), m_lx(0), m_ly(0), m_isCmap24(false), m_pltType(-1), m_nColor(0), m_nPencil(0)
+	: m_tiff(0), m_row(0), m_rowsPerStrip(0), m_stripIndex(-1), m_stripBuffer(0), m_rowLength(0),
+	  m_x(0), m_y(0), m_lx(0), m_ly(0), m_isCmap24(false), m_pltType(-1), m_nColor(0), m_nPencil(0)
 {
 }
 
@@ -70,11 +70,7 @@ PltReader::~PltReader()
 
 //------------------------------------------------------------
 
-int decode_group_name(
-	char group_name[],
-	char **name,
-	int *key,
-	int *sister_index)
+int decode_group_name(char group_name[], char **name, int *key, int *sister_index)
 {
 	char *s, *t;
 	*key = 0;
@@ -96,7 +92,8 @@ int decode_group_name(
 	return 1;
 }
 
-void PltReader::getTzpPaletteColorNames(std::map<int, std::pair<std::string, std::string>> &pltColorNames) const
+void PltReader::getTzpPaletteColorNames(
+	std::map<int, std::pair<std::string, std::string>> &pltColorNames) const
 {
 	pltColorNames = m_pltNames;
 }
@@ -104,7 +101,7 @@ void PltReader::getTzpPaletteColorNames(std::map<int, std::pair<std::string, std
 //--------------------------------------------------------------------------------------
 namespace
 {
-	bool isDefaultName(const std::string &_name)
+bool isDefaultName(const std::string &_name)
 {
 	int i;
 	QString name = QString::fromStdString(_name);
@@ -122,11 +119,11 @@ namespace
 		return false;
 }
 
-} //namespace
+} // namespace
 //------------------------------------------------------------
 
 bool PaletteRead = false;
-int ComboInkIndex[256]; //a bad patch....
+int ComboInkIndex[256]; // a bad patch....
 
 void PltReader::open(FILE *file)
 {
@@ -243,7 +240,7 @@ void PltReader::open(FILE *file)
 		if (i < m_nColor)
 			m_infoRow[i].g = 255;
 
-		while (isdigit(item->name[0])) //in toonz colors cannot begin with digits
+		while (isdigit(item->name[0])) // in toonz colors cannot begin with digits
 			item->name++;
 
 		std::map<int, std::pair<std::string, std::string>>::iterator it;
@@ -255,7 +252,8 @@ void PltReader::open(FILE *file)
 			if (i >= 256)
 				ComboInkIndex[i - 256] = comboindex;
 			std::map<int, std::pair<std::string, std::string>>::iterator it;
-			if ((it = m_pltNames.find(comboindex)) == m_pltNames.end() || isDefaultName(it->second.second)) {
+			if ((it = m_pltNames.find(comboindex)) == m_pltNames.end() ||
+				isDefaultName(it->second.second)) {
 				m_pltNames[comboindex] = std::pair<std::string, std::string>(pageName, item->name);
 				if (comboindex < m_nColor)
 					m_infoRow[comboindex].r = m_infoRow[comboindex].g = 255;
@@ -272,7 +270,7 @@ void PltReader::open(FILE *file)
 	TIFFGetField(m_tiff, TIFFTAG_PLANARCONFIG, &planarconfig);
 
 	if (photometric != PHOTOMETRIC_RGB || planarconfig != PLANARCONFIG_CONTIG) {
-		//tmsg_error("bad !");
+		// tmsg_error("bad !");
 	}
 }
 
@@ -280,7 +278,7 @@ void PltReader::open(FILE *file)
 
 int PltReader::skipLines(int lineCount)
 {
-	//m_row+=lineCount;
+	// m_row+=lineCount;
 	return lineCount;
 }
 
@@ -313,7 +311,7 @@ void PltReader::readLine(char *buffer, int x0, int x1, int shrink)
 
 	case 2:
 	case 4:
-		for (i = 0; i < (m_nColor + m_nPencil) * 4; i += 4) //prima i color, poi i pencil
+		for (i = 0; i < (m_nColor + m_nPencil) * 4; i += 4) // prima i color, poi i pencil
 		{
 			pix->r = line[i + 0];
 			pix->g = line[i + 1];
@@ -324,7 +322,7 @@ void PltReader::readLine(char *buffer, int x0, int x1, int shrink)
 		break;
 
 	case 3:
-		for (i = 0; i < (m_nColor + m_nPencil) * 4; i += 4) //prima i color, poi i pencil
+		for (i = 0; i < (m_nColor + m_nPencil) * 4; i += 4) // prima i color, poi i pencil
 		{
 			pix->m = line[i + 0]; /* different from type 2 */
 			pix->b = line[i + 1];

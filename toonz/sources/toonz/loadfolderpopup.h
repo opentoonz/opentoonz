@@ -27,19 +27,20 @@ class LoadFolderPopup : public DVGui::Dialog
 {
 	Q_OBJECT
 
-public:
-	LoadFolderPopup(QWidget *parent = 0); //!< Constructs the popup as child of an optional parent widget.
+  public:
+	LoadFolderPopup(
+		QWidget *parent = 0); //!< Constructs the popup as child of an optional parent widget.
 
 	/*! \details  The path returned by getFolder() could be empty in case
-                there is no selected folder, or the selection is not a
-                valid folder.                                                       */
+				there is no selected folder, or the selection is not a
+				valid folder.                                                       */
 
 	TFilePath getFolder() const; //!< Returns currently selected folder path.
 								 //!  \return  Currently selected folder path, <I>if any</I>.
-private:
+  private:
 	DvDirTreeView *m_treeView; //!< [\p child] The folder tree view used for selection.
 
-private slots:
+  private slots:
 
 	void onOk(); //!< Invokes IoCmd::loadResourceFolder() appropriately.
 };

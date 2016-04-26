@@ -31,7 +31,7 @@ class DVAPI TComboBox : public TWidget
 	vector<TComboBoxActionInterface *> *m_actions;
 	void sendCommand();
 
-public:
+  public:
 	TComboBox(TWidget *parent, string name = "combobox");
 	~TComboBox();
 
@@ -60,25 +60,21 @@ public:
 
 class DVAPI TComboBoxActionInterface
 {
-public:
+  public:
 	TComboBoxActionInterface() {}
 	virtual ~TComboBoxActionInterface() {}
 	virtual void triggerAction(TComboBox *cb, string text) = 0;
 };
 
-template <class T>
-class TComboBoxAction : public TComboBoxActionInterface
+template <class T> class TComboBoxAction : public TComboBoxActionInterface
 {
 	typedef void (T::*Method)(TComboBox *vf, string text);
 	T *m_target;
 	Method m_method;
 
-public:
+  public:
 	TComboBoxAction(T *target, Method method) : m_target(target), m_method(method) {}
-	void triggerAction(TComboBox *vf, string text)
-	{
-		(m_target->*m_method)(vf, text);
-	}
+	void triggerAction(TComboBox *vf, string text) { (m_target->*m_method)(vf, text); }
 };
 
 template <class T>

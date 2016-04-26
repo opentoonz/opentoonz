@@ -61,26 +61,25 @@ class TBinarizeUndo : public TUndo
 	QString m_rasId;
 	int m_rasSize; // used in TBinarizeUndo::getSize()
 
-public:
+  public:
 	// note: create Undo BEFORE binarizing. Undo is keeping a copy of the current raster
 	TBinarizeUndo(TXshSimpleLevel *sl, const TFrameId &fid, bool alphaEnabled)
 		: m_levelName(sl->getName()), m_fid(fid), m_alphaEnabled(alphaEnabled)
 	{
-		/* FIXME: clang でコンパイルできなかったのでキャストにしたがこのダウンキャスト本当に大丈夫か? */
+		/* FIXME: clang
+		 * でコンパイルできなかったのでキャストにしたがこのダウンキャスト本当に大丈夫か? */
 		TRasterImageP ri = (TRasterImageP)sl->getFrame(m_fid, false)->cloneImage();
 		m_rasId = QString("BinarizeUndo") + QString::number((uintptr_t) this);
 		TImageCache::instance()->add(m_rasId, ri);
 		m_rasSize = ri->getRaster()->getLx() * ri->getRaster()->getLy() * 4;
 	}
 
-	~TBinarizeUndo()
-	{
-		TImageCache::instance()->remove(m_rasId);
-	}
+	~TBinarizeUndo() { TImageCache::instance()->remove(m_rasId); }
 
 	TXshSimpleLevel *getLevel() const
 	{
-		TXshLevel *xshLevel = TApp::instance()->getCurrentScene()->getScene()->getLevelSet()->getLevel(m_levelName);
+		TXshLevel *xshLevel =
+			TApp::instance()->getCurrentScene()->getScene()->getLevelSet()->getLevel(m_levelName);
 		return xshLevel ? xshLevel->getSimpleLevel() : 0;
 	}
 	void notify(TXshSimpleLevel *sl) const
@@ -135,7 +134,7 @@ class BinarizePopup::Swatch : public PlaneViewer
 {
 	TRasterP m_ras;
 
-public:
+  public:
 	Swatch(QWidget *parent = 0) : PlaneViewer(parent) {}
 
 	TRasterP raster() const { return m_ras; }
@@ -150,10 +149,10 @@ public:
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
-			//Note GL_ONE instead of GL_SRC_ALPHA: it's needed since the input
-			//image is supposedly premultiplied - and it works because the
-			//viewer's background is opaque.
-			//See tpixelutils.h's overPixT function for comparison.
+			// Note GL_ONE instead of GL_SRC_ALPHA: it's needed since the input
+			// image is supposedly premultiplied - and it works because the
+			// viewer's background is opaque.
+			// See tpixelutils.h's overPixT function for comparison.
 
 			draw(m_ras);
 			glDisable(GL_BLEND);
@@ -167,7 +166,8 @@ public:
 //**************************************************************************
 
 BinarizePopup::BinarizePopup()
-	: Dialog(TApp::instance()->getMainWindow(), true, false, "Binarize"), m_frameIndex(-1), m_progressBar(0), m_timerId(0)
+	: Dialog(TApp::instance()->getMainWindow(), true, false, "Binarize"), m_frameIndex(-1),
+	  m_progressBar(0), m_timerId(0)
 {
 	setWindowTitle(tr("Binarize"));
 	setLabelWidth(0);
@@ -190,11 +190,12 @@ BinarizePopup::BinarizePopup()
 
 	QGridLayout *parametersLayout = new QGridLayout();
 
-	// parametersArea->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed));
+	// parametersArea->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding,
+	// QSizePolicy::Fixed));
 
-	//QFrame* topWidget = new QFrame(scrollArea);
-	//topWidget->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::Fixed));
-	//scrollArea->setWidget(topWidget);
+	// QFrame* topWidget = new QFrame(scrollArea);
+	// topWidget->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::Fixed));
+	// scrollArea->setWidget(topWidget);
 
 	// parametersLayout->setSizeConstraint(QLayout::SetFixedSize);
 
@@ -248,11 +249,15 @@ BinarizePopup::BinarizePopup()
 
 	bool ret = true;
 
-	//ret = ret && connect(m_brightnessField, SIGNAL(valueChanged(bool)), this, SLOT(onValuesChanged(bool)));
-	//ret = ret && connect(m_contrastField,   SIGNAL(valueChanged(bool)), this, SLOT(onValuesChanged(bool)));
-	ret = ret && connect(m_previewChk, SIGNAL(stateChanged(int)), this, SLOT(onPreviewCheckboxChanged(int)));
+	// ret = ret && connect(m_brightnessField, SIGNAL(valueChanged(bool)), this,
+	// SLOT(onValuesChanged(bool)));
+	// ret = ret && connect(m_contrastField,   SIGNAL(valueChanged(bool)), this,
+	// SLOT(onValuesChanged(bool)));
+	ret = ret && connect(m_previewChk, SIGNAL(stateChanged(int)), this,
+						 SLOT(onPreviewCheckboxChanged(int)));
 
-	ret = ret && connect(m_alphaChk, SIGNAL(stateChanged(int)), this, SLOT(onAlphaCheckboxChanged(int)));
+	ret = ret &&
+		  connect(m_alphaChk, SIGNAL(stateChanged(int)), this, SLOT(onAlphaCheckboxChanged(int)));
 
 	assert(ret);
 
@@ -283,11 +288,16 @@ void BinarizePopup::showEvent(QShowEvent *e)
 	m_viewer->setBgColor(col1, col2);
 
 	bool ret = true;
-	ret = ret && connect(app->getCurrentFrame(), SIGNAL(frameTypeChanged()), this, SLOT(fetchSample()));
-	ret = ret && connect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this, SLOT(fetchSample()));
-	ret = ret && connect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this, SLOT(fetchSample()));
-	ret = ret && connect(app->getCurrentLevel(), SIGNAL(xshLevelSwitched(TXshLevel *)), this, SLOT(onLevelSwitched(TXshLevel *)));
-	ret = ret && connect(app->getCurrentLevel(), SIGNAL(xshLevelChanged()), this, SLOT(fetchSample()));
+	ret = ret &&
+		  connect(app->getCurrentFrame(), SIGNAL(frameTypeChanged()), this, SLOT(fetchSample()));
+	ret =
+		ret && connect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this, SLOT(fetchSample()));
+	ret = ret && connect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this,
+						 SLOT(fetchSample()));
+	ret = ret && connect(app->getCurrentLevel(), SIGNAL(xshLevelSwitched(TXshLevel *)), this,
+						 SLOT(onLevelSwitched(TXshLevel *)));
+	ret = ret &&
+		  connect(app->getCurrentLevel(), SIGNAL(xshLevelChanged()), this, SLOT(fetchSample()));
 	assert(ret);
 	m_previewChk->setChecked(false);
 	fetchSample();
@@ -401,7 +411,8 @@ void BinarizePopup::fetchSample()
 		}
 	} else {
 		TXsheet *xsh = app->getCurrentScene()->getScene()->getXsheet();
-		TXshCell cell = xsh->getCell(app->getCurrentFrame()->getFrame(), app->getCurrentColumn()->getColumnIndex());
+		TXshCell cell = xsh->getCell(app->getCurrentFrame()->getFrame(),
+									 app->getCurrentColumn()->getColumnIndex());
 		img = cell.getImage(false);
 	}
 	TRasterImageP ri = img;

@@ -23,8 +23,7 @@ namespace polyline_ops
   \return   The input polyline's length
 */
 
-template <typename ForIt>
-double length(ForIt begin, ForIt end)
+template <typename ForIt> double length(ForIt begin, ForIt end)
 {
 	typedef typename std::iterator_traits<ForIt>::value_type point_type;
 
@@ -42,14 +41,13 @@ double length(ForIt begin, ForIt end)
   Computes the area enclosed by the input polyline's \a closure.
 
   \note    The input polyline is implicitly \a connected at the endpoints
-           with a straight segment. This has obviously makes no difference
-           if the supplied polyline already had coincident endpoints.
+		   with a straight segment. This has obviously makes no difference
+		   if the supplied polyline already had coincident endpoints.
 
   \return  The area enclosed by the polyline's \a closure.
 */
 
-template <typename ForIt>
-double area(ForIt begin, ForIt end)
+template <typename ForIt> double area(ForIt begin, ForIt end)
 {
 	typedef typename std::iterator_traits<ForIt>::value_type point_type;
 
@@ -59,13 +57,15 @@ double area(ForIt begin, ForIt end)
 		ForIt jt = begin, it = jt++;
 
 		for (; jt != end; it = jt++)
-			result += 0.5 *
-					  (tcg::point_traits<point_type>::y(*jt) + tcg::point_traits<point_type>::y(*it)) *
-					  (tcg::point_traits<point_type>::x(*jt) - tcg::point_traits<point_type>::x(*it));
+			result +=
+				0.5 *
+				(tcg::point_traits<point_type>::y(*jt) + tcg::point_traits<point_type>::y(*it)) *
+				(tcg::point_traits<point_type>::x(*jt) - tcg::point_traits<point_type>::x(*it));
 
-		result += 0.5 *
-				  (tcg::point_traits<point_type>::y(*begin) + tcg::point_traits<point_type>::y(*it)) *
-				  (tcg::point_traits<point_type>::x(*begin) - tcg::point_traits<point_type>::x(*it));
+		result +=
+			0.5 *
+			(tcg::point_traits<point_type>::y(*begin) + tcg::point_traits<point_type>::y(*it)) *
+			(tcg::point_traits<point_type>::x(*begin) - tcg::point_traits<point_type>::x(*it));
 	}
 
 	return result;
@@ -82,12 +82,12 @@ double area(ForIt begin, ForIt end)
   remaining part of a sequence of quadratics approximating the triplet (a, *bt, c).
 */
 
-//Note: typename iter_type::value_type == point_type
+// Note: typename iter_type::value_type == point_type
 template <typename point_type, typename iter_type>
 void tripletToQuadratics(const point_type &a, const iter_type &bt, const point_type &c,
 						 tcg::sequential_reader<std::vector<point_type>> &output)
 {
-	//Direct conversion
+	// Direct conversion
 	output.addElement(*bt);
 	output.addElement(c);
 }
@@ -100,15 +100,15 @@ void tripletToQuadratics(const point_type &a, const iter_type &bt, const point_t
   or supply a tight starting approximation.
 
 \warning Passed polylines with equal endpoints are interpreted as closed (circular) polylines;
-         in this case, the resulting endpoints of the quadratic sequence will be displaced to
-         the first segment mid-point.
+		 in this case, the resulting endpoints of the quadratic sequence will be displaced to
+		 the first segment mid-point.
 */
 
 template <typename iter_type, typename containers_reader, typename toQuadsFunc>
-void toQuadratics(iter_type begin, iter_type end, containers_reader &output,
-				  toQuadsFunc &toQuads = &tripletToQuadratics<
-										 typename iter_type::value_type, iter_type>,
-				  double mergeTol = 1.0);
+void toQuadratics(
+	iter_type begin, iter_type end, containers_reader &output,
+	toQuadsFunc &toQuads = &tripletToQuadratics<typename iter_type::value_type, iter_type>,
+	double mergeTol = 1.0);
 
 //**************************************************************************************
 //    Standard Polyline Evaluators
@@ -122,24 +122,23 @@ void toQuadratics(iter_type begin, iter_type end, containers_reader &output,
   deviation, times the endpoints-segment length.
 */
 
-template <typename RanIt>
-class StandardDeviationEvaluator
+template <typename RanIt> class StandardDeviationEvaluator
 {
-public:
+  public:
 	typedef RanIt iterator_type;
 	typedef typename std::iterator_traits<RanIt>::difference_type diff_type;
 	typedef typename std::iterator_traits<RanIt>::value_type point_type;
 	typedef typename tcg::point_traits<point_type>::value_type value_type;
 	typedef double penalty_type;
 
-protected:
+  protected:
 	iterator_type m_begin, m_end;
 
 	std::vector<double> m_sums_x, m_sums_y;   //!< Sums of the points coordinates
 	std::vector<double> m_sums2_x, m_sums2_y; //!< Sums of the points coordinates' squares
 	std::vector<double> m_sums_xy;			  //!< Sums of the coordinates products
 
-public:
+  public:
 	StandardDeviationEvaluator(const iterator_type &begin, const iterator_type &end);
 
 	penalty_type penalty(const iterator_type &a, const iterator_type &b);
@@ -154,10 +153,10 @@ public:
 	const std::vector<double> &sums_xy() const { return m_sums_xy; }
 };
 }
-} //namespace tcg::polyline_ops
+} // namespace tcg::polyline_ops
 
 #ifdef INCLUDE_HPP
 #include "hpp/polyline_ops.hpp"
 #endif
 
-#endif //TCG_POLYLINE_OPS
+#endif // TCG_POLYLINE_OPS

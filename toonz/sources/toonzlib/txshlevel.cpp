@@ -7,7 +7,8 @@
 //-----------------------------------------------------------------------------
 
 TXshLevel::TXshLevel(ClassCode code, std::wstring name)
-	: TSmartObject(code), m_name(name), m_type(UNKNOWN_XSHLEVEL), m_hookSet(new HookSet()), m_scene(0)
+	: TSmartObject(code), m_name(name), m_type(UNKNOWN_XSHLEVEL), m_hookSet(new HookSet()),
+	  m_scene(0)
 {
 	updateShortName();
 }

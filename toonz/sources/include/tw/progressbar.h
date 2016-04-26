@@ -10,7 +10,7 @@ class DVAPI TProgressBar : public TPopup
 	class Imp;
 	Imp *m_data;
 
-public:
+  public:
 	TProgressBar(TWidget *parent, string name = "progress bar", wstring text = L"");
 	~TProgressBar();
 
@@ -24,15 +24,9 @@ public:
 
 	TDimension getPreferredSize() const;
 	void setPreferredSize(const TDimension &d);
-	void setPreferredSize(int lx, int ly)
-	{
-		setPreferredSize(TDimension(lx, ly));
-	}
+	void setPreferredSize(int lx, int ly) { setPreferredSize(TDimension(lx, ly)); }
 
-	bool onNcPaint(
-		bool is_active,
-		const TDimension &window_size,
-		const TRect &caption_rect);
+	bool onNcPaint(bool is_active, const TDimension &window_size, const TRect &caption_rect);
 };
 
 #endif

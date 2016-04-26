@@ -1,6 +1,6 @@
 
 
-//Qt includes
+// Qt includes
 #include <QMap>
 #include <QSettings>
 #include <QDate>
@@ -11,13 +11,13 @@
 //#define USE_SQLITE_HDPOOL
 
 #ifdef USE_SQLITE_HDPOOL
-//SQLite include
+// SQLite include
 #include "sqlite/sqlite3.h"
 #endif
 
 #include "tcacheresourcepool.h"
 
-//Debug
+// Debug
 //#define DIAGNOSTICS
 //#include "diagnostics.h"
 
@@ -25,10 +25,10 @@
 //    Cache Resource Pool BACKED ON DISK
 //******************************************************************************************
 
-//STILL UNDER DEVELOPMENT...
+// STILL UNDER DEVELOPMENT...
 class THDCacheResourcePool
 {
-public:
+  public:
 	THDCacheResourcePool() {}
 	~THDCacheResourcePool() {}
 };
@@ -70,7 +70,8 @@ void TCacheResourcePool::invalidateAll()
 
 //----------------------------------------------------------------------
 
-inline QString TCacheResourcePool::getPoolRoot(QString cacheRoot, QString projectName, QString sceneName)
+inline QString TCacheResourcePool::getPoolRoot(QString cacheRoot, QString projectName,
+											   QString sceneName)
 {
 	return QString(cacheRoot + "/render/" + projectName + "/" + sceneName + "/");
 }
@@ -83,13 +84,13 @@ inline QString TCacheResourcePool::getPoolRoot(QString cacheRoot, QString projec
 //! verify that no resource from the old pair still exists.
 void TCacheResourcePool::setPath(QString cacheRoot, QString projectName, QString sceneName)
 {
-	//There should be no resource in memory.
+	// There should be no resource in memory.
 	assert(m_memResources.empty());
 
-	//However, just in case, invalidate all resources so that no more resource backing
-	//operation take place for current resources, from now on.
-	//No care is paid as to whether active transactions currently exist. You
-	//have been warned by the way....
+	// However, just in case, invalidate all resources so that no more resource backing
+	// operation take place for current resources, from now on.
+	// No care is paid as to whether active transactions currently exist. You
+	// have been warned by the way....
 	invalidateAll();
 
 	delete m_hdPool;
@@ -137,17 +138,18 @@ TCacheResourcePool *TCacheResourcePool::instance()
 //----------------------------------------------------------------------
 
 TCacheResourcePool::TCacheResourcePool()
-	: m_memMutex(QMutex::Recursive), m_searchCount(0), m_foundIterator(false), m_searchIterator(m_memResources.end()), m_hdPool(0), m_path()
+	: m_memMutex(QMutex::Recursive), m_searchCount(0), m_foundIterator(false),
+	  m_searchIterator(m_memResources.end()), m_hdPool(0), m_path()
 {
-	//Open the settings for cache retrieval
+	// Open the settings for cache retrieval
 }
 
 //----------------------------------------------------------------------
 
 TCacheResourcePool::~TCacheResourcePool()
 {
-	//Temporary
-	//performAutomaticCleanup();
+	// Temporary
+	// performAutomaticCleanup();
 
 	delete m_hdPool;
 }
@@ -190,15 +192,15 @@ void TCacheResourcePool::endCachedSearch()
 //! the createIfNone parameter is set.
 TCacheResource *TCacheResourcePool::getResource(const std::string &name, bool createIfNone)
 {
-	//DIAGNOSTICS_TIMER("#times.txt | getResource Overall time");
-	//DIAGNOSTICS_MEANTIMER("#times.txt | getResource Mean time");
+	// DIAGNOSTICS_TIMER("#times.txt | getResource Overall time");
+	// DIAGNOSTICS_MEANTIMER("#times.txt | getResource Mean time");
 
 	TCacheResource *result = 0;
 
-	//NOTA: Passa ad un oggetto lockatore. Quello e' in grado di gestire i casi di eccezioni ecc..
+	// NOTA: Passa ad un oggetto lockatore. Quello e' in grado di gestire i casi di eccezioni ecc..
 	beginCachedSearch();
 
-	//Search for an already allocated resource
+	// Search for an already allocated resource
 	if (m_searchIterator == m_memResources.end()) {
 		m_searchIterator = m_memResources.lower_bound(name);
 		if (m_searchIterator != m_memResources.end())
@@ -222,16 +224,16 @@ TCacheResource *TCacheResourcePool::getResource(const std::string &name, bool cr
 		if (isHDActive()) {
 #ifdef USE_SQLITE_HDPOOL
 
-			//DIAGNOSTICS_TIMER("#times.txt | HDPOOL getResource Overall time");
-			//DIAGNOSTICS_MEANTIMER("#times.txt | HDPOOL getResource Mean time");
+			// DIAGNOSTICS_TIMER("#times.txt | HDPOOL getResource Overall time");
+			// DIAGNOSTICS_MEANTIMER("#times.txt | HDPOOL getResource Mean time");
 
-			//Search in the HD pool
+			// Search in the HD pool
 			ReadQuery query(m_hdPool);
 
-			bool ret = query.prepare(
-				"SELECT Path, Flags FROM Resources WHERE Name = '" + QString::fromStdString(name) + "';");
+			bool ret = query.prepare("SELECT Path, Flags FROM Resources WHERE Name = '" +
+									 QString::fromStdString(name) + "';");
 
-			//If an error occurred, assume the resource does not exist. Doing nothing works fine.
+			// If an error occurred, assume the resource does not exist. Doing nothing works fine.
 			assert(ret);
 
 			if (query.step()) {
@@ -247,8 +249,8 @@ TCacheResource *TCacheResourcePool::getResource(const std::string &name, bool cr
 			result->m_pos = m_searchIterator =
 				m_memResources.insert(m_searchIterator, std::make_pair(name, result));
 
-//DIAGNOSTICS_STRSET("#resources.txt | RISORSE | " + QString::number((UINT) result) + " | Name",
-//QString::fromStdString(name).left(70));
+// DIAGNOSTICS_STRSET("#resources.txt | RISORSE | " + QString::number((UINT) result) + " | Name",
+// QString::fromStdString(name).left(70));
 
 #ifdef USE_SQLITE_HDPOOL
 			if (isHDActive())
@@ -272,9 +274,9 @@ void TCacheResourcePool::releaseResource(TCacheResource *resource)
 {
 	QMutexLocker locker(&m_memMutex);
 
-	//Re-check the resource's reference count. This is necessary since a concurrent
-	//thread may have locked the memMutex for resource retrieval BEFORE this one.
-	//If that is the case, the resource's refCount has increased back above 0.
+	// Re-check the resource's reference count. This is necessary since a concurrent
+	// thread may have locked the memMutex for resource retrieval BEFORE this one.
+	// If that is the case, the resource's refCount has increased back above 0.
 	if (resource->m_refCount > 0)
 		return;
 
@@ -282,10 +284,10 @@ void TCacheResourcePool::releaseResource(TCacheResource *resource)
 	QMutexLocker flushLocker(isHDActive() ? &m_hdPool->m_flushMutex : 0);
 
 	if (isHDActive()) {
-		//Flush all resource updates as this resource is being destroyed
+		// Flush all resource updates as this resource is being destroyed
 		m_hdPool->flushResources();
 
-		//Save the resource infos
+		// Save the resource infos
 		m_hdPool->saveResourceInfos(resource);
 	}
 #endif

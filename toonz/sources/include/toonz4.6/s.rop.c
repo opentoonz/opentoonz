@@ -69,150 +69,223 @@ rop_copy funz.su RAS_BW, RAS_BW
 e
 s 00713 / 00426 / 06824
 d D 1.89 99 / 01 / 11 18:03:57 tross 89 88
-c migliorati extra:corretti bachi e aggiunte funz - corretta rop_custom_fill_cmap_penramp(baco tcheck cm24)
+c migliorati extra:corretti bachi e aggiunte funz -
+						   corretta rop_custom_fill_cmap_penramp(baco tcheck cm24)
 e
 s 00034 / 00002 / 07216
-d D 1.88 98 / 12 / 14 16:21:17 vincenzo 88 87
+d D 1.88 98 / 12 / 14
+						16:
+						21:17 vincenzo 88 87
 c ristrutturazione megagalattica per le dll
 e
 s 00013 / 00000 / 07205
-d D 1.87 98 / 10 / 23 17:21:44 vincenzo 87 86
+d D 1.87 98 / 10 / 23
+						17:
+						21:44 vincenzo 87 86
 c convert_raster
 e
 s 00007 / 00001 / 07198
-d D 1.86 98 / 09 / 24 18:32:38 tross 86 85
+d D 1.86 98 / 09 / 24
+						18:
+						32:38 tross 86 85
 c messa cmap.info in create_raster()
 e
 s 00003 / 00000 / 07196
-d D 1.85 98 / 09 / 14 16:15:32 vincenzo 85 84
+d D 1.85 98 / 09 / 14
+						16:
+						15:32 vincenzo 85 84
 c clone_raster mette anchge la cmap
 e
 s 01500 / 00701 / 05696
-d D 1.84 98 / 09 / 14 15:57:39 tross 84 83
+d D 1.84 98 / 09 / 14
+						15:
+						57:39 tross 84 83
 c modifiche per CM24, velocizzati[un] premult_lpixel
 e
 s 00044 / 00064 / 06353
-d D 1.83 98 / 08 / 14 17:14:44 tross 83 82
+d D 1.83 98 / 08 / 14
+						17:
+						14:44 tross 83 82
 c tolti UNICM
 e
 s 00013 / 00014 / 06404
-d D 1.82 98 / 08 / 14 14:39:55 tross 82 81
+d D 1.82 98 / 08 / 14
+						14:
+						39:55 tross 82 81
 c tolto cmap.size
 e
 s 00348 / 00177 / 06070
-d D 1.81 98 / 07 / 16 20:02:00 tross 81 80
+d D 1.81 98 / 07 / 16
+						20:
+						02:00 tross 81 80
 c rop_copy e rop_zoom_out rgb_rgb16
 e
 s 00028 / 00000 / 06219
-d D 1.80 98 / 07 / 10 18:32:08 vincenzo 80 79
+d D 1.80 98 / 07 / 10
+						18:
+						32:08 vincenzo 80 79
 c create_subraster e clone_raster
 e
 s 00005 / 00014 / 06214
-d D 1.79 98 / 06 / 09 17:29:54 vincenzo 79 78
+d D 1.79 98 / 06 / 09
+						17:
+						29:54 vincenzo 79 78
 c eliminata struct cmap_color
 e
 s 00025 / 00025 / 06203
-d D 1.78 98 / 03 / 26 01:07:03 tross 78 77
+d D 1.78 98 / 03 / 26
+						01:
+						07:03 tross 78 77
 c assert(FALSE)-- > abort()per problemi di GP piena
 e
 s 00038 / 00000 / 06190
-d D 1.77 98 / 03 / 13 18:35:34 vincenzo 77 76
+d D 1.77 98 / 03 / 13
+						18:
+						35:34 vincenzo 77 76
 c create_raster e release_raster
 e
 s 00002 / 00002 / 06188
-d D 1.76 98 / 03 / 09 15:00:15 vincenzo 76 75
+d D 1.76 98 / 03 / 09
+						15:
+						00:15 vincenzo 76 75
 c rop_image_to_(sub)raster non inizializzava native_buffer
 e
 s 00004 / 00004 / 06186
-d D 1.75 98 / 02 / 23 12:35:57 vincenzo 75 74
+d D 1.75 98 / 02 / 23
+						12:
+						35:57 vincenzo 75 74
 c sbagliata scansione raster su premultiply
 e
 s 00082 / 00002 / 06108
-d D 1.74 98 / 02 / 23 11:15:21 tross 74 73
+d D 1.74 98 / 02 / 23
+						11:
+						15:21 tross 74 73
 c rop_premultiply()
 e
 s 00056 / 00051 / 06054
-d D 1.73 97 / 12 / 01 18:26:04 vincenzo 73 72
+d D 1.73 97 / 12 / 01
+						18:
+						26:04 vincenzo 73 72
 c rgbx->bw_q, cm16->bw_q
 e
 s 00020 / 00000 / 06085
-d D 1.72 97 / 11 / 28 17:31:32 vincenzo 72 71
+d D 1.72 97 / 11 / 28
+						17:
+						31:32 vincenzo 72 71
 c gestione RAS_CMxSy(copy, pixbytes pix_to_ras etc)
 e
 s 00017 / 00001 / 06068
-d D 1.71 97 / 11 / 18 16:42:31 tross 71 70
+d D 1.71 97 / 11 / 18
+						16:
+						42:31 tross 71 70
 c rop_copy RAS_CMxSy
 e
 s 00033 / 00001 / 06036
-d D 1.70 97 / 09 / 26 12:25:32 vincenzo 70 69
+d D 1.70 97 / 09 / 26
+						12:
+						25:32 vincenzo 70 69
 c rop_copy_rgb16_rgbm
 e
 s 00010 / 00007 / 06027
-d D 1.69 97 / 09 / 23 15:53:42 tross 69 68
+d D 1.69 97 / 09 / 23
+						15:
+						53:42 tross 69 68
 c migliorata la rop_copy_bw
 e
 s 00043 / 00003 / 05991
-d D 1.68 97 / 09 / 23 00:00:23 tross 68 67
+d D 1.68 97 / 09 / 23
+						00:
+						00:23 tross 68 67
 c rop_copy_bw_bw
 e
 s 00038 / 00000 / 05956
-d D 1.67 97 / 09 / 22 22:20:35 tross 67 66
+d D 1.67 97 / 09 / 22
+						22:
+						20:35 tross 67 66
 c rop_copy_rgbx_rgb(vincenzo)
 e
 s 00006 / 00016 / 05950
-d D 1.66 97 / 04 / 01 18:46:33 vincenzo 66 65
+d D 1.66 97 / 04 / 01
+						18:
+						46:33 vincenzo 66 65
 c esportata la dither
 e
 s 00037 / 00021 / 05929
-d D 1.65 97 / 03 / 27 19:54:27 tross 65 64
+d D 1.65 97 / 03 / 27
+						19:
+						54:27 tross 65 64
 c rop_copy_rgbm64_rgbm con random round
 e
 s 00001 / 00001 / 05949
-d D 1.64 97 / 01 / 03 15:10:39 roberto 64 63
+d D 1.64 97 / 01 / 03
+						15:
+						10:39 roberto 64 63
 c Corretto bug in rop_copy_90(CASE-- __OR)
 e
 s 00453 / 00002 / 05497
-d D 1.63 96 / 11 / 24 22:36:00 tross 63 62
+d D 1.63 96 / 11 / 24
+						22:
+						36:00 tross 63 62
 c rop_copy_90_rgb_rgb16, rop_zoom_out_90_rgb_rgb16 / rgbm
 e
 s 00381 / 00003 / 05118
-d D 1.62 96 / 09 / 14 21:54:23 tross 62 61
+d D 1.62 96 / 09 / 14
+						21:
+						54:23 tross 62 61
 c rop_zoom_out_bw_rgb16 / rgbm
 e
 s 00577 / 00323 / 04544
-d D 1.61 96 / 09 / 12 19:44:13 tross 61 60
+d D 1.61 96 / 09 / 12
+						19:
+						44:13 tross 61 60
 c rop_zoom_out_bw_rgbm / rgb16, corretto rop_zoom_out_90_gr8_...
 e
 s 00026 / 00026 / 04841
-d D 1.60 96 / 08 / 05 18:15:12 vincenzo 60 59
+d D 1.60 96 / 08 / 05
+						18:
+						15:12 vincenzo 60 59
 c gl_color->LPIXEL
 e
 s 00002 / 00001 / 04865
-d D 1.59 96 / 07 / 12 18:41:01 vincenzo 59 58
+d D 1.59 96 / 07 / 12
+						18:
+						41:01 vincenzo 59 58
 c messo RGBM64 rop_pixbytes
 e
 s 00246 / 00123 / 04620
-d D 1.58 96 / 07 / 10 17:57:56 vincenzo 58 57
+d D 1.58 96 / 07 / 10
+						17:
+						57:56 vincenzo 58 57
 c introdotto rop_copy per RAS_RGBM64
 e
 s 00280 / 00086 / 04463
-d D 1.57 96 / 07 / 10 01:01:58 tross 57 56
+d D 1.57 96 / 07 / 10
+						01:
+						01:58 tross 57 56
 c rop_zoom_out_90, per ora solo gr8-- > rgb16 / rgbm
 e
 s 00279 / 00110 / 04270
-d D 1.56 96 / 07 / 09 16:44:14 tross 56 55
+d D 1.56 96 / 07 / 09
+						16:
+						44:14 tross 56 55
 c cmap.offset-- > cmap.info.offset_mask etc.
 e
 s 00238 / 00065 / 04142
-d D 1.55 96 / 07 / 01 16:24:22 tross 55 54
+d D 1.55 96 / 07 / 01
+						16:
+						24:22 tross 55 54
 c rop_copy_90_bw / gr8_rgb16 
 e
 s 00205 / 00009 / 04002
-d D 1.54 96 / 06 / 27 20:46:24 tross 54 53
+d D 1.54 96 / 06 / 27
+						20:
+						46:24 tross 54 53
 c rop_copy_bw / gr8_rgb16, rop_zoom_out_gr8_rgb16, aggiornati nomi macro RGB16
 e
 s 00094 / 00047 / 03917
-d D 1.53 96 / 06 / 27 04:39:24 tross 53 52
+d D 1.53 96 / 06 / 27
+						04:
+						39:24 tross 53 52
 c conversioni pix_type<->ras_type
 e
 s 00675 / 00343 / 03289
@@ -248,180 +321,271 @@ rop_copy funz.su RAS_BW, RAS_BW
 c mancava la rop_copy_90 RGB--> RGB_
 e
 s 00000 / 00002 / 03285
-d D 1.44 96 / 02 / 07 18:24:05 tross 44 43
+d D 1.44 96 / 02 / 07
+						18:
+						24:05 tross 44 43
 c tolta una printf
 e
 s 00091 / 00000 / 03196
-d D 1.43 95 / 11 / 21 16:33:23 roberto 43 42
+d D 1.43 95 / 11 / 21
+						16:
+						33:23 roberto 43 42
 c Introdotta rgb to rgbm
 e
 s 00004 / 00001 / 03192
-d D 1.42 95 / 10 / 09 14:57:40 vinz 42 41
+d D 1.42 95 / 10 / 09
+						14:
+						57:40 vinz 42 41
 c aggiunti i rop_copy RAS_CM16-- > quantized type
 e
 s 00061 / 00042 / 03132
-d D 1.41 95 / 10 / 04 18:16:37 tross 41 40
-c corretto baco di rop_copy:fatto rop_copy_same()
+d D 1.41 95 / 10 / 04
+						18:
+						16:37 tross 41 40
+c corretto baco di
+				  rop_copy:fatto rop_copy_same()
 e
 s 00061 / 00001 / 03113
-d D 1.40 95 / 10 / 04 16:05:47 tross 40 39
+d D 1.40 95 / 10 / 04
+						16:
+						05:47 tross 40 39
 c rop_[sub] image_to_raster()
 e
 s 00095 / 00017 / 03019
-d D 1.39 95 / 10 / 04 12:27:49 vinz 39 38
+d D 1.39 95 / 10 / 04
+						12:
+						27:49 vinz 39 38
 c aggiunto il rop_shrink
 e
 s 00007 / 00007 / 03029
-d D 1.38 95 / 09 / 25 02:26:09 tross 38 37
+d D 1.38 95 / 09 / 25
+						02:
+						26:09 tross 38 37
 c corretto baco(poco visibile)nei rop_zoom_out... _rgbm()
 e
 s 00001 / 00004 / 03035
-d D 1.37 95 / 09 / 20 15:57:00 tross 37 36
+d D 1.37 95 / 09 / 20
+						15:
+						57:00 tross 37 36
 c migliorate rop_custom_fill_cmap_ramp / buffer
 e
 s 00060 / 00000 / 02979
-d D 1.36 95 / 09 / 19 17:22:55 tross 36 35
+d D 1.36 95 / 09 / 19
+						17:
+						22:55 tross 36 35
 c rop_custom_fill_cmap_ramp / buffer
 e
 s 00002 / 00006 / 02977
-d D 1.35 95 / 07 / 28 21:35:43 tross 35 34
+d D 1.35 95 / 07 / 28
+						21:
+						35:43 tross 35 34
 c estetica
 e
 s 00004 / 00000 / 02979
-d D 1.34 95 / 07 / 28 17:17:40 grisu 34 33
+d D 1.34 95 / 07 / 28
+						17:
+						17:40 grisu 34 33
 c corretto un baco sull' offset della cmap
 e
 s 00001 / 00001 / 02978
-d D 1.33 95 / 07 / 28 15:22:33 tross 33 32
+d D 1.33 95 / 07 / 28
+						15:
+						22:33 tross 33 32
 c corretto baco di un controllo in rop_fill_cmap_buffer
 e
 s 00119 / 00005 / 02860
-d D 1.32 95 / 07 / 27 21:36:31 tross 32 31
+d D 1.32 95 / 07 / 27
+						21:
+						36:31 tross 32 31
 c rop_fill_cmap_ramp / buffer
 e
 s 00275 / 00022 / 02590
-d D 1.31 95 / 07 / 27 00:05:00 tross 31 30
+d D 1.31 95 / 07 / 27
+						00:
+						05:00 tross 31 30
 c rop_zoom_out_cm16_rgbm, rop_zoom_out_rgbm
 e
 s 00003 / 00001 / 02609
-d D 1.30 95 / 07 / 09 22:23:39 tross 30 29
+d D 1.30 95 / 07 / 09
+						22:
+						23:39 tross 30 29
 c messaggio in rop_zoom_out access violation
 e
 s 00043 / 00034 / 02567
-d D 1.29 95 / 07 / 04 01:50:38 tross 29 28
+d D 1.29 95 / 07 / 04
+						01:
+						50:38 tross 29 28
 c rop_zoom_out a scacchiera, cmap_offset presottratto a varie funz
 e
 s 00531 / 00005 / 02070
-d D 1.28 95 / 07 / 04 00:46:11 tross 28 27
+d D 1.28 95 / 07 / 04
+						00:
+						46:11 tross 28 27
 c con rop_zoom_out funzionante per cm16_rgb_
 e
 s 00003 / 00001 / 02072
-d D 1.27 95 / 07 / 03 15:38:32 tross 27 26
+d D 1.27 95 / 07 / 03
+						15:
+						38:32 tross 27 26
 c messaggio completo in caso di access violation
 e
 s 00086 / 00000 / 01987
-d D 1.26 94 / 12 / 28 21:07:43 tross 26 25
+d D 1.26 94 / 12 / 28
+						21:
+						07:43 tross 26 25
 c aggiunta rop_copy_90_rgbm
 e
 s 00043 / 00000 / 01944
-d D 1.25 94 / 11 / 30 22:03:25 tross 25 24
+d D 1.25 94 / 11 / 30
+						22:
+						03:25 tross 25 24
 c aggiunto rop_add / remove_white_to / from_cmap
 e
 s 00001 / 00001 / 01943
-d D 1.24 94 / 10 / 26 00:28:46 tross 24 23
+d D 1.24 94 / 10 / 26
+						00:
+						28:46 tross 24 23
 c corretto baco rop_copy_rgb_rgbm
 e
 s 00147 / 00014 / 01797
-d D 1.23 94 / 09 / 16 19:45:57 tross 23 22
+d D 1.23 94 / 09 / 16
+						19:
+						45:57 tross 23 22
 c cm8
 e
 s 00231 / 00000 / 01580
-d D 1.22 94 / 09 / 16 00:02:27 tross 22 21
+d D 1.22 94 / 09 / 16
+						00:
+						02:27 tross 22 21
 c rop_copy_90_bw / gr8_rgbm
 e
 s 00243 / 00027 / 01337
-d D 1.21 94 / 09 / 11 20:52:53 tross 21 20
+d D 1.21 94 / 09 / 11
+						20:
+						52:53 tross 21 20
 c con rop_copy_90-- > cm16
 e
 s 00243 / 00000 / 01121
-d D 1.20 94 / 09 / 05 23:18:47 tross 20 19
+d D 1.20 94 / 09 / 05
+						23:
+						18:47 tross 20 19
 c iniziato rop_reduce
 e
 s 00059 / 00000 / 01062
-d D 1.19 94 / 06 / 07 07:01:19 tross 19 18
+d D 1.19 94 / 06 / 07
+						07:
+						01:19 tross 19 18
 c rop_copy WB->RGBM
 e
 s 00096 / 00004 / 00966
-d D 1.18 94 / 06 / 01 00:42:00 tross 18 17
+d D 1.18 94 / 06 / 01
+						00:
+						42:00 tross 18 17
 c con cura dimagrante per entrare nella cassetta
 e
 s 00124 / 00001 / 00846
-d D 1.17 94 / 04 / 29 23:15:12 tross 17 16
+d D 1.17 94 / 04 / 29
+						23:
+						15:12 tross 17 16
 c rop_copy_90_bw_gr8
 e
 s 00009 / 00009 / 00838
-d D 1.16 94 / 04 / 14 23:21:49 tross 16 15
+d D 1.16 94 / 04 / 14
+						23:
+						21:49 tross 16 15
 c wrap((+7) / 8)
 e
 s 00155 / 00001 / 00692
-d D 1.15 94 / 04 / 06 16:19:14 tross 15 14
+d D 1.15 94 / 04 / 06
+						16:
+						19:14 tross 15 14
 c rop_copy_90_bw piu' veloce
 e
 s 00273 / 00068 / 00420
-d D 1.14 94 / 04 / 06 03:25:39 tross 14 13
+d D 1.14 94 / 04 / 06
+						03:
+						25:39 tross 14 13
 c rop_copy_90 pare funzionare per bw e gr8
 e
 s 00003 / 00003 / 00485
-d D 1.13 94 / 03 / 31 19:38:31 tross 13 12
+d D 1.13 94 / 03 / 31
+						19:
+						38:31 tross 13 12
 c 
 e
 s 00012 / 00008 / 00476
-d D 1.12 94 / 03 / 30 21:06:15 tross 12 11
+d D 1.12 94 / 03 / 30
+						21:
+						06:15 tross 12 11
 c 
 e
 s 00001 / 00001 / 00483
-d D 1.11 94 / 03 / 30 20:46:54 tross 11 10
+d D 1.11 94 / 03 / 30
+						20:
+						46:54 tross 11 10
 c 
 e
 s 00030 / 00048 / 00454
-d D 1.10 94 / 03 / 30 20:45:37 tross 10 9
+d D 1.10 94 / 03 / 30
+						20:
+						45:37 tross 10 9
 c rimesso a posto il wrap(in pixel)
 e
 s 00007 / 00000 / 00495
-d D 1.9 94 / 03 / 30 17:30:50 tross 9 8
+d D 1.9 94 / 03 / 30
+						17:
+						30:50 tross 9 8
 c rop_pixbytes
 e
 s 00021 / 00006 / 00474
-d D 1.8 94 / 03 / 13 17:41:53 tross 8 7
+d D 1.8 94 / 03 / 13
+						17:
+						41:53 tross 8 7
 c corretto baco su rop_copy tra dimensioni diverse
 e
 s 00005 / 00001 / 00475
-d D 1.7 94 / 03 / 11 14:04:27 tross 7 6
+d D 1.7 94 / 03 / 11
+						14:
+						04:27 tross 7 6
 c bachetto rop_copy, per 3.01j
 e
 s 00187 / 00001 / 00289
-d D 1.6 94 / 03 / 11 13:48:45 tross 6 5
+d D 1.6 94 / 03 / 11
+						13:
+						48:45 tross 6 5
 c per 3.01j
 e
 s 00024 / 00027 / 00266
-d D 1.5 94 / 03 / 02 15:14:56 tross 5 4
+d D 1.5 94 / 03 / 02
+						15:
+						14:56 tross 5 4
 c cmap per copy bw->cm16 sempre lunga 256
 e
 s 00125 / 00008 / 00168
-d D 1.4 94 / 02 / 28 15:53:37 tross 4 3
+d D 1.4 94 / 02 / 28
+						15:
+						53:37 tross 4 3
 c rop_copy per RAS_BW e RAS_WB
 e
 s 00002 / 00000 / 00174
-d D 1.3 94 / 02 / 19 22:17:18 tross 3 2
+d D 1.3 94 / 02 / 19
+						22:
+						17:18 tross 3 2
 c per fullwarn su os_4
 e
 s 00024 / 00019 / 00150
-d D 1.2 94 / 02 / 10 14:04:52 tross 2 1
+d D 1.2 94 / 02 / 10
+						14:
+						04:52 tross 2 1
 c cambiati i RAS_
 e
 s 00169 / 00000 / 00000
-d D 1.1 94 / 02 / 04 22:02:58 tross 1 0
-c date and time created 94 / 02 / 04 22:02:58 by tross
+d D 1.1 94 / 02 / 04
+						22:
+						02:58 tross 1 0
+c date and time created 94 / 02 / 04
+						22:
+						02:58 by tross
 e
 u
 U
@@ -471,29 +635,28 @@ rop_copy funz.su RAS_BW, RAS_BW
 #include "stopwatch.h"
 
 I 61
-#define BUFBYTE(X, Y, BUF, BYTEWRAP, BITOFFS) \
+#define BUFBYTE(X, Y, BUF, BYTEWRAP, BITOFFS)                                                      \
 	(((UCHAR *)(BUF))[(((X) + (BITOFFS)) >> 3) + (Y) * (BYTEWRAP)])
 
-#define GET_BIT(X, Y, BUF, BYTEWRAP, BITOFFS) \
+#define GET_BIT(X, Y, BUF, BYTEWRAP, BITOFFS)                                                      \
 	((BUFBYTE(X, Y, BUF, BYTEWRAP, BITOFFS) >> (7 - (((X) + (BITOFFS)) & 7))) & (UCHAR)1)
 
-#define SET_BIT_0(X, Y, BUF, BYTEWRAP, BITOFFS) \
+#define SET_BIT_0(X, Y, BUF, BYTEWRAP, BITOFFS)                                                    \
 	(BUFBYTE(X, Y, BUF, BYTEWRAP, BITOFFS) &= ~(1 << (7 - (((X) + (BITOFFS)) & 7))))
 
-#define SET_BIT_1(X, Y, BUF, BYTEWRAP, BITOFFS) \
+#define SET_BIT_1(X, Y, BUF, BYTEWRAP, BITOFFS)                                                    \
 	(BUFBYTE(X, Y, BUF, BYTEWRAP, BITOFFS) |= (1 << (7 - (((X) + (BITOFFS)) & 7))))
 
-#define BITCPY(XO, YO, BUFO, BYTEWRAPO, BITOFFSO, XI, YI, BUFI, BYTEWRAPI, BITOFFSI) \
-	{                                                                                \
-		if (GET_BIT(XI, YI, BUFI, BYTEWRAPI, BITOFFSI))                              \
-			SET_BIT_1(XO, YO, BUFO, BYTEWRAPO, BITOFFSO);                            \
-		else                                                                         \
-			SET_BIT_0(XO, YO, BUFO, BYTEWRAPO, BITOFFSO);                            \
+#define BITCPY(XO, YO, BUFO, BYTEWRAPO, BITOFFSO, XI, YI, BUFI, BYTEWRAPI, BITOFFSI)               \
+	{                                                                                              \
+		if (GET_BIT(XI, YI, BUFI, BYTEWRAPI, BITOFFSI))                                            \
+			SET_BIT_1(XO, YO, BUFO, BYTEWRAPO, BITOFFSO);                                          \
+		else                                                                                       \
+			SET_BIT_0(XO, YO, BUFO, BYTEWRAPO, BITOFFSO);                                          \
 	}
 
 I 62
-#define GET_BWBIT(BIT, BUF) \
-	(((BUF)[(BIT) >> 3] >> (7 - ((BIT)&7))) & 1)
+#define GET_BWBIT(BIT, BUF) (((BUF)[(BIT) >> 3] >> (7 - ((BIT)&7))) & 1)
 
 I 84
 #define MAGICFAC (257U * 256U + 1U)
@@ -502,18 +665,18 @@ rop_copy funz.su RAS_BW, RAS_BW
 #define MAP24_64 PIX_CM24_PENMAP_COLMAP_TO_RGBM64
 
 I 95
-#define PIX_RGB16_FROM_USHORT(R, G, B)                                \
-	(((((R)*BYTE_FROM_USHORT_MAGICFAC) + (1 << 23)) >> 16) & 0xf800 | \
-	 ((((G)*BYTE_FROM_USHORT_MAGICFAC) + (1 << 23)) >> 21) & 0x07e0 | \
+#define PIX_RGB16_FROM_USHORT(R, G, B)                                                             \
+	(((((R)*BYTE_FROM_USHORT_MAGICFAC) + (1 << 23)) >> 16) & 0xf800 |                              \
+	 ((((G)*BYTE_FROM_USHORT_MAGICFAC) + (1 << 23)) >> 21) & 0x07e0 |                              \
 	 ((((B)*BYTE_FROM_USHORT_MAGICFAC) + (1 << 23)) >> 27))
 
 D 96
 #define PIX_RGB16_FROM_RGBX64(L) (PIX_RGB16_FROM_USHORT((L).r, (L).g, (L).b))
 E 96
 I 96
-#define PIX_XRGB1555_FROM_USHORT(R, G, B)                             \
-	(((((R)*BYTE_FROM_USHORT_MAGICFAC) + (1 << 23)) >> 17) & 0x7c00 | \
-	 ((((G)*BYTE_FROM_USHORT_MAGICFAC) + (1 << 23)) >> 22) & 0x03e0 | \
+#define PIX_XRGB1555_FROM_USHORT(R, G, B)                                                          \
+	(((((R)*BYTE_FROM_USHORT_MAGICFAC) + (1 << 23)) >> 17) & 0x7c00 |                              \
+	 ((((G)*BYTE_FROM_USHORT_MAGICFAC) + (1 << 23)) >> 22) & 0x03e0 |                              \
 	 ((((B)*BYTE_FROM_USHORT_MAGICFAC) + (1 << 23)) >> 27))
 E 96
 
@@ -540,91 +703,60 @@ rop_copy funz.su RAS_BW, RAS_BW
 I 6
 D 14
 	/* TOGLIERE QUESTA ROBA (chiedere a Walter) */
-E 14 static void rop_copy_90_bw(RASTER *rin, RASTER *rout,
-											 int x1, int y1, int x2, int y2,
-											 int newx, int newy,
+E 14 static void rop_copy_90_bw(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
+								  int newx, int newy,
 D 14 int ninety, int flip);
 E 14
 I 14
 		           int mirror, int ninety);
-E 14 static void rop_copy_90_gr8(RASTER *rin, RASTER *rout,
-								  int x1, int y1, int x2, int y2,
+E 14 static void rop_copy_90_gr8(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 								  int newx, int newy,
 D 14 int ninety, int flip);
 E 14
 I 14
 		            int mirror, int ninety);
-I 21 static void rop_copy_90_gr8_cm16(RASTER *rin, RASTER *rout,
-									   int x1, int y1, int x2, int y2,
-									   int newx, int newy,
-									   int mirror, int ninety);
-I 84 static void rop_copy_90_gr8_cm24(RASTER *rin, RASTER *rout,
-									   int x1, int y1, int x2, int y2,
-									   int newx, int newy,
-									   int mirror, int ninety);
+I 21 static void rop_copy_90_gr8_cm16(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
+									   int newx, int newy, int mirror, int ninety);
+I 84 static void rop_copy_90_gr8_cm24(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
+									   int newx, int newy, int mirror, int ninety);
 E 84
-I 22 static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
-										int x1, int y1, int x2, int y2,
-										int newx, int newy,
-										int mirror, int ninety);
-I 55 static void rop_copy_90_gr8_rgb16(RASTER *rin, RASTER *rout,
-										int x1, int y1, int x2, int y2,
-										int newx, int newy,
-										int mirror, int ninety);
+I 22 static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
+										int newx, int newy, int mirror, int ninety);
+I 55 static void rop_copy_90_gr8_rgb16(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
+										int newx, int newy, int mirror, int ninety);
 E 55
-I 23 static void rop_copy_90_cm8_cm16(RASTER *rin, RASTER *rout,
-										int x1, int y1, int x2, int y2,
-										int newx, int newy,
-										int mirror, int ninety);
-I 84 static void rop_copy_90_cm8_cm24(RASTER *rin, RASTER *rout,
-									   int x1, int y1, int x2, int y2,
-									   int newx, int newy,
-									   int mirror, int ninety);
+I 23 static void rop_copy_90_cm8_cm16(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
+										int newx, int newy, int mirror, int ninety);
+I 84 static void rop_copy_90_cm8_cm24(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
+									   int newx, int newy, int mirror, int ninety);
 E 84
 E 23
 E 22
 E 21
-I 17 static void rop_copy_90_bw_gr8(RASTER *rin, RASTER *rout,
-									  int x1, int y1, int x2, int y2,
-									  int newx, int newy,
-									  int mirror, int ninety);
-I 21 static void rop_copy_90_bw_cm16(RASTER *rin, RASTER *rout,
-									  int x1, int y1, int x2, int y2,
-									  int newx, int newy,
-									  int mirror, int ninety);
-I 84 static void rop_copy_90_bw_cm24(RASTER *rin, RASTER *rout,
-									  int x1, int y1, int x2, int y2,
-									  int newx, int newy,
-									  int mirror, int ninety);
+I 17 static void rop_copy_90_bw_gr8(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
+									  int newx, int newy, int mirror, int ninety);
+I 21 static void rop_copy_90_bw_cm16(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
+									  int newx, int newy, int mirror, int ninety);
+I 84 static void rop_copy_90_bw_cm24(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
+									  int newx, int newy, int mirror, int ninety);
 E 84
-I 55 static void rop_copy_90_bw_rgb16(RASTER *rin, RASTER *rout,
-										int x1, int y1, int x2, int y2,
-										int newx, int newy,
-										int mirror, int ninety);
+I 55 static void rop_copy_90_bw_rgb16(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
+										int newx, int newy, int mirror, int ninety);
 E 55
-I 22 static void rop_copy_90_bw_rgbm(RASTER *rin, RASTER *rout,
-									   int x1, int y1, int x2, int y2,
-									   int newx, int newy,
-									   int mirror, int ninety);
-I 26 static void rop_copy_90_rgbm(RASTER *rin, RASTER *rout,
-								   int x1, int y1, int x2, int y2,
-								   int newx, int newy,
-								   int mirror, int ninety);
-I 63 static void rop_copy_90_rgb_rgb16(RASTER *rin, RASTER *rout,
-										int x1, int y1, int x2, int y2,
-										int newx, int newy,
-										int mirror, int ninety);
+I 22 static void rop_copy_90_bw_rgbm(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
+									   int newx, int newy, int mirror, int ninety);
+I 26 static void rop_copy_90_rgbm(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
+								   int newx, int newy, int mirror, int ninety);
+I 63 static void rop_copy_90_rgb_rgb16(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
+										int newx, int newy, int mirror, int ninety);
 E 63
-I 43 static void rop_copy_90_rgb_rgbm(RASTER *rin, RASTER *rout,
-										int x1, int y1, int x2, int y2,
-										int newx, int newy,
-										int mirror, int ninety);
+I 43 static void rop_copy_90_rgb_rgbm(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
+										int newx, int newy, int mirror, int ninety);
 E 43
 I 40
 
-I 104 static void rop_copy_bw(RASTER *rin, RASTER *rout,
-								int x1, int y1, int x2, int y2,
-								int newx, int newy);
+I 104 static void rop_copy_bw(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2, int newx,
+								int newy);
 
 E 104
 	/*---------------------------------------------------------------------------*/
@@ -698,7 +830,8 @@ void rop_subimage_to_raster (IMAGE *img,
 I 76 ras->native_buffer = ras->buffer = (USHORT *)img->pixmap.buffer + img_x0
 E 76 + img_y0 * img->pixmap.xsize;
 		I 84 CASE CMAPPED24 : ras->type = RAS_CM24;
-		ras->native_buffer = ras->buffer = (ULONG *)img->pixmap.buffer + img_x0 + img_y0 * img->pixmap.xsize;
+		ras->native_buffer = ras->buffer =
+			(ULONG *)img->pixmap.buffer + img_x0 + img_y0 * img->pixmap.xsize;
 		E 84 CASE RGB : ras->type = RAS_RGBM;
 		D 76 ras->buffer = (ULONG *)img->pixmap.buffer + img_x0
 E 76
@@ -709,7 +842,8 @@ void rop_subimage_to_raster (IMAGE *img,
 E 94
 E 76 + img_y0 * img->pixmap.xsize;
 		I 94 CASE RGB64 : ras->type = RAS_RGBM64;
-		ras->native_buffer = ras->buffer = (SPIXEL *)img->pixmap.buffer + img_x0 + img_y0 * img->pixmap.xsize;
+		ras->native_buffer = ras->buffer =
+			(SPIXEL *)img->pixmap.buffer + img_x0 + img_y0 * img->pixmap.xsize;
 		E 94
 D 78 DEFAULT : assert(FALSE);
 		E 78
@@ -791,7 +925,7 @@ void rop_subimage_to_raster (IMAGE *img,
 	/*---------------------------------------------------------------------------*/
 
 I 88
-	/* ATTENZIONE !!!!! Esiste una copia esatta di questa func 
+	/* ATTENZIONE !!!!! Esiste una copia esatta di questa func
  in sources/util/image/timage/timg.c, per evitare che la image dipenda dalla
  raster; ogni modifica di questa va anche riportata li'. Vincenzo */
  
@@ -1044,20 +1178,20 @@ PIX_TYPE rop_pix_type_of_ras_type(RAS_TYPE ras_type)
 	D 84
 #define MAGICFAC (257U * 256U + 1U)
 E 84
-#define PREMULT(V, M)                            \
-	{                                            \
-		UINT mm = (M)*MAGICFAC;                  \
-		(V).r = ((V).r * mm + (1U << 23)) >> 24; \
-		(V).g = ((V).g * mm + (1U << 23)) >> 24; \
-		(V).b = ((V).b * mm + (1U << 23)) >> 24; \
+#define PREMULT(V, M)                                                                              \
+	{                                                                                              \
+		UINT mm = (M)*MAGICFAC;                                                                    \
+		(V).r = ((V).r * mm + (1U << 23)) >> 24;                                                   \
+		(V).g = ((V).g * mm + (1U << 23)) >> 24;                                                   \
+		(V).b = ((V).b * mm + (1U << 23)) >> 24;                                                   \
 	}
 
-#define PREMULT64(V, M)                               \
-	{                                                 \
-		double mf = (double)(M) * (1.0 / 65535.0);    \
-		(V).r = (USHORT)((double)((V).r) * mf + 0.5); \
-		(V).g = (USHORT)((double)((V).g) * mf + 0.5); \
-		(V).b = (USHORT)((double)((V).b) * mf + 0.5); \
+#define PREMULT64(V, M)                                                                            \
+	{                                                                                              \
+		double mf = (double)(M) * (1.0 / 65535.0);                                                 \
+		(V).r = (USHORT)((double)((V).r) * mf + 0.5);                                              \
+		(V).g = (USHORT)((double)((V).g) * mf + 0.5);                                              \
+		(V).b = (USHORT)((double)((V).b) * mf + 0.5);                                              \
 	}
 
 		assert(rin->lx == rout->lx && rin->ly == rout->ly);
@@ -1086,8 +1220,7 @@ PIX_TYPE rop_pix_type_of_ras_type(RAS_TYPE ras_type)
 				D 104 else if (m == 255U)
 E 104
 I 104 else if (m == 0xffff)
-E 104
-					*out64++ = val64;
+E 104 *out64++ = val64;
 				else
 				{
 					PREMULT64(val64, m)
@@ -1126,8 +1259,7 @@ PIX_TYPE rop_pix_type_of_ras_type(RAS_TYPE ras_type)
 I 78 abort();
 		E 78
 	}
-	I 89 if (rout->extra_mask)
-		rop_copy_extra(rin, rout, 0, 0, lx - 1, ly - 1, 0, 0);
+	I 89 if (rout->extra_mask) rop_copy_extra(rin, rout, 0, 0, lx - 1, ly - 1, 0, 0);
 	E 89
 }
 
@@ -1135,8 +1267,7 @@ PIX_TYPE rop_pix_type_of_ras_type(RAS_TYPE ras_type)
 
 E 74
 E 53
-I 41 static void rop_copy_same(RASTER *rin, RASTER *rout,
-								 int x1, int y1, int x2, int y2,
+I 41 static void rop_copy_same(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 								 int newx, int newy)
 {
 	UCHAR *rowin, *rowout;
@@ -1144,10 +1275,8 @@ PIX_TYPE rop_pix_type_of_ras_type(RAS_TYPE ras_type)
 	int pixbits_in, pixbits_out;
 	int pixbytes_in, pixbytes_out;
 
-	I 104 if (((rin->type == RAS_BW) &&
-				(rout->type == RAS_BW)) ||
-			   ((rin->type == RAS_WB) &&
-				(rout->type == RAS_WB)))
+	I 104 if (((rin->type == RAS_BW) && (rout->type == RAS_BW)) ||
+			   ((rin->type == RAS_WB) && (rout->type == RAS_WB)))
 	{
 		rop_copy_bw(rin, rout, x1, y1, x2, y2, newx, newy);
 		return;
@@ -1183,9 +1312,7 @@ PIX_TYPE rop_pix_type_of_ras_type(RAS_TYPE ras_type)
 
 /*---------------------------------------------------------------------------*/
 
-void rop_copy_extra(RASTER *rin, RASTER *rout,
-					int x1, int y1, int x2, int y2,
-					int newx, int newy)
+void rop_copy_extra(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2, int newx, int newy)
 {
 	UCHAR *rowin, *rowout, *pixin, *pixout;
 	ULONG *rowin24, *rowout24, *pixin24, *pixout24;
@@ -1270,8 +1397,7 @@ void rop_copy_extra(RASTER *rin, RASTER *rout,
 /*---------------------------------------------------------------------------*/
 
 E 41
-I 18 static void rop_copy_gr8_rgbm(RASTER *rin, RASTER *rout,
-									 int x1, int y1, int x2, int y2,
+I 18 static void rop_copy_gr8_rgbm(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 									 int newx, int newy)
 {
 	LPIXEL *rowout, *pixout;
@@ -1307,8 +1433,7 @@ void rop_copy_extra(RASTER *rin, RASTER *rout,
 /*---------------------------------------------------------------------------*/
 
 I 20
-D 84 static void rop_reduce_gr8_rgbm(RASTER *rin, RASTER *rout,
-									   int x1, int y1, int x2, int y2,
+D 84 static void rop_reduce_gr8_rgbm(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 									   int newx, int newy, int factor)
 {
 	printf("rop_reduce_gr8_rgbm not implemented yet\n");
@@ -1430,12 +1555,10 @@ static void rop_zoom_out_gr8_rgbm(RASTER *rin, RASTER *rout,
 E 28
 E 20
 E 18
-D 2 static void rop_copy_cm_rgbm(RASTER *rin, RASTER *rout,
-								   int x1, int y1, int x2, int y2,
+D 2 static void rop_copy_cm_rgbm(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 								   int newx, int newy)
 E 2
-I 2 static void rop_copy_cm16_rgbm(RASTER *rin, RASTER *rout,
-									 int x1, int y1, int x2, int y2,
+I 2 static void rop_copy_cm16_rgbm(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 									 int newx, int newy)
 E 2
 {
@@ -1499,11 +1622,9 @@ static void rop_zoom_out_gr8_rgbm(RASTER *rin, RASTER *rout,
 		pixin = rowin;
 		pixout = rowout;
 		for (x = 0; x < lx; x++)
-			D 29
-				*pixout++ = cmap[*pixin++ - cmap_offset];
+			D 29 *pixout++ = cmap[*pixin++ - cmap_offset];
 		E 29
-I 29
-			*pixout++ = cmap[*pixin++];
+I 29 *pixout++ = cmap[*pixin++];
 		E 29 rowin += wrapin;
 		rowout += wrapout;
 	}
@@ -1513,9 +1634,7 @@ static void rop_zoom_out_gr8_rgbm(RASTER *rin, RASTER *rout,
 	/*---------------------------------------------------------------------------*/
 
 I 84 static void
-rop_copy_cm24_rgbm(RASTER *rin, RASTER *rout,
-				   int x1, int y1, int x2, int y2,
-				   int newx, int newy)
+rop_copy_cm24_rgbm(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2, int newx, int newy)
 {
 	LPIXEL *rowout, *pixout, valout, *penmap, *colmap;
 	ULONG *rowin, *pixin, valin;
@@ -1588,8 +1707,7 @@ rop_copy_cm24_rgbm(RASTER *rin, RASTER *rout,
 /*---------------------------------------------------------------------------*/
 
 E 84
-I 58 static void rop_copy_cm16_rgbm64(RASTER *rin, RASTER *rout,
-										int x1, int y1, int x2, int y2,
+I 58 static void rop_copy_cm16_rgbm64(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 										int newx, int newy)
 {
 	SPIXEL *rowout, *pixout;
@@ -1629,8 +1747,7 @@ rop_copy_cm24_rgbm(RASTER *rin, RASTER *rout,
 
 /*---------------------------------------------------------------------------*/
 
-I 84 static void rop_copy_cm24_rgbm64(RASTER *rin, RASTER *rout,
-									   int x1, int y1, int x2, int y2,
+I 84 static void rop_copy_cm24_rgbm64(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 									   int newx, int newy)
 {
 	SPIXEL *rowout, *pixout, valout;
@@ -1762,15 +1879,14 @@ static void rop_copy_rgbm64_rgbm(RASTER *rin, RASTER *rout,
 	I 65
 D 66 UINT random_round;
 
-#define BYTE_FROM_USHORT_CUSTOM_ROUNDED(X, R) \
-	((((X)*BYTE_FROM_USHORT_MAGICFAC) + (R)) >> 24)
+#define BYTE_FROM_USHORT_CUSTOM_ROUNDED(X, R) ((((X)*BYTE_FROM_USHORT_MAGICFAC) + (R)) >> 24)
 
-#define RGBM64_TO_RGBM_CUSTOM_ROUNDED(S, L, R)               \
-	{                                                        \
-		(L).r = BYTE_FROM_USHORT_CUSTOM_ROUNDED((S).r, (R)); \
-		(L).g = BYTE_FROM_USHORT_CUSTOM_ROUNDED((S).g, (R)); \
-		(L).b = BYTE_FROM_USHORT_CUSTOM_ROUNDED((S).b, (R)); \
-		(L).m = PIX_BYTE_FROM_USHORT((S).m);                 \
+#define RGBM64_TO_RGBM_CUSTOM_ROUNDED(S, L, R)                                                     \
+	{                                                                                              \
+		(L).r = BYTE_FROM_USHORT_CUSTOM_ROUNDED((S).r, (R));                                       \
+		(L).g = BYTE_FROM_USHORT_CUSTOM_ROUNDED((S).g, (R));                                       \
+		(L).b = BYTE_FROM_USHORT_CUSTOM_ROUNDED((S).b, (R));                                       \
+		(L).m = PIX_BYTE_FROM_USHORT((S).m);                                                       \
 	}
 	E 66
 
@@ -1815,8 +1931,7 @@ static void rop_copy_rgbm64_rgbm(RASTER *rin, RASTER *rout,
 
 /*---------------------------------------------------------------------------*/
 
-I 95 static void rop_copy_rgbx64_rgbx(RASTER *rin, RASTER *rout,
-									   int x1, int y1, int x2, int y2,
+I 95 static void rop_copy_rgbx64_rgbx(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 									   int newx, int newy)
 {
 	LPIXEL *rowout, *pixout;
@@ -1857,12 +1972,10 @@ static void rop_copy_rgbm64_rgbm(RASTER *rin, RASTER *rout,
 E 95
 E 58
 I 20
-D 84 static void rop_reduce_cm16_rgbm(RASTER *rin, RASTER *rout,
-										int x1, int y1, int x2, int y2,
+D 84 static void rop_reduce_cm16_rgbm(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 										int newx, int newy, int factor)
 E 84
-I 84 static void rop_zoom_out_cm16_rgbm(RASTER *rin, RASTER *rout,
-										  int x1, int y1, int x2, int y2,
+I 84 static void rop_zoom_out_cm16_rgbm(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 										  int newx, int newy, int abs_zoom_level)
 E 84
 {
@@ -1965,8 +2078,7 @@ static void rop_copy_rgbm64_rgbm(RASTER *rin, RASTER *rout,
 			valout.g = (tmp_g + fac_fac_4) >> fac_fac_2_bits;
 			valout.b = (tmp_b + fac_fac_4) >> fac_fac_2_bits;
 			valout.m = (tmp_m + fac_fac_4) >> fac_fac_2_bits;
-			E 84
-				*pixout++ = valout;
+			E 84 *pixout++ = valout;
 			pixin += factor;
 		}
 		if (xrest) {
@@ -2039,12 +2151,9 @@ static void rop_copy_rgbm64_rgbm(RASTER *rin, RASTER *rout,
 E 84
 I 84 static void rop_zoom_out_cm24_rgbm(RASTER *rin, RASTER *rout,
 E 84
-D 31 int x1, int y1, int x2, int y2,
-													  int newx, int newy, int factor)
+D 31 int x1, int y1, int x2, int y2, int newx, int newy, int factor)
 E 31
-I 31 int x1,
-										 int y1, int x2, int y2,
-										 int newx, int newy, int abs_zoom_level)
+I 31 int x1, int y1, int x2, int y2, int newx, int newy, int abs_zoom_level)
 E 31
 {
 	D 31 printf(" rop_zoom_out_cm16_rgbm not implemented yet\n");
@@ -3583,8 +3692,7 @@ while (ly-- > 0)
 
 E 28
 E 20
-E 19 static void rop_copy_gr8_cm16(RASTER *rin, RASTER *rout,
-									 int x1, int y1, int x2, int y2,
+E 19 static void rop_copy_gr8_cm16(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 									 int newx, int newy)
 {
 	UCHAR *rowin, *bytein;
@@ -3648,12 +3756,10 @@ while (ly-- > 0)
 
 I 20
 D 84 static void
-rop_reduce_gr8_cm16(RASTER *rin, RASTER *rout,
-					int x1, int y1, int x2, int y2,
-					int newx, int newy, int factor)
+rop_reduce_gr8_cm16(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2, int newx, int newy,
+					int factor)
 E 84
-I 84 static void rop_copy_gr8_cm24(RASTER *rin, RASTER *rout,
-									 int x1, int y1, int x2, int y2,
+I 84 static void rop_copy_gr8_cm24(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 									 int newx, int newy)
 E 84
 {
@@ -3688,8 +3794,7 @@ rop_reduce_gr8_cm16(RASTER *rin, RASTER *rout,
 		rowin += wrapin;
 		rowout += wrapout;
 	}
-	I 89 if (rout->extra_mask)
-		rop_copy_extra(rin, rout, x1, y1, x2, y2, newx, newy);
+	I 89 if (rout->extra_mask) rop_copy_extra(rin, rout, x1, y1, x2, y2, newx, newy);
 	E 89
 E 84
 }
@@ -3712,8 +3817,7 @@ static void rop_zoom_out_gr8_cm16(RASTER *rin, RASTER *rout,
 
 /*---------------------------------------------------------------------------*/
 
-I 84 static void rop_zoom_out_gr8_cm24(RASTER *rin, RASTER *rout,
-										int x1, int y1, int x2, int y2,
+I 84 static void rop_zoom_out_gr8_cm24(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 										int newx, int newy, int abs_zoom_level)
 {
 	printf("rop_zoom_out_gr8_cm24 not implemented yet\n");
@@ -3723,8 +3827,7 @@ static void rop_zoom_out_gr8_cm16(RASTER *rin, RASTER *rout,
 
 E 84
 E 28
-I 23 static void rop_copy_cm8_cm16(RASTER *rin, RASTER *rout,
-									 int x1, int y1, int x2, int y2,
+I 23 static void rop_copy_cm8_cm16(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 									 int newx, int newy)
 {
 	UCHAR *rowin, *pixin;
@@ -3766,21 +3869,20 @@ static void rop_zoom_out_gr8_cm16(RASTER *rin, RASTER *rout,
 /*---------------------------------------------------------------------------*/
 
 E 23
-D 84 static void rop_reduce_bw_gr8(RASTER *rin, RASTER *rout,
+D 84 static void
+rop_reduce_bw_gr8(RASTER *rin, RASTER *rout,
 E 84
 I 84 static void rop_copy_cm8_cm24(RASTER *rin, RASTER *rout,
 E 84 int x1, int y1, int x2, int y2,
-D 84 int newx, int newy, int factor) {
-	printf("rop_reduce_bw_gr8 not implemented yet\n");
-}
+D 84 int newx, int newy, int factor) { printf("rop_reduce_bw_gr8 not implemented yet\n"); }
 
-									 /*---------------------------------------------------------------------------*/
+				  /*---------------------------------------------------------------------------*/
 
 I 28 static void rop_zoom_out_bw_gr8(RASTER *rin, RASTER *rout,
 D 31 int x1, int y1, int x2, int y2, int newx, int newy, int factor)
 E 31
 I 31 int x1,
-									 int y1, int x2, int y2, int newx, int newy, int abs_zoom_level)
+				  int y1, int x2, int y2, int newx, int newy, int abs_zoom_level)
 E 31
 {
 	printf("rop_zoom_out_bw_gr8 not implemented yet\n");
@@ -3867,8 +3969,7 @@ static void rop_reduce_gr8(RASTER *rin, RASTER *rout,
 			rowin += wrapin;
 			E 84 rowout += wrapout;
 		}
-	I 89 if (rout->extra_mask)
-		rop_copy_extra(rin, rout, x1, y1, x2, y2, newx, newy);
+	I 89 if (rout->extra_mask) rop_copy_extra(rin, rout, x1, y1, x2, y2, newx, newy);
 	E 89
 D 84 if (yrest)
 	{
@@ -3922,12 +4023,10 @@ static void rop_zoom_out_bw_gr8(RASTER *rin, RASTER *rout,
 /*---------------------------------------------------------------------------*/
 
 E 28
-D 84 static void rop_reduce_cm16(RASTER *rin, RASTER *rout,
-								   int x1, int y1, int x2, int y2,
+D 84 static void rop_reduce_cm16(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 								   int newx, int newy, int factor)
 E 84
-I 84 static void rop_zoom_out_gr8(RASTER *rin, RASTER *rout,
-									int x1, int y1, int x2, int y2,
+I 84 static void rop_zoom_out_gr8(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 									int newx, int newy, int abs_zoom_level)
 E 84
 {
@@ -3956,12 +4055,10 @@ static void rop_zoom_out_cm16(RASTER *rin, RASTER *rout,
 /*---------------------------------------------------------------------------*/
 
 E 28
-D 84 static void rop_reduce_rgbm(RASTER *rin, RASTER *rout,
-								   int x1, int y1, int x2, int y2,
+D 84 static void rop_reduce_rgbm(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 								   int newx, int newy, int factor)
 E 84
-I 84 static void rop_zoom_out_cm24(RASTER *rin, RASTER *rout,
-									 int x1, int y1, int x2, int y2,
+I 84 static void rop_zoom_out_cm24(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 									 int newx, int newy, int abs_zoom_level)
 E 84
 {
@@ -4119,8 +4216,7 @@ static void rop_zoom_out_rgbm(RASTER *rin, RASTER *rout,
 
 /*---------------------------------------------------------------------------*/
 
-I 46 static void rop_zoom_out_rgbx(RASTER *rin, RASTER *rout,
-									int x1, int y1, int x2, int y2,
+I 46 static void rop_zoom_out_rgbx(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 									int newx, int newy, int abs_zoom_level)
 {
 	LPIXEL *rowin, *pixin, *in, valin;
@@ -4243,9 +4339,8 @@ static void rop_zoom_out_rgbm(RASTER *rin, RASTER *rout,
 	/*---------------------------------------------------------------------------*/
 
 	static void
-	rop_zoom_out_rgbx64_rgbx(RASTER *rin, RASTER *rout,
-							 int x1, int y1, int x2, int y2,
-							 int newx, int newy, int abs_zoom_level)
+	rop_zoom_out_rgbx64_rgbx(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2, int newx,
+							 int newy, int abs_zoom_level)
 {
 	SPIXEL *rowin, *pixin, *in, valin;
 	LPIXEL *rowout, *pixout, valout;
@@ -4363,8 +4458,7 @@ static void rop_zoom_out_rgbm(RASTER *rin, RASTER *rout,
 }
 /*---------------------------------------------------------------------------*/
 
-static void rop_zoom_out_rgbm64_rgbm(RASTER *rin, RASTER *rout,
-									 int x1, int y1, int x2, int y2,
+static void rop_zoom_out_rgbm64_rgbm(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 									 int newx, int newy, int abs_zoom_level)
 {
 	SPIXEL *rowin, *pixin, *in, valin;
@@ -4494,9 +4588,7 @@ static void rop_zoom_out_rgbm64_rgbm(RASTER *rin, RASTER *rout,
 	/*---------------------------------------------------------------------------*/
 
 I 54 static void
-rop_copy_bw_rgb16(RASTER *rin, RASTER *rout,
-				  int x1, int y1, int x2, int y2,
-				  int newx, int newy)
+rop_copy_bw_rgb16(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2, int newx, int newy)
 {
 	UCHAR *rowin, *bytein;
 	USHORT *rowout, *pixout;
@@ -4539,8 +4631,7 @@ rop_copy_bw_rgb16(RASTER *rin, RASTER *rout,
 
 /*---------------------------------------------------------------------------*/
 
-I 61 static void rop_zoom_out_bw_rgb16(RASTER *rin, RASTER *rout,
-										int x1, int y1, int x2, int y2,
+I 61 static void rop_zoom_out_bw_rgb16(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 										int newx, int newy, int abs_zoom_level)
 {
 	UCHAR *rowin, *bytein, *in;
@@ -4672,8 +4763,7 @@ rop_copy_bw_rgb16(RASTER *rin, RASTER *rout,
 
 /*---------------------------------------------------------------------------*/
 
-E 61 static void rop_copy_gr8_rgb16(RASTER *rin, RASTER *rout,
-									 int x1, int y1, int x2, int y2,
+E 61 static void rop_copy_gr8_rgb16(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 									 int newx, int newy)
 {
 	UCHAR *rowin, *pixin, val;
@@ -4693,11 +4783,9 @@ rop_copy_bw_rgb16(RASTER *rin, RASTER *rout,
 		pixout = rowout;
 		for (x = 0; x < lx; x++) {
 			val = *pixin++;
-			D 60
-				*pixout++ = ROP_RGB16_FROM_BYTES(val, val, val);
+			D 60 *pixout++ = ROP_RGB16_FROM_BYTES(val, val, val);
 			E 60
-I 60
-				*pixout++ = PIX_RGB16_FROM_BYTES(val, val, val);
+I 60 *pixout++ = PIX_RGB16_FROM_BYTES(val, val, val);
 			E 60
 		}
 		rowin += wrapin;
@@ -4707,8 +4795,7 @@ rop_copy_bw_rgb16(RASTER *rin, RASTER *rout,
 
 /*---------------------------------------------------------------------------*/
 
-static void rop_zoom_out_gr8_rgb16(RASTER *rin, RASTER *rout,
-								   int x1, int y1, int x2, int y2,
+static void rop_zoom_out_gr8_rgb16(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 								   int newx, int newy, int abs_zoom_level)
 {
 	UCHAR *rowin, *pixin, *in;
@@ -4764,11 +4851,9 @@ static void rop_zoom_out_gr8_rgb16(RASTER *rin, RASTER *rout,
 				in += 2 * wrapin - factor;
 			}
 			tmp = (tmp + fac_fac_4) >> fac_fac_2_bits;
-			D 60
-				*pixout++ = ROP_RGB16_FROM_BYTES(tmp, tmp, tmp);
+			D 60 *pixout++ = ROP_RGB16_FROM_BYTES(tmp, tmp, tmp);
 			E 60
-I 60
-				*pixout++ = PIX_RGB16_FROM_BYTES(tmp, tmp, tmp);
+I 60 *pixout++ = PIX_RGB16_FROM_BYTES(tmp, tmp, tmp);
 			E 60 pixin += factor;
 		}
 		if (xrest) {
@@ -4778,11 +4863,9 @@ static void rop_zoom_out_gr8_rgb16(RASTER *rin, RASTER *rout,
 					tmp += pixin[i + j * wrapin];
 				}
 			tmp = (tmp + fac_xrest_2) / fac_xrest;
-			D 60
-				*pixout = ROP_RGB16_FROM_BYTES(tmp, tmp, tmp);
+			D 60 *pixout = ROP_RGB16_FROM_BYTES(tmp, tmp, tmp);
 			E 60
-I 60
-				*pixout = PIX_RGB16_FROM_BYTES(tmp, tmp, tmp);
+I 60 *pixout = PIX_RGB16_FROM_BYTES(tmp, tmp, tmp);
 			E 60
 		}
 		rowin += wrapin * factor;
@@ -4798,11 +4881,9 @@ static void rop_zoom_out_gr8_rgb16(RASTER *rin, RASTER *rout,
 					tmp += pixin[i + j * wrapin];
 				}
 			tmp = (tmp + yrest_fac_2) / yrest_fac;
-			D 60
-				*pixout++ = ROP_RGB16_FROM_BYTES(tmp, tmp, tmp);
+			D 60 *pixout++ = ROP_RGB16_FROM_BYTES(tmp, tmp, tmp);
 			E 60
-I 60
-				*pixout++ = PIX_RGB16_FROM_BYTES(tmp, tmp, tmp);
+I 60 *pixout++ = PIX_RGB16_FROM_BYTES(tmp, tmp, tmp);
 			E 60 pixin += factor;
 		}
 		if (xrest) {
@@ -4812,11 +4893,9 @@ static void rop_zoom_out_gr8_rgb16(RASTER *rin, RASTER *rout,
 					tmp += pixin[i + j * wrapin];
 				}
 			tmp = (tmp + yrest_xrest_2) / yrest_xrest;
-			D 60
-				*pixout = ROP_RGB16_FROM_BYTES(tmp, tmp, tmp);
+			D 60 *pixout = ROP_RGB16_FROM_BYTES(tmp, tmp, tmp);
 			E 60
-I 60
-				*pixout = PIX_RGB16_FROM_BYTES(tmp, tmp, tmp);
+I 60 *pixout = PIX_RGB16_FROM_BYTES(tmp, tmp, tmp);
 			E 60
 		}
 	}
@@ -4825,8 +4904,7 @@ static void rop_zoom_out_gr8_rgb16(RASTER *rin, RASTER *rout,
 /*---------------------------------------------------------------------------*/
 
 E 54
-I 52 static void rop_copy_cm16_rgb16(RASTER *rin, RASTER *rout,
-									   int x1, int y1, int x2, int y2,
+I 52 static void rop_copy_cm16_rgb16(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 									   int newx, int newy)
 {
 	USHORT *rowin, *pixin;
@@ -4850,15 +4928,12 @@ static void rop_zoom_out_gr8_rgb16(RASTER *rin, RASTER *rout,
 		pixout = rowout;
 		for (x = 0; x < lx; x++) {
 			val = cmap[*pixin++];
-			D 54
-				*pixout++ = BYTES_TO_RGB16(val.r, val.g, val.b);
+			D 54 *pixout++ = BYTES_TO_RGB16(val.r, val.g, val.b);
 			E 54
 I 54
-D 60
-				*pixout++ = ROP_RGB16_FROM_BYTES(val.r, val.g, val.b);
+D 60 *pixout++ = ROP_RGB16_FROM_BYTES(val.r, val.g, val.b);
 			E 60
-I 60
-				*pixout++ = PIX_RGB16_FROM_BYTES(val.r, val.g, val.b);
+I 60 *pixout++ = PIX_RGB16_FROM_BYTES(val.r, val.g, val.b);
 			E 60
 E 54
 		}
@@ -4869,8 +4944,7 @@ static void rop_zoom_out_gr8_rgb16(RASTER *rin, RASTER *rout,
 
 /*---------------------------------------------------------------------------*/
 
-I 96 static void rop_copy_cm16_xrgb1555(RASTER *rin, RASTER *rout,
-										 int x1, int y1, int x2, int y2,
+I 96 static void rop_copy_cm16_xrgb1555(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 										 int newx, int newy)
 {
 	USHORT *rowin, *pixin;
@@ -4902,8 +4976,7 @@ static void rop_zoom_out_gr8_rgb16(RASTER *rin, RASTER *rout,
 /*---------------------------------------------------------------------------*/
 
 E 96
-I 84 static void rop_copy_cm24_rgb16(RASTER *rin, RASTER *rout,
-									   int x1, int y1, int x2, int y2,
+I 84 static void rop_copy_cm24_rgb16(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 									   int newx, int newy)
 {
 	ULONG *rowin, *pixin, win;
@@ -4935,15 +5008,13 @@ static void rop_zoom_out_gr8_rgb16(RASTER *rin, RASTER *rout,
 		rowin += wrapin;
 		rowout += wrapout;
 	}
-	I 89 if (rout->extra_mask)
-		rop_copy_extra(rin, rout, x1, y1, x2, y2, newx, newy);
+	I 89 if (rout->extra_mask) rop_copy_extra(rin, rout, x1, y1, x2, y2, newx, newy);
 	E 89
 }
 
 /*---------------------------------------------------------------------------*/
 
-I 96 static void rop_copy_cm24_xrgb1555(RASTER *rin, RASTER *rout,
-										 int x1, int y1, int x2, int y2,
+I 96 static void rop_copy_cm24_xrgb1555(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 										 int newx, int newy)
 {
 	ULONG *rowin, *pixin, win;
@@ -4980,9 +5051,8 @@ static void rop_zoom_out_gr8_rgb16(RASTER *rin, RASTER *rout,
 /*---------------------------------------------------------------------------*/
 
 E 96
-E 84 static void rop_zoom_out_cm16_rgb16(RASTER *rin, RASTER *rout,
-										   int x1, int y1, int x2, int y2,
-										   int newx, int newy, int abs_zoom_level)
+E 84 static void rop_zoom_out_cm16_rgb16(RASTER *rin, RASTER *rout, int x1, int y1, int x2,
+										   int y2, int newx, int newy, int abs_zoom_level)
 {
 	USHORT *rowin, *pixin, *in;
 	LPIXEL *cmap, valin;
@@ -5049,15 +5119,12 @@ static void rop_zoom_out_gr8_rgb16(RASTER *rin, RASTER *rout,
 			tmp_r = (tmp_r + fac_fac_4) >> fac_fac_2_bits;
 			tmp_g = (tmp_g + fac_fac_4) >> fac_fac_2_bits;
 			tmp_b = (tmp_b + fac_fac_4) >> fac_fac_2_bits;
-			D 54
-				*pixout++ = BYTES_TO_RGB16(tmp_r, tmp_g, tmp_b);
+			D 54 *pixout++ = BYTES_TO_RGB16(tmp_r, tmp_g, tmp_b);
 			E 54
 I 54
-D 60
-				*pixout++ = ROP_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
+D 60 *pixout++ = ROP_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
 			E 60
-I 60
-				*pixout++ = PIX_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
+I 60 *pixout++ = PIX_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
 			E 60
 E 54 pixin += factor;
 		}
@@ -5073,15 +5140,12 @@ static void rop_zoom_out_gr8_rgb16(RASTER *rin, RASTER *rout,
 			tmp_r = (tmp_r + fac_xrest_2) / fac_xrest;
 			tmp_g = (tmp_g + fac_xrest_2) / fac_xrest;
 			tmp_b = (tmp_b + fac_xrest_2) / fac_xrest;
-			D 54
-				*pixout = BYTES_TO_RGB16(tmp_r, tmp_g, tmp_b);
+			D 54 *pixout = BYTES_TO_RGB16(tmp_r, tmp_g, tmp_b);
 			E 54
 I 54
-D 60
-				*pixout = ROP_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
+D 60 *pixout = ROP_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
 			E 60
-I 60
-				*pixout = PIX_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
+I 60 *pixout = PIX_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
 			E 60
 E 54
 		}
@@ -5103,15 +5167,12 @@ static void rop_zoom_out_gr8_rgb16(RASTER *rin, RASTER *rout,
 			tmp_r = (tmp_r + yrest_fac_2) / yrest_fac;
 			tmp_g = (tmp_g + yrest_fac_2) / yrest_fac;
 			tmp_b = (tmp_b + yrest_fac_2) / yrest_fac;
-			D 54
-				*pixout++ = BYTES_TO_RGB16(tmp_r, tmp_g, tmp_b);
+			D 54 *pixout++ = BYTES_TO_RGB16(tmp_r, tmp_g, tmp_b);
 			E 54
 I 54
-D 60
-				*pixout++ = ROP_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
+D 60 *pixout++ = ROP_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
 			E 60
-I 60
-				*pixout++ = PIX_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
+I 60 *pixout++ = PIX_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
 			E 60
 E 54 pixin += factor;
 		}
@@ -5127,15 +5188,12 @@ static void rop_zoom_out_gr8_rgb16(RASTER *rin, RASTER *rout,
 			tmp_r = (tmp_r + yrest_xrest_2) / yrest_xrest;
 			tmp_g = (tmp_g + yrest_xrest_2) / yrest_xrest;
 			tmp_b = (tmp_b + yrest_xrest_2) / yrest_xrest;
-			D 54
-				*pixout = BYTES_TO_RGB16(tmp_r, tmp_g, tmp_b);
+			D 54 *pixout = BYTES_TO_RGB16(tmp_r, tmp_g, tmp_b);
 			E 54
 I 54
-D 60
-				*pixout = ROP_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
+D 60 *pixout = ROP_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
 			E 60
-I 60
-				*pixout = PIX_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
+I 60 *pixout = PIX_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
 			E 60
 E 54
 		}
@@ -5144,8 +5202,7 @@ static void rop_zoom_out_gr8_rgb16(RASTER *rin, RASTER *rout,
 
 /*---------------------------------------------------------------------------*/
 
-I 84 static void rop_zoom_out_cm24_rgb16(RASTER *rin, RASTER *rout,
-										  int x1, int y1, int x2, int y2,
+I 84 static void rop_zoom_out_cm24_rgb16(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 										  int newx, int newy, int abs_zoom_level)
 {
 	ULONG *rowin, *pixin, *in, win;
@@ -5271,8 +5328,7 @@ static void rop_zoom_out_gr8_rgb16(RASTER *rin, RASTER *rout,
 
 /*---------------------------------------------------------------------------*/
 
-E 84 static void rop_copy_rgbx_rgb16(RASTER *rin, RASTER *rout,
-									  int x1, int y1, int x2, int y2,
+E 84 static void rop_copy_rgbx_rgb16(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 									  int newx, int newy)
 {
 	LPIXEL *rowin, *pixin, val;
@@ -5292,11 +5348,9 @@ static void rop_zoom_out_gr8_rgb16(RASTER *rin, RASTER *rout,
 		pixout = rowout;
 		for (x = 0; x < lx; x++) {
 			val = *pixin++;
-			D 70
-				*pixout++ = (val.r << 8) & 0xf800 | (val.g << 3) & 0x7e0 | (val.b >> 3);
+			D 70 *pixout++ = (val.r << 8) & 0xf800 | (val.g << 3) & 0x7e0 | (val.b >> 3);
 			E 70
-I 70
-				*pixout++ = PIX_RGB16_FROM_RGBX(val);
+I 70 *pixout++ = PIX_RGB16_FROM_RGBX(val);
 			E 70
 		}
 		rowin += wrapin;
@@ -5312,9 +5366,8 @@ static void rop_zoom_out_gr8_rgb16(RASTER *rin, RASTER *rout,
 I 96
 
 	static void
-	rop_copy_rgbx_xrgb1555(RASTER *rin, RASTER *rout,
-						   int x1, int y1, int x2, int y2,
-						   int newx, int newy)
+	rop_copy_rgbx_xrgb1555(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2, int newx,
+						   int newy)
 {
 	LPIXEL *rowin, *pixin, val;
 	USHORT *rowout, *pixout, outval;
@@ -5342,8 +5395,7 @@ static void rop_zoom_out_gr8_rgb16(RASTER *rin, RASTER *rout,
 }
 /*---------------------------------------------------------------------------*/
 
-E 96 static void rop_copy_rgbx64_rgb16(RASTER *rin, RASTER *rout,
-										int x1, int y1, int x2, int y2,
+E 96 static void rop_copy_rgbx64_rgb16(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 										int newx, int newy)
 {
 	SPIXEL *rowin, *pixin, val;
@@ -5374,9 +5426,8 @@ static void rop_zoom_out_gr8_rgb16(RASTER *rin, RASTER *rout,
 	/*---------------------------------------------------------------------------*/
 
 I 96 static void
-rop_copy_rgbx64_xrgb1555(RASTER *rin, RASTER *rout,
-						 int x1, int y1, int x2, int y2,
-						 int newx, int newy)
+rop_copy_rgbx64_xrgb1555(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2, int newx,
+						 int newy)
 {
 	SPIXEL *rowin, *pixin, val;
 	USHORT *rowout, *pixout;
@@ -5404,8 +5455,7 @@ rop_copy_rgbx64_xrgb1555(RASTER *rin, RASTER *rout,
 /*---------------------------------------------------------------------------*/
 
 E 96
-I 70 static void rop_copy_rgb16_rgbm(RASTER *rin, RASTER *rout,
-									   int x1, int y1, int x2, int y2,
+I 70 static void rop_copy_rgb16_rgbm(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 									   int newx, int newy)
 {
 	USHORT *rowin, *pixin;
@@ -5432,8 +5482,7 @@ rop_copy_rgbx64_xrgb1555(RASTER *rin, RASTER *rout,
 
 /*---------------------------------------------------------------------------*/
 
-I 96 static void rop_copy_xrgb1555_rgbm(RASTER *rin, RASTER *rout,
-										 int x1, int y1, int x2, int y2,
+I 96 static void rop_copy_xrgb1555_rgbm(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
 										 int newx, int newy)
 {
 	USHORT *rowin, *pixin;
@@ -5461,9 +5510,8 @@ rop_copy_rgbx64_xrgb1555(RASTER *rin, RASTER *rout,
 /*---------------------------------------------------------------------------*/
 
 E 96
-E 70 static void rop_zoom_out_rgbx_rgb16(RASTER *rin, RASTER *rout,
-										   int x1, int y1, int x2, int y2,
-										   int newx, int newy, int abs_zoom_level)
+E 70 static void rop_zoom_out_rgbx_rgb16(RASTER *rin, RASTER *rout, int x1, int y1, int x2,
+										   int y2, int newx, int newy, int abs_zoom_level)
 {
 	LPIXEL *rowin, *pixin, *in, valin;
 	USHORT *rowout, *pixout;
@@ -5526,15 +5574,12 @@ rop_copy_rgbx64_xrgb1555(RASTER *rin, RASTER *rout,
 			tmp_r = (tmp_r + fac_fac_4) >> fac_fac_2_bits;
 			tmp_g = (tmp_g + fac_fac_4) >> fac_fac_2_bits;
 			tmp_b = (tmp_b + fac_fac_4) >> fac_fac_2_bits;
-			D 54
-				*pixout++ = BYTES_TO_RGB16(tmp_r, tmp_g, tmp_b);
+			D 54 *pixout++ = BYTES_TO_RGB16(tmp_r, tmp_g, tmp_b);
 			E 54
 I 54
-D 60
-				*pixout++ = ROP_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
+D 60 *pixout++ = ROP_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
 			E 60
-I 60
-				*pixout++ = PIX_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
+I 60 *pixout++ = PIX_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
 			E 60
 E 54 pixin += factor;
 		}
@@ -5550,15 +5595,12 @@ rop_copy_rgbx64_xrgb1555(RASTER *rin, RASTER *rout,
 			tmp_r = (tmp_r + fac_xrest_2) / fac_xrest;
 			tmp_g = (tmp_g + fac_xrest_2) / fac_xrest;
 			tmp_b = (tmp_b + fac_xrest_2) / fac_xrest;
-			D 54
-				*pixout = BYTES_TO_RGB16(tmp_r, tmp_g, tmp_b);
+			D 54 *pixout = BYTES_TO_RGB16(tmp_r, tmp_g, tmp_b);
 			E 54
 I 54
-D 60
-				*pixout = ROP_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
+D 60 *pixout = ROP_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
 			E 60
-I 60
-				*pixout = PIX_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
+I 60 *pixout = PIX_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
 			E 60
 E 54
 		}
@@ -5580,15 +5622,12 @@ rop_copy_rgbx64_xrgb1555(RASTER *rin, RASTER *rout,
 			tmp_r = (tmp_r + yrest_fac_2) / yrest_fac;
 			tmp_g = (tmp_g + yrest_fac_2) / yrest_fac;
 			tmp_b = (tmp_b + yrest_fac_2) / yrest_fac;
-			D 54
-				*pixout++ = BYTES_TO_RGB16(tmp_r, tmp_g, tmp_b);
+			D 54 *pixout++ = BYTES_TO_RGB16(tmp_r, tmp_g, tmp_b);
 			E 54
 I 54
-D 60
-				*pixout++ = ROP_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
+D 60 *pixout++ = ROP_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
 			E 60
-I 60
-				*pixout++ = PIX_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
+I 60 *pixout++ = PIX_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
 			E 60
 E 54 pixin += factor;
 		}
@@ -5604,15 +5643,12 @@ rop_copy_rgbx64_xrgb1555(RASTER *rin, RASTER *rout,
 			tmp_r = (tmp_r + yrest_xrest_2) / yrest_xrest;
 			tmp_g = (tmp_g + yrest_xrest_2) / yrest_xrest;
 			tmp_b = (tmp_b + yrest_xrest_2) / yrest_xrest;
-			D 54
-				*pixout = BYTES_TO_RGB16(tmp_r, tmp_g, tmp_b);
+			D 54 *pixout = BYTES_TO_RGB16(tmp_r, tmp_g, tmp_b);
 			E 54
 I 54
-D 60
-				*pixout = ROP_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
+D 60 *pixout = ROP_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
 			E 60
-I 60
-				*pixout = PIX_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
+I 60 *pixout = PIX_RGB16_FROM_BYTES(tmp_r, tmp_g, tmp_b);
 			E 60
 E 54
 		}
@@ -5621,9 +5657,8 @@ rop_copy_rgbx64_xrgb1555(RASTER *rin, RASTER *rout,
 
 /*---------------------------------------------------------------------------*/
 
-I 95 static void rop_zoom_out_rgbx64_rgb16(RASTER *rin, RASTER *rout,
-											int x1, int y1, int x2, int y2,
-											int newx, int newy, int abs_zoom_level)
+I 95 static void rop_zoom_out_rgbx64_rgb16(RASTER *rin, RASTER *rout, int x1, int y1, int x2,
+											int y2, int newx, int newy, int abs_zoom_level)
 {
 	SPIXEL *rowin, *pixin, *in, valin;
 	USHORT *rowout, *pixout;
@@ -5749,12 +5784,11 @@ rop_copy_rgbx64_xrgb1555(RASTER *rin, RASTER *rout,
 	/* copia un rettangolo da rin a rout.
  * Le coordinate sono relative ai due raster: (0, 0) corrisponde
  * al primo pixel del raster.
- * 
+ *
  */
 
 	void
-	rop_copy(RASTER *rin, RASTER *rout,
-			 int x1, int y1, int x2, int y2, int newx, int newy)
+	rop_copy(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2, int newx, int newy)
 {
 	D 13 char *rowin, *rowout;
 	E 13
@@ -5837,85 +5871,138 @@ rop_copy_rgbx64_xrgb1555(RASTER *rin, RASTER *rout,
 D 96 rasras = RASRAS(rin->type, rout->type);
 	switch (rasras)
 		E 96
-I 96 if (rin->type == rout->type)
-			rop_copy_same(rin, rout, x1, y1, x2, y2, newx, newy);
+I 96 if (rin->type == rout->type) rop_copy_same(rin, rout, x1, y1, x2, y2, newx, newy);
 	else E 96
 	{
 		I 73
-D 96 CASE RASRAS(RAS_RGBM64, RAS_RGBM64) : __OR RASRAS(RAS_RGB_64, RAS_RGB_64) : __OR RASRAS(RAS_RGBM, RAS_RGB_) : __OR RASRAS(RAS_RGBM, RAS_RGBM) : __OR RASRAS(RAS_RGB_, RAS_RGB_) : __OR RASRAS(RAS_RGB, RAS_RGB) : __OR RASRAS(RAS_RGB16, RAS_RGB16) :
-D 83 __OR RASRAS(RAS_UNICM16, RAS_UNICM16) :
-E 83 __OR RASRAS(RAS_CM16S8, RAS_CM16S8) : __OR RASRAS(RAS_CM16S4, RAS_CM16S4) : __OR RASRAS(RAS_CM16, RAS_CM16) : __OR RASRAS(RAS_MBW16, RAS_MBW16) : __OR RASRAS(RAS_GR8, RAS_GR8) :
-I 90 __OR RASRAS(RAS_GR16, RAS_GR16) :
+D 96 CASE RASRAS(RAS_RGBM64, RAS_RGBM64)
+			: __OR RASRAS(RAS_RGB_64, RAS_RGB_64)
+			: __OR RASRAS(RAS_RGBM, RAS_RGB_)
+			: __OR RASRAS(RAS_RGBM, RAS_RGBM)
+			: __OR RASRAS(RAS_RGB_, RAS_RGB_)
+			: __OR RASRAS(RAS_RGB, RAS_RGB)
+			: __OR RASRAS(RAS_RGB16, RAS_RGB16)
+			:
+D 83 __OR RASRAS(RAS_UNICM16, RAS_UNICM16)
+			:
+E 83 __OR RASRAS(RAS_CM16S8, RAS_CM16S8)
+			: __OR RASRAS(RAS_CM16S4, RAS_CM16S4)
+			: __OR RASRAS(RAS_CM16, RAS_CM16)
+			: __OR RASRAS(RAS_MBW16, RAS_MBW16)
+			: __OR RASRAS(RAS_GR8, RAS_GR8)
+			:
+I 90 __OR RASRAS(RAS_GR16, RAS_GR16)
+			:
 E 90
-D 83 __OR RASRAS(RAS_UNICM8, RAS_UNICM8) :
-E 83 __OR RASRAS(RAS_CM8, RAS_CM8) : __OR RASRAS(RAS_CM8S8, RAS_CM8S8) : __OR RASRAS(RAS_CM8S4, RAS_CM8S4) :
-I 84 __OR RASRAS(RAS_CM24, RAS_CM24) :
+D 83 __OR RASRAS(RAS_UNICM8, RAS_UNICM8)
+			:
+E 83 __OR RASRAS(RAS_CM8, RAS_CM8)
+			: __OR RASRAS(RAS_CM8S8, RAS_CM8S8)
+			: __OR RASRAS(RAS_CM8S4, RAS_CM8S4)
+			:
+I 84 __OR RASRAS(RAS_CM24, RAS_CM24)
+			:
 E 84 rop_copy_same(rin, rout, x1, y1, x2, y2, newx, newy);
 
 		E 73
-D 18 CASE RASRAS(RAS_CM16, RAS_RGBM) :
+D 18 CASE RASRAS(RAS_CM16, RAS_RGBM)
+			:
 E 18
-I 18 CASE RASRAS(RAS_GR8, RAS_RGB_) : __OR RASRAS(RAS_GR8, RAS_RGBM) : rop_copy_gr8_rgbm(rin, rout, x1, y1, x2, y2, newx, newy);
+I 18 CASE RASRAS(RAS_GR8, RAS_RGB_)
+			: __OR RASRAS(RAS_GR8, RAS_RGBM)
+			: rop_copy_gr8_rgbm(rin, rout, x1, y1, x2, y2, newx, newy);
 		D 41 return;
 		E 41
 
-			CASE RASRAS(RAS_CM16, RAS_RGB_) : __OR RASRAS(RAS_CM16, RAS_RGBM) :
+			CASE RASRAS(RAS_CM16, RAS_RGB_)
+			: __OR RASRAS(RAS_CM16, RAS_RGBM)
+			:
 E 18 rop_copy_cm16_rgbm(rin, rout, x1, y1, x2, y2, newx, newy);
 		D 41 return;
 		E 41
 
-I 84 CASE RASRAS(RAS_CM24, RAS_RGB_) : __OR RASRAS(RAS_CM24, RAS_RGBM) : rop_copy_cm24_rgbm(rin, rout, x1, y1, x2, y2, newx, newy);
+I 84 CASE RASRAS(RAS_CM24, RAS_RGB_)
+			: __OR RASRAS(RAS_CM24, RAS_RGBM)
+			: rop_copy_cm24_rgbm(rin, rout, x1, y1, x2, y2, newx, newy);
 
 		E 84
-I 58 CASE RASRAS(RAS_CM16, RAS_RGB_64) : __OR RASRAS(RAS_CM16, RAS_RGBM64) : rop_copy_cm16_rgbm64(rin, rout, x1, y1, x2, y2, newx, newy);
+I 58 CASE RASRAS(RAS_CM16, RAS_RGB_64)
+			: __OR RASRAS(RAS_CM16, RAS_RGBM64)
+			: rop_copy_cm16_rgbm64(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		I 84 CASE RASRAS(RAS_CM24, RAS_RGB_64) : __OR RASRAS(RAS_CM24, RAS_RGBM64) : rop_copy_cm24_rgbm64(rin, rout, x1, y1, x2, y2, newx, newy);
+		I 84 CASE RASRAS(RAS_CM24, RAS_RGB_64)
+			: __OR RASRAS(RAS_CM24, RAS_RGBM64)
+			: rop_copy_cm24_rgbm64(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		E 84 CASE RASRAS(RAS_RGBM, RAS_RGBM64) : rop_copy_rgbm_rgbm64(rin, rout, x1, y1, x2, y2, newx, newy);
+		E 84 CASE RASRAS(RAS_RGBM, RAS_RGBM64)
+			: rop_copy_rgbm_rgbm64(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		CASE RASRAS(RAS_RGBM64, RAS_RGBM) : rop_copy_rgbm64_rgbm(rin, rout, x1, y1, x2, y2, newx, newy);
+		CASE RASRAS(RAS_RGBM64, RAS_RGBM)
+			: rop_copy_rgbm64_rgbm(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		I 95 CASE RASRAS(RAS_RGB_64, RAS_RGB_) : __OR RASRAS(RAS_RGBM64, RAS_RGB_) : __OR RASRAS(RAS_RGB_64, RAS_RGBM) : rop_copy_rgbx64_rgbx(rin, rout, x1, y1, x2, y2, newx, newy);
+		I 95 CASE RASRAS(RAS_RGB_64, RAS_RGB_)
+			: __OR RASRAS(RAS_RGBM64, RAS_RGB_)
+			: __OR RASRAS(RAS_RGB_64, RAS_RGBM)
+			: rop_copy_rgbx64_rgbx(rin, rout, x1, y1, x2, y2, newx, newy);
 
 		E 95
-I 81 CASE RASRAS(RAS_RGB, RAS_RGB16) : rop_copy_rgb_rgb16(rin, rout, x1, y1, x2, y2, newx, newy);
+I 81 CASE RASRAS(RAS_RGB, RAS_RGB16)
+			: rop_copy_rgb_rgb16(rin, rout, x1, y1, x2, y2, newx, newy);
 
 		E 81
 E 58
-I 18 CASE RASRAS(RAS_RGB, RAS_RGB_) : __OR RASRAS(RAS_RGB, RAS_RGBM) : rop_copy_rgb_rgbm(rin, rout, x1, y1, x2, y2, newx, newy);
+I 18 CASE RASRAS(RAS_RGB, RAS_RGB_)
+			: __OR RASRAS(RAS_RGB, RAS_RGBM)
+			: rop_copy_rgb_rgbm(rin, rout, x1, y1, x2, y2, newx, newy);
 		D 41 return;
 		E 41
 
-I 68 CASE RASRAS(RAS_BW, RAS_BW) : __OR RASRAS(RAS_BW, RAS_WB) : __OR RASRAS(RAS_WB, RAS_BW) : __OR RASRAS(RAS_WB, RAS_WB) :
+I 68 CASE RASRAS(RAS_BW, RAS_BW)
+			: __OR RASRAS(RAS_BW, RAS_WB)
+			: __OR RASRAS(RAS_WB, RAS_BW)
+			: __OR RASRAS(RAS_WB, RAS_WB)
+			:
 D 69 rop_copy_bw_bw(rin, rout, x1, y1, x2, y2, newx, newy);
 		E 69
 I 69 rop_copy_bw(rin, rout, x1, y1, x2, y2, newx, newy);
 		E 69
 
 E 68
-E 18 CASE RASRAS(RAS_BW, RAS_CM16) : __OR RASRAS(RAS_WB, RAS_CM16) : rop_copy_bw_cm16(rin, rout, x1, y1, x2, y2, newx, newy);
+E 18 CASE RASRAS(RAS_BW, RAS_CM16)
+			: __OR RASRAS(RAS_WB, RAS_CM16)
+			: rop_copy_bw_cm16(rin, rout, x1, y1, x2, y2, newx, newy);
 		I 19
 D 41 return;
 		E 41
 
-I 84 CASE RASRAS(RAS_BW, RAS_CM24) : __OR RASRAS(RAS_WB, RAS_CM24) : rop_copy_bw_cm24(rin, rout, x1, y1, x2, y2, newx, newy);
+I 84 CASE RASRAS(RAS_BW, RAS_CM24)
+			: __OR RASRAS(RAS_WB, RAS_CM24)
+			: rop_copy_bw_cm24(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		E 84 CASE RASRAS(RAS_BW, RAS_RGB_) : __OR RASRAS(RAS_BW, RAS_RGBM) : __OR RASRAS(RAS_WB, RAS_RGB_) : __OR RASRAS(RAS_WB, RAS_RGBM) : rop_copy_bw_rgbm(rin, rout, x1, y1, x2, y2, newx, newy);
+		E 84 CASE RASRAS(RAS_BW, RAS_RGB_)
+			: __OR RASRAS(RAS_BW, RAS_RGBM)
+			: __OR RASRAS(RAS_WB, RAS_RGB_)
+			: __OR RASRAS(RAS_WB, RAS_RGBM)
+			: rop_copy_bw_rgbm(rin, rout, x1, y1, x2, y2, newx, newy);
 		E 19
 D 41 return;
 		E 41
 I 6
 
-			CASE RASRAS(RAS_GR8, RAS_CM16) : rop_copy_gr8_cm16(rin, rout, x1, y1, x2, y2, newx, newy);
+			CASE RASRAS(RAS_GR8, RAS_CM16)
+			: rop_copy_gr8_cm16(rin, rout, x1, y1, x2, y2, newx, newy);
 		D 41 return;
 		E 41
 I 23
 
-I 84 CASE RASRAS(RAS_GR8, RAS_CM24) : rop_copy_gr8_cm24(rin, rout, x1, y1, x2, y2, newx, newy);
+I 84 CASE RASRAS(RAS_GR8, RAS_CM24)
+			: rop_copy_gr8_cm24(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		E 84 CASE RASRAS(RAS_CM8, RAS_CM16) : rop_copy_cm8_cm16(rin, rout, x1, y1, x2, y2, newx, newy);
+		E 84 CASE RASRAS(RAS_CM8, RAS_CM16)
+			: rop_copy_cm8_cm16(rin, rout, x1, y1, x2, y2, newx, newy);
 		D 41 return;
-		I 39 CASE RASRAS(RAS_CM16, RAS_BW) : rop_copy_cm8_cm16(rin, rout, x1, y1, x2, y2, newx, newy);
+		I 39 CASE RASRAS(RAS_CM16, RAS_BW)
+			: rop_copy_cm8_cm16(rin, rout, x1, y1, x2, y2, newx, newy);
 		return;
 	DEFAULT:
 		rop_copy_quantize(rasras, rin, rout, x1, y1, x2, y2, newx, newy);
@@ -5929,7 +6016,8 @@ rop_copy_rgbx64_xrgb1555(RASTER *rin, RASTER *rout,
 	pixbytes_out = rop_pixbytes(rout->type);
 	E 41
 
-I 84 CASE RASRAS(RAS_CM8, RAS_CM24) : rop_copy_cm8_cm24(rin, rout, x1, y1, x2, y2, newx, newy);
+I 84 CASE RASRAS(RAS_CM8, RAS_CM24)
+		: rop_copy_cm8_cm24(rin, rout, x1, y1, x2, y2, newx, newy);
 
 	E 84
 E 23
@@ -5948,78 +6036,212 @@ rop_copy_rgbx64_xrgb1555(RASTER *rin, RASTER *rout,
 	}
 	E 41
 I 41
-D 52 CASE RASRAS(RAS_GR8, RAS_GR8) : __OR RASRAS(RAS_CM8, RAS_CM8) : __OR RASRAS(RAS_CM16, RAS_CM16) : __OR RASRAS(RAS_RGB, RAS_RGB) : __OR RASRAS(RAS_RGB_, RAS_RGB_) : __OR RASRAS(RAS_RGBM, RAS_RGB_) : __OR RASRAS(RAS_RGBM, RAS_RGBM) :
+D 52 CASE RASRAS(RAS_GR8, RAS_GR8)
+		: __OR RASRAS(RAS_CM8, RAS_CM8)
+		: __OR RASRAS(RAS_CM16, RAS_CM16)
+		: __OR RASRAS(RAS_RGB, RAS_RGB)
+		: __OR RASRAS(RAS_RGB_, RAS_RGB_)
+		: __OR RASRAS(RAS_RGBM, RAS_RGB_)
+		: __OR RASRAS(RAS_RGBM, RAS_RGBM)
+		:
 E 52
 I 52
-D 73 CASE RASRAS(RAS_GR8, RAS_GR8) : __OR RASRAS(RAS_CM8, RAS_CM8) : __OR RASRAS(RAS_CM16, RAS_CM16) : __OR RASRAS(RAS_RGB16, RAS_RGB16) : __OR RASRAS(RAS_RGB, RAS_RGB) : __OR RASRAS(RAS_RGB_, RAS_RGB_) : __OR RASRAS(RAS_RGBM, RAS_RGB_) : __OR RASRAS(RAS_RGBM, RAS_RGBM) :
-I 58 __OR RASRAS(RAS_RGBM64, RAS_RGBM64) : __OR RASRAS(RAS_RGB_64, RAS_RGB_64) :
+D 73 CASE RASRAS(RAS_GR8, RAS_GR8)
+		: __OR RASRAS(RAS_CM8, RAS_CM8)
+		: __OR RASRAS(RAS_CM16, RAS_CM16)
+		: __OR RASRAS(RAS_RGB16, RAS_RGB16)
+		: __OR RASRAS(RAS_RGB, RAS_RGB)
+		: __OR RASRAS(RAS_RGB_, RAS_RGB_)
+		: __OR RASRAS(RAS_RGBM, RAS_RGB_)
+		: __OR RASRAS(RAS_RGBM, RAS_RGBM)
+		:
+I 58 __OR RASRAS(RAS_RGBM64, RAS_RGBM64)
+		: __OR RASRAS(RAS_RGB_64, RAS_RGB_64)
+		:
 E 58
-E 52 __OR RASRAS(RAS_MBW16, RAS_MBW16) : __OR RASRAS(RAS_UNICM8, RAS_UNICM8) : __OR RASRAS(RAS_UNICM16, RAS_UNICM16) :
-I 72 __OR RASRAS(RAS_CM8S8, RAS_CM8S8) : __OR RASRAS(RAS_CM8S4, RAS_CM8S4) : __OR RASRAS(RAS_CM16S8, RAS_CM16S8) : __OR RASRAS(RAS_CM16S4, RAS_CM16S4) :
+E 52 __OR RASRAS(RAS_MBW16, RAS_MBW16)
+		: __OR RASRAS(RAS_UNICM8, RAS_UNICM8)
+		: __OR RASRAS(RAS_UNICM16, RAS_UNICM16)
+		:
+I 72 __OR RASRAS(RAS_CM8S8, RAS_CM8S8)
+		: __OR RASRAS(RAS_CM8S4, RAS_CM8S4)
+		: __OR RASRAS(RAS_CM16S8, RAS_CM16S8)
+		: __OR RASRAS(RAS_CM16S4, RAS_CM16S4)
+		:
 E 72 rop_copy_same(rin, rout, x1, y1, x2, y2, newx, newy);
 
-	D 71 CASE RASRAS(RAS_RGBM, RAS_UNICM16) :
+	D 71 CASE RASRAS(RAS_RGBM, RAS_UNICM16)
+		:
 E 71
-I 71 CASE RASRAS(RAS_RGB_, RAS_UNICM16) : __OR RASRAS(RAS_RGBM, RAS_UNICM16) : __OR RASRAS(RAS_RGB_, RAS_UNICM8) :
-E 71 __OR RASRAS(RAS_RGBM, RAS_UNICM8) :
-I 71 __OR RASRAS(RAS_RGB_, RAS_GR8) :
-E 71 __OR RASRAS(RAS_RGBM, RAS_GR8) :
-I 71 __OR RASRAS(RAS_RGB_, RAS_MBW16) :
-E 71 __OR RASRAS(RAS_RGBM, RAS_MBW16) :
-I 72 __OR RASRAS(RAS_RGB_, RAS_BW) : __OR RASRAS(RAS_RGBM, RAS_BW) : __OR RASRAS(RAS_RGB16, RAS_BW) :
+I 71 CASE RASRAS(RAS_RGB_, RAS_UNICM16)
+		: __OR RASRAS(RAS_RGBM, RAS_UNICM16)
+		: __OR RASRAS(RAS_RGB_, RAS_UNICM8)
+		:
+E 71 __OR RASRAS(RAS_RGBM, RAS_UNICM8)
+		:
+I 71 __OR RASRAS(RAS_RGB_, RAS_GR8)
+		:
+E 71 __OR RASRAS(RAS_RGBM, RAS_GR8)
+		:
+I 71 __OR RASRAS(RAS_RGB_, RAS_MBW16)
+		:
+E 71 __OR RASRAS(RAS_RGBM, RAS_MBW16)
+		:
+I 72 __OR RASRAS(RAS_RGB_, RAS_BW)
+		: __OR RASRAS(RAS_RGBM, RAS_BW)
+		: __OR RASRAS(RAS_RGB16, RAS_BW)
+		:
 E 72
-I 42 __OR RASRAS(RAS_CM16, RAS_UNICM16) : __OR RASRAS(RAS_CM16, RAS_UNICM8) : __OR RASRAS(RAS_CM16, RAS_GR8) : __OR RASRAS(RAS_CM16, RAS_MBW16) :
-E 42 __OR RASRAS(RAS_UNICM16, RAS_UNICM8) : __OR RASRAS(RAS_UNICM16, RAS_GR8) :
-I 71 __OR RASRAS(RAS_RGB_, RAS_CM16S8) : __OR RASRAS(RAS_RGBM, RAS_CM16S8) : __OR RASRAS(RAS_RGB_, RAS_CM16S4) : __OR RASRAS(RAS_RGBM, RAS_CM16S4) : __OR RASRAS(RAS_RGB_, RAS_CM8S8) : __OR RASRAS(RAS_RGBM, RAS_CM8S8) :
-I 72 __OR RASRAS(RAS_RGB16, RAS_CM8S8) :
-E 72 __OR RASRAS(RAS_RGB_, RAS_CM8S4) : __OR RASRAS(RAS_RGBM, RAS_CM8S4) : __OR RASRAS(RAS_CM16, RAS_CM16S8) : __OR RASRAS(RAS_CM16, RAS_CM16S4) : __OR RASRAS(RAS_CM16, RAS_CM8S8) : __OR RASRAS(RAS_CM16, RAS_CM8S4) :
+I 42 __OR RASRAS(RAS_CM16, RAS_UNICM16)
+		: __OR RASRAS(RAS_CM16, RAS_UNICM8)
+		: __OR RASRAS(RAS_CM16, RAS_GR8)
+		: __OR RASRAS(RAS_CM16, RAS_MBW16)
+		:
+E 42 __OR RASRAS(RAS_UNICM16, RAS_UNICM8)
+		: __OR RASRAS(RAS_UNICM16, RAS_GR8)
+		:
+I 71 __OR RASRAS(RAS_RGB_, RAS_CM16S8)
+		: __OR RASRAS(RAS_RGBM, RAS_CM16S8)
+		: __OR RASRAS(RAS_RGB_, RAS_CM16S4)
+		: __OR RASRAS(RAS_RGBM, RAS_CM16S4)
+		: __OR RASRAS(RAS_RGB_, RAS_CM8S8)
+		: __OR RASRAS(RAS_RGBM, RAS_CM8S8)
+		:
+I 72 __OR RASRAS(RAS_RGB16, RAS_CM8S8)
+		:
+E 72 __OR RASRAS(RAS_RGB_, RAS_CM8S4)
+		: __OR RASRAS(RAS_RGBM, RAS_CM8S4)
+		: __OR RASRAS(RAS_CM16, RAS_CM16S8)
+		: __OR RASRAS(RAS_CM16, RAS_CM16S4)
+		: __OR RASRAS(RAS_CM16, RAS_CM8S8)
+		: __OR RASRAS(RAS_CM16, RAS_CM8S4)
+		:
 E 71
-D 42 __OR RASRAS(RAS_CM16, RAS_MBW16) :
+D 42 __OR RASRAS(RAS_CM16, RAS_MBW16)
+		:
 E 42 rop_copy_quantize(rasras, rin, rout, x1, y1, x2, y2, newx, newy);
 	E 41
 
 E 73
-I 54 CASE RASRAS(RAS_BW, RAS_RGB16) : __OR RASRAS(RAS_WB, RAS_RGB16) : rop_copy_bw_rgb16(rin, rout, x1, y1, x2, y2, newx, newy);
+I 54 CASE RASRAS(RAS_BW, RAS_RGB16)
+		: __OR RASRAS(RAS_WB, RAS_RGB16)
+		: rop_copy_bw_rgb16(rin, rout, x1, y1, x2, y2, newx, newy);
 
 	CASE RASRAS(RAS_GR8, RAS_RGB16) : rop_copy_gr8_rgb16(rin, rout, x1, y1, x2, y2, newx, newy);
 
 	E 54
-I 52 CASE RASRAS(RAS_CM16, RAS_RGB16) : rop_copy_cm16_rgb16(rin, rout, x1, y1, x2, y2, newx, newy);
+I 52 CASE RASRAS(RAS_CM16, RAS_RGB16)
+		: rop_copy_cm16_rgb16(rin, rout, x1, y1, x2, y2, newx, newy);
 
-	I 84 CASE RASRAS(RAS_CM24, RAS_RGB16) : rop_copy_cm24_rgb16(rin, rout, x1, y1, x2, y2, newx, newy);
+	I 84 CASE RASRAS(RAS_CM24, RAS_RGB16)
+		: rop_copy_cm24_rgb16(rin, rout, x1, y1, x2, y2, newx, newy);
 
-	E 84 CASE RASRAS(RAS_RGB_, RAS_RGB16) : __OR RASRAS(RAS_RGBM, RAS_RGB16) : rop_copy_rgbx_rgb16(rin, rout, x1, y1, x2, y2, newx, newy);
+	E 84 CASE RASRAS(RAS_RGB_, RAS_RGB16)
+		: __OR RASRAS(RAS_RGBM, RAS_RGB16)
+		: rop_copy_rgbx_rgb16(rin, rout, x1, y1, x2, y2, newx, newy);
 	I 70
 
-I 95 CASE RASRAS(RAS_RGB_64, RAS_RGB16) : __OR RASRAS(RAS_RGBM64, RAS_RGB16) : rop_copy_rgbx64_rgb16(rin, rout, x1, y1, x2, y2, newx, newy);
+I 95 CASE RASRAS(RAS_RGB_64, RAS_RGB16)
+		: __OR RASRAS(RAS_RGBM64, RAS_RGB16)
+		: rop_copy_rgbx64_rgb16(rin, rout, x1, y1, x2, y2, newx, newy);
 
 	E 95
-D 74 CASE RASRAS(RAS_RGB16, RAS_RGBM) :
+D 74 CASE RASRAS(RAS_RGB16, RAS_RGBM)
+		:
 E 74
-I 74 CASE RASRAS(RAS_RGB16, RAS_RGB_) : __OR RASRAS(RAS_RGB16, RAS_RGBM) :
+I 74 CASE RASRAS(RAS_RGB16, RAS_RGB_)
+		: __OR RASRAS(RAS_RGB16, RAS_RGBM)
+		:
 E 74 rop_copy_rgb16_rgbm(rin, rout, x1, y1, x2, y2, newx, newy);
 	E 70
 
-I 67 CASE RASRAS(RAS_RGB_, RAS_RGB) : __OR RASRAS(RAS_RGBM, RAS_RGB) : rop_copy_rgbx_rgb(rin, rout, x1, y1, x2, y2, newx, newy);
+I 67 CASE RASRAS(RAS_RGB_, RAS_RGB)
+		: __OR RASRAS(RAS_RGBM, RAS_RGB)
+		: rop_copy_rgbx_rgb(rin, rout, x1, y1, x2, y2, newx, newy);
 	I 73
 
-D 83 CASE RASRAS(RAS_RGBM, RAS_UNICM16) : __OR RASRAS(RAS_RGBM, RAS_CM16S8) : __OR RASRAS(RAS_RGBM, RAS_CM16S4) : __OR RASRAS(RAS_RGBM, RAS_MBW16) : __OR RASRAS(RAS_RGBM, RAS_UNICM8) : __OR RASRAS(RAS_RGBM, RAS_GR8) : __OR RASRAS(RAS_RGBM, RAS_CM8S8) : __OR RASRAS(RAS_RGBM, RAS_CM8S4) : __OR RASRAS(RAS_RGBM, RAS_BW) :
+D 83 CASE RASRAS(RAS_RGBM, RAS_UNICM16)
+		: __OR RASRAS(RAS_RGBM, RAS_CM16S8)
+		: __OR RASRAS(RAS_RGBM, RAS_CM16S4)
+		: __OR RASRAS(RAS_RGBM, RAS_MBW16)
+		: __OR RASRAS(RAS_RGBM, RAS_UNICM8)
+		: __OR RASRAS(RAS_RGBM, RAS_GR8)
+		: __OR RASRAS(RAS_RGBM, RAS_CM8S8)
+		: __OR RASRAS(RAS_RGBM, RAS_CM8S4)
+		: __OR RASRAS(RAS_RGBM, RAS_BW)
+		:
 
-																																																																																  __OR RASRAS(RAS_RGB_, RAS_UNICM16) : __OR RASRAS(RAS_RGB_, RAS_CM16S8) : __OR RASRAS(RAS_RGB_, RAS_CM16S4) : __OR RASRAS(RAS_RGB_, RAS_MBW16) : __OR RASRAS(RAS_RGB_, RAS_UNICM8) : __OR RASRAS(RAS_RGB_, RAS_GR8) : __OR RASRAS(RAS_RGB_, RAS_CM8S8) : __OR RASRAS(RAS_RGB_, RAS_CM8S4) : __OR RASRAS(RAS_RGB_, RAS_BW) :
+		  __OR RASRAS(RAS_RGB_, RAS_UNICM16)
+		: __OR RASRAS(RAS_RGB_, RAS_CM16S8)
+		: __OR RASRAS(RAS_RGB_, RAS_CM16S4)
+		: __OR RASRAS(RAS_RGB_, RAS_MBW16)
+		: __OR RASRAS(RAS_RGB_, RAS_UNICM8)
+		: __OR RASRAS(RAS_RGB_, RAS_GR8)
+		: __OR RASRAS(RAS_RGB_, RAS_CM8S8)
+		: __OR RASRAS(RAS_RGB_, RAS_CM8S4)
+		: __OR RASRAS(RAS_RGB_, RAS_BW)
+		:
 
-																																																																																																																																																															 __OR RASRAS(RAS_RGB16, RAS_CM8S8) : __OR RASRAS(RAS_RGB16, RAS_BW) :
+		  __OR RASRAS(RAS_RGB16, RAS_CM8S8)
+		: __OR RASRAS(RAS_RGB16, RAS_BW)
+		:
 
-																																																																																																																																																																																  __OR RASRAS(RAS_CM16, RAS_UNICM16) : __OR RASRAS(RAS_CM16, RAS_CM16S8) : __OR RASRAS(RAS_CM16, RAS_CM16S4) : __OR RASRAS(RAS_CM16, RAS_MBW16) : __OR RASRAS(RAS_CM16, RAS_UNICM8) : __OR RASRAS(RAS_CM16, RAS_GR8) : __OR RASRAS(RAS_CM16, RAS_CM8S8) : __OR RASRAS(RAS_CM16, RAS_CM8S4) : __OR RASRAS(RAS_CM16, RAS_BW) :
+		  __OR RASRAS(RAS_CM16, RAS_UNICM16)
+		: __OR RASRAS(RAS_CM16, RAS_CM16S8)
+		: __OR RASRAS(RAS_CM16, RAS_CM16S4)
+		: __OR RASRAS(RAS_CM16, RAS_MBW16)
+		: __OR RASRAS(RAS_CM16, RAS_UNICM8)
+		: __OR RASRAS(RAS_CM16, RAS_GR8)
+		: __OR RASRAS(RAS_CM16, RAS_CM8S8)
+		: __OR RASRAS(RAS_CM16, RAS_CM8S4)
+		: __OR RASRAS(RAS_CM16, RAS_BW)
+		:
 
-																																																																																																																																																																																																																																																															 __OR RASRAS(RAS_UNICM16, RAS_UNICM8) : __OR RASRAS(RAS_UNICM16, RAS_GR8) :
+		  __OR RASRAS(RAS_UNICM16, RAS_UNICM8)
+		: __OR RASRAS(RAS_UNICM16, RAS_GR8)
+		:
 E 83
-I 83 CASE RASRAS(RAS_RGBM, RAS_CM16S8) : __OR RASRAS(RAS_RGBM, RAS_CM16S4) : __OR RASRAS(RAS_RGBM, RAS_MBW16) : __OR RASRAS(RAS_RGBM, RAS_GR8) :
-I 90 __OR RASRAS(RAS_RGBM64, RAS_GR8) : __OR RASRAS(RAS_RGBM, RAS_GR16) : __OR RASRAS(RAS_RGBM64, RAS_GR16) :
-E 90 __OR RASRAS(RAS_RGBM, RAS_CM8S8) : __OR RASRAS(RAS_RGBM, RAS_CM8S4) : __OR RASRAS(RAS_RGBM, RAS_BW) : __OR RASRAS(RAS_RGB_, RAS_CM16S8) : __OR RASRAS(RAS_RGB_, RAS_CM16S4) : __OR RASRAS(RAS_RGB_, RAS_MBW16) : __OR RASRAS(RAS_RGB_, RAS_GR8) : __OR RASRAS(RAS_RGB_, RAS_CM8S8) : __OR RASRAS(RAS_RGB_, RAS_CM8S4) : __OR RASRAS(RAS_RGB_, RAS_BW) : __OR RASRAS(RAS_RGB16, RAS_CM8S8) : __OR RASRAS(RAS_RGB16, RAS_BW) : __OR RASRAS(RAS_CM16, RAS_CM16S8) : __OR RASRAS(RAS_CM16, RAS_CM16S4) : __OR RASRAS(RAS_CM16, RAS_MBW16) : __OR RASRAS(RAS_CM16, RAS_GR8) :
-I 90 __OR RASRAS(RAS_CM16, RAS_GR16) :
-E 90 __OR RASRAS(RAS_CM16, RAS_CM8S8) : __OR RASRAS(RAS_CM16, RAS_CM8S4) : __OR RASRAS(RAS_CM16, RAS_BW) :
-I 84 __OR RASRAS(RAS_CM24, RAS_CM16S8) : __OR RASRAS(RAS_CM24, RAS_CM16S4) : __OR RASRAS(RAS_CM24, RAS_MBW16) : __OR RASRAS(RAS_CM24, RAS_GR8) :
-D 89 __OR RASRAS(RAS_CM24, RAS_CM8S8) : __OR RASRAS(RAS_CM24, RAS_CM8S4) : __OR RASRAS(RAS_CM24, RAS_BW) :
+I 83 CASE RASRAS(RAS_RGBM, RAS_CM16S8)
+		: __OR RASRAS(RAS_RGBM, RAS_CM16S4)
+		: __OR RASRAS(RAS_RGBM, RAS_MBW16)
+		: __OR RASRAS(RAS_RGBM, RAS_GR8)
+		:
+I 90 __OR RASRAS(RAS_RGBM64, RAS_GR8)
+		: __OR RASRAS(RAS_RGBM, RAS_GR16)
+		: __OR RASRAS(RAS_RGBM64, RAS_GR16)
+		:
+E 90 __OR RASRAS(RAS_RGBM, RAS_CM8S8)
+		: __OR RASRAS(RAS_RGBM, RAS_CM8S4)
+		: __OR RASRAS(RAS_RGBM, RAS_BW)
+		: __OR RASRAS(RAS_RGB_, RAS_CM16S8)
+		: __OR RASRAS(RAS_RGB_, RAS_CM16S4)
+		: __OR RASRAS(RAS_RGB_, RAS_MBW16)
+		: __OR RASRAS(RAS_RGB_, RAS_GR8)
+		: __OR RASRAS(RAS_RGB_, RAS_CM8S8)
+		: __OR RASRAS(RAS_RGB_, RAS_CM8S4)
+		: __OR RASRAS(RAS_RGB_, RAS_BW)
+		: __OR RASRAS(RAS_RGB16, RAS_CM8S8)
+		: __OR RASRAS(RAS_RGB16, RAS_BW)
+		: __OR RASRAS(RAS_CM16, RAS_CM16S8)
+		: __OR RASRAS(RAS_CM16, RAS_CM16S4)
+		: __OR RASRAS(RAS_CM16, RAS_MBW16)
+		: __OR RASRAS(RAS_CM16, RAS_GR8)
+		:
+I 90 __OR RASRAS(RAS_CM16, RAS_GR16)
+		:
+E 90 __OR RASRAS(RAS_CM16, RAS_CM8S8)
+		: __OR RASRAS(RAS_CM16, RAS_CM8S4)
+		: __OR RASRAS(RAS_CM16, RAS_BW)
+		:
+I 84 __OR RASRAS(RAS_CM24, RAS_CM16S8)
+		: __OR RASRAS(RAS_CM24, RAS_CM16S4)
+		: __OR RASRAS(RAS_CM24, RAS_MBW16)
+		: __OR RASRAS(RAS_CM24, RAS_GR8)
+		:
+D 89 __OR RASRAS(RAS_CM24, RAS_CM8S8)
+		: __OR RASRAS(RAS_CM24, RAS_CM8S4)
+		: __OR RASRAS(RAS_CM24, RAS_BW)
+		:
 E 84
 E 83 rop_copy_quantize(rasras, rin, rout, x1, y1, x2, y2, newx, newy);
 	E 73
@@ -6087,8 +6309,7 @@ while (d-- > 0) {
  */
 
 	void
-	rop_reduce(RASTER *rin, RASTER *rout,
-			   int x1, int y1, int x2, int y2, int newx, int newy,
+	rop_reduce(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2, int newx, int newy,
 			   int factor)
 {
 	int tmp, newlx, newly;
@@ -6120,11 +6341,15 @@ while (d-- > 0) {
 
 	rasras = RASRAS(rin->type, rout->type);
 	switch (rasras) {
-		CASE RASRAS(RAS_GR8, RAS_RGB_) : __OR RASRAS(RAS_GR8, RAS_RGBM) : rop_reduce_gr8_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, factor);
+		CASE RASRAS(RAS_GR8, RAS_RGB_)
+			: __OR RASRAS(RAS_GR8, RAS_RGBM)
+			: rop_reduce_gr8_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, factor);
 		return;
 
-		CASE RASRAS(RAS_CM16, RAS_RGB_) :
-D 28 __OR RASRAS(RAS_CM16, RAS_RGBM) :
+		CASE RASRAS(RAS_CM16, RAS_RGB_)
+			:
+D 28 __OR RASRAS(RAS_CM16, RAS_RGBM)
+			:
 E 28
 I 28
 D 46 rop_reduce_cm16_rgb_(rin, rout, x1, y1, x2, y2, newx, newy, factor);
@@ -6132,35 +6357,54 @@ while (d-- > 0) {
 I 46 rop_reduce_cm16_rgbx(rin, rout, x1, y1, x2, y2, newx, newy, factor);
 		E 46 return;
 
-		CASE RASRAS(RAS_CM16, RAS_RGBM) :
+		CASE RASRAS(RAS_CM16, RAS_RGBM)
+			:
 E 28 rop_reduce_cm16_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, factor);
 		return;
 
-		I 81 CASE RASRAS(RAS_RGB, RAS_RGB16) : rop_reduce_rgb_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, factor);
+		I 81 CASE RASRAS(RAS_RGB, RAS_RGB16)
+			: rop_reduce_rgb_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, factor);
 		return;
 
-		E 81 CASE RASRAS(RAS_RGB, RAS_RGB_) : __OR RASRAS(RAS_RGB, RAS_RGBM) : rop_reduce_rgb_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, factor);
+		E 81 CASE RASRAS(RAS_RGB, RAS_RGB_)
+			: __OR RASRAS(RAS_RGB, RAS_RGBM)
+			: rop_reduce_rgb_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, factor);
 		return;
 
-		CASE RASRAS(RAS_BW, RAS_CM16) : __OR RASRAS(RAS_WB, RAS_CM16) : rop_reduce_bw_cm16(rin, rout, x1, y1, x2, y2, newx, newy, factor);
+		CASE RASRAS(RAS_BW, RAS_CM16)
+			: __OR RASRAS(RAS_WB, RAS_CM16)
+			: rop_reduce_bw_cm16(rin, rout, x1, y1, x2, y2, newx, newy, factor);
 		return;
 
-		CASE RASRAS(RAS_BW, RAS_RGB_) : __OR RASRAS(RAS_BW, RAS_RGBM) : __OR RASRAS(RAS_WB, RAS_RGB_) : __OR RASRAS(RAS_WB, RAS_RGBM) : rop_reduce_bw_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, factor);
+		CASE RASRAS(RAS_BW, RAS_RGB_)
+			: __OR RASRAS(RAS_BW, RAS_RGBM)
+			: __OR RASRAS(RAS_WB, RAS_RGB_)
+			: __OR RASRAS(RAS_WB, RAS_RGBM)
+			: rop_reduce_bw_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, factor);
 		return;
 
-		CASE RASRAS(RAS_GR8, RAS_CM16) : rop_reduce_gr8_cm16(rin, rout, x1, y1, x2, y2, newx, newy, factor);
+		CASE RASRAS(RAS_GR8, RAS_CM16)
+			: rop_reduce_gr8_cm16(rin, rout, x1, y1, x2, y2, newx, newy, factor);
 		return;
 
-		CASE RASRAS(RAS_WB, RAS_GR8) : __OR RASRAS(RAS_BW, RAS_GR8) : rop_reduce_bw_gr8(rin, rout, x1, y1, x2, y2, newx, newy, factor);
+		CASE RASRAS(RAS_WB, RAS_GR8)
+			: __OR RASRAS(RAS_BW, RAS_GR8)
+			: rop_reduce_bw_gr8(rin, rout, x1, y1, x2, y2, newx, newy, factor);
 		return;
 
-		CASE RASRAS(RAS_GR8, RAS_GR8) : rop_reduce_gr8(rin, rout, x1, y1, x2, y2, newx, newy, factor);
+		CASE RASRAS(RAS_GR8, RAS_GR8)
+			: rop_reduce_gr8(rin, rout, x1, y1, x2, y2, newx, newy, factor);
 		return;
 
-		CASE RASRAS(RAS_CM16, RAS_CM16) : rop_reduce_cm16(rin, rout, x1, y1, x2, y2, newx, newy, factor);
+		CASE RASRAS(RAS_CM16, RAS_CM16)
+			: rop_reduce_cm16(rin, rout, x1, y1, x2, y2, newx, newy, factor);
 		return;
 
-		CASE RASRAS(RAS_RGB_, RAS_RGB_) : __OR RASRAS(RAS_RGB_, RAS_RGBM) : __OR RASRAS(RAS_RGBM, RAS_RGB_) : __OR RASRAS(RAS_RGBM, RAS_RGBM) : rop_reduce_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, factor);
+		CASE RASRAS(RAS_RGB_, RAS_RGB_)
+			: __OR RASRAS(RAS_RGB_, RAS_RGBM)
+			: __OR RASRAS(RAS_RGBM, RAS_RGB_)
+			: __OR RASRAS(RAS_RGBM, RAS_RGBM)
+			: rop_reduce_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, factor);
 		return;
 
 	DEFAULT:
@@ -6183,8 +6427,7 @@ while (d-- > 0) {
  */
 
 	void
-	rop_shrink(RASTER *rin, RASTER *rout,
-			   int x1, int y1, int x2, int y2, int newx, int newy,
+	rop_shrink(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2, int newx, int newy,
 			   int shrink)
 {
 	UCHAR *curr_pixin, *bufferin;
@@ -6213,11 +6456,9 @@ while (d-- > 0) {
 I 39
 		/* controllo gli sconfinamenti */
 
-		if (x1 < 0 || y1 < 0 || x2 >= rin->lx || y2 >= rin->ly ||
-			newx < 0 || newy < 0 ||
+		if (x1 < 0 || y1 < 0 || x2 >= rin->lx || y2 >= rin->ly || newx < 0 || newy < 0 ||
 			newx + (x2 - x1 + shrink) / shrink > rout->lx ||
-			newy + (y2 - y1 + shrink) / shrink > rout->ly ||
-			rin->type != rout->type)
+			newy + (y2 - y1 + shrink) / shrink > rout->ly || rin->type != rout->type)
 	{
 		printf("### INTERNAL ERROR - rop_shrink; access violation\n");
 		return;
@@ -6274,8 +6515,7 @@ while (d-- > 0) {
  */
 
 	void
-	rop_zoom_out(RASTER *rin, RASTER *rout,
-				 int x1, int y1, int x2, int y2, int newx, int newy,
+	rop_zoom_out(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2, int newx, int newy,
 				 int abs_zoom_level)
 {
 	int tmp, newlx, newly;
@@ -6320,11 +6560,14 @@ while (d-- > 0) {
 
 		rasras = RASRAS(rin->type, rout->type);
 	switch (rasras) {
-		CASE RASRAS(RAS_GR8, RAS_RGB_) : __OR RASRAS(RAS_GR8, RAS_RGBM) : rop_zoom_out_gr8_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+		CASE RASRAS(RAS_GR8, RAS_RGB_)
+			: __OR RASRAS(RAS_GR8, RAS_RGBM)
+			: rop_zoom_out_gr8_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 		D 57 return;
 		E 57
 
-			CASE RASRAS(RAS_CM16, RAS_RGB_) :
+			CASE RASRAS(RAS_CM16, RAS_RGB_)
+			:
 D 46 rop_zoom_out_cm16_rgb_(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 		E 46
 I 46 rop_zoom_out_cm16_rgbx(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
@@ -6332,61 +6575,87 @@ while (d-- > 0) {
 D 57 return;
 		E 57
 
-			CASE RASRAS(RAS_CM16, RAS_RGBM) : rop_zoom_out_cm16_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_CM16, RAS_RGBM)
+			: rop_zoom_out_cm16_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 		D 57 return;
 		E 57
 
-I 81 CASE RASRAS(RAS_RGB, RAS_RGB16) : rop_zoom_out_rgb_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+I 81 CASE RASRAS(RAS_RGB, RAS_RGB16)
+			: rop_zoom_out_rgb_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 
-		E 81 CASE RASRAS(RAS_RGB, RAS_RGB_) : __OR RASRAS(RAS_RGB, RAS_RGBM) : rop_zoom_out_rgb_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+		E 81 CASE RASRAS(RAS_RGB, RAS_RGB_)
+			: __OR RASRAS(RAS_RGB, RAS_RGBM)
+			: rop_zoom_out_rgb_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 		D 57 return;
 		E 57
 
-			CASE RASRAS(RAS_BW, RAS_CM16) : __OR RASRAS(RAS_WB, RAS_CM16) : rop_zoom_out_bw_cm16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_BW, RAS_CM16)
+			: __OR RASRAS(RAS_WB, RAS_CM16)
+			: rop_zoom_out_bw_cm16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 		D 57 return;
 		E 57
 
-			CASE RASRAS(RAS_BW, RAS_RGB_) : __OR RASRAS(RAS_BW, RAS_RGBM) : __OR RASRAS(RAS_WB, RAS_RGB_) : __OR RASRAS(RAS_WB, RAS_RGBM) : rop_zoom_out_bw_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_BW, RAS_RGB_)
+			: __OR RASRAS(RAS_BW, RAS_RGBM)
+			: __OR RASRAS(RAS_WB, RAS_RGB_)
+			: __OR RASRAS(RAS_WB, RAS_RGBM)
+			: rop_zoom_out_bw_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 		D 57 return;
 		E 57
 
-			CASE RASRAS(RAS_GR8, RAS_CM16) : rop_zoom_out_gr8_cm16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_GR8, RAS_CM16)
+			: rop_zoom_out_gr8_cm16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 		D 57 return;
 		E 57
 
-			CASE RASRAS(RAS_WB, RAS_GR8) : __OR RASRAS(RAS_BW, RAS_GR8) : rop_zoom_out_bw_gr8(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_WB, RAS_GR8)
+			: __OR RASRAS(RAS_BW, RAS_GR8)
+			: rop_zoom_out_bw_gr8(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 		D 57 return;
 		E 57
 
-			CASE RASRAS(RAS_GR8, RAS_GR8) : rop_zoom_out_gr8(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_GR8, RAS_GR8)
+			: rop_zoom_out_gr8(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 		D 57 return;
 		E 57
 
-			CASE RASRAS(RAS_CM16, RAS_CM16) : rop_zoom_out_cm16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_CM16, RAS_CM16)
+			: rop_zoom_out_cm16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 		D 57 return;
 		E 57
 
-			CASE RASRAS(RAS_RGB_, RAS_RGB_) : __OR RASRAS(RAS_RGB_, RAS_RGBM) : __OR RASRAS(RAS_RGBM, RAS_RGB_) :
-D 46 __OR RASRAS(RAS_RGBM, RAS_RGBM) :
+			CASE RASRAS(RAS_RGB_, RAS_RGB_)
+			: __OR RASRAS(RAS_RGB_, RAS_RGBM)
+			: __OR RASRAS(RAS_RGBM, RAS_RGB_)
+			:
+D 46 __OR RASRAS(RAS_RGBM, RAS_RGBM)
+			:
 E 46
 I 46 rop_zoom_out_rgbx(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 		D 57 return;
 		E 57
 
-			CASE RASRAS(RAS_RGBM, RAS_RGBM) :
+			CASE RASRAS(RAS_RGBM, RAS_RGBM)
+			:
 E 46 rop_zoom_out_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 		D 57 return;
 		E 57
 I 54
 
-I 61 CASE RASRAS(RAS_BW, RAS_RGB16) : __OR RASRAS(RAS_WB, RAS_RGB16) : rop_zoom_out_bw_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+I 61 CASE RASRAS(RAS_BW, RAS_RGB16)
+			: __OR RASRAS(RAS_WB, RAS_RGB16)
+			: rop_zoom_out_bw_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 
-		E 61 CASE RASRAS(RAS_GR8, RAS_RGB16) : rop_zoom_out_gr8_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+		E 61 CASE RASRAS(RAS_GR8, RAS_RGB16)
+			: rop_zoom_out_gr8_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 		E 54
 
-I 52 CASE RASRAS(RAS_CM16, RAS_RGB16) : rop_zoom_out_cm16_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+I 52 CASE RASRAS(RAS_CM16, RAS_RGB16)
+			: rop_zoom_out_cm16_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 
-		CASE RASRAS(RAS_RGB_, RAS_RGB16) : __OR RASRAS(RAS_RGBM, RAS_RGB16) : rop_zoom_out_rgbx_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+		CASE RASRAS(RAS_RGB_, RAS_RGB16)
+			: __OR RASRAS(RAS_RGBM, RAS_RGB16)
+			: rop_zoom_out_rgbx_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 
 		E 52 DEFAULT :
 D 52 printf("### INTERNAL ERROR - rop_zoom_out; invalid raster combination\n");
@@ -6535,66 +6804,91 @@ pixbytes_out = rop_pixbytes(rout->type);
 E 23
 E 12 rasras = RASRAS(rin->type, rout->type);
 switch (rasras) {
-	CASE RASRAS(RAS_WB, RAS_WB) : __OR RASRAS(RAS_BW, RAS_BW) :
+	CASE RASRAS(RAS_WB, RAS_WB)
+		: __OR RASRAS(RAS_BW, RAS_BW)
+		:
 D 14
-																/*
-    rop_copy_90_bw(rin, rout, x1, y1, x2, y2, newx, newy, ninety, flip);
-  */
-																rop_copy(rin, rout, x1, y1, x2, y2, newx, newy);
+		  /*
+rop_copy_90_bw(rin, rout, x1, y1, x2, y2, newx, newy, ninety, flip);
+*/
+		  rop_copy(rin, rout, x1, y1, x2, y2, newx, newy);
 	E 14
 I 14 rop_copy_90_bw(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
 	E 14 return;
 
-	I 17 CASE RASRAS(RAS_WB, RAS_GR8) : __OR RASRAS(RAS_BW, RAS_GR8) : rop_copy_90_bw_gr8(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
+	I 17 CASE RASRAS(RAS_WB, RAS_GR8)
+		: __OR RASRAS(RAS_BW, RAS_GR8)
+		: rop_copy_90_bw_gr8(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
 	return;
 
-	I 21 CASE RASRAS(RAS_WB, RAS_CM16) : __OR RASRAS(RAS_BW, RAS_CM16) : rop_copy_90_bw_cm16(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
+	I 21 CASE RASRAS(RAS_WB, RAS_CM16)
+		: __OR RASRAS(RAS_BW, RAS_CM16)
+		: rop_copy_90_bw_cm16(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
 	return;
 
-	I 55 CASE RASRAS(RAS_WB, RAS_RGB16) : __OR RASRAS(RAS_BW, RAS_RGB16) : rop_copy_90_bw_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
+	I 55 CASE RASRAS(RAS_WB, RAS_RGB16)
+		: __OR RASRAS(RAS_BW, RAS_RGB16)
+		: rop_copy_90_bw_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
 
 	E 55
-I 22 CASE RASRAS(RAS_WB, RAS_RGB_) : __OR RASRAS(RAS_WB, RAS_RGBM) : __OR RASRAS(RAS_BW, RAS_RGB_) : __OR RASRAS(RAS_BW, RAS_RGBM) : rop_copy_90_bw_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
+I 22 CASE RASRAS(RAS_WB, RAS_RGB_)
+		: __OR RASRAS(RAS_WB, RAS_RGBM)
+		: __OR RASRAS(RAS_BW, RAS_RGB_)
+		: __OR RASRAS(RAS_BW, RAS_RGBM)
+		: rop_copy_90_bw_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
 	return;
 
 	E 22
 E 21
-E 17 CASE RASRAS(RAS_GR8, RAS_GR8) :
+E 17 CASE RASRAS(RAS_GR8, RAS_GR8)
+		:
 D 14
-									   /*
-    rop_copy_90_gr8(rin, rout, x1, y1, x2, y2, newx, newy, ninety, flip);
-  */
-									   rop_copy(rin, rout, x1, y1, x2, y2, newx, newy);
+		  /*
+rop_copy_90_gr8(rin, rout, x1, y1, x2, y2, newx, newy, ninety, flip);
+*/
+		  rop_copy(rin, rout, x1, y1, x2, y2, newx, newy);
 	E 14
 I 14 rop_copy_90_gr8(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
 	E 14 return;
 
-	I 21 CASE RASRAS(RAS_GR8, RAS_CM16) : rop_copy_90_gr8_cm16(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
+	I 21 CASE RASRAS(RAS_GR8, RAS_CM16)
+		: rop_copy_90_gr8_cm16(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
 	return;
 
-	I 55 CASE RASRAS(RAS_GR8, RAS_RGB16) : rop_copy_90_gr8_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
+	I 55 CASE RASRAS(RAS_GR8, RAS_RGB16)
+		: rop_copy_90_gr8_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
 	return;
 
 	E 55
-I 22 CASE RASRAS(RAS_GR8, RAS_RGB_) : __OR RASRAS(RAS_GR8, RAS_RGBM) : rop_copy_90_gr8_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
+I 22 CASE RASRAS(RAS_GR8, RAS_RGB_)
+		: __OR RASRAS(RAS_GR8, RAS_RGBM)
+		: rop_copy_90_gr8_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
 	return;
 
-	I 23 CASE RASRAS(RAS_CM8, RAS_CM16) : rop_copy_90_cm8_cm16(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
+	I 23 CASE RASRAS(RAS_CM8, RAS_CM16)
+		: rop_copy_90_cm8_cm16(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
 	return;
 
-	I 26 CASE RASRAS(RAS_RGB_, RAS_RGB_) : __OR RASRAS(RAS_RGBM, RAS_RGB_) : __OR RASRAS(RAS_RGBM, RAS_RGBM) : rop_copy_90_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
+	I 26 CASE RASRAS(RAS_RGB_, RAS_RGB_)
+		: __OR RASRAS(RAS_RGBM, RAS_RGB_)
+		: __OR RASRAS(RAS_RGBM, RAS_RGBM)
+		: rop_copy_90_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
 	return;
 
-	I 63 CASE RASRAS(RAS_RGB, RAS_RGB16) : rop_copy_90_rgb_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
+	I 63 CASE RASRAS(RAS_RGB, RAS_RGB16)
+		: rop_copy_90_rgb_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
 	return;
 
 	E 63
-I 45 CASE RASRAS(RAS_RGB, RAS_RGB_) :
+I 45 CASE RASRAS(RAS_RGB, RAS_RGB_)
+		:
 E 45
 I 43
-D 64 CASE RASRAS(RAS_RGB, RAS_RGBM) :
+D 64 CASE RASRAS(RAS_RGB, RAS_RGBM)
+		:
 E 64
-I 64 __OR RASRAS(RAS_RGB, RAS_RGBM) :
+I 64 __OR RASRAS(RAS_RGB, RAS_RGBM)
+		:
 E 64 rop_copy_90_rgb_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
 	return;
 
@@ -6702,12 +6996,12 @@ static void rop_copy_90_bw(RASTER *rin, RASTER *rout,
 	int wrapin, wrapout, tmp, cmap_offset, bit, bit_offs, startbit;
 	int x, lx, ly;
 
-#define SET_BIT(BYTE, BIT, VAL)     \
-	{                               \
-		if (VAL)                    \
-			*BYTE |= (1 << (BIT));  \
-		else                        \
-			*BYTE &= ~(1 << (BIT)); \
+#define SET_BIT(BYTE, BIT, VAL)                                                                    \
+	{                                                                                              \
+		if (VAL)                                                                                   \
+			*BYTE |= (1 << (BIT));                                                                 \
+		else                                                                                       \
+			*BYTE &= ~(1 << (BIT));                                                                \
 	}
 	E 14
 I 14 UCHAR *bufin, *bufout;
@@ -6717,16 +7011,16 @@ static void rop_copy_90_bw(RASTER *rin, RASTER *rout,
 	int u1, v1, u2, v2;
 
 	D 61
-#define BUFBYTE(X, Y, BUF, BYTEWRAP, BITOFFS) \
+#define BUFBYTE(X, Y, BUF, BYTEWRAP, BITOFFS)                                                      \
 	(((UCHAR *)(BUF))[(((X) + (BITOFFS)) >> 3) + (Y) * (BYTEWRAP)])
 
-#define GET_BIT(X, Y, BUF, BYTEWRAP, BITOFFS) \
+#define GET_BIT(X, Y, BUF, BYTEWRAP, BITOFFS)                                                      \
 	((BUFBYTE(X, Y, BUF, BYTEWRAP, BITOFFS) >> (7 - (((X) + (BITOFFS)) & 7))) & 1)
 
-#define SET_BIT_0(X, Y, BUF, BYTEWRAP, BITOFFS) \
+#define SET_BIT_0(X, Y, BUF, BYTEWRAP, BITOFFS)                                                    \
 	(BUFBYTE(X, Y, BUF, BYTEWRAP, BITOFFS) &= ~(1 << (7 - (((X) + (BITOFFS)) & 7))))
 
-#define SET_BIT_1(X, Y, BUF, BYTEWRAP, BITOFFS) \
+#define SET_BIT_1(X, Y, BUF, BYTEWRAP, BITOFFS)                                                    \
 	(BUFBYTE(X, Y, BUF, BYTEWRAP, BITOFFS) |= (1 << (7 - (((X) + (BITOFFS)) & 7))))
 
 E 61
@@ -6773,8 +7067,7 @@ DEFAULT:
  * dei pixel, ma solo su una parte dei pixel.
  */
 
-void rop_zoom_out(RASTER *rin, RASTER *rout,
-				  int x1, int y1, int x2, int y2, int newx, int newy,
+void rop_zoom_out(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2, int newx, int newy,
 				  int abs_zoom_level)
 {
 	int tmp, newlx, newly;
@@ -6801,7 +7094,10 @@ void rop_zoom_out(RASTER *rin, RASTER *rout,
 	newlx = (x2 - x1 + factor) / factor;
 	newly = (y2 - y1 + factor) / factor;
 	E 89
-I 89 __OR RASRAS(RAS_CM24, RAS_CM8S8) : __OR RASRAS(RAS_CM24, RAS_CM8S4) : __OR RASRAS(RAS_CM24, RAS_BW) : rop_copy_quantize(rasras, rin, rout, x1, y1, x2, y2, newx, newy);
+I 89 __OR RASRAS(RAS_CM24, RAS_CM8S8)
+		: __OR RASRAS(RAS_CM24, RAS_CM8S4)
+		: __OR RASRAS(RAS_CM24, RAS_BW)
+		: rop_copy_quantize(rasras, rin, rout, x1, y1, x2, y2, newx, newy);
 
 DEFAULT:
 	assert(!"rop_copy; invalid raster combination");
@@ -6810,36 +7106,66 @@ DEFAULT:
 	switch (rasras) {
 		CASE RASRAS(RAS_RGBM, RAS_RGB_) : rop_copy_same(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		CASE RASRAS(RAS_GR8, RAS_RGB_) : __OR RASRAS(RAS_GR8, RAS_RGBM) : rop_copy_gr8_rgbm(rin, rout, x1, y1, x2, y2, newx, newy);
+		CASE RASRAS(RAS_GR8, RAS_RGB_)
+			: __OR RASRAS(RAS_GR8, RAS_RGBM)
+			: rop_copy_gr8_rgbm(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		CASE RASRAS(RAS_CM16, RAS_RGB_) : __OR RASRAS(RAS_CM16, RAS_RGBM) : rop_copy_cm16_rgbm(rin, rout, x1, y1, x2, y2, newx, newy);
+		CASE RASRAS(RAS_CM16, RAS_RGB_)
+			: __OR RASRAS(RAS_CM16, RAS_RGBM)
+			: rop_copy_cm16_rgbm(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		CASE RASRAS(RAS_CM24, RAS_RGB_) : __OR RASRAS(RAS_CM24, RAS_RGBM) : rop_copy_cm24_rgbm(rin, rout, x1, y1, x2, y2, newx, newy);
+		CASE RASRAS(RAS_CM24, RAS_RGB_)
+			: __OR RASRAS(RAS_CM24, RAS_RGBM)
+			: rop_copy_cm24_rgbm(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		CASE RASRAS(RAS_CM16, RAS_RGB_64) : __OR RASRAS(RAS_CM16, RAS_RGBM64) : rop_copy_cm16_rgbm64(rin, rout, x1, y1, x2, y2, newx, newy);
+		CASE RASRAS(RAS_CM16, RAS_RGB_64)
+			: __OR RASRAS(RAS_CM16, RAS_RGBM64)
+			: rop_copy_cm16_rgbm64(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		CASE RASRAS(RAS_CM24, RAS_RGB_64) : __OR RASRAS(RAS_CM24, RAS_RGBM64) : rop_copy_cm24_rgbm64(rin, rout, x1, y1, x2, y2, newx, newy);
+		CASE RASRAS(RAS_CM24, RAS_RGB_64)
+			: __OR RASRAS(RAS_CM24, RAS_RGBM64)
+			: rop_copy_cm24_rgbm64(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		CASE RASRAS(RAS_RGBM, RAS_RGBM64) : rop_copy_rgbm_rgbm64(rin, rout, x1, y1, x2, y2, newx, newy);
+		CASE RASRAS(RAS_RGBM, RAS_RGBM64)
+			: rop_copy_rgbm_rgbm64(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		CASE RASRAS(RAS_RGBM64, RAS_RGBM) : rop_copy_rgbm64_rgbm(rin, rout, x1, y1, x2, y2, newx, newy);
+		CASE RASRAS(RAS_RGBM64, RAS_RGBM)
+			: rop_copy_rgbm64_rgbm(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		CASE RASRAS(RAS_RGB_64, RAS_RGB_) : __OR RASRAS(RAS_RGBM64, RAS_RGB_) : __OR RASRAS(RAS_RGB_64, RAS_RGBM) : rop_copy_rgbx64_rgbx(rin, rout, x1, y1, x2, y2, newx, newy);
+		CASE RASRAS(RAS_RGB_64, RAS_RGB_)
+			: __OR RASRAS(RAS_RGBM64, RAS_RGB_)
+			: __OR RASRAS(RAS_RGB_64, RAS_RGBM)
+			: rop_copy_rgbx64_rgbx(rin, rout, x1, y1, x2, y2, newx, newy);
 
 		CASE RASRAS(RAS_RGB, RAS_RGB16) : rop_copy_rgb_rgb16(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		CASE RASRAS(RAS_RGB, RAS_RGB_) : __OR RASRAS(RAS_RGB, RAS_RGBM) : rop_copy_rgb_rgbm(rin, rout, x1, y1, x2, y2, newx, newy);
+		CASE RASRAS(RAS_RGB, RAS_RGB_)
+			: __OR RASRAS(RAS_RGB, RAS_RGBM)
+			: rop_copy_rgb_rgbm(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		D 104 CASE RASRAS(RAS_BW, RAS_BW) : __OR RASRAS(RAS_BW, RAS_WB) :
+		D 104 CASE RASRAS(RAS_BW, RAS_BW)
+			: __OR RASRAS(RAS_BW, RAS_WB)
+			:
 E 104
-I 104 CASE RASRAS(RAS_BW, RAS_WB) :
-E 104 __OR RASRAS(RAS_WB, RAS_BW) : __OR RASRAS(RAS_WB, RAS_WB) : rop_copy_bw(rin, rout, x1, y1, x2, y2, newx, newy);
+I 104 CASE RASRAS(RAS_BW, RAS_WB)
+			:
+E 104 __OR RASRAS(RAS_WB, RAS_BW)
+			: __OR RASRAS(RAS_WB, RAS_WB)
+			: rop_copy_bw(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		CASE RASRAS(RAS_BW, RAS_CM16) : __OR RASRAS(RAS_WB, RAS_CM16) : rop_copy_bw_cm16(rin, rout, x1, y1, x2, y2, newx, newy);
+		CASE RASRAS(RAS_BW, RAS_CM16)
+			: __OR RASRAS(RAS_WB, RAS_CM16)
+			: rop_copy_bw_cm16(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		CASE RASRAS(RAS_BW, RAS_CM24) : __OR RASRAS(RAS_WB, RAS_CM24) : rop_copy_bw_cm24(rin, rout, x1, y1, x2, y2, newx, newy);
+		CASE RASRAS(RAS_BW, RAS_CM24)
+			: __OR RASRAS(RAS_WB, RAS_CM24)
+			: rop_copy_bw_cm24(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		CASE RASRAS(RAS_BW, RAS_RGB_) : __OR RASRAS(RAS_BW, RAS_RGBM) : __OR RASRAS(RAS_WB, RAS_RGB_) : __OR RASRAS(RAS_WB, RAS_RGBM) : rop_copy_bw_rgbm(rin, rout, x1, y1, x2, y2, newx, newy);
+		CASE RASRAS(RAS_BW, RAS_RGB_)
+			: __OR RASRAS(RAS_BW, RAS_RGBM)
+			: __OR RASRAS(RAS_WB, RAS_RGB_)
+			: __OR RASRAS(RAS_WB, RAS_RGBM)
+			: rop_copy_bw_rgbm(rin, rout, x1, y1, x2, y2, newx, newy);
 
 		CASE RASRAS(RAS_GR8, RAS_CM16) : rop_copy_gr8_cm16(rin, rout, x1, y1, x2, y2, newx, newy);
 
@@ -6849,44 +7175,108 @@ DEFAULT:
 
 		CASE RASRAS(RAS_CM8, RAS_CM24) : rop_copy_cm8_cm24(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		CASE RASRAS(RAS_BW, RAS_RGB16) : __OR RASRAS(RAS_WB, RAS_RGB16) : rop_copy_bw_rgb16(rin, rout, x1, y1, x2, y2, newx, newy);
+		CASE RASRAS(RAS_BW, RAS_RGB16)
+			: __OR RASRAS(RAS_WB, RAS_RGB16)
+			: rop_copy_bw_rgb16(rin, rout, x1, y1, x2, y2, newx, newy);
 
 		CASE RASRAS(RAS_GR8, RAS_RGB16) : rop_copy_gr8_rgb16(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		CASE RASRAS(RAS_CM16, RAS_RGB16) : rop_copy_cm16_rgb16(rin, rout, x1, y1, x2, y2, newx, newy);
+		CASE RASRAS(RAS_CM16, RAS_RGB16)
+			: rop_copy_cm16_rgb16(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		CASE RASRAS(RAS_CM24, RAS_RGB16) : rop_copy_cm24_rgb16(rin, rout, x1, y1, x2, y2, newx, newy);
+		CASE RASRAS(RAS_CM24, RAS_RGB16)
+			: rop_copy_cm24_rgb16(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		D 97 CASE RASRAS(RAS_CM16, RAS_XRGB1555) : rop_copy_cm16_xrgb1555(rin, rout, x1, y1, x2, y2, newx, newy);
+		D 97 CASE RASRAS(RAS_CM16, RAS_XRGB1555)
+			: rop_copy_cm16_xrgb1555(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		CASE RASRAS(RAS_CM24, RAS_XRGB1555) : rop_copy_cm24_xrgb1555(rin, rout, x1, y1, x2, y2, newx, newy);
+		CASE RASRAS(RAS_CM24, RAS_XRGB1555)
+			: rop_copy_cm24_xrgb1555(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		E 97 CASE RASRAS(RAS_RGB_, RAS_RGB16) : __OR RASRAS(RAS_RGBM, RAS_RGB16) : rop_copy_rgbx_rgb16(rin, rout, x1, y1, x2, y2, newx, newy);
+		E 97 CASE RASRAS(RAS_RGB_, RAS_RGB16)
+			: __OR RASRAS(RAS_RGBM, RAS_RGB16)
+			: rop_copy_rgbx_rgb16(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		D 97 CASE RASRAS(RAS_RGB_, RAS_XRGB1555) : __OR RASRAS(RAS_RGBM, RAS_XRGB1555) : rop_copy_rgbx_xrgb1555(rin, rout, x1, y1, x2, y2, newx, newy);
+		D 97 CASE RASRAS(RAS_RGB_, RAS_XRGB1555)
+			: __OR RASRAS(RAS_RGBM, RAS_XRGB1555)
+			: rop_copy_rgbx_xrgb1555(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		E 97 CASE RASRAS(RAS_RGB_64, RAS_RGB16) : __OR RASRAS(RAS_RGBM64, RAS_RGB16) : rop_copy_rgbx64_rgb16(rin, rout, x1, y1, x2, y2, newx, newy);
+		E 97 CASE RASRAS(RAS_RGB_64, RAS_RGB16)
+			: __OR RASRAS(RAS_RGBM64, RAS_RGB16)
+			: rop_copy_rgbx64_rgb16(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		D 97 CASE RASRAS(RAS_RGB_64, RAS_XRGB1555) : __OR RASRAS(RAS_RGBM64, RAS_XRGB1555) : rop_copy_rgbx64_xrgb1555(rin, rout, x1, y1, x2, y2, newx, newy);
+		D 97 CASE RASRAS(RAS_RGB_64, RAS_XRGB1555)
+			: __OR RASRAS(RAS_RGBM64, RAS_XRGB1555)
+			: rop_copy_rgbx64_xrgb1555(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		E 97 CASE RASRAS(RAS_RGB16, RAS_RGB_) : __OR RASRAS(RAS_RGB16, RAS_RGBM) : rop_copy_rgb16_rgbm(rin, rout, x1, y1, x2, y2, newx, newy);
+		E 97 CASE RASRAS(RAS_RGB16, RAS_RGB_)
+			: __OR RASRAS(RAS_RGB16, RAS_RGBM)
+			: rop_copy_rgb16_rgbm(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		D 97 CASE RASRAS(RAS_XRGB1555, RAS_RGB_) : __OR RASRAS(RAS_XRGB1555, RAS_RGBM) : rop_copy_xrgb1555_rgbm(rin, rout, x1, y1, x2, y2, newx, newy);
+		D 97 CASE RASRAS(RAS_XRGB1555, RAS_RGB_)
+			: __OR RASRAS(RAS_XRGB1555, RAS_RGBM)
+			: rop_copy_xrgb1555_rgbm(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		E 97 CASE RASRAS(RAS_RGB_, RAS_RGB) : __OR RASRAS(RAS_RGBM, RAS_RGB) : rop_copy_rgbx_rgb(rin, rout, x1, y1, x2, y2, newx, newy);
+		E 97 CASE RASRAS(RAS_RGB_, RAS_RGB)
+			: __OR RASRAS(RAS_RGBM, RAS_RGB)
+			: rop_copy_rgbx_rgb(rin, rout, x1, y1, x2, y2, newx, newy);
 
-		CASE RASRAS(RAS_RGBM, RAS_CM16S8) :
-I 98 __OR RASRAS(RAS_RGBM, RAS_CM16S12) :
-E 98 __OR RASRAS(RAS_RGBM, RAS_CM16S4) : __OR RASRAS(RAS_RGBM, RAS_MBW16) : __OR RASRAS(RAS_RGBM, RAS_GR8) : __OR RASRAS(RAS_RGBM64, RAS_GR8) : __OR RASRAS(RAS_RGBM, RAS_GR16) : __OR RASRAS(RAS_RGBM64, RAS_GR16) : __OR RASRAS(RAS_RGBM, RAS_CM8S8) : __OR RASRAS(RAS_RGBM, RAS_CM8S4) : __OR RASRAS(RAS_RGBM, RAS_BW) : __OR RASRAS(RAS_RGB_, RAS_CM16S8) : __OR RASRAS(RAS_RGB_, RAS_CM16S4) : __OR RASRAS(RAS_RGB_, RAS_MBW16) : __OR RASRAS(RAS_RGB_, RAS_GR8) : __OR RASRAS(RAS_RGB_, RAS_CM8S8) : __OR RASRAS(RAS_RGB_, RAS_CM8S4) : __OR RASRAS(RAS_RGB_, RAS_BW) : __OR RASRAS(RAS_RGB16, RAS_CM8S8) : __OR RASRAS(RAS_RGB16, RAS_BW) :
-I 98 __OR RASRAS(RAS_CM16, RAS_CM16S12) :
-E 98 __OR RASRAS(RAS_CM16, RAS_CM16S8) : __OR RASRAS(RAS_CM16, RAS_CM16S4) : __OR RASRAS(RAS_CM16, RAS_MBW16) : __OR RASRAS(RAS_CM16, RAS_GR8) : __OR RASRAS(RAS_CM16, RAS_GR16) : __OR RASRAS(RAS_CM16, RAS_CM8S8) : __OR RASRAS(RAS_CM16, RAS_CM8S4) : __OR RASRAS(RAS_CM16, RAS_BW) :
-I 98 __OR RASRAS(RAS_CM24, RAS_CM16S12) :
-E 98 __OR RASRAS(RAS_CM24, RAS_CM16S8) : __OR RASRAS(RAS_CM24, RAS_CM16S4) : __OR RASRAS(RAS_CM24, RAS_MBW16) : __OR RASRAS(RAS_CM24, RAS_GR8) :
-I 103 __OR RASRAS(RAS_CM24, RAS_GR16) :  
-E 103 __OR RASRAS(RAS_CM24, RAS_CM8S8) : __OR RASRAS(RAS_CM24, RAS_CM8S4) : __OR RASRAS(RAS_CM24, RAS_BW) :
-I 97 __OR RASRAS(RAS_CM8S8, RAS_RGBM) : __OR RASRAS(RAS_CM8S8, RAS_RGB_) :
-I 101 __OR RASRAS(RAS_CM16S12, RAS_RGBM) : __OR RASRAS(RAS_CM16S12, RAS_RGB_) :
-E 101 __OR RASRAS(RAS_RLEBW, RAS_RGB_) : __OR RASRAS(RAS_RLEBW, RAS_RGBM) :
+		CASE RASRAS(RAS_RGBM, RAS_CM16S8)
+			:
+I 98 __OR RASRAS(RAS_RGBM, RAS_CM16S12)
+			:
+E 98 __OR RASRAS(RAS_RGBM, RAS_CM16S4)
+			: __OR RASRAS(RAS_RGBM, RAS_MBW16)
+			: __OR RASRAS(RAS_RGBM, RAS_GR8)
+			: __OR RASRAS(RAS_RGBM64, RAS_GR8)
+			: __OR RASRAS(RAS_RGBM, RAS_GR16)
+			: __OR RASRAS(RAS_RGBM64, RAS_GR16)
+			: __OR RASRAS(RAS_RGBM, RAS_CM8S8)
+			: __OR RASRAS(RAS_RGBM, RAS_CM8S4)
+			: __OR RASRAS(RAS_RGBM, RAS_BW)
+			: __OR RASRAS(RAS_RGB_, RAS_CM16S8)
+			: __OR RASRAS(RAS_RGB_, RAS_CM16S4)
+			: __OR RASRAS(RAS_RGB_, RAS_MBW16)
+			: __OR RASRAS(RAS_RGB_, RAS_GR8)
+			: __OR RASRAS(RAS_RGB_, RAS_CM8S8)
+			: __OR RASRAS(RAS_RGB_, RAS_CM8S4)
+			: __OR RASRAS(RAS_RGB_, RAS_BW)
+			: __OR RASRAS(RAS_RGB16, RAS_CM8S8)
+			: __OR RASRAS(RAS_RGB16, RAS_BW)
+			:
+I 98 __OR RASRAS(RAS_CM16, RAS_CM16S12)
+			:
+E 98 __OR RASRAS(RAS_CM16, RAS_CM16S8)
+			: __OR RASRAS(RAS_CM16, RAS_CM16S4)
+			: __OR RASRAS(RAS_CM16, RAS_MBW16)
+			: __OR RASRAS(RAS_CM16, RAS_GR8)
+			: __OR RASRAS(RAS_CM16, RAS_GR16)
+			: __OR RASRAS(RAS_CM16, RAS_CM8S8)
+			: __OR RASRAS(RAS_CM16, RAS_CM8S4)
+			: __OR RASRAS(RAS_CM16, RAS_BW)
+			:
+I 98 __OR RASRAS(RAS_CM24, RAS_CM16S12)
+			:
+E 98 __OR RASRAS(RAS_CM24, RAS_CM16S8)
+			: __OR RASRAS(RAS_CM24, RAS_CM16S4)
+			: __OR RASRAS(RAS_CM24, RAS_MBW16)
+			: __OR RASRAS(RAS_CM24, RAS_GR8)
+			:
+I 103 __OR RASRAS(RAS_CM24, RAS_GR16)
+			:  
+E 103 __OR RASRAS(RAS_CM24, RAS_CM8S8)
+			: __OR RASRAS(RAS_CM24, RAS_CM8S4)
+			: __OR RASRAS(RAS_CM24, RAS_BW)
+			:
+I 97 __OR RASRAS(RAS_CM8S8, RAS_RGBM)
+			: __OR RASRAS(RAS_CM8S8, RAS_RGB_)
+			:
+I 101 __OR RASRAS(RAS_CM16S12, RAS_RGBM)
+			: __OR RASRAS(RAS_CM16S12, RAS_RGB_)
+			:
+E 101 __OR RASRAS(RAS_RLEBW, RAS_RGB_)
+			: __OR RASRAS(RAS_RLEBW, RAS_RGBM)
+			:
 
 E 97 rop_copy_quantize(rasras, rin, rout, x1, y1, x2, y2, newx, newy);
 
@@ -6909,14 +7299,12 @@ if (rout->extra_mask)
  * I due raster devono essere dello stesso tipo.
  */
 
-D 94 void rop_shrink(RASTER *rin, RASTER *rout,
-					  int x1, int y1, int x2, int y2, int newx, int newy,
+D 94 void rop_shrink(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2, int newx, int newy,
 					  int shrink)
 {
 	E 94
-I 94 void rop_shrink(RASTER * rin, RASTER * rout,
-					   int x1, int y1, int x2, int y2, int newx, int newy,
-					   int shrink)
+I 94 void rop_shrink(RASTER * rin, RASTER * rout, int x1, int y1, int x2, int y2, int newx,
+					   int newy, int shrink)
 	{
 		E 94 UCHAR *curr_pixin, *bufferin;
 		int i, j, tmp, bpp;
@@ -6943,11 +7331,9 @@ if (rout->extra_mask)
 
 		/* controllo gli sconfinamenti */
 
-		if (x1 < 0 || y1 < 0 || x2 >= rin->lx || y2 >= rin->ly ||
-			newx < 0 || newy < 0 ||
+		if (x1 < 0 || y1 < 0 || x2 >= rin->lx || y2 >= rin->ly || newx < 0 || newy < 0 ||
 			newx + (x2 - x1 + shrink) / shrink > rout->lx ||
-			newy + (y2 - y1 + shrink) / shrink > rout->ly ||
-			rin->type != rout->type) {
+			newy + (y2 - y1 + shrink) / shrink > rout->ly || rin->type != rout->type) {
 			printf("### INTERNAL ERROR - rop_shrink; access violation\n");
 			return;
 		}
@@ -7030,9 +7416,8 @@ if (rout->extra_mask)
  * dei pixel, ma solo su una parte dei pixel.
  */
 
-	void rop_zoom_out(RASTER * rin, RASTER * rout,
-					  int x1, int y1, int x2, int y2, int newx, int newy,
-					  int abs_zoom_level)
+	void rop_zoom_out(RASTER * rin, RASTER * rout, int x1, int y1, int x2, int y2, int newx,
+					  int newy, int abs_zoom_level)
 	{
 		int tmp, newlx, newly;
 		int rasras, factor, abszl;
@@ -7071,57 +7456,98 @@ if (rout->extra_mask)
 
 		rasras = RASRAS(rin->type, rout->type);
 		switch (rasras) {
-			CASE RASRAS(RAS_GR8, RAS_RGB_) : __OR RASRAS(RAS_GR8, RAS_RGBM) : rop_zoom_out_gr8_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_GR8, RAS_RGB_)
+				: __OR RASRAS(RAS_GR8, RAS_RGBM)
+				: rop_zoom_out_gr8_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 
-			CASE RASRAS(RAS_CM16, RAS_RGB_) : rop_zoom_out_cm16_rgbx(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_CM16, RAS_RGB_)
+				: rop_zoom_out_cm16_rgbx(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 
-			CASE RASRAS(RAS_CM24, RAS_RGB_) : rop_zoom_out_cm24_rgbx(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_CM24, RAS_RGB_)
+				: rop_zoom_out_cm24_rgbx(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 
-			CASE RASRAS(RAS_CM16, RAS_RGBM) : rop_zoom_out_cm16_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_CM16, RAS_RGBM)
+				: rop_zoom_out_cm16_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 
-			CASE RASRAS(RAS_CM24, RAS_RGBM) : rop_zoom_out_cm24_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_CM24, RAS_RGBM)
+				: rop_zoom_out_cm24_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 
-			CASE RASRAS(RAS_RGB, RAS_RGB16) : rop_zoom_out_rgb_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_RGB, RAS_RGB16)
+				: rop_zoom_out_rgb_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 
-			CASE RASRAS(RAS_RGB, RAS_RGB_) : __OR RASRAS(RAS_RGB, RAS_RGBM) : rop_zoom_out_rgb_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_RGB, RAS_RGB_)
+				: __OR RASRAS(RAS_RGB, RAS_RGBM)
+				: rop_zoom_out_rgb_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 
-			CASE RASRAS(RAS_BW, RAS_CM16) : __OR RASRAS(RAS_WB, RAS_CM16) : rop_zoom_out_bw_cm16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_BW, RAS_CM16)
+				: __OR RASRAS(RAS_WB, RAS_CM16)
+				: rop_zoom_out_bw_cm16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 
-			CASE RASRAS(RAS_BW, RAS_CM24) : __OR RASRAS(RAS_WB, RAS_CM24) : rop_zoom_out_bw_cm24(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_BW, RAS_CM24)
+				: __OR RASRAS(RAS_WB, RAS_CM24)
+				: rop_zoom_out_bw_cm24(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 
-			CASE RASRAS(RAS_BW, RAS_RGB_) : __OR RASRAS(RAS_BW, RAS_RGBM) : __OR RASRAS(RAS_WB, RAS_RGB_) : __OR RASRAS(RAS_WB, RAS_RGBM) : rop_zoom_out_bw_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_BW, RAS_RGB_)
+				: __OR RASRAS(RAS_BW, RAS_RGBM)
+				: __OR RASRAS(RAS_WB, RAS_RGB_)
+				: __OR RASRAS(RAS_WB, RAS_RGBM)
+				: rop_zoom_out_bw_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 
-			CASE RASRAS(RAS_GR8, RAS_CM16) : rop_zoom_out_gr8_cm16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_GR8, RAS_CM16)
+				: rop_zoom_out_gr8_cm16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 
-			CASE RASRAS(RAS_GR8, RAS_CM24) : rop_zoom_out_gr8_cm24(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_GR8, RAS_CM24)
+				: rop_zoom_out_gr8_cm24(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 
-			CASE RASRAS(RAS_WB, RAS_GR8) : __OR RASRAS(RAS_BW, RAS_GR8) : rop_zoom_out_bw_gr8(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_WB, RAS_GR8)
+				: __OR RASRAS(RAS_BW, RAS_GR8)
+				: rop_zoom_out_bw_gr8(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 
-			CASE RASRAS(RAS_GR8, RAS_GR8) : rop_zoom_out_gr8(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_GR8, RAS_GR8)
+				: rop_zoom_out_gr8(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 
-			CASE RASRAS(RAS_CM16, RAS_CM16) : rop_zoom_out_cm16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_CM16, RAS_CM16)
+				: rop_zoom_out_cm16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 
-			CASE RASRAS(RAS_CM16, RAS_CM24) : rop_zoom_out_cm24(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_CM16, RAS_CM24)
+				: rop_zoom_out_cm24(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 
-			CASE RASRAS(RAS_RGB_, RAS_RGB_) : __OR RASRAS(RAS_RGB_, RAS_RGBM) : __OR RASRAS(RAS_RGBM, RAS_RGB_) : rop_zoom_out_rgbx(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_RGB_, RAS_RGB_)
+				: __OR RASRAS(RAS_RGB_, RAS_RGBM)
+				: __OR RASRAS(RAS_RGBM, RAS_RGB_)
+				: rop_zoom_out_rgbx(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 
-			CASE RASRAS(RAS_RGBM, RAS_RGBM) : rop_zoom_out_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_RGBM, RAS_RGBM)
+				: rop_zoom_out_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 
-			CASE RASRAS(RAS_BW, RAS_RGB16) : __OR RASRAS(RAS_WB, RAS_RGB16) : rop_zoom_out_bw_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_BW, RAS_RGB16)
+				: __OR RASRAS(RAS_WB, RAS_RGB16)
+				: rop_zoom_out_bw_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 
-			CASE RASRAS(RAS_GR8, RAS_RGB16) : rop_zoom_out_gr8_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_GR8, RAS_RGB16)
+				: rop_zoom_out_gr8_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 
-			CASE RASRAS(RAS_CM16, RAS_RGB16) : rop_zoom_out_cm16_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_CM16, RAS_RGB16)
+				: rop_zoom_out_cm16_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 
-			CASE RASRAS(RAS_CM24, RAS_RGB16) : rop_zoom_out_cm24_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_CM24, RAS_RGB16)
+				: rop_zoom_out_cm24_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 
-			CASE RASRAS(RAS_RGB_, RAS_RGB16) : __OR RASRAS(RAS_RGBM, RAS_RGB16) : rop_zoom_out_rgbx_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_RGB_, RAS_RGB16)
+				: __OR RASRAS(RAS_RGBM, RAS_RGB16)
+				: rop_zoom_out_rgbx_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 
-			I 95 CASE RASRAS(RAS_RGBM64, RAS_RGB_) : __OR RASRAS(RAS_RGB_64, RAS_RGB_) : __OR RASRAS(RAS_RGB_64, RAS_RGBM) : rop_zoom_out_rgbx64_rgbx(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			I 95 CASE RASRAS(RAS_RGBM64, RAS_RGB_)
+				: __OR RASRAS(RAS_RGB_64, RAS_RGB_)
+				: __OR RASRAS(RAS_RGB_64, RAS_RGBM)
+				: rop_zoom_out_rgbx64_rgbx(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 
-			CASE RASRAS(RAS_RGBM64, RAS_RGB16) : __OR RASRAS(RAS_RGB_64, RAS_RGB16) : rop_zoom_out_rgbx64_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_RGBM64, RAS_RGB16)
+				: __OR RASRAS(RAS_RGB_64, RAS_RGB16)
+				: rop_zoom_out_rgbx64_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 
-			CASE RASRAS(RAS_RGBM64, RAS_RGBM) : rop_zoom_out_rgbm64_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
+			CASE RASRAS(RAS_RGBM64, RAS_RGBM)
+				: rop_zoom_out_rgbm64_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, abszl);
 
 			E 95 DEFAULT : assert(!"rop_zoom_out; invalid raster combination");
 		}
@@ -7136,15 +7562,13 @@ if (rout->extra_mask)
  *
  */
 
-	void rop_copy_90(RASTER * rin, RASTER * rout,
-					 int x1, int y1, int x2, int y2, int newx, int newy,
-					 int mirror, int ninety)
+	void rop_copy_90(RASTER * rin, RASTER * rout, int x1, int y1, int x2, int y2, int newx,
+					 int newy, int mirror, int ninety)
 	{
 		int newdx, newdy, tmp;
 		int rasras;
 
-		I 89 if (rout->extra_mask)
-			assert(0);
+		I 89 if (rout->extra_mask) assert(0);
 
 		E 89 mirror &= 1;
 		ninety &= 3;
@@ -7185,51 +7609,79 @@ if (rout->extra_mask)
 
 		rasras = RASRAS(rin->type, rout->type);
 		switch (rasras) {
-			CASE RASRAS(RAS_WB, RAS_WB) : __OR RASRAS(RAS_BW, RAS_BW) : rop_copy_90_bw(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
+			CASE RASRAS(RAS_WB, RAS_WB)
+				: __OR RASRAS(RAS_BW, RAS_BW)
+				: rop_copy_90_bw(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
 			return;
 
-			CASE RASRAS(RAS_WB, RAS_GR8) : __OR RASRAS(RAS_BW, RAS_GR8) : rop_copy_90_bw_gr8(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
+			CASE RASRAS(RAS_WB, RAS_GR8)
+				: __OR RASRAS(RAS_BW, RAS_GR8)
+				: rop_copy_90_bw_gr8(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
 			return;
 
-			CASE RASRAS(RAS_WB, RAS_CM16) : __OR RASRAS(RAS_BW, RAS_CM16) : rop_copy_90_bw_cm16(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
+			CASE RASRAS(RAS_WB, RAS_CM16)
+				: __OR RASRAS(RAS_BW, RAS_CM16)
+				: rop_copy_90_bw_cm16(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
 			return;
 
-			CASE RASRAS(RAS_WB, RAS_CM24) : __OR RASRAS(RAS_BW, RAS_CM24) : rop_copy_90_bw_cm24(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
+			CASE RASRAS(RAS_WB, RAS_CM24)
+				: __OR RASRAS(RAS_BW, RAS_CM24)
+				: rop_copy_90_bw_cm24(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
 			return;
 
-			CASE RASRAS(RAS_WB, RAS_RGB16) : __OR RASRAS(RAS_BW, RAS_RGB16) : rop_copy_90_bw_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
+			CASE RASRAS(RAS_WB, RAS_RGB16)
+				: __OR RASRAS(RAS_BW, RAS_RGB16)
+				: rop_copy_90_bw_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
 
-			CASE RASRAS(RAS_WB, RAS_RGB_) : __OR RASRAS(RAS_WB, RAS_RGBM) : __OR RASRAS(RAS_BW, RAS_RGB_) : __OR RASRAS(RAS_BW, RAS_RGBM) : rop_copy_90_bw_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
+			CASE RASRAS(RAS_WB, RAS_RGB_)
+				: __OR RASRAS(RAS_WB, RAS_RGBM)
+				: __OR RASRAS(RAS_BW, RAS_RGB_)
+				: __OR RASRAS(RAS_BW, RAS_RGBM)
+				: rop_copy_90_bw_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
 			return;
 
-			CASE RASRAS(RAS_GR8, RAS_GR8) : rop_copy_90_gr8(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
+			CASE RASRAS(RAS_GR8, RAS_GR8)
+				: rop_copy_90_gr8(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
 			return;
 
-			CASE RASRAS(RAS_GR8, RAS_CM16) : rop_copy_90_gr8_cm16(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
+			CASE RASRAS(RAS_GR8, RAS_CM16)
+				: rop_copy_90_gr8_cm16(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
 			return;
 
-			CASE RASRAS(RAS_GR8, RAS_CM24) : rop_copy_90_gr8_cm24(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
+			CASE RASRAS(RAS_GR8, RAS_CM24)
+				: rop_copy_90_gr8_cm24(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
 			return;
 
-			CASE RASRAS(RAS_GR8, RAS_RGB16) : rop_copy_90_gr8_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
+			CASE RASRAS(RAS_GR8, RAS_RGB16)
+				: rop_copy_90_gr8_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
 			return;
 
-			CASE RASRAS(RAS_GR8, RAS_RGB_) : __OR RASRAS(RAS_GR8, RAS_RGBM) : rop_copy_90_gr8_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
+			CASE RASRAS(RAS_GR8, RAS_RGB_)
+				: __OR RASRAS(RAS_GR8, RAS_RGBM)
+				: rop_copy_90_gr8_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
 			return;
 
-			CASE RASRAS(RAS_CM8, RAS_CM16) : rop_copy_90_cm8_cm16(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
+			CASE RASRAS(RAS_CM8, RAS_CM16)
+				: rop_copy_90_cm8_cm16(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
 			return;
 
-			CASE RASRAS(RAS_CM8, RAS_CM24) : rop_copy_90_cm8_cm24(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
+			CASE RASRAS(RAS_CM8, RAS_CM24)
+				: rop_copy_90_cm8_cm24(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
 			return;
 
-			CASE RASRAS(RAS_RGB_, RAS_RGB_) : __OR RASRAS(RAS_RGBM, RAS_RGB_) : __OR RASRAS(RAS_RGBM, RAS_RGBM) : rop_copy_90_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
+			CASE RASRAS(RAS_RGB_, RAS_RGB_)
+				: __OR RASRAS(RAS_RGBM, RAS_RGB_)
+				: __OR RASRAS(RAS_RGBM, RAS_RGBM)
+				: rop_copy_90_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
 			return;
 
-			CASE RASRAS(RAS_RGB, RAS_RGB16) : rop_copy_90_rgb_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
+			CASE RASRAS(RAS_RGB, RAS_RGB16)
+				: rop_copy_90_rgb_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
 			return;
 
-			CASE RASRAS(RAS_RGB, RAS_RGB_) : __OR RASRAS(RAS_RGB, RAS_RGBM) : rop_copy_90_rgb_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
+			CASE RASRAS(RAS_RGB, RAS_RGB_)
+				: __OR RASRAS(RAS_RGB, RAS_RGBM)
+				: rop_copy_90_rgb_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, mirror, ninety);
 			return;
 
 		DEFAULT:
@@ -7241,10 +7693,8 @@ if (rout->extra_mask)
 
 #ifdef VERSIONE_LENTA
 
-	static void rop_copy_90_bw(RASTER * rin, RASTER * rout,
-							   int x1, int y1, int x2, int y2,
-							   int newx, int newy,
-							   int mirror, int ninety)
+	static void rop_copy_90_bw(RASTER * rin, RASTER * rout, int x1, int y1, int x2, int y2,
+							   int newx, int newy, int mirror, int ninety)
 	{
 		UCHAR *bufin, *bufout;
 		int bytewrapin, bytewrapout, bitoffsin, bitoffsout, wrapin;
@@ -7398,7 +7848,8 @@ if (rout->extra_mask)
 		rowout += wrapout;
 	}
 	E 14
-I 14 else for (u0 = u00, v0 = v00, y = newy; y < newy + ly; u0 += dudy, y++) for (u = u0, v = v0, x = newx; x < newx + lx; v += dvdx, x++)
+I 14 else for (u0 = u00, v0 = v00, y = newy; y < newy + ly;
+				 u0 += dudy, y++) for (u = u0, v = v0, x = newx; x < newx + lx; v += dvdx, x++)
 	{
 		if (GET_BIT(u, v, bufin, bytewrapin, bitoffsin))
 			SET_BIT_1(x, y, bufout, bytewrapout, bitoffsout);
@@ -7413,8 +7864,7 @@ if (rout->extra_mask)
 I 15
 
 #ifdef DEBUG
-	STW_STOP(0)
-		STW_PRINT(stdout)
+	STW_STOP(0) STW_PRINT(stdout)
 #endif
 }
 
@@ -7422,10 +7872,8 @@ if (rout->extra_mask)
 
 /*---------------------------------------------------------------------------*/
 
-static void rop_copy_90_bw(RASTER *rin, RASTER *rout,
-						   int x1, int y1, int x2, int y2,
-						   int newx, int newy,
-						   int mirror, int ninety)
+static void rop_copy_90_bw(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2, int newx,
+						   int newy, int mirror, int ninety)
 {
 	UCHAR *bufin, *bufout;
 	UCHAR tmpbyte;
@@ -7455,33 +7903,32 @@ static void rop_copy_90_bw(RASTER *rin, RASTER *rout,
 	int u1, v1, u2, v2;
 
 	D 61
-#define BUFBYTE(X, Y, BUF, BYTEWRAP, BITOFFS) \
+#define BUFBYTE(X, Y, BUF, BYTEWRAP, BITOFFS)                                                      \
 	(((UCHAR *)(BUF))[(((X) + (BITOFFS)) >> 3) + (Y) * (BYTEWRAP)])
 
-#define GET_BIT(X, Y, BUF, BYTEWRAP, BITOFFS) \
+#define GET_BIT(X, Y, BUF, BYTEWRAP, BITOFFS)                                                      \
 	((BUFBYTE(X, Y, BUF, BYTEWRAP, BITOFFS) >> (7 - (((X) + (BITOFFS)) & 7))) & (UCHAR)1)
 
-#define SET_BIT_0(X, Y, BUF, BYTEWRAP, BITOFFS) \
+#define SET_BIT_0(X, Y, BUF, BYTEWRAP, BITOFFS)                                                    \
 	(BUFBYTE(X, Y, BUF, BYTEWRAP, BITOFFS) &= ~(1 << (7 - (((X) + (BITOFFS)) & 7))))
 
-#define SET_BIT_1(X, Y, BUF, BYTEWRAP, BITOFFS) \
+#define SET_BIT_1(X, Y, BUF, BYTEWRAP, BITOFFS)                                                    \
 	(BUFBYTE(X, Y, BUF, BYTEWRAP, BITOFFS) |= (1 << (7 - (((X) + (BITOFFS)) & 7))))
 
-#define BITCPY(XO, YO, BUFO, BYTEWRAPO, BITOFFSO, XI, YI, BUFI, BYTEWRAPI, BITOFFSI) \
-	{                                                                                \
-		if (GET_BIT(XI, YI, BUFI, BYTEWRAPI, BITOFFSI))                              \
-			SET_BIT_1(XO, YO, BUFO, BYTEWRAPO, BITOFFSO);                            \
-		else                                                                         \
-			SET_BIT_0(XO, YO, BUFO, BYTEWRAPO, BITOFFSO);                            \
+#define BITCPY(XO, YO, BUFO, BYTEWRAPO, BITOFFSO, XI, YI, BUFI, BYTEWRAPI, BITOFFSI)               \
+	{                                                                                              \
+		if (GET_BIT(XI, YI, BUFI, BYTEWRAPI, BITOFFSI))                                            \
+			SET_BIT_1(XO, YO, BUFO, BYTEWRAPO, BITOFFSO);                                          \
+		else                                                                                       \
+			SET_BIT_0(XO, YO, BUFO, BYTEWRAPO, BITOFFSO);                                          \
 	}
 
 E 61
 #ifdef DEBUG
-		STW_INIT(0, "rop_copy_90_bw")
-			STW_START(0)
+		STW_INIT(0, "rop_copy_90_bw") STW_START(0)
 #endif
 
-				mirror &= 1;
+			mirror &= 1;
 	ninety &= 3;
 
 	if (!ninety && !mirror) {
@@ -7580,8 +8027,7 @@ static void rop_copy_90_bw(RASTER *rin, RASTER *rout,
 			v = v0;
 			x = newx;
 			for (; x < newx + lx && ((x + bitoffsout) & 7); u += dudx, x++)
-				BITCPY(x, y, bufout, bytewrapout, bitoffsout,
-					   u, v, bufin, bytewrapin, bitoffsin)
+				BITCPY(x, y, bufout, bytewrapout, bitoffsout, u, v, bufin, bytewrapin, bitoffsin)
 			for (; x < newx + lx - 7; x += 8) {
 				tmpbyte = GET_BIT(u, v, bufin, bytewrapin, bitoffsin) << 7;
 				u += dudx;
@@ -7602,8 +8048,7 @@ static void rop_copy_90_bw(RASTER *rin, RASTER *rout,
 				BUFBYTE(x, y, bufout, bytewrapout, bitoffsout) = tmpbyte;
 			}
 			for (; x < newx + lx; u += dudx, x++)
-				BITCPY(x, y, bufout, bytewrapout, bitoffsout,
-					   u, v, bufin, bytewrapin, bitoffsin)
+				BITCPY(x, y, bufout, bytewrapout, bitoffsout, u, v, bufin, bytewrapin, bitoffsin)
 		}
 	else
 		for (u0 = u00, v0 = v00, y = newy; y < newy + ly; u0 += dudy, y++) {
@@ -7611,8 +8056,7 @@ static void rop_copy_90_bw(RASTER *rin, RASTER *rout,
 			v = v0;
 			x = newx;
 			for (; x < newx + lx && ((x + bitoffsout) & 7); v += dvdx, x++)
-				BITCPY(x, y, bufout, bytewrapout, bitoffsout,
-					   u, v, bufin, bytewrapin, bitoffsin)
+				BITCPY(x, y, bufout, bytewrapout, bitoffsout, u, v, bufin, bytewrapin, bitoffsin)
 			for (; x < newx + lx - 7; x += 8) {
 				tmpbyte = GET_BIT(u, v, bufin, bytewrapin, bitoffsin) << 7;
 				v += dvdx;
@@ -7633,14 +8077,12 @@ static void rop_copy_90_bw(RASTER *rin, RASTER *rout,
 				BUFBYTE(x, y, bufout, bytewrapout, bitoffsout) = tmpbyte;
 			}
 			for (; x < newx + lx; v += dvdx, x++)
-				BITCPY(x, y, bufout, bytewrapout, bitoffsout,
-					   u, v, bufin, bytewrapin, bitoffsin)
+				BITCPY(x, y, bufout, bytewrapout, bitoffsout, u, v, bufin, bytewrapin, bitoffsin)
 		}
 	E 15
 
 #ifdef DEBUG
-		STW_STOP(0)
-			STW_PRINT(stdout)
+		STW_STOP(0) STW_PRINT(stdout)
 #endif
 }
 
@@ -7651,9 +8093,7 @@ static void rop_copy_90_bw(RASTER *rin, RASTER *rout,
 #ifdef VERSIONE_LENTA
 
 	static void
-	rop_copy_90_gr8(RASTER *rin, RASTER *rout,
-					int x1, int y1, int x2, int y2,
-					int newx, int newy,
+	rop_copy_90_gr8(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2, int newx, int newy,
 					int mirror, int ninety)
 {
 	UCHAR *bufin, *bufout;
@@ -7880,17 +8320,14 @@ static void rop_copy_90_gr8(RASTER *rin, RASTER *rout,
 	I 17
 
 #ifdef DEBUG
-		STW_STOP(0)
-			STW_PRINT(stdout)
+		STW_STOP(0) STW_PRINT(stdout)
 #endif
 }
 
 /*---------------------------------------------------------------------------*/
 
-I 21 static void rop_copy_90_gr8_cm16(RASTER * rin, RASTER * rout,
-									   int x1, int y1, int x2, int y2,
-									   int newx, int newy,
-									   int mirror, int ninety)
+I 21 static void rop_copy_90_gr8_cm16(RASTER * rin, RASTER * rout, int x1, int y1, int x2, int y2,
+									   int newx, int newy, int mirror, int ninety)
 {
 	UCHAR *bufin, *bytein;
 	USHORT *bufout, *pixout;
@@ -8001,10 +8438,8 @@ static void rop_copy_90_gr8(RASTER *rin, RASTER *rout,
 
 /*---------------------------------------------------------------------------*/
 
-static void rop_copy_90_cm8_cm16(RASTER * rin, RASTER * rout,
-								 int x1, int y1, int x2, int y2,
-								 int newx, int newy,
-								 int mirror, int ninety)
+static void rop_copy_90_cm8_cm16(RASTER * rin, RASTER * rout, int x1, int y1, int x2, int y2,
+								 int newx, int newy, int mirror, int ninety)
 {
 	UCHAR *bufin, *pixin;
 	USHORT *bufout, *pixout;
@@ -8112,16 +8547,12 @@ static void rop_copy_90_cm8_cm16(RASTER * rin, RASTER * rout,
 /*---------------------------------------------------------------------------*/
 
 I 22
-D 55 static void rop_copy_90_gr8_rgbm(RASTER * rin, RASTER * rout,
-										int x1, int y1, int x2, int y2,
-										int newx, int newy,
-										int mirror, int ninety)
+D 55 static void rop_copy_90_gr8_rgbm(RASTER * rin, RASTER * rout, int x1, int y1, int x2, int y2,
+										int newx, int newy, int mirror, int ninety)
 E 55
 I 55 static void
-rop_copy_90_gr8_rgb16(RASTER * rin, RASTER * rout,
-					  int x1, int y1, int x2, int y2,
-					  int newx, int newy,
-					  int mirror, int ninety)
+rop_copy_90_gr8_rgb16(RASTER * rin, RASTER * rout, int x1, int y1, int x2, int y2, int newx,
+					  int newy, int mirror, int ninety)
 E 55
 {
 	UCHAR *bufin, *bytein;
@@ -8211,17 +8642,14 @@ for (u0 = u00, v0 = v00, y = newy; y < newy + ly; u0 += dudy, v0 += dvdy, y++) {
 
 E 62
 #ifdef DEBUG
-	STW_STOP(0)
-		STW_PRINT(stdout)
+	STW_STOP(0) STW_PRINT(stdout)
 #endif
 }
 
 /*---------------------------------------------------------------------------*/
 
-static void rop_copy_90_gr8_cm16(RASTER *rin, RASTER *rout,
-								 int x1, int y1, int x2, int y2,
-								 int newx, int newy,
-								 int mirror, int ninety)
+static void rop_copy_90_gr8_cm16(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
+								 int newx, int newy, int mirror, int ninety)
 {
 	UCHAR *bufin, *bytein;
 	USHORT *bufout, *pixout;
@@ -8333,10 +8761,8 @@ static void rop_copy_90_gr8_cm16(RASTER *rin, RASTER *rout,
 
 /*---------------------------------------------------------------------------*/
 
-I 84 static void rop_copy_90_gr8_cm24(RASTER *rin, RASTER *rout,
-									   int x1, int y1, int x2, int y2,
-									   int newx, int newy,
-									   int mirror, int ninety)
+I 84 static void rop_copy_90_gr8_cm24(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
+									   int newx, int newy, int mirror, int ninety)
 {
 	UCHAR *bufin, *bytein;
 	ULONG *bufout, *pixout;
@@ -8440,10 +8866,8 @@ static void rop_copy_90_gr8_cm16(RASTER *rin, RASTER *rout,
 
 /*---------------------------------------------------------------------------*/
 
-E 84 static void rop_copy_90_cm8_cm16(RASTER *rin, RASTER *rout,
-									   int x1, int y1, int x2, int y2,
-									   int newx, int newy,
-									   int mirror, int ninety)
+E 84 static void rop_copy_90_cm8_cm16(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
+									   int newx, int newy, int mirror, int ninety)
 {
 	UCHAR *bufin, *pixin;
 	USHORT *bufout, *pixout;
@@ -8550,10 +8974,8 @@ static void rop_copy_90_gr8_cm16(RASTER *rin, RASTER *rout,
 
 /*---------------------------------------------------------------------------*/
 
-I 84 static void rop_copy_90_cm8_cm24(RASTER *rin, RASTER *rout,
-									   int x1, int y1, int x2, int y2,
-									   int newx, int newy,
-									   int mirror, int ninety)
+I 84 static void rop_copy_90_cm8_cm24(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
+									   int newx, int newy, int mirror, int ninety)
 {
 	UCHAR *bufin, *pixin;
 	ULONG *bufout, *pixout;
@@ -8648,10 +9070,8 @@ static void rop_copy_90_gr8_cm16(RASTER *rin, RASTER *rout,
 
 /*---------------------------------------------------------------------------*/
 
-E 84 static void rop_copy_90_gr8_rgb16(RASTER *rin, RASTER *rout,
-										int x1, int y1, int x2, int y2,
-										int newx, int newy,
-										int mirror, int ninety)
+E 84 static void rop_copy_90_gr8_rgb16(RASTER *rin, RASTER *rout, int x1, int y1, int x2, int y2,
+										int newx, int newy, int mirror, int ninety)
 {
 	UCHAR *bufin, *bytein;
 	USHORT *bufout, *pixout;
@@ -8748,11 +9168,9 @@ static void rop_copy_90_gr8_cm16(RASTER *rin, RASTER *rout,
 			*pixout++ = tmp;
 			E 55
 I 55
-D 60
-				*pixout++ = ROP_RGB16_FROM_BYTES(*bytein, *bytein, *bytein);
+D 60 *pixout++ = ROP_RGB16_FROM_BYTES(*bytein, *bytein, *bytein);
 			E 60
-I 60
-				*pixout++ = PIX_RGB16_FROM_BYTES(*bytein, *bytein, *bytein);
+I 60 *pixout++ = PIX_RGB16_FROM_BYTES(*bytein, *bytein, *bytein);
 			E 60
 E 55 bytein += dindx;
 		}
@@ -8980,8 +9398,7 @@ static void rop_zoom_out_90_gr8_rgb16(RASTER *rin, RASTER *rout,
 E 43 tmp.m = 0xff;
 			*pixout++ = tmp;
 			E 56
-I 56
-				*pixout++ = ROP_RGB16_FROM_BYTES(*bytein, *bytein, *bytein);
+I 56 *pixout++ = ROP_RGB16_FROM_BYTES(*bytein, *bytein, *bytein);
 			E 56 bytein += dindx;
 		}
 		E 57
@@ -9093,8 +9510,7 @@ static void rop_copy_90_rgb_rgbm(RASTER *rin, RASTER *rout,
 
 	D 55
 #ifdef DEBUG
-		STW_INIT(0, "rop_copy_90_bw_gr8")
-			STW_START(0)
+		STW_INIT(0, "rop_copy_90_bw_gr8") STW_START(0)
 #endif
 
 E 55 mirror &= 1;
@@ -9243,8 +9659,7 @@ static void rop_copy_90_rgb_rgbm(RASTER *rin, RASTER *rout,
 					D 57 tmp = (tmp + fac_urest_2) / fac_urest;
 					E 57
 I 57 tmp = (tmp + fac_prest_2) / fac_prest;
-					E 57
-						*pixout = ROP_RGB16_FROM_BYTES(tmp, tmp, tmp);
+					E 57 *pixout = ROP_RGB16_FROM_BYTES(tmp, tmp, tmp);
 				}
 				D 57 rowin += wrapin * factor;
 				E 57
@@ -9297,8 +9712,7 @@ static void rop_copy_90_rgb_rgbm(RASTER *rin, RASTER *rout,
 				D 57 tmp = (tmp + vrest_fac_2) / vrest_fac;
 				E 57
 I 57 tmp = (tmp + qrest_fac_2) / qrest_fac;
-				E 57
-					*pixout++ = ROP_RGB16_FROM_BYTES(tmp, tmp, tmp);
+				E 57 *pixout++ = ROP_RGB16_FROM_BYTES(tmp, tmp, tmp);
 				D 57 pixin += factor;
 				E 57
 I 57 pixin += factor * dindp;
@@ -9323,8 +9737,7 @@ static void rop_copy_90_rgb_rgbm(RASTER *rin, RASTER *rout,
 				D 57 tmp = (tmp + vrest_urest_2) / vrest_urest;
 				E 57
 I 57 tmp = (tmp + qrest_prest_2) / qrest_prest;
-				E 57
-					*pixout = ROP_RGB16_FROM_BYTES(tmp, tmp, tmp);
+				E 57 *pixout = ROP_RGB16_FROM_BYTES(tmp, tmp, tmp);
 				E 56
 			}
 		}
@@ -9438,11 +9851,9 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 				in += 2 * dindq - factor * dindp;
 			}
 			tmp = (tmp + fac_fac_4) >> fac_fac_2_bits;
-			D 60
-				*pixout++ = ROP_RGB16_FROM_BYTES(tmp, tmp, tmp);
+			D 60 *pixout++ = ROP_RGB16_FROM_BYTES(tmp, tmp, tmp);
 			E 60
-I 60
-				*pixout++ = PIX_RGB16_FROM_BYTES(tmp, tmp, tmp);
+I 60 *pixout++ = PIX_RGB16_FROM_BYTES(tmp, tmp, tmp);
 			E 60 pixin += factor * dindp;
 		}
 		if (prest) {
@@ -9452,11 +9863,9 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 					tmp += pixin[i * dindp + j * dindq];
 				}
 			tmp = (tmp + fac_prest_2) / fac_prest;
-			D 60
-				*pixout = ROP_RGB16_FROM_BYTES(tmp, tmp, tmp);
+			D 60 *pixout = ROP_RGB16_FROM_BYTES(tmp, tmp, tmp);
 			E 60
-I 60
-				*pixout = PIX_RGB16_FROM_BYTES(tmp, tmp, tmp);
+I 60 *pixout = PIX_RGB16_FROM_BYTES(tmp, tmp, tmp);
 			E 60
 		}
 		rowin += factor * dindq;
@@ -9476,11 +9885,9 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 					tmp += pixin[i * dindp + j * dindq];
 				}
 			tmp = (tmp + qrest_fac_2) / qrest_fac;
-			D 60
-				*pixout++ = ROP_RGB16_FROM_BYTES(tmp, tmp, tmp);
+			D 60 *pixout++ = ROP_RGB16_FROM_BYTES(tmp, tmp, tmp);
 			E 60
-I 60
-				*pixout++ = PIX_RGB16_FROM_BYTES(tmp, tmp, tmp);
+I 60 *pixout++ = PIX_RGB16_FROM_BYTES(tmp, tmp, tmp);
 			E 60 pixin += factor * dindp;
 		}
 		if (prest) {
@@ -9490,11 +9897,9 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 					tmp += pixin[i * dindp + j * dindq];
 				}
 			tmp = (tmp + qrest_prest_2) / qrest_prest;
-			D 60
-				*pixout = ROP_RGB16_FROM_BYTES(tmp, tmp, tmp);
+			D 60 *pixout = ROP_RGB16_FROM_BYTES(tmp, tmp, tmp);
 			E 60
-I 60
-				*pixout = PIX_RGB16_FROM_BYTES(tmp, tmp, tmp);
+I 60 *pixout = PIX_RGB16_FROM_BYTES(tmp, tmp, tmp);
 			E 60
 		}
 	}
@@ -9623,10 +10028,8 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 
 	/*---------------------------------------------------------------------------*/
 
-	I 57 static void rop_zoom_out_90_gr8_rgbm(RASTER * rin, RASTER * rout,
-											   int x1, int y1, int x2, int y2,
-											   int newx, int newy,
-											   int abs_zoom_level,
+	I 57 static void rop_zoom_out_90_gr8_rgbm(RASTER * rin, RASTER * rout, int x1, int y1, int x2,
+											   int y2, int newx, int newy, int abs_zoom_level,
 											   int mirror, int ninety)
 	{
 		UCHAR *bufin, *rowin, *pixin, *in;
@@ -9829,10 +10232,8 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 
 	/*---------------------------------------------------------------------------*/
 
-	I 63 static void rop_copy_90_rgb_rgb16(RASTER * rin, RASTER * rout,
-											int x1, int y1, int x2, int y2,
-											int newx, int newy,
-											int mirror, int ninety)
+	I 63 static void rop_copy_90_rgb_rgb16(RASTER * rin, RASTER * rout, int x1, int y1, int x2,
+											int y2, int newx, int newy, int mirror, int ninety)
 	{
 		UCHAR *bufin, *bytein;
 		USHORT *bufout, *pixout;
@@ -9928,10 +10329,8 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 
 	/*---------------------------------------------------------------------------*/
 
-	static void rop_zoom_out_90_rgb_rgb16(RASTER * rin, RASTER * rout,
-										  int x1, int y1, int x2, int y2,
-										  int newx, int newy,
-										  int abs_zoom_level,
+	static void rop_zoom_out_90_rgb_rgb16(RASTER * rin, RASTER * rout, int x1, int y1, int x2,
+										  int y2, int newx, int newy, int abs_zoom_level,
 										  int mirror, int ninety)
 	{
 		UCHAR *bufin, *rowin, *pixin, *in;
@@ -10149,11 +10548,9 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 
 			/*---------------------------------------------------------------------------*/
 
-			static void rop_zoom_out_90_rgb_rgb16(RASTER * rin, RASTER * rout,
-												  int x1, int y1, int x2, int y2,
-												  int newx, int newy,
-												  int abs_zoom_level,
-												  int mirror, int ninety)
+			static void rop_zoom_out_90_rgb_rgb16(RASTER * rin, RASTER * rout, int x1, int y1,
+												  int x2, int y2, int newx, int newy,
+												  int abs_zoom_level, int mirror, int ninety)
 			{
 				UCHAR *bufin, *rowin, *pixin, *in;
 				int tmp_r, tmp_g, tmp_b;
@@ -10349,10 +10746,8 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 			/*---------------------------------------------------------------------------*/
 
 			E 63
-E 57 static void rop_copy_90_rgb_rgbm(RASTER * rin, RASTER * rout,
-										int x1, int y1, int x2, int y2,
-										int newx, int newy,
-										int mirror, int ninety)
+E 57 static void rop_copy_90_rgb_rgbm(RASTER * rin, RASTER * rout, int x1, int y1, int x2, int y2,
+										int newx, int newy, int mirror, int ninety)
 			{
 				UCHAR *bufin, *bytein, *appo;
 				LPIXEL *bufout, *pixout, tmp;
@@ -10453,11 +10848,9 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 
 			/*---------------------------------------------------------------------------*/
 
-			I 63 static void rop_zoom_out_90_rgb_rgbm(RASTER * rin, RASTER * rout,
-													   int x1, int y1, int x2, int y2,
-													   int newx, int newy,
-													   int abs_zoom_level,
-													   int mirror, int ninety)
+			I 63 static void rop_zoom_out_90_rgb_rgbm(RASTER * rin, RASTER * rout, int x1, int y1,
+													   int x2, int y2, int newx, int newy,
+													   int abs_zoom_level, int mirror, int ninety)
 			{
 				UCHAR *bufin, *rowin, *pixin, *in;
 				int tmp_r, tmp_g, tmp_b;
@@ -10657,10 +11050,9 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 
 			/*---------------------------------------------------------------------------*/
 
-			E 63 static void rop_copy_90_bw_gr8(RASTER * rin, RASTER * rout,
-												 int x1, int y1, int x2, int y2,
-E 56 int newx, int newy,
-												 int mirror, int ninety)
+			E 63 static void rop_copy_90_bw_gr8(RASTER * rin, RASTER * rout, int x1, int y1,
+												 int x2, int y2,
+E 56 int newx, int newy, int mirror, int ninety)
 			{
 				UCHAR *bufin, *bufout, *bytein, *byteout;
 				int bytewrapin, bitoffsin, wrapout;
@@ -10790,18 +11182,15 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 				D 55
 
 #ifdef DEBUG
-					STW_STOP(0)
-						STW_PRINT(stdout)
+					STW_STOP(0) STW_PRINT(stdout)
 #endif
 E 55
 			}
 
 			/*---------------------------------------------------------------------------*/
 
-			static void rop_copy_90_bw_cm16(RASTER * rin, RASTER * rout,
-											int x1, int y1, int x2, int y2,
-											int newx, int newy,
-											int mirror, int ninety)
+			static void rop_copy_90_bw_cm16(RASTER * rin, RASTER * rout, int x1, int y1, int x2,
+											int y2, int newx, int newy, int mirror, int ninety)
 			{
 				UCHAR *bufin, *bytein;
 				USHORT *bufout, *pixout;
@@ -10814,8 +11203,7 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 
 				D 55
 #ifdef DEBUG
-					STW_INIT(0, "rop_copy_90_bw_gr8")
-						STW_START(0)
+					STW_INIT(0, "rop_copy_90_bw_gr8") STW_START(0)
 #endif
 
 E 55 mirror &= 1;
@@ -10954,10 +11342,9 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 
 			/*---------------------------------------------------------------------------*/
 
-			I 84 static void rop_copy_90_bw_cm24(RASTER * rin, RASTER * rout,
-												  int x1, int y1, int x2, int y2,
-												  int newx, int newy,
-												  int mirror, int ninety)
+			I 84 static void rop_copy_90_bw_cm24(RASTER * rin, RASTER * rout, int x1, int y1,
+												  int x2, int y2, int newx, int newy, int mirror,
+												  int ninety)
 			{
 				UCHAR *bufin, *bytein;
 				ULONG *bufout, *pixout;
@@ -11085,10 +11472,9 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 
 			/*---------------------------------------------------------------------------*/
 
-			E 84 static void rop_copy_90_bw_rgb16(RASTER * rin, RASTER * rout,
-												   int x1, int y1, int x2, int y2,
-												   int newx, int newy,
-												   int mirror, int ninety)
+			E 84 static void rop_copy_90_bw_rgb16(RASTER * rin, RASTER * rout, int x1, int y1,
+												   int x2, int y2, int newx, int newy, int mirror,
+												   int ninety)
 			{
 				UCHAR *bufin, *bytein;
 				USHORT *bufout, *pixout;
@@ -11189,8 +11575,7 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 
 D 55
 #ifdef DEBUG
-					STW_STOP(0)
-						STW_PRINT(stdout)
+					STW_STOP(0) STW_PRINT(stdout)
 #endif
 E 55
 I 55 if (dudx) for (u0 = u00, v0 = v00, y = newy; y < newy + ly; v0 += dvdy, y++)
@@ -11222,9 +11607,8 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 
 			/*---------------------------------------------------------------------------*/
 
-			static void rop_copy_90_bw_rgbm(RASTER * rin, RASTER * rout,
-											int x1, int y1, int x2, int y2,
-											int newx, int newy,
+			static void rop_copy_90_bw_rgbm(RASTER * rin, RASTER * rout, int x1, int y1, int x2,
+											int y2, int newx, int newy,
 D 52 int mirror, int ninety)
 			{
 				UCHAR *bufin, *bytein;
@@ -11368,18 +11752,15 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 				E 17
 
 #ifdef DEBUG
-					STW_STOP(0)
-						STW_PRINT(stdout)
+					STW_STOP(0) STW_PRINT(stdout)
 #endif
 I 26
 			}
 
 			/*---------------------------------------------------------------------------*/
 
-			static void rop_copy_90_rgbm(RASTER * rin, RASTER * rout,
-										 int x1, int y1, int x2, int y2,
-										 int newx, int newy,
-										 int mirror, int ninety)
+			static void rop_copy_90_rgbm(RASTER * rin, RASTER * rout, int x1, int y1, int x2,
+										 int y2, int newx, int newy, int mirror, int ninety)
 			{
 				LPIXEL *bufin, *pixin;
 				LPIXEL *bufout, *pixout;
@@ -11535,8 +11916,7 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 
 				for (i = 0; i < ras->cmap.size; i++) {
 					m = ras->cmap.buffer[i].m;
-					if (ras->cmap.buffer[i].r > m ||
-						ras->cmap.buffer[i].g > m ||
+					if (ras->cmap.buffer[i].r > m || ras->cmap.buffer[i].g > m ||
 						ras->cmap.buffer[i].b > m)
 						break;
 					white = (UCHAR)255 - m;
@@ -11561,8 +11941,7 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 					ras->cmap.buffer[i].r -= white;
 					ras->cmap.buffer[i].g -= white;
 					ras->cmap.buffer[i].b -= white;
-					if (ras->cmap.buffer[i].r > m ||
-						ras->cmap.buffer[i].g > m ||
+					if (ras->cmap.buffer[i].r > m || ras->cmap.buffer[i].g > m ||
 						ras->cmap.buffer[i].b > m)
 						break;
 				}
@@ -11635,8 +12014,7 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 
 	D 55
 #ifdef DEBUG
-		STW_INIT(0, "rop_copy_90_bw_gr8")
-			STW_START(0)
+		STW_INIT(0, "rop_copy_90_bw_gr8") STW_START(0)
 #endif
 
 E 55 mirror &= 1;
@@ -11828,28 +12206,24 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 						v = v0;
 						pixout = bufout + newx + y * wrapout;
 						for (x = newx; x < newx + lx; v += dvdx, x++) {
-							E 53 if (GET_BIT(u, v, bufin, bytewrapin, bitoffsin))
-								*pixout++ = value_for_1;
-							else
-								*pixout++ = value_for_0;
+							E 53 if (GET_BIT(u, v, bufin, bytewrapin, bitoffsin)) *pixout++ =
+								value_for_1;
+							else *pixout++ = value_for_0;
 						}
 					}
 				D 55
 
 #ifdef DEBUG
-					STW_STOP(0)
-						STW_PRINT(stdout)
+					STW_STOP(0) STW_PRINT(stdout)
 #endif
 E 55
 			}
 
 			/*---------------------------------------------------------------------------*/
 
-			I 62 static void rop_zoom_out_90_bw_rgbm(RASTER * rin, RASTER * rout,
-													  int x1, int y1, int x2, int y2,
-													  int newx, int newy,
-													  int abs_zoom_level,
-													  int mirror, int ninety)
+			I 62 static void rop_zoom_out_90_bw_rgbm(RASTER * rin, RASTER * rout, int x1, int y1,
+													  int x2, int y2, int newx, int newy,
+													  int abs_zoom_level, int mirror, int ninety)
 			{
 				UCHAR *bufin;
 				int val_0, val_1, tmp;
@@ -12052,11 +12426,9 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 
 			/*---------------------------------------------------------------------------*/
 
-			static void rop_zoom_out_90_bw_rgb16(RASTER * rin, RASTER * rout,
-												 int x1, int y1, int x2, int y2,
-												 int newx, int newy,
-												 int abs_zoom_level,
-												 int mirror, int ninety)
+			static void rop_zoom_out_90_bw_rgb16(RASTER * rin, RASTER * rout, int x1, int y1,
+												 int x2, int y2, int newx, int newy,
+												 int abs_zoom_level, int mirror, int ninety)
 			{
 				UCHAR *bufin;
 				int val_0, val_1, tmp;
@@ -12254,10 +12626,8 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 
 			/*---------------------------------------------------------------------------*/
 
-			E 62 static void rop_copy_90_rgbm(RASTER * rin, RASTER * rout,
-											   int x1, int y1, int x2, int y2,
-											   int newx, int newy,
-											   int mirror, int ninety)
+			E 62 static void rop_copy_90_rgbm(RASTER * rin, RASTER * rout, int x1, int y1, int x2,
+											   int y2, int newx, int newy, int mirror, int ninety)
 			{
 				LPIXEL *bufin, *pixin;
 				LPIXEL *bufout, *pixout;
@@ -12356,9 +12726,8 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 
 			/* vedi sia rop_zoom_out che rop_copy_90
  */
-			void rop_zoom_out_90(RASTER * rin, RASTER * rout,
-								 int x1, int y1, int x2, int y2, int newx, int newy,
-								 int abs_zoom_level, int mirror, int ninety)
+			void rop_zoom_out_90(RASTER * rin, RASTER * rout, int x1, int y1, int x2, int y2,
+								 int newx, int newy, int abs_zoom_level, int mirror, int ninety)
 			{
 				int tmp, newlx, newly;
 				int rasras, factor, abszl;
@@ -12398,22 +12767,34 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 
 				rasras = RASRAS(rin->type, rout->type);
 				switch (rasras) {
-					I 62 CASE RASRAS(RAS_WB, RAS_RGB16) : __OR RASRAS(RAS_BW, RAS_RGB16) : rop_zoom_out_90_bw_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, abszl,
-																													 mirror, ninety);
+					I 62 CASE RASRAS(RAS_WB, RAS_RGB16)
+						: __OR RASRAS(RAS_BW, RAS_RGB16)
+						: rop_zoom_out_90_bw_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, abszl,
+												   mirror, ninety);
 
-					CASE RASRAS(RAS_WB, RAS_RGB_) : __OR RASRAS(RAS_WB, RAS_RGBM) : __OR RASRAS(RAS_BW, RAS_RGB_) : __OR RASRAS(RAS_BW, RAS_RGBM) : rop_zoom_out_90_bw_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, abszl,
-																																											mirror, ninety);
+					CASE RASRAS(RAS_WB, RAS_RGB_)
+						: __OR RASRAS(RAS_WB, RAS_RGBM)
+						: __OR RASRAS(RAS_BW, RAS_RGB_)
+						: __OR RASRAS(RAS_BW, RAS_RGBM)
+						: rop_zoom_out_90_bw_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, abszl,
+												  mirror, ninety);
 
-					E 62 CASE RASRAS(RAS_GR8, RAS_RGB16) : rop_zoom_out_90_gr8_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, abszl,
-																					  mirror, ninety);
+					E 62 CASE RASRAS(RAS_GR8, RAS_RGB16)
+						: rop_zoom_out_90_gr8_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, abszl,
+													mirror, ninety);
 
-					CASE RASRAS(RAS_GR8, RAS_RGB_) : __OR RASRAS(RAS_GR8, RAS_RGBM) : rop_zoom_out_90_gr8_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, abszl,
+					CASE RASRAS(RAS_GR8, RAS_RGB_)
+						: __OR RASRAS(RAS_GR8, RAS_RGBM)
+						: rop_zoom_out_90_gr8_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, abszl,
 I 63 mirror, ninety);
 
-					CASE RASRAS(RAS_RGB, RAS_RGB16) : rop_zoom_out_90_rgb_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, abszl,
-																				mirror, ninety);
+					CASE RASRAS(RAS_RGB, RAS_RGB16)
+						: rop_zoom_out_90_rgb_rgb16(rin, rout, x1, y1, x2, y2, newx, newy, abszl,
+													mirror, ninety);
 
-					CASE RASRAS(RAS_RGB, RAS_RGB_) : __OR RASRAS(RAS_RGB, RAS_RGBM) : rop_zoom_out_90_rgb_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, abszl,
+					CASE RASRAS(RAS_RGB, RAS_RGB_)
+						: __OR RASRAS(RAS_RGB, RAS_RGBM)
+						: rop_zoom_out_90_rgb_rgbm(rin, rout, x1, y1, x2, y2, newx, newy, abszl,
 E 63 mirror, ninety);
 
 				DEFAULT:
@@ -12501,8 +12882,7 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 
 			/*---------------------------------------------------------------------------*/
 
-			void rop_and_extra_bits(RASTER * ras, UCHAR and_mask,
-									int x1, int y1, int x2, int y2)
+			void rop_and_extra_bits(RASTER * ras, UCHAR and_mask, int x1, int y1, int x2, int y2)
 			{
 				int x, y, lx, ly, wrap;
 				ULONG *row24, *pix24, and_mask24;
@@ -12561,8 +12941,7 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 					E 82
 					{
 						m = ras->cmap.buffer[i].m;
-						if (ras->cmap.buffer[i].r > m ||
-							ras->cmap.buffer[i].g > m ||
+						if (ras->cmap.buffer[i].r > m || ras->cmap.buffer[i].g > m ||
 							ras->cmap.buffer[i].b > m)
 							break;
 						white = (UCHAR)255 - m;
@@ -12577,9 +12956,7 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 							cmap_size = TCM_MIN_CMAP_BUFFER_SIZE(ras->cmap.info);
 							for (i = 0; i < cmap_size; i++) {
 								m = buffer[i].m;
-								if (buffer[i].r > m ||
-									buffer[i].g > m ||
-									buffer[i].b > m)
+								if (buffer[i].r > m || buffer[i].g > m || buffer[i].b > m)
 									break;
 								white = (UCHAR)255 - m;
 								buffer[i].r += white;
@@ -12594,9 +12971,7 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 
 							for (i = 0; i < colbuf_size; i++) {
 								m = colbuffer[i].m;
-								if (colbuffer[i].r > m ||
-									colbuffer[i].g > m ||
-									colbuffer[i].b > m)
+								if (colbuffer[i].r > m || colbuffer[i].g > m || colbuffer[i].b > m)
 									break;
 								white = (UCHAR)i - m; /* i & 0xff == tone */
 								colbuffer[i].r += white;
@@ -12608,9 +12983,7 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 
 							for (i = 0; i < penbuf_size; i++) {
 								m = penbuffer[i].m;
-								if (penbuffer[i].r > m ||
-									penbuffer[i].g > m ||
-									penbuffer[i].b > m)
+								if (penbuffer[i].r > m || penbuffer[i].g > m || penbuffer[i].b > m)
 									break;
 								white = (UCHAR)~i - m; /* 255 - (i & 0xff) == 255 - tone */
 								penbuffer[i].r += white;
@@ -12660,9 +13033,7 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 							buffer[i].r -= white;
 							buffer[i].g -= white;
 							buffer[i].b -= white;
-							if (buffer[i].r > m ||
-								buffer[i].g > m ||
-								buffer[i].b > m)
+							if (buffer[i].r > m || buffer[i].g > m || buffer[i].b > m)
 								break;
 						}
 						if (i < cmap_size)
@@ -12676,8 +13047,7 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 							ras->cmap.buffer[i].r -= white;
 							ras->cmap.buffer[i].g -= white;
 							ras->cmap.buffer[i].b -= white;
-							if (ras->cmap.buffer[i].r > m ||
-								ras->cmap.buffer[i].g > m ||
+							if (ras->cmap.buffer[i].r > m || ras->cmap.buffer[i].g > m ||
 								ras->cmap.buffer[i].b > m)
 								break;
 							E 84
@@ -12690,9 +13060,7 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 								colbuffer[i].r -= white;
 								colbuffer[i].g -= white;
 								colbuffer[i].b -= white;
-								if (colbuffer[i].r > m ||
-									colbuffer[i].g > m ||
-									colbuffer[i].b > m)
+								if (colbuffer[i].r > m || colbuffer[i].g > m || colbuffer[i].b > m)
 									break;
 							}
 							if (i < colbuf_size)
@@ -12704,9 +13072,7 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 								penbuffer[i].r -= white;
 								penbuffer[i].g -= white;
 								penbuffer[i].b -= white;
-								if (penbuffer[i].r > m ||
-									penbuffer[i].g > m ||
-									penbuffer[i].b > m)
+								if (penbuffer[i].r > m || penbuffer[i].g > m || penbuffer[i].b > m)
 									break;
 							}
 							if (i < penbuf_size)
@@ -12791,9 +13157,7 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 				/*---------------------------------------------------------------------------*/
 
 				void rop_fill_cmap_ramp(RASTER * ras, TCM_INFO info,
-D 89 LPIXEL color, LPIXEL pencil,
-										int color_index, int pencil_index,
-										int already_premultiplied)
+D 89 LPIXEL color, LPIXEL pencil, int color_index, int pencil_index, int already_premultiplied)
 				{
 					LPIXEL val, *ramp;
 					int ramp_index;
@@ -12803,17 +13167,16 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
 
 					I 34
 D 35
-						/* Secondo noi (Grisu & Roberto) l'offset non ci vuole 
+						/* Secondo noi (Grisu & Roberto) l'offset non ci vuole
 E 34
 ramp_index = color_index  << info.color_offs  |
-             pencil_index << info.pencil_offs | info.offset_mask;
+			 pencil_index << info.pencil_offs | info.offset_mask;
 I 34
  */
-						ramp_index = color_index << info.color_offs |
-									 pencil_index << info.pencil_offs;
+						ramp_index =
+							color_index << info.color_offs | pencil_index << info.pencil_offs;
 					E 35
-I 35 ramp_index = color_index << info.color_offs |
-						pencil_index << info.pencil_offs;
+I 35 ramp_index = color_index << info.color_offs | pencil_index << info.pencil_offs;
 					E 35
 E 34 ramp = ras->cmap.buffer + ramp_index;
 					if (!already_premultiplied) {
@@ -12854,9 +13217,8 @@ ramp_index = color_index  << info.color_offs  |
 
 				/*---------------------------------------------------------------------------*/
 
-				I 84 void rop_fill_cmap_colramp(RASTER * ras, TCM_INFO info,
-												 LPIXEL color, int color_index,
-												 int already_premultiplied)
+				I 84 void rop_fill_cmap_colramp(RASTER * ras, TCM_INFO info, LPIXEL color,
+												 int color_index, int already_premultiplied)
 				{
 					LPIXEL val, *colbuffer;
 					int index, tone;
@@ -12882,9 +13244,8 @@ ramp_index = color_index  << info.color_offs  |
 
 				/*---------------------------------------------------------------------------*/
 
-				void rop_fill_cmap_penramp(RASTER * ras, TCM_INFO info,
-										   LPIXEL pencil, int pencil_index,
-										   int already_premultiplied)
+				void rop_fill_cmap_penramp(RASTER * ras, TCM_INFO info, LPIXEL pencil,
+										   int pencil_index, int already_premultiplied)
 				{
 					LPIXEL val, *penbuffer;
 					int index, enot;
@@ -12913,10 +13274,9 @@ ramp_index = color_index  << info.color_offs  |
 				/*---------------------------------------------------------------------------*/
 
 				E 84
-I 36 void rop_custom_fill_cmap_ramp(RASTER * ras, TCM_INFO info,
-									  LPIXEL color, LPIXEL pencil,
-									  int color_index, int pencil_index,
-									  int already_premultiplied, int *custom_tone)
+I 36 void rop_custom_fill_cmap_ramp(RASTER * ras, TCM_INFO info, LPIXEL color, LPIXEL pencil,
+									  int color_index, int pencil_index, int already_premultiplied,
+									  int *custom_tone)
 				{
 					LPIXEL val, *ramp;
 					int ramp_index;
@@ -12924,8 +13284,7 @@ ramp_index = color_index  << info.color_offs  |
 					int tone, tmax, tmax_2;
 					int tmax_2_r, tmax_2_g, tmax_2_b, tmax_2_m;
 
-					ramp_index = color_index << info.color_offs |
-								 pencil_index << info.pencil_offs;
+					ramp_index = color_index << info.color_offs | pencil_index << info.pencil_offs;
 					ramp = ras->cmap.buffer + ramp_index;
 					if (!already_premultiplied) {
 						color = premult_lpixel(color);
@@ -12956,7 +13315,8 @@ ramp_index = color_index  << info.color_offs  |
 E 37
 						{
 							D 37
-								/* only the following 4 lines are different from the non-custom version */
+								/* only the following 4 lines are different from the non-custom
+								   version */
 E 37 val.r = p_r + (d_r * custom_tone[tone] + tmax_2_r) / tmax;
 							val.g = p_g + (d_g * custom_tone[tone] + tmax_2_g) / tmax;
 							val.b = p_b + (d_b * custom_tone[tone] + tmax_2_b) / tmax;
@@ -12973,8 +13333,7 @@ ramp_index = color_index  << info.color_offs  |
 				/*---------------------------------------------------------------------------*/
 
 				E 36
-D 84 void rop_fill_cmap_buffer(RASTER * ras, TCM_INFO info,
-								 LPIXEL * color, LPIXEL * pencil,
+D 84 void rop_fill_cmap_buffer(RASTER * ras, TCM_INFO info, LPIXEL * color, LPIXEL * pencil,
 								 int already_premultiplied)
 				{
 					D 82 int min_cmap_buffer_size, i, j;
@@ -12987,17 +13346,16 @@ ramp_index = color_index  << info.color_offs  |
 					E 33
 I 33 assert(ras->cmap.size >= min_cmap_buffer_size);
 					E 82
-E 33 for (i = 0; i < info.n_colors; i++) for (j = 0; j < info.n_pencils; j++)
-						rop_fill_cmap_ramp(ras, info, color[i], pencil[j], i, j,
-										   already_premultiplied);
+E 33 for (i = 0; i < info.n_colors; i++) for (j = 0; j < info.n_pencils; j++) rop_fill_cmap_ramp(
+						ras, info, color[i], pencil[j], i, j, already_premultiplied);
 					I 36
 				}
 
 				/*---------------------------------------------------------------------------*/
 
-				void rop_custom_fill_cmap_buffer(RASTER * ras, TCM_INFO info,
-												 LPIXEL * color, LPIXEL * pencil,
-												 int already_premultiplied, int *custom_tone)
+				void rop_custom_fill_cmap_buffer(RASTER * ras, TCM_INFO info, LPIXEL * color,
+												 LPIXEL * pencil, int already_premultiplied,
+												 int *custom_tone)
 				{
 					D 82 int min_cmap_buffer_size, i, j;
 					E 82
@@ -13016,8 +13374,7 @@ ramp_index = color_index  << info.color_offs  |
 
 					/*---------------------------------------------------------------------------*/
 E 84
-I 84 void rop_custom_fill_cmap_colramp(RASTER * ras, TCM_INFO info,
-										 LPIXEL color, int color_index,
+I 84 void rop_custom_fill_cmap_colramp(RASTER * ras, TCM_INFO info, LPIXEL color, int color_index,
 										 int already_premultiplied, int *custom_tone)
 				{
 					LPIXEL val, *colbuffer;
@@ -13030,8 +13387,7 @@ ramp_index = color_index  << info.color_offs  |
 					{
 						if (!raster->native_buffer)
 							E 84
-I 84 if (!already_premultiplied)
-								color = premult_lpixel(color);
+I 84 if (!already_premultiplied) color = premult_lpixel(color);
 						c_r = color.r;
 						c_g = color.g;
 						c_b = color.b;
@@ -13065,8 +13421,7 @@ ramp_index = color_index  << info.color_offs  |
 
 					/*-----------------------------------------------------------------*/
 
-					void create_raster(RASTER * raster, int xsize, int ysize,
-									   RAS_TYPE type)
+					void create_raster(RASTER * raster, int xsize, int ysize, RAS_TYPE type)
 					{
 						int pixsize;
 
@@ -13075,7 +13430,8 @@ ramp_index = color_index  << info.color_offs  |
 						pixsize = rop_pixbytes(type);
 
 						if (!(raster->native_buffer = get_memory_chunk(xsize * ysize * pixsize)))
-							tmsg_fatal("can't allocate %d Mbytes", ((xsize / 1024) * (ysize / 1024)) * pixsize);
+							tmsg_fatal("can't allocate %d Mbytes",
+									   ((xsize / 1024) * (ysize / 1024)) * pixsize);
 
 						raster->buffer = raster->native_buffer;
 						raster->type = type;
@@ -13088,8 +13444,8 @@ ramp_index = color_index  << info.color_offs  |
 						/*-----------------------------------------------------------------*/
 
 						int
-						create_subraster(RASTER * rin, RASTER * rout,
-										 int x0, int y0, int x1, int y1)
+						create_subraster(RASTER * rin, RASTER * rout, int x0, int y0, int x1,
+										 int y1)
 					{
 						if (x1 < x0 || y1 < y0)
 							return FALSE;
@@ -13106,7 +13462,8 @@ ramp_index = color_index  << info.color_offs  |
 
 						rout->lx = x1 - x0 + 1;
 						rout->ly = y1 - y0 + 1;
-						rout->buffer = (UCHAR *)(rin->buffer) + (y0 * rin->wrap + x0) * rop_pixbytes(rin->type);
+						rout->buffer = (UCHAR *)(rin->buffer) +
+									   (y0 * rin->wrap + x0) * rop_pixbytes(rin->type);
 						return TRUE;
 						E 84
 					}
@@ -13120,9 +13477,9 @@ ramp_index = color_index  << info.color_offs  |
 
 D 84 void clone_raster(RASTER * rin, RASTER * rout)
 E 84
-I 84 void rop_custom_fill_cmap_penramp(RASTER * ras, TCM_INFO info,
-										 LPIXEL pencil, int pencil_index,
-										 int already_premultiplied, int *custom_tone)
+I 84 void rop_custom_fill_cmap_penramp(RASTER * ras, TCM_INFO info, LPIXEL pencil,
+										 int pencil_index, int already_premultiplied,
+										 int *custom_tone)
 E 84
 					{
 						D 84 create_raster(rout, rin->lx, rin->ly, rin->type);
@@ -13164,9 +13521,8 @@ ramp_index = color_index  << info.color_offs  |
 
 				/*---------------------------------------------------------------------------*/
 
-				void rop_fill_cmap_buffer(RASTER * ras, TCM_INFO info,
-										  LPIXEL * color, LPIXEL * pencil,
-										  int already_premultiplied)
+				void rop_fill_cmap_buffer(RASTER * ras, TCM_INFO info, LPIXEL * color,
+										  LPIXEL * pencil, int already_premultiplied)
 				{
 					int i, j;
 
@@ -13178,8 +13534,8 @@ ramp_index = color_index  << info.color_offs  |
 
 				/*---------------------------------------------------------------------------*/
 
-				void rop_fill_cmap_colbuffer(RASTER * ras, TCM_INFO info,
-											 LPIXEL * color, int already_premultiplied)
+				void rop_fill_cmap_colbuffer(RASTER * ras, TCM_INFO info, LPIXEL * color,
+											 int already_premultiplied)
 				{
 					int i;
 
@@ -13199,8 +13555,7 @@ ramp_index = color_index  << info.color_offs  |
 	int tone, tmax, tmax_2;
 	int tmax_2_r, tmax_2_g, tmax_2_b, tmax_2_m;
 
-	ramp_index = color_index << info.color_offs |
-				 pencil_index << info.pencil_offs;
+	ramp_index = color_index << info.color_offs | pencil_index << info.pencil_offs;
 	ramp = ras->cmap.buffer + ramp_index;
 	if (!already_premultiplied) {
 		color = premult_lpixel(color);
@@ -13244,8 +13599,7 @@ ramp_index = color_index  << info.color_offs  |
 
 /*---------------------------------------------------------------------------*/
 
-void rop_fill_cmap_colramp(RASTER * ras, TCM_INFO info,
-						   LPIXEL color, int color_index,
+void rop_fill_cmap_colramp(RASTER * ras, TCM_INFO info, LPIXEL color, int color_index,
 						   int already_premultiplied)
 {
 	LPIXEL val, *colbuffer;
@@ -13272,8 +13626,7 @@ void rop_fill_cmap_colramp(RASTER * ras, TCM_INFO info,
 
 /*---------------------------------------------------------------------------*/
 
-void rop_fill_cmap_penramp(RASTER * ras, TCM_INFO info,
-						   LPIXEL pencil, int pencil_index,
+void rop_fill_cmap_penramp(RASTER * ras, TCM_INFO info, LPIXEL pencil, int pencil_index,
 						   int already_premultiplied)
 {
 	LPIXEL val, *penbuffer;
@@ -13300,10 +13653,9 @@ void rop_fill_cmap_penramp(RASTER * ras, TCM_INFO info,
 
 /*---------------------------------------------------------------------------*/
 
-void rop_custom_fill_cmap_ramp(RASTER * ras, TCM_INFO info,
-							   LPIXEL color, LPIXEL pencil,
-							   int color_index, int pencil_index,
-							   int already_premultiplied, int *custom_tone)
+void rop_custom_fill_cmap_ramp(RASTER * ras, TCM_INFO info, LPIXEL color, LPIXEL pencil,
+							   int color_index, int pencil_index, int already_premultiplied,
+							   int *custom_tone)
 {
 	LPIXEL val, *ramp;
 	int ramp_index;
@@ -13311,8 +13663,7 @@ void rop_custom_fill_cmap_ramp(RASTER * ras, TCM_INFO info,
 	int tone, tmax, tmax_2;
 	int tmax_2_r, tmax_2_g, tmax_2_b, tmax_2_m;
 
-	ramp_index = color_index << info.color_offs |
-				 pencil_index << info.pencil_offs;
+	ramp_index = color_index << info.color_offs | pencil_index << info.pencil_offs;
 	ramp = ras->cmap.buffer + ramp_index;
 	if (!already_premultiplied) {
 		color = premult_lpixel(color);
@@ -13347,8 +13698,7 @@ void rop_custom_fill_cmap_ramp(RASTER * ras, TCM_INFO info,
 
 /*---------------------------------------------------------------------------*/
 
-void rop_custom_fill_cmap_colramp(RASTER * ras, TCM_INFO info,
-								  LPIXEL color, int color_index,
+void rop_custom_fill_cmap_colramp(RASTER * ras, TCM_INFO info, LPIXEL color, int color_index,
 								  int already_premultiplied, int *custom_tone)
 {
 	LPIXEL val, *colbuffer;
@@ -13375,8 +13725,7 @@ void rop_custom_fill_cmap_colramp(RASTER * ras, TCM_INFO info,
 
 /*---------------------------------------------------------------------------*/
 
-void rop_custom_fill_cmap_penramp(RASTER * ras, TCM_INFO info,
-								  LPIXEL pencil, int pencil_index,
+void rop_custom_fill_cmap_penramp(RASTER * ras, TCM_INFO info, LPIXEL pencil, int pencil_index,
 								  int already_premultiplied, int *custom_tone)
 {
 	LPIXEL val, *penbuffer;
@@ -13404,22 +13753,19 @@ void rop_custom_fill_cmap_penramp(RASTER * ras, TCM_INFO info,
 
 /*---------------------------------------------------------------------------*/
 
-void rop_fill_cmap_buffer(RASTER * ras, TCM_INFO info,
-						  LPIXEL * color, LPIXEL * pencil,
+void rop_fill_cmap_buffer(RASTER * ras, TCM_INFO info, LPIXEL * color, LPIXEL * pencil,
 						  int already_premultiplied)
 {
 	int i, j;
 
 	for (i = 0; i < info.n_colors; i++)
 		for (j = 0; j < info.n_pencils; j++)
-			rop_fill_cmap_ramp(ras, info, color[i], pencil[j], i, j,
-							   already_premultiplied);
+			rop_fill_cmap_ramp(ras, info, color[i], pencil[j], i, j, already_premultiplied);
 }
 
 /*---------------------------------------------------------------------------*/
 
-void rop_fill_cmap_colbuffer(RASTER * ras, TCM_INFO info,
-							 LPIXEL * color, int already_premultiplied)
+void rop_fill_cmap_colbuffer(RASTER * ras, TCM_INFO info, LPIXEL * color, int already_premultiplied)
 {
 	int i;
 
@@ -13431,8 +13777,7 @@ void rop_fill_cmap_colbuffer(RASTER * ras, TCM_INFO info,
 	/*---------------------------------------------------------------------------*/
 
 	void
-	rop_fill_cmap_penbuffer(RASTER * ras, TCM_INFO info,
-							LPIXEL * pencil, int already_premultiplied)
+	rop_fill_cmap_penbuffer(RASTER * ras, TCM_INFO info, LPIXEL * pencil, int already_premultiplied)
 {
 	int i;
 
@@ -13442,42 +13787,37 @@ void rop_fill_cmap_colbuffer(RASTER * ras, TCM_INFO info,
 
 /*---------------------------------------------------------------------------*/
 
-void rop_custom_fill_cmap_buffer(RASTER * ras, TCM_INFO info,
-								 LPIXEL * color, LPIXEL * pencil,
+void rop_custom_fill_cmap_buffer(RASTER * ras, TCM_INFO info, LPIXEL * color, LPIXEL * pencil,
 								 int already_premultiplied, int *custom_tone)
 {
 	int i, j;
 
 	for (i = 0; i < info.n_colors; i++)
 		for (j = 0; j < info.n_pencils; j++)
-			rop_custom_fill_cmap_ramp(ras, info, color[i], pencil[j], i, j,
-									  already_premultiplied, custom_tone);
+			rop_custom_fill_cmap_ramp(ras, info, color[i], pencil[j], i, j, already_premultiplied,
+									  custom_tone);
 }
 
 /*---------------------------------------------------------------------------*/
 
-void rop_custom_fill_cmap_colbuffer(RASTER * ras, TCM_INFO info,
-									LPIXEL * color, int already_premultiplied,
-									int *custom_tone)
+void rop_custom_fill_cmap_colbuffer(RASTER * ras, TCM_INFO info, LPIXEL * color,
+									int already_premultiplied, int *custom_tone)
 {
 	int i;
 
 	for (i = 0; i < info.n_colors; i++)
-		rop_custom_fill_cmap_colramp(ras, info, color[i], i,
-									 already_premultiplied, custom_tone);
+		rop_custom_fill_cmap_colramp(ras, info, color[i], i, already_premultiplied, custom_tone);
 }
 
 /*---------------------------------------------------------------------------*/
 
-void rop_custom_fill_cmap_penbuffer(RASTER * ras, TCM_INFO info,
-									LPIXEL * pencil, int already_premultiplied,
-									int *custom_tone)
+void rop_custom_fill_cmap_penbuffer(RASTER * ras, TCM_INFO info, LPIXEL * pencil,
+									int already_premultiplied, int *custom_tone)
 {
 	int i;
 
 	for (i = 0; i < info.n_pencils; i++)
-		rop_custom_fill_cmap_penramp(ras, info, pencil[i], i,
-									 already_premultiplied, custom_tone);
+		rop_custom_fill_cmap_penramp(ras, info, pencil[i], i, already_premultiplied, custom_tone);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -13514,8 +13854,7 @@ void release_raster(RASTER * raster)
 
 D 89 release_memory_chunk(raster->native_buffer);
 
-	E 89 if (raster->type == RAS_CM16 && raster->cmap.buffer)
-		free(raster->cmap.buffer);
+	E 89 if (raster->type == RAS_CM16 && raster->cmap.buffer) free(raster->cmap.buffer);
 	D 89
 
 E 89
@@ -13580,8 +13919,7 @@ void rop_clear_extra_but_not_patches(RASTER * raster)
 	/*---------------------------------------------------------------------------*/
 
 E 89 void
-create_raster(RASTER * raster, int xsize, int ysize,
-			  RAS_TYPE type)
+create_raster(RASTER * raster, int xsize, int ysize, RAS_TYPE type)
 {
 	int pixsize;
 
@@ -13596,7 +13934,8 @@ create_raster(RASTER * raster, int xsize, int ysize,
 				  (xsize * ysize * pixsize + (512 * 1024)) / (1024 * 1024));
 	E 86
 
-I 99 MEMORY_PRINTF("alloco %x: %dX%dX%d=%d bytes\n", raster->native_buffer, xsize, ysize, pixsize, xsize * ysize * pixsize);
+I 99 MEMORY_PRINTF("alloco %x: %dX%dX%d=%d bytes\n", raster->native_buffer, xsize, ysize, pixsize,
+					 xsize * ysize * pixsize);
 
 	E 99 raster->buffer = raster->native_buffer;
 	raster->type = type;
@@ -13612,29 +13951,26 @@ create_raster(RASTER * raster, int xsize, int ysize,
 
 /*-----------------------------------------------------------------*/
 
-D 89 int create_subraster(RASTER * rin, RASTER * rout,
-						   int x0, int y0, int x1, int y1)
+D 89 int create_subraster(RASTER * rin, RASTER * rout, int x0, int y0, int x1, int y1)
 E 89
-I 89 void
-create_raster_with_extra(RASTER * raster, int xsize, int ysize,
-						 RAS_TYPE type, UCHAR extra_mask)
+I 89 void create_raster_with_extra(RASTER * raster, int xsize, int ysize, RAS_TYPE type,
+									 UCHAR extra_mask)
 {
 	create_raster(raster, xsize, ysize, type);
 
 	raster->extra_mask = extra_mask;
 	if (extra_mask && type != RAS_CM24) {
 		if (!(raster->native_extra = get_memory_chunk(xsize * ysize)))
-			tmsg_fatal("can't allocate %d Mbytes",
-					   (xsize * ysize + (512 * 1024)) / (1024 * 1024));
-		I 99 MEMORY_PRINTF("alloco extra %x: %dX%d=%d bytes\n", raster->native_extra, xsize, ysize, xsize * ysize);
+			tmsg_fatal("can't allocate %d Mbytes", (xsize * ysize + (512 * 1024)) / (1024 * 1024));
+		I 99 MEMORY_PRINTF("alloco extra %x: %dX%d=%d bytes\n", raster->native_extra, xsize, ysize,
+							xsize * ysize);
 		E 99 raster->extra = raster->native_extra;
 	}
 }
 
 /*-----------------------------------------------------------------*/
 
-int create_subraster(RASTER * rin, RASTER * rout,
-					 int x0, int y0, int x1, int y1)
+int create_subraster(RASTER * rin, RASTER * rout, int x0, int y0, int x1, int y1)
 E 89
 {
 	if (x1 < x0 || y1 < y0)
@@ -13653,8 +13989,7 @@ int create_subraster(RASTER * rin, RASTER * rout,
 	rout->lx = x1 - x0 + 1;
 	rout->ly = y1 - y0 + 1;
 	rout->buffer = (UCHAR *)(rin->buffer) + (y0 * rin->wrap + x0) * rop_pixbytes(rin->type);
-	I 89 if (rin->extra)
-		rout->extra = rin->extra + x0 + y0 * rin->wrap;
+	I 89 if (rin->extra) rout->extra = rin->extra + x0 + y0 * rin->wrap;
 	E 89 return TRUE;
 }
 
@@ -13688,8 +14023,7 @@ void clone_raster(RASTER * rin, RASTER * rout)
 		E 90 rout->cmap = rin->cmap;
 		I 90
 D 91 TCALLOC(rout->cmap.buffer, TCM_CMAP_BUFFER_SIZE(rout->cmap.info));
-		memcpy(rout->cmap.buffer,
-			   rin->cmap.buffer, TCM_CMAP_BUFFER_SIZE(rout->cmap.info));
+		memcpy(rout->cmap.buffer, rin->cmap.buffer, TCM_CMAP_BUFFER_SIZE(rout->cmap.info));
 		if (rin->type == RAS_CM24)
 			E 91
 I 91
@@ -13700,30 +14034,27 @@ void clone_raster(RASTER * rin, RASTER * rout)
 				D 91 if (rin->cmap.penbuffer)
 				{
 					TCALLOC(rout->cmap.penbuffer, TCM_CMAP_PENBUFFER_SIZE(rout->cmap.info));
-					memcpy(rout->cmap.penbuffer,
-						   rin->cmap.penbuffer, TCM_CMAP_PENBUFFER_SIZE(rout->cmap.info));
+					memcpy(rout->cmap.penbuffer, rin->cmap.penbuffer,
+						   TCM_CMAP_PENBUFFER_SIZE(rout->cmap.info));
 				}
 				if (rin->cmap.colbuffer) {
 					TCALLOC(rout->cmap.colbuffer, TCM_CMAP_COLBUFFER_SIZE(rout->cmap.info));
-					memcpy(rout->cmap.colbuffer,
-						   rin->cmap.colbuffer, TCM_CMAP_COLBUFFER_SIZE(rout->cmap.info));
+					memcpy(rout->cmap.colbuffer, rin->cmap.colbuffer,
+						   TCM_CMAP_COLBUFFER_SIZE(rout->cmap.info));
 				}
 				E 91
 I 91 size = TCM_CMAP_BUFFER_SIZE(rout->cmap.info);
 				TMALLOC(rout->cmap.buffer, size);
-				memcpy(rout->cmap.buffer,
-					   rin->cmap.buffer, size * sizeof(LPIXEL));
+				memcpy(rout->cmap.buffer, rin->cmap.buffer, size * sizeof(LPIXEL));
 			}
 		if (rin->cmap.penbuffer) {
 			size = TCM_CMAP_PENBUFFER_SIZE(rout->cmap.info);
 			TMALLOC(rout->cmap.penbuffer, size);
-			memcpy(rout->cmap.penbuffer,
-				   rin->cmap.penbuffer, size * sizeof(LPIXEL));
+			memcpy(rout->cmap.penbuffer, rin->cmap.penbuffer, size * sizeof(LPIXEL));
 
 			size = TCM_CMAP_COLBUFFER_SIZE(rout->cmap.info);
 			TMALLOC(rout->cmap.colbuffer, size);
-			memcpy(rout->cmap.colbuffer,
-				   rin->cmap.colbuffer, size * sizeof(LPIXEL));
+			memcpy(rout->cmap.colbuffer, rin->cmap.colbuffer, size * sizeof(LPIXEL));
 			E 91
 		}
 	}
@@ -13861,8 +14192,7 @@ static void rop_mirror_v_cm24_rgbm(RASTER * rin, RASTER * rout)
 
 	D 100 if (rin->type == RAS_BW)
 E 100
-I 100 if ((rin->type == RAS_BW) ||
-			(rin->type == RAS_WB))
+I 100 if ((rin->type == RAS_BW) || (rin->type == RAS_WB))
 E 100
 	{
 		lx_size = (lx_size + 7) / 8;

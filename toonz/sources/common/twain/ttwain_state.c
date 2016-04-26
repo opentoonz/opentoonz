@@ -30,11 +30,11 @@ extern int exitTwainSession(void);
 #endif
 static void TTWAIN_FreeVar(void);
 
-#define CASE \
-	break;   \
+#define CASE                                                                                       \
+	break;                                                                                         \
 	case
-#define DEFAULT \
-	break;      \
+#define DEFAULT                                                                                    \
+	break;                                                                                         \
 	default
 #define RELEASE_STR "5.1"
 #define TITLEBAR_STR "Toonz5.1"
@@ -48,7 +48,7 @@ static void TTWAIN_FreeVar(void);
 
 #define PRINTF
 /*---------------------------------------------------------------------------*/
-/* LOCAL PROTOTYPES															                             */
+/* LOCAL PROTOTYPES */
 /*---------------------------------------------------------------------------*/
 static int TTWAIN_DoOneTransfer(void);
 static int TTWAIN_WaitForXfer(void *hwnd);
@@ -84,13 +84,13 @@ static int TTWAIN_CloseSourceManager(void *hwnd);
 
 static int TTWAIN_MGR(TUINT32 dg, TUINT32 dat, TUINT32 msg, void *pd);
 
-#define INVERT_BYTE(START, HOWMANY)                  \
-	{                                                \
-		UCHAR *p = (START);                          \
-		unsigned int ijk;                            \
-		for (ijk = 0; ijk < (HOWMANY); ijk++, p++) { \
-			*p = ~*p;                                \
-		}                                            \
+#define INVERT_BYTE(START, HOWMANY)                                                                \
+	{                                                                                              \
+		UCHAR *p = (START);                                                                        \
+		unsigned int ijk;                                                                          \
+		for (ijk = 0; ijk < (HOWMANY); ijk++, p++) {                                               \
+			*p = ~*p;                                                                              \
+		}                                                                                          \
 	}
 
 #define BB(H, L) (H << 8 | L)
@@ -125,9 +125,8 @@ int TTWAIN_SelectImageSource(void *hwnd)
 	int success = FALSE;
 	TWAINSTATE entryState = TTWAIN_GetState();
 
-	if (TTWAIN_GetState() >= TWAIN_SM_OPEN ||
-		TTWAIN_OpenSourceManager(hwnd)) {
-		//TW_IDENTITY	newSourceId;
+	if (TTWAIN_GetState() >= TWAIN_SM_OPEN || TTWAIN_OpenSourceManager(hwnd)) {
+		// TW_IDENTITY	newSourceId;
 		memset(&newSourceId, 0, sizeof newSourceId);
 
 		TTWAIN_MGR(DG_CONTROL, DAT_IDENTITY, MSG_GETDEFAULT, &newSourceId);
@@ -184,8 +183,7 @@ int TTWAIN_OpenDefaultSource(void)
 /*STATE 4 TO 5*/
 static int TTWAIN_EnableSource(void *hwnd)
 {
-	if (TTWAIN_GetState() < TWAIN_SOURCE_OPEN &&
-		!TTWAIN_OpenDefaultSource())
+	if (TTWAIN_GetState() < TWAIN_SOURCE_OPEN && !TTWAIN_OpenDefaultSource())
 		return FALSE;
 
 	TTwainData.twainUI.ShowUI = TTWAIN_GetUIStatus();
@@ -200,7 +198,7 @@ int TTWAIN_MessageHook(void *lpmsg)
 /* returns TRUE if msg processed by TWAIN (source) */
 {
 	int bProcessed = FALSE;
-	//printf("%s\n", __PRETTY_FUNCTION__);
+	// printf("%s\n", __PRETTY_FUNCTION__);
 	if (TTWAIN_GetState() >= TWAIN_SOURCE_ENABLED) {
 /* source enabled */
 #ifdef _WIN32
@@ -237,8 +235,7 @@ int TTWAIN_MessageHook(void *lpmsg)
 static int TTWAIN_EndXfer(void)
 {
 	if (TTWAIN_GetState() == TWAIN_TRANSFERRING)
-		TTWAIN_DS(DG_CONTROL, DAT_PENDINGXFERS, MSG_ENDXFER,
-				  &TTwainData.transferInfo.pendingXfers);
+		TTWAIN_DS(DG_CONTROL, DAT_PENDINGXFERS, MSG_ENDXFER, &TTwainData.transferInfo.pendingXfers);
 	return (TTWAIN_GetState() < TWAIN_TRANSFERRING);
 }
 /*---------------------------------------------------------------------------*/
@@ -251,8 +248,8 @@ static int TTWAIN_DisableSource(void)
 	TTWAIN_AbortAllPendingXfers();
 
 	if ((TTWAIN_GetState() >= TWAIN_SOURCE_ENABLED) &&
-		(TTWAIN_DS(DG_CONTROL, DAT_USERINTERFACE, MSG_DISABLEDS,
-				   &TTwainData.twainUI) == TWRC_SUCCESS)) {
+		(TTWAIN_DS(DG_CONTROL, DAT_USERINTERFACE, MSG_DISABLEDS, &TTwainData.twainUI) ==
+		 TWRC_SUCCESS)) {
 		assert(TTWAIN_GetState() == TWAIN_SOURCE_OPEN);
 		return FALSE;
 	}
@@ -324,8 +321,7 @@ static int TTWAIN_AbortAllPendingXfers(void)
 {
 	TTWAIN_EndXfer();
 	if (TTWAIN_GetState() == TWAIN_TRANSFER_READY) {
-		TTWAIN_DS(DG_CONTROL, DAT_PENDINGXFERS, MSG_RESET,
-				  &TTwainData.transferInfo.pendingXfers);
+		TTWAIN_DS(DG_CONTROL, DAT_PENDINGXFERS, MSG_RESET, &TTwainData.transferInfo.pendingXfers);
 	}
 	TTWAIN_EmptyMessageQueue();
 	return (TTWAIN_GetState() < TWAIN_TRANSFER_READY);
@@ -358,12 +354,9 @@ TW_INT16 TTWAIN_DS(TUINT32 dg, TUINT32 dat, TUINT32 msg, void *pd)
 		}
 	}
 	if (TTwainData.DSM_Entry) {
-		TTwainData.resultCode = (*TTwainData.DSM_Entry)(&TTwainData.appId,
-														&TTwainData.sourceId,
-														(TW_UINT32)dg,
-														(TW_UINT16)dat,
-														(TW_UINT16)msg,
-														(TW_MEMREF)pd);
+		TTwainData.resultCode =
+			(*TTwainData.DSM_Entry)(&TTwainData.appId, &TTwainData.sourceId, (TW_UINT32)dg,
+									(TW_UINT16)dat, (TW_UINT16)msg, (TW_MEMREF)pd);
 		bOk = (TTwainData.resultCode == TWRC_SUCCESS);
 
 		if (dg == DG_CONTROL) {
@@ -382,7 +375,8 @@ TW_INT16 TTWAIN_DS(TUINT32 dg, TUINT32 dat, TUINT32 msg, void *pd)
 
 			case DAT_PENDINGXFERS:
 				if (msg == MSG_ENDXFER && bOk) {
-					TTWAIN_SetState(((pTW_PENDINGXFERS)pd)->Count ? TWAIN_TRANSFER_READY : TWAIN_SOURCE_ENABLED);
+					TTWAIN_SetState(((pTW_PENDINGXFERS)pd)->Count ? TWAIN_TRANSFER_READY
+																  : TWAIN_SOURCE_ENABLED);
 				}
 				if (msg == MSG_RESET && bOk) {
 					TTWAIN_SetState(TWAIN_SOURCE_ENABLED);
@@ -391,7 +385,8 @@ TW_INT16 TTWAIN_DS(TUINT32 dg, TUINT32 dat, TUINT32 msg, void *pd)
 
 			case DAT_USERINTERFACE:
 				if (msg == MSG_ENABLEDS) {
-					if (TTwainData.resultCode == TWRC_FAILURE || TTwainData.resultCode == TWRC_CANCEL) {
+					if (TTwainData.resultCode == TWRC_FAILURE ||
+						TTwainData.resultCode == TWRC_CANCEL) {
 						TTWAIN_RecordError();
 					} else {
 						/* TTwainData.resultCode could be either SUCCESS or CHECKSTATUS */
@@ -448,10 +443,11 @@ TW_INT16 TTWAIN_DS(TUINT32 dg, TUINT32 dat, TUINT32 msg, void *pd)
 
 					case TWRC_FAILURE:
 						/* "If the failure occurred during the transfer of the first
-                  buffer, the session is in State 6. If the failure occurred
-                  on a subsequent buffer, the session is in State 7."
-	      */
-						TTWAIN_SetState(nMemBuffer == 0 ? TWAIN_TRANSFER_READY : TWAIN_TRANSFERRING);
+				  buffer, the session is in State 6. If the failure occurred
+				  on a subsequent buffer, the session is in State 7."
+		  */
+						TTWAIN_SetState(nMemBuffer == 0 ? TWAIN_TRANSFER_READY
+														: TWAIN_TRANSFERRING);
 						break;
 
 					case TWRC_CANCEL:
@@ -482,12 +478,8 @@ static int TTWAIN_MGR(TUINT32 dg, TUINT32 dat, TUINT32 msg, void *pd)
 
 	if (TTwainData.DSM_Entry) {
 
-		TTwainData.resultCode = (*TTwainData.DSM_Entry)(&TTwainData.appId,
-														NULL,
-														(TW_UINT32)dg,
-														(TW_UINT16)dat,
-														(TW_UINT16)msg,
-														(TW_MEMREF)pd);
+		TTwainData.resultCode = (*TTwainData.DSM_Entry)(
+			&TTwainData.appId, NULL, (TW_UINT32)dg, (TW_UINT16)dat, (TW_UINT16)msg, (TW_MEMREF)pd);
 		bOk = (TTwainData.resultCode == TWRC_SUCCESS);
 		if (dg == DG_CONTROL) {
 			if (dat == DAT_IDENTITY) {
@@ -573,18 +565,17 @@ static int TTWAIN_DoOneTransfer(void)
 
 	/* Acknowledge transfer */
 	TTWAIN_EndXfer();
-	assert(TTWAIN_GetState() == TWAIN_TRANSFER_READY ||
-		   TTWAIN_GetState() == TWAIN_SOURCE_ENABLED);
+	assert(TTWAIN_GetState() == TWAIN_TRANSFER_READY || TTWAIN_GetState() == TWAIN_SOURCE_ENABLED);
 	return rc;
 }
 /*---------------------------------------------------------------------------*/
 void TTWAIN_RegisterApp(int majorNum, int minorNum, /* app. revision*/
-						int nLanguage,				/* (human) language (use TWLG_xxx from TWAIN.H) */
-						int nCountry,				/* country (use TWCY_xxx from TWAIN.H)	     */
-						char *version,				/* version info string                          */
-						char *manufacter,			/* name of manufacter			     */
-						char *family,				/* product family				     */
-						char *product)				/* specific product			     */
+						int nLanguage,	/* (human) language (use TWLG_xxx from TWAIN.H) */
+						int nCountry,	 /* country (use TWCY_xxx from TWAIN.H)	     */
+						char *version,	/* version info string                          */
+						char *manufacter, /* name of manufacter			     */
+						char *family,	 /* product family				     */
+						char *product)	/* specific product			     */
 {
 	memset(&TTwainData.appId, 0, sizeof(TTwainData.appId));
 	TTwainData.appId.Id = 0; /* init to 0, but Source Manager will assign THE real value*/
@@ -662,9 +653,8 @@ static BOOL CALLBACK myHackEnumFunction(HWND hwnd, LPARAM lParam)
 
 	len--;
 
-	while (len &&
-		   (isdigit(TTwainData.sourceId.ProductName[len])	/*skip digit at the end*/
-			|| TTwainData.sourceId.ProductName[len] == '.')) /*skip . */
+	while (len && (isdigit(TTwainData.sourceId.ProductName[len])	/*skip digit at the end*/
+				   || TTwainData.sourceId.ProductName[len] == '.')) /*skip . */
 		len--;
 
 	if (len && !strncmp(title, TTwainData.sourceId.ProductName, len)) {
@@ -716,15 +706,15 @@ void putToBottom(HWND hwnd)
 {
 	const int unused = 0;
 
-	BOOL rc = SetWindowPos(
-		hwnd,										 // handle to window
-		HWND_BOTTOM,								 // placement-order handle
-		unused,										 // horizontal position
-		unused,										 // vertical position
-		unused,										 // width
-		unused,										 // height
-		SWP_ASYNCWINDOWPOS | SWP_NOMOVE | SWP_NOSIZE // window-positioning options
-		);
+	BOOL rc =
+		SetWindowPos(hwnd,										  // handle to window
+					 HWND_BOTTOM,								  // placement-order handle
+					 unused,									  // horizontal position
+					 unused,									  // vertical position
+					 unused,									  // width
+					 unused,									  // height
+					 SWP_ASYNCWINDOWPOS | SWP_NOMOVE | SWP_NOSIZE // window-positioning options
+					 );
 }
 
 static void myHackFunction(int v)
@@ -735,7 +725,8 @@ static void myHackFunction(int v)
 	else
 		rc = EnumWindows((WNDENUMPROC)myHackEnumFunction, (LPARAM)&putToBottom);
 
-	if (rc) /* it means that myHackEnumFunction fails to find the proper window to bring up or put down*/
+	if (rc) /* it means that myHackEnumFunction fails to find the proper window to bring up or put
+			   down*/
 	{
 		if (v == 1)
 			rc = EnumWindows((WNDENUMPROC)myHackEnumFunction2, (LPARAM)&bringToTop);
@@ -825,13 +816,12 @@ static int TTWAIN_WaitForXfer(void *hwnd)
 	TTwainData.transferInfo.oneAtLeast = TRUE;
 	/*
 TTWAIN_DS( DG_CONTROL,DAT_PENDINGXFERS, MSG_ENDXFER,
-             (TW_MEMREF)&TTwainData.transferInfo.pendingXfers);
+			 (TW_MEMREF)&TTwainData.transferInfo.pendingXfers);
 */
 	do {
 		if (TTWAIN_GetState() == TWAIN_TRANSFER_READY)
 			rc = TTWAIN_DoOneTransfer();
-		else if (TTWAIN_GetState() >= TWAIN_SOURCE_ENABLED ||
-				 TTWAIN_EnableSource(hwnd)) {
+		else if (TTWAIN_GetState() >= TWAIN_SOURCE_ENABLED || TTWAIN_EnableSource(hwnd)) {
 			/* source is enabled, wait for transfer or source closed */
 			if (TTwainData.resultCode != TWRC_CANCEL)
 				TTWAIN_ModalEventLoop();
@@ -854,7 +844,7 @@ void TTWAIN_FreeMemory(void *hMem)
 {
 	free(hMem);
 	/*
-if (hMem) 
+if (hMem)
   GLOBAL_FREE(hMem);
 */
 }
@@ -911,7 +901,7 @@ static int TTWAIN_MemoryXferHandler(void)
 	TW_UINT32 bytesToWrap = 0;
 	TW_UINT32 memorySize = 0;
 	int imgInfoOk; /* on Mac often (always) is impossible to get the imageinfo
-										 about the transfer... so no I can't prealloc memory 
+										 about the transfer... so no I can't prealloc memory
 										 and do other checks about size etc...
 									*/
 
@@ -943,7 +933,7 @@ static int TTWAIN_MemoryXferHandler(void)
 
 	if (TTwainData.transferInfo.usageMode == TTWAIN_MODE_UNLEASHED) {
 		/*
-  TTwainData.transferInfo = GLOBAL_ALLOC(GMEM_FIXED, memorySize); 
+  TTwainData.transferInfo = GLOBAL_ALLOC(GMEM_FIXED, memorySize);
 */
 		TTwainData.transferInfo.memoryBuffer = (UCHAR *)malloc(memorySize);
 
@@ -993,7 +983,8 @@ memset(targetBuffer, 0xff, TTwainData.transferInfo.memorySize);
 			if (imgInfoOk) {
 				TW_UINT32 colsToCopy;
 				rowsToCopy = MIN(imageMemXfer->Rows, rowsRemaining);
-				colsToCopy = MIN(imageMemXfer->Columns, (unsigned long)TTwainData.transferInfo.preferredLx);
+				colsToCopy =
+					MIN(imageMemXfer->Columns, (unsigned long)TTwainData.transferInfo.preferredLx);
 				bytesToCopy = CEIL(colsToCopy * pixSize);
 				bytesToWrap = CEIL(TTwainData.transferInfo.preferredLx * pixSize);
 			} else {
@@ -1001,11 +992,15 @@ memset(targetBuffer, 0xff, TTwainData.transferInfo.memorySize);
 				rowsToCopy = imageMemXfer->Rows;
 				bytesToCopy = imageMemXfer->BytesPerRow;
 				bytesToWrap = bytesToCopy;
-				newMemorySize = (TTwainData.transferInfo.preferredLy + imageMemXfer->Rows) * imageMemXfer->BytesPerRow;
+				newMemorySize = (TTwainData.transferInfo.preferredLy + imageMemXfer->Rows) *
+								imageMemXfer->BytesPerRow;
 				if (TTwainData.transferInfo.memorySize < newMemorySize) {
-					TTwainData.transferInfo.memoryBuffer = (UCHAR *)realloc(TTwainData.transferInfo.memoryBuffer, newMemorySize);
+					TTwainData.transferInfo.memoryBuffer =
+						(UCHAR *)realloc(TTwainData.transferInfo.memoryBuffer, newMemorySize);
 					TTwainData.transferInfo.memorySize = newMemorySize;
-					targetBuffer = TTwainData.transferInfo.memoryBuffer + (TTwainData.transferInfo.preferredLy * imageMemXfer->BytesPerRow);
+					targetBuffer =
+						TTwainData.transferInfo.memoryBuffer +
+						(TTwainData.transferInfo.preferredLy * imageMemXfer->BytesPerRow);
 				}
 				TTwainData.transferInfo.preferredLy += rowsToCopy;
 				if ((int)imageMemXfer->Columns > TTwainData.transferInfo.preferredLx)
@@ -1027,7 +1022,8 @@ memset(targetBuffer, 0xff, TTwainData.transferInfo.memorySize);
 			if (imgInfoOk) {
 				TW_UINT32 colsToCopy;
 				rowsToCopy = MIN(imageMemXfer->Rows, rowsRemaining);
-				colsToCopy = MIN(imageMemXfer->Columns, (unsigned long)TTwainData.transferInfo.preferredLx);
+				colsToCopy =
+					MIN(imageMemXfer->Columns, (unsigned long)TTwainData.transferInfo.preferredLx);
 				bytesToCopy = CEIL(colsToCopy * pixSize);
 				bytesToWrap = CEIL(TTwainData.transferInfo.preferredLx * pixSize);
 			} else {
@@ -1035,11 +1031,15 @@ memset(targetBuffer, 0xff, TTwainData.transferInfo.memorySize);
 				rowsToCopy = imageMemXfer->Rows;
 				bytesToCopy = imageMemXfer->BytesPerRow;
 				bytesToWrap = bytesToCopy;
-				newMemorySize = (TTwainData.transferInfo.preferredLy + imageMemXfer->Rows) * imageMemXfer->BytesPerRow;
+				newMemorySize = (TTwainData.transferInfo.preferredLy + imageMemXfer->Rows) *
+								imageMemXfer->BytesPerRow;
 				if (TTwainData.transferInfo.memorySize < newMemorySize) {
-					TTwainData.transferInfo.memoryBuffer = (UCHAR *)realloc(TTwainData.transferInfo.memoryBuffer, newMemorySize);
+					TTwainData.transferInfo.memoryBuffer =
+						(UCHAR *)realloc(TTwainData.transferInfo.memoryBuffer, newMemorySize);
 					TTwainData.transferInfo.memorySize = newMemorySize;
-					targetBuffer = TTwainData.transferInfo.memoryBuffer + (TTwainData.transferInfo.preferredLy * imageMemXfer->BytesPerRow);
+					targetBuffer =
+						TTwainData.transferInfo.memoryBuffer +
+						(TTwainData.transferInfo.preferredLy * imageMemXfer->BytesPerRow);
 				}
 				TTwainData.transferInfo.preferredLy += rowsToCopy;
 				if ((int)imageMemXfer->Columns > TTwainData.transferInfo.preferredLx)
@@ -1139,8 +1139,10 @@ done:
 					pixType = TTWAIN_RGB24;
 				}
 			} else {
-				float lx = TTWAIN_Fix32ToFloat(imageLayout.Frame.Right) - TTWAIN_Fix32ToFloat(imageLayout.Frame.Left);
-				float ly = TTWAIN_Fix32ToFloat(imageLayout.Frame.Bottom) - TTWAIN_Fix32ToFloat(imageLayout.Frame.Top);
+				float lx = TTWAIN_Fix32ToFloat(imageLayout.Frame.Right) -
+						   TTWAIN_Fix32ToFloat(imageLayout.Frame.Left);
+				float ly = TTWAIN_Fix32ToFloat(imageLayout.Frame.Bottom) -
+						   TTWAIN_Fix32ToFloat(imageLayout.Frame.Top);
 
 				xdpi = (float)TTwainData.transferInfo.preferredLx / lx;
 				ydpi = (float)TTwainData.transferInfo.preferredLy / ly;
@@ -1152,12 +1154,12 @@ done:
 						switch (pixType)
 							{
 							CASE TWPT_BW  : pixType = TTWAIN_BW;
-  						CASE TWPT_GRAY: pixType = TTWAIN_GRAY8;
-    					CASE TWPT_RGB : pixType = TTWAIN_RGB24;
-    					DEFAULT : pixType = TTWAIN_RGB24;
+						CASE TWPT_GRAY: pixType = TTWAIN_GRAY8;
+						CASE TWPT_RGB : pixType = TTWAIN_RGB24;
+						DEFAULT : pixType = TTWAIN_RGB24;
 							}
 					else
-  					pixType = TTWAIN_RGB24;
+					pixType = TTWAIN_RGB24;
 		*/
 				switch (imageMemXfer->BytesPerRow / TTwainData.transferInfo.preferredLx) {
 				case 1:
@@ -1167,8 +1169,8 @@ done:
 					pixType = TTWAIN_RGB24;
 					break;
 				default: {
-					double b = (imageMemXfer->BytesPerRow /
-								(double)TTwainData.transferInfo.preferredLx);
+					double b =
+						(imageMemXfer->BytesPerRow / (double)TTwainData.transferInfo.preferredLx);
 					if ((b >= 0.125) && (b < 8))
 						pixType = TTWAIN_BW;
 					else {
@@ -1180,13 +1182,9 @@ done:
 				}
 			}
 			stopScanning = !TTwainData.callback.onDoneCb(
-				TTwainData.transferInfo.memoryBuffer,
-				pixType,
-				TTwainData.transferInfo.preferredLx,
-				TTwainData.transferInfo.preferredLy,
-				TTwainData.transferInfo.preferredLx,
-				xdpi, ydpi,
-				TTwainData.callback.onDoneArg);
+				TTwainData.transferInfo.memoryBuffer, pixType, TTwainData.transferInfo.preferredLx,
+				TTwainData.transferInfo.preferredLy, TTwainData.transferInfo.preferredLx, xdpi,
+				ydpi, TTwainData.callback.onDoneArg);
 #ifdef MACOSX
 			PRINTF("stopScanning = %d\n", stopScanning);
 			exitTwainSession();

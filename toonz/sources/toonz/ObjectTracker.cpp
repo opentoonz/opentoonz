@@ -31,8 +31,9 @@ using namespace std;
 #define MAX_FLOAT 3.40282e+38;
 
 //---------------------------------------------------------------------------------------------------------
-//Costructor
-CObjectTracker::CObjectTracker(int imW, int imH, bool _colorimage, bool _att_background, bool _man_occlusion)
+// Costructor
+CObjectTracker::CObjectTracker(int imW, int imH, bool _colorimage, bool _att_background,
+							   bool _man_occlusion)
 {
 
 	att_background = _att_background;
@@ -68,13 +69,13 @@ CObjectTracker::CObjectTracker(int imW, int imH, bool _colorimage, bool _att_bac
 };
 
 //--------------------------------------------------------------------------------------------------------
-//Distructor
+// Distructor
 CObjectTracker::~CObjectTracker()
 {
 }
 
 //--------------------------------------------------------------------------------------------------------
-//Get pixel value RGB
+// Get pixel value RGB
 ValuePixel CObjectTracker::GetPixelValues(TRaster32P *frame, short x, short y)
 {
 	TPixel32 *data;
@@ -93,7 +94,7 @@ ValuePixel CObjectTracker::GetPixelValues(TRaster32P *frame, short x, short y)
 }
 
 //--------------------------------------------------------------------------------------------------------
-//Set pixel value RGB
+// Set pixel value RGB
 void CObjectTracker::SetPixelValues(TRaster32P *frame, ValuePixel pixelValues, short x, short y)
 {
 	TPixel32 *data;
@@ -109,8 +110,10 @@ void CObjectTracker::SetPixelValues(TRaster32P *frame, ValuePixel pixelValues, s
 }
 
 //--------------------------------------------------------------------------------------------------------
-//Inizialization parameters object
-void CObjectTracker::ObjectTrackerInitObjectParameters(short id, short x, short y, short Width, short Height, short _dim, short _var_dim, float _dist, float _distB)
+// Inizialization parameters object
+void CObjectTracker::ObjectTrackerInitObjectParameters(short id, short x, short y, short Width,
+													   short Height, short _dim, short _var_dim,
+													   float _dist, float _distB)
 {
 
 	objID = id;
@@ -140,7 +143,7 @@ void CObjectTracker::ObjectTrackerInitObjectParameters(short id, short x, short 
 }
 
 //--------------------------------------------------------------------------------------------------------
-//Update frame template
+// Update frame template
 void CObjectTracker::updateTemp()
 {
 
@@ -150,7 +153,7 @@ void CObjectTracker::updateTemp()
 	m_sTrackingObject.H_temp = m_sTrackingObject.H;
 }
 //--------------------------------------------------------------------------------------------------------
-//Object Tracking
+// Object Tracking
 void CObjectTracker::ObjeckTrackerHandlerByUser(TRaster32P *frame)
 {
 
@@ -174,9 +177,12 @@ void CObjectTracker::ObjeckTrackerHandlerByUser(TRaster32P *frame)
 			}
 			output.close();
 			output.open("output_center.txt",ios_base::app);
-			output<<"Coordinate del punto - X : "<<m_sTrackingObject.X - ((m_nImageWidth - 1)/2)<<" - Y : "<<m_sTrackingObject.Y - ((m_nImageHeight - 1)/2)<<endl;
-			output<<"Larghezza dell'area : "<<m_sTrackingObject.W <<" - Altezza dell'aera : "<<m_sTrackingObject.H<<endl;
-			output<<"Mezzo pixel : "<<m_sTrackingObject.half_pixelx <<" "<<m_sTrackingObject.half_pixely<<endl;
+			output<<"Coordinate del punto - X : "<<m_sTrackingObject.X - ((m_nImageWidth - 1)/2)<<"
+			- Y : "<<m_sTrackingObject.Y - ((m_nImageHeight - 1)/2)<<endl;
+			output<<"Larghezza dell'area : "<<m_sTrackingObject.W <<" - Altezza dell'aera :
+			"<<m_sTrackingObject.H<<endl;
+			output<<"Mezzo pixel : "<<m_sTrackingObject.half_pixelx <<"
+			"<<m_sTrackingObject.half_pixely<<endl;
 			if (m_visible=="")
 			{
 				output<<"Visibilità : VISIBLE"<<endl;
@@ -193,7 +199,7 @@ void CObjectTracker::ObjeckTrackerHandlerByUser(TRaster32P *frame)
 }
 
 //--------------------------------------------------------------------------------------------------------
-//histogram object
+// histogram object
 void CObjectTracker::FindHistogram(TRaster32P *frame, float(*histogram), float h)
 {
 	short normx = 0, normy = 0;
@@ -212,7 +218,7 @@ void CObjectTracker::FindHistogram(TRaster32P *frame, float(*histogram), float h
 	if ((colorimage) && (att_background))
 		FindWeightsBackground(frame);
 
-	//normalization
+	// normalization
 	normx = short(m_sTrackingObject.X + m_sTrackingObject.W / 2);
 	normy = short(m_sTrackingObject.Y + m_sTrackingObject.H / 2);
 
@@ -224,7 +230,7 @@ void CObjectTracker::FindHistogram(TRaster32P *frame, float(*histogram), float h
 
 			pixelValues = GetPixelValues(frame, x, y);
 
-			//components RGB "quantizzate"
+			// components RGB "quantizzate"
 			if (!colorimage) {
 				indice = 256 * E + pixelValues.r;
 			} else {
@@ -234,19 +240,23 @@ void CObjectTracker::FindHistogram(TRaster32P *frame, float(*histogram), float h
 				indice = 4096 * E + 256 * qR + 16 * qG + qB;
 			}
 
-			histogram[indice] += 1 - (((m_sTrackingObject.X - x) / normx) * ((m_sTrackingObject.X - x) / normx) + ((m_sTrackingObject.Y - y) / normy) * ((m_sTrackingObject.Y - y) / normy)) / (h * h);
+			histogram[indice] +=
+				1 -
+				(((m_sTrackingObject.X - x) / normx) * ((m_sTrackingObject.X - x) / normx) +
+				 ((m_sTrackingObject.Y - y) / normy) * ((m_sTrackingObject.Y - y) / normy)) /
+					(h * h);
 		}
 
 	if ((colorimage) && (att_background)) {
 		for (i = 0; i < HISTOGRAM_LENGTH; i++)
 			histogram[i] *= m_sTrackingObject.weights_background[i];
 
-		//normalization pdf
+		// normalization pdf
 		for (i = 0; i < HISTOGRAM_LENGTH; i++) {
 			normc += histogram[i];
 			normc1 += m_sTrackingObject.weights_background[i];
 		}
-		//Pdf
+		// Pdf
 		for (i = 0; i < HISTOGRAM_LENGTH; i++)
 			histogram[i] = histogram[i] / (normc * normc1);
 	}
@@ -261,7 +271,7 @@ void CObjectTracker::FindHistogram(TRaster32P *frame, float(*histogram), float h
 }
 
 //--------------------------------------------------------------------------------------------------------
-//Histogram background
+// Histogram background
 void CObjectTracker::FindHistogramBackground(TRaster32P *frame, float(*background))
 {
 
@@ -277,17 +287,24 @@ void CObjectTracker::FindHistogramBackground(TRaster32P *frame, float(*backgroun
 		background[i] = 0.0;
 
 	for (y = std::max(m_sTrackingObject.Y - (m_sTrackingObject.H * 1.73) / 2, 0.0);
-		 y <= std::min(m_sTrackingObject.Y + (m_sTrackingObject.H * 1.73) / 2, m_nImageHeight - 1.0); y++)
+		 y <=
+		 std::min(m_sTrackingObject.Y + (m_sTrackingObject.H * 1.73) / 2, m_nImageHeight - 1.0);
+		 y++)
 		for (x = std::max(m_sTrackingObject.X - (m_sTrackingObject.W * 1.73) / 2, 0.0);
-			 x <= std::min(m_sTrackingObject.X + (m_sTrackingObject.W * 1.73) / 2, m_nImageWidth - 1.0); x++) {
-			if (((m_sTrackingObject.Y - m_sTrackingObject.H / 2) <= y) && (y <= (m_sTrackingObject.Y + m_sTrackingObject.H / 2)) && ((m_sTrackingObject.X - m_sTrackingObject.W / 2) <= x) && (x <= (m_sTrackingObject.X + m_sTrackingObject.W / 2)))
+			 x <=
+			 std::min(m_sTrackingObject.X + (m_sTrackingObject.W * 1.73) / 2, m_nImageWidth - 1.0);
+			 x++) {
+			if (((m_sTrackingObject.Y - m_sTrackingObject.H / 2) <= y) &&
+				(y <= (m_sTrackingObject.Y + m_sTrackingObject.H / 2)) &&
+				((m_sTrackingObject.X - m_sTrackingObject.W / 2) <= x) &&
+				(x <= (m_sTrackingObject.X + m_sTrackingObject.W / 2)))
 				continue;
 
 			E = CheckEdgeExistance(frame, x, y);
 
 			pixelValues = GetPixelValues(frame, x, y);
 
-			//components RGB "quantizzate"
+			// components RGB "quantizzate"
 			qR = pixelValues.r / 16;
 			qG = pixelValues.g / 16;
 			qB = pixelValues.b / 16;
@@ -296,12 +313,12 @@ void CObjectTracker::FindHistogramBackground(TRaster32P *frame, float(*backgroun
 			pix++;
 		}
 
-	//Pdf
+	// Pdf
 	for (i = 0; i < HISTOGRAM_LENGTH; i++)
 		background[i] = background[i] / pix;
 }
 //--------------------------------------------------------------------------------------------------------
-//Weights Background
+// Weights Background
 void CObjectTracker::FindWeightsBackground(TRaster32P *frame)
 {
 	float small1;
@@ -310,10 +327,10 @@ void CObjectTracker::FindWeightsBackground(TRaster32P *frame)
 	for (i = 0; i < HISTOGRAM_LENGTH; i++)
 		m_sTrackingObject.weights_background[i] = 0.0;
 
-	//Histogram background
+	// Histogram background
 	FindHistogramBackground(frame, background.get());
 
-	//searce min != 0.0
+	// searce min != 0.0
 	for (i = 0; background[i] == 0.0; i++)
 		;
 	small1 = background[i];
@@ -321,7 +338,7 @@ void CObjectTracker::FindWeightsBackground(TRaster32P *frame)
 		if ((background[i] != 0.0) && (background[i] < small1))
 			small1 = background[i];
 
-	//weights
+	// weights
 	for (i = 0; i < HISTOGRAM_LENGTH; i++) {
 		if (background[i] == 0.0)
 			m_sTrackingObject.weights_background[i] = 1;
@@ -347,7 +364,7 @@ void CObjectTracker::FindWightsAndCOM(TRaster32P *frame, float(*histogram))
 
 	std::unique_ptr<float[]> weights(new float[HISTOGRAM_LENGTH]);
 
-	//weigths
+	// weigths
 	for (i = 0; i < HISTOGRAM_LENGTH; i++) {
 		if (histogram[i] > 0.0)
 			weights[i] = sqrt(m_sTrackingObject.initHistogram[i] / histogram[i]);
@@ -355,7 +372,7 @@ void CObjectTracker::FindWightsAndCOM(TRaster32P *frame, float(*histogram))
 			weights[i] = 0.0;
 	}
 
-	//new location
+	// new location
 	for (y = std::max(m_sTrackingObject.Y - m_sTrackingObject.H / 2, 0);
 		 y <= std::min(m_sTrackingObject.Y + m_sTrackingObject.H / 2, m_nImageHeight - 1); y++)
 		for (x = std::max(m_sTrackingObject.X - m_sTrackingObject.W / 2, 0);
@@ -387,7 +404,7 @@ void CObjectTracker::FindWightsAndCOM(TRaster32P *frame, float(*histogram))
 }
 
 //--------------------------------------------------------------------------------------------------------
-//Edge Information of pixel
+// Edge Information of pixel
 UBYTE8 CObjectTracker::CheckEdgeExistance(TRaster32P *frame, short _x, short _y)
 {
 	UBYTE8 E = 0;
@@ -460,7 +477,7 @@ void CObjectTracker::FindNextLocation(TRaster32P *frame)
 	Height = m_sTrackingObject.H;
 	Width = m_sTrackingObject.W;
 
-	//old
+	// old
 	m_sTrackingObject.W_old = m_sTrackingObject.W;
 	m_sTrackingObject.H_old = m_sTrackingObject.H;
 
@@ -474,58 +491,58 @@ void CObjectTracker::FindNextLocation(TRaster32P *frame)
 
 		DELTA = 0.1 * h;
 
-		//Prew center
+		// Prew center
 		xold = m_sTrackingObject.X;
 		yold = m_sTrackingObject.Y;
 
-		//Histogram with bandwidth h
+		// Histogram with bandwidth h
 		FindHistogram(frame, currentHistogram.get(), h);
 
-		//New location
+		// New location
 		FindWightsAndCOM(frame, currentHistogram.get());
 
-		//Histogram with new location
+		// Histogram with new location
 		FindHistogram(frame, currentHistogram.get(), h);
 
-		//Battacharyya coefficient
+		// Battacharyya coefficient
 		for (i = 0; i < HISTOGRAM_LENGTH; i++)
 			rho += sqrt(m_sTrackingObject.initHistogram[i] * currentHistogram[i]);
 
-		//old center
+		// old center
 		m_sTrackingObject.X = xold;
 		m_sTrackingObject.Y = yold;
 
-		//Histogram with bandwidth h-DELTA
+		// Histogram with bandwidth h-DELTA
 		m_sTrackingObject.H = Height - m_sTrackingObject.var_dim;
 		m_sTrackingObject.W = Width - m_sTrackingObject.var_dim;
 		FindHistogram(frame, currentHistogram.get(), h - DELTA);
 
-		//New location
+		// New location
 		FindWightsAndCOM(frame, currentHistogram.get());
 
-		//Histogram with new location
+		// Histogram with new location
 		FindHistogram(frame, currentHistogram.get(), h - DELTA);
 
-		//Battacharyya coefficient
+		// Battacharyya coefficient
 		for (i = 0; i < HISTOGRAM_LENGTH; i++)
 			rho1 += sqrt(m_sTrackingObject.initHistogram[i] * currentHistogram[i]);
 
-		//old center
+		// old center
 		m_sTrackingObject.X = xold;
 		m_sTrackingObject.Y = yold;
 
-		//Histogram with bandwidth h+DELTA
+		// Histogram with bandwidth h+DELTA
 		m_sTrackingObject.H = Height + m_sTrackingObject.var_dim;
 		m_sTrackingObject.W = Width + m_sTrackingObject.var_dim;
 		FindHistogram(frame, currentHistogram.get(), h + DELTA);
 
-		//New location
+		// New location
 		FindWightsAndCOM(frame, currentHistogram.get());
 
-		//Histogram with new location
+		// Histogram with new location
 		FindHistogram(frame, currentHistogram.get(), h + DELTA);
 
-		//Battacharyya coefficient
+		// Battacharyya coefficient
 		for (i = 0; i < HISTOGRAM_LENGTH; i++)
 			rho2 += sqrt(m_sTrackingObject.initHistogram[i] * currentHistogram[i]);
 
@@ -543,32 +560,33 @@ void CObjectTracker::FindNextLocation(TRaster32P *frame)
 			Width += m_sTrackingObject.var_dim;
 		}
 
-		//oversensitive scale adaptation
+		// oversensitive scale adaptation
 		h = 0.1 * h_opt + (1 - 0.1) * h;
 
-		//New dimension Object box
+		// New dimension Object box
 		m_sTrackingObject.H = Height;
 		m_sTrackingObject.W = Width;
 
-		//old center
+		// old center
 		m_sTrackingObject.X = xold;
 		m_sTrackingObject.Y = yold;
 
-		//Current Histogram
+		// Current Histogram
 		FindHistogram(frame, currentHistogram.get(), h);
 
-		//Definitive new location
+		// Definitive new location
 		FindWightsAndCOM(frame, currentHistogram.get());
 
-		//threshold
-		distanza = sqrt(float((xold - m_sTrackingObject.X) * (xold - m_sTrackingObject.X) + (yold - m_sTrackingObject.Y) * (yold - m_sTrackingObject.Y)));
+		// threshold
+		distanza = sqrt(float((xold - m_sTrackingObject.X) * (xold - m_sTrackingObject.X) +
+							  (yold - m_sTrackingObject.Y) * (yold - m_sTrackingObject.Y)));
 
 		if (distanza <= ITERACTION_THRESHOLD)
 			break;
 	}
-	//New Histogram
+	// New Histogram
 	FindHistogram(frame, currentHistogram.get(), h);
-	//Update
+	// Update
 	UpdateInitialHistogram(currentHistogram.get());
 }
 
@@ -579,11 +597,12 @@ void CObjectTracker::UpdateInitialHistogram(float(*histogram))
 	short i = 0;
 
 	for (i = 0; i < HISTOGRAM_LENGTH; i++)
-		m_sTrackingObject.initHistogram[i] = ALPHA * m_sTrackingObject.initHistogram[i] + (1 - ALPHA) * histogram[i];
+		m_sTrackingObject.initHistogram[i] =
+			ALPHA * m_sTrackingObject.initHistogram[i] + (1 - ALPHA) * histogram[i];
 }
 
 //-------------------------------------------------------------------------------------------------------
-//Template Matching
+// Template Matching
 float CObjectTracker::Matching(TRaster32P *frame, TRaster32P *frame_temp)
 {
 
@@ -618,18 +637,19 @@ float CObjectTracker::Matching(TRaster32P *frame, TRaster32P *frame_temp)
 	x_max = std::min(m_sTrackingObject.X_temp + m_sTrackingObject.W_temp / 2, m_nImageWidth - 1);
 	y_max = std::min(m_sTrackingObject.Y_temp + m_sTrackingObject.H_temp / 2, m_nImageHeight - 1);
 
-	//dimension template
+	// dimension template
 	dimx = x_max - x_min + 1;
 	dimy = y_max - y_min + 1;
 
-	//dimension interpolate template
+	// dimension interpolate template
 	dimx_int = dimx * 2 - 1;
 	dimy_int = dimy * 2 - 1;
 
-	//searce area
+	// searce area
 	int in = 0;
 	for (u = -m_sTrackingObject.dim_temp; u <= m_sTrackingObject.dim_temp; u++) {
-		if (((m_sTrackingObject.X + u - dimx / 2) < 0) || ((m_sTrackingObject.X + u + dimx / 2) > m_nImageWidth - 1))
+		if (((m_sTrackingObject.X + u - dimx / 2) < 0) ||
+			((m_sTrackingObject.X + u + dimx / 2) > m_nImageWidth - 1))
 			u_att[in] = 0;
 		else {
 			u_att[in] = 1;
@@ -641,7 +661,8 @@ float CObjectTracker::Matching(TRaster32P *frame, TRaster32P *frame_temp)
 
 	in = 0;
 	for (v = -m_sTrackingObject.dim_temp; v <= m_sTrackingObject.dim_temp; v++) {
-		if (((m_sTrackingObject.Y + v - dimy / 2) < 0) || ((m_sTrackingObject.Y + v + dimy / 2) > m_nImageHeight - 1))
+		if (((m_sTrackingObject.Y + v - dimy / 2) < 0) ||
+			((m_sTrackingObject.Y + v + dimy / 2) > m_nImageHeight - 1))
 			v_att[in] = 0;
 		else {
 			v_att[in] = 1;
@@ -653,16 +674,17 @@ float CObjectTracker::Matching(TRaster32P *frame, TRaster32P *frame_temp)
 
 	if ((ok_u > 0) && (ok_v > 0)) {
 
-		//Interpolate template
+		// Interpolate template
 		std::unique_ptr<ValuePixel[]> pixel_temp(new ValuePixel[dimx_int * dimy_int]);
 
-		//original value
+		// original value
 		for (int i = 0; i <= (dimx - 1); i++)
 			for (int j = 0; j <= (dimy - 1); j++) {
-				pixel_temp[i * dimy_int * 2 + j * 2] = GetPixelValues(frame_temp, x_min + i, y_min + j);
+				pixel_temp[i * dimy_int * 2 + j * 2] =
+					GetPixelValues(frame_temp, x_min + i, y_min + j);
 			}
 
-		//Interpolate value row
+		// Interpolate value row
 		for (int i = 1; i < (dimx_int * dimy_int); i += 2) {
 
 			pixel_temp[i].r = (pixel_temp[i - 1].r + pixel_temp[i + 1].r) / 2;
@@ -673,7 +695,7 @@ float CObjectTracker::Matching(TRaster32P *frame, TRaster32P *frame_temp)
 				i += dimy_int + 1;
 		}
 
-		//Interpolate value column
+		// Interpolate value column
 		for (int i = dimy_int; i <= ((dimx_int - 1) * dimy_int - 1); i += 2) {
 
 			pixel_temp[i].r = (pixel_temp[i - dimy_int].r + pixel_temp[i + dimy_int].r) / 2;
@@ -684,14 +706,26 @@ float CObjectTracker::Matching(TRaster32P *frame, TRaster32P *frame_temp)
 				i += dimy_int - 1;
 		}
 
-		//Interpolate value central
+		// Interpolate value central
 		for (int i = dimy_int + 1; i <= ((dimx_int - 1) * dimy_int - 2); i += 2) {
 
-			pixel_temp[i].r = UBYTE8(float((pixel_temp[i - dimy_int - 1].r + pixel_temp[i - dimy_int + 1].r + pixel_temp[i + dimy_int - 1].r + pixel_temp[i + dimy_int + 1].r) / 4) + 0.4);
+			pixel_temp[i].r =
+				UBYTE8(float((pixel_temp[i - dimy_int - 1].r + pixel_temp[i - dimy_int + 1].r +
+							  pixel_temp[i + dimy_int - 1].r + pixel_temp[i + dimy_int + 1].r) /
+							 4) +
+					   0.4);
 
-			pixel_temp[i].g = UBYTE8(float((pixel_temp[i - dimy_int - 1].g + pixel_temp[i - dimy_int + 1].g + pixel_temp[i + dimy_int - 1].g + pixel_temp[i + dimy_int + 1].g) / 4) + 0.4);
+			pixel_temp[i].g =
+				UBYTE8(float((pixel_temp[i - dimy_int - 1].g + pixel_temp[i - dimy_int + 1].g +
+							  pixel_temp[i + dimy_int - 1].g + pixel_temp[i + dimy_int + 1].g) /
+							 4) +
+					   0.4);
 
-			pixel_temp[i].b = UBYTE8(float((pixel_temp[i - dimy_int - 1].b + pixel_temp[i - dimy_int + 1].b + pixel_temp[i + dimy_int - 1].b + pixel_temp[i + dimy_int + 1].b) / 4) + 0.4);
+			pixel_temp[i].b =
+				UBYTE8(float((pixel_temp[i - dimy_int - 1].b + pixel_temp[i - dimy_int + 1].b +
+							  pixel_temp[i + dimy_int - 1].b + pixel_temp[i + dimy_int + 1].b) /
+							 4) +
+					   0.4);
 
 			if (i % dimy_int == dimy_int - 2)
 				i += dimy_int + 1;
@@ -720,19 +754,20 @@ float CObjectTracker::Matching(TRaster32P *frame, TRaster32P *frame_temp)
 
 		y_min_ric = m_sTrackingObject.Y + v_min - dimy / 2;
 
-		//Effective Dimension searce interpolate area
+		// Effective Dimension searce interpolate area
 		dimx_int_ric = ((dimx + ok_u - 1) * 2 - 1);
 		dimy_int_ric = ((dimy + ok_v - 1) * 2 - 1);
 
 		std::unique_ptr<ValuePixel[]> area_ricerca(new ValuePixel[dimx_int_ric * dimy_int_ric]);
 
-		//Original value
+		// Original value
 		for (int i = 0; i <= ((dimx + ok_u - 1) - 1); i++)
 			for (int j = 0; j <= ((dimy + ok_v - 1) - 1); j++) {
-				area_ricerca[i * dimy_int_ric * 2 + j * 2] = GetPixelValues(frame, x_min_ric + i, y_min_ric + j);
+				area_ricerca[i * dimy_int_ric * 2 + j * 2] =
+					GetPixelValues(frame, x_min_ric + i, y_min_ric + j);
 			}
 
-		//interpolate value row
+		// interpolate value row
 		for (int i = 1; i < (dimx_int_ric * dimy_int_ric); i += 2) {
 
 			area_ricerca[i].r = (area_ricerca[i - 1].r + area_ricerca[i + 1].r) / 2;
@@ -743,25 +778,43 @@ float CObjectTracker::Matching(TRaster32P *frame, TRaster32P *frame_temp)
 				i += dimy_int_ric + 1;
 		}
 
-		//Interpolate value column
+		// Interpolate value column
 		for (int i = dimy_int_ric; i <= ((dimx_int_ric - 1) * dimy_int_ric - 1); i += 2) {
 
-			area_ricerca[i].r = (area_ricerca[i - dimy_int_ric].r + area_ricerca[i + dimy_int_ric].r) / 2;
-			area_ricerca[i].g = (area_ricerca[i - dimy_int_ric].g + area_ricerca[i + dimy_int_ric].g) / 2;
-			area_ricerca[i].b = (area_ricerca[i - dimy_int_ric].b + area_ricerca[i + dimy_int_ric].b) / 2;
+			area_ricerca[i].r =
+				(area_ricerca[i - dimy_int_ric].r + area_ricerca[i + dimy_int_ric].r) / 2;
+			area_ricerca[i].g =
+				(area_ricerca[i - dimy_int_ric].g + area_ricerca[i + dimy_int_ric].g) / 2;
+			area_ricerca[i].b =
+				(area_ricerca[i - dimy_int_ric].b + area_ricerca[i + dimy_int_ric].b) / 2;
 
 			if (i % dimy_int_ric == dimy_int_ric - 1)
 				i += dimy_int_ric - 1;
 		}
 
-		//Interpolate value central
+		// Interpolate value central
 		for (int i = dimy_int_ric + 1; i <= ((dimx_int_ric - 1) * dimy_int_ric - 2); i += 2) {
 
-			area_ricerca[i].r = UBYTE8(float((area_ricerca[i - dimy_int_ric - 1].r + area_ricerca[i - dimy_int_ric + 1].r + area_ricerca[i + dimy_int_ric - 1].r + area_ricerca[i + dimy_int_ric + 1].r) / 4) + 0.4);
+			area_ricerca[i].r = UBYTE8(
+				float((area_ricerca[i - dimy_int_ric - 1].r + area_ricerca[i - dimy_int_ric + 1].r +
+					   area_ricerca[i + dimy_int_ric - 1].r +
+					   area_ricerca[i + dimy_int_ric + 1].r) /
+					  4) +
+				0.4);
 
-			area_ricerca[i].g = UBYTE8(float((area_ricerca[i - dimy_int_ric - 1].g + area_ricerca[i - dimy_int_ric + 1].g + area_ricerca[i + dimy_int_ric - 1].g + area_ricerca[i + dimy_int_ric + 1].g) / 4) + 0.4);
+			area_ricerca[i].g = UBYTE8(
+				float((area_ricerca[i - dimy_int_ric - 1].g + area_ricerca[i - dimy_int_ric + 1].g +
+					   area_ricerca[i + dimy_int_ric - 1].g +
+					   area_ricerca[i + dimy_int_ric + 1].g) /
+					  4) +
+				0.4);
 
-			area_ricerca[i].b = UBYTE8(float((area_ricerca[i - dimy_int_ric - 1].b + area_ricerca[i - dimy_int_ric + 1].b + area_ricerca[i + dimy_int_ric - 1].b + area_ricerca[i + dimy_int_ric + 1].b) / 4) + 0.4);
+			area_ricerca[i].b = UBYTE8(
+				float((area_ricerca[i - dimy_int_ric - 1].b + area_ricerca[i - dimy_int_ric + 1].b +
+					   area_ricerca[i + dimy_int_ric - 1].b +
+					   area_ricerca[i + dimy_int_ric + 1].b) /
+					  4) +
+				0.4);
 
 			if (i % dimy_int_ric == dimy_int_ric - 2)
 				i += dimy_int_ric + 1;
@@ -788,7 +841,7 @@ float CObjectTracker::Matching(TRaster32P *frame, TRaster32P *frame_temp)
 		float att_dist_cent = MAX_FLOAT;
 		float dist_cent;
 
-		//Distance
+		// Distance
 		for (u = 2 * u_min; u <= 2 * u_max; u++) {
 
 			for (v = 2 * v_min; v <= 2 * v_max; v++) {
@@ -804,7 +857,12 @@ float CObjectTracker::Matching(TRaster32P *frame, TRaster32P *frame_temp)
 
 						indc = ((x + (u - 2 * u_min))) * dimy_int_ric + (y + (v - 2 * v_min));
 
-						dist += (pixel_temp[indt].r - area_ricerca[indc].r) * (pixel_temp[indt].r - area_ricerca[indc].r) + (pixel_temp[indt].g - area_ricerca[indc].g) * (pixel_temp[indt].g - area_ricerca[indc].g) + (pixel_temp[indt].b - area_ricerca[indc].b) * (pixel_temp[indt].b - area_ricerca[indc].b);
+						dist += (pixel_temp[indt].r - area_ricerca[indc].r) *
+									(pixel_temp[indt].r - area_ricerca[indc].r) +
+								(pixel_temp[indt].g - area_ricerca[indc].g) *
+									(pixel_temp[indt].g - area_ricerca[indc].g) +
+								(pixel_temp[indt].b - area_ricerca[indc].b) *
+									(pixel_temp[indt].b - area_ricerca[indc].b);
 					}
 				dist = sqrt(dist) / (sqrt(float(dimx_int * dimy_int * 3 * 255 * 255)));
 
@@ -839,7 +897,9 @@ float CObjectTracker::Matching(TRaster32P *frame, TRaster32P *frame_temp)
 				track = true;
 				if (min_dist > m_sTrackingObject.threshold_distance_B) {
 					m_visible = "WARNING";
-					m_K_dist = floor((double)(min_dist - m_sTrackingObject.threshold_distance_B) / (m_sTrackingObject.threshold_distance - m_sTrackingObject.threshold_distance_B));
+					m_K_dist = floor((double)(min_dist - m_sTrackingObject.threshold_distance_B) /
+									 (m_sTrackingObject.threshold_distance -
+									  m_sTrackingObject.threshold_distance_B));
 				} else {
 					m_visible = "VISIBLE";
 				}
@@ -847,20 +907,26 @@ float CObjectTracker::Matching(TRaster32P *frame, TRaster32P *frame_temp)
 		}
 
 		if (track) {
-			//half pixel
+			// half pixel
 			m_sTrackingObject.half_pixelx = 0;
 			m_sTrackingObject.half_pixely = 0;
 
 			if (u_sup % 2 != 0)
 				if (v_sup % 2 != 0) {
-					if (mat_dist[(u_sup - 2 * u_min - 1) * (2 * ok_v - 1) + (v_sup - 2 * v_min - 1)] <
-						mat_dist[(u_sup - 2 * u_min - 1) * (2 * ok_v - 1) + (v_sup - 2 * v_min + 1)])
+					if (mat_dist[(u_sup - 2 * u_min - 1) * (2 * ok_v - 1) +
+								 (v_sup - 2 * v_min - 1)] <
+						mat_dist[(u_sup - 2 * u_min - 1) * (2 * ok_v - 1) +
+								 (v_sup - 2 * v_min + 1)])
 
-						if (mat_dist[(u_sup - 2 * u_min - 1) * (2 * ok_v - 1) + (v_sup - 2 * v_min - 1)] <
-							mat_dist[(u_sup - 2 * u_min + 1) * (2 * ok_v - 1) + (v_sup - 2 * v_min - 1)])
+						if (mat_dist[(u_sup - 2 * u_min - 1) * (2 * ok_v - 1) +
+									 (v_sup - 2 * v_min - 1)] <
+							mat_dist[(u_sup - 2 * u_min + 1) * (2 * ok_v - 1) +
+									 (v_sup - 2 * v_min - 1)])
 
-							if (mat_dist[(u_sup - 2 * u_min - 1) * (2 * ok_v - 1) + (v_sup - 2 * v_min - 1)] <
-								mat_dist[(u_sup - 2 * u_min + 1) * (2 * ok_v - 1) + (v_sup - 2 * v_min + 1)]) {
+							if (mat_dist[(u_sup - 2 * u_min - 1) * (2 * ok_v - 1) +
+										 (v_sup - 2 * v_min - 1)] <
+								mat_dist[(u_sup - 2 * u_min + 1) * (2 * ok_v - 1) +
+										 (v_sup - 2 * v_min + 1)]) {
 								m_sTrackingObject.half_pixelx = -1;
 								m_sTrackingObject.half_pixely = -1;
 								u_sup -= 1;
@@ -871,8 +937,10 @@ float CObjectTracker::Matching(TRaster32P *frame, TRaster32P *frame_temp)
 								u_sup += 1;
 								v_sup += 1;
 							}
-						else if (mat_dist[(u_sup - 2 * u_min + 1) * (2 * ok_v - 1) + (v_sup - 2 * v_min - 1)] <
-								 mat_dist[(u_sup - 2 * u_min + 1) * (2 * ok_v - 1) + (v_sup - 2 * v_min + 1)]) {
+						else if (mat_dist[(u_sup - 2 * u_min + 1) * (2 * ok_v - 1) +
+										  (v_sup - 2 * v_min - 1)] <
+								 mat_dist[(u_sup - 2 * u_min + 1) * (2 * ok_v - 1) +
+										  (v_sup - 2 * v_min + 1)]) {
 							m_sTrackingObject.half_pixelx = 1;
 							m_sTrackingObject.half_pixely = -1;
 							u_sup += 1;
@@ -883,11 +951,15 @@ float CObjectTracker::Matching(TRaster32P *frame, TRaster32P *frame_temp)
 							u_sup += 1;
 							v_sup += 1;
 						}
-					else if (mat_dist[(u_sup - 2 * u_min - 1) * (2 * ok_v - 1) + (v_sup - 2 * v_min + 1)] <
-							 mat_dist[(u_sup - 2 * u_min + 1) * (2 * ok_v - 1) + (v_sup - 2 * v_min - 1)])
+					else if (mat_dist[(u_sup - 2 * u_min - 1) * (2 * ok_v - 1) +
+									  (v_sup - 2 * v_min + 1)] <
+							 mat_dist[(u_sup - 2 * u_min + 1) * (2 * ok_v - 1) +
+									  (v_sup - 2 * v_min - 1)])
 
-						if (mat_dist[(u_sup - 2 * u_min - 1) * (2 * ok_v - 1) + (v_sup - 2 * v_min + 1)] <
-							mat_dist[(u_sup - 2 * u_min + 1) * (2 * ok_v - 1) + (v_sup - 2 * v_min + 1)]) {
+						if (mat_dist[(u_sup - 2 * u_min - 1) * (2 * ok_v - 1) +
+									 (v_sup - 2 * v_min + 1)] <
+							mat_dist[(u_sup - 2 * u_min + 1) * (2 * ok_v - 1) +
+									 (v_sup - 2 * v_min + 1)]) {
 							m_sTrackingObject.half_pixelx = -1;
 							m_sTrackingObject.half_pixely = 1;
 							u_sup -= 1;
@@ -898,8 +970,10 @@ float CObjectTracker::Matching(TRaster32P *frame, TRaster32P *frame_temp)
 							u_sup += 1;
 							v_sup += 1;
 						}
-					else if (mat_dist[(u_sup - 2 * u_min + 1) * (2 * ok_v - 1) + (v_sup - 2 * v_min - 1)] <
-							 mat_dist[(u_sup - 2 * u_min + 1) * (2 * ok_v - 1) + (v_sup - 2 * v_min + 1)]) {
+					else if (mat_dist[(u_sup - 2 * u_min + 1) * (2 * ok_v - 1) +
+									  (v_sup - 2 * v_min - 1)] <
+							 mat_dist[(u_sup - 2 * u_min + 1) * (2 * ok_v - 1) +
+									  (v_sup - 2 * v_min + 1)]) {
 						m_sTrackingObject.half_pixelx = 1;
 						m_sTrackingObject.half_pixely = -1;
 
@@ -946,17 +1020,16 @@ float CObjectTracker::Matching(TRaster32P *frame, TRaster32P *frame_temp)
 }
 
 //-------------------------------------------------------------------------------------------------------
-//Update characteristic neighbours
+// Update characteristic neighbours
 void CObjectTracker::DistanceAndUpdate(NEIGHBOUR position)
 {
 	float x0 = m_sTrackingObject.X;
 	float y0 = m_sTrackingObject.Y;
-	float x1 = position.X_old,
-		  y1 = position.Y_old;
+	float x1 = position.X_old, y1 = position.Y_old;
 	float dist2;
 	dist2 = (x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1);
 
-	//searce free position
+	// searce free position
 	for (int i = 0; i < 30; i++) {
 		if ((neighbours[i].X == -1) && (neighbours[i].Y == -1)) {
 			neighbours[i].X = position.X;
@@ -968,7 +1041,7 @@ void CObjectTracker::DistanceAndUpdate(NEIGHBOUR position)
 		}
 	}
 
-	//sostitution based on distance
+	// sostitution based on distance
 	int i = 0;
 	for (i = 0; i < 30; i++) {
 		if (dist2 < neighbours[i].dist2) {
@@ -983,7 +1056,7 @@ void CObjectTracker::DistanceAndUpdate(NEIGHBOUR position)
 }
 
 //--------------------------------------------------------------------------------------------------------
-//Set position by neighbours
+// Set position by neighbours
 void CObjectTracker::SetPositionByNeighbours(void)
 {
 	if (!track) {
@@ -1001,14 +1074,14 @@ void CObjectTracker::SetPositionByNeighbours(void)
 			}
 		}
 
-		//error: neighbours aligns
+		// error: neighbours aligns
 		if ((y[1] - y[0]) * (x[2] - x[0]) == (y[2] - y[0]) * (x[1] - x[0])) {
 			m_sTrackingObject.X = -1;
 			m_sTrackingObject.Y = -1;
 			return;
 		}
 
-		//old neighbours coordinate
+		// old neighbours coordinate
 		float x_old[3], y_old[3];
 		int i = 0;
 		for (i = 0; i < 3; i++) {
@@ -1019,21 +1092,22 @@ void CObjectTracker::SetPositionByNeighbours(void)
 		//
 		float dn2[3], dn_old2[3];
 
-		//distance
+		// distance
 		for (i = 0; i < 2; i++)
 			for (int j = i + 1; j < 3; j++) {
-				dn_old2[i + j - 1] = (x_old[i] - x_old[j]) * (x_old[i] - x_old[j]) + (y_old[i] - y_old[j]) * (y_old[i] - y_old[j]);
+				dn_old2[i + j - 1] = (x_old[i] - x_old[j]) * (x_old[i] - x_old[j]) +
+									 (y_old[i] - y_old[j]) * (y_old[i] - y_old[j]);
 				dn2[i + j - 1] = (x[i] - x[j]) * (x[i] - x[j]) + (y[i] - y[j]) * (y[i] - y[j]);
 			}
 
-		//scale factor (^2)
+		// scale factor (^2)
 		float scale = ((dn2[0] / dn_old2[0]) + (dn2[1] / dn_old2[1]) + (dn2[2] / dn_old2[2])) / 3.0;
 
-		//update distance
+		// update distance
 		for (i = 0; i < 3; i++)
 			d2[i] *= scale;
 
-		//new location
+		// new location
 		float A[2][2], b[2];
 		A[0][0] = 2 * (x[1] - x[0]);
 		A[0][1] = 2 * (y[1] - y[0]);
@@ -1057,7 +1131,7 @@ void CObjectTracker::SetPositionByNeighbours(void)
 		m_sTrackingObject.half_pixelx = 0;
 		m_sTrackingObject.half_pixely = 0;
 
-		//error
+		// error
 		if (m_sTrackingObject.X < 0) {
 			//			m_sTrackingObject.X = 0;
 			m_visible = "INVISIBLE";
@@ -1078,7 +1152,7 @@ void CObjectTracker::SetPositionByNeighbours(void)
 }
 
 //--------------------------------------------------------------------------------------------------------
-//Write on output file
+// Write on output file
 void CObjectTracker::WriteOnOutputFile(char *filename)
 {
 	ofstream output;
@@ -1089,15 +1163,18 @@ void CObjectTracker::WriteOnOutputFile(char *filename)
 	output << m_visible << endl;
 	output.close();
 	output.open("output_center.txt", ios_base::app);
-	output << "Coordinate del punto - X : " << m_sTrackingObject.X - ((m_nImageWidth - 1) / 2) << " - Y : " << m_sTrackingObject.Y - ((m_nImageHeight - 1) / 2) << endl;
-	output << "Larghezza dell'area : " << m_sTrackingObject.W << " - Altezza dell'aera : " << m_sTrackingObject.H << endl;
-	output << "Mezzo pixel : " << m_sTrackingObject.half_pixelx << " " << m_sTrackingObject.half_pixely << endl;
+	output << "Coordinate del punto - X : " << m_sTrackingObject.X - ((m_nImageWidth - 1) / 2)
+		   << " - Y : " << m_sTrackingObject.Y - ((m_nImageHeight - 1) / 2) << endl;
+	output << "Larghezza dell'area : " << m_sTrackingObject.W
+		   << " - Altezza dell'aera : " << m_sTrackingObject.H << endl;
+	output << "Mezzo pixel : " << m_sTrackingObject.half_pixelx << " "
+		   << m_sTrackingObject.half_pixely << endl;
 	output << "Visibilità : " << m_visible << endl;
 	output.close();
 }
 
 //--------------------------------------------------------------------------------------------------------
-//Reset distance
+// Reset distance
 void CObjectTracker::DistanceReset(void)
 {
 	for (int i = 0; i < 30; i++) {
@@ -1108,7 +1185,7 @@ void CObjectTracker::DistanceReset(void)
 }
 
 //--------------------------------------------------------------------------------------------------------
-//Get position neighbours
+// Get position neighbours
 NEIGHBOUR CObjectTracker::GetPosition(void)
 {
 	NEIGHBOUR _neighbour;
@@ -1122,7 +1199,7 @@ NEIGHBOUR CObjectTracker::GetPosition(void)
 	return _neighbour;
 }
 
-//Set position of the object
+// Set position of the object
 void CObjectTracker::SetPosition(short x, short y)
 {
 	if (x < 0) {
@@ -1147,13 +1224,13 @@ void CObjectTracker::SetPosition(short x, short y)
 	m_sTrackingObject.half_pixely = 0;
 }
 
-//Set the object as initialized
+// Set the object as initialized
 void CObjectTracker::SetInit(bool status)
 {
 	m_initialized = status;
 }
 
-//Get if the object is initialized
+// Get if the object is initialized
 bool CObjectTracker::GetInit()
 {
 	return m_initialized;
@@ -1169,23 +1246,23 @@ void CObjectTracker::SetVisibility(string visibility)
 	m_visible = visibility;
 }
 
-//Set initials position of neighbours
+// Set initials position of neighbours
 void CObjectTracker::SetInitials(NEIGHBOUR position)
 {
 	initial.x = position.X;
 	initial.y = position.Y;
 }
 
-//Get initials position of neighbours
+// Get initials position of neighbours
 Predict3D::Point CObjectTracker::GetInitials()
 {
 	return initial;
 }
 
-//Get the K_Dist
+// Get the K_Dist
 int CObjectTracker::GetKDist()
 {
 	return m_K_dist;
 }
 
-//End
+// End

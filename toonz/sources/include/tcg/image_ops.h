@@ -13,8 +13,7 @@ namespace tcg
 //    Image Traits  definition
 //***********************************************************************
 
-template <typename Img>
-struct image_traits_types {
+template <typename Img> struct image_traits_types {
 	typedef Img image_type;
 	typedef typename Img::pixel_type pixel_type;
 	typedef typename Img::pixel_ptr_type pixel_ptr_type;
@@ -23,12 +22,11 @@ struct image_traits_types {
 
 //-------------------------------------------------------------------
 
-template <typename Img>
-class image_traits : public image_traits_types<Img>
+template <typename Img> class image_traits : public image_traits_types<Img>
 {
 	typedef image_traits_types<Img> tr;
 
-public:
+  public:
 	static int width(const typename tr::image_type &img);
 	static int height(const typename tr::image_type &img);
 	static int wrap(const typename tr::image_type &img);

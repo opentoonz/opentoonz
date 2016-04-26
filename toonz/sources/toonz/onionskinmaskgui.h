@@ -13,7 +13,7 @@ namespace OnioniSkinMaskGUI
 {
 //-----------------------------------------------------------------------------
 
-//Da fare per la filmstrip!!
+// Da fare per la filmstrip!!
 void addOnionSkinCommand(QMenu *, bool isFilmStrip = false);
 
 //=============================================================================
@@ -24,7 +24,7 @@ class OnionSkinSwitcher : public QObject
 {
 	Q_OBJECT
 
-public:
+  public:
 	OnionSkinSwitcher() {}
 
 	OnionSkinMask getMask() const;
@@ -34,7 +34,7 @@ public:
 	bool isActive() const;
 	bool isWholeScene() const;
 
-public slots:
+  public slots:
 	void activate();
 	void deactivate();
 	void setWholeScene();
@@ -42,7 +42,7 @@ public slots:
 };
 
 //-----------------------------------------------------------------------------
-} //namespace OnioniSkinMaskGUI
+} // namespace OnioniSkinMaskGUI
 //-----------------------------------------------------------------------------
 
-#endif //ONIONSKINMASKGUI
+#endif // ONIONSKINMASKGUI

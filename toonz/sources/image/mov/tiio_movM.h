@@ -26,7 +26,7 @@ class TLevelWriterMov : public TLevelWriter
 
 	std::vector<std::pair<int, TimeValue>> m_savedFrames;
 
-public:
+  public:
 	TLevelWriterMov(const TFilePath &path, TPropertyGroup *winfo);
 	~TLevelWriterMov();
 	TImageWriterP getFrameWriter(TFrameId fid);
@@ -35,7 +35,7 @@ public:
 
 	void save(const TImageP &img, int frameIndex);
 
-private:
+  private:
 	Movie m_movie;
 	Track m_videoTrack;
 	Media m_videoMedia;
@@ -44,7 +44,7 @@ private:
 
 	GWorldPtr m_gworld;
 	PixMapHandle m_pixmap;
-	//Handle       m_compressedData;
+	// Handle       m_compressedData;
 	short m_refNum;
 
 	PixelXRGB *buf;
@@ -54,7 +54,7 @@ private:
 	TThread::Mutex m_mutex;
 	ComponentInstance m_ci;
 
-public:
+  public:
 	static TLevelWriter *create(const TFilePath &f, TPropertyGroup *winfo)
 	{
 		return new TLevelWriterMov(f, winfo);
@@ -66,21 +66,22 @@ class TLevelReaderMov : public TLevelReader
 {
 	bool m_readAsToonzOutput;
 
-public:
+  public:
 	TLevelReaderMov(const TFilePath &path);
 	~TLevelReaderMov();
 	TImageReaderP getFrameReader(TFrameId fid);
-	//friend class TImageReaderMov;
+	// friend class TImageReaderMov;
 	TLevelP loadInfo();
 
 	void enableRandomAccessRead(bool enable) { m_readAsToonzOutput = enable; }
-	void load(const TRasterP &rasP, int frameIndex, const TPoint &pos, int shrinkX = 1, int shrinkY = 1);
+	void load(const TRasterP &rasP, int frameIndex, const TPoint &pos, int shrinkX = 1,
+			  int shrinkY = 1);
 	TDimension getSize() const { return TDimension(m_lx, m_ly); }
 	TRect getBBox() const { return TRect(0, 0, m_lx - 1, m_ly - 1); }
 
 	int m_IOError;
 
-private:
+  private:
 	short m_refNum;
 	Movie m_movie;
 	short m_resId;
@@ -89,11 +90,8 @@ private:
 	map<int, TimeValue> currentTimes;
 	int m_lx, m_ly;
 
-public:
-	static TLevelReader *create(const TFilePath &f)
-	{
-		return new TLevelReaderMov(f);
-	};
+  public:
+	static TLevelReader *create(const TFilePath &f) { return new TLevelReaderMov(f); };
 	TThread::Mutex m_mutex;
 
 	TLevelP loadToonzOutputFormatInfo();
@@ -109,7 +107,7 @@ public:
   TWriterInfo *clone() const;
 private:
   TWriterInfoMov();
-  
+
 
   TWriterInfoMov(const TWriterInfoMov&);
 
@@ -130,7 +128,7 @@ class MovWriterProperties : public TPropertyGroup
 	//  std::map<wstring, CodecType> m_codecMap;
 	//  std::map<wstring, CodecQ> m_qualityMap;
 
-public:
+  public:
 	MovWriterProperties();
 	//	TPropertyGroup* clone() const;
 	//  TEnumProperty m_codec;
@@ -144,4 +142,4 @@ public:
 
 #endif //__LP64__
 
-#endif //TIIO_MOV_H
+#endif // TIIO_MOV_H

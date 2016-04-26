@@ -18,15 +18,13 @@ double Token::getDoubleValue() const
 
 //===================================================================
 
-Tokenizer::Tokenizer()
-	: m_buffer(), m_index(0)
+Tokenizer::Tokenizer() : m_buffer(), m_index(0)
 {
 }
 
 //-------------------------------------------------------------------
 
-Tokenizer::Tokenizer(std::string buffer)
-	: m_buffer(), m_index(0)
+Tokenizer::Tokenizer(std::string buffer) : m_buffer(), m_index(0)
 {
 	setBuffer(buffer);
 }
@@ -97,10 +95,9 @@ void Tokenizer::setBuffer(std::string buffer)
 				while (isascii(s[i]) && isdigit(s[i]))
 					token.append(1, s[i++]);
 
-				if ((s[i] == 'e' || s[i] == 'E') &&
-					(isascii(s[i + 1]) && isdigit(s[i + 1]) ||
-					 (s[i + 1] == '-' || s[i + 1] == '+') &&
-						 isascii(s[i + 2]) && isdigit(s[i + 2]))) {
+				if ((s[i] == 'e' || s[i] == 'E') && (isascii(s[i + 1]) && isdigit(s[i + 1]) ||
+													 (s[i + 1] == '-' || s[i + 1] == '+') &&
+														 isascii(s[i + 2]) && isdigit(s[i + 2]))) {
 					token.append(1, s[i++]);
 
 					if (s[i] == '-' || s[i] == '+')
@@ -116,8 +113,7 @@ void Tokenizer::setBuffer(std::string buffer)
 			if (s[i + 1] != '\0') {
 				token = std::string(s + i, 2);
 
-				const std::string ss[] = {
-					"==", "!=", ">=", "<=", "||", "&&"};
+				const std::string ss[] = {"==", "!=", ">=", "<=", "||", "&&"};
 
 				const int m = tArrayCount(ss);
 				if (std::find(ss, ss + m, token) != ss + m)

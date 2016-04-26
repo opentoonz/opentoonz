@@ -3,10 +3,10 @@
 #ifndef TIPC_MESSAGE_H
 #define TIPC_MESSAGE_H
 
-//Toonz includes
+// Toonz includes
 #include "tcommon.h"
 
-//Qt includes
+// Qt includes
 #include <QDataStream>
 #include <QLocalSocket>
 
@@ -36,7 +36,7 @@ class MessageParser
 	QLocalSocket *m_socket;
 	tipc::Stream *m_stream;
 
-public:
+  public:
 	virtual QString header() const = 0;
 	virtual void operator()(Message &msg) = 0;
 
@@ -48,16 +48,11 @@ public:
 //    Default Message Types declaration
 //********************************************************
 
-enum DefMsgEnum { SHMEM_REQUEST,
-				  SHMEM_RELEASE,
-				  TMPFILE_REQUEST,
-				  TMPFILE_RELEASE,
-				  QUIT_ON_ERROR };
+enum DefMsgEnum { SHMEM_REQUEST, SHMEM_RELEASE, TMPFILE_REQUEST, TMPFILE_RELEASE, QUIT_ON_ERROR };
 
-template <DefMsgEnum msgType>
-class DVAPI DefaultMessageParser : public MessageParser
+template <DefMsgEnum msgType> class DVAPI DefaultMessageParser : public MessageParser
 {
-public:
+  public:
 	QString header() const;
 	void operator()(Message &msg);
 };
@@ -95,6 +90,6 @@ QUIT_ON_ERROR
 
 //------------------------------------------------------------------------------
 
-} //namespace tipc
+} // namespace tipc
 
-#endif //TIPC_MESSAGE_H
+#endif // TIPC_MESSAGE_H

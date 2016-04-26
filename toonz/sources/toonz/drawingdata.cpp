@@ -81,7 +81,7 @@ void getFrameIdToInsert(std::set<TFrameId> &frames, TXshSimpleLevel *sl,
 	std::vector<TFrameId> fids;
 	sl->getFids(fids);
 	// cerca fids[j] <= pastePosition
-	//fids.beginからfids.endまで、frames.begin()に比べFrameIdが同じか大きいところまでjを進める
+	// fids.beginからfids.endまで、frames.begin()に比べFrameIdが同じか大きいところまでjを進める
 	//要するに、ペースト場所を選択フレーム範囲の一番上の部分にする。
 	std::vector<TFrameId>::iterator j = std::lower_bound(fids.begin(), fids.end(), pastePosition);
 	if (j != fids.begin()) {
@@ -99,7 +99,7 @@ void getFrameIdToInsert(std::set<TFrameId> &frames, TXshSimpleLevel *sl,
 			pastePosition = TFrameId(pastePosition.getNumber() - 1);
 	}
 
-	//pastePositionからコピーされたフレームの枚数分framesに挿入する。
+	// pastePositionからコピーされたフレームの枚数分framesに挿入する。
 	// frames <- i frames da inserire
 	frames.clear();
 	int i;
@@ -109,7 +109,8 @@ void getFrameIdToInsert(std::set<TFrameId> &frames, TXshSimpleLevel *sl,
 
 //-----------------------------------------------------------------------------
 
-void rasterize(TToonzImageP &target, const TVectorImageP &source, const std::map<int, int> &styleTable)
+void rasterize(TToonzImageP &target, const TVectorImageP &source,
+			   const std::map<int, int> &styleTable)
 {
 	double dpix, dpiy;
 	target->getDpi(dpix, dpiy);
@@ -122,8 +123,8 @@ void rasterize(TToonzImageP &target, const TVectorImageP &source, const std::map
 	bbox.x1 = tceil(bbox.x1);
 	bbox.y1 = tceil(bbox.y1);
 	TDimension size(bbox.getLx(), bbox.getLy());
-	TToonzImageP app = ToonzImageUtils::vectorToToonzImage(
-		source, sc, source->getPalette(), bbox.getP00(), size, 0, true);
+	TToonzImageP app = ToonzImageUtils::vectorToToonzImage(source, sc, source->getPalette(),
+														   bbox.getP00(), size, 0, true);
 	TRect rBbox = ToonzImageUtils::convertWorldToRaster(bbox, target);
 	target->getCMapped()->copy(app->getCMapped(), rBbox.getP00());
 
@@ -156,7 +157,7 @@ void vectorize(TVectorImageP &target, const TToonzImageP &source,
 	target->mergeImage(vi, TAffine(), styleTable);
 }
 
-} //namespace
+} // namespace
 
 DrawingData *DrawingData::clone() const
 {
@@ -182,15 +183,18 @@ void DrawingData::setLevelFrames(TXshSimpleLevel *sl, std::set<TFrameId> &frames
 		TFrameId frameId = *it;
 
 		// Retrieve the image to be stored in this instance
-		TImageP img = sl->getFullsampledFrame(		// Subsampling is explicitly removed, here.
-			frameId, ImageManager::dontPutInCache); // Furthermore, will not force the IM to cache it.
+		TImageP img = sl->getFullsampledFrame( // Subsampling is explicitly removed, here.
+			frameId,
+			ImageManager::dontPutInCache); // Furthermore, will not force the IM to cache it.
 		if (!img)
 			continue;
 
 		// Clone the image and store it in the image cache
-		QString id = makeCacheId((uintptr_t) this, it->getNumber()); // Cloning is necessary since the user may
-		TImageCache::instance()->add(id, img->cloneImage());		 // modify and save the original AFTER the copy
-		m_imageSet[frameId] = id;									 // has been done.
+		QString id = makeCacheId((uintptr_t) this,
+								 it->getNumber()); // Cloning is necessary since the user may
+		TImageCache::instance()->add(
+			id, img->cloneImage()); // modify and save the original AFTER the copy
+		m_imageSet[frameId] = id;   // has been done.
 
 		for (i = 0; i < hookCount; i++) {
 			Hook *levelHook = levelHooks->getHook(i);
@@ -219,28 +223,28 @@ void DrawingData::setLevelFrames(TXshSimpleLevel *sl, std::set<TFrameId> &frames
 // frames: selected frames
 // setType : INSERT->InsertPaste,  OVER_FRAMEID->Merge,  OVER_SELECTION->PasteInto
 
-bool DrawingData::getLevelFrames(TXshSimpleLevel *sl,
-								 std::set<TFrameId> &frames,
-								 ImageSetType setType,
-								 bool cloneImages,
-								 bool &keepOriginalPalette,
+bool DrawingData::getLevelFrames(TXshSimpleLevel *sl, std::set<TFrameId> &frames,
+								 ImageSetType setType, bool cloneImages, bool &keepOriginalPalette,
 								 bool isRedo) const
 {
 	int slType = m_level->getType();
 	if (m_imageSet.empty() || !sl ||
-		(frames.empty() && setType != DrawingData::OVER_FRAMEID) ||   // If setType == OVER_FRAMEID ignore frames
-		(sl->getType() != slType &&									  // Level types must be compatible...
-		 (sl->getType() != TZP_XSHLEVEL || slType != PLI_XSHLEVEL) && // ...unless they are of type PLI and TLV
-		 (sl->getType() != PLI_XSHLEVEL || slType != TZP_XSHLEVEL)))  //
+		(frames.empty() &&
+		 setType != DrawingData::OVER_FRAMEID) || // If setType == OVER_FRAMEID ignore frames
+		(sl->getType() != slType &&				  // Level types must be compatible...
+		 (sl->getType() != TZP_XSHLEVEL ||
+		  slType != PLI_XSHLEVEL) && // ...unless they are of type PLI and TLV
+		 (sl->getType() != PLI_XSHLEVEL || slType != TZP_XSHLEVEL))) //
 		return false;
 
 	if (m_level.getPointer() == sl || isRedo) {
 	}
-	//when pasting the frame to different level
+	// when pasting the frame to different level
 	else {
 		QString question;
 		question = "Replace palette ?";
-		int ret = DVGui::MsgBox(question, QObject::tr("Replace with copied palette"), QObject::tr("Keep original palette"), QObject::tr("Cancel"), 0);
+		int ret = DVGui::MsgBox(question, QObject::tr("Replace with copied palette"),
+								QObject::tr("Keep original palette"), QObject::tr("Cancel"), 0);
 
 		if (ret == 0 || ret == 3)
 			return false;
@@ -277,19 +281,19 @@ bool DrawingData::getLevelFrames(TXshSimpleLevel *sl,
 	// copied frames
 	std::map<TFrameId, QString>::const_iterator mapIt = m_imageSet.begin();
 
-	//Preprocessing to keep used styles
+	// Preprocessing to keep used styles
 	for (mapIt; mapIt != m_imageSet.end(); ++mapIt) {
 		QString imageId = mapIt->second;
 		// paste destination
 		TFrameId frameId;
 
-		//merge
-		if (setType == OVER_FRAMEID) //If setType == OVER_FRAMEID ignore frames
+		// merge
+		if (setType == OVER_FRAMEID) // If setType == OVER_FRAMEID ignore frames
 			frameId = mapIt->first;
 		else {
 			// if type == OVER_SELECTION, pasting ends at the end of selected range
 			if (it == framesToInsert.end())
-				continue; //If setType == INSERT this is not possible.
+				continue; // If setType == INSERT this is not possible.
 
 			frameId = *it;
 		}
@@ -306,7 +310,7 @@ bool DrawingData::getLevelFrames(TXshSimpleLevel *sl,
 			++it;
 	}
 
-	//Merge Palette :
+	// Merge Palette :
 	TPalette *slPlt = sl->getPalette();
 	bool styleAdded = mergePalette_Overlap(slPlt, imgPlt, keepOriginalPalette);
 
@@ -314,7 +318,7 @@ bool DrawingData::getLevelFrames(TXshSimpleLevel *sl,
 	for (int s = 0; s < slPlt->getStyleCount(); s++)
 		styleTable[s] = s;
 
-	//Merge Image
+	// Merge Image
 	for (mapIt = usedImageSet.begin(); mapIt != usedImageSet.end(); ++mapIt) {
 		QString imageId = mapIt->second;
 		TImageP img = getImage(imageId, sl, styleTable);
@@ -323,11 +327,11 @@ bool DrawingData::getLevelFrames(TXshSimpleLevel *sl,
 		sl->setFrame(mapIt->first, cloneImages ? img->cloneImage() : img);
 	}
 
-	//merge Hooks
+	// merge Hooks
 	HookSet *levelHooks = sl->getHookSet();
 
 	int hookCount = m_levelHooks.getHookCount();
-	//shiftHooks(sl,usedImageSet.begin()->first,framesToInsert.size());
+	// shiftHooks(sl,usedImageSet.begin()->first,framesToInsert.size());
 
 	std::map<TFrameId, QString>::const_iterator frameIt = m_imageSet.begin();
 	for (mapIt = usedImageSet.begin(); mapIt != usedImageSet.end(); ++mapIt, ++frameIt) {
@@ -344,7 +348,7 @@ bool DrawingData::getLevelFrames(TXshSimpleLevel *sl,
 
 	sl->setDirtyFlag(true);
 
-	//notify if there are any modifications to the palette
+	// notify if there are any modifications to the palette
 	if (styleAdded && !isRedo) {
 		QString message;
 		if (keepOriginalPalette)
@@ -360,7 +364,8 @@ bool DrawingData::getLevelFrames(TXshSimpleLevel *sl,
 
 //-----------------------------------------------------------------------------
 
-TImageP DrawingData::getImage(QString imageId, TXshSimpleLevel *sl, const std::map<int, int> &styleTable) const
+TImageP DrawingData::getImage(QString imageId, TXshSimpleLevel *sl,
+							  const std::map<int, int> &styleTable) const
 {
 	TImageP img = TImageCache::instance()->get(imageId, false);
 	int slType = m_level->getType();
@@ -371,12 +376,13 @@ TImageP DrawingData::getImage(QString imageId, TXshSimpleLevel *sl, const std::m
 		// raster -> raster
 		if (sl->getType() == TZP_XSHLEVEL) {
 			TToonzImageP slTi = slImg;
-			//Immagine di appoggio per effettuare lo scramble
+			// Immagine di appoggio per effettuare lo scramble
 			TToonzImageP newImg = ti->clone();
 			ToonzImageUtils::scrambleStyles(newImg, styleTable);
 			TRasterCM32P slRaster = slTi->getRaster();
 			TRasterCM32P imgRaster = newImg->getRaster();
-			TRop::over(slRaster, imgRaster, TTranslation(slRaster->getCenterD() - imgRaster->getCenterD()));
+			TRop::over(slRaster, imgRaster,
+					   TTranslation(slRaster->getCenterD() - imgRaster->getCenterD()));
 			TRect savebox;
 			TRop::computeBBox(slTi->getRaster(), savebox);
 			slTi->setSavebox(savebox);
@@ -420,7 +426,8 @@ TImageP DrawingData::getImage(QString imageId, TXshSimpleLevel *sl, const std::m
 
 //-----------------------------------------------------------------------------
 
-void DrawingData::setFrames(const std::map<TFrameId, QString> &imageSet, TXshSimpleLevel *level, const HookSet &levelHooks)
+void DrawingData::setFrames(const std::map<TFrameId, QString> &imageSet, TXshSimpleLevel *level,
+							const HookSet &levelHooks)
 {
 	m_levelHooks = levelHooks;
 	m_imageSet.clear();
@@ -444,9 +451,9 @@ void DrawingData::getFrames(std::set<TFrameId> &frames) const
 
 DrawingData::~DrawingData()
 {
-	//cannot do that here! if you have cloned this class, the images in the cahce are still used...
-	//int i;
-	//for(i=0; i<m_imageSet.size(); i++)
+	// cannot do that here! if you have cloned this class, the images in the cahce are still used...
+	// int i;
+	// for(i=0; i<m_imageSet.size(); i++)
 	//  TImageCache::instance()->remove(m_imageSet[i]);
 }
 
@@ -454,8 +461,8 @@ DrawingData::~DrawingData()
 
 void DrawingData::releaseData()
 {
-	//do it when you're sure you no t need images anymore... (for example in an undo distructor)
-	//int i;
-	//for(i=0; i<m_imageSet.size(); i++)
+	// do it when you're sure you no t need images anymore... (for example in an undo distructor)
+	// int i;
+	// for(i=0; i<m_imageSet.size(); i++)
 	//  TImageCache::instance()->remove(m_imageSet[i]);
 }

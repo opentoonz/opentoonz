@@ -57,7 +57,7 @@ class PlasticSkeletonDeformation;
 struct DVAPI PlasticSkeletonVertex : public tcg::Vertex<TPointD>, public TPersist {
 	PERSIST_DECLARATION(PlasticSkeletonVertex)
 
-private:
+  private:
 	friend class PlasticSkeleton;
 
 	QString m_name; //!< Vertex name
@@ -65,17 +65,17 @@ private:
 	//!< in a skeleton
 	int m_parent; //!< Index of the parent vertex in the skeleton
 
-public:
+  public:
 	// Tool data
 
 	double m_minAngle, m_maxAngle; //!< Minimum and maximum accepted angles when updating the vertex
 								   //!< position with the mouse. In degrees.
-public:
+  public:
 	// Handle data
 
 	bool m_interpolate; //!< Whether the vertex needs to be interpolated (see plasticdeformer.h)
 
-public:
+  public:
 	PlasticSkeletonVertex();
 	explicit PlasticSkeletonVertex(const TPointD &pos);
 
@@ -95,19 +95,21 @@ public:
 //    PlasticSkeleton  declaration
 //************************************************************************************
 
-class DVAPI PlasticSkeleton : public TSmartObject, public tcg::Mesh<PlasticSkeletonVertex, tcg::Edge, tcg::FaceN<3>>, public TPersist
+class DVAPI PlasticSkeleton : public TSmartObject,
+							  public tcg::Mesh<PlasticSkeletonVertex, tcg::Edge, tcg::FaceN<3>>,
+							  public TPersist
 {
 	DECLARE_CLASS_CODE
 	PERSIST_DECLARATION(PlasticSkeleton)
 
-private:
+  private:
 	class Imp;
 	std::unique_ptr<Imp> m_imp;
 
-public:
+  public:
 	typedef tcg::Mesh<PlasticSkeletonVertex, tcg::Edge, tcg::FaceN<3>> mesh_type;
 
-public:
+  public:
 	PlasticSkeleton();
 	PlasticSkeleton(const PlasticSkeleton &other);
 	~PlasticSkeleton();
@@ -116,13 +118,17 @@ public:
 
 	int parentVertex(int v) { return vertex(v).m_parent; }
 
-	void moveVertex(int v, const TPointD &pos);					  //!< Moves a vertex to the specified position, informing associated deformers
-	int addVertex(const PlasticSkeletonVertex &vx, int parent);   //!< Adds a vertex to the skeleton
-	int insertVertex(const PlasticSkeletonVertex &vx, int e);	 //!< Inserts a vertex splitting an existing edge
-																  //!< \note Inserted Vertex will connect to parent first
-	int insertVertex(const PlasticSkeletonVertex &vx, int parent, //!< Generalization of vertex addition/insertion,
-					 const std::vector<int> &children);			  //!< it is useful as inverse of vertex removal.
-	void removeVertex(int v);									  //!< Removes a vertex, reattaching all its children to parent
+	void moveVertex(int v, const TPointD &pos); //!< Moves a vertex to the specified position,
+												//!informing associated deformers
+	int addVertex(const PlasticSkeletonVertex &vx, int parent); //!< Adds a vertex to the skeleton
+	int insertVertex(const PlasticSkeletonVertex &vx,
+					 int e); //!< Inserts a vertex splitting an existing edge
+							 //!< \note Inserted Vertex will connect to parent first
+	int
+	insertVertex(const PlasticSkeletonVertex &vx,
+				 int parent, //!< Generalization of vertex addition/insertion,
+				 const std::vector<int> &children); //!< it is useful as inverse of vertex removal.
+	void removeVertex(int v); //!< Removes a vertex, reattaching all its children to parent
 	void clear();
 	void squeeze();
 
@@ -138,12 +144,12 @@ public:
 
 	std::vector<PlasticHandle> verticesToHandles() const;
 
-public:
+  public:
 	// RValues-related functions
 	PlasticSkeleton(PlasticSkeleton &&other);
 	PlasticSkeleton &operator=(PlasticSkeleton &&other);
 
-private:
+  private:
 	friend class PlasticSkeletonDeformation; // Skeleton deformations can register to be notified
 
 	void addListener(PlasticSkeletonDeformation *deformation);

@@ -38,8 +38,9 @@ QString getMacAddressFromFile()
 // LicenseChecker
 //-----------------------------------------------------------------------------
 
-LicenseChecker::LicenseChecker(const QString &requestUrl, LicenseMode licenseMode, std::string license,
-							   std::string applicationName, const QString &version)
+LicenseChecker::LicenseChecker(const QString &requestUrl, LicenseMode licenseMode,
+							   std::string license, std::string applicationName,
+							   const QString &version)
 #if QT_VERSION < 0x050000
 	: QHttp(),
 #else
@@ -66,7 +67,8 @@ LicenseChecker::LicenseChecker(const QString &requestUrl, LicenseMode licenseMod
 	m_httpRequestAborted = false;
 
 	QString param;
-	param = QString("?") + paramList.at(0) + QString("&") + paramList.at(1) + QString("&") + paramList.at(2) + QString("&") + paramList.at(3) + QString("&") + paramList.at(4);
+	param = QString("?") + paramList.at(0) + QString("&") + paramList.at(1) + QString("&") +
+			paramList.at(2) + QString("&") + paramList.at(3) + QString("&") + paramList.at(4);
 
 	QNetworkAccessManager manager;
 	QNetworkReply *reply = manager.get(QNetworkRequest(url.path() + param));
@@ -75,23 +77,22 @@ LicenseChecker::LicenseChecker(const QString &requestUrl, LicenseMode licenseMod
 
 	connect(&manager, SIGNAL(requestFinished(int, bool)), this, SLOT(httpRequestFinished(reply)));
 	connect(reply, SIGNAL(requestStarted(int)), &loop, SLOT(httpRequestStarted(int)));
-	connect(reply, SIGNAL(authenticationRequired(const QString &, quint16, QAuthenticator *)), &loop, SLOT(slotAuthenticationRequired(const QString &, quint16, QAuthenticator *)));
+	connect(reply, SIGNAL(authenticationRequired(const QString &, quint16, QAuthenticator *)),
+			&loop, SLOT(slotAuthenticationRequired(const QString &, quint16, QAuthenticator *)));
 	connect(reply, SIGNAL(stateChanged(int)), &loop, SLOT(httpStateChanged(int)));
 
 	loop.exec();
 
 #else
-	connect(this, SIGNAL(requestFinished(int, bool)), this,
-			SLOT(httpRequestFinished(int, bool)));
-	connect(this, SIGNAL(requestStarted(int)), this,
-			SLOT(httpRequestStarted(int)));
+	connect(this, SIGNAL(requestFinished(int, bool)), this, SLOT(httpRequestFinished(int, bool)));
+	connect(this, SIGNAL(requestStarted(int)), this, SLOT(httpRequestStarted(int)));
 	connect(this, SIGNAL(responseHeaderReceived(const QHttpResponseHeader &)), this,
 			SLOT(readResponseHeader(const QHttpResponseHeader &)));
 	connect(this, SIGNAL(authenticationRequired(const QString &, quint16, QAuthenticator *)), this,
 			SLOT(slotAuthenticationRequired(const QString &, quint16, QAuthenticator *)));
-	connect(this, SIGNAL(stateChanged(int)), this,
-			SLOT(httpStateChanged(int)));
-	QHttp::ConnectionMode mode = url.scheme().toLower() == "https" ? QHttp::ConnectionModeHttps : QHttp::ConnectionModeHttp;
+	connect(this, SIGNAL(stateChanged(int)), this, SLOT(httpStateChanged(int)));
+	QHttp::ConnectionMode mode =
+		url.scheme().toLower() == "https" ? QHttp::ConnectionModeHttps : QHttp::ConnectionModeHttp;
 
 	setHost(url.host(), mode, url.port() == -1 ? 0 : url.port());
 	QString urlTemp = requestToServer;
@@ -109,7 +110,8 @@ LicenseChecker::LicenseChecker(const QString &requestUrl, LicenseMode licenseMod
 	m_httpRequestAborted = false;
 
 	QString param;
-	param = QString("?") + paramList.at(0) + QString("&") + paramList.at(1) + QString("&") + paramList.at(2) + QString("&") + paramList.at(3) + QString("&") + paramList.at(4);
+	param = QString("?") + paramList.at(0) + QString("&") + paramList.at(1) + QString("&") +
+			paramList.at(2) + QString("&") + paramList.at(3) + QString("&") + paramList.at(4);
 	m_httpGetId = get(url.path() + param); //, file);
 #endif
 }
@@ -149,7 +151,8 @@ void LicenseChecker::httpStateChanged(int status)
 		stateStr = "Connected.";
 		break;
 	case 6:
-		stateStr = "The connection is closing down, but is not yet closed. (The state will be Unconnected when the connection is closed.)";
+		stateStr = "The connection is closing down, but is not yet closed. (The state will be "
+				   "Unconnected when the connection is closed.)";
 	default:
 		stateStr = "There is no connection to the host.";
 	}
@@ -204,7 +207,8 @@ void LicenseChecker::httpRequestFinished(QNetworkReply *reply)
 
 //-----------------------------------------------------------------------------
 
-void LicenseChecker::slotAuthenticationRequired(const QString &hostName, quint16, QAuthenticator *authenticator)
+void LicenseChecker::slotAuthenticationRequired(const QString &hostName, quint16,
+												QAuthenticator *authenticator)
 {
 	assert(false);
 }

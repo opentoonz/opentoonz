@@ -8,11 +8,9 @@
 namespace
 {
 
-	std::wstring getLocation(TIStream &is)
+std::wstring getLocation(TIStream &is)
 {
-	return L"File: " +
-		   is.getFilePath().getWideString() +
-		   L":" + toWideString(is.getLine());
+	return L"File: " + is.getFilePath().getWideString() + L":" + toWideString(is.getLine());
 }
 
 std::wstring message(TIStream &is, std::wstring msg)
@@ -27,8 +25,7 @@ std::wstring message(TIStream &is, std::string msg)
 
 } // namespace
 
-TIStreamException::TIStreamException(TIStream &is)
-	: TException(message(is, L"unknown exception"))
+TIStreamException::TIStreamException(TIStream &is) : TException(message(is, L"unknown exception"))
 {
 }
 
@@ -37,13 +34,11 @@ TIStreamException::TIStreamException(TIStream &is, const TException &e)
 {
 }
 
-TIStreamException::TIStreamException(TIStream &is, std::wstring msg)
-	: TException(message(is, msg))
+TIStreamException::TIStreamException(TIStream &is, std::wstring msg) : TException(message(is, msg))
 {
 }
 
-TIStreamException::TIStreamException(TIStream &is, std::string msg)
-	: TException(message(is, msg))
+TIStreamException::TIStreamException(TIStream &is, std::string msg) : TException(message(is, msg))
 {
 }
 

@@ -18,7 +18,7 @@ using namespace std;
 
 class ServerList : public TTextList
 {
-public:
+  public:
 	ServerList(TWidget *parent);
 
 	void rightButtonDown(const TMouseEvent &e);
@@ -32,8 +32,7 @@ public:
 
 //------------------------------------------------------------------------------
 
-ServerList::ServerList(TWidget *parent)
-	: TTextList(parent, "servers")
+ServerList::ServerList(TWidget *parent) : TTextList(parent, "servers")
 {
 	m_popupMenu = new TPopupMenu(this);
 
@@ -109,12 +108,11 @@ void ServerList::onActivate()
 
 class ServerStatusPage::Data
 {
-public:
+  public:
 	Data(ServerStatusPage *parent)
 	{
 		m_serverList = new ServerList(parent);
-		m_serverList->setSelAction(new TTextListAction<Data>(
-			this, &Data::onServerSelection));
+		m_serverList->setSelAction(new TTextListAction<Data>(this, &Data::onServerSelection));
 		m_name = new TTextField(parent, "name");
 		m_ipAddress = new TTextField(parent, "ipAddress");
 		m_portNumber = new TTextField(parent, "portNumber");
@@ -222,7 +220,7 @@ public:
 		int y0 = size.ly - 30;
 		int x0;
 
-		//prima la parte a sx
+		// prima la parte a sx
 		m_serverList->setGeometry(0, 0, leftSize /*100*/, size.ly - 1);
 
 		// ora la parte a dx
@@ -270,11 +268,10 @@ public:
 
 	TTextList *m_serverList;
 
-	TTextField *m_name, *m_ipAddress, *m_portNumber, *m_tasks,
-		*m_state, *m_cpuCount, *m_totPhysMem;
+	TTextField *m_name, *m_ipAddress, *m_portNumber, *m_tasks, *m_state, *m_cpuCount, *m_totPhysMem;
 
-	TLabel *m_nameLbl, *m_ipAddressLbl, *m_portNumberLbl, *m_tasksLbl,
-		*m_stateLbl, *m_cpuCountLbl, *m_totPhysMemLbl;
+	TLabel *m_nameLbl, *m_ipAddressLbl, *m_portNumberLbl, *m_tasksLbl, *m_stateLbl, *m_cpuCountLbl,
+		*m_totPhysMemLbl;
 };
 
 //------------------------------------------------------------------------------
@@ -301,8 +298,7 @@ void ServerStatusPage::onDeactivate()
 
 //------------------------------------------------------------------------------
 
-ServerStatusPage::ServerStatusPage(TWidget *parent)
-	: TabPage(parent, "Servers")
+ServerStatusPage::ServerStatusPage(TWidget *parent) : TabPage(parent, "Servers")
 {
 	m_data = new Data(this);
 }
@@ -348,10 +344,10 @@ void ServerStatusPage::update()
 	for (; i < count; ++i)
 		if (oldServers.find(i) == oldServers.end()) {
 			string itemId = sl->getItem(i)->getId();
-			/*      
-      if(sl->isSelected(itemId))
-        sl->select((i+1)%sl->getItemCount(), true);
-        */
+			/*
+	  if(sl->isSelected(itemId))
+		sl->select((i+1)%sl->getItemCount(), true);
+		*/
 			sl->removeItem(itemId);
 		}
 	it = newServers.begin();

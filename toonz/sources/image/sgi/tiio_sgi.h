@@ -15,7 +15,7 @@ Tiio::WriterMaker makeSgiWriter;
 
 class SgiWriterProperties : public TPropertyGroup
 {
-public:
+  public:
 	TEnumProperty m_pixelSize;
 	TBoolProperty m_compressed;
 	TEnumProperty m_endianess;

@@ -10,8 +10,7 @@
 namespace tcg
 {
 
-template <typename V>
-struct vertex_traits {
+template <typename V> struct vertex_traits {
 	typedef typename V::point_type point_type;
 
 	typedef typename V::edges_const_iterator edges_const_iterator;
@@ -20,21 +19,20 @@ struct vertex_traits {
 
 //----------------------------------------------------------------------
 
-template <typename Point>
-class Vertex
+template <typename Point> class Vertex
 {
-protected:
+  protected:
 	Point m_p;
 	int m_index;
 	tcg::list<int> m_edgeList;
 
-public:
+  public:
 	typedef Point point_type;
 
 	typedef tcg::list<int>::const_iterator edges_const_iterator;
 	typedef tcg::list<int>::iterator edges_iterator;
 
-public:
+  public:
 	Vertex() : m_index(-1) {}
 	Vertex(const point_type &p) : m_p(p), m_index(-1) {}
 	~Vertex() {}
@@ -66,8 +64,7 @@ public:
 
 //----------------------------------------------------------------------
 
-template <typename P>
-struct point_traits<Vertex<P>> {
+template <typename P> struct point_traits<Vertex<P>> {
 	typedef Vertex<P> point_type;
 	typedef typename point_traits<P>::value_type value_type;
 	typedef typename point_traits<P>::float_type float_type;

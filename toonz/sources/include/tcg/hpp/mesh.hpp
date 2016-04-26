@@ -31,8 +31,7 @@ int Mesh<V, E, F>::edgeInciding(int vIdx1, int vIdx2, int n) const
 
 //-------------------------------------------------------------------------
 
-template <typename V, typename E, typename F>
-int Mesh<V, E, F>::addEdge(const E &ed)
+template <typename V, typename E, typename F> int Mesh<V, E, F>::addEdge(const E &ed)
 {
 	int e = int(m_edges.push_back(ed));
 	m_edges[e].setIndex(e);
@@ -47,8 +46,7 @@ int Mesh<V, E, F>::addEdge(const E &ed)
 
 //---------------------------------------------------------------------------------------------
 
-template <typename V, typename E, typename F>
-int Mesh<V, E, F>::addFace(const F &fc)
+template <typename V, typename E, typename F> int Mesh<V, E, F>::addFace(const F &fc)
 {
 	int f = int(m_faces.push_back(fc));
 	m_faces[f].setIndex(f);
@@ -63,8 +61,7 @@ int Mesh<V, E, F>::addFace(const F &fc)
 
 //---------------------------------------------------------------------------------------------
 
-template <typename V, typename E, typename F>
-void Mesh<V, E, F>::removeVertex(int v)
+template <typename V, typename E, typename F> void Mesh<V, E, F>::removeVertex(int v)
 {
 	V &vx = vertex(v);
 
@@ -77,8 +74,7 @@ void Mesh<V, E, F>::removeVertex(int v)
 
 //---------------------------------------------------------------------------------------------
 
-template <typename V, typename E, typename F>
-void Mesh<V, E, F>::removeEdge(int e)
+template <typename V, typename E, typename F> void Mesh<V, E, F>::removeEdge(int e)
 {
 	E &ed = edge(e);
 
@@ -102,8 +98,7 @@ void Mesh<V, E, F>::removeEdge(int e)
 
 //---------------------------------------------------------------------------------------------
 
-template <typename V, typename E, typename F>
-void Mesh<V, E, F>::removeFace(int f)
+template <typename V, typename E, typename F> void Mesh<V, E, F>::removeFace(int f)
 {
 	F &fc = face(f);
 
@@ -124,13 +119,12 @@ void Mesh<V, E, F>::removeFace(int f)
 
 /*!
   \brief    Remaps the mesh indices in a natural order, removing unused cells in the internal
-            container model, for minimum memory consumption.
+			container model, for minimum memory consumption.
 
   \warning  This is a slow operation, compared to all the others in the Mesh class.
 */
 
-template <typename V, typename E, typename F>
-void Mesh<V, E, F>::squeeze()
+template <typename V, typename E, typename F> void Mesh<V, E, F>::squeeze()
 {
 	// Build new indices for remapping.
 	typename tcg::list<F>::iterator it, endI(m_faces.end());
@@ -197,20 +191,19 @@ void Mesh<V, E, F>::squeeze()
 //    Triangular Mesh methods
 //************************************************************************
 
-template <typename V, typename E, typename F>
-TriMesh<V, E, F>::TriMesh(int verticesHint)
+template <typename V, typename E, typename F> TriMesh<V, E, F>::TriMesh(int verticesHint)
 {
 	int edgesHint = (3 * verticesHint) / 2;
 
 	m_vertices.reserve(verticesHint);
 	m_edges.reserve(edgesHint);
-	m_faces.reserve(edgesHint + 1); // Since V - E + F = 1 for planar graphs (no outer face), and vMin == 0
+	m_faces.reserve(edgesHint +
+					1); // Since V - E + F = 1 for planar graphs (no outer face), and vMin == 0
 }
 
 //---------------------------------------------------------------------------------------------
 
-template <typename V, typename E, typename F>
-int TriMesh<V, E, F>::addFace(V &vx1, V &vx2, V &vx3)
+template <typename V, typename E, typename F> int TriMesh<V, E, F>::addFace(V &vx1, V &vx2, V &vx3)
 {
 	int v1 = vx1.getIndex(), v2 = vx2.getIndex(), v3 = vx3.getIndex();
 
@@ -281,8 +274,7 @@ int TriMesh<V, E, F>::otherFaceEdge(int f, int v) const
 
 //---------------------------------------------------------------------------------------------
 
-template <typename V, typename E, typename F>
-int TriMesh<V, E, F>::swapEdge(int e)
+template <typename V, typename E, typename F> int TriMesh<V, E, F>::swapEdge(int e)
 {
 	E &ed = this->edge(e);
 
@@ -291,16 +283,16 @@ int TriMesh<V, E, F>::swapEdge(int e)
 
 	int f1 = ed.face(0), f2 = ed.face(1);
 
-	//Retrieve the 2 vertices not belonging to e in the adjacent faces
+	// Retrieve the 2 vertices not belonging to e in the adjacent faces
 	int v1 = ed.vertex(0), v2 = ed.vertex(1);
 	int v3 = otherFaceVertex(f1, e), v4 = otherFaceVertex(f2, e);
 
 	assert(this->edgeInciding(v3, v4) < 0);
 
-	//Remove e
+	// Remove e
 	this->removeEdge(e);
 
-	//Insert the new faces
+	// Insert the new faces
 	addFace(v1, v3, v4); // Inserts edge E(v3, v4)
 	addFace(v2, v4, v3);
 
@@ -311,19 +303,18 @@ int TriMesh<V, E, F>::swapEdge(int e)
 
 /*
 
-    *---*---*     Common case          *          FORBIDDEN case:
+	*---*---*     Common case          *          FORBIDDEN case:
    / \ / x / \                        /|\           note that the collapsed edge
   *---*-x-X---*                      /_*_\          have 3 (possibly more) other vertices
    \ / \ x \ /                      *--X--*         with edges inciding both the collapsed
-    *---*---*                        \   /          edge's extremes.
-                                      \ /
-                                       *            This cannot be processed, since the
-                                                    unexpected merged edge would either have
-                                                    more than 2 adjacent faces, or a hole.
+	*---*---*                        \   /          edge's extremes.
+									  \ /
+									   *            This cannot be processed, since the
+													unexpected merged edge would either have
+													more than 2 adjacent faces, or a hole.
 */
 
-template <typename V, typename E, typename F>
-int TriMesh<V, E, F>::collapseEdge(int e)
+template <typename V, typename E, typename F> int TriMesh<V, E, F>::collapseEdge(int e)
 {
 	E &ed = this->edge(e);
 
@@ -346,15 +337,15 @@ int TriMesh<V, E, F>::collapseEdge(int e)
 		int srcE = this->edgeInciding(vDelete, otherV[f]),
 			dstE = this->edgeInciding(vKeep, otherV[f]);
 
-		E &srcEd = this->edge(srcE),
-		  &dstEd = this->edge(dstE);
+		E &srcEd = this->edge(srcE), &dstEd = this->edge(dstE);
 
 		typename edge_traits<E>::faces_iterator ft = srcEd.facesBegin();
 		while (ft != srcEd.facesEnd()) // current iterator will be erased
 		{
 			F &fc = this->face(*ft);
 
-			(fc.edge(0) == srcE) ? fc.setEdge(0, dstE) : (fc.edge(1) == srcE) ? fc.setEdge(1, dstE) : fc.setEdge(2, dstE);
+			(fc.edge(0) == srcE) ? fc.setEdge(0, dstE) : (fc.edge(1) == srcE) ? fc.setEdge(1, dstE)
+																			  : fc.setEdge(2, dstE);
 
 			dstEd.addFace(*ft);
 			ft = srcEd.eraseFace(ft); // here
@@ -391,8 +382,7 @@ int TriMesh<V, E, F>::collapseEdge(int e)
 
 //---------------------------------------------------------------------------------------------
 
-template <typename V, typename E, typename F>
-int TriMesh<V, E, F>::splitEdge(int e)
+template <typename V, typename E, typename F> int TriMesh<V, E, F>::splitEdge(int e)
 {
 	E &ed = this->edge(e);
 
@@ -425,6 +415,6 @@ int TriMesh<V, E, F>::splitEdge(int e)
 	return vIdx;
 }
 
-} //namespace tcg
+} // namespace tcg
 
-#endif //TCG_MESH_HPP
+#endif // TCG_MESH_HPP

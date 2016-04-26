@@ -28,13 +28,13 @@ using namespace PaletteViewerGUI;
 
 class DVAPI ChangeStyleCommand
 {
-public:
+  public:
 	ChangeStyleCommand() {}
 	virtual ~ChangeStyleCommand() {}
 	virtual bool onStyleChanged() = 0;
 };
 
-//DAFARE: non mi piace, forse e' meglio un comando esterno!!
+// DAFARE: non mi piace, forse e' meglio un comando esterno!!
 class TXsheetHandle;
 
 //=============================================================================
@@ -45,9 +45,10 @@ class DVAPI PaletteViewer : public QFrame
 {
 	Q_OBJECT
 
-public:
+  public:
 	PaletteViewer(QWidget *parent = 0, PaletteViewType viewType = LEVEL_PALETTE,
-				  bool hasSaveToolBar = true, bool hasPageCommand = true, bool hasPasteColors = true);
+				  bool hasSaveToolBar = true, bool hasPageCommand = true,
+				  bool hasPasteColors = true);
 	~PaletteViewer();
 
 	const TPaletteHandle *getPaletteHandle() const { return m_paletteHandle; }
@@ -68,13 +69,16 @@ public:
 	ChangeStyleCommand *getChangeStyleCommand() const { return m_changeStyleCommand; }
 
 	int getViewMode() const { return m_pageViewer->getViewMode(); }
-	void setViewMode(int mode) { m_pageViewer->setViewMode((PaletteViewerGUI::PageViewer::ViewMode)mode); }
+	void setViewMode(int mode)
+	{
+		m_pageViewer->setViewMode((PaletteViewerGUI::PageViewer::ViewMode)mode);
+	}
 
 	void updateView();
 
 	void enableSaveAction(bool enable);
 
-protected:
+  protected:
 	TPaletteHandle *m_paletteHandle;
 	TFrameHandle *m_frameHandle;
 	TXsheetHandle *m_xsheetHandle;
@@ -103,7 +107,7 @@ protected:
 	QAction *m_lockPaletteAction;
 	QToolButton *m_lockPaletteToolButton;
 
-protected:
+  protected:
 	void createTabBar();
 
 	void createToolBar()
@@ -135,7 +139,7 @@ protected:
 
 	void clearStyleSelection();
 
-protected slots:
+  protected slots:
 
 	void setPageView(int currentIndexPage);
 

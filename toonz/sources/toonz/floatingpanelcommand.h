@@ -16,11 +16,8 @@ class OpenFloatingPanel : public MenuItemHandler
 	QString m_title;
 	std::string m_panelType;
 
-public:
-	OpenFloatingPanel(
-		CommandId id,
-		const std::string &panelType,
-		QString title);
+  public:
+	OpenFloatingPanel(CommandId id, const std::string &panelType, QString title);
 	void execute();
 
 	static TPanel *getOrOpenFloatingPanel(const std::string &panelType);

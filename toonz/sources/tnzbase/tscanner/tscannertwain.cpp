@@ -23,8 +23,7 @@ extern "C" void TTWAIN_ErrorBox(const char *msg)
 	throwIT(msg);
 }
 
-extern "C" int onDoneCB(UCHAR *buffer, TTWAIN_PIXTYPE pixelType,
-						int lx, int ly, int wrap,
+extern "C" int onDoneCB(UCHAR *buffer, TTWAIN_PIXTYPE pixelType, int lx, int ly, int wrap,
 						float xdpi, float ydpi, void *usrData)
 {
 	TRasterP ras;
@@ -66,7 +65,7 @@ extern "C" int onDoneCB(UCHAR *buffer, TTWAIN_PIXTYPE pixelType,
 	if (ras) {
 		rasImg = TRasterImageP(ras);
 		rasImg->setDpi(xdpi, ydpi);
-		//rasImg->sethPos(hpos);
+		// rasImg->sethPos(hpos);
 		rasImg->setSavebox(ras->getBounds());
 	}
 
@@ -153,7 +152,7 @@ void TScannerTwain::updateParameters(TScannerParameters &param)
 		return;
 
 #ifdef MACOSX
-//TTWAIN_DumpCapabilities(printf);
+// TTWAIN_DumpCapabilities(printf);
 #endif
 	if (isAreaSupported()) {
 		float w, h;
@@ -169,36 +168,39 @@ void TScannerTwain::updateParameters(TScannerParameters &param)
 	TScanParam defaultTwainParam(0., 255., 128., 1.);
 	if (TTWAIN_IsCapBrightnessSupported()) {
 		m_brightness.m_supported = true;
-		TTWAIN_GetBrightness(&m_brightness.m_min, &m_brightness.m_max, &m_brightness.m_step, &m_brightness.m_def);
+		TTWAIN_GetBrightness(&m_brightness.m_min, &m_brightness.m_max, &m_brightness.m_step,
+							 &m_brightness.m_def);
 	} else {
-		//m_brightness.m_def = m_brightness.m_max = m_brightness.m_min = m_brightness.m_step = 0.;
+		// m_brightness.m_def = m_brightness.m_max = m_brightness.m_min = m_brightness.m_step = 0.;
 		m_brightness.update(defaultTwainParam);
 		m_brightness.m_supported = false;
 	}
-	//m_brightness.m_value = m_brightness.m_def;
+	// m_brightness.m_value = m_brightness.m_def;
 	param.m_brightness.update(m_brightness);
 
 	if (TTWAIN_IsCapContrastSupported()) {
 		m_contrast.m_supported = true;
-		TTWAIN_GetContrast(&m_contrast.m_min, &m_contrast.m_max, &m_contrast.m_step, &m_contrast.m_def);
+		TTWAIN_GetContrast(&m_contrast.m_min, &m_contrast.m_max, &m_contrast.m_step,
+						   &m_contrast.m_def);
 	} else {
-		//m_contrast.m_def = m_contrast.m_max = m_contrast.m_min = m_contrast.m_step = 0.;
+		// m_contrast.m_def = m_contrast.m_max = m_contrast.m_min = m_contrast.m_step = 0.;
 		m_contrast.update(defaultTwainParam);
 		m_contrast.m_supported = false;
 	}
-	//m_contrast.m_value = m_contrast.m_def;
+	// m_contrast.m_value = m_contrast.m_def;
 	param.m_contrast.update(m_contrast);
 
 	if (TTWAIN_IsCapThresholdSupported()) {
 		m_threshold.m_supported = true;
-		TTWAIN_GetThreshold(&m_threshold.m_min, &m_threshold.m_max, &m_threshold.m_step, &m_threshold.m_def);
+		TTWAIN_GetThreshold(&m_threshold.m_min, &m_threshold.m_max, &m_threshold.m_step,
+							&m_threshold.m_def);
 	} else {
-		//m_threshold.m_def = m_threshold.m_max = m_threshold.m_min = m_threshold.m_step = 0.;
+		// m_threshold.m_def = m_threshold.m_max = m_threshold.m_min = m_threshold.m_step = 0.;
 		m_threshold.update(defaultTwainParam);
 		m_threshold.m_supported = false;
 	}
 
-	//m_threshold.m_value = m_threshold.m_def;
+	// m_threshold.m_value = m_threshold.m_def;
 	param.m_threshold.update(m_threshold);
 
 	if (TTWAIN_IsCapResolutionSupported()) {
@@ -206,10 +208,10 @@ void TScannerTwain::updateParameters(TScannerParameters &param)
 		TTWAIN_GetResolution(&m_dpi.m_min, &m_dpi.m_max, &m_dpi.m_step, &m_dpi.m_def);
 		param.m_dpi.update(m_dpi);
 	} else {
-		//m_dpi.m_def = m_dpi.m_max = m_dpi.m_min = m_dpi.m_step = 0.;
+		// m_dpi.m_def = m_dpi.m_max = m_dpi.m_min = m_dpi.m_step = 0.;
 		param.m_dpi.m_supported = false;
 	}
-	//m_dpi.m_value = m_dpi.m_def;
+	// m_dpi.m_value = m_dpi.m_def;
 
 	/*
 param.m_twainVersion = string(TTWAIN_GetTwainVersion());
@@ -291,7 +293,7 @@ void TScannerTwain::acquire(const TScannerParameters &params, int paperCount)
 {
 	openAndSetupTwain();
 
-	//int feeder = TTWAIN_IsFeederLoaded();
+	// int feeder = TTWAIN_IsFeederLoaded();
 	int feeder = params.isPaperFeederEnabled();
 	m_paperLeft = paperCount;
 	int rc;
@@ -316,7 +318,7 @@ void TScannerTwain::acquire(const TScannerParameters &params, int paperCount)
 			int acq_rc = TTWAIN_AcquireMemory(0);
 
 			if (acq_rc == 0)
-				break; //error, or the user has closed the TWAIN UI
+				break; // error, or the user has closed the TWAIN UI
 			if (!feeder && ((paperCount - i) > 1))
 				notifyNextPaper();
 			TTWAIN_CloseAll(0);
@@ -333,7 +335,7 @@ void TScannerTwain::acquire(const TScannerParameters &params, int paperCount)
 			int acq_rc = TTWAIN_AcquireMemory(0);
 
 			if (acq_rc == 0)
-				break; //error, or the user has closed the TWAIN UI
+				break; // error, or the user has closed the TWAIN UI
 			if (!feeder && ((paperCount - i) > 1))
 				notifyNextPaper();
 		}

@@ -17,8 +17,7 @@ PERSIST_IDENTIFIER(TXshPaletteLevel, "paletteLevel")
 //=============================================================================
 // TXshPaletteLevel
 
-TXshPaletteLevel::TXshPaletteLevel(std::wstring name)
-	: TXshLevel(m_classCode, name), m_palette(0)
+TXshPaletteLevel::TXshPaletteLevel(std::wstring name) : TXshLevel(m_classCode, name), m_palette(0)
 {
 	m_type = PLT_XSHLEVEL;
 }

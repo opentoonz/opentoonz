@@ -44,7 +44,6 @@ TImage::~TImage()
 
 DEFINE_CLASS_CODE(TImage, 4)
 
-TImage::TImage()
-	: TSmartObject(m_classCode), m_palette(0)
+TImage::TImage() : TSmartObject(m_classCode), m_palette(0)
 {
 }

@@ -54,11 +54,7 @@ enum {
 
 };
 
-enum {
-	TK_ShiftPressed = 0x1,
-	TK_CtrlPressed = 0x2,
-	TK_AltPressed = 0x3
-};
+enum { TK_ShiftPressed = 0x1, TK_CtrlPressed = 0x2, TK_AltPressed = 0x3 };
 
 } // namespace
 

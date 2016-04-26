@@ -7,7 +7,7 @@
 //! Classe che definisce dei punti che consentono di trovare gli angoli
 class AlgorithmPointI : public TPointI
 {
-public:
+  public:
 	//! Indice originale del punto
 	int m_originalIndex;
 	//! Quantita' che dice quanto l'angolo e' acuto
@@ -20,7 +20,8 @@ public:
 	  Gli viene passato un T3DPointD e restituisce un AlgorithmPointI
 		*/
 	AlgorithmPointI(const T3DPointD &value, int index)
-		: TPointI((int)value.x, (int)value.y), m_originalIndex(index), m_sharpness(0), m_isCorner(false){};
+		: TPointI((int)value.x, (int)value.y), m_originalIndex(index), m_sharpness(0),
+		  m_isCorner(false){};
 
 	//! Costruttore
 	/*!
@@ -80,7 +81,7 @@ bool interpolate(const std::vector<T3DPointD> &points)
 
 	curr = 0;
 	next = 1;
-	//int i = points.size();
+	// int i = points.size();
 
 	while (next <= points.size() - 1) {
 		if (points[next] != points[curr]) {
@@ -89,13 +90,14 @@ bool interpolate(const std::vector<T3DPointD> &points)
 								(int)(points[curr].y - points[next].y));
 			currStep = gPoints.back();
 			double xStepTheta, yStepTheta;
-			//TPointI a;
+			// TPointI a;
 
-			while (norm2(TPointI((int)(points[next].x - currStep.x), (int)(points[next].y - currStep.y))) > 1) {
+			while (norm2(TPointI((int)(points[next].x - currStep.x),
+								 (int)(points[next].y - currStep.y))) > 1) {
 				TPointI nextPoint = TPointI((int)points[next].x, (int)points[next].y);
 
-				//TPointI a = nextPoint - currStep;
-				//int i = 0;
+				// TPointI a = nextPoint - currStep;
+				// int i = 0;
 
 				if (currStep.x > nextPoint.x)
 					xStep = currStep - xUnit;
@@ -123,12 +125,10 @@ bool interpolate(const std::vector<T3DPointD> &points)
 						currStep = yStep;
 				} else {
 					double aux = norm2(guideLine);
-					xStepTheta = acos(
-						(xStep - nextPoint) * guideLine /
-						(sqrt(norm2(xStep - nextPoint) * aux)));
-					yStepTheta = acos(
-						(yStep - nextPoint) * guideLine /
-						(sqrt(norm2(yStep - nextPoint) * aux)));
+					xStepTheta = acos((xStep - nextPoint) * guideLine /
+									  (sqrt(norm2(xStep - nextPoint) * aux)));
+					yStepTheta = acos((yStep - nextPoint) * guideLine /
+									  (sqrt(norm2(yStep - nextPoint) * aux)));
 
 					if (xStepTheta > yStepTheta)
 						currStep = yStep;
@@ -152,16 +152,11 @@ bool interpolate(const std::vector<T3DPointD> &points)
 //----------------------------------------------------------------------
 
 //! Verifica se currIndex e' un possibile angolo e in caso affermativo salva l'"acutezza"
-inline bool isAdmissibleCorner(
-	int currIndex,
-	int precIndex,
-	int nextIndex)
+inline bool isAdmissibleCorner(int currIndex, int precIndex, int nextIndex)
 {
 	int size = gPoints.size();
-	if (
-		currIndex < 0 || currIndex >= size ||
-		precIndex < 0 || precIndex >= size ||
-		nextIndex < 0 || nextIndex >= size)
+	if (currIndex < 0 || currIndex >= size || precIndex < 0 || precIndex >= size || nextIndex < 0 ||
+		nextIndex >= size)
 		return false;
 
 	AlgorithmPointI a = gPoints[currIndex] - gPoints[nextIndex];
@@ -176,8 +171,7 @@ inline bool isAdmissibleCorner(
 		return false;
 
 	double norm2_c = norm2(c);
-	double cosineOfAlpha = (norm2_a + norm2_b - norm2_c) /
-						   sqrt(4 * norm2_a * norm2_b);
+	double cosineOfAlpha = (norm2_a + norm2_b - norm2_c) / sqrt(4 * norm2_a * norm2_b);
 
 	if (cosineOfAlpha < -1)
 		cosineOfAlpha = -1;
@@ -221,7 +215,8 @@ void findCornerCandidates()
 
 		if (admissibleCornersCount) {
 			gPoints[curr].m_sharpness /= admissibleCornersCount;
-			if ((gPoints[curr].m_sharpness > (180 - gMaxAngle)) && (admissibleCornersCount > gMinSampleNum))
+			if ((gPoints[curr].m_sharpness > (180 - gMaxAngle)) &&
+				(admissibleCornersCount > gMinSampleNum))
 				gPoints[curr].m_isCorner = true;
 		}
 
@@ -262,9 +257,8 @@ void findCorners(int neighborLimit, std::vector<int> &cornerIndexes)
 //----------------------------------------------------------------------
 
 //! Individua gli eventuali angoli presenti nella curva da calcolare
-void detectCorners(const std::vector<T3DPointD> &inputPoints,
-				   int minSampleNum, int minDist, int maxDist, double maxAngle,
-					 std::vector<int> &cornerIndexes)
+void detectCorners(const std::vector<T3DPointD> &inputPoints, int minSampleNum, int minDist,
+				   int maxDist, double maxAngle, std::vector<int> &cornerIndexes)
 {
 	gMinSampleNum = minSampleNum;
 	gMinDist = minDist;

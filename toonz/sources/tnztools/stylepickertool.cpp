@@ -45,11 +45,12 @@ class StylePickerTool : public TTool
 
 	TBoolProperty m_passivePick;
 
-public:
+  public:
 	TPropertyGroup *getProperties(int targetType) { return &m_prop; }
 
 	StylePickerTool()
-		: TTool("T_StylePicker"), m_currentStyleId(0), m_colorType("Mode:"), m_passivePick("Passive Pick", false)
+		: TTool("T_StylePicker"), m_currentStyleId(0), m_colorType("Mode:"),
+		  m_passivePick("Passive Pick", false)
 	{
 		m_prop.bind(m_colorType);
 		m_colorType.addValue(AREAS);
@@ -64,28 +65,23 @@ public:
 
 	ToolType getToolType() const { return TTool::LevelReadTool; }
 
-	void draw()
-	{
-	}
+	void draw() {}
 
 	void leftButtonDown(const TPointD &pos, const TMouseEvent &e)
 	{
 		m_oldStyleId = m_currentStyleId = getApplication()->getCurrentLevelStyleIndex();
 		pick(pos, e);
 	}
-	void leftButtonDrag(const TPointD &pos, const TMouseEvent &e)
-	{
-		pick(pos, e);
-	}
+	void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) { pick(pos, e); }
 
 	void pick(const TPointD &pos, const TMouseEvent &e)
 	{
-		//Area = 0, Line = 1, All = 2
+		// Area = 0, Line = 1, All = 2
 		int modeValue = m_colorType.getIndex();
 
 		//------------------------------------
 		// MultiLayerStylePicker
-		/*---	
+		/*---
 				PickしたStyleId = 0、かつ
 				Preference で MultiLayerStylePickerが有効、かつ
 				Scene編集モード、かつ
@@ -94,20 +90,25 @@ public:
 		---*/
 		if (Preferences::instance()->isMultiLayerStylePickerEnabled() &&
 			getApplication()->getCurrentFrame()->isEditingScene()) {
-			int superPickedColumnId = getViewer()->posToColumnIndex(e.m_pos, getPixelSize() * getPixelSize(), false);
+			int superPickedColumnId =
+				getViewer()->posToColumnIndex(e.m_pos, getPixelSize() * getPixelSize(), false);
 
-			if (superPickedColumnId >= 0														  /*-- 何かColumnに当たった場合 --*/
-				&& getApplication()->getCurrentColumn()->getColumnIndex() != superPickedColumnId) /*-- かつ、Current Columnでない場合 --*/
+			if (superPickedColumnId >= 0 /*-- 何かColumnに当たった場合 --*/
+				&&
+				getApplication()->getCurrentColumn()->getColumnIndex() !=
+					superPickedColumnId) /*-- かつ、Current Columnでない場合 --*/
 			{
 				/*-- そのColumnからPickを試みる --*/
 				int currentFrame = getApplication()->getCurrentFrame()->getFrame();
-				TXshCell pickedCell = getApplication()->getCurrentXsheet()->getXsheet()->getCell(currentFrame, superPickedColumnId);
+				TXshCell pickedCell = getApplication()->getCurrentXsheet()->getXsheet()->getCell(
+					currentFrame, superPickedColumnId);
 				TImageP pickedImage = pickedCell.getImage(false).getPointer();
 				TToonzImageP picked_ti = pickedImage;
 				TVectorImageP picked_vi = pickedImage;
 				TXshSimpleLevel *picked_level = pickedCell.getSimpleLevel();
 				if ((picked_ti || picked_vi) && picked_level) {
-					TPointD tmpMousePosition = getColumnMatrix(superPickedColumnId).inv() * getViewer()->winToWorld(e.m_pos);
+					TPointD tmpMousePosition = getColumnMatrix(superPickedColumnId).inv() *
+											   getViewer()->winToWorld(e.m_pos);
 
 					TPointD tmpDpiScale = getCurrentDpiScale(picked_level, getCurrentFid());
 
@@ -115,10 +116,11 @@ public:
 					tmpMousePosition.y /= tmpDpiScale.y;
 
 					StylePicker superPicker(pickedImage);
-					int picked_subsampling = picked_level->getImageSubsampling(pickedCell.getFrameId());
-					int superPicked_StyleId = superPicker.pickStyleId(TScale(1.0 / picked_subsampling) * tmpMousePosition + TPointD(-0.5, -0.5),
-																	  getPixelSize() * getPixelSize(),
-																	  modeValue);
+					int picked_subsampling =
+						picked_level->getImageSubsampling(pickedCell.getFrameId());
+					int superPicked_StyleId = superPicker.pickStyleId(
+						TScale(1.0 / picked_subsampling) * tmpMousePosition + TPointD(-0.5, -0.5),
+						getPixelSize() * getPixelSize(), modeValue);
 					/*-- 何かStyleが拾えて、Transparentでない場合 --*/
 					if (superPicked_StyleId > 0) {
 						/*-- Levelの移動 --*/
@@ -150,12 +152,13 @@ public:
 
 		int subsampling = level->getImageSubsampling(getCurrentFid());
 		StylePicker picker(image);
-		int styleId = picker.pickStyleId(TScale(1.0 / subsampling) * pos + TPointD(-0.5, -0.5), getPixelSize() * getPixelSize(), modeValue);
+		int styleId = picker.pickStyleId(TScale(1.0 / subsampling) * pos + TPointD(-0.5, -0.5),
+										 getPixelSize() * getPixelSize(), modeValue);
 
 		if (styleId < 0)
 			return;
 
-		if (modeValue == 1) //LINES
+		if (modeValue == 1) // LINES
 		{
 			/*-- pickLineモードのとき、取得Styleが0の場合はカレントStyleを変えない。 --*/
 			if (styleId == 0)
@@ -201,9 +204,7 @@ public:
 		controller->notifyStylePassivePicked(inkStyleId, paintStyleId, tone);
 	}
 
-	void onActivate()
-	{
-	}
+	void onActivate() {}
 
 	int getCursorId() const
 	{
@@ -214,7 +215,7 @@ public:
 			return (isBlackBG) ? ToolCursor::PickerCursorWhiteLine : ToolCursor::PickerCursorLine;
 		else if (m_colorType.getValue() == AREAS)
 			return (isBlackBG) ? ToolCursor::PickerCursorWhiteArea : ToolCursor::PickerCursorArea;
-		else //line&areas
+		else // line&areas
 			return (isBlackBG) ? ToolCursor::PickerCursorWhite : ToolCursor::PickerCursor;
 	}
 

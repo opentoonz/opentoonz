@@ -22,9 +22,9 @@ struct LPoint {
 };
 
 struct Lattice {
-	int m_width;	//Number of lattice columns
-	int m_height;   //Number of lattice rows
-	LPoint *coords; //Grid vertex coordinates
+	int m_width; // Number of lattice columns
+	int m_height; // Number of lattice rows
+	LPoint *coords; // Grid vertex coordinates
 
 	Lattice() : coords(0) {}
 	~Lattice()
@@ -34,7 +34,7 @@ struct Lattice {
 	}
 };
 
-namespace //Ugly...
+namespace // Ugly...
 {
 inline int myCeil(double x)
 {
@@ -63,7 +63,7 @@ inline double getWarpRadius(const WarpParams &params)
 
 inline double getWarperEnlargement(const WarpParams &params)
 {
-	//It accounts for:
+	// It accounts for:
 	//  * Resample factor (1 - due to triangle filtering)
 	//  * Eventual grid smoothening (6 - as the blur radius applied after resampling)
 	//  * grid interpolation (2 - for the shepard interpolant radius)
@@ -75,17 +75,14 @@ inline double getWarperEnlargement(const WarpParams &params)
 
 //---------------------------------------------------------------------------
 
-void getWarpComputeRects(
-	TRectD &outputComputeRect,
-	TRectD &warpedComputeRect,
-	const TRectD &warpedBox,
-	const TRectD &requestedRect,
-	const WarpParams &params);
+void getWarpComputeRects(TRectD &outputComputeRect, TRectD &warpedComputeRect,
+						 const TRectD &warpedBox, const TRectD &requestedRect,
+						 const WarpParams &params);
 
 //---------------------------------------------------------------------------
 
-//!Deals with raster tiles and invokes warper functions
-void warp(TRasterP &tileRas, const TRasterP &rasIn, TRasterP &warper,
-		  TPointD rasInPos, TPointD warperPos, const WarpParams &params);
+//! Deals with raster tiles and invokes warper functions
+void warp(TRasterP &tileRas, const TRasterP &rasIn, TRasterP &warper, TPointD rasInPos,
+		  TPointD warperPos, const WarpParams &params);
 
 #endif

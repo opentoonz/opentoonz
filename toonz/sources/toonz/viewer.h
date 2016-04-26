@@ -19,7 +19,7 @@ class Viewer : public QGLWidget
 	//! Pointer to a Processor to process the frame drawing OpenGL primitive over it.
 	Processor *m_processor;
 
-public:
+  public:
 	bool update_frame;
 
 	//! Construct a QGLWidget object which is a child of parent.
@@ -37,7 +37,7 @@ public:
 	//! Set the message. This message is displayed for every frame (if is a non-empty string).
 	void setMessage(std::string msg);
 
-protected:
+  protected:
 	void initializeGL();
 	void paintGL();
 	void resizeGL(int width, int height);

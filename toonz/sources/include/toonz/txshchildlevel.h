@@ -20,14 +20,14 @@
 class TXsheet;
 
 //=============================================================================
-//!The TXshChildLevel class provides a child level of xsheet and allows its management.
+//! The TXshChildLevel class provides a child level of xsheet and allows its management.
 /*!Inherits \b TXshLevel.
 \n A child level getChildLevel() is a xsheet reduced to level.
    The class allows to edit xsheet getXsheet(), change xsheet setXsheet() and change
    scene xsheet setScene().
    It's possibile change level name setName() and know how many frame are in level
    getFrameCount().
-   
+
    The class provides methods to control child level icon, makeIcon(), getIcon()
    and invalidateIcon().
  */
@@ -41,29 +41,29 @@ class DVAPI TXshChildLevel : public TXshLevel
 	std::string m_iconId;
 
 	DECLARE_CLASS_CODE
-public:
+  public:
 	/*!
-    Constructs a TXshChildLevel with \b TXshLevel name \b name
+	Constructs a TXshChildLevel with \b TXshLevel name \b name
   */
 	TXshChildLevel(std::wstring name = L"");
 
 	/*!
-    Destroys the TXshChildLevel object.
+	Destroys the TXshChildLevel object.
   */
 	~TXshChildLevel();
 
 	/*!
-    Return the \b TXshChildLevel child level.
+	Return the \b TXshChildLevel child level.
   */
 	TXshChildLevel *getChildLevel() { return this; }
 	/*!
-    Return the level \b TXsheet.
-    \sa setXsheet()
+	Return the level \b TXsheet.
+	\sa setXsheet()
   */
 	TXsheet *getXsheet() { return m_xsheet; }
 	/*!
-    Set the level \b TXsheet to \b xsheet.
-    \sa getXsheet()
+	Set the level \b TXsheet to \b xsheet.
+	\sa getXsheet()
   */
 	void setXsheet(TXsheet *xsheet);
 
@@ -74,19 +74,19 @@ public:
 	void save() {}
 
 	/*!
-    Override. Set level scene to \b scene.
+	Override. Set level scene to \b scene.
   */
 	void setScene(ToonzScene *scene);
 	/*!
-    Return the frame count.
+	Return the frame count.
   */
 	int getFrameCount() const;
 	/*!
-    Set the vector \b fids to the frameId of level.
+	Set the vector \b fids to the frameId of level.
   */
 	void getFids(std::vector<TFrameId> &fids) const;
 
-private:
+  private:
 	// not implemented
 	TXshChildLevel(const TXshChildLevel &);
 	TXshChildLevel &operator=(const TXshChildLevel &);

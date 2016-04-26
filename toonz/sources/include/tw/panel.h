@@ -14,16 +14,10 @@ class TPanel : public TWidget
 	bool m_maximized;
 	int m_status;
 
-public:
-	enum Side {
-		Center,
-		Top,
-		Right,
-		Bottom,
-		Left
-	};
+  public:
+	enum Side { Center, Top, Right, Bottom, Left };
 
-public:
+  public:
 	TPanel(TWidget *parent, string name);
 
 	void draw();
@@ -54,7 +48,7 @@ public:
 
 class TPanelResizer
 {
-public:
+  public:
 	TPanelResizer(){};
 	virtual bool canMoveSide(TPanel *panel, TPanel::Side side) = 0;
 	virtual void moveSide(TPanel *panel, TPanel::Side side) = 0;

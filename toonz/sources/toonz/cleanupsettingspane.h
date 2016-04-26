@@ -1,14 +1,14 @@
 #ifndef CLEANUPSETTINGSPANE_H
 #define CLEANUPSETTINGSPANE_H
 
-//ToonzLib includes
+// ToonzLib includes
 #include "toonz/cleanupparameters.h"
 
-//ToonzQt includes
+// ToonzQt includes
 #include "toonzqt/cleanupcamerasettingswidget.h"
 #include "toonzqt/filefield.h"
 
-//Qt includes
+// Qt includes
 #include <QFrame>
 
 //  Forward declarations
@@ -24,29 +24,28 @@ class DoubleField;
 class IntField;
 }
 
-/* 
+/*
 "Save In" フィールドのためのFileField。browseDirectoryを再実装して、フィールドが空欄のときは、
 カレントレベル（Scan画像。TIF等）の入っているフォルダの１つ上をデフォルトフォルダにして開くようにしたい。
 */
 class CleanupSaveInField : public DVGui::FileField
 {
 	Q_OBJECT
-public:
-	CleanupSaveInField(QWidget *parent = 0, QString path = 0)
-		: DVGui::FileField(parent, path) {}
+  public:
+	CleanupSaveInField(QWidget *parent = 0, QString path = 0) : DVGui::FileField(parent, path) {}
 
-protected slots:
+  protected slots:
 	void browseDirectory();
 };
 
 class CleanupSettingsPane : public QFrame
 {
 	Q_OBJECT
-public:
+  public:
 	//----Cleanup Camera Settings
 	CleanupCameraSettingsWidget *m_cameraWidget;
 
-private:
+  private:
 	//----Rotate & Flip
 	QComboBox *m_rotateOm;
 	QCheckBox *m_flipX;
@@ -67,26 +66,26 @@ private:
 	CleanupParameters m_backupParams;
 	bool m_attached;
 
-public:
+  public:
 	CleanupSettingsPane(QWidget *parent = 0);
 
-protected:
+  protected:
 	void showEvent(QShowEvent *);
 	void hideEvent(QHideEvent *);
 
-public slots:
+  public slots:
 
 	void updateGui(bool postProcessPreviews);
 	void updateGui(CleanupParameters *params, CleanupParameters *oldParams);
 	void updateImageInfo();
 
-	//called from CleanupSaveInField
+	// called from CleanupSaveInField
 	TFilePath getLastSelectedPath() { return m_path; }
 
-private:
+  private:
 	void updateVisibility();
 
-private slots:
+  private slots:
 
 	void onImageSwitched();
 	void onPreviewDataChanged();

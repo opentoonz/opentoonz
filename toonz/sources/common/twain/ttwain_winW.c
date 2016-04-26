@@ -84,7 +84,8 @@ void TTWAIN_ModalEventLoopPD(void)
 	// Clear global breakout flag
 	TTwainData.breakModalLoop = FALSE;
 
-	while ((TTWAIN_GetState() >= TWAIN_SOURCE_ENABLED) && !TTwainData.breakModalLoop && GetMessage((LPMSG)&msg, NULL, 0, 0)) {
+	while ((TTWAIN_GetState() >= TWAIN_SOURCE_ENABLED) && !TTwainData.breakModalLoop &&
+		   GetMessage((LPMSG)&msg, NULL, 0, 0)) {
 		if (!TTWAIN_MessageHook((LPMSG)&msg)) {
 			TranslateMessage((LPMSG)&msg);
 			DispatchMessage((LPMSG)&msg);

@@ -9,10 +9,9 @@ namespace igs
 {
 namespace maxmin
 {
-template <class IT, class RT>
-class thread : public igs::resource::thread_execute_interface
+template <class IT, class RT> class thread : public igs::resource::thread_execute_interface
 { /* thread単位の実行設定 */
-public:
+  public:
 	thread() {}
 	void setup(
 		/* 入出力画像 */
@@ -26,7 +25,8 @@ public:
 
 		/* Action Geometry */
 		,
-		int y_begin, int y_end, std::vector<int> *lens_offsets_p, std::vector<int> *lens_sizes_p, std::vector<std::vector<double>> *lens_ratio_p
+		int y_begin, int y_end, std::vector<int> *lens_offsets_p, std::vector<int> *lens_sizes_p,
+		std::vector<std::vector<double>> *lens_ratio_p
 
 		,
 		double radius, double smooth_outer_range, int polygon_number, double roll_degree
@@ -59,8 +59,9 @@ public:
 		this->alpha_rendering_sw_ = alpha_rendering_sw;
 		this->add_blend_sw_ = add_blend_sw;
 
-		igs::maxmin::slrender::resize(
-			static_cast<int>(this->lens_offsets_p_->size()), this->width_, (ref != 0 || 4 <= channels) ? true : false, this->pixe_tracks_, this->alpha_ref_, this->result_);
+		igs::maxmin::slrender::resize(static_cast<int>(this->lens_offsets_p_->size()), this->width_,
+									  (ref != 0 || 4 <= channels) ? true : false,
+									  this->pixe_tracks_, this->alpha_ref_, this->result_);
 	}
 	void run(void)
 	{ /* threadで実行する部分 */
@@ -112,13 +113,10 @@ public:
 	}
 	void clear(void)
 	{
-		igs::maxmin::slrender::clear(
-			this->pixe_tracks_,
-			this->alpha_ref_,
-			this->result_);
+		igs::maxmin::slrender::clear(this->pixe_tracks_, this->alpha_ref_, this->result_);
 	}
 
-private:
+  private:
 	const IT *inn_;
 	IT *out_;
 	int height_;
@@ -148,27 +146,32 @@ private:
 	std::vector<double> alpha_ref_;
 	std::vector<double> result_;
 
-	void rendering_sl_ch_(
-		const int yy, const int zz, const bool render_sw, const bool add_blend_sw)
+	void rendering_sl_ch_(const int yy, const int zz, const bool render_sw, const bool add_blend_sw)
 	{
 		if (!render_sw) {
-			igs::maxmin::getput::copy(
-				this->inn_, this->height_, this->width_, this->channels_, yy, zz, this->out_);
+			igs::maxmin::getput::copy(this->inn_, this->height_, this->width_, this->channels_, yy,
+									  zz, this->out_);
 			return;
 		}
 		if (yy == this->y_begin_) {
 			igs::maxmin::getput::get_first(
-				this->inn_, this->out_, this->height_, this->width_, this->channels_, this->ref_, this->ref_mode_, yy, zz, static_cast<int>(this->pixe_tracks_.size() / 2), add_blend_sw, this->pixe_tracks_, this->alpha_ref_, this->result_);
+				this->inn_, this->out_, this->height_, this->width_, this->channels_, this->ref_,
+				this->ref_mode_, yy, zz, static_cast<int>(this->pixe_tracks_.size() / 2),
+				add_blend_sw, this->pixe_tracks_, this->alpha_ref_, this->result_);
 		} else {
 			igs::maxmin::slrender::shift(this->pixe_tracks_);
 			igs::maxmin::getput::get_next(
-				this->inn_, this->out_, this->height_, this->width_, this->channels_, this->ref_, this->ref_mode_, yy, zz, static_cast<int>(this->pixe_tracks_.size() / 2), add_blend_sw, this->pixe_tracks_, this->alpha_ref_, this->result_);
+				this->inn_, this->out_, this->height_, this->width_, this->channels_, this->ref_,
+				this->ref_mode_, yy, zz, static_cast<int>(this->pixe_tracks_.size() / 2),
+				add_blend_sw, this->pixe_tracks_, this->alpha_ref_, this->result_);
 		}
 		igs::maxmin::slrender::render(
-			this->radius_, this->smooth_outer_range_, this->polygon_number_, this->roll_degree_, this->min_sw_, *(this->lens_offsets_p_), *(this->lens_sizes_p_), *(this->lens_ratio_p_), this->pixe_tracks_, this->alpha_ref_, this->result_);
+			this->radius_, this->smooth_outer_range_, this->polygon_number_, this->roll_degree_,
+			this->min_sw_, *(this->lens_offsets_p_), *(this->lens_sizes_p_), *(this->lens_ratio_p_),
+			this->pixe_tracks_, this->alpha_ref_, this->result_);
 
-		igs::maxmin::getput::put(
-			this->result_, this->height_, this->width_, this->channels_, yy, zz, this->out_);
+		igs::maxmin::getput::put(this->result_, this->height_, this->width_, this->channels_, yy,
+								 zz, this->out_);
 	}
 };
 }
@@ -182,10 +185,9 @@ namespace igs
 {
 namespace maxmin
 {
-template <class IT, class RT>
-class multithread
+template <class IT, class RT> class multithread
 {
-public:
+  public:
 	multithread(
 		/* 入出力画像 */
 		const IT *inn, IT *out, const int height, const int width, const int channels
@@ -220,8 +222,9 @@ public:
 		)
 	{
 		/*--------------メモリ確保--------------------------*/
-		igs::maxmin::alloc_and_shape_lens_matrix(
-			radius, radius + smooth_outer_range, polygon_number, roll_degree, this->lens_offsets_, this->lens_sizes_, this->lens_ratio_);
+		igs::maxmin::alloc_and_shape_lens_matrix(radius, radius + smooth_outer_range,
+												 polygon_number, roll_degree, this->lens_offsets_,
+												 this->lens_sizes_, this->lens_ratio_);
 		/*-------スレッド毎の処理指定-----------------------*/
 		int thread_num = number_of_thread;
 		/* ゼロ以下の場合強制変更。そもそもGUIでエラーにすべき */
@@ -237,17 +240,18 @@ public:
 		/* thread set */
 		int yy = 0;
 		for (int ii = 0; ii < thread_num; ++ii) {
-			const int y_end = static_cast<int>(
-								  static_cast<double>(height) * (ii + 1) / thread_num + 0.999999) -
-							  1;
-			this->threads_.at(ii).setup(
-				inn, out, height, width, channels, ref, ref_mode, yy, y_end, &(this->lens_offsets_), &(this->lens_sizes_), &(this->lens_ratio_)
+			const int y_end =
+				static_cast<int>(static_cast<double>(height) * (ii + 1) / thread_num + 0.999999) -
+				1;
+			this->threads_.at(ii).setup(inn, out, height, width, channels, ref, ref_mode, yy, y_end,
+										&(this->lens_offsets_), &(this->lens_sizes_),
+										&(this->lens_ratio_)
 
-																															   ,
-				radius, smooth_outer_range, polygon_number, roll_degree
+											,
+										radius, smooth_outer_range, polygon_number, roll_degree
 
-				,
-				min_sw, alpha_rendering_sw, add_blend_sw);
+										,
+										min_sw, alpha_rendering_sw, add_blend_sw);
 			yy = y_end;
 		}
 		/*------スレッド毎のスレッド指定------*/
@@ -255,10 +259,7 @@ public:
 			this->mthread_.add(&(this->threads_.at(ii)));
 		}
 	}
-	void run(void)
-	{
-		this->mthread_.run();
-	}
+	void run(void) { this->mthread_.run(); }
 	void clear()
 	{
 		this->mthread_.clear();
@@ -268,7 +269,7 @@ public:
 		this->lens_offsets_.clear();
 	}
 
-private:
+  private:
 	std::vector<int> lens_offsets_;
 	std::vector<int> lens_sizes_;
 	std::vector<std::vector<double>> lens_ratio_;

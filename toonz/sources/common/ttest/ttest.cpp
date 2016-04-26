@@ -32,7 +32,7 @@ class TTestTable
 	SkipTable m_skipTable;
 	TTestTable(){};
 
-public:
+  public:
 	static TTestTable *table()
 	{
 		static TTestTable *theTable = 0;
@@ -52,10 +52,7 @@ public:
 		m_table[str] = test;
 	}
 
-	void skip(const std::string &str)
-	{
-		m_skipTable.insert(str);
-	}
+	void skip(const std::string &str) { m_skipTable.insert(str); }
 
 	void run(const std::string &str)
 	{
@@ -140,7 +137,7 @@ void TTest::verifyInstanceCount()
 	assert(m_levelInstanceCount == TLevel::getInstanceCount());
 	assert(m_imageInstanceCount == TImage::getInstanceCount());
 
-	//assert(m_rasterInstanceCount==TRaster::getInstanceCount());
+	// assert(m_rasterInstanceCount==TRaster::getInstanceCount());
 	// commentata da gmt: in qualche test viene creata un
 	// offline gl context con annesso raster che ovviamente non
 	// viene liberato.
@@ -180,12 +177,12 @@ void TTest::runTests(string name)
 				continue;
 			if (s[0] == '#' || s[0] == '!')
 				break;
-			//Verifica tutti i test
+			// Verifica tutti i test
 			if (s == "all") {
 				TTestTable::table()->runAll();
 				continue;
 			}
-			//Verifica una parte dei test che ha come nome iniziale testType[i]
+			// Verifica una parte dei test che ha come nome iniziale testType[i]
 			int i;
 			bool isTypeFound = false;
 			for (i = 0; i < (int)testType.size(); i++)
@@ -198,7 +195,7 @@ void TTest::runTests(string name)
 				continue;
 			if (s[0] == '~')
 				TTestTable::table()->skip(s.substr(1));
-			else //Verifica il test di nome s
+			else // Verifica il test di nome s
 				TTestTable::table()->run(s);
 		}
 	}
@@ -285,11 +282,10 @@ int areEqual(TRasterP ra, TRasterP rb, double err)
 					!areAlmostEqual(double(gA), double(gB), err) ||
 					!areAlmostEqual(double(bA), double(bB), err) ||
 					!areAlmostEqual(double(mA), double(mB), err)) {
-					cout << "MISMATCH: x=" << x << " y=" << y
-						 << ". Pixel a = (" << (int)rA << "," << (int)gA << ","
-						 << (int)bA << "," << (int)mA << ")"
-						 << ". Pixel b = (" << (int)rB << "," << (int)gB << ","
-						 << (int)bB << "," << (int)mB << ")" << endl;
+					cout << "MISMATCH: x=" << x << " y=" << y << ". Pixel a = (" << (int)rA << ","
+						 << (int)gA << "," << (int)bA << "," << (int)mA << ")"
+						 << ". Pixel b = (" << (int)rB << "," << (int)gB << "," << (int)bB << ","
+						 << (int)mB << ")" << endl;
 					return false;
 				}
 			}
@@ -314,11 +310,10 @@ int areEqual(TRasterP ra, TRasterP rb, double err)
 					!areAlmostEqual(double(gA), double(gB), err) ||
 					!areAlmostEqual(double(bA), double(bB), err) ||
 					!areAlmostEqual(double(mA), double(mB), err)) {
-					cout << "MISMATCH: x=" << x << " y=" << y
-						 << ". Pixel a = (" << (int)rA << "," << (int)gA << ","
-						 << (int)bA << "," << (int)mA << ")"
-						 << ". Pixel b = (" << (int)rB << "," << (int)gB << ","
-						 << (int)bB << "," << (int)mB << ")" << endl;
+					cout << "MISMATCH: x=" << x << " y=" << y << ". Pixel a = (" << (int)rA << ","
+						 << (int)gA << "," << (int)bA << "," << (int)mA << ")"
+						 << ". Pixel b = (" << (int)rB << "," << (int)gB << "," << (int)bB << ","
+						 << (int)mB << ")" << endl;
 					return false;
 				}
 			}
@@ -333,8 +328,7 @@ int areEqual(TRasterP ra, TRasterP rb, double err)
 				int rA = apix->value;
 				int rB = bpix->value;
 				if (!areAlmostEqual(double(rA), double(rB), err)) {
-					cout << "MISMATCH: x=" << x << " y=" << y
-						 << ". Pixel a = (" << (int)rA << ")"
+					cout << "MISMATCH: x=" << x << " y=" << y << ". Pixel a = (" << (int)rA << ")"
 						 << ". Pixel b = (" << (int)rB << ")" << endl;
 					return false;
 				}
@@ -358,9 +352,10 @@ int areEqual(TRasterP ra, TRasterP rb, double err)
 				if (!areAlmostEqual(double(rAink), double(rBink), err) ||
 					!areAlmostEqual(double(rAtone), double(rBtone), err) ||
 					!areAlmostEqual(double(rAPaint), double(rBPaint), err)) {
-					cout << "MISMATCH: x=" << x << " y=" << y
-						 << ". Pixel a = (Ink: " << (int)rAink << ",Tone: " << (int)rAtone << ",Paint: " << (int)rBPaint << ")"
-						 << ". Pixel b = (Ink: " << (int)rBink << ",Tone: " << (int)rBtone << ",Paint: " << (int)rBPaint << ")" << endl;
+					cout << "MISMATCH: x=" << x << " y=" << y << ". Pixel a = (Ink: " << (int)rAink
+						 << ",Tone: " << (int)rAtone << ",Paint: " << (int)rBPaint << ")"
+						 << ". Pixel b = (Ink: " << (int)rBink << ",Tone: " << (int)rBtone
+						 << ",Paint: " << (int)rBPaint << ")" << endl;
 					return false;
 				}
 			}

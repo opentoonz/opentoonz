@@ -41,9 +41,7 @@ FrameNavigator::FrameNavigator(QWidget *parent)
 
 bool FrameNavigator::anyWidgetHasFocus()
 {
-	return hasFocus() ||
-		   m_lineEdit->hasFocus() ||
-		   m_lineEdit->hasFocus();
+	return hasFocus() || m_lineEdit->hasFocus() || m_lineEdit->hasFocus();
 }
 
 //-----------------------------------------------------------------------------

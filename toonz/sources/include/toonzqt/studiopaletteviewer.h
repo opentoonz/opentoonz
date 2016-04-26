@@ -35,7 +35,9 @@ class TXshLevelHandle;
 		StudioPaletteTreeViewer is a \b QTreeWidget with three root item related to level palette
 		folder and current project palette folder, the three root folder of \b StudioPalette.
 */
-class DVAPI StudioPaletteTreeViewer : public QTreeWidget, public StudioPalette::Listener, public TProjectManager::Listener
+class DVAPI StudioPaletteTreeViewer : public QTreeWidget,
+									  public StudioPalette::Listener,
+									  public TProjectManager::Listener
 {
 	Q_OBJECT
 
@@ -54,11 +56,9 @@ class DVAPI StudioPaletteTreeViewer : public QTreeWidget, public StudioPalette::
 	// keep the checked item list in order to avoid multiple check
 	QSet<QTreeWidgetItem *> m_openedItems;
 
-public:
-	StudioPaletteTreeViewer(QWidget *parent,
-							TPaletteHandle *studioPaletteHandle,
-							TPaletteHandle *levelPaletteHandle,
-							TXsheetHandle *xsheetHandle,
+  public:
+	StudioPaletteTreeViewer(QWidget *parent, TPaletteHandle *studioPaletteHandle,
+							TPaletteHandle *levelPaletteHandle, TXsheetHandle *xsheetHandle,
 							TXshLevelHandle *currentLevelHandle);
 	~StudioPaletteTreeViewer();
 
@@ -85,7 +85,7 @@ public:
 
 	TFilePath getCurrentItemPath() { return getItemPath(currentItem()); }
 
-protected slots:
+  protected slots:
 	/*! Refresh all item of three root item in tree and preserve current item. */
 	void refresh();
 	/*! Refresh item \b item and its children; take path concerning \b item and
@@ -107,7 +107,7 @@ protected slots:
 	/*! Refresh tree only when this widget has focus*/
 	void onRefreshTreeShortcutTriggered();
 
-public slots:
+  public slots:
 	/*! Create a new \b StudioPalette palette in current item path. */
 	void addNewPalette();
 	/*! Create a new \b StudioPalette folder in current item path. */
@@ -126,7 +126,7 @@ public slots:
 	/*! Convert level palette to studio palette. */
 	void convertToStudioPalette();
 
-protected:
+  protected:
 	/*! Delete \b item path from \b StudioPalette. If item is a not empty
 			folder send a question to know if must delete item or not. */
 	void deleteItem(QTreeWidgetItem *item);
@@ -138,7 +138,8 @@ protected:
 
 	/*! Create a new item related to path \b path. */
 	QTreeWidgetItem *createItem(const TFilePath path);
-	/*! Return path related to item \b item if \b item exist, otherwise return an empty path \b TFilePath. */
+	/*! Return path related to item \b item if \b item exist, otherwise return an empty path \b
+	 * TFilePath. */
 	TFilePath getItemPath(QTreeWidgetItem *);
 
 	/*! Return current item path. */
@@ -153,7 +154,7 @@ protected:
 	void paintEvent(QPaintEvent *event);
 	/*! Open a context menu considering current item data role \b Qt::UserRole. */
 	void contextMenuEvent(QContextMenuEvent *event);
-	/*! Add an action to menu \b menu; the action has text \b name and its 
+	/*! Add an action to menu \b menu; the action has text \b name and its
 			\b triggered() signal is connetted with \b slot. */
 	void createMenuAction(QMenu &menu, const char *id, QString name, const char *slot);
 	/*! If button left is pressed start drag and drop. */
@@ -187,16 +188,14 @@ class DVAPI StudioPaletteViewer : public QSplitter
 
 	StudioPaletteTreeViewer *m_studioPaletteTreeViewer;
 
-public:
+  public:
 	StudioPaletteViewer(QWidget *parent, TPaletteHandle *studioPaletteHandle,
-						TPaletteHandle *levelPaletteHandle,
-						TFrameHandle *frameHandle,
-						TXsheetHandle *xsheetHandle,
-						TXshLevelHandle *currentLevelHandle);
+						TPaletteHandle *levelPaletteHandle, TFrameHandle *frameHandle,
+						TXsheetHandle *xsheetHandle, TXshLevelHandle *currentLevelHandle);
 	~StudioPaletteViewer();
 
 	/*! In order to save current palette from the tool button in the PageViewer.*/
 	TFilePath getCurrentItemPath();
 };
 
-#endif //STUDIOPALETTEVIEWER_H
+#endif // STUDIOPALETTEVIEWER_H

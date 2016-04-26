@@ -37,7 +37,8 @@ struct DefaultOptsInitializer {
 	}
 } _instance;
 
-inline bool rowLess(const tlin::spmat::HashMap::BucketNode *a, const tlin::spmat::HashMap::BucketNode *b)
+inline bool rowLess(const tlin::spmat::HashMap::BucketNode *a,
+					const tlin::spmat::HashMap::BucketNode *b)
 {
 	return a->m_key.first < b->m_key.first;
 }
@@ -69,7 +70,8 @@ void tlin::allocD(SuperMatrix *&A, int rows, int cols)
 
 //---------------------------------------------------------------
 
-void tlin::allocS(SuperMatrix *&A, int rows, int cols, int nnz, int *colptr, int *rowind, double *values)
+void tlin::allocS(SuperMatrix *&A, int rows, int cols, int nnz, int *colptr, int *rowind,
+				  double *values)
 {
 	A = (SuperMatrix *)SUPERLU_MALLOC(sizeof(SuperMatrix));
 	dCreate_CompCol_Matrix(A, rows, cols, nnz, values, rowind, colptr, SLU_NC, SLU_D, SLU_GE);
@@ -124,7 +126,8 @@ void tlin::createD(SuperMatrix &A, int rows, int cols)
 
 //---------------------------------------------------------------
 
-void tlin::createS(SuperMatrix &A, int rows, int cols, int nnz, int *colptr, int *rowind, double *values)
+void tlin::createS(SuperMatrix &A, int rows, int cols, int nnz, int *colptr, int *rowind,
+				   double *values)
 {
 	dCreate_CompCol_Matrix(&A, rows, cols, nnz, values, rowind, colptr, SLU_NC, SLU_D, SLU_GE);
 }
@@ -186,7 +189,7 @@ void tlin::readDN(SuperMatrix *A, int &lda, double *&values)
 
 void tlin::readNC(SuperMatrix *A, int &nnz, int *&colptr, int *&rowind, double *&values)
 {
-	assert(A->Stype == SLU_NC); //Only SLU_NC (CCS) format is supported here
+	assert(A->Stype == SLU_NC); // Only SLU_NC (CCS) format is supported here
 	NCformat *storage = (NCformat *)A->Store;
 
 	nnz = storage->nnz;
@@ -284,18 +287,18 @@ void tlin::traduceD(const tlin::sparse_matrix<double> &m, SuperMatrix *&A)
 	int rows = m.rows(), cols = m.cols();
 	const spmat::HashMap &entries = m.entries();
 
-	//Build or extract pointers to out's data
+	// Build or extract pointers to out's data
 	double *values;
 
 	if (!A)
 		allocD(A, rows, cols);
 
-	//Retrieve DN arrays from A
+	// Retrieve DN arrays from A
 	int lda;
 	readDN(A, lda, values);
 	assert(A->nrow == rows && A->ncol == cols && lda == rows);
 
-	//Copy each value in entries to A
+	// Copy each value in entries to A
 	spmat::HashMap::const_iterator it;
 	for (it = entries.begin(); it != entries.end(); ++it)
 		values[it->m_key.second * rows + it->m_key.first] = it->m_val;
@@ -331,7 +334,8 @@ void tlin::factorize(SuperMatrix *A, SuperFactors *&F, superlu_options_t *opt)
 	StatInit(&stat);
 
 	int result;
-	dgstrf(opt, &AC, sp_ienv(1), sp_ienv(2), etree, NULL, 0, F->perm_c, F->perm_r, F->L, F->U, &stat, &result);
+	dgstrf(opt, &AC, sp_ienv(1), sp_ienv(2), etree, NULL, 0, F->perm_c, F->perm_r, F->L, F->U,
+		   &stat, &result);
 
 	StatFree(&stat);
 

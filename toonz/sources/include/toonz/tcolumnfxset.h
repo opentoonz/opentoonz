@@ -27,20 +27,17 @@ class TIStream;
 class DVAPI TFxSet
 {
 
-protected:
+  protected:
 	std::set<TFx *> m_fxs;
 	// TXsheetFx *m_xsheetFx;
 
-public:
+  public:
 	TFxSet();
 	virtual ~TFxSet();
 
 	void addFx(TFx *fx);
 	bool removeFx(TFx *fx);
-	bool containsFx(TFx *fx)
-	{
-		return m_fxs.count(fx) > 0;
-	}
+	bool containsFx(TFx *fx) { return m_fxs.count(fx) > 0; }
 
 	// n.b. aggiunge m_fxs a fxs senza fare clear di quest'ultimo
 	void getFxs(std::set<TFx *> &fxs);
@@ -49,7 +46,7 @@ public:
 	TFx *getFx(int index) const;
 	TFx *getFx(const std::string &id) const;
 
-	//TXsheetFx *getXsheetFx() const {
+	// TXsheetFx *getXsheetFx() const {
 	//  return m_xsheetFx;
 	//}
 
@@ -58,7 +55,7 @@ public:
 	virtual void saveData(TOStream &os, int occupiedColumnCount);
 	virtual void loadData(TIStream &os);
 
-private:
+  private:
 	// not implemented
 	TFxSet(const TFxSet &);
 	TFxSet &operator=(const TFxSet &);

@@ -11,9 +11,10 @@ namespace igs
 {
 namespace resource
 {
-//HANDLE = unsigned long(vc6.0) = void *(vc2005)
+// HANDLE = unsigned long(vc6.0) = void *(vc2005)
 IGS_RESOURCE_IFX_EXPORT const HANDLE thread_run(
-	unsigned(__stdcall *function)(void *), void *func_arg, const int priority = THREAD_PRIORITY_NORMAL
+	unsigned(__stdcall *function)(void *), void *func_arg,
+	const int priority = THREAD_PRIORITY_NORMAL
 	/*
 	priorityに与える値を優先度の高いものから順に並べます。
 	THREAD_PRIORITY_TIME_CRITICAL		プロセスにより15 or 31
@@ -37,16 +38,16 @@ namespace igs
 {
 namespace resource
 {
-//pthread_t = unsigned long int(rhel4)
-pthread_t thread_run(
-	void *(*function)(void *), void *func_arg, const int state = PTHREAD_CREATE_JOINABLE
-	/*
-	state が
-	PTHREAD_CREATE_JOINABLE なら、pthread_join()を呼んで終了を待つ
-	PTHREAD_CREATE_DETACHED なら、なにも呼ぶ必要がないが、
-		thread終了を知るには自前で仕掛けが必要。
-	*/
-	);
+// pthread_t = unsigned long int(rhel4)
+pthread_t thread_run(void *(*function)(void *), void *func_arg,
+					 const int state = PTHREAD_CREATE_JOINABLE
+					 /*
+					 state が
+					 PTHREAD_CREATE_JOINABLE なら、pthread_join()を呼んで終了を待つ
+					 PTHREAD_CREATE_DETACHED なら、なにも呼ぶ必要がないが、
+						 thread終了を知るには自前で仕掛けが必要。
+					 */
+					 );
 void thread_join(const pthread_t thread_id);
 }
 }

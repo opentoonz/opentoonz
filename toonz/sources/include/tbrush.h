@@ -29,10 +29,10 @@ class TStrokeOutline;
 
 class DVAPI TBrush
 {
-public:
+  public:
 	class OutlineParameter
 	{
-	public:
+	  public:
 		/*double m_pixelSize;*/
 		double m_lengthStep; //  max lengthStep (sulla centerline) per la
 							 //  linearizzazione dell'outline
@@ -47,13 +47,12 @@ public:
 	TBrush() {}
 	virtual ~TBrush() {}
 
-	virtual void makeOutline(const TStroke &stroke,
-							 TStrokeOutline &outline,
+	virtual void makeOutline(const TStroke &stroke, TStrokeOutline &outline,
 							 const OutlineParameter &param) = 0;
 
 	virtual void draw() = 0;
 	virtual TBrush *clone() = 0;
 };
-#endif //PER_VECCHIO_ELLIPTIC_BRUSH
+#endif // PER_VECCHIO_ELLIPTIC_BRUSH
 
 #endif // TBRUSH_H

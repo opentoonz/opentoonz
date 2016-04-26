@@ -7,8 +7,7 @@
 
 namespace
 {
-template <typename T, typename PIXEL>
-void prepare_lut(double max, int edge, std::vector<T> &lut)
+template <typename T, typename PIXEL> void prepare_lut(double max, int edge, std::vector<T> &lut)
 {
 	double aux = (double)PIXEL::maxChannelValue;
 	int i = 0;
@@ -31,14 +30,13 @@ class SolarizeFx : public TStandardRasterFx
 	TDoubleParamP m_maximum;
 	TDoubleParamP m_edge;
 
-public:
-	SolarizeFx()
-		: m_maximum(1.0), m_edge(128.0)
+  public:
+	SolarizeFx() : m_maximum(1.0), m_edge(128.0)
 	{
 		bindParam(this, "maximum", m_maximum);
 		bindParam(this, "peak_edge", m_edge);
 		addInputPort("Source", m_input);
-		//m_value->setValueRange(0, std::numeric_limits<double>::max());
+		// m_value->setValueRange(0, std::numeric_limits<double>::max());
 		m_maximum->setValueRange(0.0, 10.0);
 		m_edge->setValueRange(0.0, 255.0);
 	}
@@ -62,14 +60,12 @@ public:
 };
 namespace
 {
-template <typename T>
-void update_param(T &param, TRaster32P ras)
+template <typename T> void update_param(T &param, TRaster32P ras)
 {
 	return;
 }
 
-template <typename T>
-void update_param(T &param, TRaster64P ras)
+template <typename T> void update_param(T &param, TRaster64P ras)
 {
 	param = param * 257;
 	return;

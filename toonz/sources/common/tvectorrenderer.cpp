@@ -64,7 +64,8 @@ void initBITMAPINFO(BITMAPINFO &info, const TRasterP img)
 
 //-----------------------------------------------------------------------------
 #ifdef BUBU
-void hardRenderVectorImage_MESA(const TVectorRenderData &rd, TRaster32P &ras, const TVectorImageP &vimg)
+void hardRenderVectorImage_MESA(const TVectorRenderData &rd, TRaster32P &ras,
+								const TVectorImageP &vimg)
 {
 	int rasterWidth = ras->getLx();
 	int rasterHeight = ras->getLy();
@@ -116,21 +117,21 @@ void hardRenderVectorImage_MESA(const TVectorRenderData &rd, TRaster32P &ras, co
 	glFinish();
 	/*
   // set info in out raster
-  TDimension size = ras->getSize();    
+  TDimension size = ras->getSize();
 
   if( ras->getWrap() == rasterWidth )
-    memcpy( ras->getRawData(), offData, ras->getPixelSize()*size.lx*size.ly );
+	memcpy( ras->getRawData(), offData, ras->getPixelSize()*size.lx*size.ly );
   else
   {
-    TRaster32P  temp( ras->getLx(), ras->getLy());
-    memcpy( temp->getRawData(), offData, ras->getPixelSize()*size.lx*size.ly );
-    ras->copy(temp);
+	TRaster32P  temp( ras->getLx(), ras->getLy());
+	memcpy( temp->getRawData(), offData, ras->getPixelSize()*size.lx*size.ly );
+	ras->copy(temp);
   }
 */
 	OSMesaDestroyContext(ctx);
 	ras->unlock();
 }
-#endif //BUBU
+#endif // BUBU
 void hardRenderVectorImage(const TVectorRenderData &rd, TRaster32P &ras, const TVectorImageP &vimg)
 {
 	int rasterWidth = ras->getLx();
@@ -183,25 +184,27 @@ void hardRenderVectorImage(const TVectorRenderData &rd, TRaster32P &ras, const T
 	HGDIOBJ oldobj = // select BIB to write
 		SelectObject(offDC, offDIB);
 
-	static PIXELFORMATDESCRIPTOR pfd =
-		{
-			sizeof(PIXELFORMATDESCRIPTOR),																						 // size of this pfd
-			1,																													 // version number
-			0 | (false ? (PFD_DRAW_TO_WINDOW | PFD_DOUBLEBUFFER) : (PFD_DRAW_TO_BITMAP | PFD_SUPPORT_GDI)) | PFD_SUPPORT_OPENGL, // support OpenGL
-			PFD_TYPE_RGBA,																										 // RGBA type
-			32,																													 // 32-bit color depth
-			0, 0, 0, 0, 0, 0,																									 // color bits ignored
-			0,																													 // no alpha buffer
-			0,																													 // shift bit ignored
-			0,																													 // no accumulation buffer
-			0, 0, 0, 0,																											 // accum bits ignored
-			32,																													 // 32-bit z-buffer
-			0,																													 // no stencil buffer
-			0,																													 // no auxiliary buffer
-			PFD_MAIN_PLANE,																										 // main layer
-			0,																													 // reserved
-			0, 0, 0																												 // layer masks ignored
-		};
+	static PIXELFORMATDESCRIPTOR pfd = {
+		sizeof(PIXELFORMATDESCRIPTOR), // size of this pfd
+		1,							   // version number
+		0 | (false ? (PFD_DRAW_TO_WINDOW | PFD_DOUBLEBUFFER)
+				   : (PFD_DRAW_TO_BITMAP | PFD_SUPPORT_GDI)) |
+			PFD_SUPPORT_OPENGL, // support OpenGL
+		PFD_TYPE_RGBA,			// RGBA type
+		32,						// 32-bit color depth
+		0,
+		0, 0, 0, 0, 0,  // color bits ignored
+		0,				// no alpha buffer
+		0,				// shift bit ignored
+		0,				// no accumulation buffer
+		0, 0, 0, 0,		// accum bits ignored
+		32,				// 32-bit z-buffer
+		0,				// no stencil buffer
+		0,				// no auxiliary buffer
+		PFD_MAIN_PLANE, // main layer
+		0,				// reserved
+		0, 0, 0			// layer masks ignored
+	};
 
 	// get the best available match of pixel format for the device context
 	int iPixelFormat = ChoosePixelFormat(offDC, &pfd);
@@ -278,20 +281,11 @@ namespace
 GLXContext ctx;
 XVisualInfo *visinfo;
 GC gc;
-Window make_rgb_window(Display *dpy,
-					   unsigned int width, unsigned int height)
+Window make_rgb_window(Display *dpy, unsigned int width, unsigned int height)
 {
-	const int sbAttrib[] = {GLX_RGBA,
-							GLX_RED_SIZE, 1,
-							GLX_GREEN_SIZE, 1,
-							GLX_BLUE_SIZE, 1,
-							None};
-	const int dbAttrib[] = {GLX_RGBA,
-							GLX_RED_SIZE, 1,
-							GLX_GREEN_SIZE, 1,
-							GLX_BLUE_SIZE, 1,
-							GLX_DOUBLEBUFFER,
-							None};
+	const int sbAttrib[] = {GLX_RGBA, GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1, GLX_BLUE_SIZE, 1, None};
+	const int dbAttrib[] = {GLX_RGBA, GLX_RED_SIZE,		1,   GLX_GREEN_SIZE, 1, GLX_BLUE_SIZE,
+							1,		  GLX_DOUBLEBUFFER, None};
 	int scrnum;
 	XSetWindowAttributes attr;
 	TUINT32 mask;
@@ -318,8 +312,7 @@ Window make_rgb_window(Display *dpy,
 	attr.event_mask = StructureNotifyMask | ExposureMask;
 	mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
 
-	win = XCreateWindow(dpy, root, 0, 0, width, height,
-						0, visinfo->depth, InputOutput,
+	win = XCreateWindow(dpy, root, 0, 0, width, height, 0, visinfo->depth, InputOutput,
 						visinfo->visual, mask, &attr);
 
 	/* make an X GC so we can do XCopyArea later */
@@ -337,8 +330,7 @@ Window make_rgb_window(Display *dpy,
 	return win;
 }
 
-GLXPixmap make_pixmap(Display *dpy, Window win,
-					  unsigned int width, unsigned int height,
+GLXPixmap make_pixmap(Display *dpy, Window win, unsigned int width, unsigned int height,
 					  Pixmap *pixmap)
 {
 	Pixmap pm;
@@ -354,12 +346,12 @@ GLXPixmap make_pixmap(Display *dpy, Window win,
 	XGetWindowAttributes(dpy, win, &attr);
 
 /*
-    * IMPORTANT:
-    *   Use the glXCreateGLXPixmapMESA funtion when using Mesa because
-    *   Mesa needs to know the colormap associated with a pixmap in order
-    *   to render correctly.  This is because Mesa allows RGB rendering
-    *   into any kind of visual, not just TrueColor or DirectColor.
-    */
+	* IMPORTANT:
+	*   Use the glXCreateGLXPixmapMESA funtion when using Mesa because
+	*   Mesa needs to know the colormap associated with a pixmap in order
+	*   to render correctly.  This is because Mesa allows RGB rendering
+	*   into any kind of visual, not just TrueColor or DirectColor.
+	*/
 #ifdef PROBLEMI_CON_IL_DRIVER_NVIDIA // GLX_MESA_pixmap_colormap //
 	if (strstr(glXQueryExtensionsString(dpy, 0), "GLX_MESA_pixmap_colormap")) {
 		/* stand-alone Mesa, specify the colormap */
@@ -383,7 +375,7 @@ GLXPixmap make_pixmap(Display *dpy, Window win,
 }
 }
 
-//void  offscreenRender(TRaster32P& ras, const TVectorImageP& vimg, const TAffine& aff)
+// void  offscreenRender(TRaster32P& ras, const TVectorImageP& vimg, const TAffine& aff)
 void hardRenderVectorImage(const TVectorRenderData &rd, TRaster32P &ras, const TVectorImageP &vimg)
 {
 	Display *dpy;
@@ -402,7 +394,7 @@ void hardRenderVectorImage(const TVectorRenderData &rd, TRaster32P &ras, const T
 	GLXDrawable olddrw = glXGetCurrentDrawable();
 
 	glXMakeCurrent(dpy, glxpm, ctx);
-	//printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
+	// printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
 
 	// cfr. help: OpenGL/Programming tip/OpenGL Correctness Tips
 	glViewport(0, 0, ras->getLx(), ras->getLy());
@@ -430,26 +422,18 @@ void hardRenderVectorImage(const TVectorRenderData &rd, TRaster32P &ras, const T
 
 #if defined(__sgi)
 
-	glReadPixels(0, 0,
-				 ras->getLx(), ras->getLy(),
-				 GL_ABGR_EXT,
-				 GL_UNSIGNED_BYTE,
+	glReadPixels(0, 0, ras->getLx(), ras->getLy(), GL_ABGR_EXT, GL_UNSIGNED_BYTE,
 				 ras->getRawData());
 
 #elif defined(LINUX)
 
-	glReadPixels(0, 0,
-				 ras->getLx(), ras->getLy(),
-				 GL_RGBA,
-				 GL_UNSIGNED_BYTE,
-				 ras->getRawData());
+	glReadPixels(0, 0, ras->getLx(), ras->getLy(), GL_RGBA, GL_UNSIGNED_BYTE, ras->getRawData());
 #endif
 
 	Bool ret = glXMakeCurrent(dpy, olddrw, oldctx);
 #ifdef DEBUG
 	if (!ret) {
-		std::cerr << __FUNCTION__
-				  << " error in glXMakeCurrent olddrw=" << olddrw
+		std::cerr << __FUNCTION__ << " error in glXMakeCurrent olddrw=" << olddrw
 				  << " oldctx=" << oldctx << std::endl;
 	}
 #endif

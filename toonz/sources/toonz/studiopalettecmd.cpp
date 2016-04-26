@@ -19,8 +19,8 @@
 #include "toonz/txshleveltypes.h"
 #include "toonz/sceneproperties.h"
 
-//DA FARE
-//Mi serve per effettuare il cambiamento della StudioPalette corrente
+// DA FARE
+// Mi serve per effettuare il cambiamento della StudioPalette corrente
 #include "studiopaletteviewer.h"
 
 /*! \namespace StudioPaletteCmd
@@ -33,17 +33,15 @@ namespace
 //-----------------------------------------------------------------------------
 
 //=============================================================================
-//PaletteAssignUndo
+// PaletteAssignUndo
 
 class PaletteAssignUndo : public TUndo
 {
 	TPaletteP m_targetPalette, m_oldPalette, m_newPalette;
 
-public:
-	PaletteAssignUndo(
-		const TPaletteP &targetPalette,
-		const TPaletteP &oldPalette,
-		const TPaletteP &newPalette)
+  public:
+	PaletteAssignUndo(const TPaletteP &targetPalette, const TPaletteP &oldPalette,
+					  const TPaletteP &newPalette)
 		: m_targetPalette(targetPalette), m_oldPalette(oldPalette), m_newPalette(newPalette)
 	{
 	}
@@ -62,26 +60,23 @@ public:
 	int getSize() const
 	{
 		return sizeof(*this) +
-			   (m_targetPalette->getStyleCount() +
-				m_oldPalette->getStyleCount() +
+			   (m_targetPalette->getStyleCount() + m_oldPalette->getStyleCount() +
 				m_newPalette->getStyleCount()) *
 				   100;
 	}
 };
 
 //=============================================================================
-//StudioPaletteAssignUndo
+// StudioPaletteAssignUndo
 
 class StudioPaletteAssignUndo : public TUndo
 {
 	TPaletteP m_oldPalette, m_newPalette;
 	TFilePath m_fp;
 
-public:
-	StudioPaletteAssignUndo(
-		const TFilePath &targetPath,
-		const TPaletteP &oldPalette,
-		const TPaletteP &newPalette)
+  public:
+	StudioPaletteAssignUndo(const TFilePath &targetPath, const TPaletteP &oldPalette,
+							const TPaletteP &newPalette)
 		: m_fp(targetPath), m_oldPalette(oldPalette), m_newPalette(newPalette)
 	{
 	}
@@ -102,151 +97,104 @@ public:
 	int getSize() const
 	{
 		return sizeof(*this) +
-			   (m_oldPalette->getStyleCount() +
-				m_newPalette->getStyleCount()) *
-				   100;
+			   (m_oldPalette->getStyleCount() + m_newPalette->getStyleCount()) * 100;
 	}
 };
 
 //=============================================================================
-//DeletePaletteUndo
+// DeletePaletteUndo
 
 class DeletePaletteUndo : public TUndo
 {
 	TFilePath m_palettePath;
 	TPaletteP m_palette;
 
-public:
-	DeletePaletteUndo(const TFilePath &palettePath)
-		: m_palettePath(palettePath)
+  public:
+	DeletePaletteUndo(const TFilePath &palettePath) : m_palettePath(palettePath)
 	{
 		m_palette = StudioPalette::instance()->getPalette(m_palettePath);
 	}
 
-	void undo() const
-	{
-		StudioPalette::instance()->setPalette(m_palettePath, m_palette->clone());
-	}
-	void redo() const
-	{
-		StudioPalette::instance()->deletePalette(m_palettePath);
-	}
-	int getSize() const
-	{
-		return sizeof(*this) + sizeof(TPalette);
-	}
+	void undo() const { StudioPalette::instance()->setPalette(m_palettePath, m_palette->clone()); }
+	void redo() const { StudioPalette::instance()->deletePalette(m_palettePath); }
+	int getSize() const { return sizeof(*this) + sizeof(TPalette); }
 };
 
 //=============================================================================
-//CreatePaletteUndo
+// CreatePaletteUndo
 
 class CreatePaletteUndo : public TUndo
 {
 	TFilePath m_palettePath;
 	TPaletteP m_palette;
 
-public:
-	CreatePaletteUndo(const TFilePath &palettePath)
-		: m_palettePath(palettePath)
+  public:
+	CreatePaletteUndo(const TFilePath &palettePath) : m_palettePath(palettePath)
 	{
 		m_palette = StudioPalette::instance()->getPalette(m_palettePath);
 	}
 
-	void undo() const
-	{
-		StudioPalette::instance()->deletePalette(m_palettePath);
-	}
-	void redo() const
-	{
-		StudioPalette::instance()->setPalette(m_palettePath, m_palette->clone());
-	}
-	int getSize() const
-	{
-		return sizeof(*this) + sizeof(TPalette);
-	}
+	void undo() const { StudioPalette::instance()->deletePalette(m_palettePath); }
+	void redo() const { StudioPalette::instance()->setPalette(m_palettePath, m_palette->clone()); }
+	int getSize() const { return sizeof(*this) + sizeof(TPalette); }
 };
 
 //=============================================================================
-//DeleteFolderUndo
-//Oss.: l'undo non ricorda eventuali sottoFolder o palette, si limita a ricreare
+// DeleteFolderUndo
+// Oss.: l'undo non ricorda eventuali sottoFolder o palette, si limita a ricreare
 //			il folder!!!
 
 class DeleteFolderUndo : public TUndo
 {
 	TFilePath m_folderPath;
 
-public:
-	DeleteFolderUndo(const TFilePath &folderPath)
-		: m_folderPath(folderPath)
-	{
-	}
+  public:
+	DeleteFolderUndo(const TFilePath &folderPath) : m_folderPath(folderPath) {}
 
 	void undo() const
 	{
-		StudioPalette::instance()->createFolder(m_folderPath.getParentDir(), m_folderPath.getWideName());
+		StudioPalette::instance()->createFolder(m_folderPath.getParentDir(),
+												m_folderPath.getWideName());
 	}
-	void redo() const
-	{
-		StudioPalette::instance()->deleteFolder(m_folderPath);
-	}
-	int getSize() const
-	{
-		return sizeof(*this) + sizeof(TPalette);
-	}
+	void redo() const { StudioPalette::instance()->deleteFolder(m_folderPath); }
+	int getSize() const { return sizeof(*this) + sizeof(TPalette); }
 };
 
 //=============================================================================
-//CreateFolderUndo
+// CreateFolderUndo
 
 class CreateFolderUndo : public TUndo
 {
 	TFilePath m_folderPath;
 
-public:
-	CreateFolderUndo(const TFilePath &folderPath)
-		: m_folderPath(folderPath)
-	{
-	}
+  public:
+	CreateFolderUndo(const TFilePath &folderPath) : m_folderPath(folderPath) {}
 
-	void undo() const
-	{
-		StudioPalette::instance()->deleteFolder(m_folderPath);
-	}
+	void undo() const { StudioPalette::instance()->deleteFolder(m_folderPath); }
 	void redo() const
 	{
-		StudioPalette::instance()->createFolder(m_folderPath.getParentDir(), m_folderPath.getWideName());
+		StudioPalette::instance()->createFolder(m_folderPath.getParentDir(),
+												m_folderPath.getWideName());
 	}
-	int getSize() const
-	{
-		return sizeof(*this) + sizeof(TPalette);
-	}
+	int getSize() const { return sizeof(*this) + sizeof(TPalette); }
 };
 
 //=============================================================================
-//MovePaletteUndo
+// MovePaletteUndo
 
 class MovePaletteUndo : public TUndo
 {
 	TFilePath m_dstPath, m_srcPath;
 
-public:
+  public:
 	MovePaletteUndo(const TFilePath &dstPath, const TFilePath &srcPath)
 		: m_dstPath(dstPath), m_srcPath(srcPath)
 	{
 	}
 
-	void undo() const
-	{
-		StudioPalette::instance()->movePalette(m_srcPath, m_dstPath);
-	}
-	void redo() const
-	{
-		StudioPalette::instance()->movePalette(m_dstPath, m_srcPath);
-	}
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	void undo() const { StudioPalette::instance()->movePalette(m_srcPath, m_dstPath); }
+	void redo() const { StudioPalette::instance()->movePalette(m_dstPath, m_srcPath); }
+	int getSize() const { return sizeof(*this); }
 };
 
 //-----------------------------------------------------------------------------
@@ -290,9 +238,10 @@ void StudioPaletteCmd::loadIntoCurrentPalette(const TFilePath &fp)
 		return;
 
 	// DA FARE
-	TPalette *current = !palette->isCleanupPalette()
-							? app->getCurrentPalette()->getPalette()
-							: app->getCurrentScene()->getScene()->getProperties()->getCleanupPalette();
+	TPalette *current =
+		!palette->isCleanupPalette()
+			? app->getCurrentPalette()->getPalette()
+			: app->getCurrentScene()->getScene()->getProperties()->getCleanupPalette();
 	//    ? cc->getCleanupPalette()
 	//    : cc->getLevelPalette();
 
@@ -309,11 +258,10 @@ void StudioPaletteCmd::loadIntoCurrentPalette(const TFilePath &fp)
 	// DA FARE
 	//  if(cc->getCurrentStylePalette() == current && styleId>=current->getStyleCount())
 	//    cc->setCurrentStyle(1);
-	TUndoManager::manager()->add(
-		new PaletteAssignUndo(current, old, current->clone()));
+	TUndoManager::manager()->add(new PaletteAssignUndo(current, old, current->clone()));
 
 	// DA FARE
-	if ( //current == cc->getCurrentStylePalette() &&
+	if ( // current == cc->getCurrentStylePalette() &&
 		app->getCurrentLevel()->getLevel()) {
 		TXshSimpleLevel *sl = app->getCurrentLevel()->getSimpleLevel();
 		if (sl) {
@@ -336,9 +284,10 @@ void StudioPaletteCmd::mergeIntoCurrentPalette(const TFilePath &fp)
 	TApp *app = TApp::instance();
 
 	// DA FARE
-	TPalette *current = !palette->isCleanupPalette()
-							? app->getCurrentPalette()->getPalette()
-							: app->getCurrentScene()->getScene()->getProperties()->getCleanupPalette();
+	TPalette *current =
+		!palette->isCleanupPalette()
+			? app->getCurrentPalette()->getPalette()
+			: app->getCurrentScene()->getScene()->getProperties()->getCleanupPalette();
 	//    ? cc->getCleanupPalette()
 	//    : cc->getLevelPalette();
 
@@ -346,13 +295,12 @@ void StudioPaletteCmd::mergeIntoCurrentPalette(const TFilePath &fp)
 		return;
 	TPalette *old = current->clone();
 	current->merge(palette);
-	TUndoManager::manager()->add(
-		new PaletteAssignUndo(current, old, current->clone()));
+	TUndoManager::manager()->add(new PaletteAssignUndo(current, old, current->clone()));
 
 	app->getCurrentPalette()->notifyPaletteChanged();
 
 	// DA FARE
-	if ( //current == cc->getCurrentStylePalette() &&
+	if ( // current == cc->getCurrentStylePalette() &&
 		app->getCurrentLevel()->getLevel())
 		app->getCurrentLevel()->getLevel()->setDirtyFlag(true);
 }
@@ -362,14 +310,15 @@ void StudioPaletteCmd::mergeIntoCurrentPalette(const TFilePath &fp)
 void StudioPaletteCmd::replaceWithCurrentPalette(const TFilePath &fp)
 {
 	// DA FARE
-	//ColorController *cc = ColorController::instance();
+	// ColorController *cc = ColorController::instance();
 	StudioPalette *sp = StudioPalette::instance();
 	TPalette *palette = sp->getPalette(fp);
 
 	// DA FARE
-	TPalette *current = !palette->isCleanupPalette()
-							? TApp::instance()->getCurrentPalette()->getPalette()
-							: TApp::instance()->getCurrentScene()->getScene()->getProperties()->getCleanupPalette();
+	TPalette *current =
+		!palette->isCleanupPalette()
+			? TApp::instance()->getCurrentPalette()->getPalette()
+			: TApp::instance()->getCurrentScene()->getScene()->getProperties()->getCleanupPalette();
 	//    ? cc->getCleanupPalette()
 	//    : cc->getLevelPalette();
 	if (!current)
@@ -377,8 +326,7 @@ void StudioPaletteCmd::replaceWithCurrentPalette(const TFilePath &fp)
 	TPalette *old = palette->clone();
 	palette->assign(current);
 	sp->setPalette(fp, current);
-	TUndoManager::manager()->add(
-		new StudioPaletteAssignUndo(fp, old, current->clone()));
+	TUndoManager::manager()->add(new StudioPaletteAssignUndo(fp, old, current->clone()));
 	// DA FARE
 	// Cambio la studioPalette corrente
 	//  ColorController::instance()->setStudioPalette(palette);
@@ -400,15 +348,15 @@ void StudioPaletteCmd::loadIntoCleanupPalette(const TFilePath &fp)
 		return;
 	// DA FARE
 	//  TPalette *current = cc->getCleanupPalette();
-	TPalette *current = TApp::instance()->getCurrentScene()->getScene()->getProperties()->getCleanupPalette();
+	TPalette *current =
+		TApp::instance()->getCurrentScene()->getScene()->getProperties()->getCleanupPalette();
 	assert(current);
 	TPalette *old = current->clone();
 	current->assign(palette);
 	// DA FARE
 	//  if(cc->getCurrentStylePalette() == current && styleId>=current->getStyleCount())
 	//    cc->setCurrentStyle(1);
-	TUndoManager::manager()->add(
-		new PaletteAssignUndo(current, old, current->clone()));
+	TUndoManager::manager()->add(new PaletteAssignUndo(current, old, current->clone()));
 	TApp::instance()->getCurrentPalette()->notifyPaletteChanged();
 }
 
@@ -417,20 +365,20 @@ void StudioPaletteCmd::loadIntoCleanupPalette(const TFilePath &fp)
 void StudioPaletteCmd::replaceWithCleanupPalette(const TFilePath &fp)
 {
 	// DA FARE
-	//ColorController *cc = ColorController::instance();
+	// ColorController *cc = ColorController::instance();
 	StudioPalette *sp = StudioPalette::instance();
 	TPalette *palette = sp->getPalette(fp);
 
 	// DA FARE
-	//TPalette *current = cc->getCleanupPalette();
-	TPalette *current = TApp::instance()->getCurrentScene()->getScene()->getProperties()->getCleanupPalette();
+	// TPalette *current = cc->getCleanupPalette();
+	TPalette *current =
+		TApp::instance()->getCurrentScene()->getScene()->getProperties()->getCleanupPalette();
 	if (!current)
 		return;
 	TPalette *old = palette->clone();
 	palette->assign(current);
 	sp->setPalette(fp, current);
-	TUndoManager::manager()->add(
-		new StudioPaletteAssignUndo(fp, old, current->clone()));
+	TUndoManager::manager()->add(new StudioPaletteAssignUndo(fp, old, current->clone()));
 	TApp::instance()->getCurrentPalette()->notifyPaletteSwitched();
 }
 
@@ -458,7 +406,7 @@ void StudioPaletteCmd::updateAllLinkedStyles()
 					TFrameId fid = *it;
 					string id = sl->getImageId(fid);
 					IconGenerator::instance()->invalidate(sl, fid);
-					//ImageManager::instance()->invalidate(id);
+					// ImageManager::instance()->invalidate(id);
 				}
 			}
 		}
@@ -506,8 +454,7 @@ void StudioPaletteCmd::movePalette(const TFilePath &dstPath, const TFilePath &sr
 /*! Create palette \b palette in folder \b folderName with name \b paletteName.
 		If there are any problems send an error message.
 */
-TFilePath StudioPaletteCmd::createPalette(const TFilePath &folderName,
-										  string paletteName,
+TFilePath StudioPaletteCmd::createPalette(const TFilePath &folderName, string paletteName,
 										  const TPalette *palette)
 {
 	TFilePath palettePath;

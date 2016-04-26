@@ -20,13 +20,12 @@ class CenteredTextWidget : public QWidget
 {
 	QString m_text;
 
-public:
-	CenteredTextWidget(QWidget *parent = 0)
-		: QWidget(parent) {}
+  public:
+	CenteredTextWidget(QWidget *parent = 0) : QWidget(parent) {}
 
 	void setText(const QString &text) { m_text = text; }
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *)
 	{
 		QPainter p(this);
@@ -48,8 +47,7 @@ protected:
 		Inherits \b TPanel.
 */
 
-MessagePanel::MessagePanel(QWidget *parent)
-	: TPanel(parent)
+MessagePanel::MessagePanel(QWidget *parent) : TPanel(parent)
 {
 	setPanelType("Message");
 	setWindowTitle("Message");
@@ -125,8 +123,7 @@ LogPanel::LogPanel(QWidget *parent, Qt::WFlags flags)
 
 	setWidget(m_messageBox);
 
-	connect(TApp::instance()->getCurrentScene(), SIGNAL(sceneSwitched()),
-			this, SLOT(clear()));
+	connect(TApp::instance()->getCurrentScene(), SIGNAL(sceneSwitched()), this, SLOT(clear()));
 }
 
 //-----------------------------------------------------------------------------
@@ -185,7 +182,7 @@ void LogPanel::clear()
 
 class OpenFloatingLogPanel : public MenuItemHandler
 {
-public:
+  public:
 	OpenFloatingLogPanel() : MenuItemHandler(MI_OpenMessage) {}
 	void execute()
 	{

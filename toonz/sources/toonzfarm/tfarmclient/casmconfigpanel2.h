@@ -24,7 +24,7 @@ class FilePathField : public TTextField
 {
 	CasmConfigPanel2 *m_page;
 
-public:
+  public:
 	FilePathField(TWidget *parent, string name = "");
 
 	void onFocusChange(bool on);
@@ -36,7 +36,7 @@ public:
 
 class CasmConfigPanel2 : public TaskConfigPanel
 {
-public:
+  public:
 	CasmConfigPanel2(TWidget *parent);
 
 	void configureNotify(const TDimension &d);
@@ -48,7 +48,7 @@ public:
 	void onNumField(double v, int type);
 	void onColumnField(string value, int type);
 
-private:
+  private:
 	CasmTask2 *m_task;
 
 	TLabel *m_setupLabel;

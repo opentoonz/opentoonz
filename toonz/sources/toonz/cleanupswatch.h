@@ -3,7 +3,7 @@
 #include "traster.h"
 #include <QWidget>
 
-//class QPushButton;
+// class QPushButton;
 class QAction;
 class CleanupSwatch : public QWidget
 {
@@ -17,12 +17,12 @@ class CleanupSwatch : public QWidget
 		TRaster32P m_r;
 		TAffine getFinalAff();
 
-	public:
+	  public:
 		CleanupSwatchArea(CleanupSwatch *parent, bool isLeft);
 		void updateRaster(bool dragging = false);
 		void updateCleanupped(bool dragging = false);
 
-	protected:
+	  protected:
 		void paintEvent(QPaintEvent *event);
 		void mousePressEvent(QMouseEvent *event);
 		void mouseMoveEvent(QMouseEvent *event);
@@ -39,20 +39,20 @@ class CleanupSwatch : public QWidget
 	TAffine m_viewAff, m_resampleAff;
 	TRasterP m_resampledRaster;
 	TRasterP m_origRaster;
-	//TRasterP m_lastRasCleanupped;
-	//TPointD  m_lastCleanuppedPos;
-public:
+	// TRasterP m_lastRasCleanupped;
+	// TPointD  m_lastCleanuppedPos;
+  public:
 	CleanupSwatch(QWidget *parent, int lx, int ly);
 
 	void setRaster(TRasterP rasLeft, const TAffine &aff, TRasterP ras);
 	void updateCleanupped();
 	bool isEnabled();
 	void enable(bool state);
-	//void enableRightSwatch(bool state);
-protected:
-	//void hideEvent(QHideEvent* e);
+	// void enableRightSwatch(bool state);
+  protected:
+	// void hideEvent(QHideEvent* e);
 	void resizeEvent(QResizeEvent *event);
 
-signals:
+  signals:
 	void enabled();
 };

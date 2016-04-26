@@ -21,21 +21,21 @@ typedef std::vector<SXYD> BLURSECTION;
 
 class CBlurMatrix
 {
-public:
+  public:
 	bool m_isSAC; // Stop At Contour
 	bool m_isRS;  // Random Sampling
 	std::vector<BLURSECTION> m_m[NBRS];
 
 	CBlurMatrix() : m_isSAC(false), m_isRS(false){};
-	CBlurMatrix(const CBlurMatrix &m); //throw(SBlurMatrixError);
+	CBlurMatrix(const CBlurMatrix &m); // throw(SBlurMatrixError);
 	CBlurMatrix(const double d, const int nb, const bool isSAC, const bool isRS);
 	//	throw(SBlurMatrixError) ;
 	virtual ~CBlurMatrix();
 
-	void createRandom(const double d, const int nb); // throw(SBlurMatrixError);
-	void createEqual(const double d, const int nb);  // throw(SBlurMatrixError);
+	void createRandom(const double d, const int nb);	  // throw(SBlurMatrixError);
+	void createEqual(const double d, const int nb);		  // throw(SBlurMatrixError);
 	void addPath(std::vector<BLURSECTION>::iterator pBS); // throw(exception);
-	void addPath();									 // throw(SBlurMatrixError);
+	void addPath();										  // throw(SBlurMatrixError);
 	void print() const;
 	bool isIn(const std::vector<BLURSECTION> &m, const SXYD &xyd) const;
 };

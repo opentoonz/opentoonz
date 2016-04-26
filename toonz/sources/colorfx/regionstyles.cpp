@@ -131,7 +131,8 @@ QString MovingSolidColor::getParamNames(int index) const
 {
 	assert(0 <= index && index < 2);
 
-	return index == 0 ? QCoreApplication::translate("MovingSolidColor", "Horiz Offset") : QCoreApplication::translate("MovingSolidColor", "Vert Offset");
+	return index == 0 ? QCoreApplication::translate("MovingSolidColor", "Horiz Offset")
+					  : QCoreApplication::translate("MovingSolidColor", "Vert Offset");
 }
 
 //-----------------------------------------------------------------------------
@@ -182,7 +183,8 @@ void MovingSolidColor::setParamValue(int index, double value)
 
 //------------------------------------------------------------
 
-void MovingSolidColor::drawRegion(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &boundary) const
+void MovingSolidColor::drawRegion(const TColorFunction *cf, const bool antiAliasing,
+								  TRegionOutline &boundary) const
 {
 	TSolidColorStyle::drawRegion(cf, true, boundary);
 }
@@ -202,12 +204,10 @@ void MovingSolidColor::drawRegion(TFlash &flash, const TRegion *r) const
 //    ShadowStyle  implementation
 //***************************************************************************
 
-ShadowStyle::ShadowStyle(const TPixel32 &bgColor,
-						 const TPixel32 &shadowColor,
-						 const TPointD &shadowDirection,
-						 double len,
-						 double density)
-	: TSolidColorStyle(bgColor), m_shadowColor(shadowColor), m_shadowDirection(normalize(shadowDirection)), m_len(len), m_density(density)
+ShadowStyle::ShadowStyle(const TPixel32 &bgColor, const TPixel32 &shadowColor,
+						 const TPointD &shadowDirection, double len, double density)
+	: TSolidColorStyle(bgColor), m_shadowColor(shadowColor),
+	  m_shadowDirection(normalize(shadowDirection)), m_len(len), m_density(density)
 {
 }
 
@@ -353,7 +353,8 @@ void ShadowStyle::setParamValue(int index, double value)
 
 //------------------------------------------------------------
 
-void ShadowStyle::drawPolyline(const TColorFunction *cf, std::vector<T3DPointD> &polyline, TPointD shadowDirection) const
+void ShadowStyle::drawPolyline(const TColorFunction *cf, std::vector<T3DPointD> &polyline,
+							   TPointD shadowDirection) const
 {
 	int i;
 	int stepNumber;
@@ -370,8 +371,8 @@ void ShadowStyle::drawPolyline(const TColorFunction *cf, std::vector<T3DPointD> 
 
 	tglColor(color);
 
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// glEnable(GL_BLEND);
+	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//// <-- tglEnableBlending();
 
 	TRegionOutline::PointVector::iterator it;
@@ -417,7 +418,7 @@ void ShadowStyle::drawPolyline(const TColorFunction *cf, std::vector<T3DPointD> 
 
 		v1 = v2;
 	}
-	//tglColor(TPixel32::White);
+	// tglColor(TPixel32::White);
 }
 
 //------------------------------------------------------------
@@ -433,7 +434,7 @@ void ShadowStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing,
 
 	////stenc->beginMask();
 	/*
-  glBegin(GL_QUADS);      
+  glBegin(GL_QUADS);
   glVertex2d (regionOutline.m_bbox.getP00().x, regionOutline.m_bbox.getP00().y);
   glVertex2d (regionOutline.m_bbox.getP01().x, regionOutline.m_bbox.getP01().y);
   glVertex2d (regionOutline.m_bbox.getP11().x, regionOutline.m_bbox.getP11().y);
@@ -443,7 +444,7 @@ void ShadowStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing,
 	////stenc->endMask();
 	////stenc->enableMask(TStencilControl::SHOW_INSIDE);
 
-	if (backgroundColor.m == 0) { //only to create stencil mask
+	if (backgroundColor.m == 0) { // only to create stencil mask
 		TSolidColorStyle appStyle(TPixel32::White);
 		stenc->beginMask();
 		appStyle.drawRegion(0, false, regionOutline);
@@ -468,7 +469,7 @@ void ShadowStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing,
 	for (regions_it = regions_it_b; regions_it != regions_it_e; ++regions_it)
 		drawPolyline(cf, *regions_it, -m_shadowDirection);
 
-	//tglColor(TPixel32::White);
+	// tglColor(TPixel32::White);
 
 	stenc->disableMask();
 }
@@ -482,16 +483,16 @@ int ShadowStyle::drawPolyline(TFlash& flash, std::vector<T3DPointD> &polyline,
   int i;
   int stepNumber;
   double distance;
-  
+
   TPointD v1,v2,diff,midPoint,ratio;
   double len;
 
-   
+
   TRegionOutline::PointVector::iterator it;
   TRegionOutline::PointVector::iterator it_b = polyline.begin();
-  TRegionOutline::PointVector::iterator it_e = polyline.end();            
-  
- 
+  TRegionOutline::PointVector::iterator it_e = polyline.end();
+
+
   std::vector<TSegment> segmentArray;
 
   v1.x = polyline.back().x;
@@ -499,25 +500,25 @@ int ShadowStyle::drawPolyline(TFlash& flash, std::vector<T3DPointD> &polyline,
 
   for(it = it_b; it!= it_e; ++it)
   {
-    v2.x = it->x;
-    v2.y = it->y;
-    if (v1==v2)
-      continue;
+	v2.x = it->x;
+	v2.y = it->y;
+	if (v1==v2)
+	  continue;
 
 
-    diff = normalize(rotate90(v2-v1));
-    len=diff*shadowDirection;
+	diff = normalize(rotate90(v2-v1));
+	len=diff*shadowDirection;
 
-    if(len>0)
-    {
-      distance = tdistance(v1,v2)*m_density;
+	if(len>0)
+	{
+	  distance = tdistance(v1,v2)*m_density;
 
-      ratio= (v2-v1)*(1.0/distance);
-      midPoint=v1;
-      stepNumber= (int)distance;
+	  ratio= (v2-v1)*(1.0/distance);
+	  midPoint=v1;
+	  stepNumber= (int)distance;
 
-      for(i=0; i<stepNumber;i++ )
-      {	  
+	  for(i=0; i<stepNumber;i++ )
+	  {
 		  std::vector<TSegment> sa;
 
 		  TPointD p0=midPoint;
@@ -527,12 +528,12 @@ int ShadowStyle::drawPolyline(TFlash& flash, std::vector<T3DPointD> &polyline,
 		  segmentArray.push_back(TSegment(p1,p0));
 		  segmentArray.push_back(TSegment(p1,p2));
 
-          midPoint += ratio;
-      }
-            
-    }
+		  midPoint += ratio;
+	  }
 
-    v1=v2;
+	}
+
+	v1=v2;
   }
 
 
@@ -553,35 +554,35 @@ void ShadowStyle::drawRegion( TFlash& flash, const TRegion* r) const
 
   TRegionOutline::Boundary::iterator regions_it;
   TRegionOutline::Boundary::iterator regions_it_b = rdf.m_ro.m_exterior->begin();
-  TRegionOutline::Boundary::iterator regions_it_e = rdf.m_ro.m_exterior->end();            
+  TRegionOutline::Boundary::iterator regions_it_e = rdf.m_ro.m_exterior->end();
 
- 
+
 // In the GL version the shadow lines are not croped into the filled region.
-// This is the reason why I don't calculate the number of shadow lines. 
+// This is the reason why I don't calculate the number of shadow lines.
 //  int nbDraw=0;
 //  for( regions_it = regions_it_b ; regions_it!= regions_it_e; ++regions_it)
 //	  nbDraw+=drawPolyline(flash,*regions_it, m_shadowDirection,false);
 
 //  regions_it_b = rdf.m_ro.m_interior->begin();
-//  regions_it_e = rdf.m_ro.m_interior->end();            
+//  regions_it_e = rdf.m_ro.m_interior->end();
 //  for( regions_it = regions_it_b ; regions_it!= regions_it_e; ++regions_it)
 //     nbDraw+=drawPolyline(flash,*regions_it,-m_shadowDirection,false);
 
 
 // Only the bbox rectangle is croped.
-  flash.drawRegion(*r,1);  
+  flash.drawRegion(*r,1);
   flash.setFillColor(getMainColor());
   flash.drawRectangle(rdf.m_ro.m_bbox);
 
   regions_it_b = rdf.m_ro.m_exterior->begin();
-  regions_it_e = rdf.m_ro.m_exterior->end();            
+  regions_it_e = rdf.m_ro.m_exterior->end();
   for( regions_it = regions_it_b ; regions_it!= regions_it_e; ++regions_it)
 	  drawPolyline(flash,*regions_it, m_shadowDirection);
 
   regions_it_b = rdf.m_ro.m_interior->begin();
-  regions_it_e = rdf.m_ro.m_interior->end();            
+  regions_it_e = rdf.m_ro.m_interior->end();
   for( regions_it = regions_it_b ; regions_it!= regions_it_e; ++regions_it)
-     drawPolyline(flash,*regions_it,-m_shadowDirection);
+	 drawPolyline(flash,*regions_it,-m_shadowDirection);
 
 
 }
@@ -619,11 +620,10 @@ void ShadowStyle::makeIcon(const TDimension &d)
 //    ShadowStyle2  implementation
 //***************************************************************************
 
-ShadowStyle2::ShadowStyle2(const TPixel32 &bgColor,
-						   const TPixel32 &shadowColor,
-						   const TPointD &shadowDirection,
-						   double shadowLength)
-	: TSolidColorStyle(bgColor), m_shadowColor(shadowColor), m_shadowLength(shadowLength), m_shadowDirection(normalize(shadowDirection))
+ShadowStyle2::ShadowStyle2(const TPixel32 &bgColor, const TPixel32 &shadowColor,
+						   const TPointD &shadowDirection, double shadowLength)
+	: TSolidColorStyle(bgColor), m_shadowColor(shadowColor), m_shadowLength(shadowLength),
+	  m_shadowDirection(normalize(shadowDirection))
 {
 }
 
@@ -675,7 +675,8 @@ QString ShadowStyle2::getParamNames(int index) const
 {
 	assert(0 <= index && index < 2);
 
-	return index == 0 ? QCoreApplication::translate("ShadowStyle2", "Angle") : QCoreApplication::translate("ShadowStyle2", "Size");
+	return index == 0 ? QCoreApplication::translate("ShadowStyle2", "Angle")
+					  : QCoreApplication::translate("ShadowStyle2", "Size");
 }
 
 //-----------------------------------------------------------------------------
@@ -751,7 +752,8 @@ void ShadowStyle2::setParamValue(int index, double value)
 namespace
 {
 
-void drawShadowLine(TPixel32 shadowColor, TPixel32 color, TPointD v1, TPointD v2, TPointD diff1, TPointD diff2)
+void drawShadowLine(TPixel32 shadowColor, TPixel32 color, TPointD v1, TPointD v2, TPointD diff1,
+					TPointD diff2)
 {
 	v1 = v1 + diff1;
 	v2 = v2 + diff2;
@@ -767,10 +769,9 @@ void drawShadowLine(TPixel32 shadowColor, TPixel32 color, TPointD v1, TPointD v2
 		r1 = t * t * t;
 		r2 = 1 - r1;
 
-		TPixel32 c((int)(color.r * r2 + shadowColor.r * r1),
-				   (int)(color.g * r2 + shadowColor.g * r1),
-				   (int)(color.b * r2 + shadowColor.b * r1),
-				   (int)(color.m * r2 + shadowColor.m * r1));
+		TPixel32 c(
+			(int)(color.r * r2 + shadowColor.r * r1), (int)(color.g * r2 + shadowColor.g * r1),
+			(int)(color.b * r2 + shadowColor.b * r1), (int)(color.m * r2 + shadowColor.m * r1));
 		tglColor(c);
 		tglVertex(v1 + t * diff1);
 		tglVertex(v2 + t * diff2);
@@ -779,9 +780,8 @@ void drawShadowLine(TPixel32 shadowColor, TPixel32 color, TPointD v1, TPointD v2
 	glEnd();
 }
 
-int drawShadowLine(TFlash &flash, TPixel32 shadowColor, TPixel32 color,
-				   TPointD v1, TPointD v2, TPointD diff1, TPointD diff2,
-				   const bool isDraw = true)
+int drawShadowLine(TFlash &flash, TPixel32 shadowColor, TPixel32 color, TPointD v1, TPointD v2,
+				   TPointD diff1, TPointD diff2, const bool isDraw = true)
 {
 	int nbDraw = 0;
 
@@ -801,20 +801,18 @@ int drawShadowLine(TFlash &flash, TPixel32 shadowColor, TPixel32 color,
 		if (isFirst) {
 			r1 = t * t * t;
 			r2 = 1 - r1;
-			oc = TPixel32((int)(color.r * r2 + shadowColor.r * r1),
-						  (int)(color.g * r2 + shadowColor.g * r1),
-						  (int)(color.b * r2 + shadowColor.b * r1),
-						  (int)(color.m * r2 + shadowColor.m * r1));
+			oc = TPixel32(
+				(int)(color.r * r2 + shadowColor.r * r1), (int)(color.g * r2 + shadowColor.g * r1),
+				(int)(color.b * r2 + shadowColor.b * r1), (int)(color.m * r2 + shadowColor.m * r1));
 			ovv1 = v1 + t * diff1;
 			ovv2 = v2 + t * diff2;
 			isFirst = false;
 		} else {
 			r1 = t * t * t;
 			r2 = 1 - r1;
-			TPixel32 c((int)(color.r * r2 + shadowColor.r * r1),
-					   (int)(color.g * r2 + shadowColor.g * r1),
-					   (int)(color.b * r2 + shadowColor.b * r1),
-					   (int)(color.m * r2 + shadowColor.m * r1));
+			TPixel32 c(
+				(int)(color.r * r2 + shadowColor.r * r1), (int)(color.g * r2 + shadowColor.g * r1),
+				(int)(color.b * r2 + shadowColor.b * r1), (int)(color.m * r2 + shadowColor.m * r1));
 			vv1 = (v1 + t * diff1);
 			vv2 = (v2 + t * diff2);
 
@@ -842,7 +840,8 @@ int drawShadowLine(TFlash &flash, TPixel32 shadowColor, TPixel32 color,
 
 //------------------------------------------------------------
 
-void ShadowStyle2::drawPolyline(const TColorFunction *cf, const std::vector<T3DPointD> &polyline, TPointD shadowDirection) const
+void ShadowStyle2::drawPolyline(const TColorFunction *cf, const std::vector<T3DPointD> &polyline,
+								TPointD shadowDirection) const
 {
 	if (polyline.empty())
 		return;
@@ -863,8 +862,8 @@ void ShadowStyle2::drawPolyline(const TColorFunction *cf, const std::vector<T3DP
 
 	tglColor(shadowColor);
 
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// glEnable(GL_BLEND);
+	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//// <-- tglEnableBlending();
 	TRegionOutline::PointVector::const_iterator it;
 	TRegionOutline::PointVector::const_iterator it_b = polyline.begin();
@@ -905,7 +904,8 @@ void ShadowStyle2::drawPolyline(const TColorFunction *cf, const std::vector<T3DP
 		len2 = lens[count + 1];
 
 		if (v0 != v1 && len1 >= 0 && len2 >= 0 && (len1 + len2) > 0)
-			drawShadowLine(shadowColor, color, v0, v1, shadowDirection * len1 * m_shadowLength, shadowDirection * len2 * m_shadowLength);
+			drawShadowLine(shadowColor, color, v0, v1, shadowDirection * len1 * m_shadowLength,
+						   shadowDirection * len2 * m_shadowLength);
 	}
 	v0.x = polyline[count].x;
 	v0.y = polyline[count].y;
@@ -914,9 +914,10 @@ void ShadowStyle2::drawPolyline(const TColorFunction *cf, const std::vector<T3DP
 	len1 = lens[count];
 	len2 = lens[0];
 	if (v0 != v1 && len1 >= 0 && len2 >= 0 && (len1 + len2) > 0)
-		drawShadowLine(shadowColor, color, v0, v1, shadowDirection * len1 * m_shadowLength, shadowDirection * len2 * m_shadowLength);
+		drawShadowLine(shadowColor, color, v0, v1, shadowDirection * len1 * m_shadowLength,
+					   shadowDirection * len2 * m_shadowLength);
 
-	//tglColor(TPixel32::White);
+	// tglColor(TPixel32::White);
 }
 
 //------------------------------------------------------------
@@ -947,11 +948,11 @@ void ShadowStyle2::drawRegion(const TColorFunction *cf, const bool antiAliasing,
 	if (cf)
 		backgroundColor = (*(cf))(backgroundColor);
 
-	if (backgroundColor.m == 0) { //only to create stencil mask
+	if (backgroundColor.m == 0) { // only to create stencil mask
 		TSolidColorStyle appStyle(TPixel32::White);
-		stenc->beginMask(); //does not draw on screen
+		stenc->beginMask(); // does not draw on screen
 		appStyle.drawRegion(0, false, boundary);
-	} else { //create stencil mask and draw on screen
+	} else { // create stencil mask and draw on screen
 		stenc->beginMask(TStencilControl::DRAW_ALSO_ON_SCREEN);
 		TSolidColorStyle::drawRegion(cf, antiAliasing, boundary);
 	}
@@ -966,7 +967,7 @@ void ShadowStyle2::drawRegion(const TColorFunction *cf, const bool antiAliasing,
 	for (regions_it = regions_it_b; regions_it != regions_it_e; ++regions_it)
 		drawPolyline(cf, *regions_it, m_shadowDirection);
 
-	//tglColor(TPixel32::White);
+	// tglColor(TPixel32::White);
 
 	stenc->disableMask();
 }
@@ -1023,7 +1024,8 @@ int ShadowStyle2::drawPolyline(TFlash &flash, std::vector<T3DPointD> &polyline,
 		len2 = lens[count + 1];
 
 		if (v0 != v1 && len1 >= 0 && len2 >= 0 && (len1 + len2) > 0)
-			nbDraw += drawShadowLine(flash, shadowColor, color, v0, v1, shadowDirection * len1 * m_shadowLength,
+			nbDraw += drawShadowLine(flash, shadowColor, color, v0, v1,
+									 shadowDirection * len1 * m_shadowLength,
 									 shadowDirection * len2 * m_shadowLength, isDraw);
 	}
 	v0.x = polyline[count].x;
@@ -1033,7 +1035,8 @@ int ShadowStyle2::drawPolyline(TFlash &flash, std::vector<T3DPointD> &polyline,
 	len1 = lens[count];
 	len2 = lens[0];
 	if (v0 != v1 && len1 >= 0 && len2 >= 0 && (len1 + len2) > 0)
-		nbDraw += drawShadowLine(flash, shadowColor, color, v0, v1, shadowDirection * len1 * m_shadowLength,
+		nbDraw += drawShadowLine(flash, shadowColor, color, v0, v1,
+								 shadowDirection * len1 * m_shadowLength,
 								 shadowDirection * len2 * m_shadowLength, isDraw);
 
 	return nbDraw;
@@ -1099,8 +1102,7 @@ void RubberModifier::modify(TRegionOutline &outline) const
 //    TRubberFillStyle  implementation
 //***************************************************************************
 
-TRubberFillStyle::TRubberFillStyle(const TPixel32 &color, double deform)
-	: TSolidColorStyle(color)
+TRubberFillStyle::TRubberFillStyle(const TPixel32 &color, double deform) : TSolidColorStyle(color)
 {
 	m_regionOutlineModifier = new RubberModifier(deform);
 }
@@ -1207,7 +1209,8 @@ void TRubberFillStyle::saveData(TOutputStreamInterface &os) const
 
 //------------------------------------------------------------
 
-void TRubberFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &boundary) const
+void TRubberFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing,
+								  TRegionOutline &boundary) const
 {
 	TSolidColorStyle::drawRegion(cf, true, boundary);
 }
@@ -1227,14 +1230,12 @@ void TRubberFillStyle::drawRegion(TFlash &flash, const TRegion *r) const
 //    TPointShadowFillStyle  implementation
 //***************************************************************************
 
-TPointShadowFillStyle::TPointShadowFillStyle(
-	const TPixel32 &bgColor,
-	const TPixel32 &shadowColor,
-	const TPointD &shadowDirection,
-	double density,
-	double shadowSize,
-	double pointSize)
-	: TSolidColorStyle(bgColor), m_shadowColor(shadowColor), m_shadowDirection(normalize(shadowDirection)), m_shadowSize(shadowSize), m_density(density), m_pointSize(pointSize)
+TPointShadowFillStyle::TPointShadowFillStyle(const TPixel32 &bgColor, const TPixel32 &shadowColor,
+											 const TPointD &shadowDirection, double density,
+											 double shadowSize, double pointSize)
+	: TSolidColorStyle(bgColor), m_shadowColor(shadowColor),
+	  m_shadowDirection(normalize(shadowDirection)), m_shadowSize(shadowSize), m_density(density),
+	  m_pointSize(pointSize)
 {
 }
 
@@ -1338,7 +1339,7 @@ double TPointShadowFillStyle::getParamValue(TColorStyle::double_tag, int index) 
 		return m_pointSize;
 	}
 
-	//never
+	// never
 	return 0;
 }
 
@@ -1414,7 +1415,8 @@ void TPointShadowFillStyle::setColorParamValue(int index, const TPixel32 &color)
 
 //------------------------------------------------------------
 
-double TPointShadowFillStyle::triangleArea(const TPointD &a, const TPointD &b, const TPointD &c) const
+double TPointShadowFillStyle::triangleArea(const TPointD &a, const TPointD &b,
+										   const TPointD &c) const
 {
 	double ab = tdistance(a, b);
 	double ac = tdistance(a, c);
@@ -1449,9 +1451,7 @@ void TPointShadowFillStyle::shadowOnEdge_parallel(const TPointD &p0, const TPoin
 			r = r * r;
 			TPointD u = p1 + (p2 - p1) * q;
 			u = u + r * (len1 * (1.0 - q) + len2 * q) * m_shadowDirection * m_shadowSize;
-			tglColor(TPixel32(m_shadowColor.r,
-							  m_shadowColor.g,
-							  m_shadowColor.b,
+			tglColor(TPixel32(m_shadowColor.r, m_shadowColor.g, m_shadowColor.b,
 							  (int)((1.0 - r) * (double)m_shadowColor.m)));
 			tglVertex(u);
 		}
@@ -1460,11 +1460,9 @@ void TPointShadowFillStyle::shadowOnEdge_parallel(const TPointD &p0, const TPoin
 
 //------------------------------------------------------------
 
-int TPointShadowFillStyle::shadowOnEdge_parallel(TFlash &flash,
-												 const TPointD &p0, const TPointD &p1,
-												 const TPointD &p2, TRandom &rnd,
-												 const double radius,
-												 const bool isDraw) const
+int TPointShadowFillStyle::shadowOnEdge_parallel(TFlash &flash, const TPointD &p0,
+												 const TPointD &p1, const TPointD &p2, TRandom &rnd,
+												 const double radius, const bool isDraw) const
 {
 	int nbDraw = 0;
 
@@ -1492,9 +1490,10 @@ int TPointShadowFillStyle::shadowOnEdge_parallel(TFlash &flash,
 			u = u + r * (len1 * (1.0 - q) + len2 * q) * m_shadowDirection * m_shadowSize;
 			nbDraw++;
 			if (isDraw) {
-				flash.setFillColor(TPixel32(m_shadowColor.r, m_shadowColor.g, m_shadowColor.b, (int)((1.0 - r) * 255)));
+				flash.setFillColor(TPixel32(m_shadowColor.r, m_shadowColor.g, m_shadowColor.b,
+											(int)((1.0 - r) * 255)));
 				flash.drawEllipse(u, radius, radius);
-				//flash.drawDot(u,radius);
+				// flash.drawDot(u,radius);
 			}
 		}
 	}
@@ -1528,7 +1527,8 @@ void TPointShadowFillStyle::deleteSameVerts(TRegionOutline::Boundary::iterator &
 
 //------------------------------------------------------------
 
-void TPointShadowFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &boundary) const
+void TPointShadowFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing,
+									   TRegionOutline &boundary) const
 {
 
 	TStencilControl *stenc = TStencilControl::instance();
@@ -1536,11 +1536,11 @@ void TPointShadowFillStyle::drawRegion(const TColorFunction *cf, const bool anti
 	if (cf)
 		backgroundColor = (*(cf))(backgroundColor);
 
-	if (backgroundColor.m == 0) { //only to create stencil mask
+	if (backgroundColor.m == 0) { // only to create stencil mask
 		TSolidColorStyle appStyle(TPixel32::White);
-		stenc->beginMask(); //does not draw on screen
+		stenc->beginMask(); // does not draw on screen
 		appStyle.drawRegion(0, false, boundary);
-	} else { //create stencil mask and draw on screen
+	} else { // create stencil mask and draw on screen
 		stenc->beginMask(TStencilControl::DRAW_ALSO_ON_SCREEN);
 		TSolidColorStyle::drawRegion(cf, antiAliasing, boundary);
 	}
@@ -1551,10 +1551,10 @@ void TPointShadowFillStyle::drawRegion(const TColorFunction *cf, const bool anti
 	glGetFloatv(GL_POINT_SIZE, &pointSizeSave);
 	GLfloat sizes[2];
 	glGetFloatv(GL_POINT_SIZE_RANGE, sizes);
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//glEnable(GL_POINT_SMOOTH);
-	//glPointSize((float)(sizes[0]+(sizes[1]-sizes[0])*m_pointSize*0.01));
+	// glEnable(GL_BLEND);
+	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// glEnable(GL_POINT_SMOOTH);
+	// glPointSize((float)(sizes[0]+(sizes[1]-sizes[0])*m_pointSize*0.01));
 	tglEnablePointSmooth((float)(sizes[0] + (sizes[1] - sizes[0]) * m_pointSize * 0.01));
 
 	TRegionOutline::Boundary::iterator regions_it;
@@ -1657,20 +1657,18 @@ void TPointShadowFillStyle::drawRegion(TFlash &flash, const TRegion *r) const
 //    TDottedFillStyle  implementation
 //***************************************************************************
 
-TDottedFillStyle::TDottedFillStyle(
-	const TPixel32 &bgColor,
-	const TPixel32 &pointColor,
-	const double dotSize,
-	const double dotDist,
-	const bool isShifted)
-	: TSolidColorStyle(bgColor), m_pointColor(pointColor), m_dotSize(dotSize), m_dotDist(dotDist), m_isShifted(isShifted)
+TDottedFillStyle::TDottedFillStyle(const TPixel32 &bgColor, const TPixel32 &pointColor,
+								   const double dotSize, const double dotDist, const bool isShifted)
+	: TSolidColorStyle(bgColor), m_pointColor(pointColor), m_dotSize(dotSize), m_dotDist(dotDist),
+	  m_isShifted(isShifted)
 {
 }
 
 //------------------------------------------------------------
 
 TDottedFillStyle::TDottedFillStyle(const TPixel32 &color)
-	: TSolidColorStyle(TPixel32(0, 0, 200)), m_pointColor(color), m_dotSize(3.0), m_dotDist(15.0), m_isShifted(true)
+	: TSolidColorStyle(TPixel32(0, 0, 200)), m_pointColor(color), m_dotSize(3.0), m_dotDist(15.0),
+	  m_isShifted(true)
 {
 }
 
@@ -1702,7 +1700,8 @@ QString TDottedFillStyle::getParamNames(int index) const
 {
 	assert(0 <= index && index < 2);
 
-	return index == 0 ? QCoreApplication::translate("TDottedFillStyle", "Dot Size") : QCoreApplication::translate("TDottedFillStyle", "Dot Distance");
+	return index == 0 ? QCoreApplication::translate("TDottedFillStyle", "Dot Size")
+					  : QCoreApplication::translate("TDottedFillStyle", "Dot Distance");
 }
 
 //-----------------------------------------------------------------------------
@@ -1784,10 +1783,11 @@ void TDottedFillStyle::setColorParamValue(int index, const TPixel32 &color)
 
 //------------------------------------------------------------
 
-void TDottedFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &boundary) const
+void TDottedFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing,
+								  TRegionOutline &boundary) const
 {
 	double LDotDist = tmax(m_dotDist, 0.1);
-	//double LDotSize=m_dotSize;
+	// double LDotSize=m_dotSize;
 	bool LIsShifted = m_isShifted;
 	const bool isTransparent = m_pointColor.m < 255;
 
@@ -1796,11 +1796,11 @@ void TDottedFillStyle::drawRegion(const TColorFunction *cf, const bool antiAlias
 	if (cf)
 		backgroundColor = (*(cf))(backgroundColor);
 
-	if (backgroundColor.m == 0) { //only to create stencil mask
+	if (backgroundColor.m == 0) { // only to create stencil mask
 		TSolidColorStyle appStyle(TPixel32::White);
-		stenc->beginMask(); //does not draw on screen
+		stenc->beginMask(); // does not draw on screen
 		appStyle.drawRegion(0, false, boundary);
-	} else { //create stencil mask and draw on screen
+	} else { // create stencil mask and draw on screen
 		stenc->beginMask(TStencilControl::DRAW_ALSO_ON_SCREEN);
 		TSolidColorStyle::drawRegion(cf, antiAliasing, boundary);
 	}
@@ -1809,8 +1809,8 @@ void TDottedFillStyle::drawRegion(const TColorFunction *cf, const bool antiAlias
 	stenc->enableMask(TStencilControl::SHOW_INSIDE);
 
 	if (isTransparent) {
-		//glEnable(GL_BLEND);
-		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		// glEnable(GL_BLEND);
+		// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		//// <-- tglEnableBlending();
 	}
 
@@ -1824,15 +1824,16 @@ void TDottedFillStyle::drawRegion(const TColorFunction *cf, const bool antiAlias
 
 	int i = 0;
 	for (double y = boundary.m_bbox.y0; y <= boundary.m_bbox.y1; y += LDotDist, ++i) {
-		double x = LIsShifted && (i % 2) == 1 ? boundary.m_bbox.x0 + LDotDist / 2.0 : boundary.m_bbox.x0;
+		double x =
+			LIsShifted && (i % 2) == 1 ? boundary.m_bbox.x0 + LDotDist / 2.0 : boundary.m_bbox.x0;
 		for (; x <= boundary.m_bbox.x1; x += LDotDist)
 			tglDrawDisk(TPointD(x, y), m_dotSize);
 		//			tglDrawCircle(TPointD(x,y),m_dotSize);
 	}
 
 	if (isTransparent) {
-		//tglColor(TPixel32::White);
-		//glDisable(GL_BLEND);
+		// tglColor(TPixel32::White);
+		// glDisable(GL_BLEND);
 	}
 
 	stenc->disableMask();
@@ -1840,8 +1841,7 @@ void TDottedFillStyle::drawRegion(const TColorFunction *cf, const bool antiAlias
 
 //------------------------------------------------------------
 
-int TDottedFillStyle::nbClip(const double LDotDist, const bool LIsShifted,
-							 const TRectD &bbox) const
+int TDottedFillStyle::nbClip(const double LDotDist, const bool LIsShifted, const TRectD &bbox) const
 {
 	int nbClipLayers = 1; // the bbox rectangle
 	int i = 0;
@@ -1884,18 +1884,19 @@ void TDottedFillStyle::drawRegion(TFlash &flash, const TRegion *r) const
 //    TCheckedFillStyle  implementation
 //***************************************************************************
 
-TCheckedFillStyle::TCheckedFillStyle(
-	const TPixel32 &bgColor, const TPixel32 &pointColor,
-	const double HDist, const double HAngle,
-	const double VDist, const double VAngle, const double Thickness)
-	: TSolidColorStyle(bgColor), m_pointColor(pointColor), m_HDist(HDist), m_HAngle(HAngle), m_VDist(VDist), m_VAngle(VAngle), m_Thickness(Thickness)
+TCheckedFillStyle::TCheckedFillStyle(const TPixel32 &bgColor, const TPixel32 &pointColor,
+									 const double HDist, const double HAngle, const double VDist,
+									 const double VAngle, const double Thickness)
+	: TSolidColorStyle(bgColor), m_pointColor(pointColor), m_HDist(HDist), m_HAngle(HAngle),
+	  m_VDist(VDist), m_VAngle(VAngle), m_Thickness(Thickness)
 {
 }
 
 //------------------------------------------------------------
 
 TCheckedFillStyle::TCheckedFillStyle(const TPixel32 &color)
-	: TSolidColorStyle(TPixel32::Transparent), m_pointColor(color), m_HDist(15.0), m_HAngle(0.0), m_VDist(15.0), m_VAngle(0.0), m_Thickness(6.0)
+	: TSolidColorStyle(TPixel32::Transparent), m_pointColor(color), m_HDist(15.0), m_HAngle(0.0),
+	  m_VDist(15.0), m_VAngle(0.0), m_Thickness(6.0)
 {
 }
 
@@ -2052,8 +2053,7 @@ void TCheckedFillStyle::saveData(TOutputStreamInterface &os) const
 
 //------------------------------------------------------------
 
-void TCheckedFillStyle::getHThickline(const TPointD &lc, const double lx,
-									  TPointD &p0, TPointD &p1,
+void TCheckedFillStyle::getHThickline(const TPointD &lc, const double lx, TPointD &p0, TPointD &p1,
 									  TPointD &p2, TPointD &p3) const
 {
 	double l = m_Thickness / cos(degree2rad(m_HAngle));
@@ -2067,8 +2067,7 @@ void TCheckedFillStyle::getHThickline(const TPointD &lc, const double lx,
 
 //------------------------------------------------------------
 
-void TCheckedFillStyle::getVThickline(const TPointD &lc, const double ly,
-									  TPointD &p0, TPointD &p1,
+void TCheckedFillStyle::getVThickline(const TPointD &lc, const double ly, TPointD &p0, TPointD &p1,
 									  TPointD &p2, TPointD &p3) const
 {
 	double l = m_Thickness / cos(degree2rad(-m_VAngle));
@@ -2100,18 +2099,19 @@ void TCheckedFillStyle::setColorParamValue(int index, const TPixel32 &color)
 
 //------------------------------------------------------------
 
-void TCheckedFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &boundary) const
+void TCheckedFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing,
+								   TRegionOutline &boundary) const
 {
 	TStencilControl *stenc = TStencilControl::instance();
 	TPixel32 backgroundColor = TSolidColorStyle::getMainColor();
 	if (cf)
 		backgroundColor = (*(cf))(backgroundColor);
 
-	if (backgroundColor.m == 0) { //only to create stencil mask
+	if (backgroundColor.m == 0) { // only to create stencil mask
 		TSolidColorStyle appStyle(TPixel32::White);
-		stenc->beginMask(); //does not draw on screen
+		stenc->beginMask(); // does not draw on screen
 		appStyle.drawRegion(0, false, boundary);
-	} else { //create stencil mask and draw on screen
+	} else { // create stencil mask and draw on screen
 		stenc->beginMask(TStencilControl::DRAW_ALSO_ON_SCREEN);
 		TSolidColorStyle::drawRegion(cf, antiAliasing, boundary);
 	}
@@ -2120,8 +2120,8 @@ void TCheckedFillStyle::drawRegion(const TColorFunction *cf, const bool antiAlia
 
 	const bool isTransparent = m_pointColor.m < 255;
 	if (isTransparent) {
-		//glEnable(GL_BLEND);
-		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		// glEnable(GL_BLEND);
+		// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		//// <-- tglEnableBlending();
 	}
 
@@ -2169,8 +2169,8 @@ void TCheckedFillStyle::drawRegion(const TColorFunction *cf, const bool antiAlia
 	glEnd();
 
 	if (isTransparent) {
-		//tglColor(TPixel32::White);
-		//glDisable(GL_BLEND);
+		// tglColor(TPixel32::White);
+		// glDisable(GL_BLEND);
 	}
 
 	stenc->disableMask();
@@ -2279,7 +2279,8 @@ void ArtisticModifier::modify(TRegionOutline &outline) const
 				counter = 0;
 			}
 			if (pIt != regIt->begin()) {
-				double distance = (pIt->x - (pIt - 1)->x) * (pIt->x - (pIt - 1)->x) + (pIt->y - (pIt - 1)->y) * (pIt->y - (pIt - 1)->y);
+				double distance = (pIt->x - (pIt - 1)->x) * (pIt->x - (pIt - 1)->x) +
+								  (pIt->y - (pIt - 1)->y) * (pIt->y - (pIt - 1)->y);
 				counter += distance;
 			}
 			double wave = 1;
@@ -2315,8 +2316,7 @@ TOutlineStyle::RegionOutlineModifier *ArtisticModifier::clone() const
 //    ArtisticSolidColor  implementation
 //***************************************************************************
 
-ArtisticSolidColor::ArtisticSolidColor(
-	const TPixel32 &color, const TPointD &move, double period)
+ArtisticSolidColor::ArtisticSolidColor(const TPixel32 &color, const TPointD &move, double period)
 	: TSolidColorStyle(color)
 {
 	m_regionOutlineModifier = new ArtisticModifier(move, period);
@@ -2465,7 +2465,8 @@ void ArtisticSolidColor::setParamValue(int index, double value)
 
 //------------------------------------------------------------
 
-void ArtisticSolidColor::drawRegion(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &boundary) const
+void ArtisticSolidColor::drawRegion(const TColorFunction *cf, const bool antiAliasing,
+									TRegionOutline &boundary) const
 {
 	TSolidColorStyle::drawRegion(cf, true, boundary);
 }
@@ -2636,12 +2637,13 @@ void TChalkFillStyle::setColorParamValue(int index, const TPixel32 &color)
 
 //------------------------------------------------------------
 
-void TChalkFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &boundary) const
+void TChalkFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing,
+								 TRegionOutline &boundary) const
 {
-	//const bool isTransparent=m_color0.m<255;
+	// const bool isTransparent=m_color0.m<255;
 
-	//TRegionOutline::Boundary& exter=*(boundary.m_exterior);
-	//TRegionOutline::Boundary& inter=*(boundary.m_interior);
+	// TRegionOutline::Boundary& exter=*(boundary.m_exterior);
+	// TRegionOutline::Boundary& inter=*(boundary.m_interior);
 
 	TPixel32 color0;
 	if (cf)
@@ -2654,11 +2656,11 @@ void TChalkFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasi
 	if (cf)
 		backgroundColor = (*(cf))(backgroundColor);
 
-	if (backgroundColor.m == 0) { //only to create stencil mask
+	if (backgroundColor.m == 0) { // only to create stencil mask
 		TSolidColorStyle appStyle(TPixel32::White);
-		stenc->beginMask(); //does not draw on screen
+		stenc->beginMask(); // does not draw on screen
 		appStyle.drawRegion(0, false, boundary);
-	} else { //create stencil mask and draw on screen
+	} else { // create stencil mask and draw on screen
 		stenc->beginMask(TStencilControl::DRAW_ALSO_ON_SCREEN);
 		TSolidColorStyle::drawRegion(cf, antiAliasing, boundary);
 	}
@@ -2695,7 +2697,7 @@ void TChalkFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasi
 		glPopMatrix();
 	}
 
-	//glEnd(); e questo che era???
+	// glEnd(); e questo che era???
 
 	glDeleteLists(chalkId, 1);
 
@@ -2717,8 +2719,7 @@ void TChalkFillStyle::drawRegion(TFlash &flash, const TRegion *r) const
 	double r1 = (m_density - minDensity) / (maxDensity - minDensity);
 	double r2 = 1.0 - r1;
 
-	TPixel32 color((int)(bgColor.r * r2 + m_color0.r * r1),
-				   (int)(bgColor.g * r2 + m_color0.g * r1),
+	TPixel32 color((int)(bgColor.r * r2 + m_color0.r * r1), (int)(bgColor.g * r2 + m_color0.g * r1),
 				   (int)(bgColor.b * r2 + m_color0.b * r1),
 				   (int)(bgColor.m * r2 + m_color0.m * r1));
 
@@ -2729,15 +2730,15 @@ void TChalkFillStyle::drawRegion(TFlash &flash, const TRegion *r) const
 	SFlashUtils rdf(r);
 	rdf.computeRegionOutline();
 
-    TRandom rnd;
+	TRandom rnd;
 
-    const bool isTransparent=m_color0.m<255;
+	const bool isTransparent=m_color0.m<255;
 
 	TRegionOutline::Boundary& exter=*(rdf.m_ro.m_exterior);
 	TRegionOutline::Boundary& inter=*(rdf.m_ro.m_interior);
 
-    TPixel32 color0=m_color0;
-  
+	TPixel32 color0=m_color0;
+
 	double lx=rdf.m_ro.m_bbox.x1-rdf.m_ro.m_bbox.x0;
 	double ly=rdf.m_ro.m_bbox.y1-rdf.m_ro.m_bbox.y0;
 
@@ -2749,20 +2750,20 @@ void TChalkFillStyle::drawRegion(TFlash &flash, const TRegion *r) const
 
   flash.setFillColor(getMainColor());
   flash.drawRectangle(TRectD(TPointD(rdf.m_ro.m_bbox.x0,rdf.m_ro.m_bbox.y0),
-	                         TPointD(rdf.m_ro.m_bbox.x1,rdf.m_ro.m_bbox.y1)));
+							 TPointD(rdf.m_ro.m_bbox.x1,rdf.m_ro.m_bbox.y1)));
 
-  flash.setThickness(0.0);	
+  flash.setThickness(0.0);
   for( int i=0;i< pointNumber; i++ ) {
-       TPixel32 tmpcolor=color0;
-       double shiftx=rdf.m_ro.m_bbox.x0+rnd.getFloat()*lx;
-       double shifty=rdf.m_ro.m_bbox.y0+rnd.getFloat()*ly;
-       tmpcolor.m=(UCHAR)(tmpcolor.m*rnd.getFloat());
-       flash.setFillColor(tmpcolor);	
-       flash.pushMatrix();
+	   TPixel32 tmpcolor=color0;
+	   double shiftx=rdf.m_ro.m_bbox.x0+rnd.getFloat()*lx;
+	   double shifty=rdf.m_ro.m_bbox.y0+rnd.getFloat()*ly;
+	   tmpcolor.m=(UCHAR)(tmpcolor.m*rnd.getFloat());
+	   flash.setFillColor(tmpcolor);
+	   flash.pushMatrix();
 	   TTranslation tM(shiftx, shifty);
-       flash.multMatrix(tM);
-       flash.drawRectangle(TRectD(TPointD(-1,-1),TPointD(1,1)));
-       flash.popMatrix();
+	   flash.multMatrix(tM);
+	   flash.drawRectangle(TRectD(TPointD(-1,-1),TPointD(1,1)));
+	   flash.popMatrix();
 	}
   */
 }
@@ -2773,14 +2774,16 @@ void TChalkFillStyle::drawRegion(TFlash &flash, const TRegion *r) const
 
 TChessFillStyle::TChessFillStyle(const TPixel32 &bgColor, const TPixel32 &pointColor,
 								 const double HDist, const double VDist, const double Angle)
-	: TSolidColorStyle(bgColor), m_pointColor(pointColor), m_HDist(HDist), m_VDist(VDist), m_Angle(Angle)
+	: TSolidColorStyle(bgColor), m_pointColor(pointColor), m_HDist(HDist), m_VDist(VDist),
+	  m_Angle(Angle)
 {
 }
 
 //------------------------------------------------------------
 
 TChessFillStyle::TChessFillStyle(const TPixel32 &color)
-	: TSolidColorStyle(TPixel32::White), m_pointColor(color), m_HDist(10.0), m_VDist(10.0), m_Angle(0.0)
+	: TSolidColorStyle(TPixel32::White), m_pointColor(color), m_HDist(10.0), m_VDist(10.0),
+	  m_Angle(0.0)
 {
 }
 
@@ -2932,8 +2935,7 @@ void TChessFillStyle::makeGrid(TRectD &bbox, TRotation &rotM, std::vector<TPoint
 {
 	double lx = bbox.x1 - bbox.x0;
 	double ly = bbox.y1 - bbox.y0;
-	TPointD center = TPointD((bbox.x1 + bbox.x0) * 0.5,
-							 (bbox.y1 + bbox.y0) * 0.5);
+	TPointD center = TPointD((bbox.x1 + bbox.x0) * 0.5, (bbox.y1 + bbox.y0) * 0.5);
 	double l = (lx + ly) / 1.3;
 	double l2 = l / 2;
 
@@ -2950,7 +2952,8 @@ void TChessFillStyle::makeGrid(TRectD &bbox, TRotation &rotM, std::vector<TPoint
 
 //------------------------------------------------------------
 
-void TChessFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &boundary) const
+void TChessFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing,
+								 TRegionOutline &boundary) const
 {
 	//	const bool isTransparent=m_pointColor.m<255;
 
@@ -2959,11 +2962,11 @@ void TChessFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasi
 	if (cf)
 		backgroundColor = (*(cf))(backgroundColor);
 
-	if (backgroundColor.m == 0) { //only to create stencil mask
+	if (backgroundColor.m == 0) { // only to create stencil mask
 		TSolidColorStyle appStyle(TPixel32::White);
-		stenc->beginMask(); //does not draw on screen
+		stenc->beginMask(); // does not draw on screen
 		appStyle.drawRegion(0, false, boundary);
-	} else { //create stencil mask and draw on screen
+	} else { // create stencil mask and draw on screen
 		stenc->beginMask(TStencilControl::DRAW_ALSO_ON_SCREEN);
 		TSolidColorStyle::drawRegion(cf, antiAliasing, boundary);
 	}
@@ -3071,17 +3074,18 @@ void TChessFillStyle::drawRegion(TFlash &flash, const TRegion *r) const
 //    TStripeFillStyle  implementation
 //***************************************************************************
 
-TStripeFillStyle::TStripeFillStyle(
-	const TPixel32 &bgColor, const TPixel32 &pointColor,
-	const double Dist, const double Angle, const double Thickness)
-	: TSolidColorStyle(bgColor), m_pointColor(pointColor), m_Dist(Dist), m_Angle(Angle), m_Thickness(Thickness)
+TStripeFillStyle::TStripeFillStyle(const TPixel32 &bgColor, const TPixel32 &pointColor,
+								   const double Dist, const double Angle, const double Thickness)
+	: TSolidColorStyle(bgColor), m_pointColor(pointColor), m_Dist(Dist), m_Angle(Angle),
+	  m_Thickness(Thickness)
 {
 }
 
 //------------------------------------------------------------
 
 TStripeFillStyle::TStripeFillStyle(const TPixel32 &color)
-	: TSolidColorStyle(TPixel32::Transparent), m_pointColor(color), m_Dist(15.0), m_Angle(0.0), m_Thickness(6.0)
+	: TSolidColorStyle(TPixel32::Transparent), m_pointColor(color), m_Dist(15.0), m_Angle(0.0),
+	  m_Thickness(6.0)
 {
 }
 
@@ -3208,8 +3212,7 @@ void TStripeFillStyle::saveData(TOutputStreamInterface &os) const
 	os << m_pointColor;
 }
 
-void TStripeFillStyle::getThickline(const TPointD &lc, const double lx,
-									TPointD &p0, TPointD &p1,
+void TStripeFillStyle::getThickline(const TPointD &lc, const double lx, TPointD &p0, TPointD &p1,
 									TPointD &p2, TPointD &p3) const
 {
 	double l = m_Thickness / cos(degree2rad(m_Angle));
@@ -3243,18 +3246,18 @@ void TStripeFillStyle::setColorParamValue(int index, const TPixel32 &color)
 inline void trim(TPointD &p0, TPointD &p1, double y0, double y1)
 {
 	if (p0.y < y0) {
-		//Trim the first extreme of the segment at y0
+		// Trim the first extreme of the segment at y0
 		double t = (y0 - p0.y) / (p1.y - p0.y);
 		p0.x = p0.x + t * (p1.x - p0.x);
 		p0.y = y0;
 	} else if (p0.y > y1) {
-		//The same, at y1
+		// The same, at y1
 		double t = (y1 - p0.y) / (p1.y - p0.y);
 		p0.x = p0.x + t * (p1.x - p0.x);
 		p0.y = y1;
 	}
 
-	//Same for p1
+	// Same for p1
 	if (p1.y < y0) {
 		double t = (y0 - p1.y) / (p0.y - p1.y);
 		p1.x = p1.x + t * (p0.x - p1.x);
@@ -3268,7 +3271,8 @@ inline void trim(TPointD &p0, TPointD &p1, double y0, double y1)
 
 //------------------------------------------------------------
 
-void TStripeFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &boundary) const
+void TStripeFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing,
+								  TRegionOutline &boundary) const
 {
 	const bool isTransparent = m_pointColor.m < 255;
 
@@ -3278,7 +3282,7 @@ void TStripeFillStyle::drawRegion(const TColorFunction *cf, const bool antiAlias
 	if (cf)
 		backgroundColor = (*(cf))(backgroundColor);
 
-	if (backgroundColor.m == 0) { //only to create stencil mask
+	if (backgroundColor.m == 0) { // only to create stencil mask
 		TSolidColorStyle appStyle(TPixel32::White);
 		stenc->beginMask();
 		appStyle.drawRegion(0, false, boundary);
@@ -3291,8 +3295,8 @@ void TStripeFillStyle::drawRegion(const TColorFunction *cf, const bool antiAlias
 	stenc->enableMask(TStencilControl::SHOW_INSIDE);
 
 	if (isTransparent) {
-		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		//glEnable(GL_BLEND);
+		// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		// glEnable(GL_BLEND);
 		//// <-- tglEnableBlending();
 	}
 
@@ -3307,7 +3311,7 @@ void TStripeFillStyle::drawRegion(const TColorFunction *cf, const bool antiAlias
 	// Horizontal Lines
 	if (fabs(m_Angle) != 90) {
 		double lx = boundary.m_bbox.x1 - boundary.m_bbox.x0;
-		//double ly=boundary.m_bbox.y1-boundary.m_bbox.y0;
+		// double ly=boundary.m_bbox.y1-boundary.m_bbox.y0;
 		double beg = boundary.m_bbox.y0;
 		double end = boundary.m_bbox.y1;
 		beg = m_Angle <= 0 ? beg : beg - lx * tan(degree2rad(m_Angle));
@@ -3333,17 +3337,17 @@ void TStripeFillStyle::drawRegion(const TColorFunction *cf, const bool antiAlias
 
 		stenc2->enableMask(TStencilControl::SHOW_OUTSIDE);
 
-		if (m_Angle != 0) //ANTIALIASING
+		if (m_Angle != 0) // ANTIALIASING
 		{
-			//glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-			//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			//glEnable(GL_BLEND);
-			//glEnable(GL_LINE_SMOOTH);
+			// glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+			// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			// glEnable(GL_BLEND);
+			// glEnable(GL_LINE_SMOOTH);
 
 			tglEnableLineSmooth();
 
-			//NOTE: Trimming the fat lines is necessary outside the (-60, 60) angles interval
-			//seemingly due to a bug in MAC-Leopard's openGL implementation...
+			// NOTE: Trimming the fat lines is necessary outside the (-60, 60) angles interval
+			// seemingly due to a bug in MAC-Leopard's openGL implementation...
 
 			glBegin(GL_LINES);
 			for (y = beg; y <= end; y += dist) {
@@ -3381,7 +3385,7 @@ void TStripeFillStyle::drawRegion(const TColorFunction *cf, const bool antiAlias
 		glEnd();
 	}
 
-	//tglColor(TPixel32::White);
+	// tglColor(TPixel32::White);
 
 	stenc->disableMask();
 }
@@ -3394,7 +3398,7 @@ int TStripeFillStyle::nbClip(const TRectD &bbox) const
 
 	if (fabs(m_Angle) != 90) {
 		double lx = bbox.x1 - bbox.x0;
-		//double ly=bbox.y1-bbox.y0;
+		// double ly=bbox.y1-bbox.y0;
 		double beg = bbox.y0;
 		double end = bbox.y1;
 		beg = m_Angle <= 0 ? beg : beg - lx * tan(degree2rad(m_Angle));
@@ -3405,8 +3409,8 @@ int TStripeFillStyle::nbClip(const TRectD &bbox) const
 	} else {
 		double beg = bbox.x0;
 		double end = bbox.x1;
-		//double y0=bbox.y0;
-		//double y1=bbox.y1;
+		// double y0=bbox.y0;
+		// double y1=bbox.y1;
 		for (double x = beg; x <= end; x += m_Dist)
 			nbClip++;
 	}
@@ -3430,7 +3434,7 @@ void TStripeFillStyle::drawRegion(TFlash &flash, const TRegion *r) const
 	// Horizontal Lines
 	if (fabs(m_Angle) != 90) {
 		double lx = bbox.x1 - bbox.x0;
-		//double ly=bbox.y1-bbox.y0;
+		// double ly=bbox.y1-bbox.y0;
 		double beg = bbox.y0;
 		double end = bbox.y1;
 		beg = m_Angle <= 0 ? beg : beg - lx * tan(degree2rad(m_Angle));
@@ -3489,18 +3493,19 @@ void TStripeFillStyle::makeIcon(const TDimension &d)
 //    TLinGradFillStyle  implementation
 //***************************************************************************
 
-TLinGradFillStyle::TLinGradFillStyle(
-	const TPixel32 &bgColor, const TPixel32 &pointColor,
-	const double Angle, const double XPos, const double YPos,
-	const double Size)
-	: TSolidColorStyle(bgColor), m_pointColor(pointColor), m_Angle(Angle), m_XPos(XPos), m_YPos(YPos), m_Size(Size)
+TLinGradFillStyle::TLinGradFillStyle(const TPixel32 &bgColor, const TPixel32 &pointColor,
+									 const double Angle, const double XPos, const double YPos,
+									 const double Size)
+	: TSolidColorStyle(bgColor), m_pointColor(pointColor), m_Angle(Angle), m_XPos(XPos),
+	  m_YPos(YPos), m_Size(Size)
 {
 }
 
 //-----------------------------------------------------------------------------
 
 TLinGradFillStyle::TLinGradFillStyle(const TPixel32 &color)
-	: TSolidColorStyle(TPixel32::White), m_pointColor(color), m_Angle(0.0), m_XPos(0.0), m_YPos(0.0), m_Size(100.0)
+	: TSolidColorStyle(TPixel32::White), m_pointColor(color), m_Angle(0.0), m_XPos(0.0),
+	  m_YPos(0.0), m_Size(100.0)
 {
 }
 
@@ -3661,10 +3666,8 @@ void TLinGradFillStyle::setColorParamValue(int index, const TPixel32 &color)
 
 //------------------------------------------------------------
 
-void TLinGradFillStyle::getRects(const TRectD &bbox,
-								 std::vector<TPointD> &r0,
-								 std::vector<TPointD> &r1,
-								 std::vector<TPointD> &r2) const
+void TLinGradFillStyle::getRects(const TRectD &bbox, std::vector<TPointD> &r0,
+								 std::vector<TPointD> &r1, std::vector<TPointD> &r2) const
 {
 	r0.clear();
 	r1.clear();
@@ -3705,16 +3708,17 @@ void TLinGradFillStyle::getRects(const TRectD &bbox,
 
 //------------------------------------------------------------
 
-void TLinGradFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &boundary) const
+void TLinGradFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing,
+								   TRegionOutline &boundary) const
 {
-	//only to create stencil mask
+	// only to create stencil mask
 	TStencilControl *stenc = TStencilControl::instance();
 	TSolidColorStyle appStyle(TPixel32::White);
-	stenc->beginMask(); //does not draw on screen
+	stenc->beginMask(); // does not draw on screen
 	appStyle.drawRegion(0, false, boundary);
 	stenc->endMask();
 
-	//compute colors
+	// compute colors
 	TPixel32 color1, color2;
 	if (cf) {
 		color1 = (*(cf))(TSolidColorStyle::getMainColor());
@@ -3724,7 +3728,7 @@ void TLinGradFillStyle::drawRegion(const TColorFunction *cf, const bool antiAlia
 		color2 = m_pointColor;
 	}
 
-	//compute points
+	// compute points
 	TRectD bbox(boundary.m_bbox);
 	std::vector<TPointD> r0, r1, r2;
 	getRects(bbox, r0, r1, r2);
@@ -3732,7 +3736,7 @@ void TLinGradFillStyle::drawRegion(const TColorFunction *cf, const bool antiAlia
 	assert(r1.size() == 4);
 	assert(r2.size() == 4);
 
-	//draw
+	// draw
 
 	stenc->enableMask(TStencilControl::SHOW_INSIDE);
 
@@ -3767,7 +3771,8 @@ void TLinGradFillStyle::drawRegion(TFlash &flash, const TRegion *r) const
 	std::vector<TPointD> rect;
 
 	TPointD center((bbox.x1 + bbox.x0) / 2.0, (bbox.y1 + bbox.y0) / 2.0);
-	center = center + TPointD(m_XPos * 0.01 * (bbox.x1 - bbox.x0) * 0.5, m_YPos * 0.01 * (bbox.y1 - bbox.y0) * 0.5);
+	center = center + TPointD(m_XPos * 0.01 * (bbox.x1 - bbox.x0) * 0.5,
+							  m_YPos * 0.01 * (bbox.y1 - bbox.y0) * 0.5);
 	double l = tdistance(TPointD(bbox.x0, bbox.y0), TPointD(bbox.x1, bbox.y1));
 
 	TAffine M(TTranslation(center) * TRotation(m_Angle));
@@ -3787,7 +3792,7 @@ void TLinGradFillStyle::drawRegion(TFlash &flash, const TRegion *r) const
 // --- Old version ---
 void TLinGradFillStyle::drawRegion(TFlash& flash, const TRegion* r) const
 {
-  flash.drawRegion(*r,1); 
+  flash.drawRegion(*r,1);
   TRectD bbox(r->getBBox());
   TPointD p0,p1,p2,p3;
   p0=TPointD(bbox.x0,bbox.y0);
@@ -3843,18 +3848,19 @@ void TLinGradFillStyle::drawRegion(TFlash& flash, const TRegion* r) const
 //    TRadGradFillStyle  implementation
 //***************************************************************************
 
-TRadGradFillStyle::TRadGradFillStyle(
-	const TPixel32 &bgColor, const TPixel32 &pointColor,
-	const double XPos, const double YPos,
-	const double Radius, const double Smooth)
-	: TSolidColorStyle(bgColor), m_pointColor(pointColor), m_XPos(XPos), m_YPos(YPos), m_Radius(Radius), m_Smooth(Smooth)
+TRadGradFillStyle::TRadGradFillStyle(const TPixel32 &bgColor, const TPixel32 &pointColor,
+									 const double XPos, const double YPos, const double Radius,
+									 const double Smooth)
+	: TSolidColorStyle(bgColor), m_pointColor(pointColor), m_XPos(XPos), m_YPos(YPos),
+	  m_Radius(Radius), m_Smooth(Smooth)
 {
 }
 
 //-----------------------------------------------------------------------------
 
 TRadGradFillStyle::TRadGradFillStyle(const TPixel32 &color)
-	: TSolidColorStyle(TPixel32::White), m_pointColor(color), m_XPos(0.0), m_YPos(0.0), m_Radius(50.0), m_Smooth(50)
+	: TSolidColorStyle(TPixel32::White), m_pointColor(color), m_XPos(0.0), m_YPos(0.0),
+	  m_Radius(50.0), m_Smooth(50)
 {
 }
 
@@ -4015,12 +4021,13 @@ void TRadGradFillStyle::setColorParamValue(int index, const TPixel32 &color)
 
 //------------------------------------------------------------
 
-void TRadGradFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &boundary) const
+void TRadGradFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing,
+								   TRegionOutline &boundary) const
 {
 	TStencilControl *stenc = TStencilControl::instance();
-	//only to create stencil mask
+	// only to create stencil mask
 	TSolidColorStyle appStyle(TPixel32::White);
-	stenc->beginMask(); //does not draw on screen
+	stenc->beginMask(); // does not draw on screen
 	appStyle.drawRegion(0, false, boundary);
 	stenc->endMask();
 
@@ -4107,18 +4114,19 @@ void TRadGradFillStyle::drawRegion(TFlash &flash, const TRegion *r) const
 //    TCircleStripeFillStyle  implementation
 //***************************************************************************
 
-TCircleStripeFillStyle::TCircleStripeFillStyle(
-	const TPixel32 &bgColor, const TPixel32 &pointColor,
-	const double XPos, const double YPos,
-	const double Dist, const double Thickness)
-	: TSolidColorStyle(bgColor), m_pointColor(pointColor), m_XPos(XPos), m_YPos(YPos), m_Dist(Dist), m_Thickness(Thickness)
+TCircleStripeFillStyle::TCircleStripeFillStyle(const TPixel32 &bgColor, const TPixel32 &pointColor,
+											   const double XPos, const double YPos,
+											   const double Dist, const double Thickness)
+	: TSolidColorStyle(bgColor), m_pointColor(pointColor), m_XPos(XPos), m_YPos(YPos), m_Dist(Dist),
+	  m_Thickness(Thickness)
 {
 }
 
 //------------------------------------------------------------
 
 TCircleStripeFillStyle::TCircleStripeFillStyle(const TPixel32 &color)
-	: TSolidColorStyle(TPixel32::Transparent), m_pointColor(color), m_XPos(0.0), m_YPos(0.0), m_Dist(15.0), m_Thickness(3.0)
+	: TSolidColorStyle(TPixel32::Transparent), m_pointColor(color), m_XPos(0.0), m_YPos(0.0),
+	  m_Dist(15.0), m_Thickness(3.0)
 {
 }
 
@@ -4279,9 +4287,8 @@ void TCircleStripeFillStyle::setColorParamValue(int index, const TPixel32 &color
 
 //------------------------------------------------------------
 
-void TCircleStripeFillStyle::getCircleStripeQuads(const TPointD &center,
-												  const double r1, const double r2,
-												  std::vector<TPointD> &pv) const
+void TCircleStripeFillStyle::getCircleStripeQuads(const TPointD &center, const double r1,
+												  const double r2, std::vector<TPointD> &pv) const
 {
 	pv.clear();
 	const double dAng = 10.0;
@@ -4293,9 +4300,8 @@ void TCircleStripeFillStyle::getCircleStripeQuads(const TPointD &center,
 
 //------------------------------------------------------------
 
-void TCircleStripeFillStyle::drawCircleStripe(const TPointD &center,
-											  const double r1, const double r2,
-											  const TPixel32 &col) const
+void TCircleStripeFillStyle::drawCircleStripe(const TPointD &center, const double r1,
+											  const double r2, const TPixel32 &col) const
 {
 	std::vector<TPointD> pv;
 	getCircleStripeQuads(center, r1, r2, pv);
@@ -4313,10 +4319,10 @@ void TCircleStripeFillStyle::drawCircleStripe(const TPointD &center,
 	stencil->endMask();
 	stencil->enableMask(TStencilControl::SHOW_OUTSIDE);
 
-	//glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//glEnable(GL_BLEND);
-	//glEnable(GL_LINE_SMOOTH);
+	// glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// glEnable(GL_BLEND);
+	// glEnable(GL_LINE_SMOOTH);
 	tglEnableLineSmooth();
 
 	// Just for the antialiasing
@@ -4337,7 +4343,8 @@ void TCircleStripeFillStyle::drawCircleStripe(const TPointD &center,
 
 //------------------------------------------------------------
 
-void TCircleStripeFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &boundary) const
+void TCircleStripeFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing,
+										TRegionOutline &boundary) const
 {
 	const bool isTransparent = m_pointColor.m < 255;
 
@@ -4352,11 +4359,11 @@ void TCircleStripeFillStyle::drawRegion(const TColorFunction *cf, const bool ant
 	else
 		foregroundColor = m_pointColor;
 
-	if (backgroundColor.m == 0) { //only to create stencil mask
+	if (backgroundColor.m == 0) { // only to create stencil mask
 		TSolidColorStyle appStyle(TPixel32::White);
-		stenc->beginMask(); //does not draw on screen
+		stenc->beginMask(); // does not draw on screen
 		appStyle.drawRegion(0, false, boundary);
-	} else { //create stencil mask and draw on screen
+	} else { // create stencil mask and draw on screen
 		stenc->beginMask(TStencilControl::DRAW_ALSO_ON_SCREEN);
 		TSolidColorStyle::drawRegion(cf, antiAliasing, boundary);
 	}
@@ -4364,8 +4371,8 @@ void TCircleStripeFillStyle::drawRegion(const TColorFunction *cf, const bool ant
 	stenc->enableMask(TStencilControl::SHOW_INSIDE);
 
 	if (isTransparent) {
-		//glEnable(GL_BLEND);
-		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		// glEnable(GL_BLEND);
+		// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		//// <-- tglEnableBlending();
 	}
 
@@ -4387,8 +4394,8 @@ void TCircleStripeFillStyle::drawRegion(const TColorFunction *cf, const bool ant
 		drawCircleStripe(center, d - halfThick, d + halfThick, foregroundColor);
 
 	if (isTransparent) {
-		//tglColor(TPixel32::White);
-		//glDisable(GL_BLEND);
+		// tglColor(TPixel32::White);
+		// glDisable(GL_BLEND);
 	}
 
 	stenc->disableMask();
@@ -4439,13 +4446,11 @@ void TCircleStripeFillStyle::drawRegion(TFlash &flash, const TRegion *r) const
 //    TMosaicFillStyle  implementation
 //***************************************************************************
 
-TMosaicFillStyle::TMosaicFillStyle(const TPixel32 &bgColor,
-								   const TPixel32 pointColor[4],
-								   const double size,
-								   const double deform,
-								   const double minThickness,
-								   const double maxThickness)
-	: TSolidColorStyle(bgColor), m_size(size), m_deform(deform), m_minThickness(minThickness), m_maxThickness(maxThickness)
+TMosaicFillStyle::TMosaicFillStyle(const TPixel32 &bgColor, const TPixel32 pointColor[4],
+								   const double size, const double deform,
+								   const double minThickness, const double maxThickness)
+	: TSolidColorStyle(bgColor), m_size(size), m_deform(deform), m_minThickness(minThickness),
+	  m_maxThickness(maxThickness)
 {
 	for (int i = 0; i < 5; i++)
 		m_pointColor[i] = pointColor[i];
@@ -4454,7 +4459,8 @@ TMosaicFillStyle::TMosaicFillStyle(const TPixel32 &bgColor,
 //------------------------------------------------------------
 
 TMosaicFillStyle::TMosaicFillStyle(const TPixel32 bgColor)
-	: TSolidColorStyle(bgColor), m_size(25.0), m_deform(70.0), m_minThickness(20), m_maxThickness(40)
+	: TSolidColorStyle(bgColor), m_size(25.0), m_deform(70.0), m_minThickness(20),
+	  m_maxThickness(40)
 {
 	m_pointColor[0] = TPixel32::Blue;
 	m_pointColor[1] = TPixel32::Green;
@@ -4621,8 +4627,8 @@ void TMosaicFillStyle::setColorParamValue(int index, const TPixel32 &color)
 
 //------------------------------------------------------------
 
-void TMosaicFillStyle::preaprePos(const TRectD &box, std::vector<TPointD> &v,
-								  int &lX, int &lY, TRandom &rand) const
+void TMosaicFillStyle::preaprePos(const TRectD &box, std::vector<TPointD> &v, int &lX, int &lY,
+								  TRandom &rand) const
 {
 	double dist = 5.0 + (60.0 - 5.0) * tcrop(m_size, 0.0, 100.0) * 0.01;
 	lY = lX = 0;
@@ -4640,10 +4646,8 @@ void TMosaicFillStyle::preaprePos(const TRectD &box, std::vector<TPointD> &v,
 
 //------------------------------------------------------------
 
-bool TMosaicFillStyle::getQuad(const int ix, const int iy,
-							   const int lX, const int lY,
-							   std::vector<TPointD> &v,
-							   TPointD *pquad, TRandom &rand) const
+bool TMosaicFillStyle::getQuad(const int ix, const int iy, const int lX, const int lY,
+							   std::vector<TPointD> &v, TPointD *pquad, TRandom &rand) const
 {
 	if (ix < 0 || iy < 0 || ix >= (lX - 1) || iy >= (lY - 1))
 		return false;
@@ -4671,7 +4675,8 @@ bool TMosaicFillStyle::getQuad(const int ix, const int iy,
 
 //------------------------------------------------------------
 
-void TMosaicFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &boundary) const
+void TMosaicFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing,
+								  TRegionOutline &boundary) const
 {
 
 	TStencilControl *stenc = TStencilControl::instance();
@@ -4679,19 +4684,19 @@ void TMosaicFillStyle::drawRegion(const TColorFunction *cf, const bool antiAlias
 	if (cf)
 		backgroundColor = (*(cf))(backgroundColor);
 
-	if (backgroundColor.m == 0) { //only to create stencil mask
+	if (backgroundColor.m == 0) { // only to create stencil mask
 		TSolidColorStyle appStyle(TPixel32::White);
-		stenc->beginMask(); //does not draw on screen
+		stenc->beginMask(); // does not draw on screen
 		appStyle.drawRegion(0, false, boundary);
-	} else { //create stencil mask and draw on screen
+	} else { // create stencil mask and draw on screen
 		stenc->beginMask(TStencilControl::DRAW_ALSO_ON_SCREEN);
 		TSolidColorStyle::drawRegion(cf, antiAliasing, boundary);
 	}
 	stenc->endMask();
 	stenc->enableMask(TStencilControl::SHOW_INSIDE);
 
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// glEnable(GL_BLEND);
+	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//// <-- tglEnableBlending();
 
 	TPixel32 color[4];
@@ -4713,7 +4718,7 @@ void TMosaicFillStyle::drawRegion(const TColorFunction *cf, const bool antiAlias
 	glBegin(GL_QUADS);
 
 	/* ma serve ?
-	tglColor(getMainColor());	
+	tglColor(getMainColor());
 	tglVertex(TPointD(boundary.m_bbox.x0,boundary.m_bbox.y0));
 	tglVertex(TPointD(boundary.m_bbox.x0,boundary.m_bbox.y1));
 	tglVertex(TPointD(boundary.m_bbox.x1,boundary.m_bbox.y1));
@@ -4734,7 +4739,7 @@ void TMosaicFillStyle::drawRegion(const TColorFunction *cf, const bool antiAlias
 			}
 	glEnd();
 
-	//tglColor(TPixel32::White);
+	// tglColor(TPixel32::White);
 
 	stenc->disableMask();
 }
@@ -4779,11 +4784,8 @@ void TMosaicFillStyle::drawRegion(TFlash &flash, const TRegion *r) const
 //    TPatchFillStyle  implementation
 //***************************************************************************
 
-TPatchFillStyle::TPatchFillStyle(const TPixel32 &bgColor,
-								 const TPixel32 pointColor[6],
-								 const double size,
-								 const double deform,
-								 const double thickness)
+TPatchFillStyle::TPatchFillStyle(const TPixel32 &bgColor, const TPixel32 pointColor[6],
+								 const double size, const double deform, const double thickness)
 	: TSolidColorStyle(bgColor), m_size(size), m_deform(deform), m_thickness(thickness)
 {
 	for (int i = 0; i < 6; i++)
@@ -4946,8 +4948,8 @@ void TPatchFillStyle::setColorParamValue(int index, const TPixel32 &color)
 
 //------------------------------------------------------------
 
-void TPatchFillStyle::preaprePos(const TRectD &box, std::vector<TPointD> &v,
-								 int &lX, int &lY, TRandom &rand) const
+void TPatchFillStyle::preaprePos(const TRectD &box, std::vector<TPointD> &v, int &lX, int &lY,
+								 TRandom &rand) const
 {
 	double q = tcrop(m_size, 0.0, 100.0) * 0.01;
 	double r = 5.0 + (60.0 - 5.0) * q;
@@ -4972,8 +4974,8 @@ void TPatchFillStyle::preaprePos(const TRectD &box, std::vector<TPointD> &v,
 
 //------------------------------------------------------------
 
-bool TPatchFillStyle::getQuadLine(const TPointD &a, const TPointD &b,
-								  const double thickn, TPointD *quad) const
+bool TPatchFillStyle::getQuadLine(const TPointD &a, const TPointD &b, const double thickn,
+								  TPointD *quad) const
 {
 	if (tdistance(a, b) < TConsts::epsilon)
 		return false;
@@ -5008,7 +5010,8 @@ void TPatchFillStyle::drawGLQuad(const TPointD *quad) const
 
 //------------------------------------------------------------
 
-void TPatchFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &boundary) const
+void TPatchFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing,
+								 TRegionOutline &boundary) const
 {
 
 	TStencilControl *stenc = TStencilControl::instance();
@@ -5016,19 +5019,19 @@ void TPatchFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasi
 	if (cf)
 		backgroundColor = (*(cf))(backgroundColor);
 
-	if (backgroundColor.m == 0) { //only to create stencil mask
+	if (backgroundColor.m == 0) { // only to create stencil mask
 		TSolidColorStyle appStyle(TPixel32::White);
-		stenc->beginMask(); //does not draw on screen
+		stenc->beginMask(); // does not draw on screen
 		appStyle.drawRegion(0, false, boundary);
-	} else { //create stencil mask and draw on screen
+	} else { // create stencil mask and draw on screen
 		stenc->beginMask(TStencilControl::DRAW_ALSO_ON_SCREEN);
 		TSolidColorStyle::drawRegion(cf, antiAliasing, boundary);
 	}
 	stenc->endMask();
 	stenc->enableMask(TStencilControl::SHOW_INSIDE);
 
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// glEnable(GL_BLEND);
+	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//// <-- tglEnableBlending();
 
 	TPixel32 color[6];
@@ -5107,7 +5110,7 @@ void TPatchFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasi
 		}
 	}
 
-	//tglColor(TPixel32::White);
+	// tglColor(TPixel32::White);
 
 	stenc->disableMask();
 }
@@ -5158,9 +5161,7 @@ void TPatchFillStyle::drawFlashQuad(TFlash &flash, const TPointD *quad) const
 
 //------------------------------------------------------------
 
-void TPatchFillStyle::drawFlashTriangle(TFlash &flash,
-										const TPointD &p1,
-										const TPointD &p2,
+void TPatchFillStyle::drawFlashTriangle(TFlash &flash, const TPointD &p1, const TPointD &p2,
 										const TPointD &p3) const
 {
 	std::vector<TPointD> lvert;

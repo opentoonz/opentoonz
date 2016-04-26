@@ -62,7 +62,8 @@
 //**********************************************************************************************
 
 /*! \namespace Stage
-    \brief The Stage namespace provides objects, classes and methods useful to view or display images.
+	\brief The Stage namespace provides objects, classes and methods useful to view or display
+   images.
 */
 
 using namespace Stage;
@@ -84,7 +85,8 @@ namespace
 
 QImage rasterToQImage(const TRaster32P &ras)
 {
-	QImage image(ras->getRawData(), ras->getLx(), ras->getLy(), QImage::Format_ARGB32_Premultiplied);
+	QImage image(ras->getRawData(), ras->getLx(), ras->getLy(),
+				 QImage::Format_ARGB32_Premultiplied);
 	return image;
 }
 
@@ -116,7 +118,7 @@ QImage rasterToQImage(const TRasterP &ras)
 	else if (TRasterGR8P srcGr8 = ras)
 		return rasterToQImage(srcGr8);
 
-	//assert(!"Cannot use drawImage with this image!");
+	// assert(!"Cannot use drawImage with this image!");
 	return QImage();
 }
 
@@ -190,18 +192,15 @@ void draw3DShadow(const TRectD &bbox, double z, double phi)
   Returns from the specified player the stage object to be plastic
   deformed - or 0 if current Toonz rules prevent it from being deformed.
 */
-TStageObject *plasticDeformedObj(
-	const Stage::Player &player, const PlasticVisualSettings &pvs);
+TStageObject *plasticDeformedObj(const Stage::Player &player, const PlasticVisualSettings &pvs);
 
 //! Draws the specified mesh image
-void onMeshImage(
-	TMeshImage *mi, const Stage::Player &player,
-	const ImagePainter::VisualSettings &vs, const TAffine &viewAff);
+void onMeshImage(TMeshImage *mi, const Stage::Player &player,
+				 const ImagePainter::VisualSettings &vs, const TAffine &viewAff);
 
 //! Applies Plastic deformation of the specified player's stage object.
-void onPlasticDeformedImage(
-	TStageObject *playerObj, const Stage::Player &player,
-	const ImagePainter::VisualSettings &vs, const TAffine &viewAff);
+void onPlasticDeformedImage(TStageObject *playerObj, const Stage::Player &player,
+							const ImagePainter::VisualSettings &vs, const TAffine &viewAff);
 
 } // namespace
 
@@ -266,7 +265,8 @@ void Picker::onImage(const Stage::Player &player)
 		double rx = dx.x * dx.x + dx.y * dx.y;
 		double ry = dy.x * dy.x + dy.y * dy.y;
 		int radius = tround(sqrt(rx > ry ? rx : ry));
-		TRect rect = TRect(p.x - radius, p.y - radius, p.x + radius, p.y + radius) * ras->getBounds();
+		TRect rect =
+			TRect(p.x - radius, p.y - radius, p.x + radius, p.y + radius) * ras->getBounds();
 		for (int y = rect.y0; !picked && y <= rect.y1; y++) {
 			pix = ras->pixels(y);
 			for (int x = rect.x0; !picked && x <= rect.x1; x++)
@@ -358,38 +358,35 @@ int Picker::getRow() const
 //    RasterPainter  implementation
 //**********************************************************************************************
 
-RasterPainter::RasterPainter(
-	const TDimension &dim,
-	const TAffine &viewAff,
-	const TRect &rect,
-	const ImagePainter::VisualSettings &vs,
-	bool checkFlags)
-	: Visitor(vs), m_dim(dim), m_viewAff(viewAff), m_clipRect(rect), m_maskLevel(0), m_singleColumnEnabled(false), m_checkFlags(checkFlags), m_doRasterDarkenBlendedView(false)
+RasterPainter::RasterPainter(const TDimension &dim, const TAffine &viewAff, const TRect &rect,
+							 const ImagePainter::VisualSettings &vs, bool checkFlags)
+	: Visitor(vs), m_dim(dim), m_viewAff(viewAff), m_clipRect(rect), m_maskLevel(0),
+	  m_singleColumnEnabled(false), m_checkFlags(checkFlags), m_doRasterDarkenBlendedView(false)
 {
 }
 
 //-----------------------------------------------------------------------------
 
-//!Utilizzato solo per TAB Pro
+//! Utilizzato solo per TAB Pro
 void RasterPainter::beginMask()
 {
 	flushRasterImages(); // per evitare che venga fatto dopo il beginMask
 	++m_maskLevel;
 	TStencilControl::instance()->beginMask();
 }
-//!Utilizzato solo per TAB Pro
+//! Utilizzato solo per TAB Pro
 void RasterPainter::endMask()
 {
 	flushRasterImages(); // se ci sono delle immagini raster nella maschera devono uscire ora
 	--m_maskLevel;
 	TStencilControl::instance()->endMask();
 }
-//!Utilizzato solo per TAB Pro
+//! Utilizzato solo per TAB Pro
 void RasterPainter::enableMask()
 {
 	TStencilControl::instance()->enableMask(TStencilControl::SHOW_INSIDE);
 }
-//!Utilizzato solo per TAB Pro
+//! Utilizzato solo per TAB Pro
 void RasterPainter::disableMask()
 {
 	flushRasterImages(); // se ci sono delle immagini raster mascherate devono uscire ora
@@ -532,7 +529,9 @@ void RasterPainter::flushRasterImages()
 		TAffine aff = TTranslation(-rect.x0, -rect.y0) * m_nodes[i].m_aff;
 		TDimension imageDim = m_nodes[i].m_raster->getSize();
 		TPointD offset(0.5, 0.5);
-		aff *= TTranslation(offset); //very quick and very dirty fix: in camerastand the images seems shifted of an half pixel...it's a quickput approximation?
+		aff *= TTranslation(offset); // very quick and very dirty fix: in camerastand the images
+									 // seems shifted of an half pixel...it's a quickput
+									 // approximation?
 
 		TPixel32 colorscale = TPixel32(0, 0, 0, m_nodes[i].m_alpha);
 		int inksOnly;
@@ -541,14 +540,18 @@ void RasterPainter::flushRasterImages()
 			inksOnly = onionInksOnly;
 
 			if (m_nodes[i].m_onionMode == Node::eOnionSkinFront)
-				colorscale = TPixel32(frontOnionColor.r, frontOnionColor.g, frontOnionColor.b, m_nodes[i].m_alpha);
+				colorscale = TPixel32(frontOnionColor.r, frontOnionColor.g, frontOnionColor.b,
+									  m_nodes[i].m_alpha);
 			else if (m_nodes[i].m_onionMode == Node::eOnionSkinBack)
-				colorscale = TPixel32(backOnionColor.r, backOnionColor.g, backOnionColor.b, m_nodes[i].m_alpha);
+				colorscale = TPixel32(backOnionColor.r, backOnionColor.g, backOnionColor.b,
+									  m_nodes[i].m_alpha);
 		} else
 			inksOnly = tc & ToonzCheck::eInksOnly;
 
 		if (TRaster32P src32 = m_nodes[i].m_raster)
-			TRop::quickPut(viewedRaster, src32, aff, colorscale, m_nodes[i].m_doPremultiply, m_nodes[i].m_whiteTransp, m_nodes[i].m_isFirstColumn, m_doRasterDarkenBlendedView);
+			TRop::quickPut(viewedRaster, src32, aff, colorscale, m_nodes[i].m_doPremultiply,
+						   m_nodes[i].m_whiteTransp, m_nodes[i].m_isFirstColumn,
+						   m_doRasterDarkenBlendedView);
 		else if (TRasterGR8P srcGr8 = m_nodes[i].m_raster)
 			TRop::quickPut(viewedRaster, srcGr8, aff, colorscale);
 		else if (TRasterCM32P srcCm = m_nodes[i].m_raster) {
@@ -557,12 +560,15 @@ void RasterPainter::flushRasterImages()
 			m_nodes[i].m_palette->setFrame(m_nodes[i].m_frame);
 
 			TPaletteP plt;
-			if ((tc & ToonzCheck::eGap || tc & ToonzCheck::eAutoclose) && m_nodes[i].m_isCurrentColumn) {
+			if ((tc & ToonzCheck::eGap || tc & ToonzCheck::eAutoclose) &&
+				m_nodes[i].m_isCurrentColumn) {
 				srcCm = srcCm->clone();
 				plt = m_nodes[i].m_palette->clone();
 				int styleIndex = plt->addStyle(TPixel::Magenta);
 				if (tc & ToonzCheck::eAutoclose)
-					TAutocloser(srcCm, AutocloseDistance, AutocloseAngle, styleIndex, AutocloseOpacity).exec();
+					TAutocloser(srcCm, AutocloseDistance, AutocloseAngle, styleIndex,
+								AutocloseOpacity)
+						.exec();
 				if (tc & ToonzCheck::eGap)
 					AreaFiller(srcCm).rectFill(m_nodes[i].m_savebox, 1, true, true, false);
 			} else
@@ -578,8 +584,12 @@ void RasterPainter::flushRasterImages()
 				settings.m_transparencyCheck = tc & (ToonzCheck::eTransparency | ToonzCheck::eGap);
 				settings.m_blackBgCheck = tc & ToonzCheck::eBlackBg;
 				/*-- InkCheck, Ink#1Check, PaintCheckはカレントカラムにのみ有効 --*/
-				settings.m_inkIndex = m_nodes[i].m_isCurrentColumn ? (tc & ToonzCheck::eInk ? index : (tc & ToonzCheck::eInk1 ? 1 : -1)) : -1;
-				settings.m_paintIndex = m_nodes[i].m_isCurrentColumn ? (tc & ToonzCheck::ePaint ? index : -1) : -1;
+				settings.m_inkIndex =
+					m_nodes[i].m_isCurrentColumn
+						? (tc & ToonzCheck::eInk ? index : (tc & ToonzCheck::eInk1 ? 1 : -1))
+						: -1;
+				settings.m_paintIndex =
+					m_nodes[i].m_isCurrentColumn ? (tc & ToonzCheck::ePaint ? index : -1) : -1;
 
 				Preferences::instance()->getTranspCheckData(settings.m_transpCheckBg,
 															settings.m_transpCheckInk,
@@ -696,7 +706,8 @@ void RasterPainter::drawRasterImages(QPainter &p, QPolygon cameraPol)
 }
 
 void buildAutocloseImage(TVectorImage *vaux, TVectorImage *vi,
-						 const std::vector<std::pair<int, double>> &startPoints, const std::vector<std::pair<int, double>> &endPoints)
+						 const std::vector<std::pair<int, double>> &startPoints,
+						 const std::vector<std::pair<int, double>> &endPoints)
 {
 	for (UINT i = 0; i < startPoints.size(); i++) {
 		TThickPoint p1 = vi->getStroke(startPoints[i].first)->getThickPoint(startPoints[i].second);
@@ -807,21 +818,19 @@ void RasterPainter::onVectorImage(TVectorImage *vi, const Stage::Player &player)
 		double m[4] = {1.0, 1.0, 1.0, 1.0}, c[4];
 
 		// Weighted addition to RGB and matte multiplication
-		m[3] = 1.0 - ((player.m_onionSkinDistance == 0) ? 0.1 : OnionSkinMask::getOnionSkinFade(player.m_onionSkinDistance));
-		c[0] = (1.0 - m[3]) * bgColor.r, c[1] = (1.0 - m[3]) * bgColor.g, c[2] = (1.0 - m[3]) * bgColor.b;
+		m[3] = 1.0 - ((player.m_onionSkinDistance == 0) ? 0.1 : OnionSkinMask::getOnionSkinFade(
+																	player.m_onionSkinDistance));
+		c[0] = (1.0 - m[3]) * bgColor.r, c[1] = (1.0 - m[3]) * bgColor.g,
+		c[2] = (1.0 - m[3]) * bgColor.b;
 		c[3] = 0.0;
 
 		cf = new TGenericColorFunction(m, c);
 	} else if (player.m_opacity < 255)
 		cf = new TTranspFader(player.m_opacity / 255.0);
 
-	TVectorRenderData rd(
-		m_viewAff * player.m_placement,
-		TRect(),
-		vPalette,
-		cf,
-		true // alpha enabled
-		);
+	TVectorRenderData rd(m_viewAff * player.m_placement, TRect(), vPalette, cf,
+						 true // alpha enabled
+						 );
 
 	rd.m_drawRegions = !inksOnly;
 	rd.m_inkCheckEnabled = tc & ToonzCheck::eInk;
@@ -844,8 +853,7 @@ void RasterPainter::onVectorImage(TVectorImage *vi, const Stage::Player &player)
 	if (m_vs.m_colorMask != 0) {
 		glColorMask((m_vs.m_colorMask & TRop::RChan) ? GL_TRUE : GL_FALSE,
 					(m_vs.m_colorMask & TRop::GChan) ? GL_TRUE : GL_FALSE,
-					(m_vs.m_colorMask & TRop::BChan) ? GL_TRUE : GL_FALSE,
-					GL_TRUE);
+					(m_vs.m_colorMask & TRop::BChan) ? GL_TRUE : GL_FALSE, GL_TRUE);
 	}
 	TVectorImageP viDelete;
 	if (tc & ToonzCheck::eGap) {
@@ -882,7 +890,10 @@ void RasterPainter::onRasterImage(TRasterImage *ri, const Stage::Player &player)
 
 	TAffine aff;
 	aff = m_viewAff * player.m_placement * player.m_dpiAff;
-	aff = TTranslation(m_dim.lx * 0.5, m_dim.ly * 0.5) * aff * TTranslation(-r->getCenterD() + convert(ri->getOffset())); //this offset is !=0 only if in cleanup camera test mode
+	aff = TTranslation(m_dim.lx * 0.5, m_dim.ly * 0.5) * aff *
+		  TTranslation(
+			  -r->getCenterD() +
+			  convert(ri->getOffset())); // this offset is !=0 only if in cleanup camera test mode
 
 	TRectD bbox = TRectD(0, 0, m_dim.lx, m_dim.ly);
 	bbox *= convert(m_clipRect);
@@ -896,9 +907,15 @@ void RasterPainter::onRasterImage(TRasterImage *ri, const Stage::Player &player)
 		// 1 opaco -> 0 completamente trasparente
 		// inverto quindi il risultato della funzione stando attento al caso 0
 		// (in cui era scolpito il valore 0.9)
-		double onionSkiFade = player.m_onionSkinDistance == 0 ? 0.9 : (1.0 - OnionSkinMask::getOnionSkinFade(player.m_onionSkinDistance));
+		double onionSkiFade =
+			player.m_onionSkinDistance == 0
+				? 0.9
+				: (1.0 - OnionSkinMask::getOnionSkinFade(player.m_onionSkinDistance));
 		alpha = tcrop(tround(onionSkiFade * 255.0), 0, 255);
-		onionMode = (player.m_onionSkinDistance > 0) ? Node::eOnionSkinFront : ((player.m_onionSkinDistance < 0) ? Node::eOnionSkinBack : Node::eOnionSkinNone);
+		onionMode =
+			(player.m_onionSkinDistance > 0)
+				? Node::eOnionSkinFront
+				: ((player.m_onionSkinDistance < 0) ? Node::eOnionSkinBack : Node::eOnionSkinNone);
 	} else if (player.m_opacity < 255)
 		alpha = player.m_opacity;
 	TXshSimpleLevel *sl = player.m_sl;
@@ -912,11 +929,13 @@ void RasterPainter::onRasterImage(TRasterImage *ri, const Stage::Player &player)
 			whiteTransp = true;
 	}
 
-	bool ignoreAlpha = (Preferences::instance()->isIgnoreAlphaonColumn1Enabled() &&
-						player.m_column == 0 &&
-						isSubsheetChainOnColumn0(sl->getScene()->getTopXsheet(), player.m_xsh, player.m_frame));
+	bool ignoreAlpha =
+		(Preferences::instance()->isIgnoreAlphaonColumn1Enabled() && player.m_column == 0 &&
+		 isSubsheetChainOnColumn0(sl->getScene()->getTopXsheet(), player.m_xsh, player.m_frame));
 
-	m_nodes.push_back(Node(r, 0, alpha, aff, ri->getSavebox(), bbox, player.m_frame, player.m_isCurrentColumn, onionMode, doPremultiply, whiteTransp, ignoreAlpha));
+	m_nodes.push_back(Node(r, 0, alpha, aff, ri->getSavebox(), bbox, player.m_frame,
+						   player.m_isCurrentColumn, onionMode, doPremultiply, whiteTransp,
+						   ignoreAlpha));
 }
 
 //-----------------------------------------------------------------------------
@@ -929,8 +948,7 @@ void RasterPainter::onToonzImage(TToonzImage *ti, const Stage::Player &player)
 		return;
 
 	TAffine aff = m_viewAff * player.m_placement * player.m_dpiAff;
-	aff =
-		TTranslation(m_dim.lx / 2.0, m_dim.ly / 2.0) * aff * TTranslation(-r->getCenterD());
+	aff = TTranslation(m_dim.lx / 2.0, m_dim.ly / 2.0) * aff * TTranslation(-r->getCenterD());
 
 	TRectD bbox = TRectD(0, 0, m_dim.lx, m_dim.ly);
 	bbox *= convert(m_clipRect);
@@ -944,13 +962,20 @@ void RasterPainter::onToonzImage(TToonzImage *ti, const Stage::Player &player)
 		// 1 opaco -> 0 completamente trasparente
 		// inverto quindi il risultato della funzione stando attento al caso 0
 		// (in cui era scolpito il valore 0.9)
-		double onionSkiFade = player.m_onionSkinDistance == 0 ? 0.9 : (1.0 - OnionSkinMask::getOnionSkinFade(player.m_onionSkinDistance));
+		double onionSkiFade =
+			player.m_onionSkinDistance == 0
+				? 0.9
+				: (1.0 - OnionSkinMask::getOnionSkinFade(player.m_onionSkinDistance));
 		alpha = tcrop(tround(onionSkiFade * 255.0), 0, 255);
-		onionMode = (player.m_onionSkinDistance > 0) ? Node::eOnionSkinFront : ((player.m_onionSkinDistance < 0) ? Node::eOnionSkinBack : Node::eOnionSkinNone);
+		onionMode =
+			(player.m_onionSkinDistance > 0)
+				? Node::eOnionSkinFront
+				: ((player.m_onionSkinDistance < 0) ? Node::eOnionSkinBack : Node::eOnionSkinNone);
 	} else if (player.m_opacity < 255)
 		alpha = player.m_opacity;
 
-	m_nodes.push_back(Node(r, ti->getPalette(), alpha, aff, ti->getSavebox(), bbox, player.m_frame, player.m_isCurrentColumn, onionMode, false, false, false));
+	m_nodes.push_back(Node(r, ti->getPalette(), alpha, aff, ti->getSavebox(), bbox, player.m_frame,
+						   player.m_isCurrentColumn, onionMode, false, false, false));
 }
 
 //**********************************************************************************************
@@ -958,9 +983,11 @@ void RasterPainter::onToonzImage(TToonzImage *ti, const Stage::Player &player)
 //**********************************************************************************************
 
 OpenGlPainter::OpenGlPainter(const TAffine &viewAff, const TRect &rect,
-							 const ImagePainter::VisualSettings &vs,
-							 bool isViewer, bool alphaEnabled)
-	: Visitor(vs), m_viewAff(viewAff), m_clipRect(rect), m_camera3d(false), m_phi(0), m_maskLevel(0), m_isViewer(isViewer), m_alphaEnabled(alphaEnabled), m_paletteHasChanged(false), m_minZ(0)
+							 const ImagePainter::VisualSettings &vs, bool isViewer,
+							 bool alphaEnabled)
+	: Visitor(vs), m_viewAff(viewAff), m_clipRect(rect), m_camera3d(false), m_phi(0),
+	  m_maskLevel(0), m_isViewer(isViewer), m_alphaEnabled(alphaEnabled),
+	  m_paletteHasChanged(false), m_minZ(0)
 {
 }
 
@@ -999,8 +1026,8 @@ void OpenGlPainter::onImage(const Stage::Player &player)
 
 void OpenGlPainter::onVectorImage(TVectorImage *vi, const Stage::Player &player)
 {
-	if (m_camera3d && (player.m_onionSkinDistance == c_noOnionSkin ||
-					   player.m_onionSkinDistance == 0)) {
+	if (m_camera3d &&
+		(player.m_onionSkinDistance == c_noOnionSkin || player.m_onionSkinDistance == 0)) {
 		const TRectD &bbox = player.m_placement * player.m_dpiAff * vi->getBBox();
 		draw3DShadow(bbox, player.m_z, m_phi);
 	}
@@ -1019,10 +1046,11 @@ void OpenGlPainter::onVectorImage(TVectorImage *vi, const Stage::Player &player)
 		cf = &fader;
 	}
 
-	TVectorRenderData rd = isViewer() ? TVectorRenderData(TVectorRenderData::ViewerSettings(),
-														  m_viewAff * player.m_placement, m_clipRect, vPalette)
-									  : TVectorRenderData(TVectorRenderData::ProductionSettings(),
-														  m_viewAff * player.m_placement, m_clipRect, vPalette);
+	TVectorRenderData rd =
+		isViewer() ? TVectorRenderData(TVectorRenderData::ViewerSettings(),
+									   m_viewAff * player.m_placement, m_clipRect, vPalette)
+				   : TVectorRenderData(TVectorRenderData::ProductionSettings(),
+									   m_viewAff * player.m_placement, m_clipRect, vPalette);
 
 	rd.m_alphaChannel = m_alphaEnabled;
 	rd.m_is3dView = m_camera3d;
@@ -1039,8 +1067,8 @@ void OpenGlPainter::onVectorImage(TVectorImage *vi, const Stage::Player &player)
 
 void OpenGlPainter::onRasterImage(TRasterImage *ri, const Stage::Player &player)
 {
-	if (m_camera3d && (player.m_onionSkinDistance == c_noOnionSkin ||
-					   player.m_onionSkinDistance == 0)) {
+	if (m_camera3d &&
+		(player.m_onionSkinDistance == c_noOnionSkin || player.m_onionSkinDistance == 0)) {
 		TRectD bbox(ri->getBBox());
 
 		// Since bbox is in image coordinates, adjust to level coordinates first
@@ -1057,9 +1085,9 @@ void OpenGlPainter::onRasterImage(TRasterImage *ri, const Stage::Player &player)
 	if (tlvFlag && m_paletteHasChanged) // o.o! Raster images here - should never be
 		assert(false);					// dealing with tlv stuff!
 
-	bool premultiplied = tlvFlag;  // xD
+	bool premultiplied = tlvFlag;		// xD
 	static std::vector<char> matteChan; // Wtf this is criminal. Altough probably this
-								   // stuff is used only in the main thread... hmmm....
+										// stuff is used only in the main thread... hmmm....
 	TRaster32P r = (TRaster32P)ri->getRaster();
 	r->lock();
 
@@ -1088,10 +1116,9 @@ void OpenGlPainter::onRasterImage(TRasterImage *ri, const Stage::Player &player)
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	tglEnableBlending(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
-	GLRasterPainter::drawRaster(
-		m_viewAff * player.m_placement * aff * TTranslation(convert(ri->getOffset())),
-		ri,
-		premultiplied);
+	GLRasterPainter::drawRaster(m_viewAff * player.m_placement * aff *
+									TTranslation(convert(ri->getOffset())),
+								ri, premultiplied);
 
 	glPopAttrib();
 
@@ -1113,8 +1140,8 @@ void OpenGlPainter::onRasterImage(TRasterImage *ri, const Stage::Player &player)
 
 void OpenGlPainter::onToonzImage(TToonzImage *ti, const Stage::Player &player)
 {
-	if (m_camera3d && (player.m_onionSkinDistance == c_noOnionSkin ||
-					   player.m_onionSkinDistance == 0)) {
+	if (m_camera3d &&
+		(player.m_onionSkinDistance == c_noOnionSkin || player.m_onionSkinDistance == 0)) {
 		TRectD bbox(ti->getBBox());
 
 		bbox -= ti->getRaster()->getCenterD();
@@ -1133,10 +1160,7 @@ void OpenGlPainter::onToonzImage(TToonzImage *ti, const Stage::Player &player)
 
 	TRasterImageP ri(ras32);
 
-	GLRasterPainter::drawRaster(
-		m_viewAff * player.m_placement * aff,
-		ri,
-		true);
+	GLRasterPainter::drawRaster(m_viewAff * player.m_placement * aff, ri, true);
 }
 
 //-----------------------------------------------------------------------------
@@ -1151,8 +1175,14 @@ void OpenGlPainter::endMask()
 	--m_maskLevel;
 	TStencilControl::instance()->endMask();
 }
-void OpenGlPainter::enableMask() { TStencilControl::instance()->enableMask(TStencilControl::SHOW_INSIDE); }
-void OpenGlPainter::disableMask() { TStencilControl::instance()->disableMask(); }
+void OpenGlPainter::enableMask()
+{
+	TStencilControl::instance()->enableMask(TStencilControl::SHOW_INSIDE);
+}
+void OpenGlPainter::disableMask()
+{
+	TStencilControl::instance()->disableMask();
+}
 
 //**********************************************************************************************
 //    Plastic functions  implementation
@@ -1161,11 +1191,11 @@ void OpenGlPainter::disableMask() { TStencilControl::instance()->disableMask(); 
 namespace
 {
 
-TStageObject *plasticDeformedObj(
-	const Stage::Player &player, const PlasticVisualSettings &pvs)
+TStageObject *plasticDeformedObj(const Stage::Player &player, const PlasticVisualSettings &pvs)
 {
 	struct locals {
-		static inline bool isDeformableMeshColumn(TXshColumn *column, const PlasticVisualSettings &pvs)
+		static inline bool isDeformableMeshColumn(TXshColumn *column,
+												  const PlasticVisualSettings &pvs)
 		{
 			return (column->getColumnType() == TXshColumn::eMeshType) &&
 				   (pvs.m_showOriginalColumn != column);
@@ -1179,7 +1209,8 @@ TStageObject *plasticDeformedObj(
 
 	if (pvs.m_applyPlasticDeformation && player.m_column >= 0) {
 		// Check whether the player's column is a direct stage-schematic child of a mesh object
-		TStageObject *playerObj = player.m_xsh->getStageObject(TStageObjectId::ColumnId(player.m_column));
+		TStageObject *playerObj =
+			player.m_xsh->getStageObject(TStageObjectId::ColumnId(player.m_column));
 		assert(playerObj);
 
 		const TStageObjectId &parentId = playerObj->getParent();
@@ -1188,9 +1219,11 @@ TStageObject *plasticDeformedObj(
 
 			if (locals::isDeformableMeshColumn(parentCol, pvs) &&
 				!locals::isDeformableMeshLevel(player.m_sl)) {
-				const SkDP &sd = player.m_xsh->getStageObject(parentId)->getPlasticSkeletonDeformation();
+				const SkDP &sd =
+					player.m_xsh->getStageObject(parentId)->getPlasticSkeletonDeformation();
 
-				const TXshCell &parentCell = player.m_xsh->getCell(player.m_frame, parentId.getIndex());
+				const TXshCell &parentCell =
+					player.m_xsh->getCell(player.m_frame, parentId.getIndex());
 				TXshSimpleLevel *parentSl = parentCell.getSimpleLevel();
 
 				if (sd && locals::isDeformableMeshLevel(parentSl))
@@ -1204,9 +1237,8 @@ TStageObject *plasticDeformedObj(
 
 //-----------------------------------------------------------------------------
 
-void onMeshImage(
-	TMeshImage *mi, const Stage::Player &player,
-	const ImagePainter::VisualSettings &vs, const TAffine &viewAff)
+void onMeshImage(TMeshImage *mi, const Stage::Player &player,
+				 const ImagePainter::VisualSettings &vs, const TAffine &viewAff)
 {
 	assert(mi);
 
@@ -1231,8 +1263,10 @@ void onMeshImage(
 
 	// Build reference change affines
 
-	const TAffine &worldMeshToMeshAff = TScale(meshSlDpi.x / Stage::inch, meshSlDpi.y / Stage::inch);
-	const TAffine &meshToWorldMeshAff = TScale(Stage::inch / meshSlDpi.x, Stage::inch / meshSlDpi.y);
+	const TAffine &worldMeshToMeshAff =
+		TScale(meshSlDpi.x / Stage::inch, meshSlDpi.y / Stage::inch);
+	const TAffine &meshToWorldMeshAff =
+		TScale(Stage::inch / meshSlDpi.x, Stage::inch / meshSlDpi.y);
 	const TAffine &worldMeshToWorldAff = player.m_placement;
 
 	const TAffine &meshToWorldAff = worldMeshToWorldAff * meshToWorldMeshAff;
@@ -1253,7 +1287,8 @@ void onMeshImage(
 		TXshColumn *column = player.m_xsh->getColumn(player.m_column);
 
 		if (column != vs.m_plasticVisualSettings.m_showOriginalColumn) {
-			TStageObject *playerObj = player.m_xsh->getStageObject(TStageObjectId::ColumnId(player.m_column));
+			TStageObject *playerObj =
+				player.m_xsh->getStageObject(TStageObjectId::ColumnId(player.m_column));
 
 			deformation = playerObj->getPlasticSkeletonDeformation().getPointer();
 			sdFrame = playerObj->paramsTime(player.m_frame);
@@ -1304,9 +1339,8 @@ void onMeshImage(
 //-----------------------------------------------------------------------------
 
 //! Applies Plastic deformation of the specified player's stage object.
-void onPlasticDeformedImage(
-	TStageObject *playerObj, const Stage::Player &player,
-	const ImagePainter::VisualSettings &vs, const TAffine &viewAff)
+void onPlasticDeformedImage(TStageObject *playerObj, const Stage::Player &player,
+							const ImagePainter::VisualSettings &vs, const TAffine &viewAff)
 {
 	bool doOnionSkin = (player.m_onionSkinDistance != c_noOnionSkin);
 	bool onionSkinImage = doOnionSkin && (player.m_onionSkinDistance != 0);
@@ -1321,7 +1355,8 @@ void onPlasticDeformedImage(
 
 			Preferences::instance()->getOnionData(frontOnionColor, backOnionColor, inksOnly);
 
-			const TPixel32 &refColor = (player.m_onionSkinDistance < 0) ? backOnionColor : frontOnionColor;
+			const TPixel32 &refColor =
+				(player.m_onionSkinDistance < 0) ? backOnionColor : frontOnionColor;
 
 			pixScale[3] = 1.0 - OnionSkinMask::getOnionSkinFade(player.m_onionSkinDistance);
 			pixScale[0] = (refColor.r / 255.0) * pixScale[3]; // refColor is not premultiplied
@@ -1347,7 +1382,8 @@ void onPlasticDeformedImage(
 	TStageObject *parentObj = player.m_xsh->getStageObject(playerObj->getParent());
 	assert(playerObj);
 
-	const PlasticSkeletonDeformationP &deformation = parentObj->getPlasticSkeletonDeformation().getPointer();
+	const PlasticSkeletonDeformationP &deformation =
+		parentObj->getPlasticSkeletonDeformation().getPointer();
 	assert(deformation);
 
 	double sdFrame = parentObj->paramsTime(player.m_frame);
@@ -1372,12 +1408,17 @@ void onPlasticDeformedImage(
 	const TAffine &worldMeshToWorldTextureAff = worldTextureToWorldMeshAff.inv();
 	const TAffine &worldMeshToWorldAff = worldTextureToWorldAff * worldMeshToWorldTextureAff;
 
-	const TAffine &meshToWorldMeshAff = TScale(Stage::inch / meshSlDpi.x, Stage::inch / meshSlDpi.y);
-	const TAffine &worldMeshToMeshAff = TScale(meshSlDpi.x / Stage::inch, meshSlDpi.y / Stage::inch);
-	const TAffine &worldTextureToTextureAff = TScale(slDpi.x / Stage::inch, slDpi.y / Stage::inch); // ::getDpiScale().inv() should be used instead...
+	const TAffine &meshToWorldMeshAff =
+		TScale(Stage::inch / meshSlDpi.x, Stage::inch / meshSlDpi.y);
+	const TAffine &worldMeshToMeshAff =
+		TScale(meshSlDpi.x / Stage::inch, meshSlDpi.y / Stage::inch);
+	const TAffine &worldTextureToTextureAff =
+		TScale(slDpi.x / Stage::inch,
+			   slDpi.y / Stage::inch); // ::getDpiScale().inv() should be used instead...
 
 	const TAffine &meshToWorldAff = worldMeshToWorldAff * meshToWorldMeshAff;
-	const TAffine &meshToTextureAff = worldTextureToTextureAff * worldMeshToWorldTextureAff * meshToWorldMeshAff;
+	const TAffine &meshToTextureAff =
+		worldTextureToTextureAff * worldMeshToWorldTextureAff * meshToWorldMeshAff;
 
 	// Retrieve a drawable texture from the player's simple level
 	const DrawableTextureDataP &texData = player.texture();
@@ -1386,7 +1427,8 @@ void onPlasticDeformedImage(
 
 	// Retrieve the associated plastic deformers data (this may eventually update the deforms)
 	const PlasticDeformerDataGroup *dataGroup = PlasticDeformerStorage::instance()->process(
-		sdFrame, mi.getPointer(), deformation.getPointer(), deformation->skeletonId(sdFrame), worldMeshToMeshAff);
+		sdFrame, mi.getPointer(), deformation.getPointer(), deformation->skeletonId(sdFrame),
+		worldMeshToMeshAff);
 	assert(dataGroup);
 
 	// Set up OpenGL stuff

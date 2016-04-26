@@ -29,8 +29,7 @@
 //----forward declarations
 std::string buildErrorString(int error);
 
-void readChannel(FILE *f, TPSDLayerInfo *li,
-				 TPSDChannelInfo *chan, int channels,
+void readChannel(FILE *f, TPSDLayerInfo *li, TPSDChannelInfo *chan, int channels,
 				 TPSDHeaderInfo *h);
 void readLongData(FILE *f, struct dictentry *parent, TPSDLayerInfo *li);
 void readByteData(FILE *f, struct dictentry *parent, TPSDLayerInfo *li);
@@ -49,9 +48,7 @@ char swapByte(unsigned char src)
 	return out;
 }
 
-TPSDReader::TPSDReader(const TFilePath &path) : m_shrinkX(1),
-												m_shrinkY(1),
-												m_region(TRect())
+TPSDReader::TPSDReader(const TFilePath &path) : m_shrinkX(1), m_shrinkY(1), m_region(TRect())
 {
 	m_layerId = 0;
 	QString name = path.getName().c_str();
@@ -60,7 +57,7 @@ TPSDReader::TPSDReader(const TFilePath &path) : m_shrinkX(1),
 	int dotPos = name.indexOf(".", sepPos);
 	name.remove(sepPos, dotPos - sepPos);
 	m_path = path.getParentDir() + TFilePath(name.toStdString());
-	//m_path = path;
+	// m_path = path;
 	QMutexLocker sl(&m_mutex);
 	openFile();
 	if (!doInfo()) {
@@ -106,15 +103,16 @@ bool TPSDReader::doInfo()
 	if (!doLayerAndMaskInfo())
 		return false;
 	// Read Layers and Mask Information Block
-	//if(!doLayersInfo()) return false;
+	// if(!doLayersInfo()) return false;
 	m_headerInfo.layerDataPos = ftell(m_file);
 
-	if (m_headerInfo.layersCount == 0) //tento con extra data
+	if (m_headerInfo.layersCount == 0) // tento con extra data
 	{
 		fseek(m_file, m_headerInfo.layerDataPos, SEEK_SET);
 		skipBlock(m_file); // skip global layer mask info
 		psdByte currentPos = ftell(m_file);
-		psdByte len = m_headerInfo.lmistart + m_headerInfo.lmilen - currentPos; // 4 = bytes skipped by global layer mask info
+		psdByte len = m_headerInfo.lmistart + m_headerInfo.lmilen -
+					  currentPos; // 4 = bytes skipped by global layer mask info
 		doExtraData(NULL, len);
 	}
 	return true;
@@ -134,8 +132,9 @@ bool TPSDReader::doHeaderInfo()
 
 	if (!feof(m_file) && !memcmp(m_headerInfo.sig, "8BPS", 4)) {
 		if (m_headerInfo.version == 1) {
-			if (m_headerInfo.channels <= 0 || m_headerInfo.channels > 64 || m_headerInfo.rows <= 0 ||
-				m_headerInfo.cols <= 0 || m_headerInfo.depth < 0 || m_headerInfo.depth > 32 || m_headerInfo.mode < 0) {
+			if (m_headerInfo.channels <= 0 || m_headerInfo.channels > 64 ||
+				m_headerInfo.rows <= 0 || m_headerInfo.cols <= 0 || m_headerInfo.depth < 0 ||
+				m_headerInfo.depth > 32 || m_headerInfo.mode < 0) {
 				throw TImageException(m_path, "Reading PSD Header Info error");
 				return false;
 			}
@@ -153,13 +152,13 @@ bool TPSDReader::doHeaderInfo()
 bool TPSDReader::doColorModeData()
 {
 	m_headerInfo.colormodepos = ftell(m_file);
-	skipBlock(m_file); //skip "color mode data"
+	skipBlock(m_file); // skip "color mode data"
 	return true;
 }
 // Read Image Resources Block
 bool TPSDReader::doImageResources()
 {
-	//skipBlock(m_file); //skip "image resources"
+	// skipBlock(m_file); //skip "image resources"
 	long len = read4Bytes(m_file); // lunghezza del blocco Image resources
 	while (len > 0) {
 		char type[4], name[0x100];
@@ -207,10 +206,10 @@ bool TPSDReader::doLayerAndMaskInfo()
 		if (layerlen) {
 			doLayersInfo();
 		} else {
-			//WARNING: layer info section empty
+			// WARNING: layer info section empty
 		}
 	} else {
-		//WARNING: layer & mask info section empty
+		// WARNING: layer & mask info section empty
 	}
 	return true;
 }
@@ -226,7 +225,8 @@ bool TPSDReader::doLayersInfo()
 		m_headerInfo.layersCount = -m_headerInfo.layersCount;
 	}
 	if (!m_headerInfo.linfoBlockEmpty) {
-		m_headerInfo.linfo = (TPSDLayerInfo *)mymalloc(m_headerInfo.layersCount * sizeof(struct TPSDLayerInfo));
+		m_headerInfo.linfo =
+			(TPSDLayerInfo *)mymalloc(m_headerInfo.layersCount * sizeof(struct TPSDLayerInfo));
 		int i = 0;
 		for (i = 0; i < m_headerInfo.layersCount; i++) {
 			readLayerInfo(i);
@@ -268,7 +268,7 @@ bool TPSDReader::readLayerInfo(int i)
 			if (chid >= -2 && chid < li->channels)
 				li->chindex[chid] = j;
 			else {
-				//WARNING: unexpected channel id
+				// WARNING: unexpected channel id
 			}
 		}
 
@@ -294,7 +294,7 @@ bool TPSDReader::readLayerInfo(int i)
 			li->mask.rows = li->mask.bottom - li->mask.top;
 			li->mask.cols = li->mask.right - li->mask.left;
 		} else {
-			//no layer mask data
+			// no layer mask data
 		}
 
 		skipBlock(m_file); // skip "layer blending ranges";
@@ -361,7 +361,8 @@ void TPSDReader::doImage(TRasterP &rasP, int layerId)
 	rowpos = (psdByte **)mymalloc(channels * sizeof(psdByte *));
 
 	for (ch = 0; ch < channels; ++ch) {
-		psdPixel chrows = li && !m_headerInfo.linfoBlockEmpty && li->chan[ch].id == -2 ? li->mask.rows : rows;
+		psdPixel chrows =
+			li && !m_headerInfo.linfoBlockEmpty && li->chan[ch].id == -2 ? li->mask.rows : rows;
 		rowpos[ch] = (psdByte *)mymalloc((chrows + 1) * sizeof(psdByte));
 	}
 
@@ -369,7 +370,7 @@ void TPSDReader::doImage(TRasterP &rasP, int layerId)
 
 	int depth = m_headerInfo.depth;
 	switch (m_headerInfo.mode) {
-	//default: // multichannel, cmyk, lab etc
+	// default: // multichannel, cmyk, lab etc
 	//	split = 1;
 	case ModeBitmap:
 	case ModeGrayScale:
@@ -394,12 +395,13 @@ void TPSDReader::doImage(TRasterP &rasP, int layerId)
 		break;
 	default:
 		tnzchannels = channels;
-		//assert(0);
+		// assert(0);
 		break;
 	}
 
 	if (!li || m_headerInfo.linfoBlockEmpty) { // merged channel
-		TPSDChannelInfo *mergedChans = (TPSDChannelInfo *)mymalloc(channels * sizeof(struct TPSDChannelInfo));
+		TPSDChannelInfo *mergedChans =
+			(TPSDChannelInfo *)mymalloc(channels * sizeof(struct TPSDChannelInfo));
 
 		readChannel(m_file, NULL, mergedChans, channels, &m_headerInfo);
 		imageDataEnd = ftell(m_file);
@@ -446,7 +448,7 @@ void TPSDReader::load(TRasterImageP &img, int layerId)
 		long sbx0 = li ? li->left : 0;
 		long sby0 = li ? m_headerInfo.rows-li->bottom : 0;
 		long sbx1 = li ? li->right - 1 : m_headerInfo.cols - 1;
-		long sby1 = li ? m_headerInfo.rows - li->top - 1 : m_headerInfo.rows - 1;	
+		long sby1 = li ? m_headerInfo.rows - li->top - 1 : m_headerInfo.rows - 1;
 		TRect layerSaveBox;
 		layerSaveBox = TRect(sbx0,sby0,sbx1,sby1);
 		TRect imageRect = TRect(0,0,m_headerInfo.cols-1,m_headerInfo.rows-1);
@@ -457,7 +459,7 @@ void TPSDReader::load(TRasterImageP &img, int layerId)
 
 		if(layerSaveBox== TRect()) {
 			img = TRasterImageP();
-			return; 
+			return;
 		}			 */
 
 		if (!rasP) {
@@ -547,7 +549,7 @@ void TPSDReader::readImageData(TRasterP &rasP, TPSDLayerInfo *li, TPSDChannelInf
 	// find the alpha channel, if needed
 	if (li && (chancount == 2 || chancount == 4)) { // grey+alpha
 		if (li->chindex[-1] == -1) {
-			//WARNING no alpha found?;
+			// WARNING no alpha found?;
 		} else
 			map[chancount - 1] = li->chindex[-1];
 	}
@@ -628,9 +630,11 @@ void TPSDReader::readImageData(TRasterP &rasP, TPSDLayerInfo *li, TPSDChannelInf
 	}
 	// Estraggo da rasP solo il rettangolo che si interseca con il livello corrente
 	// stando attento a prendere i pixel giusti.
-	int firstXPixIndexOfLayer = layerSaveBox.getP00().x - 1 + m_shrinkX - (abs(layerSaveBox.getP00().x - 1) % m_shrinkX);
+	int firstXPixIndexOfLayer =
+		layerSaveBox.getP00().x - 1 + m_shrinkX - (abs(layerSaveBox.getP00().x - 1) % m_shrinkX);
 	int lrx0 = firstXPixIndexOfLayer / m_shrinkX;
-	int firstLineIndexOfLayer = layerSaveBox.getP00().y - 1 + m_shrinkY - (abs(layerSaveBox.getP00().y - 1) % m_shrinkY);
+	int firstLineIndexOfLayer =
+		layerSaveBox.getP00().y - 1 + m_shrinkY - (abs(layerSaveBox.getP00().y - 1) % m_shrinkY);
 	int lry0 = firstLineIndexOfLayer / m_shrinkY;
 	int lrx1 = (layerSaveBox.getP11().x - abs(layerSaveBox.getP11().x % m_shrinkX)) / m_shrinkX;
 	int lry1 = (layerSaveBox.getP11().y - abs(layerSaveBox.getP11().y % m_shrinkY)) / m_shrinkY;
@@ -655,12 +659,12 @@ void TPSDReader::readImageData(TRasterP &rasP, TPSDLayerInfo *li, TPSDChannelInf
 	// Nota che nel file photoshop le righe sono memorizzate dall'ultima alla prima.
 	int rowOffset = abs(sby1) % m_shrinkY;
 	int rowCount = rowOffset;
-	//if(m_shrinkY==3) rowCount--;
+	// if(m_shrinkY==3) rowCount--;
 	for (j = 0; j < smallRas->getLy(); j++) {
 		for (ch = 0; ch < chancount; ++ch) {
 			/* get row data */
 			if (map[ch] < 0 || map[ch] > chancount) {
-				//warn("bad map[%d]=%d, skipping a channel", i, map[i]);
+				// warn("bad map[%d]=%d, skipping a channel", i, map[i]);
 				memset(inrows[ch], 0, chan->rowbytes); // zero out the row
 			} else
 				readrow(m_file, chan + map[ch], rowCount, inrows[ch], rledata);
@@ -671,10 +675,13 @@ void TPSDReader::readImageData(TRasterP &rasP, TPSDLayerInfo *li, TPSDChannelInf
 			continue;
 		}
 		if (depth == 1 && chancount == 1) {
-			if (!(layerSaveBox.getP00().x - sbx0 >= 0 && layerSaveBox.getP00().x - sbx0 + smallRas->getLx() / 8 - 1 < chan->rowbytes))
-				throw TImageException(m_path, "Unable to read image with this depth and channels values");
+			if (!(layerSaveBox.getP00().x - sbx0 >= 0 &&
+				  layerSaveBox.getP00().x - sbx0 + smallRas->getLx() / 8 - 1 < chan->rowbytes))
+				throw TImageException(m_path,
+									  "Unable to read image with this depth and channels values");
 			smallRas->lock();
-			unsigned char *rawdata = (unsigned char *)smallRas->getRawData(0, smallRas->getLy() - j - 1);
+			unsigned char *rawdata =
+				(unsigned char *)smallRas->getRawData(0, smallRas->getLy() - j - 1);
 			TPixelGR8 *pix = (TPixelGR8 *)rawdata;
 			int colCount = colOffset;
 			for (int k = 0; k < smallRas->getLx(); k += 8) {
@@ -691,10 +698,13 @@ void TPSDReader::readImageData(TRasterP &rasP, TPSDLayerInfo *li, TPSDChannelInf
 			}
 			smallRas->unlock();
 		} else if (depth == 8 && chancount > 1) {
-			if (!(layerSaveBox.getP00().x - sbx0 >= 0 && layerSaveBox.getP00().x - sbx0 + smallRas->getLx() - 1 < chan->rowbytes))
-				throw TImageException(m_path, "Unable to read image with this depth and channels values");
+			if (!(layerSaveBox.getP00().x - sbx0 >= 0 &&
+				  layerSaveBox.getP00().x - sbx0 + smallRas->getLx() - 1 < chan->rowbytes))
+				throw TImageException(m_path,
+									  "Unable to read image with this depth and channels values");
 			smallRas->lock();
-			unsigned char *rawdata = (unsigned char *)smallRas->getRawData(0, smallRas->getLy() - j - 1);
+			unsigned char *rawdata =
+				(unsigned char *)smallRas->getRawData(0, smallRas->getLy() - j - 1);
 			TPixel32 *pix = (TPixel32 *)rawdata;
 			int colCount = colOffset;
 			for (int k = 0; k < smallRas->getLx(); k++) {
@@ -721,10 +731,13 @@ void TPSDReader::readImageData(TRasterP &rasP, TPSDLayerInfo *li, TPSDChannelInf
 
 			smallRas->unlock();
 		} else if (m_headerInfo.depth == 8 && chancount == 1) {
-			if (!(layerSaveBox.getP00().x - sbx0 >= 0 && layerSaveBox.getP00().x - sbx0 + smallRas->getLx() - 1 < chan->rowbytes))
-				throw TImageException(m_path, "Unable to read image with this depth and channels values");
+			if (!(layerSaveBox.getP00().x - sbx0 >= 0 &&
+				  layerSaveBox.getP00().x - sbx0 + smallRas->getLx() - 1 < chan->rowbytes))
+				throw TImageException(m_path,
+									  "Unable to read image with this depth and channels values");
 			smallRas->lock();
-			unsigned char *rawdata = (unsigned char *)smallRas->getRawData(0, smallRas->getLy() - j - 1);
+			unsigned char *rawdata =
+				(unsigned char *)smallRas->getRawData(0, smallRas->getLy() - j - 1);
 
 			TPixelGR8 *pix = (TPixelGR8 *)rawdata;
 			int colCount = colOffset;
@@ -733,12 +746,16 @@ void TPSDReader::readImageData(TRasterP &rasP, TPSDLayerInfo *li, TPSDChannelInf
 				colCount += m_shrinkX;
 			}
 			smallRas->unlock();
-		} else if (m_headerInfo.depth == 16 && chancount == 1 && m_headerInfo.mergedalpha) // mergedChannels
+		} else if (m_headerInfo.depth == 16 && chancount == 1 &&
+				   m_headerInfo.mergedalpha) // mergedChannels
 		{
-			if (!(layerSaveBox.getP00().x - sbx0 >= 0 && layerSaveBox.getP00().x - sbx0 + smallRas->getLx() - 1 < chan->rowbytes))
-				throw TImageException(m_path, "Unable to read image with this depth and channels values");
+			if (!(layerSaveBox.getP00().x - sbx0 >= 0 &&
+				  layerSaveBox.getP00().x - sbx0 + smallRas->getLx() - 1 < chan->rowbytes))
+				throw TImageException(m_path,
+									  "Unable to read image with this depth and channels values");
 			smallRas->lock();
-			unsigned char *rawdata = (unsigned char *)smallRas->getRawData(0, smallRas->getLy() - j - 1);
+			unsigned char *rawdata =
+				(unsigned char *)smallRas->getRawData(0, smallRas->getLy() - j - 1);
 			TPixelGR8 *pix = (TPixelGR8 *)rawdata;
 			int colCount = colOffset;
 			for (int k = 0; k < smallRas->getLx(); k++) {
@@ -747,33 +764,45 @@ void TPSDReader::readImageData(TRasterP &rasP, TPSDLayerInfo *li, TPSDChannelInf
 			}
 			smallRas->unlock();
 		} else if (m_headerInfo.depth == 16) {
-			if (!(layerSaveBox.getP00().x - sbx0 >= 0 && layerSaveBox.getP00().x - sbx0 + smallRas->getLx() - 1 < chan->rowbytes))
-				throw TImageException(m_path, "Unable to read image with this depth and channels values");
+			if (!(layerSaveBox.getP00().x - sbx0 >= 0 &&
+				  layerSaveBox.getP00().x - sbx0 + smallRas->getLx() - 1 < chan->rowbytes))
+				throw TImageException(m_path,
+									  "Unable to read image with this depth and channels values");
 			smallRas->lock();
-			unsigned short *rawdata = (unsigned short *)smallRas->getRawData(0, smallRas->getLy() - j - 1);
+			unsigned short *rawdata =
+				(unsigned short *)smallRas->getRawData(0, smallRas->getLy() - j - 1);
 			TPixel64 *pix = (TPixel64 *)rawdata;
 			int colCount = colOffset;
 			for (int k = 0; k < smallRas->getLx(); k++) {
 				if (chancount >= 3) {
-					pix[k].r = swapShort(((psdUint16 *)inrows[0])[layerSaveBox.getP00().x - sbx0 + colCount]);
-					pix[k].g = swapShort(((psdUint16 *)inrows[1])[layerSaveBox.getP00().x - sbx0 + colCount]);
-					pix[k].b = swapShort(((psdUint16 *)inrows[2])[layerSaveBox.getP00().x - sbx0 + colCount]);
+					pix[k].r = swapShort(
+						((psdUint16 *)inrows[0])[layerSaveBox.getP00().x - sbx0 + colCount]);
+					pix[k].g = swapShort(
+						((psdUint16 *)inrows[1])[layerSaveBox.getP00().x - sbx0 + colCount]);
+					pix[k].b = swapShort(
+						((psdUint16 *)inrows[2])[layerSaveBox.getP00().x - sbx0 + colCount]);
 				} else if (chancount <= 2) {
-					pix[k].r = swapShort(((psdUint16 *)inrows[0])[layerSaveBox.getP00().x - sbx0 + colCount]);
-					pix[k].g = swapShort(((psdUint16 *)inrows[0])[layerSaveBox.getP00().x - sbx0 + colCount]);
-					pix[k].b = swapShort(((psdUint16 *)inrows[0])[layerSaveBox.getP00().x - sbx0 + colCount]);
+					pix[k].r = swapShort(
+						((psdUint16 *)inrows[0])[layerSaveBox.getP00().x - sbx0 + colCount]);
+					pix[k].g = swapShort(
+						((psdUint16 *)inrows[0])[layerSaveBox.getP00().x - sbx0 + colCount]);
+					pix[k].b = swapShort(
+						((psdUint16 *)inrows[0])[layerSaveBox.getP00().x - sbx0 + colCount]);
 					if (chancount == 2)
-						pix[k].m = swapShort(((psdUint16 *)inrows[1])[layerSaveBox.getP00().x - sbx0 + colCount]);
+						pix[k].m = swapShort(
+							((psdUint16 *)inrows[1])[layerSaveBox.getP00().x - sbx0 + colCount]);
 				}
 				if (chancount == 4) {
-					pix[k].m = swapShort(((psdUint16 *)inrows[3])[layerSaveBox.getP00().x - sbx0 + colCount]);
+					pix[k].m = swapShort(
+						((psdUint16 *)inrows[3])[layerSaveBox.getP00().x - sbx0 + colCount]);
 				} else
 					pix[k].m = 0xffff;
 				colCount += m_shrinkX;
 			}
 			smallRas->unlock();
 		} else {
-			throw TImageException(m_path, "Unable to read image with this depth and channels values");
+			throw TImageException(m_path,
+								  "Unable to read image with this depth and channels values");
 		}
 		rowCount += m_shrinkY;
 	}
@@ -802,7 +831,8 @@ void TPSDReader::doExtraData(TPSDLayerInfo *li, psdByte length)
 		{0, "lrFX", "EFFECT", "Effects layer", NULL /*ed_layereffects*/},
 		{0, "tySh", "TYPETOOL5", "Type tool (5.0)", NULL /*ed_typetool*/},
 		{0, "luni", "-UNICODENAME", "Unicode layer name", NULL /*ed_unicodename*/},
-		{0, "lyid", "-LAYERID", "Layer ID", readLongData}, // '-' prefix means keep tag value on one line
+		{0, "lyid", "-LAYERID", "Layer ID",
+		 readLongData}, // '-' prefix means keep tag value on one line
 		// v6.0
 		{0, "lfx2", "OBJECTEFFECT", "Object based effects layer", NULL /*ed_objecteffects*/},
 		{0, "Patt", "PATTERN", "Pattern", NULL},
@@ -815,22 +845,26 @@ void TPSDReader::doExtraData(TPSDLayerInfo *li, psdByte length)
 		{0, "lclr", "SHEETCOLOR", "Sheet color", NULL},
 		{0, "fxrp", "-REFERENCEPOINT", "Reference point", NULL /*ed_referencepoint*/},
 		{0, "grdm", "GRADIENT", "Gradient", NULL},
-		{0, "lsct", "-SECTION", "Section divider", readLongData},					// CS doc
-		{0, "SoCo", "SOLIDCOLORSHEET", "Solid color sheet", NULL /*ed_versdesc*/},  // CS doc
-		{0, "PtFl", "PATTERNFILL", "Pattern fill", NULL /*ed_versdesc*/},			// CS doc
-		{0, "GdFl", "GRADIENTFILL", "Gradient fill", NULL /*ed_versdesc*/},			// CS doc
-		{0, "vmsk", "VECTORMASK", "Vector mask", NULL},								// CS doc
-		{0, "TySh", "TYPETOOL6", "Type tool (6.0)", NULL /*ed_typetool*/},			// CS doc
-		{0, "ffxi", "-FOREIGNEFFECTID", "Foreign effect ID", readLongData},			// CS doc (this is probably a key too, who knows)
-		{0, "lnsr", "-LAYERNAMESOURCE", "Layer name source", readKey},				// CS doc (who knew this was a signature? docs fail again - and what do the values mean?)
+		{0, "lsct", "-SECTION", "Section divider", readLongData},				   // CS doc
+		{0, "SoCo", "SOLIDCOLORSHEET", "Solid color sheet", NULL /*ed_versdesc*/}, // CS doc
+		{0, "PtFl", "PATTERNFILL", "Pattern fill", NULL /*ed_versdesc*/},		   // CS doc
+		{0, "GdFl", "GRADIENTFILL", "Gradient fill", NULL /*ed_versdesc*/},		   // CS doc
+		{0, "vmsk", "VECTORMASK", "Vector mask", NULL},							   // CS doc
+		{0, "TySh", "TYPETOOL6", "Type tool (6.0)", NULL /*ed_typetool*/},		   // CS doc
+		{0, "ffxi", "-FOREIGNEFFECTID", "Foreign effect ID",
+		 readLongData}, // CS doc (this is probably a key too, who knows)
+		{0, "lnsr", "-LAYERNAMESOURCE", "Layer name source",
+		 readKey}, // CS doc (who knew this was a signature? docs fail again - and what do the
+				   // values mean?)
 		{0, "shpa", "PATTERNDATA", "Pattern data", NULL},							// CS doc
 		{0, "shmd", "METADATASETTING", "Metadata setting", NULL /*ed_metadata*/},   // CS doc
 		{0, "brst", "BLENDINGRESTRICTIONS", "Channel blending restrictions", NULL}, // CS doc
 		// v7.0
-		{0, "lyvr", "-LAYERVERSION", "Layer version", readLongData},						// CS doc
-		{0, "tsly", "-TRANSPARENCYSHAPES", "Transparency shapes layer", readByteData},		// CS doc
-		{0, "lmgm", "-LAYERMASKASGLOBALMASK", "Layer mask as global mask", readByteData},   // CS doc
-		{0, "vmgm", "-VECTORMASKASGLOBALMASK", "Vector mask as global mask", readByteData}, // CS doc
+		{0, "lyvr", "-LAYERVERSION", "Layer version", readLongData},					  // CS doc
+		{0, "tsly", "-TRANSPARENCYSHAPES", "Transparency shapes layer", readByteData},	// CS doc
+		{0, "lmgm", "-LAYERMASKASGLOBALMASK", "Layer mask as global mask", readByteData}, // CS doc
+		{0, "vmgm", "-VECTORMASKASGLOBALMASK", "Vector mask as global mask",
+		 readByteData}, // CS doc
 		// CS
 		{0, "mixr", "CHANNELMIXER", "Channel mixer", NULL}, // CS doc
 		{0, "phfl", "PHOTOFILTER", "Photo Filter", NULL},   // CS doc
@@ -841,25 +875,26 @@ void TPSDReader::doExtraData(TPSDLayerInfo *li, psdByte length)
 	while (length >= 12) {
 		psdByte block = sigkeyblock(m_file, extradict, li);
 		if (!block) {
-			//warn("bad signature in layer's extra data, skipping the rest");
+			// warn("bad signature in layer's extra data, skipping the rest");
 			break;
 		}
 		length -= block;
 	}
 }
 
-struct dictentry *TPSDReader::findbykey(FILE *f, struct dictentry *parent, char *key, TPSDLayerInfo *li)
+struct dictentry *TPSDReader::findbykey(FILE *f, struct dictentry *parent, char *key,
+										TPSDLayerInfo *li)
 {
 	struct dictentry *d;
 
 	for (d = parent; d->key; ++d)
 		if (!memcmp(key, d->key, 4)) {
-			//char *tagname = d->tag + (d->tag[0] == '-');
-			//fprintf(stderr, "matched tag %s\n", d->tag);
+			// char *tagname = d->tag + (d->tag[0] == '-');
+			// fprintf(stderr, "matched tag %s\n", d->tag);
 			if (d->func) {
 				psdByte savepos = ftell(f);
-				//int oneline = d->tag[0] == '-';
-				//char *tagname = d->tag + oneline;
+				// int oneline = d->tag[0] == '-';
+				// char *tagname = d->tag + oneline;
 				if (memcmp(key, "Lr16", 4) == 0) {
 					doLayersInfo();
 				} else
@@ -887,7 +922,7 @@ int TPSDReader::sigkeyblock(FILE *f, struct dictentry *dict, TPSDLayerInfo *li)
 	if (!memcmp(sig, "8BIM", 4)) {
 		if (dict && (d = findbykey(f, dict, key, li)) && !d->func) {
 			// there is no function to parse this block
-			//UNQUIET("    (data: %s)\n", d->desc);
+			// UNQUIET("    (data: %s)\n", d->desc);
 		}
 		fseek(f, len, SEEK_CUR);
 		return len + 12; // return number of bytes consumed
@@ -916,9 +951,8 @@ std::string buildErrorString(int error)
 }
 
 void readChannel(FILE *f, TPSDLayerInfo *li,
-				 TPSDChannelInfo *chan, //channel info array
-				 int channels,
-				 TPSDHeaderInfo *h)
+				 TPSDChannelInfo *chan, // channel info array
+				 int channels, TPSDHeaderInfo *h)
 {
 	int comp, ch;
 	psdByte pos, chpos, rb;
@@ -1002,7 +1036,7 @@ void readChannel(FILE *f, TPSDLayerInfo *li,
 
 				zipdata = (unsigned char *)mymalloc(chan->length);
 				count = fread(zipdata, 1, chan->length - 2, f);
-				//if(count < chan->length - 2)
+				// if(count < chan->length - 2)
 				//	alwayswarn("ZIP data short: wanted %d bytes, got %d", chan->length, count);
 
 				chan->unzipdata = (unsigned char *)mymalloc(chan->rows * chan->rowbytes);
@@ -1011,8 +1045,7 @@ void readChannel(FILE *f, TPSDLayerInfo *li,
 											  chan->rows * chan->rowbytes);
 				else
 					psdUnzipWithPrediction(zipdata, count, chan->unzipdata,
-										   chan->rows * chan->rowbytes,
-										   chan->cols, h->depth);
+										   chan->rows * chan->rowbytes, chan->cols, h->depth);
 
 				free(zipdata);
 			} else {
@@ -1028,7 +1061,7 @@ void readChannel(FILE *f, TPSDLayerInfo *li,
 		}
 	}
 
-	//if(li && pos != chpos + chan->length)
+	// if(li && pos != chpos + chan->length)
 	//	alwayswarn("# channel data is %ld bytes, but length = %ld\n",
 	//			   pos - chpos, chan->length);
 
@@ -1082,14 +1115,15 @@ void readKey(FILE *f, struct dictentry *parent, TPSDLayerInfo *li)
 
 void readLayer16(FILE *f, struct dictentry *parent, TPSDLayerInfo *li)
 {
-	//struct psd_header h2 = *psd_header; // a kind of 'nested' set of layers; don't alter main PSD header
+	// struct psd_header h2 = *psd_header; // a kind of 'nested' set of layers; don't alter main PSD
+	// header
 
 	// overwrite main PSD header, mainly because of the 'merged alpha' flag
 
 	// I *think* they mean us to respect the one in Lr16 because in my test data,
 	// the main layer count is zero, so cannot convey this information.
-	//dolayerinfo(f, psd_header);
-	//processlayers(f, psd_header);
+	// dolayerinfo(f, psd_header);
+	// processlayers(f, psd_header);
 }
 //---------------------------- END Utility functions
 
@@ -1136,7 +1170,8 @@ void TPSDParser::doLevels()
 			// non ha importanza quale layerId assegno, l'importante è che esista
 			level.setLayerId(0);
 			if (psdheader.layersCount == 0)
-				level.addFrame(firstLayerId); // succede nel caso in cui la psd non ha blocco layerInfo
+				level.addFrame(
+					firstLayerId); // succede nel caso in cui la psd non ha blocco layerInfo
 			m_levels.push_back(level);
 		} else if (list.size() == 3) {
 			if (list.at(2) == "group") {
@@ -1154,9 +1189,11 @@ void TPSDParser::doLevels()
 						scavenge = 0;
 					} else {
 						if (width != 0 && height != 0) {
-							m_levels[m_levels.size() - 1 - (scavenge - folderTagOpen)].addFrame(li->layerId);
+							m_levels[m_levels.size() - 1 - (scavenge - folderTagOpen)].addFrame(
+								li->layerId);
 						} else {
-							if (strcmp(li->name, "</Layer group>") == 0 || strcmp(li->name, "</Layer set>") == 0) {
+							if (strcmp(li->name, "</Layer group>") == 0 ||
+								strcmp(li->name, "</Layer set>") == 0) {
 								assert(li->layerId >= 0);
 								Level level(li->name, li->layerId, true);
 								m_levels.push_back(level);
@@ -1165,16 +1202,20 @@ void TPSDParser::doLevels()
 							} else if (li->section > 0 && li->section <= 3) // vedi specifiche psd
 							{
 								assert(li->layerId >= 0);
-								m_levels[m_levels.size() - 1 - (scavenge - folderTagOpen)].setName(li->name);
-								m_levels[m_levels.size() - 1 - (scavenge - folderTagOpen)].setLayerId(li->layerId);
+								m_levels[m_levels.size() - 1 - (scavenge - folderTagOpen)].setName(
+									li->name);
+								m_levels[m_levels.size() - 1 - (scavenge - folderTagOpen)]
+									.setLayerId(li->layerId);
 								folderTagOpen--;
 								if (folderTagOpen > 0)
-									m_levels[m_levels.size() - 1 - (scavenge - folderTagOpen)].addFrame(li->layerId, true);
+									m_levels[m_levels.size() - 1 - (scavenge - folderTagOpen)]
+										.addFrame(li->layerId, true);
 							}
 						}
 					}
 				}
-				if (psdheader.layersCount == 0) // succede nel caso in cui la psd non ha blocco layerInfo
+				if (psdheader.layersCount ==
+					0) // succede nel caso in cui la psd non ha blocco layerInfo
 				{
 					Level level;
 					level.setLayerId(0);
@@ -1197,7 +1238,8 @@ void TPSDParser::doLevels()
 					m_levels.push_back(level);
 				}
 			}
-			if (psdheader.layersCount == 0) // succede nel caso in cui la psd non ha blocco layerInfo
+			if (psdheader.layersCount ==
+				0) // succede nel caso in cui la psd non ha blocco layerInfo
 			{
 				Level level;
 				level.setLayerId(0);

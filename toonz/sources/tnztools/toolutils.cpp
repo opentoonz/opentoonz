@@ -52,7 +52,7 @@
 namespace
 {
 
-//!Riempie il vettore \b theVect con gli indici degli stroke contenuti nel mapping \b theMap.
+//! Riempie il vettore \b theVect con gli indici degli stroke contenuti nel mapping \b theMap.
 void mapToVector(const std::map<int, VIStroke *> &theMap, std::vector<int> &theVect)
 {
 	assert(theMap.size() == theVect.size());
@@ -68,13 +68,16 @@ void mapToVector(const std::map<int, VIStroke *> &theMap, std::vector<int> &theV
 void updateSaveBox(const TToonzImageP &ti)
 {
 	if (ti) {
-		assert(ti->getRaster());		   // Image should have a raster
-		assert(ti->getSubsampling() == 1); // Image should not be subsampled - modified images must be the ORIGINAL ones
+		assert(ti->getRaster()); // Image should have a raster
+		assert(ti->getSubsampling() ==
+			   1); // Image should not be subsampled - modified images must be the ORIGINAL ones
 
 		const TRect &savebox = ti->getSavebox();
 		{
 			TRect newSaveBox;
-			TRop::computeBBox(ti->getRaster(), newSaveBox); // This iterates the WHOLE raster to find its new savebox!
+			TRop::computeBBox(
+				ti->getRaster(),
+				newSaveBox); // This iterates the WHOLE raster to find its new savebox!
 
 			if (!Preferences::instance()->isMinimizeSaveboxAfterEditing())
 				newSaveBox += savebox; // If not minimizing the savebox, it cannot be shrunk.
@@ -84,7 +87,7 @@ void updateSaveBox(const TToonzImageP &ti)
 	}
 }
 
-} //namespace
+} // namespace
 
 //****************************************************************************************
 //    ToolUtils namespace
@@ -92,11 +95,13 @@ void updateSaveBox(const TToonzImageP &ti)
 
 void ToolUtils::updateSaveBox(const TXshSimpleLevelP &sl, const TFrameId &fid)
 {
-	// TODO: Savebox updates should not happen on mouse updates. This is, unfortunately, what currently happens.
+	// TODO: Savebox updates should not happen on mouse updates. This is, unfortunately, what
+	// currently happens.
 	sl->setDirtyFlag(true);
 
-	TImageP img = sl->getFrame(fid, true); // The image will be modified (it should already have been, though)
-										   // Observe that the returned image will forcedly have subsampling 1
+	TImageP img =
+		sl->getFrame(fid, true); // The image will be modified (it should already have been, though)
+								 // Observe that the returned image will forcedly have subsampling 1
 	::updateSaveBox(img);
 
 	TImageInfo *info = sl->getFrameInfo(fid, true);
@@ -156,7 +161,8 @@ TFrameId ToolUtils::getFrameId()
 
 //------------------------------------------------------------
 
-void ToolUtils::drawRect(const TRectD &rect, const TPixel32 &color, unsigned short stipple, bool doContrast)
+void ToolUtils::drawRect(const TRectD &rect, const TPixel32 &color, unsigned short stipple,
+						 bool doContrast)
 {
 	GLint src, dst;
 	bool isEnabled;
@@ -385,11 +391,12 @@ TRaster32P ToolUtils::convertStrokeToImage(TStroke *stroke, const TRect &imageBo
 	int count = stroke->getControlPointCount();
 	if (count == 0)
 		return TRaster32P();
-	TPointD imgCenter = TPointD((imageBounds.x0 + imageBounds.x1) * 0.5, (imageBounds.y0 + imageBounds.y1) * 0.5);
+	TPointD imgCenter =
+		TPointD((imageBounds.x0 + imageBounds.x1) * 0.5, (imageBounds.y0 + imageBounds.y1) * 0.5);
 
 	TStroke s(*stroke);
 
-	//check self looped stroke
+	// check self looped stroke
 	TThickPoint first = s.getControlPoint(0);
 	TThickPoint back = s.getControlPoint(count - 1);
 	if (first != back) {
@@ -398,7 +405,7 @@ TRaster32P ToolUtils::convertStrokeToImage(TStroke *stroke, const TRect &imageBo
 		s.setControlPoint(count + 1, first);
 	}
 
-	//check bounds intersection
+	// check bounds intersection
 	s.transform(TTranslation(imgCenter));
 	TRectD bbox = s.getBBox();
 	TRect rect(tfloor(bbox.x0), tfloor(bbox.y0), tfloor(bbox.x1), tfloor(bbox.y1));
@@ -408,7 +415,7 @@ TRaster32P ToolUtils::convertStrokeToImage(TStroke *stroke, const TRect &imageBo
 	if (rect.isEmpty())
 		return TRaster32P();
 
-	//creates the image
+	// creates the image
 	QImage img(rect.getLx(), rect.getLy(), QImage::Format_ARGB32);
 	img.fill(Qt::transparent);
 	QColor color = Qt::black;
@@ -454,13 +461,15 @@ TStroke *ToolUtils::merge(const ArrayOfStroke &a)
 
 //================================================================================================
 //
-//TToolUndo
+// TToolUndo
 //
 //================================================================================================
 
-ToolUtils::TToolUndo::TToolUndo(TXshSimpleLevel *level, const TFrameId &frameId,
-								bool createdFrame, bool createdLevel, const TPaletteP &oldPalette)
-	: TUndo(), m_level(level), m_frameId(frameId), m_oldPalette(oldPalette), m_col(-2), m_row(-1), m_isEditingLevel(false), m_createdFrame(createdFrame), m_createdLevel(createdLevel), m_imageId("")
+ToolUtils::TToolUndo::TToolUndo(TXshSimpleLevel *level, const TFrameId &frameId, bool createdFrame,
+								bool createdLevel, const TPaletteP &oldPalette)
+	: TUndo(), m_level(level), m_frameId(frameId), m_oldPalette(oldPalette), m_col(-2), m_row(-1),
+	  m_isEditingLevel(false), m_createdFrame(createdFrame), m_createdLevel(createdLevel),
+	  m_imageId("")
 {
 	m_animationSheetEnabled = Preferences::instance()->isAnimationSheetEnabled();
 	TTool::Application *app = TTool::getApplication();
@@ -613,8 +622,9 @@ int ToolUtils::TToolUndo::m_idCount = 0;
 
 //================================================================================================
 
-ToolUtils::TRasterUndo::TRasterUndo(TTileSetCM32 *tiles, TXshSimpleLevel *level, const TFrameId &frameId,
-									bool createdFrame, bool createdLevel, const TPaletteP &oldPalette)
+ToolUtils::TRasterUndo::TRasterUndo(TTileSetCM32 *tiles, TXshSimpleLevel *level,
+									const TFrameId &frameId, bool createdFrame, bool createdLevel,
+									const TPaletteP &oldPalette)
 	: TToolUndo(level, frameId, createdFrame, createdLevel, oldPalette), m_tiles(tiles)
 {
 }
@@ -673,9 +683,11 @@ void ToolUtils::TRasterUndo::undo() const
 
 //================================================================================================
 
-ToolUtils::TFullColorRasterUndo::TFullColorRasterUndo(TTileSetFullColor *tiles, TXshSimpleLevel *level,
+ToolUtils::TFullColorRasterUndo::TFullColorRasterUndo(TTileSetFullColor *tiles,
+													  TXshSimpleLevel *level,
 													  const TFrameId &frameId, bool createdFrame,
-													  bool createdLevel, const TPaletteP &oldPalette)
+													  bool createdLevel,
+													  const TPaletteP &oldPalette)
 	: TToolUndo(level, frameId, createdFrame, createdLevel, oldPalette), m_tiles(tiles)
 {
 }
@@ -733,7 +745,8 @@ void ToolUtils::TFullColorRasterUndo::undo() const
 
 //-----------------------------------------------------------------------------
 
-std::vector<TRect> ToolUtils::TFullColorRasterUndo::paste(const TRasterImageP &ti, const TTileSetFullColor *tileSet) const
+std::vector<TRect> ToolUtils::TFullColorRasterUndo::paste(const TRasterImageP &ti,
+														  const TTileSetFullColor *tileSet) const
 {
 	std::vector<TRect> rects;
 	TRasterP raster = ti->getRaster();
@@ -752,7 +765,8 @@ std::vector<TRect> ToolUtils::TFullColorRasterUndo::paste(const TRasterImageP &t
 
 //================================================================================================
 
-ToolUtils::UndoModifyStroke::UndoModifyStroke(TXshSimpleLevel *level, const TFrameId &frameId, int strokeIndex)
+ToolUtils::UndoModifyStroke::UndoModifyStroke(TXshSimpleLevel *level, const TFrameId &frameId,
+											  int strokeIndex)
 	: TToolUndo(level, frameId), m_strokeIndex(strokeIndex)
 {
 	TVectorImageP image = level->getFrame(frameId, true);
@@ -771,7 +785,9 @@ ToolUtils::UndoModifyStroke::UndoModifyStroke(TXshSimpleLevel *level, const TFra
 
 //-----------------------------------------------------------------------------
 
-ToolUtils::UndoModifyStroke::~UndoModifyStroke() {}
+ToolUtils::UndoModifyStroke::~UndoModifyStroke()
+{
+}
 
 //-----------------------------------------------------------------------------
 
@@ -872,13 +888,13 @@ void ToolUtils::UndoModifyStroke::redo() const
 
 int ToolUtils::UndoModifyStroke::getSize() const
 {
-	return (m_before.capacity() + m_after.capacity()) * sizeof(TThickPoint) +
-		   sizeof(*this) + 500;
+	return (m_before.capacity() + m_after.capacity()) * sizeof(TThickPoint) + sizeof(*this) + 500;
 }
 
 //-----------------------------------------------------------------------------
 
-ToolUtils::UndoModifyStrokeAndPaint::UndoModifyStrokeAndPaint(TXshSimpleLevel *level, const TFrameId &frameId,
+ToolUtils::UndoModifyStrokeAndPaint::UndoModifyStrokeAndPaint(TXshSimpleLevel *level,
+															  const TFrameId &frameId,
 															  int strokeIndex)
 	: UndoModifyStroke(level, frameId, strokeIndex), m_fillInformation(0)
 {
@@ -900,7 +916,8 @@ void ToolUtils::UndoModifyStrokeAndPaint::onAdd()
 	UndoModifyStroke::onAdd();
 	TStroke *stroke = image->getStroke(m_strokeIndex);
 	m_fillInformation = new std::vector<TFilledRegionInf>;
-	ImageUtils::getFillingInformationOverlappingArea(image, *m_fillInformation, m_oldBBox, stroke->getBBox());
+	ImageUtils::getFillingInformationOverlappingArea(image, *m_fillInformation, m_oldBBox,
+													 stroke->getBBox());
 }
 
 //-----------------------------------------------------------------------------
@@ -925,7 +942,7 @@ void ToolUtils::UndoModifyStrokeAndPaint::undo() const
 	if (!image)
 		return;
 
-	//image->validateRegions();
+	// image->validateRegions();
 	image->findRegions();
 	for (UINT i = 0; i < size; i++) {
 		reg = image->getRegion((*m_fillInformation)[i].m_regionId);
@@ -954,7 +971,8 @@ int ToolUtils::UndoModifyStrokeAndPaint::getSize() const
 
 //-----------------------------------------------------------------------------
 
-ToolUtils::UndoModifyListStroke::UndoModifyListStroke(TXshSimpleLevel *level, const TFrameId &frameId,
+ToolUtils::UndoModifyListStroke::UndoModifyListStroke(TXshSimpleLevel *level,
+													  const TFrameId &frameId,
 													  const std::vector<TStroke *> &strokeVect)
 	: TToolUndo(level, frameId), m_fillInformation(0)
 {
@@ -998,7 +1016,8 @@ void ToolUtils::UndoModifyListStroke::onAdd()
 	m_fillInformation = new std::vector<TFilledRegionInf>;
 
 	if (m_beginIt != m_endIt)
-		ImageUtils::getFillingInformationOverlappingArea(image, *m_fillInformation, m_oldBBox, newBBox);
+		ImageUtils::getFillingInformationOverlappingArea(image, *m_fillInformation, m_oldBBox,
+														 newBBox);
 }
 
 //-----------------------------------------------------------------------------
@@ -1080,12 +1099,12 @@ int ToolUtils::UndoModifyListStroke::getSize() const
 
 //=============================================================================================
 
-ToolUtils::UndoPencil::UndoPencil(TStroke *stroke,
-								  std::vector<TFilledRegionInf> *fillInformation,
+ToolUtils::UndoPencil::UndoPencil(TStroke *stroke, std::vector<TFilledRegionInf> *fillInformation,
 								  TXshSimpleLevel *level, const TFrameId &frameId,
-								  bool createdFrame, bool createdLevel,
-								  bool autogroup, bool autofill)
-	: TToolUndo(level, frameId, createdFrame, createdLevel, 0), m_strokeId(stroke->getId()), m_fillInformation(fillInformation), m_autogroup(autogroup), m_autofill(autofill)
+								  bool createdFrame, bool createdLevel, bool autogroup,
+								  bool autofill)
+	: TToolUndo(level, frameId, createdFrame, createdLevel, 0), m_strokeId(stroke->getId()),
+	  m_fillInformation(fillInformation), m_autogroup(autogroup), m_autofill(autofill)
 {
 	m_stroke = new TStroke(*stroke);
 }
@@ -1176,10 +1195,11 @@ void ToolUtils::UndoPencil::redo() const
 		int index = image->getStrokeCount() - 1;
 		image->group(index, 1);
 		if (m_autofill) {
-			//to avoid filling other strokes, I enter into the new stroke group
+			// to avoid filling other strokes, I enter into the new stroke group
 			int currentGroup = image->exitGroup();
 			image->enterGroup(index);
-			image->selectFill(stroke->getBBox().enlarge(1, 1), 0, stroke->getStyle(), false, true, false);
+			image->selectFill(stroke->getBBox().enlarge(1, 1), 0, stroke->getStyle(), false, true,
+							  false);
 			if (currentGroup != -1)
 				image->enterGroup(currentGroup);
 			else
@@ -1199,10 +1219,12 @@ int ToolUtils::UndoPencil::getSize() const
 
 //=============================================================================================
 
-ToolUtils::UndoRasterPencil::UndoRasterPencil(TXshSimpleLevel *level, const TFrameId &frameId, TStroke *stroke,
-											  bool selective, bool filled, bool doAntialias, bool createdFrame,
-												bool createdLevel, std::string primitiveName)
-	: TRasterUndo(0, level, frameId, createdFrame, createdLevel, 0), m_selective(selective), m_filled(filled), m_doAntialias(doAntialias), m_primitiveName(primitiveName)
+ToolUtils::UndoRasterPencil::UndoRasterPencil(TXshSimpleLevel *level, const TFrameId &frameId,
+											  TStroke *stroke, bool selective, bool filled,
+											  bool doAntialias, bool createdFrame,
+											  bool createdLevel, std::string primitiveName)
+	: TRasterUndo(0, level, frameId, createdFrame, createdLevel, 0), m_selective(selective),
+	  m_filled(filled), m_doAntialias(doAntialias), m_primitiveName(primitiveName)
 {
 	TRasterCM32P raster = getImage()->getRaster();
 	TDimension d = raster->getSize();
@@ -1228,7 +1250,8 @@ void ToolUtils::UndoRasterPencil::redo() const
 	if (!image)
 		return;
 
-	ToonzImageUtils::addInkStroke(image, m_stroke, m_stroke->getStyle(), m_selective, m_filled, TConsts::infiniteRectD, m_doAntialias);
+	ToonzImageUtils::addInkStroke(image, m_stroke, m_stroke->getStyle(), m_selective, m_filled,
+								  TConsts::infiniteRectD, m_doAntialias);
 	ToolUtils::updateSaveBox();
 	TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
 	notifyImageChanged();
@@ -1238,15 +1261,18 @@ void ToolUtils::UndoRasterPencil::redo() const
 
 int ToolUtils::UndoRasterPencil::getSize() const
 {
-	return TRasterUndo::getSize() + m_stroke->getControlPointCount() * sizeof(TThickPoint) + 100 + sizeof(this);
+	return TRasterUndo::getSize() + m_stroke->getControlPointCount() * sizeof(TThickPoint) + 100 +
+		   sizeof(this);
 }
 
 //=============================================================================================
 
 ToolUtils::UndoFullColorPencil::UndoFullColorPencil(TXshSimpleLevel *level, const TFrameId &frameId,
-													TStroke *stroke, double opacity, bool doAntialias,
-													bool createdFrame, bool createdLevel)
-	: TFullColorRasterUndo(0, level, frameId, createdFrame, createdLevel, 0), m_opacity(opacity), m_doAntialias(doAntialias)
+													TStroke *stroke, double opacity,
+													bool doAntialias, bool createdFrame,
+													bool createdLevel)
+	: TFullColorRasterUndo(0, level, frameId, createdFrame, createdLevel, 0), m_opacity(opacity),
+	  m_doAntialias(doAntialias)
 {
 	TRasterP raster = getImage()->getRaster();
 	TDimension d = raster->getSize();
@@ -1280,15 +1306,15 @@ void ToolUtils::UndoFullColorPencil::redo() const
 
 int ToolUtils::UndoFullColorPencil::getSize() const
 {
-	return TFullColorRasterUndo::getSize() + m_stroke->getControlPointCount() * sizeof(TThickPoint) + 100 + sizeof(this);
+	return TFullColorRasterUndo::getSize() +
+		   m_stroke->getControlPointCount() * sizeof(TThickPoint) + 100 + sizeof(this);
 }
 
 //=============================================================================================
 //
 // undo class (path strokes). call it BEFORE and register it AFTER path change
 //
-ToolUtils::UndoPath::UndoPath(TStageObjectSpline *spline)
-	: m_spline(spline)
+ToolUtils::UndoPath::UndoPath(TStageObjectSpline *spline) : m_spline(spline)
 {
 	assert(!!m_spline);
 
@@ -1333,7 +1359,8 @@ void ToolUtils::UndoPath::undo() const
 		return;
 
 	TStageObjectId currentObjectId = app->getCurrentObject()->getObjectId();
-	TStageObject *stageObject = app->getCurrentXsheet()->getXsheet()->getStageObject(currentObjectId);
+	TStageObject *stageObject =
+		app->getCurrentXsheet()->getXsheet()->getStageObject(currentObjectId);
 	if (stageObject->getSpline()->getId() == m_spline->getId())
 		app->getCurrentObject()->setSplineObject(m_spline);
 
@@ -1358,7 +1385,8 @@ void ToolUtils::UndoPath::redo() const
 		return;
 
 	TStageObjectId currentObjectId = app->getCurrentObject()->getObjectId();
-	TStageObject *stageObject = app->getCurrentXsheet()->getXsheet()->getStageObject(currentObjectId);
+	TStageObject *stageObject =
+		app->getCurrentXsheet()->getXsheet()->getStageObject(currentObjectId);
 	if (stageObject->getSpline()->getId() == m_spline->getId())
 		app->getCurrentObject()->setSplineObject(m_spline);
 
@@ -1375,7 +1403,8 @@ int ToolUtils::UndoPath::getSize() const
 // UndoControlPointEditor
 //
 
-ToolUtils::UndoControlPointEditor::UndoControlPointEditor(TXshSimpleLevel *level, const TFrameId &frameId)
+ToolUtils::UndoControlPointEditor::UndoControlPointEditor(TXshSimpleLevel *level,
+														  const TFrameId &frameId)
 	: TToolUndo(level, frameId), m_isStrokeDelete(false)
 {
 	TVectorImageP image = level->getFrame(frameId, true);
@@ -1451,8 +1480,8 @@ void ToolUtils::UndoControlPointEditor::undo() const
 	image->insertStrokeAt(s, m_oldStroke.first);
 
 	if (image->isComputedRegionAlmostOnce())
-		image->findRegions(); //in futuro togliere. Serve perche' la  removeStrokes, se gli si dice
-							  //di non calcolare le regioni, e' piu' veloce ma poi chrash tutto
+		image->findRegions(); // in futuro togliere. Serve perche' la  removeStrokes, se gli si dice
+	// di non calcolare le regioni, e' piu' veloce ma poi chrash tutto
 
 	app->getCurrentXsheet()->notifyXsheetChanged();
 	notifyImageChanged();
@@ -1486,8 +1515,8 @@ void ToolUtils::UndoControlPointEditor::redo() const
 	}
 
 	if (image->isComputedRegionAlmostOnce())
-		image->findRegions(); //in futuro togliere. Serve perche' la  removeStrokes, se gli si dice
-							  //di non calcolare le regioni, e' piu' veloce ma poi chrash tutto
+		image->findRegions(); // in futuro togliere. Serve perche' la  removeStrokes, se gli si dice
+	// di non calcolare le regioni, e' piu' veloce ma poi chrash tutto
 
 	app->getCurrentXsheet()->notifyXsheetChanged();
 	notifyImageChanged();
@@ -1498,8 +1527,7 @@ void ToolUtils::UndoControlPointEditor::redo() const
 // Menu
 //
 
-ToolUtils::DragMenu::DragMenu()
-	: QMenu()
+ToolUtils::DragMenu::DragMenu() : QMenu()
 {
 }
 
@@ -1565,26 +1593,19 @@ double ToolUtils::ConeSubVolume::compute(double cover)
 	if (i == 20)
 		return m_values[i];
 	else
-		//Interpolazione lineare.
+		// Interpolazione lineare.
 		return (-(x - (i + 1)) * m_values[i]) - (-(x - i) * m_values[i + 1]);
 }
 
 const double ToolUtils::ConeSubVolume::m_values[] = {
-	1.0, 0.99778, 0.987779, 0.967282, 0.934874,
-	0.889929, 0.832457, 0.763067, 0.683002, 0.594266,
-	0.5, 0.405734, 0.316998, 0.236933, 0.167543,
-	0.110071, 0.0651259, 0.0327182, 0.0122208, 0.00221986,
-	0.0};
+	1.0,	  0.99778,  0.987779,  0.967282,  0.934874,  0.889929,   0.832457,
+	0.763067, 0.683002, 0.594266,  0.5,		  0.405734,  0.316998,   0.236933,
+	0.167543, 0.110071, 0.0651259, 0.0327182, 0.0122208, 0.00221986, 0.0};
 
 //---------------------------------------------------------------------------------------------
 
-void ToolUtils::drawBalloon(
-	const TPointD &pos,
-	std::string text,
-	const TPixel32 &color,
-	TPoint delta,
-	bool isPicking,
-	std::vector<TRectD> *otherBalloons)
+void ToolUtils::drawBalloon(const TPointD &pos, std::string text, const TPixel32 &color,
+							TPoint delta, bool isPicking, std::vector<TRectD> *otherBalloons)
 {
 	QString qText = QString::fromStdString(text);
 	QFont font("Arial", 10); // ,QFont::Bold);
@@ -1599,10 +1620,12 @@ void ToolUtils::drawBalloon(
 		double pixelSize = sqrt(tglGetPixelSize2());
 		std::vector<TRectD> &balloons = *otherBalloons;
 		int n = (int)balloons.size();
-		TDimensionD balloonSize(pixelSize * (textRect.width() + mrg * 2), pixelSize * (textRect.height() + mrg * 2));
+		TDimensionD balloonSize(pixelSize * (textRect.width() + mrg * 2),
+								pixelSize * (textRect.height() + mrg * 2));
 		TRectD balloonRect;
 		for (;;) {
-			balloonRect = TRectD(pos + TPointD(delta.x * pixelSize, delta.y * pixelSize), balloonSize);
+			balloonRect =
+				TRectD(pos + TPointD(delta.x * pixelSize, delta.y * pixelSize), balloonSize);
 			int i = 0;
 			while (i < n && !balloons[i].overlaps(balloonRect))
 				i++;
@@ -1662,9 +1685,8 @@ void ToolUtils::drawBalloon(
 		return;
 	}
 
-	QSize size(
-		textRect.width() + textRect.left() + mrg,
-		qMax(textRect.bottom() + mrg, y + delta.y) + 3);
+	QSize size(textRect.width() + textRect.left() + mrg,
+			   qMax(textRect.bottom() + mrg, y + delta.y) + 3);
 
 	QImage label(size.width(), size.height(), QImage::Format_ARGB32);
 	label.fill(Qt::transparent);
@@ -1712,10 +1734,8 @@ void ToolUtils::drawBalloon(
 
 //---------------------------------------------------------------------------------------------
 
-void ToolUtils::drawHook(
-	const TPointD &pos,
-	ToolUtils::HookType type,
-	bool highlighted, bool onionSkin)
+void ToolUtils::drawHook(const TPointD &pos, ToolUtils::HookType type, bool highlighted,
+						 bool onionSkin)
 {
 	int r = 10, d = r + r;
 	QImage image(d, d, QImage::Format_ARGB32);
@@ -1737,8 +1757,8 @@ void ToolUtils::drawHook(
 		painter.drawEllipse(5, 5, d - 10, d - 10);
 	} else if (type == OtherLevelHook) {
 		QColor color(0, 200, 200, 200);
-		//painter.setPen(QPen(Qt::white,3));
-		//painter.drawEllipse(5,5,d-10,d-10);
+		// painter.setPen(QPen(Qt::white,3));
+		// painter.drawEllipse(5,5,d-10,d-10);
 		painter.setPen(Qt::white);
 		painter.setBrush(color);
 		painter.drawEllipse(6, 6, d - 12, d - 12);
@@ -1789,11 +1809,8 @@ TRectD ToolUtils::interpolateRect(const TRectD &rect1, const TRectD &rect2, doub
 	assert(rect2.x0 <= rect2.x1);
 	assert(rect2.y0 <= rect2.y1);
 
-	return TRectD(
-		rect1.x0 + (rect2.x0 - rect1.x0) * t,
-		rect1.y0 + (rect2.y0 - rect1.y0) * t,
-		rect1.x1 + (rect2.x1 - rect1.x1) * t,
-		rect1.y1 + (rect2.y1 - rect1.y1) * t);
+	return TRectD(rect1.x0 + (rect2.x0 - rect1.x0) * t, rect1.y0 + (rect2.y0 - rect1.y0) * t,
+				  rect1.x1 + (rect2.x1 - rect1.x1) * t, rect1.y1 + (rect2.y1 - rect1.y1) * t);
 }
 
 //-----------------------------------------------------------------------------
@@ -1846,5 +1863,5 @@ TRasterPT<PIXEL> ToolUtils::rotate90(const TRasterPT<PIXEL> &ras, bool toRight)
 				workRas->pixels(i)[lx-1-j]=ras->pixels(j)[i];
 		}
 	}
-	return workRas;	
+	return workRas;
 }*/

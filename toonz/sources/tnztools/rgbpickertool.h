@@ -24,7 +24,7 @@ class RGBPickerTool : public TTool
 	TBoolProperty m_passivePick;
 	std::vector<RGBPickerToolOptionsBox *> m_toolOptionsBox;
 
-	//Aggiunte per disegnare il lazzo a la polyline
+	// Aggiunte per disegnare il lazzo a la polyline
 	StrokeGenerator m_drawingTrack;
 	StrokeGenerator m_workingTrack;
 	TPointD m_firstDrawingPos, m_firstWorkingPos;
@@ -36,7 +36,7 @@ class RGBPickerTool : public TTool
 	std::vector<TPointD> m_workingPolyline;
 	bool m_makePick;
 
-public:
+  public:
 	RGBPickerTool();
 
 	/*-- ToolOptionBox上にPassiveに拾った色を表示するため --*/
@@ -81,19 +81,22 @@ public:
 
 	void doPolylinePick();
 
-	//!Viene aggiunto \b pos a \b m_track e disegnato il primo pezzetto del lazzo. Viene inizializzato \b m_firstPos
+	//! Viene aggiunto \b pos a \b m_track e disegnato il primo pezzetto del lazzo. Viene
+	//! inizializzato \b m_firstPos
 	void startFreehand(const TPointD &drawingPos, const TPointD &workingPos);
 
-	//!Viene aggiunto \b pos a \b m_track e disegnato un altro pezzetto del lazzo.
+	//! Viene aggiunto \b pos a \b m_track e disegnato un altro pezzetto del lazzo.
 	void freehandDrag(const TPointD &drawingPos, const TPointD &workingPos);
 
-	//!Viene chiuso il lazzo (si aggiunge l'ultimo punto ad m_track) e viene creato lo stroke rappresentante il lazzo.
+	//! Viene chiuso il lazzo (si aggiunge l'ultimo punto ad m_track) e viene creato lo stroke
+	//! rappresentante il lazzo.
 	void closeFreehand();
 
-	//!Viene aggiunto un punto al vettore m_polyline.
+	//! Viene aggiunto un punto al vettore m_polyline.
 	void addPointPolyline(const TPointD &drawingPos, const TPointD &workingPos);
 
-	//!Agginge l'ultimo pos a \b m_polyline e chiude la spezzata (aggiunge \b m_polyline.front() alla fine del vettore)
+	//! Agginge l'ultimo pos a \b m_polyline e chiude la spezzata (aggiunge \b m_polyline.front()
+	//! alla fine del vettore)
 	void closePolyline(const TPointD &drawingPos, const TPointD &workingPos);
 
 	/*--- RGBPickerToolをFlipbookで有効にする ---*/

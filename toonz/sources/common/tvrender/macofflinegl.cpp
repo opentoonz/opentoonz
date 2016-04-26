@@ -59,8 +59,9 @@ void MacOfflineGL::createContext(TDimension rasterSize, const TOfflineGL::Imp *s
 
 	GLint attribs[20], cnt = 0;
 
-	//NOTE: AGL_OFFSCREEN *must* be selected - or it seems that gl surfaces are never destructed correctly!
-	//This may lead to a kernel panic!
+	// NOTE: AGL_OFFSCREEN *must* be selected - or it seems that gl surfaces are never destructed
+	// correctly!
+	// This may lead to a kernel panic!
 
 	attribs[cnt++] = AGL_RGBA;
 	attribs[cnt++] = GL_TRUE;
@@ -87,8 +88,8 @@ void MacOfflineGL::createContext(TDimension rasterSize, const TOfflineGL::Imp *s
 	m_context = aglCreateContext(fmt, NULL);
 	if (!m_context) {
 		GLenum err = aglGetError();
-		/*		
-		AGL_NO_ERROR                 0 
+		/*
+		AGL_NO_ERROR                 0
 		AGL_BAD_ATTRIBUTE        10000
 		AGL_BAD_PROPERTY         10001
 		AGL_BAD_PIXELFMT         10002
@@ -119,13 +120,14 @@ void MacOfflineGL::createContext(TDimension rasterSize, const TOfflineGL::Imp *s
 
 	AGLPbuffer pbuffer;
 
-	ret = aglCreatePBuffer(rasterSize.lx, rasterSize.ly, GL_TEXTURE_RECTANGLE_EXT, GL_RGBA, 0, &pbuffer);
+	ret = aglCreatePBuffer(rasterSize.lx, rasterSize.ly, GL_TEXTURE_RECTANGLE_EXT, GL_RGBA, 0,
+						   &pbuffer);
 	if (!ret) {
 		GLenum err = aglGetError();
 		std::cout << "Unable to create a PBuffer, AGLError = " << err << std::endl;
 	}
 
-	//memBuffer = new GLubyte[rasterSize.lx*rasterSize.ly*4];
+	// memBuffer = new GLubyte[rasterSize.lx*rasterSize.ly*4];
 
 	ret = aglSetOffScreen(m_context, rasterSize.lx, rasterSize.ly, rasterSize.lx * 4, memBuffer);
 

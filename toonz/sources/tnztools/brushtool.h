@@ -57,7 +57,7 @@ class BrushPresetManager
 	TFilePath m_fp;				   //!< Presets file path
 	std::set<BrushData> m_presets; //!< Current presets container
 
-public:
+  public:
 	BrushPresetManager() {}
 
 	void load(const TFilePath &fp);
@@ -78,7 +78,7 @@ class BrushTool : public TTool
 {
 	Q_DECLARE_TR_FUNCTIONS(BrushTool)
 
-public:
+  public:
 	BrushTool(std::string name, int targetType);
 
 	ToolType getToolType() const { return TTool::LevelWriteTool; }
@@ -116,10 +116,10 @@ public:
 	void removePreset();
 
 	void finishRasterBrush(const TPointD &pos, int pressureVal);
-	//return true if the pencil mode is active in the Brush / PaintBrush / Eraser Tools.
+	// return true if the pencil mode is active in the Brush / PaintBrush / Eraser Tools.
 	bool isPencilModeActive();
 
-protected:
+  protected:
 	TPropertyGroup m_prop[2];
 
 	TDoublePairProperty m_thickness;
@@ -157,25 +157,23 @@ protected:
 	TRaster32P m_workRas;
 
 	std::vector<TThickPoint> m_points;
-	TRect m_strokeRect,
-		m_lastRect;
+	TRect m_strokeRect, m_lastRect;
 
 	BrushPresetManager m_presetsManager; //!< Manager for presets of this tool instance
 
-	bool m_active,
-		m_enabled,
+	bool m_active, m_enabled,
 		m_isPrompting, //!< Whether the tool is prompting for spline substitution.
-		m_firstTime,
-		m_isPath,
-		m_presetsLoaded;
+		m_firstTime, m_isPath, m_presetsLoaded;
 
 	/*--- 作業中のFrameIdをクリック時に保存し、マウスリリース時（Undoの登録時）に別のフレームに
   移動していたときの不具合を修正する。---*/
 	TFrameId m_workingFrameId;
 
-protected:
-	static void drawLine(const TPointD &point, const TPointD &centre, bool horizontal, bool isDecimal);
-	static void drawEmptyCircle(TPointD point, int thick, bool isLxEven, bool isLyEven, bool isPencil);
+  protected:
+	static void drawLine(const TPointD &point, const TPointD &centre, bool horizontal,
+						 bool isDecimal);
+	static void drawEmptyCircle(TPointD point, int thick, bool isLxEven, bool isLyEven,
+								bool isPencil);
 };
 
-#endif //BRUSHTOOL_H
+#endif // BRUSHTOOL_H

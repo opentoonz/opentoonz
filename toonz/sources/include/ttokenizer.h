@@ -27,27 +27,13 @@ namespace TSyntax
 
 class DVAPI Token
 {
-public:
-	enum Type { None,
-				Space,
-				Ident,
-				Number,
-				Punct,
-				Eos };
+  public:
+	enum Type { None, Space, Ident, Number, Punct, Eos };
 
-	Token(int pos = 0)
-		: m_text(""), m_type(None), m_pos(pos)
-	{
-	}
-	Token(int p0, int p1)
-		: m_text(p1 - p0 + 1, ' '), m_type(Space), m_pos(p0)
-	{
-	}
+	Token(int pos = 0) : m_text(""), m_type(None), m_pos(pos) {}
+	Token(int p0, int p1) : m_text(p1 - p0 + 1, ' '), m_type(Space), m_pos(p0) {}
 
-	Token(std::string text, Type type, int pos)
-		: m_text(text), m_type(type), m_pos(pos)
-	{
-	}
+	Token(std::string text, Type type, int pos) : m_text(text), m_type(type), m_pos(pos) {}
 
 	Type getType() const { return m_type; }
 
@@ -58,7 +44,7 @@ public:
 	int getPos() const { return m_pos; }
 	int getPos1() const { return m_pos + m_text.length() - 1; }
 
-private:
+  private:
 	std::string m_text;
 	int m_pos;
 	Type m_type;
@@ -73,7 +59,7 @@ class DVAPI Tokenizer
 	std::vector<Token> m_tokens;
 	int m_index;
 
-public:
+  public:
 	Tokenizer();
 	Tokenizer(std::string buffer);
 	~Tokenizer();

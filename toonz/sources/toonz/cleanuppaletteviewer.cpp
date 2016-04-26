@@ -1,21 +1,21 @@
 
 
-//TnzCore includes
+// TnzCore includes
 #include "tpalette.h"
 
-//ToonzLib includes
+// ToonzLib includes
 #include "toonz/cleanupcolorstyles.h"
 #include "toonz/tpalettehandle.h"
 #include "toonz/palettecontroller.h"
 
-//ToonzQt includes
+// ToonzQt includes
 #include "toonzqt/colorfield.h"
 #include "toonzqt/dvdialog.h"
 
-//Toonz includes
+// Toonz includes
 #include "tapp.h"
 
-//Qt includes
+// Qt includes
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QHBoxLayout>
@@ -50,7 +50,8 @@ int search(TPalette *plt, TCleanupStyle *style)
 //********************************************************************************
 
 CleanupPaletteViewer::CleanupPaletteViewer(QWidget *parent)
-	: QWidget(parent), m_ph(TApp::instance()->getPaletteController()->getCurrentCleanupPalette()), m_scrollWidget(0), m_greyMode(true), m_contrastEnabled(true)
+	: QWidget(parent), m_ph(TApp::instance()->getPaletteController()->getCurrentCleanupPalette()),
+	  m_scrollWidget(0), m_greyMode(true), m_contrastEnabled(true)
 {
 	m_scrollArea = new QScrollArea(this);
 	m_add = new QPushButton("+", this);
@@ -100,7 +101,7 @@ void CleanupPaletteViewer::buildGUI()
 {
 	m_colorFields.clear();
 
-	//delete m_scrollWidget;    //Already destroyed by m_scrollWidget->setWidget()
+	// delete m_scrollWidget;    //Already destroyed by m_scrollWidget->setWidget()
 	m_scrollWidget = new QFrame();
 
 	QVBoxLayout *scrollLayout = new QVBoxLayout(m_scrollWidget);
@@ -109,7 +110,8 @@ void CleanupPaletteViewer::buildGUI()
 	scrollLayout->setSpacing(10);
 	scrollLayout->setMargin(0);
 
-	TPalette *palette = TApp::instance()->getPaletteController()->getCurrentCleanupPalette()->getPalette();
+	TPalette *palette =
+		TApp::instance()->getPaletteController()->getCurrentCleanupPalette()->getPalette();
 	assert(palette);
 	bool ret = true;
 
@@ -136,7 +138,7 @@ void CleanupPaletteViewer::buildGUI()
 	scrollLayout->addStretch(1);
 	assert(ret);
 
-	//NOTE: setWidget() Must be done after m_scrollWidget's layout has been set (see Qt docs)
+	// NOTE: setWidget() Must be done after m_scrollWidget's layout has been set (see Qt docs)
 	m_scrollArea->setWidget(m_scrollWidget);
 	m_scrollArea->ensureWidgetVisible(m_scrollWidget, 0, 0);
 

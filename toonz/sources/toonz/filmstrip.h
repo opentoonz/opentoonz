@@ -40,7 +40,7 @@ class FilmstripFrames : public QFrame, public TSelection::View
 {
 	Q_OBJECT
 
-public:
+  public:
 #if QT_VERSION >= 0x050500
 	FilmstripFrames(QScrollArea *parent = 0, Qt::WindowFlags flags = 0);
 #else
@@ -103,14 +103,12 @@ public:
 
 	int getOneFrameHeight();
 
-protected:
+  protected:
 	void showEvent(QShowEvent *);
 	void hideEvent(QHideEvent *);
 	void paintEvent(QPaintEvent *);
 
-	enum { F_NORMAL = 0,
-		   F_INBETWEEN_RANGE = 0x1,
-		   F_INBETWEEN_LAST = 0x2 }; // Flags
+	enum { F_NORMAL = 0, F_INBETWEEN_RANGE = 0x1, F_INBETWEEN_LAST = 0x2 }; // Flags
 	void drawFrameIcon(QPainter &p, const QRect &r, int index, const TFrameId &fid, int flags);
 
 	void mousePressEvent(QMouseEvent *event);
@@ -132,12 +130,12 @@ protected:
 	void execNavigatorPan(const QPoint &point);
 	void mouseDoubleClickEvent(QMouseEvent *event);
 
-protected slots:
+  protected slots:
 	void onLevelChanged();
 	void onLevelSwitched(TXshLevel *);
 	void onFrameSwitched();
 
-private:
+  private:
 	// QSS Properties
 
 	QColor m_bgColor;
@@ -148,7 +146,7 @@ private:
 	Q_PROPERTY(QColor LightLineColor READ getLightLineColor WRITE setLightLineColor)
 	Q_PROPERTY(QColor DarkLineColor READ getDarkLineColor WRITE setDarkLineColor)
 
-private:
+  private:
 	// Widgets
 
 	QScrollArea *m_scrollArea;
@@ -170,9 +168,7 @@ private:
 		m_dragSelectionEndIndex,   //!< Ending level index during drag selections.
 		m_timerId;				   // per l'autoscroll
 
-	bool m_selecting,
-		m_dragDropArmed,
-		m_readOnly;
+	bool m_selecting, m_dragDropArmed, m_readOnly;
 
 	QPoint m_naviRectPos;
 	QPointF m_icon2ViewerRatio;
@@ -195,7 +191,7 @@ class Filmstrip : public QWidget
 	std::vector<TXshSimpleLevel *> m_levels;
 	std::map<TXshSimpleLevel *, TFrameId> m_workingFrames;
 
-public:
+  public:
 #if QT_VERSION >= 0x050500
 	Filmstrip(QWidget *parent = 0, Qt::WindowFlags flags = 0);
 #else
@@ -203,16 +199,16 @@ public:
 #endif
 	~Filmstrip();
 
-protected:
+  protected:
 	void showEvent(QShowEvent *);
 	void hideEvent(QHideEvent *);
 	void resizeEvent(QResizeEvent *);
-	//void keyPressEvent(QKeyEvent* event){
+	// void keyPressEvent(QKeyEvent* event){
 	//  event->ignore();
 	//}
 
-public slots:
-	//!Aggiorna il "titolo" del widget e rinfresca la filmstrip se c'e' qualche "check" attivo.
+  public slots:
+	//! Aggiorna il "titolo" del widget e rinfresca la filmstrip se c'e' qualche "check" attivo.
 	void onLevelSwitched(TXshLevel *oldLevel);
 	// void ensureValuesVisible(int x, int y);
 
@@ -225,9 +221,9 @@ public slots:
 
 	void onFrameSwitched();
 
-private:
+  private:
 	void updateWindowTitle();
-	//synchronize the current index of combo to the current level
+	// synchronize the current index of combo to the current level
 	void updateCurrentLevelComboItem();
 };
 
@@ -240,7 +236,7 @@ class InbetweenDialog : public DVGui::Dialog
 	Q_OBJECT
 	QComboBox *m_comboBox;
 
-public:
+  public:
 	InbetweenDialog(QWidget *parent);
 
 	void setValue(const QString &value);

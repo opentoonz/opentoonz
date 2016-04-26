@@ -12,12 +12,8 @@
 namespace
 {
 
-void doDrawRaster(const TAffine &aff,
-				  UCHAR *buffer, int wrap, int bpp, const TDimension &rasDim,
-				  const TRect &bbox,
-				  bool showBBox,
-				  GLenum magFilter,
-				  GLenum minFilter,
+void doDrawRaster(const TAffine &aff, UCHAR *buffer, int wrap, int bpp, const TDimension &rasDim,
+				  const TRect &bbox, bool showBBox, GLenum magFilter, GLenum minFilter,
 				  bool premultiplied)
 {
 	if (!buffer)
@@ -41,8 +37,10 @@ void doDrawRaster(const TAffine &aff,
 		assert(leftBox.getLy() == bbox.getLy());
 		assert(rightBox.getLy() == bbox.getLy());
 
-		doDrawRaster(aff, buffer, wrap, bpp, rasDim, leftBox, showBBox, magFilter, minFilter, premultiplied);
-		doDrawRaster(aff, buffer, wrap, bpp, rasDim, rightBox, showBBox, magFilter, minFilter, premultiplied);
+		doDrawRaster(aff, buffer, wrap, bpp, rasDim, leftBox, showBBox, magFilter, minFilter,
+					 premultiplied);
+		doDrawRaster(aff, buffer, wrap, bpp, rasDim, rightBox, showBBox, magFilter, minFilter,
+					 premultiplied);
 		return;
 	}
 
@@ -55,8 +53,10 @@ void doDrawRaster(const TAffine &aff,
 		assert(bottomBox.getLx() == bbox.getLx());
 		assert(topBox.getLx() == bbox.getLx());
 
-		doDrawRaster(aff, buffer, wrap, bpp, rasDim, bottomBox, showBBox, magFilter, minFilter, premultiplied);
-		doDrawRaster(aff, buffer, wrap, bpp, rasDim, topBox, showBBox, magFilter, minFilter, premultiplied);
+		doDrawRaster(aff, buffer, wrap, bpp, rasDim, bottomBox, showBBox, magFilter, minFilter,
+					 premultiplied);
+		doDrawRaster(aff, buffer, wrap, bpp, rasDim, topBox, showBBox, magFilter, minFilter,
+					 premultiplied);
 
 		return;
 	}
@@ -73,9 +73,7 @@ void doDrawRaster(const TAffine &aff,
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
 
-	glTexEnvf(GL_TEXTURE_ENV,
-			  GL_TEXTURE_ENV_MODE,
-			  GL_REPLACE);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
@@ -97,16 +95,9 @@ void doDrawRaster(const TAffine &aff,
 
 	glPixelStorei(GL_UNPACK_ROW_LENGTH, wrap);
 
-	glTexSubImage2D(
-		GL_TEXTURE_2D, // target (is a 2D texture)
-		0,			   // is one level only
-		0,
-		0,
-		width,
-		height,
-		fmt,
-		type,
-		buffer);
+	glTexSubImage2D(GL_TEXTURE_2D, // target (is a 2D texture)
+					0,			   // is one level only
+					0, 0, width, height, fmt, type, buffer);
 	CHECK_ERRORS_BY_GL
 
 	double halfWidth = 0.5 * bbox.getLx();
@@ -147,39 +138,28 @@ void doDrawRaster(const TAffine &aff,
 }
 
 //----------------------------------------------------------------------------
-void doDrawRaster(const TAffine &aff,
-				  const TRasterImageP &ri,
-				  const TRectI &bbox,
-				  bool showBBox,
-				  GLenum magFilter,
-				  GLenum minFilter,
-				  bool premultiplied)
+void doDrawRaster(const TAffine &aff, const TRasterImageP &ri, const TRectI &bbox, bool showBBox,
+				  GLenum magFilter, GLenum minFilter, bool premultiplied)
 {
 	TRasterP r = ri->getRaster();
 	r->lock();
-	doDrawRaster(aff,
-				 r->getRawData(), r->getWrap(), r->getPixelSize(),
-				 r->getSize(),
-				 bbox,
-				 showBBox,
-				 magFilter,
-				 minFilter,
-				 premultiplied);
+	doDrawRaster(aff, r->getRawData(), r->getWrap(), r->getPixelSize(), r->getSize(), bbox,
+				 showBBox, magFilter, minFilter, premultiplied);
 	r->unlock();
 }
 
-} //namespace
+} // namespace
 
 //===================================================================
 
-void GLRasterPainter::drawRaster(const TAffine &aff, UCHAR *buffer, int wrap, int bpp, const TDimension &rasSize, bool premultiplied)
+void GLRasterPainter::drawRaster(const TAffine &aff, UCHAR *buffer, int wrap, int bpp,
+								 const TDimension &rasSize, bool premultiplied)
 {
 	if (!buffer)
 		return;
 
-	doDrawRaster(
-		aff, buffer, wrap, bpp, rasSize, rasSize,
-		false, GL_NEAREST, GL_LINEAR, premultiplied);
+	doDrawRaster(aff, buffer, wrap, bpp, rasSize, rasSize, false, GL_NEAREST, GL_LINEAR,
+				 premultiplied);
 }
 
 //----------------------------------------------------------------------------
@@ -189,9 +169,8 @@ void GLRasterPainter::drawRaster(const TAffine &aff, const TRasterImageP &ri, bo
 	if (!ri || !ri->getRaster())
 		return;
 
-	doDrawRaster(
-		aff, ri, ri->getRaster()->getBounds(),
-		false, GL_NEAREST, GL_LINEAR, premultiplied);
+	doDrawRaster(aff, ri, ri->getRaster()->getBounds(), false, GL_NEAREST, GL_LINEAR,
+				 premultiplied);
 }
 
 //----------------------------------------------------------------------------

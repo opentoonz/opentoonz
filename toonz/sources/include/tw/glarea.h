@@ -27,11 +27,11 @@ class DVAPI TGLArea : public TWidget
 
 	void computeOcclusingRegion();
 	void deleteOcclusingRegion();
-	//void  redrawUncoveredArea(const TPoint &);
+	// void  redrawUncoveredArea(const TPoint &);
 
 	std::vector<TRect> *m_arrayOfRectToRedraw;
 
-protected:
+  protected:
 // int m_lx, m_ly;
 
 // double m_angle;
@@ -55,22 +55,19 @@ protected:
 	bool m_isInsideScreen;
 	void onGLContextCreated();
 
-public:
+  public:
 	class PickItem
 	{
-	public:
+	  public:
 		UINT m_label;
 		UINT m_zMin;
 		UINT m_zMax;
 
-		PickItem(UINT label, UINT zmin, UINT zmax)
-			: m_label(label), m_zMin(zmin), m_zMax(zmax)
-		{
-		}
+		PickItem(UINT label, UINT zmin, UINT zmax) : m_label(label), m_zMin(zmin), m_zMax(zmax) {}
 
 		~PickItem() {}
-	private:
-		//not implemented
+	  private:
+		// not implemented
 		PickItem();
 	};
 
@@ -118,13 +115,10 @@ public:
 
 	static bool isBGRASupported() { return m_bgraSupported; }
 
-	bool unProject(
-		TPointD &output,
+	bool unProject(TPointD &output,
 
-		const TPoint &mousePos,
-		const T3DPointD &planeOrigin,
-		const T3DPointD &u,
-		const T3DPointD &v) const;
+				   const TPoint &mousePos, const T3DPointD &planeOrigin, const T3DPointD &u,
+				   const T3DPointD &v) const;
 
 	void makeCurrent(); // Gl context
 	bool m_dontSwapBuffers;

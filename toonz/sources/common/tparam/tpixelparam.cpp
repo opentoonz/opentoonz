@@ -9,13 +9,16 @@
 
 class TPixelParamImp
 {
-public:
+  public:
 	TPixelParamImp(const TPixel32 &p)
-		: m_r(new TDoubleParam(p.r / 255.0)), m_g(new TDoubleParam(p.g / 255.0)), m_b(new TDoubleParam(p.b / 255.0)), m_m(new TDoubleParam(p.m / 255.0)), m_isMatteEnabled(true)
+		: m_r(new TDoubleParam(p.r / 255.0)), m_g(new TDoubleParam(p.g / 255.0)),
+		  m_b(new TDoubleParam(p.b / 255.0)), m_m(new TDoubleParam(p.m / 255.0)),
+		  m_isMatteEnabled(true)
 	{
 	}
 	TPixelParamImp(const TPixelParamImp &src)
-		: m_r(src.m_r->clone()), m_g(src.m_g->clone()), m_b(src.m_b->clone()), m_m(src.m_m->clone()), m_isMatteEnabled(src.m_isMatteEnabled)
+		: m_r(src.m_r->clone()), m_g(src.m_g->clone()), m_b(src.m_b->clone()),
+		  m_m(src.m_m->clone()), m_isMatteEnabled(src.m_isMatteEnabled)
 	{
 	}
 	~TPixelParamImp() {}
@@ -27,8 +30,7 @@ PERSIST_IDENTIFIER(TPixelParam, "pixelParam")
 
 //---------------------------------------------------------
 
-TPixelParam::TPixelParam(const TPixel32 &p)
-	: m_data(new TPixelParamImp(p))
+TPixelParam::TPixelParam(const TPixel32 &p) : m_data(new TPixelParamImp(p))
 {
 	addParam(m_data->m_r, "Red");
 	addParam(m_data->m_g, "Green");
@@ -88,11 +90,8 @@ TPixelParam::~TPixelParam()
 
 TPixel32 TPixelParam::getDefaultValue() const
 {
-	TPixelD pixd(
-		m_data->m_r->getDefaultValue(),
-		m_data->m_g->getDefaultValue(),
-		m_data->m_b->getDefaultValue(),
-		m_data->m_m->getDefaultValue());
+	TPixelD pixd(m_data->m_r->getDefaultValue(), m_data->m_g->getDefaultValue(),
+				 m_data->m_b->getDefaultValue(), m_data->m_m->getDefaultValue());
 	return toPixel32(pixd);
 }
 

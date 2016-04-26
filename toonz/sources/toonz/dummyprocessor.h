@@ -10,7 +10,7 @@ class DummyProcessor : public Processor
 {
 	std::vector<int> m_dummyData;
 
-public:
+  public:
 	//! Constructor
 	DummyProcessor();
 	//! Destructor

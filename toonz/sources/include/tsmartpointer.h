@@ -33,7 +33,7 @@ class DVAPI TSmartObject
 	static const TINT32 m_unknownClassCode;
 #endif
 
-public:
+  public:
 	typedef short ClassCode;
 
 	TSmartObject(ClassCode
@@ -72,10 +72,7 @@ public:
 #endif
 	}
 
-	inline void addRef()
-	{
-		++m_refCount;
-	}
+	inline void addRef() { ++m_refCount; }
 	inline void release()
 	{
 		if ((--m_refCount) <= 0)
@@ -85,39 +82,34 @@ public:
 
 	static TINT32 getInstanceCount(ClassCode code);
 
-private:
+  private:
 	void incrementInstanceCount();
 	void decrementInstanceCount();
 
-private:
+  private:
 	// not implemented
 	TSmartObject(const TSmartObject &);
 	TSmartObject &operator=(const TSmartObject &);
 };
 
-#define DECLARE_CLASS_CODE                                  \
-private:                                                    \
-	static const TSmartObject::ClassCode m_classCode;       \
-                                                            \
-public:                                                     \
-	inline static TINT32 getInstanceCount()                 \
-	{                                                       \
-		return TSmartObject::getInstanceCount(m_classCode); \
-	}
+#define DECLARE_CLASS_CODE                                                                         \
+  private:                                                                                         \
+	static const TSmartObject::ClassCode m_classCode;                                              \
+                                                                                                   \
+  public:                                                                                          \
+	inline static TINT32 getInstanceCount() { return TSmartObject::getInstanceCount(m_classCode); }
 
-#define DEFINE_CLASS_CODE(T, ID) \
-	const TSmartObject::ClassCode T::m_classCode = ID;
+#define DEFINE_CLASS_CODE(T, ID) const TSmartObject::ClassCode T::m_classCode = ID;
 
 //=========================================================
 
-template <class T>
-class DVAPI TSmartPointerT
+template <class T> class DVAPI TSmartPointerT
 {
 
-protected:
-	T* m_pointer;
+  protected:
+	T *m_pointer;
 
-public:
+  public:
 	TSmartPointerT() : m_pointer(0) {}
 
 	TSmartPointerT(const TSmartPointerT &src) : m_pointer(src.m_pointer)
@@ -126,7 +118,7 @@ public:
 			m_pointer->addRef();
 	}
 
-	TSmartPointerT(T* pointer) : m_pointer(pointer)
+	TSmartPointerT(T *pointer) : m_pointer(pointer)
 	{
 		if (m_pointer)
 			m_pointer->addRef();
@@ -167,8 +159,9 @@ public:
 
 	T *getPointer() const { return m_pointer; }
 
-	T* releasePointer() {
-		T* p = m_pointer;
+	T *releasePointer()
+	{
+		T *p = m_pointer;
 		m_pointer = nullptr;
 		return p;
 	}
@@ -188,7 +181,7 @@ public:
 template <class DERIVED, class BASE>
 class DVAPI TDerivedSmartPointerT : public TSmartPointerT<DERIVED>
 {
-public:
+  public:
 	typedef TDerivedSmartPointerT<DERIVED, BASE> DerivedSmartPointer;
 
 	TDerivedSmartPointerT(){};

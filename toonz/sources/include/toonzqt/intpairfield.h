@@ -65,11 +65,14 @@ class DVAPI IntPairField : public QWidget
 {
 	Q_OBJECT
 
-	QPixmap m_handleLeftPixmap, m_handleRightPixmap, m_handleLeftGrayPixmap, m_handleRightGrayPixmap;
+	QPixmap m_handleLeftPixmap, m_handleRightPixmap, m_handleLeftGrayPixmap,
+		m_handleRightGrayPixmap;
 	Q_PROPERTY(QPixmap HandleLeftPixmap READ getHandleLeftPixmap WRITE setHandleLeftPixmap);
 	Q_PROPERTY(QPixmap HandleRightPixmap READ getHandleRightPixmap WRITE setHandleRightPixmap);
-	Q_PROPERTY(QPixmap HandleLeftGrayPixmap READ getHandleLeftGrayPixmap WRITE setHandleLeftGrayPixmap);
-	Q_PROPERTY(QPixmap HandleRightGrayPixmap READ getHandleRightGrayPixmap WRITE setHandleRightGrayPixmap);
+	Q_PROPERTY(
+		QPixmap HandleLeftGrayPixmap READ getHandleLeftGrayPixmap WRITE setHandleLeftGrayPixmap);
+	Q_PROPERTY(
+		QPixmap HandleRightGrayPixmap READ getHandleRightGrayPixmap WRITE setHandleRightGrayPixmap);
 
 	IntLineEdit *m_leftLineEdit;
 	IntLineEdit *m_rightLineEdit;
@@ -88,7 +91,7 @@ class DVAPI IntPairField : public QWidget
 
 	bool m_isMaxRangeLimited;
 
-public:
+  public:
 	IntPairField(QWidget *parent = 0, bool isMaxRangeLimited = true);
 	~IntPairField() {}
 
@@ -124,7 +127,7 @@ public:
 	QColor getLightLineColor() const { return m_lightLineColor; }
 	void setDarkLineColor(const QColor &color) { m_darkLineColor = color; }
 	QColor getDarkLineColor() const { return m_darkLineColor; }
-protected:
+  protected:
 	/*! Return value corresponding \b x position. */
 	double pos2value(int x) const;
 	/*! Return x position corresponding \b value. */
@@ -141,7 +144,7 @@ protected:
 	void mouseMoveEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *event);
 
-protected slots:
+  protected slots:
 	/*! Set current left value to value in left text field; if necessary, if left
 			value is greater than right, change also current right value.
 	\n	This protected slot is called when text editing is finished.
@@ -156,14 +159,14 @@ protected slots:
 	\n	If current right value is equal to right text field value return and do nothing. */
 	void onRightEditingFinished();
 
-signals:
+  signals:
 	/*!	This signal is emitted when change one of two IntField value;
 			if one slider grab position change or if one text field editing is finished. */
 	void valuesChanged(bool isDragging);
 };
 
 //-----------------------------------------------------------------------------
-} //namespace DVGui
+} // namespace DVGui
 //-----------------------------------------------------------------------------
 
 #endif // INTPAIRFIELD_H

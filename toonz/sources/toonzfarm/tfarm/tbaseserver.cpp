@@ -19,8 +19,7 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 
-TBaseServer::TBaseServer(int port)
-	: m_port(port), m_socketId(-1), m_stopped(false)
+TBaseServer::TBaseServer(int port) : m_port(port), m_socketId(-1), m_stopped(false)
 {
 }
 
@@ -101,8 +100,7 @@ void TBaseServer::start()
 		// Verify that data was received. If yes, use it.
 		if (iReturn == SOCKET_ERROR) {
 			char szError[1024];
-			wsprintf(szError, TEXT("No data is received, receive failed.")
-								  TEXT(" Error: %d"),
+			wsprintf(szError, TEXT("No data is received, receive failed.") TEXT(" Error: %d"),
 					 WSAGetLastError());
 
 			throw(szError);
@@ -136,8 +134,7 @@ void TBaseServer::start()
 			char szError[1024];
 
 #ifdef WIN32
-			wsprintf(szError,
-					 TEXT("Sending data to the client failed. Error: %d"),
+			wsprintf(szError, TEXT("Sending data to the client failed. Error: %d"),
 					 WSAGetLastError());
 #endif
 

@@ -176,7 +176,9 @@ double OnionSkinMask::getOnionSkinFade(int rowsDistance)
 	if (rowsDistance == 0)
 		return 0.9;
 
-	double fade = MINFADE + abs(rowsDistance) * getIncrement(Preferences::instance()->getOnionPaperThickness());
+	double fade =
+		MINFADE +
+		abs(rowsDistance) * getIncrement(Preferences::instance()->getOnionPaperThickness());
 	return tcrop(fade, MINFADE, MAXFADE);
 }
 
@@ -201,7 +203,8 @@ void OnionSkinMask::setShiftTraceGhostCenter(int index, const TPointD &center)
 //***************************************************************************
 
 OnionSkinMaskModifier::OnionSkinMaskModifier(OnionSkinMask mask, int currentRow)
-	: m_oldMask(mask), m_curMask(mask), m_firstRow(0), m_lastRow(0), m_curRow(currentRow), m_status(0)
+	: m_oldMask(mask), m_curMask(mask), m_firstRow(0), m_lastRow(0), m_curRow(currentRow),
+	  m_status(0)
 {
 }
 

@@ -33,8 +33,7 @@ using namespace DVGui;
 */
 //-----------------------------------------------------------------------------
 
-HistogramPopup::HistogramPopup(QString title)
-	: QDialog(TApp::instance()->getMainWindow())
+HistogramPopup::HistogramPopup(QString title) : QDialog(TApp::instance()->getMainWindow())
 {
 	setTitle(title);
 
@@ -102,8 +101,7 @@ void HistogramPopup::updateAverageColor(const TPixel32 &pix)
 */
 //-----------------------------------------------------------------------------
 
-ViewerHistogramPopup::ViewerHistogramPopup()
-	: HistogramPopup(tr("Viewer Histogram"))
+ViewerHistogramPopup::ViewerHistogramPopup() : HistogramPopup(tr("Viewer Histogram"))
 {
 }
 
@@ -111,10 +109,8 @@ ViewerHistogramPopup::ViewerHistogramPopup()
 
 void ViewerHistogramPopup::showEvent(QShowEvent *e)
 {
-	connect(TApp::instance()->getCurrentFrame(), SIGNAL(frameSwitched()),
-			SLOT(setCurrentRaster()));
-	connect(Previewer::instance(), SIGNAL(activedChanged()),
-			SLOT(setCurrentRaster()));
+	connect(TApp::instance()->getCurrentFrame(), SIGNAL(frameSwitched()), SLOT(setCurrentRaster()));
+	connect(Previewer::instance(), SIGNAL(activedChanged()), SLOT(setCurrentRaster()));
 
 	setCurrentRaster();
 }
@@ -123,7 +119,8 @@ void ViewerHistogramPopup::showEvent(QShowEvent *e)
 
 void ViewerHistogramPopup::hideEvent(QHideEvent *e)
 {
-	disconnect(TApp::instance()->getCurrentFrame(), SIGNAL(frameSwitched()), this, SLOT(setCurrentRaster()));
+	disconnect(TApp::instance()->getCurrentFrame(), SIGNAL(frameSwitched()), this,
+			   SLOT(setCurrentRaster()));
 	disconnect(Previewer::instance(), SIGNAL(activedChanged()), this, SLOT(setCurrentRaster()));
 }
 
@@ -136,7 +133,7 @@ void ViewerHistogramPopup::setCurrentRaster()
 	TRasterP ras = 0;
 	if (previewer->isActive()) {
 		int currentFrame = app->getCurrentFrame()->getFrameIndex();
-		//Se il preview del frame non e' pronto richiamo questo metodo dopo un intervallo di 10 ms
+		// Se il preview del frame non e' pronto richiamo questo metodo dopo un intervallo di 10 ms
 		if (!previewer->isFrameReady(currentFrame)) {
 			QTimer::singleShot(10, this, SLOT(setCurrentRaster()));
 			return;

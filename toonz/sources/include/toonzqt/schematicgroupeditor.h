@@ -17,7 +17,7 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-//forward declaration
+// forward declaration
 class QGraphicsScene;
 class SchematicNode;
 class FxSchematicNode;
@@ -28,7 +28,7 @@ class SchematicName;
 
 //=====================================================
 //
-//SchematicGroupEditor
+// SchematicGroupEditor
 //
 //=====================================================
 
@@ -38,7 +38,7 @@ class DVAPI SchematicWindowEditor : public QObject, public QGraphicsItem
 
 	QPointF m_lastPos;
 
-protected:
+  protected:
 	QList<SchematicNode *> m_groupedNode;
 	QString m_groupName;
 	SchematicScene *m_scene;
@@ -46,7 +46,7 @@ protected:
 	bool m_isMacroEditor;
 	Qt::MouseButton m_button;
 
-public:
+  public:
 	SchematicWindowEditor(const QList<SchematicNode *> &groupedNode, SchematicScene *scene);
 	~SchematicWindowEditor();
 
@@ -57,18 +57,18 @@ public:
 	bool contains(SchematicNode *node) const { return m_groupedNode.contains(node); }
 	void resizeNodes(bool maximizeNodes);
 
-protected:
+  protected:
 	void mousePressEvent(QGraphicsSceneMouseEvent *e);
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *e);
 	void mouseReleaseEvent(QGraphicsSceneMouseEvent *e);
 	void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *e);
 	void contextMenuEvent(QGraphicsSceneContextMenuEvent *e);
 
-protected slots:
+  protected slots:
 	virtual void closeEditor() = 0;
 	virtual void onNameChanged() = 0;
 
-private:
+  private:
 	//! retrieve the group name and the group Id
 	virtual void initializeEditor() = 0;
 	virtual void doResizeNodes(bool maximizeNodes) = 0;
@@ -76,7 +76,7 @@ private:
 
 //=====================================================
 //
-//FxSchematicGroupEditor
+// FxSchematicGroupEditor
 //
 //=====================================================
 
@@ -87,25 +87,26 @@ class DVAPI FxSchematicGroupEditor : public SchematicWindowEditor
 
 	int m_groupId;
 
-public:
-	FxSchematicGroupEditor(int groupId, const QList<SchematicNode *> &groupedNode, SchematicScene *scene);
+  public:
+	FxSchematicGroupEditor(int groupId, const QList<SchematicNode *> &groupedNode,
+						   SchematicScene *scene);
 	~FxSchematicGroupEditor();
 
 	QRectF boundingSceneRect() const;
 	void setGroupedNodeZValue(int zValue);
 
-protected slots:
+  protected slots:
 	void closeEditor();
 	void onNameChanged();
 
-private:
+  private:
 	void initializeEditor();
 	void doResizeNodes(bool maximizeNodes);
 };
 
 //=====================================================
 //
-//FxSchematicMacroEditor
+// FxSchematicMacroEditor
 //
 //=====================================================
 
@@ -115,28 +116,29 @@ class DVAPI FxSchematicMacroEditor : public SchematicWindowEditor
 
 	TMacroFx *m_macro;
 
-public:
-	FxSchematicMacroEditor(TMacroFx *macro, const QList<SchematicNode *> &groupedNode, SchematicScene *scene);
+  public:
+	FxSchematicMacroEditor(TMacroFx *macro, const QList<SchematicNode *> &groupedNode,
+						   SchematicScene *scene);
 	~FxSchematicMacroEditor();
 
 	QRectF boundingSceneRect() const;
 	void setGroupedNodeZValue(int zValue);
 
-protected:
+  protected:
 	void mouseMoveEvent(QGraphicsSceneMouseEvent *e);
 
-protected slots:
+  protected slots:
 	void closeEditor();
 	void onNameChanged();
 
-private:
+  private:
 	void initializeEditor();
 	void doResizeNodes(bool maximizeNodes);
 };
 
 //=====================================================
 //
-//StageSchematicGroupEditor
+// StageSchematicGroupEditor
 //
 //=====================================================
 
@@ -147,18 +149,19 @@ class DVAPI StageSchematicGroupEditor : public SchematicWindowEditor
 
 	int m_groupId;
 
-public:
-	StageSchematicGroupEditor(int groupId, const QList<SchematicNode *> &groupedNode, SchematicScene *scene);
+  public:
+	StageSchematicGroupEditor(int groupId, const QList<SchematicNode *> &groupedNode,
+							  SchematicScene *scene);
 	~StageSchematicGroupEditor();
 
 	QRectF boundingSceneRect() const;
 	void setGroupedNodeZValue(int zValue);
 
-protected slots:
+  protected slots:
 	void closeEditor();
 	void onNameChanged();
 
-private:
+  private:
 	void initializeEditor();
 	void doResizeNodes(bool maximizeNodes);
 };

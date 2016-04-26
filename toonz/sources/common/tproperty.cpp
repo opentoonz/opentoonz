@@ -13,7 +13,8 @@ void TProperty::addListener(Listener *listener)
 
 void TProperty::removeListener(Listener *listener)
 {
-	m_listeners.erase(std::remove(m_listeners.begin(), m_listeners.end(), listener), m_listeners.end());
+	m_listeners.erase(std::remove(m_listeners.begin(), m_listeners.end(), listener),
+					  m_listeners.end());
 }
 
 void TProperty::notifyListeners() const
@@ -31,8 +32,7 @@ TPropertyGroup::TPropertyGroup()
 
 TPropertyGroup::~TPropertyGroup()
 {
-	for (PropertyVector::iterator it = m_properties.begin();
-		 it != m_properties.end(); ++it)
+	for (PropertyVector::iterator it = m_properties.begin(); it != m_properties.end(); ++it)
 		if (it->second)
 			delete it->first;
 }
@@ -46,8 +46,7 @@ void TPropertyGroup::clear()
 TPropertyGroup *TPropertyGroup::clone() const
 {
 	TPropertyGroup *g = new TPropertyGroup();
-	for (PropertyVector::const_iterator i = m_properties.begin();
-		 i != m_properties.end(); ++i)
+	for (PropertyVector::const_iterator i = m_properties.begin(); i != m_properties.end(); ++i)
 		g->add(i->first->clone());
 	return g;
 }
@@ -77,8 +76,7 @@ TProperty *TPropertyGroup::getProperty(std::string name)
 		return i->second;
 }
 
-template <class Property>
-void assign(Property *dst, TProperty *src)
+template <class Property> void assign(Property *dst, TProperty *src)
 {
 	Property *s = dynamic_cast<Property *>(src);
 	if (!s)
@@ -90,7 +88,7 @@ class Setter : public TProperty::Visitor
 {
 	TProperty *m_src;
 
-public:
+  public:
 	Setter(TProperty *src) : m_src(src) {}
 
 	void visit(TDoubleProperty *dst) { assign(dst, m_src); }
@@ -106,8 +104,8 @@ public:
 
 void TPropertyGroup::setProperties(TPropertyGroup *g)
 {
-	for (PropertyVector::const_iterator i = g->m_properties.begin();
-		 i != g->m_properties.end(); ++i) {
+	for (PropertyVector::const_iterator i = g->m_properties.begin(); i != g->m_properties.end();
+		 ++i) {
 		TProperty *src = i->first;
 		TProperty *dst = getProperty(src->getName());
 		if (dst) {
@@ -120,8 +118,7 @@ void TPropertyGroup::setProperties(TPropertyGroup *g)
 
 void TPropertyGroup::accept(TProperty::Visitor &v)
 {
-	for (PropertyVector::const_iterator i = m_properties.begin();
-		 i != m_properties.end(); ++i)
+	for (PropertyVector::const_iterator i = m_properties.begin(); i != m_properties.end(); ++i)
 		i->first->accept(v);
 }
 
@@ -129,7 +126,7 @@ class PropertyWriter : public TProperty::Visitor
 {
 	TOStream &m_os;
 
-public:
+  public:
 	PropertyWriter(TOStream &os) : m_os(os) {}
 
 	void visit(TDoubleProperty *p)
@@ -230,8 +227,7 @@ public:
 
 void TPropertyGroup::loadData(TIStream &is)
 {
-	for (PropertyVector::iterator it = m_properties.begin();
-		 it != m_properties.end(); ++it)
+	for (PropertyVector::iterator it = m_properties.begin(); it != m_properties.end(); ++it)
 		if (it->second)
 			delete it->first;
 	m_properties.clear();

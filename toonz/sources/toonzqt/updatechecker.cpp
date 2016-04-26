@@ -28,7 +28,7 @@ UpdateChecker::UpdateChecker(const QString &requestToServer)
 	}
 
 	QStringList paramList = urlList.at(1).split('&');
-	//if (!url.userName().isEmpty())
+	// if (!url.userName().isEmpty())
 	//	setUser(url.userName(), url.password());
 
 	m_httpRequestAborted = false;
@@ -47,27 +47,27 @@ UpdateChecker::UpdateChecker(const QString &requestToServer)
 	QEventLoop loop;
 
 	connect(reply, SIGNAL(requestStarted(int)), &loop, SLOT(httpRequestStarted(int)));
-	connect(reply, SIGNAL(authenticationRequired(const QString &, quint16, QAuthenticator *)), &loop, SLOT(slotAuthenticationRequired(const QString &, quint16, QAuthenticator *)));
+	connect(reply, SIGNAL(authenticationRequired(const QString &, quint16, QAuthenticator *)),
+			&loop, SLOT(slotAuthenticationRequired(const QString &, quint16, QAuthenticator *)));
 	connect(reply, SIGNAL(stateChanged(int)), &loop, SLOT(httpStateChanged(int)));
 
-	connect(&manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(httpRequestFinished(QNetworkReply *)));
+	connect(&manager, SIGNAL(finished(QNetworkReply *)), this,
+			SLOT(httpRequestFinished(QNetworkReply *)));
 
 	loop.exec();
 
 #else
-	//connect(this, SIGNAL(readyRead(const QHttpResponseHeader &)), this,
+	// connect(this, SIGNAL(readyRead(const QHttpResponseHeader &)), this,
 	//	SLOT(readyReadexec(const QHttpResponseHeader &)));
-	connect(this, SIGNAL(requestFinished(int, bool)), this,
-			SLOT(httpRequestFinished(int, bool)));
-	connect(this, SIGNAL(requestStarted(int)), this,
-			SLOT(httpRequestStarted(int)));
+	connect(this, SIGNAL(requestFinished(int, bool)), this, SLOT(httpRequestFinished(int, bool)));
+	connect(this, SIGNAL(requestStarted(int)), this, SLOT(httpRequestStarted(int)));
 	connect(this, SIGNAL(responseHeaderReceived(const QHttpResponseHeader &)), this,
 			SLOT(readResponseHeader(const QHttpResponseHeader &)));
 	connect(this, SIGNAL(authenticationRequired(const QString &, quint16, QAuthenticator *)), this,
 			SLOT(slotAuthenticationRequired(const QString &, quint16, QAuthenticator *)));
-	connect(this, SIGNAL(stateChanged(int)), this,
-			SLOT(httpStateChanged(int)));
-	QHttp::ConnectionMode mode = url.scheme().toLower() == "https" ? QHttp::ConnectionModeHttps : QHttp::ConnectionModeHttp;
+	connect(this, SIGNAL(stateChanged(int)), this, SLOT(httpStateChanged(int)));
+	QHttp::ConnectionMode mode =
+		url.scheme().toLower() == "https" ? QHttp::ConnectionModeHttps : QHttp::ConnectionModeHttp;
 
 	setHost(url.host(), mode, url.port() == -1 ? 0 : url.port());
 	QString urlTemp = requestToServer;
@@ -132,7 +132,8 @@ void UpdateChecker::httpStateChanged(int status)
 		stateStr = "Connected.";
 		break;
 	case 6:
-		stateStr = "The connection is closing down, but is not yet closed. (The state will be Unconnected when the connection is closed.)";
+		stateStr = "The connection is closing down, but is not yet closed. (The state will be "
+				   "Unconnected when the connection is closed.)";
 		break;
 	default:
 		stateStr = "There is no connection to the host.";
@@ -221,7 +222,8 @@ void UpdateChecker::httpRequestFinished(int requestId, bool error)
 
 //-----------------------------------------------------------------------------
 
-void UpdateChecker::slotAuthenticationRequired(const QString &hostName, quint16, QAuthenticator *authenticator)
+void UpdateChecker::slotAuthenticationRequired(const QString &hostName, quint16,
+											   QAuthenticator *authenticator)
 {
 	assert(false);
 }

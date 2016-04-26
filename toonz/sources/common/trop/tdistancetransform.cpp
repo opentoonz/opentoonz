@@ -8,7 +8,8 @@
 // STD includes
 #include <limits>
 
-//#define UNIT_TEST                                             // Enables unit testing at program startup
+//#define UNIT_TEST                                             // Enables unit testing at program
+//startup
 
 //************************************************************************
 //    Rationale
@@ -17,8 +18,8 @@
 /*!
   \file                   tdistancetransform.cpp
   \brief    This file implements an O(rows * cols) 2-dimensional distance
-            transform algorithm with customizable action on squared pixel
-            distance from the closest pixel.
+			transform algorithm with customizable action on squared pixel
+			distance from the closest pixel.
 */
 
 //************************************************************************
@@ -30,8 +31,8 @@ namespace
 
 /*!
   \brief    Given 2 parabolas with (minimal) height at centers \p a and \p b
-            and centers separated by distance \p d, returns the min between
-            \p d and the value \p x satisfying <TT>a + x^2 == b + (x - d)^2</TT>.
+			and centers separated by distance \p d, returns the min between
+			\p d and the value \p x satisfying <TT>a + x^2 == b + (x - d)^2</TT>.
 */
 
 unsigned int takeoverDist(unsigned int a, unsigned int b, unsigned int d)
@@ -71,12 +72,8 @@ void initializeDT(const TRasterPT<Pix> &ras, const TRasterPT<unsigned int> &dtRa
 //--------------------------------------------------------------
 
 template <typename Pix, typename OutFunc>
-void expand(int lineLength, int linesCount,
-			Pix *buf, int incrPix,
-			int incrLine,
-			unsigned int *dtBuf, int dtIncrPix,
-			int dtIncrLine,
-			OutFunc outFunc)
+void expand(int lineLength, int linesCount, Pix *buf, int incrPix, int incrLine,
+			unsigned int *dtBuf, int dtIncrPix, int dtIncrLine, OutFunc outFunc)
 {
 	struct locals {
 		static void copyLine(unsigned int *dst, unsigned int *src, unsigned int *srcEnd,
@@ -86,11 +83,12 @@ void expand(int lineLength, int linesCount,
 				*dst = *src;
 		}
 
-		static void buildRange(unsigned int *dtRef, unsigned int *dtLineEnd,
-							   unsigned int *&dtEnd, unsigned int *&dtNewRef)
+		static void buildRange(unsigned int *dtRef, unsigned int *dtLineEnd, unsigned int *&dtEnd,
+							   unsigned int *&dtNewRef)
 		{
-			unsigned int d = 1, dNew = 0,						   // dNew at 0 to provide a consistent dtNewRef
-				dMax = (std::numeric_limits<unsigned int>::max)(); // at the end - should not matter though
+			unsigned int d = 1, dNew = 0, // dNew at 0 to provide a consistent dtNewRef
+				dMax = (std::numeric_limits<unsigned int>::max)(); // at the end - should not matter
+																   // though
 			unsigned int *dt = dtRef + 1;
 
 			for (; d <= dMax && dt != dtLineEnd; ++d, ++dt) // Pick larger intervals if possible
@@ -112,18 +110,18 @@ void expand(int lineLength, int linesCount,
 	// This is necessary since read and write intervals overlap.
 	std::unique_ptr<unsigned[]> dtOriginalLine(new unsigned[lineLength]);
 
-	unsigned int *odtLineStart = dtOriginalLine.get(),
-				 *odtLineEnd = odtLineStart + lineLength;
+	unsigned int *odtLineStart = dtOriginalLine.get(), *odtLineEnd = odtLineStart + lineLength;
 
 	// Process each line
 	for (int l = 0; l != linesCount; ++l) {
-		unsigned int *dtLineStart = dtBuf + dtIncrLine * l,	// Using dtBuf to track colors from now on,
-			*dtLineEnd = dtLineStart + dtIncrPix * lineLength, // it already embeds colorFunc's output due
-				*dt = dtLineStart,							   // to the way it was initialized.
+		unsigned int *dtLineStart =
+						 dtBuf + dtIncrLine * l, // Using dtBuf to track colors from now on,
+			*dtLineEnd =
+				dtLineStart + dtIncrPix * lineLength, // it already embeds colorFunc's output due
+				*dt = dtLineStart,					  // to the way it was initialized.
 					*odtRef = odtLineStart;
 
-		Pix *lineStart = buf + incrLine * l,
-			*pix = lineStart;
+		Pix *lineStart = buf + incrLine * l, *pix = lineStart;
 
 		// Make a copy of the original dt values
 		locals::copyLine(dtOriginalLine.get(), dtLineStart, dtLineEnd, dtIncrPix);
@@ -140,7 +138,8 @@ void expand(int lineLength, int linesCount,
 			assert(odtLineStart <= odtNewRef && odtNewRef <= odtLineEnd);
 			assert(odtLineStart <= dtEnd && dtEnd <= odtLineEnd);
 
-			dtEnd = dtLineStart + dtIncrPix * (dtEnd - odtLineStart); // Convert dtEnd to the dt raster buffer
+			dtEnd = dtLineStart +
+					dtIncrPix * (dtEnd - odtLineStart); // Convert dtEnd to the dt raster buffer
 
 			// Process the range
 			Pix *ref = lineStart + incrPix * (odtRef - odtLineStart);
@@ -158,21 +157,21 @@ void expand(int lineLength, int linesCount,
 
 /*!
   \brief    Performs an O(rows * cols) distance transform on the specified
-            raster image.
+			raster image.
 
   \details  The algorithm relies on the separability of the 2D DT into 2
-            passes (by rows and columns) of 1-dimensional DTs.
+			passes (by rows and columns) of 1-dimensional DTs.
 
-            The 1D DT sums a pre-existing (from the previous DT step if any)
-            DT result with the one currently calculated.
+			The 1D DT sums a pre-existing (from the previous DT step if any)
+			DT result with the one currently calculated.
 
   \warning  Templace parameter OutFunc is supposed to satisfy \a transitivity
-            upon comparison of its output - so, if \p b is the output of \p a,
-            and \p c is the output of \p b, then \p c is the same as the output
-            of \p a.
+			upon comparison of its output - so, if \p b is the output of \p a,
+			and \p c is the output of \p b, then \p c is the same as the output
+			of \p a.
 
   \todo     Accept a different output raster - but preserve the case where
-            (srcRas == dstRas).
+			(srcRas == dstRas).
 */
 
 template <typename Pix, typename IsInsideFunc, typename OutFunc>
@@ -187,15 +186,15 @@ void distanceTransform(const TRasterPT<Pix> &ras, IsInsideFunc isInside, OutFunc
 	::initializeDT(ras, dtRas, isInside);  // The raster is binarized directly into the
 										   // auxiliary dtRas. Pixels in the set to expand
 										   // will have value 0, the others a suitable high value.
-	expand(lx, ly, ras->pixels(0), 1, ras->getWrap(),
-		   dtRas->pixels(0), 1, dtRas->getWrap(), outFunc);
-	expand(lx, ly, ras->pixels(0) + lx - 1, -1, ras->getWrap(),
-		   dtRas->pixels(0) + lx - 1, -1, dtRas->getWrap(), outFunc);
+	expand(lx, ly, ras->pixels(0), 1, ras->getWrap(), dtRas->pixels(0), 1, dtRas->getWrap(),
+		   outFunc);
+	expand(lx, ly, ras->pixels(0) + lx - 1, -1, ras->getWrap(), dtRas->pixels(0) + lx - 1, -1,
+		   dtRas->getWrap(), outFunc);
 
-	expand(ly, lx, ras->pixels(0), ras->getWrap(), 1,
-		   dtRas->pixels(0), dtRas->getWrap(), 1, outFunc);
-	expand(ly, lx, ras->pixels(ly - 1), -ras->getWrap(), 1,
-		   dtRas->pixels(ly - 1), -dtRas->getWrap(), 1, outFunc);
+	expand(ly, lx, ras->pixels(0), ras->getWrap(), 1, dtRas->pixels(0), dtRas->getWrap(), 1,
+		   outFunc);
+	expand(ly, lx, ras->pixels(ly - 1), -ras->getWrap(), 1, dtRas->pixels(ly - 1),
+		   -dtRas->getWrap(), 1, outFunc);
 }
 }
 
@@ -253,10 +252,7 @@ void assertEqualBufs(const TRasterT<unsigned int> &a, const TRasterT<unsigned in
 }
 
 struct Selector {
-	inline bool operator()(unsigned int val) const
-	{
-		return val;
-	}
+	inline bool operator()(unsigned int val) const { return val; }
 };
 
 struct OutputDT {
@@ -270,23 +266,16 @@ struct DTTest {
 	DTTest()
 	{
 		unsigned int imgBuf[] = {
-			0, 0, 1, 0, 0, 0,
-			0, 0, 1, 0, 0, 0,
-			0, 1, 1, 1, 1, 0,
-			0, 1, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0,
+			0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1,
+			1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		};
 
 		unsigned int dtBuf[] = {
-			4, 1, 0, 1, 4, 5,
-			2, 1, 0, 1, 1, 2,
-			1, 0, 0, 0, 0, 1,
-			1, 0, 1, 1, 1, 2,
-			2, 1, 2, 4, 4, 5,
+			4, 1, 0, 1, 4, 5, 2, 1, 0, 1, 1, 2, 1, 0, 0,
+			0, 0, 1, 1, 0, 1, 1, 1, 2, 2, 1, 2, 4, 4, 5,
 		};
 
-		TRasterPT<unsigned int> imgRas(6, 5, 6, imgBuf, false),
-			dtRas(6, 5, 6, dtBuf, false);
+		TRasterPT<unsigned int> imgRas(6, 5, 6, imgBuf, false), dtRas(6, 5, 6, dtBuf, false);
 
 		distanceTransform(imgRas, Selector(), OutputDT());
 		assertEqualBufs(*imgRas, *dtRas);

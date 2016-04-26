@@ -53,7 +53,8 @@ void TKeyframeData::setKeyframes(std::set<Position> positions, TXsheet *xsh)
 	for (it = positions.begin(); it != positions.end(); ++it) {
 		int row = it->first;
 		int col = it->second;
-		TStageObject *pegbar = xsh->getStageObject(col >= 0 ? TStageObjectId::ColumnId(col) : cameraId);
+		TStageObject *pegbar =
+			xsh->getStageObject(col >= 0 ? TStageObjectId::ColumnId(col) : cameraId);
 		assert(pegbar);
 		m_isPegbarsCycleEnabled[col] = pegbar->isCycleEnabled();
 		if (pegbar->isKeyframe(row)) {
@@ -88,7 +89,8 @@ bool TKeyframeData::getKeyframes(std::set<Position> &positions, TXsheet *xsh) co
 		TXshColumn *column = xsh->getColumn(col);
 		if (column && column->getSoundColumn())
 			continue;
-		TStageObject *pegbar = xsh->getStageObject(col >= 0 ? TStageObjectId::ColumnId(col) : cameraId);
+		TStageObject *pegbar =
+			xsh->getStageObject(col >= 0 ? TStageObjectId::ColumnId(col) : cameraId);
 		if (pegbar->getId().isColumn() && xsh->getColumn(col) && xsh->getColumn(col)->isLocked())
 			continue;
 		keyFrameChanged = true;
@@ -101,7 +103,8 @@ bool TKeyframeData::getKeyframes(std::set<Position> &positions, TXsheet *xsh) co
 	std::map<int, bool>::const_iterator it1 = m_isPegbarsCycleEnabled.begin();
 	for (it1; it1 != m_isPegbarsCycleEnabled.end(); it1++) {
 		int col = it1->first;
-		TStageObject *pegbar = xsh->getStageObject(col >= 0 ? TStageObjectId::ColumnId(col) : cameraId);
+		TStageObject *pegbar =
+			xsh->getStageObject(col >= 0 ? TStageObjectId::ColumnId(col) : cameraId);
 		pegbar->enableCycle(it1->second);
 	}
 	return true;

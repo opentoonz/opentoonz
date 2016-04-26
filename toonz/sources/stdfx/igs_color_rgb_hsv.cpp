@@ -1,17 +1,14 @@
 #include "igs_color_rgb_hsv.h"
-void igs::color::rgb_to_hsv(
-	const double red, // 0.0...1.0
-	const double gre, // 0.0...1.0
-	const double blu, // 0.0...1.0
-	double &hue,	  /* 0.0...360.0	hue(色相) */
-	double &sat,	  /* 0.0...1.0	saturation(彩度) */
-	double &val		  /* 0.0...1.0	value(明度) */
-	)
+void igs::color::rgb_to_hsv(const double red, // 0.0...1.0
+							const double gre, // 0.0...1.0
+							const double blu, // 0.0...1.0
+							double &hue,	  /* 0.0...360.0	hue(色相) */
+							double &sat,	  /* 0.0...1.0	saturation(彩度) */
+							double &val		  /* 0.0...1.0	value(明度) */
+							)
 {
-	const double maxi =
-		(red < gre) ? ((gre < blu) ? blu : gre) : ((red < blu) ? blu : red);
-	const double mini =
-		(gre < red) ? ((blu < gre) ? blu : gre) : ((blu < red) ? blu : red);
+	const double maxi = (red < gre) ? ((gre < blu) ? blu : gre) : ((red < blu) ? blu : red);
+	const double mini = (gre < red) ? ((blu < gre) ? blu : gre) : ((blu < red) ? blu : red);
 
 	val = maxi; /* value(明度) */
 
@@ -39,7 +36,7 @@ void igs::color::rgb_to_hsv(
 		}
 		/*
 			M-R-Y-G-C-B-M
-		       -1 0 1 2 3 4 5
+			   -1 0 1 2 3 4 5
 		*/
 		hue *= 60.0; /* -60 ... 300 */
 		if (hue < 0.0) {
@@ -47,15 +44,14 @@ void igs::color::rgb_to_hsv(
 		}
 	}
 }
-#include <cmath> /* floor() */
-void igs::color::hsv_to_rgb(
-	const double hue, /* 0.0...360.0	hue(色相) */
-	const double sat, /* 0.0...1.0	saturation(彩度) */
-	const double val, /* 0.0...1.0	value(明度) */
-	double &red,	  /* 0.0...1.0 */
-	double &gre,	  /* 0.0...1.0 */
-	double &blu		  /* 0.0...1.0 */
-	)
+#include <cmath>							  /* floor() */
+void igs::color::hsv_to_rgb(const double hue, /* 0.0...360.0	hue(色相) */
+							const double sat, /* 0.0...1.0	saturation(彩度) */
+							const double val, /* 0.0...1.0	value(明度) */
+							double &red,	  /* 0.0...1.0 */
+							double &gre,	  /* 0.0...1.0 */
+							double &blu		  /* 0.0...1.0 */
+							)
 {
 	if (0.0 == sat) { /* 白黒で色がない */
 		red = gre = blu = val;

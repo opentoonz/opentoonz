@@ -17,26 +17,19 @@
 
 //------------------------------------------------------
 
-//singleton
+// singleton
 class DVAPI TStencilControl
 {
-public:
-	enum MaskType {
-		SHOW_INSIDE = 0,
-		SHOW_OUTSIDE
-	};
+  public:
+	enum MaskType { SHOW_INSIDE = 0, SHOW_OUTSIDE };
 
-	enum DrawMode {
-		DRAW_ONLY_MASK = 0,
-		DRAW_ALSO_ON_SCREEN,
-		DRAW_ON_SCREEN_ONLY_ONCE
-	};
+	enum DrawMode { DRAW_ONLY_MASK = 0, DRAW_ALSO_ON_SCREEN, DRAW_ON_SCREEN_ONLY_ONCE };
 
-private:
+  private:
 	class Imp;
 	std::unique_ptr<Imp> m_imp;
 
-public:
+  public:
 	static TStencilControl *instance();
 
 	TStencilControl();

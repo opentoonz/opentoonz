@@ -17,10 +17,10 @@ class TCellSelection : public TSelection
 {
 	TimeStretchPopup *m_timeStretchPopup;
 
-public:
+  public:
 	class Range
 	{
-	public:
+	  public:
 		int m_c0, m_r0, m_c1, m_r1;
 		Range();
 		bool isEmpty() const;
@@ -29,15 +29,12 @@ public:
 		int getColCount() const;
 	};
 
-private:
+  private:
 	Range m_range;
 
-public:
+  public:
 	TCellSelection();
-	TCellSelection(Range range)
-		: m_range(range)
-	{
-	}
+	TCellSelection(Range range) : m_range(range) {}
 	~TCellSelection();
 
 	void enableCommands();
@@ -67,7 +64,7 @@ public:
 
 	bool areAllColSelectedLocked() const;
 
-	//commands
+	// commands
 	void reverseCells();
 	void swingCells();
 	void incrementCells();
@@ -104,4 +101,4 @@ public:
 	void reframe4Cells() { reframeCells(4); }
 };
 
-#endif //TCELLSELECTION_H
+#endif // TCELLSELECTION_H

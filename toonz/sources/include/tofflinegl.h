@@ -24,7 +24,7 @@ class TRasterImageP;
 
 class DVAPI TGLContextManager
 {
-public:
+  public:
 	virtual void store() = 0;
 	virtual void restore() = 0;
 };
@@ -34,13 +34,13 @@ public:
 class DVAPI TOfflineGL
 {
 
-public:
+  public:
 	class Imp
 	{
-	protected:
+	  protected:
 		int m_lx, m_ly;
 
-	public:
+	  public:
 		Imp(int lx, int ly) : m_lx(lx), m_ly(ly) {}
 		virtual ~Imp(){};
 		virtual void makeCurrent() = 0;
@@ -87,8 +87,8 @@ public:
 	// non bisogna liberare ogl
 	std::shared_ptr<Imp> m_imp;
 
-private:
-private:
+  private:
+  private:
 	// not implemented
 	TOfflineGL(const TOfflineGL &);
 	TOfflineGL &operator=(const TOfflineGL &);

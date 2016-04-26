@@ -23,8 +23,8 @@ namespace
 TFilePath getGlobalRoot()
 {
 #ifdef WIN32
-	TFilePath groot(TSystem::getSystemValue(
-		TFilePath("SOFTWARE\\Digital Video\\ToonzFarm\\1.0\\GLOBALROOT")));
+	TFilePath groot(
+		TSystem::getSystemValue(TFilePath("SOFTWARE\\Digital Video\\ToonzFarm\\1.0\\GLOBALROOT")));
 
 	return groot;
 #else
@@ -38,7 +38,7 @@ TFilePath getGlobalRoot()
 
 class Application::Imp
 {
-public:
+  public:
 	Imp() : m_farmController(0) {}
 	~Imp() {}
 
@@ -72,7 +72,7 @@ bool programEnded = false;
 
 class Cleanup
 {
-public:
+  public:
 	~Cleanup()
 	{
 		delete theApp;
@@ -129,10 +129,9 @@ bool Application::testControllerConnection() const
 	TTcpIpClient client;
 
 	int sock;
-	int ret = client.connect(m_imp->m_controllerData.m_hostName,
-							 m_imp->m_controllerData.m_ipAddress,
-							 m_imp->m_controllerData.m_port,
-							 sock);
+	int ret =
+		client.connect(m_imp->m_controllerData.m_hostName, m_imp->m_controllerData.m_ipAddress,
+					   m_imp->m_controllerData.m_port, sock);
 	if (ret == OK) {
 		client.disconnect(sock);
 		return true;

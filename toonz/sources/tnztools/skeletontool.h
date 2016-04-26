@@ -19,7 +19,7 @@ class CommandHandler;
 
 class HookData
 {
-public:
+  public:
 	int m_columnIndex;
 	int m_hookId; // 0=center (e.g. B,C,...), 1,2... = hook
 	TPointD m_pos;
@@ -31,10 +31,13 @@ public:
 
 class MagicLink
 {
-public:
+  public:
 	HookData m_h0, m_h1;
 	double m_dist2;
-	MagicLink(const HookData &h0, const HookData &h1, double dist2) : m_h0(h0), m_h1(h1), m_dist2(dist2) {}
+	MagicLink(const HookData &h0, const HookData &h1, double dist2)
+		: m_h0(h0), m_h1(h1), m_dist2(dist2)
+	{
+	}
 	bool operator<(const MagicLink &link) const { return m_dist2 < link.m_dist2; }
 };
 }
@@ -79,7 +82,7 @@ class SkeletonTool : public TTool
 	TPointD m_labelPos;
 	std::string m_label;
 
-public:
+  public:
 	SkeletonTool();
 	~SkeletonTool();
 
@@ -97,10 +100,7 @@ public:
 
 	void onImageChanged() { invalidate(); }
 
-	void reset()
-	{
-		m_temporaryPinnedColumns.clear();
-	}
+	void reset() { m_temporaryPinnedColumns.clear(); }
 
 	bool onPropertyChanged(std::string propertyName);
 
@@ -121,10 +121,7 @@ public:
 		m_parentProbe = parentProbe;
 		m_parentProbeEnabled = true;
 	}
-	void resetParentProbe()
-	{
-		m_parentProbeEnabled = false;
-	}
+	void resetParentProbe() { m_parentProbeEnabled = false; }
 
 	void drawHooks();
 
@@ -142,13 +139,10 @@ public:
 
 	int getCursorId() const;
 
-	//TRaster32P getToolIcon() const {return Pixmaps::arrow;}
+	// TRaster32P getToolIcon() const {return Pixmaps::arrow;}
 	TPropertyGroup *getProperties(int targetType) { return &m_prop; }
 
-	void updateMatrix()
-	{
-		setMatrix(getCurrentObjectParentMatrix());
-	}
+	void updateMatrix() { setMatrix(getCurrentObjectParentMatrix()); }
 	void addContextMenuItems(QMenu *menu);
 	bool select(const TSelection *) { return false; }
 
@@ -156,10 +150,7 @@ public:
 
 	void buildSkeleton(Skeleton &skeleton, int columnIndex);
 
-	void setTemporaryPinnedColumns(const std::set<int> &tmp)
-	{
-		m_temporaryPinnedColumns = tmp;
-	}
+	void setTemporaryPinnedColumns(const std::set<int> &tmp) { m_temporaryPinnedColumns = tmp; }
 	bool isGlobalKeyframesEnabled() const;
 };
 

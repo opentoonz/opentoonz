@@ -15,16 +15,9 @@ class Iwa_TileFx : public TStandardRasterFx
 {
 	FX_PLUGIN_DECLARATION(Iwa_TileFx)
 
-	enum tileQuantity {
-		eNoTile = 1,
-		eOneTile = 2,
-		eMultipleTiles = 3
-	};
+	enum tileQuantity { eNoTile = 1, eOneTile = 2, eMultipleTiles = 3 };
 
-	enum inputSize {
-		eBoundingBox = 1,
-		eCameraBox = 2
-	};
+	enum inputSize { eBoundingBox = 1, eCameraBox = 2 };
 
 	TIntEnumParamP m_inputSizeMode;
 	TRasterFxPort m_input;
@@ -37,7 +30,7 @@ class Iwa_TileFx : public TStandardRasterFx
 	TDoubleParamP m_hmargin;
 	TDoubleParamP m_vmargin;
 
-public:
+  public:
 	Iwa_TileFx();
 	~Iwa_TileFx();
 
@@ -47,25 +40,26 @@ public:
 	void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
 	int getMemoryRequirement(const TRectD &rect, double frame, const TRenderSettings &info);
 
-	void transform(
-		double frame,
-		int port,
-		const TRectD &rectOnOutput,
-		const TRenderSettings &infoOnOutput,
-		TRectD &rectOnInput,
-		TRenderSettings &infoOnInput);
+	void transform(double frame, int port, const TRectD &rectOnOutput,
+				   const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
+				   TRenderSettings &infoOnInput);
 
 	bool checkIfThisTileShouldBeComptedOrNot(int horizIndex, int vertIndex);
 	bool isInRange(int quantityMode, int index);
 
-private:
+  private:
 	void makeTile(const TTile &inputTile, const TTile &tile);
 };
 
 //------------------------------------------------------------------------------
 
 Iwa_TileFx::Iwa_TileFx()
-	: m_inputSizeMode(new TIntEnumParam(eBoundingBox, "Bounding Box")), m_leftQuantity(new TIntEnumParam(eNoTile, "No Tile")), m_rightQuantity(new TIntEnumParam(eNoTile, "No Tile")), m_topQuantity(new TIntEnumParam(eNoTile, "No Tile")), m_bottomQuantity(new TIntEnumParam(eNoTile, "No Tile")), m_xMirror(false), m_yMirror(false), m_hmargin(5.24934) /*- スタンダードサイズのカメラとLevelのマージン（2.5mm）-*/
+	: m_inputSizeMode(new TIntEnumParam(eBoundingBox, "Bounding Box")),
+	  m_leftQuantity(new TIntEnumParam(eNoTile, "No Tile")),
+	  m_rightQuantity(new TIntEnumParam(eNoTile, "No Tile")),
+	  m_topQuantity(new TIntEnumParam(eNoTile, "No Tile")),
+	  m_bottomQuantity(new TIntEnumParam(eNoTile, "No Tile")), m_xMirror(false), m_yMirror(false),
+	  m_hmargin(5.24934) /*- スタンダードサイズのカメラとLevelのマージン（2.5mm）-*/
 	  ,
 	  m_vmargin(12.4934) /*- 5.95mm -*/
 {
@@ -104,18 +98,18 @@ Iwa_TileFx::Iwa_TileFx()
 
 //------------------------------------------------------------------------------
 
-Iwa_TileFx::~Iwa_TileFx() {}
+Iwa_TileFx::~Iwa_TileFx()
+{
+}
 
 //------------------------------------------------------------------------------
 
 bool Iwa_TileFx::canHandle(const TRenderSettings &info, double frame)
 {
-	//Currently, only affines which transform the X and Y axis into themselves may
-	//be handled by this fx...
-	return (fabs(info.m_affine.a12) < 0.0001 &&
-			fabs(info.m_affine.a21) < 0.0001) ||
-		   (fabs(info.m_affine.a11) < 0.0001 &&
-			fabs(info.m_affine.a22) < 0.0001);
+	// Currently, only affines which transform the X and Y axis into themselves may
+	// be handled by this fx...
+	return (fabs(info.m_affine.a12) < 0.0001 && fabs(info.m_affine.a21) < 0.0001) ||
+		   (fabs(info.m_affine.a11) < 0.0001 && fabs(info.m_affine.a22) < 0.0001);
 }
 
 //------------------------------------------------------------------------------
@@ -133,13 +127,9 @@ bool Iwa_TileFx::doGetBBox(double frame, TRectD &bBox, const TRenderSettings &in
 
 //------------------------------------------------------------------------------
 
-void Iwa_TileFx::transform(
-	double frame,
-	int port,
-	const TRectD &rectOnOutput,
-	const TRenderSettings &infoOnOutput,
-	TRectD &rectOnInput,
-	TRenderSettings &infoOnInput)
+void Iwa_TileFx::transform(double frame, int port, const TRectD &rectOnOutput,
+						   const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
+						   TRenderSettings &infoOnInput)
 {
 	infoOnInput = infoOnOutput;
 
@@ -258,14 +248,14 @@ bool Iwa_TileFx::checkIfThisTileShouldBeComptedOrNot(int horizIndex, int vertInd
 		horizInRange = true;
 	else if (horizIndex < 0)
 		horizInRange = isInRange(leftQuantity, horizIndex);
-	else //horizIndex > 0
+	else // horizIndex > 0
 		horizInRange = isInRange(rightQuantity, horizIndex);
 
 	if (vertIndex == 0)
 		vertInRange = true;
 	else if (vertIndex < 0)
 		vertInRange = isInRange(bottomQuantity, vertIndex);
-	else //horizIndex > 0
+	else // horizIndex > 0
 		vertInRange = isInRange(topQuantity, vertIndex);
 
 	return horizInRange & vertInRange;
@@ -279,14 +269,15 @@ void Iwa_TileFx::makeTile(const TTile &inputTile, const TTile &tile)
 {
 	tile.getRaster()->clear();
 
-	//Build the mirroring pattern. It obviously repeats itself out of 2x2 tile blocks.
+	// Build the mirroring pattern. It obviously repeats itself out of 2x2 tile blocks.
 	std::map<std::pair<bool, bool>, TRasterP> mirrorRaster;
 	mirrorRaster[std::pair<bool, bool>(false, false)] = inputTile.getRaster();
 	mirrorRaster[std::pair<bool, bool>(false, true)] = inputTile.getRaster()->clone();
 	mirrorRaster[std::pair<bool, bool>(false, true)]->yMirror();
 	mirrorRaster[std::pair<bool, bool>(true, false)] = inputTile.getRaster()->clone();
 	mirrorRaster[std::pair<bool, bool>(true, false)]->xMirror();
-	mirrorRaster[std::pair<bool, bool>(true, true)] = mirrorRaster[std::pair<bool, bool>(true, false)]->clone();
+	mirrorRaster[std::pair<bool, bool>(true, true)] =
+		mirrorRaster[std::pair<bool, bool>(true, false)]->clone();
 	mirrorRaster[std::pair<bool, bool>(true, true)]->yMirror();
 
 	TPoint animatedPos = convert(inputTile.m_pos - tile.m_pos);
@@ -308,7 +299,7 @@ void Iwa_TileFx::makeTile(const TTile &inputTile, const TTile &tile)
 	int vertIndex = 0;
 
 	/*- 左下のタイルのインデックスを計算 -*/
-	//Reach the lower left tiling position
+	// Reach the lower left tiling position
 	while (animatedPos.x > 0 && tileHorizontally) {
 		animatedPos.x -= inSize.lx;
 		mirrorX = !mirrorX;
@@ -336,7 +327,7 @@ void Iwa_TileFx::makeTile(const TTile &inputTile, const TTile &tile)
 
 	bool doMirroX = mirrorX, doMirroY = mirrorY;
 
-	//Write the tiling blocks.
+	// Write the tiling blocks.
 	tile.getRaster()->lock();
 	inputTile.getRaster()->lock();
 	TPoint startTilingPos = animatedPos;
@@ -346,7 +337,8 @@ void Iwa_TileFx::makeTile(const TTile &inputTile, const TTile &tile)
 	do {
 		do {
 			if (checkIfThisTileShouldBeComptedOrNot(horizIndex, vertIndex)) {
-				std::pair<bool, bool> doMirror(doMirroX && m_xMirror->getValue(), doMirroY && m_yMirror->getValue());
+				std::pair<bool, bool> doMirror(doMirroX && m_xMirror->getValue(),
+											   doMirroY && m_yMirror->getValue());
 				tile.getRaster()->copy(mirrorRaster[doMirror], startTilingPos);
 			}
 

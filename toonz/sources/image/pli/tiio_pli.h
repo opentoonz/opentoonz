@@ -41,21 +41,21 @@ class TLevelWriterPli : public TLevelWriter
 	//  vettore da utilizzare per il calcolo della palette
 	std::vector<TPixel> m_colorArray;
 
-public:
+  public:
 	TLevelWriterPli(const TFilePath &path, TPropertyGroup *winfo);
 	~TLevelWriterPli();
 	TImageWriterP getFrameWriter(TFrameId fid);
 
 	friend class TImageWriterPli;
 
-public:
+  public:
 	static TLevelWriter *create(const TFilePath &f, TPropertyGroup *winfo)
 	{
 		return new TLevelWriterPli(f, winfo);
 	}
 
-private:
-	//not implemented
+  private:
+	// not implemented
 	TLevelWriterPli(const TLevelWriterPli &);
 	TLevelWriterPli &operator=(const TLevelWriterPli &);
 };
@@ -69,25 +69,25 @@ typedef std::pair<ImageTag *, bool> pliFrameInfo;
  */
 class TLevelReaderPli : public TLevelReader
 {
-public:
+  public:
 	TLevelReaderPli(const TFilePath &path);
 	~TLevelReaderPli();
 
 	/*!
-      Return info about current pli
-     */
+	  Return info about current pli
+	 */
 	TLevelP loadInfo();
 	void doReadPalette(bool doReadIt);
 
 	/*!
-      Return an image with Reader information 
-     */
+	  Return an image with Reader information
+	 */
 	TImageReaderP getFrameReader(TFrameId fid);
 
 	QString getCreator();
 	friend class TImageReaderPli;
 
-private:
+  private:
 	bool m_init;
 	//! struct which contanins reference to frame
 	std::map<TFrameId, pliFrameInfo> m_mapOfImage;
@@ -105,13 +105,10 @@ private:
 	ParsedPli *m_pli;
 	TLevelP m_level;
 
-public:
-	static TLevelReader *create(const TFilePath &f)
-	{
-		return new TLevelReaderPli(f);
-	}
+  public:
+	static TLevelReader *create(const TFilePath &f) { return new TLevelReaderPli(f); }
 
-private:
+  private:
 	// not implemented
 	TLevelReaderPli(const TLevelReaderPli &);
 	TLevelReaderPli &operator=(const TLevelReaderPli &);
@@ -123,15 +120,15 @@ Classe locale per la lettura di un frame del livello.
 */
 class TImageReaderPli : public TImageReader
 {
-public:
+  public:
 	TFrameId m_frameId; //<! Current frame id
 
-private:
+  private:
 	// not implemented
 	TImageReaderPli(const TImageReaderPli &);
 	TImageReaderPli &operator=(const TImageReaderPli &src);
 
-public:
+  public:
 	TImageReaderPli(const TFilePath &f, const TFrameId &frameId, TLevelReaderPli *);
 	~TImageReaderPli() {}
 
@@ -142,7 +139,7 @@ public:
 
 	TRect getBBox() const;
 
-private:
+  private:
 	//! Size of image
 	int m_lx, m_ly;
 
@@ -150,4 +147,4 @@ private:
 	TLevelReaderPli *m_lrp;
 };
 
-#endif //TTIO_PLI_INCLUDED
+#endif // TTIO_PLI_INCLUDED

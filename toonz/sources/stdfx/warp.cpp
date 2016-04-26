@@ -9,19 +9,16 @@
 namespace
 {
 
-//Local inlines
+// Local inlines
 
-template <typename T>
-inline double convert(const T &pixel);
+template <typename T> inline double convert(const T &pixel);
 
-template <>
-inline double convert<TPixel32>(const TPixel32 &pixel)
+template <> inline double convert<TPixel32>(const TPixel32 &pixel)
 {
 	return TPixelGR8::from(pixel).value;
 }
 
-template <>
-inline double convert<TPixel64>(const TPixel64 &pixel)
+template <> inline double convert<TPixel64>(const TPixel64 &pixel)
 {
 	return TPixelGR16::from(pixel).value;
 }
@@ -29,10 +26,9 @@ inline double convert<TPixel64>(const TPixel64 &pixel)
 
 /*-----------------------------------------------------------------*/
 
-template <typename T>
-class Warper : public TDistorter
+template <typename T> class Warper : public TDistorter
 {
-public:
+  public:
 	TRasterPT<T> m_rin;
 	TRasterPT<T> m_warper;
 	TRasterPT<T> m_rout;
@@ -45,9 +41,11 @@ public:
 	bool m_sharpen;
 	Lattice m_lattice;
 
-	Warper(TPointD rinPos, TPointD warperPos,
-		   const TRasterPT<T> &rin, const TRasterPT<T> &warper, TRasterPT<T> &rout, const WarpParams &params)
-		: m_rinPos(rinPos), m_warperPos(warperPos), m_rin(rin), m_warper(warper), m_rout(rout), m_intensity(1.5 * 1.5 * params.m_intensity / 100), m_shrink(params.m_shrink), m_warperScale(params.m_warperScale), m_oriDim(rin->getSize()), m_sharpen(params.m_sharpen)
+	Warper(TPointD rinPos, TPointD warperPos, const TRasterPT<T> &rin, const TRasterPT<T> &warper,
+		   TRasterPT<T> &rout, const WarpParams &params)
+		: m_rinPos(rinPos), m_warperPos(warperPos), m_rin(rin), m_warper(warper), m_rout(rout),
+		  m_intensity(1.5 * 1.5 * params.m_intensity / 100), m_shrink(params.m_shrink),
+		  m_warperScale(params.m_warperScale), m_oriDim(rin->getSize()), m_sharpen(params.m_sharpen)
 	{
 	}
 
@@ -62,8 +60,7 @@ public:
 
 /*---------------------------------------------------------------------------*/
 
-template <typename T>
-void Warper<T>::createLattice()
+template <typename T> void Warper<T>::createLattice()
 {
 	int ori_lx, ori_ly, i, j, lx, ly, incr;
 	double fac;
@@ -123,7 +120,8 @@ void Warper<T>::createLattice()
 			coord->d.x = i;
 			coord->d.y = j;
 
-			//FOR A FUTURE RELEASE: We should not make the diffs below between +1 and -1, BUT 0 and -1!!
+			// FOR A FUTURE RELEASE: We should not make the diffs below between +1 and -1, BUT 0 and
+			// -1!!
 
 			coord->s.x = fac * (convert(*(pixIn + 1)) - convert(*(pixIn - 1)));
 			coord->s.y = fac * (convert(*(pixIn + auxWrap)) - convert(*(pixIn - auxWrap)));
@@ -132,7 +130,7 @@ void Warper<T>::createLattice()
 
 	aux->unlock();
 
-	//Finally, we scale the lattice according to the m_scale parameter.
+	// Finally, we scale the lattice according to the m_scale parameter.
 	coord = m_lattice.coords;
 	int wh = m_lattice.m_width * m_lattice.m_height;
 	for (i = 0; i < wh; ++i, ++coord) {
@@ -143,8 +141,7 @@ void Warper<T>::createLattice()
 
 //---------------------------------------------------------------------------
 
-template <typename T>
-void Warper<T>::shepardWarp()
+template <typename T> void Warper<T>::shepardWarp()
 {
 	assert(m_rin.getPointer() != m_rout.getPointer());
 
@@ -161,23 +158,21 @@ void Warper<T>::shepardWarp()
 
 //---------------------------------------------------------------------------
 
-template <typename T>
-TPointD Warper<T>::map(const TPointD &p) const
+template <typename T> TPointD Warper<T>::map(const TPointD &p) const
 {
-	return TPointD(); //Not truly necessary
+	return TPointD(); // Not truly necessary
 }
 
 //---------------------------------------------------------------------------
 
-template <typename T>
-int Warper<T>::invMap(const TPointD &p, TPointD *invs) const
+template <typename T> int Warper<T>::invMap(const TPointD &p, TPointD *invs) const
 {
-	//Make a Shepard interpolant of grid points
+	// Make a Shepard interpolant of grid points
 	const double maxDist = 2 * m_warperScale;
 
 	TPointD pos(p + m_rinPos);
 
-	//First, bisect for the interesting maxDist-from-p region
+	// First, bisect for the interesting maxDist-from-p region
 	int i, j;
 	double xStart = pos.x - maxDist;
 	double yStart = pos.y - maxDist;
@@ -204,7 +199,7 @@ int Warper<T>::invMap(const TPointD &p, TPointD *invs) const
 	}
 	j = a;
 
-	//Then, build the interpolation
+	// Then, build the interpolation
 	int u, v;
 	double w, wsum = 0;
 	double xDistSq, yDistSq;
@@ -244,14 +239,11 @@ int Warper<T>::invMap(const TPointD &p, TPointD *invs) const
 
 //---------------------------------------------------------------------------
 
-//!Calculates the geometry we need for this node computation, given
-//!the known warped bbox, the requested rect, and the warp params.
-void getWarpComputeRects(
-	TRectD &outputComputeRect,
-	TRectD &warpedComputeRect,
-	const TRectD &warpedBox,
-	const TRectD &requestedRect,
-	const WarpParams &params)
+//! Calculates the geometry we need for this node computation, given
+//! the known warped bbox, the requested rect, and the warp params.
+void getWarpComputeRects(TRectD &outputComputeRect, TRectD &warpedComputeRect,
+						 const TRectD &warpedBox, const TRectD &requestedRect,
+						 const WarpParams &params)
 {
 	if (requestedRect.isEmpty() || warpedBox.isEmpty()) {
 		warpedComputeRect.empty();
@@ -259,8 +251,8 @@ void getWarpComputeRects(
 		return;
 	}
 
-	//We are to find out the geometry that is useful for the fx computation.
-	//There are some rules to follow:
+	// We are to find out the geometry that is useful for the fx computation.
+	// There are some rules to follow:
 	//  0) At this stage, we are definitely not aware of what lies in the warper
 	//     image. Therefore, we must assume the maximum warp factor allowed by the
 	//     warp params for each of its points - see getWarpRadius().
@@ -275,7 +267,7 @@ void getWarpComputeRects(
 	warpedComputeRect = enlargedOut * warpedBox;
 	outputComputeRect = enlargedBox * requestedRect;
 
-	//Finally, make sure that the result is coherent with the requestedRect's P00
+	// Finally, make sure that the result is coherent with the requestedRect's P00
 	warpedComputeRect -= requestedRect.getP00();
 	warpedComputeRect.x0 = tfloor(warpedComputeRect.x0);
 	warpedComputeRect.y0 = tfloor(warpedComputeRect.y0);
@@ -293,10 +285,10 @@ void getWarpComputeRects(
 
 //---------------------------------------------------------------------------
 
-//!Deals with raster tiles and invokes warper functions.
+//! Deals with raster tiles and invokes warper functions.
 //!\b NOTE: \b tileRas's size should be \b warper's one multiplied by params.m_scale.
-void warp(TRasterP &tileRas, const TRasterP &rasIn, TRasterP &warper,
-		  TPointD rasInPos, TPointD warperPos, const WarpParams &params)
+void warp(TRasterP &tileRas, const TRasterP &rasIn, TRasterP &warper, TPointD rasInPos,
+		  TPointD warperPos, const WarpParams &params)
 {
 
 	TRaster32P rasIn32 = rasIn;

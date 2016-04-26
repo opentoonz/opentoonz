@@ -25,26 +25,26 @@ class DvDirTreeView;
 
 //-----------------------------------------------------------------------------
 
-//!FrameCountReader is the class responsible for calculation of levels' frame counts
-//!in the file browser. Since on many file formats this requires to open the level file
-//!and scan each frame (MOV-like), and on some machine configurations such a task
-//!can be time consuming, we dedicate a separate thread for it - just like the icon
-//!generator does. Calculated frame counts are also stored for quick lookup once they
-//!have been calculated the first time.
+//! FrameCountReader is the class responsible for calculation of levels' frame counts
+//! in the file browser. Since on many file formats this requires to open the level file
+//! and scan each frame (MOV-like), and on some machine configurations such a task
+//! can be time consuming, we dedicate a separate thread for it - just like the icon
+//! generator does. Calculated frame counts are also stored for quick lookup once they
+//! have been calculated the first time.
 class FrameCountReader : public QObject
 {
 	Q_OBJECT
 
 	TThread::Executor m_executor;
 
-public:
+  public:
 	FrameCountReader();
 	~FrameCountReader();
 
 	int getFrameCount(const TFilePath &path);
 	void stopReading();
 
-signals:
+  signals:
 
 	void calculatedFrameCount();
 };
@@ -55,11 +55,13 @@ class FileBrowser : public QFrame, public DvItemListModel
 {
 	Q_OBJECT
 
-public:
+  public:
 #if QT_VERSION >= 0x050500
-	FileBrowser(QWidget *parent, Qt::WindowFlags flags = 0, bool noContextMenu = false, bool multiSelectionEnabled = false);
+	FileBrowser(QWidget *parent, Qt::WindowFlags flags = 0, bool noContextMenu = false,
+				bool multiSelectionEnabled = false);
 #else
-	FileBrowser(QWidget *parent, Qt::WFlags flags = 0, bool noContextMenu = false, bool multiSelectionEnabled = false);
+	FileBrowser(QWidget *parent, Qt::WFlags flags = 0, bool noContextMenu = false,
+				bool multiSelectionEnabled = false);
 #endif
 	~FileBrowser();
 
@@ -77,15 +79,15 @@ public:
 	QMenu *getContextMenu(QWidget *parent, int index);
 
 	/*!
-    This functions adds to the types to be filtered a new type;
-    if this function is never  called, the default filter is all image
-    files and scene files and palette files
+	This functions adds to the types to be filtered a new type;
+	if this function is never  called, the default filter is all image
+	files and scene files and palette files
   */
 	void addFilterType(const QString &type);
 
 	/*!
-    The setFilterTypes function directly specifies the list of file
-    types to be displayed in the file browser.
+	The setFilterTypes function directly specifies the list of file
+	types to be displayed in the file browser.
   */
 	void setFilterTypes(const QStringList &types);
 	const QStringList &getFilterTypes() const { return m_filter; }
@@ -113,29 +115,31 @@ public:
 
 	QSplitter *getMainSplitter() const { return m_mainSplitter; }
 
-protected:
+  protected:
 	int findIndexWithPath(TFilePath path);
 	void getExpandedFolders(DvDirModelNode *node, QList<DvDirModelNode *> &expandedNodes);
 
-	bool dropMimeData(QTreeWidgetItem *parent, int index, const QMimeData *data, Qt::DropAction action);
+	bool dropMimeData(QTreeWidgetItem *parent, int index, const QMimeData *data,
+					  Qt::DropAction action);
 
 	bool acceptDrop(const QMimeData *data) const;
 	bool drop(const QMimeData *data);
 	void showEvent(QShowEvent *);
 	void hideEvent(QHideEvent *);
 
-	// Fill the QStringList with files selected in the browser, auxiliary files (palette for tlv, hooks, sceneIcons)
+	// Fill the QStringList with files selected in the browser, auxiliary files (palette for tlv,
+	// hooks, sceneIcons)
 	// retrieve also the path, and return also the sceneIconsCount
 	void setupVersionControlCommand(QStringList &files, QString &path, int &sceneIconsCount);
 	void setupVersionControlCommand(QString &file, QString &path);
 
 	void refreshHistoryButtons();
 
-public slots:
+  public slots:
 
 	void onTreeFolderChanged();
 
-protected slots:
+  protected slots:
 
 	void refresh();
 
@@ -179,17 +183,18 @@ protected slots:
 
 	void onVersionControlCommandDone(const QStringList &files);
 
-signals:
+  signals:
 
 	void filePathClicked(const TFilePath &);
-	// reuse the list of TFrameId in order to skip loadInfo() when loading the level with sequencial frames.
+	// reuse the list of TFrameId in order to skip loadInfo() when loading the level with sequencial
+	// frames.
 	void filePathsSelected(const std::set<TFilePath> &, const std::list<std::vector<TFrameId>> &);
 	void treeFolderChanged(const TFilePath &);
 
 	// for activating/deactivating the folder history buttons( back button & forward button )
 	void historyChanged(bool, bool);
 
-private:
+  private:
 	struct Item {
 		QString m_name;
 		qlonglong m_fileSize;
@@ -207,18 +212,22 @@ private:
 		std::vector<TFrameId> m_frameIds;
 
 		Item() : m_frameCount(0), m_validInfo(false), m_fileSize(0) {}
-		Item(const TFilePath &path, bool folder = false, bool link = false, QString name = QString(""))
-			: m_path(path), m_frameCount(0), m_validInfo(false), m_fileSize(0), m_isFolder(folder), m_isLink(link), m_name(name) {}
+		Item(const TFilePath &path, bool folder = false, bool link = false,
+			 QString name = QString(""))
+			: m_path(path), m_frameCount(0), m_validInfo(false), m_fileSize(0), m_isFolder(folder),
+			  m_isLink(link), m_name(name)
+		{
+		}
 	};
 
-private:
+  private:
 	DvDirTreeView *m_folderTreeView;
 	QSplitter *m_mainSplitter;
 	QLineEdit *m_folderName;
 	DvItemViewer *m_itemViewer;
 	FrameCountReader m_frameCountReader;
 
-	//folder history
+	// folder history
 	QList<QModelIndex> m_indexHistoryList;
 	int m_currentPosition;
 
@@ -228,7 +237,7 @@ private:
 	QStringList m_filter;
 	std::map<TFilePath, Item> m_multiFileItemMap;
 
-private:
+  private:
 	void readFrameCount(Item &item);
 	void readInfo(Item &item);
 
@@ -243,19 +252,19 @@ class RenameAsToonzPopup : public DVGui::Dialog
 	DVGui::LineEdit *m_name;
 	QCheckBox *m_overwrite;
 
-public:
+  public:
 	RenameAsToonzPopup(const QString name = "", int frames = -1);
 
 	bool doOverwrite() { return m_overwrite->isChecked(); }
 	QString getName() { return m_name->text(); }
 
-private:
-	//TPropertyGroup* getFormatProperties(const std::string &ext);
+  private:
+	// TPropertyGroup* getFormatProperties(const std::string &ext);
 
-public slots:
+  public slots:
 	//! Starts the convertion.
-	//void onConvert();
-	//void onOptionsClicked();
+	// void onConvert();
+	// void onOptionsClicked();
 	void onOk();
 };
 

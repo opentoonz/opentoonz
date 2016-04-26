@@ -5,8 +5,7 @@
 
 namespace
 {
-template <typename PixType>
-inline void do_invert(TRasterPT<PixType> ras)
+template <typename PixType> inline void do_invert(TRasterPT<PixType> ras)
 {
 	int wrap = ras->getWrap();
 	int lx = ras->getLx();
@@ -31,7 +30,8 @@ inline void do_invert(TRasterPT<PixType> ras)
 //------------------------------------------------------------------------------
 
 template <typename PixType>
-inline void do_invert(TRasterPT<PixType> ras, bool invRed, bool invGreen, bool invBlue, bool invMatte)
+inline void do_invert(TRasterPT<PixType> ras, bool invRed, bool invGreen, bool invBlue,
+					  bool invMatte)
 {
 	int wrap = ras->getWrap();
 	int lx = ras->getLx();
@@ -60,8 +60,7 @@ inline void do_invert(TRasterPT<PixType> ras, bool invRed, bool invGreen, bool i
 
 //------------------------------------------------------------------------------
 
-template <>
-inline void do_invert<TPixelGR8>(TRasterPT<TPixelGR8> ras)
+template <> inline void do_invert<TPixelGR8>(TRasterPT<TPixelGR8> ras)
 {
 	int wrap = ras->getWrap();
 	int lx = ras->getLx();

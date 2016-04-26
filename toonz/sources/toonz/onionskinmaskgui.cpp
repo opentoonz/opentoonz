@@ -92,23 +92,24 @@ void OnioniSkinMaskGUI::addOnionSkinCommand(QMenu *menu, bool isFilmStrip)
 {
 	static OnioniSkinMaskGUI::OnionSkinSwitcher switcher;
 	if (switcher.isActive()) {
-		QAction *dectivateOnionSkin = menu->addAction(QString(QObject::tr("Deactivate Onion Skin")));
-		menu->connect(dectivateOnionSkin, SIGNAL(triggered()),
-					  &switcher, SLOT(deactivate()));
+		QAction *dectivateOnionSkin =
+			menu->addAction(QString(QObject::tr("Deactivate Onion Skin")));
+		menu->connect(dectivateOnionSkin, SIGNAL(triggered()), &switcher, SLOT(deactivate()));
 		if (!isFilmStrip) {
 			if (switcher.isWholeScene()) {
-				QAction *limitOnionSkinToLevel = menu->addAction(QString(QObject::tr("Limit Onion Skin To Level")));
-				menu->connect(limitOnionSkinToLevel, SIGNAL(triggered()),
-							  &switcher, SLOT(setSingleLevel()));
+				QAction *limitOnionSkinToLevel =
+					menu->addAction(QString(QObject::tr("Limit Onion Skin To Level")));
+				menu->connect(limitOnionSkinToLevel, SIGNAL(triggered()), &switcher,
+							  SLOT(setSingleLevel()));
 			} else {
-				QAction *extendOnionSkinToScene = menu->addAction(QString(QObject::tr("Extend Onion Skin To Scene")));
-				menu->connect(extendOnionSkinToScene, SIGNAL(triggered()),
-							  &switcher, SLOT(setWholeScene()));
+				QAction *extendOnionSkinToScene =
+					menu->addAction(QString(QObject::tr("Extend Onion Skin To Scene")));
+				menu->connect(extendOnionSkinToScene, SIGNAL(triggered()), &switcher,
+							  SLOT(setWholeScene()));
 			}
 		}
 	} else {
 		QAction *activateOnionSkin = menu->addAction(QString(QObject::tr("Activate Onion Skin")));
-		menu->connect(activateOnionSkin, SIGNAL(triggered()),
-					  &switcher, SLOT(activate()));
+		menu->connect(activateOnionSkin, SIGNAL(triggered()), &switcher, SLOT(activate()));
 	}
 }

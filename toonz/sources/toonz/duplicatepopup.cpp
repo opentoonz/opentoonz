@@ -37,27 +37,18 @@ class DuplicateUndo : public TUndo
 	int m_r1, m_c1;
 	int m_upTo;
 
-public:
+  public:
 	DuplicateUndo(int r0, int c0, int r1, int c1, int upTo);
 	~DuplicateUndo() {}
 	void undo() const;
 	void redo() const;
 	void repeat() const;
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Duplicate");
-	}
+	QString getHistoryString() { return QObject::tr("Duplicate"); }
 
-	int getHistoryType()
-	{
-		return HistoryType::Xsheet;
-	}
+	int getHistoryType() { return HistoryType::Xsheet; }
 };
 
 //-----------------------------------------------------------------------------
@@ -104,8 +95,7 @@ void DuplicateUndo::repeat() const
 // DuplicatePopup
 //-----------------------------------------------------------------------------
 /*--  "Repeat..." というコマンド  --*/
-DuplicatePopup::DuplicatePopup()
-	: QDialog(TApp::instance()->getMainWindow()), m_count(0), m_upTo(0)
+DuplicatePopup::DuplicatePopup() : QDialog(TApp::instance()->getMainWindow()), m_count(0), m_upTo(0)
 {
 	setWindowTitle(tr("Repeat"));
 
@@ -154,8 +144,8 @@ DuplicatePopup::DuplicatePopup()
 	ret = ret && connect(m_cancelBtn, SIGNAL(clicked()), this, SLOT(close()));
 	ret = ret && connect(m_applyBtn, SIGNAL(clicked()), this, SLOT(onApplyPressed()));
 
-	ret = ret && connect(TApp::instance()->getCurrentSelection(), SIGNAL(selectionChanged(TSelection *)),
-						 this, SLOT(onSelectionChanged()));
+	ret = ret && connect(TApp::instance()->getCurrentSelection(),
+						 SIGNAL(selectionChanged(TSelection *)), this, SLOT(onSelectionChanged()));
 	assert(ret);
 }
 
@@ -163,7 +153,8 @@ DuplicatePopup::DuplicatePopup()
 
 void DuplicatePopup::onApplyPressed()
 {
-	TCellSelection *selection = dynamic_cast<TCellSelection *>(TApp::instance()->getCurrentSelection()->getSelection());
+	TCellSelection *selection =
+		dynamic_cast<TCellSelection *>(TApp::instance()->getCurrentSelection()->getSelection());
 	if (!selection)
 		return;
 
@@ -224,7 +215,8 @@ void DuplicatePopup::updateValues()
 	getValues(count, upTo);
 	if (count == m_count && upTo == m_upTo)
 		return;
-	TCellSelection *selection = dynamic_cast<TCellSelection *>(TApp::instance()->getCurrentSelection()->getSelection());
+	TCellSelection *selection =
+		dynamic_cast<TCellSelection *>(TApp::instance()->getCurrentSelection()->getSelection());
 
 	if (!selection) {
 		m_countFld->setEnabled(false);

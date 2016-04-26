@@ -9,7 +9,7 @@
 #include "toonz/scenefx.h"
 
 //=============================================================================
-//!The Node class is a container of element necessary to define a sub-xsheet.
+//! The Node class is a container of element necessary to define a sub-xsheet.
 /*!
    The class contain a pointer to \b TXsheet \b m_xsheet, two integer to identify column
    \b m_col and row \b m_row, a \b TXshChildLevelP \b m_cl and a bool \b m_justCreated.
@@ -17,16 +17,13 @@
 
 class ChildStack::Node
 {
-public:
+  public:
 	TXsheet *m_xsheet;
 	int m_row, m_col;
 	std::map<int, int> m_rowTable;
 	TXshChildLevelP m_cl;
 	bool m_justCreated;
-	Node()
-		: m_xsheet(0), m_row(0), m_col(0), m_rowTable(), m_justCreated(false)
-	{
-	}
+	Node() : m_xsheet(0), m_row(0), m_col(0), m_rowTable(), m_justCreated(false) {}
 };
 
 //=============================================================================
@@ -116,7 +113,7 @@ bool ChildStack::closeChild(int &row, int &col)
 	m_xsheet = parentXsh;
 	m_xsheet->updateFrameCount();
 
-	//if(cl) cl->invalidateIcon();
+	// if(cl) cl->invalidateIcon();
 
 	TXsheet *xsh = m_xsheet;
 	if (justCreated) {

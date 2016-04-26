@@ -51,10 +51,7 @@ namespace
 const double previewDPI = 64;
 //-----------------------------------------------------------------------------
 
-const QString
-	BlackAndWhite = "Black & White",
-	Graytones = "Graytones",
-	Rgbcolors = "RGB Color";
+const QString BlackAndWhite = "Black & White", Graytones = "Graytones", Rgbcolors = "RGB Color";
 
 bool ScannerHasBeenDefined = false;
 
@@ -63,7 +60,8 @@ void checkPaperFormat(TScannerParameters *parameters)
 	if (parameters->getPaperOverflow()) {
 		TScanner *scanner = TScanner::instance();
 		QString scannerName = scanner ? scanner->getName() : "no scanner";
-		DVGui::warning(QObject::tr("The selected paper format is not available for %1.").arg(scannerName));
+		DVGui::warning(
+			QObject::tr("The selected paper format is not available for %1.").arg(scannerName));
 	}
 }
 
@@ -78,10 +76,12 @@ bool defineScanner(const QString &scannerType)
 
 	try {
 		if (!TScanner::instance()->isDeviceAvailable()) {
-			DVGui::warning(TScanner::m_isTwain ? QObject::tr("No TWAIN scanner is available") : QObject::tr("No scanner is available"));
-			/* FIXME: try/catch からの goto って合法じゃないだろ……。とりあえず応急処置したところ"例外ってナニ?"って感じになったのが
+			DVGui::warning(TScanner::m_isTwain ? QObject::tr("No TWAIN scanner is available")
+											   : QObject::tr("No scanner is available"));
+			/* FIXME: try/catch からの goto
+		 って合法じゃないだろ……。とりあえず応急処置したところ"例外ってナニ?"って感じになったのが
 		 indent も腐っておりつらいので後で直す */
-			//goto end;
+			// goto end;
 			QApplication::restoreOverrideCursor();
 			return false;
 		}
@@ -90,29 +90,26 @@ bool defineScanner(const QString &scannerType)
 		DVGui::warning(QString::fromStdWString(e.getMessage()));
 		QApplication::restoreOverrideCursor();
 		return false;
-		//goto end;
+		// goto end;
 	}
 
-	TScannerParameters *scanParameters = TApp::instance()
-											 ->getCurrentScene()
-											 ->getScene()
-											 ->getProperties()
-											 ->getScanParameters();
+	TScannerParameters *scanParameters =
+		TApp::instance()->getCurrentScene()->getScene()->getProperties()->getScanParameters();
 	try {
 		scanParameters->adaptToCurrentScanner();
 	} catch (TException &e) {
 		DVGui::warning(QString::fromStdWString(e.getMessage()));
-		//goto end;
+		// goto end;
 		QApplication::restoreOverrideCursor();
 		return false;
 	}
 	scanParameters->updatePaperFormat();
 	checkPaperFormat(scanParameters);
-	//ScanSettingsPopup::instance()->updateUI();
+	// ScanSettingsPopup::instance()->updateUI();
 
 	ret = true;
 
-//end:
+	// end:
 	QApplication::restoreOverrideCursor();
 	return ret;
 }
@@ -151,11 +148,8 @@ void fillOutputType(QComboBox *t, TScannerParameters *params)
 
 TPixelGR8 fromRGB(int r, int g, int b)
 {
-	return TPixelGR8((((UINT)(r)*19594 +
-					   (UINT)(g)*38472 +
-					   (UINT)(b)*7470 +
-					   (UINT)(1 << 15)) >>
-					  16));
+	return TPixelGR8(
+		(((UINT)(r)*19594 + (UINT)(g)*38472 + (UINT)(b)*7470 + (UINT)(1 << 15)) >> 16));
 }
 
 //-----------------------------------------------------------------------------
@@ -179,18 +173,20 @@ void makeTransparent(const TRaster32P &ras)
 
 //=============================================================================
 
-} //namepsapce
+} // namepsapce
 
 //=============================================================================
 /*! \class DefineScannerPopup
-		\brief The DefineScannerPopup class provides a modal dialog to choose and define a scan for application.
+		\brief The DefineScannerPopup class provides a modal dialog to choose and define a scan for
+   application.
 
 		Inherits \b Dialog.
 */
 //-----------------------------------------------------------------------------
 
 DefineScannerPopup::DefineScannerPopup()
-	: Dialog(TApp::instance()->getMainWindow(), true, Preferences::instance()->getCurrentLanguage() == "english", "DefineScanner")
+	: Dialog(TApp::instance()->getMainWindow(), true,
+			 Preferences::instance()->getCurrentLanguage() == "english", "DefineScanner")
 {
 #ifdef MACOSX
 	setModal(false);
@@ -223,7 +219,8 @@ void DefineScannerPopup::accept()
 {
 	QString scannerType = m_scanDriverOm->currentText();
 
-	if (QSettings().value("CurrentScannerType").toString() != scannerType || !ScannerHasBeenDefined) {
+	if (QSettings().value("CurrentScannerType").toString() != scannerType ||
+		!ScannerHasBeenDefined) {
 		QSettings().setValue("CurrentScannerType", scannerType);
 		ScannerHasBeenDefined = defineScanner(scannerType);
 		QAction *setCropAction = CommandManager::instance()->getAction("MI_SetScanCropbox");
@@ -317,14 +314,17 @@ void ScanSettingsPopup::hideEvent(QHideEvent *event)
 void ScanSettingsPopup::connectAll()
 {
 	bool ret = true;
-	ret = ret && connect(m_paperFormatOm, SIGNAL(currentIndexChanged(const QString &)), SLOT(onPaperChanged(const QString &)));
+	ret = ret && connect(m_paperFormatOm, SIGNAL(currentIndexChanged(const QString &)),
+						 SLOT(onPaperChanged(const QString &)));
 	ret = ret && connect(m_reverseOrderCB, SIGNAL(stateChanged(int)), SLOT(onToggle(int)));
 	ret = ret && connect(m_paperFeederCB, SIGNAL(stateChanged(int)), SLOT(onToggle(int)));
 	ret = ret && connect(m_dpi, SIGNAL(valueChanged(bool)), SLOT(onValueChanged(bool)));
 	ret = ret && connect(m_brightness, SIGNAL(valueChanged(bool)), SLOT(onValueChanged(bool)));
 	ret = ret && connect(m_threshold, SIGNAL(valueChanged(bool)), SLOT(onValueChanged(bool)));
-	ret = ret && connect(m_modeOm, SIGNAL(currentIndexChanged(const QString &)), SLOT(onModeChanged(const QString &)));
-	ret = ret && connect(TApp::instance()->getCurrentScene(), SIGNAL(sceneSwitched()), SLOT(updateUI()));
+	ret = ret && connect(m_modeOm, SIGNAL(currentIndexChanged(const QString &)),
+						 SLOT(onModeChanged(const QString &)));
+	ret = ret &&
+		  connect(TApp::instance()->getCurrentScene(), SIGNAL(sceneSwitched()), SLOT(updateUI()));
 	assert(ret);
 }
 
@@ -340,7 +340,8 @@ void ScanSettingsPopup::disconnectAll()
 	ret = ret && m_threshold->disconnect();
 	ret = ret && m_brightness->disconnect();
 	ret = ret && m_modeOm->disconnect();
-	ret = ret && disconnect(TApp::instance()->getCurrentScene(), SIGNAL(sceneSwitched()), this, SLOT(updateUI()));
+	ret = ret && disconnect(TApp::instance()->getCurrentScene(), SIGNAL(sceneSwitched()), this,
+							SLOT(updateUI()));
 	assert(ret);
 }
 
@@ -348,7 +349,8 @@ void ScanSettingsPopup::disconnectAll()
 
 void ScanSettingsPopup::onValueChanged(bool)
 {
-	TScannerParameters *params = TApp::instance()->getCurrentScene()->getScene()->getProperties()->getScanParameters();
+	TScannerParameters *params =
+		TApp::instance()->getCurrentScene()->getScene()->getProperties()->getScanParameters();
 	params->m_dpi.m_value = m_dpi->getValue();
 	params->m_threshold.m_value = m_threshold->getValue();
 	params->m_brightness.m_value = m_brightness->getValue();
@@ -358,7 +360,8 @@ void ScanSettingsPopup::onValueChanged(bool)
 
 void ScanSettingsPopup::onToggle(int)
 {
-	TScannerParameters *sp = TApp::instance()->getCurrentScene()->getScene()->getProperties()->getScanParameters();
+	TScannerParameters *sp =
+		TApp::instance()->getCurrentScene()->getScene()->getProperties()->getScanParameters();
 
 	sp->setReverseOrder(m_reverseOrderCB->isChecked());
 	sp->enablePaperFeeder(m_paperFeederCB->isChecked());
@@ -371,7 +374,8 @@ void ScanSettingsPopup::onPaperChanged(const QString &format)
 	if (!ScannerHasBeenDefined)
 		return;
 
-	TScannerParameters *sp = TApp::instance()->getCurrentScene()->getScene()->getProperties()->getScanParameters();
+	TScannerParameters *sp =
+		TApp::instance()->getCurrentScene()->getScene()->getProperties()->getScanParameters();
 	sp->setPaperFormat(format.toStdString());
 	sp->setCropBox(sp->getScanArea());
 	checkPaperFormat(sp);
@@ -384,7 +388,8 @@ void ScanSettingsPopup::onModeChanged(const QString &mode)
 	if (!ScannerHasBeenDefined)
 		return;
 
-	TScannerParameters *sp = TApp::instance()->getCurrentScene()->getScene()->getProperties()->getScanParameters();
+	TScannerParameters *sp =
+		TApp::instance()->getCurrentScene()->getScene()->getProperties()->getScanParameters();
 	m_threshold->setVisible(false);
 	m_thresholdLbl->setVisible(false);
 
@@ -397,7 +402,7 @@ void ScanSettingsPopup::onModeChanged(const QString &mode)
 	else if (mode == Rgbcolors)
 		sp->setScanType(TScannerParameters::RGB24);
 	else {
-		//assert(0);
+		// assert(0);
 		sp->setScanType(TScannerParameters::None);
 	}
 }
@@ -408,13 +413,15 @@ void ScanSettingsPopup::updateUI()
 {
 	disconnectAll();
 	checkScannerDefinition();
-	TScannerParameters *params = TApp::instance()->getCurrentScene()->getScene()->getProperties()->getScanParameters();
+	TScannerParameters *params =
+		TApp::instance()->getCurrentScene()->getScene()->getProperties()->getScanParameters();
 	QApplication::setOverrideCursor(Qt::WaitCursor);
 	params->adaptToCurrentScanner();
 	QApplication::restoreOverrideCursor();
 
 	TScanner *scanner = TScanner::instance();
-	m_scannerNameLbl->setText(scanner && scanner->getName() != "" ? scanner->getName() : "[no scanner]");
+	m_scannerNameLbl->setText(scanner && scanner->getName() != "" ? scanner->getName()
+																  : "[no scanner]");
 
 	m_reverseOrderCB->setChecked(params->isReverseOrder());
 	m_paperFeederCB->setChecked(params->m_paperFeeder.m_value == 1.0);
@@ -443,7 +450,8 @@ void ScanSettingsPopup::updateUI()
 
 	disconnect(m_modeOm);
 	fillOutputType(m_modeOm, params);
-	connect(m_modeOm, SIGNAL(currentIndexChanged(const QString &)), SLOT(onModeChanged(const QString &)));
+	connect(m_modeOm, SIGNAL(currentIndexChanged(const QString &)),
+			SLOT(onModeChanged(const QString &)));
 
 	m_modeOm->setEnabled(true);
 	switch (params->getScanType()) {
@@ -461,7 +469,8 @@ void ScanSettingsPopup::updateUI()
 		break;
 	}
 
-	m_paperFormatOm->setCurrentIndex(m_paperFormatOm->findText(QString::fromStdString(params->getPaperFormat())));
+	m_paperFormatOm->setCurrentIndex(
+		m_paperFormatOm->findText(QString::fromStdString(params->getPaperFormat())));
 
 	if (params->m_threshold.m_supported) {
 		m_threshold->setRange(params->m_threshold.m_min, params->m_threshold.m_max);
@@ -488,8 +497,7 @@ void ScanSettingsPopup::updateUI()
 #ifdef LINETEST
 //-----------------------------------------------------------------------------
 
-AutocenterPopup::AutocenterPopup()
-	: DVGui::Dialog(0, false, true)
+AutocenterPopup::AutocenterPopup() : DVGui::Dialog(0, false, true)
 {
 	setWindowTitle(tr("Autocenter"));
 
@@ -499,7 +507,7 @@ AutocenterPopup::AutocenterPopup()
 	settingsLayout->setMargin(12);
 	int row = 0;
 
-	//AutoCenter
+	// AutoCenter
 	QWidget *w = new QWidget();
 	w->setFixedWidth(70);
 	settingsLayout->addWidget(w, row, 0);
@@ -508,7 +516,7 @@ AutocenterPopup::AutocenterPopup()
 	settingsLayout->addWidget(m_autocenter, row, 1, Qt::AlignLeft);
 	++row;
 
-	//Pegbar Holse
+	// Pegbar Holse
 	settingsLayout->addWidget(new QLabel(tr("Pegbar Holes:")), row, 0, Qt::AlignRight);
 	m_pegbarHoles = new QComboBox(this);
 	m_pegbarHoles->setFixedHeight(WidgetHeight);
@@ -522,7 +530,7 @@ AutocenterPopup::AutocenterPopup()
 	settingsLayout->addWidget(m_pegbarHoles, row, 1, Qt::AlignLeft);
 	++row;
 
-	//Feld Guide
+	// Feld Guide
 	settingsLayout->addWidget(new QLabel(tr("Field Guide:")), row, 0, Qt::AlignRight);
 	m_fieldGuide = new QComboBox(this);
 	m_fieldGuide->setFixedHeight(WidgetHeight);
@@ -540,9 +548,12 @@ AutocenterPopup::AutocenterPopup()
 	endHLayout();
 
 	bool ret = true;
-	ret = ret && connect(m_autocenter, SIGNAL(toggled(bool)), this, SLOT(onAutocenterToggled(bool)));
-	ret = ret && connect(m_pegbarHoles, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(onPegbarHolesChanged(const QString &)));
-	ret = ret && connect(m_fieldGuide, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(onFieldGuideChanged(const QString &)));
+	ret =
+		ret && connect(m_autocenter, SIGNAL(toggled(bool)), this, SLOT(onAutocenterToggled(bool)));
+	ret = ret && connect(m_pegbarHoles, SIGNAL(currentIndexChanged(const QString &)), this,
+						 SLOT(onPegbarHolesChanged(const QString &)));
+	ret = ret && connect(m_fieldGuide, SIGNAL(currentIndexChanged(const QString &)), this,
+						 SLOT(onFieldGuideChanged(const QString &)));
 	assert(ret);
 }
 
@@ -550,7 +561,8 @@ AutocenterPopup::AutocenterPopup()
 
 void AutocenterPopup::showEvent(QShowEvent *e)
 {
-	CleanupParameters *cp = TApp::instance()->getCurrentScene()->getScene()->getProperties()->getCleanupParameters();
+	CleanupParameters *cp =
+		TApp::instance()->getCurrentScene()->getScene()->getProperties()->getCleanupParameters();
 	m_autocenter->setChecked(cp->m_autocenterType == AUTOCENTER_FDG);
 
 	CleanupTypes::PEGS_SIDE type = cp->m_pegSide;
@@ -574,7 +586,8 @@ void AutocenterPopup::showEvent(QShowEvent *e)
 
 void AutocenterPopup::onAutocenterToggled(bool toggled)
 {
-	CleanupParameters *cp = TApp::instance()->getCurrentScene()->getScene()->getProperties()->getCleanupParameters();
+	CleanupParameters *cp =
+		TApp::instance()->getCurrentScene()->getScene()->getProperties()->getCleanupParameters();
 	cp->m_autocenterType = toggled ? AUTOCENTER_FDG : AUTOCENTER_NONE;
 }
 
@@ -582,7 +595,8 @@ void AutocenterPopup::onAutocenterToggled(bool toggled)
 
 void AutocenterPopup::onPegbarHolesChanged(const QString &pg)
 {
-	CleanupParameters *cp = TApp::instance()->getCurrentScene()->getScene()->getProperties()->getCleanupParameters();
+	CleanupParameters *cp =
+		TApp::instance()->getCurrentScene()->getScene()->getProperties()->getCleanupParameters();
 	CleanupTypes::PEGS_SIDE type;
 	if (pg == "Bottom")
 		type = PEGS_BOTTOM;
@@ -601,7 +615,8 @@ void AutocenterPopup::onPegbarHolesChanged(const QString &pg)
 
 void AutocenterPopup::onFieldGuideChanged(const QString &fg)
 {
-	CleanupParameters *cp = TApp::instance()->getCurrentScene()->getScene()->getProperties()->getCleanupParameters();
+	CleanupParameters *cp =
+		TApp::instance()->getCurrentScene()->getScene()->getProperties()->getCleanupParameters();
 	if (cp->getFdgName() == fg.toStdString())
 		return;
 	cp->setFdgByName(fg.toStdString());
@@ -613,11 +628,8 @@ void AutocenterPopup::onFieldGuideChanged(const QString &fg)
 MyScannerListener::MyScannerListener(const ScanList &scanList)
 	: m_scanList(scanList), m_current(0), m_inc(+1), m_isCanceled(false), m_progressDialog(0)
 {
-	TScannerParameters *parameters = TApp::instance()
-										 ->getCurrentScene()
-										 ->getScene()
-										 ->getProperties()
-										 ->getScanParameters();
+	TScannerParameters *parameters =
+		TApp::instance()->getCurrentScene()->getScene()->getProperties()->getScanParameters();
 
 	m_isPreview = parameters->isPreview();
 	if (m_isPreview)
@@ -628,7 +640,8 @@ MyScannerListener::MyScannerListener(const ScanList &scanList)
 		TXshSimpleLevel *newXl = frame.getLevel();
 		TFilePath levelName(newXl->getName());
 		QString imageName = toQString(levelName.withFrame(frame.getFrameId())) + QString(".tif");
-		QString text = tr("Scanning in progress: ") + imageName + " 1/" + QString::number(frameCount);
+		QString text =
+			tr("Scanning in progress: ") + imageName + " 1/" + QString::number(frameCount);
 		m_progressDialog = new DVGui::ProgressDialog(text, QObject::tr("Cancel"), 0, frameCount);
 		connect(m_progressDialog, SIGNAL(canceled()), this, SLOT(cancelButtonPressed()));
 		m_progressDialog->setWindowModality(Qt::WindowModal);
@@ -657,8 +670,12 @@ void MyScannerListener::onImage(const TRasterImageP &rasImg)
 		TImageCache::instance()->add((std::string) "setScanCropboxId", rasImg.getPointer());
 	} else {
 #ifdef LINETEST
-		//Autocenter
-		CleanupParameters *cp = TApp::instance()->getCurrentScene()->getScene()->getProperties()->getCleanupParameters();
+		// Autocenter
+		CleanupParameters *cp = TApp::instance()
+									->getCurrentScene()
+									->getScene()
+									->getProperties()
+									->getCleanupParameters();
 		if (cp->m_autocenterType != AUTOCENTER_NONE) {
 			bool autocentered;
 			TCleanupper *cl = TCleanupper::instance();
@@ -671,7 +688,8 @@ void MyScannerListener::onImage(const TRasterImageP &rasImg)
 		}
 		makeTransparent(rasImg->getRaster());
 #endif
-		TScannerParameters *params = TApp::instance()->getCurrentScene()->getScene()->getProperties()->getScanParameters();
+		TScannerParameters *params =
+			TApp::instance()->getCurrentScene()->getScene()->getProperties()->getScanParameters();
 
 		ScanListFrame frame = m_scanList.getFrame(m_current);
 		bool isBW = false;
@@ -705,9 +723,11 @@ void MyScannerListener::onNextPaper()
 {
 	assert(!m_isPreview);
 	if (TScanner::instance()->m_isTwain)
-		DVGui::info(tr("Please, place the next paper drawing on the scanner flatbed, then select the relevant command in the TWAIN interface."));
+		DVGui::info(tr("Please, place the next paper drawing on the scanner flatbed, then select "
+					   "the relevant command in the TWAIN interface."));
 	else {
-		QString question(tr("Please, place the next paper drawing on the scanner flatbed, then click the Scan button."));
+		QString question(tr("Please, place the next paper drawing on the scanner flatbed, then "
+							"click the Scan button."));
 		int ret = DVGui::MsgBox(question, QObject::tr("Scan"), QObject::tr("Cancel"), 0);
 		if (ret == 2 || ret == 0)
 			m_isCanceled = true;
@@ -727,7 +747,9 @@ void MyScannerListener::onAutomaticallyNextPaper()
 		TXshSimpleLevel *newXl = frame.getLevel();
 		TFilePath levelName(newXl->getName());
 		QString imageName = toQString(levelName.withFrame(frame.getFrameId())) + QString(".tif");
-		m_progressDialog->setLabelText(tr("Scanning in progress: ") + imageName + QString::number(m_current + 1) + " /" + QString::number(frameCount));
+		m_progressDialog->setLabelText(tr("Scanning in progress: ") + imageName +
+									   QString::number(m_current + 1) + " /" +
+									   QString::number(frameCount));
 	}
 	m_progressDialog->setValue(step);
 	if (m_progressDialog && (step == frameCount))
@@ -757,8 +779,10 @@ void doScan()
 		return;
 	ScanList scanList;
 	if (scanList.areScannedFramesSelected()) {
-		int ret = DVGui::MsgBox(QObject::tr("Some of the selected drawings were already scanned. Do you want to scan them again?"),
-						 QObject::tr("Scan"), QObject::tr("Don't Scan"), QObject::tr("Cancel"));
+		int ret =
+			DVGui::MsgBox(QObject::tr("Some of the selected drawings were already scanned. Do you "
+									  "want to scan them again?"),
+						  QObject::tr("Scan"), QObject::tr("Don't Scan"), QObject::tr("Cancel"));
 		if (ret == 3)
 			return;
 		scanList.update(ret == 1);
@@ -782,7 +806,8 @@ void doScan()
 		MyScannerListener lst(scanList);
 		scanner->addListener(&lst);
 
-		TScannerParameters *sp = TApp::instance()->getCurrentScene()->getScene()->getProperties()->getScanParameters();
+		TScannerParameters *sp =
+			TApp::instance()->getCurrentScene()->getScene()->getProperties()->getScanParameters();
 		sp->adaptToCurrentScannerIfNeeded();
 		scanner->acquire(*sp, scanList.getFrameCount());
 		scanner->removeListener(&lst);
@@ -794,12 +819,12 @@ void doScan()
 		DVGui::warning(QString::fromStdWString(e.getMessage()));
 	}
 
-	//If some levels were scanned successfully, their renumber table must be updated.
+	// If some levels were scanned successfully, their renumber table must be updated.
 
-	//A level's renumber table is usually updated when it is either loaded or before saving -
-	//this is a similar case, where a level is filled with frames.
-	//An empty renumber table means that a renumbering operation was carried out with all frames
-	//being eradicated - which may lead to the level being saved with missing frames.
+	// A level's renumber table is usually updated when it is either loaded or before saving -
+	// this is a similar case, where a level is filled with frames.
+	// An empty renumber table means that a renumbering operation was carried out with all frames
+	// being eradicated - which may lead to the level being saved with missing frames.
 	int i, frameCount = scanList.getFrameCount();
 	TXshSimpleLevel *oldLevel = 0, *level;
 	for (i = 0; i < frameCount; ++i) {
@@ -822,17 +847,14 @@ OpenPopupCommandHandler<AutocenterPopup> openAutocenterPopup(MI_Autocenter);
 
 class ScanCommand : public MenuItemHandler
 {
-public:
+  public:
 	ScanCommand() : MenuItemHandler("MI_Scan") {}
-	void execute()
-	{
-		doScan();
-	}
+	void execute() { doScan(); }
 } ScanCommand;
 
 //=========================================================================================
 //
-//SetCropboxCommand
+// SetCropboxCommand
 //
 //=========================================================================================
 
@@ -841,11 +863,8 @@ class SetCropboxCommand : public MenuItemHandler
 
 	TTool *m_currentTool;
 
-public:
-	SetCropboxCommand()
-		: MenuItemHandler("MI_SetScanCropbox"), m_currentTool(0)
-	{
-	}
+  public:
+	SetCropboxCommand() : MenuItemHandler("MI_SetScanCropbox"), m_currentTool(0) {}
 
 	void execute()
 	{
@@ -853,7 +872,8 @@ public:
 		SetScanCropboxCheck *cropboxCheck = SetScanCropboxCheck::instance();
 		cropboxCheck->setIsEnabled(!cropboxCheck->isEnabled());
 
-		TScannerParameters *sp = TApp::instance()->getCurrentScene()->getScene()->getProperties()->getScanParameters();
+		TScannerParameters *sp =
+			TApp::instance()->getCurrentScene()->getScene()->getProperties()->getScanParameters();
 		QAction *resetCropAction = CommandManager::instance()->getAction("MI_ResetScanCropbox");
 		if (!cropboxCheck->isEnabled()) {
 			if (m_currentTool)
@@ -902,25 +922,26 @@ public:
 
 //=========================================================================================
 //
-//ResetCropboxCommand
+// ResetCropboxCommand
 //
 //=========================================================================================
 
 class ResetCropboxCommand : public MenuItemHandler
 {
-public:
+  public:
 	ResetCropboxCommand() : MenuItemHandler("MI_ResetScanCropbox") {}
 
 	void execute()
 	{
-		TScannerParameters *sp = TApp::instance()->getCurrentScene()->getScene()->getProperties()->getScanParameters();
+		TScannerParameters *sp =
+			TApp::instance()->getCurrentScene()->getScene()->getProperties()->getScanParameters();
 		sp->setCropBox(sp->getScanArea());
 	}
 } resetCropboxCommand;
 
 //=========================================================================================
 //
-//SetScanCropboxTool
+// SetScanCropboxTool
 //
 //=========================================================================================
 
@@ -930,18 +951,9 @@ class SetScanCropboxTool : public TTool
 	TScannerParameters *m_parameters;
 	int m_scaling;
 	TPointD m_lastPos;
-	enum { eNone,
-		   eMove,
-		   e00,
-		   e01,
-		   e10,
-		   e11,
-		   eM0,
-		   e1M,
-		   eM1,
-		   e0M };
+	enum { eNone, eMove, e00, e01, e10, e11, eM0, e1M, eM1, e0M };
 
-public:
+  public:
 	SetScanCropboxTool()
 		: TTool("T_SetScanCropbox"), m_imgId("setScanCropboxId"), m_scaling(eNone), m_lastPos()
 	{
@@ -959,7 +971,8 @@ public:
 		TRasterImageP ri = TImageCache::instance()->get(m_imgId, false);
 		if (ri) {
 			TPointD center = ri->getRaster()->getCenterD();
-			GLRasterPainter::drawRaster(TScale(Stage::inch / previewDPI, Stage::inch / previewDPI), ri, true);
+			GLRasterPainter::drawRaster(TScale(Stage::inch / previewDPI, Stage::inch / previewDPI),
+										ri, true);
 		}
 
 		TRectD cropBox = rect2pix(m_parameters->getCropBox());
@@ -980,10 +993,14 @@ public:
 
 		TPointD center = (cropBox.getP00() + cropBox.getP11()) * 0.5;
 
-		ToolUtils::drawSquare(TPointD(center.x, cropBox.y0), pixelSize * 4, TPixel::Red); //draw M0 handle
-		ToolUtils::drawSquare(TPointD(cropBox.x1, center.y), pixelSize * 4, TPixel::Red); //draw 1M handle
-		ToolUtils::drawSquare(TPointD(center.x, cropBox.y1), pixelSize * 4, TPixel::Red); //draw M1 handle
-		ToolUtils::drawSquare(TPointD(cropBox.x0, center.y), pixelSize * 4, TPixel::Red); //draw 0M handle
+		ToolUtils::drawSquare(TPointD(center.x, cropBox.y0), pixelSize * 4,
+							  TPixel::Red); // draw M0 handle
+		ToolUtils::drawSquare(TPointD(cropBox.x1, center.y), pixelSize * 4,
+							  TPixel::Red); // draw 1M handle
+		ToolUtils::drawSquare(TPointD(center.x, cropBox.y1), pixelSize * 4,
+							  TPixel::Red); // draw M1 handle
+		ToolUtils::drawSquare(TPointD(cropBox.x0, center.y), pixelSize * 4,
+							  TPixel::Red); // draw 0M handle
 
 		glDisable(GL_LINE_STIPPLE);
 	}
@@ -1022,10 +1039,7 @@ public:
 
 	//-----------------------------------------------------------------------------
 
-	void leftButtonDown(const TPointD &pos, const TMouseEvent &e)
-	{
-		m_lastPos = pos;
-	}
+	void leftButtonDown(const TPointD &pos, const TMouseEvent &e) { m_lastPos = pos; }
 
 	//-----------------------------------------------------------------------------
 
@@ -1039,16 +1053,20 @@ public:
 		TRectD scanArea = m_parameters->getScanArea();
 		TRectD cropBox = m_parameters->getCropBox();
 		if (m_scaling != eNone && m_scaling != eMove) {
-			if ((m_scaling == eM1 || ((m_scaling == e11 || m_scaling == e01) && !e.isShiftPressed())) &&
+			if ((m_scaling == eM1 ||
+				 ((m_scaling == e11 || m_scaling == e01) && !e.isShiftPressed())) &&
 				cropBox.x0 - dp.y < cropBox.x1)
 				cropBox.x0 -= dp.y;
-			if ((m_scaling == eM0 || ((m_scaling == e10 || m_scaling == e00) && !e.isShiftPressed())) &&
+			if ((m_scaling == eM0 ||
+				 ((m_scaling == e10 || m_scaling == e00) && !e.isShiftPressed())) &&
 				cropBox.x1 - dp.y > cropBox.x0)
 				cropBox.x1 -= dp.y;
-			if ((m_scaling == e0M || ((m_scaling == e00 || m_scaling == e01) && !e.isShiftPressed())) &&
+			if ((m_scaling == e0M ||
+				 ((m_scaling == e00 || m_scaling == e01) && !e.isShiftPressed())) &&
 				cropBox.y1 - dp.x > cropBox.y0)
 				cropBox.y1 -= dp.x;
-			if ((m_scaling == e1M || ((m_scaling == e11 || m_scaling == e10) && !e.isShiftPressed())) &&
+			if ((m_scaling == e1M ||
+				 ((m_scaling == e11 || m_scaling == e10) && !e.isShiftPressed())) &&
 				cropBox.y0 - dp.x < cropBox.y1)
 				cropBox.y0 -= dp.x;
 
@@ -1118,17 +1136,25 @@ public:
 
 	void onActivate()
 	{
-		m_parameters = TTool::getApplication()->getCurrentScene()->getScene()->getProperties()->getScanParameters();
+		m_parameters = TTool::getApplication()
+						   ->getCurrentScene()
+						   ->getScene()
+						   ->getProperties()
+						   ->getScanParameters();
 	}
 
 	void onEnter()
 	{
-		m_parameters = TTool::getApplication()->getCurrentScene()->getScene()->getProperties()->getScanParameters();
+		m_parameters = TTool::getApplication()
+						   ->getCurrentScene()
+						   ->getScene()
+						   ->getProperties()
+						   ->getScanParameters();
 	}
 
 	//-----------------------------------------------------------------------------
 
-private:
+  private:
 	TRectD rect2pix(const TRectD &rect)
 	{
 		const double f = 25.4;
@@ -1142,9 +1168,6 @@ private:
 		double cbSizely = (((rect.y1 - rect.y0) * previewDPI) / f) * scaleFactor;
 
 		TRectD rectPix(TPointD(cbOffsetx, cbOffsety), TDimensionD(cbSizelx, cbSizely));
-		return TRectD(-rectPix.y1,
-					  -rectPix.x1,
-					  -rectPix.y0,
-					  -rectPix.x0);
+		return TRectD(-rectPix.y1, -rectPix.x1, -rectPix.y0, -rectPix.x0);
 	}
 } setScanCropboxTool;

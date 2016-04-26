@@ -21,7 +21,7 @@ class CastSelection : public DvItemSelection
 {
 	CastBrowser *m_browser;
 
-public:
+  public:
 	CastSelection();
 	~CastSelection();
 
@@ -45,7 +45,7 @@ class TXshSimpleLevel;
 
 class CastItem
 {
-public:
+  public:
 	CastItem() {}
 	virtual ~CastItem() {}
 	virtual QString getName() const = 0;
@@ -65,9 +65,11 @@ class LevelCastItem : public CastItem
 	TXshLevel *m_level;
 	QSize m_itemPixmapSize;
 
-public:
+  public:
 	LevelCastItem(TXshLevel *level, QSize itemPixmapSize)
-		: m_level(level), m_itemPixmapSize(itemPixmapSize) {}
+		: m_level(level), m_itemPixmapSize(itemPixmapSize)
+	{
+	}
 	TXshLevel *getLevel() const { return m_level; }
 	QString getName() const;
 	QString getToolTip() const;
@@ -84,9 +86,11 @@ class SoundCastItem : public CastItem
 	TXshSoundLevel *m_soundLevel;
 	QSize m_itemPixmapSize;
 
-public:
+  public:
 	SoundCastItem(TXshSoundLevel *soundLevel, QSize itemPixmapSize)
-		: m_soundLevel(soundLevel), m_itemPixmapSize(itemPixmapSize) {}
+		: m_soundLevel(soundLevel), m_itemPixmapSize(itemPixmapSize)
+	{
+	}
 	TXshSoundLevel *getSoundLevel() const { return m_soundLevel; }
 	QString getName() const;
 	QString getToolTip() const;
@@ -103,9 +107,11 @@ class PaletteCastItem : public CastItem
 	TXshPaletteLevel *m_paletteLevel;
 	QSize m_itemPixmapSize;
 
-public:
+  public:
 	PaletteCastItem(TXshPaletteLevel *paletteLevel, QSize itemPixmapSize)
-		: m_paletteLevel(paletteLevel), m_itemPixmapSize(itemPixmapSize) {}
+		: m_paletteLevel(paletteLevel), m_itemPixmapSize(itemPixmapSize)
+	{
+	}
 	TXshPaletteLevel *getPaletteLevel() const { return m_paletteLevel; }
 	QString getName() const;
 	QString getToolTip() const;
@@ -120,7 +126,7 @@ class CastItems : public QMimeData
 {
 	std::vector<CastItem *> m_items;
 
-public:
+  public:
 	CastItems();
 	~CastItems();
 
@@ -130,10 +136,7 @@ public:
 	int getItemCount() const { return m_items.size(); }
 	CastItem *getItem(int index) const;
 
-	void swapItem(int index1, int index2)
-	{
-		std::swap(m_items[index1], m_items[index2]);
-	}
+	void swapItem(int index1, int index2) { std::swap(m_items[index1], m_items[index2]); }
 
 	QStringList formats() const;
 	bool hasFormat(const QString &mimeType) const;
@@ -142,4 +145,4 @@ public:
 	CastItems *getSelectedItems(const std::set<int> &indices) const;
 };
 
-#endif //FILESELECTION_H
+#endif // FILESELECTION_H

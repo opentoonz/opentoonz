@@ -17,16 +17,16 @@
 //*****************************************************************************
 
 #ifndef checkErrorsByGL
-#define checkErrorsByGL                      \
-	{                                        \
-		GLenum err = glGetError();           \
-		assert(err != GL_INVALID_ENUM);      \
-		assert(err != GL_INVALID_VALUE);     \
-		assert(err != GL_INVALID_OPERATION); \
-		assert(err != GL_STACK_OVERFLOW);    \
-		assert(err != GL_STACK_UNDERFLOW);   \
-		assert(err != GL_OUT_OF_MEMORY);     \
-		assert(err == GL_NO_ERROR);          \
+#define checkErrorsByGL                                                                            \
+	{                                                                                              \
+		GLenum err = glGetError();                                                                 \
+		assert(err != GL_INVALID_ENUM);                                                            \
+		assert(err != GL_INVALID_VALUE);                                                           \
+		assert(err != GL_INVALID_OPERATION);                                                       \
+		assert(err != GL_STACK_OVERFLOW);                                                          \
+		assert(err != GL_STACK_UNDERFLOW);                                                         \
+		assert(err != GL_OUT_OF_MEMORY);                                                           \
+		assert(err == GL_NO_ERROR);                                                                \
 	}
 #endif
 
@@ -42,7 +42,8 @@ int TColorStyle::m_currentFrame = 0;
 //-------------------------------------------------------------------
 
 TColorStyle::TColorStyle()
-	: m_name(L"color"), m_globalName(L""), m_originalName(L""), m_versionNumber(0), m_flags(0), m_enabled(true), m_icon(0), m_validIcon(false), m_isEditedFromOriginal(false)
+	: m_name(L"color"), m_globalName(L""), m_originalName(L""), m_versionNumber(0), m_flags(0),
+	  m_enabled(true), m_icon(0), m_validIcon(false), m_isEditedFromOriginal(false)
 {
 }
 
@@ -55,7 +56,9 @@ TColorStyle::~TColorStyle()
 //-------------------------------------------------------------------
 
 TColorStyle::TColorStyle(const TColorStyle &other)
-	: m_name(other.m_name), m_globalName(other.m_globalName), m_originalName(other.m_originalName), m_versionNumber(other.m_versionNumber), m_flags(other.m_flags), m_enabled(other.m_enabled), m_validIcon(false), m_isEditedFromOriginal(other.m_isEditedFromOriginal)
+	: m_name(other.m_name), m_globalName(other.m_globalName), m_originalName(other.m_originalName),
+	  m_versionNumber(other.m_versionNumber), m_flags(other.m_flags), m_enabled(other.m_enabled),
+	  m_validIcon(false), m_isEditedFromOriginal(other.m_isEditedFromOriginal)
 {
 }
 
@@ -112,11 +115,15 @@ bool TColorStyle::operator==(const TColorStyle &cs) const
 			if (getParamValue(bool_tag(), p) != cs.getParamValue(bool_tag(), p))
 				return false;
 
-			CASE INT : case ENUM : if (getParamValue(int_tag(), p) != cs.getParamValue(int_tag(), p)) return false;
+			CASE INT
+				: case ENUM
+				  : if (getParamValue(int_tag(), p) != cs.getParamValue(int_tag(), p)) return false;
 
-			CASE DOUBLE : if (getParamValue(double_tag(), p) != cs.getParamValue(double_tag(), p)) return false;
+			CASE DOUBLE : if (getParamValue(double_tag(), p) !=
+							  cs.getParamValue(double_tag(), p)) return false;
 
-			CASE FILEPATH : if (getParamValue(TFilePath_tag(), p) != cs.getParamValue(TFilePath_tag(), p)) return false;
+			CASE FILEPATH : if (getParamValue(TFilePath_tag(), p) !=
+								cs.getParamValue(TFilePath_tag(), p)) return false;
 
 		DEFAULT:
 			assert(false);
@@ -346,7 +353,8 @@ void TColorStyle::assignBlend(const TColorStyle &a, const TColorStyle &b, double
 
 		for (par = 0; par != parCount; ++par) {
 			switch (getParamType(par)) {
-				CASE DOUBLE : setParamValue(par, (1 - t) * a.getParamValue(double_tag(), par) + t * b.getParamValue(double_tag(), par));
+				CASE DOUBLE : setParamValue(par, (1 - t) * a.getParamValue(double_tag(), par) +
+													 t * b.getParamValue(double_tag(), par));
 
 			DEFAULT:;
 			}
@@ -373,14 +381,13 @@ class ColorStyleList
 		TColorStyle *m_style;
 		bool m_isObsolete;
 		//    Item() : m_style(0), m_isObsolete(false) { assert(0); }
-		Item(TColorStyle *style, bool obsolete = false)
-			: m_style(style), m_isObsolete(obsolete) {}
+		Item(TColorStyle *style, bool obsolete = false) : m_style(style), m_isObsolete(obsolete) {}
 	};
 
 	typedef std::map<int, Item> Table;
 	Table m_table;
 
-public:
+  public:
 	static ColorStyleList *instance()
 	{
 		static ColorStyleList *_instance = 0;
@@ -389,10 +396,7 @@ public:
 		return _instance;
 	}
 
-	int getStyleCount()
-	{
-		return int(m_table.size());
-	}
+	int getStyleCount() { return int(m_table.size()); }
 
 	void declare(TColorStyle *style)
 	{
@@ -405,7 +409,8 @@ public:
 		style->getObsoleteTagIds(ids);
 		for (std::vector<int>::iterator it = ids.begin(); it != ids.end(); ++it) {
 			if (m_table.find(*it) != m_table.end()) {
-				throw TException("Duplicate color style declaration for obsolete style. id = " + toString(*it));
+				throw TException("Duplicate color style declaration for obsolete style. id = " +
+								 toString(*it));
 			}
 			m_table.insert(std::make_pair(*it, Item(style->clone(), true)));
 		}
@@ -426,8 +431,7 @@ public:
 	{
 		tags.clear();
 		tags.reserve(m_table.size());
-		for (Table::iterator it = m_table.begin();
-			 it != m_table.end(); ++it)
+		for (Table::iterator it = m_table.begin(); it != m_table.end(); ++it)
 			if (!it->second.m_isObsolete)
 				tags.push_back(it->first);
 	}
@@ -440,7 +444,7 @@ public:
 		}
 	}
 
-private:
+  private:
 	// not implemented
 	ColorStyleList(const ColorStyleList &);
 	ColorStyleList &operator=(const ColorStyleList &);
@@ -493,15 +497,17 @@ void TColorStyle::drawStroke(TFlash &flash, const TStroke *s) const
 		return;
 	if (quality == TFlash::ConstantLines)
 		isCenterline = true;
-	else if (quality == TFlash::MixedLines && (maxThickness == 0 || minThickness / maxThickness > 0.5))
+	else if (quality == TFlash::MixedLines &&
+			 (maxThickness == 0 || minThickness / maxThickness > 0.5))
 		isCenterline = true;
-	else if (quality == TFlash::VariableLines && maxThickness - minThickness < 0.16) // Quando si salva il pli, si approssima al thick.
-																					 // L'errore di approx e' sempre 0.1568...
+	else if (quality == TFlash::VariableLines &&
+			 maxThickness - minThickness < 0.16) // Quando si salva il pli, si approssima al thick.
+												 // L'errore di approx e' sempre 0.1568...
 		isCenterline = true;
-	//else	assert(false);
+	// else	assert(false);
 
 	flash.setFillColor(getAverageColor());
-	//flash.setFillColor(TPixel::Red);
+	// flash.setFillColor(TPixel::Red);
 
 	TStroke *saux = const_cast<TStroke *>(s);
 	if (isCenterline) {
@@ -541,9 +547,9 @@ void TColorStyle::save(TOutputStreamInterface &os) const
 	if (gname != L"") {
 		os << toString(L"|" + gname);
 
-		//save the original name from studio palette
+		// save the original name from studio palette
 		if (origName != L"") {
-			//write two "@"s if the edited flag is ON
+			// write two "@"s if the edited flag is ON
 			os << toString(((m_isEditedFromOriginal) ? L"@@" : L"@") + origName);
 		}
 	}
@@ -574,9 +580,9 @@ TColorStyle *TColorStyle::load(TInputStreamInterface &is)
 		gname = toWideString(name.substr(1));
 		is >> name;
 
-		//If the style is copied from studio palette, original name is here
+		// If the style is copied from studio palette, original name is here
 		if (name.length() > 0 && name[0] == '@') {
-			//if there are two "@"s, then activate the edited flag
+			// if there are two "@"s, then activate the edited flag
 			if (name[1] == '@') {
 				isEdited = true;
 				origName = toWideString(name.substr(2));

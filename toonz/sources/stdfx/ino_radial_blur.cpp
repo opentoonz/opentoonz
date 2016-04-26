@@ -27,7 +27,7 @@ class ino_radial_blur : public TStandardRasterFx
 	TBoolParamP m_anti_alias;
 	TIntEnumParamP m_ref_mode;
 
-public:
+  public:
 	ino_radial_blur()
 		: m_center(TPointD(0.0, 0.0)), m_blur(0.01 * ino_param_range), m_radius(0.0), m_twist(0.0)
 		  // ,m_twist_radius(0.0)
@@ -46,13 +46,11 @@ public:
 		bindParam(this, "radius", this->m_radius);
 		bindParam(this, "twist", this->m_twist);
 		// bindParam(this,"twist_radius", this->m_twist_radius);
-		bindParam(this, "alpha_rendering",
-				  this->m_alpha_rendering);
+		bindParam(this, "alpha_rendering", this->m_alpha_rendering);
 		bindParam(this, "anti_alias", this->m_anti_alias);
 		bindParam(this, "reference", this->m_ref_mode);
 
-		this->m_radius->setValueRange(
-			0, (std::numeric_limits<double>::max)());
+		this->m_radius->setValueRange(0, (std::numeric_limits<double>::max)());
 		/* 拡大のしすぎを防ぐためにMaxを制限する */
 		this->m_blur->setValueRange(0.0 * ino_param_range, 1.0 * ino_param_range);
 		this->m_twist->setValueRange(-180.0, 180.0);
@@ -64,8 +62,7 @@ public:
 		this->m_ref_mode->addItem(-1, "Nothing");
 	}
 	//------------------------------------------------------------
-	TPointD get_render_center(
-		const double frame, const TPointD &pos, const TAffine affine)
+	TPointD get_render_center(const double frame, const TPointD &pos, const TAffine affine)
 	{
 		/*--- 表示画像の中心をゼロとしたミリメートル単位の位置 ---*/
 		TPointD center = this->m_center->getValue(frame);
@@ -76,14 +73,16 @@ public:
 		/*--- カメラ座標をrender画像座標の原点に ---*/
 		return center - pos;
 	}
-	int get_render_int_margin(
-		const double frame, const TRectD &bBox, const TAffine affine, TPointD center)
+	int get_render_int_margin(const double frame, const TRectD &bBox, const TAffine affine,
+							  TPointD center)
 	{
 		/*--- 単位変換(mm-->render用pixel)と長さ(scale)変換 ---*/
 		const double scale = ino::pixel_per_mm() * sqrt(fabs(affine.det()));
 		/*--- margin計算...Twist時正確でない ---*/
 		return igs::radial_blur::reference_margin(
-			static_cast<int>(ceil(bBox.getLy())), static_cast<int>(ceil(bBox.getLx())), center.x, center.y, this->m_twist->getValue(frame) * 3.14159265358979 / 180.0, 0.0 //this->m_twist_radius->getValue(frame) * scale
+			static_cast<int>(ceil(bBox.getLy())), static_cast<int>(ceil(bBox.getLx())), center.x,
+			center.y, this->m_twist->getValue(frame) * 3.14159265358979 / 180.0,
+			0.0 // this->m_twist_radius->getValue(frame) * scale
 			,
 			this->m_blur->getValue(frame) / ino_param_range
 
@@ -94,13 +93,10 @@ public:
 			,
 			(this->m_anti_alias->getValue() ? 4 : 1));
 	}
-	void get_render_enlarge(
-		const double frame, const TAffine affine, TRectD &bBox)
+	void get_render_enlarge(const double frame, const TAffine affine, TRectD &bBox)
 	{
-		TPointD center(this->get_render_center(
-			frame, bBox.getP00(), affine));
-		int margin = this->get_render_int_margin(
-			frame, bBox, affine, center);
+		TPointD center(this->get_render_center(frame, bBox.getP00(), affine));
+		int margin = this->get_render_int_margin(frame, bBox, affine, center);
 		if (0 < margin) {
 			/* 拡大のしすぎを防ぐテキトーな制限 */
 			if (4096 < margin) {
@@ -110,8 +106,7 @@ public:
 		}
 	}
 	//------------------------------------------------------------
-	bool doGetBBox(
-		double frame, TRectD &bBox, const TRenderSettings &info)
+	bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info)
 	{
 		if (!this->m_input.isConnected()) {
 			bBox = TRectD();
@@ -121,32 +116,30 @@ public:
 		this->get_render_enlarge(frame, info.m_affine, bBox);
 		return ret;
 	}
-	int getMemoryRequirement(
-		const TRectD &rect, double frame, const TRenderSettings &info)
+	int getMemoryRequirement(const TRectD &rect, double frame, const TRenderSettings &info)
 	{
 		TRectD bBox(rect);
 		this->get_render_enlarge(frame, info.m_affine, bBox);
 		return TRasterFx::memorySize(bBox, info.m_bpp);
 	}
-	void transform(
-		double frame, int port, const TRectD &rectOnOutput, const TRenderSettings &infoOnOutput, TRectD &rectOnInput, TRenderSettings &infoOnInput)
+	void transform(double frame, int port, const TRectD &rectOnOutput,
+				   const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
+				   TRenderSettings &infoOnInput)
 	{
 		rectOnInput = rectOnOutput;
 		infoOnInput = infoOnOutput;
-		this->get_render_enlarge(
-			frame, infoOnOutput.m_affine, rectOnInput);
+		this->get_render_enlarge(frame, infoOnOutput.m_affine, rectOnInput);
 	}
 	bool canHandle(const TRenderSettings &info, double frame)
 	{
-		//return false; // toonz has geometry control
-		//return true;
+		// return false; // toonz has geometry control
+		// return true;
 		/* 2012-11-14: trueのとき、Fx処理がジオメトリ変換の最後にまとめられてしまう。 */
 		return m_blur->getValue(frame) == 0 ? true : isAlmostIsotropic(info.m_affine);
 	}
-	void doCompute(
-		TTile &tile, double frame, const TRenderSettings &ri);
+	void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
 
-	//add 20140130
+	// add 20140130
 	void getParamUIs(TParamUIConcept *&concepts, int &length)
 	{
 		concepts = new TParamUIConcept[length = 2];
@@ -160,64 +153,62 @@ public:
 		concepts[1].m_params.push_back(m_radius);
 		concepts[1].m_params.push_back(m_center);
 	}
-	//add 20140130
+	// add 20140130
 };
 FX_PLUGIN_IDENTIFIER(ino_radial_blur, "inoRadialBlurFx");
 //--------------------------------------------------------------------
 namespace
 {
-void fx_(
-	const TRasterP in_ras // with margin
-	,
-	const int margin
+void fx_(const TRasterP in_ras // with margin
+		 ,
+		 const int margin
 
-	/* ここではinとrefは同サイズで使用している */
-	,
-	const TRasterP refer_ras // no margin
-	,
-	const int ref_mode
+		 /* ここではinとrefは同サイズで使用している */
+		 ,
+		 const TRasterP refer_ras // no margin
+		 ,
+		 const int ref_mode
 
-	,
-	TRasterP out_ras // no margin
+		 ,
+		 TRasterP out_ras // no margin
 
-	,
-	const double xp, const double yp, const double twist, const double twist_radius, const double blur, const double radius, const bool alpha_rendering_sw, const bool anti_alias_sw)
+		 ,
+		 const double xp, const double yp, const double twist, const double twist_radius,
+		 const double blur, const double radius, const bool alpha_rendering_sw,
+		 const bool anti_alias_sw)
 {
-	TRasterGR8P in_gr8(
-		in_ras->getLy(), in_ras->getLx() * ino::channels() *
-							 ((TRaster64P)in_ras ? sizeof(unsigned short) : sizeof(unsigned char)));
+	TRasterGR8P in_gr8(in_ras->getLy(),
+					   in_ras->getLx() * ino::channels() *
+						   ((TRaster64P)in_ras ? sizeof(unsigned short) : sizeof(unsigned char)));
 	in_gr8->lock();
 
-	igs::radial_blur::convert(
-		in_ras->getRawData() // BGRA
-		,
-		0 /* margin機能は使っていない、のでinとref画像は同サイズ */
+	igs::radial_blur::convert(in_ras->getRawData() // BGRA
+							  ,
+							  0 /* margin機能は使っていない、のでinとref画像は同サイズ */
 
-		,
-		(((0 <= ref_mode) && refer_ras) ? refer_ras->getRawData() : 0) // BGRA
-		,
-		(((0 <= ref_mode) && refer_ras) ? ino::bits(refer_ras) : 0), ref_mode
+							  ,
+							  (((0 <= ref_mode) && refer_ras) ? refer_ras->getRawData() : 0) // BGRA
+							  ,
+							  (((0 <= ref_mode) && refer_ras) ? ino::bits(refer_ras) : 0), ref_mode
 
-		,
-		in_gr8->getRawData() // BGRA
+							  ,
+							  in_gr8->getRawData() // BGRA
 
-		,
-		in_ras->getLy(), in_ras->getLx(), ino::channels(), ino::bits(out_ras)
+							  ,
+							  in_ras->getLy(), in_ras->getLx(), ino::channels(), ino::bits(out_ras)
 
-															   ,
-		xp + margin, yp + margin, twist, twist_radius, blur, radius
+																					 ,
+							  xp + margin, yp + margin, twist, twist_radius, blur, radius
 
-		,
-		(anti_alias_sw ? 4 : 1), alpha_rendering_sw);
+							  ,
+							  (anti_alias_sw ? 4 : 1), alpha_rendering_sw);
 
-	ino::arr_to_ras(
-		in_gr8->getRawData(), ino::channels(), out_ras, margin);
+	ino::arr_to_ras(in_gr8->getRawData(), ino::channels(), out_ras, margin);
 	in_gr8->unlock();
 }
 }
 //------------------------------------------------------------
-void ino_radial_blur::doCompute(
-	TTile &tile, double frame, const TRenderSettings &ri)
+void ino_radial_blur::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 {
 	/*------ 接続していなければ処理しない ----------------------*/
 	if (!this->m_input.isConnected()) {
@@ -225,33 +216,29 @@ void ino_radial_blur::doCompute(
 		return;
 	}
 	/*------ サポートしていないPixelタイプはエラーを投げる -----*/
-	if (!((TRaster32P)tile.getRaster()) &&
-		!((TRaster64P)tile.getRaster())) {
+	if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster())) {
 		throw TRopException("unsupported input pixel type");
 	}
 	/*------ パラメータを得る ----------------------------------*/
 	const double scale = ino::pixel_per_mm() * sqrt(fabs(ri.m_affine.det()));
 	const double blur = this->m_blur->getValue(frame) / ino_param_range;
 	const double radius = this->m_radius->getValue(frame) * scale;
-	const double twist = this->m_twist->getValue(frame) *
-						 3.14159265358979 / 180.0;
+	const double twist = this->m_twist->getValue(frame) * 3.14159265358979 / 180.0;
 	// const double twist_radius = this->m_twist_radius->getValue(frame)*scale;
 	const bool alpha_rend_sw = this->m_alpha_rendering->getValue();
 	const bool anti_alias_sw = this->m_anti_alias->getValue();
 	const int ref_mode = this->m_ref_mode->getValue();
 
 	TPointD center = this->m_center->getValue(frame);
-	TPointD render_center(this->get_render_center(
-		frame, tile.m_pos, ri.m_affine));
+	TPointD render_center(this->get_render_center(frame, tile.m_pos, ri.m_affine));
 	/*------ 入力画像の範囲を得る ------------------------------*/
-	TRectD tile_with_margin = TRectD(
-		tile.m_pos /* Render画像上(Pixel単位)の位置 */
-		,
-		TDimensionD(/* Render画像上(Pixel単位)のサイズ */
-					tile.getRaster()->getLx(), tile.getRaster()->getLy()));
+	TRectD tile_with_margin =
+		TRectD(tile.m_pos /* Render画像上(Pixel単位)の位置 */
+			   ,
+			   TDimensionD(/* Render画像上(Pixel単位)のサイズ */
+						   tile.getRaster()->getLx(), tile.getRaster()->getLy()));
 	/*------ 入力画像のエリアの拡大 ----------------------------*/
-	int margin = this->get_render_int_margin(
-		frame, tile_with_margin, ri.m_affine, render_center);
+	int margin = this->get_render_int_margin(frame, tile_with_margin, ri.m_affine, render_center);
 	if (0 < margin) {
 		/* 拡大のしすぎを防ぐテキトーな制限 */
 		if (4096 < margin) {
@@ -261,18 +248,21 @@ void ino_radial_blur::doCompute(
 	}
 	/*------ 入力画像生成 --------------------------------------*/
 	TTile tile_allocated;
-	this->m_input->allocateAndCompute(
-		tile_allocated, tile_with_margin.getP00(), TDimensionI(/* Pixel単位で四捨五入 */
-															   static_cast<int>(tile_with_margin.getLx() + 0.5), static_cast<int>(tile_with_margin.getLy() + 0.5)),
-		tile.getRaster(), frame, ri);
+	this->m_input->allocateAndCompute(tile_allocated, tile_with_margin.getP00(),
+									  TDimensionI(/* Pixel単位で四捨五入 */
+												  static_cast<int>(tile_with_margin.getLx() + 0.5),
+												  static_cast<int>(tile_with_margin.getLy() + 0.5)),
+									  tile.getRaster(), frame, ri);
 	/*------ 参照画像生成 --------------------------------------*/
 	TTile reference_tile;
 	bool reference_sw = false;
 	if (this->m_refer.isConnected()) {
 		reference_sw = true;
 		this->m_refer->allocateAndCompute(
-			reference_tile, tile_with_margin.getP00(), TDimensionI(/* Pixel単位で四捨五入 */
-																   static_cast<int>(tile_with_margin.getLx() + 0.5), static_cast<int>(tile_with_margin.getLy() + 0.5)),
+			reference_tile, tile_with_margin.getP00(),
+			TDimensionI(/* Pixel単位で四捨五入 */
+						static_cast<int>(tile_with_margin.getLx() + 0.5),
+						static_cast<int>(tile_with_margin.getLy() + 0.5)),
 			tile.getRaster(), frame, ri);
 	}
 	/* ------ 保存すべき画像メモリを塗りつぶしクリア ---------- */
@@ -283,42 +273,28 @@ void ino_radial_blur::doCompute(
 	if (log_sw) {
 		std::ostringstream os;
 		os << "params"
-		   << "  cx " << center.x
-		   << "  cy " << center.y
-		   << "  blur " << blur
-		   << "  radius " << radius
-		   << "  twist " << twist
+		   << "  cx " << center.x << "  cy " << center.y << "  blur " << blur << "  radius "
+		   << radius << "  twist " << twist
 		   // << "  twist_radius " << twist_radius
-		   << "  reference " << ref_mode
-		   << "  alpha_rendering " << alpha_rend_sw
-		   << "  anti_alias " << anti_alias_sw
-		   << "  render_center " << render_center
-		   << "  frame " << frame
-		   << "  pixbits " << ino::pixel_bits(tile.getRaster())
-		   << "  tile.m_pos " << tile.m_pos
-		   << "  tile_getLx " << tile.getRaster()->getLx()
-		   << "  y " << tile.getRaster()->getLy()
-		   << "  ri.m_cameraBox " << ri.m_cameraBox
-		   << "  ri.m_affine " << ri.m_affine
-		   << "  ri_m_affine_det " << ri.m_affine.det()
-		   << "  shrink_x " << ri.m_shrinkX
-		   << "  shrink_y " << ri.m_shrinkY
-		   << "  tile_with_margin " << tile_with_margin
-		   << "  tile_allocated.m_pos " << tile_allocated.m_pos
-		   << "  tile_allocated_getLx " << tile_allocated.getRaster()->getLx()
-		   << "  y " << tile_allocated.getRaster()->getLy();
+		   << "  reference " << ref_mode << "  alpha_rendering " << alpha_rend_sw << "  anti_alias "
+		   << anti_alias_sw << "  render_center " << render_center << "  frame " << frame
+		   << "  pixbits " << ino::pixel_bits(tile.getRaster()) << "  tile.m_pos " << tile.m_pos
+		   << "  tile_getLx " << tile.getRaster()->getLx() << "  y " << tile.getRaster()->getLy()
+		   << "  ri.m_cameraBox " << ri.m_cameraBox << "  ri.m_affine " << ri.m_affine
+		   << "  ri_m_affine_det " << ri.m_affine.det() << "  shrink_x " << ri.m_shrinkX
+		   << "  shrink_y " << ri.m_shrinkY << "  tile_with_margin " << tile_with_margin
+		   << "  tile_allocated.m_pos " << tile_allocated.m_pos << "  tile_allocated_getLx "
+		   << tile_allocated.getRaster()->getLx() << "  y " << tile_allocated.getRaster()->getLy();
 		if (reference_sw) {
-			os
-				<< "  reference_tile.m_pos " << reference_tile.m_pos
-				<< "  reference_tile_getLx " << reference_tile.getRaster()->getLx()
-				<< "  y " << reference_tile.getRaster()->getLy();
+			os << "  reference_tile.m_pos " << reference_tile.m_pos << "  reference_tile_getLx "
+			   << reference_tile.getRaster()->getLx() << "  y "
+			   << reference_tile.getRaster()->getLy();
 		}
 	}
 	/* ------ fx処理 ------------------------------------------ */
 	try {
 		tile.getRaster()->lock();
-		fx_(
-			tile_allocated.getRaster(), margin
+		fx_(tile_allocated.getRaster(), margin
 
 			,
 			(reference_sw ? reference_tile.getRaster() : nullptr), ref_mode

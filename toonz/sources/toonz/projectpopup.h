@@ -24,7 +24,7 @@ class QComboBox;
 
 class ProjectDvDirModelRootNode : public DvDirModelNode
 {
-public:
+  public:
 	ProjectDvDirModelRootNode();
 	void refreshChildren();
 };
@@ -34,11 +34,16 @@ public:
 
 class ProjectDvDirModelFileFolderNode : public DvDirModelFileFolderNode
 {
-public:
-	ProjectDvDirModelFileFolderNode(DvDirModelNode *parent, std::wstring name, const TFilePath &path)
-		: DvDirModelFileFolderNode(parent, name, path) {}
+  public:
+	ProjectDvDirModelFileFolderNode(DvDirModelNode *parent, std::wstring name,
+									const TFilePath &path)
+		: DvDirModelFileFolderNode(parent, name, path)
+	{
+	}
 	ProjectDvDirModelFileFolderNode(DvDirModelNode *parent, const TFilePath &path)
-		: DvDirModelFileFolderNode(parent, path) {}
+		: DvDirModelFileFolderNode(parent, path)
+	{
+	}
 	DvDirModelNode *makeChild(std::wstring name);
 	DvDirModelFileFolderNode *createNode(DvDirModelNode *parent, const TFilePath &path);
 };
@@ -50,9 +55,12 @@ class ProjectDvDirModelSpecialFileFolderNode : public ProjectDvDirModelFileFolde
 {
 	QPixmap m_pixmap;
 
-public:
-	ProjectDvDirModelSpecialFileFolderNode(DvDirModelNode *parent, std::wstring name, const TFilePath &path)
-		: ProjectDvDirModelFileFolderNode(parent, name, path) {}
+  public:
+	ProjectDvDirModelSpecialFileFolderNode(DvDirModelNode *parent, std::wstring name,
+										   const TFilePath &path)
+		: ProjectDvDirModelFileFolderNode(parent, name, path)
+	{
+	}
 	QPixmap getPixmap(bool isOpen) const { return m_pixmap; }
 	void setPixmap(const QPixmap &pixmap) { m_pixmap = pixmap; }
 };
@@ -62,9 +70,11 @@ public:
 
 class ProjectDvDirModelProjectNode : public ProjectDvDirModelFileFolderNode
 {
-public:
+  public:
 	ProjectDvDirModelProjectNode(DvDirModelNode *parent, const TFilePath &path)
-		: ProjectDvDirModelFileFolderNode(parent, path) {}
+		: ProjectDvDirModelFileFolderNode(parent, path)
+	{
+	}
 	void makeCurrent() {}
 	QPixmap getPixmap(bool isOpen) const;
 };
@@ -76,7 +86,7 @@ class ProjectDirModel : public QAbstractItemModel
 {
 	DvDirModelNode *m_root;
 
-public:
+  public:
 	ProjectDirModel();
 	~ProjectDirModel();
 
@@ -103,7 +113,7 @@ class ProjectPopup : public DVGui::Dialog, public TProjectManager::Listener
 {
 	Q_OBJECT
 
-protected:
+  protected:
 	ProjectDirModel *m_model;
 	DvDirTreeView *m_treeView;
 	DVGui::LineEdit *m_nameFld;
@@ -115,7 +125,7 @@ protected:
 	QComboBox *m_chooseProjectCombo;
 	QList<TFilePath> m_projectPaths;
 
-public:
+  public:
 	ProjectPopup(bool isModal);
 	// da TProjectManager::Listener
 	void onProjectSwitched();
@@ -127,7 +137,7 @@ public:
 
 	void updateChooseProjectCombo();
 
-protected:
+  protected:
 	void showEvent(QShowEvent *);
 };
 
@@ -139,10 +149,10 @@ class ProjectSettingsPopup : public ProjectPopup
 {
 	Q_OBJECT
 
-public:
+  public:
 	ProjectSettingsPopup();
 
-public slots:
+  public slots:
 	void onFolderChanged();
 	void onUseSceneChekboxChanged(int);
 
@@ -157,13 +167,13 @@ class ProjectCreatePopup : public ProjectPopup
 {
 	Q_OBJECT
 
-public:
+  public:
 	ProjectCreatePopup();
 
-public slots:
+  public slots:
 	void createProject();
 
-protected:
+  protected:
 	void showEvent(QShowEvent *);
 };
 

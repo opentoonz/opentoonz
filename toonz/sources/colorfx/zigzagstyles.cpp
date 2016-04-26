@@ -8,15 +8,13 @@
 
 #ifdef POICIPENSO
 
-TZigzagStrokeStyle::TZigzagStrokeStyle(const TPixel32 &color)
-	: m_color(color), m_density(0.5)
+TZigzagStrokeStyle::TZigzagStrokeStyle(const TPixel32 &color) : m_color(color), m_density(0.5)
 {
 }
 
 //-----------------------------------------------------------------------------
 
-TZigzagStrokeStyle::TZigzagStrokeStyle()
-	: m_color(TPixel32(0, 0, 0, 255)), m_density(0.5)
+TZigzagStrokeStyle::TZigzagStrokeStyle() : m_color(TPixel32(0, 0, 0, 255)), m_density(0.5)
 {
 }
 
@@ -63,7 +61,8 @@ void TZigzagStrokeStyle::draw(double pixelSize, const TColorFunction *)
 			double rta = 1.0 / tan(degree2rad(angle));
 			maxTranslLength = sqrt(sq(rta) + 1.0);
 		}
-		double r = (minTranslLength + (maxTranslLength - minTranslLength) * rnd.getDouble()) * pos.thick * first;
+		double r = (minTranslLength + (maxTranslLength - minTranslLength) * rnd.getDouble()) *
+				   pos.thick * first;
 		glVertex(pos + r * u);
 	}
 	glEnd();
@@ -142,7 +141,8 @@ void TImageBasedZigzagStrokeStyle::draw(double pixelSize, const TColorFunction *
 	for (double s = 0; s < (length + dist); s += dist) {
 		double w = stroke->getParameterAtLength(s);
 		TThickPoint pos = stroke->getThickPoint(w);
-		TPointD textPos((pos.x - strokeC.x) * recScale + textC.x, (pos.y - strokeC.y) * recScale + textC.y);
+		TPointD textPos((pos.x - strokeC.x) * recScale + textC.x,
+						(pos.y - strokeC.y) * recScale + textC.y);
 		TPointD u = stroke->getSpeed(w);
 		if (norm2(u) == 0)
 			continue;

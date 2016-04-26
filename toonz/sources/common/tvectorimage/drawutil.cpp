@@ -9,28 +9,18 @@
 
 namespace
 {
-void drawQuadraticCenterline(const TQuadratic &inQuad,
-							 double pixelSize,
-							 double from,
-							 double to)
+void drawQuadraticCenterline(const TQuadratic &inQuad, double pixelSize, double from, double to)
 {
-	assert(0.0 <= from &&
-		   from <= to &&
-		   to <= 1.0);
+	assert(0.0 <= from && from <= to && to <= 1.0);
 
 	to = (std::max)(0.0, (std::min)(to, 1.0));
 	from = (std::max)(0.0, (std::min)(from, to));
 
-	TQuadratic
-		tmp(inQuad),
-		s1,
-		s2;
+	TQuadratic tmp(inQuad), s1, s2;
 
-	TQuadratic
-		*quad = &tmp;
+	TQuadratic *quad = &tmp;
 
-	double
-		newFrom = from;
+	double newFrom = from;
 	if (to != 1.0) {
 		tmp.split(to, s1, s2);
 		quad = &s1;
@@ -43,7 +33,7 @@ void drawQuadraticCenterline(const TQuadratic &inQuad,
 		quad = &s2;
 	}
 
-	//glColor( TPixel32::Black );
+	// glColor( TPixel32::Black );
 	double step = computeStep(*quad, pixelSize);
 
 	// It draws the curve as a linear piecewise approximation
@@ -73,7 +63,7 @@ void drawQuadraticCenterline(const TQuadratic &inQuad,
 	// It draws the whole curve, using forward differencing
 	glBegin(GL_LINE_STRIP); // The curve starts from scP0
 
-	//scP0 = quad.getPoint(from);
+	// scP0 = quad.getPoint(from);
 	glVertex2d(scP0.x, scP0.y);
 
 	for (double t = from + h; t < to; t = t + h) {
@@ -82,7 +72,7 @@ void drawQuadraticCenterline(const TQuadratic &inQuad,
 		glVertex2d(P.x, P.y);
 	}
 
-	//scP2 = quad.getPoint(to);
+	// scP2 = quad.getPoint(to);
 	glVertex2d(scP2.x, scP2.y); // The curve ends in scP2
 	glEnd();
 }
@@ -90,8 +80,8 @@ void drawQuadraticCenterline(const TQuadratic &inQuad,
 
 //-----------------------------------------------------------------------------
 
-void stroke2polyline(std::vector<TPointD> &pnts, const TStroke &stroke,
-					 double pixelSize, double w0, double w1, bool lastRepeatable)
+void stroke2polyline(std::vector<TPointD> &pnts, const TStroke &stroke, double pixelSize, double w0,
+					 double w1, bool lastRepeatable)
 {
 	TPointD p;
 	double step;
@@ -148,7 +138,7 @@ void stroke2polyline(std::vector<TPointD> &pnts, const TStroke &stroke,
 
 			assert(step);
 			if (!step)
-				step = TConsts::epsilon; //non dovrebbe accadere mai!!!
+				step = TConsts::epsilon; // non dovrebbe accadere mai!!!
 
 			p = stroke.getChunk(i)->getPoint(t0);
 
@@ -176,8 +166,8 @@ void stroke2polyline(std::vector<TPointD> &pnts, const TStroke &stroke,
 
 /*
 void  region2polyline(vector<T3DPointD>& pnts,
-                      const TRegion* reg, 
-                      double pixelSize )
+					  const TRegion* reg,
+					  double pixelSize )
 {
 assert( reg );
 if(!reg) return;
@@ -193,51 +183,51 @@ for(UINT i=0; i<reg->getEdgeCount(); i++)
   assert(stroke);
 
   if (edge->m_w0==-1)
-    {
-    int index;
-    double t, dummy;
-    stroke->getNearestChunk(edge->m_p0, t, index, dummy);
-    edge->m_w0 = getWfromChunkAndT(stroke, index, t);
-     
-    stroke->getNearestChunk(edge->m_p1, t, index, dummy);
-    edge->m_w1 = getWfromChunkAndT(stroke, index, t);
-    }
+	{
+	int index;
+	double t, dummy;
+	stroke->getNearestChunk(edge->m_p0, t, index, dummy);
+	edge->m_w0 = getWfromChunkAndT(stroke, index, t);
+
+	stroke->getNearestChunk(edge->m_p1, t, index, dummy);
+	edge->m_w1 = getWfromChunkAndT(stroke, index, t);
+	}
 
   w0 = edge->m_w0;
   w1 = edge->m_w1;
-    
+
   assert( 0 <= w0 && w0 <= 1.0 );
   assert( 0 <= w1 && w1 <= 1.0 );
-   
+
   double step = computeStep( *stroke, pixelSize );
-    
-    // assert( step != 2 && step != 0.0 );
-    
-  if( isAlmostZero( step ) ) 
-    step = 1.0;
-   
-  step/= stroke->getChunkCount(); 
-    
+
+	// assert( step != 2 && step != 0.0 );
+
+  if( isAlmostZero( step ) )
+	step = 1.0;
+
+  step/= stroke->getChunkCount();
+
   double direction = 1;
-    
-  if( w0 > w1 ) 
-    direction *=-1;
-    
+
+  if( w0 > w1 )
+	direction *=-1;
+
   T3DPointD pnt;
-    
+
   double incr = direction*step;
-    
+
   pnt = T3DPointD( stroke->getPoint( w0 ), 0 );
-    
+
   if ( pnts.empty() || pnt != pnts.back() )
-    pnts.push_back( pnt );
-    
+	pnts.push_back( pnt );
+
   for( double w = w0 + incr; direction*w < direction*w1; w+= incr)
-    {
-    pnt = T3DPointD( stroke->getPoint( w ), 0 );    
-      if ( pnt != pnts.back() )
-        pnts.push_back( pnt );
-    }	           
+	{
+	pnt = T3DPointD( stroke->getPoint( w ), 0 );
+	  if ( pnt != pnts.back() )
+		pnts.push_back( pnt );
+	}
   }
 }
 */
@@ -336,7 +326,7 @@ TRasterP prepareTexture(const TRasterP &ras, TextureInfoForGL &texinfo)
 #endif
 
 #elif defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB)
-//mrgb
+// mrgb
 
 #warning "ottimizzare in qualche modo"
 
@@ -356,17 +346,10 @@ TRasterP prepareTexture(const TRasterP &ras, TextureInfoForGL &texinfo)
 	return ras;
 }
 
-void drawStrokeCenterline(const TStroke &stroke,
-						  double pixelSize,
-						  double from,
-						  double to)
+void drawStrokeCenterline(const TStroke &stroke, double pixelSize, double from, double to)
 {
-	int
-		c1 = 0,
-		c2 = 0;
-	double
-		t1 = 1.0,
-		t2 = 0.0;
+	int c1 = 0, c2 = 0;
+	double t1 = 1.0, t2 = 0.0;
 
 	if (stroke.getChunkCount() == 0)
 		return;
@@ -378,33 +361,19 @@ void drawStrokeCenterline(const TStroke &stroke,
 		if (from == to)
 			return;
 
-		drawQuadraticCenterline(*stroke.getChunk(c1),
-								pixelSize,
-								t1,
-								t2);
+		drawQuadraticCenterline(*stroke.getChunk(c1), pixelSize, t1, t2);
 	} else {
 		// partial first chunk
-		drawQuadraticCenterline(*stroke.getChunk(c1),
-								pixelSize,
-								t1,
-								1.0);
+		drawQuadraticCenterline(*stroke.getChunk(c1), pixelSize, t1, 1.0);
 		// next chunk
 		++c1;
 		if (c1 < c2) {
-			for (int i = c1;
-				 i < c2;
-				 ++i)
-				drawQuadraticCenterline(*stroke.getChunk(i),
-										pixelSize,
-										0.0,
-										1.0);
+			for (int i = c1; i < c2; ++i)
+				drawQuadraticCenterline(*stroke.getChunk(i), pixelSize, 0.0, 1.0);
 		}
 
 		// partial last chunk
-		drawQuadraticCenterline(*stroke.getChunk(c2),
-								pixelSize,
-								0.0,
-								t2);
+		drawQuadraticCenterline(*stroke.getChunk(c2), pixelSize, 0.0, t2);
 	}
 }
 
@@ -415,15 +384,19 @@ DVAPI TStroke *makeEllipticStroke(double thick, TPointD center, double radiusX, 
 
 	std::vector<TThickPoint> points(17);
 
-	double xmin = center.x - radiusX; // x coordinate of the upper left corner of the bounding rectangle
-	double ymin = center.y - radiusY; // y coordinate of the upper left corner of the bounding rectangle
-	double xmax = center.x + radiusX; // x coordinate of the bottom right corner of the bounding rectangle
-	double ymax = center.y + radiusY; // y coordinate of the bottom right corner of the bounding rectangle
-	const double C1 = 0.1465;		  // magic number for coefficient1
-	const double C2 = 0.2070;		  // magic number for coefficient2
-	double dx = xmax - xmin;		  // dx is width diameter
-	double dy = ymax - ymin;		  // dy is height diameter
-	const double begin = 0.8535;	  // starting position to draw (bounding square is 1x1)
+	double xmin =
+		center.x - radiusX; // x coordinate of the upper left corner of the bounding rectangle
+	double ymin =
+		center.y - radiusY; // y coordinate of the upper left corner of the bounding rectangle
+	double xmax =
+		center.x + radiusX; // x coordinate of the bottom right corner of the bounding rectangle
+	double ymax =
+		center.y + radiusY;   // y coordinate of the bottom right corner of the bounding rectangle
+	const double C1 = 0.1465; // magic number for coefficient1
+	const double C2 = 0.2070; // magic number for coefficient2
+	double dx = xmax - xmin;  // dx is width diameter
+	double dy = ymax - ymin;  // dy is height diameter
+	const double begin = 0.8535; // starting position to draw (bounding square is 1x1)
 
 	double c1dx = (double)(C1 * dx);
 	double c1dy = (double)(C1 * dy);
@@ -448,7 +421,7 @@ DVAPI TStroke *makeEllipticStroke(double thick, TPointD center, double radiusX, 
 	points[14] = points[13] + TThickPoint(0, c2dy, 0);	//
 	points[15] = points[14] + TThickPoint(0, c2dy, 0);	//
 	points[16] = points[0];								  // need to be closed!!!
-														  //points[15]+TThickPoint(-c1dx,  c1dy,0);//
+	// points[15]+TThickPoint(-c1dx,  c1dy,0);//
 
 	TStroke *stroke = new TStroke(points);
 	stroke->setSelfLoop();

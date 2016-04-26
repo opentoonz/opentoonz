@@ -16,8 +16,8 @@ using namespace DVGui;
 PropertyComboBox::PropertyComboBox(QWidget *parent, TEnumProperty *prop)
 	: QComboBox(parent), PropertyWidget(prop)
 {
-	connect(this, SIGNAL(currentIndexChanged(const QString &)),
-			this, SLOT(onCurrentIndexChanged(const QString &)));
+	connect(this, SIGNAL(currentIndexChanged(const QString &)), this,
+			SLOT(onCurrentIndexChanged(const QString &)));
 	setMaximumHeight(WidgetHeight);
 }
 
@@ -51,8 +51,7 @@ void PropertyComboBox::onPropertyChanged()
 PropertyCheckBox::PropertyCheckBox(const QString &text, QWidget *parent, TBoolProperty *prop)
 	: CheckBox(text, parent), PropertyWidget(prop)
 {
-	connect(this, SIGNAL(stateChanged(int)),
-			this, SLOT(onStateChanged(int)));
+	connect(this, SIGNAL(stateChanged(int)), this, SLOT(onStateChanged(int)));
 	setMaximumHeight(WidgetHeight);
 }
 
@@ -81,8 +80,7 @@ void PropertyCheckBox::onPropertyChanged()
 PropertyLineEdit::PropertyLineEdit(QWidget *parent, TStringProperty *prop)
 	: LineEdit(parent), PropertyWidget(prop)
 {
-	connect(this, SIGNAL(textChanged(const QString &)),
-			this, SLOT(onTextChanged(const QString &)));
+	connect(this, SIGNAL(textChanged(const QString &)), this, SLOT(onTextChanged(const QString &)));
 	setMaximumSize(100, WidgetHeight);
 }
 
@@ -111,8 +109,7 @@ void PropertyLineEdit::onPropertyChanged()
 PropertyIntField::PropertyIntField(QWidget *parent, TIntProperty *prop)
 	: IntField(parent), PropertyWidget(prop)
 {
-	connect(this, SIGNAL(valueChanged(bool)),
-			this, SLOT(onValueChanged(bool)));
+	connect(this, SIGNAL(valueChanged(bool)), this, SLOT(onValueChanged(bool)));
 }
 
 //-----------------------------------------------------------------------------

@@ -129,10 +129,10 @@ Come e' fatto il filtro:
 TNZ_LITTLE_ENDIAN undefined !!
 #endif
 
-	//2^36 * 1.5,  (52-_shiftamt=36) uses limited precision to floor
+	// 2^36 * 1.5,  (52-_shiftamt=36) uses limited precision to floor
 	const double _double2fixmagic = 68719476736.0 * 1.5;
 
-//16.16 fixed point representation
+// 16.16 fixed point representation
 const TINT32 _shiftamt = 16;
 
 #if TNZ_LITTLE_ENDIAN
@@ -149,7 +149,8 @@ inline TINT32 Double2Int(double val)
 	return ((TINT32 *)&val)[iman_] >> _shiftamt;
 }
 
-#define DOUBLE_TO_INT32(D) (d2iaux = D, d2iaux += _double2fixmagic, (((TINT32 *)&(d2iaux))[iman_] >> _shiftamt))
+#define DOUBLE_TO_INT32(D)                                                                         \
+	(d2iaux = D, d2iaux += _double2fixmagic, (((TINT32 *)&(d2iaux))[iman_] >> _shiftamt))
 
 //#define USE_DOUBLE_TO_INT
 
@@ -222,15 +223,15 @@ inline double affMV2(const TAffine &aff, double v1, double v2)
 #define INTLT(x) (CEIL(x) - 1)
 #define INTGE(x) (CEIL(x))
 
-#define NOT_LESS_THAN(MIN, X) \
-	{                         \
-		if ((X) < (MIN))      \
-			(X) = (MIN);      \
+#define NOT_LESS_THAN(MIN, X)                                                                      \
+	{                                                                                              \
+		if ((X) < (MIN))                                                                           \
+			(X) = (MIN);                                                                           \
 	}
-#define NOT_MORE_THAN(MAX, X) \
-	{                         \
-		if ((X) > (MAX))      \
-			(X) = (MAX);      \
+#define NOT_MORE_THAN(MAX, X)                                                                      \
+	{                                                                                              \
+		if ((X) > (MAX))                                                                           \
+			(X) = (MAX);                                                                           \
 	}
 
 #define tround ROUND
@@ -308,11 +309,9 @@ inline int get_filter_radius(TRop::ResampleFilterType flt_type)
 
 //---------------------------------------------------------------------------
 
-//!Equivalent to aff * TRectD(u0, v0, u1, v0).
-inline void minmax(double u0, double v0,
-				   double u1, double v1, const TAffine &aff,
-				   double &x0, double &y0,
-				   double &x1, double &y1)
+//! Equivalent to aff * TRectD(u0, v0, u1, v0).
+inline void minmax(double u0, double v0, double u1, double v1, const TAffine &aff, double &x0,
+				   double &y0, double &x1, double &y1)
 {
 	double xmin, ymin;
 	double xmax, ymax;
@@ -351,7 +350,7 @@ inline void minmax(double u0, double v0,
 
 /*
 inline bool trivial_rot (TAffine inv, int *dudx, int *dudy,
-                                    int *dvdx, int *dvdy)
+									int *dvdx, int *dvdy)
 {
 *dudx = 0;
 *dudy = 0;
@@ -580,8 +579,8 @@ static inline double flt_w_1(double x)
 
 //-----------------------------------------------------------------------------
 
-static inline void get_flt_fun_rad(TRop::ResampleFilterType flt_type,
-								   double (**flt_fun)(double), double &flt_rad)
+static inline void get_flt_fun_rad(TRop::ResampleFilterType flt_type, double (**flt_fun)(double),
+								   double &flt_rad)
 {
 	double (*fun)(double);
 	double rad;
@@ -625,9 +624,9 @@ static inline void get_flt_fun_rad(TRop::ResampleFilterType flt_type,
 
 //---------------------------------------------------------------------------
 
-static FILTER *create_filter(TRop::ResampleFilterType flt_type, double blur,
-							 double dx_du, double delta_x, int lx,
-							 double &xrad, int &umin, int &umax, int &uwidth)
+static FILTER *create_filter(TRop::ResampleFilterType flt_type, double blur, double dx_du,
+							 double delta_x, int lx, double &xrad, int &umin, int &umax,
+							 int &uwidth)
 {
 	double (*flt_fun)(double);
 	FILTER *filter, *f;
@@ -708,9 +707,8 @@ mu = lu - 1;
 
 //-----------------------------------------------------------------------------
 
-static NOCALC *create_nocalc(TRop::ResampleFilterType flt_type, double blur,
-							 double dx_du, double delta_x, int lx,
-							 int umin, int umax, int &xwidth)
+static NOCALC *create_nocalc(TRop::ResampleFilterType flt_type, double blur, double dx_du,
+							 double delta_x, int lx, int umin, int umax, int &xwidth)
 {
 	/*
 
@@ -806,19 +804,19 @@ inline void calcValueNoCalc(UINT &calc_value){
   calc_value &= ~0x80U;
 }
 */
-#define CALC_VALUE_INIT       \
-	{                         \
-		calc_value = 0xffffU; \
+#define CALC_VALUE_INIT                                                                            \
+	{                                                                                              \
+		calc_value = 0xffffU;                                                                      \
 	}
 #define CALC_VALUE_EMPTY (calc_value == 0xffffU)
 #define CALC_VALUE_READY (calc_value <= 0x1ffU)
-#define CALC_VALUE_ADVANCE \
-	{                      \
-		calc_value >>= 1;  \
+#define CALC_VALUE_ADVANCE                                                                         \
+	{                                                                                              \
+		calc_value >>= 1;                                                                          \
 	}
-#define CALC_VALUE_NOCALC     \
-	{                         \
-		calc_value &= ~0x80U; \
+#define CALC_VALUE_NOCALC                                                                          \
+	{                                                                                              \
+		calc_value &= ~0x80U;                                                                      \
 	}
 
 /////////////////////////////////////////////////////////
@@ -830,7 +828,7 @@ inline void calcValueNoCalc(UINT &calc_value){
 /*
 #define PIXVAL_EQ_24_EQUAL(V1,V2)     ((V1)&0xffffff==(V2)&0xffffff)
 #define PIXVAL_EQ_2_LONG_EQUAL(V1,V2) (*(TINT32*)&(V1)==*(TINT32*)&(V2) &&\
-                                      ((TINT32*)&(V1))[1]==((TINT32*)&(V2))[1])
+									  ((TINT32*)&(V1))[1]==((TINT32*)&(V2))[1])
 */
 /////////////////////////////////////////////////////////
 // fine GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
@@ -845,7 +843,9 @@ template <typename PixType>
 __forceinline
 #endif
 	void
-	ResampleCalcAlgo(PixType *buffer_in, int lu, int lv, int wrap_in, int max_pix_ref_u, int min_pix_ref_u, int max_pix_ref_v, int min_pix_ref_v, UCHAR *calc, int calc_bytesize, int calc_bytewrap)
+	ResampleCalcAlgo(PixType *buffer_in, int lu, int lv, int wrap_in, int max_pix_ref_u,
+					 int min_pix_ref_u, int max_pix_ref_v, int min_pix_ref_v, UCHAR *calc,
+					 int calc_bytesize, int calc_bytewrap)
 /*
 lu = width
 lv = height
@@ -990,10 +990,8 @@ wrap_in = wrap
 /*---------------------------------------------------------------------------*/
 
 template <class T>
-void create_calc(const TRasterPT<T> &rin,
-				 int min_pix_ref_u, int max_pix_ref_u,
-				 int min_pix_ref_v, int max_pix_ref_v,
-				 UCHAR *&p_calc, int &p_calc_allocsize, int &p_calc_bytewrap)
+void create_calc(const TRasterPT<T> &rin, int min_pix_ref_u, int max_pix_ref_u, int min_pix_ref_v,
+				 int max_pix_ref_v, UCHAR *&p_calc, int &p_calc_allocsize, int &p_calc_bytewrap)
 {
 	UCHAR *calc;
 	int lu, lv;
@@ -1011,7 +1009,7 @@ void create_calc(const TRasterPT<T> &rin,
 	if (calc_bytesize > p_calc_allocsize) {
 		if (p_calc_allocsize)
 			delete[](p_calc);
-		//TMALLOC (*p_calc, calc_bytesize)
+		// TMALLOC (*p_calc, calc_bytesize)
 		p_calc = new UCHAR[calc_bytesize];
 		assert(p_calc);
 		memset(p_calc, 0xff, calc_bytesize);
@@ -1023,12 +1021,12 @@ void create_calc(const TRasterPT<T> &rin,
 		return;
 	}
 
-	//RESAMPLE_CALC_ALGO
+	// RESAMPLE_CALC_ALGO
 
-	ResampleCalcAlgo<T>(rin->pixels(), lu, lv, wrap_in, max_pix_ref_u, min_pix_ref_u,
-						max_pix_ref_v, min_pix_ref_v, calc, calc_bytesize, calc_bytewrap);
+	ResampleCalcAlgo<T>(rin->pixels(), lu, lv, wrap_in, max_pix_ref_u, min_pix_ref_u, max_pix_ref_v,
+						min_pix_ref_v, calc, calc_bytesize, calc_bytewrap);
 
-	//for (int i=0;i<calc_bytesize;i++)
+	// for (int i=0;i<calc_bytesize;i++)
 	//  cout << i << ":" << (*p_calc)[i] << endl;
 
 	/////////////////////////////////////////////////////////
@@ -1039,80 +1037,80 @@ void create_calc(const TRasterPT<T> &rin,
 switch (rin->type)
   {
   case RAS_CM16:
-    {
-    USHORT *buffer_in;
-    USHORT *prev_line_in;
-    USHORT *last_line_in;
-    USHORT prev_value;
-    USHORT left_value;
-    USHORT last_value;
+	{
+	USHORT *buffer_in;
+	USHORT *prev_line_in;
+	USHORT *last_line_in;
+	USHORT prev_value;
+	USHORT left_value;
+	USHORT last_value;
 
-    buffer_in = rin->buffer;
+	buffer_in = rin->buffer;
 
 #undef  PIXVAL_EQ
 #define PIXVAL_EQ  PIXVAL_EQ_EQUAL
 
-    RESAMPLE_CALC_ALGO
+	RESAMPLE_CALC_ALGO
 
-    }
+	}
 
   CASE RAS_CM24:
-    {
-    ULONG *buffer_in;
-    ULONG *prev_line_in;
-    ULONG *last_line_in;
-    ULONG prev_value;
-    ULONG left_value;
-    ULONG last_value;
+	{
+	ULONG *buffer_in;
+	ULONG *prev_line_in;
+	ULONG *last_line_in;
+	ULONG prev_value;
+	ULONG left_value;
+	ULONG last_value;
 
-    buffer_in = rin->buffer;
+	buffer_in = rin->buffer;
 
 #undef  PIXVAL_EQ
 #define PIXVAL_EQ  PIXVAL_EQ_24_EQUAL
 
-    RESAMPLE_CALC_ALGO
+	RESAMPLE_CALC_ALGO
 
-    }
+	}
 
-  CASE RAS_RGB_:  // si potrebbe ignorare M 
+  CASE RAS_RGB_:  // si potrebbe ignorare M
   __OR RAS_RGBM:
-    {
-    LPIXEL *buffer_in;
-    LPIXEL *prev_line_in;
-    LPIXEL *last_line_in;
-    LPIXEL prev_value;
-    LPIXEL left_value;
-    LPIXEL last_value;
+	{
+	LPIXEL *buffer_in;
+	LPIXEL *prev_line_in;
+	LPIXEL *last_line_in;
+	LPIXEL prev_value;
+	LPIXEL left_value;
+	LPIXEL last_value;
 
-    buffer_in = rin->buffer;
+	buffer_in = rin->buffer;
 
 #undef  PIXVAL_EQ
 #define PIXVAL_EQ  PIXVAL_EQ_LONG_EQUAL
 
-    RESAMPLE_CALC_ALGO
+	RESAMPLE_CALC_ALGO
 
-    }
+	}
 
   CASE RAS_RGBM64:
-    {
-    SPIXEL *buffer_in;
-    SPIXEL *prev_line_in;
-    SPIXEL *last_line_in;
-    SPIXEL prev_value;
-    SPIXEL left_value;
-    SPIXEL last_value;
+	{
+	SPIXEL *buffer_in;
+	SPIXEL *prev_line_in;
+	SPIXEL *last_line_in;
+	SPIXEL prev_value;
+	SPIXEL left_value;
+	SPIXEL last_value;
 
-    buffer_in = rin->buffer;
+	buffer_in = rin->buffer;
 
 #undef  PIXVAL_EQ
 #define PIXVAL_EQ  PIXVAL_EQ_2_LONG_EQUAL
 
-    RESAMPLE_CALC_ALGO
+	RESAMPLE_CALC_ALGO
 
-    }
+	}
 
   DEFAULT:
-    assert ( !"invalid raster type");
+	assert ( !"invalid raster type");
   }
 */
 	/////////////////////////////////////////////////////////
@@ -1125,30 +1123,22 @@ switch (rin->type)
 namespace
 {
 
-template <class T>
-class Converter
+template <class T> class Converter
 {
-public:
-	static inline T convert(const TPixel32 &pixin)
-	{
-		return pixin;
-	}
+  public:
+	static inline T convert(const TPixel32 &pixin) { return pixin; }
 };
 
 #define BYTE_FROM_USHORT(u) (((256U * 255U + 1U) * u + (1 << 23)) >> 24)
 #define USHORT_FROM_BYTE(u) (u | u << 8)
 
-template <>
-class Converter<TPixel64>
+template <> class Converter<TPixel64>
 {
-public:
+  public:
 	static inline TPixel64 convert(const TPixel32 &pix)
 	{
-		return TPixel64(
-			USHORT_FROM_BYTE(pix.r),
-			USHORT_FROM_BYTE(pix.g),
-			USHORT_FROM_BYTE(pix.b),
-			USHORT_FROM_BYTE(pix.m));
+		return TPixel64(USHORT_FROM_BYTE(pix.r), USHORT_FROM_BYTE(pix.g), USHORT_FROM_BYTE(pix.b),
+						USHORT_FROM_BYTE(pix.m));
 	}
 };
 
@@ -1156,7 +1146,7 @@ public:
 
 inline double get_filter_value(TRop::ResampleFilterType flt_type, double x)
 {
-	//it is assumed that x != 0 (not checked only for speed reasons)
+	// it is assumed that x != 0 (not checked only for speed reasons)
 	switch (flt_type) {
 	case TRop::Triangle:
 		if (x < -1.0)
@@ -1248,8 +1238,7 @@ inline double get_filter_value(TRop::ResampleFilterType flt_type, double x)
 }
 
 //---------------------------------------------------------------------------
-template <class T>
-void resample_clear_rgbm(TRasterPT<T> rout, T default_value)
+template <class T> void resample_clear_rgbm(TRasterPT<T> rout, T default_value)
 {
 	T *buffer_out;
 	buffer_out = rout->pixels();
@@ -1261,15 +1250,10 @@ void resample_clear_rgbm(TRasterPT<T> rout, T default_value)
 //---------------------------------------------------------------------------
 
 template <class T, typename SUMS_TYPE>
-void resample_main_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin,
-						const TAffine &aff_xy2uv,
-						const TAffine &aff0_uv2fg,
-						int min_pix_ref_u, int min_pix_ref_v,
-						int max_pix_ref_u, int max_pix_ref_v,
-						int n_pix,
-						int *pix_ref_u, int *pix_ref_v,
-						int *pix_ref_f, int *pix_ref_g,
-						short *filter)
+void resample_main_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin, const TAffine &aff_xy2uv,
+						const TAffine &aff0_uv2fg, int min_pix_ref_u, int min_pix_ref_v,
+						int max_pix_ref_u, int max_pix_ref_v, int n_pix, int *pix_ref_u,
+						int *pix_ref_v, int *pix_ref_f, int *pix_ref_g, short *filter)
 {
 	const T *buffer_in;
 	T *buffer_out;
@@ -1318,10 +1302,9 @@ void resample_main_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin,
 	calc = 0;
 	calc_allocsize = 0;
 
-	//Create a bit array, each indicating whether a pixel has to be calculated or not
-	create_calc(rin, min_pix_ref_u, max_pix_ref_u,
-				min_pix_ref_v, max_pix_ref_v,
-				calc, calc_allocsize, calc_bytewrap);
+	// Create a bit array, each indicating whether a pixel has to be calculated or not
+	create_calc(rin, min_pix_ref_u, max_pix_ref_u, min_pix_ref_v, max_pix_ref_v, calc,
+				calc_allocsize, calc_bytewrap);
 
 	buffer_in = rin->pixels();
 	buffer_out = rout->pixels();
@@ -1344,38 +1327,39 @@ void resample_main_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin,
 	outside_max_u = mu - min_pix_ref_u;
 	outside_max_v = mv - min_pix_ref_v;
 
-	//For every pixel of the output image
+	// For every pixel of the output image
 	for (out_y = 0, out_y_ = 0.5; out_y < ly; out_y++, out_y_ += 1.0) {
 		for (out_x = 0, out_x_ = 0.5; out_x < lx; out_x++, out_x_ += 1.0) {
 			pix_out = buffer_out + out_y * wrap_out + out_x;
 
-			//Take the pre-image of the pixel through the passed affine
+			// Take the pre-image of the pixel through the passed affine
 			out_u_ = affMV1(aff_xy2uv, out_x_, out_y_);
 			out_v_ = affMV2(aff_xy2uv, out_x_, out_y_);
 
-			//Convert to integer coordinates
+			// Convert to integer coordinates
 			ref_u = intLE(out_u_);
 			ref_v = intLE(out_v_);
 
-			//NOTE: The following condition is equivalent to:
+			// NOTE: The following condition is equivalent to:
 			// (ref_u + min_pix_ref_u >= 0 && ref_v + min_pix_ref_v >= 0 &&
 			//  ref_u + max_pix_ref_u < lu && ref_v + max_pix_ref_v < lv)
 			// - since the presence of (UINT) makes integeres < 0 become >> 0
-			if (inside_nonempty &&
-				(UINT)(ref_u + min_pix_ref_u) < inside_limit_u &&
+			if (inside_nonempty && (UINT)(ref_u + min_pix_ref_u) < inside_limit_u &&
 				(UINT)(ref_v + min_pix_ref_v) < inside_limit_v) {
-				//The filter mask starting around (ref_u, ref_v) is completely contained
-				//in the source raster
+				// The filter mask starting around (ref_u, ref_v) is completely contained
+				// in the source raster
 
-				//Get the calculation array mask byte
+				// Get the calculation array mask byte
 				calc_value = calc[(ref_u >> 3) + ref_v * calc_bytewrap];
-				if (calc_value && ((calc_value >> (ref_u & 7)) & 1)) //If the mask bit for this pixel is on
+				if (calc_value &&
+					((calc_value >> (ref_u & 7)) & 1)) // If the mask bit for this pixel is on
 				{
-					ref_out_u_ = ref_u - out_u_; //Fractionary part of the pre-image
+					ref_out_u_ = ref_u - out_u_; // Fractionary part of the pre-image
 					ref_out_v_ = ref_v - out_v_;
-					ref_out_f_ = aff0MV1(aff0_uv2fg, ref_out_u_, ref_out_v_); //Make the image of it into fg
+					ref_out_f_ =
+						aff0MV1(aff0_uv2fg, ref_out_u_, ref_out_v_); // Make the image of it into fg
 					ref_out_g_ = aff0MV2(aff0_uv2fg, ref_out_u_, ref_out_v_);
-					ref_out_f = tround(ref_out_f_); //Convert to integer coordinates
+					ref_out_f = tround(ref_out_f_); // Convert to integer coordinates
 					ref_out_g = tround(ref_out_g_);
 
 					sum_weights = 0;
@@ -1384,14 +1368,16 @@ void resample_main_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin,
 					sum_contribs_b = 0;
 					sum_contribs_m = 0;
 
-					//Make the weighted sum of source pixels
+					// Make the weighted sum of source pixels
 					for (i = n_pix - 1; i >= 0; --i) {
-						//Build the weight for this pixel
-						pix_out_f = pix_ref_f[i] + ref_out_f; //image of the integer part + that of the fractionary part
+						// Build the weight for this pixel
+						pix_out_f =
+							pix_ref_f[i] +
+							ref_out_f; // image of the integer part + that of the fractionary part
 						pix_out_g = pix_ref_g[i] + ref_out_g;
 						weight = (filter[pix_out_f] * filter[pix_out_g]) >> 16;
 
-						//Add the weighted pixel contribute
+						// Add the weighted pixel contribute
 						pix_u = pix_ref_u[i] + ref_u;
 						pix_v = pix_ref_v[i] + ref_v;
 
@@ -1425,10 +1411,10 @@ void resample_main_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin,
 					pix_out->b = out_value_b;
 					pix_out->m = out_value_m;
 				} else
-					//The pixel is copied from the corresponding source...
+					// The pixel is copied from the corresponding source...
 					*pix_out = buffer_in[ref_u + ref_v * wrap_in];
-			} else if (outside_min_u <= ref_u && ref_u <= outside_max_u &&
-					   outside_min_v <= ref_v && ref_v <= outside_max_v) {
+			} else if (outside_min_u <= ref_u && ref_u <= outside_max_u && outside_min_v <= ref_v &&
+					   ref_v <= outside_max_v) {
 				if ((UINT)ref_u >= (UINT)lu || (UINT)ref_v >= (UINT)lv)
 					must_calc = true;
 				else {
@@ -1456,13 +1442,12 @@ void resample_main_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin,
 						pix_u = pix_ref_u[i] + ref_u;
 						pix_v = pix_ref_v[i] + ref_v;
 
-						if (pix_u < 0 || pix_u > mu ||
-							pix_v < 0 || pix_v > mv) {
-							sum_weights += weight; //0-padding
+						if (pix_u < 0 || pix_u > mu || pix_v < 0 || pix_v > mv) {
+							sum_weights += weight; // 0-padding
 							continue;
 						}
 
-						notLessThan(0, pix_u); //Copy-padding
+						notLessThan(0, pix_u); // Copy-padding
 						notLessThan(0, pix_v);
 						notMoreThan(mu, pix_u);
 						notMoreThan(mv, pix_v);
@@ -1515,14 +1500,12 @@ namespace
 
 __declspec(align(16)) class TPixelFloat
 {
-public:
+  public:
 	TPixelFloat() : b(0), g(0), r(0), m(0) {}
 
-	TPixelFloat(float rr, float gg, float bb, float mm)
-		: b(bb), g(gg), r(rr), m(mm) {}
+	TPixelFloat(float rr, float gg, float bb, float mm) : b(bb), g(gg), r(rr), m(mm) {}
 
-	TPixelFloat(const TPixel32 &pix)
-		: b(pix.b), g(pix.g), r(pix.r), m(pix.m) {}
+	TPixelFloat(const TPixel32 &pix) : b(pix.b), g(pix.g), r(pix.r), m(pix.m) {}
 
 	float b, g, r, m;
 };
@@ -1532,15 +1515,10 @@ public:
 //---------------------------------------------------------------------------
 
 template <class T>
-void resample_main_rgbm_SSE2(TRasterPT<T> rout, const TRasterPT<T> &rin,
-							 const TAffine &aff_xy2uv,
-							 const TAffine &aff0_uv2fg,
-							 int min_pix_ref_u, int min_pix_ref_v,
-							 int max_pix_ref_u, int max_pix_ref_v,
-							 int n_pix,
-							 int *pix_ref_u, int *pix_ref_v,
-							 int *pix_ref_f, int *pix_ref_g,
-							 short *filter)
+void resample_main_rgbm_SSE2(TRasterPT<T> rout, const TRasterPT<T> &rin, const TAffine &aff_xy2uv,
+							 const TAffine &aff0_uv2fg, int min_pix_ref_u, int min_pix_ref_v,
+							 int max_pix_ref_u, int max_pix_ref_v, int n_pix, int *pix_ref_u,
+							 int *pix_ref_v, int *pix_ref_f, int *pix_ref_g, short *filter)
 {
 	__m128i zeros = _mm_setzero_si128();
 	const T *buffer_in;
@@ -1559,8 +1537,8 @@ void resample_main_rgbm_SSE2(TRasterPT<T> rout, const TRasterPT<T> &rin,
 	int filter_mu, filter_mv;
 	UINT inside_limit_u, inside_limit_v;
 	int inside_nonempty;
-	//double outside_min_u_,  outside_min_v_;
-	//double outside_max_u_,  outside_max_v_;
+	// double outside_min_u_,  outside_min_v_;
+	// double outside_max_u_,  outside_max_v_;
 	int outside_min_u, outside_min_v;
 	int outside_max_u, outside_max_v;
 	UCHAR *calc;
@@ -1600,9 +1578,8 @@ void resample_main_rgbm_SSE2(TRasterPT<T> rout, const TRasterPT<T> &rin,
 	}
 	calc = 0;
 	calc_allocsize = 0;
-	create_calc(rin, min_pix_ref_u, max_pix_ref_u,
-				min_pix_ref_v, max_pix_ref_v,
-				calc, calc_allocsize, calc_bytewrap);
+	create_calc(rin, min_pix_ref_u, max_pix_ref_u, min_pix_ref_v, max_pix_ref_v, calc,
+				calc_allocsize, calc_bytewrap);
 
 	buffer_in = rin->pixels();
 	buffer_out = rout->pixels();
@@ -1634,8 +1611,7 @@ void resample_main_rgbm_SSE2(TRasterPT<T> rout, const TRasterPT<T> &rin,
 			ref_u = intLE(out_u_);
 			ref_v = intLE(out_v_);
 
-			if (inside_nonempty &&
-				(UINT)(ref_u + min_pix_ref_u) < inside_limit_u &&
+			if (inside_nonempty && (UINT)(ref_u + min_pix_ref_u) < inside_limit_u &&
 				(UINT)(ref_v + min_pix_ref_v) < inside_limit_v) {
 				calc_value = calc[(ref_u >> 3) + ref_v * calc_bytewrap];
 
@@ -1658,11 +1634,14 @@ void resample_main_rgbm_SSE2(TRasterPT<T> rout, const TRasterPT<T> &rin,
 						pix_v = pix_ref_v[i] + ref_v;
 
 						pix_value = buffer_in[pix_u + pix_v * wrap_in];
-						pix_value_packed_i = _mm_unpacklo_epi8(_mm_cvtsi32_si128(*(DWORD *)&pix_value), zeros);
-						pix_value_packed = _mm_cvtepi32_ps(_mm_unpacklo_epi16(pix_value_packed_i, zeros));
+						pix_value_packed_i =
+							_mm_unpacklo_epi8(_mm_cvtsi32_si128(*(DWORD *)&pix_value), zeros);
+						pix_value_packed =
+							_mm_cvtepi32_ps(_mm_unpacklo_epi16(pix_value_packed_i, zeros));
 
 						weight_packed = _mm_load1_ps(&weight);
-						sum_contribs_packed = _mm_add_ps(sum_contribs_packed, _mm_mul_ps(pix_value_packed, weight_packed));
+						sum_contribs_packed = _mm_add_ps(
+							sum_contribs_packed, _mm_mul_ps(pix_value_packed, weight_packed));
 
 						sum_weights += weight;
 					}
@@ -1670,7 +1649,8 @@ void resample_main_rgbm_SSE2(TRasterPT<T> rout, const TRasterPT<T> &rin,
 					inv_sum_weights = 1.0f / sum_weights;
 					__m128 inv_sum_weights_packed = _mm_load1_ps(&inv_sum_weights);
 
-					__m128 out_fval_packed = _mm_mul_ps(sum_contribs_packed, inv_sum_weights_packed);
+					__m128 out_fval_packed =
+						_mm_mul_ps(sum_contribs_packed, inv_sum_weights_packed);
 					out_fval_packed = _mm_max_ps(out_fval_packed, zeros2);
 					out_fval_packed = _mm_min_ps(out_fval_packed, maxChanneValue_packed);
 
@@ -1681,10 +1661,10 @@ void resample_main_rgbm_SSE2(TRasterPT<T> rout, const TRasterPT<T> &rin,
 				} else
 					*pix_out = buffer_in[ref_u + ref_v * wrap_in];
 			} else
-				//if( outside_min_u_ <= out_u_ && out_u_ <= outside_max_u_ &&
+				// if( outside_min_u_ <= out_u_ && out_u_ <= outside_max_u_ &&
 				//    outside_min_v_ <= out_v_ && out_v_ <= outside_max_v_ )
-				if (outside_min_u <= ref_u && ref_u <= outside_max_u &&
-					outside_min_v <= ref_v && ref_v <= outside_max_v) {
+				if (outside_min_u <= ref_u && ref_u <= outside_max_u && outside_min_v <= ref_v &&
+					ref_v <= outside_max_v) {
 				if ((UINT)ref_u >= (UINT)lu || (UINT)ref_v >= (UINT)lv)
 					must_calc = true;
 				else {
@@ -1709,8 +1689,7 @@ void resample_main_rgbm_SSE2(TRasterPT<T> rout, const TRasterPT<T> &rin,
 						pix_u = pix_ref_u[i] + ref_u;
 						pix_v = pix_ref_v[i] + ref_v;
 
-						if (pix_u < 0 || pix_u > mu ||
-							pix_v < 0 || pix_v > mv) {
+						if (pix_u < 0 || pix_u > mu || pix_v < 0 || pix_v > mv) {
 							sum_weights += weight;
 							continue;
 						}
@@ -1721,18 +1700,22 @@ void resample_main_rgbm_SSE2(TRasterPT<T> rout, const TRasterPT<T> &rin,
 						notMoreThan(mv, pix_v);
 
 						pix_value = buffer_in[pix_u + pix_v * wrap_in];
-						pix_value_packed_i = _mm_unpacklo_epi8(_mm_cvtsi32_si128(*(DWORD *)&pix_value), zeros);
-						pix_value_packed = _mm_cvtepi32_ps(_mm_unpacklo_epi16(pix_value_packed_i, zeros));
+						pix_value_packed_i =
+							_mm_unpacklo_epi8(_mm_cvtsi32_si128(*(DWORD *)&pix_value), zeros);
+						pix_value_packed =
+							_mm_cvtepi32_ps(_mm_unpacklo_epi16(pix_value_packed_i, zeros));
 
 						weight_packed = _mm_load1_ps(&weight);
-						sum_contribs_packed = _mm_add_ps(sum_contribs_packed, _mm_mul_ps(pix_value_packed, weight_packed));
+						sum_contribs_packed = _mm_add_ps(
+							sum_contribs_packed, _mm_mul_ps(pix_value_packed, weight_packed));
 
 						sum_weights += weight;
 					}
 					inv_sum_weights = 1.0f / sum_weights;
 
 					__m128 inv_sum_weights_packed = _mm_load1_ps(&inv_sum_weights);
-					__m128 out_fval_packed = _mm_mul_ps(sum_contribs_packed, inv_sum_weights_packed);
+					__m128 out_fval_packed =
+						_mm_mul_ps(sum_contribs_packed, inv_sum_weights_packed);
 					out_fval_packed = _mm_max_ps(out_fval_packed, zeros2);
 					out_fval_packed = _mm_min_ps(out_fval_packed, maxChanneValue_packed);
 
@@ -1756,10 +1739,8 @@ namespace
 
 //---------------------------------------------------------------------------
 
-void inline blendBySSE2(TPixel32 *pix_out,
-						float *ink, float *paint, float *tone,
-						const __m128 &maxtone_packed,
-						const __m128i &zeros)
+void inline blendBySSE2(TPixel32 *pix_out, float *ink, float *paint, float *tone,
+						const __m128 &maxtone_packed, const __m128i &zeros)
 {
 	__m128 a_packed = _mm_load_ps(ink);
 	__m128 b_packed = _mm_load_ps(paint);
@@ -1784,10 +1765,8 @@ void inline blendBySSE2(TPixel32 *pix_out,
 
 //---------------------------------------------------------------------------
 
-void inline blendBySSE2(__m128 &pix_out_packed,
-						float *ink, float *paint, float *tone,
-						const __m128 &maxtone_packed,
-						const __m128i &zeros)
+void inline blendBySSE2(__m128 &pix_out_packed, float *ink, float *paint, float *tone,
+						const __m128 &maxtone_packed, const __m128i &zeros)
 {
 	__m128 a_packed = _mm_load_ps(ink);
 	__m128 b_packed = _mm_load_ps(paint);
@@ -1808,8 +1787,7 @@ void inline blendBySSE2(__m128 &pix_out_packed,
 #endif // _WIN32
 //---------------------------------------------------------------------------
 
-static void get_prow_gr8(const TRasterGR8P &rin,
-						 double a11, double a12, double a21, double a22,
+static void get_prow_gr8(const TRasterGR8P &rin, double a11, double a12, double a21, double a22,
 						 int pmin, int pmax, int q, float *prow)
 {
 	UCHAR *bufin_gr8, *in_gr8;
@@ -1855,10 +1833,11 @@ static void get_prow_gr8(const TRasterGR8P &rin,
 			fv = v_ - v;
 			gv = 1. - fv;
 			in_gr8 = bufin_gr8 + (u * du + v * dv);
-			prow[p] = (float)troundp(fu * gv * (((UINT)(u + 1) < lu && (UINT)v < lv) ? in_gr8[du] : BORDER) +
-									 fu * fv * (((UINT)(u + 1) < lu && (UINT)(v + 1) < lv) ? in_gr8[du + dv] : BORDER) +
-									 gu * gv * (((UINT)u < lu && (UINT)v < lv) ? in_gr8[0] : BORDER) +
-									 gu * fv * (((UINT)u < lu && (UINT)(v + 1) < lv) ? in_gr8[dv] : BORDER));
+			prow[p] = (float)troundp(
+				fu * gv * (((UINT)(u + 1) < lu && (UINT)v < lv) ? in_gr8[du] : BORDER) +
+				fu * fv * (((UINT)(u + 1) < lu && (UINT)(v + 1) < lv) ? in_gr8[du + dv] : BORDER) +
+				gu * gv * (((UINT)u < lu && (UINT)v < lv) ? in_gr8[0] : BORDER) +
+				gu * fv * (((UINT)u < lu && (UINT)(v + 1) < lv) ? in_gr8[dv] : BORDER));
 		}
 	p1 = p;
 	for (p = pmax; p > p1; p--)
@@ -1874,10 +1853,11 @@ static void get_prow_gr8(const TRasterGR8P &rin,
 			fv = v_ - v;
 			gv = 1. - fv;
 			in_gr8 = bufin_gr8 + (u * du + v * dv);
-			prow[p] = (float)troundp(fu * gv * (((UINT)(u + 1) < lu && (UINT)v < lv) ? in_gr8[du] : BORDER) +
-									 fu * fv * (((UINT)(u + 1) < lu && (UINT)(v + 1) < lv) ? in_gr8[du + dv] : BORDER) +
-									 gu * gv * (((UINT)u < lu && (UINT)v < lv) ? in_gr8[0] : BORDER) +
-									 gu * fv * (((UINT)u < lu && (UINT)(v + 1) < lv) ? in_gr8[dv] : BORDER));
+			prow[p] = (float)troundp(
+				fu * gv * (((UINT)(u + 1) < lu && (UINT)v < lv) ? in_gr8[du] : BORDER) +
+				fu * fv * (((UINT)(u + 1) < lu && (UINT)(v + 1) < lv) ? in_gr8[du + dv] : BORDER) +
+				gu * gv * (((UINT)u < lu && (UINT)v < lv) ? in_gr8[0] : BORDER) +
+				gu * fv * (((UINT)u < lu && (UINT)(v + 1) < lv) ? in_gr8[dv] : BORDER));
 		}
 	p2 = p;
 	for (p = p1; p <= p2; p++)
@@ -1900,8 +1880,7 @@ static void get_prow_gr8(const TRasterGR8P &rin,
 
 #define grey(PIXEL) (TPixelGR8::from(PIXEL).value)
 
-static void get_prow_gr8(const TRaster32P &rin,
-						 double a11, double a12, double a21, double a22,
+static void get_prow_gr8(const TRaster32P &rin, double a11, double a12, double a21, double a22,
 						 int pmin, int pmax, int q, float *prow)
 {
 	TPixel *bufin_32, *in_32;
@@ -1947,10 +1926,12 @@ static void get_prow_gr8(const TRaster32P &rin,
 			fv = v_ - v;
 			gv = 1. - fv;
 			in_32 = bufin_32 + (u * du + v * dv);
-			prow[p] = (float)troundp(fu * gv * (((UINT)(u + 1) < lu && (UINT)v < lv) ? grey(in_32[du]) : BORDER) +
-									 fu * fv * (((UINT)(u + 1) < lu && (UINT)(v + 1) < lv) ? grey(in_32[du + dv]) : BORDER) +
-									 gu * gv * (((UINT)u < lu && (UINT)v < lv) ? grey(in_32[0]) : BORDER) +
-									 gu * fv * (((UINT)u < lu && (UINT)(v + 1) < lv) ? grey(in_32[dv]) : BORDER));
+			prow[p] = (float)troundp(
+				fu * gv * (((UINT)(u + 1) < lu && (UINT)v < lv) ? grey(in_32[du]) : BORDER) +
+				fu * fv *
+					(((UINT)(u + 1) < lu && (UINT)(v + 1) < lv) ? grey(in_32[du + dv]) : BORDER) +
+				gu * gv * (((UINT)u < lu && (UINT)v < lv) ? grey(in_32[0]) : BORDER) +
+				gu * fv * (((UINT)u < lu && (UINT)(v + 1) < lv) ? grey(in_32[dv]) : BORDER));
 		}
 	p1 = p;
 	for (p = pmax; p > p1; p--)
@@ -1966,10 +1947,12 @@ static void get_prow_gr8(const TRaster32P &rin,
 			fv = v_ - v;
 			gv = 1. - fv;
 			in_32 = bufin_32 + (u * du + v * dv);
-			prow[p] = (float)troundp(fu * gv * (((UINT)(u + 1) < lu && (UINT)v < lv) ? grey(in_32[du]) : BORDER) +
-									 fu * fv * (((UINT)(u + 1) < lu && (UINT)(v + 1) < lv) ? grey(in_32[du + dv]) : BORDER) +
-									 gu * gv * (((UINT)u < lu && (UINT)v < lv) ? grey(in_32[0]) : BORDER) +
-									 gu * fv * (((UINT)u < lu && (UINT)(v + 1) < lv) ? grey(in_32[dv]) : BORDER));
+			prow[p] = (float)troundp(
+				fu * gv * (((UINT)(u + 1) < lu && (UINT)v < lv) ? grey(in_32[du]) : BORDER) +
+				fu * fv *
+					(((UINT)(u + 1) < lu && (UINT)(v + 1) < lv) ? grey(in_32[du + dv]) : BORDER) +
+				gu * gv * (((UINT)u < lu && (UINT)v < lv) ? grey(in_32[0]) : BORDER) +
+				gu * fv * (((UINT)u < lu && (UINT)(v + 1) < lv) ? grey(in_32[dv]) : BORDER));
 		}
 	p2 = p;
 	for (p = p1; p <= p2; p++)
@@ -1991,14 +1974,11 @@ static void get_prow_gr8(const TRaster32P &rin,
 //---------------------------------------------------------------------------
 typedef float *MyFloatPtr;
 
-static void rop_resample_gr8(const TRasterGR8P &rin, TRasterGR8P rout,
-							 const TAffine &aff, const TAffine &invrot,
-							 FILTER *rowflt, int pmin, int pmax,
-							 FILTER *colflt, int qmin, int qmax, int nrows,
-							 int flatradu, int flatradv,
-							 double flatradx_, double flatrady_,
-							 NOCALC *rownoc, int nocdiamx,
-							 NOCALC *colnoc, int nocdiamy)
+static void rop_resample_gr8(const TRasterGR8P &rin, TRasterGR8P rout, const TAffine &aff,
+							 const TAffine &invrot, FILTER *rowflt, int pmin, int pmax,
+							 FILTER *colflt, int qmin, int qmax, int nrows, int flatradu,
+							 int flatradv, double flatradx_, double flatrady_, NOCALC *rownoc,
+							 int nocdiamx, NOCALC *colnoc, int nocdiamy)
 {
 
 	FILTER *xflt, *yflt;
@@ -2010,7 +1990,7 @@ static void rop_resample_gr8(const TRasterGR8P &rin, TRasterGR8P rout,
 	int x, y;
 	int lu, lv, mu, mv;
 	int lx, ly, mx, my;
-	//int dudp, dudq, dvdp, dvdq;
+	// int dudp, dudq, dvdp, dvdq;
 	int topq, topy;
 	int wrapin, wrapout;
 	int flatdiamu, flatdiamv;
@@ -2042,14 +2022,14 @@ static void rop_resample_gr8(const TRasterGR8P &rin, TRasterGR8P rout,
 	xrow = xrow_base - (qmin - nrows);
 	topq = qmin;
 
-	//app = xrow+topq-nrows;
+	// app = xrow+topq-nrows;
 	i = 0;
 	j = 3;
 
 	for (i = 0; i < nrows; i++)
 		*(xrow + topq - nrows + i) = new float[lx];
 
-	//while(app<xrow+topq)
+	// while(app<xrow+topq)
 	//  *app++ = new float[lx];
 
 	flatdiamu = flatradu * 2 + 1;
@@ -2069,9 +2049,9 @@ static void rop_resample_gr8(const TRasterGR8P &rin, TRasterGR8P rout,
 	/*  TCALLOC (colheight, lu);
   TCALLOC (colval,    lu);*/
 	colheight = new int[lu];
-	//memset(colheight, 0, lu);
+	// memset(colheight, 0, lu);
 	colval = new UCHAR[lu];
-	//memset(colval, 0, lu);
+	// memset(colval, 0, lu);
 	for (u = 0; u < (int)lu; u++) {
 		colheight[u] = 0;
 		colval[u] = BORDER_GR8;
@@ -2177,8 +2157,8 @@ static void rop_resample_gr8(const TRasterGR8P &rin, TRasterGR8P rout,
 						for (p = rownoc[x].first; p <= rownoc[x].last; p++)
 							prow[p] = 1.0; /* 1.0 == nocalc */
 				}
-			get_prow_gr8(rin, invrot.a11, invrot.a12, invrot.a21, invrot.a22,
-						 pmin, pmax, topq, prow);
+			get_prow_gr8(rin, invrot.a11, invrot.a12, invrot.a21, invrot.a22, pmin, pmax, topq,
+						 prow);
 			for (x = 0, xflt = rowflt; x < lx; x++, xflt++)
 				if (xxx[x]) {
 					for (tmp = 0.0, p = xflt->first; p <= xflt->last; p++)
@@ -2194,7 +2174,7 @@ static void rop_resample_gr8(const TRasterGR8P &rin, TRasterGR8P rout,
 				out_gr8[x] = TO8BIT(tmp);
 			}
 	}
-	//cest_plus_facile (xrow);
+	// cest_plus_facile (xrow);
 
 	for (q = 0; q < nrows; q++)
 		delete xrow_base[q];
@@ -2204,14 +2184,11 @@ static void rop_resample_gr8(const TRasterGR8P &rin, TRasterGR8P rout,
 
 //---------------------------------------------------------------------------
 
-static void rop_resample_rgbm32_gr8(const TRaster32P &rin, TRasterGR8P rout,
-									const TAffine &aff, const TAffine &invrot,
-									FILTER *rowflt, int pmin, int pmax,
-									FILTER *colflt, int qmin, int qmax, int nrows,
-									int flatradu, int flatradv,
-									double flatradx_, double flatrady_,
-									NOCALC *rownoc, int nocdiamx,
-									NOCALC *colnoc, int nocdiamy)
+static void rop_resample_rgbm32_gr8(const TRaster32P &rin, TRasterGR8P rout, const TAffine &aff,
+									const TAffine &invrot, FILTER *rowflt, int pmin, int pmax,
+									FILTER *colflt, int qmin, int qmax, int nrows, int flatradu,
+									int flatradv, double flatradx_, double flatrady_,
+									NOCALC *rownoc, int nocdiamx, NOCALC *colnoc, int nocdiamy)
 {
 
 	FILTER *xflt, *yflt;
@@ -2224,7 +2201,7 @@ static void rop_resample_rgbm32_gr8(const TRaster32P &rin, TRasterGR8P rout,
 	int x, y;
 	int lu, lv, mu, mv;
 	int lx, ly, mx, my;
-	//int dudp, dudq, dvdp, dvdq;
+	// int dudp, dudq, dvdp, dvdq;
 	int topq, topy;
 	int wrapin, wrapout;
 	int flatdiamu, flatdiamv;
@@ -2256,14 +2233,14 @@ static void rop_resample_rgbm32_gr8(const TRaster32P &rin, TRasterGR8P rout,
 	xrow = xrow_base - (qmin - nrows);
 	topq = qmin;
 
-	//app = xrow+topq-nrows;
+	// app = xrow+topq-nrows;
 	i = 0;
 	j = 3;
 
 	for (i = 0; i < nrows; i++)
 		*(xrow + topq - nrows + i) = new float[lx];
 
-	//while(app<xrow+topq)
+	// while(app<xrow+topq)
 	//  *app++ = new float[lx];
 
 	flatdiamu = flatradu * 2 + 1;
@@ -2283,9 +2260,9 @@ static void rop_resample_rgbm32_gr8(const TRaster32P &rin, TRasterGR8P rout,
 	/*  TCALLOC (colheight, lu);
   TCALLOC (colval,    lu);*/
 	colheight = new int[lu];
-	//memset(colheight, 0, lu);
+	// memset(colheight, 0, lu);
 	colval = new UCHAR[lu];
-	//memset(colval, 0, lu);
+	// memset(colval, 0, lu);
 	for (u = 0; u < (int)lu; u++) {
 		colheight[u] = 0;
 		colval[u] = BORDER_GR8;
@@ -2391,8 +2368,8 @@ static void rop_resample_rgbm32_gr8(const TRaster32P &rin, TRasterGR8P rout,
 						for (p = rownoc[x].first; p <= rownoc[x].last; p++)
 							prow[p] = 1.0; /* 1.0 == nocalc */
 				}
-			get_prow_gr8(rin, invrot.a11, invrot.a12, invrot.a21, invrot.a22,
-						 pmin, pmax, topq, prow);
+			get_prow_gr8(rin, invrot.a11, invrot.a12, invrot.a21, invrot.a22, pmin, pmax, topq,
+						 prow);
 			for (x = 0, xflt = rowflt; x < lx; x++, xflt++)
 				if (xxx[x]) {
 					for (tmp = 0.0, p = xflt->first; p <= xflt->last; p++)
@@ -2408,7 +2385,7 @@ static void rop_resample_rgbm32_gr8(const TRaster32P &rin, TRasterGR8P rout,
 				out_gr8[x] = TO8BIT(tmp);
 			}
 	}
-	//cest_plus_facile (xrow);
+	// cest_plus_facile (xrow);
 
 	for (q = 0; q < nrows; q++)
 		delete xrow_base[q];
@@ -2423,8 +2400,8 @@ static void rop_resample_rgbm32_gr8(const TRaster32P &rin, TRasterGR8P rout,
 //---------------------------------------------------------------------------
 
 template <class T>
-void rop_resample_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin,
-					   const TAffine &aff, TRop::ResampleFilterType flt_type, double blur)
+void rop_resample_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin, const TAffine &aff,
+					   TRop::ResampleFilterType flt_type, double blur)
 {
 #define FILTER_RESOLUTION 1024
 #define MAX_FILTER_VAL 32767
@@ -2495,26 +2472,26 @@ void rop_resample_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin,
 
 	assert(flt_type != TRop::None);
 
-	//Retrieve the filter radius in the st and fx references
+	// Retrieve the filter radius in the st and fx references
 	filter_st_radius = get_filter_radius(flt_type);
 	filter_fg_radius = filter_st_radius * FILTER_RESOLUTION;
 
-	//Retrieve the transformation affines among the involved references
-	//NOTE: The 0.5 translation is needed in order to make the later
-	//resample_main procedures work with pixel centers.
+	// Retrieve the transformation affines among the involved references
+	// NOTE: The 0.5 translation is needed in order to make the later
+	// resample_main procedures work with pixel centers.
 	aff_uv2xy = aff * TTranslation(0.5, 0.5);
 	aff0_uv2xy = aff_uv2xy.place(0.0, 0.0, 0.0, 0.0);
 	aff_xy2uv = aff_uv2xy.inv();
 
-	//Consider the norm of (1,0) and (0,1) images.
+	// Consider the norm of (1,0) and (0,1) images.
 	scale_x = sqrt(sq(aff_uv2xy.a11) + sq(aff_uv2xy.a12));
 	scale_y = sqrt(sq(aff_uv2xy.a21) + sq(aff_uv2xy.a22));
 
-	//Inserting the following scale will make shrinks look smooth.
-	aff0_xy2st = TScale((scale_x > 1.0) ? 1.0 / scale_x : 1.0,
-						(scale_y > 1.0) ? 1.0 / scale_y : 1.0);
+	// Inserting the following scale will make shrinks look smooth.
+	aff0_xy2st =
+		TScale((scale_x > 1.0) ? 1.0 / scale_x : 1.0, (scale_y > 1.0) ? 1.0 / scale_y : 1.0);
 
-	if (blur > 1.0) //Consider the blur as a scale in the filter reference
+	if (blur > 1.0) // Consider the blur as a scale in the filter reference
 	{
 		inv_blur = 1.0 / blur;
 		aff0_xy2st = TScale(inv_blur, inv_blur) * aff0_xy2st;
@@ -2525,20 +2502,17 @@ void rop_resample_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin,
 	aff0_uv2fg = aff0_st2fg * aff0_uv2st;
 	aff0_fg2uv = aff0_uv2fg.inv();
 
-	//Take the pre-image of the filter mask in uv coordinates. This is where
-	//input pixels will be taken to find an output one.
-	minmax(-filter_fg_radius, -filter_fg_radius,
-		   filter_fg_radius, filter_fg_radius,
-		   aff0_fg2uv,
-		   min_pix_out_u_, min_pix_out_v_,
-		   max_pix_out_u_, max_pix_out_v_);
+	// Take the pre-image of the filter mask in uv coordinates. This is where
+	// input pixels will be taken to find an output one.
+	minmax(-filter_fg_radius, -filter_fg_radius, filter_fg_radius, filter_fg_radius, aff0_fg2uv,
+		   min_pix_out_u_, min_pix_out_v_, max_pix_out_u_, max_pix_out_v_);
 
-	//Adjust them to integer coordinates. The intent here is that
-	//of isolating their fractionary part - furthermore, we'll take
-	//the *opposites* of fractionary parts (explained later).
-	//NOTE: We'll assume we want to include in the filter mask all
+	// Adjust them to integer coordinates. The intent here is that
+	// of isolating their fractionary part - furthermore, we'll take
+	// the *opposites* of fractionary parts (explained later).
+	// NOTE: We'll assume we want to include in the filter mask all
 	//*integer positions around a fractionary displacement of the origin*;
-	//so the approximations below are stricly necessary.
+	// so the approximations below are stricly necessary.
 
 	min_pix_ref_u = intLE(min_pix_out_u_);
 	min_pix_ref_v = intLE(min_pix_out_v_);
@@ -2546,21 +2520,21 @@ void rop_resample_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin,
 	max_pix_ref_v = intGE(max_pix_out_v_);
 
 	if (blur <= 1.0) {
-		//If the blur radius has sub-pixel width
+		// If the blur radius has sub-pixel width
 		if (aff_uv2xy.a12 == 0.0 && aff_uv2xy.a21 == 0.0) {
-			//And it's the sole scales case
+			// And it's the sole scales case
 			if (aff_uv2xy.a11 == 1.0 && isInt(aff_uv2xy.a13 - 0.5)) {
-				//And the x mapping is bijective, then prevent any filtering.
+				// And the x mapping is bijective, then prevent any filtering.
 				min_pix_ref_u = 0;
 				max_pix_ref_u = 0;
 			}
 			if (aff_uv2xy.a22 == 1.0 && isInt(aff_uv2xy.a23 - 0.5)) {
-				//And the y mapping is bijective ...
+				// And the y mapping is bijective ...
 				min_pix_ref_v = 0;
 				max_pix_ref_v = 0;
 			}
 		} else if (aff_uv2xy.a11 == 0.0 && aff_uv2xy.a22 == 0.0) {
-			//The mirrored version of the one above
+			// The mirrored version of the one above
 			if (aff_uv2xy.a12 == 1.0 && isInt(aff_uv2xy.a13 - 0.5)) {
 				min_pix_ref_v = 0;
 				max_pix_ref_v = 0;
@@ -2572,9 +2546,8 @@ void rop_resample_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin,
 		}
 	}
 
-	//Take the number of pixels involved in the filter (uv reference)
-	max_n_pix = (max_pix_ref_u - min_pix_ref_u + 1) *
-				(max_pix_ref_v - min_pix_ref_v + 1);
+	// Take the number of pixels involved in the filter (uv reference)
+	max_n_pix = (max_pix_ref_u - min_pix_ref_u + 1) * (max_pix_ref_v - min_pix_ref_v + 1);
 
 	if (max_n_pix > current_max_n_pix) {
 		current_max_n_pix = max_n_pix;
@@ -2585,18 +2558,16 @@ void rop_resample_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin,
 		assert(pix_ref_u && pix_ref_v && pix_ref_f && pix_ref_g);
 	}
 
-	//Build the image of fractionary domain from the uv to fg reference
-	minmax(-1, -1, 0, 0,
-		   aff0_uv2fg,
-		   min_ref_out_f_, min_ref_out_g_,
-		   max_ref_out_f_, max_ref_out_g_);
+	// Build the image of fractionary domain from the uv to fg reference
+	minmax(-1, -1, 0, 0, aff0_uv2fg, min_ref_out_f_, min_ref_out_g_, max_ref_out_f_,
+		   max_ref_out_g_);
 
 	min_ref_out_f = tround(min_ref_out_f_);
 	min_ref_out_g = tround(min_ref_out_g_);
 	max_ref_out_f = tround(max_ref_out_f_);
 	max_ref_out_g = tround(max_ref_out_g_);
 
-	//Remember that negative fractionary parts must be subtracted from their integer counterparts
+	// Remember that negative fractionary parts must be subtracted from their integer counterparts
 	min_pix_ref_f = -filter_fg_radius - max_ref_out_f;
 	min_pix_ref_g = -filter_fg_radius - max_ref_out_g;
 	max_pix_ref_f = filter_fg_radius - min_ref_out_f;
@@ -2609,35 +2580,34 @@ void rop_resample_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin,
 	n_pix = 0;
 
 	if (!pix_ref_u || !pix_ref_v || !pix_ref_f || !pix_ref_g) {
-		throw TRopException("tresample.cpp line2640  function rop_resample_rgbm() : alloc pix_ref failed");
+		throw TRopException(
+			"tresample.cpp line2640  function rop_resample_rgbm() : alloc pix_ref failed");
 	}
 
-	//Build the *integer* part of the fg images of those coordinates inside the uv filter bounds.
+	// Build the *integer* part of the fg images of those coordinates inside the uv filter bounds.
 
-	//NOTE: Doing so reduces the execution time for the later resample_main procedure -
-	//the idea is the following:
+	// NOTE: Doing so reduces the execution time for the later resample_main procedure -
+	// the idea is the following:
 	//  We want to build the output pixel (x,y) obtained from the source image through A.
 	//  Then, we find (u,v) = (A^-1) * (x,y) = ([u],[v]) + ({u},{v}), where [] and {}
 	//  denote integer and fractionary parts.
 	//  Now, the convolution positions on fg for (u,v) can be thought of being calculated by taking
 	//  images of integer displacements of (u,v). So, their calculation is definitely *not* directly
-	//  dependent on the fractionary part of (u,v) - that is, the (i,j)th displacement position of FG(u,v)
+	//  dependent on the fractionary part of (u,v) - that is, the (i,j)th displacement position of
+	//  FG(u,v)
 	//  is:
 	//          FG([u]+i,[v]+j) = FG(u+i,v+j) - FG({u},{v}) = FG(i,j) - FG({u},{v});
 	//
-	//  where it is assumed that FG(u,v) = (0,0), since the filter is to be considered centered on (u,v).
+	//  where it is assumed that FG(u,v) = (0,0), since the filter is to be considered centered on
+	//  (u,v).
 
-	for (cur_pix_ref_v = min_pix_ref_v;
-		 cur_pix_ref_v <= max_pix_ref_v;
-		 cur_pix_ref_v++)
-		for (cur_pix_ref_u = min_pix_ref_u;
-			 cur_pix_ref_u <= max_pix_ref_u;
-			 cur_pix_ref_u++) {
-			//Get the image of current uv position
+	for (cur_pix_ref_v = min_pix_ref_v; cur_pix_ref_v <= max_pix_ref_v; cur_pix_ref_v++)
+		for (cur_pix_ref_u = min_pix_ref_u; cur_pix_ref_u <= max_pix_ref_u; cur_pix_ref_u++) {
+			// Get the image of current uv position
 			cur_pix_ref_f_ = affMV1(aff0_uv2fg, cur_pix_ref_u, cur_pix_ref_v);
 			cur_pix_ref_g_ = affMV2(aff0_uv2fg, cur_pix_ref_u, cur_pix_ref_v);
 
-			//And round it to the closest integer in fg
+			// And round it to the closest integer in fg
 			cur_pix_ref_f = tround(cur_pix_ref_f_);
 			cur_pix_ref_g = tround(cur_pix_ref_g_);
 			if (min_pix_ref_f <= cur_pix_ref_f && cur_pix_ref_f <= max_pix_ref_f &&
@@ -2646,9 +2616,11 @@ void rop_resample_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin,
 				pix_ref_v[n_pix] = cur_pix_ref_v;
 				pix_ref_f[n_pix] = cur_pix_ref_f;
 				pix_ref_g[n_pix] = cur_pix_ref_g;
-				notMoreThan(cur_pix_ref_f + min_ref_out_f, min_pix_out_f); //cur_pix_ref > min_pix_out - min_ref_out
+				notMoreThan(cur_pix_ref_f + min_ref_out_f,
+							min_pix_out_f); // cur_pix_ref > min_pix_out - min_ref_out
 				notMoreThan(cur_pix_ref_g + min_ref_out_g, min_pix_out_g);
-				notLessThan(cur_pix_ref_f + max_ref_out_f, max_pix_out_f); //cur_pix_ref < max_pix_out - max_ref_out
+				notLessThan(cur_pix_ref_f + max_ref_out_f,
+							max_pix_out_f); // cur_pix_ref < max_pix_out - max_ref_out
 				notLessThan(cur_pix_ref_g + max_ref_out_g, max_pix_out_g);
 				n_pix++;
 			}
@@ -2660,22 +2632,22 @@ void rop_resample_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin,
 		current_flt_type = flt_type;
 #endif
 
-		//Build a sufficient filter weights array
+		// Build a sufficient filter weights array
 		min_filter_fg = -filter_fg_radius - FILTER_RESOLUTION * 3 / 2; //???
 		max_filter_fg = filter_fg_radius + FILTER_RESOLUTION * 3 / 2;
 		filter_size = max_filter_fg - min_filter_fg + 1;
-		if (filter_size > filter_array_size) //For the static vars case...
+		if (filter_size > filter_array_size) // For the static vars case...
 		{
 			filter_array.reset(new short[filter_size]);
 			assert(filter_array);
 			filter_array_size = filter_size;
 		}
-		filter = filter_array.get() - min_filter_fg; //Take the position corresponding to fg's (0,0) in the array
+		filter = filter_array.get() -
+				 min_filter_fg; // Take the position corresponding to fg's (0,0) in the array
 		filter[0] = MAX_FILTER_VAL;
-		for (f = 1, s_ = 1.0 / FILTER_RESOLUTION;
-			 f < filter_fg_radius;
+		for (f = 1, s_ = 1.0 / FILTER_RESOLUTION; f < filter_fg_radius;
 			 f++, s_ += 1.0 / FILTER_RESOLUTION) {
-			//Symmetrically build the array
+			// Symmetrically build the array
 			weight_ = get_filter_value(flt_type, s_) * (double)MAX_FILTER_VAL;
 			weight = tround(weight_);
 			filter[f] = weight;
@@ -2690,15 +2662,15 @@ void rop_resample_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin,
 	}
 #endif
 
-	//Considering the bounding square in fg
+	// Considering the bounding square in fg
 	min_pix_out_fg = tmin(min_pix_out_f, min_pix_out_g);
 	max_pix_out_fg = tmax(max_pix_out_f, max_pix_out_g);
 	if (min_pix_out_fg < min_filter_fg || max_pix_out_fg > max_filter_fg) {
-		//Reallocate the filter... and so on...
+		// Reallocate the filter... and so on...
 		filter_size = max_pix_out_fg - min_pix_out_fg + 1;
 		if (filter_size > filter_array_size) {
-			//controllare!!
-			//TREALLOC (filter_array, filter_size)
+			// controllare!!
+			// TREALLOC (filter_array, filter_size)
 			filter_array.reset(new short[filter_size]);
 
 			assert(filter_array);
@@ -2724,33 +2696,21 @@ void rop_resample_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin,
 
 #ifdef _WIN32
 	if ((TSystem::getCPUExtensions() & TSystem::CpuSupportsSse2) && T::maxChannelValue == 255)
-		resample_main_rgbm_SSE2<T>(rout, rin, aff_xy2uv, aff0_uv2fg,
-								   min_pix_ref_u, min_pix_ref_v,
-								   max_pix_ref_u, max_pix_ref_v,
-								   n_pix,
-								   pix_ref_u.get(), pix_ref_v.get(),
-								   pix_ref_f.get(), pix_ref_g.get(),
-								   filter);
+		resample_main_rgbm_SSE2<T>(rout, rin, aff_xy2uv, aff0_uv2fg, min_pix_ref_u, min_pix_ref_v,
+								   max_pix_ref_u, max_pix_ref_v, n_pix, pix_ref_u.get(),
+								   pix_ref_v.get(), pix_ref_f.get(), pix_ref_g.get(), filter);
 	else
 #endif
 		if (n_pix >= 512 || T::maxChannelValue > 255)
-		resample_main_rgbm<T, TINT64>(
-			rout, rin, aff_xy2uv, aff0_uv2fg,
-			min_pix_ref_u, min_pix_ref_v,
-			max_pix_ref_u, max_pix_ref_v,
-			n_pix,
-			pix_ref_u.get(), pix_ref_v.get(),
-			pix_ref_f.get(), pix_ref_g.get(),
-			filter);
+		resample_main_rgbm<T, TINT64>(rout, rin, aff_xy2uv, aff0_uv2fg, min_pix_ref_u,
+									  min_pix_ref_v, max_pix_ref_u, max_pix_ref_v, n_pix,
+									  pix_ref_u.get(), pix_ref_v.get(), pix_ref_f.get(),
+									  pix_ref_g.get(), filter);
 	else
-		resample_main_rgbm<T, TINT32>(
-			rout, rin, aff_xy2uv, aff0_uv2fg,
-			min_pix_ref_u, min_pix_ref_v,
-			max_pix_ref_u, max_pix_ref_v,
-			n_pix,
-			pix_ref_u.get(), pix_ref_v.get(),
-			pix_ref_f.get(), pix_ref_g.get(),
-			filter);
+		resample_main_rgbm<T, TINT32>(rout, rin, aff_xy2uv, aff0_uv2fg, min_pix_ref_u,
+									  min_pix_ref_v, max_pix_ref_u, max_pix_ref_v, n_pix,
+									  pix_ref_u.get(), pix_ref_v.get(), pix_ref_f.get(),
+									  pix_ref_g.get(), filter);
 
 	/////////////////////////////////////////////////////////
 	// INIZIO GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
@@ -2762,7 +2722,7 @@ switch (RASRAS (rin->type, rout->type))
   case RASRAS (RAS_RGB_, RAS_RGB_):
   __OR RASRAS (RAS_RGBM, RAS_RGB_):
   __OR RASRAS (RAS_RGBM, RAS_RGBM):
-    resample_main_rgbm (rin, rout,
+	resample_main_rgbm (rin, rout,
 			aff_xy2uv,
 			aff0_uv2fg,
 			min_pix_ref_u, min_pix_ref_v,
@@ -2773,18 +2733,18 @@ switch (RASRAS (rin->type, rout->type))
 			filter);
 
   CASE RASRAS (RAS_RGBM, RAS_RGBM64):
-    resample_main_rgbm_rgbm64 (rin, rout,
-			       aff_xy2uv,
-			       aff0_uv2fg,
-			       min_pix_ref_u, min_pix_ref_v,
-			       max_pix_ref_u, max_pix_ref_v,
-			       n_pix,
-			       pix_ref_u, pix_ref_v,
-			       pix_ref_f, pix_ref_g,
-			       filter);
+	resample_main_rgbm_rgbm64 (rin, rout,
+				   aff_xy2uv,
+				   aff0_uv2fg,
+				   min_pix_ref_u, min_pix_ref_v,
+				   max_pix_ref_u, max_pix_ref_v,
+				   n_pix,
+				   pix_ref_u, pix_ref_v,
+				   pix_ref_f, pix_ref_g,
+				   filter);
 
   CASE RASRAS (RAS_RGBM64, RAS_RGBM64):
-    resample_main_rgbm64 (rin, rout,
+	resample_main_rgbm64 (rin, rout,
 			  aff_xy2uv,
 			  aff0_uv2fg,
 			  min_pix_ref_u, min_pix_ref_v,
@@ -2795,51 +2755,51 @@ switch (RASRAS (rin->type, rout->type))
 			  filter);
 
   CASE RASRAS (RAS_CM16, RAS_RGBM):
-    resample_main_cm16_rgbm (rin, rout,
-			     aff_xy2uv,
-			     aff0_uv2fg,
-			     min_pix_ref_u, min_pix_ref_v,
-			     max_pix_ref_u, max_pix_ref_v,
-			     n_pix,
-			     pix_ref_u, pix_ref_v,
-			     pix_ref_f, pix_ref_g,
-			     filter);
+	resample_main_cm16_rgbm (rin, rout,
+				 aff_xy2uv,
+				 aff0_uv2fg,
+				 min_pix_ref_u, min_pix_ref_v,
+				 max_pix_ref_u, max_pix_ref_v,
+				 n_pix,
+				 pix_ref_u, pix_ref_v,
+				 pix_ref_f, pix_ref_g,
+				 filter);
 
   CASE RASRAS (RAS_CM24, RAS_RGBM):
-    resample_main_cm24_rgbm (rin, rout,
-			     aff_xy2uv,
-			     aff0_uv2fg,
-			     min_pix_ref_u, min_pix_ref_v,
-			     max_pix_ref_u, max_pix_ref_v,
-			     n_pix,
-			     pix_ref_u, pix_ref_v,
-			     pix_ref_f, pix_ref_g,
-			     filter);
+	resample_main_cm24_rgbm (rin, rout,
+				 aff_xy2uv,
+				 aff0_uv2fg,
+				 min_pix_ref_u, min_pix_ref_v,
+				 max_pix_ref_u, max_pix_ref_v,
+				 n_pix,
+				 pix_ref_u, pix_ref_v,
+				 pix_ref_f, pix_ref_g,
+				 filter);
 
   CASE RASRAS (RAS_CM16, RAS_RGBM64):
-    resample_main_cm16_rgbm64 (rin, rout,
-			       aff_xy2uv,
-			       aff0_uv2fg,
-			       min_pix_ref_u, min_pix_ref_v,
-			       max_pix_ref_u, max_pix_ref_v,
-			       n_pix,
-			       pix_ref_u, pix_ref_v,
-			       pix_ref_f, pix_ref_g,
-			       filter);
+	resample_main_cm16_rgbm64 (rin, rout,
+				   aff_xy2uv,
+				   aff0_uv2fg,
+				   min_pix_ref_u, min_pix_ref_v,
+				   max_pix_ref_u, max_pix_ref_v,
+				   n_pix,
+				   pix_ref_u, pix_ref_v,
+				   pix_ref_f, pix_ref_g,
+				   filter);
 
   CASE RASRAS (RAS_CM24, RAS_RGBM64):
-    resample_main_cm24_rgbm64 (rin, rout,
-			       aff_xy2uv,
-			       aff0_uv2fg,
-			       min_pix_ref_u, min_pix_ref_v,
-			       max_pix_ref_u, max_pix_ref_v,
-			       n_pix,
-			       pix_ref_u, pix_ref_v,
-			       pix_ref_f, pix_ref_g,
-			       filter);
+	resample_main_cm24_rgbm64 (rin, rout,
+				   aff_xy2uv,
+				   aff0_uv2fg,
+				   min_pix_ref_u, min_pix_ref_v,
+				   max_pix_ref_u, max_pix_ref_v,
+				   n_pix,
+				   pix_ref_u, pix_ref_v,
+				   pix_ref_f, pix_ref_g,
+				   filter);
 
   DEFAULT:
-    assert ( !"bad raster type combination");
+	assert ( !"bad raster type combination");
   }
 */
 	/////////////////////////////////////////////////////////
@@ -2859,8 +2819,8 @@ static void free_filter(FILTER *filter, int lx)
 
 //-----------------------------------------------------------------------------
 
-void do_resample(TRasterGR8P rout, const TRasterGR8P &rin,
-				 const TAffine &aff, TRop::ResampleFilterType flt_type, double blur)
+void do_resample(TRasterGR8P rout, const TRasterGR8P &rin, const TAffine &aff,
+				 TRop::ResampleFilterType flt_type, double blur)
 {
 	double jacob;
 	double s11, s22, s13, s23;
@@ -2884,7 +2844,7 @@ void do_resample(TRasterGR8P rout, const TRasterGR8P &rin,
 	}
 	if (!(rin->getLx() > 0 && rin->getLy() > 0)) /* immagine in vuota */
 	{
-		rout->fill(TPixelGR8::Black); //Black_rgbm
+		rout->fill(TPixelGR8::Black); // Black_rgbm
 		return;
 	}
 
@@ -2900,22 +2860,23 @@ void do_resample(TRasterGR8P rout, const TRasterGR8P &rin,
 		s13 = aff.a13;
 		s23 = aff.a23;
 
-		//rot = aff_place (0.0, 0.0, 0.0, 0.0, TScale(1/s11, 1/s22)*aff);//eventualmente invertire ordine
+		// rot = aff_place (0.0, 0.0, 0.0, 0.0, TScale(1/s11, 1/s22)*aff);//eventualmente invertire
+		// ordine
 
 		rot = (TScale(1 / s11, 1 / s22) * aff).place(0.0, 0.0, 0.0, 0.0);
 
-		//scale = aff_place (0.0, 0.0, s13, s23, TScale(s11, s22));
+		// scale = aff_place (0.0, 0.0, s13, s23, TScale(s11, s22));
 		scale = TScale(s11, s22).place(0.0, 0.0, s13, s23);
 		invrot = rot.inv();
 
-		rowf = create_filter(flt_type, blur, scale.a11, scale.a13, rout->getLx(),
-							 rad_x, pmin, pmax, dummy);
-		colf = create_filter(flt_type, blur, scale.a22, scale.a23, rout->getLy(),
-							 rad_y, qmin, qmax, nrows);
-		rown = create_nocalc(flt_type, blur, scale.a11, scale.a13, rout->getLx(),
-							 pmin, pmax, nocdiamx);
-		coln = create_nocalc(flt_type, blur, scale.a22, scale.a23, rout->getLy(),
-							 qmin, qmax, nocdiamy);
+		rowf = create_filter(flt_type, blur, scale.a11, scale.a13, rout->getLx(), rad_x, pmin, pmax,
+							 dummy);
+		colf = create_filter(flt_type, blur, scale.a22, scale.a23, rout->getLy(), rad_y, qmin, qmax,
+							 nrows);
+		rown = create_nocalc(flt_type, blur, scale.a11, scale.a13, rout->getLx(), pmin, pmax,
+							 nocdiamx);
+		coln = create_nocalc(flt_type, blur, scale.a22, scale.a23, rout->getLy(), qmin, qmax,
+							 nocdiamy);
 
 #ifdef DBMALLOC
 		malloc_chain_check(TRUE);
@@ -2927,8 +2888,7 @@ void do_resample(TRasterGR8P rout, const TRasterGR8P &rin,
 		TAffine aff_0 = aff.place(0.0, 0.0, 0.0, 0.0);
 		TAffine inv_0 = aff_0.inv();
 
-		minmax(-0.5, -0.5, 0.5, 0.5, aff_0,
-			   negradx_, negrady_, posradx_, posrady_);
+		minmax(-0.5, -0.5, 0.5, 0.5, aff_0, negradx_, negrady_, posradx_, posrady_);
 		double flatradx_ = posradx_;
 		double flatrady_ = posrady_;
 		minmax(negradx_ - rad_x, negrady_ - rad_y, posradx_ + rad_x, posrady_ + rad_y, inv_0,
@@ -2937,21 +2897,19 @@ void do_resample(TRasterGR8P rout, const TRasterGR8P &rin,
 		int flatradu = tceil(posradu_) - 1;
 		int flatradv = tceil(posradv_) - 1;
 
-		rop_resample_gr8(rin, rout, aff, invrot,
-						 rowf, pmin, pmax, colf, qmin, qmax, nrows,
-						 flatradu, flatradv, flatradx_, flatrady_,
-						 rown, nocdiamx, coln, nocdiamy);
+		rop_resample_gr8(rin, rout, aff, invrot, rowf, pmin, pmax, colf, qmin, qmax, nrows,
+						 flatradu, flatradv, flatradx_, flatrady_, rown, nocdiamx, coln, nocdiamy);
 
-		//free_nocalc (coln);
+		// free_nocalc (coln);
 		if (coln)
 			delete (coln);
-		//free_nocalc (rown);
+		// free_nocalc (rown);
 		if (rown)
 			delete (rown);
 		free_filter(colf, rout->getLy());
 		free_filter(rowf, rout->getLx());
 		//----NON GESTIAMO ANCORA EXTRA BUFFER
-		//rop_resample_extra (rin, rout, aff);
+		// rop_resample_extra (rin, rout, aff);
 
 		return;
 	} else
@@ -2960,8 +2918,8 @@ void do_resample(TRasterGR8P rout, const TRasterGR8P &rin,
 
 //-----------------------------------------------------------------------------
 
-void do_resample(TRasterGR8P rout, const TRaster32P &rin,
-				 const TAffine &aff, TRop::ResampleFilterType flt_type, double blur)
+void do_resample(TRasterGR8P rout, const TRaster32P &rin, const TAffine &aff,
+				 TRop::ResampleFilterType flt_type, double blur)
 {
 	double jacob;
 	double s11, s22, s13, s23;
@@ -2985,7 +2943,7 @@ void do_resample(TRasterGR8P rout, const TRaster32P &rin,
 	}
 	if (!(rin->getLx() > 0 && rin->getLy() > 0)) /* immagine in vuota */
 	{
-		rout->fill(TPixelGR8::Black); //Black_rgbm
+		rout->fill(TPixelGR8::Black); // Black_rgbm
 		return;
 	}
 
@@ -2999,22 +2957,21 @@ void do_resample(TRasterGR8P rout, const TRaster32P &rin,
 	s13 = aff.a13;
 	s23 = aff.a23;
 
-	//rot = aff_place (0.0, 0.0, 0.0, 0.0, TScale(1/s11, 1/s22)*aff);//eventualmente invertire ordine
+	// rot = aff_place (0.0, 0.0, 0.0, 0.0, TScale(1/s11, 1/s22)*aff);//eventualmente invertire
+	// ordine
 
 	rot = (TScale(1 / s11, 1 / s22) * aff).place(0.0, 0.0, 0.0, 0.0);
 
-	//scale = aff_place (0.0, 0.0, s13, s23, TScale(s11, s22));
+	// scale = aff_place (0.0, 0.0, s13, s23, TScale(s11, s22));
 	scale = TScale(s11, s22).place(0.0, 0.0, s13, s23);
 	invrot = rot.inv();
 
-	rowf = create_filter(flt_type, blur, scale.a11, scale.a13, rout->getLx(),
-						 rad_x, pmin, pmax, dummy);
-	colf = create_filter(flt_type, blur, scale.a22, scale.a23, rout->getLy(),
-						 rad_y, qmin, qmax, nrows);
-	rown = create_nocalc(flt_type, blur, scale.a11, scale.a13, rout->getLx(),
-						 pmin, pmax, nocdiamx);
-	coln = create_nocalc(flt_type, blur, scale.a22, scale.a23, rout->getLy(),
-						 qmin, qmax, nocdiamy);
+	rowf = create_filter(flt_type, blur, scale.a11, scale.a13, rout->getLx(), rad_x, pmin, pmax,
+						 dummy);
+	colf = create_filter(flt_type, blur, scale.a22, scale.a23, rout->getLy(), rad_y, qmin, qmax,
+						 nrows);
+	rown = create_nocalc(flt_type, blur, scale.a11, scale.a13, rout->getLx(), pmin, pmax, nocdiamx);
+	coln = create_nocalc(flt_type, blur, scale.a22, scale.a23, rout->getLy(), qmin, qmax, nocdiamy);
 
 #ifdef DBMALLOC
 	malloc_chain_check(TRUE);
@@ -3026,31 +2983,29 @@ void do_resample(TRasterGR8P rout, const TRaster32P &rin,
 	TAffine aff_0 = aff.place(0.0, 0.0, 0.0, 0.0);
 	TAffine inv_0 = aff_0.inv();
 
-	minmax(-0.5, -0.5, 0.5, 0.5, aff_0,
-		   negradx_, negrady_, posradx_, posrady_);
+	minmax(-0.5, -0.5, 0.5, 0.5, aff_0, negradx_, negrady_, posradx_, posrady_);
 	double flatradx_ = posradx_;
 	double flatrady_ = posrady_;
-	minmax(negradx_ - rad_x, negrady_ - rad_y, posradx_ + rad_x, posrady_ + rad_y, inv_0,
-		   negradu_, negradv_, posradu_, posradv_);
+	minmax(negradx_ - rad_x, negrady_ - rad_y, posradx_ + rad_x, posrady_ + rad_y, inv_0, negradu_,
+		   negradv_, posradu_, posradv_);
 
 	int flatradu = tceil(posradu_) - 1;
 	int flatradv = tceil(posradv_) - 1;
 
-	rop_resample_rgbm32_gr8(rin, rout, aff, invrot,
-							rowf, pmin, pmax, colf, qmin, qmax, nrows,
-							flatradu, flatradv, flatradx_, flatrady_,
-							rown, nocdiamx, coln, nocdiamy);
+	rop_resample_rgbm32_gr8(rin, rout, aff, invrot, rowf, pmin, pmax, colf, qmin, qmax, nrows,
+							flatradu, flatradv, flatradx_, flatrady_, rown, nocdiamx, coln,
+							nocdiamy);
 
-	//free_nocalc (coln);
+	// free_nocalc (coln);
 	if (coln)
 		delete (coln);
-	//free_nocalc (rown);
+	// free_nocalc (rown);
 	if (rown)
 		delete (rown);
 	free_filter(colf, rout->getLy());
 	free_filter(rowf, rout->getLx());
 	//----NON GESTIAMO ANCORA EXTRA BUFFER
-	//rop_resample_extra (rin, rout, aff);
+	// rop_resample_extra (rin, rout, aff);
 
 	return;
 
@@ -3060,8 +3015,8 @@ void do_resample(TRasterGR8P rout, const TRaster32P &rin,
 //-----------------------------------------------------------------------------
 
 template <class T>
-void do_resample(TRasterPT<T> rout, const TRasterPT<T> &rin,
-				 const TAffine &aff, TRop::ResampleFilterType flt_type, double blur)
+void do_resample(TRasterPT<T> rout, const TRasterPT<T> &rin, const TAffine &aff,
+				 TRop::ResampleFilterType flt_type, double blur)
 
 {
 /*
@@ -3090,34 +3045,34 @@ TAffine aff_0, inv_0;
 	}
 	if (!(rin->getLx() > 0 && rin->getLy() > 0)) /* immagine in vuota */
 	{
-		rout->fill(T::Black); //Black_rgbm
+		rout->fill(T::Black); // Black_rgbm
 
 		/////////////////////////////////////////////////////////
 		// INIZIO GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
 		/////////////////////////////////////////////////////////
 
 		/*   switch (rout->type)
-    {
-    
-    case RAS_GR8:
-      for (y = 0; y < rout->ly; y++)
-        for (x = 0; x < rout->lx; x++)
-          ((UCHAR*)rout->buffer)[x + y * rout->wrap] = BLACK_GR8;  
-    CASE RAS_RGB_:
-    __OR RAS_RGBM:
-      for (y = 0; y < rout->ly; y++)
-        for (x = 0; x < rout->lx; x++)
-          ((LPIXEL*)rout->buffer)[x + y * rout->wrap] = Black_rgbm;  
-    CASE RAS_RGBM64:
-      for (y = 0; y < rout->ly; y++)
-        for (x = 0; x < rout->lx; x++)
-          ((SPIXEL*)rout->buffer)[x + y * rout->wrap] = Black_rgbm64;  
-    DEFAULT:
-      abort();
-    }
+	{
+
+	case RAS_GR8:
+	  for (y = 0; y < rout->ly; y++)
+		for (x = 0; x < rout->lx; x++)
+		  ((UCHAR*)rout->buffer)[x + y * rout->wrap] = BLACK_GR8;
+	CASE RAS_RGB_:
+	__OR RAS_RGBM:
+	  for (y = 0; y < rout->ly; y++)
+		for (x = 0; x < rout->lx; x++)
+		  ((LPIXEL*)rout->buffer)[x + y * rout->wrap] = Black_rgbm;
+	CASE RAS_RGBM64:
+	  for (y = 0; y < rout->ly; y++)
+		for (x = 0; x < rout->lx; x++)
+		  ((SPIXEL*)rout->buffer)[x + y * rout->wrap] = Black_rgbm64;
+	DEFAULT:
+	  abort();
+	}
 	*/
 		//---- NON GESTIAMO ANCORA EXTRA BUFFER
-		//ZERO_EXTRA_OF (rout)
+		// ZERO_EXTRA_OF (rout)
 
 		/////////////////////////////////////////////////////////
 		// FINE GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
@@ -3152,27 +3107,27 @@ TAffine aff_0, inv_0;
   __OR RASRAS (RAS_RGBM,   RAS_RGBM64):
   __OR RASRAS (RAS_RGBM64, RAS_RGBM64):
 
-    rop_resample_rgbm (rin, rout, aff, flt_type, 1.0);  
+	rop_resample_rgbm (rin, rout, aff, flt_type, 1.0);
 
   #ifdef CHECK_IF_PREMULTIPLIED
-    {
-    int x, y;
-    LPIXEL *buf, pix;
-    
-    buf = rout->buffer;
-    for (y = 0; y < rout->getLy(); y++)
-      for (x = 0; x < rout->getLx(); x++)
+	{
+	int x, y;
+	LPIXEL *buf, pix;
+
+	buf = rout->buffer;
+	for (y = 0; y < rout->getLy(); y++)
+	  for (x = 0; x < rout->getLx(); x++)
 	{
 	pix = buf[x + y * rout->wrap];
 	if (pix.m < pix.b || pix.m < pix.g || pix.m < pix.r)
 	  printf ("(%d,%d): 0x%02x 0x%02x 0x%02x 0x%02x\n",
 		  x, y, pix.m, pix.b, pix.g, pix.r);
 	}
-    }
+	}
   #endif
 //----NON GESTIAMO ANCORA EXTRA BUFFER
-    rop_resample_extra (rin, rout, aff);
-    return;
+	rop_resample_extra (rin, rout, aff);
+	return;
   }
 */
 	/////////////////////////////////////////////////////////
@@ -3189,21 +3144,20 @@ TAffine aff_0, inv_0;
 	s13 = aff.a13;
 	s23 = aff.a23;
 
-	//rot = aff_place (0.0, 0.0, 0.0, 0.0, TScale(1/s11, 1/s22)*aff);//eventualmente invertire ordine
+	// rot = aff_place (0.0, 0.0, 0.0, 0.0, TScale(1/s11, 1/s22)*aff);//eventualmente invertire
+	// ordine
 	rot = (TScale(1 / s11, 1 / s22) * aff).place(0.0, 0.0, 0.0, 0.0);
 
-	//scale = aff_place (0.0, 0.0, s13, s23, TScale(s11, s22));
+	// scale = aff_place (0.0, 0.0, s13, s23, TScale(s11, s22));
 	scale = TScale(s11, s22).place(0.0, 0.0, s13, s23);
 	invrot = rot.inv();
 
-	rowf = create_filter(flt_type, blur, scale.a11, scale.a13, rout->getLx(),
-						 rad_x, pmin, pmax, dummy);
-	colf = create_filter(flt_type, blur, scale.a22, scale.a23, rout->getLy(),
-						 rad_y, qmin, qmax, nrows);
-	rown = create_nocalc(flt_type, blur, scale.a11, scale.a13, rout->getLx(),
-						 pmin, pmax, nocdiamx);
-	coln = create_nocalc(flt_type, blur, scale.a22, scale.a23, rout->getLy(),
-						 qmin, qmax, nocdiamy);
+	rowf = create_filter(flt_type, blur, scale.a11, scale.a13, rout->getLx(), rad_x, pmin, pmax,
+						 dummy);
+	colf = create_filter(flt_type, blur, scale.a22, scale.a23, rout->getLy(), rad_y, qmin, qmax,
+						 nrows);
+	rown = create_nocalc(flt_type, blur, scale.a11, scale.a13, rout->getLx(), pmin, pmax, nocdiamx);
+	coln = create_nocalc(flt_type, blur, scale.a22, scale.a23, rout->getLy(), qmin, qmax, nocdiamy);
 
 #ifdef DBMALLOC
 	malloc_chain_check(TRUE);
@@ -3215,10 +3169,9 @@ TAffine aff_0, inv_0;
 	aff_0 = aff.place(0.0, 0.0, 0.0, 0.0);
 	inv_0 = aff_0.inv();
 
-	minmax(-0.5, -0.5, 0.5, 0.5, aff_0,
-		   negradx_, negrady_, posradx_, posrady_);
-	minmax(negradx_ - rad_x, negrady_ - rad_y, posradx_ + rad_x, posrady_ + rad_y, inv_0,
-		   negradu_, negradv_, posradu_, posradv_);
+	minmax(-0.5, -0.5, 0.5, 0.5, aff_0, negradx_, negrady_, posradx_, posrady_);
+	minmax(negradx_ - rad_x, negrady_ - rad_y, posradx_ + rad_x, posrady_ + rad_y, inv_0, negradu_,
+		   negradv_, posradu_, posradv_);
 
 	/////////////////////////////////////////////////////////
 	// INIZIO GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
@@ -3232,26 +3185,26 @@ int flatradv = CEIL (posradv_) - 1;
 switch (RASRAS (rin->type, rout->type))
   {
   case RASRAS (RAS_RGB, RAS_RGB):
-    rop_resample_rgb (rin, rout, aff, invrot,
-                      rowf, pmin, pmax, colf, qmin, qmax, nrows,
-                      flatradu, flatradv, flatradx_, flatrady_,
-                      rown, nocdiamx, coln, nocdiamy);
+	rop_resample_rgb (rin, rout, aff, invrot,
+					  rowf, pmin, pmax, colf, qmin, qmax, nrows,
+					  flatradu, flatradv, flatradx_, flatrady_,
+					  rown, nocdiamx, coln, nocdiamy);
 
   CASE RASRAS (RAS_GR8, RAS_GR8):
-    rop_resample_gr8 (rin, rout, aff, invrot,
-                      rowf, pmin, pmax, colf, qmin, qmax, nrows,
-                      flatradu, flatradv, flatradx_, flatrady_,
-                      rown, nocdiamx, coln, nocdiamy);
+	rop_resample_gr8 (rin, rout, aff, invrot,
+					  rowf, pmin, pmax, colf, qmin, qmax, nrows,
+					  flatradu, flatradv, flatradx_, flatrady_,
+					  rown, nocdiamx, coln, nocdiamy);
 
   CASE RASRAS (RAS_WB, RAS_GR8):
-    rop_resample_wb (rin, rout, aff, invrot,
-                     rowf, pmin, pmax, colf, qmin, qmax, nrows,
-                     flatradu, flatradv, flatradx_, flatrady_,
-                     rown, nocdiamx, coln, nocdiamy);
+	rop_resample_wb (rin, rout, aff, invrot,
+					 rowf, pmin, pmax, colf, qmin, qmax, nrows,
+					 flatradu, flatradv, flatradx_, flatrady_,
+					 rown, nocdiamx, coln, nocdiamy);
 
   DEFAULT:
-    msg (MSG_IE, "rop_resample: unsupported raster combination");
-    return;
+	msg (MSG_IE, "rop_resample: unsupported raster combination");
+	return;
   }
   */
 
@@ -3259,23 +3212,22 @@ switch (RASRAS (rin->type, rout->type))
 	// FINE GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
 	/////////////////////////////////////////////////////////
 
-	//free_nocalc (coln);
+	// free_nocalc (coln);
 	if (coln)
 		delete (coln);
-	//free_nocalc (rown);
+	// free_nocalc (rown);
 	if (rown)
 		delete (rown);
 	free_filter(colf, rout->getLy());
 	free_filter(rowf, rout->getLx());
 //----NON GESTIAMO ANCORA EXTRA BUFFER
-//rop_resample_extra (rin, rout, aff);
+// rop_resample_extra (rin, rout, aff);
 #endif
 }
 
 //-----------------------------------------------------------------------------
 
-typedef struct
-	{
+typedef struct {
 	TUINT32 val;
 	double tot;
 } BLOB24;
@@ -3286,7 +3238,7 @@ typedef struct
 #define MINOR(x, a) ((x) >= 0 && (x) < (a))
 
 //-----------------------------------------------------------------------------
-} //namespace
+} // namespace
 
 #ifndef TNZCORE_LIGHT
 
@@ -3357,36 +3309,36 @@ void do_resample(TRasterCM32P rout, const TRasterCM32P &rin, const TAffine &aff)
 
 	transp = tone_mask;
 
-	assert(tone_mask & 0x1); //Ensure that tone lies in the less significative bits
+	assert(tone_mask & 0x1); // Ensure that tone lies in the less significative bits
 
-	//deal with every output line independently
+	// deal with every output line independently
 	for (y = 0; y < ly; y++) {
-		//Take inv*(0,y)
+		// Take inv*(0,y)
 		u_0 = inv.a12 * y + inv.a13;
 		v_0 = inv.a22 * y + inv.a23;
 
 		out_tcm = bufout_tcm + wrapout * y;
 		x = 0;
 
-		//Place transparent pixels until we reach a useful source pos.
+		// Place transparent pixels until we reach a useful source pos.
 		for (; x < lx; x++) {
-			//Add inv*(x,0) and floor it
+			// Add inv*(x,0) and floor it
 			u_ = u_0 + x * inv.a11;
 			u = tfloor(u_);
 			v_ = v_0 + x * inv.a21;
 			v = tfloor(v_);
-			if (MINOREQ(u + 1, lu) && MINOREQ(v + 1, lv)) //u>=-1 && u<lu && v>=-1 && v<lv
-				break;									  //Goto next for
-			*out_tcm++ = transp;						  //Otherwise, place a transparent pixel
+			if (MINOREQ(u + 1, lu) && MINOREQ(v + 1, lv)) // u>=-1 && u<lu && v>=-1 && v<lv
+				break; // Goto next for
+			*out_tcm++ = transp; // Otherwise, place a transparent pixel
 		}
 
-		//Deal with leftwise border pre-images
+		// Deal with leftwise border pre-images
 		for (; x < lx; x++) {
 			u_ = u_0 + x * inv.a11;
 			u = tfloor(u_);
 			v_ = v_0 + x * inv.a21;
 			v = tfloor(v_);
-			if (MINOR(u, lu) && MINOR(v, lv)) //u>=0 && u<lu && v>=0 && v<lv
+			if (MINOR(u, lu) && MINOR(v, lv)) // u>=0 && u<lu && v>=0 && v<lv
 				break;
 			in_tcm = bufin_tcm + u + v * wrapin;
 			bool u0 = MINOREQ(u, mu);
@@ -3441,60 +3393,62 @@ void do_resample(TRasterCM32P rout, const TRasterCM32P &rin, const TAffine &aff)
 						tswap(pencil_blob[j], pencil_blob[j - 1]);
 				}
 				tone = troundp(tone_tot);
-				//if (some_pencil && (TUINT32)tone == tone_mask)
+				// if (some_pencil && (TUINT32)tone == tone_mask)
 				//  tone--;
-				//if (color_blob[0].val==0 && pencil_blob[0].val==0)
+				// if (color_blob[0].val==0 && pencil_blob[0].val==0)
 				//  tone = 255;
 				*out_tcm++ = color_blob[0].val | pencil_blob[0].val | tone;
 			}
 		}
 
-		//Deal with useful source positions on the output line's pre-image
+		// Deal with useful source positions on the output line's pre-image
 		for (; x < lx; x++) {
 			u_ = u_0 + x * inv.a11;
 			u = tfloor(u_);
 			v_ = v_0 + x * inv.a21;
 			v = tfloor(v_);
-			if (!(MINOR(u, lu) && MINOR(v, lv))) //u<0 || u>=lu || v<0 || v>=lv
+			if (!(MINOR(u, lu) && MINOR(v, lv))) // u<0 || u>=lu || v<0 || v>=lv
 				break;
-			in_tcm = bufin_tcm + u + v * wrapin; //Take the associated input pixel pointer
+			in_tcm = bufin_tcm + u + v * wrapin; // Take the associated input pixel pointer
 			tcm[0] = in_tcm[0];
 			if (u < lu - 1 && v < lv - 1) {
-				//Also take their 4 next neighours (we shall perform a kinf of bilinear interpolation)
+				// Also take their 4 next neighours (we shall perform a kinf of bilinear
+				// interpolation)
 				tcm[1] = in_tcm[1];
 				tcm[2] = in_tcm[wrapin];
 				tcm[3] = in_tcm[wrapin + 1];
 			} else {
-				//Eventually, simulate the off-boundary ones
+				// Eventually, simulate the off-boundary ones
 				tcm[1] = (u == lu - 1) ? in_tcm[0] : in_tcm[1];
 				tcm[2] = (v == lv - 1) ? in_tcm[0] : in_tcm[wrapin];
 				tcm[3] = (u == lu - 1 || v == lv - 1) ? in_tcm[0] : in_tcm[wrapin + 1];
 			}
 			if (tcm[0] == tcm[1] && tcm[1] == tcm[2] && tcm[2] == tcm[3])
-				*out_tcm++ = tcm[0]; //If they are all equal, it's a copy-op
+				*out_tcm++ = tcm[0]; // If they are all equal, it's a copy-op
 			else {
-				//Otherwise, take the bilinear coordinates
+				// Otherwise, take the bilinear coordinates
 				fu = u_ - u;
 				gu = 1. - fu;
 				fv = v_ - v;
 				gv = 1. - fv;
 				w[0] = gu * gv;
-				w[2] = gu * fv; //And the associated weights
+				w[2] = gu * fv; // And the associated weights
 				w[1] = fu * gv;
 				w[3] = fu * fv;
 				color_blobs = pencil_blobs = 0;
 				tone_tot = 0.0;
 				some_pencil = false;
-				//Examine all neighbouring pixels
+				// Examine all neighbouring pixels
 				for (i = 0; i < 4; i++) {
-					tone = tcm[i] & tone_mask; //Take the tone
+					tone = tcm[i] & tone_mask; // Take the tone
 					if ((TUINT32)tone != tone_mask)
 						some_pencil = true;
-					tone_tot += tone * w[i]; //Build the weighted tone sum
+					tone_tot += tone * w[i]; // Build the weighted tone sum
 					new_color_blob.val = tcm[i] & color_mask;
-					new_color_blob.tot = tone * w[i]; //And the weighted paint tone for this pixel
-					//Fill in the different colors found in an array. Equal colors are stored as one
-					//with summed weighted total tone.
+					new_color_blob.tot = tone * w[i]; // And the weighted paint tone for this pixel
+					// Fill in the different colors found in an array. Equal colors are stored as
+					// one
+					// with summed weighted total tone.
 					for (j = 0; j < color_blobs; j++)
 						if (color_blob[j].val == new_color_blob.val)
 							break;
@@ -3502,11 +3456,11 @@ void do_resample(TRasterCM32P rout, const TRasterCM32P &rin, const TAffine &aff)
 						color_blob[j].tot += new_color_blob.tot;
 					else
 						color_blob[color_blobs++] = new_color_blob;
-					//Sort the stored colors for decreasing weighted total tone
+					// Sort the stored colors for decreasing weighted total tone
 					for (; j > 0 && color_blob[j].tot > color_blob[j - 1].tot; j--)
 						tswap(color_blob[j], color_blob[j - 1]);
 
-					//Deal the same way with ink colors.
+					// Deal the same way with ink colors.
 					new_pencil_blob.val = tcm[i] & pencil_mask;
 					new_pencil_blob.tot = (tone_mask - tone) * w[i];
 					for (j = 0; j < pencil_blobs; j++)
@@ -3521,24 +3475,24 @@ void do_resample(TRasterCM32P rout, const TRasterCM32P &rin, const TAffine &aff)
 				}
 
 				tone = tround(tone_tot);
-				//if (some_pencil && (TUINT32)tone == tone_mask)
+				// if (some_pencil && (TUINT32)tone == tone_mask)
 				//  tone--;
-				//if (color_blob[0].val==0 && pencil_blob[0].val==0)
+				// if (color_blob[0].val==0 && pencil_blob[0].val==0)
 				//  tone = 255;
 
-				//The output colors shall be the ones with maximum weighted total tone,
-				//with the overall total tone as output tone.
+				// The output colors shall be the ones with maximum weighted total tone,
+				// with the overall total tone as output tone.
 				*out_tcm++ = color_blob[0].val | pencil_blob[0].val | tone;
 			}
 		}
 
-		//Again, deal with border pixels at the end of line's pre-image
+		// Again, deal with border pixels at the end of line's pre-image
 		for (; x < lx; x++) {
 			u_ = u_0 + x * inv.a11;
 			u = tfloor(u_);
 			v_ = v_0 + x * inv.a21;
 			v = tfloor(v_);
-			if (!(MINOREQ(u + 1, lu) && MINOREQ(v + 1, lv))) //u<-1 || u>=lu || v<-1 || v>=lv
+			if (!(MINOREQ(u + 1, lu) && MINOREQ(v + 1, lv))) // u<-1 || u>=lu || v<-1 || v>=lv
 				break;
 			in_tcm = bufin_tcm + u + v * wrapin;
 			bool u0 = MINOREQ(u, mu);
@@ -3593,16 +3547,16 @@ void do_resample(TRasterCM32P rout, const TRasterCM32P &rin, const TAffine &aff)
 						tswap(pencil_blob[j], pencil_blob[j - 1]);
 				}
 				tone = troundp(tone_tot);
-				//if (some_pencil && (TUINT32)tone == tone_mask)
+				// if (some_pencil && (TUINT32)tone == tone_mask)
 				//  tone--;
-				//if (color_blob[0].val==0 && pencil_blob[0].val==0)
+				// if (color_blob[0].val==0 && pencil_blob[0].val==0)
 				//  tone = 255;
 
 				*out_tcm++ = color_blob[0].val | pencil_blob[0].val | tone;
 			}
 		}
 
-		//Finally, deal with out-of-source pixels at the end of line's pre-image
+		// Finally, deal with out-of-source pixels at the end of line's pre-image
 		for (; x < lx; x++)
 			*out_tcm++ = transp;
 	}
@@ -3616,14 +3570,10 @@ void do_resample(TRasterCM32P rout, const TRasterCM32P &rin, const TAffine &aff)
 #ifdef _WIN32
 template <class T>
 void resample_main_cm32_rgbm_SSE2(TRasterPT<T> rout, const TRasterCM32P &rin,
-								  const TAffine &aff_xy2uv,
-								  const TAffine &aff0_uv2fg,
-								  int min_pix_ref_u, int min_pix_ref_v,
-								  int max_pix_ref_u, int max_pix_ref_v,
-								  int n_pix,
-								  int *pix_ref_u, int *pix_ref_v,
-								  int *pix_ref_f, int *pix_ref_g,
-								  short *filter, TPalette *palette)
+								  const TAffine &aff_xy2uv, const TAffine &aff0_uv2fg,
+								  int min_pix_ref_u, int min_pix_ref_v, int max_pix_ref_u,
+								  int max_pix_ref_v, int n_pix, int *pix_ref_u, int *pix_ref_v,
+								  int *pix_ref_f, int *pix_ref_g, short *filter, TPalette *palette)
 {
 	__m128i zeros = _mm_setzero_si128();
 	const TPixelCM32 *buffer_in;
@@ -3680,9 +3630,8 @@ void resample_main_cm32_rgbm_SSE2(TRasterPT<T> rout, const TRasterCM32P &rin,
 	calc = 0;
 	calc_allocsize = 0;
 
-	create_calc(rin, min_pix_ref_u, max_pix_ref_u,
-				min_pix_ref_v, max_pix_ref_v,
-				calc, calc_allocsize, calc_bytewrap);
+	create_calc(rin, min_pix_ref_u, max_pix_ref_u, min_pix_ref_v, max_pix_ref_v, calc,
+				calc_allocsize, calc_bytewrap);
 
 	buffer_in = rin->pixels();
 	buffer_out = rout->pixels();
@@ -3731,8 +3680,7 @@ void resample_main_cm32_rgbm_SSE2(TRasterPT<T> rout, const TRasterCM32P &rin,
 			ref_u = intLE(out_u_);
 			ref_v = intLE(out_v_);
 
-			if (inside_nonempty &&
-				(UINT)(ref_u - inside_offset_u) < inside_limit_u &&
+			if (inside_nonempty && (UINT)(ref_u - inside_offset_u) < inside_limit_u &&
 				(UINT)(ref_v - inside_offset_v) < inside_limit_v) {
 				calc_value = calc[(ref_u >> 3) + ref_v * calc_bytewrap];
 				if (calc_value && ((calc_value >> (ref_u & 7)) & 1)) {
@@ -3765,15 +3713,14 @@ void resample_main_cm32_rgbm_SSE2(TRasterPT<T> rout, const TRasterCM32P &rin,
 							pix_value_packed = _mm_load_ps((float *)&(inks[ink]));
 						else {
 							float tt = (float)tone;
-							blendBySSE2(
-								pix_value_packed, // il valore calcolato
-								(float *)&(inks[ink]),
-								(float *)&(paints[paint]),
-								&tt, den_packed, zeros);
+							blendBySSE2(pix_value_packed, // il valore calcolato
+										(float *)&(inks[ink]), (float *)&(paints[paint]), &tt,
+										den_packed, zeros);
 						}
 
 						weight_packed = _mm_load1_ps(&weight);
-						sum_contribs_packed = _mm_add_ps(sum_contribs_packed, _mm_mul_ps(pix_value_packed, weight_packed));
+						sum_contribs_packed = _mm_add_ps(
+							sum_contribs_packed, _mm_mul_ps(pix_value_packed, weight_packed));
 
 						sum_weights += weight;
 					}
@@ -3781,7 +3728,8 @@ void resample_main_cm32_rgbm_SSE2(TRasterPT<T> rout, const TRasterCM32P &rin,
 					inv_sum_weights = 1.0f / sum_weights;
 					__m128 inv_sum_weights_packed = _mm_load1_ps(&inv_sum_weights);
 
-					__m128 out_fval_packed = _mm_mul_ps(sum_contribs_packed, inv_sum_weights_packed);
+					__m128 out_fval_packed =
+						_mm_mul_ps(sum_contribs_packed, inv_sum_weights_packed);
 					out_fval_packed = _mm_max_ps(out_fval_packed, zeros2);
 					out_fval_packed = _mm_min_ps(out_fval_packed, maxChanneValue_packed);
 
@@ -3801,7 +3749,8 @@ void resample_main_cm32_rgbm_SSE2(TRasterPT<T> rout, const TRasterCM32P &rin,
 					else if (tone == 0)
 						*pix_out = inks2[ink];
 					else
-						*pix_out = blend(inks2[ink], paints2[paint], tone, TPixelCM32::getMaxTone());
+						*pix_out =
+							blend(inks2[ink], paints2[paint], tone, TPixelCM32::getMaxTone());
 				}
 			} else if (outside_min_u_ <= out_u_ && out_u_ <= outside_max_u_ &&
 					   outside_min_v_ <= out_v_ && out_v_ <= outside_max_v_) {
@@ -3845,14 +3794,14 @@ void resample_main_cm32_rgbm_SSE2(TRasterPT<T> rout, const TRasterCM32P &rin,
 							pix_value_packed = _mm_load_ps((float *)&(inks[ink]));
 						else {
 							float tt = (float)tone;
-							blendBySSE2(
-								pix_value_packed, // il valore calcolato
-								(float *)&(inks[ink]), (float *)&(paints[paint]),
-								&tt, den_packed, zeros);
+							blendBySSE2(pix_value_packed, // il valore calcolato
+										(float *)&(inks[ink]), (float *)&(paints[paint]), &tt,
+										den_packed, zeros);
 						}
 
 						weight_packed = _mm_load1_ps(&weight);
-						sum_contribs_packed = _mm_add_ps(sum_contribs_packed, _mm_mul_ps(pix_value_packed, weight_packed));
+						sum_contribs_packed = _mm_add_ps(
+							sum_contribs_packed, _mm_mul_ps(pix_value_packed, weight_packed));
 
 						sum_weights += weight;
 					}
@@ -3860,7 +3809,8 @@ void resample_main_cm32_rgbm_SSE2(TRasterPT<T> rout, const TRasterCM32P &rin,
 					inv_sum_weights = 1.0f / sum_weights;
 
 					__m128 inv_sum_weights_packed = _mm_load1_ps(&inv_sum_weights);
-					__m128 out_fval_packed = _mm_mul_ps(sum_contribs_packed, inv_sum_weights_packed);
+					__m128 out_fval_packed =
+						_mm_mul_ps(sum_contribs_packed, inv_sum_weights_packed);
 					out_fval_packed = _mm_max_ps(out_fval_packed, zeros2);
 					out_fval_packed = _mm_min_ps(out_fval_packed, maxChanneValue_packed);
 
@@ -3880,7 +3830,8 @@ void resample_main_cm32_rgbm_SSE2(TRasterPT<T> rout, const TRasterCM32P &rin,
 					else if (tone == 0)
 						*pix_out = inks2[ink];
 					else
-						*pix_out = blend(inks2[ink], paints2[paint], tone, TPixelCM32::getMaxTone());
+						*pix_out =
+							blend(inks2[ink], paints2[paint], tone, TPixelCM32::getMaxTone());
 				}
 			} else {
 				*pix_out = default_value;
@@ -3900,14 +3851,10 @@ namespace
 
 template <class T>
 void resample_main_cm32_rgbm_bigradius(TRasterPT<T> rout, const TRasterCM32P &rin,
-									   const TAffine &aff_xy2uv,
-									   const TAffine &aff0_uv2fg,
-									   int min_pix_ref_u, int min_pix_ref_v,
-									   int max_pix_ref_u, int max_pix_ref_v,
-									   int n_pix,
-									   int *pix_ref_u, int *pix_ref_v,
-									   int *pix_ref_f, int *pix_ref_g,
-									   short *filter,
+									   const TAffine &aff_xy2uv, const TAffine &aff0_uv2fg,
+									   int min_pix_ref_u, int min_pix_ref_v, int max_pix_ref_u,
+									   int max_pix_ref_v, int n_pix, int *pix_ref_u, int *pix_ref_v,
+									   int *pix_ref_f, int *pix_ref_g, short *filter,
 									   TPalette *palette)
 {
 	// bigradius: cambia solo che i sum_contribs sono double invece che int
@@ -3965,9 +3912,8 @@ void resample_main_cm32_rgbm_bigradius(TRasterPT<T> rout, const TRasterCM32P &ri
 
 	calc = 0;
 	calc_allocsize = 0;
-	create_calc(rin, min_pix_ref_u, max_pix_ref_u,
-				min_pix_ref_v, max_pix_ref_v,
-				calc, calc_allocsize, calc_bytewrap);
+	create_calc(rin, min_pix_ref_u, max_pix_ref_u, min_pix_ref_v, max_pix_ref_v, calc,
+				calc_allocsize, calc_bytewrap);
 
 	buffer_in = rin->pixels();
 	buffer_out = rout->pixels();
@@ -4007,8 +3953,7 @@ void resample_main_cm32_rgbm_bigradius(TRasterPT<T> rout, const TRasterCM32P &ri
 			ref_u = intLE(out_u_);
 			ref_v = intLE(out_v_);
 
-			if (inside_nonempty &&
-				(UINT)(ref_u - inside_offset_u) < inside_limit_u &&
+			if (inside_nonempty && (UINT)(ref_u - inside_offset_u) < inside_limit_u &&
 				(UINT)(ref_v - inside_offset_v) < inside_limit_v) {
 				calc_value = calc[(ref_u >> 3) + ref_v * calc_bytewrap];
 				if (calc_value && ((calc_value >> (ref_u & 7)) & 1)) {
@@ -4085,7 +4030,8 @@ void resample_main_cm32_rgbm_bigradius(TRasterPT<T> rout, const TRasterCM32P &ri
 					else if (tone == 0)
 						*pix_out = Converter<T>::convert(inks[ink]);
 					else
-						*pix_out = Converter<T>::convert(blend(inks[ink], paints[paint], tone, TPixelCM32::getMaxTone()));
+						*pix_out = Converter<T>::convert(
+							blend(inks[ink], paints[paint], tone, TPixelCM32::getMaxTone()));
 				}
 			} else if (outside_min_u_ <= out_u_ && out_u_ <= outside_max_u_ &&
 					   outside_min_v_ <= out_v_ && out_v_ <= outside_max_v_) {
@@ -4189,15 +4135,10 @@ void resample_main_cm32_rgbm_bigradius(TRasterPT<T> rout, const TRasterCM32P &ri
 /*---------------------------------------------------------------------------*/
 
 template <class T>
-void resample_main_cm32_rgbm(TRasterPT<T> rout, const TRasterCM32P &rin,
-							 const TAffine &aff_xy2uv,
-							 const TAffine &aff0_uv2fg,
-							 int min_pix_ref_u, int min_pix_ref_v,
-							 int max_pix_ref_u, int max_pix_ref_v,
-							 int n_pix,
-							 int *pix_ref_u, int *pix_ref_v,
-							 int *pix_ref_f, int *pix_ref_g,
-							 short *filter,
+void resample_main_cm32_rgbm(TRasterPT<T> rout, const TRasterCM32P &rin, const TAffine &aff_xy2uv,
+							 const TAffine &aff0_uv2fg, int min_pix_ref_u, int min_pix_ref_v,
+							 int max_pix_ref_u, int max_pix_ref_v, int n_pix, int *pix_ref_u,
+							 int *pix_ref_v, int *pix_ref_f, int *pix_ref_g, short *filter,
 							 TPalette *palette)
 {
 	const TPixelCM32 *buffer_in;
@@ -4239,15 +4180,9 @@ void resample_main_cm32_rgbm(TRasterPT<T> rout, const TRasterCM32P &rin,
 #endif
 
 	if (n_pix >= 512 || T::maxChannelValue > 255) {
-		resample_main_cm32_rgbm_bigradius<T>(rout, rin,
-											 aff_xy2uv,
-											 aff0_uv2fg,
-											 min_pix_ref_u, min_pix_ref_v,
-											 max_pix_ref_u, max_pix_ref_v,
-											 n_pix,
-											 pix_ref_u, pix_ref_v,
-											 pix_ref_f, pix_ref_g,
-											 filter, palette);
+		resample_main_cm32_rgbm_bigradius<T>(
+			rout, rin, aff_xy2uv, aff0_uv2fg, min_pix_ref_u, min_pix_ref_v, max_pix_ref_u,
+			max_pix_ref_v, n_pix, pix_ref_u, pix_ref_v, pix_ref_f, pix_ref_g, filter, palette);
 		return;
 	}
 
@@ -4260,9 +4195,8 @@ void resample_main_cm32_rgbm(TRasterPT<T> rout, const TRasterCM32P &rin,
 	}
 	calc = 0;
 	calc_allocsize = 0;
-	create_calc(rin, min_pix_ref_u, max_pix_ref_u,
-				min_pix_ref_v, max_pix_ref_v,
-				calc, calc_allocsize, calc_bytewrap);
+	create_calc(rin, min_pix_ref_u, max_pix_ref_u, min_pix_ref_v, max_pix_ref_v, calc,
+				calc_allocsize, calc_bytewrap);
 
 	buffer_in = rin->pixels();
 	buffer_out = rout->pixels();
@@ -4300,8 +4234,7 @@ void resample_main_cm32_rgbm(TRasterPT<T> rout, const TRasterCM32P &rin,
 			ref_u = intLE(out_u_);
 			ref_v = intLE(out_v_);
 
-			if (inside_nonempty &&
-				(UINT)(ref_u - inside_offset_u) < inside_limit_u &&
+			if (inside_nonempty && (UINT)(ref_u - inside_offset_u) < inside_limit_u &&
 				(UINT)(ref_v - inside_offset_v) < inside_limit_v) {
 				calc_value = calc[(ref_u >> 3) + ref_v * calc_bytewrap];
 				if (calc_value && ((calc_value >> (ref_u & 7)) & 1)) {
@@ -4487,15 +4420,11 @@ void resample_main_cm32_rgbm(TRasterPT<T> rout, const TRasterCM32P &rin,
 
 //---------------------------------------------------------------------------
 
-void resample_cm32_rgbm(TRaster32P rout, const TRasterCM32P &rin,
-						const TAffine &aff_xy2uv,
-						const TAffine &aff0_uv2fg,
-						int min_pix_ref_u, int min_pix_ref_v,
-						int max_pix_ref_u, int max_pix_ref_v,
-						int n_pix,
-						int *pix_ref_u, int *pix_ref_v,
-						int *pix_ref_f, int *pix_ref_g,
-						short *filter, TPalette *palette)
+void resample_cm32_rgbm(TRaster32P rout, const TRasterCM32P &rin, const TAffine &aff_xy2uv,
+						const TAffine &aff0_uv2fg, int min_pix_ref_u, int min_pix_ref_v,
+						int max_pix_ref_u, int max_pix_ref_v, int n_pix, int *pix_ref_u,
+						int *pix_ref_v, int *pix_ref_f, int *pix_ref_g, short *filter,
+						TPalette *palette)
 {
 	const TPixelCM32 *buffer_in;
 	/*T*/ TPixel32 *buffer_out;
@@ -4538,16 +4467,16 @@ void resample_cm32_rgbm(TRaster32P rout, const TRasterCM32P &rin,
 	if (n_pix >= 512 || /*T*/ TPixel32::maxChannelValue > 255) {
 		assert(false);
 		/*
-    resample_main_rgbm_bigradius<T>( rout, rin,
-				                          aff_xy2uv,
-		                           		aff0_uv2fg,
-				                          min_pix_ref_u, min_pix_ref_v,
-				                          max_pix_ref_u, max_pix_ref_v,
-				                          n_pix,
-				                          pix_ref_u, pix_ref_v,
-				                          pix_ref_f, pix_ref_g,
-			                           	filter );
-    */
+	resample_main_rgbm_bigradius<T>( rout, rin,
+										  aff_xy2uv,
+										aff0_uv2fg,
+										  min_pix_ref_u, min_pix_ref_v,
+										  max_pix_ref_u, max_pix_ref_v,
+										  n_pix,
+										  pix_ref_u, pix_ref_v,
+										  pix_ref_f, pix_ref_g,
+										filter );
+	*/
 		return;
 	}
 
@@ -4569,9 +4498,8 @@ void resample_cm32_rgbm(TRaster32P rout, const TRasterCM32P &rin,
 
 	calc = 0;
 	calc_allocsize = 0;
-	create_calc(rin, min_pix_ref_u, max_pix_ref_u,
-				min_pix_ref_v, max_pix_ref_v,
-				calc, calc_allocsize, calc_bytewrap);
+	create_calc(rin, min_pix_ref_u, max_pix_ref_u, min_pix_ref_v, max_pix_ref_v, calc,
+				calc_allocsize, calc_bytewrap);
 
 	buffer_in = rin->pixels();
 	buffer_out = rout->pixels();
@@ -4601,8 +4529,7 @@ void resample_cm32_rgbm(TRaster32P rout, const TRasterCM32P &rin,
 			ref_u = intLE(out_u_);
 			ref_v = intLE(out_v_);
 
-			if (inside_nonempty &&
-				(UINT)(ref_u - inside_offset_u) < inside_limit_u &&
+			if (inside_nonempty && (UINT)(ref_u - inside_offset_u) < inside_limit_u &&
 				(UINT)(ref_v - inside_offset_v) < inside_limit_v) {
 				calc_value = calc[(ref_u >> 3) + ref_v * calc_bytewrap];
 				if (calc_value && ((calc_value >> (ref_u & 7)) & 1)) {
@@ -4624,7 +4551,7 @@ void resample_cm32_rgbm(TRaster32P rout, const TRasterCM32P &rin,
 						pix_u = pix_ref_u[i] + ref_u;
 						pix_v = pix_ref_v[i] + ref_v;
 
-						//pix_value = buffer_in[pix_u + pix_v * wrap_in];
+						// pix_value = buffer_in[pix_u + pix_v * wrap_in];
 
 						int pix_in_pos = pix_u + pix_v * wrap_in;
 						int t = buffer_in[pix_in_pos].getTone();
@@ -4714,7 +4641,7 @@ void resample_cm32_rgbm(TRaster32P rout, const TRasterCM32P &rin,
 						notMoreThan(mu, pix_u);
 						notMoreThan(mv, pix_v);
 
-						//pix_value = buffer_in[pix_u + pix_v * wrap_in];
+						// pix_value = buffer_in[pix_u + pix_v * wrap_in];
 
 						int pix_in_pos = pix_u + pix_v * wrap_in;
 						int t = buffer_in[pix_in_pos].getTone();
@@ -4786,8 +4713,8 @@ void resample_cm32_rgbm(TRaster32P rout, const TRasterCM32P &rin,
 //---------------------------------------------------------------------------
 
 template <class T>
-void rop_resample_rgbm_2(TRasterPT<T> rout, const TRasterCM32P &rin,
-						 const TAffine &aff, TRop::ResampleFilterType flt_type, double blur, TPalette *palette)
+void rop_resample_rgbm_2(TRasterPT<T> rout, const TRasterCM32P &rin, const TAffine &aff,
+						 TRop::ResampleFilterType flt_type, double blur, TPalette *palette)
 {
 #define FILTER_RESOLUTION 1024
 #define MAX_FILTER_VAL 32767
@@ -4868,10 +4795,10 @@ void rop_resample_rgbm_2(TRasterPT<T> rout, const TRasterCM32P &rin,
 
 	scale_x = sqrt(sq(aff_uv2xy.a11) + sq(aff_uv2xy.a12));
 	scale_y = sqrt(sq(aff_uv2xy.a21) + sq(aff_uv2xy.a22));
-	aff0_xy2st = TScale((scale_x > 1.0) ? 1.0 / scale_x : 1.0,
-						(scale_y > 1.0) ? 1.0 / scale_y : 1.0);
+	aff0_xy2st =
+		TScale((scale_x > 1.0) ? 1.0 / scale_x : 1.0, (scale_y > 1.0) ? 1.0 / scale_y : 1.0);
 
-	if (blur > 1.0) //per ora il blur e' 1.0
+	if (blur > 1.0) // per ora il blur e' 1.0
 	{
 		inv_blur = 1.0 / blur;
 		aff0_xy2st = TScale(inv_blur, inv_blur) * aff0_xy2st;
@@ -4882,11 +4809,8 @@ void rop_resample_rgbm_2(TRasterPT<T> rout, const TRasterCM32P &rin,
 	aff0_uv2fg = aff0_st2fg * aff0_uv2st;
 	aff0_fg2uv = aff0_uv2fg.inv();
 
-	minmax(-filter_fg_radius, -filter_fg_radius,
-		   filter_fg_radius, filter_fg_radius,
-		   aff0_fg2uv,
-		   min_pix_out_u_, min_pix_out_v_,
-		   max_pix_out_u_, max_pix_out_v_);
+	minmax(-filter_fg_radius, -filter_fg_radius, filter_fg_radius, filter_fg_radius, aff0_fg2uv,
+		   min_pix_out_u_, min_pix_out_v_, max_pix_out_u_, max_pix_out_v_);
 
 	min_pix_ref_u = intGT(min_pix_out_u_);
 	min_pix_ref_v = intGT(min_pix_out_v_);
@@ -4915,8 +4839,7 @@ void rop_resample_rgbm_2(TRasterPT<T> rout, const TRasterCM32P &rin,
 		}
 	}
 
-	max_n_pix = (max_pix_ref_u - min_pix_ref_u + 1) *
-				(max_pix_ref_v - min_pix_ref_v + 1);
+	max_n_pix = (max_pix_ref_u - min_pix_ref_u + 1) * (max_pix_ref_v - min_pix_ref_v + 1);
 
 	if (max_n_pix > current_max_n_pix) {
 		current_max_n_pix = max_n_pix;
@@ -4927,10 +4850,8 @@ void rop_resample_rgbm_2(TRasterPT<T> rout, const TRasterCM32P &rin,
 		assert(pix_ref_u && pix_ref_v && pix_ref_f && pix_ref_g);
 	}
 
-	minmax(-1, -1, 0, 0,
-		   aff0_uv2fg,
-		   min_ref_out_f_, min_ref_out_g_,
-		   max_ref_out_f_, max_ref_out_g_);
+	minmax(-1, -1, 0, 0, aff0_uv2fg, min_ref_out_f_, min_ref_out_g_, max_ref_out_f_,
+		   max_ref_out_g_);
 
 	min_ref_out_f = tround(min_ref_out_f_);
 	min_ref_out_g = tround(min_ref_out_g_);
@@ -4946,12 +4867,8 @@ void rop_resample_rgbm_2(TRasterPT<T> rout, const TRasterCM32P &rin,
 	max_pix_out_f = c_minint;
 	max_pix_out_g = c_minint;
 	n_pix = 0;
-	for (cur_pix_ref_v = min_pix_ref_v;
-		 cur_pix_ref_v <= max_pix_ref_v;
-		 cur_pix_ref_v++)
-		for (cur_pix_ref_u = min_pix_ref_u;
-			 cur_pix_ref_u <= max_pix_ref_u;
-			 cur_pix_ref_u++) {
+	for (cur_pix_ref_v = min_pix_ref_v; cur_pix_ref_v <= max_pix_ref_v; cur_pix_ref_v++)
+		for (cur_pix_ref_u = min_pix_ref_u; cur_pix_ref_u <= max_pix_ref_u; cur_pix_ref_u++) {
 			cur_pix_ref_f_ = affMV1(aff0_uv2fg, cur_pix_ref_u, cur_pix_ref_v);
 			cur_pix_ref_g_ = affMV2(aff0_uv2fg, cur_pix_ref_u, cur_pix_ref_v);
 			cur_pix_ref_f = tround(cur_pix_ref_f_);
@@ -4985,8 +4902,7 @@ void rop_resample_rgbm_2(TRasterPT<T> rout, const TRasterCM32P &rin,
 		}
 		filter = filter_array.get() - min_filter_fg;
 		filter[0] = MAX_FILTER_VAL;
-		for (f = 1, s_ = 1.0 / FILTER_RESOLUTION;
-			 f < filter_fg_radius;
+		for (f = 1, s_ = 1.0 / FILTER_RESOLUTION; f < filter_fg_radius;
 			 f++, s_ += 1.0 / FILTER_RESOLUTION) {
 			weight_ = get_filter_value(flt_type, s_) * (double)MAX_FILTER_VAL;
 			weight = tround(weight_);
@@ -5007,8 +4923,8 @@ void rop_resample_rgbm_2(TRasterPT<T> rout, const TRasterCM32P &rin,
 	if (min_pix_out_fg < min_filter_fg || max_pix_out_fg > max_filter_fg) {
 		filter_size = max_pix_out_fg - min_pix_out_fg + 1;
 		if (filter_size > filter_array_size) {
-			//controllare!!
-			//TREALLOC (filter_array, filter_size)
+			// controllare!!
+			// TREALLOC (filter_array, filter_size)
 			filter_array.reset(new short[filter_size]);
 
 			assert(filter_array);
@@ -5035,22 +4951,16 @@ void rop_resample_rgbm_2(TRasterPT<T> rout, const TRasterCM32P &rin,
 #ifdef _WIN32
 	TRaster32P rout32 = rout;
 	if ((TSystem::getCPUExtensions() & TSystem::CpuSupportsSse2) && rout32)
-		resample_main_cm32_rgbm_SSE2<TPixel32>(rout32, rin, aff_xy2uv, aff0_uv2fg,
-											   min_pix_ref_u, min_pix_ref_v,
-											   max_pix_ref_u, max_pix_ref_v,
-											   n_pix,
-											   pix_ref_u.get(), pix_ref_v.get(),
-											   pix_ref_f.get(), pix_ref_g.get(),
-											   filter, palette);
+		resample_main_cm32_rgbm_SSE2<TPixel32>(rout32, rin, aff_xy2uv, aff0_uv2fg, min_pix_ref_u,
+											   min_pix_ref_v, max_pix_ref_u, max_pix_ref_v, n_pix,
+											   pix_ref_u.get(), pix_ref_v.get(), pix_ref_f.get(),
+											   pix_ref_g.get(), filter, palette);
 	else
 #endif
-		resample_main_cm32_rgbm<T>(rout, rin, aff_xy2uv, aff0_uv2fg,
-								   min_pix_ref_u, min_pix_ref_v,
-								   max_pix_ref_u, max_pix_ref_v,
-								   n_pix,
-								   pix_ref_u.get(), pix_ref_v.get(),
-								   pix_ref_f.get(), pix_ref_g.get(),
-								   filter, palette);
+		resample_main_cm32_rgbm<T>(rout, rin, aff_xy2uv, aff0_uv2fg, min_pix_ref_u, min_pix_ref_v,
+								   max_pix_ref_u, max_pix_ref_v, n_pix, pix_ref_u.get(),
+								   pix_ref_v.get(), pix_ref_f.get(), pix_ref_g.get(), filter,
+								   palette);
 
 	/////////////////////////////////////////////////////////
 	// INIZIO GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
@@ -5062,7 +4972,7 @@ switch (RASRAS (rin->type, rout->type))
   case RASRAS (RAS_RGB_, RAS_RGB_):
   __OR RASRAS (RAS_RGBM, RAS_RGB_):
   __OR RASRAS (RAS_RGBM, RAS_RGBM):
-    resample_main_rgbm (rin, rout,
+	resample_main_rgbm (rin, rout,
 			aff_xy2uv,
 			aff0_uv2fg,
 			min_pix_ref_u, min_pix_ref_v,
@@ -5073,18 +4983,18 @@ switch (RASRAS (rin->type, rout->type))
 			filter);
 
   CASE RASRAS (RAS_RGBM, RAS_RGBM64):
-    resample_main_rgbm_rgbm64 (rin, rout,
-			       aff_xy2uv,
-			       aff0_uv2fg,
-			       min_pix_ref_u, min_pix_ref_v,
-			       max_pix_ref_u, max_pix_ref_v,
-			       n_pix,
-			       pix_ref_u, pix_ref_v,
-			       pix_ref_f, pix_ref_g,
-			       filter);
+	resample_main_rgbm_rgbm64 (rin, rout,
+				   aff_xy2uv,
+				   aff0_uv2fg,
+				   min_pix_ref_u, min_pix_ref_v,
+				   max_pix_ref_u, max_pix_ref_v,
+				   n_pix,
+				   pix_ref_u, pix_ref_v,
+				   pix_ref_f, pix_ref_g,
+				   filter);
 
   CASE RASRAS (RAS_RGBM64, RAS_RGBM64):
-    resample_main_rgbm64 (rin, rout,
+	resample_main_rgbm64 (rin, rout,
 			  aff_xy2uv,
 			  aff0_uv2fg,
 			  min_pix_ref_u, min_pix_ref_v,
@@ -5095,51 +5005,51 @@ switch (RASRAS (rin->type, rout->type))
 			  filter);
 
   CASE RASRAS (RAS_CM16, RAS_RGBM):
-    resample_main_cm16_rgbm (rin, rout,
-			     aff_xy2uv,
-			     aff0_uv2fg,
-			     min_pix_ref_u, min_pix_ref_v,
-			     max_pix_ref_u, max_pix_ref_v,
-			     n_pix,
-			     pix_ref_u, pix_ref_v,
-			     pix_ref_f, pix_ref_g,
-			     filter);
+	resample_main_cm16_rgbm (rin, rout,
+				 aff_xy2uv,
+				 aff0_uv2fg,
+				 min_pix_ref_u, min_pix_ref_v,
+				 max_pix_ref_u, max_pix_ref_v,
+				 n_pix,
+				 pix_ref_u, pix_ref_v,
+				 pix_ref_f, pix_ref_g,
+				 filter);
 
   CASE RASRAS (RAS_CM24, RAS_RGBM):
-    resample_main_cm24_rgbm (rin, rout,
-			     aff_xy2uv,
-			     aff0_uv2fg,
-			     min_pix_ref_u, min_pix_ref_v,
-			     max_pix_ref_u, max_pix_ref_v,
-			     n_pix,
-			     pix_ref_u, pix_ref_v,
-			     pix_ref_f, pix_ref_g,
-			     filter);
+	resample_main_cm24_rgbm (rin, rout,
+				 aff_xy2uv,
+				 aff0_uv2fg,
+				 min_pix_ref_u, min_pix_ref_v,
+				 max_pix_ref_u, max_pix_ref_v,
+				 n_pix,
+				 pix_ref_u, pix_ref_v,
+				 pix_ref_f, pix_ref_g,
+				 filter);
 
   CASE RASRAS (RAS_CM16, RAS_RGBM64):
-    resample_main_cm16_rgbm64 (rin, rout,
-			       aff_xy2uv,
-			       aff0_uv2fg,
-			       min_pix_ref_u, min_pix_ref_v,
-			       max_pix_ref_u, max_pix_ref_v,
-			       n_pix,
-			       pix_ref_u, pix_ref_v,
-			       pix_ref_f, pix_ref_g,
-			       filter);
+	resample_main_cm16_rgbm64 (rin, rout,
+				   aff_xy2uv,
+				   aff0_uv2fg,
+				   min_pix_ref_u, min_pix_ref_v,
+				   max_pix_ref_u, max_pix_ref_v,
+				   n_pix,
+				   pix_ref_u, pix_ref_v,
+				   pix_ref_f, pix_ref_g,
+				   filter);
 
   CASE RASRAS (RAS_CM24, RAS_RGBM64):
-    resample_main_cm24_rgbm64 (rin, rout,
-			       aff_xy2uv,
-			       aff0_uv2fg,
-			       min_pix_ref_u, min_pix_ref_v,
-			       max_pix_ref_u, max_pix_ref_v,
-			       n_pix,
-			       pix_ref_u, pix_ref_v,
-			       pix_ref_f, pix_ref_g,
-			       filter);
+	resample_main_cm24_rgbm64 (rin, rout,
+				   aff_xy2uv,
+				   aff0_uv2fg,
+				   min_pix_ref_u, min_pix_ref_v,
+				   max_pix_ref_u, max_pix_ref_v,
+				   n_pix,
+				   pix_ref_u, pix_ref_v,
+				   pix_ref_f, pix_ref_g,
+				   filter);
 
   DEFAULT:
-    assert ( !"bad raster type combination");
+	assert ( !"bad raster type combination");
   }
 */
 	/////////////////////////////////////////////////////////
@@ -5149,15 +5059,11 @@ switch (RASRAS (rin->type, rout->type))
 
 //-----------------------------------------------------------------------------
 
-} //namespace
+} // namespace
 
 //-----------------------------------------------------------------------------
-void TRop::resample(const TRasterP &out,
-					const TRasterCM32P &in,
-					const TPaletteP palette,
-					const TAffine &aff,
-					TRop::ResampleFilterType filterType,
-					double blur)
+void TRop::resample(const TRasterP &out, const TRasterCM32P &in, const TPaletteP palette,
+					const TAffine &aff, TRop::ResampleFilterType filterType, double blur)
 {
 	TRasterP rin = in;
 	TRaster32P rout32 = out;
@@ -5180,16 +5086,15 @@ void TRop::resample(const TRasterP &out,
 	out->unlock();
 }
 
-#endif //TNZCORE_LIGHT
+#endif // TNZCORE_LIGHT
 
-void TRop::resample(const TRasterP &rout, const TRasterP &rin,
-					const TAffine &aff, ResampleFilterType filterType, double blur)
+void TRop::resample(const TRasterP &rout, const TRasterP &rin, const TAffine &aff,
+					ResampleFilterType filterType, double blur)
 {
 	rin->lock();
 	rout->lock();
 
-	if (filterType == ClosestPixel ||
-		filterType == Bilinear) {
+	if (filterType == ClosestPixel || filterType == Bilinear) {
 		if ((TRaster64P)rout || (TRaster64P)rin)
 			filterType = Triangle;
 		else {

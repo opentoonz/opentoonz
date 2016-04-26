@@ -31,12 +31,10 @@ struct s_segm {
 typedef struct big {
 	UINT lo, hi;
 } BIG;
-#define ADD_BIG(B, X) ((B).lo += (UINT)(X), \
-					   (B).hi += (B).lo >> 30, (B).lo &= 0x3fffffff, (B))
-#define ASS_BIG(B, X) ((B).lo = (UINT)(X), \
-					   (B).hi = (B).lo >> 30, (B).lo &= 0x3fffffff, (B))
-#define ADD_BIG_BIG(B1, B2) ((B1).lo += (B2).lo, (B1).hi += (B2).hi, \
-							 (B1).hi += (B1).lo >> 30, (B1).lo &= 0x3fffffff, (B1))
+#define ADD_BIG(B, X) ((B).lo += (UINT)(X), (B).hi += (B).lo >> 30, (B).lo &= 0x3fffffff, (B))
+#define ASS_BIG(B, X) ((B).lo = (UINT)(X), (B).hi = (B).lo >> 30, (B).lo &= 0x3fffffff, (B))
+#define ADD_BIG_BIG(B1, B2)                                                                        \
+	((B1).lo += (B2).lo, (B1).hi += (B2).hi, (B1).hi += (B1).lo >> 30, (B1).lo &= 0x3fffffff, (B1))
 #define BIG_TO_DOUBLE(B) ((double)(B).hi * (double)0x40000000 + (double)(B).lo)
 
 #define BORDER_TOO 1
@@ -51,12 +49,8 @@ struct vicine {
 };
 
 struct s_fabri_region {
-	int active,
-		nextfree,
-		x, y, x1, y1, x2, y2, lx, ly,
-		xm, ym, npix, lxa, lxb,
-		tone, color_id,
-		per, holes, match;
+	int active, nextfree, x, y, x1, y1, x2, y2, lx, ly, xm, ym, npix, lxa, lxb, tone, color_id, per,
+		holes, match;
 	BIG bx, by;
 	BIG bx2, by2;
 	struct vicine *vicini;
@@ -67,9 +61,7 @@ struct s_fabri_region_list {
 	int size, n, lx, ly;
 };
 
-static struct s_fabri_region_list
-	F_reference = {0, 0, 0},
-	F_work = {0, 0, 0};
+static struct s_fabri_region_list F_reference = {0, 0, 0}, F_work = {0, 0, 0};
 
 static int F_ref_bx = 0;
 static int F_ref_by = 0;
@@ -84,8 +76,8 @@ static int Dx_t = 0, DP_t = 0, Df_t = 0;
 static int trova_migliore_padre(int prob_vector[], int *att_best);
 static int match(int prob[], int padre, int *fro, int *to);
 
-static void scan_fabri_regions(TRasterCM32P ras, struct s_fabri_region_list *rlst, int mode,
-							   int x1, int y1, int x2, int y2);
+static void scan_fabri_regions(TRasterCM32P ras, struct s_fabri_region_list *rlst, int mode, int x1,
+							   int y1, int x2, int y2);
 static void rinomina(int r1, int r2, int r_num, struct s_fabri_region_list *rl);
 static void aggiungi(int r1, int r2, struct s_fabri_region_list *rlst);
 static void rimuovi_tutti(int r1, struct s_fabri_region_list *rlst);
@@ -130,7 +122,8 @@ void rect_autofill_learn(const TToonzImageP &imgToLearn, int x1, int y1, int x2,
 
 	for (i = 0; i < F_reference.n; i++) {
 		F_reference.array[i].match = -1;
-		F_reference.array[i].color_id = ras->pixels(F_reference.array[i].y)[F_reference.array[i].x].getPaint();
+		F_reference.array[i].color_id =
+			ras->pixels(F_reference.array[i].y)[F_reference.array[i].x].getPaint();
 		pbx += BIG_TO_DOUBLE(F_reference.array[i].bx);
 		pby += BIG_TO_DOUBLE(F_reference.array[i].by);
 		abx = BIG_TO_DOUBLE(F_reference.array[i].bx);
@@ -148,7 +141,8 @@ void rect_autofill_learn(const TToonzImageP &imgToLearn, int x1, int y1, int x2,
 }
 
 /*----------------------------------------------------------------------------*/
-bool rect_autofill_apply(const TToonzImageP &imgToApply, int x1, int y1, int x2, int y2, bool selective, TTileSetCM32 *tileSet)
+bool rect_autofill_apply(const TToonzImageP &imgToApply, int x1, int y1, int x2, int y2,
+						 bool selective, TTileSetCM32 *tileSet)
 /*----------------------------------------------------------------------------*/
 {
 	double pbx, pby;
@@ -160,7 +154,7 @@ bool rect_autofill_apply(const TToonzImageP &imgToApply, int x1, int y1, int x2,
 	int col;
 	int valore;
 	int padre;
-	//int temp_prob, att_match;
+	// int temp_prob, att_match;
 	TRasterCM32P ras = imgToApply->getRaster();
 
 	if ((x2 - x1) * (y2 - y1) < MIN_SIZE)
@@ -191,8 +185,8 @@ bool rect_autofill_apply(const TToonzImageP &imgToApply, int x1, int y1, int x2,
 	if (F_work.n <= 0 || F_work.array == 0)
 		return false;
 
-	if (abs(F_work.lx * F_work.ly - F_reference.lx * F_reference.ly) > 0.1 *
-																		   (F_work.lx * F_work.ly + F_reference.lx * F_reference.ly))
+	if (abs(F_work.lx * F_work.ly - F_reference.lx * F_reference.ly) >
+		0.1 * (F_work.lx * F_work.ly + F_reference.lx * F_reference.ly))
 		return false;
 
 	for (i = 0; i < F_work.n; i++) {
@@ -223,24 +217,27 @@ bool rect_autofill_apply(const TToonzImageP &imgToApply, int x1, int y1, int x2,
 
 #ifdef SELECTIVE
 	if (selective) {
-		//Accoppia non trasparenti
+		// Accoppia non trasparenti
 
 		for (i = 0; i < F_work.n; i++)
 			if (F_work.array[i].color_id != 0) {
 				temp_prob = 0;
 				att_match = F_reference.n;
 				/* Se non verra' aggiornato in seguito non verra' *
-        * comunque piu' cambiato di colore               */
+		* comunque piu' cambiato di colore               */
 				for (j = 0; j < F_reference.n; j++)
 					if ((F_reference.array[i].match < 0) &&
 						((prob_vector[i * F_reference.n + j] / 1000.0) *
 							 (prob_vector[i * F_reference.n + j] / 1000.0) *
-							 (prob_vector[2 * (F_work.n * F_reference.n) + i * F_reference.n + j] / 1500.0) >
+							 (prob_vector[2 * (F_work.n * F_reference.n) + i * F_reference.n + j] /
+							  1500.0) >
 						 temp_prob)) {
 						att_match = j;
-						temp_prob = (prob_vector[i * F_reference.n + j] / 1000.0) *
-									(prob_vector[i * F_reference.n + j] / 1000.0) *
-									(prob_vector[2 * (F_work.n * F_reference.n) + i * F_reference.n + j] / 1500.0);
+						temp_prob =
+							(prob_vector[i * F_reference.n + j] / 1000.0) *
+							(prob_vector[i * F_reference.n + j] / 1000.0) *
+							(prob_vector[2 * (F_work.n * F_reference.n) + i * F_reference.n + j] /
+							 1500.0);
 					}
 				F_work.array[i].match = att_match;
 				if (att_match < F_reference.n)
@@ -325,7 +322,8 @@ void autofill_learn(const TToonzImageP &imgToLearn)
 
 	for (i = 0; i < F_reference.n; i++) {
 		F_reference.array[i].match = -1;
-		F_reference.array[i].color_id = ras->pixels(F_reference.array[i].y)[F_reference.array[i].y].getPaint();
+		F_reference.array[i].color_id =
+			ras->pixels(F_reference.array[i].y)[F_reference.array[i].y].getPaint();
 		pbx += BIG_TO_DOUBLE(F_reference.array[i].bx);
 		pby += BIG_TO_DOUBLE(F_reference.array[i].by);
 		abx = BIG_TO_DOUBLE(F_reference.array[i].bx);
@@ -381,8 +379,8 @@ bool autofill_apply(const TToonzImageP &imgToApply, bool selective, TTileSetCM32
 
 	scan_fabri_regions(ras, &F_work, 0, 0, 0, 0, 0);
 
-	if (abs(F_work.lx * F_work.ly - F_reference.lx * F_reference.ly) > 0.1 *
-																		   (F_work.lx * F_work.ly + F_reference.lx * F_reference.ly))
+	if (abs(F_work.lx * F_work.ly - F_reference.lx * F_reference.ly) >
+		0.1 * (F_work.lx * F_work.ly + F_reference.lx * F_reference.ly))
 		return false;
 
 	for (i = 0; i < F_work.n; i++) {
@@ -419,17 +417,20 @@ bool autofill_apply(const TToonzImageP &imgToApply, bool selective, TTileSetCM32
 				temp_prob = 0;
 				att_match = F_reference.n;
 				/* Se non verra' aggiornato in seguito non verra' *
-      * comunque piu' cambiato di colore               */
+	  * comunque piu' cambiato di colore               */
 				for (j = 0; j < F_reference.n; j++)
 					if ((F_reference.array[i].match < 0) &&
 						((prob_vector[i * F_reference.n + j] / 1000.0) *
 							 (prob_vector[i * F_reference.n + j] / 1000.0) *
-							 (prob_vector[2 * (F_work.n * F_reference.n) + i * F_reference.n + j] / 1500.0) >
+							 (prob_vector[2 * (F_work.n * F_reference.n) + i * F_reference.n + j] /
+							  1500.0) >
 						 temp_prob)) {
 						att_match = j;
-						temp_prob = (prob_vector[i * F_reference.n + j] / 1000.0) *
-									(prob_vector[i * F_reference.n + j] / 1000.0) *
-									(prob_vector[2 * (F_work.n * F_reference.n) + i * F_reference.n + j] / 1500.0);
+						temp_prob =
+							(prob_vector[i * F_reference.n + j] / 1000.0) *
+							(prob_vector[i * F_reference.n + j] / 1000.0) *
+							(prob_vector[2 * (F_work.n * F_reference.n) + i * F_reference.n + j] /
+							 1500.0);
 					}
 				F_work.array[i].match = att_match;
 				if (att_match < F_reference.n)
@@ -489,8 +490,8 @@ bool autofill_apply(const TToonzImageP &imgToApply, bool selective, TTileSetCM32
 /*---------------------------------------------------------------------------*/
 /* Scansione delle aree di Fabrizio                                          */
 /*...........................................................................*/
-static void scan_fabri_regions(TRasterCM32P ras, struct s_fabri_region_list *rlst,
-							   int mode, int ex1, int ey1, int ex2, int ey2)
+static void scan_fabri_regions(TRasterCM32P ras, struct s_fabri_region_list *rlst, int mode,
+							   int ex1, int ey1, int ex2, int ey2)
 /*---------------------------------------------------------------------------*/
 {
 	int firstfree;
@@ -534,8 +535,7 @@ static void scan_fabri_regions(TRasterCM32P ras, struct s_fabri_region_list *rls
 
 	/*.. Inizializza la struttura ...............................................*/
 	rlst->size = 100;
-	rlst->array = (struct s_fabri_region *)
-		calloc(rlst->size, sizeof(struct s_fabri_region));
+	rlst->array = (struct s_fabri_region *)calloc(rlst->size, sizeof(struct s_fabri_region));
 	rlst->n = 0;
 	firstfree = -1;
 	for (tmp = 0; tmp < rlst->size; tmp++) {
@@ -580,8 +580,9 @@ static void scan_fabri_regions(TRasterCM32P ras, struct s_fabri_region_list *rls
 							rlst->array[region_id].holes++;
 						if (region_id < 0) {
 							region_id = region_old;
-							rlst->array[region_id].per += 2 * (xb - xa + 1) + 2 -
-														  2 * (MIN(row[rold][j].xb, xb) - MAX(row[rold][j].xa, xa) + 1);
+							rlst->array[region_id].per +=
+								2 * (xb - xa + 1) + 2 -
+								2 * (MIN(row[rold][j].xb, xb) - MAX(row[rold][j].xa, xa) + 1);
 						} else if (region_id != region_old) {
 							/* CONTATTO FRA region_id E region_old */
 							PRINTF("Contatto tra %d e %d \n", region_id, region_old);
@@ -604,8 +605,9 @@ static void scan_fabri_regions(TRasterCM32P ras, struct s_fabri_region_list *rls
 
 							rlst->array[keep].holes += rlst->array[discard].holes;
 							rlst->array[keep].npix += rlst->array[discard].npix;
-							rlst->array[keep].per += rlst->array[discard].per -
-													 2 * (MIN(row[rold][j].xb, xb) - MAX(row[rold][j].xa, xa) + 1);
+							rlst->array[keep].per +=
+								rlst->array[discard].per -
+								2 * (MIN(row[rold][j].xb, xb) - MAX(row[rold][j].xa, xa) + 1);
 
 							fondi(rlst, keep, discard);
 
@@ -669,8 +671,8 @@ static void scan_fabri_regions(TRasterCM32P ras, struct s_fabri_region_list *rls
 					if (firstfree < 0) {
 						if (rlst->n >= rlst->size) {
 							rlst->size += 50;
-							rlst->array = (struct s_fabri_region *)
-								realloc(rlst->array, rlst->size * sizeof(struct s_fabri_region));
+							rlst->array = (struct s_fabri_region *)realloc(
+								rlst->array, rlst->size * sizeof(struct s_fabri_region));
 							for (tmp = rlst->size - 1; tmp >= rlst->size - 50; tmp--)
 								rlst->array[tmp].vicini = NULL;
 						}
@@ -704,7 +706,7 @@ static void scan_fabri_regions(TRasterCM32P ras, struct s_fabri_region_list *rls
 				/* MEMORIZZO LA REGIONE CORRENTE */
 				precedente = -1;
 				/*-----------------------------------------------------
-        .. Controlla se esiste vicinanza verticale ...........*/
+		.. Controlla se esiste vicinanza verticale ...........*/
 				for (tmp = xa; tmp <= xb; tmp++) {
 					if (ultima_zona[tmp - x1] != precedente) {
 						aggiungi(ultima_zona[tmp - x1], region_id, rlst);
@@ -734,8 +736,7 @@ static void scan_fabri_regions(TRasterCM32P ras, struct s_fabri_region_list *rls
 	/* mostra_vicini(rlst); */
 	for (i = 0; i < rlst->n; i++)
 		if ((rlst->array[i].active) &&
-			((rlst->array[i].x1 > x1 || border_tooX1) &&
-			 (rlst->array[i].x2 < x2 || border_tooX2) &&
+			((rlst->array[i].x1 > x1 || border_tooX1) && (rlst->array[i].x2 < x2 || border_tooX2) &&
 			 (rlst->array[i].y1 > y1 || border_tooY1) &&
 			 (rlst->array[i].y2 < y2 || border_tooY2))) {
 			if (n < i) {
@@ -766,8 +767,7 @@ static void scan_fabri_regions(TRasterCM32P ras, struct s_fabri_region_list *rls
 /*---------------------------------------------------------------------------*/
 /*  Rinomina tutti i vicini regione1 in regione2                             */
 /*...........................................................................*/
-static void rinomina(int regione1, int regione2, int num_regioni,
-					 struct s_fabri_region_list *rlst)
+static void rinomina(int regione1, int regione2, int num_regioni, struct s_fabri_region_list *rlst)
 /*---------------------------------------------------------------------------*/
 {
 	struct vicine *appo, *old, appo1;
@@ -824,8 +824,7 @@ static void rinomina(int regione1, int regione2, int num_regioni,
 /*---------------------------------------------------------------------------*/
 /* Aggiunge a regione2 il vicino regione1 e viceversa                        */
 /*...........................................................................*/
-static void aggiungi(int regione1, int regione2,
-					 struct s_fabri_region_list *rlst)
+static void aggiungi(int regione1, int regione2, struct s_fabri_region_list *rlst)
 /*---------------------------------------------------------------------------*/
 {
 	struct vicine *appo1, *appo2;
@@ -976,61 +975,42 @@ static void assign_prob3(int prob[], int i, int j)
 	double delta_pos, delta_pos_max, delta_forma_mom;
 	int delta_forma1, delta_forma2, delta_forma;
 
-	delta_posx1 =
-		BIG_TO_DOUBLE(F_reference.array[i].bx) / F_reference.array[i].npix -
-		F_ref_bx;
-	delta_posy1 =
-		BIG_TO_DOUBLE(F_reference.array[i].by) / F_reference.array[i].npix -
-		F_ref_by;
+	delta_posx1 = BIG_TO_DOUBLE(F_reference.array[i].bx) / F_reference.array[i].npix - F_ref_bx;
+	delta_posy1 = BIG_TO_DOUBLE(F_reference.array[i].by) / F_reference.array[i].npix - F_ref_by;
 
-	delta_posx2 =
-		BIG_TO_DOUBLE(F_work.array[j].bx) / F_work.array[j].npix -
-		F_wor_bx;
-	delta_posy2 =
-		BIG_TO_DOUBLE(F_work.array[j].by) / F_work.array[j].npix -
-		F_wor_by;
+	delta_posx2 = BIG_TO_DOUBLE(F_work.array[j].bx) / F_work.array[j].npix - F_wor_bx;
+	delta_posy2 = BIG_TO_DOUBLE(F_work.array[j].by) / F_work.array[j].npix - F_wor_by;
 
 	/* Cosi' calcolo il modulo della differenza */
 
-	delta_pos =
-		sqrt((delta_posx2 - delta_posx1) * (delta_posx2 - delta_posx1) +
-			 (delta_posy2 - delta_posy1) * (delta_posy2 - delta_posy1));
-	delta_pos_max =
-		sqrt((double)(F_work.lx * F_work.lx + F_work.ly * F_work.ly));
+	delta_pos = sqrt((delta_posx2 - delta_posx1) * (delta_posx2 - delta_posx1) +
+					 (delta_posy2 - delta_posy1) * (delta_posy2 - delta_posy1));
+	delta_pos_max = sqrt((double)(F_work.lx * F_work.lx + F_work.ly * F_work.ly));
 
-	prob[i + j * F_reference.n] =
-		ROUNDP(1000 * (1 -
-					   (delta_pos / delta_pos_max)));
+	prob[i + j * F_reference.n] = ROUNDP(1000 * (1 - (delta_pos / delta_pos_max)));
 
 	delta_pix = abs(F_reference.array[i].npix - F_work.array[j].npix);
 	delta_pix_max = MAX((F_work.lx * F_work.ly), (F_reference.lx * F_reference.ly));
 
-	prob[(F_work.n * F_reference.n) + i + (j * F_reference.n)] =
-		ROUNDP(1000 * (1 - ((double)delta_pix /
-							(F_reference.array[i].npix + F_work.array[j].npix))));
+	prob[(F_work.n * F_reference.n) + i + (j * F_reference.n)] = ROUNDP(
+		1000 * (1 - ((double)delta_pix / (F_reference.array[i].npix + F_work.array[j].npix))));
 
-	delta_momx1 =
-		BIG_TO_DOUBLE(F_reference.array[i].bx2) / F_reference.array[i].npix -
-		(BIG_TO_DOUBLE(F_reference.array[i].bx) / F_reference.array[i].npix *
-		 BIG_TO_DOUBLE(F_reference.array[i].bx) / F_reference.array[i].npix);
+	delta_momx1 = BIG_TO_DOUBLE(F_reference.array[i].bx2) / F_reference.array[i].npix -
+				  (BIG_TO_DOUBLE(F_reference.array[i].bx) / F_reference.array[i].npix *
+				   BIG_TO_DOUBLE(F_reference.array[i].bx) / F_reference.array[i].npix);
 
-	delta_momy1 =
-		BIG_TO_DOUBLE(F_reference.array[i].by2) / F_reference.array[i].npix -
-		(BIG_TO_DOUBLE(F_reference.array[i].by) / F_reference.array[i].npix *
-		 BIG_TO_DOUBLE(F_reference.array[i].by) / F_reference.array[i].npix);
+	delta_momy1 = BIG_TO_DOUBLE(F_reference.array[i].by2) / F_reference.array[i].npix -
+				  (BIG_TO_DOUBLE(F_reference.array[i].by) / F_reference.array[i].npix *
+				   BIG_TO_DOUBLE(F_reference.array[i].by) / F_reference.array[i].npix);
 
-	delta_momx2 =
-		BIG_TO_DOUBLE(F_work.array[j].bx2) / F_work.array[j].npix -
-		(BIG_TO_DOUBLE(F_work.array[j].bx) / F_work.array[j].npix *
-		 BIG_TO_DOUBLE(F_work.array[j].bx) / F_work.array[j].npix);
-	delta_momy2 =
-		BIG_TO_DOUBLE(F_work.array[j].by2) / F_work.array[j].npix -
-		(BIG_TO_DOUBLE(F_work.array[j].by) / F_work.array[j].npix *
-		 BIG_TO_DOUBLE(F_work.array[j].by) / F_work.array[j].npix);
+	delta_momx2 = BIG_TO_DOUBLE(F_work.array[j].bx2) / F_work.array[j].npix -
+				  (BIG_TO_DOUBLE(F_work.array[j].bx) / F_work.array[j].npix *
+				   BIG_TO_DOUBLE(F_work.array[j].bx) / F_work.array[j].npix);
+	delta_momy2 = BIG_TO_DOUBLE(F_work.array[j].by2) / F_work.array[j].npix -
+				  (BIG_TO_DOUBLE(F_work.array[j].by) / F_work.array[j].npix *
+				   BIG_TO_DOUBLE(F_work.array[j].by) / F_work.array[j].npix);
 
-	delta_forma_mom =
-		abs(sqrt(delta_momx1 + delta_momy1) -
-			sqrt(delta_momx2 + delta_momy2));
+	delta_forma_mom = abs(sqrt(delta_momx1 + delta_momy1) - sqrt(delta_momx2 + delta_momy2));
 
 	delta_forma1 = ROUNDP(1000 * (((double)F_reference.array[i].per / F_reference.array[i].npix -
 								   2 / sqrt((double)F_reference.array[i].npix / 3.14)) /
@@ -1040,9 +1020,7 @@ static void assign_prob3(int prob[], int i, int j)
 								   2 / sqrt((double)F_work.array[j].npix / 3.14)) /
 								  (2 - 2 / sqrt((double)F_work.array[j].npix / 3.14))));
 
-	delta_forma =
-		ROUNDP(1000 * (1 -
-					   (delta_forma_mom / delta_pos_max)));
+	delta_forma = ROUNDP(1000 * (1 - (delta_forma_mom / delta_pos_max)));
 
 	prob[(2 * F_work.n * F_reference.n) + i + (j * F_reference.n)] = delta_forma;
 
@@ -1072,10 +1050,12 @@ static void find_best(int prob[], int *col, int to)
 		numero = 0;
 		for (j = 0; j < F_reference.n; j++) {
 			if (F_reference.array[i].color_id == F_reference.array[j].color_id) {
-				color_value += (prob[to * F_reference.n + j] / 1000.0) *
-							   (prob[to * F_reference.n + j] / 1000.0) *
-							   /*   (prob[(F_work.n*F_reference.n)+to*F_reference.n+j]/1500.0)*
-             */ (prob[2 * (F_work.n * F_reference.n) + to * F_reference.n + j] / 1500.0);
+				color_value +=
+					(prob[to * F_reference.n + j] / 1000.0) *
+					(prob[to * F_reference.n + j] / 1000.0) *
+					/*   (prob[(F_work.n*F_reference.n)+to*F_reference.n+j]/1500.0)*
+             */ (
+						prob[2 * (F_work.n * F_reference.n) + to * F_reference.n + j] / 1500.0);
 				numero++;
 			}
 		}
@@ -1147,21 +1127,29 @@ static int trova_migliore_padre(int prob_vector[], int *att_my)
 						j = a2->region_id;
 						if (F_work.array[j].match < 0) {
 							if (prob_vector[j * F_reference.n + i] *
-									prob_vector[(F_work.n * F_reference.n) + j * F_reference.n + i] *
-									prob_vector[2 * (F_work.n * F_reference.n) + j * F_reference.n + i] >
+									prob_vector[(F_work.n * F_reference.n) + j * F_reference.n +
+												i] *
+									prob_vector[2 * (F_work.n * F_reference.n) + j * F_reference.n +
+												i] >
 								att_second)
 								att_second = prob_vector[j * F_reference.n + i] *
-											 prob_vector[(F_work.n * F_reference.n) + j * F_reference.n + i] *
-											 prob_vector[2 * (F_work.n * F_reference.n) + j * F_reference.n + i];
+											 prob_vector[(F_work.n * F_reference.n) +
+														 j * F_reference.n + i] *
+											 prob_vector[2 * (F_work.n * F_reference.n) +
+														 j * F_reference.n + i];
 
 							if (prob_vector[j * F_reference.n + i] *
-									prob_vector[(F_work.n * F_reference.n) + j * F_reference.n + i] *
-									prob_vector[2 * (F_work.n * F_reference.n) + j * F_reference.n + i] >
+									prob_vector[(F_work.n * F_reference.n) + j * F_reference.n +
+												i] *
+									prob_vector[2 * (F_work.n * F_reference.n) + j * F_reference.n +
+												i] >
 								att_best) {
 								att_second = att_best;
 								att_best = prob_vector[j * F_reference.n + i] *
-										   prob_vector[(F_work.n * F_reference.n) + j * F_reference.n + i] *
-										   prob_vector[2 * (F_work.n * F_reference.n) + j * F_reference.n + i];
+										   prob_vector[(F_work.n * F_reference.n) +
+													   j * F_reference.n + i] *
+										   prob_vector[2 * (F_work.n * F_reference.n) +
+													   j * F_reference.n + i];
 							}
 						}
 						a2 = a2->next;
@@ -1206,13 +1194,10 @@ static int match(int prob[], int padre, int *fro, int *to)
 	} else {
 		for (i = 0; i < F_reference.n; i++)
 			for (j = 0; j < F_work.n; j++)
-				if (
-					(F_work.array[j].match < 0) &&
-					(F_reference.array[i].match < 0) &&
+				if ((F_work.array[j].match < 0) && (F_reference.array[i].match < 0) &&
 					(F_work.array[j].npix > DIM_TRESH * F_work.lx * F_work.ly) &&
 					(F_reference.array[i].npix > DIM_TRESH * F_reference.lx * F_reference.ly)) {
-					if (
-						prob[j * F_reference.n + i] *
+					if (prob[j * F_reference.n + i] *
 							prob[(F_work.n * F_reference.n) + j * F_reference.n + i] *
 							prob[2 * (F_work.n * F_reference.n) + j * F_reference.n + i] >
 						att_max) {

@@ -82,19 +82,16 @@ bool canCopyFx(TFx *fx)
 //    FxsData  implementation
 //******************************************************************
 
-FxsData::FxsData()
-	: m_connected(false)
+FxsData::FxsData() : m_connected(false)
 {
 }
 
 //-------------------------------------------------------
 
-void FxsData::setFxs(const QList<TFxP> &selectedFxs,
-					 const QList<Link> &selectedLinks,
-					 const QList<int> &columnIndexes,
-					 TXsheet *xsh)
+void FxsData::setFxs(const QList<TFxP> &selectedFxs, const QList<Link> &selectedLinks,
+					 const QList<int> &columnIndexes, TXsheet *xsh)
 {
-	//fx->clonedFx
+	// fx->clonedFx
 	QMap<TFx *, TFx *> clonedFxs;
 	for (int i = 0; i < selectedFxs.size(); i++) {
 		TFx *fx = selectedFxs[i].getPointer();
@@ -125,7 +122,8 @@ void FxsData::setFxs(const QList<TFxP> &selectedFxs,
 	for (it = columnIndexes.begin(); it != columnIndexes.end(); it++) {
 		TXshColumn *col = xsh->getColumn(*it);
 		TXshColumn *newCol = col->clone();
-		newCol->getFx()->getAttributes()->setDagNodePos(col->getFx()->getAttributes()->getDagNodePos());
+		newCol->getFx()->getAttributes()->setDagNodePos(
+			col->getFx()->getAttributes()->getDagNodePos());
 		m_columns.append(newCol);
 		clonedFxs[col->getFx()] = newCol->getFx();
 	}
@@ -136,7 +134,8 @@ void FxsData::setFxs(const QList<TFxP> &selectedFxs,
 
 //-------------------------------------------------------
 
-void FxsData::getFxs(QList<TFxP> &fxs, QMap<TFx *, int> &zeraryFxColumnSize, QList<TXshColumnP> &columns) const
+void FxsData::getFxs(QList<TFxP> &fxs, QMap<TFx *, int> &zeraryFxColumnSize,
+					 QList<TXshColumnP> &columns) const
 {
 	QMap<TFx *, TFx *> clonedFxs;
 	for (int i = 0; i < m_fxs.size(); i++) {
@@ -158,7 +157,8 @@ void FxsData::getFxs(QList<TFxP> &fxs, QMap<TFx *, int> &zeraryFxColumnSize, QLi
 	for (it = m_columns.begin(); it != m_columns.end(); it++) {
 		TXshColumn *col = it->getPointer();
 		TXshColumn *newCol = col->clone();
-		newCol->getFx()->getAttributes()->setDagNodePos(col->getFx()->getAttributes()->getDagNodePos());
+		newCol->getFx()->getAttributes()->setDagNodePos(
+			col->getFx()->getAttributes()->getDagNodePos());
 		columns.append(newCol);
 		clonedFxs[col->getFx()] = newCol->getFx();
 	}

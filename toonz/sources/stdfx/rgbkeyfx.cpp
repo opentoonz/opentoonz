@@ -18,7 +18,7 @@ class RGBKeyFx : public TStandardRasterFx
 	TDoubleParamP m_brange;
 	TBoolParamP m_gender;
 
-public:
+  public:
 	RGBKeyFx()
 		: m_color(TPixel32::Black), m_rrange(0.0), m_grange(0.0), m_brange(0.0), m_gender(false)
 	{
@@ -67,8 +67,8 @@ void update_param(int &param, TRaster64P ras)
 //-------------------------------------------------------------------
 
 template <typename PIXEL, typename CHANNEL_TYPE>
-void doRGBKey(TRasterPT<PIXEL> ras, int highR, int highG, int highB,
-			  int lowR, int lowG, int lowB, bool gender)
+void doRGBKey(TRasterPT<PIXEL> ras, int highR, int highG, int highB, int lowR, int lowG, int lowB,
+			  bool gender)
 {
 	update_param(highR, ras);
 	update_param(highG, ras);
@@ -84,7 +84,8 @@ void doRGBKey(TRasterPT<PIXEL> ras, int highR, int highG, int highB,
 		PIXEL *pix = ras->pixels(j);
 		PIXEL *endPix = pix + ras->getLx();
 		while (pix < endPix) {
-			bool condition = pix->r >= lowR && pix->r <= highR && pix->g >= lowG && pix->g <= highG && pix->b >= lowB && pix->b <= highB;
+			bool condition = pix->r >= lowR && pix->r <= highR && pix->g >= lowG &&
+							 pix->g <= highG && pix->b >= lowB && pix->b <= highB;
 			if (condition != gender)
 				*pix = PIXEL::Transparent;
 			pix++;

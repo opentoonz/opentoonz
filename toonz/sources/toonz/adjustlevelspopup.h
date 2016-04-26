@@ -3,10 +3,10 @@
 #ifndef ADJUST_LEVELS_POPUP_H
 #define ADJUST_LEVELS_POPUP_H
 
-//tnzcore includes
+// tnzcore includes
 #include "traster.h"
 
-//toonzQt includes
+// toonzQt includes
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/planeviewer.h"
 #include "toonzqt/marksbar.h"
@@ -32,11 +32,11 @@ class EditableMarksBar : public QFrame
 	MarksBar *m_marksBar;
 	DVGui::IntLineEdit *m_fields[2];
 
-public:
+  public:
 	EditableMarksBar(QWidget *parent = 0);
 	~EditableMarksBar();
 
-public:
+  public:
 	const QVector<int> &marks() const { return m_marksBar->values(); }
 
 	const MarksBar *marksBar() const { return m_marksBar; }
@@ -44,15 +44,15 @@ public:
 
 	void getValues(int *values) const;
 
-signals:
+  signals:
 
 	void paramsChanged();
 
-protected slots:
+  protected slots:
 
 	void onFieldEdited();
 
-public slots:
+  public slots:
 
 	void updateFields();
 };
@@ -75,14 +75,14 @@ class AdjustLevelsPopup : public DVGui::Dialog
 	double m_thresholdD;
 	int m_threshold;
 
-private:
+  private:
 	class Swatch;
 	Swatch *m_viewer;
 
-public:
+  public:
 	AdjustLevelsPopup();
 
-protected:
+  protected:
 	void showEvent(QShowEvent *se);
 	void hideEvent(QHideEvent *se);
 
@@ -92,7 +92,7 @@ protected:
 
 	void setThreshold(double t);
 
-protected slots:
+  protected slots:
 
 	void clampRange();
 	void autoAdjust();
@@ -104,4 +104,4 @@ protected slots:
 	void apply();
 };
 
-#endif //ADJUST_LEVELS_POPUP_H
+#endif // ADJUST_LEVELS_POPUP_H

@@ -142,9 +142,7 @@ double getBestFactor(QSize viewSize, QSize imageSize)
 	"A_np.tlv"のように"_np"を付ける。"_unpainted"は長いので）
 	Paletteをキープするかどうかのフラグを追加
 */
-void saveUnpaintedLevel(const TFilePath &levelPath,
-						TXshSimpleLevel *sl,
-						std::vector<TFrameId> fids,
+void saveUnpaintedLevel(const TFilePath &levelPath, TXshSimpleLevel *sl, std::vector<TFrameId> fids,
 						bool keepOriginalPalette)
 {
 	try {
@@ -158,7 +156,9 @@ void saveUnpaintedLevel(const TFilePath &levelPath,
 			}
 		}
 
-		TFilePath unpaintedLevelPath = levelPath.getParentDir() + "nopaint\\" + TFilePath(levelPath.getName() + "_np." + levelPath.getType());
+		TFilePath unpaintedLevelPath =
+			levelPath.getParentDir() + "nopaint\\" +
+			TFilePath(levelPath.getName() + "_np." + levelPath.getType());
 
 		if (!TSystem::doesExistFileOrLevel(unpaintedLevelPath)) {
 			// No unpainted level exists. So, just copy the output file.
@@ -167,7 +167,9 @@ void saveUnpaintedLevel(const TFilePath &levelPath,
 				return;
 
 			TFilePath levelPalettePath(levelPath.withType("tpl"));
-			TFilePath unpaintedLevelPalettePath = levelPalettePath.getParentDir() + "nopaint\\" + TFilePath(levelPalettePath.getName() + "_np." + levelPalettePath.getType());
+			TFilePath unpaintedLevelPalettePath =
+				levelPalettePath.getParentDir() + "nopaint\\" +
+				TFilePath(levelPalettePath.getName() + "_np." + levelPalettePath.getType());
 
 			TSystem::copyFile(unpaintedLevelPalettePath, levelPalettePath);
 
@@ -195,7 +197,8 @@ void saveUnpaintedLevel(const TFilePath &levelPath,
 
 //------------------------------------------------------------------------------
 /*! Cleanup後のデフォルトPaletteを追加する。
-TODO: Cleanup後にデフォルトPaletteの内容を追加する仕様、Preferencesでオプション化 2016/1/16 shun_iwasawa
+TODO: Cleanup後にデフォルトPaletteの内容を追加する仕様、Preferencesでオプション化 2016/1/16
+shun_iwasawa
 */
 void addCleanupDefaultPalette(TXshSimpleLevelP sl)
 {
@@ -204,7 +207,8 @@ void addCleanupDefaultPalette(TXshSimpleLevelP sl)
 	TFileStatus pfs(palettePath);
 
 	if (!pfs.doesExist() || !pfs.isReadable()) {
-		DVGui::warning(QString("CleanupDefaultPalette file: %1 is not found!").arg(QString::fromStdWString(palettePath.getWideString())));
+		DVGui::warning(QString("CleanupDefaultPalette file: %1 is not found!")
+						   .arg(QString::fromStdWString(palettePath.getWideString())));
 		return;
 	}
 
@@ -257,7 +261,7 @@ void addCleanupDefaultPalette(TXshSimpleLevelP sl)
 	delete defaultPalette;
 }
 
-} //namespace
+} // namespace
 
 //*****************************************************************************
 //    CleanupLevel  definition
@@ -269,9 +273,12 @@ struct CleanupPopup::CleanupLevel {
 	std::vector<TFrameId> m_frames; //!< Frames to cleanup.
 	Resolution m_resolution;		//!< Resolution for verified file conflicts.
 
-public:
+  public:
 	CleanupLevel(TXshSimpleLevel *sl, const CleanupParameters &params)
-		: m_sl(sl), m_outputPath(CleanupSettingsModel::getOutputPath(m_sl, &params)), m_resolution(NO_RESOLUTION) {}
+		: m_sl(sl), m_outputPath(CleanupSettingsModel::getOutputPath(m_sl, &params)),
+		  m_resolution(NO_RESOLUTION)
+	{
+	}
 
 	bool empty() const { return m_frames.empty(); }
 };
@@ -281,7 +288,8 @@ public:
 //*****************************************************************************
 
 CleanupPopup::CleanupPopup()
-	: QDialog(TApp::instance()->getMainWindow()), m_params(new CleanupParameters), m_updater(new LevelUpdater), m_originalLevelPath(), m_originalPalette(0)
+	: QDialog(TApp::instance()->getMainWindow()), m_params(new CleanupParameters),
+	  m_updater(new LevelUpdater), m_originalLevelPath(), m_originalPalette(0)
 {
 	setWindowTitle(tr("Cleanup"));
 
@@ -351,11 +359,12 @@ CleanupPopup::CleanupPopup()
 	ret = ret && connect(m_skipButton, SIGNAL(clicked()), this, SLOT(onSkipFrame()));
 	ret = ret && connect(m_cleanupAllButton, SIGNAL(clicked()), this, SLOT(onCleanupAllFrame()));
 	ret = ret && connect(cancelButton, SIGNAL(clicked()), this, SLOT(onCancelCleanup()));
-	ret = ret && connect(m_imgViewBox, SIGNAL(toggled(bool)), this, SLOT(onImgViewBoxToggled(bool)));
+	ret =
+		ret && connect(m_imgViewBox, SIGNAL(toggled(bool)), this, SLOT(onImgViewBoxToggled(bool)));
 
 	assert(ret);
 
-	reset(); //Initialize remaining variables
+	reset(); // Initialize remaining variables
 
 	resize(450, 400);
 }
@@ -404,7 +413,8 @@ void CleanupPopup::buildCleanupList()
 	struct locals {
 		static inline bool supportsCleanup(TXshSimpleLevel *sl)
 		{
-			return (sl->getType() & FULLCOLOR_TYPE || (sl->getType() == TZP_XSHLEVEL && !sl->getScannedPath().isEmpty()));
+			return (sl->getType() & FULLCOLOR_TYPE ||
+					(sl->getType() == TZP_XSHLEVEL && !sl->getScannedPath().isEmpty()));
 		}
 	}; // locals
 
@@ -417,10 +427,8 @@ void CleanupPopup::buildCleanupList()
 	m_cleanupLevels.clear();
 
 	// Retrieve current selection
-	TCellSelection *selection =
-		dynamic_cast<TCellSelection *>(TSelection::getCurrent());
-	TColumnSelection *columnSel =
-		dynamic_cast<TColumnSelection *>(TSelection::getCurrent());
+	TCellSelection *selection = dynamic_cast<TCellSelection *>(TSelection::getCurrent());
+	TColumnSelection *columnSel = dynamic_cast<TColumnSelection *>(TSelection::getCurrent());
 	/*--- セル選択でも、カラム選択でも無い場合はCleanup自体を無効にする ---*/
 	if (!selection && !columnSel)
 		return;
@@ -488,8 +496,9 @@ void CleanupPopup::buildCleanupList()
 	// Finally, copy the retrieved data to the sorted output vector
 	std::vector<TXshSimpleLevel *>::iterator lt, lEnd = levelsList.end();
 	for (lt = levelsList.begin(); lt != lEnd; ++lt) {
-		loadCleanupParams(m_params.get(), *lt); // Load cleanup parameters associated with current level.
-												// This is necessary since the output path is specified among them.
+		loadCleanupParams(m_params.get(),
+						  *lt); // Load cleanup parameters associated with current level.
+								// This is necessary since the output path is specified among them.
 		m_cleanupLevels.push_back(CleanupLevel(*lt, *m_params.get()));
 		CleanupLevel &cl = m_cleanupLevels.back();
 
@@ -504,8 +513,7 @@ bool CleanupPopup::analyzeCleanupList()
 {
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 
-	bool shownOverwriteDialog = false,
-		 shownWritingOnSourceFile = false;
+	bool shownOverwriteDialog = false, shownWritingOnSourceFile = false;
 
 	/*--- 消されるLevel名の確認ダイアログを出すため ---*/
 	QList<TFilePath> filePathsToBeDeleted;
@@ -535,13 +543,14 @@ bool CleanupPopup::analyzeCleanupList()
 
 			// Check whether output file == input file
 			/*--- 入力となるScanned（TIFなど）のパスを得る ---*/
-			const TFilePath &inputPath = scene->decodeFilePath(
-				CleanupSettingsModel::getInputPath(sl));
+			const TFilePath &inputPath =
+				scene->decodeFilePath(CleanupSettingsModel::getInputPath(sl));
 
 			if (!shownWritingOnSourceFile && inputPath == outputPath) {
 				shownWritingOnSourceFile = true;
 
-				int ret = DVGui::MsgBox(tr("Selected drawings will overwrite the original files after the cleanup process.\n"
+				int ret = DVGui::MsgBox(tr("Selected drawings will overwrite the original files "
+										   "after the cleanup process.\n"
 										   "Do you want to continue?"),
 										tr("Ok"), tr("Cancel"));
 
@@ -561,7 +570,8 @@ bool CleanupPopup::analyzeCleanupList()
 			}
 
 			// Prompt user for file conflict resolution
-			switch (clt->m_resolution = Resolution(m_overwriteDialog->execute(&clt->m_outputPath))) {
+			switch (clt->m_resolution =
+						Resolution(m_overwriteDialog->execute(&clt->m_outputPath))) {
 			case CANCEL:
 				return false;
 
@@ -575,9 +585,10 @@ bool CleanupPopup::analyzeCleanupList()
 				continue;
 			case NOPAINT_ONLY:
 				/*--- NOPAINT_ONLY の場合は、nopaintのみを変更。
-					ただし、nopaintのLevelは消さず、処理したフレームを Overwrite する 
+					ただし、nopaintのLevelは消さず、処理したフレームを Overwrite する
 				---*/
-				outputPath = outputPath.getParentDir() + "nopaint\\" + TFilePath(outputPath.getName() + "_np." + outputPath.getType());
+				outputPath = outputPath.getParentDir() + "nopaint\\" +
+							 TFilePath(outputPath.getName() + "_np." + outputPath.getType());
 				/*--- nopaintの有無を確かめる。無ければ次のLevelへ (このLevelはCleanupする) ---*/
 				if (!TSystem::doesExistFileOrLevel(outputPath)) {
 					m_levelAlreadyExists[sl] = false;
@@ -587,8 +598,7 @@ bool CleanupPopup::analyzeCleanupList()
 
 			TLevelP level(0); // Current level info. Yeah the init is a shame... :(
 			/*--- 元のLevelと新しいCleanup結果が混合する場合。REPLACE以外 ---*/
-			if (clt->m_resolution == OVERWRITE ||
-				clt->m_resolution == WRITE_NEW ||
+			if (clt->m_resolution == OVERWRITE || clt->m_resolution == WRITE_NEW ||
 				clt->m_resolution == NOPAINT_ONLY) {
 				// Check output resolution consistency
 				// Retrieve file resolution
@@ -607,7 +617,10 @@ bool CleanupPopup::analyzeCleanupList()
 					// Thus, the conservative approach is not feasible.
 
 					// Inform the user and abort cleanup
-					DVGui::warning(tr("There were errors opening the existing level \"%1\".\n\nPlease choose to delete the existing level and create a new one\nwhen running the cleanup process.").arg(QString::fromStdWString(outputPath.getLevelNameW())));
+					DVGui::warning(tr("There were errors opening the existing level "
+									  "\"%1\".\n\nPlease choose to delete the existing level and "
+									  "create a new one\nwhen running the cleanup process.")
+									   .arg(QString::fromStdWString(outputPath.getLevelNameW())));
 
 					return false;
 				}
@@ -618,7 +631,12 @@ bool CleanupPopup::analyzeCleanupList()
 				m_params->getOutputImageInfo(outRes, outDpi.x, outDpi.y);
 
 				if (oldRes != outRes) {
-					DVGui::warning(tr("The resulting resolution of level \"%1\"\ndoes not match with that of previously cleaned up level drawings.\n\nPlease set the right camera resolution and closest field, or choose to delete\nthe existing level and create a new one when running the cleanup process.").arg(QString::fromStdWString(outputPath.getLevelNameW())));
+					DVGui::warning(
+						tr("The resulting resolution of level \"%1\"\ndoes not match with that of "
+						   "previously cleaned up level drawings.\n\nPlease set the right camera "
+						   "resolution and closest field, or choose to delete\nthe existing level "
+						   "and create a new one when running the cleanup process.")
+							.arg(QString::fromStdWString(outputPath.getLevelNameW())));
 
 					return false;
 				}
@@ -630,14 +648,19 @@ bool CleanupPopup::analyzeCleanupList()
 				levelsToBeDeleted.push_back(sl);
 
 				/*--- パレットファイルも、あれば消す ---*/
-				TFilePath palettePath = (outputPath.getParentDir() + outputPath.getName()).withType("tpl");
+				TFilePath palettePath =
+					(outputPath.getParentDir() + outputPath.getName()).withType("tpl");
 				if (TSystem::doesExistFileOrLevel(palettePath))
 					filePathsToBeDeleted.push_back(palettePath);
 				/*--- つぎに、nopaintのTLV。これは、REPLACE、NOPAINT_ONLY 両方で消す ---*/
-				TFilePath unpaintedLevelPath = outputPath.getParentDir() + "nopaint\\" + TFilePath(outputPath.getName() + "_np." + outputPath.getType());
+				TFilePath unpaintedLevelPath =
+					outputPath.getParentDir() + "nopaint\\" +
+					TFilePath(outputPath.getName() + "_np." + outputPath.getType());
 				if (TSystem::doesExistFileOrLevel(unpaintedLevelPath)) {
 					filePathsToBeDeleted.push_back(unpaintedLevelPath);
-					filePathsToBeDeleted.push_back((unpaintedLevelPath.getParentDir() + unpaintedLevelPath.getName()).withType("tpl"));
+					filePathsToBeDeleted.push_back(
+						(unpaintedLevelPath.getParentDir() + unpaintedLevelPath.getName())
+							.withType("tpl"));
 				}
 			}
 
@@ -646,9 +669,8 @@ bool CleanupPopup::analyzeCleanupList()
 			if (clt->m_resolution == WRITE_NEW) {
 				const TLevel::Table *table = level->getTable();
 
-				clt->m_frames.erase(std::remove_if(
-										clt->m_frames.begin(), clt->m_frames.end(),
-										boost::bind(&TLevel::Table::count, table, _1)),
+				clt->m_frames.erase(std::remove_if(clt->m_frames.begin(), clt->m_frames.end(),
+												   boost::bind(&TLevel::Table::count, table, _1)),
 									clt->m_frames.end());
 			}
 		}
@@ -656,9 +678,11 @@ bool CleanupPopup::analyzeCleanupList()
 
 	/*--- ファイル消去の確認ダイアログを表示 ---*/
 	if (!filePathsToBeDeleted.isEmpty()) {
-		QString question = QObject::tr("Delete and Re-cleanup : The following files will be deleted.\n\n");
+		QString question =
+			QObject::tr("Delete and Re-cleanup : The following files will be deleted.\n\n");
 		for (int i = 0; i < filePathsToBeDeleted.size(); i++) {
-			question += "   " + QString::fromStdWString(filePathsToBeDeleted[i].getWideString()) + "\n";
+			question +=
+				"   " + QString::fromStdWString(filePathsToBeDeleted[i].getWideString()) + "\n";
 		}
 		question += QObject::tr("\nAre you sure ?");
 
@@ -684,10 +708,13 @@ bool CleanupPopup::analyzeCleanupList()
 					lev->setScannedPath(TFilePath());
 					lev->setPath(scannedPath, true);
 					lev->clearFrames();
-					lev->setType(OVL_XSHLEVEL); //OVL_XSHLEVEL
+					lev->setType(OVL_XSHLEVEL); // OVL_XSHLEVEL
 					lev->setPalette(0);
 					if (lev == TApp::instance()->getCurrentLevel()->getLevel())
-						TApp::instance()->getPaletteController()->getCurrentLevelPalette()->setPalette(0);
+						TApp::instance()
+							->getPaletteController()
+							->getCurrentLevelPalette()
+							->setPalette(0);
 
 					lev->load();
 					int i, frameCount = lev->getFrameCount();
@@ -703,9 +730,8 @@ bool CleanupPopup::analyzeCleanupList()
 
 	// Before returning, erase levels whose frames list is empty
 	/*--- Cleanup対象フレームが無くなったLevelを対象から外す ---*/
-	m_cleanupLevels.erase(std::remove_if(
-							  m_cleanupLevels.begin(), m_cleanupLevels.end(),
-							  boost::mem_fn(&CleanupLevel::empty)),
+	m_cleanupLevels.erase(std::remove_if(m_cleanupLevels.begin(), m_cleanupLevels.end(),
+										 boost::mem_fn(&CleanupLevel::empty)),
 						  m_cleanupLevels.end());
 
 	return true;
@@ -745,8 +771,8 @@ QString CleanupPopup::currentString() const
 	TFilePath levelName(scannedPath.getLevelNameW());
 	QString imageName = toQString(levelName.withFrame(fid));
 
-	return tr("Cleanup in progress: ") + imageName + " " +
-		   QString::number(m_completion.first) + "/" + QString::number(m_completion.second);
+	return tr("Cleanup in progress: ") + imageName + " " + QString::number(m_completion.first) +
+		   "/" + QString::number(m_completion.second);
 }
 
 //-----------------------------------------------------------------------------
@@ -782,8 +808,8 @@ void CleanupPopup::execute()
 	}
 
 	// Initialize completion variable
-	m_completion = std::pair<int, int>(0, std::accumulate(
-											  m_cleanupLevels.begin(), m_cleanupLevels.end(), 0, locals::addFrames));
+	m_completion = std::pair<int, int>(
+		0, std::accumulate(m_cleanupLevels.begin(), m_cleanupLevels.end(), 0, locals::addFrames));
 
 	// If there are no (more) frames to cleanup, warn and quit
 	int framesCount = m_completion.second;
@@ -804,7 +830,7 @@ void CleanupPopup::execute()
 	m_progressBar->setRange(0, framesCount);
 	m_progressBar->setValue(0);
 
-	//show the progress to the main window's title bar
+	// show the progress to the main window's title bar
 	updateTitleString();
 
 	TImageP image = currentImage();
@@ -841,10 +867,9 @@ QString CleanupPopup::setupLevel()
 	CleanupLevel &cl = m_cleanupLevels[m_idx.first];
 	TXshSimpleLevel *sl = cl.m_sl;
 
-	/*---  保存先のTLVが既に存在する、かつ、REPLACE でも 
+	/*---  保存先のTLVが既に存在する、かつ、REPLACE でも
 		NOPAINT_ONLY でもない場合、Paletteを変更せず維持する ---*/
-	if (cl.m_resolution != REPLACE &&
-		cl.m_resolution != NOPAINT_ONLY &&
+	if (cl.m_resolution != REPLACE && cl.m_resolution != NOPAINT_ONLY &&
 		m_levelAlreadyExists[sl] == true)
 		m_keepOriginalPalette = true;
 	else
@@ -886,7 +911,8 @@ QString CleanupPopup::setupLevel()
 			}
 		}
 		/*--- 保存先のパスをnopaintの方に変更 ---*/
-		outputPath = outputPath.getParentDir() + "nopaint\\" + TFilePath(outputPath.getName() + "_np." + outputPath.getType());
+		outputPath = outputPath.getParentDir() + "nopaint\\" +
+					 TFilePath(outputPath.getName() + "_np." + outputPath.getType());
 		decodedPath = scene->decodeFilePath(outputPath);
 	}
 
@@ -913,9 +939,8 @@ QString CleanupPopup::setupLevel()
 
 				/*--- 「スキャン済み」のステータスにし、画像、アイコンのIDを切り替える ---*/
 				sl->setFrameStatus(fid, TXshSimpleLevel::Scanned);
-				ImageManager::instance()->rebind(
-					sl->getImageId(fid, 0),
-					sl->getImageId(fid, TXshSimpleLevel::Scanned));
+				ImageManager::instance()->rebind(sl->getImageId(fid, 0),
+												 sl->getImageId(fid, TXshSimpleLevel::Scanned));
 
 				const std::string &oldIconId = sl->getIconId(fid, 0);
 				const std::string &newIconId = sl->getIconId(fid, TXshSimpleLevel::Scanned);
@@ -940,13 +965,15 @@ QString CleanupPopup::setupLevel()
 			else /*--- 既にCleanup済みだが、再びTIFファイルからCleanupを行う場合 ---*/
 			{
 				/*--- Cleanup先のPaletteをロードして取っておく ---*/
-				TFilePath targetPalettePath = outputPath.getParentDir() + TFilePath(outputPath.getName() + ".tpl");
+				TFilePath targetPalettePath =
+					outputPath.getParentDir() + TFilePath(outputPath.getName() + ".tpl");
 				TFileStatus pfs(targetPalettePath);
 				if (pfs.doesExist() && pfs.isReadable()) {
 					TIStream is(targetPalettePath);
 					std::string tagName;
 					if (!is.matchTag(tagName) || tagName != "palette") {
-						DVGui::warning(QString("CleanupDefaultPalette file: This is not palette file"));
+						DVGui::warning(
+							QString("CleanupDefaultPalette file: This is not palette file"));
 						return NULL;
 					}
 					m_originalPalette = new TPalette();
@@ -962,7 +989,8 @@ QString CleanupPopup::setupLevel()
 		if (sl == app->getCurrentLevel()->getLevel())
 			app->getPaletteController()->getCurrentLevelPalette()->setPalette(palette.getPointer());
 
-		// Notify the xsheet that the level has changed visual type informations (either the level type,
+		// Notify the xsheet that the level has changed visual type informations (either the level
+		// type,
 		// cleanup status, etc)
 		app->getCurrentXsheet()->notifyXsheetChanged();
 	} else if (!m_params->getPath(scene).isEmpty()) // Should never be empty, AFAIK...
@@ -1005,8 +1033,7 @@ QString CleanupPopup::resetLevel()
 	struct locals {
 		static bool removeFileOrLevel(const TFilePath &fp)
 		{
-			return (!TSystem::doesExistFileOrLevel(fp) ||
-					TSystem::removeFileOrLevel(fp));
+			return (!TSystem::doesExistFileOrLevel(fp) || TSystem::removeFileOrLevel(fp));
 		}
 
 		static QString decorate(const TFilePath &fp)
@@ -1043,7 +1070,9 @@ QString CleanupPopup::resetLevel()
 			return locals::decorate(fp);
 
 		// Also remove unpainted output path if any
-		const TFilePath &unpaintedPath(outputPath.getParentDir() + "nopaint\\" + TFilePath(outputPath.getName() + "_np." + outputPath.getType()));
+		const TFilePath &unpaintedPath(
+			outputPath.getParentDir() + "nopaint\\" +
+			TFilePath(outputPath.getName() + "_np." + outputPath.getType()));
 
 		if (!locals::removeFileOrLevel(unpaintedPath))
 			return locals::decorate(unpaintedPath);
@@ -1060,7 +1089,8 @@ QString CleanupPopup::resetLevel()
 }
 
 //-----------------------------------------------------------------------------
-/*--- 現在処理を行っているLevelの最後のフレームの処理が終わってから、フレームを進めるときに呼ばれる ---*/
+/*--- 現在処理を行っているLevelの最後のフレームの処理が終わってから、フレームを進めるときに呼ばれる
+ * ---*/
 void CleanupPopup::closeLevel()
 {
 	if (m_cleanuppedLevelFrames.empty()) {
@@ -1076,8 +1106,7 @@ void CleanupPopup::closeLevel()
 	assert(sl);
 
 	/*--- Nopaintのみ上書きの場合、Cleanup前に戻す ---*/
-	if (cl.m_resolution == NOPAINT_ONLY &&
-		!m_originalLevelPath.isEmpty()) {
+	if (cl.m_resolution == NOPAINT_ONLY && !m_originalLevelPath.isEmpty()) {
 		sl->setPath(m_originalLevelPath);
 		sl->invalidateFrames();
 		std::vector<TFrameId> fIds;
@@ -1089,7 +1118,8 @@ void CleanupPopup::closeLevel()
 	if (m_keepOriginalPalette && m_originalPalette) {
 		sl->setPalette(m_originalPalette);
 		if (sl == TApp::instance()->getCurrentLevel()->getLevel())
-			TApp::instance()->getPaletteController()->getCurrentLevelPalette()->setPalette(m_originalPalette);
+			TApp::instance()->getPaletteController()->getCurrentLevelPalette()->setPalette(
+				m_originalPalette);
 		sl->invalidateFrames();
 		std::vector<TFrameId> fIds;
 		sl->getFids(fIds);
@@ -1104,7 +1134,8 @@ void CleanupPopup::closeLevel()
 	}
 
 	if (sl->getType() == TZP_XSHLEVEL &&
-		Preferences::instance()->isSaveUnpaintedInCleanupEnable() && cl.m_resolution != NOPAINT_ONLY) /*--- 再Cleanupの場合は既にNoPaintに上書きしている ---*/
+		Preferences::instance()->isSaveUnpaintedInCleanupEnable() &&
+		cl.m_resolution != NOPAINT_ONLY) /*--- 再Cleanupの場合は既にNoPaintに上書きしている ---*/
 	{
 		const TFilePath &outputPath = cl.m_outputPath;
 
@@ -1113,7 +1144,8 @@ void CleanupPopup::closeLevel()
 
 		if (outputPath.getLevelNameW().find(L"-np.") == std::wstring::npos &&
 			TFileStatus(decodedPath).doesExist()) {
-			saveUnpaintedLevel(decodedPath, sl, m_cleanuppedLevelFrames, (m_keepOriginalPalette && m_originalPalette));
+			saveUnpaintedLevel(decodedPath, sl, m_cleanuppedLevelFrames,
+							   (m_keepOriginalPalette && m_originalPalette));
 		}
 	}
 
@@ -1155,7 +1187,8 @@ void CleanupPopup::cleanupFrame()
 
 			sl->setFrame(fid, ri);
 
-			// Update the associated file. In case the operation throws, oh well the image gets skipped.
+			// Update the associated file. In case the operation throws, oh well the image gets
+			// skipped.
 			try {
 				m_updater->update(fid, ri);
 			} catch (...) {
@@ -1224,9 +1257,12 @@ void CleanupPopup::cleanupFrame()
 
 	// this enables to view the level during cleanup by another user. this behavior may abort Toonz.
 	/*
-  try { m_updater->flush(); }                                           // Release the opened level from writing
-    catch(...) {}                                                       // It is required to have it open for read
-                                                                        // when rebuilding icons... (still dangerous though)
+  try { m_updater->flush(); }                                           // Release the opened level
+  from writing
+	catch(...) {}                                                       // It is required to have it
+  open for read
+																		// when rebuilding icons...
+  (still dangerous though)
 	*/
 	m_firstLevelFrame = false;
 	m_cleanuppedLevelFrames.push_back(fid);
@@ -1261,7 +1297,7 @@ void CleanupPopup::advanceFrame()
 			m_imageViewer->setImage(image);
 	}
 
-	//show the progress in the mainwindow's title bar
+	// show the progress in the mainwindow's title bar
 	updateTitleString();
 
 	// Update the progress bar
@@ -1370,16 +1406,18 @@ CleanupPopup::OverwriteDialog::OverwriteDialog()
 
 	// Option 1: OVERWRITE
 	QRadioButton *radioButton = new QRadioButton;
-	radioButton->setText(tr("Cleanup all selected drawings overwriting those previously cleaned up.*"));
+	radioButton->setText(
+		tr("Cleanup all selected drawings overwriting those previously cleaned up.*"));
 	radioButton->setFixedHeight(20);
-	radioButton->setChecked(true); //initial option: OVERWRITE
+	radioButton->setChecked(true); // initial option: OVERWRITE
 
 	m_buttonGroup->addButton(radioButton, OVERWRITE);
 	addWidget(radioButton);
 
 	// Option 2: WRITE_NEW
 	radioButton = new QRadioButton;
-	radioButton->setText(tr("Cleanup only non-cleaned up drawings and keep those previously cleaned up.*"));
+	radioButton->setText(
+		tr("Cleanup only non-cleaned up drawings and keep those previously cleaned up.*"));
 	radioButton->setFixedHeight(20);
 
 	m_buttonGroup->addButton(radioButton, WRITE_NEW);
@@ -1387,7 +1425,8 @@ CleanupPopup::OverwriteDialog::OverwriteDialog()
 
 	// Option 3: REPLACE
 	radioButton = new QRadioButton;
-	radioButton->setText(tr("Delete existing level and create a new level with selected drawings only."));
+	radioButton->setText(
+		tr("Delete existing level and create a new level with selected drawings only."));
 	radioButton->setFixedHeight(20);
 
 	m_buttonGroup->addButton(radioButton, REPLACE);
@@ -1436,14 +1475,12 @@ void CleanupPopup::OverwriteDialog::reset()
 
 //-----------------------------------------------------------------------------
 
-QString CleanupPopup::OverwriteDialog::acceptResolution(
-	void *obj, int resolution, bool applyToAll)
+QString CleanupPopup::OverwriteDialog::acceptResolution(void *obj, int resolution, bool applyToAll)
 {
 	struct locals {
 		static inline QString existsStr(const TFilePath &fp)
 		{
-			return tr("File \"%1\" already exists.\nWhat do you want to do?")
-				.arg(fp.getQString());
+			return tr("File \"%1\" already exists.\nWhat do you want to do?").arg(fp.getQString());
 		}
 	}; // locals
 
@@ -1473,8 +1510,8 @@ QString CleanupPopup::OverwriteDialog::acceptResolution(
 				m_suffixText = m_suffix->text();
 
 			// Test produced file path
-			const TFilePath &fp_suf = fp.withName(
-				fp.getWideName() + m_suffix->text().toStdWString());
+			const TFilePath &fp_suf =
+				fp.withName(fp.getWideName() + m_suffix->text().toStdWString());
 
 			if (::exists(fp_suf))
 				error = locals::existsStr(fp_suf);
@@ -1537,7 +1574,7 @@ void CleanupPopup::updateTitleString()
 
 class CleanupCommand : public MenuItemHandler
 {
-public:
+  public:
 	CleanupCommand() : MenuItemHandler("MI_Cleanup") {}
 
 	void execute()

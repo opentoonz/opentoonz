@@ -29,33 +29,35 @@ class TXshSimpleLevel;
 */
 class ImageLoader : public ImageBuilder
 {
-public:
+  public:
 	struct BuildExtData {
-		const TXshSimpleLevel *m_sl; //!< TXshSimpleLevel instance associated to an image loading request
-		TFrameId m_fid;				 //!< m_sl's fid at which the image will be loaded
+		const TXshSimpleLevel
+			*m_sl;		//!< TXshSimpleLevel instance associated to an image loading request
+		TFrameId m_fid; //!< m_sl's fid at which the image will be loaded
 
 		int m_subs; //!< The subsampling factor for image loading (0 meaning either
 		//!< 'the currently stored one' if an image is already cached, or
 		//!< m_sl's subsampling property otherwise)
 		bool m_icon; //!< Whether the icon (if any) should be loaded instead
 
-	public:
-		BuildExtData(const TXshSimpleLevel *sl, const TFrameId &fid, int subs = 0, bool icon = false)
-			: m_sl(sl), m_fid(fid), m_subs(subs), m_icon(icon) {}
+	  public:
+		BuildExtData(const TXshSimpleLevel *sl, const TFrameId &fid, int subs = 0,
+					 bool icon = false)
+			: m_sl(sl), m_fid(fid), m_subs(subs), m_icon(icon)
+		{
+		}
 	};
 
-public:
+  public:
 	ImageLoader(const TFilePath &path, const TFrameId &fid);
 
 	bool isImageCompatible(int imFlags, void *extData);
 
 	/*-- ImageBuilder仮想関数の実装。アイコン、画像をLoad時に全てキャッシュに格納する --*/
-	void buildAllIconsAndPutInCache(TXshSimpleLevel *level,
-									std::vector<TFrameId> fids,
-									std::vector<std::string> iconIds,
-									bool cacheImagesAsWell);
+	void buildAllIconsAndPutInCache(TXshSimpleLevel *level, std::vector<TFrameId> fids,
+									std::vector<std::string> iconIds, bool cacheImagesAsWell);
 
-protected:
+  protected:
 	bool getInfo(TImageInfo &info, int imFlags, void *extData);
 	TImageP build(int imFlags, void *extData);
 
@@ -63,7 +65,7 @@ protected:
 
 	inline int buildSubsampling(int imFlags, BuildExtData *data);
 
-private:
+  private:
 	TFilePath m_path; //!< Level path to load images from
 	TFrameId m_fid;   //!< Frame of the level to load
 
@@ -76,13 +78,13 @@ private:
 
 class ImageRasterizer : public ImageBuilder
 {
-public:
+  public:
 	ImageRasterizer() {}
 	~ImageRasterizer() {}
 
 	bool isImageCompatible(int imFlags, void *extData) { return true; }
 
-protected:
+  protected:
 	bool getInfo(TImageInfo &info, int imFlags, void *extData);
 	TImageP build(int imFlags, void *extData);
 };
@@ -91,13 +93,13 @@ protected:
 
 class ImageFiller : public ImageBuilder
 {
-public:
+  public:
 	ImageFiller() {}
 	~ImageFiller() {}
 
 	bool isImageCompatible(int imFlags, void *extData) { return true; }
 
-protected:
+  protected:
 	bool getInfo(TImageInfo &info, int imFlags, void *extData);
 	TImageP build(int imFlags, void *extData);
 };

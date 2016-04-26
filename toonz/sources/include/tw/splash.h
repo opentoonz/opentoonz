@@ -21,28 +21,28 @@ class TFilePath;
 
 class DVAPI TSplashWindow
 {
-protected:
+  protected:
 	class TSplashWindowImp;
 	TSplashWindowImp *m_imp;
-	//TThread::Executor  m_thrExecutor;
-	//TRasterP					 m_raster;
+	// TThread::Executor  m_thrExecutor;
+	// TRasterP					 m_raster;
 
-protected:
+  protected:
 	TSplashWindow(TRaster32P splash_image, unsigned int timeout_msec);
 	TSplashWindow(const TFilePath &splash_image, unsigned int timeout_msec);
 
-public:
+  public:
 	virtual ~TSplashWindow();
 	void close();
 
 	static TSplashWindow *create(TRaster32P splash_image, unsigned int timeout_msec);
 	static TSplashWindow *create(const TFilePath &splash_image, unsigned int timeout_msec);
 
-protected:
+  protected:
 	void createWindow(TRaster32P splash_image, unsigned int timeout_msec);
 	void createWindow(const TFilePath &splash_image, unsigned int timeout_msec);
 
-private:
+  private:
 	// cloning is forbidden
 	TSplashWindow(const TSplashWindow &);
 	TSplashWindow &operator=(const TSplashWindow &);

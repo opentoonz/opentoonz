@@ -12,8 +12,7 @@ using namespace DVGui;
 
 //--------------------------------------------------------------------
 
-StyleIndexLineEdit::StyleIndexLineEdit()
-	: m_pltHandle(0)
+StyleIndexLineEdit::StyleIndexLineEdit() : m_pltHandle(0)
 {
 }
 

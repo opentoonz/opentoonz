@@ -17,14 +17,14 @@ class TImageWriterMesh : public TImageWriter
 {
 	TFrameId m_fid; //!< The frame id
 
-public:
+  public:
 	TImageWriterMesh(const TFilePath &fp, const TFrameId &frameId);
 	~TImageWriterMesh() {}
 
-public:
+  public:
 	void save(const TImageP &);
 
-private:
+  private:
 	TImageWriterMesh(const TImageWriterMesh &);
 	TImageWriterMesh &operator=(const TImageWriterMesh &src);
 };
@@ -85,18 +85,18 @@ class TImageReaderMesh : public TImageReader
 	TFrameId m_fid;			   //<! Current frame id
 	mutable TImageInfo m_info; //!< The image's infos
 
-public:
+  public:
 	TImageReaderMesh(const TFilePath &fp, const TFrameId &frameId);
 	~TImageReaderMesh() {}
 
 	const TImageInfo *getImageInfo() const;
 	TImageP load();
 
-private:
+  private:
 	//! Reference to level reader
 	TLevelReaderMesh *m_lrp;
 
-private:
+  private:
 	void readHeader(TIStream &is) const;
 
 	// not implemented
@@ -213,8 +213,7 @@ TImageWriterP TLevelWriterMesh::getFrameWriter(TFrameId fid)
 //    TLevelReaderMesh  implementation
 //********************************************************************************
 
-TLevelReaderMesh::TLevelReaderMesh(const TFilePath &path)
-	: TLevelReader(path)
+TLevelReaderMesh::TLevelReaderMesh(const TFilePath &path) : TLevelReader(path)
 {
 }
 

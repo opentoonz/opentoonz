@@ -203,14 +203,13 @@ inline bool isBlank(char c)
 
 class FarmServerService : public TService
 {
-public:
+  public:
 	FarmServerService(std::ostream &os)
-		: TService("ToonzFarm Server", "ToonzFarm Server"), m_os(os), m_userLog(0) {}
-
-	~FarmServerService()
+		: TService("ToonzFarm Server", "ToonzFarm Server"), m_os(os), m_userLog(0)
 	{
-		delete m_userLog;
 	}
+
+	~FarmServerService() { delete m_userLog; }
 
 	void onStart(int argc, char *argv[]);
 	void onStop();
@@ -244,17 +243,13 @@ class FarmControllerProxy : public TSmartObject
 {
 	TFarmController *m_controller;
 
-public:
-	FarmControllerProxy(TFarmController *controller)
-		: m_controller(controller) {}
+  public:
+	FarmControllerProxy(TFarmController *controller) : m_controller(controller) {}
 
-	~FarmControllerProxy()
-	{
-		delete m_controller;
-	}
+	~FarmControllerProxy() { delete m_controller; }
 	TFarmController *getController() const { return m_controller; }
 
-private:
+  private:
 	// not implemented
 	FarmControllerProxy(const FarmControllerProxy &);
 	FarmControllerProxy &operator=(const FarmControllerProxy &);
@@ -266,7 +261,7 @@ class FarmControllerProxyP
 {
 	FarmControllerProxy *m_proxy;
 
-public:
+  public:
 	FarmControllerProxyP() : m_proxy(0) {}
 	~FarmControllerProxyP()
 	{
@@ -296,14 +291,8 @@ public:
 		return *this;
 	}
 
-	TFarmController *operator->()
-	{
-		return getPointer();
-	}
-	TFarmController *getPointer() const
-	{
-		return m_proxy ? m_proxy->getController() : 0;
-	}
+	TFarmController *operator->() { return getPointer(); }
+	TFarmController *getPointer() const { return m_proxy ? m_proxy->getController() : 0; }
 };
 
 //==============================================================================
@@ -311,7 +300,7 @@ public:
 
 class FarmServer : public TFarmExecutor, public TFarmServer
 {
-public:
+  public:
 	FarmServer(int port, TUserLog *log);
 	~FarmServer();
 
@@ -323,10 +312,7 @@ public:
 		factory.create(data, &controller);
 		m_controller = controller;
 	}
-	TFarmController *getController() const
-	{
-		return m_controller.getPointer();
-	}
+	TFarmController *getController() const { return m_controller.getPointer(); }
 	void setAppPaths(const vector<TFilePath> &);
 
 	QString execute(const vector<QString> &argv);
@@ -353,7 +339,7 @@ public:
 	// class specific methods
 	void removeTask(const QString &id);
 
-private:
+  private:
 	TThread::Executor *m_executor;
 
 	ControllerData m_controllerData;
@@ -364,10 +350,10 @@ private:
 
 	TUserLog *m_userLog;
 
-public:
-	//vector<TFilePath> m_appPaths;
+  public:
+	// vector<TFilePath> m_appPaths;
 
-private:
+  private:
 	// not implemented
 	FarmServer(const FarmServer &);
 	FarmServer &operator=(const FarmServer &);
@@ -383,24 +369,23 @@ private:
 
 class Task : public TThread::Runnable
 {
-public:
-	Task(const QString &id,
-		 const QString &cmdline,
-		 TUserLog *log,
-		 FarmServer *server,
+  public:
+	Task(const QString &id, const QString &cmdline, TUserLog *log, FarmServer *server,
 		 const FarmControllerProxyP &controller)
-		: m_id(id), m_cmdline(cmdline), m_log(log), m_server(server), m_controller(controller) {}
+		: m_id(id), m_cmdline(cmdline), m_log(log), m_server(server), m_controller(controller)
+	{
+	}
 
 	void run();
 
-private:
+  private:
 	QString m_id;
 	QString m_cmdline;
 	TUserLog *m_log;
 	FarmServer *m_server;
 	FarmControllerProxyP m_controller;
 
-private:
+  private:
 	// not implemented
 	Task(const Task &);
 	Task &operator=(const Task &);
@@ -438,7 +423,7 @@ void Task::run()
 		// dell'eseguibile
 		// Attenzione: case sensitive!
 		QStringList l = m_cmdline.split(" ");
-		//assert(!"CONTROLLARE QUI");
+		// assert(!"CONTROLLARE QUI");
 		QString appName = l.at(1);
 		int i;
 		for (i = 2; i < l.size(); i++)
@@ -455,10 +440,10 @@ void Task::run()
 			}
 		}
 	}
-#endif //LEVO
+#endif // LEVO
 
-	//cout << exename << endl;
-	//cout << cmdline << endl;
+	// cout << exename << endl;
+	// cout << cmdline << endl;
 
 	QProcess process;
 
@@ -469,7 +454,7 @@ void Task::run()
 	int errorCode = process.error();
 	bool ret = (errorCode != QProcess::UnknownError) || exitCode;
 
-	//int ret=QProcess::execute(/*"C:\\depot\\vincenzo\\toonz\\main\\x86_debug\\" +*/cmdline);
+	// int ret=QProcess::execute(/*"C:\\depot\\vincenzo\\toonz\\main\\x86_debug\\" +*/cmdline);
 
 	if (ret != 0) {
 		QString logMsg("Task aborted ");
@@ -484,7 +469,7 @@ void Task::run()
 		m_log->info(logMsg);
 		m_controller->taskCompleted(m_id, exitCode);
 
-		//CloseHandle(hJob);
+		// CloseHandle(hJob);
 	}
 
 	m_server->removeTask(m_id);
@@ -492,7 +477,7 @@ void Task::run()
 	//************* COMMENTATO A CAUSA DI UN PROBLEMA SU XP
 	// ora i dischi vengono montati al primo task di tipo "runcasm"
 	// e smontati allo stop del servizio
-	//service.unmountDisks();
+	// service.unmountDisks();
 }
 
 //==============================================================================
@@ -544,12 +529,12 @@ QString FarmServer::execute(const vector<QString> &argv)
 	if (argv.size() > 0) {
 		/*
 #ifdef _DEBUG
-    for (int i=0; i<argv.size(); ++i)
-      std::cout << argv[i] << " ";
+	for (int i=0; i<argv.size(); ++i)
+	  std::cout << argv[i] << " ";
 #endif
 */
 		if (argv[0] == "addTask" && argv.size() == 3) {
-			//assert(!"Da fare");
+			// assert(!"Da fare");
 			int ret = addTask(argv[1], argv[2]);
 			return QString::number(ret);
 		} else if (argv[0] == "terminateTask" && argv.size() > 1) {
@@ -610,7 +595,7 @@ QString FarmServer::execute(const vector<QString> &argv)
 
 int FarmServer::addTask(const QString &id, const QString &cmdline)
 {
-	//std::cout << "Server: addTask" << id << cmdline << std::endl;
+	// std::cout << "Server: addTask" << id << cmdline << std::endl;
 
 	QString lcmdline = cmdline;
 
@@ -632,7 +617,8 @@ int FarmServer::addTask(const QString &id, const QString &cmdline)
 		lcmdline += " -taskid " + id;
 
 	if (lcmdline.contains("tcomposer")) {
-		lcmdline += " -farm " + QString::number(m_controllerData.m_port) + "@" + m_controllerData.m_hostName;
+		lcmdline += " -farm " + QString::number(m_controllerData.m_port) + "@" +
+					m_controllerData.m_hostName;
 		lcmdline += " -id " + id;
 	}
 
@@ -648,19 +634,17 @@ int FarmServer::addTask(const QString &id, const QString &cmdline)
 int FarmServer::terminateTask(const QString &taskid)
 {
 #ifdef _WIN32
-	HANDLE hJob = OpenJobObject(
-		MAXIMUM_ALLOWED, // access right
-		TRUE,			 // inheritance state
+	HANDLE hJob = OpenJobObject(MAXIMUM_ALLOWED, // access right
+								TRUE,			 // inheritance state
 #if QT_VERSION >= 0x050500
-		taskid.toUtf8()); // job name
+								taskid.toUtf8()); // job name
 #else
-		taskid.toAscii()); // job name
+								taskid.toAscii());						 // job name
 #endif
 
 	if (hJob != NULL) {
-		BOOL res = TerminateJobObject(
-			hJob, // handle to job
-			2);   // exit code
+		BOOL res = TerminateJobObject(hJob, // handle to job
+									  2);   // exit code
 	}
 #else
 #endif
@@ -713,7 +697,7 @@ void FarmServer::queryHwInfo(HwInfo &hwInfo)
 
 	hwInfo.m_cpuCount = TSystem::getProcessorCount();
 
-	//We can just retrieve the overall physical memory - the rest is defaulted to 500 MB
+	// We can just retrieve the overall physical memory - the rest is defaulted to 500 MB
 	hwInfo.m_totPhysMem = physMemSize;
 	hwInfo.m_availPhysMem = 500000000;
 	hwInfo.m_totVirtMem = 500000000;
@@ -735,7 +719,7 @@ void FarmServer::attachController(const ControllerData &data)
 void FarmServer::detachController(const ControllerData &data)
 {
 	if (m_controllerData == data) {
-		//delete m_controller;
+		// delete m_controller;
 		m_controller = 0;
 	}
 }
@@ -776,7 +760,10 @@ std::string getLine(std::istream &is)
 
 } // anonymous namespace
 
-int inline STRICMP(const QString &a, const QString &b) { return a.compare(b, Qt::CaseSensitive); }
+int inline STRICMP(const QString &a, const QString &b)
+{
+	return a.compare(b, Qt::CaseSensitive);
+}
 int inline STRICMP(const char *a, const char *b)
 {
 	QString str(a);
@@ -801,9 +788,9 @@ bool loadServerData(const QString &hostname, QString &addr, int &port)
 		return false;
 	while (!is.eof()) {
 		/*
-    char line[256];
-    is.getline(line, 256);
-    */
+	char line[256];
+	is.getline(line, 256);
+	*/
 		std::string line = getLine(is);
 		std::istrstream iss(line.c_str());
 
@@ -877,7 +864,8 @@ void FarmServerService::onStart(int argc, char *argv[])
 	if (!gRootDirExists) {
 		std::string errMsg("Unable to start the Server");
 		errMsg += "\n";
-		errMsg += "The directory " + toString(gRootDir.getWideString()) + " specified as Global Root does not exist";
+		errMsg += "The directory " + toString(gRootDir.getWideString()) +
+				  " specified as Global Root does not exist";
 		;
 
 		addToMessageLog(errMsg);
@@ -957,7 +945,7 @@ void FarmServerService::onStart(int argc, char *argv[])
 		// i dischi vengono montati al primo task di tipo "runcasm"
 		// e smontati allo stop del servizio
 
-		//mountDisks();
+		// mountDisks();
 	}
 #endif
 
@@ -972,13 +960,13 @@ void FarmServerService::onStart(int argc, char *argv[])
 
   Tifstream isAppCfgFile(appsCfgFile);
   if (!isAppCfgFile.good())
-    std::cout << "Error: " << appsCfgFile << endl;
+	std::cout << "Error: " << appsCfgFile << endl;
   while (!isAppCfgFile.eof())
   {
-    std::string line = getLine(isAppCfgFile);
-    istrstream iss(line.c_str());
-    TFilePath appPath = TFilePath(line);
-    appPaths.push_back(appPath);
+	std::string line = getLine(isAppCfgFile);
+	istrstream iss(line.c_str());
+	TFilePath appPath = TFilePath(line);
+	appPaths.push_back(appPath);
   }
 
   m_farmServer->setAppPaths(appPaths);
@@ -986,13 +974,13 @@ void FarmServerService::onStart(int argc, char *argv[])
 
 	QEventLoop eventLoop;
 
-	//Connect the server's listening finished signal to main loop quit.
+	// Connect the server's listening finished signal to main loop quit.
 	QObject::connect(m_farmServer, SIGNAL(finished()), &eventLoop, SLOT(quit()));
 
-	//Run the TcpIp server's listening state
+	// Run the TcpIp server's listening state
 	m_farmServer->start();
 
-	//Main loop starts here
+	// Main loop starts here
 	eventLoop.exec();
 
 	//----------------------Farm server loops here------------------------
@@ -1009,16 +997,11 @@ void FarmServerService::onStart(int argc, char *argv[])
 
 #ifdef _WIN32
 		LPVOID lpMsgBuf;
-		FormatMessage(
-			FORMAT_MESSAGE_ALLOCATE_BUFFER |
-				FORMAT_MESSAGE_FROM_SYSTEM |
-				FORMAT_MESSAGE_IGNORE_INSERTS,
-			NULL,
-			rc,
-			0, // Default language
-			(LPTSTR)&lpMsgBuf,
-			0,
-			NULL);
+		FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
+						  FORMAT_MESSAGE_IGNORE_INSERTS,
+					  NULL, rc,
+					  0, // Default language
+					  (LPTSTR)&lpMsgBuf, 0, NULL);
 
 		msg += std::string((char *)lpMsgBuf);
 
@@ -1124,15 +1107,14 @@ void FarmServerService::mountDisks()
 		NetResource.lpRemoteName = (LPSTR)remoteName.c_str(); // "\\\\vega\\PERSONALI";
 		NetResource.lpProvider = NULL;
 
-		DWORD res = WNetAddConnection2(
-			&NetResource, // connection details
-			0,			  // password
+		DWORD res = WNetAddConnection2(&NetResource, // connection details
+									   0,			 // password
 #if QT_VERSION >= 0x050500
-			TSystem::getUserName().toUtf8(), // user name
+									   TSystem::getUserName().toUtf8(), // user name
 #else
-			TSystem::getUserName().toAscii(), // user name
+									   TSystem::getUserName().toAscii(), // user name
 #endif
-			0); // connection options
+									   0); // connection options
 
 		if (res == NO_ERROR)
 			m_disksMounted.push_back(drive);
@@ -1144,12 +1126,11 @@ void FarmServerService::mountDisks()
 			char errorBuf[1024];
 			char nameBuf[1024];
 
-			DWORD rett = WNetGetLastError(
-				&dwLastError,	 // error code
-				errorBuf,		  // error description buffer
-				sizeof(errorBuf), // size of description buffer
-				nameBuf,		  // buffer for provider name
-				sizeof(nameBuf)); // size of provider name buffer
+			DWORD rett = WNetGetLastError(&dwLastError,		// error code
+										  errorBuf,			// error description buffer
+										  sizeof(errorBuf), // size of description buffer
+										  nameBuf,			// buffer for provider name
+										  sizeof(nameBuf)); // size of provider name buffer
 
 			std::string errorMessage("Unable to map ");
 			errorMessage += NetResource.lpRemoteName;
@@ -1169,10 +1150,9 @@ void FarmServerService::unmountDisks()
 	for (; it != m_disksMounted.end(); ++it) {
 		std::string drive = *it;
 
-		DWORD res = WNetCancelConnection2(
-			drive.c_str(),			// resource name
-			CONNECT_UPDATE_PROFILE, // connection type
-			TRUE);					// unconditional disconnect option
+		DWORD res = WNetCancelConnection2(drive.c_str(),		  // resource name
+										  CONNECT_UPDATE_PROFILE, // connection type
+										  TRUE);				  // unconditional disconnect option
 
 		if (res != NO_ERROR && res != ERROR_NOT_CONNECTED) {
 			std::string errorMessage("Unable to unmap ");
@@ -1197,7 +1177,7 @@ int main(int argc, char **argv)
 	bool console = false;
 
 	if (argc > 1) {
-		std::string serviceName("ToonzFarmServer"); //Must be the same of the installer's
+		std::string serviceName("ToonzFarmServer"); // Must be the same of the installer's
 		std::string serviceDisplayName = serviceName;
 
 		TCli::SimpleQualifier consoleQualifier("-console", "Run as console app");
@@ -1219,16 +1199,12 @@ int main(int argc, char **argv)
 			if (GetModuleFileName(NULL, szPath, 512) == 0) {
 				std::cout << "Unable to install";
 				std::cout << serviceName << " - ";
-				std::cout << getLastErrorText().c_str() << std::endl
-						  << std::endl;
+				std::cout << getLastErrorText().c_str() << std::endl << std::endl;
 
 				return 0;
 			}
 
-			TService::install(
-				serviceName,
-				serviceDisplayName,
-				TFilePath(szPath));
+			TService::install(serviceName, serviceDisplayName, TFilePath(szPath));
 
 			return 0;
 		}

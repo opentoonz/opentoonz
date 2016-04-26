@@ -28,7 +28,7 @@ class SetSaveboxTool
 	TToonzImage *getImage();
 	int getDragType(const TPointD &pos);
 
-public:
+  public:
 	SetSaveboxTool(TTool *tool);
 
 	int getCursorId(const TPointD &pos);
@@ -40,4 +40,4 @@ public:
 	void draw();
 };
 
-#endif //SETSAVEBOXTOOL_INCLUDED
+#endif // SETSAVEBOXTOOL_INCLUDED

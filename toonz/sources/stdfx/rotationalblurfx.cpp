@@ -15,9 +15,8 @@ class SpinBlurFx : public TStandardRasterFx
 	TDoubleParamP m_radius;
 	TDoubleParamP m_blur;
 
-public:
-	SpinBlurFx()
-		: m_point(TPointD(0.0, 0.0)), m_radius(0.0), m_blur(2.0)
+  public:
+	SpinBlurFx() : m_point(TPointD(0.0, 0.0)), m_radius(0.0), m_blur(2.0)
 	{
 		m_point->getX()->setMeasureName("fxLength");
 		m_point->getY()->setMeasureName("fxLength");
@@ -61,9 +60,8 @@ public:
 		return tround(4 * blurangle * dist);
 	}
 
-	void enlarge(
-		const TRectD &bbox, TRectD &requestedGeom,
-		const TRenderSettings &ri, double frame);
+	void enlarge(const TRectD &bbox, TRectD &requestedGeom, const TRenderSettings &ri,
+				 double frame);
 
 	bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info)
 	{
@@ -77,11 +75,8 @@ public:
 		}
 	}
 
-	void transform(double frame,
-				   int port,
-				   const TRectD &rectOnOutput,
-				   const TRenderSettings &infoOnOutput,
-				   TRectD &rectOnInput,
+	void transform(double frame, int port, const TRectD &rectOnOutput,
+				   const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
 				   TRenderSettings &infoOnInput);
 
 	void doCompute(TTile &tile, double frame, const TRenderSettings &);
@@ -112,8 +107,8 @@ public:
 
 //------------------------------------------------------------------------------
 template <typename PIXEL, typename CHANNEL_TYPE, int MAX_CHANNEL_VALUE>
-void doSpinBlur(const TRasterPT<PIXEL> rout, const TRasterPT<PIXEL> rin, double blur,
-				double radius, TPointD point)
+void doSpinBlur(const TRasterPT<PIXEL> rout, const TRasterPT<PIXEL> rin, double blur, double radius,
+				TPointD point)
 {
 	int maxRange = 0;
 	int dx = (int)point.x;
@@ -163,7 +158,7 @@ void doSpinBlur(const TRasterPT<PIXEL> rout, const TRasterPT<PIXEL> rin, double 
 					shiftx = (int)(dist * cos(tmpangle));
 					shifty = (int)(dist * sin(tmpangle));
 					if ((shiftx) < XMIN)
-						continue; //shiftx=XMIN;
+						continue; // shiftx=XMIN;
 					if ((shiftx) >= XMAX)
 						continue; //=XMAX-1;
 					if ((shifty) < YMIN)
@@ -196,11 +191,10 @@ void doSpinBlur(const TRasterPT<PIXEL> rout, const TRasterPT<PIXEL> rin, double 
 
 //------------------------------------------------------------------------------
 
-//!Calculates the geometry we need for this node computation, given
-//!the known input data (bbox) and the requested output (requestedGeom).
-void SpinBlurFx::enlarge(
-	const TRectD &bbox, TRectD &requestedGeom,
-	const TRenderSettings &ri, double frame)
+//! Calculates the geometry we need for this node computation, given
+//! the known input data (bbox) and the requested output (requestedGeom).
+void SpinBlurFx::enlarge(const TRectD &bbox, TRectD &requestedGeom, const TRenderSettings &ri,
+						 double frame)
 {
 	TRectD enlargedBbox(bbox);
 	TRectD enlargedGeom(requestedGeom);
@@ -210,8 +204,8 @@ void SpinBlurFx::enlarge(
 	enlargedBbox = enlargedBbox.enlarge(maxRange);
 	enlargedGeom = enlargedGeom.enlarge(maxRange);
 
-	//We are to find out the geometry that is useful for the fx computation.
-	//There are some rules to follow:
+	// We are to find out the geometry that is useful for the fx computation.
+	// There are some rules to follow:
 	//  a) First, the interesting output we can generate is bounded by both
 	//     the requestedRect and the blurred bbox (i.e. enlarged by the blur radius).
 	//  b) Pixels contributing to any output are necessarily part of bbox - and only
@@ -220,7 +214,7 @@ void SpinBlurFx::enlarge(
 
 	requestedGeom = (enlargedGeom * bbox) + (enlargedBbox * requestedGeom);
 
-	//Finally, make sure that the result is coherent with the original P00
+	// Finally, make sure that the result is coherent with the original P00
 	requestedGeom -= originalP00;
 	requestedGeom.x0 = tfloor(requestedGeom.x0);
 	requestedGeom.y0 = tfloor(requestedGeom.y0);
@@ -231,13 +225,9 @@ void SpinBlurFx::enlarge(
 
 //------------------------------------------------------------------------------
 
-void SpinBlurFx::transform(
-	double frame,
-	int port,
-	const TRectD &rectOnOutput,
-	const TRenderSettings &infoOnOutput,
-	TRectD &rectOnInput,
-	TRenderSettings &infoOnInput)
+void SpinBlurFx::transform(double frame, int port, const TRectD &rectOnOutput,
+						   const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
+						   TRenderSettings &infoOnInput)
 {
 	TRectD rectOut(rectOnOutput);
 
@@ -294,8 +284,7 @@ void SpinBlurFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 	TPoint offset = convert(tile.m_pos - tileRect.getP00());
 	TTile tileIn;
 	if (raster32) {
-		m_input->allocateAndCompute(tileIn, tileRect.getP00(),
-									TDimension(rasInLx, rasInLy),
+		m_input->allocateAndCompute(tileIn, tileRect.getP00(), TDimension(rasInLx, rasInLy),
 									raster32, frame, ri);
 		TRaster32P rin = tileIn.getRaster();
 		TRaster32P app = raster32->create(rasInLx, rasInLy);
@@ -303,8 +292,7 @@ void SpinBlurFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 		raster32->copy(app, -offset);
 	} else if (raster64) {
 		TRaster64P raster64 = tile.getRaster();
-		m_input->allocateAndCompute(tileIn, tileRect.getP00(),
-									TDimension(rasInLx, rasInLy),
+		m_input->allocateAndCompute(tileIn, tileRect.getP00(), TDimension(rasInLx, rasInLy),
 									raster64, frame, ri);
 		TRaster64P rin = tileIn.getRaster();
 		TRaster64P app = raster64->create(rasInLx, rasInLy);
@@ -317,41 +305,41 @@ void SpinBlurFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
   TPointD rectInCenter=(rectIn.getP00()+rectIn.getP11())*0.5;
   //rectIn = rectIn.enlarge(blur);
   int rasInLx = tround(rectIn.getLx())+1;
-  int rasInLy = tround(rectIn.getLy())+1;  
-  
+  int rasInLy = tround(rectIn.getLy())+1;
+
   point-=rectInCenter;
 
-  
 
- 
+
+
 
   TRaster32P raster32 = tile.getRaster();
-  
-  
+
+
   TTile tileIn;
-  
-  
+
+
   if (raster32)
-    {
-    m_input->allocateAndCompute(tileIn, rectIn.getP00(), 
-                              TDimension(rasInLx, rasInLy), 
-                              raster32, frame, ri);
-    TRaster32P rin=tileIn.getRaster();
-    doSpinBlur<TPixel32, UCHAR, 255>(raster32, rin, blur, radius, point);
-    }
+	{
+	m_input->allocateAndCompute(tileIn, rectIn.getP00(),
+							  TDimension(rasInLx, rasInLy),
+							  raster32, frame, ri);
+	TRaster32P rin=tileIn.getRaster();
+	doSpinBlur<TPixel32, UCHAR, 255>(raster32, rin, blur, radius, point);
+	}
   else
   {
-    TRaster64P raster64 = tile.getRaster();
-    
-    m_input->allocateAndCompute(tileIn, rectIn.getP00(), 
-                              TDimension(rasInLx, rasInLy), 
-                              raster64, frame, ri);
-    TRaster64P rin=tileIn.getRaster();
-    if (raster64)
-      doSpinBlur<TPixel64, USHORT, 65535>(raster64, rin, blur, radius, point);
-    else
-      throw TException("Brightness&Contrast: unsupported Pixel Type");
-  } 
+	TRaster64P raster64 = tile.getRaster();
+
+	m_input->allocateAndCompute(tileIn, rectIn.getP00(),
+							  TDimension(rasInLx, rasInLy),
+							  raster64, frame, ri);
+	TRaster64P rin=tileIn.getRaster();
+	if (raster64)
+	  doSpinBlur<TPixel64, USHORT, 65535>(raster64, rin, blur, radius, point);
+	else
+	  throw TException("Brightness&Contrast: unsupported Pixel Type");
+  }
 
 
 */

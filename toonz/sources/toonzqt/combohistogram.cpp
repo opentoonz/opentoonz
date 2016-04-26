@@ -10,7 +10,7 @@
 #include <QString>
 
 #include "toonz/preferences.h"
-//iwsw commented out temporarily
+// iwsw commented out temporarily
 //#include "toonzqt/ghibli_3dlut_converter.h"
 #include <QPushButton>
 #include <QDialog>
@@ -43,7 +43,7 @@ void ChannelHistoGraph::setValues()
 
 	int i;
 
-	//normalize with the maximum value
+	// normalize with the maximum value
 	int maxValue = 1;
 	for (i = 0; i < COMBOHIST_RESOLUTION_W; i++) {
 		int count = m_channelValuePtr[i];
@@ -82,7 +82,7 @@ void ChannelHistoGraph::paintEvent(QPaintEvent *event)
 
 	p.setPen(Qt::black);
 
-	//draw each histogram
+	// draw each histogram
 	for (i = 0; i < COMBOHIST_RESOLUTION_W; i++) {
 		int v = m_values[i];
 		if (v <= 0)
@@ -91,7 +91,7 @@ void ChannelHistoGraph::paintEvent(QPaintEvent *event)
 		p.drawLine(x, COMBOHIST_RESOLUTION_H + 1 - v, x, COMBOHIST_RESOLUTION_H);
 	}
 
-	//draw picked color's channel value
+	// draw picked color's channel value
 	if (m_pickedValue > -1) {
 		p.setPen(Qt::white);
 		int x = 1 + m_pickedValue;
@@ -114,7 +114,8 @@ void ChannelHistoGraph::showCurrentChannelValue(int val)
 RGBHistoGraph::RGBHistoGraph(QWidget *parent, int *channelValue)
 	: ChannelHistoGraph(parent, channelValue)
 {
-	m_histoImg = QImage(COMBOHIST_RESOLUTION_W, COMBOHIST_RESOLUTION_H, QImage::Format_ARGB32_Premultiplied);
+	m_histoImg =
+		QImage(COMBOHIST_RESOLUTION_W, COMBOHIST_RESOLUTION_H, QImage::Format_ARGB32_Premultiplied);
 }
 
 //-----------------------------------------------------------------------------
@@ -135,7 +136,7 @@ void RGBHistoGraph::setValues()
 
 		int i;
 
-		//normalize with the maximum value
+		// normalize with the maximum value
 		int maxValue = 1;
 		for (i = 0; i < COMBOHIST_RESOLUTION_W; i++) {
 			int count = m_channelValuePtr[COMBOHIST_RESOLUTION_W * chan + i];
@@ -194,8 +195,7 @@ void RGBHistoGraph::paintEvent(QPaintEvent *event)
 //=============================================================================
 // ChannelColorBar
 //-----------------------------------------------------------------------------
-ChannelColorBar::ChannelColorBar(QWidget *parent, QColor color)
-	: QWidget(parent), m_color(color)
+ChannelColorBar::ChannelColorBar(QWidget *parent, QColor color) : QWidget(parent), m_color(color)
 {
 	// 2 pixels margin for width
 	setFixedSize(COMBOHIST_RESOLUTION_W + 2, 6);
@@ -258,7 +258,7 @@ ChannelHisto::ChannelHisto(int channelIndex, int *channelValue, QWidget *parent)
 
 	m_colorBar = new ChannelColorBar(this, color);
 
-	//show/hide the alpha channel
+	// show/hide the alpha channel
 	QPushButton *showAlphaChannelButton = 0;
 	if (channelIndex == 3) {
 		showAlphaChannelButton = new QPushButton("", this);
@@ -269,7 +269,7 @@ ChannelHisto::ChannelHisto(int channelIndex, int *channelValue, QWidget *parent)
 		showAlphaChannelButton->setFocusPolicy(Qt::NoFocus);
 	}
 
-	//layout
+	// layout
 	QVBoxLayout *mainLayout = new QVBoxLayout(this);
 	mainLayout->setMargin(0);
 	mainLayout->setSpacing(2);
@@ -291,7 +291,8 @@ ChannelHisto::ChannelHisto(int channelIndex, int *channelValue, QWidget *parent)
 	setLayout(mainLayout);
 
 	if (channelIndex == 3) {
-		connect(showAlphaChannelButton, SIGNAL(toggled(bool)), this, SLOT(onShowAlphaButtonToggled(bool)));
+		connect(showAlphaChannelButton, SIGNAL(toggled(bool)), this,
+				SLOT(onShowAlphaButtonToggled(bool)));
 		onShowAlphaButtonToggled(false);
 	}
 }
@@ -341,7 +342,7 @@ void ComboHistoRGBLabel::paintEvent(QPaintEvent *pe)
 		return;
 	}
 
-	//iwsw commented out temporarily
+	// iwsw commented out temporarily
 	/*
 	if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
 	{
@@ -355,32 +356,30 @@ void ComboHistoRGBLabel::paintEvent(QPaintEvent *pe)
 
 	p.drawRect(bgRect);
 
-	//white text for dark color, black text for light color
-	int val = m_color.red() * 30 +
-			  m_color.green() * 59 +
-			  m_color.blue() * 11;
+	// white text for dark color, black text for light color
+	int val = m_color.red() * 30 + m_color.green() * 59 + m_color.blue() * 11;
 	if (val < 12800)
 		p.setPen(Qt::white);
 	else
 		p.setPen(Qt::black);
 	p.setBrush(Qt::NoBrush);
 
-	p.drawText(rect(), Qt::AlignCenter,
-			   QString("R:%1 G:%2 B:%3").arg(m_color.red()).arg(m_color.green()).arg(m_color.blue()));
+	p.drawText(
+		rect(), Qt::AlignCenter,
+		QString("R:%1 G:%2 B:%3").arg(m_color.red()).arg(m_color.green()).arg(m_color.blue()));
 }
 
 //=============================================================================
 // ComboHistogram
 //-----------------------------------------------------------------------------
 
-ComboHistogram::ComboHistogram(QWidget *parent)
-	: QWidget(parent), m_raster(0), m_palette(0)
+ComboHistogram::ComboHistogram(QWidget *parent) : QWidget(parent), m_raster(0), m_palette(0)
 {
 	for (int chan = 0; chan < 4; chan++)
 		m_histograms[chan] = new ChannelHisto(chan, &m_channelValue[chan][0], this);
 	m_histograms[4] = new ChannelHisto(4, &m_channelValue[0][0], this);
 
-	//RGB label
+	// RGB label
 	m_rgbLabel = new ComboHistoRGBLabel(QColor(128, 128, 128), this);
 	m_rgbLabel->setStyleSheet("font-size: 18px;");
 
@@ -390,34 +389,38 @@ ComboHistogram::ComboHistogram(QWidget *parent)
 	m_xPosLabel = new QLabel("", this);
 	m_yPosLabel = new QLabel("", this);
 
-	//layout
+	// layout
 	QVBoxLayout *mainLayout = new QVBoxLayout();
 	mainLayout->setMargin(5);
 	mainLayout->setSpacing(5);
 	{
-		mainLayout->addWidget(m_histograms[4]); //RGB
+		mainLayout->addWidget(m_histograms[4]); // RGB
 
-		mainLayout->addWidget(new QLabel("Picked Color", this), 0, Qt::AlignLeft | Qt::AlignVCenter);
+		mainLayout->addWidget(new QLabel("Picked Color", this), 0,
+							  Qt::AlignLeft | Qt::AlignVCenter);
 		mainLayout->addWidget(m_rgbLabel, 0, Qt::AlignCenter);
 
-		mainLayout->addWidget(new QLabel("Average Color (Ctrl + Drag)", this), 0, Qt::AlignLeft | Qt::AlignVCenter);
+		mainLayout->addWidget(new QLabel("Average Color (Ctrl + Drag)", this), 0,
+							  Qt::AlignLeft | Qt::AlignVCenter);
 		mainLayout->addWidget(m_rectAverageRgbLabel, 0, Qt::AlignCenter);
 
 		QGridLayout *infoParamLay = new QGridLayout();
 		infoParamLay->setHorizontalSpacing(3);
 		infoParamLay->setVerticalSpacing(5);
 		{
-			infoParamLay->addWidget(new QLabel("X:", this), 0, 0, Qt::AlignRight | Qt::AlignVCenter);
+			infoParamLay->addWidget(new QLabel("X:", this), 0, 0,
+									Qt::AlignRight | Qt::AlignVCenter);
 			infoParamLay->addWidget(m_xPosLabel, 0, 1, Qt::AlignLeft | Qt::AlignVCenter);
-			infoParamLay->addWidget(new QLabel("Y:", this), 1, 0, Qt::AlignRight | Qt::AlignVCenter);
+			infoParamLay->addWidget(new QLabel("Y:", this), 1, 0,
+									Qt::AlignRight | Qt::AlignVCenter);
 			infoParamLay->addWidget(m_yPosLabel, 1, 1, Qt::AlignLeft | Qt::AlignVCenter);
 		}
 		mainLayout->addLayout(infoParamLay, 0);
 
-		mainLayout->addWidget(m_histograms[0]); //R
-		mainLayout->addWidget(m_histograms[1]); //G
-		mainLayout->addWidget(m_histograms[2]); //B
-		mainLayout->addWidget(m_histograms[3]); //A
+		mainLayout->addWidget(m_histograms[0]); // R
+		mainLayout->addWidget(m_histograms[1]); // G
+		mainLayout->addWidget(m_histograms[2]); // B
+		mainLayout->addWidget(m_histograms[3]); // A
 		mainLayout->addStretch(1);
 	}
 	setLayout(mainLayout);
@@ -495,7 +498,7 @@ void ComboHistogram::computeChannelsValue()
 					++m_channelValue[3][color.m];
 				}
 			}
-		} else //8bpc raster
+		} else // 8bpc raster
 		{
 			for (j = 0; j < ly; j++) {
 				TPixel *pix = (TPixel *)m_raster->getRawData(0, j);
@@ -524,7 +527,7 @@ void ComboHistogram::updateInfo(const TPixel32 &pix, const TPointD &imagePos)
 		m_xPosLabel->setText("");
 		m_yPosLabel->setText("");
 	} else {
-		//show picked color's channel values
+		// show picked color's channel values
 		m_histograms[0]->showCurrentChannelValue((int)pix.r);
 		m_histograms[1]->showCurrentChannelValue((int)pix.g);
 		m_histograms[2]->showCurrentChannelValue((int)pix.b);

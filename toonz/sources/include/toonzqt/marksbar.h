@@ -3,10 +3,10 @@
 #ifndef MARKSBAR_H
 #define MARKSBAR_H
 
-//Toonz includes
+// Toonz includes
 #include "tcommon.h"
 
-//Qt includes
+// Qt includes
 #include <QFrame>
 
 #undef DVAPI
@@ -30,7 +30,7 @@ class DVAPI MarksBar : public QFrame
 {
 	Q_OBJECT
 
-protected:
+  protected:
 	int m_min, m_max, m_sortDist;
 
 	QVector<int> m_values;
@@ -39,7 +39,7 @@ protected:
 
 	bool m_markUp;
 
-public:
+  public:
 	MarksBar(QWidget *parent = 0, bool markUp = true);
 
 	void setRange(int min, int max, int sortDistance = -1);
@@ -58,7 +58,7 @@ public:
 
 	void conformValues(bool preferRollDown = true);
 
-protected:
+  protected:
 	virtual void drawMark(QPainter &p, int pos, const QColor &color);
 
 	int valToPos(int val);
@@ -69,10 +69,10 @@ protected:
 	void mouseMoveEvent(QMouseEvent *me);
 	void mouseReleaseEvent(QMouseEvent *me);
 
-signals:
+  signals:
 
 	void marksUpdated();
 	void marksReleased();
 };
 
-#endif //MARKSBAR_H
+#endif // MARKSBAR_H

@@ -135,7 +135,7 @@ bool areStylesUsed(const TImageP image, const std::vector<int> styleIds)
 	return false;
 }
 
-} //namespace
+} // namespace
 
 //===================================================================
 
@@ -193,13 +193,12 @@ class ArrangeStylesUndo : public TUndo
 	int m_srcPageIndex;
 	std::set<int> m_srcIndicesInPage;
 
-public:
-	ArrangeStylesUndo(TPaletteHandle *paletteHandle,
-					  int dstPageIndex,
-					  int dstIndexInPage,
-					  int srcPageIndex,
-					  const std::set<int> &srcIndicesInPage)
-		: m_paletteHandle(paletteHandle), m_dstPageIndex(dstPageIndex), m_dstIndexInPage(dstIndexInPage), m_srcPageIndex(srcPageIndex), m_srcIndicesInPage(srcIndicesInPage)
+  public:
+	ArrangeStylesUndo(TPaletteHandle *paletteHandle, int dstPageIndex, int dstIndexInPage,
+					  int srcPageIndex, const std::set<int> &srcIndicesInPage)
+		: m_paletteHandle(paletteHandle), m_dstPageIndex(dstPageIndex),
+		  m_dstIndexInPage(dstIndexInPage), m_srcPageIndex(srcPageIndex),
+		  m_srcIndicesInPage(srcIndicesInPage)
 	{
 		m_palette = m_paletteHandle->getPalette();
 		assert(m_palette);
@@ -211,7 +210,8 @@ public:
 		assert(!srcIndicesInPage.empty());
 		TPalette::Page *srcPage = m_palette->getPage(srcPageIndex);
 		assert(srcPage);
-		assert(0 <= *srcIndicesInPage.begin() && *srcIndicesInPage.rbegin() < srcPage->getStyleCount());
+		assert(0 <= *srcIndicesInPage.begin() &&
+			   *srcIndicesInPage.rbegin() < srcPage->getStyleCount());
 	}
 	void undo() const
 	{
@@ -272,32 +272,26 @@ public:
 		return QObject::tr("Arrange Styles  in Palette %1")
 			.arg(QString::fromStdWString(m_palette->getPaletteName()));
 	}
-	int getHistoryType()
-	{
-		return HistoryType::Palette;
-	}
+	int getHistoryType() { return HistoryType::Palette; }
 };
 
 } // namespace
 
 //-----------------------------------------------------------------------------
 
-void PaletteCmd::arrangeStyles(TPaletteHandle *paletteHandle,
-							   int dstPageIndex, int dstIndexInPage,
+void PaletteCmd::arrangeStyles(TPaletteHandle *paletteHandle, int dstPageIndex, int dstIndexInPage,
 							   int srcPageIndex, const std::set<int> &srcIndicesInPage)
 {
 	if (dstPageIndex == srcPageIndex && dstIndexInPage == *srcIndicesInPage.begin())
 		return;
-	ArrangeStylesUndo *undo =
-		new ArrangeStylesUndo(paletteHandle, dstPageIndex,
-							  dstIndexInPage, srcPageIndex,
-							  srcIndicesInPage);
+	ArrangeStylesUndo *undo = new ArrangeStylesUndo(paletteHandle, dstPageIndex, dstIndexInPage,
+													srcPageIndex, srcIndicesInPage);
 	undo->redo();
 	TUndoManager::manager()->add(undo);
 }
 
 //=============================================================================
-//CreateStyle
+// CreateStyle
 //-----------------------------------------------------------------------------
 namespace
 {
@@ -311,11 +305,8 @@ class CreateStyleUndo : public TUndo
 	int m_styleId;
 	TColorStyle *m_style;
 
-public:
-	CreateStyleUndo(
-		TPaletteHandle *paletteHandle,
-		int pageIndex,
-		int styleId)
+  public:
+	CreateStyleUndo(TPaletteHandle *paletteHandle, int pageIndex, int styleId)
 		: m_paletteHandle(paletteHandle), m_pageIndex(pageIndex), m_styleId(styleId)
 	{
 		m_palette = m_paletteHandle->getPalette();
@@ -355,19 +346,14 @@ public:
 			.arg(QString::number(m_styleId))
 			.arg(QString::fromStdWString(m_palette->getPaletteName()));
 	}
-	int getHistoryType()
-	{
-		return HistoryType::Palette;
-	}
+	int getHistoryType() { return HistoryType::Palette; }
 };
 
 } // namespace
 
 //-----------------------------------------------------------------------------
 
-void PaletteCmd::createStyle(
-	TPaletteHandle *paletteHandle,
-	TPalette::Page *page)
+void PaletteCmd::createStyle(TPaletteHandle *paletteHandle, TPalette::Page *page)
 {
 	int index = paletteHandle->getStyleIndex();
 	TPalette *palette = paletteHandle->getPalette();
@@ -414,7 +400,8 @@ void PaletteCmd::createStyle(
 
 	palette->setDirtyFlag(true);
 	paletteHandle->notifyPaletteChanged();
-	TUndoManager::manager()->add(new CreateStyleUndo(paletteHandle, page->getIndex(), page->getStyleId(newIndex)));
+	TUndoManager::manager()->add(
+		new CreateStyleUndo(paletteHandle, page->getIndex(), page->getStyleId(newIndex)));
 }
 
 //=============================================================================
@@ -436,15 +423,12 @@ class AddStylesUndo : public TUndo
 	std::vector<std::pair<TColorStyle *, int>> m_styles;
 	TPaletteHandle *m_paletteHandle;
 
-public:
+  public:
 	// creare DOPO l'inserimento
-	AddStylesUndo(
-		const TPaletteP &palette,
-		int pageIndex,
-		int indexInPage,
-		int count,
-		TPaletteHandle *paletteHandle)
-		: m_palette(palette), m_pageIndex(pageIndex), m_indexInPage(indexInPage), m_paletteHandle(paletteHandle)
+	AddStylesUndo(const TPaletteP &palette, int pageIndex, int indexInPage, int count,
+				  TPaletteHandle *paletteHandle)
+		: m_palette(palette), m_pageIndex(pageIndex), m_indexInPage(indexInPage),
+		  m_paletteHandle(paletteHandle)
 	{
 		assert(m_palette);
 		assert(0 <= m_pageIndex && m_pageIndex < m_palette->getPageCount());
@@ -493,18 +477,15 @@ public:
 		return QObject::tr("Add Style  to Palette %1")
 			.arg(QString::fromStdWString(m_palette->getPaletteName()));
 	}
-	int getHistoryType()
-	{
-		return HistoryType::Palette;
-	}
+	int getHistoryType() { return HistoryType::Palette; }
 };
 
 } // namespace
 
 //-----------------------------------------------------------------------------
 /*- ドラッグ＆ドロップ時に呼ばれる -*/
-void PaletteCmd::addStyles(TPaletteHandle *paletteHandle, int pageIndex,
-						   int indexInPage, const std::vector<TColorStyle *> &styles)
+void PaletteCmd::addStyles(TPaletteHandle *paletteHandle, int pageIndex, int indexInPage,
+						   const std::vector<TColorStyle *> &styles)
 {
 	TPalette *palette = paletteHandle->getPalette();
 	assert(0 <= pageIndex && pageIndex < palette->getPageCount());
@@ -525,7 +506,8 @@ void PaletteCmd::addStyles(TPaletteHandle *paletteHandle, int pageIndex,
 		}
 		/*-- それ以外の場合は、clone()でそれぞれの名前をコピーしているので、そのままでOK --*/
 	}
-	TUndoManager::manager()->add(new AddStylesUndo(palette, pageIndex, indexInPage, count, paletteHandle));
+	TUndoManager::manager()->add(
+		new AddStylesUndo(palette, pageIndex, indexInPage, count, paletteHandle));
 	palette->setDirtyFlag(true);
 }
 
@@ -571,11 +553,12 @@ void PaletteCmd::eraseStyles(const std::set<TXshSimpleLevel *> &levels,
 
 		mutable std::map<TXshSimpleLevelP, std::vector<TVectorImageP>> m_imagesByLevel;
 
-	public:
+	  public:
 		Undo(const std::set<TXshSimpleLevel *> &levels, const std::vector<int> &styleIds)
 			: m_levels(levels), m_styleIds(styleIds)
 		{
-			tcg::substitute(m_imagesByLevel, levels | boost::adaptors::filtered(isVector) | boost::adaptors::transformed(toEmptyLevelImages));
+			tcg::substitute(m_imagesByLevel, levels | boost::adaptors::filtered(isVector) |
+												 boost::adaptors::transformed(toEmptyLevelImages));
 		}
 
 		bool isValid() const { return !m_levels.empty(); }
@@ -593,7 +576,7 @@ void PaletteCmd::eraseStyles(const std::set<TXshSimpleLevel *> &levels,
 
 		int getSize() const { return 10 << 20; } // At max 10 per 100 MB
 
-	private:
+	  private:
 		static bool isVector(const TXshSimpleLevel *level)
 		{
 			return (assert(level), level->getType() == PLI_XSHLEVEL);
@@ -613,7 +596,8 @@ void PaletteCmd::eraseStyles(const std::set<TXshSimpleLevel *> &levels,
 
 		static TVectorImageP cloneImage(const TXshSimpleLevel &level, int f)
 		{
-			TVectorImageP src = static_cast<TVectorImageP>(level.getFrame(level.getFrameId(f), false));
+			TVectorImageP src =
+				static_cast<TVectorImageP>(level.getFrame(level.getFrameId(f), false));
 			TVectorImageP dst = src->clone();
 
 			copyStrokeIds(*src, *dst);
@@ -622,7 +606,10 @@ void PaletteCmd::eraseStyles(const std::set<TXshSimpleLevel *> &levels,
 
 		static void cloneImages(LevelImages &levelImages)
 		{
-			tcg::substitute(levelImages.second, boost::counting_range(0, levelImages.first->getFrameCount()) | boost::adaptors::transformed(boost::bind(cloneImage, boost::cref(*levelImages.first), _1)));
+			tcg::substitute(levelImages.second,
+							boost::counting_range(0, levelImages.first->getFrameCount()) |
+								boost::adaptors::transformed(
+									boost::bind(cloneImage, boost::cref(*levelImages.first), _1)));
 		}
 
 		static void restoreImage(const TXshSimpleLevelP &level, int f, const TVectorImageP &vi)
@@ -632,7 +619,8 @@ void PaletteCmd::eraseStyles(const std::set<TXshSimpleLevel *> &levels,
 
 		static void restoreImages(LevelImages &levelImages)
 		{
-			int f, fCount = tmin(levelImages.first->getFrameCount(), int(levelImages.second.size()));
+			int f,
+				fCount = tmin(levelImages.first->getFrameCount(), int(levelImages.second.size()));
 
 			for (f = 0; f != fCount; ++f)
 				restoreImage(levelImages.first, f, levelImages.second[f]);
@@ -665,12 +653,9 @@ class AddPageUndo : public TUndo
 	std::wstring m_pageName;
 	std::vector<std::pair<TColorStyle *, int>> m_styles;
 
-public:
+  public:
 	// creare DOPO l'inserimento
-	AddPageUndo(
-		TPaletteHandle *paletteHandle,
-		int pageIndex,
-		std::wstring pageName)
+	AddPageUndo(TPaletteHandle *paletteHandle, int pageIndex, std::wstring pageName)
 		: m_paletteHandle(paletteHandle), m_pageIndex(pageIndex), m_pageName(pageName)
 	{
 		m_palette = m_paletteHandle->getPalette();
@@ -717,10 +702,7 @@ public:
 			.arg(QString::fromStdWString(m_pageName))
 			.arg(QString::fromStdWString(m_palette->getPaletteName()));
 	}
-	int getHistoryType()
-	{
-		return HistoryType::Palette;
-	}
+	int getHistoryType() { return HistoryType::Palette; }
 };
 
 } // namespace
@@ -756,7 +738,7 @@ class DestroyPageUndo : public TUndo
 	std::wstring m_pageName;
 	std::vector<int> m_styles;
 
-public:
+  public:
 	DestroyPageUndo(TPaletteHandle *paletteHandle, int pageIndex)
 		: m_paletteHandle(paletteHandle), m_pageIndex(pageIndex)
 	{
@@ -791,10 +773,7 @@ public:
 			.arg(QString::fromStdWString(m_pageName))
 			.arg(QString::fromStdWString(m_palette->getPaletteName()));
 	}
-	int getHistoryType()
-	{
-		return HistoryType::Palette;
-	}
+	int getHistoryType() { return HistoryType::Palette; }
 };
 
 } // namespace
@@ -832,15 +811,12 @@ class SetReferenceImageUndo : public TUndo
 
 	TPaletteHandle *m_paletteHandle;
 
-public:
+  public:
 	SetReferenceImageUndo(TPaletteP palette, TPaletteHandle *paletteHandle)
 		: m_palette(palette), m_oldPalette(palette->clone()), m_paletteHandle(paletteHandle)
 	{
 	}
-	void onAdd()
-	{
-		m_newPalette = m_palette->clone();
-	}
+	void onAdd() { m_newPalette = m_palette->clone(); }
 	void undo() const
 	{
 		m_palette->assign(m_oldPalette.getPointer());
@@ -851,28 +827,22 @@ public:
 		m_palette->assign(m_newPalette.getPointer());
 		m_paletteHandle->notifyPaletteChanged();
 	}
-	int getSize() const
-	{
-		return sizeof(*this) + sizeof(TPalette) * 2;
-	}
+	int getSize() const { return sizeof(*this) + sizeof(TPalette) * 2; }
 	QString getHistoryString()
 	{
 		return QObject::tr("Load Color Model %1  to Palette %2")
 			.arg(QString::fromStdString(m_newPalette->getRefImgPath().getLevelName()))
 			.arg(QString::fromStdWString(m_palette->getPaletteName()));
 	}
-	int getHistoryType()
-	{
-		return HistoryType::Palette;
-	}
+	int getHistoryType() { return HistoryType::Palette; }
 };
 
 //===================================================================
 // loadRefImage
 //-------------------------------------------------------------------
 
-int loadRefImage(TPaletteHandle *paletteHandle, bool replace,
-				 TPaletteP levelPalette, const TFilePath &_fp, int &frame, ToonzScene *scene,
+int loadRefImage(TPaletteHandle *paletteHandle, bool replace, TPaletteP levelPalette,
+				 const TFilePath &_fp, int &frame, ToonzScene *scene,
 				 const std::vector<int> &frames)
 {
 	bool paletteAlreadyLoaded = false;
@@ -902,7 +872,8 @@ int loadRefImage(TPaletteHandle *paletteHandle, bool replace,
 							fids.push_back(it->first);
 							continue;
 						}
-						// if the frame list is specified, load only the frames matches with the list
+						// if the frame list is specified, load only the frames matches with the
+						// list
 						else {
 							std::vector<int>::const_iterator framesIt;
 							for (framesIt = frames.begin(); framesIt != frames.end(); framesIt++) {
@@ -928,7 +899,8 @@ int loadRefImage(TPaletteHandle *paletteHandle, bool replace,
 						if (paletteAlreadyLoaded || level->getPalette() != 0)
 							img->setPalette(level->getPalette());
 						else if ((fp.getType() == "tzp" || fp.getType() == "tzu"))
-							img->setPalette(ToonzImageUtils::loadTzPalette(fp.withType("plt").withNoFrame()));
+							img->setPalette(
+								ToonzImageUtils::loadTzPalette(fp.withType("plt").withNoFrame()));
 					}
 				}
 			}
@@ -951,7 +923,7 @@ int loadRefImage(TPaletteHandle *paletteHandle, bool replace,
 
 	TUndo *undo = new SetReferenceImageUndo(levelPalette, paletteHandle);
 
-	if (!replace) //ret==1)
+	if (!replace) // ret==1)
 	{
 		TPaletteP imagePalette;
 		if (TRasterImageP ri = img) {
@@ -965,7 +937,7 @@ int loadRefImage(TPaletteHandle *paletteHandle, bool replace,
 				else
 					/*-- 似ている色をまとめて1つのStyleにする --*/
 					TColorUtils::buildPalette(colors, raster, colorCount);
-				colors.erase(TPixel::Black); //il nero viene messo dal costruttore della TPalette
+				colors.erase(TPixel::Black); // il nero viene messo dal costruttore della TPalette
 				imagePalette = new TPalette();
 				std::set<TPixel32>::const_iterator it = colors.begin();
 				for (; it != colors.end(); ++it)
@@ -976,13 +948,15 @@ int loadRefImage(TPaletteHandle *paletteHandle, bool replace,
 
 		if (imagePalette) {
 			std::wstring gName = levelPalette->getGlobalName();
-			//Se sto caricando un reference image su una studio palette
+			// Se sto caricando un reference image su una studio palette
 			if (!gName.empty()) {
 				imagePalette->setGlobalName(gName);
 				StudioPalette::instance()->setStylesGlobalNames(imagePalette.getPointer());
 			}
 			// voglio evitare di sostituire una palette con pochi colori ad una con tanti colori
-			/*-- ColorModelの色数が少ないのにOverwriteしようとした場合は、余分の分だけStyleが追加される --*/
+			/*--
+			 * ColorModelの色数が少ないのにOverwriteしようとした場合は、余分の分だけStyleが追加される
+			 * --*/
 			while (imagePalette->getStyleCount() < levelPalette->getStyleCount()) {
 				int index = imagePalette->getStyleCount();
 				assert(index < levelPalette->getStyleCount());
@@ -1071,7 +1045,7 @@ class MovePageUndo : public TUndo
 	int m_srcIndex;
 	int m_dstIndex;
 
-public:
+  public:
 	MovePageUndo(TPaletteHandle *paletteHandle, int srcIndex, int dstIndex)
 		: m_paletteHandle(paletteHandle), m_srcIndex(srcIndex), m_dstIndex(dstIndex)
 	{
@@ -1088,14 +1062,8 @@ public:
 		m_paletteHandle->notifyPaletteChanged();
 	}
 	int getSize() const { return sizeof *this; }
-	QString getHistoryString()
-	{
-		return QObject::tr("Move Page");
-	}
-	int getHistoryType()
-	{
-		return HistoryType::Palette;
-	}
+	QString getHistoryString() { return QObject::tr("Move Page"); }
+	int getHistoryType() { return HistoryType::Palette; }
 };
 
 } // namespace
@@ -1123,7 +1091,7 @@ class RenamePageUndo : public TUndo
 	std::wstring m_newName;
 	std::wstring m_oldName;
 
-public:
+  public:
 	RenamePageUndo(TPaletteHandle *paletteHandle, int pageIndex, const std::wstring &newName)
 		: m_paletteHandle(paletteHandle), m_pageIndex(pageIndex), m_newName(newName)
 	{
@@ -1151,15 +1119,13 @@ public:
 			.arg(QString::fromStdWString(m_oldName))
 			.arg(QString::fromStdWString(m_newName));
 	}
-	int getHistoryType()
-	{
-		return HistoryType::Palette;
-	}
+	int getHistoryType() { return HistoryType::Palette; }
 };
 
 } // namespace
 
-void PaletteCmd::renamePalettePage(TPaletteHandle *paletteHandle, int pageIndex, const std::wstring &newName)
+void PaletteCmd::renamePalettePage(TPaletteHandle *paletteHandle, int pageIndex,
+								   const std::wstring &newName)
 {
 	if (!paletteHandle)
 		return;
@@ -1187,13 +1153,14 @@ namespace
 
 class RenamePaletteStyleUndo : public TUndo
 {
-	TPaletteHandle *m_paletteHandle; //Usato nell'undo e nel redo per lanciare la notifica di cambiamento
+	TPaletteHandle
+		*m_paletteHandle; // Usato nell'undo e nel redo per lanciare la notifica di cambiamento
 	int m_styleId;
 	TPaletteP m_palette;
 	std::wstring m_newName;
 	std::wstring m_oldName;
 
-public:
+  public:
 	RenamePaletteStyleUndo(TPaletteHandle *paletteHandle, const std::wstring &newName)
 		: m_paletteHandle(paletteHandle), m_newName(newName)
 	{
@@ -1227,10 +1194,7 @@ public:
 			.arg(QString::fromStdWString(m_oldName))
 			.arg(QString::fromStdWString(m_newName));
 	}
-	int getHistoryType()
-	{
-		return HistoryType::Palette;
-	}
+	int getHistoryType() { return HistoryType::Palette; }
 };
 
 } // namespace

@@ -19,7 +19,7 @@
 
 class RunScriptCommand : public MenuItemHandler
 {
-public:
+  public:
 	RunScriptCommand() : MenuItemHandler("MI_RunScript") {}
 	void execute();
 } runScriptCommand;
@@ -63,10 +63,11 @@ void RunScriptCommand::execute()
 	scriptConsolePanel->executeCommand(cmd);
 
 	/*
-  TFilePath projectFolder = TApp::instance()->getCurrentScene()->getScene()->getProject()->getProjectFolder();
+  TFilePath projectFolder =
+ TApp::instance()->getCurrentScene()->getScene()->getProject()->getProjectFolder();
   QString fileNameStr = QFileDialog::getSaveFileName(0,"","c:\\"); // ,
- //   QObject::tr("Save Motion Path"), QString::fromStdWString(projectFolder.getWideString()), 
- //   QObject::tr("Motion Path files (*.mpath)")); 
+ //   QObject::tr("Save Motion Path"), QString::fromStdWString(projectFolder.getWideString()),
+ //   QObject::tr("Motion Path files (*.mpath)"));
   if(fileNameStr == "") return;
   TFilePath fp(fileNameStr.toStdWString());
   if(fp.getType()=="") fp = fp.withType("mpath");

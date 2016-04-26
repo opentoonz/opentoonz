@@ -20,7 +20,7 @@ class TFilePath;
 // {
 //     class RenderData;
 // };
-//class TRenderPort::RenderData;
+// class TRenderPort::RenderData;
 
 //=============================================================================
 // Previewer
@@ -40,10 +40,10 @@ class Previewer : public QObject, public TFxObserver
 	Previewer(const Previewer &);
 	void operator=(const Previewer &);
 
-public:
+  public:
 	class Listener
 	{
-	public:
+	  public:
 		QTimer m_refreshTimer;
 
 		Listener();
@@ -59,7 +59,7 @@ public:
 		virtual void onPreviewUpdate() {}
 	};
 
-public:
+  public:
 	static Previewer *instance(bool subcameraPreview = false);
 
 	static void clearAll();
@@ -87,20 +87,20 @@ public:
 
 	std::vector<UCHAR> &getProgressBarStatus() const;
 
-private:
+  private:
 	friend class Imp;
 	void emitStartedFrame(const TRenderPort::RenderData &renderData);
 	void emitRenderedFrame(const TRenderPort::RenderData &renderData);
 	void emitFailedFrame(const TRenderPort::RenderData &renderData);
 
-signals:
+  signals:
 
 	void activedChanged();
 	void startedFrame(TRenderPort::RenderData renderData);
 	void renderedFrame(TRenderPort::RenderData renderData);
 	void failedFrame(TRenderPort::RenderData renderData);
 
-public slots:
+  public slots:
 
 	void saveFrame();
 	void saveRenderedFrames();
@@ -113,7 +113,7 @@ public slots:
 	void onXsheetChanged();
 	void onObjectChanged();
 
-protected slots:
+  protected slots:
 
 	void onStartedFrame(TRenderPort::RenderData renderData);
 	void onRenderedFrame(TRenderPort::RenderData renderData);

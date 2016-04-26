@@ -39,16 +39,16 @@ class DVAPI PalettesScanPopup : public DVGui::Dialog
 	};
 	std::vector<Directory *> m_stack;
 
-public:
+  public:
 	PalettesScanPopup();
 
 	void setCurrentFolder(TFilePath path);
 	TFilePath getCurrentFolder();
 
-protected slots:
+  protected slots:
 	void onOkBtnClicked();
 
-protected:
+  protected:
 	void setLabel(const TFilePath &fp);
 	void timerEvent(QTimerEvent *event);
 	void push(const TFilePath &fp);
@@ -59,4 +59,4 @@ protected:
 	void onPlt(const TFilePath &fp);
 };
 
-#endif //PALETTESCANPOPUP_H
+#endif // PALETTESCANPOPUP_H

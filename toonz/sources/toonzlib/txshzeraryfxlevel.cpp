@@ -12,8 +12,7 @@ PERSIST_IDENTIFIER(TXshZeraryFxLevel, "zeraryFxLevel")
 
 //-----------------------------------------------------------------------------
 
-TXshZeraryFxLevel::TXshZeraryFxLevel()
-	: TXshLevel(m_classCode, L""), m_zeraryFxColumn(0)
+TXshZeraryFxLevel::TXshZeraryFxLevel() : TXshLevel(m_classCode, L""), m_zeraryFxColumn(0)
 {
 	m_type = ZERARYFX_XSHLEVEL;
 }

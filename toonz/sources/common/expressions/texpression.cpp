@@ -15,7 +15,7 @@ using namespace TSyntax;
 
 class TExpression::Imp
 {
-public:
+  public:
 	const Grammar *m_grammar; //!< (not owned) The expression's grammar
 	TDoubleParam *m_param;	//!< (not owned) The expression's owner
 	Calculator *m_calculator; //!< (owned) Expression calculator object
@@ -28,8 +28,12 @@ public:
 	bool m_isValid,		 //!< Whether the expression is valid
 		m_hasBeenParsed; //!< Whether the expression has already been parsed
 
-public:
-	Imp() : m_grammar(0), m_param(0), m_calculator(0), m_errorPos(0, -1), m_isValid(false), m_hasBeenParsed(true) {}
+  public:
+	Imp()
+		: m_grammar(0), m_param(0), m_calculator(0), m_errorPos(0, -1), m_isValid(false),
+		  m_hasBeenParsed(true)
+	{
+	}
 	~Imp() { delete m_calculator; }
 };
 
@@ -37,8 +41,7 @@ public:
 //    TExpression  implementation
 //**********************************************************************************
 
-TExpression::TExpression()
-	: m_imp(new Imp())
+TExpression::TExpression() : m_imp(new Imp())
 {
 }
 
@@ -50,8 +53,7 @@ TExpression::~TExpression()
 
 //--------------------------------------------------------------------------
 
-TExpression::TExpression(const TExpression &src)
-	: m_imp(new Imp())
+TExpression::TExpression(const TExpression &src) : m_imp(new Imp())
 {
 	m_imp->m_grammar = src.m_imp->m_grammar;
 	m_imp->m_param = src.m_imp->m_param;

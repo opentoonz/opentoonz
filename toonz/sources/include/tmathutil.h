@@ -24,9 +24,7 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-enum TMathError {
-	INFINITE_SOLUTIONS = -1
-};
+enum TMathError { INFINITE_SOLUTIONS = -1 };
 
 //-----------------------------------------------------------------------------
 
@@ -34,7 +32,7 @@ class DVAPI TMathException : public TException
 {
 	TString m_msg;
 
-public:
+  public:
 	TMathException(std::string msg);
 	virtual ~TMathException() {}
 	virtual TString getMessage() const { return m_msg; }
@@ -42,11 +40,11 @@ public:
 
 //-----------------------------------------------------------------------------
 
-/*! 
+/*!
   Decompose a square matrix [A] dim(A)=[n x n]  using the LU method.
   A is a matrix stored for row.
   \par A array of coeff
-  \par n size of matrix 
+  \par n size of matrix
   \par indx array with permutation from pivoting
   \par d +1/-1 and depend wheter the number of row interchanges (even or odd)
   \note If error a TException is thrown.
@@ -56,7 +54,7 @@ DVAPI void tLUDecomposition(double *A, int n, int *indx, double &d);
 
 //-----------------------------------------------------------------------------
 
-/*! 
+/*!
   Use the back-substitution method to solve the linear
   system A*x=b.
   \par A matrix exited from tLUDecomposition
@@ -75,8 +73,8 @@ DVAPI void tbackSubstitution(double *A, int n, int *indx, double *b);
   Solve the system A*x=b.
   It`s needed to insert b in res.
   A and res are modifyed in the routine.
-  \par A matrix 
-  \par n size of matrix 
+  \par A matrix
+  \par n size of matrix
   \note A is square [n x n]
   \include mathutils_ex1.cpp
  */
@@ -101,7 +99,7 @@ inline void tsolveSistem(std::vector<double> &A, std::vector<double> &res)
 
 /*!
   Find determinant of square matrix A
-  \par A is matrix to test 
+  \par A is matrix to test
   \par n size of matrix
  */
 DVAPI double tdet(double *A, int n);
@@ -109,7 +107,7 @@ DVAPI double tdet(double *A, int n);
 //-----------------------------------------------------------------------------
 
 /*!
-  Find determinant of square matrix A [n x n], using information 
+  Find determinant of square matrix A [n x n], using information
   from tLUDecomposition decomposition.
   \par LUa output matrix from tLUDecomposition
   \par n size of matrix

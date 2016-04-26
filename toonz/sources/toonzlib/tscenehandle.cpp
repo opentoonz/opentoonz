@@ -9,8 +9,7 @@
 // TSceneHandle
 //-----------------------------------------------------------------------------
 
-TSceneHandle::TSceneHandle()
-	: m_scene(0), m_dirtyFlag(false)
+TSceneHandle::TSceneHandle() : m_scene(0), m_dirtyFlag(false)
 {
 }
 

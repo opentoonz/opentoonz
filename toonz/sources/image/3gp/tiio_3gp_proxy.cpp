@@ -2,7 +2,7 @@
 
 #if (defined(x64) || defined(__LP64__))
 
-//Toonz includes
+// Toonz includes
 #include "tfilepath.h"
 #include "trasterimage.h"
 #include "tstream.h"
@@ -10,11 +10,11 @@
 #include "trop.h"
 #include "tsound.h"
 
-//tipc includes
+// tipc includes
 #include "tipc.h"
 #include "t32bitsrv_wrap.h"
 
-//Qt includes
+// Qt includes
 #include <QSharedMemory>
 #include <QMutexLocker>
 #include <QDataStream>
@@ -40,18 +40,18 @@ class TImageWriter3gpProxy : public TImageWriter
 {
 	TLevelWriter3gp *m_lw;
 
-public:
+  public:
 	int m_frameIndex;
 
-public:
+  public:
 	TImageWriter3gpProxy(const TFilePath &fp, int frameIndex, TLevelWriter3gp *lw);
 	~TImageWriter3gpProxy();
 
 	bool is64bitOutputSupported() { return false; }
 	void save(const TImageP &);
 
-private:
-	//not implemented
+  private:
+	// not implemented
 	TImageWriter3gpProxy(const TImageWriter3gpProxy &);
 	TImageWriter3gpProxy &operator=(const TImageWriter3gpProxy &src);
 };
@@ -97,8 +97,9 @@ TLevelWriter3gp::TLevelWriter3gp(const TFilePath &path, TPropertyGroup *winfo)
 
 	QString res, propsFp;
 	if (winfo) {
-		//Request a temporary file to store the infos to
-		stream << (msg << QString("$tmpfile_request") << QString("initLW3") + QString::number(currCount));
+		// Request a temporary file to store the infos to
+		stream << (msg << QString("$tmpfile_request")
+					   << QString("initLW3") + QString::number(currCount));
 		if (tipc::readMessage(stream, msg) != "ok")
 			goto err;
 
@@ -112,8 +113,9 @@ TLevelWriter3gp::TLevelWriter3gp(const TFilePath &path, TPropertyGroup *winfo)
 		}
 	}
 
-	//Pass fp to the server
-	stream << (msg << QString("$initLW3gp") << m_id << QString::fromStdWString(path.getWideString()) << propsFp);
+	// Pass fp to the server
+	stream << (msg << QString("$initLW3gp") << m_id << QString::fromStdWString(path.getWideString())
+				   << propsFp);
 	if (tipc::readMessage(stream, msg) != "ok")
 		goto err;
 
@@ -192,17 +194,17 @@ void TLevelWriter3gp::save(const TImageP &img, int frameIndex)
 
 	int size = lx * ly * pixSize;
 
-	//Send messages
+	// Send messages
 	QLocalSocket socket;
 	tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1, t32bitsrv::srvCmdline());
 
 	tipc::Stream stream(&socket);
 	tipc::Message msg;
 
-	//Send the write message.
+	// Send the write message.
 	stream << (msg << QString("$LW3gpImageWrite") << m_id << frameIndex << lx << ly);
 
-	//Send the data through a shared memory segment
+	// Send the data through a shared memory segment
 	{
 		t32bitsrv::RasterExchanger<TPixel32> exch(ras);
 		tipc::writeShMemBuffer(stream, msg << tipc::clr, size, &exch);
@@ -219,18 +221,19 @@ void TLevelWriter3gp::saveSoundTrack(TSoundTrack *st)
 	if (st == 0)
 		return;
 
-	//Prepare connection
+	// Prepare connection
 	QLocalSocket socket;
 	tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1, t32bitsrv::srvCmdline());
 
 	unsigned int size = st->getSampleSize() * st->getSampleCount();
 
-	//Send the saveSoundTract command to the server
+	// Send the saveSoundTract command to the server
 	tipc::Stream stream(&socket);
 	tipc::Message msg;
 
-	stream << (msg << QString("$LW3gpSaveSoundTrack") << m_id << st->getSampleRate() << st->getBitPerSample()
-				   << st->getChannelCount() << st->getSampleCount() << st->getFormat().m_signedSample);
+	stream << (msg << QString("$LW3gpSaveSoundTrack") << m_id << st->getSampleRate()
+				   << st->getBitPerSample() << st->getChannelCount() << st->getSampleCount()
+				   << st->getFormat().m_signedSample);
 
 	t32bitsrv::BufferExchanger exch((UCHAR *)st->getRawData());
 	tipc::writeShMemBuffer(stream, msg << tipc::clr, size, &exch);
@@ -248,31 +251,33 @@ class TImageReader3gpProxy : public TImageReader
 	TLevelReader3gp *m_lr;
 	TImageInfo *m_info;
 
-public:
+  public:
 	int m_frameIndex;
 
-public:
-	TImageReader3gpProxy(const TFilePath &fp, int frameIndex, TLevelReader3gp *lr, TImageInfo *info);
+  public:
+	TImageReader3gpProxy(const TFilePath &fp, int frameIndex, TLevelReader3gp *lr,
+						 TImageInfo *info);
 	~TImageReader3gpProxy() { m_lr->release(); }
 
 	TImageP load();
-	void load(const TRasterP &rasP, const TPoint &pos = TPoint(0, 0), int shrinkX = 1, int shrinkY = 1);
+	void load(const TRasterP &rasP, const TPoint &pos = TPoint(0, 0), int shrinkX = 1,
+			  int shrinkY = 1);
 
 	TDimension getSize() const { return m_lr->getSize(); }
 	TRect getBBox() const { return m_lr->getBBox(); }
 
 	const TImageInfo *getImageInfo() const { return m_info; }
 
-private:
-	//not implemented
+  private:
+	// not implemented
 	TImageReader3gpProxy(const TImageReader3gpProxy &);
 	TImageReader3gpProxy &operator=(const TImageReader3gpProxy &src);
 };
 
 //------------------------------------------------------------------
 
-TImageReader3gpProxy::TImageReader3gpProxy(const TFilePath &fp, int frameIndex,
-										   TLevelReader3gp *lr, TImageInfo *info)
+TImageReader3gpProxy::TImageReader3gpProxy(const TFilePath &fp, int frameIndex, TLevelReader3gp *lr,
+										   TImageInfo *info)
 	: TImageReader(fp), m_lr(lr), m_frameIndex(frameIndex), m_info(info)
 {
 	m_lr->addRef();
@@ -291,8 +296,8 @@ TImageP TImageReader3gpProxy::load()
 
 void TImageReader3gpProxy::load(const TRasterP &rasP, const TPoint &pos, int shrinkX, int shrinkY)
 {
-	//NOTE: The original implementation is different. But is also does not make sense...
-	//I've substituted it with the lrm plain call.
+	// NOTE: The original implementation is different. But is also does not make sense...
+	// I've substituted it with the lrm plain call.
 	m_lr->load(rasP, m_frameIndex, pos, shrinkX, shrinkY);
 }
 
@@ -300,8 +305,7 @@ void TImageReader3gpProxy::load(const TRasterP &rasP, const TPoint &pos, int shr
 //    TLevelReader3gp Proxy implementation
 //******************************************************************************
 
-TLevelReader3gp::TLevelReader3gp(const TFilePath &path)
-	: TLevelReader(path)
+TLevelReader3gp::TLevelReader3gp(const TFilePath &path) : TLevelReader(path)
 {
 	static TAtomicVar count;
 	unsigned int currCount = ++count;
@@ -313,7 +317,8 @@ TLevelReader3gp::TLevelReader3gp(const TFilePath &path)
 	tipc::Stream stream(&socket);
 	tipc::Message msg;
 
-	stream << (msg << QString("$initLR3gp") << m_id << QString::fromStdWString(path.getWideString()));
+	stream << (msg << QString("$initLR3gp") << m_id
+				   << QString::fromStdWString(path.getWideString()));
 	if (tipc::readMessage(stream, msg) != "ok")
 		throw TImageException(path, "Couldn't open file");
 
@@ -366,7 +371,7 @@ TLevelP TLevelReader3gp::loadInfo()
 	{
 		QString shMemId(tipc::uniqueId());
 
-		//Send the appropriate command
+		// Send the appropriate command
 		stream << (msg << QString("$LR3gpLoadInfo") << m_id << shMemId);
 		if (tipc::readMessage(stream, msg) != "ok")
 			goto err;
@@ -375,7 +380,7 @@ TLevelP TLevelReader3gp::loadInfo()
 
 		msg >> frameCount >> tipc::clr;
 
-		//Read the data in the shared memory segment
+		// Read the data in the shared memory segment
 		QSharedMemory shmem(shMemId);
 		shmem.attach();
 		shmem.lock();
@@ -389,7 +394,7 @@ TLevelP TLevelReader3gp::loadInfo()
 		shmem.unlock();
 		shmem.detach();
 
-		//Release the shared memory segment
+		// Release the shared memory segment
 		stream << (msg << QString("$shmem_release") << shMemId);
 		if (tipc::readMessage(stream, msg) != "ok")
 			goto err;
@@ -413,15 +418,16 @@ void TLevelReader3gp::enableRandomAccessRead(bool enable)
 	tipc::Stream stream(&socket);
 	tipc::Message msg;
 
-	stream << (msg << QString("$LR3gpEnableRandomAccessRead") << m_id << QString(enable ? "true" : "false"));
+	stream << (msg << QString("$LR3gpEnableRandomAccessRead") << m_id
+				   << QString(enable ? "true" : "false"));
 	QString res(tipc::readMessage(stream, msg));
 	assert(res == "ok");
 }
 
 //------------------------------------------------------------------
 
-void TLevelReader3gp::load(const TRasterP &ras, int frameIndex, const TPoint &pos,
-						   int shrinkX, int shrinkY)
+void TLevelReader3gp::load(const TRasterP &ras, int frameIndex, const TPoint &pos, int shrinkX,
+						   int shrinkY)
 {
 	QLocalSocket socket;
 	tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1, t32bitsrv::srvCmdline());
@@ -431,13 +437,13 @@ void TLevelReader3gp::load(const TRasterP &ras, int frameIndex, const TPoint &po
 
 	unsigned int size = ras->getLx() * ras->getLy() * ras->getPixelSize();
 
-	//Send the appropriate command to the 32-bit server
-	stream << (msg << QString("$LR3gpImageRead") << m_id << ras->getLx() << ras->getLy() << ras->getPixelSize()
-				   << frameIndex << pos.x << pos.y << shrinkX << shrinkY);
+	// Send the appropriate command to the 32-bit server
+	stream << (msg << QString("$LR3gpImageRead") << m_id << ras->getLx() << ras->getLy()
+				   << ras->getPixelSize() << frameIndex << pos.x << pos.y << shrinkX << shrinkY);
 
 	t32bitsrv::RasterExchanger<TPixel32> exch(ras);
 	if (!tipc::readShMemBuffer(stream, msg << tipc::clr, &exch))
 		throw TException("Couldn't load image");
 }
 
-#endif //x64
+#endif // x64

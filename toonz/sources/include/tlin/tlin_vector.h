@@ -9,10 +9,9 @@
   The Vector class represents a vector in tlin-compatible algorithms.
 */
 
-template <typename T>
-class vector
+template <typename T> class vector
 {
-public:
+  public:
 	vector(int size);
 	~vector();
 
@@ -25,4 +24,4 @@ public:
 	const T &operator[](int i) const;
 };
 
-#endif //TLIN_MATRIX_H
+#endif // TLIN_MATRIX_H

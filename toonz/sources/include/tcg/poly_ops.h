@@ -28,10 +28,9 @@ namespace poly_ops
   \return   The value of the input polynomial at the specified parameter
 */
 template <typename Scalar>
-Scalar evaluate(
-	const Scalar poly[], //!< Coefficients of the input polynomial, indexed by degree
-	int deg,			 //!< Degree of the polynomial function
-	Scalar x)			 //!< Parameter the polynomial will be evaluated on
+Scalar evaluate(const Scalar poly[], //!< Coefficients of the input polynomial, indexed by degree
+				int deg,			 //!< Degree of the polynomial function
+				Scalar x)			 //!< Parameter the polynomial will be evaluated on
 {
 	// ((poly[deg] * x) + poly[deg-1]) * x + poly[deg - 2] + ...
 
@@ -46,14 +45,13 @@ Scalar evaluate(
 
 /*!
   \brief  Reduces the degree of the input polynomial, discarding all leading coefficients
-          whose absolute value is below the specified tolerance threshold.
+		  whose absolute value is below the specified tolerance threshold.
 */
 template <typename Scalar>
-void reduceDegree(
-	const Scalar poly[], //!< Input polynomial to be reduced.
-	int &deg,			 //!< Input/output polynomial degree.
-	Scalar tolerance	 //!< Coefficients threshold to reduce the polynomial with.
-	)
+void reduceDegree(const Scalar poly[], //!< Input polynomial to be reduced.
+				  int &deg,			   //!< Input/output polynomial degree.
+				  Scalar tolerance	 //!< Coefficients threshold to reduce the polynomial with.
+				  )
 {
 	while ((deg > 0) && (std::abs(poly[deg]) < tolerance))
 		--deg;
@@ -66,10 +64,9 @@ void reduceDegree(
   \remark   The supplied polynomials can actually be the same.
 */
 template <typename A, typename B, typename C, int deg>
-void add(
-	const A(&poly1)[deg], //!< First polynomial addendum.
-	const B(&poly2)[deg], //!< Second polynomial addendum.
-	C(&result)[deg])	  //!< Resulting sum.
+void add(const A(&poly1)[deg], //!< First polynomial addendum.
+		 const B(&poly2)[deg], //!< Second polynomial addendum.
+		 C(&result)[deg])	  //!< Resulting sum.
 {
 	for (int d = 0; d != deg; ++d)
 		result[d] = poly1[d] + poly2[d];
@@ -79,13 +76,12 @@ void add(
 
 /*!
   \brief  Subtracts two polynomials /p poly1 and \p poly2 and returns the
-          difference <TT>poly1 - poly2</TT>.
+		  difference <TT>poly1 - poly2</TT>.
 */
 template <typename A, typename B, typename C, int deg>
-void sub(
-	const A(&poly1)[deg], //!< First polynomial addendum.
-	const B(&poly2)[deg], //!< Second polynomial addendum.
-	C(&result)[deg])	  //!< Resulting difference.
+void sub(const A(&poly1)[deg], //!< First polynomial addendum.
+		 const B(&poly2)[deg], //!< Second polynomial addendum.
+		 C(&result)[deg])	  //!< Resulting difference.
 {
 	for (int d = 0; d != deg; ++d)
 		result[d] = poly1[d] - poly2[d];
@@ -95,16 +91,15 @@ void sub(
 
 /*!
   \brief    Multiplies two polynomials into a polynomial whose degree is the
-            \a sum of the multiplicands' degrees.
+			\a sum of the multiplicands' degrees.
 
   \warning  The resulting polynomial is currently <B>not allowed</B> to be one
-            of the multiplicands.
+			of the multiplicands.
 */
 template <typename A, typename B, typename C, int deg1, int deg2, int degR>
-void mul(
-	const A(&poly1)[deg1], //!< First multiplicand.
-	const B(&poly2)[deg2], //!< Second multiplicand.
-	C(&result)[degR])	  //!< Resulting polynomial.
+void mul(const A(&poly1)[deg1], //!< First multiplicand.
+		 const B(&poly2)[deg2], //!< Second multiplicand.
+		 C(&result)[degR])		//!< Resulting polynomial.
 {
 	TCG_STATIC_ASSERT(degR == deg1 + deg2 - 1);
 
@@ -118,17 +113,16 @@ void mul(
 
 /*!
   \brief    Calculates the chaining <TT>poly1 o poly2</TT> of two given polynomial
-            \p poly1 and \p poly2.
+			\p poly1 and \p poly2.
 
   \warning  The resulting polynomial is currently <B>not allowed</B> to be one
-            of the multiplicands.
+			of the multiplicands.
   \warning  This function is still \b untested.
 */
 template <typename A, typename B, typename C, int deg1, int deg2, int degR>
-void chain(
-	const A(&poly1)[deg1], //!< First polynomial.
-	const B(&poly2)[deg2], //!< Second polynomial.
-	C(&result)[degR])	  //!< Resulting polynomial.
+void chain(const A(&poly1)[deg1], //!< First polynomial.
+		   const B(&poly2)[deg2], //!< Second polynomial.
+		   C(&result)[degR])	  //!< Resulting polynomial.
 {
 	for (int a = 0; a != deg1; ++a) {
 		B pow[degR][2] = {{}};
@@ -141,8 +135,7 @@ void chain(
 				poly_mul(pow[p % 2], poly2, pow[(p + 1) % 2]);
 		}
 
-		B(&pow_add)
-		[degR] = pow[a % 2];
+		B(&pow_add)[degR] = pow[a % 2];
 
 		// multiply by poly1[a]
 		C addendum[degR];
@@ -157,9 +150,8 @@ void chain(
 //-------------------------------------------------------------------------------------------
 
 template <typename A, typename B, int deg, int degR>
-void derivative(
-	const A(&poly)[deg], //!< Polynomial to be derived.
-	B(&result)[degR])	//!< Resulting derivative polynomial.
+void derivative(const A(&poly)[deg], //!< Polynomial to be derived.
+				B(&result)[degR])	//!< Resulting derivative polynomial.
 {
 	TCG_STATIC_ASSERT(degR == deg - 1);
 
@@ -174,11 +166,11 @@ void derivative(
   \return   The number of solutions found under the specified divide-by tolerance
 */
 template <typename Scalar>
-inline unsigned int solve_1(
-	Scalar c[2],	//!< Polynomial coefficients array
-	Scalar s[1],	//!< Solutions array
-	Scalar tol = 0) //!< Leading coefficient tolerance, the equation has no solution
-					//!  if the leading coefficient is below this threshold
+inline unsigned int
+solve_1(Scalar c[2],	//!< Polynomial coefficients array
+		Scalar s[1],	//!< Solutions array
+		Scalar tol = 0) //!< Leading coefficient tolerance, the equation has no solution
+						//!  if the leading coefficient is below this threshold
 {
 	if (std::abs(c[1]) <= tol)
 		return 0;
@@ -196,11 +188,11 @@ inline unsigned int solve_1(
   \remark   The returned solutions are sorted, with $s[0] <= s[1]$
 */
 template <typename Scalar>
-unsigned int solve_2(
-	Scalar c[3],	//!< Polynomial coefficients array
-	Scalar s[2],	//!< Solutions array
-	Scalar tol = 0) //!< Leading coefficient tolerance, the equation has no solution
-					//!  if the leading coefficient is below this threshold
+unsigned int
+solve_2(Scalar c[3],	//!< Polynomial coefficients array
+		Scalar s[2],	//!< Solutions array
+		Scalar tol = 0) //!< Leading coefficient tolerance, the equation has no solution
+						//!  if the leading coefficient is below this threshold
 {
 	if (std::abs(c[2]) <= tol)
 		return solve_1(c, s, tol); // Reduces to first degree
@@ -228,11 +220,11 @@ unsigned int solve_2(
   \remark   The returned solutions are sorted, with $s[0] <= s[1] <= s[2]$
 */
 template <typename Scalar>
-unsigned int solve_3(
-	Scalar c[4],	//!< Polynomial coefficients array
-	Scalar s[3],	//!< Solutions array
-	Scalar tol = 0) //!< Leading coefficient tolerance, the equation is reduced to 2nd degree
-					//!  if the leading coefficient is below this threshold
+unsigned int
+solve_3(Scalar c[4],	//!< Polynomial coefficients array
+		Scalar s[3],	//!< Solutions array
+		Scalar tol = 0) //!< Leading coefficient tolerance, the equation is reduced to 2nd degree
+						//!  if the leading coefficient is below this threshold
 {
 	if (std::abs(c[3]) <= tol)
 		return solve_2(c, s, tol); // Reduces to second degree

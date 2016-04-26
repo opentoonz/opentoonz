@@ -2,7 +2,7 @@
 
 #include "tgl.h"
 
-//Qt includes
+// Qt includes
 #include <QPixmap>
 #include <QImage>
 #include <QGLWidget>
@@ -50,7 +50,8 @@ QRgb meanColor(const QImage &img, const QRect &rect)
 
 QRgb pickRGB(QWidget *widget, const QRect &rect)
 {
-	QImage img(QPixmap::grabWidget(widget, rect.x(), rect.y(), rect.width(), rect.height()).toImage());
+	QImage img(
+		QPixmap::grabWidget(widget, rect.x(), rect.y(), rect.width(), rect.height()).toImage());
 	return meanColor(img, img.rect());
 }
 
@@ -85,8 +86,11 @@ QRgb pickScreenRGB(const QRect &rect)
 
 #endif
 
-	QImage img(QPixmap::grabWindow(widget->winId(), theRect.x(), theRect.y(), theRect.width(), theRect.height()).toImage());
-	return meanColor(img, QRect(rect.left() - theRect.left(), rect.top() - theRect.top(), rect.width(), rect.height()));
+	QImage img(QPixmap::grabWindow(widget->winId(), theRect.x(), theRect.y(), theRect.width(),
+								   theRect.height())
+				   .toImage());
+	return meanColor(img, QRect(rect.left() - theRect.left(), rect.top() - theRect.top(),
+								rect.width(), rect.height()));
 }
 
 //------------------------------------------------------------------------------
@@ -98,8 +102,8 @@ QRgb pickRGB(QGLWidget *widget, const QRect &rect)
 	glReadBuffer(GL_FRONT);
 
 	QImage img(rect.size(), QImage::Format_ARGB32);
-	glReadPixels(rect.x(), widget->height() - rect.y(), rect.width(), rect.height(),
-				 GL_BGRA_EXT, GL_UNSIGNED_BYTE, img.bits());
+	glReadPixels(rect.x(), widget->height() - rect.y(), rect.width(), rect.height(), GL_BGRA_EXT,
+				 GL_UNSIGNED_BYTE, img.bits());
 
 	widget->doneCurrent();
 

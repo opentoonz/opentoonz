@@ -59,11 +59,13 @@ struct SuperFactors {
 //    SuperLU-specific routines
 //*****************************************************************************
 
-void DVAPI allocS(SuperMatrix *&A, int rows, int cols, int nnz); //!< Allocates A in NC (sparse) format
-void DVAPI allocD(SuperMatrix *&A, int rows, int cols);			 //!< Allocates A in DN (dense) format
+void DVAPI allocS(SuperMatrix *&A, int rows, int cols,
+				  int nnz);								//!< Allocates A in NC (sparse) format
+void DVAPI allocD(SuperMatrix *&A, int rows, int cols); //!< Allocates A in DN (dense) format
 
 //! Allocates A with externally supplied initializer values
-void DVAPI allocS(SuperMatrix *&A, int rows, int cols, int nnz, int *colptr, int *rowind, double *values);
+void DVAPI allocS(SuperMatrix *&A, int rows, int cols, int nnz, int *colptr, int *rowind,
+				  double *values);
 void DVAPI allocD(SuperMatrix *&A, int rows, int cols, int lda, double *values);
 
 void DVAPI freeS(SuperMatrix *A);  //!< Frees A allocated with allocS
@@ -75,15 +77,17 @@ void DVAPI createS(SuperMatrix &A, int rows, int cols, int nnz);
 void DVAPI createD(SuperMatrix &A, int rows, int cols);
 
 //! Initializes a local SuperMatrix with externally supplied data.
-void DVAPI createS(SuperMatrix &A, int rows, int cols, int nnz, int *colptr, int *rowind, double *values);
+void DVAPI createS(SuperMatrix &A, int rows, int cols, int nnz, int *colptr, int *rowind,
+				   double *values);
 void DVAPI createD(SuperMatrix &A, int rows, int cols, int lda, double *values);
 
 //! Destroys A. To be used when A is local (ie with create). Can be told to spare data deallocation.
 void DVAPI destroyS(SuperMatrix &A, bool destroyData = true);
 void DVAPI destroyD(SuperMatrix &A, bool destroyData = true);
 
-void DVAPI readDN(SuperMatrix *A, int &lda, double *&values);							  //!< Reads values ptr from A
-void DVAPI readNC(SuperMatrix *A, int &nnz, int *&colptr, int *&rowind, double *&values); //!< Reads array ptrs from A
+void DVAPI readDN(SuperMatrix *A, int &lda, double *&values); //!< Reads values ptr from A
+void DVAPI readNC(SuperMatrix *A, int &nnz, int *&colptr, int *&rowind,
+				  double *&values); //!< Reads array ptrs from A
 
 //! Copies m's content to A. A could be either 0 or an already initialized SuperMatrix.
 void DVAPI traduceS(tlin::sparse_matrix<double> &m, SuperMatrix *&A);
@@ -113,6 +117,6 @@ void DVAPI solve(SuperMatrix *A, double *b, double *&x, superlu_options_t *opt =
 void DVAPI multiplyS(const SuperMatrix *A, const double *v, double *&Av);
 void DVAPI multiplyD(const SuperMatrix *A, const double *v, double *&Av);
 
-} //namespace tlin
+} // namespace tlin
 
-#endif //TLIN_SUPERLU_WRAP
+#endif // TLIN_SUPERLU_WRAP

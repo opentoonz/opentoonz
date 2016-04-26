@@ -43,7 +43,7 @@ class CellsMover
 	// m_columnsData <- xsheet columns data
 	void getColumnsData(int c0, int c1);
 
-public:
+  public:
 	enum Qualifier {
 		eCopyCells = 0x1, // leaves a copy of cells block at the starting point
 		eInsertCells = 0x2,
@@ -80,7 +80,7 @@ public:
 	void emptyColumns(int c) const;
 	TXshColumn::ColumnType getColumnTypeFromCell(int index) const;
 
-private:
+  private:
 	// not implemented
 	CellsMover(const CellsMover &);
 	const CellsMover &operator=(const CellsMover &);
@@ -88,7 +88,7 @@ private:
 
 class LevelMoverTool : public XsheetGUI::DragTool
 {
-protected:
+  protected:
 	TPoint m_grabOffset;
 	TPoint m_startPos, m_lastPos, m_aimedPos;
 	TDimension m_range;
@@ -103,7 +103,7 @@ protected:
 	virtual bool canMove(const TPoint &pos);
 	bool canMoveColumns(const TPoint &pos);
 
-public:
+  public:
 	LevelMoverTool(XsheetViewer *viewer);
 	~LevelMoverTool();
 

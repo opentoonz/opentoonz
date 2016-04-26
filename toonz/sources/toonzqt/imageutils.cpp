@@ -76,8 +76,7 @@ void addRegionsInArea(TRegion *reg, std::vector<TFilledRegionInf> &regs, const T
 
 //--------------------------------------------------------------------
 
-void getFrameIds(TFrameId from, TFrameId to, const TLevelP &level,
-				 std::vector<TFrameId> &frames)
+void getFrameIds(TFrameId from, TFrameId to, const TLevelP &level, std::vector<TFrameId> &frames)
 {
 	struct locals {
 		static inline TFrameId getFrame(const TLevel::Table::value_type &pair)
@@ -97,8 +96,7 @@ void getFrameIds(TFrameId from, TFrameId to, const TLevelP &level,
 
 	const TLevel::Table &table = *level->getTable();
 
-	TLevel::Table::const_iterator lBegin = table.lower_bound(from),
-								  lEnd = table.upper_bound(to);
+	TLevel::Table::const_iterator lBegin = table.lower_bound(from), lEnd = table.upper_bound(to);
 
 	assert(frames.empty());
 	frames.insert(frames.end(), boost::make_transform_iterator(lBegin, locals::getFrame),
@@ -143,7 +141,8 @@ TFilePath duplicate(const TFilePath &levelPath)
 		return TFilePath();
 
 	if (!TSystem::doesExistFileOrLevel(levelPath)) {
-		DVGui::warning(QObject::tr("It is not possible to find the %1 level.").arg(QString::fromStdWString(levelPath.getWideString())));
+		DVGui::warning(QObject::tr("It is not possible to find the %1 level.")
+						   .arg(QString::fromStdWString(levelPath.getWideString())));
 		return TFilePath();
 	}
 
@@ -189,7 +188,8 @@ void premultiply(const TFilePath &levelPath)
 		return;
 
 	if (!TSystem::doesExistFileOrLevel(levelPath)) {
-		DVGui::warning(QObject::tr("It is not possible to find the level %1").arg(QString::fromStdWString(levelPath.getWideString())));
+		DVGui::warning(QObject::tr("It is not possible to find the level %1")
+						   .arg(QString::fromStdWString(levelPath.getWideString())));
 		return;
 	}
 
@@ -216,13 +216,14 @@ void premultiply(const TFilePath &levelPath)
 			return;
 
 		bool isMovie = type == TFileType::RASTER_LEVEL;
-		/*  
-    if (!isMovie && lr->getImageInfo()->m_samplePerPixel!=4)
-    {
-    QMessageBox::information(0, QString("ERROR"), QString("Only rgbm images can be premultiplied!"));
-    return;
-    }
-    */
+		/*
+	if (!isMovie && lr->getImageInfo()->m_samplePerPixel!=4)
+	{
+	QMessageBox::information(0, QString("ERROR"), QString("Only rgbm images can be
+	premultiplied!"));
+	return;
+	}
+	*/
 
 		TLevelWriterP lw;
 		if (!isMovie) {
@@ -273,17 +274,16 @@ void premultiply(const TFilePath &levelPath)
 	}
 
 	QApplication::restoreOverrideCursor();
-	QString msg = QObject::tr("Level %1 premultiplied.").arg(QString::fromStdString(levelPath.getLevelName()));
+	QString msg = QObject::tr("Level %1 premultiplied.")
+					  .arg(QString::fromStdString(levelPath.getLevelName()));
 	DVGui::info(msg);
 }
 
 //-----------------------------------------------------------------------------
 
-void getFillingInformationOverlappingArea(
-	const TVectorImageP &vi,
-	std::vector<TFilledRegionInf> &regInf,
-	const TRectD &area1,
-	const TRectD &area2)
+void getFillingInformationOverlappingArea(const TVectorImageP &vi,
+										  std::vector<TFilledRegionInf> &regInf,
+										  const TRectD &area1, const TRectD &area2)
 {
 	if (!vi->isComputedRegionAlmostOnce())
 		return;
@@ -303,10 +303,8 @@ void getFillingInformationOverlappingArea(
 
 //-----------------------------------------------------------------------------
 
-void getFillingInformationInArea(
-	const TVectorImageP &vi,
-	std::vector<TFilledRegionInf> &regs,
-	const TRectD &area)
+void getFillingInformationInArea(const TVectorImageP &vi, std::vector<TFilledRegionInf> &regs,
+								 const TRectD &area)
 {
 	if (!vi->isComputedRegionAlmostOnce())
 		return;
@@ -319,9 +317,7 @@ void getFillingInformationInArea(
 
 //--------------------------------------------------------------------
 
-void assignFillingInformation(
-	TVectorImage &vi,
-	const std::vector<TFilledRegionInf> &regs)
+void assignFillingInformation(TVectorImage &vi, const std::vector<TFilledRegionInf> &regs)
 {
 	vi.findRegions();
 
@@ -336,10 +332,9 @@ void assignFillingInformation(
 
 //--------------------------------------------------------------------
 
-void getStrokeStyleInformationInArea(
-	const TVectorImageP &vi,
-	std::vector<std::pair<int, int>> &strokesInfo,
-	const TRectD &area)
+void getStrokeStyleInformationInArea(const TVectorImageP &vi,
+									 std::vector<std::pair<int, int>> &strokesInfo,
+									 const TRectD &area)
 {
 	if (!vi->isComputedRegionAlmostOnce())
 		return;
@@ -355,8 +350,10 @@ void getStrokeStyleInformationInArea(
 }
 
 //--------------------------------------------------------------------
-void convertFromCM(const TLevelReaderP &lr, const TPaletteP &plt, const TLevelWriterP &lw, const std::vector<TFrameId> &frames,
-				   const TAffine &aff, const TRop::ResampleFilterType &resType, FrameTaskNotifier *frameNotifier, const TPixel &bgColor, bool removeDotBeforeFrameNumber = false)
+void convertFromCM(const TLevelReaderP &lr, const TPaletteP &plt, const TLevelWriterP &lw,
+				   const std::vector<TFrameId> &frames, const TAffine &aff,
+				   const TRop::ResampleFilterType &resType, FrameTaskNotifier *frameNotifier,
+				   const TPixel &bgColor, bool removeDotBeforeFrameNumber = false)
 {
 	for (int i = 0; i < (int)frames.size(); i++) {
 		if (frameNotifier->abortTask())
@@ -392,7 +389,8 @@ void convertFromCM(const TLevelReaderP &lr, const TPaletteP &plt, const TLevelWr
 					int index = 4 + 1 + outPath.getType().length();
 					std::wstring renamedStr = outPath.getWideString();
 					if (renamedStr[renamedStr.length() - index - 1] == L'.')
-						renamedStr = renamedStr.substr(0, renamedStr.length() - index - 1) + renamedStr.substr(renamedStr.length() - index, index);
+						renamedStr = renamedStr.substr(0, renamedStr.length() - index - 1) +
+									 renamedStr.substr(renamedStr.length() - index, index);
 
 					const TFilePath fp(renamedStr);
 					TImageWriterP writer(fp);
@@ -404,37 +402,42 @@ void convertFromCM(const TLevelReaderP &lr, const TPaletteP &plt, const TLevelWr
 				}
 			}
 		} catch (...) {
-			//QString msg=QObject::tr("Frame %1 : conversion failed!").arg(QString::number(i+1));
+			// QString msg=QObject::tr("Frame %1 : conversion failed!").arg(QString::number(i+1));
 			//      DVGui::info(msg);
 		}
-		/*-- これはプログレスバーを進めるものなので、動画番号ではなく、完了したフレームの枚数を投げる --*/
+		/*--
+		 * これはプログレスバーを進めるものなので、動画番号ではなく、完了したフレームの枚数を投げる
+		 * --*/
 		frameNotifier->notifyFrameCompleted(100 * (i + 1) / frames.size());
 	}
 }
 
 //--------------------------------------------------------------------
 
-void convertFromVI(const TLevelReaderP &lr, const TPaletteP &plt, const TLevelWriterP &lw, const std::vector<TFrameId> &frames,
-				   const TRop::ResampleFilterType &resType, int width, FrameTaskNotifier *frameNotifier)
+void convertFromVI(const TLevelReaderP &lr, const TPaletteP &plt, const TLevelWriterP &lw,
+				   const std::vector<TFrameId> &frames, const TRop::ResampleFilterType &resType,
+				   int width, FrameTaskNotifier *frameNotifier)
 {
 	QString msg;
 	int i;
 	std::vector<TVectorImageP> images;
 	TRectD maxBbox;
-	for (i = 0; i < (int)frames.size(); i++) { //trovo la bbox che possa contenere tutte le immagini
+	for (i = 0; i < (int)frames.size(); i++) { // trovo la bbox che possa contenere tutte le
+											   // immagini
 		try {
 			TImageReaderP ir = lr->getFrameReader(frames[i]);
 			TVectorImageP img = ir->load();
 			images.push_back(img);
 			maxBbox += img->getBBox();
 		} catch (...) {
-			msg = QObject::tr("Frame %1 : conversion failed!").arg(QString::fromStdString(frames[i].expand()));
+			msg = QObject::tr("Frame %1 : conversion failed!")
+					  .arg(QString::fromStdString(frames[i].expand()));
 			DVGui::info(msg);
 		}
 	}
 	maxBbox = maxBbox.enlarge(2);
 	TAffine aff;
-	if (width) //calcolo l'affine
+	if (width) // calcolo l'affine
 		aff = TScale((double)width / maxBbox.getLx());
 	maxBbox = aff * maxBbox;
 
@@ -445,9 +448,10 @@ void convertFromVI(const TLevelReaderP &lr, const TPaletteP &plt, const TLevelWr
 			TVectorImageP vectorImage = images[i];
 			assert(vectorImage);
 			if (vectorImage) {
-				//faccio il render dell'immagine
+				// faccio il render dell'immagine
 				vectorImage->transform(aff, true);
-				const TVectorRenderData rd(TTranslation(-maxBbox.getP00()), TRect(), plt.getPointer(), 0, true, true);
+				const TVectorRenderData rd(TTranslation(-maxBbox.getP00()), TRect(),
+										   plt.getPointer(), 0, true, true);
 				TOfflineGL *glContext = new TOfflineGL(convert(maxBbox).getSize());
 				glContext->clear(TPixel32::Transparent);
 				glContext->draw(vectorImage, rd);
@@ -456,7 +460,8 @@ void convertFromVI(const TLevelReaderP &lr, const TPaletteP &plt, const TLevelWr
 				iw->save(TRasterImageP(rasImage));
 			}
 		} catch (...) {
-			msg = QObject::tr("Frame %1 : conversion failed!").arg(QString::fromStdString(frames[i].expand()));
+			msg = QObject::tr("Frame %1 : conversion failed!")
+					  .arg(QString::fromStdString(frames[i].expand()));
 			DVGui::info(msg);
 		}
 		frameNotifier->notifyFrameCompleted(100 * (i + 1) / frames.size());
@@ -465,12 +470,15 @@ void convertFromVI(const TLevelReaderP &lr, const TPaletteP &plt, const TLevelWr
 
 //-----------------------------------------------------------------------
 
-void convertFromFullRaster(const TLevelReaderP &lr, const TLevelWriterP &lw, const std::vector<TFrameId> &_frames,
-						   const TAffine &aff, const TRop::ResampleFilterType &resType, FrameTaskNotifier *frameNotifier,
-						   const TPixel &bgColor, bool removeDotBeforeFrameNumber = false)
+void convertFromFullRaster(const TLevelReaderP &lr, const TLevelWriterP &lw,
+						   const std::vector<TFrameId> &_frames, const TAffine &aff,
+						   const TRop::ResampleFilterType &resType,
+						   FrameTaskNotifier *frameNotifier, const TPixel &bgColor,
+						   bool removeDotBeforeFrameNumber = false)
 {
 	std::vector<TFrameId> frames = _frames;
-	if (frames.empty() && lr->loadInfo()->getFrameCount() == 1) //e' una immagine singola, non un livello
+	if (frames.empty() &&
+		lr->loadInfo()->getFrameCount() == 1) // e' una immagine singola, non un livello
 		frames.push_back(TFrameId());
 
 	for (int i = 0; i < (int)frames.size(); i++) {
@@ -478,7 +486,7 @@ void convertFromFullRaster(const TLevelReaderP &lr, const TLevelWriterP &lw, con
 			break;
 		try {
 			TRasterImageP img;
-			if (frames[i] == TFrameId()) //immagine singola, non livello
+			if (frames[i] == TFrameId()) // immagine singola, non livello
 			{
 				assert(frames.size() == 1);
 				TImageP _img;
@@ -521,7 +529,8 @@ void convertFromFullRaster(const TLevelReaderP &lr, const TLevelWriterP &lw, con
 					int index = 4 + 1 + outPath.getType().length();
 					std::wstring renamedStr = outPath.getWideString();
 					if (renamedStr[renamedStr.length() - index - 1] == L'.')
-						renamedStr = renamedStr.substr(0, renamedStr.length() - index - 1) + renamedStr.substr(renamedStr.length() - index, index);
+						renamedStr = renamedStr.substr(0, renamedStr.length() - index - 1) +
+									 renamedStr.substr(renamedStr.length() - index, index);
 					const TFilePath fp(renamedStr);
 					TImageWriterP writer(fp);
 					writer->setProperties(lw->getProperties());
@@ -532,22 +541,24 @@ void convertFromFullRaster(const TLevelReaderP &lr, const TLevelWriterP &lw, con
 				}
 			}
 		} catch (...) {
-			//QString msg=QObject::tr("Frame %1 : conversion failed!").arg(QString::number(i+1));
-			//DVGui::info(msg);
+			// QString msg=QObject::tr("Frame %1 : conversion failed!").arg(QString::number(i+1));
+			// DVGui::info(msg);
 		}
-		/*-- これはプログレスバーを進めるものなので、動画番号ではなく、完了したフレームの枚数を投げる --*/
+		/*--
+		 * これはプログレスバーを進めるものなので、動画番号ではなく、完了したフレームの枚数を投げる
+		 * --*/
 		frameNotifier->notifyFrameCompleted(100 * (i + 1) / frames.size());
 	}
 }
 
 //-----------------------------------------------------------------------
 
-void convertFromVector(const TLevelReaderP &lr, const TLevelWriterP &lw, const std::vector<TFrameId> &_frames,
-					   FrameTaskNotifier *frameNotifier)
+void convertFromVector(const TLevelReaderP &lr, const TLevelWriterP &lw,
+					   const std::vector<TFrameId> &_frames, FrameTaskNotifier *frameNotifier)
 {
 	std::vector<TFrameId> frames = _frames;
 	TLevelP lv = lr->loadInfo();
-	if (frames.empty() && lv->getFrameCount() == 1) //e' una immagine singola, non un livello
+	if (frames.empty() && lv->getFrameCount() == 1) // e' una immagine singola, non un livello
 		frames.push_back(TFrameId());
 
 	for (int i = 0; i < (int)frames.size(); i++) {
@@ -555,7 +566,7 @@ void convertFromVector(const TLevelReaderP &lr, const TLevelWriterP &lw, const s
 			break;
 		try {
 			TVectorImageP img;
-			if (frames[i] == TFrameId()) //immagine singola, non livello
+			if (frames[i] == TFrameId()) // immagine singola, non livello
 			{
 				assert(frames.size() == 1);
 				TImageP _img;
@@ -577,8 +588,8 @@ void convertFromVector(const TLevelReaderP &lr, const TLevelWriterP &lw, const s
 				iw->save(img);
 			}
 		} catch (...) {
-			//QString msg=QObject::tr("Frame %1 : conversion failed!").arg(QString::number(i+1));
-			//DVGui::info(msg);
+			// QString msg=QObject::tr("Frame %1 : conversion failed!").arg(QString::number(i+1));
+			// DVGui::info(msg);
 		}
 		frameNotifier->notifyFrameCompleted(100 * (i + 1) / frames.size());
 	}
@@ -586,16 +597,12 @@ void convertFromVector(const TLevelReaderP &lr, const TLevelWriterP &lw, const s
 
 //-----------------------------------------------------------------------
 
-void convert(const TFilePath &source, const TFilePath &dest,
-			 const TFrameId &from, const TFrameId &to,
-			 double framerate,
-			 TPropertyGroup *prop,
-			 FrameTaskNotifier *frameNotifier,
-			 const TPixel &bgColor,
+void convert(const TFilePath &source, const TFilePath &dest, const TFrameId &from,
+			 const TFrameId &to, double framerate, TPropertyGroup *prop,
+			 FrameTaskNotifier *frameNotifier, const TPixel &bgColor,
 			 bool removeDotBeforeFrameNumber)
 {
-	std::string dstExt = dest.getType(),
-				srcExt = source.getType();
+	std::string dstExt = dest.getType(), srcExt = source.getType();
 
 	// Load source level structure
 	TLevelReaderP lr(source);
@@ -612,8 +619,9 @@ void convert(const TFilePath &source, const TFilePath &dest,
 		std::string codecName = prop->getProperty(0)->getValueAsString();
 		if (!AviCodecRestrictions::canWriteMovie(toWideString(codecName), res)) {
 			return;
-			//QString msg=QObject::tr("The image resolution does not fit the chosen output file format.");
-			//DVGui::MsgBox(DVGui::WARNING,msg);
+			// QString msg=QObject::tr("The image resolution does not fit the chosen output file
+			// format.");
+			// DVGui::MsgBox(DVGui::WARNING,msg);
 		}
 	}
 #endif
@@ -627,24 +635,22 @@ void convert(const TFilePath &source, const TFilePath &dest,
 	lw->setFrameRate(framerate);
 
 	if (srcExt == "tlv")
-		convertFromCM(lr, level->getPalette(), lw, frames, TAffine(), TRop::Triangle, frameNotifier, bgColor, removeDotBeforeFrameNumber);
+		convertFromCM(lr, level->getPalette(), lw, frames, TAffine(), TRop::Triangle, frameNotifier,
+					  bgColor, removeDotBeforeFrameNumber);
 	else if (srcExt == "pli")
-		//assert(!"Conversion from pli files is currently diabled");
+		// assert(!"Conversion from pli files is currently diabled");
 		convertFromVector(lr, lw, frames, frameNotifier);
 	else
-		convertFromFullRaster(lr, lw, frames, TAffine(), TRop::Triangle, frameNotifier, bgColor, removeDotBeforeFrameNumber);
+		convertFromFullRaster(lr, lw, frames, TAffine(), TRop::Triangle, frameNotifier, bgColor,
+							  removeDotBeforeFrameNumber);
 }
 
 //=============================================================================
 
-void convertNaa2Tlv(
-	const TFilePath &source, const TFilePath &dest,
-	const TFrameId &from, const TFrameId &to,
-	FrameTaskNotifier *frameNotifier,
-	TPalette *palette)
+void convertNaa2Tlv(const TFilePath &source, const TFilePath &dest, const TFrameId &from,
+					const TFrameId &to, FrameTaskNotifier *frameNotifier, TPalette *palette)
 {
-	std::string dstExt = dest.getType(),
-				srcExt = source.getType();
+	std::string dstExt = dest.getType(), srcExt = source.getType();
 
 	// Load source level structure
 	TLevelReaderP lr(source);
@@ -696,8 +702,8 @@ void convertNaa2Tlv(
 				TImageWriterP iw = lw->getFrameWriter(frames[f]);
 				iw->save(dstImg);
 			} else {
-				DVGui::warning(QObject::tr(
-										   "The source image seems not suitable for this kind of conversion"));
+				DVGui::warning(
+					QObject::tr("The source image seems not suitable for this kind of conversion"));
 				frameNotifier->notifyError();
 			}
 		} catch (...) {
@@ -711,12 +717,13 @@ void convertNaa2Tlv(
 
 #define ZOOMLEVELS 13
 #define NOZOOMINDEX 6
-double ZoomFactors[ZOOMLEVELS] = {0.015625, 0.03125, 0.0625, 0.125, 0.25,
-								  0.5, 1, 2, 4, 8, 16, 32, 64};
+double ZoomFactors[ZOOMLEVELS] = {0.015625, 0.03125, 0.0625, 0.125, 0.25, 0.5, 1,
+								  2,		4,		 8,		 16,	32,   64};
 
 double getQuantizedZoomFactor(double zf, bool forward)
 {
-	if (forward && (zf > ZoomFactors[ZOOMLEVELS - 1] || areAlmostEqual(zf, ZoomFactors[ZOOMLEVELS - 1], 1e-5)))
+	if (forward &&
+		(zf > ZoomFactors[ZOOMLEVELS - 1] || areAlmostEqual(zf, ZoomFactors[ZOOMLEVELS - 1], 1e-5)))
 		return zf;
 	else if (!forward && (zf < ZoomFactors[0] || areAlmostEqual(zf, ZoomFactors[0], 1e-5)))
 		return zf;
@@ -749,7 +756,8 @@ double getQuantizedZoomFactor(double zf, bool forward)
 namespace
 {
 
-void getViewerShortcuts(int &zoomIn, int &zoomOut, int &zoomReset, int &zoomFit, int &showHideFullScreen, int &actualPixelSize)
+void getViewerShortcuts(int &zoomIn, int &zoomOut, int &zoomReset, int &zoomFit,
+						int &showHideFullScreen, int &actualPixelSize)
 {
 	CommandManager *cManager = CommandManager::instance();
 
@@ -757,19 +765,19 @@ void getViewerShortcuts(int &zoomIn, int &zoomOut, int &zoomReset, int &zoomFit,
 	zoomOut = cManager->getKeyFromShortcut(cManager->getShortcutFromId(V_ZoomOut));
 	zoomReset = cManager->getKeyFromShortcut(cManager->getShortcutFromId(V_ZoomReset));
 	zoomFit = cManager->getKeyFromShortcut(cManager->getShortcutFromId(V_ZoomFit));
-	showHideFullScreen = cManager->getKeyFromShortcut(cManager->getShortcutFromId(V_ShowHideFullScreen));
+	showHideFullScreen =
+		cManager->getKeyFromShortcut(cManager->getShortcutFromId(V_ShowHideFullScreen));
 	actualPixelSize = cManager->getKeyFromShortcut(cManager->getShortcutFromId(V_ActualPixelSize));
 }
 
-} //namespace
+} // namespace
 
 //--------------------------------------------------------------------------
 
 namespace ImageUtils
 {
 
-ShortcutZoomer::ShortcutZoomer(QWidget *zoomingWidget)
-	: m_widget(zoomingWidget)
+ShortcutZoomer::ShortcutZoomer(QWidget *zoomingWidget) : m_widget(zoomingWidget)
 {
 }
 
@@ -778,7 +786,8 @@ ShortcutZoomer::ShortcutZoomer(QWidget *zoomingWidget)
 bool ShortcutZoomer::exec(QKeyEvent *event)
 {
 	int zoomInKey, zoomOutKey, zoomResetKey, zoomFitKey, showHideFullScreenKey, actualPixelSize;
-	getViewerShortcuts(zoomInKey, zoomOutKey, zoomResetKey, zoomFitKey, showHideFullScreenKey, actualPixelSize);
+	getViewerShortcuts(zoomInKey, zoomOutKey, zoomResetKey, zoomFitKey, showHideFullScreenKey,
+					   actualPixelSize);
 
 	int key = event->key();
 	if (key == Qt::Key_Control || key == Qt::Key_Shift || key == Qt::Key_Alt)
@@ -786,19 +795,24 @@ bool ShortcutZoomer::exec(QKeyEvent *event)
 
 	key = key | event->modifiers() & (~0xf0000000); // Ignore if the key is a numpad key
 
-	return (key == showHideFullScreenKey) ? toggleFullScreen() : (key == Qt::Key_Escape) ? toggleFullScreen(true) : (key == actualPixelSize) ? setActualPixelSize() : (key == zoomFitKey) ? fit() : (key == zoomInKey ||
-																																																	 key == zoomOutKey ||
-																																																	 key == zoomResetKey)
-																																																		? zoom(key == zoomInKey, key == zoomResetKey)
-																																																		: false;
+	return (key == showHideFullScreenKey)
+			   ? toggleFullScreen()
+			   : (key == Qt::Key_Escape)
+					 ? toggleFullScreen(true)
+					 : (key == actualPixelSize)
+						   ? setActualPixelSize()
+						   : (key == zoomFitKey)
+								 ? fit()
+								 : (key == zoomInKey || key == zoomOutKey || key == zoomResetKey)
+									   ? zoom(key == zoomInKey, key == zoomResetKey)
+									   : false;
 }
 
 //*********************************************************************************************
 //    FullScreenWidget  implementation
 //*********************************************************************************************
 
-FullScreenWidget::FullScreenWidget(QWidget *parent)
-	: QWidget(parent)
+FullScreenWidget::FullScreenWidget(QWidget *parent) : QWidget(parent)
 {
 	QHBoxLayout *layout = new QHBoxLayout(this);
 	layout->setMargin(0);
@@ -842,4 +856,4 @@ bool FullScreenWidget::toggleFullScreen(bool quit)
 	return false;
 }
 
-} //imageutils
+} // imageutils

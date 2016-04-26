@@ -50,7 +50,8 @@ void addMark(const TRasterP &mark, TRasterImageP img)
 		int borderx = troundp(0.035 * (ras->getLx() - mark->getLx()));
 		int bordery = troundp(0.035 * (ras->getLy() - mark->getLy()));
 
-		TRect rect = TRect(borderx, bordery, borderx + mark->getLx() - 1, bordery + mark->getLy() - 1);
+		TRect rect =
+			TRect(borderx, bordery, borderx + mark->getLx() - 1, bordery + mark->getLy() - 1);
 		TRop::over(ras->extract(rect), mark);
 
 		img->setRaster(ras);
@@ -99,7 +100,7 @@ QString getPreviewName(unsigned long renderSessionId)
 
 class MovieRenderer::Imp : public TRenderPort, public TSmartObject
 {
-public:
+  public:
 	ToonzScene *m_scene;
 	TRenderer m_renderer;
 	TFilePath m_fp;
@@ -133,7 +134,7 @@ public:
 	bool m_preview;
 	bool m_movieType;
 
-public:
+  public:
 	Imp(ToonzScene *scene, const TFilePath &moviePath, int threadCount, bool cacheResults);
 	~Imp();
 
@@ -152,9 +153,11 @@ public:
 
 	void prepareForStart();
 	void addSoundtrack(int r0, int r1, double fps);
-	void postProcessImage(const TRasterImageP &img, bool has64bitOutputSupport, const TRasterP &mark, int frame);
+	void postProcessImage(const TRasterImageP &img, bool has64bitOutputSupport,
+						  const TRasterP &mark, int frame);
 
-	//! Saves the specified rasters at the specified time; returns whether the frames were successfully saved, and
+	//! Saves the specified rasters at the specified time; returns whether the frames were
+	//! successfully saved, and
 	//! the associated time-adjusted level frame.
 	std::pair<bool, int> saveFrame(double frame, const std::pair<TRasterP, TRasterP> &rasters);
 	std::string getRenderCacheId();
@@ -162,17 +165,21 @@ public:
 
 //---------------------------------------------------------
 
-MovieRenderer::Imp::Imp(ToonzScene *scene,
-						const TFilePath &moviePath,
-						int threadCount,
+MovieRenderer::Imp::Imp(ToonzScene *scene, const TFilePath &moviePath, int threadCount,
 						bool cacheResults)
-	: m_scene(scene), m_renderer(threadCount), m_fp(moviePath), m_frameSize(scene->getCurrentCamera()->getRes()), m_xDpi(72), m_yDpi(72), m_renderSessionId(RenderSessionId++), m_nextFrameIdxToSave(0), m_savingThreadsCount(0), m_whiteSample(0), m_firstCompletedRaster(true) //< I know, sounds weird - it's just set to false
+	: m_scene(scene), m_renderer(threadCount), m_fp(moviePath),
+	  m_frameSize(scene->getCurrentCamera()->getRes()), m_xDpi(72), m_yDpi(72),
+	  m_renderSessionId(RenderSessionId++), m_nextFrameIdxToSave(0), m_savingThreadsCount(0),
+	  m_whiteSample(0),
+	  m_firstCompletedRaster(true) //< I know, sounds weird - it's just set to false
 	  ,
 	  m_failure(false) //  AFTER the first completed raster gets processed
 	  ,
-	  m_cacheResults(cacheResults), m_preview(moviePath.isEmpty()), m_movieType(isMovieType(moviePath))
+	  m_cacheResults(cacheResults), m_preview(moviePath.isEmpty()),
+	  m_movieType(isMovieType(moviePath))
 {
-	m_renderCacheId = m_fp.withName(m_fp.getName() + "#RENDERID" + QString::number(m_renderSessionId).toStdString())
+	m_renderCacheId = m_fp.withName(m_fp.getName() + "#RENDERID" +
+									QString::number(m_renderSessionId).toStdString())
 						  .getLevelName();
 
 	m_renderer.addPort(this);
@@ -182,7 +189,8 @@ MovieRenderer::Imp::Imp(ToonzScene *scene,
 
 MovieRenderer::Imp::~Imp()
 {
-	m_renderer.removePort(this); // Please, note: a TRenderer instance is currently a shared-pointer-like
+	m_renderer.removePort(
+		this); // Please, note: a TRenderer instance is currently a shared-pointer-like
 } // object to a private worker. *That* object may outlive the TRenderer instance.
 
 //---------------------------------------------------------
@@ -190,7 +198,8 @@ MovieRenderer::Imp::~Imp()
 void MovieRenderer::Imp::prepareForStart()
 {
 	struct locals {
-		static void eraseUncompatibleExistingLevel(const TFilePath &fp, const TDimension &imageSize) // nothrow
+		static void eraseUncompatibleExistingLevel(const TFilePath &fp,
+												   const TDimension &imageSize) // nothrow
 		{
 			assert(!fp.isEmpty());
 
@@ -222,27 +231,32 @@ void MovieRenderer::Imp::prepareForStart()
 	double frameRate = (double)oprop->getFrameRate();
 
 	/*-- Frame rate の stretch --*/
-	double stretchFactor = oprop->getRenderSettings().m_timeStretchTo / oprop->getRenderSettings().m_timeStretchFrom;
+	double stretchFactor =
+		oprop->getRenderSettings().m_timeStretchTo / oprop->getRenderSettings().m_timeStretchFrom;
 	frameRate *= stretchFactor;
 
 	// Get the shrink
 	int shrinkX = m_renderSettings.m_shrinkX, shrinkY = m_renderSettings.m_shrinkY;
 
-	//Build the render area
+	// Build the render area
 	TPointD cameraPos(-0.5 * m_frameSize.lx, -0.5 * m_frameSize.ly);
 	TDimensionD cameraRes(double(m_frameSize.lx) / shrinkX, double(m_frameSize.ly) / shrinkY);
 	TDimension cameraResI(cameraRes.lx, cameraRes.ly);
 
-	TRectD renderArea(cameraPos.x, cameraPos.y, cameraPos.x + cameraRes.lx, cameraPos.y + cameraRes.ly);
+	TRectD renderArea(cameraPos.x, cameraPos.y, cameraPos.x + cameraRes.lx,
+					  cameraPos.y + cameraRes.ly);
 	setRenderArea(renderArea);
 
 	if (!m_fp.isEmpty()) {
-		try // Construction of a LevelUpdater may throw (well, almost ANY operation on a LevelUpdater
-		{   // could throw). But due to backward compatibility this function is assumed to be non-throwing.
+		try // Construction of a LevelUpdater may throw (well, almost ANY operation on a
+			// LevelUpdater
+		{   // could throw). But due to backward compatibility this function is assumed to be
+			// non-throwing.
 			if (!m_renderSettings.m_stereoscopic) {
 				locals::eraseUncompatibleExistingLevel(m_fp, cameraResI);
 
-				m_levelUpdaterA.reset(new LevelUpdater(m_fp, oprop->getFileFormatProperties(m_fp.getType())));
+				m_levelUpdaterA.reset(
+					new LevelUpdater(m_fp, oprop->getFileFormatProperties(m_fp.getType())));
 				m_levelUpdaterA->getLevelWriter()->setFrameRate(frameRate);
 			} else {
 				TFilePath leftFp = m_fp.withName(m_fp.getName() + "_l");
@@ -251,15 +265,19 @@ void MovieRenderer::Imp::prepareForStart()
 				locals::eraseUncompatibleExistingLevel(leftFp, cameraResI);
 				locals::eraseUncompatibleExistingLevel(rightFp, cameraResI);
 
-				m_levelUpdaterA.reset(new LevelUpdater(leftFp, oprop->getFileFormatProperties(leftFp.getType())));
+				m_levelUpdaterA.reset(
+					new LevelUpdater(leftFp, oprop->getFileFormatProperties(leftFp.getType())));
 				m_levelUpdaterA->getLevelWriter()->setFrameRate(frameRate);
 
-				m_levelUpdaterB.reset(new LevelUpdater(rightFp, oprop->getFileFormatProperties(rightFp.getType())));
+				m_levelUpdaterB.reset(
+					new LevelUpdater(rightFp, oprop->getFileFormatProperties(rightFp.getType())));
 				m_levelUpdaterB->getLevelWriter()->setFrameRate(frameRate);
 			}
 		} catch (...) {
-			// If we get here, it's because one of the LevelUpdaters could not be created. So, let's say
-			// that if one could not be created, then ALL OF THEM couldn't (ie saving is not possible at all).
+			// If we get here, it's because one of the LevelUpdaters could not be created. So, let's
+			// say
+			// that if one could not be created, then ALL OF THEM couldn't (ie saving is not
+			// possible at all).
 			m_levelUpdaterA.reset();
 			m_levelUpdaterB.reset();
 		}
@@ -272,7 +290,8 @@ void MovieRenderer::Imp::addSoundtrack(int r0, int r1, double fps)
 {
 	TCG_ASSERT(r0 <= r1, return );
 
-	TXsheet::SoundProperties *prop = new TXsheet::SoundProperties(); // Ownership will be surrendered ...
+	TXsheet::SoundProperties *prop =
+		new TXsheet::SoundProperties(); // Ownership will be surrendered ...
 	prop->m_frameRate = fps;
 
 	TSoundTrack *snd = m_scene->getXsheet()->makeSound(prop); // ... here
@@ -286,8 +305,7 @@ void MovieRenderer::Imp::addSoundtrack(int r0, int r1, double fps)
 	double samplePerFrame = snd->getSampleRate() / fps;
 
 	// Extract the useful part of scene soundtrack
-	TSoundTrackP snd1 = snd->extract((TINT32)(r0 * samplePerFrame),
-									 (TINT32)(r1 * samplePerFrame));
+	TSoundTrackP snd1 = snd->extract((TINT32)(r0 * samplePerFrame), (TINT32)(r1 * samplePerFrame));
 	assert(!m_st);
 	if (!m_st) {
 		// First, add white sound before the 'from' instant
@@ -297,8 +315,7 @@ void MovieRenderer::Imp::addSoundtrack(int r0, int r1, double fps)
 
 	// Then, add the rest
 	TINT32 fromSample = m_st->getSampleCount();
-	TINT32 numSample = tmax(TINT32((r1 - r0 + 1) * samplePerFrame),
-							snd1->getSampleCount());
+	TINT32 numSample = tmax(TINT32((r1 - r0 + 1) * samplePerFrame), snd1->getSampleCount());
 
 	m_st = TSop::insertBlank(m_st, fromSample, numSample + m_whiteSample);
 	m_st->copy(snd1, TINT32(fromSample + m_whiteSample));
@@ -318,7 +335,8 @@ void MovieRenderer::Imp::onRenderRasterCompleted(const RenderData &renderData)
 
 //---------------------------------------------------------
 
-void MovieRenderer::Imp::postProcessImage(const TRasterImageP &img, bool has64bitOutputSupport, const TRasterP &mark, int frame)
+void MovieRenderer::Imp::postProcessImage(const TRasterImageP &img, bool has64bitOutputSupport,
+										  const TRasterP &mark, int frame)
 {
 	img->setDpi(m_xDpi, m_yDpi);
 
@@ -337,12 +355,14 @@ void MovieRenderer::Imp::postProcessImage(const TRasterImageP &img, bool has64bi
 
 //---------------------------------------------------------------------
 
-std::pair<bool, int> MovieRenderer::Imp::saveFrame(double frame, const std::pair<TRasterP, TRasterP> &rasters)
+std::pair<bool, int> MovieRenderer::Imp::saveFrame(double frame,
+												   const std::pair<TRasterP, TRasterP> &rasters)
 {
 	bool success = false;
 
 	// Build the frame number to write to
-	double stretchFac = double(m_renderSettings.m_timeStretchTo) / m_renderSettings.m_timeStretchFrom;
+	double stretchFac =
+		double(m_renderSettings.m_timeStretchTo) / m_renderSettings.m_timeStretchFrom;
 
 	int fr = (stretchFac != 1) ? tround(frame * stretchFac) : int(frame);
 	TFrameId fid(fr + 1);
@@ -382,7 +402,8 @@ std::pair<bool, int> MovieRenderer::Imp::saveFrame(double frame, const std::pair
 
 			if (rasterB) {
 				TRasterImageP imgB(rasterB);
-				postProcessImage(imgB, has64bitOutputSupport, m_renderSettings.m_mark, fid.getNumber());
+				postProcessImage(imgB, has64bitOutputSupport, m_renderSettings.m_mark,
+								 fid.getNumber());
 
 				m_levelUpdaterB->update(fid, imgB);
 			}
@@ -419,7 +440,8 @@ void MovieRenderer::Imp::doRenderRasterCompleted(const RenderData &renderData)
 
 	QMutexLocker locker(&m_mutex);
 
-	// Build soundtrack at the first time a frame is completed - and the filetype is that of a movie.
+	// Build soundtrack at the first time a frame is completed - and the filetype is that of a
+	// movie.
 	if (m_firstCompletedRaster && m_movieType && !m_st) {
 		int from, to;
 		getRange(m_scene, false, from, to);
@@ -489,7 +511,8 @@ void MovieRenderer::Imp::doRenderRasterCompleted(const RenderData &renderData)
 				}
 			} saveTimer(m_savingThreadsCount);
 
-			// Unlock the mutex only in case this is NOT a movie type. Single images can be saved concurrently.
+			// Unlock the mutex only in case this is NOT a movie type. Single images can be saved
+			// concurrently.
 			struct MutexUnlocker {
 				QMutexLocker *m_locker;
 				~MutexUnlocker()
@@ -524,7 +547,8 @@ void MovieRenderer::Imp::doRenderRasterCompleted(const RenderData &renderData)
 
 			{
 				int from, to;
-				getRange(m_scene, false, from, to); // It's ok since cancels can only happen from Toonz...
+				getRange(m_scene, false, from,
+						 to); // It's ok since cancels can only happen from Toonz...
 
 				for (int i = from; i < to; i++)
 					TImageCache::instance()->remove(m_renderCacheId + toString(i + 1));
@@ -575,7 +599,7 @@ void MovieRenderer::Imp::doPreviewRasterCompleted(const RenderData &renderData)
 
 		TImageCache::instance()->add(frameName.toStdString(), img);
 
-		//controlla se ci sono frame(uguali ad altri) da mettere in cache
+		// controlla se ci sono frame(uguali ad altri) da mettere in cache
 
 		std::vector<double>::const_iterator jt;
 		for (jt = renderData.m_frames.begin(), ++jt; jt != renderData.m_frames.end(); ++jt) {
@@ -632,7 +656,8 @@ void MovieRenderer::Imp::onRenderFailure(const RenderData &renderData, TExceptio
 		// I would have expected that at least those frames that were computed could
 		// attempt saving! Why is this not addressed? They're even marked as 'failed'!
 
-		double stretchFac = (double)renderData.m_info.m_timeStretchTo / renderData.m_info.m_timeStretchFrom;
+		double stretchFac =
+			(double)renderData.m_info.m_timeStretchTo / renderData.m_info.m_timeStretchFrom;
 
 		int fr;
 		if (stretchFac != 1)
@@ -660,7 +685,8 @@ void MovieRenderer::Imp::onRenderFailure(const RenderData &renderData, TExceptio
 
 void MovieRenderer::Imp::onRenderFinished(bool isCanceled)
 {
-	TFilePath levelName(m_levelUpdaterA.get() ? m_fp : TFilePath(getPreviewName(m_renderSessionId).toStdWString()));
+	TFilePath levelName(
+		m_levelUpdaterA.get() ? m_fp : TFilePath(getPreviewName(m_renderSessionId).toStdWString()));
 
 	// Close updaters. After this, the output levels should be finalized on disk.
 	m_levelUpdaterA.reset();
@@ -675,7 +701,8 @@ void MovieRenderer::Imp::onRenderFinished(bool isCanceled)
 		// I wonder why listeners are not informed of a failed sequence, btw...
 	}
 
-	release(); // The movieRenderer is released by the render process. It could eventually be deleted.
+	release(); // The movieRenderer is released by the render process. It could eventually be
+			   // deleted.
 }
 
 //======================================================================================
@@ -684,7 +711,8 @@ void MovieRenderer::Imp::onRenderFinished(bool isCanceled)
 //    MovieRenderer
 //----------------------
 
-MovieRenderer::MovieRenderer(ToonzScene *scene, const TFilePath &moviePath, int threadCount, bool cacheResults)
+MovieRenderer::MovieRenderer(ToonzScene *scene, const TFilePath &moviePath, int threadCount,
+							 bool cacheResults)
 	: m_imp(new Imp(scene, moviePath, threadCount, cacheResults))
 {
 	m_imp->addRef(); // See MovieRenderer::start(). Can't just delete it in the dtor.
@@ -746,19 +774,21 @@ void MovieRenderer::start()
 {
 	m_imp->prepareForStart();
 
-	//Add a reference to MovieRenderer's Imp. The reference is 'owned' by TRenderer's render process - when it
-	//ends (that is, when notifies onRenderFinished), the reference is released. As to TRenderer's specifics,
-	//this is ensured to happen only after all the other port notifications for each frame have been invoked.
+	// Add a reference to MovieRenderer's Imp. The reference is 'owned' by TRenderer's render
+	// process - when it
+	// ends (that is, when notifies onRenderFinished), the reference is released. As to TRenderer's
+	// specifics,
+	// this is ensured to happen only after all the other port notifications for each frame have
+	// been invoked.
 	m_imp->addRef();
 
-	//Prepare the TRenderer::RenderDatas to render
+	// Prepare the TRenderer::RenderDatas to render
 	RenderDataVector *datasToBeRendered = new RenderDataVector;
 	size_t i, size = m_imp->m_framesToBeRendered.size();
 	for (i = 0; i < size; ++i)
-		datasToBeRendered->push_back(TRenderer::RenderData(
-			m_imp->m_framesToBeRendered[i].first,
-			m_imp->m_renderSettings,
-			m_imp->m_framesToBeRendered[i].second));
+		datasToBeRendered->push_back(TRenderer::RenderData(m_imp->m_framesToBeRendered[i].first,
+														   m_imp->m_renderSettings,
+														   m_imp->m_framesToBeRendered[i].second));
 
 	m_imp->m_renderer.startRendering(datasToBeRendered);
 }
@@ -774,11 +804,14 @@ void MovieRenderer::onCanceled()
 
 TRenderer *MovieRenderer::getTRenderer()
 {
-	// Again, this is somewhat BAD. The pointed-to object dies together with the MovieRenderer instance.
-	// Since a TRenderer is already smart-pointer-like, we could just return a copy - however, it really
+	// Again, this is somewhat BAD. The pointed-to object dies together with the MovieRenderer
+	// instance.
+	// Since a TRenderer is already smart-pointer-like, we could just return a copy - however, it
+	// really
 	// shouln't be that way. Maybe one day we'll revert that and actually use a smart pointer class.
 
-	// For now, no use of this function seems to access the returned pointer beyond the lifespan of the
+	// For now, no use of this function seems to access the returned pointer beyond the lifespan of
+	// the
 	// associated MovieRenderer instance - so I'm not gonna touch the class interface.
 	return &m_imp->m_renderer;
 }

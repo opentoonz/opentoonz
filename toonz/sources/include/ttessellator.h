@@ -29,13 +29,13 @@ class TRegionOutline;
 class DVAPI TTessellator
 {
 
-public:
-	virtual ~TTessellator()
-	{
-	}
+  public:
+	virtual ~TTessellator() {}
 
-	virtual void tessellate(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &outline, TPixel32 color) = 0;
-	virtual void tessellate(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &outline, TRaster32P texture) = 0;
+	virtual void tessellate(const TColorFunction *cf, const bool antiAliasing,
+							TRegionOutline &outline, TPixel32 color) = 0;
+	virtual void tessellate(const TColorFunction *cf, const bool antiAliasing,
+							TRegionOutline &outline, TRaster32P texture) = 0;
 };
 
 //=============================================================================
@@ -45,12 +45,12 @@ public:
 class DVAPI TglTessellator : public TTessellator
 {
 
-public:
-	//TThread::Mutex m_mutex;
+  public:
+	// TThread::Mutex m_mutex;
 
 	class DVAPI GLTess
 	{
-	public:
+	  public:
 #ifdef GLU_VERSION_1_2
 		GLUtesselator *m_tess;
 #else
@@ -65,16 +65,20 @@ public:
 		~GLTess();
 	};
 
-private:
-	//static GLTess m_glTess;
+  private:
+	// static GLTess m_glTess;
 
-	void doTessellate(GLTess &glTess, const TColorFunction *cf, const bool antiAliasing, TRegionOutline &outline);
-	void doTessellate(GLTess &glTess, const TColorFunction *cf, const bool antiAliasing, TRegionOutline outline, const TAffine &aff);
+	void doTessellate(GLTess &glTess, const TColorFunction *cf, const bool antiAliasing,
+					  TRegionOutline &outline);
+	void doTessellate(GLTess &glTess, const TColorFunction *cf, const bool antiAliasing,
+					  TRegionOutline outline, const TAffine &aff);
 
-public:
-	//void tessellate(const TVectorRenderData &rd, TRegionOutline &outline );
-	void tessellate(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &outline, TPixel32 color);
-	void tessellate(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &outline, TRaster32P texture);
+  public:
+	// void tessellate(const TVectorRenderData &rd, TRegionOutline &outline );
+	void tessellate(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &outline,
+					TPixel32 color);
+	void tessellate(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &outline,
+					TRaster32P texture);
 };
 
 //=============================================================================

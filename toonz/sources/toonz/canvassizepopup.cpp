@@ -49,10 +49,9 @@ class ResizeCanvasUndo : public TUndo
 	static int m_idCount;
 	int m_undoSize;
 
-public:
-	ResizeCanvasUndo(const TXshSimpleLevelP &level, const TFrameId &fid,
-					 const TImageP &oldImage, const TImageP &newImage,
-					 const TDimension &oldDim, const TDimension &newDim)
+  public:
+	ResizeCanvasUndo(const TXshSimpleLevelP &level, const TFrameId &fid, const TImageP &oldImage,
+					 const TImageP &newImage, const TDimension &oldDim, const TDimension &newDim)
 		: TUndo(), m_level(level), m_fid(fid), m_oldDim(oldDim), m_newDim(newDim)
 	{
 		m_oldImageId = "ResizeCanvasUndo_oldImage_" + toString(m_idCount);
@@ -113,10 +112,7 @@ public:
 		}
 	}
 
-	int getSize() const
-	{
-		return m_undoSize;
-	}
+	int getSize() const { return m_undoSize; }
 };
 
 int ResizeCanvasUndo::m_idCount = 0;
@@ -163,7 +159,7 @@ PeggingWidget::PeggingWidget(QWidget *parent)
 	m_buttonGroup = new QButtonGroup();
 	m_buttonGroup->setExclusive(true);
 
-	//second buttons line
+	// second buttons line
 	createButton(&m_00, e00);
 	createButton(&m_01, e01);
 	createButton(&m_02, e02);
@@ -175,7 +171,7 @@ PeggingWidget::PeggingWidget(QWidget *parent)
 	ret = ret && connect(m_01, SIGNAL(released()), this, SLOT(on01()));
 	ret = ret && connect(m_02, SIGNAL(released()), this, SLOT(on02()));
 
-	//second buttons line
+	// second buttons line
 	createButton(&m_10, e10);
 	createButton(&m_11, e11);
 	createButton(&m_12, e12);
@@ -186,7 +182,7 @@ PeggingWidget::PeggingWidget(QWidget *parent)
 	ret = ret && connect(m_11, SIGNAL(released()), this, SLOT(on11()));
 	ret = ret && connect(m_12, SIGNAL(released()), this, SLOT(on12()));
 
-	//third buttons line
+	// third buttons line
 	createButton(&m_20, e20);
 	createButton(&m_21, e21);
 	createButton(&m_22, e22);
@@ -267,9 +263,12 @@ void PeggingWidget::on00()
 	QPixmap pix(30, 30);
 	pix.fill(Qt::transparent);
 	m_00->setIcon(pix);
-	m_01->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLx ? -90 : 90), Qt::SmoothTransformation));
-	m_11->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLx ? -90 : 90), Qt::SmoothTransformation));
-	m_10->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLy ? 0 : 180), Qt::SmoothTransformation));
+	m_01->setIcon(
+		m_topPix.transformed(QMatrix().rotate(m_cutLx ? -90 : 90), Qt::SmoothTransformation));
+	m_11->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLx ? -90 : 90),
+											Qt::SmoothTransformation));
+	m_10->setIcon(
+		m_topPix.transformed(QMatrix().rotate(m_cutLy ? 0 : 180), Qt::SmoothTransformation));
 
 	m_02->setIcon(pix);
 	m_12->setIcon(pix);
@@ -286,11 +285,16 @@ void PeggingWidget::on01()
 	QPixmap pix(30, 30);
 	pix.fill(Qt::transparent);
 	m_01->setIcon(pix);
-	m_00->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLx ? 90 : -90), Qt::SmoothTransformation));
-	m_10->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 0 : 180), Qt::SmoothTransformation));
-	m_11->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLy ? 0 : 180), Qt::SmoothTransformation));
-	m_12->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? -90 : 90), Qt::SmoothTransformation));
-	m_02->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLx ? -90 : 90), Qt::SmoothTransformation));
+	m_00->setIcon(
+		m_topPix.transformed(QMatrix().rotate(m_cutLx ? 90 : -90), Qt::SmoothTransformation));
+	m_10->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 0 : 180),
+											Qt::SmoothTransformation));
+	m_11->setIcon(
+		m_topPix.transformed(QMatrix().rotate(m_cutLy ? 0 : 180), Qt::SmoothTransformation));
+	m_12->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? -90 : 90),
+											Qt::SmoothTransformation));
+	m_02->setIcon(
+		m_topPix.transformed(QMatrix().rotate(m_cutLx ? -90 : 90), Qt::SmoothTransformation));
 
 	m_20->setIcon(pix);
 	m_21->setIcon(pix);
@@ -305,9 +309,12 @@ void PeggingWidget::on02()
 	QPixmap pix(30, 30);
 	pix.fill(Qt::transparent);
 	m_02->setIcon(pix);
-	m_01->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLx ? 90 : -90), Qt::SmoothTransformation));
-	m_11->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 0 : 180), Qt::SmoothTransformation));
-	m_12->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLy ? 0 : 180), Qt::SmoothTransformation));
+	m_01->setIcon(
+		m_topPix.transformed(QMatrix().rotate(m_cutLx ? 90 : -90), Qt::SmoothTransformation));
+	m_11->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 0 : 180),
+											Qt::SmoothTransformation));
+	m_12->setIcon(
+		m_topPix.transformed(QMatrix().rotate(m_cutLy ? 0 : 180), Qt::SmoothTransformation));
 
 	m_00->setIcon(pix);
 	m_10->setIcon(pix);
@@ -324,11 +331,16 @@ void PeggingWidget::on10()
 	QPixmap pix(30, 30);
 	pix.fill(Qt::transparent);
 	m_10->setIcon(pix);
-	m_00->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLy ? 180 : 0), Qt::SmoothTransformation));
-	m_01->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 180 : 0), Qt::SmoothTransformation));
-	m_11->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLx ? -90 : 90), Qt::SmoothTransformation));
-	m_21->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? -90 : 90), Qt::SmoothTransformation));
-	m_20->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLy ? 0 : 180), Qt::SmoothTransformation));
+	m_00->setIcon(
+		m_topPix.transformed(QMatrix().rotate(m_cutLy ? 180 : 0), Qt::SmoothTransformation));
+	m_01->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 180 : 0),
+											Qt::SmoothTransformation));
+	m_11->setIcon(
+		m_topPix.transformed(QMatrix().rotate(m_cutLx ? -90 : 90), Qt::SmoothTransformation));
+	m_21->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? -90 : 90),
+											Qt::SmoothTransformation));
+	m_20->setIcon(
+		m_topPix.transformed(QMatrix().rotate(m_cutLy ? 0 : 180), Qt::SmoothTransformation));
 
 	m_02->setIcon(pix);
 	m_12->setIcon(pix);
@@ -343,14 +355,22 @@ void PeggingWidget::on11()
 	QPixmap pix(30, 30);
 	pix.fill(Qt::transparent);
 	m_11->setIcon(pix);
-	m_00->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 90 : -90), Qt::SmoothTransformation));
-	m_01->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLy ? 180 : 0), Qt::SmoothTransformation));
-	m_02->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 180 : 0), Qt::SmoothTransformation));
-	m_10->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLx ? 90 : -90), Qt::SmoothTransformation));
-	m_12->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLx ? -90 : 90), Qt::SmoothTransformation));
-	m_20->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 0 : 180), Qt::SmoothTransformation));
-	m_21->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLy ? 0 : 180), Qt::SmoothTransformation));
-	m_22->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? -90 : 90), Qt::SmoothTransformation));
+	m_00->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 90 : -90),
+											Qt::SmoothTransformation));
+	m_01->setIcon(
+		m_topPix.transformed(QMatrix().rotate(m_cutLy ? 180 : 0), Qt::SmoothTransformation));
+	m_02->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 180 : 0),
+											Qt::SmoothTransformation));
+	m_10->setIcon(
+		m_topPix.transformed(QMatrix().rotate(m_cutLx ? 90 : -90), Qt::SmoothTransformation));
+	m_12->setIcon(
+		m_topPix.transformed(QMatrix().rotate(m_cutLx ? -90 : 90), Qt::SmoothTransformation));
+	m_20->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 0 : 180),
+											Qt::SmoothTransformation));
+	m_21->setIcon(
+		m_topPix.transformed(QMatrix().rotate(m_cutLy ? 0 : 180), Qt::SmoothTransformation));
+	m_22->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? -90 : 90),
+											Qt::SmoothTransformation));
 }
 
 //-----------------------------------------------------------------------------
@@ -361,11 +381,16 @@ void PeggingWidget::on12()
 	QPixmap pix(30, 30);
 	pix.fill(Qt::transparent);
 	m_12->setIcon(pix);
-	m_02->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLy ? 180 : 0), Qt::SmoothTransformation));
-	m_01->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 90 : -90), Qt::SmoothTransformation));
-	m_11->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLx ? 90 : -90), Qt::SmoothTransformation));
-	m_21->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 0 : 180), Qt::SmoothTransformation));
-	m_22->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLy ? 0 : 180), Qt::SmoothTransformation));
+	m_02->setIcon(
+		m_topPix.transformed(QMatrix().rotate(m_cutLy ? 180 : 0), Qt::SmoothTransformation));
+	m_01->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 90 : -90),
+											Qt::SmoothTransformation));
+	m_11->setIcon(
+		m_topPix.transformed(QMatrix().rotate(m_cutLx ? 90 : -90), Qt::SmoothTransformation));
+	m_21->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 0 : 180),
+											Qt::SmoothTransformation));
+	m_22->setIcon(
+		m_topPix.transformed(QMatrix().rotate(m_cutLy ? 0 : 180), Qt::SmoothTransformation));
 
 	m_00->setIcon(pix);
 	m_10->setIcon(pix);
@@ -380,9 +405,12 @@ void PeggingWidget::on20()
 	QPixmap pix(30, 30);
 	pix.fill(Qt::transparent);
 	m_20->setIcon(pix);
-	m_10->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLy ? 180 : 0), Qt::SmoothTransformation));
-	m_11->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 180 : 0), Qt::SmoothTransformation));
-	m_21->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLx ? -90 : 90), Qt::SmoothTransformation));
+	m_10->setIcon(
+		m_topPix.transformed(QMatrix().rotate(m_cutLy ? 180 : 0), Qt::SmoothTransformation));
+	m_11->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 180 : 0),
+											Qt::SmoothTransformation));
+	m_21->setIcon(
+		m_topPix.transformed(QMatrix().rotate(m_cutLx ? -90 : 90), Qt::SmoothTransformation));
 
 	m_00->setIcon(pix);
 	m_01->setIcon(pix);
@@ -399,11 +427,16 @@ void PeggingWidget::on21()
 	QPixmap pix(30, 30);
 	pix.fill(Qt::transparent);
 	m_21->setIcon(pix);
-	m_20->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLx ? 90 : -90), Qt::SmoothTransformation));
-	m_10->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 90 : -90), Qt::SmoothTransformation));
-	m_11->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLy ? 180 : 0), Qt::SmoothTransformation));
-	m_12->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 180 : 0), Qt::SmoothTransformation));
-	m_22->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLx ? -90 : 90), Qt::SmoothTransformation));
+	m_20->setIcon(
+		m_topPix.transformed(QMatrix().rotate(m_cutLx ? 90 : -90), Qt::SmoothTransformation));
+	m_10->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 90 : -90),
+											Qt::SmoothTransformation));
+	m_11->setIcon(
+		m_topPix.transformed(QMatrix().rotate(m_cutLy ? 180 : 0), Qt::SmoothTransformation));
+	m_12->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 180 : 0),
+											Qt::SmoothTransformation));
+	m_22->setIcon(
+		m_topPix.transformed(QMatrix().rotate(m_cutLx ? -90 : 90), Qt::SmoothTransformation));
 
 	m_00->setIcon(pix);
 	m_01->setIcon(pix);
@@ -418,9 +451,12 @@ void PeggingWidget::on22()
 	QPixmap pix(30, 30);
 	pix.fill(Qt::transparent);
 	m_22->setIcon(pix);
-	m_12->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLy ? 180 : 0), Qt::SmoothTransformation));
-	m_11->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 90 : -90), Qt::SmoothTransformation));
-	m_21->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLx ? 90 : -90), Qt::SmoothTransformation));
+	m_12->setIcon(
+		m_topPix.transformed(QMatrix().rotate(m_cutLy ? 180 : 0), Qt::SmoothTransformation));
+	m_11->setIcon(m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 90 : -90),
+											Qt::SmoothTransformation));
+	m_21->setIcon(
+		m_topPix.transformed(QMatrix().rotate(m_cutLx ? 90 : -90), Qt::SmoothTransformation));
 
 	m_00->setIcon(pix);
 	m_01->setIcon(pix);
@@ -482,13 +518,13 @@ CanvasSizePopup::CanvasSizePopup()
 
 	TDimension dim = m_sl->getResolution();
 
-	//Current Xsize
+	// Current Xsize
 	m_currentXSize = new QLabel(QString::number(dim.lx));
 	m_currentXSize->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 	m_currentXSize->setFixedHeight(DVGui::WidgetHeight);
 	addWidget(tr("Width:"), m_currentXSize);
 
-	//Current Ysize
+	// Current Ysize
 	m_currentYSize = new QLabel(QString::number(dim.ly));
 	m_currentYSize->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 	m_currentYSize->setFixedHeight(DVGui::WidgetHeight);
@@ -496,7 +532,7 @@ CanvasSizePopup::CanvasSizePopup()
 
 	addSeparator(tr("New Size"));
 
-	//Unit
+	// Unit
 	m_unit = new QComboBox(this);
 	m_unit->addItem("pixel");
 	m_unit->addItem("mm");
@@ -505,21 +541,22 @@ CanvasSizePopup::CanvasSizePopup()
 	m_unit->addItem("inch");
 	m_unit->setFixedHeight(DVGui::WidgetHeight);
 	addWidget(tr("Unit:"), m_unit);
-	connect(m_unit, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(onUnitChanged(const QString &)));
+	connect(m_unit, SIGNAL(currentIndexChanged(const QString &)), this,
+			SLOT(onUnitChanged(const QString &)));
 
-	//New Xsize
+	// New Xsize
 	m_xSizeFld = new DVGui::DoubleLineEdit(this, dim.lx);
 	m_xSizeFld->setFixedSize(80, DVGui::WidgetHeight);
 	addWidget(tr("Width:"), m_xSizeFld);
 	connect(m_xSizeFld, SIGNAL(textChanged(const QString &)), this, SLOT(onSizeChanged()));
 
-	//New Ysize
+	// New Ysize
 	m_ySizeFld = new DVGui::DoubleLineEdit(this, dim.ly);
 	m_ySizeFld->setFixedSize(80, DVGui::WidgetHeight);
 	addWidget(tr("Height:"), m_ySizeFld);
 	connect(m_ySizeFld, SIGNAL(textChanged(const QString &)), this, SLOT(onSizeChanged()));
 
-	//Relative
+	// Relative
 	m_relative = new DVGui::CheckBox(tr("Relative"), this);
 	m_relative->setFixedHeight(DVGui::WidgetHeight);
 	m_relative->setChecked(false);
@@ -533,7 +570,7 @@ CanvasSizePopup::CanvasSizePopup()
 
 	endVLayout();
 
-	//add buttons
+	// add buttons
 	QPushButton *okBtn = new QPushButton(tr("Resize"), this);
 	okBtn->setDefault(true);
 	QPushButton *cancelBtn = new QPushButton(tr("Cancel"), this);
@@ -571,8 +608,10 @@ void CanvasSizePopup::onSizeChanged()
 	TDimension dim = m_sl->getResolution();
 	TPointD dpi = m_sl->getDpi();
 	QString unit = m_unit->currentText();
-	double measuredXValue = m_relative->isChecked() ? dim.lx + m_xSizeFld->getValue() : m_xSizeFld->getValue();
-	double measuredYValue = m_relative->isChecked() ? dim.ly + m_ySizeFld->getValue() : m_ySizeFld->getValue();
+	double measuredXValue =
+		m_relative->isChecked() ? dim.lx + m_xSizeFld->getValue() : m_xSizeFld->getValue();
+	double measuredYValue =
+		m_relative->isChecked() ? dim.ly + m_ySizeFld->getValue() : m_ySizeFld->getValue();
 	double newXValue = getPixelLength(measuredXValue, m_xMeasure, dpi.x, unit);
 	double newYValue = getPixelLength(measuredYValue, m_yMeasure, dpi.y, unit);
 	m_pegging->cutLx(dim.lx > newXValue);
@@ -645,7 +684,8 @@ void CanvasSizePopup::onOkBtn()
 	}
 
 	if (dim.lx > newXValue || dim.ly > newYValue) {
-		int ret = DVGui::MsgBox(tr("The new canvas size is smaller than the current one.\nDo you want to crop the canvas?"),
+		int ret = DVGui::MsgBox(tr("The new canvas size is smaller than the current one.\nDo you "
+								   "want to crop the canvas?"),
 								tr("Crop"), tr("Cancel"));
 		if (ret == 2)
 			return;
@@ -684,8 +724,9 @@ void CanvasSizePopup::onOkBtn()
 			TRasterP ras = ri->getRaster();
 			TRasterP newRas = ras->create(newDim.lx, newDim.ly);
 			if (newRas->getPixelSize() < 4)
-				memset(newRas->getRawData(), 255, newRas->getPixelSize() * newRas->getWrap() * newRas->getLy());
-			//TRop::addBackground(newRas,TPixel32::White);
+				memset(newRas->getRawData(), 255,
+					   newRas->getPixelSize() * newRas->getWrap() * newRas->getLy());
+			// TRop::addBackground(newRas,TPixel32::White);
 			else
 				newRas->clear();
 			newRas->copy(ras, pos);
@@ -694,7 +735,8 @@ void CanvasSizePopup::onOkBtn()
 			ri->getDpi(xdpi, ydpi);
 			newImg->setDpi(xdpi, ydpi);
 			m_sl->setFrame(fids[i], newImg);
-			TUndoManager::manager()->add(new ResizeCanvasUndo(m_sl, fids[i], img, newImg, dim, newDim));
+			TUndoManager::manager()->add(
+				new ResizeCanvasUndo(m_sl, fids[i], img, newImg, dim, newDim));
 		} else if (ti) {
 			TRasterP ras = ti->getRaster();
 			TRasterP newRas = ras->create(newDim.lx, newDim.ly);
@@ -707,7 +749,8 @@ void CanvasSizePopup::onOkBtn()
 			ti->getDpi(xdpi, ydpi);
 			newImg->setDpi(xdpi, ydpi);
 			m_sl->setFrame(fids[i], newImg);
-			TUndoManager::manager()->add(new ResizeCanvasUndo(m_sl, fids[i], img, newImg, dim, newDim));
+			TUndoManager::manager()->add(
+				new ResizeCanvasUndo(m_sl, fids[i], img, newImg, dim, newDim));
 		} else
 			assert(0);
 		IconGenerator::instance()->invalidate(m_sl.getPointer(), fids[i]);

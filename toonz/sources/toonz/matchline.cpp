@@ -58,18 +58,19 @@ namespace
 
 class MergeCmappedPair
 {
-public:
+  public:
 	const TXshCell *m_cell;
 	TAffine m_imgAff;
 	const TXshCell *m_mcell;
 	TAffine m_matchAff;
 
-	MergeCmappedPair(const TXshCell &cell, const TAffine &imgAff,
-					 const TXshCell &mcell, const TAffine &matchAff)
+	MergeCmappedPair(const TXshCell &cell, const TAffine &imgAff, const TXshCell &mcell,
+					 const TAffine &matchAff)
 		: m_cell(&cell), m_imgAff(imgAff), m_mcell(&mcell), m_matchAff(matchAff){};
 };
 
-void doMatchlines(const std::vector<MergeCmappedPair> &matchingLevels, int inkIndex, int inkPrevalence)
+void doMatchlines(const std::vector<MergeCmappedPair> &matchingLevels, int inkIndex,
+				  int inkPrevalence)
 {
 	if (matchingLevels.empty())
 		return;
@@ -79,7 +80,7 @@ void doMatchlines(const std::vector<MergeCmappedPair> &matchingLevels, int inkIn
 
 	TPalette::Page *page;
 
-	//upInkId -> downInkId
+	// upInkId -> downInkId
 	std::map<int, int> usedInks;
 
 	int i = 0;
@@ -111,12 +112,11 @@ void doMatchlines(const std::vector<MergeCmappedPair> &matchingLevels, int inkIn
 		int lyout = tround(out.getLy()) + 1 + ((offs.y < 0) ? offs.y : 0);
 
 		if (lxout <= 0 || lyout <= 0 || offs.x >= rlx || offs.y >= rly) {
-			//tmsg_error("no intersections between matchline and level");
+			// tmsg_error("no intersections between matchline and level");
 			continue;
 		}
 
-		aff = aff.place((double)(in.getLx() / 2.0),
-						(double)(in.getLy() / 2.0),
+		aff = aff.place((double)(in.getLx() / 2.0), (double)(in.getLy() / 2.0),
 						(out.getLx()) / 2.0 + ((offs.x < 0) ? offs.x : 0),
 						(out.getLy()) / 2.0 + ((offs.y < 0) ? offs.y : 0));
 
@@ -178,7 +178,8 @@ void doMatchlines(const std::vector<MergeCmappedPair> &matchingLevels, int inkIn
 
 /*------------------------------------------------------------------------*/
 
-void applyDeleteMatchline(TXshSimpleLevel *sl, const std::vector<TFrameId> &fids, const std::vector<int> &_inkIndexes)
+void applyDeleteMatchline(TXshSimpleLevel *sl, const std::vector<TFrameId> &fids,
+						  const std::vector<int> &_inkIndexes)
 {
 	TPalette::Page *page = 0;
 	int i, j, pageIndex = 0;
@@ -222,7 +223,7 @@ void applyDeleteMatchline(TXshSimpleLevel *sl, const std::vector<TFrameId> &fids
 }
 
 /*------------------------------------------------------------------------*/
-} //namespace
+} // namespace
 //-----------------------------------------------------------------------------
 
 void MatchlinesDialog::accept()
@@ -287,7 +288,10 @@ int MatchlinesDialog::getInkIndex()
 		return -1;
 	else {
 		if (QString("current").contains(m_inkIndex->text()))
-			return TApp::instance()->getPaletteController()->getCurrentLevelPalette()->getStyleIndex();
+			return TApp::instance()
+				->getPaletteController()
+				->getCurrentLevelPalette()
+				->getStyleIndex();
 		else {
 			bool ok;
 			int value = m_inkIndex->text().toInt(&ok);
@@ -301,7 +305,8 @@ int MatchlinesDialog::getInkIndex()
 //-----------------------------------------------------------------------------
 
 MatchlinesDialog::MatchlinesDialog()
-	: Dialog(TApp::instance()->getMainWindow(), true, true, "Matchlines"), m_pltHandle(new TPaletteHandle()), m_currentXsheet(0)
+	: Dialog(TApp::instance()->getMainWindow(), true, true, "Matchlines"),
+	  m_pltHandle(new TPaletteHandle()), m_currentXsheet(0)
 {
 	setWindowTitle(tr("Apply Match Lines"));
 
@@ -461,7 +466,8 @@ void MatchlinesDialog::onLineStackButtonPressed(int id)
 }
 
 //-----------------------------------------------------------------------------
-/*- スライダを動かしたらボタンを解除する。対応する値がある場合は対応するボタンを押される状態にする -*/
+/*- スライダを動かしたらボタンを解除する。対応する値がある場合は対応するボタンを押される状態にする
+ * -*/
 void MatchlinesDialog::onInkPrevalenceChanged(bool isDragging)
 {
 	if (isDragging)
@@ -486,14 +492,15 @@ void MatchlinesDialog::onInkPrevalenceChanged(bool isDragging)
 
 class DeleteMatchlineUndo : public TUndo
 {
-public:
+  public:
 	TXshLevel *m_xl;
 	TXshSimpleLevel *m_sl;
 	std::vector<TFrameId> m_fids;
 	std::vector<int> m_indexes;
 	TPaletteP m_matchlinePalette;
 
-	DeleteMatchlineUndo(TXshLevel *xl, TXshSimpleLevel *sl, const std::vector<TFrameId> &fids, const std::vector<int> &indexes) //, TPalette*matchPalette)
+	DeleteMatchlineUndo(TXshLevel *xl, TXshSimpleLevel *sl, const std::vector<TFrameId> &fids,
+						const std::vector<int> &indexes) //, TPalette*matchPalette)
 		: TUndo(),
 		  m_xl(xl),
 		  m_sl(sl),
@@ -502,7 +509,8 @@ public:
 	{
 		int i;
 		for (i = 0; i < fids.size(); i++) {
-			QString id = "DeleteMatchlineUndo" + QString::number((uintptr_t) this) + "-" + QString::number(i);
+			QString id = "DeleteMatchlineUndo" + QString::number((uintptr_t) this) + "-" +
+						 QString::number(i);
 			TToonzImageP image = sl->getFrame(fids[i], false);
 			assert(image);
 			TImageCache::instance()->add(id, image->clone());
@@ -514,7 +522,8 @@ public:
 		int i;
 
 		for (i = 0; i < m_fids.size(); i++) {
-			QString id = "DeleteMatchlineUndo" + QString::number((uintptr_t) this) + "-" + QString::number(i);
+			QString id = "DeleteMatchlineUndo" + QString::number((uintptr_t) this) + "-" +
+						 QString::number(i);
 			TImageP img = TImageCache::instance()->get(id, false)->cloneImage();
 
 			m_sl->setFrame(m_fids[i], img);
@@ -541,16 +550,15 @@ public:
 		TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 
 	~DeleteMatchlineUndo()
 	{
 		int i;
 		for (i = 0; i < m_fids.size(); i++)
-			TImageCache::instance()->remove("DeleteMatchlineUndo" + QString::number((uintptr_t) this) + "-" + QString::number(i));
+			TImageCache::instance()->remove("DeleteMatchlineUndo" +
+											QString::number((uintptr_t) this) + "-" +
+											QString::number(i));
 	}
 
 	QString getHistoryString()
@@ -558,10 +566,7 @@ public:
 		return QObject::tr("Delete Matchline  : Level %1")
 			.arg(QString::fromStdWString(m_sl->getName()));
 	}
-	int getHistoryType()
-	{
-		return HistoryType::FilmStrip;
-	}
+	int getHistoryType() { return HistoryType::FilmStrip; }
 };
 
 //-----------------------------------------------------------------------------
@@ -576,13 +581,13 @@ class MatchlineUndo : public TUndo
 	int m_column, m_mColumn;
 	int m_index, m_prevalence;
 
-public:
-	MatchlineUndo(TXshLevelP xl, int mergeCmappedSessionId,
-				  int index, int prevalence,
-				  int column, TXshSimpleLevel *level, const std::map<TFrameId, QString> &images,
-				  int mColumn,
+  public:
+	MatchlineUndo(TXshLevelP xl, int mergeCmappedSessionId, int index, int prevalence, int column,
+				  TXshSimpleLevel *level, const std::map<TFrameId, QString> &images, int mColumn,
 				  TPalette *palette)
-		: TUndo(), m_xl(xl), m_mergeCmappedSessionId(mergeCmappedSessionId), m_palette(palette->clone()), m_level(level), m_column(column), m_mColumn(mColumn), m_index(index), m_prevalence(prevalence), m_images(images)
+		: TUndo(), m_xl(xl), m_mergeCmappedSessionId(mergeCmappedSessionId),
+		  m_palette(palette->clone()), m_level(level), m_column(column), m_mColumn(mColumn),
+		  m_index(index), m_prevalence(prevalence), m_images(images)
 	{
 	}
 
@@ -595,7 +600,8 @@ public:
 		std::vector<TFrameId> fids;
 		for (; it != m_images.end(); ++it) //, ++mit)
 		{
-			QString id = "MatchlinesUndo" + QString::number(m_mergeCmappedSessionId) + "-" + QString::number(it->first.getNumber());
+			QString id = "MatchlinesUndo" + QString::number(m_mergeCmappedSessionId) + "-" +
+						 QString::number(it->first.getNumber());
 			TImageP img = TImageCache::instance()->get(id, false)->cloneImage();
 
 			img->setPalette(m_level->getPalette());
@@ -618,17 +624,15 @@ public:
 		doMatchlines(m_column, m_mColumn, m_index, m_prevalence, m_mergeCmappedSessionId);
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 
 	~MatchlineUndo()
 	{
 		std::map<TFrameId, QString>::const_iterator it = m_images.begin();
 		for (; it != m_images.end(); ++it) //, ++mit)
 		{
-			QString id = "MatchlineUndo" + QString::number(m_mergeCmappedSessionId) + "-" + QString::number(it->first.getNumber());
+			QString id = "MatchlineUndo" + QString::number(m_mergeCmappedSessionId) + "-" +
+						 QString::number(it->first.getNumber());
 			TImageCache::instance()->remove(id);
 		}
 		delete m_palette;
@@ -640,10 +644,7 @@ public:
 			.arg(QString::number(m_column + 1))
 			.arg(QString::number(m_mColumn + 1));
 	}
-	int getHistoryType()
-	{
-		return HistoryType::FilmStrip;
-	}
+	int getHistoryType() { return HistoryType::FilmStrip; }
 };
 
 //-----------------------------------------------------------------------------
@@ -709,12 +710,14 @@ void doMatchlines(int column, int mColumn, int index, int inkPrevalence, int Mer
 		/*-- 左カラムに複数のLevelが入っている場合、警告を出して抜ける --*/
 		else if (level != cell[i].getSimpleLevel()) {
 			getImageProgressBar->close();
-			DVGui::warning(QObject::tr("It is not possible to apply match lines to a column containing more than one level."));
+			DVGui::warning(QObject::tr("It is not possible to apply match lines to a column "
+									   "containing more than one level."));
 			/*-- 前に遡ってキャッシュを消去 --*/
 			i--;
 			for (; i >= 0; i--) {
 				TFrameId fid = cell[i].m_frameId;
-				QString id = "MatchlinesUndo" + QString::number(MergeCmappedSessionId) + "-" + QString::number(fid.getNumber());
+				QString id = "MatchlinesUndo" + QString::number(MergeCmappedSessionId) + "-" +
+							 QString::number(fid.getNumber());
 				if (TImageCache::instance()->isCached(id.toStdString()))
 					TImageCache::instance()->remove(id);
 			}
@@ -725,12 +728,14 @@ void doMatchlines(int column, int mColumn, int index, int inkPrevalence, int Mer
 			mLevel = mCell[i].getSimpleLevel();
 		else if (mLevel != mCell[i].getSimpleLevel()) {
 			getImageProgressBar->close();
-			DVGui::warning(QObject::tr("It is not possible to use a match lines column containing more than one level."));
+			DVGui::warning(QObject::tr(
+				"It is not possible to use a match lines column containing more than one level."));
 			/*-- 前に遡ってキャッシュを消去 --*/
 			i--;
 			for (; i >= 0; i--) {
 				TFrameId fid = cell[i].m_frameId;
-				QString id = "MatchlinedUndo" + QString::number(MergeCmappedSessionId) + "-" + QString::number(fid.getNumber());
+				QString id = "MatchlinedUndo" + QString::number(MergeCmappedSessionId) + "-" +
+							 QString::number(fid.getNumber());
 				if (TImageCache::instance()->isCached(id.toStdString()))
 					TImageCache::instance()->remove(id);
 			}
@@ -752,19 +757,22 @@ void doMatchlines(int column, int mColumn, int index, int inkPrevalence, int Mer
 			//ラスタLevelじゃないとき、エラーを返す
 			if (!timg || !tmatch) {
 				getImageProgressBar->close();
-				DVGui::warning(QObject::tr("Match lines can be applied to Toonz raster levels only."));
+				DVGui::warning(
+					QObject::tr("Match lines can be applied to Toonz raster levels only."));
 				/*-- 前に遡ってキャッシュを消去 --*/
 				i--;
 				for (; i >= 0; i--) {
 					TFrameId fid = cell[i].m_frameId;
-					QString id = "MatchlinedUndo" + QString::number(MergeCmappedSessionId) + "-" + QString::number(fid.getNumber());
+					QString id = "MatchlinedUndo" + QString::number(MergeCmappedSessionId) + "-" +
+								 QString::number(fid.getNumber());
 					if (TImageCache::instance()->isCached(id.toStdString()))
 						TImageCache::instance()->remove(id);
 				}
 				return;
 			}
 			/*- Matchline前の画像をUndoに格納 -*/
-			QString id = "MatchlinesUndo" + QString::number(MergeCmappedSessionId) + "-" + QString::number(fid.getNumber());
+			QString id = "MatchlinesUndo" + QString::number(MergeCmappedSessionId) + "-" +
+						 QString::number(fid.getNumber());
 			TImageCache::instance()->add(id, timg->clone(), false);
 			images[fid] = id;
 			TAffine imgAff, matchAff;
@@ -772,7 +780,8 @@ void doMatchlines(int column, int mColumn, int index, int inkPrevalence, int Mer
 			getColumnPlacement(matchAff, xsh, start + i, mColumn, false);
 			TAffine dpiAff = getDpiAffine(level, fid);
 			TAffine mdpiAff = getDpiAffine(mLevel, mFid);
-			matchingLevels.push_back(MergeCmappedPair(cell[i], imgAff * dpiAff, mCell[i], matchAff * mdpiAff));
+			matchingLevels.push_back(
+				MergeCmappedPair(cell[i], imgAff * dpiAff, mCell[i], matchAff * mdpiAff));
 			table[fid] = mFid;
 		}
 	}
@@ -783,7 +792,7 @@ void doMatchlines(int column, int mColumn, int index, int inkPrevalence, int Mer
 		return;
 	}
 
-	if (inkPrevalence == -1) //we are not in the redo
+	if (inkPrevalence == -1) // we are not in the redo
 	{
 		TPalette *plt = level->getPalette();
 		if (!plt) {
@@ -801,8 +810,10 @@ void doMatchlines(int column, int mColumn, int index, int inkPrevalence, int Mer
 				for (int i = 0; i < (int)cell.size(); i++) {
 					TFrameId fid = cell[i].m_frameId;
 					TFrameId mFid = mCell[i].m_frameId;
-					QString id = "MatchlinedUndo" + QString::number(MergeCmappedSessionId) + "-" + QString::number(fid.getNumber());
-					QString mid = "MatchlinerUndo" + QString::number(MergeCmappedSessionId) + "-" + QString::number(mFid.getNumber());
+					QString id = "MatchlinedUndo" + QString::number(MergeCmappedSessionId) + "-" +
+								 QString::number(fid.getNumber());
+					QString mid = "MatchlinerUndo" + QString::number(MergeCmappedSessionId) + "-" +
+								  QString::number(mFid.getNumber());
 					if (TImageCache::instance()->isCached(id.toStdString()))
 						TImageCache::instance()->remove(id);
 					if (TImageCache::instance()->isCached(mid.toStdString()))
@@ -813,25 +824,23 @@ void doMatchlines(int column, int mColumn, int index, int inkPrevalence, int Mer
 
 			index = md->getInkIndex();
 			if (index >= styleCount)
-				DVGui::warning(QObject::tr("The style index you specified is not available in the palette of the destination level."));
+				DVGui::warning(QObject::tr("The style index you specified is not available in the "
+										   "palette of the destination level."));
 			if (index != -1)
 				LastMatchlineIndex = index;
 		}
 
 		inkPrevalence = md ? md->getInkPrevalence() : 0;
 
-		TUndoManager::manager()->add(new MatchlineUndo(xl, MergeCmappedSessionId,
-													   index, inkPrevalence,
-													   column, level, images,
-													   mColumn,
-													   plt));
+		TUndoManager::manager()->add(new MatchlineUndo(
+			xl, MergeCmappedSessionId, index, inkPrevalence, column, level, images, mColumn, plt));
 	}
 
 	QApplication::setOverrideCursor(Qt::WaitCursor);
 	doMatchlines(matchingLevels, index, inkPrevalence);
 	QApplication::restoreOverrideCursor();
 
-	for (int i = 0; i < (int)cell.size(); i++) //the saveboxes must be updated
+	for (int i = 0; i < (int)cell.size(); i++) // the saveboxes must be updated
 	{
 		if (cell[i].isEmpty() || mCell[i].isEmpty())
 			continue;
@@ -909,7 +918,7 @@ QString indexes2string(const std::set<TFrameId> fids)
 	return str;
 }
 
-} //namespace
+} // namespace
 
 //-----------------------------------------------------------------------------
 
@@ -962,7 +971,8 @@ std::vector<TFrameId> DeleteInkDialog::getFrames()
 }
 
 DeleteInkDialog::DeleteInkDialog(const QString &str, int inkIndex)
-	: Dialog(TApp::instance()->getMainWindow(), true, Preferences::instance()->getCurrentLanguage() == "english", "DeleteInk")
+	: Dialog(TApp::instance()->getMainWindow(), true,
+			 Preferences::instance()->getCurrentLanguage() == "english", "DeleteInk")
 {
 	setWindowTitle(tr("Delete Lines"));
 
@@ -981,10 +991,12 @@ DeleteInkDialog::DeleteInkDialog(const QString &str, int inkIndex)
 		upperLay->setMargin(0);
 		upperLay->setSpacing(5);
 		{
-			upperLay->addWidget(new QLabel(tr("Style Index:"), this), 0, 0, Qt::AlignRight | Qt::AlignVCenter);
+			upperLay->addWidget(new QLabel(tr("Style Index:"), this), 0, 0,
+								Qt::AlignRight | Qt::AlignVCenter);
 			upperLay->addWidget(m_inkIndex, 0, 1);
 
-			upperLay->addWidget(new QLabel(tr("Apply to Frames:"), this), 1, 0, Qt::AlignRight | Qt::AlignVCenter);
+			upperLay->addWidget(new QLabel(tr("Apply to Frames:"), this), 1, 0,
+								Qt::AlignRight | Qt::AlignVCenter);
 			upperLay->addWidget(m_frames, 1, 1);
 		}
 		m_topLayout->addLayout(upperLay);
@@ -1007,7 +1019,7 @@ void DeleteInkDialog::setRange(const QString &str)
 }
 
 //-----------------------------------------------------------------------------
-/*-- 
+/*--
 	 DeleteMatchLineコマンドから呼ばれる場合：chooseInkがfalse
 	 DeleteLinesコマンドから呼ばれる場合：chooseInkがtrue
 --*/
@@ -1015,7 +1027,7 @@ void DeleteInkDialog::setRange(const QString &str)
 void doDeleteMatchlines(TXshSimpleLevel *sl, const std::set<TFrameId> &fids, bool chooseInk)
 {
 	std::vector<int> indexes;
-	//vector<TToonzImageP> images;
+	// vector<TToonzImageP> images;
 	std::vector<TFrameId> frames;
 	std::vector<TFrameId> fidsToProcess;
 	int i;
@@ -1037,19 +1049,24 @@ void doDeleteMatchlines(TXshSimpleLevel *sl, const std::set<TFrameId> &fids, boo
 				return;
 			indexes = md->getInkIndexes();
 			if (indexes.empty()) {
-				DVGui::warning(QObject::tr("The style index range you specified is not valid: please separate values with a comma (e.g. 1,2,5) or with a dash (e.g. 4-7 will refer to indexes 4, 5, 6 and 7)."));
+				DVGui::warning(
+					QObject::tr("The style index range you specified is not valid: please separate "
+								"values with a comma (e.g. 1,2,5) or with a dash (e.g. 4-7 will "
+								"refer to indexes 4, 5, 6 and 7)."));
 				continue;
 			}
 
 			frames = md->getFrames();
 			if (frames.empty()) {
-				DVGui::warning(QObject::tr("The frame range you specified is not valid: please separate values with a comma (e.g. 1,2,5) or with a dash (e.g. 4-7 will refer to frames 4, 5, 6 and 7)."));
+				DVGui::warning(QObject::tr("The frame range you specified is not valid: please "
+										   "separate values with a comma (e.g. 1,2,5) or with a "
+										   "dash (e.g. 4-7 will refer to frames 4, 5, 6 and 7)."));
 				continue;
 			}
 			for (i = 0; i < frames.size(); i++) {
 				if (!sl->isFid(frames[i]))
 					continue;
-				//images.push_back(sl->getFrame(frames[i], true));
+				// images.push_back(sl->getFrame(frames[i], true));
 				if (sl->getFrame(frames[i], false))
 					fidsToProcess.push_back(frames[i]);
 			}
@@ -1059,7 +1076,7 @@ void doDeleteMatchlines(TXshSimpleLevel *sl, const std::set<TFrameId> &fids, boo
 	} else {
 		std::set<TFrameId>::const_iterator it = fids.begin();
 		for (; it != fids.end(); ++it) {
-			//images.push_back(sl->getFrame(*it, true));
+			// images.push_back(sl->getFrame(*it, true));
 			if (sl->getFrame(*it, false))
 				fidsToProcess.push_back(*it);
 		}
@@ -1072,11 +1089,12 @@ void doDeleteMatchlines(TXshSimpleLevel *sl, const std::set<TFrameId> &fids, boo
 
 	TXshLevel *xl = TApp::instance()->getCurrentLevel()->getLevel();
 
-	TUndoManager::manager()->add(new DeleteMatchlineUndo(xl, sl, fidsToProcess, indexes)); //, images[0]->getPalette()));
+	TUndoManager::manager()->add(
+		new DeleteMatchlineUndo(xl, sl, fidsToProcess, indexes)); //, images[0]->getPalette()));
 
 	applyDeleteMatchline(sl, fidsToProcess, indexes);
 
-	for (int i = 0; i < fidsToProcess.size(); i++) //the saveboxes must be updated
+	for (int i = 0; i < fidsToProcess.size(); i++) // the saveboxes must be updated
 		ToolUtils::updateSaveBox(sl, fidsToProcess[i]);
 
 	std::vector<TFrameId> fidsss;

@@ -39,7 +39,7 @@ nessun DS ha ritornato valori sensati, per cui non vengono usate.
 /*
 Scommentare MACOSX_NO_PARAMS, per evitare che l'applicazione abbia il controllo
 dei parametri (Caps supportate, ImageLayout, XferCount)
-Utile sotto MACOSX per evitare che i DS della HP si aprano alla richiesta, 
+Utile sotto MACOSX per evitare che i DS della HP si aprano alla richiesta,
 e rimangano li.... in attesa di una scansione (tutto continua a funzionare,
 alla prima scansione il DS si chiude correttamente e l'applicazione ottiene
 l'immagine)
@@ -71,31 +71,21 @@ l'immagine)
 	static float TTWAIN_GetStepValue(TW_RANGE range);
 	static int TTWAIN_IsItemInList(void *list, void *item, TUINT32 list_count, TUINT32 item_size);
 
-	static const size_t DCItemSize[13] =
-		{
-			sizeof(TW_INT8),
-			sizeof(TW_INT16),
-			sizeof(TW_INT32),
-			sizeof(TW_UINT8),
-			sizeof(TW_UINT16),
-			sizeof(TW_UINT32),
-			sizeof(TW_BOOL),
-			sizeof(TW_FIX32),
-			sizeof(TW_FRAME),
-			sizeof(TW_STR32),
-			sizeof(TW_STR64),
-			sizeof(TW_STR128),
-			sizeof(TW_STR255),
-		}; /* see twain.h */
+	static const size_t DCItemSize[13] = {
+		sizeof(TW_INT8),   sizeof(TW_INT16),  sizeof(TW_INT32), sizeof(TW_UINT8),
+		sizeof(TW_UINT16), sizeof(TW_UINT32), sizeof(TW_BOOL),  sizeof(TW_FIX32),
+		sizeof(TW_FRAME),  sizeof(TW_STR32),  sizeof(TW_STR64), sizeof(TW_STR128),
+		sizeof(TW_STR255),
+	}; /* see twain.h */
 
 #define FLAVOR_UNUSED (0xffff)
 
-#define CASE \
-	break;   \
+#define CASE                                                                                       \
+	break;                                                                                         \
 	case
 #define __OR case
-#define DEFAULT \
-	break;      \
+#define DEFAULT                                                                                    \
+	break;                                                                                         \
 	default
 	struct TTWAIN_PIXELTYPEP {
 		TW_UINT16 type;
@@ -379,8 +369,8 @@ l'immagine)
 
 		if (!rc)
 			goto done;
-		found = TTWAIN_IsItemInList(container->ItemList, &twPix,
-									container->NumItems, DCItemSize[container->ItemType]);
+		found = TTWAIN_IsItemInList(container->ItemList, &twPix, container->NumItems,
+									DCItemSize[container->ItemType]);
 
 	done:
 		GLOBAL_UNLOCK(handle);
@@ -412,8 +402,8 @@ l'immagine)
 
 		if (!rc)
 			goto done;
-		found = TTWAIN_IsItemInList(container->ItemList, &comprType,
-									container->NumItems, DCItemSize[container->ItemType]);
+		found = TTWAIN_IsItemInList(container->ItemList, &comprType, container->NumItems,
+									DCItemSize[container->ItemType]);
 		found = TRUE;
 	done:
 		if (handle) {
@@ -460,7 +450,8 @@ l'immagine)
 	{
 #ifdef MACOSX
 		static char msg[1024];
-		strncpy(msg, (const char *)&TTwainData.sourceId.Manufacturer[1], *TTwainData.sourceId.Manufacturer);
+		strncpy(msg, (const char *)&TTwainData.sourceId.Manufacturer[1],
+				*TTwainData.sourceId.Manufacturer);
 		return msg;
 #else
 	return (char *)TTwainData.sourceId.Manufacturer;
@@ -471,7 +462,8 @@ l'immagine)
 	{
 #ifdef MACOSX
 		static char msg[1024];
-		strncpy(msg, (const char *)&TTwainData.sourceId.ProductFamily[1], *TTwainData.sourceId.ProductFamily);
+		strncpy(msg, (const char *)&TTwainData.sourceId.ProductFamily[1],
+				*TTwainData.sourceId.ProductFamily);
 		return msg;
 #else
 	return (char *)TTwainData.sourceId.ProductFamily;
@@ -482,7 +474,8 @@ l'immagine)
 	{
 #ifdef MACOSX
 		static char msg[1024];
-		strncpy(msg, (const char *)&TTwainData.sourceId.ProductName[1], *TTwainData.sourceId.ProductName);
+		strncpy(msg, (const char *)&TTwainData.sourceId.ProductName[1],
+				*TTwainData.sourceId.ProductName);
 		return msg;
 #else
 	return (char *)TTwainData.sourceId.ProductName;
@@ -536,7 +529,7 @@ l'immagine)
 			/*
   MEMORY LEAK !!! ma per ora va bene cosi'...
   if (TTwainData.supportedCaps)
-    GLOBAL_FREE(TTwainData.supportedCaps);
+	GLOBAL_FREE(TTwainData.supportedCaps);
   */
 			TTwainData.supportedCaps = container;
 		}
@@ -562,8 +555,7 @@ l'immagine)
 		}
 
 		for (i = 0; i < TTWAIN_PIXTYPE_HOWMANY; i++) {
-			if ((PixType[i].type == pixelType.Item) &&
-				(PixType[i].flavor == pixelFlavor.Item)) {
+			if ((PixType[i].type == pixelType.Item) && (PixType[i].flavor == pixelFlavor.Item)) {
 				*pixType = (TTWAIN_PIXTYPE)i;
 				return TRUE;
 			}
@@ -592,16 +584,12 @@ l'immagine)
 #else
 	return TTwainData.isSupportedCapsSupported &&
 		   (TTwainData.supportedCaps &&
-			TTWAIN_IsItemInList(TTwainData.supportedCaps, cap,
-								TTwainData.supportedCaps->NumItems,
+			TTWAIN_IsItemInList(TTwainData.supportedCaps, cap, TTwainData.supportedCaps->NumItems,
 								DCItemSize[TTwainData.supportedCaps->ItemType]));
 #endif
 	}
 	/*---------------------------------------------------------------------------*/
-	static int TTWAIN_IsCapSupportedTW_INT16(TW_INT16 cap)
-	{
-		return TTWAIN_IsCapSupported(&cap);
-	}
+	static int TTWAIN_IsCapSupportedTW_INT16(TW_INT16 cap) { return TTWAIN_IsCapSupported(&cap); }
 	/*---------------------------------------------------------------------------*/
 	int TTWAIN_IsCapResolutionSupported(void)
 	{
@@ -765,10 +753,8 @@ l'immagine)
 		twFlavor = PixType[pixtype].flavor;
 		twBitDepth = PixType[pixtype].bitDepth;
 		/*the default in twain specs is chocolate*/
-		TTwainData.transferInfo.nextImageNeedsToBeInverted = ((twFlavor !=
-															   TWPF_CHOCOLATE) &&
-															  (twFlavor !=
-															   FLAVOR_UNUSED));
+		TTwainData.transferInfo.nextImageNeedsToBeInverted =
+			((twFlavor != TWPF_CHOCOLATE) && (twFlavor != FLAVOR_UNUSED));
 
 		rc = TTWAIN_SetCap(ICAP_PIXELTYPE, TWON_ONEVALUE, TWTY_UINT16, (TW_UINT32 *)&twPix);
 		if (TTWAIN_IsCapBitDepthSupported())
@@ -781,7 +767,7 @@ l'immagine)
 					handle = GLOBAL_ALLOC(GMEM_FIXED, size);
 					if (!handle)
 						return TRUE; /*non sono semplicamente riuscito a prendere info riguardo
-	               il pixelFlavor, ma setPixelType e' andato a buon fine */
+				   il pixelFlavor, ma setPixelType e' andato a buon fine */
 #ifdef _WIN32
 					container = (TW_ENUMERATION *)handle;
 #else
@@ -789,16 +775,18 @@ l'immagine)
 #endif
 					rc3 = TTWAIN_GetCap(ICAP_PIXELFLAVOR, TWON_ENUMERATION, (void *)container, 0);
 					if (rc3) {
-						found = TTWAIN_IsItemInList(container->ItemList, &twFlavor,
-													container->NumItems,
-													DCItemSize[container->ItemType]);
+						found =
+							TTWAIN_IsItemInList(container->ItemList, &twFlavor, container->NumItems,
+												DCItemSize[container->ItemType]);
 						/*let's try to set....*/
 						if (found) {
-							rc4 = TTWAIN_SetCap(ICAP_PIXELFLAVOR, TWON_ONEVALUE, TWTY_UINT16, (TW_UINT32 *)&twFlavor);
+							rc4 = TTWAIN_SetCap(ICAP_PIXELFLAVOR, TWON_ONEVALUE, TWTY_UINT16,
+												(TW_UINT32 *)&twFlavor);
 							if (rc4) {
 								TW_UINT16 current, *itemList;
 								/*check if it's properly set...*/
-								rc5 = TTWAIN_GetCap(ICAP_PIXELFLAVOR, TWON_ENUMERATION, (void *)container, 0);
+								rc5 = TTWAIN_GetCap(ICAP_PIXELFLAVOR, TWON_ENUMERATION,
+													(void *)container, 0);
 								if (rc5) {
 									itemList = (TW_UINT16 *)container->ItemList;
 									current = itemList[container->CurrentIndex];
@@ -849,7 +837,7 @@ l'immagine)
 		return TRUE;
 #endif
 		/*
-if (TTWAIN_GetState() != TWAIN_SOURCE_OPEN) 
+if (TTWAIN_GetState() != TWAIN_SOURCE_OPEN)
   {
   TTWAIN_RecordError();
   return FALSE;
@@ -877,8 +865,8 @@ if (TTWAIN_GetState() != TWAIN_SOURCE_OPEN)
 		return TTWAIN_SetCap(CAP_XFERCOUNT, TWON_ONEVALUE, TWTY_INT16, (TW_UINT32 *)&nXfers);
 	}
 	/*---------------------------------------------------------------------------*/
-	int TTWAIN_SetXferMech(TTWAIN_TRANSFER_MECH mech, void *ptr, TUINT32 size,
-						   int preferredLx, int preferredLy, TUINT32 numberOfImages)
+	int TTWAIN_SetXferMech(TTWAIN_TRANSFER_MECH mech, void *ptr, TUINT32 size, int preferredLx,
+						   int preferredLy, TUINT32 numberOfImages)
 	{
 		TW_UINT32 theMech = mech;
 
@@ -929,20 +917,11 @@ if (TTwainData.transferInfo.usageMode == TTWAIN_MODE_UNLEASHED)
 		return (int)onevalue_data.Item;
 	}
 	/*---------------------------------------------------------------------------*/
-	int TTWAIN_GetUIStatus(void)
-	{
-		return TTwainData.UIStatus;
-	}
+	int TTWAIN_GetUIStatus(void) { return TTwainData.UIStatus; }
 	/*---------------------------------------------------------------------------*/
-	void TTWAIN_SetUIStatus(int status)
-	{
-		TTwainData.UIStatus = status;
-	}
+	void TTWAIN_SetUIStatus(int status) { TTwainData.UIStatus = status; }
 	/*---------------------------------------------------------------------------*/
-	int TTWAIN_GetModalStatus(void)
-	{
-		return TTwainData.modalStatus;
-	}
+	int TTWAIN_GetModalStatus(void) { return TTwainData.modalStatus; }
 	/*---------------------------------------------------------------------------*/
 	int TTWAIN_IsDeviceOnLine(void)/* -1 unknown, 0 no, 1 yes */
 	{
@@ -971,10 +950,7 @@ if (TTwainData.transferInfo.usageMode == TTWAIN_MODE_UNLEASHED)
 		return (TTwainData.twainAvailable == AVAIABLE_YES);
 	}
 	/*---------------------------------------------------------------------------*/
-	void TTWAIN_SetAvailable(TWAINAVAILABLE status)
-	{
-		TTwainData.twainAvailable = status;
-	}
+	void TTWAIN_SetAvailable(TWAINAVAILABLE status) { TTwainData.twainAvailable = status; }
 	/*---------------------------------------------------------------------------*/
 
 	/*---------------------------------------------------------------------------*/
@@ -985,7 +961,8 @@ if (TTwainData.transferInfo.usageMode == TTWAIN_MODE_UNLEASHED)
 	{
 		switch (range.ItemType) {
 		case TWTY_INT8:
-			__OR TWTY_INT16 : __OR TWTY_INT32 : __OR TWTY_UINT8 : __OR TWTY_UINT16 : return (float)range.MinValue;
+			__OR TWTY_INT16 : __OR TWTY_INT32 : __OR TWTY_UINT8 : __OR TWTY_UINT16
+																  : return (float)range.MinValue;
 
 			CASE TWTY_FIX32:
 			{
@@ -995,13 +972,13 @@ if (TTwainData.transferInfo.usageMode == TTWAIN_MODE_UNLEASHED)
 
 		DEFAULT:
 			/*
-  TWTY_UINT32  
-  TWTY_BOOL    
-  TWTY_FRAME   
-  TWTY_STR32   
-  TWTY_STR64   
-  TWTY_STR128  
-  TWTY_STR255  
+  TWTY_UINT32
+  TWTY_BOOL
+  TWTY_FRAME
+  TWTY_STR32
+  TWTY_STR64
+  TWTY_STR128
+  TWTY_STR255
   */
 			assert(!"Invalid type!!!");
 			return 0;
@@ -1013,7 +990,8 @@ if (TTwainData.transferInfo.usageMode == TTWAIN_MODE_UNLEASHED)
 	{
 		switch (range.ItemType) {
 		case TWTY_INT8:
-			__OR TWTY_INT16 : __OR TWTY_INT32 : __OR TWTY_UINT8 : __OR TWTY_UINT16 : return (float)range.MaxValue;
+			__OR TWTY_INT16 : __OR TWTY_INT32 : __OR TWTY_UINT8 : __OR TWTY_UINT16
+																  : return (float)range.MaxValue;
 
 			CASE TWTY_FIX32:
 			{
@@ -1023,13 +1001,13 @@ if (TTwainData.transferInfo.usageMode == TTWAIN_MODE_UNLEASHED)
 
 		DEFAULT:
 			/*
-  TWTY_UINT32  
-  TWTY_BOOL    
-  TWTY_FRAME   
-  TWTY_STR32   
-  TWTY_STR64   
-  TWTY_STR128  
-  TWTY_STR255  
+  TWTY_UINT32
+  TWTY_BOOL
+  TWTY_FRAME
+  TWTY_STR32
+  TWTY_STR64
+  TWTY_STR128
+  TWTY_STR255
   */
 			assert(!"Invalid type!!");
 			return 0;
@@ -1041,7 +1019,9 @@ if (TTwainData.transferInfo.usageMode == TTWAIN_MODE_UNLEASHED)
 	{
 		switch (range.ItemType) {
 		case TWTY_INT8:
-			__OR TWTY_INT16 : __OR TWTY_INT32 : __OR TWTY_UINT8 : __OR TWTY_UINT16 : return (float)range.DefaultValue;
+			__OR TWTY_INT16 : __OR TWTY_INT32 : __OR TWTY_UINT8
+												: __OR TWTY_UINT16
+												  : return (float)range.DefaultValue;
 
 			CASE TWTY_FIX32:
 			{
@@ -1051,13 +1031,13 @@ if (TTwainData.transferInfo.usageMode == TTWAIN_MODE_UNLEASHED)
 
 		DEFAULT:
 			/*
-  TWTY_UINT32  
-  TWTY_BOOL    
-  TWTY_FRAME   
-  TWTY_STR32   
-  TWTY_STR64   
-  TWTY_STR128  
-  TWTY_STR255  
+  TWTY_UINT32
+  TWTY_BOOL
+  TWTY_FRAME
+  TWTY_STR32
+  TWTY_STR64
+  TWTY_STR128
+  TWTY_STR255
   */
 			assert(!"Invalid type!!");
 			return 0;
@@ -1069,7 +1049,8 @@ if (TTwainData.transferInfo.usageMode == TTWAIN_MODE_UNLEASHED)
 	{
 		switch (range.ItemType) {
 		case TWTY_INT8:
-			__OR TWTY_INT16 : __OR TWTY_INT32 : __OR TWTY_UINT8 : __OR TWTY_UINT16 : return (float)range.StepSize;
+			__OR TWTY_INT16 : __OR TWTY_INT32 : __OR TWTY_UINT8 : __OR TWTY_UINT16
+																  : return (float)range.StepSize;
 
 			CASE TWTY_FIX32:
 			{
@@ -1079,13 +1060,13 @@ if (TTwainData.transferInfo.usageMode == TTWAIN_MODE_UNLEASHED)
 
 		DEFAULT:
 			/*
-  TWTY_UINT32  
-  TWTY_BOOL    
-  TWTY_FRAME   
-  TWTY_STR32   
-  TWTY_STR64   
-  TWTY_STR128  
-  TWTY_STR255  
+  TWTY_UINT32
+  TWTY_BOOL
+  TWTY_FRAME
+  TWTY_STR32
+  TWTY_STR64
+  TWTY_STR128
+  TWTY_STR255
   */
 			assert(!"Invalid type!!");
 			return 0;
@@ -1100,8 +1081,7 @@ if (TTwainData.transferInfo.usageMode == TTWAIN_MODE_UNLEASHED)
 		return TTWAIN_Native2RasterPD(handle, the_ras, lx, ly);
 	}
 	/*---------------------------------------------------------------------------*/
-	static int TTWAIN_IsItemInList(void *list, void *item, TUINT32 list_count,
-								   TUINT32 item_size)
+	static int TTWAIN_IsItemInList(void *list, void *item, TUINT32 list_count, TUINT32 item_size)
 	{
 		int found = FALSE;
 		TUINT32 count = list_count;
@@ -1371,10 +1351,7 @@ if (TTwainData.transferInfo.usageMode == TTWAIN_MODE_UNLEASHED)
 	}
 	/*---------------------------------------------------------------------------*/
 	/*---------------------------------------------------------------------------*/
-	void TTWAIN_SetTwainUsage(TTWAIN_USAGE_MODE um)
-	{
-		TTwainData.transferInfo.usageMode = um;
-	}
+	void TTWAIN_SetTwainUsage(TTWAIN_USAGE_MODE um) { TTwainData.transferInfo.usageMode = um; }
 	/*---------------------------------------------------------------------------*/
 	extern void registerTwainCallback();
 

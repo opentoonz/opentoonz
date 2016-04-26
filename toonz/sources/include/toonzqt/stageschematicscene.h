@@ -7,7 +7,7 @@
 #include "tgeometry.h"
 #include <QMap>
 
-//forward declaration
+// forward declaration
 class TStageObject;
 class TXsheetHandle;
 class TObjectHandle;
@@ -39,11 +39,8 @@ class TreeStageNode
 	//! The childre of the node
 	std::vector<TreeStageNode *> m_cildren;
 
-public:
-	TreeStageNode(StageSchematicNode *node)
-		: m_node(node)
-	{
-	}
+  public:
+	TreeStageNode(StageSchematicNode *node) : m_node(node) {}
 
 	~TreeStageNode()
 	{
@@ -74,10 +71,12 @@ public:
 //
 //==================================================================
 
-//! It is the implementation of the SchematicScene representig the QGraphicsScene for the Stage Schematic.
+//! It is the implementation of the SchematicScene representig the QGraphicsScene for the Stage
+//! Schematic.
 //! All StageSchematicNode,  StageSchematicSplineNode and link are pleced and handled in this scene.
 //! The scene mantains two mapping:
-//! one for StageSchematicNode and one for StageSchematicSplineNode. These mapping can be used to retrieve
+//! one for StageSchematicNode and one for StageSchematicSplineNode. These mapping can be used to
+//! retrieve
 //! nodes and spline.\n
 //! To regenearte the scene use the updateScene().\n
 //! To oreder nodes in the scene use the reorderScene().
@@ -103,7 +102,7 @@ class StageSchematicScene : public SchematicScene
 
 	bool m_showLetterOnPortFlag;
 
-public:
+  public:
 	StageSchematicScene(QWidget *parent);
 	~StageSchematicScene();
 
@@ -130,13 +129,14 @@ public:
 	void updateNestedGroupEditors(StageSchematicNode *node, const QPointF &newPos);
 	void resizeNodes(bool maximizedNode);
 
-	bool isShowLetterOnPortFlagEnabled(){ return m_showLetterOnPortFlag; }
+	bool isShowLetterOnPortFlagEnabled() { return m_showLetterOnPortFlag; }
 
-private:
+  private:
 	StageSchematicNode *addStageSchematicNode(TStageObject *pegbar);
 	StageSchematicGroupNode *addStageGroupNode(QList<TStageObject *> objs);
 	StageSchematicSplineNode *addSchematicSplineNode(TStageObjectSpline *spline);
-	StageSchematicGroupEditor *addEditedGroupedStageSchematicNode(int groupId, const QList<SchematicNode *> &groupedObjs);
+	StageSchematicGroupEditor *
+	addEditedGroupedStageSchematicNode(int groupId, const QList<SchematicNode *> &groupedObjs);
 	StageSchematicNode *createStageSchematicNode(StageSchematicScene *scene, TStageObject *pegbar);
 
 	//! Places all nodes in the window
@@ -151,10 +151,12 @@ private:
 	void makeTree(TreeStageNode *treeNode);
 
 	//! Give the right position to the \b treeNode children.
-	//! All nodes of the stage schematic are replaced recursively on each children starting from a root.
+	//! All nodes of the stage schematic are replaced recursively on each children starting from a
+	//! root.
 	//! \b xPos and \b yPos are update from the method.
 	//! \sa findRoots(vector<TreeNode*> &roots)
-	void placeChildren(TreeStageNode *treeNode, double &xPos, double &yPos, bool isCameraTree = false);
+	void placeChildren(TreeStageNode *treeNode, double &xPos, double &yPos,
+					   bool isCameraTree = false);
 
 	//! Place a StageSchematicNode in the window.
 	//! It is usually used to place new nodes that have not position.
@@ -172,16 +174,16 @@ private:
 	void updatePositionOnResize(TStageObject *obj, bool maximizedNode);
 	void updateSplinePositionOnResize(TStageObjectSpline *spl, bool maximizedNode);
 
-protected:
+  protected:
 	void contextMenuEvent(QGraphicsSceneContextMenuEvent *cme);
 	void mousePressEvent(QGraphicsSceneMouseEvent *me);
 
-signals:
+  signals:
 	void editObject();
 	void doCollapse(QList<TStageObjectId>);
 	void doExplodeChild(QList<TStageObjectId>);
 
-protected slots:
+  protected slots:
 	void onSelectionSwitched(TSelection *oldSel, TSelection *newSel);
 
 	void onPegbarAdded();
@@ -208,4 +210,4 @@ protected slots:
 	void onSwitchPortModeToggled(bool withLetter);
 };
 
-#endif //STAGESCHEMATIC_H
+#endif // STAGESCHEMATIC_H

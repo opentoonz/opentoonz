@@ -32,27 +32,27 @@ class DVAPI TToonzImage : public TImage
 	std::string m_name;
 	//! The savebox of the image
 	TRect m_savebox;
-	//double m_hPos;
+	// double m_hPos;
 	//! The offset of the image
 	TPoint m_offset;
 	//! ColorMapped raster of the image.
 	TRasterCM32P m_ras;
 	TThread::Mutex m_mutex;
 
-public:
+  public:
 	TToonzImage();
 	TToonzImage(const TRasterCM32P &raster, const TRect &saveBox);
 
 	~TToonzImage();
 
-private:
+  private:
 	//! Is used to clone an existing ToonzImage.
 	TToonzImage(const TToonzImage &);
 
 	//! Not implemented
 	TToonzImage &operator=(const TToonzImage &);
 
-public:
+  public:
 	//! Return the type of the image.
 	TImage::Type getType() const { return TImage::TOONZ_RASTER; }
 
@@ -90,9 +90,9 @@ public:
 	void setOffset(const TPoint &offset) { m_offset = offset; }
 
 	//! Return raster hPos \b m_hPos
-	//double gethPos() const {return m_hPos;}
+	// double gethPos() const {return m_hPos;}
 	//! Return a clone of image
-	//void sethPos(double hPos) {m_hPos= hPos;}
+	// void sethPos(double hPos) {m_hPos= hPos;}
 
 	//! Return a clone of the current image
 	TImage *cloneImage() const;
@@ -113,7 +113,7 @@ public:
 	//! Return a clone of the current image.
 	TToonzImageP clone() const;
 
-private:
+  private:
 	//! Image dimension
 	TDimension m_size;
 };
@@ -127,11 +127,14 @@ template class DVAPI TDerivedSmartPointerT<TToonzImage, TImage>;
 
 class DVAPI TToonzImageP : public TDerivedSmartPointerT<TToonzImage, TImage>
 {
-public:
+  public:
 	TToonzImageP() {}
 	TToonzImageP(TToonzImage *image) : DerivedSmartPointer(image) {}
 	TToonzImageP(TImageP image) : DerivedSmartPointer(image) {}
-	TToonzImageP(const TRasterCM32P &ras, const TRect &saveBox) : DerivedSmartPointer(new TToonzImage(ras, saveBox)) {}
+	TToonzImageP(const TRasterCM32P &ras, const TRect &saveBox)
+		: DerivedSmartPointer(new TToonzImage(ras, saveBox))
+	{
+	}
 	operator TImageP() { return TImageP(m_pointer); }
 };
 

@@ -22,10 +22,9 @@
 //  TCellKeyframeSelection
 //-----------------------------------------------------------------------------
 
-TCellKeyframeSelection::TCellKeyframeSelection(TCellSelection *cellSelection, TKeyframeSelection *keyframeSelection)
-	: m_cellSelection(cellSelection)
-	, m_keyframeSelection(keyframeSelection)
-	, m_xsheetHandle(0)
+TCellKeyframeSelection::TCellKeyframeSelection(TCellSelection *cellSelection,
+											   TKeyframeSelection *keyframeSelection)
+	: m_cellSelection(cellSelection), m_keyframeSelection(keyframeSelection), m_xsheetHandle(0)
 {
 }
 
@@ -59,7 +58,7 @@ bool TCellKeyframeSelection::isEmpty() const
 void TCellKeyframeSelection::copyCellsKeyframes()
 {
 	TCellKeyframeData *data = new TCellKeyframeData();
-	//Copy cells
+	// Copy cells
 	int r0, c0, r1, c1;
 	m_cellSelection->getSelectedCells(r0, c0, r1, c1);
 	if (!isEmpty()) {
@@ -72,7 +71,7 @@ void TCellKeyframeSelection::copyCellsKeyframes()
 		cellData->setCells(xsh, r0, c0, r1, c1);
 		data->setCellData(cellData);
 	}
-	//Copy keyframes
+	// Copy keyframes
 	if (!isEmpty()) {
 		QClipboard *clipboard = QApplication::clipboard();
 		TXsheet *xsh = m_xsheetHandle->getXsheet();
@@ -80,7 +79,7 @@ void TCellKeyframeSelection::copyCellsKeyframes()
 		keyframeData->setKeyframes(m_keyframeSelection->getSelection(), xsh);
 		data->setKeyframeData(keyframeData);
 	}
-	//Set the cliboard
+	// Set the cliboard
 	QClipboard *clipboard = QApplication::clipboard();
 	clipboard->setMimeData(data, QClipboard::Clipboard);
 }

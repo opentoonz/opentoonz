@@ -16,18 +16,16 @@ namespace tcg
 //    Tcg Pixel Types  definition
 //***********************************************************
 
-template <typename Chan, typename pixel_category>
-struct Pixel;
+template <typename Chan, typename pixel_category> struct Pixel;
 
-template <typename Chan>
-struct Pixel<Chan, grayscale_pixel_tag> {
+template <typename Chan> struct Pixel<Chan, grayscale_pixel_tag> {
 	typedef grayscale_pixel_tag pixel_category;
 	typedef Chan channel_type;
 
-public:
+  public:
 	channel_type l;
 
-public:
+  public:
 	Pixel() : l() {}
 	Pixel(channel_type _l) : l(_l) {}
 
@@ -35,18 +33,16 @@ public:
 	bool operator!=(const Pixel &other) const { return l != other.l; }
 };
 
-template <typename Chan>
-struct Pixel<Chan, rgb_pixel_tag> {
+template <typename Chan> struct Pixel<Chan, rgb_pixel_tag> {
 	typedef rgb_pixel_tag pixel_category;
 	typedef Chan channel_type;
 
-public:
+  public:
 	channel_type r, g, b;
 
-public:
+  public:
 	Pixel() : r(), g(), b() {}
-	Pixel(channel_type _r, channel_type _g, channel_type _b)
-		: r(_r), g(_g), b(_b) {}
+	Pixel(channel_type _r, channel_type _g, channel_type _b) : r(_r), g(_g), b(_b) {}
 
 	bool operator==(const Pixel &other) const
 	{
@@ -58,18 +54,19 @@ public:
 	}
 };
 
-template <typename Chan>
-struct Pixel<Chan, rgbm_pixel_tag> {
+template <typename Chan> struct Pixel<Chan, rgbm_pixel_tag> {
 	typedef rgbm_pixel_tag pixel_category;
 	typedef Chan channel_type;
 
-public:
+  public:
 	channel_type r, g, b, m;
 
-public:
+  public:
 	Pixel() : r(), g(), b(), m() {}
 	Pixel(channel_type _r, channel_type _g, channel_type _b, channel_type _m)
-		: r(_r), g(_g), b(_b), m(_m) {}
+		: r(_r), g(_g), b(_b), m(_m)
+	{
+	}
 
 	bool operator==(const Pixel &other) const
 	{
@@ -102,8 +99,7 @@ struct pixel_traits<Pixel<Chan, grayscale_pixel_tag>, grayscale_pixel_tag> {
 	static channel_type &l(pixel_type &pix) { return pix.l; }
 };
 
-template <typename Chan>
-struct pixel_traits<Pixel<Chan, rgb_pixel_tag>, rgb_pixel_tag> {
+template <typename Chan> struct pixel_traits<Pixel<Chan, rgb_pixel_tag>, rgb_pixel_tag> {
 	typedef Pixel<Chan, rgb_pixel_tag> pixel_type;
 	typedef rgb_pixel_tag pixel_category;
 	typedef Chan channel_type;

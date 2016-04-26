@@ -37,8 +37,7 @@ TExternFx *TExternFx::create(std::string name)
 
 //=========================================================
 
-TExternalProgramFx::TExternalProgramFx(std::string name)
-	: m_externFxName(name)
+TExternalProgramFx::TExternalProgramFx(std::string name) : m_externFxName(name)
 {
 	initialize(name);
 	setName(L"ExternalProgramFx");
@@ -47,8 +46,7 @@ TExternalProgramFx::TExternalProgramFx(std::string name)
 
 //------------------------------------------------------------------
 
-TExternalProgramFx::TExternalProgramFx()
-	: m_externFxName()
+TExternalProgramFx::TExternalProgramFx() : m_externFxName()
 {
 	setName(L"ExternalProgramFx");
 	//    addInputPort("input2", m_input2);
@@ -129,7 +127,7 @@ void TExternalProgramFx::addPort(std::string portName, std::string ext, bool isI
 
 //------------------------------------------------------------------
 
-//void TExternalProgramFx::addParam(string paramName, const TParamP &param)
+// void TExternalProgramFx::addParam(string paramName, const TParamP &param)
 //{
 //  m_params[paramName] = param;
 //  TFx::addParam(paramName, param);
@@ -139,11 +137,10 @@ void TExternalProgramFx::addPort(std::string portName, std::string ext, bool isI
 
 TFx *TExternalProgramFx::clone(bool recursive) const
 {
-	TExternalProgramFx *fx =
-		dynamic_cast<TExternalProgramFx *>(TExternFx::create(m_externFxName));
+	TExternalProgramFx *fx = dynamic_cast<TExternalProgramFx *>(TExternFx::create(m_externFxName));
 	assert(fx);
-	//new TExternalProgramFx();
-	//fx->setExecutable(m_executablePath, m_args);
+	// new TExternalProgramFx();
+	// fx->setExecutable(m_executablePath, m_args);
 
 	// copia della time region
 	fx->setActiveTimeRegion(getActiveTimeRegion());
@@ -153,8 +150,8 @@ TFx *TExternalProgramFx::clone(bool recursive) const
 
 	assert(getInputPortCount() == fx->getInputPortCount());
 
-	//std::map<std::string, Port>::const_iterator j;
-	//for(j=m_ports.begin(); j!=m_ports.end(); ++j)
+	// std::map<std::string, Port>::const_iterator j;
+	// for(j=m_ports.begin(); j!=m_ports.end(); ++j)
 	//  fx->addPort(j->first, j->second.m_ext, j->second.m_port != 0);
 
 	// copia ricorsiva sulle porte
@@ -166,8 +163,8 @@ TFx *TExternalProgramFx::clone(bool recursive) const
 		}
 	}
 
-	//std::map<std::string, TParamP>::const_iterator j;
-	//for(j=m_params.begin(); j!=m_params.end(); ++j)
+	// std::map<std::string, TParamP>::const_iterator j;
+	// for(j=m_params.begin(); j!=m_params.end(); ++j)
 	//  fx->addParam(j->first, j->second->clone());
 
 	return fx;
@@ -201,14 +198,14 @@ bool TExternalProgramFx::doGetBBox(double frame, TRectD &bBox, const TRenderSett
 	/*
 if(m_input1.isConnected() || m_input2.isConnected())
 {
-  bool ret = m_input1->doGetBBox(frame, bBox) || m_input1->doGetBBox(frame, bBox); 
+  bool ret = m_input1->doGetBBox(frame, bBox) || m_input1->doGetBBox(frame, bBox);
   return ret;
 }
 else
 {
   bBox = TRectD();
   return false;
-} 
+}
 */
 }
 
@@ -282,9 +279,9 @@ void TExternalProgramFx::doCompute(TTile &tile, double frame, const TRenderSetti
 
 		args.replace(i, m + 1, value);
 	}
-	args = " " + args; //aggiungo uno spazio per sicurezza
-	//ofstream os("C:\\temp\\butta.txt");
-	//os << args << endl;
+	args = " " + args; // aggiungo uno spazio per sicurezza
+	// ofstream os("C:\\temp\\butta.txt");
+	// os << args << endl;
 
 	// bisognerebbe calcolare le immagini dalla/e porta/e di input
 	// scrivere il/i valore/i nei files temporanei/o
@@ -301,18 +298,17 @@ void TExternalProgramFx::doCompute(TTile &tile, double frame, const TRenderSetti
 
 	GetStartupInfo(&si);
 
-	BOOL ret = CreateProcess(
-		(char *)executablePath.c_str(),			 // name of executable module
-		buffer,									 // command line string
-		NULL,									 // SD
-		NULL,									 // SD
-		TRUE,									 // handle inheritance option
-		CREATE_NO_WINDOW, /*CREATE_NEW_CONSOLE*/ // creation flags
-		NULL,									 // new environment block
-		NULL,									 // current directory name
-		&si,									 // startup information
-		&pinfo									 // process information
-		);
+	BOOL ret = CreateProcess((char *)executablePath.c_str(),		  // name of executable module
+							 buffer,								  // command line string
+							 NULL,									  // SD
+							 NULL,									  // SD
+							 TRUE,									  // handle inheritance option
+							 CREATE_NO_WINDOW, /*CREATE_NEW_CONSOLE*/ // creation flags
+							 NULL,									  // new environment block
+							 NULL,									  // current directory name
+							 &si,									  // startup information
+							 &pinfo									  // process information
+							 );
 
 	if (!ret)
 		DWORD err = GetLastError();
@@ -321,9 +317,8 @@ void TExternalProgramFx::doCompute(TTile &tile, double frame, const TRenderSetti
 	WaitForSingleObject(pinfo.hProcess, INFINITE);
 
 	DWORD exitCode;
-	ret = GetExitCodeProcess(
-		pinfo.hProcess, // handle to the process
-		&exitCode);		// termination status
+	ret = GetExitCodeProcess(pinfo.hProcess, // handle to the process
+							 &exitCode);	 // termination status
 
 #else
 	std::string cmdline = executablePath + buffer;
@@ -337,19 +332,19 @@ void TExternalProgramFx::doCompute(TTile &tile, double frame, const TRenderSetti
   else if(name == "over") color = TPixel32::Green;
   else color = TPixel32::Red;
   for(int iy=0;iy<ras->getLy();iy++)
-    {
-     TPixel32 *pix = ras->pixels(iy);
-     TPixel32 *endPix = pix + ras->getLx();
-     double x = tile.m_pos.x;
-     double y = tile.m_pos.y + iy;
-     while(pix<endPix)
-       {
-        if(x*x+y*y<900) *pix = color;
-        else *pix = TPixel32(0,0,0,0);
-        ++pix;
-        x+=1.0;
-       }
-    }
+	{
+	 TPixel32 *pix = ras->pixels(iy);
+	 TPixel32 *endPix = pix + ras->getLx();
+	 double x = tile.m_pos.x;
+	 double y = tile.m_pos.y + iy;
+	 while(pix<endPix)
+	   {
+		if(x*x+y*y<900) *pix = color;
+		else *pix = TPixel32(0,0,0,0);
+		++pix;
+		x+=1.0;
+	   }
+	}
 */
 
 	try {
@@ -358,7 +353,7 @@ void TExternalProgramFx::doCompute(TTile &tile, double frame, const TRenderSetti
 	} catch (...) {
 	}
 
-	//butto i file temporanei creati
+	// butto i file temporanei creati
 	std::map<std::string, TFilePath>::const_iterator fileIt;
 	for (fileIt = tmpFiles.begin(); fileIt != tmpFiles.end(); ++fileIt) {
 		if (TFileStatus(fileIt->second).doesExist() == true)
@@ -492,18 +487,17 @@ void ExternalProgramFx::doCompute(TTile &tile, double frame, const TRenderSettin
 
 	GetStartupInfo(&si);
 
-	BOOL ret = CreateProcess(
-		NULL,									 // name of executable module
-		(char *)cmdline.c_str(),				 // command line string
-		NULL,									 // SD
-		NULL,									 // SD
-		TRUE,									 // handle inheritance option
-		CREATE_NO_WINDOW, /*CREATE_NEW_CONSOLE*/ // creation flags
-		NULL,									 // new environment block
-		NULL,									 // current directory name
-		&si,									 // startup information
-		&pinfo									 // process information
-		);
+	BOOL ret = CreateProcess(NULL,									  // name of executable module
+							 (char *)cmdline.c_str(),				  // command line string
+							 NULL,									  // SD
+							 NULL,									  // SD
+							 TRUE,									  // handle inheritance option
+							 CREATE_NO_WINDOW, /*CREATE_NEW_CONSOLE*/ // creation flags
+							 NULL,									  // new environment block
+							 NULL,									  // current directory name
+							 &si,									  // startup information
+							 &pinfo									  // process information
+							 );
 
 	if (!ret)
 		DWORD err = GetLastError();
@@ -512,9 +506,8 @@ void ExternalProgramFx::doCompute(TTile &tile, double frame, const TRenderSettin
 	WaitForSingleObject(pinfo.hProcess, INFINITE);
 
 	DWORD exitCode;
-	ret = GetExitCodeProcess(
-		pinfo.hProcess, // handle to the process
-		&exitCode);		// termination status
+	ret = GetExitCodeProcess(pinfo.hProcess, // handle to the process
+							 &exitCode);	 // termination status
 
 #else
 	int exitCode = system(cmdline.c_str());

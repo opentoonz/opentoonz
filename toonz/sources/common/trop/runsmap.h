@@ -21,11 +21,11 @@
   The following coding is adopted to extract the run length from the run headers:
 
   \li We'll use the last 2 bits only in the headers. With these, we can cover directly
-      those runs up to 4 pixels length.
+	  those runs up to 4 pixels length.
   \li When the length >=4, we require that one byte is taken in the run to store the length
-      up to 256 pixels.
+	  up to 256 pixels.
   \li When the length >= 256, we take 4 additional bytes to store the length (which this time
-      could go up to billions).
+	  could go up to billions).
 
   Observe that the runsmap supports a symmetrical representation, useful
   to traverse runs both forward and backwards. This means that 2 headers are
@@ -33,7 +33,7 @@
 */
 class RunsMap : public TRasterT<TPixelGR8>
 {
-public:
+  public:
 	RunsMap(int lx, int ly) : TRasterT<TPixelGR8>(lx, ly) { clear(); }
 
 	const UCHAR &runHeader(int x, int y) const { return pixels(y)[x].value; }
@@ -45,7 +45,7 @@ public:
 		return runLength(pixels(y) + x, reversed);
 	}
 
-public:
+  public:
 	void setRunLength(TPixelGR8 *run, TUINT32 length);
 	void setRunLength(int x, int y, TUINT32 length) { setRunLength(pixels(y) + x, length); }
 };
@@ -58,7 +58,7 @@ template class DV_EXPORT_API TSmartPointerT<RunsMap>;
 
 class RunsMapP : public TSmartPointerT<RunsMap>
 {
-public:
+  public:
 	RunsMapP() {}
 	RunsMapP(int lx, int ly) : TSmartPointerT<RunsMap>(new RunsMap(lx, ly)) {}
 	RunsMapP(const TDimension &d) : TSmartPointerT<RunsMap>(new RunsMap(d.lx, d.ly)) {}
@@ -69,15 +69,14 @@ public:
 template <typename Pixel, typename PixelSelector>
 void buildRunsMap(RunsMapP &runsMap, const TRasterPT<Pixel> &ras, const PixelSelector &selector)
 {
-	//Traverse the raster, extracting run lengths
+	// Traverse the raster, extracting run lengths
 	int y, ly = ras->getLy();
 	for (y = 0; y < ly; ++y) {
 		Pixel *lineStart = (Pixel *)ras->pixels(y), *lineEnd = lineStart + ras->getLx();
 
 		Pixel *pix, *runStart;
 		typename PixelSelector::value_type colorIndex;
-		for (pix = runStart = lineStart, colorIndex = selector.value(*pix);
-			 pix < lineEnd; ++pix)
+		for (pix = runStart = lineStart, colorIndex = selector.value(*pix); pix < lineEnd; ++pix)
 			if (selector.value(*pix) != colorIndex) {
 				runsMap->setRunLength(runStart - lineStart, y, pix - runStart);
 				runStart = pix;
@@ -87,4 +86,4 @@ void buildRunsMap(RunsMapP &runsMap, const TRasterPT<Pixel> &ras, const PixelSel
 	}
 }
 
-#endif //RUNSMAP_H
+#endif // RUNSMAP_H

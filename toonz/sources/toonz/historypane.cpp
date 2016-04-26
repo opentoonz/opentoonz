@@ -20,25 +20,24 @@ namespace
 const struct {
 	int historyType;
 	const char *pixmapFilename;
-} historyTypeInfo[] = {
-	{HistoryType::Unidentified, "history_normal"},
-	{HistoryType::BrushTool, "history_brush"},
-	{HistoryType::EraserTool, "history_eraser"},
-	{HistoryType::FillTool, "history_fill"},
-	{HistoryType::PaintBrushTool, "history_paintbrush"},
-	{HistoryType::AutocloseTool, "history_autoclose"},
-	{HistoryType::GeometricTool, "history_geometric"},
-	{HistoryType::ControlPointEditorTool, "history_controlpointeditor"},
-	{HistoryType::EditTool_Move, "history_move"},
-	{HistoryType::FingerTool, "history_finger"},
-	//{HistoryType::PickTool,			"history_pick"},
-	{HistoryType::Palette, "history_palette"},
-	{HistoryType::Fx, "history_fx"},
-	{HistoryType::Schematic, "history_schematic"},
-	{HistoryType::Xsheet, "history_xsheet"},
-	{HistoryType::FilmStrip, "history_filmstrip"},
+} historyTypeInfo[] = {{HistoryType::Unidentified, "history_normal"},
+					   {HistoryType::BrushTool, "history_brush"},
+					   {HistoryType::EraserTool, "history_eraser"},
+					   {HistoryType::FillTool, "history_fill"},
+					   {HistoryType::PaintBrushTool, "history_paintbrush"},
+					   {HistoryType::AutocloseTool, "history_autoclose"},
+					   {HistoryType::GeometricTool, "history_geometric"},
+					   {HistoryType::ControlPointEditorTool, "history_controlpointeditor"},
+					   {HistoryType::EditTool_Move, "history_move"},
+					   {HistoryType::FingerTool, "history_finger"},
+					   //{HistoryType::PickTool,			"history_pick"},
+					   {HistoryType::Palette, "history_palette"},
+					   {HistoryType::Fx, "history_fx"},
+					   {HistoryType::Schematic, "history_schematic"},
+					   {HistoryType::Xsheet, "history_xsheet"},
+					   {HistoryType::FilmStrip, "history_filmstrip"},
 
-	{0, 0}};
+					   {0, 0}};
 };
 
 class HistoryPixmapManager
@@ -47,7 +46,7 @@ class HistoryPixmapManager
 	std::map<int, QPixmap> m_pms;
 
 	HistoryPixmapManager() {}
-public:
+  public:
 	static HistoryPixmapManager *instance()
 	{
 		static HistoryPixmapManager _instance;
@@ -137,7 +136,7 @@ void HistoryField::paintEvent(QPaintEvent *evt)
 				p.setBrush(QColor(0, 0, 128));
 			p.drawRect(tmpRect);
 
-			//draw text
+			// draw text
 			QFont fon = p.font();
 			fon.setItalic(isFuture);
 			p.setFont(fon);
@@ -152,7 +151,8 @@ void HistoryField::paintEvent(QPaintEvent *evt)
 			p.drawText(tmpRect, Qt::AlignLeft | Qt::AlignVCenter, tmpUndo->getHistoryString());
 
 			QRect tmpIconRect = undoIconRect.translated(0, 20 * (i - 1));
-			p.drawPixmap(tmpIconRect, HistoryPixmapManager::instance()->getHistoryPm(tmpUndo->getHistoryType()));
+			p.drawPixmap(tmpIconRect,
+						 HistoryPixmapManager::instance()->getHistoryPm(tmpUndo->getHistoryType()));
 		}
 	}
 }
@@ -187,11 +187,11 @@ void HistoryField::mousePressEvent(QMouseEvent *event)
 	if (index == currentIndex)
 		return;
 
-	if (index < currentIndex) //undo
+	if (index < currentIndex) // undo
 	{
 		for (int i = 0; i < (currentIndex - index); i++)
 			TUndoManager::manager()->undo();
-	} else //redo
+	} else // redo
 	{
 		for (int i = 0; i < (index - currentIndex); i++)
 			TUndoManager::manager()->redo();

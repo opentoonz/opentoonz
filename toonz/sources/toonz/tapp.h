@@ -32,7 +32,7 @@ class ComboViewerPanel;
 //! This is the instance of the main application.
 
 /*! This class is a singleton and is used to initialize the main application window.
-		It defines the basic signals used in the application, as the status changing of 
+		It defines the basic signals used in the application, as the status changing of
 		the scene and connects them to the basic handlers.
 	\n	It is also used to retrieve a pointer to the current state of the application,
 		as the pointer to the main window, a pointer to the current scene or a pointer
@@ -49,10 +49,10 @@ QMainWindow * mainwindow = TApp::instance()->getMainWindow();
 TStageObjectId currentObjectId = TApp::instance()->getCurrentObject()->getObjectId();
 
 		\endcode
-		This class is used to take care of changes on the state of the application and to 
+		This class is used to take care of changes on the state of the application and to
 		notify through event handling to the rest of the code.
 	*/
-class TApp : public QObject, public TTool::Application //Singleton
+class TApp : public QObject, public TTool::Application // Singleton
 {
 	Q_OBJECT
 
@@ -71,7 +71,7 @@ class TApp : public QObject, public TTool::Application //Singleton
 
 	QMainWindow *m_mainWindow;
 
-	//keep a pointer of the inknpaint viewer in order to enable navigator pan in the filmstrip
+	// keep a pointer of the inknpaint viewer in order to enable navigator pan in the filmstrip
 	ComboViewerPanel *m_inknPaintViewerPanel;
 
 	int m_autosavePeriod; // minutes
@@ -83,7 +83,7 @@ class TApp : public QObject, public TTool::Application //Singleton
 	bool m_isStarting;
 	bool m_isPenCloseToTablet;
 
-public:
+  public:
 	/*!
 		A static pointer to the main application.
 	*/
@@ -125,8 +125,7 @@ public:
 	/*!
 		Returns a pointer to the current layer's mask.
 	*/
-	TOnionSkinMaskHandle *
-	getCurrentOnionSkin() const { return m_currentOnionSkinMask; }
+	TOnionSkinMaskHandle *getCurrentOnionSkin() const { return m_currentOnionSkinMask; }
 	/*!
 		Returns a pointer to the current effect.
 	*/
@@ -153,7 +152,7 @@ public:
 	*/
 	QMainWindow *getMainWindow() const { return m_mainWindow; }
 	/*!
-		Returns a pointer to the current room. The current room is the window environment in use, 
+		Returns a pointer to the current room. The current room is the window environment in use,
 		i.e. the drawing tab, the animation tab, the pltedit tab etc...
 	*/
 	TMainWindow *getCurrentRoom() const;
@@ -162,14 +161,14 @@ public:
 	*/
 	int getCurrentImageType();
 	/*!
-		Initializes the main window application. It is called in the main function 
+		Initializes the main window application. It is called in the main function
 		after the environment initialization.
 	*/
 	void init();
 
 	QString getCurrentRoomName() const;
 
-	//keep a pointer of the inknpaint viewer in order to enable navigator pan in the filmstrip
+	// keep a pointer of the inknpaint viewer in order to enable navigator pan in the filmstrip
 	void setInknPaintViewerPanel(ComboViewerPanel *panel) { m_inknPaintViewerPanel = panel; }
 	ComboViewerPanel *getInknPaintViewerPanel() const { return m_inknPaintViewerPanel; }
 
@@ -177,14 +176,14 @@ public:
 
 	bool isPenCloseToTablet() const { return m_isPenCloseToTablet; }
 
-protected:
+  protected:
 	bool eventFilter(QObject *obj, QEvent *event);
 
-private:
+  private:
 	void updateXshLevel();
 	void updateCurrentFrame();
 
-protected slots:
+  protected slots:
 	void onXsheetChanged();
 	void onSceneSwitched();
 	void onXsheetSwitched();
@@ -210,4 +209,4 @@ protected slots:
 	void onStopAutoSave();
 };
 
-#endif //TAPP_H
+#endif // TAPP_H

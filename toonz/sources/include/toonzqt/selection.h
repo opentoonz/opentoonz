@@ -25,17 +25,17 @@ class QWidget;
 
 class DVAPI TSelection
 {
-public:
+  public:
 	class View
 	{
-	public:
+	  public:
 		virtual ~View(){};
 
 		virtual void onSelectionChanged() = 0;
 		virtual void enableCommands() {}
 	};
 
-public:
+  public:
 	TSelection();
 	virtual ~TSelection();
 
@@ -50,8 +50,7 @@ public:
 	void enableCommand(CommandId cmdId, CommandHandlerInterface *handler);
 
 	// overridden enableCommands() will call enableCommand()
-	template <class T>
-	inline void enableCommand(T *target, CommandId cmdId, void (T::*method)())
+	template <class T> inline void enableCommand(T *target, CommandId cmdId, void (T::*method)())
 	{
 		enableCommand(cmdId, new CommandHandlerHelper<T>(target, method));
 	}
@@ -78,8 +77,8 @@ public:
 
 	void notifyView();
 
-private:
+  private:
 	View *m_view;
 };
 
-#endif //TSELECTION_H
+#endif // TSELECTION_H

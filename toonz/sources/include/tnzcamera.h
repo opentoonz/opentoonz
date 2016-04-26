@@ -35,13 +35,13 @@ class TXshSimpleLevel;
 
 class DVAPI CameraImageViewer
 {
-public:
+  public:
 	CameraImageViewer() {}
 
 	virtual void setImage(TRasterP ras) = 0;
 };
 
-//void processImage(unsigned char* m_ptr, int camWidth, int camHeight);
+// void processImage(unsigned char* m_ptr, int camWidth, int camHeight);
 
 #ifndef USE_OPENGL_SHARED
 //=============================================================================
@@ -54,13 +54,9 @@ class ImageProcessing : public TThread::Runnable
 	int m_camWidth;
 	int m_camHeight;
 
-	enum AcquireType {
-		ACQUIRE_FRAME,
-		ACQUIRE_WHITE_IMAGE,
-		NONE
-	} m_acquireType;
+	enum AcquireType { ACQUIRE_FRAME, ACQUIRE_WHITE_IMAGE, NONE } m_acquireType;
 
-public:
+  public:
 	ImageProcessing();
 	~ImageProcessing();
 
@@ -114,7 +110,7 @@ class DVAPI TnzCamera : public QObject
 
 	TnzCamera();
 
-public:
+  public:
 	static TnzCamera *instance();
 	bool initTnzCamera();
 	~TnzCamera();
@@ -125,15 +121,9 @@ public:
 		Q_EMIT imageChanged(camWidth, camHeight, ptr);
 	}
 #else
-	TThread::Executor *getImageProcessingExecutor() const
-	{
-		return m_imageProcessingExecutor;
-	}
+	TThread::Executor *getImageProcessingExecutor() const { return m_imageProcessingExecutor; }
 #endif
-	bool &startedImageProcessing()
-	{
-		return m_startedImageProcessing;
-	}
+	bool &startedImageProcessing() { return m_startedImageProcessing; }
 
 	bool isFreezed() const { return m_freeze; }
 	void freeze(bool freeze) { m_freeze = freeze; }
@@ -146,17 +136,11 @@ public:
 	TFrameId getCurrentFid() const;
 
 #ifdef CHECK_VIDEO_FRAME_INTERVALL
-	double getVideoFrameIntervall() const
-	{
-		return m_videoFrameIntervall;
-	}
+	double getVideoFrameIntervall() const { return m_videoFrameIntervall; }
 	void setVideoFrameIntervall(double intervall);
 #endif
 
-	bool isAcquireFrame() const
-	{
-		return m_acquireFrame;
-	}
+	bool isAcquireFrame() const { return m_acquireFrame; }
 	bool isAcquireWhiteImage() const { return m_acquireWhiteImage; }
 	void setViewImage(TRaster32P img);
 	void setAcquiredImage(TRaster32P img);
@@ -188,18 +172,19 @@ public:
 	bool cameraConnect(wstring deviceName);
 	void cameraDisconnect();
 	bool onViewfinder(CameraImageViewer *viewer);
-	bool onRelease(TFrameId frameId, wstring fileName, int row = 0, int col = 0, bool keepWhiteImage = false);
+	bool onRelease(TFrameId frameId, wstring fileName, int row = 0, int col = 0,
+				   bool keepWhiteImage = false);
 	int saveType() const;
 	void setSaveType(int value);
 
-	//Utility function
+	// Utility function
 	void keepWhiteImage();
 
 	void notifyCameraShutDown() { Q_EMIT cameraShutDown(); }
 	void notifyAbort() { Q_EMIT abort(); }
 
 #ifdef USE_OPENGL_SHARED
-protected Q_SLOTS:
+  protected Q_SLOTS:
 	void processImage(int camWidth, int camHeight, unsigned char *ptr);
 #endif
 
@@ -221,16 +206,16 @@ protected Q_SLOTS:
 
 #include "tfilepath_io.h"
 
-class LogWriter //Singleton
+class LogWriter // Singleton
 {
 	Tofstream m_os;
 
-public:
+  public:
 	LogWriter(TFilePath fp);
 
 	void write(QString str);
 
-public:
+  public:
 	static LogWriter *instance();
 	~LogWriter();
 };

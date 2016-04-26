@@ -2,10 +2,10 @@
 #ifndef BORDERS_EXTRACTOR_HPP
 #define BORDERS_EXTRACTOR_HPP
 
-//Toonz includes
+// Toonz includes
 #include "raster_edge_iterator.h"
 
-//tcg includes
+// tcg includes
 #include "tcg/tcg_traits.h"
 #include "tcg/tcg_containers_reader.h"
 #include "tcg/tcg_hash.h"
@@ -22,10 +22,9 @@ namespace borders
 //    Private stuff
 //*********************************************************************************************************
 
-template <typename PixelSelector>
-class _DummyReader
+template <typename PixelSelector> class _DummyReader
 {
-public:
+  public:
 	void openContainer(const RasterEdgeIterator<PixelSelector> &) {}
 	void addElement(const RasterEdgeIterator<PixelSelector> &) {}
 	void closeContainer() {}
@@ -35,7 +34,8 @@ public:
 //    Borders Extraction procedure
 //*********************************************************************************************************
 
-inline void _signEdge(RunsMapP &runsMap, int x, int y0, int y1, UCHAR increasingSign, UCHAR decreasingSign)
+inline void _signEdge(RunsMapP &runsMap, int x, int y0, int y1, UCHAR increasingSign,
+					  UCHAR decreasingSign)
 {
 	for (; y0 < y1; ++y0)
 		runsMap->runHeader(x, y0) |= increasingSign;
@@ -52,8 +52,8 @@ inline void _signEdge(RunsMapP &runsMap, int x, int y0, int y1, UCHAR increasing
 //---------------------------------------------------------------------------------------------
 
 template <typename Pixel, typename PixelSelector, typename ContainerReader>
-void _readBorder(const TRasterPT<Pixel> &rin, const PixelSelector &selector,
-				 RunsMapP &runsMap, int x, int y, bool counter, ContainerReader &reader)
+void _readBorder(const TRasterPT<Pixel> &rin, const PixelSelector &selector, RunsMapP &runsMap,
+				 int x, int y, bool counter, ContainerReader &reader)
 {
 	typedef typename PixelSelector::value_type value_type;
 
@@ -61,9 +61,10 @@ void _readBorder(const TRasterPT<Pixel> &rin, const PixelSelector &selector,
 	if (!counter)
 		increasingSign |= _HIERARCHY_INCREASE, decreasingSign |= _HIERARCHY_DECREASE;
 
-	//First, read the border entirely, while erasing the border from
-	//the runsMap.
-	RasterEdgeIterator<PixelSelector> it(rin, selector, TPoint(x, y), counter ? TPoint(1, 0) : TPoint(0, 1));
+	// First, read the border entirely, while erasing the border from
+	// the runsMap.
+	RasterEdgeIterator<PixelSelector> it(rin, selector, TPoint(x, y),
+										 counter ? TPoint(1, 0) : TPoint(0, 1));
 	//++it;   //As we could be in the middle of a straight edge, increment to get a corner
 
 	TPoint start(it.pos()), startDir(it.dir());
@@ -74,7 +75,7 @@ void _readBorder(const TRasterPT<Pixel> &rin, const PixelSelector &selector,
 		const TPoint &currPos(it.pos());
 		reader.addElement(it);
 
-		//Sign the corresponding (vertical) edge
+		// Sign the corresponding (vertical) edge
 		_signEdge(runsMap, oldPos.x, oldPos.y, currPos.y, increasingSign, decreasingSign);
 
 		oldPos = currPos;
@@ -94,14 +95,14 @@ void readBorders(const TRasterPT<Pixel> &rin, const PixelSelector &selector,
 	typedef TRasterPT<Pixel> RasterTypeP;
 	typedef _DummyReader<PixelSelector> DummyReader;
 
-	//First, extract the run-length representation for rin
+	// First, extract the run-length representation for rin
 	RunsMapP runsMap;
 	if (rasterRunsMap && *rasterRunsMap) {
-		//If it was supplied, use it
+		// If it was supplied, use it
 		runsMap = *rasterRunsMap;
 		runsMap->lock();
 	} else {
-		//In case, build it anew
+		// In case, build it anew
 		runsMap = RunsMapP(rin->getLx(), rin->getLy());
 
 		runsMap->lock();
@@ -109,15 +110,15 @@ void readBorders(const TRasterPT<Pixel> &rin, const PixelSelector &selector,
 	}
 
 	if (rasterRunsMap)
-		//Return the runsMap if requested
+		// Return the runsMap if requested
 		*rasterRunsMap = runsMap;
 
-	//Build a fake reader for internal borders
+	// Build a fake reader for internal borders
 	DummyReader dummyReader;
 
-	//Now, use it to extract borders - iterate through runs and, whenever
-	//one is found with opaque color (ie not transparent), extract its
-	//associated border. The border is erased internally after the read.
+	// Now, use it to extract borders - iterate through runs and, whenever
+	// one is found with opaque color (ie not transparent), extract its
+	// associated border. The border is erased internally after the read.
 	int lx = rin->getLx(), ly = rin->getLy();
 
 	int hierarchyLevel = 0;
@@ -135,7 +136,7 @@ void readBorders(const TRasterPT<Pixel> &rin, const PixelSelector &selector,
 				if (prevHeader & _BORDER_RIGHT) {
 					if (prevHeader & _HIERARCHY_DECREASE)
 						--hierarchyLevel;
-				} else //Every right border in a region should be signed. Do so now.
+				} else // Every right border in a region should be signed. Do so now.
 					_readBorder(rin, selector, runsMap, x, y, true, dummyReader);
 			}
 
@@ -148,7 +149,7 @@ void readBorders(const TRasterPT<Pixel> &rin, const PixelSelector &selector,
 					_readBorder(rin, selector, runsMap, x, y, false, reader);
 				}
 			} else {
-				if (!(selector.transparent(*pix))) //External transparent region - do not extract
+				if (!(selector.transparent(*pix))) // External transparent region - do not extract
 				{
 					++hierarchyLevel;
 					if (!(nextHeader & _BORDER_LEFT))
@@ -156,7 +157,7 @@ void readBorders(const TRasterPT<Pixel> &rin, const PixelSelector &selector,
 				}
 			}
 
-			//Increment variables
+			// Increment variables
 			x += runsMap->runLength(x, y), pix = lineStart + x, run = runsStart + x;
 			prevHeader = (run - 1)->value;
 		}
@@ -178,15 +179,18 @@ void readBorders(const TRasterPT<Pixel> &rin, const PixelSelector &selector,
 //    New Mesh Extraction procedure
 //*********************************************************************************************************
 
-enum { _PROCESSED = 0x1,
-	   _HIERARCHY_UP = 0x2,
-	   _HIERARCHY_DN = 0x4,
-	   _PROCESSED_AND_HIERARCHY_UP = (_PROCESSED | _HIERARCHY_UP) };
+enum {
+	_PROCESSED = 0x1,
+	_HIERARCHY_UP = 0x2,
+	_HIERARCHY_DN = 0x4,
+	_PROCESSED_AND_HIERARCHY_UP = (_PROCESSED | _HIERARCHY_UP)
+};
 
 //-------------------------------------------------------------------
 
 template <typename RasterEdgeIter>
-inline bool _isVertex(const RasterEdgeIter &it, const typename RasterEdgeIter::value_type &oldOtherColor)
+inline bool _isVertex(const RasterEdgeIter &it,
+					  const typename RasterEdgeIter::value_type &oldOtherColor)
 {
 	return (it.otherColor() != oldOtherColor) ||
 		   (it.turn() == it.adherence() && (!(it.turn() & RasterEdgeIter::AMBIGUOUS)) &&
@@ -195,12 +199,14 @@ inline bool _isVertex(const RasterEdgeIter &it, const typename RasterEdgeIter::v
 
 //-------------------------------------------------------------------
 
-inline size_t _pointHash(const TPoint &point) { return point.x ^ point.y; }
+inline size_t _pointHash(const TPoint &point)
+{
+	return point.x ^ point.y;
+}
 
 //-------------------------------------------------------------------
 
-template <typename RasterEdgeIter>
-struct _ExternalEdgeSigner {
+template <typename RasterEdgeIter> struct _ExternalEdgeSigner {
 	static inline void signAndIncrement(RunsMapP &runsMap, RasterEdgeIter &it)
 	{
 		if (it.dir().y > 0) {
@@ -226,8 +232,7 @@ struct _ExternalEdgeSigner {
 
 //-------------------------------------------------------------------
 
-template <typename RasterEdgeIter>
-struct _InternalEdgeSigner {
+template <typename RasterEdgeIter> struct _InternalEdgeSigner {
 	static inline void signAndIncrement(RunsMapP &runsMap, RasterEdgeIter &it)
 	{
 		if (it.dir().y) {
@@ -249,8 +254,8 @@ struct _InternalEdgeSigner {
 //-------------------------------------------------------------------
 
 template <typename RasterEdgeIter, typename Mesh, typename ContainersReader, typename EdgeSigner>
-int _readEdge(RasterEdgeIter &it, const RasterEdgeIter &end, RunsMapP runsMap,
-			  int &vIdx, Mesh &mesh, tcg::hash<TPoint, int> &pointsHash, ContainersReader &reader)
+int _readEdge(RasterEdgeIter &it, const RasterEdgeIter &end, RunsMapP runsMap, int &vIdx,
+			  Mesh &mesh, tcg::hash<TPoint, int> &pointsHash, ContainersReader &reader)
 {
 	typedef tcg::container_reader_traits<ContainersReader, typename Mesh::edge_type> edge_output;
 
@@ -270,10 +275,16 @@ int _readEdge(RasterEdgeIter &it, const RasterEdgeIter &end, RunsMapP runsMap,
 
 	// Identify the newly found vertex. If it's a brand new one, add it
 	tcg::hash<TPoint, int>::iterator ht = pointsHash.find(it.pos());
-	vIdx = (ht == pointsHash.end()) ? pointsHash[it.pos()] = mesh.addVertex(typename Mesh::vertex_type(it.pos())) : ht.m_idx;
+	vIdx = (ht == pointsHash.end())
+			   ? pointsHash[it.pos()] = mesh.addVertex(typename Mesh::vertex_type(it.pos()))
+			   : ht.m_idx;
 
 	ed.addVertex(vIdx);
-	ed.direction(1) = (it.turn() == RasterEdgeIter::STRAIGHT) ? -it.dir() : (it.turn() == RasterEdgeIter::LEFT) ? tcg::point_ops::ortLeft(it.dir()) : tcg::point_ops::ortRight(it.dir());
+	ed.direction(1) = (it.turn() == RasterEdgeIter::STRAIGHT)
+						  ? -it.dir()
+						  : (it.turn() == RasterEdgeIter::LEFT)
+								? tcg::point_ops::ortLeft(it.dir())
+								: tcg::point_ops::ortRight(it.dir());
 
 	int eIdx = mesh.addEdge(ed);
 	edge_output::closeContainer(reader, &mesh, eIdx);
@@ -305,7 +316,8 @@ void _readMeshes(const RasterEdgeIter &begin, RunsMapP &runsMap, ContainersReade
 			assert((pix->value & _PROCESSED) && (pix->value & _HIERARCHY_UP));
 
 			do {
-				// Iterate through the line. Extract a mesh each time an unprocessed raster edge is found.
+				// Iterate through the line. Extract a mesh each time an unprocessed raster edge is
+				// found.
 				if (!(pix->value & _PROCESSED)) {
 					assert(hierarchyLevel == 1);
 
@@ -336,9 +348,8 @@ void _readMeshes(const RasterEdgeIter &begin, RunsMapP &runsMap, ContainersReade
 //-------------------------------------------------------------------
 
 template <typename RasterEdgeIter, typename Mesh, typename ContainersReader>
-void _readBorder(const RasterEdgeIter &begin, RunsMapP runsMap,
-				 int vIdx, Mesh &mesh, tcg::hash<TPoint, int> &pointsHash,
-				 ContainersReader &reader)
+void _readBorder(const RasterEdgeIter &begin, RunsMapP runsMap, int vIdx, Mesh &mesh,
+				 tcg::hash<TPoint, int> &pointsHash, ContainersReader &reader)
 {
 	typedef typename Mesh::face_type face_type;
 	typedef typename Mesh::edge_type edge_type;
@@ -370,8 +381,9 @@ void _readBorder(const RasterEdgeIter &begin, RunsMapP runsMap,
 
 		if (e == edgesCount) {
 			// In case the edge was not found, it needs to be extracted now.
-			eIdx = _readEdge<RasterEdgeIter, Mesh, ContainersReader, _InternalEdgeSigner<RasterEdgeIter>>(
-				it, begin, runsMap, vIdx, mesh, pointsHash, reader);
+			eIdx = _readEdge<RasterEdgeIter, Mesh, ContainersReader,
+							 _InternalEdgeSigner<RasterEdgeIter>>(it, begin, runsMap, vIdx, mesh,
+																  pointsHash, reader);
 		} else {
 			// The edge was already extracted. We just need to update the iterator then.
 			const edge_type &ed = mesh.edge(eIdx);
@@ -404,8 +416,8 @@ void _readBorder(const RasterEdgeIter &begin, RunsMapP runsMap,
 
 template <typename PixelSelector, typename Mesh, typename ContainersReader>
 void _readMesh(const TRasterPT<typename PixelSelector::pixel_type> &rin,
-			   const PixelSelector &selector, RunsMapP &runsMap, int x, int y,
-			   Mesh &mesh, ContainersReader &reader)
+			   const PixelSelector &selector, RunsMapP &runsMap, int x, int y, Mesh &mesh,
+			   ContainersReader &reader)
 {
 	typedef typename Mesh::vertex_type vertex_type;
 	typedef typename Mesh::edge_type edge_type;
@@ -429,8 +441,9 @@ void _readMesh(const TRasterPT<typename PixelSelector::pixel_type> &rin,
 	// The outer edges are extracted first in clockwise orientation.
 	begin = it;
 	do {
-		_readEdge<raster_edge_iterator, Mesh, ContainersReader, _ExternalEdgeSigner<raster_edge_iterator>>(
-			it, begin, runsMap, vIdx, mesh, pointsHash, reader);
+		_readEdge<raster_edge_iterator, Mesh, ContainersReader,
+				  _ExternalEdgeSigner<raster_edge_iterator>>(it, begin, runsMap, vIdx, mesh,
+															 pointsHash, reader);
 
 	} while (it != begin);
 
@@ -466,8 +479,8 @@ void _readMesh(const TRasterPT<typename PixelSelector::pixel_type> &rin,
 //---------------------------------------------------------------------------------------------
 
 template <typename PixelSelector, typename Mesh, typename ContainersReader>
-void readMeshes(const TRasterPT<typename PixelSelector::pixel_type> &rin, const PixelSelector &selector,
-				ContainersReader &reader, RunsMapP *rasterRunsMap)
+void readMeshes(const TRasterPT<typename PixelSelector::pixel_type> &rin,
+				const PixelSelector &selector, ContainersReader &reader, RunsMapP *rasterRunsMap)
 {
 	typedef typename PixelSelector::pixel_type pixel_type;
 	typedef TRasterPT<pixel_type> RasterTypeP;
@@ -523,7 +536,7 @@ void readMeshes(const TRasterPT<typename PixelSelector::pixel_type> &rin, const 
 				face_output::addElement(reader, meshPtr);
 			}
 
-			//Increment variables
+			// Increment variables
 			x += runsMap->runLength(x, y), pix = lineStart + x, run = runsStart + x;
 			prevHeader = (run - 1)->value;
 		}
@@ -536,6 +549,6 @@ void readMeshes(const TRasterPT<typename PixelSelector::pixel_type> &rin, const 
 	runsMap->unlock();
 }
 }
-} //namespace TRop::borders
+} // namespace TRop::borders
 
-#endif //BORDERS_EXTRACTOR_HPP
+#endif // BORDERS_EXTRACTOR_HPP

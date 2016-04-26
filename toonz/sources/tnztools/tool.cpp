@@ -75,7 +75,7 @@ class ToolSelector
 {
 	std::string m_toolName;
 
-public:
+  public:
 	ToolSelector(std::string toolName) : m_toolName(toolName) {}
 
 	void selectTool()
@@ -117,7 +117,8 @@ bool TTool::m_isFrameCreated = false;
 // brutto brutto. fix quick & dirty del baco #6213 (undo con animation sheet)
 // bisogna ripensare la logica degli undo e del touchImage
 // m_cellsData viene inizializzato nel touchImage() in modalita' animation sheet
-// contiene una o due terne che rappresentano range di celle (dell'xsheet) modificate dall'inserimento
+// contiene una o due terne che rappresentano range di celle (dell'xsheet) modificate
+// dall'inserimento
 // di un nuovo frame: [r0,r1,type].
 // type = 0 : vecchio (cella[r0-1]) => nuovo
 // type = 1 : vuoto => vecchio (cella[r0-1])
@@ -131,7 +132,8 @@ std::vector<int> TTool::m_cellsData;
 //*****************************************************************************************
 
 TTool::TTool(std::string name)
-	: m_name(name), m_viewer(0), m_targetType(NoTarget), m_enabled(true), m_active(false), m_picking(false)
+	: m_name(name), m_viewer(0), m_targetType(NoTarget), m_enabled(true), m_active(false),
+	  m_picking(false)
 {
 }
 
@@ -170,8 +172,9 @@ void TTool::bind(int targetType)
 		toolTable->insert(std::make_pair(std::make_pair(name, MeshImage), &theDummyTool));
 
 		ToolSelector *toolSelector = new ToolSelector(name);
-		CommandManager::instance()->setHandler(name.c_str(),
-											   new CommandHandlerHelper<ToolSelector>(toolSelector, &ToolSelector::selectTool));
+		CommandManager::instance()->setHandler(
+			name.c_str(),
+			new CommandHandlerHelper<ToolSelector>(toolSelector, &ToolSelector::selectTool));
 	}
 
 	if (targetType & ToonzImage)
@@ -317,12 +320,14 @@ TImage *TTool::touchImage()
 			// current cell is not empty
 			if (isAutoCreateEnabled && animationSheetEnabled && row > 0 &&
 				xsh->getCell(row - 1, col) == xsh->getCell(row, col)) {
-				// animationSheet is enabled and the current cell is a "hold". We must create a new drawing.
+				// animationSheet is enabled and the current cell is a "hold". We must create a new
+				// drawing.
 				// measure the hold length (starting from the current row) : r0-r1
 				int r0 = row, r1 = row;
 				while (xsh->getCell(r1 + 1, col) == cell)
 					r1++;
-				// find the proper frameid (possibly addisng suffix, in order to avoid a fid already used)
+				// find the proper frameid (possibly addisng suffix, in order to avoid a fid already
+				// used)
 				TFrameId fid = getNewFrameId(sl, row);
 				// create the new drawing
 				TImageP img = sl->createEmptyFrame();
@@ -355,7 +360,8 @@ TImage *TTool::touchImage()
 		xsh->getCellRange(col, r0, r1);
 
 		if (animationSheetEnabled && r0 <= r1) {
-			// animation sheet enabled and not empty column. We must create a new drawing in the column level and possibly add "holds"
+			// animation sheet enabled and not empty column. We must create a new drawing in the
+			// column level and possibly add "holds"
 
 			// find the last not-empty cell before the current one (a) and the first after (b)
 			int a = row - 1, b = row + 1;
@@ -373,10 +379,12 @@ TImage *TTool::touchImage()
 			}
 			if (sl) {
 				// note: sl should be always !=0 (the column is not empty)
-				// if - for some reason - it is ==0 then we skip to the standard (i.e. !animationSheetEnabled) beahviour
+				// if - for some reason - it is ==0 then we skip to the standard (i.e.
+				// !animationSheetEnabled) beahviour
 
 				// create the drawing
-				// find the proper frameid (possibly addisng suffix, in order to avoid a fid already used)
+				// find the proper frameid (possibly addisng suffix, in order to avoid a fid already
+				// used)
 				TFrameId fid = getNewFrameId(sl, row);
 				// create the new drawing
 				TImageP img = sl->createEmptyFrame();
@@ -428,7 +436,8 @@ TImage *TTool::touchImage()
 		if (row > 0 && xsh->getCell(row - 1, col).getSimpleLevel() != 0 && !animationSheetEnabled) {
 			sl = xsh->getCell(row - 1, col).getSimpleLevel();
 			if (sl->getType() != OVL_XSHLEVEL || sl->getPath().getFrame() != TFrameId::NO_FRAME) {
-				// la cella precedente contiene un drawing di un livello. animationSheet e' disabilitato
+				// la cella precedente contiene un drawing di un livello. animationSheet e'
+				// disabilitato
 				// creo un nuovo frame
 				currentLevel->setLevel(sl);
 				if (sl->isSubsequence() || sl->isReadOnly())
@@ -446,7 +455,8 @@ TImage *TTool::touchImage()
 			}
 		}
 
-		// animation sheet disabled or empty column. autoCreate is enabled: we must create a new level
+		// animation sheet disabled or empty column. autoCreate is enabled: we must create a new
+		// level
 		int levelType = pref->getDefLevelType();
 		TXshLevel *xl = scene->createNewLevel(levelType);
 		sl = xl->getSimpleLevel();
@@ -493,7 +503,8 @@ void TTool::invalidate(const TRectD &rect)
 			TXshSimpleLevel *sl = getApplication()->getCurrentLevel()->getSimpleLevel();
 			if (sl)
 				dpiScale = getCurrentDpiScale(sl, getCurrentFid());
-			m_viewer->GLInvalidateRect(getCurrentColumnMatrix() * TScale(dpiScale.x, dpiScale.y) * rect);
+			m_viewer->GLInvalidateRect(getCurrentColumnMatrix() * TScale(dpiScale.x, dpiScale.y) *
+									   rect);
 		}
 	}
 }
@@ -560,8 +571,8 @@ TTool::Application *TTool::getApplication()
 //-----------------------------------------------------------------------------
 
 /*! Notify change of current image: update icon and notify level change.
-    If current object is a spline commit spline chenged.
-    If current mode is EditingLevel touch current frame.
+	If current object is a spline commit spline chenged.
+	If current mode is EditingLevel touch current frame.
 */
 void TTool::notifyImageChanged()
 {
@@ -666,9 +677,7 @@ TFrameId TTool::getCurrentFid() const
 
 	int row = m_application->getCurrentFrame()->getFrame();
 	int col = m_application->getCurrentColumn()->getColumnIndex();
-	TXshCell cell = m_application->getCurrentXsheet()
-						->getXsheet()
-						->getCell(row, col);
+	TXshCell cell = m_application->getCurrentXsheet()->getXsheet()->getCell(row, col);
 	if (cell.isEmpty())
 		return TFrameId::NO_FRAME;
 
@@ -741,11 +750,8 @@ TAffine TTool::getColumnMatrix(int columnIndex) const
 
 	TStageObject *object = xsh->getStageObject(columnId);
 	TAffine placement;
-	TStageObject::perspective(
-		placement,
-		cameraPlacement, cameraZ,
-		columnPlacement, columnZ,
-		object->getGlobalNoScaleZ());
+	TStageObject::perspective(placement, cameraPlacement, cameraZ, columnPlacement, columnZ,
+							  object->getGlobalNoScaleZ());
 
 	return placement;
 }
@@ -774,11 +780,7 @@ TAffine TTool::getCurrentObjectParentMatrix2() const
 	double cameraZ = camera->getZ(frame);
 
 	TAffine placement;
-	TStageObject::perspective(
-		placement,
-		cameraPlacement, cameraZ,
-		objPlacement, objZ,
-		0);
+	TStageObject::perspective(placement, cameraPlacement, cameraZ, objPlacement, objZ, 0);
 	return placement;
 }
 
@@ -862,17 +864,20 @@ QString TTool::updateEnabled()
 		if (toolType == TTool::ColumnTool) {
 			// Check column target
 			if (column->getLevelColumn() && !(targetType & LevelColumns))
-				return (enable(false), QObject::tr("The current tool cannot be used on a Level column."));
+				return (enable(false),
+						QObject::tr("The current tool cannot be used on a Level column."));
 
 			if (column->getMeshColumn() && !(targetType & MeshColumns))
-				return (enable(false), QObject::tr("The current tool cannot be used on a Mesh column."));
+				return (enable(false),
+						QObject::tr("The current tool cannot be used on a Mesh column."));
 		}
 	}
 
 	// Check column tools
 	if (toolType == TTool::ColumnTool) {
 		if (filmstrip)
-			return (enable(false), QObject::tr("The current tool cannot be used in Level Strip mode."));
+			return (enable(false),
+					QObject::tr("The current tool cannot be used in Level Strip mode."));
 
 		if ((!column || column->isEmpty()) && !(targetType & TTool::EmptyTarget))
 			return (enable(false), QString());
@@ -882,30 +887,40 @@ QString TTool::updateEnabled()
 	if (toolType & TTool::LevelTool) {
 		// Check against splines
 		if (spline) {
-			return (targetType & Splines) ? (enable(true), QString()) : (enable(false), QObject::tr("The current tool cannot be used to edit a motion path."));
+			return (targetType & Splines)
+					   ? (enable(true), QString())
+					   : (enable(false),
+						  QObject::tr("The current tool cannot be used to edit a motion path."));
 		}
 
 		// Check against empty levels
 		if (!xl)
-			return (targetType & EmptyTarget) ? (enable(true), QString()) : (enable(false), QString());
+			return (targetType & EmptyTarget) ? (enable(true), QString())
+											  : (enable(false), QString());
 
 		// Check against simple-level-edness
 		if (!sl)
-			return (enable(false), QObject::tr("The current level is not editable.")); // Does it happen at all btw?
+			return (
+				enable(false),
+				QObject::tr("The current level is not editable.")); // Does it happen at all btw?
 
 		// Check against level types
 		{
 			if ((levelType == PLI_XSHLEVEL) && !(targetType & VectorImage))
-				return (enable(false), QObject::tr("The current tool cannot be used on a Vector Level."));
+				return (enable(false),
+						QObject::tr("The current tool cannot be used on a Vector Level."));
 
 			if ((levelType == TZP_XSHLEVEL) && !(targetType & ToonzImage))
-				return (enable(false), QObject::tr("The current tool cannot be used on a Toonz Level."));
+				return (enable(false),
+						QObject::tr("The current tool cannot be used on a Toonz Level."));
 
 			if ((levelType == OVL_XSHLEVEL) && !(targetType & RasterImage))
-				return (enable(false), QObject::tr("The current tool cannot be used on a Raster Level."));
+				return (enable(false),
+						QObject::tr("The current tool cannot be used on a Raster Level."));
 
 			if ((levelType == MESH_XSHLEVEL) && !(targetType & MeshImage))
-				return (enable(false), QObject::tr("The current tool cannot be used on a Mesh Level."));
+				return (enable(false),
+						QObject::tr("The current tool cannot be used on a Mesh Level."));
 		}
 
 		// Check against impossibly traceable movements on the column
@@ -913,9 +928,12 @@ QString TTool::updateEnabled()
 			// Test for Mesh-deformed levels
 			const TStageObjectId &parentId = obj->getParent();
 			if (parentId.isColumn() && obj->getParentHandle()[0] != 'H') {
-				TXshSimpleLevel *parentSl = xsh->getCell(rowIndex, parentId.getIndex()).getSimpleLevel();
+				TXshSimpleLevel *parentSl =
+					xsh->getCell(rowIndex, parentId.getIndex()).getSimpleLevel();
 				if (parentSl && parentSl->getType() == MESH_XSHLEVEL)
-					return (enable(false), QObject::tr("The current tool cannot be used on a mesh-deformed level"));
+					return (
+						enable(false),
+						QObject::tr("The current tool cannot be used on a mesh-deformed level"));
 			}
 		}
 
@@ -927,12 +945,14 @@ QString TTool::updateEnabled()
 				TFrameId currentFid = getCurrentFid();
 
 				if (editableFrames.find(currentFid) == editableFrames.end())
-					return (enable(false), QObject::tr("The current frame is locked: any editing is forbidden."));
+					return (enable(false),
+							QObject::tr("The current frame is locked: any editing is forbidden."));
 			}
 
 			// Check level type write support
 			if (sl->getPath().getType() == "psd" || // We don't have the API to write psd files
-				sl->is16BitChannelLevel() ||		// Inherited by previous implementation. Could be fixed?
+				sl->is16BitChannelLevel() || // Inherited by previous implementation. Could be
+											 // fixed?
 				sl->getProperties()->getBpp() == 1) // Black & White images. Again, could be fixed?
 
 				return (enable(false), QObject::tr("The current level is not editable."));

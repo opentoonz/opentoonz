@@ -16,9 +16,7 @@
 
 //-----------------------------------------------------------------------------
 
-TAffine getDpiAffine(TXshSimpleLevel *level,
-					 const TFrameId &fid,
-					 bool forceFullSampling)
+TAffine getDpiAffine(TXshSimpleLevel *level, const TFrameId &fid, bool forceFullSampling)
 {
 	const double factor = Stage::inch;
 
@@ -73,7 +71,8 @@ TAffine getDpiAffine(TCamera *camera)
 TPointD getCurrentDpiScale(TXshSimpleLevel *sl, const TFrameId &fid)
 {
 	TAffine aff = getDpiAffine(sl, fid);
-	if ((sl->getType() == TZP_XSHLEVEL || sl->getType() == OVL_XSHLEVEL) && sl->getProperties()->getSubsampling() > 1) {
+	if ((sl->getType() == TZP_XSHLEVEL || sl->getType() == OVL_XSHLEVEL) &&
+		sl->getProperties()->getSubsampling() > 1) {
 		int subs = sl->getProperties()->getSubsampling();
 		TImageP img = TImageCache::instance()->get(sl->getImageId(fid), false);
 		TToonzImageP ti(img);

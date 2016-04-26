@@ -19,14 +19,13 @@ TMsgCore *TMsgCore::instance()
 
 //----------------------------------
 
-TMsgCore::TMsgCore()
-	: m_tcpServer(0), m_clientSocket(0)
+TMsgCore::TMsgCore() : m_tcpServer(0), m_clientSocket(0)
 {
 }
 
 //----------------------------------
 
-void TMsgCore::OnNewConnection() //server side
+void TMsgCore::OnNewConnection() // server side
 {
 	QTcpSocket *socket;
 	if (m_tcpServer)
@@ -43,9 +42,9 @@ void TMsgCore::OnNewConnection() //server side
 
 #define TMSG_PORT 10545
 
-bool TMsgCore::openConnection() //server side
+bool TMsgCore::openConnection() // server side
 {
-	//QHostAddress host = (remoteConnection) ? QHostAddress::AnyQHostAddress::LocalHost : ;
+	// QHostAddress host = (remoteConnection) ? QHostAddress::AnyQHostAddress::LocalHost : ;
 
 	if (m_tcpServer != 0 && m_tcpServer->serverAddress() == QHostAddress::Any)
 		return true;
@@ -54,8 +53,11 @@ bool TMsgCore::openConnection() //server side
 
 	m_tcpServer = new QTcpServer();
 	bool ret = connect(m_tcpServer, SIGNAL(newConnection()), SLOT(OnNewConnection()));
-	//bool listen = m_tcpServer->listen(QString("tmsg")+QString::number(QCoreApplication::applicationPid()));
-	bool listen = m_tcpServer->listen(QHostAddress::Any, TMSG_PORT); //QString("tmsg")+QString::number(QCoreApplication::applicationPid()));
+	// bool listen =
+	// m_tcpServer->listen(QString("tmsg")+QString::number(QCoreApplication::applicationPid()));
+	bool listen = m_tcpServer->listen(
+		QHostAddress::Any,
+		TMSG_PORT); // QString("tmsg")+QString::number(QCoreApplication::applicationPid()));
 	if (!listen) {
 		QString err = m_tcpServer->errorString();
 	}
@@ -66,16 +68,16 @@ bool TMsgCore::openConnection() //server side
 
 //---------------------------
 
-QString TMsgCore::getConnectionName() //server side
+QString TMsgCore::getConnectionName() // server side
 {
 	assert(m_tcpServer);
-	QString serverName = "pippo"; //m_tcpServer->serverName();
+	QString serverName = "pippo"; // m_tcpServer->serverName();
 	return serverName;
 }
 
 //-----------------------------------------------------------------------
 
-void TMsgCore::OnDisconnected() //server side
+void TMsgCore::OnDisconnected() // server side
 {
 	std::set<QTcpSocket *>::iterator it = m_sockets.begin();
 	while (it != m_sockets.end()) {
@@ -85,17 +87,18 @@ void TMsgCore::OnDisconnected() //server side
 			it++;
 	}
 
-	//if (m_socketIn)
-	//delete m_socketIn;
-	//m_socketIn = 0;
+	// if (m_socketIn)
+	// delete m_socketIn;
+	// m_socketIn = 0;
 }
 
 //------------------------------------------------------------------
 
-void TMsgCore::OnReadyRead() //server side
+void TMsgCore::OnReadyRead() // server side
 {
 	std::set<QTcpSocket *>::iterator it = m_sockets.begin();
-	for (; it != m_sockets.end(); it++) //devo scorrerli tutti perche' non so da quale socket viene il messaggio...
+	for (; it != m_sockets.end();
+		 it++) // devo scorrerli tutti perche' non so da quale socket viene il messaggio...
 	{
 		if ((*it)->state() == QTcpSocket::ConnectedState && (*it)->bytesAvailable() > 0)
 			break;
@@ -108,7 +111,7 @@ void TMsgCore::OnReadyRead() //server side
 
 //-------------------------------------------------
 
-void TMsgCore::readFromSocket(QTcpSocket *socket) //server side
+void TMsgCore::readFromSocket(QTcpSocket *socket) // server side
 {
 	static char data[1024];
 	static QString prevMessage;
@@ -138,7 +141,7 @@ void TMsgCore::readFromSocket(QTcpSocket *socket) //server side
 
 	for (int i = 0; i < messages.size(); i++) {
 		QString str = messages.at(i).simplified();
-		str.chop(4); //rimuovo i "#END" alla fine
+		str.chop(4); // rimuovo i "#END" alla fine
 		if (str.startsWith("ERROR"))
 			DVGui::error(str.right(str.size() - 5));
 		else if (str.startsWith("WARNING"))
@@ -154,9 +157,9 @@ void TMsgCore::readFromSocket(QTcpSocket *socket) //server side
 
 TMsgCore::~TMsgCore()
 {
-	if (m_tcpServer == 0 && m_clientSocket != 0) //client side
+	if (m_tcpServer == 0 && m_clientSocket != 0) // client side
 	{
-		//m_socketIn->waitForBytesWritten (-1);
+		// m_socketIn->waitForBytesWritten (-1);
 		//   m_clientSocket->disconnectFromServer();
 		// m_clientSocket->waitForDisconnected();
 		delete m_clientSocket;
@@ -166,13 +169,16 @@ TMsgCore::~TMsgCore()
 
 //----------------------------------
 
-bool TMsgCore::send(DVGui::MsgType type, const QString &message) //client side
+bool TMsgCore::send(DVGui::MsgType type, const QString &message) // client side
 {
 	if (receivers(SIGNAL(sendMessage(int, const QString &))) == 0) {
 		if (m_clientSocket == 0 || m_clientSocket->state() != QTcpSocket::ConnectedState)
 			return false;
 
-		QString socketMessage = (type == DVGui::CRITICAL ? "#TMSG ERROR " : (type == DVGui::WARNING ? "#TMSG WARNING " : "#TMSG INFO ")) + message + " #END\n";
+		QString socketMessage =
+			(type == DVGui::CRITICAL ? "#TMSG ERROR " : (type == DVGui::WARNING ? "#TMSG WARNING "
+																				: "#TMSG INFO ")) +
+			message + " #END\n";
 
 #if QT_VERSION >= 0x050000
 		m_clientSocket->write(socketMessage.toLatin1());
@@ -180,7 +186,7 @@ bool TMsgCore::send(DVGui::MsgType type, const QString &message) //client side
 		m_clientSocket->write(socketMessage.toAscii());
 #endif
 		m_clientSocket->flush();
-		//m_clientSocket->waitForBytesWritten (1000);
+		// m_clientSocket->waitForBytesWritten (1000);
 	} else
 		Q_EMIT sendMessage(type, message);
 
@@ -189,15 +195,16 @@ bool TMsgCore::send(DVGui::MsgType type, const QString &message) //client side
 
 //-------------------------------------------------------------------
 
-void TMsgCore::connectTo(const QString &address) //client side
+void TMsgCore::connectTo(const QString &address) // client side
 {
 	m_clientSocket = new QTcpSocket();
-	m_clientSocket->connectToHost(address == "" ? QHostAddress::LocalHost : QHostAddress(address), TMSG_PORT);
-	//m_clientSocket->connectToServer (connectionName, QIODevice::ReadWrite | QIODevice::Text);
+	m_clientSocket->connectToHost(address == "" ? QHostAddress::LocalHost : QHostAddress(address),
+								  TMSG_PORT);
+	// m_clientSocket->connectToServer (connectionName, QIODevice::ReadWrite | QIODevice::Text);
 	bool ret = m_clientSocket->waitForConnected(1000);
 	if (!ret) {
 		// std::cout << "cannot connect to "<< address.toStdString() << std::endl;
-		//std::cout << "error "<< m_clientSocket->errorString().toStdString() << std::endl;
+		// std::cout << "error "<< m_clientSocket->errorString().toStdString() << std::endl;
 		int err = m_clientSocket->error();
 	}
 }

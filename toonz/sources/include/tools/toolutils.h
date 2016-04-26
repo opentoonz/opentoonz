@@ -72,7 +72,8 @@ const double PickRadius = 1.5;
 
 //-----------------------------------------------------------------------------
 
-void DVAPI drawRect(const TRectD &rect, const TPixel32 &color, unsigned short stipple, bool doContrast = false);
+void DVAPI drawRect(const TRectD &rect, const TPixel32 &color, unsigned short stipple,
+					bool doContrast = false);
 
 //-----------------------------------------------------------------------------
 
@@ -117,25 +118,18 @@ TRaster32P convertStrokeToImage(TStroke *stroke, const TRect &imageBounds, TPoin
 
 //-----------------------------------------------------------------------------
 
-void drawBalloon(
-	const TPointD &pos,	// position "pointed" by the balloon (world units)
-	std::string text,	  // balloon text
-	const TPixel32 &color, // ballon background color (text is black)
-	TPoint delta,		   // text position (pixels; pos is the origin; y grows upward)
-	bool isPicking = false,
-	std::vector<TRectD> *otherBalloons = 0); // avoid other balloons positions; add the new ballons positions
+void drawBalloon(const TPointD &pos,	// position "pointed" by the balloon (world units)
+				 std::string text,		// balloon text
+				 const TPixel32 &color, // ballon background color (text is black)
+				 TPoint delta,			// text position (pixels; pos is the origin; y grows upward)
+				 bool isPicking = false,
+				 std::vector<TRectD> *otherBalloons =
+					 0); // avoid other balloons positions; add the new ballons positions
 
 //-----------------------------------------------------------------------------
 
-enum HookType { NormalHook,
-				PassHookA,
-				PassHookB,
-				OtherLevelHook };
-void drawHook(
-	const TPointD &p,
-	HookType type,
-	bool highlighted = false,
-	bool onionSkin = false);
+enum HookType { NormalHook, PassHookA, PassHookB, OtherLevelHook };
+void drawHook(const TPointD &p, HookType type, bool highlighted = false, bool onionSkin = false);
 
 //-----------------------------------------------------------------------------
 
@@ -145,7 +139,7 @@ TStroke *merge(const ArrayOfStroke &a);
 
 class DVAPI TToolUndo : public TUndo
 {
-protected:
+  protected:
 	TXshSimpleLevelP m_level;
 	TFrameId m_frameId;
 	int m_row, m_col;
@@ -153,7 +147,8 @@ protected:
 	bool m_createdFrame;
 	bool m_createdLevel;
 	bool m_animationSheetEnabled;
-	std::vector<int> m_cellsData; // represent original frame range when m_animationSheetEnabled, m_createdFrame and !m_isEditingLevel; see tool.cpp
+	std::vector<int> m_cellsData; // represent original frame range when m_animationSheetEnabled,
+								  // m_createdFrame and !m_isEditingLevel; see tool.cpp
 	TPaletteP m_oldPalette;
 	std::string m_imageId;
 	static int m_idCount;
@@ -163,15 +158,12 @@ protected:
 
 	void notifyImageChanged() const;
 
-public:
-	TToolUndo(TXshSimpleLevel *level, const TFrameId &frameId,
-			  bool createdFrame = false, bool createdLevel = false, const TPaletteP &oldPalette = 0);
+  public:
+	TToolUndo(TXshSimpleLevel *level, const TFrameId &frameId, bool createdFrame = false,
+			  bool createdLevel = false, const TPaletteP &oldPalette = 0);
 	~TToolUndo();
 
-	virtual QString getToolName()
-	{
-		return QString("Tool");
-	}
+	virtual QString getToolName() { return QString("Tool"); }
 	virtual QString getHistoryString()
 	{
 		return QObject::tr("%1   Level : %2  Frame : %3")
@@ -186,23 +178,21 @@ public:
 class DVAPI TRasterUndo : public TToolUndo
 {
 
-protected:
+  protected:
 	TTileSetCM32 *m_tiles;
 
 	TToonzImageP getImage() const;
 
-public:
+  public:
 	TRasterUndo(TTileSetCM32 *tiles, TXshSimpleLevel *level, const TFrameId &frameId,
-				bool createdFrame, bool createdLevel, const TPaletteP &oldPalette); //get tiles ownership
+				bool createdFrame, bool createdLevel,
+				const TPaletteP &oldPalette); // get tiles ownership
 	~TRasterUndo();
 
 	int getSize() const;
 	void undo() const;
 
-	virtual QString getToolName()
-	{
-		return QString("Raster Tool");
-	}
+	virtual QString getToolName() { return QString("Raster Tool"); }
 };
 
 //================================================================================================
@@ -210,20 +200,21 @@ public:
 class DVAPI TFullColorRasterUndo : public TToolUndo
 {
 
-protected:
+  protected:
 	TTileSetFullColor *m_tiles;
 
 	TRasterImageP getImage() const;
 
-public:
+  public:
 	TFullColorRasterUndo(TTileSetFullColor *tiles, TXshSimpleLevel *level, const TFrameId &frameId,
-						 bool createdFrame, bool createdLevel, const TPaletteP &oldPalette); //get tiles ownership
+						 bool createdFrame, bool createdLevel,
+						 const TPaletteP &oldPalette); // get tiles ownership
 	~TFullColorRasterUndo();
 
 	int getSize() const;
 	void undo() const;
 
-private:
+  private:
 	std::vector<TRect> paste(const TRasterImageP &ti, const TTileSetFullColor *tileSet) const;
 };
 
@@ -237,7 +228,7 @@ class UndoModifyStroke : public TToolUndo
 	int m_row;
 	int m_column;
 
-public:
+  public:
 	int m_strokeIndex;
 
 	UndoModifyStroke(TXshSimpleLevel *level, const TFrameId &frameId, int strokeIndex);
@@ -257,7 +248,7 @@ class UndoModifyStrokeAndPaint : public UndoModifyStroke
 	std::vector<TFilledRegionInf> *m_fillInformation;
 	TRectD m_oldBBox;
 
-public:
+  public:
 	UndoModifyStrokeAndPaint(TXshSimpleLevel *level, const TFrameId &frameId, int strokeIndex);
 
 	~UndoModifyStrokeAndPaint();
@@ -266,10 +257,7 @@ public:
 	void undo() const;
 	int getSize() const;
 
-	QString getToolName()
-	{
-		return QObject::tr("Modify Stroke Tool");
-	}
+	QString getToolName() { return QObject::tr("Modify Stroke Tool"); }
 };
 
 //-----------------------------------------------------------------------------
@@ -282,8 +270,9 @@ class UndoModifyListStroke : public TToolUndo
 	std::vector<TFilledRegionInf> *m_fillInformation;
 	TRectD m_oldBBox;
 
-public:
-	UndoModifyListStroke(TXshSimpleLevel *level, const TFrameId &frameId, const std::vector<TStroke *> &strokeList);
+  public:
+	UndoModifyListStroke(TXshSimpleLevel *level, const TFrameId &frameId,
+						 const std::vector<TStroke *> &strokeList);
 
 	~UndoModifyListStroke();
 
@@ -292,10 +281,7 @@ public:
 	void redo() const;
 	int getSize() const;
 
-	QString getToolName()
-	{
-		return QObject::tr("Modify Stroke Tool");
-	}
+	QString getToolName() { return QObject::tr("Modify Stroke Tool"); }
 };
 
 //-----------------------------------------------------------------------------
@@ -309,40 +295,34 @@ class UndoPencil : public TToolUndo
 	bool m_autogroup;
 	bool m_autofill;
 
-public:
-	UndoPencil(TStroke *stroke, std::vector<TFilledRegionInf> *fillInformation, TXshSimpleLevel *level,
-			   const TFrameId &frameId, bool m_createdFrame, bool m_createdLevel,
-			   bool autogroup = false, bool autofill = false);
+  public:
+	UndoPencil(TStroke *stroke, std::vector<TFilledRegionInf> *fillInformation,
+			   TXshSimpleLevel *level, const TFrameId &frameId, bool m_createdFrame,
+			   bool m_createdLevel, bool autogroup = false, bool autofill = false);
 	~UndoPencil();
 	void undo() const;
 	void redo() const;
 	int getSize() const;
 
-	QString getToolName()
-	{
-		return QString("Vector Brush Tool");
-	}
-	int getHistoryType()
-	{
-		return HistoryType::BrushTool;
-	}
+	QString getToolName() { return QString("Vector Brush Tool"); }
+	int getHistoryType() { return HistoryType::BrushTool; }
 };
 
 //-----------------------------------------------------------------------------
 /*--  Hardness=100 又は Pencilモード のときのGeometricToolのUndo --*/
 class UndoRasterPencil : public TRasterUndo
 {
-protected:
+  protected:
 	TStroke *m_stroke;
 	bool m_selective, m_filled, m_doAntialias;
 
 	/*-- HistoryにPrimitive名を表示するため --*/
 	std::string m_primitiveName;
 
-public:
+  public:
 	UndoRasterPencil(TXshSimpleLevel *level, const TFrameId &frameId, TStroke *stroke,
-					 bool selective, bool filled, bool doAntialias, bool createdFrame, bool createdLevel,
-					 std::string primitiveName);
+					 bool selective, bool filled, bool doAntialias, bool createdFrame,
+					 bool createdLevel, std::string primitiveName);
 	~UndoRasterPencil();
 	virtual void redo() const;
 	int getSize() const;
@@ -351,35 +331,26 @@ public:
 	{
 		return QString("Geometric Tool : %1").arg(QString::fromStdString(m_primitiveName));
 	}
-	int getHistoryType()
-	{
-		return HistoryType::GeometricTool;
-	}
+	int getHistoryType() { return HistoryType::GeometricTool; }
 };
 
 //-----------------------------------------------------------------------------
 
 class UndoFullColorPencil : public TFullColorRasterUndo
 {
-protected:
+  protected:
 	TStroke *m_stroke;
 	double m_opacity;
 	bool m_doAntialias;
 
-public:
-	UndoFullColorPencil(TXshSimpleLevel *level, const TFrameId &frameId, TStroke *stroke, double opacity,
-						bool doAntialias, bool createdFrame, bool createdLevel);
+  public:
+	UndoFullColorPencil(TXshSimpleLevel *level, const TFrameId &frameId, TStroke *stroke,
+						double opacity, bool doAntialias, bool createdFrame, bool createdLevel);
 	~UndoFullColorPencil();
 	virtual void redo() const;
 	int getSize() const;
-	QString getToolName()
-	{
-		return QString("Geometric Tool");
-	}
-	int getHistoryType()
-	{
-		return HistoryType::GeometricTool;
-	}
+	QString getToolName() { return QString("Geometric Tool"); }
+	int getHistoryType() { return HistoryType::GeometricTool; }
 };
 
 //-----------------------------------------------------------------------------
@@ -392,24 +363,18 @@ class UndoPath : public TUndo
 	TStageObjectSpline *m_spline;
 	std::vector<TThickPoint> m_before, m_after;
 	bool m_selfLoopBefore;
-	//TStroke *m_before;
-	//TStroke *m_after;
+	// TStroke *m_before;
+	// TStroke *m_after;
 
-public:
+  public:
 	UndoPath(TStageObjectSpline *spline);
 	~UndoPath();
 	void onAdd();
 	void undo() const;
 	void redo() const;
 	int getSize() const;
-	QString getHistoryString()
-	{
-		return QObject::tr("Modify Spline");
-	}
-	int getHistoryType()
-	{
-		return HistoryType::ControlPointEditorTool;
-	}
+	QString getHistoryString() { return QObject::tr("Modify Spline"); }
+	int getHistoryType() { return HistoryType::ControlPointEditorTool; }
 };
 
 //-----------------------------------------------------------------------------
@@ -425,7 +390,7 @@ class UndoControlPointEditor : public TToolUndo
 	int m_row;
 	int m_column;
 
-public:
+  public:
 	UndoControlPointEditor(TXshSimpleLevel *level, const TFrameId &frameId);
 	~UndoControlPointEditor();
 
@@ -439,16 +404,11 @@ public:
 
 	int getSize() const
 	{
-		return sizeof(*this) + /*(m_oldFillInformation.capacity()+m_newFillInformation.capacity())*sizeof(TFilledRegionInf) +*/ 500;
+		return sizeof(*this) +
+			   /*(m_oldFillInformation.capacity()+m_newFillInformation.capacity())*sizeof(TFilledRegionInf) +*/ 500;
 	}
-	virtual QString getToolName()
-	{
-		return QString("Control Point Editor");
-	}
-	int getHistoryType()
-	{
-		return HistoryType::ControlPointEditorTool;
-	}
+	virtual QString getToolName() { return QString("Control Point Editor"); }
+	int getHistoryType() { return HistoryType::ControlPointEditorTool; }
 };
 
 //-----------------------------------------------------------------------------
@@ -458,11 +418,11 @@ public:
 
 class DragMenu : public QMenu
 {
-public:
+  public:
 	DragMenu();
 	QAction *exec(const QPoint &p, QAction *action = 0);
 
-protected:
+  protected:
 	void mouseReleaseEvent(QMouseEvent *e);
 };
 
@@ -473,7 +433,7 @@ protected:
 
 class ColumChooserMenu : public DragMenu
 {
-public:
+  public:
 	ColumChooserMenu(TXsheet *xsh, const std::vector<int> &columnIndexes);
 	int execute();
 };
@@ -484,12 +444,10 @@ class ConeSubVolume
 {
 	const static double m_values[21];
 
-public:
-	ConeSubVolume()
-	{
-	}
+  public:
+	ConeSubVolume() {}
 
-	//calcola il sottovolume di un cono di raggio e volume unitario in base
+	// calcola il sottovolume di un cono di raggio e volume unitario in base
 	static double compute(double cover);
 };
 
@@ -499,11 +457,11 @@ public:
 TFrameId DVAPI getFrameId();
 
 /*
-    The following functions set the specified (or current) level frame as edited (ie to be saved),
-    and, in the colormap case, update the associated savebox.
+	The following functions set the specified (or current) level frame as edited (ie to be saved),
+	and, in the colormap case, update the associated savebox.
 
-    The 'Minimize Savebox after Editing' preference is used to determine if the savebox has to be
-    shrunk to the image's bounding box or include the previous savebox.
+	The 'Minimize Savebox after Editing' preference is used to determine if the savebox has to be
+	shrunk to the image's bounding box or include the previous savebox.
   */
 
 void DVAPI updateSaveBox(const TXshSimpleLevelP &sl, const TFrameId &fid);
@@ -514,16 +472,15 @@ bool DVAPI isJustCreatedSpline(TImage *image);
 
 TRectD DVAPI interpolateRect(const TRectD &rect1, const TRectD &rect2, double t);
 
-//bool DVAPI isASubRegion(int reg, const vector<TRegion*> &regions);
+// bool DVAPI isASubRegion(int reg, const vector<TRegion*> &regions);
 
-//!Returns a TRectD that contains all points in \b points
-//!If \b maxThickness is not zero, the TRectD is computed using this value.
+//! Returns a TRectD that contains all points in \b points
+//! If \b maxThickness is not zero, the TRectD is computed using this value.
 TRectD DVAPI getBounds(const std::vector<TThickPoint> &points, double maxThickness = 0);
 
-//!Ritorna un raster uguale a quello dato ma ruotato di 90 gradi
-//!Il parametro toRight indica se si sta ruotando a destra o a sinistra!
-template <typename PIXEL>
-TRasterPT<PIXEL> rotate90(const TRasterPT<PIXEL> &ras, bool toRight)
+//! Ritorna un raster uguale a quello dato ma ruotato di 90 gradi
+//! Il parametro toRight indica se si sta ruotando a destra o a sinistra!
+template <typename PIXEL> TRasterPT<PIXEL> rotate90(const TRasterPT<PIXEL> &ras, bool toRight)
 {
 	if (!ras)
 		return TRasterPT<PIXEL>(0);

@@ -29,12 +29,13 @@ class DVAPI TXshLevelHandle : public QObject
 
 	TXshLevel *m_level;
 
-public:
+  public:
 	TXshLevelHandle();
 	~TXshLevelHandle();
 
 	TXshLevel *getLevel() const;
-	TXshSimpleLevel *getSimpleLevel() const; // helper function: getLevel()->getSimpleLevel(), controllando che getLevel() !=0
+	TXshSimpleLevel *getSimpleLevel()
+		const; // helper function: getLevel()->getSimpleLevel(), controllando che getLevel() !=0
 
 	void setLevel(TXshLevel *level);
 
@@ -43,7 +44,7 @@ public:
 	void notifyLevelTitleChange() { emit xshLevelTitleChanged(); }
 	void notifyCanvasSizeChange() { emit xshCanvasSizeChanged(); }
 
-signals:
+  signals:
 	void xshLevelSwitched(TXshLevel *oldLevel);
 	void xshLevelChanged();
 	void xshLevelViewChanged();

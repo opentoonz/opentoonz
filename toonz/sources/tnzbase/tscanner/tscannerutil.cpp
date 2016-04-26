@@ -4,10 +4,10 @@
 
 #include <cstring>
 
-#define BUFBYTE(X, Y, BUF, BYTEWRAP, BITOFFS) \
+#define BUFBYTE(X, Y, BUF, BYTEWRAP, BITOFFS)                                                      \
 	(((UCHAR *)(BUF))[(((X) + (BITOFFS)) >> 3) + (Y) * (BYTEWRAP)])
 
-#define GET_BIT(X, Y, BUF, BYTEWRAP, BITOFFS) \
+#define GET_BIT(X, Y, BUF, BYTEWRAP, BITOFFS)                                                      \
 	((BUFBYTE(X, Y, BUF, BYTEWRAP, BITOFFS) >> (7 - (((X) + (BITOFFS)) & 7))) & (UCHAR)1)
 
 namespace TScannerUtil
@@ -19,8 +19,7 @@ struct EP {
 
 //-----------------------------------------------------------------------------
 
-void copyRGBBufferToTRaster32(unsigned char *rgbBuffer,
-							  int rgbLx, int rgbLy,
+void copyRGBBufferToTRaster32(unsigned char *rgbBuffer, int rgbLx, int rgbLy,
 							  const TRaster32P &rout, bool internal)
 {
 	if (internal) {
@@ -78,8 +77,7 @@ void copyRGBBufferToTRasterGR8(unsigned char *rgbBuffer, int rgbLx, int rgbLy, i
 
 //-----------------------------------------------------------------------------
 
-void copyGR8BufferToTRasterGR8(unsigned char *gr8Buffer,
-							   int rgbLx, int rgbLy,
+void copyGR8BufferToTRasterGR8(unsigned char *gr8Buffer, int rgbLx, int rgbLy,
 							   const TRasterGR8P &rout, bool internal)
 {
 	if (internal) {
@@ -103,8 +101,7 @@ void copyGR8BufferToTRasterGR8(unsigned char *gr8Buffer,
 
 //-----------------------------------------------------------------------------
 
-void copyGR8BufferToTRasterBW(unsigned char *gr8Buffer,
-							  int rgbLx, int rgbLy,
+void copyGR8BufferToTRasterBW(unsigned char *gr8Buffer, int rgbLx, int rgbLy,
 							  const TRasterGR8P &rout, bool internal, float thres)
 {
 	if (internal) {
@@ -131,8 +128,7 @@ void copyGR8BufferToTRasterBW(unsigned char *gr8Buffer,
 
 //-----------------------------------------------------------------------------
 
-void copyBWBufferToTRasterGR8(const unsigned char *buffer,
-							  int rgbLx, int rgbLy,
+void copyBWBufferToTRasterGR8(const unsigned char *buffer, int rgbLx, int rgbLy,
 							  const TRasterGR8P &rout, bool isBW, bool internal)
 {
 	if (0)
@@ -213,7 +209,7 @@ void copy90BWBufferToRasGR8(unsigned char *bwBuffer, int bwLx, int bwLy, int bwW
 
 	bufin = bwBuffer;
 	bytewrapin = (bwWrap + 7) >> 3;
-	bitoffsin = 0; //rin->bit_offs;
+	bitoffsin = 0; // rin->bit_offs;
 	bufout = rout->getRawData();
 	wrapout = rout->getWrap();
 

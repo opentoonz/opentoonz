@@ -5,9 +5,12 @@
 #include "toonz/rasterbrush.h"
 #include "trop.h"
 
-RasterStrokeGenerator::RasterStrokeGenerator(const TRasterCM32P &raster, Tasks task, ColorType colorType,
-											 int styleId, const TThickPoint &p, bool selective, int selectedStyle, bool keepAntialias)
-	: m_raster(raster), m_boxOfRaster(TRect(raster->getSize())), m_styleId(styleId), m_selective(selective), m_task(task), m_colorType(colorType), m_eraseStyle(4095), m_selectedStyle(selectedStyle), m_keepAntiAlias(keepAntialias), m_doAnArc(false)
+RasterStrokeGenerator::RasterStrokeGenerator(const TRasterCM32P &raster, Tasks task,
+											 ColorType colorType, int styleId, const TThickPoint &p,
+											 bool selective, int selectedStyle, bool keepAntialias)
+	: m_raster(raster), m_boxOfRaster(TRect(raster->getSize())), m_styleId(styleId),
+	  m_selective(selective), m_task(task), m_colorType(colorType), m_eraseStyle(4095),
+	  m_selectedStyle(selectedStyle), m_keepAntiAlias(keepAntialias), m_doAnArc(false)
 {
 	TThickPoint pp = p;
 	m_points.push_back(pp);
@@ -34,18 +37,18 @@ bool RasterStrokeGenerator::add(const TThickPoint &p)
 
 //-----------------------------------------------------------
 
-//Disegna il tratto interamente
+// Disegna il tratto interamente
 void RasterStrokeGenerator::generateStroke(bool isPencil) const
 {
 	std::vector<TThickPoint> points(m_points);
 	int size = points.size();
-	//Prende un buffer trasparente di appoggio
+	// Prende un buffer trasparente di appoggio
 	TRect box = getBBox(points);
 	TPoint newOrigin = box.getP00();
 	TRasterCM32P rasBuffer(box.getSize());
 	rasBuffer->clear();
 
-	//Trasla i punti secondo il nuovo sitema di riferimento
+	// Trasla i punti secondo il nuovo sitema di riferimento
 	translatePoints(points, newOrigin);
 
 	std::vector<TThickPoint> partialPoints;
@@ -120,7 +123,7 @@ TRect RasterStrokeGenerator::generateLastPieceOfStroke(bool isPencil, bool close
 	TRasterCM32P rasBuffer(box.getSize());
 	rasBuffer->clear();
 
-	//Trasla i punti secondo il nuovo sitema di riferimento
+	// Trasla i punti secondo il nuovo sitema di riferimento
 	translatePoints(points, newOrigin);
 
 	rasterBrush(rasBuffer, points, m_styleId, !isPencil);
@@ -130,7 +133,8 @@ TRect RasterStrokeGenerator::generateLastPieceOfStroke(bool isPencil, bool close
 
 //-----------------------------------------------------------
 
-//Ritorna il rettangolo contenente i dischi generati con centri in "points" e diametro "points.thick" +3 pixel a bordo
+// Ritorna il rettangolo contenente i dischi generati con centri in "points" e diametro
+// "points.thick" +3 pixel a bordo
 TRect RasterStrokeGenerator::getBBox(const std::vector<TThickPoint> &points) const
 {
 	double x0 = (std::numeric_limits<double>::max)(), y0 = (std::numeric_limits<double>::max)(),
@@ -146,13 +150,15 @@ TRect RasterStrokeGenerator::getBBox(const std::vector<TThickPoint> &points) con
 		if (points[i].y + radius > y1)
 			y1 = points[i].y + radius;
 	}
-	return TRect(TPoint((int)floor(x0 - 3), (int)floor(y0 - 3)), TPoint((int)ceil(x1 + 3), (int)ceil(y1 + 3)));
+	return TRect(TPoint((int)floor(x0 - 3), (int)floor(y0 - 3)),
+				 TPoint((int)ceil(x1 + 3), (int)ceil(y1 + 3)));
 }
 
 //-----------------------------------------------------------
 
-//Ricalcola i punti in un nuovo sistema di riferimento
-void RasterStrokeGenerator::translatePoints(std::vector<TThickPoint> &points, const TPoint &newOrigin) const
+// Ricalcola i punti in un nuovo sistema di riferimento
+void RasterStrokeGenerator::translatePoints(std::vector<TThickPoint> &points,
+											const TPoint &newOrigin) const
 {
 	TPointD p(newOrigin.x, newOrigin.y);
 	for (int i = 0; i < (int)points.size(); i++)
@@ -161,8 +167,9 @@ void RasterStrokeGenerator::translatePoints(std::vector<TThickPoint> &points, co
 
 //-----------------------------------------------------------
 
-//Effettua la over.
-void RasterStrokeGenerator::placeOver(const TRasterCM32P &out, const TRasterCM32P &in, const TPoint &p) const
+// Effettua la over.
+void RasterStrokeGenerator::placeOver(const TRasterCM32P &out, const TRasterCM32P &in,
+									  const TPoint &p) const
 {
 	TRect inBox = in->getBounds() + p;
 	TRect outBox = out->getBounds();
@@ -199,25 +206,35 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out, const TRasterCM32
 			if (m_task == ERASE) {
 				if (m_colorType == INK) {
 					if (!m_keepAntiAlias) {
-						if (inPix->getTone() == 0 && (!m_selective || (m_selective && outPix->getInk() == m_selectedStyle))) {
+						if (inPix->getTone() == 0 &&
+							(!m_selective ||
+							 (m_selective && outPix->getInk() == m_selectedStyle))) {
 							outPix->setTone(255);
 						}
-					} else if (inPix->getTone() < 255 && (!m_selective || (m_selective && outPix->getInk() == m_selectedStyle))) {
+					} else if (inPix->getTone() < 255 &&
+							   (!m_selective ||
+								(m_selective && outPix->getInk() == m_selectedStyle))) {
 						outPix->setTone(tmax(outPix->getTone(), 255 - inPix->getTone()));
 					}
 				}
 				if (m_colorType == PAINT) {
-					if (inPix->getTone() == 0 && (!m_selective || (m_selective && outPix->getPaint() == m_selectedStyle)))
+					if (inPix->getTone() == 0 &&
+						(!m_selective || (m_selective && outPix->getPaint() == m_selectedStyle)))
 						outPix->setPaint(0);
 				}
 				if (m_colorType == INKNPAINT) {
-					if (inPix->getTone() < 255 && (!m_selective || (m_selective && outPix->getPaint() == m_selectedStyle)))
+					if (inPix->getTone() < 255 &&
+						(!m_selective || (m_selective && outPix->getPaint() == m_selectedStyle)))
 						outPix->setPaint(0);
 					if (!m_keepAntiAlias) {
-						if (inPix->getTone() == 0 && (!m_selective || (m_selective && outPix->getInk() == m_selectedStyle))) {
+						if (inPix->getTone() == 0 &&
+							(!m_selective ||
+							 (m_selective && outPix->getInk() == m_selectedStyle))) {
 							outPix->setTone(255);
 						}
-					} else if (inPix->getTone() < 255 && (!m_selective || (m_selective && outPix->getInk() == m_selectedStyle))) {
+					} else if (inPix->getTone() < 255 &&
+							   (!m_selective ||
+								(m_selective && outPix->getInk() == m_selectedStyle))) {
 						outPix->setTone(tmax(outPix->getTone(), 255 - inPix->getTone()));
 					}
 				}
@@ -231,7 +248,9 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out, const TRasterCM32
 					if (changePaint)
 						*outPix = TPixelCM32(outPix->getInk(), inPix->getInk(), outPix->getTone());
 				if (m_colorType == INKNPAINT)
-					*outPix = TPixelCM32(inPix->getInk(), changePaint ? inPix->getInk() : outPix->getPaint(), outPix->getTone());
+					*outPix = TPixelCM32(inPix->getInk(),
+										 changePaint ? inPix->getInk() : outPix->getPaint(),
+										 outPix->getTone());
 			}
 
 			/*-- Finger tool --*/
@@ -278,7 +297,9 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out, const TRasterCM32
 					/*-- 4近傍のピクセルについて --*/
 					int maxTone = tone;
 					for (int p = 0; p < 4; p++) {
-						/*-- Ink＃がCurrentでない、または、自分Pixelより線が薄い（Toneが高い）ものを集計する --*/
+						/*--
+						 * Ink＃がCurrentでない、または、自分Pixelより線が薄い（Toneが高い）ものを集計する
+						 * --*/
 						if (neighbourPixels[p]->getInk() != inkId) {
 							count++;
 							maxTone = 255;

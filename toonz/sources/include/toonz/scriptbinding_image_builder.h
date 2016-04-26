@@ -16,7 +16,7 @@ class DVAPI Transform : public Wrapper
 	Q_OBJECT
 	TAffine m_affine;
 
-public:
+  public:
 	Transform();
 	Transform(const TAffine &aff);
 
@@ -41,7 +41,7 @@ class DVAPI ImageBuilder : public Wrapper
 
 	QString add(const TImageP &img, const TAffine &aff);
 
-public:
+  public:
 	ImageBuilder();
 	~ImageBuilder();
 

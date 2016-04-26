@@ -67,11 +67,8 @@ FunctionSegmentPage::~FunctionSegmentPage()
 
 class FunctionEmptySegmentPage : public FunctionSegmentPage
 {
-public:
-	FunctionEmptySegmentPage(FunctionSegmentViewer *parent = 0)
-		: FunctionSegmentPage(parent)
-	{
-	}
+  public:
+	FunctionEmptySegmentPage(FunctionSegmentViewer *parent = 0) : FunctionSegmentPage(parent) {}
 
 	void refresh() {}
 	void apply() {}
@@ -98,7 +95,8 @@ SpeedInOutSegmentPage::SpeedInOutSegmentPage(FunctionSegmentViewer *parent)
 	mainLayout->setVerticalSpacing(5);
 	mainLayout->setMargin(2);
 	{
-		mainLayout->addWidget(new QLabel(tr("First Speed:")), 0, 0, Qt::AlignRight | Qt::AlignVCenter);
+		mainLayout->addWidget(new QLabel(tr("First Speed:")), 0, 0,
+							  Qt::AlignRight | Qt::AlignVCenter);
 		mainLayout->addWidget(m_firstSpeedFld, 0, 1, 1, 2);
 
 		mainLayout->addWidget(new QLabel(tr("Handle:")), 1, 0, Qt::AlignRight | Qt::AlignVCenter);
@@ -106,7 +104,8 @@ SpeedInOutSegmentPage::SpeedInOutSegmentPage(FunctionSegmentViewer *parent)
 		mainLayout->addWidget(new QLabel(tr("/")), 1, 2);
 		mainLayout->addWidget(m_speed0xFld, 1, 3);
 
-		mainLayout->addWidget(new QLabel(tr("Last Speed:")), 2, 0, Qt::AlignRight | Qt::AlignVCenter);
+		mainLayout->addWidget(new QLabel(tr("Last Speed:")), 2, 0,
+							  Qt::AlignRight | Qt::AlignVCenter);
 		mainLayout->addWidget(m_lastSpeedFld, 2, 1, 1, 2);
 
 		mainLayout->addWidget(new QLabel(tr("Handle:")), 3, 0, Qt::AlignRight | Qt::AlignVCenter);
@@ -120,13 +119,19 @@ SpeedInOutSegmentPage::SpeedInOutSegmentPage(FunctionSegmentViewer *parent)
 	mainLayout->setColumnStretch(3, 1);
 	setLayout(mainLayout);
 
-	bool ret = connect(m_speed0xFld, SIGNAL(editingFinished()), this, SLOT(onFirstHandleXChanged()));
-	ret = ret && connect(m_speed0yFld, SIGNAL(editingFinished()), this, SLOT(onFirstHandleYChanged()));
-	ret = ret && connect(m_firstSpeedFld, SIGNAL(editingFinished()), this, SLOT(onFirstSpeedChanged()));
+	bool ret =
+		connect(m_speed0xFld, SIGNAL(editingFinished()), this, SLOT(onFirstHandleXChanged()));
+	ret = ret &&
+		  connect(m_speed0yFld, SIGNAL(editingFinished()), this, SLOT(onFirstHandleYChanged()));
+	ret = ret &&
+		  connect(m_firstSpeedFld, SIGNAL(editingFinished()), this, SLOT(onFirstSpeedChanged()));
 
-	ret = ret && connect(m_speed1xFld, SIGNAL(editingFinished()), this, SLOT(onLastHandleXChanged()));
-	ret = ret && connect(m_speed1yFld, SIGNAL(editingFinished()), this, SLOT(onLastHandleYChanged()));
-	ret = ret && connect(m_lastSpeedFld, SIGNAL(editingFinished()), this, SLOT(onLastSpeedChanged()));
+	ret =
+		ret && connect(m_speed1xFld, SIGNAL(editingFinished()), this, SLOT(onLastHandleXChanged()));
+	ret =
+		ret && connect(m_speed1yFld, SIGNAL(editingFinished()), this, SLOT(onLastHandleYChanged()));
+	ret =
+		ret && connect(m_lastSpeedFld, SIGNAL(editingFinished()), this, SLOT(onLastSpeedChanged()));
 
 	assert(ret);
 }
@@ -211,7 +216,8 @@ void SpeedInOutSegmentPage::onLastHandleXChanged()
 		 Speedを保持してハンドルの長さを変える。 ---*/
 	int segmentIndex = getViewer()->getSegmentIndex();
 	TDoubleParam *curve = getCurve();
-	if (curve && curve->getKeyframeCount() >= 3 && segmentIndex < curve->getKeyframeCount() - 2) /*--- 後のSegmentが存在している条件 ---*/
+	if (curve && curve->getKeyframeCount() >= 3 &&
+		segmentIndex < curve->getKeyframeCount() - 2) /*--- 後のSegmentが存在している条件 ---*/
 	{
 		TDoubleKeyframe kf = getCurve()->getKeyframe(segmentIndex + 1);
 		/*--- Linkしていて、SpeedIn/Outでない場合の条件 ---*/
@@ -238,7 +244,8 @@ void SpeedInOutSegmentPage::onLastHandleYChanged()
 	Speedを保持してハンドルの長さを変える。 ---*/
 	int segmentIndex = getViewer()->getSegmentIndex();
 	TDoubleParam *curve = getCurve();
-	if (curve && curve->getKeyframeCount() >= 3 && segmentIndex < curve->getKeyframeCount() - 2) /*--- 後のSegmentが存在している条件 ---*/
+	if (curve && curve->getKeyframeCount() >= 3 &&
+		segmentIndex < curve->getKeyframeCount() - 2) /*--- 後のSegmentが存在している条件 ---*/
 	{
 		TDoubleKeyframe kf = getCurve()->getKeyframe(segmentIndex + 1);
 		/*--- Linkしていて、SpeedIn/Outでない場合の条件 ---*/
@@ -310,14 +317,17 @@ void SpeedInOutSegmentPage::refresh()
 
 	/*--- キーフレームがリンク、かつ隣がSpeedIn/Outでないとき、
 		Speed入力BoxをDisableする。それ以外の場合はEnableする ---*/
-	//PrevKey
-	if (kIndex > 0 && curve->getKeyframe(kIndex).m_linkedHandles && curve->getKeyframe(kIndex).m_prevType != TDoubleKeyframe::SpeedInOut)
+	// PrevKey
+	if (kIndex > 0 && curve->getKeyframe(kIndex).m_linkedHandles &&
+		curve->getKeyframe(kIndex).m_prevType != TDoubleKeyframe::SpeedInOut)
 		m_firstSpeedFld->setEnabled(false);
 	else
 		m_firstSpeedFld->setEnabled(true);
 
-	//NextKey
-	if (curve->getKeyframeCount() >= 3 && kIndex < curve->getKeyframeCount() - 2 && curve->getKeyframe(kIndex + 1).m_linkedHandles && curve->getKeyframe(kIndex + 1).m_type != TDoubleKeyframe::SpeedInOut)
+	// NextKey
+	if (curve->getKeyframeCount() >= 3 && kIndex < curve->getKeyframeCount() - 2 &&
+		curve->getKeyframe(kIndex + 1).m_linkedHandles &&
+		curve->getKeyframe(kIndex + 1).m_type != TDoubleKeyframe::SpeedInOut)
 		m_lastSpeedFld->setEnabled(false);
 	else
 		m_lastSpeedFld->setEnabled(true);
@@ -360,7 +370,8 @@ void SpeedInOutSegmentPage::getGuiValues(TPointD &speedIn, TPointD &speedOut)
 //=============================================================================
 
 EaseInOutSegmentPage::EaseInOutSegmentPage(bool isPercentage, FunctionSegmentViewer *parent)
-	: FunctionSegmentPage(parent), m_fieldScale(isPercentage ? 100.0 : 1.0), m_isPercentage(isPercentage)
+	: FunctionSegmentPage(parent), m_fieldScale(isPercentage ? 100.0 : 1.0),
+	  m_isPercentage(isPercentage)
 {
 	std::string measureName = isPercentage ? "percentage" : "";
 
@@ -618,7 +629,7 @@ void FunctionExpressionSegmentPage::apply()
 	setter.setUnitName(unitName);
 
 	/*
-  
+
   TDoubleKeyframe kf0 = curve->getKeyframeAt(getR0());
   kf0.m_expressionText = m_expressionFld->getExpression();
   kf0.m_unitName = m_unitFld->text().toStdString();
@@ -628,29 +639,28 @@ void FunctionExpressionSegmentPage::apply()
   TMeasure *curveMeasure = curve->getMeasure();
   if(curveMeasure)
   {
-    TUnit *unit = curveMeasure->getUnit(unitExtension);
-    if(unit)
-      curveMeasure->setCurrentUnit(unit);
-    else
-    {
-      unitExtension = curveMeasure->getCurrentUnit()->getDefaultExtension();
-      m_unitFld->setText(QString::fromStdWString(unitExtension));
-    }
+	TUnit *unit = curveMeasure->getUnit(unitExtension);
+	if(unit)
+	  curveMeasure->setCurrentUnit(unit);
+	else
+	{
+	  unitExtension = curveMeasure->getCurrentUnit()->getDefaultExtension();
+	  m_unitFld->setText(QString::fromStdWString(unitExtension));
+	}
   }
   else
-    m_unitFld->setText("");
+	m_unitFld->setText("");
 */
 }
 
 //-----------------------------------------------------------------------------
 /*! return false if a circular reference is occured
 */
-bool FunctionExpressionSegmentPage::getGuiValues(std::string &expressionText,
-												 std::string &unitName)
+bool FunctionExpressionSegmentPage::getGuiValues(std::string &expressionText, std::string &unitName)
 {
 	expressionText = m_expressionFld->getExpression();
 
-	//checking a circular reference
+	// checking a circular reference
 	TDoubleParam *curve = getCurve();
 	TExpression expr;
 	expr.setGrammar(curve->getGrammar());
@@ -676,7 +686,7 @@ class FileSegmentPage : public FunctionSegmentPage
 	LineEdit *m_fieldIndexFld;
 	LineEdit *m_measureFld;
 
-public:
+  public:
 	FileSegmentPage(FunctionSegmentViewer *parent = 0) : FunctionSegmentPage(parent)
 	{
 		m_fileFld = new DVGui::FileField(this);
@@ -705,9 +715,11 @@ public:
 			bottomLay->setSpacing(5);
 			bottomLay->setMargin(0);
 			{
-				bottomLay->addWidget(new QLabel(tr("Column:")), 0, 0, Qt::AlignRight | Qt::AlignVCenter);
+				bottomLay->addWidget(new QLabel(tr("Column:")), 0, 0,
+									 Qt::AlignRight | Qt::AlignVCenter);
 				bottomLay->addWidget(m_fieldIndexFld, 0, 1);
-				bottomLay->addWidget(new QLabel(tr("Unit:")), 1, 0, Qt::AlignRight | Qt::AlignVCenter);
+				bottomLay->addWidget(new QLabel(tr("Unit:")), 1, 0,
+									 Qt::AlignRight | Qt::AlignVCenter);
 				bottomLay->addWidget(m_measureFld, 1, 1);
 			}
 			bottomLay->setColumnStretch(0, 0);
@@ -895,8 +907,7 @@ void SimilarShapeSegmentPage::apply()
 	setter.setSimilarShape(m_expressionFld->getExpression(), m_offsetFld->text().toDouble());
 }
 
-void SimilarShapeSegmentPage::getGuiValues(std::string &expressionText,
-										   double &similarShapeOffset)
+void SimilarShapeSegmentPage::getGuiValues(std::string &expressionText, double &similarShapeOffset)
 {
 	expressionText = m_expressionFld->getExpression();
 	similarShapeOffset = m_offsetFld->text().toDouble();
@@ -904,7 +915,8 @@ void SimilarShapeSegmentPage::getGuiValues(std::string &expressionText,
 
 //=============================================================================
 
-FunctionSegmentViewer::FunctionSegmentViewer(QWidget *parent, FunctionSheet *sheet, FunctionPanel *panel)
+FunctionSegmentViewer::FunctionSegmentViewer(QWidget *parent, FunctionSheet *sheet,
+											 FunctionPanel *panel)
 	: QFrame(parent), m_curve(0), m_r0(0), m_r1(0), m_sheet(sheet), m_xshHandle(0), m_panel(panel)
 {
 	setObjectName("FunctionSegmentViewer");
@@ -958,7 +970,7 @@ FunctionSegmentViewer::FunctionSegmentViewer(QWidget *parent, FunctionSheet *she
 		m_parametersPanel->addWidget(m_pages[i]);
 	m_parametersPanel->setCurrentIndex(0);
 
-	//buttons
+	// buttons
 	QPushButton *applyButton = new QPushButton(tr("Apply"), this);
 	m_prevCurveButton = new QPushButton(this);
 	m_nextCurveButton = new QPushButton(this);
@@ -1058,13 +1070,19 @@ FunctionSegmentViewer::FunctionSegmentViewer(QWidget *parent, FunctionSheet *she
 
 	//---- signal-slot connections
 	bool ret = true;
-	ret = ret && connect(m_typeCombo, SIGNAL(currentIndexChanged(int)), m_parametersPanel, SLOT(setCurrentIndex(int)));
-	ret = ret && connect(m_typeCombo, SIGNAL(activated(int)), this, SLOT(onSegmentTypeChanged(int)));
+	ret = ret && connect(m_typeCombo, SIGNAL(currentIndexChanged(int)), m_parametersPanel,
+						 SLOT(setCurrentIndex(int)));
+	ret =
+		ret && connect(m_typeCombo, SIGNAL(activated(int)), this, SLOT(onSegmentTypeChanged(int)));
 	ret = ret && connect(applyButton, SIGNAL(clicked()), this, SLOT(onApplyButtonPressed()));
-	ret = ret && connect(m_prevCurveButton, SIGNAL(clicked()), this, SLOT(onPrevCurveButtonPressed()));
-	ret = ret && connect(m_nextCurveButton, SIGNAL(clicked()), this, SLOT(onNextCurveButtonPressed()));
-	ret = ret && connect(m_prevLinkButton, SIGNAL(clicked()), this, SLOT(onPrevLinkButtonPressed()));
-	ret = ret && connect(m_nextLinkButton, SIGNAL(clicked()), this, SLOT(onNextLinkButtonPressed()));
+	ret = ret &&
+		  connect(m_prevCurveButton, SIGNAL(clicked()), this, SLOT(onPrevCurveButtonPressed()));
+	ret = ret &&
+		  connect(m_nextCurveButton, SIGNAL(clicked()), this, SLOT(onNextCurveButtonPressed()));
+	ret =
+		ret && connect(m_prevLinkButton, SIGNAL(clicked()), this, SLOT(onPrevLinkButtonPressed()));
+	ret =
+		ret && connect(m_nextLinkButton, SIGNAL(clicked()), this, SLOT(onNextLinkButtonPressed()));
 	assert(ret);
 
 	m_sheet = sheet;
@@ -1140,8 +1158,7 @@ void FunctionSegmentViewer::setSegmentByFrame(TDoubleParam *curve, int frame)
 void FunctionSegmentViewer::refresh()
 {
 	if (m_sheet->isVisible()) {
-		m_paramNameLabel->setText(
-			m_sheet->getSelectedParamName());
+		m_paramNameLabel->setText(m_sheet->getSelectedParamName());
 		if (m_sheet->getSelectedParamName().isEmpty()) {
 			m_curve = 0;
 			m_segmentIndex = -1;
@@ -1181,7 +1198,7 @@ void FunctionSegmentViewer::refresh()
 		m_stepFld->setText(QString::number(kf.m_step));
 
 		/*--- 前後のキーフレームの表示を更新 ---*/
-		//Prev
+		// Prev
 		if (m_segmentIndex != 0) {
 			TDoubleKeyframe prevKf = m_curve->getKeyframe(m_segmentIndex - 1);
 			m_prevCurveButton->setEnabled(true);
@@ -1189,7 +1206,7 @@ void FunctionSegmentViewer::refresh()
 			m_prevCurveButton->setText(tr("< ") + typeToString(prevKf.m_type));
 			m_prevLinkButton->setChecked(kf.m_linkedHandles);
 		}
-		//Next
+		// Next
 		if (m_curve->getKeyframeCount() - 2 != m_segmentIndex) {
 			TDoubleKeyframe nextKf = m_curve->getKeyframe(m_segmentIndex + 1);
 			m_nextCurveButton->setEnabled(true);
@@ -1261,7 +1278,9 @@ void FunctionSegmentViewer::refresh()
 						int endFrame;
 						if (m_xshHandle) {
 							endFrame = m_xshHandle->getXsheet()->getFrameCount();
-							/*--- xsheetに何もLevelがないとき,又は選択フレームがXsheetをはみだしているとき ---*/
+							/*---
+							 * xsheetに何もLevelがないとき,又は選択フレームがXsheetをはみだしているとき
+							 * ---*/
 							if (endFrame == 0 || s0 + 1 >= endFrame)
 								endFrame = s0 + 16;
 						} else {
@@ -1313,7 +1332,7 @@ bool FunctionSegmentViewer::segmentIsValid() const
 {
 	return m_curve && 0 <= m_segmentIndex && m_segmentIndex + 1 < m_curve->getKeyframeCount();
 }
-/*---- 
+/*----
  すでにカーブがあり元のTypeの場合→本来の値に更新（refresh）
  EaseIn/Out⇔EaseIn/Out(％)→値を変換
  その他→各ページのイニシャライズ(ExpressionはGrammerを入れる)
@@ -1346,7 +1365,8 @@ void FunctionSegmentViewer::onApplyButtonPressed()
 	/*--- パラメータの現状を取得 ---*/
 	int fromFrame = m_fromFld->text().toInt() - 1;
 	int toFrame = m_toFld->text().toInt() - 1;
-	TDoubleKeyframe::Type comboType = (TDoubleKeyframe::Type)indexToType(m_typeCombo->currentIndex());
+	TDoubleKeyframe::Type comboType =
+		(TDoubleKeyframe::Type)indexToType(m_typeCombo->currentIndex());
 	int step = m_stepFld->text().toInt();
 
 	TPointD speedIn(0, 0);
@@ -1362,13 +1382,15 @@ void FunctionSegmentViewer::onApplyButtonPressed()
 		// no param
 		break;
 	case TDoubleKeyframe::SpeedInOut: {
-		SpeedInOutSegmentPage *page = qobject_cast<SpeedInOutSegmentPage *>(m_parametersPanel->currentWidget());
+		SpeedInOutSegmentPage *page =
+			qobject_cast<SpeedInOutSegmentPage *>(m_parametersPanel->currentWidget());
 		if (page)
 			page->getGuiValues(speedIn, speedOut);
 	} break;
 	case TDoubleKeyframe::EaseInOut:
 	case TDoubleKeyframe::EaseInOutPercentage: {
-		EaseInOutSegmentPage *page = qobject_cast<EaseInOutSegmentPage *>(m_parametersPanel->currentWidget());
+		EaseInOutSegmentPage *page =
+			qobject_cast<EaseInOutSegmentPage *>(m_parametersPanel->currentWidget());
 		if (page)
 			page->getGuiValues(speedIn, speedOut);
 	} break;
@@ -1376,7 +1398,8 @@ void FunctionSegmentViewer::onApplyButtonPressed()
 		// no param
 		break;
 	case TDoubleKeyframe::Expression: {
-		FunctionExpressionSegmentPage *page = qobject_cast<FunctionExpressionSegmentPage *>(m_parametersPanel->currentWidget());
+		FunctionExpressionSegmentPage *page =
+			qobject_cast<FunctionExpressionSegmentPage *>(m_parametersPanel->currentWidget());
 		if (page) {
 			bool ok = page->getGuiValues(expressionText, unitName);
 			if (!ok)
@@ -1392,7 +1415,8 @@ void FunctionSegmentViewer::onApplyButtonPressed()
 		// no param
 		break;
 	case TDoubleKeyframe::SimilarShape: {
-		SimilarShapeSegmentPage *page = qobject_cast<SimilarShapeSegmentPage *>(m_parametersPanel->currentWidget());
+		SimilarShapeSegmentPage *page =
+			qobject_cast<SimilarShapeSegmentPage *>(m_parametersPanel->currentWidget());
 		if (page)
 			page->getGuiValues(expressionText, similarShapeOffset);
 	} break;
@@ -1422,17 +1446,11 @@ void FunctionSegmentViewer::onApplyButtonPressed()
 	if (m_panel)
 		setter.setPixelRatio(m_panel->getPixelRatio(m_curve));
 
-	setter.setAllParams(step,
-						comboType,
-						speedIn,
-						speedOut,
-						expressionText,
-						unitName,
-						fileParams,
+	setter.setAllParams(step, comboType, speedIn, speedOut, expressionText, unitName, fileParams,
 						similarShapeOffset);
 }
 
-//for displaying the types of neighbor segments
+// for displaying the types of neighbor segments
 QString FunctionSegmentViewer::typeToString(int typeId) const
 {
 	int i;
@@ -1507,7 +1525,8 @@ void FunctionSegmentViewer::onPrevCurveButtonPressed()
 	int r0 = (int)prevKey.m_frame;
 	int r1 = (int)currentKey.m_frame;
 
-	m_sheet->getSelection()->selectSegment(m_curve, currentKeyIndex - 1, QRect(col, r0, 1, r1 - r0 + 1));
+	m_sheet->getSelection()->selectSegment(m_curve, currentKeyIndex - 1,
+										   QRect(col, r0, 1, r1 - r0 + 1));
 	m_sheet->updateAll();
 }
 
@@ -1545,7 +1564,8 @@ void FunctionSegmentViewer::onNextCurveButtonPressed()
 	int r0 = (int)nextKey.m_frame;
 	int r1 = (int)nextNextKey.m_frame;
 
-	m_sheet->getSelection()->selectSegment(m_curve, currentKeyIndex + 1, QRect(col, r0, 1, r1 - r0 + 1));
+	m_sheet->getSelection()->selectSegment(m_curve, currentKeyIndex + 1,
+										   QRect(col, r0, 1, r1 - r0 + 1));
 	m_sheet->updateAll();
 }
 
@@ -1567,14 +1587,9 @@ void FunctionSegmentViewer::onNextLinkButtonPressed()
 
 bool FunctionSegmentViewer::anyWidgetHasFocus()
 {
-	return m_topbar->hasFocus() ||
-		   m_fromFld->hasFocus() ||
-		   m_toFld->hasFocus() ||
-		   m_typeCombo->hasFocus() ||
-		   m_stepFld->hasFocus() ||
-		   m_prevCurveButton->hasFocus() ||
-		   m_nextCurveButton->hasFocus() ||
-		   m_prevLinkButton->hasFocus() ||
+	return m_topbar->hasFocus() || m_fromFld->hasFocus() || m_toFld->hasFocus() ||
+		   m_typeCombo->hasFocus() || m_stepFld->hasFocus() || m_prevCurveButton->hasFocus() ||
+		   m_nextCurveButton->hasFocus() || m_prevLinkButton->hasFocus() ||
 		   m_nextLinkButton->hasFocus();
 }
 

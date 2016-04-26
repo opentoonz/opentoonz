@@ -10,7 +10,7 @@ guardare DAFARE
 guardare assumo
 autoalign rgb ->ora viene chiamata con un buffer rgbm ! modificare opportunamente
 
-fare resize e realloc size dello stack a 65000 unita' 
+fare resize e realloc size dello stack a 65000 unita'
 
 */
 
@@ -26,7 +26,7 @@ static int Debug_flag = FALSE;
 /*===========================================================================*/
 /*
 
-     AUTOALIGNMENT 
+	 AUTOALIGNMENT
 
 
 */
@@ -35,9 +35,8 @@ static int Debug_flag = FALSE;
 #define AUTOAL_WHITE_COLS 2
 #define AUTOAL_THRESHOLD 160
 
-static int autoalign_gr8(UCHAR *buffer_gr8,
-						 int wrap, int lx, int ly, int pix_origin,
-						 int dpix_dx, int dpix_dy, int strip_width)
+static int autoalign_gr8(UCHAR *buffer_gr8, int wrap, int lx, int ly, int pix_origin, int dpix_dx,
+						 int dpix_dy, int strip_width)
 {
 	int first_x[2], dx_dcol[2], target[2];
 	int i, x, y, cols;
@@ -130,8 +129,7 @@ found:
 
 /*---------------------------------------------------------------------------*/
 
-static int autoalign_rgb(TPixel32 *buffer_rgb,
-						 int wrap, int lx, int ly, int pix_origin,
+static int autoalign_rgb(TPixel32 *buffer_rgb, int wrap, int lx, int ly, int pix_origin,
 						 int dpix_dx, int dpix_dy, int strip_width)
 {
 	int first_x[2], dx_dcol[2], target[2];
@@ -229,12 +227,12 @@ found:
 
 /*---------------------------------------------------------------------------*/
 
-//static void make_bitcount (int b[256], int count_zeros)
+// static void make_bitcount (int b[256], int count_zeros)
 //{
-//int i, j, xorValue;
+// int i, j, xorValue;
 
-//xorValue = count_zeros ? 0xff : 0;
-//for (i = 0; i < 256; i++)
+// xorValue = count_zeros ? 0xff : 0;
+// for (i = 0; i < 256; i++)
 //  {
 //  b[i] = 0;
 //  for (j = i ^ xorValue; j; j &= j - 1)
@@ -244,7 +242,7 @@ found:
 
 /*---------------------------------------------------------------------------*/
 
-//static int autoalign_bw (UCHAR *buffer_bw, bool isWB /*true se WB, false se BW*/,
+// static int autoalign_bw (UCHAR *buffer_bw, bool isWB /*true se WB, false se BW*/,
 //                         int wrap, int lx, int ly, int pix_origin,
 //			 int dpix_dx, int dpix_dy, int strip_width)
 //{
@@ -285,29 +283,29 @@ for (i = 0; i < 2; i++)
   consec_white_cols = 0;
   black_strip_edge  = 0;
   for (x = first_x[i], cols = 0; cols < strip_width; x += dx_dcol[i], cols++)
-    {
-    col_value = 0;
-    byte = origin + x * dbytes_dx;
-    for (y = 0; y < ly_bytes; y++)
-      {
-      col_value += bitcount[*byte];
-      byte += dbytes_dybytes;
-      }
-    if (col_value < threshold)
-      {
-      consec_white_cols = 0;
-      consec_black_cols++;
-      if (consec_black_cols >= AUTOAL_BLACK_COLS)
+	{
+	col_value = 0;
+	byte = origin + x * dbytes_dx;
+	for (y = 0; y < ly_bytes; y++)
+	  {
+	  col_value += bitcount[*byte];
+	  byte += dbytes_dybytes;
+	  }
+	if (col_value < threshold)
+	  {
+	  consec_white_cols = 0;
+	  consec_black_cols++;
+	  if (consec_black_cols >= AUTOAL_BLACK_COLS)
 	black_strip_edge = x;
-      }
-    else
-      {
-      consec_black_cols = 0;
-      consec_white_cols++;
-      if (consec_white_cols >= AUTOAL_WHITE_COLS && black_strip_edge)
+	  }
+	else
+	  {
+	  consec_black_cols = 0;
+	  consec_white_cols++;
+	  if (consec_white_cols >= AUTOAL_WHITE_COLS && black_strip_edge)
 	goto found;
-      }
-    }
+	  }
+	}
   }
 return FALSE;
 
@@ -318,54 +316,54 @@ for (x = first_x[i], cols = 0; cols < strip_width; x += dx_dcol[i], cols++)
   {
   byte = origin + x * dbytes_dx;
   for (y = 0; y < ly_bytes; y++)
-    {
-    *byte = white;
-    byte += dbytes_dybytes;
-    }
+	{
+	*byte = white;
+	byte += dbytes_dybytes;
+	}
   }
 delta_x = target[i] - black_strip_edge;
 delta_bytes = delta_x * dbytes_dx;
 if (delta_x > 0)
   {
   for (x = lx - 1 - delta_x; x >= 0; x--)
-    {
-    byte = origin + x * dbytes_dx;
-    for (y = 0; y < ly_bytes; y++)
-      {
-      *(byte + delta_bytes) = *byte;
-      byte += dbytes_dybytes;
-      }
-    }
+	{
+	byte = origin + x * dbytes_dx;
+	for (y = 0; y < ly_bytes; y++)
+	  {
+	  *(byte + delta_bytes) = *byte;
+	  byte += dbytes_dybytes;
+	  }
+	}
   for (x = lx - delta_x; x < lx; x++)
-    {
-    byte = origin + x * dbytes_dx;
-    for (y = 0; y < ly_bytes; y++)
-      {
-      *byte = white;
-      byte += dbytes_dybytes;
-      }
-    }
+	{
+	byte = origin + x * dbytes_dx;
+	for (y = 0; y < ly_bytes; y++)
+	  {
+	  *byte = white;
+	  byte += dbytes_dybytes;
+	  }
+	}
   }
 else if (delta_x < 0)
   {
   for (x = -delta_x; x < lx; x++)
-    {
-    byte = origin + x * dbytes_dx;
-    for (y = 0; y < ly_bytes; y++)
-      {
-      *(byte + delta_bytes) = *byte;
-      byte += dbytes_dybytes;
-      }
-    }
+	{
+	byte = origin + x * dbytes_dx;
+	for (y = 0; y < ly_bytes; y++)
+	  {
+	  *(byte + delta_bytes) = *byte;
+	  byte += dbytes_dybytes;
+	  }
+	}
   for (x = 0; x < -delta_x; x++)
-    {
-    byte = origin + x * dbytes_dx;
-    for (y = 0; y < ly_bytes; y++)
-      {
-      *byte = white;
-      byte += dbytes_dybytes;
-      }
-    }
+	{
+	byte = origin + x * dbytes_dx;
+	for (y = 0; y < ly_bytes; y++)
+	  {
+	  *byte = white;
+	  byte += dbytes_dybytes;
+	  }
+	}
   }
 return TRUE;
 }
@@ -386,15 +384,15 @@ Non viene presa in considerazione una eventuale savebox
 Per adesso non scrivo l'algo per wb con primary scan orizzontale, quindi:
 
 assert (image->orientation == TOR_LEFTBOT  ||
-        image->orientation == TOR_RIGHTBOT ||
-        image->orientation == TOR_LEFTTOP  ||
-        image->orientation == TOR_RIGHTTOP    );
+		image->orientation == TOR_RIGHTBOT ||
+		image->orientation == TOR_LEFTTOP  ||
+		image->orientation == TOR_RIGHTTOP    );
 */
 	/* DAFARE
 if (    image->orientation != TOR_LEFTBOT  &&
-        image->orientation != TOR_RIGHTBOT &&
-        image->orientation != TOR_LEFTTOP  &&
-        image->orientation != TOR_RIGHTTOP    )
+		image->orientation != TOR_RIGHTBOT &&
+		image->orientation != TOR_LEFTTOP  &&
+		image->orientation != TOR_RIGHTTOP    )
  {
   tmsg_error(" autoalign error: bad image orientation");
   return FALSE;
@@ -404,7 +402,7 @@ if (    image->orientation != TOR_LEFTBOT  &&
 
 	TRasterP ras = image->getRaster();
 	wrap = ras->getWrap();
-	assert(TRaster32P(ras) || TRasterGR8P(ras)); //per ricordare di gestire le img bw!
+	assert(TRaster32P(ras) || TRasterGR8P(ras)); // per ricordare di gestire le img bw!
 	/* DAFARE
 if (rop_pixbits (image->ras.type) < 8 && rop_fillerbits (image->ras.type))
   wrap = (wrap + 7) / 8 * 8;
@@ -414,19 +412,19 @@ if (rop_pixbits (image->ras.type) < 8 && rop_fillerbits (image->ras.type))
 switch (image->orientation)
   {
   CASE TOR_BOTLEFT:__OR TOR_BOTRIGHT:__OR TOR_TOPLEFT:__OR TOR_TOPRIGHT:
-    strip_width = mmToPixel (5.0, image->x_dpi);
-    lx = image->ras.lx;
-    ly = image->ras.ly;
+	strip_width = mmToPixel (5.0, image->x_dpi);
+	lx = image->ras.lx;
+	ly = image->ras.ly;
 
   CASE TOR_LEFTBOT:__OR TOR_RIGHTBOT:__OR TOR_LEFTTOP:__OR TOR_RIGHTTOP:
-    strip_width = mmToPixel (5.0, image->y_dpi);
-    lx = image->ras.ly;
-    ly = image->ras.lx;
+	strip_width = mmToPixel (5.0, image->y_dpi);
+	lx = image->ras.ly;
+	ly = image->ras.lx;
 
   DEFAULT: assert (FALSE);lx=ly=strip_width=0;
   }
 */
-	//assumo TOR_BOTLEFT:__OR TOR_BOTRIGHT:__OR TOR_TOPLEFT:__OR TOR_TOPRIGHT:
+	// assumo TOR_BOTLEFT:__OR TOR_BOTRIGHT:__OR TOR_TOPLEFT:__OR TOR_TOPRIGHT:
 	double dpix, dpiy;
 	image->getDpi(dpix, dpiy);
 	strip_width = (int)mmToPixel(5.0, dpix);
@@ -439,41 +437,41 @@ switch (image->orientation)
 switch (image->orientation)
   {
   CASE TOR_BOTLEFT:
-    pix_origin = 0;
-    dpix_dx =  1;
-    dpix_dy =  wrap;
+	pix_origin = 0;
+	dpix_dx =  1;
+	dpix_dy =  wrap;
   CASE TOR_BOTRIGHT:
-    pix_origin = mx;
-    dpix_dx = -1;
-    dpix_dy =  wrap;
+	pix_origin = mx;
+	dpix_dx = -1;
+	dpix_dy =  wrap;
   CASE TOR_TOPLEFT:
-    pix_origin = my * wrap;
-    dpix_dx =  1;
-    dpix_dy = -wrap;
+	pix_origin = my * wrap;
+	dpix_dx =  1;
+	dpix_dy = -wrap;
   CASE TOR_TOPRIGHT:
-    pix_origin = mx + my * wrap;
-    dpix_dx = -1;
-    dpix_dy = -wrap;
+	pix_origin = mx + my * wrap;
+	dpix_dx = -1;
+	dpix_dy = -wrap;
   CASE TOR_LEFTBOT:
-    pix_origin = 0;
-    dpix_dx =  wrap;
-    dpix_dy =  1;
+	pix_origin = 0;
+	dpix_dx =  wrap;
+	dpix_dy =  1;
   CASE TOR_RIGHTBOT:
-    pix_origin = mx * wrap;
-    dpix_dx = -wrap;
-    dpix_dy =  1;
+	pix_origin = mx * wrap;
+	dpix_dx = -wrap;
+	dpix_dy =  1;
   CASE TOR_LEFTTOP:
-    pix_origin = my;
-    dpix_dx =  wrap;
-    dpix_dy = -1;
+	pix_origin = my;
+	dpix_dx =  wrap;
+	dpix_dy = -1;
   CASE TOR_RIGHTTOP:
-    pix_origin = my + mx * wrap;
-    dpix_dx = -wrap;
-    dpix_dy = -1;
+	pix_origin = my + mx * wrap;
+	dpix_dx = -wrap;
+	dpix_dy = -1;
   DEFAULT: assert(FALSE); pix_origin=dpix_dx=dpix_dy=0;
   }
 */
-	//assumo  CASE TOR_BOTLEFT:
+	// assumo  CASE TOR_BOTLEFT:
 	pix_origin = 0;
 	dpix_dx = 1;
 	dpix_dy = wrap;
@@ -484,12 +482,12 @@ switch (image->orientation)
 	int ret = FALSE;
 
 	if (ras8)
-		ret = autoalign_gr8(ras8->getRawData(), wrap, lx, ly, pix_origin,
-							dpix_dx, dpix_dy, strip_width);
+		ret = autoalign_gr8(ras8->getRawData(), wrap, lx, ly, pix_origin, dpix_dx, dpix_dy,
+							strip_width);
 
 	else if (ras32)
-		ret = autoalign_rgb(ras32->pixels(), wrap, lx, ly, pix_origin,
-							dpix_dx, dpix_dy, strip_width);
+		ret =
+			autoalign_rgb(ras32->pixels(), wrap, lx, ly, pix_origin, dpix_dx, dpix_dy, strip_width);
 	else
 		assert(!"Unsupported pixel type");
 
@@ -497,10 +495,10 @@ switch (image->orientation)
 	/*
   CASE RAS_WB:
   __OR RAS_BW:
-    assert ( !image->ras.bit_offs);
-    return autoalign_bw (image->ras.buffer, image->ras.type,
-                         wrap, lx, ly, pix_origin,
-		         dpix_dx, dpix_dy, strip_width);
+	assert ( !image->ras.bit_offs);
+	return autoalign_bw (image->ras.buffer, image->ras.type,
+						 wrap, lx, ly, pix_origin,
+				 dpix_dx, dpix_dy, strip_width);
 
   DEFAULT: assert (!"Unsupported alignment\n");
   }
@@ -511,12 +509,12 @@ switch (image->orientation)
 /*===========================================================================*/
 /*
 
-     AUTOCENTERING
+	 AUTOCENTERING
 
 
 */
 /*
- * Calcoli in millimetri per questa funzione che alla fine restituisce un 
+ * Calcoli in millimetri per questa funzione che alla fine restituisce un
  * valore per la striscia di ricerca direttamente in pixel
  */
 
@@ -531,22 +529,19 @@ int compute_strip_pixel(FDG_INFO *fdg, double dpi)
 		if (max_half_size < half_size)
 			max_half_size = half_size;
 	}
-	strip_size_mm = fdg->dist_ctr_hole_to_edge +
-					max_half_size +
-					SECURITY_MARGIN_MM;
+	strip_size_mm = fdg->dist_ctr_hole_to_edge + max_half_size + SECURITY_MARGIN_MM;
 
 	strip_size_pix = (int)mmToPixel(strip_size_mm, dpi);
 
 	if (Debug_flag)
-		printf("Controllo una striscia larga %g mm e %d pixels\n",
-			   strip_size_mm, strip_size_pix);
+		printf("Controllo una striscia larga %g mm e %d pixels\n", strip_size_mm, strip_size_pix);
 
 	return strip_size_pix;
 }
 
 /*---------------------------------------------------------------------------*/
 
-#define SQMM_TO_SQPIXEL(area, x_res, y_res) \
+#define SQMM_TO_SQPIXEL(area, x_res, y_res)                                                        \
 	((double)((x_res) * (y_res)) * (double)(area) * ((1.0 / 25.4) * (1.0 / 25.4)))
 
 /*---------------------------------------------------------------------------*/
@@ -584,8 +579,7 @@ typedef struct big {
 	unsigned lo, hi;
 } BIG;
 #define CLEARBIG(B) ((B).lo = 0, (B).hi = 0, (B))
-#define ADDBIG(B, X) ((B).lo += (unsigned)(X), \
-					  (B).hi += (B).lo >> 30, (B).lo &= 0x3fffffff, (B))
+#define ADDBIG(B, X) ((B).lo += (unsigned)(X), (B).hi += (B).lo >> 30, (B).lo &= 0x3fffffff, (B))
 #define BIG_TO_DOUBLE(B) ((double)(B).hi * (double)0x40000000 + (double)(B).lo)
 
 #define IS_BLACK_GR8(PIX) (*(PIX) < 110)
@@ -615,8 +609,8 @@ static int Black_pixel = 0;
 #endif
 
 #ifdef DAFARE
-static int find_dots_bw(const TRasterP &img, int strip_width, PEGS_SIDE pegs_side,
-						DOT dotarray[], int dotarray_size, int max_area);
+static int find_dots_bw(const TRasterP &img, int strip_width, PEGS_SIDE pegs_side, DOT dotarray[],
+						int dotarray_size, int max_area);
 #endif
 static int find_dots_gr8(const TRasterGR8P &img, int strip_width, PEGS_SIDE pegs_side,
 						 DOT dotarray[], int dotarray_size, int max_area);
@@ -627,23 +621,20 @@ static void
 visit_bw(int i, int j, int x, int y, int bit, UCHAR *byte),
 #endif
 	visit_gr8(int i, int j, int x, int y, UCHAR *pix),
-	visit_rgb(int i, int j, int x, int y, TPixel32 *pix),
-	stampa_dot(DOT *dot);
+	visit_rgb(int i, int j, int x, int y, TPixel32 *pix), stampa_dot(DOT *dot);
 
-static int
-compare_dots(DOT dots[], int *ndots, DOT reference[], int ref_dot);
+static int compare_dots(DOT dots[], int *ndots, DOT reference[], int ref_dot);
 
-#define REVERSE(byte, bit)  \
-	{                       \
-		unsigned char mask; \
-		mask = 1 << (bit);  \
-		*(byte) ^= mask;    \
+#define REVERSE(byte, bit)                                                                         \
+	{                                                                                              \
+		unsigned char mask;                                                                        \
+		mask = 1 << (bit);                                                                         \
+		*(byte) ^= mask;                                                                           \
 	}
 
 /*---------------------------------------------------------------------------*/
 
-typedef struct
-	{
+typedef struct {
 	short ret, bit;
 	int x, y, i, j;
 	void *ptr;
@@ -653,95 +644,93 @@ static STACK_INFO *Stack = 0;
 static int Stack_alloc_size = 0;
 static int Stack_size = 0;
 
-#define CREATE_STACK                                                         \
-	{                                                                        \
-		assert(!Stack);                                                      \
-		Stack_alloc_size = 65500;                                            \
-		Stack_size = 0;                                                      \
-		Stack = (STACK_INFO *)malloc(Stack_alloc_size * sizeof(STACK_INFO)); \
-		if (!Stack)                                                          \
-			return FALSE;                                                    \
+#define CREATE_STACK                                                                               \
+	{                                                                                              \
+		assert(!Stack);                                                                            \
+		Stack_alloc_size = 65500;                                                                  \
+		Stack_size = 0;                                                                            \
+		Stack = (STACK_INFO *)malloc(Stack_alloc_size * sizeof(STACK_INFO));                       \
+		if (!Stack)                                                                                \
+			return FALSE;                                                                          \
 	}
 
-#define DESTROY_STACK         \
-	{                         \
-		Stack_alloc_size = 0; \
-		Stack_size = 0;       \
-		free(Stack);          \
-		Stack = 0;            \
+#define DESTROY_STACK                                                                              \
+	{                                                                                              \
+		Stack_alloc_size = 0;                                                                      \
+		Stack_size = 0;                                                                            \
+		free(Stack);                                                                               \
+		Stack = 0;                                                                                 \
 	}
 
 #define STACK_IS_EMPTY (!Stack_size)
 
-#define PUSH_ONTO_STACK(RET, X, Y, I, J, BIT, PTR)                                       \
-	{                                                                                    \
-		if (Stack_size >= Stack_alloc_size) {                                            \
-			Stack_alloc_size += 65500;                                                   \
-			Stack = (STACK_INFO *)realloc(Stack, Stack_alloc_size * sizeof(STACK_INFO)); \
-			if (!Stack)                                                                  \
-				return;                                                                  \
-		}                                                                                \
-		Stack[Stack_size].ret = (RET);                                                   \
-		Stack[Stack_size].x = (X);                                                       \
-		Stack[Stack_size].y = (Y);                                                       \
-		Stack[Stack_size].i = (I);                                                       \
-		Stack[Stack_size].j = (J);                                                       \
-		Stack[Stack_size].bit = (BIT);                                                   \
-		Stack[Stack_size].ptr = (PTR);                                                   \
-		Stack_size++;                                                                    \
+#define PUSH_ONTO_STACK(RET, X, Y, I, J, BIT, PTR)                                                 \
+	{                                                                                              \
+		if (Stack_size >= Stack_alloc_size) {                                                      \
+			Stack_alloc_size += 65500;                                                             \
+			Stack = (STACK_INFO *)realloc(Stack, Stack_alloc_size * sizeof(STACK_INFO));           \
+			if (!Stack)                                                                            \
+				return;                                                                            \
+		}                                                                                          \
+		Stack[Stack_size].ret = (RET);                                                             \
+		Stack[Stack_size].x = (X);                                                                 \
+		Stack[Stack_size].y = (Y);                                                                 \
+		Stack[Stack_size].i = (I);                                                                 \
+		Stack[Stack_size].j = (J);                                                                 \
+		Stack[Stack_size].bit = (BIT);                                                             \
+		Stack[Stack_size].ptr = (PTR);                                                             \
+		Stack_size++;                                                                              \
 	}
 
-#define POP_FROM_STACK_U(RET, X, Y, I, J, BIT, PTR) \
-	{                                               \
-		Stack_size--;                               \
-		(RET) = Stack[Stack_size].ret;              \
-		(X) = Stack[Stack_size].x;                  \
-		(Y) = Stack[Stack_size].y;                  \
-		(I) = Stack[Stack_size].i;                  \
-		(J) = Stack[Stack_size].j;                  \
-		(BIT) = Stack[Stack_size].bit;              \
-		(PTR) = (UCHAR *)Stack[Stack_size].ptr;     \
+#define POP_FROM_STACK_U(RET, X, Y, I, J, BIT, PTR)                                                \
+	{                                                                                              \
+		Stack_size--;                                                                              \
+		(RET) = Stack[Stack_size].ret;                                                             \
+		(X) = Stack[Stack_size].x;                                                                 \
+		(Y) = Stack[Stack_size].y;                                                                 \
+		(I) = Stack[Stack_size].i;                                                                 \
+		(J) = Stack[Stack_size].j;                                                                 \
+		(BIT) = Stack[Stack_size].bit;                                                             \
+		(PTR) = (UCHAR *)Stack[Stack_size].ptr;                                                    \
 	}
 
-#define POP_FROM_STACK_TPIXEL32(RET, X, Y, I, J, BIT, PTR) \
-	{                                                      \
-		Stack_size--;                                      \
-		(RET) = Stack[Stack_size].ret;                     \
-		(X) = Stack[Stack_size].x;                         \
-		(Y) = Stack[Stack_size].y;                         \
-		(I) = Stack[Stack_size].i;                         \
-		(J) = Stack[Stack_size].j;                         \
-		(BIT) = Stack[Stack_size].bit;                     \
-		(PTR) = (TPixel32 *)Stack[Stack_size].ptr;         \
+#define POP_FROM_STACK_TPIXEL32(RET, X, Y, I, J, BIT, PTR)                                         \
+	{                                                                                              \
+		Stack_size--;                                                                              \
+		(RET) = Stack[Stack_size].ret;                                                             \
+		(X) = Stack[Stack_size].x;                                                                 \
+		(Y) = Stack[Stack_size].y;                                                                 \
+		(I) = Stack[Stack_size].i;                                                                 \
+		(J) = Stack[Stack_size].j;                                                                 \
+		(BIT) = Stack[Stack_size].bit;                                                             \
+		(PTR) = (TPixel32 *)Stack[Stack_size].ptr;                                                 \
 	}
 
 /*---------------------------------------------------------------------------*/
 
-static int find_dots(const TRasterP &img, int strip_width, PEGS_SIDE pegs_side,
-					 DOT dotarray[], int dotarray_size, int max_area)
+static int find_dots(const TRasterP &img, int strip_width, PEGS_SIDE pegs_side, DOT dotarray[],
+					 int dotarray_size, int max_area)
 {
 	TRaster32P ras32(img);
 	if (ras32)
-		return find_dots_rgb(ras32, strip_width, pegs_side, dotarray, dotarray_size,
-							 max_area);
+		return find_dots_rgb(ras32, strip_width, pegs_side, dotarray, dotarray_size, max_area);
 	TRasterGR8P ras8(img);
 	if (ras8)
-		return find_dots_gr8(ras8, strip_width, pegs_side, dotarray, dotarray_size,
-							 max_area);
+		return find_dots_gr8(ras8, strip_width, pegs_side, dotarray, dotarray_size, max_area);
 	assert(!"Unsupported pixel type");
 	/* DAFARE
   CASE RAS_BW:
   __OR RAS_WB:
-    return find_dots_bw (img, strip_width, pegs_side, dotarray, dotarray_size,
-                              max_area);
+	return find_dots_bw (img, strip_width, pegs_side, dotarray, dotarray_size,
+							  max_area);
 */
 	return 0;
 }
 
 /*---------------------------------------------------------------------------*/
 #ifdef DAFARE
-static int find_dots_bw(const TRasterP &img, int strip_width, PEGS_SIDE pegs_side,
-						DOT dotarray[], int dotarray_size, int max_area)
+static int find_dots_bw(const TRasterP &img, int strip_width, PEGS_SIDE pegs_side, DOT dotarray[],
+						int dotarray_size, int max_area)
 {
 	int n_dots, ins, shift;
 	int x, y; // coords in img coord system
@@ -803,8 +792,7 @@ static int find_dots_bw(const TRasterP &img, int strip_width, PEGS_SIDE pegs_sid
 	Pix_ystep = (img->wrap + 7) >> 3;
 
 	if (Debug_flag) {
-		printf("Zona di scansione: (%d,%d) -- (%d,%d)\n",
-			   x0, y0, xlast, ylast);
+		printf("Zona di scansione: (%d,%d) -- (%d,%d)\n", x0, y0, xlast, ylast);
 		printf("wrap: %d\n", img->wrap);
 	}
 
@@ -830,11 +818,9 @@ static int find_dots_bw(const TRasterP &img, int strip_width, PEGS_SIDE pegs_sid
 				visit_bw(i, j, x, y, bit, byte);
 				dot_lx = Xmax - Xmin + 1;
 				dot_ly = Ymax - Ymin + 1;
-				if (Npix < max_area * 3 / 2 &&
-					dot_lx > 3 && dot_lx < (xsize >> 1) &&
-					dot_ly > 3 && dot_ly < (ysize >> 1) &&
-					Xmin > x0 && Xmax < xlast &&
-					Ymin > y0 && Ymax < ylast) {
+				if (Npix < max_area * 3 / 2 && dot_lx > 3 && dot_lx < (xsize >> 1) && dot_ly > 3 &&
+					dot_ly < (ysize >> 1) && Xmin > x0 && Xmax < xlast && Ymin > y0 &&
+					Ymax < ylast) {
 					dot_x = BIG_TO_DOUBLE(Xsum) / BIG_TO_DOUBLE(Weightsum);
 					dot_y = BIG_TO_DOUBLE(Ysum) / BIG_TO_DOUBLE(Weightsum);
 					if (vertical) {
@@ -897,7 +883,8 @@ static int find_dots_gr8(const TRasterGR8P &img, int strip_width, PEGS_SIDE pegs
 		ysize = strip_width;
 		vertical = FALSE;
 
-		CASE PEGS_LEFT : __OR PEGS_RIGHT : x0 = pegs_side == PEGS_LEFT ? 0 : img->getLx() - strip_width;
+		CASE PEGS_LEFT : __OR PEGS_RIGHT : x0 = pegs_side == PEGS_LEFT ? 0
+																	   : img->getLx() - strip_width;
 		y0 = 0;
 		xsize = strip_width;
 		ysize = img->getLy();
@@ -932,8 +919,7 @@ static int find_dots_gr8(const TRasterGR8P &img, int strip_width, PEGS_SIDE pegs
 
 	Pix_ystep = img->getWrap();
 	if (Debug_flag) {
-		printf("Zona di scansione: (%d,%d) -- (%d,%d)\n",
-			   x0, y0, xlast, ylast);
+		printf("Zona di scansione: (%d,%d) -- (%d,%d)\n", x0, y0, xlast, ylast);
 		printf("wrap: %d\n", img->getWrap());
 	}
 #ifdef RECURSIVE_VERSION
@@ -959,11 +945,9 @@ static int find_dots_gr8(const TRasterGR8P &img, int strip_width, PEGS_SIDE pegs
 				visit_gr8(i, j, x, y, pix);
 				dot_lx = Xmax - Xmin + 1;
 				dot_ly = Ymax - Ymin + 1;
-				if (Npix < max_area * 3 / 2 &&
-					dot_lx > 3 && dot_lx < (xsize >> 1) &&
-					dot_ly > 3 && dot_ly < (ysize >> 1) &&
-					Xmin > x0 && Xmax < xlast &&
-					Ymin > y0 && Ymax < ylast) {
+				if (Npix < max_area * 3 / 2 && dot_lx > 3 && dot_lx < (xsize >> 1) && dot_ly > 3 &&
+					dot_ly < (ysize >> 1) && Xmin > x0 && Xmax < xlast && Ymin > y0 &&
+					Ymax < ylast) {
 					dot_x = (float)(BIG_TO_DOUBLE(Xsum) / BIG_TO_DOUBLE(Weightsum));
 					dot_y = (float)(BIG_TO_DOUBLE(Ysum) / BIG_TO_DOUBLE(Weightsum));
 					if (vertical) {
@@ -1022,7 +1006,8 @@ static int find_dots_rgb(const TRaster32P &img, int strip_width, PEGS_SIDE pegs_
 		ysize = strip_width;
 		vertical = FALSE;
 
-		CASE PEGS_LEFT : __OR PEGS_RIGHT : x0 = pegs_side == PEGS_LEFT ? 0 : img->getLx() - strip_width;
+		CASE PEGS_LEFT : __OR PEGS_RIGHT : x0 = pegs_side == PEGS_LEFT ? 0
+																	   : img->getLx() - strip_width;
 		y0 = 0;
 		xsize = strip_width;
 		ysize = img->getLy();
@@ -1056,8 +1041,7 @@ static int find_dots_rgb(const TRaster32P &img, int strip_width, PEGS_SIDE pegs_
 	buffer = img->pixels();
 	Pix_ystep = img->getWrap();
 	if (Debug_flag) {
-		printf("Zona di scansione: (%d,%d) -- (%d,%d)\n",
-			   x0, y0, xlast, ylast);
+		printf("Zona di scansione: (%d,%d) -- (%d,%d)\n", x0, y0, xlast, ylast);
 		printf("wrap: %d\n", img->getWrap());
 	}
 #ifdef RECURSIVE_VERSION
@@ -1080,11 +1064,9 @@ static int find_dots_rgb(const TRaster32P &img, int strip_width, PEGS_SIDE pegs_
 				visit_rgb(i, j, x, y, pix);
 				dot_lx = Xmax - Xmin + 1;
 				dot_ly = Ymax - Ymin + 1;
-				if (Npix < max_area * 3 / 2 &&
-					dot_lx > 3 && dot_lx < (xsize >> 1) &&
-					dot_ly > 3 && dot_ly < (ysize >> 1) &&
-					Xmin > x0 && Xmax < xlast &&
-					Ymin > y0 && Ymax < ylast) {
+				if (Npix < max_area * 3 / 2 && dot_lx > 3 && dot_lx < (xsize >> 1) && dot_ly > 3 &&
+					dot_ly < (ysize >> 1) && Xmin > x0 && Xmax < xlast && Ymin > y0 &&
+					Ymax < ylast) {
 					dot_x = (float)(BIG_TO_DOUBLE(Xsum) / BIG_TO_DOUBLE(Weightsum));
 					dot_y = (float)(BIG_TO_DOUBLE(Ysum) / BIG_TO_DOUBLE(Weightsum));
 					if (vertical) {
@@ -1493,10 +1475,8 @@ static void visit_rgb(int i, int j, int x, int y, TPixel32 *pix)
  * questo livello.
  * Inoltre: la pegs_side si riferisce alle coordinate di raster.
  */
-int get_image_rotation_and_center(const TRasterP &img, int strip_width,
-								  PEGS_SIDE pegs_side,
-								  double *p_ang, double *cx, double *cy,
-								  DOT ref[], int ref_dot)
+int get_image_rotation_and_center(const TRasterP &img, int strip_width, PEGS_SIDE pegs_side,
+								  double *p_ang, double *cx, double *cy, DOT ref[], int ref_dot)
 {
 	double angle;
 	int found, i;
@@ -1525,7 +1505,7 @@ int get_image_rotation_and_center(const TRasterP &img, int strip_width,
 		printf(">>>> %d dots found\n", ndot);
 
 	i = 0;
-	while (i < ndot) //elimino i dots troppo piccoli
+	while (i < ndot) // elimino i dots troppo piccoli
 	{
 		if (dotarray[i].area < 500) {
 			for (int j = i; j < ndot - 1; j++)
@@ -1579,8 +1559,7 @@ int get_image_rotation_and_center(const TRasterP &img, int strip_width,
 #define PERCENT (40.0 / 100.0)
 #define MIN_V 100.0
 
-static int compare_dots(DOT dots[], int *ndots,
-						DOT reference[], int ref_dot)
+static int compare_dots(DOT dots[], int *ndots, DOT reference[], int ref_dot)
 {
 	int found;
 	int toll, i_ok = 0, j_ok = 0, k_ok = 0;
@@ -1660,8 +1639,8 @@ static int compare_dots(DOT dots[], int *ndots,
 				del2 = (dist_i_k - ref_dis[1]);
 				v = ((del1 * del1) + (del2 * del2));
 
-				//Furthermore, add discrepancies from the reference hole areas
-				v += abs(dots[i].area - reference[0].area); //fabs since areas are already squared
+				// Furthermore, add discrepancies from the reference hole areas
+				v += abs(dots[i].area - reference[0].area); // fabs since areas are already squared
 				v += abs(dots[j].area - reference[1].area);
 				v += abs(dots[k].area - reference[2].area);
 
@@ -1674,8 +1653,7 @@ static int compare_dots(DOT dots[], int *ndots,
 			}
 
 	if (Debug_flag) {
-		printf("Ho trovato v = %f su %f per %d %d %d \n",
-			   v, vmin, i_ok, j_ok, k_ok);
+		printf("Ho trovato v = %f su %f per %d %d %d \n", v, vmin, i_ok, j_ok, k_ok);
 		printf("----  Dot <%d>  ----\n", i_ok);
 		stampa_dot(dots + i_ok);
 		printf("----  Dot <%d>  ----\n", j_ok);
@@ -1701,8 +1679,7 @@ static int compare_dots(DOT dots[], int *ndots,
 		dy = reference[1].y - reference[2].y;
 		ref_dis_1_2 = sqrtf((dx * dx) + (dy * dy));
 
-		if (fabsf(dist_i_j - ref_dis_0_1) < tolld &&
-			fabsf(dist_j_k - ref_dis_1_2) < tolld) {
+		if (fabsf(dist_i_j - ref_dis_0_1) < tolld && fabsf(dist_j_k - ref_dis_1_2) < tolld) {
 			*ndots = 3;
 			*(dots) = *(dots + i_ok);
 			*(dots + 1) = *(dots + j_ok);

@@ -59,20 +59,19 @@ class ToolHandle;
 */
 class ToolOptionControl : public TProperty::Listener
 {
-protected:
+  protected:
 	std::string m_propertyName;
 	TTool *m_tool;
 	ToolHandle *m_toolHandle;
 
-public:
-	ToolOptionControl(TTool *tool, std::string propertyName,
-					  ToolHandle *toolHandle = 0);
+  public:
+	ToolOptionControl(TTool *tool, std::string propertyName, ToolHandle *toolHandle = 0);
 
 	const std::string &propertyName() const { return m_propertyName; }
 
 	void onPropertyChanged() { updateStatus(); }
 	void notifyTool();
-	//return true if the control is belonging to the visible viewer
+	// return true if the control is belonging to the visible viewer
 	bool isInVisibleViewer(QWidget *widget);
 
 	virtual void updateStatus() = 0;
@@ -86,18 +85,17 @@ class ToolOptionCheckbox : public DVGui::CheckBox, public ToolOptionControl
 {
 	Q_OBJECT
 
-protected:
+  protected:
 	TBoolProperty *m_property;
 
-public:
-	ToolOptionCheckbox(TTool *tool, TBoolProperty *property,
-					   ToolHandle *toolHandle = 0,
+  public:
+	ToolOptionCheckbox(TTool *tool, TBoolProperty *property, ToolHandle *toolHandle = 0,
 					   QWidget *parent = 0);
 	void updateStatus();
-public slots:
+  public slots:
 	void doClick();
 
-protected:
+  protected:
 	void nextCheckState();
 };
 
@@ -107,15 +105,14 @@ class ToolOptionSlider : public DVGui::DoubleField, public ToolOptionControl
 {
 	Q_OBJECT
 
-protected:
+  protected:
 	TDoubleProperty *m_property;
 
-public:
-	ToolOptionSlider(TTool *tool, TDoubleProperty *property,
-					 ToolHandle *toolHandle = 0);
+  public:
+	ToolOptionSlider(TTool *tool, TDoubleProperty *property, ToolHandle *toolHandle = 0);
 	void updateStatus();
 
-protected slots:
+  protected slots:
 
 	void onValueChanged(bool isDragging);
 	void increase();
@@ -128,16 +125,15 @@ class ToolOptionPairSlider : public DVGui::DoublePairField, public ToolOptionCon
 {
 	Q_OBJECT
 
-protected:
+  protected:
 	TDoublePairProperty *m_property;
 
-public:
-	ToolOptionPairSlider(TTool *tool, TDoublePairProperty *property,
-						 const QString &leftName, const QString &rightName,
-						 ToolHandle *toolHandle = 0);
+  public:
+	ToolOptionPairSlider(TTool *tool, TDoublePairProperty *property, const QString &leftName,
+						 const QString &rightName, ToolHandle *toolHandle = 0);
 	void updateStatus();
 
-protected slots:
+  protected slots:
 
 	void onValuesChanged(bool isDragging);
 	void increaseMaxValue();
@@ -152,16 +148,15 @@ class ToolOptionIntPairSlider : public DVGui::IntPairField, public ToolOptionCon
 {
 	Q_OBJECT
 
-protected:
+  protected:
 	TIntPairProperty *m_property;
 
-public:
-	ToolOptionIntPairSlider(TTool *tool, TIntPairProperty *property,
-							const QString &leftName, const QString &rightName,
-							ToolHandle *toolHandle = 0);
+  public:
+	ToolOptionIntPairSlider(TTool *tool, TIntPairProperty *property, const QString &leftName,
+							const QString &rightName, ToolHandle *toolHandle = 0);
 	void updateStatus();
 
-protected slots:
+  protected slots:
 
 	void onValuesChanged(bool isDragging);
 	void increaseMaxValue();
@@ -176,15 +171,14 @@ class ToolOptionIntSlider : public DVGui::IntField, public ToolOptionControl
 {
 	Q_OBJECT
 
-protected:
+  protected:
 	TIntProperty *m_property;
 
-public:
-	ToolOptionIntSlider(TTool *tool, TIntProperty *property,
-						ToolHandle *toolHandle = 0);
+  public:
+	ToolOptionIntSlider(TTool *tool, TIntProperty *property, ToolHandle *toolHandle = 0);
 	void updateStatus();
 
-protected slots:
+  protected slots:
 
 	void onValueChanged(bool isDragging);
 	void increase();
@@ -197,16 +191,15 @@ class ToolOptionCombo : public QComboBox, public ToolOptionControl
 {
 	Q_OBJECT
 
-protected:
+  protected:
 	TEnumProperty *m_property;
 
-public:
-	ToolOptionCombo(TTool *tool, TEnumProperty *property,
-					ToolHandle *toolHandle = 0);
+  public:
+	ToolOptionCombo(TTool *tool, TEnumProperty *property, ToolHandle *toolHandle = 0);
 	void loadEntries();
 	void updateStatus();
 
-public slots:
+  public slots:
 
 	void onActivated(int);
 	void doShowPopup();
@@ -219,15 +212,15 @@ class ToolOptionPopupButton : public PopupButton, public ToolOptionControl
 {
 	Q_OBJECT
 
-protected:
+  protected:
 	TEnumProperty *m_property;
 
-public:
+  public:
 	ToolOptionPopupButton(TTool *tool, TEnumProperty *property);
 	void updateStatus();
 	TEnumProperty *getProperty() { return m_property; }
 
-public slots:
+  public slots:
 
 	void onActivated(int);
 	void doShowPopup();
@@ -241,14 +234,14 @@ class ToolOptionTextField : public DVGui::LineEdit, public ToolOptionControl
 {
 	Q_OBJECT
 
-protected:
+  protected:
 	TStringProperty *m_property;
 
-public:
+  public:
 	ToolOptionTextField(TTool *tool, TStringProperty *property);
 	void updateStatus();
 
-public slots:
+  public slots:
 
 	void onValueChanged();
 };
@@ -259,16 +252,16 @@ class StyleIndexFieldAndChip : public DVGui::StyleIndexLineEdit, public ToolOpti
 {
 	Q_OBJECT
 
-protected:
+  protected:
 	TStyleIndexProperty *m_property;
 	TPaletteHandle *m_pltHandle;
 
-public:
+  public:
 	StyleIndexFieldAndChip(TTool *tool, TStyleIndexProperty *property, TPaletteHandle *pltHandle,
 						   ToolHandle *toolHandle = 0);
 	void updateStatus();
 
-public slots:
+  public slots:
 
 	void onValueChanged(const QString &);
 	void updateColor();
@@ -293,20 +286,20 @@ class ToolOptionParamRelayField : public DVGui::MeasuredDoubleLineEdit, public T
 	TDoubleParamP m_param; //!< Cached property param
 	TMeasure *m_measure;   //!< Cached property param measure
 
-protected:
+  protected:
 	TDoubleParamRelayProperty *m_property; //!< The TDoubleParam relaying property
 
 	TBoolProperty *m_globalKey;	//!< The property enforcing global keys
 	TPropertyGroup *m_globalGroup; //!< The property group whose properties
 								   //!< are affected by m_globalKey
-public:
+  public:
 	ToolOptionParamRelayField(TTool *tool, TDoubleParamRelayProperty *property, int decimals = 2);
 
 	void setGlobalKey(TBoolProperty *globalKey, TPropertyGroup *globalGroup);
 
 	void updateStatus();
 
-protected slots:
+  protected slots:
 
 	virtual void onValueChanged();
 };
@@ -328,10 +321,10 @@ class DVAPI MeasuredValueField : public DVGui::LineEdit
 
 	int m_precision;
 
-protected:
+  protected:
 	bool m_isGlobalKeyframe;
 
-public:
+  public:
 	MeasuredValueField(QWidget *parent, QString name = "numfield");
 	~MeasuredValueField();
 
@@ -347,13 +340,13 @@ public:
 	void setPrecision(int precision);
 	int getPrecision() { return m_precision; }
 
-protected slots:
+  protected slots:
 
 	void commit();
 	void onTextChanged(const QString &);
 	void errorHighlightingTick();
 
-signals:
+  signals:
 
 	void measuredValueChanged(TMeasuredValue *value);
 };
@@ -367,24 +360,22 @@ class PegbarChannelField : public MeasuredValueField, public ToolOptionControl
 	TFrameHandle *m_frameHandle;
 	TObjectHandle *m_objHandle;
 	TXsheetHandle *m_xshHandle;
-	enum ScaleType { eNone = 0,
-					 eAR = 1,
-					 eMass = 2 } m_scaleType;
+	enum ScaleType { eNone = 0, eAR = 1, eMass = 2 } m_scaleType;
 
-public:
+  public:
 	PegbarChannelField(TTool *tool, enum TStageObject::Channel actionId, QString name,
-					   TFrameHandle *frameHandle, TObjectHandle *objHandle, TXsheetHandle *xshHandle,
-					   QWidget *parent = 0);
+					   TFrameHandle *frameHandle, TObjectHandle *objHandle,
+					   TXsheetHandle *xshHandle, QWidget *parent = 0);
 
 	~PegbarChannelField() {}
 
 	void updateStatus();
 
-public slots:
+  public slots:
 
 	void onScaleTypeChanged(int type);
 
-protected slots:
+  protected slots:
 
 	void onChange(TMeasuredValue *fld);
 };
@@ -399,15 +390,15 @@ class DVAPI PegbarCenterField : public MeasuredValueField, public ToolOptionCont
 	TObjectHandle *m_objHandle;
 	TXsheetHandle *m_xshHandle;
 
-public:
-	PegbarCenterField(TTool *tool, int index, QString name, TObjectHandle *objHandle, TXsheetHandle *xshHandle,
-					  QWidget *parent = 0);
+  public:
+	PegbarCenterField(TTool *tool, int index, QString name, TObjectHandle *objHandle,
+					  TXsheetHandle *xshHandle, QWidget *parent = 0);
 
 	~PegbarCenterField() {}
 
 	void updateStatus();
 
-protected slots:
+  protected slots:
 
 	void onChange(TMeasuredValue *fld);
 };
@@ -418,13 +409,13 @@ class NoScaleField : public MeasuredValueField, public ToolOptionControl
 {
 	Q_OBJECT
 
-public:
+  public:
 	NoScaleField(TTool *tool, QString name);
 	~NoScaleField() {}
 
 	void updateStatus();
 
-protected slots:
+  protected slots:
 
 	void onChange(TMeasuredValue *fld);
 };
@@ -437,7 +428,7 @@ class PropertyMenuButton : public QToolButton, public ToolOptionControl
 
 	QList<TBoolProperty *> m_properties;
 
-public:
+  public:
 	PropertyMenuButton(QWidget *parent = 0, TTool *tool = 0,
 					   QList<TBoolProperty *> properties = QList<TBoolProperty *>(),
 					   QIcon icon = QIcon(), QString tooltip = QString());
@@ -445,11 +436,11 @@ public:
 
 	void updateStatus();
 
-protected slots:
+  protected slots:
 
 	void onActionTriggered(QAction *);
 
-signals:
+  signals:
 
 	void onPropertyChanged(QString name);
 };
@@ -463,7 +454,7 @@ class SelectionScaleField : public MeasuredValueField
 	int m_id;
 	SelectionTool *m_tool;
 
-public:
+  public:
 	SelectionScaleField(SelectionTool *tool, int actionId, QString name);
 
 	~SelectionScaleField() {}
@@ -471,10 +462,10 @@ public:
 	void updateStatus();
 	bool applyChange();
 
-protected slots:
+  protected slots:
 	void onChange(TMeasuredValue *fld);
 
-signals:
+  signals:
 	void valueChange();
 };
 
@@ -486,14 +477,14 @@ class SelectionRotationField : public MeasuredValueField
 
 	SelectionTool *m_tool;
 
-public:
+  public:
 	SelectionRotationField(SelectionTool *tool, QString name);
 
 	~SelectionRotationField() {}
 
 	void updateStatus();
 
-protected slots:
+  protected slots:
 	void onChange(TMeasuredValue *fld);
 };
 
@@ -506,14 +497,14 @@ class SelectionMoveField : public MeasuredValueField
 	int m_id;
 	SelectionTool *m_tool;
 
-public:
+  public:
 	SelectionMoveField(SelectionTool *tool, int id, QString name);
 
 	~SelectionMoveField() {}
 
 	void updateStatus();
 
-protected slots:
+  protected slots:
 	void onChange(TMeasuredValue *fld);
 };
 
@@ -525,14 +516,14 @@ class ThickChangeField : public MeasuredValueField
 
 	SelectionTool *m_tool;
 
-public:
+  public:
 	ThickChangeField(SelectionTool *tool, QString name);
 
 	~ThickChangeField() {}
 
 	void updateStatus();
 
-protected slots:
+  protected slots:
 	void onChange(TMeasuredValue *fld);
 };
 

@@ -33,9 +33,12 @@ class DirectoryBrowser : public ThumbnailViewer
 	GenericFileBrowserAction *m_fileSelChangeAction;
 	GenericFileBrowserAction *m_fileDblClickAction;
 
-public:
+  public:
 	DirectoryBrowser(TWidget *parent, const vector<string> &fileTypes)
-		: ThumbnailViewer(parent), m_fileSelChangeAction(0), m_fileDblClickAction(0), m_fileTypes(fileTypes) {}
+		: ThumbnailViewer(parent), m_fileSelChangeAction(0), m_fileDblClickAction(0),
+		  m_fileTypes(fileTypes)
+	{
+	}
 
 	~DirectoryBrowser()
 	{
@@ -49,10 +52,7 @@ public:
 	void setPath(const TFilePath &filepath);
 	void setFilter(const vector<string> &fileTypes);
 
-	TFilePath getPath() const
-	{
-		return m_filepath;
-	}
+	TFilePath getPath() const { return m_filepath; }
 
 	void onDoubleClick(int index);
 	void onSelect(int index);
@@ -62,10 +62,7 @@ public:
 		m_fileSelChangeAction = action;
 	}
 
-	void setFileDblClickAction(GenericFileBrowserAction *action)
-	{
-		m_fileDblClickAction = action;
-	}
+	void setFileDblClickAction(GenericFileBrowserAction *action) { m_fileDblClickAction = action; }
 };
 
 //-------------------------------------------------------------------
@@ -92,8 +89,7 @@ void DirectoryBrowser::onDoubleClick(int index)
 	Thumbnail *thumbnail = getItem(index);
 	if (thumbnail->getType() != Thumbnail::SCENE)
 		return;
-	TFilePath path =
-		thumbnail->getPath().getParentDir() + (thumbnail->getName() + "_files");
+	TFilePath path = thumbnail->getPath().getParentDir() + (thumbnail->getName() + "_files");
 	setPath(path);
 	invalidate();
 }
@@ -113,14 +109,10 @@ void DirectoryBrowser::onSelect(int index)
 
 class MyTreeViewItem : public TTreeViewItem
 {
-public:
-	MyTreeViewItem(TTreeViewItemParent *parent)
-		: TTreeViewItem(parent) {}
+  public:
+	MyTreeViewItem(TTreeViewItemParent *parent) : TTreeViewItem(parent) {}
 
-	TDimension getIconSize() const
-	{
-		return TDimension(26, 26);
-	}
+	TDimension getIconSize() const { return TDimension(26, 26); }
 
 	void drawIcon(TTreeView *w, const TPoint &origin)
 	{
@@ -153,8 +145,8 @@ public:
 
 	/*
   void draw(TTreeView *w, const TPoint &origin) {
-    drawIcon(w,origin);
-    drawName(w,origin);
+	drawIcon(w,origin);
+	drawName(w,origin);
   }
 */
 };
@@ -163,9 +155,8 @@ public:
 
 class MyTreeView : public TTreeView
 {
-public:
-	MyTreeView(TWidget *parent, string name = "MyTreeView")
-		: TTreeView(parent, name)
+  public:
+	MyTreeView(TWidget *parent, string name = "MyTreeView") : TTreeView(parent, name)
 	{
 		setBackgroundColor(White);
 	}
@@ -191,14 +182,14 @@ class SimpleFileItem : public MyTreeViewItem
 {
 	TFilePath m_path;
 
-public:
+  public:
 	SimpleFileItem(TTreeViewItemParent *parent, const TFilePath &path)
-		: MyTreeViewItem(parent), m_path(path) { setIsLeaf(true); }
-
-	wstring getName() const
+		: MyTreeViewItem(parent), m_path(path)
 	{
-		return m_path.withoutParentDir().getWideString();
+		setIsLeaf(true);
 	}
+
+	wstring getName() const { return m_path.withoutParentDir().getWideString(); }
 
 	TFilePath getPath() const { return m_path; }
 };
@@ -207,8 +198,8 @@ public:
 
 bool caseInsensitiveLessThan(const TFilePath &fp1, const TFilePath &fp2)
 {
-	return (stricmp(toString(fp1.getWideString()).c_str(),
-					toString(fp2.getWideString()).c_str()) < 0);
+	return (stricmp(toString(fp1.getWideString()).c_str(), toString(fp2.getWideString()).c_str()) <
+			0);
 }
 
 //-------------------------------------------------------------------
@@ -217,20 +208,17 @@ class FileFolderItem : public MyTreeViewItem
 {
 	TFilePath m_path;
 
-public:
+  public:
 	FileFolderItem(TTreeViewItemParent *parent, const TFilePath &path)
-		: MyTreeViewItem(parent), m_path(path) {}
+		: MyTreeViewItem(parent), m_path(path)
+	{
+	}
 	wstring getName() const
 	{
-		return m_path.isRoot()
-				   ? m_path.getWideString()
-				   : m_path.withoutParentDir().getWideString();
+		return m_path.isRoot() ? m_path.getWideString() : m_path.withoutParentDir().getWideString();
 	}
 
-	TDimension getIconSize() const
-	{
-		return TDimension(16, 16);
-	}
+	TDimension getIconSize() const { return TDimension(16, 16); }
 
 	void onOpen()
 	{
@@ -241,7 +229,7 @@ public:
 			for (TFilePathSet::iterator it = fps.begin(); it != fps.end(); it++) {
 				if (TFileStatus(*it).isDirectory())
 					new FileFolderItem(this, *it);
-				//else
+				// else
 				//  new SimpleFileItem(this, *it);
 			}
 		} catch (TException &e) {
@@ -261,9 +249,8 @@ public:
 class MyComputerFolder : public MyTreeViewItem
 {
 
-public:
-	MyComputerFolder(TTreeViewItemParent *parent)
-		: MyTreeViewItem(parent) {}
+  public:
+	MyComputerFolder(TTreeViewItemParent *parent) : MyTreeViewItem(parent) {}
 
 	wstring getName() const { return toWideString("My Computer"); }
 
@@ -276,10 +263,7 @@ public:
 			TTreeViewItem *item = new FileFolderItem(this, *it);
 		}
 	}
-	void drawIcon(TTreeView *w, const TPoint &origin)
-	{
-		w->rectwrite(mycomputer, origin);
-	}
+	void drawIcon(TTreeView *w, const TPoint &origin) { w->rectwrite(mycomputer, origin); }
 };
 
 //-------------------------------------------------------------------
@@ -287,20 +271,13 @@ public:
 class HistoryFolder : public MyTreeViewItem
 {
 
-public:
-	HistoryFolder(TTreeViewItemParent *parent)
-		: MyTreeViewItem(parent) {}
+  public:
+	HistoryFolder(TTreeViewItemParent *parent) : MyTreeViewItem(parent) {}
 
 	wstring getName() const { return toWideString("History"); }
 
-	void onOpen()
-	{
-		clearItems();
-	}
-	void drawIcon(TTreeView *w, const TPoint &origin)
-	{
-		w->rectwrite(history, origin);
-	}
+	void onOpen() { clearItems(); }
+	void drawIcon(TTreeView *w, const TPoint &origin) { w->rectwrite(history, origin); }
 };
 
 //-------------------------------------------------------------------
@@ -308,9 +285,8 @@ public:
 class LibraryFolder : public MyTreeViewItem
 {
 
-public:
-	LibraryFolder(TTreeViewItemParent *parent)
-		: MyTreeViewItem(parent) {}
+  public:
+	LibraryFolder(TTreeViewItemParent *parent) : MyTreeViewItem(parent) {}
 
 	wstring getName() const { return toWideString("Library"); }
 
@@ -322,10 +298,7 @@ public:
 		new FileFolderItem(this, root + "images");
 		new FileFolderItem(this, root + "scenes");
 	}
-	void drawIcon(TTreeView *w, const TPoint &origin)
-	{
-		w->rectwrite(library, origin);
-	}
+	void drawIcon(TTreeView *w, const TPoint &origin) { w->rectwrite(library, origin); }
 };
 
 //-------------------------------------------------------------------
@@ -333,21 +306,14 @@ public:
 class WorkFolder : public FileFolderItem
 {
 
-public:
-	WorkFolder(TTreeViewItemParent *parent)
-		: FileFolderItem(parent, TEnv::getRootDir() + "work") {}
+  public:
+	WorkFolder(TTreeViewItemParent *parent) : FileFolderItem(parent, TEnv::getRootDir() + "work") {}
 
-	TDimension getIconSize() const
-	{
-		return TDimension(24, 24);
-	}
+	TDimension getIconSize() const { return TDimension(24, 24); }
 
 	wstring getName() const { return toWideString("Work"); }
 
-	void drawIcon(TTreeView *w, const TPoint &origin)
-	{
-		w->rectwrite(workinprogress, origin);
-	}
+	void drawIcon(TTreeView *w, const TPoint &origin) { w->rectwrite(workinprogress, origin); }
 };
 //-------------------------------------------------------------------
 
@@ -356,7 +322,7 @@ class FileFolderTreeView : public MyTreeView
 	DirectoryBrowser *m_viewer;
 	TTreeViewItem *m_myComputer;
 
-public:
+  public:
 	FileFolderTreeView(TWidget *parent, DirectoryBrowser *viewer)
 		: MyTreeView(parent), m_viewer(viewer)
 	{
@@ -365,10 +331,10 @@ public:
 		m_myComputer->open();
 
 		/*
-    new HistoryFolder(this);
-    new LibraryFolder(this);
-    new WorkFolder(this);
-    */
+	new HistoryFolder(this);
+	new LibraryFolder(this);
+	new WorkFolder(this);
+	*/
 	}
 
 	void leftButtonDoubleClick(const TMouseEvent &e);
@@ -411,8 +377,7 @@ TTreeViewItem *openChild(TTreeViewItem *folder, const TFilePath &childPath)
 {
 	int count = folder->getItemCount();
 	for (int i = 0; i < count; ++i) {
-		FileFolderItem *item =
-			dynamic_cast<FileFolderItem *>(folder->getItem(i));
+		FileFolderItem *item = dynamic_cast<FileFolderItem *>(folder->getItem(i));
 
 		if (item && item->getPath() == childPath) {
 			item->open();
@@ -473,7 +438,7 @@ void FileFolderTreeView::setCurrentDir(const TFilePath &dirPath)
 
 class FileBrowser::Data
 {
-public:
+  public:
 	Data() {}
 	~Data() {}
 

@@ -17,10 +17,10 @@
 
 class DVAPI TColorSlider : public TWidget
 {
-public:
+  public:
 	class DVAPI Color : public TPixel32
 	{
-	public:
+	  public:
 		int h, s, v;
 		Color() : TPixel32(), h(0), s(0), v(0) {}
 		Color(const TPixel32 &c) : TPixel32(c), h(0), s(0), v(0) { updateHsv(); }
@@ -41,7 +41,7 @@ public:
 
 	class DVAPI Action
 	{
-	public:
+	  public:
 		Action() {}
 		virtual ~Action() {}
 		virtual void notify(const Color &color, bool dragging) = 0;
@@ -84,14 +84,13 @@ public:
 
 	class Data;
 
-private:
+  private:
 	Data *m_data;
 };
 
-template <class T>
-class TColorSliderAction : public TColorSlider::Action
+template <class T> class TColorSliderAction : public TColorSlider::Action
 {
-public:
+  public:
 	typedef void (T::*CommandMethod)(const TColorSlider::Color &color, bool dragging);
 
 	TColorSliderAction(T *target, CommandMethod method) : m_target(target), m_method(method){};
@@ -100,7 +99,7 @@ public:
 		(m_target->*m_method)(color, dragging);
 	};
 
-private:
+  private:
 	T *m_target;
 	CommandMethod m_method;
 };

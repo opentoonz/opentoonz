@@ -20,8 +20,7 @@
 #include <QAction>
 #include <QIntValidator>
 
-FunctionKeyframeNavigator::FunctionKeyframeNavigator(QWidget *parent)
-	: KeyframeNavigator(parent)
+FunctionKeyframeNavigator::FunctionKeyframeNavigator(QWidget *parent) : KeyframeNavigator(parent)
 {
 }
 

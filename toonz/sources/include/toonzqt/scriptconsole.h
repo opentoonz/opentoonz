@@ -29,21 +29,21 @@ class DVAPI ScriptConsole : public QTextEdit
 
 	QString m_prompt;
 
-public:
+  public:
 	ScriptConsole(QWidget *parent = 0);
 	~ScriptConsole();
 
 	void executeCommand(const QString &cmd);
 	ScriptEngine *getEngine() const { return m_engine; }
 
-protected:
+  protected:
 	void keyPressEvent(QKeyEvent *e);
 	void onReturnKeyPress();
 
 	bool canInsertFromMimeData(const QMimeData *source) const;
 	void insertFromMimeData(const QMimeData *source);
 
-public slots:
+  public slots:
 	void onEvaluationDone();
 	void output(int, const QString &msg);
 	void onCursorPositionChanged();

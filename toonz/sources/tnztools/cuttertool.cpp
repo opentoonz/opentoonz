@@ -46,16 +46,13 @@ class UndoCutter : public ToolUtils::TToolUndo
 	int m_row;
 	int m_column;
 
-public:
-	UndoCutter(TXshSimpleLevel *level,
-			   const TFrameId &frameId,
-			   VIStroke *oldStroke,
-			   int pos,
-			   int newStrokeId1,
-			   int newStrokeId2,
-			   std::vector<TFilledRegionInf> *fillInformation,
+  public:
+	UndoCutter(TXshSimpleLevel *level, const TFrameId &frameId, VIStroke *oldStroke, int pos,
+			   int newStrokeId1, int newStrokeId2, std::vector<TFilledRegionInf> *fillInformation,
 			   std::vector<DoublePair> *sortedWRanges)
-		: TToolUndo(level, frameId), m_oldStroke(oldStroke), m_newStrokeId1(newStrokeId1), m_newStrokeId2(newStrokeId2), m_pos(pos), m_fillInformation(fillInformation), m_sortedWRanges(sortedWRanges)
+		: TToolUndo(level, frameId), m_oldStroke(oldStroke), m_newStrokeId1(newStrokeId1),
+		  m_newStrokeId2(newStrokeId2), m_pos(pos), m_fillInformation(fillInformation),
+		  m_sortedWRanges(sortedWRanges)
 	{
 		TTool::Application *app = TTool::getApplication();
 		if (app) {
@@ -76,7 +73,8 @@ public:
 		TTool::Application *app = TTool::getApplication();
 		if (!app)
 			return;
-		if (dynamic_cast<StrokeSelection *>(TTool::getApplication()->getCurrentSelection()->getSelection()))
+		if (dynamic_cast<StrokeSelection *>(
+				TTool::getApplication()->getCurrentSelection()->getSelection()))
 			TTool::getApplication()->getCurrentSelection()->setSelection(0);
 
 		if (app->getCurrentFrame()->isEditingScene()) {
@@ -154,10 +152,7 @@ public:
 		return sizeof(*this) + m_fillInformation->capacity() * sizeof(TFilledRegionInf) + 500;
 	}
 
-	QString getToolName()
-	{
-		return QString("Cutter Tool");
-	}
+	QString getToolName() { return QString("Cutter Tool"); }
 };
 
 //=============================================================================
@@ -167,7 +162,7 @@ public:
 class CutterTool : public TTool
 {
 
-public:
+  public:
 	bool m_mouseDown;
 
 	TPointD m_vTan;
@@ -177,8 +172,7 @@ public:
 	int m_cursorId;
 	double m_pW;
 
-	CutterTool()
-		: TTool("T_Cutter"), m_mouseDown(false), m_cursorId(ToolCursor::CutterCursor)
+	CutterTool() : TTool("T_Cutter"), m_mouseDown(false), m_cursorId(ToolCursor::CutterCursor)
 	{
 		bind(TTool::VectorImage);
 	}
@@ -187,9 +181,9 @@ public:
 
 	void draw()
 	{
-		//TAffine viewMatrix = getViewer()->getViewMatrix();
-		//glPushMatrix();
-		//tglMultMatrix(viewMatrix);
+		// TAffine viewMatrix = getViewer()->getViewMatrix();
+		// glPushMatrix();
+		// tglMultMatrix(viewMatrix);
 
 		const double pixelSize = getPixelSize();
 
@@ -208,7 +202,7 @@ public:
 			tglColor(TPixelD(0.1, 0.9, 0.1));
 			tglDrawSegment(p - v, p + v);
 		}
-		//glPopMatrix();
+		// glPopMatrix();
 	}
 
 	void leftButtonDown(const TPointD &pos, const TMouseEvent &)
@@ -268,7 +262,8 @@ public:
 			}
 
 			std::vector<TFilledRegionInf> *fillInformation = new std::vector<TFilledRegionInf>;
-			ImageUtils::getFillingInformationOverlappingArea(vi, *fillInformation, strokeRef->getBBox());
+			ImageUtils::getFillingInformationOverlappingArea(vi, *fillInformation,
+															 strokeRef->getBBox());
 
 			VIStroke *oldStroke = cloneVIStroke(vi->getVIStroke(strokeIndex));
 			bool isSelfLoop = vi->getStroke(strokeIndex)->isSelfLoop();
@@ -280,10 +275,14 @@ public:
 			assert(sl);
 			TFrameId id = getCurrentFid();
 			if (isSelfLoop || sortedWRanges->size() == 1) {
-				nundo = new UndoCutter(sl, id, oldStroke, strokeIndex, vi->getStroke(strokeIndex)->getId(), -1, fillInformation, sortedWRanges);
+				nundo = new UndoCutter(sl, id, oldStroke, strokeIndex,
+									   vi->getStroke(strokeIndex)->getId(), -1, fillInformation,
+									   sortedWRanges);
 			} else {
 				assert(strokeIndex + 1 < vi->getStrokeCount());
-				nundo = new UndoCutter(sl, id, oldStroke, strokeIndex, vi->getStroke(strokeIndex)->getId(), vi->getStroke(strokeIndex + 1)->getId(), fillInformation, sortedWRanges);
+				nundo = new UndoCutter(
+					sl, id, oldStroke, strokeIndex, vi->getStroke(strokeIndex)->getId(),
+					vi->getStroke(strokeIndex + 1)->getId(), fillInformation, sortedWRanges);
 			}
 
 			TUndoManager::manager()->add(nundo);
@@ -317,14 +316,9 @@ public:
 		invalidate();
 	}
 
-	void onLeave()
-	{
-		m_speed = TPointD(0, 0);
-	}
+	void onLeave() { m_speed = TPointD(0, 0); }
 
-	void onActivate()
-	{
-	}
+	void onActivate() {}
 	void onEnter()
 	{
 		if ((TVectorImageP)getImage(false))
@@ -339,6 +333,6 @@ public:
 
 //-----------------------------------------------------------------------------
 } // namespace
-//-----------------------------------------------------------------------------
+  //-----------------------------------------------------------------------------
 
-//TTool *getCutterTool() {return &cutterTool;}
+// TTool *getCutterTool() {return &cutterTool;}

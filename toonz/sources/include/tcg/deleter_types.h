@@ -10,7 +10,7 @@
   \file     deleter_types.h
 
   \brief    This file contains implementations of some useful deleter functors
-            and deleter concepts.
+			and deleter concepts.
 */
 
 namespace tcg
@@ -20,23 +20,19 @@ namespace tcg
 //    Deleter  objects
 //*********************************************************************************
 
-template <typename T>
-struct deleter {
+template <typename T> struct deleter {
 	void operator()(T *ptr) const { delete ptr; }
 };
 
-template <typename T>
-struct deleter<T[]> {
+template <typename T> struct deleter<T[]> {
 	void operator()(T *ptr) const { delete[] ptr; }
 };
 
-template <typename T>
-struct dtor {
+template <typename T> struct dtor {
 	void operator()(T *ptr) const { ptr->~T(); }
 };
 
-template <typename T>
-struct dtor<T[]> {
+template <typename T> struct dtor<T[]> {
 	int m_count;
 
 	dtor(int count) : m_count(count) {}
@@ -59,13 +55,12 @@ struct freer {
   to support specialization on incomplete types.
 */
 
-template <typename T>
-class deleter_concept
+template <typename T> class deleter_concept
 {
-public:
+  public:
 	typedef typename tcg::traits<T>::pointer_type pointer_type;
 
-public:
+  public:
 	virtual ~deleter_concept() {}
 
 	virtual deleter_concept *clone() const = 0;
@@ -74,18 +69,16 @@ public:
 
 //--------------------------------------------------------------------------------
 
-template <typename T>
-class deleter_model : public deleter_concept<T>
+template <typename T> class deleter_model : public deleter_concept<T>
 {
-public:
+  public:
 	deleter_concept<T> *clone() const { return new deleter_model<T>(*this); }
 	void operator()(T *ptr) { delete ptr; }
 };
 
-template <typename T>
-class deleter_model<T[]> : public deleter_concept<T[]>
+template <typename T> class deleter_model<T[]> : public deleter_concept<T[]>
 {
-public:
+  public:
 	deleter_concept<T[]> *clone() const { return new deleter_model<T[]>(*this); }
 	void operator()(T *ptr) { delete[] ptr; }
 };

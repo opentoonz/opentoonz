@@ -17,24 +17,15 @@ class LoadCurveUndo : public TUndo
 	TDoubleParamP m_curve;
 	TDoubleParamP m_oldCurve, m_newCurve;
 
-public:
+  public:
 	LoadCurveUndo(TDoubleParam *curve) : m_curve(curve)
 	{
 		m_oldCurve = static_cast<TDoubleParam *>(curve->clone());
 	}
-	void onAdd()
-	{
-		m_newCurve = static_cast<TDoubleParam *>(m_curve->clone());
-	}
+	void onAdd() { m_newCurve = static_cast<TDoubleParam *>(m_curve->clone()); }
 
-	void undo() const
-	{
-		m_curve->copy(m_oldCurve.getPointer());
-	}
-	void redo() const
-	{
-		m_curve->copy(m_newCurve.getPointer());
-	}
+	void undo() const { m_curve->copy(m_oldCurve.getPointer()); }
+	void redo() const { m_curve->copy(m_newCurve.getPointer()); }
 	int getSize() const
 	{
 		return sizeof(*this) + 2 * sizeof(TDoubleParam); // not very accurate
@@ -48,7 +39,7 @@ class CurvePopup : public FileBrowserPopup
 	TFilePath m_folderPath;
 	TDoubleParam *m_curve;
 
-public:
+  public:
 	CurvePopup(const QString name, const TFilePath folderPath, TDoubleParam *curve)
 		: FileBrowserPopup(name), m_folderPath(folderPath), m_curve(curve)
 	{
@@ -69,7 +60,8 @@ public:
 	bool checkOverride(const TFilePath &fp) const
 	{
 		if (TFileStatus(fp).doesExist()) {
-			QString question = QObject::tr("Are you sure you want to override ") + QString::fromStdWString(fp.getLevelNameW()) + "?";
+			QString question = QObject::tr("Are you sure you want to override ") +
+							   QString::fromStdWString(fp.getLevelNameW()) + "?";
 			int ret = DVGui::MsgBox(question, QObject::tr("Override"), QObject::tr("Cancel"), 1);
 			return ret == 1;
 		} else
@@ -83,7 +75,7 @@ public:
 
 class SaveCurvePopup : public CurvePopup
 {
-public:
+  public:
 	SaveCurvePopup(const TFilePath folderPath, TDoubleParam *curve)
 		: CurvePopup(tr("Save Curve"), folderPath, curve)
 	{
@@ -124,7 +116,7 @@ bool SaveCurvePopup::execute()
 
 class LoadCurvePopup : public CurvePopup
 {
-public:
+  public:
 	LoadCurvePopup(const TFilePath folderPath, TDoubleParam *curve)
 		: CurvePopup(tr("Load Curve"), folderPath, curve)
 	{
@@ -152,7 +144,7 @@ bool LoadCurvePopup::execute()
 
 	try {
 		TIStream is(fp);
-		//default value must be kept the same!!!
+		// default value must be kept the same!!!
 		TDoubleParam *curve = getCurve();
 		double defaultValue = curve->getDefaultValue();
 		LoadCurveUndo *undo = new LoadCurveUndo(curve);
@@ -173,7 +165,7 @@ class ExportCurvePopup : public CurvePopup
 {
 	std::string m_name;
 
-public:
+  public:
 	ExportCurvePopup(const TFilePath folderPath, TDoubleParam *curve, const std::string &name)
 		: CurvePopup(tr("Export Curve"), folderPath, curve), m_name(name)
 	{
@@ -207,8 +199,7 @@ bool ExportCurvePopup::execute()
 		os << "# COMPOSED BY:  " << TSystem::getUserName().toStdString() << std::endl;
 		os << "# MACHINE NAME: " << TSystem::getHostName().toStdString() << std::endl;
 		// os << "# DATE:         " << TSystem::getCurrentTime() << endl;
-		os << std::endl
-		   << std::endl;
+		os << std::endl << std::endl;
 
 		int frameCount = 1;
 		TDoubleParam *curve = getCurve();

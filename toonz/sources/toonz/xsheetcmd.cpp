@@ -101,9 +101,7 @@ bool isKeyframe(int r, int c)
 {
 	TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
 
-	TStageObjectId objectId =
-		(c == -1) ? TStageObjectId::CameraId(0)
-				  : TStageObjectId::ColumnId(c);
+	TStageObjectId objectId = (c == -1) ? TStageObjectId::CameraId(0) : TStageObjectId::ColumnId(c);
 
 	TStageObject *object = xsh->getStageObject(objectId);
 	assert(object);
@@ -122,10 +120,10 @@ namespace XshCmd
 
 class InsertSceneFrameUndo : public TUndo
 {
-protected:
+  protected:
 	int m_frame;
 
-public:
+  public:
 	InsertSceneFrameUndo(int frame) : m_frame(frame) {}
 
 	void undo() const
@@ -150,12 +148,9 @@ public:
 	{
 		return QObject::tr("Insert Frame  at Frame %1").arg(QString::number(m_frame + 1));
 	}
-	int getHistoryType()
-	{
-		return HistoryType::Xsheet;
-	}
+	int getHistoryType() { return HistoryType::Xsheet; }
 
-protected:
+  protected:
 	static void doInsertSceneFrame(int frame);
 	static void doRemoveSceneFrame(int frame);
 };
@@ -232,7 +227,7 @@ void insertSceneFrame(int frame)
 
 class InsertSceneFrameCommand : public MenuItemHandler
 {
-public:
+  public:
 	InsertSceneFrameCommand() : MenuItemHandler(MI_InsertSceneFrame) {}
 	void execute()
 	{
@@ -250,9 +245,8 @@ class RemoveSceneFrameUndo : public InsertSceneFrameUndo
 	std::vector<TXshCell> m_cells;
 	std::vector<TStageObject::Keyframe> m_keyframes;
 
-public:
-	RemoveSceneFrameUndo(int frame)
-		: InsertSceneFrameUndo(frame)
+  public:
+	RemoveSceneFrameUndo(int frame) : InsertSceneFrameUndo(frame)
 	{
 		// Store cells and TStageObject::Keyframe that will be canceled
 
@@ -315,10 +309,7 @@ public:
 	{
 		return QObject::tr("Remove Frame  at Frame %1").arg(QString::number(m_frame + 1));
 	}
-	int getHistoryType()
-	{
-		return HistoryType::Xsheet;
-	}
+	int getHistoryType() { return HistoryType::Xsheet; }
 };
 
 //-----------------------------------------------------------------------------
@@ -335,7 +326,7 @@ void removeSceneFrame(int frame)
 
 class RemoveSceneFrameCommand : public MenuItemHandler
 {
-public:
+  public:
 	RemoveSceneFrameCommand() : MenuItemHandler(MI_RemoveSceneFrame) {}
 	void execute()
 	{
@@ -350,30 +341,25 @@ public:
 
 class GlobalKeyframeUndo : public TUndo
 {
-public:
-	GlobalKeyframeUndo(int frame)
-		: m_frame(frame) {}
+  public:
+	GlobalKeyframeUndo(int frame) : m_frame(frame) {}
 
 	int getSize() const { return sizeof(*this) + m_columns.size() * sizeof(int); }
 
-	int getHistoryType()
-	{
-		return HistoryType::Xsheet;
-	}
+	int getHistoryType() { return HistoryType::Xsheet; }
 
-protected:
+  protected:
 	std::vector<int> m_columns;
 	int m_frame;
 
-protected:
+  protected:
 	static void doInsertGlobalKeyframes(int frame, const std::vector<int> &columns);
 	static void doRemoveGlobalKeyframes(int frame, const std::vector<int> &columns);
 };
 
 //-----------------------------------------------------------------------------
 
-void GlobalKeyframeUndo::doInsertGlobalKeyframes(
-	int frame, const std::vector<int> &columns)
+void GlobalKeyframeUndo::doInsertGlobalKeyframes(int frame, const std::vector<int> &columns)
 {
 	TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
 
@@ -397,7 +383,8 @@ void GlobalKeyframeUndo::doInsertGlobalKeyframes(
 			objectId = TStageObjectId::ColumnId(c);
 
 		TXshColumn *xshColumn = xsh->getColumn(c);
-		if ((!xshColumn || xshColumn->isLocked() || xshColumn->isCellEmpty(frame)) && !objectId.isCamera())
+		if ((!xshColumn || xshColumn->isLocked() || xshColumn->isCellEmpty(frame)) &&
+			!objectId.isCamera())
 			continue;
 
 		TStageObject *obj = xsh->getStageObject(objectId);
@@ -407,8 +394,7 @@ void GlobalKeyframeUndo::doInsertGlobalKeyframes(
 
 //-----------------------------------------------------------------------------
 
-void GlobalKeyframeUndo::doRemoveGlobalKeyframes(
-	int frame, const std::vector<int> &columns)
+void GlobalKeyframeUndo::doRemoveGlobalKeyframes(int frame, const std::vector<int> &columns)
 {
 	TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
 
@@ -445,13 +431,12 @@ void GlobalKeyframeUndo::doRemoveGlobalKeyframes(
 
 class InsertGlobalKeyframeUndo : public GlobalKeyframeUndo
 {
-public:
-	InsertGlobalKeyframeUndo(int frame, const std::vector<int> &columns)
-		: GlobalKeyframeUndo(frame)
+  public:
+	InsertGlobalKeyframeUndo(int frame, const std::vector<int> &columns) : GlobalKeyframeUndo(frame)
 	{
-		tcg::substitute(m_columns, columns | ba::filtered(
-												 std::not1(boost::make_adaptable<bool, int>(
-													 boost::bind(isKeyframe, frame, _1)))));
+		tcg::substitute(m_columns,
+						columns | ba::filtered(std::not1(boost::make_adaptable<bool, int>(
+									  boost::bind(isKeyframe, frame, _1)))));
 	}
 
 	void redo() const
@@ -496,7 +481,7 @@ void insertGlobalKeyframe(int frame)
 
 class InsertGlobalKeyframeCommand : public MenuItemHandler
 {
-public:
+  public:
 	InsertGlobalKeyframeCommand() : MenuItemHandler(MI_InsertGlobalKeyframe) {}
 	void execute()
 	{
@@ -513,9 +498,8 @@ class RemoveGlobalKeyframeUndo : public GlobalKeyframeUndo
 {
 	std::vector<TStageObject::Keyframe> m_keyframes;
 
-public:
-	RemoveGlobalKeyframeUndo(int frame, const std::vector<int> &columns)
-		: GlobalKeyframeUndo(frame)
+  public:
+	RemoveGlobalKeyframeUndo(int frame, const std::vector<int> &columns) : GlobalKeyframeUndo(frame)
 	{
 		struct locals {
 
@@ -524,8 +508,7 @@ public:
 				TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
 
 				TStageObjectId objectId =
-					(c == -1) ? TStageObjectId::CameraId(0)
-							  : TStageObjectId::ColumnId(c);
+					(c == -1) ? TStageObjectId::CameraId(0) : TStageObjectId::ColumnId(c);
 
 				TStageObject *object = xsh->getStageObject(objectId);
 				assert(object);
@@ -534,11 +517,10 @@ public:
 			}
 		}; // locals
 
-		tcg::substitute(m_columns, columns | ba::filtered(
-												 boost::bind(isKeyframe, frame, _1)));
+		tcg::substitute(m_columns, columns | ba::filtered(boost::bind(isKeyframe, frame, _1)));
 
-		tcg::substitute(m_keyframes, m_columns | ba::transformed(
-													 boost::bind(locals::getKeyframe, frame, _1)));
+		tcg::substitute(m_keyframes,
+						m_columns | ba::transformed(boost::bind(locals::getKeyframe, frame, _1)));
 	}
 
 	void redo() const
@@ -558,8 +540,7 @@ public:
 			int col = m_columns[c];
 
 			TStageObjectId objectId =
-				(col == -1) ? TStageObjectId::CameraId(0)
-							: TStageObjectId::ColumnId(col);
+				(col == -1) ? TStageObjectId::CameraId(0) : TStageObjectId::ColumnId(col);
 
 			TStageObject *object = xsh->getStageObject(objectId);
 			object->setKeyframeWithoutUndo(m_frame, m_keyframes[c]);
@@ -600,7 +581,7 @@ void removeGlobalKeyframe(int frame)
 
 class RemoveGlobalKeyframeCommand : public MenuItemHandler
 {
-public:
+  public:
 	RemoveGlobalKeyframeCommand() : MenuItemHandler(MI_RemoveGlobalKeyframe) {}
 	void execute()
 	{
@@ -617,13 +598,14 @@ public:
 
 class SelectRowKeyframesCommand : public MenuItemHandler
 {
-public:
+  public:
 	SelectRowKeyframesCommand() : MenuItemHandler(MI_SelectRowKeyframes) {}
 
 	void execute()
 	{
 		TApp *app = TApp::instance();
-		TKeyframeSelection *selection = dynamic_cast<TKeyframeSelection *>(app->getCurrentSelection()->getSelection());
+		TKeyframeSelection *selection =
+			dynamic_cast<TKeyframeSelection *>(app->getCurrentSelection()->getSelection());
 		int row = app->getCurrentFrame()->getFrame();
 
 		selection->selectNone();
@@ -654,13 +636,14 @@ public:
 
 class SelectColumnKeyframesCommand : public MenuItemHandler
 {
-public:
+  public:
 	SelectColumnKeyframesCommand() : MenuItemHandler(MI_SelectColumnKeyframes) {}
 
 	void execute()
 	{
 		TApp *app = TApp::instance();
-		TKeyframeSelection *selection = dynamic_cast<TKeyframeSelection *>(app->getCurrentSelection()->getSelection());
+		TKeyframeSelection *selection =
+			dynamic_cast<TKeyframeSelection *>(app->getCurrentSelection()->getSelection());
 
 		int col = app->getCurrentColumn()->getColumnIndex();
 		TStageObjectId objectId = app->getCurrentObject()->getObjectId();
@@ -674,8 +657,8 @@ public:
 		TStageObject *pegbar = xsh->getStageObject(objectId);
 		TStageObject::KeyframeMap keyframes;
 		pegbar->getKeyframes(keyframes);
-		for (TStageObject::KeyframeMap::iterator it = keyframes.begin();
-			 it != keyframes.end(); ++it)
+		for (TStageObject::KeyframeMap::iterator it = keyframes.begin(); it != keyframes.end();
+			 ++it)
 			selection->select(it->first, col);
 
 		app->getCurrentXsheet()->notifyXsheetChanged();
@@ -686,13 +669,14 @@ public:
 
 class SelectAllKeyframesCommand : public MenuItemHandler
 {
-public:
+  public:
 	SelectAllKeyframesCommand() : MenuItemHandler(MI_SelectAllKeyframes) {}
 
 	void execute()
 	{
 		TApp *app = TApp::instance();
-		TKeyframeSelection *selection = dynamic_cast<TKeyframeSelection *>(app->getCurrentSelection()->getSelection());
+		TKeyframeSelection *selection =
+			dynamic_cast<TKeyframeSelection *>(app->getCurrentSelection()->getSelection());
 		if (!selection)
 			return;
 
@@ -714,8 +698,8 @@ public:
 			TStageObject *pegbar = xsh->getStageObject(objectId);
 			TStageObject::KeyframeMap keyframes;
 			pegbar->getKeyframes(keyframes);
-			for (TStageObject::KeyframeMap::iterator it = keyframes.begin();
-				 it != keyframes.end(); ++it) {
+			for (TStageObject::KeyframeMap::iterator it = keyframes.begin(); it != keyframes.end();
+				 ++it) {
 				int row = it->first;
 				assert(pegbar->isKeyframe(row));
 				selection->select(row, col);
@@ -729,13 +713,14 @@ public:
 
 class SelectAllKeyframesBeforeCommand : public MenuItemHandler
 {
-public:
+  public:
 	SelectAllKeyframesBeforeCommand() : MenuItemHandler(MI_SelectAllKeyframesNotBefore) {}
 
 	void execute()
 	{
 		TApp *app = TApp::instance();
-		TKeyframeSelection *selection = dynamic_cast<TKeyframeSelection *>(app->getCurrentSelection()->getSelection());
+		TKeyframeSelection *selection =
+			dynamic_cast<TKeyframeSelection *>(app->getCurrentSelection()->getSelection());
 		if (!selection)
 			return;
 		int currentRow = app->getCurrentFrame()->getFrame();
@@ -757,8 +742,8 @@ public:
 			TStageObject *pegbar = xsh->getStageObject(objectId);
 			TStageObject::KeyframeMap keyframes;
 			pegbar->getKeyframes(keyframes);
-			for (TStageObject::KeyframeMap::iterator it = keyframes.begin();
-				 it != keyframes.end(); ++it) {
+			for (TStageObject::KeyframeMap::iterator it = keyframes.begin(); it != keyframes.end();
+				 ++it) {
 				int row = it->first;
 				if (row < currentRow)
 					continue;
@@ -774,13 +759,14 @@ public:
 
 class SelectAllKeyframesAfterCommand : public MenuItemHandler
 {
-public:
+  public:
 	SelectAllKeyframesAfterCommand() : MenuItemHandler(MI_SelectAllKeyframesNotAfter) {}
 
 	void execute()
 	{
 		TApp *app = TApp::instance();
-		TKeyframeSelection *selection = dynamic_cast<TKeyframeSelection *>(app->getCurrentSelection()->getSelection());
+		TKeyframeSelection *selection =
+			dynamic_cast<TKeyframeSelection *>(app->getCurrentSelection()->getSelection());
 		if (!selection)
 			return;
 		int currentRow = app->getCurrentFrame()->getFrame();
@@ -803,8 +789,8 @@ public:
 			TStageObject *pegbar = xsh->getStageObject(objectId);
 			TStageObject::KeyframeMap keyframes;
 			pegbar->getKeyframes(keyframes);
-			for (TStageObject::KeyframeMap::iterator it = keyframes.begin();
-				 it != keyframes.end(); ++it) {
+			for (TStageObject::KeyframeMap::iterator it = keyframes.begin(); it != keyframes.end();
+				 ++it) {
 				int row = it->first;
 				if (row > currentRow)
 					continue;
@@ -820,13 +806,14 @@ public:
 
 class SelectPreviousKeysInColumnCommand : public MenuItemHandler
 {
-public:
+  public:
 	SelectPreviousKeysInColumnCommand() : MenuItemHandler(MI_SelectPreviousKeysInColumn) {}
 
 	void execute()
 	{
 		TApp *app = TApp::instance();
-		TKeyframeSelection *selection = dynamic_cast<TKeyframeSelection *>(app->getCurrentSelection()->getSelection());
+		TKeyframeSelection *selection =
+			dynamic_cast<TKeyframeSelection *>(app->getCurrentSelection()->getSelection());
 		if (!selection)
 			return;
 		int currentRow = app->getCurrentFrame()->getFrame();
@@ -844,7 +831,8 @@ public:
 		TStageObject *pegbar = xsh->getStageObject(objectId);
 		TStageObject::KeyframeMap keyframes;
 		pegbar->getKeyframes(keyframes);
-		for (TStageObject::KeyframeMap::iterator it = keyframes.begin(); it != keyframes.end(); ++it) {
+		for (TStageObject::KeyframeMap::iterator it = keyframes.begin(); it != keyframes.end();
+			 ++it) {
 			int row = it->first;
 			if (row > currentRow)
 				continue;
@@ -859,13 +847,14 @@ public:
 
 class SelectFollowingKeysInColumnCommand : public MenuItemHandler
 {
-public:
+  public:
 	SelectFollowingKeysInColumnCommand() : MenuItemHandler(MI_SelectFollowingKeysInColumn) {}
 
 	void execute()
 	{
 		TApp *app = TApp::instance();
-		TKeyframeSelection *selection = dynamic_cast<TKeyframeSelection *>(app->getCurrentSelection()->getSelection());
+		TKeyframeSelection *selection =
+			dynamic_cast<TKeyframeSelection *>(app->getCurrentSelection()->getSelection());
 		if (!selection)
 			return;
 		int currentRow = app->getCurrentFrame()->getFrame();
@@ -882,7 +871,8 @@ public:
 		TStageObject *pegbar = xsh->getStageObject(objectId);
 		TStageObject::KeyframeMap keyframes;
 		pegbar->getKeyframes(keyframes);
-		for (TStageObject::KeyframeMap::iterator it = keyframes.begin(); it != keyframes.end(); ++it) {
+		for (TStageObject::KeyframeMap::iterator it = keyframes.begin(); it != keyframes.end();
+			 ++it) {
 			int row = it->first;
 			if (row < currentRow)
 				continue;
@@ -897,13 +887,14 @@ public:
 
 class SelectPreviousKeysInRowCommand : public MenuItemHandler
 {
-public:
+  public:
 	SelectPreviousKeysInRowCommand() : MenuItemHandler(MI_SelectPreviousKeysInRow) {}
 
 	void execute()
 	{
 		TApp *app = TApp::instance();
-		TKeyframeSelection *selection = dynamic_cast<TKeyframeSelection *>(app->getCurrentSelection()->getSelection());
+		TKeyframeSelection *selection =
+			dynamic_cast<TKeyframeSelection *>(app->getCurrentSelection()->getSelection());
 		if (!selection)
 			return;
 		int currentRow = app->getCurrentFrame()->getFrame();
@@ -927,7 +918,8 @@ public:
 			TStageObject *pegbar = xsh->getStageObject(objectId);
 			TStageObject::KeyframeMap keyframes;
 			pegbar->getKeyframes(keyframes);
-			for (TStageObject::KeyframeMap::iterator it = keyframes.begin(); it != keyframes.end(); ++it) {
+			for (TStageObject::KeyframeMap::iterator it = keyframes.begin(); it != keyframes.end();
+				 ++it) {
 				int row = it->first;
 				if (row != currentRow)
 					continue;
@@ -944,13 +936,14 @@ public:
 
 class SelectFollowingKeysInRowCommand : public MenuItemHandler
 {
-public:
+  public:
 	SelectFollowingKeysInRowCommand() : MenuItemHandler(MI_SelectFollowingKeysInRow) {}
 
 	void execute()
 	{
 		TApp *app = TApp::instance();
-		TKeyframeSelection *selection = dynamic_cast<TKeyframeSelection *>(app->getCurrentSelection()->getSelection());
+		TKeyframeSelection *selection =
+			dynamic_cast<TKeyframeSelection *>(app->getCurrentSelection()->getSelection());
 		if (!selection)
 			return;
 		int currentRow = app->getCurrentFrame()->getFrame();
@@ -975,7 +968,8 @@ public:
 			TStageObject *pegbar = xsh->getStageObject(objectId);
 			TStageObject::KeyframeMap keyframes;
 			pegbar->getKeyframes(keyframes);
-			for (TStageObject::KeyframeMap::iterator it = keyframes.begin(); it != keyframes.end(); ++it) {
+			for (TStageObject::KeyframeMap::iterator it = keyframes.begin(); it != keyframes.end();
+				 ++it) {
 				int row = it->first;
 				if (row != currentRow)
 					continue;
@@ -991,13 +985,14 @@ public:
 
 class InvertKeyframeSelectionCommand : public MenuItemHandler
 {
-public:
+  public:
 	InvertKeyframeSelectionCommand() : MenuItemHandler(MI_InvertKeyframeSelection) {}
 
 	void execute()
 	{
 		TApp *app = TApp::instance();
-		TKeyframeSelection *selection = dynamic_cast<TKeyframeSelection *>(app->getCurrentSelection()->getSelection());
+		TKeyframeSelection *selection =
+			dynamic_cast<TKeyframeSelection *>(app->getCurrentSelection()->getSelection());
 		if (!selection)
 			return;
 
@@ -1018,7 +1013,8 @@ public:
 			TStageObject *pegbar = xsh->getStageObject(objectId);
 			TStageObject::KeyframeMap keyframes;
 			pegbar->getKeyframes(keyframes);
-			for (TStageObject::KeyframeMap::iterator it = keyframes.begin(); it != keyframes.end(); ++it) {
+			for (TStageObject::KeyframeMap::iterator it = keyframes.begin(); it != keyframes.end();
+				 ++it) {
 				assert(pegbar->isKeyframe(it->first));
 				if (selection->isSelected(it->first, col))
 					selection->unselect(it->first, col);
@@ -1042,14 +1038,15 @@ class KeyFrameHandleCommandUndo : public TUndo
 	TStageObjectId m_objId;
 	int m_rowFirst, m_rowSecond;
 
-	TStageObject::Keyframe m_oldKeyframeFirst, m_oldKeyframeSecond,
-		m_newKeyframeFirst, m_newKeyframeSecond;
+	TStageObject::Keyframe m_oldKeyframeFirst, m_oldKeyframeSecond, m_newKeyframeFirst,
+		m_newKeyframeSecond;
 
-public:
+  public:
 	KeyFrameHandleCommandUndo(TStageObjectId id, int rowFirst, int rowSecond)
 		: m_objId(id), m_rowFirst(rowFirst), m_rowSecond(rowSecond)
 	{
-		TStageObject *pegbar = TApp::instance()->getCurrentXsheet()->getXsheet()->getStageObject(m_objId);
+		TStageObject *pegbar =
+			TApp::instance()->getCurrentXsheet()->getXsheet()->getStageObject(m_objId);
 		assert(pegbar);
 
 		m_oldKeyframeFirst = pegbar->getKeyframe(m_rowFirst);
@@ -1058,7 +1055,8 @@ public:
 
 	void onAdd()
 	{
-		TStageObject *pegbar = TApp::instance()->getCurrentXsheet()->getXsheet()->getStageObject(m_objId);
+		TStageObject *pegbar =
+			TApp::instance()->getCurrentXsheet()->getXsheet()->getStageObject(m_objId);
 		assert(pegbar);
 
 		m_newKeyframeFirst = pegbar->getKeyframe(m_rowFirst);
@@ -1067,7 +1065,8 @@ public:
 
 	void setKeyframes(const TStageObject::Keyframe &k0, const TStageObject::Keyframe &k1) const
 	{
-		TStageObject *pegbar = TApp::instance()->getCurrentXsheet()->getXsheet()->getStageObject(m_objId);
+		TStageObject *pegbar =
+			TApp::instance()->getCurrentXsheet()->getXsheet()->getStageObject(m_objId);
 		assert(pegbar);
 
 		pegbar->setKeyframeWithoutUndo(m_rowFirst, k0);
@@ -1084,13 +1083,9 @@ public:
 
 	QString getHistoryString()
 	{
-		return QObject::tr("Set Keyframe : %1")
-			.arg(QString::fromStdString(m_objId.toString()));
+		return QObject::tr("Set Keyframe : %1").arg(QString::fromStdString(m_objId.toString()));
 	}
-	int getHistoryType()
-	{
-		return HistoryType::Xsheet;
-	}
+	int getHistoryType() { return HistoryType::Xsheet; }
 };
 
 } // namespace
@@ -1099,7 +1094,7 @@ public:
 
 class SetAccelerationCommand : public MenuItemHandler
 {
-public:
+  public:
 	SetAccelerationCommand() : MenuItemHandler(MI_SetAcceleration) {}
 
 	void execute()
@@ -1148,7 +1143,7 @@ public:
 
 class SetDecelerationCommand : public MenuItemHandler
 {
-public:
+  public:
 	SetDecelerationCommand() : MenuItemHandler(MI_SetDeceleration) {}
 
 	void execute()
@@ -1195,7 +1190,7 @@ public:
 
 class SetConstantSpeedCommand : public MenuItemHandler
 {
-public:
+  public:
 	SetConstantSpeedCommand() : MenuItemHandler(MI_SetConstantSpeed) {}
 
 	void execute()
@@ -1238,7 +1233,7 @@ public:
 
 class ResetArrowCommand : public MenuItemHandler
 {
-public:
+  public:
 	ResetArrowCommand() : MenuItemHandler(MI_ResetInterpolation) {}
 
 	void execute()
@@ -1284,7 +1279,7 @@ public:
 
 class NewOutputFx : public MenuItemHandler
 {
-public:
+  public:
 	NewOutputFx() : MenuItemHandler(MI_NewOutputFx) {}
 
 	void execute()
@@ -1398,7 +1393,7 @@ class XsheetWriter
 	std::map<TXshChildLevel *, int> m_childTable;
 	std::vector<NumericColumn> m_numericColumns;
 
-public:
+  public:
 	XsheetWriter(ToonzScene *scene);
 
 	void setXsheet(TXsheet *xsh);
@@ -1418,8 +1413,7 @@ public:
 	void write(ostream &os);
 };
 
-XsheetWriter::XsheetWriter(ToonzScene *scene)
-	: m_xsh(0)
+XsheetWriter::XsheetWriter(ToonzScene *scene) : m_xsh(0)
 {
 	buildChildTable(scene);
 	setXsheet(scene->getXsheet());
@@ -1482,11 +1476,12 @@ void XsheetWriter::columnHeader(ostream &os, int c)
 void XsheetWriter::numericColumnHeader(ostream &os, int c)
 {
 	std::string pegbarName = m_numericColumns[c].m_pegbar->getName();
-	std::string curveName = m_numericColumns[c].m_curve->getName(); //toString(TStringTable::translate(m_numericColumns[c].m_curve->getName()));
+	std::string curveName =
+		m_numericColumns[c]
+			.m_curve
+			->getName(); // toString(TStringTable::translate(m_numericColumns[c].m_curve->getName()));
 	os << "  <th class='" << (c > 0 ? "numeric" : "first_numeric") << "'>";
-	os << pegbarName
-	   << "<br>"
-	   << curveName;
+	os << pegbarName << "<br>" << curveName;
 	os << "</th>" << endl;
 }
 
@@ -1572,8 +1567,7 @@ void XsheetWriter::write(ostream &os)
 		for (;;) {
 			r1 = tmin(rowCount, r0 + rowsPerPage) - 1;
 			tableCaption(os);
-			os << "<table>" << endl
-			   << "<tr>" << endl;
+			os << "<table>" << endl << "<tr>" << endl;
 			if (c0 == 0)
 				os << "  <th>&nbsp;</th>" << endl;
 			for (c = c0; c <= c1; c++) {
@@ -1625,7 +1619,8 @@ void makeHtml(TFilePath fp)
 	os << "</head><body>" << endl;
 	os << "<table class='header'>" << endl;
 	for (int k = 0; k < (int)infos.size(); k++)
-		os << "<tr><th>" << infos[k].first << ":</th><td>" << infos[k].second << "</td></tr>" << endl;
+		os << "<tr><th>" << infos[k].first << ":</th><td>" << infos[k].second << "</td></tr>"
+		   << endl;
 	os << "<tr><th>Project:</th><td>" << projectName << "</td></tr>" << endl;
 	os << "<tr><th>Scene:</th><td>" << sceneName << "</td></tr>" << endl;
 	os << "<tr><th>Frames:</th><td>" << scene->getFrameCount() << "</td></tr>" << endl;
@@ -1669,7 +1664,7 @@ void makeHtml(TFilePath fp)
 
 class PrintXsheetCommand : public MenuItemHandler
 {
-public:
+  public:
 	PrintXsheetCommand() : MenuItemHandler(MI_PrintXsheet) {}
 	void execute();
 } printXsheetCommand;

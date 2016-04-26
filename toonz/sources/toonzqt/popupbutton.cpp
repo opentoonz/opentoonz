@@ -1,6 +1,6 @@
 
 
-//Qt includes
+// Qt includes
 #include <QMenu>
 
 #include "toonzqt/popupbutton.h"
@@ -9,8 +9,7 @@
 //    PopupButton class implementation
 //********************************************************************************
 
-PopupButton::PopupButton(QWidget *parent)
-	: QPushButton(parent), m_index(-1)
+PopupButton::PopupButton(QWidget *parent) : QPushButton(parent), m_index(-1)
 {
 	setFocusPolicy(Qt::NoFocus);
 

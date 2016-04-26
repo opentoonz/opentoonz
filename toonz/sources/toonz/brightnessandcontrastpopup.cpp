@@ -58,13 +58,13 @@ void my_compute_lut(double contrast, double brightness, std::vector<int> &lut)
 	for (i = 0; i < lutSize; i++) {
 		value = i / maxChannelValueD;
 
-		//brightness
+		// brightness
 		if (brightness < 0.0)
 			value = value * (1.0 + brightness);
 		else
 			value = value + ((1.0 - value) * brightness);
 
-		//contrast
+		// contrast
 		if (contrast < 0.0) {
 			if (value > 0.5)
 				nvalue = 1.0 - value;
@@ -122,7 +122,8 @@ inline void doPix<TPixelGR8>(TPixelGR8 *outPix, const TPixelGR8 *inPix, const st
 //-----------------------------------------------------------------------------
 
 template <>
-inline void doPix<TPixelGR16>(TPixelGR16 *outPix, const TPixelGR16 *inPix, const std::vector<int> &lut)
+inline void doPix<TPixelGR16>(TPixelGR16 *outPix, const TPixelGR16 *inPix,
+							  const std::vector<int> &lut)
 {
 	outPix->value = lut[inPix->value];
 }
@@ -193,13 +194,12 @@ void onChange(const TRasterP &in, const TRasterP &out, int contrast, int brightn
 
 //-----------------------------------------------------------------------------
 
-template <typename RAS>
-inline void onChange(const RAS &ras, int contrast, int brightness)
+template <typename RAS> inline void onChange(const RAS &ras, int contrast, int brightness)
 {
 	onChange(ras, ras, contrast, brightness);
 }
 
-} //namespace
+} // namespace
 
 //**************************************************************************
 //    BrightnessAndContrastPopup Swatch
@@ -209,7 +209,7 @@ class BrightnessAndContrastPopup::Swatch : public PlaneViewer
 {
 	TRasterP m_ras;
 
-public:
+  public:
 	Swatch(QWidget *parent = 0) : PlaneViewer(parent)
 	{
 		setBgColor(TPixel32::White, TPixel32::White);
@@ -226,10 +226,10 @@ public:
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
-			//Note GL_ONE instead of GL_SRC_ALPHA: it's needed since the input
-			//image is supposedly premultiplied - and it works because the
-			//viewer's background is opaque.
-			//See tpixelutils.h's overPixT function for comparison.
+			// Note GL_ONE instead of GL_SRC_ALPHA: it's needed since the input
+			// image is supposedly premultiplied - and it works because the
+			// viewer's background is opaque.
+			// See tpixelutils.h's overPixT function for comparison.
 
 			pushGLWorldCoordinates();
 			draw(m_ras);
@@ -257,7 +257,8 @@ BrightnessAndContrastPopup::BrightnessAndContrastPopup()
 	beginVLayout();
 
 	QSplitter *splitter = new QSplitter(Qt::Vertical);
-	splitter->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
+	splitter->setSizePolicy(
+		QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
 	addWidget(splitter);
 
 	endVLayout();
@@ -271,7 +272,8 @@ BrightnessAndContrastPopup::BrightnessAndContrastPopup()
 	splitter->setStretchFactor(0, 1);
 
 	QFrame *topWidget = new QFrame(scrollArea);
-	topWidget->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
+	topWidget->setSizePolicy(
+		QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
 	scrollArea->setWidget(topWidget);
 
 	QGridLayout *topLayout = new QGridLayout(this);
@@ -279,7 +281,7 @@ BrightnessAndContrastPopup::BrightnessAndContrastPopup()
 
 	//------------------------- Parameters --------------------------
 
-	//Brightness
+	// Brightness
 	QLabel *brightnessLabel = new QLabel(tr("Brightness:"));
 	topLayout->addWidget(brightnessLabel, 0, 0, Qt::AlignRight | Qt::AlignVCenter);
 
@@ -288,7 +290,7 @@ BrightnessAndContrastPopup::BrightnessAndContrastPopup()
 	m_brightnessField->setValue(0);
 	topLayout->addWidget(m_brightnessField, 0, 1);
 
-	//Contrast
+	// Contrast
 	QLabel *contrastLabel = new QLabel(tr("Contrast:"));
 	topLayout->addWidget(contrastLabel, 1, 0, Qt::AlignRight | Qt::AlignVCenter);
 
@@ -319,8 +321,10 @@ BrightnessAndContrastPopup::BrightnessAndContrastPopup()
 
 	bool ret = true;
 
-	ret = ret && connect(m_brightnessField, SIGNAL(valueChanged(bool)), this, SLOT(onValuesChanged(bool)));
-	ret = ret && connect(m_contrastField, SIGNAL(valueChanged(bool)), this, SLOT(onValuesChanged(bool)));
+	ret = ret &&
+		  connect(m_brightnessField, SIGNAL(valueChanged(bool)), this, SLOT(onValuesChanged(bool)));
+	ret = ret &&
+		  connect(m_contrastField, SIGNAL(valueChanged(bool)), this, SLOT(onValuesChanged(bool)));
 
 	assert(ret);
 
@@ -341,7 +345,8 @@ void BrightnessAndContrastPopup::setCurrentSampleRaster()
 	if (cellSelection) {
 		TApp *app = TApp::instance();
 		TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
-		TXshCell cell = xsh->getCell(app->getCurrentFrame()->getFrameIndex(), app->getCurrentColumn()->getColumnIndex());
+		TXshCell cell = xsh->getCell(app->getCurrentFrame()->getFrameIndex(),
+									 app->getCurrentColumn()->getColumnIndex());
 		TRasterImageP rasImage = cell.getImage(true);
 		if (rasImage && rasImage->getRaster())
 			sampleRas = rasImage->getRaster()->clone();
@@ -349,7 +354,8 @@ void BrightnessAndContrastPopup::setCurrentSampleRaster()
 		TApp *app = TApp::instance();
 		TXshSimpleLevel *simpleLevel = app->getCurrentLevel()->getSimpleLevel();
 		if (simpleLevel) {
-			TRasterImageP rasImage = (TRasterImageP)simpleLevel->getFrame(app->getCurrentFrame()->getFid(), true);
+			TRasterImageP rasImage =
+				(TRasterImageP)simpleLevel->getFrame(app->getCurrentFrame()->getFid(), true);
 			if (rasImage && rasImage->getRaster())
 				sampleRas = rasImage->getRaster()->clone();
 		}
@@ -375,9 +381,12 @@ void BrightnessAndContrastPopup::showEvent(QShowEvent *se)
 {
 	TApp *app = TApp::instance();
 	bool ret = true;
-	ret = ret && connect(app->getCurrentFrame(), SIGNAL(frameTypeChanged()), this, SLOT(setCurrentSampleRaster()));
-	ret = ret && connect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this, SLOT(setCurrentSampleRaster()));
-	ret = ret && connect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this, SLOT(setCurrentSampleRaster()));
+	ret = ret && connect(app->getCurrentFrame(), SIGNAL(frameTypeChanged()), this,
+						 SLOT(setCurrentSampleRaster()));
+	ret = ret && connect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
+						 SLOT(setCurrentSampleRaster()));
+	ret = ret && connect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this,
+						 SLOT(setCurrentSampleRaster()));
 	assert(ret);
 	setCurrentSampleRaster();
 }
@@ -387,9 +396,12 @@ void BrightnessAndContrastPopup::showEvent(QShowEvent *se)
 void BrightnessAndContrastPopup::hideEvent(QHideEvent *he)
 {
 	TApp *app = TApp::instance();
-	disconnect(app->getCurrentFrame(), SIGNAL(frameTypeChanged()), this, SLOT(setCurrentSampleRaster()));
-	disconnect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this, SLOT(setCurrentSampleRaster()));
-	disconnect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this, SLOT(setCurrentSampleRaster()));
+	disconnect(app->getCurrentFrame(), SIGNAL(frameTypeChanged()), this,
+			   SLOT(setCurrentSampleRaster()));
+	disconnect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
+			   SLOT(setCurrentSampleRaster()));
+	disconnect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this,
+			   SLOT(setCurrentSampleRaster()));
 
 	Dialog::hideEvent(he);
 
@@ -406,18 +418,16 @@ class TRasterBrightnessUndo : public TUndo
 	QString m_rasId;
 	int m_rasSize;
 
-public:
+  public:
 	TRasterBrightnessUndo(int brightness, int contrast, int r, int c, TRasterP ras)
-		: m_r(r), m_c(c), m_rasId(), m_brightness(brightness), m_contrast(contrast), m_rasSize(ras->getLx() * ras->getLy() * ras->getPixelSize())
+		: m_r(r), m_c(c), m_rasId(), m_brightness(brightness), m_contrast(contrast),
+		  m_rasSize(ras->getLx() * ras->getLy() * ras->getPixelSize())
 	{
 		m_rasId = QString("BrightnessUndo") + QString::number((uintptr_t) this);
 		TImageCache::instance()->add(m_rasId, TRasterImageP(ras));
 	}
 
-	~TRasterBrightnessUndo()
-	{
-		TImageCache::instance()->remove(m_rasId);
-	}
+	~TRasterBrightnessUndo() { TImageCache::instance()->remove(m_rasId); }
 
 	void undo() const
 	{
@@ -426,7 +436,8 @@ public:
 		TRasterImageP rasImage = (TRasterImageP)cell.getImage(true);
 		if (!rasImage)
 			return;
-		rasImage->setRaster(((TRasterImageP)TImageCache::instance()->get(m_rasId, true))->getRaster()->clone());
+		rasImage->setRaster(
+			((TRasterImageP)TImageCache::instance()->get(m_rasId, true))->getRaster()->clone());
 		TXshSimpleLevel *simpleLevel = cell.getSimpleLevel();
 		assert(simpleLevel);
 		simpleLevel->touchFrame(cell.getFrameId());
@@ -491,7 +502,8 @@ void BrightnessAndContrastPopup::apply()
 					continue;
 				images.insert(rasImage.getPointer());
 				oneImageChanged = true;
-				TUndoManager::manager()->add(new TRasterBrightnessUndo(brightness, contrast, r, c, ras->clone()));
+				TUndoManager::manager()->add(
+					new TRasterBrightnessUndo(brightness, contrast, r, c, ras->clone()));
 				onChange(ras, contrast, brightness);
 				TXshSimpleLevel *simpleLevel = cell.getSimpleLevel();
 				assert(simpleLevel);
@@ -505,7 +517,8 @@ void BrightnessAndContrastPopup::apply()
 			return;
 		}
 	}
-	TFilmstripSelection *filmstripSelection = dynamic_cast<TFilmstripSelection *>(TSelection::getCurrent());
+	TFilmstripSelection *filmstripSelection =
+		dynamic_cast<TFilmstripSelection *>(TSelection::getCurrent());
 	if (filmstripSelection) {
 		TXshSimpleLevel *simpleLevel = TApp::instance()->getCurrentLevel()->getSimpleLevel();
 		if (simpleLevel) {
@@ -544,10 +557,12 @@ void BrightnessAndContrastPopup::onValuesChanged(bool dragging)
 	if (!m_startRas || !m_viewer->raster())
 		return;
 
-	onChange(m_startRas, m_viewer->raster(), m_contrastField->getValue(), m_brightnessField->getValue());
+	onChange(m_startRas, m_viewer->raster(), m_contrastField->getValue(),
+			 m_brightnessField->getValue());
 	m_viewer->update();
 }
 
 //-----------------------------------------------------------------------------
 
-OpenPopupCommandHandler<BrightnessAndContrastPopup> openBrightnessAndContrastPopup(MI_BrightnessAndContrast);
+OpenPopupCommandHandler<BrightnessAndContrastPopup>
+	openBrightnessAndContrastPopup(MI_BrightnessAndContrast);

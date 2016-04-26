@@ -23,7 +23,7 @@ class ParticlesManager : public TRenderResourceManager
 {
 	T_RENDER_RESOURCE_MANAGER
 
-public:
+  public:
 	struct FxData;
 
 	struct FrameData {
@@ -50,7 +50,7 @@ public:
 		FxData();
 	};
 
-public:
+  public:
 	ParticlesManager();
 	~ParticlesManager();
 
@@ -58,7 +58,7 @@ public:
 
 	FrameData *data(unsigned long fxId);
 
-private:
+  private:
 	std::map<unsigned long, FxData *> m_fxs;
 	QMutex m_mutex;
 

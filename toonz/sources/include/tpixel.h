@@ -37,13 +37,13 @@ class TPixelGR16;
 //-----------------------------------------------------------------------------
 
 /*! The standard pixel type: r,g,b,m; 1 byte/channel.
-    A set of predefined colors are included as well.
-    Note that channel ordering is platform depending. */
+	A set of predefined colors are included as well.
+	Note that channel ordering is platform depending. */
 
 class DVAPI DV_ALIGNED(4) TPixelRGBM32
 {
 	TPixelRGBM32(TUINT32 mask) { *(TUINT32 *)this = mask; };
-public:
+  public:
 	static const int maxChannelValue;
 	typedef unsigned char Channel;
 
@@ -64,26 +64,20 @@ public:
 #ifdef powerpc
 	TPixelRGBM32() : m(maxChannelValue), r(0), g(0), b(0){};
 	TPixelRGBM32(const TPixelRGBM32 &pix) : m(pix.m), r(pix.r), g(pix.g), b(pix.b){};
-	TPixelRGBM32(int rr, int gg, int bb, int mm = maxChannelValue)
-		: m(mm), r(rr), g(gg), b(bb){};
+	TPixelRGBM32(int rr, int gg, int bb, int mm = maxChannelValue) : m(mm), r(rr), g(gg), b(bb){};
 #else
 	TPixelRGBM32() : b(0), g(0), r(0), m(maxChannelValue){};
 	TPixelRGBM32(const TPixelRGBM32 &pix) : b(pix.b), g(pix.g), r(pix.r), m(pix.m){};
-	TPixelRGBM32(int rr, int gg, int bb, int mm = maxChannelValue)
-		: b(bb), g(gg), r(rr), m(mm){};
+	TPixelRGBM32(int rr, int gg, int bb, int mm = maxChannelValue) : b(bb), g(gg), r(rr), m(mm){};
 #endif
 
 #else
 
 	TPixelRGBM32() : r(0), g(0), b(0), m(maxChannelValue){};
-	TPixelRGBM32(int rr, int gg, int bb, int mm = maxChannelValue)
-		: r(rr), g(gg), b(bb), m(mm){};
+	TPixelRGBM32(int rr, int gg, int bb, int mm = maxChannelValue) : r(rr), g(gg), b(bb), m(mm){};
 
 	// Copy constructor and operator=
-	TPixelRGBM32(const TPixelRGBM32 &pix)
-	{
-		*(TUINT32 *)this = *(const TUINT32 *)&pix;
-	}
+	TPixelRGBM32(const TPixelRGBM32 &pix) { *(TUINT32 *)this = *(const TUINT32 *)&pix; }
 
 	TPixelRGBM32 &operator=(const TPixelRGBM32 &pix)
 	{
@@ -93,15 +87,33 @@ public:
 
 #endif
 
-public:
-	inline bool operator==(const TPixelRGBM32 &p) const { return *(const TUINT32 *)this == *(const TUINT32 *)&p; }
-	inline bool operator!=(const TPixelRGBM32 &p) const { return *(const TUINT32 *)this != *(const TUINT32 *)&p; }
+  public:
+	inline bool operator==(const TPixelRGBM32 &p) const
+	{
+		return *(const TUINT32 *)this == *(const TUINT32 *)&p;
+	}
+	inline bool operator!=(const TPixelRGBM32 &p) const
+	{
+		return *(const TUINT32 *)this != *(const TUINT32 *)&p;
+	}
 
-	inline bool operator<(const TPixelRGBM32 &p) const { return *(const TUINT32 *)this < *(const TUINT32 *)&p; }
-	inline bool operator>=(const TPixelRGBM32 &p) const { return *(const TUINT32 *)this >= *(const TUINT32 *)&p; }
+	inline bool operator<(const TPixelRGBM32 &p) const
+	{
+		return *(const TUINT32 *)this < *(const TUINT32 *)&p;
+	}
+	inline bool operator>=(const TPixelRGBM32 &p) const
+	{
+		return *(const TUINT32 *)this >= *(const TUINT32 *)&p;
+	}
 
-	inline bool operator>(const TPixelRGBM32 &p) const { return *(const TUINT32 *)this > *(const TUINT32 *)&p; }
-	inline bool operator<=(const TPixelRGBM32 &p) const { return *(const TUINT32 *)this <= *(const TUINT32 *)&p; }
+	inline bool operator>(const TPixelRGBM32 &p) const
+	{
+		return *(const TUINT32 *)this > *(const TUINT32 *)&p;
+	}
+	inline bool operator<=(const TPixelRGBM32 &p) const
+	{
+		return *(const TUINT32 *)this <= *(const TUINT32 *)&p;
+	}
 
 	/*
   //!Returns itself
@@ -110,12 +122,13 @@ public:
   static inline TPixelRGBM32 from(const TPixelRGBM64 &pix);
   //!Converts TPixelGR8 into TPixelRGBM32
   static TPixelRGBM32 from(const TPixelGR8 &pix);
-  //!Converts TPixelGR16 into TPixelRGBM32   
+  //!Converts TPixelGR16 into TPixelRGBM32
   static TPixelRGBM32 from(const TPixelGR16 &pix);
-  //!In this conversion instead of truncating values fron 64 to 32 a randomic dithering is performed.
+  //!In this conversion instead of truncating values fron 64 to 32 a randomic dithering is
+  performed.
   //!r is a unsigned int random value
   static inline TPixelRGBM32 from(const TPixelRGBM64 &pix, TUINT32 r); // per il dithering
-   // ecc.. 
+   // ecc..
 
   //!Converts TPixelD into TPixelRGBM32
   // static inline TPixelRGBM32 from(const TPixelD &pix);
@@ -146,7 +159,7 @@ class DVAPI DV_ALIGNED(4) TPixelRGBM64
 class DVAPI DV_ALIGNED(8) TPixelRGBM64
 {
 #endif
-public:
+  public:
 	static const int maxChannelValue;
 	typedef unsigned short Channel;
 
@@ -155,38 +168,32 @@ public:
 #elif TNZ_MACHINE_CHANNEL_ORDER_MRGB
 	Channel m, r, g, b;
 #elif TNZ_MACHINE_CHANNEL_ORDER_RGBM
-	Channel r, g, b, m;
+Channel r, g, b, m;
 #else
 undefined machine order !!!!
 #endif
 
 #ifdef _WIN32
 	TPixelRGBM64() : r(0), g(0), b(0), m(maxChannelValue){};
-	TPixelRGBM64(int rr, int gg, int bb, int mm = maxChannelValue)
-		: r(rr), g(gg), b(bb), m(mm){};
+	TPixelRGBM64(int rr, int gg, int bb, int mm = maxChannelValue) : r(rr), g(gg), b(bb), m(mm){};
 #else
 #if defined(LINUX) || defined(MACOSX)
 
 #ifdef powerpc
 
 	TPixelRGBM64() : m(maxChannelValue), b(0), g(0), r(0){};
-	TPixelRGBM64(int rr, int gg, int bb, int mm = maxChannelValue)
-		: m(mm), b(bb), g(gg), r(rr){};
+	TPixelRGBM64(int rr, int gg, int bb, int mm = maxChannelValue) : m(mm), b(bb), g(gg), r(rr){};
 #else
 
 	TPixelRGBM64() : b(0), g(0), r(0), m(maxChannelValue){};
-	TPixelRGBM64(int rr, int gg, int bb, int mm = maxChannelValue)
-		: b(bb), g(gg), r(rr), m(mm){};
+	TPixelRGBM64(int rr, int gg, int bb, int mm = maxChannelValue) : b(bb), g(gg), r(rr), m(mm){};
 
 #endif
 #endif
 #endif
 
 	// Copy constructor and operator=
-	TPixelRGBM64(const TPixelRGBM64 &pix)
-	{
-		*(TUINT64 *)this = *(const TUINT64 *)&pix;
-	}
+	TPixelRGBM64(const TPixelRGBM64 &pix) { *(TUINT64 *)this = *(const TUINT64 *)&pix; }
 
 	TPixelRGBM64 &operator=(const TPixelRGBM64 &pix)
 	{
@@ -194,22 +201,34 @@ undefined machine order !!!!
 		return *this;
 	}
 
-public:
-	inline bool operator==(const TPixelRGBM64 &p) const { return *(const TUINT64 *)this == *(const TUINT64 *)&p; }
-	inline bool operator!=(const TPixelRGBM64 &p) const { return *(const TUINT64 *)this != *(const TUINT64 *)&p; }
+  public:
+	inline bool operator==(const TPixelRGBM64 &p) const
+	{
+		return *(const TUINT64 *)this == *(const TUINT64 *)&p;
+	}
+	inline bool operator!=(const TPixelRGBM64 &p) const
+	{
+		return *(const TUINT64 *)this != *(const TUINT64 *)&p;
+	}
 
-	inline bool operator<(const TPixelRGBM64 &p) const { return *(const TUINT64 *)this < *(const TUINT64 *)&p; }
+	inline bool operator<(const TPixelRGBM64 &p) const
+	{
+		return *(const TUINT64 *)this < *(const TUINT64 *)&p;
+	}
 	inline bool operator>=(const TPixelRGBM64 &p) const { return !operator<(p); }
 
-	inline bool operator>(const TPixelRGBM64 &p) const { return *(const TUINT64 *)this > *(const TUINT64 *)&p; }
+	inline bool operator>(const TPixelRGBM64 &p) const
+	{
+		return *(const TUINT64 *)this > *(const TUINT64 *)&p;
+	}
 	inline bool operator<=(const TPixelRGBM64 &p) const { return !operator>(p); }
 
 	/*
-  //!Converts TPixelRGBM32 into TPixelRGBM64   
+  //!Converts TPixelRGBM32 into TPixelRGBM64
   static inline TPixelRGBM64 from(const TPixelRGBM32 &pix);
-  //!Converts TPixelGR8 into TPixelRGBM64   
+  //!Converts TPixelGR8 into TPixelRGBM64
   static TPixelRGBM64 from(const TPixelGR8 &pix   );
-  //!Converts TPixelGR16 into TPixelRGBM64      
+  //!Converts TPixelGR16 into TPixelRGBM64
   static TPixelRGBM64 from(const TPixelGR16 &pix  );
   //!Converts TPixelD into TPixelRGBM64
   static inline TPixelRGBM64 from(const TPixelD &pix);
@@ -239,18 +258,24 @@ typedef TPixelRGBM64 TPixel64;
 
 class DVAPI TPixelD
 {
-public:
+  public:
 	typedef double Channel;
 
 	Channel r, g, b, m;
 
 	TPixelD() : r(0), g(0), b(0), m(1){};
 	TPixelD(const TPixelD &pix) : r(pix.r), g(pix.g), b(pix.b), m(pix.m){};
-	TPixelD(double rr, double gg, double bb, double mm = 1)
-		: r(rr), g(gg), b(bb), m(mm){};
+	TPixelD(double rr, double gg, double bb, double mm = 1) : r(rr), g(gg), b(bb), m(mm){};
 
-	inline bool operator==(const TPixelD &p) const { return r == p.r && g == p.g && b == p.b && m == p.m; };
-	inline bool operator<(const TPixelD &p) const { return r < p.r || (r == p.r && (g < p.g || (g == p.g && (b < p.b || (b == p.b && (m < p.m)))))); };
+	inline bool operator==(const TPixelD &p) const
+	{
+		return r == p.r && g == p.g && b == p.b && m == p.m;
+	};
+	inline bool operator<(const TPixelD &p) const
+	{
+		return r < p.r ||
+			   (r == p.r && (g < p.g || (g == p.g && (b < p.b || (b == p.b && (m < p.m))))));
+	};
 
 	inline bool operator>=(const TPixelD &p) const { return !operator<(p); };
 	inline bool operator!=(const TPixelD &p) const { return !operator==(p); };
@@ -278,7 +303,7 @@ public:
   static inline TPixelD from(const TPixelRGBM64 &pix);
   //!Converts TPixelGR8 into TPixelRGBM32
   static TPixelD from(const TPixelGR8 &pix);
-  //!Converts TPixelGR16 into TPixelRGBM32   
+  //!Converts TPixelGR16 into TPixelRGBM32
   static TPixelD from(const TPixelGR16 &pix);
   //!Returns itself
   static inline TPixelD from(const TPixelD &pix) {return pix;};
@@ -299,7 +324,7 @@ public:
 
 class DVAPI TPixelCY
 {
-public:
+  public:
 	UCHAR c, y;
 };
 
@@ -308,10 +333,10 @@ public:
 TPixel64 DVAPI TPixel64::from(const TPixel32 &pix)
 {
    return TPixel64(
-         ushortFromByte(pix.r),
-         ushortFromByte(pix.g),
-         ushortFromByte(pix.b),
-         ushortFromByte(pix.m));
+		 ushortFromByte(pix.r),
+		 ushortFromByte(pix.g),
+		 ushortFromByte(pix.b),
+		 ushortFromByte(pix.m));
 }
 
 //-----------------------------------------------------------------------------
@@ -319,10 +344,10 @@ TPixel64 DVAPI TPixel64::from(const TPixel32 &pix)
 TPixel32 DVAPI TPixel32::from(const TPixel64 &pix)
 {
    return TPixel32(
-         byteFromUshort(pix.r),
-         byteFromUshort(pix.g),
-         byteFromUshort(pix.b),
-         byteFromUshort(pix.m));
+		 byteFromUshort(pix.r),
+		 byteFromUshort(pix.g),
+		 byteFromUshort(pix.b),
+		 byteFromUshort(pix.m));
 }
 
 //-----------------------------------------------------------------------------
@@ -348,10 +373,10 @@ TPixel32 DVAPI TPixel32::from(const TPixelD &pix)
 {
   const int max = 255;
   return TPixel32(
-    tcrop((int)(pix.r*max), 0,max),
-    tcrop((int)(pix.g*max), 0,max),
-    tcrop((int)(pix.b*max), 0,max),
-    tcrop((int)(pix.m*max), 0,max));
+	tcrop((int)(pix.r*max), 0,max),
+	tcrop((int)(pix.g*max), 0,max),
+	tcrop((int)(pix.b*max), 0,max),
+	tcrop((int)(pix.m*max), 0,max));
 }
 */
 //-----------------------------------------------------------------------------
@@ -360,10 +385,10 @@ TPixel64 DVAPI TPixel64::from(const TPixelD &pix)
 {
   const int max = 65535;
   return TPixel64(
-    tcrop((int)(pix.r*max), 0,max),
-    tcrop((int)(pix.g*max), 0,max),
-    tcrop((int)(pix.b*max), 0,max),
-    tcrop((int)(pix.m*max), 0,max));
+	tcrop((int)(pix.r*max), 0,max),
+	tcrop((int)(pix.g*max), 0,max),
+	tcrop((int)(pix.b*max), 0,max),
+	tcrop((int)(pix.m*max), 0,max));
 }
 */
 //-----------------------------------------------------------------------------

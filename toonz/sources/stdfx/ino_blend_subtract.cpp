@@ -13,7 +13,7 @@ class ino_blend_subtract : public TBlendForeBackRasterFx
 	TBoolParamP m_clipping_mask;
 	TBoolParamP m_alpha_rendering;
 
-public:
+  public:
 	ino_blend_subtract()
 		: m_opacity(1.0 * ino::param_range()), m_clipping_mask(true), m_alpha_rendering(true)
 	{
@@ -25,12 +25,8 @@ public:
 		this->m_opacity->setValueRange(0, 1.0 * ino::param_range());
 	}
 	~ino_blend_subtract() {}
-	bool canHandle(const TRenderSettings &rs, double frame)
-	{
-		return true;
-	}
-	bool doGetBBox(
-		double frame, TRectD &bBox, const TRenderSettings &rs)
+	bool canHandle(const TRenderSettings &rs, double frame) { return true; }
+	bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &rs)
 	{
 		TRectD up_bx;
 		const bool up_sw = (m_up.isConnected() ? m_up->doGetBBox(frame, up_bx, rs) : false);
@@ -50,29 +46,26 @@ public:
 			return false;
 		}
 	}
-	//TRect getInvalidRect(const TRect &max) {return max;}
-	//void doSetParam(const std::string &name, const TParamP &param) {}
-	int getMemoryRequirement(
-		const TRectD &rect, double frame, const TRenderSettings &rs)
+	// TRect getInvalidRect(const TRect &max) {return max;}
+	// void doSetParam(const std::string &name, const TParamP &param) {}
+	int getMemoryRequirement(const TRectD &rect, double frame, const TRenderSettings &rs)
 	{
 		return TRasterFx::memorySize(rect, rs.m_bpp);
 	}
 
-	void doDryCompute(
-		TRectD &rect, double frame, const TRenderSettings &rs)
+	void doDryCompute(TRectD &rect, double frame, const TRenderSettings &rs)
 	{
 		this->dryComputeUpAndDown(rect, frame, rs, false);
 	}
-	void doCompute(
-		TTile &tile, double frame, const TRenderSettings &rs);
-	void computeUpAndDown(
-		TTile &tile, double frame, const TRenderSettings &rs, TRasterP &dn_ras, TRasterP &up_ras, bool upComputesWholeTile = false);
-	void dryComputeUpAndDown(
-		TRectD &rect, double frame, const TRenderSettings &rs, bool upComputesWholeTile = false
-		/*
-upComputesWholeTile は Screen, Min, Blendでtrueにして使用している。 
-*/
-		);
+	void doCompute(TTile &tile, double frame, const TRenderSettings &rs);
+	void computeUpAndDown(TTile &tile, double frame, const TRenderSettings &rs, TRasterP &dn_ras,
+						  TRasterP &up_ras, bool upComputesWholeTile = false);
+	void dryComputeUpAndDown(TRectD &rect, double frame, const TRenderSettings &rs,
+							 bool upComputesWholeTile = false
+							 /*
+					 upComputesWholeTile は Screen, Min, Blendでtrueにして使用している。
+					 */
+							 );
 };
 FX_PLUGIN_IDENTIFIER(ino_blend_subtract, "inoSubtractFx");
 //------------------------------------------------------------
@@ -89,12 +82,12 @@ void makeRectCoherent(TRectD &rect, const TPointD &pos)
 	rect += pos;
 }
 }
-void ino_blend_subtract::computeUpAndDown(
-	TTile &tile, double frame, const TRenderSettings &rs, TRasterP &dn_ras, TRasterP &up_ras, bool upComputesWholeTile)
+void ino_blend_subtract::computeUpAndDown(TTile &tile, double frame, const TRenderSettings &rs,
+										  TRasterP &dn_ras, TRasterP &up_ras,
+										  bool upComputesWholeTile)
 {
 	/* ------ サポートしていないPixelタイプはエラーを投げる --- */
-	if (!((TRaster32P)tile.getRaster()) &&
-		!((TRaster64P)tile.getRaster())) {
+	if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster())) {
 		throw TRopException("unsupported input pixel type");
 	}
 	/*
@@ -106,10 +99,10 @@ fxをreplaceすると、
 	m_refernce --> m_down(=port1)
 となる
 */
-	const bool up_is = (this->m_up.isConnected() &&
-						this->m_up.getFx()->getTimeRegion().contains(frame));
-	const bool down_is = (this->m_down.isConnected() &&
-						  this->m_down.getFx()->getTimeRegion().contains(frame));
+	const bool up_is =
+		(this->m_up.isConnected() && this->m_up.getFx()->getTimeRegion().contains(frame));
+	const bool down_is =
+		(this->m_down.isConnected() && this->m_down.getFx()->getTimeRegion().contains(frame));
 	/* ------ 両方とも切断の時処理しない ---------------------- */
 	if (!up_is && !down_is) {
 		tile.getRaster()->clear();
@@ -157,12 +150,12 @@ fxをreplaceすると、
 
 	/* ------ upのメモリ確保と描画 ---------------------------- */
 	TTile upTile;
-	this->m_up->allocateAndCompute(
-		upTile, upBBox.getP00(), upSize, tile.getRaster() /* 32/64bitsの判定に使う */
-		,
-		frame, rs);
+	this->m_up->allocateAndCompute(upTile, upBBox.getP00(), upSize,
+								   tile.getRaster() /* 32/64bitsの判定に使う */
+								   ,
+								   frame, rs);
 	/* ------ upとdownのTRasterを得る ------------------------- */
-	TRectI dnRect(upTile.getRaster()->getSize()); //TDimensionI(-)
+	TRectI dnRect(upTile.getRaster()->getSize()); // TDimensionI(-)
 
 	dnRect += convert(upTile.m_pos - tile.m_pos); /* uptile->tile原点 */
 	/*
@@ -175,13 +168,13 @@ fxをreplaceすると、
 	up_ras = upTile.getRaster();
 	assert(dn_ras->getSize() == up_ras->getSize());
 }
-void ino_blend_subtract::dryComputeUpAndDown(
-	TRectD &rect, double frame, const TRenderSettings &rs, bool upComputesWholeTile)
+void ino_blend_subtract::dryComputeUpAndDown(TRectD &rect, double frame, const TRenderSettings &rs,
+											 bool upComputesWholeTile)
 {
-	const bool up_is = (this->m_up.isConnected() &&
-						this->m_up.getFx()->getTimeRegion().contains(frame));
-	const bool down_is = (this->m_down.isConnected() &&
-						  this->m_down.getFx()->getTimeRegion().contains(frame));
+	const bool up_is =
+		(this->m_up.isConnected() && this->m_up.getFx()->getTimeRegion().contains(frame));
+	const bool down_is =
+		(this->m_down.isConnected() && this->m_down.getFx()->getTimeRegion().contains(frame));
 	/* ------ 両方とも切断の時処理しない ---------------------- */
 	if (!up_is && !down_is) {
 		return;
@@ -220,10 +213,10 @@ void ino_blend_subtract::dryComputeUpAndDown(
 namespace
 {
 template <class T, class Q>
-void tmpl_(
-	TRasterPT<T> dn_ras_out, const TRasterPT<T> &up_ras, const double up_opacity, const bool clipping_mask_sw, const bool alpha_rendering_sw)
+void tmpl_(TRasterPT<T> dn_ras_out, const TRasterPT<T> &up_ras, const double up_opacity,
+		   const bool clipping_mask_sw, const bool alpha_rendering_sw)
 {
-	double maxi = static_cast<double>(T::maxChannelValue); //255or65535
+	double maxi = static_cast<double>(T::maxChannelValue); // 255or65535
 
 	assert(dn_ras_out->getSize() == up_ras->getSize());
 
@@ -240,8 +233,9 @@ void tmpl_(
 			double dng = static_cast<double>(out_pix->g) / maxi;
 			double dnb = static_cast<double>(out_pix->b) / maxi;
 			double dna = static_cast<double>(out_pix->m) / maxi;
-			igs::color::subtract(
-				dnr, dng, dnb, dna, upr, upg, upb, upa, clipping_mask_sw ? up_opacity * dna : up_opacity, alpha_rendering_sw);
+			igs::color::subtract(dnr, dng, dnb, dna, upr, upg, upb, upa,
+								 clipping_mask_sw ? up_opacity * dna : up_opacity,
+								 alpha_rendering_sw);
 			out_pix->r = static_cast<Q>(dnr * (maxi + 0.999999));
 			out_pix->g = static_cast<Q>(dng * (maxi + 0.999999));
 			out_pix->b = static_cast<Q>(dnb * (maxi + 0.999999));
@@ -249,8 +243,8 @@ void tmpl_(
 		}
 	}
 }
-void fx_(
-	TRasterP &dn_ras_out, const TRasterP &up_ras, const TPoint &pos, const double up_opacity, const bool clipping_mask_sw, const bool alpha_rendering_sw)
+void fx_(TRasterP &dn_ras_out, const TRasterP &up_ras, const TPoint &pos, const double up_opacity,
+		 const bool clipping_mask_sw, const bool alpha_rendering_sw)
 {
 	/* 交差したエリアを処理するようにする、いるのか??? */
 	TRect outRect(dn_ras_out->getBounds());
@@ -267,18 +261,15 @@ void fx_(
 	TRaster64P rout64 = cRout, rup64 = cRup;
 
 	if (rout32 && rup32) {
-		tmpl_<TPixel32, UCHAR>(
-			rout32, rup32, up_opacity, clipping_mask_sw, alpha_rendering_sw);
+		tmpl_<TPixel32, UCHAR>(rout32, rup32, up_opacity, clipping_mask_sw, alpha_rendering_sw);
 	} else if (rout64 && rup64) {
-		tmpl_<TPixel64, USHORT>(
-			rout64, rup64, up_opacity, clipping_mask_sw, alpha_rendering_sw);
+		tmpl_<TPixel64, USHORT>(rout64, rup64, up_opacity, clipping_mask_sw, alpha_rendering_sw);
 	} else {
 		throw TRopException("unsupported pixel type");
 	}
 }
 }
-void ino_blend_subtract::doCompute(
-	TTile &tile, double frame, const TRenderSettings &rs)
+void ino_blend_subtract::doCompute(TTile &tile, double frame, const TRenderSettings &rs)
 {
 	/* ------ 画像生成 ---------------------------------------- */
 	TRasterP dn_ras, up_ras;
@@ -294,16 +285,11 @@ void ino_blend_subtract::doCompute(
 	if (log_sw) {
 		std::ostringstream os;
 		os << "params"
-		   << "  up_opacity " << up_opacity
-		   << "   dn_tile w " << dn_ras->getLx()
-		   << "  wrap " << dn_ras->getWrap()
-		   << "  h " << dn_ras->getLy()
-		   << "  pixbits " << ino::pixel_bits(dn_ras)
-		   << "   up_tile w " << up_ras->getLx()
-		   << "  wrap " << up_ras->getWrap()
-		   << "  h " << up_ras->getLy()
-		   << "  pixbits " << ino::pixel_bits(up_ras)
-		   << "   frame " << frame;
+		   << "  up_opacity " << up_opacity << "   dn_tile w " << dn_ras->getLx() << "  wrap "
+		   << dn_ras->getWrap() << "  h " << dn_ras->getLy() << "  pixbits "
+		   << ino::pixel_bits(dn_ras) << "   up_tile w " << up_ras->getLx() << "  wrap "
+		   << up_ras->getWrap() << "  h " << up_ras->getLy() << "  pixbits "
+		   << ino::pixel_bits(up_ras) << "   frame " << frame;
 	}
 	/* ------ fx処理 ------------------------------------------ */
 	try {
@@ -313,7 +299,8 @@ void ino_blend_subtract::doCompute(
 		if (up_ras) {
 			up_ras->lock();
 		}
-		fx_(dn_ras, up_ras, TPoint(), up_opacity, this->m_clipping_mask->getValue(), this->m_alpha_rendering->getValue());
+		fx_(dn_ras, up_ras, TPoint(), up_opacity, this->m_clipping_mask->getValue(),
+			this->m_alpha_rendering->getValue());
 		if (up_ras) {
 			up_ras->unlock();
 		}

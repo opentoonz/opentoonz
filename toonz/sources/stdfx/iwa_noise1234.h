@@ -36,7 +36,7 @@
 class Noise1234
 {
 
-public:
+  public:
 	Noise1234() {}
 	~Noise1234() {}
 
@@ -52,10 +52,9 @@ public:
 	static float pnoise(float x, int px);
 	static float pnoise(float x, float y, int px, int py);
 	static float pnoise(float x, float y, float z, int px, int py, int pz);
-	static float pnoise(float x, float y, float z, float w,
-						int px, int py, int pz, int pw);
+	static float pnoise(float x, float y, float z, float w, int px, int py, int pz, int pw);
 
-private:
+  private:
 	static unsigned char perm[];
 	static float grad(int hash, float x);
 	static float grad(int hash, float x, float y);

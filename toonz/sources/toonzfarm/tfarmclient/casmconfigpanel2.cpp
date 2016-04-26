@@ -21,8 +21,7 @@ using namespace TwConsts;
 
 //==============================================================================
 
-FilePathField::FilePathField(TWidget *parent, string name)
-	: TTextField(parent, name)
+FilePathField::FilePathField(TWidget *parent, string name) : TTextField(parent, name)
 {
 	m_page = dynamic_cast<CasmConfigPanel2 *>(parent);
 }
@@ -92,11 +91,7 @@ enum numFieldType {
 	M_CHUNKSIZE
 };
 
-enum textFieldType {
-	M_TCOLUMN = 0,
-	M_TSETUP,
-	M_TENTRYPOINT
-};
+enum textFieldType { M_TCOLUMN = 0, M_TSETUP, M_TENTRYPOINT };
 
 namespace
 {
@@ -106,11 +101,8 @@ class NumFieldChanger : public TNumField::Action
 	CasmConfigPanel2 *m_ccp;
 	numFieldType m_type;
 
-public:
-	NumFieldChanger(CasmConfigPanel2 *ccp, numFieldType type)
-		: m_ccp(ccp), m_type(type)
-	{
-	}
+  public:
+	NumFieldChanger(CasmConfigPanel2 *ccp, numFieldType type) : m_ccp(ccp), m_type(type) {}
 
 	void sendCommand(const TNumField::Event &ev);
 };
@@ -125,16 +117,10 @@ class ColumnFieldChanger : public TTextField::Action
 	CasmConfigPanel2 *m_ccp;
 	textFieldType m_type;
 
-public:
-	ColumnFieldChanger(CasmConfigPanel2 *ccp, textFieldType type)
-		: m_ccp(ccp), m_type(type)
-	{
-	}
+  public:
+	ColumnFieldChanger(CasmConfigPanel2 *ccp, textFieldType type) : m_ccp(ccp), m_type(type) {}
 
-	void sendCommand(std::wstring value)
-	{
-		m_ccp->onColumnField(toString(value), m_type);
-	}
+	void sendCommand(std::wstring value) { m_ccp->onColumnField(toString(value), m_type); }
 };
 }
 
@@ -153,8 +139,7 @@ static bool is_num(string word)
 
 //==============================================================================
 
-CasmConfigPanel2::CasmConfigPanel2(TWidget *parent)
-	: TaskConfigPanel(parent), m_task(0)
+CasmConfigPanel2::CasmConfigPanel2(TWidget *parent) : TaskConfigPanel(parent), m_task(0)
 {
 	m_chunkSizeLabel = new TLabel(this);
 	m_chunkSizeLabel->setText("Task Chunk Size:");
@@ -166,7 +151,7 @@ CasmConfigPanel2::CasmConfigPanel2(TWidget *parent)
 	m_setupLabel = new TLabel(this);
 	m_setupLabel->setText("Setup Path:");
 	m_setupTextField = new FilePathField(this);
-	//m_setupTextField->addAction(new ColumnFieldChanger(this, M_TSETUP));
+	// m_setupTextField->addAction(new ColumnFieldChanger(this, M_TSETUP));
 	m_setupBrowseBtn = new TButton(this);
 	m_setupBrowseBtn->setTitle("...");
 	tconnect(*m_setupBrowseBtn, this, &CasmConfigPanel2::browseSetupFiles);
@@ -213,14 +198,16 @@ CasmConfigPanel2::CasmConfigPanel2(TWidget *parent)
 	m_subPixelMove->addOption("None");
 	m_subPixelMove->addOption("RGB");
 	m_subPixelMove->addOption("All");
-	m_subPixelMove->setAction(new TOptionMenuAction<CasmConfigPanel2>(this, &CasmConfigPanel2::onSubPixelMove));
+	m_subPixelMove->setAction(
+		new TOptionMenuAction<CasmConfigPanel2>(this, &CasmConfigPanel2::onSubPixelMove));
 
 	m_processingLabel = new TLabel(this);
 	m_processingLabel->setText("Processing:");
 	m_processing = new TOptionMenu(this);
 	m_processing->addOption("32 Bit");
 	m_processing->addOption("64 Bit");
-	m_processing->setAction(new TOptionMenuAction<CasmConfigPanel2>(this, &CasmConfigPanel2::onProcessing));
+	m_processing->setAction(
+		new TOptionMenuAction<CasmConfigPanel2>(this, &CasmConfigPanel2::onProcessing));
 
 	m_resampleQualityLabel = new TLabel(this);
 	m_resampleQualityLabel->setText("Resample Quality:");
@@ -228,7 +215,8 @@ CasmConfigPanel2::CasmConfigPanel2(TWidget *parent)
 	m_resampleQuality->addOption("Standard");
 	m_resampleQuality->addOption("Improved");
 	m_resampleQuality->addOption("High");
-	m_resampleQuality->setAction(new TOptionMenuAction<CasmConfigPanel2>(this, &CasmConfigPanel2::onResampleQuality));
+	m_resampleQuality->setAction(
+		new TOptionMenuAction<CasmConfigPanel2>(this, &CasmConfigPanel2::onResampleQuality));
 
 	m_focus = new TCheckBox(this, "Constant Focus");
 	tconnect<CasmConfigPanel2>(*m_focus, this, onConstantFocus);
@@ -262,13 +250,14 @@ CasmConfigPanel2::CasmConfigPanel2(TWidget *parent)
 	m_gammaValue->addAction(new NumFieldChanger(this, M_GAMMA));
 
 	m_clap = new TCheckBox(this, "Add Clap");
-	//tconnect<CasmConfigPanel2>(*m_clap, this, onClap);
+	// tconnect<CasmConfigPanel2>(*m_clap, this, onClap);
 	/*
   m_outputScriptLabel = new TLabel(this);
   m_outputScriptLabel->setText("Output Script:");
   m_outputScript = new TOptionMenu(this);
   m_outputScript->addOption("None");
-  //m_subPixelMove->setAction(new TOptionMenuAction<CasmConfigPanel2>(this, &CasmConfigPanel2::onOutputScript));
+  //m_subPixelMove->setAction(new TOptionMenuAction<CasmConfigPanel2>(this,
+  &CasmConfigPanel2::onOutputScript));
   m_entryPointLabel = new TLabel(this);
   m_entryPointLabel->setText("Entry Point:");
   m_entryPoint = new TTextField(this);
@@ -515,9 +504,8 @@ void CasmConfigPanel2::onColumnField(string value, int type)
 
 	switch (type) {
 	case M_TCOLUMN:
-		if (value == "" || value == "ALL" || value == "All" ||
-			value == "all" || value == "AL" || value == "Al" ||
-			value == "a" || value == "A")
+		if (value == "" || value == "ALL" || value == "All" || value == "all" || value == "AL" ||
+			value == "Al" || value == "a" || value == "A")
 			m_task->m_numColumn = -1;
 		else if (is_num(value))
 			m_task->m_numColumn = atoi(value.c_str());
@@ -572,7 +560,7 @@ void CasmConfigPanel2::browseSetupFiles()
 #endif
 
 	d -= popup->getSize();
-	//TDimension d = TMainshell::getMainshell()->getSize() - popup->getSize();
+	// TDimension d = TMainshell::getMainshell()->getSize() - popup->getSize();
 	popup->popup(TPoint(d.lx / 2, d.ly / 2));
 	popup->setCaption("Load Setup");
 }

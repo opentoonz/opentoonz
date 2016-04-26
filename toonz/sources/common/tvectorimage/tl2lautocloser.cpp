@@ -18,7 +18,7 @@ class MyTimer
 	LARGE_INTEGER m_freq;
 	LARGE_INTEGER m_startTime, m_overhead;
 
-public:
+  public:
 	MyTimer() : m_enabled(false)
 	{
 		if (QueryPerformanceFrequency(&m_freq)) {
@@ -42,7 +42,8 @@ public:
 		LARGE_INTEGER curTime;
 		QueryPerformanceCounter(&curTime);
 		LONGLONG microseconds = 1000000 *
-								(curTime.QuadPart - m_startTime.QuadPart - m_overhead.QuadPart) / m_freq.QuadPart;
+								(curTime.QuadPart - m_startTime.QuadPart - m_overhead.QuadPart) /
+								m_freq.QuadPart;
 		return 0.000001 * (double)microseconds;
 	}
 };
@@ -103,10 +104,7 @@ struct StrokePoint {
 		else
 			tgdir = TPointD(0, 0);
 	}
-	StrokePoint()
-		: w(0), s(0), pos(), crv(), crvdir(), stroke(0)
-	{
-	}
+	StrokePoint() : w(0), s(0), pos(), crv(), crvdir(), stroke(0) {}
 };
 
 //===========================================================================
@@ -116,8 +114,7 @@ struct StrokePoint {
 struct StrokePointSet {
 	TStroke *stroke;
 	std::vector<StrokePoint> points;
-	StrokePointSet(TStroke *stroke_ = 0)
-		: stroke(stroke_)
+	StrokePointSet(TStroke *stroke_ = 0) : stroke(stroke_)
 	{
 		const double inc = 5;
 		if (stroke_) {
@@ -137,31 +134,23 @@ struct StrokePointSet {
 
 class StrokesIntersection
 {
-public:
+  public:
 	std::vector<double> m_ida, m_idb; // distances to the closest intersection
 									  // (referred to StrokePointSet)
 
 	StrokesIntersection() {}
-	StrokesIntersection(
-		const StrokePointSet &psa,
-		const StrokePointSet &psb,
-		const std::vector<DoublePair> *intersection);
+	StrokesIntersection(const StrokePointSet &psa, const StrokePointSet &psb,
+						const std::vector<DoublePair> *intersection);
 
-	~StrokesIntersection()
-	{
-	}
+	~StrokesIntersection() {}
 
-	void update(
-		const StrokePointSet &psa,
-		const StrokePointSet &psb,
-		const std::vector<DoublePair> &intersections);
+	void update(const StrokePointSet &psa, const StrokePointSet &psb,
+				const std::vector<DoublePair> &intersections);
 
 	static void wrap(std::vector<double> &is, TStroke *stroke);
 
-	static void computeIntersectionDistances(
-		std::vector<double> &id,
-		const StrokePointSet &ps,
-		const std::vector<double> &is);
+	static void computeIntersectionDistances(std::vector<double> &id, const StrokePointSet &ps,
+											 const std::vector<double> &is);
 
 	StrokesIntersection *swapped() const
 	{
@@ -189,10 +178,8 @@ StrokesIntersection::StrokesIntersection(const StrokePointSet &psa, const Stroke
 
 //---------------------------------------------------------------------------
 
-void StrokesIntersection::update(
-	const StrokePointSet &psa,
-	const StrokePointSet &psb,
-	const std::vector<DoublePair> &intersections)
+void StrokesIntersection::update(const StrokePointSet &psa, const StrokePointSet &psb,
+								 const std::vector<DoublePair> &intersections)
 {
 	TStroke *strokea = psa.stroke;
 	TStroke *strokeb = psb.stroke;
@@ -252,10 +239,9 @@ void StrokesIntersection::wrap(std::vector<double> &is, TStroke *stroke)
 
 // for each StrokePoint computes the related intersection distance (i.e. the distance to
 // the closest intersection)
-void StrokesIntersection::computeIntersectionDistances(
-	std::vector<double> &id,
-	const StrokePointSet &ps,
-	const std::vector<double> &is)
+void StrokesIntersection::computeIntersectionDistances(std::vector<double> &id,
+													   const StrokePointSet &ps,
+													   const std::vector<double> &is)
 {
 	id.clear();
 	id.resize(ps.points.size(), -1);
@@ -285,7 +271,7 @@ void StrokesIntersection::computeIntersectionDistances(
 
 class TL2LAutocloser::Imp
 {
-public:
+  public:
 	double m_maxDist2;
 	std::map<TStroke *, StrokePointSet *> m_strokes;
 	std::map<std::pair<TStroke *, TStroke *>, StrokesIntersection *> m_intersections;
@@ -310,8 +296,8 @@ public:
 	StrokesIntersection *getIntersection(TStroke *strokea, TStroke *strokeb,
 										 const std::vector<DoublePair> *intersection)
 	{
-		std::map<std::pair<TStroke *, TStroke *>, StrokesIntersection *>::iterator
-			it = m_intersections.find(std::make_pair(strokea, strokeb));
+		std::map<std::pair<TStroke *, TStroke *>, StrokesIntersection *>::iterator it =
+			m_intersections.find(std::make_pair(strokea, strokeb));
 		if (it != m_intersections.end())
 			return it->second;
 		StrokesIntersection *si = new StrokesIntersection(strokea, strokeb, intersection);
@@ -320,8 +306,7 @@ public:
 		return si;
 	}
 
-	void search(std::vector<TL2LAutocloser::Segment> &segments,
-				TStroke *strokea, TStroke *strokeb,
+	void search(std::vector<TL2LAutocloser::Segment> &segments, TStroke *strokea, TStroke *strokeb,
 				const std::vector<DoublePair> *intersection);
 
 	void drawLinks();
@@ -384,10 +369,8 @@ void TL2LAutocloser::Imp::drawStrokes()
 //-----------------------------------------------------------------------------
 
 // search autoclose segments
-void TL2LAutocloser::Imp::search(
-	std::vector<TL2LAutocloser::Segment> &segments,
-	TStroke *strokea, TStroke *strokeb,
-	const std::vector<DoublePair> *intersections)
+void TL2LAutocloser::Imp::search(std::vector<TL2LAutocloser::Segment> &segments, TStroke *strokea,
+								 TStroke *strokeb, const std::vector<DoublePair> *intersections)
 {
 	m_lastStrokePair.first = m_lastStrokePair.second = 0;
 	if (strokea == 0 || strokeb == 0)
@@ -443,7 +426,8 @@ void TL2LAutocloser::Imp::search(
 				if (ds < dist * 1.5)
 					continue;
 			}
-			if ((si->m_ida[i] > 0 && si->m_ida[i] < dist) || (si->m_idb[j] > 0 && si->m_idb[j] < dist))
+			if ((si->m_ida[i] > 0 && si->m_ida[i] < dist) ||
+				(si->m_idb[j] > 0 && si->m_idb[j] < dist))
 				continue;
 			if (k < 0 || dist2 < minDist2) {
 				k = j;
@@ -458,18 +442,18 @@ void TL2LAutocloser::Imp::search(
 	/*
   for(i=0;i<(int)links.size();i++)
   {
-    int ia = links[i].first;
-    int ib = links[i].second;
-    double mind2 = norm2(psa->points[ia].pos - psb->points[ib].pos);
-    TL2LAutocloser::Segment segment;
-    segment.stroke0 = strokea;
-    segment.stroke1 = strokeb;
-    segment.w0 = psa->points[ia].w;
-    segment.w1 = psb->points[ib].w;
-    segment.p0 = strokea->getThickPoint(segment.w0);
-    segment.p1 = strokeb->getThickPoint(segment.w1);
-    segment.dist2 = mind2;
-    segments.push_back(segment);
+	int ia = links[i].first;
+	int ib = links[i].second;
+	double mind2 = norm2(psa->points[ia].pos - psb->points[ib].pos);
+	TL2LAutocloser::Segment segment;
+	segment.stroke0 = strokea;
+	segment.stroke1 = strokeb;
+	segment.w0 = psa->points[ia].w;
+	segment.w1 = psb->points[ib].w;
+	segment.p0 = strokea->getThickPoint(segment.w0);
+	segment.p1 = strokeb->getThickPoint(segment.w1);
+	segment.dist2 = mind2;
+	segments.push_back(segment);
   }
   */
 
@@ -520,8 +504,7 @@ void TL2LAutocloser::Imp::search(
 
 //=============================================================================
 
-TL2LAutocloser::TL2LAutocloser()
-	: m_imp(new Imp())
+TL2LAutocloser::TL2LAutocloser() : m_imp(new Imp())
 {
 }
 
@@ -555,10 +538,8 @@ void TL2LAutocloser::search(std::vector<Segment> &segments, TStroke *stroke0, TS
 
 //-----------------------------------------------------------------------------
 
-void TL2LAutocloser::search(
-	std::vector<Segment> &segments,
-	TStroke *stroke0, TStroke *stroke1,
-	const std::vector<DoublePair> &intersection)
+void TL2LAutocloser::search(std::vector<Segment> &segments, TStroke *stroke0, TStroke *stroke1,
+							const std::vector<DoublePair> &intersection)
 {
 	if (stroke0 && stroke1)
 		m_imp->search(segments, stroke0, stroke1, &intersection);

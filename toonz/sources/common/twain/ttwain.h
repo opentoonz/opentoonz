@@ -49,11 +49,7 @@ typedef enum TTWAIN_BITORDER {
 	TTWAIN_MSBFIRST = TWBO_MSBFIRST
 } TTWAIN_BITORDER;
 
-typedef enum TWAINAVAILABLE {
-	AVAIABLE_DONTKNOW = -1,
-	AVAIABLE_YES,
-	AVAIABLE_NO
-} TWAINAVAILABLE;
+typedef enum TWAINAVAILABLE { AVAIABLE_DONTKNOW = -1, AVAIABLE_YES, AVAIABLE_NO } TWAINAVAILABLE;
 
 typedef enum TTWAIN_TRANSFER_MECH {
 	TTWAIN_TRANSFERMODE_NATIVE = TWSX_NATIVE,
@@ -61,27 +57,22 @@ typedef enum TTWAIN_TRANSFER_MECH {
 	TTWAIN_TRANSFERMODE_FILE = TWSX_FILE
 } TTWAIN_TRANSFER_MECH;
 
-typedef enum TTWAIN_USAGE_MODE {
-	TTWAIN_MODE_LEASHED,
-	TTWAIN_MODE_UNLEASHED
-} TTWAIN_USAGE_MODE;
+typedef enum TTWAIN_USAGE_MODE { TTWAIN_MODE_LEASHED, TTWAIN_MODE_UNLEASHED } TTWAIN_USAGE_MODE;
 
 /* application should return 0 to stop the scanning process, any other value elsewhere */
-typedef int TTWAIN_ONDONE_CB(UCHAR *buffer, TTWAIN_PIXTYPE pixelType,
-							 int lx, int ly, int wrap,
-							 float xdpi, float ydpi,
-							 void *usrData);
+typedef int TTWAIN_ONDONE_CB(UCHAR *buffer, TTWAIN_PIXTYPE pixelType, int lx, int ly, int wrap,
+							 float xdpi, float ydpi, void *usrData);
 
 typedef void TTWAIN_ONERROR_CB(void *usrData, void *alwaysZero);
 
 int TTWAIN_IsAvailable(void);
 void TWAIN_RegisterApp(int majorNum, int minorNum, /* app. revision*/
-					   int nLanguage,			   /* (human) language (use TWLG_xxx from TWAIN.H) */
-					   int nCountry,			   /* country (use TWCY_xxx from TWAIN.H)	     */
-					   char *version,			   /* version info string                          */
-					   char *manufacter,		   /* name of manufacter			     */
-					   char *family,			   /* product family				     */
-					   char *product);			   /* specific product			     */
+					   int nLanguage,	/* (human) language (use TWLG_xxx from TWAIN.H) */
+					   int nCountry,	 /* country (use TWCY_xxx from TWAIN.H)	     */
+					   char *version,	/* version info string                          */
+					   char *manufacter, /* name of manufacter			     */
+					   char *family,	 /* product family				     */
+					   char *product);   /* specific product			     */
 int TTWAIN_SelectImageSource(void *hwnd);
 /*---------------------------------------------------------------------------*/
 void *TTWAIN_AcquireNative(void *hwnd);
@@ -90,7 +81,7 @@ void TTWAIN_StopAcquire(void);
 
 /*
 nb. AcquireMemory returns: an upside-down bitmap :)
-nb. AcquireNative returns: 
+nb. AcquireNative returns:
 			  under Windows an HBITMAP
 			  under Mac     a  PICT
 */

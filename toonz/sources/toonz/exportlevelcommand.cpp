@@ -65,8 +65,9 @@ struct BusyCursorOverride {
 struct ExportOverwriteCB : public IoCmd::OverwriteCallbacks {
 	bool overwriteRequest(const TFilePath &fp)
 	{
-		int ret = DVGui::MsgBox(QObject::tr("Warning: file %1 already exists.").arg(toQString(fp)),
-						 QObject::tr("Continue Exporting"), QObject::tr("Stop Exporting"), 1);
+		int ret =
+			DVGui::MsgBox(QObject::tr("Warning: file %1 already exists.").arg(toQString(fp)),
+						  QObject::tr("Continue Exporting"), QObject::tr("Stop Exporting"), 1);
 		return (ret == 1);
 	}
 };
@@ -77,7 +78,7 @@ struct ExportProgressCB : public IoCmd::ProgressCallbacks {
 	QString m_processedName;
 	ProgressDialog m_pb;
 
-public:
+  public:
 	ExportProgressCB() : m_pb("", QObject::tr("Cancel"), 0, 0) { m_pb.show(); }
 	static QString msg() { return QObject::tr("Exporting level of %1 frames in %2"); }
 
@@ -107,9 +108,7 @@ namespace
 struct VectorThicknessTransformer {
 	const TVectorImageP &m_vi;
 
-	VectorThicknessTransformer(const TVectorImageP &vi,
-							   double thickTransform[2][2],
-							   double param)
+	VectorThicknessTransformer(const TVectorImageP &vi, double thickTransform[2][2], double param)
 		: m_vi(vi), m_mutexLocker(vi->getMutex())
 	{
 		// Build thickness transform
@@ -139,9 +138,7 @@ struct VectorThicknessTransformer {
 
 					thickBackup.m_thicknesses.push_back(point.thick);
 
-					point.thick = tmax(
-						tcg::poly_ops::evaluate(thickPoly, 1, point.thick),
-						0.0);
+					point.thick = tmax(tcg::poly_ops::evaluate(thickPoly, 1, point.thick), 0.0);
 
 					stroke->setControlPoint(cp, point);
 				}
@@ -152,9 +149,7 @@ struct VectorThicknessTransformer {
 	~VectorThicknessTransformer()
 	{
 		// Iterate altered strokes
-		std::deque<StrokeThicknesses>::const_iterator
-			tbt,
-			tbEnd = m_thicknessesBackup.end();
+		std::deque<StrokeThicknesses>::const_iterator tbt, tbEnd = m_thicknessesBackup.end();
 
 		for (tbt = m_thicknessesBackup.begin(); tbt != tbEnd; ++tbt) {
 			TStroke *stroke = m_vi->getStroke(tbt->m_strokeIdx);
@@ -174,16 +169,16 @@ struct VectorThicknessTransformer {
 		}
 	}
 
-private:
+  private:
 	struct StrokeThicknesses {
 		int m_strokeIdx;
 		std::vector<double> m_thicknesses;
 
-	public:
+	  public:
 		StrokeThicknesses(int strokeIdx) : m_strokeIdx(strokeIdx) {}
 	};
 
-private:
+  private:
 	std::deque<StrokeThicknesses> m_thicknessesBackup;
 	QMutexLocker m_mutexLocker;
 };
@@ -226,13 +221,15 @@ class ImageExporter
 	TRasterP m_rout;
 	std::auto_ptr<TOfflineGL> m_glContext;
 
-public:
+  public:
 	ImageExporter(const TXshSimpleLevel &sl, const ExportLevelOptions &opts)
-		: m_sl(sl), m_opts(opts) {}
+		: m_sl(sl), m_opts(opts)
+	{
+	}
 
 	TImageP exportedImage(const TFrameId &fid, TXshLevelType outImgType);
 
-private:
+  private:
 	void adjust0Dpi(const TRasterImageP &ri);
 
 	TRasterImageP exportedImage(TRasterImageP ri);
@@ -311,8 +308,8 @@ TRasterImageP ImageExporter::exportedRasterImage(TVectorImageP vi)
 {
 	const TCamera &camera = m_opts.m_camera;
 
-	TVectorRenderData rd(TVectorRenderData::ProductionSettings(),
-						 camera.getStageToCameraRef(), TRect(), vi->getPalette());
+	TVectorRenderData rd(TVectorRenderData::ProductionSettings(), camera.getStageToCameraRef(),
+						 TRect(), vi->getPalette());
 	rd.m_antiAliasing = !m_opts.m_noAntialias;
 
 	if (!m_glContext.get())
@@ -382,10 +379,10 @@ TImageP ImageExporter::exportedImage(const TFrameId &fid, TXshLevelType outImgTy
 			int fCount = m_sl.getFrameCount();
 			double param = (fCount == 1) ? 0.0 : m_sl.fid2index(fid) / double(fCount - 1);
 
-			VectorThicknessTransformer transformer(
-				vi, m_opts.m_thicknessTransform, param);
+			VectorThicknessTransformer transformer(vi, m_opts.m_thicknessTransform, param);
 
-			img = (outImgType == TZP_TYPE) ? TImageP(exportedToonzImage(vi)) : TImageP(exportedRasterImage(vi));
+			img = (outImgType == TZP_TYPE) ? TImageP(exportedToonzImage(vi))
+										   : TImageP(exportedRasterImage(vi));
 		}
 
 	DEFAULT : {
@@ -403,10 +400,8 @@ TImageP ImageExporter::exportedImage(const TFrameId &fid, TXshLevelType outImgTy
 //    Export Level commands
 //***********************************************************************************
 
-TImageP IoCmd::exportedImage(
-	const std::string &ext,
-	const TXshSimpleLevel &sl, const TFrameId &fid,
-	const ExportLevelOptions &opts)
+TImageP IoCmd::exportedImage(const std::string &ext, const TXshSimpleLevel &sl, const TFrameId &fid,
+							 const ExportLevelOptions &opts)
 {
 	ImageExporter exporter(sl, opts);
 
@@ -415,14 +410,14 @@ TImageP IoCmd::exportedImage(
 
 //---------------------------------------------------------------------------
 
-//esporta il livello corrente in un formato full color. se forRetas e' true, viene esportato
-//in modo adatto ad essere usato in Retas, e cioe':
+// esporta il livello corrente in un formato full color. se forRetas e' true, viene esportato
+// in modo adatto ad essere usato in Retas, e cioe':
 //- messo il bianco al posto del transparente
-//- se c'e' bianco nell'immagine, viene "sporcato"(altrimenti poi viene letto come trasparente da retas)
+//- se c'e' bianco nell'immagine, viene "sporcato"(altrimenti poi viene letto come trasparente da
+//retas)
 //- l'output e' solo tga a 24bit compressed nel formato pippo0001.tga
 
-bool IoCmd::exportLevel(const TFilePath &path, TXshSimpleLevel *sl,
-						ExportLevelOptions opts,
+bool IoCmd::exportLevel(const TFilePath &path, TXshSimpleLevel *sl, ExportLevelOptions opts,
 						OverwriteCallbacks *overwriteCB, ProgressCallbacks *progressCB)
 {
 	struct Locals {
@@ -448,10 +443,11 @@ bool IoCmd::exportLevel(const TFilePath &path, TXshSimpleLevel *sl,
 				TFilePath fpout;
 
 				if (m_opts.m_forRetas) {
-					QString pathOut = QString::fromStdWString(m_path.getParentDir().getWideString()) +
-									  "\\" + QString::fromStdString(m_path.getName()) +
-									  QString::fromStdString(m_sl->index2fid(i).expand()) +
-									  "." + QString::fromStdString(m_path.getType());
+					QString pathOut =
+						QString::fromStdWString(m_path.getParentDir().getWideString()) + "\\" +
+						QString::fromStdString(m_path.getName()) +
+						QString::fromStdString(m_sl->index2fid(i).expand()) + "." +
+						QString::fromStdString(m_path.getType());
 					fpout = TFilePath(pathOut.toStdString());
 				} else
 					fpout = TFilePath(m_path.withFrame(m_sl->index2fid(i)));
@@ -541,12 +537,12 @@ bool IoCmd::exportLevel(const TFilePath &path, TXshSimpleLevel *sl,
 	// Output properties
 	if (!opts.m_props) {
 		ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
-		opts.m_props = scene->getProperties()->getOutputProperties()->getFileFormatProperties(path.getType());
+		opts.m_props =
+			scene->getProperties()->getOutputProperties()->getFileFormatProperties(path.getType());
 	}
 
 	// Camera (todo)
-	assert(opts.m_camera.getRes().lx > 0 &&
-		   opts.m_camera.getRes().ly > 0);
+	assert(opts.m_camera.getRes().lx > 0 && opts.m_camera.getRes().ly > 0);
 
 	// Callbacks
 	std::auto_ptr<OverwriteCallbacks> overwriteDefault(

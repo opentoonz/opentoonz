@@ -95,13 +95,13 @@ ComboViewerPanel::ComboViewerPanel(QWidget *parent, Qt::WFlags flags)
 	hbox->setFrameStyle(QFrame::StyledPanel);
 	hbox->setObjectName("ComboViewerPanel");
 
-	//ToolBar
+	// ToolBar
 	m_toolbar = new Toolbar(this, false);
-	//Tool Options
+	// Tool Options
 	m_toolOptions = new ToolOptions();
 	m_toolOptions->setObjectName("ComboViewerToolOptions");
 
-	//Viewer
+	// Viewer
 	ImageUtils::FullScreenWidget *fsWidget = new ImageUtils::FullScreenWidget(this);
 	fsWidget->setWidget(m_sceneViewer = new SceneViewer(fsWidget));
 
@@ -111,8 +111,8 @@ ComboViewerPanel::ComboViewerPanel(QWidget *parent, Qt::WFlags flags)
 	//  Qt may crash in handling WM_SIZE of m_sceneViewer in splash.finish(&w)
 	//  in main.cpp. To suppress sending WM_SIZE, set window position here.
 	//  WM_SIZE will not be sent if window poistion is not changed.
-	::SetWindowPos(reinterpret_cast<HWND>(m_sceneViewer->winId()),
-		HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+	::SetWindowPos(reinterpret_cast<HWND>(m_sceneViewer->winId()), HWND_TOP, 0, 0, 0, 0,
+				   SWP_NOMOVE | SWP_NOSIZE);
 #endif
 
 	m_vRuler = new Ruler(this, m_sceneViewer, true);
@@ -124,7 +124,7 @@ ComboViewerPanel::ComboViewerPanel(QWidget *parent, Qt::WFlags flags)
 	m_keyFrameButton->setObjectHandle(app->getCurrentObject());
 	m_keyFrameButton->setXsheetHandle(app->getCurrentXsheet());
 
-	//FlipConsole
+	// FlipConsole
 	int buttons = FlipConsole::cFullConsole;
 	buttons &= (~FlipConsole::eSound);
 	buttons &= (~FlipConsole::eFilledRaster);
@@ -148,7 +148,8 @@ ComboViewerPanel::ComboViewerPanel(QWidget *parent, Qt::WFlags flags)
 			viewerL->addWidget(fsWidget, 1, 1);
 		}
 		mainLayout->addLayout(viewerL, 1);
-		m_flipConsole = new FlipConsole(mainLayout, buttons, false, m_keyFrameButton, "SceneViewerConsole", this, true);
+		m_flipConsole = new FlipConsole(mainLayout, buttons, false, m_keyFrameButton,
+										"SceneViewerConsole", this, true);
 	}
 	hbox->setLayout(mainLayout);
 	setWidget(hbox);
@@ -162,7 +163,8 @@ ComboViewerPanel::ComboViewerPanel(QWidget *parent, Qt::WFlags flags)
 	m_flipConsole->enableButton(FlipConsole::eGBlue, false, false);
 	m_flipConsole->enableButton(FlipConsole::eSound, false, true);
 
-	m_flipConsole->setFrameRate(app->getCurrentScene()->getScene()->getProperties()->getOutputProperties()->getFrameRate());
+	m_flipConsole->setFrameRate(
+		app->getCurrentScene()->getScene()->getProperties()->getOutputProperties()->getFrameRate());
 	m_flipConsole->setFrameHandle(TApp::instance()->getCurrentFrame());
 
 	bool ret = true;
@@ -172,18 +174,17 @@ ComboViewerPanel::ComboViewerPanel(QWidget *parent, Qt::WFlags flags)
 	ret = ret && connect(m_sceneViewer, SIGNAL(previewToggled()), SLOT(changeWindowTitle()));
 	ret = ret && connect(m_flipConsole, SIGNAL(playStateChanged(bool)),
 						 TApp::instance()->getCurrentFrame(), SLOT(setPlaying(bool)));
-	ret = ret && connect(m_flipConsole, SIGNAL(buttonPressed(FlipConsole::EGadget)),
-						 m_sceneViewer, SLOT(onButtonPressed(FlipConsole::EGadget)));
-	ret = ret && connect(m_sceneViewer, SIGNAL(previewStatusChanged()),
-						 this, SLOT(update()));
-	ret = ret && connect(app->getCurrentScene(), SIGNAL(sceneSwitched()),
-						 this, SLOT(onSceneSwitched()));
+	ret = ret && connect(m_flipConsole, SIGNAL(buttonPressed(FlipConsole::EGadget)), m_sceneViewer,
+						 SLOT(onButtonPressed(FlipConsole::EGadget)));
+	ret = ret && connect(m_sceneViewer, SIGNAL(previewStatusChanged()), this, SLOT(update()));
+	ret = ret &&
+		  connect(app->getCurrentScene(), SIGNAL(sceneSwitched()), this, SLOT(onSceneSwitched()));
 	assert(ret);
 
 	// note: initializeTitleBar() refers to m_sceneViewer
 	initializeTitleBar(getTitleBar());
 
-	//initial state of the parts
+	// initial state of the parts
 	m_visibleFlag[CVPARTS_TOOLBAR] = true;
 	m_visibleFlag[CVPARTS_TOOLOPTIONS] = true;
 	m_visibleFlag[CVPARTS_FLIPCONSOLE] = true;
@@ -196,11 +197,11 @@ ComboViewerPanel::ComboViewerPanel(QWidget *parent, Qt::WFlags flags)
 
 void ComboViewerPanel::updateShowHide()
 {
-	//toolbar
+	// toolbar
 	m_toolbar->setVisible(m_visibleFlag[CVPARTS_TOOLBAR]);
-	//tool options bar
+	// tool options bar
 	m_toolOptions->setVisible(m_visibleFlag[CVPARTS_TOOLOPTIONS]);
-	//flip console
+	// flip console
 	m_flipConsole->showHideAllParts(m_visibleFlag[CVPARTS_FLIPCONSOLE]);
 	update();
 }
@@ -222,7 +223,7 @@ void ComboViewerPanel::addShowHideContextMenu(QMenu *menu)
 {
 
 	QMenu *showHideMenu = menu->addMenu(tr("GUI Show / Hide"));
-	//actions
+	// actions
 	QAction *toolbarSHAct = showHideMenu->addAction(tr("Toolbar"));
 	QAction *toolOptionsSHAct = showHideMenu->addAction(tr("Tool Options Bar"));
 	QAction *flipConsoleSHAct = showHideMenu->addAction(tr("Console"));
@@ -245,7 +246,8 @@ void ComboViewerPanel::addShowHideContextMenu(QMenu *menu)
 	showHideActGroup->addAction(toolOptionsSHAct);
 	showHideActGroup->addAction(flipConsoleSHAct);
 
-	connect(showHideActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onShowHideActionTriggered(QAction *)));
+	connect(showHideActGroup, SIGNAL(triggered(QAction *)), this,
+			SLOT(onShowHideActionTriggered(QAction *)));
 
 	showHideMenu->addSeparator();
 	showHideMenu->addAction(CommandManager::instance()->getAction(MI_ViewCamera));
@@ -258,7 +260,7 @@ void ComboViewerPanel::addShowHideContextMenu(QMenu *menu)
 }
 
 //-----------------------------------------------------------------------------
-/*! slot function for show/hide the parts 
+/*! slot function for show/hide the parts
 */
 
 void ComboViewerPanel::onShowHideActionTriggered(QAction *act)
@@ -283,16 +285,19 @@ void ComboViewerPanel::onDrawFrame(int frame, const ImagePainter::VisualSettings
 	TFrameHandle *frameHandle = app->getCurrentFrame();
 
 	if (m_sceneViewer->isPreviewEnabled()) {
-		class Previewer *pr = Previewer::instance(m_sceneViewer->getPreviewMode() == SceneViewer::SUBCAMERA_PREVIEW);
+		class Previewer *pr =
+			Previewer::instance(m_sceneViewer->getPreviewMode() == SceneViewer::SUBCAMERA_PREVIEW);
 
-		pr->getRaster(frame - 1); //the 'getRaster' starts the render of the frame is not already started
+		pr->getRaster(frame -
+					  1); // the 'getRaster' starts the render of the frame is not already started
 		int curFrame = frame;
-		if (frameHandle->isPlaying() && !pr->isFrameReady(frame - 1)) //stops on last rendered frame until current is ready!
+		if (frameHandle->isPlaying() &&
+			!pr->isFrameReady(frame - 1)) // stops on last rendered frame until current is ready!
 		{
 			while (frame > 0 && !pr->isFrameReady(frame - 1))
 				frame--;
 			if (frame == 0)
-				frame = curFrame; //if no frame is ready, I stay on current...no use to rewind
+				frame = curFrame; // if no frame is ready, I stay on current...no use to rewind
 			m_flipConsole->setCurrentFrame(frame);
 		}
 	}
@@ -300,7 +305,8 @@ void ComboViewerPanel::onDrawFrame(int frame, const ImagePainter::VisualSettings
 	assert(frame >= 0);
 	if (frame != frameHandle->getFrameIndex() + 1) {
 		if (frameHandle->isEditingScene()) {
-			TXshColumn *column = app->getCurrentXsheet()->getXsheet()->getColumn(app->getCurrentColumn()->getColumnIndex());
+			TXshColumn *column = app->getCurrentXsheet()->getXsheet()->getColumn(
+				app->getCurrentColumn()->getColumnIndex());
 			if (column) {
 				TXshSoundColumn *soundColumn = column->getSoundColumn();
 				if (soundColumn && !soundColumn->isPlaying())
@@ -354,27 +360,29 @@ void ComboViewerPanel::showEvent(QShowEvent *)
 	ret = ret && connect(levelHandle, SIGNAL(xshLevelChanged()), this, SLOT(changeWindowTitle()));
 	ret = ret && connect(frameHandle, SIGNAL(frameSwitched()), this, SLOT(changeWindowTitle()));
 	// onXshLevelSwitched(TXshLevel*)： changeWindowTitle() + updateFrameRange()
-	ret = ret && connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)),
-						 this, SLOT(onXshLevelSwitched(TXshLevel *)));
+	ret = ret && connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
+						 SLOT(onXshLevelSwitched(TXshLevel *)));
 
-	//updateFrameRange(): update the frame slider's range
+	// updateFrameRange(): update the frame slider's range
 	ret = ret && connect(levelHandle, SIGNAL(xshLevelChanged()), this, SLOT(updateFrameRange()));
 
-	//onFrameTypeChanged(): reset the marker positions in the flip console
+	// onFrameTypeChanged(): reset the marker positions in the flip console
 	ret = ret && connect(frameHandle, SIGNAL(frameTypeChanged()), this, SLOT(onFrameTypeChanged()));
 
-	//onFrameChanged(): update the flipconsole according to the current frame
+	// onFrameChanged(): update the flipconsole according to the current frame
 	ret = ret && connect(frameHandle, SIGNAL(frameSwitched()), this, SLOT(onFrameChanged()));
 
-	ret = ret && connect(app->getCurrentTool(), SIGNAL(toolSwitched()), m_sceneViewer, SLOT(onToolSwitched()));
-	ret = ret && connect(sceneHandle, SIGNAL(preferenceChanged()), m_flipConsole, SLOT(onPreferenceChanged()));
+	ret = ret && connect(app->getCurrentTool(), SIGNAL(toolSwitched()), m_sceneViewer,
+						 SLOT(onToolSwitched()));
+	ret = ret && connect(sceneHandle, SIGNAL(preferenceChanged()), m_flipConsole,
+						 SLOT(onPreferenceChanged()));
 	m_flipConsole->onPreferenceChanged();
 
 	assert(ret);
 
 	m_flipConsole->setActive(true);
 
-	//refresh
+	// refresh
 	onSceneChanged();
 	changeWindowTitle();
 }
@@ -408,96 +416,83 @@ void ComboViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar)
 
 	// buttons for show / hide toggle for the field guide and the safe area
 	TPanelTitleBarButtonForSafeArea *safeAreaButton = new TPanelTitleBarButtonForSafeArea(
-		titleBar,
-		":Resources/safearea.png",
-		":Resources/safearea_over.png",
+		titleBar, ":Resources/safearea.png", ":Resources/safearea_over.png",
 		":Resources/safearea_on.png");
 	safeAreaButton->setToolTip("Safe Area (Right Click to Select)");
 	titleBar->add(QPoint(x, 1), safeAreaButton);
-	ret = ret && connect(safeAreaButton, SIGNAL(toggled(bool)), CommandManager::instance()->getAction(MI_SafeArea), SLOT(trigger()));
-	ret = ret && connect(CommandManager::instance()->getAction(MI_SafeArea), SIGNAL(triggered(bool)), safeAreaButton, SLOT(setPressed(bool)));
-	//initialize state
+	ret = ret && connect(safeAreaButton, SIGNAL(toggled(bool)),
+						 CommandManager::instance()->getAction(MI_SafeArea), SLOT(trigger()));
+	ret = ret && connect(CommandManager::instance()->getAction(MI_SafeArea),
+						 SIGNAL(triggered(bool)), safeAreaButton, SLOT(setPressed(bool)));
+	// initialize state
 	safeAreaButton->setPressed(CommandManager::instance()->getAction(MI_SafeArea)->isChecked());
 
-	button = new TPanelTitleBarButton(
-		titleBar,
-		":Resources/fieldguide.png",
-		":Resources/fieldguide_over.png",
-		":Resources/fieldguide_on.png");
+	button =
+		new TPanelTitleBarButton(titleBar, ":Resources/fieldguide.png",
+								 ":Resources/fieldguide_over.png", ":Resources/fieldguide_on.png");
 	button->setToolTip("Field Guide");
 	x += 5 + iconWidth;
 	titleBar->add(QPoint(x, 1), button);
-	ret = ret && connect(button, SIGNAL(toggled(bool)), CommandManager::instance()->getAction(MI_FieldGuide), SLOT(trigger()));
-	ret = ret && connect(CommandManager::instance()->getAction(MI_FieldGuide), SIGNAL(triggered(bool)), button, SLOT(setPressed(bool)));
-	//initialize state
+	ret = ret && connect(button, SIGNAL(toggled(bool)),
+						 CommandManager::instance()->getAction(MI_FieldGuide), SLOT(trigger()));
+	ret = ret && connect(CommandManager::instance()->getAction(MI_FieldGuide),
+						 SIGNAL(triggered(bool)), button, SLOT(setPressed(bool)));
+	// initialize state
 	button->setPressed(CommandManager::instance()->getAction(MI_FieldGuide)->isChecked());
 
-	//view mode toggles
-	button = new TPanelTitleBarButton(
-		titleBar,
-		":Resources/standard.png",
-		":Resources/standard_over.png",
-		":Resources/standard_on.png");
+	// view mode toggles
+	button = new TPanelTitleBarButton(titleBar, ":Resources/standard.png",
+									  ":Resources/standard_over.png", ":Resources/standard_on.png");
 	button->setToolTip("Camera Stand View");
 	x += 10 + iconWidth;
 	titleBar->add(QPoint(x, 1), button);
 	button->setButtonSet(viewModeButtonSet, SceneViewer::NORMAL_REFERENCE);
 	button->setPressed(true);
 
-	button = new TPanelTitleBarButton(
-		titleBar,
-		":Resources/3D.png",
-		":Resources/3D_over.png",
-		":Resources/3D_on.png");
+	button = new TPanelTitleBarButton(titleBar, ":Resources/3D.png", ":Resources/3D_over.png",
+									  ":Resources/3D_on.png");
 	button->setToolTip("3D View");
 	x += 19; // width of standard.png = 18pixels
 	titleBar->add(QPoint(x, 1), button);
 	button->setButtonSet(viewModeButtonSet, SceneViewer::CAMERA3D_REFERENCE);
 
-	button = new TPanelTitleBarButton(
-		titleBar,
-		":Resources/view_camera.png",
-		":Resources/view_camera_over.png",
-		":Resources/view_camera_on.png");
+	button = new TPanelTitleBarButton(titleBar, ":Resources/view_camera.png",
+									  ":Resources/view_camera_over.png",
+									  ":Resources/view_camera_on.png");
 	button->setToolTip("Camera View");
 	x += 18; // width of 3D.png = 18pixels
 	titleBar->add(QPoint(x, 1), button);
 	button->setButtonSet(viewModeButtonSet, SceneViewer::CAMERA_REFERENCE);
-	ret = ret && connect(viewModeButtonSet, SIGNAL(selected(int)), m_sceneViewer, SLOT(setReferenceMode(int)));
+	ret = ret && connect(viewModeButtonSet, SIGNAL(selected(int)), m_sceneViewer,
+						 SLOT(setReferenceMode(int)));
 
-	//freeze button
-	button = new TPanelTitleBarButton(
-		titleBar,
-		":Resources/freeze.png",
-		":Resources/freeze_over.png",
-		":Resources/freeze_on.png");
+	// freeze button
+	button = new TPanelTitleBarButton(titleBar, ":Resources/freeze.png",
+									  ":Resources/freeze_over.png", ":Resources/freeze_on.png");
 	x += 10 + 19; // width of viewcamera.png = 18pixels
 
-	button->setToolTip("Freeze"); //RC1
+	button->setToolTip("Freeze"); // RC1
 	titleBar->add(QPoint(x, 1), button);
 	ret = ret && connect(button, SIGNAL(toggled(bool)), m_sceneViewer, SLOT(freeze(bool)));
 
-	//preview toggles
-	m_previewButton = new TPanelTitleBarButton(
-		titleBar,
-		":Resources/viewpreview.png",
-		":Resources/viewpreview_over.png",
-		":Resources/viewpreview_on.png");
+	// preview toggles
+	m_previewButton = new TPanelTitleBarButton(titleBar, ":Resources/viewpreview.png",
+											   ":Resources/viewpreview_over.png",
+											   ":Resources/viewpreview_on.png");
 	x += 5 + iconWidth;
 	titleBar->add(QPoint(x, 1), m_previewButton);
 	m_previewButton->setToolTip(tr("Preview"));
 	ret = ret && connect(m_previewButton, SIGNAL(toggled(bool)), SLOT(enableFullPreview(bool)));
 
 	m_subcameraPreviewButton = new TPanelTitleBarButton(
-		titleBar,
-		":Resources/subcamera_preview.png",
-		":Resources/subcamera_preview_over.png",
+		titleBar, ":Resources/subcamera_preview.png", ":Resources/subcamera_preview_over.png",
 		":Resources/subcamera_preview_on.png");
 	x += 28; // width of viewpreview.png =28pixels
 
 	titleBar->add(QPoint(x, 1), m_subcameraPreviewButton);
 	m_subcameraPreviewButton->setToolTip(tr("Sub-camera Preview"));
-	ret = ret && connect(m_subcameraPreviewButton, SIGNAL(toggled(bool)), SLOT(enableSubCameraPreview(bool)));
+	ret = ret && connect(m_subcameraPreviewButton, SIGNAL(toggled(bool)),
+						 SLOT(enableSubCameraPreview(bool)));
 
 	assert(ret);
 }
@@ -517,7 +512,8 @@ void ComboViewerPanel::enableFullPreview(bool enabled)
 void ComboViewerPanel::enableSubCameraPreview(bool enabled)
 {
 	m_previewButton->setPressed(false);
-	m_sceneViewer->enablePreview(enabled ? SceneViewer::SUBCAMERA_PREVIEW : SceneViewer::NO_PREVIEW);
+	m_sceneViewer->enablePreview(enabled ? SceneViewer::SUBCAMERA_PREVIEW
+										 : SceneViewer::NO_PREVIEW);
 	m_flipConsole->setProgressBarStatus(&Previewer::instance(true)->getProgressBarStatus());
 	enableFlipConsoleForCamerastand(enabled);
 }
@@ -595,15 +591,24 @@ void ComboViewerPanel::changeWindowTitle()
 		name = name + tr("   ::   Level: ") + imageName;
 
 		if (m_sceneViewer->isPreviewEnabled()) {
-			name = name + "  ::  Zoom : " + QString::number((int)(100.0 * sqrt(m_sceneViewer->getViewMatrix().det()) * m_sceneViewer->getDpiFactor())) + "%";
+			name = name + "  ::  Zoom : " +
+				   QString::number((int)(100.0 * sqrt(m_sceneViewer->getViewMatrix().det()) *
+										 m_sceneViewer->getDpiFactor())) +
+				   "%";
 		}
 
 		// If the current level exists and some option is set in the preference,
 		// set the zoom value to the current level's dpi
-		else if (Preferences::instance()->isActualPixelViewOnSceneEditingModeEnabled() && TApp::instance()->getCurrentLevel()->getSimpleLevel() && !CleanupPreviewCheck::instance()->isEnabled() // cleanup preview must be OFF
-				 && !CameraTestCheck::instance()->isEnabled())																																	 // camera test mode must be OFF neither
+		else if (Preferences::instance()->isActualPixelViewOnSceneEditingModeEnabled() &&
+				 TApp::instance()->getCurrentLevel()->getSimpleLevel() &&
+				 !CleanupPreviewCheck::instance()->isEnabled() // cleanup preview must be OFF
+				 &&
+				 !CameraTestCheck::instance()->isEnabled()) // camera test mode must be OFF neither
 		{
-			name = name + "  ::  Zoom : " + QString::number((int)(100.0 * sqrt(m_sceneViewer->getViewMatrix().det()) * m_sceneViewer->getDpiFactor())) + "%";
+			name = name + "  ::  Zoom : " +
+				   QString::number((int)(100.0 * sqrt(m_sceneViewer->getViewMatrix().det()) *
+										 m_sceneViewer->getDpiFactor())) +
+				   "%";
 		}
 
 	}
@@ -612,11 +617,15 @@ void ComboViewerPanel::changeWindowTitle()
 		TXshLevel *level = app->getCurrentLevel()->getLevel();
 		if (level) {
 			TFilePath fp(level->getName());
-			QString imageName = QString::fromStdWString(fp.withFrame(app->getCurrentFrame()->getFid()).getWideString());
+			QString imageName = QString::fromStdWString(
+				fp.withFrame(app->getCurrentFrame()->getFid()).getWideString());
 
 			name = name + tr("Level: ") + imageName;
 
-			name = name + "  ::  Zoom : " + QString::number((int)(100.0 * sqrt(m_sceneViewer->getViewMatrix().det()) * m_sceneViewer->getDpiFactor())) + "%";
+			name = name + "  ::  Zoom : " +
+				   QString::number((int)(100.0 * sqrt(m_sceneViewer->getViewMatrix().det()) *
+										 m_sceneViewer->getDpiFactor())) +
+				   "%";
 		}
 	}
 	setWindowTitle(name);
@@ -646,7 +655,12 @@ void ComboViewerPanel::onSceneChanged()
 		maxFrameIndex = frameIndex;
 
 	// set the FPS for new scene
-	m_flipConsole->setFrameRate(TApp::instance()->getCurrentScene()->getScene()->getProperties()->getOutputProperties()->getFrameRate());
+	m_flipConsole->setFrameRate(TApp::instance()
+									->getCurrentScene()
+									->getScene()
+									->getProperties()
+									->getOutputProperties()
+									->getFrameRate());
 	// update the frame slider's range with new frameHandle
 	m_flipConsole->setFrameRange(1, maxFrameIndex + 1, 1, frameIndex + 1);
 
@@ -656,8 +670,7 @@ void ComboViewerPanel::onSceneChanged()
 	m_flipConsole->setMarkers(fromIndex, toIndex);
 
 	// update the key frames
-	if (m_keyFrameButton &&
-		(m_keyFrameButton->getCurrentFrame() != frameIndex))
+	if (m_keyFrameButton && (m_keyFrameButton->getCurrentFrame() != frameIndex))
 		m_keyFrameButton->setCurrentFrame(frameIndex);
 }
 
@@ -680,8 +693,7 @@ void ComboViewerPanel::onFrameChanged()
 {
 	int frameIndex = TApp::instance()->getCurrentFrame()->getFrameIndex();
 	m_flipConsole->setCurrentFrame(frameIndex + 1);
-	if (m_keyFrameButton &&
-		(m_keyFrameButton->getCurrentFrame() != frameIndex))
+	if (m_keyFrameButton && (m_keyFrameButton->getCurrentFrame() != frameIndex))
 		m_keyFrameButton->setCurrentFrame(frameIndex);
 }
 
@@ -704,7 +716,7 @@ void ComboViewerPanel::onFrameTypeChanged()
 
 	// if in the scene editing mode, get the preview marker positions
 	if (TApp::instance()->getCurrentFrame()->isEditingScene()) {
-		//set the markers
+		// set the markers
 		int fromIndex, toIndex, dummy;
 		XsheetGUI::getPlayRange(fromIndex, toIndex, dummy);
 		m_flipConsole->setMarkers(fromIndex, toIndex);

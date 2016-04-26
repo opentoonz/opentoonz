@@ -18,7 +18,8 @@ int end_group(toonz_ui_page_handle_t page, const char *name)
 	return TOONZ_ERROR_INVALID_HANDLE;
 }
 
-int bind_param(toonz_ui_page_handle_t page, toonz_param_handle_t param, toonz_param_view_handle_t traits)
+int bind_param(toonz_ui_page_handle_t page, toonz_param_handle_t param,
+			   toonz_param_view_handle_t traits)
 {
 	if (UIPage *pages = reinterpret_cast<UIPage *>(page)) {
 		if (Param *p = reinterpret_cast<Param *>(param)) {

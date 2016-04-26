@@ -49,7 +49,7 @@ class DVAPI TExpression
 	class Imp;
 	std::unique_ptr<Imp> m_imp;
 
-public:
+  public:
 	TExpression();
 	~TExpression();
 
@@ -61,9 +61,9 @@ public:
 	const TSyntax::Grammar *getGrammar() const;
 
 	/*!
-    Sets the expression's text - a mix of mathematical expressions
-    and grammar-recognized patterns that is able to calculate the
-    expression's value at a given frame.
+	Sets the expression's text - a mix of mathematical expressions
+	and grammar-recognized patterns that is able to calculate the
+	expression's value at a given frame.
   */
 	void setText(std::string text);
 	std::string getText() const;
@@ -72,7 +72,7 @@ public:
 
 	/*!
 		Returns whether the expression is valid according to actual
-      grammar syntax (i.e. it has at least one calculator node).
+	  grammar syntax (i.e. it has at least one calculator node).
 	*/
 	bool isValid();
 
@@ -86,7 +86,7 @@ public:
 
 	bool isCycling() const;
 
-private:
+  private:
 	// The expression is parsed lazily - ie when a getters attempts to
 	// evaluate the expression and it was not yet parsed
 	void parse();

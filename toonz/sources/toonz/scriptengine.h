@@ -14,14 +14,14 @@ namespace ScriptWrapper
 class Cell : public QObject
 {
 	Q_OBJECT
-public:
+  public:
 	Cell();
 };
 
 class Xsheet : public QObject
 {
 	Q_OBJECT
-public:
+  public:
 	Xsheet();
 };
 
@@ -30,7 +30,7 @@ class Level : public QObject
 	Q_OBJECT
 	QString m_name;
 
-public:
+  public:
 	Level();
 	Level(TXshSimpleLevel *);
 	~Level();
@@ -42,13 +42,13 @@ public:
 
 	Q_PROPERTY(QString name READ getName WRITE setName)
 
-private:
+  private:
 };
 
 class Scene : public QObject
 {
 	Q_OBJECT
-public:
+  public:
 	Scene();
 };
 

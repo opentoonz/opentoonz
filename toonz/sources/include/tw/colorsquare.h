@@ -23,7 +23,7 @@ class ColorSquare : public TWidget
 	TPoint m_currentPos;
 	TPoint m_oldMousePos;
 
-public:
+  public:
 	ColorSquare(TWidget *parent, string name = "colorSquare");
 
 	~ColorSquare();

@@ -48,14 +48,13 @@ namespace
 PreviewToggleCommand previewToggle;
 CameraTestToggleCommand cameraTestToggle;
 
-} //namespace
+} // namespace
 
 //**********************************************************************************
 //    PreviewToggleCommand implementation
 //**********************************************************************************
 
-PreviewToggleCommand::PreviewToggleCommand()
-	: MenuItemHandler("MI_CleanupPreview")
+PreviewToggleCommand::PreviewToggleCommand() : MenuItemHandler("MI_CleanupPreview")
 {
 	// Setup the processing timer. The timer is needed to prevent (or rather, cumulate)
 	// short-lived parameter changes to trigger any preview processing.
@@ -78,17 +77,17 @@ void PreviewToggleCommand::execute()
 
 void PreviewToggleCommand::enable()
 {
-	//Cleanup Preview and Camera Test are exclusive. In case, disable the latter.
-	//NOTE: This is done *before* attaching, since attach may invoke a preview rebuild.
+	// Cleanup Preview and Camera Test are exclusive. In case, disable the latter.
+	// NOTE: This is done *before* attaching, since attach may invoke a preview rebuild.
 	CameraTestCheck *tc = CameraTestCheck::instance();
 	tc->setIsEnabled(false);
 
-	//Attach to the model
+	// Attach to the model
 	CleanupSettingsModel *model = CleanupSettingsModel::instance();
 
 	model->attach(CleanupSettingsModel::LISTENER | CleanupSettingsModel::PREVIEWER);
 
-	//Connect signals
+	// Connect signals
 	bool ret = true;
 	ret = ret && connect(model, SIGNAL(previewDataChanged()), this, SLOT(onPreviewDataChanged()));
 	ret = ret && connect(model, SIGNAL(modelChanged(bool)), this, SLOT(onModelChanged(bool)));
@@ -101,7 +100,7 @@ void PreviewToggleCommand::enable()
 
 	onPreviewDataChanged();
 
-	//in preview cleanup mode, tools are forbidden! Reverting to hand...
+	// in preview cleanup mode, tools are forbidden! Reverting to hand...
 	TApp::instance()->getCurrentTool()->setTool(T_Hand);
 }
 
@@ -114,7 +113,8 @@ void PreviewToggleCommand::disable()
 	model->detach(CleanupSettingsModel::LISTENER | CleanupSettingsModel::PREVIEWER);
 
 	bool ret = true;
-	ret = ret && disconnect(model, SIGNAL(previewDataChanged()), this, SLOT(onPreviewDataChanged()));
+	ret =
+		ret && disconnect(model, SIGNAL(previewDataChanged()), this, SLOT(onPreviewDataChanged()));
 	ret = ret && disconnect(model, SIGNAL(modelChanged(bool)), this, SLOT(onModelChanged(bool)));
 	ret = ret && disconnect(&m_timer, SIGNAL(timeout()), this, SLOT(postProcess()));
 
@@ -209,7 +209,7 @@ void PreviewToggleCommand::postProcess()
 
 void PreviewToggleCommand::clean()
 {
-	//Release all previewed images
+	// Release all previewed images
 	if (m_sl) {
 		int i, fidsCount = m_fids.size();
 		for (i = 0; i < fidsCount; ++i) {
@@ -237,8 +237,7 @@ void PreviewToggleCommand::clean()
 //    CameraTestToggleCommand implementation
 //**********************************************************************************
 
-CameraTestToggleCommand::CameraTestToggleCommand()
-	: MenuItemHandler("MI_CameraTest"), m_oldTool(0)
+CameraTestToggleCommand::CameraTestToggleCommand() : MenuItemHandler("MI_CameraTest"), m_oldTool(0)
 {
 	m_timer.setSingleShot(true);
 	m_timer.setInterval(500);
@@ -267,16 +266,16 @@ void CameraTestToggleCommand::enable()
 		return;
 	}
 
-	//Cleanup Preview and Camera Test are exclusive. In case, disable the latter.
-	//NOTE: This is done *before* attaching, since attach may invoke a preview rebuild.
+	// Cleanup Preview and Camera Test are exclusive. In case, disable the latter.
+	// NOTE: This is done *before* attaching, since attach may invoke a preview rebuild.
 	CleanupPreviewCheck *pc = CleanupPreviewCheck::instance();
 	pc->setIsEnabled(false);
 
-	//Attach to the model
+	// Attach to the model
 	CleanupSettingsModel *model = CleanupSettingsModel::instance();
 	model->attach(CleanupSettingsModel::LISTENER | CleanupSettingsModel::CAMERATEST, false);
 
-	//Connect signals
+	// Connect signals
 	bool ret = true;
 	ret = ret && connect(model, SIGNAL(previewDataChanged()), this, SLOT(onPreviewDataChanged()));
 	assert(ret);
@@ -294,7 +293,8 @@ void CameraTestToggleCommand::disable()
 	model->detach(CleanupSettingsModel::LISTENER | CleanupSettingsModel::CAMERATEST);
 
 	bool ret = true;
-	ret = ret && disconnect(model, SIGNAL(previewDataChanged()), this, SLOT(onPreviewDataChanged()));
+	ret =
+		ret && disconnect(model, SIGNAL(previewDataChanged()), this, SLOT(onPreviewDataChanged()));
 	assert(ret);
 
 	clean();
@@ -363,7 +363,7 @@ void CameraTestToggleCommand::postProcess()
 
 void CameraTestToggleCommand::clean()
 {
-	//Release all previewed images
+	// Release all previewed images
 	if (m_sl) {
 		int i, fidsCount = m_fids.size();
 		for (i = 0; i < fidsCount; ++i) {
@@ -393,7 +393,7 @@ class UndoCameraTestMove : public TUndo
 	TPointD m_before, m_after;
 	CleanupParameters *m_cp;
 
-public:
+  public:
 	UndoCameraTestMove(const TPointD &before, const TPointD &after, CleanupParameters *cp)
 		: m_before(before), m_after(after), m_cp(cp)
 	{
@@ -429,14 +429,8 @@ public:
 	}
 	int getSize() const { return sizeof(*this); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Move Cleanup Camera");
-	}
-	int getHistoryType()
-	{
-		return HistoryType::EditTool_Move;
-	}
+	QString getHistoryString() { return QObject::tr("Move Cleanup Camera"); }
+	int getHistoryType() { return HistoryType::EditTool_Move; }
 };
 
 //=============================================================================
@@ -448,11 +442,12 @@ class UndoCameraTestScale : public TUndo
 	TDimensionD m_sizeBefore, m_sizeAfter;
 	CleanupParameters *m_cp;
 
-public:
+  public:
 	UndoCameraTestScale(const TDimension &resBefore, const TDimensionD &sizeBefore,
 						const TDimension &resAfter, const TDimensionD &sizeAfter,
 						CleanupParameters *cp)
-		: m_resBefore(resBefore), m_sizeBefore(sizeBefore), m_resAfter(resAfter), m_sizeAfter(sizeAfter), m_cp(cp)
+		: m_resBefore(resBefore), m_sizeBefore(sizeBefore), m_resAfter(resAfter),
+		  m_sizeAfter(sizeAfter), m_cp(cp)
 	{
 	}
 
@@ -489,14 +484,8 @@ public:
 	}
 	int getSize() const { return sizeof(*this); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Scale Cleanup Camera");
-	}
-	int getHistoryType()
-	{
-		return HistoryType::EditTool_Move;
-	}
+	QString getHistoryString() { return QObject::tr("Scale Cleanup Camera"); }
+	int getHistoryType() { return HistoryType::EditTool_Move; }
 };
 
 //**********************************************************************************
@@ -509,24 +498,16 @@ class CameraTestTool : public TTool
 	bool m_dragged;
 	int m_scaling;
 
-	enum { eNoScale,
-		   e00,
-		   e01,
-		   e10,
-		   e11,
-		   eM0,
-		   e1M,
-		   eM1,
-		   e0M };
+	enum { eNoScale, e00, e01, e10, e11, eM0, e1M, eM1, e0M };
 
 	/*--- +ShiftドラッグでX、Y軸平行移動機能のため ---*/
 	TPointD m_firstPos;
 	TPointD m_firstCameraOffset;
-	//for scaling undo
+	// for scaling undo
 	TDimension m_firstRes;
 	TDimensionD m_firstSize;
 
-public:
+  public:
 	CameraTestTool();
 
 	void draw();
@@ -540,7 +521,7 @@ public:
 
 	int getCursorId() const;
 
-private:
+  private:
 	void drawCleanupCamera(double pixelSize);
 	void drawClosestFieldCamera(double pixelSize);
 
@@ -549,7 +530,8 @@ private:
 //==========================================================================
 
 CameraTestTool::CameraTestTool()
-	: TTool("T_CameraTest"), m_lastPos(-1, -1), m_dragged(false), m_scaling(eNoScale), m_firstRes(0, 0), m_firstSize(0, 0)
+	: TTool("T_CameraTest"), m_lastPos(-1, -1), m_dragged(false), m_scaling(eNoScale),
+	  m_firstRes(0, 0), m_firstSize(0, 0)
 {
 	bind(TTool::AllTargets); // Deals with tool deactivation internally
 }
@@ -603,7 +585,8 @@ void CameraTestTool::drawClosestFieldCamera(double pixelSize)
 		return;
 
 	TRectD rect(cp->m_camera.getStageRect());
-	rect = rect.enlarge((zoom - 1) * (rect.x1 - rect.x0 + 1) / 2.0, (zoom - 1) * (rect.y1 - rect.y0 + 1) / 2.0);
+	rect = rect.enlarge((zoom - 1) * (rect.x1 - rect.x0 + 1) / 2.0,
+						(zoom - 1) * (rect.y1 - rect.y0 + 1) / 2.0);
 
 	glColor3d(0.0, 0.0, 1.0);
 	glLineStipple(1, 0xFFFF);
@@ -640,7 +623,7 @@ void CameraTestTool::draw()
 
 	glTranslated(-0.5 * cp->m_offx * Stage::inch, -0.5 * cp->m_offy * Stage::inch, 0);
 	drawCleanupCamera(pixelSize);
-	//drawClosestFieldCamera(pixelSize);
+	// drawClosestFieldCamera(pixelSize);
 
 	TRectD r(cp->m_camera.getStageRect());
 	TPointD size(10, 10);
@@ -655,17 +638,17 @@ void CameraTestTool::draw()
 
 	TPointD center(0.5 * (r.getP00() + r.getP11()));
 
-	ToolUtils::drawSquare(TPointD(center.x, r.y0), pixelSize4, TPixel::Red); //draw M0 handle
-	ToolUtils::drawSquare(TPointD(r.x1, center.y), pixelSize4, TPixel::Red); //draw 1M handle
-	ToolUtils::drawSquare(TPointD(center.x, r.y1), pixelSize4, TPixel::Red); //draw M1 handle
-	ToolUtils::drawSquare(TPointD(r.x0, center.y), pixelSize4, TPixel::Red); //draw 0M handle
+	ToolUtils::drawSquare(TPointD(center.x, r.y0), pixelSize4, TPixel::Red); // draw M0 handle
+	ToolUtils::drawSquare(TPointD(r.x1, center.y), pixelSize4, TPixel::Red); // draw 1M handle
+	ToolUtils::drawSquare(TPointD(center.x, r.y1), pixelSize4, TPixel::Red); // draw M1 handle
+	ToolUtils::drawSquare(TPointD(r.x0, center.y), pixelSize4, TPixel::Red); // draw 0M handle
 
 	glPopMatrix();
 }
 
 void CameraTestTool::mouseMove(const TPointD &p, const TMouseEvent &e)
 {
-	if (m_lastPos.x != -1) //left mouse button is clicked
+	if (m_lastPos.x != -1) // left mouse button is clicked
 	{
 		m_scaling = eNoScale;
 		return;
@@ -716,8 +699,8 @@ void CameraTestTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e)
 		m_firstSize = cp->m_camera.getSize();
 	}
 
-	//Limit commits to the sole interface updates. This is necessary since drags
-	//would otherwise trigger full preview re-processings.
+	// Limit commits to the sole interface updates. This is necessary since drags
+	// would otherwise trigger full preview re-processings.
 	CleanupSettingsModel::instance()->setCommitMask(CleanupSettingsModel::INTERFACE);
 }
 
@@ -776,10 +759,9 @@ void CameraTestTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e)
 		if (newDim.lx < 2.0 || newDim.ly < 2.0)
 			return;
 
-		cp->m_camera.setSize(
-			newDim,
-			true,   // Preserve DPI
-			false); // A/R imposed above in corner cases
+		cp->m_camera.setSize(newDim,
+							 true,   // Preserve DPI
+							 false); // A/R imposed above in corner cases
 	} else {
 		if (e.isShiftPressed()) {
 			TPointD delta = pos - m_firstPos;
@@ -810,7 +792,7 @@ void CameraTestTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e)
 
 void CameraTestTool::leftButtonUp(const TPointD &pos, const TMouseEvent &)
 {
-	//Reset full commit status - invokes preview rebuild on its own.
+	// Reset full commit status - invokes preview rebuild on its own.
 	CleanupSettingsModel::instance()->setCommitMask(CleanupSettingsModel::FULLPROCESS);
 
 	CleanupParameters *cp = CleanupSettingsModel::instance()->getCurrentParameters();
@@ -819,19 +801,16 @@ void CameraTestTool::leftButtonUp(const TPointD &pos, const TMouseEvent &)
 		/*-- 値が変わったらUndoを登録 --*/
 		if (m_firstCameraOffset.x != cp->m_offx || m_firstCameraOffset.y != cp->m_offy) {
 			UndoCameraTestMove *undo =
-				new UndoCameraTestMove(m_firstCameraOffset,
-									   TPointD(cp->m_offx, cp->m_offy),
-									   cp);
+				new UndoCameraTestMove(m_firstCameraOffset, TPointD(cp->m_offx, cp->m_offy), cp);
 			TUndoManager::manager()->add(undo);
 		}
 	}
 	/*-- サイズ変更のUndo --*/
 	else {
-		if (m_firstSize.lx != cp->m_camera.getSize().lx || m_firstSize.ly != cp->m_camera.getSize().ly) {
-			UndoCameraTestScale *undo =
-				new UndoCameraTestScale(m_firstRes, m_firstSize,
-										cp->m_camera.getRes(), cp->m_camera.getSize(),
-										cp);
+		if (m_firstSize.lx != cp->m_camera.getSize().lx ||
+			m_firstSize.ly != cp->m_camera.getSize().ly) {
+			UndoCameraTestScale *undo = new UndoCameraTestScale(
+				m_firstRes, m_firstSize, cp->m_camera.getRes(), cp->m_camera.getSize(), cp);
 			TUndoManager::manager()->add(undo);
 		}
 	}
@@ -880,7 +859,7 @@ int CameraTestTool::getCursorId() const
 
 class OpacityCheckToggleCommand : public MenuItemHandler
 {
-public:
+  public:
 	OpacityCheckToggleCommand() : MenuItemHandler("MI_OpacityCheck") {}
 	void execute()
 	{

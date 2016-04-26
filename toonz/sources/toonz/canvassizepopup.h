@@ -20,17 +20,7 @@ class CheckBox;
 
 //=============================================================================
 
-enum PeggingPositions {
-	e00,
-	e01,
-	e02,
-	e10,
-	e11,
-	e12,
-	e20,
-	e21,
-	e22
-};
+enum PeggingPositions { e00, e01, e02, e10, e11, e12, e20, e21, e22 };
 
 //=============================================================================
 
@@ -48,7 +38,7 @@ class PeggingWidget : public QWidget
 	PeggingPositions m_pegging;
 	bool m_cutLx, m_cutLy;
 
-public:
+  public:
 	PeggingWidget(QWidget *parent = 0);
 	PeggingPositions getPeggingPosition() const { return m_pegging; }
 	void resetWidget();
@@ -56,13 +46,13 @@ public:
 	void cutLy(bool value) { m_cutLy = value; }
 	void updateAnchor();
 
-private:
+  private:
 	void createButton(QPushButton **button, PeggingPositions position);
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *);
 
-public slots:
+  public slots:
 	void on00();
 	void on01();
 	void on02();
@@ -94,13 +84,13 @@ class CanvasSizePopup : public DVGui::Dialog
 
 	TMeasure *m_xMeasure, *m_yMeasure;
 
-public:
+  public:
 	CanvasSizePopup();
 
-protected:
+  protected:
 	void showEvent(QShowEvent *e);
 
-public slots:
+  public slots:
 	void onOkBtn();
 	void onSizeChanged();
 	void onRelative(bool);

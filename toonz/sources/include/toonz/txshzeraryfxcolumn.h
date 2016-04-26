@@ -16,14 +16,14 @@
 #endif
 
 //=============================================================================
-//forward declarations
+// forward declarations
 class TFx;
 class TZeraryColumnFx;
 class TXshZeraryFxLevel;
 class TXshCell;
 
 //=============================================================================
-//!The TXshZeraryFxColumn class provides a zerary fx column in xsheet and allows its management.
+//! The TXshZeraryFxColumn class provides a zerary fx column in xsheet and allows its management.
 /*!Inherits \b TXshCellColumn.
 \n The class defines zerary fx column, more than \b TXshCellColumn has a pointer to
    \b TZeraryColumnFx getZeraryColumnFx() and a pointer to \b TXshZeraryFxLevel.
@@ -36,19 +36,19 @@ class DVAPI TXshZeraryFxColumn : public TXshCellColumn
 	TZeraryColumnFx *m_zeraryColumnFx;
 	TXshZeraryFxLevel *m_zeraryFxLevel;
 
-public:
+  public:
 	/*!
-    Constructs a TXshZeraryFxColumn with default value.
+	Constructs a TXshZeraryFxColumn with default value.
   */
 	TXshZeraryFxColumn(int frameCount = 100);
 	/*!
-    Constructs a TXshZeraryFxColumn object that is a copy of the TXshZeraryFxColumn
-    object \a src.
-    \sa clone()
+	Constructs a TXshZeraryFxColumn object that is a copy of the TXshZeraryFxColumn
+	object \a src.
+	\sa clone()
   */
 	TXshZeraryFxColumn(const TXshZeraryFxColumn &src);
 	/*!
-    Destroys the TXshZeraryFxColumn object.
+	Destroys the TXshZeraryFxColumn object.
   */
 	~TXshZeraryFxColumn();
 
@@ -61,7 +61,7 @@ public:
 	TXshColumn *clone() const;
 
 	/*!
-    Return \b TZeraryColumnFx.
+	Return \b TZeraryColumnFx.
   */
 	TZeraryColumnFx *getZeraryColumnFx() const { return m_zeraryColumnFx; }
 
@@ -80,7 +80,7 @@ public:
 	/*! Implement method isn't necessary because TXshZeraryFxColumn doesn't have icon. */
 	void updateIcon() {}
 
-private:
+  private:
 	// not implemented
 	TXshZeraryFxColumn &operator=(const TXshZeraryFxColumn &);
 };

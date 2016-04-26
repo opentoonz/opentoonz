@@ -13,12 +13,12 @@ TPalette *createStandardCleanupPalette()
 {
 	TPalette *palette = new TPalette();
 	TPalette::Page *page = palette->getPage(0);
-	page->removeStyle(1); //tolgo il black che c'e' gia' nella palette di default
+	page->removeStyle(1); // tolgo il black che c'e' gia' nella palette di default
 	TBlackCleanupStyle *black = new TBlackCleanupStyle();
 	palette->setStyle(1, black);
 	page->addStyle(1);
-	//page->addStyle(palette->addStyle(new TColorCleanupStyle(TPixel32::Red)));
-	//page->addStyle(palette->addStyle(new TColorCleanupStyle(TPixel32::Blue)));
+	// page->addStyle(palette->addStyle(new TColorCleanupStyle(TPixel32::Red)));
+	// page->addStyle(palette->addStyle(new TColorCleanupStyle(TPixel32::Blue)));
 	black->setName(L"color_1");
 	palette->addRef();
 	palette->setIsCleanupPalette(true);
@@ -36,9 +36,7 @@ TPalette *createToonzPalette(TPalette *cleanupPalette)
 
 	for (int i = 0; i < cleanupPalette->getPage(0)->getStyleCount(); i++) {
 		int styleId = cleanupPalette->getPage(0)->getStyleId(i);
-		TCleanupStyle *cs =
-			dynamic_cast<TCleanupStyle *>(
-				cleanupPalette->getStyle(styleId));
+		TCleanupStyle *cs = dynamic_cast<TCleanupStyle *>(cleanupPalette->getStyle(styleId));
 		if (!cs)
 			continue;
 		TPixel32 color = cs->getMainColor();
@@ -73,9 +71,7 @@ TPalette *createToonzPalette(TPalette *cleanupPalette, int colorParamIndex)
 
 	for (int i = 0; i < cleanupPalette->getPage(0)->getStyleCount(); i++) {
 		int styleId = cleanupPalette->getPage(0)->getStyleId(i);
-		TCleanupStyle *cs =
-			dynamic_cast<TCleanupStyle *>(
-				cleanupPalette->getStyle(styleId));
+		TCleanupStyle *cs = dynamic_cast<TCleanupStyle *>(cleanupPalette->getStyle(styleId));
 		if (!cs)
 			continue;
 		TPixel32 color = cs->getColorParamValue(colorParamIndex);
@@ -105,13 +101,9 @@ void TargetColors::update(TPalette *palette, bool noAntialias)
 {
 	m_colors.clear();
 
-	TargetColor tranparent(
-		TPixel32(255, 255, 255, 0) /*TPixel32::Transparent*/,
-		0, // BackgroundStyle,
-		0,
-		0,
-		0,
-		0);
+	TargetColor tranparent(TPixel32(255, 255, 255, 0) /*TPixel32::Transparent*/,
+						   0, // BackgroundStyle,
+						   0, 0, 0, 0);
 
 	m_colors.push_back(tranparent);
 
@@ -121,22 +113,14 @@ void TargetColors::update(TPalette *palette, bool noAntialias)
 		if (!cs)
 			continue;
 		if (TBlackCleanupStyle *blackStyle = dynamic_cast<TBlackCleanupStyle *>(cs)) {
-			TargetColor tc(
-				blackStyle->getMainColor(),
-				styleId,
-				(int)blackStyle->getBrightness(),
-				noAntialias ? 100 : (int)blackStyle->getContrast(),
-				blackStyle->getColorThreshold(),
-				blackStyle->getWhiteThreshold());
+			TargetColor tc(blackStyle->getMainColor(), styleId, (int)blackStyle->getBrightness(),
+						   noAntialias ? 100 : (int)blackStyle->getContrast(),
+						   blackStyle->getColorThreshold(), blackStyle->getWhiteThreshold());
 			m_colors.push_back(tc);
 		} else if (TColorCleanupStyle *colorStyle = dynamic_cast<TColorCleanupStyle *>(cs)) {
-			TargetColor tc(
-				colorStyle->getMainColor(),
-				styleId,
-				(int)colorStyle->getBrightness(),
-				noAntialias ? 100 : (int)colorStyle->getContrast(),
-				colorStyle->getHRange(),
-				colorStyle->getLineWidth());
+			TargetColor tc(colorStyle->getMainColor(), styleId, (int)colorStyle->getBrightness(),
+						   noAntialias ? 100 : (int)colorStyle->getContrast(),
+						   colorStyle->getHRange(), colorStyle->getLineWidth());
 			m_colors.push_back(tc);
 		}
 	}

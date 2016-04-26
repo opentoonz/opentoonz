@@ -124,8 +124,8 @@ TRaster32P loadFrame(int frame, const TAffine &affine)
 		TVectorImageP vimage = vi->clone();
 		vimage->transform(TTranslation((size.lx - 1) * 0.5, (size.ly - 1) * 0.5), true);
 
-		TVectorRenderData rd(TVectorRenderData::ProductionSettings(),
-							 TAffine(), size, plt.getPointer());
+		TVectorRenderData rd(TVectorRenderData::ProductionSettings(), TAffine(), size,
+							 plt.getPointer());
 
 		TOfflineGL offlineContext(size);
 		offlineContext.makeCurrent();
@@ -146,7 +146,7 @@ TRaster32P loadFrame(int frame, const TAffine &affine)
 }
 
 //-----------------------------------------------------------------------------
-} //namespace
+} // namespace
 //-----------------------------------------------------------------------------
 
 //=============================================================================
@@ -166,14 +166,14 @@ TrackerPopup::TrackerPopup(QWidget *parent, Qt::WFlags flags)
 
 	beginVLayout();
 
-	//IntField per i parametri threshold, accuracy, smoothness
-	m_threshold = new DoubleField(); //W_Threshold
+	// IntField per i parametri threshold, accuracy, smoothness
+	m_threshold = new DoubleField(); // W_Threshold
 	m_threshold->setFixedHeight(WidgetHeight);
 	m_threshold->setRange(0, 1);
 	m_threshold->setValue(0.2);
 	addWidget(tr("Threshold:"), m_threshold);
 
-	m_sensibility = new DoubleField(); //W_Accuracy
+	m_sensibility = new DoubleField(); // W_Accuracy
 	m_sensibility->setFixedHeight(WidgetHeight);
 	m_sensibility->setRange(0, 1000);
 	m_sensibility->setValue(10);
@@ -189,8 +189,8 @@ TrackerPopup::TrackerPopup(QWidget *parent, Qt::WFlags flags)
 
 	endVLayout();
 
-	//Bottone Convert
-	m_trackBtn = new QPushButton(QString(tr("Track")), this); //W_Vectorize
+	// Bottone Convert
+	m_trackBtn = new QPushButton(QString(tr("Track")), this); // W_Vectorize
 	connect(m_trackBtn, SIGNAL(clicked()), this, SLOT(onTrack()));
 
 	addButtonBarWidget(m_trackBtn);
@@ -231,8 +231,8 @@ bool TrackerPopup::apply()
 	if (framesNumber <= 0)
 		return false;
 
-	m_tracker = new Tracker(threshold, sensibility, activeBackground,
-							manageOcclusion, variationWindow, frameStart, framesNumber);
+	m_tracker = new Tracker(threshold, sensibility, activeBackground, manageOcclusion,
+							variationWindow, frameStart, framesNumber);
 	if (m_tracker->getLastError() != 0) {
 		DVGui::warning(m_tracker->getLastError());
 		return false;
@@ -242,7 +242,8 @@ bool TrackerPopup::apply()
 	connect(m_myThread, SIGNAL(finished()), this, SLOT(startNewThread()));
 	m_progressBarIndex = 0;
 	m_stoppedProcess = false;
-	m_progress = new ProgressDialog(tr("Processing..."), tr("Cancel"), m_progressBarIndex, m_tracker->getFramesNumber() - 1);
+	m_progress = new ProgressDialog(tr("Processing..."), tr("Cancel"), m_progressBarIndex,
+									m_tracker->getFramesNumber() - 1);
 	//	QPushButton* cancelButton = new QPushButton(QString("Cancel"),this);
 	//  m_progress->setCancelButton(cancelButton);
 	bool ret = connect(m_progress, SIGNAL(canceled()), this, SLOT(stopProcessing()));
@@ -291,10 +292,8 @@ void TrackerPopup::onTrack()
 // TrackerPopup
 //-----------------------------------------------------------------------------
 
-Tracker::Tracker(double threshold, double sensibility,
-				 int activeBackground, int manageOcclusion,
-				 int variationWindow, int frameStart,
-				 int framesNumber)
+Tracker::Tracker(double threshold, double sensibility, int activeBackground, int manageOcclusion,
+				 int variationWindow, int frameStart, int framesNumber)
 	: m_affine()
 {
 	m_threshold = threshold;
@@ -394,14 +393,15 @@ bool Tracker::setup()
 	m_trackerCount = 0;
 	int k = 0;
 	for (k = 0; k < (int)m_trackerObjectsSet->getTrackerObjectsCount(); k++) {
-		m_trackerCount = m_trackerCount + m_trackerObjectsSet->getObjectFromIndex(k)->getHooksCount();
+		m_trackerCount =
+			m_trackerCount + m_trackerObjectsSet->getObjectFromIndex(k)->getHooksCount();
 	}
 	if (m_trackerCount <= 0 || m_trackerCount > 30) {
 		m_lastErrorCode = 3;
 		return false;
 	}
 
-	//ID object
+	// ID object
 	std::unique_ptr<short[]> id(new short[m_trackerCount]);
 	if (!id) {
 		m_lastErrorCode = 1;
@@ -421,7 +421,7 @@ bool Tracker::setup()
 		return false;
 	}
 
-	//Width and Height of object box
+	// Width and Height of object box
 	std::unique_ptr<short[]> Width(new short[m_trackerCount]);
 	if (!Width) {
 		m_lastErrorCode = 1;
@@ -466,8 +466,8 @@ bool Tracker::setup()
 		TVectorImageP vimage = vi->clone();
 		vimage->transform(TTranslation((size.lx - 1) * 0.5, (size.ly - 1) * 0.5), true);
 
-		TVectorRenderData rd(TVectorRenderData::ProductionSettings(),
-							 TAffine(), size, plt.getPointer());
+		TVectorRenderData rd(TVectorRenderData::ProductionSettings(), TAffine(), size,
+							 plt.getPointer());
 
 		TOfflineGL offlineContext(size);
 		offlineContext.makeCurrent();
@@ -497,7 +497,7 @@ bool Tracker::setup()
 
 	TFrameId fid = toolH->getTool()->getCurrentFid();
 	m_rasterOrigin = m_raster->getCenterD() - TPointD(size.lx, 0);
-	//characteristics objects
+	// characteristics objects
 	int posInitObject = 0;
 	int totalFrameCount = m_level->getFrameCount();
 	int i = 0;
@@ -522,7 +522,8 @@ bool Tracker::setup()
 				m_lastErrorCode = 4;
 				return false;
 			}
-			TRectD trackerRect(TDimensionD(hook->getTrackerRegionWidth(), hook->getTrackerRegionHeight()));
+			TRectD trackerRect(
+				TDimensionD(hook->getTrackerRegionWidth(), hook->getTrackerRegionHeight()));
 			trackerRect = m_affine * trackerRect;
 			Width[posInitObject + j] = trackerRect.getLx();
 			// controllo che le dimensioni (larghezza) della regioni siano contenute nell'immagine
@@ -541,7 +542,8 @@ bool Tracker::setup()
 				return false;
 			}
 			m_numstart[posInitObject + j] = startFrameGlobalIndex;
-			if (m_numstart[posInitObject + j] < 0 || m_numstart[posInitObject + j] >= totalFrameCount - 1) {
+			if (m_numstart[posInitObject + j] < 0 ||
+				m_numstart[posInitObject + j] >= totalFrameCount - 1) {
 				m_lastErrorCode = 12;
 				return false;
 			}
@@ -558,11 +560,11 @@ bool Tracker::setup()
 		m_framesNumber = numframe;
 	}
 
-	//dimension searce template area
+	// dimension searce template area
 	short dimtemp = 8;
-	//variation dimension window
+	// variation dimension window
 	short vardim = m_variationWindow;
-	//threshold lose object (null =0)
+	// threshold lose object (null =0)
 	float threshold_dist = m_threshold;
 
 	if ((threshold_dist < 0.0) || (threshold_dist > 1.0)) {
@@ -577,7 +579,7 @@ bool Tracker::setup()
 	}
 
 	m_currentFrame = m_indexFrameStart;
-	//update current frame
+	// update current frame
 	m_raster = loadFrame(m_currentFrame, m_affine);
 	if (!m_raster) {
 		m_lastErrorCode = 1;
@@ -596,14 +598,16 @@ bool Tracker::setup()
 	bool image_background = false;
 	bool occl = m_manageOcclusion;
 
-	//costruct trackers
+	// costruct trackers
 
 	for (i = 0; i < m_trackerCount; i++) {
-		//costruct
+		// costruct
 		m_pObjectTracker[i] = new CObjectTracker(size.lx, size.ly, image_c, image_background, occl);
 
-		//initialization
-		m_pObjectTracker[i]->ObjectTrackerInitObjectParameters(id[i], x[i], y[i], Width[i], Height[i], dimtemp, vardim, threshold_dist, threshold_distB);
+		// initialization
+		m_pObjectTracker[i]->ObjectTrackerInitObjectParameters(id[i], x[i], y[i], Width[i],
+															   Height[i], dimtemp, vardim,
+															   threshold_dist, threshold_distB);
 	}
 
 	m_numobjactive = 0;
@@ -618,7 +622,7 @@ bool Tracker::setup()
 	m_raster_template = new TRaster32P[m_trackerCount];
 
 	for (i = 0; (i < m_numobjactive); i++) {
-		//tracking	object first frame
+		// tracking	object first frame
 		m_pObjectTracker[i]->ObjeckTrackerHandlerByUser(&m_raster);
 		m_raster_template[i] = m_raster;
 	}
@@ -637,7 +641,7 @@ bool Tracker::trackCurrentFrame()
 {
 	m_raster_prev = m_raster;
 
-	//update Current Frame;
+	// update Current Frame;
 	m_raster = loadFrame(m_currentFrame, m_affine);
 	if (!m_raster) {
 		m_lastErrorCode = 1;
@@ -647,7 +651,7 @@ bool Tracker::trackCurrentFrame()
 	short app1 = 0;
 	app1 = m_numobjactive;
 
-	//control active object
+	// control active object
 	int i = 0;
 	for (i = m_numobjactive; (i < m_trackerCount); i++) {
 		if (m_num == m_numstart[m_numobjactive])
@@ -657,7 +661,7 @@ bool Tracker::trackCurrentFrame()
 	}
 
 	for (i = 0; i < app1; i++) {
-		//tracking old objects
+		// tracking old objects
 		if (m_pObjectTracker[i]->track)
 			m_pObjectTracker[i]->ObjeckTrackerHandlerByUser(&m_raster);
 		float dist_temp;
@@ -667,11 +671,12 @@ bool Tracker::trackCurrentFrame()
 			m_pObjectTracker[i]->updateTemp();
 		}
 	}
-	//update neighbours
+	// update neighbours
 	for (i = 0; i < app1; i++) {
 		m_pObjectTracker[i]->DistanceReset();
 		for (int k = 0; k < app1; k++) {
-			if ((m_pObjectTracker[k]->track) && (i != k) && (m_pObjectTracker[i]->objID == m_pObjectTracker[k]->objID)) {
+			if ((m_pObjectTracker[k]->track) && (i != k) &&
+				(m_pObjectTracker[i]->objID == m_pObjectTracker[k]->objID)) {
 				NEIGHBOUR position = m_pObjectTracker[k]->GetPosition();
 				m_pObjectTracker[i]->DistanceAndUpdate(position);
 				if (!m_pObjectTracker[i]->GetInit()) {
@@ -683,7 +688,7 @@ bool Tracker::trackCurrentFrame()
 	}
 	Predict3D::Point current[30], initials[30];
 	bool visible[30];
-	//datiPredict<<endl<<"-----------------------------"<<endl<<endl;
+	// datiPredict<<endl<<"-----------------------------"<<endl<<endl;
 	for (i = 0; i < app1; i++) {
 		visible[i] = m_pObjectTracker[i]->track;
 		initials[i] = m_pObjectTracker[i]->GetInitials();
@@ -697,10 +702,12 @@ bool Tracker::trackCurrentFrame()
 			if (Predict3D::Predict(app1, initials, current, visible)) {
 				k_dist = m_pObjectTracker[i]->GetKDist();
 				NEIGHBOUR position = m_pObjectTracker[i]->GetPosition();
-				m_pObjectTracker[i]->SetPosition((k_dist * (current[i].x) + (1 - k_dist) * (position.X)), (k_dist * (current[i].y) + (1 - k_dist) * (position.Y)));
+				m_pObjectTracker[i]->SetPosition(
+					(k_dist * (current[i].x) + (1 - k_dist) * (position.X)),
+					(k_dist * (current[i].y) + (1 - k_dist) * (position.Y)));
 			}
 		}
-		//Set position by neighbours
+		// Set position by neighbours
 		if (!m_pObjectTracker[i]->track) {
 			if (Predict3D::Predict(app1, initials, current, visible)) {
 				m_pObjectTracker[i]->SetPosition(current[i].x, current[i].y);
@@ -725,7 +732,7 @@ bool Tracker::trackCurrentFrame()
 		}
 	}
 
-	//tracking new objects
+	// tracking new objects
 	for (i = app1; i < m_numobjactive; i++) {
 		m_pObjectTracker[i]->ObjeckTrackerHandlerByUser(&m_raster);
 		m_raster_template[i] = m_raster;
@@ -742,7 +749,7 @@ QString Tracker::getErrorMessage(int errorCode)
 {
 	QString errorMessage;
 	switch (errorCode) {
-	case 0: //No Error
+	case 0: // No Error
 		errorMessage = QObject::tr("");
 		break;
 	case 1:
@@ -752,16 +759,20 @@ QString Tracker::getErrorMessage(int errorCode)
 		errorMessage = QObject::tr("It is not possible to track the level:\nno region defined.");
 		break;
 	case 3:
-		errorMessage = QObject::tr("It is not possible to track specified regions:\nmore than 30 regions defined.");
+		errorMessage = QObject::tr(
+			"It is not possible to track specified regions:\nmore than 30 regions defined.");
 		break;
 	case 4:
-		errorMessage = QObject::tr("It is not possible to track specified regions:\ndefined regions are not valid.");
+		errorMessage = QObject::tr(
+			"It is not possible to track specified regions:\ndefined regions are not valid.");
 		break;
 	case 5:
-		errorMessage = QObject::tr("It is not possible to track specified regions:\nsome regions are too wide.");
+		errorMessage = QObject::tr(
+			"It is not possible to track specified regions:\nsome regions are too wide.");
 		break;
 	case 6:
-		errorMessage = QObject::tr("It is not possible to track specified regions:\nsome regions are too high.");
+		errorMessage = QObject::tr(
+			"It is not possible to track specified regions:\nsome regions are too high.");
 		break;
 	case 7:
 		errorMessage = QObject::tr("Frame Start Error");
@@ -779,13 +790,15 @@ QString Tracker::getErrorMessage(int errorCode)
 		errorMessage = QObject::tr("No Frame Found");
 		break;
 	case 12:
-		errorMessage = QObject::tr("It is not possible to track specified regions:\nthe selected level is not valid.");
+		errorMessage = QObject::tr(
+			"It is not possible to track specified regions:\nthe selected level is not valid.");
 		break;
 	case 13:
 		errorMessage = QObject::tr("It is not possible to track the level:\nno level selected.");
 		break;
 	case 14:
-		errorMessage = QObject::tr("It is not possible to track specified regions:\nthe level has to be saved first.");
+		errorMessage = QObject::tr(
+			"It is not possible to track specified regions:\nthe level has to be saved first.");
 		break;
 	default:
 		errorMessage = QObject::tr("It is not possible to track the level:\nundefined error.");

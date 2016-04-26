@@ -24,9 +24,14 @@
 //=============================================================================
 
 TSceneProperties::TSceneProperties()
-	: m_cleanupParameters(new CleanupParameters()), m_scanParameters(new TScannerParameters()), m_vectorizerParameters(new VectorizerParameters()), m_captureParameters(new CaptureParameters()), m_outputProp(new TOutputProperties()), m_previewProp(new TOutputProperties()), m_bgColor(255, 255, 255, 0), m_markerDistance(6), m_markerOffset(0), m_fullcolorSubsampling(1), m_tlvSubsampling(1), m_fieldGuideSize(12), m_fieldGuideAspectRatio(1.38)
+	: m_cleanupParameters(new CleanupParameters()), m_scanParameters(new TScannerParameters()),
+	  m_vectorizerParameters(new VectorizerParameters()),
+	  m_captureParameters(new CaptureParameters()), m_outputProp(new TOutputProperties()),
+	  m_previewProp(new TOutputProperties()), m_bgColor(255, 255, 255, 0), m_markerDistance(6),
+	  m_markerOffset(0), m_fullcolorSubsampling(1), m_tlvSubsampling(1), m_fieldGuideSize(12),
+	  m_fieldGuideAspectRatio(1.38)
 {
-	//Default color
+	// Default color
 	m_notesColor.push_back(TPixel32(255, 235, 140));
 	m_notesColor.push_back(TPixel32(255, 160, 120));
 	m_notesColor.push_back(TPixel32(255, 180, 190));
@@ -328,14 +333,16 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject)
 			is >> projectPath;
 		} else if (tagName == "range") {
 			is >> globFrom >> globTo;
-		} //backCompatibility: prima range e fps non erano in Output
+		} // backCompatibility: prima range e fps non erano in Output
 		else if (tagName == "step") {
 			is >> globStep;
 		} else if (tagName == "fps") {
 			is >> globFrameRate;
 		} else if (tagName == "bgColor") {
 			is >> m_bgColor;
-		} else if (tagName == "viewerBgColor" || tagName == "previewBgColor" || tagName == "chessboardColor1" || tagName == "chessboardColor2") //back compatibility
+		} else if (tagName == "viewerBgColor" || tagName == "previewBgColor" ||
+				   tagName == "chessboardColor1" ||
+				   tagName == "chessboardColor2") // back compatibility
 		{
 			TPixel32 dummy;
 			is >> dummy;
@@ -348,16 +355,16 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject)
 		} else if (tagName == "safearea") {
 			double dummy1, dummy2;
 			is >> dummy1 >> dummy2;
-		} //back compatibility
+		} // back compatibility
 		else if (tagName == "columnIconLoadingPolicy") {
 			int dummy;
 			is >> dummy;
-		}								 //back compatibility
-		else if (tagName == "playrange") //back compatibility
+		} // back compatibility
+		else if (tagName == "playrange") // back compatibility
 		{
 			std::string dummy;
 			is >> globFrom >> globTo >> dummy;
-		} else if (tagName == "camera") //back compatibility with tab 2.2
+		} else if (tagName == "camera") // back compatibility with tab 2.2
 		{
 			clearPointerContainer(m_cameras);
 			m_cameras.clear();
@@ -491,22 +498,38 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject)
 							switch (j) {
 							case 0:
 								renderSettings.m_quality = TRenderSettings::StandardResampleQuality;
-								CASE 1 : renderSettings.m_quality = TRenderSettings::ImprovedResampleQuality;
-								CASE 2 : renderSettings.m_quality = TRenderSettings::HighResampleQuality;
-								CASE 100 : renderSettings.m_quality = TRenderSettings::Triangle_FilterResampleQuality;
-								CASE 101 : renderSettings.m_quality = TRenderSettings::Mitchell_FilterResampleQuality;
-								CASE 102 : renderSettings.m_quality = TRenderSettings::Cubic5_FilterResampleQuality;
-								CASE 103 : renderSettings.m_quality = TRenderSettings::Cubic75_FilterResampleQuality;
-								CASE 104 : renderSettings.m_quality = TRenderSettings::Cubic1_FilterResampleQuality;
-								CASE 105 : renderSettings.m_quality = TRenderSettings::Hann2_FilterResampleQuality;
-								CASE 106 : renderSettings.m_quality = TRenderSettings::Hann3_FilterResampleQuality;
-								CASE 107 : renderSettings.m_quality = TRenderSettings::Hamming2_FilterResampleQuality;
-								CASE 108 : renderSettings.m_quality = TRenderSettings::Hamming3_FilterResampleQuality;
-								CASE 109 : renderSettings.m_quality = TRenderSettings::Lanczos2_FilterResampleQuality;
-								CASE 110 : renderSettings.m_quality = TRenderSettings::Lanczos3_FilterResampleQuality;
-								CASE 111 : renderSettings.m_quality = TRenderSettings::Gauss_FilterResampleQuality;
-								CASE 112 : renderSettings.m_quality = TRenderSettings::ClosestPixel_FilterResampleQuality;
-								CASE 113 : renderSettings.m_quality = TRenderSettings::Bilinear_FilterResampleQuality;
+								CASE 1 : renderSettings.m_quality =
+									TRenderSettings::ImprovedResampleQuality;
+								CASE 2 : renderSettings.m_quality =
+									TRenderSettings::HighResampleQuality;
+								CASE 100 : renderSettings.m_quality =
+									TRenderSettings::Triangle_FilterResampleQuality;
+								CASE 101 : renderSettings.m_quality =
+									TRenderSettings::Mitchell_FilterResampleQuality;
+								CASE 102 : renderSettings.m_quality =
+									TRenderSettings::Cubic5_FilterResampleQuality;
+								CASE 103 : renderSettings.m_quality =
+									TRenderSettings::Cubic75_FilterResampleQuality;
+								CASE 104 : renderSettings.m_quality =
+									TRenderSettings::Cubic1_FilterResampleQuality;
+								CASE 105 : renderSettings.m_quality =
+									TRenderSettings::Hann2_FilterResampleQuality;
+								CASE 106 : renderSettings.m_quality =
+									TRenderSettings::Hann3_FilterResampleQuality;
+								CASE 107 : renderSettings.m_quality =
+									TRenderSettings::Hamming2_FilterResampleQuality;
+								CASE 108 : renderSettings.m_quality =
+									TRenderSettings::Hamming3_FilterResampleQuality;
+								CASE 109 : renderSettings.m_quality =
+									TRenderSettings::Lanczos2_FilterResampleQuality;
+								CASE 110 : renderSettings.m_quality =
+									TRenderSettings::Lanczos3_FilterResampleQuality;
+								CASE 111 : renderSettings.m_quality =
+									TRenderSettings::Gauss_FilterResampleQuality;
+								CASE 112 : renderSettings.m_quality =
+									TRenderSettings::ClosestPixel_FilterResampleQuality;
+								CASE 113 : renderSettings.m_quality =
+									TRenderSettings::Bilinear_FilterResampleQuality;
 							DEFAULT:
 								renderSettings.m_quality = TRenderSettings::StandardResampleQuality;
 							}
@@ -516,8 +539,10 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject)
 							switch (j) {
 							case 0:
 								renderSettings.m_fieldPrevalence = TRenderSettings::NoField;
-								CASE 1 : renderSettings.m_fieldPrevalence = TRenderSettings::EvenField;
-								CASE 2 : renderSettings.m_fieldPrevalence = TRenderSettings::OddField;
+								CASE 1 : renderSettings.m_fieldPrevalence =
+									TRenderSettings::EvenField;
+								CASE 2 : renderSettings.m_fieldPrevalence =
+									TRenderSettings::OddField;
 							DEFAULT:
 								renderSettings.m_fieldPrevalence = TRenderSettings::NoField;
 							}
@@ -550,17 +575,19 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject)
 							while (is.matchTag(tagName)) {
 								if (tagName == "formatProperties") {
 									std::string ext = is.getTagAttribute("ext");
-									TPropertyGroup *pg =
-										out.getFileFormatProperties(ext);
+									TPropertyGroup *pg = out.getFileFormatProperties(ext);
 									if (ext == "avi") {
 										TPropertyGroup appProperties;
 										appProperties.loadData(is);
-										if (pg->getPropertyCount() != 1 || appProperties.getPropertyCount() != 1) {
+										if (pg->getPropertyCount() != 1 ||
+											appProperties.getPropertyCount() != 1) {
 											is.closeChild();
 											continue;
 										}
-										TEnumProperty *enumProp = dynamic_cast<TEnumProperty *>(pg->getProperty(0));
-										TEnumProperty *enumAppProp = dynamic_cast<TEnumProperty *>(appProperties.getProperty(0));
+										TEnumProperty *enumProp =
+											dynamic_cast<TEnumProperty *>(pg->getProperty(0));
+										TEnumProperty *enumAppProp = dynamic_cast<TEnumProperty *>(
+											appProperties.getProperty(0));
 										assert(enumAppProp && enumProp);
 										if (enumAppProp && enumProp) {
 											try {
@@ -582,7 +609,8 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject)
 					}
 					if (renderSettings.m_timeStretchFrom == renderSettings.m_timeStretchTo &&
 						renderSettings.m_timeStretchTo == 1)
-						renderSettings.m_timeStretchFrom = renderSettings.m_timeStretchTo = out.getFrameRate();
+						renderSettings.m_timeStretchFrom = renderSettings.m_timeStretchTo =
+							out.getFrameRate();
 
 					out.setRenderSettings(renderSettings);
 				} else
@@ -594,7 +622,7 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject)
 		} else if (tagName == "cleanupParameters") {
 			m_cleanupParameters->loadData(is, !isLoadingProject);
 		} else if (tagName == "scanParameters") {
-			//m_scanParameters->adaptToCurrentScanner(); Rallenta tutto!!!
+			// m_scanParameters->adaptToCurrentScanner(); Rallenta tutto!!!
 			m_scanParameters->loadData(is);
 		} else if (tagName == "vectorizerParameters") {
 			m_vectorizerParameters->loadData(is);
@@ -636,7 +664,8 @@ void TSceneProperties::cloneCamerasFrom(TStageObjectTree *stageObjects)
 			tmpCameraId++;
 			continue;
 		}
-		TStageObject *cameraObject = stageObjects->getStageObject(TStageObjectId::CameraId(tmpCameraId));
+		TStageObject *cameraObject =
+			stageObjects->getStageObject(TStageObjectId::CameraId(tmpCameraId));
 		TCamera *camera = new TCamera(*cameraObject->getCamera());
 		m_cameras.push_back(camera);
 		/*-- カメラが見つかったので、i も tmpCameraId も進める --*/

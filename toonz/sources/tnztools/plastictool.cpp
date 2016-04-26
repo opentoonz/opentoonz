@@ -93,7 +93,10 @@ double frame()
 
 //------------------------------------------------------------------------
 
-int row() { return int(frame()) + 1; }
+int row()
+{
+	return int(frame()) + 1;
+}
 
 //------------------------------------------------------------------------
 
@@ -147,14 +150,18 @@ int skeletonId()
 
 //------------------------------------------------------------------------
 
-double sdFrame() { return stageObject()->paramsTime(frame()); }
+double sdFrame()
+{
+	return stageObject()->paramsTime(frame());
+}
 
 //------------------------------------------------------------------------
 
 void setKeyframe(TDoubleParamP &param, double frame)
 {
 	if (!param->isKeyframe(frame)) {
-		KeyframeSetter setter(param.getPointer(), -1, false); // Not placing undos through this setter
+		KeyframeSetter setter(param.getPointer(), -1,
+							  false); // Not placing undos through this setter
 		setter.createKeyframe(frame);
 	}
 }
@@ -207,9 +214,8 @@ void invalidateXsheet()
 struct PlasticSkeletonPMime : public DvMimeData {
 	PlasticSkeletonP m_skeleton;
 
-public:
-	PlasticSkeletonPMime(const PlasticSkeletonP &skeleton)
-		: m_skeleton(skeleton) {}
+  public:
+	PlasticSkeletonPMime(const PlasticSkeletonP &skeleton) : m_skeleton(skeleton) {}
 
 	virtual DvMimeData *clone() const { return new PlasticSkeletonPMime(m_skeleton); }
 	virtual void releaseData() { m_skeleton = PlasticSkeletonP(); }
@@ -218,7 +224,7 @@ public:
 struct SkDPMime : public DvMimeData {
 	SkDP m_sd;
 
-public:
+  public:
 	SkDPMime(const SkDP &sd) : m_sd(sd) {}
 
 	virtual DvMimeData *clone() const { return new SkDPMime(m_sd); }
@@ -242,11 +248,11 @@ class SetVertexNameUndo : public TUndo
 	int m_row, m_col; //!< Xsheet coordinates
 	int m_v;		  //!< Changed vertex
 
-public:
+  public:
 	mutable QString m_oldName, m_newName; //!< Vertex names
-	mutable SkVD m_oldVd;				  //!< Old Vertex deformation (SHARE-OWNED, rather than CLONED)
+	mutable SkVD m_oldVd; //!< Old Vertex deformation (SHARE-OWNED, rather than CLONED)
 
-public:
+  public:
 	SetVertexNameUndo(int v, const QString &newName)
 		: m_row(::row()), m_col(::column()), m_v(v), m_newName(newName)
 	{
@@ -310,9 +316,11 @@ class PasteDeformationUndo : public TUndo
 	int m_col;			   //!< Affected column
 	SkDP m_oldSd, m_newSd; //!< The skeleton deformations
 
-public:
+  public:
 	PasteDeformationUndo(const SkDP &newSd)
-		: m_col(column()), m_oldSd(stageObject()->getPlasticSkeletonDeformation()), m_newSd(newSd) {}
+		: m_col(column()), m_oldSd(stageObject()->getPlasticSkeletonDeformation()), m_newSd(newSd)
+	{
+	}
 
 	int getSize() const { return 1 << 20; }
 
@@ -360,11 +368,8 @@ PlasticTool::TemporaryActivation::~TemporaryActivation()
 
 class PlasticToolOptionsBox::SkelIdsComboBox : public QComboBox
 {
-public:
-	SkelIdsComboBox(QWidget *parent = 0) : QComboBox(parent)
-	{
-		updateSkeletonsList();
-	}
+  public:
+	SkelIdsComboBox(QWidget *parent = 0) : QComboBox(parent) { updateSkeletonsList(); }
 
 	void updateSkeletonsList();
 	void updateCurrentSkeleton();
@@ -404,8 +409,10 @@ void PlasticToolOptionsBox::SkelIdsComboBox::updateCurrentSkeleton()
 //    PlasticToolOptionsBox  implementation
 //****************************************************************************************
 
-PlasticToolOptionsBox::PlasticToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle)
-	: GenericToolOptionsBox(parent, tool, pltHandle, PlasticTool::MODES_COUNT), m_tool(tool), m_subToolbars(new GenericToolOptionsBox *[PlasticTool::MODES_COUNT])
+PlasticToolOptionsBox::PlasticToolOptionsBox(QWidget *parent, TTool *tool,
+											 TPaletteHandle *pltHandle)
+	: GenericToolOptionsBox(parent, tool, pltHandle, PlasticTool::MODES_COUNT), m_tool(tool),
+	  m_subToolbars(new GenericToolOptionsBox *[PlasticTool::MODES_COUNT])
 //, m_subToolbarActions(new QAction*[PlasticTool::MODES_COUNT])
 {
 	struct locals {
@@ -462,38 +469,38 @@ PlasticToolOptionsBox::PlasticToolOptionsBox(QWidget *parent, TTool *tool, TPale
 
 	// Adjust some specific controls first
 	{
-		ToolOptionTextField *minAngleField = static_cast<ToolOptionTextField *>(
-			animateOptionsBox->control("minAngle"));
+		ToolOptionTextField *minAngleField =
+			static_cast<ToolOptionTextField *>(animateOptionsBox->control("minAngle"));
 		assert(minAngleField);
 
 		minAngleField->setFixedWidth(40);
 
-		ToolOptionTextField *maxAngleField = static_cast<ToolOptionTextField *>(
-			animateOptionsBox->control("maxAngle"));
+		ToolOptionTextField *maxAngleField =
+			static_cast<ToolOptionTextField *>(animateOptionsBox->control("maxAngle"));
 		assert(maxAngleField);
 
 		maxAngleField->setFixedWidth(40);
 	}
 
 	// Distance
-	ToolOptionParamRelayField *distanceField = new ToolOptionParamRelayField(
-		&l_plasticTool, &l_plasticTool.m_distanceRelay);
+	ToolOptionParamRelayField *distanceField =
+		new ToolOptionParamRelayField(&l_plasticTool, &l_plasticTool.m_distanceRelay);
 	distanceField->setGlobalKey(&l_plasticTool.m_globalKey, &l_plasticTool.m_relayGroup);
 
 	QLabel *distanceLabel = new QLabel(tr("Distance"));
 	distanceLabel->setFixedHeight(20);
 
 	// Angle
-	ToolOptionParamRelayField *angleField = new ToolOptionParamRelayField(
-		&l_plasticTool, &l_plasticTool.m_angleRelay);
+	ToolOptionParamRelayField *angleField =
+		new ToolOptionParamRelayField(&l_plasticTool, &l_plasticTool.m_angleRelay);
 	angleField->setGlobalKey(&l_plasticTool.m_globalKey, &l_plasticTool.m_relayGroup);
 
 	QLabel *angleLabel = new QLabel(tr("Angle"));
 	angleLabel->setFixedHeight(20);
 
 	// SO
-	ToolOptionParamRelayField *soField = new ToolOptionParamRelayField(
-		&l_plasticTool, &l_plasticTool.m_soRelay);
+	ToolOptionParamRelayField *soField =
+		new ToolOptionParamRelayField(&l_plasticTool, &l_plasticTool.m_soRelay);
 	soField->setGlobalKey(&l_plasticTool.m_globalKey, &l_plasticTool.m_relayGroup);
 
 	QLabel *soLabel = new QLabel(tr("SO"));
@@ -516,7 +523,8 @@ void PlasticToolOptionsBox::showEvent(QShowEvent *se)
 {
 	bool ret = true;
 
-	ret = ret && connect(&l_plasticTool, SIGNAL(skelIdsListChanged()), SLOT(onSkelIdsListChanged()));
+	ret =
+		ret && connect(&l_plasticTool, SIGNAL(skelIdsListChanged()), SLOT(onSkelIdsListChanged()));
 	ret = ret && connect(&l_plasticTool, SIGNAL(skelIdChanged()), SLOT(onSkelIdChanged()));
 	ret = ret && connect(m_skelIdComboBox, SIGNAL(activated(int)), SLOT(onSkelIdEdited()));
 	ret = ret && connect(m_addSkelButton, SIGNAL(released()), SLOT(onAddSkeleton()));
@@ -604,13 +612,24 @@ void PlasticToolOptionsBox::onRemoveSkeleton()
 //****************************************************************************************
 
 PlasticTool::PlasticTool()
-	: TTool(T_Plastic), m_skelId(-(std::numeric_limits<int>::max)()), m_propGroup(new TPropertyGroup[MODES_COUNT + 1]), m_mode("mode"), m_vertexName("vertexName", L""), m_interpolate("interpolate", false), m_snapToMesh("snapToMesh", false), m_thickness("Thickness", 1, 100, 5), m_rigidValue("rigidValue"), m_globalKey("globalKeyframe", true), m_keepDistance("keepDistance", true), m_minAngle("minAngle", L""), m_maxAngle("maxAngle", L""), m_distanceRelay("distanceRelay"), m_angleRelay("angleRelay"), m_soRelay("soRelay"), m_skelIdRelay("skelIdRelay"), m_pressedPos(TConsts::napd), m_dragged(false), m_svHigh(-1), m_seHigh(-1), m_mvHigh(-1), m_meHigh(-1), m_rigidityPainter(createRigidityPainter()), m_showSkeletonOS(true), m_recompileOnMouseRelease(false)
+	: TTool(T_Plastic), m_skelId(-(std::numeric_limits<int>::max)()),
+	  m_propGroup(new TPropertyGroup[MODES_COUNT + 1]), m_mode("mode"),
+	  m_vertexName("vertexName", L""), m_interpolate("interpolate", false),
+	  m_snapToMesh("snapToMesh", false), m_thickness("Thickness", 1, 100, 5),
+	  m_rigidValue("rigidValue"), m_globalKey("globalKeyframe", true),
+	  m_keepDistance("keepDistance", true), m_minAngle("minAngle", L""),
+	  m_maxAngle("maxAngle", L""), m_distanceRelay("distanceRelay"), m_angleRelay("angleRelay"),
+	  m_soRelay("soRelay"), m_skelIdRelay("skelIdRelay"), m_pressedPos(TConsts::napd),
+	  m_dragged(false), m_svHigh(-1), m_seHigh(-1), m_mvHigh(-1), m_meHigh(-1),
+	  m_rigidityPainter(createRigidityPainter()), m_showSkeletonOS(true),
+	  m_recompileOnMouseRelease(false)
 {
 	// And now, a little trick about tool binding
 	bind(TTool::AllImages);  // Attach the tool to all types :)
 	bind(TTool::MeshLevels); // But disable it for all but meshes :0
 
-	// This little trick is needed to associate the tool to common levels (the toolbar must appear), in
+	// This little trick is needed to associate the tool to common levels (the toolbar must appear),
+	// in
 	// order to make them meshable.
 
 	// Bind properties to the appropriate property group (needed by the automatic toolbar builder)
@@ -709,7 +728,8 @@ void PlasticTool::updateTranslation()
 ToolOptionsBox *PlasticTool::createOptionsBox()
 {
 	// Create the options box
-	TPaletteHandle *currPalette = TTool::getApplication()->getPaletteController()->getCurrentLevelPalette();
+	TPaletteHandle *currPalette =
+		TTool::getApplication()->getPaletteController()->getCurrentLevelPalette();
 	PlasticToolOptionsBox *optionsBox = new PlasticToolOptionsBox(0, this, currPalette);
 
 	// Connect it to receive m_mode notifications
@@ -795,7 +815,8 @@ void PlasticTool::storeDeformation()
 
 void PlasticTool::storeSkeletonId()
 {
-	int skelId = m_sd ? m_sd->skeletonIdsParam()->getValue(::sdFrame()) : -(std::numeric_limits<int>::max)();
+	int skelId =
+		m_sd ? m_sd->skeletonIdsParam()->getValue(::sdFrame()) : -(std::numeric_limits<int>::max)();
 	if (m_skelId != skelId) {
 		m_skelId = skelId;
 		clearSkeletonSelections();
@@ -931,10 +952,18 @@ void PlasticTool::onSetViewer()
 void PlasticTool::onActivate()
 {
 	bool ret;
-	ret = connect(TTool::m_application->getCurrentFrame(), SIGNAL(frameSwitched()), this, SLOT(onFrameSwitched())), assert(ret);
-	ret = connect(TTool::m_application->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this, SLOT(onColumnSwitched())), assert(ret);
-	ret = connect(TTool::m_application->getCurrentXsheet(), SIGNAL(xsheetChanged()), this, SLOT(onXsheetChanged())), assert(ret);
-	ret = connect(TTool::m_application->getCurrentXsheet(), SIGNAL(xsheetSwitched()), this, SLOT(onXsheetChanged())), assert(ret);
+	ret = connect(TTool::m_application->getCurrentFrame(), SIGNAL(frameSwitched()), this,
+				  SLOT(onFrameSwitched())),
+	assert(ret);
+	ret = connect(TTool::m_application->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this,
+				  SLOT(onColumnSwitched())),
+	assert(ret);
+	ret = connect(TTool::m_application->getCurrentXsheet(), SIGNAL(xsheetChanged()), this,
+				  SLOT(onXsheetChanged())),
+	assert(ret);
+	ret = connect(TTool::m_application->getCurrentXsheet(), SIGNAL(xsheetSwitched()), this,
+				  SLOT(onXsheetChanged())),
+	assert(ret);
 
 	onSetViewer();
 	onColumnSwitched();
@@ -950,10 +979,18 @@ void PlasticTool::onDeactivate()
 	setActive(false);
 
 	bool ret;
-	ret = disconnect(TTool::m_application->getCurrentFrame(), SIGNAL(frameSwitched()), this, SLOT(onFrameSwitched())), assert(ret);
-	ret = disconnect(TTool::m_application->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this, SLOT(onColumnSwitched())), assert(ret);
-	ret = disconnect(TTool::m_application->getCurrentXsheet(), SIGNAL(xsheetChanged()), this, SLOT(onXsheetChanged())), assert(ret);
-	ret = disconnect(TTool::m_application->getCurrentXsheet(), SIGNAL(xsheetSwitched()), this, SLOT(onXsheetChanged())), assert(ret);
+	ret = disconnect(TTool::m_application->getCurrentFrame(), SIGNAL(frameSwitched()), this,
+					 SLOT(onFrameSwitched())),
+	assert(ret);
+	ret = disconnect(TTool::m_application->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this,
+					 SLOT(onColumnSwitched())),
+	assert(ret);
+	ret = disconnect(TTool::m_application->getCurrentXsheet(), SIGNAL(xsheetChanged()), this,
+					 SLOT(onXsheetChanged())),
+	assert(ret);
+	ret = disconnect(TTool::m_application->getCurrentXsheet(), SIGNAL(xsheetSwitched()), this,
+					 SLOT(onXsheetChanged())),
+	assert(ret);
 
 	Viewer *viewer = getViewer();
 	if (viewer)
@@ -991,8 +1028,10 @@ void PlasticTool::onSelectionChanged()
 		m_vertexName.setValue(vx.name().toStdWString());
 		m_interpolate.setValue(vx.m_interpolate);
 
-		m_minAngle.setValue((vx.m_minAngle == -l_dmax) ? L"" : QString::number(vx.m_minAngle).toStdWString());
-		m_maxAngle.setValue((vx.m_maxAngle == l_dmax) ? L"" : QString::number(vx.m_maxAngle).toStdWString());
+		m_minAngle.setValue(
+			(vx.m_minAngle == -l_dmax) ? L"" : QString::number(vx.m_minAngle).toStdWString());
+		m_maxAngle.setValue(
+			(vx.m_maxAngle == l_dmax) ? L"" : QString::number(vx.m_maxAngle).toStdWString());
 
 		vd = m_sd->vertexDeformation(skelId, m_svSel);
 	} else {
@@ -1058,7 +1097,8 @@ void PlasticTool::setSkeletonSelection(const PlasticVertexSelection &vSel)
 	// Okay, the following is cheap - we have to update the Function Editor (specifically)
 	// since current vertex is shown in a special color. We know that the same happens for
 	// the current stage object, so... we'll attach there.
-	TTool::getApplication()->getCurrentObject()->notifyObjectIdChanged(false); // Carry on, you've seen nothing ;)
+	TTool::getApplication()->getCurrentObject()->notifyObjectIdChanged(
+		false); // Carry on, you've seen nothing ;)
 }
 
 //------------------------------------------------------------------------
@@ -1072,15 +1112,11 @@ void PlasticTool::toggleSkeletonSelection(const PlasticVertexSelection &addition
 	std::vector<int> selectedIdxs;
 
 	if (m_svSel.contains(addition)) {
-		std::set_difference(
-			storedIdxs.begin(), storedIdxs.end(),
-			addedIdxs.begin(), addedIdxs.end(),
-			std::back_inserter(selectedIdxs));
+		std::set_difference(storedIdxs.begin(), storedIdxs.end(), addedIdxs.begin(),
+							addedIdxs.end(), std::back_inserter(selectedIdxs));
 	} else {
-		std::set_union(
-			storedIdxs.begin(), storedIdxs.end(),
-			addedIdxs.begin(), addedIdxs.end(),
-			std::back_inserter(selectedIdxs));
+		std::set_union(storedIdxs.begin(), storedIdxs.end(), addedIdxs.begin(), addedIdxs.end(),
+					   std::back_inserter(selectedIdxs));
 	}
 
 	setSkeletonSelection(selectedIdxs);
@@ -1111,8 +1147,9 @@ PlasticVertexSelection PlasticTool::branchSelection(int vIdx) const
 			for (et = vx.edgesBegin(); et != eEnd; ++et) {
 				int child = skeleton.edge(*et).vertex(1);
 
-				if (v != child)							// The edge to parent is in the list
-					addBranch(skeleton, child, branch); // I wonder if it's ensured to be always at begin?
+				if (v != child) // The edge to parent is in the list
+					addBranch(skeleton, child,
+							  branch); // I wonder if it's ensured to be always at begin?
 			}
 		}
 	};
@@ -1145,8 +1182,8 @@ void PlasticTool::copySkeleton()
 
 void PlasticTool::pasteSkeleton_undo()
 {
-	const PlasticSkeletonPMime *data = dynamic_cast<const PlasticSkeletonPMime *>(
-		QApplication::clipboard()->mimeData());
+	const PlasticSkeletonPMime *data =
+		dynamic_cast<const PlasticSkeletonPMime *>(QApplication::clipboard()->mimeData());
 	if (!data)
 		return;
 
@@ -1199,9 +1236,10 @@ void PlasticTool::pasteDeformation_undo()
 	const PlasticSkeletonDeformationP &oldSd = obj->getPlasticSkeletonDeformation();
 	if (oldSd) {
 		// A skeleton already exists. Ask the user if it has to be replaced.
-		bool replace = DVGui::MsgBox(
-						   tr("A group of skeletons already exists for current column. Replacing it will also substitute any existing vertex animation.\n\nDo you want to continue?"),
-						   tr("Ok"), tr("Cancel")) == 1;
+		bool replace = DVGui::MsgBox(tr("A group of skeletons already exists for current column. "
+										"Replacing it will also substitute any existing vertex "
+										"animation.\n\nDo you want to continue?"),
+									 tr("Ok"), tr("Cancel")) == 1;
 
 		if (!replace)
 			return;
@@ -1334,8 +1372,8 @@ void PlasticTool::setVertexName(QString &name)
 	// manipulation must refer the correct vd name.
 	m_deformedSkeleton.invalidate();
 
-	PlasticDeformerStorage::instance()->invalidateSkeleton(
-		m_sd.getPointer(), ::skeletonId(), PlasticDeformerStorage::NONE);
+	PlasticDeformerStorage::instance()->invalidateSkeleton(m_sd.getPointer(), ::skeletonId(),
+														   PlasticDeformerStorage::NONE);
 }
 
 //------------------------------------------------------------------------
@@ -1419,12 +1457,14 @@ void PlasticTool::addContextMenuItems(QMenu *menu)
 	// Add global actions
 	if (m_sd && m_sd->skeleton(::skeletonId())) {
 		QAction *copySkeleton = menu->addAction(tr("Copy Skeleton"));
-		ret = ret && connect(copySkeleton, SIGNAL(triggered()), &l_plasticTool, SLOT(copySkeleton()));
+		ret =
+			ret && connect(copySkeleton, SIGNAL(triggered()), &l_plasticTool, SLOT(copySkeleton()));
 	}
 
 	if (dynamic_cast<const PlasticSkeletonPMime *>(QApplication::clipboard()->mimeData())) {
 		QAction *pasteSkeleton = menu->addAction(tr("Paste Skeleton"));
-		ret = ret && connect(pasteSkeleton, SIGNAL(triggered()), &l_plasticTool, SLOT(pasteSkeleton_undo()));
+		ret = ret && connect(pasteSkeleton, SIGNAL(triggered()), &l_plasticTool,
+							 SLOT(pasteSkeleton_undo()));
 	}
 
 	menu->addSeparator(); // Separate actions type
@@ -1446,25 +1486,29 @@ void PlasticTool::addContextMenuItems(QMenu *menu)
 	showMesh->setCheckable(true);
 	showMesh->setChecked(m_pvs.m_drawMeshesWireframe);
 
-	ret = ret && connect(showMesh, SIGNAL(triggered(bool)), &l_plasticTool, SLOT(onShowMeshToggled(bool)));
+	ret = ret &&
+		  connect(showMesh, SIGNAL(triggered(bool)), &l_plasticTool, SLOT(onShowMeshToggled(bool)));
 
 	QAction *showRigidity = menu->addAction(tr("Show Rigidity"));
 	showRigidity->setCheckable(true);
 	showRigidity->setChecked(m_pvs.m_drawRigidity);
 
-	ret = ret && connect(showRigidity, SIGNAL(triggered(bool)), &l_plasticTool, SLOT(onShowRigidityToggled(bool)));
+	ret = ret && connect(showRigidity, SIGNAL(triggered(bool)), &l_plasticTool,
+						 SLOT(onShowRigidityToggled(bool)));
 
 	QAction *showSO = menu->addAction(tr("Show SO"));
 	showSO->setCheckable(true);
 	showSO->setChecked(m_pvs.m_drawSO);
 
-	ret = ret && connect(showSO, SIGNAL(triggered(bool)), &l_plasticTool, SLOT(onShowSOToggled(bool)));
+	ret = ret &&
+		  connect(showSO, SIGNAL(triggered(bool)), &l_plasticTool, SLOT(onShowSOToggled(bool)));
 
 	QAction *showSkeletonOS = menu->addAction(tr("Show Skeleton Onion Skin"));
 	showSkeletonOS->setCheckable(true);
 	showSkeletonOS->setChecked(m_showSkeletonOS);
 
-	ret = ret && connect(showSkeletonOS, SIGNAL(triggered(bool)), &l_plasticTool, SLOT(onShowSkelOSToggled(bool)));
+	ret = ret && connect(showSkeletonOS, SIGNAL(triggered(bool)), &l_plasticTool,
+						 SLOT(onShowSkelOSToggled(bool)));
 
 	assert(ret);
 
@@ -1535,12 +1579,12 @@ bool PlasticTool::onPropertyChanged(std::string propertyName)
 			const QString &oldName = skeleton->vertex(m_svSel).name();
 
 			bool doRename = true;
-			if (oldName != newName &&
-				!locals::alreadyContainsVertexName(*skeleton, newName) &&
-				m_sd->vertexDeformation(newName) &&
-				locals::vdCount(m_sd, oldName) == 1)
-				doRename = (DVGui::MsgBox(tr("The previous vertex name will be discarded, and all associated keys will be lost.\n\nDo you want to proceed?"),
-										  QObject::tr("Ok"), QObject::tr("Cancel")) == 1);
+			if (oldName != newName && !locals::alreadyContainsVertexName(*skeleton, newName) &&
+				m_sd->vertexDeformation(newName) && locals::vdCount(m_sd, oldName) == 1)
+				doRename =
+					(DVGui::MsgBox(tr("The previous vertex name will be discarded, and all "
+									  "associated keys will be lost.\n\nDo you want to proceed?"),
+								   QObject::tr("Ok"), QObject::tr("Cancel")) == 1);
 
 			if (doRename) {
 				TUndo *undo = new SetVertexNameUndo(m_svSel, newName);
@@ -1557,13 +1601,13 @@ bool PlasticTool::onPropertyChanged(std::string propertyName)
 			// Set interpolation property to the associated skeleton vertex
 			int skelId = ::skeletonId();
 
-			m_sd->skeleton(skelId)->vertex(m_svSel).m_interpolate =
-				m_interpolate.getValue();
+			m_sd->skeleton(skelId)->vertex(m_svSel).m_interpolate = m_interpolate.getValue();
 
-			m_interpolate.notifyListeners(); // NOTE: This should NOT invoke this function recursively
+			m_interpolate
+				.notifyListeners(); // NOTE: This should NOT invoke this function recursively
 
-			PlasticDeformerStorage::instance()->invalidateSkeleton(
-				m_sd.getPointer(), skelId, PlasticDeformerStorage::ALL);
+			PlasticDeformerStorage::instance()->invalidateSkeleton(m_sd.getPointer(), skelId,
+																   PlasticDeformerStorage::ALL);
 		}
 	} else if (propertyName == "minAngle") {
 		if (m_sd && m_svSel >= 0) {
@@ -1709,9 +1753,7 @@ void drawText(const TPointD &pos, const QString &text, double fontScale)
 	double matrix[16];
 
 	glGetDoublev(GL_MODELVIEW_MATRIX, matrix);
-	TAffine worldToWindowAff(
-		matrix[0], matrix[4], matrix[12],
-		matrix[1], matrix[5], matrix[13]);
+	TAffine worldToWindowAff(matrix[0], matrix[4], matrix[12], matrix[1], matrix[5], matrix[13]);
 
 	// Push the window reference
 	glPushMatrix();
@@ -1823,7 +1865,8 @@ void PlasticTool::drawSkeleton(const PlasticSkeleton &skel, double pixelSize, UC
 			glBegin(GL_LINES);
 			{
 				for (et = edges.begin(); et != eEnd; ++et)
-					locals::drawLine(skel.vertex(et->vertex(0)).P(), skel.vertex(et->vertex(1)).P());
+					locals::drawLine(skel.vertex(et->vertex(0)).P(),
+									 skel.vertex(et->vertex(1)).P());
 			}
 			glEnd();
 
@@ -1833,7 +1876,8 @@ void PlasticTool::drawSkeleton(const PlasticSkeleton &skel, double pixelSize, UC
 			glBegin(GL_LINES);
 			{
 				for (et = edges.begin(); et != eEnd; ++et)
-					locals::drawLine(skel.vertex(et->vertex(0)).P(), skel.vertex(et->vertex(1)).P());
+					locals::drawLine(skel.vertex(et->vertex(0)).P(),
+									 skel.vertex(et->vertex(1)).P());
 			}
 			glEnd();
 		}
@@ -1850,7 +1894,8 @@ void PlasticTool::drawSkeleton(const PlasticSkeleton &skel, double pixelSize, UC
 			drawFilledHandle(vertices.begin()->P(), handleRadius, pixelSize, magenta);
 
 			// Draw remaining vertices
-			tcg::list<PlasticSkeleton::vertex_type>::const_iterator vt(vertices.begin()), vEnd(vertices.end());
+			tcg::list<PlasticSkeleton::vertex_type>::const_iterator vt(vertices.begin()),
+				vEnd(vertices.end());
 			if (vt != vEnd) {
 				for (vt = ++vertices.begin(); vt != vEnd; ++vt)
 					drawHandle(vt->P(), handleRadius, vt->m_interpolate ? magenta : yellow);
@@ -1961,8 +2006,7 @@ void PlasticTool::drawAngleLimits(const SkDP &sd, int skelId, int v, double pixe
 			glEnd();
 		}
 
-		void drawLimit(const SkDP &sd, int skelId, int v,
-					   double angleLimit, double pixelSize)
+		void drawLimit(const SkDP &sd, int skelId, int v, double angleLimit, double pixelSize)
 		{
 			const PlasticSkeleton &skel = *sd->skeleton(skelId);
 			const PlasticSkeleton &defSkel = m_this->deformedSkeleton();
@@ -1978,8 +2022,7 @@ void PlasticTool::drawAngleLimits(const SkDP &sd, int skelId, int v, double pixe
 			// Build directions
 			int vGrandParent = vxParent.parent();
 
-			TPointD dirFromParent(vx.P() - vxParent.P()),
-				dirFromGrandParent(1, 0),
+			TPointD dirFromParent(vx.P() - vxParent.P()), dirFromGrandParent(1, 0),
 				dirFromDeformedGrandParent(1, 0);
 
 			if (vGrandParent >= 0) {
@@ -1991,15 +2034,18 @@ void PlasticTool::drawAngleLimits(const SkDP &sd, int skelId, int v, double pixe
 			}
 
 			// Retrieve angular data
-			double angleShift = sd->vertexDeformation(skelId, v)->m_params[SkVD::ANGLE]->getValue(::frame());
-			double defaultAngleValue = tcg::consts::rad_to_deg * tcg::point_ops::angle(
-																	 dirFromGrandParent, dirFromParent);
+			double angleShift =
+				sd->vertexDeformation(skelId, v)->m_params[SkVD::ANGLE]->getValue(::frame());
+			double defaultAngleValue =
+				tcg::consts::rad_to_deg * tcg::point_ops::angle(dirFromGrandParent, dirFromParent);
 
 			// Convert to radians
 			double currentBranchAngle_rad = tcg::point_ops::rad(dirFromDeformedGrandParent);
 
-			double currentAngle_rad = currentBranchAngle_rad + tcg::consts::deg_to_rad * (angleShift + defaultAngleValue);
-			double limitDirection_rad = currentBranchAngle_rad + tcg::consts::deg_to_rad * (angleLimit + defaultAngleValue);
+			double currentAngle_rad =
+				currentBranchAngle_rad + tcg::consts::deg_to_rad * (angleShift + defaultAngleValue);
+			double limitDirection_rad =
+				currentBranchAngle_rad + tcg::consts::deg_to_rad * (angleLimit + defaultAngleValue);
 
 			glColor4ub(0, 0, 255, 128);
 
@@ -2017,7 +2063,8 @@ void PlasticTool::drawAngleLimits(const SkDP &sd, int skelId, int v, double pixe
 
 			// Draw limit annulus arc
 			angleLimit = tcrop(angleLimit, angleShift - 180.0, angleShift + 180.0);
-			limitDirection_rad = currentBranchAngle_rad + tcg::consts::deg_to_rad * (angleLimit + defaultAngleValue);
+			limitDirection_rad =
+				currentBranchAngle_rad + tcg::consts::deg_to_rad * (angleLimit + defaultAngleValue);
 
 			double radius = tcg::point_ops::dist(defVx.P(), defVxParent.P()) * 0.25;
 

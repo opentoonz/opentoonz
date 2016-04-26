@@ -93,12 +93,13 @@ class RectRasterUndo : public TRasterUndo
 	bool m_selective;
 	bool m_invert;
 
-public:
-	RectRasterUndo(TTileSetCM32 *tileSet, const TRectD &modifyArea, TStroke stroke,
-				   int styleId, std::wstring eraseType, std::wstring colorType,
-				   TXshSimpleLevel *level, bool selective, bool invert,
-				   const TFrameId &frameId)
-		: TRasterUndo(tileSet, level, frameId, false, false, 0), m_modifyArea(modifyArea), m_styleId(styleId), m_eraseType(eraseType), m_colorType(colorType), m_selective(selective), m_invert(invert)
+  public:
+	RectRasterUndo(TTileSetCM32 *tileSet, const TRectD &modifyArea, TStroke stroke, int styleId,
+				   std::wstring eraseType, std::wstring colorType, TXshSimpleLevel *level,
+				   bool selective, bool invert, const TFrameId &frameId)
+		: TRasterUndo(tileSet, level, frameId, false, false, 0), m_modifyArea(modifyArea),
+		  m_styleId(styleId), m_eraseType(eraseType), m_colorType(colorType),
+		  m_selective(selective), m_invert(invert)
 	{
 		m_stroke = new TStroke(stroke);
 	}
@@ -111,7 +112,8 @@ public:
 		bool eraseInk = m_colorType == LINES || m_colorType == ALL;
 		bool erasePaint = m_colorType == AREAS || m_colorType == ALL;
 		if (m_eraseType == RECTERASE) {
-			TRect rect = ToonzImageUtils::eraseRect(ti, m_modifyArea, m_styleId, eraseInk, erasePaint);
+			TRect rect =
+				ToonzImageUtils::eraseRect(ti, m_modifyArea, m_styleId, eraseInk, erasePaint);
 			if (!rect.isEmpty())
 				ToolUtils::updateSaveBox(m_level, m_frameId);
 
@@ -121,7 +123,8 @@ public:
 				TRaster32P ras = convertStrokeToImage(m_stroke, ti->getRaster()->getBounds(), pos);
 				if (!ras)
 					return;
-				ToonzImageUtils::eraseImage(ti, ras, pos, m_invert, eraseInk, erasePaint, m_selective, m_styleId);
+				ToonzImageUtils::eraseImage(ti, ras, pos, m_invert, eraseInk, erasePaint,
+											m_selective, m_styleId);
 				ToolUtils::updateSaveBox(m_level, m_frameId);
 			}
 		}
@@ -131,10 +134,8 @@ public:
 
 	int getSize() const
 	{
-		return TRasterUndo::getSize() +
-			   sizeof(this) +
-			   m_stroke->getControlPointCount() * sizeof(TThickPoint) +
-			   100;
+		return TRasterUndo::getSize() + sizeof(this) +
+			   m_stroke->getControlPointCount() * sizeof(TThickPoint) + 100;
 	}
 
 	~RectRasterUndo()
@@ -143,14 +144,8 @@ public:
 			delete m_stroke;
 	}
 
-	QString getToolName()
-	{
-		return QString("Eraser Tool (Rect)");
-	}
-	int getHistoryType()
-	{
-		return HistoryType::EraserTool;
-	}
+	QString getToolName() { return QString("Eraser Tool (Rect)"); }
+	int getHistoryType() { return HistoryType::EraserTool; }
 };
 
 //=====================================================================
@@ -166,12 +161,13 @@ class RasterEraserUndo : public TRasterUndo
 	ColorType m_colorType;
 	int m_colorSelected;
 
-public:
+  public:
 	RasterEraserUndo(TTileSetCM32 *tileSet, const std::vector<TThickPoint> &points,
-					 ColorType colorType, int styleId, bool selective,
-					 int colorSelected, TXshSimpleLevel *level,
-					 const TFrameId &frameId, bool isPencil)
-		: TRasterUndo(tileSet, level, frameId, false, false, 0), m_points(points), m_styleId(styleId), m_selective(selective), m_colorType(colorType), m_colorSelected(colorSelected), m_isPencil(isPencil)
+					 ColorType colorType, int styleId, bool selective, int colorSelected,
+					 TXshSimpleLevel *level, const TFrameId &frameId, bool isPencil)
+		: TRasterUndo(tileSet, level, frameId, false, false, 0), m_points(points),
+		  m_styleId(styleId), m_selective(selective), m_colorType(colorType),
+		  m_colorSelected(colorSelected), m_isPencil(isPencil)
 	{
 	}
 
@@ -179,28 +175,21 @@ public:
 	{
 		TToonzImageP image = m_level->getFrame(m_frameId, true);
 		TRasterCM32P ras = image->getRaster();
-		RasterStrokeGenerator m_rasterTrack(ras, ERASE, m_colorType, 0, m_points[0], m_selective, m_colorSelected, !m_isPencil);
+		RasterStrokeGenerator m_rasterTrack(ras, ERASE, m_colorType, 0, m_points[0], m_selective,
+											m_colorSelected, !m_isPencil);
 		m_rasterTrack.setPointsSequence(m_points);
 		m_rasterTrack.generateStroke(m_isPencil);
-		image->setSavebox(image->getSavebox() + m_rasterTrack.getBBox(m_rasterTrack.getPointsSequence()));
+		image->setSavebox(image->getSavebox() +
+						  m_rasterTrack.getBBox(m_rasterTrack.getPointsSequence()));
 		ToolUtils::updateSaveBox();
 		TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
 		notifyImageChanged();
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this) + TRasterUndo::getSize();
-	}
+	int getSize() const { return sizeof(*this) + TRasterUndo::getSize(); }
 
-	QString getToolName()
-	{
-		return QString("Eraser Tool");
-	}
-	int getHistoryType()
-	{
-		return HistoryType::EraserTool;
-	}
+	QString getToolName() { return QString("Eraser Tool"); }
+	int getHistoryType() { return HistoryType::EraserTool; }
 };
 
 //=====================================================================
@@ -214,13 +203,14 @@ class RasterBluredEraserUndo : public TRasterUndo
 	double m_hardness;
 	std::wstring m_mode;
 
-public:
-	RasterBluredEraserUndo(TTileSetCM32 *tileSet,
-						   const std::vector<TThickPoint> &points,
-						   int styleId, bool selective,
-						   TXshSimpleLevel *level, const TFrameId &frameId,
-						   int size, double hardness, const std::wstring &mode)
-		: TRasterUndo(tileSet, level, frameId, false, false, 0), m_points(points), m_styleId(styleId), m_selective(selective), m_size(size), m_hardness(hardness), m_mode(mode)
+  public:
+	RasterBluredEraserUndo(TTileSetCM32 *tileSet, const std::vector<TThickPoint> &points,
+						   int styleId, bool selective, TXshSimpleLevel *level,
+						   const TFrameId &frameId, int size, double hardness,
+						   const std::wstring &mode)
+		: TRasterUndo(tileSet, level, frameId, false, false, 0), m_points(points),
+		  m_styleId(styleId), m_selective(selective), m_size(size), m_hardness(hardness),
+		  m_mode(mode)
 	{
 	}
 
@@ -263,24 +253,15 @@ public:
 		notifyImageChanged();
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this) + TRasterUndo::getSize();
-	}
+	int getSize() const { return sizeof(*this) + TRasterUndo::getSize(); }
 
-	QString getToolName()
-	{
-		return QString("Eraser Tool");
-	}
-	int getHistoryType()
-	{
-		return HistoryType::EraserTool;
-	}
+	QString getToolName() { return QString("Eraser Tool"); }
+	int getHistoryType() { return HistoryType::EraserTool; }
 };
 
 void eraseStroke(const TToonzImageP &ti, TStroke *stroke, std::wstring eraseType,
-				 std::wstring colorType, bool invert, bool selective,
-				 int styleId, const TXshSimpleLevelP &level, const TFrameId &frameId)
+				 std::wstring colorType, bool invert, bool selective, int styleId,
+				 const TXshSimpleLevelP &level, const TFrameId &frameId)
 {
 	assert(stroke);
 	TPoint pos;
@@ -297,9 +278,9 @@ void eraseStroke(const TToonzImageP &ti, TStroke *stroke, std::wstring eraseType
 		area = ras->getBounds();
 	TTileSetCM32 *tileSet = new TTileSetCM32(ras->getSize());
 	tileSet->add(ras, area);
-	TUndoManager::manager()->add(new RectRasterUndo(tileSet, convert(area), *stroke,
-													selective ? styleId : -1, eraseType, colorType, level.getPointer(),
-													selective, invert, frameId));
+	TUndoManager::manager()->add(
+		new RectRasterUndo(tileSet, convert(area), *stroke, selective ? styleId : -1, eraseType,
+						   colorType, level.getPointer(), selective, invert, frameId));
 	bool eraseInk = colorType == LINES || colorType == ALL;
 	bool erasePaint = colorType == AREAS || colorType == ALL;
 	ToonzImageUtils::eraseImage(ti, image, pos, invert, eraseInk, erasePaint, selective, styleId);
@@ -311,69 +292,118 @@ void drawLine(const TPointD &point, const TPointD &centre, bool horizontal, bool
 {
 	if (!isDecimal) {
 		if (horizontal) {
-			tglDrawSegment(TPointD(point.x - 1.5, point.y + 0.5) + centre, TPointD(point.x - 0.5, point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(point.y - 0.5, -point.x + 1.5) + centre, TPointD(point.y - 0.5, -point.x + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.x + 0.5, -point.y + 0.5) + centre, TPointD(-point.x - 0.5, -point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 0.5, point.x - 0.5) + centre, TPointD(-point.y - 0.5, point.x + 0.5) + centre);
+			tglDrawSegment(TPointD(point.x - 1.5, point.y + 0.5) + centre,
+						   TPointD(point.x - 0.5, point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(point.y - 0.5, -point.x + 1.5) + centre,
+						   TPointD(point.y - 0.5, -point.x + 0.5) + centre);
+			tglDrawSegment(TPointD(-point.x + 0.5, -point.y + 0.5) + centre,
+						   TPointD(-point.x - 0.5, -point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(-point.y - 0.5, point.x - 0.5) + centre,
+						   TPointD(-point.y - 0.5, point.x + 0.5) + centre);
 
-			tglDrawSegment(TPointD(point.y - 0.5, point.x + 0.5) + centre, TPointD(point.y - 0.5, point.x - 0.5) + centre);
-			tglDrawSegment(TPointD(point.x - 0.5, -point.y + 0.5) + centre, TPointD(point.x - 1.5, -point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 0.5, -point.x + 0.5) + centre, TPointD(-point.y - 0.5, -point.x + 1.5) + centre);
-			tglDrawSegment(TPointD(-point.x - 0.5, point.y + 0.5) + centre, TPointD(-point.x + 0.5, point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(point.y - 0.5, point.x + 0.5) + centre,
+						   TPointD(point.y - 0.5, point.x - 0.5) + centre);
+			tglDrawSegment(TPointD(point.x - 0.5, -point.y + 0.5) + centre,
+						   TPointD(point.x - 1.5, -point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(-point.y - 0.5, -point.x + 0.5) + centre,
+						   TPointD(-point.y - 0.5, -point.x + 1.5) + centre);
+			tglDrawSegment(TPointD(-point.x - 0.5, point.y + 0.5) + centre,
+						   TPointD(-point.x + 0.5, point.y + 0.5) + centre);
 		} else {
-			tglDrawSegment(TPointD(point.x - 1.5, point.y + 1.5) + centre, TPointD(point.x - 1.5, point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(point.x - 1.5, point.y + 0.5) + centre, TPointD(point.x - 0.5, point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(point.y + 0.5, -point.x + 1.5) + centre, TPointD(point.y - 0.5, -point.x + 1.5) + centre);
-			tglDrawSegment(TPointD(point.y - 0.5, -point.x + 1.5) + centre, TPointD(point.y - 0.5, -point.x + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.x + 0.5, -point.y - 0.5) + centre, TPointD(-point.x + 0.5, -point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.x + 0.5, -point.y + 0.5) + centre, TPointD(-point.x - 0.5, -point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 1.5, point.x - 0.5) + centre, TPointD(-point.y - 0.5, point.x - 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 0.5, point.x - 0.5) + centre, TPointD(-point.y - 0.5, point.x + 0.5) + centre);
+			tglDrawSegment(TPointD(point.x - 1.5, point.y + 1.5) + centre,
+						   TPointD(point.x - 1.5, point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(point.x - 1.5, point.y + 0.5) + centre,
+						   TPointD(point.x - 0.5, point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(point.y + 0.5, -point.x + 1.5) + centre,
+						   TPointD(point.y - 0.5, -point.x + 1.5) + centre);
+			tglDrawSegment(TPointD(point.y - 0.5, -point.x + 1.5) + centre,
+						   TPointD(point.y - 0.5, -point.x + 0.5) + centre);
+			tglDrawSegment(TPointD(-point.x + 0.5, -point.y - 0.5) + centre,
+						   TPointD(-point.x + 0.5, -point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(-point.x + 0.5, -point.y + 0.5) + centre,
+						   TPointD(-point.x - 0.5, -point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(-point.y - 1.5, point.x - 0.5) + centre,
+						   TPointD(-point.y - 0.5, point.x - 0.5) + centre);
+			tglDrawSegment(TPointD(-point.y - 0.5, point.x - 0.5) + centre,
+						   TPointD(-point.y - 0.5, point.x + 0.5) + centre);
 
-			tglDrawSegment(TPointD(point.y + 0.5, point.x - 0.5) + centre, TPointD(point.y - 0.5, point.x - 0.5) + centre);
-			tglDrawSegment(TPointD(point.y - 0.5, point.x - 0.5) + centre, TPointD(point.y - 0.5, point.x + 0.5) + centre);
-			tglDrawSegment(TPointD(point.x - 1.5, -point.y - 0.5) + centre, TPointD(point.x - 1.5, -point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(point.x - 1.5, -point.y + 0.5) + centre, TPointD(point.x - 0.5, -point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 1.5, -point.x + 1.5) + centre, TPointD(-point.y - 0.5, -point.x + 1.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 0.5, -point.x + 1.5) + centre, TPointD(-point.y - 0.5, -point.x + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.x + 0.5, point.y + 1.5) + centre, TPointD(-point.x + 0.5, point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.x + 0.5, point.y + 0.5) + centre, TPointD(-point.x - 0.5, point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(point.y + 0.5, point.x - 0.5) + centre,
+						   TPointD(point.y - 0.5, point.x - 0.5) + centre);
+			tglDrawSegment(TPointD(point.y - 0.5, point.x - 0.5) + centre,
+						   TPointD(point.y - 0.5, point.x + 0.5) + centre);
+			tglDrawSegment(TPointD(point.x - 1.5, -point.y - 0.5) + centre,
+						   TPointD(point.x - 1.5, -point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(point.x - 1.5, -point.y + 0.5) + centre,
+						   TPointD(point.x - 0.5, -point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(-point.y - 1.5, -point.x + 1.5) + centre,
+						   TPointD(-point.y - 0.5, -point.x + 1.5) + centre);
+			tglDrawSegment(TPointD(-point.y - 0.5, -point.x + 1.5) + centre,
+						   TPointD(-point.y - 0.5, -point.x + 0.5) + centre);
+			tglDrawSegment(TPointD(-point.x + 0.5, point.y + 1.5) + centre,
+						   TPointD(-point.x + 0.5, point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(-point.x + 0.5, point.y + 0.5) + centre,
+						   TPointD(-point.x - 0.5, point.y + 0.5) + centre);
 		}
 	} else {
 		if (horizontal) {
-			tglDrawSegment(TPointD(point.x - 0.5, point.y + 0.5) + centre, TPointD(point.x + 0.5, point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(point.y + 0.5, point.x - 0.5) + centre, TPointD(point.y + 0.5, point.x + 0.5) + centre);
-			tglDrawSegment(TPointD(point.y + 0.5, -point.x + 0.5) + centre, TPointD(point.y + 0.5, -point.x - 0.5) + centre);
-			tglDrawSegment(TPointD(point.x + 0.5, -point.y - 0.5) + centre, TPointD(point.x - 0.5, -point.y - 0.5) + centre);
-			tglDrawSegment(TPointD(-point.x - 0.5, -point.y - 0.5) + centre, TPointD(-point.x + 0.5, -point.y - 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 0.5, -point.x + 0.5) + centre, TPointD(-point.y - 0.5, -point.x - 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 0.5, point.x - 0.5) + centre, TPointD(-point.y - 0.5, point.x + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.x + 0.5, point.y + 0.5) + centre, TPointD(-point.x - 0.5, point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(point.x - 0.5, point.y + 0.5) + centre,
+						   TPointD(point.x + 0.5, point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(point.y + 0.5, point.x - 0.5) + centre,
+						   TPointD(point.y + 0.5, point.x + 0.5) + centre);
+			tglDrawSegment(TPointD(point.y + 0.5, -point.x + 0.5) + centre,
+						   TPointD(point.y + 0.5, -point.x - 0.5) + centre);
+			tglDrawSegment(TPointD(point.x + 0.5, -point.y - 0.5) + centre,
+						   TPointD(point.x - 0.5, -point.y - 0.5) + centre);
+			tglDrawSegment(TPointD(-point.x - 0.5, -point.y - 0.5) + centre,
+						   TPointD(-point.x + 0.5, -point.y - 0.5) + centre);
+			tglDrawSegment(TPointD(-point.y - 0.5, -point.x + 0.5) + centre,
+						   TPointD(-point.y - 0.5, -point.x - 0.5) + centre);
+			tglDrawSegment(TPointD(-point.y - 0.5, point.x - 0.5) + centre,
+						   TPointD(-point.y - 0.5, point.x + 0.5) + centre);
+			tglDrawSegment(TPointD(-point.x + 0.5, point.y + 0.5) + centre,
+						   TPointD(-point.x - 0.5, point.y + 0.5) + centre);
 		} else {
-			tglDrawSegment(TPointD(point.x - 0.5, point.y + 1.5) + centre, TPointD(point.x - 0.5, point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(point.x - 0.5, point.y + 0.5) + centre, TPointD(point.x + 0.5, point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(point.y + 1.5, point.x - 0.5) + centre, TPointD(point.y + 0.5, point.x - 0.5) + centre);
-			tglDrawSegment(TPointD(point.y + 0.5, point.x - 0.5) + centre, TPointD(point.y + 0.5, point.x + 0.5) + centre);
-			tglDrawSegment(TPointD(point.y + 1.5, -point.x + 0.5) + centre, TPointD(point.y + 0.5, -point.x + 0.5) + centre);
-			tglDrawSegment(TPointD(point.y + 0.5, -point.x + 0.5) + centre, TPointD(point.y + 0.5, -point.x - 0.5) + centre);
-			tglDrawSegment(TPointD(point.x - 0.5, -point.y - 1.5) + centre, TPointD(point.x - 0.5, -point.y - 0.5) + centre);
-			tglDrawSegment(TPointD(point.x - 0.5, -point.y - 0.5) + centre, TPointD(point.x + 0.5, -point.y - 0.5) + centre);
+			tglDrawSegment(TPointD(point.x - 0.5, point.y + 1.5) + centre,
+						   TPointD(point.x - 0.5, point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(point.x - 0.5, point.y + 0.5) + centre,
+						   TPointD(point.x + 0.5, point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(point.y + 1.5, point.x - 0.5) + centre,
+						   TPointD(point.y + 0.5, point.x - 0.5) + centre);
+			tglDrawSegment(TPointD(point.y + 0.5, point.x - 0.5) + centre,
+						   TPointD(point.y + 0.5, point.x + 0.5) + centre);
+			tglDrawSegment(TPointD(point.y + 1.5, -point.x + 0.5) + centre,
+						   TPointD(point.y + 0.5, -point.x + 0.5) + centre);
+			tglDrawSegment(TPointD(point.y + 0.5, -point.x + 0.5) + centre,
+						   TPointD(point.y + 0.5, -point.x - 0.5) + centre);
+			tglDrawSegment(TPointD(point.x - 0.5, -point.y - 1.5) + centre,
+						   TPointD(point.x - 0.5, -point.y - 0.5) + centre);
+			tglDrawSegment(TPointD(point.x - 0.5, -point.y - 0.5) + centre,
+						   TPointD(point.x + 0.5, -point.y - 0.5) + centre);
 
-			tglDrawSegment(TPointD(-point.x + 0.5, -point.y - 1.5) + centre, TPointD(-point.x + 0.5, -point.y - 0.5) + centre);
-			tglDrawSegment(TPointD(-point.x + 0.5, -point.y - 0.5) + centre, TPointD(-point.x - 0.5, -point.y - 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 1.5, -point.x + 0.5) + centre, TPointD(-point.y - 0.5, -point.x + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 0.5, -point.x + 0.5) + centre, TPointD(-point.y - 0.5, -point.x - 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 1.5, point.x - 0.5) + centre, TPointD(-point.y - 0.5, point.x - 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 0.5, point.x - 0.5) + centre, TPointD(-point.y - 0.5, point.x + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.x + 0.5, point.y + 1.5) + centre, TPointD(-point.x + 0.5, point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.x + 0.5, point.y + 0.5) + centre, TPointD(-point.x - 0.5, point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(-point.x + 0.5, -point.y - 1.5) + centre,
+						   TPointD(-point.x + 0.5, -point.y - 0.5) + centre);
+			tglDrawSegment(TPointD(-point.x + 0.5, -point.y - 0.5) + centre,
+						   TPointD(-point.x - 0.5, -point.y - 0.5) + centre);
+			tglDrawSegment(TPointD(-point.y - 1.5, -point.x + 0.5) + centre,
+						   TPointD(-point.y - 0.5, -point.x + 0.5) + centre);
+			tglDrawSegment(TPointD(-point.y - 0.5, -point.x + 0.5) + centre,
+						   TPointD(-point.y - 0.5, -point.x - 0.5) + centre);
+			tglDrawSegment(TPointD(-point.y - 1.5, point.x - 0.5) + centre,
+						   TPointD(-point.y - 0.5, point.x - 0.5) + centre);
+			tglDrawSegment(TPointD(-point.y - 0.5, point.x - 0.5) + centre,
+						   TPointD(-point.y - 0.5, point.x + 0.5) + centre);
+			tglDrawSegment(TPointD(-point.x + 0.5, point.y + 1.5) + centre,
+						   TPointD(-point.x + 0.5, point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(-point.x + 0.5, point.y + 0.5) + centre,
+						   TPointD(-point.x - 0.5, point.y + 0.5) + centre);
 		}
 	}
 }
 
 //-------------------------------------------------------------------------------------------------------
 
-void drawEmptyCircle(int thick, const TPointD &mousePos, bool isPencil, bool isLxEven, bool isLyEven)
+void drawEmptyCircle(int thick, const TPointD &mousePos, bool isPencil, bool isLxEven,
+					 bool isLyEven)
 {
 	TPointD pos = mousePos;
 	if (isLxEven)
@@ -412,7 +442,7 @@ class EraserTool : public TTool
 {
 	Q_DECLARE_TR_FUNCTIONS(EraserTool)
 
-public:
+  public:
 	EraserTool(std::string name);
 	~EraserTool()
 	{
@@ -428,8 +458,8 @@ public:
 
 	void update(const TToonzImageP &ti, const TPointD &pos);
 	void saveUndo();
-	void update(const TToonzImageP &ti, TRectD selArea, const TXshSimpleLevelP &level, bool multi = false,
-				const TFrameId &frameId = -1);
+	void update(const TToonzImageP &ti, TRectD selArea, const TXshSimpleLevelP &level,
+				bool multi = false, const TFrameId &frameId = -1);
 
 	void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
 	void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
@@ -438,9 +468,9 @@ public:
 
 	void multiAreaEraser(const TXshSimpleLevelP &sl, TFrameId &firstFid, TFrameId &lastFid,
 						 TStroke *firstStroke, TStroke *lastStroke);
-	void doMultiEraser(const TImageP &img, double t,
-					   const TXshSimpleLevelP &sl, const TFrameId &fid,
-					   const TVectorImageP &firstImage, const TVectorImageP &lastImage);
+	void doMultiEraser(const TImageP &img, double t, const TXshSimpleLevelP &sl,
+					   const TFrameId &fid, const TVectorImageP &firstImage,
+					   const TVectorImageP &lastImage);
 
 	void mouseMove(const TPointD &pos, const TMouseEvent &e);
 	void onEnter();
@@ -449,7 +479,8 @@ public:
 	bool onPropertyChanged(std::string propertyName);
 	void onImageChanged();
 
-	void multiUpdate(const TXshSimpleLevelP &level, TFrameId firstFrameId, TFrameId lastFrameId, TRectD firstRect, TRectD lastRect);
+	void multiUpdate(const TXshSimpleLevelP &level, TFrameId firstFrameId, TFrameId lastFrameId,
+					 TRectD firstRect, TRectD lastRect);
 
 	TPropertyGroup *getProperties(int targetType) { return &m_prop; }
 
@@ -461,18 +492,13 @@ public:
 	/*-- Brush、PaintBrush、EraserToolがPencilModeのときにTrueを返す --*/
 	bool isPencilModeActive();
 
-private:
+  private:
 	/*-- 終了処理 --*/
 	void storeUndoAndRefresh();
 
-	enum Type {
-		NONE = 0,
-		BRUSH,
-		INKCHANGE,
-		ERASER
-	};
+	enum Type { NONE = 0, BRUSH, INKCHANGE, ERASER };
 
-private:
+  private:
 	TPropertyGroup m_prop;
 
 	TEnumProperty m_eraseType;
@@ -489,8 +515,7 @@ private:
 	TXshSimpleLevelP m_level;
 	std::pair<int, int> m_currCell;
 
-	TFrameId m_firstFrameId,
-		m_veryFirstFrameId;
+	TFrameId m_firstFrameId, m_veryFirstFrameId;
 
 	StrokeGenerator m_track;
 
@@ -501,35 +526,24 @@ private:
 
 	RasterStrokeGenerator *m_normalEraser;
 
-	TRectD m_selectingRect,
-		m_firstRect;
+	TRectD m_selectingRect, m_firstRect;
 
 	ColorType m_colorTypeEraser;
 
-	TPointD m_mousePos,
-		m_brushPos,
-		m_firstPos;
+	TPointD m_mousePos, m_brushPos, m_firstPos;
 
 	std::vector<TPointD> m_polyline;
 
-	//gestione cancellino blurato
+	// gestione cancellino blurato
 	TRasterCM32P m_backupRas;
 	TRaster32P m_workRas;
 	QRadialGradient m_brushPad;
 	std::vector<TThickPoint> m_points;
 	BluredBrush *m_bluredBrush;
 
-	double m_pointSize,
-		m_distance2,
-		m_cleanerSize,
-		m_thick;
+	double m_pointSize, m_distance2, m_cleanerSize, m_thick;
 
-	bool m_isXsheetCell,
-		m_active,
-		m_enabled,
-		m_selecting,
-		m_firstFrameSelected,
-		m_firstTime;
+	bool m_isXsheetCell, m_active, m_enabled, m_selecting, m_firstFrameSelected, m_firstTime;
 
 	/*---  消しゴム開始時のFrameIdを保存し、マウスリリース時（Undoの登録時）に
 		別のフレームに移動していた場合に備える
@@ -550,19 +564,22 @@ EraserTool inkPaintEraserTool("T_Eraser");
 //------------------------------------------------------------------------
 
 EraserTool::EraserTool(std::string name)
-	: TTool(name), m_toolSize("Size:", 1, 100, 10, false) //W_ToolOptions_EraserToolSize
+	: TTool(name), m_toolSize("Size:", 1, 100, 10, false) // W_ToolOptions_EraserToolSize
 	  ,
-	  m_hardness("Hardness:", 0, 100, 100), m_eraseType("Type:") //W_ToolOptions_Erasetype
+	  m_hardness("Hardness:", 0, 100, 100), m_eraseType("Type:") // W_ToolOptions_Erasetype
 	  ,
-	  m_colorType("Mode:") //W_ToolOptions_InkOrPaint
+	  m_colorType("Mode:") // W_ToolOptions_InkOrPaint
 	  ,
-	  m_currentStyle("Selective", false) //W_ToolOptions_Selective
+	  m_currentStyle("Selective", false) // W_ToolOptions_Selective
 	  ,
-	  m_invertOption("Invert", false) //W_ToolOptions_Invert
+	  m_invertOption("Invert", false) // W_ToolOptions_Invert
 	  ,
-	  m_multi("Frame Range", false) //W_ToolOptions_FrameRange
+	  m_multi("Frame Range", false) // W_ToolOptions_FrameRange
 	  ,
-	  m_pencil("Pencil Mode", false), m_currCell(-1, -1), m_tileSaver(0), m_bluredBrush(0), m_pointSize(-1), m_thick(0.5), m_firstFrameSelected(false), m_selecting(false), m_active(false), m_enabled(false), m_isXsheetCell(false), m_firstTime(true), m_workingFrameId(TFrameId()), m_isLeftButtonPressed(false)
+	  m_pencil("Pencil Mode", false), m_currCell(-1, -1), m_tileSaver(0), m_bluredBrush(0),
+	  m_pointSize(-1), m_thick(0.5), m_firstFrameSelected(false), m_selecting(false),
+	  m_active(false), m_enabled(false), m_isXsheetCell(false), m_firstTime(true),
+	  m_workingFrameId(TFrameId()), m_isLeftButtonPressed(false)
 {
 	bind(TTool::ToonzImage);
 
@@ -636,15 +653,18 @@ void EraserTool::draw()
 		int ly = ras->getLy();
 
 		/*-- InkCheck, PaintCheck, Ink#1CheckがONのときは、BrushTipの描画色を変える --*/
-		if ((ToonzCheck::instance()->getChecks() & ToonzCheck::eInk) || (ToonzCheck::instance()->getChecks() & ToonzCheck::ePaint) || (ToonzCheck::instance()->getChecks() & ToonzCheck::eInk1))
+		if ((ToonzCheck::instance()->getChecks() & ToonzCheck::eInk) ||
+			(ToonzCheck::instance()->getChecks() & ToonzCheck::ePaint) ||
+			(ToonzCheck::instance()->getChecks() & ToonzCheck::eInk1))
 			glColor3d(0.5, 0.8, 0.8);
 		else
 			glColor3d(1.0, 0.0, 0.0);
 		drawEmptyCircle(tround(m_cleanerSize), m_brushPos,
-						(m_pencil.getValue() || m_colorType.getValue() == AREAS),
-						lx % 2 == 0, ly % 2 == 0);
+						(m_pencil.getValue() || m_colorType.getValue() == AREAS), lx % 2 == 0,
+						ly % 2 == 0);
 	}
-	if ((m_eraseType.getValue() == FREEHANDERASE || m_eraseType.getValue() == POLYLINEERASE) && m_multi.getValue()) {
+	if ((m_eraseType.getValue() == FREEHANDERASE || m_eraseType.getValue() == POLYLINEERASE) &&
+		m_multi.getValue()) {
 		TPixel color = TPixel32::Red;
 		tglColor(color);
 		if (m_firstStroke)
@@ -683,9 +703,7 @@ void EraserTool::resetMulti()
 	m_firstRect.empty();
 	m_selectingRect.empty();
 	TTool::Application *app = TTool::getApplication();
-	m_level = app->getCurrentLevel()->getLevel()
-				  ? app->getCurrentLevel()->getSimpleLevel()
-				  : 0;
+	m_level = app->getCurrentLevel()->getLevel() ? app->getCurrentLevel()->getSimpleLevel() : 0;
 	m_firstFrameId = m_veryFirstFrameId = getFrameId();
 	if (m_firstStroke) {
 		delete m_firstStroke;
@@ -695,7 +713,8 @@ void EraserTool::resetMulti()
 
 //----------------------------------------------------------------------
 
-void EraserTool::multiUpdate(const TXshSimpleLevelP &level, TFrameId firstFid, TFrameId lastFid, TRectD firstRect, TRectD lastRect)
+void EraserTool::multiUpdate(const TXshSimpleLevelP &level, TFrameId firstFid, TFrameId lastFid,
+							 TRectD firstRect, TRectD lastRect)
 {
 	bool backward = false;
 	if (firstFid > lastFid) {
@@ -744,7 +763,8 @@ void EraserTool::multiUpdate(const TXshSimpleLevelP &level, TFrameId firstFid, T
 			TRectD rect04 = TRectD(TPointD((double)rect.x1, -100000.), TPointD(100000., 100000.));
 			update(ti, rect04, level, true, fid);
 		} else
-			update(ti, interpolateRect(firstRect, lastRect, backward ? 1 - t : t), level, true, fid);
+			update(ti, interpolateRect(firstRect, lastRect, backward ? 1 - t : t), level, true,
+				   fid);
 
 		TRect savebox;
 		TRop::computeBBox(ti->getRaster(), savebox);
@@ -780,8 +800,9 @@ void EraserTool::update(const TToonzImageP &ti, TRectD selArea, const TXshSimple
 	TUndo *undo;
 
 	std::wstring inkPaint = m_colorType.getValue();
-	undo = new RectRasterUndo(tileSet, selArea, TStroke(), selective ? styleId : -1, m_eraseType.getValue(), inkPaint,
-							  level.getPointer(), selective, m_invertOption.getValue(), frameId);
+	undo = new RectRasterUndo(tileSet, selArea, TStroke(), selective ? styleId : -1,
+							  m_eraseType.getValue(), inkPaint, level.getPointer(), selective,
+							  m_invertOption.getValue(), frameId);
 
 	ToonzImageUtils::eraseRect(ti, selArea, selective ? styleId : -1,
 							   inkPaint == LINES || inkPaint == ALL,
@@ -826,7 +847,8 @@ void EraserTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e)
 			m_tileSaver = new TTileSaverCM32(raster, m_tileSet);
 			TPointD halfThick(m_toolSize.getValue() * 0.5, m_toolSize.getValue() * 0.5);
 			invalidateRect = TRectD(pos - halfThick, pos + halfThick);
-			if (m_hardness.getValue() == 100 || m_pencil.getValue() || m_colorType.getValue() == AREAS) {
+			if (m_hardness.getValue() == 100 || m_pencil.getValue() ||
+				m_colorType.getValue() == AREAS) {
 				if (m_colorType.getValue() == LINES) {
 					m_colorTypeEraser = INK;
 				}
@@ -834,11 +856,12 @@ void EraserTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e)
 					m_colorTypeEraser = PAINT;
 				if (m_colorType.getValue() == ALL)
 					m_colorTypeEraser = INKNPAINT;
-				m_normalEraser = new RasterStrokeGenerator(raster, ERASE, m_colorTypeEraser, 0, intPos,
-														   m_currentStyle.getValue(), currentStyle,
-														   !(m_pencil.getValue() || m_colorType.getValue() == AREAS));
+				m_normalEraser = new RasterStrokeGenerator(
+					raster, ERASE, m_colorTypeEraser, 0, intPos, m_currentStyle.getValue(),
+					currentStyle, !(m_pencil.getValue() || m_colorType.getValue() == AREAS));
 				m_tileSaver->save(m_normalEraser->getLastRect());
-				m_normalEraser->generateLastPieceOfStroke(m_pencil.getValue() || m_colorType.getValue() == AREAS);
+				m_normalEraser->generateLastPieceOfStroke(m_pencil.getValue() ||
+														  m_colorType.getValue() == AREAS);
 			} else {
 				m_points.clear();
 				m_backupRas = raster->clone();
@@ -847,7 +870,8 @@ void EraserTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e)
 				TPointD center = raster->getCenterD();
 				TThickPoint point(pos + center, m_toolSize.getValue());
 				m_points.push_back(point);
-				m_bluredBrush = new BluredBrush(m_workRas, m_toolSize.getValue(), m_brushPad, false);
+				m_bluredBrush =
+					new BluredBrush(m_workRas, m_toolSize.getValue(), m_brushPad, false);
 
 				TRect bbox = m_bluredBrush->getBoundFromPoints(m_points);
 				m_tileSaver->save(bbox);
@@ -879,7 +903,9 @@ void EraserTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e)
 			m_track.add(TThickPoint(pos, m_thick), pixelSize2);
 			TPointD dpiScale = m_viewer->getDpiScale();
 
-			TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White : TPixel32::Black;
+			TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg
+							   ? TPixel32::White
+							   : TPixel32::Black;
 			tglColor(color);
 
 			getViewer()->startForegroundDrawing();
@@ -938,18 +964,22 @@ void EraserTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e)
 			invalidate(invalidateRect.enlarge(2));
 		}
 		if (m_eraseType.getValue() == NORMALERASE) {
-			if (m_normalEraser && (m_hardness.getValue() == 100 || m_pencil.getValue() || m_colorType.getValue() == AREAS)) {
+			if (m_normalEraser && (m_hardness.getValue() == 100 || m_pencil.getValue() ||
+								   m_colorType.getValue() == AREAS)) {
 				TPointD pp(pos.x, pos.y);
 				TThickPoint intPos;
 				if (m_pencil.getValue() || m_colorType.getValue() == AREAS)
-					intPos = TThickPoint(pp + convert(ti->getRaster()->getCenter()), m_toolSize.getValue());
+					intPos = TThickPoint(pp + convert(ti->getRaster()->getCenter()),
+										 m_toolSize.getValue());
 				else
-					intPos = TThickPoint(pp + convert(ti->getRaster()->getCenter()), m_toolSize.getValue() - 1);
+					intPos = TThickPoint(pp + convert(ti->getRaster()->getCenter()),
+										 m_toolSize.getValue() - 1);
 
 				bool isAdded = m_normalEraser->add(intPos);
 				if (ti && isAdded) {
 					m_tileSaver->save(m_normalEraser->getLastRect());
-					m_normalEraser->generateLastPieceOfStroke(m_pencil.getValue() || m_colorType.getValue() == AREAS);
+					m_normalEraser->generateLastPieceOfStroke(m_pencil.getValue() ||
+															  m_colorType.getValue() == AREAS);
 					std::vector<TThickPoint> brushPoints = m_normalEraser->getPointsSequence();
 					int m = (int)brushPoints.size();
 					std::vector<TThickPoint> points;
@@ -1001,8 +1031,9 @@ void EraserTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e)
 					m_bluredBrush->addArc(m_points[m - 4], old, mid, 1, 1);
 				}
 				m_tileSaver->save(bbox);
-				m_bluredBrush->eraseDrawing(ti->getRaster(), m_backupRas, bbox, m_currentStyle.getValue(),
-											currentStyle, m_colorType.getValue());
+				m_bluredBrush->eraseDrawing(ti->getRaster(), m_backupRas, bbox,
+											m_currentStyle.getValue(), currentStyle,
+											m_colorType.getValue());
 			}
 			invalidate(invalidateRect.enlarge(2) - rasCenter);
 		}
@@ -1011,7 +1042,9 @@ void EraserTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e)
 				return;
 
 			getViewer()->startForegroundDrawing();
-			TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White : TPixel32::Black;
+			TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg
+							   ? TPixel32::White
+							   : TPixel32::Black;
 			tglColor(color);
 			glPushMatrix();
 			tglMultMatrix(getMatrix());
@@ -1039,8 +1072,9 @@ void EraserTool::onImageChanged()
 	if (!xshl || m_level.getPointer() != xshl || (m_selectingRect.isEmpty() && !m_firstStroke))
 		resetMulti();
 	else if (m_firstFrameId == getFrameId())
-		m_firstFrameSelected = false; //nel caso sono passato allo stato 1 e torno all'immagine iniziale, torno allo stato iniziale
-	else {							  //cambio stato.
+		m_firstFrameSelected = false; // nel caso sono passato allo stato 1 e torno all'immagine
+									  // iniziale, torno allo stato iniziale
+	else { // cambio stato.
 		m_firstFrameSelected = true;
 		if (m_eraseType.getValue() != FREEHANDERASE && m_eraseType.getValue() != POLYLINEERASE) {
 			assert(!m_selectingRect.isEmpty());
@@ -1071,7 +1105,8 @@ void EraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e)
 			if (m_multi.getValue()) {
 				TTool::Application *app = TTool::getApplication();
 				if (m_firstFrameSelected) {
-					multiUpdate(m_level, m_firstFrameId, getFrameId(), m_firstRect, m_selectingRect);
+					multiUpdate(m_level, m_firstFrameId, getFrameId(), m_firstRect,
+								m_selectingRect);
 					if (e.isShiftPressed()) {
 						m_firstRect = m_selectingRect;
 						m_firstFrameId = getFrameId();
@@ -1096,7 +1131,8 @@ void EraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e)
 				if (m_invertOption.getValue()) {
 					TUndoManager::manager()->beginBlock();
 					TRectD rect = m_selectingRect;
-					TRectD worldBBox = ToonzImageUtils::convertRasterToWorld(ti->getRaster()->getBounds(), ti);
+					TRectD worldBBox =
+						ToonzImageUtils::convertRasterToWorld(ti->getRaster()->getBounds(), ti);
 					rect *= ToonzImageUtils::convertRasterToWorld(ti->getSavebox(), ti);
 
 					TRectD rect01 = TRectD(worldBBox.getP00(), TPointD(rect.x0, worldBBox.y1));
@@ -1111,7 +1147,8 @@ void EraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e)
 					if (rect03.getLx() > 0 && rect03.getLy() > 0)
 						update(ti, rect03, simLevel, false, frameId);
 
-					TRectD rect04 = TRectD(TPointD(rect.x1, worldBBox.y0), TPointD(worldBBox.x1, worldBBox.y1));
+					TRectD rect04 =
+						TRectD(TPointD(rect.x1, worldBBox.y0), TPointD(worldBBox.x1, worldBBox.y1));
 					if (rect04.getLx() > 0 && rect04.getLy() > 0)
 						update(ti, rect04, simLevel, false, frameId);
 					TUndoManager::manager()->endBlock();
@@ -1135,11 +1172,12 @@ void EraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e)
 			/*--Erase中にフレームが動いても、クリック時のFidに対してUndoを記録する--*/
 			TFrameId frameId = m_workingFrameId.isEmptyFrame() ? getCurrentFid() : m_workingFrameId;
 
-			if (m_normalEraser && (m_hardness.getValue() == 100 || m_pencil.getValue() || m_colorType.getValue() == AREAS)) {
-				TUndoManager::manager()->add(new RasterEraserUndo(m_tileSet, m_normalEraser->getPointsSequence(),
-																  m_colorTypeEraser, 0, m_normalEraser->isSelective(), currentStyle,
-																  simLevel.getPointer(), frameId,
-																  (m_pencil.getValue() || m_colorType.getValue() == AREAS)));
+			if (m_normalEraser && (m_hardness.getValue() == 100 || m_pencil.getValue() ||
+								   m_colorType.getValue() == AREAS)) {
+				TUndoManager::manager()->add(new RasterEraserUndo(
+					m_tileSet, m_normalEraser->getPointsSequence(), m_colorTypeEraser, 0,
+					m_normalEraser->isSelective(), currentStyle, simLevel.getPointer(), frameId,
+					(m_pencil.getValue() || m_colorType.getValue() == AREAS)));
 				app->getCurrentTool()->getTool()->notifyImageChanged(frameId);
 				app->getCurrentXsheet()->notifyXsheetChanged();
 				delete m_normalEraser;
@@ -1157,8 +1195,9 @@ void EraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e)
 					TRect bbox = m_bluredBrush->getBoundFromPoints(points);
 					m_tileSaver->save(bbox);
 					m_bluredBrush->addArc(points[0], points[1], points[2], 1, 1);
-					m_bluredBrush->eraseDrawing(ti->getRaster(), m_backupRas, bbox, m_currentStyle.getValue(),
-												currentStyle, m_colorType.getValue());
+					m_bluredBrush->eraseDrawing(ti->getRaster(), m_backupRas, bbox,
+												m_currentStyle.getValue(), currentStyle,
+												m_colorType.getValue());
 					TRectD invalidateRect = ToolUtils::getBounds(points, m_toolSize.getValue());
 					invalidate(invalidateRect.enlarge(2) - rasCenter);
 				}
@@ -1167,9 +1206,10 @@ void EraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e)
 				m_workRas = TRaster32P();
 				delete m_bluredBrush;
 				m_bluredBrush = 0;
-				TUndoManager::manager()->add(new RasterBluredEraserUndo(m_tileSet, m_points,
-																		currentStyle, m_currentStyle.getValue(), simLevel.getPointer(),
-																		frameId, m_toolSize.getValue(), m_hardness.getValue() * 0.01, m_colorType.getValue()));
+				TUndoManager::manager()->add(new RasterBluredEraserUndo(
+					m_tileSet, m_points, currentStyle, m_currentStyle.getValue(),
+					simLevel.getPointer(), frameId, m_toolSize.getValue(),
+					m_hardness.getValue() * 0.01, m_colorType.getValue()));
 			}
 			delete m_tileSaver;
 			m_tileSaver = 0;
@@ -1196,7 +1236,7 @@ void EraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e)
 
 			TTool::Application *app = TTool::getApplication();
 			int styleId = app->getCurrentLevelStyleIndex();
-			if (m_multi.getValue()) //stroke multi
+			if (m_multi.getValue()) // stroke multi
 			{
 				if (m_firstFrameSelected) {
 					TFrameId tmp = getFrameId();
@@ -1221,14 +1261,14 @@ void EraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e)
 						resetMulti();
 						delete stroke;
 					}
-				} else //primo frame
+				} else // primo frame
 				{
 					m_firstStroke = stroke;
 					m_isXsheetCell = app->getCurrentFrame()->isEditingScene();
 					m_currCell = std::pair<int, int>(getColumnIndex(), getFrame());
 					invalidate(m_firstStroke->getBBox().enlarge(2));
 				}
-			} else //stroke non multi
+			} else // stroke non multi
 			{
 				if (!getImage(true))
 					return;
@@ -1277,7 +1317,7 @@ void EraserTool::leftButtonDoubleClick(const TPointD &pos, const TMouseEvent &e)
 	assert(stroke->getPoint(0) == stroke->getPoint(1));
 
 	int styleId = app->getCurrentLevelStyleIndex();
-	if (m_multi.getValue()) //stroke multi
+	if (m_multi.getValue()) // stroke multi
 	{
 		if (m_firstFrameSelected) {
 			TFrameId tmp = getFrameId();
@@ -1301,7 +1341,7 @@ void EraserTool::leftButtonDoubleClick(const TPointD &pos, const TMouseEvent &e)
 				resetMulti();
 				delete stroke;
 			}
-		} else //primo frame
+		} else // primo frame
 		{
 			m_firstStroke = stroke;
 			m_isXsheetCell = app->getCurrentFrame()->isEditingScene();
@@ -1316,7 +1356,8 @@ void EraserTool::leftButtonDoubleClick(const TPointD &pos, const TMouseEvent &e)
 		TFrameId frameId = getFrameId();
 		TToonzImageP ti = (TToonzImageP)getImage(true);
 		eraseStroke(ti, stroke, m_eraseType.getValue(), m_colorType.getValue(),
-					m_invertOption.getValue(), m_currentStyle.getValue(), styleId, simLevel, frameId);
+					m_invertOption.getValue(), m_currentStyle.getValue(), styleId, simLevel,
+					frameId);
 		notifyImageChanged();
 		if (m_invertOption.getValue())
 			invalidate();
@@ -1459,9 +1500,7 @@ void EraserTool::onEnter()
 	//  getApplication()->editImage();
 	m_cleanerSize = m_toolSize.getValue();
 	TTool::Application *app = TTool::getApplication();
-	m_level = app->getCurrentLevel()->getLevel()
-				  ? app->getCurrentLevel()->getSimpleLevel()
-				  : 0;
+	m_level = app->getCurrentLevel()->getLevel() ? app->getCurrentLevel()->getSimpleLevel() : 0;
 }
 
 //----------------------------------------------------------------------
@@ -1537,9 +1576,9 @@ void EraserTool::multiAreaEraser(const TXshSimpleLevelP &sl, TFrameId &firstFid,
 
 //-------------------------------------------------------------------------------------------------
 
-void EraserTool::doMultiEraser(const TImageP &img, double t,
-							   const TXshSimpleLevelP &sl, const TFrameId &fid,
-							   const TVectorImageP &firstImage, const TVectorImageP &lastImage)
+void EraserTool::doMultiEraser(const TImageP &img, double t, const TXshSimpleLevelP &sl,
+							   const TFrameId &fid, const TVectorImageP &firstImage,
+							   const TVectorImageP &lastImage)
 {
 	//  ColorController::instance()->switchToLevelPalette();
 	int styleId = TTool::getApplication()->getCurrentLevelStyleIndex();
@@ -1583,15 +1622,12 @@ void EraserTool::storeUndoAndRefresh()
 		m_firstStroke = 0;
 	}
 	if (m_normalEraser) {
-		TUndoManager::manager()->add(new RasterEraserUndo(m_tileSet,
-														  m_normalEraser->getPointsSequence(),
-														  m_colorTypeEraser,
-														  0,
-														  m_normalEraser->isSelective(),
-														  TTool::getApplication()->getCurrentLevelStyleIndex(),
-														  TTool::getApplication()->getCurrentLevel()->getLevel()->getSimpleLevel(),
-														  m_workingFrameId.isEmptyFrame() ? getCurrentFid() : m_workingFrameId,
-														  (m_pencil.getValue() || m_colorType.getValue() == AREAS)));
+		TUndoManager::manager()->add(new RasterEraserUndo(
+			m_tileSet, m_normalEraser->getPointsSequence(), m_colorTypeEraser, 0,
+			m_normalEraser->isSelective(), TTool::getApplication()->getCurrentLevelStyleIndex(),
+			TTool::getApplication()->getCurrentLevel()->getLevel()->getSimpleLevel(),
+			m_workingFrameId.isEmptyFrame() ? getCurrentFid() : m_workingFrameId,
+			(m_pencil.getValue() || m_colorType.getValue() == AREAS)));
 		delete m_normalEraser;
 		m_normalEraser = 0;
 	}
@@ -1600,14 +1636,12 @@ void EraserTool::storeUndoAndRefresh()
 		m_workRas = TRaster32P();
 		delete m_bluredBrush;
 		m_bluredBrush = 0;
-		TUndoManager::manager()->add(new RasterBluredEraserUndo(m_tileSet, m_points,
-																TTool::getApplication()->getCurrentLevelStyleIndex(),
-																m_currentStyle.getValue(),
-																TTool::getApplication()->getCurrentLevel()->getLevel()->getSimpleLevel(),
-																m_workingFrameId.isEmptyFrame() ? getCurrentFid() : m_workingFrameId,
-																m_toolSize.getValue(),
-																m_hardness.getValue() * 0.01,
-																m_colorType.getValue()));
+		TUndoManager::manager()->add(new RasterBluredEraserUndo(
+			m_tileSet, m_points, TTool::getApplication()->getCurrentLevelStyleIndex(),
+			m_currentStyle.getValue(),
+			TTool::getApplication()->getCurrentLevel()->getLevel()->getSimpleLevel(),
+			m_workingFrameId.isEmptyFrame() ? getCurrentFid() : m_workingFrameId,
+			m_toolSize.getValue(), m_hardness.getValue() * 0.01, m_colorType.getValue()));
 	}
 	if (m_tileSaver) {
 		delete m_tileSaver;
@@ -1638,4 +1672,4 @@ bool EraserTool::isPencilModeActive()
 	return m_eraseType.getValue() == NORMALERASE && m_pencil.getValue();
 }
 
-} //namespace
+} // namespace

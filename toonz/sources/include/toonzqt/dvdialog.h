@@ -63,40 +63,27 @@ void DVAPI MsgBoxInPopup(MsgType type, const QString &text);
 // 2 = secondo bottone da sx premuto
 // 3 = terzo bottone da sx premuto
 
-int DVAPI MsgBox(MsgType type,
-				 const QString &text,
-				 const std::vector<QString> &buttons,
-				 int defaultButtonIndex = 0,
-				 QWidget *parent = 0);
+int DVAPI MsgBox(MsgType type, const QString &text, const std::vector<QString> &buttons,
+				 int defaultButtonIndex = 0, QWidget *parent = 0);
 
 // QUESTION: due bottoni user defined
-int DVAPI MsgBox(const QString &text,
-				 const QString &button1,
-				 const QString &button2,
-				 int defaultButtonIndex = 0,
-				 QWidget *parent = 0);
+int DVAPI MsgBox(const QString &text, const QString &button1, const QString &button2,
+				 int defaultButtonIndex = 0, QWidget *parent = 0);
 
 // QUESTION: tre bottoni user defined
-int DVAPI MsgBox(const QString &text,
-				 const QString &button1,
-				 const QString &button2,
-				 const QString &button3,
-				 int defaultButtonIndex = 0,
-				 QWidget *parent = 0);
+int DVAPI MsgBox(const QString &text, const QString &button1, const QString &button2,
+				 const QString &button3, int defaultButtonIndex = 0, QWidget *parent = 0);
 
-Dialog DVAPI *createMsgBox(MsgType type,
-						   const QString &text,
-						   const QStringList &buttons,
-						   int defaultButtonIndex,
-						   QWidget *parent = 0);
+Dialog DVAPI *createMsgBox(MsgType type, const QString &text, const QStringList &buttons,
+						   int defaultButtonIndex, QWidget *parent = 0);
 
-//void DVAPI error(const QString &msg);
-//void DVAPI info(const QString &msg);
+// void DVAPI error(const QString &msg);
+// void DVAPI info(const QString &msg);
 
 //-----------------------------------------------------------------------------
 
-QString DVAPI getText(const QString &title, const QString &label,
-					  const QString &text = QString(), bool *ok = 0);
+QString DVAPI getText(const QString &title, const QString &label, const QString &text = QString(),
+					  bool *ok = 0);
 
 //=============================================================================
 /*! \brief The Separator class provides a separator.
@@ -113,7 +100,7 @@ QString DVAPI getText(const QString &title, const QString &label,
 		To add a separator to DV dialog \b Dialog you must create a new Separator
 		and recall \b Dialog::addWidget(), or recall \b Dialog::addSeparator().
 
-		\b Example: in a DV dialog \b Dialog 
+		\b Example: in a DV dialog \b Dialog
 		\code
 			Separator* exampleNameAndLine = new Separator(QString("Example Name"));
 			addWidget(exampleNameAndLine);
@@ -135,7 +122,7 @@ class DVAPI Separator : public QFrame
 	QString m_name;
 	bool m_isHorizontal;
 
-public:
+  public:
 	Separator(QString name = "", QWidget *parent = 0);
 	~Separator();
 
@@ -151,7 +138,7 @@ public:
 	/*!	Return true if saparator orientation is horizontal, false otherwise. */
 	bool isHorizontal() { return m_isHorizontal; }
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *event);
 };
 
@@ -168,13 +155,13 @@ class DVAPI Dialog : public QDialog
 	// sull'addButtonBarWidget(). cfr filebrowserpopup.cpp.
 	// Dobbiamo discutere di Dialog.
 
-protected:
+  protected:
 	QHBoxLayout *m_buttonLayout;
 	QList<QLabel *> m_labelList;
 	void resizeEvent(QResizeEvent *e);
 	void moveEvent(QMoveEvent *e);
 
-public:
+  public:
 	QVBoxLayout *m_topLayout;
 	QFrame *m_mainFrame, *m_buttonFrame;
 
@@ -190,9 +177,10 @@ public:
 
 	std::vector<QWidget *> m_buttonBarWidgets;
 
-public:
-	//if 'name' is not empty, the dialog will remember its geometry between Toonz sessions
-	Dialog(QWidget *parent = 0, bool hasButton = false, bool hasFixedSize = true, const QString &name = QString());
+  public:
+	// if 'name' is not empty, the dialog will remember its geometry between Toonz sessions
+	Dialog(QWidget *parent = 0, bool hasButton = false, bool hasFixedSize = true,
+		   const QString &name = QString());
 	~Dialog();
 
 	void beginVLayout();
@@ -234,15 +222,15 @@ public:
 	virtual void hideEvent(QHideEvent *event);
 
 	void clearButtonBar();
-signals:
+  signals:
 	void dialogClosed();
 };
 
 //-----------------------------------------------------------------------------
 /*! Is a modal dialog with exclusive list of radio button.
-    Exec value depend to checked button.
-    0 -> Cancel or Close Popup,
-    1,2,3,... -> checkbox clicked.
+	Exec value depend to checked button.
+	0 -> Cancel or Close Popup,
+	1,2,3,... -> checkbox clicked.
 */
 class DVAPI RadioButtonDialog : public DVGui::Dialog
 {
@@ -250,11 +238,11 @@ class DVAPI RadioButtonDialog : public DVGui::Dialog
 
 	int m_result;
 
-public:
+  public:
 	RadioButtonDialog(const QString &labelText, const QList<QString> &radioButtonList,
 					  QWidget *parent = 0, Qt::WindowFlags f = 0);
 
-public Q_SLOTS:
+  public Q_SLOTS:
 	void onButtonClicked(int id);
 	void onCancel();
 	void onApply();
@@ -262,8 +250,8 @@ public Q_SLOTS:
 
 //-----------------------------------------------------------------------------
 
-int DVAPI RadioButtonMsgBox(MsgType type, const QString &labelText,
-							const QList<QString> &buttons, QWidget *parent = 0);
+int DVAPI RadioButtonMsgBox(MsgType type, const QString &labelText, const QList<QString> &buttons,
+							QWidget *parent = 0);
 
 //-----------------------------------------------------------------------------
 
@@ -275,12 +263,12 @@ class DVAPI ProgressDialog : public DVGui::Dialog
 	QProgressBar *m_progressBar;
 	QPushButton *m_cancelButton;
 
-protected:
+  protected:
 	bool m_isCanceled;
 
-public:
-	ProgressDialog(const QString &labelText, const QString &cancelButtonText,
-				   int minimum, int maximum, QWidget *parent = 0, Qt::WindowFlags f = 0);
+  public:
+	ProgressDialog(const QString &labelText, const QString &cancelButtonText, int minimum,
+				   int maximum, QWidget *parent = 0, Qt::WindowFlags f = 0);
 
 	void setLabelText(const QString &text);
 	void setCancelButton(QPushButton *cancelButton);
@@ -296,7 +284,7 @@ public:
 
 	bool wasCanceled() const;
 
-public Q_SLOTS:
+  public Q_SLOTS:
 	void setValue(int progress);
 	virtual void onCancel();
 
@@ -309,18 +297,22 @@ public Q_SLOTS:
 					 0 if press cancel or close popup.
 	  If newPalette != 0 verify if styles to erase are in new palette before send question.
 */
-int eraseStylesInDemand(TPalette *palette, const TXsheetHandle *xsheetHandle, TPalette *newPalette = 0);
+int eraseStylesInDemand(TPalette *palette, const TXsheetHandle *xsheetHandle,
+						TPalette *newPalette = 0);
 
-int eraseStylesInDemand(TPalette *palette, std::vector<int> styleIds, const TXsheetHandle *xsheetHandle);
-
-//-----------------------------------------------------------------------------
-
-void DVAPI featureNotAvelaible(QString applicationName = QString("Toonz Bravo Web"), QString url = QString("http://www.bravo.toonz.com"));
-
-void DVAPI requestTrialLicense(QString url = QString("http://www.toonz.com"), QString mail = QString("license@toonz.com"));
+int eraseStylesInDemand(TPalette *palette, std::vector<int> styleIds,
+						const TXsheetHandle *xsheetHandle);
 
 //-----------------------------------------------------------------------------
-} //namespace DVGui
+
+void DVAPI featureNotAvelaible(QString applicationName = QString("Toonz Bravo Web"),
+							   QString url = QString("http://www.bravo.toonz.com"));
+
+void DVAPI requestTrialLicense(QString url = QString("http://www.toonz.com"),
+							   QString mail = QString("license@toonz.com"));
+
+//-----------------------------------------------------------------------------
+} // namespace DVGui
 //-----------------------------------------------------------------------------
 
 #endif // DVDIALOG_INCLUDED

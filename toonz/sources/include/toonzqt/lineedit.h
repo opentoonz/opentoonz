@@ -35,7 +35,7 @@ class DVAPI LineEdit : public QLineEdit
 	bool m_isReturnPressed;
 	bool m_forbiddenSpecialChars;
 
-public:
+  public:
 	LineEdit(QWidget *parent = 0, bool forbiddenSpecialChars = false);
 	LineEdit(const QString &contents, QWidget *parent = 0, bool forbiddenSpecialChars = false);
 
@@ -43,16 +43,16 @@ public:
 
 	~LineEdit() {}
 
-protected:
+  protected:
 	void focusInEvent(QFocusEvent *event);
 	void keyPressEvent(QKeyEvent *event);
 
-signals:
+  signals:
 	void focusIn();
 };
 
 //-----------------------------------------------------------------------------
-} //namespace DVGui
+} // namespace DVGui
 //-----------------------------------------------------------------------------
 
 #endif // LINEEDIT_H

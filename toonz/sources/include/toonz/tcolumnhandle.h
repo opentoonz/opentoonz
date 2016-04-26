@@ -30,7 +30,7 @@ class DVAPI TColumnHandle : public QObject
 	TXshColumn *m_column;
 	int m_columnIndex;
 
-public:
+  public:
 	TColumnHandle();
 	~TColumnHandle();
 
@@ -40,9 +40,9 @@ public:
 	int getColumnIndex() const { return m_columnIndex; }
 	void setColumnIndex(int index);
 
-signals:
+  signals:
 
 	void columnIndexSwitched();
 };
 
-#endif //TCOLUMNHANDLE_H
+#endif // TCOLUMNHANDLE_H

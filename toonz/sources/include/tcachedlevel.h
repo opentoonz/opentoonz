@@ -45,13 +45,13 @@ public:
   bool isCached(int starFrame, int endFrame) const  = 0; // estremi compresi
 
   virtual void putRaster(int frame, const TRasterP &ras) = 0;
-  
+
   virtual void getRaster(int frame, TRaster32P  &ras) const
-    { getRaster(frame, TRasterP(ras)); }
+	{ getRaster(frame, TRasterP(ras)); }
   virtual void getRaster(int frame, TRaster64P  &ras) const
-    { getRaster(frame, TRasterP(ras)); }
+	{ getRaster(frame, TRasterP(ras)); }
   virtual void getRaster(int frame, TRasterYUV422P &ras) const
-    { getRaster(frame, TRasterP(ras)); }
+	{ getRaster(frame, TRasterP(ras)); }
 
   void invalidateAll() = 0;
   void invalidate(int starFrame, int endFrame) = 0; // estremi compresi
@@ -106,7 +106,7 @@ public:
 
 
 
-void TRAMUncompressedCache::getRaster(int frame, TRasterP &ras) 
+void TRAMUncompressedCache::getRaster(int frame, TRasterP &ras)
 {
 TRaster32P ras32(ras.getSize());
 getRaster(frame, ras32);
@@ -126,7 +126,7 @@ void TRAMUncompressedCache::getRaster(int frame, TRaster32P  &ras) const
 
 class DVAPI TRasterCache
 {
-public:
+  public:
 	TRasterCache(TCachePersist *cp);
 	virtual ~TRasterCache();
 
@@ -152,11 +152,11 @@ public:
 
 	TUINT64 getUsedSpace();
 
-protected:
+  protected:
 	//  virtual TRasterP doGetRaster(int frame) = 0;
 	//  virtual void doPutRaster(int frame, const TRasterP &ras) = 0;
 
-private:
+  private:
 	class Data;
 	Data *m_data;
 };
@@ -165,7 +165,7 @@ private:
 
 class DVAPI TCachePersist
 {
-public:
+  public:
 	TCachePersist(TRasterCodec *codec) : m_codec(codec) {}
 	virtual ~TCachePersist() {}
 
@@ -183,13 +183,13 @@ public:
 
 	virtual TUINT64 getUsedSpace() = 0;
 
-	//private:
+	// private:
 	TRasterCodec *m_codec;
 };
 
 class DVAPI TRamCachePersist : public TCachePersist
 {
-public:
+  public:
 	TRamCachePersist(TRasterCodec *codec);
 	~TRamCachePersist();
 
@@ -202,13 +202,13 @@ public:
 
 	TUINT64 getUsedSpace();
 
-private:
+  private:
 	TRasterP doGetRaster(int frame);
 	bool doGetRaster(int frame, TRaster32P &ras) const;
 
 	bool doPutRaster(int frame, const TRasterP &ras);
 
-private:
+  private:
 	class Imp;
 	Imp *m_imp;
 };
@@ -217,7 +217,7 @@ private:
 
 class DVAPI TDiskCachePersist : public TCachePersist
 {
-public:
+  public:
 	TDiskCachePersist(TRasterCodec *codec, const TFilePath &fullpath);
 	~TDiskCachePersist();
 
@@ -230,13 +230,13 @@ public:
 
 	TUINT64 getUsedSpace();
 
-private:
+  private:
 	TRasterP doGetRaster(int frame);
 	bool doGetRaster(int frame, TRaster32P &ras) const;
 
 	bool doPutRaster(int frame, const TRasterP &ras);
 
-private:
+  private:
 	class Imp;
 	Imp *m_imp;
 };
@@ -246,7 +246,7 @@ private:
 
 class DVAPI TDiskCachePersist2 : public TCachePersist
 {
-public:
+  public:
 	TDiskCachePersist2(TRasterCodec *codec, const TFilePath &fullpath);
 	~TDiskCachePersist2();
 
@@ -259,13 +259,13 @@ public:
 
 	TUINT64 getUsedSpace();
 
-private:
+  private:
 	TRasterP doGetRaster(int frame);
 	bool doGetRaster(int frame, TRaster32P &ras) const;
 
 	bool doPutRaster(int frame, const TRasterP &ras);
 
-private:
+  private:
 	class Imp;
 	Imp *m_imp;
 };
@@ -274,7 +274,7 @@ private:
 
 class DVAPI TCompressedLevel
 {
-public:
+  public:
 	TCompressedLevel(const TFilePath &fullpath);
 	~TCompressedLevel();
 	void setSize(TDimension d);
@@ -283,14 +283,13 @@ public:
 	void invalidate(int frame);
 	void invalidateAll();
 
-private:
-	TCompressedLevel(); //not implemented
+  private:
+	TCompressedLevel(); // not implemented
 
 	TFilePath m_fullpath;
 	TRawDataCodec *m_codec;
 
-	int m_viewFrameMin,
-		m_viewFrameMax;
+	int m_viewFrameMin, m_viewFrameMax;
 
 #ifdef _WIN32
 	HANDLE m_hFile, m_hMap;

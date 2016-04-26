@@ -24,9 +24,10 @@ class PerlinNoiseFx : public TStandardRasterFx
 	TDoubleParamP m_intensity;
 	TBoolParamP m_matte;
 
-public:
+  public:
 	PerlinNoiseFx()
-		: m_type(new TIntEnumParam(PNOISE_CLOUDS, "Clouds")), m_size(100.0), m_min(0.0), m_max(1.0), m_evol(0.0), m_intensity(40.0), m_offsetx(0.0), m_offsety(0.0), m_matte(1.0)
+		: m_type(new TIntEnumParam(PNOISE_CLOUDS, "Clouds")), m_size(100.0), m_min(0.0), m_max(1.0),
+		  m_evol(0.0), m_intensity(40.0), m_offsetx(0.0), m_offsety(0.0), m_matte(1.0)
 	{
 		m_offsetx->setMeasureName("fxLength");
 		m_offsety->setMeasureName("fxLength");
@@ -58,19 +59,13 @@ public:
 		}
 	}
 
-	void transform(double frame,
-				   int port,
-				   const TRectD &rectOnOutput,
-				   const TRenderSettings &infoOnOutput,
-				   TRectD &rectOnInput,
+	void transform(double frame, int port, const TRectD &rectOnOutput,
+				   const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
 				   TRenderSettings &infoOnInput);
 
 	void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
 	int getMemoryRequirement(const TRectD &rect, double frame, const TRenderSettings &info);
-	bool canHandle(const TRenderSettings &info, double frame)
-	{
-		return false;
-	}
+	bool canHandle(const TRenderSettings &info, double frame) { return false; }
 
 	void getParamUIs(TParamUIConcept *&concepts, int &length)
 	{
@@ -86,8 +81,8 @@ public:
 //==============================================================================
 template <typename PIXEL, typename CHANNEL_TYPE>
 void doPerlinNoise(const TRasterPT<PIXEL> &rasOut, const TRasterPT<PIXEL> &rasIn, TPointD &tilepos,
-				   double evolution, double size, double min, double max,
-				   double offsetx, double offsety, int type, int brad, int matte, double scale)
+				   double evolution, double size, double min, double max, double offsetx,
+				   double offsety, int type, int brad, int matte, double scale)
 {
 	PerlinNoise Noise;
 	rasOut->lock();
@@ -104,7 +99,8 @@ void doPerlinNoise(const TRasterPT<PIXEL> &rasOut, const TRasterPT<PIXEL> &rasIn
 			pos.y += j;
 			while (pixout < endPixOut) {
 				TPointD posAff = aff * pos;
-				double pnoise = Noise.Turbolence(posAff.x + offsetx, posAff.y + offsety, evolution, size, min, max);
+				double pnoise = Noise.Turbolence(posAff.x + offsetx, posAff.y + offsety, evolution,
+												 size, min, max);
 				int sval = (int)(brad * (pnoise - 0.5));
 				int pixshift = sval + rasIn->getWrap() * (sval);
 				pos.x += 1.0;
@@ -133,8 +129,10 @@ void doPerlinNoise(const TRasterPT<PIXEL> &rasOut, const TRasterPT<PIXEL> &rasIn
 			pos.y += j;
 			while (pixout < endPixOut) {
 				TPointD posAff = aff * pos;
-				double pnoisex = Noise.Marble(posAff.x + offsetx, posAff.y + offsety, evolution, size, min, max);
-				double pnoisey = Noise.Marble(posAff.x + offsetx, posAff.y + offsety, evolution + 100, size, min, max);
+				double pnoisex =
+					Noise.Marble(posAff.x + offsetx, posAff.y + offsety, evolution, size, min, max);
+				double pnoisey = Noise.Marble(posAff.x + offsetx, posAff.y + offsety,
+											  evolution + 100, size, min, max);
 				int svalx = (int)(brad * (pnoisex - 0.5));
 				int svaly = (int)(brad * (pnoisey - 0.5));
 				int pixshift = svalx + rasIn->getWrap() * (svaly);
@@ -160,13 +158,9 @@ void doPerlinNoise(const TRasterPT<PIXEL> &rasOut, const TRasterPT<PIXEL> &rasIn
 
 //==============================================================================
 
-void PerlinNoiseFx::transform(
-	double frame,
-	int port,
-	const TRectD &rectOnOutput,
-	const TRenderSettings &infoOnOutput,
-	TRectD &rectOnInput,
-	TRenderSettings &infoOnInput)
+void PerlinNoiseFx::transform(double frame, int port, const TRectD &rectOnOutput,
+							  const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
+							  TRenderSettings &infoOnInput)
 {
 	infoOnInput = infoOnOutput;
 	TRectD rectOut(rectOnOutput);
@@ -187,10 +181,7 @@ void PerlinNoiseFx::transform(
 
 //==============================================================================
 
-void PerlinNoiseFx::doCompute(
-	TTile &tile,
-	double frame,
-	const TRenderSettings &ri)
+void PerlinNoiseFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 {
 	if (!m_input.isConnected())
 		return;
@@ -223,8 +214,7 @@ void PerlinNoiseFx::doCompute(
 	int rasInLy = tround(rectIn.getLy());
 
 	TTile tileIn;
-	m_input->allocateAndCompute(tileIn, rectIn.getP00(),
-								TDimension(rasInLx, rasInLy),
+	m_input->allocateAndCompute(tileIn, rectIn.getP00(), TDimension(rasInLx, rasInLy),
 								tile.getRaster(), frame, ri);
 
 	TPointD pos = tile.m_pos;
@@ -233,15 +223,14 @@ void PerlinNoiseFx::doCompute(
 	TRaster32P rasIn = tileIn.getRaster();
 
 	if (rasOut)
-		doPerlinNoise<TPixel32, UCHAR>(rasOut, rasIn, pos, evolution, size, min, max,
-									   offsetx, offsety,
-									   type, brad, matte, scale);
+		doPerlinNoise<TPixel32, UCHAR>(rasOut, rasIn, pos, evolution, size, min, max, offsetx,
+									   offsety, type, brad, matte, scale);
 	else {
 		TRaster64P rasOut = tile.getRaster();
 		TRaster64P rasIn = tileIn.getRaster();
 		if (rasOut)
-			doPerlinNoise<TPixel64, USHORT>(rasOut, rasIn, pos, evolution, size, min, max,
-											offsetx, offsety, type, brad, matte, scale);
+			doPerlinNoise<TPixel64, USHORT>(rasOut, rasIn, pos, evolution, size, min, max, offsetx,
+											offsety, type, brad, matte, scale);
 		else
 			throw TException("Brightness&Contrast: unsupported Pixel Type");
 	}
@@ -249,7 +238,8 @@ void PerlinNoiseFx::doCompute(
 
 //------------------------------------------------------------------
 
-int PerlinNoiseFx::getMemoryRequirement(const TRectD &rect, double frame, const TRenderSettings &info)
+int PerlinNoiseFx::getMemoryRequirement(const TRectD &rect, double frame,
+										const TRenderSettings &info)
 {
 	double scale = sqrt(fabs(info.m_affine.det()));
 	int brad = (int)m_intensity->getValue(frame) * scale;

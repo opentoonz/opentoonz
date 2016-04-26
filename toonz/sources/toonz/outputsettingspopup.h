@@ -58,16 +58,16 @@ class OutputSettingsPopup : public DVGui::Dialog
 
 	void updatePresetComboItems();
 
-public:
+  public:
 	OutputSettingsPopup(bool isPreview = false);
 
-protected:
+  protected:
 	ToonzScene *getCurrentScene() const;
 	TOutputProperties *getProperties() const;
 	void showEvent(QShowEvent *);
 	void hideEvent(QHideEvent *);
 
-protected slots:
+  protected slots:
 
 	void updateField();
 	void onPathChanged();
@@ -101,7 +101,7 @@ protected slots:
 
 class PreviewSettingsPopup : public OutputSettingsPopup
 {
-public:
+  public:
 	PreviewSettingsPopup() : OutputSettingsPopup(true) {}
 };
 

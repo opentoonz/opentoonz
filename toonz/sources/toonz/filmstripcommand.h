@@ -45,17 +45,10 @@ void moveToScene(TXshSimpleLevel *sl);
 void moveToScene(TXshPaletteLevel *pl);
 void moveToScene(TXshSoundLevel *sl);
 
-enum InbetweenInterpolation { II_Linear,
-							  II_EaseIn,
-							  II_EaseOut,
-							  II_EaseInOut };
-void inbetweenWithoutUndo(TXshSimpleLevel *sl,
-						  const TFrameId &fid0,
-						  const TFrameId &fid1,
+enum InbetweenInterpolation { II_Linear, II_EaseIn, II_EaseOut, II_EaseInOut };
+void inbetweenWithoutUndo(TXshSimpleLevel *sl, const TFrameId &fid0, const TFrameId &fid1,
 						  InbetweenInterpolation interpolation);
-void inbetween(TXshSimpleLevel *sl,
-			   const TFrameId &fid0,
-			   const TFrameId &fid1,
+void inbetween(TXshSimpleLevel *sl, const TFrameId &fid0, const TFrameId &fid1,
 			   InbetweenInterpolation interpolation);
 
 void renumberDrawing(TXshSimpleLevel *sl, const TFrameId &oldFid, const TFrameId &desiredNewFid);

@@ -63,7 +63,7 @@ class DVAPI ParamField : public QWidget
 {
 	Q_OBJECT
 
-protected:
+  protected:
 	QHBoxLayout *m_layout;
 	QString m_paramName;
 
@@ -71,7 +71,7 @@ protected:
 	QString m_interfaceName;
 	QString m_description;
 
-public:
+  public:
 	ParamField(QWidget *parent, QString paramName, const TParamP &param, bool addEmptyLabel = true);
 	~ParamField();
 
@@ -92,7 +92,7 @@ public:
 	static void setFxHandle(TFxHandle *fxHandle);
 
 	virtual void setPrecision(int precision) {}
-signals:
+  signals:
 	void currentParamChanged();
 	void actualParamChanged();
 	void paramKeyToggle();
@@ -106,19 +106,14 @@ class DVAPI ParamFieldKeyToggle : public QWidget
 {
 	Q_OBJECT
 
-public:
-	enum Status {
-		NOT_ANIMATED,
-		NOT_KEYFRAME,
-		MODIFIED,
-		KEYFRAME
-	};
+  public:
+	enum Status { NOT_ANIMATED, NOT_KEYFRAME, MODIFIED, KEYFRAME };
 
-private:
+  private:
 	Status m_status;
 	bool m_highlighted;
 
-public:
+  public:
 	ParamFieldKeyToggle(QWidget *parent, std::string name = "ParamFieldKeyToggle");
 
 	void setStatus(Status status);
@@ -126,21 +121,20 @@ public:
 
 	void setStatus(bool hasKeyframe, bool isKeyframe, bool hasBeenChanged);
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *);
 	void mousePressEvent(QMouseEvent *);
 	void enterEvent(QEvent *);
 	void leaveEvent(QEvent *);
 
-signals:
+  signals:
 	void keyToggled();
 };
 
 //=============================================================================
 // FxSettingsKeyToggleUndo
 //=============================================================================
-template <class T, class ParamP>
-class FxSettingsKeyToggleUndo : public TUndo
+template <class T, class ParamP> class FxSettingsKeyToggleUndo : public TUndo
 {
 	TFxHandle *m_fxHandle;
 	QString m_name;
@@ -150,13 +144,15 @@ class FxSettingsKeyToggleUndo : public TUndo
 	ParamP m_param;
 	T m_currentValue;
 
-public:
-	FxSettingsKeyToggleUndo(ParamP param, T currentValue, bool wasKeyFrame, QString name, int frame, TFxHandle *fxHandle)
-		: m_param(param), m_currentValue(currentValue), m_wasKeyframe(wasKeyFrame), m_name(name), m_frame(frame), m_fxHandle(fxHandle)
+  public:
+	FxSettingsKeyToggleUndo(ParamP param, T currentValue, bool wasKeyFrame, QString name, int frame,
+							TFxHandle *fxHandle)
+		: m_param(param), m_currentValue(currentValue), m_wasKeyframe(wasKeyFrame), m_name(name),
+		  m_frame(frame), m_fxHandle(fxHandle)
 	{
 	}
 
-	//void notify();
+	// void notify();
 
 	void undo() const
 	{
@@ -180,14 +176,8 @@ public:
 			m_fxHandle->notifyFxChanged();
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
-	int getHistoryType()
-	{
-		return HistoryType::Fx;
-	}
+	int getSize() const { return sizeof(*this); }
+	int getHistoryType() { return HistoryType::Fx; }
 	QString getHistoryString()
 	{
 		QString str = QObject::tr("Modify Fx Param : %1 Key : %2  Frame %3")
@@ -203,16 +193,16 @@ public:
 // AnimatedParamField
 //-----------------------------------------------------------------------------
 
-template <class T, class ParamP>
-class DVAPI AnimatedParamField : public ParamField
+template <class T, class ParamP> class DVAPI AnimatedParamField : public ParamField
 {
-protected:
+  protected:
 	ParamP m_currentParam, m_actualParam;
 	int m_frame;
 	ParamFieldKeyToggle *m_keyToggle;
 
-public:
-	AnimatedParamField(QWidget *parent, QString name, const ParamP &param, bool addEmptyLabel = true)
+  public:
+	AnimatedParamField(QWidget *parent, QString name, const ParamP &param,
+					   bool addEmptyLabel = true)
 		: ParamField(parent, name, param, addEmptyLabel), m_frame(0)
 	{
 		m_keyToggle = new ParamFieldKeyToggle(this);
@@ -247,7 +237,8 @@ public:
 		T stroke = m_actualParam->getValue(m_frame);
 		T stroke2 = m_currentParam->getValue(m_frame);
 		m_keyToggle->setStatus(m_actualParam->hasKeyframes(), m_actualParam->isKeyframe(m_frame),
-							   m_actualParam->getValue(m_frame) != m_currentParam->getValue(m_frame));
+							   m_actualParam->getValue(m_frame) !=
+								   m_currentParam->getValue(m_frame));
 	}
 
 	/*-- エフェクトの位置パラメータをSwatchViewerでドラッグして編集するときに呼ばれる ---*/
@@ -288,13 +279,9 @@ public:
 		emit actualParamChanged();
 		emit paramKeyToggle();
 
-		TUndoManager::manager()->add(
-			new FxSettingsKeyToggleUndo<T, ParamP>(m_actualParam,
-												   currentVal,
-												   wasKeyFrame,
-												   m_interfaceName,
-												   m_frame,
-												   ParamField::m_fxHandleStat));
+		TUndoManager::manager()->add(new FxSettingsKeyToggleUndo<T, ParamP>(
+			m_actualParam, currentVal, wasKeyFrame, m_interfaceName, m_frame,
+			ParamField::m_fxHandleStat));
 	}
 };
 
@@ -308,14 +295,14 @@ class DVAPI MeasuredDoubleParamField : public AnimatedParamField<double, TDouble
 
 	DVGui::MeasuredDoubleField *m_measuredDoubleField;
 
-public:
+  public:
 	MeasuredDoubleParamField(QWidget *parent, QString name, const TDoubleParamP &param);
 
 	void updateField(double value);
 
 	QSize getPreferedSize() { return QSize(260, 28); }
 
-protected slots:
+  protected slots:
 	void onChange(bool);
 	void onKeyToggled();
 };
@@ -330,7 +317,7 @@ class DVAPI MeasuredRangeParamField : public AnimatedParamField<DoublePair, TRan
 
 	DVGui::MeasuredDoublePairField *m_valueField;
 
-public:
+  public:
 	MeasuredRangeParamField(QWidget *parent, QString name, const TRangeParamP &param);
 
 	void updateField(DoublePair value);
@@ -338,7 +325,7 @@ public:
 	QSize getPreferedSize() { return QSize(300, 20); }
 	void setPrecision(int precision);
 
-protected slots:
+  protected slots:
 	void onChange(bool);
 	void onKeyToggled();
 };
@@ -353,7 +340,7 @@ class DVAPI PointParamField : public AnimatedParamField<TPointD, TPointParamP>
 
 	DVGui::MeasuredDoubleField *m_xFld, *m_yFld;
 
-public:
+  public:
 	PointParamField(QWidget *parent, QString name, const TPointParamP &param);
 
 	void setPointValue(const TPointD &p);
@@ -362,7 +349,7 @@ public:
 
 	QSize getPreferedSize() { return QSize(270, 28); }
 
-protected slots:
+  protected slots:
 	void onChange(bool);
 	void onKeyToggled();
 };
@@ -377,7 +364,7 @@ class DVAPI PixelParamField : public AnimatedParamField<TPixel32, TPixelParamP>
 
 	DVGui::ColorField *m_colorField;
 
-public:
+  public:
 	PixelParamField(QWidget *parent, QString name, const TPixelParamP &param);
 
 	void updateField(TPixel32 value);
@@ -388,10 +375,10 @@ public:
 	TPixel32 getColor();
 	void setColor(TPixel32 value);
 
-protected:
+  protected:
 	void setParams();
 
-protected slots:
+  protected slots:
 	void onChange(const TPixel32 &value, bool isDragging);
 	void onKeyToggled();
 };
@@ -405,10 +392,10 @@ class DVAPI RgbLinkButton : public QPushButton
 	Q_OBJECT
 	PixelParamField *m_field1, *m_field2;
 
-public:
+  public:
 	RgbLinkButton(QString str, QWidget *parent, PixelParamField *field1, PixelParamField *field2);
 
-protected slots:
+  protected slots:
 	void onButtonClicked();
 };
 
@@ -422,7 +409,7 @@ class DVAPI SpectrumParamField : public AnimatedParamField<TSpectrum, TSpectrumP
 
 	DVGui::SpectrumField *m_spectrumField;
 
-public:
+  public:
 	SpectrumParamField(QWidget *parent, QString name, const TSpectrumParamP &param);
 
 	void updateField(TSpectrum value);
@@ -431,7 +418,7 @@ public:
 
 	QSize getPreferedSize() { return QSize(390, 60); }
 
-protected slots:
+  protected slots:
 	void onKeyToggled();
 	void onChange(bool isDragging);
 	void onKeyAdded(int keyIndex);
@@ -449,7 +436,7 @@ class EnumParamField : public ParamField
 	TIntEnumParamP m_currentParam, m_actualParam;
 	QComboBox *m_om;
 
-public:
+  public:
 	EnumParamField(QWidget *parent, QString name, const TIntEnumParamP &param);
 
 	void setParam(const TParamP &current, const TParamP &actual, int frame);
@@ -457,7 +444,7 @@ public:
 
 	QSize getPreferedSize() { return QSize(150, 20); }
 
-protected slots:
+  protected slots:
 	void onChange(const QString &str);
 };
 
@@ -472,7 +459,7 @@ class DVAPI BoolParamField : public ParamField
 	TBoolParamP m_currentParam, m_actualParam;
 	DVGui::CheckBox *m_checkBox;
 
-public:
+  public:
 	BoolParamField(QWidget *parent, QString name, const TBoolParamP &param);
 
 	void setParam(const TParamP &current, const TParamP &actual, int frame);
@@ -480,11 +467,11 @@ public:
 
 	QSize getPreferedSize() { return QSize(20, 10); }
 
-protected slots:
+  protected slots:
 	void onToggled(bool checked);
 
 	/*-- visibleToggle UIで使用する --*/
-signals:
+  signals:
 	void toggled(bool);
 };
 
@@ -500,7 +487,7 @@ class DVAPI IntParamField : public ParamField
 	DVGui::IntField *m_intField;
 	typedef IntParamField This;
 
-public:
+  public:
 	IntParamField(QWidget *parent = 0, QString name = 0, const TIntParamP &param = 0);
 
 	void setParam(const TParamP &current, const TParamP &actual, int frame);
@@ -508,7 +495,7 @@ public:
 
 	QSize getPreferedSize() { return QSize(50, 28); }
 
-protected slots:
+  protected slots:
 	void onChange(bool isDragging = false);
 };
 
@@ -523,14 +510,14 @@ class DVAPI StringParamField : public ParamField
 	TStringParamP m_currentParam, m_actualParam;
 	DVGui::LineEdit *m_textFld;
 
-public:
+  public:
 	StringParamField(QWidget *parent, QString name, const TStringParamP &param);
 
 	void setParam(const TParamP &current, const TParamP &actual, int frame);
 	void update(int frame);
 
 	QSize getPreferedSize() { return QSize(100, 20); }
-protected slots:
+  protected slots:
 	void onChange();
 };
 
@@ -544,7 +531,7 @@ class DVAPI ToneCurveParamField : public AnimatedParamField<const QList<TPointD>
 
 	DVGui::ToneCurveField *m_toneCurveField;
 
-public:
+  public:
 	ToneCurveParamField(QWidget *parent, QString name, const TToneCurveParamP &param);
 
 	void updateField(const QList<TPointD> value);
@@ -553,7 +540,7 @@ public:
 
 	QSize getPreferedSize() { return QSize(400, 380); }
 
-protected slots:
+  protected slots:
 	void onChannelChanged(int);
 
 	void onChange(bool isDragging);
@@ -575,13 +562,13 @@ class DVAPI LineEdit_double : public ParamField
 	TDoubleParamP actual_;
 	QLineEdit *value_;
 
-public:
+  public:
 	LineEdit_double(QWidget *parent, QString name, TDoubleParamP const &param);
 
 	void setParam(TParamP const &current, TParamP const &actual, int frame);
 	void update(int frame);
 
-protected slots:
+  protected slots:
 	void update_value(QString const &text); // could not use MACROs for slots
 };
 
@@ -594,13 +581,13 @@ class DVAPI Slider_double : public ParamField
 	TDoubleParamP actual_;
 	QSlider *value_;
 
-public:
+  public:
 	Slider_double(QWidget *parent, QString name, TDoubleParamP const &param);
 
 	void setParam(TParamP const &current, TParamP const &actual, int frame);
 	void update(int frame);
 
-protected slots:
+  protected slots:
 	void update_value(int);
 };
 
@@ -613,13 +600,13 @@ class DVAPI SpinBox_double : public ParamField
 	TDoubleParamP actual_;
 	QDoubleSpinBox *value_;
 
-public:
+  public:
 	SpinBox_double(QWidget *parent, QString name, TDoubleParamP const &param);
 
 	void setParam(TParamP const &current, TParamP const &actual, int frame);
 	void update(int frame);
 
-protected slots:
+  protected slots:
 	void update_value(double);
 };
 }
@@ -635,13 +622,13 @@ class DVAPI LineEdit_int : public ParamField
 	TIntParamP actual_;
 	QLineEdit *value_;
 
-public:
+  public:
 	LineEdit_int(QWidget *parent, QString name, TIntParamP const &param);
 
 	void setParam(TParamP const &current, TParamP const &actual, int frame);
 	void update(int frame);
 
-protected slots:
+  protected slots:
 	void update_value(QString const &text);
 };
 
@@ -654,13 +641,13 @@ class DVAPI Slider_int : public ParamField
 	TIntParamP actual_;
 	QSlider *value_;
 
-public:
+  public:
 	Slider_int(QWidget *parent, QString name, TIntParamP const &param);
 
 	void setParam(TParamP const &current, TParamP const &actual, int frame);
 	void update(int frame);
 
-protected slots:
+  protected slots:
 	void update_value(int);
 };
 
@@ -673,13 +660,13 @@ class DVAPI SpinBox_int : public ParamField
 	TIntParamP actual_;
 	QSpinBox *value_;
 
-public:
+  public:
 	SpinBox_int(QWidget *parent, QString name, TIntParamP const &param);
 
 	void setParam(TParamP const &current, TParamP const &actual, int frame);
 	void update(int frame);
 
-protected slots:
+  protected slots:
 	void update_value(int);
 };
 
@@ -696,13 +683,13 @@ class DVAPI CheckBox_bool : public ParamField
 	TBoolParamP actual_;
 	QCheckBox *value_;
 
-public:
+  public:
 	CheckBox_bool(QWidget *parent, QString name, TBoolParamP const &param);
 
 	void setParam(TParamP const &current, TParamP const &actual, int frame);
 	void update(int frame);
 
-protected slots:
+  protected slots:
 	void update_value(int);
 };
 
@@ -719,13 +706,13 @@ class DVAPI RadioButton_enum : public ParamField
 	TIntEnumParamP actual_;
 	QButtonGroup *value_;
 
-public:
+  public:
 	RadioButton_enum(QWidget *parent, QString name, TIntEnumParamP const &param);
 
 	void setParam(TParamP const &current, TParamP const &actual, int frame);
 	void update(int frame);
 
-protected slots:
+  protected slots:
 	void update_value(int);
 };
 
@@ -738,13 +725,13 @@ class DVAPI ComboBox_enum : public ParamField
 	TIntEnumParamP actual_;
 	QComboBox *value_;
 
-public:
+  public:
 	ComboBox_enum(QWidget *parent, QString name, TIntEnumParamP const &param);
 
 	void setParam(TParamP const &current, TParamP const &actual, int frame);
 	void update(int frame);
 
-protected slots:
+  protected slots:
 	void update_value(int);
 };
 } // end of namespace component
@@ -760,13 +747,13 @@ class DVAPI LineEdit_string : public ParamField
 	TStringParamP actual_;
 	QLineEdit *value_;
 
-public:
+  public:
 	LineEdit_string(QWidget *parent, QString name, TStringParamP const &param);
 
 	void setParam(TParamP const &current, TParamP const &actual, int frame);
 	void update(int frame);
 
-protected slots:
+  protected slots:
 	void update_value(QString const &);
 };
 } // end of namespace component
@@ -775,7 +762,7 @@ protected slots:
 extern "C" {
 #endif
 
-#define TOONZ_DECLARE_MAKE_WIDGET(NAME) \
+#define TOONZ_DECLARE_MAKE_WIDGET(NAME)                                                            \
 	ParamField *NAME(QWidget *parent, QString name, TParamP const &param)
 
 TOONZ_DECLARE_MAKE_WIDGET(make_lineedit);

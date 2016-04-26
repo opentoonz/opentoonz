@@ -56,10 +56,10 @@ class DVAPI RasterSelection : public TSelection
 	bool m_isPastedSelection;
 	bool m_noAntialiasing;
 
-private:
+  private:
 	void pasteSelection(const RasterImageData *data);
 
-public:
+  public:
 	RasterSelection();
 	RasterSelection(const RasterSelection &src);
 
@@ -83,7 +83,10 @@ public:
 	void setStartPosition(const TPoint &position) { m_startPosition = position; }
 	TPoint getStartPosition() const { return m_startPosition; }
 
-	void setFloatingSeletion(const TRasterP &floatingSelection) { m_floatingSelection = floatingSelection; }
+	void setFloatingSeletion(const TRasterP &floatingSelection)
+	{
+		m_floatingSelection = floatingSelection;
+	}
 	TRasterP getFloatingSelection() const { return m_floatingSelection; }
 	TRasterP getOriginalFloatingSelection() const { return m_originalfloatingSelection; }
 
@@ -91,7 +94,10 @@ public:
 	TFrameId getFrameId() const { return m_fid; }
 
 	int getTransformationCount() const { return m_transformationCount; }
-	void setTransformationCount(int transformationCount) { m_transformationCount = transformationCount; }
+	void setTransformationCount(int transformationCount)
+	{
+		m_transformationCount = transformationCount;
+	}
 
 	void setNoAntialiasing(bool value) { m_noAntialiasing = value; }
 
@@ -100,19 +106,19 @@ public:
 	/*! Returns strokes bounding box.*/
 	TRectD getStrokesBound(std::vector<TStroke> strokes) const;
 	/*! Returns m_strokes bounding box in world coordinates.
-      The bounding box results transformed if the selection is transformed.*/
+	  The bounding box results transformed if the selection is transformed.*/
 	TRectD getSelectionBound() const;
 	/*! Returns m_originlStrokes bounding box in world coordinates.*/
 	TRectD getOriginalSelectionBound() const;
 
 	/*! Return \b m_selectionBbox.
-      Can be different from getSelectionBound() after a free deform transformation. */
+	  Can be different from getSelectionBound() after a free deform transformation. */
 	TRectD getSelectionBbox() const;
 	void setSelectionBbox(const TRectD &rect);
 
 	void selectNone();
 
-	//!Take a rect in world coordinates and put it in the selection.
+	//! Take a rect in world coordinates and put it in the selection.
 	void select(const TRectD &rect);
 	void select(TStroke &stroke);
 	void selectAll();
@@ -123,22 +129,22 @@ public:
 	bool isFloating() const;
 	void transform(const TAffine &affine);
 
-	//commands
+	// commands
 
-	//!Build the floating image using m_strokes.
+	//! Build the floating image using m_strokes.
 	void makeFloating();
-	//!Paste the floating image over the current image and empty the selection.
+	//! Paste the floating image over the current image and empty the selection.
 	void pasteFloatingSelection();
-	//!Delete the floating image.
+	//! Delete the floating image.
 	void deleteSelection();
-	//!Copy the floating image  in the clipboard.
+	//! Copy the floating image  in the clipboard.
 	void copySelection();
-	//!Cut the floating image.
+	//! Cut the floating image.
 	void cutSelection();
-	//!Create the floating image using clipboard Data.
+	//! Create the floating image using clipboard Data.
 	void pasteSelection();
 
 	bool isTransformed();
 };
 
-#endif //RASTER_SELECTION_H
+#endif // RASTER_SELECTION_H

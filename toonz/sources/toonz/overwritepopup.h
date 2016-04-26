@@ -45,16 +45,17 @@ class OverwriteDialog : public DVGui::Dialog
 {
 	Q_OBJECT
 
-public:
-	enum Resolution { CANCELED = 0x0,
-					  KEEP_OLD = 0x1,
-					  OVERWRITE = 0x2,
-					  RENAME = 0x4,
-					  ALL_RESOLUTIONS = KEEP_OLD | OVERWRITE | RENAME };
-	enum Flags { NO_FLAG = 0x0,
-				 APPLY_TO_ALL_FLAG = 0x1 };
+  public:
+	enum Resolution {
+		CANCELED = 0x0,
+		KEEP_OLD = 0x1,
+		OVERWRITE = 0x2,
+		RENAME = 0x4,
+		ALL_RESOLUTIONS = KEEP_OLD | OVERWRITE | RENAME
+	};
+	enum Flags { NO_FLAG = 0x0, APPLY_TO_ALL_FLAG = 0x1 };
 
-public:
+  public:
 	struct ExistsFunc {
 		virtual QString conflictString(const TFilePath &fp) const = 0;
 		virtual bool operator()(const TFilePath &fp) const = 0;
@@ -68,15 +69,13 @@ public:
 		bool operator()(const TFilePath &fp) const;
 	};
 
-public:
+  public:
 	OverwriteDialog();
 
 	bool cancelPressed() const { return m_cancelPressed; }
 
-	Resolution execute(TFilePath &filePath,
-					   const ExistsFunc &exists,
-					   Resolution acceptedRes = ALL_RESOLUTIONS,
-					   Flags flags = NO_FLAG);
+	Resolution execute(TFilePath &filePath, const ExistsFunc &exists,
+					   Resolution acceptedRes = ALL_RESOLUTIONS, Flags flags = NO_FLAG);
 
 	//--------------------- Legacy Functions ------------------------
 
@@ -92,17 +91,19 @@ public:
 	//! Resets state variables
 	void reset();
 
-	/*! this method has to be called for each filepath to be imported. Only if necessary, it opens a popup. 
-  put parameter multiLoad to true only if you are importing more then one level (so that the button 'apply to all' appears in the dialog)*/
+	/*! this method has to be called for each filepath to be imported. Only if necessary, it opens a
+  popup.
+  put parameter multiLoad to true only if you are importing more then one level (so that the button
+  'apply to all' appears in the dialog)*/
 	std::wstring execute(ToonzScene *scene, const TFilePath &levelPath, bool multiLoad);
 
-protected slots:
+  protected slots:
 
 	void applyToAll();
 	void cancel();
 	void onButtonClicked(int);
 
-private:
+  private:
 	bool m_applyToAll;
 	bool m_cancelPressed;
 
@@ -115,7 +116,7 @@ private:
 	DVGui::LineEdit *m_suffix;
 	QPushButton *m_okBtn, *m_okToAllBtn, *m_cancelBtn;
 
-private:
+  private:
 	TFilePath addSuffix(const TFilePath &src) const;
 };
 

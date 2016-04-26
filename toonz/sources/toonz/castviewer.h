@@ -23,7 +23,7 @@ class CastTreeViewer : public QTreeWidget, public TSelection
 
 	void populateFolder(QTreeWidgetItem *folder);
 
-public:
+  public:
 	CastTreeViewer(QWidget *parent = 0);
 	QSize sizeHint() const;
 
@@ -35,7 +35,7 @@ public:
 	void selectNone() {}
 	void enableCommands();
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *);
 	void dragEnterEvent(QDragEnterEvent *event);
 	void dragMoveEvent(QDragMoveEvent *event);
@@ -43,7 +43,7 @@ protected:
 	void dragLeaveEvent(QDragLeaveEvent *event);
 	void resizeEvent(QResizeEvent *);
 
-public slots:
+  public slots:
 	void onItemChanged(QTreeWidgetItem *item, int column);
 	void onFolderChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
 	void onSceneNameChanged();
@@ -56,13 +56,13 @@ public slots:
 
 	void resizeToConts(void);
 
-signals:
+  signals:
 	void itemMovedToFolder();
 };
 
 //-----------------------------------------------------------------------------
 
-//!La classe si occupa della visualizzazione dello scene cast.
+//! La classe si occupa della visualizzazione dello scene cast.
 /*!E' figlia di \b QSplitter e contiene un albero che visualizza i folder \b m_treeView
    e un widget che consente di visualizzare i file \b m_sceneCastView.
    I suoi widget sono settati tramite un modello del tipo \b SceneCastModel.*/
@@ -76,7 +76,7 @@ class CastBrowser : public QSplitter, public DvItemListModel
 
 	std::unique_ptr<CastItems> m_castItems;
 
-public:
+  public:
 #if QT_VERSION >= 0x050500
 	CastBrowser(QWidget *parent = 0, Qt::WindowFlags flags = 0);
 #else
@@ -84,7 +84,7 @@ public:
 #endif
 	~CastBrowser();
 
-	CastItems const& getCastItems() const { return *m_castItems; }
+	CastItems const &getCastItems() const { return *m_castItems; }
 
 	void sortByDataModel(DataType dataType, bool isDiscendent);
 
@@ -102,14 +102,15 @@ public:
 	void viewFile();
 	void viewFileInfo();
 
-protected:
-	bool dropMimeData(QTreeWidgetItem *parent, int index, const QMimeData *data, Qt::DropAction action);
+  protected:
+	bool dropMimeData(QTreeWidgetItem *parent, int index, const QMimeData *data,
+					  Qt::DropAction action);
 	Qt::DropActions supportedDropActions() const;
 
-	//void showEvent(QShowEvent*);
-	//void hideEvent(QHideEvent*);
+	// void showEvent(QShowEvent*);
+	// void hideEvent(QHideEvent*);
 
-protected slots:
+  protected slots:
 	void folderChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
 	void refresh();
 };

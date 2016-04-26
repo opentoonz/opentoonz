@@ -21,6 +21,6 @@ extern UCHAR NextSeedTable[];
 extern UCHAR EndpointTable[];
 
 extern UCHAR ExtremeEndpointTable[];
-} //namespace
+} // namespace
 
 #endif

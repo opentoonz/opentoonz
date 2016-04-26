@@ -23,7 +23,7 @@
 #pragma comment(lib, "iphlpapi.lib")
 #endif
 
-//Cryptopp
+// Cryptopp
 #include "pubkey.h"
 #include "dh.h"
 #include "sha.h"
@@ -52,38 +52,43 @@
 //	Licenza non codificata:	mmmmmmmmSyyMMdd
 //	MACAddress(8 caratteri) Separatore(1 carattere) Data (6 caratteri)
 
-#define LICENSE_FORMAT_TYPE 1 //vedi sopra
+#define LICENSE_FORMAT_TYPE 1 // vedi sopra
 
 // Il separatore sta ad indicare il tipo di licenza: standard, pro, student, ecc.. e viene indicato
 // nella licenza con lettere tipo "N", "S", "P" ecc. oppure con tre lettere...
 
 // La licenza codificata è lunga 40 caratteri.
 
-const std::string INFINITY_LICENSE = "999999"; //licenze a scadenza infinita
+const std::string INFINITY_LICENSE = "999999"; // licenze a scadenza infinita
 
 // Definisco la lunghezza del machincode a seconda del tipo di licenza.
 // Per i prodotti che hanno 3 separatori nella licenza la lunghezza del machine code è 7.
 // Per i prodotti che hanno un solo separatore nella licenza la lunghezza del machine code è 8
 
 #if LICENSE_FORMAT_TYPE == 1
-const int MACHINE_CODE_LENGTH = 6;	 //prendo solo gli ultimi 6 caratteri del macAddress(che ha 12 caratteri)
-const int SEPARATOR_LENGTH = 4;		   // Numero di caratteri che indicano il numero di separatori.
-									   // Per questo tipo di licenza i primi due sono il license type e gli altri due indicano la versione
-const int DATE_LENGTH = 6;			   // Numero di caratteri che indicano la data nella licenza decrittata
-const int DECRYPTED_TOTAL_LENGTH = 16; //lunghezza della licenza decrittata
-const char *CODECHAR = "D";			   //Ultimo carattere della licenza che identifica il formato
+const int MACHINE_CODE_LENGTH =
+	6; // prendo solo gli ultimi 6 caratteri del macAddress(che ha 12 caratteri)
+const int SEPARATOR_LENGTH = 4; // Numero di caratteri che indicano il numero di separatori.
+// Per questo tipo di licenza i primi due sono il license type e gli altri due indicano la versione
+const int DATE_LENGTH = 6; // Numero di caratteri che indicano la data nella licenza decrittata
+const int DECRYPTED_TOTAL_LENGTH = 16; // lunghezza della licenza decrittata
+const char *CODECHAR = "D"; // Ultimo carattere della licenza che identifica il formato
 #elif LICENSE_FORMAT_TYPE == 2
-const int MACHINE_CODE_LENGTH = 7;	 //prendo solo gli ultimi 6 caratteri del macAddress(che ha 12 caratteri)
-const int SEPARATOR_LENGTH = 2;		   // Numero di caratteri che indicano il prodotto nella licenza decrittata
-const int DATE_LENGTH = 6;			   // Numero di caratteri che indicano la data nella licenza decrittata
-const int DECRYPTED_TOTAL_LENGTH = 15; //lunghezza della licenza decrittata
-const char *CODECHAR = "A";			   //Ultimo carattere della licenza che identifica il formato
+const int MACHINE_CODE_LENGTH =
+	7; // prendo solo gli ultimi 6 caratteri del macAddress(che ha 12 caratteri)
+const int SEPARATOR_LENGTH =
+	2;					   // Numero di caratteri che indicano il prodotto nella licenza decrittata
+const int DATE_LENGTH = 6; // Numero di caratteri che indicano la data nella licenza decrittata
+const int DECRYPTED_TOTAL_LENGTH = 15; // lunghezza della licenza decrittata
+const char *CODECHAR = "A"; // Ultimo carattere della licenza che identifica il formato
 #elif LICENSE_FORMAT_TYPE == 3
-const int MACHINE_CODE_LENGTH = 8;	 //prendo solo gli ultimi 6 caratteri del macAddress(che ha 12 caratteri)
-const int SEPARATOR_LENGTH = 1;		   // Numero di caratteri che indicano il prodotto nella licenza decrittata
-const int DATE_LENGTH = 6;			   // Numero di caratteri che indicano la data nella licenza decrittata
-const int DECRYPTED_TOTAL_LENGTH = 15; //lunghezza della licenza decrittata
-const char *CODECHAR = "A"; //Ultimo carattere della licenza che identifica il formato
+const int MACHINE_CODE_LENGTH =
+	8; // prendo solo gli ultimi 6 caratteri del macAddress(che ha 12 caratteri)
+const int SEPARATOR_LENGTH =
+	1;					   // Numero di caratteri che indicano il prodotto nella licenza decrittata
+const int DATE_LENGTH = 6; // Numero di caratteri che indicano la data nella licenza decrittata
+const int DECRYPTED_TOTAL_LENGTH = 15; // lunghezza della licenza decrittata
+const char *CODECHAR = "A"; // Ultimo carattere della licenza che identifica il formato
 #endif
 
 const int ACTIVATION_CODE_LENGTH = 25;
@@ -98,10 +103,12 @@ QString m_lastErrorMessage = "No error";
 
 std::string decrypt(std::string code);
 
-//le seguenti due classi sono valide solo per la crittografia
-class TRUEHash : public CryptoPP::IteratedHashWithStaticTransform<CryptoPP::word32, CryptoPP::BigEndian, 32, 4, TRUEHash>
+// le seguenti due classi sono valide solo per la crittografia
+class TRUEHash
+	: public CryptoPP::IteratedHashWithStaticTransform<CryptoPP::word32, CryptoPP::BigEndian, 32, 4,
+													   TRUEHash>
 {
-public:
+  public:
 	static void InitState(HashWordType *state)
 	{
 		state[0] = 0x01;
@@ -111,12 +118,14 @@ public:
 	static const char *StaticAlgorithmName() { return "TRUE HASH"; }
 };
 
-template <class EC, class COFACTOR_OPTION = CryptoPP::NoCofactorMultiplication, bool DHAES_MODE = false>
+template <class EC, class COFACTOR_OPTION = CryptoPP::NoCofactorMultiplication,
+		  bool DHAES_MODE = false>
 struct ECIESNullT
 	: public CryptoPP::DL_ES<
 		  CryptoPP::DL_Keys_EC<EC>,
 		  CryptoPP::DL_KeyAgreementAlgorithm_DH<typename EC::Point, COFACTOR_OPTION>,
-		  CryptoPP::DL_KeyDerivationAlgorithm_P1363<typename EC::Point, DHAES_MODE, CryptoPP::P1363_KDF2<CryptoPP::SHA1>>,
+		  CryptoPP::DL_KeyDerivationAlgorithm_P1363<typename EC::Point, DHAES_MODE,
+													CryptoPP::P1363_KDF2<CryptoPP::SHA1>>,
 		  CryptoPP::DL_EncryptionAlgorithm_Xor<CryptoPP::HMAC<TRUEHash>, DHAES_MODE>,
 		  CryptoPP::ECIES<EC>> {
 	static std::string StaticAlgorithmName() { return "ECIES with NULL T"; }
@@ -163,16 +172,13 @@ std::vector<string> getAllMacAddressWin()
 	do {
 		char acMAC[18];
 		int type = (int)pAdapterInfo->Type;
-		sprintf(acMAC, "%02X%02X%02X%02X%02X%02X",
-				int(pAdapterInfo->Address[0]),
-				int(pAdapterInfo->Address[1]),
-				int(pAdapterInfo->Address[2]),
-				int(pAdapterInfo->Address[3]),
-				int(pAdapterInfo->Address[4]),
+		sprintf(acMAC, "%02X%02X%02X%02X%02X%02X", int(pAdapterInfo->Address[0]),
+				int(pAdapterInfo->Address[1]), int(pAdapterInfo->Address[2]),
+				int(pAdapterInfo->Address[3]), int(pAdapterInfo->Address[4]),
 				int(pAdapterInfo->Address[5]));
 		string MacAddresStr = toUpper(acMAC);
 		pAdapterInfo = pAdapterInfo->Next; // Progress through linked list
-		//se type è == 6 allora si tratta di un Ethernet adapter
+		// se type è == 6 allora si tratta di un Ethernet adapter
 		if (type == 6)
 			allMacAddress.push_back(MacAddresStr);
 	} while (pAdapterInfo); // Terminate if last adapter
@@ -191,7 +197,8 @@ std::string getMacAddressWin()
 	return MacAddressStr;
 }
 
-// Restituisce i Machine Code (ultimi MACHINE_CODE_LENGTH caratteri del MAc Address della prima interfaccia di Rete.) di
+// Restituisce i Machine Code (ultimi MACHINE_CODE_LENGTH caratteri del MAc Address della prima
+// interfaccia di Rete.) di
 // tutt le interfacce di rete
 // Funzione per Windows.
 std::vector<string> getAllMachineCodeWin()
@@ -234,8 +241,8 @@ std::vector<int> getValidMachineCodesIndex()
 			continue;
 		QString mac = netInterface.hardwareAddress();
 
-		//Se la lunghezza dell'indirizzo e' 17 (caratteri piu' i : separatori)
-		//allora e' considerato valido
+		// Se la lunghezza dell'indirizzo e' 17 (caratteri piu' i : separatori)
+		// allora e' considerato valido
 		if (mac.size() == 17)
 			machineCodesIndex.push_back(i);
 	}
@@ -245,7 +252,7 @@ std::vector<int> getValidMachineCodesIndex()
 	return machineCodesIndex;
 }
 
-//restituisce il MacAddress per intero
+// restituisce il MacAddress per intero
 std::string License::getFirstValidMacAddress()
 {
 	std::string macAddressString = "";
@@ -254,8 +261,9 @@ std::string License::getFirstValidMacAddress()
 #else
 	std::vector<int> validMachineCodesIndex = getValidMachineCodesIndex();
 	if ((int)validMachineCodesIndex.size() > 0) {
-		//prendo la prima interfaccia di rete valida
-		QNetworkInterface netInterface = QNetworkInterface::interfaceFromIndex(validMachineCodesIndex[0]);
+		// prendo la prima interfaccia di rete valida
+		QNetworkInterface netInterface =
+			QNetworkInterface::interfaceFromIndex(validMachineCodesIndex[0]);
 		QString macAddress = netInterface.hardwareAddress();
 		macAddress.remove(QChar(':'), Qt::CaseInsensitive);
 		macAddress = macAddress.toUpper();
@@ -352,7 +360,7 @@ bool checkSeparatorFromDecryptedCode(string decryptedCode, LicenseType &licenseT
 /*
 // data la licenza decriptata resituisce il tipo di licenza
 void checkSeparatorFromDecryptedCode(string decryptedCode, string &separator, int &licenseType)
-{	
+{
 QString QdecryptedLicense = QString::fromStdString(decryptedCode);
 	if(QdecryptedLicense.contains("LT"))
 	{
@@ -363,9 +371,10 @@ QString QdecryptedLicense = QString::fromStdString(decryptedCode);
 		  licenseType = INVALID_LICENSE;
 }
 
-// ritorna il tipo di licenza, il machine code e la data di scadenza della licenza 
+// ritorna il tipo di licenza, il machine code e la data di scadenza della licenza
 // se non c'è un separatre valido ritorna INVALID_LICENSE
-int getMachineCodeAndExpDateFromDecryptedCode(std::string decryptedCode, string &machineCode, string &expDate) 
+int getMachineCodeAndExpDateFromDecryptedCode(std::string decryptedCode, string &machineCode, string
+&expDate)
 {
 	if(decryptedCode.length()!=LICENSE_CODE_LENGTH) return INVALID_LICENSE;
 	machineCode = decryptedCode.substr(0,MACHINE_CODE_LENGTH);
@@ -403,7 +412,7 @@ LicenseType License::checkLicense(std::string code)
 	std::string decryptedLicense = decryptLicense(code);
 
 	if (decryptedLicense == "")
-		return INVALID_LICENSE; //throw std::string("CryptoPP::DecodingResult: Invalid Coding"); }
+		return INVALID_LICENSE; // throw std::string("CryptoPP::DecodingResult: Invalid Coding"); }
 
 	string machineCodeFromDecryptedLecense = "";
 	bool ret = getMachineCodeFromDecryptedCode(decryptedLicense, machineCodeFromDecryptedLecense);
@@ -462,7 +471,7 @@ LicenseType License::checkLicense(std::string code)
 
 bool License::isTemporaryLicense(std::string code)
 {
-	//if(checkLicense(code)==INVALID_LICENSE) return false;
+	// if(checkLicense(code)==INVALID_LICENSE) return false;
 	QString codeQString = QString::fromStdString(code);
 	codeQString = codeQString.remove(QChar('-'), Qt::CaseInsensitive);
 	code = codeQString.toStdString();
@@ -552,15 +561,15 @@ bool License::isActivationCode(std::string code)
 	int tot = 0;
 	for (int i = 0; i < length - 1; i++) {
 		int chrAscii = code[i];
-		tot += chrAscii; //std::cout << chrAscii;
+		tot += chrAscii; // std::cout << chrAscii;
 	}
 	tot = tot % 26;
 	return ((tot + 65) == (int)code[length - 1]);
-	//return code.length() == 6 && code[0]=='P' && code[5]=='E';
+	// return code.length() == 6 && code[0]=='P' && code[5]=='E';
 }
 //---------------------------------------------------------------------
-//Controllo della sentinella. Lo facciamo per controllare che la data della
-//prima installazione sia minore della data corrente.
+// Controllo della sentinella. Lo facciamo per controllare che la data della
+// prima installazione sia minore della data corrente.
 //---------------------------------------------------------------------
 #ifdef MACOSX
 
@@ -626,19 +635,21 @@ std::string License::createClsid(string fullMacAddress, char *licenseType)
 	reverse(RFullMacAddress.begin(), RFullMacAddress.end());
 	int i;
 
-	//std::cout << "applicationVersion=" << applicationVersion << std::endl;
+	// std::cout << "applicationVersion=" << applicationVersion << std::endl;
 	string applicationVersionString = string(applicationVersion);
-	//std::cout << "applicationVersionString=" << applicationVersionString << std::endl;
+	// std::cout << "applicationVersionString=" << applicationVersionString << std::endl;
 
 	string fullString = "";
 	if (LICENSE_FORMAT_TYPE == 3)
-		fullString = licenseType + RFullMacAddress +
-					 applicationVersionString.substr(0, 1) + applicationVersionString.substr(2, 1) +
-					 fullMacAddress + "0" + applicationVersionString.substr(2, 1) + applicationVersionString.substr(0, 1) + "00";
+		fullString = licenseType + RFullMacAddress + applicationVersionString.substr(0, 1) +
+					 applicationVersionString.substr(2, 1) + fullMacAddress + "0" +
+					 applicationVersionString.substr(2, 1) + applicationVersionString.substr(0, 1) +
+					 "00";
 	else
-		fullString = licenseType + RFullMacAddress +
-					 applicationVersionString.substr(0, 1) + applicationVersionString.substr(2, 1) +
-					 fullMacAddress + applicationVersionString.substr(2, 1) + applicationVersionString.substr(0, 1) + "00";
+		fullString = licenseType + RFullMacAddress + applicationVersionString.substr(0, 1) +
+					 applicationVersionString.substr(2, 1) + fullMacAddress +
+					 applicationVersionString.substr(2, 1) + applicationVersionString.substr(0, 1) +
+					 "00";
 	assert(fullString.length() == 32);
 	string clsid = "{";
 	for (i = 0; i < 32; i++) {
@@ -647,33 +658,30 @@ std::string License::createClsid(string fullMacAddress, char *licenseType)
 		char c0 = fullString[i];
 		clsid += getC(&c0);
 	}
-	//sostituiamo due elementi affinche cambino al cambiare di applicationVersion per
-	//garantire nuove licenze demo al cambio di versione
+	// sostituiamo due elementi affinche cambino al cambiare di applicationVersion per
+	// garantire nuove licenze demo al cambio di versione
 
-	//std::cout << "applicationVersion[0]=" << applicationVersion[0] << std::endl;
-	//std::cout << "applicationVersion[2]=" << applicationVersion[2] << std::endl;
+	// std::cout << "applicationVersion[0]=" << applicationVersion[0] << std::endl;
+	// std::cout << "applicationVersion[2]=" << applicationVersion[2] << std::endl;
 
-	//clsid[8]=applicationVersion[0];
-	//clsid[13]=applicationVersion[2];
+	// clsid[8]=applicationVersion[0];
+	// clsid[13]=applicationVersion[2];
 	clsid[1] = toupper(clsid[1]);
 	clsid += "}";
 	return clsid;
 }
-//Se la sentinella non esiste ritorna la stringa "noExists"
+// Se la sentinella non esiste ritorna la stringa "noExists"
 std::string License::readSentinelDate(string regKey)
 {
 #ifdef WIN32
-	//string wincls="CLSID";
+	// string wincls="CLSID";
 	TCHAR buffer[1024];
 	unsigned long bufferSize = sizeof(buffer);
 	wstring value;
 	string regKeyF = string(wincls) + "\\" + regKey + "\\InProcServer32";
 	HKEY hcplF;
-	if (RegOpenKeyEx(HKEY_CLASSES_ROOT,
-					 toWideString(regKeyF).c_str(),
-					 0,
-					 KEY_READ,
-					 &hcplF) == ERROR_SUCCESS) {
+	if (RegOpenKeyEx(HKEY_CLASSES_ROOT, toWideString(regKeyF).c_str(), 0, KEY_READ, &hcplF) ==
+		ERROR_SUCCESS) {
 		RegQueryValueEx(hcplF, L"Version", 0, 0, (BYTE *)buffer, &bufferSize);
 	} else
 		return "noExists";
@@ -719,12 +727,13 @@ bool License::isValidSentinel(string license)
 		if (cryptedSentinelDateString != "noExists")
 			break;
 	}
-	//Se la sentinella non esiste vuol dire che il software non
+	// Se la sentinella non esiste vuol dire che il software non
 	//è stato istallato e quindi non viene fatto alcun controllo sulla sentinella.
 	if (cryptedSentinelDateString == "noExists")
 		return true;
 	string sentinelDateString = decrypt(cryptedSentinelDateString).substr(0, 8);
-	QDate sentinelDate = sentinelDate.fromString(QString::fromStdString(sentinelDateString), "yyyyMMdd");
+	QDate sentinelDate =
+		sentinelDate.fromString(QString::fromStdString(sentinelDateString), "yyyyMMdd");
 	if (!sentinelDate.isValid())
 		return false;
 	QDate currentDate = QDate::currentDate();
@@ -738,7 +747,7 @@ myHttp::myHttp(const QString &requestToServer, LicenseWizard *licenseWizard)
 #endif
 {
 	m_licenseWizard = licenseWizard;
-	//m_licenseWizard = new LicenseWizard(((QWidget*)TApp::instance()->getMainWindow()));
+	// m_licenseWizard = new LicenseWizard(((QWidget*)TApp::instance()->getMainWindow()));
 
 	m_licenseWizard->setPage(2);
 
@@ -755,38 +764,42 @@ myHttp::myHttp(const QString &requestToServer, LicenseWizard *licenseWizard)
 	m_httpRequestAborted = false;
 
 	QString param;
-	param = QString("?") + paramList.at(0) + QString("&") + paramList.at(1) + QString("&") + paramList.at(2) + QString("&") + paramList.at(3);
+	param = QString("?") + paramList.at(0) + QString("&") + paramList.at(1) + QString("&") +
+			paramList.at(2) + QString("&") + paramList.at(3);
 
 	QNetworkAccessManager manager;
 	QNetworkReply *reply = manager.get(QNetworkRequest(url.path() + param));
 
 	QEventLoop loop;
 
-	//connect(reply, SIGNAL(readyRead(const QHttpResponseHeader &)), &loop, SLOT(readyReadexec(const QHttpResponseHeader &)));
-	//connect(reply, SIGNAL(requestFinished(int, bool)), &loop, SLOT(httpRequestFinished(int, bool)));
+	// connect(reply, SIGNAL(readyRead(const QHttpResponseHeader &)), &loop,
+	// SLOT(readyReadexec(const QHttpResponseHeader &)));
+	// connect(reply, SIGNAL(requestFinished(int, bool)), &loop, SLOT(httpRequestFinished(int,
+	// bool)));
 	connect(reply, SIGNAL(requestStarted(int)), &loop, SLOT(httpRequestStarted(int)));
-	//connect(reply, SIGNAL(responseHeaderReceived(const QHttpResponseHeader &)), &loop, SLOT(readResponseHeader(const QHttpResponseHeader &)));
-	connect(reply, SIGNAL(authenticationRequired(const QString &, quint16, QAuthenticator *)), &loop, SLOT(slotAuthenticationRequired(const QString &, quint16, QAuthenticator *)));
+	// connect(reply, SIGNAL(responseHeaderReceived(const QHttpResponseHeader &)), &loop,
+	// SLOT(readResponseHeader(const QHttpResponseHeader &)));
+	connect(reply, SIGNAL(authenticationRequired(const QString &, quint16, QAuthenticator *)),
+			&loop, SLOT(slotAuthenticationRequired(const QString &, quint16, QAuthenticator *)));
 	connect(reply, SIGNAL(stateChanged(int)), &loop, SLOT(httpStateChanged(int)));
 
-	connect(&manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(httpRequestFinished(QNetworkReply *)));
+	connect(&manager, SIGNAL(finished(QNetworkReply *)), this,
+			SLOT(httpRequestFinished(QNetworkReply *)));
 
 	loop.exec();
 #else
 
 	connect(this, SIGNAL(readyRead(const QHttpResponseHeader &)), this,
 			SLOT(readyReadexec(const QHttpResponseHeader &)));
-	connect(this, SIGNAL(requestFinished(int, bool)), this,
-			SLOT(httpRequestFinished(int, bool)));
-	connect(this, SIGNAL(requestStarted(int)), this,
-			SLOT(httpRequestStarted(int)));
+	connect(this, SIGNAL(requestFinished(int, bool)), this, SLOT(httpRequestFinished(int, bool)));
+	connect(this, SIGNAL(requestStarted(int)), this, SLOT(httpRequestStarted(int)));
 	connect(this, SIGNAL(responseHeaderReceived(const QHttpResponseHeader &)), this,
 			SLOT(readResponseHeader(const QHttpResponseHeader &)));
 	connect(this, SIGNAL(authenticationRequired(const QString &, quint16, QAuthenticator *)), this,
 			SLOT(slotAuthenticationRequired(const QString &, quint16, QAuthenticator *)));
-	connect(this, SIGNAL(stateChanged(int)), this,
-			SLOT(httpStateChanged(int)));
-	QHttp::ConnectionMode mode = url.scheme().toLower() == "https" ? QHttp::ConnectionModeHttps : QHttp::ConnectionModeHttp;
+	connect(this, SIGNAL(stateChanged(int)), this, SLOT(httpStateChanged(int)));
+	QHttp::ConnectionMode mode =
+		url.scheme().toLower() == "https" ? QHttp::ConnectionModeHttps : QHttp::ConnectionModeHttp;
 
 	setHost(url.host(), mode, url.port() == -1 ? 0 : url.port());
 	QString urlTemp = requestToServer;
@@ -798,7 +811,8 @@ myHttp::myHttp(const QString &requestToServer, LicenseWizard *licenseWizard)
 	m_httpRequestAborted = false;
 
 	QString param;
-	param = QString("?") + paramList.at(0) + QString("&") + paramList.at(1) + QString("&") + paramList.at(2) + QString("&") + paramList.at(3);
+	param = QString("?") + paramList.at(0) + QString("&") + paramList.at(1) + QString("&") +
+			paramList.at(2) + QString("&") + paramList.at(3);
 	m_httpGetId = get(url.path() + param); //, file);
 #endif
 }
@@ -808,7 +822,7 @@ void myHttp::readResponseHeader(const QHttpResponseHeader &responseHeader)
 {
 	int err = responseHeader.statusCode();
 	if (err != 200 && err != 502) {
-		//MsgBox(INFORMATION,tr("Download failed: %1.").arg(responseHeader.reasonPhrase()));
+		// MsgBox(INFORMATION,tr("Download failed: %1.").arg(responseHeader.reasonPhrase()));
 		/*QMessageBox::information(0, tr("HTTP"),
 		 tr("Download failed: %1.")
 		 .arg(responseHeader.reasonPhrase()));*/
@@ -839,7 +853,8 @@ void myHttp::httpStateChanged(int status)
 		stateStr = "Connected.";
 		break;
 	case 6:
-		stateStr = "The connection is closing down, but is not yet closed. (The state will be Unconnected when the connection is closed.)";
+		stateStr = "The connection is closing down, but is not yet closed. (The state will be "
+				   "Unconnected when the connection is closed.)";
 	default:
 		stateStr = "There is no connection to the host.";
 	}
@@ -882,7 +897,7 @@ void myHttp::httpRequestFinished(int requestId, bool error)
 
 	if (checkLicense(license) == INVALID_LICENSE) {
 		MsgBox(WARNING, tr("Activation error: ") + QString::fromStdString(license));
-		//QMessageBox::information(0, QString("Invalid License"), QString::fromStdString(license));
+		// QMessageBox::information(0, QString("Invalid License"), QString::fromStdString(license));
 		goto errore;
 	}
 
@@ -892,25 +907,27 @@ void myHttp::httpRequestFinished(int requestId, bool error)
 		return;
 	}
 
-	//Verifico che tutto sia andato bene
+	// Verifico che tutto sia andato bene
 	newLicense = getInstalledLicense();
 	if (license != newLicense) {
 		MsgBox(CRITICAL, tr("Can't write license on disk!"));
-		//QMessageBox::information(0, QString("Error"), "Non e' possibile scrivere la licenza su disco!");
+		// QMessageBox::information(0, QString("Error"), "Non e' possibile scrivere la licenza su
+		// disco!");
 		m_licenseWizard->setPage(1);
 		return;
 	} else {
 		m_licenseWizard->accept();
-		//MsgBox(INFORMATION,tr("Activation successfully!"));
+		// MsgBox(INFORMATION,tr("Activation successfully!"));
 		return;
 	}
 
 errore:
 	QString errore = errorString();
-	//MsgBox(WARNING,errorString());
+	// MsgBox(WARNING,errorString());
 }
 
-void myHttp::slotAuthenticationRequired(const QString &hostName, quint16, QAuthenticator *authenticator)
+void myHttp::slotAuthenticationRequired(const QString &hostName, quint16,
+										QAuthenticator *authenticator)
 {
 	assert(false);
 }
@@ -920,13 +937,15 @@ extern const char *applicationVersion;
 extern const char *applicationName;
 ActivateStatus License::activate(string activationCode, LicenseWizard *licenseWizard)
 {
-	//licenseWizard->hide();//lose();//accept();
+	// licenseWizard->hide();//lose();//accept();
 	string MacAddress = getFirstValidMacAddress();
 	string tabversion = string(applicationVersion);
 	string appname = string(applicationName);
 	QString requestToServer = "http://www.the-tab.com/cgi-shl/tab30/activate/run.asp";
-	requestToServer = requestToServer + QString("?Activation_Code=") + QString::fromStdString(activationCode);
-	requestToServer = requestToServer + QString("&MAC_Address=") + QString::fromStdString(MacAddress);
+	requestToServer =
+		requestToServer + QString("?Activation_Code=") + QString::fromStdString(activationCode);
+	requestToServer =
+		requestToServer + QString("&MAC_Address=") + QString::fromStdString(MacAddress);
 	requestToServer = requestToServer + QString("&AppName=") + QString::fromStdString(appname);
 	requestToServer = requestToServer + QString("&Version=") + QString::fromStdString(tabversion);
 	requestToServer.remove(" ");
@@ -960,18 +979,18 @@ bool License::setLicense(std::string license)
 	/*
 	 QSettings settings(
 	 "license.dat");
-	 settings.setPath(QSettings::IniFormat, 
-	 QSettings::SystemScope, 
+	 settings.setPath(QSettings::IniFormat,
+	 QSettings::SystemScope,
 	 QString::fromStdWString(configDir.getWideString()));
 	 QSettings settings(
-	 QSettings::SystemScope, 
+	 QSettings::SystemScope,
 	 QCoreApplication::organizationName(),
 	 QCoreApplication::applicationName());
 	 settings.setValue(licenseKeyName, QString::fromStdString(license));
 	 settings.sync(); */
 	// non voglio rischiare che un crash mi faccia perdere la licenza
 	// con sync mi assicuro che venga scritta subito (su disco o nei registry)
-	//return true;
+	// return true;
 }
 // Se c'è installata una licenza allora la decripta e legge il machine code.
 // Se questo è uguale al mac Address di una delle interfacce di rete presenti
@@ -984,14 +1003,16 @@ bool License::writeMacAddress()
 	string encryptedLicense = getInstalledLicense();
 	if (encryptedLicense != "") {
 		// Elimino i trattini dalla licenza
-		QString qlicense = QString::fromStdString(encryptedLicense).remove(QChar('-'), Qt::CaseInsensitive);
+		QString qlicense =
+			QString::fromStdString(encryptedLicense).remove(QChar('-'), Qt::CaseInsensitive);
 		string code = qlicense.toStdString();
 		// decripto la licenza installata
 		decryptedLicense = decryptLicense(code);
 	}
 	if (decryptedLicense != "") {
 		string macAddressFromDecryptedLecense = "";
-		bool ret = getMachineCodeFromDecryptedCode(decryptedLicense, macAddressFromDecryptedLecense);
+		bool ret =
+			getMachineCodeFromDecryptedCode(decryptedLicense, macAddressFromDecryptedLecense);
 		std::vector<string> allMacAddresses;
 		// Recupero tutti i mac address validi presenti sulla macchina corrente.
 		getAllValidMacAddresses(allMacAddresses);
@@ -1013,8 +1034,8 @@ bool License::writeMacAddress()
 }
 //-----------------------------------------------------------------------------
 
-//Restituisce la stringa decriptata.
-//Se il code non è un codice valido restituisce "".
+// Restituisce la stringa decriptata.
+// Se il code non è un codice valido restituisce "".
 std::string decrypt(std::string code)
 {
 	CryptoPP::Integer p("5860230647");
@@ -1036,8 +1057,7 @@ std::string decrypt(std::string code)
 
 	CryptoPP::Base32Decoder Decoder;
 
-	Decoder.Put(reinterpret_cast<const byte *>(code.c_str()),
-				code.length());
+	Decoder.Put(reinterpret_cast<const byte *>(code.c_str()), code.length());
 	Decoder.MessageEnd();
 
 	// Scratch forBase 32 Encoded Ciphertext
@@ -1045,7 +1065,7 @@ std::string decrypt(std::string code)
 	byte *DecodedText = new byte[DecodedTextLength + 1];
 
 	if (NULL == DecodedText)
-		return false; //DecodedText Allocation Failure }
+		return false; // DecodedText Allocation Failure }
 	DecodedText[DecodedTextLength] = '\0';
 	Decoder.Get(DecodedText, DecodedTextLength);
 
@@ -1058,18 +1078,19 @@ std::string decrypt(std::string code)
 	unsigned int RecoveredTextLength = Decryptor.MaxPlaintextLength(DecodedTextLength);
 	if (0 == RecoveredTextLength) {
 		return "";
-	} //throw std::string("codeLength non valida (too long or too short)"); }
+	} // throw std::string("codeLength non valida (too long or too short)"); }
 
 	byte *RecoveredText = new byte[4 * plainTextLength];
 	if (NULL == RecoveredText) {
 		return "";
-	} //throw std::string( "RecoveredText CipherText Allocation Failure" ); }
+	} // throw std::string( "RecoveredText CipherText Allocation Failure" ); }
 
 	// Decryption
-	CryptoPP::DecodingResult Result = Decryptor.Decrypt(rng, DecodedText, DecodedTextLength, RecoveredText);
+	CryptoPP::DecodingResult Result =
+		Decryptor.Decrypt(rng, DecodedText, DecodedTextLength, RecoveredText);
 
 	if (false == Result.isValidCoding)
-		return ""; //throw std::string("CryptoPP::DecodingResult: Invalid Coding"); }
+		return ""; // throw std::string("CryptoPP::DecodingResult: Invalid Coding"); }
 	std::string license = reinterpret_cast<char *>(RecoveredText);
 
 	string decripetedLicense = license.substr(0, plainTextLength);
@@ -1081,9 +1102,10 @@ std::string License::decryptLicense(std::string code)
 {
 	if (code == "")
 		return "";
-	//Sostituisco l'ultima lettera della licenza, che serve ad identificare il tipo di formattazione della licenza
-	//Rimetto il carattere "A" per permettere la corretta decrittazione.
-	//Per maggiorni info vedere il generatore di licenze
+	// Sostituisco l'ultima lettera della licenza, che serve ad identificare il tipo di
+	// formattazione della licenza
+	// Rimetto il carattere "A" per permettere la corretta decrittazione.
+	// Per maggiorni info vedere il generatore di licenze
 	int codesize = code.size();
 	code = code.substr(0, codesize - 1) + "A";
 	code = addDefaultChars(code);
@@ -1093,12 +1115,14 @@ std::string License::decryptLicense(std::string code)
 	if (LICENSE_FORMAT_TYPE == 1) {
 		if (decripetedLicense.size() < 5)
 			return "";
-		//La data nella licenza è in formato esadecimale, la converto in decimale.
-		QString datastring = "0x" + QString::fromStdString(decripetedLicense.substr(decripetedLicense.size() - 5, 5));
+		// La data nella licenza è in formato esadecimale, la converto in decimale.
+		QString datastring = "0x" + QString::fromStdString(
+										decripetedLicense.substr(decripetedLicense.size() - 5, 5));
 		bool ok = false;
 		int date = datastring.toInt(&ok, 16);
 		// sostituisco la data mettendola in formato esadecimale
-		decripetedLicense = decripetedLicense.substr(0, decripetedLicense.size() - 5) + QString::number(date).toStdString();
+		decripetedLicense = decripetedLicense.substr(0, decripetedLicense.size() - 5) +
+							QString::number(date).toStdString();
 	}
 	return decripetedLicense;
 }

@@ -58,7 +58,8 @@ FunctionViewer::FunctionViewer(QWidget *parent, Qt::WindowFlags flags)
 #else
 FunctionViewer::FunctionViewer(QWidget *parent, Qt::WFlags flags)
 #endif
-	: QSplitter(parent), m_xshHandle(0), m_frameHandle(0), m_objectHandle(0), m_fxHandle(0), m_columnHandle(0), m_curve(0), m_selection(new FunctionSelection()), m_sceneHandle(0)
+	: QSplitter(parent), m_xshHandle(0), m_frameHandle(0), m_objectHandle(0), m_fxHandle(0),
+	  m_columnHandle(0), m_curve(0), m_selection(new FunctionSelection()), m_sceneHandle(0)
 {
 	setObjectName("FunctionEditor");
 
@@ -78,8 +79,7 @@ FunctionViewer::FunctionViewer(QWidget *parent, Qt::WFlags flags)
 	m_treeView->resize(150, m_treeView->size().height());
 	m_treeView->setMinimumWidth(0);
 
-	FunctionTreeModel *ftModel =
-		dynamic_cast<FunctionTreeModel *>(m_treeView->model());
+	FunctionTreeModel *ftModel = dynamic_cast<FunctionTreeModel *>(m_treeView->model());
 	m_functionGraph->setModel(ftModel);
 	m_numericalColumns->setModel(ftModel);
 
@@ -91,10 +91,11 @@ FunctionViewer::FunctionViewer(QWidget *parent, Qt::WFlags flags)
 	m_toolbar->setSelection(m_selection);
 	m_toolbar->setFocusPolicy(Qt::NoFocus);
 
-	m_toolbar->setFrameHandle(&m_localFrame);		   // The function editor adopts an internal timeline
-	m_functionGraph->setFrameHandle(&m_localFrame);	// synchronized among its various sub-widgets.
-	m_numericalColumns->setFrameHandle(&m_localFrame); // In case an external m_frameHandle is specified,
-													   // it synchronizes with that, too.
+	m_toolbar->setFrameHandle(&m_localFrame); // The function editor adopts an internal timeline
+	m_functionGraph->setFrameHandle(&m_localFrame); // synchronized among its various sub-widgets.
+	m_numericalColumns->setFrameHandle(
+		&m_localFrame); // In case an external m_frameHandle is specified,
+						// it synchronizes with that, too.
 
 	//---- layout
 
@@ -130,23 +131,31 @@ FunctionViewer::FunctionViewer(QWidget *parent, Qt::WFlags flags)
 	bool ret = true;
 	ret = ret && connect(m_toolbar, SIGNAL(numericalColumnToggled()), this, SLOT(toggleMode()));
 	ret = ret && connect(ftModel, SIGNAL(activeChannelsChanged()), m_functionGraph, SLOT(update()));
-	ret = ret && connect(ftModel, SIGNAL(activeChannelsChanged()), m_numericalColumns, SLOT(updateAll()));
+	ret = ret &&
+		  connect(ftModel, SIGNAL(activeChannelsChanged()), m_numericalColumns, SLOT(updateAll()));
 	ret = ret && connect(ftModel, SIGNAL(curveChanged(bool)), m_treeView, SLOT(update()));
 	ret = ret && connect(ftModel, SIGNAL(curveChanged(bool)), m_functionGraph, SLOT(update()));
-	ret = ret && connect(ftModel, SIGNAL(curveChanged(bool)), m_numericalColumns, SLOT(updateAll()));
-	ret = ret && connect(ftModel, SIGNAL(curveSelected(TDoubleParam *)), this, SLOT(onCurveSelected(TDoubleParam *)));
-	ret = ret && connect(ftModel, SIGNAL(curveChanged(bool)), m_segmentViewer, SLOT(onCurveChanged()));
+	ret =
+		ret && connect(ftModel, SIGNAL(curveChanged(bool)), m_numericalColumns, SLOT(updateAll()));
+	ret = ret && connect(ftModel, SIGNAL(curveSelected(TDoubleParam *)), this,
+						 SLOT(onCurveSelected(TDoubleParam *)));
+	ret = ret &&
+		  connect(ftModel, SIGNAL(curveChanged(bool)), m_segmentViewer, SLOT(onCurveChanged()));
 	ret = ret && connect(ftModel, SIGNAL(curveChanged(bool)), this, SLOT(onCurveChanged(bool)));
 	ret = ret && connect(&m_localFrame, SIGNAL(frameSwitched()), this, SLOT(onFrameSwitched()));
-	ret = ret && connect(getSelection(), SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
-	ret = ret && connect(m_functionGraph, SIGNAL(keyframeSelected(double)), m_toolbar, SLOT(setFrame(double)));
+	ret = ret &&
+		  connect(getSelection(), SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
+	ret = ret && connect(m_functionGraph, SIGNAL(keyframeSelected(double)), m_toolbar,
+						 SLOT(setFrame(double)));
 
-	ret = ret && connect(m_treeView, SIGNAL(switchCurrentObject(TStageObject *)),
-						 this, SLOT(doSwitchCurrentObject(TStageObject *)));
-	ret = ret && connect(m_treeView, SIGNAL(switchCurrentFx(TFx *)),
-						 this, SLOT(doSwitchCurrentFx(TFx *)));
+	ret = ret && connect(m_treeView, SIGNAL(switchCurrentObject(TStageObject *)), this,
+						 SLOT(doSwitchCurrentObject(TStageObject *)));
+	ret = ret &&
+		  connect(m_treeView, SIGNAL(switchCurrentFx(TFx *)), this, SLOT(doSwitchCurrentFx(TFx *)));
 
-	ret = ret && connect(ftModel, SIGNAL(currentChannelChanged(FunctionTreeModel::Channel *)), m_numericalColumns, SLOT(onCurrentChannelChanged(FunctionTreeModel::Channel *)));
+	ret = ret &&
+		  connect(ftModel, SIGNAL(currentChannelChanged(FunctionTreeModel::Channel *)),
+				  m_numericalColumns, SLOT(onCurrentChannelChanged(FunctionTreeModel::Channel *)));
 
 	assert(ret);
 
@@ -176,19 +185,27 @@ void FunctionViewer::showEvent(QShowEvent *)
 	}
 
 	if (m_frameHandle)
-		ret = connect(m_frameHandle, SIGNAL(frameSwitched()), this, SLOT(propagateExternalSetFrame())) && ret;
+		ret = connect(m_frameHandle, SIGNAL(frameSwitched()), this,
+					  SLOT(propagateExternalSetFrame())) &&
+			  ret;
 
 	if (m_objectHandle) {
-		ret = connect(m_objectHandle, SIGNAL(objectSwitched()), this, SLOT(onStageObjectSwitched())) && ret;
-		ret = connect(m_objectHandle, SIGNAL(objectChanged(bool)), this, SLOT(onStageObjectChanged(bool))) && ret;
+		ret = connect(m_objectHandle, SIGNAL(objectSwitched()), this,
+					  SLOT(onStageObjectSwitched())) &&
+			  ret;
+		ret = connect(m_objectHandle, SIGNAL(objectChanged(bool)), this,
+					  SLOT(onStageObjectChanged(bool))) &&
+			  ret;
 	}
 
 	if (m_fxHandle)
 		ret = connect(m_fxHandle, SIGNAL(fxSwitched()), this, SLOT(onFxSwitched())) && ret;
 
-	//display animated channels when the scene is switched
+	// display animated channels when the scene is switched
 	if (m_sceneHandle)
-		ret = connect(m_sceneHandle, SIGNAL(sceneSwitched()), m_treeView, SLOT(displayAnimatedChannels())) && ret;
+		ret = connect(m_sceneHandle, SIGNAL(sceneSwitched()), m_treeView,
+					  SLOT(displayAnimatedChannels())) &&
+			  ret;
 
 	assert(ret);
 
@@ -202,7 +219,8 @@ void FunctionViewer::showEvent(QShowEvent *)
 		TXsheet *xsh = m_xshHandle->getXsheet();
 
 		const TStageObjectId &objId = m_objectHandle->getObjectId();
-		ftm->setCurrentStageObject((objId == TStageObjectId::NoneId) ? (TStageObject *)0 : xsh->getStageObject(objId));
+		ftm->setCurrentStageObject((objId == TStageObjectId::NoneId) ? (TStageObject *)0
+																	 : xsh->getStageObject(objId));
 	}
 
 	if (m_fxHandle)
@@ -313,7 +331,8 @@ void FunctionViewer::setFrameHandle(TFrameHandle *frameHandle)
 	m_frameHandle = frameHandle;
 
 	if (m_frameHandle && isVisible()) {
-		bool ret = connect(m_frameHandle, SIGNAL(frameSwitched()), this, SLOT(propagateExternalSetFrame()));
+		bool ret = connect(m_frameHandle, SIGNAL(frameSwitched()), this,
+						   SLOT(propagateExternalSetFrame()));
 		assert(ret);
 	}
 }
@@ -334,8 +353,12 @@ void FunctionViewer::setObjectHandle(TObjectHandle *objectHandle)
 		m_treeView->updateAll();
 
 		bool ret = true;
-		ret = connect(m_objectHandle, SIGNAL(objectSwitched()), this, SLOT(onStageObjectSwitched())) && ret;
-		ret = connect(m_objectHandle, SIGNAL(objectChanged(bool)), this, SLOT(onStageObjectChanged(bool))) && ret;
+		ret = connect(m_objectHandle, SIGNAL(objectSwitched()), this,
+					  SLOT(onStageObjectSwitched())) &&
+			  ret;
+		ret = connect(m_objectHandle, SIGNAL(objectChanged(bool)), this,
+					  SLOT(onStageObjectChanged(bool))) &&
+			  ret;
 
 		assert(ret);
 	}
@@ -412,10 +435,9 @@ void FunctionViewer::onCurveChanged(bool isDragging)
 	if (m_objectHandle)
 		m_objectHandle->notifyObjectIdChanged(isDragging);
 
-	//emit signal if the current channel belongs to Fx in order to update the preview fx
+	// emit signal if the current channel belongs to Fx in order to update the preview fx
 	if (m_fxHandle) {
-		FunctionTreeModel *ftModel =
-			dynamic_cast<FunctionTreeModel *>(m_treeView->model());
+		FunctionTreeModel *ftModel = dynamic_cast<FunctionTreeModel *>(m_treeView->model());
 		if (ftModel) {
 			FunctionTreeModel::Channel *currChan = ftModel->getCurrentChannel();
 			if (currChan) {
@@ -465,7 +487,8 @@ void FunctionViewer::onStageObjectSwitched()
 	TXsheet *xsh = m_xshHandle->getXsheet();
 
 	const TStageObjectId &objId = m_objectHandle->getObjectId();
-	TStageObject *obj = (objId == TStageObjectId::NoneId) ? (TStageObject *)0 : xsh->getStageObject(objId);
+	TStageObject *obj =
+		(objId == TStageObjectId::NoneId) ? (TStageObject *)0 : xsh->getStageObject(objId);
 
 	static_cast<FunctionTreeModel *>(m_treeView->model())->setCurrentStageObject(obj);
 
@@ -480,7 +503,8 @@ void FunctionViewer::onStageObjectChanged(bool isDragging)
 	TXsheet *xsh = m_xshHandle->getXsheet();
 
 	const TStageObjectId &objId = m_objectHandle->getObjectId();
-	TStageObject *obj = (objId == TStageObjectId::NoneId) ? (TStageObject *)0 : xsh->getStageObject(objId);
+	TStageObject *obj =
+		(objId == TStageObjectId::NoneId) ? (TStageObject *)0 : xsh->getStageObject(objId);
 
 	static_cast<FunctionTreeModel *>(m_treeView->model())->setCurrentStageObject(obj);
 
@@ -579,8 +603,7 @@ void FunctionViewer::propagateExternalSetFrame()
 
 //-----------------------------------------------------------------------------
 
-void FunctionViewer::addParameter(
-	TParam *parameter, const TFilePath &folder)
+void FunctionViewer::addParameter(TParam *parameter, const TFilePath &folder)
 {
 	static_cast<FunctionTreeModel *>(m_treeView->model())->addParameter(parameter, folder);
 }
@@ -604,7 +627,8 @@ void FunctionViewer::clearFocusColumnsAndGraph()
 
 bool FunctionViewer::columnsOrGraphHasFocus()
 {
-	return m_functionGraph->hasFocus() || m_numericalColumns->anyWidgetHasFocus() || m_toolbar->anyWidgetHasFocus() || m_segmentViewer->anyWidgetHasFocus();
+	return m_functionGraph->hasFocus() || m_numericalColumns->anyWidgetHasFocus() ||
+		   m_toolbar->anyWidgetHasFocus() || m_segmentViewer->anyWidgetHasFocus();
 }
 
 //-----------------------------------------------------------------------------

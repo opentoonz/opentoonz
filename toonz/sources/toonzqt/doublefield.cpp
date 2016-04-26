@@ -27,8 +27,8 @@ void DoubleValueLineEdit::focusOutEvent(QFocusEvent *e)
 	MeasuredDoubleLineEdit *lineEdit = qobject_cast<MeasuredDoubleLineEdit *>(this);
 	if (lineEdit) {
 		int decimal = lineEdit->getDecimals();
-		isOutOfRange = (value < minValue - pow(0.1, decimal + 1) ||
-						value > maxValue + pow(0.1, decimal + 1));
+		isOutOfRange =
+			(value < minValue - pow(0.1, decimal + 1) || value > maxValue + pow(0.1, decimal + 1));
 	} else
 		isOutOfRange = (value < minValue || value > maxValue);
 
@@ -125,7 +125,7 @@ void DoubleValueField::setValue(double value)
 	int sliderValue = value * pow(10., dicimal);
 
 	m_slider->setValue(sliderValue);
-	//forzo il repaint... non sempre si aggiorna e l'update non sembra risolvere il ptroblema!!!
+	// forzo il repaint... non sempre si aggiorna e l'update non sembra risolvere il ptroblema!!!
 	m_slider->repaint();
 }
 
@@ -191,15 +191,14 @@ void DoubleValueField::onSliderChanged(int value)
 	int dicimal = m_lineEdit->getDecimals();
 	double val = double(value) * pow(0.1, dicimal);
 
-	//Controllo necessario per evitare che il segnale di cambiamento venga emesso piu' volte.
-	if (m_lineEdit->getValue() == val ||
-		(m_roller->getValue() == val && m_roller->isVisible()))
+	// Controllo necessario per evitare che il segnale di cambiamento venga emesso piu' volte.
+	if (m_lineEdit->getValue() == val || (m_roller->getValue() == val && m_roller->isVisible()))
 		return;
 	m_lineEdit->setValue(val);
 	m_roller->setValue(val);
-	//Faccio in modo che il cursore sia sulla prima cifra, cosi' se la stringa
-	//da visualizzare e' piu' lunga del campo le cifre che vengono troncate sono
-	//le ultime e non le prime (dovrebbero essere quelle dopo la virgola).
+	// Faccio in modo che il cursore sia sulla prima cifra, cosi' se la stringa
+	// da visualizzare e' piu' lunga del campo le cifre che vengono troncate sono
+	// le ultime e non le prime (dovrebbero essere quelle dopo la virgola).
 	m_lineEdit->setCursorPosition(0);
 
 	emit valueChanged(true);
@@ -213,7 +212,7 @@ void DoubleValueField::onLineEditValueChanged()
 	int dicimal = m_lineEdit->getDecimals();
 	double sliderValue = value * pow(10., dicimal);
 
-	//Controllo necessario per evitare che il segnale di cambiamento venga emesso piu' volte.
+	// Controllo necessario per evitare che il segnale di cambiamento venga emesso piu' volte.
 	if ((m_slider->value() == sliderValue && m_slider->isVisible()) ||
 		(m_roller->getValue() == value && m_roller->isVisible()))
 		return;
@@ -241,9 +240,9 @@ void DoubleValueField::onRollerValueChanged(bool isDragging)
 	m_slider->setValue(sliderValue);
 	m_lineEdit->setValue(value);
 
-	//Faccio in modo che il cursore sia sulla prima cifra, cosi' se la stringa
-	//da visualizzare e' piu' lunga del campo le cifre che vengono troncate sono
-	//le ultime e non le prime (dovrebbero essere quelle dopo la virgola).
+	// Faccio in modo che il cursore sia sulla prima cifra, cosi' se la stringa
+	// da visualizzare e' piu' lunga del campo le cifre che vengono troncate sono
+	// le ultime e non le prime (dovrebbero essere quelle dopo la virgola).
 	m_lineEdit->setCursorPosition(0);
 
 	emit valueChanged(isDragging);
@@ -253,10 +252,10 @@ void DoubleValueField::onRollerValueChanged(bool isDragging)
 // DoubleLineEdit
 //-----------------------------------------------------------------------------
 
-DoubleLineEdit::DoubleLineEdit(QWidget *parent, double value)
-	: DoubleValueLineEdit(parent)
+DoubleLineEdit::DoubleLineEdit(QWidget *parent, double value) : DoubleValueLineEdit(parent)
 {
-	m_validator = new QDoubleValidator(-(std::numeric_limits<double>::max)(), (std::numeric_limits<double>::max)(), 8, this);
+	m_validator = new QDoubleValidator(-(std::numeric_limits<double>::max)(),
+									   (std::numeric_limits<double>::max)(), 8, this);
 	setValidator(m_validator);
 
 	setValue(value);
@@ -279,9 +278,9 @@ void DoubleLineEdit::setValue(double value)
 	str.setNum(value);
 	setText(str);
 
-	//Faccio in modo che il cursore sia sulla prima cifra, cosi' se la stringa
-	//da visualizzare e' piu' lunga del campo le cifre che vengono troncate sono
-	//le ultime e non le prime (dovrebbero essere quelle dopo la virgola).
+	// Faccio in modo che il cursore sia sulla prima cifra, cosi' se la stringa
+	// da visualizzare e' piu' lunga del campo le cifre che vengono troncate sono
+	// le ultime e non le prime (dovrebbero essere quelle dopo la virgola).
 	setCursorPosition(0);
 }
 
@@ -344,13 +343,16 @@ DoubleField::DoubleField(QWidget *parent, bool isRollerHide, int decimals)
 //-----------------------------------------------------------------------------
 
 MeasuredDoubleLineEdit::MeasuredDoubleLineEdit(QWidget *parent)
-	: DoubleValueLineEdit(parent), m_minValue(-(std::numeric_limits<double>::max)()), m_maxValue((std::numeric_limits<double>::max)()), m_modified(false), m_errorHighlighting(0), m_errorHighlightingTimerId(0), m_decimals(7)
+	: DoubleValueLineEdit(parent), m_minValue(-(std::numeric_limits<double>::max)()),
+	  m_maxValue((std::numeric_limits<double>::max)()), m_modified(false), m_errorHighlighting(0),
+	  m_errorHighlightingTimerId(0), m_decimals(7)
 {
 	setObjectName("ValueLineEdit");
 	m_value = new TMeasuredValue("length");
 	valueToText();
 	bool ret = connect(this, SIGNAL(editingFinished()), this, SLOT(onEditingFinished()));
-	ret = ret && connect(this, SIGNAL(textChanged(const QString &)), this, SLOT(onTextChanged(const QString &)));
+	ret = ret && connect(this, SIGNAL(textChanged(const QString &)), this,
+						 SLOT(onTextChanged(const QString &)));
 	assert(ret);
 }
 
@@ -491,7 +493,8 @@ void MeasuredDoubleLineEdit::timerEvent(QTimerEvent *)
 		int v = 255 - (int)(m_errorHighlighting * 255);
 		m_errorHighlighting = m_errorHighlighting * 0.8;
 		int c = 255 << 16 | v << 8 | v;
-		setStyleSheet(QString("#ValueLineEdit {background-color:#%1}").arg(c, 6, 16, QLatin1Char('0')));
+		setStyleSheet(
+			QString("#ValueLineEdit {background-color:#%1}").arg(c, 6, 16, QLatin1Char('0')));
 	}
 }
 

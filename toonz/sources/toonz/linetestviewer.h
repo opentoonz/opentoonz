@@ -34,15 +34,15 @@ class LineTestViewer : public QGLWidget
 	Qt::MouseButton m_mouseButton;
 
 #ifndef USE_QPAINTER
-	//bool m_pboSupported;
+	// bool m_pboSupported;
 	GLuint m_textureId;
 	GLuint m_pboId;
 #endif
 
-	//!Used to zoom and pan
+	//! Used to zoom and pan
 	TAffine m_viewAffine;
 
-public:
+  public:
 	LineTestViewer(QWidget *parent = 0);
 	~LineTestViewer();
 
@@ -52,10 +52,7 @@ public:
 	TPointD winToWorld(const TPoint &winPos) const;
 
 	// overriden from TTool::Viewer
-	void pan(const TPoint &delta)
-	{
-		panQt(QPoint(delta.x, delta.y));
-	}
+	void pan(const TPoint &delta) { panQt(QPoint(delta.x, delta.y)); }
 	// overriden from TTool::Viewer
 	void zoom(const TPointD &center, double factor)
 	{
@@ -72,14 +69,14 @@ public:
 
 	void zoomQt(bool forward, bool reset);
 
-protected:
+  protected:
 #ifdef USE_QPAINTER
 	void paintEvent(QPaintEvent *);
 #else
 	void paintGL();
 	void initializeGL();
 	void resizeGL(int width, int height);
-	//void checkPBOSupport();
+	// void checkPBOSupport();
 	void paintRaster(TRasterP ras);
 #endif
 
@@ -99,15 +96,15 @@ protected:
 	void panQt(const QPoint &delta);
 	void zoomQt(const QPoint &center, double factor);
 
-public slots:
+  public slots:
 	void onButtonPressed(FlipConsole::EGadget button);
 	void resetView();
 
-protected slots:
+  protected slots:
 	void onFrameSwitched();
 	void onXsheetChanged();
 	void onSceneSwitched();
-signals:
+  signals:
 	void onZoomChanged();
 };
 

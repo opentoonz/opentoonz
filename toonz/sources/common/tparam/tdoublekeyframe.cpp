@@ -6,7 +6,9 @@
 #include "tunit.h"
 
 TDoubleKeyframe::TDoubleKeyframe(double frame, double value)
-	: m_type(Linear), m_frame(frame), m_value(value), m_step(1), m_isKeyframe(false), m_speedIn(), m_speedOut(), m_linkedHandles(true), m_expressionText(""), m_fileParams(), m_similarShapeOffset(0), m_unitName("")
+	: m_type(Linear), m_frame(frame), m_value(value), m_step(1), m_isKeyframe(false), m_speedIn(),
+	  m_speedOut(), m_linkedHandles(true), m_expressionText(""), m_fileParams(),
+	  m_similarShapeOffset(0), m_unitName("")
 {
 }
 
@@ -55,13 +57,11 @@ void TDoubleKeyframe::saveData(TOStream &os) const
 		os << m_frame << m_value;
 		break;
 	case SpeedInOut:
-		os << m_frame << m_value
-		   << m_speedOut.x << m_speedOut.y;
+		os << m_frame << m_value << m_speedOut.x << m_speedOut.y;
 		break;
 	case EaseInOut:
 	case EaseInOutPercentage:
-		os << m_frame << m_value
-		   << m_speedOut.x;
+		os << m_frame << m_value << m_speedOut.x;
 		break;
 	case Expression:
 		os << m_frame << m_expressionText << unitName;
@@ -95,8 +95,7 @@ void TDoubleKeyframe::loadData(TIStream &is)
 	std::string tagName;
 	if (!is.matchTag(tagName))
 		return;
-	std::map<std::string, TDoubleKeyframe::Type>::iterator it =
-		typeCodes.find(tagName);
+	std::map<std::string, TDoubleKeyframe::Type>::iterator it = typeCodes.find(tagName);
 	if (it == typeCodes.end()) {
 		throw TException(tagName + " : unexpected tag");
 	}

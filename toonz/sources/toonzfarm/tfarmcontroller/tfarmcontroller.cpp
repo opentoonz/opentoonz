@@ -119,9 +119,9 @@ TFilePath getLocalRoot()
 		}
 	}
 
-//TFilePath name = TFilePath("TFARMLOCALROOT");
-//char *s = getenv(toString(name.getWideString()).c_str());
-//lroot = TFilePath(s?s:"");
+// TFilePath name = TFilePath("TFARMLOCALROOT");
+// char *s = getenv(toString(name.getWideString()).c_str());
+// lroot = TFilePath(s?s:"");
 
 #endif
 	return lroot;
@@ -177,15 +177,15 @@ bool loadControllerData(QString &hostName, QString &addr, int &port)
 
 bool isAScript(TFarmTask *task)
 {
-	return false; //todo per gli script
-				  /*
+	return false; // todo per gli script
+	/*
 #ifdef _WIN32
-   return task->m_cmdline.contains(".bat");
+return task->m_cmdline.contains(".bat");
 #else
-  return (task->m_cmdline.contains(".csh")|| 
-          task->m_cmdline.contains(".sh")|| 
-          task->m_cmdline.contains(".tcsh"))
-#endif   
+return (task->m_cmdline.contains(".csh")||
+task->m_cmdline.contains(".sh")||
+task->m_cmdline.contains(".tcsh"))
+#endif
 */
 }
 
@@ -195,20 +195,19 @@ bool isAScript(TFarmTask *task)
 
 class CtrlFarmTask : public TFarmTask
 {
-public:
+  public:
 	CtrlFarmTask() : m_toBeDeleted(false), m_failureCount(0) {}
 
-	CtrlFarmTask(
-		const QString &id, const QString &name, const QString &cmdline,
-		const QString &user, const QString &host, int stepCount, int priority)
-		: TFarmTask(id, name, cmdline, user, host, stepCount, priority), m_toBeDeleted(false), m_failureCount(0)
+	CtrlFarmTask(const QString &id, const QString &name, const QString &cmdline,
+				 const QString &user, const QString &host, int stepCount, int priority)
+		: TFarmTask(id, name, cmdline, user, host, stepCount, priority), m_toBeDeleted(false),
+		  m_failureCount(0)
 	{
 		m_id = id;
 		m_status = Waiting;
 	}
 
-	CtrlFarmTask(const CtrlFarmTask &rhs)
-		: TFarmTask(rhs)
+	CtrlFarmTask(const CtrlFarmTask &rhs) : TFarmTask(rhs)
 	{
 		m_serverId = rhs.m_serverId;
 		m_subTasks = rhs.m_subTasks;
@@ -234,14 +233,10 @@ namespace
 
 class TFarmTaskDeclaration : public TPersistDeclaration
 {
-public:
-	TFarmTaskDeclaration(const std::string &id)
-		: TPersistDeclaration(id) {}
+  public:
+	TFarmTaskDeclaration(const std::string &id) : TPersistDeclaration(id) {}
 
-	TPersist *create() const
-	{
-		return new CtrlFarmTask;
-	}
+	TPersist *create() const { return new CtrlFarmTask; }
 } Declaration("tfarmtask");
 }
 
@@ -374,9 +369,10 @@ const TPersistDeclaration *CtrlFarmTask::getDeclaration() const
 
 class FarmServerProxy
 {
-public:
+  public:
 	FarmServerProxy(const QString &hostName, const QString &addr, int port, int maxTaskCount = 1)
-		: m_hostName(hostName), m_addr(addr), m_port(port), m_offline(false), m_attached(false), m_maxTaskCount(maxTaskCount), m_platform(NoPlatform)
+		: m_hostName(hostName), m_addr(addr), m_port(port), m_offline(false), m_attached(false),
+		  m_maxTaskCount(maxTaskCount), m_platform(NoPlatform)
 	{
 		TFarmServerFactory serverFactory;
 		serverFactory.create(m_hostName, m_addr, m_port, &m_server);
@@ -384,30 +380,15 @@ public:
 
 	~FarmServerProxy() {}
 
-	QString getId() const
-	{
-		return getIpAddress();
-	}
+	QString getId() const { return getIpAddress(); }
 
-	QString getHostName() const
-	{
-		return m_hostName;
-	}
+	QString getHostName() const { return m_hostName; }
 
-	QString getIpAddress() const
-	{
-		return m_addr;
-	}
+	QString getIpAddress() const { return m_addr; }
 
-	int getPort() const
-	{
-		return m_port;
-	}
+	int getPort() const { return m_port; }
 
-	const vector<QString> &getTasks() const
-	{
-		return m_tasks;
-	}
+	const vector<QString> &getTasks() const { return m_tasks; }
 
 	int addTask(const CtrlFarmTask *task);
 	void terminateTask(const QString &taskId);
@@ -417,10 +398,7 @@ public:
 
 	bool testConnection(int timeout);
 
-	void queryHwInfo(TFarmServer::HwInfo &hwInfo)
-	{
-		m_server->queryHwInfo(hwInfo);
-	}
+	void queryHwInfo(TFarmServer::HwInfo &hwInfo) { m_server->queryHwInfo(hwInfo); }
 
 	void attachController(const QString &name, const QString &addr, int port)
 	{
@@ -497,9 +475,11 @@ bool doTestConnection(const QString &hostName, const QString &addr, int port)
 #ifdef _WIN32
 class ConnectionTest : public TThread::Runnable
 {
-public:
+  public:
 	ConnectionTest(const FarmServerProxy *server, HANDLE hEvent)
-		: m_server(server), m_hEvent(hEvent) {}
+		: m_server(server), m_hEvent(hEvent)
+	{
+	}
 
 	void run();
 
@@ -509,8 +489,7 @@ public:
 
 void ConnectionTest::run()
 {
-	bool res = doTestConnection(
-		m_server->m_hostName, m_server->m_addr, m_server->m_port);
+	bool res = doTestConnection(m_server->m_hostName, m_server->m_addr, m_server->m_port);
 
 	SetEvent(m_hEvent);
 }
@@ -568,7 +547,7 @@ class TaskId
 	int m_id;
 	int m_subId;
 
-public:
+  public:
 	TaskId(int id, int subId = -1) : m_id(id), m_subId(m_subId){};
 	TaskId(const QString &id)
 	{
@@ -582,9 +561,18 @@ public:
 		}
 	}
 
-	inline bool operator==(const TaskId &f) const { return f.m_id == m_id && f.m_subId == m_subId; };
-	inline bool operator!=(const TaskId &f) const { return (m_id != f.m_id || m_subId != f.m_subId); };
-	inline bool operator<(const TaskId &f) const { return (m_id < f.m_id || (m_id == f.m_id && m_subId < f.m_subId)); };
+	inline bool operator==(const TaskId &f) const
+	{
+		return f.m_id == m_id && f.m_subId == m_subId;
+	};
+	inline bool operator!=(const TaskId &f) const
+	{
+		return (m_id != f.m_id || m_subId != f.m_subId);
+	};
+	inline bool operator<(const TaskId &f) const
+	{
+		return (m_id < f.m_id || (m_id == f.m_id && m_subId < f.m_subId));
+	};
 	inline bool operator>(const TaskId &f) const { return f < *this; }
 	inline bool operator>=(const TaskId &f) const { return !operator<(f); }
 	inline bool operator<=(const TaskId &f) const { return !operator>(f); }
@@ -596,7 +584,7 @@ public:
 		return *this;
 	}
 
-	//operator string() const;
+	// operator string() const;
 	QString toString() const
 	{
 		QString id(QString::number(m_id));
@@ -610,7 +598,7 @@ public:
 
 class FarmController : public TFarmExecutor, public TFarmController
 {
-public:
+  public:
 	FarmController(const QString &hostName, const QString &addr, int port, TUserLog *log);
 
 	void loadServersData(const TFilePath &globalRoot);
@@ -621,12 +609,8 @@ public:
 
 	// TFarmController interface methods implementation
 
-	QString addTask(
-		const QString &name, const QString &cmdline,
-		const QString &user, const QString &host,
-		bool suspended,
-		int priority,
-		TFarmPlatform platform);
+	QString addTask(const QString &name, const QString &cmdline, const QString &user,
+					const QString &host, bool suspended, int priority, TFarmPlatform platform);
 
 	QString addTask(const TFarmTask &task, bool suspended);
 
@@ -641,11 +625,7 @@ public:
 
 	void queryTaskInfo(const QString &id, TFarmTask &task);
 
-	void queryTaskShortInfo(
-		const QString &id,
-		QString &parentId,
-		QString &name,
-		TaskState &status);
+	void queryTaskShortInfo(const QString &id, QString &parentId, QString &name, TaskState &status);
 
 	// used (by a server) to notify a server start
 	void attachServer(const QString &name, const QString &addr, int port);
@@ -657,12 +637,8 @@ public:
 	void taskSubmissionError(const QString &taskId, int errCode);
 
 	// used by a server to notify a task progress
-	void taskProgress(
-		const QString &taskId,
-		int step,
-		int stepCount,
-		int frameNumber,
-		FrameState state);
+	void taskProgress(const QString &taskId, int step, int stepCount, int frameNumber,
+					  FrameState state);
 
 	// used (by a server) to notify a task completion
 	void taskCompleted(const QString &taskId, int exitCode);
@@ -684,12 +660,9 @@ public:
 	void deactivateServer(const QString &id, bool completeRunningTasks);
 
 	// FarmController specific methods
-	CtrlFarmTask *doAddTask(
-		const QString &id, const QString &parentId,
-		const QString &name, const QString &cmdline,
-		const QString &user, const QString &host,
-		bool suspended, int stepCount, int priority,
-		TFarmPlatform platform);
+	CtrlFarmTask *doAddTask(const QString &id, const QString &parentId, const QString &name,
+							const QString &cmdline, const QString &user, const QString &host,
+							bool suspended, int stepCount, int priority, TFarmPlatform platform);
 
 	void startTask(CtrlFarmTask *task, FarmServerProxy *server);
 
@@ -729,7 +702,8 @@ int FarmController::NextTaskId = 0;
 
 //------------------------------------------------------------------------------
 
-FarmController::FarmController(const QString &hostName, const QString &addr, int port, TUserLog *log)
+FarmController::FarmController(const QString &hostName, const QString &addr, int port,
+							   TUserLog *log)
 	: TFarmExecutor(port), m_hostName(hostName), m_addr(addr), m_port(port), m_userLog(log)
 {
 	TFilePath rootDir = getGlobalRoot();
@@ -890,8 +864,8 @@ QString FarmController::execute(const vector<QString> &argv)
 
 				fromStr(subTaskPriority, argv[i + 4]);
 
-				TFarmTask *subTask = new TFarmTask("",
-												   argv[i], argv[i + 1], argv[i + 2], argv[i + 3], subTaskPriority, 50);
+				TFarmTask *subTask = new TFarmTask("", argv[i], argv[i + 1], argv[i + 2],
+												   argv[i + 3], subTaskPriority, 50);
 
 				task.addTask(subTask);
 			}
@@ -935,8 +909,8 @@ QString FarmController::execute(const vector<QString> &argv)
 				int subTaskPriority;
 				fromStr(subTaskPriority, argv[i + 5]);
 
-				TFarmTask *subTask = new TFarmTask(
-					"", argv[i], argv[i + 1], argv[i + 2], argv[i + 3], subTaskStepCount, subTaskPriority);
+				TFarmTask *subTask = new TFarmTask("", argv[i], argv[i + 1], argv[i + 2],
+												   argv[i + 3], subTaskStepCount, subTaskPriority);
 
 				subTask->m_dependencies = new TFarmTask::Dependencies(*task.m_dependencies);
 				subTask->m_platform = platform;
@@ -1097,12 +1071,10 @@ QString FarmController::execute(const vector<QString> &argv)
 
 //------------------------------------------------------------------------------
 
-CtrlFarmTask *FarmController::doAddTask(
-	const QString &id, const QString &parentId,
-	const QString &name, const QString &cmdline,
-	const QString &user, const QString &host,
-	bool suspended, int stepCount,
-	int priority, TFarmPlatform platform)
+CtrlFarmTask *FarmController::doAddTask(const QString &id, const QString &parentId,
+										const QString &name, const QString &cmdline,
+										const QString &user, const QString &host, bool suspended,
+										int stepCount, int priority, TFarmPlatform platform)
 {
 	CtrlFarmTask *task = new CtrlFarmTask(id, name, cmdline, user, host, stepCount, priority);
 	task->m_submissionDate = QDateTime::currentDateTime();
@@ -1111,14 +1083,15 @@ CtrlFarmTask *FarmController::doAddTask(
 
 	m_tasks.insert(std::make_pair(TaskId(id), task));
 
-	m_userLog->info("Task " + task->m_id + " received at " + task->m_submissionDate.toString() + "\n");
+	m_userLog->info("Task " + task->m_id + " received at " + task->m_submissionDate.toString() +
+					"\n");
 	m_userLog->info("\"" + task->getCommandLine() + "\"\n");
 
 	if (suspended)
 		task->m_status = Suspended;
 	/*
   else
-    tryToStartTask(task);
+	tryToStartTask(task);
 */
 	return task;
 }
@@ -1149,8 +1122,7 @@ void FarmController::startTask(CtrlFarmTask *task, FarmServerProxy *server)
 		for (; itSubTaskId != task->m_subTasks.end(); ++itSubTaskId) {
 			QString subTaskId = *itSubTaskId;
 
-			map<TaskId, CtrlFarmTask *>::iterator itSubTask =
-				m_tasks.find(TaskId(subTaskId));
+			map<TaskId, CtrlFarmTask *>::iterator itSubTask = m_tasks.find(TaskId(subTaskId));
 			if (itSubTask != m_tasks.end()) {
 				CtrlFarmTask *subTask = itSubTask->second;
 				if (subTask->m_status == Waiting) {
@@ -1200,7 +1172,8 @@ CtrlFarmTask *FarmController::getTaskToStart(FarmServerProxy *server)
 	map<TaskId, CtrlFarmTask *>::iterator itTask = m_tasks.begin();
 	for (; itTask != m_tasks.end(); ++itTask) {
 		CtrlFarmTask *task = itTask->second;
-		if ((!server || (task->m_platform == NoPlatform || task->m_platform == server->m_platform)) &&
+		if ((!server ||
+			 (task->m_platform == NoPlatform || task->m_platform == server->m_platform)) &&
 			((task->m_status == Waiting && task->m_priority > maxPriority) ||
 			 (task->m_status == Aborted && task->m_failureCount < 3) && task->m_parentId != "")) {
 			bool dependenciesCompleted = true;
@@ -1314,7 +1287,8 @@ bool FarmController::tryToStartTask(CtrlFarmTask *task)
 					continue;
 
 				vector<QString>::iterator its =
-					find(task->m_failedOnServers.begin(), task->m_failedOnServers.end(), server->getId());
+					find(task->m_failedOnServers.begin(), task->m_failedOnServers.end(),
+						 server->getId());
 
 				if (its != task->m_failedOnServers.end())
 					continue;
@@ -1396,7 +1370,7 @@ ServerState FarmController::getServerState(FarmServerProxy *server, QString &tas
 
 class ServerInitializer : public TThread::Runnable
 {
-public:
+  public:
 	ServerInitializer(FarmServerProxy *server) : m_server(server) {}
 
 	void run()
@@ -1409,7 +1383,7 @@ public:
 		}
 
 		m_server->m_attached = true;
-		//m_server->m_maxTaskCount = hwInfo.m_cpuCount;
+		// m_server->m_maxTaskCount = hwInfo.m_cpuCount;
 		m_server->m_maxTaskCount = 1;
 	}
 
@@ -1430,7 +1404,7 @@ void FarmController::initServer(FarmServerProxy *server)
 	}
 
 	server->m_attached = true;
-	//server->m_maxTaskCount = hwInfo.m_cpuCount;
+	// server->m_maxTaskCount = hwInfo.m_cpuCount;
 	server->m_maxTaskCount = 1;
 
 	server->m_platform = hwInfo.m_type;
@@ -1438,16 +1412,13 @@ void FarmController::initServer(FarmServerProxy *server)
 
 //------------------------------------------------------------------------------
 
-QString FarmController::addTask(
-	const QString &name, const QString &cmdline,
-	const QString &user, const QString &host,
-	bool suspended, int priority, TFarmPlatform platform)
+QString FarmController::addTask(const QString &name, const QString &cmdline, const QString &user,
+								const QString &host, bool suspended, int priority,
+								TFarmPlatform platform)
 {
 	QString parentId = "";
-	CtrlFarmTask *task = doAddTask(
-		QString::number(NextTaskId++), parentId,
-		name, cmdline, user, host, suspended,
-		1, priority, platform);
+	CtrlFarmTask *task = doAddTask(QString::number(NextTaskId++), parentId, name, cmdline, user,
+								   host, suspended, 1, priority, platform);
 
 	return task->m_id;
 }
@@ -1456,12 +1427,11 @@ QString FarmController::addTask(
 
 class TaskStarter : public TThread::Runnable
 {
-public:
-	TaskStarter(
-		FarmController *controller,
-		CtrlFarmTask *task,
-		FarmServerProxy *server = 0)
-		: m_controller(controller), m_task(task), m_server(server) {}
+  public:
+	TaskStarter(FarmController *controller, CtrlFarmTask *task, FarmServerProxy *server = 0)
+		: m_controller(controller), m_task(task), m_server(server)
+	{
+	}
 
 	void run();
 
@@ -1493,16 +1463,12 @@ QString FarmController::addTask(const TFarmTask &task, bool suspended)
 	int count = task.getTaskCount();
 	if (count == 1) {
 		QString parentId = "";
-		myTask = doAddTask(
-			id, parentId,
-			task.m_name, task.getCommandLine(),
-			task.m_user, task.m_hostName,
-			suspended, task.m_stepCount,
-			task.m_priority, task.m_platform);
+		myTask = doAddTask(id, parentId, task.m_name, task.getCommandLine(), task.m_user,
+						   task.m_hostName, suspended, task.m_stepCount, task.m_priority,
+						   task.m_platform);
 	} else {
-		myTask = new CtrlFarmTask(
-			id, task.m_name, task.getCommandLine(),
-			task.m_user, task.m_hostName, task.m_stepCount, task.m_priority);
+		myTask = new CtrlFarmTask(id, task.m_name, task.getCommandLine(), task.m_user,
+								  task.m_hostName, task.m_stepCount, task.m_priority);
 
 		myTask->m_submissionDate = QDateTime::currentDateTime();
 		myTask->m_parentId = "";
@@ -1518,12 +1484,10 @@ QString FarmController::addTask(const TFarmTask &task, bool suspended)
 			TFarmTask &tt = const_cast<TFarmTask &>(task);
 			TFarmTask *subtask = tt.getTask(i);
 
-			CtrlFarmTask *mySubTask = doAddTask(
-				subTaskId, myTask->m_id,
-				subtask->m_name, subtask->getCommandLine(),
-				subtask->m_user, subtask->m_hostName,
-				suspended, subtask->m_stepCount,
-				subtask->m_priority, task.m_platform);
+			CtrlFarmTask *mySubTask =
+				doAddTask(subTaskId, myTask->m_id, subtask->m_name, subtask->getCommandLine(),
+						  subtask->m_user, subtask->m_hostName, suspended, subtask->m_stepCount,
+						  subtask->m_priority, task.m_platform);
 
 			mySubTask->m_dependencies = new TFarmTask::Dependencies(*task.m_dependencies);
 
@@ -1566,8 +1530,9 @@ void FarmController::removeTask(const QString &id)
 					if (itServer != m_servers.end()) {
 						FarmServerProxy *server = itServer->second;
 						if (server) {
-							vector<QString>::const_iterator it3 = find(
-								server->getTasks().begin(), server->getTasks().end(), subTask->m_id);
+							vector<QString>::const_iterator it3 =
+								find(server->getTasks().begin(), server->getTasks().end(),
+									 subTask->m_id);
 
 							if (it3 != server->getTasks().end()) {
 								aSubtaskIsRunning = true;
@@ -1611,8 +1576,9 @@ void FarmController::suspendTask(const QString &id)
 					if (itServer != m_servers.end()) {
 						FarmServerProxy *server = itServer->second;
 						if (server) {
-							vector<QString>::const_iterator it3 = find(
-								server->getTasks().begin(), server->getTasks().end(), subTask->m_id);
+							vector<QString>::const_iterator it3 =
+								find(server->getTasks().begin(), server->getTasks().end(),
+									 subTask->m_id);
 
 							if (it3 != server->getTasks().end())
 								server->terminateTask(subTask->m_id);
@@ -1727,17 +1693,17 @@ void FarmController::getTasks(const QString &parentId, vector<TaskShortInfo> &ta
   map<TaskId, CtrlFarmTask*>::iterator it = m_tasks.find(parentId);
   if (it != m_tasks.end())
   {
-    CtrlFarmTask *task = it->second;
-    vector<std::string>::iterator itSubTakId = task->m_subTasks.begin();
-    for ( ; itSubTakId != task->m_subTasks.end(); ++itSubTakId)
-    {
-      map<std::string, CtrlFarmTask*>::iterator itSubTask = m_tasks.find(*itSubTakId);
-      if (itSubTask != m_tasks.end())
-      {
-        CtrlFarmTask *subTask = itSubTask->second;
-        tasks.push_back(TaskShortInfo(*itSubTakId, subTask->m_name, subTask->m_status));
-      }
-    }
+	CtrlFarmTask *task = it->second;
+	vector<std::string>::iterator itSubTakId = task->m_subTasks.begin();
+	for ( ; itSubTakId != task->m_subTasks.end(); ++itSubTakId)
+	{
+	  map<std::string, CtrlFarmTask*>::iterator itSubTask = m_tasks.find(*itSubTakId);
+	  if (itSubTask != m_tasks.end())
+	  {
+		CtrlFarmTask *subTask = itSubTask->second;
+		tasks.push_back(TaskShortInfo(*itSubTakId, subTask->m_name, subTask->m_status));
+	  }
+	}
   }
 */
 }
@@ -1763,9 +1729,8 @@ void FarmController::queryTaskInfo(const QString &id, TFarmTask &task)
 
 //------------------------------------------------------------------------------
 
-void FarmController::queryTaskShortInfo(
-	const QString &id, QString &parentId,
-	QString &name, TaskState &status)
+void FarmController::queryTaskShortInfo(const QString &id, QString &parentId, QString &name,
+										TaskState &status)
 {
 	map<TaskId, CtrlFarmTask *>::iterator it = m_tasks.find(TaskId(id));
 	if (it != m_tasks.end()) {
@@ -1786,8 +1751,7 @@ void FarmController::attachServer(const QString &name, const QString &addr, int 
 	for (; it != m_servers.end(); ++it) {
 		FarmServerProxy *s = it->second;
 
-		if (STRICMP(s->getHostName(), name) == 0 ||
-			STRICMP(s->getIpAddress(), addr) == 0) {
+		if (STRICMP(s->getHostName(), name) == 0 || STRICMP(s->getIpAddress(), addr) == 0) {
 			server = s;
 			break;
 		}
@@ -1808,8 +1772,7 @@ void FarmController::detachServer(const QString &name, const QString &addr, int 
 	map<QString, FarmServerProxy *>::iterator it = m_servers.begin();
 	for (; it != m_servers.end(); ++it) {
 		FarmServerProxy *s = it->second;
-		if (STRICMP(s->getHostName(), name) == 0 ||
-			STRICMP(s->getIpAddress(), addr) == 0) {
+		if (STRICMP(s->getHostName(), name) == 0 || STRICMP(s->getIpAddress(), addr) == 0) {
 			s->m_attached = false;
 			break;
 		}
@@ -1843,7 +1806,8 @@ void FarmController::taskSubmissionError(const QString &taskId, int errCode)
 				std::vector<QString>::iterator itSubTaskId = parentTask->m_subTasks.begin();
 				for (; itSubTaskId != parentTask->m_subTasks.end(); ++itSubTaskId) {
 					QString subTaskId = *itSubTaskId;
-					map<TaskId, CtrlFarmTask *>::iterator itSubTask = m_tasks.find(TaskId(subTaskId));
+					map<TaskId, CtrlFarmTask *>::iterator itSubTask =
+						m_tasks.find(TaskId(subTaskId));
 					if (itSubTask != m_tasks.end()) {
 						CtrlFarmTask *subTask = itSubTask->second;
 						if (subTask->m_status == Running || subTask->m_status == Waiting) {
@@ -1868,19 +1832,19 @@ void FarmController::taskSubmissionError(const QString &taskId, int errCode)
 
 		if (server) {
 			/*
-      string msg = "Task " + taskId + " completed on ";
-      msg += server->getHostName().c_str();
-      msg += "\n\n";
-      m_userLog->info(msg);
-      */
+	  string msg = "Task " + taskId + " completed on ";
+	  msg += server->getHostName().c_str();
+	  msg += "\n\n";
+	  m_userLog->info(msg);
+	  */
 			server->removeTask(taskId);
 		}
 
 		/*
-    if (parentTask && parentTask->m_status == Completed)
-    {
-      m_userLog->info("Task " + parentTask->m_id + " completed\n\n");
-    }
+	if (parentTask && parentTask->m_status == Completed)
+	{
+	  m_userLog->info("Task " + parentTask->m_id + " completed\n\n");
+	}
 */
 		if (task->m_toBeDeleted)
 			delete task;
@@ -1909,12 +1873,8 @@ void FarmController::taskSubmissionError(const QString &taskId, int errCode)
 
 //------------------------------------------------------------------------------
 
-void FarmController::taskProgress(
-	const QString &taskId,
-	int step,
-	int stepCount,
-	int frameNumber,
-	FrameState state)
+void FarmController::taskProgress(const QString &taskId, int step, int stepCount, int frameNumber,
+								  FrameState state)
 {
 	map<TaskId, CtrlFarmTask *>::iterator itTask = m_tasks.find(TaskId(taskId));
 	if (itTask != m_tasks.end()) {
@@ -1925,7 +1885,8 @@ void FarmController::taskProgress(
 			++task->m_failedSteps;
 
 		if (task->m_parentId != "") {
-			map<TaskId, CtrlFarmTask *>::iterator itParentTask = m_tasks.find(TaskId(task->m_parentId));
+			map<TaskId, CtrlFarmTask *>::iterator itParentTask =
+				m_tasks.find(TaskId(task->m_parentId));
 			CtrlFarmTask *parentTask = itParentTask->second;
 			if (state == FrameDone)
 				++parentTask->m_successfullSteps;
@@ -1996,7 +1957,8 @@ void FarmController::taskCompleted(const QString &taskId, int exitCode)
 					std::vector<QString>::iterator itSubTaskId = parentTask->m_subTasks.begin();
 					for (; itSubTaskId != parentTask->m_subTasks.end(); ++itSubTaskId) {
 						QString subTaskId = *itSubTaskId;
-						map<TaskId, CtrlFarmTask *>::iterator itSubTask = m_tasks.find(TaskId(subTaskId));
+						map<TaskId, CtrlFarmTask *>::iterator itSubTask =
+							m_tasks.find(TaskId(subTaskId));
 						if (itSubTask != m_tasks.end()) {
 							CtrlFarmTask *subTask = itSubTask->second;
 
@@ -2008,12 +1970,12 @@ void FarmController::taskCompleted(const QString &taskId, int exitCode)
 								aSubTaskFailed = true;
 
 							/*
-              if (subTask->m_status == Running || subTask->m_status == Waiting)
-                parentTaskState = Running;
-              else
-              if (subTask->m_status == Aborted)
-                aSubTaskFailed = true;
-              */
+			  if (subTask->m_status == Running || subTask->m_status == Waiting)
+				parentTaskState = Running;
+			  else
+			  if (subTask->m_status == Aborted)
+				aSubTaskFailed = true;
+			  */
 						}
 					}
 				} else
@@ -2078,10 +2040,9 @@ void FarmController::taskCompleted(const QString &taskId, int exitCode)
 		if (task) {
 			try {
 				if (task->m_status == Aborted) {
-					vector<QString>::iterator it = find(
-						task->m_failedOnServers.begin(),
-						task->m_failedOnServers.end(),
-						server->getId());
+					vector<QString>::iterator it =
+						find(task->m_failedOnServers.begin(), task->m_failedOnServers.end(),
+							 server->getId());
 
 					if (it == task->m_failedOnServers.end())
 						doRestartTask(task->m_id, false, server);
@@ -2168,10 +2129,9 @@ void FarmController::activateServer(const QString &id)
 			if (task) {
 				try {
 					if (task->m_status == Aborted) {
-						vector<QString>::iterator it = find(
-							task->m_failedOnServers.begin(),
-							task->m_failedOnServers.end(),
-							server->getId());
+						vector<QString>::iterator it =
+							find(task->m_failedOnServers.begin(), task->m_failedOnServers.end(),
+								 server->getId());
 
 						if (it == task->m_failedOnServers.end())
 							doRestartTask(task->m_id, false, server);
@@ -2297,10 +2257,9 @@ void FarmController::activateReadyServers()
 				if (task) {
 					try {
 						if (task->m_status == Aborted) {
-							vector<QString>::iterator it = find(
-								task->m_failedOnServers.begin(),
-								task->m_failedOnServers.end(),
-								server->getId());
+							vector<QString>::iterator it =
+								find(task->m_failedOnServers.begin(), task->m_failedOnServers.end(),
+									 server->getId());
 
 							if (it == task->m_failedOnServers.end())
 								doRestartTask(task->m_id, false, server);
@@ -2324,14 +2283,12 @@ void FarmController::activateReadyServers()
 
 class ControllerService : public TService
 {
-public:
-	ControllerService()
-		: TService("ToonzFarmController", "ToonzFarm Controller"), m_controller(0) {}
-
-	~ControllerService()
+  public:
+	ControllerService() : TService("ToonzFarmController", "ToonzFarm Controller"), m_controller(0)
 	{
-		delete m_controller;
 	}
+
+	~ControllerService() { delete m_controller; }
 
 	void onStart(int argc, char *argv[]);
 	void onStop();
@@ -2448,17 +2405,17 @@ void ControllerService::onStart(int argc, char *argv[])
 	msg += "\n\n";
 	m_userLog->info(msg);
 
-	//std::cout << msg;
+	// std::cout << msg;
 
 	QEventLoop eventLoop;
 
-	//Connect the server's listening finished signal to main loop quit.
+	// Connect the server's listening finished signal to main loop quit.
 	QObject::connect(m_controller, SIGNAL(finished()), &eventLoop, SLOT(quit()));
 
-	//Start the TcpIp server's listening thread
+	// Start the TcpIp server's listening thread
 	m_controller->start();
 
-	//Enter main event loop
+	// Enter main event loop
 	eventLoop.exec();
 
 	//----------------------Farm controller loops here------------------------
@@ -2468,7 +2425,7 @@ void ControllerService::onStart(int argc, char *argv[])
 	msg += "\n";
 	m_userLog->info(msg);
 
-//std::cout << msg;
+// std::cout << msg;
 
 #ifdef __sgi
 	{
@@ -2481,8 +2438,8 @@ void ControllerService::onStart(int argc, char *argv[])
 
 void ControllerService::onStop()
 {
-	//TFilePath fp = getTasksDataFile();
-	//m_controller->save(fp);
+	// TFilePath fp = getTasksDataFile();
+	// m_controller->save(fp);
 
 	TFilePath rootDir = getGlobalRoot();
 	TFilePath lastUsedIdFilePath = rootDir + "config" + "id.txt";
@@ -2512,7 +2469,7 @@ int main(int argc, char **argv)
 	bool console = false;
 
 	if (argc > 1) {
-		string serviceName("ToonzFarmController"); //Must be the same of the installer's
+		string serviceName("ToonzFarmController"); // Must be the same of the installer's
 		string serviceDisplayName = serviceName;
 
 		TCli::SimpleQualifier consoleQualifier("-console", "Run as console app");
@@ -2534,16 +2491,12 @@ int main(int argc, char **argv)
 			if (GetModuleFileName(NULL, szPath, 512) == 0) {
 				std::cout << "Unable to install";
 				std::cout << serviceName << " - ";
-				std::cout << getLastErrorText().c_str() << std::endl
-						  << std::endl;
+				std::cout << getLastErrorText().c_str() << std::endl << std::endl;
 
 				return 0;
 			}
 
-			TService::install(
-				serviceName,
-				serviceDisplayName,
-				TFilePath(szPath));
+			TService::install(serviceName, serviceDisplayName, TFilePath(szPath));
 
 			return 0;
 		}

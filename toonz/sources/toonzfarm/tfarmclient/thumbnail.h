@@ -14,21 +14,18 @@ class TPalette;
 
 class Thumbnail
 {
-public:
+  public:
 	class Frame
 	{
-	public:
+	  public:
 		Frame(const TFrameId &fid) : m_fid(fid) {}
 		const TFrameId m_fid;
 		TRaster32P m_raster;
 	};
 
-	enum Type {
-		LEVEL,
-		SCENE
-	};
+	enum Type { LEVEL, SCENE };
 
-protected:
+  protected:
 	vector<Frame *> m_frames;
 
 	int m_currentFrameIndex;
@@ -38,7 +35,7 @@ protected:
 	TDimension m_size;
 	TRaster32P m_raster;
 
-public:
+  public:
 	Thumbnail(const TDimension &size);
 	virtual ~Thumbnail();
 
@@ -76,7 +73,7 @@ public:
 	TAffine getAffine(const TDimension &cameraSize) const;
 	virtual bool startDragDrop() { return false; }
 
-private:
+  private:
 	// not implemented
 	Thumbnail(const Thumbnail &);
 	Thumbnail &operator=(const Thumbnail &);
@@ -86,10 +83,10 @@ private:
 
 class LevelThumbnail : public Thumbnail
 {
-protected:
+  protected:
 	TXshLevel *m_level;
 
-public:
+  public:
 	LevelThumbnail(const TDimension &size, TXshLevel *level);
 	~LevelThumbnail();
 
@@ -104,7 +101,7 @@ public:
 
 	Type getType() const { return LEVEL; };
 
-private:
+  private:
 	// not implemented
 	LevelThumbnail(const LevelThumbnail &);
 	LevelThumbnail &operator=(const LevelThumbnail &);
@@ -114,12 +111,12 @@ private:
 
 class SceneThumbnail : public Thumbnail
 {
-protected:
+  protected:
 	string m_name;
 	TXsheet *m_xsheet;
 	TPalette *m_palette;
 
-public:
+  public:
 	SceneThumbnail(const TDimension &size, TXsheet *xsheet, TPalette *palette);
 	~SceneThumbnail();
 
@@ -134,7 +131,7 @@ public:
 
 	void setName(string name);
 
-private:
+  private:
 	// not implemented
 	SceneThumbnail(const LevelThumbnail &);
 	SceneThumbnail &operator=(const LevelThumbnail &);
@@ -144,10 +141,10 @@ private:
 
 class FileThumbnail : public Thumbnail
 {
-protected:
+  protected:
 	TFilePath m_filepath;
 
-public:
+  public:
 	FileThumbnail(const TDimension &size, const TFilePath &path);
 
 	string getName() const { return m_filepath.getName(); }
@@ -159,7 +156,7 @@ public:
 
 	bool startDragDrop();
 
-private:
+  private:
 	// not implemented
 	FileThumbnail(const FileThumbnail &);
 	FileThumbnail &operator=(const FileThumbnail &);

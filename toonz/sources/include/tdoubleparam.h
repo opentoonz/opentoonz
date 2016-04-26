@@ -57,7 +57,7 @@ class DVAPI TDoubleParam : public TParam
 	class Imp;
 	std::unique_ptr<Imp> m_imp;
 
-public:
+  public:
 	TDoubleParam(double v = 0.0);
 	TDoubleParam(const TDoubleParam &src);
 	~TDoubleParam();
@@ -91,7 +91,7 @@ public:
 	// returns the outcoming speed vector for keyframe kIndex. kIndex must be speedinout
 	TPointD getSpeedOut(int kIndex) const;
 
-	//TPointD getSpeed(double frame);
+	// TPointD getSpeed(double frame);
 
 	// a specific grammar defines expressions as 'peg2.ns' and allows to
 	// create a link to the appropriate data source (e.g.
@@ -115,7 +115,8 @@ public:
 	//! assign k to the kIndex-th keyframe; postcondition: m_frame order is maintained
 	void setKeyframe(int kIndex, const TDoubleKeyframe &k);
 
-	//! call setKeyframe(it.first,it.second) for each it in ks; postcondition: m_frame order is maintained
+	//! call setKeyframe(it.first,it.second) for each it in ks; postcondition: m_frame order is
+	//! maintained
 	void setKeyframes(const std::map<int, TDoubleKeyframe> &ks);
 
 	//! create a keyframe in k.m_frame (if is needed) and assign k to it
@@ -130,10 +131,7 @@ public:
 	int getNextKeyframe(double frame) const;
 	int getPrevKeyframe(double frame) const;
 
-	void assignKeyframe(
-		double frame,
-		const TParamP &src, double srcFrame,
-		bool changedOnly);
+	void assignKeyframe(double frame, const TParamP &src, double srcFrame, bool changedOnly);
 
 	bool isAnimatable() const { return true; }
 

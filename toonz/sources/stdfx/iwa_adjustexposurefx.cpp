@@ -7,9 +7,7 @@
 ------------------------------------------------------------*/
 
 template <typename RASTER, typename PIXEL>
-void Iwa_AdjustExposureFx::setSourceRaster(const RASTER srcRas,
-										   float4 *dstMem,
-										   TDimensionI dim)
+void Iwa_AdjustExposureFx::setSourceRaster(const RASTER srcRas, float4 *dstMem, TDimensionI dim)
 {
 	float4 *chann_p = dstMem;
 
@@ -31,9 +29,7 @@ void Iwa_AdjustExposureFx::setSourceRaster(const RASTER srcRas,
  出力結果をChannel値に変換してタイルに格納
 ------------------------------------------------------------*/
 template <typename RASTER, typename PIXEL>
-void Iwa_AdjustExposureFx::setOutputRaster(float4 *srcMem,
-										   const RASTER dstRas,
-										   TDimensionI dim)
+void Iwa_AdjustExposureFx::setOutputRaster(float4 *srcMem, const RASTER dstRas, TDimensionI dim)
 {
 	float4 *chan_p = srcMem;
 	for (int j = 0; j < dim.ly; j++) {
@@ -41,13 +37,17 @@ void Iwa_AdjustExposureFx::setOutputRaster(float4 *srcMem,
 		for (int i = 0; i < dim.lx; i++) {
 			float val;
 			val = (*chan_p).x * (float)PIXEL::maxChannelValue + 0.5f;
-			pix->r = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
+			pix->r = (typename PIXEL::Channel)(
+				(val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
 			val = (*chan_p).y * (float)PIXEL::maxChannelValue + 0.5f;
-			pix->g = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
+			pix->g = (typename PIXEL::Channel)(
+				(val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
 			val = (*chan_p).z * (float)PIXEL::maxChannelValue + 0.5f;
-			pix->b = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
+			pix->b = (typename PIXEL::Channel)(
+				(val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
 			val = (*chan_p).w * (float)PIXEL::maxChannelValue + 0.5f;
-			pix->m = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
+			pix->m = (typename PIXEL::Channel)(
+				(val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
 
 			pix++;
 			chan_p++;
@@ -57,8 +57,7 @@ void Iwa_AdjustExposureFx::setOutputRaster(float4 *srcMem,
 
 //------------------------------------------------
 
-Iwa_AdjustExposureFx::Iwa_AdjustExposureFx()
-	: m_hardness(3.3), m_scale(0.0), m_offset(0.0)
+Iwa_AdjustExposureFx::Iwa_AdjustExposureFx() : m_hardness(3.3), m_scale(0.0), m_offset(0.0)
 {
 	addInputPort("Source", m_source);
 	bindParam(this, "hardness", m_hardness, false);
@@ -72,9 +71,7 @@ Iwa_AdjustExposureFx::Iwa_AdjustExposureFx()
 
 //------------------------------------------------
 
-void Iwa_AdjustExposureFx::doCompute(TTile &tile,
-									 double frame,
-									 const TRenderSettings &settings)
+void Iwa_AdjustExposureFx::doCompute(TTile &tile, double frame, const TRenderSettings &settings)
 {
 	/*- Sourceが無ければreturn -*/
 	if (!m_source.isConnected()) {
@@ -113,17 +110,15 @@ void Iwa_AdjustExposureFx::doCompute(TTile &tile,
 
 //------------------------------------------------
 
-void Iwa_AdjustExposureFx::doCompute_CPU(TTile &tile,
-										 double frame,
-										 const TRenderSettings &settings,
-										 TDimensionI &dim,
-										 float4 *tile_host)
+void Iwa_AdjustExposureFx::doCompute_CPU(TTile &tile, double frame, const TRenderSettings &settings,
+										 TDimensionI &dim, float4 *tile_host)
 {
 	float hardness = (float)m_hardness->getValue(frame);
 	float scale = (float)m_scale->getValue(frame);
 	float offset = (float)m_offset->getValue(frame);
 
-	float exposureOffset = (powf(10.0f, (float)(abs(offset) / hardness)) - 1.0f) * ((offset < 0.0f) ? -1.0f : 1.0f);
+	float exposureOffset =
+		(powf(10.0f, (float)(abs(offset) / hardness)) - 1.0f) * ((offset < 0.0f) ? -1.0f : 1.0f);
 
 	float4 *pix = tile_host;
 
@@ -158,9 +153,7 @@ void Iwa_AdjustExposureFx::doCompute_CPU(TTile &tile,
 
 //------------------------------------------------
 
-bool Iwa_AdjustExposureFx::doGetBBox(double frame,
-									 TRectD &bBox,
-									 const TRenderSettings &info)
+bool Iwa_AdjustExposureFx::doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info)
 {
 	if (m_source.isConnected()) {
 		bool ret = m_source->doGetBBox(frame, bBox, info);
@@ -173,8 +166,7 @@ bool Iwa_AdjustExposureFx::doGetBBox(double frame,
 
 //------------------------------------------------
 
-bool Iwa_AdjustExposureFx::canHandle(const TRenderSettings &info,
-									 double frame)
+bool Iwa_AdjustExposureFx::canHandle(const TRenderSettings &info, double frame)
 {
 	return true;
 }

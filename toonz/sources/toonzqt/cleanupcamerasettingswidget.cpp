@@ -39,7 +39,7 @@ CleanupCameraSettingsWidget::CleanupCameraSettingsWidget()
 	m_offsx_lock->setObjectName("EditToolLockButton");
 	m_offsy_lock->setObjectName("EditToolLockButton");
 
-	//m_cameraWidget->hideUseLevelSettingsBtn();
+	// m_cameraWidget->hideUseLevelSettingsBtn();
 
 	//--- layout
 	QVBoxLayout *mainLay = new QVBoxLayout();

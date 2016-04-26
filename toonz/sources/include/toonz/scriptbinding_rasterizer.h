@@ -19,7 +19,7 @@ class DVAPI Rasterizer : public Wrapper
 	double m_dpi;
 	bool m_antialiasing;
 
-public:
+  public:
 	Rasterizer();
 	~Rasterizer();
 

@@ -14,7 +14,7 @@ class DVAPI Renderer : public Wrapper
 	class Imp;
 	Imp *m_imp;
 
-public:
+  public:
 	Renderer();
 	~Renderer();
 

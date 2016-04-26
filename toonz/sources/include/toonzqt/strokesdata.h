@@ -29,23 +29,13 @@ class FullColorImageData;
 class DVAPI StrokesData : public DvMimeData
 {
 
-public:
+  public:
 	TVectorImageP m_image;
 
-	StrokesData()
-	{
-	}
-	StrokesData(const StrokesData *src)
-		: m_image(src->m_image)
-	{
-	}
-	StrokesData(TVectorImage *image)
-		: m_image(image)
-	{
-	}
-	~StrokesData()
-	{
-	}
+	StrokesData() {}
+	StrokesData(const StrokesData *src) : m_image(src->m_image) {}
+	StrokesData(TVectorImage *image) : m_image(image) {}
+	~StrokesData() {}
 
 	StrokesData *clone() const
 	{

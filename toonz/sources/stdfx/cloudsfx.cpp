@@ -16,9 +16,10 @@ class CloudsFx : public TStandardZeraryFx
 	TDoubleParamP m_evol;
 	TSpectrumParamP m_colors;
 
-public:
+  public:
 	CloudsFx()
-		: m_type(new TIntEnumParam(PNOISE_CLOUDS, "Clouds")), m_size(100.0), m_min(0.0), m_max(1.0), m_evol(0.0)
+		: m_type(new TIntEnumParam(PNOISE_CLOUDS, "Clouds")), m_size(100.0), m_min(0.0), m_max(1.0),
+		  m_evol(0.0)
 	{
 		bindParam(this, "type", m_type);
 		m_type->addItem(PNOISE_WOODS, "Marble/Wood");
@@ -26,9 +27,8 @@ public:
 		bindParam(this, "min", m_min);
 		bindParam(this, "max", m_max);
 		bindParam(this, "evolution", m_evol);
-		TSpectrum::ColorKey colors[] = {
-			TSpectrum::ColorKey(0, TPixel32::White),
-			TSpectrum::ColorKey(1, TPixel32::Transparent)};
+		TSpectrum::ColorKey colors[] = {TSpectrum::ColorKey(0, TPixel32::White),
+										TSpectrum::ColorKey(1, TPixel32::Transparent)};
 		m_colors = TSpectrumParamP(tArrayCount(colors), colors);
 		bindParam(this, "colors", m_colors);
 		m_size->setValueRange(0, 200);
@@ -47,15 +47,12 @@ public:
 	void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
 
 	bool canHandle(const TRenderSettings &info, double frame) { return false; }
-	//TAffine handledAffine(const TRenderSettings& info, double frame) {return TAffine();}
+	// TAffine handledAffine(const TRenderSettings& info, double frame) {return TAffine();}
 };
 
 //==================================================================
 
-void CloudsFx::doCompute(
-	TTile &tile,
-	double frame,
-	const TRenderSettings &ri)
+void CloudsFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 {
 	double scale = sqrt(fabs(ri.m_affine.det()));
 	int type = m_type->getValue();
@@ -68,10 +65,7 @@ void CloudsFx::doCompute(
 		size = 0.01;
 	TPointD pos = tile.m_pos;
 
-	doClouds(
-		tile.getRaster(),
-		m_colors,
-		pos, evolution, size, min, max, type, scale, frame);
+	doClouds(tile.getRaster(), m_colors, pos, evolution, size, min, max, type, scale, frame);
 }
 
 FX_PLUGIN_IDENTIFIER(CloudsFx, "cloudsFx");

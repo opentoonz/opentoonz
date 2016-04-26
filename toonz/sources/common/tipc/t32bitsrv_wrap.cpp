@@ -24,8 +24,7 @@ int t32bitsrv::BufferExchanger::write(char *dstBuf, int len)
 
 //================================================================================
 
-template <typename PIXEL>
-int t32bitsrv::RasterExchanger<PIXEL>::read(const char *srcBuf, int len)
+template <typename PIXEL> int t32bitsrv::RasterExchanger<PIXEL>::read(const char *srcBuf, int len)
 {
 	if (m_ras->getWrap() == m_ras->getLx()) {
 		memcpy(m_pix, srcBuf, len);
@@ -36,11 +35,9 @@ int t32bitsrv::RasterExchanger<PIXEL>::read(const char *srcBuf, int len)
 		int lineData = m_ras->getLx() * sizeof(PIXEL);
 		int lineDataToRead = tmin((int)((m_ras->getLx() - xStart) * sizeof(PIXEL)), remainingData);
 
-		for (; remainingData > 0;
-			 m_pix += (m_ras->getWrap() - xStart),
-			 remainingData -= lineDataToRead,
-			 lineDataToRead = tmin(lineData, remainingData),
-			 xStart = 0)
+		for (; remainingData > 0; m_pix += (m_ras->getWrap() - xStart),
+								  remainingData -= lineDataToRead,
+								  lineDataToRead = tmin(lineData, remainingData), xStart = 0)
 			memcpy(m_pix, srcBuf, lineDataToRead);
 	}
 
@@ -49,10 +46,9 @@ int t32bitsrv::RasterExchanger<PIXEL>::read(const char *srcBuf, int len)
 
 //--------------------------------------------------------------------------------
 
-template <typename PIXEL>
-int t32bitsrv::RasterExchanger<PIXEL>::write(char *dstBuf, int len)
+template <typename PIXEL> int t32bitsrv::RasterExchanger<PIXEL>::write(char *dstBuf, int len)
 {
-	//We pass entire pixels, not just bytes
+	// We pass entire pixels, not just bytes
 	len = len - (len % sizeof(PIXEL));
 
 	if (m_ras->getWrap() == m_ras->getLx()) {
@@ -64,11 +60,9 @@ int t32bitsrv::RasterExchanger<PIXEL>::write(char *dstBuf, int len)
 		int lineData = m_ras->getLx() * sizeof(PIXEL);
 		int lineDataToWrite = tmin((int)((m_ras->getLx() - xStart) * sizeof(PIXEL)), remainingData);
 
-		for (; remainingData > 0;
-			 m_pix += (m_ras->getWrap() - xStart),
-			 remainingData -= lineDataToWrite,
-			 lineDataToWrite = tmin(lineData, remainingData),
-			 xStart = 0)
+		for (; remainingData > 0; m_pix += (m_ras->getWrap() - xStart),
+								  remainingData -= lineDataToWrite,
+								  lineDataToWrite = tmin(lineData, remainingData), xStart = 0)
 			memcpy(dstBuf, m_pix, lineDataToWrite);
 	}
 

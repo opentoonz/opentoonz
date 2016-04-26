@@ -23,25 +23,25 @@ class DVAPI TLevel : public TSmartObject
 
 	DECLARE_CLASS_CODE
 
-public:
+  public:
 	typedef std::map<const TFrameId, TImageP> Table;
 	typedef Table::iterator Iterator;
 
-private:
+  private:
 	std::string m_name;
 	Table *m_table;
 	TPalette *m_palette;
 
-public:
+  public:
 	TLevel();
 	~TLevel();
 
-private:
+  private:
 	// not implemented
 	TLevel(const TLevel &);
 	TLevel &operator=(const TLevel &);
 
-public:
+  public:
 	// nome
 	std::string getName() const;
 	void setName(std::string name);
@@ -56,8 +56,8 @@ public:
 
 	// ritorna la posizione (0..getNFrames()-1) del frame f
 	// se il frame f non c'e' ritorna -1
-	//int getIndex(const TFrameId fid);
-	//int getIndex(int f) {return getIndex(TFrameId(f));};
+	// int getIndex(const TFrameId fid);
+	// int getIndex(int f) {return getIndex(TFrameId(f));};
 
 	Iterator begin() { return m_table->begin(); };
 	Iterator end() { return m_table->end(); };
@@ -78,7 +78,7 @@ template class DVAPI TSmartPointerT<TLevel>;
 
 class DVAPI TLevelP : public TSmartPointerT<TLevel>
 {
-public:
+  public:
 	TLevelP() : TSmartPointerT<TLevel>(new TLevel) {}
 	TLevelP(TLevel *level) : TSmartPointerT<TLevel>(level) {}
 };

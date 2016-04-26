@@ -42,11 +42,14 @@ using namespace DVGui;
 		clicked(const TColorStyle &style).
 */
 StyleSample::StyleSample(QWidget *parent, int sizeX, int sizeY)
-	: m_samplePixmap(sizeX, sizeY, QImage::Format_ARGB32), m_bgRas(sizeX, sizeY), m_style(0), m_clickEnabled(false), m_chessColor1(0, 0, 0), m_chessColor2(255, 255, 255), m_isEditing(false)
+	: m_samplePixmap(sizeX, sizeY, QImage::Format_ARGB32), m_bgRas(sizeX, sizeY), m_style(0),
+	  m_clickEnabled(false), m_chessColor1(0, 0, 0), m_chessColor2(255, 255, 255),
+	  m_isEditing(false)
 {
 	setMinimumSize(sizeX, sizeY);
 	setColor(TPixel32::Transparent);
-	TRop::checkBoard(m_bgRas, m_chessColor1, m_chessColor2, TDimensionD(sizeX / 8, sizeX / 8), TPointD(0, 0));
+	TRop::checkBoard(m_bgRas, m_chessColor1, m_chessColor2, TDimensionD(sizeX / 8, sizeX / 8),
+					 TPointD(0, 0));
 	setEnable(true);
 }
 
@@ -78,7 +81,7 @@ void StyleSample::setStyle(TColorStyle &style)
 		setColor(style.getMainColor());
 	else {
 		TRaster32P icon = style.getIcon(qsize2Dimension(m_samplePixmap.rect().size()));
-		m_samplePixmap = rasterToQImage(icon, false); //modified in 6.2
+		m_samplePixmap = rasterToQImage(icon, false); // modified in 6.2
 		update();
 	}
 	if (m_clickEnabled)
@@ -92,8 +95,8 @@ void StyleSample::setStyle(TColorStyle &style)
 void StyleSample::setColor(const TPixel32 &pixel)
 {
 	QColor color(pixel.r, pixel.g, pixel.b, pixel.m);
-	//iwsw commented out temporarily
-	//if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
+	// iwsw commented out temporarily
+	// if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
 	//	Ghibli3DLutConverter::instance()->convert(color);
 	m_samplePixmap.fill(color.rgba());
 	update();
@@ -105,7 +108,8 @@ void StyleSample::setChessboardColors(const TPixel32 &col1, const TPixel32 &col2
 {
 	m_chessColor1 = col1;
 	m_chessColor2 = col2;
-	TRop::checkBoard(m_bgRas, m_chessColor1, m_chessColor2, TDimensionD(m_bgRas->getLx() / 8, m_bgRas->getLy() / 8), TPointD(0, 0));
+	TRop::checkBoard(m_bgRas, m_chessColor1, m_chessColor2,
+					 TDimensionD(m_bgRas->getLx() / 8, m_bgRas->getLy() / 8), TPointD(0, 0));
 	update();
 }
 
@@ -121,7 +125,7 @@ void StyleSample::paintEvent(QPaintEvent *event)
 	painter.drawImage(0, 0, img.scaled(size()));
 	painter.drawImage(0, 0, m_samplePixmap.scaled(size()));
 	if (m_isEditing) {
-		//QRect rect(0,0,m_bgRas->getLx(),m_bgRas->getLy());
+		// QRect rect(0,0,m_bgRas->getLx(),m_bgRas->getLy());
 		painter.setPen(Qt::white);
 		painter.drawRect(rect().adjusted(0, 0, -1, -1));
 		painter.drawRect(rect().adjusted(2, 2, -3, -3));
@@ -164,7 +168,8 @@ void StyleSample::mouseDoubleClickEvent(QMouseEvent *event)
 		This two object is used to manage channel value, them range is fixed to [0,255].
 		This object size is fixed, [50, 2*DVGui::WidgetHeight].
 
-		To know when channel parameter value change class provides a signal, valueChanged(int value);
+		To know when channel parameter value change class provides a signal, valueChanged(int
+   value);
 		class emit signal when slider value change or when text field is editing,
 		see SLOT: onSliderChanged(int value) and onEditChanged(const QString &str)
 		to know when signal is emitted.
@@ -174,9 +179,8 @@ void StyleSample::mouseDoubleClickEvent(QMouseEvent *event)
 		if slider position change or text field is editing.
 		\sa onEditChanged(const QString &str) and onSliderChanged(int value).
 */
-ChannelField::ChannelField(QWidget *parent,
-						   const QString &string,
-						   int value, int maxValue, bool horizontal, int labelWidth, int sliderWidth)
+ChannelField::ChannelField(QWidget *parent, const QString &string, int value, int maxValue,
+						   bool horizontal, int labelWidth, int sliderWidth)
 	: QWidget(parent), m_maxValue(maxValue)
 {
 	assert(maxValue > 0);
@@ -285,7 +289,8 @@ void ChannelField::onSliderReleased()
 //=============================================================================
 
 ColorField::ColorFieldEditorController *ColorField::m_editorController = 0;
-//																							new ColorField::ColorFieldEditorController();
+//																							new
+//ColorField::ColorFieldEditorController();
 
 //=============================================================================
 /*! \class DVGui::ColorField
@@ -319,10 +324,7 @@ ColorField::ColorFieldEditorController *ColorField::m_editorController = 0;
 /*!	\fn TPixel32  DVGui::ColorField::getColor() const
 		Return ColorField current color.
 */
-ColorField::ColorField(QWidget *parent,
-					   bool isAlphaActive,
-					   TPixel32 color,
-					   int squareSize,
+ColorField::ColorField(QWidget *parent, bool isAlphaActive, TPixel32 color, int squareSize,
 					   bool useStyleEditor)
 	: QWidget(parent), m_color(color), m_notifyEditingChange(true), m_useStyleEditor(useStyleEditor)
 {
@@ -340,11 +342,13 @@ ColorField::ColorField(QWidget *parent,
 	m_redChannel = new ChannelField(this, QString("R:"), m_color.r);
 	connect(m_redChannel, SIGNAL(valueChanged(int, bool)), SLOT(onRedChannelChanged(int, bool)));
 	m_greenChannel = new ChannelField(this, QString("G:"), m_color.g);
-	connect(m_greenChannel, SIGNAL(valueChanged(int, bool)), SLOT(onGreenChannelChanged(int, bool)));
+	connect(m_greenChannel, SIGNAL(valueChanged(int, bool)),
+			SLOT(onGreenChannelChanged(int, bool)));
 	m_blueChannel = new ChannelField(this, QString("B:"), m_color.b);
 	connect(m_blueChannel, SIGNAL(valueChanged(int, bool)), SLOT(onBlueChannelChanged(int, bool)));
 	m_alphaChannel = new ChannelField(this, QString("M:"), m_color.m);
-	connect(m_alphaChannel, SIGNAL(valueChanged(int, bool)), SLOT(onAlphaChannelChanged(int, bool)));
+	connect(m_alphaChannel, SIGNAL(valueChanged(int, bool)),
+			SLOT(onAlphaChannelChanged(int, bool)));
 
 	layout->addWidget(m_colorSample);
 	layout->addWidget(m_redChannel);
@@ -366,13 +370,15 @@ void ColorField::setAlphaActive(bool active)
 {
 	if (active && !m_alphaChannel->isVisible()) {
 		m_alphaChannel->show();
-		connect(m_alphaChannel, SIGNAL(valueChanged(int, bool)), SLOT(onAlphaChannelChanged(int, bool)));
+		connect(m_alphaChannel, SIGNAL(valueChanged(int, bool)),
+				SLOT(onAlphaChannelChanged(int, bool)));
 		assert(m_color.m == 255);
-		//m_color.m = m_alphaChannel->getChannel();
-		//m_colorSample->setColor(m_color);
+		// m_color.m = m_alphaChannel->getChannel();
+		// m_colorSample->setColor(m_color);
 	} else if (!active && m_alphaChannel->isVisible()) {
 		m_alphaChannel->hide();
-		disconnect(m_alphaChannel, SIGNAL(valueChanged(int, bool)), this, SLOT(onAlphaChannelChanged(int, bool)));
+		disconnect(m_alphaChannel, SIGNAL(valueChanged(int, bool)), this,
+				   SLOT(onAlphaChannelChanged(int, bool)));
 		if (m_color.m != 255) {
 			m_alphaChannel->setChannel(255);
 			m_color.m = 255;
@@ -403,20 +409,28 @@ void ColorField::hideChannelsFields(bool hide)
 		m_greenChannel->hide();
 		m_blueChannel->hide();
 		m_alphaChannel->hide();
-		disconnect(m_redChannel, SIGNAL(valueChanged(int, bool)), this, SLOT(onRedChannelChanged(int, bool)));
-		disconnect(m_greenChannel, SIGNAL(valueChanged(int, bool)), this, SLOT(onGreenChannelChanged(int, bool)));
-		disconnect(m_blueChannel, SIGNAL(valueChanged(int, bool)), this, SLOT(onBlueChannelChanged(int, bool)));
-		disconnect(m_alphaChannel, SIGNAL(valueChanged(int, bool)), this, SLOT(onAlphaChannelChanged(int, bool)));
+		disconnect(m_redChannel, SIGNAL(valueChanged(int, bool)), this,
+				   SLOT(onRedChannelChanged(int, bool)));
+		disconnect(m_greenChannel, SIGNAL(valueChanged(int, bool)), this,
+				   SLOT(onGreenChannelChanged(int, bool)));
+		disconnect(m_blueChannel, SIGNAL(valueChanged(int, bool)), this,
+				   SLOT(onBlueChannelChanged(int, bool)));
+		disconnect(m_alphaChannel, SIGNAL(valueChanged(int, bool)), this,
+				   SLOT(onAlphaChannelChanged(int, bool)));
 	} else {
 		m_redChannel->show();
 		m_greenChannel->show();
 		m_blueChannel->show();
 		m_alphaChannel->show();
 		;
-		connect(m_redChannel, SIGNAL(valueChanged(int, bool)), SLOT(onRedChannelChanged(int, bool)));
-		connect(m_greenChannel, SIGNAL(valueChanged(int, bool)), SLOT(onGreenChannelChanged(int, bool)));
-		connect(m_blueChannel, SIGNAL(valueChanged(int, bool)), SLOT(onBlueChannelChanged(int, bool)));
-		connect(m_alphaChannel, SIGNAL(valueChanged(int, bool)), SLOT(onAlphaChannelChanged(int, bool)));
+		connect(m_redChannel, SIGNAL(valueChanged(int, bool)),
+				SLOT(onRedChannelChanged(int, bool)));
+		connect(m_greenChannel, SIGNAL(valueChanged(int, bool)),
+				SLOT(onGreenChannelChanged(int, bool)));
+		connect(m_blueChannel, SIGNAL(valueChanged(int, bool)),
+				SLOT(onBlueChannelChanged(int, bool)));
+		connect(m_alphaChannel, SIGNAL(valueChanged(int, bool)),
+				SLOT(onAlphaChannelChanged(int, bool)));
 	}
 }
 
@@ -620,23 +634,32 @@ void CleanupColorField::mousePressEvent(QMouseEvent *event)
 //-----------------------------------------------
 CleanupColorField::CleanupColorField(QWidget *parent, TCleanupStyle *cleanupStyle,
 									 TPaletteHandle *ph, bool greyMode)
-	: QWidget(parent), m_style(cleanupStyle), m_cleanupStyle(cleanupStyle), m_ph(ph), m_greyMode(greyMode), m_notifyEditingChange(true)
+	: QWidget(parent), m_style(cleanupStyle), m_cleanupStyle(cleanupStyle), m_ph(ph),
+	  m_greyMode(greyMode), m_notifyEditingChange(true)
 {
 	TBlackCleanupStyle *bs = dynamic_cast<TBlackCleanupStyle *>(cleanupStyle);
 	TColorCleanupStyle *cs = dynamic_cast<TColorCleanupStyle *>(cleanupStyle);
 	assert(bs || cs);
 
 	m_colorSample = new StyleSample(this, SQUARESIZE / 2, SQUARESIZE);
-	m_brightnessChannel = new ChannelField(this, DVGui::CleanupColorField::tr("Brightness:"), cleanupStyle->getBrightness(), 100, true, 75, -1);
-	m_contrastChannel = new ChannelField(this, DVGui::CleanupColorField::tr("Contrast:"), cleanupStyle->getContrast(), 100, true, 75, -1);
+	m_brightnessChannel = new ChannelField(this, DVGui::CleanupColorField::tr("Brightness:"),
+										   cleanupStyle->getBrightness(), 100, true, 75, -1);
+	m_contrastChannel = new ChannelField(this, DVGui::CleanupColorField::tr("Contrast:"),
+										 cleanupStyle->getContrast(), 100, true, 75, -1);
 	if (!greyMode) {
 		if (bs) {
-			m_cThresholdChannel = new ChannelField(this, DVGui::CleanupColorField::tr("Color Thres"), bs->getColorThreshold(), 100, true, 75, -1);
-			m_wThresholdChannel = new ChannelField(this, DVGui::CleanupColorField::tr("White Thres"), bs->getWhiteThreshold(), 100, true, 75, -1);
-		} else //cs
+			m_cThresholdChannel =
+				new ChannelField(this, DVGui::CleanupColorField::tr("Color Thres"),
+								 bs->getColorThreshold(), 100, true, 75, -1);
+			m_wThresholdChannel =
+				new ChannelField(this, DVGui::CleanupColorField::tr("White Thres"),
+								 bs->getWhiteThreshold(), 100, true, 75, -1);
+		} else // cs
 		{
-			m_hRangeChannel = new ChannelField(this, DVGui::CleanupColorField::tr("H Range"), cs->getHRange(), 120, true, 75, -1);
-			m_lineWidthChannel = new ChannelField(this, DVGui::CleanupColorField::tr("Line Width"), cs->getLineWidth(), 100, true, 75, -1);
+			m_hRangeChannel = new ChannelField(this, DVGui::CleanupColorField::tr("H Range"),
+											   cs->getHRange(), 120, true, 75, -1);
+			m_lineWidthChannel = new ChannelField(this, DVGui::CleanupColorField::tr("Line Width"),
+												  cs->getLineWidth(), 100, true, 75, -1);
 		}
 	}
 
@@ -673,15 +696,21 @@ CleanupColorField::CleanupColorField(QWidget *parent, TCleanupStyle *cleanupStyl
 	//---- signal-slot connections
 
 	bool ret = true;
-	ret = ret && connect(m_brightnessChannel, SIGNAL(valueChanged(int, bool)), SLOT(onBrightnessChannelChanged(int, bool)));
-	ret = ret && connect(m_contrastChannel, SIGNAL(valueChanged(int, bool)), SLOT(onContrastChannelChanged(int, bool)));
+	ret = ret && connect(m_brightnessChannel, SIGNAL(valueChanged(int, bool)),
+						 SLOT(onBrightnessChannelChanged(int, bool)));
+	ret = ret && connect(m_contrastChannel, SIGNAL(valueChanged(int, bool)),
+						 SLOT(onContrastChannelChanged(int, bool)));
 	if (!greyMode) {
 		if (bs) {
-			ret = ret && connect(m_cThresholdChannel, SIGNAL(valueChanged(int, bool)), SLOT(onCThresholdChannelChanged(int, bool)));
-			ret = ret && connect(m_wThresholdChannel, SIGNAL(valueChanged(int, bool)), SLOT(onWThresholdChannelChanged(int, bool)));
+			ret = ret && connect(m_cThresholdChannel, SIGNAL(valueChanged(int, bool)),
+								 SLOT(onCThresholdChannelChanged(int, bool)));
+			ret = ret && connect(m_wThresholdChannel, SIGNAL(valueChanged(int, bool)),
+								 SLOT(onWThresholdChannelChanged(int, bool)));
 		} else {
-			ret = ret && connect(m_hRangeChannel, SIGNAL(valueChanged(int, bool)), SLOT(onHRangeChannelChanged(int, bool)));
-			ret = ret && connect(m_lineWidthChannel, SIGNAL(valueChanged(int, bool)), SLOT(onLineWidthChannelChanged(int, bool)));
+			ret = ret && connect(m_hRangeChannel, SIGNAL(valueChanged(int, bool)),
+								 SLOT(onHRangeChannelChanged(int, bool)));
+			ret = ret && connect(m_lineWidthChannel, SIGNAL(valueChanged(int, bool)),
+								 SLOT(onLineWidthChannelChanged(int, bool)));
 		}
 	}
 }
@@ -754,8 +783,7 @@ void CleanupColorField::setOutputColor(const TPixel32 &color)
 
 void CleanupColorField::setStyle(TColorStyle *style)
 {
-	if (getColor() == style->getMainColor() &&
-		getOutputColor() == style->getColorParamValue(1))
+	if (getColor() == style->getMainColor() && getOutputColor() == style->getColorParamValue(1))
 		return;
 
 	m_cleanupStyle->setMainColor(style->getMainColor());
@@ -804,7 +832,7 @@ void CleanupColorField::hideEvent(QHideEvent *)
 		return;
 	getEditorController()->edit(0);
 	getEditorController()->hide();
-	//setEditorController(0);
+	// setEditorController(0);
 }
 
 //-----------------------------------------------------------

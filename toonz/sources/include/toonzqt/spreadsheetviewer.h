@@ -35,7 +35,7 @@ class DVAPI FrameScroller
 {
 	QList<FrameScroller *> m_connectedScrollers;
 
-public:
+  public:
 	FrameScroller();
 	virtual ~FrameScroller();
 	void connectScroller(FrameScroller *scroller);
@@ -55,7 +55,7 @@ public:
 
 class DVAPI DragTool
 {
-public:
+  public:
 	DragTool() {}
 	virtual ~DragTool() {}
 
@@ -70,7 +70,7 @@ class DVAPI SetFrameDragTool : public DragTool
 {
 	TFrameHandle *m_frameHandle;
 
-public:
+  public:
 	SetFrameDragTool(TFrameHandle *frameHandle) : m_frameHandle(frameHandle) {}
 
 	void click(int row, int col, QMouseEvent *e);
@@ -85,7 +85,7 @@ class DVAPI SelectionDragTool : public DragTool
 	SpreadsheetViewer *m_viewer;
 	int m_firstRow, m_firstCol;
 
-public:
+  public:
 	SelectionDragTool(SpreadsheetViewer *viewer);
 
 	void click(int row, int col, QMouseEvent *e);
@@ -101,7 +101,7 @@ class DVAPI PanTool : public DragTool
 	GenericPanel *m_panel;
 	QPoint m_lastPos;
 
-public:
+  public:
 	PanTool(GenericPanel *panel);
 
 	void click(int row, int col, QMouseEvent *e);
@@ -115,7 +115,7 @@ class DVAPI ScrollArea : public QScrollArea
 {
 	Q_OBJECT
 
-public:
+  public:
 #if QT_VERSION >= 0x050500
 	ScrollArea(QWidget *parent = 0, Qt::WindowFlags flags = 0);
 #else
@@ -123,7 +123,7 @@ public:
 #endif
 	virtual ~ScrollArea();
 
-protected:
+  protected:
 	// keyPressEvent and wheelEvent are ignored by the ScrollArea
 	// and therefore they are handled by the parent (Viewer)
 	void keyPressEvent(QKeyEvent *e);
@@ -138,7 +138,7 @@ class DVAPI GenericPanel : public QWidget
 	SpreadsheetViewer *m_viewer;
 	DragTool *m_dragTool;
 
-public:
+  public:
 	GenericPanel(SpreadsheetViewer *viewer);
 	virtual ~GenericPanel();
 
@@ -146,7 +146,7 @@ public:
 
 	virtual DragTool *createDragTool(QMouseEvent *) { return 0; };
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *);
 	void mousePressEvent(QMouseEvent *);
 	void mouseReleaseEvent(QMouseEvent *);
@@ -159,13 +159,13 @@ class DVAPI RowPanel : public GenericPanel
 {
 	Q_OBJECT
 	const int m_xa; // frame cells start at m_xa
-public:
+  public:
 	RowPanel(SpreadsheetViewer *viewer);
 	virtual ~RowPanel() {}
 
 	DragTool *createDragTool(QMouseEvent *);
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *);
 	void drawRows(QPainter &p, int r0, int r1);
 	void drawCurrentRowGadget(QPainter &p, int r0, int r1);
@@ -176,7 +176,7 @@ protected:
 class DVAPI ColumnPanel : public GenericPanel
 {
 	Q_OBJECT
-public:
+  public:
 	ColumnPanel(SpreadsheetViewer *viewer);
 	virtual ~ColumnPanel() {}
 };
@@ -187,13 +187,13 @@ class DVAPI CellPanel : public GenericPanel
 {
 	Q_OBJECT
 
-public:
+  public:
 	CellPanel(SpreadsheetViewer *viewer);
 	virtual ~CellPanel() {}
 
 	DragTool *createDragTool(QMouseEvent *);
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *);
 	virtual void drawCells(QPainter &p, int r0, int c0, int r1, int c1) {}
 };
@@ -213,40 +213,46 @@ class DVAPI SpreadsheetViewer : public QFrame, public Spreadsheet::FrameScroller
 	Q_PROPERTY(QColor BGColor READ getBGColor WRITE setBGColor)
 	Q_PROPERTY(QColor LightLineColor READ getLightLineColor WRITE setLightLineColor)
 
-	QColor m_currentRowBgColor; //current frame, column
-	QColor m_markerLineColor;   //marker interval (0, 255, 246)
-	QColor m_textColor;			//text (black)
-	QColor m_verticalLineColor; //vertical line (black)
+	QColor m_currentRowBgColor; // current frame, column
+	QColor m_markerLineColor; // marker interval (0, 255, 246)
+	QColor m_textColor; // text (black)
+	QColor m_verticalLineColor; // vertical line (black)
 	Q_PROPERTY(QColor CurrentRowBgColor READ getCurrentRowBgColor WRITE setCurrentRowBgColor)
 	Q_PROPERTY(QColor MarkerLineColor READ getMarkerLineColor WRITE setMarkerLineColor)
 	Q_PROPERTY(QColor TextColor READ getTextColor WRITE setTextColor)
 	Q_PROPERTY(QColor VerticalLineColor READ getVerticalLineColor WRITE setVerticalLineColor)
 
-	//key frame
+	// key frame
 	QColor m_keyFrameColor;			// (219,139,54)
 	QColor m_keyFrameBorderColor;   // (82,51,20)
 	QColor m_selectedKeyFrameColor; // (237,197,155)
-	//key frame inbetween
+	// key frame inbetween
 	QColor m_inBetweenColor;		 // (194,194,176)
 	QColor m_inBetweenBorderColor;   // (72,72,65)
 	QColor m_selectedInBetweenColor; // (225,225,216)
-	//empty cell
+	// empty cell
 	QColor m_selectedEmptyColor; // (190,190,190)
-	//empty cell in the scene range
+	// empty cell in the scene range
 	QColor m_selectedSceneRangeEmptyColor; // (210,210,210)
 	Q_PROPERTY(QColor KeyFrameColor READ getKeyFrameColor WRITE setKeyFrameColor)
 	Q_PROPERTY(QColor KeyFrameBorderColor READ getKeyFrameBorderColor WRITE setKeyFrameBorderColor)
-	Q_PROPERTY(QColor SelectedKeyFrameColor READ getSelectedKeyFrameColor WRITE setSelectedKeyFrameColor)
+	Q_PROPERTY(
+		QColor SelectedKeyFrameColor READ getSelectedKeyFrameColor WRITE setSelectedKeyFrameColor)
 	Q_PROPERTY(QColor InBetweenColor READ getInBetweenColor WRITE setInBetweenColor)
-	Q_PROPERTY(QColor InBetweenBorderColor READ getInBetweenBorderColor WRITE setInBetweenBorderColor)
-	Q_PROPERTY(QColor SelectedInBetweenColor READ getSelectedInBetweenColor WRITE setSelectedInBetweenColor)
+	Q_PROPERTY(
+		QColor InBetweenBorderColor READ getInBetweenBorderColor WRITE setInBetweenBorderColor)
+	Q_PROPERTY(QColor SelectedInBetweenColor READ getSelectedInBetweenColor WRITE
+				   setSelectedInBetweenColor)
 	Q_PROPERTY(QColor SelectedEmptyColor READ getSelectedEmptyColor WRITE setSelectedEmptyColor)
-	Q_PROPERTY(QColor SelectedSceneRangeEmptyColor READ getSelectedSceneRangeEmptyColor WRITE setSelectedSceneRangeEmptyColor)
+	Q_PROPERTY(QColor SelectedSceneRangeEmptyColor READ getSelectedSceneRangeEmptyColor WRITE
+				   setSelectedSceneRangeEmptyColor)
 
-	QColor m_columnHeaderBorderColor; //column header border lines (46,47,46)
-	QColor m_selectedColumnTextColor; //selected column text (red)
-	Q_PROPERTY(QColor ColumnHeaderBorderColor READ getColumnHeaderBorderColor WRITE setColumnHeaderBorderColor)
-	Q_PROPERTY(QColor SelectedColumnTextColor READ getSelectedColumnTextColor WRITE setSelectedColumnTextColor)
+	QColor m_columnHeaderBorderColor; // column header border lines (46,47,46)
+	QColor m_selectedColumnTextColor; // selected column text (red)
+	Q_PROPERTY(QColor ColumnHeaderBorderColor READ getColumnHeaderBorderColor WRITE
+				   setColumnHeaderBorderColor)
+	Q_PROPERTY(QColor SelectedColumnTextColor READ getSelectedColumnTextColor WRITE
+				   setSelectedColumnTextColor)
 
 	Spreadsheet::ScrollArea *m_columnScrollArea;
 	Spreadsheet::ScrollArea *m_rowScrollArea;
@@ -266,7 +272,7 @@ class DVAPI SpreadsheetViewer : public QFrame, public Spreadsheet::FrameScroller
 	// QRect m_selectedCells; // x=col, y=row
 	bool m_isComputingSize;
 
-public:
+  public:
 	SpreadsheetViewer(QWidget *parent);
 	virtual ~SpreadsheetViewer();
 
@@ -285,7 +291,7 @@ public:
 	// provvisorio
 	QScrollArea *getFrameScrollArea() const { return m_cellScrollArea; }
 
-	//QProperty
+	// QProperty
 	void setLightLightBGColor(const QColor &color) { m_lightLightBgColor = color; }
 	QColor getLightLightBGColor() const { return m_lightLightBgColor; }
 	void setBGColor(const QColor &color) { m_bgColor = color; }
@@ -314,7 +320,10 @@ public:
 	QColor getSelectedInBetweenColor() const { return m_selectedInBetweenColor; }
 	void setSelectedEmptyColor(const QColor &color) { m_selectedEmptyColor = color; }
 	QColor getSelectedEmptyColor() const { return m_selectedEmptyColor; }
-	void setSelectedSceneRangeEmptyColor(const QColor &color) { m_selectedSceneRangeEmptyColor = color; }
+	void setSelectedSceneRangeEmptyColor(const QColor &color)
+	{
+		m_selectedSceneRangeEmptyColor = color;
+	}
 	QColor getSelectedSceneRangeEmptyColor() const { return m_selectedSceneRangeEmptyColor; }
 	void setColumnHeaderBorderColor(const QColor &color) { m_columnHeaderBorderColor = color; }
 	QColor getColumnHeaderBorderColor() const { return m_columnHeaderBorderColor; }
@@ -363,7 +372,7 @@ public:
 
 	void ensureVisibleCol(int col);
 
-protected:
+  protected:
 	void showEvent(QShowEvent *);
 	void hideEvent(QHideEvent *);
 	void resizeEvent(QResizeEvent *event);
@@ -371,7 +380,7 @@ protected:
 	void wheelEvent(QWheelEvent *event);
 	void timerEvent(QTimerEvent *);
 
-public slots:
+  public slots:
 	void setRowCount(int rowCount);
 	void setColumnCount(int columnCount);
 

@@ -54,7 +54,7 @@ namespace
 
 class ViewerZoomer : public ImageUtils::ShortcutZoomer
 {
-public:
+  public:
 	ViewerZoomer(QWidget *parent) : ShortcutZoomer(parent) {}
 	void zoom(bool zoomin, bool resetZoom)
 	{
@@ -73,7 +73,7 @@ public:
 	}
 };
 
-} //namespace
+} // namespace
 //-----------------------------------------------------------------------------
 
 ToggleCommandHandler capturePanelFieldGuideToggle(MI_CapturePanelFieldGuide, false);
@@ -84,11 +84,9 @@ ToggleCommandHandler capturePanelFieldGuideToggle(MI_CapturePanelFieldGuide, fal
 
 class CaptureCommand : public MenuItemHandler
 {
-public:
+  public:
 	CaptureCommand() : MenuItemHandler(MI_Capture) {}
-	void execute()
-	{
-	}
+	void execute() {}
 } CaptureCommand;
 
 //=============================================================================
@@ -96,7 +94,8 @@ public:
 //-----------------------------------------------------------------------------
 
 LineTestImageViewer::LineTestImageViewer(QWidget *parent)
-	: QWidget(parent), m_pos(), m_mouseButton(), m_viewAffine(), m_raster(), m_isPainting(false), m_isOnionSkinActive(false), m_isViewFrameActive(false)
+	: QWidget(parent), m_pos(), m_mouseButton(), m_viewAffine(), m_raster(), m_isPainting(false),
+	  m_isOnionSkinActive(false), m_isViewFrameActive(false)
 {
 	m_viewAffine = getNormalZoomScale();
 	bool ret = connect(this, SIGNAL(rasterChanged()), this, SLOT(update()));
@@ -183,7 +182,7 @@ void LineTestImageViewer::mouseMoveEvent(QMouseEvent *event)
 {
 	QPoint curPos = event->pos();
 	if (m_mouseButton == Qt::MidButton || m_mouseButton == Qt::LeftButton) {
-		//panning
+		// panning
 		panQt(curPos - m_pos);
 		m_pos = curPos;
 		return;
@@ -275,7 +274,8 @@ void LineTestImageViewer::zoomQt(bool forward, bool reset)
 	double scale2 = m_viewAffine.det();
 	if (reset || ((scale2 < 256 || !forward) && (scale2 > 0.001 * 0.05 || forward))) {
 		double oldZoomScale = sqrt(scale2);
-		double zoomScale = reset ? 1 : ImageUtils::getQuantizedZoomFactor(oldZoomScale / normalZoom, forward);
+		double zoomScale =
+			reset ? 1 : ImageUtils::getQuantizedZoomFactor(oldZoomScale / normalZoom, forward);
 		m_viewAffine = TScale(zoomScale * normalZoom / oldZoomScale) * m_viewAffine;
 	}
 	update();
@@ -300,7 +300,8 @@ void LineTestImageViewer::paintEvent(QPaintEvent *e)
 	int h = height();
 
 	TAffine viewAffine = TTranslation(w * 0.5, h * 0.5) * m_viewAffine;
-	QMatrix matrix(viewAffine.a11, viewAffine.a21, viewAffine.a12, viewAffine.a22, viewAffine.a13, viewAffine.a23);
+	QMatrix matrix(viewAffine.a11, viewAffine.a21, viewAffine.a12, viewAffine.a22, viewAffine.a13,
+				   viewAffine.a23);
 
 	QMatrix flip(1, 0, 0, -1, 0, h);
 	matrix *= flip;
@@ -312,7 +313,7 @@ void LineTestImageViewer::paintEvent(QPaintEvent *e)
 		QPainter::CompositionMode mode = p.compositionMode();
 		if (m_isOnionSkinActive) {
 			p.setMatrix(matrix, true);
-			//Devo mostrare l'immagine corrente
+			// Devo mostrare l'immagine corrente
 			TRasterP currentRas = getCurrentImage();
 			if (currentRas) {
 				QImage currentImage = rasterToQImage(currentRas, true, false);
@@ -325,7 +326,9 @@ void LineTestImageViewer::paintEvent(QPaintEvent *e)
 				mask.bits()[3] = 255;
 
 				p.setCompositionMode(QPainter::CompositionMode_Plus);
-				p.drawImage(QRect(-currentRas->getLx() * 0.5, -currentRas->getLy() * 0.5, currentRas->getLx(), currentRas->getLy()), mask);
+				p.drawImage(QRect(-currentRas->getLx() * 0.5, -currentRas->getLy() * 0.5,
+								  currentRas->getLx(), currentRas->getLy()),
+							mask);
 				p.setCompositionMode(QPainter::CompositionMode_Multiply);
 			}
 			currentRas = TRasterP();
@@ -359,7 +362,7 @@ void LineTestImageViewer::paintEvent(QPaintEvent *e)
 		m_raster->unlock();
 	} else {
 		p.setMatrix(matrix, true);
-		//Devo mostrare l'immagine corrente
+		// Devo mostrare l'immagine corrente
 		TRasterP currentRas = getCurrentImage();
 		if (currentRas) {
 			QImage currentImage = rasterToQImage(currentRas, true, false);
@@ -369,7 +372,7 @@ void LineTestImageViewer::paintEvent(QPaintEvent *e)
 	}
 	m_isPainting = false;
 
-	//Draw Camera and Field Guide
+	// Draw Camera and Field Guide
 	TCamera *camera = TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera();
 	TDimension res = camera->getRes();
 	QRectF cameraRect(-res.lx * 0.5, -res.ly * 0.5, res.lx, res.ly);
@@ -446,7 +449,8 @@ ChooseCameraDialog::ChooseCameraDialog(QList<QString> cameras)
 		listView->addItem(cameras.at(i));
 	if (cameras.size() > 0)
 		m_cameraIndex = 0;
-	ret = ret && connect(listView, SIGNAL(currentRowChanged(int)), this, SLOT(onCurrentRowChanged(int)));
+	ret = ret &&
+		  connect(listView, SIGNAL(currentRowChanged(int)), this, SLOT(onCurrentRowChanged(int)));
 
 	addWidget(listView);
 
@@ -488,7 +492,9 @@ void ChooseCameraDialog::onCancelButtonPressed()
 // CaptureSettingsPopup
 
 CaptureSettingsPopup::CaptureSettingsPopup()
-	: Dialog(TApp::instance()->getMainWindow()), m_defineDeviceButton(0), m_useWhiteImage(0), m_keepWhiteImage(0), m_imageWidthLineEdit(0), m_imageHeightLineEdit(0), m_contrastField(0), m_brightnessField(0)
+	: Dialog(TApp::instance()->getMainWindow()), m_defineDeviceButton(0), m_useWhiteImage(0),
+	  m_keepWhiteImage(0), m_imageWidthLineEdit(0), m_imageHeightLineEdit(0), m_contrastField(0),
+	  m_brightnessField(0)
 {
 	setWindowTitle("Capture Settings");
 	CaptureParameters *parameters = getCaptureParameters();
@@ -504,16 +510,20 @@ CaptureSettingsPopup::CaptureSettingsPopup()
 	resolutionWidget->setMaximumHeight(DVGui::WidgetHeight);
 	QHBoxLayout *resolutionLayout = new QHBoxLayout(resolutionWidget);
 	resolutionLayout->setMargin(0);
-	m_imageWidthLineEdit = new DVGui::IntLineEdit(resolutionWidget, parameters->getResolution().lx, 0, 10000);
+	m_imageWidthLineEdit =
+		new DVGui::IntLineEdit(resolutionWidget, parameters->getResolution().lx, 0, 10000);
 	m_imageWidthLineEdit->setMaximumHeight(DVGui::WidgetHeight);
-	ret = ret && connect(m_imageWidthLineEdit, SIGNAL(editingFinished()), this, SLOT(onImageWidthEditingFinished()));
+	ret = ret && connect(m_imageWidthLineEdit, SIGNAL(editingFinished()), this,
+						 SLOT(onImageWidthEditingFinished()));
 	resolutionLayout->addWidget(m_imageWidthLineEdit);
 	QLabel *vResLabel = new QLabel(tr("V Resolution"), resolutionWidget);
 	vResLabel->setMaximumHeight(DVGui::WidgetHeight);
 	resolutionLayout->addWidget(vResLabel);
-	m_imageHeightLineEdit = new DVGui::IntLineEdit(resolutionWidget, parameters->getResolution().ly, 0, 10000);
+	m_imageHeightLineEdit =
+		new DVGui::IntLineEdit(resolutionWidget, parameters->getResolution().ly, 0, 10000);
 	m_imageHeightLineEdit->setMaximumHeight(DVGui::WidgetHeight);
-	ret = ret && connect(m_imageHeightLineEdit, SIGNAL(editingFinished()), this, SLOT(onImageHeightEditingFinished()));
+	ret = ret && connect(m_imageHeightLineEdit, SIGNAL(editingFinished()), this,
+						 SLOT(onImageHeightEditingFinished()));
 	resolutionLayout->addWidget(m_imageHeightLineEdit);
 	resolutionWidget->setLayout(resolutionLayout);
 	addWidget(QString(tr("H Resolution")), resolutionWidget);
@@ -525,7 +535,8 @@ CaptureSettingsPopup::CaptureSettingsPopup()
 	m_useWhiteImage = new DVGui::CheckBox(tr("White Calibration"), whiteImageWidget);
 	m_useWhiteImage->setMaximumHeight(DVGui::WidgetHeight);
 	m_useWhiteImage->setChecked(parameters->isUseWhiteImage());
-	ret = ret && connect(m_useWhiteImage, SIGNAL(stateChanged(int)), this, SLOT(onUseWhiteImageStateChanged(int)));
+	ret = ret && connect(m_useWhiteImage, SIGNAL(stateChanged(int)), this,
+						 SLOT(onUseWhiteImageStateChanged(int)));
 	whiteImageLayout->addWidget(m_useWhiteImage);
 	m_keepWhiteImage = new QPushButton(tr("Capture"), m_useWhiteImage);
 	ret = ret && connect(m_keepWhiteImage, SIGNAL(clicked()), this, SLOT(onKeepWhiteImage()));
@@ -537,21 +548,24 @@ CaptureSettingsPopup::CaptureSettingsPopup()
 	m_brightnessField->setRange(0, 100);
 	m_brightnessField->setValue(parameters->getBrightness());
 	m_brightnessField->setFixedHeight(DVGui::WidgetHeight);
-	ret = ret && connect(m_brightnessField, SIGNAL(valueChanged(bool)), this, SLOT(onBrightnessChanged(bool)));
+	ret = ret && connect(m_brightnessField, SIGNAL(valueChanged(bool)), this,
+						 SLOT(onBrightnessChanged(bool)));
 	addWidget(QString(tr("Brightness:")), m_brightnessField);
 
 	m_contrastField = new DVGui::IntField(this);
 	m_contrastField->setRange(-100, 100);
 	m_contrastField->setValue(parameters->getContranst());
 	m_contrastField->setFixedHeight(DVGui::WidgetHeight);
-	ret = ret && connect(m_contrastField, SIGNAL(valueChanged(bool)), this, SLOT(onContrastChanged(bool)));
+	ret = ret &&
+		  connect(m_contrastField, SIGNAL(valueChanged(bool)), this, SLOT(onContrastChanged(bool)));
 	addWidget(QString(tr("Contrast:")), m_contrastField);
 
-	//UsideDown Field
+	// UsideDown Field
 	m_upsideDown = new DVGui::CheckBox(tr(" Upside-down"), this);
 	m_upsideDown->setMaximumSize(100, 25);
 	m_upsideDown->setChecked(parameters->isUpsideDown());
-	ret = ret && connect(m_upsideDown, SIGNAL(stateChanged(int)), this, SLOT(onUpsideDownStateChanged(int)));
+	ret = ret && connect(m_upsideDown, SIGNAL(stateChanged(int)), this,
+						 SLOT(onUpsideDownStateChanged(int)));
 	addWidget(QString(tr("")), m_upsideDown);
 
 	endVLayout();
@@ -597,7 +611,8 @@ void CaptureSettingsPopup::updateWidgets()
 
 CaptureParameters *CaptureSettingsPopup::getCaptureParameters()
 {
-	TSceneProperties *sceneProperties = TApp::instance()->getCurrentScene()->getScene()->getProperties();
+	TSceneProperties *sceneProperties =
+		TApp::instance()->getCurrentScene()->getScene()->getProperties();
 	Q_ASSERT(sceneProperties);
 	return sceneProperties->getCaptureParameters();
 }
@@ -759,7 +774,8 @@ FileSettingsPopup::FileSettingsPopup()
 	m_fileFormat->setMaximumHeight(WidgetHeight);
 	std::string ext = parameters->getFileFormat();
 	m_fileFormat->setCurrentIndex(m_fileFormat->findText(QString::fromStdString(ext)));
-	ret = ret && connect(m_fileFormat, SIGNAL(currentIndexChanged(const QString &)), SLOT(onFormatChanged(const QString &)));
+	ret = ret && connect(m_fileFormat, SIGNAL(currentIndexChanged(const QString &)),
+						 SLOT(onFormatChanged(const QString &)));
 	fileFormatLayout->addWidget(m_fileFormat);
 
 	QPushButton *fileFormatButton = new QPushButton(QString("Options"), fileFormatWidget);
@@ -790,7 +806,8 @@ void FileSettingsPopup::updateWidgets()
 
 CaptureParameters *FileSettingsPopup::getCaptureParameters()
 {
-	TSceneProperties *sceneProperties = TApp::instance()->getCurrentScene()->getScene()->getProperties();
+	TSceneProperties *sceneProperties =
+		TApp::instance()->getCurrentScene()->getScene()->getProperties();
 	Q_ASSERT(sceneProperties);
 	return sceneProperties->getCaptureParameters();
 }
@@ -811,7 +828,7 @@ void FileSettingsPopup::onFormatChanged(const QString &str)
 
 //-----------------------------------------------------------------------------
 /*! Open a popup output format settings popup to set current output format
-    settings.
+	settings.
 */
 void FileSettingsPopup::openSettingsPopup()
 {
@@ -824,7 +841,10 @@ void FileSettingsPopup::openSettingsPopup()
 // LineTestCapturePane
 
 LineTestCapturePane::LineTestCapturePane(QWidget *parent)
-	: TPanel(parent), m_imageView(0), m_nameField(0), m_frameField(0), m_saveMode(0), m_onionSkin(0), m_incrementField(0), m_stepField(0), m_connectionCheckBox(0), m_lineColorField(0), m_captureButton(0), m_captureSettingsPopup(0), m_fileSettingsPopup(0), m_canCapture(true), m_timerId(0)
+	: TPanel(parent), m_imageView(0), m_nameField(0), m_frameField(0), m_saveMode(0),
+	  m_onionSkin(0), m_incrementField(0), m_stepField(0), m_connectionCheckBox(0),
+	  m_lineColorField(0), m_captureButton(0), m_captureSettingsPopup(0), m_fileSettingsPopup(0),
+	  m_canCapture(true), m_timerId(0)
 {
 	bool ret = true;
 	CaptureParameters *parameters = getCaptureParameters();
@@ -832,23 +852,23 @@ LineTestCapturePane::LineTestCapturePane(QWidget *parent)
 	QSplitter *splitter = new QSplitter(Qt::Vertical, this);
 	splitter->setObjectName("OnePixelMarginFrame");
 
-	//First splitter widget top widget
+	// First splitter widget top widget
 	QWidget *topWidget = new QWidget(splitter);
 	QVBoxLayout *topLayout = new QVBoxLayout(topWidget);
 	topLayout->setMargin(0);
 	topLayout->setSpacing(0);
 
-	//Add to top widget image view
+	// Add to top widget image view
 	m_imageView = new LineTestImageViewer(topWidget);
 	topLayout->addWidget(m_imageView, 10);
 	ret = ret && connect(m_imageView, SIGNAL(onZoomChanged()), SLOT(changeWindowTitle()));
 
-	//Add to top widget separator
+	// Add to top widget separator
 	DVGui::Separator *horizSeparator = new DVGui::Separator(QString(), topWidget);
 	horizSeparator->setFixedHeight(1);
 	topLayout->addWidget(horizSeparator);
 
-	//Add to top widget capture widget
+	// Add to top widget capture widget
 	QWidget *captureWidget = new QWidget(topWidget);
 	captureWidget->setMaximumHeight(45);
 	QHBoxLayout *captureLayout = new QHBoxLayout(captureWidget);
@@ -860,29 +880,30 @@ LineTestCapturePane::LineTestCapturePane(QWidget *parent)
 	QGridLayout *optionsLayout = new QGridLayout(optionsWidget);
 	optionsLayout->setMargin(0);
 	optionsLayout->setSpacing(0);
-	//Name field
+	// Name field
 	QLabel *nameLabel = new QLabel(tr("Name:"), optionsWidget);
 	nameLabel->setMaximumHeight(19);
 	optionsLayout->addWidget(nameLabel, 0, 0, 1, 1, Qt::AlignRight | Qt::AlignVCenter);
 	m_nameField = new DVGui::LineEdit(tr(""), optionsWidget, true);
 	m_nameField->setMaximumSize(110, 19);
 	optionsLayout->addWidget(m_nameField, 0, 1, 1, 1, Qt::AlignLeft | Qt::AlignVCenter);
-	//Frame Field
+	// Frame Field
 	QLabel *frameLabel = new QLabel(tr("Frame:"), optionsWidget);
 	frameLabel->setMaximumHeight(DVGui::WidgetHeight);
 	optionsLayout->addWidget(frameLabel, 0, 2, 1, 1, Qt::AlignRight | Qt::AlignVCenter);
 	m_frameField = new DVGui::IntLineEdit(optionsWidget, 1, 1, 9999, 4);
 	m_frameField->setFixedSize(35, 19);
 	optionsLayout->addWidget(m_frameField, 0, 3, 1, 1, Qt::AlignLeft | Qt::AlignVCenter);
-	//Step Field
+	// Step Field
 	QLabel *incrementLabel = new QLabel(tr("Increment:"), optionsWidget);
 	incrementLabel->setMaximumHeight(DVGui::WidgetHeight);
 	optionsLayout->addWidget(incrementLabel, 0, 4, 1, 1, Qt::AlignRight | Qt::AlignVCenter);
 	m_incrementField = new DVGui::IntLineEdit(optionsWidget, parameters->getIncrement(), 1, 100);
 	m_incrementField->setFixedSize(35, 19);
 	optionsLayout->addWidget(m_incrementField, 0, 5, 1, 1, Qt::AlignLeft | Qt::AlignVCenter);
-	ret = ret && connect(m_incrementField, SIGNAL(editingFinished()), SLOT(onIncrementFieldEditFinished()));
-	//Step Widget
+	ret = ret && connect(m_incrementField, SIGNAL(editingFinished()),
+						 SLOT(onIncrementFieldEditFinished()));
+	// Step Widget
 	QLabel *stepLabel = new QLabel(tr("Step:"), optionsWidget);
 	stepLabel->setMaximumHeight(DVGui::WidgetHeight);
 	optionsLayout->addWidget(stepLabel, 0, 6, 1, 1, Qt::AlignRight | Qt::AlignVCenter);
@@ -890,7 +911,7 @@ LineTestCapturePane::LineTestCapturePane(QWidget *parent)
 	m_stepField->setFixedSize(35, 19);
 	optionsLayout->addWidget(m_stepField, 0, 7, 1, 1, Qt::AlignLeft | Qt::AlignVCenter);
 	ret = ret && connect(m_stepField, SIGNAL(editingFinished()), SLOT(onStepFieldEditFinished()));
-	//Mode Field
+	// Mode Field
 	QLabel *modeLabel = new QLabel(tr("Mode:"), optionsWidget);
 	modeLabel->setMaximumHeight(DVGui::WidgetHeight);
 	optionsLayout->addWidget(modeLabel, 1, 0, 1, 1, Qt::AlignRight | Qt::AlignVCenter);
@@ -899,26 +920,30 @@ LineTestCapturePane::LineTestCapturePane(QWidget *parent)
 	QStringList saveMode;
 	saveMode << tr("New     ") << tr("Overwite     ") << tr("Insert");
 	m_saveMode->addItems(saveMode);
-	ret = ret && connect(m_saveMode, SIGNAL(currentIndexChanged(int)), SLOT(onSaveModeChanged(int)));
+	ret =
+		ret && connect(m_saveMode, SIGNAL(currentIndexChanged(int)), SLOT(onSaveModeChanged(int)));
 	optionsLayout->addWidget(m_saveMode, 1, 1, 1, 1, Qt::AlignLeft | Qt::AlignVCenter);
-	//Onion Skin Field
+	// Onion Skin Field
 	m_onionSkin = new DVGui::CheckBox(tr(" Onion Skin  "), optionsWidget);
 	m_onionSkin->setMaximumSize(100, 25);
-	ret = ret && connect(m_onionSkin, SIGNAL(stateChanged(int)), this, SLOT(onOnionSkinStateChanged(int)));
+	ret = ret &&
+		  connect(m_onionSkin, SIGNAL(stateChanged(int)), this, SLOT(onOnionSkinStateChanged(int)));
 	optionsLayout->addWidget(m_onionSkin, 1, 3, 1, 1, Qt::AlignLeft | Qt::AlignVCenter);
-	//Onion View Frame
+	// Onion View Frame
 	m_viewFrame = new DVGui::CheckBox(tr(" View Frame"), optionsWidget);
 	m_viewFrame->setMaximumSize(100, 25);
-	ret = ret && connect(m_viewFrame, SIGNAL(stateChanged(int)), this, SLOT(onViewFrameStateChanged(int)));
+	ret = ret &&
+		  connect(m_viewFrame, SIGNAL(stateChanged(int)), this, SLOT(onViewFrameStateChanged(int)));
 	optionsLayout->addWidget(m_viewFrame, 1, 4, 1, 1, Qt::AlignLeft | Qt::AlignVCenter);
-	//Line Colo Field
+	// Line Colo Field
 	QLabel *fadeLabel = new QLabel(tr("Fade:"), optionsWidget);
 	fadeLabel->setMaximumHeight(DVGui::WidgetHeight);
 	optionsLayout->addWidget(fadeLabel, 1, 5, 1, 1, Qt::AlignRight | Qt::AlignVCenter);
 	m_lineColorField = new DVGui::ColorField(optionsWidget, false, TPixel32(), 18);
 	m_lineColorField->setFixedHeight(18);
 	m_lineColorField->hideChannelsFields(true);
-	ret = ret && connect(m_lineColorField, SIGNAL(colorChanged(const TPixel32 &, bool)), this, SLOT(onLinesColorChanged(const TPixel32 &, bool)));
+	ret = ret && connect(m_lineColorField, SIGNAL(colorChanged(const TPixel32 &, bool)), this,
+						 SLOT(onLinesColorChanged(const TPixel32 &, bool)));
 	optionsLayout->addWidget(m_lineColorField, 1, 6, 1, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
 	optionsWidget->setLayout(optionsLayout);
@@ -934,12 +959,13 @@ LineTestCapturePane::LineTestCapturePane(QWidget *parent)
 	QVBoxLayout *captureButtonsLayout = new QVBoxLayout(captureButtonsWidget);
 	captureButtonsLayout->setMargin(2);
 	captureButtonsLayout->setSpacing(0);
-	//Connection Button
+	// Connection Button
 	m_connectionCheckBox = new DVGui::CheckBox(tr(" Connection"), captureButtonsWidget);
 	m_connectionCheckBox->setMaximumSize(100, 19);
-	ret = ret && connect(m_connectionCheckBox, SIGNAL(stateChanged(int)), this, SLOT(onConnectCheckboxStateChanged(int)));
+	ret = ret && connect(m_connectionCheckBox, SIGNAL(stateChanged(int)), this,
+						 SLOT(onConnectCheckboxStateChanged(int)));
 	captureButtonsLayout->addWidget(m_connectionCheckBox, Qt::AlignCenter);
-	//Capture Button
+	// Capture Button
 	m_captureButton = new QPushButton(tr("       Capture       "), captureButtonsWidget);
 	m_captureButton->setMaximumSize(100, 19);
 	ret = ret && connect(m_captureButton, SIGNAL(clicked()), this, SLOT(captureButton()));
@@ -956,18 +982,19 @@ LineTestCapturePane::LineTestCapturePane(QWidget *parent)
 
 	splitter->addWidget(topWidget);
 
-	//Second splitter widget
+	// Second splitter widget
 	QWidget *bottomWidget = new QWidget(splitter);
 	bottomWidget->setFixedHeight(23);
 	QHBoxLayout *bottomLayout = new QHBoxLayout(bottomWidget);
 	bottomLayout->setMargin(0);
 	bottomLayout->setSpacing(0);
-	//Capture Settings Button
+	// Capture Settings Button
 	QPushButton *captureSettingsButton = new QPushButton(tr("Capture Settings"), bottomWidget);
 	captureSettingsButton->setMaximumSize(100, 19);
-	ret = ret && connect(captureSettingsButton, SIGNAL(clicked()), this, SLOT(showCaptureSettings()));
+	ret =
+		ret && connect(captureSettingsButton, SIGNAL(clicked()), this, SLOT(showCaptureSettings()));
 	bottomLayout->addWidget(captureSettingsButton, Qt::AlignHCenter);
-	//File Settings Button
+	// File Settings Button
 	QPushButton *fileSettingsButton = new QPushButton(tr("   File Settings    "), bottomWidget);
 	fileSettingsButton->setMaximumSize(100, 19);
 	ret = ret && connect(fileSettingsButton, SIGNAL(clicked()), this, SLOT(showFileSettings()));
@@ -980,8 +1007,10 @@ LineTestCapturePane::LineTestCapturePane(QWidget *parent)
 
 	initializeTitleBar(getTitleBar());
 
-	//Lo sceneSwitched() va aggiornato anche quando il popup non e' visibile altrimenti ci si trova in una situazione inconsistente
-	ret = ret && connect(TApp::instance()->getCurrentScene(), SIGNAL(sceneSwitched()), this, SLOT(onSceneSwitched()));
+	// Lo sceneSwitched() va aggiornato anche quando il popup non e' visibile altrimenti ci si trova
+	// in una situazione inconsistente
+	ret = ret && connect(TApp::instance()->getCurrentScene(), SIGNAL(sceneSwitched()), this,
+						 SLOT(onSceneSwitched()));
 
 	changeWindowTitle();
 
@@ -992,7 +1021,8 @@ LineTestCapturePane::LineTestCapturePane(QWidget *parent)
 
 CaptureParameters *LineTestCapturePane::getCaptureParameters()
 {
-	TSceneProperties *sceneProperties = TApp::instance()->getCurrentScene()->getScene()->getProperties();
+	TSceneProperties *sceneProperties =
+		TApp::instance()->getCurrentScene()->getScene()->getProperties();
 	Q_ASSERT(sceneProperties);
 	return sceneProperties->getCaptureParameters();
 }
@@ -1012,10 +1042,14 @@ void LineTestCapturePane::showEvent(QShowEvent *)
 	TApp *app = TApp::instance();
 
 	TXsheetHandle *xshHandle = app->getCurrentXsheet();
-	bool ret = connect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this, SLOT(updateFileField()));
-	ret = ret && connect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this, SLOT(updateFileField()));
-	ret = ret && connect(app->getCurrentXsheet(), SIGNAL(xsheetChanged()), this, SLOT(updateFileField()));
-	ret = ret && connect(TnzCamera::instance(), SIGNAL(captureFinished()), this, SLOT(onCaptureFinished()));
+	bool ret = connect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this,
+					   SLOT(updateFileField()));
+	ret = ret &&
+		  connect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this, SLOT(updateFileField()));
+	ret = ret &&
+		  connect(app->getCurrentXsheet(), SIGNAL(xsheetChanged()), this, SLOT(updateFileField()));
+	ret = ret && connect(TnzCamera::instance(), SIGNAL(captureFinished()), this,
+						 SLOT(onCaptureFinished()));
 
 	QAction *act = CommandManager::instance()->getAction(MI_Capture);
 	ret = ret && connect(act, SIGNAL(triggered()), m_captureButton, SIGNAL(clicked()));
@@ -1032,7 +1066,8 @@ void LineTestCapturePane::hideEvent(QHideEvent *)
 {
 	TApp *app = TApp::instance();
 	TXsheetHandle *xshHandle = app->getCurrentXsheet();
-	disconnect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this, SLOT(updateFileField()));
+	disconnect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this,
+			   SLOT(updateFileField()));
 	disconnect(app->getCurrentXsheet(), SIGNAL(xsheetChanged()), this, SLOT(updateFileField()));
 	disconnect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this, SLOT(updateFileField()));
 	disconnect(TnzCamera::instance(), SIGNAL(captureFinished()), this, SLOT(onCaptureFinished()));
@@ -1067,7 +1102,8 @@ bool LineTestCapturePane::capture()
 		return false;
 	}
 	QApplication::setOverrideCursor(Qt::WaitCursor);
-	bool ret = TnzCamera::instance()->onRelease(TFrameId(m_frameField->text().toInt()), m_nameField->text().toStdWString(), row, col);
+	bool ret = TnzCamera::instance()->onRelease(TFrameId(m_frameField->text().toInt()),
+												m_nameField->text().toStdWString(), row, col);
 	QApplication::restoreOverrideCursor();
 	return ret;
 }
@@ -1096,11 +1132,8 @@ void LineTestCapturePane::initializeTitleBar(TPanelTitleBar *titleBar)
 	int x = -50;
 	int iconWidth = 17;
 	TPanelTitleBarButton *button;
-	button = new TPanelTitleBarButton(
-		titleBar,
-		":Resources/freeze.png",
-		":Resources/freeze_over.png",
-		":Resources/freeze_on.png");
+	button = new TPanelTitleBarButton(titleBar, ":Resources/freeze.png",
+									  ":Resources/freeze_over.png", ":Resources/freeze_on.png");
 	button->setToolTip("Freeze");
 	titleBar->add(QPoint(x, 2), button);
 	ret = ret && connect(button, SIGNAL(toggled(bool)), this, SLOT(freeze(bool)));
@@ -1114,7 +1147,8 @@ void LineTestCapturePane::showCaptureSettings()
 {
 	if (!m_captureSettingsPopup) {
 		m_captureSettingsPopup = new CaptureSettingsPopup();
-		bool ret = connect(m_captureSettingsPopup, SIGNAL(newDeviceDefined()), m_connectionCheckBox, SLOT(toggle()));
+		bool ret = connect(m_captureSettingsPopup, SIGNAL(newDeviceDefined()), m_connectionCheckBox,
+						   SLOT(toggle()));
 		assert(ret);
 	}
 	m_captureSettingsPopup->show();
@@ -1186,7 +1220,8 @@ void LineTestCapturePane::onLinesColorChanged(const TPixel32 &color, bool)
 void LineTestCapturePane::onConnectCheckboxStateChanged(int state)
 {
 	if (state) {
-		TSceneProperties *sceneProperties = TApp::instance()->getCurrentScene()->getScene()->getProperties();
+		TSceneProperties *sceneProperties =
+			TApp::instance()->getCurrentScene()->getScene()->getProperties();
 		Q_ASSERT(sceneProperties);
 		std::wstring deviceName = sceneProperties->getCaptureParameters()->getDeviceName();
 
@@ -1210,7 +1245,8 @@ void LineTestCapturePane::onConnectCheckboxStateChanged(int state)
 
 void LineTestCapturePane::captureButton()
 {
-	//Se il bottone di capture e' stato cliccato da meno di 500 ms non consento una nuova acquisizione.
+	// Se il bottone di capture e' stato cliccato da meno di 500 ms non consento una nuova
+	// acquisizione.
 	if (!m_canCapture)
 		return;
 
@@ -1258,8 +1294,8 @@ void LineTestCapturePane::captureButton()
 	number += getCaptureParameters()->getIncrement();
 	TFrameId fid(number);
 
-	//controllo se esiste gia' un livello con frame number diversi.
-	//Nel qual ccaso devo utilizzare il FrameId presente nella cella.
+	// controllo se esiste gia' un livello con frame number diversi.
+	// Nel qual ccaso devo utilizzare il FrameId presente nella cella.
 	row = TApp::instance()->getCurrentFrame()->getFrameIndex();
 	TXshColumn *column = xsh->getColumn(col);
 	if (column) {
@@ -1270,8 +1306,10 @@ void LineTestCapturePane::captureButton()
 
 	setFrameField(fid);
 
-	bool connectionRet = connect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this, SLOT(updateFileField()));
-	connectionRet = connectionRet && connect(app->getCurrentXsheet(), SIGNAL(xsheetChanged()), this, SLOT(updateFileField()));
+	bool connectionRet =
+		connect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this, SLOT(updateFileField()));
+	connectionRet = connectionRet && connect(app->getCurrentXsheet(), SIGNAL(xsheetChanged()), this,
+											 SLOT(updateFileField()));
 	assert(connectionRet);
 
 	m_canCapture = false;
@@ -1347,7 +1385,8 @@ void LineTestCapturePane::onCaptureFinished()
 	app->getCurrentXsheet()->notifyXsheetChanged();
 	app->getCurrentLevel()->notifyLevelChange();
 
-	bool ret = connect(app->getCurrentXsheet(), SIGNAL(xsheetChanged()), this, SLOT(updateFileField()));
+	bool ret =
+		connect(app->getCurrentXsheet(), SIGNAL(xsheetChanged()), this, SLOT(updateFileField()));
 	assert(ret);
 
 	TnzCamera *camera = TnzCamera::instance();

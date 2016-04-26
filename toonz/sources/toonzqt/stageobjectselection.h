@@ -9,7 +9,7 @@
 #include <QList>
 #include <QPair>
 
-//forward declaration
+// forward declaration
 class TXsheetHandle;
 class TObjectHandle;
 class TColumnHandle;
@@ -37,14 +37,17 @@ class StageObjectSelection : public QObject, public TSelection
 	TFxHandle *m_fxHandle;
 	TPointD m_pastePosition;
 
-public:
+  public:
 	StageObjectSelection();
 	StageObjectSelection(const StageObjectSelection &src);
 	~StageObjectSelection();
 
 	void enableCommands();
 
-	bool isEmpty() const { return m_selectedObjects.empty() && m_selectedLinks.empty() && m_selectedSplines.empty(); }
+	bool isEmpty() const
+	{
+		return m_selectedObjects.empty() && m_selectedLinks.empty() && m_selectedSplines.empty();
+	}
 	void setPastePosition(const TPointD &pos) { m_pastePosition = pos; };
 
 	void selectNone()
@@ -80,17 +83,18 @@ public:
 	void setColumnHandle(TColumnHandle *colHandle) { m_colHandle = colHandle; }
 	void setFxHandle(TFxHandle *fxHandle) { m_fxHandle = fxHandle; }
 
-	//return true if objects in m_selectedObjects makes a connected graph;
+	// return true if objects in m_selectedObjects makes a connected graph;
 	bool isConnected() const;
 
-private:
+  private:
 	// not implemented
 	StageObjectSelection &operator=(const StageObjectSelection &);
 
 	QPair<TStageObjectId, TStageObjectId> getBoundingObjects(SchematicLink *link);
-	QPair<TStageObjectId, TStageObjectId> getBoundingObjects(SchematicPort *inputPort, SchematicPort *outputPort);
+	QPair<TStageObjectId, TStageObjectId> getBoundingObjects(SchematicPort *inputPort,
+															 SchematicPort *outputPort);
 
-signals:
+  signals:
 	void doCollapse(QList<TStageObjectId>);
 	void doExplodeChild(QList<TStageObjectId>);
 };

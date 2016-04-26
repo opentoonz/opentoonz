@@ -50,7 +50,7 @@ class VIStroke;
 
 /*!
   TVectorImage: describe a vector image.
-    A vector image is a set of strokes and regions.
+	A vector image is a set of strokes and regions.
   \relates  TImage
 */
 class DVAPI TVectorImage : public TImage
@@ -58,7 +58,7 @@ class DVAPI TVectorImage : public TImage
 	class Imp;
 	int pickGroup(const TPointD &pos, bool onEnteredGroup) const;
 
-public:
+  public:
 	std::unique_ptr<Imp> m_imp;
 
 	struct IntersectionBranch {
@@ -69,22 +69,19 @@ public:
 		UINT m_nextBranch;
 		bool m_gettingOut;
 	};
-	//!if the vectorimage is loaded from disc, loaded=true
+	//! if the vectorimage is loaded from disc, loaded=true
 	TVectorImage(bool loaded = false);
 	virtual ~TVectorImage();
 
-	TImage::Type getType() const
-	{
-		return VECTOR;
-	}
+	TImage::Type getType() const { return VECTOR; }
 
 	/*!Set valid regions flags
-	    call validateRegions() after region/stroke changes
-     */
+		call validateRegions() after region/stroke changes
+	 */
 	void validateRegions(bool state = false);
 	//! Get valid regions flags
 	/*! Call validateRegions() after region/stroke changes
-     */
+	 */
 	bool areValidRegions();
 
 	//! Return a clone of image
@@ -109,7 +106,7 @@ public:
 
 	//! returns the region equivalent to region, 0 if does not exists.
 	TRegion *findRegion(const TRegion &region) const;
-	//calcola tutte le regioni che intersecano  rect(e qualcuna in piu' a volte...)
+	// calcola tutte le regioni che intersecano  rect(e qualcuna in piu' a volte...)
 	void findRegions(const TRectD &rect);
 
 	//! Return the strokes' count
@@ -148,10 +145,11 @@ public:
 
 	//! Return -1 if two object are contained in the same group.
 	/*! Objects can be strokes or regions: they are identified by \b index1 and \b index2.
-		If objects aren't in the same group, the method return the number of equal level into the nested groups.*/
+		If objects aren't in the same group, the method return the number of equal level into the
+	   nested groups.*/
 	int areDifferentGroup(UINT index1, bool isRegion1, UINT index2, bool isRegion2) const;
 
-	//utility functions
+	// utility functions
 	//! Return true if two strokes has common parent groups.
 	bool sameParentGroupStrokes(UINT index1, UINT index2) const
 	{
@@ -169,40 +167,38 @@ public:
 		return areDifferentGroup(strokeIndex, false, regionIndex, true) == -1;
 	}
 
-	//entering and exiting groups
+	// entering and exiting groups
 	bool inCurrentGroup(int strokeIndex) const;
 	bool canEnterGroup(int strokeIndex) const;
 	bool selectable(int strokeIndex) const;
 	bool enterGroup(int index);
 
-	//return -1 if no possible to exit, otherwise a stroke index  which has same id of the exiting group
+	// return -1 if no possible to exit, otherwise a stroke index  which has same id of the exiting
+	// group
 	int exitGroup();
 	bool isEnteredGroupStroke(int index) const;
 	bool canMoveStrokes(int strokeIndex, int count, int moveBefore) const;
-	//returns depth of group inside.
+	// returns depth of group inside.
 	int isInsideGroup() const;
 
 	int pickGroup(const TPointD &pos) const;
 	int getGroupByStroke(UINT index) const;
 	int getGroupByRegion(UINT index) const;
 
-	/*! 
-      get the stroke nearest at point 
-      \note outw is stroke parameter w in [0,1]
-      \par p [input] is point nearest stroke
-      \par outw [output] is parameter of minimum in stroke
-      \par strokeIndex [output] is index of stroke in vector image
-      \par dist2 [output] is the square value of distance
-      \ret true if a value is found
-     */
-	bool getNearestStroke(
-		const TPointD &p,
+	/*!
+	  get the stroke nearest at point
+	  \note outw is stroke parameter w in [0,1]
+	  \par p [input] is point nearest stroke
+	  \par outw [output] is parameter of minimum in stroke
+	  \par strokeIndex [output] is index of stroke in vector image
+	  \par dist2 [output] is the square value of distance
+	  \ret true if a value is found
+	 */
+	bool getNearestStroke(const TPointD &p,
 
-		// output
-		double &outw,
-		UINT &strokeIndex,
-		double &dist2,
-		bool inCurrentGroup = true) const;
+						  // output
+						  double &outw, UINT &strokeIndex, double &dist2,
+						  bool inCurrentGroup = true) const;
 
 	//! Enable or disable the style of a stroke according to the \b enable param.
 	static void enableStrokeStyle(int index, bool enable);
@@ -212,8 +208,8 @@ public:
 	//! Remove the stroke of index \b index and if \b doComputeRegions is true recompute the regions
 	TStroke *removeStroke(int index, bool doComputeRegions = true);
 	//! Remove the strokes identified by indexes in the vector \b toBeRemoved
-	/*! If \b deleteThem is true strokes are really delete; 
-        if \b doComputeRegions is true recompute the regions*/
+	/*! If \b deleteThem is true strokes are really delete;
+		if \b doComputeRegions is true recompute the regions*/
 	void removeStrokes(const std::vector<int> &tobeRemoved, bool deleteThem, bool recomputeRegions);
 
 	//! Delete the \b TStroke stroke of index \b index
@@ -228,7 +224,10 @@ public:
 	void replaceStroke(int index, TStroke *newStroke);
 
 	//! Insert a \b VIStroke \b vs at index \b strokeIndex
-	void insertStrokeAt(VIStroke *vs, int strokeIndex, bool recomputeRegions = true); //! Move \b count strokes starting from \b fromIndex before the stroke identified by the \b moveBefore index.
+	void insertStrokeAt(VIStroke *vs, int strokeIndex,
+						bool recomputeRegions = true); //! Move \b count strokes starting from \b
+													   //! fromIndex before the stroke identified by
+													   //! the \b moveBefore index.
 	void moveStrokes(int fromIndex, int count, int moveBefore);
 	//! Find regions of a \b TVectorImage
 	void findRegions(bool fromSwf = false);
@@ -245,17 +244,22 @@ public:
 	//! Return the region which contains \b p, if none regions contains \b p return 0
 	TRegion *getRegion(const TPointD &p);
 
-	//! Fill the region which contains \b p with \b styleId. it returns the  style of the region before filling or -1 if not filled.
+	//! Fill the region which contains \b p with \b styleId. it returns the  style of the region
+	//! before filling or -1 if not filled.
 	int fill(const TPointD &p, int styleId, bool onlyEmpty = false);
-	//! Fill all the regions and strokes contained in \b selectArea or contained into the regions formed by the stroke \b s with the style \b styleId.
-	/*! If \b onlyUnfilled is true, only regions filled with the style 0 are filled with the new stile.
+	//! Fill all the regions and strokes contained in \b selectArea or contained into the regions
+	//! formed by the stroke \b s with the style \b styleId.
+	/*! If \b onlyUnfilled is true, only regions filled with the style 0 are filled with the new
+	   stile.
 		If \b fillAreas is true regions are filled.
 		If \b fillLines is true stroke are filled.*/
-	bool selectFill(const TRectD &selectArea, TStroke *s, int styleId, bool onlyUnfilled, bool fillAreas, bool fillLines);
+	bool selectFill(const TRectD &selectArea, TStroke *s, int styleId, bool onlyUnfilled,
+					bool fillAreas, bool fillLines);
 
 	//! Fill all regions contained in the \b stroke area with \b styleIndex
 	void areaFill(TStroke *stroke, int styleIndex, bool onlyUnfilled);
-	//! Fill the stroke which contains \b p with \b newStyleId; it returns the  style of stroke before filling or -1 if not filled.
+	//! Fill the stroke which contains \b p with \b newStyleId; it returns the  style of stroke
+	//! before filling or -1 if not filled.
 	int fillStrokes(const TPointD &p, int newStyleId);
 
 	//! Return true if \b computeRegion method was called
@@ -266,35 +270,42 @@ public:
 
 	//! Call the following method after stroke modification
 	//! \note you must specify, using the second argument, whether the modification was a reflection
-	void notifyChangedStrokes(const std::vector<int> &strokeIndexArray, const std::vector<TStroke *> &oldStrokeArray, bool areFlipped = false);
+	void notifyChangedStrokes(const std::vector<int> &strokeIndexArray,
+							  const std::vector<TStroke *> &oldStrokeArray,
+							  bool areFlipped = false);
 
 	//! Call the following method after stroke modification
 	void notifyChangedStrokes(int strokeIndex, TStroke *oldStroke = 0, bool isFlipped = false);
 
-	UINT getFillData(std::unique_ptr<IntersectionBranch[]>& v);
-	void setFillData(std::unique_ptr<IntersectionBranch[]> const& v, UINT size, bool doComputeRegions = true);
+	UINT getFillData(std::unique_ptr<IntersectionBranch[]> &v);
+	void setFillData(std::unique_ptr<IntersectionBranch[]> const &v, UINT size,
+					 bool doComputeRegions = true);
 
-	void drawAutocloses(const TVectorRenderData &rd) const; //debug method
+	void drawAutocloses(const TVectorRenderData &rd) const; // debug method
 
-	/*! Includes a (transformed) copy of imgs in this. If setSelected==true then selects imported strokes.
+	/*! Includes a (transformed) copy of imgs in this. If setSelected==true then selects imported
+	   strokes.
 		It also includes the color informations.
 		Try to assign the same stroke ids (if unused)
 	*/
 	void enableRegionComputing(bool enabled, bool notIntersectingStrokes);
 
-	/*! if enabled, region edges are joined together when possible. for flash render, should be disabled!
+	/*! if enabled, region edges are joined together when possible. for flash render, should be
+	 * disabled!
   */
 	void enableMinimizeEdges(bool enabled);
-	/*! Creates a new Image using the selected strokes. If removeFlag==true then removes selected strokes
-	    It includes (in the new image) the color informations too.
-		It mantains stroke ids. 
+	/*! Creates a new Image using the selected strokes. If removeFlag==true then removes selected
+	   strokes
+		It includes (in the new image) the color informations too.
+		It mantains stroke ids.
 	*/
 	TVectorImageP splitSelected(bool removeFlag);
 
 	//! Merge the image with the \b img.
 	void mergeImage(const TVectorImageP &img, const TAffine &affine, bool sameStrokeId = true);
 
-	void mergeImage(const TVectorImageP &img, const TAffine &affine, const std::map<int, int> &styleTable, bool sameStrokeId = true);
+	void mergeImage(const TVectorImageP &img, const TAffine &affine,
+					const std::map<int, int> &styleTable, bool sameStrokeId = true);
 	//! Merge the image with the vector of image \b images.
 	void mergeImage(const std::vector<const TVectorImage *> &images);
 
@@ -308,22 +319,24 @@ public:
 	void reassignStyles(std::map<int, int> &table);
 
 	//! Transfer the stroke style of the \b sourceStroke in the \b sourceImage to the style
-	static void transferStrokeColors(TVectorImageP sourceImage,
-									 int sourceStroke,
-									 TVectorImageP destinationImage,
-									 int destinationStroke);
-	//! Set the edges of the stroke identified by \b strokeIndex with the styles \b leftColorIndex and \brightColorIndex.
+	static void transferStrokeColors(TVectorImageP sourceImage, int sourceStroke,
+									 TVectorImageP destinationImage, int destinationStroke);
+	//! Set the edges of the stroke identified by \b strokeIndex with the styles \b leftColorIndex
+	//! and \brightColorIndex.
 	void setEdgeColors(int strokeIndex, int leftColorIndex, int rightColorIndex);
 
-	/*! This functions splits stroke with index 'strokeIndex' in n+1 strokes, where n is the size of vector sortedW, 
-	    cutting it in points w specified in sortedW. SortedW must be sorted in ascending order.
-		Resulting strokes are put in VectorImage in position strokeIndex,strokeIndex+1, ... strokeIndex+n.
+	/*! This functions splits stroke with index 'strokeIndex' in n+1 strokes, where n is the size of
+	   vector sortedW,
+		cutting it in points w specified in sortedW. SortedW must be sorted in ascending order.
+		Resulting strokes are put in VectorImage in position strokeIndex,strokeIndex+1, ...
+	   strokeIndex+n.
 		Information on fill colors are maintened, as much as possible. */
 	void splitStroke(int strokeIndex, const std::vector<DoublePair> &sortedWRanges);
 	VIStroke *joinStroke(int index1, int index2, int cpIndex1, int cpIndex2, bool isSmooth);
 	VIStroke *extendStroke(int index, const TThickPoint &p, int cpIndex, bool isSmooth);
-	/*! this method removes the parts  of the stroke that are not bounds of regions. only ending parts are removed. 
-  If the entire stroke is not bounding any region, it is kept entitely. 
+	/*! this method removes the parts  of the stroke that are not bounds of regions. only ending
+  parts are removed.
+  If the entire stroke is not bounding any region, it is kept entitely.
   it returns the original stroke (for undo)*/
 	TStroke *removeEndpoints(int strokeIndex);
 
@@ -336,10 +349,12 @@ public:
 	//! Return the autoclose tolerance.
 	double getAutocloseTolerance() const;
 
-	//!forces the recomputing of all regions (it is actually done only after having loaded the vectorimage)
+	//! forces the recomputing of all regions (it is actually done only after having loaded the
+	//! vectorimage)
 	void recomputeRegionsIfNeeded();
 
-	/*! Remove all image strokes and all image regions with style index contained in \b styleIds vector.*/
+	/*! Remove all image strokes and all image regions with style index contained in \b styleIds
+	 * vector.*/
 	void eraseStyleIds(const std::vector<int> styleIds);
 
 	TThread::Mutex *getMutex() const;
@@ -350,7 +365,7 @@ public:
 
 	void computeRegion(const TPointD &p, int styleId);
 
-private: //not implemented
+  private: // not implemented
 	TVectorImage(const TVectorImage &);
 	TVectorImage &operator=(const TVectorImage &);
 };
@@ -371,27 +386,21 @@ template class DVAPI TDerivedSmartPointerT<TVectorImage, TImage>;
 
 class DVAPI TVectorImageP : public TDerivedSmartPointerT<TVectorImage, TImage>
 {
-public:
+  public:
 	TVectorImageP() {}
 	TVectorImageP(TVectorImage *image) : DerivedSmartPointer(image) {}
 	TVectorImageP(TImageP image) : DerivedSmartPointer(image) {}
 #if !defined(_WIN32)
-	TVectorImageP(TImage *image) : DerivedSmartPointer(TImageP(image))
-	{
-	}
+	TVectorImageP(TImage *image) : DerivedSmartPointer(TImageP(image)) {}
 #endif
-	operator TImageP()
-	{
-		return TImageP(m_pointer);
-	}
+	operator TImageP() { return TImageP(m_pointer); }
 };
 
 //-----------------------------------------------------------------------------
 
 // GMT: DA TOGLIERE. vedi sopra
 #ifdef LINUX
-DVAPI void hardRenderVectorImage(const TVectorRenderData &rd,
-								 TRaster32P &r,
+DVAPI void hardRenderVectorImage(const TVectorRenderData &rd, TRaster32P &r,
 								 const TVectorImageP &vimg);
 #endif
 //-----------------------------------------------------------------------------
@@ -400,7 +409,7 @@ DVAPI void hardRenderVectorImage(const TVectorRenderData &rd,
 
 class DVAPI TInputStreamInterface
 {
-public:
+  public:
 	TInputStreamInterface() {}
 	virtual ~TInputStreamInterface() {}
 
@@ -419,7 +428,7 @@ public:
 
 class DVAPI TOutputStreamInterface
 {
-public:
+  public:
 	TOutputStreamInterface() {}
 	virtual ~TOutputStreamInterface() {}
 

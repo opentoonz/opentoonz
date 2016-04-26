@@ -27,9 +27,7 @@ CompositeStatus::CompositeStatus()
 
 CompositeStatus::~CompositeStatus()
 {
-	iterator
-		it = db_.begin(),
-		end = db_.end();
+	iterator it = db_.begin(), end = db_.end();
 
 	while (it != end) {
 		delete it->second;
@@ -41,14 +39,12 @@ CompositeStatus::~CompositeStatus()
 
 //---------------------------------------------------------------------------
 
-void CompositeStatus::add(CompositeStatus *status,
-						  const std::string &name)
+void CompositeStatus::add(CompositeStatus *status, const std::string &name)
 {
 	if (!status)
 		return;
 
-	CompositeStatus
-		*tmp = this->find(name);
+	CompositeStatus *tmp = this->find(name);
 
 	if (tmp)
 		delete tmp;
@@ -60,9 +56,7 @@ void CompositeStatus::add(CompositeStatus *status,
 
 void CompositeStatus::remove(const std::string &name)
 {
-	iterator
-		found = db_.find(name),
-		end = db_.end();
+	iterator found = db_.find(name), end = db_.end();
 
 	if (found != end) {
 		delete found->second;
@@ -72,12 +66,9 @@ void CompositeStatus::remove(const std::string &name)
 
 //---------------------------------------------------------------------------
 
-CompositeStatus *
-CompositeStatus::find(const std::string &name) const
+CompositeStatus *CompositeStatus::find(const std::string &name) const
 {
-	const_iterator
-		found = db_.find(name),
-		end = db_.end();
+	const_iterator found = db_.find(name), end = db_.end();
 
 	if (found != end)
 		return found->second;

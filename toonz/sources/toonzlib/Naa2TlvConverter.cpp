@@ -41,7 +41,8 @@ QString RegionInfo::getTypeString() const
 }
 
 Naa2TlvConverter::Naa2TlvConverter()
-	: MaxColorCount(1000), m_regionRas(0), m_borderRas(0), m_dotRas(0), m_syntheticInkRas(0), m_inkThickness(0), m_palette(0), m_valid(false)
+	: MaxColorCount(1000), m_regionRas(0), m_borderRas(0), m_dotRas(0), m_syntheticInkRas(0),
+	  m_inkThickness(0), m_palette(0), m_valid(false)
 
 {
 }
@@ -91,7 +92,7 @@ void Naa2TlvConverter::process(const TRaster32P &srcRas)
 
 	measureThickness();
 
-	//findPaints();
+	// findPaints();
 	findPaints2();
 
 	findThinPaints();
@@ -175,7 +176,8 @@ void Naa2TlvConverter::separateRegions()
 	const int ly = m_regionRas->getLy();
 	const int wrap = lx;
 
-	// we assume that m_regions contains almost no information (except: m_regions[i].colorIndex == i)
+	// we assume that m_regions contains almost no information (except: m_regions[i].colorIndex ==
+	// i)
 	m_regions.clear();
 
 	WorkRaster<int> wb(lx, ly); // work buffer
@@ -223,7 +225,8 @@ void Naa2TlvConverter::separateRegions()
 			}
 
 			// merge if needed
-			if (cUp == cLeft && cUp >= 0 && regionMap[wbScanLine[x - 1]] != regionMap[wbScanLine[x - wrap]]) {
+			if (cUp == cLeft && cUp >= 0 &&
+				regionMap[wbScanLine[x - 1]] != regionMap[wbScanLine[x - wrap]]) {
 				// merge
 				int pixelToDiscard = wbScanLine[x - 1];
 				int pixelToKeep = wbScanLine[x - wrap];
@@ -236,7 +239,7 @@ void Naa2TlvConverter::separateRegions()
 				for (int i = 0; i < regionMap.count(); i++)
 					if (regionMap[i] == regionToDiscard)
 						regionMap[i] = regionToKeep;
-				//wbScanLine[x] = pixelToKeep;
+				// wbScanLine[x] = pixelToKeep;
 				m_regions[regionToDiscard].type = RegionInfo::Unused;
 				freeRegions.append(regionToDiscard);
 			}
@@ -251,7 +254,8 @@ void Naa2TlvConverter::separateRegions()
 			int k = m_regions.count();
 			freeRegions.removeAll(k);
 		} else if (!freeRegions.empty()) {
-			// last region is used, but there is at least a free region with lower index: move it there
+			// last region is used, but there is at least a free region with lower index: move it
+			// there
 			int regionToDiscard = m_regions.count() - 1;
 			int regionToKeep = freeRegions.back();
 			freeRegions.pop_back();
@@ -389,7 +393,8 @@ void Naa2TlvConverter::findRegionBorders()
 	delete m_borderRas;
 	m_borderRas = new WorkRaster<unsigned char>(lx, ly);
 
-	static const int dd[][2] = {{-1, -1}, {0, -1}, {1, -1}, {-1, 0}, {1, 0}, {-1, 1}, {0, 1}, {1, 1}};
+	static const int dd[][2] = {{-1, -1}, {0, -1}, {1, -1}, {-1, 0},
+								{1, 0},   {-1, 1}, {0, 1},  {1, 1}};
 
 	// find region-region boundaries
 	for (int y = 0; y < ly; y++) {
@@ -418,7 +423,8 @@ void Naa2TlvConverter::findRegionBorders()
 //-----------------------------------------------------------------------------
 
 // update m_borders, adding 2,3... for internal pixels close to boundary
-// update m_regions[i].boundaries (histogram : boundaries[k] is the number of pixels belonging to that region with m_border[pix] == k)
+// update m_regions[i].boundaries (histogram : boundaries[k] is the number of pixels belonging to
+// that region with m_border[pix] == k)
 
 void Naa2TlvConverter::erodeRegions()
 {
@@ -429,7 +435,8 @@ void Naa2TlvConverter::erodeRegions()
 	int lx = m_regionRas->getLx();
 	int ly = m_regionRas->getLy();
 
-	static const int dd[][2] = {{-1, -1}, {0, -1}, {1, -1}, {-1, 0}, {1, 0}, {-1, 1}, {0, 1}, {1, 1}};
+	static const int dd[][2] = {{-1, -1}, {0, -1}, {1, -1}, {-1, 0},
+								{1, 0},   {-1, 1}, {0, 1},  {1, 1}};
 
 	for (int iter = 0; iter < 10; iter++) {
 		for (int y = 0; y < ly; y++) {
@@ -495,13 +502,15 @@ void Naa2TlvConverter::findMainInks()
 		RegionInfo &region = m_regions[i];
 		if (region.type != RegionInfo::Unknown)
 			continue;
-		if (region.isBackground() || region.type == RegionInfo::LargePaint || region.boundaries[0] > 0)
+		if (region.isBackground() || region.type == RegionInfo::LargePaint ||
+			region.boundaries[0] > 0)
 			continue;
 		double ap2 = 100000.0 * (double)region.pixelCount / pow((double)region.perimeter, 2);
 		if (ap2 > 100)
 			continue;
 		foreach (int c, region.links.keys()) {
-			if (c >= 0 && (m_regions[c].isBackground() || m_regions[c].type == RegionInfo::LargePaint)) {
+			if (c >= 0 &&
+				(m_regions[c].isBackground() || m_regions[c].type == RegionInfo::LargePaint)) {
 				int strength = region.links[c];
 				if (strength > 50) {
 					m_regions[i].type = RegionInfo::MainInk;
@@ -786,11 +795,13 @@ void Naa2TlvConverter::assignColorTypes()
 
 //-----------------------------------------------------------------------------
 
-void Naa2TlvConverter::addBorderInks() // add syntethic inks: lines between two adjacent fill-regions
+void Naa2TlvConverter::addBorderInks() // add syntethic inks: lines between two adjacent
+									   // fill-regions
 {
 	int lx = m_regionRas->getLx();
 	int ly = m_regionRas->getLy();
-	static const int dd[][2] = {{0, -1}, {-1, 0}, {1, 0}, {0, 1}, {1, 1}, {-1, -1}, {-1, 1}, {1, -1}};
+	static const int dd[][2] = {{0, -1}, {-1, 0},  {1, 0},  {0, 1},
+								{1, 1},  {-1, -1}, {-1, 1}, {1, -1}};
 
 	m_syntheticInkRas = new WorkRaster<unsigned char>(lx, ly);
 	for (int i = 0; i < lx * ly; i++)
@@ -812,7 +823,8 @@ void Naa2TlvConverter::addBorderInks() // add syntethic inks: lines between two 
 			int c = workScanLine[x];
 			if (borderScanLine[x] != 1)
 				continue; // consider border pixel only
-			if (0 == (m_regions[c].type & RegionInfo::Paint) && m_regions[c].type != RegionInfo::Unknown)
+			if (0 == (m_regions[c].type & RegionInfo::Paint) &&
+				m_regions[c].type != RegionInfo::Unknown)
 				continue; // consider paint pixels only
 
 			// is touching a different no-ink pixel?
@@ -825,8 +837,10 @@ void Naa2TlvConverter::addBorderInks() // add syntethic inks: lines between two 
 					if (m_regions[c1].type == RegionInfo::Background) {
 						touchesOtherRegion = true;
 						break;
-					} else if (m_regions[c1].type == RegionInfo::Unknown || (m_regions[c1].type & RegionInfo::Paint) != 0) {
-						// OLD: note: we consider only regions with a lower index, to avoid to create double border strokes
+					} else if (m_regions[c1].type == RegionInfo::Unknown ||
+							   (m_regions[c1].type & RegionInfo::Paint) != 0) {
+						// OLD: note: we consider only regions with a lower index, to avoid to
+						// create double border strokes
 						// NEW: we put syntetic ink pixels in larger regions
 						if (m_regions[c1].pixelCount < m_regions[c].pixelCount) {
 							touchesOtherRegion = true;
@@ -874,7 +888,8 @@ void Naa2TlvConverter::measureThickness()
 			int regionId = regionBuffer[y * lx + x];
 			RegionInfo &region = m_regions[regionId];
 			int type = region.type;
-			if (type == RegionInfo::Background || type == RegionInfo::LargePaint || type == RegionInfo::ThinInk)
+			if (type == RegionInfo::Background || type == RegionInfo::LargePaint ||
+				type == RegionInfo::ThinInk)
 				continue;
 
 			int thickness = measureThickness(x, y);
@@ -891,11 +906,13 @@ void Naa2TlvConverter::measureThickness()
 	for (int i = 0; i < m_regions.count(); i++) {
 		RegionInfo &region = m_regions[i];
 		int type = region.type;
-		if (type == RegionInfo::Background || type == RegionInfo::LargePaint || type == RegionInfo::ThinInk)
+		if (type == RegionInfo::Background || type == RegionInfo::LargePaint ||
+			type == RegionInfo::ThinInk)
 			continue;
 		int thicknessCount = 0;
 		double thickness = 0.0;
-		for (QMap<int, int>::Iterator it = region.thicknessHistogram.begin(); it != region.thicknessHistogram.end(); ++it) {
+		for (QMap<int, int>::Iterator it = region.thicknessHistogram.begin();
+			 it != region.thicknessHistogram.end(); ++it) {
 			thicknessCount += it.value();
 			thickness += it.key() * it.value();
 		}
@@ -941,7 +958,9 @@ int Naa2TlvConverter::measureThickness(int x0, int y0)
 
 	// a is a direction index; a : inside; a+1 : outside
 	int a = 0;
-	while (a < 8 && !(regionBuffer[k0 + dd[a]] == regionId && regionBuffer[k0 + dd[(a + 1) % 8]] != regionId))
+	while (
+		a < 8 &&
+		!(regionBuffer[k0 + dd[a]] == regionId && regionBuffer[k0 + dd[(a + 1) % 8]] != regionId))
 		a++;
 	if (a == 8) {
 		// k0 is an isolated point or (strange!) an intern point
@@ -1095,8 +1114,8 @@ TToonzImageP Naa2TlvConverter::makeTlv(bool transparentSyntheticInks)
 	}
 	styleIds.append(0); // syntetic ink
 
-	//int synteticInkStyleId = palette->getPage(0)->addStyle(TPixel32(0,0,0,0));
-	//styleIds.append(synteticInkStyleId);
+	// int synteticInkStyleId = palette->getPage(0)->addStyle(TPixel32(0,0,0,0));
+	// styleIds.append(synteticInkStyleId);
 
 	for (int y = 0; y < ly; y++) {
 		unsigned short *workScanLine = m_regionRas->pixels(y);

@@ -22,12 +22,11 @@ class AnimateValuesUndo : public TUndo
 	int m_row, m_col; //!< Xsheet coordinates
 	int m_v;		  //!< Moved vertex
 
-public:
+  public:
 	SkDKey m_oldValues, m_newValues; //!< Keyframe values
 
-public:
-	AnimateValuesUndo(int v)
-		: m_row(::row()), m_col(::column()), m_v(v) {}
+  public:
+	AnimateValuesUndo(int v) : m_row(::row()), m_col(::column()), m_v(v) {}
 
 	// Again, not accurate. We should get in the details of SkDF... So, let's say
 	// around 10 kB - max 10k instances in the standard undos pool.
@@ -58,7 +57,8 @@ public:
 
 		l_suspendParamsObservation = true; // Coalesce params change notifications into one
 
-		l_plasticTool.deformation()->deleteKeyframe(m_row - 1); // Yep. Typical frame/row shift... xD
+		l_plasticTool.deformation()->deleteKeyframe(m_row -
+													1); // Yep. Typical frame/row shift... xD
 		l_plasticTool.deformation()->setKeyframe(m_oldValues);
 
 		l_suspendParamsObservation = false;
@@ -129,12 +129,14 @@ void PlasticTool::leftButtonDrag_animate(const TPointD &pos, const TMouseEvent &
 
 		// Move selected branch
 		if (m_keepDistance.getValue()) {
-			::setKeyframe(vd->m_params[SkVD::ANGLE], frame); // Set a keyframe for it. It must be done
-															 // to set the correct function interpolation
-															 // type and other stuff.
+			::setKeyframe(vd->m_params[SkVD::ANGLE],
+						  frame); // Set a keyframe for it. It must be done
+								  // to set the correct function interpolation
+								  // type and other stuff.
 			m_sd->updateAngle(*skeleton(), deformedSkeleton(), frame, m_svSel, pos);
 		} else {
-			::setKeyframe(vd->m_params[SkVD::ANGLE], frame);	// Same here. NOTE: Not setting a frame on
+			::setKeyframe(vd->m_params[SkVD::ANGLE],
+						  frame); // Same here. NOTE: Not setting a frame on
 			::setKeyframe(vd->m_params[SkVD::DISTANCE], frame); // vd directly due to SkVD::SO
 
 			m_sd->updatePosition(*skeleton(), deformedSkeleton(), frame, m_svSel, pos);
@@ -142,7 +144,8 @@ void PlasticTool::leftButtonDrag_animate(const TPointD &pos, const TMouseEvent &
 
 		l_suspendParamsObservation = false;
 
-		//onChange();                                                     // Due to a nasty Function Editor dependency,
+		// onChange();                                                     // Due to a nasty
+		// Function Editor dependency,
 		// it's better to call the following directly
 		m_deformedSkeleton.invalidate();
 		invalidate();
@@ -192,14 +195,17 @@ void PlasticTool::addContextMenuActions_animate(QMenu *menu)
 		ret = ret && connect(setKey, SIGNAL(triggered()), &l_plasticTool, SLOT(setKey_undo()));
 
 		QAction *setRestKey = menu->addAction(tr("Set Rest Key"));
-		ret = ret && connect(setRestKey, SIGNAL(triggered()), &l_plasticTool, SLOT(setRestKey_undo()));
+		ret = ret &&
+			  connect(setRestKey, SIGNAL(triggered()), &l_plasticTool, SLOT(setRestKey_undo()));
 	}
 
 	QAction *setGlobalKey = menu->addAction(tr("Set Global Key"));
-	ret = ret && connect(setGlobalKey, SIGNAL(triggered()), &l_plasticTool, SLOT(setGlobalKey_undo()));
+	ret = ret &&
+		  connect(setGlobalKey, SIGNAL(triggered()), &l_plasticTool, SLOT(setGlobalKey_undo()));
 
 	QAction *setGlobalRestKey = menu->addAction(tr("Set Global Rest Key"));
-	ret = ret && connect(setGlobalRestKey, SIGNAL(triggered()), &l_plasticTool, SLOT(setGlobalRestKey_undo()));
+	ret = ret && connect(setGlobalRestKey, SIGNAL(triggered()), &l_plasticTool,
+						 SLOT(setGlobalRestKey_undo()));
 
 	menu->addSeparator();
 

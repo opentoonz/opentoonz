@@ -50,11 +50,11 @@ const int labelSize = 110;
 //-----------------------------------------------------------------------------
 
 /*
-class CheckBoardRect : public QWidget 
+class CheckBoardRect : public QWidget
 {
 TRaster32P m_ras;
 
-public: 
+public:
 CheckBoardRect(QWidget *parent, int sizeX, int sizeY)
 	: m_ras(sizeX,sizeY)
   {
@@ -63,7 +63,8 @@ CheckBoardRect(QWidget *parent, int sizeX, int sizeY)
   }
 void setColors(const TPixel32 &color1, const TPixel32 &color2)
   {
-  TRop::checkBoard(m_ras, color1, color2, TDimensionD(m_ras->getLx()/8, m_ras->getLy()/8),TPointD(0, 0));
+  TRop::checkBoard(m_ras, color1, color2, TDimensionD(m_ras->getLx()/8, m_ras->getLy()/8),TPointD(0,
+0));
   update();
   }
 protected:
@@ -73,44 +74,43 @@ void paintEvent(QPaintEvent *event)
 	QImage img(m_ras->getRawData(), m_ras->getLx(), m_ras->getLy(), QImage::Format_ARGB32);
   painter.drawImage(0,0,img);
   }
-}; 
+};
 */
 
 //=============================================================================
 // SceneSettingsPopup
 //-----------------------------------------------------------------------------
 
-SceneSettingsPopup::SceneSettingsPopup()
-	: QDialog(TApp::instance()->getMainWindow())
+SceneSettingsPopup::SceneSettingsPopup() : QDialog(TApp::instance()->getMainWindow())
 {
 	setWindowTitle(tr("Scene Settings"));
 	setObjectName("SceneSettings");
 	TSceneProperties *sprop = getProperties();
 
-	//Frame Rate
+	// Frame Rate
 	double frameRate = sprop->getOutputProperties()->getFrameRate();
 	m_frameRateFld = new DoubleLineEdit(this, frameRate);
 	m_frameRateFld->setRange(1, 100);
 	m_frameRateFld->setDecimals(2);
 
-	//Camera BG color
+	// Camera BG color
 	m_bgColorFld = new ColorField(this, true, sprop->getBgColor());
 
-	//Field Guide Size - A/R
+	// Field Guide Size - A/R
 	int fieldGuideSize = sprop->getFieldGuideSize();
 	m_fieldGuideFld = new DVGui::IntLineEdit(this, fieldGuideSize, 0, 50);
 	m_aspectRatioFld = new DoubleLineEdit(this, 1.38);
 	m_aspectRatioFld->setRange(-10000.0, 10000.0);
 	m_aspectRatioFld->setDecimals(5);
 
-	//Image Subsampling  - Tlv Subsampling
+	// Image Subsampling  - Tlv Subsampling
 	int fullcolorSubsampling = sprop->getFullcolorSubsampling();
 	m_fullcolorSubsamplingFld = new DVGui::IntLineEdit(this, fullcolorSubsampling, 1);
 
 	int tlvSubsampling = sprop->getTlvSubsampling();
 	m_tlvSubsamplingFld = new DVGui::IntLineEdit(this, tlvSubsampling, 1);
 
-	//Marker Interval - Start Frame
+	// Marker Interval - Start Frame
 	int distance, offset;
 	sprop->getMarkers(distance, offset);
 	m_markerIntervalFld = new DVGui::IntLineEdit(this, distance, 0);
@@ -122,28 +122,36 @@ SceneSettingsPopup::SceneSettingsPopup()
 	mainLayout->setHorizontalSpacing(5);
 	mainLayout->setVerticalSpacing(15);
 	{
-		//Frame Rate
-		mainLayout->addWidget(new QLabel(tr("Frame Rate:"), this), 0, 0, Qt::AlignRight | Qt::AlignVCenter);
+		// Frame Rate
+		mainLayout->addWidget(new QLabel(tr("Frame Rate:"), this), 0, 0,
+							  Qt::AlignRight | Qt::AlignVCenter);
 		mainLayout->addWidget(m_frameRateFld, 0, 1);
-		//Camera BG color
-		mainLayout->addWidget(new QLabel(tr("Camera BG Color:"), this), 1, 0, Qt::AlignRight | Qt::AlignVCenter);
+		// Camera BG color
+		mainLayout->addWidget(new QLabel(tr("Camera BG Color:"), this), 1, 0,
+							  Qt::AlignRight | Qt::AlignVCenter);
 		mainLayout->addWidget(m_bgColorFld, 1, 1, 1, 4);
-		//Field Guide Size - A/R
-		mainLayout->addWidget(new QLabel(tr("Field Guide Size:"), this), 2, 0, Qt::AlignRight | Qt::AlignVCenter);
+		// Field Guide Size - A/R
+		mainLayout->addWidget(new QLabel(tr("Field Guide Size:"), this), 2, 0,
+							  Qt::AlignRight | Qt::AlignVCenter);
 		mainLayout->addWidget(m_fieldGuideFld, 2, 1);
-		mainLayout->addWidget(new QLabel(tr("A/R:"), this), 2, 2, Qt::AlignRight | Qt::AlignVCenter);
+		mainLayout->addWidget(new QLabel(tr("A/R:"), this), 2, 2,
+							  Qt::AlignRight | Qt::AlignVCenter);
 		mainLayout->addWidget(m_aspectRatioFld, 2, 3);
-		//Image Subsampling  - Tlv Subsampling
-		mainLayout->addWidget(new QLabel(tr("Image Subsampling:"), this), 3, 0, Qt::AlignRight | Qt::AlignVCenter);
+		// Image Subsampling  - Tlv Subsampling
+		mainLayout->addWidget(new QLabel(tr("Image Subsampling:"), this), 3, 0,
+							  Qt::AlignRight | Qt::AlignVCenter);
 		mainLayout->addWidget(m_fullcolorSubsamplingFld, 3, 1);
 		if (m_tlvSubsamplingFld) {
-			mainLayout->addWidget(new QLabel(tr("TLV Subsampling:"), this), 4, 0, Qt::AlignRight | Qt::AlignVCenter);
+			mainLayout->addWidget(new QLabel(tr("TLV Subsampling:"), this), 4, 0,
+								  Qt::AlignRight | Qt::AlignVCenter);
 			mainLayout->addWidget(m_tlvSubsamplingFld, 4, 1);
 		}
-		//Marker Interval - Start Frame
-		mainLayout->addWidget(new QLabel(tr("Marker Interval:"), this), 5, 0, Qt::AlignRight | Qt::AlignVCenter);
+		// Marker Interval - Start Frame
+		mainLayout->addWidget(new QLabel(tr("Marker Interval:"), this), 5, 0,
+							  Qt::AlignRight | Qt::AlignVCenter);
 		mainLayout->addWidget(m_markerIntervalFld, 5, 1);
-		mainLayout->addWidget(new QLabel(tr("  Start Frame:"), this), 5, 2, Qt::AlignRight | Qt::AlignVCenter);
+		mainLayout->addWidget(new QLabel(tr("  Start Frame:"), this), 5, 2,
+							  Qt::AlignRight | Qt::AlignVCenter);
 		mainLayout->addWidget(m_startFrameFld, 5, 3);
 	}
 	mainLayout->setColumnStretch(0, 0);
@@ -154,22 +162,30 @@ SceneSettingsPopup::SceneSettingsPopup()
 	mainLayout->setRowStretch(6, 1);
 	setLayout(mainLayout);
 
-	//signal-slot connections
+	// signal-slot connections
 	bool ret = true;
-	//Frame Rate
-	ret = ret && connect(m_frameRateFld, SIGNAL(editingFinished()), this, SLOT(onFrameRateEditingFinished()));
-	//Camera BG color
-	ret = ret && connect(m_bgColorFld, SIGNAL(colorChanged(const TPixel32 &, bool)), this, SLOT(setBgColor(const TPixel32 &, bool)));
-	//Field Guide Size - A/R
-	ret = ret && connect(m_fieldGuideFld, SIGNAL(editingFinished()), this, SLOT(onFieldGuideSizeEditingFinished()));
-	ret = ret && connect(m_aspectRatioFld, SIGNAL(editingFinished()), this, SLOT(onFieldGuideAspectRatioEditingFinished()));
-	//Image Subsampling  - Tlv Subsampling
-	ret = ret && connect(m_fullcolorSubsamplingFld, SIGNAL(editingFinished()), this, SLOT(onFullColorSubsampEditingFinished()));
+	// Frame Rate
+	ret = ret && connect(m_frameRateFld, SIGNAL(editingFinished()), this,
+						 SLOT(onFrameRateEditingFinished()));
+	// Camera BG color
+	ret = ret && connect(m_bgColorFld, SIGNAL(colorChanged(const TPixel32 &, bool)), this,
+						 SLOT(setBgColor(const TPixel32 &, bool)));
+	// Field Guide Size - A/R
+	ret = ret && connect(m_fieldGuideFld, SIGNAL(editingFinished()), this,
+						 SLOT(onFieldGuideSizeEditingFinished()));
+	ret = ret && connect(m_aspectRatioFld, SIGNAL(editingFinished()), this,
+						 SLOT(onFieldGuideAspectRatioEditingFinished()));
+	// Image Subsampling  - Tlv Subsampling
+	ret = ret && connect(m_fullcolorSubsamplingFld, SIGNAL(editingFinished()), this,
+						 SLOT(onFullColorSubsampEditingFinished()));
 	if (m_tlvSubsamplingFld)
-		ret = ret && connect(m_tlvSubsamplingFld, SIGNAL(editingFinished()), this, SLOT(onTlvSubsampEditingFinished()));
-	//Marker Interval - Start Frame
-	ret = ret && connect(m_markerIntervalFld, SIGNAL(editingFinished()), this, SLOT(onMakerIntervalEditingFinished()));
-	ret = ret && connect(m_startFrameFld, SIGNAL(editingFinished()), this, SLOT(onStartFrameEditingFinished()));
+		ret = ret && connect(m_tlvSubsamplingFld, SIGNAL(editingFinished()), this,
+							 SLOT(onTlvSubsampEditingFinished()));
+	// Marker Interval - Start Frame
+	ret = ret && connect(m_markerIntervalFld, SIGNAL(editingFinished()), this,
+						 SLOT(onMakerIntervalEditingFinished()));
+	ret = ret && connect(m_startFrameFld, SIGNAL(editingFinished()), this,
+						 SLOT(onStartFrameEditingFinished()));
 	assert(ret);
 }
 

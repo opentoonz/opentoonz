@@ -34,7 +34,7 @@ typedef tcg::Mesh<TTextureVertex, tcg::Edge, tcg::FaceN<3>> Graph;
 struct DistanceGreater {
 	float *m_distances;
 
-public:
+  public:
 	DistanceGreater(float *distances) : m_distances(distances) {}
 
 	bool operator()(int a, int b) { return m_distances[a] > m_distances[b]; }
@@ -53,9 +53,11 @@ struct BFS_DistanceBuilder {
 	float *m_distances; //!< (NOT owned) Distances from selected vertex
 	UCHAR *m_colormap;  //!< (NOT owned) Graph BFS colormap
 
-public:
+  public:
 	BFS_DistanceBuilder(float *distances, UCHAR *colormap)
-		: m_distances(distances), m_colormap(colormap) {}
+		: m_distances(distances), m_colormap(colormap)
+	{
+	}
 
 	void tree_edge(const edge_descr &e, const Graph &g)
 	{
@@ -100,8 +102,7 @@ public:
 
 //==================================================================================
 
-bool buildDistances(float *distances, const TTextureMesh &mesh, const TPointD &pos,
-					int *faceHint)
+bool buildDistances(float *distances, const TTextureMesh &mesh, const TPointD &pos, int *faceHint)
 {
 	using namespace local;
 
@@ -141,8 +142,8 @@ bool buildDistances(float *distances, const TTextureMesh &mesh, const TPointD &p
 
 //----------------------------------------------------------------------------------
 
-void buildSO(double *so, const TTextureMesh &mesh,
-			 const std::vector<PlasticHandle> &handles, int *faceHints)
+void buildSO(double *so, const TTextureMesh &mesh, const std::vector<PlasticHandle> &handles,
+			 int *faceHints)
 {
 	int v, vCount = mesh.verticesCount();
 

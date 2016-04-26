@@ -30,7 +30,7 @@ void printLibRelease(ostream &out)
 }
 //---------------------------------------------------------
 
-} //namespace
+} // namespace
 
 //=========================================================
 //
@@ -46,7 +46,7 @@ void printLibRelease(ostream &out)
 
 class SpecialUsageElement : public UsageElement
 {
-public:
+  public:
 	SpecialUsageElement(std::string name) : UsageElement(name, " "){};
 	void dumpValue(ostream &) const {};
 	void resetValue(){};
@@ -105,7 +105,7 @@ void fetchElement(string &dst, int index, int &argc, char *argv[])
 
 //---------------------------------------------------------
 
-} //namespace
+} // namespace
 
 //=========================================================
 //
@@ -113,8 +113,7 @@ void fetchElement(string &dst, int index, int &argc, char *argv[])
 //
 //---------------------------------------------------------
 
-UsageElement::UsageElement(string name, string help)
-	: m_name(name), m_help(help), m_selected(false)
+UsageElement::UsageElement(string name, string help) : m_name(name), m_help(help), m_selected(false)
 {
 }
 
@@ -204,8 +203,7 @@ void MultiArgument::fetch(int index, int &argc, char *argv[])
 //
 //---------------------------------------------------------
 
-UsageLine::UsageLine()
-	: m_count(0)
+UsageLine::UsageLine() : m_count(0)
 {
 }
 
@@ -303,8 +301,7 @@ UsageLine TCli::operator+(const UsageLine &a, const Optional &b)
 
 //=========================================================
 
-Optional::Optional(const UsageLine &ul)
-	: UsageLine(ul.getCount() + 2)
+Optional::Optional(const UsageLine &ul) : UsageLine(ul.getCount() + 2)
 {
 	m_elements[0] = &bra;
 	m_elements[m_count - 1] = &ket;
@@ -330,7 +327,7 @@ class TCli::UsageImp
 
 	UsageLine *m_selectedUsageLine;
 
-public:
+  public:
 	UsageImp(string progName);
 	~UsageImp(){};
 	void add(const UsageLine &);
@@ -349,17 +346,14 @@ public:
 	void resetValues();
 	void clear();
 	void parse(int argc, char *argv[]);
-	void fetchArguments(
-		UsageLine &ul, int a, int b,
-		int &argc, char *argv[]);
+	void fetchArguments(UsageLine &ul, int a, int b, int &argc, char *argv[]);
 	bool matchSwitcher(const UsageLine &ul) const;
 	bool hasSwitcher(const UsageLine &ul) const;
 	bool matchArgCount(const UsageLine &ul, int a, int b, int argc) const;
 
 	void dumpValues(ostream &out) const;
 
-	void getArgCountRange(const UsageLine &ul, int a, int b,
-						  int &min, int &max) const;
+	void getArgCountRange(const UsageLine &ul, int a, int b, int &min, int &max) const;
 
 	static const int InfiniteArgCount;
 };
@@ -370,8 +364,7 @@ const int UsageImp::InfiniteArgCount = 2048;
 
 //---------------------------------------------------------
 
-UsageImp::UsageImp(string progName)
-	: m_progName(progName), m_selectedUsageLine(0)
+UsageImp::UsageImp(string progName) : m_progName(progName), m_selectedUsageLine(0)
 {
 	addStandardUsages();
 }
@@ -551,8 +544,7 @@ void UsageImp::parse(int argc, char *argv[])
 	vector<UsageLine *> usages;
 
 	for (i = 0; i < m_usageLines.size(); i++)
-		if (hasSwitcher(m_usageLines[i]) &&
-			matchSwitcher(m_usageLines[i]))
+		if (hasSwitcher(m_usageLines[i]) && matchSwitcher(m_usageLines[i]))
 			usages.push_back(&m_usageLines[i]);
 	if (usages.empty())
 		for (i = 0; i < m_usageLines.size(); i++)
@@ -598,9 +590,7 @@ void UsageImp::parse(int argc, char *argv[])
 
 //---------------------------------------------------------
 
-void UsageImp::fetchArguments(
-	UsageLine &ul,
-	int a, int b, int &argc, char *argv[])
+void UsageImp::fetchArguments(UsageLine &ul, int a, int b, int &argc, char *argv[])
 {
 	assert(0 <= a && a <= b && b < ul.getCount());
 	int i;
@@ -652,8 +642,7 @@ void UsageImp::fetchArguments(
 bool UsageImp::matchSwitcher(const UsageLine &ul) const
 {
 	for (int i = 0; i < ul.getCount(); i++)
-		if (ul[i]->isSwitcher() &&
-			!ul[i]->isSelected())
+		if (ul[i]->isSwitcher() && !ul[i]->isSelected())
 			return false;
 	return true;
 }
@@ -670,8 +659,7 @@ bool UsageImp::hasSwitcher(const UsageLine &ul) const
 
 //---------------------------------------------------------
 
-bool UsageImp::matchArgCount(const UsageLine &ul,
-							 int a, int b, int argc) const
+bool UsageImp::matchArgCount(const UsageLine &ul, int a, int b, int argc) const
 {
 	int n = 0;
 	int i;
@@ -707,8 +695,7 @@ bool UsageImp::matchArgCount(const UsageLine &ul,
 
 //---------------------------------------------------------
 
-void UsageImp::getArgCountRange(const UsageLine &ul, int a, int b,
-								int &min, int &max) const
+void UsageImp::getArgCountRange(const UsageLine &ul, int a, int b, int &min, int &max) const
 {
 	min = max = 0;
 	int n = 0;
@@ -759,8 +746,7 @@ void UsageImp::dumpValues(std::ostream &out) const
 		m_qlist[i]->dumpValue(out);
 	for (i = 0; i < m_args.size(); i++)
 		m_args[i]->dumpValue(out);
-	out << endl
-		<< endl;
+	out << endl << endl;
 }
 
 //---------------------------------------------------------
@@ -780,8 +766,7 @@ void UsageImp::resetValues()
 //
 //---------------------------------------------------------
 
-Usage::Usage(string progName)
-	: m_imp(new UsageImp(progName))
+Usage::Usage(string progName) : m_imp(new UsageImp(progName))
 {
 }
 
@@ -858,9 +843,7 @@ bool Usage::parse(int argc, char *argv[], std::ostream &err)
 //---------------------------------------------------------
 
 RangeQualifier::RangeQualifier()
-	: Qualifier("-range from to | -frame fr",
-				"frame range"),
-	  m_from(0), m_to(-1)
+	: Qualifier("-range from to | -frame fr", "frame range"), m_from(0), m_to(-1)
 {
 }
 

@@ -10,9 +10,10 @@
 	PTHREAD_CREATE_DETACHED なら、なにも呼ぶ必要がないが、
 		thread終了を知るには自前で仕掛けが必要。
 */
-pthread_t igs::resource::thread_run(
-	void *(*function)(void *), void *func_arg, const int state // PTHREAD_CREATE_JOINABLE/PTHREAD_CREATE_DETACHED
-	)
+pthread_t
+igs::resource::thread_run(void *(*function)(void *), void *func_arg,
+						  const int state // PTHREAD_CREATE_JOINABLE/PTHREAD_CREATE_DETACHED
+						  )
 {
 	pthread_attr_t attr;
 	if (::pthread_attr_init(&attr)) {
@@ -23,12 +24,10 @@ pthread_t igs::resource::thread_run(
 	}
 
 	pthread_t thread_id = 0;
-	const int erno = ::pthread_create(
-		&(thread_id), &attr, function, func_arg);
+	const int erno = ::pthread_create(&(thread_id), &attr, function, func_arg);
 
 	if (0 != erno) {
-		throw std::domain_error(igs_resource_msg_from_err(
-			"pthread_create(-)", erno));
+		throw std::domain_error(igs_resource_msg_from_err("pthread_create(-)", erno));
 	}
 	return thread_id;
 }
@@ -46,7 +45,6 @@ void igs::resource::thread_join(const pthread_t thread_id)
 {
 	const int erno = ::pthread_join(thread_id, NULL);
 	if (0 != erno) {
-		throw std::domain_error(igs_resource_msg_from_err(
-			"pthread_join(-)", erno));
+		throw std::domain_error(igs_resource_msg_from_err("pthread_join(-)", erno));
 	}
 }

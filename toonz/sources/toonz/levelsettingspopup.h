@@ -66,14 +66,14 @@ class LevelSettingsPopup : public DVGui::Dialog
 	QLabel *m_subsamplingLabel;
 	DVGui::IntLineEdit *m_subsamplingFld;
 
-public:
+  public:
 	LevelSettingsPopup();
 
-protected:
+  protected:
 	void showEvent(QShowEvent *e);
 	void hideEvent(QHideEvent *e);
 
-public slots:
+  public slots:
 
 	void onCastSelectionChanged();
 	void onSelectionSwitched(TSelection *oldSelection, TSelection *newSelection);
@@ -93,7 +93,7 @@ public slots:
 	void onAntialiasSoftnessChanged();
 	void onWhiteTranspChanged(int);
 
-protected slots:
+  protected slots:
 	void onSceneChanged();
 };
 

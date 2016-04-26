@@ -41,12 +41,15 @@
 
 void MergeCmappedDialog::accept()
 {
-	m_levelPath = TFilePath(QString(m_saveInFileFld->getPath() + "\\" + m_fileNameFld->text() + ".tlv").toStdString());
+	m_levelPath = TFilePath(
+		QString(m_saveInFileFld->getPath() + "\\" + m_fileNameFld->text() + ".tlv").toStdString());
 	TFilePath fp = TApp::instance()->getCurrentScene()->getScene()->decodeFilePath(m_levelPath);
 
 	if (TSystem::doesExistFileOrLevel(fp)) {
-		if (DVGui::MsgBox(QObject::tr("Level ") + QString::fromStdWString(m_levelPath.getWideString()) + QObject::tr(" already exists! Are you sure you want to overwrite it?"),
-						  tr("Ok"), tr("Cancel")) != 1)
+		if (DVGui::MsgBox(
+				QObject::tr("Level ") + QString::fromStdWString(m_levelPath.getWideString()) +
+					QObject::tr(" already exists! Are you sure you want to overwrite it?"),
+				tr("Ok"), tr("Cancel")) != 1)
 			return;
 		else {
 			TSystem::removeFileOrLevel(fp);
@@ -92,7 +95,7 @@ MergeCmappedDialog::MergeCmappedDialog(TFilePath &levelPath)
 
 class MergeColumnsCommand : public MenuItemHandler
 {
-public:
+  public:
 	MergeColumnsCommand() : MenuItemHandler(MI_MergeColumns) {}
 
 	void execute()
@@ -102,12 +105,14 @@ public:
 		std::set<int> indices = selection ? selection->getIndices() : std::set<int>();
 
 		if (indices.empty()) {
-			DVGui::warning(tr("It is not possible to execute the merge column command because no column was selected."));
+			DVGui::warning(tr("It is not possible to execute the merge column command because no "
+							  "column was selected."));
 			return;
 		}
 
 		if (indices.size() == 1) {
-			DVGui::warning(tr("It is not possible to execute the merge column command  because only one columns is  selected."));
+			DVGui::warning(tr("It is not possible to execute the merge column command  because "
+							  "only one columns is  selected."));
 			return;
 		}
 
@@ -123,21 +128,23 @@ public:
 
 class ApplyMatchlinesCommand : public MenuItemHandler
 {
-public:
+  public:
 	ApplyMatchlinesCommand() : MenuItemHandler(MI_ApplyMatchLines) {}
 
 	void execute()
 	{
 		TColumnSelection *selection = dynamic_cast<TColumnSelection *>(TSelection::getCurrent());
 		if (!selection) {
-			DVGui::warning(tr("It is not possible to apply the match lines because no column was selected."));
+			DVGui::warning(
+				tr("It is not possible to apply the match lines because no column was selected."));
 			return;
 		}
 
 		std::set<int> indices = selection->getIndices();
 
 		if (indices.size() != 2) {
-			DVGui::warning(tr("It is not possible to apply the match lines because two columns have to be selected."));
+			DVGui::warning(tr("It is not possible to apply the match lines because two columns "
+							  "have to be selected."));
 			return;
 		}
 
@@ -181,7 +188,8 @@ bool checkColumnValidity(int column)
 			return false;
 		}
 		if (level != cell[i].getSimpleLevel()) {
-			DVGui::warning(QObject::tr("It is not possible to merge tlv columns containing more than one level"));
+			DVGui::warning(QObject::tr(
+				"It is not possible to merge tlv columns containing more than one level"));
 			return false;
 		}
 	}
@@ -198,7 +206,8 @@ bool checkColumnValidity(int column)
 
 //---------------------------------------------------------------------------------------------------------
 
-void doCloneLevelNoSave(const TCellSelection::Range &range, const QString &newLevelName, bool withUndo);
+void doCloneLevelNoSave(const TCellSelection::Range &range, const QString &newLevelName,
+						bool withUndo);
 
 //-----------------------------------------------------------------------------
 namespace
@@ -213,12 +222,12 @@ class CloneLevelNoSaveUndo : public TUndo
 	TCellSelection::Range m_range;
 	QString m_levelname;
 
-public:
-	CloneLevelNoSaveUndo(
-		const TCellSelection::Range &range,
-		const std::map<TXshSimpleLevel *, TXshLevelP> &createdLevels,
-		const std::set<int> &insertedColumnIndices, const QString &levelname)
-		: m_createdLevels(createdLevels), m_range(range), m_insertedColumnIndices(insertedColumnIndices), m_levelname(levelname)
+  public:
+	CloneLevelNoSaveUndo(const TCellSelection::Range &range,
+						 const std::map<TXshSimpleLevel *, TXshLevelP> &createdLevels,
+						 const std::set<int> &insertedColumnIndices, const QString &levelname)
+		: m_createdLevels(createdLevels), m_range(range),
+		  m_insertedColumnIndices(insertedColumnIndices), m_levelname(levelname)
 	{
 	}
 
@@ -244,14 +253,12 @@ public:
 		}
 		app->getCurrentXsheet()->notifyXsheetChanged();
 	}
-	void redo() const
-	{
-		doCloneLevelNoSave(m_range, m_levelname, false);
-	}
+	void redo() const { doCloneLevelNoSave(m_range, m_levelname, false); }
 
 	int getSize() const
 	{
-		return sizeof *this + (sizeof(TXshLevelP) + sizeof(TXshSimpleLevel *)) * m_createdLevels.size();
+		return sizeof *this +
+			   (sizeof(TXshLevelP) + sizeof(TXshSimpleLevel *)) * m_createdLevels.size();
 	}
 };
 
@@ -259,7 +266,8 @@ public:
 } // namespace
 //-----------------------------------------------------------------------------
 
-void doCloneLevelNoSave(const TCellSelection::Range &range, const QString &newLevelName = QString(), bool withUndo = true)
+void doCloneLevelNoSave(const TCellSelection::Range &range, const QString &newLevelName = QString(),
+						bool withUndo = true)
 {
 	std::map<TXshSimpleLevel *, TXshLevelP> createdLevels;
 
@@ -287,7 +295,7 @@ void doCloneLevelNoSave(const TCellSelection::Range &range, const QString &newLe
 
 		bool keepOldLevel = false;
 
-		//OverwriteDialog* dialog = new OverwriteDialog();
+		// OverwriteDialog* dialog = new OverwriteDialog();
 		for (int r = range.m_r0; r <= range.m_r1; ++r) {
 			TXshCell cell = xsh->getCell(r, c);
 
@@ -300,7 +308,8 @@ void doCloneLevelNoSave(const TCellSelection::Range &range, const QString &newLe
 			if (cell.getSimpleLevel() == 0 || cell.getSimpleLevel()->getPath().getType() == "psd")
 				continue;
 
-			std::map<TXshSimpleLevel *, TXshLevelP>::iterator it = createdLevels.find(cell.getSimpleLevel());
+			std::map<TXshSimpleLevel *, TXshLevelP>::iterator it =
+				createdLevels.find(cell.getSimpleLevel());
 			if (it == createdLevels.end()) {
 				// Create a new level if not already done
 
@@ -311,11 +320,11 @@ void doCloneLevelNoSave(const TCellSelection::Range &range, const QString &newLe
 
 					xl = scene->createNewLevel(levelType, newLevelName.toStdWString());
 					sl = xl->getSimpleLevel();
-					//if(levelType == OVL_XSHLEVEL)
+					// if(levelType == OVL_XSHLEVEL)
 					//  dstPath = dstPath.withType(oldSl->getPath().getType());
 					assert(sl);
-					//sl->setPath(scene->codeFilePath(dstPath));
-					//sl->setName(newName);
+					// sl->setPath(scene->codeFilePath(dstPath));
+					// sl->setName(newName);
 					sl->clonePropertiesFrom(oldSl);
 					*sl->getHookSet() = *oldSl->getHookSet();
 
@@ -359,7 +368,7 @@ void doCloneLevelNoSave(const TCellSelection::Range &range, const QString &newLe
 			sl->getProperties()->setDirtyFlag(true);
 	}
 
-	//Se non e' stata inserita nessuna cella rimuovo le colonne aggiunte e ritorno.
+	// Se non e' stata inserita nessuna cella rimuovo le colonne aggiunte e ritorno.
 	if (!isOneCellCloned) {
 		if (!insertedColumnIndices.empty()) {
 			int i;
@@ -372,7 +381,8 @@ void doCloneLevelNoSave(const TCellSelection::Range &range, const QString &newLe
 		return;
 	}
 	if (withUndo)
-		TUndoManager::manager()->add(new CloneLevelNoSaveUndo(range, createdLevels, insertedColumnIndices, newLevelName));
+		TUndoManager::manager()->add(
+			new CloneLevelNoSaveUndo(range, createdLevels, insertedColumnIndices, newLevelName));
 
 	app->getCurrentXsheet()->notifyXsheetChanged();
 	app->getCurrentScene()->setDirtyFlag(true);
@@ -392,24 +402,26 @@ void cloneColumn(const TCellSelection::Range &cells, const TFilePath &newLevelPa
 	ks.pasteKeyframes();
 }
 
-} //namespace
+} // namespace
 
 class MergeCmappedCommand : public MenuItemHandler
 {
-public:
+  public:
 	MergeCmappedCommand() : MenuItemHandler(MI_MergeCmapped) {}
 	void execute()
 	{
 		TColumnSelection *selection = dynamic_cast<TColumnSelection *>(TSelection::getCurrent());
 		if (!selection) {
-			DVGui::warning(tr("It is not possible to merge tlv columns because no column was selected."));
+			DVGui::warning(
+				tr("It is not possible to merge tlv columns because no column was selected."));
 			return;
 		}
 
 		std::set<int> indices = selection->getIndices();
 
 		if (indices.size() < 2) {
-			DVGui::warning(tr("It is not possible to merge tlv columns because at least two columns have to be selected."));
+			DVGui::warning(tr("It is not possible to merge tlv columns because at least two "
+							  "columns have to be selected."));
 			return;
 		}
 
@@ -418,13 +430,15 @@ public:
 
 		TCellSelection::Range cells;
 		cells.m_c0 = cells.m_c1 = destColumn;
-		TXshColumn *column = TApp::instance()->getCurrentXsheet()->getXsheet()->getColumn(destColumn);
+		TXshColumn *column =
+			TApp::instance()->getCurrentXsheet()->getXsheet()->getColumn(destColumn);
 		column->getRange(cells.m_r0, cells.m_r1);
 
-		//column->getLevelColumn()
+		// column->getLevelColumn()
 
 		TFilePath newLevelPath;
-		TXshCell c = TApp::instance()->getCurrentXsheet()->getXsheet()->getCell(cells.m_r0, destColumn);
+		TXshCell c =
+			TApp::instance()->getCurrentXsheet()->getXsheet()->getCell(cells.m_r0, destColumn);
 		if (!c.isEmpty() && c.getSimpleLevel())
 			newLevelPath = c.getSimpleLevel()->getPath();
 
@@ -436,7 +450,8 @@ public:
 			if (!checkColumnValidity(*it))
 				return;
 
-		DVGui::ProgressDialog progress(tr("Merging Tlv Levels..."), QString(), 0, indices.size() - 1, TApp::instance()->getMainWindow());
+		DVGui::ProgressDialog progress(tr("Merging Tlv Levels..."), QString(), 0,
+									   indices.size() - 1, TApp::instance()->getMainWindow());
 		progress.setWindowModality(Qt::WindowModal);
 		progress.setWindowTitle(tr("Merging Tlv Levels..."));
 		progress.setValue(0);
@@ -453,7 +468,10 @@ public:
 		for (int count = 0; it != indices.end();) {
 			int index = *it;
 			it++;
-			mergeCmapped(destColumn, index - count, it == indices.end() ? QString::fromStdWString(newLevelPath.getWideString()) : "", false);
+			mergeCmapped(destColumn, index - count,
+						 it == indices.end() ? QString::fromStdWString(newLevelPath.getWideString())
+											 : "",
+						 false);
 			ColumnCmd::deleteColumn(index - count);
 			progress.setValue(++count);
 			QCoreApplication::instance()->processEvents();
@@ -473,8 +491,10 @@ void doDeleteCommand(bool isMatchline)
 
 	TCellSelection *sel = dynamic_cast<TCellSelection *>(TSelection::getCurrent());
 	if (!sel) {
-		TFilmstripSelection *filmstripSelection = dynamic_cast<TFilmstripSelection *>(TSelection::getCurrent());
-		TColumnSelection *columnSelection = dynamic_cast<TColumnSelection *>(TSelection::getCurrent());
+		TFilmstripSelection *filmstripSelection =
+			dynamic_cast<TFilmstripSelection *>(TSelection::getCurrent());
+		TColumnSelection *columnSelection =
+			dynamic_cast<TColumnSelection *>(TSelection::getCurrent());
 		std::set<int> indices;
 		std::set<TFrameId> fids;
 		if (filmstripSelection && (fids = filmstripSelection->getSelectedFids()).size() > 0) {
@@ -486,7 +506,8 @@ void doDeleteCommand(bool isMatchline)
 			TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
 			return;
 		} else if (!columnSelection || (indices = columnSelection->getIndices()).size() != 1) {
-			DVGui::warning(QObject::tr("It is not possible to delete lines because no column, cell or level strip frame was selected."));
+			DVGui::warning(QObject::tr("It is not possible to delete lines because no column, cell "
+									   "or level strip frame was selected."));
 			return;
 		}
 		int from, to;
@@ -514,7 +535,8 @@ void doDeleteCommand(bool isMatchline)
 	for (i = r.y0; i <= r.y1; i++) {
 		TXshCell cell = xsh->getCell(i, r.x0);
 		if (cell.isEmpty()) {
-			DVGui::warning(QObject::tr("It is not possible to delete lines because no column, cell or level strip frame was selected."));
+			DVGui::warning(QObject::tr("It is not possible to delete lines because no column, cell "
+									   "or level strip frame was selected."));
 			return;
 		}
 		if (cell.m_level->getType() != TZP_XSHLEVEL) {
@@ -540,18 +562,15 @@ void doDeleteCommand(bool isMatchline)
 	TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
 }
 
-} //namespace
+} // namespace
 
 //-----------------------------------------------------------------------------
 
 class DeleteInkCommand : public MenuItemHandler
 {
-public:
+  public:
 	DeleteInkCommand() : MenuItemHandler(MI_DeleteInk) {}
-	void execute()
-	{
-		doDeleteCommand(false);
-	}
+	void execute() { doDeleteCommand(false); }
 
 } DeleteInkCommand;
 
@@ -559,11 +578,8 @@ public:
 
 class DeleteMatchlinesCommand : public MenuItemHandler
 {
-public:
+  public:
 	DeleteMatchlinesCommand() : MenuItemHandler(MI_DeleteMatchLines) {}
-	void execute()
-	{
-		doDeleteCommand(true);
-	}
+	void execute() { doDeleteCommand(true); }
 
 } DeleteMatchlinesCommand;

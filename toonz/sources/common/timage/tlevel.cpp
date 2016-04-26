@@ -7,8 +7,7 @@ DEFINE_CLASS_CODE(TLevel, 7)
 
 //-------------------------------------------------
 
-TLevel::TLevel()
-	: TSmartObject(m_classCode), m_name(""), m_table(new Table()), m_palette(0)
+TLevel::TLevel() : TSmartObject(m_classCode), m_name(""), m_table(new Table()), m_palette(0)
 {
 }
 
@@ -66,7 +65,7 @@ int TLevel::getIndex(const TFrameId fid)
 {
   int index = 0;
   for(Iterator it = m_table->begin(); it != m_table->end(); it++, index++)
-    if(it->first == fid) return index;
+	if(it->first == fid) return index;
   return -1;
 }
 

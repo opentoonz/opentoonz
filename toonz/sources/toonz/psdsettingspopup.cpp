@@ -28,9 +28,11 @@
 using namespace DVGui;
 #define REF_LAYER_BY_NAME
 
-QStringList modesDescription = (QStringList() << "Flatten visible document layers into a single image. Layer styles are maintained."
-											  << "Load document layers as frames into a single xsheet column."
-											  << "Load document layers as xhseet columns.");
+QStringList modesDescription =
+	(QStringList()
+	 << "Flatten visible document layers into a single image. Layer styles are maintained."
+	 << "Load document layers as frames into a single xsheet column."
+	 << "Load document layers as xhseet columns.");
 
 // Per adesso non appare
 // Costruisce la stringa delle info della psd da caricare che comparirà nel popup:
@@ -51,11 +53,16 @@ void doPSDInfo(TFilePath psdpath, QTreeWidget *psdTree)
 		QString parentDir = QString::fromStdWString(psdpath.getParentDir().getWideString());
 		QString dimension = QString::number(width) + "x" + QString::number(height);
 		QList<QTreeWidgetItem *> items;
-		items.append(new QTreeWidgetItem((QTreeWidget *)0, QStringList(QString("Filename: %1").arg(filename))));
-		items.append(new QTreeWidgetItem((QTreeWidget *)0, QStringList(QString("Parent dir: %1").arg(parentDir))));
-		items.append(new QTreeWidgetItem((QTreeWidget *)0, QStringList(QString("Dimension: %1").arg(dimension))));
-		items.append(new QTreeWidgetItem((QTreeWidget *)0, QStringList(QString("Depth: %1").arg(QString::number(depth)))));
-		items.append(new QTreeWidgetItem((QTreeWidget *)0, QStringList(QString("Channels: %1").arg(QString::number(channels)))));
+		items.append(new QTreeWidgetItem((QTreeWidget *)0,
+										 QStringList(QString("Filename: %1").arg(filename))));
+		items.append(new QTreeWidgetItem((QTreeWidget *)0,
+										 QStringList(QString("Parent dir: %1").arg(parentDir))));
+		items.append(new QTreeWidgetItem((QTreeWidget *)0,
+										 QStringList(QString("Dimension: %1").arg(dimension))));
+		items.append(new QTreeWidgetItem(
+			(QTreeWidget *)0, QStringList(QString("Depth: %1").arg(QString::number(depth)))));
+		items.append(new QTreeWidgetItem(
+			(QTreeWidget *)0, QStringList(QString("Channels: %1").arg(QString::number(channels)))));
 		QTreeWidgetItem *layersItem = new QTreeWidgetItem((QTreeWidget *)0);
 		int count = 0;
 		QList<QTreeWidgetItem *> layersItemChildren;
@@ -76,12 +83,14 @@ void doPSDInfo(TFilePath psdpath, QTreeWidget *psdTree)
 				scavenge++;
 			} else if (width > 0 && height > 0) {
 				if (scavenge >= 0) {
-					layersItemChildren[scavenge]->addChild(new QTreeWidgetItem((QTreeWidget *)0, QStringList(QString("%1").arg(layerName))));
+					layersItemChildren[scavenge]->addChild(new QTreeWidgetItem(
+						(QTreeWidget *)0, QStringList(QString("%1").arg(layerName))));
 					count++;
 				}
 			}
 		}
-		QString layerItemText = "Layers: " + QString::number(count); //+" ("+QString::number(layersCount)+")";
+		QString layerItemText =
+			"Layers: " + QString::number(count); //+" ("+QString::number(layersCount)+")";
 		layersItem->setText(0, layerItemText);
 		items.append(layersItem);
 
@@ -209,7 +218,7 @@ PsdSettingsPopup::PsdSettingsPopup()
 void PsdSettingsPopup::setPath(const TFilePath &path)
 {
 	m_path = path;
-	//doPSDInfo(path,m_psdTree);
+	// doPSDInfo(path,m_psdTree);
 	QString filename = QString::fromStdString(path.getName()); //+psdpath.getDottedType());
 	QString pathLbl = QString::fromStdWString(path.getParentDir().getWideString());
 	m_filename->setText(filename);
@@ -349,20 +358,21 @@ TFilePath PsdSettingsPopup::getPsdFramePath(int levelIndex, int frameIndex)
 		name += "#" + toString(frameId);
 	name += m_path.getDottedType();
 	TFilePath psdpath =
-		TApp::instance()->getCurrentScene()->getScene()->decodeFilePath(m_path).getParentDir() + TFilePath(name);
+		TApp::instance()->getCurrentScene()->getScene()->decodeFilePath(m_path).getParentDir() +
+		TFilePath(name);
 	return psdpath;
 }
 int PsdSettingsPopup::getFramesCount(int levelIndex)
 {
-	//assert(levelIndex>=0 && levelIndex<m_levels.size());
-	//return m_levels[levelIndex].framesCount;
+	// assert(levelIndex>=0 && levelIndex<m_levels.size());
+	// return m_levels[levelIndex].framesCount;
 	int levelId = m_psdparser->getLevelId(levelIndex);
 	return m_psdparser->getFramesCount(levelId);
 }
 bool PsdSettingsPopup::isFolder(int levelIndex)
 {
-	//assert(levelIndex>=0 && levelIndex<m_levels.size());
-	//return m_levels[levelIndex].isFolder;
+	// assert(levelIndex>=0 && levelIndex<m_levels.size());
+	// return m_levels[levelIndex].isFolder;
 	return m_psdparser->isFolder(levelIndex);
 }
 bool PsdSettingsPopup::isSubFolder(int levelIndex, int frameIndex)
@@ -381,4 +391,4 @@ int PsdSettingsPopup::getSubfolderLevelIndex(int psdLevelIndex, int frameIndex)
 
 //=============================================================================
 
-//OpenPopupCommandHandler<PsdSettingsPopup> openPsdSettingsPopup(MI_SceneSettings);
+// OpenPopupCommandHandler<PsdSettingsPopup> openPsdSettingsPopup(MI_SceneSettings);

@@ -32,7 +32,7 @@ class QMimeData;
 
 class DvItemListModel
 {
-public:
+  public:
 	enum DataType {
 		Name,
 		Thumbnail,
@@ -63,7 +63,7 @@ public:
 		VC_PartialModified
 	};
 
-public:
+  public:
 	DvItemListModel() : m_isDiscendent(true), m_orderType(Name) {}
 	virtual ~DvItemListModel() {}
 
@@ -90,7 +90,7 @@ public:
 	virtual bool acceptDrop(const QMimeData *data) const { return false; }
 	virtual bool drop(const QMimeData *data) { return false; }
 
-protected:
+  protected:
 	bool m_isDiscendent;
 	DataType m_orderType;
 };
@@ -113,7 +113,7 @@ class ItemViewPlayWidget : public QWidget
 		QPixmap m_pixmap;
 		QSize m_iconSize;
 
-	public:
+	  public:
 		PlayManager();
 		~PlayManager() {}
 
@@ -132,7 +132,7 @@ class ItemViewPlayWidget : public QWidget
 
 	PlayManager *m_playManager;
 
-public:
+  public:
 	ItemViewPlayWidget(QWidget *parent = 0);
 	~ItemViewPlayWidget() {}
 
@@ -150,7 +150,7 @@ public:
 
 	void paint(QPainter *painter, QRect rect);
 
-protected:
+  protected:
 	void timerEvent(QTimerEvent *event);
 };
 
@@ -162,7 +162,7 @@ class DVItemViewPlayDelegate : public QObject
 
 	ItemViewPlayWidget *m_itemViewPlay;
 
-public:
+  public:
 	DVItemViewPlayDelegate(QWidget *parent);
 	~DVItemViewPlayDelegate() {}
 
@@ -170,11 +170,11 @@ public:
 
 	bool setPlayWidget(DvItemListModel *model, int index, QRect rect, QPoint pos);
 
-public slots:
+  public slots:
 
 	void resetPlayWidget();
 
-protected:
+  protected:
 	QRect getPlayButtonRect(QRect rect);
 	QRect getPlaySliderRect(QRect rect);
 };
@@ -188,7 +188,7 @@ class DvItemSelection : public QObject, public TSelection
 	std::set<int> m_selectedIndices;
 	DvItemListModel *m_model;
 
-public:
+  public:
 	DvItemSelection();
 
 	void select(int index, bool on = true);
@@ -196,26 +196,17 @@ public:
 	void selectNone();
 	void selectAll();
 
-	bool isSelected(int index) const
-	{
-		return m_selectedIndices.count(index) > 0;
-	}
-	bool isEmpty() const
-	{
-		return m_selectedIndices.empty();
-	}
+	bool isSelected(int index) const { return m_selectedIndices.count(index) > 0; }
+	bool isEmpty() const { return m_selectedIndices.empty(); }
 
-	const std::set<int> &getSelectedIndices() const
-	{
-		return m_selectedIndices;
-	}
+	const std::set<int> &getSelectedIndices() const { return m_selectedIndices; }
 
 	void setModel(DvItemListModel *model);
 	DvItemListModel *getModel() const { return m_model; }
 
 	void enableCommands();
 
-signals:
+  signals:
 
 	void itemSelectionChanged();
 };
@@ -226,22 +217,21 @@ class DvItemViewerPanel : public QFrame, public TSelection::View
 {
 	Q_OBJECT
 
-	QColor m_alternateBackground;	//alaternate bg color for teble view (170,170,170)
-	QColor m_textColor;				 //text color (black)
-	QColor m_selectedTextColor;		 //selected item text color (white)
-	QColor m_folderTextColor;		 //folder item text color (blue)
-	QColor m_selectedItemBackground; //selected item background color (0,0,128)
+	QColor m_alternateBackground; // alaternate bg color for teble view (170,170,170)
+	QColor m_textColor; // text color (black)
+	QColor m_selectedTextColor; // selected item text color (white)
+	QColor m_folderTextColor; // folder item text color (blue)
+	QColor m_selectedItemBackground; // selected item background color (0,0,128)
 
 	Q_PROPERTY(QColor AlternateBackground READ getAlternateBackground WRITE setAlternateBackground)
 	Q_PROPERTY(QColor TextColor READ getTextColor WRITE setTextColor)
 	Q_PROPERTY(QColor SelectedTextColor READ getSelectedTextColor WRITE setSelectedTextColor)
 	Q_PROPERTY(QColor FolderTextColor READ getFolderTextColor WRITE setFolderTextColor)
-	Q_PROPERTY(QColor SelectedItemBackground READ getSelectedItemBackground WRITE setSelectedItemBackground)
+	Q_PROPERTY(QColor SelectedItemBackground READ getSelectedItemBackground WRITE
+				   setSelectedItemBackground)
 
-public:
-	enum ViewType { ListView = 0,
-					TableView,
-					ThumbnailView };
+  public:
+	enum ViewType { ListView = 0, TableView, ThumbnailView };
 	void setAlternateBackground(const QColor &color) { m_alternateBackground = color; }
 	QColor getAlternateBackground() const { return m_alternateBackground; }
 	void setTextColor(const QColor &color) { m_textColor = color; }
@@ -253,7 +243,7 @@ public:
 	void setSelectedItemBackground(const QColor &color) { m_selectedItemBackground = color; }
 	QColor getSelectedItemBackground() const { return m_selectedItemBackground; }
 
-private:
+  private:
 	ViewType to_enum(int n)
 	{
 		switch (n) {
@@ -293,13 +283,15 @@ private:
 	QPoint m_startDragPosition;
 	QPoint m_lastMousePos;
 	int m_currentIndex;
-	std::vector<std::pair<DvItemListModel::DataType, std::pair<int, bool>>> m_columns; // type, <width, visibility>
+	std::vector<std::pair<DvItemListModel::DataType, std::pair<int, bool>>>
+		m_columns; // type, <width, visibility>
 	DvItemListModel *getModel() const;
 	int getItemCount() const { return getModel() ? getModel()->getItemCount() : 0; }
 	QColor m_missingColor;
 
-public:
-	DvItemViewerPanel(DvItemViewer *viewer, bool noContextMenu, bool multiselectionEnabled, QWidget *parent);
+  public:
+	DvItemViewerPanel(DvItemViewer *viewer, bool noContextMenu, bool multiselectionEnabled,
+					  QWidget *parent);
 
 	void enableGlobalSelection(bool enabled) { m_globalSelectionEnabled = enabled; }
 
@@ -308,7 +300,11 @@ public:
 
 	void addColumn(DvItemListModel::DataType dataType, int width);
 	void setColumnWidth(DvItemListModel::DataType dataType, int width);
-	void getColumns(std::vector<std::pair<DvItemListModel::DataType, std::pair<int, bool>>> &columns) { columns = m_columns; };
+	void
+	getColumns(std::vector<std::pair<DvItemListModel::DataType, std::pair<int, bool>>> &columns)
+	{
+		columns = m_columns;
+	};
 	bool getVisibility(DvItemListModel::DataType dataType);
 	void setVisibility(DvItemListModel::DataType dataType, bool value);
 	int getContentMinimumWidth();
@@ -341,7 +337,7 @@ public:
 	void setSelection(DvItemSelection *selection); // gets ownership
 	void setMissingTextColor(const QColor &color);
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *);
 	void mousePressEvent(QMouseEvent *);
 	void mouseMoveEvent(QMouseEvent *);
@@ -350,10 +346,10 @@ protected:
 	void contextMenuEvent(QContextMenuEvent *);
 	bool event(QEvent *event);
 
-signals:
+  signals:
 	void viewTypeChange(DvItemViewerPanel::ViewType viewType);
 
-public slots:
+  public slots:
 	void setListView();
 	void setTableView();
 	void setThumbnailsView();
@@ -368,20 +364,20 @@ class DvItemViewer : public QScrollArea
 {
 	Q_OBJECT
 
-public:
-	enum WindowType { Browser = 0,
-					  Cast };
+  public:
+	enum WindowType { Browser = 0, Cast };
 	WindowType m_windowType;
 
-private:
+  private:
 	DvItemListModel *m_model;
 	DvItemViewerPanel *m_panel;
 
-protected:
+  protected:
 	void resizeEvent(QResizeEvent *);
 
-public:
-	DvItemViewer(QWidget *parent, bool noContextMenu = false, bool multiSelectionEnabled = false, enum WindowType = Browser);
+  public:
+	DvItemViewer(QWidget *parent, bool noContextMenu = false, bool multiSelectionEnabled = false,
+				 enum WindowType = Browser);
 
 	void resetVerticalScrollBar();
 	DvItemListModel *getModel() const { return m_model; }
@@ -405,11 +401,11 @@ public:
 	void selectNone();
 	void keyPressEvent(QKeyEvent *event);
 
-protected:
+  protected:
 	void dragEnterEvent(QDragEnterEvent *event);
 	void dropEvent(QDropEvent *event);
 
-signals:
+  signals:
 	void clickedItem(int index);
 	void selectedItems(const std::set<int> &indexes);
 };
@@ -425,13 +421,13 @@ class DvItemViewerTitleBar : public QWidget
 	int m_dragColumnIndex;
 	QPoint m_pos;
 
-public:
+  public:
 	DvItemViewerTitleBar(DvItemViewer *itemViewer, QWidget *parent = 0, bool isInteractive = true);
 
-protected slots:
+  protected slots:
 	void onViewTypeChanged(DvItemViewerPanel::ViewType viewType);
 
-protected:
+  protected:
 	void mouseMoveEvent(QMouseEvent *);
 	void openContextMenu(QMouseEvent *);
 	void mousePressEvent(QMouseEvent *);
@@ -446,13 +442,13 @@ class DvItemViewerButtonBar : public QToolBar
 	QAction *m_folderBack;
 	QAction *m_folderFwd;
 
-public:
+  public:
 	DvItemViewerButtonBar(DvItemViewer *itemViewer, QWidget *parent = 0);
 
-public slots:
+  public slots:
 	void onHistoryChanged(bool, bool);
 
-signals:
+  signals:
 	void folderUp();
 	void newFolder();
 	void folderBack();

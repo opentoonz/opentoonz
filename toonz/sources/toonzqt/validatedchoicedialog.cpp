@@ -67,8 +67,7 @@ int DVGui::ValidatedChoiceDialog::execute(void *obj)
 	};
 
 	Resol curResolution(NO_REQUIRED_RESOLUTION, false),
-		newResolution(m_appliedToAll ? m_appliedToAllRes : NO_REQUIRED_RESOLUTION,
-					  m_appliedToAll);
+		newResolution(m_appliedToAll ? m_appliedToAllRes : NO_REQUIRED_RESOLUTION, m_appliedToAll);
 
 	bool initialize = true;
 
@@ -97,8 +96,7 @@ int DVGui::ValidatedChoiceDialog::execute(void *obj)
 		}
 
 		// Substitute resolution and retry
-		curResolution = newResolution,
-		newResolution = Resol(NO_REQUIRED_RESOLUTION, false);
+		curResolution = newResolution, newResolution = Resol(NO_REQUIRED_RESOLUTION, false);
 
 	} while (true);
 

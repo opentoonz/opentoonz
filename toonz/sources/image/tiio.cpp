@@ -7,16 +7,17 @@
 //-------------------------------------------------------------------
 
 /*!
-    TImageReader::load MUST throw an exception in case of error (file not found, ...)
-    TImageWriter::save MUST throw an exception in case of error (write denied, 
-                                                                 disk full,      ...)
-    N.B.: gestire nei TImageWriter il caso "disk full"!!!
+	TImageReader::load MUST throw an exception in case of error (file not found, ...)
+	TImageWriter::save MUST throw an exception in case of error (write denied,
+																 disk full,      ...)
+	N.B.: gestire nei TImageWriter il caso "disk full"!!!
 */
 
-//Math needs to be included before the rest on MAC - but I've not figured out why (it would be included anyway though)
+// Math needs to be included before the rest on MAC - but I've not figured out why (it would be
+// included anyway though)
 #include <math.h>
 
-//Platform-specific includes
+// Platform-specific includes
 #ifdef _WIN32
 
 #ifndef x64
@@ -40,7 +41,7 @@
 #include "./mov/tiio_movL.h"
 #endif
 
-//Common includes
+// Common includes
 #include "./quantel/tiio_quantel.h"
 #include "./sgi/tiio_sgi.h"
 #include "./tga/tiio_tga.h"
@@ -177,18 +178,18 @@ void initImageIo(bool lightVersion)
 		/*
 #if (defined(_WIN32) && !defined(x64))
 
-    TLevelWriter::define("pct", TLevelWriterPicPct::create, true);
-    TLevelReader::define("pct", TLevelReaderPicPct::create);
-    TFileType::declare("pct", TFileType::RASTER_LEVEL);
-    Tiio::defineWriterProperties("pct", new Tiio::PctWriterProperties());
-    TLevelWriter::define("pic", TLevelWriterPicPct::create, true);
-    TLevelReader::define("pic", TLevelReaderPicPct::create);
-    TFileType::declare("pic", TFileType::RASTER_LEVEL);
+	TLevelWriter::define("pct", TLevelWriterPicPct::create, true);
+	TLevelReader::define("pct", TLevelReaderPicPct::create);
+	TFileType::declare("pct", TFileType::RASTER_LEVEL);
+	Tiio::defineWriterProperties("pct", new Tiio::PctWriterProperties());
+	TLevelWriter::define("pic", TLevelWriterPicPct::create, true);
+	TLevelReader::define("pic", TLevelReaderPicPct::create);
+	TFileType::declare("pic", TFileType::RASTER_LEVEL);
 
-    TLevelWriter::define("pict", TLevelWriterPicPct::create, true);
-    TLevelReader::define("pict", TLevelReaderPicPct::create);
-    TFileType::declare("pict", TFileType::RASTER_LEVEL);
-    Tiio::defineWriterProperties("pict", new Tiio::PctWriterProperties());
+	TLevelWriter::define("pict", TLevelWriterPicPct::create, true);
+	TLevelReader::define("pict", TLevelReaderPicPct::create);
+	TFileType::declare("pict", TFileType::RASTER_LEVEL);
+	Tiio::defineWriterProperties("pict", new Tiio::PctWriterProperties());
 
 #endif    // _WIN32 && 32-bit
 */

@@ -18,13 +18,13 @@
 #endif
 
 //=============================================================================
-//forward declarations
+// forward declarations
 class TStroke;
 class TStageObject;
 class TDoubleParam;
 
 //=============================================================================
-//!The TStageObjectSpline class define stage object motion path.
+//! The TStageObjectSpline class define stage object motion path.
 /*!Inherits \b TSmartObject and \b TPersist.
 \n The motion path is defined by spline build as \b TStroke getStroke(),
    and node position getDagNodePos(); spline can be set using setStroke()
@@ -46,20 +46,20 @@ class DVAPI TStageObjectSpline : public TSmartObject, public TPersist
 	bool m_isOpened;
 	std::vector<TDoubleParam *> m_posPathParams;
 
-public:
+  public:
 	TStageObjectSpline();
 	~TStageObjectSpline();
 
 	TStageObjectSpline *clone() const;
 
 	/*!
-    Return spline stroke.
-    \sa setStroke()
+	Return spline stroke.
+	\sa setStroke()
   */
 	const TStroke *getStroke() const;
 	/*!
-    Set spline stroke to \b stroke.
-    \sa getStroke()
+	Set spline stroke to \b stroke.
+	\sa getStroke()
   */
 	void setStroke(TStroke *stroke); //! keeps ownership
 
@@ -84,7 +84,7 @@ public:
 	void addParam(TDoubleParam *param);
 	void removeParam(TDoubleParam *param);
 
-private:
+  private:
 	// not implemented: can't copy a TStageObjectSpline
 	TStageObjectSpline &operator=(const TStageObjectSpline &);
 	TStageObjectSpline(const TStageObjectSpline &);

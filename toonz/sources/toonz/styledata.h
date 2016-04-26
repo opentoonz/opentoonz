@@ -17,7 +17,7 @@ class StyleData : public DvMimeData
 
 	std::vector<std::pair<int, TColorStyle *>> m_styles;
 
-public:
+  public:
 	StyleData();
 	~StyleData();
 

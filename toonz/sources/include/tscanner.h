@@ -20,10 +20,7 @@ class TIStream;
 class TFilePath;
 
 struct DVAPI TScanParam {
-	TScanParam()
-		: m_supported(false), m_min(0), m_max(0), m_def(0), m_step(0), m_value(0)
-	{
-	}
+	TScanParam() : m_supported(false), m_min(0), m_max(0), m_def(0), m_step(0), m_value(0) {}
 
 	TScanParam(float _min, float _max, float _def, float _step)
 		: m_supported(true), m_min(_min), m_max(_max), m_def(_def), m_step(1), m_value(_def)
@@ -40,15 +37,10 @@ struct DVAPI TScanParam {
 
 class DVAPI TScannerParameters
 {
-public:
-	enum ScanType {
-		None,
-		BW,
-		GR8,
-		RGB24
-	};
+  public:
+	enum ScanType { None, BW, GR8, RGB24 };
 
-private:
+  private:
 	// Supported scan types: Black and white, graytones, color
 	bool m_bw, m_gray, m_rgb;
 
@@ -56,26 +48,28 @@ private:
 	ScanType m_scanType;
 
 	std::string m_paperFormat; // e.g. "A4 paper"
-	TRectD m_scanArea;	// in mm /* TWAIN preferirebbe gli inch, ma uso i mm per seguire tnz4.x*/
-	TRectD m_cropBox;	 // in mm /* TWAIN preferirebbe gli inch, ma uso i mm per seguire tnz4.x*/
+	TRectD m_scanArea; // in mm /* TWAIN preferirebbe gli inch, ma uso i mm per seguire tnz4.x*/
+	TRectD m_cropBox;  // in mm /* TWAIN preferirebbe gli inch, ma uso i mm per seguire tnz4.x*/
 	bool m_isPreview;
-	TDimensionD m_maxPaperSize; // in mm /* TWAIN preferirebbe gli inch, ma uso i mm per seguire tnz4.x*/
+	TDimensionD
+		m_maxPaperSize; // in mm /* TWAIN preferirebbe gli inch, ma uso i mm per seguire tnz4.x*/
 
-	bool m_paperOverflow; // vale true se la scanArea e' stata tagliata rispetto alle dimensioni della carta
+	bool m_paperOverflow; // vale true se la scanArea e' stata tagliata rispetto alle dimensioni
+						  // della carta
 						  // per rispettare la maxPaperSize
 
 	bool m_validatedByCurrentScanner;
 	// vale false se bisogna ancora chiamare adaptToCurrentScanner()
 	// l'idea e' di chiamare questo metodo il meno possibile
 
-public:
+  public:
 	TScanParam m_brightness;
 	TScanParam m_contrast;
 	TScanParam m_threshold;
 	TScanParam m_dpi;
 	TScanParam m_paperFeeder; // value==1.0 => use paper feeder
 
-private:
+  private:
 	// other useful info ?!
 	std::string m_twainVersion;
 	std::string m_manufacturer;
@@ -87,7 +81,7 @@ private:
 
 	void cropScanArea(); // assicura che scanArea sia dentro maxPaperSize
 
-public:
+  public:
 	TScannerParameters();
 	~TScannerParameters();
 
@@ -139,7 +133,7 @@ public:
 
 class TScannerListener
 {
-public:
+  public:
 	virtual void onImage(const TRasterImageP &) = 0;
 	virtual void onError() = 0;
 	virtual void onNextPaper() = 0;
@@ -155,16 +149,16 @@ class DVAPI TScanner
 
 	std::set<TScannerListener *> m_listeners;
 
-protected:
+  protected:
 	TScanParam m_brightness, m_contrast, m_threshold, m_dpi;
 	int m_paperLeft;
 	QString m_scannerName;
 
-public:
+  public:
 	TScanner();
 	virtual ~TScanner();
 
-	static bool m_isTwain; //brutto, brutto :(
+	static bool m_isTwain; // brutto, brutto :(
 	static TScanner *instance();
 
 	virtual void selectDevice() = 0;
@@ -176,7 +170,8 @@ public:
 	// se possibile non modifica i valori correnti, ma cambia solo quello che non e' piu' adatto
 	// abilita/disabilita i parametri "opzionali".
 	// n.b. i parametri opzionali che vengono disabilitati mantengono il loro valore
-	// (cosi' se fai save default settings dopo aver cambiato scanner non ti perdi i vecchi settaggi)
+	// (cosi' se fai save default settings dopo aver cambiato scanner non ti perdi i vecchi
+	// settaggi)
 
 	virtual void acquire(const TScannerParameters &param, int paperCount) = 0;
 
@@ -201,16 +196,16 @@ public:
 
 class DVAPI TPaperFormatManager
 { // singleton
-public:
+  public:
 	class Format
 	{
-	public:
+	  public:
 		TDimensionD m_size;
 		Format() : m_size(0, 0) {}
 		Format(const TDimensionD &size) : m_size(size) {}
 	};
 
-private:
+  private:
 	typedef std::map<std::string, Format> FormatTable;
 	FormatTable m_formats;
 
@@ -218,7 +213,7 @@ private:
 	void readPaperFormat(const TFilePath &fp);
 	void readPaperFormats();
 
-public:
+  public:
 	static TPaperFormatManager *instance();
 
 	// resitutisce la lista dei formati

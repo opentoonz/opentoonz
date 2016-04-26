@@ -13,7 +13,7 @@
   \file     function_types.h
 
   \brief    This file contains some template class types useful to convert functions
-            into functors <I> at compile-time <\I>, with minimal memory overhead.
+			into functors <I> at compile-time <\I>, with minimal memory overhead.
 */
 
 namespace tcg
@@ -23,8 +23,7 @@ namespace tcg
 //    Function Objects  definition
 //************************************************************************************
 
-template <typename Func, Func f>
-struct function;
+template <typename Func, Func f> struct function;
 
 //---------------------------------------------------------------------------
 
@@ -83,15 +82,15 @@ struct function<Ret (C::*)(Arg) const, f> : public std::binary_function<const C 
 
 /*!
   \brief    Binary function object binder generalizing \p std::binder1st with
-            an explicitly specifiable bound type.
+			an explicitly specifiable bound type.
 
   \note     Unlike std::binder1st, this binder accepts functors whose arguments
-            are reference types.
+			are reference types.
 
   \sa       Helper function tcg::bind1st().
 
   \remark   This class currently <I>adds an additional arguments copy</I>.
-            Be warned of this when using heavyweight argument types.
+			Be warned of this when using heavyweight argument types.
 */
 
 template <class Func, typename Arg = typename function_traits<Func>::arg1_type>
@@ -99,17 +98,16 @@ class binder1st : public std::unary_function<
 					  typename function_traits<Func>::arg2_type, // Forward function types
 					  typename function_traits<Func>::ret_type>  //
 {
-public:
-	binder1st(const Func &func, Arg arg1)
-		: m_func(func), m_arg1(arg1) {}
+  public:
+	binder1st(const Func &func, Arg arg1) : m_func(func), m_arg1(arg1) {}
 
-	typename function_traits<Func>::ret_type operator()(
-		typename function_traits<Func>::arg2_type arg2) const // NOTE: Double copy
+	typename function_traits<Func>::ret_type
+	operator()(typename function_traits<Func>::arg2_type arg2) const // NOTE: Double copy
 	{
 		return m_func(m_arg1, arg2);
 	}
 
-protected:
+  protected:
 	Func m_func;
 	Arg m_arg1;
 };
@@ -117,21 +115,19 @@ protected:
 //---------------------------------------------------------------------------
 
 template <class Func, typename Arg = typename function_traits<Func>::arg2_type>
-class binder2nd : public std::unary_function<
-					  typename function_traits<Func>::arg1_type,
-					  typename function_traits<Func>::ret_type>
+class binder2nd : public std::unary_function<typename function_traits<Func>::arg1_type,
+											 typename function_traits<Func>::ret_type>
 {
-public:
-	binder2nd(const Func &func, Arg arg2)
-		: m_func(func), m_arg2(arg2) {}
+  public:
+	binder2nd(const Func &func, Arg arg2) : m_func(func), m_arg2(arg2) {}
 
-	typename function_traits<Func>::ret_type operator()(
-		typename function_traits<Func>::arg1_type arg1) const
+	typename function_traits<Func>::ret_type
+	operator()(typename function_traits<Func>::arg1_type arg1) const
 	{
 		return m_func(arg1, m_arg2);
 	}
 
-protected:
+  protected:
 	Func m_func;
 	Arg m_arg2;
 };
@@ -140,15 +136,15 @@ protected:
 
 /*!
   \brief    Helper function for the creation of binder objects with automatic
-            type deduction.
+			type deduction.
 
   \warning  Unlike std::bind1st, the bound argument type is the one <I>declared
-            by the function object</I>. This is typically a commodity, but
-            be aware of the subtle implications:
+			by the function object</I>. This is typically a commodity, but
+			be aware of the subtle implications:
 
-              \li Only parameters copied by value result in a copied
-                  bound argument.
-              \li Avoid temporaries as bound reference arguments.
+			  \li Only parameters copied by value result in a copied
+				  bound argument.
+			  \li Avoid temporaries as bound reference arguments.
 
   \sa       Class tcg::binder1st.
 */
@@ -159,8 +155,7 @@ inline binder1st<Func> bind1st(const Func &func, const Arg &arg1)
 	return binder1st<Func>(func, arg1);
 }
 
-template <typename Func, typename Arg>
-inline binder1st<Func> bind1st(const Func &func, Arg &arg1)
+template <typename Func, typename Arg> inline binder1st<Func> bind1st(const Func &func, Arg &arg1)
 {
 	return binder1st<Func>(func, arg1);
 }
@@ -173,8 +168,7 @@ inline binder2nd<Func> bind2nd(const Func &func, const Arg &arg2)
 	return binder2nd<Func>(func, arg2);
 }
 
-template <typename Func, typename Arg>
-inline binder2nd<Func> bind2nd(const Func &func, Arg &arg2)
+template <typename Func, typename Arg> inline binder2nd<Func> bind2nd(const Func &func, Arg &arg2)
 {
 	return binder2nd<Func>(func, arg2);
 }

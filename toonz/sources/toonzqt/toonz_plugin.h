@@ -79,54 +79,56 @@ typedef toonz_plugin_probe_list_t plugin_probe_list_t;
 }
 #endif
 
-#define TOONZ_IF_VER(major, minor) \
-	{                              \
-		(major), (minor)           \
+#define TOONZ_IF_VER(major, minor)                                                                 \
+	{                                                                                              \
+		(major), (minor)                                                                           \
 	} /* interface or type version */
-#define TOONZ_PLUGIN_VER(major, minor) \
-	{                                  \
-		(major), (minor)               \
+#define TOONZ_PLUGIN_VER(major, minor)                                                             \
+	{                                                                                              \
+		(major), (minor)                                                                           \
 	} /* plugin version */
 
-#define TOONZ_PLUGIN_PROBE_BEGIN(ver)                              \
-	static const toonz_if_version_t toonz_plugin_probe_ver_ = ver; \
+#define TOONZ_PLUGIN_PROBE_BEGIN(ver)                                                              \
+	static const toonz_if_version_t toonz_plugin_probe_ver_ = ver;                                 \
 	struct toonz_plugin_probe_t_ toonz_plugin_info_begin_[] = {
 
-#define TOONZ_PLUGIN_PROBE_DEFINE(plugin_ver, nm, vendor, ident, note, helpurl, cls, handler) \
-	{                                                                                         \
-		toonz_plugin_probe_ver_,                                                              \
-			plugin_ver,                                                                       \
-			(nm), (vendor), (ident), (note), (helpurl),                                       \
-			{0}, /* reserved null ptrs */                                                     \
-			((cls)),                                                                          \
-			{0}, /* reserved 32bit-integers */                                                \
-			(handler),                                                                        \
-		{                                                                                     \
-			0                                                                                 \
-		} /* reserved null ptrs */                                                            \
+#define TOONZ_PLUGIN_PROBE_DEFINE(plugin_ver, nm, vendor, ident, note, helpurl, cls, handler)      \
+	{                                                                                              \
+		toonz_plugin_probe_ver_, plugin_ver, (nm), (vendor), (ident), (note), (helpurl),           \
+			{0},		  /* reserved null ptrs */                                                 \
+			((cls)), {0}, /* reserved 32bit-integers */                                            \
+			(handler),                                                                             \
+		{                                                                                          \
+			0                                                                                      \
+		} /* reserved null ptrs */                                                                 \
 	}
 
-#define TOONZ_PLUGIN_PROBE_END \
-	, { 0 } /* delim */        \
-	}                          \
-	;                          \
-	TOONZ_EXPORT struct toonz_plugin_probe_list_t_ toonz_plugin_info_list = {toonz_plugin_probe_ver_, toonz_plugin_info_begin_, &toonz_plugin_info_begin_[sizeof(toonz_plugin_info_begin_) / sizeof(struct toonz_plugin_probe_t_) - 1]};
+#define TOONZ_PLUGIN_PROBE_END                                                                     \
+	, { 0 } /* delim */                                                                            \
+	}                                                                                              \
+	;                                                                                              \
+	TOONZ_EXPORT struct toonz_plugin_probe_list_t_ toonz_plugin_info_list = {                      \
+		toonz_plugin_probe_ver_, toonz_plugin_info_begin_,                                         \
+		&toonz_plugin_info_begin_[sizeof(toonz_plugin_info_begin_) /                               \
+									  sizeof(struct toonz_plugin_probe_t_) -                       \
+								  1]};
 
 /*! エラーコード */
-#define TOONZ_OK (0)					   /*!< 成功 */
-#define TOONZ_ERROR_UNKNOWN (-1)		   /*!< 下記以外の不明なエラー */
-#define TOONZ_ERROR_NOT_IMPLEMENTED (-2)   /*!< 未実装 */
-#define TOONZ_ERROR_VERSION_UNMATCH (-3)   /*!< バージョン不整合 */
-#define TOONZ_ERROR_INVALID_HANDLE (-4)	/*!< 型が異なるなどの無効なハンドルが渡された */
-#define TOONZ_ERROR_NULL (-5)			   /*!< NULLが許容されていない引数がNULL */
-#define TOONZ_ERROR_POLLUTED (-6)		   /*!< 0でなければならない予約フィールドが0ではない */
-#define TOONZ_ERROR_OUT_OF_MEMORY (-7)	 /*!< メモリ不足 */
-#define TOONZ_ERROR_INVALID_SIZE (-8)	  /*!< 引数で指定されたサイズが間違っている */
-#define TOONZ_ERROR_INVALID_VALUE (-9)	 /*!< 定義されてない値 */
-#define TOONZ_ERROR_BUSY (-10)			   /*!< 要求されたリソースが既に使用されている */
+#define TOONZ_OK (0)					 /*!< 成功 */
+#define TOONZ_ERROR_UNKNOWN (-1)		 /*!< 下記以外の不明なエラー */
+#define TOONZ_ERROR_NOT_IMPLEMENTED (-2) /*!< 未実装 */
+#define TOONZ_ERROR_VERSION_UNMATCH (-3) /*!< バージョン不整合 */
+#define TOONZ_ERROR_INVALID_HANDLE (-4) /*!< 型が異なるなどの無効なハンドルが渡された */
+#define TOONZ_ERROR_NULL (-5)			/*!< NULLが許容されていない引数がNULL */
+#define TOONZ_ERROR_POLLUTED (-6) /*!< 0でなければならない予約フィールドが0ではない */
+#define TOONZ_ERROR_OUT_OF_MEMORY (-7) /*!< メモリ不足 */
+#define TOONZ_ERROR_INVALID_SIZE (-8) /*!< 引数で指定されたサイズが間違っている */
+#define TOONZ_ERROR_INVALID_VALUE (-9) /*!< 定義されてない値 */
+#define TOONZ_ERROR_BUSY (-10) /*!< 要求されたリソースが既に使用されている */
 #define TOONZ_ERROR_NOT_FOUND (-11)		   /*!< 指定されたものが見つからなかった */
 #define TOONZ_ERROR_FAILED_TO_CREATE (-12) /*!< オブジェクト等の作成に失敗 */
-#define TOONZ_ERROR_PREREQUISITE (-13)	 /*!< 事前に他の関数を呼ぶなどの前提条件が満たされていない */
+#define TOONZ_ERROR_PREREQUISITE (-13) /*!< 事前に他の関数を呼ぶなどの前提条件が満たされていない \
+										  */
 
 #define TOONZ_PARAM_ERROR_NONE (0)
 #define TOONZ_PARAM_ERROR_VERSION (1 << 0) /* version unmatched */
@@ -137,9 +139,10 @@ typedef toonz_plugin_probe_list_t plugin_probe_list_t;
 #define TOONZ_PARAM_ERROR_GROUP_NUM (1 << 4)
 #define TOONZ_PARAM_ERROR_TRAITS (1 << 5) /* traits is unknown*/
 
-#define TOONZ_PARAM_ERROR_NO_KEY (1 << 8)	/* the key is null */
-#define TOONZ_PARAM_ERROR_KEY_DUP (1 << 9)   /* the key must be unique in the plugin */
-#define TOONZ_PARAM_ERROR_KEY_NAME (1 << 10) /* the key must be formed as '[:alpha:_][:alpha::number:_]* */
+#define TOONZ_PARAM_ERROR_NO_KEY (1 << 8)  /* the key is null */
+#define TOONZ_PARAM_ERROR_KEY_DUP (1 << 9) /* the key must be unique in the plugin */
+#define TOONZ_PARAM_ERROR_KEY_NAME                                                                 \
+	(1 << 10) /* the key must be formed as '[:alpha:_][:alpha::number:_]* */
 #define TOONZ_PARAM_ERROR_POLLUTED (1 << 11) /* reserved field must be zero. for future release */
 
 #define TOONZ_PARAM_ERROR_MIN_MAX (1 << 12)

@@ -24,16 +24,16 @@ extern "C" typedef void (*LICENSE_OBSERVER_CB)(char *);
 
 class DVAPI PermissionsManager // singleton
 {
-public:
+  public:
 	static PermissionsManager *instance();
 	std::string getSVNUserName(int index) const;
 	std::string getSVNPassword(int index) const;
 
-private:
+  private:
 	class Imp;
 	std::unique_ptr<Imp> m_imp;
 
-private:
+  private:
 	PermissionsManager();
 	~PermissionsManager();
 };

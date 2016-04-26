@@ -18,82 +18,82 @@ inline double luminance(TPixel64 *pix)
 {
 	return 0.2126 * pix->r + 0.7152 * pix->g + 0.0722 * pix->b;
 }
-} //namespace
+} // namespace
 
 //-----------------------------------------------------------------------------
 
-#define FOR_EACH_PIXEL_BEGIN_LOOP(UpType, up, DownType, down, OutType, out) \
-	{                                                                       \
-		int upWrap = up->getWrap();                                         \
-		int downWrap = down->getWrap();                                     \
-		int outWrap = out->getWrap();                                       \
-                                                                            \
-		up->lock();                                                         \
-		down->lock();                                                       \
-		out->lock();                                                        \
-		UpType *upPix = 0, *upRow = up->pixels();                           \
-		DownType *downPix, *downRow = down->pixels();                       \
-		OutType *outPix, *outRow = out->pixels();                           \
-		UpType *endPix;                                                     \
-		int upLx = up->getLx();                                             \
-		UpType *lastPix = upRow + upWrap * (up->getLy() - 1) + upLx;        \
-		while (upPix < lastPix) {                                           \
-			upPix = upRow;                                                  \
-			downPix = downRow;                                              \
-			outPix = outRow;                                                \
-			endPix = upPix + upLx;                                          \
+#define FOR_EACH_PIXEL_BEGIN_LOOP(UpType, up, DownType, down, OutType, out)                        \
+	{                                                                                              \
+		int upWrap = up->getWrap();                                                                \
+		int downWrap = down->getWrap();                                                            \
+		int outWrap = out->getWrap();                                                              \
+                                                                                                   \
+		up->lock();                                                                                \
+		down->lock();                                                                              \
+		out->lock();                                                                               \
+		UpType *upPix = 0, *upRow = up->pixels();                                                  \
+		DownType *downPix, *downRow = down->pixels();                                              \
+		OutType *outPix, *outRow = out->pixels();                                                  \
+		UpType *endPix;                                                                            \
+		int upLx = up->getLx();                                                                    \
+		UpType *lastPix = upRow + upWrap * (up->getLy() - 1) + upLx;                               \
+		while (upPix < lastPix) {                                                                  \
+			upPix = upRow;                                                                         \
+			downPix = downRow;                                                                     \
+			outPix = outRow;                                                                       \
+			endPix = upPix + upLx;                                                                 \
 			while (upPix < endPix) {
 
 //-----------------------------------------------------------------------------
 
-#define FOR_EACH_PIXEL_END_LOOP(up, down, out) \
-	++upPix;                                   \
-	++downPix;                                 \
-	++outPix;                                  \
-	}                                          \
-	upRow += upWrap;                           \
-	downRow += downWrap;                       \
-	outRow += outWrap;                         \
-	}                                          \
-	up->unlock();                              \
-	down->unlock();                            \
-	out->unlock();                             \
+#define FOR_EACH_PIXEL_END_LOOP(up, down, out)                                                     \
+	++upPix;                                                                                       \
+	++downPix;                                                                                     \
+	++outPix;                                                                                      \
+	}                                                                                              \
+	upRow += upWrap;                                                                               \
+	downRow += downWrap;                                                                           \
+	outRow += outWrap;                                                                             \
+	}                                                                                              \
+	up->unlock();                                                                                  \
+	down->unlock();                                                                                \
+	out->unlock();                                                                                 \
 	}
 
 //-----------------------------------------------------------------------------
 
-#define FOR_EACH_PIXEL_32_BEGIN_LOOP \
-	assert(up32 &&down32 &&out32);   \
+#define FOR_EACH_PIXEL_32_BEGIN_LOOP                                                               \
+	assert(up32 &&down32 &&out32);                                                                 \
 	FOR_EACH_PIXEL_BEGIN_LOOP(TPixelRGBM32, up32, TPixelRGBM32, down32, TPixelRGBM32, out32)
 
 //-----------------------------------------------------------------------------
 
-#define FOR_EACH_PIXEL_32_END_LOOP \
-	assert(up32 &&down32 &&out32); \
+#define FOR_EACH_PIXEL_32_END_LOOP                                                                 \
+	assert(up32 &&down32 &&out32);                                                                 \
 	FOR_EACH_PIXEL_END_LOOP(up32, down32, out32)
 
 //-----------------------------------------------------------------------------
 
-#define FOR_EACH_PIXEL_64_BEGIN_LOOP \
-	assert(up64 &&down64 &&out64);   \
+#define FOR_EACH_PIXEL_64_BEGIN_LOOP                                                               \
+	assert(up64 &&down64 &&out64);                                                                 \
 	FOR_EACH_PIXEL_BEGIN_LOOP(TPixelRGBM64, up64, TPixelRGBM64, down64, TPixelRGBM64, out64)
 
 //-----------------------------------------------------------------------------
 
-#define FOR_EACH_PIXEL_64_END_LOOP \
-	assert(up64 &&down64 &&out64); \
+#define FOR_EACH_PIXEL_64_END_LOOP                                                                 \
+	assert(up64 &&down64 &&out64);                                                                 \
 	FOR_EACH_PIXEL_END_LOOP(up64, down64, out64)
 
 //-----------------------------------------------------------------------------
 
-#define FOR_EACH_PIXEL_8_BEGIN_LOOP \
-	assert(up8 &&down8 &&out8);     \
+#define FOR_EACH_PIXEL_8_BEGIN_LOOP                                                                \
+	assert(up8 &&down8 &&out8);                                                                    \
 	FOR_EACH_PIXEL_BEGIN_LOOP(TPixelGR8, up8, TPixelGR8, down8, TPixelGR8, out8)
 
 //-----------------------------------------------------------------------------
 
-#define FOR_EACH_PIXEL_8_END_LOOP \
-	assert(up8 &&down8 &&out8);   \
+#define FOR_EACH_PIXEL_8_END_LOOP                                                                  \
+	assert(up8 &&down8 &&out8);                                                                    \
 	FOR_EACH_PIXEL_END_LOOP(up32, down32, out32)
 
 //-----------------------------------------------------------------------------
@@ -592,40 +592,42 @@ void TRop::sub(const TRasterP &rup, const TRasterP &rdown, const TRasterP &rout,
 void TRop::mult(const TRasterP &rup, const TRasterP &rdown, const TRasterP &rout, int v, bool matte)
 {
 	/*
-    Let U be 'up', D be 'down' and M be 'multiplied' (the result), and suppose for the moment
-    that pixels are both NOT premultiplied and normalized to [0, 1].
+	Let U be 'up', D be 'down' and M be 'multiplied' (the result), and suppose for the moment
+	that pixels are both NOT premultiplied and normalized to [0, 1].
 
-    The additional value v is used to add to RGB components of the U pixel:
+	The additional value v is used to add to RGB components of the U pixel:
 
-      U'_rgb = (U_rgb + v / 255)
+	  U'_rgb = (U_rgb + v / 255)
 
-    The matte component is either U_m D_m in case (matte == true), or D_m in case (matte == false).
-    Please, observe that in the case (matte == false) that choice makes the product NOT COMMUTATIVE,
-    but I think that's justified - it's simply the most obvious use case.
+	The matte component is either U_m D_m in case (matte == true), or D_m in case (matte == false).
+	Please, observe that in the case (matte == false) that choice makes the product NOT COMMUTATIVE,
+	but I think that's justified - it's simply the most obvious use case.
 
-    In case (matte == true), each channel is multiplied independently, and that's it.
+	In case (matte == true), each channel is multiplied independently, and that's it.
 
-    The matter is more complicated when (matte == false). The problem in this case is dealing with rgb
-    components when U and D both have some transparency.  When U is fully transparent, we expect the
-    result to be D, and vice-versa, which is non-trivial.
+	The matter is more complicated when (matte == false). The problem in this case is dealing with
+	rgb
+	components when U and D both have some transparency.  When U is fully transparent, we expect the
+	result to be D, and vice-versa, which is non-trivial.
 
-    We REQUIRE that (let's denote r only here):
+	We REQUIRE that (let's denote r only here):
 
-      M_r = M_r_u = U_r (1 - D_m) + U_r D_r D_m,   when  U_m == 1    (When U is fully opaque, M_r is a D_m-linear
-                                                                      combination of U_r and U_r D_r)
-      M_r = M_r_d = D_r (1 - U_m) + U_r D_r U_m,   when  D_m == 1    (Vice-versa, when it's D that is fully opaque)
+	  M_r = M_r_u = U_r (1 - D_m) + U_r D_r D_m,   when  U_m == 1    (When U is fully opaque, M_r is
+	a D_m-linear
+																	  combination of U_r and U_r
+	D_r)
+	  M_r = M_r_d = D_r (1 - U_m) + U_r D_r U_m,   when  D_m == 1    (Vice-versa, when it's D that
+	is fully opaque)
 
-    Finally, we're building a weighted sum, by U_m and D_m of the two above:
+	Finally, we're building a weighted sum, by U_m and D_m of the two above:
 
-      M_r = (M_r_u * U_m + M_r_d * D_m) / (U_m + D_m) =
-          = (...) =
-          = [ U_r U_m (1 - D_m) + D_r D_m (1 - U_m) + 2 U_r U_m  D_r D_m ] / (U_m + D_m)
+	  M_r = (M_r_u * U_m + M_r_d * D_m) / (U_m + D_m) =
+		  = (...) =
+		  = [ U_r U_m (1 - D_m) + D_r D_m (1 - U_m) + 2 U_r U_m  D_r D_m ] / (U_m + D_m)
   */
 
 	// 32-bit images case
-	TRaster32P up32 = rup,
-			   down32 = rdown,
-			   out32 = rout;
+	TRaster32P up32 = rup, down32 = rdown, out32 = rout;
 
 	if (up32 && down32 && out32) {
 		static const float maxChannelF = float(TPixel32::maxChannelValue);
@@ -660,19 +662,29 @@ void TRop::mult(const TRasterP &rup, const TRasterP &rdown, const TRasterP &rout
 			mSumf = upPix->m + float(downPix->m);
 			if (mSumf > 0.0f) {
 				umf_norm = upPix->m / maxChannelF, dmf_norm = downPix->m / maxChannelF;
-				outMf = upPix->m + (1.0f - umf_norm) * downPix->m; // umf_norm should be ensured in [0.0, 1.0].
-																   // Convex combination should be in the conversion range.
+				outMf = upPix->m +
+						(1.0f - umf_norm) * downPix->m; // umf_norm should be ensured in [0.0, 1.0].
+				// Convex combination should be in the conversion range.
 				normalizer = outMf / (maxChannelF * mSumf);
 				umdmf_norm = umf_norm * dmf_norm;
 
 				uf = upPix->r + vf * umdmf_norm, df = downPix->r, ufdf = uf * df;
-				outPix->r = tcrop((uf * (maxChannelC - downPix->m) + df * (maxChannelC - upPix->m) + ufdf + ufdf) * normalizer, 0.0f, outMf);
+				outPix->r = tcrop((uf * (maxChannelC - downPix->m) + df * (maxChannelC - upPix->m) +
+								   ufdf + ufdf) *
+									  normalizer,
+								  0.0f, outMf);
 
 				uf = upPix->g + vf * umdmf_norm, df = downPix->g, ufdf = uf * df;
-				outPix->g = tcrop((uf * (maxChannelC - downPix->m) + df * (maxChannelC - upPix->m) + ufdf + ufdf) * normalizer, 0.0f, outMf);
+				outPix->g = tcrop((uf * (maxChannelC - downPix->m) + df * (maxChannelC - upPix->m) +
+								   ufdf + ufdf) *
+									  normalizer,
+								  0.0f, outMf);
 
 				uf = upPix->b + vf * umdmf_norm, df = downPix->b, ufdf = uf * df;
-				outPix->b = tcrop((uf * (maxChannelC - downPix->m) + df * (maxChannelC - upPix->m) + ufdf + ufdf) * normalizer, 0.0f, outMf);
+				outPix->b = tcrop((uf * (maxChannelC - downPix->m) + df * (maxChannelC - upPix->m) +
+								   ufdf + ufdf) *
+									  normalizer,
+								  0.0f, outMf);
 
 				outPix->m = outMf;
 			} else
@@ -685,9 +697,7 @@ void TRop::mult(const TRasterP &rup, const TRasterP &rdown, const TRasterP &rout
 	}
 
 	// 64-bit images case
-	TRaster64P up64 = rup,
-			   down64 = rdown,
-			   out64 = rout;
+	TRaster64P up64 = rup, down64 = rdown, out64 = rout;
 
 	if (up64 && down64 && out64) {
 		static const double maxChannelF = double(TPixel64::maxChannelValue);
@@ -726,13 +736,22 @@ void TRop::mult(const TRasterP &rup, const TRasterP &rdown, const TRasterP &rout
 				umdmf_norm = umf_norm * dmf_norm;
 
 				uf = upPix->r + vf * umdmf_norm, df = downPix->r, ufdf = uf * df;
-				outPix->r = tcrop((uf * (maxChannelC - downPix->m) + df * (maxChannelC - upPix->m) + ufdf + ufdf) * normalizer, 0.0, outMf);
+				outPix->r = tcrop((uf * (maxChannelC - downPix->m) + df * (maxChannelC - upPix->m) +
+								   ufdf + ufdf) *
+									  normalizer,
+								  0.0, outMf);
 
 				uf = upPix->g + vf * umdmf_norm, df = downPix->g, ufdf = uf * df;
-				outPix->g = tcrop((uf * (maxChannelC - downPix->m) + df * (maxChannelC - upPix->m) + ufdf + ufdf) * normalizer, 0.0, outMf);
+				outPix->g = tcrop((uf * (maxChannelC - downPix->m) + df * (maxChannelC - upPix->m) +
+								   ufdf + ufdf) *
+									  normalizer,
+								  0.0, outMf);
 
 				uf = upPix->b + vf * umdmf_norm, df = downPix->b, ufdf = uf * df;
-				outPix->b = tcrop((uf * (maxChannelC - downPix->m) + df * (maxChannelC - upPix->m) + ufdf + ufdf) * normalizer, 0.0, outMf);
+				outPix->b = tcrop((uf * (maxChannelC - downPix->m) + df * (maxChannelC - upPix->m) +
+								   ufdf + ufdf) *
+									  normalizer,
+								  0.0, outMf);
 
 				outPix->m = outMf;
 			} else
@@ -760,7 +779,8 @@ void TRop::ropin(const TRasterP &source, const TRasterP &matte, const TRasterP &
 	TRaster64P out64 = rout;
 
 	if (source32 && matte32 && out32) {
-		FOR_EACH_PIXEL_BEGIN_LOOP(TPixelRGBM32, source32, TPixelRGBM32, matte32, TPixelRGBM32, out32)
+		FOR_EACH_PIXEL_BEGIN_LOOP(TPixelRGBM32, source32, TPixelRGBM32, matte32, TPixelRGBM32,
+								  out32)
 
 		if (downPix->m == 0)
 			outPix->r = outPix->g = outPix->b = outPix->m = 0;
@@ -768,20 +788,20 @@ void TRop::ropin(const TRasterP &source, const TRasterP &matte, const TRasterP &
 			*outPix = *upPix;
 		else {
 			/*
-      __m128i zeros = _mm_setzero_si128();
+	  __m128i zeros = _mm_setzero_si128();
 
-	    __m128i upPix_packed_i= _mm_unpacklo_epi8(_mm_cvtsi32_si128(*(DWORD*)upPix), zeros);
-	    __m128  upPix_packed  = _mm_cvtepi32_ps(_mm_unpacklo_epi16(upPix_packed_i, zeros));
+		__m128i upPix_packed_i= _mm_unpacklo_epi8(_mm_cvtsi32_si128(*(DWORD*)upPix), zeros);
+		__m128  upPix_packed  = _mm_cvtepi32_ps(_mm_unpacklo_epi16(upPix_packed_i, zeros));
 
-      float fac = downPix->m / 255.0;
-      __m128 fac_packed = _mm_load1_ps(&fac);
+	  float fac = downPix->m / 255.0;
+	  __m128 fac_packed = _mm_load1_ps(&fac);
 
-      upPix_packed = _mm_mul_ps(upPix_packed, fac_packed);
+	  upPix_packed = _mm_mul_ps(upPix_packed, fac_packed);
 
-      __m128i outPix_packed_i = _mm_cvtps_epi32(upPix_packed);
-      outPix_packed_i = _mm_packs_epi32(outPix_packed_i, zeros);
-      outPix_packed_i = _mm_packus_epi16(outPix_packed_i, zeros);
-      *(DWORD*)(outPix) = _mm_cvtsi128_si32(outPix_packed_i);      
+	  __m128i outPix_packed_i = _mm_cvtps_epi32(upPix_packed);
+	  outPix_packed_i = _mm_packs_epi32(outPix_packed_i, zeros);
+	  outPix_packed_i = _mm_packus_epi16(outPix_packed_i, zeros);
+	  *(DWORD*)(outPix) = _mm_cvtsi128_si32(outPix_packed_i);
 */
 
 			const int MAGICFAC = (257U * 256U + 1U);
@@ -797,7 +817,8 @@ void TRop::ropin(const TRasterP &source, const TRasterP &matte, const TRasterP &
 	} else if (source64 && matte64 && out64)
 
 	{
-		FOR_EACH_PIXEL_BEGIN_LOOP(TPixelRGBM64, source64, TPixelRGBM64, matte64, TPixelRGBM64, out64)
+		FOR_EACH_PIXEL_BEGIN_LOOP(TPixelRGBM64, source64, TPixelRGBM64, matte64, TPixelRGBM64,
+								  out64)
 
 		if (downPix->m == 0)
 			outPix->r = outPix->g = outPix->b = outPix->m = 0;
@@ -805,20 +826,20 @@ void TRop::ropin(const TRasterP &source, const TRasterP &matte, const TRasterP &
 			*outPix = *upPix;
 		else {
 			/*
-      __m128i zeros = _mm_setzero_si128();
+	  __m128i zeros = _mm_setzero_si128();
 
-	    __m128i upPix_packed_i= _mm_unpacklo_epi8(_mm_cvtsi32_si128(*(DWORD*)upPix), zeros);
-	    __m128  upPix_packed  = _mm_cvtepi32_ps(_mm_unpacklo_epi16(upPix_packed_i, zeros));
+		__m128i upPix_packed_i= _mm_unpacklo_epi8(_mm_cvtsi32_si128(*(DWORD*)upPix), zeros);
+		__m128  upPix_packed  = _mm_cvtepi32_ps(_mm_unpacklo_epi16(upPix_packed_i, zeros));
 
-      float fac = downPix->m / 255.0;
-      __m128 fac_packed = _mm_load1_ps(&fac);
+	  float fac = downPix->m / 255.0;
+	  __m128 fac_packed = _mm_load1_ps(&fac);
 
-      upPix_packed = _mm_mul_ps(upPix_packed, fac_packed);
+	  upPix_packed = _mm_mul_ps(upPix_packed, fac_packed);
 
-      __m128i outPix_packed_i = _mm_cvtps_epi32(upPix_packed);
-      outPix_packed_i = _mm_packs_epi32(outPix_packed_i, zeros);
-      outPix_packed_i = _mm_packus_epi16(outPix_packed_i, zeros);
-      *(DWORD*)(outPix) = _mm_cvtsi128_si32(outPix_packed_i);      
+	  __m128i outPix_packed_i = _mm_cvtps_epi32(upPix_packed);
+	  outPix_packed_i = _mm_packs_epi32(outPix_packed_i, zeros);
+	  outPix_packed_i = _mm_packus_epi16(outPix_packed_i, zeros);
+	  *(DWORD*)(outPix) = _mm_cvtsi128_si32(outPix_packed_i);
 */
 			double fac = downPix->m / 65535.0;
 
@@ -845,7 +866,8 @@ void TRop::ropout(const TRasterP &source, const TRasterP &matte, const TRasterP 
 	TRaster64P out64 = rout;
 
 	if (source32 && matte32 && out32) {
-		FOR_EACH_PIXEL_BEGIN_LOOP(TPixelRGBM32, source32, TPixelRGBM32, matte32, TPixelRGBM32, out32)
+		FOR_EACH_PIXEL_BEGIN_LOOP(TPixelRGBM32, source32, TPixelRGBM32, matte32, TPixelRGBM32,
+								  out32)
 
 		if (downPix->m == 255)
 			outPix->r = outPix->g = outPix->b = outPix->m = 0;
@@ -863,7 +885,8 @@ void TRop::ropout(const TRasterP &source, const TRasterP &matte, const TRasterP 
 
 		FOR_EACH_PIXEL_END_LOOP(source32, matte32, out32)
 	} else if (source64 && matte64 && out64) {
-		FOR_EACH_PIXEL_BEGIN_LOOP(TPixelRGBM64, source64, TPixelRGBM64, matte64, TPixelRGBM64, out64)
+		FOR_EACH_PIXEL_BEGIN_LOOP(TPixelRGBM64, source64, TPixelRGBM64, matte64, TPixelRGBM64,
+								  out64)
 
 		if (downPix->m == 65535)
 			outPix->r = outPix->g = outPix->b = outPix->m = 0;
@@ -1150,7 +1173,7 @@ void TRop::ropmin(const TRasterP &rup, const TRasterP &rdown, const TRasterP &ro
 				tmp.r = upPix->r < downPix->r ? upPix->r : downPix->r;
 				tmp.g = upPix->g < downPix->g ? upPix->g : downPix->g;
 				tmp.b = upPix->b < downPix->b ? upPix->b : downPix->b;
-				//tmp.m = upPix->m < downPix->m ? upPix->m : downPix->m;
+				// tmp.m = upPix->m < downPix->m ? upPix->m : downPix->m;
 				outPix->r = upPix->m * (tmp.r - downPix->r) / 255.0 + downPix->r;
 				outPix->g = upPix->m * (tmp.g - downPix->g) / 255.0 + downPix->g;
 				outPix->b = upPix->m * (tmp.b - downPix->b) / 255.0 + downPix->b;
@@ -1187,7 +1210,7 @@ void TRop::ropmin(const TRasterP &rup, const TRasterP &rdown, const TRasterP &ro
 					tmp.r = upPix->r < downPix->r ? upPix->r : downPix->r;
 					tmp.g = upPix->g < downPix->g ? upPix->g : downPix->g;
 					tmp.b = upPix->b < downPix->b ? upPix->b : downPix->b;
-					//tmp.m = upPix->m < downPix->m ? upPix->m : downPix->m;
+					// tmp.m = upPix->m < downPix->m ? upPix->m : downPix->m;
 					outPix->r = upPix->m * (tmp.r - downPix->r) / 65535.0 + downPix->r;
 					outPix->g = upPix->m * (tmp.g - downPix->g) / 65535.0 + downPix->g;
 					outPix->b = upPix->m * (tmp.b - downPix->b) / 65535.0 + downPix->b;
@@ -1284,7 +1307,7 @@ void TRop::linearburn(const TRasterP &rup, const TRasterP &rdown, const TRasterP
 				app.r = (UCHAR)tcrop<TINT32>(r, (TINT32)0, (TINT32)255);
 				app.g = (UCHAR)tcrop<TINT32>(g, (TINT32)0, (TINT32)255);
 				app.b = (UCHAR)tcrop<TINT32>(b, (TINT32)0, (TINT32)255);
-				//app.m = (UCHAR)tcrop<TINT32> (m, (TINT32)0, (TINT32)255);
+				// app.m = (UCHAR)tcrop<TINT32> (m, (TINT32)0, (TINT32)255);
 				app.m = upPix->m;
 			} else
 				app = *upPix;
@@ -1313,7 +1336,7 @@ void TRop::linearburn(const TRasterP &rup, const TRasterP &rdown, const TRasterP
 					app.r = (USHORT)tcrop<TINT32>(r, 0, 0xffff);
 					app.g = (USHORT)tcrop<TINT32>(g, 0, 0xffff);
 					app.b = (USHORT)tcrop<TINT32>(b, 0, 0xffff);
-					//app.m = (UCHAR)tcrop<TINT32> (m, (TINT32)0, (TINT32)255);
+					// app.m = (UCHAR)tcrop<TINT32> (m, (TINT32)0, (TINT32)255);
 					app.m = upPix->m;
 				} else
 					app = *upPix;
@@ -1397,19 +1420,25 @@ void TRop::overlay(const TRasterP &rup, const TRasterP &rdown, const TRasterP &r
 					if (tmpPix.r < 32768)
 						app.r = troundp(2 * tmp2Pix.r * (tmpPix.r / 65535.0));
 					else {
-						SHORT r = 65535 * (1 - 2 * (1.0 - tmpPix.r / 65535.0) * (1.0 - tmp2Pix.r / 65535.0));
+						SHORT r =
+							65535 *
+							(1 - 2 * (1.0 - tmpPix.r / 65535.0) * (1.0 - tmp2Pix.r / 65535.0));
 						app.r = (USHORT)tcrop<TINT32>(r, 0, 65535);
 					}
 					if (tmpPix.g < 32768)
 						app.g = troundp(2 * tmp2Pix.g * (tmpPix.g / 65535.0));
 					else {
-						SHORT g = 65535 * (1 - 2 * (1.0 - tmpPix.g / 65535.0) * (1.0 - tmp2Pix.g / 65535.0));
+						SHORT g =
+							65535 *
+							(1 - 2 * (1.0 - tmpPix.g / 65535.0) * (1.0 - tmp2Pix.g / 65535.0));
 						app.g = (USHORT)tcrop<TINT32>(g, 0, 65535);
 					}
 					if (tmpPix.b < 32768)
 						app.b = troundp(2 * tmp2Pix.b * (tmpPix.b / 65535.0));
 					else {
-						SHORT b = 65535 * (1 - 2 * (1.0 - tmpPix.b / 65535.0) * (1.0 - tmp2Pix.b / 65535.0));
+						SHORT b =
+							65535 *
+							(1 - 2 * (1.0 - tmpPix.b / 65535.0) * (1.0 - tmp2Pix.b / 65535.0));
 						app.b = (USHORT)tcrop<TINT32>(b, 0, 65535);
 					}
 					app.m = tmp2Pix.m;
@@ -1431,7 +1460,8 @@ void TRop::overlay(const TRasterP &rup, const TRasterP &rdown, const TRasterP &r
 				if (downPix->value < 128)
 					value = troundp(2 * upPix->value * (downPix->value / 255.0));
 				else
-					value = 255 * (1 - 2 * (1.0 - downPix->value / 255.0) * (1.0 - upPix->value / 255.0));
+					value = 255 *
+							(1 - 2 * (1.0 - downPix->value / 255.0) * (1.0 - upPix->value / 255.0));
 				outPix->value = (UCHAR)tcrop<USHORT>(value, 0, 255);
 
 				FOR_EACH_PIXEL_8_END_LOOP
@@ -1571,8 +1601,7 @@ void TRop::whiteTransp(const TRasterP &ras)
 
 //-----------------------------------------------------------------------------
 
-template <typename Chan>
-const double *premultiplyTable()
+template <typename Chan> const double *premultiplyTable()
 {
 	static double *table = 0;
 	if (!table) {
@@ -1594,8 +1623,7 @@ template DVAPI const double *premultiplyTable<USHORT>();
 
 //-----------------------------------------------------------------------------
 
-template <typename Chan>
-const double *depremultiplyTable()
+template <typename Chan> const double *depremultiplyTable()
 {
 	static double *table = 0;
 	if (!table) {

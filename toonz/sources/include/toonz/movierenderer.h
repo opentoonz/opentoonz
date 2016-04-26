@@ -46,20 +46,18 @@ class DVAPI MovieRenderer : public QObject
 	class Imp;
 	Imp *m_imp;
 
-public:
+  public:
 	class Listener
 	{
-	public:
+	  public:
 		virtual bool onFrameCompleted(int frame) = 0;
 		virtual bool onFrameFailed(int frame, TException &e) = 0;
 		virtual void onSequenceCompleted(const TFilePath &fp) = 0;
 		virtual ~Listener() {}
 	};
 
-public:
-	MovieRenderer(ToonzScene *scene,
-				  const TFilePath &moviePath,
-				  int threadCount = 1,
+  public:
+	MovieRenderer(ToonzScene *scene, const TFilePath &moviePath, int threadCount = 1,
 				  bool cacheResults = true);
 
 	~MovieRenderer();
@@ -78,11 +76,11 @@ public:
 
 	void start();
 
-public slots:
+  public slots:
 
 	void onCanceled();
 
-private:
+  private:
 	// not implemented
 	MovieRenderer(const MovieRenderer &);
 	MovieRenderer &operator=(const MovieRenderer &);

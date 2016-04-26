@@ -1,4 +1,6 @@
-//TODO: エフェクトの縮小表示時のアイコンのファイル名。要プラグインFxへの対応。ここに集めるのではなく、Fxに自己申告させるか、アイコン自体を無くす。　2016/1/12 shun_iwasawa
+// TODO:
+// エフェクトの縮小表示時のアイコンのファイル名。要プラグインFxへの対応。ここに集めるのではなく、Fxに自己申告させるか、アイコン自体を無くす。　2016/1/12
+// shun_iwasawa
 
 #ifndef FXICONMANAGER_H
 #define FXICONMANAGER_H
@@ -137,7 +139,7 @@ class FxIconPixmapManager
 
 	FxIconPixmapManager();
 
-public:
+  public:
 	static FxIconPixmapManager *instance();
 
 	const QPixmap &getFxIconPm(std::string type);

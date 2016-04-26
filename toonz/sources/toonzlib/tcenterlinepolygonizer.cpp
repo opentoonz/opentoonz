@@ -14,16 +14,16 @@
 //    Raw Borders Extraction
 //===============================
 
-//Raw contour class definition
+// Raw contour class definition
 
 class RawBorderPoint
 {
 
 	TPoint m_position;
-	int m_ambiguousTurn; //used to remember cases of multiple turning directions
-						 //in a RawBorder extraction.
+	int m_ambiguousTurn; // used to remember cases of multiple turning directions
+	// in a RawBorder extraction.
 
-public:
+  public:
 	RawBorderPoint() : m_ambiguousTurn(0) {}
 	RawBorderPoint(int i, int j) : m_position(i, j), m_ambiguousTurn(0) {}
 
@@ -31,8 +31,7 @@ public:
 	inline int x() const { return m_position.x; }
 	inline int y() const { return m_position.y; }
 
-	enum { left = 1,
-		   right = 2 }; //Direction taken at ambiguous turning point
+	enum { left = 1, right = 2 }; // Direction taken at ambiguous turning point
 	inline int getAmbiguous() const { return m_ambiguousTurn; }
 	inline void setAmbiguous(int direction) { m_ambiguousTurn = direction; }
 };
@@ -41,13 +40,13 @@ public:
 
 class RawBorder : public std::vector<RawBorderPoint>
 {
-	int m_xExternal; //x coordinate of a specific vertex in the outer
-					 //RawBorder which contains this inner one.
+	int m_xExternal; // x coordinate of a specific vertex in the outer
+	// RawBorder which contains this inner one.
 	TPointD *m_coordinateSums;
 	TPointD *m_coordinateSquareSums;
 	double *m_coordinateMixedSums;
 
-public:
+  public:
 	RawBorder() {}
 	~RawBorder() {}
 
@@ -60,8 +59,8 @@ public:
 
 //--------------------------------------------------------------------------
 
-//Of course we don't want RawBorders to be entirely copied whenever STL
-//requires to resize a BorderFamily...
+// Of course we don't want RawBorders to be entirely copied whenever STL
+// requires to resize a BorderFamily...
 typedef std::vector<RawBorder *> BorderFamily;
 typedef std::vector<BorderFamily> BorderList;
 
@@ -75,13 +74,9 @@ typedef std::vector<BorderFamily> BorderList;
 
 namespace
 {
-//Const names
-enum { white = 0,
-	   black = 1 };
-enum { inner = 0,
-	   outer = 1,
-	   none = 2,
-	   invalid = 3 };
+// Const names
+enum { white = 0, black = 1 };
+enum { inner = 0, outer = 1, none = 2, invalid = 3 };
 }
 
 //=======================================================================================
@@ -90,7 +85,7 @@ enum { inner = 0,
 //    Raster Data Functions
 //-------------------------------
 
-//NOTA: Il tono di un TPixelCM32 rappresenta la transizione tra colore ink e colore paint.
+// NOTA: Il tono di un TPixelCM32 rappresenta la transizione tra colore ink e colore paint.
 //      di solito, se il tono e' basso abbiamo un colore ink - che puo' anche essere bianco,
 //      in teoria...
 //      Sarebbe opportuno che il vettorizzatore riconoscesse - per colormap - il colore
@@ -105,64 +100,62 @@ enum { inner = 0,
 //                    E' possibile controllare il colore sui vertici delle sequenze semplificate
 //                    e fare una media.
 
-//NOTE: Transparency makes colors fade to white. Full transparent black pixels are considered white.
+// NOTE: Transparency makes colors fade to white. Full transparent black pixels are considered
+// white.
 
 //--------------------------------------------------------------------------
 
-template <typename T>
-class PixelEvaluator
+template <typename T> class PixelEvaluator
 {
 	TRasterPT<T> m_ras;
 	int m_threshold;
 
-public:
-	PixelEvaluator(const TRasterPT<T> &ras, int threshold)
-		: m_ras(ras), m_threshold(threshold) {}
+  public:
+	PixelEvaluator(const TRasterPT<T> &ras, int threshold) : m_ras(ras), m_threshold(threshold) {}
 
 	inline unsigned char getBlackOrWhite(int x, int y);
 };
 
 //--------------------------------------------------------------------------
 
-template <>
-inline unsigned char PixelEvaluator<TPixel32>::getBlackOrWhite(int x, int y)
+template <> inline unsigned char PixelEvaluator<TPixel32>::getBlackOrWhite(int x, int y)
 {
-	//return ras->pixels(y)[x].r + 2 * ras->pixels(y)[x].g + ras->pixels(y)[x].b <
+	// return ras->pixels(y)[x].r + 2 * ras->pixels(y)[x].g + ras->pixels(y)[x].b <
 	//   threshold * (ras->pixels(y)[x].m / 255.0);
-	//NOTE: Green is considered twice brighter than red or blue channel.
+	// NOTE: Green is considered twice brighter than red or blue channel.
 
-	//Using Value of HSV color model
+	// Using Value of HSV color model
 	return tmax(m_ras->pixels(y)[x].r, tmax(m_ras->pixels(y)[x].g, m_ras->pixels(y)[x].b)) <
 		   m_threshold * (m_ras->pixels(y)[x].m / 255.0);
 
-	//Using Lightness of HSV color model
-	//return (max(ras->pixels(y)[x].r, max(ras->pixels(y)[x].g, ras->pixels(y)[x].b)) +
+	// Using Lightness of HSV color model
+	// return (max(ras->pixels(y)[x].r, max(ras->pixels(y)[x].g, ras->pixels(y)[x].b)) +
 	//       min(ras->pixels(y)[x].r, min(ras->pixels(y)[x].g, ras->pixels(y)[x].b))) / 2.0 <
 	//  threshold * (ras->pixels(y)[x].m / 255.0);
 
-	//Using (relative) Luminance
-	//return 0.2126 * ras->pixels(y)[x].r + 0.7152 * ras->pixels(y)[x].g + 0.0722 * ras->pixels(y)[x].b <
+	// Using (relative) Luminance
+	// return 0.2126 * ras->pixels(y)[x].r + 0.7152 * ras->pixels(y)[x].g + 0.0722 *
+	// ras->pixels(y)[x].b <
 	//  threshold * (ras->pixels(y)[x].m / 255.0);
 }
 
-template <>
-inline unsigned char PixelEvaluator<TPixelGR8>::getBlackOrWhite(int x, int y)
+template <> inline unsigned char PixelEvaluator<TPixelGR8>::getBlackOrWhite(int x, int y)
 {
 	return m_ras->pixels(y)[x].value < m_threshold;
 }
 
-template <>
-inline unsigned char PixelEvaluator<TPixelCM32>::getBlackOrWhite(int x, int y)
+template <> inline unsigned char PixelEvaluator<TPixelCM32>::getBlackOrWhite(int x, int y)
 {
 	return m_ras->pixels(y)[x].getTone() < m_threshold;
 }
 
 //--------------------------------------------------------------------------
 
-//Signaturemap format:
-//  stores a map of bytes, whose first bit represents the color (black/white) of corresponding pixel, and
+// Signaturemap format:
+//  stores a map of bytes, whose first bit represents the color (black/white) of corresponding
+//  pixel, and
 //  the rest its 'signature', used as an int to store information.
-//NOTE: given a TRaster32, the corresponding Signaturemap constructed is intended 0(white)-padded
+// NOTE: given a TRaster32, the corresponding Signaturemap constructed is intended 0(white)-padded
 
 class Signaturemap
 {
@@ -170,21 +163,17 @@ class Signaturemap
 	int m_rowSize;
 	int m_colSize;
 
-public:
+  public:
 	Signaturemap(const TRasterP &ras, int threshold);
 
-	template <typename T>
-	void readRasterData(const TRasterPT<T> &ras, int threshold);
+	template <typename T> void readRasterData(const TRasterPT<T> &ras, int threshold);
 
 	inline int getRowSize() const { return m_rowSize; }
 	inline int getColSize() const { return m_colSize; }
 
 	unsigned char *pixelByte(int x, int y) { return &m_array[(y + 1) * m_rowSize + x + 1]; }
 
-	bool getBitmapColor(int x, int y) const
-	{
-		return m_array[(y + 1) * m_rowSize + x + 1] & 1;
-	}
+	bool getBitmapColor(int x, int y) const { return m_array[(y + 1) * m_rowSize + x + 1] & 1; }
 
 	inline unsigned char getSignature(int x, int y) const
 	{
@@ -195,7 +184,7 @@ public:
 	{
 		unsigned char *pixel = pixelByte(x, y);
 		*pixel &= 1;
-		*pixel |= (val << 1); //Si puo' fare meglio??
+		*pixel |= (val << 1); // Si puo' fare meglio??
 	}
 };
 
@@ -203,13 +192,13 @@ public:
 
 Signaturemap::Signaturemap(const TRasterP &ras, int threshold)
 {
-	//Extrapolate raster type
+	// Extrapolate raster type
 	TRaster32P rr = (TRaster32P)ras;
 	TRasterGR8P rgr = (TRasterGR8P)ras;
 	TRasterCM32P rt = (TRasterCM32P)ras;
 	assert(rr || rgr || rt);
 
-	//Read raster data
+	// Read raster data
 	if (rr) {
 		rr->lock();
 		readRasterData(rr, threshold);
@@ -227,8 +216,7 @@ Signaturemap::Signaturemap(const TRasterP &ras, int threshold)
 
 //--------------------------------------------------------------------------
 
-template <typename T>
-void Signaturemap::readRasterData(const TRasterPT<T> &ras, int threshold)
+template <typename T> void Signaturemap::readRasterData(const TRasterPT<T> &ras, int threshold)
 {
 	unsigned char *currByte;
 	int x, y;
@@ -258,29 +246,25 @@ void Signaturemap::readRasterData(const TRasterPT<T> &ras, int threshold)
 
 //--------------------------------------------------------------------------
 
-//Minority check for amiguous turning directions
+// Minority check for amiguous turning directions
 inline bool getMinorityCheck(const Signaturemap &ras, int x, int y)
 {
-	//Assumes (x,y) is ambiguous case: 2 immediate surrounding pixels are white and 2 black
-	return (ras.getBitmapColor(x + 1, y) +
-			ras.getBitmapColor(x + 1, y - 1) +
-			ras.getBitmapColor(x - 2, y) +
-			ras.getBitmapColor(x - 2, y - 1) +
-			ras.getBitmapColor(x - 1, y + 1) +
-			ras.getBitmapColor(x - 1, y - 2) +
-			ras.getBitmapColor(x, y + 1) +
-			ras.getBitmapColor(x, y - 2)) > 4;
+	// Assumes (x,y) is ambiguous case: 2 immediate surrounding pixels are white and 2 black
+	return (ras.getBitmapColor(x + 1, y) + ras.getBitmapColor(x + 1, y - 1) +
+			ras.getBitmapColor(x - 2, y) + ras.getBitmapColor(x - 2, y - 1) +
+			ras.getBitmapColor(x - 1, y + 1) + ras.getBitmapColor(x - 1, y - 2) +
+			ras.getBitmapColor(x, y + 1) + ras.getBitmapColor(x, y - 2)) > 4;
 }
 
 //--------------------------------------------------------------------------
 
-//Sets signature of a given border
+// Sets signature of a given border
 inline void setSignature(Signaturemap &ras, const RawBorder &border, int val)
 {
 	unsigned int j;
 	int yOld;
 
-	//Set border's alpha channel
+	// Set border's alpha channel
 	yOld = border.back().y();
 	for (j = 0; j < border.size(); ++j) {
 		if (border[j].y() < yOld) {
@@ -298,20 +282,20 @@ inline void setSignature(Signaturemap &ras, const RawBorder &border, int val)
 //    Raw Borders Extraction
 //-------------------------------
 
-//RawBorderPoints correspond to lower-left pixel corners.
-//EXAMPLE: (0,0) is the lower-left *corner* of the image, whereas (0,0) also
+// RawBorderPoints correspond to lower-left pixel corners.
+// EXAMPLE: (0,0) is the lower-left *corner* of the image, whereas (0,0) also
 // represents coordinates of the lower-left *pixel*.
-//NOTE: 'Ambiguous turning' vertices are those of kind:
+// NOTE: 'Ambiguous turning' vertices are those of kind:
 //
 //    B|W           W|B
 //    -x-    -or-   -x-
 //    W|B           B|W
 //
-//Keeping B on the right of our path-seeking direction, we may either turn
-//left or right at these points.
+// Keeping B on the right of our path-seeking direction, we may either turn
+// left or right at these points.
 
-RawBorder *extractPath(Signaturemap &ras, int x0, int y0,
-					   int pathType, int xOuterPixel, int despeckling)
+RawBorder *extractPath(Signaturemap &ras, int x0, int y0, int pathType, int xOuterPixel,
+					   int despeckling)
 {
 	RawBorder *path = new RawBorder;
 	int x, y;
@@ -331,56 +315,56 @@ RawBorder *extractPath(Signaturemap &ras, int x0, int y0,
 
 	path->push_back(RawBorderPoint(x0, y0));
 
-	//Check here if (x0, y0) is an ambiguous-direction point
+	// Check here if (x0, y0) is an ambiguous-direction point
 	nextLeftPixel = ras.getBitmapColor(x0 + (dirY - dirX - 1) / 2, y0 + (-dirY - dirX - 1) / 2);
 	nextRightPixel = ras.getBitmapColor(x0 + (-dirX - dirY - 1) / 2, y0 + (dirX - dirY - 1) / 2);
 	if ((nextRightPixel == black) && (nextLeftPixel == white))
 		path->back().setAmbiguous(dirX ? RawBorderPoint::left : RawBorderPoint::right);
 
-	//Begin path extraction
+	// Begin path extraction
 
 	for (x = x0 + dirX, y = y0 + dirY; !(x == x0 && y == y0); x += dirX, y += dirY) {
 		path->push_back(RawBorderPoint(x, y));
 
-		//Calculate next direction
+		// Calculate next direction
 		nextLeftPixel = ras.getBitmapColor(x + (dirX - dirY - 1) / 2, y + (dirY + dirX - 1) / 2);
 		nextRightPixel = ras.getBitmapColor(x + (dirX + dirY - 1) / 2, y + (dirY - dirX - 1) / 2);
 
 		if ((nextRightPixel == black) && (nextLeftPixel == black)) {
-			//Left Turn
+			// Left Turn
 			std::swap(dirY, dirX);
 			dirX = -dirX;
 		} else if ((nextRightPixel == white) && (nextLeftPixel == white)) {
-			//Right Turn
+			// Right Turn
 			std::swap(dirY, dirX);
 			dirY = -dirY;
 		} else if ((nextRightPixel == white) && (nextLeftPixel == black)) {
 
-			//path->back().setAmbiguous();
+			// path->back().setAmbiguous();
 
-			//Do a surrounding check and connect minority color
+			// Do a surrounding check and connect minority color
 			if (getMinorityCheck(ras, x, y) == black) {
 				std::swap(dirY, dirX);
 				dirY = -dirY;
 				path->back().setAmbiguous(RawBorderPoint::right);
-			} //right turn
+			} // right turn
 			else {
 				std::swap(dirY, dirX);
 				dirX = -dirX;
 				path->back().setAmbiguous(RawBorderPoint::left);
-			} //left turn
+			} // left turn
 		}
 
-		//Also calculate border area
+		// Also calculate border area
 		area += y * dirX;
 
-		//And sign treated pixel
+		// And sign treated pixel
 		if (dirY != 0)
 			ras.setSignature(x, y + (dirY - 1) / 2, pathType);
 	}
 
-	//If the inner region's overall area is under a given threshold,
-	//then erase it (intended as image noise).
+	// If the inner region's overall area is under a given threshold,
+	// then erase it (intended as image noise).
 	if (abs(area) < despeckling) {
 		setSignature(ras, *path, invalid);
 		delete path;
@@ -407,58 +391,59 @@ BorderList *extractBorders(const TRasterP &ras, int threshold, int despeckling)
 	bool enteredRegionType;
 	unsigned char signature;
 
-	//Traverse image to extract raw borders
+	// Traverse image to extract raw borders
 	for (y = 0; y < ras->getLy(); ++y) {
 		oldColor = white;
 		enteredRegionType = outer;
 		for (x = 0; x < ras->getLx(); ++x) {
 			if (oldColor ^ (Color = byteImage.getBitmapColor(x, y))) {
-				//Region type changes
+				// Region type changes
 				enteredRegionType = !enteredRegionType;
 
 				if ((signature = byteImage.getSignature(x, y)) == none) {
-					//We've found a border
-					if (foundPath = extractPath(byteImage, x, y, !enteredRegionType, xOuterPixel, despeckling))
+					// We've found a border
+					if (foundPath = extractPath(byteImage, x, y, !enteredRegionType, xOuterPixel,
+												despeckling))
 						if (enteredRegionType == outer)
 							innerBorders.push_back(foundPath);
 						else
 							outerBorders.push_back(foundPath);
 				}
 
-				//If leaving a white region, remember it - in order to establish
-				//border hierarchy in the future
+				// If leaving a white region, remember it - in order to establish
+				// border hierarchy in the future
 				if (enteredRegionType == inner && signature != invalid)
 					xOuterPixel = x;
 
-				//Invalid pixels got signed by a cut-out path, due to insufficient area
+				// Invalid pixels got signed by a cut-out path, due to insufficient area
 				if (signature == invalid)
-					byteImage.setSignature(x, y, none); //Restore them now
+					byteImage.setSignature(x, y, none); // Restore them now
 
 				oldColor = Color;
 			}
 		}
 	}
 
-	//Now, we have all borders found, but no hierarchy between them.
+	// Now, we have all borders found, but no hierarchy between them.
 
 	unsigned int i;
 	std::list<RawBorder *>::iterator l;
 
-	//Build hierarchy
+	// Build hierarchy
 
-	innerBorders.push_front(0); //Just to keep a fixed list head
+	innerBorders.push_front(0); // Just to keep a fixed list head
 
 	for (i = 0; i < outerBorders.size(); ++i) {
 
-		//Initialize a border family
+		// Initialize a border family
 		borderHierarchy->push_back(BorderFamily());
 		borderHierarchy->back().push_back(outerBorders[i]);
 
-		//Reset outerBorders[i]'s signature
+		// Reset outerBorders[i]'s signature
 		setSignature(byteImage, *outerBorders[i], none);
 
-		//Now check inner borders for insideness - check if the outerPixel
-		//remembered in path extraction has been cleared
+		// Now check inner borders for insideness - check if the outerPixel
+		// remembered in path extraction has been cleared
 		for (l = innerBorders.begin(), ++l; l != innerBorders.end(); ++l) {
 			if (byteImage.getSignature((*l)->xExternalPixel(), (**l)[0].y()) == none) {
 				borderHierarchy->back().push_back(*l);
@@ -478,7 +463,7 @@ BorderList *extractBorders(const TRasterP &ras, int threshold, int despeckling)
 //    Calculate optimal polygons
 //==================================
 
-//The optimal polygon for a given original border is found like:
+// The optimal polygon for a given original border is found like:
 
 // 1) Find couples (i,k(i)), so that k(i) be the largest k:
 //        d(j,ik) <= 1;  for *all* i<j<k.  (d is infinite-norm distance)
@@ -490,7 +475,7 @@ BorderList *extractBorders(const TRasterP &ras, int threshold, int despeckling)
 // 4) Calculate sums for path penalties.
 // 5) Apply optimality algorithm.
 
-//NOTE: Weak simpleness reads like: a set of polygons is weak-simple if no edge
+// NOTE: Weak simpleness reads like: a set of polygons is weak-simple if no edge
 //      *crosses* another edge. Superposition and collision of edges with vertices
 //      are still admitted.
 //        =>  It can be shown that due to 1) and special conditions on ambiguous
@@ -499,10 +484,10 @@ BorderList *extractBorders(const TRasterP &ras, int threshold, int despeckling)
 
 //--------------------------------------------------------------------------
 
-//Helper functions/classes: circular-indexed vectors
+// Helper functions/classes: circular-indexed vectors
 
-//returns 1 whenever the triple (a,b,c) is 'circular' mod n.
-//NOTE: We'll find useful taking (i,i,j) as 1 and (i,j,j) as 0.
+// returns 1 whenever the triple (a,b,c) is 'circular' mod n.
+// NOTE: We'll find useful taking (i,i,j) as 1 and (i,j,j) as 0.
 inline bool isCircular(int a, int b, int c)
 {
 	return a <= c ? a <= b && b < c : c > b || b >= a;
@@ -510,16 +495,15 @@ inline bool isCircular(int a, int b, int c)
 
 //--------------------------------------------------------------------------
 
-//Extracts a 'next corner' array - helps improving overall speed
+// Extracts a 'next corner' array - helps improving overall speed
 inline std::unique_ptr<int[]> findNextCorners(RawBorder &path)
 {
 	std::unique_ptr<int[]> corners(new int[path.size()]);
 
-	//NOTE: 0 is a corner, due to the path extraction procedure.
+	// NOTE: 0 is a corner, due to the path extraction procedure.
 	int currentCorner = 0;
 	for (int i = path.size() - 1; i >= 0; --i) {
-		if (path[currentCorner].x() != path[i].x() &&
-			path[currentCorner].y() != path[i].y())
+		if (path[currentCorner].x() != path[i].x() && path[currentCorner].y() != path[i].y())
 			currentCorner = i + 1;
 		corners[i] = currentCorner;
 	}
@@ -529,17 +513,14 @@ inline std::unique_ptr<int[]> findNextCorners(RawBorder &path)
 
 //--------------------------------------------------------------------------
 
-//Calculate furthest k satisfying 1) for all fixed i.
-inline std::unique_ptr<int[]> furthestKs(RawBorder &path, std::unique_ptr<int[]>& nextCorners)
+// Calculate furthest k satisfying 1) for all fixed i.
+inline std::unique_ptr<int[]> furthestKs(RawBorder &path, std::unique_ptr<int[]> &nextCorners)
 {
 
 	int n = path.size();
 	std::unique_ptr<int[]> kVector(new int[n]);
 
-	enum { left,
-		   up,
-		   right,
-		   down };
+	enum { left, up, right, down };
 	int directionsOccurred[4];
 
 	nextCorners = findNextCorners(path);
@@ -553,39 +534,41 @@ inline std::unique_ptr<int[]> furthestKs(RawBorder &path, std::unique_ptr<int[]>
 	int directionSignature;
 
 	for (i = 0; i < n; ++i) {
-		//Initialize search
+		// Initialize search
 		leftConstraint = rightConstraint = TPoint();
 		directionsOccurred[0] = directionsOccurred[1] = directionsOccurred[2] =
 			directionsOccurred[3] = 0;
 		j = i;
 		jNextPoint = iPoint = path[i].pos();
 
-		//Search for k(i)
+		// Search for k(i)
 		while (1) {
 
-			//NOTE: Here using TPoint::operator= is less effective than setting
-			//its x and y components directly...
+			// NOTE: Here using TPoint::operator= is less effective than setting
+			// its x and y components directly...
 
 			jPoint = jNextPoint;
 			jNextPoint = path[nextCorners[j]].pos();
 
-			//Update directions count
-			directionSignature = jNextPoint.x > jPoint.x ? right : jNextPoint.x < jPoint.x ? left
-																						   : jNextPoint.y > jPoint.y ? up : down;
+			// Update directions count
+			directionSignature =
+				jNextPoint.x > jPoint.x ? right : jNextPoint.x < jPoint.x
+													  ? left
+													  : jNextPoint.y > jPoint.y ? up : down;
 			directionsOccurred[directionSignature] = 1;
 
-			//If all 4 axis directions occurred, quit
-			if (directionsOccurred[left] && directionsOccurred[right] &&
-				directionsOccurred[up] && directionsOccurred[down]) {
+			// If all 4 axis directions occurred, quit
+			if (directionsOccurred[left] && directionsOccurred[right] && directionsOccurred[up] &&
+				directionsOccurred[down]) {
 				k = j;
 				goto foundK;
 			}
 
-			//Update displacement from i
+			// Update displacement from i
 			shift = jNextPoint - iPoint;
 
-			//Test j against constraints
-			//if(cross(shift, leftConstraint)<0 || cross(shift, rightConstraint)>0)
+			// Test j against constraints
+			// if(cross(shift, leftConstraint)<0 || cross(shift, rightConstraint)>0)
 			if (cross(shift, leftConstraint) < 0) {
 				violatedConstraint = leftConstraint;
 				break;
@@ -595,29 +578,30 @@ inline std::unique_ptr<int[]> furthestKs(RawBorder &path, std::unique_ptr<int[]>
 				break;
 			}
 
-			//Update constraints
+			// Update constraints
 			if (abs(shift.x) > 1 || abs(shift.y) > 1) {
 
-				newLeftConstraint.x = shift.x +
-									  (shift.y < 0 || (shift.y == 0 && shift.x < 0) ? 1 : -1);
-				newLeftConstraint.y = shift.y +
-									  (shift.x > 0 || (shift.x == 0 && shift.y < 0) ? 1 : -1);
+				newLeftConstraint.x =
+					shift.x + (shift.y < 0 || (shift.y == 0 && shift.x < 0) ? 1 : -1);
+				newLeftConstraint.y =
+					shift.y + (shift.x > 0 || (shift.x == 0 && shift.y < 0) ? 1 : -1);
 
 				if (cross(newLeftConstraint, leftConstraint) >= 0)
 					leftConstraint = newLeftConstraint;
 
-				newRightConstraint.x = shift.x +
-									   (shift.y > 0 || (shift.y == 0 && shift.x < 0) ? 1 : -1);
+				newRightConstraint.x =
+					shift.x + (shift.y > 0 || (shift.y == 0 && shift.x < 0) ? 1 : -1);
 
-				newRightConstraint.y = shift.y +
-									   (shift.x < 0 || (shift.x == 0 && shift.y < 0) ? 1 : -1);
+				newRightConstraint.y =
+					shift.y + (shift.x < 0 || (shift.x == 0 && shift.y < 0) ? 1 : -1);
 
 				if (cross(newRightConstraint, rightConstraint) <= 0)
 					rightConstraint = newRightConstraint;
 			}
 
-			//Imposing strict constraint for ambiguous turnings, to ensure polygons' weak simpleness.
-			//Has to be defined *outside* abs checks.
+			// Imposing strict constraint for ambiguous turnings, to ensure polygons' weak
+			// simpleness.
+			// Has to be defined *outside* abs checks.
 			if (path[nextCorners[j]].getAmbiguous()) {
 				if (path[nextCorners[j]].getAmbiguous() == RawBorderPoint::left)
 					rightConstraint = shift;
@@ -628,11 +612,13 @@ inline std::unique_ptr<int[]> furthestKs(RawBorder &path, std::unique_ptr<int[]>
 			j = nextCorners[j];
 		}
 
-		//At this point, constraints are violated by the next corner.
-		//Then, search for the last k between j and corners[j] not violating them.
+		// At this point, constraints are violated by the next corner.
+		// Then, search for the last k between j and corners[j] not violating them.
 
 		direction = convert(normalize(convert(jNextPoint - jPoint)));
-		k = (j + cross(jPoint - iPoint, violatedConstraint) / cross(violatedConstraint, direction)) % n;
+		k = (j +
+			 cross(jPoint - iPoint, violatedConstraint) / cross(violatedConstraint, direction)) %
+			n;
 
 	foundK:
 
@@ -657,7 +643,7 @@ inline std::unique_ptr<int[]> calculateForwardArcs(RawBorder &border, bool ambig
 	std::unique_ptr<int[]> K(new int[n]);
 	std::unique_ptr<int[]> res(new int[n]);
 
-	//find K[i]= min {k[j]}, j=i..n-1.
+	// find K[i]= min {k[j]}, j=i..n-1.
 	for (int i = 0; i < n; ++i) {
 		int j;
 		for (j = i, K[i] = k[i]; isCircular(i, j, K[i]); j = (j + 1) % n)
@@ -665,7 +651,7 @@ inline std::unique_ptr<int[]> calculateForwardArcs(RawBorder &border, bool ambig
 				K[i] = k[j];
 	}
 
-	//Finally, we perform the following clean-up operations:
+	// Finally, we perform the following clean-up operations:
 	//  first, extremities of [i,K[i]] are clipped away, to obtain a
 	//    smoother optimal polygon (and deal with cases like the unitary
 	//    square);
@@ -675,25 +661,26 @@ inline std::unique_ptr<int[]> calculateForwardArcs(RawBorder &border, bool ambig
 		res[j] = K[i] < j ? (K[i] == 0 ? n - 1 : n) : K[i] - 1;
 	}
 
-	//Amibiguities check for vertex and edge superpositions. Prevent problems in the forecoming
-	//straight-skeleton thinning process.
+	// Amibiguities check for vertex and edge superpositions. Prevent problems in the forecoming
+	// straight-skeleton thinning process.
 
 	if (ambiguitiesCheck) {
 		for (int i = 1; nextCorners[i] > 0; i = nextCorners[i]) {
 			if (border[i].getAmbiguous() == RawBorderPoint::right) {
-				//Check vertices from i (excluded) to res[res[i]]; if in it there exists vertex k so that pos(k)==pos(i)...
-				//This prevents the existence of 0 degree angles in the optimal polygon.
+				// Check vertices from i (excluded) to res[res[i]]; if in it there exists vertex k
+				// so that pos(k)==pos(i)...
+				// This prevents the existence of 0 degree angles in the optimal polygon.
 
 				int rrPlus1 = (res[res[i] % n] + 1) % n;
 
-				for (int j = nextCorners[i];
-					 isCircular(i, j, rrPlus1) && j != i; //remember that isCircular(a,a,b) == 1 ...
+				for (int j = nextCorners[i]; isCircular(i, j, rrPlus1) &&
+											 j != i; // remember that isCircular(a,a,b) == 1 ...
 					 j = nextCorners[j]) {
 					if (border[j].getAmbiguous() && (border[j].pos() == border[i].pos())) {
 						res[res[i] % n] = j - 1;
 						assert((res[i] % n) != j - 1);
 
-						//Further, ensure res is increasing
+						// Further, ensure res is increasing
 						for (int k = res[i] % n; res[k] >= j - 1 && k >= 0; --k) {
 							res[k] = j - 1;
 							assert(k != j - 1);
@@ -711,9 +698,9 @@ inline std::unique_ptr<int[]> calculateForwardArcs(RawBorder &border, bool ambig
 
 //--------------------------------------------------------------------------
 
-//Let sum[i] and sum2[i] be respectively the sums of vertex coordinates
-//from 0 to i, and the sums of their squares; sumsMix contain sums of
-//xy terms.
+// Let sum[i] and sum2[i] be respectively the sums of vertex coordinates
+// from 0 to i, and the sums of their squares; sumsMix contain sums of
+// xy terms.
 inline void calculateSums(RawBorder &path)
 {
 	unsigned int i, n = path.size();
@@ -742,8 +729,8 @@ inline void calculateSums(RawBorder &path)
 
 //--------------------------------------------------------------------------
 
-//Let a,b the index-extremities of an arc of this path.
-//Then return its penalty.
+// Let a,b the index-extremities of an arc of this path.
+// Then return its penalty.
 inline double penalty(RawBorder &path, int a, int b)
 {
 	int n = b - a + 1;
@@ -762,7 +749,7 @@ inline double penalty(RawBorder &path, int a, int b)
 
 //--------------------------------------------------------------------------
 
-//NOTA: Il seguente algoritmo di riduzione assicura la semplicita' (debole) dei poligoni prodotti.
+// NOTA: Il seguente algoritmo di riduzione assicura la semplicita' (debole) dei poligoni prodotti.
 //
 
 inline void reduceBorder(RawBorder &border, Contour &res, bool ambiguitiesCheck)
@@ -771,36 +758,36 @@ inline void reduceBorder(RawBorder &border, Contour &res, bool ambiguitiesCheck)
 	int minPenaltyNext;
 	std::unique_ptr<int[]> minPenaltyNextArray(new int[n]);
 
-	//Calculate preliminary infos
+	// Calculate preliminary infos
 	std::unique_ptr<int[]> longestArcFrom = calculateForwardArcs(border, ambiguitiesCheck);
 	calculateSums(border);
 
 	std::unique_ptr<double[]> penaltyToEnd(new double[n + 1]);
 
-	//EXPLANATION:
-	//The fastest way to extract the optimal reduced border is based on the
-	//weakly monotonic property of longestArc[].
-	//The minimal number of its vertices 'm' is easily found by
-	//traversing the path with the longest step allowed. Let b[] be that
-	//succession; then, given res[i], it has to be reached by a vertex in
-	//the interval: {a[i-1], .. , b[i-1]}, where longestArc[a[i-1]]=a[i],
-	//longestArc[a[i-1]-1]<a[i], and a[m]=n.
+	// EXPLANATION:
+	// The fastest way to extract the optimal reduced border is based on the
+	// weakly monotonic property of longestArc[].
+	// The minimal number of its vertices 'm' is easily found by
+	// traversing the path with the longest step allowed. Let b[] be that
+	// succession; then, given res[i], it has to be reached by a vertex in
+	// the interval: {a[i-1], .. , b[i-1]}, where longestArc[a[i-1]]=a[i],
+	// longestArc[a[i-1]-1]<a[i], and a[m]=n.
 
-	//Calculate m
+	// Calculate m
 	int m = 0;
 	for (int i = 0; i < n; i = longestArcFrom[i])
 		++m;
 
-	//Calculate b[]
+	// Calculate b[]
 	std::unique_ptr<int[]> b(new int[m + 1]);
 	b[m] = n;
 	for (int i = 0, j = 0; j < m; i = longestArcFrom[i], ++j)
 		b[j] = i;
 
-	//NOTE: a[] need not be completely found - we just remember the
-	//a=a[j+1] currently needed.
+	// NOTE: a[] need not be completely found - we just remember the
+	// a=a[j+1] currently needed.
 
-	//Now, build the optimal polygon
+	// Now, build the optimal polygon
 	for (int j = m - 1, a = n; j >= 0; --j) {
 		int k;
 		for (k = b[j]; k >= 0 && longestArcFrom[k] >= a; --k) {
@@ -816,13 +803,13 @@ inline void reduceBorder(RawBorder &border, Contour &res, bool ambiguitiesCheck)
 		a = k + 1;
 	}
 
-	//Finally, read off the optimal polygon
+	// Finally, read off the optimal polygon
 
 	res.resize(m);
 	for (int i = 0, j = 0; i < n; i = minPenaltyNextArray[i], ++j) {
 		res[j] = ContourNode(border[i].x(), border[i].y());
 
-		//Ambiguities are still remembered in the output polygon.
+		// Ambiguities are still remembered in the output polygon.
 		if (border[i].getAmbiguous() == RawBorderPoint::left)
 			res[j].setAttribute(ContourNode::AMBIGUOUS_LEFT);
 		if (border[i].getAmbiguous() == RawBorderPoint::right)
@@ -836,15 +823,15 @@ inline void reduceBorder(RawBorder &border, Contour &res, bool ambiguitiesCheck)
 
 //--------------------------------------------------------------------------
 
-//Reduction caller and list copier.
+// Reduction caller and list copier.
 inline void reduceBorders(BorderList &borders, Contours &result, bool ambiguitiesCheck)
 {
 	unsigned int i, j;
 
-	//Initialize output container
+	// Initialize output container
 	result.resize(borders.size());
 
-	//Copy results
+	// Copy results
 	for (i = 0; i < borders.size(); ++i) {
 		result[i].resize(borders[i].size());
 		for (j = 0; j < borders[i].size(); ++j) {
@@ -860,8 +847,8 @@ inline void reduceBorders(BorderList &borders, Contours &result, bool ambiguitie
 //    Polygonization Main
 //===========================
 
-//Extracts a polygonal, minimal yet faithful representation of image contours
-//Contours* polygonize(const TRasterP &ras){
+// Extracts a polygonal, minimal yet faithful representation of image contours
+// Contours* polygonize(const TRasterP &ras){
 void polygonize(const TRasterP &ras, Contours &polygons, VectorizerCoreGlobals &g)
 {
 	BorderList *borders;

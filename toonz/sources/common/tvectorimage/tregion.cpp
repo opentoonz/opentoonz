@@ -15,7 +15,7 @@
 // STD includes
 #include <set>
 
-//DEFINE_CLASS_CODE(TEdge, 40)
+// DEFINE_CLASS_CODE(TEdge, 40)
 
 //=============================================================================
 /*
@@ -27,15 +27,14 @@ void foo()
 
   TEdge *e = new TEdge;
 
-  
+
 
 }
 */
 
 //=============================================================================
 
-bool compareEdge(const TEdge &a,
-				 const TEdge &b)
+bool compareEdge(const TEdge &a, const TEdge &b)
 {
 	return a.m_s == b.m_s;
 }
@@ -46,7 +45,7 @@ class TRegion::Imp
 {
 	double m_polyStep;
 
-public:
+  public:
 	TRegionProp *m_prop;
 
 	mutable TRectD m_bBox;
@@ -55,9 +54,12 @@ public:
 	std::vector<TEdge *> m_edge;
 	std::vector<TRegion *> m_includedRegionArray;
 
-public:
+  public:
 	Imp()
-		: m_polyStep(-1), m_prop(0), m_bBox(), m_isValidBBox(true), m_edge(), m_includedRegionArray() {}
+		: m_polyStep(-1), m_prop(0), m_bBox(), m_isValidBBox(true), m_edge(),
+		  m_includedRegionArray()
+	{
+	}
 
 	~Imp()
 	{
@@ -99,7 +101,8 @@ public:
 	bool contains(const TPointD &p) const;
 	bool contains(const TRegion::Imp &p) const;
 
-	//this function returns true only if p is contained in the region, taking into account holes in it.
+	// this function returns true only if p is contained in the region, taking into account holes in
+	// it.
 	bool noSubregionContains(const TPointD &p) const;
 	void addSubregion(TRegion *region);
 	// bool getPointInside(TPointD &p) const;
@@ -110,8 +113,7 @@ public:
 	void computeScanlineIntersections(double y, std::vector<double> &intersections) const;
 	bool thereAreintersections(const TStroke &s) const;
 
-	int leftScanlineIntersections(const TPointD &p,
-								  double(TPointD::*h), double(TPointD::*v)) const;
+	int leftScanlineIntersections(const TPointD &p, double(TPointD::*h), double(TPointD::*v)) const;
 };
 
 //=============================================================================
@@ -134,10 +136,9 @@ TRegion *TRegion::findRegion(const TRegion &r) const
 
 //=============================================================================
 
-TRegion::TRegion()
-	: m_imp(new TRegion::Imp())
+TRegion::TRegion() : m_imp(new TRegion::Imp())
 {
-	//m_imp->m_fillStyle->setRegion(this);
+	// m_imp->m_fillStyle->setRegion(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -149,66 +150,66 @@ TRegion::~TRegion()
 //-----------------------------------------------------------------------------
 /*
 bool TRegion::Imp::contains(const TPointD &p) const
-{  
+{
   bool leftIntersectionsAreOdd=false, rightIntersectionsAreOdd=false;
-  
+
   if (!getBBox().contains(p))
-    return false;
-  
+	return false;
+
   vector<TPointD> poly;
   UINT i=0 ;
   //region2polyline(poly, *this);
-   
+
   for(; i<m_edge.size(); i++)
-    stroke2polyline( poly, *m_edge[i]->m_s, 1.0, m_edge[i]->m_w0, m_edge[i]->m_w1); 
-  
+	stroke2polyline( poly, *m_edge[i]->m_s, 1.0, m_edge[i]->m_w0, m_edge[i]->m_w1);
+
   poly.push_back(poly.front());
 
   TRectD bbox = getBBox();
 
   double dist = (bbox.x1-bbox.x0)*0.5;
-  
+
   TSegment horizSegment = TSegment(TPointD(bbox.x0-dist, p.y),TPointD(bbox.x1+dist, p.y));
-  
+
   for (i=0; i<poly.size()-1; i++)
   {
-    vector<DoublePair> intersections;
-    
-    if (poly[i].y==poly[i+1].y && poly[i+1].y==p.y)
-      continue;
-    
-    if (intersect(TSegment(poly[i], poly[i+1]), horizSegment, 
-      intersections))
-    {
-      assert(intersections.size()==1);
-      
-      TPointD pInt = horizSegment.getPoint(intersections[0].second);
-      if (pInt==poly[i+1])
-        continue;
-      if (pInt.x>p.x)
-        rightIntersectionsAreOdd = !rightIntersectionsAreOdd;
-      else
-        leftIntersectionsAreOdd = !leftIntersectionsAreOdd;
-    }
+	vector<DoublePair> intersections;
+
+	if (poly[i].y==poly[i+1].y && poly[i+1].y==p.y)
+	  continue;
+
+	if (intersect(TSegment(poly[i], poly[i+1]), horizSegment,
+	  intersections))
+	{
+	  assert(intersections.size()==1);
+
+	  TPointD pInt = horizSegment.getPoint(intersections[0].second);
+	  if (pInt==poly[i+1])
+		continue;
+	  if (pInt.x>p.x)
+		rightIntersectionsAreOdd = !rightIntersectionsAreOdd;
+	  else
+		leftIntersectionsAreOdd = !leftIntersectionsAreOdd;
+	}
   }
-  
-  
+
+
   //assert(!(leftIntersectionsAreOdd^rightIntersectionsAreOdd)); //intersections must be even!
-  
+
   return leftIntersectionsAreOdd;
 }
 */
 //-----------------------------------------------------------------------------
 
-//questa funzione fa l'intersezione della porzione [t0, t1) della quadratica q
+// questa funzione fa l'intersezione della porzione [t0, t1) della quadratica q
 // con una retta orizzontale passante per p.y,
-//e setta i due booleani in base a quante intersezioni stanno a sx e a dx di p
+// e setta i due booleani in base a quante intersezioni stanno a sx e a dx di p
 
-//il valore di ritorno dice se l'intersezione e' ad un estremo e se la curva
-//sta tutta sopra(1) o tutta sotto) -1;
-//questo valore viene riusato come input della successiva chiamata a findSide:
-//se anche questa ha l'intersezione allo stesso estremo e sullo stesso
-//lato (cuspide) quell'intersezione non conta(doppia, come con la tangente)
+// il valore di ritorno dice se l'intersezione e' ad un estremo e se la curva
+// sta tutta sopra(1) o tutta sotto) -1;
+// questo valore viene riusato come input della successiva chiamata a findSide:
+// se anche questa ha l'intersezione allo stesso estremo e sullo stesso
+// lato (cuspide) quell'intersezione non conta(doppia, come con la tangente)
 
 //-----------------------------------------------------------------------------
 
@@ -218,18 +219,25 @@ namespace
 inline int computeSide(const TQuadratic &q, double t, bool forward)
 {
 	double speedY = q.getSpeedY(t);
-	if (speedY == 0)																			//se la tangente e' zero, non si riesce a capire su che semipiano sta la curva rispetto alla semiretta orizzontale campione. in questo caso e' sufficiente vedere dove giace il terzo controlpoint della quad .
-		speedY = (forward ? (q.getP2().y - q.getPoint(t).y) : (q.getPoint(t).y - q.getP0().y)); //q.getSpeedY(t+(forward?0.00001:-0.00001));
+	if (speedY == 0) // se la tangente e' zero, non si riesce a capire su che semipiano sta la curva
+					 // rispetto alla semiretta orizzontale campione. in questo caso e' sufficiente
+					 // vedere dove giace il terzo controlpoint della quad .
+		speedY =
+			(forward
+				 ? (q.getP2().y - q.getPoint(t).y)
+				 : (q.getPoint(t).y - q.getP0().y)); // q.getSpeedY(t+(forward?0.00001:-0.00001));
 	return speedY > 0 ? 1 : -1;
 }
 
-inline void computeIntersection(const TQuadratic &q, double t, double t0, double t1, double x, int sideOfPrevious, bool &leftAreOdd)
+inline void computeIntersection(const TQuadratic &q, double t, double t0, double t1, double x,
+								int sideOfPrevious, bool &leftAreOdd)
 {
 	if (((t0 < t1 && t >= t0 && t < t1) || (t0 > t1 && t > t1 && t <= t0)) && q.getX(t) <= x) {
 
 		if (t == t0) {
 			assert(sideOfPrevious != 0);
-			if (computeSide(q, t0, t0 < t1) != sideOfPrevious) //cuspide! non considero l'intersezione
+			if (computeSide(q, t0, t0 < t1) !=
+				sideOfPrevious) // cuspide! non considero l'intersezione
 				return;
 		}
 		leftAreOdd = !leftAreOdd;
@@ -238,11 +246,12 @@ inline void computeIntersection(const TQuadratic &q, double t, double t0, double
 
 //-----------------------------------------------------------------------------
 
-__inline int findSides(const TPointD &p, const TQuadratic &q, double t0, double t1, bool &leftAreOdd, int sideOfPrevious)
+__inline int findSides(const TPointD &p, const TQuadratic &q, double t0, double t1,
+					   bool &leftAreOdd, int sideOfPrevious)
 {
 	TRectD bbox = q.getBBox();
 
-	//assert(!(t0==t1 && q.getPoint(t0).y==p.y));
+	// assert(!(t0==t1 && q.getPoint(t0).y==p.y));
 
 	if (bbox.y0 > p.y || bbox.y1 < p.y)
 		return 0;
@@ -265,12 +274,13 @@ if((q.getPoint(t0).y-p.y)*(q.getPoint(t1).y-p.y)<0)
 	double det;
 	double alfa = y0 - 2 * y1 + y2;
 
-	if (!areAlmostEqual(alfa, 0, 1e-10)) //alfa, il coefficiente di t^2, non e' zero: due soluzioni
+	if (!areAlmostEqual(alfa, 0, 1e-10)) // alfa, il coefficiente di t^2, non e' zero: due soluzioni
 	{
 		det = y1 * y1 - y0 * y2 + p.y * alfa;
-		if (det < 0 || (det == 0 && y0 != p.y && y2 != p.y)) // con det<0 no soluzioni reali o due soluzioni coincidenti
-															 // (a meno che le soluzioni non siano agli estremi, in quel caso e'
-															 //  una sola!), due intersezioni stesso lato, posso scartare
+		if (det < 0 || (det == 0 && y0 != p.y &&
+						y2 != p.y)) // con det<0 no soluzioni reali o due soluzioni coincidenti
+			// (a meno che le soluzioni non siano agli estremi, in quel caso e'
+			//  una sola!), due intersezioni stesso lato, posso scartare
 			return 0;
 		else {
 			double ta, tb;
@@ -284,13 +294,13 @@ if((q.getPoint(t0).y-p.y)*(q.getPoint(t1).y-p.y)<0)
 			}
 
 			if (ta == t1 || tb == t1)
-				return computeSide(q, t1, t1 < t0); //q.getSpeedY(t1)>0?1:-1;
+				return computeSide(q, t1, t1 < t0); // q.getSpeedY(t1)>0?1:-1;
 			else
 				return 0;
 		}
-	} else //alfa, il coefficiente di t^2 e' zero: una  sola soluzione
+	} else // alfa, il coefficiente di t^2 e' zero: una  sola soluzione
 	{
-		if (y2 == y0) //segmento orizzontale
+		if (y2 == y0) // segmento orizzontale
 			return sideOfPrevious;
 		double t = (p.y - y0) / (y2 - y0);
 
@@ -305,7 +315,7 @@ if((q.getPoint(t0).y-p.y)*(q.getPoint(t1).y-p.y)<0)
 			}
 		}
 		if (t == t1)
-			return (y2 - y0 > 0) ? 1 : -1; //q.getPoint(t0).y>p.y?1:-1;
+			return (y2 - y0 > 0) ? 1 : -1; // q.getPoint(t0).y>p.y?1:-1;
 		else
 			return 0;
 	}
@@ -313,7 +323,9 @@ if((q.getPoint(t0).y-p.y)*(q.getPoint(t1).y-p.y)<0)
 
 //-----------------------------------------------------------------------------
 
-void addIntersection(const TQuadratic &q, double t, double t0, double t1, std::vector<double> &intersections, double intersection, std::vector<int> &sides)
+void addIntersection(const TQuadratic &q, double t, double t0, double t1,
+					 std::vector<double> &intersections, double intersection,
+					 std::vector<int> &sides)
 {
 	int side = 0;
 
@@ -323,7 +335,7 @@ void addIntersection(const TQuadratic &q, double t, double t0, double t1, std::v
 		side = (q.getPoint(t1 + ((t0 > t1) ? 0.01 : -0.01)).y - q.getPoint(t1).y) > 0 ? 1 : -1;
 
 	if (!intersections.empty() && areAlmostEqual(intersection, intersections.back(), 1e-4)) {
-		//assert(areAlmostEqual(t, t0, 1e-3));
+		// assert(areAlmostEqual(t, t0, 1e-3));
 		assert(sides.back() != 0);
 
 		if (side == sides.back()) {
@@ -338,8 +350,8 @@ void addIntersection(const TQuadratic &q, double t, double t0, double t1, std::v
 
 //-----------------------------------------------------------------------------
 
-void findIntersections(double y, const TQuadratic &q, double t0, double t1, std::vector<double> &intersections,
-					   std::vector<int> &sides)
+void findIntersections(double y, const TQuadratic &q, double t0, double t1,
+					   std::vector<double> &intersections, std::vector<int> &sides)
 {
 
 	TRectD bbox = q.getBBox();
@@ -354,7 +366,7 @@ void findIntersections(double y, const TQuadratic &q, double t0, double t1, std:
 
 	double alfa = y0 - 2 * y1 + y2;
 
-	if (!areAlmostEqual(alfa, 0, 1e-10)) //la quadratica non e' un segmento
+	if (!areAlmostEqual(alfa, 0, 1e-10)) // la quadratica non e' un segmento
 	{
 
 		double det = y1 * y1 - y0 * y2 + y * alfa;
@@ -365,23 +377,26 @@ void findIntersections(double y, const TQuadratic &q, double t0, double t1, std:
 			double t = (y0 - y1) / alfa;
 			if (areAlmostEqual(t, t0, 1e-5) || areAlmostEqual(t, t1, 1e-5)) {
 				double s = 1 - t;
-				double intersection = q.getP0().x * s * s + 2 * t * s * q.getP1().x + t * t * q.getP2().x;
+				double intersection =
+					q.getP0().x * s * s + 2 * t * s * q.getP1().x + t * t * q.getP2().x;
 				addIntersection(q, t, t0, t1, intersections, intersection, sides);
 			}
 		} else {
 			double ta, tb;
 			bool rev = q.getPoint(t0).x > q.getPoint(t1).x;
-			//if (alfa<0) rev = !rev;
+			// if (alfa<0) rev = !rev;
 
 			det = sqrt(det);
 
 			ta = (y0 - y1 + det) / alfa;
 			double sa = 1 - ta;
-			double intersectiona = q.getP0().x * sa * sa + 2 * ta * sa * q.getP1().x + ta * ta * q.getP2().x;
+			double intersectiona =
+				q.getP0().x * sa * sa + 2 * ta * sa * q.getP1().x + ta * ta * q.getP2().x;
 
 			tb = (y0 - y1 - det) / alfa;
 			double sb = 1 - tb;
-			double intersectionb = q.getP0().x * sb * sb + 2 * tb * sb * q.getP1().x + tb * tb * q.getP2().x;
+			double intersectionb =
+				q.getP0().x * sb * sb + 2 * tb * sb * q.getP1().x + tb * tb * q.getP2().x;
 
 			if ((rev && intersectiona < intersectionb) || (!rev && intersectiona > intersectionb))
 				tswap(intersectiona, intersectionb), tswap(ta, tb);
@@ -392,7 +407,7 @@ void findIntersections(double y, const TQuadratic &q, double t0, double t1, std:
 			if ((t0 < t1 && tb >= t0 && tb <= t1) || (t0 >= t1 && tb >= t1 && tb <= t0))
 				addIntersection(q, tb, t0, t1, intersections, intersectionb, sides);
 		}
-	} else if (y2 != y0) //la quadratica e' un segmento non orizzontale
+	} else if (y2 != y0) // la quadratica e' un segmento non orizzontale
 	{
 		if (y2 == y0)
 			return;
@@ -407,7 +422,7 @@ void findIntersections(double y, const TQuadratic &q, double t0, double t1, std:
 		else if (areAlmostEqual(t, t0, 1e-4))
 			side = (q.getPoint(t1).y > q.getPoint(t0).y) ? 1 : -1;
 		if (!intersections.empty() && areAlmostEqual(intersection, intersections.back(), 1e-4)) {
-			//assert(areAlmostEqual(t, t0, 1e-4));
+			// assert(areAlmostEqual(t, t0, 1e-4));
 			assert(sides.back() != 0);
 			assert(side != 0);
 			if (side == sides.back()) {
@@ -419,8 +434,11 @@ void findIntersections(double y, const TQuadratic &q, double t0, double t1, std:
 			sides.push_back(side);
 		}
 
-	} else //la quadratica e' un segmento orizzontale
-		findIntersections(y, TQuadratic(q.getPoint(t0), 0.5 * (q.getPoint(t0) + q.getPoint(t1)) + TPointD(0, 1.0), q.getPoint(t1)), 0, 1, intersections, sides);
+	} else // la quadratica e' un segmento orizzontale
+		findIntersections(y, TQuadratic(q.getPoint(t0),
+										0.5 * (q.getPoint(t0) + q.getPoint(t1)) + TPointD(0, 1.0),
+										q.getPoint(t1)),
+						  0, 1, intersections, sides);
 }
 }
 //-----------------------------------------------------------------------------
@@ -464,18 +482,18 @@ bool TRegion::getPointInside(TPointD &p) const
 
 TRegionProp *TRegion::getProp()
 {
-	//if(m_working)  buttato m_working
+	// if(m_working)  buttato m_working
 	return m_imp->m_prop;
 	/*
   int styleId = getStyle();
   if(!styleId ) return 0;
-  TColorStyle * style = palette->getStyle(styleId); 
+  TColorStyle * style = palette->getStyle(styleId);
   if (!style->isRegionStyle() || style->isEnabled() == false)
-    return 0;
+	return 0;
   if( !m_imp->m_prop || style != m_imp->m_prop->getColorStyle() )
   {
-    delete m_imp->m_prop;     
-    m_imp->m_prop = style->makeRegionProp(this);
+	delete m_imp->m_prop;
+	m_imp->m_prop = style->makeRegionProp(this);
   }
   return m_imp->m_prop;
 */
@@ -499,18 +517,18 @@ void TRegion::draw(const TVectorRenderData &rd)
   int styleId = getStyle();
 
   if(!styleId )
-    return;
+	return;
 
   TColorStyle * style = rd.m_palette->getStyle(styleId);
- 
+
   if (!style->isRegionStyle() || style->isEnabled() == false)
-    return;
-     
+	return;
+
 
   if( !m_imp->m_prop || style != m_imp->m_prop->getColorStyle() )
   {
-    delete m_imp->m_prop;     
-    m_imp->m_prop = style->makeRegionProp(this);
+	delete m_imp->m_prop;
+	m_imp->m_prop = style->makeRegionProp(this);
   }
 
   m_imp->m_prop->draw(rd);
@@ -547,12 +565,9 @@ void checkPolyline(const std::vector<T3DPointD> &p)
 
 			ret = intersect(s0, s1, res);
 			if (ret)
-				assert(
-					(ret == 1) &&
-					(areAlmostEqual(res[0].first, 1) ||
-					 areAlmostEqual(res[0].first, 0)) &&
-					(areAlmostEqual(res[0].second, 1) ||
-					 areAlmostEqual(res[0].second, 0)));
+				assert((ret == 1) &&
+					   (areAlmostEqual(res[0].first, 1) || areAlmostEqual(res[0].first, 0)) &&
+					   (areAlmostEqual(res[0].second, 1) || areAlmostEqual(res[0].second, 0)));
 		}
 	}
 
@@ -570,12 +585,9 @@ void checkPolyline(const std::vector<T3DPointD> &p)
 
 		ret = intersect(s0, s1, res);
 		if (ret)
-			assert(
-				(ret == 1) &&
-				(areAlmostEqual(res[0].first, 1) ||
-				 areAlmostEqual(res[0].first, 0)) &&
-				(areAlmostEqual(res[0].second, 1) ||
-				 areAlmostEqual(res[0].second, 0)));
+			assert((ret == 1) &&
+				   (areAlmostEqual(res[0].first, 1) || areAlmostEqual(res[0].first, 0)) &&
+				   (areAlmostEqual(res[0].second, 1) || areAlmostEqual(res[0].second, 0)));
 	}
 }
 
@@ -679,14 +691,14 @@ bool TRegion::Imp::contains(const TPointD &p) const
 	if (!getBBox().contains(p))
 		return false;
 
-	//printContains(p);
+	// printContains(p);
 
 	UINT i;
 
 	int side = 0;
 
-	for (i = 0; i < m_edge.size() * 2; i++) //i pari, esplora gli edge,
-											//i dispari esplora i segmenti di autoclose tra un edge e il successivo
+	for (i = 0; i < m_edge.size() * 2; i++) // i pari, esplora gli edge,
+	// i dispari esplora i segmenti di autoclose tra un edge e il successivo
 	{
 		if (i & 0x1) {
 			TPointD p0 = m_edge[i / 2]->m_s->getPoint(m_edge[i / 2]->m_w1);
@@ -700,7 +712,8 @@ bool TRegion::Imp::contains(const TPointD &p) const
 				continue;
 
 			if (!areAlmostEqual(p0, p1, 1e-2))
-				side = findSides(p, TQuadratic(p0, 0.5 * (p0 + p1), p1), 0.0, 1.0, leftAreOdd, side);
+				side =
+					findSides(p, TQuadratic(p0, 0.5 * (p0 + p1), p1), 0.0, 1.0, leftAreOdd, side);
 
 			continue;
 		}
@@ -734,7 +747,7 @@ bool TRegion::Imp::contains(const TPointD &p) const
 		  {
 		  tswap(chunkIndex0, chunkIndex1);
 		  tswap(t0, t1);
-      }*/
+	  }*/
 			if (chunkIndex0 > chunkIndex1) {
 				side = findSides(p, *q0, t0, 0, leftAreOdd, side);
 				for (int j = chunkIndex0 - 1; j > chunkIndex1; j--)
@@ -759,16 +772,13 @@ bool TRegion::Imp::contains(const TPointD &p) const
 
 //-----------------------------------------------------------------------------
 
-int TRegion::Imp::leftScanlineIntersections(
-	const TPointD &p,
-	double(TPointD::*h), double(TPointD::*v)) const
+int TRegion::Imp::leftScanlineIntersections(const TPointD &p, double(TPointD::*h),
+											double(TPointD::*v)) const
 {
 	struct Locals {
 		const Imp *m_this;
-		double m_x, m_y,
-			m_tol;
-		double TPointD::*m_h,
-			TPointD::*m_v;
+		double m_x, m_y, m_tol;
+		double TPointD::*m_h, TPointD::*m_v;
 
 		inline double x(const TPointD &p) const { return p.*m_h; }
 		inline double y(const TPointD &p) const { return p.*m_v; }
@@ -776,15 +786,15 @@ int TRegion::Imp::leftScanlineIntersections(
 		inline double get(const TQuadratic &q, double t, double(TPointD::*val)) const
 		{
 			double one_t = 1.0 - t;
-			return one_t * (one_t * q.getP0().*val + t * q.getP1().*val) + t * (one_t * q.getP1().*val + t * q.getP2().*val);
+			return one_t * (one_t * q.getP0().*val + t * q.getP1().*val) +
+				   t * (one_t * q.getP1().*val + t * q.getP2().*val);
 		}
 
 		inline double getX(const TQuadratic &q, double t) const { return get(q, t, m_h); }
 		inline double getY(const TQuadratic &q, double t) const { return get(q, t, m_v); }
 
-		void getEdgeData(int e, TEdge *&ed, TStroke *&s,
-						 int &chunk0, const TThickQuadratic *&q0, double &t0,
-						 int &chunk1, const TThickQuadratic *&q1, double &t1) const
+		void getEdgeData(int e, TEdge *&ed, TStroke *&s, int &chunk0, const TThickQuadratic *&q0,
+						 double &t0, int &chunk1, const TThickQuadratic *&q1, double &t1) const
 		{
 			ed = m_this->m_edge[e];
 			s = ed->m_s;
@@ -798,19 +808,18 @@ int TRegion::Imp::leftScanlineIntersections(
 
 		bool isInYRange(double y0, double y1) const
 		{
-			return (y0 <= m_y && m_y < y1)	 // Assuming the first endpoint is vertical-including,
-				   || (y1 < m_y && m_y <= y0); // while the latter is not. Vertical conditions are EXACT.
+			return (y0 <= m_y && m_y < y1) // Assuming the first endpoint is vertical-including,
+				   || (y1 < m_y &&
+					   m_y <= y0); // while the latter is not. Vertical conditions are EXACT.
 		}
 
-		bool areInYRange(const TQuadratic &q, double t0, double t1,
-						 int(&solIdx)[2]) const
+		bool areInYRange(const TQuadratic &q, double t0, double t1, int(&solIdx)[2]) const
 		{
 			assert(0.0 <= t0 && t0 <= 1.0), assert(0.0 <= t1 && t1 <= 1.0);
 
 			const TPointD &p0 = q.getP0(), &p1 = q.getP1(), &p2 = q.getP2();
 
-			double der[2] = {y(p1) - y(p0), y(p0) - y(p1) + y(p2) - y(p1)},
-				   s;
+			double der[2] = {y(p1) - y(p0), y(p0) - y(p1) + y(p2) - y(p1)}, s;
 
 			double y0 = getY(q, t0), y1 = getY(q, t1);
 
@@ -826,8 +835,7 @@ int TRegion::Imp::leftScanlineIntersections(
 					solIdx[0] = (ys < m_y && m_y <= y0 || y0 <= m_y && m_y < ys) ? 1 : -1;
 					solIdx[1] = (ys < m_y && m_y < y1 || y1 < m_y && m_y < ys) ? 0 : -1;
 				} else {
-					solIdx[0] = isInYRange(y0, y1) ? (t0 < s) ? 0 : 1
-												   : -1;
+					solIdx[0] = isInYRange(y0, y1) ? (t0 < s) ? 0 : 1 : -1;
 					solIdx[1] = -1;
 				}
 			} else
@@ -841,9 +849,11 @@ int TRegion::Imp::leftScanlineIntersections(
 			const TPointD &p0 = seg.getP0(), &p1 = seg.getP1();
 			bool wasAscending = ascending;
 
-			ascending = (y(p1) > y(p0)) ? true
-										: (y(p1) < y(p0)) ? false
-														  : (wasAscending = !ascending, ascending); // Couples with the cusp check below
+			ascending =
+				(y(p1) > y(p0)) ? true : (y(p1) < y(p0))
+											 ? false
+											 : (wasAscending = !ascending,
+												ascending); // Couples with the cusp check below
 
 			if (!isInYRange(y(p0), y(p1)))
 				return 0;
@@ -852,45 +862,44 @@ int TRegion::Imp::leftScanlineIntersections(
 				return int(x(p0) < m_x && ascending == wasAscending); // Cusps treated here
 
 			double y1_y0 = y(p1) - y(p0), // (x, m_y) in (p0, p1) from here on
-				poly[2] = {(m_y - y(p0)) * (x(p1) - x(p0)), -y1_y0},
-				   sx_x0;
+				poly[2] = {(m_y - y(p0)) * (x(p1) - x(p0)), -y1_y0}, sx_x0;
 
-			return tcg::poly_ops::solve_1(poly, &sx_x0, m_tol) ? int(sx_x0 < m_x - x(p0))
-															   : int(x(p0) < m_x && x(p1) < m_x); // Almost horizontal segments are
-		}																						  // flattened along the axes
+			return tcg::poly_ops::solve_1(poly, &sx_x0, m_tol)
+					   ? int(sx_x0 < m_x - x(p0))
+					   : int(x(p0) < m_x && x(p1) < m_x); // Almost horizontal segments are
+		}												  // flattened along the axes
 
 		int isAscending(const TThickQuadratic &q, double t, bool forward)
 		{
-			double y0 = y(q.getP0()), y1 = y(q.getP1()), y2 = y(q.getP2()),
-				   y1_y0 = y1 - y0, y2_y1 = y2 - y1;
+			double y0 = y(q.getP0()), y1 = y(q.getP1()), y2 = y(q.getP2()), y1_y0 = y1 - y0,
+				   y2_y1 = y2 - y1;
 
 			double yspeed_2 = tcg::numeric_ops::lerp(y1_y0, y2_y1, t) * (2 * int(forward) - 1),
 				   yaccel = y2_y1 - y1_y0;
 
-			return (yspeed_2 > 0.0) ? 1
-									: (yspeed_2 < 0.0) ? -1
-													   : tcg::numeric_ops::sign(yaccel);
+			return (yspeed_2 > 0.0) ? 1 : (yspeed_2 < 0.0) ? -1 : tcg::numeric_ops::sign(yaccel);
 		}
 
-		int leftScanlineIntersections(const TQuadratic &q, double t0, double t1,
-									  bool &ascending)
+		int leftScanlineIntersections(const TQuadratic &q, double t0, double t1, bool &ascending)
 		{
 			const TPointD &p0 = q.getP0(), &p1 = q.getP1(), &p2 = q.getP2();
 
-			double y1_y0 = y(p1) - y(p0),
-				   accel = y(p2) - y(p1) - y1_y0;
+			double y1_y0 = y(p1) - y(p0), accel = y(p2) - y(p1) - y1_y0;
 
 			// Fallback to segment case whenever we have too flat quads
 			if (std::fabs(accel) < m_tol)
-				return leftScanlineIntersections(TSegment(q.getPoint(t0), q.getPoint(t1)), ascending);
+				return leftScanlineIntersections(TSegment(q.getPoint(t0), q.getPoint(t1)),
+												 ascending);
 
 			// Calculate new ascension
 			int ascends = isAscending(q, t1, t0 < t1);
 			bool wasAscending = ascending;
 
-			ascending = (ascends > 0) ? true
-									  : (ascends < 0) ? false
-													  : (wasAscending = !ascending, ascending); // Couples with the cusps check below
+			ascending =
+				(ascends > 0) ? true : (ascends < 0)
+										   ? false
+										   : (wasAscending = !ascending,
+											  ascending); // Couples with the cusps check below
 
 			// In case the y coords are not in range, quit
 			int solIdx[2];
@@ -898,16 +907,17 @@ int TRegion::Imp::leftScanlineIntersections(
 				return 0;
 
 			// Identify coordinates for which  q(t) == y
-			double poly[3] = {y(p0) - m_y, 2.0 * y1_y0, accel},
-				   s[2];
+			double poly[3] = {y(p0) - m_y, 2.0 * y1_y0, accel}, s[2];
 
-			int sCount = tcg::poly_ops::solve_2(poly, s); // Tolerance dealt at the first bailout above
+			int sCount =
+				tcg::poly_ops::solve_2(poly, s); // Tolerance dealt at the first bailout above
 			if (sCount == 2) {
 				// Calculate result
 				int result = 0;
 
 				if (solIdx[0] >= 0) {
-					result += int(getX(q, s[solIdx[0]]) < m_x && (getY(q, t0) != m_y || ascending == wasAscending)); // Cusp check
+					result += int(getX(q, s[solIdx[0]]) < m_x &&
+								  (getY(q, t0) != m_y || ascending == wasAscending)); // Cusp check
 				}
 
 				if (solIdx[1] >= 0)
@@ -916,8 +926,9 @@ int TRegion::Imp::leftScanlineIntersections(
 				return result;
 			}
 
-			return (assert(sCount == 0), 0); // Should never happen, since m_y is in range. If it ever happens,
-											 // it must be close to the extremal - so quit with no intersections.
+			return (assert(sCount == 0),
+					0); // Should never happen, since m_y is in range. If it ever happens,
+						// it must be close to the extremal - so quit with no intersections.
 		}
 
 	} locals = {this, p.*h, p.*v, 1e-4, h, v};
@@ -946,14 +957,16 @@ int TRegion::Imp::leftScanlineIntersections(
 					leftInters += locals.leftScanlineIntersections(*q0, t0, 1.0, ascending);
 
 					for (int c = chunk0 + 1; c != chunk1; ++c)
-						leftInters += locals.leftScanlineIntersections(*s->getChunk(c), 0.0, 1.0, ascending);
+						leftInters +=
+							locals.leftScanlineIntersections(*s->getChunk(c), 0.0, 1.0, ascending);
 
 					leftInters += locals.leftScanlineIntersections(*q1, 0.0, t1, ascending);
 				} else {
 					leftInters += locals.leftScanlineIntersections(*q0, t0, 0.0, ascending);
 
 					for (int c = chunk0 - 1; c != chunk1; --c)
-						leftInters += locals.leftScanlineIntersections(*s->getChunk(c), 1.0, 0.0, ascending);
+						leftInters +=
+							locals.leftScanlineIntersections(*s->getChunk(c), 1.0, 0.0, ascending);
 
 					leftInters += locals.leftScanlineIntersections(*q1, 1.0, t1, ascending);
 				}
@@ -1068,25 +1081,25 @@ if (!r.getBBox().contains(getBBox()))
 for (i=0; i<m_edge.size(); i++)
   {
   for (j=0, found=false; !found && j<r.m_edge.size(); j++)
-    if (m_edge[i]->m_s==r.m_edge[j]->m_s)
-      {
-      double w0 = tmin(m_edge[i]->m_w0, m_edge[i]->m_w1) ;
-      double w1 = tmax(m_edge[i]->m_w0, m_edge[i]->m_w1) ;
-      double r_w0 = tmin(r.m_edge[j]->m_w0, r.m_edge[j]->m_w1);
-      double r_w1 = tmax(r.m_edge[j]->m_w0, r.m_edge[j]->m_w1);
+	if (m_edge[i]->m_s==r.m_edge[j]->m_s)
+	  {
+	  double w0 = tmin(m_edge[i]->m_w0, m_edge[i]->m_w1) ;
+	  double w1 = tmax(m_edge[i]->m_w0, m_edge[i]->m_w1) ;
+	  double r_w0 = tmin(r.m_edge[j]->m_w0, r.m_edge[j]->m_w1);
+	  double r_w1 = tmax(r.m_edge[j]->m_w0, r.m_edge[j]->m_w1);
 
-      if ((w0>=r_w0 || areAlmostEqual(w0, r_w0, 0.1)) && 
-          (w1<=r_w1 || areAlmostEqual(w1, r_w1, 0.1)))
-        {
-        found=true;
-        areTouching = true;
-        }
-      else
-        found=false;
-      //found=true;
-      }
+	  if ((w0>=r_w0 || areAlmostEqual(w0, r_w0, 0.1)) &&
+		  (w1<=r_w1 || areAlmostEqual(w1, r_w1, 0.1)))
+		{
+		found=true;
+		areTouching = true;
+		}
+	  else
+		found=false;
+	  //found=true;
+	  }
   if ((!found) && !r.contains(m_edge[i]->m_s->getPoint(0.5*(m_edge[i]->m_w0+m_edge[i]->m_w1))))
-    return false;
+	return false;
   }
 return areTouching;
 }
@@ -1106,11 +1119,13 @@ bool TRegion::Imp::isSubRegionOf(const TRegion::Imp &r) const
 				(subE->m_w0 < m_edge[i]->m_w1) == (e->m_w0 < e->m_w1)) {
 				bool forward = (e->m_w0 < e->m_w1);
 
-				if (forward && (subE->m_w0 >= e->m_w0 || areAlmostEqual(subE->m_w0, e->m_w0, 1e-3)) &&
+				if (forward &&
+					(subE->m_w0 >= e->m_w0 || areAlmostEqual(subE->m_w0, e->m_w0, 1e-3)) &&
 					(subE->m_w1 <= e->m_w1 || areAlmostEqual(subE->m_w1, e->m_w1, 1e-3)))
 					return true;
 
-				if (!forward && (subE->m_w0 <= e->m_w0 || areAlmostEqual(subE->m_w0, e->m_w0, 1e-3)) &&
+				if (!forward &&
+					(subE->m_w0 <= e->m_w0 || areAlmostEqual(subE->m_w0, e->m_w0, 1e-3)) &&
 					(subE->m_w1 >= e->m_w1 || areAlmostEqual(subE->m_w1, e->m_w1, 1e-3)))
 					return true;
 			}
@@ -1133,7 +1148,8 @@ TRegion *TRegion::getRegion(const TPointD &p)
 
 bool TRegion::getInternalPoint(TPointD &p)
 {
-	return m_imp->getInternalPoint(p, getBBox().x0, getBBox().x1, 0.5 * (getBBox().y0 + getBBox().y1));
+	return m_imp->getInternalPoint(p, getBBox().x0, getBBox().x1,
+								   0.5 * (getBBox().y0 + getBBox().y1));
 }
 
 //-----------------------------------------------------------------------------
@@ -1199,16 +1215,14 @@ TRectD TRegion::getBBox() const
 void TRegion::addEdge(TEdge *e, bool minimizeEdges)
 {
 
-	if (minimizeEdges &&
-		e->m_s->getMaxThickness() > 0.0 && //outline strokes ignore this
-		!m_imp->m_edge.empty() &&
-		m_imp->m_edge.back()->m_index == e->m_index &&
+	if (minimizeEdges && e->m_s->getMaxThickness() > 0.0 && // outline strokes ignore this
+		!m_imp->m_edge.empty() && m_imp->m_edge.back()->m_index == e->m_index &&
 		areAlmostEqual(m_imp->m_edge.back()->m_w1, e->m_w0, 1e-5))
 		m_imp->m_edge.back()->m_w1 = e->m_w1;
 	else
 		m_imp->m_edge.push_back(e);
 	m_imp->m_isValidBBox = false;
-	//if (e->m_s->isSelfLoop())
+	// if (e->m_s->isSelfLoop())
 	//  assert(m_imp->m_edge.size()==1);
 }
 
@@ -1283,7 +1297,7 @@ void TRegion::deleteSubregion(UINT index)
 {
 	assert(m_imp->m_includedRegionArray[index]->getSubregionCount() == 0);
 
-	//delete m_imp->m_includedRegionArray[index];
+	// delete m_imp->m_includedRegionArray[index];
 	m_imp->m_includedRegionArray.erase(m_imp->m_includedRegionArray.begin() + index);
 }
 
@@ -1327,8 +1341,13 @@ void TRegion::print()
 	std::cout << "\nNum edges: " << getEdgeCount() << std::endl;
 	for (UINT i = 0; i < getEdgeCount(); i++) {
 		std::cout << "\nEdge #" << i;
-		std::cout << ":P0(" << getEdge(i)->m_s->getChunk(0)->getP0().x << "," << getEdge(i)->m_s->getChunk(0)->getP0().y << ")";
-		std::cout << ":P2(" << getEdge(i)->m_s->getChunk(getEdge(i)->m_s->getChunkCount() - 1)->getP2().x << "," << getEdge(i)->m_s->getChunk(getEdge(i)->m_s->getChunkCount() - 1)->getP2().y << ")";
+		std::cout << ":P0(" << getEdge(i)->m_s->getChunk(0)->getP0().x << ","
+				  << getEdge(i)->m_s->getChunk(0)->getP0().y << ")";
+		std::cout << ":P2("
+				  << getEdge(i)->m_s->getChunk(getEdge(i)->m_s->getChunkCount() - 1)->getP2().x
+				  << ","
+				  << getEdge(i)->m_s->getChunk(getEdge(i)->m_s->getChunkCount() - 1)->getP2().y
+				  << ")";
 		std::cout << std::endl;
 	}
 	if (m_imp->m_includedRegionArray.size()) {
@@ -1350,11 +1369,11 @@ void TRegion::setStyle(int colorStyle)
 	/*
   if (!colorStyle || (colorStyle && colorStyle->isFillStyle())  )
   {
-    for (UINT i=0; i<getEdgeCount(); i++)
-      getEdge(i)->setColorStyle(colorStyle);
+	for (UINT i=0; i<getEdgeCount(); i++)
+	  getEdge(i)->setColorStyle(colorStyle);
 
-    delete m_imp->m_prop;
-    m_imp->m_prop = 0;
+	delete m_imp->m_prop;
+	m_imp->m_prop = 0;
   }
   */
 }
@@ -1369,13 +1388,13 @@ TRegionId TRegion::getId()
 	for (UINT i = 0; i < m_imp->m_edge.size(); i++)
 		if (m_imp->m_edge[i]->m_index >= 0) {
 			edge = m_imp->m_edge[i];
-			return TRegionId(edge->m_s->getId(),
-							 (float)((edge->m_w0 + edge->m_w1) * 0.5), edge->m_w0 < edge->m_w1);
+			return TRegionId(edge->m_s->getId(), (float)((edge->m_w0 + edge->m_w1) * 0.5),
+							 edge->m_w0 < edge->m_w1);
 		}
 
 	edge = m_imp->m_edge[0];
-	return TRegionId(edge->m_s->getId(),
-					 (float)((edge->m_w0 + edge->m_w1) * 0.5), edge->m_w0 < edge->m_w1);
+	return TRegionId(edge->m_s->getId(), (float)((edge->m_w0 + edge->m_w1) * 0.5),
+					 edge->m_w0 < edge->m_w1);
 }
 
 //-----------------------------------------------------------------------------
@@ -1395,7 +1414,7 @@ int TRegion::getStyle() const
 	for (; i < n; i++) {
 		int styleId = getEdge(i)->getStyle();
 		if (styleId != 0 && ret == 0) {
-			//assert(styleId<100);
+			// assert(styleId<100);
 			ret = styleId;
 			if (i > 0)
 				for (j = 0; j < i; j++)
@@ -1414,15 +1433,16 @@ void TRegion::addSubregion(TRegion *region)
 
 void TRegion::Imp::addSubregion(TRegion *region)
 {
-	for (std::vector<TRegion *>::iterator it = m_includedRegionArray.begin(); it != m_includedRegionArray.end(); ++it) {
+	for (std::vector<TRegion *>::iterator it = m_includedRegionArray.begin();
+		 it != m_includedRegionArray.end(); ++it) {
 		if (region->contains(**it)) {
-			//region->addSubregion(*it);
+			// region->addSubregion(*it);
 			region->addSubregion(*it);
 			it = m_includedRegionArray.erase(it);
 			while (it != m_includedRegionArray.end()) {
 				if (region->contains(**it)) {
 					region->addSubregion(*it);
-					//region->addSubregion(*it);
+					// region->addSubregion(*it);
 					it = m_includedRegionArray.erase(it);
 				} else
 					it++;

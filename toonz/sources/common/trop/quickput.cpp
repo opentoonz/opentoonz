@@ -15,9 +15,9 @@
 #endif
 */
 
-//The following must be old IRIX code. Should be re-tested.
-//It seems that gcc compiles it, but requiring a LOT of
-//resources... very suspect...
+// The following must be old IRIX code. Should be re-tested.
+// It seems that gcc compiles it, but requiring a LOT of
+// resources... very suspect...
 
 /*#ifdef __LP64__
 #include "optimize_for_lp64.h"
@@ -28,17 +28,15 @@
 //=============================================================================
 
 #ifdef OPTIMIZE_FOR_LP64
-void quickResample_optimized(
-	const TRasterP &dn,
-	const TRasterP &up,
-	const TAffine &aff,
-	TRop::ResampleFilterType filterType);
+void quickResample_optimized(const TRasterP &dn, const TRasterP &up, const TAffine &aff,
+							 TRop::ResampleFilterType filterType);
 #endif
 
 namespace
 {
 
-inline TPixel32 applyColorScale(const TPixel32 &color, const TPixel32 &colorScale, bool toBePremultiplied = false)
+inline TPixel32 applyColorScale(const TPixel32 &color, const TPixel32 &colorScale,
+								bool toBePremultiplied = false)
 {
 	/*-- 半透明のラスタをViewer上で半透明にquickputするとき、色が暗くなってしまうのを防ぐ --*/
 	if (colorScale.r == 0 && colorScale.g == 0 && colorScale.b == 0) {
@@ -46,13 +44,15 @@ inline TPixel32 applyColorScale(const TPixel32 &color, const TPixel32 &colorScal
 		if (toBePremultiplied)
 			return TPixel32(color.r, color.g, color.b, color.m * colorScale.m / 255);
 		else
-			return TPixel32(color.r * colorScale.m / 255, color.g * colorScale.m / 255, color.b * colorScale.m / 255, color.m * colorScale.m / 255);
+			return TPixel32(color.r * colorScale.m / 255, color.g * colorScale.m / 255,
+							color.b * colorScale.m / 255, color.m * colorScale.m / 255);
 	}
 	int r = color.r + colorScale.r;
 	int g = color.g + colorScale.g;
 	int b = color.b + colorScale.b;
 
-	return premultiply(TPixel32(r > 255 ? 255 : r, g > 255 ? 255 : g, b > 255 ? 255 : b, color.m * colorScale.m / 255));
+	return premultiply(TPixel32(r > 255 ? 255 : r, g > 255 ? 255 : g, b > 255 ? 255 : b,
+								color.m * colorScale.m / 255));
 }
 
 //------------------------------------------------------------------------------
@@ -63,15 +63,13 @@ inline TPixel32 applyColorScaleCMapped(const TPixel32 &color, const TPixel32 &co
 	int g = color.g + colorScale.g;
 	int b = color.b + colorScale.b;
 
-	return premultiply(TPixel32(r > 255 ? 255 : r, g > 255 ? 255 : g, b > 255 ? 255 : b, color.m * colorScale.m / 255));
+	return premultiply(TPixel32(r > 255 ? 255 : r, g > 255 ? 255 : g, b > 255 ? 255 : b,
+								color.m * colorScale.m / 255));
 }
 
 //------------------------------------------------------------------------------
 
-void doQuickPutFilter(
-	const TRaster32P &dn,
-	const TRaster32P &up,
-	const TAffine &aff)
+void doQuickPutFilter(const TRaster32P &dn, const TRaster32P &up, const TAffine &aff)
 {
 	//  se aff e' degenere la controimmagine di up e' un segmento (o un punto)
 	if ((aff.a11 * aff.a22 - aff.a12 * aff.a21) == 0)
@@ -87,8 +85,8 @@ void doQuickPutFilter(
 	//  disponibili per la parte intera di xL, yL)
 	assert(tmax(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
 
-	TRectD boundingBoxD = TRectD(convert(dn->getSize())) *
-						  (aff * TRectD(0, 0, up->getLx() - 2, up->getLy() - 2));
+	TRectD boundingBoxD =
+		TRectD(convert(dn->getSize())) * (aff * TRectD(0, 0, up->getLx() - 2, up->getLy() - 2));
 	//  clipping
 	if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
 		return;
@@ -267,8 +265,7 @@ void doQuickPutFilter(
 			int xI = xL >> PADN; //	troncato
 			int yI = yL >> PADN; //	troncato
 
-			assert((0 <= xI) && (xI <= up->getLx() - 1) &&
-				   (0 <= yI) && (yI <= up->getLy() - 1));
+			assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) && (yI <= up->getLy() - 1));
 
 			//  (xI, yI)
 			TPixel32 *upPix00 = upBasePix + (yI * upWrap + xI);
@@ -289,29 +286,17 @@ void doQuickPutFilter(
 			int yWeight0 = (1 << PADN) - yWeight1;
 
 			//  filtro bilineare 4 pixels: media pesata sui singoli canali
-			int rColDownTmp = (xWeight0 * (upPix00->r) +
-							   xWeight1 * ((upPix10)->r)) >>
-							  PADN;
+			int rColDownTmp = (xWeight0 * (upPix00->r) + xWeight1 * ((upPix10)->r)) >> PADN;
 
-			int gColDownTmp = (xWeight0 * (upPix00->g) +
-							   xWeight1 * ((upPix10)->g)) >>
-							  PADN;
+			int gColDownTmp = (xWeight0 * (upPix00->g) + xWeight1 * ((upPix10)->g)) >> PADN;
 
-			int bColDownTmp = (xWeight0 * (upPix00->b) +
-							   xWeight1 * ((upPix10)->b)) >>
-							  PADN;
+			int bColDownTmp = (xWeight0 * (upPix00->b) + xWeight1 * ((upPix10)->b)) >> PADN;
 
-			int rColUpTmp = (xWeight0 * ((upPix01)->r) +
-							 xWeight1 * ((upPix11)->r)) >>
-							PADN;
+			int rColUpTmp = (xWeight0 * ((upPix01)->r) + xWeight1 * ((upPix11)->r)) >> PADN;
 
-			int gColUpTmp = (xWeight0 * ((upPix01)->g) +
-							 xWeight1 * ((upPix11)->g)) >>
-							PADN;
+			int gColUpTmp = (xWeight0 * ((upPix01)->g) + xWeight1 * ((upPix11)->g)) >> PADN;
 
-			int bColUpTmp = (xWeight0 * ((upPix01)->b) +
-							 xWeight1 * ((upPix11)->b)) >>
-							PADN;
+			int bColUpTmp = (xWeight0 * ((upPix01)->b) + xWeight1 * ((upPix11)->b)) >> PADN;
 
 			unsigned char rCol =
 				(unsigned char)((yWeight0 * rColDownTmp + yWeight1 * rColUpTmp) >> PADN);
@@ -340,15 +325,9 @@ void doQuickPutFilter(
 //=============================================================================
 //=============================================================================
 
-void doQuickPutNoFilter(
-	const TRaster32P &dn,
-	const TRaster32P &up,
-	const TAffine &aff,
-	const TPixel32 &colorScale,
-	bool doPremultiply,
-	bool whiteTransp,
-	bool firstColumn,
-	bool doRasterDarkenBlendedView)
+void doQuickPutNoFilter(const TRaster32P &dn, const TRaster32P &up, const TAffine &aff,
+						const TPixel32 &colorScale, bool doPremultiply, bool whiteTransp,
+						bool firstColumn, bool doRasterDarkenBlendedView)
 {
 	//  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
 	//  di up e' un segmento (o un punto)
@@ -555,8 +534,7 @@ void doQuickPutNoFilter(
 			int xI = xL >> PADN; //  round
 			int yI = yL >> PADN; //  round
 
-			assert((0 <= xI) && (xI <= up->getLx() - 1) &&
-				   (0 <= yI) && (yI <= up->getLy() - 1));
+			assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) && (yI <= up->getLy() - 1));
 
 			TPixel32 upPix = *(upBasePix + (yI * upWrap + xI));
 
@@ -588,12 +566,8 @@ void doQuickPutNoFilter(
 //=============================================================================
 //=============================================================================
 
-void doQuickPutNoFilter(
-	const TRaster32P &dn,
-	const TRaster64P &up,
-	const TAffine &aff,
-	bool doPremultiply,
-	bool firstColumn)
+void doQuickPutNoFilter(const TRaster32P &dn, const TRaster64P &up, const TAffine &aff,
+						bool doPremultiply, bool firstColumn)
 {
 	//  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
 	//  di up e' un segmento (o un punto)
@@ -800,8 +774,7 @@ void doQuickPutNoFilter(
 			int xI = xL >> PADN; //  round
 			int yI = yL >> PADN; //  round
 
-			assert((0 <= xI) && (xI <= up->getLx() - 1) &&
-				   (0 <= yI) && (yI <= up->getLy() - 1));
+			assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) && (yI <= up->getLy() - 1));
 
 			TPixel64 *upPix = upBasePix + (yI * upWrap + xI);
 			if (firstColumn)
@@ -823,11 +796,8 @@ void doQuickPutNoFilter(
 //=============================================================================
 //=============================================================================
 
-void doQuickPutNoFilter(
-	const TRaster32P &dn,
-	const TRasterGR8P &up,
-	const TAffine &aff,
-	const TPixel32 &colorScale)
+void doQuickPutNoFilter(const TRaster32P &dn, const TRasterGR8P &up, const TAffine &aff,
+						const TPixel32 &colorScale)
 {
 	if ((aff.a11 * aff.a22 - aff.a12 * aff.a21) == 0)
 		return;
@@ -956,8 +926,7 @@ void doQuickPutNoFilter(
 			int xI = xL >> PADN; //  round
 			int yI = yL >> PADN; //  round
 
-			assert((0 <= xI) && (xI <= up->getLx() - 1) &&
-				   (0 <= yI) && (yI <= up->getLy() - 1));
+			assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) && (yI <= up->getLy() - 1));
 
 			TPixelGR8 *upPix = upBasePix + (yI * upWrap + xI);
 			if (colorScale == TPixel32::Black) {
@@ -986,11 +955,8 @@ void doQuickPutNoFilter(
 
 //=============================================================================
 
-void doQuickPutFilter(
-	const TRaster32P &dn,
-	const TRaster32P &up,
-	double sx, double sy,
-	double tx, double ty)
+void doQuickPutFilter(const TRaster32P &dn, const TRaster32P &up, double sx, double sy, double tx,
+					  double ty)
 {
 	//  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
 	//  di up e' un segmento (o un punto)
@@ -1008,8 +974,8 @@ void doQuickPutFilter(
 	//  max dimensioni di up gestibili (limite imposto dal numero di bit
 	//  disponibili per la parte intera di xL, yL)
 	TAffine aff(sx, 0, tx, 0, sy, ty);
-	TRectD boundingBoxD = TRectD(convert(dn->getSize())) *
-						  (aff * TRectD(0, 0, up->getLx() - 2, up->getLy() - 2));
+	TRectD boundingBoxD =
+		TRectD(convert(dn->getSize())) * (aff * TRectD(0, 0, up->getLx() - 2, up->getLy() - 2));
 
 	//  clipping
 	if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
@@ -1198,8 +1164,7 @@ void doQuickPutFilter(
 			//  approssimato con (xI, yI)
 			int xI = xL >> PADN; //  troncato
 
-			assert((0 <= xI) && (xI <= up->getLx() - 1) &&
-				   (0 <= yI) && (yI <= up->getLy() - 1));
+			assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) && (yI <= up->getLy() - 1));
 
 			//  (xI, yI)
 			TPixel32 *upPix00 = upBasePix + (yI * upWrap + xI);
@@ -1218,23 +1183,17 @@ void doQuickPutFilter(
 			int xWeight0 = (1 << PADN) - xWeight1;
 
 			//  filtro bilineare 4 pixels: media pesata sui singoli canali
-			int rColDownTmp =
-				(xWeight0 * (upPix00->r) + xWeight1 * ((upPix10)->r)) >> PADN;
+			int rColDownTmp = (xWeight0 * (upPix00->r) + xWeight1 * ((upPix10)->r)) >> PADN;
 
-			int gColDownTmp =
-				(xWeight0 * (upPix00->g) + xWeight1 * ((upPix10)->g)) >> PADN;
+			int gColDownTmp = (xWeight0 * (upPix00->g) + xWeight1 * ((upPix10)->g)) >> PADN;
 
-			int bColDownTmp =
-				(xWeight0 * (upPix00->b) + xWeight1 * ((upPix10)->b)) >> PADN;
+			int bColDownTmp = (xWeight0 * (upPix00->b) + xWeight1 * ((upPix10)->b)) >> PADN;
 
-			int rColUpTmp =
-				(xWeight0 * ((upPix01)->r) + xWeight1 * ((upPix11)->r)) >> PADN;
+			int rColUpTmp = (xWeight0 * ((upPix01)->r) + xWeight1 * ((upPix11)->r)) >> PADN;
 
-			int gColUpTmp =
-				(xWeight0 * ((upPix01)->g) + xWeight1 * ((upPix11)->g)) >> PADN;
+			int gColUpTmp = (xWeight0 * ((upPix01)->g) + xWeight1 * ((upPix11)->g)) >> PADN;
 
-			int bColUpTmp =
-				(xWeight0 * ((upPix01)->b) + xWeight1 * ((upPix11)->b)) >> PADN;
+			int bColUpTmp = (xWeight0 * ((upPix01)->b) + xWeight1 * ((upPix11)->b)) >> PADN;
 
 			unsigned char rCol =
 				(unsigned char)((yWeight0 * rColDownTmp + yWeight1 * rColUpTmp) >> PADN);
@@ -1261,14 +1220,9 @@ void doQuickPutFilter(
 //=============================================================================
 //=============================================================================
 //=============================================================================
-void doQuickPutNoFilter(
-	const TRaster32P &dn,
-	const TRaster32P &up,
-	double sx, double sy,
-	double tx, double ty,
-	const TPixel32 &colorScale,
-	bool doPremultiply, bool whiteTransp, bool firstColumn,
-	bool doRasterDarkenBlendedView)
+void doQuickPutNoFilter(const TRaster32P &dn, const TRaster32P &up, double sx, double sy, double tx,
+						double ty, const TPixel32 &colorScale, bool doPremultiply, bool whiteTransp,
+						bool firstColumn, bool doRasterDarkenBlendedView)
 {
 	//  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
 	//  di up e' un segmento (o un punto)
@@ -1473,8 +1427,7 @@ void doQuickPutNoFilter(
 			//  approssimato con (xI, yI)
 			int xI = xL >> PADN; //	round
 
-			assert((0 <= xI) && (xI <= up->getLx() - 1) &&
-				   (0 <= yI) && (yI <= up->getLy() - 1));
+			assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) && (yI <= up->getLy() - 1));
 
 			TPixel32 upPix = *(upBasePix + (yI * upWrap + xI));
 
@@ -1504,12 +1457,8 @@ void doQuickPutNoFilter(
 }
 
 //=============================================================================
-void doQuickPutNoFilter(
-	const TRaster32P &dn,
-	const TRasterGR8P &up,
-	double sx, double sy,
-	double tx, double ty,
-	const TPixel32 &colorScale)
+void doQuickPutNoFilter(const TRaster32P &dn, const TRasterGR8P &up, double sx, double sy,
+						double tx, double ty, const TPixel32 &colorScale)
 {
 	if ((sx == 0) || (sy == 0))
 		return;
@@ -1613,8 +1562,7 @@ void doQuickPutNoFilter(
 			xL += deltaXL;
 			int xI = xL >> PADN; //	round
 
-			assert((0 <= xI) && (xI <= up->getLx() - 1) &&
-				   (0 <= yI) && (yI <= up->getLy() - 1));
+			assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) && (yI <= up->getLy() - 1));
 
 			TPixelGR8 *upPix = upBasePix + (yI * upWrap + xI);
 			if (colorScale == TPixel32::Black) {
@@ -1632,22 +1580,19 @@ void doQuickPutNoFilter(
 
 			/*
 	  if (upPix->value == 0)
-	    dnPix->r = dnPix->g = dnPix->b = dnPix->m = upPix->value;
+		dnPix->r = dnPix->g = dnPix->b = dnPix->m = upPix->value;
 	  else if (upPix->value == 255)
-	    dnPix->r = dnPix->g = dnPix->b = dnPix->m = upPix->value;
+		dnPix->r = dnPix->g = dnPix->b = dnPix->m = upPix->value;
 	  else
-	    *dnPix = quickOverPix(*dnPix, *upPix);
-      */
+		*dnPix = quickOverPix(*dnPix, *upPix);
+	  */
 		}
 	}
 	dn->unlock();
 	up->unlock();
 }
 
-void doQuickResampleFilter(
-	const TRaster32P &dn,
-	const TRaster32P &up,
-	const TAffine &aff)
+void doQuickResampleFilter(const TRaster32P &dn, const TRaster32P &up, const TAffine &aff)
 {
 	//  se aff e' degenere la controimmagine di up e' un segmento (o un punto)
 	if ((aff.a11 * aff.a22 - aff.a12 * aff.a21) == 0)
@@ -1662,8 +1607,8 @@ void doQuickResampleFilter(
 	//  max dimensioni di up gestibili (limite imposto dal numero di bit
 	//  disponibili per la parte intera di xL, yL)
 
-	TRectD boundingBoxD = TRectD(convert(dn->getSize())) *
-						  (aff * TRectD(0, 0, up->getLx() - 2, up->getLy() - 2));
+	TRectD boundingBoxD =
+		TRectD(convert(dn->getSize())) * (aff * TRectD(0, 0, up->getLx() - 2, up->getLy() - 2));
 
 	//  clipping
 	if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
@@ -1847,8 +1792,7 @@ void doQuickResampleFilter(
 			int xI = xL >> PADN; //	troncato
 			int yI = yL >> PADN; //	troncato
 
-			assert((0 <= xI) && (xI <= up->getLx() - 1) &&
-				   (0 <= yI) && (yI <= up->getLy() - 1));
+			assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) && (yI <= up->getLy() - 1));
 
 			//  (xI, yI)
 			TPixel32 *upPix00 = upBasePix + (yI * upWrap + xI);
@@ -1869,29 +1813,21 @@ void doQuickResampleFilter(
 			int yWeight0 = (1 << PADN) - yWeight1;
 
 			//  filtro bilineare 4 pixels: media pesata sui singoli canali
-			int rColDownTmp =
-				(xWeight0 * (upPix00->r) + xWeight1 * ((upPix10)->r)) >> PADN;
+			int rColDownTmp = (xWeight0 * (upPix00->r) + xWeight1 * ((upPix10)->r)) >> PADN;
 
-			int gColDownTmp =
-				(xWeight0 * (upPix00->g) + xWeight1 * ((upPix10)->g)) >> PADN;
+			int gColDownTmp = (xWeight0 * (upPix00->g) + xWeight1 * ((upPix10)->g)) >> PADN;
 
-			int bColDownTmp =
-				(xWeight0 * (upPix00->b) + xWeight1 * ((upPix10)->b)) >> PADN;
+			int bColDownTmp = (xWeight0 * (upPix00->b) + xWeight1 * ((upPix10)->b)) >> PADN;
 
-			int mColDownTmp =
-				(xWeight0 * (upPix00->m) + xWeight1 * ((upPix10)->m)) >> PADN;
+			int mColDownTmp = (xWeight0 * (upPix00->m) + xWeight1 * ((upPix10)->m)) >> PADN;
 
-			int rColUpTmp =
-				(xWeight0 * ((upPix01)->r) + xWeight1 * ((upPix11)->r)) >> PADN;
+			int rColUpTmp = (xWeight0 * ((upPix01)->r) + xWeight1 * ((upPix11)->r)) >> PADN;
 
-			int gColUpTmp =
-				(xWeight0 * ((upPix01)->g) + xWeight1 * ((upPix11)->g)) >> PADN;
+			int gColUpTmp = (xWeight0 * ((upPix01)->g) + xWeight1 * ((upPix11)->g)) >> PADN;
 
-			int bColUpTmp =
-				(xWeight0 * ((upPix01)->b) + xWeight1 * ((upPix11)->b)) >> PADN;
+			int bColUpTmp = (xWeight0 * ((upPix01)->b) + xWeight1 * ((upPix11)->b)) >> PADN;
 
-			int mColUpTmp =
-				(xWeight0 * ((upPix01)->m) + xWeight1 * ((upPix11)->m)) >> PADN;
+			int mColUpTmp = (xWeight0 * ((upPix01)->m) + xWeight1 * ((upPix11)->m)) >> PADN;
 
 			dnPix->r = (unsigned char)((yWeight0 * rColDownTmp + yWeight1 * rColUpTmp) >> PADN);
 			dnPix->g = (unsigned char)((yWeight0 * gColDownTmp + yWeight1 * gColUpTmp) >> PADN);
@@ -1906,10 +1842,7 @@ void doQuickResampleFilter(
 //=============================================================================
 //=============================================================================
 
-void doQuickResampleFilter(
-	const TRaster32P &dn,
-	const TRasterGR8P &up,
-	const TAffine &aff)
+void doQuickResampleFilter(const TRaster32P &dn, const TRasterGR8P &up, const TAffine &aff)
 {
 	if ((aff.a11 * aff.a22 - aff.a12 * aff.a21) == 0)
 		return;
@@ -1919,8 +1852,8 @@ void doQuickResampleFilter(
 	const int MASKN = (1 << PADN) - 1;
 	assert(tmax(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
 
-	TRectD boundingBoxD = TRectD(convert(dn->getSize())) *
-						  (aff * TRectD(0, 0, up->getLx() - 2, up->getLy() - 2));
+	TRectD boundingBoxD =
+		TRectD(convert(dn->getSize())) * (aff * TRectD(0, 0, up->getLx() - 2, up->getLy() - 2));
 
 	//  clipping
 	if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
@@ -2018,8 +1951,7 @@ void doQuickResampleFilter(
 			int xI = xL >> PADN; //	troncato
 			int yI = yL >> PADN; //	troncato
 
-			assert((0 <= xI) && (xI <= up->getLx() - 1) &&
-				   (0 <= yI) && (yI <= up->getLy() - 1));
+			assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) && (yI <= up->getLy() - 1));
 
 			//  (xI, yI)
 			TPixelGR8 *upPix00 = upBasePix + (yI * upWrap + xI);
@@ -2040,13 +1972,12 @@ void doQuickResampleFilter(
 			int yWeight0 = (1 << PADN) - yWeight1;
 
 			//  filtro bilineare 4 pixels: media pesata sui singoli canali
-			int colDownTmp =
-				(xWeight0 * (upPix00->value) + xWeight1 * ((upPix10)->value)) >> PADN;
+			int colDownTmp = (xWeight0 * (upPix00->value) + xWeight1 * ((upPix10)->value)) >> PADN;
 
-			int colUpTmp =
-				(xWeight0 * ((upPix01)->value) + xWeight1 * ((upPix11)->value)) >> PADN;
+			int colUpTmp = (xWeight0 * ((upPix01)->value) + xWeight1 * ((upPix11)->value)) >> PADN;
 
-			dnPix->r = dnPix->g = dnPix->b = (unsigned char)((yWeight0 * colDownTmp + yWeight1 * colUpTmp) >> PADN);
+			dnPix->r = dnPix->g = dnPix->b =
+				(unsigned char)((yWeight0 * colDownTmp + yWeight1 * colUpTmp) >> PADN);
 
 			dnPix->m = 255;
 		}
@@ -2058,11 +1989,8 @@ void doQuickResampleFilter(
 //=============================================================================
 //=============================================================================
 
-void doQuickResampleColorFilter(
-	const TRaster32P &dn,
-	const TRaster32P &up,
-	const TAffine &aff,
-	UCHAR colorMask)
+void doQuickResampleColorFilter(const TRaster32P &dn, const TRaster32P &up, const TAffine &aff,
+								UCHAR colorMask)
 {
 	if ((aff.a11 * aff.a22 - aff.a12 * aff.a21) == 0)
 		return;
@@ -2156,8 +2084,7 @@ void doQuickResampleColorFilter(
 			int xI = xL >> PADN; //  round
 			int yI = yL >> PADN; //  round
 
-			assert((0 <= xI) && (xI <= up->getLx() - 1) &&
-				   (0 <= yI) && (yI <= up->getLy() - 1));
+			assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) && (yI <= up->getLy() - 1));
 
 			if (colorMask == TRop::MChan)
 				dnPix->r = dnPix->g = dnPix->b = (upBasePix + (yI * upWrap + xI))->m;
@@ -2181,11 +2108,8 @@ void doQuickResampleColorFilter(
 //=============================================================================
 //=============================================================================
 
-void doQuickResampleColorFilter(
-	const TRaster32P &dn,
-	const TRaster64P &up,
-	const TAffine &aff,
-	UCHAR colorMask)
+void doQuickResampleColorFilter(const TRaster32P &dn, const TRaster64P &up, const TAffine &aff,
+								UCHAR colorMask)
 {
 	if ((aff.a11 * aff.a22 - aff.a12 * aff.a21) == 0)
 		return;
@@ -2279,11 +2203,11 @@ void doQuickResampleColorFilter(
 			int xI = xL >> PADN; //  round
 			int yI = yL >> PADN; //  round
 
-			assert((0 <= xI) && (xI <= up->getLx() - 1) &&
-				   (0 <= yI) && (yI <= up->getLy() - 1));
+			assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) && (yI <= up->getLy() - 1));
 
 			if (colorMask == TRop::MChan)
-				dnPix->r = dnPix->g = dnPix->b = byteFromUshort((upBasePix + (yI * upWrap + xI))->m);
+				dnPix->r = dnPix->g = dnPix->b =
+					byteFromUshort((upBasePix + (yI * upWrap + xI))->m);
 			else {
 				TPixel64 *pix = upBasePix + (yI * upWrap + xI);
 				dnPix->r = byteFromUshort(((colorMask & TRop::RChan) ? pix->r : 0));
@@ -2300,11 +2224,8 @@ void doQuickResampleColorFilter(
 //=============================================================================
 //=============================================================================
 
-void doQuickResampleFilter(
-	const TRaster32P &dn,
-	const TRaster32P &up,
-	double sx, double sy,
-	double tx, double ty)
+void doQuickResampleFilter(const TRaster32P &dn, const TRaster32P &up, double sx, double sy,
+						   double tx, double ty)
 {
 	//  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
 	//  di up e' un segmento (o un punto)
@@ -2497,8 +2418,7 @@ void doQuickResampleFilter(
 			//  approssimato con (xI, yI)
 			int xI = xL >> PADN; //  troncato
 
-			assert((0 <= xI) && (xI <= up->getLx() - 1) &&
-				   (0 <= yI) && (yI <= up->getLy() - 1));
+			assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) && (yI <= up->getLy() - 1));
 
 			//  (xI, yI)
 			TPixel32 *upPix00 = upBasePix + (yI * upWrap + xI);
@@ -2517,29 +2437,21 @@ void doQuickResampleFilter(
 			int xWeight0 = (1 << PADN) - xWeight1;
 
 			//  filtro bilineare 4 pixels: media pesata sui singoli canali
-			int rColDownTmp =
-				(xWeight0 * (upPix00->r) + xWeight1 * ((upPix10)->r)) >> PADN;
+			int rColDownTmp = (xWeight0 * (upPix00->r) + xWeight1 * ((upPix10)->r)) >> PADN;
 
-			int gColDownTmp =
-				(xWeight0 * (upPix00->g) + xWeight1 * ((upPix10)->g)) >> PADN;
+			int gColDownTmp = (xWeight0 * (upPix00->g) + xWeight1 * ((upPix10)->g)) >> PADN;
 
-			int bColDownTmp =
-				(xWeight0 * (upPix00->b) + xWeight1 * ((upPix10)->b)) >> PADN;
+			int bColDownTmp = (xWeight0 * (upPix00->b) + xWeight1 * ((upPix10)->b)) >> PADN;
 
-			int mColDownTmp =
-				(xWeight0 * (upPix00->m) + xWeight1 * ((upPix10)->m)) >> PADN;
+			int mColDownTmp = (xWeight0 * (upPix00->m) + xWeight1 * ((upPix10)->m)) >> PADN;
 
-			int rColUpTmp =
-				(xWeight0 * ((upPix01)->r) + xWeight1 * ((upPix11)->r)) >> PADN;
+			int rColUpTmp = (xWeight0 * ((upPix01)->r) + xWeight1 * ((upPix11)->r)) >> PADN;
 
-			int gColUpTmp =
-				(xWeight0 * ((upPix01)->g) + xWeight1 * ((upPix11)->g)) >> PADN;
+			int gColUpTmp = (xWeight0 * ((upPix01)->g) + xWeight1 * ((upPix11)->g)) >> PADN;
 
-			int bColUpTmp =
-				(xWeight0 * ((upPix01)->b) + xWeight1 * ((upPix11)->b)) >> PADN;
+			int bColUpTmp = (xWeight0 * ((upPix01)->b) + xWeight1 * ((upPix11)->b)) >> PADN;
 
-			int mColUpTmp =
-				(xWeight0 * ((upPix01)->m) + xWeight1 * ((upPix11)->m)) >> PADN;
+			int mColUpTmp = (xWeight0 * ((upPix01)->m) + xWeight1 * ((upPix11)->m)) >> PADN;
 
 			dnPix->r = (unsigned char)((yWeight0 * rColDownTmp + yWeight1 * rColUpTmp) >> PADN);
 			dnPix->g = (unsigned char)((yWeight0 * gColDownTmp + yWeight1 * gColUpTmp) >> PADN);
@@ -2553,11 +2465,8 @@ void doQuickResampleFilter(
 
 //------------------------------------------------------------------------------------------
 
-void doQuickResampleFilter(
-	const TRaster32P &dn,
-	const TRasterGR8P &up,
-	double sx, double sy,
-	double tx, double ty)
+void doQuickResampleFilter(const TRaster32P &dn, const TRasterGR8P &up, double sx, double sy,
+						   double tx, double ty)
 {
 	//  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
 	//  di up e' un segmento (o un punto)
@@ -2750,8 +2659,7 @@ void doQuickResampleFilter(
 			//  approssimato con (xI, yI)
 			int xI = xL >> PADN; //  troncato
 
-			assert((0 <= xI) && (xI <= up->getLx() - 1) &&
-				   (0 <= yI) && (yI <= up->getLy() - 1));
+			assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) && (yI <= up->getLy() - 1));
 
 			//  (xI, yI)
 			TPixelGR8 *upPix00 = upBasePix + (yI * upWrap + xI);
@@ -2770,14 +2678,13 @@ void doQuickResampleFilter(
 			int xWeight0 = (1 << PADN) - xWeight1;
 
 			//  filtro bilineare 4 pixels: media pesata sui singoli canali
-			int colDownTmp =
-				(xWeight0 * (upPix00->value) + xWeight1 * (upPix10->value)) >> PADN;
+			int colDownTmp = (xWeight0 * (upPix00->value) + xWeight1 * (upPix10->value)) >> PADN;
 
-			int colUpTmp =
-				(xWeight0 * ((upPix01)->value) + xWeight1 * (upPix11->value)) >> PADN;
+			int colUpTmp = (xWeight0 * ((upPix01)->value) + xWeight1 * (upPix11->value)) >> PADN;
 
 			dnPix->m = 255;
-			dnPix->r = dnPix->g = dnPix->b = (unsigned char)((yWeight0 * colDownTmp + yWeight1 * colUpTmp) >> PADN);
+			dnPix->r = dnPix->g = dnPix->b =
+				(unsigned char)((yWeight0 * colDownTmp + yWeight1 * colUpTmp) >> PADN);
 		}
 	}
 	dn->unlock();
@@ -2788,11 +2695,8 @@ void doQuickResampleFilter(
 //=============================================================================
 //=============================================================================
 template <typename PIX>
-void doQuickResampleNoFilter(
-	const TRasterPT<PIX> &dn,
-	const TRasterPT<PIX> &up,
-	double sx, double sy,
-	double tx, double ty)
+void doQuickResampleNoFilter(const TRasterPT<PIX> &dn, const TRasterPT<PIX> &up, double sx,
+							 double sy, double tx, double ty)
 {
 	//  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
 	//  di up e' un segmento (o un punto)
@@ -2967,8 +2871,7 @@ void doQuickResampleNoFilter(
 			//  approssimato con (xI, yI)
 			int xI = xL >> PADN; //  round
 
-			assert((0 <= xI) && (xI <= up->getLx() - 1) &&
-				   (0 <= yI) && (yI <= up->getLy() - 1));
+			assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) && (yI <= up->getLy() - 1));
 
 			*dnPix = *(upBasePix + (yI * upWrap + xI));
 		}
@@ -2993,13 +2896,8 @@ void doQuickResampleNoFilter(
 //
 //=============================================================================
 
-void doQuickPutCmapped(
-	const TRaster32P &dn,
-	const TRasterCM32P &up,
-	const TPaletteP &palette,
-	const TAffine &aff,
-	const TPixel32 &globalColorScale,
-	bool inksOnly)
+void doQuickPutCmapped(const TRaster32P &dn, const TRasterCM32P &up, const TPaletteP &palette,
+					   const TAffine &aff, const TPixel32 &globalColorScale, bool inksOnly)
 {
 	//  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
 	//  di up e' un segmento (o un punto)
@@ -3062,11 +2960,12 @@ void doQuickPutCmapped(
 	int upWrap = up->getWrap();
 
 	std::vector<TPixel32> colors(palette->getStyleCount());
-	//vector<TPixel32> inks(palette->getStyleCount());
+	// vector<TPixel32> inks(palette->getStyleCount());
 
 	if (globalColorScale != TPixel::Black)
 		for (int i = 0; i < palette->getStyleCount(); i++)
-			colors[i] = applyColorScaleCMapped(palette->getStyle(i)->getAverageColor(), globalColorScale);
+			colors[i] =
+				applyColorScaleCMapped(palette->getStyle(i)->getAverageColor(), globalColorScale);
 	else
 		for (int i = 0; i < palette->getStyleCount(); i++)
 			colors[i] = ::premultiply(palette->getStyle(i)->getAverageColor());
@@ -3217,8 +3116,7 @@ void doQuickPutCmapped(
 			int xI = xL >> PADN; //  round
 			int yI = yL >> PADN; //  round
 
-			assert((0 <= xI) && (xI <= up->getLx() - 1) &&
-				   (0 <= yI) && (yI <= up->getLy() - 1));
+			assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) && (yI <= up->getLy() - 1));
 
 			TPixelCM32 *upPix = upBasePix + (yI * upWrap + xI);
 			int t = upPix->getTone();
@@ -3267,17 +3165,13 @@ TPixel TransparencyCheckBlackBgInk = TPixel(255,255,255); //bg
 TPixel TransparencyCheckWhiteBgInk = TPixel(0,0,0);    //ink
 TPixel TransparencyCheckPaint = TPixel(127,127,127);  //paint*/
 
-void doQuickPutCmapped(
-	const TRaster32P &dn,
-	const TRasterCM32P &up,
-	const TPaletteP &palette,
-	const TAffine &aff,
-	const TRop::CmappedQuickputSettings &s)
-/*const TPixel32& globalColorScale, 
+void doQuickPutCmapped(const TRaster32P &dn, const TRasterCM32P &up, const TPaletteP &palette,
+					   const TAffine &aff, const TRop::CmappedQuickputSettings &s)
+/*const TPixel32& globalColorScale,
 		 bool inksOnly,
 		 bool transparencyCheck,
 		 bool blackBgCheck,
-		 int inkIndex, 
+		 int inkIndex,
 		 int paintIndex)*/
 {
 	if ((aff.a11 * aff.a22 - aff.a12 * aff.a21) == 0)
@@ -3316,7 +3210,8 @@ void doQuickPutCmapped(
 			paints[i] = inks[i] = ::premultiply(palette->getStyle(i)->getAverageColor());
 	else
 		for (int i = 0; i < palette->getStyleCount(); i++)
-			paints[i] = inks[i] = applyColorScaleCMapped(palette->getStyle(i)->getAverageColor(), s.m_globalColorScale);
+			paints[i] = inks[i] = applyColorScaleCMapped(palette->getStyle(i)->getAverageColor(),
+														 s.m_globalColorScale);
 
 	dn->lock();
 	up->lock();
@@ -3376,8 +3271,7 @@ void doQuickPutCmapped(
 			yL += deltaYL;
 			int xI = xL >> PADN;
 			int yI = yL >> PADN;
-			assert((0 <= xI) && (xI <= up->getLx() - 1) &&
-				   (0 <= yI) && (yI <= up->getLy() - 1));
+			assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) && (yI <= up->getLy() - 1));
 			TPixelCM32 *upPix = upBasePix + (yI * upWrap + xI);
 			int t = upPix->getTone();
 			int p = upPix->getPaint();
@@ -3397,8 +3291,10 @@ void doQuickPutCmapped(
 						if (i == s.m_inkIndex) {
 							inkColor = TPixel::Red;
 							if (p == 0) {
-								t = t / 2; //transparency check(for a bug!) darken semitrasparent pixels; ghibli likes it, and wants it also for ink checks...
-										   //otherwise, ramps goes always from reds towards grey...
+								t = t / 2; // transparency check(for a bug!) darken semitrasparent
+										   // pixels; ghibli likes it, and wants it also for ink
+										   // checks...
+								// otherwise, ramps goes always from reds towards grey...
 							}
 						} else
 							inkColor = inks[i];
@@ -3439,14 +3335,9 @@ void doQuickPutCmapped(
 
 //=============================================================================
 //=============================================================================
-void doQuickPutCmapped(
-	const TRaster32P &dn,
-	const TRasterCM32P &up,
-	const TPaletteP &palette,
-	double sx, double sy,
-	double tx, double ty,
-	const TPixel32 &globalColorScale,
-	bool inksOnly)
+void doQuickPutCmapped(const TRaster32P &dn, const TRasterCM32P &up, const TPaletteP &palette,
+					   double sx, double sy, double tx, double ty, const TPixel32 &globalColorScale,
+					   bool inksOnly)
 {
 	//  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
 	//  di up e' un segmento (o un punto)
@@ -3626,7 +3517,8 @@ void doQuickPutCmapped(
 	std::vector<TPixel32> inks(count, TPixel32::Red);
 	if (globalColorScale != TPixel::Black)
 		for (int i = 0; i < palette->getStyleCount(); i++)
-			paints[i] = inks[i] = applyColorScaleCMapped(palette->getStyle(i)->getAverageColor(), globalColorScale);
+			paints[i] = inks[i] =
+				applyColorScaleCMapped(palette->getStyle(i)->getAverageColor(), globalColorScale);
 	else
 		for (int i = 0; i < palette->getStyleCount(); i++)
 			paints[i] = inks[i] = ::premultiply(palette->getStyle(i)->getAverageColor());
@@ -3662,8 +3554,7 @@ void doQuickPutCmapped(
 			//  approssimato con (xI, yI)
 			int xI = xL >> PADN; //	round
 
-			assert((0 <= xI) && (xI <= up->getLx() - 1) &&
-				   (0 <= yI) && (yI <= up->getLy() - 1));
+			assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) && (yI <= up->getLy() - 1));
 
 			TPixelCM32 *upPix = upBasePix + (yI * upWrap + xI);
 			int t = upPix->getTone();
@@ -3710,12 +3601,8 @@ void doQuickPutCmapped(
 //=============================================================================
 //=============================================================================
 
-void doQuickResampleColorFilter(
-	const TRaster32P &dn,
-	const TRasterCM32P &up,
-	const TPaletteP &plt,
-	const TAffine &aff,
-	UCHAR colorMask)
+void doQuickResampleColorFilter(const TRaster32P &dn, const TRasterCM32P &up, const TPaletteP &plt,
+								const TAffine &aff, UCHAR colorMask)
 {
 	if ((aff.a11 * aff.a22 - aff.a12 * aff.a21) == 0)
 		return;
@@ -3815,8 +3702,7 @@ void doQuickResampleColorFilter(
 			int xI = xL >> PADN; //  round
 			int yI = yL >> PADN; //  round
 
-			assert((0 <= xI) && (xI <= up->getLx() - 1) &&
-				   (0 <= yI) && (yI <= up->getLy() - 1));
+			assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) && (yI <= up->getLy() - 1));
 
 			TPixelCM32 *upPix = upBasePix + (yI * upWrap + xI);
 			int t = upPix->getTone();
@@ -3847,13 +3733,10 @@ void doQuickResampleColorFilter(
 
 //==========================================================
 
-#endif //TNZCORE_LIGHT
+#endif // TNZCORE_LIGHT
 
 #ifdef OPTIMIZE_FOR_LP64
-void doQuickResampleFilter_optimized(
-	const TRaster32P &dn,
-	const TRaster32P &up,
-	const TAffine &aff)
+void doQuickResampleFilter_optimized(const TRaster32P &dn, const TRaster32P &up, const TAffine &aff)
 {
 	//  se aff e' degenere la controimmagine di up e' un segmento (o un punto)
 	if ((aff.a11 * aff.a22 - aff.a12 * aff.a21) == 0)
@@ -3868,8 +3751,8 @@ void doQuickResampleFilter_optimized(
 	//  max dimensioni di up gestibili (limite imposto dal numero di bit
 	//  disponibili per la parte intera di xL, yL)
 
-	TRectD boundingBoxD = TRectD(convert(dn->getSize())) *
-						  (aff * TRectD(0, 0, up->getLx() - 2, up->getLy() - 2));
+	TRectD boundingBoxD =
+		TRectD(convert(dn->getSize())) * (aff * TRectD(0, 0, up->getLx() - 2, up->getLy() - 2));
 
 	//  clipping
 	if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
@@ -4005,11 +3888,8 @@ void doQuickResampleFilter_optimized(
 
 #ifdef OPTIMIZE_FOR_LP64
 
-void doQuickResampleFilter_optimized(
-	const TRaster32P &dn,
-	const TRaster32P &up,
-	double sx, double sy,
-	double tx, double ty)
+void doQuickResampleFilter_optimized(const TRaster32P &dn, const TRaster32P &up, double sx,
+									 double sy, double tx, double ty)
 {
 	//  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
 	//  di up e' un segmento (o un punto)
@@ -4027,8 +3907,8 @@ void doQuickResampleFilter_optimized(
 	assert(tmax(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
 
 	TAffine aff(sx, 0, tx, 0, sy, ty);
-	TRectD boundingBoxD = TRectD(convert(dn->getSize())) *
-						  (aff * TRectD(0, 0, up->getLx() - 2, up->getLy() - 2));
+	TRectD boundingBoxD =
+		TRectD(convert(dn->getSize())) * (aff * TRectD(0, 0, up->getLx() - 2, up->getLy() - 2));
 
 	//  clipping
 	if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
@@ -4256,14 +4136,14 @@ void doQuickResampleFilter_optimized(
 //
 //=============================================================================
 
-void TRop::quickPut(const TRasterP &dn,
-					const TRasterCM32P &upCM32, const TPaletteP &plt,
+void TRop::quickPut(const TRasterP &dn, const TRasterCM32P &upCM32, const TPaletteP &plt,
 					const TAffine &aff, const TPixel32 &globalColorScale, bool inksOnly)
 {
 	TRaster32P dn32 = dn;
 	if (dn32 && upCM32)
 		if (areAlmostEqual(aff.a12, 0) && areAlmostEqual(aff.a21, 0))
-			doQuickPutCmapped(dn32, upCM32, plt, aff.a11, aff.a22, aff.a13, aff.a23, globalColorScale, inksOnly);
+			doQuickPutCmapped(dn32, upCM32, plt, aff.a11, aff.a22, aff.a13, aff.a23,
+							  globalColorScale, inksOnly);
 		else
 			doQuickPutCmapped(dn32, upCM32, plt, aff, globalColorScale, inksOnly);
 	else
@@ -4276,23 +4156,25 @@ void TRop::quickPut(const TRasterP &dn,
 //
 //=============================================================================
 
-void TRop::quickPut(const TRasterP &dn,
-					const TRasterCM32P &upCM32, const TPaletteP &plt, const TAffine &aff,
-					const CmappedQuickputSettings &settings) //const TPixel32& globalColorScale, bool inksOnly, bool transparencyCheck, bool blackBgCheck, int inkIndex, int paintIndex)
+void TRop::quickPut(const TRasterP &dn, const TRasterCM32P &upCM32, const TPaletteP &plt,
+					const TAffine &aff,
+					const CmappedQuickputSettings &settings) // const TPixel32& globalColorScale,
+															 // bool inksOnly, bool
+															 // transparencyCheck, bool
+															 // blackBgCheck, int inkIndex, int
+															 // paintIndex)
 {
 	TRaster32P dn32 = dn;
 	if (dn32 && upCM32)
-		doQuickPutCmapped(dn32, upCM32, plt, aff, settings); //globalColorScale, inksOnly, transparencyCheck, blackBgCheck, inkIndex, paintIndex);
+		doQuickPutCmapped(dn32, upCM32, plt, aff, settings); // globalColorScale, inksOnly,
+															 // transparencyCheck, blackBgCheck,
+															 // inkIndex, paintIndex);
 	else
 		throw TRopException("raster type mismatch");
 }
 
-void TRop::quickResampleColorFilter(
-	const TRasterP &dn,
-	const TRasterP &up,
-	const TAffine &aff,
-	const TPaletteP &plt,
-	UCHAR colorMask)
+void TRop::quickResampleColorFilter(const TRasterP &dn, const TRasterP &up, const TAffine &aff,
+									const TPaletteP &plt, UCHAR colorMask)
 {
 
 	TRaster32P dn32 = dn;
@@ -4305,13 +4187,13 @@ void TRop::quickResampleColorFilter(
 		doQuickResampleColorFilter(dn32, upCM32, plt, aff, colorMask);
 	else if (dn32 && up64)
 		doQuickResampleColorFilter(dn32, up64, aff, colorMask);
-	//else if (dn32 && upCM32)
+	// else if (dn32 && upCM32)
 	//  doQuickResampleColorFilter(dn32, upCM32, aff, plt, colorMask);
 	else
 		throw TRopException("raster type mismatch");
 }
 
-#endif //TNZCORE_LIGHT
+#endif // TNZCORE_LIGHT
 
 //=============================================================================
 //=============================================================================
@@ -4320,17 +4202,11 @@ void TRop::quickResampleColorFilter(
 //
 //=============================================================================
 
-void quickPut(
-	const TRasterP &dn,
-	const TRasterP &up,
-	const TAffine &aff,
-	TRop::ResampleFilterType filterType,
-	const TPixel32 &colorScale,
-	bool doPremultiply, bool whiteTransp, bool firstColumn,
-	bool doRasterDarkenBlendedView)
+void quickPut(const TRasterP &dn, const TRasterP &up, const TAffine &aff,
+			  TRop::ResampleFilterType filterType, const TPixel32 &colorScale, bool doPremultiply,
+			  bool whiteTransp, bool firstColumn, bool doRasterDarkenBlendedView)
 {
-	assert(filterType == TRop::Bilinear ||
-		   filterType == TRop::ClosestPixel);
+	assert(filterType == TRop::Bilinear || filterType == TRop::ClosestPixel);
 
 	bool bilinear = filterType == TRop::Bilinear;
 
@@ -4351,11 +4227,14 @@ void quickPut(
 			if (bilinear)
 				doQuickPutFilter(dn32, up32, aff.a11, aff.a22, aff.a13, aff.a23);
 			else
-				doQuickPutNoFilter(dn32, up32, aff.a11, aff.a22, aff.a13, aff.a23, colorScale, doPremultiply, whiteTransp, firstColumn, doRasterDarkenBlendedView);
+				doQuickPutNoFilter(dn32, up32, aff.a11, aff.a22, aff.a13, aff.a23, colorScale,
+								   doPremultiply, whiteTransp, firstColumn,
+								   doRasterDarkenBlendedView);
 		else if (bilinear)
 			doQuickPutFilter(dn32, up32, aff);
 		else
-			doQuickPutNoFilter(dn32, up32, aff, colorScale, doPremultiply, whiteTransp, firstColumn, doRasterDarkenBlendedView);
+			doQuickPutNoFilter(dn32, up32, aff, colorScale, doPremultiply, whiteTransp, firstColumn,
+							   doRasterDarkenBlendedView);
 	} else if (dn32 && up64)
 		doQuickPutNoFilter(dn32, up64, aff, doPremultiply, firstColumn);
 	else
@@ -4364,10 +4243,7 @@ void quickPut(
 
 //=============================================================================
 template <typename PIX>
-void doQuickResampleNoFilter(
-	const TRasterPT<PIX> &dn,
-	const TRasterPT<PIX> &up,
-	const TAffine &aff)
+void doQuickResampleNoFilter(const TRasterPT<PIX> &dn, const TRasterPT<PIX> &up, const TAffine &aff)
 {
 	//  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
 	//  di up e' un segmento (o un punto)
@@ -4540,8 +4416,7 @@ void doQuickResampleNoFilter(
 			int xI = xL >> PADN; //  round
 			int yI = yL >> PADN; //  round
 
-			assert((0 <= xI) && (xI <= up->getLx() - 1) &&
-				   (0 <= yI) && (yI <= up->getLy() - 1));
+			assert((0 <= xI) && (xI <= up->getLx() - 1) && (0 <= yI) && (yI <= up->getLy() - 1));
 
 			*dnPix = *(upBasePix + (yI * upWrap + xI));
 		}
@@ -4554,14 +4429,10 @@ void doQuickResampleNoFilter(
 
 #ifdef OPTIMIZE_FOR_LP64
 
-void quickResample_optimized(
-	const TRasterP &dn,
-	const TRasterP &up,
-	const TAffine &aff,
-	TRop::ResampleFilterType filterType)
+void quickResample_optimized(const TRasterP &dn, const TRasterP &up, const TAffine &aff,
+							 TRop::ResampleFilterType filterType)
 {
-	assert(filterType == TRop::Bilinear ||
-		   filterType == TRop::ClosestPixel);
+	assert(filterType == TRop::Bilinear || filterType == TRop::ClosestPixel);
 
 	bool bilinear = filterType == TRop::Bilinear;
 
@@ -4572,11 +4443,9 @@ void quickResample_optimized(
 	if (dn32 && up32)
 		if (areAlmostEqual(aff.a12, 0) && areAlmostEqual(aff.a21, 0))
 			if (bilinear)
-				doQuickResampleFilter_optimized(dn32, up32,
-												aff.a11, aff.a22, aff.a13, aff.a23);
+				doQuickResampleFilter_optimized(dn32, up32, aff.a11, aff.a22, aff.a13, aff.a23);
 			else
-				doQuickResampleNoFilter(dn32, up32, aff.a11, aff.a22, aff.a13,
-										aff.a23);
+				doQuickResampleNoFilter(dn32, up32, aff.a11, aff.a22, aff.a13, aff.a23);
 		else if (bilinear)
 			doQuickResampleFilter_optimized(dn32, up32, aff);
 		else
@@ -4589,11 +4458,8 @@ void quickResample_optimized(
 
 //=============================================================================
 
-void quickResample(
-	const TRasterP &dn,
-	const TRasterP &up,
-	const TAffine &aff,
-	TRop::ResampleFilterType filterType)
+void quickResample(const TRasterP &dn, const TRasterP &up, const TAffine &aff,
+				   TRop::ResampleFilterType filterType)
 {
 
 #ifdef OPTIMIZE_FOR_LP64
@@ -4602,8 +4468,7 @@ void quickResample(
 
 #else
 
-	assert(filterType == TRop::Bilinear ||
-		   filterType == TRop::ClosestPixel);
+	assert(filterType == TRop::Bilinear || filterType == TRop::ClosestPixel);
 
 	bool bilinear = filterType == TRop::Bilinear;
 

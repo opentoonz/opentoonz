@@ -36,11 +36,7 @@
 
 using namespace DVGui;
 
-enum StyleType {
-	NORMALSTYLE,
-	STUDIOSTYLE,
-	LINKEDSTYLE
-};
+enum StyleType { NORMALSTYLE, STUDIOSTYLE, LINKEDSTYLE };
 
 //-----------------------------------------------------------------------------
 namespace
@@ -75,8 +71,8 @@ void copyStylesWithoutUndo(TPalette *palette, TPaletteHandle *pltHandle, int pag
 /*! Paste styles contained in \b data in the end of current palette page.
 		Add to styleIndicesInPage pasted styles index.
 */
-bool pasteStylesDataWithoutUndo(TPalette *palette, TPaletteHandle *pltHandle, const StyleData *data, int indexInPage,
-								int pageIndex, std::set<int> *styleIndicesInPage)
+bool pasteStylesDataWithoutUndo(TPalette *palette, TPaletteHandle *pltHandle, const StyleData *data,
+								int indexInPage, int pageIndex, std::set<int> *styleIndicesInPage)
 {
 	if (!palette)
 		palette = pltHandle->getPalette();
@@ -114,7 +110,7 @@ bool pasteStylesDataWithoutUndo(TPalette *palette, TPaletteHandle *pltHandle, co
 				styleId = palette->addStyle(style);
 		}
 
-		//check the type of the original(copied) style
+		// check the type of the original(copied) style
 		// If the original is NormalStyle
 		if (style->getGlobalName() == L"") {
 			// 1. If pasting normal style to level palette, do nothing
@@ -128,8 +124,10 @@ bool pasteStylesDataWithoutUndo(TPalette *palette, TPaletteHandle *pltHandle, co
 		}
 		// If the original is StudioPaletteStyle
 		else if (style->getOriginalName() == L"") {
-			// 3. If pasting StudioPaletteStyle to level palette, set the style name into the original name.
-			// 4. If pasting StudioPaletteStyle to studio palette, set the style name into the original name and keep the link.
+			// 3. If pasting StudioPaletteStyle to level palette, set the style name into the
+			// original name.
+			// 4. If pasting StudioPaletteStyle to studio palette, set the style name into the
+			// original name and keep the link.
 			style->setOriginalName(style->getName());
 		}
 		// If the original is linked style, do nothing
@@ -173,7 +171,8 @@ bool pasteStylesWithoutUndo(TPalette *palette, TPaletteHandle *pltHandle, int pa
 	// cancello la selezione
 	if (styleIndicesInPage)
 		styleIndicesInPage->clear();
-	return pasteStylesDataWithoutUndo(palette, pltHandle, data, indexInPage, pageIndex, styleIndicesInPage);
+	return pasteStylesDataWithoutUndo(palette, pltHandle, data, indexInPage, pageIndex,
+									  styleIndicesInPage);
 }
 
 //-----------------------------------------------------------------------------
@@ -196,7 +195,8 @@ void deleteStylesWithoutUndo(TPalette *palette, TPaletteHandle *pltHandle, int p
 		int j = *it;
 		int styleId = page->getStyleId(j);
 		if (styleId < 2) {
-			error(QObject::tr("It is not possible to delete the style #") + QString::number(styleId));
+			error(QObject::tr("It is not possible to delete the style #") +
+				  QString::number(styleId));
 		} else {
 			if (styleId == pltHandle->getStyleIndex())
 				pltHandle->setStyleIndex(1);
@@ -219,7 +219,7 @@ void deleteStylesWithoutUndo(TPalette *palette, TPaletteHandle *pltHandle, int p
 			pltHandle->setStyleIndex(1);
 		}
 	}
-	//This function is used in undo and redo. So do not activate dirtyflag.
+	// This function is used in undo and redo. So do not activate dirtyflag.
 	pltHandle->notifyColorStyleChanged(false, false);
 	pltHandle->notifyPaletteChanged();
 }
@@ -283,7 +283,7 @@ class PasteStylesUndo : public TUndo
 	TPaletteP m_palette;
 	QMimeData *m_data;
 
-public:
+  public:
 	PasteStylesUndo(TStyleSelection *selection, int oldStyleIndex, QMimeData *data)
 		: m_selection(selection), m_oldStyleIndex(oldStyleIndex), m_data(data)
 	{
@@ -292,28 +292,26 @@ public:
 		m_palette = m_selection->getPaletteHandle()->getPalette();
 	}
 
-	~PasteStylesUndo()
-	{
-		delete m_data;
-	}
+	~PasteStylesUndo() { delete m_data; }
 
 	void undo() const
 	{
 		TPaletteHandle *paletteHandle = m_selection->getPaletteHandle();
 		std::set<int> styleIndicesInPage = m_styleIndicesInPage;
-		cutStylesWithoutUndo(m_palette.getPointer(), paletteHandle, m_pageIndex, &styleIndicesInPage);
+		cutStylesWithoutUndo(m_palette.getPointer(), paletteHandle, m_pageIndex,
+							 &styleIndicesInPage);
 
 		m_selection->selectNone();
 		m_selection->makeCurrent();
 
-		//Setto l'indice corrente.
+		// Setto l'indice corrente.
 		if (m_palette.getPointer() == paletteHandle->getPalette())
 			paletteHandle->setStyleIndex(m_oldStyleIndex);
 	}
 
 	void redo() const
 	{
-		//Se e' la paletta corrente setto l'indice corrente.
+		// Se e' la paletta corrente setto l'indice corrente.
 		TPaletteHandle *paletteHandle = m_selection->getPaletteHandle();
 		if (m_palette.getPointer() == paletteHandle->getPalette())
 			paletteHandle->setStyleIndex(m_oldStyleIndex);
@@ -324,9 +322,10 @@ public:
 		const StyleData *data = dynamic_cast<const StyleData *>(m_data);
 		assert(data);
 		std::set<int> styleIndicesInPage;
-		pasteStylesDataWithoutUndo(m_palette.getPointer(), paletteHandle, data, indexInPage, m_pageIndex, &styleIndicesInPage);
+		pasteStylesDataWithoutUndo(m_palette.getPointer(), paletteHandle, data, indexInPage,
+								   m_pageIndex, &styleIndicesInPage);
 
-		//Se e' la paletta corrente aggiorno la selezione
+		// Se e' la paletta corrente aggiorno la selezione
 		if (m_selection && m_palette.getPointer() == paletteHandle->getPalette()) {
 			m_selection->selectNone();
 			m_selection->select(m_pageIndex);
@@ -337,19 +336,13 @@ public:
 		}
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 	QString getHistoryString()
 	{
 		return QObject::tr("Paste Style  in Palette : %1")
 			.arg(QString::fromStdWString(m_palette->getPaletteName()));
 	}
-	int getHistoryType()
-	{
-		return HistoryType::Palette;
-	}
+	int getHistoryType() { return HistoryType::Palette; }
 };
 
 //=============================================================================
@@ -364,7 +357,7 @@ class DeleteStylesUndo : public TUndo
 	QMimeData *m_data;
 	TPaletteP m_palette;
 
-public:
+  public:
 	DeleteStylesUndo(TStyleSelection *selection, QMimeData *data)
 		: m_selection(selection), m_data(data)
 	{
@@ -378,27 +371,22 @@ public:
 		m_styleIndicesInPage = styleIndicesInPage;
 	}
 
-	void setPageIndex(int pageIndex)
-	{
-		m_pageIndex = pageIndex;
-	}
+	void setPageIndex(int pageIndex) { m_pageIndex = pageIndex; }
 
-	~DeleteStylesUndo()
-	{
-		delete m_data;
-	}
+	~DeleteStylesUndo() { delete m_data; }
 
 	void undo() const
 	{
 		TPaletteHandle *paletteHandle = m_selection->getPaletteHandle();
-		//Prendo il data corrente
+		// Prendo il data corrente
 		QClipboard *clipboard = QApplication::clipboard();
 		QMimeData *currentData = cloneData(clipboard->mimeData());
-		//Setto il vecchio data
+		// Setto il vecchio data
 		clipboard->setMimeData(cloneData(m_data), QClipboard::Clipboard);
 
 		std::set<int> styleIndicesInPage = m_styleIndicesInPage;
-		insertStylesWithoutUndo(m_palette.getPointer(), paletteHandle, m_pageIndex, &styleIndicesInPage);
+		insertStylesWithoutUndo(m_palette.getPointer(), paletteHandle, m_pageIndex,
+								&styleIndicesInPage);
 
 		if (m_selection && m_palette.getPointer() == paletteHandle->getPalette()) {
 			m_selection->selectNone();
@@ -409,36 +397,31 @@ public:
 
 			m_selection->makeCurrent();
 		}
-		//Rimetto il data corrente.
+		// Rimetto il data corrente.
 		clipboard->setMimeData(currentData, QClipboard::Clipboard);
-		//do not activate dirty flag here in case that the m_palette is not current when undo
+		// do not activate dirty flag here in case that the m_palette is not current when undo
 		paletteHandle->notifyColorStyleChanged(false, false);
 	}
 
 	void redo() const
 	{
 		std::set<int> styleIndicesInPage = m_styleIndicesInPage;
-		deleteStylesWithoutUndo(m_palette.getPointer(), m_selection->getPaletteHandle(), m_pageIndex, &styleIndicesInPage);
+		deleteStylesWithoutUndo(m_palette.getPointer(), m_selection->getPaletteHandle(),
+								m_pageIndex, &styleIndicesInPage);
 		if (m_selection) {
 			m_selection->selectNone();
 			m_selection->makeCurrent();
 		}
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 
 	QString getHistoryString()
 	{
 		return QObject::tr("Delete Style  from Palette : %1")
 			.arg(QString::fromStdWString(m_palette->getPaletteName()));
 	}
-	int getHistoryType()
-	{
-		return HistoryType::Palette;
-	}
+	int getHistoryType() { return HistoryType::Palette; }
 };
 
 //=============================================================================
@@ -454,7 +437,7 @@ class CutStylesUndo : public TUndo
 	QMimeData *m_data;	//!< data containing cut styles
 	TPaletteP m_palette;
 
-public:
+  public:
 	CutStylesUndo(TStyleSelection *selection, QMimeData *data, QMimeData *oldData)
 		: m_selection(selection), m_oldData(oldData), m_data(data)
 	{
@@ -478,7 +461,8 @@ public:
 		clipboard->setMimeData(cloneData(m_data), QClipboard::Clipboard);
 
 		std::set<int> styleIndicesInPage = m_styleIndicesInPage;
-		insertStylesWithoutUndo(m_palette.getPointer(), paletteHandle, m_pageIndex, &styleIndicesInPage);
+		insertStylesWithoutUndo(m_palette.getPointer(), paletteHandle, m_pageIndex,
+								&styleIndicesInPage);
 
 		if (m_selection && m_palette.getPointer() == paletteHandle->getPalette()) {
 			m_selection->selectNone();
@@ -489,14 +473,15 @@ public:
 			m_selection->makeCurrent();
 		}
 
-		//Setto il che c'era prima del cut
+		// Setto il che c'era prima del cut
 		clipboard->setMimeData(cloneData(m_oldData), QClipboard::Clipboard);
 	}
 
 	void redo() const
 	{
 		std::set<int> styleIndicesInPage = m_styleIndicesInPage;
-		cutStylesWithoutUndo(m_palette.getPointer(), m_selection->getPaletteHandle(), m_pageIndex, &styleIndicesInPage);
+		cutStylesWithoutUndo(m_palette.getPointer(), m_selection->getPaletteHandle(), m_pageIndex,
+							 &styleIndicesInPage);
 
 		m_selection->selectNone();
 		m_selection->makeCurrent();
@@ -509,10 +494,7 @@ public:
 		return QObject::tr("Cut Style  from Palette : %1")
 			.arg(QString::fromStdWString(m_palette->getPaletteName()));
 	}
-	int getHistoryType()
-	{
-		return HistoryType::Palette;
-	}
+	int getHistoryType() { return HistoryType::Palette; }
 };
 
 //-----------------------------------------------------------------------------
@@ -538,7 +520,8 @@ TStyleSelection::~TStyleSelection()
 
 void TStyleSelection::enableCommands()
 {
-	if (m_paletteHandle && m_paletteHandle->getPalette() && !m_paletteHandle->getPalette()->isCleanupPalette()) {
+	if (m_paletteHandle && m_paletteHandle->getPalette() &&
+		!m_paletteHandle->getPalette()->isCleanupPalette()) {
 		enableCommand(this, MI_Cut, &TStyleSelection::cutStyles);
 		enableCommand(this, MI_Copy, &TStyleSelection::copyStyles);
 		enableCommand(this, MI_Paste, &TStyleSelection::pasteStyles);
@@ -546,9 +529,10 @@ void TStyleSelection::enableCommands()
 		enableCommand(this, MI_PasteColors, &TStyleSelection::pasteStylesColor);
 		enableCommand(this, MI_PasteNames, &TStyleSelection::pasteStylesName);
 
-		//available only for level palette
+		// available only for level palette
 		if (m_paletteHandle->getPalette()->getGlobalName() == L"")
-			enableCommand(this, MI_GetColorFromStudioPalette, &TStyleSelection::getBackOriginalStyle);
+			enableCommand(this, MI_GetColorFromStudioPalette,
+						  &TStyleSelection::getBackOriginalStyle);
 	}
 	enableCommand(this, MI_Clear, &TStyleSelection::deleteStyles);
 	enableCommand(this, MI_EraseUnusedStyles, &TStyleSelection::eraseUnsedStyle);
@@ -580,8 +564,7 @@ void TStyleSelection::select(int pageIndex, int styleIndexInPage, bool on)
 
 bool TStyleSelection::isSelected(int pageIndex, int id) const
 {
-	return m_pageIndex == pageIndex &&
-		   m_styleIndicesInPage.find(id) != m_styleIndicesInPage.end();
+	return m_pageIndex == pageIndex && m_styleIndicesInPage.find(id) != m_styleIndicesInPage.end();
 }
 
 //------------------------------------------------------------------
@@ -678,7 +661,8 @@ void TStyleSelection::copyStyles()
 {
 	if (isEmpty())
 		return;
-	copyStylesWithoutUndo(m_paletteHandle->getPalette(), m_paletteHandle, m_pageIndex, &m_styleIndicesInPage);
+	copyStylesWithoutUndo(m_paletteHandle->getPalette(), m_paletteHandle, m_pageIndex,
+						  &m_styleIndicesInPage);
 }
 
 //-------------------------------------------------------------------
@@ -703,7 +687,8 @@ void TStyleSelection::pasteStyles()
 	int oldStyleIndex = m_paletteHandle->getStyleIndex();
 	QClipboard *clipboard = QApplication::clipboard();
 	QMimeData *oldData = cloneData(clipboard->mimeData());
-	pasteStylesWithoutUndo(m_paletteHandle->getPalette(), m_paletteHandle, m_pageIndex, &m_styleIndicesInPage);
+	pasteStylesWithoutUndo(m_paletteHandle->getPalette(), m_paletteHandle, m_pageIndex,
+						   &m_styleIndicesInPage);
 	palette->setDirtyFlag(true);
 	TUndoManager::manager()->add(new PasteStylesUndo(this, oldStyleIndex, oldData));
 }
@@ -747,7 +732,8 @@ void TStyleSelection::deleteStyles()
 
 	std::auto_ptr<TUndo> undo(new DeleteStylesUndo(this, data));
 
-	deleteStylesWithoutUndo(m_paletteHandle->getPalette(), m_paletteHandle, m_pageIndex, &m_styleIndicesInPage);
+	deleteStylesWithoutUndo(m_paletteHandle->getPalette(), m_paletteHandle, m_pageIndex,
+							&m_styleIndicesInPage);
 	palette->setDirtyFlag(true);
 
 	TUndoManager::manager()->add(undo.release());
@@ -762,7 +748,7 @@ void TStyleSelection::eraseUnsedStyle()
 	TPalette *palette = m_paletteHandle->getPalette();
 	findPaletteLevels(levels, row, column, palette, m_xsheetHandle->getXsheet());
 
-	//Verifico quali stili sono usati e quali no
+	// Verifico quali stili sono usati e quali no
 	std::map<int, bool> usedStyleIds;
 	int pageCount = palette->getPageCount();
 	std::set<TXshSimpleLevel *>::const_iterator it = levels.begin();
@@ -782,7 +768,8 @@ void TStyleSelection::eraseUnsedStyle()
 					int styleId = page->getStyleId(j);
 					if (m != 0 && usedStyleIds[styleId])
 						continue;
-					if (i == 0 && j == 0) //Il primo stile della prima pagina non deve essere mai cancellato
+					if (i == 0 &&
+						j == 0) // Il primo stile della prima pagina non deve essere mai cancellato
 					{
 						usedStyleIds[styleId] = true;
 						continue;
@@ -795,9 +782,9 @@ void TStyleSelection::eraseUnsedStyle()
 
 	TUndoManager::manager()->beginBlock();
 
-	//Butto gli stili non usati
+	// Butto gli stili non usati
 	for (i = 0; i < pageCount; i++) {
-		//Variabili usate per l'undo
+		// Variabili usate per l'undo
 		std::set<int> styleIndicesInPage;
 		StyleData *data = new StyleData();
 		TPalette::Page *page = palette->getPage(i);
@@ -809,16 +796,16 @@ void TStyleSelection::eraseUnsedStyle()
 			styleIndicesInPage.insert(j);
 			data->addStyle(styleId, page->getStyle(j)->clone());
 		}
-		//Se styleIndicesInPage e' vuoto ci sono stili da cancellare.
+		// Se styleIndicesInPage e' vuoto ci sono stili da cancellare.
 		if (styleIndicesInPage.empty()) {
 			delete data;
 			continue;
 		}
-		//Cancello gli stili
+		// Cancello gli stili
 		std::set<int>::reverse_iterator it;
 		for (it = styleIndicesInPage.rbegin(); it != styleIndicesInPage.rend(); ++it)
 			page->removeStyle(*it);
-		//Undo
+		// Undo
 		DeleteStylesUndo *undo = new DeleteStylesUndo(this, data);
 		undo->setPageIndex(i);
 		undo->setStyleIndicesInPage(styleIndicesInPage);
@@ -849,7 +836,7 @@ class UndoPasteValues : public TUndo
 
 	class Item
 	{
-	public:
+	  public:
 		int m_index;
 		TColorStyle *m_oldStyle;
 		TColorStyle *m_newStyle;
@@ -873,7 +860,7 @@ class UndoPasteValues : public TUndo
 
 	TPalette *getPalette() const { return m_palette.getPointer(); }
 
-public:
+  public:
 	UndoPasteValues(TStyleSelection *selection, bool pasteName, bool pasteColor = true)
 		: m_selection(selection), m_pasteName(pasteName), m_pasteColor(pasteColor)
 	{
@@ -926,19 +913,20 @@ public:
 			m_selection->select(m_pageIndex, indexInPage, true);
 		}
 
-		//Se avevo aggiunto degli stili devo rimuoverli.
+		// Se avevo aggiunto degli stili devo rimuoverli.
 		int j;
 		for (j = (int)m_itemsInserted.size() - 1; j >= 0; j--) {
 			int indexInPage = m_itemsInserted[j]->m_index;
 			int styleId = page->getStyleId(indexInPage);
-			if (getPalette() == m_paletteHandle->getPalette() && styleId == m_paletteHandle->getStyleIndex())
+			if (getPalette() == m_paletteHandle->getPalette() &&
+				styleId == m_paletteHandle->getStyleIndex())
 				m_paletteHandle->setStyleIndex(page->getStyleId(indexInPage - 1));
 			getPalette()->setStyle(styleId, TPixel32::Red);
 			page->removeStyle(indexInPage);
 		}
 
 		m_selection->makeCurrent();
-		//do not activate a dirty flag here in case that m_palette is not currentpalette
+		// do not activate a dirty flag here in case that m_palette is not currentpalette
 		m_paletteHandle->notifyColorStyleChanged(false, false);
 		m_paletteHandle->notifyColorStyleSwitched();
 	}
@@ -957,16 +945,16 @@ public:
 			indexInPage = m_items[i]->m_index;
 			int styleId = page->getStyleId(indexInPage);
 
-			//first, check out the types of copied and pasted styles
+			// first, check out the types of copied and pasted styles
 			StyleType srcType, dstType;
-			//copied (source)
+			// copied (source)
 			if (style->getGlobalName() == L"")
 				srcType = NORMALSTYLE;
 			else if (style->getOriginalName() == L"")
 				srcType = STUDIOSTYLE;
 			else
 				srcType = LINKEDSTYLE;
-			//pasted (destination)
+			// pasted (destination)
 			TColorStyle *dstStyle = m_items[i]->m_oldStyle;
 			std::wstring dstGlobalName = dstStyle->getGlobalName();
 			std::wstring dstOriginalName = dstStyle->getOriginalName();
@@ -979,39 +967,47 @@ public:
 
 			pasteValue(styleId, style);
 
-			//Process the global and original names according to the pasted style
+			// Process the global and original names according to the pasted style
 			TColorStyle *pastedStyle = getPalette()->getStyle(styleId);
 			if (srcType == NORMALSTYLE) {
 				if (dstType == NORMALSTYLE) {
-				}								 //1. From normal to normal. Do nothing.
-				else if (dstType == STUDIOSTYLE) //2. From normal to studio. Restore the global name
+				} // 1. From normal to normal. Do nothing.
+				else if (dstType ==
+						 STUDIOSTYLE) // 2. From normal to studio. Restore the global name
 					pastedStyle->setGlobalName(dstGlobalName);
-				else //dstType == LINKEDSTYLE		//3. From normal to linked. Restore both the global and the original name. Activate the edited flag.
+				else // dstType == LINKEDSTYLE		//3. From normal to linked. Restore both the
+					 // global and the original name. Activate the edited flag.
 				{
 					pastedStyle->setGlobalName(dstGlobalName);
 					pastedStyle->setOriginalName(dstOriginalName);
 					pastedStyle->setIsEditedFlag(true);
 				}
 			} else if (srcType == STUDIOSTYLE) {
-				if (dstType == NORMALSTYLE) //4. From studio to normal. Set the studio style's name to the original name.
+				if (dstType == NORMALSTYLE) // 4. From studio to normal. Set the studio style's name
+											// to the original name.
 					pastedStyle->setOriginalName(style->getName());
-				else if (dstType == STUDIOSTYLE) //5. From studio to studio. Restore the global name.
+				else if (dstType ==
+						 STUDIOSTYLE) // 5. From studio to studio. Restore the global name.
 					pastedStyle->setGlobalName(dstGlobalName);
-				else //dstStyle == LINKEDSTYLE		//6. From studio to linked. Set the studio style's name to the original name, and set the edited flag to off.
+				else // dstStyle == LINKEDSTYLE		//6. From studio to linked. Set the studio
+					 // style's name to the original name, and set the edited flag to off.
 				{
 					pastedStyle->setOriginalName(style->getName());
 					pastedStyle->setIsEditedFlag(false);
 				}
-			} else //srcType == LINKEDSTYLE
+			} else // srcType == LINKEDSTYLE
 			{
 				if (dstType == NORMALSTYLE) {
-				}								 //7. From linked to normal. Do nothing.
-				else if (dstType == STUDIOSTYLE) //8. From linked to studio. Restore the global name. Delete the original name. Set the edited flag to off.
+				} // 7. From linked to normal. Do nothing.
+				else if (dstType == STUDIOSTYLE) // 8. From linked to studio. Restore the global
+												 // name. Delete the original name. Set the edited
+												 // flag to off.
 				{
 					pastedStyle->setGlobalName(dstGlobalName);
 					pastedStyle->setOriginalName(L"");
 					pastedStyle->setIsEditedFlag(false);
-				} else //dstStyle == LINKEDSTYLE		//9. From linked to linked. Do nothing (bring all information from the original).
+				} else // dstStyle == LINKEDSTYLE		//9. From linked to linked. Do nothing (bring
+					   // all information from the original).
 				{
 				}
 			}
@@ -1025,20 +1021,23 @@ public:
 			StyleData *newData = new StyleData();
 			int j;
 			for (j = 0; j < (int)m_itemsInserted.size(); j++)
-				newData->addStyle(m_itemsInserted[j]->m_index, m_itemsInserted[j]->m_newStyle->clone());
+				newData->addStyle(m_itemsInserted[j]->m_index,
+								  m_itemsInserted[j]->m_newStyle->clone());
 
 			std::set<int> styleIndicesInPage;
-			pasteStylesDataWithoutUndo(getPalette(), m_paletteHandle, newData, indexInPage + 1, m_pageIndex, &styleIndicesInPage);
+			pasteStylesDataWithoutUndo(getPalette(), m_paletteHandle, newData, indexInPage + 1,
+									   m_pageIndex, &styleIndicesInPage);
 
 			std::set<int>::iterator styleIt;
-			for (styleIt = styleIndicesInPage.begin(); styleIt != styleIndicesInPage.end(); ++styleIt)
+			for (styleIt = styleIndicesInPage.begin(); styleIt != styleIndicesInPage.end();
+				 ++styleIt)
 				m_selection->select(m_pageIndex, *styleIt, true);
 
 			delete newData;
 		}
 
 		m_selection->makeCurrent();
-		//do not activate a dirty flag here in case that m_palette is not currentpalette
+		// do not activate a dirty flag here in case that m_palette is not currentpalette
 		m_paletteHandle->notifyColorStyleChanged(false, false);
 		m_paletteHandle->notifyColorStyleSwitched();
 	}
@@ -1061,10 +1060,7 @@ public:
 		else
 			return QObject::tr("Paste%1").arg(palNameStr);
 	}
-	int getHistoryType()
-	{
-		return HistoryType::Palette;
-	}
+	int getHistoryType() { return HistoryType::Palette; }
 };
 
 //-----------------------------------------------------------------------------
@@ -1092,7 +1088,8 @@ void TStyleSelection::pasteStylesValues(bool pasteName, bool pasteColor)
 
 	int dataStyleCount = data->getStyleCount();
 	if (dataStyleCount > (int)m_styleIndicesInPage.size()) {
-		QString question = QObject::tr("There are more cut/copied styles than selected. Paste anyway (adding styles)?");
+		QString question = QObject::tr(
+			"There are more cut/copied styles than selected. Paste anyway (adding styles)?");
 		int ret = DVGui::MsgBox(question, QObject::tr("Paste"), QObject::tr("Cancel"), 0);
 		if (ret == 2 || ret == 0)
 			return;
@@ -1101,7 +1098,8 @@ void TStyleSelection::pasteStylesValues(bool pasteName, bool pasteColor)
 	UndoPasteValues *undo = new UndoPasteValues(this, pasteName, pasteColor);
 	std::set<int>::iterator it;
 	int indexInPage = 0;
-	for (it = m_styleIndicesInPage.begin(); it != m_styleIndicesInPage.end() && i < data->getStyleCount(); ++it, i++) {
+	for (it = m_styleIndicesInPage.begin();
+		 it != m_styleIndicesInPage.end() && i < data->getStyleCount(); ++it, i++) {
 		if (page->getStyleCount() < i)
 			break;
 		indexInPage = *it;
@@ -1113,16 +1111,16 @@ void TStyleSelection::pasteStylesValues(bool pasteName, bool pasteColor)
 
 		if (pasteColor) {
 
-			//first, check out the types of copied and pasted styles
+			// first, check out the types of copied and pasted styles
 			StyleType srcType, dstType;
-			//copied (source)
+			// copied (source)
 			if (data->getStyle(i)->getGlobalName() == L"")
 				srcType = NORMALSTYLE;
 			else if (data->getStyle(i)->getOriginalName() == L"")
 				srcType = STUDIOSTYLE;
 			else
 				srcType = LINKEDSTYLE;
-			//pasted (destination)
+			// pasted (destination)
 			TColorStyle *dstStyle = page->getStyle(indexInPage);
 			std::wstring dstGlobalName = dstStyle->getGlobalName();
 			std::wstring dstOriginalName = dstStyle->getOriginalName();
@@ -1134,46 +1132,55 @@ void TStyleSelection::pasteStylesValues(bool pasteName, bool pasteColor)
 				dstType = LINKEDSTYLE;
 			//---- 追加ここまで iwasawa
 
-			//For cleanup styles, do not duplicate the cleanup information. Just paste color information.
+			// For cleanup styles, do not duplicate the cleanup information. Just paste color
+			// information.
 			TCleanupStyle *cleanupStyle = dynamic_cast<TCleanupStyle *>(data->getStyle(i));
 			if (cleanupStyle && !palette->isCleanupPalette())
 				palette->setStyle(styleId, cleanupStyle->getMainColor());
 			else
 				palette->setStyle(styleId, data->getStyle(i)->clone());
 
-			//Process the global and original names according to the pasted style
+			// Process the global and original names according to the pasted style
 			TColorStyle *pastedStyle = getPalette()->getStyle(styleId);
 			if (srcType == NORMALSTYLE) {
 				if (dstType == NORMALSTYLE) {
-				}								 //1. From normal to normal. Do nothing.
-				else if (dstType == STUDIOSTYLE) //2. From normal to studio. Restore the global name
+				} // 1. From normal to normal. Do nothing.
+				else if (dstType ==
+						 STUDIOSTYLE) // 2. From normal to studio. Restore the global name
 					pastedStyle->setGlobalName(dstGlobalName);
-				else //dstType == LINKEDSTYLE		//3. From normal to linked. Restore both the global and the original name. Activate the edited flag.
+				else // dstType == LINKEDSTYLE		//3. From normal to linked. Restore both the
+					 // global and the original name. Activate the edited flag.
 				{
 					pastedStyle->setGlobalName(dstGlobalName);
 					pastedStyle->setOriginalName(dstOriginalName);
 					pastedStyle->setIsEditedFlag(true);
 				}
 			} else if (srcType == STUDIOSTYLE) {
-				if (dstType == NORMALSTYLE) //4. From studio to normal. Set the studio style's name to the original name.
+				if (dstType == NORMALSTYLE) // 4. From studio to normal. Set the studio style's name
+											// to the original name.
 					pastedStyle->setOriginalName(data->getStyle(i)->getName());
-				else if (dstType == STUDIOSTYLE) //5. From studio to studio. Restore the global name.
+				else if (dstType ==
+						 STUDIOSTYLE) // 5. From studio to studio. Restore the global name.
 					pastedStyle->setGlobalName(dstGlobalName);
-				else //dstStyle == LINKEDSTYLE		//6. From studio to linked. Set the studio style's name to the original name, and set the edited flag to off.
+				else // dstStyle == LINKEDSTYLE		//6. From studio to linked. Set the studio
+					 // style's name to the original name, and set the edited flag to off.
 				{
 					pastedStyle->setOriginalName(data->getStyle(i)->getName());
 					pastedStyle->setIsEditedFlag(false);
 				}
-			} else //srcType == LINKEDSTYLE
+			} else // srcType == LINKEDSTYLE
 			{
 				if (dstType == NORMALSTYLE) {
-				}								 //7. From linked to normal. Do nothing.
-				else if (dstType == STUDIOSTYLE) //8. From linked to studio. Restore the global name. Delete the original name. Set the edited flag to off.
+				} // 7. From linked to normal. Do nothing.
+				else if (dstType == STUDIOSTYLE) // 8. From linked to studio. Restore the global
+												 // name. Delete the original name. Set the edited
+												 // flag to off.
 				{
 					pastedStyle->setGlobalName(dstGlobalName);
 					pastedStyle->setOriginalName(L"");
 					pastedStyle->setIsEditedFlag(false);
-				} else //dstStyle == LINKEDSTYLE		//9. From linked to linked. Do nothing (bring all information from the original).
+				} else // dstStyle == LINKEDSTYLE		//9. From linked to linked. Do nothing (bring
+					   // all information from the original).
 				{
 				}
 			}
@@ -1184,12 +1191,13 @@ void TStyleSelection::pasteStylesValues(bool pasteName, bool pasteColor)
 				page->getStyle(indexInPage)->setFlags(flags);
 			}
 		}
-		//when "paste name"
+		// when "paste name"
 		if (pasteName)
 			page->getStyle(indexInPage)->setName(data->getStyle(i)->getName());
 	}
 
-	// Se gli stili del data sono piu' di quelli selezionati faccio un paste degli stili che restano,
+	// Se gli stili del data sono piu' di quelli selezionati faccio un paste degli stili che
+	// restano,
 	// inserisco i nuovi stili dopo indexInPage.
 	if (i < dataStyleCount) {
 		StyleData *newData = new StyleData();
@@ -1198,7 +1206,8 @@ void TStyleSelection::pasteStylesValues(bool pasteName, bool pasteColor)
 			newData->addStyle(data->getStyleIndex(j), data->getStyle(j)->clone());
 
 		std::set<int> styleIndicesInPage;
-		pasteStylesDataWithoutUndo(m_paletteHandle->getPalette(), m_paletteHandle, newData, indexInPage + 1, m_pageIndex, &styleIndicesInPage);
+		pasteStylesDataWithoutUndo(m_paletteHandle->getPalette(), m_paletteHandle, newData,
+								   indexInPage + 1, m_pageIndex, &styleIndicesInPage);
 		undo->addItemToInsert(styleIndicesInPage);
 
 		std::set<int>::iterator styleIt;
@@ -1209,14 +1218,15 @@ void TStyleSelection::pasteStylesValues(bool pasteName, bool pasteColor)
 	}
 	TUndoManager::manager()->add(undo);
 
-	//clear cache(invalidate) of the level
-	if (m_levelHandle && m_levelHandle->getSimpleLevel() && !m_levelHandle->getSimpleLevel()->getProperties()->getDirtyFlag())
+	// clear cache(invalidate) of the level
+	if (m_levelHandle && m_levelHandle->getSimpleLevel() &&
+		!m_levelHandle->getSimpleLevel()->getProperties()->getDirtyFlag())
 		m_levelHandle->getSimpleLevel()->invalidateFrames();
 
 	m_paletteHandle->notifyColorStyleChanged(false);
 	m_paletteHandle->notifyColorStyleSwitched();
 
-	//this is to redraw the style editor with colorStyleSwitched() signal
+	// this is to redraw the style editor with colorStyleSwitched() signal
 	m_paletteHandle->setStyleIndex(m_paletteHandle->getStyleIndex());
 	palette->setDirtyFlag(true);
 }
@@ -1259,17 +1269,17 @@ class UndoBlendColor : public TUndo
 	std::vector<std::pair<int, TColorStyle *>> m_colorStyles;
 	TPixel32 m_c0, m_c1;
 
-public:
-	UndoBlendColor(TPaletteHandle *paletteHandle, int pageIndex, std::vector<std::pair<int, TColorStyle *>> colorStyles,
-				   const TPixel32 &c0, const TPixel32 &c1)
-		: m_paletteHandle(paletteHandle), m_pageIndex(pageIndex), m_colorStyles(colorStyles), m_c0(c0), m_c1(c1)
+  public:
+	UndoBlendColor(TPaletteHandle *paletteHandle, int pageIndex,
+				   std::vector<std::pair<int, TColorStyle *>> colorStyles, const TPixel32 &c0,
+				   const TPixel32 &c1)
+		: m_paletteHandle(paletteHandle), m_pageIndex(pageIndex), m_colorStyles(colorStyles),
+		  m_c0(c0), m_c1(c1)
 	{
 		m_palette = m_paletteHandle->getPalette();
 	}
 
-	~UndoBlendColor()
-	{
-	}
+	~UndoBlendColor() {}
 
 	void undo() const
 	{
@@ -1285,10 +1295,11 @@ public:
 			QString gname = QString::fromStdWString(st->getGlobalName());
 			if (!gname.isEmpty() && gname[0] != L'-')
 				continue;
-			m_palette->setStyle(page->getStyleId(m_colorStyles[i].first), m_colorStyles[i].second->clone());
+			m_palette->setStyle(page->getStyleId(m_colorStyles[i].first),
+								m_colorStyles[i].second->clone());
 			m_colorStyles[i].second->invalidateIcon();
 		}
-		//do not activate a dirty flag here in case that m_palette is not currentpalette
+		// do not activate a dirty flag here in case that m_palette is not currentpalette
 		m_paletteHandle->notifyColorStyleChanged(false, false);
 		m_paletteHandle->notifyColorStyleSwitched();
 	}
@@ -1311,7 +1322,7 @@ public:
 			cs->setMainColor(blend(m_c0, m_c1, (double)i / (double)(m_colorStyles.size() - 1)));
 			cs->invalidateIcon();
 		}
-		//do not activate a dirty flag here in case that m_palette is not currentpalette
+		// do not activate a dirty flag here in case that m_palette is not currentpalette
 		m_paletteHandle->notifyColorStyleChanged(false, false);
 		m_paletteHandle->notifyColorStyleSwitched();
 	}
@@ -1326,14 +1337,11 @@ public:
 		return QObject::tr("Blend Colors  in Palette : %1")
 			.arg(QString::fromStdWString(m_palette->getPaletteName()));
 	}
-	int getHistoryType()
-	{
-		return HistoryType::Palette;
-	}
+	int getHistoryType() { return HistoryType::Palette; }
 };
 
 //-----------------------------------------------------------------------------
-} //namespace
+} // namespace
 //-----------------------------------------------------------------------------
 
 void TStyleSelection::blendStyles()
@@ -1407,16 +1415,14 @@ class UndoLinkToStudioPalette : public TUndo
 	std::vector<ColorStyleData> m_styles;
 	bool m_updateLinkedColors;
 
-public:
+  public:
 	UndoLinkToStudioPalette(TPaletteHandle *paletteHandle, int pageIndex)
 		: m_paletteHandle(paletteHandle), m_pageIndex(pageIndex), m_updateLinkedColors(false)
 	{
 		m_palette = m_paletteHandle->getPalette();
 	}
 
-	~UndoLinkToStudioPalette()
-	{
-	}
+	~UndoLinkToStudioPalette() {}
 
 	void setUpdateLinkedColors(bool updateLinkedColors)
 	{
@@ -1464,24 +1470,18 @@ public:
 			StudioPalette::instance()->updateLinkedColors(m_palette.getPointer());
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 
 	QString getHistoryString()
 	{
 		return QObject::tr("Toggle Link  in Palette : %1")
 			.arg(QString::fromStdWString(m_palette->getPaletteName()));
 	}
-	int getHistoryType()
-	{
-		return HistoryType::Palette;
-	}
+	int getHistoryType() { return HistoryType::Palette; }
 };
 
 //-----------------------------------------------------------------------------
-} //namespace
+} // namespace
 //-----------------------------------------------------------------------------
 
 void TStyleSelection::toggleLink()
@@ -1558,7 +1558,8 @@ void TStyleSelection::eraseToggleLink()
 
 	UndoLinkToStudioPalette *undo = new UndoLinkToStudioPalette(m_paletteHandle, m_pageIndex);
 
-	for (std::set<int>::iterator it = m_styleIndicesInPage.begin(); it != m_styleIndicesInPage.end(); ++it) {
+	for (std::set<int>::iterator it = m_styleIndicesInPage.begin();
+		 it != m_styleIndicesInPage.end(); ++it) {
 		int index = *it;
 		TColorStyle *cs = page->getStyle(index);
 		assert(cs);
@@ -1591,7 +1592,8 @@ void TStyleSelection::toggleKeyframe(int frame)
 	int n = m_styleIndicesInPage.size();
 	TPalette::Page *page = palette->getPage(m_pageIndex);
 	assert(page);
-	for (std::set<int>::iterator it = m_styleIndicesInPage.begin(); it != m_styleIndicesInPage.end(); ++it) {
+	for (std::set<int>::iterator it = m_styleIndicesInPage.begin();
+		 it != m_styleIndicesInPage.end(); ++it) {
 		int styleId = page->getStyleId(*it);
 		palette->setKeyframe(styleId, frame);
 	}
@@ -1612,7 +1614,7 @@ class UndoRemoveLink : public TUndo
 	};
 	std::vector<ColorStyleData> m_styles;
 
-public:
+  public:
 	UndoRemoveLink(TPaletteHandle *paletteHandle, int pageIndex)
 		: m_paletteHandle(paletteHandle), m_pageIndex(pageIndex)
 	{
@@ -1661,24 +1663,19 @@ public:
 		m_paletteHandle->notifyColorStyleChanged(false, false);
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 
 	QString getHistoryString()
 	{
 		return QObject::tr("Remove Link  in Palette : %1")
 			.arg(QString::fromStdWString(m_palette->getPaletteName()));
 	}
-	int getHistoryType()
-	{
-		return HistoryType::Palette;
-	}
+	int getHistoryType() { return HistoryType::Palette; }
 };
 
 //-----------------------------------------------------------------------------
-/*! remove link from studio palette. Delete the global and the orginal names. return true if something changed
+/*! remove link from studio palette. Delete the global and the orginal names. return true if
+ * something changed
 */
 bool TStyleSelection::removeLink()
 {
@@ -1726,18 +1723,16 @@ class getBackOriginalStyleUndo : public TUndo
 	TStyleSelection m_selection;
 	std::vector<TPixel32> m_oldColors, m_newColors;
 
-	//remember the edited flags
+	// remember the edited flags
 	std::vector<bool> m_oldEditedFlags, m_newEditedFlags;
 
-public:
+  public:
 	getBackOriginalStyleUndo(const TStyleSelection &selection) : m_selection(selection)
 	{
 		getColors(m_oldColors, m_oldEditedFlags);
 	}
 
-	~getBackOriginalStyleUndo()
-	{
-	}
+	~getBackOriginalStyleUndo() {}
 
 	void getStyles(std::vector<TColorStyle *> &styles, const TStyleSelection &selection) const
 	{
@@ -1761,10 +1756,7 @@ public:
 		return sizeof *this + (m_oldColors.size() + m_newColors.size()) * sizeof(TPixel32);
 	}
 
-	void onAdd()
-	{
-		getColors(m_newColors, m_newEditedFlags);
-	}
+	void onAdd() { getColors(m_newColors, m_newEditedFlags); }
 
 	void getColors(std::vector<TPixel32> &colors, std::vector<bool> &flags) const
 	{
@@ -1795,24 +1787,12 @@ public:
 		m_selection.getPaletteHandle()->notifyColorStyleChanged(false, false);
 	}
 
-	void undo() const
-	{
-		setColors(m_oldColors, m_oldEditedFlags);
-	}
+	void undo() const { setColors(m_oldColors, m_oldEditedFlags); }
 
-	void redo() const
-	{
-		setColors(m_newColors, m_newEditedFlags);
-	}
+	void redo() const { setColors(m_newColors, m_newEditedFlags); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Get Color from Studio Palette");
-	}
-	int getHistoryType()
-	{
-		return HistoryType::Palette;
-	}
+	QString getHistoryString() { return QObject::tr("Get Color from Studio Palette"); }
+	int getHistoryType() { return HistoryType::Palette; }
 };
 
 //-----------------------------------------------------------------------------
@@ -1825,7 +1805,7 @@ void TStyleSelection::getBackOriginalStyle()
 		return;
 
 	if (isEmpty() || palette->isLocked())
-		return; //110804 iwasawa
+		return; // 110804 iwasawa
 
 	int n = m_styleIndicesInPage.size();
 	if (n <= 0)
@@ -1840,7 +1820,7 @@ void TStyleSelection::getBackOriginalStyle()
 
 	TUndo *undo = new getBackOriginalStyleUndo(this);
 
-	//for each selected style
+	// for each selected style
 	for (std::set<int>::iterator it = m_styleIndicesInPage.begin();
 		 it != m_styleIndicesInPage.end(); ++it) {
 		TColorStyle *cs = page->getStyle(*it);
@@ -1851,7 +1831,7 @@ void TStyleSelection::getBackOriginalStyle()
 		if (gname == L"")
 			continue;
 
-		//Find the palette from the table
+		// Find the palette from the table
 		int k = gname.find_first_of(L'-', 1);
 		if (k == (int)std::wstring::npos)
 			continue;
@@ -1863,11 +1843,9 @@ void TStyleSelection::getBackOriginalStyle()
 
 		TPalette *spPalette = 0;
 
-		//If not found in the table, then search for a new studio palette.
+		// If not found in the table, then search for a new studio palette.
 		if (palIt == table.end()) {
-			spPalette =
-				StudioPalette::instance()
-					->getPalette(paletteId);
+			spPalette = StudioPalette::instance()->getPalette(paletteId);
 			if (!spPalette)
 				continue;
 			table[paletteId] = spPalette;
@@ -1875,20 +1853,20 @@ void TStyleSelection::getBackOriginalStyle()
 		} else
 			spPalette = palIt->second.getPointer();
 
-		//j is StudioPaletteID
+		// j is StudioPaletteID
 		int j = toInt(gname.substr(k + 1));
 
 		if (spPalette && 0 <= j && j < spPalette->getStyleCount()) {
 			TColorStyle *spStyle = spPalette->getStyle(j);
 			assert(spStyle);
 
-			//edit flag is also copied here
+			// edit flag is also copied here
 			spStyle = spStyle->clone();
 			spStyle->setGlobalName(gname);
 
-			//get the original name from the studio palette
+			// get the original name from the studio palette
 			spStyle->setOriginalName(spStyle->getName());
-			//do not change the style name
+			// do not change the style name
 			spStyle->setName(cs->getName());
 
 			palette->setStyle(page->getStyleId(*it), spStyle);

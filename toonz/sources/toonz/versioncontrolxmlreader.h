@@ -32,12 +32,12 @@ class SVNPartialLockReader : public QXmlStreamReader
 
 	SVNPartialLock m_currentPartialLock;
 
-public:
+  public:
 	SVNPartialLockReader(const QString &xmlSVNResponse);
 
 	QList<SVNPartialLock> getPartialLock() { return m_partialLock; }
 
-protected:
+  protected:
 	void readTarget();
 	void readProperty();
 	void readUnknownElement();
@@ -64,12 +64,12 @@ class SVNConfigReader : public QXmlStreamReader
 	QString m_data;
 	QString m_path;
 
-public:
+  public:
 	SVNConfigReader(const QString &xml);
 	QList<SVNRepository> getRepositories() { return m_repositories; }
 	QString getSVNPath() { return m_path; }
 
-protected:
+  protected:
 	void readRepository();
 	void readSVNPath();
 	void readUnknownElement();
@@ -116,13 +116,13 @@ class SVNStatusReader : public QXmlStreamReader
 	QString m_currentLockOwner;
 	QString m_currentLockDate;
 
-public:
+  public:
 	SVNStatusReader(const QString &xmlSVNResponse);
 	~SVNStatusReader();
 
 	QList<SVNStatus> getStatus() { return m_status; }
 
-protected:
+  protected:
 	void resetCurrentValues();
 
 	void readEntry();
@@ -155,12 +155,12 @@ class SVNLogReader : public QXmlStreamReader
 	QString m_currentDate;
 	QString m_currentMsg;
 
-public:
+  public:
 	SVNLogReader(const QString &xmlSVNResponse);
 
 	QList<SVNLog> getLog() { return m_log; }
 
-protected:
+  protected:
 	void readEntry();
 	void readUnknownElement();
 };
@@ -174,13 +174,13 @@ class SVNInfoReader : public QXmlStreamReader
 	QString m_revision;
 	QString m_url;
 
-public:
+  public:
 	SVNInfoReader(const QString &xmlSVNResponse);
 
 	QString getRevision() const { return m_revision; }
 	QString getURL() const { return m_url; }
 
-protected:
+  protected:
 	void readEntry();
 	void readUnknownElement();
 };
@@ -199,14 +199,14 @@ class SVNListReader : public QXmlStreamReader
 	QString m_data;
 	QList<SVNListInfo> m_listInfo;
 
-public:
+  public:
 	SVNListReader(const QString &xmlSVNResponse);
 
 	QList<SVNListInfo> getList() { return m_listInfo; }
 
 	QStringList getDirs();
 
-protected:
+  protected:
 	void readEntry();
 	void readUnknownElement();
 };

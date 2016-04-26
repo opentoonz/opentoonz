@@ -29,8 +29,8 @@ namespace DVGui
 
 enum MsgType {
 	INFORMATION,
-	WARNING,  //this one opens  a popup only if tmsg not visible
-	CRITICAL, //this one opens always a popup
+	WARNING, // this one opens  a popup only if tmsg not visible
+	CRITICAL, // this one opens always a popup
 	QUESTION
 };
 
@@ -50,17 +50,18 @@ class DVAPI TMsgCore : public QObject
 	std::set<QTcpSocket *> m_sockets;
 	void readFromSocket(QTcpSocket *socket);
 
-public:
+  public:
 	TMsgCore();
 	~TMsgCore();
 	static TMsgCore *instance();
 
-	//client side
-	// 'send' returns false if the tmessage is not active in the application (tipically, in console applications such as tcomposer)
+	// client side
+	// 'send' returns false if the tmessage is not active in the application (tipically, in console
+	// applications such as tcomposer)
 	bool send(DVGui::MsgType type, const QString &message);
 	void connectTo(const QString &address = "");
 
-	//server side
+	// server side
 	bool openConnection();
 	QString getConnectionName();
 
@@ -69,7 +70,7 @@ public:
 		void
 		sendMessage(int type, const QString &message);
 
-public Q_SLOTS:
+  public Q_SLOTS:
 
 	void OnNewConnection();
 	void OnReadyRead();

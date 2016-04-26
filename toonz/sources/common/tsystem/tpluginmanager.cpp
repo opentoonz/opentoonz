@@ -33,22 +33,19 @@
 
 class TPluginManager::Plugin
 {
-public:
+  public:
 #ifdef _WIN32
 	typedef HINSTANCE Handle;
 #else
 	typedef void *Handle;
 #endif
 
-private:
+  private:
 	Handle m_handle;
 	TPluginInfo m_info;
 
-public:
-	Plugin(Handle handle)
-		: m_handle(handle)
-	{
-	}
+  public:
+	Plugin(Handle handle) : m_handle(handle) {}
 
 	Handle getHandle() const { return m_handle; }
 	const TPluginInfo &getInfo() const { return m_info; }
@@ -103,8 +100,7 @@ bool TPluginManager::isIgnored(std::string name) const
 
 void TPluginManager::unloadPlugins()
 {
-	for (PluginTable::iterator it = m_pluginTable.begin();
-		 it != m_pluginTable.end(); ++it) {
+	for (PluginTable::iterator it = m_pluginTable.begin(); it != m_pluginTable.end(); ++it) {
 		Plugin::Handle handle = (*it)->getHandle();
 #ifndef LINUX
 #ifdef _WIN32
@@ -152,15 +148,13 @@ void TPluginManager::loadPlugin(const TFilePath &fp)
 		m_loadedPlugins.insert(fp);
 		Plugin *plugin = new Plugin(handle);
 		m_pluginTable.push_back(plugin);
-		//cout << "loaded" << endl;
+		// cout << "loaded" << endl;
 		TnzLibMainProcType *tnzLibMain = 0;
 #ifdef _WIN32
-		tnzLibMain = (TnzLibMainProcType *)
-			GetProcAddress(handle, TnzLibMainProcName);
+		tnzLibMain = (TnzLibMainProcType *)GetProcAddress(handle, TnzLibMainProcName);
 #else
-		tnzLibMain = (TnzLibMainProcType *)
-			dlsym(handle, TnzLibMainProcName);
-		if (!tnzLibMain) //provo _ come prefisso
+		tnzLibMain = (TnzLibMainProcType *)dlsym(handle, TnzLibMainProcName);
+		if (!tnzLibMain) // provo _ come prefisso
 			tnzLibMain = (TnzLibMainProcType *)dlsym(handle, TnzLibMainProcName2);
 #endif
 
@@ -197,8 +191,7 @@ void TPluginManager::loadPlugins(const TFilePath &dir)
 	if (dirContent.empty())
 		return;
 
-	for (TFilePathSet::iterator it = dirContent.begin();
-		 it != dirContent.end(); it++) {
+	for (TFilePathSet::iterator it = dirContent.begin(); it != dirContent.end(); it++) {
 		TFilePath fp = *it;
 		if (fp.getType() != extension)
 			continue;
@@ -232,7 +225,7 @@ void TPluginManager::loadStandardPlugins()
 
 	TFilePath pluginsDir = TSystem::getDllDir() + "plugins";
 
-	//loadPlugins(pluginsDir + "io");
+	// loadPlugins(pluginsDir + "io");
 	loadPlugins(pluginsDir + "fx");
 }
 

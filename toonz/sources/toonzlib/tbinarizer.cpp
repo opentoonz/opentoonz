@@ -7,7 +7,8 @@ namespace
 {
 
 //
-// computeColor: RGB =>  colore(0=Black, 1=Red,2=Green,3=Blue), valore (=max(r,g,b)), croma (= max(r,g,b)-min(r,g,b))
+// computeColor: RGB =>  colore(0=Black, 1=Red,2=Green,3=Blue), valore (=max(r,g,b)), croma (=
+// max(r,g,b)-min(r,g,b))
 //
 inline void computeColor(int &color, int &value, int &chroma, const TPixel32 &pix)
 {
@@ -37,21 +38,21 @@ inline void computeColor(int &color, int &value, int &chroma, const TPixel32 &pi
 		color = 3;
 
 	/*
-    // quando gestiremo anche ciano, magenta e giallo
-    int cD0 = c[0]-c[1], cD1 = c[1]-c[2];
-    if(cD0>cD1)
-    {
-      if(pix.r==cMax) color=1;
-      else if(pix.g==cMax) color=2;
-      else color=3;
-    }
-    else
-    {
-      if(pix.r==cMin) color=4;
-      else if(pix.g==cMin) color=5;
-      else color=6;
-    }
-    */
+	// quando gestiremo anche ciano, magenta e giallo
+	int cD0 = c[0]-c[1], cD1 = c[1]-c[2];
+	if(cD0>cD1)
+	{
+	  if(pix.r==cMax) color=1;
+	  else if(pix.g==cMax) color=2;
+	  else color=3;
+	}
+	else
+	{
+	  if(pix.r==cMin) color=4;
+	  else if(pix.g==cMin) color=5;
+	  else color=6;
+	}
+	*/
 }
 
 // ritorna true se i primi pixel del buffer non sono tutti opachi
@@ -64,7 +65,8 @@ bool hasAlpha(const TPixel32 *buffer, int w, int h)
 	return false;
 }
 
-// aggiunge un bianco opaco all'immagine (dovremmo gia' avere una funzione del genere, ma non l'ho trovata)
+// aggiunge un bianco opaco all'immagine (dovremmo gia' avere una funzione del genere, ma non l'ho
+// trovata)
 void removeAlpha(TPixel32 *buffer, int w, int h)
 {
 	TPixel32 *pix = buffer;
@@ -79,8 +81,7 @@ void removeAlpha(TPixel32 *buffer, int w, int h)
 
 //=========================================================
 
-TBinarizer::TBinarizer()
-	: m_alphaEnabled(true)
+TBinarizer::TBinarizer() : m_alphaEnabled(true)
 {
 }
 
@@ -90,8 +91,7 @@ void TBinarizer::process(const TRaster32P &ras)
 {
 	// palette di colori puri che verranno usati per l'output: nero, rosso, verde, blu
 	static const TPixel32 colors[] = {
-		TPixel32(0, 0, 0),
-		TPixel32(255, 0, 0), TPixel32(0, 255, 0), TPixel32(0, 0, 255),
+		TPixel32(0, 0, 0),	 TPixel32(255, 0, 0),   TPixel32(0, 255, 0),  TPixel32(0, 0, 255),
 		TPixel32(0, 255, 255), TPixel32(255, 0, 255), TPixel32(255, 255, 0)};
 
 	int w = ras->getLx(), h = ras->getLy();
@@ -108,11 +108,19 @@ void TBinarizer::process(const TRaster32P &ras)
 	int w1 = ((w - 1) >> b) + 1, h1 = ((h - 1) >> b) + 1;
 
 	// buffer di appoggio
-	std::vector<unsigned char> vBuffer(w * h, 0);	 // per ogni pixel: v = min(r,g,b) (inchiostro scuro su sfondo chiaro: mi sembra che min funzioni meglio di max)
-	std::vector<unsigned char> thrBuffer(w1 * h1, 0); // per ogni quadrato: se v>thrBuffer[k1] allora siamo sicuro che e' sfondo
-	std::vector<unsigned char> qBuffer(w1 * h1, 0);   // per ogni quadrato: quel v tale che solo 20 pixel in tutto il quadrato sono piu' scuri
-	std::vector<unsigned char> tBuffer(w * h, 255);   // per ogni pixel: 'tipo' del pixel (0..6=>colore, 20=cornice esterna, )
-	std::vector<unsigned char> sBuffer(w * h, 255);   // per ogni pixel: quando faccio il fill il colore si puo' estendere solo sui vicini con v<sBuffer[k]
+	std::vector<unsigned char> vBuffer(w * h, 0); // per ogni pixel: v = min(r,g,b) (inchiostro
+												  // scuro su sfondo chiaro: mi sembra che min
+												  // funzioni meglio di max)
+	std::vector<unsigned char> thrBuffer(
+		w1 * h1, 0); // per ogni quadrato: se v>thrBuffer[k1] allora siamo sicuro che e' sfondo
+	std::vector<unsigned char> qBuffer(
+		w1 * h1,
+		0); // per ogni quadrato: quel v tale che solo 20 pixel in tutto il quadrato sono piu' scuri
+	std::vector<unsigned char> tBuffer(
+		w * h, 255); // per ogni pixel: 'tipo' del pixel (0..6=>colore, 20=cornice esterna, )
+	std::vector<unsigned char> sBuffer(w * h, 255); // per ogni pixel: quando faccio il fill il
+													// colore si puo' estendere solo sui vicini con
+													// v<sBuffer[k]
 
 	std::vector<int> boundary1, boundary2; // usati per il fill
 	boundary1.reserve(w * h / 2);
@@ -148,7 +156,8 @@ void TBinarizer::process(const TRaster32P &ras)
 				goodBgQuadCount++;
 				bgThreshold = 29;
 			} else {
-				// background normale. salto eventuali zeri (lo sfondo puo' essere grigio, anche scuro)
+				// background normale. salto eventuali zeri (lo sfondo puo' essere grigio, anche
+				// scuro)
 				int i = 31;
 				while (i >= 0 && histo[i] == 0)
 					i--;
@@ -161,7 +170,8 @@ void TBinarizer::process(const TRaster32P &ras)
 				int i2 = 2 * i1 - i0;
 				bgThreshold = i2 - 1;
 			}
-			// calcolo qBuffer[k1] : e' un valore di v tale che pochi pixel (<20) hanno un valore inferiore.
+			// calcolo qBuffer[k1] : e' un valore di v tale che pochi pixel (<20) hanno un valore
+			// inferiore.
 			// Se qBuffer[k1] e' molto grande vuol dire che il quadrato e' vuoto
 			int i = 0;
 			int c = histo[i];
@@ -178,7 +188,8 @@ void TBinarizer::process(const TRaster32P &ras)
 	bool goodBackground = goodBgQuadCount > w1 * h1 / 2;
 
 	// thrDelta e' una correzione sul threshold per immagini con cattivo background
-	// un quadrato che abbia meno di 20 (v.s sopra c<20) sotto thrBuffer[k1]-thrDelta e' considerato sfondo
+	// un quadrato che abbia meno di 20 (v.s sopra c<20) sotto thrBuffer[k1]-thrDelta e' considerato
+	// sfondo
 	int thrDelta = 0;
 	if (!goodBackground)
 		thrDelta = 20;
@@ -210,14 +221,16 @@ void TBinarizer::process(const TRaster32P &ras)
 					if (vk < thrBuffer[k1]) {
 						// vk<thrBuffer[k1] : non e' detto che il pixel sia sfondo
 						bool isSeed = false;
-						if (vk2 <= vBuffer[k + 1] && vk2 <= vBuffer[k - 1] && vk2 <= vBuffer[k + w] && vk2 <= vBuffer[k - w]) {
+						if (vk2 <= vBuffer[k + 1] && vk2 <= vBuffer[k - 1] &&
+							vk2 <= vBuffer[k + w] && vk2 <= vBuffer[k - w]) {
 							// il pixel e' un minimo locale. calcolo il colore
 							int color, value, chroma;
 							computeColor(color, value, chroma, buffer[k]);
 
 							const int chromaThreshold = 40;
 							if (chroma > chromaThreshold) {
-								// il pixel e' un buon candidato ad essere "sicuramente colorato": controllo i vicini
+								// il pixel e' un buon candidato ad essere "sicuramente colorato":
+								// controllo i vicini
 								// per evitare i pixel colorati sparsi (sulle linee nere).
 								int m = 0;
 								int dd[] = {1, -1, w, -w, 1 + w, 1 - w, -1 + w, -1 - w};
@@ -227,8 +240,10 @@ void TBinarizer::process(const TRaster32P &ras)
 									if (ch1 > 20 && c1 == color)
 										m++;
 								}
-								// scarto se intorno non ci sono almeno due pixel dello stesso colore
-								// n.b. lascio un valore alto per chroma per evitare che il pixel possa diventare "sicuramente nero". vedi sotto
+								// scarto se intorno non ci sono almeno due pixel dello stesso
+								// colore
+								// n.b. lascio un valore alto per chroma per evitare che il pixel
+								// possa diventare "sicuramente nero". vedi sotto
 								if (m < 2)
 									chroma = chromaThreshold - 1;
 							}
@@ -237,14 +252,18 @@ void TBinarizer::process(const TRaster32P &ras)
 								// "sicuramente" colorato
 								tBuffer[k] = color;
 								isSeed = true;
-							} else if (chroma < 15 && vBuffer[k] * 100 < qBuffer[k1] * 25 + (thrBuffer[k1] - thrDelta) * 75) {
-								// molto poco colorato e scuro (al 25% della distanza fra qBuffer[] e bg) => "sicuramente" nero
+							} else if (chroma < 15 &&
+									   vBuffer[k] * 100 <
+										   qBuffer[k1] * 25 + (thrBuffer[k1] - thrDelta) * 75) {
+								// molto poco colorato e scuro (al 25% della distanza fra qBuffer[]
+								// e bg) => "sicuramente" nero
 								tBuffer[k] = 0;
 								isSeed = true;
 							}
 						}
 						if (isSeed) {
-							// se il pixel e' sicuramente colorato o sicuramente nero diventa un seme per il fill
+							// se il pixel e' sicuramente colorato o sicuramente nero diventa un
+							// seme per il fill
 							// il fill si deve fermare quando sono al 50% della distanza verso il bg
 							sBuffer[k] = (vBuffer[k] + thrBuffer[k1]) / 2;
 							boundary1.push_back(k);
@@ -264,7 +283,8 @@ void TBinarizer::process(const TRaster32P &ras)
 			const int dd[] = {1, -1, w, -w};
 			for (int j = 0; j < 4; j++) {
 				int ka = dd[j] + k;
-				// se il pixel adiacente non e' gia' colorato (e non e' la cornice esterna) e ha un v ancora abbastanza scuro...
+				// se il pixel adiacente non e' gia' colorato (e non e' la cornice esterna) e ha un
+				// v ancora abbastanza scuro...
 				if (tBuffer[ka] > 20 && vBuffer[ka] < sBuffer[k]) {
 					// lo coloro e lo faccio diventare un nuovo seme
 					tBuffer[ka] = tBuffer[k];

@@ -24,7 +24,7 @@ class TOStream;
 
 class DVAPI TIStreamException : public TException
 {
-public:
+  public:
 	TIStreamException(TIStream &is);
 	TIStreamException(TIStream &is, const TException &e);
 	TIStreamException(TIStream &is, std::wstring message);

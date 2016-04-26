@@ -28,8 +28,10 @@ inline bool supportsRandomAccess(const TFilePath &fp)
 {
 	const std::string &type = fp.getType();
 	return type == "tlv" || // TLVs do support random access
-		   //type == "pli" ||                                       // PLIs... I thought they would - but no :(
-		   //type == "mov" ||                                       // MOVs are 'on the way' to support it... for now, no
+		   // type == "pli" ||                                       // PLIs... I thought they would
+		   // - but no :(
+		   // type == "mov" ||                                       // MOVs are 'on the way' to
+		   // support it... for now, no
 		   fp.getDots() == ".."; // Multi-file levels of course do
 }
 
@@ -76,14 +78,16 @@ void enforceBpp(TPropertyGroup *pg, int bpp, bool upgradeOnly)
 //*****************************************************************************************
 
 LevelUpdater::LevelUpdater()
-	: m_pg(0), m_inputLevel(0), m_currIdx(0), m_imageInfo(0), m_usingTemporaryFile(false), m_opened(false)
+	: m_pg(0), m_inputLevel(0), m_currIdx(0), m_imageInfo(0), m_usingTemporaryFile(false),
+	  m_opened(false)
 {
 }
 
 //-----------------------------------------------------------------------------
 
 LevelUpdater::LevelUpdater(TXshSimpleLevel *sl)
-	: m_pg(0), m_inputLevel(0), m_imageInfo(0), m_currIdx(0), m_opened(false), m_usingTemporaryFile(false)
+	: m_pg(0), m_inputLevel(0), m_imageInfo(0), m_currIdx(0), m_opened(false),
+	  m_usingTemporaryFile(false)
 {
 	open(sl);
 }
@@ -91,7 +95,8 @@ LevelUpdater::LevelUpdater(TXshSimpleLevel *sl)
 //-----------------------------------------------------------------------------
 
 LevelUpdater::LevelUpdater(const TFilePath &fp, TPropertyGroup *lwProperties)
-	: m_pg(0), m_inputLevel(0), m_imageInfo(0), m_currIdx(0), m_opened(false), m_usingTemporaryFile(false)
+	: m_pg(0), m_inputLevel(0), m_imageInfo(0), m_currIdx(0), m_opened(false),
+	  m_usingTemporaryFile(false)
 {
 	open(fp, lwProperties);
 }
@@ -153,10 +158,13 @@ void LevelUpdater::buildSourceInfo(const TFilePath &fp)
 
 		const TImageInfo *info = m_lr->getImageInfo();
 		if (info) {
-			m_imageInfo = new TImageInfo(*info); // Clone the info. The originals are owned by the reader.
+			m_imageInfo =
+				new TImageInfo(*info); // Clone the info. The originals are owned by the reader.
 			if (info->m_properties)
-				m_imageInfo->m_properties = info->m_properties->clone(); // Same for these (unfortunately, TImageInfo is currently
-																		 // no more than a struct...)
+				m_imageInfo->m_properties =
+					info->m_properties
+						->clone(); // Same for these (unfortunately, TImageInfo is currently
+								   // no more than a struct...)
 		}
 	} catch (...) {
 		// The level exists but could not be read.
@@ -178,7 +186,8 @@ void LevelUpdater::buildSourceInfo(const TFilePath &fp)
 void LevelUpdater::buildProperties(const TFilePath &fp)
 {
 	// Ensure that at least the default properties for specified fp.getType() exist.
-	m_pg = (m_imageInfo && m_imageInfo->m_properties) ? m_imageInfo->m_properties->clone() : Tiio::makeWriterProperties(fp.getType());
+	m_pg = (m_imageInfo && m_imageInfo->m_properties) ? m_imageInfo->m_properties->clone()
+													  : Tiio::makeWriterProperties(fp.getType());
 
 	if (!m_pg) {
 		// If no suitable pg could be found, the extension must be wrong. Reset and throw.
@@ -211,7 +220,8 @@ void LevelUpdater::open(const TFilePath &fp, TPropertyGroup *pg)
 		m_usingTemporaryFile = existsLevel && !supportsRandomAccess(fp);
 		if (m_usingTemporaryFile) {
 			// The level requires a temporary to write frames to. Upon closing, the original level
-			// is deleted and the temporary takes its place. Note that m_lw takes ownership of the properties group.
+			// is deleted and the temporary takes its place. Note that m_lw takes ownership of the
+			// properties group.
 			m_lwPath = getNewTemporaryFilePath(fp);
 			m_lw = TLevelWriterP(m_lwPath, m_pg->clone());
 
@@ -219,7 +229,7 @@ void LevelUpdater::open(const TFilePath &fp, TPropertyGroup *pg)
 				for (TLevel::Iterator it = m_inputLevel->begin(); it != m_inputLevel->end(); ++it)
 					m_fids.push_back(it->first);
 		} else {
-			m_lr = TLevelReaderP();					 // Release the reader. This is necessary since the
+			m_lr = TLevelReaderP(); // Release the reader. This is necessary since the
 			m_lw = TLevelWriterP(fp, m_pg->clone()); // original file itself will be MODIFIED.
 			m_lwPath = fp;
 		}
@@ -232,7 +242,8 @@ void LevelUpdater::open(const TFilePath &fp, TPropertyGroup *pg)
 		throw;
 	}
 
-	// In case the writer saves icons inside the output level (TLV case), set the associated icon size now
+	// In case the writer saves icons inside the output level (TLV case), set the associated icon
+	// size now
 	TDimension iconSize = Preferences::instance()->getIconSize();
 	assert(iconSize.lx > 0 && iconSize.ly > 0);
 	m_lw->setIconSize(iconSize);
@@ -266,7 +277,8 @@ void LevelUpdater::open(TXshSimpleLevel *sl)
 	assert(levelProperties);
 
 	if (levelProperties->hasAlpha() || !existsLevel) {
-		int bpp = levelProperties->hasAlpha() ? tmin(32, levelProperties->getBpp()) : levelProperties->getBpp();
+		int bpp = levelProperties->hasAlpha() ? tmin(32, levelProperties->getBpp())
+											  : levelProperties->getBpp();
 		enforceBpp(m_pg, bpp, existsLevel);
 	}
 
@@ -294,7 +306,8 @@ void LevelUpdater::open(TXshSimpleLevel *sl)
 	// Load the frames directly from sl
 	sl->getFids(m_fids);
 
-	// In case the writer saves icons inside the output level (TLV case), set the associated icon size now
+	// In case the writer saves icons inside the output level (TLV case), set the associated icon
+	// size now
 	TDimension iconSize = Preferences::instance()->getIconSize();
 	assert(iconSize.lx > 0 && iconSize.ly > 0);
 	m_lw->setIconSize(iconSize);
@@ -330,11 +343,13 @@ void LevelUpdater::addFramesTo(int endIdx)
 		// in memory. Images are accessed through the level itself.
 
 		for (; m_currIdx < endIdx; ++m_currIdx) {
-			TImageP img = m_sl->getFullsampledFrame(m_fids[m_currIdx], ImageManager::dontPutInCache);
+			TImageP img =
+				m_sl->getFullsampledFrame(m_fids[m_currIdx], ImageManager::dontPutInCache);
 			assert(img);
 
 			if (!img && m_lr) {
-				// This should actually never happen. ImageManager should already ensure that img exists.
+				// This should actually never happen. ImageManager should already ensure that img
+				// exists.
 				// However, as last resort let's just look at the file too...
 				img = m_lr->getFrameReader(m_fids[m_currIdx])->load();
 				if (img)
@@ -393,19 +408,25 @@ void LevelUpdater::close()
 			// Add all remaining frames still in m_fids
 			addFramesTo((int)m_fids.size());
 
-			// Currently written level is temporary. It must be renamed to its originally intended path,
-			// if it's possible to write there. Now, if it's writable, in particular it should be readable,
+			// Currently written level is temporary. It must be renamed to its originally intended
+			// path,
+			// if it's possible to write there. Now, if it's writable, in particular it should be
+			// readable,
 			// so m_lr should exist.
 
-			// If not... well, the file was corrupt or something. Instead than attempting to delete it,
-			// we're begin conservative - this means that no data is lost, but unfortunately temporaries
+			// If not... well, the file was corrupt or something. Instead than attempting to delete
+			// it,
+			// we're begin conservative - this means that no data is lost, but unfortunately
+			// temporaries
 			// might pile up...
 			if (m_lr) {
 				TFilePath finalPath(m_lr->getFilePath()), tempPath(m_lw->getFilePath());
 
 				// Release m_lr and m_lw - to be sure that no file is kept open while renaming.
-				// NOTE: releasing m_lr and m_lw should not throw anything. As stated before, throwing
-				//       in destructors is bad. I'm not sure this is actually guaranteed in Toonz, however :(
+				// NOTE: releasing m_lr and m_lw should not throw anything. As stated before,
+				// throwing
+				//       in destructors is bad. I'm not sure this is actually guaranteed in Toonz,
+				//       however :(
 				m_lr = TLevelReaderP(), m_lw = TLevelWriterP();
 
 				// Rename the level
@@ -437,7 +458,8 @@ void LevelUpdater::close()
 			}
 
 			// NOTE: If for some reason m_lr was not present and we were using a temporary file, no
-			// renaming takes place. Users could see the __x temporaries and, eventually, rename them manually
+			// renaming takes place. Users could see the __x temporaries and, eventually, rename
+			// them manually
 			// or see what's wrong with the unwritable file.
 		}
 

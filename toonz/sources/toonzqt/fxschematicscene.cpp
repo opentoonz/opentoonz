@@ -49,13 +49,14 @@ class MatchesFx
 {
 	TFxP m_fx;
 
-public:
+  public:
 	MatchesFx(const TFxP &fx) : m_fx(fx) {}
 
 	bool operator()(const TFxP &fx)
 	{
 		TZeraryColumnFx *zfx = dynamic_cast<TZeraryColumnFx *>(fx.getPointer());
-		return (m_fx.getPointer() == fx.getPointer()) || (zfx && m_fx.getPointer() == zfx->getZeraryFx());
+		return (m_fx.getPointer() == fx.getPointer()) ||
+			   (zfx && m_fx.getPointer() == zfx->getZeraryFx());
 	}
 };
 
@@ -86,9 +87,11 @@ void keepSubgroup(QMap<int, QList<SchematicNode *>> &editedGroup)
 //-----------------------------------------------------------
 
 //! Find the input and the output fx contained in \b visitedFxs.
-//! \b visitedFxs must be a connected fx selection. In \b outputFx is put the root of the connected fx selection.
+//! \b visitedFxs must be a connected fx selection. In \b outputFx is put the root of the connected
+//! fx selection.
 //! In \b inputFx is put a leaf of the connected fx selection.
-void findBoundariesFxs(TFx *&inputFx, TFx *&outputFx, QMap<TFx *, bool> &visitedFxs, TFx *currentFx = 0)
+void findBoundariesFxs(TFx *&inputFx, TFx *&outputFx, QMap<TFx *, bool> &visitedFxs,
+					   TFx *currentFx = 0)
 {
 	if (visitedFxs.isEmpty())
 		return;
@@ -319,13 +322,18 @@ int FxSchematicScene::SupportLinks::size()
 //==================================================================
 
 FxSchematicScene::FxSchematicScene(QWidget *parent)
-	: SchematicScene(parent), m_firstPoint(sceneRect().center()), m_xshHandle(0), m_fxHandle(0), m_addFxContextMenu(), m_disconnectionLinks(), m_connectionLinks(), m_isConnected(false), m_linkUnlinkSimulation(false), m_altPressed(false), m_lastPos(0, 0), m_currentFxNode(0), m_gridDimension(eSmall), m_isLargeScaled(true)
+	: SchematicScene(parent), m_firstPoint(sceneRect().center()), m_xshHandle(0), m_fxHandle(0),
+	  m_addFxContextMenu(), m_disconnectionLinks(), m_connectionLinks(), m_isConnected(false),
+	  m_linkUnlinkSimulation(false), m_altPressed(false), m_lastPos(0, 0), m_currentFxNode(0),
+	  m_gridDimension(eSmall), m_isLargeScaled(true)
 {
 	m_selection = new FxSelection();
 	m_selection->setFxSchematicScene(this);
 
-	connect(m_selection, SIGNAL(doCollapse(const QList<TFxP> &)), this, SLOT(onCollapse(const QList<TFxP> &)));
-	connect(m_selection, SIGNAL(doExplodeChild(const QList<TFxP> &)), this, SIGNAL(doExplodeChild(const QList<TFxP> &)));
+	connect(m_selection, SIGNAL(doCollapse(const QList<TFxP> &)), this,
+			SLOT(onCollapse(const QList<TFxP> &)));
+	connect(m_selection, SIGNAL(doExplodeChild(const QList<TFxP> &)), this,
+			SIGNAL(doExplodeChild(const QList<TFxP> &)));
 	connect(this, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
 
 	m_addFxContextMenu.setSelection(m_selection);
@@ -395,10 +403,10 @@ void FxSchematicScene::updateScene()
 	int i;
 
 	FxDag *fxDag = xsh->getFxDag();
-	//Add XSheetFX node
+	// Add XSheetFX node
 	addFxSchematicNode(fxDag->getXsheetFx());
 
-	//Add outputFx nodes
+	// Add outputFx nodes
 	int k;
 	for (k = 0; k < fxDag->getOutputFxCount(); k++) {
 		TOutputFx *fx = fxDag->getOutputFx(k);
@@ -411,7 +419,7 @@ void FxSchematicScene::updateScene()
 			editedGroup[fx->getAttributes()->getEditingGroupId()].append(node);
 	}
 
-	//Add columnFx and zeraryFx nodes
+	// Add columnFx and zeraryFx nodes
 	for (i = 0; i < xsh->getColumnCount(); i++) {
 		TXshColumn *column = xsh->getColumn(i);
 		TFx *fx = 0;
@@ -435,7 +443,7 @@ void FxSchematicScene::updateScene()
 			editedGroup[fx->getAttributes()->getEditingGroupId()].append(node);
 	}
 
-	//Add normalFx
+	// Add normalFx
 	for (i = 0; i < fxSet->getFxCount(); i++) {
 		TFx *fx = fxSet->getFx(i);
 		TMacroFx *macro = dynamic_cast<TMacroFx *>(fx);
@@ -448,7 +456,8 @@ void FxSchematicScene::updateScene()
 			for (j = 0; j < (int)fxs.size(); j++) {
 				SchematicNode *node = addFxSchematicNode(fxs[j].getPointer());
 				editedMacro[macro].append(node);
-				if (fxs[j]->getAttributes()->isGrouped() && macro->getAttributes()->isGroupEditing())
+				if (fxs[j]->getAttributes()->isGrouped() &&
+					macro->getAttributes()->isGroupEditing())
 					editedGroup[fx->getAttributes()->getEditingGroupId()].append(node);
 			}
 			continue;
@@ -458,7 +467,7 @@ void FxSchematicScene::updateScene()
 			editedGroup[fx->getAttributes()->getEditingGroupId()].append(node);
 	}
 
-	//grouped node
+	// grouped node
 	QMap<int, QList<TFxP>>::const_iterator it;
 	for (it = groupedFxs.begin(); it != groupedFxs.end(); it++) {
 		FxSchematicNode *node = addGroupedFxSchematicNode(it.key(), it.value());
@@ -505,14 +514,16 @@ void FxSchematicScene::updateEditedGroups(const QMap<int, QList<SchematicNode *>
 
 //------------------------------------------------------------------
 
-void FxSchematicScene::updateEditedMacros(const QMap<TMacroFx *, QList<SchematicNode *>> &editedMacro)
+void FxSchematicScene::updateEditedMacros(
+	const QMap<TMacroFx *, QList<SchematicNode *>> &editedMacro)
 {
 	QMap<TMacroFx *, QList<SchematicNode *>>::const_iterator it;
 	for (it = editedMacro.begin(); it != editedMacro.end(); it++) {
 		TMacroFx *macro = it.key();
 		int zValue = 2;
 		if (macro->getAttributes()->isGrouped()) {
-			FxSchematicGroupEditor *containingGroup = m_groupEditorTable[macro->getAttributes()->getEditingGroupId()];
+			FxSchematicGroupEditor *containingGroup =
+				m_groupEditorTable[macro->getAttributes()->getEditingGroupId()];
 			assert(containingGroup);
 			zValue = containingGroup->zValue() + 2;
 		}
@@ -546,7 +557,8 @@ FxSchematicNode *FxSchematicScene::addFxSchematicNode(TFx *fx)
 
 //------------------------------------------------------------------
 
-FxSchematicNode *FxSchematicScene::addGroupedFxSchematicNode(int groupId, const QList<TFxP> &groupedFxs)
+FxSchematicNode *FxSchematicScene::addGroupedFxSchematicNode(int groupId,
+															 const QList<TFxP> &groupedFxs)
 {
 	TFxSet *terminals = getXsheet()->getFxDag()->getTerminalFxs();
 	QList<TFxP> roots = getRoots(groupedFxs, terminals);
@@ -566,8 +578,9 @@ FxSchematicNode *FxSchematicScene::addGroupedFxSchematicNode(int groupId, const 
 
 //------------------------------------------------------------------
 
-FxSchematicGroupEditor *FxSchematicScene::addEditedGroupedFxSchematicNode(int groupId,
-																		  const QList<SchematicNode *> &groupedFxs)
+FxSchematicGroupEditor *
+FxSchematicScene::addEditedGroupedFxSchematicNode(int groupId,
+												  const QList<SchematicNode *> &groupedFxs)
 {
 	FxSchematicGroupEditor *editorGroup = new FxSchematicGroupEditor(groupId, groupedFxs, this);
 	m_groupEditorTable[groupId] = editorGroup;
@@ -576,7 +589,9 @@ FxSchematicGroupEditor *FxSchematicScene::addEditedGroupedFxSchematicNode(int gr
 
 //------------------------------------------------------------------
 
-FxSchematicMacroEditor *FxSchematicScene::addEditedMacroFxSchematicNode(TMacroFx *macro, const QList<SchematicNode *> &groupedFxs)
+FxSchematicMacroEditor *
+FxSchematicScene::addEditedMacroFxSchematicNode(TMacroFx *macro,
+												const QList<SchematicNode *> &groupedFxs)
 {
 	FxSchematicMacroEditor *editorMacro = new FxSchematicMacroEditor(macro, groupedFxs, this);
 	m_macroEditorTable[macro] = editorMacro;
@@ -631,12 +646,12 @@ void FxSchematicScene::placeNode(FxSchematicNode *node)
 	FxDag *fxDag = m_xshHandle->getXsheet()->getFxDag();
 	QRectF nodeRect = node->boundingRect();
 	if (node->isA(eOutpuFx)) {
-		//I'm placing an output node
+		// I'm placing an output node
 		TFx *xsheetFx = fxDag->getXsheetFx();
 		TFxPort *outPort = xsheetFx->getOutputConnection(0);
 		TFx *connectedOutput = outPort ? outPort->getOwnerFx() : 0;
 		if (connectedOutput && connectedOutput == node->getFx()) {
-			//The output node is connected to the xsheet node
+			// The output node is connected to the xsheet node
 			TPointD pos = xsheetFx->getAttributes()->getDagNodePos();
 			if (pos != TConst::nowhere)
 				nodeRect.translate(pos.x + 120, pos.y);
@@ -645,12 +660,12 @@ void FxSchematicScene::placeNode(FxSchematicNode *node)
 			while (!isAnEmptyZone(nodeRect))
 				nodeRect.translate(0, step);
 		} else {
-			//The output node is not connected to the xsheet node
+			// The output node is not connected to the xsheet node
 			TFx *fx = node->getFx();
 			TFxPort *port = fx->getInputPort(0);
 			TFx *inputFx = port->getFx();
 			if (inputFx) {
-				//The output node is connected to another node
+				// The output node is connected to another node
 				TPointD pos = inputFx->getAttributes()->getDagNodePos();
 				if (pos != TConst::nowhere)
 					nodeRect.translate(pos.x + 120, pos.y);
@@ -659,7 +674,7 @@ void FxSchematicScene::placeNode(FxSchematicNode *node)
 					return;
 				}
 			} else {
-				//The output node is not connected
+				// The output node is not connected
 				QPointF pos = sceneRect().center();
 				nodeRect.translate(pos);
 			}
@@ -671,7 +686,7 @@ void FxSchematicScene::placeNode(FxSchematicNode *node)
 		node->setPos(newPos);
 		return;
 	} else if (node->isA(eXSheetFx)) {
-		//I'm placing the xsheet node
+		// I'm placing the xsheet node
 		TFxSet *terminalFxs = fxDag->getTerminalFxs();
 		int i;
 		double maxX = m_firstPoint.x();
@@ -690,9 +705,9 @@ void FxSchematicScene::placeNode(FxSchematicNode *node)
 		node->getFx()->getAttributes()->setDagNodePos(TPointD(pos.x(), pos.y()));
 		node->setPos(pos);
 		return;
-	} else if (node->isA(eMacroFx) || node->isA(eNormalFx) ||
-			   node->isA(eNormalLayerBlendingFx) || node->isA(eNormalMatteFx) || node->isA(eNormalImageAdjustFx)) {
-		//I'm placing an effect or a macro
+	} else if (node->isA(eMacroFx) || node->isA(eNormalFx) || node->isA(eNormalLayerBlendingFx) ||
+			   node->isA(eNormalMatteFx) || node->isA(eNormalImageAdjustFx)) {
+		// I'm placing an effect or a macro
 		TFx *inputFx = node->getFx()->getInputPort(0)->getFx();
 		QPointF pos;
 		if (inputFx) {
@@ -724,7 +739,7 @@ void FxSchematicScene::placeNode(FxSchematicNode *node)
 		}
 		return;
 	} else if (node->isA(eZeraryFx) || node->isA(eColumnFx) || node->isA(eGroupedFx)) {
-		//I'm placing a column
+		// I'm placing a column
 		nodeRect.translate(m_firstPoint);
 		nodeRect.translate(10, 10);
 		while (!isAnEmptyZone(nodeRect))
@@ -762,7 +777,8 @@ void FxSchematicScene::updateLink()
 			TFxPort *port = inputPortsFx->getInputPort(i);
 
 			if (TFx *linkedFx = port->getFx()) {
-				if (!linkedFx->getAttributes()->isGrouped() || linkedFx->getAttributes()->isGroupEditing()) {
+				if (!linkedFx->getAttributes()->isGrouped() ||
+					linkedFx->getAttributes()->isGroupEditing()) {
 					// Not in a group / open group case
 					assert(m_table.contains(linkedFx));
 
@@ -777,7 +793,8 @@ void FxSchematicScene::updateLink()
 					assert(m_groupedTable.contains(linkedFx->getAttributes()->getGroupId()));
 
 					if (m_groupedTable.contains(linkedFx->getAttributes()->getGroupId())) {
-						FxSchematicNode *linkedNode = m_groupedTable[linkedFx->getAttributes()->getGroupId()];
+						FxSchematicNode *linkedNode =
+							m_groupedTable[linkedFx->getAttributes()->getGroupId()];
 						SchematicPort *p0 = linkedNode->getOutputPort();
 						SchematicPort *p1 = node->getInputPort(i);
 						if (p0 && p1)
@@ -817,7 +834,8 @@ void FxSchematicScene::updateLink()
 					TFx *linkedFx = fx->getInputPort(j)->getFx();
 					if (!linkedFx)
 						continue;
-					if (!linkedFx->getAttributes()->isGrouped() || linkedFx->getAttributes()->isGroupEditing()) {
+					if (!linkedFx->getAttributes()->isGrouped() ||
+						linkedFx->getAttributes()->isGroupEditing()) {
 						assert(m_table.contains(linkedFx));
 						if (m_table.contains(linkedFx)) {
 							FxSchematicNode *linkedNode = m_table[linkedFx];
@@ -844,7 +862,7 @@ void FxSchematicScene::updateLink()
 		}
 	}
 
-	//to solve an edit macro problem: create a dummy link
+	// to solve an edit macro problem: create a dummy link
 	QMap<TMacroFx *, FxSchematicMacroEditor *>::iterator it3;
 	for (it3 = m_macroEditorTable.begin(); it3 != m_macroEditorTable.end(); it3++) {
 		TMacroFx *macro = it3.key();
@@ -1100,7 +1118,8 @@ void FxSchematicScene::onSelectionChanged()
 					if (columnNode)
 						m_selection->select(columnNode->getColumnIndex());
 					else {
-						FxSchematicPaletteNode *paletteNode = dynamic_cast<FxSchematicPaletteNode *>(node);
+						FxSchematicPaletteNode *paletteNode =
+							dynamic_cast<FxSchematicPaletteNode *>(node);
 						if (paletteNode)
 							m_selection->select(paletteNode->getColumnIndex());
 					}
@@ -1168,7 +1187,7 @@ void FxSchematicScene::reorderScene()
 		minY = tmin(y, minY);
 	}
 
-	//remove retrolink
+	// remove retrolink
 	for (i = 0; i < xsh->getColumnCount(); i++) {
 		TXshColumn *column = xsh->getColumn(i);
 		TFx *fx = column->getFx();
@@ -1240,8 +1259,7 @@ void FxSchematicScene::placeNodeAndParents(TFx *fx, double x, double &maxX, doub
 	if (!fx)
 		return;
 	m_placedFxs.append(fx);
-	if (fx->getFxType() == "STD_particlesFx" ||
-		fx->getFxType() == "STD_Iwa_ParticlesFx") {
+	if (fx->getFxType() == "STD_particlesFx" || fx->getFxType() == "STD_Iwa_ParticlesFx") {
 		TXsheet *xsh = m_xshHandle->getXsheet();
 		int i = 0;
 		for (i = 0; i < xsh->getColumnCount(); i++) {
@@ -1262,7 +1280,7 @@ void FxSchematicScene::placeNodeAndParents(TFx *fx, double x, double &maxX, doub
 	int i;
 	for (i = 0; i < fx->getOutputConnectionCount(); i++) {
 		TFx *outputFx = fx->getOutputConnection(i)->getOwnerFx();
-		//controllo se e' una porta sorgente
+		// controllo se e' una porta sorgente
 		TFxPort *port = outputFx->getInputPort(0);
 		if (port && port->getFx() != fx)
 			continue;
@@ -1491,7 +1509,7 @@ void FxSchematicScene::onSwitchCurrentFx(TFx *fx)
 
 		SwatchViewer::suspendRendering(false);
 
-		m_fxHandle->setFx(fx, false); //Setting the fx updates the swatch
+		m_fxHandle->setFx(fx, false); // Setting the fx updates the swatch
 
 		emit editObject();
 	} else {
@@ -1503,7 +1521,7 @@ void FxSchematicScene::onSwitchCurrentFx(TFx *fx)
 
 void FxSchematicScene::onFxNodeDoubleClicked()
 {
-	//emitting fxSettingsShouldBeSwitched
+	// emitting fxSettingsShouldBeSwitched
 	m_fxHandle->onFxNodeDoubleClicked();
 }
 
@@ -1577,7 +1595,7 @@ void FxSchematicScene::mousePressEvent(QGraphicsSceneMouseEvent *me)
    ② 最上段にあるSchematicNode::mousePressEvent内でsetSelected(this)が呼ばれ
    ③ シグナルQGraphicsScene::selectionChanged()がエミットされ
    ④ スロットFxSchematticScene::onSelectionChanged()が呼ばれ
-    その中で、いったんselectNone()され、その後選択ノードが追加される。
+	その中で、いったんselectNone()され、その後選択ノードが追加される。
    ここにいたるまでにm_selectionが正しく更新される保障が無い。
    よって、選択Fx無しと勘違いして、FxSettingsが更新されないおそれがある。
    そこで、m_selection->isEmpty()では無く、QGraphicsScene::selectedItems()の個数で
@@ -1600,8 +1618,8 @@ void FxSchematicScene::mousePressEvent(QGraphicsSceneMouseEvent *me)
 		m_selectionOldPos.append(QPair<TFxP, TPointD>(selectedFx, pos));
 	}
 	FxsData fxsData;
-	fxsData.setFxs(m_selection->getFxs(), m_selection->getLinks(),
-				   m_selection->getColumnIndexes(), m_xshHandle->getXsheet());
+	fxsData.setFxs(m_selection->getFxs(), m_selection->getLinks(), m_selection->getColumnIndexes(),
+				   m_xshHandle->getXsheet());
 	if (fxsData.isConnected() && me->button() == Qt::LeftButton && !port && !link)
 		m_isConnected = true;
 }
@@ -1672,8 +1690,10 @@ void FxSchematicScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *me)
 			SchematicLink *link = bridgeLinks[0];
 
 			if (link) {
-				FxSchematicNode *outputNode = dynamic_cast<FxSchematicNode *>(link->getEndPort()->getNode());
-				FxSchematicNode *inputNode = dynamic_cast<FxSchematicNode *>(link->getStartPort()->getNode());
+				FxSchematicNode *outputNode =
+					dynamic_cast<FxSchematicNode *>(link->getEndPort()->getNode());
+				FxSchematicNode *inputNode =
+					dynamic_cast<FxSchematicNode *>(link->getStartPort()->getNode());
 
 				if (inputNode && outputNode) {
 					SchematicPort *port = link->getStartPort();
@@ -1691,7 +1711,8 @@ void FxSchematicScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *me)
 					if (!outputNode->isA(eXSheetFx))
 						fxLink.m_index = i;
 
-					TFxCommand::connectFxs(fxLink, m_selection->getFxs().toStdList(), m_xshHandle, m_selectionOldPos);
+					TFxCommand::connectFxs(fxLink, m_selection->getFxs().toStdList(), m_xshHandle,
+										   m_selectionOldPos);
 				}
 			}
 		} else if (m_disconnectionLinks.size() > 0) {
@@ -1723,7 +1744,9 @@ bool FxSchematicScene::event(QEvent *e)
 void FxSchematicScene::onInsertPaste()
 {
 	if (!m_selection->insertPasteSelection())
-		DVGui::error(tr("Cannot Paste Insert a selection of unconnected FX nodes.\nSelect FX nodes and related links before copying or cutting the selection you want to paste."));
+		DVGui::error(
+			tr("Cannot Paste Insert a selection of unconnected FX nodes.\nSelect FX nodes and "
+			   "related links before copying or cutting the selection you want to paste."));
 }
 
 //------------------------------------------------------------------
@@ -1731,7 +1754,9 @@ void FxSchematicScene::onInsertPaste()
 void FxSchematicScene::onAddPaste()
 {
 	if (!m_selection->addPasteSelection())
-		DVGui::error(tr("Cannot Paste Add a selection of unconnected FX nodes.\nSelect FX nodes and related links before copying or cutting the selection you want to paste."));
+		DVGui::error(
+			tr("Cannot Paste Add a selection of unconnected FX nodes.\nSelect FX nodes and related "
+			   "links before copying or cutting the selection you want to paste."));
 }
 
 //------------------------------------------------------------------
@@ -1739,7 +1764,9 @@ void FxSchematicScene::onAddPaste()
 void FxSchematicScene::onReplacePaste()
 {
 	if (!m_selection->replacePasteSelection())
-		DVGui::error(tr("Cannot Paste Replace a selection of unconnected FX nodes.\nSelect FX nodes and related links before copying or cutting the selection you want to paste."));
+		DVGui::error(
+			tr("Cannot Paste Replace a selection of unconnected FX nodes.\nSelect FX nodes and "
+			   "related links before copying or cutting the selection you want to paste."));
 }
 
 //------------------------------------------------------------------
@@ -1807,7 +1834,7 @@ void FxSchematicScene::onEditGroup()
 void FxSchematicScene::highlightLinks(FxSchematicNode *node, bool value)
 {
 	int i, portCount = node->getInputPortCount();
-	//SchematicLink* ghostLink = m_supportLinks.getDisconnectionLink(eGhost);
+	// SchematicLink* ghostLink = m_supportLinks.getDisconnectionLink(eGhost);
 	for (i = 0; i < portCount; i++) {
 		FxSchematicPort *port = node->getInputPort(i);
 		int j, linkCount = port->getLinkCount();
@@ -2086,7 +2113,7 @@ void FxSchematicScene::closeInnerMacroEditor(int groupId)
 
 void FxSchematicScene::resizeNodes(bool maximizedNode)
 {
-	//resize nodes
+	// resize nodes
 	m_gridDimension = maximizedNode ? eLarge : eSmall;
 	m_xshHandle->getXsheet()->getFxDag()->setDagGridDimension(m_gridDimension);
 	QMap<TFx *, FxSchematicNode *>::iterator it1;

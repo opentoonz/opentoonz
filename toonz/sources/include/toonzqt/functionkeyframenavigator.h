@@ -16,12 +16,12 @@ class DVAPI FunctionKeyframeNavigator : public KeyframeNavigator
 	Q_OBJECT
 	TDoubleParamP m_curve;
 
-public:
+  public:
 	FunctionKeyframeNavigator(QWidget *parent);
 
 	void setCurve(TDoubleParam *curve);
 
-protected:
+  protected:
 	bool hasNext() const;
 	bool hasPrev() const;
 	bool hasKeyframes() const;
@@ -34,7 +34,7 @@ protected:
 	void showEvent(QShowEvent *);
 	void hideEvent(QHideEvent *);
 
-public slots:
+  public slots:
 	void onFrameSwitched() { update(); }
 };
 

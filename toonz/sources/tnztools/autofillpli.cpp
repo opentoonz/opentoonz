@@ -28,7 +28,8 @@ struct Region {
 	TRegion *m_region;
 
 	Region()
-		: m_area(0), m_perimeter(0), m_barycentre(0, 0), m_size(0, 0), m_match(-1), m_styleId(0), m_region(0)
+		: m_area(0), m_perimeter(0), m_barycentre(0, 0), m_size(0, 0), m_match(-1), m_styleId(0),
+		  m_region(0)
 	{
 	}
 };
@@ -39,7 +40,8 @@ struct MatchingProbs {
 	bool m_overlappingArea, m_matched;
 
 	MatchingProbs()
-		: m_from(0), m_to(0), m_perimeterProb(0), m_areaProb(0), m_barycenterProb(0), m_overlappingArea(false), m_matched(false)
+		: m_from(0), m_to(0), m_perimeterProb(0), m_areaProb(0), m_barycenterProb(0),
+		  m_overlappingArea(false), m_matched(false)
 	{
 	}
 };
@@ -56,15 +58,10 @@ class AreasAndPerimeterFormula : public TRegionFeatureFormula
 {
 	double m_signedArea, m_perimeter;
 
-public:
-	AreasAndPerimeterFormula()
-		: m_signedArea(0), m_perimeter(0)
-	{
-	}
+  public:
+	AreasAndPerimeterFormula() : m_signedArea(0), m_perimeter(0) {}
 
-	~AreasAndPerimeterFormula()
-	{
-	}
+	~AreasAndPerimeterFormula() {}
 
 	void update(const TPointD &p1, const TPointD &p2)
 	{
@@ -84,15 +81,10 @@ class CentroidFormula : public TRegionFeatureFormula
 	TPointD m_centroid;
 	double m_signedArea;
 
-public:
-	CentroidFormula()
-		: m_centroid(), m_signedArea(0)
-	{
-	}
+  public:
+	CentroidFormula() : m_centroid(), m_signedArea(0) {}
 
-	~CentroidFormula()
-	{
-	}
+	~CentroidFormula() {}
 
 	void update(const TPointD &p1, const TPointD &p2)
 	{
@@ -133,8 +125,8 @@ int match(std::vector<MatchingProbs> &probsVector, int &from, int &to)
 
 //---------------------------------------------------------------------------------------------
 
-void assignProbs(std::vector<MatchingProbs> &probVector, const Region &reference, const Region &work,
-				 int from, int to)
+void assignProbs(std::vector<MatchingProbs> &probVector, const Region &reference,
+				 const Region &work, int from, int to)
 {
 	double delta_posx1, delta_posy1, delta_posx2, delta_posy2;
 	int delta_area, delta_per;
@@ -156,10 +148,10 @@ void assignProbs(std::vector<MatchingProbs> &probVector, const Region &reference
 
 	// Cosi' calcolo il modulo della differenza
 
-	delta_pos =
-		sqrt((delta_posx2 - delta_posx1) * (delta_posx2 - delta_posx1) +
-			 (delta_posy2 - delta_posy1) * (delta_posy2 - delta_posy1));
-	delta_pos_max = sqrt((double)(work.m_size.lx * work.m_size.lx + work.m_size.ly * work.m_size.ly));
+	delta_pos = sqrt((delta_posx2 - delta_posx1) * (delta_posx2 - delta_posx1) +
+					 (delta_posy2 - delta_posy1) * (delta_posy2 - delta_posy1));
+	delta_pos_max =
+		sqrt((double)(work.m_size.lx * work.m_size.lx + work.m_size.ly * work.m_size.ly));
 
 	probs.m_barycenterProb = tround(1000 * (1 - (delta_pos / delta_pos_max)));
 
@@ -168,7 +160,8 @@ void assignProbs(std::vector<MatchingProbs> &probVector, const Region &reference
 	probs.m_areaProb = tround(1000 * (1 - ((double)delta_area / (reference.m_area + work.m_area))));
 
 	delta_per = abs(reference.m_perimeter - work.m_perimeter);
-	probs.m_perimeterProb = tround(1000 * (1 - ((double)delta_per / (reference.m_perimeter + work.m_perimeter))));
+	probs.m_perimeterProb =
+		tround(1000 * (1 - ((double)delta_per / (reference.m_perimeter + work.m_perimeter))));
 	probVector.push_back(probs);
 }
 
@@ -247,7 +240,7 @@ bool contains(TRegion *container, TRegion *contained)
 	return true;
 }
 
-} //namespace
+} // namespace
 
 //==============================================================================================
 
@@ -351,7 +344,8 @@ bool rect_autofill_apply(const TVectorImageP &imgToApply, const TRectD &rect, bo
 		int valore = 0;
 		do
 			valore = match(probVector, from, to);
-		while ((regionsWork[to].m_match != -1 || regionsReference[from].m_match != -1) && valore > 0);
+		while ((regionsWork[to].m_match != -1 || regionsReference[from].m_match != -1) &&
+			   valore > 0);
 		if (valore > AMB_TRESH) {
 			regionsWork[to].m_match = from;
 			regionsReference[from].m_match = to;
@@ -482,7 +476,8 @@ bool stroke_autofill_apply(const TVectorImageP &imgToApply, TStroke *stroke, boo
 		int valore = 0;
 		do
 			valore = match(probVector, from, to);
-		while ((regionsWork[to].m_match != -1 || regionsReference[from].m_match != -1) && valore > 0);
+		while ((regionsWork[to].m_match != -1 || regionsReference[from].m_match != -1) &&
+			   valore > 0);
 		if (valore > AMB_TRESH) {
 			regionsWork[to].m_match = from;
 			regionsReference[from].m_match = to;

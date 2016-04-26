@@ -31,7 +31,28 @@
 //**************************************************************************
 
 Iwa_TiledParticlesFx::Iwa_TiledParticlesFx()
-	: m_source("Texture"), m_control("Control"), source_ctrl_val(0), bright_thres_val(25), center_val(TPointD(0.0, 0.0)), length_val(5.0), height_val(4.0), maxnum_val(10.0), lifetime_val(DoublePair(100., 100.)), lifetime_ctrl_val(0), column_lifetime_val(false), startpos_val(1), randseed_val(1), gravity_val(0.0), g_angle_val(0.0), gravity_ctrl_val(0), friction_val(0.0), friction_ctrl_val(0), windint_val(0.0), windangle_val(0.0), swingmode_val(new TIntEnumParam(SWING_RANDOM, "Random")), randomx_val(DoublePair(0., 0.)), randomy_val(DoublePair(0., 0.)), randomx_ctrl_val(0), randomy_ctrl_val(0), swing_val(DoublePair(0., 0.)), speed_val(DoublePair(0., 10.)), speed_ctrl_val(0), speeda_val(DoublePair(0., 0.)), speeda_ctrl_val(0), speeda_use_gradient_val(false), speedscale_val(false), toplayer_val(new TIntEnumParam(TOP_YOUNGER, "Younger")), mass_val(DoublePair(1., 1.)), scale_val(DoublePair(100., 100.)), scale_ctrl_val(0), scale_ctrl_all_val(false), rot_val(DoublePair(0., 0.)), rot_ctrl_val(0), trail_val(DoublePair(0., 0.)), trailstep_val(0.0), rotswingmode_val(new TIntEnumParam(SWING_RANDOM, "Random")), rotspeed_val(0.0), rotsca_val(DoublePair(0., 0.)), rotswing_val(DoublePair(0., 0.)), pathaim_val(false), opacity_val(DoublePair(0., 100.)), opacity_ctrl_val(0), trailopacity_val(DoublePair(0., 100.)), scalestep_val(DoublePair(0., 0.)), scalestep_ctrl_val(0), fadein_val(0.0), fadeout_val(0.0), animation_val(new TIntEnumParam(ANIM_HOLD, "Hold Frame")), step_val(1), gencol_ctrl_val(0), gencol_spread_val(0.0), genfadecol_val(0.0), fincol_ctrl_val(0), fincol_spread_val(0.0), finrangecol_val(0.0), finfadecol_val(0.0), foutcol_ctrl_val(0), foutcol_spread_val(0.0), foutrangecol_val(0.0), foutfadecol_val(0.0)
+	: m_source("Texture"), m_control("Control"), source_ctrl_val(0), bright_thres_val(25),
+	  center_val(TPointD(0.0, 0.0)), length_val(5.0), height_val(4.0), maxnum_val(10.0),
+	  lifetime_val(DoublePair(100., 100.)), lifetime_ctrl_val(0), column_lifetime_val(false),
+	  startpos_val(1), randseed_val(1), gravity_val(0.0), g_angle_val(0.0), gravity_ctrl_val(0),
+	  friction_val(0.0), friction_ctrl_val(0), windint_val(0.0), windangle_val(0.0),
+	  swingmode_val(new TIntEnumParam(SWING_RANDOM, "Random")), randomx_val(DoublePair(0., 0.)),
+	  randomy_val(DoublePair(0., 0.)), randomx_ctrl_val(0), randomy_ctrl_val(0),
+	  swing_val(DoublePair(0., 0.)), speed_val(DoublePair(0., 10.)), speed_ctrl_val(0),
+	  speeda_val(DoublePair(0., 0.)), speeda_ctrl_val(0), speeda_use_gradient_val(false),
+	  speedscale_val(false), toplayer_val(new TIntEnumParam(TOP_YOUNGER, "Younger")),
+	  mass_val(DoublePair(1., 1.)), scale_val(DoublePair(100., 100.)), scale_ctrl_val(0),
+	  scale_ctrl_all_val(false), rot_val(DoublePair(0., 0.)), rot_ctrl_val(0),
+	  trail_val(DoublePair(0., 0.)), trailstep_val(0.0),
+	  rotswingmode_val(new TIntEnumParam(SWING_RANDOM, "Random")), rotspeed_val(0.0),
+	  rotsca_val(DoublePair(0., 0.)), rotswing_val(DoublePair(0., 0.)), pathaim_val(false),
+	  opacity_val(DoublePair(0., 100.)), opacity_ctrl_val(0),
+	  trailopacity_val(DoublePair(0., 100.)), scalestep_val(DoublePair(0., 0.)),
+	  scalestep_ctrl_val(0), fadein_val(0.0), fadeout_val(0.0),
+	  animation_val(new TIntEnumParam(ANIM_HOLD, "Hold Frame")), step_val(1), gencol_ctrl_val(0),
+	  gencol_spread_val(0.0), genfadecol_val(0.0), fincol_ctrl_val(0), fincol_spread_val(0.0),
+	  finrangecol_val(0.0), finfadecol_val(0.0), foutcol_ctrl_val(0), foutcol_spread_val(0.0),
+	  foutrangecol_val(0.0), foutfadecol_val(0.0)
 
 	  ,
 	  source_gradation_val(false), pick_color_for_every_frame_val(false)
@@ -47,7 +68,7 @@ Iwa_TiledParticlesFx::Iwa_TiledParticlesFx()
 	  /*- 手前奥でコントロールを立体化してみる -*/
 	  ,
 	  curl_ctrl_1_val(0), curl_ctrl_2_val(0)
-	  /*- 粒子敷き詰め作戦。粒子を正三角形で敷き詰めたときの、 
+	  /*- 粒子敷き詰め作戦。粒子を正三角形で敷き詰めたときの、
 		正三角形の一辺の長さをインチで指定する -*/
 	  ,
 	  iw_triangleSize(15.0)
@@ -195,9 +216,8 @@ Iwa_TiledParticlesFx::Iwa_TiledParticlesFx()
 	animation_val->addItem(ANIM_SR_CYCLE, "Column Swing - Random Start");
 	bindParam(this, "step", step_val);
 	step_val->setValueRange(1, (std::numeric_limits<int>::max)());
-	TSpectrum::ColorKey colors[] = {
-		TSpectrum::ColorKey(0, TPixel32::Red),
-		TSpectrum::ColorKey(1, TPixel32::Red)};
+	TSpectrum::ColorKey colors[] = {TSpectrum::ColorKey(0, TPixel32::Red),
+									TSpectrum::ColorKey(1, TPixel32::Red)};
 	gencol_val = TSpectrumParamP(tArrayCount(colors), colors);
 	bindParam(this, "birth_color", gencol_val);
 	bindParam(this, "birth_color_ctrl", gencol_ctrl_val);
@@ -205,9 +225,8 @@ Iwa_TiledParticlesFx::Iwa_TiledParticlesFx()
 	gencol_spread_val->setValueRange(0.0, (std::numeric_limits<int>::max)());
 	bindParam(this, "birth_color_fade", genfadecol_val);
 	genfadecol_val->setValueRange(0.0, 100.0);
-	TSpectrum::ColorKey colors1[] = {
-		TSpectrum::ColorKey(0, TPixel32::Green),
-		TSpectrum::ColorKey(1, TPixel32::Green)};
+	TSpectrum::ColorKey colors1[] = {TSpectrum::ColorKey(0, TPixel32::Green),
+									 TSpectrum::ColorKey(1, TPixel32::Green)};
 	fincol_val = TSpectrumParamP(tArrayCount(colors1), colors1);
 	bindParam(this, "fadein_color", fincol_val);
 	bindParam(this, "fadein_color_ctrl", fincol_ctrl_val);
@@ -217,9 +236,8 @@ Iwa_TiledParticlesFx::Iwa_TiledParticlesFx()
 	finrangecol_val->setValueRange(0.0, (std::numeric_limits<double>::max)());
 	bindParam(this, "fadein_color_fade", finfadecol_val);
 	finfadecol_val->setValueRange(0.0, 100.0);
-	TSpectrum::ColorKey colors2[] = {
-		TSpectrum::ColorKey(0, TPixel32::Blue),
-		TSpectrum::ColorKey(1, TPixel32::Blue)};
+	TSpectrum::ColorKey colors2[] = {TSpectrum::ColorKey(0, TPixel32::Blue),
+									 TSpectrum::ColorKey(1, TPixel32::Blue)};
 	foutcol_val = TSpectrumParamP(tArrayCount(colors2), colors2);
 	bindParam(this, "fadeout_color", foutcol_val);
 	bindParam(this, "fadeout_color_ctrl", foutcol_ctrl_val);
@@ -351,9 +369,7 @@ void Iwa_TiledParticlesFx::doDryCompute(TRectD &rect, double frame, const TRende
 	unsigned long fxId = getIdentifier();
 	int inputPortCount = getInputPortCount();
 
-	int i,
-		j,
-		curr_frame = frame,					   /*- 現在のフレーム -*/
+	int i, j, curr_frame = frame,			   /*- 現在のフレーム -*/
 		startframe = startpos_val->getValue(); /*- Particesの開始フレーム -*/
 
 	TRenderSettings infoOnInput(info);
@@ -400,7 +416,7 @@ void Iwa_TiledParticlesFx::doCompute(TTile &tile, double frame, const TRenderSet
 	TDimension p_size(0, 0);
 
 	/*- 参照画像ポートの取得 -*/
-	std::vector<TRasterFxPort *> part_ports;   /*- テクスチャ素材画像のポート -*/
+	std::vector<TRasterFxPort *> part_ports; /*- テクスチャ素材画像のポート -*/
 	std::map<int, TRasterFxPort *> ctrl_ports; /*- コントロール画像のポート番号／ポート -*/
 	int portsCount = this->getInputPortCount();
 
@@ -422,7 +438,8 @@ void Iwa_TiledParticlesFx::doCompute(TTile &tile, double frame, const TRenderSet
 
 	/*- テクスチャ素材のバウンディングボックスを足し合わせる ←この工程、いらないかも？-*/
 	if (!part_ports.empty()) {
-		TRectD outTileBBox(tile.m_pos, TDimensionD(tile.getRaster()->getLx(), tile.getRaster()->getLy()));
+		TRectD outTileBBox(tile.m_pos,
+						   TDimensionD(tile.getRaster()->getLx(), tile.getRaster()->getLy()));
 		TRectD bbox;
 
 		for (unsigned int i = 0; i < (int)part_ports.size(); ++i) {
@@ -432,7 +449,8 @@ void Iwa_TiledParticlesFx::doCompute(TTile &tile, double frame, const TRenderSet
 			partLevel.push_back(new TLevel());
 			partLevel[i]->setName((*part_ports[i])->getAlias(0, ri));
 
-			// The particles offset must be calculated without considering the affine's translational
+			// The particles offset must be calculated without considering the affine's
+			// translational
 			// component
 			TRenderSettings riZero(ri);
 			riZero.m_affine.a13 = riZero.m_affine.a23 = 0;
@@ -459,7 +477,8 @@ void Iwa_TiledParticlesFx::doCompute(TTile &tile, double frame, const TRenderSet
 		offlineGlContext->clear(TPixel32(0, 0, 0, 0));
 
 		TStroke *stroke;
-		stroke = makeEllipticStroke(0.07, TPointD((vecsize.lx - 1) * .5, (vecsize.ly - 1) * .5), 2.0, 2.0);
+		stroke = makeEllipticStroke(0.07, TPointD((vecsize.lx - 1) * .5, (vecsize.ly - 1) * .5),
+									2.0, 2.0);
 		TVectorImageP vectmp = new TVectorImage();
 
 		TPalette *plt = new TPalette();
@@ -487,12 +506,14 @@ void Iwa_TiledParticlesFx::doCompute(TTile &tile, double frame, const TRenderSet
 	TTile tileIn;
 	if (TRaster32P raster32 = tile.getRaster()) {
 		TFlash *flash = 0;
-		myEngine.render_particles(flash, &tile, part_ports, ri, p_size, p_offset, ctrl_ports, partLevel,
-								  1, (int)frame, 1, 0, 0, 0, 0, lastframe, getIdentifier());
+		myEngine.render_particles(flash, &tile, part_ports, ri, p_size, p_offset, ctrl_ports,
+								  partLevel, 1, (int)frame, 1, 0, 0, 0, 0, lastframe,
+								  getIdentifier());
 	} else if (TRaster64P raster64 = tile.getRaster()) {
 		TFlash *flash = 0;
-		myEngine.render_particles(flash, &tile, part_ports, ri, p_size, p_offset, ctrl_ports, partLevel,
-								  1, (int)frame, 1, 0, 0, 0, 0, lastframe, getIdentifier());
+		myEngine.render_particles(flash, &tile, part_ports, ri, p_size, p_offset, ctrl_ports,
+								  partLevel, 1, (int)frame, 1, 0, 0, 0, 0, lastframe,
+								  getIdentifier());
 	} else
 		throw TException("ParticlesFx: unsupported Pixel Type");
 }
@@ -517,9 +538,8 @@ void Iwa_TiledParticlesFx::compatibilityTranslatePort(int major, int minor, std:
 	} else if (version < VersionNumber(1, 20)) {
 		int idx;
 
-		bool chop =
-			((idx = portName.find("Texture")) != std::string::npos && idx > 0) ||
-			((idx = portName.find("Control")) != std::string::npos && idx > 0);
+		bool chop = ((idx = portName.find("Texture")) != std::string::npos && idx > 0) ||
+					((idx = portName.find("Control")) != std::string::npos && idx > 0);
 
 		if (chop)
 			portName.erase(portName.begin(), portName.begin() + idx);

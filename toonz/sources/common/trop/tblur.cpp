@@ -12,8 +12,7 @@ namespace
 {
 
 #ifdef _WIN32
-template <class T>
-struct BlurPixel {
+template <class T> struct BlurPixel {
 	T b;
 	T g;
 	T r;
@@ -21,8 +20,7 @@ struct BlurPixel {
 };
 
 #else
-template <class T>
-struct BlurPixel {
+template <class T> struct BlurPixel {
 	T r;
 	T g;
 	T b;
@@ -35,115 +33,111 @@ struct BlurPixel {
 
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 
-#define LOAD_COL_CODE                  \
-                                       \
-	buffer += x;                       \
-	pix = col + by1;                   \
-                                       \
-	for (i = by1; i < ly + by1; i++) { \
-		*pix++ = *buffer;              \
-		buffer += lx;                  \
-	}                                  \
-                                       \
-	pix += by2;                        \
-	left_val = col[0];                 \
-	right_val = *(pix - 1);            \
-	col--;                             \
-                                       \
-	for (i = 0; i < brad; i++) {       \
-		*col-- = left_val;             \
-		*pix++ = right_val;            \
+#define LOAD_COL_CODE                                                                              \
+                                                                                                   \
+	buffer += x;                                                                                   \
+	pix = col + by1;                                                                               \
+                                                                                                   \
+	for (i = by1; i < ly + by1; i++) {                                                             \
+		*pix++ = *buffer;                                                                          \
+		buffer += lx;                                                                              \
+	}                                                                                              \
+                                                                                                   \
+	pix += by2;                                                                                    \
+	left_val = col[0];                                                                             \
+	right_val = *(pix - 1);                                                                        \
+	col--;                                                                                         \
+                                                                                                   \
+	for (i = 0; i < brad; i++) {                                                                   \
+		*col-- = left_val;                                                                         \
+		*pix++ = right_val;                                                                        \
 	}
 
 //-------------------------------------------------------------------
 
-#define BLUR_CODE(round_fac, channel_type)                                  \
-	pix1 = row1;                                                            \
-	pix2 = row1 - 1;                                                        \
-                                                                            \
-	sigma1.r = pix1->r;                                                     \
-	sigma1.g = pix1->g;                                                     \
-	sigma1.b = pix1->b;                                                     \
-	sigma1.m = pix1->m;                                                     \
-	pix1++;                                                                 \
-                                                                            \
-	sigma2.r = sigma2.g = sigma2.b = sigma2.m = 0.0;                        \
-	sigma3.r = sigma3.g = sigma3.b = sigma3.m = 0.0;                        \
-                                                                            \
-	for (i = 1; i < brad; i++) {                                            \
-		sigma1.r += pix1->r;                                                \
-		sigma1.g += pix1->g;                                                \
-		sigma1.b += pix1->b;                                                \
-		sigma1.m += pix1->m;                                                \
-                                                                            \
-		sigma2.r += pix2->r;                                                \
-		sigma2.g += pix2->g;                                                \
-		sigma2.b += pix2->b;                                                \
-		sigma2.m += pix2->m;                                                \
-                                                                            \
-		sigma3.r += i * (pix1->r + pix2->r);                                \
-		sigma3.g += i * (pix1->g + pix2->g);                                \
-		sigma3.b += i * (pix1->b + pix2->b);                                \
-		sigma3.m += i * (pix1->m + pix2->m);                                \
-                                                                            \
-		pix1++;                                                             \
-		pix2--;                                                             \
-	}                                                                       \
-                                                                            \
-	rsum = (sigma1.r + sigma2.r) * coeff - sigma3.r * coeffq + (round_fac); \
-	gsum = (sigma1.g + sigma2.g) * coeff - sigma3.g * coeffq + (round_fac); \
-	bsum = (sigma1.b + sigma2.b) * coeff - sigma3.b * coeffq + (round_fac); \
-	msum = (sigma1.m + sigma2.m) * coeff - sigma3.m * coeffq + (round_fac); \
-                                                                            \
-	row2->r = (channel_type)(rsum);                                         \
-	row2->g = (channel_type)(gsum);                                         \
-	row2->b = (channel_type)(bsum);                                         \
-	row2->m = (channel_type)(msum);                                         \
-	row2++;                                                                 \
-                                                                            \
-	sigma2.r += row1[-brad].r;                                              \
-	sigma2.g += row1[-brad].g;                                              \
-	sigma2.b += row1[-brad].b;                                              \
-	sigma2.m += row1[-brad].m;                                              \
-                                                                            \
-	pix1 = row1 + brad;                                                     \
-	pix2 = row1;                                                            \
-	pix3 = row1 - brad;                                                     \
-	pix4 = row1 - brad + 1;                                                 \
-                                                                            \
-	desigma.r = sigma1.r - sigma2.r;                                        \
-	desigma.g = sigma1.g - sigma2.g;                                        \
-	desigma.b = sigma1.b - sigma2.b;                                        \
-	desigma.m = sigma1.m - sigma2.m;                                        \
-                                                                            \
-	for (i = 1; i < length; i++) {                                          \
-		desigma.r += pix1->r - 2 * pix2->r + pix3->r;                       \
-		desigma.g += pix1->g - 2 * pix2->g + pix3->g;                       \
-		desigma.b += pix1->b - 2 * pix2->b + pix3->b;                       \
-		desigma.m += pix1->m - 2 * pix2->m + pix3->m;                       \
-                                                                            \
-		rsum += (desigma.r + diff * (pix1->r - pix4->r)) * coeffq;          \
-		gsum += (desigma.g + diff * (pix1->g - pix4->g)) * coeffq;          \
-		bsum += (desigma.b + diff * (pix1->b - pix4->b)) * coeffq;          \
-		msum += (desigma.m + diff * (pix1->m - pix4->m)) * coeffq;          \
-                                                                            \
-		row2->r = (channel_type)(rsum);                                     \
-		row2->g = (channel_type)(gsum);                                     \
-		row2->b = (channel_type)(bsum);                                     \
-		row2->m = (channel_type)(msum);                                     \
-		row2++;                                                             \
-		pix1++, pix2++, pix3++, pix4++;                                     \
+#define BLUR_CODE(round_fac, channel_type)                                                         \
+	pix1 = row1;                                                                                   \
+	pix2 = row1 - 1;                                                                               \
+                                                                                                   \
+	sigma1.r = pix1->r;                                                                            \
+	sigma1.g = pix1->g;                                                                            \
+	sigma1.b = pix1->b;                                                                            \
+	sigma1.m = pix1->m;                                                                            \
+	pix1++;                                                                                        \
+                                                                                                   \
+	sigma2.r = sigma2.g = sigma2.b = sigma2.m = 0.0;                                               \
+	sigma3.r = sigma3.g = sigma3.b = sigma3.m = 0.0;                                               \
+                                                                                                   \
+	for (i = 1; i < brad; i++) {                                                                   \
+		sigma1.r += pix1->r;                                                                       \
+		sigma1.g += pix1->g;                                                                       \
+		sigma1.b += pix1->b;                                                                       \
+		sigma1.m += pix1->m;                                                                       \
+                                                                                                   \
+		sigma2.r += pix2->r;                                                                       \
+		sigma2.g += pix2->g;                                                                       \
+		sigma2.b += pix2->b;                                                                       \
+		sigma2.m += pix2->m;                                                                       \
+                                                                                                   \
+		sigma3.r += i * (pix1->r + pix2->r);                                                       \
+		sigma3.g += i * (pix1->g + pix2->g);                                                       \
+		sigma3.b += i * (pix1->b + pix2->b);                                                       \
+		sigma3.m += i * (pix1->m + pix2->m);                                                       \
+                                                                                                   \
+		pix1++;                                                                                    \
+		pix2--;                                                                                    \
+	}                                                                                              \
+                                                                                                   \
+	rsum = (sigma1.r + sigma2.r) * coeff - sigma3.r * coeffq + (round_fac);                        \
+	gsum = (sigma1.g + sigma2.g) * coeff - sigma3.g * coeffq + (round_fac);                        \
+	bsum = (sigma1.b + sigma2.b) * coeff - sigma3.b * coeffq + (round_fac);                        \
+	msum = (sigma1.m + sigma2.m) * coeff - sigma3.m * coeffq + (round_fac);                        \
+                                                                                                   \
+	row2->r = (channel_type)(rsum);                                                                \
+	row2->g = (channel_type)(gsum);                                                                \
+	row2->b = (channel_type)(bsum);                                                                \
+	row2->m = (channel_type)(msum);                                                                \
+	row2++;                                                                                        \
+                                                                                                   \
+	sigma2.r += row1[-brad].r;                                                                     \
+	sigma2.g += row1[-brad].g;                                                                     \
+	sigma2.b += row1[-brad].b;                                                                     \
+	sigma2.m += row1[-brad].m;                                                                     \
+                                                                                                   \
+	pix1 = row1 + brad;                                                                            \
+	pix2 = row1;                                                                                   \
+	pix3 = row1 - brad;                                                                            \
+	pix4 = row1 - brad + 1;                                                                        \
+                                                                                                   \
+	desigma.r = sigma1.r - sigma2.r;                                                               \
+	desigma.g = sigma1.g - sigma2.g;                                                               \
+	desigma.b = sigma1.b - sigma2.b;                                                               \
+	desigma.m = sigma1.m - sigma2.m;                                                               \
+                                                                                                   \
+	for (i = 1; i < length; i++) {                                                                 \
+		desigma.r += pix1->r - 2 * pix2->r + pix3->r;                                              \
+		desigma.g += pix1->g - 2 * pix2->g + pix3->g;                                              \
+		desigma.b += pix1->b - 2 * pix2->b + pix3->b;                                              \
+		desigma.m += pix1->m - 2 * pix2->m + pix3->m;                                              \
+                                                                                                   \
+		rsum += (desigma.r + diff * (pix1->r - pix4->r)) * coeffq;                                 \
+		gsum += (desigma.g + diff * (pix1->g - pix4->g)) * coeffq;                                 \
+		bsum += (desigma.b + diff * (pix1->b - pix4->b)) * coeffq;                                 \
+		msum += (desigma.m + diff * (pix1->m - pix4->m)) * coeffq;                                 \
+                                                                                                   \
+		row2->r = (channel_type)(rsum);                                                            \
+		row2->g = (channel_type)(gsum);                                                            \
+		row2->b = (channel_type)(bsum);                                                            \
+		row2->m = (channel_type)(msum);                                                            \
+		row2++;                                                                                    \
+		pix1++, pix2++, pix3++, pix4++;                                                            \
 	}
 
 //-------------------------------------------------------------------
 
 template <typename PIXEL_SRC, typename PIXEL_DST, typename T>
-inline void blur_code(
-	PIXEL_SRC *row1, PIXEL_DST *row2,
-	int length,
-	float coeff, float coeffq,
-	int brad, float diff,
-	float round_fac)
+inline void blur_code(PIXEL_SRC *row1, PIXEL_DST *row2, int length, float coeff, float coeffq,
+					  int brad, float diff, float round_fac)
 {
 	int i;
 	T rsum, gsum, bsum, msum;
@@ -235,12 +229,8 @@ inline void blur_code(
 
 //-------------------------------------------------------------------
 template <class T, class P>
-inline void blur_code_SSE2(
-	T *row1, BlurPixel<P> *row2,
-	int length,
-	float coeff, float coeffq,
-	int brad, float diff,
-	float round_fac)
+inline void blur_code_SSE2(T *row1, BlurPixel<P> *row2, int length, float coeff, float coeffq,
+						   int brad, float diff, float round_fac)
 {
 
 	static float two = 2;
@@ -309,8 +299,8 @@ inline void blur_code_SSE2(
 	__m128i isum = _mm_cvtps_epi32(sum);
   isum = _mm_packs_epi32(isum, zeros);
   isum = _mm_packs_epi16(isum, zeros);
-    
-  *(DWORD*)row2 = _mm_cvtsi128_si32(isum);      
+
+  *(DWORD*)row2 = _mm_cvtsi128_si32(isum);
 */
 	_mm_store_ps((float *)row2, sum);
 	row2++;
@@ -356,10 +346,10 @@ inline void blur_code_SSE2(
 		sum = _mm_add_ps(sum, tmp);
 		/*
 	  isum = _mm_cvtps_epi32(sum);
-    isum = _mm_packs_epi32(isum, zeros);
-    isum = _mm_packs_epi16(isum, zeros);
-    
-    *(DWORD*)row2 = _mm_cvtsi128_si32(isum);      
+	isum = _mm_packs_epi32(isum, zeros);
+	isum = _mm_packs_epi16(isum, zeros);
+
+	*(DWORD*)row2 = _mm_cvtsi128_si32(isum);
 */
 		_mm_store_ps((float *)row2, sum);
 
@@ -370,12 +360,8 @@ inline void blur_code_SSE2(
 
 //-------------------------------------------------------------------
 template <class T, class P>
-inline void blur_code_SSE2(
-	BlurPixel<P> *row1, T *row2,
-	int length,
-	float coeff, float coeffq,
-	int brad, float diff,
-	float round_fac)
+inline void blur_code_SSE2(BlurPixel<P> *row1, T *row2, int length, float coeff, float coeffq,
+						   int brad, float diff, float round_fac)
 {
 	int i;
 
@@ -428,13 +414,13 @@ inline void blur_code_SSE2(
 	__m128 sum = _mm_add_ps(sigma1, sigma2);
 	sum = _mm_mul_ps(sum, pCoeff);
 	__m128 sum2 = _mm_mul_ps(sigma3, pCoeffq);
-	//sum2 = _mm_add_ps(sum2, pRoundFac);
+	// sum2 = _mm_add_ps(sum2, pRoundFac);
 	sum = _mm_sub_ps(sum, sum2);
 
 	// converte i canali da float a char
 	__m128i isum = _mm_cvtps_epi32(sum);
 	isum = _mm_packs_epi32(isum, zeros);
-	//isum = _mm_packs_epi16(isum, zeros);
+	// isum = _mm_packs_epi16(isum, zeros);
 	isum = _mm_packus_epi16(isum, zeros);
 	*(DWORD *)row2 = _mm_cvtsi128_si32(isum);
 
@@ -474,8 +460,8 @@ inline void blur_code_SSE2(
 		// converte i canali da float a char
 		__m128i isum = _mm_cvtps_epi32(sum);
 		isum = _mm_packs_epi32(isum, zeros);
-		//isum = _mm_packs_epi16(isum, zeros);  // QUESTA RIGA E' SBAGLIATA
-		//assert(false);
+		// isum = _mm_packs_epi16(isum, zeros);  // QUESTA RIGA E' SBAGLIATA
+		// assert(false);
 		isum = _mm_packus_epi16(isum, zeros);
 		*(DWORD *)row2 = _mm_cvtsi128_si32(isum);
 
@@ -488,37 +474,37 @@ inline void blur_code_SSE2(
 
 //-------------------------------------------------------------------
 
-#define STORE_COL_CODE(crop_val)                                           \
-	{                                                                      \
-		int i, val;                                                        \
-		double ampl;                                                       \
-		buffer += x;                                                       \
-                                                                           \
-		ampl = 1.0 + blur / 15.0;                                          \
-                                                                           \
-		if (backlit)                                                       \
-			for (i = ((dy >= 0) ? 0 : -dy); i < MIN(ly, r_ly - dy); i++) { \
-				val = troundp(col[i].r * ampl);                            \
-				buffer->r = (val > crop_val) ? crop_val : val;             \
-				val = troundp(col[i].g * ampl);                            \
-				buffer->g = (val > crop_val) ? crop_val : val;             \
-				val = troundp(col[i].b * ampl);                            \
-				buffer->b = (val > crop_val) ? crop_val : val;             \
-				val = troundp(col[i].m * ampl);                            \
-				buffer->m = (val > crop_val) ? crop_val : val;             \
-				buffer += wrap;                                            \
-			}                                                              \
-		else                                                               \
-			for (i = ((dy >= 0) ? 0 : -dy); i < MIN(ly, r_ly - dy); i++) { \
-				*buffer = col[i];                                          \
-				buffer += wrap;                                            \
-			}                                                              \
+#define STORE_COL_CODE(crop_val)                                                                   \
+	{                                                                                              \
+		int i, val;                                                                                \
+		double ampl;                                                                               \
+		buffer += x;                                                                               \
+                                                                                                   \
+		ampl = 1.0 + blur / 15.0;                                                                  \
+                                                                                                   \
+		if (backlit)                                                                               \
+			for (i = ((dy >= 0) ? 0 : -dy); i < MIN(ly, r_ly - dy); i++) {                         \
+				val = troundp(col[i].r * ampl);                                                    \
+				buffer->r = (val > crop_val) ? crop_val : val;                                     \
+				val = troundp(col[i].g * ampl);                                                    \
+				buffer->g = (val > crop_val) ? crop_val : val;                                     \
+				val = troundp(col[i].b * ampl);                                                    \
+				buffer->b = (val > crop_val) ? crop_val : val;                                     \
+				val = troundp(col[i].m * ampl);                                                    \
+				buffer->m = (val > crop_val) ? crop_val : val;                                     \
+				buffer += wrap;                                                                    \
+			}                                                                                      \
+		else                                                                                       \
+			for (i = ((dy >= 0) ? 0 : -dy); i < MIN(ly, r_ly - dy); i++) {                         \
+				*buffer = col[i];                                                                  \
+				buffer += wrap;                                                                    \
+			}                                                                                      \
 	}
 
 //-------------------------------------------------------------------
 template <class T>
-void store_colRgb(T *buffer, int wrap, int r_ly, T *col,
-				  int ly, int x, int dy, int backlit, double blur)
+void store_colRgb(T *buffer, int wrap, int r_ly, T *col, int ly, int x, int dy, int backlit,
+				  double blur)
 {
 	int val = T::maxChannelValue;
 
@@ -532,8 +518,8 @@ void store_colRgb(T *buffer, int wrap, int r_ly, T *col,
 
 //-------------------------------------------------------------------
 template <class T>
-void store_colGray(T *buffer, int wrap, int r_ly, T *col,
-				   int ly, int x, int dy, int backlit, double blur)
+void store_colGray(T *buffer, int wrap, int r_ly, T *col, int ly, int x, int dy, int backlit,
+				   double blur)
 {
 	int i;
 	double ampl;
@@ -549,8 +535,8 @@ void store_colGray(T *buffer, int wrap, int r_ly, T *col,
 
 //-------------------------------------------------------------------
 template <class P>
-void load_colRgb(BlurPixel<P> *buffer, BlurPixel<P> *col,
-				 int lx, int ly, int x, int brad, int by1, int by2)
+void load_colRgb(BlurPixel<P> *buffer, BlurPixel<P> *col, int lx, int ly, int x, int brad, int by1,
+				 int by2)
 {
 	int i;
 	BlurPixel<P> *pix, left_val, right_val;
@@ -560,8 +546,8 @@ void load_colRgb(BlurPixel<P> *buffer, BlurPixel<P> *col,
 
 //-------------------------------------------------------------------
 
-void load_channel_col32(float *buffer, float *col,
-						int lx, int ly, int x, int brad, int by1, int by2)
+void load_channel_col32(float *buffer, float *col, int lx, int ly, int x, int brad, int by1,
+						int by2)
 {
 	int i;
 	float *pix, left_val, right_val;
@@ -571,8 +557,8 @@ void load_channel_col32(float *buffer, float *col,
 
 //-------------------------------------------------------------------
 template <class T, class Q, class P>
-void do_filtering_chan(BlurPixel<P> *row1, T *row2, int length,
-					   float coeff, float coeffq, int brad, float diff, bool useSSE)
+void do_filtering_chan(BlurPixel<P> *row1, T *row2, int length, float coeff, float coeffq, int brad,
+					   float diff, bool useSSE)
 {
 #ifdef _WIN32
 	if (useSSE && T::maxChannelValue == 255)
@@ -592,9 +578,7 @@ void do_filtering_chan(BlurPixel<P> *row1, T *row2, int length,
 //-------------------------------------------------------------------
 
 template <class T>
-void do_filtering_channel_float(T *row1, float *row2,
-								int length,
-								float coeff, float coeffq,
+void do_filtering_channel_float(T *row1, float *row2, int length, float coeff, float coeffq,
 								int brad, float diff)
 {
 	int i;
@@ -646,8 +630,8 @@ void do_filtering_channel_float(T *row1, float *row2,
 
 //-------------------------------------------------------------------
 template <class T>
-void do_filtering_channel_gray(float *row1, T *row2, int length,
-							   float coeff, float coeffq, int brad, float diff)
+void do_filtering_channel_gray(float *row1, T *row2, int length, float coeff, float coeffq,
+							   int brad, float diff)
 {
 	int i;
 	float sum;
@@ -698,8 +682,7 @@ void do_filtering_channel_gray(float *row1, T *row2, int length,
 
 //-------------------------------------------------------------------
 template <class T>
-void load_rowRgb(TRasterPT<T> &rin, T *row, int lx, int y, int brad,
-				 int bx1, int bx2)
+void load_rowRgb(TRasterPT<T> &rin, T *row, int lx, int y, int brad, int bx1, int bx2)
 {
 	int i;
 	T *buf32, *pix;
@@ -730,8 +713,7 @@ void load_rowRgb(TRasterPT<T> &rin, T *row, int lx, int y, int brad,
 
 //-------------------------------------------------------------------
 template <class T>
-void load_rowGray(TRasterPT<T> &rin, T *row, int lx, int y, int brad,
-				  int bx1, int bx2)
+void load_rowGray(TRasterPT<T> &rin, T *row, int lx, int y, int brad, int bx1, int bx2)
 {
 	int i;
 	T *buf8, *pix;
@@ -757,8 +739,8 @@ void load_rowGray(TRasterPT<T> &rin, T *row, int lx, int y, int brad,
 
 //-------------------------------------------------------------------
 template <class T, class P>
-void do_filtering_floatRgb(T *row1, BlurPixel<P> *row2, int length,
-						   float coeff, float coeffq, int brad, float diff, bool useSSE)
+void do_filtering_floatRgb(T *row1, BlurPixel<P> *row2, int length, float coeff, float coeffq,
+						   int brad, float diff, bool useSSE)
 {
 /*
   int i;
@@ -787,9 +769,10 @@ void doBlurRgb(TRasterPT<T> &dstRas, TRasterPT<T> &srcRas, double blur, int dx, 
 
 	brad = (int)ceil(blur); /* number of pixels involved in the filtering */
 
-	//int border = brad*2; // per sicurezza
+	// int border = brad*2; // per sicurezza
 
-	coeff = (float)(blur / (brad - brad * brad + blur * (2 * brad - 1))); /*sum of the weights of triangolar filter.              */
+	coeff = (float)(blur / (brad - brad * brad +
+							blur * (2 * brad - 1))); /*sum of the weights of triangolar filter. */
 	coeffq = (float)(coeff / blur);
 	diff = (float)(blur - brad);
 	lx = srcRas->getLx();
@@ -817,7 +800,7 @@ void doBlurRgb(TRasterPT<T> &dstRas, TRasterPT<T> &srcRas, double blur, int dx, 
 		TRasterGR8P raux(llx * sizeof(BlurPixel<P>), ly);
 		r1 = raux;
 		r1->lock();
-		fbuffer = (BlurPixel<P> *)r1->getRawData(); //new CASM_FPIXEL [llx *ly];
+		fbuffer = (BlurPixel<P> *)r1->getRawData(); // new CASM_FPIXEL [llx *ly];
 		row1 = new T[llx + 2 * brad];
 		col1 = new BlurPixel<P>[lly + 2 * brad];
 		col2 = new T[lly];
@@ -846,7 +829,8 @@ void doBlurRgb(TRasterPT<T> &dstRas, TRasterPT<T> &srcRas, double blur, int dx, 
 		for (i = (dx >= 0) ? 0 : -dx; i < tmin(llx, dstRas->getLx() - dx); i++) {
 			load_colRgb<P>(fbuffer, col1 + brad, llx, ly, i, brad, by1, by2);
 			do_filtering_chan<T, Q, P>(col1 + brad, col2, lly, coeff, coeffq, brad, diff, useSSE);
-			store_colRgb<T>(buffer, dstRas->getWrap(), dstRas->getLy(), col2, lly, i + dx, dy, 0, blur);
+			store_colRgb<T>(buffer, dstRas->getWrap(), dstRas->getLy(), col2, lly, i + dx, dy, 0,
+							blur);
 		}
 		dstRas->unlock();
 	} catch (...) {
@@ -878,8 +862,9 @@ void doBlurGray(TRasterPT<T> &dstRas, TRasterPT<T> &srcRas, double blur, int dx,
 	float coeff, coeffq, diff;
 	int bx1 = 0, by1 = 0, bx2 = 0, by2 = 0;
 
-	brad = (int)ceil(blur);												  /* number of pixels involved in the filtering */
-	coeff = (float)(blur / (brad - brad * brad + blur * (2 * brad - 1))); /*sum of the weights of triangolar filter.              */
+	brad = (int)ceil(blur); /* number of pixels involved in the filtering */
+	coeff = (float)(blur / (brad - brad * brad +
+							blur * (2 * brad - 1))); /*sum of the weights of triangolar filter. */
 	coeffq = (float)(coeff / blur);
 	diff = (float)(blur - brad);
 	lx = srcRas->getLx();
@@ -896,7 +881,7 @@ void doBlurGray(TRasterPT<T> &dstRas, TRasterPT<T> &srcRas, double blur, int dx,
 
 	TRasterGR8P r1(llx * sizeof(float), ly);
 	r1->lock();
-	fbuffer = (float *)r1->getRawData(); //new float[llx *ly];
+	fbuffer = (float *)r1->getRawData(); // new float[llx *ly];
 
 	row1 = new T[llx + 2 * brad];
 	col1 = new float[lly + 2 * brad];
@@ -923,13 +908,14 @@ void doBlurGray(TRasterPT<T> &dstRas, TRasterPT<T> &srcRas, double blur, int dx,
 		do_filtering_channel_gray<T>(col1 + brad, col2, lly, coeff, coeffq, brad, diff);
 
 		int backlit = 0;
-		store_colGray<T>(buffer, dstRas->getWrap(), dstRas->getLy(), col2, lly, i + dx, dy, backlit, blur);
+		store_colGray<T>(buffer, dstRas->getWrap(), dstRas->getLy(), col2, lly, i + dx, dy, backlit,
+						 blur);
 	}
 	dstRas->unlock();
 	delete[] col2;
 	delete[] col1;
 	delete[] row1;
-	r1->unlock(); //delete[]fbuffer;
+	r1->unlock(); // delete[]fbuffer;
 }
 
 }; // namespace
@@ -946,7 +932,8 @@ int TRop::getBlurBorder(double blur)
 
 //--------------------------------------------------------------------
 
-void TRop::blur(const TRasterP &dstRas, const TRasterP &srcRas, double blur, int dx, int dy, bool useSSE)
+void TRop::blur(const TRasterP &dstRas, const TRasterP &srcRas, double blur, int dx, int dy,
+				bool useSSE)
 {
 	TRaster32P dstRas32 = dstRas;
 	TRaster32P srcRas32 = srcRas;

@@ -27,14 +27,8 @@
 struct ControlPoint {
 	TStroke *m_stroke;
 	int m_index;
-	ControlPoint(TStroke *stroke, int index)
-		: m_stroke(stroke), m_index(index)
-	{
-	}
-	TPointD getPoint() const
-	{
-		return m_stroke->getControlPoint(m_index);
-	}
+	ControlPoint(TStroke *stroke, int index) : m_stroke(stroke), m_index(index) {}
+	TPointD getPoint() const { return m_stroke->getControlPoint(m_index); }
 	void setPoint(const TPointD &p)
 	{
 		TThickPoint point = m_stroke->getControlPoint(m_index);
@@ -74,9 +68,9 @@ void renormalizeImage(TVectorImage *vi)
 			double d = tdistance(posj, posi);
 			if (d < 0.01) {
 				/*if(d>0)
-             {
-              int yy = 123;
-             }*/
+			 {
+			  int yy = 123;
+			 }*/
 				neighbours.push_back(j);
 				center += posj;
 			}
@@ -96,11 +90,11 @@ class Node;
 
 class DataPixel
 {
-public:
+  public:
 	TPoint m_pos;
 	int m_value;
 	bool m_ink;
-	//int m_index;
+	// int m_index;
 	Node *m_node;
 	DataPixel() : m_value(0), m_ink(false), /*m_index(0), */ m_node(0) {}
 };
@@ -117,7 +111,7 @@ class Junction;
 
 class Node
 {
-public:
+  public:
 	Node *m_other;
 	DataPixel *m_pixel;
 	Node *m_prev, *m_next;
@@ -127,10 +121,7 @@ public:
 #endif
 	bool m_visited;
 	Node()
-		: m_pixel(0),
-		  m_prev(0),
-		  m_next(0),
-		  m_junction(0),
+		: m_pixel(0), m_prev(0), m_next(0), m_junction(0),
 #ifdef DEBUG
 		  m_flag(false),
 #endif
@@ -145,14 +136,13 @@ class ProtoStroke;
 
 class Junction
 {
-public:
+  public:
 	TThickPoint m_center;
 	std::deque<Node *> m_nodes;
 	int m_junctionOrder;
 	std::vector<ProtoStroke *> m_protoStrokes;
 	bool m_locked;
-	Junction()
-		: m_center(), m_nodes(), m_junctionOrder(0), m_protoStrokes(), m_locked(false) {}
+	Junction() : m_center(), m_nodes(), m_junctionOrder(0), m_protoStrokes(), m_locked(false) {}
 	bool isConvex();
 };
 
@@ -160,57 +150,60 @@ public:
 
 class ProtoStroke
 {
-public:
+  public:
 	TPointD m_startDirection, m_endDirection;
 	Junction *m_startJunction, *m_endJunction;
 	std::deque<TThickPoint> m_points;
 	ProtoStroke()
-		: m_points(), m_startDirection(), m_endDirection(), m_startJunction(0), m_endJunction(0) {}
-	ProtoStroke(std::deque<TThickPoint>::iterator it_b,
-				std::deque<TThickPoint>::iterator it_e)
-		: m_points(it_b, it_e), m_startDirection(), m_endDirection(), m_startJunction(0), m_endJunction(0) {}
+		: m_points(), m_startDirection(), m_endDirection(), m_startJunction(0), m_endJunction(0)
+	{
+	}
+	ProtoStroke(std::deque<TThickPoint>::iterator it_b, std::deque<TThickPoint>::iterator it_e)
+		: m_points(it_b, it_e), m_startDirection(), m_endDirection(), m_startJunction(0),
+		  m_endJunction(0)
+	{
+	}
 };
 
 class ProtoRegion
 {
-public:
+  public:
 	TPointD m_center;
 	bool m_isConvex;
 	std::vector<TThickPoint> m_points;
-	ProtoRegion(bool isConvex)
-		: m_points(), m_isConvex(isConvex), m_center() {}
+	ProtoRegion(bool isConvex) : m_points(), m_isConvex(isConvex), m_center() {}
 };
 
 class JunctionMerge
 {
-public:
+  public:
 	Junction *m_junction;
 	Node *m_startNode, *m_endNode;
 	bool m_isNext;
 	JunctionMerge(Junction *junction)
-		: m_junction(junction), m_startNode(0), m_endNode(0), m_isNext(true) {}
-	JunctionMerge(Junction *junction, Node *startNode, Node *endNode, bool
-																		  isNext)
-		: m_junction(junction), m_startNode(startNode), m_endNode(endNode), m_isNext(isNext) {}
-	bool operator==(const JunctionMerge &op2)
+		: m_junction(junction), m_startNode(0), m_endNode(0), m_isNext(true)
 	{
-		return (m_junction == op2.m_junction);
 	}
+	JunctionMerge(Junction *junction, Node *startNode, Node *endNode, bool isNext)
+		: m_junction(junction), m_startNode(startNode), m_endNode(endNode), m_isNext(isNext)
+	{
+	}
+	bool operator==(const JunctionMerge &op2) { return (m_junction == op2.m_junction); }
 };
 
 class JunctionLink
 {
-public:
+  public:
 	Junction *m_first;
 	Junction *m_second;
 	int m_order;
-	JunctionLink(Junction *first, Junction *second)
-		: m_first(first), m_second(second), m_order(0) {}
+	JunctionLink(Junction *first, Junction *second) : m_first(first), m_second(second), m_order(0)
+	{
+	}
 	bool operator==(const JunctionLink &op2) const
 	{
-		return (m_first == op2.m_first && m_second == op2.m_second) || (m_first ==
-																			op2.m_second &&
-																		m_second == op2.m_first);
+		return (m_first == op2.m_first && m_second == op2.m_second) ||
+			   (m_first == op2.m_second && m_second == op2.m_first);
 	}
 };
 
@@ -218,7 +211,7 @@ class CenterLineVectorizer
 {
 	TPalette *m_palette;
 
-public:
+  public:
 	//	int m_delta[8];
 	//	int m_radius;
 	TRasterP m_src;
@@ -246,7 +239,7 @@ public:
 	vector<JunctionLink> m_links;
 	list<ProtoStroke> m_protoStrokes;
 	list<ProtoRegion> m_protoRegions;
-	//list< std::vector<TThickPoint> > m_protoHoles;
+	// list< std::vector<TThickPoint> > m_protoHoles;
 
 	Node *findOtherSide(Node *node);
 	bool testOtherSide(Node *na1, Node *nb1, double &startDist2);
@@ -281,7 +274,9 @@ public:
 	}
 
 	CenterLineVectorizer(const VectorizerConfiguration &configuration, TPalette *palette)
-		: m_configuration(configuration), m_palette(palette) {}
+		: m_configuration(configuration), m_palette(palette)
+	{
+	}
 
 	~CenterLineVectorizer();
 
@@ -295,10 +290,8 @@ public:
 
 	DataPixel *findUnvisitedInkPixel();
 
-	bool linkNextProtoStroke(
-		ProtoStroke *const dstProtoStroke,
-		Junction *const currJunction,
-		const int k);
+	bool linkNextProtoStroke(ProtoStroke *const dstProtoStroke, Junction *const currJunction,
+							 const int k);
 	void joinProtoStrokes(ProtoStroke *const dstProtoStroke);
 
 	void resolveUnvisitedNode(Node *node);
@@ -320,13 +313,13 @@ public:
 	void link(DataPixel *pix, DataPixel *from, DataPixel *to);
 
 	/*#ifdef DEBUG
-	inline TPixel32 &getOutPix(DataPixel*pix) {return 
+	inline TPixel32 &getOutPix(DataPixel*pix) {return
 m_output->pixels()[pix->m_index]; }
 	void outputNodes(Node *node);
 	void outputInks();
 #endif*/
 
-private:
+  private:
 	// not implemented
 	CenterLineVectorizer(const CenterLineVectorizer &);
 	CenterLineVectorizer &operator=(const CenterLineVectorizer &);
@@ -338,9 +331,8 @@ class CompareJunctionNodes
 {
 	TPointD m_center;
 
-public:
-	CompareJunctionNodes(TPointD center)
-		: m_center(center) {}
+  public:
+	CompareJunctionNodes(TPointD center) : m_center(center) {}
 
 	bool operator()(const Node *n1, const Node *n2)
 	{
@@ -405,21 +397,15 @@ inline bool right(const TPointD &a, const TPointD &b, const TPointD &c)
 
 //---------------------------------------------------------
 
-enum RectIntersectionResult {
-	parallel,
-	coincident,
-	intersected
-};
+enum RectIntersectionResult { parallel, coincident, intersected };
 
-RectIntersectionResult rectsIntersect(const TPointD &a1, const TPointD &a2,
-									  const TPointD &b1, const TPointD &b2,
-									  TPointD &intersection)
+RectIntersectionResult rectsIntersect(const TPointD &a1, const TPointD &a2, const TPointD &b1,
+									  const TPointD &b2, TPointD &intersection)
 {
 	double ma, mb, ca, cb;
 
 	if (a2.x == a1.x && b2.x == b1.x) {
-		if (collinear(a1, a2, b1) &&
-			collinear(a1, a2, b2))
+		if (collinear(a1, a2, b1) && collinear(a1, a2, b2))
 			return coincident;
 		else
 			return parallel;
@@ -440,8 +426,7 @@ RectIntersectionResult rectsIntersect(const TPointD &a1, const TPointD &a2,
 		mb = (b2.y - b1.y) / (b2.x - b1.x);
 
 		if (ma == mb) {
-			if (collinear(a1, a2, b1) &&
-				collinear(a1, a2, b2))
+			if (collinear(a1, a2, b1) && collinear(a1, a2, b2))
 				return coincident;
 			else
 				return parallel;
@@ -466,18 +451,14 @@ bool Junction::isConvex()
 	std::deque<Node *>::iterator it = m_nodes.begin();
 	std::deque<Node *>::iterator it_e = m_nodes.end() - 2;
 	for (; it != it_e; ++it) {
-		if (right(
-				convert((*(it))->m_pixel->m_pos),
-				convert((*(it + 1))->m_pixel->m_pos),
-				convert((*(it + 2))->m_pixel->m_pos)))
+		if (right(convert((*(it))->m_pixel->m_pos), convert((*(it + 1))->m_pixel->m_pos),
+				  convert((*(it + 2))->m_pixel->m_pos)))
 			nonConvexAngles++;
 		if (nonConvexAngles > 1)
 			return false;
 	}
-	if (right(
-			convert((*(it))->m_pixel->m_pos),
-			convert((*(it + 1))->m_pixel->m_pos),
-			convert((*(m_nodes.begin()))->m_pixel->m_pos)))
+	if (right(convert((*(it))->m_pixel->m_pos), convert((*(it + 1))->m_pixel->m_pos),
+			  convert((*(m_nodes.begin()))->m_pixel->m_pos)))
 		nonConvexAngles++;
 	if (nonConvexAngles > 1)
 		return false;
@@ -501,7 +482,7 @@ CenterLineVectorizer::~CenterLineVectorizer()
 	m_links.clear();
 	m_protoStrokes.clear();
 	m_protoRegions.clear();
-	//m_protoHoles.clear();
+	// m_protoHoles.clear();
 }
 
 //---------------------------------------------------------
@@ -524,10 +505,7 @@ void CenterLineVectorizer::clearJunctions()
 
 //---------------------------------------------------------
 
-void CenterLineVectorizer::link(
-	DataPixel *pix,
-	DataPixel *srcPix,
-	DataPixel *dstPix)
+void CenterLineVectorizer::link(DataPixel *pix, DataPixel *srcPix, DataPixel *dstPix)
 {
 	Node *srcNode = 0, *dstNode = 0, *node = 0;
 	Node *tmp;
@@ -593,7 +571,8 @@ void CenterLineVectorizer::link(
 
 inline int colorDistance2(const TPixel32 &c0, const TPixel32 &c1)
 {
-	return ((c0.r - c1.r) * (c0.r - c1.r) + (c0.g - c1.g) * (c0.g - c1.g) + (c0.b - c1.b) * (c0.b - c1.b));
+	return ((c0.r - c1.r) * (c0.r - c1.r) + (c0.g - c1.g) * (c0.g - c1.g) +
+			(c0.b - c1.b) * (c0.b - c1.b));
 }
 
 //---------------------------------------------------------
@@ -657,7 +636,7 @@ void CenterLineVectorizer::makeDataRaster(const TRasterP &src)
 				*dataPix = DataPixel();
 				int distance2 = colorDistance2(m_configuration.m_inkColor, *inPix);
 
-				//int value = (inPix->r + 2*inPix->g + inPix->b)>>2;
+				// int value = (inPix->r + 2*inPix->g + inPix->b)>>2;
 				if (y == 0 || y == m_src->getLy() - 1 || x == 0 || x == m_src->getLx() - 1) {
 					dataPix->m_value = 255;
 					dataPix->m_ink = false;
@@ -668,7 +647,7 @@ void CenterLineVectorizer::makeDataRaster(const TRasterP &src)
 				dataPix->m_pos.x = x++;
 				dataPix->m_pos.y = y;
 				dataPix->m_node = 0;
-				//dataPix->m_index = index++;
+				// dataPix->m_index = index++;
 				inPix++;
 				dataPix++;
 			}
@@ -687,9 +666,9 @@ void CenterLineVectorizer::makeDataRaster(const TRasterP &src)
 			x = 0;
 			while (inPix < inEndPix) {
 				*dataPix = DataPixel();
-				//int distance2 = colorDistance2(m_configuration.m_inkColor, *inPix);
+				// int distance2 = colorDistance2(m_configuration.m_inkColor, *inPix);
 
-				//int value = (inPix->r + 2*inPix->g + inPix->b)>>2;
+				// int value = (inPix->r + 2*inPix->g + inPix->b)>>2;
 				if (y == 0 || y == m_src->getLy() - 1 || x == 0 || x == m_src->getLx() - 1) {
 					dataPix->m_value = 255;
 					dataPix->m_ink = false;
@@ -700,7 +679,7 @@ void CenterLineVectorizer::makeDataRaster(const TRasterP &src)
 				dataPix->m_pos.x = x++;
 				dataPix->m_pos.y = y;
 				dataPix->m_node = 0;
-				//dataPix->m_index = index++;
+				// dataPix->m_index = index++;
 				inPix++;
 				dataPix++;
 			}
@@ -710,7 +689,7 @@ void CenterLineVectorizer::makeDataRaster(const TRasterP &src)
 	else if (srcCM) {
 		int currInk, nextInk = 0;
 		do {
-			int threshold = m_configuration.m_threshold; //tolerance: 1->MAX thresh: 1-255
+			int threshold = m_configuration.m_threshold; // tolerance: 1->MAX thresh: 1-255
 			currInk = nextInk;
 			nextInk = 0;
 			m_dataRasterArray.push_back(pair<int, DataRasterP>(currInk, dataRaster));
@@ -740,13 +719,13 @@ void CenterLineVectorizer::makeDataRaster(const TRasterP &src)
 							}
 						}
 					}
-					//TPixel col = m_palette->getStyle(inPix->getInk())->getMainColor();
+					// TPixel col = m_palette->getStyle(inPix->getInk())->getMainColor();
 					dataPix->m_pos.x = x++;
 					dataPix->m_pos.y = y;
 					dataPix->m_value = value;
 					dataPix->m_ink = (value < threshold);
 					dataPix->m_node = 0;
-					//dataPix->m_index = index++;
+					// dataPix->m_index = index++;
 					inPix++;
 					dataPix++;
 				}
@@ -780,8 +759,7 @@ void CenterLineVectorizer::init()
 		pix++;
 		for (pix++; pix < endPix; ++pix) {
 			if ((pix->m_ink == false) ||
-				(pix[-wrap].m_ink && pix[wrap].m_ink &&
-				 pix[-1].m_ink && pix[1].m_ink))
+				(pix[-wrap].m_ink && pix[wrap].m_ink && pix[-1].m_ink && pix[1].m_ink))
 				continue;
 			int i;
 			for (i = 0; i < 8; i++)
@@ -816,9 +794,9 @@ void CenterLineVectorizer::init()
 }
 /*
 #ifdef DEBUG
-    
-    int i;
-    for(i = 0;i<(int)m_nodes.size();i++)
+
+	int i;
+	for(i = 0;i<(int)m_nodes.size();i++)
 	{
 		Node *node = m_nodes[i];
 		if(node->m_pixel==0) continue;
@@ -828,7 +806,7 @@ void CenterLineVectorizer::init()
 		assert(node->m_next->m_prev == node);
 	}
 
-    for(i = 0;i<m_dataRaster->getLx()*m_dataRaster->getLy(); i++)
+	for(i = 0;i<m_dataRaster->getLx()*m_dataRaster->getLy(); i++)
 	{
 		DataPixel *pix = m_dataRaster->pixels()+i;
 		for(Node *node = pix->m_node; node; node=node->m_other)
@@ -861,7 +839,7 @@ TPointD CenterLineVectorizer::computeCenter(Node *na, Node *nb, double &r)
 	/*	double vsum = 0.0;
 	TPointD d = pa-pb;
 	if(fabs(d.x)>fabs(d.y))
-    {
+	{
 		if(pa.x>pb.x) tswap(pa,pb);
 		for(int x = pa.x; x<=pb.x; x++)
 		{
@@ -869,10 +847,10 @@ TPointD CenterLineVectorizer::computeCenter(Node *na, Node *nb, double &r)
 			int v = 255-m_dataRaster->pixels(y)[x].m_value;
 			center += v * TPointD(x,y);
 			vsum += v;
-        }
-    }
+		}
+	}
 	else
-    {
+	{
 		if(pa.y>pb.y) tswap(pa,pb);
 		for(int y = pa.y; y<=pb.y; y++)
 		{
@@ -881,7 +859,7 @@ TPointD CenterLineVectorizer::computeCenter(Node *na, Node *nb, double &r)
 			center += v * TPointD(x,y);
 			vsum += v;
 		}
-    }
+	}
 	assert(vsum>0);
 	r = 0.5*vsum/255.0;
 	return center * (1/vsum);
@@ -916,9 +894,8 @@ Node *CenterLineVectorizer::findOtherSide(Node *node)
 	TPoint pos = pix->m_pos;
 	int i;
 	for (i = 0;; i++) {
-		TPoint q(pos.x + d1.x * i + d2.x * num * i / den, pos.y + d1.y * i +
-															  d2.y * num * i / den);
-		//if (!m_dataRaster->getBounds().contains(q)) break;
+		TPoint q(pos.x + d1.x * i + d2.x * num * i / den, pos.y + d1.y * i + d2.y * num * i / den);
+		// if (!m_dataRaster->getBounds().contains(q)) break;
 		DataPixel *nextPix = m_dataRaster->pixels(q.y) + q.x;
 		if (nextPix->m_ink == false)
 			break;
@@ -1001,20 +978,17 @@ void setEndpointsDirections(ProtoStroke &protoStroke)
 	if (size == 1)
 		return;
 	if (size < 5) {
-		protoStroke.m_startDirection = protoStroke.m_points[0] -
-									   protoStroke.m_points[1];
-		protoStroke.m_endDirection = protoStroke.m_points[size - 1] -
-									 protoStroke.m_points[size - 2];
+		protoStroke.m_startDirection = protoStroke.m_points[0] - protoStroke.m_points[1];
+		protoStroke.m_endDirection =
+			protoStroke.m_points[size - 1] - protoStroke.m_points[size - 2];
 	} else if (size < 10) {
 		assert(protoStroke.m_points.front() != protoStroke.m_points.back());
-		protoStroke.m_startDirection = protoStroke.m_points[0] -
-									   protoStroke.m_points[2];
-		protoStroke.m_endDirection = protoStroke.m_points[size - 1] -
-									 protoStroke.m_points[size - 3];
-		startThickness = 0.5 * (protoStroke.m_points[1].thick +
-								protoStroke.m_points[2].thick);
-		endThickness = 0.5 * (protoStroke.m_points[size - 2].thick +
-							  protoStroke.m_points[size - 3].thick);
+		protoStroke.m_startDirection = protoStroke.m_points[0] - protoStroke.m_points[2];
+		protoStroke.m_endDirection =
+			protoStroke.m_points[size - 1] - protoStroke.m_points[size - 3];
+		startThickness = 0.5 * (protoStroke.m_points[1].thick + protoStroke.m_points[2].thick);
+		endThickness =
+			0.5 * (protoStroke.m_points[size - 2].thick + protoStroke.m_points[size - 3].thick);
 	} else {
 		protoStroke.m_startDirection = 4 * protoStroke.m_points[0];
 		protoStroke.m_endDirection = 4 * protoStroke.m_points[size - 1];
@@ -1033,8 +1007,7 @@ void setEndpointsDirections(ProtoStroke &protoStroke)
 
 	double startNorm = norm(protoStroke.m_startDirection);
 	if (startNorm)
-		protoStroke.m_startDirection = protoStroke.m_startDirection *
-									   (1 / startNorm);
+		protoStroke.m_startDirection = protoStroke.m_startDirection * (1 / startNorm);
 
 	double endNorm = norm(protoStroke.m_endDirection);
 	if (endNorm)
@@ -1050,10 +1023,10 @@ void setEndpointsDirections(ProtoStroke &protoStroke)
 
 //---------------------------------------------------------
 
-bool CenterLineVectorizer::testOtherSide(Node *na1, Node *nb1, double
-																   &startDist2)
+bool CenterLineVectorizer::testOtherSide(Node *na1, Node *nb1, double &startDist2)
 {
-	if (na1->m_pixel->m_pos == nb1->m_pixel->m_pos || na1->m_next == nb1 || na1->m_prev == nb1 || na1->m_next->m_next == nb1 || na1->m_prev->m_prev == nb1)
+	if (na1->m_pixel->m_pos == nb1->m_pixel->m_pos || na1->m_next == nb1 || na1->m_prev == nb1 ||
+		na1->m_next->m_next == nb1 || na1->m_prev->m_prev == nb1)
 		return false;
 
 	Node *na2 = na1->m_next;
@@ -1164,8 +1137,8 @@ void CenterLineVectorizer::traceLine(DataPixel *pix)
 	Node *naa = node;
 
 	bool isSamePixel;
-	if (node->m_other && node->m_other->m_pixel && (node->m_pixel->m_pos ==
-													node->m_other->m_pixel->m_pos)) {
+	if (node->m_other && node->m_other->m_pixel &&
+		(node->m_pixel->m_pos == node->m_other->m_pixel->m_pos)) {
 		node = node->m_other;
 		isSamePixel = true;
 	} else {
@@ -1185,7 +1158,7 @@ void CenterLineVectorizer::traceLine(DataPixel *pix)
 	if (startDist2 < THICKNESS_LIMIT_2)
 		startDist2 = THICKNESS_LIMIT_2;
 
-	//try to detect errors in findOtherSide
+	// try to detect errors in findOtherSide
 	if (!isSamePixel && !testOtherSide(naa, nbb, startDist2))
 		return;
 
@@ -1212,7 +1185,7 @@ void CenterLineVectorizer::traceLine(DataPixel *pix)
 
 			Node *na1 = na->m_next;
 			Node *nb1 = nb->m_prev;
-			//if (!na1 || !nb1) break;
+			// if (!na1 || !nb1) break;
 
 			TPoint da = na1->m_pixel->m_pos - pb;
 			TPoint db = nb1->m_pixel->m_pos - pa;
@@ -1294,9 +1267,9 @@ void CenterLineVectorizer::traceLine(DataPixel *pix)
 				r = THICKNESS_LIMIT;
 			TThickPoint point(center, r);
 			TPointI pos = convert(center);
-			//TPixel32  *inPix = m_src->pixels(pos.y);
-			//inPix += pos.x;
-			//int value = (inPix->r + 2*inPix->g + inPix->b)>>2;
+			// TPixel32  *inPix = m_src->pixels(pos.y);
+			// inPix += pos.x;
+			// int value = (inPix->r + 2*inPix->g + inPix->b)>>2;
 
 			if (distance2 > maxDist2 || distance2 < minDist2 || na->m_next == nb || na->m_prev == nb
 				//|| isJunction(na, nb)
@@ -1396,10 +1369,8 @@ void CenterLineVectorizer::outputNodes(Node *node)
 
 //---------------------------------------------------------
 
-bool CenterLineVectorizer::linkNextProtoStroke(
-	ProtoStroke *const dstProtoStroke,
-	Junction *const currJunction,
-	int k)
+bool CenterLineVectorizer::linkNextProtoStroke(ProtoStroke *const dstProtoStroke,
+											   Junction *const currJunction, int k)
 {
 	assert(dstProtoStroke);
 	assert(currJunction);
@@ -1413,13 +1384,12 @@ bool CenterLineVectorizer::linkNextProtoStroke(
 	Junction *nextJunction = 0;
 
 	std::vector<ProtoStroke *>::iterator it;
-	std::vector<ProtoStroke *>::iterator it_e =
-		currJunction->m_protoStrokes.end();
+	std::vector<ProtoStroke *>::iterator it_e = currJunction->m_protoStrokes.end();
 	std::vector<ProtoStroke *>::iterator it_candidate = it_e;
 	double candidateProbability = JOIN_LIMIT;
 	int candidate_k;
 	for (it = currJunction->m_protoStrokes.begin(); it != it_e; it++) {
-		//erase dstProtoStroke in currJunction
+		// erase dstProtoStroke in currJunction
 		if (*it == dstProtoStroke) {
 			it = currJunction->m_protoStrokes.erase(it);
 			it_e = currJunction->m_protoStrokes.end();
@@ -1439,18 +1409,14 @@ bool CenterLineVectorizer::linkNextProtoStroke(
 
 		if (k == 0) {
 			if (next_k == 0)
-				probability = 1 - norm2(dstProtoStroke->m_startDirection +
-										(*it)->m_startDirection);
+				probability = 1 - norm2(dstProtoStroke->m_startDirection + (*it)->m_startDirection);
 			else
-				probability = 1 - norm2(dstProtoStroke->m_startDirection +
-										(*it)->m_endDirection);
+				probability = 1 - norm2(dstProtoStroke->m_startDirection + (*it)->m_endDirection);
 		} else {
 			if (next_k == 0)
-				probability = 1 - norm2(dstProtoStroke->m_endDirection +
-										(*it)->m_startDirection);
+				probability = 1 - norm2(dstProtoStroke->m_endDirection + (*it)->m_startDirection);
 			else
-				probability = 1 - norm2(dstProtoStroke->m_endDirection +
-										(*it)->m_endDirection);
+				probability = 1 - norm2(dstProtoStroke->m_endDirection + (*it)->m_endDirection);
 		}
 
 		if (probability > candidateProbability ||
@@ -1471,17 +1437,17 @@ bool CenterLineVectorizer::linkNextProtoStroke(
 		return false;
 	/*	if(k==0)
 	{
-		if(	candidate_k == 0 && dstProtoStroke->m_startJunction == 
+		if(	candidate_k == 0 && dstProtoStroke->m_startJunction ==
 (*it_candidate)->m_endJunction ||
-			candidate_k == 1 && dstProtoStroke->m_startJunction == 
+			candidate_k == 1 && dstProtoStroke->m_startJunction ==
 (*it_candidate)->m_startJunction	)
 			return false;
 	}
 	else if(k==1)
 	{
-		if(	candidate_k == 0 && dstProtoStroke->m_endJunction == 
+		if(	candidate_k == 0 && dstProtoStroke->m_endJunction ==
 (*it_candidate)->m_endJunction ||
-			candidate_k == 1 && dstProtoStroke->m_endJunction == 
+			candidate_k == 1 && dstProtoStroke->m_endJunction ==
 (*it_candidate)->m_startJunction	)
 			return false;
 	}
@@ -1493,27 +1459,23 @@ bool CenterLineVectorizer::linkNextProtoStroke(
 
 	if (k == 0) {
 		if (candidate_k == 0) {
-			dstProtoStroke->m_points.insert(
-				dstProtoStroke->m_points.begin(),
-				srcProtoStroke->m_points.rbegin(),
-				srcProtoStroke->m_points.rend());
+			dstProtoStroke->m_points.insert(dstProtoStroke->m_points.begin(),
+											srcProtoStroke->m_points.rbegin(),
+											srcProtoStroke->m_points.rend());
 		} else {
-			dstProtoStroke->m_points.insert(
-				dstProtoStroke->m_points.begin(),
-				srcProtoStroke->m_points.begin(),
-				srcProtoStroke->m_points.end());
+			dstProtoStroke->m_points.insert(dstProtoStroke->m_points.begin(),
+											srcProtoStroke->m_points.begin(),
+											srcProtoStroke->m_points.end());
 		}
 	} else {
 		if (candidate_k == 0) {
-			dstProtoStroke->m_points.insert(
-				dstProtoStroke->m_points.end(),
-				srcProtoStroke->m_points.begin(),
-				srcProtoStroke->m_points.end());
+			dstProtoStroke->m_points.insert(dstProtoStroke->m_points.end(),
+											srcProtoStroke->m_points.begin(),
+											srcProtoStroke->m_points.end());
 		} else {
-			dstProtoStroke->m_points.insert(
-				dstProtoStroke->m_points.end(),
-				srcProtoStroke->m_points.rbegin(),
-				srcProtoStroke->m_points.rend());
+			dstProtoStroke->m_points.insert(dstProtoStroke->m_points.end(),
+											srcProtoStroke->m_points.rbegin(),
+											srcProtoStroke->m_points.rend());
 		}
 	}
 
@@ -1521,15 +1483,13 @@ bool CenterLineVectorizer::linkNextProtoStroke(
 	srcProtoStroke->m_startJunction = 0;
 	srcProtoStroke->m_endJunction = 0;
 
-	//refresh currJunction
+	// refresh currJunction
 	currJunction->m_protoStrokes.erase(it_candidate);
 
-	//refresh nextJunction
+	// refresh nextJunction
 	if (nextJunction) {
-		it = std::find(
-			nextJunction->m_protoStrokes.begin(),
-			nextJunction->m_protoStrokes.end(),
-			srcProtoStroke);
+		it = std::find(nextJunction->m_protoStrokes.begin(), nextJunction->m_protoStrokes.end(),
+					   srcProtoStroke);
 		assert(it != nextJunction->m_protoStrokes.end());
 		nextJunction->m_protoStrokes.erase(it);
 		nextJunction->m_protoStrokes.push_back(dstProtoStroke);
@@ -1557,10 +1517,9 @@ bool CenterLineVectorizer::linkNextProtoStroke(
 
 //---------------------------------------------------------
 
-void CenterLineVectorizer::joinProtoStrokes(ProtoStroke *const
-												dstProtoStroke)
+void CenterLineVectorizer::joinProtoStrokes(ProtoStroke *const dstProtoStroke)
 {
-	//std::deque<TThickPoint> &dstPoints = dstProtoStroke->m_points;
+	// std::deque<TThickPoint> &dstPoints = dstProtoStroke->m_points;
 	for (int k = 0; k < 2; k++) {
 		for (;;) {
 			Junction *currJunction;
@@ -1579,19 +1538,15 @@ void CenterLineVectorizer::joinProtoStrokes(ProtoStroke *const
 	}
 	std::vector<ProtoStroke *>::iterator it;
 	if (dstProtoStroke->m_startJunction) {
-		it = std::find(
-			dstProtoStroke->m_startJunction->m_protoStrokes.begin(),
-			dstProtoStroke->m_startJunction->m_protoStrokes.end(),
-			dstProtoStroke);
+		it = std::find(dstProtoStroke->m_startJunction->m_protoStrokes.begin(),
+					   dstProtoStroke->m_startJunction->m_protoStrokes.end(), dstProtoStroke);
 		if (it != dstProtoStroke->m_startJunction->m_protoStrokes.end())
 			dstProtoStroke->m_startJunction->m_protoStrokes.erase(it);
 		dstProtoStroke->m_startJunction = 0;
 	}
 	if (dstProtoStroke->m_endJunction) {
-		it = std::find(
-			dstProtoStroke->m_endJunction->m_protoStrokes.begin(),
-			dstProtoStroke->m_endJunction->m_protoStrokes.end(),
-			dstProtoStroke);
+		it = std::find(dstProtoStroke->m_endJunction->m_protoStrokes.begin(),
+					   dstProtoStroke->m_endJunction->m_protoStrokes.end(), dstProtoStroke);
 		if (it != dstProtoStroke->m_endJunction->m_protoStrokes.end())
 			dstProtoStroke->m_endJunction->m_protoStrokes.erase(it);
 		dstProtoStroke->m_endJunction = 0;
@@ -1600,11 +1555,9 @@ void CenterLineVectorizer::joinProtoStrokes(ProtoStroke *const
 
 //---------------------------------------------------------
 
-bool y_intersect(const double y0, const TPointD p1, const TPointD p2,
-				 double &x0)
+bool y_intersect(const double y0, const TPointD p1, const TPointD p2, double &x0)
 {
-	if ((y0 < p1.y && y0 < p2.y) ||
-		(y0 > p1.y && y0 > p2.y))
+	if ((y0 < p1.y && y0 < p2.y) || (y0 > p1.y && y0 > p2.y))
 		return false;
 
 	x0 = (p1.x * (p2.y - y0) + p2.x * (y0 - p1.y)) / (p2.y - p1.y);
@@ -1647,8 +1600,7 @@ Junction *CenterLineVectorizer::mergeJunctions(const std::list<JunctionMerge> &j
 	std::list<JunctionMerge>::const_iterator it_junction;
 	std::deque<Node *>::iterator it_startNode, it_endNode;
 
-	for (it_junction = junctions.begin(); it_junction != junctions.end();
-		 ++it_junction) {
+	for (it_junction = junctions.begin(); it_junction != junctions.end(); ++it_junction) {
 		newJunction->m_center += it_junction->m_junction->m_center;
 
 		std::deque<Node *>::iterator it_node;
@@ -1659,7 +1611,8 @@ Junction *CenterLineVectorizer::mergeJunctions(const std::list<JunctionMerge> &j
 				newJunction->m_nodes.push_back(*it_node);
 			}
 		} else {
-			//			if( isContained(it_junction->m_junction->m_center, newJunction->m_nodes) ) continue;
+			//			if( isContained(it_junction->m_junction->m_center, newJunction->m_nodes) )
+			//continue;
 			/*			if(	it_junction->m_junction->m_nodes.size() < 3)
 			{
 				std::vector<ProtoStroke*>::iterator it_protoStroke;
@@ -1679,13 +1632,11 @@ Junction *CenterLineVectorizer::mergeJunctions(const std::list<JunctionMerge> &j
 			}
 */
 
-			it_startNode = std::find(newJunction->m_nodes.begin(),
-									 newJunction->m_nodes.end(),
+			it_startNode = std::find(newJunction->m_nodes.begin(), newJunction->m_nodes.end(),
 									 it_junction->m_startNode);
 			assert(it_startNode != newJunction->m_nodes.end());
 			it_endNode = std::find(it_junction->m_junction->m_nodes.begin(),
-								   it_junction->m_junction->m_nodes.end(),
-								   it_junction->m_endNode);
+								   it_junction->m_junction->m_nodes.end(), it_junction->m_endNode);
 			assert(it_endNode != it_junction->m_junction->m_nodes.end());
 
 			for (it_node = it_junction->m_junction->m_nodes.begin();
@@ -1695,10 +1646,9 @@ Junction *CenterLineVectorizer::mergeJunctions(const std::list<JunctionMerge> &j
 
 			if (it_junction->m_isNext) {
 				++it_startNode;
-				newJunction->m_nodes.insert(it_startNode,
-											it_junction->m_junction->m_nodes.begin(), it_endNode);
-				it_startNode = std::find(newJunction->m_nodes.begin(),
-										 newJunction->m_nodes.end(),
+				newJunction->m_nodes.insert(it_startNode, it_junction->m_junction->m_nodes.begin(),
+											it_endNode);
+				it_startNode = std::find(newJunction->m_nodes.begin(), newJunction->m_nodes.end(),
 										 it_junction->m_startNode);
 				assert(it_startNode != newJunction->m_nodes.end());
 				++it_startNode;
@@ -1706,10 +1656,9 @@ Junction *CenterLineVectorizer::mergeJunctions(const std::list<JunctionMerge> &j
 											it_junction->m_junction->m_nodes.end());
 			} else {
 				++it_endNode;
-				newJunction->m_nodes.insert(it_startNode,
-											it_junction->m_junction->m_nodes.begin(), it_endNode);
-				it_startNode = std::find(newJunction->m_nodes.begin(),
-										 newJunction->m_nodes.end(),
+				newJunction->m_nodes.insert(it_startNode, it_junction->m_junction->m_nodes.begin(),
+											it_endNode);
+				it_startNode = std::find(newJunction->m_nodes.begin(), newJunction->m_nodes.end(),
 										 it_junction->m_startNode);
 				assert(it_startNode != newJunction->m_nodes.end());
 				newJunction->m_nodes.insert(it_startNode, it_endNode,
@@ -1719,8 +1668,7 @@ Junction *CenterLineVectorizer::mergeJunctions(const std::list<JunctionMerge> &j
 
 		std::vector<ProtoStroke *>::iterator it_protoStroke;
 		for (it_protoStroke = it_junction->m_junction->m_protoStrokes.begin();
-			 it_protoStroke != it_junction->m_junction->m_protoStrokes.end();
-			 ++it_protoStroke) {
+			 it_protoStroke != it_junction->m_junction->m_protoStrokes.end(); ++it_protoStroke) {
 			if ((*it_protoStroke)->m_startJunction == it_junction->m_junction) {
 				(*it_protoStroke)->m_startJunction = newJunction;
 				newJunction->m_protoStrokes.push_back(*it_protoStroke);
@@ -1734,19 +1682,14 @@ Junction *CenterLineVectorizer::mergeJunctions(const std::list<JunctionMerge> &j
 		std::vector<JunctionLink>::iterator it_links;
 		for (it_links = m_links.begin(); it_links != m_links.end(); ++it_links) {
 			if (it_links->m_first == it_junction->m_junction)
-				it_links->m_first =
-					newJunction;
+				it_links->m_first = newJunction;
 			if (it_links->m_second == it_junction->m_junction)
-				it_links->m_second =
-					newJunction;
+				it_links->m_second = newJunction;
 		}
 
-		//erase old junction
+		// erase old junction
 		std::vector<Junction *>::iterator it;
-		it = std::find(
-			m_junctions.begin(),
-			m_junctions.end(),
-			it_junction->m_junction);
+		it = std::find(m_junctions.begin(), m_junctions.end(), it_junction->m_junction);
 		assert(it != m_junctions.end());
 		delete it_junction->m_junction;
 		m_junctions.erase(it);
@@ -1756,21 +1699,18 @@ Junction *CenterLineVectorizer::mergeJunctions(const std::list<JunctionMerge> &j
 
 	std::vector<ProtoStroke *>::iterator it_protoStroke;
 	for (it_protoStroke = newJunction->m_protoStrokes.begin();
-		 it_protoStroke != newJunction->m_protoStrokes.end();
-		 ++it_protoStroke) {
+		 it_protoStroke != newJunction->m_protoStrokes.end(); ++it_protoStroke) {
 		if ((*it_protoStroke)->m_points.size() < 6 &&
 			(*it_protoStroke)->m_startJunction == newJunction &&
 			(*it_protoStroke)->m_endJunction == newJunction) {
 			(*it_protoStroke)->m_points.clear();
-			(*it_protoStroke)->m_startJunction = (*it_protoStroke)->m_endJunction =
-				0;
+			(*it_protoStroke)->m_startJunction = (*it_protoStroke)->m_endJunction = 0;
 
 			ProtoStroke *protoStroke = *it_protoStroke;
 			for (;;) {
 				std::vector<ProtoStroke *>::iterator it;
 				it = std::find(newJunction->m_protoStrokes.begin(),
-							   newJunction->m_protoStrokes.end(),
-							   protoStroke);
+							   newJunction->m_protoStrokes.end(), protoStroke);
 				if (it == newJunction->m_protoStrokes.end())
 					break;
 				newJunction->m_protoStrokes.erase(it);
@@ -1798,8 +1738,7 @@ void CenterLineVectorizer::joinJunctions()
 
 		//		std::sort(currJunction->m_nodes.begin(), currJunction->m_nodes.end());
 		std::deque<Node *>::iterator it;
-		for (it = currJunction->m_nodes.begin(); it != currJunction->m_nodes.end();
-			 it++) {
+		for (it = currJunction->m_nodes.begin(); it != currJunction->m_nodes.end(); it++) {
 			Node *currNode = *it;
 			Node *prevNode = *it;
 			Node *nextNode = *it;
@@ -1809,7 +1748,7 @@ void CenterLineVectorizer::joinJunctions()
 				prevNode = prevNode->m_prev;
 				prevNode->m_visited = true;
 				if (prevNode->m_junction != 0 && prevNode->m_junction != currJunction) {
-					//double junctionMaxDist = 3.5*currJunction->m_center.thick;
+					// double junctionMaxDist = 3.5*currJunction->m_center.thick;
 					it_link = std::find(m_links.begin(), m_links.end(),
 										JunctionLink(currJunction, prevNode->m_junction));
 					/*					if(	j >= 1*SEARCH_WINDOW &&
@@ -1822,11 +1761,12 @@ junctionMaxDist)
 						else
 							++(it_link->m_order);
 					}
-					else*/ if (it_link == m_links.end() &&
-																		std::find(joinJunctions.begin(), joinJunctions.end(),
-																				  JunctionMerge(prevNode->m_junction)) == joinJunctions.end()) {
-						joinJunctions.push_back(JunctionMerge(prevNode->m_junction, currNode,
-															  prevNode, false));
+					else*/ if (
+						it_link == m_links.end() &&
+						std::find(joinJunctions.begin(), joinJunctions.end(),
+								  JunctionMerge(prevNode->m_junction)) == joinJunctions.end()) {
+						joinJunctions.push_back(
+							JunctionMerge(prevNode->m_junction, currNode, prevNode, false));
 					}
 				}
 				if (prevNode->m_visited)
@@ -1836,7 +1776,7 @@ junctionMaxDist)
 				nextNode = nextNode->m_next;
 				prevNode->m_visited = true;
 				if (nextNode->m_junction != 0 && nextNode->m_junction != currJunction) {
-					//double junctionMaxDist = 3.5*currJunction->m_center.thick;
+					// double junctionMaxDist = 3.5*currJunction->m_center.thick;
 					it_link = std::find(m_links.begin(), m_links.end(),
 										JunctionLink(currJunction, nextNode->m_junction));
 					/*					if(	j >= 1*SEARCH_WINDOW &&
@@ -1849,11 +1789,12 @@ junctionMaxDist )
 						else
 							++(it_link->m_order);
 					}
-					else*/ if (it_link == m_links.end() &&
-																		std::find(joinJunctions.begin(), joinJunctions.end(),
-																				  JunctionMerge(nextNode->m_junction)) == joinJunctions.end()) {
-						joinJunctions.push_back(JunctionMerge(nextNode->m_junction, currNode,
-															  nextNode, true));
+					else*/ if (
+						it_link == m_links.end() &&
+						std::find(joinJunctions.begin(), joinJunctions.end(),
+								  JunctionMerge(nextNode->m_junction)) == joinJunctions.end()) {
+						joinJunctions.push_back(
+							JunctionMerge(nextNode->m_junction, currNode, nextNode, true));
 					}
 				}
 				if (nextNode->m_visited)
@@ -1861,7 +1802,7 @@ junctionMaxDist )
 			}
 		}
 		if (joinJunctions.size() > 1) {
-			//erase duplicate junctions
+			// erase duplicate junctions
 			//			joinJunctions.sort();
 			//			std::sort(joinJunctions.begin(), joinJunctions.end());
 			//			std::list<JunctionMerge>::iterator it_newEnd;
@@ -1917,10 +1858,10 @@ void CenterLineVectorizer::resolveUnvisitedNode(Node *node)
 	}
 
 	if(	(link.m_first) && (link.m_second) && (link.m_first != link.m_second)
-		&& steps >= 2*SEARCH_WINDOW && norm(link.m_first->m_center - 
+		&& steps >= 2*SEARCH_WINDOW && norm(link.m_first->m_center -
 link.m_second->m_center) > 2.5 &&
 		std::find(m_links.begin(), m_links.end(), link) == m_links.end() &&
-		std::find(m_links.begin(), m_links.end(), JunctionLink(link.m_second, 
+		std::find(m_links.begin(), m_links.end(), JunctionLink(link.m_second,
 link.m_first) ) == m_links.end() )
 	{
 		m_links.push_back(link);
@@ -1941,9 +1882,11 @@ link.m_first) ) == m_links.end() )
 
 void CenterLineVectorizer::createJunctionPolygon(Junction *junction)
 {
-	//int size = junction->m_nodes.size();
-	//	std::sort(junction->m_nodes.begin(), junction->m_nodes.end(), CompareJunctionNodes(junction->m_center));
-	//	std::reverse(junction->m_nodes.begin(), junction->m_nodes.end());	std::deque<Node*>::iterator it, it_temp;
+	// int size = junction->m_nodes.size();
+	//	std::sort(junction->m_nodes.begin(), junction->m_nodes.end(),
+	//CompareJunctionNodes(junction->m_center));
+	//	std::reverse(junction->m_nodes.begin(), junction->m_nodes.end());
+	//std::deque<Node*>::iterator it, it_temp;
 	std::deque<Node *>::iterator it, it_temp;
 	for (it = junction->m_nodes.begin(); it != junction->m_nodes.end(); it++) {
 		int step = 0;
@@ -1979,7 +1922,7 @@ void CenterLineVectorizer::createJunctionPolygon(Junction *junction)
 			{
 				if(currNode != otherNode)
 				{
-					it_temp = std::find(junction->m_nodes.begin(), junction->m_nodes.end(), 
+					it_temp = std::find(junction->m_nodes.begin(), junction->m_nodes.end(),
 currNode);
 					if(it+1 == junction->m_nodes.end())
 						std::swap(*junction->m_nodes.begin(), *it_temp);
@@ -2007,12 +1950,14 @@ currNode);
 					--it;
 				}
 			else {
-				//				assert(*(it+1) == otherNode || (it+1 == junction->m_nodes.end() && *junction->m_nodes.begin() == otherNode) );
+				//				assert(*(it+1) == otherNode || (it+1 == junction->m_nodes.end() &&
+				//*junction->m_nodes.begin() == otherNode) );
 				if (currNode != otherNode) {
 					Node tempNode = *otherNode;
 					*otherNode = *currNode;
 					*currNode = tempNode;
-					//					it_temp = std::find(junction->m_nodes.begin(), junction->m_nodes.end(), currNode);
+					//					it_temp = std::find(junction->m_nodes.begin(),
+					//junction->m_nodes.end(), currNode);
 					//					assert(it_temp != junction->m_nodes.end());
 					//					if(it+1 == junction->m_nodes.end())
 					//						std::swap(*junction->m_nodes.begin(), *it_temp);
@@ -2033,20 +1978,19 @@ void CenterLineVectorizer::handleLinks()
 	for (it_links = m_links.begin(); it_links != m_links.end(); ++it_links) {
 		ProtoStroke linkingProtoStroke;
 
-		//initialize points
+		// initialize points
 		TThickPoint p1 = it_links->m_first->m_center;
 		TThickPoint p2 = it_links->m_second->m_center - p1;
-		linkingProtoStroke.m_points.push_back(TThickPoint(p1,
-														  JUNCTION_THICKNESS_RATIO * p1.thick));
-		linkingProtoStroke.m_points.push_back(TThickPoint(p1 + 0.5 * p2,
-														  JUNCTION_THICKNESS_RATIO * (p1.thick + 0.5 * p2.thick)));
-		linkingProtoStroke.m_points.push_back(TThickPoint(p1 + p2,
-														  JUNCTION_THICKNESS_RATIO * (p1.thick + p2.thick)));
+		linkingProtoStroke.m_points.push_back(TThickPoint(p1, JUNCTION_THICKNESS_RATIO * p1.thick));
+		linkingProtoStroke.m_points.push_back(
+			TThickPoint(p1 + 0.5 * p2, JUNCTION_THICKNESS_RATIO * (p1.thick + 0.5 * p2.thick)));
+		linkingProtoStroke.m_points.push_back(
+			TThickPoint(p1 + p2, JUNCTION_THICKNESS_RATIO * (p1.thick + p2.thick)));
 
-		//initialize directions
+		// initialize directions
 		setEndpointsDirections(linkingProtoStroke);
 
-		//initialize junctions
+		// initialize junctions
 		/*		linkingProtoStroke.m_startJunction = it_links->first;
 		linkingProtoStroke.m_endJunction = it_links->second;*/
 		m_protoStrokes.push_back(linkingProtoStroke);
@@ -2057,8 +2001,7 @@ void CenterLineVectorizer::handleLinks()
 
 //---------------------------------------------------------
 
-bool isFalseBranch(int k, ProtoStroke *protoStroke, int recursionOrder,
-				   TThickPoint &edge)
+bool isFalseBranch(int k, ProtoStroke *protoStroke, int recursionOrder, TThickPoint &edge)
 {
 	if (recursionOrder > 3)
 		return false;
@@ -2156,14 +2099,13 @@ bool isFalseBranch(int k, ProtoStroke *protoStroke, int recursionOrder,
 void CenterLineVectorizer::handleJunctions()
 {
 	std::vector<Junction *>::iterator it_junction = m_junctions.begin();
-	for (it_junction = m_junctions.begin(); it_junction < m_junctions.end();
-		 it_junction++) {
+	for (it_junction = m_junctions.begin(); it_junction < m_junctions.end(); it_junction++) {
 		Junction *currJunction = *it_junction;
 
 		if (currJunction->m_protoStrokes.empty()) {
 			std::deque<Node *>::iterator it_node;
-			for (it_node = currJunction->m_nodes.begin();
-				 it_node != currJunction->m_nodes.end(); ++it_node) {
+			for (it_node = currJunction->m_nodes.begin(); it_node != currJunction->m_nodes.end();
+				 ++it_node) {
 				(*it_node)->m_junction = 0;
 				(*it_node)->m_visited = false;
 			}
@@ -2175,10 +2117,10 @@ void CenterLineVectorizer::handleJunctions()
 
 		std::vector<ProtoStroke *>::iterator it;
 
-		//set polygon center
+		// set polygon center
 		/*		double size = currJunction->m_nodes.size();
 		std::deque<Node*>::iterator it_node;
-		for(it_node = currJunction->m_nodes.begin(); 
+		for(it_node = currJunction->m_nodes.begin();
 it_node!=currJunction->m_nodes.end(); it_node++)
 		{
 			currJunction->m_center += convert( (*it_node)->m_pixel->m_pos );
@@ -2193,8 +2135,8 @@ it_node!=currJunction->m_nodes.end(); it_node++)
 		}
 */
 		double size = currJunction->m_protoStrokes.size();
-		for (it = currJunction->m_protoStrokes.begin();
-			 it != currJunction->m_protoStrokes.end(); it++) {
+		for (it = currJunction->m_protoStrokes.begin(); it != currJunction->m_protoStrokes.end();
+			 it++) {
 			if (((*it))->m_startJunction == currJunction && (*it)->m_endJunction == currJunction) {
 				currJunction->m_center += 0.5 * (*it)->m_points.front();
 				currJunction->m_center += 0.5 * (*it)->m_points.back();
@@ -2228,8 +2170,7 @@ it_node!=currJunction->m_nodes.end(); it_node++)
 
 	joinJunctions();
 	//	return;
-	for (it_junction = m_junctions.begin(); it_junction < m_junctions.end();
-		 it_junction++) {
+	for (it_junction = m_junctions.begin(); it_junction < m_junctions.end(); it_junction++) {
 		Junction *currJunction = *it_junction;
 		if (currJunction->m_center.thick < 2 * THICKNESS_LIMIT)
 			currJunction->m_center.thick = 2 * THICKNESS_LIMIT;
@@ -2241,10 +2182,8 @@ it_node!=currJunction->m_nodes.end(); it_node++)
 		currJunction->m_junctionOrder = currJunction->m_protoStrokes.size();
 
 		if (currJunction->m_protoStrokes.size() == 3) {
-			std::vector<ProtoStroke *>::iterator it_e =
-				currJunction->m_protoStrokes.end();
-			std::vector<ProtoStroke *>::iterator it_candidate1 = it_e, it_candidate2 =
-																		   it_e;
+			std::vector<ProtoStroke *>::iterator it_e = currJunction->m_protoStrokes.end();
+			std::vector<ProtoStroke *>::iterator it_candidate1 = it_e, it_candidate2 = it_e;
 			int candidate1_k, candidate2_k;
 			double candidateProbability = JOIN_LIMIT;
 			int k, next_k;
@@ -2275,21 +2214,20 @@ it_node!=currJunction->m_nodes.end(); it_node++)
 
 					if (k == 0) {
 						if (next_k == 0)
-							probability = 1 - norm2((*it)->m_startDirection +
-													(*it_next)->m_startDirection);
+							probability =
+								1 - norm2((*it)->m_startDirection + (*it_next)->m_startDirection);
 						else
-							probability = 1 - norm2((*it)->m_startDirection +
-													(*it_next)->m_endDirection);
+							probability =
+								1 - norm2((*it)->m_startDirection + (*it_next)->m_endDirection);
 					} else {
 						if (next_k == 0)
-							probability = 1 - norm2((*it)->m_endDirection +
-													(*it_next)->m_startDirection);
+							probability =
+								1 - norm2((*it)->m_endDirection + (*it_next)->m_startDirection);
 						else
-							probability = 1 - norm2((*it)->m_endDirection +
-													(*it_next)->m_endDirection);
+							probability =
+								1 - norm2((*it)->m_endDirection + (*it_next)->m_endDirection);
 					}
-					if (probability > candidateProbability ||
-						(*it)->m_points.size() < 3) {
+					if (probability > candidateProbability || (*it)->m_points.size() < 3) {
 						candidateProbability = probability;
 						it_candidate1 = it;
 						it_candidate2 = it_next;
@@ -2340,28 +2278,23 @@ intersected)
 			}
 */		}
 
-if (true || currJunction->m_nodes.size() <= 12 ||
-	currJunction->isConvex()) {
+if (true || currJunction->m_nodes.size() <= 12 || currJunction->isConvex()) {
 	TThickPoint junctionPoint(currJunction->m_center);
-	for (it = currJunction->m_protoStrokes.begin();
-		 it != currJunction->m_protoStrokes.end(); it++) {
+	for (it = currJunction->m_protoStrokes.begin(); it != currJunction->m_protoStrokes.end();
+		 it++) {
 		assert((*it)->m_startJunction == currJunction || (*it)->m_endJunction == currJunction);
 		if ((*it)->m_startJunction == currJunction) {
 			TPointD deltaPoint = (*it)->m_points.front() - junctionPoint;
-			double deltaThick = (*it)->m_points.front().thick -
-								junctionPoint.thick;
+			double deltaThick = (*it)->m_points.front().thick - junctionPoint.thick;
 			if (norm2(deltaPoint) > 0.2) {
 				if (norm2(deltaPoint) > 2) {
-					(*it)->m_points.push_front(
-						TThickPoint(junctionPoint + 0.7 * deltaPoint, junctionPoint.thick +
-																		  0.7 * deltaThick));
-					(*it)->m_points.push_front(
-						TThickPoint(junctionPoint + 0.4 * deltaPoint, junctionPoint.thick +
-																		  0.4 * deltaThick));
+					(*it)->m_points.push_front(TThickPoint(junctionPoint + 0.7 * deltaPoint,
+														   junctionPoint.thick + 0.7 * deltaThick));
+					(*it)->m_points.push_front(TThickPoint(junctionPoint + 0.4 * deltaPoint,
+														   junctionPoint.thick + 0.4 * deltaThick));
 				}
-				(*it)->m_points.push_front(
-					TThickPoint(junctionPoint + 0.0 * deltaPoint, junctionPoint.thick +
-																	  0.0 * deltaThick));
+				(*it)->m_points.push_front(TThickPoint(junctionPoint + 0.0 * deltaPoint,
+													   junctionPoint.thick + 0.0 * deltaThick));
 			}
 		}
 		if ((*it)->m_endJunction == currJunction) {
@@ -2369,16 +2302,13 @@ if (true || currJunction->m_nodes.size() <= 12 ||
 			double deltaThick = (*it)->m_points.back().thick - junctionPoint.thick;
 			if (norm2(deltaPoint) > 0.2) {
 				if (norm2(deltaPoint) > 2) {
-					(*it)->m_points.push_back(
-						TThickPoint(junctionPoint + 0.7 * deltaPoint, junctionPoint.thick +
-																		  0.7 * deltaThick));
-					(*it)->m_points.push_back(
-						TThickPoint(junctionPoint + 0.4 * deltaPoint, junctionPoint.thick +
-																		  0.4 * deltaThick));
+					(*it)->m_points.push_back(TThickPoint(junctionPoint + 0.7 * deltaPoint,
+														  junctionPoint.thick + 0.7 * deltaThick));
+					(*it)->m_points.push_back(TThickPoint(junctionPoint + 0.4 * deltaPoint,
+														  junctionPoint.thick + 0.4 * deltaThick));
 				}
-				(*it)->m_points.push_back(
-					TThickPoint(junctionPoint + 0.0 * deltaPoint, junctionPoint.thick +
-																	  0.0 * deltaThick));
+				(*it)->m_points.push_back(TThickPoint(junctionPoint + 0.0 * deltaPoint,
+													  junctionPoint.thick + 0.0 * deltaThick));
 			}
 		}
 	}
@@ -2387,18 +2317,17 @@ if (true || currJunction->m_nodes.size() <= 12 ||
 	region.m_center = currJunction->m_center;
 
 	std::deque<Node *>::iterator it_nodes;
-	for (it_nodes = currJunction->m_nodes.begin();
-		 it_nodes != currJunction->m_nodes.end(); it_nodes++)
-		region.m_points.push_back(
-			TThickPoint(convert((*it_nodes)->m_pixel->m_pos), 0.0));
+	for (it_nodes = currJunction->m_nodes.begin(); it_nodes != currJunction->m_nodes.end();
+		 it_nodes++)
+		region.m_points.push_back(TThickPoint(convert((*it_nodes)->m_pixel->m_pos), 0.0));
 
 	region.m_points.push_back(
 		TThickPoint(convert((*currJunction->m_nodes.begin())->m_pixel->m_pos), 0.0));
 
 	m_protoRegions.push_back(region);
 
-	for (it = currJunction->m_protoStrokes.begin();
-		 it != currJunction->m_protoStrokes.end(); it++) {
+	for (it = currJunction->m_protoStrokes.begin(); it != currJunction->m_protoStrokes.end();
+		 it++) {
 		if ((*it)->m_startJunction == currJunction && (*it)->m_endJunction == currJunction) {
 			if ((*it)->m_points.size() < 10)
 				(*it)->m_points.clear();
@@ -2415,7 +2344,7 @@ if (true || currJunction->m_nodes.size() <= 12 ||
 }
 	}
 
-	//handleLinks();
+	// handleLinks();
 }
 
 //---------------------------------------------------------
@@ -2439,12 +2368,13 @@ void CenterLineVectorizer::createStrokes()
 				it = it_centerlines->m_points.begin()+1;
 				for(;;)
 				{
-					if( it >= it_centerlines->m_points.end()-(m_configuration.m_smoothness+1)) break;
+					if( it >= it_centerlines->m_points.end()-(m_configuration.m_smoothness+1))
+				break;
 					for(int j=0; j<m_configuration.m_smoothness;j++)
 						it = it_centerlines->m_points.erase(it);
 					++it;
 				}
-        */
+		*/
 				// gmt. credo che l'idea sia di lasciare un punto e
 				// toglierne m_configuration.m_smoothness e cosi' via fino alla fine
 				// n.b. ho modificato il comportamento sugli eventuali ultimi punti
@@ -2482,10 +2412,13 @@ void CenterLineVectorizer::createStrokes()
 				for (i = 0; i < n; i++)
 					rr[i] = points[i].thick;
 				for (i = 2; i < n - 2; i++)
-					points[i].thick = 0.8 * (1 / 5.0) *
-									  (/*rr[i-4]+rr[i-3]*/ +rr[i - 2] + rr[i - 1] + rr[i] + rr[i + 1] + rr[i + 2] /*+rr[i+3]+rr[i+4]*/);
-				points[0].thick = points[1].thick = points[2].thick;			 //=points[3].thick;//=points[4].thick;
-				points[n - 1].thick = points[n - 2].thick = points[n - 3].thick; //=points[n-4].thick;//=points[n-5].thick;
+					points[i].thick =
+						0.8 * (1 / 5.0) * (/*rr[i-4]+rr[i-3]*/ +rr[i - 2] + rr[i - 1] + rr[i] +
+										   rr[i + 1] + rr[i + 2] /*+rr[i+3]+rr[i+4]*/);
+				points[0].thick = points[1].thick =
+					points[2].thick; //=points[3].thick;//=points[4].thick;
+				points[n - 1].thick = points[n - 2].thick =
+					points[n - 3].thick; //=points[n-4].thick;//=points[n-5].thick;
 				delete[] rr;
 			}
 			TStroke *stroke = TStroke::interpolate(points, m_configuration.m_interpolationError);
@@ -2513,11 +2446,11 @@ void CenterLineVectorizer::createRegions()
 		else
 		{
 			TPointD internalPoint;
-			internalPoint = rotate90(it_regions->m_points[1] - 
+			internalPoint = rotate90(it_regions->m_points[1] -
 it_regions->m_points[0]);
 			assert(norm2(internalPoint) != 0);
 			normalize(internalPoint);
-			internalPoint = internalPoint*0.001 + 0.5*(it_regions->m_points[1] + 
+			internalPoint = internalPoint*0.001 + 0.5*(it_regions->m_points[1] +
 it_regions->m_points[0]);
 			m_vimage->fill(internalPoint, TPalette::DefaultStrokeStyle);
 		}*/
@@ -2574,7 +2507,8 @@ void CenterLineVectorizer::outputInks()
 
 //---------------------------------------------------------
 
-TVectorImageP centerlineVectorize(const TImageP &image, const VectorizerConfiguration &c, TPalette *palette)
+TVectorImageP centerlineVectorize(const TImageP &image, const VectorizerConfiguration &c,
+								  TPalette *palette)
 {
 	CenterLineVectorizer vectorizer(c, palette);
 
@@ -2601,17 +2535,20 @@ TVectorImageP centerlineVectorize(const TImageP &image, const VectorizerConfigur
 class OutlineVectorizer : public CenterLineVectorizer
 {
 
-public:
+  public:
 	list<vector<TThickPoint>> m_protoOutlines;
 
 	void traceOutline(Node *initialNode);
 
-	OutlineVectorizer(const VectorizerConfiguration &configuration, TPalette *palette) : CenterLineVectorizer(configuration, palette) {}
+	OutlineVectorizer(const VectorizerConfiguration &configuration, TPalette *palette)
+		: CenterLineVectorizer(configuration, palette)
+	{
+	}
 	~OutlineVectorizer();
 
 	void createOutlineStrokes();
 
-private:
+  private:
 	// not implemented
 	OutlineVectorizer(const OutlineVectorizer &);
 	OutlineVectorizer &operator=(const OutlineVectorizer &);
@@ -2726,22 +2663,25 @@ void OutlineVectorizer::createOutlineStrokes()
 			stroke->setStyle(m_configuration.m_strokeStyleId);
 			stroke->setSelfLoop();
 			m_vimage->addStroke(stroke);
-			//			TStroke *stroke = TStroke::interpolate(points, m_configuration.interpolationError);
+			//			TStroke *stroke = TStroke::interpolate(points,
+			//m_configuration.interpolationError);
 			//     		stroke->setStyle(strokeStyleId);
-			//			m_vimage->addStroke(stroke);//, TPalette::DefaultStrokeStyle, TPalette::DefaultFillStyle);
-			//internalPoints.push_back(internalPoint);
-			//m_vimage->fill(externalPoint, TPalette::DefaultFillStyle);
+			//			m_vimage->addStroke(stroke);//, TPalette::DefaultStrokeStyle,
+			//TPalette::DefaultFillStyle);
+			// internalPoints.push_back(internalPoint);
+			// m_vimage->fill(externalPoint, TPalette::DefaultFillStyle);
 		}
 	}
 
-	//m_vimage->autoFill(m_configuration.m_strokeStyleId);
-	//for (UINT i=0; i<internalPoints.size(); i++)
+	// m_vimage->autoFill(m_configuration.m_strokeStyleId);
+	// for (UINT i=0; i<internalPoints.size(); i++)
 	//  m_vimage->fill(internalPoints[i],fillStyleId);
 }
 
 //---------------------------------------------------------
 
-TVectorImageP outlineVectorize(const TImageP &image, const VectorizerConfiguration &configuration, TPalette *palette)
+TVectorImageP outlineVectorize(const TImageP &image, const VectorizerConfiguration &configuration,
+							   TPalette *palette)
 {
 	TVectorImageP out;
 
@@ -2777,7 +2717,8 @@ TVectorImageP outlineVectorize(const TImageP &image, const VectorizerConfigurati
 }
 
 //---------------------------------------------------------
-void applyFillColors(TRegion *r, const TRasterP &ras, TPalette *palette, const TPoint &offset, bool leaveUnpainted)
+void applyFillColors(TRegion *r, const TRasterP &ras, TPalette *palette, const TPoint &offset,
+					 bool leaveUnpainted)
 {
 	TPointD pd;
 	TRasterCM32P rt = (TRasterCM32P)ras;
@@ -2841,20 +2782,20 @@ void applyFillColors(TVectorImageP vi, const TImageP &img, TPalette *palette, bo
 
 	vi->findRegions();
 	for (int i = 0; i < (int)vi->getRegionCount(); i++)
-		applyFillColors(vi->getRegion(i), ras, palette, convert(tb.getP00() - vb.getP00()), leaveUnpainted);
+		applyFillColors(vi->getRegion(i), ras, palette, convert(tb.getP00() - vb.getP00()),
+						leaveUnpainted);
 }
 
 //=========================================================
 
 TVectorImageP vectorize(const TImageP &img, const VectorizerConfiguration &c, TPalette *plt)
 {
-	TVectorImageP vi = c.m_outline
-						   ? outlineVectorize(img, c, plt)
-						   : centerlineVectorize(img, c, plt);
+	TVectorImageP vi =
+		c.m_outline ? outlineVectorize(img, c, plt) : centerlineVectorize(img, c, plt);
 
 	applyFillColors(vi, img, plt, c.m_leaveUnpainted);
 
-	//else if (c.m_outline)
+	// else if (c.m_outline)
 	//  vi->autoFill(c.m_strokeStyleId);
 
 	TPointD center;

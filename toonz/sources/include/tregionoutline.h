@@ -5,7 +5,7 @@
 
 class TRegionOutline
 {
-public:
+  public:
 	typedef std::vector<T3DPointD> PointVector;
 	typedef std::vector<PointVector> Boundary;
 

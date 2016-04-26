@@ -9,7 +9,7 @@ class HistoryField : public QFrame
 
 	QScrollArea *m_scrollArea;
 
-public:
+  public:
 #if QT_VERSION >= 0x050500
 	HistoryField(QScrollArea *parent = 0, Qt::WindowFlags flags = 0);
 #else
@@ -23,7 +23,7 @@ public:
 
 	void exposeCurrent();
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *);
 	void mousePressEvent(QMouseEvent *event);
 };
@@ -35,7 +35,7 @@ class HistoryPane : public QWidget
 	HistoryField *m_field;
 	QScrollArea *m_frameArea;
 
-public:
+  public:
 #if QT_VERSION >= 0x050500
 	HistoryPane(QWidget *parent = 0, Qt::WindowFlags flags = 0);
 #else
@@ -43,12 +43,12 @@ public:
 #endif
 	~HistoryPane(){};
 
-protected:
+  protected:
 	void resizeEvent(QResizeEvent *);
 	void showEvent(QShowEvent *);
 	void hideEvent(QHideEvent *);
 
-public slots:
+  public slots:
 	void onHistoryChanged();
 };
 

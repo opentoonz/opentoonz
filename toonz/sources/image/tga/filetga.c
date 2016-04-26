@@ -19,8 +19,7 @@
  *
  */
 
-/*@unused@*/ static const char rcsid[] =
-	"$Id: targa.c,v 1.7 2003/06/21 09:30:53 emikulic Exp $";
+/*@unused@*/ static const char rcsid[] = "$Id: targa.c,v 1.7 2003/06/21 09:30:53 emikulic Exp $";
 
 #define TGA_KEEP_MACROS /* BIT, htole16, letoh16 */
 #include "targa.h"
@@ -30,23 +29,20 @@
 #define SANE_DEPTH(x) ((x) == 8 || (x) == 16 || (x) == 24 || (x) == 32)
 #define UNMAP_DEPTH(x) ((x) == 16 || (x) == 24 || (x) == 32)
 
-static const char tga_id[] =
-	"\0\0\0\0" /* extension area offset */
-	"\0\0\0\0" /* developer directory offset */
-	"TRUEVISION-XFILE.";
+static const char tga_id[] = "\0\0\0\0" /* extension area offset */
+							 "\0\0\0\0" /* developer directory offset */
+							 "TRUEVISION-XFILE.";
 
 static const size_t tga_id_length = 26; /* tga_id + \0 */
 
 /* helpers */
 static tga_result tga_read_rle(tga_image *dest, FILE *fp);
-static tga_result tga_write_row_RLE(FILE *fp,
-									const tga_image *src, const uint8_t *row);
-typedef enum { RAW,
-			   RLE } packet_type;
-static packet_type rle_packet_type(const uint8_t *row, const uint16_t pos,
-								   const uint16_t width, const uint16_t bpp);
-static uint8_t rle_packet_len(const uint8_t *row, const uint16_t pos,
-							  const uint16_t width, const uint16_t bpp, const packet_type type);
+static tga_result tga_write_row_RLE(FILE *fp, const tga_image *src, const uint8_t *row);
+typedef enum { RAW, RLE } packet_type;
+static packet_type rle_packet_type(const uint8_t *row, const uint16_t pos, const uint16_t width,
+								   const uint16_t bpp);
+static uint8_t rle_packet_len(const uint8_t *row, const uint16_t pos, const uint16_t width,
+							  const uint16_t bpp, const packet_type type);
 
 uint8_t tga_get_attribute_bits(const tga_image *tga)
 {
@@ -65,24 +61,20 @@ int tga_is_top_to_bottom(const tga_image *tga)
 
 int tga_is_colormapped(const tga_image *tga)
 {
-	return (
-		tga->image_type == TGA_IMAGE_TYPE_COLORMAP ||
-		tga->image_type == TGA_IMAGE_TYPE_COLORMAP_RLE);
+	return (tga->image_type == TGA_IMAGE_TYPE_COLORMAP ||
+			tga->image_type == TGA_IMAGE_TYPE_COLORMAP_RLE);
 }
 
 int tga_is_rle(const tga_image *tga)
 {
-	return (
-		tga->image_type == TGA_IMAGE_TYPE_COLORMAP_RLE ||
-		tga->image_type == TGA_IMAGE_TYPE_BGR_RLE ||
-		tga->image_type == TGA_IMAGE_TYPE_MONO_RLE);
+	return (tga->image_type == TGA_IMAGE_TYPE_COLORMAP_RLE ||
+			tga->image_type == TGA_IMAGE_TYPE_BGR_RLE ||
+			tga->image_type == TGA_IMAGE_TYPE_MONO_RLE);
 }
 
 int tga_is_mono(const tga_image *tga)
 {
-	return (
-		tga->image_type == TGA_IMAGE_TYPE_MONO ||
-		tga->image_type == TGA_IMAGE_TYPE_MONO_RLE);
+	return (tga->image_type == TGA_IMAGE_TYPE_MONO || tga->image_type == TGA_IMAGE_TYPE_MONO_RLE);
 }
 
 /* ---------------------------------------------------------------------------
@@ -160,21 +152,21 @@ tga_result tga_read(tga_image *dest, const char *filename)
  */
 tga_result tga_read_from_FILE(tga_image *dest, FILE *fp)
 {
-#define BARF(errcode)           \
-	{                           \
-		tga_free_buffers(dest); \
-		return errcode;         \
+#define BARF(errcode)                                                                              \
+	{                                                                                              \
+		tga_free_buffers(dest);                                                                    \
+		return errcode;                                                                            \
 	}
 
-#define READ(destptr, size)               \
-	if (fread(destptr, size, 1, fp) != 1) \
+#define READ(destptr, size)                                                                        \
+	if (fread(destptr, size, 1, fp) != 1)                                                          \
 	BARF(TGAERR_EOF)
 
-#define READ16(dest)                       \
-	{                                      \
-		if (fread(&(dest), 2, 1, fp) != 1) \
-			BARF(TGAERR_EOF);              \
-		dest = letoh16(dest);              \
+#define READ16(dest)                                                                               \
+	{                                                                                              \
+		if (fread(&(dest), 2, 1, fp) != 1)                                                         \
+			BARF(TGAERR_EOF);                                                                      \
+		dest = letoh16(dest);                                                                      \
 	}
 
 	dest->image_id = NULL;
@@ -191,20 +183,16 @@ tga_result tga_read_from_FILE(tga_image *dest, FILE *fp)
 	if (dest->image_type == TGA_IMAGE_TYPE_NONE)
 		BARF(TGAERR_NO_IMG);
 
-	if (dest->image_type != TGA_IMAGE_TYPE_COLORMAP &&
-		dest->image_type != TGA_IMAGE_TYPE_BGR &&
+	if (dest->image_type != TGA_IMAGE_TYPE_COLORMAP && dest->image_type != TGA_IMAGE_TYPE_BGR &&
 		dest->image_type != TGA_IMAGE_TYPE_MONO &&
 		dest->image_type != TGA_IMAGE_TYPE_COLORMAP_RLE &&
-		dest->image_type != TGA_IMAGE_TYPE_BGR_RLE &&
-		dest->image_type != TGA_IMAGE_TYPE_MONO_RLE)
+		dest->image_type != TGA_IMAGE_TYPE_BGR_RLE && dest->image_type != TGA_IMAGE_TYPE_MONO_RLE)
 		BARF(TGAERR_IMG_TYPE);
 
-	if (tga_is_colormapped(dest) &&
-		dest->color_map_type == TGA_COLOR_MAP_ABSENT)
+	if (tga_is_colormapped(dest) && dest->color_map_type == TGA_COLOR_MAP_ABSENT)
 		BARF(TGAERR_CMAP_MISSING);
 
-	if (!tga_is_colormapped(dest) &&
-		dest->color_map_type == TGA_COLOR_MAP_PRESENT)
+	if (!tga_is_colormapped(dest) && dest->color_map_type == TGA_COLOR_MAP_PRESENT)
 		BARF(TGAERR_CMAP_PRESENT);
 
 	READ16(dest->color_map_origin);
@@ -227,8 +215,7 @@ tga_result tga_read_from_FILE(tga_image *dest, FILE *fp)
 		BARF(TGAERR_ZERO_SIZE);
 
 	READ(&dest->pixel_depth, 1);
-	if (!SANE_DEPTH(dest->pixel_depth) ||
-		(dest->pixel_depth != 8 && tga_is_colormapped(dest)))
+	if (!SANE_DEPTH(dest->pixel_depth) || (dest->pixel_depth != 8 && tga_is_colormapped(dest)))
 		BARF(TGAERR_PIXEL_DEPTH);
 
 	READ(&dest->image_descriptor, 1);
@@ -241,18 +228,15 @@ tga_result tga_read_from_FILE(tga_image *dest, FILE *fp)
 	}
 
 	if (dest->color_map_type == TGA_COLOR_MAP_PRESENT) {
-		dest->color_map_data = (uint8_t *)malloc(
-			(dest->color_map_origin + dest->color_map_length) *
-			dest->color_map_depth / 8);
+		dest->color_map_data = (uint8_t *)malloc((dest->color_map_origin + dest->color_map_length) *
+												 dest->color_map_depth / 8);
 		if (dest->color_map_data == NULL)
 			BARF(TGAERR_NO_MEM);
-		READ(dest->color_map_data +
-				 (dest->color_map_origin * dest->color_map_depth / 8),
+		READ(dest->color_map_data + (dest->color_map_origin * dest->color_map_depth / 8),
 			 dest->color_map_length * dest->color_map_depth / 8);
 	}
 
-	dest->image_data = (uint8_t *)malloc(
-		dest->width * dest->height * dest->pixel_depth / 8);
+	dest->image_data = (uint8_t *)malloc(dest->width * dest->height * dest->pixel_depth / 8);
 	if (dest->image_data == NULL)
 		BARF(TGAERR_NO_MEM);
 
@@ -263,8 +247,7 @@ tga_result tga_read_from_FILE(tga_image *dest, FILE *fp)
 			BARF(result);
 	} else {
 		/* uncompressed */
-		READ(dest->image_data,
-			 dest->width * dest->height * dest->pixel_depth / 8);
+		READ(dest->image_data, dest->width * dest->height * dest->pixel_depth / 8);
 	}
 
 	return TGA_NOERR;
@@ -280,13 +263,12 @@ tga_result tga_read_from_FILE(tga_image *dest, FILE *fp)
 static tga_result tga_read_rle(tga_image *dest, FILE *fp)
 {
 #define RLE_BIT BIT(7)
-#define READ(dest, size)               \
-	if (fread(dest, size, 1, fp) != 1) \
+#define READ(dest, size)                                                                           \
+	if (fread(dest, size, 1, fp) != 1)                                                             \
 	return TGAERR_EOF
 
 	uint8_t *pos;
-	uint32_t p_loaded = 0,
-			 p_expected = dest->width * dest->height;
+	uint32_t p_loaded = 0, p_expected = dest->width * dest->height;
 	uint8_t bpp = dest->pixel_depth / 8; /* bytes per pixel */
 
 	pos = dest->image_data;
@@ -349,11 +331,10 @@ tga_result tga_write(const char *filename, const tga_image *src)
  * fields set up correctly.
  */
 #define PIXEL(ofs) (row + (ofs)*bpp)
-static tga_result tga_write_row_RLE(FILE *fp,
-									const tga_image *src, const uint8_t *row)
+static tga_result tga_write_row_RLE(FILE *fp, const tga_image *src, const uint8_t *row)
 {
-#define WRITE(src, size)               \
-	if (fwrite(src, size, 1, fp) != 1) \
+#define WRITE(src, size)                                                                           \
+	if (fwrite(src, size, 1, fp) != 1)                                                             \
 	return TGAERR_WRITE
 
 	uint16_t pos = 0;
@@ -390,8 +371,8 @@ static tga_result tga_write_row_RLE(FILE *fp,
  */
 #define SAME(ofs1, ofs2) (memcmp(PIXEL(ofs1), PIXEL(ofs2), bpp) == 0)
 
-static packet_type rle_packet_type(const uint8_t *row, const uint16_t pos,
-								   const uint16_t width, const uint16_t bpp)
+static packet_type rle_packet_type(const uint8_t *row, const uint16_t pos, const uint16_t width,
+								   const uint16_t bpp)
 {
 	if (pos == width - 1)
 		return RAW;			/* one pixel */
@@ -411,8 +392,8 @@ static packet_type rle_packet_type(const uint8_t *row, const uint16_t pos,
  * Find the length of the current RLE packet.  This is a helper function
  * called from tga_write_row_RLE().
  */
-static uint8_t rle_packet_len(const uint8_t *row, const uint16_t pos,
-							  const uint16_t width, const uint16_t bpp, const packet_type type)
+static uint8_t rle_packet_len(const uint8_t *row, const uint16_t pos, const uint16_t width,
+							  const uint16_t bpp, const packet_type type)
 {
 	uint8_t len = 2;
 
@@ -456,40 +437,34 @@ static uint8_t rle_packet_len(const uint8_t *row, const uint16_t pos,
  */
 tga_result tga_write_to_FILE(FILE *fp, const tga_image *src)
 {
-#define WRITE(srcptr, size)               \
-	if (fwrite(srcptr, size, 1, fp) != 1) \
+#define WRITE(srcptr, size)                                                                        \
+	if (fwrite(srcptr, size, 1, fp) != 1)                                                          \
 	return TGAERR_WRITE
 
-#define WRITE16(src)                       \
-	{                                      \
-		uint16_t _temp = htole16(src);     \
-		if (fwrite(&_temp, 2, 1, fp) != 1) \
-			return TGAERR_WRITE;           \
+#define WRITE16(src)                                                                               \
+	{                                                                                              \
+		uint16_t _temp = htole16(src);                                                             \
+		if (fwrite(&_temp, 2, 1, fp) != 1)                                                         \
+			return TGAERR_WRITE;                                                                   \
 	}
 
 	WRITE(&src->image_id_length, 1);
 
-	if (src->color_map_type != TGA_COLOR_MAP_ABSENT &&
-		src->color_map_type != TGA_COLOR_MAP_PRESENT)
+	if (src->color_map_type != TGA_COLOR_MAP_ABSENT && src->color_map_type != TGA_COLOR_MAP_PRESENT)
 		return TGAERR_CMAP_TYPE;
 	WRITE(&src->color_map_type, 1);
 
 	if (src->image_type == TGA_IMAGE_TYPE_NONE)
 		return TGAERR_NO_IMG;
-	if (src->image_type != TGA_IMAGE_TYPE_COLORMAP &&
-		src->image_type != TGA_IMAGE_TYPE_BGR &&
-		src->image_type != TGA_IMAGE_TYPE_MONO &&
-		src->image_type != TGA_IMAGE_TYPE_COLORMAP_RLE &&
-		src->image_type != TGA_IMAGE_TYPE_BGR_RLE &&
-		src->image_type != TGA_IMAGE_TYPE_MONO_RLE)
+	if (src->image_type != TGA_IMAGE_TYPE_COLORMAP && src->image_type != TGA_IMAGE_TYPE_BGR &&
+		src->image_type != TGA_IMAGE_TYPE_MONO && src->image_type != TGA_IMAGE_TYPE_COLORMAP_RLE &&
+		src->image_type != TGA_IMAGE_TYPE_BGR_RLE && src->image_type != TGA_IMAGE_TYPE_MONO_RLE)
 		return TGAERR_IMG_TYPE;
 	WRITE(&src->image_type, 1);
 
-	if (tga_is_colormapped(src) &&
-		src->color_map_type == TGA_COLOR_MAP_ABSENT)
+	if (tga_is_colormapped(src) && src->color_map_type == TGA_COLOR_MAP_ABSENT)
 		return TGAERR_CMAP_MISSING;
-	if (!tga_is_colormapped(src) &&
-		src->color_map_type == TGA_COLOR_MAP_PRESENT)
+	if (!tga_is_colormapped(src) && src->color_map_type == TGA_COLOR_MAP_PRESENT)
 		return TGAERR_CMAP_PRESENT;
 	if (src->color_map_type == TGA_COLOR_MAP_PRESENT) {
 		if (src->color_map_length == 0)
@@ -510,8 +485,7 @@ tga_result tga_write_to_FILE(FILE *fp, const tga_image *src)
 	WRITE16(src->width);
 	WRITE16(src->height);
 
-	if (!SANE_DEPTH(src->pixel_depth) ||
-		(src->pixel_depth != 8 && tga_is_colormapped(src)))
+	if (!SANE_DEPTH(src->pixel_depth) || (src->pixel_depth != 8 && tga_is_colormapped(src)))
 		return TGAERR_PIXEL_DEPTH;
 	WRITE(&src->pixel_depth, 1);
 
@@ -521,22 +495,20 @@ tga_result tga_write_to_FILE(FILE *fp, const tga_image *src)
 		WRITE(&src->image_id, src->image_id_length);
 
 	if (src->color_map_type == TGA_COLOR_MAP_PRESENT)
-		WRITE(src->color_map_data +
-				  (src->color_map_origin * src->color_map_depth / 8),
+		WRITE(src->color_map_data + (src->color_map_origin * src->color_map_depth / 8),
 			  src->color_map_length * src->color_map_depth / 8);
 
 	if (tga_is_rle(src)) {
 		uint16_t row;
 		for (row = 0; row < src->height; row++) {
-			tga_result result = tga_write_row_RLE(fp, src,
-												  src->image_data + row * src->width * src->pixel_depth / 8);
+			tga_result result = tga_write_row_RLE(
+				fp, src, src->image_data + row * src->width * src->pixel_depth / 8);
 			if (result != TGA_NOERR)
 				return result;
 		}
 	} else {
 		/* uncompressed */
-		WRITE(src->image_data,
-			  src->width * src->height * src->pixel_depth / 8);
+		WRITE(src->image_data, src->width * src->height * src->pixel_depth / 8);
 	}
 
 	WRITE(tga_id, tga_id_length);
@@ -552,8 +524,8 @@ tga_result tga_write_to_FILE(FILE *fp, const tga_image *src)
  * This is just a helper function to initialise the header fields in a
  * tga_image struct.
  */
-static void init_tga_image(tga_image *img, uint8_t *image,
-						   const uint16_t width, const uint16_t height, const uint8_t depth)
+static void init_tga_image(tga_image *img, uint8_t *image, const uint16_t width,
+						   const uint16_t height, const uint8_t depth)
 {
 	img->image_id_length = 0;
 	img->color_map_type = TGA_COLOR_MAP_ABSENT;
@@ -572,8 +544,8 @@ static void init_tga_image(tga_image *img, uint8_t *image,
 	img->image_data = image;
 }
 
-tga_result tga_write_mono(const char *filename, uint8_t *image,
-						  const uint16_t width, const uint16_t height)
+tga_result tga_write_mono(const char *filename, uint8_t *image, const uint16_t width,
+						  const uint16_t height)
 {
 	tga_image img;
 	init_tga_image(&img, image, width, height, 8);
@@ -581,8 +553,8 @@ tga_result tga_write_mono(const char *filename, uint8_t *image,
 	return tga_write(filename, &img);
 }
 
-tga_result tga_write_mono_rle(const char *filename, uint8_t *image,
-							  const uint16_t width, const uint16_t height)
+tga_result tga_write_mono_rle(const char *filename, uint8_t *image, const uint16_t width,
+							  const uint16_t height)
 {
 	tga_image img;
 	init_tga_image(&img, image, width, height, 8);
@@ -590,8 +562,8 @@ tga_result tga_write_mono_rle(const char *filename, uint8_t *image,
 	return tga_write(filename, &img);
 }
 
-tga_result tga_write_bgr(const char *filename, uint8_t *image,
-						 const uint16_t width, const uint16_t height, const uint8_t depth)
+tga_result tga_write_bgr(const char *filename, uint8_t *image, const uint16_t width,
+						 const uint16_t height, const uint8_t depth)
 {
 	tga_image img;
 	init_tga_image(&img, image, width, height, depth);
@@ -599,8 +571,8 @@ tga_result tga_write_bgr(const char *filename, uint8_t *image,
 	return tga_write(filename, &img);
 }
 
-tga_result tga_write_bgr_rle(const char *filename, uint8_t *image,
-							 const uint16_t width, const uint16_t height, const uint8_t depth)
+tga_result tga_write_bgr_rle(const char *filename, uint8_t *image, const uint16_t width,
+							 const uint16_t height, const uint8_t depth)
 {
 	tga_image img;
 	init_tga_image(&img, image, width, height, depth);
@@ -609,8 +581,8 @@ tga_result tga_write_bgr_rle(const char *filename, uint8_t *image,
 }
 
 /* Note: this function will MODIFY <image> */
-tga_result tga_write_rgb(const char *filename, uint8_t *image,
-						 const uint16_t width, const uint16_t height, const uint8_t depth)
+tga_result tga_write_rgb(const char *filename, uint8_t *image, const uint16_t width,
+						 const uint16_t height, const uint8_t depth)
 {
 	tga_image img;
 	init_tga_image(&img, image, width, height, depth);
@@ -620,8 +592,8 @@ tga_result tga_write_rgb(const char *filename, uint8_t *image,
 }
 
 /* Note: this function will MODIFY <image> */
-tga_result tga_write_rgb_rle(const char *filename, uint8_t *image,
-							 const uint16_t width, const uint16_t height, const uint8_t depth)
+tga_result tga_write_rgb_rle(const char *filename, uint8_t *image, const uint16_t width,
+							 const uint16_t height, const uint8_t depth)
 {
 	tga_image img;
 	init_tga_image(&img, image, width, height, depth);
@@ -789,8 +761,8 @@ uint8_t *tga_find_pixel(const tga_image *img, uint16_t x, uint16_t y)
  * be set to NULL if not wanted.  Returns TGAERR_PIXEL_DEPTH if a stupid
  * number of bits is given.
  */
-tga_result tga_unpack_pixel(const uint8_t *src, const uint8_t bits,
-							uint8_t *b, uint8_t *g, uint8_t *r, uint8_t *a)
+tga_result tga_unpack_pixel(const uint8_t *src, const uint8_t bits, uint8_t *b, uint8_t *g,
+							uint8_t *r, uint8_t *a)
 {
 	switch (bits) {
 	case 32:
@@ -852,8 +824,8 @@ tga_result tga_unpack_pixel(const uint8_t *src, const uint8_t bits,
  * Pack the pixel at the dest pointer according to bits.  Returns
  * TGAERR_PIXEL_DEPTH if a stupid number of bits is given.
  */
-tga_result tga_pack_pixel(uint8_t *dest, const uint8_t bits,
-						  const uint8_t b, const uint8_t g, const uint8_t r, const uint8_t a)
+tga_result tga_pack_pixel(uint8_t *dest, const uint8_t bits, const uint8_t b, const uint8_t g,
+						  const uint8_t r, const uint8_t a)
 {
 	switch (bits) {
 	case 32:
@@ -895,8 +867,7 @@ tga_result tga_pack_pixel(uint8_t *dest, const uint8_t bits,
  * Desaturate the specified Targa using the specified coefficients:
  *      output = ( red * cr + green * cg + blue * cb ) / dv
  */
-tga_result tga_desaturate(tga_image *img, const int cr, const int cg,
-						  const int cb, const int dv)
+tga_result tga_desaturate(tga_image *img, const int cr, const int cg, const int cb, const int dv)
 {
 	uint8_t bpp = img->pixel_depth / 8; /* bytes per pixel */
 	uint8_t *dest, *src, *tmp;
@@ -912,16 +883,12 @@ tga_result tga_desaturate(tga_image *img, const int cr, const int cg,
 		return TGAERR_PIXEL_DEPTH;
 
 	dest = img->image_data;
-	for (src = img->image_data;
-		 src < img->image_data + img->width * img->height * bpp;
+	for (src = img->image_data; src < img->image_data + img->width * img->height * bpp;
 		 src += bpp) {
 		uint8_t b, g, r;
 		(void)tga_unpack_pixel(src, img->pixel_depth, &b, &g, &r, NULL);
 
-		*dest = (uint8_t)(((int)b * cb +
-						   (int)g * cg +
-						   (int)r * cr) /
-						  dv);
+		*dest = (uint8_t)(((int)b * cb + (int)g * cg + (int)r * cr) / dv);
 		dest++;
 	}
 
@@ -966,8 +933,7 @@ tga_result tga_convert_depth(tga_image *img, const uint8_t bits)
 	uint8_t src_bpp, dest_bpp;
 	uint8_t *src, *dest;
 
-	if (!UNMAP_DEPTH(bits) ||
-		!SANE_DEPTH(img->pixel_depth))
+	if (!UNMAP_DEPTH(bits) || !SANE_DEPTH(img->pixel_depth))
 		return TGAERR_PIXEL_DEPTH;
 
 	if (tga_is_colormapped(img)) {
@@ -990,8 +956,7 @@ tga_result tga_convert_depth(tga_image *img, const uint8_t bits)
 
 		/* convert forwards */
 		dest = img->image_data;
-		for (src = img->image_data;
-			 src < img->image_data + img->width * img->height * src_bpp;
+		for (src = img->image_data; src < img->image_data + img->width * img->height * src_bpp;
 			 src += src_bpp) {
 			uint8_t r, g, b, a;
 			(void)tga_unpack_pixel(src, img->pixel_depth, &r, &g, &b, &a);
@@ -1006,8 +971,7 @@ tga_result tga_convert_depth(tga_image *img, const uint8_t bits)
 		img->image_data = tmp;
 	} else {
 		/* expand */
-		void *tmp = realloc(img->image_data,
-							img->width * img->height * dest_bpp);
+		void *tmp = realloc(img->image_data, img->width * img->height * dest_bpp);
 		if (tmp == NULL)
 			return TGAERR_NO_MEM;
 		img->image_data = (uint8_t *)tmp;
@@ -1015,8 +979,7 @@ tga_result tga_convert_depth(tga_image *img, const uint8_t bits)
 		/* convert backwards */
 		dest = img->image_data + (img->width * img->height - 1) * dest_bpp;
 		for (src = img->image_data + (img->width * img->height - 1) * src_bpp;
-			 src >= img->image_data;
-			 src -= src_bpp) {
+			 src >= img->image_data; src -= src_bpp) {
 			uint8_t r, g, b, a;
 			(void)tga_unpack_pixel(src, img->pixel_depth, &r, &g, &b, &a);
 			(void)tga_pack_pixel(dest, bits, r, g, b, a);
@@ -1039,8 +1002,7 @@ tga_result tga_swap_red_blue(tga_image *img)
 	if (!UNMAP_DEPTH(img->pixel_depth))
 		return TGAERR_PIXEL_DEPTH;
 
-	for (ptr = img->image_data;
-		 ptr < img->image_data + (img->width * img->height - 1) * bpp;
+	for (ptr = img->image_data; ptr < img->image_data + (img->width * img->height - 1) * bpp;
 		 ptr += bpp) {
 		uint8_t r, g, b, a;
 		(void)tga_unpack_pixel(ptr, img->pixel_depth, &b, &g, &r, &a);

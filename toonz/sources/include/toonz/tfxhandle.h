@@ -28,12 +28,12 @@ class DVAPI TFxHandle : public QObject
 {
 	Q_OBJECT
 
-private:
+  private:
 	TFx *m_fx;
 	// for reperoducing the last fx-creation command in the Schematic
 	QString m_previousActionString;
 
-public:
+  public:
 	TFxHandle();
 	~TFxHandle();
 
@@ -51,10 +51,10 @@ public:
 	void setPreviousActionString(QString str) { m_previousActionString = str; }
 	QString getPreviousActionString() { return m_previousActionString; }
 
-public slots:
+  public slots:
 	void onColumnChanged();
 
-signals:
+  signals:
 	void fxSwitched();
 	void fxChanged();
 	void fxPresetSaved();
@@ -63,4 +63,4 @@ signals:
 	void fxSettingsShouldBeSwitched();
 };
 
-#endif //TFRAMEHANDLE_H
+#endif // TFRAMEHANDLE_H

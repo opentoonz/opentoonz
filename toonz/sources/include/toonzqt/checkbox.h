@@ -32,20 +32,20 @@ class DVAPI CheckBox : public QCheckBox
 {
 	Q_OBJECT
 
-public:
+  public:
 	CheckBox(QWidget *parent = 0);
 	CheckBox(const QString &text, QWidget *parent = 0);
 
 	~CheckBox() {}
 
-protected:
+  protected:
 	void mousePressEvent(QMouseEvent *e);
 	void mouseReleaseEvent(QMouseEvent *e);
 	void mouseMoveEvent(QMouseEvent *);
 };
 
 //-----------------------------------------------------------------------------
-} //namespace DVGui
+} // namespace DVGui
 //-----------------------------------------------------------------------------
 
 #endif // CHECKBOX_H

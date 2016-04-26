@@ -22,23 +22,23 @@ class TValueField;
 
 class DVAPI TColorField : public TWidget
 {
-public:
+  public:
 	class Listener
 	{
-	public:
+	  public:
 		virtual void onChange(TColorField *cfd, TPixel32 color, bool dragging) {}
 		virtual ~Listener() {}
 	};
 
 	class ColorEditor
 	{
-	public:
+	  public:
 		virtual void connectTo(TColorField *fld, bool openPopup = false) = 0;
 		virtual bool isConnectedTo(TColorField *fld) const = 0;
 		virtual void updateColor(const TPixel32 &color, bool dragging) = 0;
 	};
 
-private:
+  private:
 	Listener *m_listener;
 	TPixel32 m_color;
 	ColorChip *m_colorChip;
@@ -48,10 +48,10 @@ private:
 	bool m_matteEnabled;
 	ColorEditor *m_colorEditor;
 
-protected:
+  protected:
 	virtual void onChange(TPixel32 color, bool dragging) {}
 
-public:
+  public:
 	TColorField(TWidget *parent, string name, int labelWidth, bool matteEnabled);
 
 	void configureNotify(const TDimension &size);
@@ -147,13 +147,14 @@ class TColorFieldAction : public TColorFieldActionInterface {
   Method m_method;
 public:
   TColorFieldAction(T*target, Method method) : m_target(target), m_method(method) {}
-  void triggerAction(TColorField*vf, const TPixel32 &value, bool dragging) 
-    {(m_target->*m_method)(vf, value, dragging); }
+  void triggerAction(TColorField*vf, const TPixel32 &value, bool dragging)
+	{(m_target->*m_method)(vf, value, dragging); }
 };
 
 
 template <class T>
-inline void tconnect(TColorField&src, T *target, void (T::*method)(TColorField *vf, const TPixel32 &value, bool dragging))
+inline void tconnect(TColorField&src, T *target, void (T::*method)(TColorField *vf, const TPixel32
+&value, bool dragging))
 {
   src.addAction(new TColorFieldAction<T>(target, method));
 }
@@ -176,13 +177,14 @@ class TColorField2Action : public TColorField2ActionInterface {
   Method m_method;
 public:
   TColorField2Action(T*target, Method method) : m_target(target), m_method(method) {}
-  void triggerAction(TColorField2*vf, const TPixel32 &value, bool dragging) 
-    {(m_target->*m_method)(vf, value, dragging); }
+  void triggerAction(TColorField2*vf, const TPixel32 &value, bool dragging)
+	{(m_target->*m_method)(vf, value, dragging); }
 };
 
 
 template <class T>
-inline void tconnect(TColorField2&src, T *target, void (T::*method)(TColorField2 *vf, const TPixel32 &value, bool dragging))
+inline void tconnect(TColorField2&src, T *target, void (T::*method)(TColorField2 *vf, const TPixel32
+&value, bool dragging))
 {
   src.addAction(new TColorField2Action<T>(target, method));
 }
@@ -228,13 +230,14 @@ class TColorField3Action : public TColorField3ActionInterface {
   Method m_method;
 public:
   TColorField3Action(T*target, Method method) : m_target(target), m_method(method) {}
-  void triggerAction(TColorField3*vf, const TPixel32 &value, bool dragging) 
-    {(m_target->*m_method)(vf, value, dragging); }
+  void triggerAction(TColorField3*vf, const TPixel32 &value, bool dragging)
+	{(m_target->*m_method)(vf, value, dragging); }
 };
 
 
 template <class T>
-inline void tconnect(TColorField3&src, T *target, void (T::*method)(TColorField3 *vf, const TPixel32 &value, bool dragging))
+inline void tconnect(TColorField3&src, T *target, void (T::*method)(TColorField3 *vf, const TPixel32
+&value, bool dragging))
 {
   src.addAction(new TColorField3Action<T>(target, method));
 }

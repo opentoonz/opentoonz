@@ -54,7 +54,7 @@ class DVAPI StyleSample : public QWidget
 
 	bool m_isEditing;
 
-public:
+  public:
 	StyleSample(QWidget *parent, int sizeX, int sizeY);
 	~StyleSample();
 
@@ -76,12 +76,12 @@ public:
 	void setEnable(bool drawEnable) { m_drawEnable = drawEnable; }
 	bool isEnable() const { return m_drawEnable; }
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *event);
 	void mousePressEvent(QMouseEvent *);
 	void mouseDoubleClickEvent(QMouseEvent *event);
 
-signals:
+  signals:
 	void clicked(const TColorStyle &style);
 };
 
@@ -97,21 +97,19 @@ class DVAPI ChannelField : public QWidget
 	QSlider *m_channelSlider;
 	int m_maxValue;
 
-public:
-	ChannelField(QWidget *parent = 0,
-				 const QString &string = "",
-				 int value = 0, int maxValue = 255, bool horizontal = false,
-				 int labelWidth = 13, int sliderWidth = 40);
+  public:
+	ChannelField(QWidget *parent = 0, const QString &string = "", int value = 0, int maxValue = 255,
+				 bool horizontal = false, int labelWidth = 13, int sliderWidth = 40);
 
 	~ChannelField() {}
 
 	void setChannel(int value);
 	int getChannel();
 
-signals:
+  signals:
 	void valueChanged(int value, bool isDragging);
 
-protected slots:
+  protected slots:
 	void onSliderChanged(int value);
 	void onSliderReleased();
 	void onEditChanged(const QString &str);
@@ -133,14 +131,14 @@ class DVAPI ColorField : public QWidget
 
 	TPixel32 m_color;
 
-	//!If it is true editing changed are notified, setIsEditing emit editingChanged signal.
+	//! If it is true editing changed are notified, setIsEditing emit editingChanged signal.
 	bool m_notifyEditingChange;
 	bool m_useStyleEditor;
 
-public:
+  public:
 	class ColorFieldEditorController
 	{
-	public:
+	  public:
 		ColorFieldEditorController() {}
 		virtual ~ColorFieldEditorController() {}
 		virtual void edit(DVGui::ColorField *colorField){};
@@ -149,10 +147,8 @@ public:
 
 	static ColorFieldEditorController *m_editorController;
 
-	ColorField(QWidget *parent = 0,
-			   bool isAlphaActive = true,
-			   TPixel32 color = TPixel32(0, 0, 0, 255),
-			   int squareSize = 40,
+	ColorField(QWidget *parent = 0, bool isAlphaActive = true,
+			   TPixel32 color = TPixel32(0, 0, 0, 255), int squareSize = 40,
 			   bool useStyleEditor = true);
 
 	~ColorField() {}
@@ -187,19 +183,19 @@ public:
 	void hideChannelsFields(bool hide);
 	void setAlphaActive(bool active);
 
-protected:
+  protected:
 	void updateChannels();
 	void mousePressEvent(QMouseEvent *event);
 	void mouseDoubleClickEvent(QMouseEvent *event);
 	void hideEvent(QHideEvent *);
 
-protected slots:
+  protected slots:
 	void onRedChannelChanged(int value, bool isDragging);
 	void onGreenChannelChanged(int value, bool isDragging);
 	void onBlueChannelChanged(int value, bool isDragging);
 	void onAlphaChannelChanged(int value, bool isDragging);
 
-signals:
+  signals:
 	void editingChanged(const TPixel32 &, bool isEditing);
 	void colorChanged(const TPixel32 &, bool isDragging);
 };
@@ -226,13 +222,13 @@ class DVAPI CleanupColorField : public QWidget
 
 	bool m_greyMode;
 
-	//!If it is true editing changed are notified, setIsEditing emit editingChanged signal.
+	//! If it is true editing changed are notified, setIsEditing emit editingChanged signal.
 	bool m_notifyEditingChange;
 
-public:
+  public:
 	class CleanupColorFieldEditorController
 	{
-	public:
+	  public:
 		CleanupColorFieldEditorController() {}
 		virtual ~CleanupColorFieldEditorController() {}
 
@@ -242,8 +238,9 @@ public:
 
 	static CleanupColorFieldEditorController *m_editorController;
 
-public:
-	CleanupColorField(QWidget *parent, TCleanupStyle *cleanupStyle, TPaletteHandle *ph, bool greyMode);
+  public:
+	CleanupColorField(QWidget *parent, TCleanupStyle *cleanupStyle, TPaletteHandle *ph,
+					  bool greyMode);
 	~CleanupColorField() { getEditorController()->edit(0); }
 
 	static void setEditorController(CleanupColorFieldEditorController *editorController);
@@ -276,12 +273,12 @@ public:
 
 	void setContrastEnabled(bool enable);
 
-protected:
+  protected:
 	void mousePressEvent(QMouseEvent *event);
 	void mouseDoubleClickEvent(QMouseEvent *event);
 	void hideEvent(QHideEvent *);
 
-protected slots:
+  protected slots:
 
 	void onBrightnessChannelChanged(int value, bool dragging);
 	void onContrastChannelChanged(int value, bool dragging);
@@ -290,14 +287,14 @@ protected slots:
 	void onHRangeChannelChanged(int value, bool dragging);
 	void onLineWidthChannelChanged(int value, bool dragging);
 
-signals:
+  signals:
 
 	void editingChanged(const TPixel32 &, bool isEditing);
 	void StyleSelected(TCleanupStyle *);
 };
 
 //-----------------------------------------------------------------------------
-} //namespace DVGui
+} // namespace DVGui
 //-----------------------------------------------------------------------------
 
 #endif // COLORFIELD_H

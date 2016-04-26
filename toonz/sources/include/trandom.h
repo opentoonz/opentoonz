@@ -19,7 +19,7 @@
 */
 class DVAPI TRandom
 {
-public:
+  public:
 	TRandom(UINT seed = 0);
 	~TRandom();
 
@@ -50,7 +50,7 @@ public:
 	/*! returns a double number in the range [0, 1[ */
 	double getDouble();
 
-private:
+  private:
 	UINT seed;
 	int idx1, idx2;
 	UINT ran[56];
@@ -68,4 +68,4 @@ private:
 	inline void setRandomFloatType();
 };
 
-#endif //TRANDOM_INCLUDED
+#endif // TRANDOM_INCLUDED

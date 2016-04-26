@@ -44,10 +44,8 @@ TFilePath TSystem::toUNC(const TFilePath &fp)
 			// Pointers to head of buffer
 			UNIVERSAL_NAME_INFO *puni = (UNIVERSAL_NAME_INFO *)&szBuff;
 
-			DWORD dwResult = WNetGetUniversalNameW(toWideString(fpStr).c_str(),
-												   UNIVERSAL_NAME_INFO_LEVEL,
-												   (LPVOID)&szBuff,
-												   &cbBuff);
+			DWORD dwResult = WNetGetUniversalNameW(
+				toWideString(fpStr).c_str(), UNIVERSAL_NAME_INFO_LEVEL, (LPVOID)&szBuff, &cbBuff);
 
 			switch (dwResult) {
 			case NO_ERROR:
@@ -70,19 +68,15 @@ TFilePath TSystem::toUNC(const TFilePath &fp)
 			NET_API_STATUS res;
 			PSHARE_INFO_502 BufPtr, p;
 
-			DWORD er = 0,
-				  tr = 0,
-				  resume = 0,
-				  i;
+			DWORD er = 0, tr = 0, resume = 0, i;
 
 			int iBestMatch = 0;
 
-			std::string csTemp,
-				csTempDrive,
-				csBestMatch;
+			std::string csTemp, csTempDrive, csBestMatch;
 
 			do {
-				res = NetShareEnum(NULL, 502, (LPBYTE *)&BufPtr, MAX_PREFERRED_LENGTH, &er, &tr, &resume);
+				res = NetShareEnum(NULL, 502, (LPBYTE *)&BufPtr, MAX_PREFERRED_LENGTH, &er, &tr,
+								   &resume);
 
 				// If the call succeeds,
 				if (res == ERROR_SUCCESS || res == ERROR_MORE_DATA) {
@@ -92,27 +86,30 @@ TFilePath TSystem::toUNC(const TFilePath &fp)
 					for (i = 1; i <= er; i++) {
 						if (p->shi502_type == STYPE_DISKTREE) {
 							//#ifdef IS_DOTNET
-							// shi502_path e' una wstring, aanche se la dichiarazione di PSHARE_INFO_502 non lo sa!
+							// shi502_path e' una wstring, aanche se la dichiarazione di
+							// PSHARE_INFO_502 non lo sa!
 							std::wstring shareLocalPathW = (LPWSTR)(p->shi502_path);
 							std::string shareLocalPath = toString(shareLocalPathW);
 							//#else
-							//string shareLocalPath = toString(p->shi502_path);
+							// string shareLocalPath = toString(p->shi502_path);
 							//#endif
 
 							if (toLower(fpStr).find(toLower(shareLocalPath)) == 0) {
 								std::string hostName = TSystem::getHostName().toStdString();
 								//   #ifdef IS_DOTNET
-								// shi502_netname e' una wstring, anche se la dichiarazione di PSHARE_INFO_502 non lo sa!
+								// shi502_netname e' una wstring, anche se la dichiarazione di
+								// PSHARE_INFO_502 non lo sa!
 								std::wstring shareNetNameW = (LPWSTR)(p->shi502_netname);
 								std::string shareNetName = toString(shareNetNameW);
 								//	 #else
-								//string shareNetName = toString(p->shi502_netname);
+								// string shareNetName = toString(p->shi502_netname);
 								//#endif
 								shareNetName.append("\\");
 
 								std::string fp(fpStr);
-								std::string uncpath = "\\\\" + hostName + "\\" +
-												 fp.replace(0, shareLocalPath.size(), shareNetName);
+								std::string uncpath =
+									"\\\\" + hostName + "\\" +
+									fp.replace(0, shareLocalPath.size(), shareNetName);
 
 								return TFilePath(uncpath);
 							}
@@ -124,7 +121,7 @@ TFilePath TSystem::toUNC(const TFilePath &fp)
 					// Free the allocated buffer.
 					NetApiBufferFree(BufPtr);
 				} else {
-					//TRACE(_T("Error: %ld\n"), res);
+					// TRACE(_T("Error: %ld\n"), res);
 				}
 
 				// Continue to call NetShareEnum while
@@ -134,10 +131,10 @@ TFilePath TSystem::toUNC(const TFilePath &fp)
 		}
 	}
 
-	//throw TException("Cannot convert the path specified to UNC");
+	// throw TException("Cannot convert the path specified to UNC");
 	return fp;
 #else
-	//throw TException("Cannot convert the path specified to UNC");
+	// throw TException("Cannot convert the path specified to UNC");
 	return fp;
 #endif
 }
@@ -184,20 +181,22 @@ TFilePath TSystem::toLocalPath(const TFilePath &fp)
 			for (int i = 1; i <= (int)er; i++) {
 				if (p->shi502_type == STYPE_DISKTREE) {
 					//#ifdef IS_DOTNET
-					//shi502_netname e' una wstring, anche se la dichiarazione di PSHARE_INFO_502 non lo sa!
+					// shi502_netname e' una wstring, anche se la dichiarazione di PSHARE_INFO_502
+					// non lo sa!
 					std::wstring shareNetNameW = (LPWSTR)(p->shi502_netname);
 					std::string shareNetName = toString(shareNetNameW);
 					//	#else
-					//string shareNetName = toString(p->shi502_netname);
+					// string shareNetName = toString(p->shi502_netname);
 					//#endif
 
 					if (toLower(fpShareName) == toLower(shareNetName)) {
 						//#ifdef IS_DOTNET
-						// shi502_path e' una wstring, anche se la dichiarazione di PSHARE_INFO_502 non lo sa!
+						// shi502_path e' una wstring, anche se la dichiarazione di PSHARE_INFO_502
+						// non lo sa!
 						std::wstring shareLocalPathW = (LPWSTR)(p->shi502_path);
 						std::string shareLocalPath = toString(shareLocalPathW);
 						//#else
-						//string shareLocalPath = toString(p->shi502_path);
+						// string shareLocalPath = toString(p->shi502_path);
 						//#endif
 						std::string localPath = shareLocalPath + path;
 						return TFilePath(localPath);
@@ -210,7 +209,7 @@ TFilePath TSystem::toLocalPath(const TFilePath &fp)
 			// Free the allocated buffer.
 			NetApiBufferFree(BufPtr);
 		} else {
-			//TRACE(_T("Error: %ld\n"), res);
+			// TRACE(_T("Error: %ld\n"), res);
 		}
 
 		// Continue to call NetShareEnum while

@@ -48,30 +48,30 @@ class FunctionViewer;
   \brief    The Function Editor's (tree-like) \a model, as in the <I>model-view</I> architecture.
 
   \details  This class represents the data associated to Toonz's Function Editor panels in a
-            view-independent way. The model's purpose is that of representing all \a channels of the
-            objects in a scene. A \a channel is here intended as an <I>animatable parameter</I>
-            represented by a <I>single real-valued function</I>.
+			view-independent way. The model's purpose is that of representing all \a channels of the
+			objects in a scene. A \a channel is here intended as an <I>animatable parameter</I>
+			represented by a <I>single real-valued function</I>.
 
-            Animatable objects are currently subdivided in two main types: <I>stage objects</I>
-            (which consist roughly all the objects represented in the \a stage schematic view,
-            including cameras, spline curves and pegbars), and \a fxs. Stage objects typically
-            feature a uniform channels group structure, whereas each fx type have a different set
-            of parameters (and thus channels). Recently, \a column objects can sport an additional
-            group of channels, related to Plastic skeleton animations (see TnzExt library).
+			Animatable objects are currently subdivided in two main types: <I>stage objects</I>
+			(which consist roughly all the objects represented in the \a stage schematic view,
+			including cameras, spline curves and pegbars), and \a fxs. Stage objects typically
+			feature a uniform channels group structure, whereas each fx type have a different set
+			of parameters (and thus channels). Recently, \a column objects can sport an additional
+			group of channels, related to Plastic skeleton animations (see TnzExt library).
 */
 
 class FunctionTreeModel : public TreeModel, public TParamObserver
 {
 	Q_OBJECT
 
-public:
+  public:
 	/*!
-    \brief    FunctionTreeModel's abstract base item class, adding the requirement to
-              return features visibility data.
+	\brief    FunctionTreeModel's abstract base item class, adding the requirement to
+			  return features visibility data.
   */
 	class Item : public TreeModel::Item
 	{
-	public:
+	  public:
 		Item() {}
 
 		virtual bool isActive() const = 0;
@@ -83,17 +83,14 @@ public:
 	//! The model item representing a channels group.
 	class ChannelGroup : public Item
 	{
-	public:
-		enum ShowFilter {
-			ShowAllChannels,
-			ShowAnimatedChannels
-		};
+	  public:
+		enum ShowFilter { ShowAllChannels, ShowAnimatedChannels };
 
-	private:
+	  private:
 		QString m_name;
 		ShowFilter m_showFilter;
 
-	public:
+	  public:
 		ChannelGroup(const QString &name = "");
 		~ChannelGroup();
 
@@ -112,7 +109,7 @@ public:
 								// its animation status
 		QVariant data(int role) const;
 
-		//used in FunctionTreeView::onActivated
+		// used in FunctionTreeView::onActivated
 		void setChildrenAllActive(bool active);
 
 		void displayAnimatedChannels();
@@ -121,20 +118,22 @@ public:
 	//----------------------------------------------------------------------------------
 
 	/*!
-    \brief    The common class representing a \a parameter in the model.
-    
-    \remark   This class's concept is different from that of a Channel, as a \a parameter could
-              be composed of <I>multiple channels</I>, e.g. like an animated \p RGBA color, which
-              has 4 channels.
+	\brief    The common class representing a \a parameter in the model.
+
+	\remark   This class's concept is different from that of a Channel, as a \a parameter could
+			  be composed of <I>multiple channels</I>, e.g. like an animated \p RGBA color, which
+			  has 4 channels.
   */
 	class ParamWrapper
 	{
-	protected:
-		TParamP m_param; //!< The wrapped parameter.
-		std::wstring m_fxId;  //!< Fx identifier for m_param's owner, if any.
+	  protected:
+		TParamP m_param;	 //!< The wrapped parameter.
+		std::wstring m_fxId; //!< Fx identifier for m_param's owner, if any.
 
-	public:
-		ParamWrapper(const TParamP &param, const std::wstring &fxId) : m_param(param), m_fxId(fxId) {}
+	  public:
+		ParamWrapper(const TParamP &param, const std::wstring &fxId) : m_param(param), m_fxId(fxId)
+		{
+		}
 		virtual ~ParamWrapper() {}
 
 		const std::wstring &getFxId() const { return m_fxId; }
@@ -154,10 +153,10 @@ public:
 		std::string m_paramNamePref;
 
 		bool m_isActive; //!< Whether the channels is active, ie visible
-		//!< as a curve and numeric column
-	public:
-		Channel(FunctionTreeModel *model, TDoubleParam *param,
-				std::string paramNamePrefix = "", std::wstring fxId = L"");
+						 //!< as a curve and numeric column
+	  public:
+		Channel(FunctionTreeModel *model, TDoubleParam *param, std::string paramNamePrefix = "",
+				std::wstring fxId = L"");
 		~Channel();
 
 		TDoubleParam *getParam() const { return (TDoubleParam *)m_param.getPointer(); }
@@ -166,7 +165,7 @@ public:
 		QString getShortName() const;
 		QString getLongName() const;
 
-		//in order to show the expression name in the tooltip
+		// in order to show the expression name in the tooltip
 		QString getExprRefName() const;
 
 		ChannelGroup *getChannelGroup() const { return m_group; }
@@ -189,7 +188,7 @@ public:
 		void *getInternalPointer() const;
 	};
 
-private:
+  private:
 	ChannelGroup *m_stageObjects, //!< Predefined group for stage object channels.
 		*m_fxs;					  //!< Predefined group for fx parameters.
 
@@ -204,20 +203,14 @@ private:
 	TFxHandle *m_fxHandle;
 	TObjectHandle *m_objectHandle;
 
-public:
+  public:
 	FunctionTreeModel(FunctionTreeView *parent = 0); // BUT! Should be view-independent! :o
 	~FunctionTreeModel();
 
-	Channel *getCurrentChannel() const
-	{
-		return m_currentChannel;
-	}
+	Channel *getCurrentChannel() const { return m_currentChannel; }
 
 	Channel *getActiveChannel(int index) const;
-	int getActiveChannelCount() const
-	{
-		return m_activeChannels.size();
-	}
+	int getActiveChannelCount() const { return m_activeChannels.size(); }
 
 	int getColumnIndexByCurve(TDoubleParam *param) const;
 
@@ -232,20 +225,11 @@ public:
 
 	void applyShowFilters();
 
-	void setCurrentStageObject(TStageObject *obj)
-	{
-		m_currentStageObject = obj;
-	}
-	TStageObject *getCurrentStageObject() const
-	{
-		return m_currentStageObject;
-	}
+	void setCurrentStageObject(TStageObject *obj) { m_currentStageObject = obj; }
+	TStageObject *getCurrentStageObject() const { return m_currentStageObject; }
 
 	void setCurrentFx(TFx *fx);
-	TFx *getCurrentFx() const
-	{
-		return m_currentFx;
-	}
+	TFx *getCurrentFx() const { return m_currentFx; }
 
 	void addParameter(TParam *parameter,
 					  const TFilePath &folder); //!< See function FunctionViewer::addParameter().
@@ -256,18 +240,16 @@ public:
 	TObjectHandle *getObjectHandle() { return m_objectHandle; }
 	void setObjectHandle(TObjectHandle *objectHandle) { m_objectHandle = objectHandle; }
 
-signals:
+  signals:
 
 	void activeChannelsChanged();
 	void curveSelected(TDoubleParam *);
 	void curveChanged(bool isDragging);
 	void currentChannelChanged(FunctionTreeModel::Channel *);
 
-private:
-	void addParameter(ChannelGroup *group,
-					  const std::string &prefixString,
-					  const std::wstring &fxId,
-					  TParam *param);
+  private:
+	void addParameter(ChannelGroup *group, const std::string &prefixString,
+					  const std::wstring &fxId, TParam *param);
 
 	//! remove channel from m_activeChannels and m_currentChannel
 	void onChannelDestroyed(Channel *channel);
@@ -280,10 +262,7 @@ private:
 		emit activeChannelsChanged();
 	}
 
-	void emitCurveSelected(TDoubleParam *curve)
-	{
-		emit curveSelected(curve);
-	}
+	void emitCurveSelected(TDoubleParam *curve) { emit curveSelected(curve); }
 
 	void emitCurrentChannelChanged(FunctionTreeModel::Channel *channel)
 	{
@@ -304,7 +283,7 @@ private:
 	void refreshPlasticDeformations();
 	void addActiveChannels(TreeModel::Item *item);
 
-public:
+  public:
 	ChannelGroup *getStageObjectChannel(int index) const;
 	ChannelGroup *getFxChannel(int index) const;
 	int getStageObjectsChannelCount() const { return m_stageObjects->getChildCount(); }
@@ -315,10 +294,10 @@ public:
 
 class FxChannelGroup : public FunctionTreeModel::ChannelGroup
 {
-public:
+  public:
 	TFx *m_fx;
 
-public:
+  public:
 	FxChannelGroup(TFx *fx);
 	~FxChannelGroup();
 
@@ -351,13 +330,13 @@ class FunctionTreeView : public TreeView
 	QPoint m_dragStartPosition;
 	//---
 
-	//set color by using style sheet
-	QColor m_textColor;		   //text color (black)
-	QColor m_currentTextColor; //current item text color (red)
+	// set color by using style sheet
+	QColor m_textColor; // text color (black)
+	QColor m_currentTextColor; // current item text color (red)
 	Q_PROPERTY(QColor TextColor READ getTextColor WRITE setTextColor)
 	Q_PROPERTY(QColor CurrentTextColor READ getCurrentTextColor WRITE setCurrentTextColor)
 
-public:
+  public:
 	FunctionTreeView(FunctionViewer *parent);
 
 	void setCurrentScenePath(TFilePath scenePath) { m_scenePath = scenePath; }
@@ -369,7 +348,7 @@ public:
 	void setCurrentTextColor(const QColor &color) { m_currentTextColor = color; }
 	QColor getCurrentTextColor() const { return m_currentTextColor; }
 
-protected:
+  protected:
 	void onClick(TreeModel::Item *item, const QPoint &itemPos, QMouseEvent *e);
 
 	void onMidClick(TreeModel::Item *item, const QPoint &itemPos, QMouseEvent *e);
@@ -380,15 +359,15 @@ protected:
 	void openContextMenu(FunctionTreeModel::Channel *channel, const QPoint &globalPos);
 	void openContextMenu(FunctionTreeModel::ChannelGroup *group, const QPoint &globalPos);
 
-public slots:
+  public slots:
 
 	void onActivated(const QModelIndex &index);
 	void updateAll();
 
-	//show all the animated channels when the scene switched
+	// show all the animated channels when the scene switched
 	void displayAnimatedChannels();
 
-signals:
+  signals:
 
 	void switchCurrentObject(TStageObject *obj);
 	void switchCurrentFx(TFx *fx);

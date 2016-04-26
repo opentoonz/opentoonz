@@ -24,10 +24,9 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-template <class T>
-class WorkRaster
+template <class T> class WorkRaster
 {
-public:
+  public:
 	typedef T Pixel;
 	WorkRaster(int lx, int ly) : m_lx(lx), m_ly(ly), m_buffer(new Pixel[lx * ly]) {}
 
@@ -35,7 +34,7 @@ public:
 	inline int getLy() const { return m_ly; }
 	inline Pixel *pixels(int y = 0) const { return m_buffer.get() + m_lx * y; }
 
-private:
+  private:
 	std::unique_ptr<Pixel[]> m_buffer;
 	int m_lx, m_ly;
 };
@@ -67,7 +66,11 @@ struct DVAPI RegionInfo {
 	QPoint pos; // un pixel interno (serve per rintracciare la regione sullo schermo)
 	int x0, y0, x1, y1;
 
-	RegionInfo() : colorIndex(-1), pixelCount(-1), type(Unknown), thickness(0), perimeter(0), inkBoundary(0), disc(0), param1(0), x0(0), y0(0), x1(-1), y1(-1) {}
+	RegionInfo()
+		: colorIndex(-1), pixelCount(-1), type(Unknown), thickness(0), perimeter(0), inkBoundary(0),
+		  disc(0), param1(0), x0(0), y0(0), x1(-1), y1(-1)
+	{
+	}
 
 	void touchRegion(int regionId)
 	{
@@ -86,7 +89,7 @@ struct DVAPI RegionInfo {
 
 class DVAPI Naa2TlvConverter
 {
-public:
+  public:
 	const int MaxColorCount;
 	WorkRaster<unsigned short> *m_regionRas;
 	WorkRaster<unsigned char> *m_borderRas;
@@ -129,7 +132,8 @@ public:
 
 	int getRegionIndex(int x, int y) const
 	{
-		if (!!m_regionRas && 0 <= x && x < m_regionRas->getLx() && 0 <= y && y < m_regionRas->getLy())
+		if (!!m_regionRas && 0 <= x && x < m_regionRas->getLx() && 0 <= y &&
+			y < m_regionRas->getLy())
 			return m_regionRas->pixels(y)[x];
 		else
 			return -1;

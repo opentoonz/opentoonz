@@ -5,13 +5,7 @@
 namespace
 {
 
-enum { SUBSTITUTE,
-	   PATTERNTYPE,
-	   ADD,
-	   SUBTRACT,
-	   MULTIPLY,
-	   LIGHTEN,
-	   DARKEN };
+enum { SUBSTITUTE, PATTERNTYPE, ADD, SUBTRACT, MULTIPLY, LIGHTEN, DARKEN };
 
 typedef void (*func32)(TPixel32 &pixmask, const TPixel32 &pixtext, double v);
 typedef void (*func64)(TPixel64 &pixmask, const TPixel64 &pixtext, double v);
@@ -22,11 +16,10 @@ typedef void (*func64)(TPixel64 &pixmask, const TPixel64 &pixtext, double v);
 
 //-----------------------------------------------------------------------------
 
-//!Make \b pixout completely opaque if \b pixcomp is not fully transparent. This helps
-//!in avoiding antialias merge problems when overing palette filtered masks with their
-//!inverses.
-template <class T>
-inline void makeOpaque(T &pixout, const T &pixcomp, double v)
+//! Make \b pixout completely opaque if \b pixcomp is not fully transparent. This helps
+//! in avoiding antialias merge problems when overing palette filtered masks with their
+//! inverses.
+template <class T> inline void makeOpaque(T &pixout, const T &pixcomp, double v)
 {
 	if (pixcomp.m > 0) {
 		double k = T::maxChannelValue / (double)pixout.m;
@@ -39,9 +32,8 @@ inline void makeOpaque(T &pixout, const T &pixcomp, double v)
 
 //---------------------------------------------------------------------------------------
 
-//!Copies \b pixin into \b pixout - while matte components are multiplied.
-template <class T>
-inline void substitute(T &pixout, const T &pixin, double v)
+//! Copies \b pixin into \b pixout - while matte components are multiplied.
+template <class T> inline void substitute(T &pixout, const T &pixin, double v)
 {
 	double k = pixout.m / (double)T::maxChannelValue;
 	pixout.r = k * pixin.r;
@@ -52,8 +44,8 @@ inline void substitute(T &pixout, const T &pixin, double v)
 
 //---------------------------------------------------------------------------------------
 
-//!Decrease \b pixout's rgb colors proportionally to \b pixin's value. The matte channel
-//!is kept unaltered.
+//! Decrease \b pixout's rgb colors proportionally to \b pixin's value. The matte channel
+//! is kept unaltered.
 inline void pattern32(TPixel32 &pixout, const TPixel32 &pixin, double v)
 {
 	double val = TPixelGR8::from(pixin).value / 255.0;
@@ -72,8 +64,7 @@ inline void pattern64(TPixel64 &pixout, const TPixel64 &pixin, double v)
 
 //---------------------------------------------------------------------------------------
 
-template <class T>
-void textureAdd(T &pixout, const T &pixin, double v)
+template <class T> void textureAdd(T &pixout, const T &pixin, double v)
 {
 	if (pixin.m > 0) {
 		TINT32 pixoutm = pixout.m;
@@ -96,8 +87,7 @@ void textureAdd(T &pixout, const T &pixin, double v)
 
 //---------------------------------------------------------------------------------------
 
-template <class T>
-void textureSub(T &pixout, const T &pixin, double v)
+template <class T> void textureSub(T &pixout, const T &pixin, double v)
 {
 	if (pixin.m > 0) {
 		TINT32 pixoutm = pixout.m;
@@ -120,8 +110,7 @@ void textureSub(T &pixout, const T &pixin, double v)
 
 //---------------------------------------------------------------------------------------
 
-template <class T>
-void textureMult(T &pixout, const T &pixin, double v)
+template <class T> void textureMult(T &pixout, const T &pixin, double v)
 {
 	TINT32 pixoutm = pixout.m;
 
@@ -142,8 +131,7 @@ void textureMult(T &pixout, const T &pixin, double v)
 
 //---------------------------------------------------------------------------------------
 
-template <class T>
-void textureLighten(T &pixout, const T &pixin, double v)
+template <class T> void textureLighten(T &pixout, const T &pixin, double v)
 {
 	TINT32 pixoutm = pixout.m;
 
@@ -164,8 +152,7 @@ void textureLighten(T &pixout, const T &pixin, double v)
 
 //---------------------------------------------------------------------------------------
 
-template <class T>
-void textureDarken(T &pixout, const T &pixin, double v)
+template <class T> void textureDarken(T &pixout, const T &pixin, double v)
 {
 	TINT32 pixoutm = pixout.m;
 
@@ -186,8 +173,7 @@ void textureDarken(T &pixout, const T &pixin, double v)
 
 //=======================================================================================
 
-void myOver32(const TRaster32P &rasOut, const TRasterP &rasUp,
-			  func32 func, double v)
+void myOver32(const TRaster32P &rasOut, const TRasterP &rasUp, func32 func, double v)
 {
 	assert(rasOut->getSize() == rasUp->getSize());
 	TRaster32P rasUp32 = rasUp;
@@ -203,8 +189,7 @@ void myOver32(const TRaster32P &rasOut, const TRasterP &rasUp,
 	}
 }
 
-void myOver64(const TRaster64P &rasOut, const TRasterP &rasUp,
-			  func64 func, double v)
+void myOver64(const TRaster64P &rasOut, const TRasterP &rasUp, func64 func, double v)
 {
 	assert(rasOut->getSize() == rasUp->getSize());
 	TRaster64P rasUp64 = rasUp;

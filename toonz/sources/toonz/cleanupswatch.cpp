@@ -44,7 +44,7 @@ void CleanupSwatch::enable(bool state)
 	m_enabled = state;
 	if (!m_enabled) {
 		m_resampledRaster = TRasterP();
-		//m_lastRasCleanupped = TRasterP();
+		// m_lastRasCleanupped = TRasterP();
 		m_origRaster = TRasterP();
 		m_viewAff = TAffine();
 		m_resampleAff = TAffine();
@@ -67,7 +67,7 @@ CleanupSwatch::CleanupSwatchArea::CleanupSwatchArea(CleanupSwatch *parent, bool 
 {
 	setMinimumHeight(150);
 
-	//The following helps in re-establishing focus for wheel events
+	// The following helps in re-establishing focus for wheel events
 	setFocusPolicy(Qt::WheelFocus);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
@@ -78,7 +78,7 @@ void CleanupSwatch::CleanupSwatchArea::mousePressEvent(QMouseEvent *event)
 {
 	if (!m_sw->m_resampledRaster || m_sw->m_lx == 0 || m_sw->m_ly == 0)
 		return;
-	//if (m_sw->m_lastRasCleanupped)
+	// if (m_sw->m_lastRasCleanupped)
 	//   TRop::addBackground(m_sw->m_lastRasCleanupped, TPixel::White);
 	m_pos = event->pos();
 
@@ -95,20 +95,17 @@ namespace
 {
 #define ZOOMLEVELS 33
 #define NOZOOMINDEX 20
-double ZoomFactors[ZOOMLEVELS] = {0.001, 0.002, 0.003, 0.004, 0.005, 0.007,
-								  0.01, 0.015, 0.02, 0.03, 0.04, 0.05,
-								  0.0625, 0.0833, 0.125, 0.167, 0.25, 0.333,
-								  0.5, 0.667, 1, 2, 3, 4,
-								  5, 6, 7, 8, 12, 16,
-								  24, 32, 40};
+double ZoomFactors[ZOOMLEVELS] = {0.001, 0.002, 0.003, 0.004,  0.005,  0.007, 0.01,  0.015, 0.02,
+								  0.03,  0.04,  0.05,  0.0625, 0.0833, 0.125, 0.167, 0.25,  0.333,
+								  0.5,   0.667, 1,	 2,	  3,	  4,	 5,	 6,		7,
+								  8,	 12,	16,	24,	 32,	 40};
 
 double getQuantizedZoomFactor(double zf, bool forward)
 {
-	if (forward && (zf > ZoomFactors[ZOOMLEVELS - 1] ||
-					areAlmostEqual(zf, ZoomFactors[ZOOMLEVELS - 1], 1e-5)))
+	if (forward &&
+		(zf > ZoomFactors[ZOOMLEVELS - 1] || areAlmostEqual(zf, ZoomFactors[ZOOMLEVELS - 1], 1e-5)))
 		return zf;
-	else if (!forward && (zf < ZoomFactors[0] ||
-						  areAlmostEqual(zf, ZoomFactors[0], 1e-5)))
+	else if (!forward && (zf < ZoomFactors[0] || areAlmostEqual(zf, ZoomFactors[0], 1e-5)))
 		return zf;
 
 	assert((!forward && zf > ZoomFactors[0]) || (forward && zf < ZoomFactors[ZOOMLEVELS - 1]));
@@ -134,7 +131,7 @@ double getQuantizedZoomFactor(double zf, bool forward)
 	return ZoomFactors[NOZOOMINDEX];
 }
 
-} //namespace
+} // namespace
 //-----------------------------------------------------------------------------
 
 void CleanupSwatch::CleanupSwatchArea::keyPressEvent(QKeyEvent *event)
@@ -153,12 +150,15 @@ void CleanupSwatch::CleanupSwatchArea::keyPressEvent(QKeyEvent *event)
 		double currZoomScale = sqrt(m_sw->m_viewAff.det());
 		double factor = getQuantizedZoomFactor(currZoomScale, forward);
 
-		double minZoom = tmin((double)m_sw->m_lx / m_sw->m_resampledRaster->getLx(), (double)m_sw->m_ly / m_sw->m_resampledRaster->getLy());
+		double minZoom = tmin((double)m_sw->m_lx / m_sw->m_resampledRaster->getLx(),
+							  (double)m_sw->m_ly / m_sw->m_resampledRaster->getLy());
 		if ((!forward && factor < minZoom) || (forward && factor > 40.0))
 			return;
 
 		TPointD delta(0.5 * width(), 0.5 * height());
-		m_sw->m_viewAff = (TTranslation(delta) * TScale(factor / currZoomScale) * TTranslation(-delta)) * m_sw->m_viewAff;
+		m_sw->m_viewAff =
+			(TTranslation(delta) * TScale(factor / currZoomScale) * TTranslation(-delta)) *
+			m_sw->m_viewAff;
 	}
 	m_sw->m_leftSwatch->updateRaster();
 	m_sw->m_rightSwatch->updateRaster();
@@ -203,12 +203,14 @@ void CleanupSwatch::CleanupSwatchArea::wheelEvent(QWheelEvent *event)
 	if (factor == 1.0)
 		return;
 	double scale = m_sw->m_viewAff.det();
-	double minZoom = tmin((double)m_sw->m_lx / m_sw->m_resampledRaster->getLx(), (double)m_sw->m_ly / m_sw->m_resampledRaster->getLy());
+	double minZoom = tmin((double)m_sw->m_lx / m_sw->m_resampledRaster->getLx(),
+						  (double)m_sw->m_ly / m_sw->m_resampledRaster->getLy());
 	if ((factor < 1 && sqrt(scale) < minZoom) || (factor > 1 && scale > 1200.0))
 		return;
 
 	TPointD delta(event->pos().x(), height() - event->pos().y());
-	m_sw->m_viewAff = (TTranslation(delta) * TScale(factor) * TTranslation(-delta)) * m_sw->m_viewAff;
+	m_sw->m_viewAff =
+		(TTranslation(delta) * TScale(factor) * TTranslation(-delta)) * m_sw->m_viewAff;
 
 	m_sw->m_leftSwatch->updateRaster();
 	m_sw->m_rightSwatch->updateRaster();
@@ -222,14 +224,14 @@ void CleanupSwatch::resizeEvent(QResizeEvent *event)
 	m_lx = s.width();
 	m_ly = s.height();
 
-	//m_rightSwatch->resize(m_lx, m_ly);
+	// m_rightSwatch->resize(m_lx, m_ly);
 	m_leftSwatch->setMinimumHeight(0);
 	m_rightSwatch->setMinimumHeight(0);
 	m_leftSwatch->updateRaster();
 	m_rightSwatch->updateRaster();
-	//m_rightSwatch->updateRaster();
+	// m_rightSwatch->updateRaster();
 	QWidget::resizeEvent(event);
-	//update();
+	// update();
 }
 
 /*
@@ -252,7 +254,8 @@ void CleanupSwatch::CleanupSwatchArea::updateCleanupped(bool dragging)
 	if (outRect.isEmpty())
 		return;
 
-	TRasterP rasCleanupped = TCleanupper::instance()->processColors(m_sw->m_resampledRaster->extract(outRect));
+	TRasterP rasCleanupped =
+		TCleanupper::instance()->processColors(m_sw->m_resampledRaster->extract(outRect));
 	TPointD cleanuppedPos = convert(outRect.getP00());
 
 	TRop::quickPut(m_r, rasCleanupped, aff * TTranslation(cleanuppedPos));
@@ -261,7 +264,8 @@ void CleanupSwatch::CleanupSwatchArea::updateCleanupped(bool dragging)
 //---------------------------------------------------------------------------------
 #ifdef LEVO
 
-void CleanupSwatch::CleanupSwatchArea::updateCleanupped Versione ricalcolo Al Release Del mouse(bool dragging)
+void CleanupSwatch::CleanupSwatchArea::updateCleanupped Versione ricalcolo Al Release Del
+mouse(bool dragging)
 {
 	TAffine aff = getFinalAff();
 
@@ -275,7 +279,8 @@ void CleanupSwatch::CleanupSwatchArea::updateCleanupped Versione ricalcolo Al Re
 	if (dragging && m_sw->m_lastRasCleanupped)
 		m_r->fill(TPixel(200, 200, 200));
 	else {
-		m_sw->m_lastRasCleanupped = TCleanupper::instance()->processColors(m_sw->m_resampledRaster->extract(outRect));
+		m_sw->m_lastRasCleanupped =
+			TCleanupper::instance()->processColors(m_sw->m_resampledRaster->extract(outRect));
 		m_sw->m_lastCleanuppedPos = convert(outRect.getP00());
 	}
 	TRop::quickPut(m_r, m_sw->m_lastRasCleanupped, aff * TTranslation(m_sw->m_lastCleanuppedPos));
@@ -286,7 +291,8 @@ void CleanupSwatch::CleanupSwatchArea::updateCleanupped Versione ricalcolo Al Re
 
 TAffine CleanupSwatch::CleanupSwatchArea::getFinalAff()
 {
-	return m_sw->m_viewAff * TAffine().place(m_sw->m_resampledRaster->getCenterD(), m_r->getCenterD());
+	return m_sw->m_viewAff *
+		   TAffine().place(m_sw->m_resampledRaster->getCenterD(), m_r->getCenterD());
 }
 
 //------------------------------------------------------------------------------
@@ -337,7 +343,7 @@ void CleanupSwatch::setRaster(TRasterP rasLeft, const TAffine &aff, TRasterP ras
 	if (!isVisible()) {
 		m_resampledRaster = TRasterP();
 		m_origRaster = TRasterP();
-		//m_lastRasCleanupped = TRasterP();
+		// m_lastRasCleanupped = TRasterP();
 		return;
 	}
 

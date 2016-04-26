@@ -94,7 +94,8 @@ void backlit(TRaster32P lighted, TRaster32P light, TRaster32P out, double blur, 
 
 //---------------------------------------------------------------------
 
-void backlit(TRaster64P lighted, TRaster64P light, TRaster64P out, double blur, const TPixel &color32, double fade, double scale)
+void backlit(TRaster64P lighted, TRaster64P light, TRaster64P out, double blur,
+			 const TPixel &color32, double fade, double scale)
 {
 	assert(light && lighted && out);
 
@@ -188,7 +189,7 @@ class BacklitFx : public TBaseRasterFx
 
 	TPixelParamP m_color;
 
-public:
+  public:
 	BacklitFx() : m_value(0.0), m_color(TPixel::White), m_fade(0.0)
 	{
 		m_color->enableMatte(true);
@@ -256,20 +257,24 @@ public:
 		TDimension tileSize(tile.getRaster()->getSize());
 		TRectD rect(tile.m_pos, TDimensionD(tileSize.lx, tileSize.ly));
 
-		//TRectD rect(tile.m_pos,convert(tile.getRaster()->getBounds().getP11())+tile.m_pos);
+		// TRectD rect(tile.m_pos,convert(tile.getRaster()->getBounds().getP11())+tile.m_pos);
 		rect = rect.enlarge(brad);
 		TRect rectI(tfloor(rect.x0), tfloor(rect.y0), tceil(rect.x1) - 1, tceil(rect.y1) - 1);
-		//m_light->compute(tile, frame, ri);
+		// m_light->compute(tile, frame, ri);
 		TTile srcTile;
-		m_lighted->allocateAndCompute(srcTile, rect.getP00(), rectI.getSize(), tile.getRaster(), frame, ri);
+		m_lighted->allocateAndCompute(srcTile, rect.getP00(), rectI.getSize(), tile.getRaster(),
+									  frame, ri);
 		TTile ctrTile;
-		m_light->allocateAndCompute(ctrTile, rect.getP00(), rectI.getSize(), tile.getRaster(), frame, ri);
+		m_light->allocateAndCompute(ctrTile, rect.getP00(), rectI.getSize(), tile.getRaster(),
+									frame, ri);
 		if ((TRaster32P)srcTile.getRaster() && (TRaster32P)tile.getRaster())
-			backlit((TRaster32P)srcTile.getRaster(), (TRaster32P)ctrTile.getRaster(), (TRaster32P)ctrTile.getRaster(),
-					value, m_color->getValue(frame), m_fade->getValue(frame) / 100.0, scale);
+			backlit((TRaster32P)srcTile.getRaster(), (TRaster32P)ctrTile.getRaster(),
+					(TRaster32P)ctrTile.getRaster(), value, m_color->getValue(frame),
+					m_fade->getValue(frame) / 100.0, scale);
 		else if ((TRaster64P)srcTile.getRaster() && (TRaster64P)tile.getRaster())
-			backlit((TRaster64P)srcTile.getRaster(), (TRaster64P)ctrTile.getRaster(), (TRaster64P)ctrTile.getRaster(),
-					value, m_color->getValue(frame), m_fade->getValue(frame) / 100.0, scale);
+			backlit((TRaster64P)srcTile.getRaster(), (TRaster64P)ctrTile.getRaster(),
+					(TRaster64P)ctrTile.getRaster(), value, m_color->getValue(frame),
+					m_fade->getValue(frame) / 100.0, scale);
 		else
 			throw TRopException("TRop::max invalid raster combination");
 		tile.getRaster()->copy(ctrTile.getRaster(), TPoint(-brad, -brad));

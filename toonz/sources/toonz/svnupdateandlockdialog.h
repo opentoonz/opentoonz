@@ -46,18 +46,18 @@ class SVNUpdateAndLockDialog : public DVGui::Dialog
 
 	int m_sceneIconAdded;
 
-public:
-	SVNUpdateAndLockDialog(QWidget *parent, const QString &workingDir,
-						   const QStringList &files, int workingRevision, int sceneIconAdded);
+  public:
+	SVNUpdateAndLockDialog(QWidget *parent, const QString &workingDir, const QStringList &files,
+						   int workingRevision, int sceneIconAdded);
 
-private:
+  private:
 	void switchToCloseButton();
 	void checkFiles();
 
 	void lockCommand();
 	void updateCommand();
 
-protected slots:
+  protected slots:
 	void onError(const QString &);
 
 	void onUpdateAndLockButtonClicked();
@@ -74,7 +74,7 @@ protected slots:
 
 	void reverseMerge();
 
-signals:
+  signals:
 	void done(const QStringList &);
 };
 

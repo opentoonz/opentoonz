@@ -12,13 +12,13 @@ PERSIST_IDENTIFIER(TToneCurveParam, "toneCurveParam")
 
 //---------------------------------------------------------
 
-TToneCurveParam::TToneCurveParam()
-	: TParam()
+TToneCurveParam::TToneCurveParam() : TParam()
 {
 	m_toneChannel = RGBA;
 
 	std::vector<TPointD> points;
-	//Inserisco dei punti fuori dal range(0-255) perche' mi consentono di gestire i primi punti come speciali.
+	// Inserisco dei punti fuori dal range(0-255) perche' mi consentono di gestire i primi punti
+	// come speciali.
 	points.push_back(TPointD(-40, 0));
 	points.push_back(TPointD(-20, 0));
 	points.push_back(TPointD(-20, 0));
@@ -64,8 +64,7 @@ TParamSetP getClonedParamSet(TParamSetP srcParamSet)
 
 //---------------------------------------------------------
 
-TToneCurveParam::TToneCurveParam(const TToneCurveParam &src)
-	: TParam(src.getName())
+TToneCurveParam::TToneCurveParam(const TToneCurveParam &src) : TParam(src.getName())
 {
 	m_rgbaParamSet = getClonedParamSet(src.getParamSet(RGBA));
 	m_rgbParamSet = getClonedParamSet(src.getParamSet(RGB));
@@ -241,15 +240,17 @@ void TToneCurveParam::setDefaultValue(const QList<TPointD> &value)
 
 std::string TToneCurveParam::getValueAlias(double frame, int precision)
 {
-	return getCurrentParamSet()->getValueAlias(frame, precision) + m_isLinear->getValueAlias(frame, precision);
+	return getCurrentParamSet()->getValueAlias(frame, precision) +
+		   m_isLinear->getValueAlias(frame, precision);
 }
 
 //---------------------------------------------------------
 
 bool TToneCurveParam::isKeyframe(double frame) const
 {
-	if (m_rgbaParamSet->isKeyframe(frame) || m_rgbParamSet->isKeyframe(frame) || m_rParamSet->isKeyframe(frame) ||
-		m_gParamSet->isKeyframe(frame) || m_bParamSet->isKeyframe(frame) || m_aParamSet->isKeyframe(frame))
+	if (m_rgbaParamSet->isKeyframe(frame) || m_rgbParamSet->isKeyframe(frame) ||
+		m_rParamSet->isKeyframe(frame) || m_gParamSet->isKeyframe(frame) ||
+		m_bParamSet->isKeyframe(frame) || m_aParamSet->isKeyframe(frame))
 		return true;
 	return false;
 }
@@ -307,8 +308,9 @@ void TToneCurveParam::getKeyframes(std::set<double> &frames) const
 
 bool TToneCurveParam::hasKeyframes() const
 {
-	if (m_rgbaParamSet->hasKeyframes() || m_rgbParamSet->hasKeyframes() || m_rParamSet->hasKeyframes() ||
-		m_gParamSet->hasKeyframes() || m_bParamSet->hasKeyframes() || m_aParamSet->hasKeyframes())
+	if (m_rgbaParamSet->hasKeyframes() || m_rgbParamSet->hasKeyframes() ||
+		m_rParamSet->hasKeyframes() || m_gParamSet->hasKeyframes() || m_bParamSet->hasKeyframes() ||
+		m_aParamSet->hasKeyframes())
 		return true;
 	return false;
 }

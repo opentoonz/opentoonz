@@ -25,12 +25,11 @@ class SetSaveboxUndo : public TRasterUndo
 	TRect m_modifiedSavebox;
 	TRect m_originalSavebox;
 
-public:
-	SetSaveboxUndo(TTileSetCM32 *tileSet,
-				   const TRect &modifiedSavebox,
-				   const TRect &originalSavebox,
-				   TXshSimpleLevel *level, const TFrameId &frameId)
-		: TRasterUndo(tileSet, level, frameId, false, false, 0), m_modifiedSavebox(modifiedSavebox), m_originalSavebox(originalSavebox)
+  public:
+	SetSaveboxUndo(TTileSetCM32 *tileSet, const TRect &modifiedSavebox,
+				   const TRect &originalSavebox, TXshSimpleLevel *level, const TFrameId &frameId)
+		: TRasterUndo(tileSet, level, frameId, false, false, 0), m_modifiedSavebox(modifiedSavebox),
+		  m_originalSavebox(originalSavebox)
 	{
 	}
 
@@ -54,14 +53,9 @@ public:
 		ti->setSavebox(m_originalSavebox);
 	}
 
-	int getSize() const
-	{
-		return TRasterUndo::getSize() + sizeof(this) + 100;
-	}
+	int getSize() const { return TRasterUndo::getSize() + sizeof(this) + 100; }
 
-	~SetSaveboxUndo()
-	{
-	}
+	~SetSaveboxUndo() {}
 
 	QString getHistoryString()
 	{
@@ -78,15 +72,14 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-} //namespace
+} // namespace
 //-----------------------------------------------------------------------------
 
 //=============================================================================
 // SetSaveboxTool
 //-----------------------------------------------------------------------------
 
-SetSaveboxTool::SetSaveboxTool(TTool *tool)
-	: m_tool(tool), m_pos(), m_modifiedRect()
+SetSaveboxTool::SetSaveboxTool(TTool *tool) : m_tool(tool), m_pos(), m_modifiedRect()
 {
 }
 
@@ -212,13 +205,14 @@ void SetSaveboxTool::leftButtonUp(const TPointD &pos)
 	TTileSetCM32 *tileSet = new TTileSetCM32(ras->getSize());
 	tileSet->add(ras, image->getSavebox());
 	/*-- 以下を有効にすると、SaveBoxの外の絵のデータが失われる --*/
-	//ras->clearOutside(savebox);
-	//if(Preferences::instance()->isMinimizeSaveboxAfterEditing())
+	// ras->clearOutside(savebox);
+	// if(Preferences::instance()->isMinimizeSaveboxAfterEditing())
 	//	TRop::computeBBox(ras, savebox);
 	image->setSavebox(savebox);
 
 	TXshSimpleLevel *level = m_tool->getApplication()->getCurrentLevel()->getSimpleLevel();
-	TUndoManager::manager()->add(new SetSaveboxUndo(tileSet, savebox, convert(originalSavebox), level, m_tool->getCurrentFid()));
+	TUndoManager::manager()->add(new SetSaveboxUndo(tileSet, savebox, convert(originalSavebox),
+													level, m_tool->getCurrentFid()));
 	m_modifiedRect = TRectD();
 	m_tool->notifyImageChanged();
 }

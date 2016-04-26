@@ -51,12 +51,7 @@ enum AUTO_ADJ_MODE {
 
 };
 
-enum OVERLAP_ALGO {
-	OVER_NO_BLEND,
-	OVER_BLEND,
-	OVER_MERGE,
-	OVER_HOW_MANY
-};
+enum OVERLAP_ALGO { OVER_NO_BLEND, OVER_BLEND, OVER_MERGE, OVER_HOW_MANY };
 
 enum AUTOCENTER_TYPE {
 	AUTOCENTER_NONE,
@@ -76,7 +71,7 @@ struct DOT {
 
 class FDG_INFO
 {
-public:
+  public:
 	string m_name;
 	int ctr_type;
 	/* ctr_type == TRUE:  */
@@ -90,17 +85,15 @@ public:
 	double dist_ctr_hole_to_edge; /* in mm */
 
 	FDG_INFO()
-		: ctr_type(0), ctr_x(0), ctr_y(0), ctr_angle(0), ctr_skew(0), dist_ctr_to_ctr_hole(0), dist_ctr_hole_to_edge(0)
+		: ctr_type(0), ctr_x(0), ctr_y(0), ctr_angle(0), ctr_skew(0), dist_ctr_to_ctr_hole(0),
+		  dist_ctr_hole_to_edge(0)
 	{
 	}
 
 	bool operator==(const FDG_INFO &rhs) const
 	{
-		return (ctr_type == rhs.ctr_type &&
-				ctr_x == rhs.ctr_x &&
-				ctr_y == rhs.ctr_y &&
-				ctr_angle == rhs.ctr_angle &&
-				ctr_skew == rhs.ctr_skew &&
+		return (ctr_type == rhs.ctr_type && ctr_x == rhs.ctr_x && ctr_y == rhs.ctr_y &&
+				ctr_angle == rhs.ctr_angle && ctr_skew == rhs.ctr_skew &&
 				dist_ctr_to_ctr_hole == rhs.dist_ctr_to_ctr_hole &&
 				dist_ctr_hole_to_edge == rhs.dist_ctr_hole_to_edge);
 	}
@@ -108,15 +101,15 @@ public:
 
 } // namespace CleanupTypes
 
-//class CleanupPreprocessedImage;
-//class TToonzImage;
+// class CleanupPreprocessedImage;
+// class TToonzImage;
 
 class DVAPI CleanupParameters
 {
 
 	CleanupTypes::FDG_INFO m_fdgInfo;
 
-public:
+  public:
 	CleanupParameters();
 
 	// in realta' nel popup c'e' solo un checkbox.

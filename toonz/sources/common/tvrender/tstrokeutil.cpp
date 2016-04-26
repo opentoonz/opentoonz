@@ -31,8 +31,7 @@ typedef std::vector<TThickQuadratic *> QuadStrokeChunkArray;
 
 //---------------------------------------------------------------------------
 
-int getControlPointIndex(const TStroke &stroke,
-						 double w)
+int getControlPointIndex(const TStroke &stroke, double w)
 {
 	TThickPoint p = stroke.getControlPointAtParameter(w);
 
@@ -48,13 +47,8 @@ int getControlPointIndex(const TStroke &stroke,
 
 //---------------------------------------------------------------------------
 
-double findMinimum(const TStrokeDeformation &def,
-				   const TStroke &stroke,
-				   double x1,
-				   double x2,
-				   double xacc,
-				   double length = 0,
-				   int max_iter = 100)
+double findMinimum(const TStrokeDeformation &def, const TStroke &stroke, double x1, double x2,
+				   double xacc, double length = 0, int max_iter = 100)
 
 {
 	int j;
@@ -92,8 +86,8 @@ double findMinimum(const TStrokeDeformation &def,
   *  Poniamo il che:
   *   (o) i punti della stroke si trovino lungo l'asse y=-100;
   *   (o) le x che corrisponderanno siano x1=-10 e x2=+10 (ovvio dall'equazione).
-  * 
-  *  La parabola potrà essere rappresentata sul lato sx da una quadratica con 
+  *
+  *  La parabola potrà essere rappresentata sul lato sx da una quadratica con
   *  punti di controllo:
   *    P0=(-10,-100),
   *    P1=(-5,    0),
@@ -104,22 +98,18 @@ double findMinimum(const TStrokeDeformation &def,
   *  il valore con cui campionare la stroke da testare; ci dovranno essere tanti
   *  punti da spostare per quanti campioni sono presenti nel riferimento.
   */
-double
-computeIncrement(double strokeLength,
-				 double pixelSize)
+double computeIncrement(double strokeLength, double pixelSize)
 {
 	assert(pixelSize > 0 && "Pixel size is negative!!!");
 	assert(strokeLength > 0 && "Stroke Length size is negative!!!");
 
 	// altezza della parabola (va verso il basso)
-	double
-		height = 100;
+	double height = 100;
 
 	// suppongo di fare almeno un drag di 100 pixel
 	assert(height >= 100.0);
 
-	double
-		x = sqrt(height);
+	double x = sqrt(height);
 
 	// il punto p1 dovra' essere all'intersezione
 	//  tra le tangenti ai due estremi.
@@ -128,34 +118,22 @@ computeIncrement(double strokeLength,
 	//  cioe': grad(x,-2 x)
 	//  e se y = m x + q
 	//  m =
-	double
-		m = 2.0 * x;
+	double m = 2.0 * x;
 
-	double
-		q = m * x - height;
+	double q = m * x - height;
 
-	double
-		p1x = q / m;
+	double p1x = q / m;
 
-	double
-		scale = strokeLength / (2.0 * x);
+	double scale = strokeLength / (2.0 * x);
 
-	TScale
-		scaleAffine(scale, scale);
+	TScale scaleAffine(scale, scale);
 
-	TPointD
-		p0 = scaleAffine * TPointD(-x, -height),
-		p1 = scaleAffine * TPointD(-p1x, 0.0),
-		p2 = scaleAffine * TPointD(0.0, 0.0);
+	TPointD p0 = scaleAffine * TPointD(-x, -height), p1 = scaleAffine * TPointD(-p1x, 0.0),
+			p2 = scaleAffine * TPointD(0.0, 0.0);
 
-	TQuadratic
-		quadratic(p0,
-				  p1,
-				  p2);
+	TQuadratic quadratic(p0, p1, p2);
 
-	double
-		step = computeStep(quadratic,
-						   pixelSize);
+	double step = computeStep(quadratic, pixelSize);
 
 	//  giusto per aggiungere punti anche nel caso peggiore.
 	if (step >= 1.0)
@@ -190,11 +168,13 @@ void detectEdges(const std::vector<TPointD> &pointArray, std::vector<UINT> &edge
 	std::vector<double> sharpnessArray;
 	sharpnessArray.push_back(TConsts::pi); //  il primo punto e' un corner
 	int nodeCount;
-	for (nodeCount = 1; nodeCount < size - 1; ++nodeCount) { //  scorre la sharpPointArray escludendo gli estremi
+	for (nodeCount = 1; nodeCount < size - 1;
+		 ++nodeCount) { //  scorre la sharpPointArray escludendo gli estremi
 		sharpnessArray.push_back(0);
 		TPointD point(pointArray[nodeCount]);
 		int leftCount;
-		for (leftCount = nodeCount - 1; leftCount >= 0; --leftCount) { //  calcola i lati "left" dei triangoli inscritti...
+		for (leftCount = nodeCount - 1; leftCount >= 0;
+			 --leftCount) { //  calcola i lati "left" dei triangoli inscritti...
 			TPointD left = pointArray[leftCount];
 			double dLeft2 = norm2(left - point);
 			if (dLeft2 < dMin2)
@@ -202,7 +182,8 @@ void detectEdges(const std::vector<TPointD> &pointArray, std::vector<UINT> &edge
 			else if (dLeft2 > dMax2)
 				break;
 			int rightCount;
-			for (rightCount = nodeCount + 1; rightCount < size; ++rightCount) { //  calcola i lati "right" dei triangoli inscritti...
+			for (rightCount = nodeCount + 1; rightCount < size;
+				 ++rightCount) { //  calcola i lati "right" dei triangoli inscritti...
 				TPointD right = pointArray[rightCount];
 				double dRight2 = norm2(right - point);
 				if (dRight2 < dMin2)
@@ -230,11 +211,13 @@ void detectEdges(const std::vector<TPointD> &pointArray, std::vector<UINT> &edge
 	edgeIndexArray.push_back(0); //  il primo punto e' un corner
 
 	// trovo i massimi locali escludendo gli estremi
-	for (nodeCount = 1; nodeCount < size - 1; ++nodeCount) { //  scorre la lista escludendo gli estremi
+	for (nodeCount = 1; nodeCount < size - 1;
+		 ++nodeCount) { //  scorre la lista escludendo gli estremi
 		bool isCorner = true;
 		TPointD point(pointArray[nodeCount]);
 		int leftCount;
-		for (leftCount = nodeCount - 1; leftCount >= 0; --leftCount) { //  scorre la lista di sharpPoint a sinistra di node...
+		for (leftCount = nodeCount - 1; leftCount >= 0;
+			 --leftCount) { //  scorre la lista di sharpPoint a sinistra di node...
 			TPointD left = pointArray[leftCount];
 			double dLeft2 = norm2(left - point);
 			if (dLeft2 > dMax2)
@@ -247,7 +230,8 @@ void detectEdges(const std::vector<TPointD> &pointArray, std::vector<UINT> &edge
 		if (isCorner)
 			continue;
 		int rightCount;
-		for (rightCount = nodeCount + 1; rightCount < size; ++rightCount) { //  scorre la lista di sharpPoint a destra di node..
+		for (rightCount = nodeCount + 1; rightCount < size;
+			 ++rightCount) { //  scorre la lista di sharpPoint a destra di node..
 			TPointD right = pointArray[rightCount];
 			double dRight2 = norm2(right - point);
 			if (dRight2 > dMax2)
@@ -269,9 +253,7 @@ void detectEdges(const std::vector<TPointD> &pointArray, std::vector<UINT> &edge
 //    API  functions
 //*******************************************************************************
 
-bool increaseControlPoints(TStroke &stroke,
-						   const TStrokeDeformation &deformer,
-						   double pixelSize)
+bool increaseControlPoints(TStroke &stroke, const TStrokeDeformation &deformer, double pixelSize)
 {
 
 	if (isAlmostZero(stroke.getLength())) {
@@ -293,7 +275,8 @@ bool increaseControlPoints(TStroke &stroke,
 
 	// step 2:
 	//  increase control point checking delta of deformer
-	double maxDifference = deformer.getMaxDiff(); //sopra questo valore di delta, si aggiungono punti
+	double maxDifference =
+		deformer.getMaxDiff(); // sopra questo valore di delta, si aggiungono punti
 
 	int strokeControlPoint = stroke.getControlPointCount();
 
@@ -302,16 +285,13 @@ bool increaseControlPoints(TStroke &stroke,
 	if (pixelSize < TConsts::epsilon)
 		pixelSize = TConsts::epsilon;
 
-	double
-		length = stroke.getLength(),
-		// set the step function of length
+	double length = stroke.getLength(),
+		   // set the step function of length
 		//    step = length > 1.0 ?  pixelSize * 15.0/ length : length,
-		//step = 0.01,
+		// step = 0.01,
 		w = 0.0;
 
-	double
-		step = computeIncrement(length,
-								pixelSize);
+	double step = computeIncrement(length, pixelSize);
 
 	double x1, x2, d1, d2, diff, offset, minimum, incr;
 
@@ -336,8 +316,9 @@ bool increaseControlPoints(TStroke &stroke,
 			offset = (d1 + d2) * 0.5;
 
 			// find the position of step
-			minimum = findMinimum(deformer, stroke, x1, x2, TConsts::epsilon, offset, 20); //tra x1 e x2 va messo un nuovo punto di controllo. dove?
-			//questa funzione trova il punto in cui si supera il valore maxdifference
+			minimum = findMinimum(deformer, stroke, x1, x2, TConsts::epsilon, offset,
+								  20); // tra x1 e x2 va messo un nuovo punto di controllo. dove?
+			// questa funzione trova il punto in cui si supera il valore maxdifference
 
 			// if minimum is not found or is equal to previous value
 			//  use an euristic...
@@ -347,7 +328,7 @@ bool increaseControlPoints(TStroke &stroke,
 			}
 
 			//... else insert a control point in minimum
-			w = minimum; //la scansione riprende dal nuovo punto, in questo modo si infittisce...
+			w = minimum; // la scansione riprende dal nuovo punto, in questo modo si infittisce...
 			stroke.insertControlPoints(minimum);
 
 			// update of step
@@ -362,8 +343,7 @@ bool increaseControlPoints(TStroke &stroke,
 
 //-----------------------------------------------------------------------------
 
-void modifyControlPoints(TStroke &stroke,
-						 const TStrokeDeformation &deformer)
+void modifyControlPoints(TStroke &stroke, const TStrokeDeformation &deformer)
 {
 	int cpCount = stroke.getControlPointCount();
 
@@ -379,8 +359,8 @@ void modifyControlPoints(TStroke &stroke,
 
 //-----------------------------------------------------------------------------
 
-void modifyControlPoints(TStroke &stroke,
-						 const TStrokeDeformation &deformer, std::vector<double> &controlPointLen)
+void modifyControlPoints(TStroke &stroke, const TStrokeDeformation &deformer,
+						 std::vector<double> &controlPointLen)
 {
 	UINT cpCount = stroke.getControlPointCount();
 
@@ -392,7 +372,8 @@ void modifyControlPoints(TStroke &stroke,
 	assert(controlPointLen.size() == cpCount);
 
 	for (UINT i = 0; i < cpCount; ++i) {
-		newP = stroke.getControlPoint(i) + deformer.getDisplacementForControlPointLen(stroke, controlPointLen[i]);
+		newP = stroke.getControlPoint(i) +
+			   deformer.getDisplacementForControlPointLen(stroke, controlPointLen[i]);
 		if (isAlmostZero(newP.thick, 0.005))
 			newP.thick = 0;
 		stroke.setControlPoint(i, newP);
@@ -415,9 +396,9 @@ void modifyThickness(TStroke &stroke, const TStrokeDeformation &deformer,
 
 		thick = stroke.getControlPoint(i).thick;
 
-		//The additive version is straightforward.
-		//The exponential version is devised to keep derivative 1 at disp == 0;
-		//it is typically used when the thickness decreases.
+		// The additive version is straightforward.
+		// The exponential version is devised to keep derivative 1 at disp == 0;
+		// it is typically used when the thickness decreases.
 
 		thick = (exponentially && thick >= 0.005) ? thick * exp(disp / thick) : thick + disp;
 
@@ -435,9 +416,7 @@ void transform_thickness(TStroke &stroke, const double poly[], int deg)
 	int cp, cpCount = stroke.getControlPointCount();
 	for (cp = 0; cp != cpCount; ++cp) {
 		TThickPoint cpPoint = stroke.getControlPoint(cp);
-		cpPoint.thick = tmax(
-			tcg::poly_ops::evaluate(poly, deg, cpPoint.thick),
-			0.0);
+		cpPoint.thick = tmax(tcg::poly_ops::evaluate(poly, deg, cpPoint.thick), 0.0);
 
 		stroke.setControlPoint(cp, cpPoint);
 	}
@@ -450,43 +429,32 @@ TStroke *Toonz::merge(const std::vector<TStroke *> &strokes)
 	if (strokes.empty())
 		return 0;
 
-	std::vector<TThickPoint>
-		new_stroke_cp;
+	std::vector<TThickPoint> new_stroke_cp;
 
-	int
-		size_stroke_array = strokes.size();
+	int size_stroke_array = strokes.size();
 
-	int
-		size_cp;
+	int size_cp;
 
-	const TStroke *
-		ref;
+	const TStroke *ref;
 
-	TThickPoint
-		last = TConsts::natp;
+	TThickPoint last = TConsts::natp;
 
 	if (!strokes[0])
 		return 0;
 
 	new_stroke_cp.push_back(strokes[0]->getControlPoint(0));
 	int i, j;
-	for (i = 0;
-		 i < size_stroke_array;
-		 i++) {
+	for (i = 0; i < size_stroke_array; i++) {
 		ref = strokes[i];
 		if (!ref)
 			return 0;
 
 		size_cp = ref->getControlPointCount();
-		for (j = 0;
-			 j < size_cp - 1;
-			 j++) {
-			const TThickPoint &
-				pnt = ref->getControlPoint(j);
+		for (j = 0; j < size_cp - 1; j++) {
+			const TThickPoint &pnt = ref->getControlPoint(j);
 
-			if (last != TConsts::natp &&
-				j == 0) {
-				//new_stroke_cp.push_back( (last+pnt)*0.5 );
+			if (last != TConsts::natp && j == 0) {
+				// new_stroke_cp.push_back( (last+pnt)*0.5 );
 				new_stroke_cp.push_back(last);
 			}
 
@@ -512,10 +480,10 @@ class CpsReader
 {
 	std::vector<TThickPoint> &m_cps;
 
-public:
+  public:
 	typedef TPointD value_type;
 
-public:
+  public:
 	CpsReader(std::vector<TThickPoint> &cps) : m_cps(cps) {}
 
 	void openContainer(const TPointD &point) { addElement(point); }
@@ -530,7 +498,7 @@ public:
 template <typename iter_type>
 double buildLength(const iter_type &begin, const iter_type &end, double tol)
 {
-	//Build direction
+	// Build direction
 	iter_type it = begin, jt;
 	++it;
 
@@ -548,11 +516,11 @@ double buildLength(const iter_type &begin, const iter_type &end, double tol)
 		if (fabs(dist) > tol) {
 			double s, t;
 			if (dist > 0) {
-				tcg::point_ops::intersectionCoords(*jt, segDir,
-												   a + tol * tcg::point_ops::ortLeft(dir), dir, s, t);
+				tcg::point_ops::intersectionCoords(
+					*jt, segDir, a + tol * tcg::point_ops::ortLeft(dir), dir, s, t);
 			} else {
-				tcg::point_ops::intersectionCoords(*jt, segDir,
-												   a + tol * tcg::point_ops::ortRight(dir), dir, s, t);
+				tcg::point_ops::intersectionCoords(
+					*jt, segDir, a + tol * tcg::point_ops::ortRight(dir), dir, s, t);
 			}
 
 			s = tcrop(s, 0.0, 1.0);
@@ -590,13 +558,16 @@ class TripletsConverter
 	iter_type m_first, m_end, m_last;
 	double m_adherenceTol, m_angleTol, m_relativeTol, m_relativeDistTol;
 
-public:
-	TripletsConverter(const iter_type &begin, const iter_type &end,
-					  double adherenceTol, double angleTol,
-					  double relativeTol, double relativeDistTol)
-		: m_circular(*begin == *(end - 1)), m_first(m_circular ? begin + 1 : begin), m_end(end), m_adherenceTol(adherenceTol), m_angleTol(angleTol), m_relativeTol(relativeTol), m_relativeDistTol(relativeDistTol) {}
+  public:
+	TripletsConverter(const iter_type &begin, const iter_type &end, double adherenceTol,
+					  double angleTol, double relativeTol, double relativeDistTol)
+		: m_circular(*begin == *(end - 1)), m_first(m_circular ? begin + 1 : begin), m_end(end),
+		  m_adherenceTol(adherenceTol), m_angleTol(angleTol), m_relativeTol(relativeTol),
+		  m_relativeDistTol(relativeDistTol)
+	{
+	}
 
-	//Using bisector to convert a triplet
+	// Using bisector to convert a triplet
 	void operator()(const TPointD &a, const iter_type &bt, const TPointD &c,
 					tcg::sequential_reader<std::vector<TPointD>> &output)
 	{
@@ -605,12 +576,12 @@ public:
 		double prod = tcg::point_ops::direction(b, a) * tcg::point_ops::direction(b, c);
 
 		if (prod > m_angleTol) {
-			//Full corner
+			// Full corner
 			output.addElement(0.5 * (a + b));
 			output.addElement(b);
 			output.addElement(0.5 * (b + c));
 		} else {
-			//Build the angle bisector
+			// Build the angle bisector
 			TPointD a_b(a - b);
 			TPointD c_b(c - b);
 
@@ -627,22 +598,22 @@ public:
 			double t2 = tcrop(m_adherenceTol / (cos_v_dir * norm_c_b), 0.0, 0.5);
 
 			if (t1 == 0.5 && t2 == 0.5) {
-				//Direct conversion
+				// Direct conversion
 				output.addElement(b);
 			} else {
-				//Build the quadratic split
+				// Build the quadratic split
 				TPointD d(b + t1 * (a - b)), f(b + t2 * (c - b)), e(0.5 * (d + f));
 
-				//Build curvature radiuses at the corner
+				// Build curvature radiuses at the corner
 
-				//NOTE: Both speed and acceleration would hold 2.0 as multiplier, which
-				//is calculated implicitly.
+				// NOTE: Both speed and acceleration would hold 2.0 as multiplier, which
+				// is calculated implicitly.
 
 				TPointD speed(f - d);
 
 				double num = norm(speed);
 				if (num <= TConsts::epsilon) {
-					//Curvature radius is 0 - full corner
+					// Curvature radius is 0 - full corner
 					output.addElement(0.5 * (a + b));
 					output.addElement(b);
 					output.addElement(0.5 * (b + c));
@@ -655,7 +626,7 @@ public:
 					double radius1 = (den1 == 0.0) ? 0.0 : num / den1;
 					double radius2 = (den1 == 0.0) ? 0.0 : num / den2;
 
-					//Build edges length
+					// Build edges length
 					double length1, length2;
 					if (m_circular) {
 						cyclic_iter_type it(bt, m_first, m_end, 0);
@@ -672,15 +643,15 @@ public:
 						length2 = buildLength(bt, m_end, m_relativeDistTol);
 					}
 
-					//Test curvature radiuses against edge length
+					// Test curvature radiuses against edge length
 					if (radius1 / length1 < m_relativeTol && // both must hold
 						radius2 / length2 < m_relativeTol) {
-						//Full corner
+						// Full corner
 						output.addElement(0.5 * (a + b));
 						output.addElement(b);
 						output.addElement(0.5 * (b + c));
 					} else {
-						//Quadratic split
+						// Quadratic split
 						output.addElement(d);
 						output.addElement(e);
 						output.addElement(f);
@@ -693,18 +664,16 @@ public:
 	}
 };
 
-} //namespace
+} // namespace
 
 //-----------------------------------------------------------------------------
 
-void polylineToQuadratics(const std::vector<TPointD> &polyline,
-						  std::vector<TThickPoint> &cps,
-						  double adherenceTol, double angleTol,
-						  double relativeTol, double relativeDistTol,
-						  double mergeTol)
+void polylineToQuadratics(const std::vector<TPointD> &polyline, std::vector<TThickPoint> &cps,
+						  double adherenceTol, double angleTol, double relativeTol,
+						  double relativeDistTol, double mergeTol)
 {
 	CpsReader cpsReader(cps);
-	TripletsConverter op(polyline.begin(), polyline.end(),
-						 adherenceTol, angleTol, relativeTol, relativeDistTol);
+	TripletsConverter op(polyline.begin(), polyline.end(), adherenceTol, angleTol, relativeTol,
+						 relativeDistTol);
 	tcg::polyline_ops::toQuadratics(polyline.begin(), polyline.end(), cpsReader, op, mergeTol);
 }

@@ -21,8 +21,7 @@
 
 //=============================================================================
 
-TRegionProp::TRegionProp(const TRegion *region)
-	: m_region(region), m_regionChanged(true)
+TRegionProp::TRegionProp(const TRegion *region) : m_region(region), m_regionChanged(true)
 {
 }
 
@@ -34,8 +33,7 @@ namespace
 
 //-------------------------------------------------------------------
 
-bool computeOutline(const TRegion *region,
-					TRegionOutline::PointVector &polyline,
+bool computeOutline(const TRegion *region, TRegionOutline::PointVector &polyline,
 					const double pixelSize)
 {
 	bool doAntialiasing = false;
@@ -51,24 +49,24 @@ bool computeOutline(const TRegion *region,
 		if (edge.m_index >= 0 && edge.m_s) {
 			bool outline = (edge.m_s->getAverageThickness() == 0.0);
 			if (outline && !doAntialiasing) {
-				//The region must be antialiased if it has at least one invisible (0-thin) edge
+				// The region must be antialiased if it has at least one invisible (0-thin) edge
 				doAntialiasing = true;
 
-				//Plus, edges will have to be reproduced independently from the edge side
+				// Plus, edges will have to be reproduced independently from the edge side
 				indices.reserve(edgeSize);
 			}
 
 			if (outline && (edge.m_w0 > edge.m_w1)) {
 				int newSize = polyline2d.size();
 				if (oldSize < newSize) {
-					//There is a sequence of forward vertices
+					// There is a sequence of forward vertices
 					indices.push_back(newSize - oldSize);
 					oldSize = newSize;
 				}
 
 				stroke2polyline(polyline2d, *edge.m_s, pixelSize, edge.m_w1, edge.m_w0, true);
 
-				//Insert the sequence of backward vertices
+				// Insert the sequence of backward vertices
 				newSize = polyline2d.size();
 				indices.push_back(oldSize - newSize);
 				oldSize = newSize;
@@ -77,7 +75,7 @@ bool computeOutline(const TRegion *region,
 		}
 	}
 
-	//Copy points to the output
+	// Copy points to the output
 	int pointNumber = polyline2d.size();
 	polyline.reserve(pointNumber);
 
@@ -96,8 +94,8 @@ bool computeOutline(const TRegion *region,
 			l = i - l;
 			j = l - 1;
 
-			//Inverted sequences are symmetric by construction.
-			//If necessary, chop the last element.
+			// Inverted sequences are symmetric by construction.
+			// If necessary, chop the last element.
 			if (polyline2d[i] == polyline2d[j])
 				++i;
 
@@ -107,7 +105,7 @@ bool computeOutline(const TRegion *region,
 		}
 	}
 
-	//Finally, copy the remaining (forward) ones
+	// Finally, copy the remaining (forward) ones
 	for (; i < pointNumber; ++i)
 		polyline.push_back(T3DPointD(polyline2d[i], 0.0));
 
@@ -115,14 +113,14 @@ bool computeOutline(const TRegion *region,
 }
 
 /*!
- This function accept a polygon which can have autointersections, 
+ This function accept a polygon which can have autointersections,
  and creates a number of not-autointersecting polygons. the second function is for recursive calls.
  It is used for The GlTessellator
 */
 //-------------------------------------------------------------------
 
 //-------------------------------------------------------------------
-} //end namaspace
+} // end namaspace
 //-------------------------------------------------------------------
 
 //-------------------------------------------------------------------
@@ -162,15 +160,15 @@ OutlineRegionProp::OutlineRegionProp(const TRegion *region, const TOutlineStyleP
 
 void OutlineRegionProp::draw(const TVectorRenderData &rd)
 {
-	if (rd.m_clippingRect != TRect() && !rd.m_is3dView && !(rd.m_aff * getRegion()->getBBox()).overlaps(convert(rd.m_clippingRect)))
+	if (rd.m_clippingRect != TRect() && !rd.m_is3dView &&
+		!(rd.m_aff * getRegion()->getBBox()).overlaps(convert(rd.m_clippingRect)))
 		return;
 
 	glPushMatrix();
 	tglMultMatrix(rd.m_aff);
 	double pixelSize = sqrt(tglGetPixelSize2());
 
-	if (!isAlmostZero(pixelSize - m_pixelSize, 1e-5) ||
-		m_regionChanged ||
+	if (!isAlmostZero(pixelSize - m_pixelSize, 1e-5) || m_regionChanged ||
 		m_styleVersionNumber != m_colorStyle->getVersionNumber()) {
 		m_pixelSize = pixelSize;
 		m_regionChanged = false;
@@ -184,9 +182,7 @@ void OutlineRegionProp::draw(const TVectorRenderData &rd)
 
 	assert(!m_outline.m_exterior.empty());
 
-	m_colorStyle->drawRegion(rd.m_cf,
-							 rd.m_antiAliasing && rd.m_regionAntialias,
-							 m_outline);
+	m_colorStyle->drawRegion(rd.m_cf, rd.m_antiAliasing && rd.m_regionAntialias, m_outline);
 
 	glPopMatrix();
 }

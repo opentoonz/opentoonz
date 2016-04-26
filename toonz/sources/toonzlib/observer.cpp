@@ -14,15 +14,15 @@ void TNotifier::attach(TChangeObserver*observer)
 {
   std::vector<TObserverList*>::iterator it;
   for(it = m_obsList.begin(); it != m_obsList.end(); ++it)
-    (*it)->attach(observer);
+	(*it)->attach(observer);
   if(TGlobalObserver *go = dynamic_cast<TGlobalObserver *>(observer))
-    {
-     if(m_newSceneNotifiedObs.find(go) == m_newSceneNotifiedObs.end())
-       {
-        go->update(TGlobalChange(true));
-        m_newSceneNotifiedObs.insert(go);
-       }
-    }
+	{
+	 if(m_newSceneNotifiedObs.find(go) == m_newSceneNotifiedObs.end())
+	   {
+		go->update(TGlobalChange(true));
+		m_newSceneNotifiedObs.insert(go);
+	   }
+	}
 }
 
 
@@ -30,7 +30,7 @@ void TNotifier::detach(TChangeObserver*observer)
 {
   std::vector<TObserverList*>::iterator it;
   for(it = m_obsList.begin(); it != m_obsList.end(); ++it)
-    (*it)->detach(observer);
+	(*it)->detach(observer);
 }
 */
 

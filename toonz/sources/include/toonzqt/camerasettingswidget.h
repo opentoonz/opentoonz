@@ -46,7 +46,7 @@ class CheckBox;
 
 class SimpleExpValidator : public QValidator
 {
-public:
+  public:
 	SimpleExpValidator(QObject *parent) : QValidator(parent){};
 	State validate(QString &input, int &pos) const;
 };
@@ -58,14 +58,14 @@ class SimpleExpField : public QLineEdit
 	SimpleExpValidator *m_validator;
 	QString m_previousValue;
 
-public:
+  public:
 	SimpleExpField(QWidget *parent);
 
 	void setValue(double);
 	void setValue(double, int, int);
 	double getValue();
 
-protected:
+  protected:
 	void focusInEvent(QFocusEvent *event);
 	void focusOutEvent(QFocusEvent *event);
 };
@@ -104,18 +104,11 @@ class DVAPI CameraSettingsWidget : public QFrame
 	void loadPresetList();
 	bool parsePresetString(const QString &str, QString &name, int &xres, int &yres, QString &ar);
 
-	bool parsePresetString(const QString &str,
-						   QString &name,
-						   int &xres,
-						   int &yres,
-						   double &fx,
-						   double &fy,
-						   QString &xoffset,
-						   QString &yoffset,
-						   double &ar,
+	bool parsePresetString(const QString &str, QString &name, int &xres, int &yres, double &fx,
+						   double &fy, QString &xoffset, QString &yoffset, double &ar,
 						   bool forCleanup = false);
 
-public:
+  public:
 	CameraSettingsWidget(bool forCleanup = false);
 	~CameraSettingsWidget();
 
@@ -136,7 +129,8 @@ public:
 	// The aspect ratio can be expressed as a fraction (e.g. "4/3")
 	// The following methods convert code/decode the value
 	static double aspectRatioStringToValue(const QString &s);
-	/*--- カメラの縦横ピクセル値を入力できるようにし、valueがX/Yの値に近かったら、"X/Y"と表示する ---*/
+	/*--- カメラの縦横ピクセル値を入力できるようにし、valueがX/Yの値に近かったら、"X/Y"と表示する
+	 * ---*/
 	static QString aspectRatioValueToString(double ar, int width = 0, int height = 0);
 
 	// the current camera dimension (in inches)
@@ -146,13 +140,14 @@ public:
 	TDimension getRes() const;
 
 	/*--- cleanupCameraSettingsWidgetからポインタを受け取る ---*/
-	void setOffsetWidgetPointers(DVGui::MeasuredDoubleLineEdit *offsX, DVGui::MeasuredDoubleLineEdit *offsY)
+	void setOffsetWidgetPointers(DVGui::MeasuredDoubleLineEdit *offsX,
+								 DVGui::MeasuredDoubleLineEdit *offsY)
 	{
 		m_offsX = offsX;
 		m_offsY = offsY;
 	}
 
-protected:
+  protected:
 	bool eventFilter(QObject *obj, QEvent *e);
 
 	void hComputeLx();
@@ -170,7 +165,7 @@ protected:
 
 	void setArFld(double ar);
 
-protected slots:
+  protected slots:
 	void onLxChanged();
 	void onLyChanged();
 	void onArChanged();
@@ -185,10 +180,10 @@ protected slots:
 	void removePreset();
 	void useLevelSettings();
 
-signals:
+  signals:
 	void changed();			  // some value has been changed
 	void levelSettingsUsed(); // the "Use level settings" button has been pressed.
-							  // Note: a changed() signal is always emitted after levelSettingsUsed()
+	// Note: a changed() signal is always emitted after levelSettingsUsed()
 };
 
 #endif

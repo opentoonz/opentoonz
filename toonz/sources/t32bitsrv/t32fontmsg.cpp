@@ -3,18 +3,18 @@
 #ifdef MACOSX
 #ifndef __LP64__
 
-//Toonz stuff
+// Toonz stuff
 #include "tvectorimage.h"
 #include "tstroke.h"
 #include "traster.h"
 #include "tfont.h"
 
-//Qt stuff
+// Qt stuff
 #include <QString>
 #include <QSharedMemory>
 #include <QDebug>
 
-//tipc includes
+// tipc includes
 #include "tipc.h"
 #include "tipcmsg.h"
 #include "tipcsrv.h"
@@ -116,9 +116,7 @@ void SetTypefaceParser::operator()(Message &msg)
 
 	TFontManager *fm = TFontManager::instance();
 	fm->setTypeface(typeface);
-	msg << QString("ok")
-		<< fm->getLineAscender()
-		<< fm->getLineDescender();
+	msg << QString("ok") << fm->getLineAscender() << fm->getLineDescender();
 }
 
 //************************************************************************
@@ -132,9 +130,7 @@ void SetSizeParser::operator()(Message &msg)
 
 	TFontManager *fm = TFontManager::instance();
 	fm->setSize(size);
-	msg << QString("ok")
-		<< fm->getLineAscender()
-		<< fm->getLineDescender();
+	msg << QString("ok") << fm->getLineAscender() << fm->getLineDescender();
 }
 
 //************************************************************************
@@ -184,7 +180,7 @@ void DrawCharVIParser::operator()(Message &msg)
 	TPoint p = TFontManager::instance()->drawChar(vi, charCode, nextCode);
 	msg << QString("ok") << p.x << p.y;
 
-	//Write the vector image
+	// Write the vector image
 	std::vector<TThickPoint> cps;
 
 	unsigned int i, strokesCount = vi->getStrokeCount();
@@ -209,16 +205,16 @@ void DrawCharGRParser::operator()(Message &msg)
 	wchar_t charCode, nextCode;
 	msg >> ink >> shMemId >> charCode >> nextCode >> clr;
 
-	//Build the character
+	// Build the character
 	TRasterGR8P charRas;
 	TPoint unused;
 	TPoint p = TFontManager::instance()->drawChar(charRas, unused, charCode, nextCode);
 
-	//Retrieve the raster size
+	// Retrieve the raster size
 	int lx = charRas->getLx(), ly = charRas->getLy();
 	int size = lx * ly * sizeof(TPixelGR8);
 
-	//Request a shared memory segment of that size
+	// Request a shared memory segment of that size
 	{
 		tipc::DefaultMessageParser<SHMEM_REQUEST> msgParser;
 		Message shMsg;
@@ -234,7 +230,7 @@ void DrawCharGRParser::operator()(Message &msg)
 		}
 	}
 
-	//Copy charRas to the shared segment
+	// Copy charRas to the shared segment
 	QSharedMemory shmem(shMemId);
 	shmem.attach();
 	shmem.lock();
@@ -258,16 +254,16 @@ void DrawCharCMParser::operator()(Message &msg)
 	wchar_t charCode, nextCode;
 	msg >> ink >> shMemId >> charCode >> nextCode >> clr;
 
-	//Build the character
+	// Build the character
 	TRasterCM32P charRas;
 	TPoint unused;
 	TPoint p = TFontManager::instance()->drawChar(charRas, unused, ink, charCode, nextCode);
 
-	//Retrieve the raster size
+	// Retrieve the raster size
 	int lx = charRas->getLx(), ly = charRas->getLy();
 	int size = lx * ly * sizeof(TPixelCM32);
 
-	//Request a shared memory segment of that size
+	// Request a shared memory segment of that size
 	{
 		tipc::DefaultMessageParser<SHMEM_REQUEST> msgParser;
 		Message shMsg;
@@ -283,7 +279,7 @@ void DrawCharCMParser::operator()(Message &msg)
 		}
 	}
 
-	//Copy charRas to the shared segment
+	// Copy charRas to the shared segment
 	QSharedMemory shmem(shMemId);
 	shmem.attach();
 	shmem.lock();
@@ -296,7 +292,7 @@ void DrawCharCMParser::operator()(Message &msg)
 	msg << QString("ok") << lx << ly << p.x << p.y;
 }
 
-} //namespace font_io
+} // namespace font_io
 
 #endif // !__LP64
 #endif // MACOSX

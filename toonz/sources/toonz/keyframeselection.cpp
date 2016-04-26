@@ -50,7 +50,8 @@ bool shiftKeyframesWithoutUndo(int r0, int r1, int c0, int c1, bool cut)
 	bool isShifted = false;
 	int x;
 	for (x = c0; x <= c1; x++) {
-		TStageObject *stObj = xsh->getStageObject(x >= 0 ? TStageObjectId::ColumnId(x) : TStageObjectId::CameraId(0));
+		TStageObject *stObj =
+			xsh->getStageObject(x >= 0 ? TStageObjectId::ColumnId(x) : TStageObjectId::CameraId(0));
 		std::set<int> keyToShift;
 		int kr0, kr1;
 		stObj->getKeyframeRange(kr0, kr1);
@@ -78,7 +79,8 @@ void copyKeyframesWithoutUndo(std::set<TKeyframeSelection::Position> *positions)
 
 //-----------------------------------------------------------------------------
 
-bool pasteKeyframesWithoutUndo(const TKeyframeData *data, std::set<TKeyframeSelection::Position> *positions)
+bool pasteKeyframesWithoutUndo(const TKeyframeData *data,
+							   std::set<TKeyframeSelection::Position> *positions)
 {
 	if (!data || positions->empty())
 		return false;
@@ -105,7 +107,8 @@ bool deleteKeyframesWithoutUndo(std::set<TKeyframeSelection::Position> *position
 	for (; it != positions->end(); ++it) {
 		int row = it->first;
 		int col = it->second;
-		TStageObject *pegbar = xsh->getStageObject(col >= 0 ? TStageObjectId::ColumnId(col) : cameraId);
+		TStageObject *pegbar =
+			xsh->getStageObject(col >= 0 ? TStageObjectId::ColumnId(col) : cameraId);
 		if (pegbar->getId().isColumn() && xsh->getColumn(col) && xsh->getColumn(col)->isLocked())
 			continue;
 		areAllColumnLocked = false;
@@ -130,9 +133,11 @@ class PasteKeyframesUndo : public TUndo
 	QMimeData *m_oldData;
 	int m_r0, m_r1, m_c0, m_c1;
 
-public:
-	PasteKeyframesUndo(TKeyframeSelection *selection, QMimeData *newData, QMimeData *oldData, int r0, int r1, int c0, int c1)
-		: m_selection(selection), m_newData(newData), m_oldData(oldData), m_r0(r0), m_r1(r1), m_c0(c0), m_c1(c1)
+  public:
+	PasteKeyframesUndo(TKeyframeSelection *selection, QMimeData *newData, QMimeData *oldData,
+					   int r0, int r1, int c0, int c1)
+		: m_selection(selection), m_newData(newData), m_oldData(oldData), m_r0(r0), m_r1(r1),
+		  m_c0(c0), m_c1(c1)
 	{
 	}
 
@@ -142,7 +147,7 @@ public:
 		delete m_newData;
 		delete m_oldData;
 	}
-	//data->xsh
+	// data->xsh
 	void setXshFromData(QMimeData *data) const
 	{
 		const TKeyframeData *keyframeData = dynamic_cast<TKeyframeData *>(data);
@@ -151,7 +156,7 @@ public:
 	}
 	void undo() const
 	{
-		//Delete merged data
+		// Delete merged data
 		deleteKeyframesWithoutUndo(&m_selection->getSelection());
 		if (-(m_r1 - m_r0 + 1) != 0)
 			shiftKeyframesWithoutUndo(m_r0, m_r1, m_c0, m_c1, true);
@@ -163,19 +168,13 @@ public:
 	{
 		if (m_r1 - m_r0 + 1 != 0)
 			shiftKeyframesWithoutUndo(m_r0, m_r1, m_c0, m_c1, false);
-		//Delete merged data
+		// Delete merged data
 		setXshFromData(m_newData);
 		TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
 	}
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Paste Key Frames");
-	}
+	QString getHistoryString() { return QObject::tr("Paste Key Frames"); }
 };
 
 //=============================================================================
@@ -188,8 +187,9 @@ class DeleteKeyframesUndo : public TUndo
 	QMimeData *m_data;
 	int m_r0, m_r1, m_c0, m_c1;
 
-public:
-	DeleteKeyframesUndo(TKeyframeSelection *selection, QMimeData *data, int r0, int r1, int c0, int c1)
+  public:
+	DeleteKeyframesUndo(TKeyframeSelection *selection, QMimeData *data, int r0, int r1, int c0,
+						int c1)
 		: m_selection(selection), m_data(data), m_r0(r0), m_r1(r1), m_c0(c0), m_c1(c1)
 	{
 	}
@@ -218,15 +218,9 @@ public:
 		TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Delete Key Frames");
-	}
+	QString getHistoryString() { return QObject::tr("Delete Key Frames"); }
 };
 
 //-----------------------------------------------------------------------------
@@ -355,18 +349,19 @@ void TKeyframeSelection::pasteKeyframesWithShift(int r0, int r1, int c0, int c1)
 {
 	unselectLockedColumn();
 
-	//Retrieve keyframes to paste
+	// Retrieve keyframes to paste
 	QClipboard *clipboard = QApplication::clipboard();
 	const TKeyframeData *data = dynamic_cast<const TKeyframeData *>(clipboard->mimeData());
 	if (!data) {
-		const TCellKeyframeData *cellKeyframeData = dynamic_cast<const TCellKeyframeData *>(clipboard->mimeData());
+		const TCellKeyframeData *cellKeyframeData =
+			dynamic_cast<const TCellKeyframeData *>(clipboard->mimeData());
 		if (cellKeyframeData)
 			data = cellKeyframeData->getKeyframeData();
 	}
 	if (!data)
 		return;
 
-	//Retrieve corresponding old keyframes
+	// Retrieve corresponding old keyframes
 	std::set<TKeyframeSelection::Position> positions(m_positions);
 	data->getKeyframes(positions);
 
@@ -384,7 +379,8 @@ void TKeyframeSelection::pasteKeyframesWithShift(int r0, int r1, int c0, int c1)
 	TKeyframeData *newData = new TKeyframeData();
 	newData->setKeyframes(m_positions, xsh);
 	TKeyframeSelection *selection = new TKeyframeSelection(m_positions);
-	TUndoManager::manager()->add(new PasteKeyframesUndo(selection, newData, oldData, r0, r1, c0, c1));
+	TUndoManager::manager()->add(
+		new PasteKeyframesUndo(selection, newData, oldData, r0, r1, c0, c1));
 	TApp::instance()->getCurrentScene()->setDirtyFlag(true);
 	TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
 }

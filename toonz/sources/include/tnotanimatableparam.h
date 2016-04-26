@@ -31,19 +31,18 @@
 #pragma warning(disable : 4251)
 #endif
 
-template <class T>
-class TNotAnimatableParamChange : public TParamChange
+template <class T> class TNotAnimatableParamChange : public TParamChange
 {
 	T m_oldValue;
 	T m_newValue;
 
-public:
-	TNotAnimatableParamChange(TParam *param,
-							  const T &oldValue, const T &newValue,
-							  bool undoing)
-		: TParamChange(param, TParamChange::m_minFrame, TParamChange::m_maxFrame,
-					   false, false, undoing),
-		  m_oldValue(oldValue), m_newValue(newValue) {}
+  public:
+	TNotAnimatableParamChange(TParam *param, const T &oldValue, const T &newValue, bool undoing)
+		: TParamChange(param, TParamChange::m_minFrame, TParamChange::m_maxFrame, false, false,
+					   undoing),
+		  m_oldValue(oldValue), m_newValue(newValue)
+	{
+	}
 
 	TParamChange *clone() const { return new TNotAnimatableParamChange<T>(*this); }
 	TUndo *createUndo() const;
@@ -53,19 +52,16 @@ public:
 //  TNotAnimatableParamChangeUndo
 //-----------------------------------------------------------------------------
 
-template <class T>
-class TNotAnimatableParamChangeUndo : public TUndo
+template <class T> class TNotAnimatableParamChangeUndo : public TUndo
 {
-public:
-	TNotAnimatableParamChangeUndo(TParam *param,
-								  const T &oldValue,
-								  const T &newValue);
+  public:
+	TNotAnimatableParamChangeUndo(TParam *param, const T &oldValue, const T &newValue);
 	~TNotAnimatableParamChangeUndo();
 	void undo() const;
 	void redo() const;
 	int getSize() const;
 
-private:
+  private:
 	TParam *m_param;
 	T m_oldValue;
 	T m_newValue;
@@ -75,10 +71,9 @@ private:
 //  TNotAnimatableParamObserver
 //-----------------------------------------------------------------------------
 
-template <class T>
-class TNotAnimatableParamObserver : public TParamObserver
+template <class T> class TNotAnimatableParamObserver : public TParamObserver
 {
-public:
+  public:
 	TNotAnimatableParamObserver() {}
 	virtual void onChange(const TParamChange &) = 0;
 	void onChange(const TNotAnimatableParamChange<T> &change)
@@ -96,16 +91,15 @@ typedef TNotAnimatableParamObserver<TFilePath> TFilePathParamObserver;
 //-----------------------------------------------------------------------------
 using std::set;
 
-template <class T>
-class DVAPI TNotAnimatableParam : public TParam
+template <class T> class DVAPI TNotAnimatableParam : public TParam
 {
 	T m_defaultValue, m_value;
 
-protected:
+  protected:
 	set<TNotAnimatableParamObserver<T> *> m_observers;
 	set<TParamObserver *> m_paramObservers;
 
-public:
+  public:
 	TNotAnimatableParam(T def = T()) : TParam(), m_defaultValue(def), m_value(def){};
 	TNotAnimatableParam(const TNotAnimatableParam &src)
 		: TParam(src.getName()), m_defaultValue(src.getDefaultValue()), m_value(src.getValue()){};
@@ -120,13 +114,12 @@ public:
 
 		TNotAnimatableParamChange<T> change(this, m_value, v, undoing);
 		m_value = v;
-		for (typename std::set<TNotAnimatableParamObserver<T> *>::iterator obsIt = m_observers.begin();
-			 obsIt != m_observers.end();
-			 ++obsIt)
+		for (typename std::set<TNotAnimatableParamObserver<T> *>::iterator obsIt =
+				 m_observers.begin();
+			 obsIt != m_observers.end(); ++obsIt)
 			(*obsIt)->onChange(change);
 		for (std::set<TParamObserver *>::iterator parObsIt = m_paramObservers.begin();
-			 parObsIt != m_paramObservers.end();
-			 ++parObsIt)
+			 parObsIt != m_paramObservers.end(); ++parObsIt)
 			(*parObsIt)->onChange(change);
 	}
 
@@ -145,7 +138,8 @@ public:
 
 	void addObserver(TParamObserver *observer)
 	{
-		TNotAnimatableParamObserver<T> *obs = dynamic_cast<TNotAnimatableParamObserver<T> *>(observer);
+		TNotAnimatableParamObserver<T> *obs =
+			dynamic_cast<TNotAnimatableParamObserver<T> *>(observer);
 		if (obs)
 			m_observers.insert(obs);
 		else
@@ -153,7 +147,8 @@ public:
 	}
 	void removeObserver(TParamObserver *observer)
 	{
-		TNotAnimatableParamObserver<T> *obs = dynamic_cast<TNotAnimatableParamObserver<T> *>(observer);
+		TNotAnimatableParamObserver<T> *obs =
+			dynamic_cast<TNotAnimatableParamObserver<T> *>(observer);
 		if (obs)
 			m_observers.erase(obs);
 		else
@@ -164,15 +159,9 @@ public:
 	bool isKeyframe(double) const { return false; }
 	void deleteKeyframe(double) {}
 	void clearKeyframes() {}
-	void assignKeyframe(
-		double,
-		const TSmartPointerT<TParam> &, double,
-		bool) {}
+	void assignKeyframe(double, const TSmartPointerT<TParam> &, double, bool) {}
 
-	std::string getValueAlias(double, int)
-	{
-		return toString(getValue());
-	}
+	std::string getValueAlias(double, int) { return toString(getValue()); }
 	bool hasKeyframes() const { return 0; };
 	void getKeyframes(std::set<double> &) const {};
 	int getNextKeyframe(double) const { return -1; };
@@ -197,10 +186,12 @@ class DVAPI TIntParam : public TNotAnimatableParam<int>
 	int minValue, maxValue;
 	bool m_isWheelEnabled;
 
-public:
-	TIntParam(int v = int()) : TNotAnimatableParam<int>(v),
-							   minValue(-(std::numeric_limits<int>::max)()),
-							   maxValue((std::numeric_limits<int>::max)()), m_isWheelEnabled(false) {}
+  public:
+	TIntParam(int v = int())
+		: TNotAnimatableParam<int>(v), minValue(-(std::numeric_limits<int>::max)()),
+		  maxValue((std::numeric_limits<int>::max)()), m_isWheelEnabled(false)
+	{
+	}
 	TIntParam(const TIntParam &src) : TNotAnimatableParam<int>(src) {}
 	TParam *clone() const { return new TIntParam(*this); }
 	void loadData(TIStream &is);
@@ -230,7 +221,7 @@ class DVAPI TBoolParam : public TNotAnimatableParam<bool>
 {
 	PERSIST_DECLARATION(TBoolParam);
 
-public:
+  public:
 	TBoolParam(bool v = bool()) : TNotAnimatableParam<bool>(v) {}
 	TBoolParam(const TBoolParam &src) : TNotAnimatableParam<bool>(src) {}
 
@@ -258,7 +249,7 @@ class DVAPI TFilePathParam : public TNotAnimatableParam<TFilePath>
 {
 	PERSIST_DECLARATION(TFilePathParam);
 
-public:
+  public:
 	TFilePathParam(const TFilePath &v = TFilePath()) : TNotAnimatableParam<TFilePath>(v) {}
 	TFilePathParam(const TFilePathParam &src) : TNotAnimatableParam<TFilePath>(src) {}
 	TParam *clone() const { return new TFilePathParam(*this); }
@@ -284,7 +275,7 @@ class DVAPI TStringParam : public TNotAnimatableParam<std::wstring>
 {
 	PERSIST_DECLARATION(TStringParam);
 
-public:
+  public:
 	TStringParam(std::wstring v = L"") : TNotAnimatableParam<std::wstring>(v) {}
 	TStringParam(const TStringParam &src) : TNotAnimatableParam<std::wstring>(src) {}
 	TParam *clone() const { return new TStringParam(*this); }
@@ -307,7 +298,7 @@ class DVAPI TEnumParam : public TNotAnimatableParam<int>
 
 	PERSIST_DECLARATION(TEnumParam)
 
-public:
+  public:
 	TEnumParam(const int &v, const std::string &caption);
 
 	TEnumParam();
@@ -330,7 +321,7 @@ public:
 	void loadData(TIStream &is);
 	void saveData(TOStream &os);
 
-private:
+  private:
 	std::unique_ptr<TEnumParamImp> m_imp;
 };
 
@@ -342,9 +333,12 @@ DVAPI_PARAM_SMARTPOINTER(TIntEnumParam)
 
 class DVAPI TIntEnumParamP : public TDerivedSmartPointerT<TIntEnumParam, TParam>
 {
-public:
+  public:
 	TIntEnumParamP(TIntEnumParam *p = 0) : DerivedSmartPointer(p) {}
-	TIntEnumParamP(int v, const std::string &caption) : DerivedSmartPointer(new TEnumParam(v, caption)) {}
+	TIntEnumParamP(int v, const std::string &caption)
+		: DerivedSmartPointer(new TEnumParam(v, caption))
+	{
+	}
 	TIntEnumParamP(TParamP &p) : DerivedSmartPointer(p) {}
 	TIntEnumParamP(const TParamP &p) : DerivedSmartPointer(p) {}
 	operator TParamP() const { return TParamP(m_pointer); }
@@ -368,7 +362,7 @@ class DVAPI TNADoubleParam : public TNotAnimatableParam<double>
 {
 	PERSIST_DECLARATION(TNADoubleParam);
 
-public:
+  public:
 	TNADoubleParam(double v = double()) : TNotAnimatableParam<double>(v), m_min(0.), m_max(100.) {}
 	TNADoubleParam(const TNADoubleParam &src) : TNotAnimatableParam<double>(src) {}
 	TParam *clone() const { return new TNADoubleParam(*this); }
@@ -393,7 +387,7 @@ public:
 	void loadData(TIStream &is);
 	void saveData(TOStream &os);
 
-private:
+  private:
 	double m_min, m_max;
 };
 
@@ -404,8 +398,7 @@ DEFINE_PARAM_SMARTPOINTER(TNADoubleParam, double)
 //-----------------------------------------------------------------------------
 
 template <class T>
-TNotAnimatableParamChangeUndo<T>::TNotAnimatableParamChangeUndo(TParam *param,
-																const T &oldValue,
+TNotAnimatableParamChangeUndo<T>::TNotAnimatableParamChangeUndo(TParam *param, const T &oldValue,
 																const T &newValue)
 	: m_param(param), m_oldValue(oldValue), m_newValue(newValue)
 {
@@ -414,16 +407,14 @@ TNotAnimatableParamChangeUndo<T>::TNotAnimatableParamChangeUndo(TParam *param,
 
 //-----------------------------------------------------------------------------
 
-template <class T>
-TNotAnimatableParamChangeUndo<T>::~TNotAnimatableParamChangeUndo()
+template <class T> TNotAnimatableParamChangeUndo<T>::~TNotAnimatableParamChangeUndo()
 {
 	m_param->release();
 }
 
 //-----------------------------------------------------------------------------
 
-template <class T>
-void TNotAnimatableParamChangeUndo<T>::undo() const
+template <class T> void TNotAnimatableParamChangeUndo<T>::undo() const
 {
 	TNotAnimatableParam<T> *p = dynamic_cast<TNotAnimatableParam<T> *>(m_param);
 	p->setValue(m_oldValue, true);
@@ -431,16 +422,14 @@ void TNotAnimatableParamChangeUndo<T>::undo() const
 
 //-----------------------------------------------------------------------------
 
-template <class T>
-void TNotAnimatableParamChangeUndo<T>::redo() const
+template <class T> void TNotAnimatableParamChangeUndo<T>::redo() const
 {
 	TNotAnimatableParam<T> *p = dynamic_cast<TNotAnimatableParam<T> *>(m_param);
 	p->setValue(m_newValue, true);
 }
 //-----------------------------------------------------------------------------
 
-template <class T>
-int TNotAnimatableParamChangeUndo<T>::getSize() const
+template <class T> int TNotAnimatableParamChangeUndo<T>::getSize() const
 {
 	return sizeof(*this);
 }
@@ -449,8 +438,7 @@ int TNotAnimatableParamChangeUndo<T>::getSize() const
 //  TNotAnimatableParamChange
 //-----------------------------------------------------------------------------
 
-template <class T>
-TUndo *TNotAnimatableParamChange<T>::createUndo() const
+template <class T> TUndo *TNotAnimatableParamChange<T>::createUndo() const
 {
 	return new TNotAnimatableParamChangeUndo<T>(m_param, m_oldValue, m_newValue);
 }

@@ -2,7 +2,7 @@
 
 #include "assert.h"
 
-//Qt includes
+// Qt includes
 #include <QDataStream>
 #include <QDebug>
 
@@ -34,7 +34,7 @@
 
 void tipc::SocketController::onReadyRead()
 {
-	//Deliver the message to the server for interpretation.
+	// Deliver the message to the server for interpretation.
 	m_server->dispatchSocket(m_socket);
 }
 
@@ -44,7 +44,7 @@ void tipc::SocketController::onDisconnected()
 {
 	m_socket->QObject::disconnect(SIGNAL(readyRead()));
 
-	//Auto-delete this
+	// Auto-delete this
 	delete this;
 }
 
@@ -52,12 +52,11 @@ void tipc::SocketController::onDisconnected()
 //    Server implementation
 //*******************************************************************************
 
-tipc::Server::Server()
-	: m_lock(false)
+tipc::Server::Server() : m_lock(false)
 {
 	connect(this, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
 
-	//Add default parsers
+	// Add default parsers
 	addParser(new DefaultMessageParser<SHMEM_REQUEST>);
 	addParser(new DefaultMessageParser<SHMEM_RELEASE>);
 	addParser(new DefaultMessageParser<TMPFILE_REQUEST>);
@@ -69,7 +68,7 @@ tipc::Server::Server()
 
 tipc::Server::~Server()
 {
-	//Release parsers
+	// Release parsers
 	QHash<QString, MessageParser *>::iterator it;
 	for (it = m_parsers.begin(); it != m_parsers.end(); ++it)
 		delete it.value();
@@ -97,20 +96,20 @@ void tipc::Server::onNewConnection()
 {
 	tipc_debug(qDebug("new connection"));
 
-	//Accept the connection
+	// Accept the connection
 	QLocalSocket *socket = nextPendingConnection();
 
-	//Allocate a controller for the socket
+	// Allocate a controller for the socket
 	SocketController *controller = new SocketController;
 	controller->m_server = this;
 	controller->m_socket = socket;
 
-	//Connect the controller to the socket's signals
+	// Connect the controller to the socket's signals
 	connect(socket, SIGNAL(readyRead()), controller, SLOT(onReadyRead()));
 	connect(socket, SIGNAL(disconnected()), controller, SLOT(onDisconnected()));
 	connect(socket, SIGNAL(disconnected()), socket, SLOT(deleteLater()));
-	connect(socket, SIGNAL(error(QLocalSocket::LocalSocketError)),
-			this, SLOT(onError(QLocalSocket::LocalSocketError)));
+	connect(socket, SIGNAL(error(QLocalSocket::LocalSocketError)), this,
+			SLOT(onError(QLocalSocket::LocalSocketError)));
 }
 
 //-----------------------------------------------------------------------
@@ -124,9 +123,9 @@ void tipc::Server::onError(QLocalSocket::LocalSocketError error)
 
 void tipc::Server::dispatchSocket(QLocalSocket *socket)
 {
-	//The lock is established when a message is currently being processed.
-	//Returning if the lock is set avoids having recursive message processing;
-	//which is possible if a parser expects further message packets.
+	// The lock is established when a message is currently being processed.
+	// Returning if the lock is set avoids having recursive message processing;
+	// which is possible if a parser expects further message packets.
 	if (m_lock)
 		return;
 
@@ -160,7 +159,7 @@ void tipc::Server::dispatchSocket(QLocalSocket *socket)
 
 		m_lock = false;
 
-		//The Message has been read and processed. Send the reply.
+		// The Message has been read and processed. Send the reply.
 		if (msg.ba().size() > 0)
 			stream << msg;
 	}

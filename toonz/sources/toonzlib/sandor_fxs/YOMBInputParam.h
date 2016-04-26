@@ -14,7 +14,7 @@
 #include "SDef.h"
 #include "InputParam.h"
 
-#define MAXNBCIL 4096 //512
+#define MAXNBCIL 4096 // 512
 
 typedef struct color_index_list {
 	int nb;
@@ -23,7 +23,7 @@ typedef struct color_index_list {
 
 class CYOMBInputParam : public CInputParam
 {
-public:
+  public:
 	bool m_isRandomSampling;
 	bool m_isShowSelection;
 	bool m_isStopAtContour;
@@ -37,22 +37,19 @@ public:
 	COLOR_INDEX_LIST m_ink, m_paint;
 	bool m_isCM;
 
-	CYOMBInputParam() : m_isRandomSampling(false),
-						m_isShowSelection(false), m_isStopAtContour(false),
-						m_dSample(0.0), m_nbSample(0),
-						m_dA(0.0), m_dAB(0.0), m_nbColor(0), m_isCM(false)
+	CYOMBInputParam()
+		: m_isRandomSampling(false), m_isShowSelection(false), m_isStopAtContour(false),
+		  m_dSample(0.0), m_nbSample(0), m_dA(0.0), m_dAB(0.0), m_nbColor(0), m_isCM(false)
 	{
 		for (int i = 0; i < 5; i++)
 			m_color[i][0] = m_color[i][1] = m_color[i][2] = m_color[i][3] = 0;
 		m_ink.nb = m_paint.nb = 0;
 	};
-	CYOMBInputParam(const CYOMBInputParam &p) : CInputParam(p),
-												m_isRandomSampling(p.m_isRandomSampling),
-												m_isShowSelection(p.m_isShowSelection),
-												m_isStopAtContour(p.m_isStopAtContour),
-												m_dSample(p.m_dSample), m_nbSample(p.m_nbSample),
-												m_dA(p.m_dA), m_dAB(p.m_dAB), m_nbColor(p.m_nbColor),
-												m_isCM(p.m_isCM)
+	CYOMBInputParam(const CYOMBInputParam &p)
+		: CInputParam(p), m_isRandomSampling(p.m_isRandomSampling),
+		  m_isShowSelection(p.m_isShowSelection), m_isStopAtContour(p.m_isStopAtContour),
+		  m_dSample(p.m_dSample), m_nbSample(p.m_nbSample), m_dA(p.m_dA), m_dAB(p.m_dAB),
+		  m_nbColor(p.m_nbColor), m_isCM(p.m_isCM)
 	{
 		if (m_isCM) {
 			m_ink.nb = p.m_ink.nb;
@@ -69,18 +66,15 @@ public:
 	};
 
 	CYOMBInputParam(const int argc, const char *argv[], const int shrink);
-	CYOMBInputParam(const int argc, const char *argv[], const int shrink,
-					const bool isCM16);
+	CYOMBInputParam(const int argc, const char *argv[], const int shrink, const bool isCM16);
 
 	virtual ~CYOMBInputParam(){};
 
-	void makeColorIndexList(const char *s, COLOR_INDEX_LIST &cil,
-							const int maxIndex);
+	void makeColorIndexList(const char *s, COLOR_INDEX_LIST &cil, const int maxIndex);
 	bool isRange(const char *s) const;
 	int getRangeBegin(const char *s) const;
 	int getRangeEnd(const char *s) const;
-	void strToColorIndex(const char *s, COLOR_INDEX_LIST &cil,
-						 const int maxIndex);
+	void strToColorIndex(const char *s, COLOR_INDEX_LIST &cil, const int maxIndex);
 	void print(COLOR_INDEX_LIST &cil);
 
 	//	void makeBlendString(const char *ss);

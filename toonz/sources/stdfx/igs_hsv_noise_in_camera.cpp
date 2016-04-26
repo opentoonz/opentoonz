@@ -14,12 +14,14 @@ namespace hsv_noise_in_camera
 /* バッファをまとめて確保(return or throwで自動解放) */
 class noise_reference
 {
-public:
-	noise_reference(
-		const int ww, const int hh, const double hue_range, const double sat_range, const double val_range, const double alp_range, const unsigned long random_seed, const double near_blur
+  public:
+	noise_reference(const int ww, const int hh, const double hue_range, const double sat_range,
+					const double val_range, const double alp_range, const unsigned long random_seed,
+					const double near_blur
 
-		,
-		const int camera_x, const int camera_y, const int camera_w, const int camera_h) : w_(ww), h_(hh), nblur_(near_blur)
+					,
+					const int camera_x, const int camera_y, const int camera_w, const int camera_h)
+		: w_(ww), h_(hh), nblur_(near_blur)
 	{
 		if (0 == ww) {
 			return;
@@ -86,7 +88,7 @@ public:
 
 		/* マージンあるかないかでノイズパターンが変わってしまうため、
 	near_blur用に広げてはいけない */
-		//if (0.0 != near_blur) { x1-=1; x2+=1; y1-=1; y2+=1; }
+		// if (0.0 != near_blur) { x1-=1; x2+=1; y1-=1; y2+=1; }
 
 		if (0.0 != hue_range) {
 			int pos = 0;
@@ -139,23 +141,19 @@ public:
 	}
 	double hue_value(const int xx, const int yy)
 	{
-		return this->noise_value_(
-			this->hue_array_, this->w_, this->h_, xx, yy, this->nblur_);
+		return this->noise_value_(this->hue_array_, this->w_, this->h_, xx, yy, this->nblur_);
 	}
 	double sat_value(const int xx, const int yy)
 	{
-		return this->noise_value_(
-			this->sat_array_, this->w_, this->h_, xx, yy, this->nblur_);
+		return this->noise_value_(this->sat_array_, this->w_, this->h_, xx, yy, this->nblur_);
 	}
 	double val_value(const int xx, const int yy)
 	{
-		return this->noise_value_(
-			this->val_array_, this->w_, this->h_, xx, yy, this->nblur_);
+		return this->noise_value_(this->val_array_, this->w_, this->h_, xx, yy, this->nblur_);
 	}
 	double alp_value(const int xx, const int yy)
 	{
-		return this->noise_value_(
-			this->alp_array_, this->w_, this->h_, xx, yy, this->nblur_);
+		return this->noise_value_(this->alp_array_, this->w_, this->h_, xx, yy, this->nblur_);
 	}
 	void clear()
 	{
@@ -164,12 +162,9 @@ public:
 		this->sat_array_.clear();
 		this->hue_array_.clear();
 	}
-	~noise_reference()
-	{
-		this->clear();
-	}
+	~noise_reference() { this->clear(); }
 
-private:
+  private:
 	const int w_;
 	const int h_;
 	const double nblur_;
@@ -177,16 +172,16 @@ private:
 	std::vector<double> sat_array_;
 	std::vector<double> val_array_;
 	std::vector<double> alp_array_;
-	void accum_in_(
-		const double *noise_array, const int ww, const int hh, const int xx, const int yy, double &accum_val, int &accum_count)
+	void accum_in_(const double *noise_array, const int ww, const int hh, const int xx,
+				   const int yy, double &accum_val, int &accum_count)
 	{
 		if ((0 <= xx) && (xx < ww) && (0 <= yy) && (yy < hh)) {
 			accum_val += noise_array[yy * ww + xx];
 			++accum_count;
 		}
 	}
-	double noise_value_(
-		const std::vector<double> &noise_vector, const int ww, const int hh, const int xx, const int yy, const double near_blur)
+	double noise_value_(const std::vector<double> &noise_vector, const int ww, const int hh,
+						const int xx, const int yy, const double near_blur)
 	{
 		if (noise_vector.size() <= 0) {
 			return 0.0;
@@ -212,8 +207,7 @@ private:
 		accum_val /= static_cast<double>(accum_count);
 
 		/* 中心Pixelと廻り(1Pixel幅)の平均値とのバランスを返す */
-		return (near_blur * accum_val) +
-			   ((1.0 - near_blur) * noise_array[yy * ww + xx]);
+		return (near_blur * accum_val) + ((1.0 - near_blur) * noise_array[yy * ww + xx]);
 	}
 
 	/* copy constructorを無効化 */
@@ -231,24 +225,21 @@ namespace hsv_noise_in_camera
 /* 端値を適度に調整する */
 class control_term_within_limits
 {
-public:
-	control_term_within_limits(
-		const double effective_low = 0.0, const double effective_high = 0.0, const double center = 0.5, const int type = 0, const double noise_range = 0.0) : effective_low_(effective_low),
-																																							  effective_high_(effective_high),
-																																							  center_(center),
-																																							  type_(static_cast<term_type_>(type)),
-																																							  noise_range_(noise_range)
+  public:
+	control_term_within_limits(const double effective_low = 0.0, const double effective_high = 0.0,
+							   const double center = 0.5, const int type = 0,
+							   const double noise_range = 0.0)
+		: effective_low_(effective_low), effective_high_(effective_high), center_(center),
+		  type_(static_cast<term_type_>(type)), noise_range_(noise_range)
 	{
 	}
-	void exec(
-		const double current_value /* 0...1 */
-		,
-		double &noise /* -noise_range/2...noise_range/2 */
-		,
-		double &shift_value)
+	void exec(const double current_value /* 0...1 */
+			  ,
+			  double &noise /* -noise_range/2...noise_range/2 */
+			  ,
+			  double &shift_value)
 	{
-		if ((0.0 < this->effective_low_) &&
-			(current_value < this->center_)) {
+		if ((0.0 < this->effective_low_) && (current_value < this->center_)) {
 			const double cen = this->center_;
 			const double val = current_value;
 			const double ran = this->noise_range_;
@@ -280,8 +271,7 @@ public:
 			}
 		}
 
-		if ((0.0 < this->effective_high_) &&
-			(this->center_ < current_value)) {
+		if ((0.0 < this->effective_high_) && (this->center_ < current_value)) {
 			const double cen = this->center_;
 			const double val = current_value;
 			const double ran = this->noise_range_;
@@ -316,7 +306,7 @@ public:
 		}
 	}
 	double noise_range(void) const { return this->noise_range_; }
-private:
+  private:
 	/* low,high両方ゼロ =exec()内処理せず =端値はカット =default */
 	const double effective_low_;
 	const double effective_high_;
@@ -346,15 +336,22 @@ namespace igs
 namespace hsv_noise_in_camera
 {
 /* RGB値にノイズをのせる */
-void pixel_rgb(
-	const double red_in, const double gre_in, const double blu_in, const double alp_in, const double hue_noise, const double sat_noise, const double val_noise, control_term_within_limits &sat_term, control_term_within_limits &val_term, double &red_out, double &gre_out, double &blu_out);
+void pixel_rgb(const double red_in, const double gre_in, const double blu_in, const double alp_in,
+			   const double hue_noise, const double sat_noise, const double val_noise,
+			   control_term_within_limits &sat_term, control_term_within_limits &val_term,
+			   double &red_out, double &gre_out, double &blu_out);
 /* Alpha値にノイズをのせる */
-void pixel_a(
-	const double alp_in, const double alp_noise, control_term_within_limits &alp_term, double &alp_out);
+void pixel_a(const double alp_in, const double alp_noise, control_term_within_limits &alp_term,
+			 double &alp_out);
 }
 }
-void igs::hsv_noise_in_camera::pixel_rgb(
-	const double red_in, const double gre_in, const double blu_in, const double alp_in, const double hue_noise, const double sat_noise, const double val_noise, control_term_within_limits &sat_term, control_term_within_limits &val_term, double &red_out, double &gre_out, double &blu_out)
+void igs::hsv_noise_in_camera::pixel_rgb(const double red_in, const double gre_in,
+										 const double blu_in, const double alp_in,
+										 const double hue_noise, const double sat_noise,
+										 const double val_noise,
+										 control_term_within_limits &sat_term,
+										 control_term_within_limits &val_term, double &red_out,
+										 double &gre_out, double &blu_out)
 {
 	if (0.0 == alp_in) {
 		red_out = red_in;
@@ -400,8 +397,8 @@ void igs::hsv_noise_in_camera::pixel_rgb(
 	}
 	igs::color::hsv_to_rgb(hue, sat, val, red_out, gre_out, blu_out);
 }
-void igs::hsv_noise_in_camera::pixel_a(
-	const double alp_in, const double alp_noise, control_term_within_limits &alp_term, double &alp_out)
+void igs::hsv_noise_in_camera::pixel_a(const double alp_in, const double alp_noise,
+									   control_term_within_limits &alp_term, double &alp_out)
 {
 	// if (0.0 == alp_in) { return; }
 	double alpin = alp_in;
@@ -426,31 +423,35 @@ namespace hsv_noise_in_camera
 {
 /* raster画像にノイズをのせるtemplate */
 template <class T>
-void change_template_(
-	T *image_array, const int ww, const int hh, const int ch, noise_reference &noise, const double hue_range, control_term_within_limits &sat_term, control_term_within_limits &val_term, control_term_within_limits &alp_term)
+void change_template_(T *image_array, const int ww, const int hh, const int ch,
+					  noise_reference &noise, const double hue_range,
+					  control_term_within_limits &sat_term, control_term_within_limits &val_term,
+					  control_term_within_limits &alp_term)
 {
-	const double div_val =
-		static_cast<double>(std::numeric_limits<T>::max());
-	const double mul_val =
-		static_cast<double>(std::numeric_limits<T>::max()) + 0.999999;
+	const double div_val = static_cast<double>(std::numeric_limits<T>::max());
+	const double mul_val = static_cast<double>(std::numeric_limits<T>::max()) + 0.999999;
 	double rr, gg, bb, aa;
 
 	if (igs::image::rgba::siz == ch) {
 		using namespace igs::image::rgba;
 		for (int yy = 0; yy < hh; ++yy) {
 			for (int xx = 0; xx < ww; ++xx) {
-				if (
-					((0.0 != hue_range) || (0.0 != val_term.noise_range()) || (0.0 != sat_term.noise_range())) /* ノイズがhsvのどれか一つはある */
+				if (((0.0 != hue_range) || (0.0 != val_term.noise_range()) ||
+					 (0.0 != sat_term.noise_range())) /* ノイズがhsvのどれか一つはある */
 					) {
-					pixel_rgb(
-						static_cast<double>(image_array[red]) / div_val, static_cast<double>(image_array[gre]) / div_val, static_cast<double>(image_array[blu]) / div_val, static_cast<double>(image_array[alp]) / div_val, noise.hue_value(xx, yy), noise.sat_value(xx, yy), noise.val_value(xx, yy), sat_term, val_term, rr, gg, bb);
+					pixel_rgb(static_cast<double>(image_array[red]) / div_val,
+							  static_cast<double>(image_array[gre]) / div_val,
+							  static_cast<double>(image_array[blu]) / div_val,
+							  static_cast<double>(image_array[alp]) / div_val,
+							  noise.hue_value(xx, yy), noise.sat_value(xx, yy),
+							  noise.val_value(xx, yy), sat_term, val_term, rr, gg, bb);
 					image_array[red] = static_cast<T>(rr * mul_val);
 					image_array[gre] = static_cast<T>(gg * mul_val);
 					image_array[blu] = static_cast<T>(bb * mul_val);
 				}
 				if (0.0 != alp_term.noise_range()) {
-					pixel_a(
-						static_cast<double>(image_array[alp]) / div_val, noise.alp_value(xx, yy), alp_term, aa);
+					pixel_a(static_cast<double>(image_array[alp]) / div_val,
+							noise.alp_value(xx, yy), alp_term, aa);
 					image_array[alp] = static_cast<T>(aa * mul_val);
 				}
 				image_array += ch;
@@ -458,13 +459,16 @@ void change_template_(
 		}
 	} else if (igs::image::rgb::siz == ch) {
 		using namespace igs::image::rgb;
-		if (
-			((0.0 != hue_range) || (0.0 != sat_term.noise_range()) || (0.0 != val_term.noise_range())) /* ノイズがhsvのどれか一つはある */
+		if (((0.0 != hue_range) || (0.0 != sat_term.noise_range()) ||
+			 (0.0 != val_term.noise_range())) /* ノイズがhsvのどれか一つはある */
 			) {
 			for (int yy = 0; yy < hh; ++yy) {
 				for (int xx = 0; xx < ww; ++xx, image_array += ch) {
-					pixel_rgb(
-						static_cast<double>(image_array[red]) / div_val, static_cast<double>(image_array[gre]) / div_val, static_cast<double>(image_array[blu]) / div_val, 1.0, noise.hue_value(xx, yy), noise.sat_value(xx, yy), noise.val_value(xx, yy), sat_term, val_term, rr, gg, bb);
+					pixel_rgb(static_cast<double>(image_array[red]) / div_val,
+							  static_cast<double>(image_array[gre]) / div_val,
+							  static_cast<double>(image_array[blu]) / div_val, 1.0,
+							  noise.hue_value(xx, yy), noise.sat_value(xx, yy),
+							  noise.val_value(xx, yy), sat_term, val_term, rr, gg, bb);
 					image_array[red] = static_cast<T>(rr * mul_val);
 					image_array[gre] = static_cast<T>(gg * mul_val);
 					image_array[blu] = static_cast<T>(bb * mul_val);
@@ -505,40 +509,44 @@ void igs::hsv_noise_in_camera::change(
 	const int camera_x, const int camera_y, const int camera_w, const int camera_h
 
 	,
-	const double hue_range, const double sat_range, const double val_range, const double alp_range, const unsigned long random_seed, const double near_blur
+	const double hue_range, const double sat_range, const double val_range, const double alp_range,
+	const unsigned long random_seed, const double near_blur
 
 	,
-	const double sat_effective, const double sat_center, const int sat_type, const double val_effective, const double val_center, const int val_type, const double alp_effective, const double alp_center, const int alp_type)
+	const double sat_effective, const double sat_center, const int sat_type,
+	const double val_effective, const double val_center, const int val_type,
+	const double alp_effective, const double alp_center, const int alp_type)
 {
 	if ((0.0 == hue_range) && (0.0 == sat_range) && (0.0 == val_range) && (0.0 == alp_range)) {
 		return;
 	}
 
-	if ((igs::image::rgba::siz != channels) && (igs::image::rgb::siz != channels) && (1 != channels) /* grayscale */
+	if ((igs::image::rgba::siz != channels) && (igs::image::rgb::siz != channels) &&
+		(1 != channels) /* grayscale */
 		) {
 		throw std::domain_error("Bad channels,Not rgba/rgb/grayscale");
 	}
 
 	/* ノイズ参照画像を作成する */
-	noise_reference noise(
-		width, height, hue_range, sat_range, val_range, alp_range, random_seed, near_blur, camera_x, camera_y, camera_w, camera_h);
+	noise_reference noise(width, height, hue_range, sat_range, val_range, alp_range, random_seed,
+						  near_blur, camera_x, camera_y, camera_w, camera_h);
 
 	/* 端値を適度に調整する設定 */
-	control_term_within_limits sat_term(
-		sat_effective, sat_effective, sat_center, sat_type, sat_range);
-	control_term_within_limits val_term(
-		val_effective, val_effective, val_center, val_type, val_range);
-	control_term_within_limits alp_term(
-		alp_effective, alp_effective, alp_center, alp_type, alp_range);
+	control_term_within_limits sat_term(sat_effective, sat_effective, sat_center, sat_type,
+										sat_range);
+	control_term_within_limits val_term(val_effective, val_effective, val_center, val_type,
+										val_range);
+	control_term_within_limits alp_term(alp_effective, alp_effective, alp_center, alp_type,
+										alp_range);
 
 	/* rgb(a)画像にhsv(a)でドットノイズを加える */
 	if (std::numeric_limits<unsigned char>::digits == bits) {
-		change_template_(
-			static_cast<unsigned char *>(image_array), width, height, channels, noise, hue_range, sat_term, val_term, alp_term);
+		change_template_(static_cast<unsigned char *>(image_array), width, height, channels, noise,
+						 hue_range, sat_term, val_term, alp_term);
 		noise.clear(); /* ノイズ画像メモリ解放 */
 	} else if (std::numeric_limits<unsigned short>::digits == bits) {
-		change_template_(
-			static_cast<unsigned short *>(image_array), width, height, channels, noise, hue_range, sat_term, val_term, alp_term);
+		change_template_(static_cast<unsigned short *>(image_array), width, height, channels, noise,
+						 hue_range, sat_term, val_term, alp_term);
 		noise.clear(); /* ノイズ画像メモリ解放 */
 	} else {
 		throw std::domain_error("Bad bits,Not uchar/ushort");

@@ -22,7 +22,7 @@ void TParamVar::setParamObserver(TParamObserver *obs)
 
 class TParamContainer::Imp
 {
-public:
+  public:
 	std::map<std::string, TParamVar *> m_nameTable;
 	std::vector<TParamVar *> m_vars;
 	TParamObserver *m_paramObserver;
@@ -30,8 +30,7 @@ public:
 	~Imp() { clearPointerContainer(m_vars); }
 };
 
-TParamContainer::TParamContainer()
-	: m_imp(new Imp())
+TParamContainer::TParamContainer() : m_imp(new Imp())
 {
 }
 
@@ -99,17 +98,17 @@ TParam *TParamContainer::getParam(std::string name) const
 void TParamContainer::unlink()
 {
 	for (int i = 0; i < getParamCount(); i++) {
-		//TRangeParam *p0;//,*p1;
+		// TRangeParam *p0;//,*p1;
 		TParamVar *var = m_imp->m_vars[i];
 		TParam *param = var->getParam();
-		//p0 = dynamic_cast<TRangeParam *>(param);
+		// p0 = dynamic_cast<TRangeParam *>(param);
 		var->setParam(param->clone());
 		/*p1 = dynamic_cast<TRangeParam *>(var->getParam());
-     if(p0 && p1)
-     {
-       string name = p0->getName();
-       name = p1->getName();
-     }*/
+	 if(p0 && p1)
+	 {
+	   string name = p0->getName();
+	   name = p1->getName();
+	 }*/
 	}
 }
 

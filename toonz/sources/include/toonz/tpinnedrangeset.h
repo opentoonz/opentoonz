@@ -17,13 +17,10 @@
 
 class DVAPI TPinnedRangeSet
 {
-public:
+  public:
 	struct Range {
 		int first, second;
-		Range(int _first, int _second)
-			: first(_first), second(_second)
-		{
-		}
+		Range(int _first, int _second) : first(_first), second(_second) {}
 	};
 
 	TPinnedRangeSet();
@@ -37,10 +34,7 @@ public:
 	void removeRange(int first, int second);
 	void removeAllRanges();
 
-	int isPinned(int frame) const
-	{
-		return getRangeIndex(frame) >= 0;
-	}
+	int isPinned(int frame) const { return getRangeIndex(frame) >= 0; }
 
 	const Range *getRange(int frame) const
 	{
@@ -64,7 +58,7 @@ public:
 	void loadData(TIStream &is);
 	void saveData(TOStream &os);
 
-private:
+  private:
 	TStageObject *m_stageObject;
 	std::vector<Range> m_ranges;
 	TAffine m_placement;

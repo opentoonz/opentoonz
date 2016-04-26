@@ -23,15 +23,14 @@ namespace tlin
   stores \b columns in consecutive data blocks.
 */
 
-template <typename T>
-class matrix
+template <typename T> class matrix
 {
 	int m_rows;
 	int m_cols;
 
 	T *m_entries;
 
-public:
+  public:
 	matrix() : m_rows(0), m_cols(0), m_entries(0) {}
 	matrix(int rows, int cols) : m_rows(rows), m_cols(cols), m_entries(new T[rows * cols])
 	{
@@ -74,10 +73,7 @@ public:
 	T *values() { return m_entries; }
 	const T *values() const { return m_entries; }
 
-	void fill(const T &val)
-	{
-		memset(m_entries, val, m_rows * m_cols * sizeof(T));
-	}
+	void fill(const T &val) { memset(m_entries, val, m_rows * m_cols * sizeof(T)); }
 };
 
 //-------------------------------------------------------------------------
@@ -86,6 +82,6 @@ public:
 
 typedef tlin::matrix<double> mat;
 
-} //namespace tlin
+} // namespace tlin
 
-#endif //TLIN_MATRIX_H
+#endif // TLIN_MATRIX_H

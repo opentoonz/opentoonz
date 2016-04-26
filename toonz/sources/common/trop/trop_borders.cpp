@@ -30,14 +30,12 @@ namespace
 //    Container Reader for Borders Reader
 //****************************************************************
 
-template <typename PixelSelector>
-class WrapperReader
+template <typename PixelSelector> class WrapperReader
 {
 	TRop::borders::BordersReader &m_reader;
 
-public:
-	WrapperReader(TRop::borders::BordersReader &reader)
-		: m_reader(reader) {}
+  public:
+	WrapperReader(TRop::borders::BordersReader &reader) : m_reader(reader) {}
 
 	void openContainer(const RasterEdgeIterator<PixelSelector> &it)
 	{
@@ -50,7 +48,7 @@ public:
 	void closeContainer() { m_reader.closeContainer(); }
 };
 
-} //namespace
+} // namespace
 
 //****************************************************************
 //    Borders Extractor instantiations
@@ -106,8 +104,8 @@ void readBorders_simple(const TRasterGR16P &raster, BordersReader &reader,
 
 //--------------------------------------------------------------------------------
 
-void readBorders_simple(const TRasterCM32P &raster, BordersReader &reader,
-						bool onlyCorners, int toneThreshold)
+void readBorders_simple(const TRasterCM32P &raster, BordersReader &reader, bool onlyCorners,
+						int toneThreshold)
 {
 	typedef PixelSelector<TPixelCM32> pixel_selector;
 
@@ -154,7 +152,7 @@ void readBorders_simple(const TRasterP &raster, BordersReader &reader, bool only
 	}
 }
 }
-} //namespace TRop::borders
+} // namespace TRop::borders
 
 //****************************************************************
 //    Meshes Extraction (MeshesReader::Imp)
@@ -167,7 +165,7 @@ namespace borders
 
 class TRop::borders::ImageMeshesReader::Imp
 {
-public:
+  public:
 	Face m_outerFace;
 	tcg::list<ImageMeshP> m_meshes;
 
@@ -175,7 +173,7 @@ public:
 
 	int m_facesCount, m_edgesCount;
 
-public:
+  public:
 	Imp() : m_facesCount(), m_edgesCount() {}
 
 	void clear()
@@ -192,8 +190,7 @@ public:
 //    Meshes Extraction (MeshesReader)
 //****************************************************************
 
-ImageMeshesReader::ImageMeshesReader()
-	: m_imp(new Imp)
+ImageMeshesReader::ImageMeshesReader() : m_imp(new Imp)
 {
 }
 
@@ -287,12 +284,16 @@ struct container_reader_traits<ImageMeshesReaderT<Pixel>, ImageMesh::face_type> 
 	typedef ImageMeshesReaderT<Pixel> meshes_reader_type;
 	typedef typename meshes_reader_type::value_type value_type;
 
-public:
-	inline static void openContainer(meshes_reader_type &reader, ImageMesh *mesh, int faceIdx, const value_type &colorValue)
+  public:
+	inline static void openContainer(meshes_reader_type &reader, ImageMesh *mesh, int faceIdx,
+									 const value_type &colorValue)
 	{
 		reader.openFace(mesh, faceIdx, colorValue);
 	}
-	inline static void addElement(meshes_reader_type &reader, ImageMesh *mesh) { reader.addMesh(mesh); }
+	inline static void addElement(meshes_reader_type &reader, ImageMesh *mesh)
+	{
+		reader.addMesh(mesh);
+	}
 	inline static void closeContainer(meshes_reader_type &reader) { reader.closeFace(); }
 };
 
@@ -301,7 +302,7 @@ struct container_reader_traits<ImageMeshesReaderT<Pixel>, ImageMesh::edge_type> 
 	typedef ImageMeshesReaderT<Pixel> meshes_reader_type;
 	typedef typename meshes_reader_type::raster_edge_iterator raster_edge_iterator;
 
-public:
+  public:
 	inline static void openContainer(meshes_reader_type &reader, const raster_edge_iterator &it)
 	{
 		reader.openEdge(it);
@@ -316,7 +317,7 @@ public:
 	}
 };
 
-} //namespace tcg
+} // namespace tcg
 
 //****************************************************************
 //    Meshes Extraction (functions)
@@ -335,7 +336,8 @@ void readMeshes(const TRasterPT<Pix> &raster, ImageMeshesReaderT<Pix> &reader)
 	reader.clear();
 
 	raster->lock();
-	readMeshes<pixel_selector, ImageMesh, ImageMeshesReaderT<Pix>>(raster, reader.pixelSelector(), reader);
+	readMeshes<pixel_selector, ImageMesh, ImageMeshesReaderT<Pix>>(raster, reader.pixelSelector(),
+																   reader);
 	raster->unlock();
 }
 
@@ -349,10 +351,15 @@ template DV_EXPORT_API class RasterEdgeIterator<PixelSelector<TPixelGR8>>;
 template DV_EXPORT_API class RasterEdgeIterator<PixelSelector<TPixelGR16>>;
 template DV_EXPORT_API class RasterEdgeIterator<PixelSelector<TPixelCM32>>;
 
-template DV_EXPORT_API void readMeshes<TPixel32>(const TRasterPT<TPixel32> &raster, ImageMeshesReaderT<TPixel32> &reader);
-template DV_EXPORT_API void readMeshes<TPixel64>(const TRasterPT<TPixel64> &raster, ImageMeshesReaderT<TPixel64> &reader);
-template DV_EXPORT_API void readMeshes<TPixelGR8>(const TRasterPT<TPixelGR8> &raster, ImageMeshesReaderT<TPixelGR8> &reader);
-template DV_EXPORT_API void readMeshes<TPixelGR16>(const TRasterPT<TPixelGR16> &raster, ImageMeshesReaderT<TPixelGR16> &reader);
-template DV_EXPORT_API void readMeshes<TPixelCM32>(const TRasterPT<TPixelCM32> &raster, ImageMeshesReaderT<TPixelCM32> &reader);
+template DV_EXPORT_API void readMeshes<TPixel32>(const TRasterPT<TPixel32> &raster,
+												 ImageMeshesReaderT<TPixel32> &reader);
+template DV_EXPORT_API void readMeshes<TPixel64>(const TRasterPT<TPixel64> &raster,
+												 ImageMeshesReaderT<TPixel64> &reader);
+template DV_EXPORT_API void readMeshes<TPixelGR8>(const TRasterPT<TPixelGR8> &raster,
+												  ImageMeshesReaderT<TPixelGR8> &reader);
+template DV_EXPORT_API void readMeshes<TPixelGR16>(const TRasterPT<TPixelGR16> &raster,
+												   ImageMeshesReaderT<TPixelGR16> &reader);
+template DV_EXPORT_API void readMeshes<TPixelCM32>(const TRasterPT<TPixelCM32> &raster,
+												   ImageMeshesReaderT<TPixelCM32> &reader);
 }
-} //namespace TRop::borders
+} // namespace TRop::borders

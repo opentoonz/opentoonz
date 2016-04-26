@@ -72,7 +72,7 @@ double TQuadratic::getT(const TPointD &p) const
 	// esprimo b in forma di polinomio  ed ottengo
 	//
 	//    ||  2                ||
-	//min || a t + b t + c - p ||
+	// min || a t + b t + c - p ||
 	//    ||                   ||
 	//
 	// il tutto si riconduce a cercare le radici
@@ -81,9 +81,7 @@ double TQuadratic::getT(const TPointD &p) const
 	// 2·a ·t  + 3·a·b·t  + t·(2·a·v + b ) + b·v
 	// dove v e' pari a c - p
 
-	vector<TPointD>
-		bez(3),
-		poly(3);
+	vector<TPointD> bez(3), poly(3);
 
 	bez[0] = m_p0;
 	bez[1] = m_p1;
@@ -208,16 +206,14 @@ double TQuadratic::getCurvature(double t) const
 
 	TPointD v_1_0(q2.m_p1 - q2.m_p0);
 
-	double
-		a = norm2(v_1_0);
+	double a = norm2(v_1_0);
 
 	if (isAlmostZero(a))
 		return (std::numeric_limits<double>::max)();
 
 	a = 1.0 / sqrt(a);
 
-	double
-		b = cross(v_1_0 * a, q2.m_p2 - q2.m_p0);
+	double b = cross(v_1_0 * a, q2.m_p2 - q2.m_p0);
 
 	return 0.5 * signum * b / a;
 }
@@ -294,9 +290,9 @@ int TQuadratic::getX(double y, double &x0, double &x1) const
 	double half_b = getP1().y - getP0().y;
 	double c = getP0().y - y;
 
-	if (a == 0) //segment
+	if (a == 0) // segment
 	{
-		if (half_b == 0) //horizontal segment, or point
+		if (half_b == 0) // horizontal segment, or point
 		{
 			if (c == 0) {
 				x0 = getP0().x;
@@ -371,8 +367,7 @@ TPointD TCubic::getSpeed(double t) const
 }
 //=============================================================================
 
-TThickQuadratic::TThickQuadratic()
-	: TQuadratic(), m_thickP0(0), m_thickP1(0), m_thickP2(0)
+TThickQuadratic::TThickQuadratic() : TQuadratic(), m_thickP0(0), m_thickP1(0), m_thickP2(0)
 {
 }
 
@@ -385,26 +380,26 @@ TThickQuadratic::TThickQuadratic(const TQuadratic &q)
 
 //-----------------------------------------------------------------------------
 
-TThickQuadratic::TThickQuadratic(const TPointD &p0, double thickP0,
-								 const TPointD &p1, double thickP1,
-								 const TPointD &p2, double thickP2)
+TThickQuadratic::TThickQuadratic(const TPointD &p0, double thickP0, const TPointD &p1,
+								 double thickP1, const TPointD &p2, double thickP2)
 	: TQuadratic(p0, p1, p2), m_thickP0(thickP0), m_thickP1(thickP1), m_thickP2(thickP2)
 {
 }
 
 //-----------------------------------------------------------------------------
 
-TThickQuadratic::TThickQuadratic(const TThickPoint &p0,
-								 const TThickPoint &p1,
+TThickQuadratic::TThickQuadratic(const TThickPoint &p0, const TThickPoint &p1,
 								 const TThickPoint &p2)
-	: TQuadratic(TPointD(p0.x, p0.y), TPointD(p1.x, p1.y), TPointD(p2.x, p2.y)), m_thickP0(p0.thick), m_thickP1(p1.thick), m_thickP2(p2.thick)
+	: TQuadratic(TPointD(p0.x, p0.y), TPointD(p1.x, p1.y), TPointD(p2.x, p2.y)),
+	  m_thickP0(p0.thick), m_thickP1(p1.thick), m_thickP2(p2.thick)
 {
 }
 
 //-----------------------------------------------------------------------------
 
 TThickQuadratic::TThickQuadratic(const TThickQuadratic &thickQuadratic)
-	: TQuadratic(thickQuadratic), m_thickP0(thickQuadratic.m_thickP0), m_thickP1(thickQuadratic.m_thickP1), m_thickP2(thickQuadratic.m_thickP2)
+	: TQuadratic(thickQuadratic), m_thickP0(thickQuadratic.m_thickP0),
+	  m_thickP1(thickQuadratic.m_thickP1), m_thickP2(thickQuadratic.m_thickP2)
 {
 }
 
@@ -433,7 +428,8 @@ void TThickQuadratic::setThickP2(const TThickPoint &p)
 TThickPoint TThickQuadratic::getThickPoint(double t) const
 {
 	double s = 1 - t;
-	return TThickPoint(m_p0 * s * s + 2 * t * s * m_p1 + t * t * m_p2, m_thickP0 * s * s + 2 * t * s * m_thickP1 + t * t * m_thickP2);
+	return TThickPoint(m_p0 * s * s + 2 * t * s * m_p1 + t * t * m_p2,
+					   m_thickP0 * s * s + 2 * t * s * m_thickP1 + t * t * m_thickP2);
 }
 
 //-----------------------------------------------------------------------------
@@ -490,37 +486,33 @@ TRectD TThickQuadratic::getBBox() const
 // Methods of the class TThickCubic
 // ============================================================================
 
-TThickCubic::TThickCubic()
-	: TCubic(), m_thickP0(0), m_thickP1(0), m_thickP2(0), m_thickP3(0)
+TThickCubic::TThickCubic() : TCubic(), m_thickP0(0), m_thickP1(0), m_thickP2(0), m_thickP3(0)
 {
 }
 
 //-----------------------------------------------------------------------------
 
-TThickCubic::TThickCubic(const TPointD &p0, double thickP0,
-						 const TPointD &p1, double thickP1,
-						 const TPointD &p2, double thickP2,
-						 const TPointD &p3, double thickP3)
-	: TCubic(p0, p1, p2, p3), m_thickP0(thickP0), m_thickP1(thickP1), m_thickP2(thickP2), m_thickP3(thickP3)
+TThickCubic::TThickCubic(const TPointD &p0, double thickP0, const TPointD &p1, double thickP1,
+						 const TPointD &p2, double thickP2, const TPointD &p3, double thickP3)
+	: TCubic(p0, p1, p2, p3), m_thickP0(thickP0), m_thickP1(thickP1), m_thickP2(thickP2),
+	  m_thickP3(thickP3)
 {
 }
 
 //-----------------------------------------------------------------------------
 
-TThickCubic::TThickCubic(const TThickPoint &p0,
-						 const TThickPoint &p1,
-						 const TThickPoint &p2,
+TThickCubic::TThickCubic(const TThickPoint &p0, const TThickPoint &p1, const TThickPoint &p2,
 						 const TThickPoint &p3)
-	: TCubic(TPointD(p0.x, p0.y), TPointD(p1.x, p1.y), TPointD(p2.x, p2.y), TPointD(p3.x, p3.y)), m_thickP0(p0.thick), m_thickP1(p1.thick), m_thickP2(p2.thick), m_thickP3(p3.thick)
+	: TCubic(TPointD(p0.x, p0.y), TPointD(p1.x, p1.y), TPointD(p2.x, p2.y), TPointD(p3.x, p3.y)),
+	  m_thickP0(p0.thick), m_thickP1(p1.thick), m_thickP2(p2.thick), m_thickP3(p3.thick)
 {
 }
 //  tonino ***************************************************************
 
-TThickCubic::TThickCubic(const T3DPointD &p0,
-						 const T3DPointD &p1,
-						 const T3DPointD &p2,
+TThickCubic::TThickCubic(const T3DPointD &p0, const T3DPointD &p1, const T3DPointD &p2,
 						 const T3DPointD &p3)
-	: TCubic(TPointD(p0.x, p0.y), TPointD(p1.x, p1.y), TPointD(p2.x, p2.y), TPointD(p3.x, p3.y)), m_thickP0(p0.z), m_thickP1(p1.z), m_thickP2(p2.z), m_thickP3(p3.z)
+	: TCubic(TPointD(p0.x, p0.y), TPointD(p1.x, p1.y), TPointD(p2.x, p2.y), TPointD(p3.x, p3.y)),
+	  m_thickP0(p0.z), m_thickP1(p1.z), m_thickP2(p2.z), m_thickP3(p3.z)
 {
 }
 
@@ -529,7 +521,8 @@ TThickCubic::TThickCubic(const T3DPointD &p0,
 //-----------------------------------------------------------------------------
 
 TThickCubic::TThickCubic(const TThickCubic &thickCubic)
-	: TCubic(thickCubic), m_thickP0(thickCubic.m_thickP0), m_thickP1(thickCubic.m_thickP1), m_thickP2(thickCubic.m_thickP2), m_thickP3(thickCubic.m_thickP3)
+	: TCubic(thickCubic), m_thickP0(thickCubic.m_thickP0), m_thickP1(thickCubic.m_thickP1),
+	  m_thickP2(thickCubic.m_thickP2), m_thickP3(thickCubic.m_thickP3)
 {
 }
 
@@ -572,10 +565,7 @@ void TThickCubic::setThickP3(const TThickPoint &p)
 
 TThickPoint TThickCubic::getThickPoint(double t) const
 {
-	double
-		thick_l1,
-		thick_h,
-		thick_r3;
+	double thick_l1, thick_h, thick_r3;
 
 	double s = 1.0 - t;
 
@@ -643,14 +633,13 @@ void TThickCubic::split(double t, TThickCubic &first, TThickCubic &second) const
 
 ostream &operator<<(ostream &out, const TQuadratic &curve)
 {
-	return out << "Q{" << curve.getP0() << ", " << curve.getP1() << ", "
-			   << curve.getP2() << "}";
+	return out << "Q{" << curve.getP0() << ", " << curve.getP1() << ", " << curve.getP2() << "}";
 }
 
 ostream &operator<<(ostream &out, const TCubic &curve)
 {
-	return out << "C{" << curve.getP0() << ", " << curve.getP1() << ", "
-			   << curve.getP2() << ", " << curve.getP3() << "}";
+	return out << "C{" << curve.getP0() << ", " << curve.getP1() << ", " << curve.getP2() << ", "
+			   << curve.getP3() << "}";
 }
 
 ostream &operator<<(ostream &out, const TThickSegment &segment)
@@ -660,15 +649,14 @@ ostream &operator<<(ostream &out, const TThickSegment &segment)
 
 ostream &operator<<(ostream &out, const TThickQuadratic &tq)
 {
-	return out << "TQ{" << tq.getThickP0() << ", " << tq.getThickP1() << ", " << tq.getThickP2() << "}";
+	return out << "TQ{" << tq.getThickP0() << ", " << tq.getThickP1() << ", " << tq.getThickP2()
+			   << "}";
 }
 
 ostream &operator<<(ostream &out, const TThickCubic &tc)
 {
-	return out << "TC{" << tc.getThickP0() << ", "
-			   << tc.getThickP1() << ", "
-			   << tc.getThickP2() << ", "
-			   << tc.getThickP3() << "}";
+	return out << "TC{" << tc.getThickP0() << ", " << tc.getThickP1() << ", " << tc.getThickP2()
+			   << ", " << tc.getThickP3() << "}";
 }
 
 //-----------------------------------------------------------------------------

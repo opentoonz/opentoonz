@@ -9,7 +9,7 @@
 
 class AppMainshell : public TMainshell
 {
-public:
+  public:
 	AppMainshell();
 	~AppMainshell();
 
@@ -33,7 +33,7 @@ public:
 	void onTimer(int);
 	string getAppId() const { return "TFarm"; }
 
-private:
+  private:
 	class Data;
 	Data *m_data;
 };

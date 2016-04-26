@@ -17,7 +17,7 @@
 #endif
 
 //=============================================================================
-//forwards declarations
+// forwards declarations
 
 class TSegment;
 class TQuadratic;
@@ -26,8 +26,8 @@ class TThickQuadratic;
 //=============================================================================
 
 /*! area (orientata) del trapeziode limitato dalla curva
-    e dall'asse delle ascisse. L'area e' positiva se p(0),...p(t)...,p(1),p(0)
-      viene percorso in senso antiorario 
+	e dall'asse delle ascisse. L'area e' positiva se p(0),...p(t)...,p(1),p(0)
+	  viene percorso in senso antiorario
 DVAPI double getArea(const TQuadratic &curve);
 */
 
@@ -45,55 +45,46 @@ inline double tdistance(const TPointD &point, const TSegment &segment)
 }
 
 /*!
-  Compute intersection between segments; 
+  Compute intersection between segments;
   return the number of intersections (0/1/2/-1) and add them
   (as a param couple) to the vector 'intersections'
-  \note 
-    if the segment intersections is larger than one point
-    (i.e. the segments share a sub-segment) return 2 and 
-    in vector there are extremes of sub-segment.
+  \note
+	if the segment intersections is larger than one point
+	(i.e. the segments share a sub-segment) return 2 and
+	in vector there are extremes of sub-segment.
  */
 
-DVAPI int intersect(const TPointD &seg1p0, const TPointD &seg1p1, const TPointD &seg2p0, const TPointD &seg2p1,
-					std::vector<DoublePair> &intersections);
+DVAPI int intersect(const TPointD &seg1p0, const TPointD &seg1p1, const TPointD &seg2p0,
+					const TPointD &seg2p1, std::vector<DoublePair> &intersections);
 
-DVAPI int intersect(const TSegment &first,
-					const TSegment &second,
+DVAPI int intersect(const TSegment &first, const TSegment &second,
 					std::vector<DoublePair> &intersections);
 
 /*!
-  Compute intersection between quadratics; 
+  Compute intersection between quadratics;
   return the number of intersections (0-4) and add them
   (as a param couple) to the vector 'intersections'
  */
-DVAPI int intersect(const TQuadratic &q0,
-					const TQuadratic &q1,
+DVAPI int intersect(const TQuadratic &q0, const TQuadratic &q1,
 					std::vector<DoublePair> &intersections, bool checksegments = true);
 
 /*!
-  Compute intersection between and a segment; 
+  Compute intersection between and a segment;
   return the number of intersections [0,2] and add them
   (as a param couple) to the vector 'intersections'.
   Remark:
-    In pair "first" is for the first object and "second"
-    its for the second.
+	In pair "first" is for the first object and "second"
+	its for the second.
  */
-DVAPI int intersect(const TQuadratic &q,
-					const TSegment &s,
-					std::vector<DoublePair> &intersections,
+DVAPI int intersect(const TQuadratic &q, const TSegment &s, std::vector<DoublePair> &intersections,
 					bool firstQuad = true);
 
-inline int intersect(const TSegment &s,
-					 const TQuadratic &q,
-					 std::vector<DoublePair> &intersections)
+inline int intersect(const TSegment &s, const TQuadratic &q, std::vector<DoublePair> &intersections)
 {
 	return intersect(q, s, intersections, false);
 }
 
-template <class T>
-void split(const T &tq,
-		   const std::vector<double> &pars,
-		   std::vector<T *> &v)
+template <class T> void split(const T &tq, const std::vector<double> &pars, std::vector<T *> &v)
 {
 	if (pars.empty())
 		return;
@@ -117,8 +108,7 @@ void split(const T &tq,
 	v.push_back(new T(q2));
 }
 
-template <class T>
-void split(const T &tq, double w0, double w1, T &qOut)
+template <class T> void split(const T &tq, double w0, double w1, T &qOut)
 {
 	T q2;
 
@@ -156,7 +146,7 @@ class TQuadraticLengthEvaluator
 	double m_c, m_e, m_f, m_sqrt_a_div_2, m_tRef, m_primitive_0;
 	bool m_constantSpeed, m_noSpeed0, m_squareIntegrand;
 
-public:
+  public:
 	TQuadraticLengthEvaluator() {}
 	TQuadraticLengthEvaluator(const TQuadratic &quad) { setQuad(quad); }
 

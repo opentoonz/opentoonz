@@ -27,16 +27,16 @@
 //==================================================================
 
 #ifndef checkErrorsByGL
-#define checkErrorsByGL                      \
-	{                                        \
-		GLenum err = glGetError();           \
-		assert(err != GL_INVALID_ENUM);      \
-		assert(err != GL_INVALID_VALUE);     \
-		assert(err != GL_INVALID_OPERATION); \
-		assert(err != GL_STACK_OVERFLOW);    \
-		assert(err != GL_STACK_UNDERFLOW);   \
-		assert(err != GL_OUT_OF_MEMORY);     \
-		assert(err == GL_NO_ERROR);          \
+#define checkErrorsByGL                                                                            \
+	{                                                                                              \
+		GLenum err = glGetError();                                                                 \
+		assert(err != GL_INVALID_ENUM);                                                            \
+		assert(err != GL_INVALID_VALUE);                                                           \
+		assert(err != GL_INVALID_OPERATION);                                                       \
+		assert(err != GL_STACK_OVERFLOW);                                                          \
+		assert(err != GL_STACK_UNDERFLOW);                                                         \
+		assert(err != GL_OUT_OF_MEMORY);                                                           \
+		assert(err == GL_NO_ERROR);                                                                \
 	}
 #endif
 
@@ -72,8 +72,8 @@ TThread::Mutex CombineDataGuard;
 
 std::list<GLdouble *> Combine_data;
 
-extern "C" void CALLBACK myCombine(GLdouble coords[3], GLdouble *d[4],
-								   GLfloat w[4], GLdouble **dataOut)
+extern "C" void CALLBACK myCombine(GLdouble coords[3], GLdouble *d[4], GLfloat w[4],
+								   GLdouble **dataOut)
 {
 	GLdouble *newCoords = new GLdouble[3];
 
@@ -86,7 +86,7 @@ extern "C" void CALLBACK myCombine(GLdouble coords[3], GLdouble *d[4],
 
 //===================================================================
 
-//typedef std::vector<T3DPointD>::iterator Vect3D_iter;
+// typedef std::vector<T3DPointD>::iterator Vect3D_iter;
 
 //-------------------------------------------------------------------
 }
@@ -103,7 +103,8 @@ typedef GLvoid (*GluCallback)();
 
 #endif
 
-void TglTessellator::doTessellate(GLTess &glTess, const TColorFunction *cf, const bool antiAliasing, TRegionOutline outline, const TAffine &aff)
+void TglTessellator::doTessellate(GLTess &glTess, const TColorFunction *cf, const bool antiAliasing,
+								  TRegionOutline outline, const TAffine &aff)
 {
 	QMutexLocker sl(&CombineDataGuard);
 
@@ -126,7 +127,8 @@ void TglTessellator::doTessellate(GLTess &glTess, const TColorFunction *cf, cons
 #endif
 #endif
 
-	for (TRegionOutline::Boundary::iterator poly_it = outline.m_exterior.begin(); poly_it != outline.m_exterior.end(); ++poly_it) {
+	for (TRegionOutline::Boundary::iterator poly_it = outline.m_exterior.begin();
+		 poly_it != outline.m_exterior.end(); ++poly_it) {
 #ifdef GLU_VERSION_1_2
 		gluTessBeginContour(glTess.m_tess);
 #else
@@ -137,8 +139,9 @@ void TglTessellator::doTessellate(GLTess &glTess, const TColorFunction *cf, cons
 #endif
 #endif
 
-		for (TRegionOutline::PointVector::iterator it = poly_it->begin(); it != poly_it->end(); ++it) {
-			//T3DPointD p = *it;
+		for (TRegionOutline::PointVector::iterator it = poly_it->begin(); it != poly_it->end();
+			 ++it) {
+			// T3DPointD p = *it;
 			it->x = aff.a11 * it->x + aff.a12 * it->y;
 			it->y = aff.a21 * it->x + aff.a22 * it->y;
 
@@ -152,7 +155,8 @@ void TglTessellator::doTessellate(GLTess &glTess, const TColorFunction *cf, cons
 	int subRegionNumber = outline.m_interior.size();
 	if (subRegionNumber > 0) {
 
-		for (TRegionOutline::Boundary::iterator poly_it = outline.m_interior.begin(); poly_it != outline.m_interior.end(); ++poly_it) {
+		for (TRegionOutline::Boundary::iterator poly_it = outline.m_interior.begin();
+			 poly_it != outline.m_interior.end(); ++poly_it) {
 #ifdef GLU_VERSION_1_2
 			gluTessBeginContour(glTess.m_tess);
 #else
@@ -163,8 +167,9 @@ void TglTessellator::doTessellate(GLTess &glTess, const TColorFunction *cf, cons
 #endif
 #endif
 
-			for (TRegionOutline::PointVector::reverse_iterator rit = poly_it->rbegin(); rit != poly_it->rend(); ++rit) {
-				//T3DPointD p = *rit;
+			for (TRegionOutline::PointVector::reverse_iterator rit = poly_it->rbegin();
+				 rit != poly_it->rend(); ++rit) {
+				// T3DPointD p = *rit;
 				rit->x = aff.a11 * rit->x + aff.a12 * rit->y;
 				rit->y = aff.a21 * rit->x + aff.a22 * rit->y;
 				gluTessVertex(glTess.m_tess, &(rit->x), &(rit->x));
@@ -193,7 +198,8 @@ void TglTessellator::doTessellate(GLTess &glTess, const TColorFunction *cf, cons
 		delete[](*beginIt);
 }
 
-void TglTessellator::doTessellate(GLTess &glTess, const TColorFunction *cf, const bool antiAliasing, TRegionOutline &outline)
+void TglTessellator::doTessellate(GLTess &glTess, const TColorFunction *cf, const bool antiAliasing,
+								  TRegionOutline &outline)
 {
 	QMutexLocker sl(&CombineDataGuard);
 
@@ -216,7 +222,8 @@ void TglTessellator::doTessellate(GLTess &glTess, const TColorFunction *cf, cons
 #endif
 #endif
 
-	for (TRegionOutline::Boundary::iterator poly_it = outline.m_exterior.begin(); poly_it != outline.m_exterior.end(); ++poly_it) {
+	for (TRegionOutline::Boundary::iterator poly_it = outline.m_exterior.begin();
+		 poly_it != outline.m_exterior.end(); ++poly_it) {
 
 #ifdef GLU_VERSION_1_2
 		gluTessBeginContour(glTess.m_tess);
@@ -228,7 +235,8 @@ void TglTessellator::doTessellate(GLTess &glTess, const TColorFunction *cf, cons
 #endif
 #endif
 
-		for (TRegionOutline::PointVector::iterator it = poly_it->begin(); it != poly_it->end(); ++it)
+		for (TRegionOutline::PointVector::iterator it = poly_it->begin(); it != poly_it->end();
+			 ++it)
 			gluTessVertex(glTess.m_tess, &(it->x), &(it->x));
 
 #ifdef GLU_VERSION_1_2
@@ -239,7 +247,8 @@ void TglTessellator::doTessellate(GLTess &glTess, const TColorFunction *cf, cons
 	int subRegionNumber = outline.m_interior.size();
 	if (subRegionNumber > 0) {
 
-		for (TRegionOutline::Boundary::iterator poly_it = outline.m_interior.begin(); poly_it != outline.m_interior.end(); ++poly_it) {
+		for (TRegionOutline::Boundary::iterator poly_it = outline.m_interior.begin();
+			 poly_it != outline.m_interior.end(); ++poly_it) {
 
 #ifdef GLU_VERSION_1_2
 			gluTessBeginContour(glTess.m_tess);
@@ -251,7 +260,8 @@ void TglTessellator::doTessellate(GLTess &glTess, const TColorFunction *cf, cons
 #endif
 #endif
 
-			for (TRegionOutline::PointVector::reverse_iterator rit = poly_it->rbegin(); rit != poly_it->rend(); ++rit)
+			for (TRegionOutline::PointVector::reverse_iterator rit = poly_it->rbegin();
+				 rit != poly_it->rend(); ++rit)
 				gluTessVertex(glTess.m_tess, &(rit->x), &(rit->x));
 
 #ifdef GLU_VERSION_1_2
@@ -279,7 +289,8 @@ void TglTessellator::doTessellate(GLTess &glTess, const TColorFunction *cf, cons
 
 //------------------------------------------------------------------
 
-void TglTessellator::tessellate(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &outline, TPixel32 color)
+void TglTessellator::tessellate(const TColorFunction *cf, const bool antiAliasing,
+								TRegionOutline &outline, TPixel32 color)
 {
 	if (cf)
 		color = (*(cf))(color);
@@ -306,13 +317,15 @@ void TglTessellator::tessellate(const TColorFunction *cf, const bool antiAliasin
 
 		tglEnableLineSmooth();
 
-		for (TRegionOutline::Boundary::iterator poly_it = outline.m_exterior.begin(); poly_it != outline.m_exterior.end(); ++poly_it) {
+		for (TRegionOutline::Boundary::iterator poly_it = outline.m_exterior.begin();
+			 poly_it != outline.m_exterior.end(); ++poly_it) {
 			std::vector<GLdouble> v;
 			if (poly_it->size() == 0)
 				continue;
 			v.resize(poly_it->size() * 2);
 			int i = 0;
-			for (TRegionOutline::PointVector::iterator it = poly_it->begin(); it != poly_it->end(); ++it) {
+			for (TRegionOutline::PointVector::iterator it = poly_it->begin(); it != poly_it->end();
+				 ++it) {
 				v[i++] = it->x;
 				v[i++] = it->y;
 			}
@@ -325,11 +338,13 @@ void TglTessellator::tessellate(const TColorFunction *cf, const bool antiAliasin
 			glDisableClientState(GL_VERTEX_ARRAY);
 		}
 
-		for (TRegionOutline::Boundary::iterator poly_it = outline.m_interior.begin(); poly_it != outline.m_interior.end(); ++poly_it) {
+		for (TRegionOutline::Boundary::iterator poly_it = outline.m_interior.begin();
+			 poly_it != outline.m_interior.end(); ++poly_it) {
 			std::vector<GLdouble> v;
 			v.resize(poly_it->size() * 2);
 			int i = 0;
-			for (TRegionOutline::PointVector::iterator it = poly_it->begin(); it != poly_it->end(); ++it) {
+			for (TRegionOutline::PointVector::iterator it = poly_it->begin(); it != poly_it->end();
+				 ++it) {
 				v[i++] = it->x;
 				v[i++] = it->y;
 			}
@@ -347,9 +362,10 @@ void TglTessellator::tessellate(const TColorFunction *cf, const bool antiAliasin
 
 //------------------------------------------------------------------
 
-void TglTessellator::tessellate(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &outline, TRaster32P texture)
+void TglTessellator::tessellate(const TColorFunction *cf, const bool antiAliasing,
+								TRegionOutline &outline, TRaster32P texture)
 {
-	//QMutexLocker sl(m_mutex);
+	// QMutexLocker sl(m_mutex);
 	checkErrorsByGL;
 	glEnable(GL_TEXTURE_2D);
 	glColor4d(1, 1, 1, 1);
@@ -429,6 +445,6 @@ void TglTessellator::tessellate(const TColorFunction *cf, const bool antiAliasin
 
 //------------------------------------------------------------------
 
-//TglTessellator::GLTess TglTessellator::m_glTess;
+// TglTessellator::GLTess TglTessellator::m_glTess;
 
 //=============================================================================

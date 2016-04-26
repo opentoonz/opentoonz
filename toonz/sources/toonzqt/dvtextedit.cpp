@@ -28,10 +28,14 @@ qreal distanceBetweenPointandRect(const QRect &rect, const QPoint &point)
 	if (rect.contains(point))
 		return 0;
 
-	qreal topLeftDistance = sqrt(pow((double)(point.x() - rect.topLeft().x()), 2) + pow((double)(point.y() - rect.topLeft().y()), 2));
-	qreal topRightDistance = sqrt(pow((double)(point.x() - rect.topRight().x()), 2) + pow((double)(point.y() - rect.topRight().y()), 2));
-	qreal bottomLeftDistance = sqrt(pow((double)(point.x() - rect.bottomLeft().x()), 2) + pow((double)(point.y() - rect.bottomLeft().y()), 2));
-	qreal bottomRightDistance = sqrt(pow((double)(point.x() - rect.bottomRight().x()), 2) + pow((double)(point.y() - rect.bottomRight().y()), 2));
+	qreal topLeftDistance = sqrt(pow((double)(point.x() - rect.topLeft().x()), 2) +
+								 pow((double)(point.y() - rect.topLeft().y()), 2));
+	qreal topRightDistance = sqrt(pow((double)(point.x() - rect.topRight().x()), 2) +
+								  pow((double)(point.y() - rect.topRight().y()), 2));
+	qreal bottomLeftDistance = sqrt(pow((double)(point.x() - rect.bottomLeft().x()), 2) +
+									pow((double)(point.y() - rect.bottomLeft().y()), 2));
+	qreal bottomRightDistance = sqrt(pow((double)(point.x() - rect.bottomRight().x()), 2) +
+									 pow((double)(point.y() - rect.bottomRight().y()), 2));
 
 	qreal topMax = qMin(topLeftDistance, topRightDistance);
 	qreal bottomMax = qMin(bottomLeftDistance, bottomRightDistance);
@@ -46,8 +50,7 @@ using namespace DVGui;
 // DvMiniToolBar
 //-----------------------------------------------------------------------------
 
-DvMiniToolBar::DvMiniToolBar(QWidget *parent)
-	: QFrame(parent), m_dragPos(0, 0)
+DvMiniToolBar::DvMiniToolBar(QWidget *parent) : QFrame(parent), m_dragPos(0, 0)
 {
 	setObjectName("DvMiniToolBar");
 	setStyleSheet("#DvMiniToolBar {border: 1px solid black;}");
@@ -84,8 +87,7 @@ void DvMiniToolBar::mouseMoveEvent(QMouseEvent *e)
 // DvTextEditButton
 //-----------------------------------------------------------------------------
 
-DvTextEditButton::DvTextEditButton(QWidget *parent)
-	: QWidget(parent)
+DvTextEditButton::DvTextEditButton(QWidget *parent) : QWidget(parent)
 {
 	setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
 	setFixedSize(16, 16);
@@ -133,8 +135,8 @@ DvTextEdit::DvTextEdit(QWidget *parent)
 	setTextColor(TPixel32::Black, false);
 	alignmentChanged(alignment());
 
-	connect(this, SIGNAL(currentCharFormatChanged(const QTextCharFormat &)),
-			this, SLOT(onCurrentCharFormatChanged(const QTextCharFormat &)));
+	connect(this, SIGNAL(currentCharFormatChanged(const QTextCharFormat &)), this,
+			SLOT(onCurrentCharFormatChanged(const QTextCharFormat &)));
 
 	connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(onCursorPositionChanged()));
 
@@ -146,9 +148,9 @@ void DvTextEdit::changeFont(const QFont &f)
 {
 
 	QTextCharFormat fmt = currentCharFormat();
-	//bool aux = fmt.fontUnderline();
+	// bool aux = fmt.fontUnderline();
 	fmt.setFont(f);
-	//fmt.setFontHintingPreference(QFont::PreferFullHinting);
+	// fmt.setFontHintingPreference(QFont::PreferFullHinting);
 	mergeFormatOnWordOrSelection(fmt);
 }
 
@@ -176,16 +178,20 @@ void DvTextEdit::createActions()
 
 	m_colorField = new DVGui::ColorField(this, true, TPixel32(), 30);
 	m_colorField->hideChannelsFields(true);
-	connect(m_colorField, SIGNAL(colorChanged(const TPixel32 &, bool)), this, SLOT(setTextColor(const TPixel32 &, bool)));
+	connect(m_colorField, SIGNAL(colorChanged(const TPixel32 &, bool)), this,
+			SLOT(setTextColor(const TPixel32 &, bool)));
 
 	m_alignActionGroup = new QActionGroup(this);
 	connect(m_alignActionGroup, SIGNAL(triggered(QAction *)), this, SLOT(setTextAlign(QAction *)));
 
-	m_alignLeftAction = new QAction(createQIconOnOffPNG("align_left"), tr("Align Left"), m_alignActionGroup);
+	m_alignLeftAction =
+		new QAction(createQIconOnOffPNG("align_left"), tr("Align Left"), m_alignActionGroup);
 	m_alignLeftAction->setCheckable(true);
-	m_alignCenterAction = new QAction(createQIconOnOffPNG("align_center"), tr("Align Center"), m_alignActionGroup);
+	m_alignCenterAction =
+		new QAction(createQIconOnOffPNG("align_center"), tr("Align Center"), m_alignActionGroup);
 	m_alignCenterAction->setCheckable(true);
-	m_alignRightAction = new QAction(createQIconOnOffPNG("align_right"), tr("Align Right"), m_alignActionGroup);
+	m_alignRightAction =
+		new QAction(createQIconOnOffPNG("align_right"), tr("Align Right"), m_alignActionGroup);
 	m_alignRightAction->setCheckable(true);
 }
 
@@ -204,7 +210,8 @@ void DvTextEdit::createMiniToolBar()
 	m_fontComboBox->setMaximumHeight(20);
 	m_fontComboBox->setMinimumWidth(140);
 
-	connect(m_fontComboBox, SIGNAL(activated(const QString &)), this, SLOT(setTextFamily(const QString &)));
+	connect(m_fontComboBox, SIGNAL(activated(const QString &)), this,
+			SLOT(setTextFamily(const QString &)));
 
 	m_sizeComboBox = new QComboBox(toolBarUp);
 	m_sizeComboBox->setEditable(true);
@@ -215,7 +222,8 @@ void DvTextEdit::createMiniToolBar()
 	foreach (int size, db.standardSizes())
 		m_sizeComboBox->addItem(QString::number(size));
 
-	connect(m_sizeComboBox, SIGNAL(activated(const QString &)), this, SLOT(setTextSize(const QString &)));
+	connect(m_sizeComboBox, SIGNAL(activated(const QString &)), this,
+			SLOT(setTextSize(const QString &)));
 
 	toolBarUp->addWidget(m_fontComboBox);
 	toolBarUp->addWidget(m_sizeComboBox);

@@ -44,25 +44,17 @@ StraightCornerDeformation::~StraightCornerDeformation()
 
 //-----------------------------------------------------------------------------
 
-bool StraightCornerDeformation::findExtremes_(const ContextStatus *status,
-											  Interval &ret)
+bool StraightCornerDeformation::findExtremes_(const ContextStatus *status, Interval &ret)
 {
-	bool
-		found = ToonzExt::findNearestStraightCorners(status->stroke2change_,
-													 status->w_,
-													 ret,
-													 &this->getStraightsList());
+	bool found = ToonzExt::findNearestStraightCorners(status->stroke2change_, status->w_, ret,
+													  &this->getStraightsList());
 	// it is not a forced solution
-	if ((status->key_event_ != shortcutKey_) &&
-		found)
+	if ((status->key_event_ != shortcutKey_) && found)
 		return found;
 	else {
 		// it is forced then probably i want to find
-		found = ToonzExt::findNearestSpireCorners(status->stroke2change_,
-												  status->w_,
-												  ret,
-												  status->cornerSize_,
-												  &this->getSpiresList());
+		found = ToonzExt::findNearestSpireCorners(status->stroke2change_, status->w_, ret,
+												  status->cornerSize_, &this->getSpiresList());
 	}
 	return found;
 }
@@ -82,37 +74,23 @@ bool StraightCornerDeformation::check_(const ContextStatus *status)
 	assert(status && "Not status available");
 
 	TStroke *s = status->stroke2change_;
-	double
-		w = status->w_;
+	double w = status->w_;
 
 	// check extremes in another way.
-	if (!s->isSelfLoop() &&
-			areAlmostEqual(w, 0.0) ||
-		areAlmostEqual(w, 1.0)) {
-		return isAStraightCorner(s,
-								 w,
-								 &this->getStraightsList());
+	if (!s->isSelfLoop() && areAlmostEqual(w, 0.0) || areAlmostEqual(w, 1.0)) {
+		return isAStraightCorner(s, w, &this->getStraightsList());
 	}
 
-	ToonzExt::Interval
-		ret;
-	if (ToonzExt::findNearestStraightCorners(status->stroke2change_,
-											 status->w_,
-											 ret,
+	ToonzExt::Interval ret;
+	if (ToonzExt::findNearestStraightCorners(status->stroke2change_, status->w_, ret,
 											 &this->getStraightsList()) &&
-		isAStraightCorner(s,
-						  w,
-						  &this->getStraightsList())) {
+		isAStraightCorner(s, w, &this->getStraightsList())) {
 		if (ret.first > ret.second) {
 			assert(s->isSelfLoop());
-			if ((ret.first < w &&
-				 w <= 1.0) ||
-				(0.0 <= w &&
-				 w < ret.second))
+			if ((ret.first < w && w <= 1.0) || (0.0 <= w && w < ret.second))
 				return true;
 		} else {
-			if (ret.first < w &&
-				w < ret.second)
+			if (ret.first < w && w < ret.second)
 				return true;
 		}
 	}
@@ -121,16 +99,14 @@ bool StraightCornerDeformation::check_(const ContextStatus *status)
 
 //-----------------------------------------------------------------------------
 
-double
-StraightCornerDeformation::findActionLength()
+double StraightCornerDeformation::findActionLength()
 {
 	return stroke2manipulate_->getLength();
 }
 
 //-----------------------------------------------------------------------------
 
-StraightCornerDeformation *
-StraightCornerDeformation::instance()
+StraightCornerDeformation *StraightCornerDeformation::instance()
 {
 	static StraightCornerDeformation singleton;
 	return &singleton;

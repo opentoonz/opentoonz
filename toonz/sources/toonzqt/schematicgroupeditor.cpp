@@ -18,18 +18,20 @@
 
 //=====================================================
 //
-//SchematicGroupEditor
+// SchematicGroupEditor
 //
 //=====================================================
 
-SchematicWindowEditor::SchematicWindowEditor(const QList<SchematicNode *> &groupedNode, SchematicScene *scene)
+SchematicWindowEditor::SchematicWindowEditor(const QList<SchematicNode *> &groupedNode,
+											 SchematicScene *scene)
 #if QT_VERSION >= 0x050000
 	: QGraphicsItem()
 #else
 	: QGraphicsItem(0, scene)
 #endif
 	  ,
-	  m_groupedNode(groupedNode), m_scene(scene), m_lastPos(), m_button(Qt::NoButton), m_isMacroEditor(false)
+	  m_groupedNode(groupedNode), m_scene(scene), m_lastPos(), m_button(Qt::NoButton),
+	  m_isMacroEditor(false)
 {
 #if QT_VERSION >= 0x050000
 	scene->addItem(this);
@@ -59,7 +61,8 @@ QRectF SchematicWindowEditor::boundingRect() const
 
 //---------------------------------------------------------------
 
-void SchematicWindowEditor::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void SchematicWindowEditor::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+								  QWidget *widget)
 {
 	painter->setPen(QColor(0, 0, 0, 255));
 	if (m_isMacroEditor)
@@ -73,13 +76,15 @@ void SchematicWindowEditor::paint(QPainter *painter, const QStyleOptionGraphicsI
 	painter->setBrush(QColor(180, 180, 180, 125));
 	painter->drawRect(rect);
 
-	//draw the topRight cross
+	// draw the topRight cross
 	rect = QRectF(0, 0, 11, 11);
 	rect.moveTopLeft(QPointF(bRect.width() - 13, 2));
 	painter->drawRoundedRect(rect, 2, 2);
 	painter->setPen(Qt::black);
-	painter->drawLine(QPointF(rect.left() + 2, rect.top() + 2), QPointF(rect.right() - 2, rect.bottom() - 2));
-	painter->drawLine(QPointF(rect.left() + 2, rect.bottom() - 2), QPointF(rect.right() - 2, rect.top() + 2));
+	painter->drawLine(QPointF(rect.left() + 2, rect.top() + 2),
+					  QPointF(rect.right() - 2, rect.bottom() - 2));
+	painter->drawLine(QPointF(rect.left() + 2, rect.bottom() - 2),
+					  QPointF(rect.right() - 2, rect.top() + 2));
 
 	if (!m_nameItem->isVisible()) {
 		painter->setPen(Qt::white);
@@ -178,11 +183,13 @@ void SchematicWindowEditor::contextMenuEvent(QGraphicsSceneContextMenuEvent *e)
 
 //=====================================================
 //
-//FxSchematicGroupEditor
+// FxSchematicGroupEditor
 //
 //=====================================================
 
-FxSchematicGroupEditor::FxSchematicGroupEditor(int groupId, const QList<SchematicNode *> &groupedNode, SchematicScene *scene)
+FxSchematicGroupEditor::FxSchematicGroupEditor(int groupId,
+											   const QList<SchematicNode *> &groupedNode,
+											   SchematicScene *scene)
 	: SchematicWindowEditor(groupedNode, scene), m_groupId(groupId)
 {
 	initializeEditor();
@@ -212,8 +219,8 @@ void FxSchematicGroupEditor::initializeEditor()
 
 void FxSchematicGroupEditor::closeEditor()
 {
-	//Ptrebbero esserci delle macro aperte per edit nel gruppo...
-	//devo chiedere alla scena di chiuderle per me... da qui non posso farlo!
+	// Ptrebbero esserci delle macro aperte per edit nel gruppo...
+	// devo chiedere alla scena di chiuderle per me... da qui non posso farlo!
 	FxSchematicScene *fxScene = dynamic_cast<FxSchematicScene *>(scene());
 	assert(fxScene);
 	fxScene->closeInnerMacroEditor(m_groupId);
@@ -273,7 +280,8 @@ void FxSchematicGroupEditor::onNameChanged()
 	FxSchematicScene *fxScene = dynamic_cast<FxSchematicScene *>(scene());
 	if (!fxScene)
 		return;
-	TFxCommand::renameGroup(fxs.toStdList(), m_groupName.toStdWString(), true, fxScene->getXsheetHandle());
+	TFxCommand::renameGroup(fxs.toStdList(), m_groupName.toStdWString(), true,
+							fxScene->getXsheetHandle());
 	update();
 }
 
@@ -331,7 +339,7 @@ void FxSchematicGroupEditor::doResizeNodes(bool maximizeNodes)
 
 //=====================================================
 //
-//FxSchematicMacroEditor
+// FxSchematicMacroEditor
 //
 //=====================================================
 
@@ -440,11 +448,12 @@ void FxSchematicMacroEditor::doResizeNodes(bool maximizeNodes)
 
 //=====================================================
 //
-//StageSchematicGroupEditor
+// StageSchematicGroupEditor
 //
 //=====================================================
 
-StageSchematicGroupEditor::StageSchematicGroupEditor(int groupId, const QList<SchematicNode *> &groupedNode,
+StageSchematicGroupEditor::StageSchematicGroupEditor(int groupId,
+													 const QList<SchematicNode *> &groupedNode,
 													 SchematicScene *scene)
 	: SchematicWindowEditor(groupedNode, scene), m_groupId(groupId)
 {
@@ -534,7 +543,8 @@ void StageSchematicGroupEditor::onNameChanged()
 	m_nameItem->hide();
 	m_groupName = m_nameItem->toPlainText();
 	for (i = 0; i < m_groupedNode.size(); i++) {
-		StageSchematicGroupNode *groupNode = dynamic_cast<StageSchematicGroupNode *>(m_groupedNode[i]);
+		StageSchematicGroupNode *groupNode =
+			dynamic_cast<StageSchematicGroupNode *>(m_groupedNode[i]);
 		StageSchematicNode *node = dynamic_cast<StageSchematicNode *>(m_groupedNode[i]);
 		if (groupNode)
 			objs.append(groupNode->getGroupedObjects());
@@ -545,7 +555,8 @@ void StageSchematicGroupEditor::onNameChanged()
 	StageSchematicScene *stageScene = dynamic_cast<StageSchematicScene *>(scene());
 	if (!stageScene)
 		return;
-	TStageObjectCmd::renameGroup(objs, m_groupName.toStdWString(), true, stageScene->getXsheetHandle());
+	TStageObjectCmd::renameGroup(objs, m_groupName.toStdWString(), true,
+								 stageScene->getXsheetHandle());
 	update();
 }
 

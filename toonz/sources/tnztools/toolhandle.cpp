@@ -17,7 +17,8 @@
 //-----------------------------------------------------------------------------
 
 ToolHandle::ToolHandle()
-	: m_tool(0), m_toolName(""), m_toolTargetType(TTool::NoTarget), m_storedToolName(""), m_toolIsBusy(false)
+	: m_tool(0), m_toolName(""), m_toolTargetType(TTool::NoTarget), m_storedToolName(""),
+	  m_toolIsBusy(false)
 {
 }
 
@@ -80,7 +81,8 @@ void ToolHandle::storeTool()
 void ToolHandle::restoreTool()
 {
 	// qDebug() << m_storedToolTime.elapsed();
-	if (m_storedToolName != m_toolName && m_storedToolName != "" && m_storedToolTime.elapsed() > 500) {
+	if (m_storedToolName != m_toolName && m_storedToolName != "" &&
+		m_storedToolTime.elapsed() > 500) {
 		setTool(m_storedToolName);
 	}
 }
@@ -115,7 +117,10 @@ void ToolHandle::setToolBusy(bool value)
 
 QIcon currentIcon;
 
-QIcon getCurrentIcon() { return currentIcon; }
+QIcon getCurrentIcon()
+{
+	return currentIcon;
+}
 
 //-----------------------------------------------------------------------------
 

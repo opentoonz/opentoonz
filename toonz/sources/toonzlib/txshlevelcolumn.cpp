@@ -50,7 +50,7 @@ TXshLevelColumn::TXshLevelColumn()
 	  ,
 	  m_iconVisible(false)
 {
-	//updateIcon();
+	// updateIcon();
 	m_fx->addRef();
 	m_fx->setColumn(this);
 }
@@ -109,7 +109,7 @@ TXshColumn *TXshLevelColumn::clone() const
 	column->m_cells = m_cells;
 	column->m_first = m_first;
 
-	//column->updateIcon();
+	// column->updateIcon();
 	return column;
 }
 
@@ -140,14 +140,15 @@ void TXshLevelColumn::loadData(TIStream &is)
 					TFilePath path;
 					is >> row >> rowCount >> p >> str >> increment;
 					TFrameId fid = qstringToFrameId(str);
-					assert((fid.getLetter() == 0 && rowCount >= 0) || (fid.getLetter() != 0 && rowCount == 1));
+					assert((fid.getLetter() == 0 && rowCount >= 0) ||
+						   (fid.getLetter() != 0 && rowCount == 1));
 					TXshLevel *xshLevel = dynamic_cast<TXshLevel *>(p);
 					if (xshLevel) {
 						int fidNumber = fid.getNumber();
 						for (int i = 0; i < rowCount; i++) {
 							TXshCell cell(xshLevel, fid);
 							setCell(row++, cell);
-							//rowCount>1 => fid has not letter.
+							// rowCount>1 => fid has not letter.
 							fidNumber += increment;
 							fid = TFrameId(fidNumber);
 						}
@@ -193,11 +194,13 @@ void TXshLevelColumn::saveData(TOStream &os)
 				continue;
 			TFrameId fid = cell.m_frameId;
 			int n = 1, inc = 0, dr = fid.getNumber();
-			//If fid has not letter save more than one cell and its incrementation; otherwise save one cell.
+			// If fid has not letter save more than one cell and its incrementation; otherwise save
+			// one cell.
 			if (r < r1 && fid.getLetter() == 0) {
 				TXshCell cell2 = getCell(r + 1);
 				TFrameId fid2 = cell2.m_frameId;
-				if (cell2.m_level.getPointer() == cell.m_level.getPointer() && fid2.getLetter() == 0) {
+				if (cell2.m_level.getPointer() == cell.m_level.getPointer() &&
+					fid2.getLetter() == 0) {
 					inc = cell2.m_frameId.getNumber() - dr;
 					n++;
 					for (;;) {
@@ -205,7 +208,8 @@ void TXshLevelColumn::saveData(TOStream &os)
 							break;
 						cell2 = getCell(r + n);
 						TFrameId fid2 = cell2.m_frameId;
-						if (cell2.m_level.getPointer() != cell.m_level.getPointer() || fid2.getLetter() != 0)
+						if (cell2.m_level.getPointer() != cell.m_level.getPointer() ||
+							fid2.getLetter() != 0)
 							break;
 						if (fid2.getNumber() != dr + n * inc)
 							break;

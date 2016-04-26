@@ -86,7 +86,7 @@ SceneViewerPanel::SceneViewerPanel(QWidget *parent, Qt::WFlags flags)
 	mainLayout->setMargin(0);
 	mainLayout->setSpacing(0);
 
-	//Viewer
+	// Viewer
 	QWidget *viewer = new QWidget(hbox);
 	QGridLayout *viewerL = new QGridLayout(viewer);
 
@@ -123,7 +123,8 @@ SceneViewerPanel::SceneViewerPanel(QWidget *parent, Qt::WFlags flags)
 	buttons &= (~FlipConsole::eDefineLoadBox);
 	buttons &= (~FlipConsole::eUseLoadBox);
 
-	m_flipConsole = new FlipConsole(mainLayout, buttons, false, m_keyFrameButton, "SceneViewerConsole", this, true);
+	m_flipConsole = new FlipConsole(mainLayout, buttons, false, m_keyFrameButton,
+									"SceneViewerConsole", this, true);
 
 	m_flipConsole->enableButton(FlipConsole::eMatte, false, false);
 	m_flipConsole->enableButton(FlipConsole::eSave, false, false);
@@ -138,16 +139,20 @@ SceneViewerPanel::SceneViewerPanel(QWidget *parent, Qt::WFlags flags)
 
 	m_flipConsole->setFrameHandle(TApp::instance()->getCurrentFrame());
 
-	ret = ret && connect(m_flipConsole, SIGNAL(playStateChanged(bool)), TApp::instance()->getCurrentFrame(), SLOT(setPlaying(bool)));
-	ret = ret && connect(m_flipConsole, SIGNAL(buttonPressed(FlipConsole::EGadget)), m_sceneViewer, SLOT(onButtonPressed(FlipConsole::EGadget)));
+	ret = ret && connect(m_flipConsole, SIGNAL(playStateChanged(bool)),
+						 TApp::instance()->getCurrentFrame(), SLOT(setPlaying(bool)));
+	ret = ret && connect(m_flipConsole, SIGNAL(buttonPressed(FlipConsole::EGadget)), m_sceneViewer,
+						 SLOT(onButtonPressed(FlipConsole::EGadget)));
 
 	ret = ret && connect(m_sceneViewer, SIGNAL(previewStatusChanged()), this, SLOT(update()));
 
-	ret = ret && connect(app->getCurrentScene(), SIGNAL(sceneSwitched()), this, SLOT(onSceneSwitched()));
+	ret = ret &&
+		  connect(app->getCurrentScene(), SIGNAL(sceneSwitched()), this, SLOT(onSceneSwitched()));
 
 	assert(ret);
 
-	m_flipConsole->setFrameRate(app->getCurrentScene()->getScene()->getProperties()->getOutputProperties()->getFrameRate());
+	m_flipConsole->setFrameRate(
+		app->getCurrentScene()->getScene()->getProperties()->getOutputProperties()->getFrameRate());
 	updateFrameRange(), updateFrameMarkers();
 
 	hbox->setLayout(mainLayout);
@@ -166,10 +171,14 @@ void SceneViewerPanel::onDrawFrame(int frame, const ImagePainter::VisualSettings
 	TFrameHandle *frameHandle = app->getCurrentFrame();
 
 	if (m_sceneViewer->isPreviewEnabled()) {
-		class Previewer *pr = Previewer::instance(m_sceneViewer->getPreviewMode() == SceneViewer::SUBCAMERA_PREVIEW);
-		pr->getRaster(frame - 1, settings.m_recomputeIfNeeded); //the 'getRaster' starts the render of the frame is not already started
+		class Previewer *pr =
+			Previewer::instance(m_sceneViewer->getPreviewMode() == SceneViewer::SUBCAMERA_PREVIEW);
+		pr->getRaster(frame - 1, settings.m_recomputeIfNeeded); // the 'getRaster' starts the render
+																// of the frame is not already
+																// started
 		int curFrame = frame;
-		if (frameHandle->isPlaying() && !pr->isFrameReady(frame - 1)) //stops on last rendered frame until current is ready!
+		if (frameHandle->isPlaying() &&
+			!pr->isFrameReady(frame - 1)) // stops on last rendered frame until current is ready!
 		{
 			while (frame > 1 && !pr->isFrameReady(frame - 1))
 				frame--;
@@ -181,8 +190,10 @@ void SceneViewerPanel::onDrawFrame(int frame, const ImagePainter::VisualSettings
 	if (frame != frameHandle->getFrameIndex() + 1) {
 		int oldFrame = frameHandle->getFrame();
 		frameHandle->setCurrentFrame(frame);
-		if (!frameHandle->isPlaying() && !frameHandle->isEditingLevel() && oldFrame != frameHandle->getFrame())
-			frameHandle->scrubXsheet(frame - 1, frame - 1, TApp::instance()->getCurrentXsheet()->getXsheet());
+		if (!frameHandle->isPlaying() && !frameHandle->isEditingLevel() &&
+			oldFrame != frameHandle->getFrame())
+			frameHandle->scrubXsheet(frame - 1, frame - 1,
+									 TApp::instance()->getCurrentXsheet()->getXsheet());
 	}
 
 	else if (settings.m_blankColor != TPixel::Transparent)
@@ -215,24 +226,28 @@ void SceneViewerPanel::showEvent(QShowEvent *)
 	ret = ret && connect(sceneHandle, SIGNAL(sceneChanged()), this, SLOT(onSceneChanged()));
 	ret = ret && connect(sceneHandle, SIGNAL(nameSceneChanged()), this, SLOT(changeWindowTitle()));
 
-	ret = ret && connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this, SLOT(onXshLevelSwitched(TXshLevel *)));
+	ret = ret && connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
+						 SLOT(onXshLevelSwitched(TXshLevel *)));
 	ret = ret && connect(levelHandle, SIGNAL(xshLevelChanged()), this, SLOT(changeWindowTitle()));
-	ret = ret && connect(levelHandle, SIGNAL(xshLevelTitleChanged()), this, SLOT(changeWindowTitle()));
+	ret = ret &&
+		  connect(levelHandle, SIGNAL(xshLevelTitleChanged()), this, SLOT(changeWindowTitle()));
 	ret = ret && connect(levelHandle, SIGNAL(xshLevelChanged()), this, SLOT(updateFrameRange()));
 
 	ret = ret && connect(frameHandle, SIGNAL(frameSwitched()), this, SLOT(changeWindowTitle()));
 	ret = ret && connect(frameHandle, SIGNAL(frameSwitched()), this, SLOT(onFrameSwitched()));
 	ret = ret && connect(frameHandle, SIGNAL(frameTypeChanged()), this, SLOT(onFrameTypeChanged()));
 
-	ret = ret && connect(app->getCurrentTool(), SIGNAL(toolSwitched()), m_sceneViewer, SLOT(onToolSwitched()));
+	ret = ret && connect(app->getCurrentTool(), SIGNAL(toolSwitched()), m_sceneViewer,
+						 SLOT(onToolSwitched()));
 
-	ret = ret && connect(sceneHandle, SIGNAL(preferenceChanged()), m_flipConsole, SLOT(onPreferenceChanged()));
+	ret = ret && connect(sceneHandle, SIGNAL(preferenceChanged()), m_flipConsole,
+						 SLOT(onPreferenceChanged()));
 	m_flipConsole->onPreferenceChanged();
 
 	assert(ret);
 
-	//Aggiorno FPS al valore definito nel viewer corrente.
-	//frameHandle->setPreviewFrameRate(m_fpsSlider->value());
+	// Aggiorno FPS al valore definito nel viewer corrente.
+	// frameHandle->setPreviewFrameRate(m_fpsSlider->value());
 	m_flipConsole->setActive(true);
 }
 
@@ -252,7 +267,8 @@ void SceneViewerPanel::hideEvent(QHideEvent *)
 	disconnect(sceneHandle, SIGNAL(sceneChanged()), this, SLOT(onSceneChanged()));
 	disconnect(sceneHandle, SIGNAL(nameSceneChanged()), this, SLOT(changeWindowTitle()));
 
-	disconnect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this, SLOT(onXshLevelSwitched(TXshLevel *)));
+	disconnect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
+			   SLOT(onXshLevelSwitched(TXshLevel *)));
 	disconnect(levelHandle, SIGNAL(xshLevelChanged()), this, SLOT(changeWindowTitle()));
 	disconnect(levelHandle, SIGNAL(xshLevelTitleChanged()), this, SLOT(changeWindowTitle()));
 	disconnect(levelHandle, SIGNAL(xshLevelChanged()), this, SLOT(updateFrameRange()));
@@ -261,9 +277,11 @@ void SceneViewerPanel::hideEvent(QHideEvent *)
 	disconnect(frameHandle, SIGNAL(frameSwitched()), this, SLOT(onFrameSwitched()));
 	disconnect(frameHandle, SIGNAL(frameTypeChanged()), this, SLOT(onFrameTypeChanged()));
 
-	disconnect(app->getCurrentTool(), SIGNAL(toolSwitched()), m_sceneViewer, SLOT(onToolSwitched()));
+	disconnect(app->getCurrentTool(), SIGNAL(toolSwitched()), m_sceneViewer,
+			   SLOT(onToolSwitched()));
 
-	disconnect(sceneHandle, SIGNAL(preferenceChanged()), m_flipConsole, SLOT(onPreferenceChanged()));
+	disconnect(sceneHandle, SIGNAL(preferenceChanged()), m_flipConsole,
+			   SLOT(onPreferenceChanged()));
 
 	m_flipConsole->setActive(false);
 }
@@ -288,67 +306,55 @@ void SceneViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar)
 	int x = -188;
 	int iconWidth = 17;
 	TPanelTitleBarButton *button;
-	button = new TPanelTitleBarButton(
-		titleBar,
-		":Resources/freeze.png",
-		":Resources/freeze_over.png",
-		":Resources/freeze_on.png");
+	button = new TPanelTitleBarButton(titleBar, ":Resources/freeze.png",
+									  ":Resources/freeze_over.png", ":Resources/freeze_on.png");
 	button->setToolTip(tr("Freeze"));
 	titleBar->add(QPoint(x, 2), button);
 	ret = ret && connect(button, SIGNAL(toggled(bool)), m_sceneViewer, SLOT(freeze(bool)));
-	ret = ret && connect(m_sceneViewer, SIGNAL(freezeStateChanged(bool)), button, SLOT(setPressed(bool)));
+	ret = ret &&
+		  connect(m_sceneViewer, SIGNAL(freezeStateChanged(bool)), button, SLOT(setPressed(bool)));
 
-	button = new TPanelTitleBarButton(
-		titleBar,
-		":Resources/standard.png",
-		":Resources/standard_over.png",
-		":Resources/standard_on.png");
+	button = new TPanelTitleBarButton(titleBar, ":Resources/standard.png",
+									  ":Resources/standard_over.png", ":Resources/standard_on.png");
 	button->setToolTip(tr("Camera Stand View"));
 	x += 18 + iconWidth;
 	titleBar->add(QPoint(x, 2), button);
 	button->setButtonSet(viewModeButtonSet, SceneViewer::NORMAL_REFERENCE);
 	button->setPressed(true);
 
-	button = new TPanelTitleBarButton(
-		titleBar,
-		":Resources/3D.png",
-		":Resources/3D_over.png",
-		":Resources/3D_on.png");
+	button = new TPanelTitleBarButton(titleBar, ":Resources/3D.png", ":Resources/3D_over.png",
+									  ":Resources/3D_on.png");
 	button->setToolTip(tr("3D View"));
 	x += 5 + iconWidth;
 	titleBar->add(QPoint(x, 2), button);
 	button->setButtonSet(viewModeButtonSet, SceneViewer::CAMERA3D_REFERENCE);
 
-	button = new TPanelTitleBarButton(
-		titleBar,
-		":Resources/view_camera.png",
-		":Resources/view_camera_over.png",
-		":Resources/view_camera_on.png");
+	button = new TPanelTitleBarButton(titleBar, ":Resources/view_camera.png",
+									  ":Resources/view_camera_over.png",
+									  ":Resources/view_camera_on.png");
 	button->setToolTip(tr("Camera View"));
 	x += 5 + iconWidth;
 	titleBar->add(QPoint(x, 2), button);
 	button->setButtonSet(viewModeButtonSet, SceneViewer::CAMERA_REFERENCE);
-	ret = ret && connect(viewModeButtonSet, SIGNAL(selected(int)), m_sceneViewer, SLOT(setReferenceMode(int)));
+	ret = ret && connect(viewModeButtonSet, SIGNAL(selected(int)), m_sceneViewer,
+						 SLOT(setReferenceMode(int)));
 
-	m_previewButton = new TPanelTitleBarButton(
-		titleBar,
-		":Resources/viewpreview.png",
-		":Resources/viewpreview_over.png",
-		":Resources/viewpreview_on.png");
+	m_previewButton = new TPanelTitleBarButton(titleBar, ":Resources/viewpreview.png",
+											   ":Resources/viewpreview_over.png",
+											   ":Resources/viewpreview_on.png");
 	x += 18 + iconWidth;
 	titleBar->add(QPoint(x, 2), m_previewButton);
 	m_previewButton->setToolTip(tr("Preview"));
 	ret = ret && connect(m_previewButton, SIGNAL(toggled(bool)), SLOT(enableFullPreview(bool)));
 
 	m_subcameraPreviewButton = new TPanelTitleBarButton(
-		titleBar,
-		":Resources/subcamera_preview.png",
-		":Resources/subcamera_preview_over.png",
+		titleBar, ":Resources/subcamera_preview.png", ":Resources/subcamera_preview_over.png",
 		":Resources/subcamera_preview_on.png");
 	x += 5 + iconWidth;
 	titleBar->add(QPoint(x, 2), m_subcameraPreviewButton);
 	m_subcameraPreviewButton->setToolTip(tr("Sub-camera Preview"));
-	ret = ret && connect(m_subcameraPreviewButton, SIGNAL(toggled(bool)), SLOT(enableSubCameraPreview(bool)));
+	ret = ret && connect(m_subcameraPreviewButton, SIGNAL(toggled(bool)),
+						 SLOT(enableSubCameraPreview(bool)));
 
 	assert(ret);
 }
@@ -368,7 +374,8 @@ void SceneViewerPanel::enableFullPreview(bool enabled)
 void SceneViewerPanel::enableSubCameraPreview(bool enabled)
 {
 	m_previewButton->setPressed(false);
-	m_sceneViewer->enablePreview(enabled ? SceneViewer::SUBCAMERA_PREVIEW : SceneViewer::NO_PREVIEW);
+	m_sceneViewer->enablePreview(enabled ? SceneViewer::SUBCAMERA_PREVIEW
+										 : SceneViewer::NO_PREVIEW);
 	m_flipConsole->setProgressBarStatus(&Previewer::instance(true)->getProgressBarStatus());
 	enableFlipConsoleForCamerastand(enabled);
 }
@@ -390,7 +397,7 @@ void SceneViewerPanel::enableFlipConsoleForCamerastand(bool on)
 
 	m_flipConsole->enableProgressBar(on);
 	m_flipConsole->enableBlanks(on);
-	//m_flipConsole->update();
+	// m_flipConsole->update();
 	update();
 }
 
@@ -406,7 +413,7 @@ void SceneViewerPanel::onXshLevelSwitched(TXshLevel *)
 void SceneViewerPanel::changeWindowTitle()
 {
 	TApp *app = TApp::instance();
-	//zoom = sqrt(m_sceneViewer->getViewMatrix().det());
+	// zoom = sqrt(m_sceneViewer->getViewMatrix().det());
 	ToonzScene *scene = app->getCurrentScene()->getScene();
 	if (!scene)
 		return;
@@ -429,8 +436,10 @@ void SceneViewerPanel::changeWindowTitle()
 		TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
 		TXshCell cell = xsh->getCell(frame, col);
 		if (cell.isEmpty()) {
-			TAffine aff = m_sceneViewer->getViewMatrix() * m_sceneViewer->getNormalZoomScale().inv();
-			name = name + tr("  ::  Zoom : ") + QString::number(tround(100.0 * sqrt(aff.det()))) + "%";
+			TAffine aff =
+				m_sceneViewer->getViewMatrix() * m_sceneViewer->getNormalZoomScale().inv();
+			name =
+				name + tr("  ::  Zoom : ") + QString::number(tround(100.0 * sqrt(aff.det()))) + "%";
 			setWindowTitle(name);
 			return;
 		}
@@ -442,7 +451,8 @@ void SceneViewerPanel::changeWindowTitle()
 		TXshLevel *level = app->getCurrentLevel()->getLevel();
 		if (level) {
 			TFilePath fp(level->getName());
-			QString imageName = QString::fromStdWString(fp.withFrame(app->getCurrentFrame()->getFid()).getWideString());
+			QString imageName = QString::fromStdWString(
+				fp.withFrame(app->getCurrentFrame()->getFid()).getWideString());
 			name = name + tr("Level: ") + imageName;
 		}
 	}
@@ -491,8 +501,8 @@ void SceneViewerPanel::onSceneChanged()
 	TApp *app = TApp::instance();
 	ToonzScene *scene = app->getCurrentScene()->getScene();
 	assert(scene);
-	//vinz: perche veniva fatto?
-	//m_flipConsole->updateCurrentFPS(scene->getProperties()->getOutputProperties()->getFrameRate());
+	// vinz: perche veniva fatto?
+	// m_flipConsole->updateCurrentFPS(scene->getProperties()->getOutputProperties()->getFrameRate());
 
 	int frameIndex = TApp::instance()->getCurrentFrame()->getFrameIndex();
 	if (m_keyFrameButton->getCurrentFrame() != frameIndex)
@@ -508,7 +518,12 @@ void SceneViewerPanel::onSceneSwitched()
 	enableFlipConsoleForCamerastand(false);
 	m_sceneViewer->enablePreview(SceneViewer::NO_PREVIEW);
 	m_flipConsole->setChecked(FlipConsole::eDefineSubCamera, false);
-	m_flipConsole->setFrameRate(TApp::instance()->getCurrentScene()->getScene()->getProperties()->getOutputProperties()->getFrameRate());
+	m_flipConsole->setFrameRate(TApp::instance()
+									->getCurrentScene()
+									->getScene()
+									->getProperties()
+									->getOutputProperties()
+									->getFrameRate());
 	m_sceneViewer->setEditPreviewSubcamera(false);
 	onSceneChanged();
 }

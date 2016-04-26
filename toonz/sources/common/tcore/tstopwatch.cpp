@@ -31,9 +31,7 @@ extern "C" long sysconf(int);
 
 TStopWatch TStopWatch::StopWatch[10];
 
-enum TimerType { TTUUnknown,
-				 TTUHiRes,
-				 TTUTickCount };
+enum TimerType { TTUUnknown, TTUHiRes, TTUTickCount };
 static void determineTimer();
 
 #ifdef _WIN32
@@ -52,8 +50,7 @@ using namespace std;
 
 //-----------------------------------------------------------
 
-TStopWatch::TStopWatch(std::string name)
-	: m_name(name), m_active(false), m_isRunning(false)
+TStopWatch::TStopWatch(std::string name) : m_name(name), m_active(false), m_isRunning(false)
 {
 	if (timerToUse == TTUUnknown)
 		determineTimer();
@@ -85,10 +82,7 @@ void TStopWatch::setStartToCurrentTime()
 #ifdef _WIN32
 	FILETIME creationTime, exitTime;
 	BOOL ret = GetProcessTimes(GetCurrentProcess(), // specifies the process of interest
-							   &creationTime,
-							   &exitTime,
-							   &m_startSystem,
-							   &m_startUser);
+							   &creationTime, &exitTime, &m_startSystem, &m_startUser);
 
 	if (timerToUse == TTUTickCount) {
 		m_start = GetTickCount();
@@ -145,8 +139,8 @@ inline __int64 FileTimeToInt64(LPFILETIME pFileTime)
 // Aggiunge il tempo trascorso fra start(startUser, startSystem) e l'istante corrente
 // a tm(tmUser, tmSystem)
 //
-static void checkTime(START start, START_USER startUser, START_SYSTEM startSystem,
-					  TM_TOTAL &tm, TM_USER &tmUser, TM_SYSTEM &tmSystem)
+static void checkTime(START start, START_USER startUser, START_SYSTEM startSystem, TM_TOTAL &tm,
+					  TM_USER &tmUser, TM_SYSTEM &tmSystem)
 {
 	assert(timerToUse == TTUTickCount);
 
@@ -155,16 +149,13 @@ static void checkTime(START start, START_USER startUser, START_SYSTEM startSyste
 	DWORD tm_stop;
 	FILETIME creationTime, exitTime, stopSystem, stopUser;
 	BOOL ret = GetProcessTimes(GetCurrentProcess(), // specifies the process of interest
-							   &creationTime,
-							   &exitTime,
-							   &stopSystem,
-							   &stopUser);
+							   &creationTime, &exitTime, &stopSystem, &stopUser);
 	tm_stop = GetTickCount();
 	assert(tm_stop >= start);
-	tm += tm_stop - start; //total elapsed time
+	tm += tm_stop - start; // total elapsed time
 
-	tmUser += FileTimeToInt64(&stopUser) - FileTimeToInt64(&startUser);		  //user elapsed time
-	tmSystem += FileTimeToInt64(&stopSystem) - FileTimeToInt64(&startSystem); //system elapsed time
+	tmUser += FileTimeToInt64(&stopUser) - FileTimeToInt64(&startUser); // user elapsed time
+	tmSystem += FileTimeToInt64(&stopSystem) - FileTimeToInt64(&startSystem); // system elapsed time
 
 #else // _WIN32
 
@@ -191,18 +182,15 @@ namespace
 
 //-----------------------------------------------------------
 
-void hrCheckTime(LARGE_INTEGER start, START_USER startUser, START_SYSTEM startSystem,
-				 TM_TOTAL &tm, TM_USER &tmUser, TM_SYSTEM &tmSystem)
+void hrCheckTime(LARGE_INTEGER start, START_USER startUser, START_SYSTEM startSystem, TM_TOTAL &tm,
+				 TM_USER &tmUser, TM_SYSTEM &tmSystem)
 {
 	assert(timerToUse != TTUTickCount);
 
 	LARGE_INTEGER hrTm_stop;
 	FILETIME creationTime, exitTime, stopSystem, stopUser;
 	BOOL ret = GetProcessTimes(GetCurrentProcess(), // specifies the process of interest
-							   &creationTime,
-							   &exitTime,
-							   &stopSystem,
-							   &stopUser);
+							   &creationTime, &exitTime, &stopSystem, &stopUser);
 
 	QueryPerformanceCounter(&hrTm_stop);
 	assert(hrTm_stop.HighPart > start.HighPart ||
@@ -212,7 +200,7 @@ void hrCheckTime(LARGE_INTEGER start, START_USER startUser, START_SYSTEM startSy
 	int Oht = overheadTicks;
 
 	LARGE_INTEGER dtime;
-	//faccio "a mano" la differenza dtime = m_tStop - m_tStart
+	// faccio "a mano" la differenza dtime = m_tStop - m_tStart
 	dtime.HighPart = hrTm_stop.HighPart - start.HighPart;
 	if (hrTm_stop.LowPart >= start.LowPart)
 		dtime.LowPart = hrTm_stop.LowPart - start.LowPart;
@@ -247,13 +235,13 @@ void hrCheckTime(LARGE_INTEGER start, START_USER startUser, START_SYSTEM startSy
 	double totalTime = 1000.0 * dtime.LowPart / Freq.LowPart;
 	tm += troundp(totalTime);
 
-	tmUser += FileTimeToInt64(&stopUser) - FileTimeToInt64(&startUser);		  //user elapsed time
-	tmSystem += FileTimeToInt64(&stopSystem) - FileTimeToInt64(&startSystem); //system elapsed time
+	tmUser += FileTimeToInt64(&stopUser) - FileTimeToInt64(&startUser); // user elapsed time
+	tmSystem += FileTimeToInt64(&stopSystem) - FileTimeToInt64(&startSystem); // system elapsed time
 }
 
 //-----------------------------------------------------------
 
-} //namespace
+} // namespace
 
 #endif // _WIN32
 
@@ -353,7 +341,8 @@ TStopWatch::operator string()
 {
 	char buffer[256];
 	ostrstream out(buffer, sizeof(buffer));
-	out << m_name.c_str() << ": " << (int)getTotalTime() << " u" << (int)getUserTime() << " s" << (TINT32)getSystemTime();
+	out << m_name.c_str() << ": " << (int)getTotalTime() << " u" << (int)getUserTime() << " s"
+		<< (TINT32)getSystemTime();
 	return string(buffer, out.pcount());
 }
 

@@ -26,9 +26,9 @@ int value;
 double aux;
 int max = T::maxChannelValue;
 
-if (up.m == 0)  
+if (up.m == 0)
   ris = dw;
-else if ((up.m == max)&&(glob==1))      
+else if ((up.m == max)&&(glob==1))
   ris = up;
 else if (glob==1)
   {
@@ -60,8 +60,8 @@ else
 /*---------------------------------------------------------------------------*/
 
 template <class T>
-inline void blur_code(
-	T *row1, T *row2, int length, double coeff, double coeffq, int brad, double diff, double globmatte)
+inline void blur_code(T *row1, T *row2, int length, double coeff, double coeffq, int brad,
+					  double diff, double globmatte)
 {
 	int i;
 	double rsum, gsum, bsum, msum;
@@ -119,9 +119,9 @@ inline void blur_code(
 		row2->m = (int)(row2->m * globmatte);
 	}
 	*row2 = overPix(*row1, *row2);
-	//overlayPixels<T>(*row1, *row2, *row2, globmatte);
+	// overlayPixels<T>(*row1, *row2, *row2, globmatte);
 
-	//row2++;
+	// row2++;
 
 	sigma2.r += row1[-brad].r;
 	sigma2.g += row1[-brad].g;
@@ -160,7 +160,7 @@ inline void blur_code(
 			row2->m = (int)(row2->m * globmatte);
 		}
 		*row2 = overPix(*pix2, *row2);
-		//overlayPixels<T>(*pix2, *row2, *row2, 0.8);
+		// overlayPixels<T>(*pix2, *row2, *row2, 0.8);
 
 		row2++;
 		pix1++, pix2++, pix3++, pix4++;
@@ -170,7 +170,8 @@ inline void blur_code(
 /*---------------------------------------------------------------------------*/
 
 template <class T>
-void do_filtering(T *row1, T *row2, int length, double coeff, int brad, double Mblur, double globmatte)
+void do_filtering(T *row1, T *row2, int length, double coeff, int brad, double Mblur,
+				  double globmatte)
 {
 	int i;
 	double rsum, gsum, bsum, msum;
@@ -192,7 +193,8 @@ void do_filtering(T *row1, T *row2, int length, double coeff, int brad, double M
 		sigma2.m += -i * row1[-i].m;
 	}
 
-	for (i = 0; i < length; i++) /* for the ith point the previous computing is used, with the values */
+	for (i = 0; i < length;
+		 i++) /* for the ith point the previous computing is used, with the values */
 	{
 		/* stored in the auxiliar variables sigma1 and sigma2.                           */
 		rsum = ((Mblur - i) * sigma1.r + sigma2.r) / coeff;
@@ -211,7 +213,7 @@ void do_filtering(T *row1, T *row2, int length, double coeff, int brad, double M
 			row2[i].m = (int)(row2[i].m * globmatte);
 		}
 		row2[i] = overPix(row1[i], row2[i]);
-		//overlayPixels<T>(row1[i], row2[i], row2[i], globmatte);
+		// overlayPixels<T>(row1[i], row2[i], row2[i], globmatte);
 
 		if (i < length - 1) {
 			sigma1.r += row1[i + 1].r - row1[i - brad].r;
@@ -229,8 +231,7 @@ void do_filtering(T *row1, T *row2, int length, double coeff, int brad, double M
 
 /*---------------------------------------------------------------------------*/
 
-template <class T>
-void takeRow(T *rin, T *row, int lx, int brad, bool bidirectional)
+template <class T> void takeRow(T *rin, T *row, int lx, int brad, bool bidirectional)
 {
 	int i;
 
@@ -241,25 +242,26 @@ void takeRow(T *rin, T *row, int lx, int brad, bool bidirectional)
 		row[i] = row[0];		 /* to avoid a black blur to get into the picture.          */
 
 	if (bidirectional)
-		for (i = lx; i < lx + brad; i++) /* pixels equal to the ones of border of image are added   */
-			row[i] = row[lx - 1];		 /* to avoid a black blur to get into the picture.          */
+		for (i = lx; i < lx + brad; i++) /* pixels equal to the ones of border of image are added */
+			row[i] = row[lx - 1]; /* to avoid a black blur to get into the picture.          */
 }
 
 /*---------------------------------------------------------------------------*/
 
-template <class T>
-void doDirectionalBlur(TRasterPT<T> r, double blur, bool bidirectional)
+template <class T> void doDirectionalBlur(TRasterPT<T> r, double blur, bool bidirectional)
 {
 	int i, lx, ly, brad;
 	double coeff, coeffq, diff, globmatte;
 
 	brad = tfloor(blur); /* number of pixels involved in the filtering.          */
 	if (bidirectional) {
-		coeff = blur / (brad - brad * brad + blur * (2 * brad - 1)); //sum of the weights of triangolar filter.
+		coeff = blur / (brad - brad * brad +
+						blur * (2 * brad - 1)); // sum of the weights of triangolar filter.
 		coeffq = coeff / blur;
 		diff = blur - brad;
 	} else
-		coeff = (brad + 1) * (1 - brad / (2 * blur)) * blur; /*sum of the weights of triangolar filter.              */
+		coeff = (brad + 1) * (1 - brad / (2 * blur)) *
+				blur; /*sum of the weights of triangolar filter.              */
 
 	lx = r->getLx();
 	ly = r->getLy();
@@ -290,7 +292,8 @@ void doDirectionalBlur(TRasterPT<T> r, double blur, bool bidirectional)
 /*---------------------------------------------------------------------------*/
 
 template <class T>
-void directionalBlur(TRasterPT<T> rout, TRasterPT<T> rin, const TPointD &blur, const TPoint &offset, bool bidirectional)
+void directionalBlur(TRasterPT<T> rout, TRasterPT<T> rin, const TPointD &blur, const TPoint &offset,
+					 bool bidirectional)
 {
 	double cs, sn, cx_aux, cy_aux;
 	int lx, ly, lx_aux, ly_aux;
@@ -321,7 +324,7 @@ void directionalBlur(TRasterPT<T> rout, TRasterPT<T> rin, const TPointD &blur, c
 	TRop::resample(rout, raux, rotInv);
 }
 
-} //namespace
+} // namespace
 
 void enlargeDir(TRectD &r, TPointD p, bool bidirectional)
 {
@@ -365,9 +368,9 @@ void reduceDir(TRectD &r, TPointD p, bool bidirectional)
 
 class DirectionalBlurBaseFx : public TStandardRasterFx
 {
-	//FX_PLUGIN_DECLARATION(DirectionalBlurBaseFx)
+	// FX_PLUGIN_DECLARATION(DirectionalBlurBaseFx)
 
-protected:
+  protected:
 	bool m_isMotionBlur;
 	TRasterFxPort m_input;
 	TDoubleParamP m_angle;
@@ -376,10 +379,12 @@ protected:
 	TBoolParamP m_spread;
 	//  TBoolParamP m_useSSE;
 
-public:
+  public:
 	bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info);
 
-	DirectionalBlurBaseFx(bool isMotionBLur) : m_isMotionBlur(isMotionBLur), m_angle(0.0), m_intensity(10.0), m_bidirectional(false), m_spread(true)
+	DirectionalBlurBaseFx(bool isMotionBLur)
+		: m_isMotionBlur(isMotionBLur), m_angle(0.0), m_intensity(10.0), m_bidirectional(false),
+		  m_spread(true)
 	{
 		bindParam(this, "intensity", m_intensity);
 		bindParam(this, "bidirectional", m_bidirectional);
@@ -415,9 +420,8 @@ class DirectionalBlurFx : public DirectionalBlurBaseFx
 {
 	FX_PLUGIN_DECLARATION(DirectionalBlurFx)
 
-public:
-	DirectionalBlurFx()
-		: DirectionalBlurBaseFx(false)
+  public:
+	DirectionalBlurFx() : DirectionalBlurBaseFx(false)
 	{
 		m_intensity->setMeasureName("fxLength");
 		m_angle->setMeasureName("angle");
@@ -439,17 +443,15 @@ class MotionBlurFx : public DirectionalBlurBaseFx
 
 {
 	FX_PLUGIN_DECLARATION(MotionBlurFx)
-public:
-	MotionBlurFx()
-		: DirectionalBlurBaseFx(true)
-	{
-	}
+  public:
+	MotionBlurFx() : DirectionalBlurBaseFx(true) {}
 
 	std::string getAlias(double frame, const TRenderSettings &info) const
 	{
 		unsigned long id = getIdentifier();
 		double value = m_intensity->getValue(frame);
-		return getFxType() + "[" + toString(id) + "," + toString(frame) + "," + toString(value) + "]";
+		return getFxType() + "[" + toString(id) + "," + toString(frame) + "," + toString(value) +
+			   "]";
 	}
 };
 
@@ -510,14 +512,15 @@ void DirectionalBlurBaseFx::doCompute(TTile &tile, double frame, const TRenderSe
 		return;
 	}
 
-	TRectD rectTile = TRectD(tile.m_pos, TDimensionD(tile.getRaster()->getLx(), tile.getRaster()->getLy()));
+	TRectD rectTile =
+		TRectD(tile.m_pos, TDimensionD(tile.getRaster()->getLx(), tile.getRaster()->getLy()));
 	if (!rectTile.isEmpty()) {
 		TRectD bboxIn;
 		m_input->getBBox(frame, bboxIn, ri);
 		if (bboxIn == TConsts::infiniteRectD)
 			bboxIn = rectTile;
 		TPointD blur = (1.0 / shrink) * (aff * blurVector);
-		//enlarge must be bidirectional, because we need pixel on the ohter side of blur
+		// enlarge must be bidirectional, because we need pixel on the ohter side of blur
 		enlargeDir(bboxIn, blur, true);
 		rectTile = bboxIn * rectTile.enlarge(fabs(blur.x), fabs(blur.y));
 		TRect rectIn;
@@ -529,8 +532,7 @@ void DirectionalBlurBaseFx::doCompute(TTile &tile, double frame, const TRenderSe
 		int rasInLx = rectIn.getLx();
 		int rasInLy = rectIn.getLy();
 		TTile tileIn;
-		m_input->allocateAndCompute(tileIn, convert(rectIn.getP00()),
-									TDimension(rasInLx, rasInLy),
+		m_input->allocateAndCompute(tileIn, convert(rectIn.getP00()), TDimension(rasInLx, rasInLy),
 									tile.getRaster(), frame, ri);
 		TRasterP rasIn = tileIn.getRaster();
 		TRect rectOut = rasIn->getBounds() + (rectIn.getP00() - convert(tile.m_pos));
@@ -550,7 +552,8 @@ void DirectionalBlurBaseFx::doCompute(TTile &tile, double frame, const TRenderSe
 
 //---------------------------------------------------------------------------
 
-int DirectionalBlurBaseFx::getMemoryRequirement(const TRectD &rect, double frame, const TRenderSettings &info)
+int DirectionalBlurBaseFx::getMemoryRequirement(const TRectD &rect, double frame,
+												const TRenderSettings &info)
 {
 	TPointD blurVector;
 	if (m_isMotionBlur) {

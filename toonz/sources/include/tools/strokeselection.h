@@ -38,10 +38,10 @@ class TSceneHandle;
 
 class DVAPI StrokeSelection : public TSelection
 {
-public:
+  public:
 	typedef std::set<int> IndexesContainer;
 
-public:
+  public:
 	StrokeSelection();
 	~StrokeSelection();
 
@@ -63,12 +63,9 @@ public:
 	void toggle(int index);
 	void selectNone() { m_indexes.clear(); }
 
-	void setSceneHandle(TSceneHandle *tsh)
-	{
-		m_sceneHandle = tsh;
-	}
+	void setSceneHandle(TSceneHandle *tsh) { m_sceneHandle = tsh; }
 
-public:
+  public:
 	// Commands
 
 	void changeColorStyle(int styleIndex);
@@ -81,15 +78,16 @@ public:
 
 	void enableCommands();
 
-private:
+  private:
 	TVectorImageP m_vi;			//!< Selected vector image.
 	IndexesContainer m_indexes; //!< Selected stroke indexes in m_vi.
 
 	std::unique_ptr<TGroupCommand> m_groupCommand; //!< Groups commands wrapper.
-	TSceneHandle *m_sceneHandle;					 //!< Global scene handle. \deprecated  Use TApplication instead.
+	TSceneHandle *m_sceneHandle; //!< Global scene handle. \deprecated  Use TApplication instead.
 
-	/*!Set this boolean to true before call tool->notifyImageChanged() when you want to reset strokes bbox.
-     N.B. after call tool->notifyImageChanged() set m_updateSelectionBBox to false.*/
+	/*!Set this boolean to true before call tool->notifyImageChanged() when you want to reset
+	 strokes bbox.
+	 N.B. after call tool->notifyImageChanged() set m_updateSelectionBBox to false.*/
 	bool m_updateSelectionBBox;
 };
 

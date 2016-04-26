@@ -10,7 +10,7 @@
 
 class MacOfflineGL : public TOfflineGL::Imp
 {
-public:
+  public:
 	AGLContext m_context;
 	AGLContext m_oldContext;
 

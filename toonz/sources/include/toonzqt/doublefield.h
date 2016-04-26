@@ -34,11 +34,8 @@ class DVAPI DoubleValueLineEdit : public LineEdit
 {
 	Q_OBJECT
 
-public:
-	DoubleValueLineEdit(QWidget *parent = 0)
-		: LineEdit(parent)
-	{
-	}
+  public:
+	DoubleValueLineEdit(QWidget *parent = 0) : LineEdit(parent) {}
 	~DoubleValueLineEdit() {}
 
 	virtual void setValue(double value) = 0;
@@ -49,11 +46,11 @@ public:
 
 	virtual int getDecimals() { return 2; }
 
-protected:
+  protected:
 	/*! If focus is lost and current value is out of range emit signal \b lostFocus. */
 	void focusOutEvent(QFocusEvent *);
 
-signals:
+  signals:
 	/*! To emit when value change. */
 	void valueChanged();
 };
@@ -84,13 +81,13 @@ class DVAPI DoubleValueField : public QWidget
 {
 	Q_OBJECT
 
-protected:
+  protected:
 	RollerField *m_roller;
 	DoubleValueLineEdit *m_lineEdit;
 	QSlider *m_slider;
 	QWidget *m_spaceWidget;
 
-public:
+  public:
 	DoubleValueField(QWidget *parent, DoubleValueLineEdit *lineEdit);
 	~DoubleValueField() {}
 
@@ -114,7 +111,7 @@ public:
 	void enableRoller(bool enable);
 	bool isRollerEnabled();
 
-protected slots:
+  protected slots:
 	/*! Set to value the text field and roller. If text field value is different from \b value
 			emit signal valueChanged(int value). */
 	void onSliderChanged(int value);
@@ -129,7 +126,7 @@ protected slots:
 			emit signal valueChanged(). */
 	void onRollerValueChanged(bool isDragging);
 
-signals:
+  signals:
 	/*!	This signal is emitted when DoubleFiel, slider, roller or text field, value change;
 			if slider position change or text field editing is finished.
 			\sa onEditingFinished() and onSliderChanged(int value). */
@@ -155,7 +152,7 @@ class DVAPI DoubleLineEdit : public DoubleValueLineEdit
 
 	QDoubleValidator *m_validator;
 
-public:
+  public:
 	DoubleLineEdit(QWidget *parent = 0, double value = 1);
 	~DoubleLineEdit() {}
 
@@ -186,14 +183,14 @@ public:
 class DVAPI DoubleField : public DoubleValueField
 {
 
-public:
+  public:
 	DoubleField(QWidget *parent = 0, bool isRollerHide = true, int decimals = 2);
 	~DoubleField() {}
 };
 
 //=============================================================================
 /*! \brief The MeasuredDoubleLineEdit class provides to view an object to manage
-            a double lineEdit with its misure.
+			a double lineEdit with its misure.
 */
 class DVAPI MeasuredDoubleLineEdit : public DoubleValueLineEdit
 {
@@ -207,7 +204,7 @@ class DVAPI MeasuredDoubleLineEdit : public DoubleValueLineEdit
 	int m_errorHighlightingTimerId;
 	int m_decimals;
 
-public:
+  public:
 	MeasuredDoubleLineEdit(QWidget *parent = 0);
 	~MeasuredDoubleLineEdit();
 
@@ -225,13 +222,13 @@ public:
 	// called after setText()
 	void postSetText() { onEditingFinished(); }
 
-private:
+  private:
 	void valueToText();
 
-protected:
+  protected:
 	void timerEvent(QTimerEvent *e);
 
-protected slots:
+  protected slots:
 
 	void onEditingFinished();
 	void onTextChanged(const QString &);
@@ -247,7 +244,7 @@ class DVAPI MeasuredDoubleField : public DoubleValueField
 {
 	Q_OBJECT
 
-public:
+  public:
 	MeasuredDoubleField(QWidget *parent = 0, bool isRollerHide = true);
 	~MeasuredDoubleField() {}
 
@@ -257,7 +254,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-} //namespace DVGui
+} // namespace DVGui
 //-----------------------------------------------------------------------------
 
 #endif // DOUBLEFIELD_H

@@ -8,28 +8,25 @@
 //==========================================================
 /*!
 The class TSoundTrackReaderAiff reads audio files having
-.aiff extension 
+.aiff extension
 */
 
 class TSoundTrackReaderAiff : public TSoundTrackReader
 {
-public:
+  public:
 	TSoundTrackReaderAiff(const TFilePath &fp);
 	~TSoundTrackReaderAiff() {}
 
 	/*!
   Loads the .aiff audio file whose path has been specified in the constructor.
-  It returns a TSoundTrackP created from the audio file 
+  It returns a TSoundTrackP created from the audio file
   */
 	TSoundTrackP load();
 
 	/*!
   Returns a soundtrack reader able to read .aiff audio files
   */
-	static TSoundTrackReader *create(const TFilePath &fp)
-	{
-		return new TSoundTrackReaderAiff(fp);
-	}
+	static TSoundTrackReader *create(const TFilePath &fp) { return new TSoundTrackReaderAiff(fp); }
 };
 
 //==========================================================
@@ -39,7 +36,7 @@ The class TSoundTrackWriterAiff writes audio file having
 */
 class TSoundTrackWriterAiff : public TSoundTrackWriter
 {
-public:
+  public:
 	TSoundTrackWriterAiff(const TFilePath &fp);
 	~TSoundTrackWriterAiff() {}
 
@@ -52,10 +49,7 @@ public:
 	/*!
   Returns a soundtrack writer able to write .aiff audio files
   */
-	static TSoundTrackWriter *create(const TFilePath &fp)
-	{
-		return new TSoundTrackWriterAiff(fp);
-	}
+	static TSoundTrackWriter *create(const TFilePath &fp) { return new TSoundTrackWriterAiff(fp); }
 };
 
 #endif

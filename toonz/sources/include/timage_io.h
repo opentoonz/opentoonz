@@ -39,7 +39,7 @@ class DVAPI TImageException : public TException
 {
 	TFilePath m_fp;
 
-public:
+  public:
 	TImageException(const TFilePath &fp, const std::string &msg);
 	~TImageException() {}
 
@@ -55,7 +55,7 @@ class DVAPI TImageVersionException : public TException
 	TFilePath m_fp;
 	int m_major, m_minor;
 
-public:
+  public:
 	TImageVersionException(const TFilePath &fp, int major, int minor);
 	~TImageVersionException() {}
 
@@ -88,7 +88,7 @@ class DVAPI TImageReader : public TSmartObject
 
 	friend class TImageReaderP;
 
-protected:
+  protected:
 	// std::fstream m_stream;
 	TFilePath m_path;
 	FILE *m_file;
@@ -103,18 +103,18 @@ protected:
 	TRect m_region;
 	static bool m_safeMode;
 
-public:
+  public:
 	static void setSafeModeReadingForTzl(bool activated) { m_safeMode = activated; }
 	TImageReader(const TFilePath &path);
 	virtual ~TImageReader();
 
-private:
+  private:
 	// not implemented
 	TImageReader(const TImageReader &);
 	TImageReader &operator=(const TImageReader &src);
 	TImageP load0();
 
-public:
+  public:
 	// TImageReader keeps ownership: DO NOT DELETE
 	virtual const TImageInfo *getImageInfo() const;
 
@@ -123,19 +123,17 @@ public:
 	TPropertyGroup *getProperties();
 	void setProperties(const TPropertyGroup *);
 	/*! Load Image from disk.
-    If set region then loads only image's region.
+	If set region then loads only image's region.
 		If set shrink then loads image (or region, if set) with shrink.
 
-    Note: if the region, or part of it, is not contained in the image
+	Note: if the region, or part of it, is not contained in the image
 	  then returns only the intersection between the image and region.
 		If the intersection is void returns TImageP();
 */
 	virtual TImageP load();
 
-	void load(
-		const TRasterP &ras,
-		const TPoint &pos = TPoint(0, 0),
-		int shrinkX = 1, int shrinkY = 1);
+	void load(const TRasterP &ras, const TPoint &pos = TPoint(0, 0), int shrinkX = 1,
+			  int shrinkY = 1);
 
 	static bool load(const TFilePath &, TRasterP &);
 	static bool load(const TFilePath &, TImageP &);
@@ -145,12 +143,10 @@ public:
 
 	static void getSupportedFormats(QStringList &names);
 
-	//TDimension getSize() const;
-	//virtual TRect getBBox() const = 0;
+	// TDimension getSize() const;
+	// virtual TRect getBBox() const = 0;
 
-	static void define(
-		QString extension,
-		TImageReaderCreateProc *proc);
+	static void define(QString extension, TImageReaderCreateProc *proc);
 
 	void doReadGraytones(bool readThem);
 	void enable16BitRead(bool is64bitEnabled) { m_is64BitEnabled = is64bitEnabled; }
@@ -158,14 +154,15 @@ public:
 	int getShrink() const { return m_shrink; }
 	/*!
 	   Setta lo shrink in modo che al load() viene letta da disco
-		 una riga ogni "shrink" righe ed all'interno di queste righe viene letto un pixel ogni "shrink" pixel. 
+		 una riga ogni "shrink" righe ed all'interno di queste righe viene letto un pixel ogni
+	   "shrink" pixel.
 		 La prima riga viene sempre letta.
 		 Il primo pixel di una riga letta viene sempre preso.
-	   Nota che se shrink=1 non viene saltata alcuna riga ne pixel. 
+	   Nota che se shrink=1 non viene saltata alcuna riga ne pixel.
 	*/
 	void setShrink(int shrink);
 
-	/*! 
+	/*!
  Set image's region.
  Region dimension doesn't consider shrink.
 */
@@ -176,7 +173,8 @@ public:
 */
 	TRect getRegion() const { return m_region; }
 
-	void getTzpPaletteColorNames(std::map<int, std::pair<std::string, std::string>> &pltColorNames); //colorindex(<256: paint), pagename, colorname
+	void getTzpPaletteColorNames(std::map<int, std::pair<std::string, std::string>> &
+									 pltColorNames); // colorindex(<256: paint), pagename, colorname
 };
 
 //-----------------------------------------------------------
@@ -187,7 +185,7 @@ template class DVAPI TSmartPointerT<TImageReader>;
 
 class DVAPI TImageReaderP : public TSmartPointerT<TImageReader>
 {
-public:
+  public:
 	TImageReaderP(TImageReader *ir) : TSmartPointerT<TImageReader>(ir){};
 	// il costruttore "non banale"
 	TImageReaderP(const TFilePath &filepath);
@@ -211,7 +209,7 @@ class DVAPI TImageWriter : public TSmartObject
 
 	DECLARE_CLASS_CODE
 
-protected:
+  protected:
 	// std::fstream m_stream;
 	TFilePath m_path;
 
@@ -219,16 +217,16 @@ protected:
 	Tiio::VectorWriter *m_vectorWriter;
 	TPropertyGroup *m_properties;
 
-public:
+  public:
 	TImageWriter(const TFilePath &path);
 	virtual ~TImageWriter();
 
-private:
+  private:
 	// not implemented
 	TImageWriter(const TImageWriter &);
 	TImageWriter &operator=(const TImageWriter &src);
 
-public:
+  public:
 	TFilePath getFilePath() const { return m_path; };
 
 	// don't get ownership
@@ -241,9 +239,7 @@ public:
 
 	static void getSupportedFormats(QStringList &names, bool onlyRenderFormats);
 
-	static void define(
-		QString extension,
-		TImageWriterCreateProc *proc, bool isRenderFormat);
+	static void define(QString extension, TImageWriterCreateProc *proc, bool isRenderFormat);
 };
 
 //-----------------------------------------------------------
@@ -254,7 +250,7 @@ template class DVAPI TSmartPointerT<TImageWriter>;
 
 class DVAPI TImageWriterP : public TSmartPointerT<TImageWriter>
 {
-public:
+  public:
 	TImageWriterP(TImageWriter *iw) : TSmartPointerT<TImageWriter>(iw){};
 	// il costruttore "non banale"
 	TImageWriterP(const TFilePath &filepath);

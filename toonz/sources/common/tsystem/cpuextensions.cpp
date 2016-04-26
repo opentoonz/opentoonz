@@ -12,7 +12,7 @@ using namespace TSystem;
 #ifdef x64
 long TSystem::getCPUExtensions()
 {
-	return TSystem::CpuSupportsSse | TSystem::CpuSupportsSse2; //TSystem::CPUExtensionsNone
+	return TSystem::CpuSupportsSse | TSystem::CpuSupportsSse2; // TSystem::CPUExtensionsNone
 }
 
 #else

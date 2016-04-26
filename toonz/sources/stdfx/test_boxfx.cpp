@@ -20,9 +20,11 @@ class Test_BoxFx : public TStandardRasterFx
 	TBoolParamP m_bool;
 	TStringParamP m_string;
 
-public:
+  public:
 	Test_BoxFx()
-		: m_h(30.0), m_v(30.0), m_color(TPixel32::Blue), m_range(DoublePair(100., 100.)), m_int(12), m_enum(new TIntEnumParam(0, "Color")), m_point(TPointD(0.0, 0.0)), m_bool(true), m_string(L"urka")
+		: m_h(30.0), m_v(30.0), m_color(TPixel32::Blue), m_range(DoublePair(100., 100.)), m_int(12),
+		  m_enum(new TIntEnumParam(0, "Color")), m_point(TPointD(0.0, 0.0)), m_bool(true),
+		  m_string(L"urka")
 	{
 		m_h->setValueRange(0, 100);
 		m_enum->addItem(1, "Uno");
@@ -37,10 +39,9 @@ public:
 		bindParam(this, "int", m_int);
 		bindParam(this, "range", m_range);
 		bindParam(this, "bool", m_bool);
-		TSpectrum::ColorKey colors[] = {
-			TSpectrum::ColorKey(0, TPixel32::White),
-			TSpectrum::ColorKey(0.5, TPixel32::Yellow),
-			TSpectrum::ColorKey(1, TPixel32::Red)};
+		TSpectrum::ColorKey colors[] = {TSpectrum::ColorKey(0, TPixel32::White),
+										TSpectrum::ColorKey(0.5, TPixel32::Yellow),
+										TSpectrum::ColorKey(1, TPixel32::Red)};
 		m_colors = TSpectrumParamP(tArrayCount(colors), colors);
 		bindParam(this, "spectrum", m_colors);
 		bindParam(this, "string", m_string);
@@ -66,16 +67,9 @@ public:
 //===================================================================
 
 template <class PIX, class RAS>
-void doTest_Box(
-	RAS ras,
-	double h, double v,
-	TPointD pos,
-	TPixel32 &color32,
-	int my_enum, int my_int,
-	const TSpectrumT<PIX> spectrum,
-	TPointD point,
-	DoublePair range,
-	bool my_bool)
+void doTest_Box(RAS ras, double h, double v, TPointD pos, TPixel32 &color32, int my_enum,
+				int my_int, const TSpectrumT<PIX> spectrum, TPointD point, DoublePair range,
+				bool my_bool)
 {
 	int lx = ras->getLx();
 	int ly = ras->getLy();
@@ -92,7 +86,9 @@ void doTest_Box(
 			if (tmp.x > 0 && tmp.x < h && tmp.y > 0 && tmp.y < v) {
 				if (my_enum && my_bool) {
 					if (tmp.x > range.first && tmp.x < range.second)
-						*pix = spectrum.getPremultipliedValue(sqrt((tmp.x - point.x) * (tmp.x - point.x) / (h * h) + (tmp.y - point.y) * (tmp.y - point.y) / (v * v)));
+						*pix = spectrum.getPremultipliedValue(
+							sqrt((tmp.x - point.x) * (tmp.x - point.x) / (h * h) +
+								 (tmp.y - point.y) * (tmp.y - point.y) / (v * v)));
 					else
 						*pix = color;
 				} else
@@ -121,13 +117,11 @@ void Test_BoxFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 	DoublePair range = m_range->getValue(frame);
 	bool my_bool = m_bool->getValue();
 	if (TRaster32P raster32 = tile.getRaster())
-		doTest_Box<TPixel32, TRaster32P>(
-			raster32, h, v, tile.m_pos, color, my_enum, my_int,
-			m_colors->getValue(frame), point, range, my_bool);
+		doTest_Box<TPixel32, TRaster32P>(raster32, h, v, tile.m_pos, color, my_enum, my_int,
+										 m_colors->getValue(frame), point, range, my_bool);
 	else if (TRaster64P raster64 = tile.getRaster())
-		doTest_Box<TPixel64, TRaster64P>(
-			raster64, h, v, tile.m_pos, color, my_enum, my_int,
-			m_colors->getValue64(frame), point, range, my_bool);
+		doTest_Box<TPixel64, TRaster64P>(raster64, h, v, tile.m_pos, color, my_enum, my_int,
+										 m_colors->getValue64(frame), point, range, my_bool);
 	else
 		throw TException("Test_BoxFx: unsupported Pixel Type");
 }

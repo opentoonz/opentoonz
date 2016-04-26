@@ -36,37 +36,29 @@ class DVAPI TDragDropExpt
 };
 
 //////////////////
-//TDropSource/////
+// TDropSource/////
 //////////////////
 
 class DVAPI TDropSource
 {
 
 #if defined(__GNUC__)
-public:
+  public:
 #endif
 	class Imp;
 #if defined(__GNUC__)
-private:
+  private:
 #endif
 
 	Imp *m_imp;
 
-private:
+  private:
 	// not implemented
 	TDropSource(const TDropSource &);
 	TDropSource &operator=(const TDropSource &);
 
-public:
-	enum DropEffect {
-		None = 0,
-		Copy,
-		Move,
-		Link,
-		CopyScroll,
-		MoveScroll,
-		LinkScroll
-	};
+  public:
+	enum DropEffect { None = 0, Copy, Move, Link, CopyScroll, MoveScroll, LinkScroll };
 
 	TDropSource();
 	virtual ~TDropSource();
@@ -77,21 +69,21 @@ public:
 
 	// viene chiamata durante il drag su un target passando come
 	// argomento il valore ritornato dalla onOver() del target
-	//virtual CursorToUse setCursor(DropEffect dropEffect);
+	// virtual CursorToUse setCursor(DropEffect dropEffect);
 
 	virtual void setCursor(DropEffect dropEffect);
 };
 
 //////////////////
-//TDropTarget/////
+// TDropTarget/////
 //////////////////
 //! \brief Ascoltatore degli eventi per il Drag&Drop
 class DVAPI TDragDropListener
 {
-public:
+  public:
 	class Event
 	{
-	public:
+	  public:
 		const TData *const m_data;
 		TPoint m_pos;
 		unsigned int m_buttonMask;
@@ -112,12 +104,12 @@ public:
 };
 
 //////////////////
-//TDataObject/////
+// TDataObject/////
 //////////////////
 
 class DVAPI TDataObject
 {
-public:
+  public:
 	class Imp;
 	Imp *m_imp;
 
@@ -125,23 +117,19 @@ public:
 	TDataObject(const TDataObject &);
 	TDataObject &operator=(const TDataObject &);
 
-public:
-	enum DataType {
-		Text,
-		File,
-		Bitmap
-	};
+  public:
+	enum DataType { Text, File, Bitmap };
 
 	TDataObject();
 	~TDataObject();
 
-	//Costruttore per Text
+	// Costruttore per Text
 	TDataObject(const std::string &str);
 	TDataObject(const std::wstring &str);
-	//Costruttore per File
+	// Costruttore per File
 	TDataObject(const std::vector<std::string> &vStr);
 	TDataObject(const std::vector<std::wstring> &vStr);
-	//Costruttore per dt_bitmap o eventualmente un tipo proprietario
+	// Costruttore per dt_bitmap o eventualmente un tipo proprietario
 	TDataObject(DataType dataType, const unsigned char *data, const unsigned int dataLen);
 
 	bool getDataTypes(std::vector<DataType> &dataType) const;
@@ -150,8 +138,8 @@ public:
 	bool getData(std::vector<string> &vStr) const;
 	bool getData(DataType dataType, unsigned char *&data, unsigned int *dataLen) const;
 
-	//friend class TDropSource::Imp;
-	//friend class TDropTarget::Imp;
+	// friend class TDropSource::Imp;
+	// friend class TDropTarget::Imp;
 	friend class TEnumFormatEtc;
 };
 
@@ -172,23 +160,22 @@ public:
 
 class DVAPI TDNDGenericDataHolder
 {
-protected:
+  protected:
 	TDNDGenericDataHolder() {}
 	static TDNDGenericDataHolder *m_holder;
 
-public:
+  public:
 	virtual ~TDNDGenericDataHolder() {}
 	static bool isDraggingCustomData() { return m_holder != 0; }
 	TDropSource::DropEffect doDragDrop();
 };
 
-template <class T>
-class TDNDDataHolder : public TDNDGenericDataHolder
+template <class T> class TDNDDataHolder : public TDNDGenericDataHolder
 {
 	T *m_value;
 	string m_name;
 
-public:
+  public:
 	TDNDDataHolder(T *value, string name = "") : m_value(value), m_name(name) { m_holder = this; }
 	~TDNDDataHolder() { m_holder = 0; }
 	T *getValue() const { return m_value; }

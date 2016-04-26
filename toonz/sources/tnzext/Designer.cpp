@@ -53,8 +53,7 @@ void ToonzExt::Designer::draw(ToonzExt::Selector *)
 
 //-----------------------------------------------------------------------------
 
-double
-ToonzExt::Designer::getPixelSize2() const
+double ToonzExt::Designer::getPixelSize2() const
 {
 	return tglGetPixelSize2();
 }

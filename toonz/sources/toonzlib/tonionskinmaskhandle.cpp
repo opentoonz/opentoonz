@@ -6,8 +6,7 @@
 // TColumnHandle
 //-----------------------------------------------------------------------------
 
-TOnionSkinMaskHandle::TOnionSkinMaskHandle()
-	: m_onionSkinMask()
+TOnionSkinMaskHandle::TOnionSkinMaskHandle() : m_onionSkinMask()
 {
 }
 

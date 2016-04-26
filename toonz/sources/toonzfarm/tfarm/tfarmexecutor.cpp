@@ -4,8 +4,7 @@
 #include <QStringList>
 //------------------------------------------------------------------------------
 
-TFarmExecutor::TFarmExecutor(int port)
-	: TTcpIpServer(port)
+TFarmExecutor::TFarmExecutor(int port) : TTcpIpServer(port)
 {
 }
 

@@ -19,13 +19,13 @@ namespace Tiio
 DVAPI Tiio::ReaderMaker makeBmpReader;
 DVAPI Tiio::WriterMaker makeBmpWriter;
 
-//DVAPI TPropertyGroup *makeBmpWriterProperties();
+// DVAPI TPropertyGroup *makeBmpWriterProperties();
 
 class BmpWriterProperties : public TPropertyGroup
 {
-public:
+  public:
 	TEnumProperty m_pixelSize;
-	//TBoolProperty m_compressed;
+	// TBoolProperty m_compressed;
 
 	BmpWriterProperties();
 };

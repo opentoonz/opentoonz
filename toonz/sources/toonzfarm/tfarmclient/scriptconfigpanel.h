@@ -19,7 +19,7 @@ class PathFileField : public TTextField
 {
 	ScriptConfigPanel *m_page;
 
-public:
+  public:
 	PathFileField(TWidget *parent, string name = "");
 
 	void onFocusChange(bool on);
@@ -31,7 +31,7 @@ public:
 
 class ScriptConfigPanel : public TaskConfigPanel
 {
-public:
+  public:
 	ScriptConfigPanel(TWidget *parent);
 
 	void configureNotify(const TDimension &d);
@@ -43,7 +43,7 @@ public:
 	void loadScript(const TFilePath &fp);
 	void onTextField(string value, int type);
 
-private:
+  private:
 	ScriptTask *m_task;
 
 	TLabel *m_fileLbl;

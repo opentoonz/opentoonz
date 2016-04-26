@@ -1,7 +1,7 @@
 
 
-#define _CRT_SECURE_NO_WARNINGS (1)  //Warning treated as errors
-#define _CRT_SECURE_NO_DEPRECATE (1) //use of fopen deprecated
+#define _CRT_SECURE_NO_WARNINGS (1) // Warning treated as errors
+#define _CRT_SECURE_NO_DEPRECATE (1) // use of fopen deprecated
 
 // Tnz includes (-.-')
 #include "../toonz/tapp.h"
@@ -155,7 +155,7 @@ void fatalError(string msg)
 {
 #ifdef _WIN32
 	std::cout << msg << std::endl;
-	//MessageBox(0,msg.c_str(),"Fatal error",MB_ICONERROR);
+	// MessageBox(0,msg.c_str(),"Fatal error",MB_ICONERROR);
 	exit(1);
 #else
 	// TODO: Come si fa ad aggiungere un messaggio di errore qui?
@@ -227,7 +227,7 @@ TFilePath setToonzFolder(const TFilePath &filename, std::string toonzVar)
 		while (isBlank(*s))
 			s++;
 		if (*s == '\0')
-			continue; //errore: dst vuoto
+			continue; // errore: dst vuoto
 		t = s;
 		while (*t)
 			t++;
@@ -270,7 +270,7 @@ void tcomposerRunOutOfContMemHandler(unsigned long size)
 	cout << msg << endl;
 	m_userLog->error(msg);
 
-	//The task will necessarily do something wrong. So we quit with an error code.
+	// The task will necessarily do something wrong. So we quit with an error code.
 	TImageCache::instance()->clear(true);
 	exit(2);
 }
@@ -280,9 +280,11 @@ void tcomposerRunOutOfContMemHandler(unsigned long size)
 
 class MyMovieRenderListener : public MovieRenderer::Listener
 {
-public:
-	MyMovieRenderListener(const TFilePath &fp, int frameCount, QWaitCondition &renderCompleted, bool stereo)
-		: m_fp(fp), m_frameCount(frameCount), m_frameCompletedCount(0), m_frameFailedCount(0), m_renderCompleted(renderCompleted), m_stereo(stereo)
+  public:
+	MyMovieRenderListener(const TFilePath &fp, int frameCount, QWaitCondition &renderCompleted,
+						  bool stereo)
+		: m_fp(fp), m_frameCount(frameCount), m_frameCompletedCount(0), m_frameFailedCount(0),
+		  m_renderCompleted(renderCompleted), m_stereo(stereo)
 	{
 	}
 
@@ -305,7 +307,8 @@ bool MyMovieRenderListener::onFrameCompleted(int frame)
 	TFilePath fp = m_fp.withFrame(frame + 1);
 	string msg;
 	if (m_stereo)
-		msg = toString(fp.withName(fp.getName() + "_l").getWideString()) + " and " + toString(fp.withName(fp.getName() + "_r").getWideString()) + " computed";
+		msg = toString(fp.withName(fp.getName() + "_l").getWideString()) + " and " +
+			  toString(fp.withName(fp.getName() + "_r").getWideString()) + " computed";
 	else
 		msg = toString(fp.getWideString()) + " computed";
 	cout << msg << endl;
@@ -313,9 +316,11 @@ bool MyMovieRenderListener::onFrameCompleted(int frame)
 	DVGui::info(QString::fromStdString(msg));
 	if (FarmController) {
 		try {
-			FarmController->taskProgress(TaskId, m_frameCompletedCount + m_frameFailedCount, m_frameCount, frame + 1, FrameDone);
+			FarmController->taskProgress(TaskId, m_frameCompletedCount + m_frameFailedCount,
+										 m_frameCount, frame + 1, FrameDone);
 		} catch (...) {
-			msg = "Unable to connect to " + toString(FarmControllerPort) + "@" + FarmControllerName.toStdString();
+			msg = "Unable to connect to " + toString(FarmControllerPort) + "@" +
+				  FarmControllerName.toStdString();
 			cout << msg;
 			m_userLog->error(msg);
 		}
@@ -341,9 +346,11 @@ bool MyMovieRenderListener::onFrameFailed(int frame, TException &e)
 	m_userLog->error(msg);
 	if (FarmController) {
 		try {
-			FarmController->taskProgress(TaskId, m_frameCompletedCount + m_frameFailedCount, m_frameCount, frame + 1, FrameFailed);
+			FarmController->taskProgress(TaskId, m_frameCompletedCount + m_frameFailedCount,
+										 m_frameCount, frame + 1, FrameFailed);
 		} catch (...) {
-			msg = "Unable to connect to " + toString(FarmControllerPort) + "@" + FarmControllerName.toStdString();
+			msg = "Unable to connect to " + toString(FarmControllerPort) + "@" +
+				  FarmControllerName.toStdString();
 			cout << msg;
 			m_userLog->error(msg);
 		}
@@ -366,7 +373,7 @@ void MyMovieRenderListener::onSequenceCompleted(const TFilePath &fp)
 
 class MyMultimediaRenderListener : public MultimediaRenderer::Listener
 {
-public:
+  public:
 	TFilePath m_fp;
 	int m_frameCount;
 	int m_frameCompletedCount;
@@ -388,14 +395,17 @@ public:
 bool MyMultimediaRenderListener::onFrameCompleted(int frame, int column)
 {
 	int actualFrame = frame + 1;
-	string msg = toString(m_fp.getWideString()) + ", column " + toString(column) + ", frame " + toString(actualFrame) + " computed";
+	string msg = toString(m_fp.getWideString()) + ", column " + toString(column) + ", frame " +
+				 toString(actualFrame) + " computed";
 	cout << msg << endl;
 	m_userLog->info(msg);
 	if (FarmController) {
 		try {
-			FarmController->taskProgress(TaskId, m_frameCompletedCount + m_frameFailedCount, m_frameCount, actualFrame, FrameDone);
+			FarmController->taskProgress(TaskId, m_frameCompletedCount + m_frameFailedCount,
+										 m_frameCount, actualFrame, FrameDone);
 		} catch (...) {
-			msg = "Unable to connect to " + toString(FarmControllerPort) + "@" + FarmControllerName.toStdString();
+			msg = "Unable to connect to " + toString(FarmControllerPort) + "@" +
+				  FarmControllerName.toStdString();
 			cout << msg;
 			m_userLog->error(msg);
 		}
@@ -410,7 +420,8 @@ bool MyMultimediaRenderListener::onFrameCompleted(int frame, int column)
 bool MyMultimediaRenderListener::onFrameFailed(int frame, int column, TException &e)
 {
 	int actualFrame = frame + 1;
-	string msg = toString(m_fp.getWideString()) + ", column " + toString(column) + ", frame " + toString(actualFrame) + " failed";
+	string msg = toString(m_fp.getWideString()) + ", column " + toString(column) + ", frame " +
+				 toString(actualFrame) + " failed";
 
 	if (!e.getMessage().empty())
 		msg += ": " + toString(e.getMessage());
@@ -419,9 +430,11 @@ bool MyMultimediaRenderListener::onFrameFailed(int frame, int column, TException
 	m_userLog->error(msg);
 	if (FarmController) {
 		try {
-			FarmController->taskProgress(TaskId, m_frameCompletedCount + m_frameFailedCount, m_frameCount, actualFrame, FrameFailed);
+			FarmController->taskProgress(TaskId, m_frameCompletedCount + m_frameFailedCount,
+										 m_frameCount, actualFrame, FrameFailed);
 		} catch (...) {
-			msg = "Unable to connect to " + toString(FarmControllerPort) + "@" + FarmControllerName.toStdString();
+			msg = "Unable to connect to " + toString(FarmControllerPort) + "@" +
+				  FarmControllerName.toStdString();
 			cout << msg;
 			m_userLog->error(msg);
 		}
@@ -433,12 +446,8 @@ bool MyMultimediaRenderListener::onFrameFailed(int frame, int column, TException
 
 //==================================================================================
 
-std::pair<int, int> generateMovie(ToonzScene *scene,
-								  const TFilePath &fp,
-								  int r0, int r1,
-								  int step, int shrink,
-								  int threadCount,
-								  int maxTileSize)
+std::pair<int, int> generateMovie(ToonzScene *scene, const TFilePath &fp, int r0, int r1, int step,
+								  int shrink, int threadCount, int maxTileSize)
 {
 	QWaitCondition renderCompleted;
 
@@ -464,11 +473,13 @@ std::pair<int, int> generateMovie(ToonzScene *scene,
 
 #ifdef _WIN32
 	if (ext == "avi") {
-		TPropertyGroup *props = scene->getProperties()->getOutputProperties()->getFileFormatProperties(ext);
+		TPropertyGroup *props =
+			scene->getProperties()->getOutputProperties()->getFileFormatProperties(ext);
 		string codecName = props->getProperty(0)->getValueAsString();
 		TDimension res = scene->getCurrentCamera()->getRes();
 		if (!AviCodecRestrictions::canWriteMovie(toWideString(codecName), res)) {
-			string msg("The resolution of the output camera does not fit with the options chosen for the output file format.");
+			string msg("The resolution of the output camera does not fit with the options chosen "
+					   "for the output file format.");
 			m_userLog->error(msg);
 			exit(1);
 		}
@@ -506,18 +517,17 @@ std::pair<int, int> generateMovie(ToonzScene *scene,
 		for (int i = 0; i < numFrames; i += step, r += stepd)
 			multimediaRenderer.addFrame(r);
 
-		MyMultimediaRenderListener *listener =
-			new MyMultimediaRenderListener(fp,
-										   multimediaRenderer.getFrameCount() * multimediaRenderer.getColumnsCount());
+		MyMultimediaRenderListener *listener = new MyMultimediaRenderListener(
+			fp, multimediaRenderer.getFrameCount() * multimediaRenderer.getColumnsCount());
 		multimediaRenderer.addListener(listener);
 
 		multimediaRenderer.start();
 
 		//----------------- main thread remains above until render is done ----------------
 
-		//NOTE: the passed total frame count "columns * frames" is an overestimate in this case:
-		//columns which do not appear on certain frames are not rendered. So, just realize the
-		//number of failed frames if any.
+		// NOTE: the passed total frame count "columns * frames" is an overestimate in this case:
+		// columns which do not appear on certain frames are not rendered. So, just realize the
+		// number of failed frames if any.
 		std::pair<int, int> framePair =
 			std::make_pair(listener->m_frameCount, listener->m_frameCount);
 
@@ -550,13 +560,16 @@ std::pair<int, int> generateMovie(ToonzScene *scene,
 			if (rs.m_stereoscopic)
 				scene->shiftCameraX(-rs.m_stereoscopicShift / 2);
 
-			fx.m_frameA = (TRasterFxP)buildSceneFx(scene, scene->getXsheet(), r, which, shrink, false);
+			fx.m_frameA =
+				(TRasterFxP)buildSceneFx(scene, scene->getXsheet(), r, which, shrink, false);
 
 			if (rs.m_fieldPrevalence != TRenderSettings::NoField)
-				fx.m_frameB = (TRasterFxP)buildSceneFx(scene, scene->getXsheet(), r + 0.5 * timeStretchFactor, which, shrink, false);
+				fx.m_frameB = (TRasterFxP)buildSceneFx(
+					scene, scene->getXsheet(), r + 0.5 * timeStretchFactor, which, shrink, false);
 			else if (rs.m_stereoscopic) {
 				scene->shiftCameraX(rs.m_stereoscopicShift);
-				fx.m_frameB = (TRasterFxP)buildSceneFx(scene, scene->getXsheet(), r, which, shrink, false);
+				fx.m_frameB =
+					(TRasterFxP)buildSceneFx(scene, scene->getXsheet(), r, which, shrink, false);
 				scene->shiftCameraX(-rs.m_stereoscopicShift / 2);
 			} else
 				fx.m_frameB = TRasterFxP();
@@ -566,12 +579,12 @@ std::pair<int, int> generateMovie(ToonzScene *scene,
 
 		movieRenderer.start();
 
-		//Start main loop
+		// Start main loop
 		QCoreApplication::instance()->exec();
 
 		//----------------- tcomposer's main thread loops here ----------------
 
-		//int frameCompleted = listener->m_frameCompletedCount;
+		// int frameCompleted = listener->m_frameCompletedCount;
 		std::pair<int, int> framePair =
 			std::make_pair(listener->m_frameCompletedCount, listener->m_frameCount);
 
@@ -586,7 +599,7 @@ std::pair<int, int> generateMovie(ToonzScene *scene,
 //
 //----------------------------------------------------------------------------------
 
-//TODO: il main comincia a diventare troppo lungo. Forse val la pena
+// TODO: il main comincia a diventare troppo lungo. Forse val la pena
 // separarlo in varie funzioni
 // (tipo initToonzEnvironment(), parseCommandLine(), ecc)
 
@@ -602,24 +615,26 @@ int main(int argc, char *argv[])
 
 #ifdef _WIN32
 #ifndef x64
-	//Store the floating point control word. It will be re-set before Toonz initialization
-	//has ended.
+	// Store the floating point control word. It will be re-set before Toonz initialization
+	// has ended.
 	unsigned int fpWord = 0;
 	_controlfp_s(&fpWord, 0, 0);
 #endif
 #endif
 
-	//Set the app's locale for numeric stuff to standard C. This is important for atof() and similar
-	//calls that are locale-dependant.
+	// Set the app's locale for numeric stuff to standard C. This is important for atof() and
+	// similar
+	// calls that are locale-dependant.
 	setlocale(LC_NUMERIC, "C");
 
 	// Install run out of contiguous memory callback
-	TBigMemoryManager::instance()->setRunOutOfContiguousMemoryHandler(&tcomposerRunOutOfContMemHandler);
+	TBigMemoryManager::instance()->setRunOutOfContiguousMemoryHandler(
+		&tcomposerRunOutOfContMemHandler);
 
 #ifdef _WIN32
-//Define 64-bit precision for floating-point arithmetic. Please observe that the
-//initImageIo() call below would already impose this precision. This just wants to be
-//explicit.
+// Define 64-bit precision for floating-point arithmetic. Please observe that the
+// initImageIo() call below would already impose this precision. This just wants to be
+// explicit.
 //_controlfp_s(0, 0, 0x10000);
 #endif
 
@@ -633,10 +648,10 @@ int main(int argc, char *argv[])
 	TEnv::setSystemVarPrefix(systemVarPrefix);
 	TSystem::hasMainLoop(true);
 
-	//QMessageBox::information(0, QString("eccolo"), QString("composer!"));
+	// QMessageBox::information(0, QString("eccolo"), QString("composer!"));
 
 	int i;
-	for (i = 0; i < argc; i++) //tmsg must be set as soon as it's possible
+	for (i = 0; i < argc; i++) // tmsg must be set as soon as it's possible
 	{
 		QString str = argv[i];
 		if (str == "-tmsg") {
@@ -660,11 +675,11 @@ int main(int argc, char *argv[])
 	TEnv::setStuffDir(stuffDirPath);
 
 /*
-    #ifdef BRAVO
-      TFilePath stuffDir("/Applications/Toonz 7.1 Bravo/Toonz 7.1 Bravo stuff");
-    #else
-      TFilePath stuffDir("/Applications/Toonz 7.1/Toonz 7.1 stuff");
-    #endif	
+	#ifdef BRAVO
+	  TFilePath stuffDir("/Applications/Toonz 7.1 Bravo/Toonz 7.1 Bravo stuff");
+	#else
+	  TFilePath stuffDir("/Applications/Toonz 7.1/Toonz 7.1 stuff");
+	#endif
 	  TEnv::setStuffDir(stuffDir);
 */
 
@@ -673,9 +688,11 @@ int main(int argc, char *argv[])
 	// controllo se la xxxroot e' definita e corrisponde ad un file esistente
 	TFilePath fp = TEnv::getStuffDir();
 	if (fp == TFilePath())
-		fatalError(string("Undefined: \"") + toString(TEnv::getRootVarPath().getWideString()) + "\"");
+		fatalError(string("Undefined: \"") + toString(TEnv::getRootVarPath().getWideString()) +
+				   "\"");
 	if (!TFileStatus(fp).isDirectory())
-		fatalError(string("Directory \"") + toString(fp.getWideString()) + "\" not found or not readable");
+		fatalError(string("Directory \"") + toString(fp.getWideString()) +
+				   "\" not found or not readable");
 
 	TFilePath lRootDir = fp + "toonzfarm";
 	TFilePath logFilePath = lRootDir + "tcomposer.log";
@@ -685,58 +702,59 @@ int main(int argc, char *argv[])
 	/*
 
   #ifdef MACOSX
-    // Library and cacheRoot Folders
-	
-	TFilePath libraryFolder = 
-      setToonzFolder(
-        TEnv::getStuffDir() + "toonzenv.txt",
-        TEnv::getSystemVarPrefix() +"LIBRARY");
+	// Library and cacheRoot Folders
+
+	TFilePath libraryFolder =
+	  setToonzFolder(
+		TEnv::getStuffDir() + "toonzenv.txt",
+		TEnv::getSystemVarPrefix() +"LIBRARY");
 	  if(libraryFolder == TFilePath())
 	  {
-	    cout << "Cannot set " << TEnv::getSystemVarPrefix() << "LIBRARY folder" << endl;
-	    m_userLog->error("Cannot set " +TEnv::getSystemVarPrefix()+"LIBRARY folder");
+		cout << "Cannot set " << TEnv::getSystemVarPrefix() << "LIBRARY folder" << endl;
+		m_userLog->error("Cannot set " +TEnv::getSystemVarPrefix()+"LIBRARY folder");
 		  return -1;
 	  }
-	  TFilePath cacheRoot = 
-      setToonzFolder(
-        TEnv::getStuffDir() + "toonzenv.txt",
-        TEnv::getSystemVarPrefix()+"CACHEROOT");
+	  TFilePath cacheRoot =
+	  setToonzFolder(
+		TEnv::getStuffDir() + "toonzenv.txt",
+		TEnv::getSystemVarPrefix()+"CACHEROOT");
 	  if(cacheRoot == TFilePath())
 	  {
-	    cout << "Cannot set " + TEnv::getSystemVarPrefix() +"CACHEROOT folder" << endl;
-	    m_userLog->error("Cannot set " + TEnv::getSystemVarPrefix() + "CACHEROOT folder");
+		cout << "Cannot set " + TEnv::getSystemVarPrefix() +"CACHEROOT folder" << endl;
+		m_userLog->error("Cannot set " + TEnv::getSystemVarPrefix() + "CACHEROOT folder");
 		  return -1;
 	  }
 */
 	/*
-    #ifdef BRAVO
-    TFilePath libraryFolder("/Applications/Toonz 5.0 Bravo/Toonz 5.0 Bravo stuff/projects/library");
-    TFilePath cacheRoot("/Applications/Toonz 5.0 Bravo/Toonz 5.0 Bravo stuff/cache");
-    #else
-    TFilePath libraryFolder("/Applications/Toonz 5.0/Toonz 5.0 stuff/projects/library");
-    TFilePath cacheRoot("/Applications/Toonz 5.0/Toonz 5.0 stuff/cache");
-    #endif
+	#ifdef BRAVO
+	TFilePath libraryFolder("/Applications/Toonz 5.0 Bravo/Toonz 5.0 Bravo stuff/projects/library");
+	TFilePath cacheRoot("/Applications/Toonz 5.0 Bravo/Toonz 5.0 Bravo stuff/cache");
+	#else
+	TFilePath libraryFolder("/Applications/Toonz 5.0/Toonz 5.0 stuff/projects/library");
+	TFilePath cacheRoot("/Applications/Toonz 5.0/Toonz 5.0 stuff/cache");
+	#endif
 */
 	/*
 	TRasterImagePatternStrokeStyle::setRootDir(libraryFolder);
 	  TVectorImagePatternStrokeStyle::setRootDir(libraryFolder);
 	  TPalette::setRootDir(libraryFolder);
-    cacheRoot += TFilePath(toString(TSystem::getProcessId()));
-    TFileStatus fs(cacheRoot);
-    if (!fs.doesExist())
-      TSystem::mkDir(cacheRoot);
-    TImageCache::instance()->setRootDir(cacheRoot);
-  
-  	// ProjectFolder
-    TFilePath projectFolder = setToonzFolder(TEnv::getStuffDir() + "toonzenv.txt", TEnv::getSystemVarPrefix()+"PROJECTS");
-		
-	  if(projectFolder == TFilePath()) 
+	cacheRoot += TFilePath(toString(TSystem::getProcessId()));
+	TFileStatus fs(cacheRoot);
+	if (!fs.doesExist())
+	  TSystem::mkDir(cacheRoot);
+	TImageCache::instance()->setRootDir(cacheRoot);
+
+	// ProjectFolder
+	TFilePath projectFolder = setToonzFolder(TEnv::getStuffDir() + "toonzenv.txt",
+  TEnv::getSystemVarPrefix()+"PROJECTS");
+
+	  if(projectFolder == TFilePath())
 	  {
-	    cout << "Cannot set TOONZPROJECTS folder" << endl;
-	    m_userLog->error("Cannot set TOONZPROJECTS folder");
+		cout << "Cannot set TOONZPROJECTS folder" << endl;
+		m_userLog->error("Cannot set TOONZPROJECTS folder");
 		  return -1;
 	  }
-	
+
 	  TProjectManager::instance()->addProjectsRoot(projectFolder);
   #else
 */
@@ -777,7 +795,8 @@ int main(int argc, char *argv[])
 	StringQualifier tmsg("-tmsg val", "only internal use");
 
 	Usage usage(argv[0]);
-	usage.add(srcName + dstName + range + stepOpt + shrinkOpt + multimedia + farmData + idq + nthreads + tileSize + tmsg);
+	usage.add(srcName + dstName + range + stepOpt + shrinkOpt + multimedia + farmData + idq +
+			  nthreads + tileSize + tmsg);
 	if (!usage.parse(argc, argv))
 		exit(1);
 
@@ -823,7 +842,8 @@ int main(int argc, char *argv[])
 		//	TPluginManager::instance()->loadPlugins(binRoot + "bin" + "plugins" + "io");
 		//	TPluginManager::instance()->loadPlugins(binRoot + "bin" + "plugins" + "fx");
 		//#else
-		//    TPluginManager::instance()->loadStandardPlugins();//per ora , visto che altrimenti non funzionano gli stili speciali
+		//    TPluginManager::instance()->loadStandardPlugins();//per ora , visto che altrimenti non
+		//    funzionano gli stili speciali
 
 		initImageIo();
 		Tiio::defineStd();
@@ -846,8 +866,7 @@ int main(int argc, char *argv[])
 
 		//---------------------------------------------------------
 		msg = "Loading " + srcFilePath.getName();
-		cout << endl
-			 << msg << endl;
+		cout << endl << msg << endl;
 		m_userLog->info(msg);
 		TProjectManager *pm = TProjectManager::instance();
 		// pm->enableTabMode(true);
@@ -886,7 +905,7 @@ int main(int argc, char *argv[])
 				  ".\n Some files may be missing.";
 			cout << msg << endl;
 			m_userLog->error(msg);
-			//return false;
+			// return false;
 		}
 
 		msg = "scene loaded";
@@ -903,16 +922,15 @@ int main(int argc, char *argv[])
 			if (dstFilePath == TFilePath())
 				dstFilePath = TFilePath("+outputs") + "$scenename.tif";
 			else if (dstFilePath.getName() == "")
-				dstFilePath = (dstFilePath.getParentDir() + scene->getSceneName()).withType(dstFilePath.getType());
+				dstFilePath = (dstFilePath.getParentDir() + scene->getSceneName())
+								  .withType(dstFilePath.getType());
 		}
 
 		dstFilePath = scene->decodeFilePath(dstFilePath);
 
 		//---------------------------------------------------------
 		msg = "Generating " + dstFilePath.getName();
-		cout << endl
-			 << "Generating " << dstFilePath << endl
-			 << endl;
+		cout << endl << "Generating " << dstFilePath << endl << endl;
 		m_userLog->info(msg);
 
 		TFilePath theDstFilePath = dstFilePath;
@@ -952,16 +970,21 @@ int main(int argc, char *argv[])
 		else
 			shrink = scene_shrink;
 		if (multimedia.isSelected())
-			scene->getProperties()->getOutputProperties()->setMultimediaRendering(multimedia.getValue());
+			scene->getProperties()->getOutputProperties()->setMultimediaRendering(
+				multimedia.getValue());
 
-		//Retrieve Thread count
+		// Retrieve Thread count
 		const int procCount = TSystem::getProcessorCount();
 		int threadCount;
 		const int threadCounts[3] = {1, procCount / 2, procCount};
 		if (nthreads.isSelected()) {
 			QString threadCountStr = QString::fromStdString(nthreads.getValue());
 			threadCount =
-				(threadCountStr == "single") ? threadCounts[0] : (threadCountStr == "half") ? threadCounts[1] : (threadCountStr == "all") ? threadCounts[2] : threadCountStr.toInt();
+				(threadCountStr == "single") ? threadCounts[0] : (threadCountStr == "half")
+																	 ? threadCounts[1]
+																	 : (threadCountStr == "all")
+																		   ? threadCounts[2]
+																		   : threadCountStr.toInt();
 
 			if (threadCount <= 0) {
 				cout << "Qualifier 'nthreads': bad input" << endl;
@@ -974,17 +997,20 @@ int main(int argc, char *argv[])
 
 		threadCount = tcrop(1, procCount, threadCount);
 
-		//Retrieve max tile size (raster granularity)
+		// Retrieve max tile size (raster granularity)
 		int maxTileSize;
-		const int maxTileSizes[4] = {
-			(std::numeric_limits<int>::max)(),
-			TOutputProperties::LargeVal,
-			TOutputProperties::MediumVal,
-			TOutputProperties::SmallVal};
+		const int maxTileSizes[4] = {(std::numeric_limits<int>::max)(), TOutputProperties::LargeVal,
+									 TOutputProperties::MediumVal, TOutputProperties::SmallVal};
 		if (tileSize.isSelected()) {
 			QString tileSizeStr = QString::fromStdString(tileSize.getValue());
 			maxTileSize =
-				(tileSizeStr == "none") ? maxTileSizes[0] : (tileSizeStr == "large") ? maxTileSizes[1] : (tileSizeStr == "medium") ? maxTileSizes[2] : (tileSizeStr == "small") ? maxTileSizes[3] : tileSizeStr.toInt();
+				(tileSizeStr == "none") ? maxTileSizes[0] : (tileSizeStr == "large")
+																? maxTileSizes[1]
+																: (tileSizeStr == "medium")
+																	  ? maxTileSizes[2]
+																	  : (tileSizeStr == "small")
+																			? maxTileSizes[3]
+																			: tileSizeStr.toInt();
 
 			if (maxTileSize <= 0) {
 				cout << "Qualifier 'maxtilesize': bad input" << endl;
@@ -999,49 +1025,57 @@ int main(int argc, char *argv[])
 		if (maxTileSize != (std::numeric_limits<int>::max)())
 			m_userLog->info("Render tile: " + toString(maxTileSize));
 
-		//Disable the Passive cache manager. It has no sense if it cannot write on disk...
-		//TCacheResourcePool::instance();   //Needs to be instanced before TPassiveCacheManager...
+		// Disable the Passive cache manager. It has no sense if it cannot write on disk...
+		// TCacheResourcePool::instance();   //Needs to be instanced before TPassiveCacheManager...
 		TPassiveCacheManager::instance()->setEnabled(false);
 
 #ifdef _WIN32
 #ifndef x64
-		//On 32-bit architecture, there could be cases in which initialization could alter the
-		//FPU floating point control word. I've seen this happen when loading some AVI coded (VFAPI),
-		//where 80-bit internal precision was used instead of the standard 64-bit (much faster and
-		//sufficient - especially considering that x86 truncates to 64-bit representation anyway).
-		//IN ANY CASE, revert to the original control word.
-		//In the x64 case these precision changes simply should not take place up to _controlfp_s
-		//documentation.
+		// On 32-bit architecture, there could be cases in which initialization could alter the
+		// FPU floating point control word. I've seen this happen when loading some AVI coded
+		// (VFAPI),
+		// where 80-bit internal precision was used instead of the standard 64-bit (much faster and
+		// sufficient - especially considering that x86 truncates to 64-bit representation anyway).
+		// IN ANY CASE, revert to the original control word.
+		// In the x64 case these precision changes simply should not take place up to _controlfp_s
+		// documentation.
 		_controlfp_s(0, fpWord, -1);
 #endif
 #endif
 
-		framePair = generateMovie(scene, theDstFilePath, r0, r1, step, shrink, threadCount, maxTileSize);
+		framePair =
+			generateMovie(scene, theDstFilePath, r0, r1, step, shrink, threadCount, maxTileSize);
 
 		Sw1.stop();
 
-		m_userLog->info("Raster Allocation Peak: " + toString(TBigMemoryManager::instance()->getAllocationPeak()) + " KB");
-		m_userLog->info("Raster Allocation Mean: " + toString(TBigMemoryManager::instance()->getAllocationMean()) + " KB");
+		m_userLog->info("Raster Allocation Peak: " +
+						toString(TBigMemoryManager::instance()->getAllocationPeak()) + " KB");
+		m_userLog->info("Raster Allocation Mean: " +
+						toString(TBigMemoryManager::instance()->getAllocationMean()) + " KB");
 
 		msg = "Compositing completed in " + toString(Sw1.getTotalTime() / 1000.0, 2) + " seconds";
-		string msg2 = "\n" + toString(Sw2.getTotalTime() / 1000.0, 2) + " seconds spent on loading" + "\n" +
-					  toString(TStopWatch::global(0).getTotalTime() / 1000.0, 2) + " seconds spent on saving" + "\n" +
-					  toString(TStopWatch::global(8).getTotalTime() / 1000.0, 2) + " seconds spent on rendering" + "\n";
+		string msg2 = "\n" + toString(Sw2.getTotalTime() / 1000.0, 2) +
+					  " seconds spent on loading" + "\n" +
+					  toString(TStopWatch::global(0).getTotalTime() / 1000.0, 2) +
+					  " seconds spent on saving" + "\n" +
+					  toString(TStopWatch::global(8).getTotalTime() / 1000.0, 2) +
+					  " seconds spent on rendering" + "\n";
 		cout << msg + msg2;
 		m_userLog->info(msg + msg2);
 		DVGui::info(QString::fromStdString(msg));
 		TImageCache::instance()->clear(true);
 		/*
-    cout << "Compositing completed in " + toString(Sw1.getTotalTime()/1000.0, 2) + " seconds";
-    cout << endl;
-    
-    cout << toString(Sw2.getTotalTime()/1000.0, 2) << " seconds spent on loading" << endl;
-    cout << toString(TStopWatch::global(0).getTotalTime()/1000.0, 2) << " seconds spent on saving" << endl;
-    cout << toString(TStopWatch::global(8).getTotalTime()/1000.0, 2) << " seconds spent on rendering" << endl;
-    cout << endl;*/
+	cout << "Compositing completed in " + toString(Sw1.getTotalTime()/1000.0, 2) + " seconds";
+	cout << endl;
+
+	cout << toString(Sw2.getTotalTime()/1000.0, 2) << " seconds spent on loading" << endl;
+	cout << toString(TStopWatch::global(0).getTotalTime()/1000.0, 2) << " seconds spent on saving"
+	<< endl;
+	cout << toString(TStopWatch::global(8).getTotalTime()/1000.0, 2) << " seconds spent on
+	rendering" << endl;
+	cout << endl;*/
 	} catch (TException &e) {
-		msg = "Untrapped exception: " + toString(e.getMessage()),
-		cout << msg << endl;
+		msg = "Untrapped exception: " + toString(e.getMessage()), cout << msg << endl;
 		m_userLog->error(msg);
 		TImageCache::instance()->clear(true);
 	} catch (...) {

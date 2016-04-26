@@ -38,7 +38,7 @@ class PosPathKeyframesUpdater
 	std::vector<double> m_newControlPointsLengths;
 	double m_oldSplineLength, m_newSplineLength;
 
-public:
+  public:
 	PosPathKeyframesUpdater(TStroke *oldSpline, TStroke *newSpline)
 		: m_oldSplineLength(0), m_newSplineLength(0)
 	{
@@ -112,7 +112,8 @@ void PosPathKeyframesUpdater::update(double &s)
 // TStageObjectSpline
 
 TStageObjectSpline::TStageObjectSpline()
-	: TSmartObject(m_classCode), m_stroke(0), m_dagNodePos(TConst::nowhere), m_id(-1), m_idBase(toString(idBaseCode++)), m_name(""), m_isOpened(false)
+	: TSmartObject(m_classCode), m_stroke(0), m_dagNodePos(TConst::nowhere), m_id(-1),
+	  m_idBase(toString(idBaseCode++)), m_name(""), m_isOpened(false)
 {
 	double d = 30;
 	std::vector<TThickPoint> points;

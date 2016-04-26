@@ -28,14 +28,14 @@ class PlasticDeformerFx : public TRasterFx
 {
 	FX_DECLARATION(PlasticDeformerFx)
 
-public:
+  public:
 	TXsheet *m_xsh;			//!< The Fx's enclosing Xsheet
 	int m_col;				//!< The input column index
 	TAffine m_texPlacement; //!< Texture to mesh reference transform
 
 	TRasterFxPort m_port; //!< Input port
 
-public:
+  public:
 	PlasticDeformerFx();
 
 	TFx *clone(bool recursive = true) const;
@@ -50,7 +50,7 @@ public:
 
 	std::string getPluginId() const { return std::string(); }
 
-private:
+  private:
 	void buildRenderSettings(double, TRenderSettings &);
 
 	bool buildTextureData(double, TRenderSettings &, TAffine &);

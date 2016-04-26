@@ -34,11 +34,10 @@ class DVAPI LicenseChecker
 {
 	Q_OBJECT
 
-public:
-	enum LicenseMode { TAB,
-					   TOONZ };
+  public:
+	enum LicenseMode { TAB, TOONZ };
 
-private:
+  private:
 	bool m_httpRequestAborted;
 	int m_httpGetId;
 
@@ -46,16 +45,17 @@ private:
 
 	bool m_isValid;
 
-public:
+  public:
 	LicenseChecker(const QString &requestUrl, LicenseMode licenseMode, std::string license,
 				   std::string applicationName, const QString &version);
 
 	bool isLicenseValid() const { return m_isValid; }
 
-private:
-	QString buildRequest(const QString &requestUrl, std::string license, std::string applicationName, const QString &version);
+  private:
+	QString buildRequest(const QString &requestUrl, std::string license,
+						 std::string applicationName, const QString &version);
 
-protected slots:
+  protected slots:
 	//#if QT_VERSION >= 0x050000
 	void httpRequestFinished(QNetworkReply *);
 	//#else
@@ -64,7 +64,8 @@ protected slots:
 	//  void readResponseHeader(const QHttpResponseHeader &responseHeader);
 	//#endif
 	void httpRequestStarted(int requestId) {}
-	void slotAuthenticationRequired(const QString &hostName, quint16, QAuthenticator *authenticator);
+	void slotAuthenticationRequired(const QString &hostName, quint16,
+									QAuthenticator *authenticator);
 	void httpStateChanged(int state);
 };
 

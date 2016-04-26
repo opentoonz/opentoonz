@@ -48,10 +48,9 @@ typedef std::vector<double> Doubles;
 typedef std::vector<BlendAndPoint> BlendAndPoints;
 //=============================================================================
 
-template <class T>
-class TOptimizedStrokeStyleT : public TColorStyle
+template <class T> class TOptimizedStrokeStyleT : public TColorStyle
 {
-public:
+  public:
 	TOptimizedStrokeStyleT() {}
 
 	bool isRegionStyle() const { return false; }
@@ -76,7 +75,7 @@ class TFurStrokeStyle : public TOptimizedStrokeStyleT<Points>
 	double m_cs, m_sn, m_angle, m_length;
 	TPixel32 m_color;
 
-public:
+  public:
 	TFurStrokeStyle();
 
 	TColorStyle *clone() const;
@@ -87,7 +86,10 @@ public:
 	void drawStroke(const TColorFunction *cf, Points &positions, const TStroke *stroke) const;
 	void drawStroke(TFlash &rd, const TStroke *stroke) const;
 
-	QString getDescription() const { return QCoreApplication::translate("TFurStrokeStyle", "Herringbone"); }
+	QString getDescription() const
+	{
+		return QCoreApplication::translate("TFurStrokeStyle", "Herringbone");
+	}
 
 	bool hasMainColor() const { return true; }
 	TPixel32 getMainColor() const { return m_color; }
@@ -101,10 +103,7 @@ public:
 	double getParamValue(TColorStyle::double_tag, int index) const;
 	void setParamValue(int index, double value);
 
-	void saveData(TOutputStreamInterface &os) const
-	{
-		os << m_color << m_angle << m_length;
-	}
+	void saveData(TOutputStreamInterface &os) const { os << m_color << m_angle << m_length; }
 
 	void loadData(TInputStreamInterface &is)
 	{
@@ -122,7 +121,7 @@ class TChainStrokeStyle : public TOptimizedStrokeStyleT<Points>
 {
 	TPixel32 m_color;
 
-public:
+  public:
 	TChainStrokeStyle(const TPixel32 &color);
 	TChainStrokeStyle();
 
@@ -130,7 +129,10 @@ public:
 
 	TColorStyle *clone() const;
 
-	QString getDescription() const { return QCoreApplication::translate("TChainStrokeStyle", "Chain"); }
+	QString getDescription() const
+	{
+		return QCoreApplication::translate("TChainStrokeStyle", "Chain");
+	}
 
 	bool hasMainColor() const { return true; }
 	TPixel32 getMainColor() const { return m_color; }
@@ -152,14 +154,17 @@ class TSprayStrokeStyle : public TSimpleStrokeStyle
 	TPixel32 m_color;
 	double m_blend, m_intensity, m_radius;
 
-public:
+  public:
 	TSprayStrokeStyle();
 
 	void invalidate() {}
 
 	TColorStyle *clone() const;
 
-	QString getDescription() const { return QCoreApplication::translate("TSprayStrokeStyle", "Circlets"); }
+	QString getDescription() const
+	{
+		return QCoreApplication::translate("TSprayStrokeStyle", "Circlets");
+	}
 
 	bool hasMainColor() const { return true; }
 	TPixel32 getMainColor() const { return m_color; }
@@ -176,8 +181,14 @@ public:
 	void drawStroke(const TColorFunction *cf, const TStroke *stroke) const;
 	void drawStroke(TFlash &flash, const TStroke *stroke) const;
 
-	void loadData(TInputStreamInterface &is) { is >> m_color >> m_blend >> m_intensity >> m_radius; }
-	void saveData(TOutputStreamInterface &os) const { os << m_color << m_blend << m_intensity << m_radius; }
+	void loadData(TInputStreamInterface &is)
+	{
+		is >> m_color >> m_blend >> m_intensity >> m_radius;
+	}
+	void saveData(TOutputStreamInterface &os) const
+	{
+		os << m_color << m_blend << m_intensity << m_radius;
+	}
 	int getTagId() const { return 106; };
 };
 
@@ -188,14 +199,17 @@ class TGraphicPenStrokeStyle : public TOptimizedStrokeStyleT<DrawmodePointsMatri
 	TPixel32 m_color;
 	double m_intensity;
 
-public:
+  public:
 	TGraphicPenStrokeStyle();
 
 	void invalidate() {}
 
 	TColorStyle *clone() const;
 
-	QString getDescription() const { return QCoreApplication::translate("TGraphicPenStrokeStyle", "Dashes"); }
+	QString getDescription() const
+	{
+		return QCoreApplication::translate("TGraphicPenStrokeStyle", "Dashes");
+	}
 
 	bool hasMainColor() const { return true; }
 	TPixel32 getMainColor() const { return m_color; }
@@ -209,8 +223,10 @@ public:
 	double getParamValue(TColorStyle::double_tag, int index) const;
 	void setParamValue(int index, double value);
 
-	void computeData(DrawmodePointsMatrix &data, const TStroke *stroke, const TColorFunction *cf) const;
-	void drawStroke(const TColorFunction *cf, DrawmodePointsMatrix &data, const TStroke *stroke) const;
+	void computeData(DrawmodePointsMatrix &data, const TStroke *stroke,
+					 const TColorFunction *cf) const;
+	void drawStroke(const TColorFunction *cf, DrawmodePointsMatrix &data,
+					const TStroke *stroke) const;
 	void drawStroke(TFlash &flash, const TStroke *s) const;
 
 	void loadData(TInputStreamInterface &is) { is >> m_color >> m_intensity; }
@@ -225,7 +241,7 @@ class TDottedLineStrokeStyle : public TOptimizedStrokeStyleT<Points>
 	TPixel32 m_color;
 	double m_in, m_line, m_out, m_blank;
 
-public:
+  public:
 	TDottedLineStrokeStyle();
 
 	void computeData(Points &positions, const TStroke *stroke, const TColorFunction *cf) const;
@@ -236,7 +252,10 @@ public:
 
 	TColorStyle *clone() const;
 
-	QString getDescription() const { return QCoreApplication::translate("TDottedLineStrokeStyle", "Vanishing"); }
+	QString getDescription() const
+	{
+		return QCoreApplication::translate("TDottedLineStrokeStyle", "Vanishing");
+	}
 
 	bool hasMainColor() const { return true; }
 	TPixel32 getMainColor() const { return m_color; }
@@ -250,8 +269,14 @@ public:
 	double getParamValue(TColorStyle::double_tag, int index) const;
 	void setParamValue(int index, double value);
 
-	void loadData(TInputStreamInterface &is) { is >> m_color >> m_in >> m_line >> m_out >> m_blank; }
-	void saveData(TOutputStreamInterface &os) const { os << m_color << m_in << m_line << m_out << m_blank; }
+	void loadData(TInputStreamInterface &is)
+	{
+		is >> m_color >> m_in >> m_line >> m_out >> m_blank;
+	}
+	void saveData(TOutputStreamInterface &os) const
+	{
+		os << m_color << m_in << m_line << m_out << m_blank;
+	}
 	bool isSaveSupported() { return true; }
 
 	int getTagId() const { return 111; }
@@ -264,7 +289,7 @@ class TRopeStrokeStyle : public TOptimizedStrokeStyleT<Points>
 	TPixel32 m_color;
 	double m_bend;
 
-public:
+  public:
 	TRopeStrokeStyle();
 
 	void computeData(Points &positions, const TStroke *stroke, const TColorFunction *cf) const;
@@ -275,7 +300,10 @@ public:
 
 	TColorStyle *clone() const;
 
-	QString getDescription() const { return QCoreApplication::translate("TRopeStrokeStyle", "Rope"); }
+	QString getDescription() const
+	{
+		return QCoreApplication::translate("TRopeStrokeStyle", "Rope");
+	}
 
 	bool hasMainColor() const { return true; }
 	TPixel32 getMainColor() const { return m_color; }
@@ -303,7 +331,7 @@ class TCrystallizeStrokeStyle : public TOptimizedStrokeStyleT<Points>
 	TPixel32 m_color;
 	double m_period, m_opacity;
 
-public:
+  public:
 	TCrystallizeStrokeStyle();
 
 	void computeData(Points &positions, const TStroke *stroke, const TColorFunction *cf) const;
@@ -314,7 +342,10 @@ public:
 
 	TColorStyle *clone() const;
 
-	QString getDescription() const { return QCoreApplication::translate("TCrystallizeStrokeStyle", "Tulle"); }
+	QString getDescription() const
+	{
+		return QCoreApplication::translate("TCrystallizeStrokeStyle", "Tulle");
+	}
 
 	bool hasMainColor() const { return true; }
 	TPixel32 getMainColor() const { return m_color; }
@@ -342,7 +373,7 @@ class TBraidStrokeStyle : public TSimpleStrokeStyle
 	TPixel32 m_colors[3];
 	double m_period;
 
-public:
+  public:
 	TBraidStrokeStyle();
 
 	TColorStyle *clone() const;
@@ -352,7 +383,10 @@ public:
 
 	void invalidate() {}
 
-	QString getDescription() const { return QCoreApplication::translate("TBraidStrokeStyle", "Plait"); }
+	QString getDescription() const
+	{
+		return QCoreApplication::translate("TBraidStrokeStyle", "Plait");
+	}
 
 	bool hasMainColor() const { return true; }
 	TPixel32 getMainColor() const { return m_colors[0]; }
@@ -370,9 +404,15 @@ public:
 	double getParamValue(TColorStyle::double_tag, int index) const;
 	void setParamValue(int index, double value);
 
-	void loadData(TInputStreamInterface &is) { is >> m_colors[0] >> m_colors[1] >> m_colors[2] >> m_period; }
+	void loadData(TInputStreamInterface &is)
+	{
+		is >> m_colors[0] >> m_colors[1] >> m_colors[2] >> m_period;
+	}
 	void loadData(int oldId, TInputStreamInterface &);
-	void saveData(TOutputStreamInterface &os) const { os << m_colors[0] << m_colors[1] << m_colors[2] << m_period; }
+	void saveData(TOutputStreamInterface &os) const
+	{
+		os << m_colors[0] << m_colors[1] << m_colors[2] << m_period;
+	}
 	bool isSaveSupported() { return true; }
 
 	int getTagId() const { return 136; };
@@ -386,14 +426,17 @@ class TSketchStrokeStyle : public TSimpleStrokeStyle
 	TPixel32 m_color;
 	double m_density;
 
-public:
+  public:
 	TSketchStrokeStyle();
 
 	TColorStyle *clone() const;
 
 	void invalidate() {}
 
-	QString getDescription() const { return QCoreApplication::translate("TSketchStrokeStyle", "Fuzz"); }
+	QString getDescription() const
+	{
+		return QCoreApplication::translate("TSketchStrokeStyle", "Fuzz");
+	}
 
 	bool hasMainColor() const { return true; }
 	TPixel32 getMainColor() const { return m_color; }
@@ -423,14 +466,17 @@ class TBubbleStrokeStyle : public TSimpleStrokeStyle
 {
 	TPixel32 m_color0, m_color1;
 
-public:
+  public:
 	TBubbleStrokeStyle();
 
 	TColorStyle *clone() const;
 
 	void invalidate() {}
 
-	QString getDescription() const { return QCoreApplication::translate("TBubbleStrokeStyle", "Bubbles"); }
+	QString getDescription() const
+	{
+		return QCoreApplication::translate("TBubbleStrokeStyle", "Bubbles");
+	}
 
 	bool hasMainColor() const { return true; }
 	TPixel32 getMainColor() const { return m_color0; }
@@ -465,7 +511,7 @@ class TTissueStrokeStyle : public TOptimizedStrokeStyleT<PointMatrix>
 	TPixel32 m_color;
 	double m_density, m_border;
 
-public:
+  public:
 	TTissueStrokeStyle();
 
 	TColorStyle *clone() const;
@@ -476,7 +522,10 @@ public:
 
 	void invalidate() {}
 
-	QString getDescription() const { return QCoreApplication::translate("TTissueStrokeStyle", "Gauze"); }
+	QString getDescription() const
+	{
+		return QCoreApplication::translate("TTissueStrokeStyle", "Gauze");
+	}
 
 	bool hasMainColor() const { return true; }
 	TPixel32 getMainColor() const { return m_color; }
@@ -503,13 +552,14 @@ class TBiColorStrokeStyle : public TOutlineStyle
 	TPixel32 m_color0, m_color1;
 	double m_parameter;
 
-public:
+  public:
 	TBiColorStrokeStyle();
 
 	TColorStyle *clone() const;
 
 	void drawStroke(const TColorFunction *cf, TStrokeOutline *outline, const TStroke *stroke) const;
-	void drawRegion(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &boundary) const;
+	void drawRegion(const TColorFunction *cf, const bool antiAliasing,
+					TRegionOutline &boundary) const;
 	void drawStroke(TFlash &flash, const TStroke *stroke) const;
 
 	bool isRegionStyle() const { return false; }
@@ -517,7 +567,10 @@ public:
 
 	void invalidate() {}
 
-	QString getDescription() const { return QCoreApplication::translate("TBiColorStrokeStyle", "Shade"); }
+	QString getDescription() const
+	{
+		return QCoreApplication::translate("TBiColorStrokeStyle", "Shade");
+	}
 
 	bool hasMainColor() const { return true; }
 	TPixel32 getMainColor() const { return m_color0; }
@@ -553,12 +606,13 @@ class TNormal2StrokeStyle : public TOutlineStyle
 	TPixel32 m_color;
 	double m_lightx, m_lighty, m_shininess, m_metal, m_bend;
 
-public:
+  public:
 	TNormal2StrokeStyle();
 
 	TColorStyle *clone() const;
 
-	void drawRegion(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &boundary) const;
+	void drawRegion(const TColorFunction *cf, const bool antiAliasing,
+					TRegionOutline &boundary) const;
 	void drawStroke(const TColorFunction *cf, TStrokeOutline *outline, const TStroke *stroke) const;
 	void drawStroke(TFlash &flash, const TStroke *stroke) const;
 
@@ -567,7 +621,10 @@ public:
 
 	void invalidate() {}
 
-	QString getDescription() const { return QCoreApplication::translate("TNormal2StrokeStyle", "Bump"); }
+	QString getDescription() const
+	{
+		return QCoreApplication::translate("TNormal2StrokeStyle", "Bump");
+	}
 
 	bool hasMainColor() const { return true; }
 	TPixel32 getMainColor() const { return m_color; }
@@ -581,10 +638,15 @@ public:
 	double getParamValue(TColorStyle::double_tag, int index) const;
 	void setParamValue(int index, double value);
 
-	void loadData(TInputStreamInterface &is) { is >> m_color >> m_lightx >> m_lighty >> m_shininess >> m_metal >> m_bend; }
+	void loadData(TInputStreamInterface &is)
+	{
+		is >> m_color >> m_lightx >> m_lighty >> m_shininess >> m_metal >> m_bend;
+	}
 	void loadData(int oldId, TInputStreamInterface &);
-	void saveData(TOutputStreamInterface &os) const { os << m_color << m_lightx << m_lighty
-														 << m_shininess << m_metal << m_bend; }
+	void saveData(TOutputStreamInterface &os) const
+	{
+		os << m_color << m_lightx << m_lighty << m_shininess << m_metal << m_bend;
+	}
 
 	int getTagId() const { return 120; };
 	void getObsoleteTagIds(std::vector<int> &ids) const { ids.push_back(121); }
@@ -597,14 +659,17 @@ class TChalkStrokeStyle2 : public TOptimizedStrokeStyleT<Doubles>
 	TPixel32 m_color;
 	double m_blend, m_intensity, m_in, m_out, m_noise;
 
-public:
+  public:
 	TChalkStrokeStyle2();
 
 	TColorStyle *clone() const;
 
 	void invalidate() {}
 
-	QString getDescription() const { return QCoreApplication::translate("TChalkStrokeStyle2", "Chalk"); }
+	QString getDescription() const
+	{
+		return QCoreApplication::translate("TChalkStrokeStyle2", "Chalk");
+	}
 
 	bool hasMainColor() const { return true; }
 	TPixel32 getMainColor() const { return m_color; }
@@ -621,10 +686,15 @@ public:
 	void computeData(Doubles &positions, const TStroke *stroke, const TColorFunction *cf) const;
 	void drawStroke(const TColorFunction *cf, Doubles &positions, const TStroke *stroke) const;
 
-	void loadData(TInputStreamInterface &is) { is >> m_color >> m_blend >> m_intensity >> m_in >> m_out >> m_noise; }
+	void loadData(TInputStreamInterface &is)
+	{
+		is >> m_color >> m_blend >> m_intensity >> m_in >> m_out >> m_noise;
+	}
 	void loadData(int oldId, TInputStreamInterface &);
-	void saveData(TOutputStreamInterface &os) const { os << m_color << m_blend << m_intensity << m_in
-														 << m_out << m_noise; }
+	void saveData(TOutputStreamInterface &os) const
+	{
+		os << m_color << m_blend << m_intensity << m_in << m_out << m_noise;
+	}
 	int getTagId() const { return 123; };
 	void getObsoleteTagIds(std::vector<int> &ids) const { ids.push_back(105); }
 };
@@ -636,7 +706,7 @@ class TBlendStrokeStyle2 : public TOptimizedStrokeStyleT<PointsAndDoubles>
 	TPixel32 m_color;
 	double m_blend, m_in, m_out;
 
-public:
+  public:
 	TBlendStrokeStyle2();
 
 	TColorStyle *clone() const;
@@ -647,7 +717,10 @@ public:
 
 	void invalidate() {}
 
-	QString getDescription() const { return QCoreApplication::translate("TBlendStrokeStyle2", "Fade"); }
+	QString getDescription() const
+	{
+		return QCoreApplication::translate("TBlendStrokeStyle2", "Fade");
+	}
 
 	bool hasMainColor() const { return true; }
 	TPixel32 getMainColor() const { return m_color; }
@@ -677,19 +750,22 @@ class TTwirlStrokeStyle : public TOptimizedStrokeStyleT<Doubles>
 	TPixel32 m_color;
 	double m_period, m_blend;
 
-public:
+  public:
 	TTwirlStrokeStyle();
 
 	TColorStyle *clone() const;
 
 	void computeData(Doubles &data, const TStroke *stroke, const TColorFunction *cf) const;
 	void drawStroke(const TColorFunction *cf, Doubles &data, const TStroke *stroke) const;
-	//void drawStroke(const TColorFunction *cf, const TStroke *stroke) const;
+	// void drawStroke(const TColorFunction *cf, const TStroke *stroke) const;
 	void drawStroke(TFlash &flash, const TStroke *stroke) const;
 
 	void invalidate() {}
 
-	QString getDescription() const { return QCoreApplication::translate("TTwirlStrokeStyle", "Ribbon"); }
+	QString getDescription() const
+	{
+		return QCoreApplication::translate("TTwirlStrokeStyle", "Ribbon");
+	}
 
 	bool hasMainColor() const { return true; }
 	TPixel32 getMainColor() const { return m_color; }
@@ -717,13 +793,15 @@ class TSawToothStrokeStyle : public TOutlineStyle
 	TPixel32 m_color;
 	double m_parameter;
 
-public:
-	TSawToothStrokeStyle(TPixel32 color = TPixel32::Blue,
-						 double parameter = 20.0);
+  public:
+	TSawToothStrokeStyle(TPixel32 color = TPixel32::Blue, double parameter = 20.0);
 
 	TColorStyle *clone() const;
 
-	void drawRegion(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &boundary) const {}
+	void drawRegion(const TColorFunction *cf, const bool antiAliasing,
+					TRegionOutline &boundary) const
+	{
+	}
 	void drawStroke(const TColorFunction *cf, TStrokeOutline *outline, const TStroke *stroke) const;
 	void drawStroke(TFlash &flash, const TStroke *stroke) const;
 
@@ -732,11 +810,13 @@ public:
 
 	void invalidate() {}
 
-	void computeOutline(const TStroke *stroke,
-						TStrokeOutline &outline,
+	void computeOutline(const TStroke *stroke, TStrokeOutline &outline,
 						TOutlineUtil::OutlineParameter param) const;
 
-	QString getDescription() const { return QCoreApplication::translate("TSawToothStrokeStyle", "Jagged"); }
+	QString getDescription() const
+	{
+		return QCoreApplication::translate("TSawToothStrokeStyle", "Jagged");
+	}
 
 	bool hasMainColor() const { return true; }
 	TPixel32 getMainColor() const { return m_color; }
@@ -762,19 +842,22 @@ class TMultiLineStrokeStyle2 : public TOptimizedStrokeStyleT<BlendAndPoints>
 	TPixel32 m_color0, m_color1;
 	double m_intensity, m_length, m_thick, m_noise;
 
-public:
+  public:
 	TMultiLineStrokeStyle2();
 
 	TColorStyle *clone() const;
 
 	void computeData(BlendAndPoints &data, const TStroke *stroke, const TColorFunction *cf) const;
 	void drawStroke(const TColorFunction *cf, BlendAndPoints &data, const TStroke *stroke) const;
-	//void drawStroke(const TColorFunction *cf, const TStroke *stroke) const;
+	// void drawStroke(const TColorFunction *cf, const TStroke *stroke) const;
 	void drawStroke(TFlash &flash, const TStroke *stroke) const;
 
 	void invalidate() {}
 
-	QString getDescription() const { return QCoreApplication::translate("TMultiLineStrokeStyle2", "Gouache"); }
+	QString getDescription() const
+	{
+		return QCoreApplication::translate("TMultiLineStrokeStyle2", "Gouache");
+	}
 
 	bool hasMainColor() const { return true; }
 	TPixel32 getMainColor() const { return m_color0; }
@@ -798,9 +881,15 @@ public:
 	double getParamValue(TColorStyle::double_tag, int index) const;
 	void setParamValue(int index, double value);
 
-	void loadData(TInputStreamInterface &is) { is >> m_color0 >> m_color1 >> m_intensity >> m_length >> m_thick >> m_noise; }
+	void loadData(TInputStreamInterface &is)
+	{
+		is >> m_color0 >> m_color1 >> m_intensity >> m_length >> m_thick >> m_noise;
+	}
 	void loadData(int oldId, TInputStreamInterface &);
-	void saveData(TOutputStreamInterface &os) const { os << m_color0 << m_color1 << m_intensity << m_length << m_thick << m_noise; }
+	void saveData(TOutputStreamInterface &os) const
+	{
+		os << m_color0 << m_color1 << m_intensity << m_length << m_thick << m_noise;
+	}
 	bool isSaveSupported() { return true; }
 
 	int getTagId() const { return 138; };
@@ -820,26 +909,27 @@ class TZigzagStrokeStyle : public TOptimizedStrokeStyleT<Points>
 	double m_minAngle, m_maxAngle;
 	double m_thickness;
 
-	//void drawBLines(RectVector& rects) const;
+	// void drawBLines(RectVector& rects) const;
 	void setRealMinMax() const;
-	bool getZigZagPosition(const TStroke *stroke, TRandom &rnd,
-						   const double s, const int first,
-						   const double minTranslLength,
-						   TThickPoint &pos, TThickPoint &pos1) const;
+	bool getZigZagPosition(const TStroke *stroke, TRandom &rnd, const double s, const int first,
+						   const double minTranslLength, TThickPoint &pos, TThickPoint &pos1) const;
 
-public:
+  public:
 	TZigzagStrokeStyle();
 
 	TColorStyle *clone() const;
 
 	void computeData(Points &positions, const TStroke *stroke, const TColorFunction *cf) const;
 	void drawStroke(const TColorFunction *cf, Points &positions, const TStroke *stroke) const;
-	//void drawStroke(const TColorFunction *cf, const TStroke *stroke) const;
+	// void drawStroke(const TColorFunction *cf, const TStroke *stroke) const;
 	void drawStroke(TFlash &flash, const TStroke *stroke) const;
 
 	void invalidate() {}
 
-	QString getDescription() const { return QCoreApplication::translate("TZigzagStrokeStyle", "Zigzag"); }
+	QString getDescription() const
+	{
+		return QCoreApplication::translate("TZigzagStrokeStyle", "Zigzag");
+	}
 
 	bool hasMainColor() const { return true; }
 	TPixel32 getMainColor() const { return m_color; }
@@ -853,8 +943,14 @@ public:
 	double getParamValue(TColorStyle::double_tag, int index) const;
 	void setParamValue(int index, double value);
 
-	void loadData(TInputStreamInterface &is) { is >> m_color >> m_minDist >> m_maxDist >> m_minAngle >> m_maxAngle >> m_thickness; }
-	void saveData(TOutputStreamInterface &os) const { os << m_color << m_minDist << m_maxDist << m_minAngle << m_maxAngle << m_thickness; }
+	void loadData(TInputStreamInterface &is)
+	{
+		is >> m_color >> m_minDist >> m_maxDist >> m_minAngle >> m_maxAngle >> m_thickness;
+	}
+	void saveData(TOutputStreamInterface &os) const
+	{
+		os << m_color << m_minDist << m_maxDist << m_minAngle << m_maxAngle << m_thickness;
+	}
 	bool isSaveSupported() { return true; }
 
 	int getTagId() const { return 129; }
@@ -867,19 +963,22 @@ class TSinStrokeStyle : public TOptimizedStrokeStyleT<Points>
 	TPixel32 m_color;
 	double m_frequency, m_thick;
 
-public:
+  public:
 	TSinStrokeStyle();
 
 	TColorStyle *clone() const;
 
 	void computeData(Points &positions, const TStroke *stroke, const TColorFunction *cf) const;
 	void drawStroke(const TColorFunction *cf, Points &positions, const TStroke *stroke) const;
-	//void drawStroke(const TColorFunction *cf, const TStroke *stroke) const;
+	// void drawStroke(const TColorFunction *cf, const TStroke *stroke) const;
 	void drawStroke(TFlash &flash, const TStroke *stroke) const;
 
 	void invalidate() {}
 
-	QString getDescription() const { return QCoreApplication::translate("TSinStrokeStyle", "Wave"); }
+	QString getDescription() const
+	{
+		return QCoreApplication::translate("TSinStrokeStyle", "Wave");
+	}
 
 	bool hasMainColor() const { return true; }
 	TPixel32 getMainColor() const { return m_color; }
@@ -906,14 +1005,17 @@ class TFriezeStrokeStyle2 : public TOptimizedStrokeStyleT<Points>
 	TPixel32 m_color;
 	double m_parameter, m_thick;
 
-public:
+  public:
 	TFriezeStrokeStyle2();
 
 	TColorStyle *clone() const;
 
 	void invalidate() {}
 
-	QString getDescription() const { return QCoreApplication::translate("TFriezeStrokeStyle2", "Curl"); }
+	QString getDescription() const
+	{
+		return QCoreApplication::translate("TFriezeStrokeStyle2", "Curl");
+	}
 
 	bool hasMainColor() const { return true; }
 	TPixel32 getMainColor() const { return m_color; }
@@ -927,9 +1029,11 @@ public:
 	double getParamValue(TColorStyle::double_tag, int index) const;
 	void setParamValue(int index, double value);
 
-	void computeData(std::vector<TPointD> &positions, const TStroke *stroke, const TColorFunction *cf) const;
-	void drawStroke(const TColorFunction *cf, std::vector<TPointD> &positions, const TStroke *stroke) const;
-	//void drawStroke(const TColorFunction *cf, const TStroke *stroke) const;
+	void computeData(std::vector<TPointD> &positions, const TStroke *stroke,
+					 const TColorFunction *cf) const;
+	void drawStroke(const TColorFunction *cf, std::vector<TPointD> &positions,
+					const TStroke *stroke) const;
+	// void drawStroke(const TColorFunction *cf, const TStroke *stroke) const;
 	void drawStroke(TFlash &flash, const TStroke *stroke) const;
 
 	void loadData(TInputStreamInterface &is) { is >> m_color >> m_parameter >> m_thick; }
@@ -946,15 +1050,16 @@ class TDualColorStrokeStyle2 : public TOutlineStyle
 	TPixel32 m_color0, m_color1;
 	double m_parameter;
 
-public:
-	TDualColorStrokeStyle2(
-		TPixel32 color0 = TPixel32::Blue,
-		TPixel32 color1 = TPixel32::Yellow,
-		double parameter = 20.0);
+  public:
+	TDualColorStrokeStyle2(TPixel32 color0 = TPixel32::Blue, TPixel32 color1 = TPixel32::Yellow,
+						   double parameter = 20.0);
 
 	TColorStyle *clone() const;
 
-	void drawRegion(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &boundary) const {}
+	void drawRegion(const TColorFunction *cf, const bool antiAliasing,
+					TRegionOutline &boundary) const
+	{
+	}
 	void drawStroke(const TColorFunction *cf, TStrokeOutline *outline, const TStroke *stroke) const;
 	void drawStroke(TFlash &flash, const TStroke *stroke) const;
 
@@ -963,11 +1068,13 @@ public:
 
 	void invalidate() {}
 
-	void computeOutline(const TStroke *stroke,
-						TStrokeOutline &outline,
+	void computeOutline(const TStroke *stroke, TStrokeOutline &outline,
 						TOutlineUtil::OutlineParameter param) const;
 
-	QString getDescription() const { return QCoreApplication::translate("TDualColorStrokeStyle2", "Striped"); }
+	QString getDescription() const
+	{
+		return QCoreApplication::translate("TDualColorStrokeStyle2", "Striped");
+	}
 
 	bool hasMainColor() const { return true; }
 	TPixel32 getMainColor() const { return m_color0; }
@@ -1003,14 +1110,16 @@ class TLongBlendStrokeStyle2 : public TOutlineStyle
 	TPixel32 m_color0, m_color1;
 	double m_parameter;
 
-public:
+  public:
 	TLongBlendStrokeStyle2(TPixel32 color0 = TPixel32::Blue,
-						   TPixel32 color1 = TPixel32::Transparent,
-						   double parameter = 20.0);
+						   TPixel32 color1 = TPixel32::Transparent, double parameter = 20.0);
 
 	TColorStyle *clone() const;
 
-	void drawRegion(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &boundary) const {}
+	void drawRegion(const TColorFunction *cf, const bool antiAliasing,
+					TRegionOutline &boundary) const
+	{
+	}
 	void drawStroke(const TColorFunction *cf, TStrokeOutline *outline, const TStroke *stroke) const;
 	void drawStroke(TFlash &flash, const TStroke *stroke) const;
 
@@ -1019,11 +1128,13 @@ public:
 
 	void invalidate() {}
 
-	void computeOutline(const TStroke *stroke,
-						TStrokeOutline &outline,
+	void computeOutline(const TStroke *stroke, TStrokeOutline &outline,
 						TOutlineUtil::OutlineParameter param) const;
 
-	QString getDescription() const { return QCoreApplication::translate("TLongBlendStrokeStyle2", "Watercolor"); }
+	QString getDescription() const
+	{
+		return QCoreApplication::translate("TLongBlendStrokeStyle2", "Watercolor");
+	}
 
 	bool hasMainColor() const { return true; }
 	TPixel32 getMainColor() const { return m_color0; }
@@ -1065,14 +1176,13 @@ class OutlineViewerStyle : public TSolidColorStyle
 	int m_enumPar;
 	TFilePath m_pathPar;
 
-protected:
+  protected:
 	void loadData(TInputStreamInterface &is);
 	void saveData(TOutputStreamInterface &os) const;
 
-public:
-	OutlineViewerStyle(TPixel32 color = TPixel32::Black,
-					   double parameter0 = 0.0, double parameter1 = 0.0,
-					   double parameter2 = 2.0, double parameter3 = 3.0);
+  public:
+	OutlineViewerStyle(TPixel32 color = TPixel32::Black, double parameter0 = 0.0,
+					   double parameter1 = 0.0, double parameter2 = 2.0, double parameter3 = 3.0);
 
 	TColorStyle *clone() const;
 
@@ -1097,15 +1207,17 @@ public:
 	TFilePath getParamValue(TColorStyle::TFilePath_tag, int index) const;
 	void setParamValue(int index, const TFilePath &path);
 
-	void computeOutline(const TStroke *stroke,
-						TStrokeOutline &outline,
+	void computeOutline(const TStroke *stroke, TStrokeOutline &outline,
 						TOutlineUtil::OutlineParameter param) const;
 
 	bool isRegionStyle() const { return false; }
 	bool isStrokeStyle() const { return true; }
 
 	void drawStroke(const TColorFunction *cf, TStrokeOutline *outline, const TStroke *stroke) const;
-	QString getDescription() const { return QCoreApplication::translate("OutlineViewerStyle", "OutlineViewer(OnlyDebug)"); }
+	QString getDescription() const
+	{
+		return QCoreApplication::translate("OutlineViewerStyle", "OutlineViewer(OnlyDebug)");
+	}
 	int getTagId() const { return 99; };
 };
 
@@ -1118,7 +1230,7 @@ class TMatrioskaStrokeStyle;
 class TMatrioskaStrokeProp : public TStrokeProp
 {
 
-protected:
+  protected:
 	double m_outlinePixelSize;
 	TMatrioskaStrokeStyle *m_colorStyle;
 
@@ -1126,7 +1238,7 @@ protected:
 
 	std::vector<TStroke *> m_appStrokes;
 
-public:
+  public:
 	TMatrioskaStrokeProp(const TStroke *stroke, TMatrioskaStrokeStyle *style);
 	~TMatrioskaStrokeProp();
 
@@ -1142,16 +1254,13 @@ class TMatrioskaStrokeStyle : public TSolidColorStyle
 	double m_parameter;
 	TPixel32 m_color2;
 
-protected:
+  protected:
 	void loadData(TInputStreamInterface &is);
 	void saveData(TOutputStreamInterface &os) const;
 
-public:
-	TMatrioskaStrokeStyle(
-		TPixel32 color1 = TPixel32::Magenta,
-		TPixel32 color2 = TPixel32::Blue,
-		double parameter = 6.0,
-		bool alternate = true);
+  public:
+	TMatrioskaStrokeStyle(TPixel32 color1 = TPixel32::Magenta, TPixel32 color2 = TPixel32::Blue,
+						  double parameter = 6.0, bool alternate = true);
 
 	TColorStyle *clone() const;
 
@@ -1172,7 +1281,10 @@ public:
 	bool isRegionStyle() const { return false; }
 	bool isStrokeStyle() const { return true; }
 
-	QString getDescription() const { return QCoreApplication::translate("TMatrioskaStrokeStyle", "Toothpaste"); }
+	QString getDescription() const
+	{
+		return QCoreApplication::translate("TMatrioskaStrokeStyle", "Toothpaste");
+	}
 	int getTagId() const { return 141; };
 };
 

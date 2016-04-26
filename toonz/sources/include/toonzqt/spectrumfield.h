@@ -40,25 +40,18 @@ class DVAPI SpectrumBar : public QWidget
 
 	TSpectrum m_spectrum;
 
-public:
-	SpectrumBar(QWidget *parent = 0,
-				TPixel32 color = TPixel32(0, 0, 0, 255));
+  public:
+	SpectrumBar(QWidget *parent = 0, TPixel32 color = TPixel32(0, 0, 0, 255));
 
 	~SpectrumBar();
 
-	int getCurrentKeyIndex()
-	{
-		return m_currentKeyIndex;
-	}
+	int getCurrentKeyIndex() { return m_currentKeyIndex; }
 	void setCurrentKeyIndex(int index);
 
 	int getCurrentPos();
 	TPixel32 getCurrentColor();
 
-	TSpectrum &getSpectrum()
-	{
-		return m_spectrum;
-	}
+	TSpectrum &getSpectrum() { return m_spectrum; }
 	void setSpectrum(TSpectrum &spectrum)
 	{
 		m_spectrum = spectrum;
@@ -68,18 +61,18 @@ public:
 		update();
 	}
 
-public slots:
+  public slots:
 	void setCurrentPos(int pos, bool isDragging);
 	void setCurrentColor(const TPixel32 &color);
 	void addKeyAt(int pos);
 
-signals:
+  signals:
 	void currentPosChanged(bool isDragging);
 	void currentKeyChanged();
 	void currentKeyAdded(int);
 	void currentKeyRemoved(int);
 
-protected:
+  protected:
 	double posToSpectrumValue(int pos);
 	int spectrumValueToPos(double spectrumValue);
 
@@ -108,41 +101,34 @@ class DVAPI SpectrumField : public QWidget
 	ColorField *m_colorField;
 	SpectrumBar *m_spectrumbar;
 
-public:
-	SpectrumField(QWidget *parent = 0,
-				  TPixel32 color = TPixel32(0, 0, 0, 255));
+  public:
+	SpectrumField(QWidget *parent = 0, TPixel32 color = TPixel32(0, 0, 0, 255));
 
 	~SpectrumField();
 
-	TSpectrum &getSpectrum()
-	{
-		return m_spectrumbar->getSpectrum();
-	}
+	TSpectrum &getSpectrum() { return m_spectrumbar->getSpectrum(); }
 	void setSpectrum(TSpectrum &spectrum)
 	{
 		m_spectrumbar->setSpectrum(spectrum);
 		m_colorField->setColor(m_spectrumbar->getCurrentColor());
 	}
 
-	int getCurrentKeyIndex()
-	{
-		return m_spectrumbar->getCurrentKeyIndex();
-	}
+	int getCurrentKeyIndex() { return m_spectrumbar->getCurrentKeyIndex(); }
 	void setCurrentKeyIndex(int index)
 	{
 		m_spectrumbar->setCurrentKeyIndex(index);
 		m_colorField->setColor(m_spectrumbar->getCurrentColor());
 	}
 
-protected slots:
+  protected slots:
 	void onCurrentPosChanged(bool isDragging);
 	void onCurrentKeyChanged();
 	void onColorChanged(const TPixel32 &color, bool isDragging);
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *e);
 
-signals:
+  signals:
 	void keyColorChanged(bool);
 	void keyPositionChanged(bool);
 	void keyAdded(int);
@@ -150,7 +136,7 @@ signals:
 };
 
 //-----------------------------------------------------------------------------
-} //namespace DVGui
+} // namespace DVGui
 //-----------------------------------------------------------------------------
 
 #endif // SPECTRUMFIELD_H

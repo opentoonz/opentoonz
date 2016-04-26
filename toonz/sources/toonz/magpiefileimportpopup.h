@@ -22,7 +22,7 @@ class MagpieInfo
 	QList<QString> m_actsIdentifier;
 	QString m_fileName;
 
-public:
+  public:
 	MagpieInfo(TFilePath path);
 
 	int getFrameCount() const { return m_comments.size(); }
@@ -52,20 +52,20 @@ class MagpieFileImportPopup : public DVGui::Dialog
 	FlipBook *m_flipbook;
 	TFilePath m_levelPath;
 
-public:
+  public:
 	MagpieFileImportPopup();
 
 	void setFilePath(TFilePath path);
 
-protected:
+  protected:
 	void showEvent(QShowEvent *);
 	void hideEvent(QHideEvent *);
 
-protected slots:
+  protected slots:
 	void onLevelPathChanged();
 	void onOkPressed();
 
-signals:
+  signals:
 	void closeButtonPressed();
 	void doubleClick();
 };

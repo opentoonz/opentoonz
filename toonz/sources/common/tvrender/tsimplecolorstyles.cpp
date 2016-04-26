@@ -126,7 +126,7 @@ namespace
 
 class DisplayListManager // singleton
 {
-public:
+  public:
 	TThread::Mutex m_mutex;
 	typedef HGLRC T_hGlContext;
 
@@ -137,7 +137,9 @@ public:
 		TFrameId m_fid;
 		T_hGlContext m_glContext;
 		Key(std::string name, TFrameId fid, T_hGlContext glContext)
-			: m_name(name), m_fid(fid), m_glContext(glContext) {}
+			: m_name(name), m_fid(fid), m_glContext(glContext)
+		{
+		}
 	};
 
 	//----------------------------------------------
@@ -145,26 +147,26 @@ public:
 		GLuint m_displayListId;
 		TColorFunction::Parameters m_parameters;
 		HDC m_hdc;
-		Info()
-			: m_displayListId(0), m_hdc(0), m_parameters(TColorFunction::Parameters()) {}
+		Info() : m_displayListId(0), m_hdc(0), m_parameters(TColorFunction::Parameters()) {}
 
 		Info(GLuint displayListId, HDC hdc, TColorFunction::Parameters parameters)
-			: m_displayListId(displayListId), m_hdc(hdc), m_parameters(parameters) {}
+			: m_displayListId(displayListId), m_hdc(hdc), m_parameters(parameters)
+		{
+		}
 
-		//se ad una stessa chiave corrispondono due displayInfo diversi (second questo metodo),
-		//si aggiorna la displayList secondo l'ultima chiamata.
-		//Serve per non duplicare troppe liste, per parametri che non cambiano spesso, come le cf.
+		// se ad una stessa chiave corrispondono due displayInfo diversi (second questo metodo),
+		// si aggiorna la displayList secondo l'ultima chiamata.
+		// Serve per non duplicare troppe liste, per parametri che non cambiano spesso, come le cf.
 		bool isDrawnAs(const Info &linfo)
 		{
-			return (
-				this->m_parameters.m_mR == linfo.m_parameters.m_mR &&
-				this->m_parameters.m_mG == linfo.m_parameters.m_mG &&
-				this->m_parameters.m_mB == linfo.m_parameters.m_mB &&
-				this->m_parameters.m_mM == linfo.m_parameters.m_mM &&
-				this->m_parameters.m_cR == linfo.m_parameters.m_cR &&
-				this->m_parameters.m_cG == linfo.m_parameters.m_cG &&
-				this->m_parameters.m_cB == linfo.m_parameters.m_cB &&
-				this->m_parameters.m_cM == linfo.m_parameters.m_cM);
+			return (this->m_parameters.m_mR == linfo.m_parameters.m_mR &&
+					this->m_parameters.m_mG == linfo.m_parameters.m_mG &&
+					this->m_parameters.m_mB == linfo.m_parameters.m_mB &&
+					this->m_parameters.m_mM == linfo.m_parameters.m_mM &&
+					this->m_parameters.m_cR == linfo.m_parameters.m_cR &&
+					this->m_parameters.m_cG == linfo.m_parameters.m_cG &&
+					this->m_parameters.m_cB == linfo.m_parameters.m_cB &&
+					this->m_parameters.m_cM == linfo.m_parameters.m_cM);
 		}
 	};
 	//----------------------------------------------
@@ -182,7 +184,7 @@ public:
 
 	typedef std::map<Key, Info, KeyLess> DisplayListMap;
 
-private:
+  private:
 	DisplayListMap m_displayListMap;
 
 	DisplayListManager() {}
@@ -200,13 +202,13 @@ private:
 
 		glLoadIdentity();
 		// forzo pixelSize come se si disegnasse su una stroke con thickness=10
-		//tglMultMatrix(TScale(10.0/ry));
+		// tglMultMatrix(TScale(10.0/ry));
 
-		//forzo pixelSize a 20.
-		//In questo modo, un'immagine piu' grande (nel pli
-		//che definisce il custom style) viene piu' definita di una piu' piccola,
-		//anche se appaiono della stessa dimensione (che dipende esclusivamente dalla thickness)
-		//tglMultMatrix(TScale(0.50));
+		// forzo pixelSize a 20.
+		// In questo modo, un'immagine piu' grande (nel pli
+		// che definisce il custom style) viene piu' definita di una piu' piccola,
+		// anche se appaiono della stessa dimensione (che dipende esclusivamente dalla thickness)
+		// tglMultMatrix(TScale(0.50));
 
 		TPalette *vPalette = image->getPalette();
 		assert(vPalette);
@@ -226,7 +228,7 @@ private:
 		CHECK_GL_ERROR
 	}
 
-public:
+  public:
 	static DisplayListManager *instance()
 	{
 		static DisplayListManager singleton;
@@ -234,7 +236,8 @@ public:
 	}
 	//--------------------------------------------
 
-	GLuint getDisplayListId(TVectorImage *image, std::string name, TFrameId fid, const TVectorRenderData &rd)
+	GLuint getDisplayListId(TVectorImage *image, std::string name, TFrameId fid,
+							const TVectorRenderData &rd)
 	{
 		QMutexLocker sl(&m_mutex);
 		TColorFunction::Parameters parameters;
@@ -249,14 +252,14 @@ public:
 		DisplayListMap::iterator it = m_displayListMap.find(key);
 		if (it != m_displayListMap.end()) {
 			if (listInfo.isDrawnAs(it->second)) {
-				//lascia tutto com'e' ed utilizza la displaliList
+				// lascia tutto com'e' ed utilizza la displaliList
 				listInfo.m_displayListId = it->second.m_displayListId;
-			} else { //aggiorna la displayList con le nuove info (attualmente solo la cf)
+			} else { // aggiorna la displayList con le nuove info (attualmente solo la cf)
 				listInfo.m_displayListId = it->second.m_displayListId;
 				recordList(listInfo.m_displayListId, image, rd);
 				m_displayListMap[key] = listInfo;
 			}
-		} else //se non ho mai disegnato l'immagine creo la displayList
+		} else // se non ho mai disegnato l'immagine creo la displayList
 		{
 			CHECK_GL_ERROR
 			listInfo.m_displayListId = glGenLists(1);
@@ -274,17 +277,17 @@ public:
 
 	void clearLists()
 	{
-		//save current context and others
+		// save current context and others
 		HDC hCurrentDC = wglGetCurrentDC();
 		T_hGlContext hCurrentContext = wglGetCurrentContext();
-		//free all display lists
+		// free all display lists
 		DisplayListMap::iterator it = m_displayListMap.begin();
 		for (; it != m_displayListMap.end(); ++it) {
 			wglMakeCurrent(it->second.m_hdc, it->first.m_glContext);
 			glDeleteLists(it->second.m_displayListId, 1);
 		}
 		m_displayListMap.clear();
-		//restore current context
+		// restore current context
 
 		wglMakeCurrent(hCurrentDC, hCurrentContext);
 	}
@@ -307,15 +310,16 @@ TStrokeProp *TSimpleStrokeStyle::makeStrokeProp(const TStroke *stroke)
 //    TOutlineStyle  implementation
 //*************************************************************************************
 
-TOutlineStyle::TOutlineStyle()
-	: m_regionOutlineModifier(0)
+TOutlineStyle::TOutlineStyle() : m_regionOutlineModifier(0)
 {
 }
 
 //-----------------------------------------------------------------------------
 
 TOutlineStyle::TOutlineStyle(const TOutlineStyle &other)
-	: TColorStyle(other), m_regionOutlineModifier(other.m_regionOutlineModifier ? other.m_regionOutlineModifier->clone() : 0)
+	: TColorStyle(other),
+	  m_regionOutlineModifier(other.m_regionOutlineModifier ? other.m_regionOutlineModifier->clone()
+															: 0)
 {
 }
 
@@ -350,8 +354,7 @@ TRegionProp *TOutlineStyle::makeRegionProp(const TRegion *region)
 
 //-----------------------------------------------------------------------------
 
-void TOutlineStyle::computeOutline(const TStroke *stroke,
-								   TStrokeOutline &outline,
+void TOutlineStyle::computeOutline(const TStroke *stroke, TStrokeOutline &outline,
 								   TOutlineUtil::OutlineParameter param) const
 {
 	TOutlineUtil::makeOutline(*stroke, outline, param);
@@ -392,7 +395,8 @@ TColorStyle *TSolidColorStyle::clone() const
 void TSolidColorStyle::makeIcon(const TDimension &size)
 {
 	/*-- TSolidColorStyle, TColorCleanupStyle, TBlackCleanupStyle --*/
-	if (getTagId() != 3 && getTagId() != 2001 && getTagId() != 2002) // e' un'istanza di una classe derivata da TSolidColorStyle
+	if (getTagId() != 3 && getTagId() != 2001 &&
+		getTagId() != 2002) // e' un'istanza di una classe derivata da TSolidColorStyle
 	{
 		TColorStyle::makeIcon(size);
 	} else {
@@ -406,7 +410,8 @@ void TSolidColorStyle::makeIcon(const TDimension &size)
 		else {
 			TRaster32P fg(size);
 			fg->fill(premultiply(col));
-			TRop::checkBoard(m_icon, TPixel32::Black, TPixel32::White, TDimensionD(6, 6), TPointD());
+			TRop::checkBoard(m_icon, TPixel32::Black, TPixel32::White, TDimensionD(6, 6),
+							 TPointD());
 			TRop::over(m_icon, fg);
 		}
 	}
@@ -414,7 +419,8 @@ void TSolidColorStyle::makeIcon(const TDimension &size)
 
 //-----------------------------------------------------------------------------
 
-void TSolidColorStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &boundary) const
+void TSolidColorStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing,
+								  TRegionOutline &boundary) const
 {
 	m_tessellator->tessellate(cf, antiAliasing, boundary, m_color);
 }
@@ -433,7 +439,8 @@ void TSolidColorStyle::drawRegion(TFlash &flash, const TRegion *r) const
 
 //=============================================================================
 
-void TSolidColorStyle::drawStroke(const TColorFunction *cf, TStrokeOutline *outline, const TStroke *stroke) const
+void TSolidColorStyle::drawStroke(const TColorFunction *cf, TStrokeOutline *outline,
+								  const TStroke *stroke) const
 {
 	struct locals {
 		static inline void fillOutlinedStroke(const std::vector<TOutlinePoint> &v)
@@ -466,16 +473,16 @@ void TSolidColorStyle::drawStroke(const TColorFunction *cf, TStrokeOutline *outl
 			TStencilControl *stencil = TStencilControl::instance();
 
 			/*
-    // invertendo l'ordine tra disegno interno e contorno, l'antialiasing
-    // peggiora un po'. Piu che altro, il mangiucchiamento che faceva su alcune macchine, 
-    // ma solo in drawOnScreen, ora lo fa anche quando si renderizza offline    
-    stencil->beginMask(TStencilControl::DRAW_ON_SCREEN_ONLY_ONCE);
-    // center line
-    fillOutlinedStroke(v);    
-    // outline with antialiasing
-    drawAntialiasedOutline(v);                
-    stencil->endMask();
-    */
+	// invertendo l'ordine tra disegno interno e contorno, l'antialiasing
+	// peggiora un po'. Piu che altro, il mangiucchiamento che faceva su alcune macchine,
+	// ma solo in drawOnScreen, ora lo fa anche quando si renderizza offline
+	stencil->beginMask(TStencilControl::DRAW_ON_SCREEN_ONLY_ONCE);
+	// center line
+	fillOutlinedStroke(v);
+	// outline with antialiasing
+	drawAntialiasedOutline(v);
+	stencil->endMask();
+	*/
 
 			stencil->beginMask(TStencilControl::DRAW_ON_SCREEN_ONLY_ONCE);
 			locals::fillOutlinedStroke(v);
@@ -561,8 +568,7 @@ void TSolidColorStyle::saveData(TOutputStreamInterface &os) const
 //    TCenterLineStrokeStyle  implementation
 //*************************************************************************************
 
-TCenterLineStrokeStyle::TCenterLineStrokeStyle(
-	const TPixel32 &color, USHORT stipple, double width)
+TCenterLineStrokeStyle::TCenterLineStrokeStyle(const TPixel32 &color, USHORT stipple, double width)
 	: m_color(color), m_stipple(stipple), m_width(width)
 {
 }
@@ -797,7 +803,7 @@ void TCenterLineStrokeStyle::setParamValue(int index, double value)
 }
 
 /*
-TPixel32 TTextureStyle::getMainColor() const 
+TPixel32 TTextureStyle::getMainColor() const
 {return m_averageColor; }*/
 
 //*************************************************************************************
@@ -885,7 +891,8 @@ TColorStyle::ParamType TRasterImagePatternStrokeStyle::getParamType(int index) c
 QString TRasterImagePatternStrokeStyle::getParamNames(int index) const
 {
 	assert(0 <= index && index < getParamCount());
-	return (index == 0) ? QCoreApplication::translate("TRasterImagePatternStrokeStyle", "Distance") : QCoreApplication::translate("TRasterImagePatternStrokeStyle", "Rotation");
+	return (index == 0) ? QCoreApplication::translate("TRasterImagePatternStrokeStyle", "Distance")
+						: QCoreApplication::translate("TRasterImagePatternStrokeStyle", "Rotation");
 }
 
 //-----------------------------------------------------------------------------
@@ -919,12 +926,12 @@ void TRasterImagePatternStrokeStyle::setParamValue(int index, double value)
 
 	if (index == 0) {
 		if (m_space != value) {
-			updateVersionNumber(); //aggiorna il vettore di affini
+			updateVersionNumber(); // aggiorna il vettore di affini
 		}
 		m_space = value;
 	} else {
 		if (m_rotation != value) {
-			updateVersionNumber(); //aggiorna il vettore di affini
+			updateVersionNumber(); // aggiorna il vettore di affini
 		}
 		m_rotation = value;
 	}
@@ -945,7 +952,8 @@ void TRasterImagePatternStrokeStyle::loadLevel(const std::string &patternName)
 			double sc = tmin(scx, scy);
 			double dx = (dstSize.lx - srcSize.lx * sc) * 0.5;
 			double dy = (dstSize.ly - srcSize.ly * sc) * 0.5;
-			return TScale(sc) * TTranslation(0.5 * TPointD(srcSize.lx, srcSize.ly) + TPointD(dx, dy));
+			return TScale(sc) *
+				   TTranslation(0.5 * TPointD(srcSize.lx, srcSize.ly) + TPointD(dx, dy));
 		}
 	}; // locals
 
@@ -1010,11 +1018,8 @@ void TRasterImagePatternStrokeStyle::loadLevel(const std::string &patternName)
 			TDimension cameraSize(768, 576);
 
 			// definisco i renderdata
-			const TVectorRenderData rd(
-				locals::getAffine(cameraSize, ras->getSize()),
-				TRect(),
-				level->getPalette(),
-				0, true, true);
+			const TVectorRenderData rd(locals::getAffine(cameraSize, ras->getSize()), TRect(),
+									   level->getPalette(), 0, true, true);
 			// rasterizzo
 			glContext->draw(vi, rd);
 			ras->copy(glContext->getRaster());
@@ -1027,7 +1032,8 @@ void TRasterImagePatternStrokeStyle::loadLevel(const std::string &patternName)
 
 //--------------------------------------------------------------------------------------------------
 
-void TRasterImagePatternStrokeStyle::computeTransformations(std::vector<TAffine> &transformations, const TStroke *stroke) const
+void TRasterImagePatternStrokeStyle::computeTransformations(std::vector<TAffine> &transformations,
+															const TStroke *stroke) const
 {
 	const int frameCount = m_level->getFrameCount();
 	if (frameCount == 0)
@@ -1068,10 +1074,9 @@ void TRasterImagePatternStrokeStyle::computeTransformations(std::vector<TAffine>
 
 //-----------------------------------------------------------------------------
 
-void TRasterImagePatternStrokeStyle::drawStroke(
-	const TVectorRenderData &rd,
-	const std::vector<TAffine> &transformations,
-	const TStroke *stroke) const
+void TRasterImagePatternStrokeStyle::drawStroke(const TVectorRenderData &rd,
+												const std::vector<TAffine> &transformations,
+												const TStroke *stroke) const
 {
 	TStopWatch sw;
 	sw.start();
@@ -1166,12 +1171,14 @@ void TRasterImagePatternStrokeStyle::drawStroke(TFlash &flash, const TStroke *st
 {
 	flash.drawHangedObjects();
 	if (m_level->getFrameCount() == 0) {
-		//if( rd.m_clippingRect!=TRect() && ! convert(rd.m_aff*stroke->getBBox()).overlaps( rd.m_clippingRect ) ) return;
-		TCenterLineStrokeStyle *appStyle = new TCenterLineStrokeStyle(TPixel32(255, 0, 0, 255), 0x0, 2.0);
-		//flash.pushMatrix();
-		//flash.multMatrix(rd.m_aff);
+		// if( rd.m_clippingRect!=TRect() && ! convert(rd.m_aff*stroke->getBBox()).overlaps(
+		// rd.m_clippingRect ) ) return;
+		TCenterLineStrokeStyle *appStyle =
+			new TCenterLineStrokeStyle(TPixel32(255, 0, 0, 255), 0x0, 2.0);
+		// flash.pushMatrix();
+		// flash.multMatrix(rd.m_aff);
 		appStyle->drawStroke(flash, stroke);
-		//glPopMatrix();
+		// glPopMatrix();
 		return;
 	}
 
@@ -1310,7 +1317,7 @@ void TVectorImagePatternStrokeStyle::makeIcon(const TDimension &size)
 		m_icon = icon;
 		return;
 	}
-	//img->setPalette(m_level->getPalette());
+	// img->setPalette(m_level->getPalette());
 	TPalette *vPalette = m_level->getPalette();
 	assert(vPalette);
 	img->setPalette(vPalette);
@@ -1351,7 +1358,8 @@ TColorStyle::ParamType TVectorImagePatternStrokeStyle::getParamType(int index) c
 QString TVectorImagePatternStrokeStyle::getParamNames(int index) const
 {
 	assert(0 <= index && index < getParamCount());
-	return (index == 0) ? QCoreApplication::translate("TVectorImagePatternStrokeStyle", "Distance") : QCoreApplication::translate("TVectorImagePatternStrokeStyle", "Rotation");
+	return (index == 0) ? QCoreApplication::translate("TVectorImagePatternStrokeStyle", "Distance")
+						: QCoreApplication::translate("TVectorImagePatternStrokeStyle", "Rotation");
 }
 
 //-----------------------------------------------------------------------------
@@ -1385,12 +1393,12 @@ void TVectorImagePatternStrokeStyle::setParamValue(int index, double value)
 
 	if (index == 0) {
 		if (m_space != value) {
-			updateVersionNumber(); //aggiorna il vettore di affini
+			updateVersionNumber(); // aggiorna il vettore di affini
 		}
 		m_space = value;
 	} else {
 		if (m_rotation != value) {
-			updateVersionNumber(); //aggiorna il vettore di affini
+			updateVersionNumber(); // aggiorna il vettore di affini
 		}
 		m_rotation = value;
 	}
@@ -1402,7 +1410,7 @@ void TVectorImagePatternStrokeStyle::loadLevel(const std::string &patternName)
 {
 	m_level = TLevelP();
 	m_name = patternName;
-	assert(!getRootDir().isEmpty()); //se e' vuota, non si e' chiamata la setRoot(..)
+	assert(!getRootDir().isEmpty()); // se e' vuota, non si e' chiamata la setRoot(..)
 	TFilePath fp = getRootDir() + (patternName + ".pli");
 	TLevelReaderP lr(fp);
 	m_level = lr->loadInfo();
@@ -1417,7 +1425,8 @@ void TVectorImagePatternStrokeStyle::loadLevel(const std::string &patternName)
 
 //--------------------------------------------------------------------------------------------------
 
-void TVectorImagePatternStrokeStyle::computeTransformations(std::vector<TAffine> &transformations, const TStroke *stroke) const
+void TVectorImagePatternStrokeStyle::computeTransformations(std::vector<TAffine> &transformations,
+															const TStroke *stroke) const
 {
 	const int frameCount = m_level->getFrameCount();
 	if (frameCount == 0)
@@ -1448,8 +1457,7 @@ void TVectorImagePatternStrokeStyle::computeTransformations(std::vector<TAffine>
 		double sc = p.thick / ry;
 		if (sc < 0.0001)
 			sc = 0.0001;
-		TAffine aff =
-			TTranslation(p) * TRotation(ang) * TScale(sc) * TTranslation(-center);
+		TAffine aff = TTranslation(p) * TRotation(ang) * TScale(sc) * TTranslation(-center);
 		transformations.push_back(aff);
 		double ds = tmax(2.0, sc * bbox.getLx() + m_space);
 		s += ds;
@@ -1469,7 +1477,9 @@ void TVectorImagePatternStrokeStyle::clearGlDisplayLists()
 
 //--------------------------------------------------------------------------------------------------
 
-void TVectorImagePatternStrokeStyle::drawStroke(const TVectorRenderData &rd, const std::vector<TAffine> &transformations, const TStroke *stroke) const
+void TVectorImagePatternStrokeStyle::drawStroke(const TVectorRenderData &rd,
+												const std::vector<TAffine> &transformations,
+												const TStroke *stroke) const
 {
 	const int frameCount = m_level->getFrameCount();
 	if (frameCount == 0)
@@ -1592,7 +1602,8 @@ void TVectorImagePatternStrokeStyle::drawStroke(const TVectorRenderData &rd, con
 			CHECK_GL_ERROR
 #ifdef _WIN32
 
-			GLuint listId = DisplayListManager::instance()->getDisplayListId(imgPointer, m_name, fid, rd);
+			GLuint listId =
+				DisplayListManager::instance()->getDisplayListId(imgPointer, m_name, fid, rd);
 			if (listId != 0) {
 				CHECK_GL_ERROR
 				glCallList(listId);
@@ -1625,12 +1636,14 @@ void TVectorImagePatternStrokeStyle::drawStroke(TFlash &flash, const TStroke *st
 
 	const int frameCount = m_level->getFrameCount();
 	if (frameCount == 0) {
-		//if( rd.m_clippingRect!=TRect() && ! convert(rd.m_aff*stroke->getBBox()).overlaps( rd.m_clippingRect ) ) return;
-		TCenterLineStrokeStyle *appStyle = new TCenterLineStrokeStyle(TPixel32(255, 0, 0, 255), 0x0, 2.0);
-		//flash.pushMatrix();
-		//flash.multMatrix(rd.m_aff);
+		// if( rd.m_clippingRect!=TRect() && ! convert(rd.m_aff*stroke->getBBox()).overlaps(
+		// rd.m_clippingRect ) ) return;
+		TCenterLineStrokeStyle *appStyle =
+			new TCenterLineStrokeStyle(TPixel32(255, 0, 0, 255), 0x0, 2.0);
+		// flash.pushMatrix();
+		// flash.multMatrix(rd.m_aff);
 		appStyle->drawStroke(flash, stroke);
-		//glPopMatrix();
+		// glPopMatrix();
 		return;
 	}
 	UINT cpCount = stroke->getControlPointCount();
@@ -1665,28 +1678,27 @@ void TVectorImagePatternStrokeStyle::drawStroke(TFlash &flash, const TStroke *st
 		double ang = rad2degree(atan(v)) + m_rotation;
 		TRectD bbox = img->getBBox();
 		TPointD center = 0.5 * (bbox.getP00() + bbox.getP11());
-		//double rx = bbox.getLx() * 0.5;
+		// double rx = bbox.getLx() * 0.5;
 		double ry = bbox.getLy() * 0.5;
 		if (ry * ry < 1e-5)
 			ry = p.thick;
 		double sc = p.thick / ry;
 		if (sc < 0.0001)
 			sc = 0.0001;
-		TAffine aff =
-			TTranslation(p) * TRotation(ang) * TScale(sc) * TTranslation(-center);
-		//TVectorRenderData rd2(rd, rd.m_aff * aff);
-		//c'era un crash se, dopo aver fatto new color, si selezionava un pattern
-		//e si disegnava (stack overflow). Ora r2 prende la palette
-		//dell'immagine caricata
+		TAffine aff = TTranslation(p) * TRotation(ang) * TScale(sc) * TTranslation(-center);
+		// TVectorRenderData rd2(rd, rd.m_aff * aff);
+		// c'era un crash se, dopo aver fatto new color, si selezionava un pattern
+		// e si disegnava (stack overflow). Ora r2 prende la palette
+		// dell'immagine caricata
 		TVectorImage *imgPointer = img.getPointer();
 
-		//TVectorRenderData rd2(rd.m_aff * aff,rd.m_clippingRect,
+		// TVectorRenderData rd2(rd.m_aff * aff,rd.m_clippingRect,
 		//                  img->getPalette(),rd.m_cf,rd.m_antiAliasing);
 
 		flash.pushMatrix();
 		flash.multMatrix(aff);
 		flash.buildImage(imgPointer, false);
-		//flash.draw(imgPointer, 0);
+		// flash.draw(imgPointer, 0);
 		flash.popMatrix();
 
 		double ds = tmax(2.0, sc * bbox.getLx() + m_space);
@@ -1754,7 +1766,7 @@ TStrokeProp *TVectorImagePatternStrokeStyle::makeStrokeProp(const TStroke *strok
 
 void TVectorImagePatternStrokeStyle::getObsoleteTagIds(std::vector<int> &ids) const
 {
-	//ids.push_back(100);
+	// ids.push_back(100);
 }
 
 //*************************************************************************************

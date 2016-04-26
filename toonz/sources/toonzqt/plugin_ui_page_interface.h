@@ -18,15 +18,12 @@ class UIPage
 		std::string name_;
 		std::vector<std::pair<std::string, ParamView *>> params_;
 
-	public:
+	  public:
 		Group(const std::string &name) : name_(name) {}
 
 		Group(const Group &group) : name_(group.name_), params_(group.params_) {}
 
-		inline const std::string &name() const
-		{
-			return name_;
-		}
+		inline const std::string &name() const { return name_; }
 
 		inline void add_param(const std::string &param, ParamView *components)
 		{
@@ -47,10 +44,8 @@ class UIPage
 	std::string name_;
 	std::vector<Group *> groups_;
 
-public:
-	inline UIPage(const char *name) : name_(name)
-	{
-	}
+  public:
+	inline UIPage(const char *name) : name_(name) {}
 
 	inline ~UIPage()
 	{
@@ -110,6 +105,7 @@ public:
 
 int begin_group(toonz_ui_page_handle_t page, const char *name);
 int end_group(toonz_ui_page_handle_t page, const char *name);
-int bind_param(toonz_ui_page_handle_t page, toonz_param_handle_t param, toonz_param_view_handle_t traits);
+int bind_param(toonz_ui_page_handle_t page, toonz_param_handle_t param,
+			   toonz_param_view_handle_t traits);
 
 #endif

@@ -24,18 +24,16 @@ class CCallCircle
 	int m_nb;
 	std::unique_ptr<SXYDW[]> m_c;
 
-	void draw(UCHAR *drawB, const int lX, const int lY,
-			  const int xx, const int yy, const double r);
+	void draw(UCHAR *drawB, const int lX, const int lY, const int xx, const int yy, const double r);
 	void null();
 
-public:
+  public:
 	CCallCircle() : m_r(0.0), m_nb(0) {}
 	CCallCircle(const double r);
 	virtual ~CCallCircle();
 	void print();
 
-	template <class P>
-	void getCC(CSTColSelPic<P> &pic, P &col)
+	template <class P> void getCC(CSTColSelPic<P> &pic, P &col)
 	{
 		int xy = pic.m_lX * pic.m_lY;
 		UCHAR *pSel = pic.m_sel.get();
@@ -50,8 +48,7 @@ public:
 			}
 	}
 
-	template <class P>
-	void getCC(CSTColSelPic<P> &pic, const int xx, const int yy, P &col)
+	template <class P> void getCC(CSTColSelPic<P> &pic, const int xx, const int yy, P &col)
 	{
 		for (int i = 0; i < m_nb; i++) {
 			int x = xx + m_c[i].x;
@@ -71,8 +68,8 @@ public:
 	}
 
 	template <class P>
-	void setNewContour(CSTColSelPic<P> &picOri, CSTColSelPic<P> &pic,
-					   UCHAR *drawB, const bool isOneCC)
+	void setNewContour(CSTColSelPic<P> &picOri, CSTColSelPic<P> &pic, UCHAR *drawB,
+					   const bool isOneCC)
 	{
 		UCHAR *pDB = drawB;
 		P *p = pic.m_pic;
@@ -120,8 +117,7 @@ public:
 		}
 	}
 
-	template <class P>
-	void draw(CSTColSelPic<P> &pic, const bool isOneCC, const double random)
+	template <class P> void draw(CSTColSelPic<P> &pic, const bool isOneCC, const double random)
 	// throw(SMemAllocError)
 	{
 		if (m_nb <= 0 || m_c == 0)

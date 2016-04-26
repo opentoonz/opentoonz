@@ -19,14 +19,15 @@ namespace
 			|
 			v
  */
-bool inside_polygon_(
-	double radius, int odd_diameter, double xp, double yp, int polygon_number, double roll_degree)
+bool inside_polygon_(double radius, int odd_diameter, double xp, double yp, int polygon_number,
+					 double roll_degree)
 {
 	if (polygon_number < 3) { /* equal less than 2  is circle */
 		return true;
 	}
 	double radian = roll_degree * M_PI / 180.0, add_radian = 2.0 * M_PI / polygon_number;
-	double x1 = radius * cos(radian), y1 = radius * sin(radian), x2 = 0, y2 = 0, xa = odd_diameter, xb = odd_diameter;
+	double x1 = radius * cos(radian), y1 = radius * sin(radian), x2 = 0, y2 = 0, xa = odd_diameter,
+		   xb = odd_diameter;
 	radian += add_radian;
 
 	/* 線分の回数loop回す */
@@ -42,8 +43,7 @@ bool inside_polygon_(
 
 		/* scanline方向でy1とy2の間で区切った領域外なら次へ
 		((y2==y1==yp)の場合も)しない線分なら次へ */
-		if (!(((y1 <= yp) && (yp <= y2)) ||
-			  ((y2 <= yp) && (yp <= y1)))) {
+		if (!(((y1 <= yp) && (yp <= y2)) || ((y2 <= yp) && (yp <= y1)))) {
 			continue;
 		}
 
@@ -51,8 +51,7 @@ bool inside_polygon_(
 
 		/* 水平線分 */
 		if (y2 == y1) {
-			if (((x1 <= xp) && (xp <= x2)) ||
-				((x2 <= xp) && (xp <= x1))) {
+			if (((x1 <= xp) && (xp <= x2)) || ((x2 <= xp) && (xp <= x1))) {
 				return true;
 			} /* 水平線分上 */
 			else {
@@ -69,8 +68,7 @@ bool inside_polygon_(
 			/* 2番目の交差位置(xb) */
 			if (xb == odd_diameter) {
 			xb = (yp - y1) * (x2 - x1) / (y2 - y1) + x1;
-			if (((xa <= xp) && (xp <= xb)) ||
-				((xb <= xp) && (xp <= xa))) {
+			if (((xa <= xp) && (xp <= xb)) || ((xb <= xp) && (xp <= xa))) {
 				return true;
 			} /* 水平範囲内 */
 			else {
@@ -85,13 +83,13 @@ bool inside_polygon_(
 	 x - x1    y - y1
 	------- = -------
 	x2 - x1   y2 - y1
-    -->	(x - x1) * (y2 - y1) = (y - y1) * (x2 - x1)
-    -->	x * (y2 - y1) - x1 * (y2 - y1) = y * (x2 - x1) - y1 * (x2 - x1)
-    --> y * (x2 - x1) - y1 * (x2 - x1) = x * (y2 - y1) - x1 * (y2 - y1)
-    -->	y * (x2 - x1) + x1 * (y2 - y1) = x * (y2 - y1) + y1 * (x2 - x1)
-    -->	(y1 - y2) * x + (x2 - x1) * y + x1 * (y2 - y1) - y1 * (x2 - x1) = 0
-    --> (y1 - y2) * x + (x2 - x1) * y + x1*y2 - x1*y1 - y1*x2 + y1*x1 = 0
-    --> (y1 - y2) * x + (x2 - x1) * y + x1*y2 - y1*x2 = 0
+	-->	(x - x1) * (y2 - y1) = (y - y1) * (x2 - x1)
+	-->	x * (y2 - y1) - x1 * (y2 - y1) = y * (x2 - x1) - y1 * (x2 - x1)
+	--> y * (x2 - x1) - y1 * (x2 - x1) = x * (y2 - y1) - x1 * (y2 - y1)
+	-->	y * (x2 - x1) + x1 * (y2 - y1) = x * (y2 - y1) + y1 * (x2 - x1)
+	-->	(y1 - y2) * x + (x2 - x1) * y + x1 * (y2 - y1) - y1 * (x2 - x1) = 0
+	--> (y1 - y2) * x + (x2 - x1) * y + x1*y2 - x1*y1 - y1*x2 + y1*x1 = 0
+	--> (y1 - y2) * x + (x2 - x1) * y + x1*y2 - y1*x2 = 0
 
 	点(x0,y0)と直線との距離(垂線の長さ)(h)
 	a * x + b * y + c = 0 ならば、
@@ -102,8 +100,8 @@ bool inside_polygon_(
 	h =	---------------------------------------------------
 		sqrt((y1 - y2) * (y1 - y2) + (x2 - x1) * (x2 - x1))
  */
-double length_to_polygon_(
-	double radius, double xp, double yp, int polygon_number, double roll_degree)
+double length_to_polygon_(double radius, double xp, double yp, int polygon_number,
+						  double roll_degree)
 {
 	/* 現在位置での角度 */
 	double radian = atan2(yp, xp); /* 0 ... M_PI , -M_PI ... 0 */
@@ -143,8 +141,8 @@ double length_to_polygon_(
 	return fabs((y1 - y2) * xp + (x2 - x1) * yp + x1 * y2 - y1 * x2) /
 		   sqrt((y1 - y2) * (y1 - y2) + (x2 - x1) * (x2 - x1));
 }
-void alloc_lens_matrix_(
-	const int odd_diameter, std::vector<int> &lens_offsets, std::vector<int> &lens_sizes, std::vector<std::vector<double>> &lens_ratio)
+void alloc_lens_matrix_(const int odd_diameter, std::vector<int> &lens_offsets,
+						std::vector<int> &lens_sizes, std::vector<std::vector<double>> &lens_ratio)
 {
 	lens_offsets.resize(odd_diameter);
 	lens_sizes.resize(odd_diameter);
@@ -153,16 +151,15 @@ void alloc_lens_matrix_(
 		lens_ratio.at(yy).resize(odd_diameter);
 	}
 }
-void free_lens_matrix_(
-	std::vector<int> &lens_offsets, std::vector<int> &lens_sizes, std::vector<std::vector<double>> &lens_ratio)
+void free_lens_matrix_(std::vector<int> &lens_offsets, std::vector<int> &lens_sizes,
+					   std::vector<std::vector<double>> &lens_ratio)
 {
 	lens_ratio.clear();
 	lens_sizes.clear();
 	lens_offsets.clear();
 }
 }
-const int igs::maxmin::diameter_from_outer_radius(
-	const double outer_radius)
+const int igs::maxmin::diameter_from_outer_radius(const double outer_radius)
 {
 	/* -------- 半径(radius)を含むピクセル直径 --------
 	中心pixelが必要、奇数(1,3,5...)となる
@@ -177,13 +174,10 @@ const int igs::maxmin::diameter_from_outer_radius(
  直径(+1)		<-------|-------|------->
  -->odd_diameter
 	*/
-	return (
-			   static_cast<int>(ceil(outer_radius + 0.5) + 0.5) - 1) *
-			   2 +
-		   1;
+	return (static_cast<int>(ceil(outer_radius + 0.5) + 0.5) - 1) * 2 + 1;
 }
-const double igs::maxmin::outer_radius_from_radius(
-	const double radius, const double smooth_outer_range)
+const double igs::maxmin::outer_radius_from_radius(const double radius,
+												   const double smooth_outer_range)
 {
 	if (radius < 1.0) {
 		/*
@@ -202,14 +196,16 @@ const double igs::maxmin::outer_radius_from_radius(
 	}
 	return radius + smooth_outer_range;
 }
-const int igs::maxmin::alloc_and_shape_lens_matrix(
-	const double radius // 0<=
-	,
-	const double outer_radius, const int polygon_number // =2
-	,
-	const double roll_degree // 0<= ... <=360
-	,
-	std::vector<int> &lens_offsets, std::vector<int> &lens_sizes, std::vector<std::vector<double>> &lens_ratio)
+const int igs::maxmin::alloc_and_shape_lens_matrix(const double radius // 0<=
+												   ,
+												   const double outer_radius,
+												   const int polygon_number // =2
+												   ,
+												   const double roll_degree // 0<= ... <=360
+												   ,
+												   std::vector<int> &lens_offsets,
+												   std::vector<int> &lens_sizes,
+												   std::vector<std::vector<double>> &lens_ratio)
 {
 	/*------ 大きさが無い指定のときMemory解放 ------*/
 	if (radius <= 0.0) {
@@ -218,33 +214,32 @@ const int igs::maxmin::alloc_and_shape_lens_matrix(
 	}
 
 	/*------ 半径から必要なピクセル単位の直径を求める ------*/
-	const int odd_diameter =
-		igs::maxmin::diameter_from_outer_radius(outer_radius);
+	const int odd_diameter = igs::maxmin::diameter_from_outer_radius(outer_radius);
 
 	/*------ Memory確保or再利用 ------*/
-	alloc_lens_matrix_(
-		odd_diameter, lens_offsets, lens_sizes, lens_ratio);
+	alloc_lens_matrix_(odd_diameter, lens_offsets, lens_sizes, lens_ratio);
 
 	/*------ lens matrix情報を書き込む ------*/
 	igs::maxmin::reshape_lens_matrix(
-		radius, igs::maxmin::outer_radius_from_radius(radius, outer_radius - radius), odd_diameter, polygon_number, roll_degree, lens_offsets, lens_sizes, lens_ratio);
+		radius, igs::maxmin::outer_radius_from_radius(radius, outer_radius - radius), odd_diameter,
+		polygon_number, roll_degree, lens_offsets, lens_sizes, lens_ratio);
 	return odd_diameter;
 }
-const void igs::maxmin::reshape_lens_matrix(
-	const double radius // 0<=
-	,
-	const double outer_radius, const int odd_diameter /* 最大直径 */
-	,
-	const int polygon_number // =2
-	,
-	const double roll_degree // 0<= ... <=360
-	,
-	std::vector<int> &lens_offsets /* 最大直径分の配列 */
-	,
-	std::vector<int> &lens_sizes /* 最大直径分の配列 */
-	,
-	std::vector<std::vector<double>> &lens_ratio /* 最大直径分の配列 */
-	)
+const void
+igs::maxmin::reshape_lens_matrix(const double radius // 0<=
+								 ,
+								 const double outer_radius, const int odd_diameter /* 最大直径 */
+								 ,
+								 const int polygon_number // =2
+								 ,
+								 const double roll_degree // 0<= ... <=360
+								 ,
+								 std::vector<int> &lens_offsets /* 最大直径分の配列 */
+								 ,
+								 std::vector<int> &lens_sizes /* 最大直径分の配列 */
+								 ,
+								 std::vector<std::vector<double>> &lens_ratio /* 最大直径分の配列 */
+								 )
 {
 	/***std::cout
 << "ra=" << radius
@@ -268,8 +263,7 @@ const void igs::maxmin::reshape_lens_matrix(
 			const double current_radius = sqrt(xp * xp + yp * yp);
 			/* 外枠影響内 */
 			if ((current_radius <= outer_radius) &&
-				inside_polygon_(
-					outer_radius, odd_diameter, xp, yp, polygon_number, roll_degree)) {
+				inside_polygon_(outer_radius, odd_diameter, xp, yp, polygon_number, roll_degree)) {
 				/* scanlineスタート位置(ポインタ)のセット */
 				if (lens_offsets.at(yy) < 0) {
 					/* 半径内に入った瞬間その位置を記録 */
@@ -278,8 +272,7 @@ const void igs::maxmin::reshape_lens_matrix(
 
 			} else { /* 影響外 */
 				/* scalineサイズのセット */
-				if ((0 <= lens_offsets.at(yy)) &&
-					(lens_sizes.at(yy) == 0)) {
+				if ((0 <= lens_offsets.at(yy)) && (lens_sizes.at(yy) == 0)) {
 					/* 半径内を出た瞬間そこまでのサイズを記録 */
 					lens_sizes.at(yy) = xx - lens_offsets.at(yy);
 				}
@@ -302,12 +295,10 @@ const void igs::maxmin::reshape_lens_matrix(
 			const double current_radius = sqrt(xp * xp + yp * yp);
 			/* 外枠内 */
 			if ((current_radius <= outer_radius) &&
-				inside_polygon_(
-					outer_radius, odd_diameter, xp, yp, polygon_number, roll_degree)) {
+				inside_polygon_(outer_radius, odd_diameter, xp, yp, polygon_number, roll_degree)) {
 				/* 内枠内 */
 				if ((current_radius <= radius) &&
-					inside_polygon_(
-						radius, odd_diameter, xp, yp, polygon_number, roll_degree)) {
+					inside_polygon_(radius, odd_diameter, xp, yp, polygon_number, roll_degree)) {
 					lens_ratio.at(yy).at(xr++) = 1.0;
 				}
 				/* 外枠と内枠の間 */
@@ -316,12 +307,11 @@ const void igs::maxmin::reshape_lens_matrix(
 						lens_ratio.at(yy).at(xr++) =
 							(outer_radius - current_radius) / (outer_radius - radius);
 					} else {
-						const double leninn = length_to_polygon_(
-							radius, xp, yp, polygon_number, roll_degree);
-						const double lenout = length_to_polygon_(
-							outer_radius, xp, yp, polygon_number, roll_degree);
-						lens_ratio.at(yy).at(xr++) =
-							lenout / (leninn + lenout);
+						const double leninn =
+							length_to_polygon_(radius, xp, yp, polygon_number, roll_degree);
+						const double lenout =
+							length_to_polygon_(outer_radius, xp, yp, polygon_number, roll_degree);
+						lens_ratio.at(yy).at(xr++) = lenout / (leninn + lenout);
 					}
 				}
 			}

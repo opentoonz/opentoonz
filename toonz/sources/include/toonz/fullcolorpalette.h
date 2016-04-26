@@ -17,7 +17,7 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-//forward declaration
+// forward declaration
 class TPalette;
 class ToonzScene;
 
@@ -30,7 +30,7 @@ class DVAPI FullColorPalette : public QObject
 
 	FullColorPalette();
 
-public:
+  public:
 	static FullColorPalette *instance();
 	~FullColorPalette();
 	void clear();

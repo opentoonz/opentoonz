@@ -17,20 +17,20 @@
 
 class DVAPI Logger
 { // singleton
-public:
+  public:
 	class Listener
 	{
-	public:
+	  public:
 		virtual void onAdd() = 0;
 		virtual ~Listener() {}
 	};
 
-private:
+  private:
 	Logger();
 	std::vector<Listener *> m_listeners;
 	std::vector<std::wstring> m_rows;
 
-public:
+  public:
 	static Logger *instance();
 
 	void add(std::wstring s);

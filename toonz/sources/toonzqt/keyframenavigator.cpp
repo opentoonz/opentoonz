@@ -137,7 +137,7 @@ TStageObject *ViewerKeyframeNavigator::getStageObject() const
 
 	TStageObjectId objectId = m_objectHandle->getObjectId();
 	TXsheet *xsh = m_xsheetHandle->getXsheet();
-	//Se e' una colonna sound non posso settare chiavi
+	// Se e' una colonna sound non posso settare chiavi
 	if (objectId.isColumn()) {
 		TXshColumn *column = xsh->getColumn(objectId.getIndex());
 		if (column && column->getSoundColumn())
@@ -214,7 +214,8 @@ void ViewerKeyframeNavigator::toggle()
 	if (pegbar->isFullKeyframe(frame)) {
 		TStageObject::Keyframe key = pegbar->getKeyframe(frame);
 		pegbar->removeKeyframeWithoutUndo(frame);
-		UndoRemoveKeyFrame *undo = new UndoRemoveKeyFrame(pegbar->getId(), frame, key, m_xsheetHandle);
+		UndoRemoveKeyFrame *undo =
+			new UndoRemoveKeyFrame(pegbar->getId(), frame, key, m_xsheetHandle);
 		undo->setObjectHandle(m_objectHandle);
 		TUndoManager::manager()->add(undo);
 	} else {
@@ -294,26 +295,17 @@ class UndoPaletteSetKeyFrame : public TUndo
 	int m_styleId;
 	TPaletteHandle *m_paletteHandle;
 
-public:
+  public:
 	UndoPaletteSetKeyFrame(int styleId, int frame, TPaletteHandle *paletteHandle)
 		: m_frame(frame), m_styleId(styleId), m_paletteHandle(paletteHandle)
 	{
 	}
 
-	void undo() const
-	{
-		setKeyFrame();
-	}
-	void redo() const
-	{
-		setKeyFrame();
-	}
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	void undo() const { setKeyFrame(); }
+	void redo() const { setKeyFrame(); }
+	int getSize() const { return sizeof(*this); }
 
-protected:
+  protected:
 	void setKeyFrame() const
 	{
 		TPalette *palette = m_paletteHandle->getPalette();
@@ -325,7 +317,7 @@ protected:
 	}
 };
 //-----------------------------------------------------------------------------
-} //namespace
+} // namespace
 //=============================================================================
 
 //=============================================================================
@@ -399,10 +391,10 @@ void PaletteKeyframeNavigator::toggle()
 	if (!palette)
 		return;
 
-	int styleId = getStyleIndex(),
-		frame = getCurrentFrame();
+	int styleId = getStyleIndex(), frame = getCurrentFrame();
 
-	std::auto_ptr<UndoPaletteSetKeyFrame> undo(new UndoPaletteSetKeyFrame(styleId, frame, m_paletteHandle));
+	std::auto_ptr<UndoPaletteSetKeyFrame> undo(
+		new UndoPaletteSetKeyFrame(styleId, frame, m_paletteHandle));
 	undo->redo();
 
 	TUndoManager::manager()->add(undo.release());
@@ -473,7 +465,7 @@ namespace
 {
 //-----------------------------------------------------------------------------
 
-//!Se non c'e' un keyframe successivo ritorna frame
+//! Se non c'e' un keyframe successivo ritorna frame
 int getNextKeyframe(TFxP fx, int frame)
 {
 	if (!fx)
@@ -493,7 +485,7 @@ int getNextKeyframe(TFxP fx, int frame)
 
 //-----------------------------------------------------------------------------
 
-//!Se non c'e' un keyframe precedente ritorna frame
+//! Se non c'e' un keyframe precedente ritorna frame
 int getPrevKeyframe(TFxP fx, int frame)
 {
 	if (!fx)
@@ -528,7 +520,7 @@ void setKeyframe(TFxP fx, int frame, bool on)
 }
 
 //-----------------------------------------------------------------------------
-} //anonymous namespace
+} // anonymous namespace
 //=============================================================================
 
 //=============================================================================
@@ -634,7 +626,8 @@ void FxKeyframeNavigator::toggle()
 
 	// modifico lo stato: nokeyframe->full, full->no, partial->full
 	bool on = !isKeyframe || isKeyframe && !isFullKeyframe;
-	for (i = 0; i < fx->getParams()->getParamCount(); i++) { // TODO. spostare questo codice in TParam
+	for (i = 0; i < fx->getParams()->getParamCount();
+		 i++) { // TODO. spostare questo codice in TParam
 		TParamP param = fx->getParams()->getParam(i);
 		if (TDoubleParamP dp = param) {
 			if (on)

@@ -19,14 +19,14 @@ Currently there are two types of this object
 ST_RGBM		- CSTPic<UC_PIXEL>	- UCHAR r,g,b,m channels
 ST_RGBM64	- CSTPic<US_PIXEL>	- USHORT r,g,b,m channels
 
-The CMAP RASTER pictures have to be converted to ST_RGBM or 
-ST_RGBM64, but the CMAP information can be used with the help 
-of m_raster.  
+The CMAP RASTER pictures have to be converted to ST_RGBM or
+ST_RGBM64, but the CMAP information can be used with the help
+of m_raster.
 
 m_lX,m_lY - the length of the picture in X,Y direction
 m_pic - the buffer of the picture
-m_ras - stores the pointer to the original RASTER picture 
-   
+m_ras - stores the pointer to the original RASTER picture
+
 ************************************************************/
 
 #include "toonz4.6/udit.h"
@@ -50,45 +50,46 @@ typedef enum {
 //! to be considered starting from Toonz 6.1 - the allocated raster is now managed
 //! by the image cache. Basically, when constructing one such object, the image is locked
 //! in the Toonz cache - and you must remember to unlock and relock it along inactivity periods.
-template <class P>
-class CSTPic
+template <class P> class CSTPic
 {
 	std::string m_cacheId;
 	TRasterImageP m_picP;
 
-public:
+  public:
 	int m_lX, m_lY;
 	P *m_pic;
 	const RASTER *m_ras;
 
-	CSTPic(void) : m_cacheId(TImageCache::instance()->getUniqueId()),
-				   m_lX(0), m_lY(0), m_pic(0), m_ras(0) {}
+	CSTPic(void)
+		: m_cacheId(TImageCache::instance()->getUniqueId()), m_lX(0), m_lY(0), m_pic(0), m_ras(0)
+	{
+	}
 
 	void nullPic()
 	{
-		//if ( m_pic ) { delete [] m_pic; m_pic=0; }
+		// if ( m_pic ) { delete [] m_pic; m_pic=0; }
 		unlock();
 		TImageCache::instance()->remove(m_cacheId);
 	}
 
-	//!Retrieves the raster image from the cache to work with it.
+	//! Retrieves the raster image from the cache to work with it.
 	void lock()
 	{
 		m_picP = TImageCache::instance()->get(m_cacheId, true);
 		m_pic = (P *)m_picP->getRaster()->getRawData();
 	}
 
-	//!Release the raster image for inactivity periods.
+	//! Release the raster image for inactivity periods.
 	void unlock()
 	{
 		m_picP = 0;
 		m_pic = 0;
 	}
 
-	CSTPic(const int lX, const int lY) : //throw(SMemAllocError) :
-										 m_cacheId(TImageCache::instance()->getUniqueId()),
-										 m_lX(lX), m_lY(lY),
-										 m_pic(0), m_ras(0)
+	CSTPic(const int lX, const int lY)
+		: // throw(SMemAllocError) :
+		  m_cacheId(TImageCache::instance()->getUniqueId()),
+		  m_lX(lX), m_lY(lY), m_pic(0), m_ras(0)
 	{
 		try {
 			initPic();
@@ -98,10 +99,10 @@ public:
 		}
 	}
 
-	CSTPic(const CSTPic<P> &sp) : //throw(SMemAllocError) :
-								  m_lX(sp.m_lX),
-								  m_lY(sp.m_lY),
-								  m_pic(0), m_ras(sp.m_ras)
+	CSTPic(const CSTPic<P> &sp)
+		: // throw(SMemAllocError) :
+		  m_lX(sp.m_lX),
+		  m_lY(sp.m_lY), m_pic(0), m_ras(sp.m_ras)
 	{
 		try {
 			initPic();
@@ -112,19 +113,16 @@ public:
 		}
 	}
 
-	~CSTPic(void)
-	{
-		null();
-	}
+	~CSTPic(void) { null(); }
 
-	//!Allocates the specified raster and surrenders it to the image cache.
+	//! Allocates the specified raster and surrenders it to the image cache.
 	//!\b NOTE: The raster being initialized is LOCKED after this call.
-	//!You must remember to UNLOCK it when no more used.
-	void initPic() //throw(SMemAllocError)
+	//! You must remember to UNLOCK it when no more used.
+	void initPic() // throw(SMemAllocError)
 	{
 		nullPic();
 		if (m_lX > 0 && m_lY > 0) {
-			//m_pic=new P[m_lX*m_lY];
+			// m_pic=new P[m_lX*m_lY];
 			TRasterGR8P ras(m_lX * m_lY * sizeof(P), 1);
 			if (!ras)
 				throw SMemAllocError("in initPic");
@@ -308,15 +306,14 @@ public:
 	// Gets the color of a RASTER pixel
 	// RASTER operation always gets I_PIXEL color and I_PIXEL is casted
 	// to the right type
-	void getRasterPixel(const RASTER *ras, const int x, const int y,
-						I_PIXEL &ip) const
+	void getRasterPixel(const RASTER *ras, const int x, const int y, I_PIXEL &ip) const
 	{
 		if (x >= 0 && x < ras->lx && y >= 0 && y < ras->ly && ras->buffer) {
 			LPIXEL *pL;
 			LPIXEL pLL;
 			SPIXEL *pS;
 			UD44_CMAPINDEX32 *ci32;
-			//UD44_PIXEL32* pen;
+			// UD44_PIXEL32* pen;
 			UD44_PIXEL32 *col;
 			switch (ras->type) {
 			case (RAS_RGBM):
@@ -347,8 +344,7 @@ public:
 			ip.r = ip.g = ip.b = ip.m = 0;
 	}
 
-	void getRasterPixel(const int x, const int y,
-						I_PIXEL &ip) const
+	void getRasterPixel(const int x, const int y, I_PIXEL &ip) const
 	{
 		if (m_ras)
 			getRasterPixel(m_ras, x, y, ip);
@@ -360,8 +356,7 @@ public:
 	// RASTER operation always gets I_PIXEL color and I_PIXEL is casted
 	// to the right type
 
-	void setRasterPixel(RASTER *ras, const int x, const int y,
-						const I_PIXEL &ip) const
+	void setRasterPixel(RASTER *ras, const int x, const int y, const I_PIXEL &ip) const
 	{
 		if (x >= 0 && x < ras->lx && y >= 0 && y < ras->ly && ras->buffer) {
 			LPIXEL *pL;
@@ -385,10 +380,8 @@ public:
 		}
 	}
 
-	bool copy_raster(const RASTER *ir, RASTER *out_r,
-					 const int xBeg, const int yBeg,
-					 const int xEnd, const int yEnd,
-					 const int ox, const int oy)
+	bool copy_raster(const RASTER *ir, RASTER *out_r, const int xBeg, const int yBeg,
+					 const int xEnd, const int yEnd, const int ox, const int oy)
 
 	{
 		if ((ir->lx <= 0) || (ir->ly <= 0) || (out_r->lx <= 0) || (out_r->ly <= 0))
@@ -397,8 +390,7 @@ public:
 			return false;
 		if (out_r->type == RAS_CM32)
 			return false;
-		if (ir->type == RAS_CM32 &&
-			(ir->cmap.buffer == NULL))
+		if (ir->type == RAS_CM32 && (ir->cmap.buffer == NULL))
 			return false;
 
 		for (int y = yBeg, yy = oy; y <= yEnd; y++, yy++)
@@ -408,15 +400,13 @@ public:
 				if (xx >= 0 && yy >= 0 && xx < out_r->lx && yy < out_r->ly) {
 					LPIXEL *pL;
 					SPIXEL *pS;
-					if (out_r->type == RAS_RGBM &&
-						(ir->type == RAS_RGBM || ir->type == RAS_CM32)) {
+					if (out_r->type == RAS_RGBM && (ir->type == RAS_RGBM || ir->type == RAS_CM32)) {
 						pL = (LPIXEL *)(out_r->buffer) + yy * out_r->wrap + xx;
 						pL->r = (UCHAR)ip.r;
 						pL->g = (UCHAR)ip.g;
 						pL->b = (UCHAR)ip.b;
 						pL->m = (UCHAR)ip.m;
-					} else if (out_r->type == RAS_RGBM &&
-							   ir->type == RAS_RGBM64) {
+					} else if (out_r->type == RAS_RGBM && ir->type == RAS_RGBM64) {
 						pL = (LPIXEL *)(out_r->buffer) + yy * out_r->wrap + xx;
 						pL->r = PIX_BYTE_FROM_USHORT((USHORT)ip.r);
 						pL->g = PIX_BYTE_FROM_USHORT((USHORT)ip.g);
@@ -429,8 +419,7 @@ public:
 						pS->g = PIX_USHORT_FROM_BYTE((UCHAR)ip.g);
 						pS->b = PIX_USHORT_FROM_BYTE((UCHAR)ip.b);
 						pS->m = PIX_USHORT_FROM_BYTE((UCHAR)ip.m);
-					} else if (out_r->type == RAS_RGBM64 &&
-							   ir->type == RAS_RGBM64) {
+					} else if (out_r->type == RAS_RGBM64 && ir->type == RAS_RGBM64) {
 						pS = (SPIXEL *)(out_r->buffer) + yy * out_r->wrap + xx;
 						pS->r = (USHORT)ip.r;
 						pS->g = (USHORT)ip.g;
@@ -445,14 +434,14 @@ public:
 	// Generates and reads the CSTPic using RASTER.
 	// \b NOTE: This LOCKS the raster being read. You must remember to unlock it afterwards
 	// when it is needed no more.
-	virtual void read(const RASTER *ras) //throw(SMemAllocError)
+	virtual void read(const RASTER *ras) // throw(SMemAllocError)
 	{
 		try {
 			null();
-			if (((ras->type == RAS_RGBM || ras->type == RAS_RGBM64) &&
-				 ras->buffer && ras->lx > 0 && ras->ly > 0) ||
-				(ras->type == RAS_CM32 && ras->buffer &&
-				 ras->cmap.buffer && ras->lx > 0 && ras->ly > 0)) {
+			if (((ras->type == RAS_RGBM || ras->type == RAS_RGBM64) && ras->buffer && ras->lx > 0 &&
+				 ras->ly > 0) ||
+				(ras->type == RAS_CM32 && ras->buffer && ras->cmap.buffer && ras->lx > 0 &&
+				 ras->ly > 0)) {
 				m_lX = ras->lx;
 				m_lY = ras->ly;
 				m_ras = ras;
@@ -523,10 +512,10 @@ public:
 	}
 
 	// Writes the CSTPic into the RASTER
-	virtual void write(RASTER *ras) const //throw(SWriteRasterError)
+	virtual void write(RASTER *ras) const // throw(SWriteRasterError)
 	{
-		if ((ras->type == RAS_RGBM || ras->type == RAS_RGBM64) &&
-			ras->lx > 0 && ras->ly > 0 && ras->buffer) {
+		if ((ras->type == RAS_RGBM || ras->type == RAS_RGBM64) && ras->lx > 0 && ras->ly > 0 &&
+			ras->buffer) {
 			int x, y;
 			I_PIXEL ip;
 			const P *p;
@@ -545,7 +534,7 @@ public:
 
 	// Writes the 'r' rectangle of CSTPic into the 'p' position in RASTER
 	virtual void write(RASTER *ras, const SRECT &r, const SPOINT &p) const
-	//throw(SWriteRasterError)
+	// throw(SWriteRasterError)
 	{
 		if (ras->type == RAS_RGBM || ras->type == RAS_RGBM64) {
 			int xs, ys, xd, yd;
@@ -564,8 +553,9 @@ public:
 			throw SWriteRasterError("(bad Raster type)");
 	}
 
-	virtual void writeOutBorder(const RASTER *rasin, const int border, RASTER *ras, const SRECT &r, const SPOINT &p) const
-	//throw(SWriteRasterError)
+	virtual void writeOutBorder(const RASTER *rasin, const int border, RASTER *ras, const SRECT &r,
+								const SPOINT &p) const
+	// throw(SWriteRasterError)
 	{
 		assert(rasin->type == RAS_CM32);
 		UD44_PIXEL32 *col = (UD44_PIXEL32 *)(rasin->cmap.buffer);
@@ -579,9 +569,10 @@ public:
 					int x = xd - border;
 					int y = yd - border;
 					if (x >= 0 && y >= 0 && x < rasin->lx && y < rasin->ly) {
-						UD44_CMAPINDEX32 pixel = *(((UD44_CMAPINDEX32 *)rasin->buffer) + y * rasin->wrap + x);
-						//int tone = (pix&0xff);
-						//int paint = ((pix>>8)&0xfff);
+						UD44_CMAPINDEX32 pixel =
+							*(((UD44_CMAPINDEX32 *)rasin->buffer) + y * rasin->wrap + x);
+						// int tone = (pix&0xff);
+						// int paint = ((pix>>8)&0xfff);
 						if ((pixel & 0xff) == 0 || ((pixel >> 8) & 0xfff) != 0) {
 							LPIXEL pLL;
 							PIX_CM32_MAP_TO_RGBM(pixel, col, pLL)
@@ -658,7 +649,7 @@ public:
 	}
 
 	/*
-void hlsNoise(const double d) 
+void hlsNoise(const double d)
 {	int xy=m_lX*m_lY;
 	P* p=m_pic;
 	for( int i=0; i<xy; i++,p++ )
@@ -668,12 +659,11 @@ void hlsNoise(const double d)
 			q=1.0-d*(double)((rand()%201)-100)/100.0;
 			l*=q;
 			hls2rgb(h,l,s,&(p->r),&(p->g),&(p->b));
-		}		
+		}
 }
 */
 
-	void rgb2hls(UCHAR r, UCHAR g, UCHAR b,
-				 double *h, double *l, double *s)
+	void rgb2hls(UCHAR r, UCHAR g, UCHAR b, double *h, double *l, double *s)
 	{
 		double ma, mi, delta, sum;
 		double rf, gf, bf;
@@ -694,7 +684,9 @@ void hlsNoise(const double d)
 			*h = UNDEFINED;
 		} else {
 			*s = *l <= 0.5 ? delta / sum : delta / (2.0 - sum);
-			*h = fabs((rf - ma)) < 0.000001 ? (gf - bf) / delta : (fabs((gf - ma)) < 0.000001 ? 2.0 + (bf - rf) / delta : 4.0 + (rf - gf) / delta);
+			*h = fabs((rf - ma)) < 0.000001 ? (gf - bf) / delta : (fabs((gf - ma)) < 0.000001
+																	   ? 2.0 + (bf - rf) / delta
+																	   : 4.0 + (rf - gf) / delta);
 			*h *= 60;
 			*h = *h < 0.0 ? *h + 360.0 : *h;
 		}
@@ -718,8 +710,7 @@ void hlsNoise(const double d)
 		return (v);
 	}
 
-	void hls2rgb(double h, double l, double s,
-				 UCHAR *r, UCHAR *g, UCHAR *b)
+	void hls2rgb(double h, double l, double s, UCHAR *r, UCHAR *g, UCHAR *b)
 	{
 		double rf, gf, bf;
 		double m1, m2;

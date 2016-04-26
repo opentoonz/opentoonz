@@ -17,7 +17,7 @@ class ParticlesFx : public TStandardZeraryFx
 
 	TFxPortDG m_source, m_control;
 
-public:
+  public:
 	TIntParamP source_ctrl_val;
 	TIntParamP bright_thres_val;
 	TBoolParamP multi_source_val;
@@ -92,30 +92,15 @@ public:
 	TBoolParamP pick_color_for_every_frame_val;
 	TBoolParamP perspective_distribution_val;
 
-public:
-	enum { UNIT_SMALL_INCH,
-		   UNIT_INCH };
-	enum { MATTE_REF,
-		   GRAY_REF,
-		   H_REF };
-	enum { SWING_RANDOM,
-		   SWING_SMOOTH };
-	enum { ANIM_HOLD,
-		   ANIM_RANDOM,
-		   ANIM_CYCLE,
-		   ANIM_R_CYCLE,
-		   ANIM_S_CYCLE,
-		   ANIM_SR_CYCLE };
-	enum { TOP_YOUNGER,
-		   TOP_OLDER,
-		   TOP_SMALLER,
-		   TOP_BIGGER,
-		   TOP_RANDOM };
-	enum { CTRL_NONE = -1,
-		   CTRL_1,
-		   CTRL_2 };
+  public:
+	enum { UNIT_SMALL_INCH, UNIT_INCH };
+	enum { MATTE_REF, GRAY_REF, H_REF };
+	enum { SWING_RANDOM, SWING_SMOOTH };
+	enum { ANIM_HOLD, ANIM_RANDOM, ANIM_CYCLE, ANIM_R_CYCLE, ANIM_S_CYCLE, ANIM_SR_CYCLE };
+	enum { TOP_YOUNGER, TOP_OLDER, TOP_SMALLER, TOP_BIGGER, TOP_RANDOM };
+	enum { CTRL_NONE = -1, CTRL_1, CTRL_2 };
 
-public:
+  public:
 	ParticlesFx();
 	~ParticlesFx();
 

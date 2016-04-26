@@ -27,8 +27,7 @@ namespace Tiio
 
 //-------------------------------------------------------------------
 
-enum RowOrder { BOTTOM2TOP,
-				TOP2BOTTOM };
+enum RowOrder { BOTTOM2TOP, TOP2BOTTOM };
 
 //-------------------------------------------------------------------
 
@@ -43,10 +42,10 @@ class DVAPI Exception
 class DVAPI Reader
 {
 
-protected:
+  protected:
 	TImageInfo m_info;
 
-public:
+  public:
 	Reader();
 	virtual ~Reader();
 
@@ -68,14 +67,18 @@ public:
 	virtual bool read16BitIsEnabled() const { return false; }
 
 	// this function enables/disables the 64 bit reading.
-	//If disabled, 64 bit images will be automatically  scaled down to 32 bit.
-	//The default behaviour for formats that support 64 bit images is "Enabled"
+	// If disabled, 64 bit images will be automatically  scaled down to 32 bit.
+	// The default behaviour for formats that support 64 bit images is "Enabled"
 
 	virtual void enable16BitRead(bool) {}
 
-	virtual void getTzpPaletteColorNames(std::map<int, std::pair<std::string, std::string>> &pltColorNames) const { assert(false); }
+	virtual void
+	getTzpPaletteColorNames(std::map<int, std::pair<std::string, std::string>> &pltColorNames) const
+	{
+		assert(false);
+	}
 
-private:
+  private:
 	// not implemented
 	Reader(const Reader &);
 	Reader &operator=(const Reader &);
@@ -86,12 +89,12 @@ private:
 class DVAPI Writer
 {
 
-protected:
+  protected:
 	TImageInfo m_info;
 	TPropertyGroup *m_properties;
 	static int m_bwThreshold;
 
-public:
+  public:
 	static void getSupportedFormats(QStringList &formats, bool onlyRenderFormats);
 	static void setBlackAndWhiteThreshold(int threshold) { m_bwThreshold = threshold; }
 
@@ -112,7 +115,7 @@ public:
 
 	void setProperties(TPropertyGroup *properties);
 
-private:
+  private:
 	// not implemented
 	Writer(const Writer &);
 	Writer &operator=(const Writer &);
@@ -122,7 +125,7 @@ private:
 
 class DVAPI VectorReader
 {
-public:
+  public:
 	VectorReader() {}
 	virtual ~VectorReader() {}
 
@@ -135,7 +138,7 @@ public:
 
 class DVAPI VectorWriter
 {
-public:
+  public:
 	VectorWriter() {}
 	virtual ~VectorWriter() {}
 
@@ -167,7 +170,8 @@ DVAPI void defineReaderMaker(const char *ext, Tiio::ReaderMaker *fn);
 DVAPI void defineWriterMaker(const char *ext, Tiio::WriterMaker *fn, bool isRenderFormat);
 
 DVAPI void defineVectorReaderMaker(const char *ext, Tiio::VectorReaderMaker *fn);
-DVAPI void defineVectorWriterMaker(const char *ext, Tiio::VectorWriterMaker *fn, bool isRenderFormat);
+DVAPI void defineVectorWriterMaker(const char *ext, Tiio::VectorWriterMaker *fn,
+								   bool isRenderFormat);
 
 DVAPI void defineWriterProperties(const char *ext, TPropertyGroup *);
 

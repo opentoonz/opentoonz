@@ -12,8 +12,7 @@
 // TSelection
 //-----------------------------------------------------------------------------
 
-TSelection::TSelection()
-	: m_view(0)
+TSelection::TSelection() : m_view(0)
 {
 }
 
@@ -50,7 +49,7 @@ TSelection *TSelection::getCurrent()
 
 void TSelection::setCurrent(TSelection *selection)
 {
-	//assert(0);
+	// assert(0);
 	TSelectionHandle::getCurrent()->setSelection(selection);
 }
 

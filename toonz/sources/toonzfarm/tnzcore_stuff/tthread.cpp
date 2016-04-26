@@ -33,7 +33,7 @@ Window TheMainWindow;
 
 class Thread
 {
-public:
+  public:
 	Thread();
 	Thread(const TThread::RunnableP &runnable);
 
@@ -54,7 +54,7 @@ public:
 
 	class Imp;
 
-private:
+  private:
 	friend class ThreadGroup;
 	Imp *m_imp;
 };
@@ -63,26 +63,24 @@ private:
 
 class ThreadGroup
 {
-public:
+  public:
 	ThreadGroup();
 	~ThreadGroup();
 
 	void add(Thread *thread);
 	void joinAll();
 
-private:
+  private:
 	class Imp;
 	Imp *m_imp;
 };
 
 //------------------------------------------------------------------------------
 
-template <class T>
-class QueueT
+template <class T> class QueueT
 {
-public:
-	QueueT(int slotCount)
-		: m_items(), m_slotCount(slotCount), m_notEmpty(), m_notFull(), m_mutex()
+  public:
+	QueueT(int slotCount) : m_items(), m_slotCount(slotCount), m_notEmpty(), m_notFull(), m_mutex()
 	{
 	}
 
@@ -117,7 +115,7 @@ public:
 		return size;
 	}
 
-private:
+  private:
 	std::queue<T> m_items;
 	TThread::Condition m_notEmpty;
 	TThread::Condition m_notFull;
@@ -153,9 +151,11 @@ ULONG TThread::getMainShellHandle()
 
 class BoostRunnable
 {
-public:
+  public:
 	BoostRunnable(const TThread::RunnableP &runnable, Thread::Imp *threadImp)
-		: m_runnable(runnable), m_threadImp(threadImp) {}
+		: m_runnable(runnable), m_threadImp(threadImp)
+	{
+	}
 
 	void operator()();
 
@@ -167,11 +167,10 @@ public:
 
 class Thread::Imp
 {
-public:
+  public:
 	Imp() : m_boostThread(0), m_isCanceled(false), m_stateMutex() {}
 
-	Imp(const TThread::RunnableP &runnable)
-		: m_isCanceled(false), m_stateMutex()
+	Imp(const TThread::RunnableP &runnable) : m_isCanceled(false), m_stateMutex()
 	{
 		m_boostThread = new boost::thread(BoostRunnable(runnable, this));
 	}
@@ -187,17 +186,14 @@ public:
 	bool m_isCanceled;
 	long m_kkkk;
 
-	enum State {
-		Running,
-		Canceled
-	};
+	enum State { Running, Canceled };
 
 	static boost::mutex m_mutex;
 	static std::map<long, State> m_state;
 
 	class Key
 	{
-	public:
+	  public:
 		Key(long id) : m_id(id) {}
 		long m_id;
 	};
@@ -237,8 +233,7 @@ Thread::Thread() : m_imp(new Thread::Imp)
 
 //------------------------------------------------------------------------------
 
-Thread::Thread(const TThread::RunnableP &runnable)
-	: m_imp(new Imp(runnable))
+Thread::Thread(const TThread::RunnableP &runnable) : m_imp(new Imp(runnable))
 {
 }
 
@@ -292,7 +287,7 @@ void Thread::milestone() throw(TThread::Interrupt)
 
 class ThreadGroup::Imp
 {
-public:
+  public:
 	Imp() : m_boostThreadGroup() {}
 	~Imp() {}
 
@@ -337,7 +332,7 @@ void TThread::milestone() throw(TThread::Interrupt)
 
 class TThread::Mutex::Imp
 {
-public:
+  public:
 	boost::mutex m_mutex;
 
 	Imp() : m_mutex() {}
@@ -357,7 +352,7 @@ TThread::Mutex::~Mutex()
 
 class TThread::ScopedLock::Imp
 {
-public:
+  public:
 	boost::mutex::scoped_lock *m_sl;
 
 	Imp(boost::mutex &mutex) : m_sl(new boost::mutex::scoped_lock(mutex)) {}
@@ -369,7 +364,9 @@ public:
 	}
 };
 
-TThread::ScopedLock::ScopedLock(Mutex &mutex) : m_imp(new Imp(mutex.m_imp->m_mutex)) {}
+TThread::ScopedLock::ScopedLock(Mutex &mutex) : m_imp(new Imp(mutex.m_imp->m_mutex))
+{
+}
 
 TThread::ScopedLock::~ScopedLock()
 {
@@ -380,15 +377,16 @@ TThread::ScopedLock::~ScopedLock()
 
 class TThread::Condition::Imp
 {
-public:
+  public:
 	boost::condition m_condition;
 
 	Imp() : m_condition() {}
 	~Imp() {}
 };
 
-TThread::Condition::Condition()
-	: m_imp(new Imp()) {}
+TThread::Condition::Condition() : m_imp(new Imp())
+{
+}
 
 TThread::Condition::~Condition()
 {
@@ -433,19 +431,19 @@ void TThread::Msg::send()
 
 #ifdef WIN32
 	/*
-Non viene utilizzato PostThreadMessage perche' se l'applicazione 
-si trova in un modal loop (esempio MessageBox) oppure si sta 
+Non viene utilizzato PostThreadMessage perche' se l'applicazione
+si trova in un modal loop (esempio MessageBox) oppure si sta
 facendo move o resize di una finestra i messaggi non giungono al
 message loop.
-http://support.microsoft.com/default.aspx?scid=KB;EN-US;q183116& 
+http://support.microsoft.com/default.aspx?scid=KB;EN-US;q183116&
 */
 
 	/*
   BOOL rc = PostThreadMessage(
-    getMainThreadId(),      // thread identifier
-    WM_THREAD_NOTIFICATION, // message
-    WPARAM(msg),            // first message parameter
-    0);                     // second message parameter   
+	getMainThreadId(),      // thread identifier
+	WM_THREAD_NOTIFICATION, // message
+	WPARAM(msg),            // first message parameter
+	0);                     // second message parameter
 */
 	PostMessage(HWND(getMainShellHandle()), WM_THREAD_NOTIFICATION, WPARAM(msg), 0);
 #else
@@ -455,7 +453,7 @@ http://support.microsoft.com/default.aspx?scid=KB;EN-US;q183116&
 	clientMsg.format = 32;
 	clientMsg.message_type = Msg::MsgId();
 	clientMsg.data.l[0] = (long)msg;
-	//Status status =
+	// Status status =
 	XSendEvent(TheDisplay, TheMainWindow, 0, NoEventMask, (XEvent *)&clientMsg);
 	XFlush(TheDisplay);
 #endif
@@ -482,14 +480,14 @@ UINT TThread::Msg::MsgId()
 
 class TThread::Executor::Imp : public TSmartObject
 {
-public:
+  public:
 	typedef TSmartPointerT<TThread::Executor::Imp> ImpP;
 
 	//---------------------------------------------------
 
 	class Worker : public Runnable
 	{
-	public:
+	  public:
 		Worker(ImpP owner) : Runnable(), m_owner(owner) {}
 		~Worker() {}
 
@@ -518,11 +516,10 @@ public:
 	std::map<long, Thread *> m_workerThreads;
 
 	Imp(int threadsCount, bool suspend)
-		: TSmartObject(), m_suspend(suspend), m_threadHasToDie(false), m_threadCount(threadsCount), m_tasks(), m_workerThreads(), m_mutex(), m_cond(){};
+		: TSmartObject(), m_suspend(suspend), m_threadHasToDie(false), m_threadCount(threadsCount),
+		  m_tasks(), m_workerThreads(), m_mutex(), m_cond(){};
 
-	~Imp()
-	{
-	}
+	~Imp() {}
 };
 
 //------------------------------------------------------------------------------
@@ -574,7 +571,8 @@ void TThread::Executor::Imp::Worker::run()
 							return;
 						}
 					} else {
-						// il thread sta per morire -> bisogna eliminarlo dalla lista dei worker thread
+						// il thread sta per morire -> bisogna eliminarlo dalla lista dei worker
+						// thread
 						doCleanup();
 						return;
 					}
@@ -593,7 +591,7 @@ void TThread::Executor::Imp::Worker::run()
 			Thread::milestone();
 		}
 	} catch (TThread::Interrupt &) {
-		//m_owner->m_cond.notifyOne();
+		// m_owner->m_cond.notifyOne();
 	} catch (...) {
 
 		// eccezione non prevista --> bisogna eliminare il thread
@@ -608,7 +606,8 @@ void TThread::Executor::Imp::Worker::run()
 
 void TThread::Executor::Imp::Worker::doCleanup()
 {
-	std::map<long, Thread *>::iterator it = m_owner->m_workerThreads.find(reinterpret_cast<long>(this));
+	std::map<long, Thread *>::iterator it =
+		m_owner->m_workerThreads.find(reinterpret_cast<long>(this));
 
 	if (it != m_owner->m_workerThreads.end()) {
 		Thread *thread = it->second;
@@ -627,8 +626,7 @@ void TThread::Executor::addTask(const RunnableP &task)
 	TThread::ScopedLock sl(m_imp->m_mutex);
 	m_imp->m_tasks.push(task);
 	if (m_imp->m_workerThreads.size() < m_imp->m_threadCount) {
-		TThread::Executor::Imp::Worker *worker =
-			new TThread::Executor::Imp::Worker(m_imp);
+		TThread::Executor::Imp::Worker *worker = new TThread::Executor::Imp::Worker(m_imp);
 
 		m_imp->m_workerThreads[reinterpret_cast<long>(worker)] = new Thread(worker);
 	} else {

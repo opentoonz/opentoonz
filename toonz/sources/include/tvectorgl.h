@@ -36,7 +36,7 @@
 #endif
 
 //=============================================================================
-//forward declarations
+// forward declarations
 class TStroke;
 class TRegion;
 class TVectorImage;

@@ -48,7 +48,7 @@ int TTcpIpClient::connect(const QString &hostName, const QString &addrStr, int p
 /*
   if (!addrStr.empty())
   {
-    unsigned long ipAddr = inet_addr(addrStr.c_str());
+	unsigned long ipAddr = inet_addr(addrStr.c_str());
   }
 */
 #if QT_VERSION >= 0x050500
@@ -103,16 +103,17 @@ int TTcpIpClient::connect(const QString &hostName, const QString &addrStr, int p
 }
 
 /*
-int TTcpIpClient::connect(const std::string &hostName, const std::string &addrStr, int port, int &sock)
+int TTcpIpClient::connect(const std::string &hostName, const std::string &addrStr, int port, int
+&sock)
 {
   struct hostent *he = gethostbyname (hostName.c_str());
   if (!he)
   {
 #ifdef _WIN32
-    int err = WSAGetLastError();
+	int err = WSAGetLastError();
 #else
 #endif
-    return HOST_UNKNOWN;
+	return HOST_UNKNOWN;
   }
 
   int socket_id = socket (AF_INET, SOCK_STREAM,0);
@@ -126,20 +127,20 @@ int TTcpIpClient::connect(const std::string &hostName, const std::string &addrSt
   int rcConnect = ::connect (socket_id, (struct sockaddr *)&(addr), sizeof addr);
   if (rcConnect == SOCKET_ERROR)
   {
-    sock = -1;
+	sock = -1;
 #ifdef _WIN32
-    int err = WSAGetLastError();
-    switch (err)
-    {
-     case WSAECONNREFUSED:
-        return CONNECTION_REFUSED;
-     case WSAETIMEDOUT:
-        return CONNECTION_TIMEDOUT;
-     default:
-        return CONNECTION_FAILED;
-    }
+	int err = WSAGetLastError();
+	switch (err)
+	{
+	 case WSAECONNREFUSED:
+		return CONNECTION_REFUSED;
+	 case WSAETIMEDOUT:
+		return CONNECTION_TIMEDOUT;
+	 default:
+		return CONNECTION_FAILED;
+	}
 #else
-    return CONNECTION_FAILED;
+	return CONNECTION_FAILED;
 #endif
   }
 
@@ -261,7 +262,7 @@ int readData(int sock, QString &data)
 			break; // break out of loop
 		} else if (cnt < (int)sizeof(buff)) {
 			data += QString(buff);
-			//break;  // break out of loop
+			// break;  // break out of loop
 		} else {
 			data += QString(buff);
 		}
@@ -345,7 +346,7 @@ int readData(int sock, string &data)
 			break; // break out of loop
 		} else if (cnt < sizeof(buff)) {
 			data += string(buff);
-			//break;  // break out of loop
+			// break;  // break out of loop
 		} else {
 			data += string(buff);
 		}
@@ -375,7 +376,7 @@ int TTcpIpClient::send(int sock, const std::string &data, string &reply)
 {
   int ret = send(sock, data);
   if (ret == 0)
-    ret = readData(sock, reply);
+	ret = readData(sock, reply);
   return ret;
 }
 */

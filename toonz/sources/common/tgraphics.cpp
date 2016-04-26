@@ -7,13 +7,10 @@ extern "C" {
 #include "tvis.h"
 }
 
-TGraphics::TGraphics(_TWIDGET *_gf,
-					 int ras_x0, int ras_y0,
-					 int ras_x1, int ras_y1,
-					 int gf_x0, int gf_y0,
-					 int gf_x1, int gf_y1,
-					 int zoom_level)
-	: gf(_gf), currentPoint(0, 0), gfRegion(gf_x0, gf_y0, gf_x1, gf_y1), rasterRegion(ras_x0 - 1, ras_y0 - 1, ras_x1 + 1, ras_y1 + 1)
+TGraphics::TGraphics(_TWIDGET *_gf, int ras_x0, int ras_y0, int ras_x1, int ras_y1, int gf_x0,
+					 int gf_y0, int gf_x1, int gf_y1, int zoom_level)
+	: gf(_gf), currentPoint(0, 0), gfRegion(gf_x0, gf_y0, gf_x1, gf_y1),
+	  rasterRegion(ras_x0 - 1, ras_y0 - 1, ras_x1 + 1, ras_y1 + 1)
 	  //, rasterRegion(ras_x0,ras_y0,ras_x1,ras_y1)
 	  ,
 	  zoomFactor(1), pixelSize(1)
@@ -195,8 +192,7 @@ void TGraphics::drawArc(const TCubicCurve &arc)
 
 //---------------------------------------------------
 
-void TGraphics::drawArcTo(const TPointD &d1, const TPointD &d2,
-						  const TPointD &d3)
+void TGraphics::drawArcTo(const TPointD &d1, const TPointD &d2, const TPointD &d3)
 {
 	TPointD oldPoint = currentPoint;
 	currentPoint += d1 + d2 + d3;
@@ -238,13 +234,10 @@ void TGraphics::drawSquare(const TPointD &p, double r)
 
 //---------------------------------------------------
 
-void TGraphics::drawArc(
-	const TPointD &p0,
-	const TPointD &p1,
-	const TPointD &p2)
+void TGraphics::drawArc(const TPointD &p0, const TPointD &p1, const TPointD &p2)
 {
 	TRectD rect = convert(rasterRegion.enlarge(+10));
-	//TRectD rect(rasterRegion.x0, rasterRegion.y0, rasterRegion.x1, rasterRegion.y1);
+	// TRectD rect(rasterRegion.x0, rasterRegion.y0, rasterRegion.x1, rasterRegion.y1);
 	TRectD bBox = boundingBox(p0, p1, p2);
 
 	if (!rect.overlaps(bBox)) {

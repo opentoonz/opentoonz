@@ -12,7 +12,7 @@
   \file     tcg_point_ops.h
 
   \brief    This file contains useful functions to deal with \a planar objects
-            (\a two dimensions) up to points and lines.
+			(\a two dimensions) up to points and lines.
 */
 
 //*****************************************************************************
@@ -30,32 +30,36 @@ namespace tcg
 namespace point_ops
 {
 
-template <typename Point>
-inline Point NaP() { return Point(numeric_ops::NaN<typename point_traits<Point>::value_type>(),
-								  numeric_ops::NaN<typename point_traits<Point>::value_type>()); }
+template <typename Point> inline Point NaP()
+{
+	return Point(numeric_ops::NaN<typename point_traits<Point>::value_type>(),
+				 numeric_ops::NaN<typename point_traits<Point>::value_type>());
+}
 
 //-------------------------------------------------------------------------------------------
 
-template <typename Point>
-inline Point operator+(const Point &a, const Point &b) { return Point(a.x + b.x, a.y + b.y); }
+template <typename Point> inline Point operator+(const Point &a, const Point &b)
+{
+	return Point(a.x + b.x, a.y + b.y);
+}
 
 //-------------------------------------------------------------------------------------------
 
-template <typename Point>
-inline Point operator-(const Point &a, const Point &b) { return Point(a.x - b.x, a.y - b.y); }
+template <typename Point> inline Point operator-(const Point &a, const Point &b)
+{
+	return Point(a.x - b.x, a.y - b.y);
+}
 
 //-------------------------------------------------------------------------------------------
 
-template <typename Point, typename Scalar>
-inline Point operator*(Scalar a, const Point &b)
+template <typename Point, typename Scalar> inline Point operator*(Scalar a, const Point &b)
 {
 	return Point(a * b.x, a * b.y);
 }
 
 //-------------------------------------------------------------------------------------------
 
-template <typename Point, typename Scalar>
-inline Point operator/(const Point &a, Scalar b)
+template <typename Point, typename Scalar> inline Point operator/(const Point &a, Scalar b)
 {
 	return Point(a.x / b, a.y / b);
 }
@@ -78,13 +82,14 @@ inline typename point_traits<Point>::value_type cross(const Point &a, const Poin
 
 //-------------------------------------------------------------------------------------------
 
-template <typename Point>
-inline typename point_traits<Point>::value_type norm2(const Point &a) { return a * a; }
+template <typename Point> inline typename point_traits<Point>::value_type norm2(const Point &a)
+{
+	return a * a;
+}
 
 //-------------------------------------------------------------------------------------------
 
-template <typename Point>
-inline typename point_traits<Point>::float_type norm(const Point &a)
+template <typename Point> inline typename point_traits<Point>::float_type norm(const Point &a)
 {
 	return sqrt(typename point_traits<Point>::float_type(a * a));
 }
@@ -110,14 +115,14 @@ inline typename point_traits<Point>::value_type dist(const Point &a, const Point
 template <typename Point>
 inline typename point_traits<Point>::value_type absDist(const Point &a, const Point &b)
 {
-	typename point_traits<Point>::value_type xDist = std::abs(b.x - a.x), yDist = std::abs(b.y - a.y);
+	typename point_traits<Point>::value_type xDist = std::abs(b.x - a.x),
+											 yDist = std::abs(b.y - a.y);
 	return (xDist < yDist) ? yDist : xDist;
 }
 
 //-------------------------------------------------------------------------------------------
 
-template <typename Point>
-inline Point normalized(const Point &v)
+template <typename Point> inline Point normalized(const Point &v)
 {
 	return v / norm(v);
 }
@@ -133,8 +138,7 @@ inline Point normalized(const Point &v, typename point_traits<Point>::value_type
 
 //-------------------------------------------------------------------------------------------
 
-template <typename Point>
-inline void normalize(Point &v)
+template <typename Point> inline void normalize(Point &v)
 {
 	v = normalized(v);
 }
@@ -150,8 +154,7 @@ inline bool normalize(Point &v, typename point_traits<Point>::value_type tol)
 
 //-------------------------------------------------------------------------------------------
 
-template <typename Point>
-inline Point direction(const Point &a, const Point &b)
+template <typename Point> inline Point direction(const Point &a, const Point &b)
 {
 	return normalized(b - a);
 }
@@ -167,14 +170,18 @@ inline Point direction(const Point &a, const Point &b, typename point_traits<Poi
 //-------------------------------------------------------------------------------------------
 
 //! Returns the left orthogonal of passed point
-template <typename Point>
-inline Point ortLeft(const Point &p) { return Point(-p.y, p.x); }
+template <typename Point> inline Point ortLeft(const Point &p)
+{
+	return Point(-p.y, p.x);
+}
 
 //-------------------------------------------------------------------------------------------
 
 //! Returns the right orthogonal of passed point
-template <typename Point>
-inline Point ortRight(const Point &p) { return Point(p.y, -p.x); }
+template <typename Point> inline Point ortRight(const Point &p)
+{
+	return Point(p.y, -p.x);
+}
 
 //-------------------------------------------------------------------------------------------
 
@@ -182,8 +189,7 @@ inline Point ortRight(const Point &p) { return Point(p.y, -p.x); }
   Returns the bisecting direction \p bd between \p d0 and \p d1, in the plane region
   where <TT>d x d1 > 0</TT>
 */
-template <typename Point>
-inline Point bisecant(const Point &d0, const Point &d1)
+template <typename Point> inline Point bisecant(const Point &d0, const Point &d1)
 {
 	Point sum = d0 + d1;
 	double norm = sum * sum;
@@ -202,8 +208,7 @@ inline Point bisecant(const Point &d0, const Point &d1)
 //-------------------------------------------------------------------------------------------
 
 //! Returns the projection of point \p p on line <TT>a -> d</TT>
-template <typename Point>
-inline Point projection(const Point &p, const Point &a, const Point &d)
+template <typename Point> inline Point projection(const Point &p, const Point &a, const Point &d)
 {
 	return a + ((p.x - a.x) * d.x + (p.y - a.y) * d.y) * d;
 }
@@ -211,17 +216,14 @@ inline Point projection(const Point &p, const Point &a, const Point &d)
 //-------------------------------------------------------------------------------------------
 
 //! Returns res: <TT>p = p0 + res.x * (p1 - p0) + res.y * (p1 - p0)_orth</TT>
-template <typename Point>
-Point ortCoords(const Point &p, const Point &p0, const Point &p1)
+template <typename Point> Point ortCoords(const Point &p, const Point &p0, const Point &p1)
 {
 	Point v01(p1.x - p0.x, p1.y - p0.y);
 	Point v02(p.x - p0.x, p.y - p0.y);
 
 	typename point_traits<Point>::value_type den = v01.x * v01.x + v01.y * v01.y;
 
-	return Point(
-		(v01.x * v02.x + v01.y * v02.y) / den,
-		(v01.y * v02.x - v01.x * v02.y) / den);
+	return Point((v01.x * v02.x + v01.y * v02.y) / den, (v01.y * v02.x - v01.x * v02.y) / den);
 }
 
 //-------------------------------------------------------------------------------------------
@@ -236,17 +238,16 @@ Point triCoords(const Point &p, const Point &p0, const Point &p1, const Point &p
 
 	typename point_traits<Point>::value_type det = v01.x * v02.y - v02.x * v01.y;
 
-	return Point(
-		(v02.y * p_p0.x - v02.x * p_p0.y) / det,
-		(v01.x * p_p0.y - v01.y * p_p0.x) / det);
+	return Point((v02.y * p_p0.x - v02.x * p_p0.y) / det, (v01.x * p_p0.y - v01.y * p_p0.x) / det);
 }
 
 //-------------------------------------------------------------------------------------------
 
-//! Returns the signed distance of point \p p from line <TT>a->d</TT>, where positive means <I>at its left</I>.
+//! Returns the signed distance of point \p p from line <TT>a->d</TT>, where positive means <I>at
+//! its left</I>.
 template <typename Point>
-inline typename point_traits<Point>::value_type lineSignedDist(
-	const Point &p, const Point &a, const Point &d)
+inline typename point_traits<Point>::value_type lineSignedDist(const Point &p, const Point &a,
+															   const Point &d)
 {
 	return (p.y - a.y) * d.x - (p.x - a.x) * d.y;
 }
@@ -255,7 +256,8 @@ inline typename point_traits<Point>::value_type lineSignedDist(
 
 //! Returns the distance of point \p p from line <TT>a->d</TT>
 template <typename Point>
-inline typename point_traits<Point>::value_type lineDist(const Point &p, const Point &a, const Point &d)
+inline typename point_traits<Point>::value_type lineDist(const Point &p, const Point &a,
+														 const Point &d)
 {
 	return std::abs(lineSignedDist(p, a, d));
 }
@@ -293,8 +295,7 @@ typename point_traits<Point>::value_type segDist(const Point &a, const Point &b,
 
 //-------------------------------------------------------------------------------------------
 
-template <typename Point>
-inline typename point_traits<Point>::value_type rad(const Point &p)
+template <typename Point> inline typename point_traits<Point>::value_type rad(const Point &p)
 {
 	return atan2(p.y, p.x);
 }
@@ -303,19 +304,21 @@ inline typename point_traits<Point>::value_type rad(const Point &p)
 
 /*!
   Computes the angle, in radians, between \a unnormalized directions \p v1 and \p v2.
-  \return The angle between the specified directions, in the range <TT>[-consts::pi, consts::pi]</TT>.
+  \return The angle between the specified directions, in the range <TT>[-consts::pi,
+  consts::pi]</TT>.
 */
 template <typename Point>
 inline typename point_traits<Point>::value_type angle(const Point &v1, const Point &v2)
 {
-	return numeric_ops::mod<typename point_traits<Point>::value_type>(rad(v2) - rad(v1), -consts::pi, consts::pi);
+	return numeric_ops::mod<typename point_traits<Point>::value_type>(rad(v2) - rad(v1),
+																	  -consts::pi, consts::pi);
 }
 
 //-------------------------------------------------------------------------------------------
 
 template <typename Point>
-inline typename point_traits<Point>::value_type segCoord(
-	const Point &p, const Point &p0, const Point &p1)
+inline typename point_traits<Point>::value_type segCoord(const Point &p, const Point &p0,
+														 const Point &p1)
 {
 	Point p1_p0 = p1 - p0;
 	return ((p - p0) * p1_p0) / (p1_p0 * p1_p0);
@@ -328,7 +331,7 @@ inline typename point_traits<Point>::value_type segCoord(
   \return Whether the calculation succeeded with the specified tolerance parameter.
 
   \note In case the absolute value of the system's determinant is less or equal to the
-        passed tolerance, the values numeric_ops::NaN() are returned for \p s and \p t.
+		passed tolerance, the values numeric_ops::NaN() are returned for \p s and \p t.
 */
 template <typename Point>
 bool intersectionCoords(const Point &a, const Point &v, const Point &c, const Point &w,
@@ -359,7 +362,7 @@ bool intersectionCoords(const Point &a, const Point &v, const Point &c, const Po
   \return Whether the calculation succeeded with the specified tolerance parameter.
 
   \note In case the absolute value of the system's determinant is less or equal to the
-        passed tolerance, the values numeric_ops::NaN() are returned for \p s and \p t.
+		passed tolerance, the values numeric_ops::NaN() are returned for \p s and \p t.
 */
 template <typename Point>
 inline bool intersectionSegCoords(const Point &a, const Point &b, const Point &c, const Point &d,
@@ -374,7 +377,7 @@ inline bool intersectionSegCoords(const Point &a, const Point &b, const Point &c
 
 /*!
   \brief  Stores the 6 values of the bidimensional affine transform mapping
-          \p p0, \p p1, \p p2 into \p q0, \p q1, \p q1.
+		  \p p0, \p p1, \p p2 into \p q0, \p q1, \p q1.
 
   Returned values are in <I>row-major</I> order, with the translational component
   at multiple of 3 indexes.
@@ -385,9 +388,8 @@ inline bool intersectionSegCoords(const Point &a, const Point &b, const Point &c
   \return  Whether the affine could be solved under the specified constraints
 */
 template <typename Point>
-bool affineMap(const Point &p0, const Point &p1, const Point &p2,
-			   const Point &q0, const Point &q1, const Point &q2,
-			   typename point_traits<Point>::value_type affValues[],
+bool affineMap(const Point &p0, const Point &p1, const Point &p2, const Point &q0, const Point &q1,
+			   const Point &q2, typename point_traits<Point>::value_type affValues[],
 			   typename point_traits<Point>::value_type detTol = 0)
 {
 	typedef typename point_traits<Point>::value_type value_type;
@@ -427,14 +429,13 @@ bool affineMap(const Point &p0, const Point &p1, const Point &p2,
 
 /*!
   \brief  Calculates the best fit line passing through \p p whose \p n samples have the specified
-          coordinate sums
+		  coordinate sums
 
   \note   Returned unnormalized direction \p v may be NaP() in case no preferential direction could
-          be chosen
+		  be chosen
 */
 template <typename Point>
-bool bestFit(const Point &p, Point &v,
-			 typename point_traits<Point>::value_type sums_x,
+bool bestFit(const Point &p, Point &v, typename point_traits<Point>::value_type sums_x,
 			 typename point_traits<Point>::value_type sums_y,
 			 typename point_traits<Point>::value_type sums2_x,
 			 typename point_traits<Point>::value_type sums2_y,
@@ -483,11 +484,10 @@ bool bestFit(const Point &p, Point &v,
   Calculates the best fit line whose n samples have the specified coordinate sums.
 
   \note  Returned point \p p is the samples mean, while (not normalized) direction \p v
-         may be NaP in case no preferential direction could be chosen.
+		 may be NaP in case no preferential direction could be chosen.
 */
 template <typename Point>
-bool bestFit(Point &p, Point &v,
-			 typename point_traits<Point>::value_type sums_x,
+bool bestFit(Point &p, Point &v, typename point_traits<Point>::value_type sums_x,
 			 typename point_traits<Point>::value_type sums_y,
 			 typename point_traits<Point>::value_type sums2_x,
 			 typename point_traits<Point>::value_type sums2_y,

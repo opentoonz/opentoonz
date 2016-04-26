@@ -24,7 +24,7 @@ class DVAPI TCheckBox : public TWidget
 	class TCheckBoxData;
 	TCheckBoxData *m_data;
 
-public:
+  public:
 	TCheckBox(TWidget *parent, string name = "button");
 	~TCheckBox();
 
@@ -49,26 +49,29 @@ public:
 
 class DVAPI TCheckBoxActionInterface
 {
-public:
+  public:
 	TCheckBoxActionInterface() {}
 	virtual ~TCheckBoxActionInterface() {}
 	virtual void triggerAction(TCheckBox *checkbox, bool selected) = 0;
 };
 
-template <class T>
-class TCheckBoxAction : public TCheckBoxActionInterface
+template <class T> class TCheckBoxAction : public TCheckBoxActionInterface
 {
 	typedef void (T::*Method)(TCheckBox *checkbox, bool selected);
 	T *m_target;
 	Method m_method;
 
-public:
+  public:
 	TCheckBoxAction(T *target, Method method) : m_target(target), m_method(method) {}
-	void triggerAction(TCheckBox *checkbox, bool selected) { (m_target->*m_method)(checkbox, selected); }
+	void triggerAction(TCheckBox *checkbox, bool selected)
+	{
+		(m_target->*m_method)(checkbox, selected);
+	}
 };
 
 template <class T>
-inline void tconnect(TCheckBox &src, T *target, void (T::*method)(TCheckBox *checkbox, bool selected))
+inline void tconnect(TCheckBox &src, T *target,
+					 void (T::*method)(TCheckBox *checkbox, bool selected))
 {
 	src.addAction(new TCheckBoxAction<T>(target, method));
 }

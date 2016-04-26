@@ -13,12 +13,7 @@ class RulerTool : public TTool
 {
 	Q_DECLARE_TR_FUNCTIONS(RulerTool)
 
-	enum DragMode {
-		MakeNewRuler = 0,
-		MoveFirstPos,
-		MoveSecondPos,
-		MoveRuler
-	};
+	enum DragMode { MakeNewRuler = 0, MoveFirstPos, MoveSecondPos, MoveRuler };
 
 	TPointD m_firstPos, m_secondPos;
 	TPointD m_mousePos;
@@ -29,7 +24,7 @@ class RulerTool : public TTool
 
 	std::vector<RulerToolOptionsBox *> m_toolOptionsBox;
 
-public:
+  public:
 	RulerTool();
 
 	void setToolOptionsBox(RulerToolOptionsBox *toolOptionsBox);
@@ -57,7 +52,7 @@ public:
 	/*--- 現在のマウス位置がRulerに十分近ければTrue ---*/
 	bool isNearRuler();
 
-private:
+  private:
 	/*--- 基準点に対し、マウス位置を0,45,90度にフィットさせた位置を返す ---*/
 	TPointD getHVCoordinatedPos(TPointD p, TPointD centerPos);
 };

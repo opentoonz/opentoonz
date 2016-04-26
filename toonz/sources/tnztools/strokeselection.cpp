@@ -108,7 +108,8 @@ bool pasteStrokesWithoutUndo(TVectorImageP image, std::set<int> &outIndexes,
 	QClipboard *clipboard = QApplication::clipboard();
 	const StrokesData *stData = dynamic_cast<const StrokesData *>(clipboard->mimeData());
 	const ToonzImageData *tiData = dynamic_cast<const ToonzImageData *>(clipboard->mimeData());
-	const FullColorImageData *fciData = dynamic_cast<const FullColorImageData *>(clipboard->mimeData());
+	const FullColorImageData *fciData =
+		dynamic_cast<const FullColorImageData *>(clipboard->mimeData());
 	std::set<int> indexes = outIndexes;
 	if (stData)
 		stData->getImage(image, indexes, insert);
@@ -127,10 +128,12 @@ bool pasteStrokesWithoutUndo(TVectorImageP image, std::set<int> &outIndexes,
 	} else
 		return false;
 
-	StrokeSelection *selection = dynamic_cast<StrokeSelection *>(TTool::getApplication()->getCurrentSelection()->getSelection());
+	StrokeSelection *selection = dynamic_cast<StrokeSelection *>(
+		TTool::getApplication()->getCurrentSelection()->getSelection());
 	if (selection)
 		selection->notifyView();
-	outIndexes = indexes; //outIndexes is a reference  to current  selection, so the notifyImageChanged could reset it!
+	outIndexes = indexes; // outIndexes is a reference  to current  selection, so the
+						  // notifyImageChanged could reset it!
 	return true;
 }
 
@@ -153,7 +156,8 @@ void deleteStrokesWithoutUndo(TVectorImageP image, std::set<int> &indexes)
 	indexes.clear();
 
 	TTool::getApplication()->getCurrentTool()->getTool()->notifyImageChanged();
-	StrokeSelection *selection = dynamic_cast<StrokeSelection *>(TTool::getApplication()->getCurrentSelection()->getSelection());
+	StrokeSelection *selection = dynamic_cast<StrokeSelection *>(
+		TTool::getApplication()->getCurrentSelection()->getSelection());
 	if (selection)
 		selection->notifyView();
 }
@@ -175,10 +179,8 @@ class CopyStrokesUndo : public TUndo
 	QMimeData *m_oldData;
 	QMimeData *m_newData;
 
-public:
-	CopyStrokesUndo(QMimeData *oldData,
-					QMimeData *newData)
-		: m_oldData(oldData), m_newData(newData)
+  public:
+	CopyStrokesUndo(QMimeData *oldData, QMimeData *newData) : m_oldData(oldData), m_newData(newData)
 	{
 	}
 
@@ -194,10 +196,7 @@ public:
 		clipboard->setMimeData(cloneData(m_newData), QClipboard::Clipboard);
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 };
 
 //=============================================================================
@@ -213,22 +212,17 @@ class PasteStrokesUndo : public TUndo
 	QMimeData *m_oldData;
 	TSceneHandle *m_sceneHandle;
 
-public:
-	PasteStrokesUndo(TXshSimpleLevel *level,
-					 const TFrameId &frameId,
-					 std::set<int> &indexes,
-					 TPaletteP oldPalette,
-					 TSceneHandle *sceneHandle)
-		: m_level(level), m_frameId(frameId), m_indexes(indexes), m_oldPalette(oldPalette), m_sceneHandle(sceneHandle)
+  public:
+	PasteStrokesUndo(TXshSimpleLevel *level, const TFrameId &frameId, std::set<int> &indexes,
+					 TPaletteP oldPalette, TSceneHandle *sceneHandle)
+		: m_level(level), m_frameId(frameId), m_indexes(indexes), m_oldPalette(oldPalette),
+		  m_sceneHandle(sceneHandle)
 	{
 		QClipboard *clipboard = QApplication::clipboard();
 		m_oldData = cloneData(clipboard->mimeData());
 	}
 
-	~PasteStrokesUndo()
-	{
-		delete m_oldData;
-	}
+	~PasteStrokesUndo() { delete m_oldData; }
 
 	void undo() const
 	{
@@ -236,7 +230,8 @@ public:
 
 		// Se la selezione corrente e' la stroke selection devo svuotarla,
 		// altrimenti puo' rimanere selezionato uno stroke che non esiste piu'.
-		StrokeSelection *selection = dynamic_cast<StrokeSelection *>(TTool::getApplication()->getCurrentSelection()->getSelection());
+		StrokeSelection *selection = dynamic_cast<StrokeSelection *>(
+			TTool::getApplication()->getCurrentSelection()->getSelection());
 		if (selection)
 			selection->selectNone();
 
@@ -260,10 +255,7 @@ public:
 		clipboard->setMimeData(data, QClipboard::Clipboard);
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 };
 
 //--------------------------------------------------------------------
@@ -274,9 +266,8 @@ class RemoveEndpointsUndo : public TUndo
 	TFrameId m_frameId;
 	std::vector<std::pair<int, TStroke *>> m_strokes;
 
-public:
-	RemoveEndpointsUndo(TXshSimpleLevel *level,
-						const TFrameId &frameId,
+  public:
+	RemoveEndpointsUndo(TXshSimpleLevel *level, const TFrameId &frameId,
 						std::vector<std::pair<int, TStroke *>> strokes)
 		: m_level(level), m_frameId(frameId), m_strokes(strokes)
 
@@ -299,7 +290,8 @@ public:
 			newS->setId(m_strokes[i].second->getId());
 			vi->restoreEndpoints(m_strokes[i].first, newS);
 		}
-		StrokeSelection *selection = dynamic_cast<StrokeSelection *>(TTool::getApplication()->getCurrentSelection()->getSelection());
+		StrokeSelection *selection = dynamic_cast<StrokeSelection *>(
+			TTool::getApplication()->getCurrentSelection()->getSelection());
 		if (selection)
 			selection->selectNone();
 
@@ -313,15 +305,12 @@ public:
 		for (i = 0; i < (int)m_strokes.size(); i++) {
 			TStroke *s = vi->removeEndpoints(m_strokes[i].first);
 			delete s;
-			//assert(s==m_strokes[i].second);
+			// assert(s==m_strokes[i].second);
 		}
 		TTool::getApplication()->getCurrentTool()->getTool()->notifyImageChanged();
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 };
 //=============================================================================
 // DeleteFramesUndo
@@ -329,26 +318,22 @@ public:
 
 class DeleteStrokesUndo : public TUndo
 {
-protected:
+  protected:
 	TXshSimpleLevelP m_level;
 	TFrameId m_frameId;
 	std::set<int> m_indexes;
 	QMimeData *m_data;
 	TSceneHandle *m_sceneHandle;
 
-public:
-	DeleteStrokesUndo(TXshSimpleLevel *level,
-					  const TFrameId &frameId,
-					  std::set<int> indexes, QMimeData *data,
-					  TSceneHandle *sceneHandle)
-		: m_level(level), m_frameId(frameId), m_indexes(indexes), m_data(data), m_sceneHandle(sceneHandle)
+  public:
+	DeleteStrokesUndo(TXshSimpleLevel *level, const TFrameId &frameId, std::set<int> indexes,
+					  QMimeData *data, TSceneHandle *sceneHandle)
+		: m_level(level), m_frameId(frameId), m_indexes(indexes), m_data(data),
+		  m_sceneHandle(sceneHandle)
 	{
 	}
 
-	~DeleteStrokesUndo()
-	{
-		delete m_data;
-	}
+	~DeleteStrokesUndo() { delete m_data; }
 
 	void undo() const
 	{
@@ -371,10 +356,7 @@ public:
 		deleteStrokesWithoutUndo(image, indexes);
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 };
 
 //=============================================================================
@@ -384,18 +366,14 @@ public:
 class CutStrokesUndo : public DeleteStrokesUndo
 {
 
-public:
-	CutStrokesUndo(TXshSimpleLevel *level,
-				   const TFrameId &frameId,
-				   std::set<int> indexes, QMimeData *data,
-				   TSceneHandle *sceneHandle)
+  public:
+	CutStrokesUndo(TXshSimpleLevel *level, const TFrameId &frameId, std::set<int> indexes,
+				   QMimeData *data, TSceneHandle *sceneHandle)
 		: DeleteStrokesUndo(level, frameId, indexes, data, sceneHandle)
 	{
 	}
 
-	~CutStrokesUndo()
-	{
-	}
+	~CutStrokesUndo() {}
 
 	void redo() const
 	{
@@ -428,7 +406,8 @@ StrokeSelection::~StrokeSelection()
 //-----------------------------------------------------------------------------
 
 StrokeSelection::StrokeSelection(const StrokeSelection &other)
-	: m_vi(other.m_vi), m_indexes(other.m_indexes), m_groupCommand(new TGroupCommand()), m_sceneHandle(other.m_sceneHandle), m_updateSelectionBBox(other.m_updateSelectionBBox)
+	: m_vi(other.m_vi), m_indexes(other.m_indexes), m_groupCommand(new TGroupCommand()),
+	  m_sceneHandle(other.m_sceneHandle), m_updateSelectionBBox(other.m_updateSelectionBBox)
 {
 	m_groupCommand->setSelection(this);
 }
@@ -491,7 +470,8 @@ void StrokeSelection::removeEndpoints()
 	TTool *tool = TTool::getApplication()->getCurrentTool()->getTool();
 	TXshSimpleLevel *level = TTool::getApplication()->getCurrentLevel()->getSimpleLevel();
 	if (!undoData.empty())
-		TUndoManager::manager()->add(new RemoveEndpointsUndo(level, tool->getCurrentFid(), undoData));
+		TUndoManager::manager()->add(
+			new RemoveEndpointsUndo(level, tool->getCurrentFid(), undoData));
 
 	m_updateSelectionBBox = true;
 	tool->notifyImageChanged();
@@ -517,7 +497,8 @@ void StrokeSelection::deleteStrokes()
 	bool isSpline = tool->getApplication()->getCurrentObject()->isSpline();
 	TUndo *undo;
 	if (isSpline)
-		undo = new ToolUtils::UndoPath(tool->getXsheet()->getStageObject(tool->getObjectId())->getSpline());
+		undo = new ToolUtils::UndoPath(
+			tool->getXsheet()->getStageObject(tool->getObjectId())->getSpline());
 
 	StrokesData *data = new StrokesData();
 	data->setImage(m_vi, m_indexes);
@@ -526,7 +507,8 @@ void StrokeSelection::deleteStrokes()
 
 	if (!isSpline) {
 		TXshSimpleLevel *level = TTool::getApplication()->getCurrentLevel()->getSimpleLevel();
-		TUndoManager::manager()->add(new DeleteStrokesUndo(level, tool->getCurrentFid(), oldIndexes, data, m_sceneHandle));
+		TUndoManager::manager()->add(
+			new DeleteStrokesUndo(level, tool->getCurrentFid(), oldIndexes, data, m_sceneHandle));
 	} else {
 		assert(undo);
 		if (undo)
@@ -549,7 +531,7 @@ void StrokeSelection::copy()
 	copyStrokesWithoutUndo(m_vi, m_indexes);
 	QMimeData *newData = cloneData(clipboard->mimeData());
 
-	//TUndoManager::manager()->add(new CopyStrokesUndo(oldData, newData));
+	// TUndoManager::manager()->add(new CopyStrokesUndo(oldData, newData));
 }
 
 //=============================================================================
@@ -564,7 +546,8 @@ void StrokeSelection::paste()
 	if (!tool)
 		return;
 	if (TTool::getApplication()->getCurrentObject()->isSpline()) {
-		const StrokesData *stData = dynamic_cast<const StrokesData *>(QApplication::clipboard()->mimeData());
+		const StrokesData *stData =
+			dynamic_cast<const StrokesData *>(QApplication::clipboard()->mimeData());
 		if (!stData)
 			return;
 		TVectorImageP splineImg = tool->getImage(true);
@@ -573,7 +556,8 @@ void StrokeSelection::paste()
 			return;
 
 		QMutexLocker lock(splineImg->getMutex());
-		TUndo *undo = new ToolUtils::UndoPath(tool->getXsheet()->getStageObject(tool->getObjectId())->getSpline());
+		TUndo *undo = new ToolUtils::UndoPath(
+			tool->getXsheet()->getStageObject(tool->getObjectId())->getSpline());
 		while (splineImg->getStrokeCount() > 0)
 			splineImg->deleteStroke(0);
 
@@ -595,11 +579,15 @@ void StrokeSelection::paste()
 	bool isPaste = pasteStrokesWithoutUndo(tarImg, m_indexes, m_sceneHandle);
 	if (isPaste) {
 		TXshSimpleLevel *level = TTool::getApplication()->getCurrentLevel()->getSimpleLevel();
-		TUndoManager::manager()->add(new PasteStrokesUndo(level, tool->getCurrentFid(), m_indexes, oldPalette, m_sceneHandle));
+		TUndoManager::manager()->add(new PasteStrokesUndo(level, tool->getCurrentFid(), m_indexes,
+														  oldPalette, m_sceneHandle));
 		m_updateSelectionBBox = isPaste;
 	}
 	tool->notifyImageChanged();
-	tool->getApplication()->getPaletteController()->getCurrentLevelPalette()->notifyPaletteChanged();
+	tool->getApplication()
+		->getPaletteController()
+		->getCurrentLevelPalette()
+		->notifyPaletteChanged();
 	m_updateSelectionBBox = false;
 	tool->invalidate();
 }
@@ -621,7 +609,8 @@ void StrokeSelection::cut()
 	bool isSpline = tool->getApplication()->getCurrentObject()->isSpline();
 	TUndo *undo;
 	if (isSpline)
-		undo = new ToolUtils::UndoPath(tool->getXsheet()->getStageObject(tool->getObjectId())->getSpline());
+		undo = new ToolUtils::UndoPath(
+			tool->getXsheet()->getStageObject(tool->getObjectId())->getSpline());
 
 	StrokesData *data = new StrokesData();
 	data->setImage(m_vi, m_indexes);
@@ -629,7 +618,8 @@ void StrokeSelection::cut()
 	cutStrokesWithoutUndo(m_vi, m_indexes);
 	if (!isSpline) {
 		TXshSimpleLevel *level = tool->getApplication()->getCurrentLevel()->getSimpleLevel();
-		TUndoManager::manager()->add(new CutStrokesUndo(level, tool->getCurrentFid(), oldIndexes, data, m_sceneHandle));
+		TUndoManager::manager()->add(
+			new CutStrokesUndo(level, tool->getCurrentFid(), oldIndexes, data, m_sceneHandle));
 	} else {
 		assert(undo);
 		if (undo)
@@ -674,11 +664,8 @@ class UndoSetStrokeStyle : public TUndo
 	std::vector<int> m_oldStyles;
 	int m_newStyle;
 
-public:
-	UndoSetStrokeStyle(TVectorImageP image, int newStyle)
-		: m_image(image), m_newStyle(newStyle)
-	{
-	}
+  public:
+	UndoSetStrokeStyle(TVectorImageP image, int newStyle) : m_image(image), m_newStyle(newStyle) {}
 
 	void addStroke(TStroke *stroke)
 	{
@@ -716,8 +703,7 @@ public:
 
 	int getSize() const
 	{
-		return sizeof(*this) +
-			   m_strokeIndexes.capacity() * sizeof(m_strokeIndexes[0]) +
+		return sizeof(*this) + m_strokeIndexes.capacity() * sizeof(m_strokeIndexes[0]) +
 			   m_oldStyles.capacity() * sizeof(m_oldStyles[0]);
 	}
 };

@@ -6,8 +6,7 @@
 #include "tconvert.h"
 #include <iostream.h>
 
-TEnv::RootSystemVar
-	systemVar(TFilePath("SOFTWARE\\Digital Video\\Toonz\\5.0\\ToonzRoot"));
+TEnv::RootSystemVar systemVar(TFilePath("SOFTWARE\\Digital Video\\Toonz\\5.0\\ToonzRoot"));
 
 ostream &operator<<(ostream &out, TProject *project)
 {
@@ -26,9 +25,9 @@ int main()
   cout << "current: " << TProject::getCurrent() << endl;
   TProjectManager *m = TProjectManager::instance();
   for(int i=0;i<m->getProjectCount();i++)
-    {
-     cout << "  " << m->getProject(i) << endl;
-    }
+	{
+	 cout << "  " << m->getProject(i) << endl;
+	}
   TProject *project = new TProject(TFilePath("funziona"));
   project->setFolder(TProject::Extras, TFilePath("C:\\butta"));
   m->addProject(project);

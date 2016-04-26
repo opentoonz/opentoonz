@@ -7,7 +7,7 @@
 
 class DVAPI TPopup : public TWidget
 {
-protected:
+  protected:
 	bool m_isOpen;
 	bool m_isMenu;
 	bool m_hasCaption;
@@ -16,8 +16,9 @@ protected:
 	virtual void create();
 	std::wstring m_caption;
 
-public:
-	TPopup(TWidget *parent, std::string name, bool hasCaption = true, bool isResizable = true, bool isTopMost = false);
+  public:
+	TPopup(TWidget *parent, std::string name, bool hasCaption = true, bool isResizable = true,
+		   bool isTopMost = false);
 	~TPopup();
 
 	virtual void openPopup();
@@ -29,7 +30,7 @@ public:
 
 	bool onNcPaint(bool is_active, const TDimension &window_size, const TRect &caption_rect);
 
-	//if return false, the popup does not close;
+	// if return false, the popup does not close;
 	virtual bool onClose() { return true; }
 	virtual void onOpen() {}
 
@@ -54,15 +55,16 @@ public:
 
 class DVAPI TModalPopup : public TPopup
 {
-private:
+  private:
 	bool m_shellWasDisabled;
 	bool m_doQuit;
 
-protected:
+  protected:
 	virtual void create();
 
-public:
-	TModalPopup(TWidget *parent, std::string name, bool hasCaption = true, bool isResizable = true, bool isTopMost = true);
+  public:
+	TModalPopup(TWidget *parent, std::string name, bool hasCaption = true, bool isResizable = true,
+				bool isTopMost = true);
 	~TModalPopup();
 
 	// virtual void popup(const TPoint &pos);

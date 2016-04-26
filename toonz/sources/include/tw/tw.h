@@ -24,21 +24,21 @@ class TDragDropListener;
 class DVAPI TGuiColor
 {
 	int m_red, m_green, m_blue;
-	//mutable void* m_imp;
-	//bool  m_isStock;
-	//int m_shade;
+	// mutable void* m_imp;
+	// bool  m_isStock;
+	// int m_shade;
 
-	//TUINT32 *m_index;
-	//mutable bool m_allocated;
-public:
-	//static const int m_maxShade;
+	// TUINT32 *m_index;
+	// mutable bool m_allocated;
+  public:
+	// static const int m_maxShade;
 
 	TGuiColor(int r, int g, int b);
 	TGuiColor();
 	~TGuiColor();
 
-	//TGuiColor(const TGuiColor&);
-	//TGuiColor& operator=(const TGuiColor&);
+	// TGuiColor(const TGuiColor&);
+	// TGuiColor& operator=(const TGuiColor&);
 
 	// TUINT32 getIndex(int shade=0) const;
 	// TUINT32 getRGB(int shade=0) const;
@@ -49,11 +49,11 @@ public:
 
 	void computeShade(int index, int &r, int &g, int &b) const;
 
-	//void* imp() const {return m_imp;}
-	//void imp(void* imp) const { m_imp = imp; }
-	//bool isStock() const { return m_isStock; }
+	// void* imp() const {return m_imp;}
+	// void imp(void* imp) const { m_imp = imp; }
+	// bool isStock() const { return m_isStock; }
 
-protected:
+  protected:
 	void initStockColor();
 };
 
@@ -61,8 +61,8 @@ protected:
 
 class TWidgetImp;
 
-//class TTarget {};
-//class TTimerTarget {};
+// class TTarget {};
+// class TTimerTarget {};
 
 class TWidget;
 typedef std::vector<TWidget *> TWidgetList;
@@ -73,15 +73,11 @@ class DVAPI TWidget
 // : public TTarget, public TTimerTarget
 {
 
-public:
-	enum Alignment { BEGIN,
-					 CENTER,
-					 END };
-	enum FocusHandling { IGNORE_FOCUS,
-						 STOP_FOCUS,
-						 LISTEN_TO_FOCUS };
+  public:
+	enum Alignment { BEGIN, CENTER, END };
+	enum FocusHandling { IGNORE_FOCUS, STOP_FOCUS, LISTEN_TO_FOCUS };
 
-protected:
+  protected:
 	TRect m_placement;
 	int m_xoff, m_yoff;
 
@@ -89,7 +85,7 @@ protected:
 	bool m_hidden; // il widget non vuole mostrarsi
 	bool m_childrenChanged;
 
-	//TTimer *m_timer;
+	// TTimer *m_timer;
 
 	TWidget *m_parent, *m_sonKeeper;
 	std::string m_name, m_contextHelpReference;
@@ -116,17 +112,17 @@ protected:
 	static TWidget *m_focusOwner;
 
 	// not implemented (cannot copy and assign widget)
-private:
+  private:
 	TWidget(const TWidget &);
 	TWidget &operator=(const TWidget &);
 
-protected:
+  protected:
 	virtual void create();
 	virtual void setDecoration();
 	virtual void destroyImp();
 	void createSons();
 
-public:
+  public:
 	TWidget(TWidget *parent = 0, std::string name = "unnamed");
 	virtual ~TWidget();
 
@@ -143,33 +139,15 @@ public:
 
 	inline void setPlacement(const TRect &rect) { m_placement = rect; }
 
-	inline void setGeometry(int x0, int y0, int x1, int y1)
-	{
-		setGeometry(TRect(x0, y0, x1, y1));
-	}
+	inline void setGeometry(int x0, int y0, int x1, int y1) { setGeometry(TRect(x0, y0, x1, y1)); }
 
 	virtual void setGeometry(const TRect &rect);
-	void setGeometry(const TPoint &pos, const TDimension &size)
-	{
-		setGeometry(TRect(pos, size));
-	}
-	inline void setSize(int w, int h)
-	{
-		setGeometry(getPosition(), TDimension(w, h));
-	}
+	void setGeometry(const TPoint &pos, const TDimension &size) { setGeometry(TRect(pos, size)); }
+	inline void setSize(int w, int h) { setGeometry(getPosition(), TDimension(w, h)); }
 
-	inline void setSize(const TDimension &size)
-	{
-		setSize(size.lx, size.ly);
-	}
-	inline void setPosition(int x, int y)
-	{
-		setGeometry(TPoint(x, y), getSize());
-	}
-	inline void setPosition(const TPoint &pt)
-	{
-		setGeometry(pt, getSize());
-	}
+	inline void setSize(const TDimension &size) { setSize(size.lx, size.ly); }
+	inline void setPosition(int x, int y) { setGeometry(TPoint(x, y), getSize()); }
+	inline void setPosition(const TPoint &pt) { setGeometry(pt, getSize()); }
 	inline bool contains(int x, int y) const { return contains(TPoint(x, y)); }
 	inline bool contains(const TPoint &p) const { return m_placement.contains(p); }
 
@@ -184,7 +162,10 @@ public:
 	virtual void addSon(TWidget *son);
 	virtual void removeSon(TWidget *son);
 	inline int getSonCount() const { return m_sons->size(); }
-	inline TWidget *getSon(int i) const { return i < 0 || i >= (int)(m_sons->size()) ? 0 : (*m_sons)[i]; }
+	inline TWidget *getSon(int i) const
+	{
+		return i < 0 || i >= (int)(m_sons->size()) ? 0 : (*m_sons)[i];
+	}
 
 	//
 	// help messages
@@ -195,17 +176,11 @@ public:
 	void setHelp(std::string shortHelp, std::string longHelp);
 	void setHelp(std::wstring shortHelp, std::wstring longHelp);
 
-	virtual std::string getContextHelpReference(const TPoint &)
-	{
-		return m_contextHelpReference;
-	}
+	virtual std::string getContextHelpReference(const TPoint &) { return m_contextHelpReference; }
 
-	void setContextHelpReference(std::string s)
-	{
-		m_contextHelpReference = s;
-	}
+	void setContextHelpReference(std::string s) { m_contextHelpReference = s; }
 
-	//void delegateHelpToParent();
+	// void delegateHelpToParent();
 
 	virtual std::wstring getTooltipString(const TPoint &) { return getShortHelp(); }
 
@@ -258,10 +233,7 @@ public:
 	virtual bool getFocus() { return false; }
 	virtual void circulateFocus();
 
-	virtual void copyRegion(
-		const TPoint &dst,
-		const TPoint &src,
-		const TDimension &size);
+	virtual void copyRegion(const TPoint &dst, const TPoint &src, const TDimension &size);
 
 	//
 	// draw
@@ -315,19 +287,11 @@ public:
 	virtual void drawRect(const TRect &);
 	virtual void fillRect(const TRect &);
 
-	virtual void drawRect(int x0, int y0, int x1, int y1)
-	{
-		drawRect(TRect(x0, y0, x1, y1));
-	}
-	virtual void fillRect(int x0, int y0, int x1, int y1)
-	{
-		fillRect(TRect(x0, y0, x1, y1));
-	}
+	virtual void drawRect(int x0, int y0, int x1, int y1) { drawRect(TRect(x0, y0, x1, y1)); }
+	virtual void fillRect(int x0, int y0, int x1, int y1) { fillRect(TRect(x0, y0, x1, y1)); }
 
-	virtual void draw3DRect(const TRect &,
-							bool pressed = false, int border = 1);
-	virtual void fill3DRect(const TRect &,
-							bool pressed = false, int border = 1);
+	virtual void draw3DRect(const TRect &, bool pressed = false, int border = 1);
+	virtual void fill3DRect(const TRect &, bool pressed = false, int border = 1);
 
 	virtual void drawDottedRect(const TRect &);
 	virtual void drawDottedRect(int x0, int y0, int x1, int y1)
@@ -335,11 +299,8 @@ public:
 		drawDottedRect(TRect(x0, y0, x1, y1));
 	}
 
-	virtual void fillPolygon(
-		const TGuiColor &fillColor,
-		const TGuiColor &borderColor,
-		const TPoint points[],
-		int pointCount);
+	virtual void fillPolygon(const TGuiColor &fillColor, const TGuiColor &borderColor,
+							 const TPoint points[], int pointCount);
 
 	virtual void clear(const TRect &);
 
@@ -398,9 +359,10 @@ public:
 
 	virtual void onChildrenChanged() {}
 
-	virtual bool onNcPaint(bool is_active, const TDimension &window_size, const TRect &caption_rect);
+	virtual bool onNcPaint(bool is_active, const TDimension &window_size,
+						   const TRect &caption_rect);
 
-public:
+  public:
 	static void setFocusOwner(TWidget *w);
 	static TWidget *getFocusOwner();
 
@@ -431,14 +393,14 @@ public:
 	bool isMenuRelated() const { return m_menuRelated; }
 
 	// se non altro e' brutto il nome
-	//NB: il nome e' brutto... ora questo e' anche sbagliato
+	// NB: il nome e' brutto... ora questo e' anche sbagliato
 	static void processAllPendingMessages(); // questa processa solo i WM_PAINT
 
 	static void processAllPendingMessages2(); // questa processa tutto
 
 	// mah? serve a evitare il circuito invalidate() -> repaint(); chiama direttamente
 	// repaint() (creando l'opportuno GC su windows)
-	//void paintRegion(const TRect &rect);
+	// void paintRegion(const TRect &rect);
 
 	static TDimension getScreenSize();
 	static void getScreenPlacement(std::vector<TRectI> &);

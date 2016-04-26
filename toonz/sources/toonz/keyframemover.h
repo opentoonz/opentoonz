@@ -38,7 +38,7 @@ class KeyframeMover
 	// m_lastKeyframes and m_lastKeyframeData <- xsheet
 	void getKeyframes();
 
-public:
+  public:
 	KeyframeMover();
 	~KeyframeMover();
 
@@ -53,7 +53,8 @@ public:
 
 	int getQualifiers() const { return m_qualifiers; }
 
-	bool moveKeyframes(int dr, std::set<TKeyframeSelection::Position> &newPositions, TKeyframeSelection *selection = 0);
+	bool moveKeyframes(int dr, std::set<TKeyframeSelection::Position> &newPositions,
+					   TKeyframeSelection *selection = 0);
 
 	void undoMoveKeyframe() { setKeyframes(); }
 };
@@ -81,7 +82,7 @@ class KeyframeMoverTool : public XsheetGUI::DragTool
 
 	void rectSelect(int row, int col);
 
-public:
+  public:
 	KeyframeMoverTool(XsheetViewer *viewer, bool justMovement = false);
 
 	bool canMove(const TPoint &pos);

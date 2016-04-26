@@ -15,9 +15,8 @@ class ino_blur : public TStandardRasterFx
 	TDoubleParamP m_radius;
 	TIntEnumParamP m_ref_mode;
 
-public:
-	ino_blur()
-		: m_radius(1.0), m_ref_mode(new TIntEnumParam(0, "Red"))
+  public:
+	ino_blur() : m_radius(1.0), m_ref_mode(new TIntEnumParam(0, "Red"))
 	{
 		addInputPort("Source", this->m_input);
 		addInputPort("Reference", this->m_refer);
@@ -35,8 +34,7 @@ public:
 		this->m_ref_mode->addItem(-1, "Nothing");
 	}
 	//------------------------------------------------------------
-	double get_render_real_radius(
-		const double frame, const TAffine affine)
+	double get_render_real_radius(const double frame, const TAffine affine)
 	{
 		/*--- ベクトルにする --- */
 		TPointD rend_vect;
@@ -54,21 +52,18 @@ toonz/main/sources/stdfx/motionblurfx.cpp
 		aff.a13 = aff.a23 = 0; /* 移動変換をしないで... */
 		rend_vect = aff * rend_vect;
 		/*--- 方向は無視して長さを返す ---*/
-		return sqrt(
-			rend_vect.x * rend_vect.x + rend_vect.y * rend_vect.y);
+		return sqrt(rend_vect.x * rend_vect.x + rend_vect.y * rend_vect.y);
 	}
-	void get_render_enlarge(
-		const double frame, const TAffine affine, TRectD &bBox)
+	void get_render_enlarge(const double frame, const TAffine affine, TRectD &bBox)
 	{
-		const int margin = igs::gaussian_blur_hv::int_radius(
-			this->get_render_real_radius(frame, affine));
+		const int margin =
+			igs::gaussian_blur_hv::int_radius(this->get_render_real_radius(frame, affine));
 		if (0 < margin) {
 			bBox = bBox.enlarge(static_cast<double>(margin));
 		}
 	}
 	//------------------------------------------------------------
-	bool doGetBBox(
-		double frame, TRectD &bBox, const TRenderSettings &info)
+	bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info)
 	{
 		if (false == this->m_input.isConnected()) {
 			bBox = TRectD();
@@ -78,23 +73,21 @@ toonz/main/sources/stdfx/motionblurfx.cpp
 		this->get_render_enlarge(frame, info.m_affine, bBox);
 		return ret;
 	}
-	int getMemoryRequirement(
-		const TRectD &rect, double frame, const TRenderSettings &info)
+	int getMemoryRequirement(const TRectD &rect, double frame, const TRenderSettings &info)
 	{
 		TRectD bBox(rect);
 		this->get_render_enlarge(frame, info.m_affine, bBox);
 		return TRasterFx::memorySize(bBox, info.m_bpp);
 	}
-	void transform(
-		double frame, int port, const TRectD &rectOnOutput, const TRenderSettings &infoOnOutput, TRectD &rectOnInput, TRenderSettings &infoOnInput)
+	void transform(double frame, int port, const TRectD &rectOnOutput,
+				   const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
+				   TRenderSettings &infoOnInput)
 	{
 		rectOnInput = rectOnOutput;
 		infoOnInput = infoOnOutput;
-		this->get_render_enlarge(
-			frame, infoOnOutput.m_affine, rectOnInput);
+		this->get_render_enlarge(frame, infoOnOutput.m_affine, rectOnInput);
 	}
-	bool canHandle(
-		const TRenderSettings &info, double frame)
+	bool canHandle(const TRenderSettings &info, double frame)
 	{
 		if (0 == this->m_radius->getValue(frame)) {
 			return true;
@@ -102,29 +95,27 @@ toonz/main/sources/stdfx/motionblurfx.cpp
 			return isAlmostIsotropic(info.m_affine);
 		}
 	}
-	void doCompute(
-		TTile &tile, double frame, const TRenderSettings &rend_sets);
+	void doCompute(TTile &tile, double frame, const TRenderSettings &rend_sets);
 };
 FX_PLUGIN_IDENTIFIER(ino_blur, "inoBlurFx");
 //------------------------------------------------------------
 namespace
 {
-void fx_(
-	const TRasterP in_ras // with margin
-	,
-	TRasterP out_ras // no margin
+void fx_(const TRasterP in_ras // with margin
+		 ,
+		 TRasterP out_ras // no margin
 
-	,
-	const TRasterP refer_ras, const int ref_mode
+		 ,
+		 const TRasterP refer_ras, const int ref_mode
 
-	,
-	const int int_radius, const double real_radius)
+		 ,
+		 const int int_radius, const double real_radius)
 {
-	TRasterGR8P out_buffer(
-		out_ras->getLy(), out_ras->getLx() * ino::channels() *
-							  ((TRaster64P)in_ras ? sizeof(unsigned short) : sizeof(unsigned char)));
-	const int buffer_bytes = igs::gaussian_blur_hv::buffer_bytes(
-		in_ras->getLy(), in_ras->getLx(), int_radius);
+	TRasterGR8P out_buffer(out_ras->getLy(), out_ras->getLx() * ino::channels() *
+												 ((TRaster64P)in_ras ? sizeof(unsigned short)
+																	 : sizeof(unsigned char)));
+	const int buffer_bytes =
+		igs::gaussian_blur_hv::buffer_bytes(in_ras->getLy(), in_ras->getLx(), int_radius);
 	TRasterGR8P cvt_buffer(buffer_bytes, 1);
 	out_buffer->lock();
 	cvt_buffer->lock();
@@ -143,8 +134,8 @@ void fx_(
 		ino::bits(in_ras) // const int bits
 
 		,
-		(((0 <= ref_mode) && (0 != refer_ras)) ? refer_ras->getRawData() : 0) //BGRA
-																			  // const unsigned char *ref
+		(((0 <= ref_mode) && (0 != refer_ras)) ? refer_ras->getRawData() : 0) // BGRA
+		// const unsigned char *ref
 		,
 		(((0 <= ref_mode) && (0 != refer_ras)) ? ino::bits(refer_ras) : 0)
 		// const int ref_bits
@@ -162,15 +153,13 @@ void fx_(
 		real_radius // const double real_radius
 					// , 0.25
 		);
-	ino::arr_to_ras(
-		out_buffer->getRawData(), ino::channels(), out_ras, 0);
+	ino::arr_to_ras(out_buffer->getRawData(), ino::channels(), out_ras, 0);
 	cvt_buffer->unlock();
 	out_buffer->unlock();
 }
 }
 //------------------------------------------------------------
-void ino_blur::doCompute(
-	TTile &tile, double frame, const TRenderSettings &rend_sets)
+void ino_blur::doCompute(TTile &tile, double frame, const TRenderSettings &rend_sets)
 {
 	/*------ 接続していなければ処理しない ----------------------*/
 	if (!this->m_input.isConnected()) {
@@ -178,15 +167,12 @@ void ino_blur::doCompute(
 		return;
 	}
 	/*------ サポートしていないPixelタイプはエラーを投げる -----*/
-	if (!((TRaster32P)tile.getRaster()) &&
-		!((TRaster64P)tile.getRaster())) {
+	if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster())) {
 		throw TRopException("unsupported input pixel type");
 	}
 	/*------ ボケ足長さの実際の長さをえる ----------------------*/
-	const double real_radius = this->get_render_real_radius(
-		frame, rend_sets.m_affine);
-	const int int_radius = igs::gaussian_blur_hv::int_radius(
-		real_radius);
+	const double real_radius = this->get_render_real_radius(frame, rend_sets.m_affine);
+	const int int_radius = igs::gaussian_blur_hv::int_radius(real_radius);
 	/*------ ボケ足長さがゼロのときはblur処理しない ------------*/
 	if (0 == int_radius) {
 		this->m_input->compute(tile, frame, rend_sets);
@@ -196,11 +182,10 @@ void ino_blur::doCompute(
 	const int ref_mode = this->m_ref_mode->getValue();
 
 	/*------ 表示の範囲を得る ----------------------------------*/
-	TRectD bBox = TRectD(
-		tile.m_pos /* Render画像上(Pixel単位)の位置 */
-		,
-		TDimensionD(/* Render画像上(Pixel単位)のサイズ */
-					tile.getRaster()->getLx(), tile.getRaster()->getLy()));
+	TRectD bBox = TRectD(tile.m_pos /* Render画像上(Pixel単位)の位置 */
+						 ,
+						 TDimensionD(/* Render画像上(Pixel単位)のサイズ */
+									 tile.getRaster()->getLx(), tile.getRaster()->getLy()));
 	/*------ ぼけ半径(=マージン)分表示範囲を広げる -------------*/
 	if (0 < int_radius) {
 		bBox = bBox.enlarge(static_cast<double>(int_radius));
@@ -219,8 +204,9 @@ TTile &tile
 */
 	TTile enlarge_tile;
 	this->m_input->allocateAndCompute(
-		enlarge_tile, bBox.getP00(), TDimensionI(/* Pixel単位に四捨五入 */
-												 static_cast<int>(bBox.getLx() + 0.5), static_cast<int>(bBox.getLy() + 0.5)),
+		enlarge_tile, bBox.getP00(),
+		TDimensionI(/* Pixel単位に四捨五入 */
+					static_cast<int>(bBox.getLx() + 0.5), static_cast<int>(bBox.getLy() + 0.5)),
 		tile.getRaster(), frame, rend_sets);
 
 	/*------ 参照画像生成 --------------------------------------*/
@@ -228,12 +214,11 @@ TTile &tile
 	bool ref_sw = false;
 	if (this->m_refer.isConnected()) {
 		ref_sw = true;
-		this->m_refer->allocateAndCompute(
-			ref_tile, tile.m_pos /* TPointD */
-			,
-			tile.getRaster()->getSize() /* Pixel単位 */
-			,
-			tile.getRaster(), frame, rend_sets);
+		this->m_refer->allocateAndCompute(ref_tile, tile.m_pos /* TPointD */
+										  ,
+										  tile.getRaster()->getSize() /* Pixel単位 */
+										  ,
+										  tile.getRaster(), frame, rend_sets);
 	}
 
 	/* ------ 保存すべき画像メモリを塗りつぶしクリア ---------- */
@@ -245,29 +230,19 @@ TTile &tile
 	if (log_sw) {
 		std::ostringstream os;
 		os << "params"
-		   << "  usr_radius " << this->m_radius->getValue(frame)
-		   << "  real_radius " << real_radius
-		   << "  int_radius " << int_radius
-		   << "  ref_mode " << ref_mode
-		   << "  tile"
-		   << " pos " << tile.m_pos
-		   << " w " << tile.getRaster()->getLx()
-		   << " h " << tile.getRaster()->getLy()
-		   << "  enl_tile"
-		   << " w " << enlarge_tile.getRaster()->getLx()
-		   << " h " << enlarge_tile.getRaster()->getLy()
-		   << "  pixbits " << ino::pixel_bits(tile.getRaster())
-		   << "  frame " << frame
-		   << "  affine a11 " << rend_sets.m_affine.a11
-		   << "  a12 " << rend_sets.m_affine.a12
-		   << "  a21 " << rend_sets.m_affine.a21
-		   << "  a22 " << rend_sets.m_affine.a22;
+		   << "  usr_radius " << this->m_radius->getValue(frame) << "  real_radius " << real_radius
+		   << "  int_radius " << int_radius << "  ref_mode " << ref_mode << "  tile"
+		   << " pos " << tile.m_pos << " w " << tile.getRaster()->getLx() << " h "
+		   << tile.getRaster()->getLy() << "  enl_tile"
+		   << " w " << enlarge_tile.getRaster()->getLx() << " h "
+		   << enlarge_tile.getRaster()->getLy() << "  pixbits " << ino::pixel_bits(tile.getRaster())
+		   << "  frame " << frame << "  affine a11 " << rend_sets.m_affine.a11 << "  a12 "
+		   << rend_sets.m_affine.a12 << "  a21 " << rend_sets.m_affine.a21 << "  a22 "
+		   << rend_sets.m_affine.a22;
 		if (ref_sw) {
-			os
-				<< "  ref_tile"
-				<< " pos " << ref_tile.m_pos
-				<< " x " << ref_tile.getRaster()->getLx()
-				<< " y " << ref_tile.getRaster()->getLy();
+			os << "  ref_tile"
+			   << " pos " << ref_tile.m_pos << " x " << ref_tile.getRaster()->getLx() << " y "
+			   << ref_tile.getRaster()->getLy();
 		}
 	}
 	/* ------ fx処理 ------------------------------------------ */

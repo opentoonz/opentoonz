@@ -10,9 +10,18 @@ using std::for_each;
 namespace
 {
 
-void deleteUndo(const TUndo *undo) { delete undo; }
-void callUndo(const TUndo *undo) { undo->undo(); }
-void callRedo(const TUndo *undo) { undo->redo(); }
+void deleteUndo(const TUndo *undo)
+{
+	delete undo;
+}
+void callUndo(const TUndo *undo)
+{
+	undo->undo();
+}
+void callRedo(const TUndo *undo)
+{
+	undo->redo();
+}
 // void callRepeat(const TUndo* undo) {undo->repeat(); }
 
 class TUndoBlock : public TUndo
@@ -22,7 +31,7 @@ class TUndoBlock : public TUndo
 	typedef std::vector<TUndo *>::const_reverse_iterator ReverseIterator;
 	mutable bool m_deleted, m_undoing;
 
-public:
+  public:
 	TUndoBlock() : m_deleted(false), m_undoing(false) {}
 	~TUndoBlock()
 	{
@@ -41,10 +50,7 @@ public:
 		size += (m_undos.capacity() - m_undos.size()) * sizeof(TUndo *);
 		return size;
 	}
-	int getUndoCount() const
-	{
-		return (int)m_undos.size();
-	}
+	int getUndoCount() const { return (int)m_undos.size(); }
 	void setLast()
 	{
 		for (UINT i = 1; i < m_undos.size(); i++)
@@ -57,22 +63,22 @@ public:
 		assert(!m_deleted);
 		assert(!m_undoing);
 		m_undoing = true;
-		//VERSIONE CORRETTA
+		// VERSIONE CORRETTA
 		for_each(m_undos.rbegin(), m_undos.rend(), callUndo);
-		//VERSIONE SBAGLIATA
-		//for_each(m_undos.begin(), m_undos.end(), callUndo);
+		// VERSIONE SBAGLIATA
+		// for_each(m_undos.begin(), m_undos.end(), callUndo);
 		m_undoing = false;
 	}
 	void redo() const
 	{
 		assert(!m_deleted);
-		//VERSIONE CORRETTA
+		// VERSIONE CORRETTA
 		for_each(m_undos.begin(), m_undos.end(), callRedo);
-		//VERSIONE SBAGLIATA
-		//for_each(m_undos.rbegin(), m_undos.rend(), callRedo);
+		// VERSIONE SBAGLIATA
+		// for_each(m_undos.rbegin(), m_undos.rend(), callRedo);
 	}
 
-	//void repeat() const {
+	// void repeat() const {
 	//  for_each(m_undos.begin(), m_undos.end(), callRepeat);
 	//}
 	void onAdd() {}
@@ -131,17 +137,17 @@ struct TUndoManager::TUndoManagerImp {
 
 	std::vector<TUndoBlock *> m_blockStack;
 
-public:
+  public:
 	TUndoManagerImp() : m_skipped(false), m_undoMemorySize(0) { m_current = m_undoList.end(); }
 	~TUndoManagerImp() {}
 
 	void add(TUndo *undo);
 
-public:
+  public:
 	static struct ManagerPtr {
 		TUndoManager *m_ptr;
 
-	public:
+	  public:
 		ManagerPtr() : m_ptr(0) {}
 		~ManagerPtr()
 		{
@@ -152,7 +158,7 @@ public:
 
 	} theManager;
 
-private:
+  private:
 	void doAdd(TUndo *undo);
 };
 
@@ -171,8 +177,7 @@ TUndoManager *TUndoManager::manager()
 
 //=============================================================================
 
-TUndoManager::TUndoManager()
-	: m_imp(new TUndoManagerImp)
+TUndoManager::TUndoManager() : m_imp(new TUndoManagerImp)
 {
 }
 
@@ -180,7 +185,7 @@ TUndoManager::TUndoManager()
 
 TUndoManager::~TUndoManager()
 {
-	//cout << "Distrutto undo manager" << endl;
+	// cout << "Distrutto undo manager" << endl;
 	assert(m_imp->m_blockStack.empty());
 	reset();
 }
@@ -211,7 +216,7 @@ void TUndoManager::TUndoManagerImp::doAdd(TUndo *undo)
 	for (i = 0; i < count; i++)
 		memorySize += m_undoList[i]->getSize();
 
-	while (count > 100 || (count != 0 && memorySize + undo->getSize() > m_undoMemorySize)) //20MB
+	while (count > 100 || (count != 0 && memorySize + undo->getSize() > m_undoMemorySize)) // 20MB
 	{
 		--count;
 		TUndo *undo = m_undoList.front();
@@ -243,7 +248,7 @@ void TUndoManager::beginBlock()
 
 void TUndoManager::endBlock()
 {
-	//vogliamo fare anche resize del vector ???
+	// vogliamo fare anche resize del vector ???
 	assert(m_imp->m_blockStack.empty() == false);
 	TUndoBlock *undoBlock = m_imp->m_blockStack.back();
 	m_imp->m_blockStack.pop_back();
@@ -298,7 +303,7 @@ bool TUndoManager::redo()
 }
 
 //-----------------------------------------------------------------------------
-//repeat e' come redo ma non sposta il puntatore al corrente
+// repeat e' come redo ma non sposta il puntatore al corrente
 /*
 void TUndoManager::repeat()
 {
@@ -306,7 +311,7 @@ void TUndoManager::repeat()
   UndoListIterator &it = m_imp->m_current;
   if (it != m_imp->m_undoList.end())
   {
-    (*it)->repeat();
+	(*it)->repeat();
   }
 }
 */

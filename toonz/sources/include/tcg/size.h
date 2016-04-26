@@ -10,14 +10,13 @@ namespace tcg
 //    Bidimensional size  class
 //**********************************************************************************
 
-template <typename T>
-struct SizeT {
+template <typename T> struct SizeT {
 	typedef T value_type;
 
-public:
+  public:
 	T w, h;
 
-public:
+  public:
 	SizeT() : w(), h() {}
 	SizeT(T w_, T h_) : w(w_), h(h_) {}
 
@@ -44,34 +43,29 @@ public:
 		return SizeT<T>(a.w - b.w, a.h - b.h);
 	}
 
-	template <typename K>
-	SizeT &operator*=(K k)
+	template <typename K> SizeT &operator*=(K k)
 	{
 		w *= k, h *= k;
 		return *this;
 	}
 
-	template <typename K>
-	SizeT &operator/=(K k)
+	template <typename K> SizeT &operator/=(K k)
 	{
 		w /= k, h /= k;
 		return *this;
 	}
 
-	template <typename K>
-	friend SizeT<T> operator*(K k, const SizeT<T> &a)
+	template <typename K> friend SizeT<T> operator*(K k, const SizeT<T> &a)
 	{
 		return SizeT<T>(k * a.w, k * a.h);
 	}
 
-	template <typename K>
-	friend SizeT<T> operator*(const SizeT<T> &a, K k)
+	template <typename K> friend SizeT<T> operator*(const SizeT<T> &a, K k)
 	{
 		return SizeT<T>(a.w * k, a.h * k);
 	}
 
-	template <typename K>
-	friend SizeT<T> operator/(const SizeT<T> &a, K k)
+	template <typename K> friend SizeT<T> operator/(const SizeT<T> &a, K k)
 	{
 		return SizeT<T>(a.w / k, a.h / k);
 	}
@@ -118,14 +112,13 @@ typedef SizeT<double> SizeD;
 //    Tridimensional size  class
 //**********************************************************************************
 
-template <typename T>
-struct Size3T {
+template <typename T> struct Size3T {
 	typedef T value_type;
 
-public:
+  public:
 	T w, h, d;
 
-public:
+  public:
 	Size3T() : w(), h(), d() {}
 	Size3T(T w_, T h_, T d_) : w(w_), h(h_), d(d_) {}
 
@@ -152,34 +145,29 @@ public:
 		return SizeT<T>(a.w - b.w, a.h - b.h, a.d + b.d);
 	}
 
-	template <typename K>
-	Size3T &operator*=(K k)
+	template <typename K> Size3T &operator*=(K k)
 	{
 		w *= k, h *= k, d *= k;
 		return *this;
 	}
 
-	template <typename K>
-	Size3T &operator/=(K k)
+	template <typename K> Size3T &operator/=(K k)
 	{
 		w /= k, h /= k, d /= k;
 		return *this;
 	}
 
-	template <typename K>
-	friend Size3T<T> operator*(K k, const Size3T<T> &a)
+	template <typename K> friend Size3T<T> operator*(K k, const Size3T<T> &a)
 	{
 		return Size3T<T>(k * a.w, k * a.h, k * a.d);
 	}
 
-	template <typename K>
-	friend Size3T<T> operator*(const Size3T<T> &a, K k)
+	template <typename K> friend Size3T<T> operator*(const Size3T<T> &a, K k)
 	{
 		return Size3T<T>(a.w * k, a.h * k, a.d * k);
 	}
 
-	template <typename K>
-	friend Size3T<T> operator/(const Size3T<T> &a, K k)
+	template <typename K> friend Size3T<T> operator/(const Size3T<T> &a, K k)
 	{
 		return Size3T<T>(a.w / k, a.h / k, a.d / k);
 	}
@@ -230,23 +218,18 @@ typedef Size3T<double> Size3D;
 //    N-dimensional size  class
 //**********************************************************************************
 
-template <int N, typename T>
-struct SizeN {
+template <int N, typename T> struct SizeN {
 	static const int size = N;
 	typedef T value_type;
 
-public:
+  public:
 	T span[N];
 
-public:
+  public:
 	SizeN() {}
 	SizeN(const T &t) { std::fill(span, span + N, t); }
 
-	template <typename It>
-	SizeN(It begin, It end)
-	{
-		std::copy(begin, end, span);
-	}
+	template <typename It> SizeN(It begin, It end) { std::copy(begin, end, span); }
 
 	// To be completed...
 };

@@ -31,7 +31,7 @@ const int firstFrameKeySize = 4 * sizeof(char);
 class QuickTimeCleanUp;
 class QuickTimeStuff
 {
-public:
+  public:
 	static QuickTimeStuff *instance()
 	{
 		if (!m_singleton)
@@ -39,11 +39,9 @@ public:
 		return m_singleton;
 	}
 	OSErr getStatus() { return m_status; }
-	~QuickTimeStuff()
-	{
-	}
+	~QuickTimeStuff() {}
 
-private:
+  private:
 	QuickTimeStuff() : m_status(noErr)
 	{
 		m_status = noErr;
@@ -53,22 +51,26 @@ private:
 	static QuickTimeStuff *m_singleton;
 
 	OSErr m_status;
-	friend class QuickTimeCleanUp; //questa DEVE essere friend, cosi' posso controllare direttamente
-								   //lo stato del singleton.
+	friend class QuickTimeCleanUp; // questa DEVE essere friend, cosi' posso controllare
+								   // direttamente
+	// lo stato del singleton.
 };
 
 class QuickTimeCleanUp
 {
-public:
+  public:
 	QuickTimeCleanUp() {}
 	~QuickTimeCleanUp()
 	{ /*
-                        Nel caso si arrivasse qui senza il singleton instanziato, e si facesse direttamente
-                        'delete QuickTimeStuff::instance();' Quicktime non farebbe in tempo a terminare le
-                        sue routine di inizializzazione (che sono ANCHE su altri thread) e la chiamata a
-                        TerminateQTML() causerebbe un crash
-                        */
-		//std::cout << "destroing variable... Thread = " << GetCurrentThreadId() << std::endl;
+						Nel caso si arrivasse qui senza il singleton instanziato, e si facesse
+		 direttamente
+						'delete QuickTimeStuff::instance();' Quicktime non farebbe in tempo a
+		 terminare le
+						sue routine di inizializzazione (che sono ANCHE su altri thread) e la
+		 chiamata a
+						TerminateQTML() causerebbe un crash
+						*/
+		// std::cout << "destroing variable... Thread = " << GetCurrentThreadId() << std::endl;
 
 		//              std::cout <<"~QTCleanup"<< std::endl;
 		if (QuickTimeStuff::m_singleton)
@@ -97,71 +99,71 @@ enum QTLibError {
 	QTUnableToSetMovieBox,
 };
 
-} //namespace
+} // namespace
 
 ////-----------------------------------------------------------
 //
-//CodecType Tiio::MovWriterProperties::getCurrentCodec()const
+// CodecType Tiio::MovWriterProperties::getCurrentCodec()const
 //{
-//std::map<wstring, CodecType>::const_iterator it;
+// std::map<wstring, CodecType>::const_iterator it;
 //
-//it = m_codecMap.find(m_codec.getValue());
-//assert(it!=m_codecMap.end());
-//return it->second;
+// it = m_codecMap.find(m_codec.getValue());
+// assert(it!=m_codecMap.end());
+// return it->second;
 //}
 //
 ////-----------------------------------------------------------
 //
-//wstring Tiio::MovWriterProperties::getCurrentNameFromCodec(CodecType &cCodec)const
+// wstring Tiio::MovWriterProperties::getCurrentNameFromCodec(CodecType &cCodec)const
 //{
-//std::map<wstring, CodecType>::const_iterator it;
+// std::map<wstring, CodecType>::const_iterator it;
 //
-//for(it=m_codecMap.begin();it!=m_codecMap.end();++it)
+// for(it=m_codecMap.begin();it!=m_codecMap.end();++it)
 //{
 ////  CodecType tmp=it->second;
 //  if(it->second==cCodec) break;
 //}
-//assert(it!=m_codecMap.end());
-//return it->first;
+// assert(it!=m_codecMap.end());
+// return it->first;
 //}
 //
 ////-----------------------------------------------------------
 //
-//wstring Tiio::MovWriterProperties::getCurrentQualityFromCodeQ(CodecQ &cCodecQ)const
+// wstring Tiio::MovWriterProperties::getCurrentQualityFromCodeQ(CodecQ &cCodecQ)const
 //{
-//std::map<wstring, CodecQ>::const_iterator it;
+// std::map<wstring, CodecQ>::const_iterator it;
 //
-//for(it=m_qualityMap.begin();it!=m_qualityMap.end();++it)
+// for(it=m_qualityMap.begin();it!=m_qualityMap.end();++it)
 //{
 ////  CodecQ tmp=it->second;
 //  if(it->second==cCodecQ) break;
 //}
-//assert(it!=m_qualityMap.end());
-//return it->first;
+// assert(it!=m_qualityMap.end());
+// return it->first;
 //}
 //
 ////-----------------------------------------------------------
 //
-//CodecQ Tiio::MovWriterProperties::getCurrentQuality() const
+// CodecQ Tiio::MovWriterProperties::getCurrentQuality() const
 //{
-//std::map<wstring, CodecQ>::const_iterator it;
+// std::map<wstring, CodecQ>::const_iterator it;
 //
-//it = m_qualityMap.find(m_quality.getValue());
-//assert(it!=m_qualityMap.end());
-//return it->second;
+// it = m_qualityMap.find(m_quality.getValue());
+// assert(it!=m_qualityMap.end());
+// return it->second;
 //}
 //
 ////-----------------------------------------------------------
 //
 //
-//TPropertyGroup* Tiio::MovWriterProperties::clone() const
+// TPropertyGroup* Tiio::MovWriterProperties::clone() const
 //{
 //  MovWriterProperties*g = new MovWriterProperties();
 //
 //	g->m_codec.setValue(m_codec.getValue());
 //	g->m_quality.setValue(m_quality.getValue());
 //
-//return (TPropertyGroup*)g;
+// return (TPropertyGroup*)g;
 //}
 
 Tiio::MovWriterProperties::MovWriterProperties()
@@ -172,10 +174,11 @@ Tiio::MovWriterProperties::MovWriterProperties()
 		return;
 	}
 
-	//if (InitializeQTML(0)!=noErr)
+	// if (InitializeQTML(0)!=noErr)
 	//    return;
 
-	ComponentInstance ci = OpenDefaultComponent(StandardCompressionType, StandardCompressionSubType);
+	ComponentInstance ci =
+		OpenDefaultComponent(StandardCompressionType, StandardCompressionSubType);
 	QTAtomContainer settings;
 
 	if (SCGetSettingsAsAtomContainer(ci, &settings) != noErr)
@@ -206,18 +209,18 @@ DisposeCodecNameList(codecList);
 
 TIntEnumeration  codecQuality;
 
-m_quality.addValue(L"min quality"); 
-      m_qualityMap[L"min quality"] = codecMinQuality;
+m_quality.addValue(L"min quality");
+	  m_qualityMap[L"min quality"] = codecMinQuality;
 m_quality.addValue(L"low quality");
-      m_qualityMap[L"low quality"] = codecLowQuality;
+	  m_qualityMap[L"low quality"] = codecLowQuality;
 m_quality.addValue(L"normal quality");
-      m_qualityMap[L"normal quality"] = codecNormalQuality;
+	  m_qualityMap[L"normal quality"] = codecNormalQuality;
 m_quality.addValue(L"high quality");
-      m_qualityMap[L"high quality"] = codecHighQuality;
+	  m_qualityMap[L"high quality"] = codecHighQuality;
 m_quality.addValue(L"max quality");
-      m_qualityMap[L"max quality"] = codecMaxQuality;
+	  m_qualityMap[L"max quality"] = codecMaxQuality;
 m_quality.addValue(L"lossless quality");
-      m_qualityMap[L"lossless quality"] = codecLosslessQuality;
+	  m_qualityMap[L"lossless quality"] = codecLosslessQuality;
 
 m_quality.setValue(L"normal quality");
 
@@ -311,7 +314,7 @@ TimeScale frameRateToTimeScale(double frameRate)
 const string CodecNamesId = "PU_CodecName";
 const string CodecQualityId = "PU_CodecQuality";
 
-} //namespace
+} // namespace
 
 //------------------------------------------------------------------------------
 
@@ -327,21 +330,21 @@ bool IsQuickTimeInstalled()
 class TImageWriterMov : public TImageWriter
 {
 
-public:
+  public:
 	TImageWriterMov(const TFilePath &, int frameIndex, TLevelWriterMov *);
 	~TImageWriterMov() { m_lwm->release(); }
 	bool is64bitOutputSupported() { return false; }
 
-private:
-	//not implemented
+  private:
+	// not implemented
 	TImageWriterMov(const TImageWriterMov &);
 	TImageWriterMov &operator=(const TImageWriterMov &src);
 
-public:
+  public:
 	void save(const TImageP &);
 	int m_frameIndex;
 
-private:
+  private:
 	TLevelWriterMov *m_lwm;
 };
 
@@ -351,24 +354,25 @@ private:
 class TImageReaderMov : public TImageReader
 {
 
-public:
+  public:
 	TImageReaderMov(const TFilePath &, int frameIndex, TLevelReaderMov *);
 	~TImageReaderMov() { m_lrm->release(); }
 
-private:
-	//not implemented
+  private:
+	// not implemented
 	TImageReaderMov(const TImageReaderMov &);
 	TImageReaderMov &operator=(const TImageReaderMov &src);
 
-public:
+  public:
 	TImageP load();
-	void load(const TRasterP &rasP, const TPoint &pos = TPoint(0, 0), int shrinkX = 1, int shrinkY = 1);
+	void load(const TRasterP &rasP, const TPoint &pos = TPoint(0, 0), int shrinkX = 1,
+			  int shrinkY = 1);
 	int m_frameIndex;
 
 	TDimension getSize() const { return m_lrm->getSize(); }
 	TRect getBBox() const { return m_lrm->getBBox(); }
 
-private:
+  private:
 	TLevelReaderMov *m_lrm;
 };
 
@@ -392,7 +396,8 @@ void copy(TRasterP rin, PixelXRGB *bufout, int lx, int ly, unsigned short rowbyt
 	rin->lock();
 	TRaster32P rin32 = rin;
 	assert(rin32);
-	int lineOffset = (rowbytes == 0) ? lx : rowbytes / sizeof(PixelXRGB); //in pixelsize, cioe 4 bytes
+	int lineOffset =
+		(rowbytes == 0) ? lx : rowbytes / sizeof(PixelXRGB); // in pixelsize, cioe 4 bytes
 
 	PixelXRGB *rowout = &(bufout[(ly - 1) * lineOffset]) /*-startOffset*/;
 	for (int y = 0; y < rin32->getLy(); y++) {
@@ -410,7 +415,7 @@ void copy(TRasterP rin, PixelXRGB *bufout, int lx, int ly, unsigned short rowbyt
 		rowout -= lineOffset;
 	}
 	rin->unlock();
-} //end function
+} // end function
 };
 //-----------------------------------------------------------
 /*
@@ -422,9 +427,9 @@ return new TWriterInfoMov();
 //-----------------------------------------------------------
 
 TWriterInfoMov::TWriterInfoMov(const TWriterInfoMov&src)
-               :TWriterInfo(src)
-               ,m_codecTable(src.m_codecTable)
-               ,m_qualityTable(src.m_qualityTable)
+			   :TWriterInfo(src)
+			   ,m_codecTable(src.m_codecTable)
+			   ,m_qualityTable(src.m_qualityTable)
 {
 }
 
@@ -437,8 +442,8 @@ return new TWriterInfoMov(*this);
 
 //-----------------------------------------------------------
 
-TWriterInfoMov::TWriterInfoMov() 
-               :TWriterInfo()
+TWriterInfoMov::TWriterInfoMov()
+			   :TWriterInfo()
 {
 if (QuickTimeStuff::instance()->getStatus()!=noErr)
   {
@@ -461,7 +466,7 @@ for (short i = 0; i < codecList->count; ++i)
   // byte [1..Len] data
   UCHAR len = codecNameSpec->typeName[0];
   string name((char*)&codecNameSpec->typeName[1], len);
-  
+
   codecNames.addItem(name, i);
 
   m_codecTable.insert(CodecTable::value_type(i, codecNameSpec->cType));
@@ -474,7 +479,7 @@ int q = 0;
 
 TIntEnumeration  codecQuality;
 
-codecQuality.addItem("min quality",q); 
+codecQuality.addItem("min quality",q);
 m_qualityTable.insert(QualityTable::value_type(q++, codecMinQuality));
 
 codecQuality.addItem("low quality",q);
@@ -545,7 +550,7 @@ void TLevelWriterMov::save(const TImageP &img, int frameIndex)
 
 	int lx = image->getRaster()->getLx();
 	int ly = image->getRaster()->getLy();
-	//void *buffer = image->getRaster()->getRawData();
+	// void *buffer = image->getRaster()->getRawData();
 
 	int pixSize = image->getRaster()->getPixelSize();
 	if (pixSize != 4)
@@ -562,15 +567,15 @@ const char* codec = toString(prop->m_codec.getValue()).c_str();
 const char* qual = toString(prop->m_quality.getValue()).c_str();
 */
 
-	//CodecType codecType;
-	//try {
-	//codecType = prop->getCurrentCodec();
+	// CodecType codecType;
+	// try {
+	// codecType = prop->getCurrentCodec();
 	//  } catch (...)//boost::bad_any_cast&)
 	//    {
 	//    throw TImageException(m_path, "bad codec name");
 	//    }
 	//
-	//CodecQ quality = prop->getCurrentQuality();
+	// CodecQ quality = prop->getCurrentQuality();
 	QDErr err;
 
 	if (m_videoTrack == 0) {
@@ -586,7 +591,7 @@ const char* qual = toString(prop->m_quality.getValue()).c_str();
 
 		QTDisposeAtomContainer(atoms);
 
-		//FSSpec fspec;
+		// FSSpec fspec;
 		Rect frame;
 		long max_compressed_size;
 
@@ -600,7 +605,8 @@ const char* qual = toString(prop->m_quality.getValue()).c_str();
 		TimeScale timeScale = ::frameRateToTimeScale(m_frameRate);
 		SetMovieTimeScale(m_movie, timeScale);
 
-		m_videoTrack = NewMovieTrack(m_movie, FixRatio((short)lx, 1), FixRatio((short)ly, 1), kNoVolume);
+		m_videoTrack =
+			NewMovieTrack(m_movie, FixRatio((short)lx, 1), FixRatio((short)ly, 1), kNoVolume);
 
 		if ((err = GetMoviesError() != noErr))
 			throw TImageException(getFilePath(), "can't create video track");
@@ -640,13 +646,13 @@ const char* qual = toString(prop->m_quality.getValue()).c_str();
 		//
 		//#endif
 
-		//m_compressedData = NewHandle(max_compressed_size);
+		// m_compressedData = NewHandle(max_compressed_size);
 
 		if ((err = MemError()) != noErr)
 			throw TImageException(getFilePath(), "can't allocate compressed data for movie");
 
-		//MoveHHi(m_compressedData);
-		//HLock(m_compressedData);
+		// MoveHHi(m_compressedData);
+		// HLock(m_compressedData);
 
 		if ((err = MemError()) != noErr)
 			throw TImageException(getFilePath(), "can't allocate img handle");
@@ -684,29 +690,22 @@ const char* qual = toString(prop->m_quality.getValue()).c_str();
 	compressed_data_ptr = StripAddress(*(m_compressedData));
 	copy(ras, buf, buf_lx, buf_ly);
 #else
-	//compressed_data_ptr  = *m_compressedData;
+	// compressed_data_ptr  = *m_compressedData;
 	copy(ras, buf, buf_lx, buf_ly, rowBytes);
 #endif
 
-//img_descr = (ImageDescriptionHandle)NewHandle(4);
+// img_descr = (ImageDescriptionHandle)NewHandle(4);
 
 #ifdef WIN32
-	if ((err = CompressImage(m_gworld->portPixMap,
-							 &frame,
-							 quality, compression,
-							 img_descr, compressed_data_ptr)) != noErr)
+	if ((err = CompressImage(m_gworld->portPixMap, &frame, quality, compression, img_descr,
+							 compressed_data_ptr)) != noErr)
 		throw TImageException(getFilePath(), "can't compress image");
 #else
 
 #if defined(HAS_QUICKDRAW)
 	PixMapHandle pixmapH = GetPortPixMap(m_gworld);
 
-	if ((err = SCCompressImage(
-			 m_ci,
-			 pixmapH,
-			 &frame,
-			 &img_descr,
-			 &compressedData)) != noErr)
+	if ((err = SCCompressImage(m_ci, pixmapH, &frame, &img_descr, &compressedData)) != noErr)
 		throw TImageException(getFilePath(), "can't compress image");
 #endif
 
@@ -719,10 +718,8 @@ const char* qual = toString(prop->m_quality.getValue()).c_str();
 #endif
 
 	TimeValue sampleTime;
-	if ((err = AddMediaSample(m_videoMedia, compressedData, 0,
-							  (*img_descr)->dataSize, 100,
-							  (SampleDescriptionHandle)img_descr,
-							  1, 0, &sampleTime)) != noErr)
+	if ((err = AddMediaSample(m_videoMedia, compressedData, 0, (*img_descr)->dataSize, 100,
+							  (SampleDescriptionHandle)img_descr, 1, 0, &sampleTime)) != noErr)
 		throw TImageException(getFilePath(), "can't add image to movie media");
 
 	if ((err = EndMediaEdits(m_videoMedia)) != noErr)
@@ -743,7 +740,8 @@ TLevelWriterMov::TLevelWriterMov(const TFilePath &path, TPropertyGroup *winfo)
 	: TLevelWriter(path, winfo), m_IOError(QTNoError), m_pixmap(0)
 	  //,m_compressedData(0)
 	  ,
-	  m_gworld(0), m_videoMedia(0), m_videoTrack(0), m_soundMedia(0), m_soundTrack(0), m_movie(0), m_firstFrame((std::numeric_limits<int>::max)())
+	  m_gworld(0), m_videoMedia(0), m_videoTrack(0), m_soundMedia(0), m_soundTrack(0), m_movie(0),
+	  m_firstFrame((std::numeric_limits<int>::max)())
 {
 
 	m_frameRate = 12.;
@@ -758,7 +756,8 @@ TLevelWriterMov::TLevelWriterMov(const TFilePath &path, TPropertyGroup *winfo)
 	QString qStr = QString::fromStdWString(m_path.getWideString());
 	const char *pStr = qStr.toUtf8().data();
 
-	//   std::cout << "TLevelWriterMov costruttore FP: " << toString(m_path.getWideString()) << std::endl;
+	//   std::cout << "TLevelWriterMov costruttore FP: " << toString(m_path.getWideString()) <<
+	//   std::endl;
 	//   std::cout << "TLevelWriterMov costruttore char: " << pStr << std::endl;
 
 	if (!getFSSpecFromPosixPath(pStr, &fspec, true)) {
@@ -781,34 +780,34 @@ TLevelWriterMov::TLevelWriterMov(const TFilePath &path, TPropertyGroup *winfo)
 //-----------------------------------------------------------
 
 #ifdef _DEBUG
-#define FailIf(cond, handler)                                      \
-	if (cond) {                                                    \
-		/*		DebugStr((ConstStr255Param)#cond " goto " #handler);*/ \
-		goto handler;                                              \
+#define FailIf(cond, handler)                                                                      \
+	if (cond) {                                                                                    \
+		/*		DebugStr((ConstStr255Param)#cond " goto " #handler);*/                                 \
+		goto handler;                                                                              \
 	}
 #else
-#define FailIf(cond, handler) \
-	if (cond) {               \
-		goto handler;         \
+#define FailIf(cond, handler)                                                                      \
+	if (cond) {                                                                                    \
+		goto handler;                                                                              \
 	}
 #endif
 
 #ifdef _DEBUG
-#define C(cond, action, handler)                                   \
-	if (cond) {                                                    \
-		/*		DebugStr((ConstStr255Param)#cond " goto " #handler);*/ \
-		{                                                          \
-			action;                                                \
-		}                                                          \
-		goto handler;                                              \
+#define C(cond, action, handler)                                                                   \
+	if (cond) {                                                                                    \
+		/*		DebugStr((ConstStr255Param)#cond " goto " #handler);*/                                 \
+		{                                                                                          \
+			action;                                                                                \
+		}                                                                                          \
+		goto handler;                                                                              \
 	}
 #else
-#define FailWithAction(cond, action, handler) \
-	if (cond) {                               \
-		{                                     \
-			action;                           \
-		}                                     \
-		goto handler;                         \
+#define FailWithAction(cond, action, handler)                                                      \
+	if (cond) {                                                                                    \
+		{                                                                                          \
+			action;                                                                                \
+		}                                                                                          \
+		goto handler;                                                                              \
 	}
 #endif
 
@@ -817,7 +816,7 @@ void TLevelWriterMov::saveSoundTrack(TSoundTrack *st)
 
 	OSErr myErr = noErr;
 
-	//int err;
+	// int err;
 
 	if (!st)
 		throw TException("null reference to soundtrack");
@@ -832,7 +831,8 @@ void TLevelWriterMov::saveSoundTrack(TSoundTrack *st)
 
 		FailIf(myErr != noErr, CompressErr);
 
-		m_soundMedia = NewTrackMedia(m_soundTrack, SoundMediaType, st->getSampleRate(), NULL, 0); //track->rate >> 16
+		m_soundMedia = NewTrackMedia(m_soundTrack, SoundMediaType, st->getSampleRate(), NULL,
+									 0); // track->rate >> 16
 		myErr = GetMoviesError();
 		FailIf(myErr != noErr, Exit);
 	}
@@ -862,9 +862,8 @@ void TLevelWriterMov::saveSoundTrack(TSoundTrack *st)
 	sourceInfo.buffer = (unsigned char *)st->getRawData();
 	sourceInfo.reserved = 0x0;
 
-	destInfo.flags = kNoSampleRateConversion | kNoSampleSizeConversion |
-					 kNoSampleFormatConversion | kNoChannelConversion |
-					 kNoDecompression | kNoVolumeConversion |
+	destInfo.flags = kNoSampleRateConversion | kNoSampleSizeConversion | kNoSampleFormatConversion |
+					 kNoChannelConversion | kNoDecompression | kNoVolumeConversion |
 					 kNoRealtimeProcessing;
 
 	destInfo.format = k16BitNativeEndianFormat;
@@ -881,7 +880,8 @@ void TLevelWriterMov::saveSoundTrack(TSoundTrack *st)
 	myErr = SoundConverterGetInfo(converter, siCompressionFactor, &compressionInfo);
 
 	myErr = SoundConverterGetInfo(converter, siCompressionFactor, &compressionInfo);
-	myErr = GetCompressionInfo(fixedCompression, sourceInfo.format, sourceInfo.numChannels, sourceInfo.sampleSize, &compressionInfo);
+	myErr = GetCompressionInfo(fixedCompression, sourceInfo.format, sourceInfo.numChannels,
+							   sourceInfo.sampleSize, &compressionInfo);
 	FailIf(myErr != noErr, ConverterErr);
 
 	compressionInfo.bytesPerFrame = compressionInfo.bytesPerPacket * destInfo.numChannels;
@@ -893,7 +893,8 @@ void TLevelWriterMov::saveSoundTrack(TSoundTrack *st)
 	//////////
 
 	// use the SoundDescription format 1 because it adds fields for data size information
-	// and is required by AddSoundDescriptionExtension if an extension is required for the compression format
+	// and is required by AddSoundDescriptionExtension if an extension is required for the
+	// compression format
 
 	mySampleDesc = (SoundDescriptionV1Handle)NewHandleClear(sizeof(SoundDescriptionV1));
 	FailWithAction(myErr != noErr, myErr = MemError(), Exit);
@@ -922,20 +923,16 @@ void TLevelWriterMov::saveSoundTrack(TSoundTrack *st)
 	//
 	//////////
 
-	/*if ((err = AddMediaSample(m_videoMedia, compressedData,  0, 
-	                        (*img_descr)->dataSize, 1, 
-												  (SampleDescriptionHandle)img_descr, 
+	/*if ((err = AddMediaSample(m_videoMedia, compressedData,  0,
+							(*img_descr)->dataSize, 1,
+												  (SampleDescriptionHandle)img_descr,
 													1, 0, 0))!=noErr)
   throw TImageException(getFilePath(), "can't add image to movie media");*/
 
-	myErr = AddMediaSample(m_soundMedia, myDestHandle,
-						   0,
-						   destInfo.sampleCount * compressionInfo.bytesPerFrame,
-						   1,
+	myErr = AddMediaSample(m_soundMedia, myDestHandle, 0,
+						   destInfo.sampleCount * compressionInfo.bytesPerFrame, 1,
 						   (SampleDescriptionHandle)mySampleDesc,
-						   destInfo.sampleCount * compressionInfo.samplesPerPacket,
-						   0,
-						   NULL);
+						   destInfo.sampleCount * compressionInfo.samplesPerPacket, 0, NULL);
 	FailIf(myErr != noErr, MediaErr);
 
 	myErr = EndMediaEdits(m_soundMedia);
@@ -985,33 +982,36 @@ TLevelWriterMov::~TLevelWriterMov()
 	OSStatus mderr;
 
 	if (m_videoTrack) {
-		//Insert the saved Frames into the track. Holes in the frames sequence will be intended as still
-		//frames.
+		// Insert the saved Frames into the track. Holes in the frames sequence will be intended as
+		// still
+		// frames.
 		TimeValue movieTimeScale = GetMovieTimeScale(m_movie);
 		int savedFramesSize = (int)m_savedFrames.size() - 1;
 
 		int i;
 		for (i = 0; i < savedFramesSize; ++i) {
 			TimeValue mediaPosition = m_savedFrames[i].second;
-			TimeValue trackPosition = ((m_savedFrames[i].first - m_firstFrame) * movieTimeScale) / m_frameRate;
+			TimeValue trackPosition =
+				((m_savedFrames[i].first - m_firstFrame) * movieTimeScale) / m_frameRate;
 
 			TimeValue duration = m_savedFrames[i + 1].first - m_savedFrames[i].first;
 			Fixed ratio = tround(fixed1 / (double)duration);
 
-			if ((err =
-					 InsertMediaIntoTrack(m_videoTrack, trackPosition, mediaPosition, 100, ratio)) != noErr)
+			if ((err = InsertMediaIntoTrack(m_videoTrack, trackPosition, mediaPosition, 100,
+											ratio)) != noErr)
 				throw TImageException(getFilePath(), "can't insert media into track");
 		}
 
 		if (savedFramesSize >= 0) {
 			TimeValue mediaPosition = m_savedFrames[i].second;
-			TimeValue trackPosition = ((m_savedFrames[i].first - m_firstFrame) * movieTimeScale) / m_frameRate;
+			TimeValue trackPosition =
+				((m_savedFrames[i].first - m_firstFrame) * movieTimeScale) / m_frameRate;
 
 			// The last frame has duration 1 (frame):
 			//   duration = 1  =>  ratio = fixed1
 
-			if ((err =
-					 InsertMediaIntoTrack(m_videoTrack, trackPosition, mediaPosition, 100, fixed1)) != noErr)
+			if ((err = InsertMediaIntoTrack(m_videoTrack, trackPosition, mediaPosition, 100,
+											fixed1)) != noErr)
 				throw TImageException(getFilePath(), "can't insert media into track");
 		}
 
@@ -1019,26 +1019,21 @@ TLevelWriterMov::~TLevelWriterMov()
 		if ((mderr = QTCopyMovieMetaData(m_movie, &metaDataRef)) != noErr)
 			throw TImageException(getFilePath(), "can't access metadata informations");
 
-		if ((mderr =
-				 QTMetaDataAddItem(
-					 metaDataRef,
-					 kQTMetaDataStorageFormatUserData,
-					 kQTMetaDataKeyFormatUserData,
-					 (const UInt8 *)firstFrameKey.c_str(),
-					 firstFrameKeySize,
-					 (const UInt8 *)(&m_firstFrame),
-					 sizeof(int),
-					 kQTMetaDataTypeUnsignedIntegerBE,
-					 0)) != noErr)
+		if ((mderr = QTMetaDataAddItem(metaDataRef, kQTMetaDataStorageFormatUserData,
+									   kQTMetaDataKeyFormatUserData,
+									   (const UInt8 *)firstFrameKey.c_str(), firstFrameKeySize,
+									   (const UInt8 *)(&m_firstFrame), sizeof(int),
+									   kQTMetaDataTypeUnsignedIntegerBE, 0)) != noErr)
 			throw TImageException(getFilePath(), "can't insert metadata informations");
 
 		QTMetaDataRelease(metaDataRef);
 	}
 
 	if (m_soundTrack) {
-		if (0 != (err = InsertMediaIntoTrack(m_soundTrack, 0, 0, GetMediaDuration(m_soundMedia), fixed1)))
+		if (0 != (err = InsertMediaIntoTrack(m_soundTrack, 0, 0, GetMediaDuration(m_soundMedia),
+											 fixed1)))
 			throw TImageException(getFilePath(), "can't insert sound into track");
-		//FailIf(err != noErr, MediaErr);
+		// FailIf(err != noErr, MediaErr);
 	}
 
 	short resId = movieInDataForkResID;
@@ -1058,12 +1053,12 @@ TLevelWriterMov::~TLevelWriterMov()
 
 	// get the file
 	FSSpec inFsSpec;
-	//NativePathNameToFSSpec(inputFileName, &inFsSpec, 0);
+	// NativePathNameToFSSpec(inputFileName, &inFsSpec, 0);
 	FSMakeFSSpec(0, 0, inputFileName, &inFsSpec);
 	getFSSpecFromPosixPath(pStr, &inFsSpec, false);
 
 	// Initialize Quicktime Movie Toolbox
-	//EnterMovies ();
+	// EnterMovies ();
 
 	// open the movie
 	short sResRefNum;
@@ -1083,22 +1078,21 @@ TLevelWriterMov::~TLevelWriterMov()
 	FSMakeFSSpec(0, 0, "C:\\temp\\out.3gp", &fspec);
 	getFSSpecFromPosixPath(pStr, &fspec, false);
 
-	//NativePathNameToFSSpec	("C:\\temp\\out.3gp", &fspec, kFullNativePath);
+	// NativePathNameToFSSpec	("C:\\temp\\out.3gp", &fspec, kFullNativePath);
 
 	long myFlags = 0L;
 	myFlags = createMovieFileDeleteCurFile; // |
-											//movieFileSpecValid | movieToFileOnlyExport;
+	// movieFileSpecValid | movieToFileOnlyExport;
 
-	err = ConvertMovieToFile(
-		movie,					// the movie to convert
-		0,						// all tracks in the movie
-		&fspec,					// the output file
-		FOUR_CHAR_CODE('3gpp'), // the output file type
-		FOUR_CHAR_CODE('TVOD'), // the output file creator
-		smSystemScript,			// the script
-		0,						// no resource ID to be returned
-		myFlags,				// export flags
-		m_myExporter);			// no specific exp
+	err = ConvertMovieToFile(movie,					 // the movie to convert
+							 0,						 // all tracks in the movie
+							 &fspec,				 // the output file
+							 FOUR_CHAR_CODE('3gpp'), // the output file type
+							 FOUR_CHAR_CODE('TVOD'), // the output file creator
+							 smSystemScript,		 // the script
+							 0,						 // no resource ID to be returned
+							 myFlags,				 // export flags
+							 m_myExporter);			 // no specific exp
 }
 if (sResRefNum)
 	CloseMovieFile(sResRefNum);
@@ -1128,10 +1122,11 @@ TImageWriterP TLevelWriterMov::getFrameWriter(TFrameId fid)
 //-----------------------------------------------------------
 
 TLevelReaderMov::TLevelReaderMov(const TFilePath &path)
-	: TLevelReader(path), m_IOError(QTNoError), m_track(0), m_movie(0), m_depth(0), m_readAsToonzOutput(false)
+	: TLevelReader(path), m_IOError(QTNoError), m_track(0), m_movie(0), m_depth(0),
+	  m_readAsToonzOutput(false)
 {
 
-	//std::cout << "MOVIE PATH : " << toString(path) << std::endl;
+	// std::cout << "MOVIE PATH : " << toString(path) << std::endl;
 	FSSpec fspec;
 	QDErr err;
 	Boolean dataRefWasChanged;
@@ -1144,7 +1139,7 @@ TLevelReaderMov::TLevelReaderMov(const TFilePath &path)
 	QString qStr = QString::fromStdWString(m_path.getWideString());
 	char *pStr = qStr.toUtf8().data();
 
-	//FSMakeFSSpec(0, 0,(const unsigned char*)pStr , &fspec);
+	// FSMakeFSSpec(0, 0,(const unsigned char*)pStr , &fspec);
 	getFSSpecFromPosixPath(pStr, &fspec, false);
 	pStr = 0;
 
@@ -1155,14 +1150,13 @@ TLevelReaderMov::TLevelReaderMov(const TFilePath &path)
 
 	m_resId = 0;
 	Str255 name;
-	err = NewMovieFromFile(&m_movie, m_refNum, &m_resId,
-						   name, fsRdPerm, &dataRefWasChanged);
+	err = NewMovieFromFile(&m_movie, m_refNum, &m_resId, name, fsRdPerm, &dataRefWasChanged);
 
 	int numTracks = GetMovieTrackCount(m_movie);
-	//assert(numTracks==1 || numTracks ==2);
+	// assert(numTracks==1 || numTracks ==2);
 	m_track = GetMovieIndTrackType(m_movie, 1, VideoMediaType, movieTrackMediaType);
 
-	//m_track=GetMovieTrack(m_movie,numTracks);
+	// m_track=GetMovieTrack(m_movie,numTracks);
 
 	ImageDescriptionHandle imageH;
 	imageH = (ImageDescriptionHandle)NewHandleClear(sizeof(ImageDescription));
@@ -1226,10 +1220,11 @@ TLevelP TLevelReaderMov::loadInfo()
 	TimeValue nextTime, currentTime;
 	currentTime = 0;
 	nextTime = 0;
-	//per il primo
+	// per il primo
 	int f = 0;
 	// io vorrei fare '|', ma sul manuale c'e' scritto '+'
-	GetMovieNextInterestingTime(m_movie, nextTimeMediaSample + nextTimeEdgeOK, 1, &mediaType, currentTime, 0, &nextTime, 0);
+	GetMovieNextInterestingTime(m_movie, nextTimeMediaSample + nextTimeEdgeOK, 1, &mediaType,
+								currentTime, 0, &nextTime, 0);
 	if (nextTime != -1) {
 		TFrameId frame(f + 1);
 		level->setFrame(frame, TImageP());
@@ -1238,7 +1233,8 @@ TLevelP TLevelReaderMov::loadInfo()
 	}
 	currentTime = nextTime;
 	while (nextTime != -1) {
-		GetMovieNextInterestingTime(m_movie, nextTimeMediaSample, 1, &mediaType, currentTime, 0, &nextTime, 0);
+		GetMovieNextInterestingTime(m_movie, nextTimeMediaSample, 1, &mediaType, currentTime, 0,
+									&nextTime, 0);
 		if (nextTime != -1) {
 			TFrameId frame(f + 1);
 			level->setFrame(frame, TImageP());
@@ -1260,34 +1256,25 @@ TLevelP TLevelReaderMov::loadToonzOutputFormatInfo()
 
 	OSStatus mderr;
 
-	//Retrieve the first frame of movie. This info has been put in a metadata atom.
+	// Retrieve the first frame of movie. This info has been put in a metadata atom.
 	QTMetaDataRef metaDataRef;
 	if ((mderr = QTCopyMovieMetaData(m_movie, &metaDataRef)) != noErr)
 		throw TImageException(m_path, "can't access metadata informations");
 
 	QTMetaDataItem firstFrameItem;
 
-	//Find the metadata atom
-	mderr = QTMetaDataGetNextItem(
-		metaDataRef,
-		kQTMetaDataStorageFormatUserData,
-		kQTMetaDataItemUninitialized,
-		kQTMetaDataKeyFormatUserData,
-		(const UInt8 *)firstFrameKey.c_str(),
-		firstFrameKeySize,
-		&firstFrameItem);
+	// Find the metadata atom
+	mderr = QTMetaDataGetNextItem(metaDataRef, kQTMetaDataStorageFormatUserData,
+								  kQTMetaDataItemUninitialized, kQTMetaDataKeyFormatUserData,
+								  (const UInt8 *)firstFrameKey.c_str(), firstFrameKeySize,
+								  &firstFrameItem);
 
-	//Try to read the value. If the atom was not found, just assume firstFrame = 0.
+	// Try to read the value. If the atom was not found, just assume firstFrame = 0.
 	int firstFrame = 0;
 	if (mderr == noErr) {
-		//The atom was found. Then, retrieve the value
-		if ((mderr =
-				 QTMetaDataGetItemValue(
-					 metaDataRef,
-					 firstFrameItem,
-					 (UInt8 *)(&firstFrame),
-					 sizeof(int),
-					 0) != noErr))
+		// The atom was found. Then, retrieve the value
+		if ((mderr = QTMetaDataGetItemValue(metaDataRef, firstFrameItem, (UInt8 *)(&firstFrame),
+											sizeof(int), 0) != noErr))
 			throw TImageException(m_path, "can't read metadata informations");
 	}
 
@@ -1305,13 +1292,15 @@ TLevelP TLevelReaderMov::loadToonzOutputFormatInfo()
 	std::vector<TimeValue> interestingTimeValues;
 
 	// io vorrei fare '|', ma sul manuale c'e' scritto '+'
-	GetMovieNextInterestingTime(m_movie, nextTimeMediaSample + nextTimeEdgeOK, 1, &mediaType, currentTime, 0, &nextTime, 0);
+	GetMovieNextInterestingTime(m_movie, nextTimeMediaSample + nextTimeEdgeOK, 1, &mediaType,
+								currentTime, 0, &nextTime, 0);
 	if (nextTime != -1) {
 		interestingTimeValues.push_back(nextTime);
 		currentTime = nextTime;
 	}
 	while (nextTime != -1) {
-		GetMovieNextInterestingTime(m_movie, nextTimeMediaSample, 1, &mediaType, currentTime, 0, &nextTime, 0);
+		GetMovieNextInterestingTime(m_movie, nextTimeMediaSample, 1, &mediaType, currentTime, 0,
+									&nextTime, 0);
 		if (nextTime != -1) {
 			interestingTimeValues.push_back(nextTime);
 			currentTime = nextTime;
@@ -1361,7 +1350,7 @@ inline void setMatteAndYMirror(const TRaster32P &ras)
 	ras->lock();
 	TPixel32 *upRow = ras->pixels();
 	TPixel32 *dwRow = ras->pixels(ras->getLy() - 1);
-	int hLy = (int)(ras->getLy() / 2. + 0.5); //piccola pessimizzazione...
+	int hLy = (int)(ras->getLy() / 2. + 0.5); // piccola pessimizzazione...
 	int wrap = ras->getWrap();
 	int lx = ras->getLx();
 	TPixel32 *upPix = 0;
@@ -1386,7 +1375,8 @@ inline void setMatteAndYMirror(const TRaster32P &ras)
 
 //------------------------------------------------
 
-void TLevelReaderMov::load(const TRasterP &rasP, int frameIndex, const TPoint &pos, int shrinkX, int shrinkY)
+void TLevelReaderMov::load(const TRasterP &rasP, int frameIndex, const TPoint &pos, int shrinkX,
+						   int shrinkY)
 {
 	GWorldPtr offscreenGWorld = 0;
 	{
@@ -1409,10 +1399,9 @@ void TLevelReaderMov::load(const TRasterP &rasP, int frameIndex, const TPoint &p
 #elif defined TNZ_MACHINE_CHANNEL_ORDER_MRGB
 		OSType pixelFormat = k32ARGBPixelFormat;
 #endif
-		//ras->lock();
-		err = QTNewGWorldFromPtr(
-			&offscreenGWorld, pixelFormat,
-			&rect, 0, 0, 0, ras->getRawData(), ras->getWrap() * 4);
+		// ras->lock();
+		err = QTNewGWorldFromPtr(&offscreenGWorld, pixelFormat, &rect, 0, 0, 0, ras->getRawData(),
+								 ras->getWrap() * 4);
 
 		if (err != noErr) {
 			m_IOError = QTUnableToCreateResource;
@@ -1481,7 +1470,7 @@ void TLevelReaderMov::load(const TRasterP &rasP, int frameIndex, const TPoint &p
 	return;
 
 error:
-//rasP->unlock();
+// rasP->unlock();
 #if defined(HAS_QUICKDRAW)
 	if (offscreenGWorld)
 		DisposeGWorld(offscreenGWorld);

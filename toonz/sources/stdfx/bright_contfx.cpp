@@ -12,9 +12,8 @@ class Bright_ContFx : public TStandardRasterFx
 	TDoubleParamP m_bright;
 	TDoubleParamP m_contrast;
 
-public:
-	Bright_ContFx()
-		: m_bright(0.0), m_contrast(0.0)
+  public:
+	Bright_ContFx() : m_bright(0.0), m_contrast(0.0)
 	{
 		bindParam(this, "brightness", m_bright);
 		bindParam(this, "contrast", m_contrast);

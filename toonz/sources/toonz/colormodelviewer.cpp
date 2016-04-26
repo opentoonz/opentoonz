@@ -76,9 +76,13 @@ TPaletteHandle *getPaletteHandle()
 		Set current level to TLevelP() and image to "0".
 */
 ColorModelViewer::ColorModelViewer(QWidget *parent)
-	: FlipBook(parent,
-			   QString(tr("Color Model")),
-			   FlipConsole::cFullConsole & (~(FlipConsole::eFilterRgbm | FlipConsole::cFilterGRgb | FlipConsole::eRate | FlipConsole::eSound | FlipConsole::eSaveImg | FlipConsole::eHisto | FlipConsole::eCompare | FlipConsole::eCustomize | FlipConsole::eSave | FlipConsole::eFilledRaster | FlipConsole::eDefineLoadBox | FlipConsole::eUseLoadBox | FlipConsole::eDefineSubCamera)),
+	: FlipBook(parent, QString(tr("Color Model")),
+			   FlipConsole::cFullConsole &
+				   (~(FlipConsole::eFilterRgbm | FlipConsole::cFilterGRgb | FlipConsole::eRate |
+					  FlipConsole::eSound | FlipConsole::eSaveImg | FlipConsole::eHisto |
+					  FlipConsole::eCompare | FlipConsole::eCustomize | FlipConsole::eSave |
+					  FlipConsole::eFilledRaster | FlipConsole::eDefineLoadBox |
+					  FlipConsole::eUseLoadBox | FlipConsole::eDefineSubCamera)),
 			   eDontKeepFilesOpened, true),
 	  m_mode(0), m_currentRefImgPath(TFilePath())
 {
@@ -86,10 +90,11 @@ ColorModelViewer::ColorModelViewer(QWidget *parent)
 
 	setToolCursor(m_imageViewer, ToolCursor::PickerCursor);
 
-	//Do not call the special procedure for flipbook closures...
+	// Do not call the special procedure for flipbook closures...
 	disconnect(parentWidget(), SIGNAL(closeButtonPressed()), this, SLOT(onCloseButtonPressed()));
 
-	bool ret = connect(this, SIGNAL(refImageNotFound()), this, SLOT(onRefImageNotFound()), Qt::QueuedConnection);
+	bool ret = connect(this, SIGNAL(refImageNotFound()), this, SLOT(onRefImageNotFound()),
+					   Qt::QueuedConnection);
 	assert(ret);
 
 	m_imageViewer->setMouseTracking(true);
@@ -124,7 +129,7 @@ void ColorModelViewer::dragEnterEvent(QDragEnterEvent *event)
 
 //-----------------------------------------------------------------------------
 /*! If event data has urls, convert each urls in path and set view and current
-    palette reference image (recall loadImage() and setLevel()).
+	palette reference image (recall loadImage() and setLevel()).
 */
 void ColorModelViewer::dropEvent(QDropEvent *event)
 {
@@ -152,7 +157,8 @@ void ColorModelViewer::loadImage(const TFilePath &fp)
 	if (!paletteHandle->getPalette())
 		return;
 
-	QString question(QObject::tr("The color model palette is different from the destination palette.\nWhat do you want to do? "));
+	QString question(QObject::tr("The color model palette is different from the destination "
+								 "palette.\nWhat do you want to do? "));
 	QList<QString> list;
 	list.append(QObject::tr("Overwrite the destination palette."));
 	list.append(QObject::tr("Keep the destination palette and apply it to the color model."));
@@ -208,7 +214,8 @@ void ColorModelViewer::contextMenuEvent(QContextMenuEvent *event)
 
 	menu.addSeparator();
 
-	QString shortcut = QString::fromStdString(CommandManager::instance()->getShortcutFromId(V_ZoomReset));
+	QString shortcut =
+		QString::fromStdString(CommandManager::instance()->getShortcutFromId(V_ZoomReset));
 	QAction *reset = menu.addAction(tr("Reset View") + "\t " + shortcut);
 	connect(reset, SIGNAL(triggered()), m_imageViewer, SLOT(resetView()));
 
@@ -258,8 +265,9 @@ void ColorModelViewer::pick(const QPoint &p)
 	StylePicker picker(img, currentPalette);
 
 	QPoint viewP = m_imageViewer->mapFrom(this, p);
-	TPointD pos = m_imageViewer->getViewAff().inv() * TPointD(viewP.x() - m_imageViewer->width() / 2,
-															  -viewP.y() + m_imageViewer->height() / 2);
+	TPointD pos =
+		m_imageViewer->getViewAff().inv() *
+		TPointD(viewP.x() - m_imageViewer->width() / 2, -viewP.y() + m_imageViewer->height() / 2);
 
 	/*---
 		カレントToolに合わせてPickモードを変更
@@ -270,7 +278,8 @@ void ColorModelViewer::pick(const QPoint &p)
 	if (styleIndex < 0)
 		return;
 
-	/*-- pickLineモードのとき、取得Styleが0の場合 / PurePaintの部分をクリックした場合 はカレントStyleを変えない --*/
+	/*-- pickLineモードのとき、取得Styleが0の場合 / PurePaintの部分をクリックした場合
+	 * はカレントStyleを変えない --*/
 	if (m_mode == 1) {
 		if (styleIndex == 0)
 			return;
@@ -320,7 +329,8 @@ void ColorModelViewer::showEvent(QShowEvent *e)
 	ToolHandle *toolHandle = TApp::instance()->getCurrentTool();
 	bool ret = connect(paletteHandle, SIGNAL(paletteSwitched()), this, SLOT(showCurrentImage()));
 	ret = ret && connect(paletteHandle, SIGNAL(paletteChanged()), this, SLOT(showCurrentImage()));
-	ret = ret && connect(paletteHandle, SIGNAL(colorStyleChanged()), this, SLOT(showCurrentImage()));
+	ret =
+		ret && connect(paletteHandle, SIGNAL(colorStyleChanged()), this, SLOT(showCurrentImage()));
 	/*- ツールのTypeに合わせてPickのタイプも変え、カーソルも切り替える -*/
 	ret = ret && connect(toolHandle, SIGNAL(toolSwitched()), this, SLOT(changePickType()));
 	ret = ret && connect(toolHandle, SIGNAL(toolChanged()), this, SLOT(changePickType()));
@@ -358,7 +368,7 @@ void ColorModelViewer::changePickType()
 		} else if (var == AREAS) {
 			m_mode = 0;
 			setToolCursor(m_imageViewer, ToolCursor::PickerCursorArea);
-		} else //Line & Areas
+		} else // Line & Areas
 		{
 			m_mode = 2;
 			setToolCursor(m_imageViewer, ToolCursor::PickerCursor);
@@ -368,7 +378,7 @@ void ColorModelViewer::changePickType()
 
 //-----------------------------------------------------------------------------
 /*! If current palette level exists reset image viewer and set current viewer
-    to refences image path level.
+	to refences image path level.
 */
 
 void ColorModelViewer::updateViewer()
@@ -563,4 +573,5 @@ void ColorModelViewer::onRefImageNotFound()
 
 //=============================================================================
 
-OpenFloatingPanel openColorModelCommand(MI_OpenColorModel, "ColorModel", QObject::tr("Color Model"));
+OpenFloatingPanel openColorModelCommand(MI_OpenColorModel, "ColorModel",
+										QObject::tr("Color Model"));

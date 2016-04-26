@@ -37,7 +37,8 @@ using namespace SkeletonSubtools;
 //------------------------------------------------------------
 
 DragCenterTool::DragCenterTool(SkeletonTool *tool)
-	: DragTool(tool), m_objId(TTool::getApplication()->getCurrentObject()->getObjectId()), m_frame(TTool::getApplication()->getCurrentFrame()->getFrame())
+	: DragTool(tool), m_objId(TTool::getApplication()->getCurrentObject()->getObjectId()),
+	  m_frame(TTool::getApplication()->getCurrentFrame()->getFrame())
 {
 }
 
@@ -48,7 +49,8 @@ void DragCenterTool::leftButtonDown(const TPointD &pos, const TMouseEvent &)
 	TXsheet *xsh = TTool::getApplication()->getCurrentXsheet()->getXsheet();
 	m_center = m_oldCenter = xsh->getCenter(m_objId, m_frame);
 	m_firstPos = pos;
-	m_affine = xsh->getPlacement(m_objId, m_frame).inv() * xsh->getParentPlacement(m_objId, m_frame);
+	m_affine =
+		xsh->getPlacement(m_objId, m_frame).inv() * xsh->getParentPlacement(m_objId, m_frame);
 	m_affine.a13 = m_affine.a23 = 0;
 }
 
@@ -65,7 +67,8 @@ void DragCenterTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &)
 
 void DragCenterTool::leftButtonUp(const TPointD &pos, const TMouseEvent &)
 {
-	UndoStageObjectCenterMove *undo = new UndoStageObjectCenterMove(m_objId, m_frame, m_oldCenter, m_center);
+	UndoStageObjectCenterMove *undo =
+		new UndoStageObjectCenterMove(m_objId, m_frame, m_oldCenter, m_center);
 	TTool::Application *app = TTool::getApplication();
 	undo->setObjectHandle(app->getCurrentObject());
 	undo->setXsheetHandle(app->getCurrentXsheet());
@@ -78,8 +81,7 @@ void DragCenterTool::leftButtonUp(const TPointD &pos, const TMouseEvent &)
 //
 //------------------------------------------------------------
 
-DragChannelTool::DragChannelTool(SkeletonTool *tool, TStageObject::Channel a0)
-	: DragTool(tool)
+DragChannelTool::DragChannelTool(SkeletonTool *tool, TStageObject::Channel a0) : DragTool(tool)
 {
 	TTool::Application *app = TTool::getApplication();
 	m_before.setFrameHandle(app->getCurrentFrame());
@@ -105,7 +107,8 @@ DragChannelTool::DragChannelTool(SkeletonTool *tool, TStageObject::Channel a0)
 
 //------------------------------------------------------------
 
-DragChannelTool::DragChannelTool(SkeletonTool *tool, TStageObject::Channel a0, TStageObject::Channel a1)
+DragChannelTool::DragChannelTool(SkeletonTool *tool, TStageObject::Channel a0,
+								 TStageObject::Channel a1)
 	: DragTool(tool)
 {
 	TTool::Application *app = TTool::getApplication();
@@ -147,7 +150,8 @@ TPointD DragChannelTool::getCenter()
 	TStageObjectId objId = app->getCurrentObject()->getObjectId();
 	int frame = app->getCurrentFrame()->getFrame();
 	TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
-	return xsh->getParentPlacement(objId, frame).inv() * xsh->getPlacement(objId, frame) * (Stage::inch * xsh->getCenter(objId, frame));
+	return xsh->getParentPlacement(objId, frame).inv() * xsh->getPlacement(objId, frame) *
+		   (Stage::inch * xsh->getCenter(objId, frame));
 }
 
 //------------------------------------------------------------
@@ -260,7 +264,8 @@ void DragRotationTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &)
 //------------------------------------------------------------
 
 ParentChangeTool::ParentChangeTool(SkeletonTool *tool, TTool::Viewer *viewer)
-	: DragTool(tool), m_viewer(viewer), m_index(-1), m_snapped(true), m_pixelSize(tool->getPixelSize())
+	: DragTool(tool), m_viewer(viewer), m_index(-1), m_snapped(true),
+	  m_pixelSize(tool->getPixelSize())
 {
 }
 
@@ -334,7 +339,7 @@ void ParentChangeTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e)
 		m_elements[col] = element;
 	}
 
-	//m_newParentCenter = TPointD();
+	// m_newParentCenter = TPointD();
 	m_firstWinPos = e.m_pos;
 
 	m_affine = xsh->getParentPlacement(id, currentFrame).inv();
@@ -437,7 +442,7 @@ namespace
 
 class Graph
 {
-public:
+  public:
 	typedef std::set<int> Links;
 	typedef Links::const_iterator LinkIter;
 	typedef std::map<int, Links> Nodes;
@@ -485,10 +490,7 @@ public:
 
 	bool isLeave(int id) const { return m_leaves.count(id); }
 
-	enum LeaveType { PINNED = 0x1,
-					 TEMP = 0x2,
-					 CHILD_END = 0x4,
-					 PARENT_END = 0x8 };
+	enum LeaveType { PINNED = 0x1, TEMP = 0x2, CHILD_END = 0x4, PARENT_END = 0x8 };
 	int getLeaveType(int id) const
 	{
 		LeaveIter it = m_leaves.find(id);
@@ -510,7 +512,7 @@ public:
 		m_leaves.clear();
 	}
 
-private:
+  private:
 	Nodes m_nodes;
 	std::map<int, int> m_leaves;
 };
@@ -577,14 +579,16 @@ bool addToActiveChain(Graph &tree, const Skeleton::Bone *bone, const Skeleton::B
 			if (bone->getChild(i) != prevBone)
 				locked |= hasPinned(bone->getChild(i), bone);
 		insert = !locked;
-	} else // add parent if free and grand-parent or some other child has been added; don't add pinned parent
+	} else // add parent if free and grand-parent or some other child has been added; don't add
+		   // pinned parent
 		insert = isFree && propagate;
 
 	if (insert) {
 		int index = tree.touch(bone->getColumnIndex());
 		if (!isFree)
 			tree.setLeaveType(index, isTempPinned ? 2 : 1);
-		else if (!isChild && bone->getParent() && !tree.isNode(bone->getParent()->getColumnIndex())) {
+		else if (!isChild && bone->getParent() &&
+				 !tree.isNode(bone->getParent()->getColumnIndex())) {
 			// the parent has not been added. it was locked => this node act as pinned
 			tree.setLeaveType(index, 2);
 		}
@@ -621,12 +625,18 @@ class IKToolUndo : public TUndo
 	TAffine m_oldFootPlacement, m_newFootPlacement;
 	int m_frame;
 
-public:
+  public:
 	IKToolUndo() {}
 
 	void setFirstFootId(const TStageObjectId &firstFootId) { m_firstFootId = firstFootId; }
-	void setFirstFootOldPlacement(const TAffine &oldPlacement) { m_oldFootPlacement = oldPlacement; }
-	void setFirstFootNewPlacement(const TAffine &newPlacement) { m_newFootPlacement = newPlacement; }
+	void setFirstFootOldPlacement(const TAffine &oldPlacement)
+	{
+		m_oldFootPlacement = oldPlacement;
+	}
+	void setFirstFootNewPlacement(const TAffine &newPlacement)
+	{
+		m_newFootPlacement = newPlacement;
+	}
 
 	void addNode(const TStageObjectId &id)
 	{
@@ -644,7 +654,8 @@ public:
 		TXsheet *xsh = TTool::getApplication()->getCurrentXsheet()->getXsheet();
 		m_frame = TTool::getApplication()->getCurrentFrame()->getFrame();
 		for (int i = 0; i < (int)m_nodes.size(); i++) {
-			TDoubleParam *param = xsh->getStageObject(m_nodes[i].m_id)->getParam(TStageObject::T_Angle);
+			TDoubleParam *param =
+				xsh->getStageObject(m_nodes[i].m_id)->getParam(TStageObject::T_Angle);
 			m_nodes[i].m_newAngle = param->getValue(m_frame);
 		}
 	}
@@ -666,7 +677,8 @@ public:
 	{
 		TXsheet *xsh = TTool::getApplication()->getCurrentXsheet()->getXsheet();
 		for (int i = 0; i < (int)m_nodes.size(); i++) {
-			TDoubleParam *param = xsh->getStageObject(m_nodes[i].m_id)->getParam(TStageObject::T_Angle);
+			TDoubleParam *param =
+				xsh->getStageObject(m_nodes[i].m_id)->getParam(TStageObject::T_Angle);
 			if (m_nodes[i].m_wasKeyframe)
 				param->setValue(m_frame, m_nodes[i].m_oldAngle);
 			else
@@ -682,7 +694,8 @@ public:
 	{
 		TXsheet *xsh = TTool::getApplication()->getCurrentXsheet()->getXsheet();
 		for (int i = 0; i < (int)m_nodes.size(); i++) {
-			TDoubleParam *param = xsh->getStageObject(m_nodes[i].m_id)->getParam(TStageObject::T_Angle);
+			TDoubleParam *param =
+				xsh->getStageObject(m_nodes[i].m_id)->getParam(TStageObject::T_Angle);
 			param->setValue(m_frame, m_nodes[i].m_newAngle);
 		}
 		if (m_firstFootId.isColumn())
@@ -703,7 +716,8 @@ public:
 //------------------------------------------------------------
 
 IKTool::IKTool(SkeletonTool *tool, TTool::Viewer *viewer, Skeleton *skeleton, int columnIndex)
-	: DragTool(tool), m_viewer(viewer), m_skeleton(skeleton), m_pos(), m_columnIndex(columnIndex), m_valid(false), m_IHateIK(false), m_foot(0), m_firstFoot(0), m_undo(0)
+	: DragTool(tool), m_viewer(viewer), m_skeleton(skeleton), m_pos(), m_columnIndex(columnIndex),
+	  m_valid(false), m_IHateIK(false), m_foot(0), m_firstFoot(0), m_undo(0)
 {
 }
 
@@ -825,7 +839,8 @@ void IKTool::initEngine(const TPointD &pos)
 				Skeleton::Bone *next = m_skeleton->getBoneByColumnIndex(*it++);
 				for (; it != links.end(); ++it)
 					stack.push_back(std::make_pair(*it, prev));
-				if (links.size() > 1 || (prev && next && (prev->getParent() == bone && next->getParent() == bone))) {
+				if (links.size() > 1 ||
+					(prev && next && (prev->getParent() == bone && next->getParent() == bone))) {
 					bone = next;
 				} else {
 					m_joints.push_back(Joint(bone, prev, sign));
@@ -835,7 +850,7 @@ void IKTool::initEngine(const TPointD &pos)
 			}
 		}
 	}
-	//if(m_joints.size()>=2 && m_joints[1].m_prevBone == m_joints[0].m_bone)
+	// if(m_joints.size()>=2 && m_joints[1].m_prevBone == m_joints[0].m_bone)
 	//  m_joints[0].m_sign = m_joints[1].m_sign;
 
 	// feed the engine
@@ -935,7 +950,8 @@ void IKTool::storeOldValues()
 {
 	for (int i = 0; i < (int)m_joints.size(); i++) {
 
-		TStageObjectValues values(m_joints[i].m_bone->getStageObject()->getId(), TStageObject::T_Angle);
+		TStageObjectValues values(m_joints[i].m_bone->getStageObject()->getId(),
+								  TStageObject::T_Angle);
 		if (getTool()->isGlobalKeyframesEnabled()) {
 			values.add(TStageObject::T_X);
 			values.add(TStageObject::T_Y);
@@ -1084,12 +1100,8 @@ class ChangeDrawingUndo : public TUndo
 	int m_row, m_col;
 	TFrameId m_oldFid, m_newFid;
 
-public:
-	ChangeDrawingUndo(int row, int col)
-		: m_row(row), m_col(col)
-	{
-		m_oldFid = getDrawing();
-	}
+  public:
+	ChangeDrawingUndo(int row, int col) : m_row(row), m_col(col) { m_oldFid = getDrawing(); }
 
 	TFrameId getDrawing() const
 	{
@@ -1114,10 +1126,7 @@ public:
 		app->getCurrentXsheet()->notifyXsheetChanged();
 	}
 
-	void onAdd()
-	{
-		m_newFid = getDrawing();
-	}
+	void onAdd() { m_newFid = getDrawing(); }
 	void undo() const { setDrawing(m_oldFid); }
 	void redo() const { setDrawing(m_newFid); }
 	int getSize() const { return sizeof(*this); }
@@ -1211,8 +1220,7 @@ bool ChangeDrawingTool::changeDrawing(int delta)
 
 //============================================================
 
-CommandHandler::CommandHandler()
-	: m_skeleton(0), m_tempPinnedSet(0)
+CommandHandler::CommandHandler() : m_skeleton(0), m_tempPinnedSet(0)
 {
 }
 

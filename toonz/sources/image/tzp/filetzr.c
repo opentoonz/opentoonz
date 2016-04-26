@@ -111,94 +111,94 @@ typedef enum
 
 #define TAGS_BUFLEN 65536
 
-#define READ_BYTES_OR_ERROR(buf, n, file)       \
-	{                                           \
-		if (fread((buf), 1, (n), (file)) < (n)) \
-			goto error;                         \
+#define READ_BYTES_OR_ERROR(buf, n, file)                                                          \
+	{                                                                                              \
+		if (fread((buf), 1, (n), (file)) < (n))                                                    \
+			goto error;                                                                            \
 	}
 
-#define BYTES_TO_FLOAT(b, f)       \
-	{                              \
-		UCHAR *fr = (b);           \
-		UCHAR *to = (UCHAR *)&(f); \
-		if (TNZ_LITTLE_ENDIAN) {   \
-			to[0] = fr[3];         \
-			to[1] = fr[2];         \
-			to[2] = fr[1];         \
-			to[3] = fr[0];         \
-		} else {                   \
-			to[0] = fr[0];         \
-			to[1] = fr[1];         \
-			to[2] = fr[2];         \
-			to[3] = fr[3];         \
-		}                          \
+#define BYTES_TO_FLOAT(b, f)                                                                       \
+	{                                                                                              \
+		UCHAR *fr = (b);                                                                           \
+		UCHAR *to = (UCHAR *)&(f);                                                                 \
+		if (TNZ_LITTLE_ENDIAN) {                                                                   \
+			to[0] = fr[3];                                                                         \
+			to[1] = fr[2];                                                                         \
+			to[2] = fr[1];                                                                         \
+			to[3] = fr[0];                                                                         \
+		} else {                                                                                   \
+			to[0] = fr[0];                                                                         \
+			to[1] = fr[1];                                                                         \
+			to[2] = fr[2];                                                                         \
+			to[3] = fr[3];                                                                         \
+		}                                                                                          \
 	}
 
-#define FLOAT_TO_BYTES(f, b)       \
-	{                              \
-		UCHAR *fr = (UCHAR *)&(f); \
-		UCHAR *to = (b);           \
-		if (TNZ_LITTLE_ENDIAN) {   \
-			to[0] = fr[3];         \
-			to[1] = fr[2];         \
-			to[2] = fr[1];         \
-			to[3] = fr[0];         \
-		} else {                   \
-			to[0] = fr[0];         \
-			to[1] = fr[1];         \
-			to[2] = fr[2];         \
-			to[3] = fr[3];         \
-		}                          \
+#define FLOAT_TO_BYTES(f, b)                                                                       \
+	{                                                                                              \
+		UCHAR *fr = (UCHAR *)&(f);                                                                 \
+		UCHAR *to = (b);                                                                           \
+		if (TNZ_LITTLE_ENDIAN) {                                                                   \
+			to[0] = fr[3];                                                                         \
+			to[1] = fr[2];                                                                         \
+			to[2] = fr[1];                                                                         \
+			to[3] = fr[0];                                                                         \
+		} else {                                                                                   \
+			to[0] = fr[0];                                                                         \
+			to[1] = fr[1];                                                                         \
+			to[2] = fr[2];                                                                         \
+			to[3] = fr[3];                                                                         \
+		}                                                                                          \
 	}
 
-#define BYTES_TO_DOUBLE(b, d)      \
-	{                              \
-		UCHAR *fr = (b);           \
-		UCHAR *to = (UCHAR *)&(d); \
-		if (TNZ_LITTLE_ENDIAN) {   \
-			to[0] = fr[7];         \
-			to[1] = fr[6];         \
-			to[2] = fr[5];         \
-			to[3] = fr[4];         \
-			to[4] = fr[3];         \
-			to[5] = fr[2];         \
-			to[6] = fr[1];         \
-			to[7] = fr[0];         \
-		} else {                   \
-			to[0] = fr[0];         \
-			to[1] = fr[1];         \
-			to[2] = fr[2];         \
-			to[3] = fr[3];         \
-			to[4] = fr[4];         \
-			to[5] = fr[5];         \
-			to[6] = fr[6];         \
-			to[7] = fr[7];         \
-		}                          \
+#define BYTES_TO_DOUBLE(b, d)                                                                      \
+	{                                                                                              \
+		UCHAR *fr = (b);                                                                           \
+		UCHAR *to = (UCHAR *)&(d);                                                                 \
+		if (TNZ_LITTLE_ENDIAN) {                                                                   \
+			to[0] = fr[7];                                                                         \
+			to[1] = fr[6];                                                                         \
+			to[2] = fr[5];                                                                         \
+			to[3] = fr[4];                                                                         \
+			to[4] = fr[3];                                                                         \
+			to[5] = fr[2];                                                                         \
+			to[6] = fr[1];                                                                         \
+			to[7] = fr[0];                                                                         \
+		} else {                                                                                   \
+			to[0] = fr[0];                                                                         \
+			to[1] = fr[1];                                                                         \
+			to[2] = fr[2];                                                                         \
+			to[3] = fr[3];                                                                         \
+			to[4] = fr[4];                                                                         \
+			to[5] = fr[5];                                                                         \
+			to[6] = fr[6];                                                                         \
+			to[7] = fr[7];                                                                         \
+		}                                                                                          \
 	}
 
-#define DOUBLE_TO_BYTES(d, b)      \
-	{                              \
-		UCHAR *fr = (UCHAR *)&(d); \
-		UCHAR *to = (b);           \
-		if (TNZ_LITTLE_ENDIAN) {   \
-			to[0] = fr[7];         \
-			to[1] = fr[6];         \
-			to[2] = fr[5];         \
-			to[3] = fr[4];         \
-			to[4] = fr[3];         \
-			to[5] = fr[2];         \
-			to[6] = fr[1];         \
-			to[7] = fr[0];         \
-		} else {                   \
-			to[0] = fr[0];         \
-			to[1] = fr[1];         \
-			to[2] = fr[2];         \
-			to[3] = fr[3];         \
-			to[4] = fr[4];         \
-			to[5] = fr[5];         \
-			to[6] = fr[6];         \
-			to[7] = fr[7];         \
-		}                          \
+#define DOUBLE_TO_BYTES(d, b)                                                                      \
+	{                                                                                              \
+		UCHAR *fr = (UCHAR *)&(d);                                                                 \
+		UCHAR *to = (b);                                                                           \
+		if (TNZ_LITTLE_ENDIAN) {                                                                   \
+			to[0] = fr[7];                                                                         \
+			to[1] = fr[6];                                                                         \
+			to[2] = fr[5];                                                                         \
+			to[3] = fr[4];                                                                         \
+			to[4] = fr[3];                                                                         \
+			to[5] = fr[2];                                                                         \
+			to[6] = fr[1];                                                                         \
+			to[7] = fr[0];                                                                         \
+		} else {                                                                                   \
+			to[0] = fr[0];                                                                         \
+			to[1] = fr[1];                                                                         \
+			to[2] = fr[2];                                                                         \
+			to[3] = fr[3];                                                                         \
+			to[4] = fr[4];                                                                         \
+			to[5] = fr[5];                                                                         \
+			to[6] = fr[6];                                                                         \
+			to[7] = fr[7];                                                                         \
+		}                                                                                          \
 	}
 
 static void *Tzr_buffer;
@@ -206,10 +206,10 @@ static int   Tzr_buffer_bytes;
 
 static int Next_img_read_tzr_cmapped = FALSE;
 static int Read_cmapped = FALSE;
-#define SET_READ_CMAPPED                          \
-	{                                             \
-		Read_cmapped = Next_img_read_tzr_cmapped; \
-		Next_img_read_tzr_cmapped = FALSE;        \
+#define SET_READ_CMAPPED                                                                           \
+	{                                                                                              \
+		Read_cmapped = Next_img_read_tzr_cmapped;                                                  \
+		Next_img_read_tzr_cmapped = FALSE;                                                         \
 	}
 
 /*---------------------------------------------------------------------------*/
@@ -234,14 +234,14 @@ int tzr_safe_bytes_for_2_1_1_pixels (int n_pix)
 
   /*---------------------------------------------------------------------------*/
 
-#define GET_INVAL      \
-	{                  \
-		inval = *in++; \
-		remain--;      \
+#define GET_INVAL                                                                                  \
+	{                                                                                              \
+		inval = *in++;                                                                             \
+		remain--;                                                                                  \
 	}
-#define PUT_OUTVAL              \
-	{                           \
-		*out++ = (UCHAR)outval; \
+#define PUT_OUTVAL                                                                                 \
+	{                                                                                              \
+		*out++ = (UCHAR)outval;                                                                    \
 	}
 
 /*---------------------------------------------------------------------------*/
@@ -883,9 +883,9 @@ static TBOOL write_tzr_2_1_1 (char *filename, FILE *file, IMAGE *image)
 		int i;
 		enc = tzr_encode_cm24_2_1_1(line, lx, tzr_buf + enclen_bytes);
 		/*for (i=0; i<enc; i+=4)
-    printf("*** %x %x %x %x\n", tzr_buf[enclen_bytes+i],
-                                tzr_buf[enclen_bytes+i+1], 
-				tzr_buf[enclen_bytes+i+2], 
+	printf("*** %x %x %x %x\n", tzr_buf[enclen_bytes+i],
+								tzr_buf[enclen_bytes+i+1],
+				tzr_buf[enclen_bytes+i+2],
 				tzr_buf[enclen_bytes+i+3]); */
 		if (enclen_bytes == 2) {
 			tzr_buf[0] = (enc >> 8) & 0xFF;
@@ -1026,8 +1026,7 @@ count_out_and_start_from_in0:
 start_from_in0:
 	if (GET_IN0 == 0xF) {
 		switch (in1) {
-			CASE 0x0 :
-				*out++ = outval | maxtone;
+			CASE 0x0 : *out++ = outval | maxtone;
 			goto start_from_in0;
 
 			CASE 0x1 : count = GET_IN0;
@@ -1065,8 +1064,7 @@ start_from_in0:
 
 			CASE 0xF : switch (GET_IN0)
 			{
-				CASE 0xE : CASE 0xF :
-							   *out++ = outval | in1;
+				CASE 0xE : CASE 0xF : *out++ = outval | in1;
 			DEFAULT:
 				goto rle_decoding_error;
 			}
@@ -1089,8 +1087,7 @@ count_out_and_start_from_in1:
 start_from_in1:
 	if (in1 == 0xF) {
 		switch (GET_IN0) {
-			CASE 0x0 :
-				*out++ = outval | maxtone;
+			CASE 0x0 : *out++ = outval | maxtone;
 			goto start_from_in1;
 
 			CASE 0x1 : count = in1;
@@ -1131,8 +1128,7 @@ start_from_in1:
 
 			CASE 0xF : switch (in1)
 			{
-				CASE 0xE : CASE 0xF :
-							   *out++ = outval | *in++ >> 4;
+				CASE 0xE : CASE 0xF : *out++ = outval | *in++ >> 4;
 			DEFAULT:
 				goto rle_decoding_error;
 			}
@@ -1190,8 +1186,7 @@ start_from_in0:
 	if (inval == 0xFF) {
 		GET_IN0;
 		switch (in0) {
-			CASE 0x0 :
-				*out++ = outval | maxtone;
+			CASE 0x0 : *out++ = outval | maxtone;
 			goto start_from_in1;
 
 			CASE 0x1 : count = in1;
@@ -1258,8 +1253,7 @@ start_from_in1:
 	GET_IN0;
 	if (in0 == 0xF && aux == 0xF) {
 		switch (in1) {
-			CASE 0x0 :
-				*out++ = outval | maxtone;
+			CASE 0x0 : *out++ = outval | maxtone;
 			goto start_from_in0;
 
 			CASE 0x1 : GET_IN0;
@@ -1700,8 +1694,8 @@ static TBOOL read_tzr_header (char *filename, FILE *file, IMAGE *image,
 			{
 				CASE 1 : *tzr_type = 0x01010100;
 			DEFAULT:
-				tmsg_error("unsupported file type (%d %d %d) in %s",
-						   buf[4 + 0], buf[4 + 1], buf[4 + 2], filename);
+				tmsg_error("unsupported file type (%d %d %d) in %s", buf[4 + 0], buf[4 + 1],
+						   buf[4 + 2], filename);
 				goto error;
 			}
 		}
@@ -1711,23 +1705,21 @@ static TBOOL read_tzr_header (char *filename, FILE *file, IMAGE *image,
 			{
 				CASE 1 : *tzr_type = 0x02010100;
 			DEFAULT:
-				tmsg_error("unsupported file type (%d %d %d) in %s",
-						   buf[4 + 0], buf[4 + 1], buf[4 + 2], filename);
+				tmsg_error("unsupported file type (%d %d %d) in %s", buf[4 + 0], buf[4 + 1],
+						   buf[4 + 2], filename);
 				goto error;
 			}
 		DEFAULT:
-			tmsg_error("unsupported file type (%d %d) in %s",
-					   buf[4 + 0], buf[4 + 1], filename);
+			tmsg_error("unsupported file type (%d %d) in %s", buf[4 + 0], buf[4 + 1], filename);
 			goto error;
 		}
 	DEFAULT:
-		tmsg_error("unsupported file type (%d) in %s",
-				   buf[4 + 0], filename);
+		tmsg_error("unsupported file type (%d) in %s", buf[4 + 0], filename);
 		goto error;
 	}
 	switch (*tzr_type) {
-		CASE 0x01010100 : __OR 0x02010100 : READ_BYTES_OR_ERROR(buf, 9, file)
-												lx = buf[0] << 16 | buf[1] << 8 | buf[2];
+		CASE 0x01010100 : __OR 0x02010100 : READ_BYTES_OR_ERROR(buf, 9, file) lx =
+												buf[0] << 16 | buf[1] << 8 | buf[2];
 		ly = buf[3] << 16 | buf[4] << 8 | buf[5];
 		img_offs = buf[6] << 16 | buf[7] << 8 | buf[8];
 		if (*tzr_type == 0x01010100) {
@@ -1815,17 +1807,18 @@ IMAGE *img_read_tzr (char *filename)
 	image = new_img();
 	if (!image)
 		goto error;
-	if (!read_tzr_header(filename, file, image, &tzr_type, &img_offs,
-						 Read_cmapped, TRUE))
+	if (!read_tzr_header(filename, file, image, &tzr_type, &img_offs, Read_cmapped, TRUE))
 		goto error;
 	lx = image->pixmap.xsize;
 	ly = image->pixmap.ysize;
 	if (!allocate_pixmap(image, lx, ly))
 		goto error;
 	switch (tzr_type) {
-		CASE 0x01010100 : if (!read_tzr_1_1_1(filename, file, image, img_offs, Read_cmapped)) goto error;
+		CASE 0x01010100
+			: if (!read_tzr_1_1_1(filename, file, image, img_offs, Read_cmapped)) goto error;
 
-		CASE 0x02010100 : if (!read_tzr_2_1_1(filename, file, image, img_offs, Read_cmapped)) goto error;
+		CASE 0x02010100
+			: if (!read_tzr_2_1_1(filename, file, image, img_offs, Read_cmapped)) goto error;
 
 	DEFAULT:
 		goto error;
@@ -1861,8 +1854,7 @@ IMAGE *img_read_region_tzr (char *filename, int x0, int y0,
 	image = new_img();
 	if (!image)
 		goto error;
-	if (!read_tzr_header(filename, file, image, &tzr_type, &img_offs,
-						 Read_cmapped, TRUE))
+	if (!read_tzr_header(filename, file, image, &tzr_type, &img_offs, Read_cmapped, TRUE))
 		goto error;
 	full_lx = image->pixmap.xsize;
 	full_ly = image->pixmap.ysize;
@@ -1888,11 +1880,11 @@ IMAGE *img_read_region_tzr (char *filename, int x0, int y0,
 	getInfoRegion(&region, x0, y0, x1, y1, step, full_lx, full_ly);
 
 	switch (tzr_type) {
-		CASE 0x01010100 : if (!read_region_tzr_1_1_1(filename, file, image, img_offs,
-													 Read_cmapped, &region)) goto error;
+		CASE 0x01010100 : if (!read_region_tzr_1_1_1(filename, file, image, img_offs, Read_cmapped,
+													 &region)) goto error;
 
-		CASE 0x02010100 : if (!read_region_tzr_2_1_1(filename, file, image, img_offs,
-													 Read_cmapped, &region)) goto error;
+		CASE 0x02010100 : if (!read_region_tzr_2_1_1(filename, file, image, img_offs, Read_cmapped,
+													 &region)) goto error;
 
 	DEFAULT:
 		goto error;
@@ -1923,8 +1915,7 @@ IMAGE *img_read_tzr_info (char *filename)
 	image = new_img();
 	if (!image)
 		goto error;
-	if (!read_tzr_header(filename, file, image, &tzr_type, &img_offs,
-						 Read_cmapped, TRUE))
+	if (!read_tzr_header(filename, file, image, &tzr_type, &img_offs, Read_cmapped, TRUE))
 		goto error;
 	fclose(file);
 	return image;

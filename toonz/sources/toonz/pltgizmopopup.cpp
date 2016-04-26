@@ -34,7 +34,8 @@ using namespace DVGui;
 
 //-----------------------------------------------------------------------------
 
-void getStyles(std::vector<TColorStyle *> &styles, const TStyleSelection &selection, TPaletteP palette)
+void getStyles(std::vector<TColorStyle *> &styles, const TStyleSelection &selection,
+			   TPaletteP palette)
 {
 	styles.clear();
 	int pageIndex = selection.getPageIndex();
@@ -81,26 +82,21 @@ class GizmoUndo : public TUndo
 	std::vector<bool> m_oldEditedFlags, m_newEditedFlags;
 	TPaletteP m_palette;
 
-public:
+  public:
 	GizmoUndo(const TStyleSelection &selection)
 		: m_selection(selection), m_palette(selection.getPalette())
 	{
 		getColors(m_oldColors, m_oldEditedFlags);
 	}
 
-	~GizmoUndo()
-	{
-	}
+	~GizmoUndo() {}
 
 	int getSize() const
 	{
 		return sizeof *this + (m_oldColors.size() + m_newColors.size()) * sizeof(TPixel32);
 	}
 
-	void onAdd()
-	{
-		getColors(m_newColors, m_newEditedFlags);
-	}
+	void onAdd() { getColors(m_newColors, m_newEditedFlags); }
 
 	void getColors(std::vector<TPixel32> &colors, std::vector<bool> &flags) const
 	{
@@ -128,21 +124,17 @@ public:
 			styles[i]->invalidateIcon();
 		}
 		/*-- m_palette が currentPaletteでない可能性があるため、DirtyFlagは立てない --*/
-		TApp::instance()->getPaletteController()->getCurrentPalette()->notifyColorStyleChanged(false, false);
+		TApp::instance()->getPaletteController()->getCurrentPalette()->notifyColorStyleChanged(
+			false, false);
 	}
 
-	void undo() const
-	{
-		setColors(m_oldColors, m_oldEditedFlags);
-	}
-	void redo() const
-	{
-		setColors(m_newColors, m_newEditedFlags);
-	}
+	void undo() const { setColors(m_oldColors, m_oldEditedFlags); }
+	void redo() const { setColors(m_newColors, m_newEditedFlags); }
 
 	QString getHistoryString()
 	{
-		QString str = QObject::tr("Palette Gizmo  %1").arg(QString::fromStdWString(m_palette->getPaletteName()));
+		QString str = QObject::tr("Palette Gizmo  %1")
+						  .arg(QString::fromStdWString(m_palette->getPaletteName()));
 
 		TPalette::Page *page = m_palette->getPage(m_selection.getPageIndex());
 		if (!page)
@@ -156,10 +148,7 @@ public:
 		str.append(")");
 		return str;
 	}
-	int getHistoryType()
-	{
-		return HistoryType::Palette;
-	}
+	int getHistoryType() { return HistoryType::Palette; }
 };
 
 //=============================================================================
@@ -175,7 +164,7 @@ class TransparencyModifier
 {
 	int m_delta;
 
-public:
+  public:
 	TransparencyModifier(int delta) : m_delta(delta) {}
 	TPixel32 f(TPixel32 color) const
 	{
@@ -197,7 +186,7 @@ class TransparencyShifter
 {
 	int m_delta;
 
-public:
+  public:
 	TransparencyShifter(int delta) : m_delta(delta) {}
 	TPixel32 f(TPixel32 color) const
 	{
@@ -220,7 +209,7 @@ class HueModifier
 {
 	int m_delta;
 
-public:
+  public:
 	HueModifier(int delta) : m_delta(delta) {}
 	TPixel32 f(TPixel32 color) const
 	{
@@ -240,7 +229,7 @@ class HueShifter
 {
 	int m_delta;
 
-public:
+  public:
 	HueShifter(int delta) : m_delta(delta) {}
 	TPixel32 f(TPixel32 color) const
 	{
@@ -269,7 +258,7 @@ class LuminanceModifier
 {
 	int m_delta;
 
-public:
+  public:
 	LuminanceModifier(int delta) : m_delta(delta) {}
 	TPixel32 f(TPixel32 color) const
 	{
@@ -294,7 +283,7 @@ class LuminanceShifter
 {
 	int m_delta;
 
-public:
+  public:
 	LuminanceShifter(int delta) : m_delta(delta) {}
 	TPixel32 f(TPixel32 color) const
 	{
@@ -324,7 +313,7 @@ class SaturationModifier
 {
 	int m_delta;
 
-public:
+  public:
 	SaturationModifier(int delta) : m_delta(delta) {}
 	TPixel32 f(TPixel32 color) const
 	{
@@ -346,7 +335,7 @@ class SaturationShifter
 {
 	int m_delta;
 
-public:
+  public:
 	SaturationShifter(int delta) : m_delta(delta) {}
 	TPixel32 f(TPixel32 color) const
 	{
@@ -377,28 +366,24 @@ class FadeModifier
 	TPixel32 m_target;
 	int m_delta;
 
-public:
+  public:
 	FadeModifier(TPixel32 target, int delta) : m_target(target), m_delta(delta) {}
 	TPixel32 f(TPixel32 color) const
 	{
-		color.r =
-			tcrop((m_target.r * m_delta + color.r * (100 - m_delta)) / 100, 0, 255);
-		color.g =
-			tcrop((m_target.g * m_delta + color.g * (100 - m_delta)) / 100, 0, 255);
-		color.b =
-			tcrop((m_target.b * m_delta + color.b * (100 - m_delta)) / 100, 0, 255);
-		color.m =
-			tcrop((m_target.m * m_delta + color.m * (100 - m_delta)) / 100, 0, 255);
+		color.r = tcrop((m_target.r * m_delta + color.r * (100 - m_delta)) / 100, 0, 255);
+		color.g = tcrop((m_target.g * m_delta + color.g * (100 - m_delta)) / 100, 0, 255);
+		color.b = tcrop((m_target.b * m_delta + color.b * (100 - m_delta)) / 100, 0, 255);
+		color.m = tcrop((m_target.m * m_delta + color.m * (100 - m_delta)) / 100, 0, 255);
 		return color;
 	}
 };
 
 //=============================================================================
 
-template <class T>
-void modifyColor(const T &modifier)
+template <class T> void modifyColor(const T &modifier)
 {
-	TPaletteHandle *paletteHandle = TApp::instance()->getPaletteController()->getCurrentLevelPalette();
+	TPaletteHandle *paletteHandle =
+		TApp::instance()->getPaletteController()->getCurrentLevelPalette();
 	TPaletteP palette = paletteHandle->getPalette();
 	if (palette->isLocked()) {
 		QMessageBox::warning(0, QObject::tr("Warning"), QObject::tr("Palette is locked."));
@@ -489,7 +474,7 @@ ValueAdjuster::ValueAdjuster(QWidget *parent, Qt::WFlags flags)
 {
 	QPushButton *plusBut = new QPushButton(QString("+"), this);
 	QPushButton *minusBut = new QPushButton(QString("-"), this);
-	m_valueLineEdit = new DoubleLineEdit(this, 10.00); //parent - value - min - max
+	m_valueLineEdit = new DoubleLineEdit(this, 10.00); // parent - value - min - max
 	QLabel *percLabel = new QLabel(QString("%"), this);
 	plusBut->setFixedSize(21, 21);
 	minusBut->setFixedSize(21, 21);
@@ -547,7 +532,7 @@ ValueShifter::ValueShifter(bool isHue, QWidget *parent, Qt::WFlags flags)
 	QPushButton *plusBut = new QPushButton(QString("+"), this);
 	QPushButton *minusBut = new QPushButton(QString("-"), this);
 	int maxValue = (isHue) ? 360 : 100;
-	m_valueLineEdit = new DoubleLineEdit(this, 10.00); //parent - value
+	m_valueLineEdit = new DoubleLineEdit(this, 10.00); // parent - value
 	plusBut->setFixedSize(21, 21);
 	minusBut->setFixedSize(21, 21);
 	plusBut->setObjectName("GizmoButton");
@@ -643,8 +628,7 @@ void ColorFader::onClicked()
 // PltGizmoPopup
 //-----------------------------------------------------------------------------
 
-PltGizmoPopup::PltGizmoPopup()
-	: Dialog(TApp::instance()->getMainWindow(), false, true, "PltGizmo")
+PltGizmoPopup::PltGizmoPopup() : Dialog(TApp::instance()->getMainWindow(), false, true, "PltGizmo")
 {
 	setWindowTitle(tr("Palette Gizmo"));
 
@@ -683,7 +667,7 @@ PltGizmoPopup::PltGizmoPopup()
 			upperLay->addWidget(saturationShift, 2, 2, 1, 2);
 
 			upperLay->addWidget(new QLabel(tr("Hue"), this), 3, 0);
-			//upperLay->addWidget(hueValue,3,1);
+			// upperLay->addWidget(hueValue,3,1);
 			upperLay->addWidget(hueShift, 3, 2, 1, 2);
 
 			upperLay->addWidget(new QLabel(tr("Matte"), this), 4, 0);
@@ -711,7 +695,7 @@ PltGizmoPopup::PltGizmoPopup()
 			{
 				colorLay->addWidget(new QLabel(tr("Color"), this), 0);
 				colorLay->addWidget(m_colorFld);
-				//colorLay->addStretch();
+				// colorLay->addStretch();
 			}
 			fadeLay->addLayout(colorLay);
 

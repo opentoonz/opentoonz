@@ -8,19 +8,19 @@ namespace resource
 {
 class thread_execute_interface
 {
-public:
+  public:
 	virtual void run(void) = 0;
 	virtual ~thread_execute_interface() {} /* 仮想デストラクタの空定義 */
 };
 
 class multithread
 {
-public:
+  public:
 	void add(void *thread_execute_instance);
 	void run(void); /* 指定が一個の場合はスレッド実行せずただ実行 */
 	void clear(void);
 
-private:
+  private:
 	std::vector<void *> thre_exec_;
 };
 }

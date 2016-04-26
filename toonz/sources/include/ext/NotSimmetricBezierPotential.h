@@ -24,26 +24,19 @@
 
 namespace ToonzExt
 {
-class DVAPI
-	NotSimmetricBezierPotential
-	: public Potential
+class DVAPI NotSimmetricBezierPotential : public Potential
 {
-public:
+  public:
 	virtual ~NotSimmetricBezierPotential();
 
 	// chiama compute_value ma effettua un controllo del parametro
-	virtual double
-	value_(double radiusToTest) const;
+	virtual double value_(double radiusToTest) const;
 
-	virtual void
-	setParameters_(const TStroke *ref,
-				   double w,
-				   double actionLength);
+	virtual void setParameters_(const TStroke *ref, double w, double actionLength);
 
-	Potential *
-	clone();
+	Potential *clone();
 
-private:
+  private:
 	double compute_shape(double) const; // funzione ausiliaria per
 	// il calcolo del parametro
 	// da usare

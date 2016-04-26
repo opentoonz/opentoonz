@@ -27,31 +27,23 @@
 
 namespace ToonzExt
 {
-class DVAPI
-	CornerDeformation
-	: public StrokeDeformationImpl
+class DVAPI CornerDeformation : public StrokeDeformationImpl
 {
 
 	CornerDeformation();
 
-public:
+  public:
 	virtual ~CornerDeformation();
 
-	bool
-	check_(const ContextStatus *status);
+	bool check_(const ContextStatus *status);
 
-	bool
-	findExtremes_(const ContextStatus *,
-				  Interval &);
+	bool findExtremes_(const ContextStatus *, Interval &);
 
-	double
-	findActionLength();
+	double findActionLength();
 
-	virtual void
-	draw(Designer *);
+	virtual void draw(Designer *);
 
-	static CornerDeformation *
-	instance();
+	static CornerDeformation *instance();
 };
 }
 #endif /* CORNERDEFORMATION_H */

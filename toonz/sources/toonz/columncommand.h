@@ -23,7 +23,8 @@ void deleteColumns(std::set<int> &indices, bool onlyColumns, bool withoutUndo);
 void deleteColumn(int index);
 //! if data==0 then uses clipboard
 void pasteColumns(std::set<int> &indices, const StageObjectsData *data = 0);
-//! helper function: copies srcIndex column and pastes it before dstIndex. Does not affect the clipboard
+//! helper function: copies srcIndex column and pastes it before dstIndex. Does not affect the
+//! clipboard
 void copyColumn(int dstIndex, int srcIndex);
 
 void resequence(int index);

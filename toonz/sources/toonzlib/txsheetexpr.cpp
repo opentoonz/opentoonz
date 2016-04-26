@@ -47,9 +47,11 @@ class ParamDependencyFinder : public TSyntax::CalculatorNodeVisitor
 	TDoubleParam *m_possiblyDependentParam;
 	bool m_found;
 
-public:
+  public:
 	ParamDependencyFinder(TDoubleParam *possiblyDependentParam)
-		: m_possiblyDependentParam(possiblyDependentParam), m_found(false) {}
+		: m_possiblyDependentParam(possiblyDependentParam), m_found(false)
+	{
+	}
 
 	void check(TDoubleParam *param)
 	{
@@ -71,19 +73,15 @@ class ParamCalculatorNode : public CalculatorNode, public TParamObserver, public
 	TDoubleParamP m_param;
 	std::auto_ptr<CalculatorNode> m_frame;
 
-public:
-	ParamCalculatorNode(Calculator *calculator,
-						const TDoubleParamP &param,
+  public:
+	ParamCalculatorNode(Calculator *calculator, const TDoubleParamP &param,
 						std::auto_ptr<CalculatorNode> frame)
 		: CalculatorNode(calculator), m_param(param), m_frame(frame)
 	{
 		param->addObserver(this);
 	}
 
-	~ParamCalculatorNode()
-	{
-		m_param->removeObserver(this);
-	}
+	~ParamCalculatorNode() { m_param->removeObserver(this); }
 
 	double compute(double vars[3]) const
 	{
@@ -115,8 +113,8 @@ public:
 		if (TDoubleParam *ownerParam = getCalculator()->getOwnerParameter()) {
 			const std::set<TParamObserver *> &observers = ownerParam->observers();
 
-			TParamChange propagatedChange(
-				ownerParam, 0, 0, false, paramChange.m_dragging, paramChange.m_undoing);
+			TParamChange propagatedChange(ownerParam, 0, 0, false, paramChange.m_dragging,
+										  paramChange.m_undoing);
 
 			std::set<TParamObserver *>::const_iterator ot, oEnd = observers.end();
 			for (ot = observers.begin(); ot != oEnd; ++ot)
@@ -134,13 +132,12 @@ class XsheetDrawingCalculatorNode : public CalculatorNode, public boost::noncopy
 
 	std::auto_ptr<CalculatorNode> m_frame;
 
-public:
-	XsheetDrawingCalculatorNode(
-		Calculator *calc,
-		TXsheet *xsh,
-		int columnIndex,
-		std::auto_ptr<CalculatorNode> frame)
-		: CalculatorNode(calc), m_xsh(xsh), m_columnIndex(columnIndex), m_frame(frame) {}
+  public:
+	XsheetDrawingCalculatorNode(Calculator *calc, TXsheet *xsh, int columnIndex,
+								std::auto_ptr<CalculatorNode> frame)
+		: CalculatorNode(calc), m_xsh(xsh), m_columnIndex(columnIndex), m_frame(frame)
+	{
+	}
 
 	double compute(double vars[3]) const
 	{
@@ -169,13 +166,14 @@ class XsheetReferencePattern : public Pattern
 {
 	TXsheet *m_xsh;
 
-public:
+  public:
 	XsheetReferencePattern(TXsheet *xsh) : m_xsh(xsh)
 	{
-		setDescription(
-			std::string("object.action\nTransformation reference\n") +
-			"object can be: tab, table, cam<n>, camera<n>, col<n>, peg<n>, pegbar<n>\n" +
-			"action can be: ns,ew,rot,ang,angle,z,zdepth,sx,sy,sc,scale,scalex,scaley,path,pos,shx,shy");
+		setDescription(std::string("object.action\nTransformation reference\n") +
+					   "object can be: tab, table, cam<n>, camera<n>, col<n>, peg<n>, pegbar<n>\n" +
+					   "action can be: "
+					   "ns,ew,rot,ang,angle,z,zdepth,sx,sy,sc,scale,scalex,scaley,path,pos,shx,"
+					   "shy");
 	}
 
 	TStageObjectId matchObjectName(const Token &token) const
@@ -217,9 +215,11 @@ public:
 			return TStageObject::T_Angle;
 		else if (s == "z" || s == "zdepth")
 			return TStageObject::T_Z;
-		else if (s == "sx" || s == "scalex" || s == "xscale" || s == "xs" || s == "sh" || s == "scaleh" || s == "hscale" || s == "hs")
+		else if (s == "sx" || s == "scalex" || s == "xscale" || s == "xs" || s == "sh" ||
+				 s == "scaleh" || s == "hscale" || s == "hs")
 			return TStageObject::T_ScaleX;
-		else if (s == "sy" || s == "scaley" || s == "yscale" || s == "ys" || s == "sv" || s == "scalev" || s == "vscale" || s == "vs")
+		else if (s == "sy" || s == "scaley" || s == "yscale" || s == "ys" || s == "sv" ||
+				 s == "scalev" || s == "vscale" || s == "vs")
 			return TStageObject::T_ScaleY;
 		else if (s == "sc" || s == "scale")
 			return TStageObject::T_Scale;
@@ -242,14 +242,14 @@ public:
 		int i = (int)previousTokens.size();
 		if (i == 0)
 			return matchObjectName(token) != TStageObjectId::NoneId;
-		else if (i == 1 && token.getText() == "." || i == 3 && token.getText() == "(" || i == 5 && token.getText() == ")")
+		else if (i == 1 && token.getText() == "." || i == 3 && token.getText() == "(" ||
+				 i == 5 && token.getText() == ")")
 			return true;
 		else if (i == 2) {
 			if (matchChannelName(token) < TStageObject::T_ChannelCount)
 				return true;
 			else
-				return token.getText() == "cell" &&
-					   matchObjectName(previousTokens[0]).isColumn();
+				return token.getText() == "cell" && matchObjectName(previousTokens[0]).isColumn();
 		} else
 			return false;
 	}
@@ -261,26 +261,26 @@ public:
 	{
 		return previousTokens.size() >= 6 || previousTokens.size() == 3;
 	}
-	TSyntax::TokenType getTokenType(const std::vector<Token> &previousTokens, const Token &token) const
+	TSyntax::TokenType getTokenType(const std::vector<Token> &previousTokens,
+									const Token &token) const
 	{
 		return TSyntax::Operator;
 	}
 
 	void getAcceptableKeywords(std::vector<std::string> &keywords) const
 	{
-		const std::string ks[] = { "table", "tab", "col", "cam", "camera", "peg", "pegbar" };
+		const std::string ks[] = {"table", "tab", "col", "cam", "camera", "peg", "pegbar"};
 		for (int i = 0; i < tArrayCount(ks); i++)
 			keywords.push_back(ks[i]);
 	}
 
-	void createNode(
-		Calculator *calc,
-		std::vector<CalculatorNode *> &stack,
-		const std::vector<Token> &tokens) const
+	void createNode(Calculator *calc, std::vector<CalculatorNode *> &stack,
+					const std::vector<Token> &tokens) const
 	{
 		assert(tokens.size() >= 3);
 
-		std::auto_ptr<CalculatorNode> frameNode((tokens.size() == 6) ? popNode(stack) : new VariableNode(calc, CalculatorNode::FRAME));
+		std::auto_ptr<CalculatorNode> frameNode(
+			(tokens.size() == 6) ? popNode(stack) : new VariableNode(calc, CalculatorNode::FRAME));
 
 		TStageObjectId objectId = matchObjectName(tokens[0]);
 
@@ -304,7 +304,7 @@ class FxReferencePattern : public Pattern
 {
 	TXsheet *m_xsh;
 
-public:
+  public:
 	FxReferencePattern(TXsheet *xsh) : m_xsh(xsh) {}
 
 	TFx *getFx(const Token &token) const
@@ -316,7 +316,8 @@ public:
 		int i;
 		for (i = 0; i < fx->getParams()->getParamCount(); i++) {
 			TParam *param = fx->getParams()->getParam(i);
-			std::string paramName = toString(TStringTable::translate(fx->getFxType() + "." + param->getName()));
+			std::string paramName =
+				toString(TStringTable::translate(fx->getFxType() + "." + param->getName()));
 			int i = paramName.find(" ");
 			while (i != std::string::npos) {
 				paramName.erase(i, 1);
@@ -394,19 +395,21 @@ public:
 		int n = (int)previousTokens.size();
 		return n >= 2 && (n & 1) == 1 && previousTokens[n - 2].getText() != "(";
 	}
-	TSyntax::TokenType getTokenType(const std::vector<Token> &previousTokens, const Token &token) const
+	TSyntax::TokenType getTokenType(const std::vector<Token> &previousTokens,
+									const Token &token) const
 	{
 		return TSyntax::Operator;
 	}
 
-	void createNode(
-		Calculator *calc,
-		std::vector<CalculatorNode *> &stack,
-		const std::vector<Token> &tokens) const
+	void createNode(Calculator *calc, std::vector<CalculatorNode *> &stack,
+					const std::vector<Token> &tokens) const
 	{
 		int tokenSize = tokens.size();
 
-		std::auto_ptr<CalculatorNode> frameNode((tokenSize > 0 && tokens.back().getText() == ")") ? popNode(stack) : new VariableNode(calc, CalculatorNode::FRAME));
+		std::auto_ptr<CalculatorNode> frameNode(
+			(tokenSize > 0 && tokens.back().getText() == ")")
+				? popNode(stack)
+				: new VariableNode(calc, CalculatorNode::FRAME));
 
 		TFx *fx = getFx(tokens[2]);
 		if (!fx || tokenSize < 4)
@@ -436,10 +439,10 @@ class PlasticVertexPattern : public Pattern
 	TXsheet *m_xsh;
 
 	/*
-    Full pattern layout:
+	Full pattern layout:
 
-      vertex ( columnNumber , " vertexName " ) . component (  expr )
-         0   1      2       3 4      5     6 7 8     9     10  11  12
+	  vertex ( columnNumber , " vertexName " ) . component (  expr )
+		 0   1      2       3 4      5     6 7 8     9     10  11  12
   */
 
 	enum Positions {
@@ -459,9 +462,8 @@ class PlasticVertexPattern : public Pattern
 		POSITIONS_COUNT
 	};
 
-public:
-	PlasticVertexPattern(TXsheet *xsh)
-		: m_xsh(xsh)
+  public:
+	PlasticVertexPattern(TXsheet *xsh) : m_xsh(xsh)
 	{
 		setDescription(
 			"vertex(columnNumber, \"vertexName\").action\nVertex data\n"
@@ -483,10 +485,12 @@ public:
 			const PlasticVertexPattern *m_this;
 			const SkD *skdp(const Token &columnToken)
 			{
-				int colIdx = columnToken.getIntValue() - 1; // The first column (1) actually starts at index 0
+				int colIdx = columnToken.getIntValue() -
+							 1; // The first column (1) actually starts at index 0
 
 				if (!m_this->m_xsh->isColumnEmpty(colIdx)) {
-					TStageObject *obj = m_this->m_xsh->getStageObject(TStageObjectId::ColumnId(colIdx));
+					TStageObject *obj =
+						m_this->m_xsh->getStageObject(TStageObjectId::ColumnId(colIdx));
 					assert(obj);
 
 					if (const SkDP &skdp = obj->getPlasticSkeletonDeformation())
@@ -515,9 +519,10 @@ public:
 				}
 			}
 
-			CASE COMPONENT : return std::count(
-								 m_components, m_components + sizeof(m_components) / sizeof(Component),
-								 text) > 0;
+			CASE COMPONENT
+				: return std::count(m_components,
+									m_components + sizeof(m_components) / sizeof(Component), text) >
+				  0;
 		}
 
 		return false;
@@ -533,7 +538,8 @@ public:
 		return (previousTokens.size() >= POSITIONS_COUNT || previousTokens.size() == L2);
 	}
 
-	TSyntax::TokenType getTokenType(const std::vector<Token> &previousTokens, const Token &token) const
+	TSyntax::TokenType getTokenType(const std::vector<Token> &previousTokens,
+									const Token &token) const
 	{
 		return TSyntax::Operator;
 	}
@@ -543,7 +549,9 @@ public:
 	{
 		assert(tokens.size() > COMPONENT);
 
-		std::auto_ptr<CalculatorNode> frameNode((tokens.size() == POSITIONS_COUNT) ? popNode(stack) : new VariableNode(calc, CalculatorNode::FRAME));
+		std::auto_ptr<CalculatorNode> frameNode(
+			(tokens.size() == POSITIONS_COUNT) ? popNode(stack)
+											   : new VariableNode(calc, CalculatorNode::FRAME));
 
 		int colIdx = tokens[COLUMN_NUMBER].getIntValue() - 1;
 		if (!m_xsh->isColumnEmpty(colIdx)) {
@@ -553,11 +561,14 @@ public:
 			if (const SkDP &skdp = obj->getPlasticSkeletonDeformation()) {
 				const QString &vertexName = QString::fromStdString(tokens[VERTEX_NAME].getText());
 				if (SkVD *skvd = skdp->vertexDeformation(vertexName)) {
-					const Component *componentsEnd = m_components + sizeof(m_components) / sizeof(Component),
-									*component = std::find(m_components, componentsEnd, tokens[COMPONENT].getText());
+					const Component *componentsEnd =
+										m_components + sizeof(m_components) / sizeof(Component),
+									*component = std::find(m_components, componentsEnd,
+														   tokens[COMPONENT].getText());
 
 					if (component != componentsEnd) {
-						const TDoubleParamP &param = skvd->m_params[component->m_paramId].getPointer();
+						const TDoubleParamP &param =
+							skvd->m_params[component->m_paramId].getPointer();
 						stack.push_back(new ParamCalculatorNode(calc, param, frameNode));
 					}
 				}
@@ -565,18 +576,15 @@ public:
 		}
 	}
 
-private:
+  private:
 	struct Component {
 		std::string m_name;
 		SkVD::Params m_paramId;
 
-		bool operator==(const std::string &name) const
-		{
-			return (m_name == name);
-		}
+		bool operator==(const std::string &name) const { return (m_name == name); }
 	};
 
-private:
+  private:
 	static const std::string m_fixedTokens[POSITIONS_COUNT];
 	static const Component m_components[5];
 };
@@ -585,7 +593,11 @@ const std::string PlasticVertexPattern::m_fixedTokens[POSITIONS_COUNT] = {
 	"vertex", "(", "", ",", "\"", "", "\"", ")", ".", "", "(", "", ")"};
 
 const PlasticVertexPattern::Component PlasticVertexPattern::m_components[] = {
-	{"ang", SkVD::ANGLE}, {"angle", SkVD::ANGLE}, {"dist", SkVD::DISTANCE}, {"distance", SkVD::DISTANCE}, {"so", SkVD::SO}};
+	{"ang", SkVD::ANGLE},
+	{"angle", SkVD::ANGLE},
+	{"dist", SkVD::DISTANCE},
+	{"distance", SkVD::DISTANCE},
+	{"so", SkVD::SO}};
 
 } // namespace
 

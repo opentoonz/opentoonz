@@ -19,7 +19,7 @@ class HSVKeyFx : public TStandardRasterFx
 	TDoubleParamP m_vrange;
 	TBoolParamP m_gender;
 
-public:
+  public:
 	HSVKeyFx()
 		: m_h(0.0), m_s(0.0), m_v(0.0), m_hrange(0.0), m_srange(0.0), m_vrange(0.0), m_gender(false)
 	{
@@ -59,8 +59,8 @@ public:
 //------------------------------------------------------------------------------
 
 template <typename PIXEL>
-void doHSVKey(const TRasterPT<PIXEL> &ras, double lowH, double highH,
-			  double lowS, double highS, double lowV, double highV, bool gender)
+void doHSVKey(const TRasterPT<PIXEL> &ras, double lowH, double highH, double lowS, double highS,
+			  double lowV, double highV, bool gender)
 {
 	double aux = (double)PIXEL::maxChannelValue;
 	int j;
@@ -72,7 +72,8 @@ void doHSVKey(const TRasterPT<PIXEL> &ras, double lowH, double highH,
 		while (pix < endPix) {
 			double h, s, v;
 			OLDRGB2HSV(pix->r / aux, pix->g / aux, pix->b / aux, &h, &s, &v);
-			bool condition = h >= lowH && h <= highH && s >= lowS && s <= highS && v >= lowV && v <= highV;
+			bool condition =
+				h >= lowH && h <= highH && s >= lowS && s <= highS && v >= lowV && v <= highV;
 			if (condition != gender)
 				*pix = PIXEL::Transparent;
 			pix++;

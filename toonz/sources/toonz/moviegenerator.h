@@ -22,26 +22,23 @@ class TOutputProperties;
 
 class MovieGenerator
 {
-public:
+  public:
 	class Imp;
 
-private:
+  private:
 	std::unique_ptr<Imp> m_imp;
 
-public:
+  public:
 	class Listener
 	{
-	public:
+	  public:
 		//! if listener returns false then the movie generation aborts
 		virtual bool onFrameCompleted(int frameCount) = 0;
 		virtual ~Listener() {}
 	};
 
-	MovieGenerator(
-		const TFilePath &outputPath,
-		const TDimension &cameraResolution,
-		TOutputProperties &outputProperties,
-		bool useMarkers);
+	MovieGenerator(const TFilePath &outputPath, const TDimension &cameraResolution,
+				   TOutputProperties &outputProperties, bool useMarkers);
 
 	~MovieGenerator();
 
@@ -64,7 +61,7 @@ public:
 
 	void close();
 
-private:
+  private:
 	// not implemented
 	MovieGenerator(const MovieGenerator &);
 	MovieGenerator &operator=(const MovieGenerator &);

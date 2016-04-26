@@ -30,10 +30,15 @@ class AdjustLevelsFx : public TStandardRasterFx
 	TDoubleParamP m_gamma_b;
 	TDoubleParamP m_gamma_m;
 
-public:
+  public:
 	AdjustLevelsFx()
 
-		: m_in_rgb(DoublePair(0.0, 255.0)), m_in_r(DoublePair(0.0, 255.0)), m_in_g(DoublePair(0.0, 255.0)), m_in_b(DoublePair(0.0, 255.0)), m_in_m(DoublePair(0.0, 255.0)), m_out_rgb(DoublePair(0.0, 255.0)), m_out_r(DoublePair(0.0, 255.0)), m_out_g(DoublePair(0.0, 255.0)), m_out_b(DoublePair(0.0, 255.0)), m_out_m(DoublePair(0.0, 255.0)), m_gamma_rgb(1.0), m_gamma_r(1.0), m_gamma_g(1.0), m_gamma_b(1.0), m_gamma_m(1.0)
+		: m_in_rgb(DoublePair(0.0, 255.0)), m_in_r(DoublePair(0.0, 255.0)),
+		  m_in_g(DoublePair(0.0, 255.0)), m_in_b(DoublePair(0.0, 255.0)),
+		  m_in_m(DoublePair(0.0, 255.0)), m_out_rgb(DoublePair(0.0, 255.0)),
+		  m_out_r(DoublePair(0.0, 255.0)), m_out_g(DoublePair(0.0, 255.0)),
+		  m_out_b(DoublePair(0.0, 255.0)), m_out_m(DoublePair(0.0, 255.0)), m_gamma_rgb(1.0),
+		  m_gamma_r(1.0), m_gamma_g(1.0), m_gamma_b(1.0), m_gamma_m(1.0)
 	{
 		bindParam(this, "in_rgb", m_in_rgb);
 		bindParam(this, "in_r", m_in_r);

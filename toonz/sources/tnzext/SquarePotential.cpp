@@ -8,9 +8,7 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 
-void ToonzExt::SquarePotential::setParameters_(const TStroke *ref,
-											   double par,
-											   double al)
+void ToonzExt::SquarePotential::setParameters_(const TStroke *ref, double par, double al)
 {
 	ref_ = ref;
 	par_ = par;
@@ -21,12 +19,10 @@ void ToonzExt::SquarePotential::setParameters_(const TStroke *ref,
 	lenghtAtParam_ = ref->getLength(par);
 
 	// lunghezza dal pto di click all'inizio della curva
-	leftFactor_ = min(lenghtAtParam_,
-					  actionLength_ * 0.5); //lenghtAtParam_ / strokeLength_;
+	leftFactor_ = min(lenghtAtParam_, actionLength_ * 0.5); // lenghtAtParam_ / strokeLength_;
 
 	// lunghezza dal pto di click alla fine
-	rightFactor_ = min(strokeLength_ - lenghtAtParam_,
-					   actionLength_ * 0.5);
+	rightFactor_ = min(strokeLength_ - lenghtAtParam_, actionLength_ * 0.5);
 
 	// considero come intervallo di mapping [-range,range].
 	//  4 ha come valore c.a. 10exp-6
@@ -42,8 +38,7 @@ ToonzExt::SquarePotential::~SquarePotential()
 
 //-----------------------------------------------------------------------------
 
-double
-ToonzExt::SquarePotential::value_(double value2test) const
+double ToonzExt::SquarePotential::value_(double value2test) const
 {
 	return this->compute_value(value2test);
 }
@@ -63,8 +58,7 @@ double ToonzExt::SquarePotential::compute_shape(double value2test) const
 
 //-----------------------------------------------------------------------------
 
-double
-ToonzExt::SquarePotential::compute_value(double value2test) const
+double ToonzExt::SquarePotential::compute_value(double value2test) const
 {
 	// use
 	//     2
@@ -90,11 +84,9 @@ ToonzExt::SquarePotential::compute_value(double value2test) const
 	else if (rightFactor_ == 0.0)
 		x = (x - (strokeLength_ - tmp_al)) / tmp_al;
 	else {
-		if (x <= lenghtAtParam_ &&
-			((lenghtAtParam_ - x) <= leftFactor_))
+		if (x <= lenghtAtParam_ && ((lenghtAtParam_ - x) <= leftFactor_))
 			x = (x - (lenghtAtParam_ - leftFactor_)) / leftFactor_;
-		else if (x > lenghtAtParam_ &&
-				 ((x - lenghtAtParam_) < rightFactor_))
+		else if (x > lenghtAtParam_ && ((x - lenghtAtParam_) < rightFactor_))
 			x = (rightFactor_ - (x - lenghtAtParam_)) / rightFactor_;
 		else
 			x = -1;
@@ -102,7 +94,7 @@ ToonzExt::SquarePotential::compute_value(double value2test) const
 
 	if (x < 0.0)
 		return 0.0;
-	//assert( 0.0 <= x &&
+	// assert( 0.0 <= x &&
 	//  x <= 1.0 + TConsts::epsilon );
 	res = sq(x);
 
@@ -111,8 +103,7 @@ ToonzExt::SquarePotential::compute_value(double value2test) const
 
 //-----------------------------------------------------------------------------
 
-ToonzExt::Potential *
-ToonzExt::SquarePotential::clone()
+ToonzExt::Potential *ToonzExt::SquarePotential::clone()
 {
 	return new SquarePotential;
 }

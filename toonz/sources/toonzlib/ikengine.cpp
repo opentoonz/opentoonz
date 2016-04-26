@@ -3,11 +3,7 @@
 #include "toonz/ikengine.h"
 #include "toonz/ikjacobian.h"
 
-enum Method { JACOB_TRANS,
-			  PURE_PSEUDO,
-			  DLS,
-			  SDLS,
-			  COMPARE };
+enum Method { JACOB_TRANS, PURE_PSEUDO, DLS, SDLS, COMPARE };
 
 IKEngine::IKEngine()
 {
@@ -16,8 +12,8 @@ IKEngine::IKEngine()
 int IKEngine::addJoint(const TPointD &pos, int indexParent)
 {
 	// TODO: evitare che si formino segmenti nulli
-	//assert(m_joints.empty() || norm2(pos-m_joints.back())>0.000001);
-	//assert(m_nodes[indexParent]);
+	// assert(m_joints.empty() || norm2(pos-m_joints.back())>0.000001);
+	// assert(m_nodes[indexParent]);
 	assert(m_skeleton.getNode(indexParent));
 	m_skeleton.addNode(new IKNode());
 	int index = m_skeleton.getNodeCount() - 1;
@@ -25,12 +21,12 @@ int IKEngine::addJoint(const TPointD &pos, int indexParent)
 	m_skeleton.setParent(index, indexParent);
 	return index;
 }
-//la root deve coincidere con un punto bloccato!
+// la root deve coincidere con un punto bloccato!
 void IKEngine::setRoot(const TPointD &pos)
 {
 	m_skeleton.addNode(new IKNode());
 	m_skeleton.setNode(0, pos, IKNode::JOINT);
-	//m_skeleton.setParent(0,0);
+	// m_skeleton.setParent(0,0);
 	m_skeleton.setRoot(0);
 }
 
@@ -73,7 +69,7 @@ double IKEngine::getJointAngle(int index)
 
 void IKEngine::drag(TPointD &pos)
 {
-	//assert(index>-1 && index<m_skeleton.getNodeCount());
+	// assert(index>-1 && index<m_skeleton.getNodeCount());
 	// se lo scheletro è vuoto non succede nulla
 	if (m_skeleton.getNodeCount() == 0)
 		return;
@@ -84,7 +80,7 @@ void IKEngine::drag(TPointD &pos)
 		return;
 	m_skeleton.setPurpose(indexDrag, IKNode::EFFECTOR);
 
-	//assegno un indice alla sequenza dei giunti (nodi -end effectors)
+	// assegno un indice alla sequenza dei giunti (nodi -end effectors)
 	setSequenceJoints();
 
 	target.push_back(pos);
@@ -124,7 +120,7 @@ void IKEngine::doUpdateStep(Jacobian &jacobian)
 		jacobian.UpdateThetas(); // Aggiorno i valori di theta
 
 		clampingDetected = jacobian.checkJointsLimit();
-		//jacobian.UpdatedSClampValue();
+		// jacobian.UpdatedSClampValue();
 	}
 }
 

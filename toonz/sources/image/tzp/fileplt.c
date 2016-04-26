@@ -19,10 +19,10 @@
 
 static int Next_img_read_plt_without_buffer = FALSE;
 static int Read_without_buffer = FALSE;
-#define SET_READ_WITHOUT_BUFFER                                 \
-	{                                                           \
-		Read_without_buffer = Next_img_read_plt_without_buffer; \
-		Next_img_read_plt_without_buffer = FALSE;               \
+#define SET_READ_WITHOUT_BUFFER                                                                    \
+	{                                                                                              \
+		Read_without_buffer = Next_img_read_plt_without_buffer;                                    \
+		Next_img_read_plt_without_buffer = FALSE;                                                  \
 	}
 
 #ifdef VECCHIA_MANIERA
@@ -108,8 +108,7 @@ int img_write_plt(char *filename, IMAGE *image)
 #ifdef VECCHIA_MANIERA
 
 	names_pointer = (TREE *)image->cmap.names;
-	image->cmap.names = cdb_encode_names((TREE *)image->cmap.names,
-										 &(image->cmap.names_max));
+	image->cmap.names = cdb_encode_names((TREE *)image->cmap.names, &(image->cmap.names_max));
 	str = build_string_names(image);
 	names_string_pointer = (char *)image->cmap.names;
 	image->cmap.names = (USHORT *)names_pointer;
@@ -141,13 +140,12 @@ int img_write_plt(char *filename, IMAGE *image)
 	scanline = TIFFScanlineSize(tfp);
 
 	/*
- * massima lunghezza di bytes in una strip e' 8k 
- * vedi Graphics File Formats pag.48 
+ * massima lunghezza di bytes in una strip e' 8k
+ * vedi Graphics File Formats pag.48
  */
 	rows_per_strip = (8 * 1024) / scanline;
 
-	TIFFSetField(tfp, TIFFTAG_ROWSPERSTRIP,
-				 rows_per_strip == 0 ? 1L : rows_per_strip);
+	TIFFSetField(tfp, TIFFTAG_ROWSPERSTRIP, rows_per_strip == 0 ? 1L : rows_per_strip);
 
 	TMALLOC(buffer, scanline);
 	cmap = image->cmap.buffer;
@@ -297,8 +295,7 @@ IMAGE *img_read_plt(char *filename)
 		image->cmap.info.n_colors = palette[10];
 		image->cmap.info.n_pencils = palette[11];
 	}
-	image->cmap.info.default_val = (image->cmap.info.n_tones - 1) |
-								   image->cmap.info.offset_mask;
+	image->cmap.info.default_val = (image->cmap.info.n_tones - 1) | image->cmap.info.offset_mask;
 
 	cmap_alloc_size = TCM_CMAP_BUFFER_SIZE(image->cmap.info);
 	cmap_file_size = palette[2] ? palette[2] : cmap_alloc_size;
@@ -310,8 +307,7 @@ IMAGE *img_read_plt(char *filename)
 	if (!buffer)
 		goto bad;
 
-	with_cmap_buffer = !Read_without_buffer || (plt_type <= 2) ||
-					   (plt_type == 4);
+	with_cmap_buffer = !Read_without_buffer || (plt_type <= 2) || (plt_type == 4);
 	if (with_cmap_buffer) {
 		if (colpen_cmap) {
 			TMALLOC(image->cmap.colbuffer, colbuf_alloc_size);
@@ -393,14 +389,14 @@ IMAGE *img_read_plt(char *filename)
 			if (colpen_cmap) {
 				memset(image->cmap.colbuffer, 0, colbuf_alloc_size * sizeof(LPIXEL));
 				memset(image->cmap.penbuffer, 0, penbuf_alloc_size * sizeof(LPIXEL));
-				fill_cmap_colbuffer(image->cmap.colbuffer, image->cmap.info,
-									image->cmap.color, FALSE);
-				fill_cmap_penbuffer(image->cmap.penbuffer, image->cmap.info,
-									image->cmap.pencil, FALSE);
+				fill_cmap_colbuffer(image->cmap.colbuffer, image->cmap.info, image->cmap.color,
+									FALSE);
+				fill_cmap_penbuffer(image->cmap.penbuffer, image->cmap.info, image->cmap.pencil,
+									FALSE);
 			} else {
 				memset(image->cmap.buffer, 0, cmap_alloc_size * sizeof(LPIXEL));
-				fill_cmap_buffer(image->cmap.buffer, image->cmap.info,
-								 image->cmap.color, image->cmap.pencil, FALSE);
+				fill_cmap_buffer(image->cmap.buffer, image->cmap.info, image->cmap.color,
+								 image->cmap.pencil, FALSE);
 			}
 	DEFAULT:
 		goto bad;
@@ -410,8 +406,7 @@ IMAGE *img_read_plt(char *filename)
 
 	set_color_names(image, names);
 	names_pointer = image->cmap.names;
-	image->cmap.names = (USHORT *)cdb_decode_names(image->cmap.names,
-												   image->cmap.names_max);
+	image->cmap.names = (USHORT *)cdb_decode_names(image->cmap.names, image->cmap.names_max);
 	TFREE(names_pointer);
 
 #endif
@@ -422,8 +417,7 @@ IMAGE *img_read_plt(char *filename)
 
 	max_n_colors = 1 << image->cmap.info.color_bits;
 	max_n_pencils = 1 << image->cmap.info.pencil_bits;
-	if (max_n_colors > image->cmap.info.n_colors ||
-		max_n_pencils > image->cmap.info.n_pencils) {
+	if (max_n_colors > image->cmap.info.n_colors || max_n_pencils > image->cmap.info.n_pencils) {
 		act_n_colors = image->cmap.info.n_colors;
 		act_n_pencils = image->cmap.info.n_pencils;
 		image->cmap.info.n_colors = max_n_colors;
@@ -439,20 +433,20 @@ IMAGE *img_read_plt(char *filename)
 			index = TCM_COLOR_INDEX(image->cmap.info, i);
 			cdb_set_group(image, index, UNUSED_COLOR_PAGE_NAME);
 			if (with_cmap_buffer && colpen_cmap)
-				fill_cmap_colramp(image->cmap.colbuffer, image->cmap.info,
-								  image->cmap.color[i], i, FALSE);
+				fill_cmap_colramp(image->cmap.colbuffer, image->cmap.info, image->cmap.color[i], i,
+								  FALSE);
 		}
 		for (i = act_n_pencils; i < max_n_pencils; i++) {
 			image->cmap.pencil[i] = black;
 			index = TCM_PENCIL_INDEX(image->cmap.info, i);
 			cdb_set_group(image, index, UNUSED_COLOR_PAGE_NAME);
 			if (with_cmap_buffer && colpen_cmap)
-				fill_cmap_penramp(image->cmap.penbuffer, image->cmap.info,
-								  image->cmap.pencil[i], i, FALSE);
+				fill_cmap_penramp(image->cmap.penbuffer, image->cmap.info, image->cmap.pencil[i], i,
+								  FALSE);
 		}
 		if (with_cmap_buffer && !colpen_cmap)
-			fill_cmap_buffer(image->cmap.buffer, image->cmap.info,
-							 image->cmap.color, image->cmap.pencil, FALSE);
+			fill_cmap_buffer(image->cmap.buffer, image->cmap.info, image->cmap.color,
+							 image->cmap.pencil, FALSE);
 	}
 
 	if (buffer)
@@ -526,8 +520,7 @@ IMAGE *img_read_plt_info(char *filename)
 		image->cmap.info.n_colors = palette[10];
 		image->cmap.info.n_pencils = palette[11];
 	}
-	image->cmap.info.default_val = (image->cmap.info.n_tones - 1) |
-								   image->cmap.info.offset_mask;
+	image->cmap.info.default_val = (image->cmap.info.n_tones - 1) | image->cmap.info.offset_mask;
 
 	/* Leggo history */
 	if (!TIFFGetField(tfp, TIFFTAG_TOONZHISTORY, &image->history))
@@ -538,8 +531,7 @@ IMAGE *img_read_plt_info(char *filename)
 
 	max_n_colors = 1 << image->cmap.info.color_bits;
 	max_n_pencils = 1 << image->cmap.info.pencil_bits;
-	if (max_n_colors > image->cmap.info.n_colors ||
-		max_n_pencils > image->cmap.info.n_pencils) {
+	if (max_n_colors > image->cmap.info.n_colors || max_n_pencils > image->cmap.info.n_pencils) {
 		image->cmap.info.n_colors = max_n_colors;
 		image->cmap.info.n_pencils = max_n_pencils;
 		image->cmap.color_n = image->cmap.info.n_colors;

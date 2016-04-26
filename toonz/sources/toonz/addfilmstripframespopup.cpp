@@ -35,10 +35,12 @@ AddFilmstripFramesPopup::AddFilmstripFramesPopup()
 	upperLay->setMargin(0);
 	upperLay->setSpacing(5);
 	{
-		upperLay->addWidget(new QLabel(tr("From Frame:"), this), 0, 0, Qt::AlignRight | Qt::AlignVCenter);
+		upperLay->addWidget(new QLabel(tr("From Frame:"), this), 0, 0,
+							Qt::AlignRight | Qt::AlignVCenter);
 		upperLay->addWidget(m_startFld, 0, 1);
 
-		upperLay->addWidget(new QLabel(tr("To Frame:"), this), 1, 0, Qt::AlignRight | Qt::AlignVCenter);
+		upperLay->addWidget(new QLabel(tr("To Frame:"), this), 1, 0,
+							Qt::AlignRight | Qt::AlignVCenter);
 		upperLay->addWidget(m_endFld, 1, 1);
 
 		upperLay->addWidget(new QLabel(tr("Step:"), this), 2, 0, Qt::AlignRight | Qt::AlignVCenter);
@@ -73,9 +75,9 @@ void AddFilmstripFramesPopup::onOk()
   int step  = (int)m_stepFld->text().toInt();
 
   try {
-    FilmstripCmd::addFrames(start,end,step);
+	FilmstripCmd::addFrames(start,end,step);
   } catch( ... ) {
-    return;
+	return;
   }
   close();
 */

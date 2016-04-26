@@ -40,8 +40,7 @@ namespace tcg
 namespace detail
 {
 
-template <typename mesh_type>
-struct CBackData {
+template <typename mesh_type> struct CBackData {
 	mesh_type *m_mesh;
 	int m_triangle[3];
 	int m_i;
@@ -50,8 +49,7 @@ struct CBackData {
 //============================================================================
 
 // NOTE: must be declared with CALLBACK directive
-template <typename mesh_type>
-void CALLBACK tessBegin(GLenum type, void *polygon_data)
+template <typename mesh_type> void CALLBACK tessBegin(GLenum type, void *polygon_data)
 {
 	assert(type == GL_TRIANGLES);
 
@@ -61,8 +59,7 @@ void CALLBACK tessBegin(GLenum type, void *polygon_data)
 
 //----------------------------------------------------------------------------
 
-template <typename mesh_type>
-void CALLBACK tessEnd(void *polygon_data)
+template <typename mesh_type> void CALLBACK tessEnd(void *polygon_data)
 {
 	CBackData<mesh_type> *data = (CBackData<mesh_type> *)polygon_data;
 	assert(data->m_i == 0);
@@ -95,9 +92,8 @@ void CALLBACK tessVertex(void *vertex_data, void *polygon_data)
 
 //----------------------------------------------------------------------------
 
-//Supplied to ensure that triangle primitives are always of type GL_TRIANGLE
-template <typename mesh_type>
-void CALLBACK edgeFlag(GLboolean flag)
+// Supplied to ensure that triangle primitives are always of type GL_TRIANGLE
+template <typename mesh_type> void CALLBACK edgeFlag(GLboolean flag)
 {
 }
 
@@ -110,8 +106,7 @@ void CALLBACK edgeFlag(GLboolean flag)
 namespace detail
 {
 
-template <typename Func>
-void gluRegister(GLUtesselator *tess, GLenum which, Func *func)
+template <typename Func> void gluRegister(GLUtesselator *tess, GLenum which, Func *func)
 {
 	gluTessCallback(tess, which, (TCG_GLU_CALLBACK)func);
 }
@@ -164,8 +159,7 @@ void gluTriangulate(ForIt tribeBegin, ForIt tribeEnd, ContainersReader &meshes_r
 
 			typename polygon_type::iterator pt, pEnd = (*ft)->end();
 			for (pt = (*ft)->begin(); pt != pEnd; ++pt)
-				gluTessVertex(tess,
-							  TriMeshStuff::glu_vertex_traits<vertex_type>::vertex3d(*pt),
+				gluTessVertex(tess, TriMeshStuff::glu_vertex_traits<vertex_type>::vertex3d(*pt),
 							  (void *)&*pt);
 
 			gluTessEndContour(tess);
@@ -209,7 +203,7 @@ inline void touchEdge(std::vector<UCHAR> &buildEdge, mesh_type &mesh, int e)
 template <typename mesh_type>
 inline void touchVertex(std::vector<UCHAR> &buildEdge, mesh_type &mesh, int v)
 {
-	//Sign all adjacent edges and adjacent faces' edges to v
+	// Sign all adjacent edges and adjacent faces' edges to v
 	typename mesh_type::vertex_type &vx = mesh.vertex(v);
 	const tcg::list<int> &incidentEdges = vx.edges();
 	tcg::list<int>::const_iterator it;
@@ -220,15 +214,13 @@ inline void touchVertex(std::vector<UCHAR> &buildEdge, mesh_type &mesh, int v)
 
 //================================================================================
 
-template <typename mesh_type>
-class BoundaryEdges
+template <typename mesh_type> class BoundaryEdges
 {
 	std::vector<UCHAR> m_boundaryVertices;
 	const mesh_type &m_mesh;
 
-public:
-	BoundaryEdges(const mesh_type &mesh)
-		: m_mesh(mesh)
+  public:
+	BoundaryEdges(const mesh_type &mesh) : m_mesh(mesh)
 	{
 		const tcg::list<typename mesh_type::edge_type> &edges = mesh.edges();
 		const tcg::list<typename mesh_type::vertex_type> &vertices = mesh.vertices();
@@ -275,7 +267,7 @@ void TriMeshStuff::DefaultEvaluator<mesh_type>::actionSort(
 	int count = 0;
 	memset(actionSequence, ActionEvaluator::NONE, 3 * sizeof(typename ActionEvaluator::Action));
 
-	//Try to minimize the edge length deviation in e's neighbourhood
+	// Try to minimize the edge length deviation in e's neighbourhood
 	const typename mesh_type::edge_type &ed = mesh.edge(e);
 	int f1 = ed.face(0), f2 = ed.face(1);
 	const TPointD *v1, *v2, *v3, *v4;
@@ -304,10 +296,10 @@ void TriMeshStuff::DefaultEvaluator<mesh_type>::actionSort(
 	}
 
 	if (f1 >= 0 && f2 >= 0) {
-		//Build the edge lengths
+		// Build the edge lengths
 		length[5] = norm(*v4 - *v3);
 
-		//Evaluate swap - take the triangles with least maximum mean boundary edge
+		// Evaluate swap - take the triangles with least maximum mean boundary edge
 		double m1 = (length[0] + length[1] + length[2]) / 3.0;
 		double m2 = (length[0] + length[3] + length[4]) / 3.0;
 		double m3 = (length[5] + length[1] + length[3]) / 3.0;
@@ -316,16 +308,16 @@ void TriMeshStuff::DefaultEvaluator<mesh_type>::actionSort(
 		if (tmax(m3, m4) < tmax(m1, m2) - 1e-5)
 			actionSequence[count++] = ActionEvaluator::SWAP;
 
-		//NOTE: The original swap evaluation was about maximizing the minimal face angle.
-		//However, this requires quite some cross products - the above test is sufficiently
-		//simple and has a similar behaviour.
+		// NOTE: The original swap evaluation was about maximizing the minimal face angle.
+		// However, this requires quite some cross products - the above test is sufficiently
+		// simple and has a similar behaviour.
 
-		//Evaluate collapse
+		// Evaluate collapse
 		if (length[0] < m_collapseValue)
 			actionSequence[count++] = ActionEvaluator::COLLAPSE;
 	}
 
-	//Evaluate split
+	// Evaluate split
 	if (length[0] > m_splitValue)
 		actionSequence[count++] = ActionEvaluator::SPLIT;
 }
@@ -335,23 +327,24 @@ void TriMeshStuff::DefaultEvaluator<mesh_type>::actionSort(
 namespace detail
 {
 
-template <typename mesh_type>
-inline bool testSwap(const mesh_type &mesh, int e)
+template <typename mesh_type> inline bool testSwap(const mesh_type &mesh, int e)
 {
-	//Retrieve adjacent faces
+	// Retrieve adjacent faces
 	const typename mesh_type::edge_type &ed = mesh.edge(e);
 
 	int f1 = ed.face(0), f2 = ed.face(1);
 	if (f1 < 0 || f2 < 0)
 		return false;
 
-	//Retrieve the 4 adjacent vertices
+	// Retrieve the 4 adjacent vertices
 	const typename mesh_type::vertex_type &v1 = mesh.vertex(ed.vertex(0));
 	const typename mesh_type::vertex_type &v2 = mesh.vertex(ed.vertex(1));
-	const typename mesh_type::vertex_type &v3 = mesh.vertex(mesh.otherFaceVertex(f1, ed.getIndex()));
-	const typename mesh_type::vertex_type &v4 = mesh.vertex(mesh.otherFaceVertex(f2, ed.getIndex()));
+	const typename mesh_type::vertex_type &v3 =
+		mesh.vertex(mesh.otherFaceVertex(f1, ed.getIndex()));
+	const typename mesh_type::vertex_type &v4 =
+		mesh.vertex(mesh.otherFaceVertex(f2, ed.getIndex()));
 
-	//Make sure that vertex v4 lies between the semiplane generated by v3v1 and v3v2
+	// Make sure that vertex v4 lies between the semiplane generated by v3v1 and v3v2
 	TPointD a(v1.P() - v3.P()), b(v2.P() - v3.P());
 
 	double normA = norm(a), normB = norm(b);
@@ -380,14 +373,14 @@ inline bool testSwap(const mesh_type &mesh, int e)
 
 //----------------------------------------------------------------------------
 
-//Tests edge e for admissibility of ad edge collapse. Edge e must not have adjacent
-//faces with boundary components.
-//Furthermore, we must test that faces adjacent to f1 and f2 keep e on the same side of
-//the line passing through v3v1 and v3v2.
+// Tests edge e for admissibility of ad edge collapse. Edge e must not have adjacent
+// faces with boundary components.
+// Furthermore, we must test that faces adjacent to f1 and f2 keep e on the same side of
+// the line passing through v3v1 and v3v2.
 template <typename mesh_type>
 inline bool testCollapse(const mesh_type &mesh, int e, const BoundaryEdges<mesh_type> &boundary)
 {
-	//Any face adjacent to e must have no boundary edge
+	// Any face adjacent to e must have no boundary edge
 	const typename mesh_type::edge_type &ed = mesh.edge(e);
 	int f1 = ed.face(0), f2 = ed.face(1);
 
@@ -395,11 +388,11 @@ inline bool testCollapse(const mesh_type &mesh, int e, const BoundaryEdges<mesh_
 		return false;
 
 	int v1 = mesh.edge(e).vertex(0), v2 = mesh.edge(e).vertex(1);
-	if (boundary.isBoundaryVertex(v1) ||
-		boundary.isBoundaryVertex(v2))
+	if (boundary.isBoundaryVertex(v1) || boundary.isBoundaryVertex(v2))
 		return false;
 
-	//Test faces adjacent to v1 or v2. Since one of their vertices will change, we must make sure that their
+	// Test faces adjacent to v1 or v2. Since one of their vertices will change, we must make sure
+	// that their
 	//'side' does not change too.
 	int v = mesh.otherFaceVertex(f1, e);
 	int l = mesh.edgeInciding(v1, v);
@@ -407,31 +400,35 @@ inline bool testCollapse(const mesh_type &mesh, int e, const BoundaryEdges<mesh_
 	int vNext = mesh.otherFaceVertex(f, l);
 
 	while (f != f2) {
-		//Test face f
-		if (tsign(point_ops::cross(mesh.vertex(vNext).P() - mesh.vertex(v).P(), mesh.vertex(v2).P() - mesh.vertex(v).P())) !=
-			tsign(point_ops::cross(mesh.vertex(vNext).P() - mesh.vertex(v).P(), mesh.vertex(v1).P() - mesh.vertex(v).P())))
+		// Test face f
+		if (tsign(point_ops::cross(mesh.vertex(vNext).P() - mesh.vertex(v).P(),
+								   mesh.vertex(v2).P() - mesh.vertex(v).P())) !=
+			tsign(point_ops::cross(mesh.vertex(vNext).P() - mesh.vertex(v).P(),
+								   mesh.vertex(v1).P() - mesh.vertex(v).P())))
 			return false;
 
-		//Update vars
+		// Update vars
 		v = vNext;
 		l = mesh.edgeInciding(v1, v);
 		f = mesh.edge(l).face(0) == f ? mesh.edge(l).face(1) : mesh.edge(l).face(0);
 		vNext = mesh.otherFaceVertex(f, l);
 	}
 
-	//Same with respect to v2
+	// Same with respect to v2
 	v = mesh.otherFaceVertex(f1, e);
 	l = mesh.edgeInciding(v2, v);
 	f = mesh.edge(l).face(0) == f1 ? mesh.edge(l).face(1) : mesh.edge(l).face(0);
 	vNext = mesh.otherFaceVertex(f, l);
 
 	while (f != f2) {
-		//Test face f
-		if (tsign(point_ops::cross(mesh.vertex(vNext).P() - mesh.vertex(v).P(), mesh.vertex(v2).P() - mesh.vertex(v).P())) !=
-			tsign(point_ops::cross(mesh.vertex(vNext).P() - mesh.vertex(v).P(), mesh.vertex(v1).P() - mesh.vertex(v).P())))
+		// Test face f
+		if (tsign(point_ops::cross(mesh.vertex(vNext).P() - mesh.vertex(v).P(),
+								   mesh.vertex(v2).P() - mesh.vertex(v).P())) !=
+			tsign(point_ops::cross(mesh.vertex(vNext).P() - mesh.vertex(v).P(),
+								   mesh.vertex(v1).P() - mesh.vertex(v).P())))
 			return false;
 
-		//Update vars
+		// Update vars
 		v = vNext;
 		l = mesh.edgeInciding(v2, v);
 		f = mesh.edge(l).face(0) == f ? mesh.edge(l).face(1) : mesh.edge(l).face(0);
@@ -446,27 +443,27 @@ inline bool testCollapse(const mesh_type &mesh, int e, const BoundaryEdges<mesh_
 //----------------------------------------------------------------------------
 
 template <typename mesh_type>
-void refineMesh(
-	mesh_type &mesh, TriMeshStuff::ActionEvaluator<mesh_type> &eval, unsigned long maxActions)
+void refineMesh(mesh_type &mesh, TriMeshStuff::ActionEvaluator<mesh_type> &eval,
+				unsigned long maxActions)
 {
 	using namespace detail;
 
 	typedef TriMeshStuff::ActionEvaluator<mesh_type> Evaluator;
 	typedef typename Evaluator::Action Action;
 
-	//DIAGNOSTICS_TIMER("simplifyMesh");
+	// DIAGNOSTICS_TIMER("simplifyMesh");
 
-	//Build boundary edges. They will not be altered by the simplification procedure.
+	// Build boundary edges. They will not be altered by the simplification procedure.
 	detail::BoundaryEdges<mesh_type> boundary(mesh);
 	Action actions[3], *act, *actEnd = actions + 3;
 
 	tcg::list<Edge> &edges = mesh.edges();
 	tcg::list<Edge>::iterator it;
 
-	//DIAGNOSTICS_SET("Simplify | Vertex count (before simplify)", mesh.vertexCount());
-	//DIAGNOSTICS_SET("Simplify | Edges count (before simplify)", edges.size());
+	// DIAGNOSTICS_SET("Simplify | Vertex count (before simplify)", mesh.vertexCount());
+	// DIAGNOSTICS_SET("Simplify | Edges count (before simplify)", edges.size());
 
-	//Build a vector of the edges to be analyzed
+	// Build a vector of the edges to be analyzed
 	std::vector<UCHAR> buildEdge(edges.nodesCount(), 1);
 	int touchedIdx;
 	bool boundaryEdge;
@@ -476,7 +473,7 @@ cycle:
 	if (maxActions-- == 0)
 		return;
 
-	//Analyze mesh for possible updates. Perform the first one.
+	// Analyze mesh for possible updates. Perform the first one.
 	for (it = edges.begin(); it != edges.end(); ++it) {
 		if (!buildEdge[it.m_idx])
 			continue;
@@ -486,7 +483,7 @@ cycle:
 		eval.actionSort(mesh, it.m_idx, actions);
 
 		for (act = actions; act < actEnd; ++act) {
-			//Try to perform the i-th action
+			// Try to perform the i-th action
 			if (*act == Evaluator::NONE)
 				break;
 
@@ -495,7 +492,8 @@ cycle:
 				touchEdge(buildEdge, mesh, touchedIdx);
 
 				goto cycle;
-			} else if (!boundaryEdge && *act == Evaluator::COLLAPSE && testCollapse(mesh, it.m_idx, boundary)) {
+			} else if (!boundaryEdge && *act == Evaluator::COLLAPSE &&
+					   testCollapse(mesh, it.m_idx, boundary)) {
 				touchedIdx = mesh.collapseEdge(it.m_idx);
 				touchVertex(buildEdge, mesh, touchedIdx);
 
@@ -520,8 +518,8 @@ cycle:
 		buildEdge[it.m_idx] = 0;
 	}
 
-	//DIAGNOSTICS_SET("Simplify | Vertex count (after simplify)", mesh.vertexCount());
-	//DIAGNOSTICS_SET("Simplify | Edges count (after simplify)", edges.size());
+	// DIAGNOSTICS_SET("Simplify | Vertex count (after simplify)", mesh.vertexCount());
+	// DIAGNOSTICS_SET("Simplify | Edges count (after simplify)", edges.size());
 }
 
 } // namespace tcg

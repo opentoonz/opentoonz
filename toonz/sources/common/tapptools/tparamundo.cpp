@@ -6,7 +6,7 @@
 
 class ParamUndoManager : public TParamUndoManager
 {
-public:
+  public:
 	ParamUndoManager() {}
 	~ParamUndoManager() {}
 	void onChange(const TParamChange &change);
@@ -26,7 +26,7 @@ void ParamUndoManager::onChange(const TParamChange &change)
 {
 	assert(0);
 
-	//if (!change.m_undoing && !change.m_dragging)
+	// if (!change.m_undoing && !change.m_dragging)
 	//  TUndoManager::manager()->add(change.createUndo());
 }
 

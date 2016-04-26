@@ -30,14 +30,14 @@ class DVAPI TDoubleParamRelayProperty : public TProperty, public TParamObserver
 	TDoubleParamP m_param; //!< The referenced param
 	double m_frame;		   //!< Frame at which m_param returns values
 
-public:
+  public:
 	class Visitor
 	{
-	public:
+	  public:
 		virtual void visit(TDoubleParamRelayProperty *p) = 0;
 	};
 
-public:
+  public:
 	TDoubleParamRelayProperty(const std::string &name, TDoubleParamP param = TDoubleParamP());
 	~TDoubleParamRelayProperty();
 

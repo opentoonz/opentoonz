@@ -14,21 +14,20 @@
 
 class TGenericGridAction
 {
-public:
+  public:
 	virtual ~TGenericGridAction() {}
 	virtual void sendCommand(int item) = 0;
 };
 
 //-------------------------------------------------------------------
 
-template <class T>
-class TGridAction : public TGenericGridAction
+template <class T> class TGridAction : public TGenericGridAction
 {
-public:
+  public:
 	typedef void (T::*Method)(int item);
 	TGridAction(T *target, Method method) : m_target(target), m_method(method) {}
 	void sendCommand(int item) { (m_target->*m_method)(item); }
-private:
+  private:
 	T *m_target;
 	Method m_method;
 };
@@ -37,7 +36,7 @@ private:
 
 class TGridCell
 {
-public:
+  public:
 	TGridCell() {}
 	TGridCell(const string &text) : m_text(text) {}
 
@@ -48,12 +47,8 @@ public:
 
 class TGridColumn : public TColumnHeader
 {
-public:
-	enum Alignment {
-		LeftAlignment,
-		CenterAlignment,
-		RightAlignment
-	};
+  public:
+	enum Alignment { LeftAlignment, CenterAlignment, RightAlignment };
 
 	TGridColumn(const string &name = "", Alignment alignment = CenterAlignment);
 	~TGridColumn();
@@ -64,10 +59,7 @@ public:
 
 	const TGridCell &getCell(int row) const;
 	void setCell(int row, const TGridCell &cell);
-	void setCell(int row, const string &text)
-	{
-		setCell(row, TGridCell(text));
-	}
+	void setCell(int row, const string &text) { setCell(row, TGridCell(text)); }
 
 	void getCells(int row, int rowCount, TGridCell cells[]);
 	void setCells(int row, int rowCount, const TGridCell cells[]);
@@ -79,7 +71,7 @@ public:
 	string getName() const;
 	Alignment getAlignment() const;
 
-private:
+  private:
 	class Imp;
 	Imp *m_imp;
 };
@@ -91,11 +83,12 @@ typedef TSmartPointerT<TGridColumn> TGridColumnP;
 
 class TGrid : public TWidget
 {
-public:
+  public:
 	TGrid(TWidget *parent, string name = "grid");
 	~TGrid();
 
-	void addColumn(const string &name, int width, TGridColumn::Alignment align = TGridColumn::CenterAlignment);
+	void addColumn(const string &name, int width,
+				   TGridColumn::Alignment align = TGridColumn::CenterAlignment);
 
 	void addRow();
 	void removeRow(int row);
@@ -132,7 +125,7 @@ public:
 */
 	void scrollTo(int y);
 
-private:
+  private:
 	class Data;
 	Data *m_data;
 };

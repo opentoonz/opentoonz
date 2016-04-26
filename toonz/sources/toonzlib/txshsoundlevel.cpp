@@ -19,7 +19,8 @@ PERSIST_IDENTIFIER(TXshSoundLevel, "soundLevel")
 //=============================================================================
 
 TXshSoundLevel::TXshSoundLevel(std::wstring name, int startOffset, int endOffset)
-	: TXshLevel(m_classCode, name), m_soundTrack(0), m_duration(0), m_samplePerFrame(0), m_frameSoundCount(0), m_fps(12), m_path()
+	: TXshLevel(m_classCode, name), m_soundTrack(0), m_duration(0), m_samplePerFrame(0),
+	  m_frameSoundCount(0), m_fps(12), m_path()
 {
 }
 
@@ -180,8 +181,8 @@ void TXshSoundLevel::computeValues(int frameHeight)
 	double maxPressure = 0.0;
 	double minPressure = 0.0;
 
-	m_soundTrack->getMinMaxPressure(
-		TINT32(0), (TINT32)sampleCount, TSound::LEFT, minPressure, maxPressure);
+	m_soundTrack->getMinMaxPressure(TINT32(0), (TINT32)sampleCount, TSound::LEFT, minPressure,
+									maxPressure);
 
 	double absMaxPressure = tmax(fabs(minPressure), fabs(maxPressure));
 
@@ -192,26 +193,27 @@ void TXshSoundLevel::computeValues(int frameHeight)
 	double weightA = 20.0 / absMaxPressure;
 
 	long i = 0, j;
-	long p = 0; //se p parte da zero notazione per pixel,
-				//se parte da 1 notazione per frame
+	long p = 0; // se p parte da zero notazione per pixel,
+	// se parte da 1 notazione per frame
 	while (i < m_frameSoundCount) {
 		for (j = 0; j < frameHeight - 1; ++j) {
 			double min = 0.0;
 			double max = 0.0;
 			m_soundTrack->getMinMaxPressure(
 				(TINT32)(i * m_samplePerFrame + j * samplePerPixel),
-				(TINT32)(i * m_samplePerFrame + (j + 1) * samplePerPixel - 1),
-				TSound::MONO, min, max);
-			m_values.insert(std::pair<int, std::pair<double, double>>(p + j, std::pair<double, double>(min * weightA, max * weightA)));
+				(TINT32)(i * m_samplePerFrame + (j + 1) * samplePerPixel - 1), TSound::MONO, min,
+				max);
+			m_values.insert(std::pair<int, std::pair<double, double>>(
+				p + j, std::pair<double, double>(min * weightA, max * weightA)));
 		}
 
 		double min = 0.0;
 		double max = 0.0;
-		m_soundTrack->getMinMaxPressure(
-			(TINT32)(i * m_samplePerFrame + j * samplePerPixel),
-			(TINT32)((i + 1) * m_samplePerFrame - 1),
-			TSound::MONO, min, max);
-		m_values.insert(std::pair<int, std::pair<double, double>>(p + j, std::pair<double, double>(min * weightA, max * weightA)));
+		m_soundTrack->getMinMaxPressure((TINT32)(i * m_samplePerFrame + j * samplePerPixel),
+										(TINT32)((i + 1) * m_samplePerFrame - 1), TSound::MONO, min,
+										max);
+		m_values.insert(std::pair<int, std::pair<double, double>>(
+			p + j, std::pair<double, double>(min * weightA, max * weightA)));
 
 		++i;
 		p += frameHeight;
@@ -246,7 +248,7 @@ int TXshSoundLevel::getFrameCount() const
 }
 
 //-----------------------------------------------------------------------------
-//Implementato per utilita'
+// Implementato per utilita'
 void TXshSoundLevel::getFids(std::vector<TFrameId> &fids) const
 {
 	int i;

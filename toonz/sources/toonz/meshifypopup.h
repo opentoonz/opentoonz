@@ -3,7 +3,7 @@
 #ifndef MESHIFYPOPUP_H
 #define MESHIFYPOPUP_H
 
-//TnzQt includes
+// TnzQt includes
 #include "toonzqt/dvdialog.h"
 
 // TnzLib includes
@@ -36,34 +36,34 @@ class QPushButton;
 
 /*!
   \brief    Popup window displayed when the user wants to create meshes for the
-            Plastic Tool.
+			Plastic Tool.
 */
 
 class MeshifyPopup : public DVGui::Dialog
 {
 	Q_OBJECT
 
-public:
+  public:
 	MeshifyPopup();
 
-protected:
+  protected:
 	void showEvent(QShowEvent *se);
 	void hideEvent(QHideEvent *se);
 
 	void acquirePreview();
 	void updateMeshPreview();
 
-protected slots:
+  protected slots:
 
 	void onCellSwitched();
 	void onParamsChanged(bool dragging = false);
 
 	void apply();
 
-private:
+  private:
 	class Swatch;
 
-private:
+  private:
 	// GUI memebers
 
 	DVGui::MeasuredDoubleField *m_edgesLength; //!< Target length of mesh edges.

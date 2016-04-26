@@ -2,31 +2,31 @@
 
 #include "trasterfx.h"
 
-//Core-system includes
+// Core-system includes
 #include "tsystem.h"
 #include "tthreadmessage.h"
 
-//Fx basics
+// Fx basics
 #include "tparamcontainer.h"
 #include "tbasefx.h"
 #include "tfxattributes.h"
 
-//Images components
+// Images components
 #include "timagecache.h"
 #include "trasterimage.h"
 #include "trop.h"
 
-//Optimization components
+// Optimization components
 #include "trenderresourcemanager.h"
 #include "tfxcachemanager.h"
 #include "trenderer.h"
 
-//Diagnostics
+// Diagnostics
 //#define DIAGNOSTICS
 #ifdef DIAGNOSTICS
 #include "diagnostics.h"
 
-#endif //DIAGNOSTICS
+#endif // DIAGNOSTICS
 
 //===================================================
 
@@ -82,16 +82,16 @@ inline TRectD myConvert(const TRect &rect)
 inline void enlargeToI(TRectD &r)
 {
 	TRectD temp(tfloor(r.x0), tfloor(r.y0), tceil(r.x1), tceil(r.y1));
-	//NOTE: If we enlarge a TConsts::infiniteRectD or one which trespass
-	//ints' numerical bounds, the rect may become empty.
+	// NOTE: If we enlarge a TConsts::infiniteRectD or one which trespass
+	// ints' numerical bounds, the rect may become empty.
 	if (!myIsEmpty(temp))
 		r = temp;
 }
 
 //--------------------------------------------------
 
-//Calculates the 2-norm of the passed affine A - that is, the max modulus
-//of A*A's eigenvalues (*A being the adjoint).
+// Calculates the 2-norm of the passed affine A - that is, the max modulus
+// of A*A's eigenvalues (*A being the adjoint).
 double norm2(const TAffine &aff)
 {
 	double a11 = aff.a11 * aff.a11 + aff.a12 * aff.a12;
@@ -158,13 +158,9 @@ inline QString traduce(const TRect &rect)
 
 inline QString qTraduce(const TAffine &aff)
 {
-	return "[" +
-		   QString::number(aff.a11, 'g', 15) + "," +
-		   QString::number(aff.a12, 'g', 15) + "," +
-		   QString::number(aff.a13, 'g', 15) + "," +
-		   QString::number(aff.a21, 'g', 15) + "," +
-		   QString::number(aff.a22, 'g', 15) + "," +
-		   QString::number(aff.a23, 'g', 15) + "]";
+	return "[" + QString::number(aff.a11, 'g', 15) + "," + QString::number(aff.a12, 'g', 15) + "," +
+		   QString::number(aff.a13, 'g', 15) + "," + QString::number(aff.a21, 'g', 15) + "," +
+		   QString::number(aff.a22, 'g', 15) + "," + QString::number(aff.a23, 'g', 15) + "]";
 }
 
 //--------------------------------------------------
@@ -172,8 +168,8 @@ inline QString qTraduce(const TAffine &aff)
 inline std::string traduce(const TAffine &aff)
 {
 	return
-		//Observe that toString distinguishes + and - 0. That is a problem
-		//when comparing aliases - so near 0 values are explicitly rounded to 0.
+		// Observe that toString distinguishes + and - 0. That is a problem
+		// when comparing aliases - so near 0 values are explicitly rounded to 0.
 		(areAlmostEqual(aff.a11, 0.0) ? "0" : toString(aff.a11, 5)) + "," +
 		(areAlmostEqual(aff.a12, 0.0) ? "0" : toString(aff.a12, 5)) + "," +
 		(areAlmostEqual(aff.a13, 0.0) ? "0" : toString(aff.a13, 5)) + "," +
@@ -186,10 +182,10 @@ inline std::string traduce(const TAffine &aff)
 
 //------------------------------------------------------------------------------
 
-//The following should be cleared - and its functionalities surrendered directly
-//to an appropriate resource manager...
+// The following should be cleared - and its functionalities surrendered directly
+// to an appropriate resource manager...
 
-//!Declares an image to be kept in cache until the render ends or is canceled.
+//! Declares an image to be kept in cache until the render ends or is canceled.
 void addRenderCache(const std::string &alias, TImageP image)
 {
 	TFxCacheManager::instance()->add(alias, image);
@@ -197,7 +193,7 @@ void addRenderCache(const std::string &alias, TImageP image)
 
 //------------------------------------------------------------------------------
 
-//!The inverse function to addRenderCache.
+//! The inverse function to addRenderCache.
 void removeRenderCache(const std::string &alias)
 {
 	TFxCacheManager::instance()->remove(alias);
@@ -217,7 +213,7 @@ class TrFx : public TBaseRasterFx
 
 	TRasterFx *m_fx;
 
-public:
+  public:
 	TrFx() {}
 	~TrFx() {}
 
@@ -227,7 +223,10 @@ public:
 
 	//-----------------------------------------------------------
 
-	bool isCachable() const { return true; } //Currently cachable as a test. Observe that it was NOT in Toonz 6.1
+	bool isCachable() const
+	{
+		return true;
+	} // Currently cachable as a test. Observe that it was NOT in Toonz 6.1
 
 	//-----------------------------------------------------------
 
@@ -237,8 +236,9 @@ public:
 
 	std::string getAlias(double frame, const TRenderSettings &info) const
 	{
-		//NOTE: TrFx are not present at this recursive level. Affines dealing is currently handled by inserting the
-		//rendering affine AFTER a getAlias call. Ever.
+		// NOTE: TrFx are not present at this recursive level. Affines dealing is currently handled
+		// by inserting the
+		// rendering affine AFTER a getAlias call. Ever.
 		std::string alias = getFxType();
 		return alias + "[" + m_fx->getAlias(frame, info) + "]";
 	}
@@ -247,7 +247,8 @@ public:
 
 	bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info)
 	{
-		//NOTE: TrFx are not present at this recursive level. Affines dealing is still handled by TGeometryFxs here....
+		// NOTE: TrFx are not present at this recursive level. Affines dealing is still handled by
+		// TGeometryFxs here....
 		return m_fx->doGetBBox(frame, bBox, info);
 	}
 
@@ -269,8 +270,9 @@ public:
 		// rasIn e' un raster dello stesso tipo di tile.getRaster()
 
 		TTile inTile;
-		m_fx->allocateAndCompute(inTile, rectIn.getP00(), TDimension(rectInI.getLx(), rectInI.getLy()),
-								 tile.getRaster(), frame, infoIn);
+		m_fx->allocateAndCompute(inTile, rectIn.getP00(),
+								 TDimension(rectInI.getLx(), rectInI.getLy()), tile.getRaster(),
+								 frame, infoIn);
 
 		infoIn.m_affine = appliedAff;
 		TRasterFx::applyAffine(tile, inTile, infoIn);
@@ -304,7 +306,7 @@ public:
 		return TRasterFx::memorySize(rectIn, info.m_bpp);
 	}
 
-private:
+  private:
 	bool buildInput(const TRectD &rectOut, double frame, const TRenderSettings &infoOut,
 					TRectD &rectIn, TRenderSettings &infoIn, TAffine &appliedAff)
 	{
@@ -328,7 +330,8 @@ private:
 		TRectD bbox;
 		m_fx->getBBox(frame, bbox, infoIn);
 
-		rectIn = ((appliedAffInv * rectOut).enlarge(filterRadius) + // The filter size applies in input during
+		rectIn = ((appliedAffInv * rectOut)
+					  .enlarge(filterRadius) + // The filter size applies in input during
 				  (appliedAffInv * rectOut.enlarge(filterRadius))) *
 				 bbox; // magnifications, and in output during
 					   // minifications. Thus, they basically cumulate.
@@ -362,17 +365,20 @@ class FxResourceBuilder : public ResourceBuilder
 
 	TRectD m_outRect;
 
-public:
-	FxResourceBuilder(const std::string &resourceName,
-					  const TRasterFxP &fx, const TRenderSettings &rs, double frame)
-		: ResourceBuilder(resourceName, fx.getPointer(), frame, rs), m_rfx(fx), m_frame(frame), m_rs(&rs), m_currTile(0) {}
+  public:
+	FxResourceBuilder(const std::string &resourceName, const TRasterFxP &fx,
+					  const TRenderSettings &rs, double frame)
+		: ResourceBuilder(resourceName, fx.getPointer(), frame, rs), m_rfx(fx), m_frame(frame),
+		  m_rs(&rs), m_currTile(0)
+	{
+	}
 
 	inline void build(TTile &tile);
 
-protected:
+  protected:
 	void simCompute(const TRectD &rect)
 	{
-		TRectD rectCpy(rect); //Why the hell dryCompute(..) has non-const TRectD& input ????
+		TRectD rectCpy(rect); // Why the hell dryCompute(..) has non-const TRectD& input ????
 		m_rfx->doDryCompute(rectCpy, m_frame, *m_rs);
 	}
 
@@ -408,14 +414,14 @@ void FxResourceBuilder::buildTileToCalculate(const TRectD &tileGeom)
 
 	TRasterP outRas(m_outTile->getRaster());
 
-	//If possible, try to reuse outRas's buffer.
+	// If possible, try to reuse outRas's buffer.
 
 	TDimension outputSize(outRas->getSize());
 	TDimension requiredSize(tceil(tileGeom.getLx()), tceil(tileGeom.getLy()));
 
 	TRasterP ras;
 	if (outputSize.lx >= requiredSize.lx && outputSize.ly >= requiredSize.ly) {
-		//Reuse fxOutput's buffer
+		// Reuse fxOutput's buffer
 		TRect rect(0, 0, requiredSize.lx - 1, requiredSize.ly - 1);
 		ras = outRas->extract(rect);
 		ras->clear();
@@ -459,7 +465,7 @@ void FxResourceBuilder::upload(TCacheResourceP &resource)
 
 bool FxResourceBuilder::download(TCacheResourceP &resource)
 {
-	//In case the output tile was used to calculate the fx, avoid downloading
+	// In case the output tile was used to calculate the fx, avoid downloading
 	if (m_currTile == m_outTile)
 		return true;
 
@@ -474,7 +480,7 @@ bool FxResourceBuilder::download(TCacheResourceP &resource)
 
 class TRasterFx::TRasterFxImp
 {
-public:
+  public:
 	bool m_cacheEnabled;
 	TTile m_cachedTile;
 	double m_frame;
@@ -482,11 +488,9 @@ public:
 
 	TRenderSettings m_info;
 	std::string m_interactiveCacheId;
-	mutable TThread::Mutex m_mutex; //brutto
+	mutable TThread::Mutex m_mutex; // brutto
 
-	TRasterFxImp() : m_cacheEnabled(false), m_isEnabled(true), m_cachedTile(0)
-	{
-	}
+	TRasterFxImp() : m_cacheEnabled(false), m_isEnabled(true), m_cachedTile(0) {}
 
 	~TRasterFxImp() {}
 
@@ -503,10 +507,7 @@ public:
 		}
 	}
 
-	bool isCacheEnabled() const
-	{
-		return m_cacheEnabled;
-	}
+	bool isCacheEnabled() const { return m_cacheEnabled; }
 
 	bool isEnabled() const
 	{
@@ -523,8 +524,7 @@ public:
 
 //--------------------------------------------------
 
-TRasterFx::TRasterFx()
-	: m_rasFxImp(new TRasterFxImp)
+TRasterFx::TRasterFx() : m_rasFxImp(new TRasterFxImp)
 {
 }
 
@@ -539,10 +539,8 @@ TRasterFx::~TRasterFx()
 
 TAffine TRasterFx::handledAffine(const TRenderSettings &info, double frame)
 {
-	return (
-			   info.m_affine.a11 == info.m_affine.a22 &&
-			   info.m_affine.a12 == 0 && info.m_affine.a21 == 0 &&
-			   info.m_affine.a13 == 0 && info.m_affine.a23 == 0)
+	return (info.m_affine.a11 == info.m_affine.a22 && info.m_affine.a12 == 0 &&
+			info.m_affine.a21 == 0 && info.m_affine.a13 == 0 && info.m_affine.a23 == 0)
 			   ? info.m_affine
 			   : TScale(norm2(info.m_affine));
 }
@@ -559,11 +557,8 @@ bool TRasterFx::getBBox(double frame, TRectD &bBox, const TRenderSettings &info)
 
 //--------------------------------------------------
 
-void TRasterFx::transform(double frame,
-						  int port,
-						  const TRectD &rectOnOutput,
-						  const TRenderSettings &infoOnOutput,
-						  TRectD &rectOnInput,
+void TRasterFx::transform(double frame, int port, const TRectD &rectOnOutput,
+						  const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
 						  TRenderSettings &infoOnInput)
 {
 	rectOnInput = rectOnOutput;
@@ -586,7 +581,8 @@ int TRasterFx::memorySize(const TRectD &rect, int bpp)
 //! will need to perform in order to render the passed input.
 //! This method should be reimplemented in order to make the Toonz rendering process aware of
 //! the use of big raster memory chunks, at least.
-//! Observe that the passed tile geometry is implicitly <i> already allocated <\i> for the fx output.
+//! Observe that the passed tile geometry is implicitly <i> already allocated <\i> for the fx
+//! output.
 //! \n
 //! The default implementation returns 0, assuming that the passed implicit memory size is passed
 //! below in node computation without further allocation of resources. Fxs can reimplement this
@@ -633,9 +629,7 @@ std::string TRasterFx::getAlias(double frame, const TRenderSettings &info) const
 
 //--------------------------------------------------
 
-void TRasterFx::dryCompute(TRectD &rect,
-						   double frame,
-						   const TRenderSettings &info)
+void TRasterFx::dryCompute(TRectD &rect, double frame, const TRenderSettings &info)
 {
 	if (checkActiveTimeRegion() && !getActiveTimeRegion().contains(frame))
 		return;
@@ -652,13 +646,12 @@ void TRasterFx::dryCompute(TRectD &rect,
 		return;
 	}
 
-	//If the input tile has a fractionary position, it is passed to the
-	//rendersettings' accumulated affine.
+	// If the input tile has a fractionary position, it is passed to the
+	// rendersettings' accumulated affine.
 	TPoint intTilePos(tfloor(rect.x0), tfloor(rect.y0));
 	TPointD fracTilePos(rect.x0 - intTilePos.x, rect.y0 - intTilePos.y);
-	TPointD fracInfoTranslation(
-		info.m_affine.a13 - fracTilePos.x,
-		info.m_affine.a23 - fracTilePos.y);
+	TPointD fracInfoTranslation(info.m_affine.a13 - fracTilePos.x,
+								info.m_affine.a23 - fracTilePos.y);
 	TPoint intInfoTranslation(tfloor(fracInfoTranslation.x), tfloor(fracInfoTranslation.y));
 	TPointD newTilePos(intTilePos.x - intInfoTranslation.x, intTilePos.y - intInfoTranslation.y);
 
@@ -673,9 +666,9 @@ void TRasterFx::dryCompute(TRectD &rect,
 		return;
 	}
 
-	//If the fx can't handle the whole affine passed with the TRenderSettings, the part
-	//of it that the fx can't handle is retained and applied by an affine transformer fx (TrFx)
-	//after the node has been computed.
+	// If the fx can't handle the whole affine passed with the TRenderSettings, the part
+	// of it that the fx can't handle is retained and applied by an affine transformer fx (TrFx)
+	// after the node has been computed.
 	bool canHandleAffine = canHandle(info, frame) || (handledAffine(info, frame) == info.m_affine);
 	if (!info.m_affine.isIdentity() && !canHandleAffine) {
 		TrFx *transformerFx = new TrFx;
@@ -685,15 +678,16 @@ void TRasterFx::dryCompute(TRectD &rect,
 		return;
 	}
 
-	std::string alias = getAlias(frame, info) + "[" + ::traduce(info.m_affine) + "][" + ::toString(info.m_bpp) + "]";
+	std::string alias = getAlias(frame, info) + "[" + ::traduce(info.m_affine) + "][" +
+						::toString(info.m_bpp) + "]";
 
 	int renderStatus = TRenderer::instance().getRenderStatus(TRenderer::renderId());
 	TFxCacheManager *cacheManager = TFxCacheManager::instance();
 
 	if (renderStatus == TRenderer::FIRSTRUN) {
 		TRectD bbox;
-		//ret = getBBox... puo' darsi che l'enlarge del trFx (o naturale del bbox) faccia
-		//diventare TRectD() non vuoto!!
+		// ret = getBBox... puo' darsi che l'enlarge del trFx (o naturale del bbox) faccia
+		// diventare TRectD() non vuoto!!
 		getBBox(frame, bbox, info);
 		enlargeToI(bbox);
 
@@ -701,10 +695,8 @@ void TRasterFx::dryCompute(TRectD &rect,
 		if (myIsEmpty(interestingRect))
 			return;
 
-		//Declare the tile to the tiles manager
-		ResourceBuilder::declareResource(
-			alias, this,
-			interestingRect, frame, info);
+		// Declare the tile to the tiles manager
+		ResourceBuilder::declareResource(alias, this, interestingRect, frame, info);
 
 		doDryCompute(interestingRect, frame, info);
 	} else {
@@ -716,7 +708,7 @@ void TRasterFx::dryCompute(TRectD &rect,
 		if (myIsEmpty(interestingRect))
 			return;
 
-		//Invoke the fx-specific simulation process
+		// Invoke the fx-specific simulation process
 		FxResourceBuilder rBuilder(alias, this, info, frame);
 		rBuilder.simBuild(interestingRect);
 	}
@@ -738,9 +730,7 @@ void TRasterFx::dryCompute(TRectD &rect,
 //! By default, this method raises a dryCompute call to each input port in increasing
 //! order, using the TRasterFx::transform method to identify the tiles to be passed
 //! on input precomputation.
-void TRasterFx::doDryCompute(TRectD &rect,
-							 double frame,
-							 const TRenderSettings &info)
+void TRasterFx::doDryCompute(TRectD &rect, double frame, const TRenderSettings &info)
 {
 	int inputPortCount = getInputPortCount();
 	for (int i = 0; i < inputPortCount; ++i) {
@@ -763,16 +753,13 @@ void TRasterFx::doDryCompute(TRectD &rect,
 //! This is an overloaded member function that deals with
 //! the allocation of an input tile before invoking the TRasterFx::compute
 //! method on it.
-void TRasterFx::allocateAndCompute(
-	TTile &tile,
-	const TPointD &pos, const TDimension &size,
-	TRasterP templateRas, double frame,
-	const TRenderSettings &info)
+void TRasterFx::allocateAndCompute(TTile &tile, const TPointD &pos, const TDimension &size,
+								   TRasterP templateRas, double frame, const TRenderSettings &info)
 {
 	if (templateRas) {
 		TRaster32P ras32(templateRas);
 		TRaster64P ras64(templateRas);
-		templateRas = 0; //Release the reference to templateRas before allocation
+		templateRas = 0; // Release the reference to templateRas before allocation
 
 		TRasterP tileRas;
 		if (ras32)
@@ -804,11 +791,10 @@ void TRasterFx::allocateAndCompute(
 
 //! This method supplies the actual fx rendering code.
 
-void TRasterFx::compute(TTile &tile, double frame,
-						const TRenderSettings &info)
+void TRasterFx::compute(TTile &tile, double frame, const TRenderSettings &info)
 {
-	//If the render was aborted, avoid everything
-	//if(TRenderer::instance().isAborted(TRenderer::renderId()))
+	// If the render was aborted, avoid everything
+	// if(TRenderer::instance().isAborted(TRenderer::renderId()))
 	//  throw TException("Render canceled");
 
 	if (checkActiveTimeRegion() && !getActiveTimeRegion().contains(frame))
@@ -820,7 +806,7 @@ void TRasterFx::compute(TTile &tile, double frame,
 
 		TFxPort *port = getInputPort(0);
 
-		//la porta 0 non deve essere una porta di controllo
+		// la porta 0 non deve essere una porta di controllo
 		assert(port->isaControlPort() == false);
 
 		if (port->isConnected()) {
@@ -831,14 +817,13 @@ void TRasterFx::compute(TTile &tile, double frame,
 		return;
 	}
 
-	//If the input tile has a fractionary position, it is passed to the
-	//rendersettings' accumulated affine. At the same time, the integer part of
-	//such affine is transferred to the tile.
+	// If the input tile has a fractionary position, it is passed to the
+	// rendersettings' accumulated affine. At the same time, the integer part of
+	// such affine is transferred to the tile.
 	TPoint intTilePos(tfloor(tile.m_pos.x), tfloor(tile.m_pos.y));
 	TPointD fracTilePos(tile.m_pos.x - intTilePos.x, tile.m_pos.y - intTilePos.y);
-	TPointD fracInfoTranslation(
-		info.m_affine.a13 - fracTilePos.x,
-		info.m_affine.a23 - fracTilePos.y);
+	TPointD fracInfoTranslation(info.m_affine.a13 - fracTilePos.x,
+								info.m_affine.a23 - fracTilePos.y);
 	TPoint intInfoTranslation(tfloor(fracInfoTranslation.x), tfloor(fracInfoTranslation.y));
 	TPointD newTilePos(intTilePos.x - intInfoTranslation.x, intTilePos.y - intInfoTranslation.y);
 	/*-- 入力タイルの位置が、小数値を持っていた場合 --*/
@@ -866,11 +851,12 @@ void TRasterFx::compute(TTile &tile, double frame,
 		return;
 	}
 
-	//Retrieve tile's geometry
+	// Retrieve tile's geometry
 	TRectD tilePlacement = myConvert(tile.getRaster()->getBounds()) + tile.m_pos;
 
-	//Build the fx result alias (in other words, its name)
-	std::string alias = getAlias(frame, info) + "[" + ::traduce(info.m_affine) + "][" + ::toString(info.m_bpp) + "]"; //To be moved below
+	// Build the fx result alias (in other words, its name)
+	std::string alias = getAlias(frame, info) + "[" + ::traduce(info.m_affine) + "][" +
+						::toString(info.m_bpp) + "]"; // To be moved below
 
 	TRectD bbox;
 	getBBox(frame, bbox, info);
@@ -880,7 +866,7 @@ void TRasterFx::compute(TTile &tile, double frame,
 	if (myIsEmpty(interestingRect))
 		return;
 
-	//Extract the interesting tile from requested one
+	// Extract the interesting tile from requested one
 	TTile interestingTile;
 	interestingTile.m_pos = interestingRect.getP00();
 	TRect interestingRectI(myConvert(interestingRect - tilePlacement.getP00()));
@@ -888,7 +874,7 @@ void TRasterFx::compute(TTile &tile, double frame,
 
 #ifdef DIAGNOSTICS
 
-	//1. Push fx name on call stack
+	// 1. Push fx name on call stack
 	QString fxName = QString::fromStdString(getDeclaration()->getId());
 
 	DIAGNOSTICS_PUSH("FName", fxName);
@@ -899,7 +885,7 @@ void TRasterFx::compute(TTile &tile, double frame,
 
 #endif
 
-	//Invoke the fx-specific computation process
+	// Invoke the fx-specific computation process
 	FxResourceBuilder rBuilder(alias, this, info, frame);
 	rBuilder.build(interestingTile);
 
@@ -914,10 +900,11 @@ void TRasterFx::compute(TTile &tile, double frame,
 	long fxCumulativeTime = DIAGNOSTICS_GLOGET(fxStr);
 	long count = DIAGNOSTICS_GET(countsStr);
 
-	//2. Add this time to fx time, and subtract it from parent time
+	// 2. Add this time to fx time, and subtract it from parent time
 	DIAGNOSTICS_GLOADD(fxStr, computeTime);
 	DIAGNOSTICS_ADD(countsStr, 1);
-	DIAGNOSTICS_SET("#ftimes.txt | 4. " + fxName + " | 3. Mean time", (fxCumulativeTime + computeTime) / (count + 1));
+	DIAGNOSTICS_SET("#ftimes.txt | 4. " + fxName + " | 3. Mean time",
+					(fxCumulativeTime + computeTime) / (count + 1));
 
 	DIAGNOSTICS_POP("FName", 1);
 	QString parentFxName = DIAGNOSTICS_STACKGET("FName");
@@ -949,10 +936,7 @@ tryCanceled:
 
 //------------------------------------------------------------------------------
 
-TRasterP TRasterFx::applyAffine(
-	TTile &tileOut,
-	const TTile &tileIn,
-	const TRenderSettings &info)
+TRasterP TRasterFx::applyAffine(TTile &tileOut, const TTile &tileIn, const TRenderSettings &info)
 {
 	TAffine aff = info.m_affine;
 
@@ -960,13 +944,13 @@ TRasterP TRasterFx::applyAffine(
 	TRasterP dst_ras = tileOut.getRaster();
 
 	if (aff.isTranslation()) {
-		//Check the tile origins' fractionary displacement
+		// Check the tile origins' fractionary displacement
 		TPointD diff(tileOut.m_pos - tileIn.m_pos - TPointD(aff.a13, aff.a23));
 		double fracX = diff.x - tfloor(diff.x);
 		double fracY = diff.y - tfloor(diff.y);
 
 		if ((fracX < 0.01 || fracX > 0.99) && (fracY < 0.01 || fracY > 0.99)) {
-			//Just copy part of tileIn into tileOut
+			// Just copy part of tileIn into tileOut
 			TRect geomIn(src_ras->getBounds());
 			TRect geomOut(dst_ras->getBounds());
 			TPoint diffI(convert(diff));
@@ -990,7 +974,8 @@ TRasterP TRasterFx::applyAffine(
 	TRectD rectOut = myConvert(dst_ras->getBounds()) + tileOut.m_pos;
 
 	TRectD rectInAfter = aff * myConvert(src_ras->getBounds());
-	TAffine rasterAff = TTranslation((aff * rectIn).getP00() - rectOut.getP00() - rectInAfter.getP00()) * aff;
+	TAffine rasterAff =
+		TTranslation((aff * rectIn).getP00() - rectOut.getP00() - rectInAfter.getP00()) * aff;
 
 	TRop::ResampleFilterType qual;
 	switch (info.m_quality) {
@@ -1042,7 +1027,10 @@ void TRasterFx::enableCache(bool on)
 //------------------------------------------------------------------------------
 
 TRenderSettings::TRenderSettings()
-	: m_gamma(1), m_timeStretchFrom(25), m_timeStretchTo(25), m_stereoscopicShift(0.05), m_bpp(32), m_maxTileSize((std::numeric_limits<int>::max)()), m_shrinkX(1), m_shrinkY(1), m_quality(StandardResampleQuality), m_fieldPrevalence(NoField), m_stereoscopic(false), m_isSwatch(false), m_applyShrinkToViewer(false), m_userCachable(true), m_isCanceled(NULL)
+	: m_gamma(1), m_timeStretchFrom(25), m_timeStretchTo(25), m_stereoscopicShift(0.05), m_bpp(32),
+	  m_maxTileSize((std::numeric_limits<int>::max)()), m_shrinkX(1), m_shrinkY(1),
+	  m_quality(StandardResampleQuality), m_fieldPrevalence(NoField), m_stereoscopic(false),
+	  m_isSwatch(false), m_applyShrinkToViewer(false), m_userCachable(true), m_isCanceled(NULL)
 {
 }
 
@@ -1056,24 +1044,14 @@ TRenderSettings::~TRenderSettings()
 
 std::string TRenderSettings::toString() const
 {
-	std::string ss =
-		::toString(m_bpp) + ";" +
-		::toString(m_quality) + ";" +
-		::toString(m_gamma) + ";" +
-		::toString(m_timeStretchFrom) + ";" +
-		::toString(m_timeStretchTo) + ";" +
-		::toString(m_fieldPrevalence) + ";" +
-		::toString(m_shrinkX) + "," +
-		::toString(m_shrinkY) + ";" +
-		::toString(m_affine.a11) + "," +
-		::toString(m_affine.a12) + "," +
-		::toString(m_affine.a13) + "," +
-		::toString(m_affine.a21) + "," +
-		::toString(m_affine.a22) + "," +
-		::toString(m_affine.a23) + ";" +
-		::toString(m_maxTileSize) + ";" +
-		::toString(m_isSwatch) + ";" +
-		::toString(m_userCachable) + ";{";
+	std::string ss = ::toString(m_bpp) + ";" + ::toString(m_quality) + ";" + ::toString(m_gamma) +
+					 ";" + ::toString(m_timeStretchFrom) + ";" + ::toString(m_timeStretchTo) + ";" +
+					 ::toString(m_fieldPrevalence) + ";" + ::toString(m_shrinkX) + "," +
+					 ::toString(m_shrinkY) + ";" + ::toString(m_affine.a11) + "," +
+					 ::toString(m_affine.a12) + "," + ::toString(m_affine.a13) + "," +
+					 ::toString(m_affine.a21) + "," + ::toString(m_affine.a22) + "," +
+					 ::toString(m_affine.a23) + ";" + ::toString(m_maxTileSize) + ";" +
+					 ::toString(m_isSwatch) + ";" + ::toString(m_userCachable) + ";{";
 	if (!m_data.empty()) {
 		ss += m_data[0]->toString();
 		for (int i = 1; i < (int)m_data.size(); i++)
@@ -1087,21 +1065,13 @@ std::string TRenderSettings::toString() const
 
 bool TRenderSettings::operator==(const TRenderSettings &rhs) const
 {
-	if (m_bpp != rhs.m_bpp ||
-		m_quality != rhs.m_quality ||
-		m_fieldPrevalence != rhs.m_fieldPrevalence ||
-		m_stereoscopic != rhs.m_stereoscopic ||
-		m_stereoscopicShift != rhs.m_stereoscopicShift ||
-		m_gamma != rhs.m_gamma ||
-		m_timeStretchFrom != rhs.m_timeStretchFrom ||
-		m_timeStretchTo != rhs.m_timeStretchTo ||
-		m_shrinkX != rhs.m_shrinkX ||
-		m_shrinkY != rhs.m_shrinkY ||
-		m_applyShrinkToViewer != rhs.m_applyShrinkToViewer ||
-		m_maxTileSize != rhs.m_maxTileSize ||
-		m_affine != rhs.m_affine ||
-		m_mark != rhs.m_mark ||
-		m_isSwatch != rhs.m_isSwatch ||
+	if (m_bpp != rhs.m_bpp || m_quality != rhs.m_quality ||
+		m_fieldPrevalence != rhs.m_fieldPrevalence || m_stereoscopic != rhs.m_stereoscopic ||
+		m_stereoscopicShift != rhs.m_stereoscopicShift || m_gamma != rhs.m_gamma ||
+		m_timeStretchFrom != rhs.m_timeStretchFrom || m_timeStretchTo != rhs.m_timeStretchTo ||
+		m_shrinkX != rhs.m_shrinkX || m_shrinkY != rhs.m_shrinkY ||
+		m_applyShrinkToViewer != rhs.m_applyShrinkToViewer || m_maxTileSize != rhs.m_maxTileSize ||
+		m_affine != rhs.m_affine || m_mark != rhs.m_mark || m_isSwatch != rhs.m_isSwatch ||
 		m_userCachable != rhs.m_userCachable)
 		return false;
 

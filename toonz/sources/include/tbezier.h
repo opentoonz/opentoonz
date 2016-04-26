@@ -10,12 +10,9 @@
 //-----------------------------------------------------------------------------
 
 /*!
-  Compute the forward differences.  
+  Compute the forward differences.
  */
-template <class T>
-void forwardDifferences(
-	const std::vector<T> &coeff,
-	std::vector<T> &diffs)
+template <class T> void forwardDifferences(const std::vector<T> &coeff, std::vector<T> &diffs)
 {
 	diffs.clear();
 
@@ -35,23 +32,18 @@ void forwardDifferences(
 //-----------------------------------------------------------------------------
 
 /*!
-  Converts Bezier form to power (polynomial) form. 
+  Converts Bezier form to power (polynomial) form.
   \par  bez coefficients in Bezier form.
   \ret  coeff coefficients of power form.
   \note coeffs are ordered from smaller b[0] to greater b[size-1] .
  */
-template <class T>
-void bezier2poly(const std::vector<T> &bez,
-				 std::vector<T> &coeff)
+template <class T> void bezier2poly(const std::vector<T> &bez, std::vector<T> &coeff)
 {
 	forwardDifferences(bez, coeff); // compute forward differences
 									// and store them in coeff.
-	int
-		degree = bez.size() - 1;
+	int degree = bez.size() - 1;
 
-	double
-		i_factorial = 1,
-		n_r = 1;
+	double i_factorial = 1, n_r = 1;
 
 	coeff[0] = bez[0];
 
@@ -66,14 +58,12 @@ void bezier2poly(const std::vector<T> &bez,
 //-----------------------------------------------------------------------------
 
 /*!
-  Converts power (polynomial) form to Bezier form. 
+  Converts power (polynomial) form to Bezier form.
   \par  coeff coefficients of power form.
   \ret  bez coefficients in Bezier form.
   \note coeffs are ordered from smaller b[0] to greater b[size-1].
  */
-template <class T>
-void poly2bezier(const std::vector<T> &poly,
-				 std::vector<T> &bez)
+template <class T> void poly2bezier(const std::vector<T> &poly, std::vector<T> &bez)
 {
 	UINT n = poly.size();
 

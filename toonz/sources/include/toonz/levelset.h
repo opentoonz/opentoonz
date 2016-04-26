@@ -49,8 +49,8 @@ class TOStream;
   but can be used to list the levels pool in a hierarchycal view.
 
   \warning This class distinguishes between \b paths and \b folders as described above, but
-           the associated data type (TFilePath) is the same. Please, pay attention to the
-           function argument names, in this respect.
+		   the associated data type (TFilePath) is the same. Please, pay attention to the
+		   function argument names, in this respect.
 */
 
 class DVAPI TLevelSet
@@ -64,7 +64,7 @@ class DVAPI TLevelSet
 
 	std::set<TXshLevel *> m_saveSet; //!< If m_saveSet is not empty, only its levels
 									 //!< will be saved
-public:
+  public:
 	TLevelSet();
 	~TLevelSet();
 
@@ -104,7 +104,7 @@ public:
 	void loadData(TIStream &is);
 	void saveData(TOStream &os);
 
-private:
+  private:
 	// Not copiable
 	TLevelSet(const TLevelSet &);
 	TLevelSet &operator=(const TLevelSet &);

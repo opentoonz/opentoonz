@@ -24,7 +24,7 @@ class DVAPI Arg
 {
 	TString m_arg;
 
-public:
+  public:
 	/*
 #if defined(MACOSX)
   Arg(const string &arg) {}
@@ -49,7 +49,7 @@ class DVAPI ArgList
 {
 	vector<Arg> m_args;
 
-public:
+  public:
 	ArgList() {}
 	ArgList(const Arg &arg) { m_args.push_back(arg); }
 	ArgList(const Arg &arg0, const Arg &arg1)
@@ -75,9 +75,7 @@ public:
 #pragma warning(pop)
 #endif
 
-enum Answer { NO = 0,
-			  YES = 1,
-			  CANCEL = -1 };
+enum Answer { NO = 0, YES = 1, CANCEL = -1 };
 
 /*
 #if defined(MACOSX)
@@ -150,10 +148,8 @@ inline Answer yesNoCancel(const string &str, const Arg &arg0, const Arg &arg1, c
 	return yesNoCancel(str, ArgList(arg0, arg1, arg2));
 }
 
-DVAPI int multipleChoicesQuestion(
-	const string &question,
-	const ArgList &argLst,
-	std::vector<string> &buttons);
+DVAPI int multipleChoicesQuestion(const string &question, const ArgList &argLst,
+								  std::vector<string> &buttons);
 
 } // namespace
 

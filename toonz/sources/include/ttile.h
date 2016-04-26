@@ -20,14 +20,14 @@
 class DVAPI TTile
 {
 
-private:
+  private:
 	std::string m_rasterId;
 	TRect m_subRect;
 	TTile(const TTile &);
 	TTile &operator=(const TTile &);
 	void addInCache(const TRasterP &raster);
 
-public:
+  public:
 	TPointD m_pos;
 
 	TTile() : m_rasterId(""), m_pos(), m_subRect() {}
@@ -44,7 +44,8 @@ public:
 			if (m_subRect == rimg->getRaster()->getBounds())
 				return rimg->getRaster();
 			else
-				return rimg->getRaster()->extract(m_subRect.x0, m_subRect.y0, m_subRect.x1, m_subRect.y1);
+				return rimg->getRaster()->extract(m_subRect.x0, m_subRect.y0, m_subRect.x1,
+												  m_subRect.y1);
 		}
 
 		TToonzImageP timg = (TToonzImageP)img;
@@ -52,7 +53,8 @@ public:
 			if (m_subRect == timg->getRaster()->getBounds())
 				return timg->getRaster();
 			else
-				return timg->getRaster()->extract(m_subRect.x0, m_subRect.y0, m_subRect.x1, m_subRect.y1);
+				return timg->getRaster()->extract(m_subRect.x0, m_subRect.y0, m_subRect.x1,
+												  m_subRect.y1);
 		}
 
 		return TRasterP();

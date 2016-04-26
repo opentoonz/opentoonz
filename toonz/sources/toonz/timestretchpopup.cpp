@@ -46,14 +46,16 @@ class TimeStretchUndo : public TUndo
 	int m_newRange;
 	std::unique_ptr<TXshCell[]> m_cells;
 
-	//servono per modificare la selezione
+	// servono per modificare la selezione
 	TimeStretchPopup::STRETCH_TYPE m_type;
 	int m_c0Old;
 	int m_c1Old;
 
-public:
-	TimeStretchUndo(int r0, int c0, int r1, int c1, int newRange, TimeStretchPopup::STRETCH_TYPE type)
-		: m_r0(r0), m_c0(c0), m_r1(r1), m_c1(c1), m_newRange(newRange), m_type(type), m_c0Old(0), m_c1Old(0)
+  public:
+	TimeStretchUndo(int r0, int c0, int r1, int c1, int newRange,
+					TimeStretchPopup::STRETCH_TYPE type)
+		: m_r0(r0), m_c0(c0), m_r1(r1), m_c1(c1), m_newRange(newRange), m_type(type), m_c0Old(0),
+		  m_c1Old(0)
 	{
 		int nr = m_r1 - m_r0 + 1;
 		int nc = m_c1 - m_c0 + 1;
@@ -66,9 +68,7 @@ public:
 				m_cells[k++] = TApp::instance()->getCurrentXsheet()->getXsheet()->getCell(r, c);
 	}
 
-	~TimeStretchUndo()
-	{
-	}
+	~TimeStretchUndo() {}
 
 	void setOldColumnRange(int c0, int c1)
 	{
@@ -83,7 +83,7 @@ public:
 		int oldNr = m_newRange;
 		int nr = m_r1 - m_r0 + 1;
 
-		if (nr > oldNr) //Se avevo cancellato delle celle devo reinserirle
+		if (nr > oldNr) // Se avevo cancellato delle celle devo reinserirle
 		{
 			int c;
 			for (c = m_c0; c <= m_c1; c++) {
@@ -93,7 +93,7 @@ public:
 				for (i = 0; i < nr; i++)
 					xsh->setCell(i + m_r0, c, m_cells[i + nr * (c - m_c0)]);
 			}
-		} else //Altrimenti devo rimuoverle
+		} else // Altrimenti devo rimuoverle
 		{
 			int c;
 			for (c = m_c0; c <= m_c1; c++) {
@@ -105,7 +105,8 @@ public:
 			}
 		}
 
-		TCellSelection *selection = dynamic_cast<TCellSelection *>(app->getCurrentSelection()->getSelection());
+		TCellSelection *selection =
+			dynamic_cast<TCellSelection *>(app->getCurrentSelection()->getSelection());
 		if (selection) {
 			if (m_type == TimeStretchPopup::eRegion)
 				selection->selectCells(m_r0, m_c0, m_r1, m_c1);
@@ -124,7 +125,8 @@ public:
 		TApp *app = TApp::instance();
 		app->getCurrentXsheet()->getXsheet()->timeStretch(m_r0, m_c0, m_r1, m_c1, m_newRange);
 
-		TCellSelection *selection = dynamic_cast<TCellSelection *>(app->getCurrentSelection()->getSelection());
+		TCellSelection *selection =
+			dynamic_cast<TCellSelection *>(app->getCurrentSelection()->getSelection());
 		if (selection) {
 			if (m_type == TimeStretchPopup::eRegion)
 				selection->selectCells(m_r0, m_c0, m_r0 + m_newRange - 1, m_c1);
@@ -135,19 +137,10 @@ public:
 		app->getCurrentXsheet()->notifyXsheetSoundChanged();
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Time Stretch");
-	}
-	int getHistoryType()
-	{
-		return HistoryType::Xsheet;
-	}
+	QString getHistoryString() { return QObject::tr("Time Stretch"); }
+	int getHistoryType() { return HistoryType::Xsheet; }
 };
 
 //-----------------------------------------------------------------------------
@@ -155,7 +148,8 @@ public:
 void timeStretch(int newRange, TimeStretchPopup::STRETCH_TYPE type)
 {
 	TCellSelection::Range range;
-	TCellSelection *selection = dynamic_cast<TCellSelection *>(TApp::instance()->getCurrentSelection()->getSelection());
+	TCellSelection *selection =
+		dynamic_cast<TCellSelection *>(TApp::instance()->getCurrentSelection()->getSelection());
 	if (type != TimeStretchPopup::eWholeXsheet) {
 		if (!selection) {
 			DVGui::error(QObject::tr("The current selection is invalid."));
@@ -193,7 +187,7 @@ void timeStretch(int newRange, TimeStretchPopup::STRETCH_TYPE type)
 		undo->setOldColumnRange(range.m_c0, range.m_c1);
 	TUndoManager::manager()->add(undo);
 
-	//Modifico la selezione in base al tipo di comando effettuato
+	// Modifico la selezione in base al tipo di comando effettuato
 	if (type != TimeStretchPopup::eWholeXsheet) {
 		assert(selection);
 		selection->selectCells(r0, range.m_c0, r0 + newRange - 1, range.m_c1);
@@ -213,7 +207,8 @@ void timeStretch(int newRange, TimeStretchPopup::STRETCH_TYPE type)
 //-----------------------------------------------------------------------------
 
 TimeStretchPopup::TimeStretchPopup()
-	: Dialog(TApp::instance()->getMainWindow(), true, true, "TimeStretch"), m_currentStretchType(eRegion)
+	: Dialog(TApp::instance()->getMainWindow(), true, true, "TimeStretch"),
+	  m_currentStretchType(eRegion)
 {
 	setModal(false);
 	setWindowTitle(tr("Time Stretch"));
@@ -255,7 +250,8 @@ TimeStretchPopup::TimeStretchPopup()
 void TimeStretchPopup::showEvent(QShowEvent *)
 {
 	TSelectionHandle *selectionHandle = TApp::instance()->getCurrentSelection();
-	bool ret = connect(selectionHandle, SIGNAL(selectionChanged(TSelection *)), this, SLOT(updateValues(TSelection *)));
+	bool ret = connect(selectionHandle, SIGNAL(selectionChanged(TSelection *)), this,
+					   SLOT(updateValues(TSelection *)));
 	ret = ret && connect(selectionHandle, SIGNAL(selectionSwitched(TSelection *, TSelection *)),
 						 this, SLOT(updateValues(TSelection *, TSelection *)));
 	TXsheetHandle *xsheetHandle = TApp::instance()->getCurrentXsheet();
@@ -269,7 +265,8 @@ void TimeStretchPopup::showEvent(QShowEvent *)
 void TimeStretchPopup::hideEvent(QHideEvent *e)
 {
 	TSelectionHandle *selectionHandle = TApp::instance()->getCurrentSelection();
-	bool ret = disconnect(selectionHandle, SIGNAL(selectionChanged(TSelection *)), this, SLOT(updateValues(TSelection *)));
+	bool ret = disconnect(selectionHandle, SIGNAL(selectionChanged(TSelection *)), this,
+						  SLOT(updateValues(TSelection *)));
 	ret = ret && connect(selectionHandle, SIGNAL(selectionSwitched(TSelection *, TSelection *)),
 						 this, SLOT(updateValues(TSelection *, TSelection *)));
 	TXsheetHandle *xsheetHandle = TApp::instance()->getCurrentXsheet();

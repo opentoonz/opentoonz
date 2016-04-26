@@ -49,20 +49,17 @@ namespace
 //! \li if two nodes are of the same type, they are odered using indexes
 class CompareNodes
 {
-public:
+  public:
 	bool operator()(TreeStageNode *node1, TreeStageNode *node2)
 	{
 		TStageObjectId id1 = node1->getNode()->getStageObject()->getId();
 		TStageObjectId id2 = node2->getNode()->getStageObject()->getId();
 
-		if (id1.isTable() ||
-			(id1.isCamera() && !id2.isTable() && !id2.isCamera()) ||
+		if (id1.isTable() || (id1.isCamera() && !id2.isTable() && !id2.isCamera()) ||
 			(id1.isPegbar() && !id2.isTable() && !id2.isCamera() && !id2.isPegbar()))
 			return true;
-		if ((id1.isCamera() && id2.isCamera()) ||
-			(id1.isTable() && id2.isTable()) ||
-			(id1.isPegbar() && id2.isPegbar()) ||
-			(id1.isColumn() && id2.isColumn()))
+		if ((id1.isCamera() && id2.isCamera()) || (id1.isTable() && id2.isTable()) ||
+			(id1.isPegbar() && id2.isPegbar()) || (id1.isColumn() && id2.isColumn()))
 			return id1.getIndex() < id2.getIndex();
 		return false;
 	}
@@ -99,15 +96,14 @@ void keepSubgroup(QMap<int, QList<SchematicNode *>> &editedGroup)
 			assert(obj);
 			QMap<int, QList<SchematicNode *>>::iterator it2;
 			for (it2 = editedGroup.begin(); it2 != editedGroup.end(); it2++) {
-				if (obj->isContainedInGroup(it2.key()) &&
-					!editedGroup[it2.key()].contains(node))
+				if (obj->isContainedInGroup(it2.key()) && !editedGroup[it2.key()].contains(node))
 					editedGroup[it2.key()].append(node);
 			}
 		}
 	}
 }
 
-} //namespace
+} // namespace
 
 //==================================================================
 //
@@ -132,14 +128,18 @@ void TreeStageNode::sortChildren(int startIndex, int lastIndex)
 //==================================================================
 
 StageSchematicScene::StageSchematicScene(QWidget *parent)
-	: SchematicScene(parent), m_nextNodePos(0, 0), m_xshHandle(0), m_objHandle(0), m_colHandle(0), m_sceneHandle(0), m_frameHandle(0), m_gridDimension(eSmall), m_showLetterOnPortFlag(ShowLetterOnOutputPortOfStageNode!=0)
+	: SchematicScene(parent), m_nextNodePos(0, 0), m_xshHandle(0), m_objHandle(0), m_colHandle(0),
+	  m_sceneHandle(0), m_frameHandle(0), m_gridDimension(eSmall),
+	  m_showLetterOnPortFlag(ShowLetterOnOutputPortOfStageNode != 0)
 {
 	QPointF sceneCenter = sceneRect().center();
 	m_firstPos = TPointD(sceneCenter.x(), sceneCenter.y());
 
 	m_selection = new StageObjectSelection();
-	connect(m_selection, SIGNAL(doCollapse(QList<TStageObjectId>)), this, SLOT(onCollapse(QList<TStageObjectId>)));
-	connect(m_selection, SIGNAL(doExplodeChild(QList<TStageObjectId>)), this, SIGNAL(doExplodeChild(QList<TStageObjectId>)));
+	connect(m_selection, SIGNAL(doCollapse(QList<TStageObjectId>)), this,
+			SLOT(onCollapse(QList<TStageObjectId>)));
+	connect(m_selection, SIGNAL(doExplodeChild(QList<TStageObjectId>)), this,
+			SIGNAL(doExplodeChild(QList<TStageObjectId>)));
 	connect(this, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
 	m_highlightedLinks.clear();
 }
@@ -231,7 +231,7 @@ void StageSchematicScene::updateScene()
 		}
 	}
 
-	//Motion Path
+	// Motion Path
 	m_splineTable.clear();
 	for (int i = 0; i < pegTree->getSplineCount(); i++) {
 		TStageObjectSpline *spline = pegTree->getSpline(i);
@@ -267,7 +267,8 @@ void StageSchematicScene::updateScene()
 		if (!pegbar->isGrouped() || pegbar->isGroupEditing()) {
 			it = m_nodeTable.find(pegbar->getId());
 
-			//! note: not every stage object is represented in the scene (e.g. empty columns are not)
+			//! note: not every stage object is represented in the scene (e.g. empty columns are
+			//! not)
 			if (it == m_nodeTable.end())
 				continue;
 			StageSchematicNode *node = it.value();
@@ -279,8 +280,10 @@ void StageSchematicScene::updateScene()
 				{
 					StageSchematicNode *parentNode = it.value();
 					if (parentNode) {
-						StageSchematicNodePort *port1 = parentNode->makeChildPort(QString::fromStdString(pegbar->getParentHandle()));
-						StageSchematicNodePort *port2 = node->makeParentPort(QString::fromStdString(pegbar->getHandle()));
+						StageSchematicNodePort *port1 = parentNode->makeChildPort(
+							QString::fromStdString(pegbar->getParentHandle()));
+						StageSchematicNodePort *port2 =
+							node->makeParentPort(QString::fromStdString(pegbar->getHandle()));
 						port2->makeLink(port1);
 					}
 				}
@@ -290,13 +293,14 @@ void StageSchematicScene::updateScene()
 					if (m_GroupTable.contains(groupId)) {
 						StageSchematicGroupNode *groupeNode = m_GroupTable[groupId];
 						StageSchematicNodePort *port1 = groupeNode->getChildPort(0);
-						StageSchematicNodePort *port2 = node->makeParentPort(QString::fromStdString(pegbar->getHandle()));
+						StageSchematicNodePort *port2 =
+							node->makeParentPort(QString::fromStdString(pegbar->getHandle()));
 						port2->makeLink(port1);
 					}
 				}
 			}
 
-			//link to motion path
+			// link to motion path
 			TStageObjectSpline *spline = pegbar->getSpline();
 			if (spline) {
 				QMap<TStageObjectSpline *, StageSchematicSplineNode *>::iterator splineIt;
@@ -317,7 +321,8 @@ void StageSchematicScene::updateScene()
 					continue;
 				StageSchematicNode *parentNode = it.value();
 				if (parentNode) {
-					StageSchematicNodePort *port1 = parentNode->makeChildPort(QString::fromStdString(pegbar->getParentHandle()));
+					StageSchematicNodePort *port1 = parentNode->makeChildPort(
+						QString::fromStdString(pegbar->getParentHandle()));
 					StageSchematicNodePort *port2 = groupeNode->getParentPort();
 					port2->makeLink(port1);
 				}
@@ -351,7 +356,7 @@ void StageSchematicScene::updateScene()
 
 StageSchematicNode *StageSchematicScene::addStageSchematicNode(TStageObject *pegbar)
 {
-	//create the node according to the type of StageObject
+	// create the node according to the type of StageObject
 	StageSchematicNode *node = createStageSchematicNode(this, pegbar);
 	if (!node)
 		return 0;
@@ -359,11 +364,10 @@ StageSchematicNode *StageSchematicScene::addStageSchematicNode(TStageObject *peg
 	connect(node, SIGNAL(xsheetChanged()), this, SLOT(onXsheetChanged()));
 	connect(node, SIGNAL(currentObjectChanged(const TStageObjectId &, bool)), this,
 			SLOT(onCurrentObjectChanged(const TStageObjectId &, bool)));
-	connect(node, SIGNAL(currentColumnChanged(int)), this,
-			SLOT(onCurrentColumnChanged(int)));
+	connect(node, SIGNAL(currentColumnChanged(int)), this, SLOT(onCurrentColumnChanged(int)));
 	connect(node, SIGNAL(editObject()), this, SIGNAL(editObject()));
 
-	//specify the node position
+	// specify the node position
 	if (pegbar->getDagNodePos() == TConst::nowhere) {
 		if (pegbar->getId().isColumn()) {
 			StageSchematicColumnNode *cNode = dynamic_cast<StageSchematicColumnNode *>(node);
@@ -391,8 +395,7 @@ StageSchematicGroupNode *StageSchematicScene::addStageGroupNode(QList<TStageObje
 	connect(node, SIGNAL(xsheetChanged()), this, SLOT(onXsheetChanged()));
 	connect(node, SIGNAL(currentObjectChanged(const TStageObjectId &, bool)), this,
 			SLOT(onCurrentObjectChanged(const TStageObjectId &, bool)));
-	connect(node, SIGNAL(currentColumnChanged(int)), this,
-			SLOT(onCurrentColumnChanged(int)));
+	connect(node, SIGNAL(currentColumnChanged(int)), this, SLOT(onCurrentColumnChanged(int)));
 	connect(node, SIGNAL(editObject()), this, SIGNAL(editObject()));
 	if (root->getDagNodePos() == TConst::nowhere) {
 		placeNode(node);
@@ -403,10 +406,12 @@ StageSchematicGroupNode *StageSchematicScene::addStageGroupNode(QList<TStageObje
 
 //------------------------------------------------------------------
 
-StageSchematicGroupEditor *StageSchematicScene::addEditedGroupedStageSchematicNode(int groupId,
-																				   const QList<SchematicNode *> &groupedObjs)
+StageSchematicGroupEditor *
+StageSchematicScene::addEditedGroupedStageSchematicNode(int groupId,
+														const QList<SchematicNode *> &groupedObjs)
 {
-	StageSchematicGroupEditor *editorGroup = new StageSchematicGroupEditor(groupId, groupedObjs, this);
+	StageSchematicGroupEditor *editorGroup =
+		new StageSchematicGroupEditor(groupId, groupedObjs, this);
 	m_groupEditorTable[groupId] = editorGroup;
 	return editorGroup;
 }
@@ -424,10 +429,10 @@ void StageSchematicScene::updatePosition(StageSchematicNode *node, const TPointD
   int i;
   for(i=0; i<placedNodes.size(); i++)
   {
-    StageSchematicNode *placedNode = dynamic_cast<StageSchematicNode*>(placedNodes[i]);
-    assert(placedNode);
-    TPointD newPos = placedNode->getStageObject()->getDagNodePos()+offset;
-    updatePosition(placedNode,newPos);
+	StageSchematicNode *placedNode = dynamic_cast<StageSchematicNode*>(placedNodes[i]);
+	assert(placedNode);
+	TPointD newPos = placedNode->getStageObject()->getDagNodePos()+offset;
+	updatePosition(placedNode,newPos);
   }
   */
 }
@@ -544,7 +549,8 @@ void StageSchematicScene::resizeNodes(bool maximizedNode)
 		if (obj && obj->getId().isColumn()) {
 			if (!m_nodeTable.contains(obj->getId()))
 				continue;
-			StageSchematicColumnNode *node = dynamic_cast<StageSchematicColumnNode *>(m_nodeTable[obj->getId()]);
+			StageSchematicColumnNode *node =
+				dynamic_cast<StageSchematicColumnNode *>(m_nodeTable[obj->getId()]);
 			assert(node);
 			node->resize(maximizedNode);
 		}
@@ -557,7 +563,8 @@ void StageSchematicScene::resizeNodes(bool maximizedNode)
 		if (spl) {
 			if (!m_splineTable.contains(spl))
 				continue;
-			StageSchematicSplineNode *node = dynamic_cast<StageSchematicSplineNode *>(m_splineTable[spl]);
+			StageSchematicSplineNode *node =
+				dynamic_cast<StageSchematicSplineNode *>(m_splineTable[spl]);
 			assert(node);
 			node->resize(maximizedNode);
 			updateSplinePositionOnResize(spl, maximizedNode);
@@ -616,7 +623,8 @@ StageSchematicSplineNode *StageSchematicScene::addSchematicSplineNode(TStageObje
 //------------------------------------------------------------------
 /*! create node according to the type of StageObject
 */
-StageSchematicNode *StageSchematicScene::createStageSchematicNode(StageSchematicScene *scene, TStageObject *pegbar)
+StageSchematicNode *StageSchematicScene::createStageSchematicNode(StageSchematicScene *scene,
+																  TStageObject *pegbar)
 {
 	TStageObjectId id = pegbar->getId();
 	if (id.isColumn()) {
@@ -673,7 +681,7 @@ void StageSchematicScene::placeNodes()
 	std::vector<TreeStageNode *> roots;
 	findRoots(roots);
 
-	//sorts the roots container. Sortijg rules are specified by CompareNodes class
+	// sorts the roots container. Sortijg rules are specified by CompareNodes class
 	std::sort(roots.begin(), roots.end(), CompareNodes());
 
 	double xFirstPos = m_firstPos.x - 500;
@@ -684,14 +692,14 @@ void StageSchematicScene::placeNodes()
 	double maxYPos = yFirstPos;
 	int step = m_gridDimension == eLarge ? 100 : 50;
 
-	//places the first roots and its children. The first root is always a table!
+	// places the first roots and its children. The first root is always a table!
 	assert(roots[0]->getNode()->getStageObject()->getId().isTable());
 	roots[0]->getNode()->getStageObject()->setDagNodePos(TPointD(xFirstPos, yFirstPos));
 	placeChildren(roots[0], xPos, yPos);
 	maxXPos = xPos;
 
 	int i;
-	//places other roots and root's children.
+	// places other roots and root's children.
 	for (i = 1; i < (int)roots.size(); i++) {
 		TStageObject *pegbar = roots[i]->getNode()->getStageObject();
 		xPos = xFirstPos;
@@ -702,7 +710,7 @@ void StageSchematicScene::placeNodes()
 		maxYPos = tmax(yPos, maxYPos);
 	}
 
-	//places all spline nodes.
+	// places all spline nodes.
 	TStageObjectTree *pegTree = m_xshHandle->getXsheet()->getStageObjectTree();
 	for (i = 0; i < pegTree->getSplineCount(); i++) {
 		TStageObjectSpline *spline = pegTree->getSpline(i);
@@ -710,7 +718,7 @@ void StageSchematicScene::placeNodes()
 		maxXPos += (m_showLetterOnPortFlag) ? 150 : 120;
 	}
 
-	//delete the tree
+	// delete the tree
 	for (i = 0; i < (int)roots.size(); i++)
 		delete roots[i];
 	roots.clear();
@@ -726,7 +734,7 @@ void StageSchematicScene::findRoots(std::vector<TreeStageNode *> &roots)
 	int i;
 	for (i = 0; i < pegTree->getStageObjectCount(); i++) {
 		TStageObject *pegbar = pegTree->getStageObject(i);
-		//only cameras and pegbars can be roots
+		// only cameras and pegbars can be roots
 		if (pegbar->getId().isCamera() || pegbar->getId().isTable()) {
 			StageSchematicNode *node = m_nodeTable[pegbar->getId()];
 			TreeStageNode *treeNode = new TreeStageNode(node);
@@ -747,8 +755,9 @@ void StageSchematicScene::makeTree(TreeStageNode *treeNode)
 		int firstChild = treeNode->getChildrenCount();
 		int j, linkCount = port->getLinkCount();
 		for (j = 0; j < linkCount; j++) {
-			//the linked node is taken and the method is iterated for this node
-			StageSchematicNode *schematicNode = dynamic_cast<StageSchematicNode *>(port->getLinkedNode(j));
+			// the linked node is taken and the method is iterated for this node
+			StageSchematicNode *schematicNode =
+				dynamic_cast<StageSchematicNode *>(port->getLinkedNode(j));
 			TreeStageNode *treeChild = new TreeStageNode(schematicNode);
 			treeNode->addChild(treeChild);
 			makeTree(treeChild);
@@ -760,14 +769,16 @@ void StageSchematicScene::makeTree(TreeStageNode *treeNode)
 
 //------------------------------------------------------------------
 
-void StageSchematicScene::placeChildren(TreeStageNode *treeNode, double &xPos, double &yPos, bool isCameraTree)
+void StageSchematicScene::placeChildren(TreeStageNode *treeNode, double &xPos, double &yPos,
+										bool isCameraTree)
 {
 	int i;
-	xPos += (m_showLetterOnPortFlag)?150:120;
+	xPos += (m_showLetterOnPortFlag) ? 150 : 120;
 	double xChildPos = xPos;
 	double xRefPos = xPos;
 	bool firstChild = true;
-	bool startFromCamera = isCameraTree || treeNode->getNode()->getStageObject()->getId().isCamera();
+	bool startFromCamera =
+		isCameraTree || treeNode->getNode()->getStageObject()->getId().isCamera();
 	int step = m_gridDimension == eLarge ? 100 : 50;
 	double yOffset = startFromCamera ? step : -step;
 	if (startFromCamera)
@@ -778,7 +789,7 @@ void StageSchematicScene::placeChildren(TreeStageNode *treeNode, double &xPos, d
 		if (childPegbar->getId().isCamera())
 			continue;
 		xChildPos = xRefPos;
-		//first child must have same yPos of father.
+		// first child must have same yPos of father.
 		yPos += firstChild ? 0 : yOffset;
 		firstChild = false;
 		childPegbar->setDagNodePos(TPointD(xChildPos, yPos));
@@ -842,7 +853,7 @@ void StageSchematicScene::placeNode(StageSchematicNode *node)
 	nodeRect.moveTopLeft(initPos);
 
 	bool found = false;
-	//try to place inside of the visible area
+	// try to place inside of the visible area
 	if (!views().isEmpty() && pegbar->getId().isPegbar()) {
 		QGraphicsView *view = views().at(0);
 		QRectF visibleRect = view->mapToScene(0, 0, view->width(), view->height()).boundingRect();
@@ -860,7 +871,7 @@ void StageSchematicScene::placeNode(StageSchematicNode *node)
 				nodeRect.translate(0, -step);
 				yPos -= step;
 			}
-			//if failed to place this column, then move the candidate position to right
+			// if failed to place this column, then move the candidate position to right
 			if (visibleRect.contains(nodeRect)) {
 				found = true;
 				break;
@@ -924,8 +935,8 @@ void StageSchematicScene::placeSplineNode(StageSchematicSplineNode *splineNode)
 
 void StageSchematicScene::onPegbarAdded()
 {
-	//if this command called from the context menu, place the node at the cllicked position
-	//clickedPos will be null(0,0) if it called from the toolbar
+	// if this command called from the context menu, place the node at the cllicked position
+	// clickedPos will be null(0,0) if it called from the toolbar
 	QPointF clickedPos = qobject_cast<QAction *>(sender())->data().toPointF();
 
 	TStageObjectCmd::addNewPegbar(m_xshHandle, m_objHandle, clickedPos);
@@ -935,8 +946,8 @@ void StageSchematicScene::onPegbarAdded()
 
 void StageSchematicScene::onSplineAdded()
 {
-	//if this command called from the context menu, place the node at the cllicked position
-	//clickedPos will be null(0,0) if it called from the toolbar
+	// if this command called from the context menu, place the node at the cllicked position
+	// clickedPos will be null(0,0) if it called from the toolbar
 	QPointF clickedPos = qobject_cast<QAction *>(sender())->data().toPointF();
 
 	TStageObjectCmd::addNewSpline(m_xshHandle, m_objHandle, m_colHandle, clickedPos);
@@ -946,8 +957,8 @@ void StageSchematicScene::onSplineAdded()
 
 void StageSchematicScene::onCameraAdded()
 {
-	//if this command called from the context menu, place the node at the cllicked position
-	//clickedPos will be null(0,0) if it called from the toolbar
+	// if this command called from the context menu, place the node at the cllicked position
+	// clickedPos will be null(0,0) if it called from the toolbar
 	QPointF clickedPos = qobject_cast<QAction *>(sender())->data().toPointF();
 
 	TStageObjectCmd::addNewCamera(m_xshHandle, m_objHandle, clickedPos);
@@ -992,9 +1003,10 @@ void StageSchematicScene::onSaveSpline()
 	DVGui::featureNotAvelaible();
 #else
 	TFilePath projectFolder = m_sceneHandle->getScene()->getProject()->getProjectFolder();
-	QString fileNameStr = QFileDialog::getSaveFileName(this->views()[0],
-													   QObject::tr("Save Motion Path"), QString::fromStdWString(projectFolder.getWideString()),
-													   QObject::tr("Motion Path files (*.mpath)"));
+	QString fileNameStr =
+		QFileDialog::getSaveFileName(this->views()[0], QObject::tr("Save Motion Path"),
+									 QString::fromStdWString(projectFolder.getWideString()),
+									 QObject::tr("Motion Path files (*.mpath)"));
 	if (fileNameStr == "")
 		return;
 	TFilePath fp(fileNameStr.toStdWString());
@@ -1013,7 +1025,7 @@ void StageSchematicScene::onSaveSpline()
 			throw "no spline";
 		TOStream os(fp);
 
-		//Only points are saved
+		// Only points are saved
 		const TStroke *stroke = spline->getStroke();
 		int n = stroke ? stroke->getControlPointCount() : 0;
 		for (int i = 0; i < n; i++) {
@@ -1031,9 +1043,10 @@ void StageSchematicScene::onSaveSpline()
 void StageSchematicScene::onLoadSpline()
 {
 	TFilePath projectFolder = m_sceneHandle->getScene()->getProject()->getProjectFolder();
-	QString fileNameStr = QFileDialog::getOpenFileName(this->views()[0],
-													   QObject::tr("Load Motion Path"), QString::fromStdWString(projectFolder.getWideString()),
-													   QObject::tr("Motion Path files (*.mpath)"));
+	QString fileNameStr =
+		QFileDialog::getOpenFileName(this->views()[0], QObject::tr("Load Motion Path"),
+									 QString::fromStdWString(projectFolder.getWideString()),
+									 QObject::tr("Motion Path files (*.mpath)"));
 	if (fileNameStr == "")
 		return;
 	TFilePath fp(fileNameStr.toStdWString());
@@ -1047,11 +1060,12 @@ void StageSchematicScene::onLoadSpline()
 			return;
 		}
 		assert(m_objHandle->isSpline());
-		//ObjectID of the parent node to which the spline is connected
+		// ObjectID of the parent node to which the spline is connected
 		TStageObjectId id = m_objHandle->getObjectId();
 		TXsheet *xsh = m_xshHandle->getXsheet();
 
-		TStageObjectSpline *spline = xsh->getStageObjectTree()->getStageObject(id, false)->getSpline();
+		TStageObjectSpline *spline =
+			xsh->getStageObjectTree()->getStageObject(id, false)->getSpline();
 		if (!spline)
 			return;
 
@@ -1146,21 +1160,21 @@ void StageSchematicScene::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme)
 
 	QMenu menu(views()[0]);
 
-	//AddPegbar
+	// AddPegbar
 	QAction *addPegbar = new QAction(tr("&New Pegbar"), &menu);
 	connect(addPegbar, SIGNAL(triggered()), this, SLOT(onPegbarAdded()));
 
-	//AddSpline
+	// AddSpline
 	QAction *addSpline = new QAction(tr("&New Motion Path"), &menu);
 	connect(addSpline, SIGNAL(triggered()), this, SLOT(onSplineAdded()));
 
-	//AddCamera
+	// AddCamera
 	QAction *addCamera = new QAction(tr("&New Camera"), &menu);
 	connect(addCamera, SIGNAL(triggered()), this, SLOT(onCameraAdded()));
 
 	QAction *paste = CommandManager::instance()->getAction("MI_Paste");
 
-	//this is to place the node at the clicked position
+	// this is to place the node at the clicked position
 	addPegbar->setData(cme->scenePos());
 	addSpline->setData(cme->scenePos());
 	addCamera->setData(cme->scenePos());

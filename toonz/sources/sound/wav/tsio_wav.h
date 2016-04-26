@@ -8,27 +8,24 @@
 //==========================================================
 /*!
 The class TSoundTrackReaderWav reads audio files having
-.wav extension 
+.wav extension
 */
 class TSoundTrackReaderWav : public TSoundTrackReader
 {
-public:
+  public:
 	TSoundTrackReaderWav(const TFilePath &fp);
 	~TSoundTrackReaderWav() {}
 
 	/*!
   Loads the .wav audio file whose path has been specified in the constructor.
-  It returns a TSoundTrackP created from the audio file 
+  It returns a TSoundTrackP created from the audio file
   */
 	TSoundTrackP load();
 
 	/*!
   Returns a soundtrack reader able to read .wav audio files
   */
-	static TSoundTrackReader *create(const TFilePath &fp)
-	{
-		return new TSoundTrackReaderWav(fp);
-	}
+	static TSoundTrackReader *create(const TFilePath &fp) { return new TSoundTrackReaderWav(fp); }
 };
 
 //==========================================================
@@ -39,7 +36,7 @@ The class TSoundTrackWriterWav writes audio file having
 
 class TSoundTrackWriterWav : public TSoundTrackWriter
 {
-public:
+  public:
 	TSoundTrackWriterWav(const TFilePath &fp);
 	~TSoundTrackWriterWav() {}
 
@@ -52,10 +49,7 @@ public:
 	/*!
   Returns a soundtrack writer able to write .wav audio files
   */
-	static TSoundTrackWriter *create(const TFilePath &fp)
-	{
-		return new TSoundTrackWriterWav(fp);
-	}
+	static TSoundTrackWriter *create(const TFilePath &fp) { return new TSoundTrackWriterWav(fp); }
 };
 
 #endif

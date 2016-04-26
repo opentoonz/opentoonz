@@ -15,7 +15,7 @@ class CacheFxCommand : public QObject
 {
 	Q_OBJECT
 
-public:
+  public:
 	CacheFxCommand();
 	~CacheFxCommand();
 
@@ -26,7 +26,7 @@ public:
 
 	void onLevelChanged(const std::string &levelName);
 
-public slots:
+  public slots:
 
 	void onFxChanged();
 	void onXsheetChanged();

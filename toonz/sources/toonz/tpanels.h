@@ -37,7 +37,7 @@ class PaletteViewerPanel : public TPanel
 	TPanelTitleBarButton *m_isCurrentButton;
 	bool m_isCurrent;
 
-public:
+  public:
 	PaletteViewerPanel(QWidget *parent);
 
 	void setViewType(int viewType);
@@ -45,11 +45,11 @@ public:
 
 	void reset();
 
-protected:
+  protected:
 	void initializeTitleBar();
 	bool isActivatableOnEnter() { return true; }
 
-protected slots:
+  protected slots:
 	void onColorStyleSwitched();
 	void onPaletteSwitched();
 	void onCurrentButtonToggled(bool isCurrent);
@@ -67,12 +67,12 @@ class StudioPaletteViewerPanel : public TPanel
 	TPaletteHandle *m_studioPaletteHandle;
 	StudioPaletteViewer *m_studioPaletteViewer;
 
-public:
+  public:
 	StudioPaletteViewerPanel(QWidget *parent);
 
-protected:
+  protected:
 	bool isActivatableOnEnter() { return true; }
-protected slots:
+  protected slots:
 	void onColorStyleSwitched();
 	void onPaletteSwitched();
 };
@@ -86,7 +86,7 @@ class StyleEditorPanel : public TPanel
 	Q_OBJECT
 	StyleEditor *m_styleEditor;
 
-public:
+  public:
 	StyleEditorPanel(QWidget *parent);
 };
 
@@ -94,7 +94,8 @@ public:
 // ColorFieldEditorController
 //---------------------------------------------------------
 
-class ColorFieldEditorController : public QObject, public DVGui::ColorField::ColorFieldEditorController
+class ColorFieldEditorController : public QObject,
+								   public DVGui::ColorField::ColorFieldEditorController
 {
 	Q_OBJECT
 
@@ -102,15 +103,15 @@ class ColorFieldEditorController : public QObject, public DVGui::ColorField::Col
 	TPaletteHandle *m_colorFieldHandle;
 	DVGui::ColorField *m_currentColorField;
 
-public:
+  public:
 	ColorFieldEditorController();
 	~ColorFieldEditorController() {}
 
-	//Indice dello stile corrente == 1
+	// Indice dello stile corrente == 1
 	void edit(DVGui::ColorField *colorField);
 	void hide();
 
-protected slots:
+  protected slots:
 	void onColorStyleChanged();
 	void onColorChanged(const TPixel32 &color, bool);
 };
@@ -119,7 +120,9 @@ protected slots:
 // CleanupColorFieldEditorController
 //---------------------------------------------------------
 
-class CleanupColorFieldEditorController : public QObject, public DVGui::CleanupColorField::CleanupColorFieldEditorController
+class CleanupColorFieldEditorController
+	: public QObject,
+	  public DVGui::CleanupColorField::CleanupColorFieldEditorController
 {
 	Q_OBJECT
 
@@ -128,15 +131,15 @@ class CleanupColorFieldEditorController : public QObject, public DVGui::CleanupC
 	DVGui::CleanupColorField *m_currentColorField;
 	bool m_blackColor;
 
-public:
+  public:
 	CleanupColorFieldEditorController();
 	~CleanupColorFieldEditorController() {}
 
-	//Indice dello stile corrente == 1
+	// Indice dello stile corrente == 1
 	void edit(DVGui::CleanupColorField *colorField);
 	void hide();
 
-protected slots:
+  protected slots:
 	void onColorStyleChanged();
 };
 
@@ -150,17 +153,17 @@ class SchematicScenePanel : public TPanel
 
 	SchematicViewer *m_schematicViewer;
 
-public:
+  public:
 	SchematicScenePanel(QWidget *parent);
 
 	void setViewType(int viewType);
 	int getViewType();
 
-protected:
+  protected:
 	void showEvent(QShowEvent *e);
 	void hideEvent(QHideEvent *e);
 
-protected slots:
+  protected slots:
 	void onShowPreview(TFxP fx);
 	void onCollapse(const QList<TFxP> &);
 	void onCollapse(QList<TStageObjectId>);
@@ -179,7 +182,7 @@ class FunctionViewerPanel : public TPanel
 
 	FunctionViewer *m_functionViewer;
 
-public:
+  public:
 	FunctionViewerPanel(QWidget *parent = 0);
 
 	void reset();
@@ -189,11 +192,11 @@ public:
 
 	bool widgetInThisPanelIsFocused();
 
-protected:
+  protected:
 	void widgetFocusOnEnter();
 	void widgetClearFocusOnLeave();
 
-public slots:
+  public slots:
 
 	void onIoCurve(int type, TDoubleParam *curve, const std::string &name);
 	void onEditObject();
@@ -209,7 +212,7 @@ class ToolOptionPanel : public TPanel
 
 	ToolOptions *m_toolOption;
 
-public:
+  public:
 	ToolOptionPanel(QWidget *parent);
 };
 
@@ -225,17 +228,17 @@ class FlipbookPanel : public TPanel
 	QSize m_floatingSize;
 	TPanelTitleBarButton *m_button;
 
-protected:
+  protected:
 	void initializeTitleBar(TPanelTitleBar *titleBar);
 
-public:
+  public:
 	FlipbookPanel(QWidget *parent);
 
 	void reset();
 	// disable minimize button when docked
 	void onDock(bool docked);
 
-protected slots:
+  protected slots:
 	void onMinimizeButtonToggled(bool);
 };
 

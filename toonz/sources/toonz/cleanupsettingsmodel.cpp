@@ -1,10 +1,10 @@
 
 
-//TnzCore includes
+// TnzCore includes
 #include "tstream.h"
 #include "tsystem.h"
 
-//ToonzLib includes
+// ToonzLib includes
 #include "toonz/toonzscene.h"
 #include "toonz/sceneproperties.h"
 #include "toonz/txshleveltypes.h"
@@ -22,16 +22,16 @@
 #include "toonz/palettecontroller.h"
 #include "toonz/tproject.h"
 
-//ToonzQt includes
+// ToonzQt includes
 #include "toonzqt/gutil.h"
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/tselectionhandle.h"
 
-//Toonz includes
+// Toonz includes
 #include "tapp.h"
 #include "filebrowserpopup.h"
 
-//Qt includes
+// Qt includes
 #include <QMetaType>
 #include <QApplication>
 
@@ -50,7 +50,7 @@ namespace
 
 class IOSettingsPopup : public FileBrowserPopup
 {
-public:
+  public:
 	IOSettingsPopup(const QString &title) : FileBrowserPopup(title)
 	{
 		setModal(true);
@@ -63,7 +63,8 @@ public:
 		if (!folderPath.isEmpty())
 			folderPath = folderPath.getParentDir();
 		else {
-			TProject *currentProject = TProjectManager::instance()->getCurrentProject().getPointer();
+			TProject *currentProject =
+				TProjectManager::instance()->getCurrentProject().getPointer();
 			if (currentProject)
 				folderPath = currentProject->decode(currentProject->getFolder(TProject::Inputs));
 		}
@@ -79,12 +80,12 @@ public:
 
 class SaveSettingsPopup : public IOSettingsPopup
 {
-public:
+  public:
 	SaveSettingsPopup() : IOSettingsPopup(tr("Save Cleanup Settings"))
 	{
-		//addFilterType("tif");
-		//addFilterType("tga");
-		//addFilterType("png");
+		// addFilterType("tif");
+		// addFilterType("tga");
+		// addFilterType("png");
 
 		setOkText(tr("Save"));
 	}
@@ -98,11 +99,12 @@ public:
 		if (savePath.isEmpty())
 			return false;
 
-		savePath = savePath.withNoFrame().withType("cln"); //Just to be sure
+		savePath = savePath.withNoFrame().withType("cln"); // Just to be sure
 		if (TFileStatus(savePath).doesExist()) {
-			int ret = DVGui::MsgBox(QObject::tr("The cleanup settings file for the %1 level already exists.\n Do you want to overwrite it?")
-								 .arg(toQString(savePath.withoutParentDir())),
-							 QObject::tr("Overwrite"), QObject::tr("Don't Overwrite"), 0);
+			int ret = DVGui::MsgBox(QObject::tr("The cleanup settings file for the %1 level "
+												"already exists.\n Do you want to overwrite it?")
+										.arg(toQString(savePath.withoutParentDir())),
+									QObject::tr("Overwrite"), QObject::tr("Don't Overwrite"), 0);
 
 			if (ret == 2)
 				return false;
@@ -119,11 +121,8 @@ public:
 
 class LoadSettingsPopup : public IOSettingsPopup
 {
-public:
-	LoadSettingsPopup() : IOSettingsPopup(tr("Load Cleanup Settings"))
-	{
-		setOkText(tr("Load"));
-	}
+  public:
+	LoadSettingsPopup() : IOSettingsPopup(tr("Load Cleanup Settings")) { setOkText(tr("Load")); }
 
 	bool execute()
 	{
@@ -144,19 +143,20 @@ public:
 	}
 };
 
-} //namespace
+} // namespace
 
 //******************************************************************************
 //    CleanupSettingsModel implementation
 //******************************************************************************
 
 CleanupSettingsModel::CleanupSettingsModel()
-	: m_listenersCount(0), m_previewersCount(0), m_cameraTestsCount(0), m_allowedActions(FULLPROCESS), m_action(NONE), m_c(-1), m_sl(0)
+	: m_listenersCount(0), m_previewersCount(0), m_cameraTestsCount(0),
+	  m_allowedActions(FULLPROCESS), m_action(NONE), m_c(-1), m_sl(0)
 {
 	CleanupParameters *currentParams = getCurrentParameters();
 
-	//Don't clone the palette. Palette changes are tracked through
-	//palette handle signals.
+	// Don't clone the palette. Palette changes are tracked through
+	// palette handle signals.
 	m_backupParams.assign(currentParams, false);
 
 	TSceneHandle *sceneHandle = TApp::instance()->getCurrentScene();
@@ -257,13 +257,18 @@ void CleanupSettingsModel::connectSignals()
 	TColumnHandle *columnHandle = app->getCurrentColumn();
 	TPaletteHandle *paletteHandle = app->getPaletteController()->getCurrentCleanupPalette();
 
-	//The following are queued. This is best to prevent double-updates and selection issues with cln cancels.
+	// The following are queued. This is best to prevent double-updates and selection issues with
+	// cln cancels.
 	bool ret = true;
 
-	ret = ret && connect(frameHandle, SIGNAL(frameSwitched()), SLOT(onCellChanged()), Qt::QueuedConnection);
-	ret = ret && connect(columnHandle, SIGNAL(columnIndexSwitched()), SLOT(onCellChanged()), Qt::QueuedConnection);
-	ret = ret && connect(paletteHandle, SIGNAL(colorStyleChanged()), SLOT(onPaletteChanged()), Qt::QueuedConnection);
-	ret = ret && connect(paletteHandle, SIGNAL(paletteChanged()), SLOT(onPaletteChanged()), Qt::QueuedConnection);
+	ret = ret && connect(frameHandle, SIGNAL(frameSwitched()), SLOT(onCellChanged()),
+						 Qt::QueuedConnection);
+	ret = ret && connect(columnHandle, SIGNAL(columnIndexSwitched()), SLOT(onCellChanged()),
+						 Qt::QueuedConnection);
+	ret = ret && connect(paletteHandle, SIGNAL(colorStyleChanged()), SLOT(onPaletteChanged()),
+						 Qt::QueuedConnection);
+	ret = ret && connect(paletteHandle, SIGNAL(paletteChanged()), SLOT(onPaletteChanged()),
+						 Qt::QueuedConnection);
 
 	assert(ret);
 
@@ -312,7 +317,8 @@ void CleanupSettingsModel::commitChanges()
 			action = INTERFACE;
 
 		// Check post-processing-related changes
-		if (currentParams->m_transparencyCheckEnabled != m_backupParams.m_transparencyCheckEnabled ||
+		if (currentParams->m_transparencyCheckEnabled !=
+				m_backupParams.m_transparencyCheckEnabled ||
 			currentParams->m_noAntialias != m_backupParams.m_noAntialias ||
 			currentParams->m_postAntialias != m_backupParams.m_postAntialias ||
 			currentParams->m_despeckling != m_backupParams.m_despeckling ||
@@ -361,15 +367,18 @@ void CleanupSettingsModel::commitChanges(int action)
 
 		// Deal with scene stuff
 		if (m_clnPath.isEmpty()) {
-			TApp::instance()->getCurrentScene()->setDirtyFlag(true);   // This should be moved outside... sadly not supported at the moment...
-			CleanupParameters::GlobalParameters.assign(currentParams); // The global settings are being changed
+			TApp::instance()->getCurrentScene()->setDirtyFlag(
+				true); // This should be moved outside... sadly not supported at the moment...
+			CleanupParameters::GlobalParameters.assign(
+				currentParams); // The global settings are being changed
 		}
 	}
 
 	// Perform actions
-	int maxAction = tmax(action, m_action);				 // Add previuosly required actions
-	action = tmin(maxAction, m_allowedActions);			 // But only up to the allowed action
-	m_action = (action == maxAction) ? NONE : maxAction; // Then, update the previously required action
+	int maxAction = tmax(action, m_action);		// Add previuosly required actions
+	action = tmin(maxAction, m_allowedActions); // But only up to the allowed action
+	m_action =
+		(action == maxAction) ? NONE : maxAction; // Then, update the previously required action
 
 	if (action >= FULLPROCESS)
 		rebuildPreview();
@@ -436,20 +445,19 @@ void CleanupSettingsModel::processFrame(TXshSimpleLevel *sl, TFrameId fid)
 	// Perform primary cleanup processing
 	if (doProcessing) {
 		// Warning: the process() call below will put imageToCleanup = 0.
-		CleanupPreprocessedImage *cpi = cl->process(
-			imageToCleanup, true, m_previewTransformed, false, true, true, &m_transform);
+		CleanupPreprocessedImage *cpi = cl->process(imageToCleanup, true, m_previewTransformed,
+													false, true, true, &m_transform);
 		delete cpi;
 	}
 
 	// Perform camera test processing
 	if (doCameraTest) {
 		m_cameraTestTransformed = m_original;
-		if (params->m_autocenterType != CleanupTypes::AUTOCENTER_NONE ||
-			params->m_rotate != 0 ||
-			params->m_flipx ||
-			params->m_flipy) {
+		if (params->m_autocenterType != CleanupTypes::AUTOCENTER_NONE || params->m_rotate != 0 ||
+			params->m_flipx || params->m_flipy) {
 			bool autocentered;
-			m_cameraTestTransformed = cl->autocenterOnly(m_original.getPointer(), true, autocentered);
+			m_cameraTestTransformed =
+				cl->autocenterOnly(m_original.getPointer(), true, autocentered);
 
 			if (params->m_autocenterType != CleanupTypes::AUTOCENTER_NONE && !autocentered)
 				DVGui::warning(QObject::tr("The autocentering failed on the current drawing."));
@@ -561,12 +569,14 @@ bool CleanupSettingsModel::saveSettingsIfNeeded()
 	CleanupParameters *params = getCurrentParameters();
 
 	if (params->getDirtyFlag() && !m_clnPath.isEmpty() && TFileStatus(m_clnPath).doesExist()) {
-		QString question(QObject::tr("The cleanup settings for the current level have been modified...\n\nDo you want to save your changes?"));
+		QString question(QObject::tr("The cleanup settings for the current level have been "
+									 "modified...\n\nDo you want to save your changes?"));
 
 		int ret = DVGui::MsgBox(question, QObject::tr("Save"), QObject::tr("Discard"),
 								QObject::tr("Cancel"), 0);
 		if (ret == 1) {
-			// WARNING: This is legacy behavior, but is it really needed? I think there should be no further
+			// WARNING: This is legacy behavior, but is it really needed? I think there should be no
+			// further
 			// request of user interaction - why invoking the popup to choose the save path?
 			promptSave();
 		} else if (ret == 3)
@@ -583,7 +593,7 @@ void CleanupSettingsModel::restoreGlobalSettings()
 	CleanupParameters *currentParams = getCurrentParameters();
 	currentParams->assign(&CleanupParameters::GlobalParameters);
 
-	//Make sure that the current cleanup palette is set to currentParams' palette
+	// Make sure that the current cleanup palette is set to currentParams' palette
 	TApp::instance()->getPaletteController()->getCurrentCleanupPalette()->setPalette(
 		currentParams->m_cleanupPalette.getPointer());
 
@@ -667,13 +677,16 @@ bool CleanupSettingsModel::loadSettings(const TFilePath &clnPath)
 	if (!loadSettings(cp, clnPath))
 		return false;
 
-	//The same as restoreGlobalSettings()
-	TApp::instance()->getPaletteController()->getCurrentCleanupPalette()->setPalette(cp->m_cleanupPalette.getPointer());
+	// The same as restoreGlobalSettings()
+	TApp::instance()->getPaletteController()->getCurrentCleanupPalette()->setPalette(
+		cp->m_cleanupPalette.getPointer());
 
-	/*--- LoadSettingsPopupからこの関数が呼ばれたとき、ロードしたパラメータをGlobal設定に格納する---*/
+	/*---
+	 * LoadSettingsPopupからこの関数が呼ばれたとき、ロードしたパラメータをGlobal設定に格納する---*/
 	if (m_clnPath.isEmpty()) {
-		TApp::instance()->getCurrentScene()->setDirtyFlag(true); // This should be moved outside... sadly not supported at the moment...
-		CleanupParameters::GlobalParameters.assign(cp);			 // The global settings are being changed
+		TApp::instance()->getCurrentScene()->setDirtyFlag(
+			true); // This should be moved outside... sadly not supported at the moment...
+		CleanupParameters::GlobalParameters.assign(cp); // The global settings are being changed
 	}
 
 	m_backupParams.assign(cp, false);
@@ -749,5 +762,6 @@ TFilePath CleanupSettingsModel::getOutputPath(TXshSimpleLevel *sl, const Cleanup
 	// Check if the cleaned up level already exists
 	const TFilePath &outDir = params->getPath(scene);
 
-	return lineProcessing ? (outDir + inPath.getWideName()).withType("tlv") : (outDir + inPath.getLevelNameW()).withType("tif");
+	return lineProcessing ? (outDir + inPath.getWideName()).withType("tlv")
+						  : (outDir + inPath.getLevelNameW()).withType("tif");
 }

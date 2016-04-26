@@ -12,7 +12,7 @@
 #include "tparamcontainer.h"
 #include "tfxutil.h"
 
-//Rendering cache management includes
+// Rendering cache management includes
 #include "tfxcachemanager.h"
 #include "tcacheresourcepool.h"
 #include "tpassivecachemanager.h"
@@ -43,15 +43,20 @@ scale, releasing them when the scene scale changes; plus, the resource associate
 output is also stored.
 
 In other rendering contexts, the scene scale can be assumed constant - so the above distinction
-is unnecessary. All results from the input fxs are stored until the edited fx is unset from the swatch.
+is unnecessary. All results from the input fxs are stored until the edited fx is unset from the
+swatch.
 
-Please observe that variations in the scene context - such as frame change, schematic changes, scene changes
-and so on - actually cause the fx to be re-set for edit in the swatch. Once this happens, the previously
+Please observe that variations in the scene context - such as frame change, schematic changes, scene
+changes
+and so on - actually cause the fx to be re-set for edit in the swatch. Once this happens, the
+previously
 stored results are conveniently flushed from the cache.
 */
 
-/*NOTE: This can be extended in case we realize multiple swatch viewers... It should be sufficient to map
-a swatch pointer to its associated cache data - the advantage being that cache resources are shared at the
+/*NOTE: This can be extended in case we realize multiple swatch viewers... It should be sufficient
+to map
+a swatch pointer to its associated cache data - the advantage being that cache resources are shared
+at the
 same scene zoom.*/
 
 class SwatchCacheManager : public TFxCacheManagerDelegate
@@ -67,7 +72,7 @@ class SwatchCacheManager : public TFxCacheManagerDelegate
 
 	QMutex m_mutex;
 
-public:
+  public:
 	SwatchCacheManager() {}
 	~SwatchCacheManager() {}
 
@@ -77,13 +82,11 @@ public:
 
 	void clearSwatchResults();
 
-	void getResource(
-		TCacheResourceP &resource, const std::string &alias,
-		const TFxP &fx, double frame, const TRenderSettings &rs,
-		ResourceDeclaration *resData);
+	void getResource(TCacheResourceP &resource, const std::string &alias, const TFxP &fx,
+					 double frame, const TRenderSettings &rs, ResourceDeclaration *resData);
 
-	//void onRenderInstanceStart(unsigned long renderId);
-	//void onRenderInstanceEnd(unsigned long renderId);
+	// void onRenderInstanceStart(unsigned long renderId);
+	// void onRenderInstanceEnd(unsigned long renderId);
 
 	bool renderHasOwnership() { return false; }
 };
@@ -96,22 +99,20 @@ class SwatchCacheManagerGenerator : public TRenderResourceManagerGenerator
 {
 	TRenderResourceManager *operator()(void)
 	{
-		//return new TPassiveCacheManager;
+		// return new TPassiveCacheManager;
 		return SwatchCacheManager::instance();
 	}
 };
 
-MANAGER_FILESCOPE_DECLARATION_DEP(
-	SwatchCacheManager,
-	SwatchCacheManagerGenerator,
-	TFxCacheManager::deps())
+MANAGER_FILESCOPE_DECLARATION_DEP(SwatchCacheManager, SwatchCacheManagerGenerator,
+								  TFxCacheManager::deps())
 
 //=============================================================================
 namespace
 {
 //-----------------------------------------------------------------------------
 
-//!Abilita o disabilita la cache nell'effetto \b fx di \b frame in funzione di \b on
+//! Abilita o disabilita la cache nell'effetto \b fx di \b frame in funzione di \b on
 void setFxForCaching(TFx *fx)
 {
 	SwatchCacheManager::instance()->setFx(fx);
@@ -120,7 +121,7 @@ void setFxForCaching(TFx *fx)
 
 //-----------------------------------------------------------------------------
 
-//!Se name finisce con suffix ritorna la parte iniziale, altrimenti ""
+//! Se name finisce con suffix ritorna la parte iniziale, altrimenti ""
 std::string matchSuffix(std::string name, std::string suffix)
 {
 	if (name.length() <= suffix.length())
@@ -137,17 +138,16 @@ std::string matchSuffix(std::string name, std::string suffix)
 TRaster32P createCrossIcon()
 {
 	TRaster32P crossIcon = TRaster32P(7, 7);
-	//m_crossIcon e' utilizzata per evidenziare gli eventuali \b Point memorizzati in \b m_points.
+	// m_crossIcon e' utilizzata per evidenziare gli eventuali \b Point memorizzati in \b m_points.
 	crossIcon->fill(TPixel32(0, 0, 0, 0));
 	TPixel32 *c = crossIcon->pixels(3) + 3;
 	for (int i = 1; i <= 3; i++)
-		c[i] = c[-i] = c[7 * i] = c[-7 * i] =
-			(i & 1) == 0 ? TPixel32::White : TPixel32::Red;
+		c[i] = c[-i] = c[7 * i] = c[-7 * i] = (i & 1) == 0 ? TPixel32::White : TPixel32::Red;
 	return crossIcon;
 }
 
 //-----------------------------------------------------------------------------
-//!Disegna una freccia lunga \b len pixel.
+//! Disegna una freccia lunga \b len pixel.
 /*!La punta della freccia si trova a coordinate (0,ly/2), la coda a (len-1,ly/2).
 */
 TRaster32P createArrowShape(int len)
@@ -180,19 +180,17 @@ TRaster32P createArrowShape(int len)
 
 #define ZOOMLEVELS 30
 #define NOZOOMINDEX 20
-double ZoomFactors[ZOOMLEVELS] = {0.001, 0.002, 0.003, 0.004, 0.005, 0.007,
-								  0.01, 0.015, 0.02, 0.03, 0.04, 0.05,
-								  0.0625, 0.0833, 0.125, 0.167, 0.25, 0.333,
-								  0.5, 0.667, 1, 2, 3, 4,
-								  5, 6, 7, 8, 12, 16};
+double ZoomFactors[ZOOMLEVELS] = {0.001, 0.002, 0.003, 0.004, 0.005,  0.007,  0.01,  0.015,
+								  0.02,  0.03,  0.04,  0.05,  0.0625, 0.0833, 0.125, 0.167,
+								  0.25,  0.333, 0.5,   0.667, 1,	  2,	  3,	 4,
+								  5,	 6,		7,	 8,	 12,	 16};
 
 double getQuantizedZoomFactor(double zf, bool forward)
 {
 	if (forward && zf > ZoomFactors[ZOOMLEVELS - 1] ||
 		areAlmostEqual(zf, ZoomFactors[ZOOMLEVELS - 1], 1e-5))
 		return zf;
-	else if (!forward && zf < ZoomFactors[0] ||
-			 areAlmostEqual(zf, ZoomFactors[0], 1e-5))
+	else if (!forward && zf < ZoomFactors[0] || areAlmostEqual(zf, ZoomFactors[0], 1e-5))
 		return zf;
 
 	assert((!forward && zf > ZoomFactors[0]) || (forward && zf < ZoomFactors[ZOOMLEVELS - 1]));
@@ -220,7 +218,7 @@ double getQuantizedZoomFactor(double zf, bool forward)
 
 //-----------------------------------------------------------------------------
 
-bool suspendedRendering = false; //Global vars for swatch rendering suspension
+bool suspendedRendering = false; // Global vars for swatch rendering suspension
 QEventLoop *waitingLoop = 0;
 int submittedTasks = 0;
 
@@ -237,9 +235,12 @@ SwatchViewer::SwatchViewer(QWidget *parent, Qt::WindowFlags flags)
 #else
 SwatchViewer::SwatchViewer(QWidget *parent, Qt::WFlags flags)
 #endif
-	: QWidget(parent, flags), m_fx(0), m_actualFxClone(0), m_mouseButton(Qt::NoButton), m_selectedPoint(0), m_pointPosDelta(TPointD()), m_enabled(false), m_content(), m_aff(TAffine()), m_fxAff(TAffine()), m_cameraRect(), m_bgPainter(0), m_pos(TPoint()), m_firstPos(TPoint()), m_oldContent(), m_curContent(), m_executor()
+	: QWidget(parent, flags), m_fx(0), m_actualFxClone(0), m_mouseButton(Qt::NoButton),
+	  m_selectedPoint(0), m_pointPosDelta(TPointD()), m_enabled(false), m_content(),
+	  m_aff(TAffine()), m_fxAff(TAffine()), m_cameraRect(), m_bgPainter(0), m_pos(TPoint()),
+	  m_firstPos(TPoint()), m_oldContent(), m_curContent(), m_executor()
 {
-	//setMinimumSize(150,150);
+	// setMinimumSize(150,150);
 	setMinimumHeight(150);
 	setFixedWidth(150);
 	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
@@ -261,11 +262,11 @@ SwatchViewer::~SwatchViewer()
 
 //-----------------------------------------------------------------------------
 
-//!This static method is used to temporarily suspend all swatch-related render
-//!processing, typically because the rendering scene is being deleted.
-//!When a suspension is invoked, all further rendering requests made to
-//!swatch viewers are silently rejected, while currently active or scheduled ones
-//!are canceled and waited for completion.
+//! This static method is used to temporarily suspend all swatch-related render
+//! processing, typically because the rendering scene is being deleted.
+//! When a suspension is invoked, all further rendering requests made to
+//! swatch viewers are silently rejected, while currently active or scheduled ones
+//! are canceled and waited for completion.
 void SwatchViewer::suspendRendering(bool suspend, bool blocking)
 {
 	suspendedRendering = suspend;
@@ -286,7 +287,7 @@ void SwatchViewer::setCameraSize(const TDimension &cameraSize)
 	TRect cameraRect(cameraSize);
 	if (cameraRect != m_cameraRect) {
 		m_cameraRect = cameraRect;
-		updateSize(size()); //Invoke a size update to adapt the widget to the new camera ratio
+		updateSize(size()); // Invoke a size update to adapt the widget to the new camera ratio
 	}
 }
 
@@ -314,8 +315,7 @@ void SwatchViewer::setFx(const TFxP &fx, const TFxP &actualFx, int frame)
 		m_fxAff = TAffine();
 	int i;
 	for (i = 0; i < actualFx->getParams()->getParamCount(); i++) {
-		TPointParam *pointParam =
-			dynamic_cast<TPointParam *>(actualFx->getParams()->getParam(i));
+		TPointParam *pointParam = dynamic_cast<TPointParam *>(actualFx->getParams()->getParam(i));
 		if (pointParam)
 			m_points.push_back(Point(i, pointParam));
 	}
@@ -366,7 +366,8 @@ void SwatchViewer::setEnable(bool enabled)
 void SwatchViewer::updateSize(const QSize &size)
 {
 	int h = size.height();
-	double ratio = m_cameraRect.getLy() > 0 ? m_cameraRect.getLx() / (double)m_cameraRect.getLy() : 1.0;
+	double ratio =
+		m_cameraRect.getLy() > 0 ? m_cameraRect.getLx() / (double)m_cameraRect.getLy() : 1.0;
 	int w = tmin((int)(h * ratio), parentWidget()->width());
 	setFixedWidth(w);
 	if (w > 2 && h > 2)
@@ -444,8 +445,8 @@ void SwatchViewer::computeContent()
 	if (!m_raster)
 		return;
 
-	//Clear the swatch cache when the zoom scale has changed (cache results are not compatible
-	//between different scale levels)
+	// Clear the swatch cache when the zoom scale has changed (cache results are not compatible
+	// between different scale levels)
 	if (m_aff.a11 != m_contentAff.a11)
 		SwatchCacheManager::instance()->clearSwatchResults();
 
@@ -453,8 +454,8 @@ void SwatchViewer::computeContent()
 	TDimension size = rect.getSize();
 	assert(m_raster->getSize() == size);
 	if (m_fx) {
-		//TFxP fx = makeAffine(m_fx, m_aff);
-		//TRasterFxP rasterFx = fx;
+		// TFxP fx = makeAffine(m_fx, m_aff);
+		// TRasterFxP rasterFx = fx;
 		TRasterFxP rasterFx = m_fx;
 		if (rasterFx) {
 			m_executor.cancelAll();
@@ -635,8 +636,9 @@ void SwatchViewer::mousePressEvent(QMouseEvent *event)
 						if (i != j && m_points[j].m_param->getName() == otherName)
 							break;
 					if (j < n) {
-						TPoint dist = world2win(m_points[m_selectedPoint].m_param->getValue(m_frame)) -
-									  world2win(m_points[j].m_param->getValue(m_frame));
+						TPoint dist =
+							world2win(m_points[m_selectedPoint].m_param->getValue(m_frame)) -
+							world2win(m_points[j].m_param->getValue(m_frame));
 						int ddist2 = dist.x * dist.x + dist.y * dist.y;
 						if (ddist2 < 100)
 							m_selectedPoint = j;
@@ -668,13 +670,15 @@ void SwatchViewer::mouseMoveEvent(QMouseEvent *event)
 		int index = m_points[m_selectedPoint].m_index;
 		emit pointPositionChanged(index, p);
 
-		//It seems that mouse move events may jeopardize our rendering notification deliveries
+		// It seems that mouse move events may jeopardize our rendering notification deliveries
 		// - probably because Qt considers them 'higher priority stuff' with respect
-		//to common queued signal-slot connections.
+		// to common queued signal-slot connections.
 
-		//In order to allow processing of the ContentRender::started() and ContentRender::finished()
-		//signals, we need to process events. We will exclude user input events (ie other mouse events)
-		//to avoid unnecessary recursions.
+		// In order to allow processing of the ContentRender::started() and
+		// ContentRender::finished()
+		// signals, we need to process events. We will exclude user input events (ie other mouse
+		// events)
+		// to avoid unnecessary recursions.
 
 		QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 	} else if (m_mouseButton == Qt::MidButton) {
@@ -682,7 +686,7 @@ void SwatchViewer::mouseMoveEvent(QMouseEvent *event)
 			return;
 		m_curContent->fill(TPixel32::Transparent);
 		TPointD step = convert(pos - m_pos);
-		//Devo aggiornare l'affine per riposizionare la camera.
+		// Devo aggiornare l'affine per riposizionare la camera.
 		m_aff = TTranslation(step.x, -step.y) * m_aff;
 		m_pos = pos;
 		TPoint p = pos - m_firstPos;
@@ -729,7 +733,7 @@ void SwatchViewer::keyPressEvent(QKeyEvent *event)
 
 void SwatchViewer::hideEvent(QHideEvent *event)
 {
-	//Clear the swatch cache
+	// Clear the swatch cache
 	::setFxForCaching(0);
 }
 
@@ -737,15 +741,18 @@ void SwatchViewer::hideEvent(QHideEvent *event)
 // SwatchViewer::ContentRender
 //-----------------------------------------------------------------------------
 
-SwatchViewer::ContentRender::ContentRender(
-	TRasterFx *fx, int frame, const TDimension &size, SwatchViewer *viewer)
-	: m_fx(fx), m_raster(0), m_frame(frame), m_size(size), m_aff(viewer->m_aff), m_viewer(viewer), m_started(false)
+SwatchViewer::ContentRender::ContentRender(TRasterFx *fx, int frame, const TDimension &size,
+										   SwatchViewer *viewer)
+	: m_fx(fx), m_raster(0), m_frame(frame), m_size(size), m_aff(viewer->m_aff), m_viewer(viewer),
+	  m_started(false)
 {
-	//Is there a less complicated way...?
+	// Is there a less complicated way...?
 	connect(this, SIGNAL(started(TThread::RunnableP)), this, SLOT(onStarted(TThread::RunnableP)));
 	connect(this, SIGNAL(finished(TThread::RunnableP)), this, SLOT(onFinished(TThread::RunnableP)));
-	connect(this, SIGNAL(exception(TThread::RunnableP)), this, SLOT(onFinished(TThread::RunnableP)));
-	connect(this, SIGNAL(canceled(TThread::RunnableP)), this, SLOT(onCanceled(TThread::RunnableP)), Qt::QueuedConnection); //Starts will need to come *strictly before* cancels
+	connect(this, SIGNAL(exception(TThread::RunnableP)), this,
+			SLOT(onFinished(TThread::RunnableP)));
+	connect(this, SIGNAL(canceled(TThread::RunnableP)), this, SLOT(onCanceled(TThread::RunnableP)),
+			Qt::QueuedConnection); // Starts will need to come *strictly before* cancels
 }
 
 //-----------------------------------------------------------------------------
@@ -774,7 +781,8 @@ void SwatchViewer::ContentRender::run()
 	info.m_affine = m_aff;
 
 	TTile tile;
-	m_fx->allocateAndCompute(tile, -0.5 * TPointD(m_size.lx, m_size.ly), m_size, 0, (double)m_frame, info);
+	m_fx->allocateAndCompute(tile, -0.5 * TPointD(m_size.lx, m_size.ly), m_size, 0, (double)m_frame,
+							 info);
 	m_raster = tile.getRaster();
 
 	m_viewer->m_renderer.declareFrameEnd(m_frame);
@@ -836,9 +844,9 @@ void SwatchCacheManager::setFx(const TFxP &fx)
 {
 	QMutexLocker locker(&m_mutex);
 
-	//Update the fxs id data
+	// Update the fxs id data
 	if (fx == TFxP()) {
-		//Clear if no fx is set
+		// Clear if no fx is set
 		m_setFxId = 0;
 		m_childrenFxIds.clear();
 	} else {
@@ -850,7 +858,7 @@ void SwatchCacheManager::setFx(const TFxP &fx)
 		assert(rfx);
 
 		for (int i = 0; i < fx->getInputPortCount(); ++i) {
-			//Fxs not allowing cache on the input port are skipped
+			// Fxs not allowing cache on the input port are skipped
 			if (!rfx->allowUserCacheOnPort(i))
 				continue;
 
@@ -858,7 +866,7 @@ void SwatchCacheManager::setFx(const TFxP &fx)
 			if (iport && iport->isConnected()) {
 				TFx *child = iport->getFx();
 
-				//In the zerary case, extract the actual fx
+				// In the zerary case, extract the actual fx
 				TZeraryColumnFx *zcfx = dynamic_cast<TZeraryColumnFx *>(child);
 				if (zcfx)
 					child = zcfx->getZeraryFx();
@@ -869,9 +877,9 @@ void SwatchCacheManager::setFx(const TFxP &fx)
 		}
 	}
 
-	//NOTE: Check if this should be avoided in some case...
+	// NOTE: Check if this should be avoided in some case...
 
-	//Release the locks and clear the resources
+	// Release the locks and clear the resources
 	if (m_currEditedFxResult)
 		m_currEditedFxResult->releaseLock();
 	m_currEditedFxResult = TCacheResourceP();
@@ -892,7 +900,7 @@ void SwatchCacheManager::setFx(const TFxP &fx)
 
 //-----------------------------------------------------------------------------
 
-//This method is invoked by the swatch when its scene scale changes. Find it above.
+// This method is invoked by the swatch when its scene scale changes. Find it above.
 void SwatchCacheManager::clearSwatchResults()
 {
 	QMutexLocker locker(&m_mutex);
@@ -909,19 +917,18 @@ void SwatchCacheManager::clearSwatchResults()
 
 //-----------------------------------------------------------------------------
 
-void SwatchCacheManager::getResource(
-	TCacheResourceP &resource, const std::string &alias,
-	const TFxP &fx, double frame, const TRenderSettings &rs,
-	ResourceDeclaration *resData)
+void SwatchCacheManager::getResource(TCacheResourceP &resource, const std::string &alias,
+									 const TFxP &fx, double frame, const TRenderSettings &rs,
+									 ResourceDeclaration *resData)
 {
-	//Only FX RESULTS are interesting - plus, avoid if we're not currently
-	//editing an fx.
+	// Only FX RESULTS are interesting - plus, avoid if we're not currently
+	// editing an fx.
 	if (!(fx && m_setFxId > 0))
 		return;
 
 	QMutexLocker locker(&m_mutex);
 
-	//Cache the result in case the fx's id is among the stored ones.
+	// Cache the result in case the fx's id is among the stored ones.
 	unsigned long fxId = fx->getIdentifier();
 
 	if (fxId == m_setFxId && rs.m_isSwatch) {
@@ -941,8 +948,7 @@ void SwatchCacheManager::getResource(
 			resource = TCacheResourceP(alias, true);
 
 		if (rs.m_isSwatch) {
-			std::set<TCacheResourceP>::iterator it =
-				m_swatchCacheContainer.find(resource);
+			std::set<TCacheResourceP>::iterator it = m_swatchCacheContainer.find(resource);
 
 			if (it == m_swatchCacheContainer.end()) {
 				resource->addLock();
@@ -953,8 +959,7 @@ void SwatchCacheManager::getResource(
 			resource->enableBackup();
 			TCacheResourcePool::instance()->addReference(resource, "S");
 #else
-			std::set<TCacheResourceP>::iterator it =
-				m_genericCacheContainer.find(resource);
+			std::set<TCacheResourceP>::iterator it = m_genericCacheContainer.find(resource);
 
 			if (it == m_genericCacheContainer.end()) {
 				resource->addLock();

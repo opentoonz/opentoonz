@@ -9,7 +9,7 @@
 class TLevelReaderPsd : public TLevelReader
 {
 
-public:
+  public:
 	TLevelReaderPsd(const TFilePath &path);
 	~TLevelReaderPsd();
 	TImageReaderP getFrameReader(TFrameId fid);
@@ -23,35 +23,35 @@ public:
 	TRect getBBox() const { return TRect(0, 0, m_lx - 1, m_ly - 1); }
 
 	void setLayerId(int layerId) { m_layerId = layerId; }
-	//int m_IOError;
+	// int m_IOError;
 
-private:
+  private:
 	TFilePath m_path;
 	int m_lx, m_ly;
 	int m_layersCount;
 	TPSDReader *m_psdreader;
 	int m_layerId;
 	std::map<TFrameId, int> m_frameTable; // frameID, layerId
-public:
+  public:
 	static TLevelReader *create(const TFilePath &f);
 	TThread::Mutex m_mutex;
 };
 
 class TLevelWriterPsd : public TLevelWriter
 {
-public:
+  public:
 	TLevelWriterPsd(const TFilePath &path, TPropertyGroup *winfo);
 	~TLevelWriterPsd();
 	TImageWriterP getFrameWriter(TFrameId fid);
 
 	void save(const TImageP &img, int layerId);
 
-private:
-public:
+  private:
+  public:
 	static TLevelWriter *create(const TFilePath &f, TPropertyGroup *winfo)
 	{
 		return new TLevelWriterPsd(f, winfo);
 	};
 };
 
-#endif //TIIO_PSD_H
+#endif // TIIO_PSD_H

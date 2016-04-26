@@ -8,7 +8,7 @@
 #include "toonz/tstageobject.h"
 #include "keyframeselection.h"
 
-//forward declarations
+// forward declarations
 class TXsheet;
 
 //=============================================================================
@@ -17,24 +17,21 @@ class TXsheet;
 
 class TKeyframeData : public DvMimeData
 {
-public:
+  public:
 	typedef TKeyframeSelection::Position Position;
 	typedef std::map<Position, TStageObject::Keyframe> KeyData;
 	typedef std::map<Position, TStageObject::Keyframe>::const_iterator Iterator;
 
 	KeyData m_keyData;
 
-	//Numero di colonna della pegbar associato al booleano isCycleEnabled della pegbar
+	// Numero di colonna della pegbar associato al booleano isCycleEnabled della pegbar
 	std::map<int, bool> m_isPegbarsCycleEnabled;
 
 	TKeyframeData();
 	TKeyframeData(const TKeyframeData *src);
 	~TKeyframeData();
 
-	TKeyframeData *clone() const
-	{
-		return new TKeyframeData(this);
-	}
+	TKeyframeData *clone() const { return new TKeyframeData(this); }
 
 	// data <- xsh
 	void setKeyframes(std::set<Position> positions, TXsheet *xsh);
@@ -53,4 +50,4 @@ public:
 	}
 };
 
-#endif //KEYFRAMEDATA_INCLUDED
+#endif // KEYFRAMEDATA_INCLUDED

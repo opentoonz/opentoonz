@@ -24,7 +24,7 @@ class DVAPI TFxAttributes
 	bool m_speedAware;
 	bool m_isOpened;
 	TPointD m_speed;
-	//A stack is used to manage subgroups.
+	// A stack is used to manage subgroups.
 	QStack<int> m_groupId;
 	QStack<std::wstring> m_groupName;
 	int m_passiveCacheDataIdx;
@@ -34,7 +34,7 @@ class DVAPI TFxAttributes
 	/*-- MotionBlurなどのFxのために、オブジェクトの軌跡のデータを取得する --*/
 	QList<TPointD> m_motionPoints;
 
-public:
+  public:
 	TFxAttributes();
 	~TFxAttributes();
 
@@ -58,13 +58,10 @@ public:
 
 	int &passiveCacheDataIdx() { return m_passiveCacheDataIdx; }
 
-	void setMotionPoints(QList<TPointD> motionPoints)
-	{
-		m_motionPoints = motionPoints;
-	}
+	void setMotionPoints(QList<TPointD> motionPoints) { m_motionPoints = motionPoints; }
 	QList<TPointD> getMotionPoints() { return m_motionPoints; }
 
-	//Group management
+	// Group management
 
 	int setGroupId(int value);
 	void setGroupId(int value, int position);

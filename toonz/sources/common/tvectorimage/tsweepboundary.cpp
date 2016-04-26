@@ -53,22 +53,17 @@ set<TPointD> nonSimpleCrossing;
 
 class LinkedQuadratic : public TQuadratic
 {
-public:
+  public:
 	LinkedQuadratic *prev, *next;
 	LinkedQuadratic() : TQuadratic(), prev(0), next(0){};
 	LinkedQuadratic(const TPointD &p0, const TPointD &p1, const TPointD &p2)
-		: TQuadratic(p0, p1, p2), prev(0), next(0) {}
-	LinkedQuadratic(TQuadratic &Quadratic)
-		: TQuadratic(Quadratic),
-		  prev(0), next(0) {}
+		: TQuadratic(p0, p1, p2), prev(0), next(0)
+	{
+	}
+	LinkedQuadratic(TQuadratic &Quadratic) : TQuadratic(Quadratic), prev(0), next(0) {}
 };
 
-typedef enum Direction {
-	inward = 0,
-	outward = 1,
-	deletedInward = 2,
-	deletedOutward = 3
-};
+typedef enum Direction { inward = 0, outward = 1, deletedInward = 2, deletedOutward = 3 };
 
 /*
 	class CompareOutlines {
@@ -97,9 +92,8 @@ typedef enum Direction {
 */
 class CompareLinkedQuadratics
 {
-public:
-	bool operator()(const LinkedQuadratic &q1,
-					const LinkedQuadratic &q2)
+  public:
+	bool operator()(const LinkedQuadratic &q1, const LinkedQuadratic &q2)
 	{
 		if (q1.getBBox().y1 > q2.getBBox().y1)
 			return true;
@@ -116,7 +110,7 @@ public:
 
 class CompareBranches
 {
-public:
+  public:
 	bool operator()(const pair<LinkedQuadratic *, Direction> &b1,
 					const pair<LinkedQuadratic *, Direction> &b2)
 	{
@@ -176,14 +170,12 @@ public:
 
 typedef list<LinkedQuadratic> LinkedQuadraticList;
 typedef list<TQuadratic> QuadraticList;
-} //namespace {
+} // namespace {
 
 //---------------------------------------------------------------------------
 
-void splitCircularArcIntoQuadraticCurves(const TPointD &Center,
-										 const TPointD &Pstart,
-										 const TPointD &Pend,
-										 vector<TQuadratic *> &quadArray)
+void splitCircularArcIntoQuadraticCurves(const TPointD &Center, const TPointD &Pstart,
+										 const TPointD &Pend, vector<TQuadratic *> &quadArray)
 {
 	// It splits a circular anticlockwise arc into a sequence of quadratic bezier curves
 	// Every quadratic curve can approximate an arc no longer than 45 degrees (or 60).
@@ -192,8 +184,8 @@ void splitCircularArcIntoQuadraticCurves(const TPointD &Center,
 	// be unpredictable.
 	// The last component in quadCurve[] is an ending void curve
 
-	/* 
----------------------------------------------------------------------------------- 
+	/*
+----------------------------------------------------------------------------------
 */
 	// If you want to split the arc into arcs no longer than 45 degrees (so that the whole
 	// curve will be splitted into 8 pieces) you have to set these constants as follows:
@@ -208,8 +200,8 @@ void splitCircularArcIntoQuadraticCurves(const TPointD &Center,
 	// sin_ang     ==> sin_60 = 0.5 * sqrt(3);
 	// tan_semiang ==> tan_30 = 0.57735026918962576450914878050196;
 	// N_QUAD                 = 6;
-	/* 
----------------------------------------------------------------------------------- 
+	/*
+----------------------------------------------------------------------------------
 */
 
 	// Defines some useful constant to split the arc into arcs no longer than 'ang' degrees
@@ -232,13 +224,13 @@ void splitCircularArcIntoQuadraticCurves(const TPointD &Center,
 	while ((cross_prod <= 0) || (dot_prod <= cos_ang * sqr_radius)) // the circular arc is longer
 																	// than a 'ang' degrees arc
 	{
-		if (quadArray.size() == (UINT)N_QUAD) // this is possible if Pstart or Pend is not onto the circumference
+		if (quadArray.size() ==
+			(UINT)N_QUAD) // this is possible if Pstart or Pend is not onto the circumference
 			return;
 		TPointD Rstart_rot_ang(cos_ang * Rstart.x - sin_ang * Rstart.y,
 							   sin_ang * Rstart.x + cos_ang * Rstart.y);
 		TPointD Rstart_rot_90(-Rstart.y, Rstart.x);
-		quad = new TQuadratic(aliasPstart,
-							  aliasPstart + tan_semiang * Rstart_rot_90,
+		quad = new TQuadratic(aliasPstart, aliasPstart + tan_semiang * Rstart_rot_90,
 							  Center + Rstart_rot_ang);
 		quadArray.push_back(quad);
 
@@ -256,13 +248,18 @@ void splitCircularArcIntoQuadraticCurves(const TPointD &Center,
 			return;
 	}
 
-	if ((cross_prod > 0) && (dot_prod > 0)) // the last quadratic curve approximates an arc shorter than a 'ang' degrees arc
+	if ((cross_prod > 0) &&
+		(dot_prod >
+		 0)) // the last quadratic curve approximates an arc shorter than a 'ang' degrees arc
 	{
 		TPointD Rstart_rot_90(-Rstart.y, Rstart.x);
 
 		double deg_index = (sqr_radius - dot_prod) / (sqr_radius + dot_prod);
 
-		quad = new TQuadratic(aliasPstart, (deg_index < 0) ? 0.5 * (aliasPstart + Pend) : aliasPstart + sqrt(deg_index) * Rstart_rot_90, Pend);
+		quad = new TQuadratic(aliasPstart,
+							  (deg_index < 0) ? 0.5 * (aliasPstart + Pend)
+											  : aliasPstart + sqrt(deg_index) * Rstart_rot_90,
+							  Pend);
 		quadArray.push_back(quad);
 
 	} else // the last curve, already computed, is as long as a 'ang' degrees arc
@@ -287,30 +284,27 @@ inline bool collinear(const TPointD &a, const TPointD &b, const TPointD &c)
 	return area == 0;
 }
 
-void computeStrokeBoundary(const TStroke &stroke, LinkedQuadraticList &inputBoundaries, unsigned int &chunkIndex);
-void normalizeTThickQuadratic(const TThickQuadratic *&sourceThickQuadratic, TThickQuadratic &tempThickQuadratic);
+void computeStrokeBoundary(const TStroke &stroke, LinkedQuadraticList &inputBoundaries,
+						   unsigned int &chunkIndex);
+void normalizeTThickQuadratic(const TThickQuadratic *&sourceThickQuadratic,
+							  TThickQuadratic &tempThickQuadratic);
 inline void normalizeTQuadratic(TQuadratic *&sourceQuadratic);
-void getBoundaryPoints(const TPointD &P0,
-					   const TPointD &P1,
-					   const TThickPoint &center,
-					   TPointD &fwdPoint,
-					   TPointD &rwdPoint);
-void getAverageBoundaryPoints(const TPointD &P0,
-							  const TThickPoint &center,
-							  const TPointD &P2,
-							  TPointD &fwdPoint,
-							  TPointD &rwdPoint);
+void getBoundaryPoints(const TPointD &P0, const TPointD &P1, const TThickPoint &center,
+					   TPointD &fwdPoint, TPointD &rwdPoint);
+void getAverageBoundaryPoints(const TPointD &P0, const TThickPoint &center, const TPointD &P2,
+							  TPointD &fwdPoint, TPointD &rwdPoint);
 void linkQuadraticList(LinkedQuadraticList &inputBoundaries);
 void computeInputBoundaries(LinkedQuadraticList &inputBoundaries);
 void processAdjacentQuadratics(LinkedQuadraticList &inputBoundaries);
-void findIntersections(LinkedQuadratic *quadratic,
-					   set<LinkedQuadratic *> &intersectionWindow,
-					   map<LinkedQuadratic *,
-						   vector<double>> &intersectedQuadratics);
-void refreshIntersectionWindow(LinkedQuadratic *quadratic, set<LinkedQuadratic *> &intersectionWindow);
-void segmentate(LinkedQuadraticList &inputBoundaries, LinkedQuadratic *thickQuadratic, vector<double> &splitPoints);
+void findIntersections(LinkedQuadratic *quadratic, set<LinkedQuadratic *> &intersectionWindow,
+					   map<LinkedQuadratic *, vector<double>> &intersectedQuadratics);
+void refreshIntersectionWindow(LinkedQuadratic *quadratic,
+							   set<LinkedQuadratic *> &intersectionWindow);
+void segmentate(LinkedQuadraticList &inputBoundaries, LinkedQuadratic *thickQuadratic,
+				vector<double> &splitPoints);
 void processIntersections(LinkedQuadraticList &intersectionBoundary);
-bool processNonSimpleLoops(TPointD &intersectionPoint, vector<pair<LinkedQuadratic *, Direction>> &crossing);
+bool processNonSimpleLoops(TPointD &intersectionPoint,
+						   vector<pair<LinkedQuadratic *, Direction>> &crossing);
 bool deleteUnlinkedLoops(LinkedQuadraticList &inputBoundaries);
 bool getOutputOutlines(LinkedQuadraticList &inputBoundaries, vector<TStroke *> &sweepStrokes);
 void removeFalseHoles(const vector<TStroke *> &strokes);
@@ -318,20 +312,12 @@ void removeFalseHoles(const vector<TStroke *> &strokes);
 inline void TraceLinkedQuadraticList(LinkedQuadraticList &quadraticList)
 {
 #ifdef _WIN32
-	_RPT0(_CRT_WARN,
-		  "\n__________________________________________________\n");
+	_RPT0(_CRT_WARN, "\n__________________________________________________\n");
 	LinkedQuadraticList::iterator it = quadraticList.begin();
 	while (it != quadraticList.end()) {
-		_RPT4(_CRT_WARN,
-			  "\nP0( %f, %f)   P2( %f, %f)",
-			  it->getP0().x,
-			  it->getP0().y,
-			  it->getP2().x,
+		_RPT4(_CRT_WARN, "\nP0( %f, %f)   P2( %f, %f)", it->getP0().x, it->getP0().y, it->getP2().x,
 			  it->getP2().y);
-		_RPT3(_CRT_WARN,
-			  " currAddress = %p, nextAddress = %p prevAddress = %p\n",
-			  &(*it),
-			  it->next,
+		_RPT3(_CRT_WARN, " currAddress = %p, nextAddress = %p prevAddress = %p\n", &(*it), it->next,
 			  it->prev);
 		++it;
 	}
@@ -373,12 +359,12 @@ TStroke *getOutStroke(LinkedQuadraticList &inputBoundaries)
 	for (; it != inputBoundaries.end(); ++it)
 
 	{
-		//if (tdistance2(aux.back(), it->getP2())>0.25)
+		// if (tdistance2(aux.back(), it->getP2())>0.25)
 		{
 			aux.push_back(it->getP1());
 			aux.push_back(it->getP2());
 		}
-		//inputBoundaries.remove(*it);
+		// inputBoundaries.remove(*it);
 	}
 	return new TStroke(aux);
 }
@@ -387,24 +373,24 @@ TStroke *getOutStroke(LinkedQuadraticList &inputBoundaries)
 
 inline bool getOutputOutlines(LinkedQuadraticList &inputBoundaries, vector<TStroke *> &sweepStrokes)
 {
-	//int count=0;
+	// int count=0;
 
 	while (!inputBoundaries.empty()) {
-		//outputOutlines.push_back(TFlash::Polyline());
+		// outputOutlines.push_back(TFlash::Polyline());
 		vector<TPointD> v;
 		LinkedQuadraticList::iterator it = inputBoundaries.begin();
-		//std::advance(it, count+1);
+		// std::advance(it, count+1);
 		LinkedQuadratic *first = &(*it);
 		LinkedQuadratic *toRemove, *current = first;
 		v.push_back(current->getP0());
 		do {
-			//if (tdistance2(v.back(), current->getP2())>0.25)
+			// if (tdistance2(v.back(), current->getP2())>0.25)
 			{
 				v.push_back(current->getP1());
 				v.push_back(current->getP2());
 			}
-			//count++;
-			//outputOutlines.back().m_quads.push_back(new TQuadratic(*current));
+			// count++;
+			// outputOutlines.back().m_quads.push_back(new TQuadratic(*current));
 			toRemove = current;
 			current = current->next;
 			inputBoundaries.remove(*toRemove);
@@ -418,7 +404,8 @@ inline bool getOutputOutlines(LinkedQuadraticList &inputBoundaries, vector<TStro
 
 		} while (current != first && !inputBoundaries.empty());
 		sweepStrokes.push_back(new TStroke(v));
-		//		sort(outputOutlines[count].begin(), outputOutlines[count].end(), CompareQuadratics());
+		//		sort(outputOutlines[count].begin(), outputOutlines[count].end(),
+		//CompareQuadratics());
 	}
 	inputBoundaries.clear();
 	return true;
@@ -428,13 +415,13 @@ inline bool getOutputOutlines(LinkedQuadraticList &inputBoundaries, vector<TStro
 
 bool computeBoundaryStroke(const TStroke &_stroke, vector<TStroke *> &sweepStrokes)
 {
-	//if(!outlines.empty()) return false;
+	// if(!outlines.empty()) return false;
 
 	TStroke *oriStroke = const_cast<TStroke *>(&_stroke);
 	TStroke *stroke = oriStroke;
 	for (int i = 0; i < stroke->getControlPointCount(); i++) {
 		TThickPoint p = stroke->getControlPoint(i);
-		//se ci sono punti a spessore nullo, viene male il boundary.
+		// se ci sono punti a spessore nullo, viene male il boundary.
 		if (areAlmostEqual(p.thick, 0, 1e-8)) {
 			if (stroke == oriStroke)
 				stroke = new TStroke(_stroke);
@@ -458,10 +445,10 @@ bool computeBoundaryStroke(const TStroke &_stroke, vector<TStroke *> &sweepStrok
 			return false;
 		if (!getOutputOutlines(inputBoundaries, sweepStrokes))
 			return false;
-		//TStroke *sout = getOutStroke(inputBoundaries);
-		//sweepStrokes.push_back(sout);
+		// TStroke *sout = getOutStroke(inputBoundaries);
+		// sweepStrokes.push_back(sout);
 
-		//if(!getOutputOutlines(inputBoundaries, outlines)) return false;
+		// if(!getOutputOutlines(inputBoundaries, outlines)) return false;
 	}
 
 	if (stroke != &_stroke)
@@ -471,7 +458,8 @@ bool computeBoundaryStroke(const TStroke &_stroke, vector<TStroke *> &sweepStrok
 
 //-------------------------------------------------------------------
 
-inline void computeStrokeBoundary(const TStroke &stroke, LinkedQuadraticList &inputBoundaries, unsigned int &chunkIndex)
+inline void computeStrokeBoundary(const TStroke &stroke, LinkedQuadraticList &inputBoundaries,
+								  unsigned int &chunkIndex)
 {
 	unsigned int chunkCount = stroke.getChunkCount();
 	assert(chunkCount - chunkIndex > 0);
@@ -490,16 +478,15 @@ inline void computeStrokeBoundary(const TStroke &stroke, LinkedQuadraticList &in
 	thickQuadratic = stroke.getChunk(chunkIndex);
 	while (thickQuadratic->getP0() == thickQuadratic->getP2()) {
 		double thickness;
-		thickness = tmax(thickQuadratic->getThickP0().thick,
-						 thickQuadratic->getThickP1().thick,
+		thickness = tmax(thickQuadratic->getThickP0().thick, thickQuadratic->getThickP1().thick,
 						 thickQuadratic->getThickP2().thick);
 
 		++chunkIndex;
 		if (chunkIndex == chunkCount) {
 			vector<TQuadratic *> quadArray;
-			double thickness = tmax(thickQuadratic->getThickP0().thick,
-									thickQuadratic->getThickP1().thick,
-									thickQuadratic->getThickP2().thick);
+			double thickness =
+				tmax(thickQuadratic->getThickP0().thick, thickQuadratic->getThickP1().thick,
+					 thickQuadratic->getThickP2().thick);
 
 			if (thickness < thicknessLimit)
 				thickness = thicknessLimit;
@@ -536,11 +523,8 @@ inline void computeStrokeBoundary(const TStroke &stroke, LinkedQuadraticList &in
 	}
 
 	normalizeTThickQuadratic(thickQuadratic, tempThickQuadratic);
-	getBoundaryPoints(thickQuadratic->getP0(),
-					  thickQuadratic->getP1(),
-					  thickQuadratic->getThickP0(),
-					  fwdP0,
-					  rwdP2);
+	getBoundaryPoints(thickQuadratic->getP0(), thickQuadratic->getP1(),
+					  thickQuadratic->getThickP0(), fwdP0, rwdP2);
 
 	if (!(rwdP2 == fwdP0)) {
 		//		inputBoundaries.push_front(TQuadratic(rwdP2, (rwdP2+fwdP0)*0.5, fwdP0));
@@ -601,8 +585,10 @@ inline void computeStrokeBoundary(const TStroke &stroke, LinkedQuadraticList &in
 		normalizeTThickQuadratic(nextThickQuadratic, tempNextThickQuadratic);
 
 		vector<DoublePair> intersections;
-		TQuadratic quadratic(thickQuadratic->getP0(), thickQuadratic->getP1(), thickQuadratic->getP2());
-		TQuadratic nextQuadratic(nextThickQuadratic->getP0(), nextThickQuadratic->getP1(), nextThickQuadratic->getP2());
+		TQuadratic quadratic(thickQuadratic->getP0(), thickQuadratic->getP1(),
+							 thickQuadratic->getP2());
+		TQuadratic nextQuadratic(nextThickQuadratic->getP0(), nextThickQuadratic->getP1(),
+								 nextThickQuadratic->getP2());
 
 		if (intersect(quadratic, nextQuadratic, intersections) > 1) {
 			double currSplit = 1, nextSplit = 0;
@@ -612,8 +598,7 @@ inline void computeStrokeBoundary(const TStroke &stroke, LinkedQuadraticList &in
 				if (nextSplit < intersections[i].second)
 					nextSplit = intersections[i].second;
 			}
-			if (currSplit < one && nextSplit > zero &&
-				currSplit > 0.5 && nextSplit < 0.5) {
+			if (currSplit < one && nextSplit > zero && currSplit > 0.5 && nextSplit < 0.5) {
 				TQuadratic firstSplit, secondSplit;
 
 				quadratic.split(currSplit, firstSplit, secondSplit);
@@ -626,22 +611,13 @@ inline void computeStrokeBoundary(const TStroke &stroke, LinkedQuadraticList &in
 			}
 		}
 
-		getAverageBoundaryPoints(thickQuadratic->getP0(),
-								 thickQuadratic->getThickP1(),
-								 thickQuadratic->getP2(),
-								 fwdP1,
-								 rwdP1);
+		getAverageBoundaryPoints(thickQuadratic->getP0(), thickQuadratic->getThickP1(),
+								 thickQuadratic->getP2(), fwdP1, rwdP1);
 
-		getBoundaryPoints(thickQuadratic->getP1(),
-						  thickQuadratic->getP2(),
-						  thickQuadratic->getThickP2(),
-						  fwdP2,
-						  rwdP0);
-		getBoundaryPoints(thickQuadratic->getP2(),
-						  nextThickQuadratic->getP1(),
-						  thickQuadratic->getThickP2(),
-						  nextFwdP0,
-						  nextRwdP2);
+		getBoundaryPoints(thickQuadratic->getP1(), thickQuadratic->getP2(),
+						  thickQuadratic->getThickP2(), fwdP2, rwdP0);
+		getBoundaryPoints(thickQuadratic->getP2(), nextThickQuadratic->getP1(),
+						  thickQuadratic->getThickP2(), nextFwdP0, nextRwdP2);
 
 		TPointD v1 = thickQuadratic->getP2() - thickQuadratic->getP1();
 		TPointD v2 = nextThickQuadratic->getP1() - nextThickQuadratic->getP0();
@@ -657,8 +633,10 @@ inline void computeStrokeBoundary(const TStroke &stroke, LinkedQuadraticList &in
 			rwdP2 = rwdP0;
 		} else if (!(nextFwdP0 == fwdP2) && !(nextRwdP2 == rwdP0)) {
 			bool turnLeft, turnRight;
-			turnLeft = left(thickQuadratic->getP1(), thickQuadratic->getP2(), nextThickQuadratic->getP1());
-			turnRight = right(thickQuadratic->getP1(), thickQuadratic->getP2(), nextThickQuadratic->getP1());
+			turnLeft =
+				left(thickQuadratic->getP1(), thickQuadratic->getP2(), nextThickQuadratic->getP1());
+			turnRight = right(thickQuadratic->getP1(), thickQuadratic->getP2(),
+							  nextThickQuadratic->getP1());
 			if (turnLeft) {
 				double thickness = thickQuadratic->getThickP2().thick;
 				if (thickness < thicknessLimit)
@@ -666,8 +644,9 @@ inline void computeStrokeBoundary(const TStroke &stroke, LinkedQuadraticList &in
 
 				TPointD temp;
 				if (rwdP0 + nextRwdP2 - 2 * thickQuadratic->getP2() != TPointD(0, 0)) {
-					temp = (normalize(rwdP0 + nextRwdP2 - 2 * thickQuadratic->getP2()) * thickness) +
-						   thickQuadratic->getP2();
+					temp =
+						(normalize(rwdP0 + nextRwdP2 - 2 * thickQuadratic->getP2()) * thickness) +
+						thickQuadratic->getP2();
 				} else
 					temp = TPointD(0, 0);
 
@@ -675,7 +654,8 @@ inline void computeStrokeBoundary(const TStroke &stroke, LinkedQuadraticList &in
 				inputBoundaries.push_back(LinkedQuadratic(fwdP0, fwdP1, fwdP2));
 
 				vector<TQuadratic *> quadArray;
-				splitCircularArcIntoQuadraticCurves(thickQuadratic->getP2(), fwdP2, nextFwdP0, quadArray);
+				splitCircularArcIntoQuadraticCurves(thickQuadratic->getP2(), fwdP2, nextFwdP0,
+													quadArray);
 				for (unsigned int i = 0; i < quadArray.size(); ++i) {
 					if (!(quadArray[i]->getP0() == quadArray[i]->getP2())) {
 						normalizeTQuadratic(quadArray[i]);
@@ -694,8 +674,9 @@ inline void computeStrokeBoundary(const TStroke &stroke, LinkedQuadraticList &in
 
 				TPointD temp;
 				if (fwdP2 + nextFwdP0 - 2 * thickQuadratic->getP2() != TPointD(0, 0)) {
-					temp = (normalize(fwdP2 + nextFwdP0 - 2 * thickQuadratic->getP2()) * thickness) +
-						   thickQuadratic->getP2();
+					temp =
+						(normalize(fwdP2 + nextFwdP0 - 2 * thickQuadratic->getP2()) * thickness) +
+						thickQuadratic->getP2();
 				} else
 					temp = TPointD(0, 0);
 
@@ -703,7 +684,8 @@ inline void computeStrokeBoundary(const TStroke &stroke, LinkedQuadraticList &in
 				inputBoundaries.push_back(LinkedQuadratic(fwdP0, fwdP1, temp));
 
 				vector<TQuadratic *> quadArray;
-				splitCircularArcIntoQuadraticCurves(thickQuadratic->getP2(), nextRwdP2, rwdP0, quadArray);
+				splitCircularArcIntoQuadraticCurves(thickQuadratic->getP2(), nextRwdP2, rwdP0,
+													quadArray);
 				for (int i = quadArray.size() - 1; i >= 0; --i) {
 					if (!(quadArray[i]->getP0() == quadArray[i]->getP2())) {
 						normalizeTQuadratic(quadArray[i]);
@@ -723,15 +705,15 @@ inline void computeStrokeBoundary(const TStroke &stroke, LinkedQuadraticList &in
 				//								thickQuadratic->getP2(),
 				//								nextThickQuadratic->getP2()));
 
-				if (!collinear(
-						thickQuadratic->getP0(),
-						thickQuadratic->getP2(),
-						nextThickQuadratic->getP2())) {
+				if (!collinear(thickQuadratic->getP0(), thickQuadratic->getP2(),
+							   nextThickQuadratic->getP2())) {
 					inputBoundaries.push_back(LinkedQuadratic(fwdP0, fwdP1, fwdP2));
-					inputBoundaries.push_front(LinkedQuadratic(thickQuadratic->getP2(), rwdP1, rwdP2));
+					inputBoundaries.push_front(
+						LinkedQuadratic(thickQuadratic->getP2(), rwdP1, rwdP2));
 
 					vector<TQuadratic *> quadArray;
-					splitCircularArcIntoQuadraticCurves(thickQuadratic->getP2(), fwdP2, nextFwdP0, quadArray);
+					splitCircularArcIntoQuadraticCurves(thickQuadratic->getP2(), fwdP2, nextFwdP0,
+														quadArray);
 					for (unsigned int i = 0; i < quadArray.size(); ++i) {
 						if (!(quadArray[i]->getP0() == quadArray[i]->getP2())) {
 							normalizeTQuadratic(quadArray[i]);
@@ -743,12 +725,12 @@ inline void computeStrokeBoundary(const TStroke &stroke, LinkedQuadraticList &in
 
 					fwdP0 = nextFwdP0;
 					rwdP2 = thickQuadratic->getP2();
-				} else if (left(thickQuadratic->getP0(),
-								thickQuadratic->getP1(),
+				} else if (left(thickQuadratic->getP0(), thickQuadratic->getP1(),
 								nextThickQuadratic->getP2())) {
 					inputBoundaries.push_back(LinkedQuadratic(fwdP0, fwdP1, fwdP2));
 					vector<TQuadratic *> quadArray;
-					splitCircularArcIntoQuadraticCurves(thickQuadratic->getP2(), fwdP2, nextFwdP0, quadArray);
+					splitCircularArcIntoQuadraticCurves(thickQuadratic->getP2(), fwdP2, nextFwdP0,
+														quadArray);
 					for (unsigned int i = 0; i < quadArray.size(); ++i) {
 						if (!(quadArray[i]->getP0() == quadArray[i]->getP2())) {
 							normalizeTQuadratic(quadArray[i]);
@@ -759,12 +741,12 @@ inline void computeStrokeBoundary(const TStroke &stroke, LinkedQuadraticList &in
 					quadArray.clear();
 					fwdP0 = nextFwdP0;
 					rwdP2 = rwdP0;
-				} else if (right(thickQuadratic->getP0(),
-								 thickQuadratic->getP1(),
+				} else if (right(thickQuadratic->getP0(), thickQuadratic->getP1(),
 								 nextThickQuadratic->getP2())) {
 					inputBoundaries.push_front(LinkedQuadratic(rwdP0, rwdP1, rwdP2));
 					vector<TQuadratic *> quadArray;
-					splitCircularArcIntoQuadraticCurves(thickQuadratic->getP2(), fwdP2, nextFwdP0, quadArray);
+					splitCircularArcIntoQuadraticCurves(thickQuadratic->getP2(), fwdP2, nextFwdP0,
+														quadArray);
 					for (int i = quadArray.size() - 1; i >= 0; --i) {
 						if (!(quadArray[i]->getP0() == quadArray[i]->getP2())) {
 							normalizeTQuadratic(quadArray[i]);
@@ -813,17 +795,11 @@ inline void computeStrokeBoundary(const TStroke &stroke, LinkedQuadraticList &in
 	}
 	else
 */ {
-		getAverageBoundaryPoints(thickQuadratic->getP0(),
-								 thickQuadratic->getThickP1(),
-								 thickQuadratic->getP2(),
-								 fwdP1,
-								 rwdP1);
+		getAverageBoundaryPoints(thickQuadratic->getP0(), thickQuadratic->getThickP1(),
+								 thickQuadratic->getP2(), fwdP1, rwdP1);
 
-		getBoundaryPoints(thickQuadratic->getP1(),
-						  thickQuadratic->getP2(),
-						  thickQuadratic->getThickP2(),
-						  fwdP2,
-						  rwdP0);
+		getBoundaryPoints(thickQuadratic->getP1(), thickQuadratic->getP2(),
+						  thickQuadratic->getThickP2(), fwdP2, rwdP0);
 
 		inputBoundaries.push_front(LinkedQuadratic(rwdP0, rwdP1, rwdP2));
 		inputBoundaries.push_back(LinkedQuadratic(fwdP0, fwdP1, fwdP2));
@@ -847,16 +823,17 @@ inline void computeStrokeBoundary(const TStroke &stroke, LinkedQuadraticList &in
 
 //-------------------------------------------------------------------
 
-inline void normalizeTThickQuadratic(const TThickQuadratic *&sourceThickQuadratic, TThickQuadratic &tempThickQuadratic)
+inline void normalizeTThickQuadratic(const TThickQuadratic *&sourceThickQuadratic,
+									 TThickQuadratic &tempThickQuadratic)
 {
 	assert(!(sourceThickQuadratic->getP0() == sourceThickQuadratic->getP2()));
 	if (sourceThickQuadratic->getP0() == sourceThickQuadratic->getP1() ||
 		sourceThickQuadratic->getP1() == sourceThickQuadratic->getP2() ||
-		collinear(sourceThickQuadratic->getP0(),
-				  sourceThickQuadratic->getP1(),
+		collinear(sourceThickQuadratic->getP0(), sourceThickQuadratic->getP1(),
 				  sourceThickQuadratic->getP2())) {
 		tempThickQuadratic = *sourceThickQuadratic;
-		TThickPoint middleThickPoint((sourceThickQuadratic->getP0() + sourceThickQuadratic->getP2()) * 0.5);
+		TThickPoint middleThickPoint(
+			(sourceThickQuadratic->getP0() + sourceThickQuadratic->getP2()) * 0.5);
 		middleThickPoint.thick = tempThickQuadratic.getThickP1().thick;
 		tempThickQuadratic.setThickP1(middleThickPoint);
 		sourceThickQuadratic = &tempThickQuadratic;
@@ -868,9 +845,7 @@ inline void normalizeTQuadratic(TQuadratic *&sourceQuadratic)
 	assert(!(sourceQuadratic->getP0() == sourceQuadratic->getP2()));
 	if (sourceQuadratic->getP0() == sourceQuadratic->getP1() ||
 		sourceQuadratic->getP1() == sourceQuadratic->getP2() ||
-		collinear(sourceQuadratic->getP0(),
-				  sourceQuadratic->getP1(),
-				  sourceQuadratic->getP2())) {
+		collinear(sourceQuadratic->getP0(), sourceQuadratic->getP1(), sourceQuadratic->getP2())) {
 		TPointD middleThickPoint((sourceQuadratic->getP0() + sourceQuadratic->getP2()) * 0.5);
 		sourceQuadratic->setP1(middleThickPoint);
 	}
@@ -878,7 +853,8 @@ inline void normalizeTQuadratic(TQuadratic *&sourceQuadratic)
 
 //-------------------------------------------------------------------
 
-inline void getBoundaryPoints(const TPointD &P0, const TPointD &P1, const TThickPoint &center, TPointD &fwdPoint, TPointD &rwdPoint)
+inline void getBoundaryPoints(const TPointD &P0, const TPointD &P1, const TThickPoint &center,
+							  TPointD &fwdPoint, TPointD &rwdPoint)
 {
 	double thickness = center.thick;
 	if (thickness < thicknessLimit)
@@ -920,7 +896,8 @@ inline void getBoundaryPoints(const TPointD &P0, const TPointD &P1, const TThick
 
 //-------------------------------------------------------------------
 
-inline void getAverageBoundaryPoints(const TPointD &P0, const TThickPoint &center, const TPointD &P2, TPointD &fwdPoint, TPointD &rwdPoint)
+inline void getAverageBoundaryPoints(const TPointD &P0, const TThickPoint &center,
+									 const TPointD &P2, TPointD &fwdPoint, TPointD &rwdPoint)
 {
 	TPointD fwdP0, fwdP2;
 	TPointD rwdP0, rwdP2;
@@ -945,7 +922,8 @@ inline void getAverageBoundaryPoints(const TPointD &P0, const TThickPoint &cente
 		} else
 			assert(false);
 	} else {
-		double m = ((fwdP0.y + fwdP2.y) - (rwdP0.y + rwdP2.y)) / ((fwdP0.x + fwdP2.x) - (rwdP0.x + rwdP2.x));
+		double m = ((fwdP0.y + fwdP2.y) - (rwdP0.y + rwdP2.y)) /
+				   ((fwdP0.x + fwdP2.x) - (rwdP0.x + rwdP2.x));
 
 		fwdPoint.x = center.x + (thickness) / sqrt(1 + m * m);
 		fwdPoint.y = center.y + m * (fwdPoint.x - center.x);
@@ -997,10 +975,10 @@ inline void computeInputBoundaries(LinkedQuadraticList &inputBoundaries)
 	map<LinkedQuadratic *, vector<double>> intersectedQuadratics;
 	LinkedQuadraticList intersectionBoundary;
 
-	//detect adjacent quadratics intersections
+	// detect adjacent quadratics intersections
 	processAdjacentQuadratics(inputBoundaries);
 
-	//detect Intersections
+	// detect Intersections
 	LinkedQuadraticList::iterator it;
 	it = inputBoundaries.begin();
 	while (it != inputBoundaries.end()) {
@@ -1030,15 +1008,17 @@ inline void computeInputBoundaries(LinkedQuadraticList &inputBoundaries)
 		++it1;
 	}*/
 
-	//segmentate curves
-	map<LinkedQuadratic *, vector<double>>::iterator it_intersectedQuadratics = intersectedQuadratics.begin();
+	// segmentate curves
+	map<LinkedQuadratic *, vector<double>>::iterator it_intersectedQuadratics =
+		intersectedQuadratics.begin();
 	while (it_intersectedQuadratics != intersectedQuadratics.end()) {
-		segmentate(intersectionBoundary, it_intersectedQuadratics->first, it_intersectedQuadratics->second);
+		segmentate(intersectionBoundary, it_intersectedQuadratics->first,
+				   it_intersectedQuadratics->second);
 		inputBoundaries.remove(*it_intersectedQuadratics->first);
 		++it_intersectedQuadratics;
 	}
 
-	//process intersections
+	// process intersections
 	processIntersections(intersectionBoundary);
 
 	inputBoundaries.sort(CompareLinkedQuadratics());
@@ -1072,8 +1052,7 @@ inline void processAdjacentQuadratics(LinkedQuadraticList &inputBoundaries)
 			inputBoundaries.remove(*curr);
 			inputBoundaries.remove(*next);
 			curr = temp;
-		} else if ((curr->getP0() == next->getP0()) &&
-				   (curr->getP1() == next->getP1()) &&
+		} else if ((curr->getP0() == next->getP0()) && (curr->getP1() == next->getP1()) &&
 				   (curr->getP2() == next->getP2())) {
 			assert(false);
 			(curr)->next = next->next;
@@ -1113,12 +1092,10 @@ inline void findIntersections(LinkedQuadratic *quadratic,
 	while (it != intersectionWindow.end()) {
 		vector<DoublePair> intersections;
 
-		if ((quadratic->getP0() == (*it)->getP2()) &&
-			(quadratic->getP1() == (*it)->getP1()) &&
+		if ((quadratic->getP0() == (*it)->getP2()) && (quadratic->getP1() == (*it)->getP1()) &&
 			(quadratic->getP2() == (*it)->getP0()))
 			assert(false);
-		else if ((quadratic->getP0() == (*it)->getP0()) &&
-				 (quadratic->getP1() == (*it)->getP1()) &&
+		else if ((quadratic->getP0() == (*it)->getP0()) && (quadratic->getP1() == (*it)->getP1()) &&
 				 (quadratic->getP2() == (*it)->getP2()))
 			assert(false);
 		else if (quadratic->prev == *it) {
@@ -1151,8 +1128,7 @@ inline void refreshIntersectionWindow(LinkedQuadratic *quadratic,
 
 //-------------------------------------------------------------------
 
-inline void segmentate(LinkedQuadraticList &intersectionBoundary,
-					   LinkedQuadratic *quadratic,
+inline void segmentate(LinkedQuadraticList &intersectionBoundary, LinkedQuadratic *quadratic,
 					   vector<double> &splitPoints)
 {
 	for (unsigned int k = 0; k < splitPoints.size(); k++) {
@@ -1245,7 +1221,7 @@ inline void processIntersections(LinkedQuadraticList &intersectionBoundary)
 			if (crossing.size() > 2) {
 				sort(crossing.begin(), crossing.end(), CompareBranches());
 
-				/*				_RPT0(	_CRT_WARN, 
+				/*				_RPT0(	_CRT_WARN,
 "\n__________________________________________________\n");
 				for(unsigned int j=0;j<crossing.size();++j)
 				{
@@ -1262,7 +1238,8 @@ inline void processIntersections(LinkedQuadraticList &intersectionBoundary)
 					else assert(false);
 				}*/
 
-				vector<pair<LinkedQuadratic *, Direction>>::iterator it, it_prev, it_next, it_nextnext, it_prevprev;
+				vector<pair<LinkedQuadratic *, Direction>>::iterator it, it_prev, it_next,
+					it_nextnext, it_prevprev;
 				it = crossing.begin();
 				while (it != crossing.end()) {
 					if (it->second == outward) {
@@ -1288,7 +1265,8 @@ inline void processIntersections(LinkedQuadraticList &intersectionBoundary)
 							((it_nextnext->first)->getP0() == (it_next->first)->getP0() &&
 							 (it_nextnext->first)->getP2() == (it_next->first)->getP2() &&
 							 (it_nextnext->first)->getP1() == (it_next->first)->getP1())) {
-							if (it_nextnext->second == outward || it_nextnext->second == deletedOutward) {
+							if (it_nextnext->second == outward ||
+								it_nextnext->second == deletedOutward) {
 								it->first->prev = 0;
 								it->second = deletedOutward;
 							}
@@ -1324,7 +1302,8 @@ inline void processIntersections(LinkedQuadraticList &intersectionBoundary)
 							((it_prevprev->first)->getP0() == (it_prev->first)->getP0() &&
 							 (it_prevprev->first)->getP2() == (it_prev->first)->getP2() &&
 							 (it_prevprev->first)->getP1() == (it_prev->first)->getP1())) {
-							if (it_prevprev->second == inward || it_prevprev->second == deletedInward) {
+							if (it_prevprev->second == inward ||
+								it_prevprev->second == deletedInward) {
 								it->first->next = 0;
 								it->second = deletedInward;
 							}
@@ -1353,7 +1332,7 @@ inline void processIntersections(LinkedQuadraticList &intersectionBoundary)
 					assert(crossing[1].second == outward);
 					crossing[0].first->next = crossing[1].first;
 					crossing[1].first->prev = crossing[0].first;
-				} else //if(crossing[0].second == outward)
+				} else // if(crossing[0].second == outward)
 				{
 					assert(crossing[1].second == inward);
 					crossing[0].first->prev = crossing[1].first;
@@ -1382,8 +1361,7 @@ bool processNonSimpleLoops(TPointD &intersectionPoint,
 					loopStart->prev = 0;
 					crossing.erase(it);
 					loopCurr->next = 0;
-					last = remove(crossing.begin(),
-								  crossing.end(),
+					last = remove(crossing.begin(), crossing.end(),
 								  pair<LinkedQuadratic *, Direction>(loopCurr, inward));
 					crossing.erase(last, crossing.end());
 					return true;
@@ -1423,7 +1401,8 @@ inline bool deleteUnlinkedLoops(LinkedQuadraticList &inputBoundaries)
 				if (count == 0)
 					return false;
 				if (nonSimpleCrossing.find(current->getP2()) != nonSimpleCrossing.end())
-				//					|| simpleCrossing.find(current->getP2()) != simpleCrossing.end() )
+				//					|| simpleCrossing.find(current->getP2()) != simpleCrossing.end()
+				//)
 				{
 					if (current->next)
 						current->next->prev = 0;
@@ -1457,7 +1436,8 @@ inline bool deleteUnlinkedLoops(LinkedQuadraticList &inputBoundaries)
 				if (count == 0)
 					return false;
 				if (nonSimpleCrossing.find(current->getP0()) != nonSimpleCrossing.end())
-				//					|| simpleCrossing.find(current->getP0()) != simpleCrossing.end() )
+				//					|| simpleCrossing.find(current->getP0()) != simpleCrossing.end()
+				//)
 				{
 					if (current->prev)
 						current->prev->next = 0;
@@ -1521,19 +1501,23 @@ void addBranch(IntersectionData &intData, list<IntersectedStroke> &strokeList,
 	item.m_edge.m_w0 = w;
 
 	tan1 = item.m_edge.m_s->getSpeed(w);
-	tan2 = ((strokeList.back().m_gettingOut) ? 1 : -1) * strokeList.back().m_edge.m_s->getSpeed(strokeList.back().m_edge.m_w0);
+	tan2 = ((strokeList.back().m_gettingOut) ? 1 : -1) *
+		   strokeList.back().m_edge.m_s->getSpeed(strokeList.back().m_edge.m_w0);
 
-	if (strokeList.size() == 2) //potrebbero essere orientati male; due branch possono stare come vogliono, ma col terzo no.
+	if (strokeList.size() == 2) // potrebbero essere orientati male; due branch possono stare come
+								// vogliono, ma col terzo no.
 	{
-		TPointD aux = ((strokeList.begin()->m_gettingOut) ? 1 : -1) * strokeList.begin()->m_edge.m_s->getSpeed(strokeList.begin()->m_edge.m_w0);
+		TPointD aux = ((strokeList.begin()->m_gettingOut) ? 1 : -1) *
+					  strokeList.begin()->m_edge.m_s->getSpeed(strokeList.begin()->m_edge.m_w0);
 		if (cross(aux, tan2) > 0) {
 			std::reverse(strokeList.begin(), strokeList.end());
-			tan2 = ((strokeList.back().m_gettingOut) ? 1 : -1) * strokeList.back().m_edge.m_s->getSpeed(strokeList.back().m_edge.m_w0);
+			tan2 = ((strokeList.back().m_gettingOut) ? 1 : -1) *
+				   strokeList.back().m_edge.m_s->getSpeed(strokeList.back().m_edge.m_w0);
 		}
 	}
 
 	double lastCross = cross(tan1, tan2);
-	//UINT size = strokeList.size();
+	// UINT size = strokeList.size();
 
 	UINT added = 0;
 	bool endPoint = (w == 0.0 || w == 1.0);
@@ -1573,8 +1557,8 @@ void addBranch(IntersectionData &intData, list<IntersectedStroke> &strokeList,
 
 //-----------------------------------------------------------------------------
 
-void addBranches(IntersectionData &intData, Intersection &intersection, const vector<TStroke *> &s, int ii, int jj,
-				 DoublePair intersectionPair)
+void addBranches(IntersectionData &intData, Intersection &intersection, const vector<TStroke *> &s,
+				 int ii, int jj, DoublePair intersectionPair)
 {
 	bool foundS1 = false, foundS2 = false;
 	list<IntersectedStroke>::iterator it;
@@ -1600,7 +1584,7 @@ void addBranches(IntersectionData &intData, Intersection &intersection, const ve
 	if (!foundS2) {
 		int size = intersection.m_strokeList.size();
 		addBranch(intData, intersection.m_strokeList, s, jj, intersectionPair.second);
-		//intersection.m_numInter+=intersection.m_strokeList.size()-size;
+		// intersection.m_numInter+=intersection.m_strokeList.size()-size;
 		assert(intersection.m_strokeList.size() - size > 0);
 	}
 }
@@ -1634,8 +1618,10 @@ Intersection makeIntersection(IntersectionData &intData, const vector<TStroke *>
 
 	bool reversed = false;
 
-	if (cross(item1.m_edge.m_s->getSpeed(inter.first), item2.m_edge.m_s->getSpeed(inter.second)) > 0)
-		reversed = true; //std::reverse(interList.m_strokeList.begin(), interList.m_strokeList.end());
+	if (cross(item1.m_edge.m_s->getSpeed(inter.first), item2.m_edge.m_s->getSpeed(inter.second)) >
+		0)
+		reversed =
+			true; // std::reverse(interList.m_strokeList.begin(), interList.m_strokeList.end());
 
 	if (item1.m_edge.m_w0 != 1.0) {
 		item1.m_gettingOut = true;
@@ -1659,8 +1645,7 @@ Intersection makeIntersection(IntersectionData &intData, const vector<TStroke *>
 
 //-----------------------------------------------------------------------------
 
-void addIntersection(IntersectionData &intData,
-					 const vector<TStroke *> &s, int ii, int jj,
+void addIntersection(IntersectionData &intData, const vector<TStroke *> &s, int ii, int jj,
 					 DoublePair intersection)
 {
 	list<Intersection>::iterator it;
@@ -1679,8 +1664,9 @@ void addIntersection(IntersectionData &intData,
 	p = s[ii]->getPoint(intersection.first);
 
 	for (it = intData.m_intList.begin(); it != intData.m_intList.end(); it++)
-		if (areAlmostEqual((*it).m_intersection, p)) //devono essere rigorosamente uguali, altrimenti
-													 // il calcolo dell'ordine dei rami con le tangenti sballa
+		if (areAlmostEqual((*it).m_intersection,
+						   p)) // devono essere rigorosamente uguali, altrimenti
+		// il calcolo dell'ordine dei rami con le tangenti sballa
 		{
 			if ((*it).m_intersection == p)
 				addBranches(intData, *it, s, ii, jj, intersection);
@@ -1699,7 +1685,7 @@ void findNearestIntersection(list<Intersection> &interList)
 
 	for (i1 = interList.begin(); i1 != interList.end(); i1++) {
 		for (i2 = (*i1).m_strokeList.begin(); i2 != (*i1).m_strokeList.end(); i2++) {
-			if ((*i2).m_nextIntersection != interList.end()) //already set
+			if ((*i2).m_nextIntersection != interList.end()) // already set
 				continue;
 
 			int versus = (i2->m_gettingOut) ? 1 : -1;
@@ -1742,9 +1728,7 @@ void findNearestIntersection(list<Intersection> &interList)
 }
 //-----------------------------------------------------------------------------
 
-int myIntersect(const TStroke *s1,
-				const TStroke *s2,
-				std::vector<DoublePair> &intersections)
+int myIntersect(const TStroke *s1, const TStroke *s2, std::vector<DoublePair> &intersections)
 {
 	int k = 0;
 	assert(s1 != s2);
@@ -1779,7 +1763,8 @@ void computeIntersections(IntersectionData &intData, const vector<TStroke *> &st
 
 	for (i = 0; i < (int)strokeArray.size(); i++) {
 		TStroke *s1 = strokeArray[i];
-		addIntersection(intData, strokeArray, i, i, DoublePair(0, 1)); //le stroke sono sicuramente selfloop!
+		addIntersection(intData, strokeArray, i, i,
+						DoublePair(0, 1)); // le stroke sono sicuramente selfloop!
 		for (j = i + 1; j < (int)strokeArray.size(); j++) {
 			TStroke *s2 = strokeArray[j];
 			vector<DoublePair> intersections;
@@ -1789,18 +1774,19 @@ void computeIntersections(IntersectionData &intData, const vector<TStroke *> &st
 		}
 	}
 
-	//la struttura delle intersezioni viene poi visitata per trovare
+	// la struttura delle intersezioni viene poi visitata per trovare
 	// i link tra un'intersezione e la successiva
 
 	findNearestIntersection(intData.m_intList);
 
-	//for (it1=intData.m_intList.begin(); it1!=intData.m_intList.end();) //la faccio qui, e non nella eraseIntersection. vedi commento li'.
-	//eraseDeadIntersections(intData.m_intList);
+	// for (it1=intData.m_intList.begin(); it1!=intData.m_intList.end();) //la faccio qui, e non
+	// nella eraseIntersection. vedi commento li'.
+	// eraseDeadIntersections(intData.m_intList);
 
-	//for (it1=intData.m_intList.begin(); it1!=intData.m_intList.end(); it1++)
+	// for (it1=intData.m_intList.begin(); it1!=intData.m_intList.end(); it1++)
 	//   markDeadIntersections(intData.m_intList, it1);
 
-	//checkInterList(intData.m_intList);
+	// checkInterList(intData.m_intList);
 }
 
 //-----------------------------------------------------------------------------
@@ -1812,7 +1798,7 @@ bool isValidArea(const TRegion &r);
 
 //-----------------------------------------------------------------------------
 
-} //namespace
+} // namespace
 
 #endif
 
@@ -1823,7 +1809,7 @@ bool computeSweepBoundary(const vector<TStroke *> &strokes, vector<vector<TQuadr
 
 	if (strokes.empty())
 		return false;
-	//if(!outlines.empty()) return false;
+	// if(!outlines.empty()) return false;
 	vector<TStroke *> sweepStrokes;
 
 	UINT i = 0;
@@ -1834,25 +1820,25 @@ bool computeSweepBoundary(const vector<TStroke *> &strokes, vector<vector<TQuadr
   return true;
 	Count++;*/
 
-	//ofstream of("c:\\temp\\boh.txt");
+	// ofstream of("c:\\temp\\boh.txt");
 
 	for (i = 0; i < sweepStrokes.size(); i++) {
-		//of<<"****sweepstroke #"<<i<<"*****"<<endl;
+		// of<<"****sweepstroke #"<<i<<"*****"<<endl;
 		outlines.push_back(vector<TQuadratic *>());
 		vector<TQuadratic *> &q = outlines.back();
 		for (int j = 0; j < sweepStrokes[i]->getChunkCount(); j++) {
 			const TThickQuadratic *q0 = sweepStrokes[i]->getChunk(j);
-			//of<<"q"<<j<<": "<<q0->getP0().x<<", "<<q0->getP0().y<<endl;
-			//of<<"     "<<     q0->getP1().x<<", "<<q0->getP1().y<<endl;
-			//of<<"     "<<     q0->getP2().x<<", "<<q0->getP2().y<<endl;
+			// of<<"q"<<j<<": "<<q0->getP0().x<<", "<<q0->getP0().y<<endl;
+			// of<<"     "<<     q0->getP1().x<<", "<<q0->getP1().y<<endl;
+			// of<<"     "<<     q0->getP2().x<<", "<<q0->getP2().y<<endl;
 
 			q.push_back(new TQuadratic(*q0));
 		}
 	}
 
-	//return true;
+	// return true;
 
-	//computeRegions(sweepStrokes, outlines);
+	// computeRegions(sweepStrokes, outlines);
 	clearPointerContainer(sweepStrokes);
 
 	return true;
@@ -1878,7 +1864,7 @@ TRegion *findRegion(list<Intersection> &intList, list<Intersection>::iterator it
 					list<IntersectedStroke>::iterator it2)
 {
 	TRegion *r = new TRegion();
-	//int currStyle=0;
+	// int currStyle=0;
 
 	list<IntersectedStroke>::iterator itStart = it2;
 
@@ -1894,7 +1880,7 @@ TRegion *findRegion(list<Intersection> &intList, list<Intersection>::iterator it
 
 		do {
 			it2++;
-			if (it2 == ((*it1).m_strokeList.end())) //la lista e' circolare
+			if (it2 == ((*it1).m_strokeList.end())) // la lista e' circolare
 				it2 = (*it1).m_strokeList.begin();
 		} while (it2->m_nextIntersection == intList.end());
 

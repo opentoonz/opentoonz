@@ -53,14 +53,10 @@ void CornerDeformation::draw(Designer *designer)
 
 //-----------------------------------------------------------------------------
 
-bool CornerDeformation::findExtremes_(const ContextStatus *status,
-									  Interval &ret)
+bool CornerDeformation::findExtremes_(const ContextStatus *status, Interval &ret)
 {
-	return ToonzExt::findNearestSpireCorners(status->stroke2change_,
-											 status->w_,
-											 ret,
-											 status->cornerSize_,
-											 &this->getSpiresList());
+	return ToonzExt::findNearestSpireCorners(status->stroke2change_, status->w_, ret,
+											 status->cornerSize_, &this->getSpiresList());
 }
 
 //-----------------------------------------------------------------------------
@@ -69,42 +65,31 @@ bool CornerDeformation::check_(const ContextStatus *status)
 {
 	assert(status && "Not status available");
 
-	TStroke
-		*s = status->stroke2change_;
-	double
-		w = status->w_;
+	TStroke *s = status->stroke2change_;
+	double w = status->w_;
 
-	if (isASpireCorner(s,
-					   w,
-					   status->cornerSize_,
-					   &this->getSpiresList()))
+	if (isASpireCorner(s, w, status->cornerSize_, &this->getSpiresList()))
 		return true;
 
 #ifdef USE_TOLERANCE_IN_SELECTION
 
 	// analyse if the selected distance is close to an extreme if an
 	//  extreme is almost an extreme prefer to select extreme
-	const TPointD
-		pressed = status->stroke2change_->getPoint(status->w_);
+	const TPointD pressed = status->stroke2change_->getPoint(status->w_);
 
-	double
-		pixelTolerance2 = sq(5 * status->pixelSize_);
+	double pixelTolerance2 = sq(5 * status->pixelSize_);
 
 	// array of corners
-	std::vector<double>
-		corners;
+	std::vector<double> corners;
 
 	// also if an straight extreme was not found prefer smooth
-	if (cornersDetector(status->stroke2change_,
-						status->cornerSize_,
-						corners)) {
+	if (cornersDetector(status->stroke2change_, status->cornerSize_, corners)) {
 		while (!corners.empty()) {
-			TPointD
-				actual = status->stroke2change_->getPoint(corners.back());
+			TPointD actual = status->stroke2change_->getPoint(corners.back());
 			if (tdistance2(actual, pressed) < pixelTolerance2) {
-				//status->w_ = corners.back();
-				//out = CornerDeformation::instance();
-				//break;
+				// status->w_ = corners.back();
+				// out = CornerDeformation::instance();
+				// break;
 				this->w_ = corners.back();
 				return true;
 			}
@@ -118,20 +103,18 @@ bool CornerDeformation::check_(const ContextStatus *status)
 
 //-----------------------------------------------------------------------------
 
-double
-CornerDeformation::findActionLength()
+double CornerDeformation::findActionLength()
 {
 	// just to limit action until parameters are not computed
 	//  return  lengthOfAction_ < stroke2transform_->getLength() ?
 	//          lengthOfAction_ : stroke2transform_->getLength();
-	//return -1;//
+	// return -1;//
 	return stroke2manipulate_->getLength();
 }
 
 //-----------------------------------------------------------------------------
 
-CornerDeformation *
-CornerDeformation::instance()
+CornerDeformation *CornerDeformation::instance()
 {
 	static CornerDeformation singleton;
 	return &singleton;

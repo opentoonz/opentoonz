@@ -23,23 +23,23 @@
 
 class DVAPI TTextField : public TWidget, public TTextListener
 {
-public:
+  public:
 	class Action
 	{
-	public:
+	  public:
 		virtual ~Action() {}
 		virtual void sendCommand(std::wstring) = 0;
 	};
 
 	class Listener
 	{
-	public:
+	  public:
 		virtual void onKeyPressed(int key){};
 		virtual void onFocusChange(bool on){};
 		virtual ~Listener() {}
 	};
 
-protected:
+  protected:
 	std::wstring m_text, m_oldText;
 	int m_pos;
 	int m_sel0, m_sel1;
@@ -53,7 +53,7 @@ protected:
 
 	void updateOffset();
 
-public:
+  public:
 	TTextField(TWidget *parent, std::string name = "textfield");
 	~TTextField();
 
@@ -88,9 +88,7 @@ public:
 	virtual std::wstring copyText();
 	virtual std::wstring cutText();
 
-	virtual void drawFieldText(
-		const TPoint &origin,
-		std::wstring text);
+	virtual void drawFieldText(const TPoint &origin, std::wstring text);
 
 #ifndef MACOSX
 	// pezza dovuta al baco del gcc3.3.1. Togliere quando lo si aggiorna al 3.3.2 o superiori
@@ -108,21 +106,18 @@ public:
 
 //-------------------------------------------------------------------
 
-template <class T>
-class TTextFieldAction : public TTextField::Action
+template <class T> class TTextFieldAction : public TTextField::Action
 {
 	typedef void (T::*Method)(std::wstring text);
 	T *m_target;
 	Method m_method;
 
-public:
-	TTextFieldAction(T *target, Method method)
-		: m_target(target), m_method(method) {}
+  public:
+	TTextFieldAction(T *target, Method method) : m_target(target), m_method(method) {}
 	void sendCommand(std::wstring s) { (m_target->*m_method)(s); }
 };
 
-template <class T>
-void tconnect(TTextField *fld, T *target, void (T::*method)(std::wstring s))
+template <class T> void tconnect(TTextField *fld, T *target, void (T::*method)(std::wstring s))
 {
 	fld->addCommitAction(new TTextFieldAction<T>(target, method));
 }
@@ -131,43 +126,40 @@ void tconnect(TTextField *fld, T *target, void (T::*method)(std::wstring s))
 
 class DVAPI TNumField : public TTextField
 {
-public:
+  public:
 	class Event
 	{
-	public:
+	  public:
 		TNumField *m_field;
 		double m_value;
-		enum Reason { KeyPressed,
-					  FocusChange,
-					  ReturnPressed };
+		enum Reason { KeyPressed, FocusChange, ReturnPressed };
 		Reason m_reason;
-		Event(TNumField *field)
-			: m_field(field), m_value(field->getValue()), m_reason(KeyPressed)
+		Event(TNumField *field) : m_field(field), m_value(field->getValue()), m_reason(KeyPressed)
 		{
 		}
 	};
 
 	class Action
 	{
-	public:
+	  public:
 		virtual ~Action() {}
 		virtual void sendCommand(const Event &ev) = 0;
 	};
 
-private:
+  private:
 	double m_minValue, m_maxValue;
 	std::vector<Action *> m_numActions;
 	bool m_isInteger;
 	int m_precision;
 
-protected:
+  protected:
 	double m_value;
 	virtual void valueToText();
 	virtual void textToValue();
 
 	void sendCommand();
 
-public:
+  public:
 	TNumField(TWidget *parent, std::string name = "numfield");
 	~TNumField();
 
@@ -192,16 +184,14 @@ public:
 	void pasteText(std::wstring text);
 };
 
-template <class T>
-class TNumFieldAction : public TNumField::Action
+template <class T> class TNumFieldAction : public TNumField::Action
 {
 	T *m_target;
 	typedef void (T::*Method)(const TNumField::Event &e);
 	Method m_method;
 
-public:
-	TNumFieldAction(T *target, Method method)
-		: m_target(target), m_method(method) {}
+  public:
+	TNumFieldAction(T *target, Method method) : m_target(target), m_method(method) {}
 	void sendCommand(const TNumField::Event &e) { (m_target->*m_method)(e); }
 };
 
@@ -217,19 +207,19 @@ class TMeasuredValue;
 
 class DVAPI TMeasuredValueField : public TTextField
 {
-public:
+  public:
 	class Action
 	{
-	public:
+	  public:
 		virtual ~Action() {}
 		virtual void sendCommand(TMeasuredValueField *field) = 0;
 	};
 
-private:
+  private:
 	TMeasuredValue *m_value;
 	std::vector<Action *> m_actions;
 
-public:
+  public:
 	TMeasuredValueField(TWidget *parent, std::string name = "numfield");
 	~TMeasuredValueField();
 
@@ -242,22 +232,20 @@ public:
 
 	void addAction(Action *action);
 
-	//void onFocusChange(bool status);
-	//void pasteText(wstring text);
+	// void onFocusChange(bool status);
+	// void pasteText(wstring text);
 
 	void commit();
 };
 
-template <class T>
-class TMeasuredValueFieldAction : public TMeasuredValueField::Action
+template <class T> class TMeasuredValueFieldAction : public TMeasuredValueField::Action
 {
 	typedef void (T::*Method)(TMeasuredValueField *fld);
 	T *m_target;
 	Method m_method;
 
-public:
-	TMeasuredValueFieldAction(T *target, Method method)
-		: m_target(target), m_method(method) {}
+  public:
+	TMeasuredValueFieldAction(T *target, Method method) : m_target(target), m_method(method) {}
 	void sendCommand(TMeasuredValueField *fld) { (m_target->*m_method)(fld); }
 };
 

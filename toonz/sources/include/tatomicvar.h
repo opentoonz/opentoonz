@@ -32,9 +32,9 @@ typedef struct {
 	volatile int counter;
 } atomic_t;
 
-#define ATOMIC_INIT(i) \
-	{                  \
-		(i)            \
+#define ATOMIC_INIT(i)                                                                             \
+	{                                                                                              \
+		(i)                                                                                        \
 	}
 
 #define atomic_read(v) ((v)->counter)
@@ -56,28 +56,26 @@ static __inline__ void atomic_add(int a, atomic_t *v)
 {
 	int t;
 
-	__asm__ __volatile__(
-		"1:	lwarx	%0,0,%3		\n\
+	__asm__ __volatile__("1:	lwarx	%0,0,%3		\n\
 	add	%0,%2,%0\n\
 	stwcx.	%0,0,%3\n\
 	bne-	1b"
-		: "=&r"(t), "=m"(v->counter)
-		: "r"(a), "r"(&v->counter), "m"(v->counter)
-		: "cc");
+						 : "=&r"(t), "=m"(v->counter)
+						 : "r"(a), "r"(&v->counter), "m"(v->counter)
+						 : "cc");
 }
 
 static __inline__ int atomic_add_return(int a, atomic_t *v)
 {
 	int t;
 
-	__asm__ __volatile__(
-		"1:	lwarx	%0,0,%2		\n\
+	__asm__ __volatile__("1:	lwarx	%0,0,%2		\n\
 	add	%0,%1,%0\n\
 	stwcx.	%0,0,%2\n\
 	bne-	1b" SMP_ISYNC
-		: "=&r"(t)
-		: "r"(a), "r"(&v->counter)
-		: "cc", "memory");
+						 : "=&r"(t)
+						 : "r"(a), "r"(&v->counter)
+						 : "cc", "memory");
 
 	return t;
 }
@@ -86,28 +84,26 @@ static __inline__ void atomic_sub(int a, atomic_t *v)
 {
 	int t;
 
-	__asm__ __volatile__(
-		"1:	lwarx	%0,0,%3		\n\
+	__asm__ __volatile__("1:	lwarx	%0,0,%3		\n\
 	subf	%0,%2,%0\n\
 	stwcx.	%0,0,%3\n\
 	bne-	1b"
-		: "=&r"(t), "=m"(v->counter)
-		: "r"(a), "r"(&v->counter), "m"(v->counter)
-		: "cc");
+						 : "=&r"(t), "=m"(v->counter)
+						 : "r"(a), "r"(&v->counter), "m"(v->counter)
+						 : "cc");
 }
 
 static __inline__ int atomic_sub_return(int a, atomic_t *v)
 {
 	int t;
 
-	__asm__ __volatile__(
-		"1:	lwarx	%0,0,%2		\n\
+	__asm__ __volatile__("1:	lwarx	%0,0,%2		\n\
 	subf	%0,%1,%0\n\
 	stwcx.	%0,0,%2\n\
 	bne-	1b" SMP_ISYNC
-		: "=&r"(t)
-		: "r"(a), "r"(&v->counter)
-		: "cc", "memory");
+						 : "=&r"(t)
+						 : "r"(a), "r"(&v->counter)
+						 : "cc", "memory");
 
 	return t;
 }
@@ -116,28 +112,26 @@ static __inline__ void atomic_inc(atomic_t *v)
 {
 	int t;
 
-	__asm__ __volatile__(
-		"1:	lwarx	%0,0,%2		\n\
+	__asm__ __volatile__("1:	lwarx	%0,0,%2		\n\
 	addic	%0,%0,1\n\
 	stwcx.	%0,0,%2\n\
 	bne-	1b"
-		: "=&r"(t), "=m"(v->counter)
-		: "r"(&v->counter), "m"(v->counter)
-		: "cc");
+						 : "=&r"(t), "=m"(v->counter)
+						 : "r"(&v->counter), "m"(v->counter)
+						 : "cc");
 }
 
 static __inline__ int atomic_inc_return(atomic_t *v)
 {
 	int t;
 
-	__asm__ __volatile__(
-		"1:	lwarx	%0,0,%1		\n\
+	__asm__ __volatile__("1:	lwarx	%0,0,%1		\n\
 	addic	%0,%0,1\n\
 	stwcx.	%0,0,%1\n\
 	bne-	1b" SMP_ISYNC
-		: "=&r"(t)
-		: "r"(&v->counter)
-		: "cc", "memory");
+						 : "=&r"(t)
+						 : "r"(&v->counter)
+						 : "cc", "memory");
 
 	return t;
 }
@@ -146,28 +140,26 @@ static __inline__ void atomic_dec(atomic_t *v)
 {
 	int t;
 
-	__asm__ __volatile__(
-		"1:	lwarx	%0,0,%2		\n\
+	__asm__ __volatile__("1:	lwarx	%0,0,%2		\n\
 	addic	%0,%0,-1\n\
 	stwcx.	%0,0,%2\n\
 	bne-	1b"
-		: "=&r"(t), "=m"(v->counter)
-		: "r"(&v->counter), "m"(v->counter)
-		: "cc");
+						 : "=&r"(t), "=m"(v->counter)
+						 : "r"(&v->counter), "m"(v->counter)
+						 : "cc");
 }
 
 static __inline__ int atomic_dec_return(atomic_t *v)
 {
 	int t;
 
-	__asm__ __volatile__(
-		"1:	lwarx	%0,0,%1		\n\
+	__asm__ __volatile__("1:	lwarx	%0,0,%1		\n\
 	addic	%0,%0,-1\n\
 	stwcx.	%0,0,%1\n\
 	bne-	1b" SMP_ISYNC
-		: "=&r"(t)
-		: "r"(&v->counter)
-		: "cc", "memory");
+						 : "=&r"(t)
+						 : "r"(&v->counter)
+						 : "cc", "memory");
 
 	return t;
 }
@@ -207,22 +199,17 @@ static __inline__ int atomic_add(int num, const atomic_t *v)
 @ @PLATFORM NOT SUPPORTED !@ @
 #endif
 
-/*! Platform specific 
-    Provides class with increment & decrement absolutely done in interlocked way 
+/*! Platform specific
+	Provides class with increment & decrement absolutely done in interlocked way
 */
 
 class DVAPI TAtomicVar
 {
-public:
+  public:
 #if defined(LINUX) || defined(MACOSX)
-	TAtomicVar()
-	{
-		atomic_set(&m_var, 0);
-	}
+	TAtomicVar() { atomic_set(&m_var, 0); }
 #else
-	TAtomicVar() : m_var(0)
-	{
-	}
+	TAtomicVar() : m_var(0) {}
 #endif
 
 	long operator++()
@@ -309,10 +296,10 @@ public:
 #endif
 
 #if !defined(LINUX) || defined(LINUX) && (__GNUC__ == 3) && (__GNUC_MINOR__ > 1)
-private: // to avoid well known bug in gcc3 ... fixed in later versions..
+  private: // to avoid well known bug in gcc3 ... fixed in later versions..
 #endif
-	TAtomicVar &operator=(const TAtomicVar &); //not implemented
-	TAtomicVar(const TAtomicVar &v);		   //not implemented
+	TAtomicVar &operator=(const TAtomicVar &); // not implemented
+	TAtomicVar(const TAtomicVar &v); // not implemented
 };
 
 #endif

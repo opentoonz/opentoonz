@@ -21,9 +21,9 @@
 class TContentHistory;
 
 //=============================================================================
-//!The TXshPaletteLevel class represents a palette uncoupled from a level
+//! The TXshPaletteLevel class represents a palette uncoupled from a level
 /*!Inherits \b TXshLevel.
-\n A palette can be loaded in the xsheet and subsequently can be used as 
+\n A palette can be loaded in the xsheet and subsequently can be used as
    "external palette". The number of frames of the palette-level depends on
    the palette animation.
 
@@ -33,7 +33,7 @@ class TContentHistory;
 class DVAPI TXshPaletteLevel : public TXshLevel
 {
 
-private:
+  private:
 	PERSIST_DECLARATION(TXshPaletteLevel)
 
 	TFilePath m_path;
@@ -42,43 +42,43 @@ private:
 
 	DECLARE_CLASS_CODE
 
-public:
+  public:
 	/*!
-    Constructs a TXshPaletteLevel with \b name
+	Constructs a TXshPaletteLevel with \b name
   */
 	TXshPaletteLevel(std::wstring name = L"");
 
 	/*!
-    Destroys the TXshPaletteLevel object.
+	Destroys the TXshPaletteLevel object.
   */
 	~TXshPaletteLevel();
 
 	/*!
-    Return the \b TXshPaletteLevel level (overridden from TXshLevel)
+	Return the \b TXshPaletteLevel level (overridden from TXshLevel)
   */
 	TXshPaletteLevel *getPaletteLevel() { return this; }
 
 	/*!
-    Return the \b TPalette 
-    \sa setPalette()
+	Return the \b TPalette
+	\sa setPalette()
   */
 	TPalette *getPalette() const;
 
 	/*!
-    Set the level palette to \b palette.
-    \sa getPalette()
+	Set the level palette to \b palette.
+	\sa getPalette()
   */
 	void setPalette(TPalette *palette);
 
 	/*!
-    Return level path.
-    \sa setPath()
+	Return level path.
+	\sa setPath()
   */
 	TFilePath getPath() const { return m_path; }
 
 	/*!
-    Set level path. 
-    \sa getPath()
+	Set level path.
+	\sa getPath()
   */
 	void setPath(const TFilePath &path);
 
@@ -100,7 +100,7 @@ public:
 	//! destroys the old contentHistory and replaces it with the new one. Gets ownership
 	void setContentHistory(TContentHistory *contentHistory);
 
-private:
+  private:
 	// not implemented
 	TXshPaletteLevel(const TXshPaletteLevel &);
 	TXshPaletteLevel &operator=(const TXshPaletteLevel &);

@@ -16,28 +16,23 @@ namespace tcg
 //    Bidimensional Rect  class
 //**********************************************************************************
 
-template <typename T>
-struct RectT {
-	T x0, y0,
-		x1, y1;
+template <typename T> struct RectT {
+	T x0, y0, x1, y1;
 
-public:
+  public:
 	RectT() : x0((std::numeric_limits<T>::max)()), y0(x0), x1(-x0), y1(x1) {}
-	RectT(T x0_, T y0_, T x1_, T y1_)
-		: x0(x0_), y0(y0_), x1(x1_), y1(y1_) {}
-	RectT(const PointT<T> &p0, const PointT<T> &p1)
-		: x0(p0.x), y0(p0.y), x1(p1.x), y1(p1.y) {}
+	RectT(T x0_, T y0_, T x1_, T y1_) : x0(x0_), y0(y0_), x1(x1_), y1(y1_) {}
+	RectT(const PointT<T> &p0, const PointT<T> &p1) : x0(p0.x), y0(p0.y), x1(p1.x), y1(p1.y) {}
 	RectT(const PointT<T> &p0, const SizeT<T> &size)
-		: x0(p0.x), y0(p0.y), x1(p0.x + size.w), y1(p0.y + size.h) {}
+		: x0(p0.x), y0(p0.y), x1(p0.x + size.w), y1(p0.y + size.h)
+	{
+	}
 
 	bool empty() const { return (x1 <= x0) || (y1 <= y0); }
 
 	PointT<T> p0() const { return PointT<T>(x0, y0); }
 	PointT<T> p1() const { return PointT<T>(x1, y1); }
-	PointT<T> center() const
-	{
-		return PointT<T>((x0 + x1) / 2, (y0 + y1) / 2);
-	}
+	PointT<T> center() const { return PointT<T>((x0 + x1) / 2, (y0 + y1) / 2); }
 
 	T width() const { return x1 - x0; }
 	T height() const { return y1 - y0; }
@@ -77,20 +72,17 @@ public:
 		return RectT<T>(p.x - r.x0, p.y - r.y0, p.x - r.x1, p.y - r.y1);
 	}
 
-	template <typename K>
-	RectT &operator*=(K k)
+	template <typename K> RectT &operator*=(K k)
 	{
 		x0 *= k, y0 *= k, x1 *= k, y1 *= k;
 		return *this;
 	}
 
-	template <typename K>
-	friend RectT<T> operator*(const RectT<T> &r, K k)
+	template <typename K> friend RectT<T> operator*(const RectT<T> &r, K k)
 	{
 		return RectT<T>(r.x0 * k, r.y0 * k, r.x1 * k, r.y1 * k);
 	}
-	template <typename K>
-	friend RectT<T> operator*(K k, const RectT<T> &r)
+	template <typename K> friend RectT<T> operator*(K k, const RectT<T> &r)
 	{
 		return RectT<T>(k * r.x0, k * r.y0, k * r.x1, k * r.y1);
 	}
@@ -121,40 +113,16 @@ public:
 		return *this;
 	}
 
-	RectT &operator|=(const PointT<T> &p)
-	{
-		return operator|=(RectT(p.x, p.y, p.x, p.y));
-	}
-	RectT &operator&=(const PointT<T> &p)
-	{
-		return operator&=(RectT(p.x, p.y, p.x, p.y));
-	}
+	RectT &operator|=(const PointT<T> &p) { return operator|=(RectT(p.x, p.y, p.x, p.y)); }
+	RectT &operator&=(const PointT<T> &p) { return operator&=(RectT(p.x, p.y, p.x, p.y)); }
 
-	friend RectT<T> operator|(const RectT<T> &a, const RectT<T> &b)
-	{
-		return RectT<T>(a) |= b;
-	}
-	friend RectT<T> operator&(const RectT<T> &a, const RectT<T> &b)
-	{
-		return RectT<T>(a) &= b;
-	}
+	friend RectT<T> operator|(const RectT<T> &a, const RectT<T> &b) { return RectT<T>(a) |= b; }
+	friend RectT<T> operator&(const RectT<T> &a, const RectT<T> &b) { return RectT<T>(a) &= b; }
 
-	friend RectT<T> operator|(const RectT<T> &r, const PointT<T> &p)
-	{
-		return RectT<T>(r) |= p;
-	}
-	friend RectT<T> operator&(const RectT<T> &r, const PointT<T> &p)
-	{
-		return RectT<T>(r) &= p;
-	}
-	friend RectT<T> operator|(const PointT<T> &p, const RectT<T> &r)
-	{
-		return RectT<T>(r) |= p;
-	}
-	friend RectT<T> operator&(const PointT<T> &p, const RectT<T> &r)
-	{
-		return RectT<T>(r) &= p;
-	}
+	friend RectT<T> operator|(const RectT<T> &r, const PointT<T> &p) { return RectT<T>(r) |= p; }
+	friend RectT<T> operator&(const RectT<T> &r, const PointT<T> &p) { return RectT<T>(r) &= p; }
+	friend RectT<T> operator|(const PointT<T> &p, const RectT<T> &r) { return RectT<T>(r) |= p; }
+	friend RectT<T> operator&(const PointT<T> &p, const RectT<T> &r) { return RectT<T>(r) &= p; }
 };
 
 //------------------------------------------------------------------------
@@ -167,28 +135,29 @@ typedef RectI Rect;
 //    Tridimensional Rect  class
 //**********************************************************************************
 
-template <typename T>
-struct Rect3T {
-	T x0, y0, z0,
-		x1, y1, z1;
+template <typename T> struct Rect3T {
+	T x0, y0, z0, x1, y1, z1;
 
-public:
+  public:
 	Rect3T() : x0((std::numeric_limits<T>::max)()), y0(x0), z0(x0), x1(-x0), y1(x1), z1(x1) {}
 	Rect3T(T x0_, T y0_, T z0_, T x1_, T y1_, T z1_)
-		: x0(x0_), y0(y0_), z0(z0_), x1(x1_), y1(y1_), z1(z1_) {}
+		: x0(x0_), y0(y0_), z0(z0_), x1(x1_), y1(y1_), z1(z1_)
+	{
+	}
 	Rect3T(const Point3T<T> &p0, const Point3T<T> &p1)
-		: x0(p0.x), y0(p0.y), z0(p0.z) x1(p1.x), y1(p1.y), z1(p1.z) {}
+		: x0(p0.x), y0(p0.y), z0(p0.z) x1(p1.x), y1(p1.y), z1(p1.z)
+	{
+	}
 	Rect3T(const Point3T<T> &p0, const Size3T<T> &size)
-		: x0(p0.x), y0(p0.y), z0(p0.z), x1(p0.x + size.w), y1(p0.y + size.h), z1(p0.z + size.d) {}
+		: x0(p0.x), y0(p0.y), z0(p0.z), x1(p0.x + size.w), y1(p0.y + size.h), z1(p0.z + size.d)
+	{
+	}
 
 	bool empty() const { return (x1 <= x0) || (y1 <= y0) || (z1 <= z0); }
 
 	Point3T<T> p0() const { return Point3T<T>(x0, y0, z0); }
 	Point3T<T> p1() const { return Point3T<T>(x1, y1, z1); }
-	Point3T<T> center() const
-	{
-		return Point3T<T>((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2);
-	}
+	Point3T<T> center() const { return Point3T<T>((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); }
 
 	T width() const { return x1 - x0; }
 	T height() const { return y1 - y0; }
@@ -197,7 +166,8 @@ public:
 
 	bool operator==(const Rect3T &other) const
 	{
-		return x0 == other.x0 && y0 == other.y0 && z0 == other.z0 && x1 == other.x1 && y1 == other.y1 && z1 == other.z1;
+		return x0 == other.x0 && y0 == other.y0 && z0 == other.z0 && x1 == other.x1 &&
+			   y1 == other.y1 && z1 == other.z1;
 	}
 	bool operator!=(const Rect3T &other) const { return !operator==(other); }
 
@@ -214,43 +184,34 @@ public:
 
 	friend Rect3T<T> operator+(const Rect3T<T> &r, const tcg::Point3T<T> &p)
 	{
-		return Rect3T<T>(r.x0 + p.x, r.y0 + p.y, r.z0 + p.z,
-						 r.x1 + p.x, r.y1 + p.y, r.z1 + p.z);
+		return Rect3T<T>(r.x0 + p.x, r.y0 + p.y, r.z0 + p.z, r.x1 + p.x, r.y1 + p.y, r.z1 + p.z);
 	}
 	friend Rect3T<T> operator-(const Rect3T<T> &r, const tcg::Point3T<T> &p)
 	{
-		return Rect3T<T>(r.x0 - p.x, r.y0 - p.y, r.z0 - p.z,
-						 r.x1 - p.x, r.y1 - p.y, r.z1 - p.z);
+		return Rect3T<T>(r.x0 - p.x, r.y0 - p.y, r.z0 - p.z, r.x1 - p.x, r.y1 - p.y, r.z1 - p.z);
 	}
 	friend Rect3T<T> operator+(const tcg::Point3T<T> &p, const Rect3T<T> &r)
 	{
-		return Rect3T<T>(p.x + r.x0, p.x + r.y0, p.x + r.z0,
-						 p.x + r.x1 + p.x, r.y1, p.x + r.z1);
+		return Rect3T<T>(p.x + r.x0, p.x + r.y0, p.x + r.z0, p.x + r.x1 + p.x, r.y1, p.x + r.z1);
 	}
 	friend Rect3T<T> operator-(const tcg::Point3T<T> &p, const Rect3T<T> &r)
 	{
-		return Rect3T<T>(p.x - r.x0, p.y - r.y0, p.z - r.z0,
-						 p.x - r.x1, p.y - r.y1, p.z - r.z1);
+		return Rect3T<T>(p.x - r.x0, p.y - r.y0, p.z - r.z0, p.x - r.x1, p.y - r.y1, p.z - r.z1);
 	}
 
-	template <typename K>
-	Rect3T &operator*=(K k)
+	template <typename K> Rect3T &operator*=(K k)
 	{
 		x0 *= k, y0 *= k, z0 *= k, x1 *= k, y1 *= k, z1 *= k;
 		return *this;
 	}
 
-	template <typename K>
-	friend Rect3T<T> operator*(const Rect3T<T> &r, K k)
+	template <typename K> friend Rect3T<T> operator*(const Rect3T<T> &r, K k)
 	{
-		return RectT<T>(r.x0 * k, r.y0 * k, r.z0 * k,
-						r.x1 * k, r.y1 * k, r.z1 * k);
+		return RectT<T>(r.x0 * k, r.y0 * k, r.z0 * k, r.x1 * k, r.y1 * k, r.z1 * k);
 	}
-	template <typename K>
-	friend Rect3T<T> operator*(K k, const Rect3T<T> &r)
+	template <typename K> friend Rect3T<T> operator*(K k, const Rect3T<T> &r)
 	{
-		return RectT<T>(k * r.x0, k * r.y0, k * r.z0,
-						k * r.x1, k * r.y1, k * r.z1);
+		return RectT<T>(k * r.x0, k * r.y0, k * r.z0, k * r.x1, k * r.y1, k * r.z1);
 	}
 
 	Rect3T &operator|=(const Rect3T &other)
@@ -296,14 +257,8 @@ public:
 		return operator&=(RectT(p.x, p.y, p.z, p.x, p.y, p.z));
 	}
 
-	friend Rect3T<T> operator|(const Rect3T<T> &a, const Rect3T<T> &b)
-	{
-		return Rect3T<T>(a) |= b;
-	}
-	friend Rect3T<T> operator&(const Rect3T<T> &a, const Rect3T<T> &b)
-	{
-		return Rect3T<T>(a) &= b;
-	}
+	friend Rect3T<T> operator|(const Rect3T<T> &a, const Rect3T<T> &b) { return Rect3T<T>(a) |= b; }
+	friend Rect3T<T> operator&(const Rect3T<T> &a, const Rect3T<T> &b) { return Rect3T<T>(a) &= b; }
 
 	friend Rect3T<T> operator|(const Rect3T<T> &r, const Point3T<T> &p)
 	{

@@ -31,10 +31,10 @@ class InsertFxPopup : public DVGui::Dialog
 	QIcon m_presetIcon;
 	QIcon m_fxIcon;
 
-public:
+  public:
 	InsertFxPopup();
 
-private:
+  private:
 	TFx *createFx();
 
 	void makeItem(QTreeWidgetItem *parent, std::string fxid);
@@ -46,18 +46,18 @@ private:
 	bool loadFx(TFilePath fp);
 	void loadMacro();
 
-public slots:
+  public slots:
 	void onItemDoubleClicked(QTreeWidgetItem *w, int c);
 	void onInsert();
 	void onReplace();
 	void onAdd();
 
-protected:
+  protected:
 	void showEvent(QShowEvent *);
 	void hideEvent(QHideEvent *);
 	void contextMenuEvent(QContextMenuEvent *);
 
-protected slots:
+  protected slots:
 	void updatePresets();
 	void removePreset();
 };

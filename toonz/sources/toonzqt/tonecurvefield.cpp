@@ -95,7 +95,8 @@ double qtDistance(const QPointF &p1, const QPointF &p2)
 
 //-----------------------------------------------------------------------------
 
-QPointF getNewFirstHandlePoint(const QPointF &p, const QPointF &nextP, const QPointF &oldHandlePoint)
+QPointF getNewFirstHandlePoint(const QPointF &p, const QPointF &nextP,
+							   const QPointF &oldHandlePoint)
 {
 	bool canMove = (nextP.x() - p.x() > 16);
 	int yDistance = nextP.y() - p.y();
@@ -111,7 +112,8 @@ QPointF getNewFirstHandlePoint(const QPointF &p, const QPointF &nextP, const QPo
 
 //-----------------------------------------------------------------------------
 
-QPointF getNewSecondHandlePoint(const QPointF &p, const QPointF &nextP, const QPointF &oldHandlePoint)
+QPointF getNewSecondHandlePoint(const QPointF &p, const QPointF &nextP,
+								const QPointF &oldHandlePoint)
 {
 	bool canMove = (nextP.x() - p.x() > 16);
 	int yDistance = p.y() - nextP.y();
@@ -126,7 +128,7 @@ QPointF getNewSecondHandlePoint(const QPointF &p, const QPointF &nextP, const QP
 }
 
 //-----------------------------------------------------------------------------
-} //anonymous namespace
+} // anonymous namespace
 //-----------------------------------------------------------------------------
 
 //=============================================================================
@@ -134,7 +136,9 @@ QPointF getNewSecondHandlePoint(const QPointF &p, const QPointF &nextP, const QP
 //=============================================================================
 
 ChennelCurveEditor::ChennelCurveEditor(QWidget *parent, HistogramView *histogramView)
-	: QWidget(parent), m_histogramView(histogramView), m_currentControlPointIndex(-1), m_mouseButton(Qt::NoButton), m_curveHeight(256), m_LeftRightMargin(42), m_TopMargin(9), m_BottomMargin(48), m_isLinear(false)
+	: QWidget(parent), m_histogramView(histogramView), m_currentControlPointIndex(-1),
+	  m_mouseButton(Qt::NoButton), m_curveHeight(256), m_LeftRightMargin(42), m_TopMargin(9),
+	  m_BottomMargin(48), m_isLinear(false)
 {
 	setFixedSize(m_curveHeight + 2 * m_LeftRightMargin + 2,
 				 m_curveHeight + m_TopMargin + m_BottomMargin);
@@ -285,9 +289,11 @@ void ChennelCurveEditor::movePoint(int index, const QPointF delta)
 	int firstIndex = 3;
 	int lastIndex = m_points.size() - 4;
 	if (index == firstIndex)
-		emit firstLastXPostionChanged(viewToStrokePoint(p).x, viewToStrokePoint(m_points.at(lastIndex)).x);
+		emit firstLastXPostionChanged(viewToStrokePoint(p).x,
+									  viewToStrokePoint(m_points.at(lastIndex)).x);
 	if (index == lastIndex)
-		emit firstLastXPostionChanged(viewToStrokePoint(m_points.at(firstIndex)).x, viewToStrokePoint(p).x);
+		emit firstLastXPostionChanged(viewToStrokePoint(m_points.at(firstIndex)).x,
+									  viewToStrokePoint(p).x);
 }
 
 //-----------------------------------------------------------------------------
@@ -300,9 +306,11 @@ void ChennelCurveEditor::setPoint(int index, const QPointF p)
 	int firstIndex = 3;
 	int lastIndex = m_points.size() - 4;
 	if (index == firstIndex)
-		emit firstLastXPostionChanged(viewToStrokePoint(p).x, viewToStrokePoint(m_points.at(lastIndex)).x);
+		emit firstLastXPostionChanged(viewToStrokePoint(p).x,
+									  viewToStrokePoint(m_points.at(lastIndex)).x);
 	if (index == lastIndex)
-		emit firstLastXPostionChanged(viewToStrokePoint(m_points.at(firstIndex)).x, viewToStrokePoint(p).x);
+		emit firstLastXPostionChanged(viewToStrokePoint(m_points.at(firstIndex)).x,
+									  viewToStrokePoint(p).x);
 }
 
 //-----------------------------------------------------------------------------
@@ -348,7 +356,8 @@ void ChennelCurveEditor::moveCentralControlPoint(int index, const QPointF delta)
 
 	QPointF p = m_points.at(index);
 	QPointF d = delta;
-	//Trovo il valore di delta im modo tale che il punto di controllo non sia trascinato fuori dal range consentito
+	// Trovo il valore di delta im modo tale che il punto di controllo non sia trascinato fuori dal
+	// range consentito
 	int newX = p.x() + delta.x();
 	int newY = p.y() + delta.y();
 	QPointF newPoint = checkPoint(QPoint(newX, newY));
@@ -359,7 +368,7 @@ void ChennelCurveEditor::moveCentralControlPoint(int index, const QPointF delta)
 	double nextDistance = nextP.x() - (p.x() + d.x());
 	double precDistance = (p.x() + d.x()) - precP.x();
 
-	//Caso particolare: Punto di controllo corrente == primo visibile,
+	// Caso particolare: Punto di controllo corrente == primo visibile,
 	//								  Punto di controllo successivo == l'ultimo visibile
 	if (index == 3 && index + 3 == pointCount - 4) {
 		setPoint(index + 1, getNewFirstHandlePoint(p, nextP, m_points.at(index + 1)));
@@ -367,7 +376,7 @@ void ChennelCurveEditor::moveCentralControlPoint(int index, const QPointF delta)
 		if (nextDistance < 0)
 			d = QPointF(nextP.x() - p.x(), d.y());
 	}
-	//Caso particolare: Punto di controllo corrente == ultimo visibile,
+	// Caso particolare: Punto di controllo corrente == ultimo visibile,
 	//								  Punto di controllo precedente == primo visibile
 	else if (index - 3 == 3 && index == pointCount - 4) {
 		setPoint(index - 2, getNewFirstHandlePoint(precP, p, m_points.at(index - 2)));
@@ -375,20 +384,20 @@ void ChennelCurveEditor::moveCentralControlPoint(int index, const QPointF delta)
 		if (precDistance < 0)
 			d = QPointF(precP.x() - p.x(), d.y());
 	}
-	//Altrimenti calcolo il nuovo delta
+	// Altrimenti calcolo il nuovo delta
 	else if (nextDistance < 16)
 		d = QPointF(nextP.x() - p.x() - 16, d.y());
 	else if (precDistance < 16)
 		d = QPointF(precP.x() - p.x() + 16, d.y());
 
-	//Punto di controllo speciale: il primo visualizzato.
+	// Punto di controllo speciale: il primo visualizzato.
 	if (index == 3) {
 		QPointF dY = QPointF(0, d.y());
 		movePoint(index - 1, dY);
 		movePoint(index - 2, dY);
 		movePoint(index - 3, dY);
 	}
-	//Punto di controllo speciale: l'ultimo visualizzato.
+	// Punto di controllo speciale: l'ultimo visualizzato.
 	if (index == pointCount - 4) {
 		QPointF dY = QPointF(0, d.y());
 		movePoint(index + 1, dY);
@@ -446,7 +455,8 @@ bool ChennelCurveEditor::eraseControlPointWhileMove(int index, const QPointF del
 	//Se vado troppo vicino al punto di controllo precedente, o successivo, lo elimino.
 	if(nextDistance<=16)
 	{
-		//Caso particolare: il successivo e' l'ultimo visibile; non posso eliminare l'ultimo punto di controllo visibile.
+		//Caso particolare: il successivo e' l'ultimo visibile; non posso eliminare l'ultimo punto
+di controllo visibile.
 		if(index+3 == pointCount-4)
 		{
 			//Se il punto di controllo in index e' il primo visibile sto gestendo il
@@ -469,7 +479,8 @@ bool ChennelCurveEditor::eraseControlPointWhileMove(int index, const QPointF del
 	}
 	if(precDistance<=16)
 	{
-		//Caso particolare: il precedente e' il primo visibile; non posso eliminare il primo punto di controllo visibile.
+		//Caso particolare: il precedente e' il primo visibile; non posso eliminare il primo punto
+di controllo visibile.
 		if(index-3 == 3)
 		{
 			//Se il punto di controllo in index e' l'ultimo visibile sto gestendo il
@@ -501,10 +512,11 @@ void ChennelCurveEditor::addControlPoint(double percent)
 	QPainterPath path = getPainterPath();
 	QPointF p = path.pointAtPercent(percent);
 
-	//Cerco il punto di controllo precedente
+	// Cerco il punto di controllo precedente
 	int pointCount = m_points.size();
 	int beforeControlPointIndex;
-	for (beforeControlPointIndex = pointCount - 1; beforeControlPointIndex >= 0; beforeControlPointIndex--) {
+	for (beforeControlPointIndex = pointCount - 1; beforeControlPointIndex >= 0;
+		 beforeControlPointIndex--) {
 		QPointF point = m_points.at(beforeControlPointIndex);
 		if (isCentralControlPoint(beforeControlPointIndex) && point.x() < p.x())
 			break;
@@ -514,19 +526,19 @@ void ChennelCurveEditor::addControlPoint(double percent)
 		return;
 
 	QPointF p0 = checkPoint(m_points.at(beforeControlPointIndex));
-	//Se sono troppo vicino al punto di controllo precedente ritorno
+	// Se sono troppo vicino al punto di controllo precedente ritorno
 	if (abs(p.x() - p0.x()) <= 16)
 		return;
 	double beforeControlPointPercent = getPercentAtPoint(p0, path);
 	QPointF p1 = checkPoint(m_points.at(beforeControlPointIndex + 1));
 	QPointF p2 = checkPoint(m_points.at(beforeControlPointIndex + 2));
 	QPointF p3 = checkPoint(m_points.at(beforeControlPointIndex + 3));
-	//Se sono troppo vicino al punto di controllo successivo ritorno
+	// Se sono troppo vicino al punto di controllo successivo ritorno
 	if (abs(p3.x() - p.x()) <= 16)
 		return;
 	double nextControlPointPercent = getPercentAtPoint(p3, path);
 
-	//Calcolo la velocita' e quindi il coiffciente angolare.
+	// Calcolo la velocita' e quindi il coiffciente angolare.
 	double t = percent * 100 / (nextControlPointPercent - beforeControlPointPercent);
 	double s = t - 1;
 	QPointF speed = 3.0 * ((p1 - p0) * s * s + 2 * (p2 - p0) * s * t + (p3 - p2) * t * t);
@@ -553,7 +565,8 @@ void ChennelCurveEditor::removeCurrentControlPoint()
 
 void ChennelCurveEditor::removeControlPoint(int index)
 {
-	//Non posso eliminare il primo punto di controllo visibile quindi lo rimetto in condizione iniziale
+	// Non posso eliminare il primo punto di controllo visibile quindi lo rimetto in condizione
+	// iniziale
 	if (index <= 4) {
 		setPoint(0, strokeToViewPoint(TPointD(-40, 0)));
 		setPoint(1, strokeToViewPoint(TPointD(-20, 0)));
@@ -564,7 +577,8 @@ void ChennelCurveEditor::removeControlPoint(int index)
 		emit controlPointChanged(false);
 		return;
 	}
-	//Non posso eliminare il l'ultimo punto di controllo visibile quindi lo rimetto in condizione iniziale
+	// Non posso eliminare il l'ultimo punto di controllo visibile quindi lo rimetto in condizione
+	// iniziale
 	if (index >= m_points.size() - 5) {
 		int i = m_points.size() - 5;
 		setPoint(i, strokeToViewPoint(TPointD(239, 239)));
@@ -617,12 +631,12 @@ QPainterPath ChennelCurveEditor::getPainterPath()
 		p0 = p3;
 	}
 
-	//Cerco le eventuali intersezioni con il bordo.
+	// Cerco le eventuali intersezioni con il bordo.
 	QRectF rect(m_LeftRightMargin, m_TopMargin, m_curveHeight, m_curveHeight);
 	QRectF r = path.boundingRect();
 	if (!rect.contains(QRect(rect.left(), r.top(), rect.width(), r.height()))) {
 		QList<QPointF> points = getIntersectedPoint(rect, path);
-		//Se trovo punti di intersezione (per come e' definita la curva devono essere pari)
+		// Se trovo punti di intersezione (per come e' definita la curva devono essere pari)
 		// faccio l'unione del path calcolato e di nuovi path lineari.
 		int j = 0;
 		for (j = 0; j < points.size(); j++) {
@@ -643,7 +657,7 @@ void ChennelCurveEditor::paintEvent(QPaintEvent *e)
 {
 	QPainter painter(this);
 
-	//Disegno il reticolato
+	// Disegno il reticolato
 	painter.setRenderHint(QPainter::Antialiasing, false);
 	painter.setPen(QColor(250, 250, 250));
 	int i;
@@ -653,24 +667,28 @@ void ChennelCurveEditor::paintEvent(QPaintEvent *e)
 		int delta = m_TopMargin + 16 * i;
 		int j;
 		for (j = 1; j < 4; j++)
-			painter.drawLine(QPoint((j - 1) * d + m_LeftRightMargin + 1, delta), QPoint(j * d + m_LeftRightMargin - 1, delta));
-		painter.drawLine(QPoint((4 - 1) * d + m_LeftRightMargin + 1, delta), QPoint(4 * d + m_LeftRightMargin, delta));
+			painter.drawLine(QPoint((j - 1) * d + m_LeftRightMargin + 1, delta),
+							 QPoint(j * d + m_LeftRightMargin - 1, delta));
+		painter.drawLine(QPoint((4 - 1) * d + m_LeftRightMargin + 1, delta),
+						 QPoint(4 * d + m_LeftRightMargin, delta));
 		// linee verticali
 		delta = m_LeftRightMargin + 1 + 16 * i;
 		if (i % 4 == 0)
 			continue;
 		for (j = 1; j < 5; j++)
-			painter.drawLine(QPoint(delta, (j - 1) * d + m_TopMargin), QPoint(delta, j * d + m_TopMargin - 1));
+			painter.drawLine(QPoint(delta, (j - 1) * d + m_TopMargin),
+							 QPoint(delta, j * d + m_TopMargin - 1));
 	}
 
-	//Disegno l'histogram.
+	// Disegno l'histogram.
 	m_histogramView->draw(&painter, QPoint(m_LeftRightMargin - 10, 0));
 
-	//Disegno la barra verticale a sinistra.
-	m_verticalChannelBar->draw(&painter, QPoint(0, -2)); //-1 == m_topMargin- il margine della barra(=10+1).
+	// Disegno la barra verticale a sinistra.
+	m_verticalChannelBar->draw(&painter,
+							   QPoint(0, -2)); //-1 == m_topMargin- il margine della barra(=10+1).
 
 	QRectF r = rect().adjusted(m_LeftRightMargin, m_TopMargin, -m_LeftRightMargin, -m_BottomMargin);
-	//Disegno la curva entro i limiti del grafo
+	// Disegno la curva entro i limiti del grafo
 	painter.setClipRect(r, Qt::IntersectClip);
 	QPainterPath path = getPainterPath();
 	if (path.isEmpty())
@@ -680,7 +698,7 @@ void ChennelCurveEditor::paintEvent(QPaintEvent *e)
 	painter.setBrush(Qt::NoBrush);
 	painter.drawPath(path);
 
-	//Disegno i punti di controllo (esclusi i primi tre e gli ultimi tre)
+	// Disegno i punti di controllo (esclusi i primi tre e gli ultimi tre)
 	r = r.adjusted(-5, -5, 5, 5);
 	int n = m_points.size();
 	QPointF p = m_points.at(3);
@@ -743,12 +761,13 @@ void ChennelCurveEditor::mousePressEvent(QMouseEvent *e)
 		double minDistance;
 		int controlPointIndex = getClosestPointIndex(posF, minDistance);
 
-		//Se la distanza e' piccola seleziono il control point corrente
+		// Se la distanza e' piccola seleziono il control point corrente
 		if (minDistance < 20)
 			m_currentControlPointIndex = controlPointIndex;
 		else {
 			m_currentControlPointIndex = -1;
-			//Se sono sufficentemente lontano da un punto di controllo, ma abbastanza vicino alla curva
+			// Se sono sufficentemente lontano da un punto di controllo, ma abbastanza vicino alla
+			// curva
 			// aggiungo un punto di controllo
 			double percent = getPercentAtPoint(posF, getPainterPath());
 			if (percent != 0 && minDistance > 20)
@@ -763,8 +782,7 @@ void ChennelCurveEditor::mousePressEvent(QMouseEvent *e)
 void ChennelCurveEditor::mouseReleaseEvent(QMouseEvent *e)
 {
 	/*-- マウスドラッグ中はプレビューを更新しない。ここで初めて更新 --*/
-	if (m_mouseButton == Qt::LeftButton &&
-		m_currentControlPointIndex != -1 &&
+	if (m_mouseButton == Qt::LeftButton && m_currentControlPointIndex != -1 &&
 		e->button() == Qt::LeftButton)
 		emit controlPointChanged(false);
 	m_mouseButton = Qt::NoButton;
@@ -796,8 +814,7 @@ void ChennelCurveEditor::leaveEvent(QEvent *)
 
 bool ChennelCurveEditor::eventFilter(QObject *object, QEvent *event)
 {
-	if (event->type() == QEvent::Shortcut ||
-		event->type() == QEvent::ShortcutOverride) {
+	if (event->type() == QEvent::Shortcut || event->type() == QEvent::ShortcutOverride) {
 		if (!object->inherits("FxSettings")) {
 			event->accept();
 			return true;
@@ -849,7 +866,7 @@ ToneCurveField::ToneCurveField(QWidget *parent, FxHistogramRender *fxHistogramRe
 			 << "Alpha";
 	int channelCount = channels.size();
 
-	//lista canali: label+comboBox
+	// lista canali: label+comboBox
 	QWidget *channelListWidget = new QWidget(this);
 	QHBoxLayout *channelListLayout = new QHBoxLayout(channelListWidget);
 	channelListLayout->setMargin(0);
@@ -864,7 +881,7 @@ ToneCurveField::ToneCurveField(QWidget *parent, FxHistogramRender *fxHistogramRe
 	channelListWidget->setLayout(channelListLayout);
 	mainLayout->addWidget(channelListWidget, 0, Qt::AlignCenter);
 
-	//stack widget dei grafi
+	// stack widget dei grafi
 	m_toneCurveStackedWidget = new QStackedWidget(this);
 	Histograms *histograms = new Histograms(0, true);
 	fxHistogramRender->setHistograms(histograms);
@@ -872,7 +889,8 @@ ToneCurveField::ToneCurveField(QWidget *parent, FxHistogramRender *fxHistogramRe
 	for (i = 0; i < channelCount; i++) {
 		ChennelCurveEditor *c = new ChennelCurveEditor(this, histograms->getHistogramView(i));
 		m_toneCurveStackedWidget->addWidget(c);
-		connect(c, SIGNAL(firstLastXPostionChanged(int, int)), this, SLOT(onFirstLastXPostionChanged(int, int)));
+		connect(c, SIGNAL(firstLastXPostionChanged(int, int)), this,
+				SLOT(onFirstLastXPostionChanged(int, int)));
 	}
 
 	QWidget *w = new QWidget(this);
@@ -884,7 +902,7 @@ ToneCurveField::ToneCurveField(QWidget *parent, FxHistogramRender *fxHistogramRe
 	mainLayout->addWidget(w, 0, Qt::AlignHCenter);
 	m_toneCurveStackedWidget->setCurrentIndex(currentChannelIndex);
 
-	//stack widget degli slider
+	// stack widget degli slider
 	m_sliderStackedWidget = new QStackedWidget(this);
 	for (i = 0; i < channelCount; i++) {
 		IntPairField *intPairSlider = new IntPairField(this);
@@ -904,9 +922,12 @@ ToneCurveField::ToneCurveField(QWidget *parent, FxHistogramRender *fxHistogramRe
 	connect(m_isLinearCheckBox, SIGNAL(clicked(bool)), SLOT(setLinearManually(bool)));
 	connect(m_isLinearCheckBox, SIGNAL(toggled(bool)), SLOT(setLinear(bool)));
 
-	connect(m_channelListChooser, SIGNAL(currentIndexChanged(int)), m_toneCurveStackedWidget, SLOT(setCurrentIndex(int)));
-	connect(m_channelListChooser, SIGNAL(currentIndexChanged(int)), m_sliderStackedWidget, SLOT(setCurrentIndex(int)));
-	connect(m_channelListChooser, SIGNAL(currentIndexChanged(int)), this, SIGNAL(currentChannelIndexChanged(int)));
+	connect(m_channelListChooser, SIGNAL(currentIndexChanged(int)), m_toneCurveStackedWidget,
+			SLOT(setCurrentIndex(int)));
+	connect(m_channelListChooser, SIGNAL(currentIndexChanged(int)), m_sliderStackedWidget,
+			SLOT(setCurrentIndex(int)));
+	connect(m_channelListChooser, SIGNAL(currentIndexChanged(int)), this,
+			SIGNAL(currentChannelIndexChanged(int)));
 
 	setLayout(mainLayout);
 }
@@ -922,7 +943,8 @@ void ToneCurveField::setCurrentChannel(int currentChannel)
 
 ChennelCurveEditor *ToneCurveField::getChannelEditor(int channel) const
 {
-	ChennelCurveEditor *c = dynamic_cast<ChennelCurveEditor *>(m_toneCurveStackedWidget->widget(channel));
+	ChennelCurveEditor *c =
+		dynamic_cast<ChennelCurveEditor *>(m_toneCurveStackedWidget->widget(channel));
 	assert(c);
 	return c;
 }

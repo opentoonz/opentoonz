@@ -65,9 +65,11 @@ class IronTool : public TTool
 	bool m_active;
 	int m_cursorId;
 
-public:
+  public:
 	IronTool()
-		: TTool("T_Iron"), m_strokeRef(0), m_draw(false), m_active(false), m_dragged(false), m_undo(0), m_cpIndexMin(-1), m_cpIndexMax(-1), m_oldStroke(0), m_cursorId(ToolCursor::IronCursor)
+		: TTool("T_Iron"), m_strokeRef(0), m_draw(false), m_active(false), m_dragged(false),
+		  m_undo(0), m_cpIndexMin(-1), m_cpIndexMax(-1), m_oldStroke(0),
+		  m_cursorId(ToolCursor::IronCursor)
 	{
 		bind(TTool::Vectors);
 	}
@@ -164,8 +166,8 @@ public:
 
 		double totalStrokeLen = m_strokeRef->getLength();
 
-		bool direction = !m_strokeRef->isSelfLoop() ||
-						 draggedStrokeLen < totalStrokeLen - draggedStrokeLen;
+		bool direction =
+			!m_strokeRef->isSelfLoop() || draggedStrokeLen < totalStrokeLen - draggedStrokeLen;
 
 		if (!direction) {
 			draggedStrokeLen = totalStrokeLen - draggedStrokeLen;
@@ -183,7 +185,7 @@ public:
 		int i;
 		int maxCP = m_strokeRef->getControlPointCount() - 1;
 
-		//iCP0 is the control point index before v0 (or just on v0)
+		// iCP0 is the control point index before v0 (or just on v0)
 		int iCP0 = (int)(maxCP * v0);
 		int iCP1 = m_strokeRef->getControlPointIndexAfterParameter(v1);
 
@@ -209,7 +211,8 @@ public:
 			return;
 		}
 
-		//*********************************************** point of no return **************************
+		//*********************************************** point of no return
+		//**************************
 		m_dragged = true;
 		m_beginPoint = point2;
 
@@ -259,9 +262,9 @@ public:
 		v0 = m_strokeRef->getParameterAtControlPoint(iCP0);
 		v1 = m_strokeRef->getParameterAtControlPoint(iCP1);
 
-		//double smoothFactor = getApplication()->getVectorToolsParameters().getToolSize();
-		//smoothFactor *= 0.01;
-		//smoothFactor = (smoothFactor*smoothFactor*smoothFactor)*0.7;
+		// double smoothFactor = getApplication()->getVectorToolsParameters().getToolSize();
+		// smoothFactor *= 0.01;
+		// smoothFactor = (smoothFactor*smoothFactor*smoothFactor)*0.7;
 
 		const double smoothFactor = 0.08;
 
@@ -306,11 +309,9 @@ public:
 
 			assert(isAlmostZero((smoothFP * v1vp + smoothFP * vpv0) + oppSmoothFactor - 1.0));
 
-			m_strokeRef->setControlPoint(i, TThickPoint(
-												pf0 * v1vp +
-													pf1 * vpv0 +
-													appDPoint * oppSmoothFactor,
-												appThickPoint.thick));
+			m_strokeRef->setControlPoint(
+				i, TThickPoint(pf0 * v1vp + pf1 * vpv0 + appDPoint * oppSmoothFactor,
+							   appThickPoint.thick));
 			// this is like
 			//
 			// averageP = ( p0*(v1-vp)/(v1-v0) + p1*(vp-v0)/(v1-v0));
@@ -347,7 +348,7 @@ public:
 		}
 		QMutexLocker lock(vi->getMutex());
 
-		//TStroke *oldStroke = new TStroke(*(vi->getStroke(m_selectedStroke)));
+		// TStroke *oldStroke = new TStroke(*(vi->getStroke(m_selectedStroke)));
 
 		//------------------------------------------------------------------------------
 
@@ -355,7 +356,7 @@ public:
 
 		m_cpIndexMin &= ~1; // nearest even value less or equal to m_cpIndexMin
 
-		if (m_cpIndexMax & 1) //odd
+		if (m_cpIndexMax & 1) // odd
 			m_cpIndexMax++;
 
 		int i = 0;
@@ -364,11 +365,11 @@ public:
 		if ((m_cpIndexMin == 0 && (UINT)m_cpIndexMax == cpCount - 1) ||
 			(m_cpIndexMin == m_cpIndexMax && m_strokeRef->isSelfLoop())) {
 			/*
-      e' meglio rilevarli i corners.
-      Tanto se hai appiattito abbastanza, se ne vanno da soli,
-      senza lasciare ingrati compiti alla reuceControlPoints
-      Altrimenti non si fa altro che aumentarli i punti di controllo
-      */
+	  e' meglio rilevarli i corners.
+	  Tanto se hai appiattito abbastanza, se ne vanno da soli,
+	  senza lasciare ingrati compiti alla reuceControlPoints
+	  Altrimenti non si fa altro che aumentarli i punti di controllo
+	  */
 			std::vector<int> corners;
 			corners.push_back(0);
 			detectCorners(m_strokeRef, 45, corners);
@@ -389,7 +390,8 @@ public:
 				corners.push_back(newStroke->getChunkCount());
 				newStroke->reduceControlPoints(2.0 * getPixelSize(), corners);
 
-				hitPoints.resize(m_cpIndexMin + newStroke->getControlPointCount() + cpCount - 1 - m_cpIndexMax);
+				hitPoints.resize(m_cpIndexMin + newStroke->getControlPointCount() + cpCount - 1 -
+								 m_cpIndexMax);
 
 				count = 0;
 
@@ -436,10 +438,9 @@ public:
 				corners.push_back(newStroke2->getChunkCount());
 				newStroke2->reduceControlPoints(2.0 * getPixelSize(), corners);
 
-				hitPoints.resize(
-					newStroke1->getControlPointCount() +
-					newStroke2->getControlPointCount() +
-					m_cpIndexMin - m_cpIndexMax - 1);
+				hitPoints.resize(newStroke1->getControlPointCount() +
+								 newStroke2->getControlPointCount() + m_cpIndexMin - m_cpIndexMax -
+								 1);
 
 				count = 0;
 				for (i = 0; i < newStroke2->getControlPointCount(); i++) {
@@ -501,20 +502,14 @@ public:
 		invalidate();
 	}
 
-	bool moveCursor(const TPointD &pos)
-	{
-		return false;
-	}
+	bool moveCursor(const TPointD &pos) { return false; }
 
 	void onActivate()
 	{
 		//      getApplication()->editImageOrSpline();
 	}
 
-	void onLeave()
-	{
-		m_draw = false;
-	}
+	void onLeave() { m_draw = false; }
 
 	int getCursorId() const { return m_cursorId; }
 	void onEnter()
@@ -571,4 +566,4 @@ void drawControlPoints(const TStroke *&stroke, double pixelSize)
 
 } // namespace
 
-//TTool *getIronTool() {return &ironTool;}
+// TTool *getIronTool() {return &ironTool;}

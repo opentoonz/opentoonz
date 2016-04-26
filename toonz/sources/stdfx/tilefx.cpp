@@ -12,11 +12,7 @@ class TileFx : public TStandardRasterFx
 {
 	FX_PLUGIN_DECLARATION(TileFx)
 
-	enum tilingMode {
-		eTile = 1,
-		eTileHorizontally = 2,
-		eTileVertically = 3
-	};
+	enum tilingMode { eTile = 1, eTileHorizontally = 2, eTileVertically = 3 };
 
 	TRasterFxPort m_input;
 	TIntEnumParamP m_mode;
@@ -24,7 +20,7 @@ class TileFx : public TStandardRasterFx
 	TBoolParamP m_yMirror;
 	TDoubleParamP m_margin;
 
-public:
+  public:
 	TileFx();
 	~TileFx();
 
@@ -33,15 +29,11 @@ public:
 	void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
 	int getMemoryRequirement(const TRectD &rect, double frame, const TRenderSettings &info);
 
-	void transform(
-		double frame,
-		int port,
-		const TRectD &rectOnOutput,
-		const TRenderSettings &infoOnOutput,
-		TRectD &rectOnInput,
-		TRenderSettings &infoOnInput);
+	void transform(double frame, int port, const TRectD &rectOnOutput,
+				   const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
+				   TRenderSettings &infoOnInput);
 
-private:
+  private:
 	void makeTile(const TTile &inputTile, const TTile &tile) const;
 };
 
@@ -62,18 +54,18 @@ TileFx::TileFx()
 
 //------------------------------------------------------------------------------
 
-TileFx::~TileFx() {}
+TileFx::~TileFx()
+{
+}
 
 //------------------------------------------------------------------------------
 
 bool TileFx::canHandle(const TRenderSettings &info, double frame)
 {
-	//Currently, only affines which transform the X and Y axis into themselves may
-	//be handled by this fx...
-	return (fabs(info.m_affine.a12) < 0.0001 &&
-			fabs(info.m_affine.a21) < 0.0001) ||
-		   (fabs(info.m_affine.a11) < 0.0001 &&
-			fabs(info.m_affine.a22) < 0.0001);
+	// Currently, only affines which transform the X and Y axis into themselves may
+	// be handled by this fx...
+	return (fabs(info.m_affine.a12) < 0.0001 && fabs(info.m_affine.a21) < 0.0001) ||
+		   (fabs(info.m_affine.a11) < 0.0001 && fabs(info.m_affine.a22) < 0.0001);
 }
 
 //------------------------------------------------------------------------------
@@ -91,13 +83,9 @@ bool TileFx::doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info)
 
 //------------------------------------------------------------------------------
 
-void TileFx::transform(
-	double frame,
-	int port,
-	const TRectD &rectOnOutput,
-	const TRenderSettings &infoOnOutput,
-	TRectD &rectOnInput,
-	TRenderSettings &infoOnInput)
+void TileFx::transform(double frame, int port, const TRectD &rectOnOutput,
+					   const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
+					   TRenderSettings &infoOnInput)
 {
 	infoOnInput = infoOnOutput;
 
@@ -173,14 +161,15 @@ void TileFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 */
 void TileFx::makeTile(const TTile &inputTile, const TTile &tile) const
 {
-	//Build the mirroring pattern. It obviously repeats itself out of 2x2 tile blocks.
+	// Build the mirroring pattern. It obviously repeats itself out of 2x2 tile blocks.
 	std::map<std::pair<bool, bool>, TRasterP> mirrorRaster;
 	mirrorRaster[std::pair<bool, bool>(false, false)] = inputTile.getRaster();
 	mirrorRaster[std::pair<bool, bool>(false, true)] = inputTile.getRaster()->clone();
 	mirrorRaster[std::pair<bool, bool>(false, true)]->yMirror();
 	mirrorRaster[std::pair<bool, bool>(true, false)] = inputTile.getRaster()->clone();
 	mirrorRaster[std::pair<bool, bool>(true, false)]->xMirror();
-	mirrorRaster[std::pair<bool, bool>(true, true)] = mirrorRaster[std::pair<bool, bool>(true, false)]->clone();
+	mirrorRaster[std::pair<bool, bool>(true, true)] =
+		mirrorRaster[std::pair<bool, bool>(true, false)]->clone();
 	mirrorRaster[std::pair<bool, bool>(true, true)]->yMirror();
 
 	TPoint animatedPos = convert(inputTile.m_pos - tile.m_pos);
@@ -192,7 +181,7 @@ void TileFx::makeTile(const TTile &inputTile, const TTile &tile) const
 	bool tileOrizontally = mode == 1 || mode == 2;
 	bool tileVertically = mode == 1 || mode == 3;
 
-	//Reach the lower left tiling position
+	// Reach the lower left tiling position
 	while (animatedPos.x > 0 && tileOrizontally) {
 		animatedPos.x -= inSize.lx;
 		mirrorX = !mirrorX;
@@ -211,13 +200,14 @@ void TileFx::makeTile(const TTile &inputTile, const TTile &tile) const
 	}
 	bool doMirroX = mirrorX, doMirroY = mirrorY;
 
-	//Write the tiling blocks.
+	// Write the tiling blocks.
 	tile.getRaster()->lock();
 	inputTile.getRaster()->lock();
 	TPoint startTilingPos = animatedPos;
 	do {
 		do {
-			std::pair<bool, bool> doMirror(doMirroX && m_xMirror->getValue(), doMirroY && m_yMirror->getValue());
+			std::pair<bool, bool> doMirror(doMirroX && m_xMirror->getValue(),
+										   doMirroY && m_yMirror->getValue());
 			tile.getRaster()->copy(mirrorRaster[doMirror], startTilingPos);
 			startTilingPos.x += inSize.lx;
 			doMirroX = !doMirroX;

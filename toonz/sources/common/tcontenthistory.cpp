@@ -26,8 +26,7 @@ using namespace std;
 
 //-------------------------------------------------------
 
-TContentHistory::TContentHistory(bool isLevel)
-	: m_isLevel(isLevel), m_frozenHistory()
+TContentHistory::TContentHistory(bool isLevel) : m_isLevel(isLevel), m_frozenHistory()
 {
 }
 
@@ -108,7 +107,8 @@ QString getLine(int counter, const QDateTime &date, const set<TFrameId> &frames)
 	}
 
 	if (frames.empty())
-		return "| #" + blanks(QString::number(counter), 4) + blanks(date.toString(Fmt), 20) + blanks(machine, 12) + user + " |";
+		return "| #" + blanks(QString::number(counter), 4) + blanks(date.toString(Fmt), 20) +
+			   blanks(machine, 12) + user + " |";
 
 	QString framesStr;
 
@@ -117,9 +117,8 @@ QString getLine(int counter, const QDateTime &date, const set<TFrameId> &frames)
 	while (it != frames.end()) {
 		first = last = *it;
 		++it;
-		while (it != frames.end() &&
-			   ((*it).getNumber() == last.getNumber() || // 1a, 1b....
-				(*it).getNumber() == last.getNumber() + 1)) {
+		while (it != frames.end() && ((*it).getNumber() == last.getNumber() || // 1a, 1b....
+									  (*it).getNumber() == last.getNumber() + 1)) {
 			assert(*it > last);
 			last = *it, ++it;
 		}
@@ -128,7 +127,8 @@ QString getLine(int counter, const QDateTime &date, const set<TFrameId> &frames)
 			framesStr += ", ";
 	}
 
-	return "| #" + blanks(QString::number(counter), 4) + blanks(date.toString(Fmt), 20) + blanks(machine, 12) + user + blanks(framesStr, 20) + " |";
+	return "| #" + blanks(QString::number(counter), 4) + blanks(date.toString(Fmt), 20) +
+		   blanks(machine, 12) + user + blanks(framesStr, 20) + " |";
 }
 
 //--------------------------------------------------------------------
@@ -196,7 +196,8 @@ const QString TContentHistory::serialize() const
 		return m_frozenHistory + currentHistory;
 	else if (currentHistory != "") {
 		if (m_isLevel)
-			return "| #    DATE:       Time:   MACHINE:    USER:          FRAMES MODIFIED:     |" + currentHistory;
+			return "| #    DATE:       Time:   MACHINE:    USER:          FRAMES MODIFIED:     |" +
+				   currentHistory;
 		else
 			return "| #    DATE:       Time:   MACHINE:    USER:           |" + currentHistory;
 	} else
@@ -279,7 +280,7 @@ void testHistory()
 		}
 
 
-    {
+	{
 		TContentHistory ch(false);
 
 		ch.modifiedNow();

@@ -20,7 +20,7 @@
 /*
   EXPLANATION:
 
-    The tlin_cblas_wrap files implement a simplified wrapper interface to CBLAS routines.
+	The tlin_cblas_wrap files implement a simplified wrapper interface to CBLAS routines.
 */
 
 //================================================================================
@@ -37,6 +37,6 @@ void DVAPI sum(int n, const double *x, double *&y);
 void DVAPI multiply(int rows, int cols, const double *A, const double *x, double *&y);
 void DVAPI multiply(const mat &A, const double *x, double *&y);
 
-} //namespace tlin
+} // namespace tlin
 
-#endif //TLIN_CBLAS_WRAP
+#endif // TLIN_CBLAS_WRAP

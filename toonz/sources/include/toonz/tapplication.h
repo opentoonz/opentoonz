@@ -30,7 +30,7 @@ class TColorStyle;
 
 class TApplication
 {
-public:
+  public:
 	TApplication() {}
 	virtual ~TApplication() {}
 

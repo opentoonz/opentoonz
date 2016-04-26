@@ -19,7 +19,7 @@ class TOStream;
 class TIStream;
 
 //=============================================================================
-//!The ColumnFan class is used to menage display columns.
+//! The ColumnFan class is used to menage display columns.
 /*!The class allows to fold a column by column index, deactivate(), to
    open folded columns, activate() and to know if column is folded or not, isActive().
 
@@ -33,7 +33,7 @@ class DVAPI ColumnFan
 {
 	class Column
 	{
-	public:
+	  public:
 		bool m_active;
 		int m_pos;
 		Column() : m_active(true), m_pos(0) {}
@@ -43,40 +43,40 @@ class DVAPI ColumnFan
 	int m_firstFreePos;
 
 	/*!
-    Called by activate() and deactivate() to update columns coordinates.
+	Called by activate() and deactivate() to update columns coordinates.
   */
 	void update();
 
-public:
+  public:
 	/*!
-    Constructs a ColumnFan with default value.
+	Constructs a ColumnFan with default value.
   */
 	ColumnFan();
 
 	/*!
-    Set column \b col not folded.
-    \sa deactivate() and isActive()
+	Set column \b col not folded.
+	\sa deactivate() and isActive()
   */
 	void activate(int col);
 	/*!
-    Fold column \b col.
-    \sa activate() and isActive()
+	Fold column \b col.
+	\sa activate() and isActive()
   */
 	void deactivate(int col);
 	/*!
-    Return true if column \b col is active, column is not folded, else return false.
-    \sa activate() and deactivate()
+	Return true if column \b col is active, column is not folded, else return false.
+	\sa activate() and deactivate()
   */
 	bool isActive(int col) const;
 
 	/*!
-    Return column index of column in x-axis coordinate \b x.
-    \sa colToX()
+	Return column index of column in x-axis coordinate \b x.
+	\sa colToX()
   */
 	int xToCol(int x) const;
 	/*!
-    Return column x-axis coordinate of column identify with \b col.
-    \sa xToCol()
+	Return column x-axis coordinate of column identify with \b col.
+	\sa xToCol()
   */
 	int colToX(int col) const;
 

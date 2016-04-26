@@ -15,9 +15,8 @@ class RGBMFadeFx : public TStandardRasterFx
 	TPixelParamP m_color;
 	TDoubleParamP m_intensity;
 
-public:
-	RGBMFadeFx()
-		: m_intensity(50.0), m_color(TPixel32::Black)
+  public:
+	RGBMFadeFx() : m_intensity(50.0), m_color(TPixel32::Black)
 	{
 		bindParam(this, "color", m_color);
 		bindParam(this, "intensity", m_intensity);
@@ -41,8 +40,7 @@ public:
 	bool canHandle(const TRenderSettings &info, double frame) { return true; }
 };
 
-template <typename PIXEL>
-void doRGBMFade(TRasterPT<PIXEL> &ras, const PIXEL &col, double intensity)
+template <typename PIXEL> void doRGBMFade(TRasterPT<PIXEL> &ras, const PIXEL &col, double intensity)
 {
 	int j;
 	ras->lock();
@@ -60,10 +58,10 @@ void doRGBMFade(TRasterPT<PIXEL> &ras, const PIXEL &col, double intensity)
 			val = troundp(pix->b + intensity * (col.b * factor - pix->b));
 			pix->b = (val > PIXEL::maxChannelValue) ? PIXEL::maxChannelValue : val;
 			/*  qui si faceva il fade anche del matte
-      pix->r=(UCHAR)(pix->r+intensity*(col.r-pix->r));
-      pix->g=(UCHAR)(pix->g+intensity*(col.g-pix->g));
-      pix->b=(UCHAR)(pix->b+intensity*(col.b-pix->b));
-      pix->m=(UCHAR)(pix->m+intensity*(col.m-pix->m));*/
+	  pix->r=(UCHAR)(pix->r+intensity*(col.r-pix->r));
+	  pix->g=(UCHAR)(pix->g+intensity*(col.g-pix->g));
+	  pix->b=(UCHAR)(pix->b+intensity*(col.b-pix->b));
+	  pix->m=(UCHAR)(pix->m+intensity*(col.m-pix->m));*/
 			++pix;
 		}
 	}
@@ -71,8 +69,7 @@ void doRGBMFade(TRasterPT<PIXEL> &ras, const PIXEL &col, double intensity)
 }
 //------------------------------------------------------------------------------
 
-void RGBMFadeFx::doCompute(TTile &tile, double frame,
-						   const TRenderSettings &ri)
+void RGBMFadeFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 {
 	if (!m_input.isConnected())
 		return;

@@ -9,14 +9,14 @@
 
 class TServerProxy
 {
-public:
+  public:
 	TServerProxy(const std::string hostName, int portId);
 	~TServerProxy();
 
 	bool testConnection() const;
 	int exec(int argc, char *argv[], std::string &reply);
 
-private:
+  private:
 	std::string m_hostName;
 	int m_portId;
 };

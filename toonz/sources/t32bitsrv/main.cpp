@@ -2,19 +2,19 @@
 
 #if (!(defined(x64) || defined(__LP64__) || defined(LINUX)))
 
-//Toonz includes
+// Toonz includes
 #include "tiio_std.h"
 #include "tnzimage.h"
 
-//Qt includes
+// Qt includes
 #include <QCoreApplication>
 #include <QThread>
 
-//tipc includes
+// tipc includes
 #include "tipcmsg.h"
 #include "tipcsrv.h"
 
-//Specific Parsers includes
+// Specific Parsers includes
 #include "t32movmsg.h"
 #include "t323gpmsg.h"
 #include "t32fontmsg.h"
@@ -27,12 +27,12 @@ class ServerThread : public QThread
 {
 	QString m_srvName;
 
-public:
+  public:
 	ServerThread(const QString &srvName) : m_srvName(srvName) {}
 
 	void run()
 	{
-		//Start a local server receiving connections on the specified key
+		// Start a local server receiving connections on the specified key
 		tipc::Server server;
 		mov_io::addParsers(&server);
 		_3gp_io::addParsers(&server);
@@ -40,7 +40,7 @@ public:
 		font_io::addParsers(&server);
 #endif
 
-		//Start listening on supplied key
+		// Start listening on supplied key
 		bool ok = server.listen(m_srvName);
 
 		exec();
@@ -53,7 +53,7 @@ public:
 
 int main(int argc, char *argv[])
 {
-	if (argc < 2) //The server key name must be passed
+	if (argc < 2) // The server key name must be passed
 		return -1;
 
 	QCoreApplication a(argc, argv);
@@ -67,12 +67,12 @@ int main(int argc, char *argv[])
 	QLocalServer::removeServer(srvName);
 	QLocalServer::removeServer(mainSrvName);
 
-	//Start a separate thread to host most of the event processing
+	// Start a separate thread to host most of the event processing
 	ServerThread *srvThread = new ServerThread(srvName);
 	srvThread->start();
 
-	//Start a server on the main thread too - this one to host
-	//commands that need to be explicitly performed on the main thread
+	// Start a server on the main thread too - this one to host
+	// commands that need to be explicitly performed on the main thread
 	tipc::Server server;
 	mov_io::addParsers(&server);
 	_3gp_io::addParsers(&server);
@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
 	font_io::addParsers(&server);
 #endif
 
-	//Start listening on supplied key
+	// Start listening on supplied key
 	bool ok = server.listen(srvName + "_main");
 
 	a.exec();
