@@ -1,12 +1,11 @@
 # Building on Windows
 
-This software can be built using Visual Studio 2013 and Qt 5.5
+This software can be built using Visual Studio 2013 and Qt 5.6
 
 ## Required Software
 
 ### Visual Studio Express 2013 for Windows Desktop
 - https://www.microsoft.com/en-us/download/details.aspx?id=44914
-- Since Qt 5.5 does not work with Visual Studio 2015, Visual Studio 2013 must be used.
 - Make sure that the target platform is "for Windows Desktop" not "for Windows".
 - Community and Provessional versions of Visual Studio 2013 for Windows Desktop also work.
 
@@ -26,11 +25,10 @@ Because of the size of these libraries, they are not maintained in the git repos
 They will have to be installed seperately as follows.
 
 ### Qt
-- http://download.qt.io/official_releases/qt/5.5/5.5.1/
+- http://download.qt.io/official_releases/qt/5.6/5.6.0/
 - Qt is a cross-platform GUI framework.
-- This project does not use the latest Qt framework (5.6).
 - Select the following file from the above link:
-  - qt-opensource-windows-x86-msvc2013_64-5.5.1.exe
+  - qt-opensource-windows-x86-msvc2013_64-5.6.0.exe
 
 ### boost
 - boost 1.55.0 or later is required (tested up to 1.60.0), but the support build is using 1.55.0 exactly.
@@ -93,9 +91,9 @@ If a previous binary of OpenToonz was already installed, this step and the follo
 OpenToonz utilizes the QuickTime SDK's `mov` and associated file formats.  Since the QuickTime SDK only comes in 32-bit versions, the 32-bit file `t32bitsrv.exe` from the QuickTime SDK is used in both the 64-bit and 32-bit versions of OpenToonz.  As a result, the following instructions apply to both the 32 and 64-bit versions of OpenToonz.
 
 ### Qt
-- http://download.qt.io/official_releases/qt/5.5/5.5.1/
+- http://download.qt.io/official_releases/qt/5.6/5.6.0/
 - Find the following file from the above link and install in the appropriate folder.
-  - qt-opensource-windows-x86-msvc2013-5.5.1.exe
+  - qt-opensource-windows-x86-msvc2013-5.6.0.exe
 
 ### QuickTime SDK
 1. Sign in using your Apple developer ID and download `QuickTime 7.3 SDK for Windows.zip` from the following url.

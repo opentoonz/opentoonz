@@ -105,7 +105,7 @@ ComboViewerPanel::ComboViewerPanel(QWidget *parent, Qt::WFlags flags)
 	ImageUtils::FullScreenWidget *fsWidget = new ImageUtils::FullScreenWidget(this);
 	fsWidget->setWidget(m_sceneViewer = new SceneViewer(fsWidget));
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN) && (QT_VERSION >= 0x050500) && (QT_VERSION < 0x050600)
 	//  Workaround for QTBUG-48288
 	//  This code should be removed after updating Qt.
 	//  Qt may crash in handling WM_SIZE of m_sceneViewer in splash.finish(&w)
