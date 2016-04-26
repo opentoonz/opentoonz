@@ -1242,16 +1242,11 @@ extern const char *applicationVersion;
 //-----------------------------------------------------------------------------
 void MainWindow::checkForUpdates()
 {
-/* FIXME: とりあえずアップデートチェックしないことにする */
-#if QT_VERSION < 0x050000
-	QString requestToServer = "http://www.toonz.com/cgi-shl/update/update.asp";
-	requestToServer = requestToServer + QString("?Application_Name=") + applicationName;
-	requestToServer = requestToServer + QString("&Version=") + applicationVersion;
-	requestToServer.remove(" ");
+	// Since there is only a single version of Opentoonz, we can do a simple check against a string
+	QUrl updateUrl = "http://ss23.geek.nz/opentoonz-version.txt";
 
-	m_updateChecker = new UpdateChecker(requestToServer);
-	connect(m_updateChecker, SIGNAL(done(bool)), this, SLOT(onUpdateCheckerDone(bool)));
-#endif
+	m_updateChecker = new UpdateChecker(updateUrl);
+	connect(m_updateChecker, &UpdateChecker::done, this, &MainWindow::onUpdateCheckerDone);
 }
 //-----------------------------------------------------------------------------
 #ifdef LINETEST
@@ -1271,52 +1266,24 @@ void MainWindow::checkForLicense()
 
 void MainWindow::onUpdateCheckerDone(bool error)
 {
-	if (!error) {
-		// Get the last update date
-		const TFilePath lastUpdateFilePath = TEnv::getConfigDir() + "lastUpdate.dat";
-		//QFile data(toQString(lastUpdateFilePath));
-
-		QFile data(QString::fromStdWString(lastUpdateFilePath.getWideString()));
-		QString dateString;
-		if (data.open(QIODevice::ReadOnly)) {
-			QTextStream in(&data);
-			in >> dateString;
-		}
-		data.close();
-
-		// Last update Date
-		QDate lastUpdate = QDate::fromString(dateString, "MM/dd/yyyy");
-		// Current Update Date
-		QDate updateDate = m_updateChecker->getUpdateDate();
-		// Update web page
-		QUrl webPageUrl = m_updateChecker->getWebPageUrl();
-
-		// If the response 'make sense'
-		if (!updateDate.toString("MM/dd/yyyy").isEmpty() && !webPageUrl.toString().isEmpty()) {
-			if (!lastUpdate.isValid() || updateDate > lastUpdate) {
-				std::vector<QString> buttons;
-				buttons.push_back(QString(tr("Visit Web Site")));
-				buttons.push_back(QString(tr("Cancel")));
-				int ret = DVGui::MsgBox(DVGui::INFORMATION, QObject::tr("An update is available for this software.\nVisit the Web site for more information."), buttons);
-				if (ret == 1)
-					QDesktopServices::openUrl(webPageUrl);
-
-				// Write the new last date to file
-				QFile data(QString::fromStdWString(lastUpdateFilePath.getWideString()));
-				if (data.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-					QTextStream out(&data);
-					out << updateDate.toString("MM/dd/yyyy");
-					out.flush();
-				}
-				data.close();
-			}
-		}
+	if (error) {
+		// Don't bother doing the update if there was an error
+		return;
 	}
 
-#if QT_VERSION < 0x050000
+	// TODO: Change this so that it is a proper >= comparison instead of just ==, to deal with beta releases
+	if (m_updateChecker->getLatestVersion() != QString::fromStdString(TEnv::getApplicationVersion())) {
+		std::vector<QString> buttons;
+		buttons.push_back(QString(tr("Visit Web Site")));
+		buttons.push_back(QString(tr("Cancel")));
+		int ret = MsgBox(INFORMATION, QObject::tr("An update is available for this software.\nVisit the Web site for more information."), buttons);
+		if (ret == 1)
+			// This URL can be "translated" to give a localised version to non-English users
+			QDesktopServices::openUrl(QObject::tr("https://opentoonz.github.io/e/"));
+	}
+
 	disconnect(m_updateChecker);
 	m_updateChecker->deleteLater();
-#endif
 }
 //-----------------------------------------------------------------------------
 #ifdef LINETEST
