@@ -53,8 +53,7 @@ const std::string
 	/*! Default palettes folder: is used for color design (色指定)*/
 	TProject::Palettes = "palettes";
 //! Default project name
-const TFilePath
-	TProject::SandboxProjectName("sandbox");
+const TFilePath TProject::SandboxProjectName("sandbox");
 
 TProjectP currentProject;
 
@@ -154,7 +153,7 @@ TFilePath searchProjectPath(TFilePath folder)
 	assert(folder.isAbsolute());
 	wstring projectName = folder.getWideName();
 
-	//Search for the first available project file, starting from the most recent.
+	// Search for the first available project file, starting from the most recent.
 	TFilePath projectPath;
 	for (int i = 0; i < prjSuffixCount; ++i) {
 		projectPath = folder + TFilePath(projectName + prjSuffix[i] + xmlExt);
@@ -162,7 +161,7 @@ TFilePath searchProjectPath(TFilePath folder)
 			return projectPath;
 	}
 
-	//If none exist in the folder, build the name with the most recent suffix
+	// If none exist in the folder, build the name with the most recent suffix
 	return folder + TFilePath(projectName + prjSuffix[0] + xmlExt);
 }
 
@@ -202,19 +201,21 @@ void hideOlderProjectFiles(const TFilePath &folderPath)
 /*! \class TProject tproject.h
 	\brief Define and handle a toonz project.
 
-    A toonz project is identified by a project name that matches a folder with the same name in the project root.\n
-	The project folder can contains saveral other folders. 
-	By default, five folders are created: Inputs, Drawings, Scenes, Extras and Outputs. 
+	A toonz project is identified by a project name that matches a folder with the same name in the
+   project root.\n
+	The project folder can contains saveral other folders.
+	By default, five folders are created: Inputs, Drawings, Scenes, Extras and Outputs.
 	Each of this folders can be renamed using the setFolder(string name, TFilePath path) method.
 	Usually, the \b name parameter is choosen from inputs, drawings, scenes, extras and outputs;
 	the \b path parameter contains the folder that can have a different name from them.
 	All association between names and folder are kept in a mapping.\n
-	A folder of a project can be constant or scene dependent. A constant folder is used by 
-	every scene created in the project to save or load data. A scene dependent folder is used only by the scene 
-	from wich the folder depends. A scene dependent folder contains the string "$scene" in its path. 
+	A folder of a project can be constant or scene dependent. A constant folder is used by
+	every scene created in the project to save or load data. A scene dependent folder is used only
+   by the scene
+	from wich the folder depends. A scene dependent folder contains the string "$scene" in its path.
 
 	\code
-	e.g. 
+	e.g.
 	Scene path: "...\\prodA\\episode1\\scenes\\sceneA.tzn"
 	Drawings scene dependent folder: "...\\prodA\\episode1\\$scene\\drawings"
 	Drawings folder path: "...\\prodA\\episode1\\SceneA\\drawings"
@@ -246,8 +247,8 @@ void hideOlderProjectFiles(const TFilePath &folderPath)
   */
 
 /*! \fn const TSceneProperties &TProject::getSceneProperties() const
-    Returns the scene properties of the project.
-    \see TSceneProperties
+	Returns the scene properties of the project.
+	\see TSceneProperties
 	*/
 
 /*! \fn void TProject::save()
@@ -259,8 +260,7 @@ void hideOlderProjectFiles(const TFilePath &folderPath)
 	\see TProjectManager and TOStream.
   */
 
-TProject::TProject()
-	: m_name(), m_path(), m_sprop(new TSceneProperties())
+TProject::TProject() : m_name(), m_path(), m_sprop(new TSceneProperties())
 {
 }
 
@@ -296,7 +296,8 @@ void TProject::setFolder(string name, TFilePath path)
 //-------------------------------------------------------------------
 /*! Create a folder named with \b name.
 	Call the setFolder(name,TFilePath(name)) method.\n
-	e.g. setFolder(TProject::Drawings) is equivalent to setFolder(TProject::Drawings, TFilePath("drawings"))\n
+	e.g. setFolder(TProject::Drawings) is equivalent to setFolder(TProject::Drawings,
+   TFilePath("drawings"))\n
 	The resulting is "..\\projectFolder\\drawings"
 */
 void TProject::setFolder(string name)
@@ -377,10 +378,7 @@ string TProject::getFolderName(int index) const
 int TProject::getFolderIndex(string name) const
 {
 	std::vector<std::string>::const_iterator it;
-	it = std::find(
-		m_folderNames.begin(),
-		m_folderNames.end(),
-		name);
+	it = std::find(m_folderNames.begin(), m_folderNames.end(), name);
 	if (it == m_folderNames.end())
 		return -1;
 	return std::distance(it, m_folderNames.begin());
@@ -393,8 +391,7 @@ int TProject::getFolderIndex(string name) const
 */
 bool TProject::isCurrent() const
 {
-	TFilePath currentProjectPath =
-		TProjectManager::instance()->getCurrentProjectPath();
+	TFilePath currentProjectPath = TProjectManager::instance()->getCurrentProjectPath();
 	if (getProjectPath() == currentProjectPath)
 		return true;
 	else
@@ -404,7 +401,7 @@ bool TProject::isCurrent() const
 
 //-------------------------------------------------------------------
 /*! Set the scene properties \b sprop to the project.
-    \see TSceneProperties*/
+	\see TSceneProperties*/
 void TProject::setSceneProperties(const TSceneProperties &sprop)
 {
 	m_sprop->assign(&sprop);
@@ -512,7 +509,7 @@ wstring TProject::getFolderNameFromPath(const TFilePath &folderDir)
 
 //-------------------------------------------------------------------
 /*! Saves the project in the specified path.
-	The TfilePath fp must be an absolute path. The project is saved as a xml file.\n 
+	The TfilePath fp must be an absolute path. The project is saved as a xml file.\n
 	Uses TProjectManager and TOStream.
 	\note Exceptions can be thrown.
 	\see TProjectManager and TOStream.
@@ -539,12 +536,14 @@ bool TProject::save(const TFilePath &projectPath)
 
 	TFileStatus fs(projectPath);
 	if (fs.doesExist() && !fs.isWritable()) {
-		throw TSystemException(projectPath, "Cannot save the project settings. The file is read-only.");
+		throw TSystemException(projectPath,
+							   "Cannot save the project settings. The file is read-only.");
 		return false;
 	}
 	TFileStatus fs2(scenesDescPath);
 	if (fs2.doesExist() && !fs2.isWritable()) {
-		throw TSystemException(projectPath, "Cannot save the project settings. The scenes file is read-only.");
+		throw TSystemException(projectPath,
+							   "Cannot save the project settings. The scenes file is read-only.");
 		return false;
 	}
 
@@ -595,8 +594,7 @@ bool TProject::save(const TFilePath &projectPath)
 	pm->getFolderNames(foldernames);
 	for (int f = 0; f < foldernames.size(); f++) {
 		TFilePath folderpath = decode(getFolder(foldernames.at(f)));
-		if (folderpath.isEmpty()
-			||!isConstantFolder(f) )
+		if (folderpath.isEmpty() || !isConstantFolder(f))
 			continue;
 
 		TFilePath xmlPath = folderpath + "scenes.xml";
@@ -614,9 +612,9 @@ bool TProject::save(const TFilePath &projectPath)
 		os2.closeChild();
 	}
 
-	//The project has been successfully saved. In case there are other
-	//project files from older Toonz project versions, those files are
-	//renamed so that older Toonz versions can no longer 'see' it.
+	// The project has been successfully saved. In case there are other
+	// project files from older Toonz project versions, those files are
+	// renamed so that older Toonz versions can no longer 'see' it.
 	if (!isFolderUnderVersionControl(projectFolder))
 		hideOlderProjectFiles(projectFolder);
 
@@ -651,7 +649,7 @@ void TProject::load(const TFilePath &projectPath)
 	delete m_sprop;
 	m_sprop = new TSceneProperties();
 
-	//Read the project
+	// Read the project
 	TIStream is(inputProjectPath);
 	if (!is)
 		return;
@@ -692,7 +690,7 @@ void TProject::load(const TFilePath &projectPath)
 
 //-------------------------------------------------------------------
 /*! Returns true if the specified path is a project path.\n
-	A project path must be absolute, must be an xml file and must have the name of the 
+	A project path must be absolute, must be an xml file and must have the name of the
 	parent root with either one of the version-dependent suffixes "_prj*".\n
 	\code
 	e.g. "C:\\Toonz 5.2 stuff\\projects\\prodA\\episode1\\episode1_prj.xml" is a project path.
@@ -719,9 +717,9 @@ namespace
 /*
 class SimpleProject : public TProject {
 public:
-  SimpleProject() : TProject(TFilePath("___simpleProject")) {    
+  SimpleProject() : TProject(TFilePath("___simpleProject")) {
   }
-  
+
 };
 */
 } // namespace
@@ -733,16 +731,20 @@ public:
 //-------------------------------------------------------------------
 
 /*! \class TProjectManager tproject.h
-	\brief Manages all toonz projects. The class provides all needed method to retrieve projects paths, names 
+	\brief Manages all toonz projects. The class provides all needed method to retrieve projects
+   paths, names
 	and folders.
 
-	It is possible to handle more than one project root. 
-	The class mantains a container this purpose. All the projects roots must be setted by hand in the windows 
+	It is possible to handle more than one project root.
+	The class mantains a container this purpose. All the projects roots must be setted by hand in
+   the windows
 	registery. By default, only one project root is created when toonz is installed.\n
-	The project root container can be updated using addProjectsRoot(const TFilePath &root), addDefaultProjectsRoot()
+	The project root container can be updated using addProjectsRoot(const TFilePath &root),
+   addDefaultProjectsRoot()
 	methods.
 
-	The class mantains also information about the current project. The class provides all needed method to retrieve 
+	The class mantains also information about the current project. The class provides all needed
+   method to retrieve
 	the current project path, name and folder.
 	\see TProject
 
@@ -758,8 +760,7 @@ public:
 	\note the tab mode is used for Tab Application
 */
 
-TProjectManager::TProjectManager()
-	: m_tabMode(false), m_tabKidsMode(false)
+TProjectManager::TProjectManager() : m_tabMode(false), m_tabKidsMode(false)
 {
 }
 
@@ -779,25 +780,26 @@ TProjectManager *TProjectManager::instance()
 }
 
 //-------------------------------------------------------------------
-/*! Adds the specified folder \b fp in the projecs roots container.\n 
+/*! Adds the specified folder \b fp in the projecs roots container.\n
 	If \b fp is already contained in the container, the method does nothing.
 	\note \b fp must be a folder and not a file path.*/
 void TProjectManager::addProjectsRoot(const TFilePath &root)
 {
-	//assert(TFileStatus(root).isDirectory());
+	// assert(TFileStatus(root).isDirectory());
 	if (std::find(m_projectsRoots.begin(), m_projectsRoots.end(), root) == m_projectsRoots.end())
 		m_projectsRoots.push_back(root);
 }
 
 //-------------------------------------------------------------------
 
-/*! Adds the specified folder \b fp in the version control projecs roots container.\n 
+/*! Adds the specified folder \b fp in the version control projecs roots container.\n
 	If \b fp is already contained in the container, the method does nothing.
 	\note \b fp must be a folder and not a file path.*/
 void TProjectManager::addSVNProjectsRoot(const TFilePath &root)
 {
 	assert(TFileStatus(root).isDirectory());
-	if (std::find(m_svnProjectsRoots.begin(), m_svnProjectsRoots.end(), root) == m_svnProjectsRoots.end())
+	if (std::find(m_svnProjectsRoots.begin(), m_svnProjectsRoots.end(), root) ==
+		m_svnProjectsRoots.end())
 		m_svnProjectsRoots.push_back(root);
 }
 
@@ -850,7 +852,8 @@ TFilePath TProjectManager::projectPathToProjectName(const TFilePath &projectPath
 
 //-------------------------------------------------------------------
 /*! Returns an absolute path of the specified \b projectName.\n
-	\note The returned project path is allways computed used the first project root in the container.*/
+	\note The returned project path is allways computed used the first project root in the
+   container.*/
 TFilePath TProjectManager::projectNameToProjectPath(const TFilePath &projectName)
 {
 	assert(!TProject::isAProjectPath(projectName));
@@ -879,7 +882,7 @@ TFilePath TProjectManager::getProjectPathByName(const TFilePath &projectName)
 {
 	assert(!TProject::isAProjectPath(projectName));
 	assert(!projectName.isAbsolute());
-	//TFilePath relativeProjectPath = projectName + (projectName.getName() + projectPathSuffix);
+	// TFilePath relativeProjectPath = projectName + (projectName.getName() + projectPathSuffix);
 	if (m_projectsRoots.empty())
 		addDefaultProjectsRoot();
 	if (projectName == TProject::SandboxProjectName)
@@ -930,9 +933,8 @@ void TProjectManager::getFolderNames(std::vector<std::string> &names)
 			}
 	} catch (...) {
 	}
-	const std::string stdNames[] = {
-		TProject::Inputs, TProject::Drawings, TProject::Scenes,
-		TProject::Extras, TProject::Outputs, TProject::Scripts};
+	const std::string stdNames[] = {TProject::Inputs, TProject::Drawings, TProject::Scenes,
+									TProject::Extras, TProject::Outputs,  TProject::Scripts};
 	for (int i = 0; i < (int)tArrayCount(stdNames); i++) {
 		string name = stdNames[i];
 		// se il nome non e' gia' stato inserito lo aggiungo
@@ -954,7 +956,7 @@ void TProjectManager::setCurrentProjectPath(const TFilePath &fp)
 
 //-------------------------------------------------------------------
 /*! Returns the current project path.\n
-	The project path, usually, is setted in key registry. If a current project path isn't setted, 
+	The project path, usually, is setted in key registry. If a current project path isn't setted,
 	TProject::SandboxProjectName is setted as current project.
 */
 TFilePath TProjectManager::getCurrentProjectPath()
@@ -979,7 +981,7 @@ TFilePath TProjectManager::getCurrentProjectPath()
 
 //-------------------------------------------------------------------
 /*! Returns the current TProject.\n
-	If a current TProject() doesn't exist, load the project in the the current project path. 
+	If a current TProject() doesn't exist, load the project in the the current project path.
 */
 TProjectP TProjectManager::getCurrentProject()
 {
@@ -994,7 +996,8 @@ TProjectP TProjectManager::getCurrentProject()
 
 //-------------------------------------------------------------------
 /*! Returns the TProjectP in which the specified \b scenePath is saved.\n
-	Returns 0 if \b scenePath isn't a valid scene, or isn't saved in a valid folder of a project root.
+	Returns 0 if \b scenePath isn't a valid scene, or isn't saved in a valid folder of a project
+   root.
 	\note \b scenePath must be an absolute path.\n
 	Creates a new TProject. The caller gets ownership.*/
 TProjectP TProjectManager::loadSceneProject(const TFilePath &scenePath)
@@ -1068,10 +1071,7 @@ TProjectP TProjectManager::loadSceneProject(const TFilePath &scenePath)
 
 void TProjectManager::notifyListeners()
 {
-	for (std::set<Listener *>::iterator i =
-			 m_listeners.begin();
-		 i != m_listeners.end();
-		 ++i)
+	for (std::set<Listener *>::iterator i = m_listeners.begin(); i != m_listeners.end(); ++i)
 		(*i)->onProjectSwitched();
 }
 
@@ -1079,10 +1079,7 @@ void TProjectManager::notifyListeners()
 
 void TProjectManager::notifyProjectChanged()
 {
-	for (std::set<Listener *>::iterator i =
-			 m_listeners.begin();
-		 i != m_listeners.end();
-		 ++i)
+	for (std::set<Listener *>::iterator i = m_listeners.begin(); i != m_listeners.end(); ++i)
 		(*i)->onProjectChanged();
 }
 
@@ -1113,9 +1110,10 @@ void TProjectManager::initializeScene(ToonzScene *scene)
 	project->load(currentProjectPath);
 
 	sprop->assign(&project->getSceneProperties());
-	CleanupParameters::GlobalParameters.assign(project->getSceneProperties().getCleanupParameters());
+	CleanupParameters::GlobalParameters.assign(
+		project->getSceneProperties().getCleanupParameters());
 
-	//scene->setProject(this);
+	// scene->setProject(this);
 	scene->setUntitled();
 	sprop->cloneCamerasTo(scene->getTopXsheet()->getStageObjectTree());
 	sprop->onInitialize();

@@ -34,11 +34,11 @@
 // SVNLockDialog
 //-----------------------------------------------------------------------------
 
-SVNLockDialog::SVNLockDialog(QWidget *parent,
-							 const QString &workingDir, const QStringList &files,
-							 bool lock,
-							 int sceneIconAdded)
-	: Dialog(TApp::instance()->getMainWindow(), true, false), m_editSceneContentsCheckBox(0), m_workingDir(workingDir), m_files(files), m_lock(lock), m_hasError(false), m_sceneIconAdded(sceneIconAdded), m_targetTempFile(0)
+SVNLockDialog::SVNLockDialog(QWidget *parent, const QString &workingDir, const QStringList &files,
+							 bool lock, int sceneIconAdded)
+	: Dialog(TApp::instance()->getMainWindow(), true, false), m_editSceneContentsCheckBox(0),
+	  m_workingDir(workingDir), m_files(files), m_lock(lock), m_hasError(false),
+	  m_sceneIconAdded(sceneIconAdded), m_targetTempFile(0)
 {
 	setModal(false);
 	setAttribute(Qt::WA_DeleteOnClose, true);
@@ -113,7 +113,8 @@ SVNLockDialog::SVNLockDialog(QWidget *parent,
 
 	m_editSceneContentsCheckBox->hide();
 
-	connect(m_editSceneContentsCheckBox, SIGNAL(toggled(bool)), this, SLOT(onEditSceneContentsToggled(bool)));
+	connect(m_editSceneContentsCheckBox, SIGNAL(toggled(bool)), this,
+			SLOT(onEditSceneContentsToggled(bool)));
 
 	int fileSize = m_files.size();
 	for (int i = 0; i < fileSize; i++) {
@@ -152,7 +153,8 @@ SVNLockDialog::SVNLockDialog(QWidget *parent,
 	connect(&m_thread, SIGNAL(error(const QString &)), this, SLOT(onError(const QString &)));
 
 	// 1. Getting status
-	connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this, SLOT(onStatusRetrieved(const QString &)));
+	connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
+			SLOT(onStatusRetrieved(const QString &)));
 	m_thread.getSVNStatus(m_workingDir);
 }
 
@@ -182,9 +184,13 @@ void SVNLockDialog::onStatusRetrieved(const QString &xmlResponse)
 		m_waitingLabel->hide();
 
 		if (m_lock)
-			m_textLabel->setText(tr("%1 items to edit.").arg(m_filesToEdit.size() == 1 ? 1 : m_filesToEdit.size() - m_sceneIconAdded));
+			m_textLabel->setText(
+				tr("%1 items to edit.")
+					.arg(m_filesToEdit.size() == 1 ? 1 : m_filesToEdit.size() - m_sceneIconAdded));
 		else
-			m_textLabel->setText(tr("%1 items to unlock.").arg(m_filesToEdit.size() == 1 ? 1 : m_filesToEdit.size() - m_sceneIconAdded));
+			m_textLabel->setText(
+				tr("%1 items to unlock.")
+					.arg(m_filesToEdit.size() == 1 ? 1 : m_filesToEdit.size() - m_sceneIconAdded));
 
 		m_lockButton->show();
 	}
@@ -244,8 +250,8 @@ void SVNLockDialog::onLockButtonClicked()
 	// Check the status of sceneResources
 	if (!m_sceneResources.empty()) {
 		m_thread.disconnect(SIGNAL(done(const QString &)));
-		connect(&m_thread, SIGNAL(statusRetrieved(const QString &)),
-				this, SLOT(onSceneResourcesStatusRetrieved(const QString &)));
+		connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
+				SLOT(onSceneResourcesStatusRetrieved(const QString &)));
 		m_thread.getSVNStatus(m_workingDir, m_sceneResources);
 		return;
 	} else
@@ -257,9 +263,13 @@ void SVNLockDialog::onLockButtonClicked()
 void SVNLockDialog::executeCommand()
 {
 	if (m_lock)
-		m_textLabel->setText(tr("Editing %1 items...").arg(m_filesToEdit.size() == 1 ? 1 : m_filesToEdit.size() - m_sceneIconAdded));
+		m_textLabel->setText(
+			tr("Editing %1 items...")
+				.arg(m_filesToEdit.size() == 1 ? 1 : m_filesToEdit.size() - m_sceneIconAdded));
 	else
-		m_textLabel->setText(tr("Unlocking %1 items...").arg(m_filesToEdit.size() == 1 ? 1 : m_filesToEdit.size() - m_sceneIconAdded));
+		m_textLabel->setText(
+			tr("Unlocking %1 items...")
+				.arg(m_filesToEdit.size() == 1 ? 1 : m_filesToEdit.size() - m_sceneIconAdded));
 
 	QStringList args;
 	if (m_lock)
@@ -286,9 +296,12 @@ void SVNLockDialog::executeCommand()
 
 	if (m_lock) {
 		if (!m_commentTextEdit->toPlainText().isEmpty())
-			args << QString("-m").append(TSystem::getHostName() + ":" + m_commentTextEdit->toPlainText());
+			args << QString("-m")
+						.append(TSystem::getHostName() + ":" + m_commentTextEdit->toPlainText());
 		else
-			args << QString("-m").append(TSystem::getHostName() + ":" + VersionControl::instance()->getUserName() + " edit files.");
+			args << QString("-m").append(TSystem::getHostName() + ":" +
+										 VersionControl::instance()->getUserName() +
+										 " edit files.");
 	}
 
 	m_thread.disconnect(SIGNAL(done(const QString &)));
@@ -414,17 +427,24 @@ void SVNLockDialog::onEditSceneContentsToggled(bool checked)
 	}
 
 	if (m_lock)
-		m_textLabel->setText(tr("%1 items to edit.").arg(m_filesToEdit.size() + m_sceneResources.size() == 1 ? 1 : m_filesToEdit.size() + m_sceneResources.size() - m_sceneIconAdded));
+		m_textLabel->setText(
+			tr("%1 items to edit.")
+				.arg(m_filesToEdit.size() + m_sceneResources.size() == 1
+						 ? 1
+						 : m_filesToEdit.size() + m_sceneResources.size() - m_sceneIconAdded));
 	else
-		m_textLabel->setText(tr("%1 items to unlock.").arg(m_filesToEdit.size() + m_sceneResources.size() == 1 ? 1 : m_filesToEdit.size() + m_sceneResources.size() - m_sceneIconAdded));
+		m_textLabel->setText(
+			tr("%1 items to unlock.")
+				.arg(m_filesToEdit.size() + m_sceneResources.size() == 1
+						 ? 1
+						 : m_filesToEdit.size() + m_sceneResources.size() - m_sceneIconAdded));
 }
 
 //=============================================================================
 // SVNLockInfoDialog
 //-----------------------------------------------------------------------------
 
-SVNLockInfoDialog::SVNLockInfoDialog(QWidget *parent,
-									 const SVNStatus &status)
+SVNLockInfoDialog::SVNLockInfoDialog(QWidget *parent, const SVNStatus &status)
 	: Dialog(TApp::instance()->getMainWindow(), true, false), m_status(status)
 {
 	setModal(false);
@@ -462,7 +482,7 @@ SVNLockInfoDialog::SVNLockInfoDialog(QWidget *parent,
 		dateString += QString::number(dayCount) + " days ago.";
 
 	mainLayout->addRow(tr("<b>Date:</b>"), new QLabel(dateString)),
-		//container->setLayout(mainLayout);
+		// container->setLayout(mainLayout);
 
 		beginHLayout();
 	addLayout(mainLayout, false);

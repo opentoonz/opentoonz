@@ -42,9 +42,7 @@ ToonzExt::ContextStatus::ContextStatus(const ContextStatus &ob)
 
 //-----------------------------------------------------------------------------
 
-ToonzExt::ContextStatus &
-	ToonzExt::ContextStatus::
-	operator=(const ContextStatus &ob)
+ToonzExt::ContextStatus &ToonzExt::ContextStatus::operator=(const ContextStatus &ob)
 {
 	w_ = ob.w_;
 	isManual_ = ob.isManual_;

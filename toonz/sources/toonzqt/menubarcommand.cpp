@@ -40,8 +40,7 @@ AuxActionsCreator::AuxActionsCreator()
 }
 //-----------------------------------------------------------------------------
 
-AuxActionsCreatorManager::AuxActionsCreatorManager()
-	: m_auxActionsCreated(false)
+AuxActionsCreatorManager::AuxActionsCreatorManager() : m_auxActionsCreated(false)
 {
 }
 
@@ -124,11 +123,8 @@ void CommandManager::setShortcut(CommandId id, QAction *action, std::string shor
 
 //---------------------------------------------------------
 
-void CommandManager::define(
-	CommandId id,
-	CommandType type,
-	std::string defaultShortcutString,
-	QAction *qaction)
+void CommandManager::define(CommandId id, CommandType type, std::string defaultShortcutString,
+							QAction *qaction)
 {
 	assert(type != UndefinedCommandType);
 	assert(qaction != 0);
@@ -190,7 +186,8 @@ void CommandManager::setHandler(CommandId id, CommandHandlerInterface *handler)
 		node->m_handler = handler;
 	}
 	if (node->m_qaction) {
-		node->m_qaction->setEnabled(node->m_enabled && (!!node->m_handler || node->m_qaction->actionGroup() != 0));
+		node->m_qaction->setEnabled(node->m_enabled &&
+									(!!node->m_handler || node->m_qaction->actionGroup() != 0));
 	}
 }
 
@@ -317,7 +314,8 @@ void CommandManager::setShortcut(QAction *action, std::string shortcutString)
 	assert(ks.count() == 1 || ks.count() == 0 && shortcut == "");
 
 	if (node->m_type == ZoomCommandType && ks.count() > 1) {
-		DVGui::warning(QObject::tr("It is not possible to assing a shortcut with modifiers to the visualization commands."));
+		DVGui::warning(QObject::tr("It is not possible to assing a shortcut with modifiers to the "
+								   "visualization commands."));
 		return;
 	}
 	// lo shortcut e' gia' assegnato?
@@ -346,9 +344,7 @@ void CommandManager::setShortcut(QAction *action, std::string shortcutString)
 	TFilePath fp = ToonzFolder::getMyModuleDir() + TFilePath("shortcuts.ini");
 	QSettings settings(toQString(fp), QSettings::IniFormat);
 	settings.beginGroup("shortcuts");
-	settings.setValue(
-		QString::fromStdString(node->m_id),
-		QString::fromStdString(shortcutString));
+	settings.setValue(QString::fromStdString(node->m_id), QString::fromStdString(shortcutString));
 	if (oldActionId != "")
 		settings.remove(oldActionId);
 	settings.endGroup();
@@ -365,8 +361,8 @@ void CommandManager::enable(CommandId id, bool enabled)
 		return;
 	node->m_enabled = enabled;
 	if (node->m_qaction)
-		node->m_qaction->setEnabled(
-			node->m_enabled && (!!node->m_handler || node->m_qaction->actionGroup() != 0));
+		node->m_qaction->setEnabled(node->m_enabled &&
+									(!!node->m_handler || node->m_qaction->actionGroup() != 0));
 }
 
 //---------------------------------------------------------
@@ -426,7 +422,7 @@ void CommandManager::setToggleTexts(CommandId id, const QString &onText, const Q
 
 //---------------------------------------------------------
 
-std::string CommandManager::getIdFromAction(QAction* action)
+std::string CommandManager::getIdFromAction(QAction *action)
 {
 	std::map<QAction *, Node *>::iterator it = m_qactionTable.find(action);
 	if (it != m_qactionTable.end())
@@ -447,7 +443,7 @@ QString CommandManager::getFullText(CommandId id, bool state)
   QAction *action = it->second->m_qaction;
   QString text = action->text();
   if(node->m_onText != "" && node->m_offText != "")
-    text = state ? node->m_onText : node->m_offText;
+	text = state ? node->m_onText : node->m_offText;
 
   QString shortcut = QString::fromStdString(getShortcutFromAction(action));
   if(shortcut != "") text += " " + shortcut;
@@ -459,16 +455,15 @@ QString CommandManager::getFullText(CommandId id, bool state)
 
 MenuItemHandler::MenuItemHandler(const char *cmdId)
 {
-	CommandManager::instance()->setHandler(cmdId,
-										   new CommandHandlerHelper<MenuItemHandler>(this, &MenuItemHandler::execute));
+	CommandManager::instance()->setHandler(
+		cmdId, new CommandHandlerHelper<MenuItemHandler>(this, &MenuItemHandler::execute));
 }
 
 //=============================================================================
 // DVAction
 //-----------------------------------------------------------------------------
 
-DVAction::DVAction(const QString &text, QObject *parent)
-	: QAction(text, parent)
+DVAction::DVAction(const QString &text, QObject *parent) : QAction(text, parent)
 {
 	connect(this, SIGNAL(triggered()), this, SLOT(onTriggered()));
 }
@@ -512,19 +507,19 @@ DVMenuAction::DVMenuAction(const QString &text, QWidget *parent, QList<QString> 
 		attention to inserted order.*/
 void DVMenuAction::setActions(QList<QString> actions)
 {
-	if (m_triggeredActionIndex != -1) //Sta facendo l'onTriggered
+	if (m_triggeredActionIndex != -1) // Sta facendo l'onTriggered
 		return;
 	clear();
 	int i;
 	for (i = 0; i < actions.size(); i++) {
 		QString actionId = actions.at(i);
-		//Se l'azione e' definita da un CommandId la aggiungo.
+		// Se l'azione e' definita da un CommandId la aggiungo.
 		QAction *action = CommandManager::instance()->getAction(actionId.toStdString().c_str());
 		if (action) {
 			addAction(action);
 			continue;
 		}
-		//Altrimenti creo una nuova azione e la aggiungo.
+		// Altrimenti creo una nuova azione e la aggiungo.
 		action = addAction(actionId);
 		action->setData(QVariant(i));
 	}

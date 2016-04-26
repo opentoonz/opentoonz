@@ -79,7 +79,7 @@ void getFileFids(TFilePath path, std::vector<TFrameId> &fids)
 			} catch (...) {
 			}
 		}
-	} else if (path.isLevelName()) //for levels johndoe..tif etc.
+	} else if (path.isLevelName()) // for levels johndoe..tif etc.
 	{
 		try {
 			TLevelReaderP lr(path);
@@ -327,8 +327,7 @@ int DvItemListModel::compareData(DataType dataType, int firstIndex, int secondIn
 //
 //-----------------------------------------------------------------------------
 
-DvItemSelection::DvItemSelection()
-	: m_model(0)
+DvItemSelection::DvItemSelection() : m_model(0)
 {
 }
 
@@ -418,7 +417,8 @@ void ItemViewPlayWidget::PlayManager::setInfo(DvItemListModel *model, int index)
 	assert(!!model && index >= 0);
 	QString string = model->getItemData(index, DvItemListModel::FullPath).toString();
 	TFilePath path = TFilePath(string.toStdWString());
-	if (!m_path.isEmpty() && !m_fids.empty() && path == m_path) //Ho gia' il path e i frameId settati correttamente
+	if (!m_path.isEmpty() && !m_fids.empty() &&
+		path == m_path) // Ho gia' il path e i frameId settati correttamente
 	{
 		m_currentFidIndex = 0;
 		m_pixmap = QPixmap();
@@ -438,12 +438,13 @@ void ItemViewPlayWidget::PlayManager::setInfo(DvItemListModel *model, int index)
 bool ItemViewPlayWidget::PlayManager::increaseCurrentFrame()
 {
 	QPixmap pixmap;
-	if (m_currentFidIndex == 0) //Il primo fid deve essere calcolato senza tener conto del frameId (dovrebbe esistere)
+	if (m_currentFidIndex ==
+		0) // Il primo fid deve essere calcolato senza tener conto del frameId (dovrebbe esistere)
 		pixmap = (m_pixmap.isNull()) ? IconGenerator::instance()->getIcon(m_path) : m_pixmap;
 	else
 		pixmap = IconGenerator::instance()->getIcon(m_path, m_fids[m_currentFidIndex]);
 	if (pixmap.isNull())
-		return false; //Se non ha ancora finito di calcolare l'icona ritorno
+		return false; // Se non ha ancora finito di calcolare l'icona ritorno
 	assert(!m_iconSize.isEmpty());
 	m_pixmap = scalePixmapKeepingAspectRatio(pixmap, m_iconSize, Qt::transparent);
 	++m_currentFidIndex;
@@ -455,12 +456,13 @@ bool ItemViewPlayWidget::PlayManager::increaseCurrentFrame()
 bool ItemViewPlayWidget::PlayManager::getCurrentFrame()
 {
 	QPixmap pixmap;
-	if (m_currentFidIndex == 0) //Il primo fid deve essere calcolato senza tener conto del frameId (dovrebbe esistere)
+	if (m_currentFidIndex ==
+		0) // Il primo fid deve essere calcolato senza tener conto del frameId (dovrebbe esistere)
 		pixmap = IconGenerator::instance()->getIcon(m_path);
 	else
 		pixmap = IconGenerator::instance()->getIcon(m_path, m_fids[m_currentFidIndex]);
 	if (pixmap.isNull())
-		return false; //Se non ha ancora finito di calcolare l'icona ritorno
+		return false; // Se non ha ancora finito di calcolare l'icona ritorno
 	assert(!m_iconSize.isEmpty());
 	m_pixmap = scalePixmapKeepingAspectRatio(pixmap, m_iconSize, Qt::transparent);
 	return true;
@@ -549,7 +551,8 @@ void ItemViewPlayWidget::clear()
 
 void ItemViewPlayWidget::setIsPlaying(DvItemListModel *model, int index)
 {
-	if (isIndexPlaying(index) && !m_isSliderMode) //Devo fare stop prima di inizializzare un nuovo play
+	if (isIndexPlaying(index) &&
+		!m_isSliderMode) // Devo fare stop prima di inizializzare un nuovo play
 	{
 		stop();
 		return;
@@ -566,7 +569,8 @@ void ItemViewPlayWidget::setIsPlaying(DvItemListModel *model, int index)
 
 //-----------------------------------------------------------------------------
 
-void ItemViewPlayWidget::setIsPlayingCurrentFrameIndex(DvItemListModel *model, int index, int xValue, int lenght)
+void ItemViewPlayWidget::setIsPlayingCurrentFrameIndex(DvItemListModel *model, int index,
+													   int xValue, int lenght)
 {
 	m_isSliderMode = true;
 
@@ -576,7 +580,7 @@ void ItemViewPlayWidget::setIsPlayingCurrentFrameIndex(DvItemListModel *model, i
 	}
 	if (!m_playManager->setCurrentFrameIndexFromXValue(xValue, lenght))
 		return;
-	stop(); //Devo fare stop prima di cambiare il frame corrente
+	stop(); // Devo fare stop prima di cambiare il frame corrente
 	play();
 }
 
@@ -608,7 +612,7 @@ void ItemViewPlayWidget::timerEvent(QTimerEvent *event)
 		parentWidget()->update();
 		return;
 	}
-	if (m_isSliderMode) //Modalita' slider
+	if (m_isSliderMode) // Modalita' slider
 	{
 		if (!m_playManager->getCurrentFrame())
 			return;
@@ -616,7 +620,7 @@ void ItemViewPlayWidget::timerEvent(QTimerEvent *event)
 		stop();
 		return;
 	}
-	//Modalita' play
+	// Modalita' play
 	if (!m_playManager->increaseCurrentFrame())
 		return;
 	else
@@ -627,15 +631,15 @@ void ItemViewPlayWidget::timerEvent(QTimerEvent *event)
 // DVItemViewPlayDelegate
 //-----------------------------------------------------------------------------
 
-DVItemViewPlayDelegate::DVItemViewPlayDelegate(QWidget *parent)
-	: QObject(parent)
+DVItemViewPlayDelegate::DVItemViewPlayDelegate(QWidget *parent) : QObject(parent)
 {
 	m_itemViewPlay = new ItemViewPlayWidget(parent);
 }
 
 //-----------------------------------------------------------------------------
 
-bool DVItemViewPlayDelegate::setPlayWidget(DvItemListModel *model, int index, QRect rect, QPoint pos)
+bool DVItemViewPlayDelegate::setPlayWidget(DvItemListModel *model, int index, QRect rect,
+										   QPoint pos)
 {
 	bool isPlaying = getPlayButtonRect(rect).contains(pos);
 	if (!isPlaying && !getPlaySliderRect(rect).contains(pos))
@@ -643,7 +647,9 @@ bool DVItemViewPlayDelegate::setPlayWidget(DvItemListModel *model, int index, QR
 	if (isPlaying)
 		m_itemViewPlay->setIsPlaying(model, index);
 	else
-		m_itemViewPlay->setIsPlayingCurrentFrameIndex(model, index, pos.x() - getPlaySliderRect(rect).left(), getPlaySliderRect(rect).width());
+		m_itemViewPlay->setIsPlayingCurrentFrameIndex(model, index,
+													  pos.x() - getPlaySliderRect(rect).left(),
+													  getPlaySliderRect(rect).width());
 	return true;
 }
 
@@ -670,12 +676,13 @@ void DVItemViewPlayDelegate::paint(QPainter *painter, QRect rect, int index)
 		QSize iconSize(6, 11);
 		static QIcon playIcon = createQIconPNG("iconplay");
 		QPixmap pixmap = playIcon.pixmap(iconSize);
-		if (m_itemViewPlay->isIndexPlaying(index)) //Puo' servire in modalita' slider
+		if (m_itemViewPlay->isIndexPlaying(index)) // Puo' servire in modalita' slider
 			m_itemViewPlay->paint(painter, rect);
 		painter->drawPixmap(getPlayButtonRect(rect).adjusted(2, 0, -2, 0), pixmap);
 	}
 	QRect sliderRect = getPlaySliderRect(rect);
-	double xSliderValue = sliderRect.left() + m_itemViewPlay->getCurrentFramePosition(sliderRect.width()) - 1;
+	double xSliderValue =
+		sliderRect.left() + m_itemViewPlay->getCurrentFramePosition(sliderRect.width()) - 1;
 	QRect indicatorRect(xSliderValue, sliderRect.top() + 2, 2, 6);
 	sliderRect = sliderRect.adjusted(0, 4, 0, -4);
 	QColor sliderColor(171, 206, 255);
@@ -711,8 +718,15 @@ QRect DVItemViewPlayDelegate::getPlaySliderRect(QRect rect)
 //
 //-----------------------------------------------------------------------------
 
-DvItemViewerPanel::DvItemViewerPanel(DvItemViewer *viewer, bool noContextMenu, bool multiSelectionEnabled, QWidget *parent)
-	: QFrame(parent), m_selection(0), m_viewer(viewer), m_viewType(viewer->m_windowType == DvItemViewer::Cast ? to_enum(CastView) : to_enum(BrowserView)), m_xMargin(0), m_yMargin(0), m_itemSpacing(0), m_itemPerRow(0), m_itemSize(0, 0), m_iconSize(80, 60), m_currentIndex(-1), m_singleColumnEnabled(false), m_centerAligned(false), m_noContextMenu(noContextMenu), m_isPlayDelegateDisable(true), m_globalSelectionEnabled(true), m_multiSelectionEnabled(multiSelectionEnabled), m_missingColor(Qt::gray)
+DvItemViewerPanel::DvItemViewerPanel(DvItemViewer *viewer, bool noContextMenu,
+									 bool multiSelectionEnabled, QWidget *parent)
+	: QFrame(parent), m_selection(0), m_viewer(viewer),
+	  m_viewType(viewer->m_windowType == DvItemViewer::Cast ? to_enum(CastView)
+															: to_enum(BrowserView)),
+	  m_xMargin(0), m_yMargin(0), m_itemSpacing(0), m_itemPerRow(0), m_itemSize(0, 0),
+	  m_iconSize(80, 60), m_currentIndex(-1), m_singleColumnEnabled(false), m_centerAligned(false),
+	  m_noContextMenu(noContextMenu), m_isPlayDelegateDisable(true), m_globalSelectionEnabled(true),
+	  m_multiSelectionEnabled(multiSelectionEnabled), m_missingColor(Qt::gray)
 {
 	setFrameStyle(QFrame::StyledPanel);
 	setFocusPolicy(Qt::StrongFocus);
@@ -926,9 +940,8 @@ QRect DvItemViewerPanel::index2pos(int index) const
 {
 	int row = index / m_itemPerRow;
 	int col = index - row * m_itemPerRow;
-	QPoint pos(
-		m_xMargin + (m_itemSize.width() + m_itemSpacing) * col,
-		m_yMargin + (m_itemSize.height() + m_itemSpacing) * row);
+	QPoint pos(m_xMargin + (m_itemSize.width() + m_itemSpacing) * col,
+			   m_yMargin + (m_itemSize.height() + m_itemSpacing) * row);
 	return QRect(pos, m_itemSize);
 }
 
@@ -939,9 +952,7 @@ QRect DvItemViewerPanel::getCaptionRect(int index) const
 	QRect itemRect = index2pos(index);
 	//  TDimension m_iconSize(80,60);// = IconGenerator::instance()->getIconSize();
 	int y = itemRect.top() + m_iconSize.height();
-	QRect textRect(
-		itemRect.left(), y,
-		itemRect.width(), itemRect.bottom() - y);
+	QRect textRect(itemRect.left(), y, itemRect.width(), itemRect.bottom() - y);
 
 	return textRect;
 }
@@ -999,10 +1010,10 @@ void DvItemViewerPanel::paintEvent(QPaintEvent *)
 	}
 
 	/*
- 
+
   p.setPen(Qt::green);
-  for(i=0;i<n;i++) 
-    p.drawRect(index2pos(i));
+  for(i=0;i<n;i++)
+	p.drawRect(index2pos(i));
 
   int y = getContentHeight(width());
   p.drawLine(0,y,width(),y);
@@ -1035,31 +1046,35 @@ void DvItemViewerPanel::paintThumbnailItem(QPainter &p, int index)
 	if (!getModel())
 		return;
 
-	QRect iconRect(rect.left() + (rect.width() - m_iconSize.width()) / 2, rect.top(), m_iconSize.width(), m_iconSize.height());
-	QRect textRect(iconRect.left(), iconRect.bottom(), iconRect.width(), rect.bottom() - iconRect.bottom());
+	QRect iconRect(rect.left() + (rect.width() - m_iconSize.width()) / 2, rect.top(),
+				   m_iconSize.width(), m_iconSize.height());
+	QRect textRect(iconRect.left(), iconRect.bottom(), iconRect.width(),
+				   rect.bottom() - iconRect.bottom());
 
-	//Draw Selection
+	// Draw Selection
 	if (isSelected) {
 		p.setPen(Qt::NoPen);
 		p.fillRect(iconRect.adjusted(-2, -2, 2, 2), getSelectedItemBackground());
 		p.fillRect(textRect.adjusted(-2, 3, 2, 0), getSelectedItemBackground());
 	}
 
-	//Draw Pixmap
-	//if(status != DvItemListModel::VC_Missing)
+	// Draw Pixmap
+	// if(status != DvItemListModel::VC_Missing)
 	//{
 
-	QPixmap thumbnail = getModel()->getItemData(index, DvItemListModel::Thumbnail, isSelected).value<QPixmap>();
+	QPixmap thumbnail =
+		getModel()->getItemData(index, DvItemListModel::Thumbnail, isSelected).value<QPixmap>();
 	if (!thumbnail.isNull())
 		p.drawPixmap(iconRect.topLeft(), thumbnail);
 	//}
 	else {
 		static QPixmap missingPixmap = QPixmap(":Resources/missing.png");
-		QRect pixmapRect(rect.left() + (rect.width() - missingPixmap.width()) / 2, rect.top(), missingPixmap.width(), missingPixmap.height());
+		QRect pixmapRect(rect.left() + (rect.width() - missingPixmap.width()) / 2, rect.top(),
+						 missingPixmap.width(), missingPixmap.height());
 		p.drawPixmap(pixmapRect.topLeft(), missingPixmap);
 	}
 
-	//Draw Text
+	// Draw Text
 	if (status == DvItemListModel::VC_Missing)
 		p.setPen(m_missingColor);
 	else
@@ -1075,11 +1090,12 @@ void DvItemViewerPanel::paintThumbnailItem(QPainter &p, int index)
 	p.drawText(textRect, Qt::AlignCenter, hyphenText(elideName, p.font(), textRect.width()));
 
 	if (isSelected) {
-		if (!m_isPlayDelegateDisable && getModel()->getItemData(index, DvItemListModel::PlayAvailable).toBool())
+		if (!m_isPlayDelegateDisable &&
+			getModel()->getItemData(index, DvItemListModel::PlayAvailable).toBool())
 			m_itemViewPlayDelegate->paint(&p, iconRect.adjusted(-2, -2, 1, 1), index);
 	}
 
-	//Draw Scene rect
+	// Draw Scene rect
 	if (getModel()->isSceneItem(index)) {
 		QRect r(iconRect.left(), iconRect.top(), iconRect.width(), 4);
 		p.setPen(Qt::black);
@@ -1139,9 +1155,11 @@ void DvItemViewerPanel::paintTableItem(QPainter &p, int index)
 	if (isSelected)
 		p.fillRect(rect, getSelectedItemBackground());
 	else if (index % 2 == 0)
-		p.fillRect(rect, getAlternateBackground()); //160,160,160
+		p.fillRect(rect, getAlternateBackground()); // 160,160,160
 
-	DvItemListModel::Status status = (DvItemListModel::Status)getModel()->getItemData(index, DvItemListModel::VersionControlStatus).toInt();
+	DvItemListModel::Status status = (DvItemListModel::Status)getModel()
+										 ->getItemData(index, DvItemListModel::VersionControlStatus)
+										 .toInt();
 
 	if (getModel()->getItemData(index, DvItemListModel::IsFolder).toBool())
 		p.setPen(getFolderTextColor());
@@ -1162,7 +1180,8 @@ void DvItemViewerPanel::paintTableItem(QPainter &p, int index)
 	// Version Control status pixmap
 	QPixmap statusPixmap = getStatusPixmap(status);
 	if (!statusPixmap.isNull()) {
-		p.drawPixmap(x + 1, y + 1, statusPixmap.scaled(15, 15, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+		p.drawPixmap(x + 1, y + 1,
+					 statusPixmap.scaled(15, 15, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 		x += 15;
 	}
 
@@ -1172,7 +1191,8 @@ void DvItemViewerPanel::paintTableItem(QPainter &p, int index)
 		DvItemListModel::DataType dataType = m_columns[i].first;
 		QString value = getModel()->getItemDataAsString(index, dataType);
 		int lx = m_columns[i].second.first;
-		p.drawText(QRect(x + 4, y + 1, lx - 4, ly - 1), Qt::AlignLeft | Qt::AlignVCenter, elideText(value, p.font(), lx));
+		p.drawText(QRect(x + 4, y + 1, lx - 4, ly - 1), Qt::AlignLeft | Qt::AlignVCenter,
+				   elideText(value, p.font(), lx));
 		x += lx;
 	}
 	if (n > 1) {
@@ -1235,7 +1255,8 @@ void DvItemViewerPanel::mousePressEvent(QMouseEvent *event)
 
 	// without any modifier, clear the selection
 	if (!m_multiSelectionEnabled ||
-		(0 == (event->modifiers() & Qt::ControlModifier) && 0 == (event->modifiers() & Qt::ShiftModifier) && !m_selection->isSelected(index)))
+		(0 == (event->modifiers() & Qt::ControlModifier) &&
+		 0 == (event->modifiers() & Qt::ShiftModifier) && !m_selection->isSelected(index)))
 		m_selection->selectNone();
 
 	// if click something
@@ -1258,7 +1279,7 @@ void DvItemViewerPanel::mousePressEvent(QMouseEvent *event)
 					b = index;
 				int i;
 				for (i = a; i <= b; i++) {
-					//select except folder items
+					// select except folder items
 					if (!getModel()->getItemData(i, DvItemListModel::IsFolder).toBool())
 						m_selection->select(i);
 				}
@@ -1393,7 +1414,9 @@ bool DvItemViewerPanel::event(QEvent *event)
 			QPoint point = rect.topLeft() - QPoint(1, 4);
 			QRect pixmapRect(point.x(), point.y(), iconSize.x(), iconSize.y());
 			if (pixmapRect.contains(helpEvent->pos()))
-				QToolTip::showText(helpEvent->globalPos(), getModel()->getItemDataAsString(index, DvItemListModel::VersionControlStatus));
+				QToolTip::showText(
+					helpEvent->globalPos(),
+					getModel()->getItemDataAsString(index, DvItemListModel::VersionControlStatus));
 			else {
 				QVariant data = getModel()->getItemData(index, DvItemListModel::ToolTip);
 				if (data == QVariant())
@@ -1433,7 +1456,8 @@ void DvItemViewerPanel::setTableView()
 void DvItemViewerPanel::setThumbnailsView()
 {
 	m_viewType = ThumbnailView;
-	m_viewer->m_windowType == DvItemViewer::Cast ? CastView = ThumbnailView : BrowserView = ThumbnailView;
+	m_viewer->m_windowType == DvItemViewer::Cast ? CastView = ThumbnailView : BrowserView =
+																				  ThumbnailView;
 	emit viewTypeChange(m_viewType);
 	m_viewer->updateContentSize();
 	update();
@@ -1455,9 +1479,8 @@ void DvItemViewerPanel::exportFileList()
 	else
 		initialPath = toQString(fp);
 
-	QString fileName = QFileDialog::getSaveFileName(0, tr("Save File List"),
-													initialPath,
-													tr("File List (*.csv)"));
+	QString fileName =
+		QFileDialog::getSaveFileName(0, tr("Save File List"), initialPath, tr("File List (*.csv)"));
 
 	if (fileName.isEmpty())
 		return;
@@ -1494,7 +1517,8 @@ void DvItemViewerPanel::exportFileList()
 //
 //-----------------------------------------------------------------------------
 
-DvItemViewer::DvItemViewer(QWidget *parent, bool noContextMenu, bool multiSelectionEnabled, DvItemViewer::WindowType windowType)
+DvItemViewer::DvItemViewer(QWidget *parent, bool noContextMenu, bool multiSelectionEnabled,
+						   DvItemViewer::WindowType windowType)
 	: QScrollArea(parent), m_model(0)
 {
 	m_windowType = windowType;
@@ -1594,19 +1618,24 @@ void DvItemViewer::selectNone()
 //
 //-----------------------------------------------------------------------------
 
-DvItemViewerTitleBar::DvItemViewerTitleBar(DvItemViewer *itemViewer, QWidget *parent, bool isInteractive)
-	: QWidget(parent), m_itemViewer(itemViewer), m_isInteractive(isInteractive), m_pos(QPoint(0, 0)), m_dragColumnIndex(-1)
+DvItemViewerTitleBar::DvItemViewerTitleBar(DvItemViewer *itemViewer, QWidget *parent,
+										   bool isInteractive)
+	: QWidget(parent), m_itemViewer(itemViewer), m_isInteractive(isInteractive),
+	  m_pos(QPoint(0, 0)), m_dragColumnIndex(-1)
 {
 	setMinimumHeight(22);
 
-	bool ret = connect(m_itemViewer->getPanel(), SIGNAL(viewTypeChange(DvItemViewerPanel::ViewType)),
-					   this, SLOT(onViewTypeChanged(DvItemViewerPanel::ViewType)));
+	bool ret =
+		connect(m_itemViewer->getPanel(), SIGNAL(viewTypeChange(DvItemViewerPanel::ViewType)), this,
+				SLOT(onViewTypeChanged(DvItemViewerPanel::ViewType)));
 
 	assert(ret);
 
 	setMouseTracking(true);
-	if ((itemViewer->m_windowType == DvItemViewer::Browser && BrowserView == DvItemViewerPanel::TableView) ||
-		(itemViewer->m_windowType == DvItemViewer::Cast && CastView == DvItemViewerPanel::TableView))
+	if ((itemViewer->m_windowType == DvItemViewer::Browser &&
+		 BrowserView == DvItemViewerPanel::TableView) ||
+		(itemViewer->m_windowType == DvItemViewer::Cast &&
+		 CastView == DvItemViewerPanel::TableView))
 		show();
 	else
 		hide();
@@ -1616,8 +1645,10 @@ DvItemViewerTitleBar::DvItemViewerTitleBar(DvItemViewer *itemViewer, QWidget *pa
 
 void DvItemViewerTitleBar::onViewTypeChanged(DvItemViewerPanel::ViewType viewType)
 {
-	if ((m_itemViewer->m_windowType == DvItemViewer::Browser && BrowserView == DvItemViewerPanel::TableView) ||
-		(m_itemViewer->m_windowType == DvItemViewer::Cast && CastView == DvItemViewerPanel::TableView))
+	if ((m_itemViewer->m_windowType == DvItemViewer::Browser &&
+		 BrowserView == DvItemViewerPanel::TableView) ||
+		(m_itemViewer->m_windowType == DvItemViewer::Cast &&
+		 CastView == DvItemViewerPanel::TableView))
 		show();
 	else
 		hide();
@@ -1654,7 +1685,8 @@ void DvItemViewerTitleBar::mouseMoveEvent(QMouseEvent *event)
 		int columnWidth = columns[m_dragColumnIndex].second.first;
 		if (columnWidth + delta < 20)
 			return;
-		m_itemViewer->getPanel()->setColumnWidth(columns[m_dragColumnIndex].first, columnWidth + delta);
+		m_itemViewer->getPanel()->setColumnWidth(columns[m_dragColumnIndex].first,
+												 columnWidth + delta);
 		update();
 		m_pos = pos;
 	}
@@ -1701,29 +1733,33 @@ void DvItemViewerTitleBar::mousePressEvent(QMouseEvent *event)
 
 void DvItemViewerTitleBar::openContextMenu(QMouseEvent *event)
 {
-	//QAction setNameAction          (QObject::tr("Name"),0);
-	//setNameAction.setCheckable(true);
-	//setNameAction.setChecked(m_itemViewer->getPanel()->getVisibility(DvItemListModel::Name));
+	// QAction setNameAction          (QObject::tr("Name"),0);
+	// setNameAction.setCheckable(true);
+	// setNameAction.setChecked(m_itemViewer->getPanel()->getVisibility(DvItemListModel::Name));
 	QAction setSizeAction(QObject::tr("Size"), 0);
 	setSizeAction.setCheckable(true);
 	setSizeAction.setChecked(m_itemViewer->getPanel()->getVisibility(DvItemListModel::FileSize));
 	QAction setFramesAction(QObject::tr("Frames"), 0);
 	setFramesAction.setCheckable(true);
-	setFramesAction.setChecked(m_itemViewer->getPanel()->getVisibility(DvItemListModel::FrameCount));
+	setFramesAction.setChecked(
+		m_itemViewer->getPanel()->getVisibility(DvItemListModel::FrameCount));
 	QAction setDateCreatedAction(QObject::tr("Date Created"), 0);
 	setDateCreatedAction.setCheckable(true);
-	setDateCreatedAction.setChecked(m_itemViewer->getPanel()->getVisibility(DvItemListModel::CreationDate));
+	setDateCreatedAction.setChecked(
+		m_itemViewer->getPanel()->getVisibility(DvItemListModel::CreationDate));
 	QAction setDateModifiedAction(QObject::tr("Date Modified"), 0);
 	setDateModifiedAction.setCheckable(true);
-	setDateModifiedAction.setChecked(m_itemViewer->getPanel()->getVisibility(DvItemListModel::ModifiedDate));
+	setDateModifiedAction.setChecked(
+		m_itemViewer->getPanel()->getVisibility(DvItemListModel::ModifiedDate));
 	QAction setTypeAction(QObject::tr("Type"), 0);
 	setTypeAction.setCheckable(true);
 	setTypeAction.setChecked(m_itemViewer->getPanel()->getVisibility(DvItemListModel::FileType));
 	QAction setVersionControlAction(QObject::tr("Version Control"), 0);
 	setVersionControlAction.setCheckable(true);
-	setVersionControlAction.setChecked(m_itemViewer->getPanel()->getVisibility(DvItemListModel::VersionControlStatus));
+	setVersionControlAction.setChecked(
+		m_itemViewer->getPanel()->getVisibility(DvItemListModel::VersionControlStatus));
 	QMenu menu(0);
-	//menu.addAction(&setNameAction);
+	// menu.addAction(&setNameAction);
 	menu.addAction(&setFramesAction);
 	if (m_itemViewer->m_windowType == DvItemViewer::Browser) {
 		menu.addAction(&setSizeAction);
@@ -1734,20 +1770,32 @@ void DvItemViewerTitleBar::openContextMenu(QMouseEvent *event)
 	}
 
 	QAction *action = menu.exec(event->globalPos()); // QCursor::pos());
-	//if(action==&setNameAction)
-	//m_itemViewer->getPanel()->setVisibility(DvItemListModel::Name,!m_itemViewer->getPanel()->getVisibility(DvItemListModel::Name));
+	// if(action==&setNameAction)
+	// m_itemViewer->getPanel()->setVisibility(DvItemListModel::Name,!m_itemViewer->getPanel()->getVisibility(DvItemListModel::Name));
 	if (action == &setSizeAction)
-		m_itemViewer->getPanel()->setVisibility(DvItemListModel::FileSize, !m_itemViewer->getPanel()->getVisibility(DvItemListModel::FileSize));
+		m_itemViewer->getPanel()->setVisibility(
+			DvItemListModel::FileSize,
+			!m_itemViewer->getPanel()->getVisibility(DvItemListModel::FileSize));
 	if (action == &setFramesAction)
-		m_itemViewer->getPanel()->setVisibility(DvItemListModel::FrameCount, !m_itemViewer->getPanel()->getVisibility(DvItemListModel::FrameCount));
+		m_itemViewer->getPanel()->setVisibility(
+			DvItemListModel::FrameCount,
+			!m_itemViewer->getPanel()->getVisibility(DvItemListModel::FrameCount));
 	if (action == &setDateCreatedAction)
-		m_itemViewer->getPanel()->setVisibility(DvItemListModel::CreationDate, !m_itemViewer->getPanel()->getVisibility(DvItemListModel::CreationDate));
+		m_itemViewer->getPanel()->setVisibility(
+			DvItemListModel::CreationDate,
+			!m_itemViewer->getPanel()->getVisibility(DvItemListModel::CreationDate));
 	if (action == &setDateModifiedAction)
-		m_itemViewer->getPanel()->setVisibility(DvItemListModel::ModifiedDate, !m_itemViewer->getPanel()->getVisibility(DvItemListModel::ModifiedDate));
+		m_itemViewer->getPanel()->setVisibility(
+			DvItemListModel::ModifiedDate,
+			!m_itemViewer->getPanel()->getVisibility(DvItemListModel::ModifiedDate));
 	if (action == &setTypeAction)
-		m_itemViewer->getPanel()->setVisibility(DvItemListModel::FileType, !m_itemViewer->getPanel()->getVisibility(DvItemListModel::FileType));
+		m_itemViewer->getPanel()->setVisibility(
+			DvItemListModel::FileType,
+			!m_itemViewer->getPanel()->getVisibility(DvItemListModel::FileType));
 	if (action == &setVersionControlAction)
-		m_itemViewer->getPanel()->setVisibility(DvItemListModel::VersionControlStatus, !m_itemViewer->getPanel()->getVisibility(DvItemListModel::VersionControlStatus));
+		m_itemViewer->getPanel()->setVisibility(
+			DvItemListModel::VersionControlStatus,
+			!m_itemViewer->getPanel()->getVisibility(DvItemListModel::VersionControlStatus));
 
 	m_itemViewer->getPanel()->update();
 }
@@ -1761,7 +1809,8 @@ void DvItemViewerTitleBar::paintEvent(QPaintEvent *)
 	QRect rect(0, 0, width(), height());
 
 	QBrush nb = QBrush(Qt::NoBrush);
-	QPalette pal = QPalette(nb, nb, QBrush(QColor(Qt::white)), QBrush(QColor(Qt::black)), QBrush(QColor(Qt::gray)), nb, nb, nb, nb);
+	QPalette pal = QPalette(nb, nb, QBrush(QColor(Qt::white)), QBrush(QColor(Qt::black)),
+							QBrush(QColor(Qt::gray)), nb, nb, nb, nb);
 
 	p.fillRect(rect, QColor(192, 192, 192));
 
@@ -1780,7 +1829,7 @@ void DvItemViewerTitleBar::paintEvent(QPaintEvent *)
 		DvItemListModel::DataType dataType = columns[i].first;
 		int columnLx = columns[i].second.first;
 
-		//paint background
+		// paint background
 		QColor bgColor;
 		if (dataType == model->getCurrentOrderType())
 			bgColor = QColor(230, 230, 230);
@@ -1801,9 +1850,10 @@ void DvItemViewerTitleBar::paintEvent(QPaintEvent *)
 			p.drawPixmap(QRect(x + columnLx - 10, y + 6, 8, 8), arrowIcon.pixmap(8, 8));
 		}
 
-		//draw text
+		// draw text
 		QString value = model->getItemDataIdentifierName(dataType);
-		p.drawText(QRect(x + 4, y + 1, columnLx - 4, ly - 1), Qt::AlignLeft | Qt::AlignVCenter, elideText(value, p.font(), columnLx - 4));
+		p.drawText(QRect(x + 4, y + 1, columnLx - 4, ly - 1), Qt::AlignLeft | Qt::AlignVCenter,
+				   elideText(value, p.font(), columnLx - 4));
 
 		x += columnLx;
 	}
@@ -1854,7 +1904,7 @@ DvItemViewerButtonBar::DvItemViewerButtonBar(DvItemViewer *itemViewer, QWidget *
 #ifndef STUDENT
 	addSeparator();
 
-	//view mode
+	// view mode
 	QActionGroup *actions = new QActionGroup(this);
 	actions->setExclusive(true);
 
@@ -1862,8 +1912,10 @@ DvItemViewerButtonBar::DvItemViewerButtonBar(DvItemViewer *itemViewer, QWidget *
 	QAction *thumbView = new QAction(thumbViewIcon, tr("Icons View"), this);
 	thumbView->setCheckable(true);
 	thumbView->setIconText("Icon");
-	thumbView->setChecked((itemViewer->m_windowType == DvItemViewer::Browser && DvItemViewerPanel::ThumbnailView == BrowserView) ||
-						  (itemViewer->m_windowType == DvItemViewer::Cast && DvItemViewerPanel::ThumbnailView == CastView));
+	thumbView->setChecked((itemViewer->m_windowType == DvItemViewer::Browser &&
+						   DvItemViewerPanel::ThumbnailView == BrowserView) ||
+						  (itemViewer->m_windowType == DvItemViewer::Cast &&
+						   DvItemViewerPanel::ThumbnailView == CastView));
 	actions->addAction(thumbView);
 	addAction(thumbView);
 
@@ -1871,8 +1923,10 @@ DvItemViewerButtonBar::DvItemViewerButtonBar(DvItemViewer *itemViewer, QWidget *
 	QAction *listView = new QAction(listViewIcon, tr("List View"), this);
 	listView->setCheckable(true);
 	listView->setIconText("List");
-	listView->setChecked((itemViewer->m_windowType == DvItemViewer::Browser && DvItemViewerPanel::TableView == BrowserView) ||
-						 (itemViewer->m_windowType == DvItemViewer::Cast && DvItemViewerPanel::TableView == CastView));
+	listView->setChecked((itemViewer->m_windowType == DvItemViewer::Browser &&
+						  DvItemViewerPanel::TableView == BrowserView) ||
+						 (itemViewer->m_windowType == DvItemViewer::Cast &&
+						  DvItemViewerPanel::TableView == CastView));
 	actions->addAction(listView);
 	addAction(listView);
 
@@ -1888,7 +1942,8 @@ DvItemViewerButtonBar::DvItemViewerButtonBar(DvItemViewer *itemViewer, QWidget *
 	QAction *exportFileListAction = new QAction(tr("Export File List"), this);
 	addAction(exportFileListAction);
 	addSeparator();
-	connect(exportFileListAction, SIGNAL(triggered()), itemViewer->getPanel(), SLOT(exportFileList()));
+	connect(exportFileListAction, SIGNAL(triggered()), itemViewer->getPanel(),
+			SLOT(exportFileList()));
 
 	connect(folderUp, SIGNAL(triggered()), SIGNAL(folderUp()));
 	connect(newFolder, SIGNAL(triggered()), SIGNAL(newFolder()));

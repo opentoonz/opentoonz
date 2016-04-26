@@ -60,7 +60,7 @@ class ExportLevelPopup : public FileBrowserPopup
 {
 	Q_OBJECT
 
-public:
+  public:
 	ExportLevelPopup();
 	~ExportLevelPopup();
 
@@ -69,15 +69,15 @@ public:
 	TPropertyGroup *getFormatProperties(const std::string &ext);
 	IoCmd::ExportLevelOptions getOptions(const std::string &ext);
 
-protected:
+  protected:
 	void showEvent(QShowEvent *se);
 	void hideEvent(QHideEvent *he);
 
-private:
+  private:
 	class ExportOptions;
 	class Swatch;
 
-private:
+  private:
 	// Widgets
 
 	DVGui::CheckBox *m_retas;
@@ -89,12 +89,11 @@ private:
 
 	// Others
 
-	std::map<std::string,
-			 TPropertyGroup *> m_formatProperties;
+	std::map<std::string, TPropertyGroup *> m_formatProperties;
 
 	TFrameHandle m_levelFrameIndexHandle; //!< Autonomous current level's frame \a index handle.
 
-private slots:
+  private slots:
 
 	void onOptionsClicked();
 	void onRetas(int);
@@ -111,24 +110,24 @@ class ExportLevelPopup::ExportOptions : public QFrame
 {
 	Q_OBJECT
 
-public:
+  public:
 	ExportOptions(QWidget *parent = 0);
 
 	IoCmd::ExportLevelOptions getOptions() const;
 
 	void updateOnSelection();
 
-signals:
+  signals:
 
 	void optionsChanged();
 
-protected:
+  protected:
 	void showEvent(QShowEvent *se);
 
 	void updateCameraDefault();
 	void updateDpi();
 
-private:
+  private:
 	friend class ExportLevelPopup;
 
 	QWidget *m_pliOptions;
@@ -148,12 +147,10 @@ private:
 
 	QComboBox *m_thicknessTransformMode;
 
-	DVGui::MeasuredDoubleLineEdit *m_fromThicknessScale,
-		*m_fromThicknessDisplacement,
-		*m_toThicknessScale,
-		*m_toThicknessDisplacement;
+	DVGui::MeasuredDoubleLineEdit *m_fromThicknessScale, *m_fromThicknessDisplacement,
+		*m_toThicknessScale, *m_toThicknessDisplacement;
 
-private slots:
+  private slots:
 
 	void updateXRes();
 	void updateYRes();

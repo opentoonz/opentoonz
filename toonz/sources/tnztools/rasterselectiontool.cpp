@@ -45,7 +45,8 @@ void RasterFreeDeformer::setPoint(int index, const TPointD &p)
 
 //-----------------------------------------------------------------------------
 
-void RasterFreeDeformer::setPoints(const TPointD &p0, const TPointD &p1, const TPointD &p2, const TPointD &p3)
+void RasterFreeDeformer::setPoints(const TPointD &p0, const TPointD &p1, const TPointD &p2,
+								   const TPointD &p3)
 {
 	m_newPoints[0] = p0;
 	m_newPoints[1] = p1;
@@ -68,17 +69,17 @@ void RasterFreeDeformer::deformImage()
 	double y1 = tmax(p00.y, p10.y, p11.y, p01.y);
 
 	TRectD sourceRect(TPointD(), TPointD(m_ras->getLx(), m_ras->getLy()));
-	BilinearDistorterBase dist(
-		sourceRect.getP00(), sourceRect.getP10(), sourceRect.getP01(), sourceRect.getP11(),
-		p00, p10, p01, p11);
+	BilinearDistorterBase dist(sourceRect.getP00(), sourceRect.getP10(), sourceRect.getP01(),
+							   sourceRect.getP11(), p00, p10, p01, p11);
 
 	TRect destRect(tfloor(x0), tfloor(y0), tceil(x1) - 1, tceil(y1) - 1);
 	if (TRasterCM32P ras = (TRasterCM32P)m_ras)
 		m_newRas = TRasterCM32P(destRect.getLx(), destRect.getLy());
 	else if (TRaster32P ras = (TRaster32P)m_ras)
 		m_newRas = TRaster32P(destRect.getLx(), destRect.getLy());
-	TRasterP newRas(m_newRas); //Someway, conversion from TRasterCM32P to TRasterP is not automatic
-	distort(newRas, m_ras, dist, destRect.getP00(), m_noAntialiasing ? TRop::ClosestPixel : TRop::Bilinear);
+	TRasterP newRas(m_newRas); // Someway, conversion from TRasterCM32P to TRasterP is not automatic
+	distort(newRas, m_ras, dist, destRect.getP00(),
+			m_noAntialiasing ? TRop::ClosestPixel : TRop::Bilinear);
 }
 
 //=============================================================================
@@ -86,7 +87,8 @@ void RasterFreeDeformer::deformImage()
 //-----------------------------------------------------------------------------
 
 DragSelectionTool::UndoRasterDeform::UndoRasterDeform(RasterSelectionTool *tool)
-	: TUndo(), m_tool(tool), m_oldBBox(tool->getBBox()), m_newBBox(), m_oldCenter(tool->getCenter()), m_newCenter(), m_dim()
+	: TUndo(), m_tool(tool), m_oldBBox(tool->getBBox()), m_newBBox(),
+	  m_oldCenter(tool->getCenter()), m_newCenter(), m_dim()
 {
 	RasterSelection *selection = (RasterSelection *)tool->getSelection();
 	m_oldStrokes = selection->getStrokes();
@@ -262,12 +264,14 @@ void DragSelectionTool::RasterDeformTool::applyTransform(FourPoints bbox)
 	FourPoints realBbox = bbox * selection->getTransformation().inv();
 	RasterFreeDeformer *freeDeformer = (RasterFreeDeformer *)tool->getFreeDeformer();
 	freeDeformer->setNoAntialiasing(tool->getNoAntialiasingValue());
-	freeDeformer->setPoints(realBbox.getP00(), realBbox.getP10(), realBbox.getP11(), realBbox.getP01());
+	freeDeformer->setPoints(realBbox.getP00(), realBbox.getP10(), realBbox.getP11(),
+							realBbox.getP01());
 	freeDeformer->deformImage();
 	selection->setFloatingSeletion(freeDeformer->getImage());
 	VectorFreeDeformer *vectorFreeDeformer = tool->getSelectionFreeDeformer();
 	if (vectorFreeDeformer) {
-		vectorFreeDeformer->setPoints(realBbox.getP00(), realBbox.getP10(), realBbox.getP11(), realBbox.getP01());
+		vectorFreeDeformer->setPoints(realBbox.getP00(), realBbox.getP10(), realBbox.getP11(),
+									  realBbox.getP01());
 		vectorFreeDeformer->deformImage();
 		TVectorImage *vi = vectorFreeDeformer->getDeformedImage();
 		std::vector<TStroke> newStrokes;
@@ -365,7 +369,8 @@ DragSelectionTool::RasterFreeDeformTool::RasterFreeDeformTool(RasterSelectionToo
 
 //-----------------------------------------------------------------------------
 
-void DragSelectionTool::RasterFreeDeformTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e)
+void DragSelectionTool::RasterFreeDeformTool::leftButtonDrag(const TPointD &pos,
+															 const TMouseEvent &e)
 {
 	m_freeDeform->leftButtonDrag(pos, e);
 }
@@ -389,7 +394,8 @@ void DragSelectionTool::RasterMoveSelectionTool::transform(TAffine aff)
 
 //-----------------------------------------------------------------------------
 
-void DragSelectionTool::RasterMoveSelectionTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e)
+void DragSelectionTool::RasterMoveSelectionTool::leftButtonDown(const TPointD &pos,
+																const TMouseEvent &e)
 {
 	m_moveSelection->leftButtonDown(pos, e);
 	RasterDeformTool::leftButtonDown(pos, e);
@@ -397,7 +403,8 @@ void DragSelectionTool::RasterMoveSelectionTool::leftButtonDown(const TPointD &p
 
 //-----------------------------------------------------------------------------
 
-void DragSelectionTool::RasterMoveSelectionTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e)
+void DragSelectionTool::RasterMoveSelectionTool::leftButtonDrag(const TPointD &pos,
+																const TMouseEvent &e)
 {
 	m_moveSelection->leftButtonDrag(pos, e);
 }
@@ -420,11 +427,12 @@ TPointD DragSelectionTool::RasterScaleTool::transform(int index, TPointD newPos)
 	TPointD scaleValue = tool->m_deformValues.m_scaleValue;
 
 	std::vector<FourPoints> startBboxs = m_scale->getStartBboxs();
-	FourPoints bbox = m_scale->bboxScaleInCenter(index, startBboxs[0], newPos, scaleValue, m_scale->getStartCenter(), true);
+	FourPoints bbox = m_scale->bboxScaleInCenter(index, startBboxs[0], newPos, scaleValue,
+												 m_scale->getStartCenter(), true);
 	if (bbox == startBboxs[0])
 		return scaleValue;
 
-	//Se non ho scalato rispetto al centro calcolo la posizione del nuovo centro
+	// Se non ho scalato rispetto al centro calcolo la posizione del nuovo centro
 	if (!m_scale->scaleInCenter())
 		tool->setCenter(m_scale->getNewCenter(index, startBboxs[0], scaleValue));
 
@@ -458,7 +466,9 @@ TEnv::IntVar NoAntialiasing("NoAntialiasing", 0);
 //-----------------------------------------------------------------------------
 
 RasterSelectionTool::RasterSelectionTool(int targetType)
-	: SelectionTool(targetType), m_transformationCount(0), m_selectionFreeDeformer(0), m_noAntialiasing("No Antialiasing", false), m_modifySavebox("Modify Savebox", false), m_setSaveboxTool(0)
+	: SelectionTool(targetType), m_transformationCount(0), m_selectionFreeDeformer(0),
+	  m_noAntialiasing("No Antialiasing", false), m_modifySavebox("Modify Savebox", false),
+	  m_setSaveboxTool(0)
 {
 	m_prop.bind(m_noAntialiasing);
 	m_rasterSelection.setView(this);
@@ -502,7 +512,7 @@ void RasterSelectionTool::setNewFreeDeformer()
 	if (!strokes.empty()) {
 		TVectorImage *vi = new TVectorImage();
 		std::set<int> indices;
-		//Devo deformare anche gli strokes della selezione!!!
+		// Devo deformare anche gli strokes della selezione!!!
 		int i;
 		for (i = 0; i < (int)strokes.size(); i++) {
 			vi->addStroke(new TStroke(strokes[i]));
@@ -529,7 +539,8 @@ bool RasterSelectionTool::isFloating() const
 
 //-----------------------------------------------------------------------------
 
-void RasterSelectionTool::modifySelectionOnClick(TImageP image, const TPointD &pos, const TMouseEvent &e)
+void RasterSelectionTool::modifySelectionOnClick(TImageP image, const TPointD &pos,
+												 const TMouseEvent &e)
 {
 	const TXshCell &imageCell = TTool::getImageCell();
 
@@ -541,8 +552,8 @@ void RasterSelectionTool::modifySelectionOnClick(TImageP image, const TPointD &p
 	updateAction(pos, e);
 
 	m_firstPos = m_curPos = pos;
-	if (!m_rasterSelection.isEmpty() && !m_rasterSelection.isFloating() &&
-		e.isShiftPressed() && !m_rasterSelection.isTransformed()) {
+	if (!m_rasterSelection.isEmpty() && !m_rasterSelection.isFloating() && e.isShiftPressed() &&
+		!m_rasterSelection.isTransformed()) {
 		m_selectingRect.empty();
 		m_transformationCount = 0;
 		m_selecting = true;
@@ -559,7 +570,8 @@ void RasterSelectionTool::modifySelectionOnClick(TImageP image, const TPointD &p
 			m_selecting = true;
 		} else {
 			if (!m_rasterSelection.isFloating() &&
-				(m_what == Inside || m_what == ROTATION || m_what == SCALE || m_what == SCALE_X || m_what == SCALE_Y)) {
+				(m_what == Inside || m_what == ROTATION || m_what == SCALE || m_what == SCALE_X ||
+				 m_what == SCALE_Y)) {
 				m_rasterSelection.makeFloating();
 				m_transformationCount = 0;
 				m_rasterSelection.setTransformationCount(0);
@@ -629,8 +641,10 @@ void RasterSelectionTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &
 			else if (ri)
 				imageSize = ri->getRaster()->getSize();
 			TPointD p(imageSize.lx % 2 ? 0.5 : 0.0, imageSize.ly % 2 ? 0.5 : 0.0);
-			TRectD rectD(tround(tmin(m_firstPos.x, pos.x) - p.x) + p.x, tround(tmin(m_firstPos.y, pos.y) - p.y) + p.y,
-						 tround(tmax(m_firstPos.x, pos.x) - p.x) + p.x, tround(tmax(m_firstPos.y, pos.y) - p.y) + p.y);
+			TRectD rectD(tround(tmin(m_firstPos.x, pos.x) - p.x) + p.x,
+						 tround(tmin(m_firstPos.y, pos.y) - p.y) + p.y,
+						 tround(tmax(m_firstPos.x, pos.x) - p.x) + p.x,
+						 tround(tmax(m_firstPos.y, pos.y) - p.y) + p.y);
 
 			m_selectingRect = rectD;
 			m_bboxs.clear();
@@ -642,7 +656,8 @@ void RasterSelectionTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &
 
 	double pixelSize = getPixelSize();
 	TTool::Application *app = TTool::getApplication();
-	if (!app || m_justSelected || !m_selecting || tdistance2(pos, m_curPos) < 9.0 * pixelSize * pixelSize)
+	if (!app || m_justSelected || !m_selecting ||
+		tdistance2(pos, m_curPos) < 9.0 * pixelSize * pixelSize)
 		return;
 
 	m_curPos = pos;
@@ -681,7 +696,7 @@ void RasterSelectionTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e)
 	if (!m_selecting)
 		return;
 
-	//Se stavo modificando la selezione la completo
+	// Se stavo modificando la selezione la completo
 
 	TImageP image = getImage(true);
 	TToonzImageP ti = (TToonzImageP)image;
@@ -737,7 +752,7 @@ void RasterSelectionTool::drawFloatingSelection()
 	glPushMatrix();
 	tglMultMatrix(aff);
 
-	//draw m_floatingSelection
+	// draw m_floatingSelection
 	if (isFloating()) {
 		TRasterP floatingSelection = m_rasterSelection.getFloatingSelection();
 		TImageP app;
@@ -809,7 +824,7 @@ void RasterSelectionTool::draw()
   if(ti)
   {
 	 TRectD saveBox = ToonzImageUtils::convertRasterToWorld(ti->getSavebox(), ti);
-    drawRect(saveBox.enlarge(0.5)*ti->getSubsampling(), TPixel32::Black, 0x5555, true);
+	drawRect(saveBox.enlarge(0.5)*ti->getSubsampling(), TPixel32::Black, 0x5555, true);
   }
   */
 
@@ -913,7 +928,8 @@ void RasterSelectionTool::onImageChanged()
 	// 1. Invoking getImage(true) after getImage(false, 1) will return the same image
 	// 2. The cached fullsampled image may be in the 'not modified' ImageManager state.
 	//    Users could then alter the required image level subsampling - but doing so will
-	//    immediately redirect here through 'onXshLevelChanged()' (thus resetting the subs back to 1).
+	//    immediately redirect here through 'onXshLevelChanged()' (thus resetting the subs back to
+	//    1).
 
 	TImageP image = getImage(false, 1);
 	TToonzImageP ti = image;

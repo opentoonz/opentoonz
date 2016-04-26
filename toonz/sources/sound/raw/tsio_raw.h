@@ -13,23 +13,20 @@ The class TSoundTrackReaderRaw reads audio files having
 */
 class TSoundTrackReaderRaw : public TSoundTrackReader
 {
-public:
+  public:
 	TSoundTrackReaderRaw(const TFilePath &fp);
 	~TSoundTrackReaderRaw() {}
 
 	/*!
   Loads the .raw audio file whose path has been specified in the constructor.
-  It returns a TSoundTrackP created from the audio file 
+  It returns a TSoundTrackP created from the audio file
   */
 	TSoundTrackP load();
 
 	/*!
   Returns a soundtrack reader able to read .raw audio files
   */
-	static TSoundTrackReader *create(const TFilePath &fp)
-	{
-		return new TSoundTrackReaderRaw(fp);
-	}
+	static TSoundTrackReader *create(const TFilePath &fp) { return new TSoundTrackReaderRaw(fp); }
 };
 
 //==========================================================
@@ -40,7 +37,7 @@ The class TSoundTrackWriterRaw writes audio file having
 */
 class TSoundTrackWriterRaw : public TSoundTrackWriter
 {
-public:
+  public:
 	TSoundTrackWriterRaw(const TFilePath &fp);
 	~TSoundTrackWriterRaw() {}
 
@@ -53,10 +50,7 @@ public:
 	/*!
   Returns a soundtrack writer able to write .raw audio files
   */
-	static TSoundTrackWriter *create(const TFilePath &fp)
-	{
-		return new TSoundTrackWriterRaw(fp);
-	}
+	static TSoundTrackWriter *create(const TFilePath &fp) { return new TSoundTrackWriterRaw(fp); }
 };
 
 #endif

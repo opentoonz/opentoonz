@@ -26,7 +26,8 @@ QScriptValue getScene(QScriptContext *context, const QScriptValue &sceneArg, Sce
 {
 	scene = qscriptvalue_cast<Scene *>(sceneArg);
 	if (!scene)
-		return context->throwError(QObject::tr("First argument must be a scene : %1").arg(sceneArg.toString()));
+		return context->throwError(
+			QObject::tr("First argument must be a scene : %1").arg(sceneArg.toString()));
 	if (scene->getToonzScene() == 0)
 		return context->throwError(QObject::tr("Can't render empty scene"));
 	return QScriptValue();
@@ -46,7 +47,7 @@ void valueToIntList(const QScriptValue &arr, QList<int> &list)
 
 class Renderer::Imp : public TRenderPort
 {
-public:
+  public:
 	TScriptBinding::Image *m_outputImage;
 	TScriptBinding::Level *m_outputLevel;
 	TPointD m_cameraDpi;
@@ -65,9 +66,7 @@ public:
 		m_outputLevel = 0;
 	}
 
-	~Imp()
-	{
-	}
+	~Imp() {}
 
 	void setRenderArea(ToonzScene *scene)
 	{
@@ -105,12 +104,11 @@ public:
 		}
 	}
 
-	std::vector<TRenderer::RenderData> *makeRenderData(ToonzScene *scene, const std::vector<int> &rows)
+	std::vector<TRenderer::RenderData> *makeRenderData(ToonzScene *scene,
+													   const std::vector<int> &rows)
 	{
-		TRenderSettings settings = scene
-									   ->getProperties()
-									   ->getOutputProperties()
-									   ->getRenderSettings();
+		TRenderSettings settings =
+			scene->getProperties()->getOutputProperties()->getRenderSettings();
 
 		QList<bool> oldColumnStates;
 		enableColumns(scene, oldColumnStates);
@@ -170,10 +168,7 @@ public:
 		render(makeRenderData(scene, rows));
 	}
 
-	void onRenderRasterStarted(const RenderData &renderData)
-	{
-		int a = 1;
-	}
+	void onRenderRasterStarted(const RenderData &renderData) { int a = 1; }
 	void onRenderRasterCompleted(const RenderData &renderData)
 	{
 		TRasterP outputRaster = renderData.m_rasA;
@@ -194,19 +189,13 @@ public:
 				TImageCache::instance()->compress(ids[i]);
 		}
 	}
-	void onRenderFailure(const RenderData &renderData, TException &e)
-	{
-	}
-	void onRenderFinished()
-	{
-		m_completed = true;
-	}
+	void onRenderFailure(const RenderData &renderData, TException &e) {}
+	void onRenderFinished() { m_completed = true; }
 }; // class RenderEngine
 
 //=======================================================
 
-Renderer::Renderer()
-	: m_imp(new Imp())
+Renderer::Renderer() : m_imp(new Imp())
 {
 }
 
@@ -243,23 +232,23 @@ QScriptValue Renderer::renderScene(const QScriptValue &sceneArg)
 	m_imp->renderScene(scene->getToonzScene(), outputLevel);
 	return create(engine(), outputLevel);
 	/*
-    for(int row=0;row<scene->getToonzScene()->getFrameCount();row++)
-    {
-      engine()->collectGarbage();
-      TImageP img = renderEngine.renderFrame(row);
-      if(img)
-      {
-        QScriptValue frame = create(new Image(img));
-        QScriptValueList args; args << QString::number(row+1) << frame;
-        newLevel.property("setFrame").call(newLevel, args);
-      }
-      else
-      {
-        return context()->throwError(tr("Render failed"));
-      }
-    }
-    return newLevel;
-    */
+	for(int row=0;row<scene->getToonzScene()->getFrameCount();row++)
+	{
+	  engine()->collectGarbage();
+	  TImageP img = renderEngine.renderFrame(row);
+	  if(img)
+	  {
+		QScriptValue frame = create(new Image(img));
+		QScriptValueList args; args << QString::number(row+1) << frame;
+		newLevel.property("setFrame").call(newLevel, args);
+	  }
+	  else
+	  {
+		return context()->throwError(tr("Render failed"));
+	  }
+	}
+	return newLevel;
+	*/
 }
 
 Q_INVOKABLE QScriptValue Renderer::renderFrame(const QScriptValue &sceneArg, int frame)
@@ -278,90 +267,93 @@ Q_INVOKABLE QScriptValue Renderer::renderFrame(const QScriptValue &sceneArg, int
 	return create(engine(), outputImage);
 
 	/*
-    Scene *scene = 0;
-    QScriptValue err = getScene(context(), sceneArg, scene);
-    if(err.isError()) return err;
+	Scene *scene = 0;
+	QScriptValue err = getScene(context(), sceneArg, scene);
+	if(err.isError()) return err;
 
 
 
 
-    engine()->collectGarbage();
+	engine()->collectGarbage();
 
-    RenderEngine renderEngine(scene->getToonzScene());
-    TImageP img = renderEngine.renderFrame(frame);
+	RenderEngine renderEngine(scene->getToonzScene());
+	TImageP img = renderEngine.renderFrame(frame);
 
-    for(int i=0;i<oldStatus.length();i++)
-      xsh->getColumn(i)->setPreviewVisible(oldStatus[i]);
+	for(int i=0;i<oldStatus.length();i++)
+	  xsh->getColumn(i)->setPreviewVisible(oldStatus[i]);
 
-    if(img)
-    {
-      return create(engine(), new Image(img));
-    }    
-    else
-    {
-      return context()->throwError(tr("Render failed"));
-    }
-    */
+	if(img)
+	{
+	  return create(engine(), new Image(img));
+	}
+	else
+	{
+	  return context()->throwError(tr("Render failed"));
+	}
+	*/
 }
 
 /*
-  QScriptValue Renderer::renderColumns(const QScriptValue &sceneArg, const QScriptValue &columnListArg)
+  QScriptValue Renderer::renderColumns(const QScriptValue &sceneArg, const QScriptValue
+  &columnListArg)
   {
-    Scene *scene = 0;
-    QScriptValue err = getScene(context(), sceneArg, scene);
-    if(err.isError()) return err;
+	Scene *scene = 0;
+	QScriptValue err = getScene(context(), sceneArg, scene);
+	if(err.isError()) return err;
 
-    QList<bool> oldStatus;
-    QList<bool> newStatus;
-    TXsheet *xsh = scene->getToonzScene()->getXsheet();
-    for(int i=0;i<xsh->getColumnCount();i++)
-    {
-      oldStatus.append(xsh->getColumn(i)->isPreviewVisible());
-      newStatus.append(false);
-    }
+	QList<bool> oldStatus;
+	QList<bool> newStatus;
+	TXsheet *xsh = scene->getToonzScene()->getXsheet();
+	for(int i=0;i<xsh->getColumnCount();i++)
+	{
+	  oldStatus.append(xsh->getColumn(i)->isPreviewVisible());
+	  newStatus.append(false);
+	}
 
-    if(!columnListArg.isArray())
-      return context()->throwError(tr("Second argument must be an array of column indices : ").arg(columnListArg.toString()));
-    int m = columnListArg.property("length").toInt32();
-    for(quint32 i=0;i<(int)m;i++)
-    {
-      QScriptValue c = columnListArg.property(i);
-      if(!c.isNumber())
-      {
-        return context()->throwError(tr("Second argument must be an array of integer numbers : %1 (#%2)")
-          .arg(columnListArg.toString())
-          .arg(i));
-      }
-      int index = c.toInteger();
-      if(0<=index && index<newStatus.length()) newStatus[index] = true;
-    }
-    for(int i=0;i<newStatus.length();i++)
-      xsh->getColumn(i)->setPreviewVisible(newStatus[i]);
+	if(!columnListArg.isArray())
+	  return context()->throwError(tr("Second argument must be an array of column indices :
+  ").arg(columnListArg.toString()));
+	int m = columnListArg.property("length").toInt32();
+	for(quint32 i=0;i<(int)m;i++)
+	{
+	  QScriptValue c = columnListArg.property(i);
+	  if(!c.isNumber())
+	  {
+		return context()->throwError(tr("Second argument must be an array of integer numbers : %1
+  (#%2)")
+		  .arg(columnListArg.toString())
+		  .arg(i));
+	  }
+	  int index = c.toInteger();
+	  if(0<=index && index<newStatus.length()) newStatus[index] = true;
+	}
+	for(int i=0;i<newStatus.length();i++)
+	  xsh->getColumn(i)->setPreviewVisible(newStatus[i]);
 
-    err = QScriptValue();
-    QScriptValue newLevel = create(new Level());
-    RenderEngine renderEngine(scene->getToonzScene());
-    for(int row=0;row<scene->getToonzScene()->getFrameCount();row++)
-    {
-      engine()->collectGarbage();
-      TImageP img = renderEngine.renderFrame(row);
-      if(img)
-      {
-        QScriptValue frame = create(new Image(img));
-        QScriptValueList args; args << QString::number(row+1) << frame;
-        newLevel.property("setFrame").call(newLevel, args);
-      }
-      else
-      {
-        err = context()->throwError(tr("Render failed"));
-        break;
-      }
-    }
+	err = QScriptValue();
+	QScriptValue newLevel = create(new Level());
+	RenderEngine renderEngine(scene->getToonzScene());
+	for(int row=0;row<scene->getToonzScene()->getFrameCount();row++)
+	{
+	  engine()->collectGarbage();
+	  TImageP img = renderEngine.renderFrame(row);
+	  if(img)
+	  {
+		QScriptValue frame = create(new Image(img));
+		QScriptValueList args; args << QString::number(row+1) << frame;
+		newLevel.property("setFrame").call(newLevel, args);
+	  }
+	  else
+	  {
+		err = context()->throwError(tr("Render failed"));
+		break;
+	  }
+	}
 
-    for(int i=0;i<oldStatus.length();i++)
-      xsh->getColumn(i)->setPreviewVisible(oldStatus[i]);
-    if(err.isError()) return err;
-    else return newLevel;
+	for(int i=0;i<oldStatus.length();i++)
+	  xsh->getColumn(i)->setPreviewVisible(oldStatus[i]);
+	if(err.isError()) return err;
+	else return newLevel;
   }
   */
 

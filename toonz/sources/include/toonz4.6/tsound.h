@@ -67,10 +67,7 @@ typedef unsigned int VOLUME; /* 0    , 255  */
 /*------------------- DIGITAL AUDIO --------------------*/
 
 /* channels number */
-typedef enum {
-	TS_MONO = 1,
-	TS_STEREO = 2
-} TS_DIGITAL_CHANNELS;
+typedef enum { TS_MONO = 1, TS_STEREO = 2 } TS_DIGITAL_CHANNELS;
 
 /*
  audio quality (sampling rate)
@@ -92,7 +89,7 @@ typedef enum {
 #define TS_RADIO_QUALITY TS_RATE_22050
 #define TS_CD_QUALITY TS_RATE_44100
 
-/* 
+/*
  sample dimension
  mu: BIT
  */
@@ -118,7 +115,8 @@ enum {
 	TS_MASK_CHANNEL = (1 << 3),
 	TS_MASK_SAMPLE = (1 << 4),
 	TS_MASK_FILENAME = (1 << 5),
-	TS_MASK_ALL = TS_MASK_ORIGIN | TS_MASK_DURATION | TS_MASK_QUALITY | TS_MASK_CHANNEL | TS_MASK_SAMPLE | TS_MASK_FILENAME,
+	TS_MASK_ALL = TS_MASK_ORIGIN | TS_MASK_DURATION | TS_MASK_QUALITY | TS_MASK_CHANNEL |
+				  TS_MASK_SAMPLE | TS_MASK_FILENAME,
 	TS_MASK_CREATE = TS_MASK_QUALITY | TS_MASK_CHANNEL | TS_MASK_SAMPLE
 };
 
@@ -139,8 +137,8 @@ typedef struct _TS_STRACK_INFO {
 
 typedef struct _TS_STRACK *TS_STRACK;
 
-/* 
- I/O devices 
+/*
+ I/O devices
  */
 
 typedef enum {
@@ -150,11 +148,7 @@ typedef enum {
 	TS_INPUT_DUMMY /* per aprire in output */
 } TS_DEVTYPE;
 
-typedef enum {
-	TS_UNIQUE = 0,
-	TS_RIGHT,
-	TS_LEFT
-} TS_CHAN;
+typedef enum { TS_UNIQUE = 0, TS_RIGHT, TS_LEFT } TS_CHAN;
 
 /*
 typedef struct _TS_DEVICE_INFO {
@@ -182,7 +176,7 @@ TNZAPI TSAPI TS_STRACK tsCreateStrack(TS_STRACK_INFO info);
 TNZAPI TSAPI TS_RESULT tsDestroyStrack(TS_STRACK strack);
 
 /*---------------------- Conversion Functions -----------------------------*/
-/* 
+/*
 	secs * tsFrameRate() => num.frames
 	N.B.:Nessun controllo sui parametri passati (conv.indiscriminata)
 */
@@ -204,15 +198,14 @@ TNZAPI TSAPI void tsAreyousure_to_quit(void);
 /* riempie tutti i campi della info */
 TNZAPI TSAPI TS_RESULT tsFileInfo(TS_STRING szFileName, TS_STRACK_INFO info);
 
-TNZAPI TSAPI TS_STRACK tsLoad(TS_STRING szFileName, AUDIOFRAME from,
-							  AUDIOFRAME to);
+TNZAPI TSAPI TS_STRACK tsLoad(TS_STRING szFileName, AUDIOFRAME from, AUDIOFRAME to);
 
-TNZAPI TSAPI TS_STRACK tsLoadSubsampled(TS_STRING szFileName,
-										TS_STRACK_INFO desired_info, AUDIOFRAME from, AUDIOFRAME to);
+TNZAPI TSAPI TS_STRACK tsLoadSubsampled(TS_STRING szFileName, TS_STRACK_INFO desired_info,
+										AUDIOFRAME from, AUDIOFRAME to);
 /* if from==ALL && to==ALL the whole track is loaded */
 /*
-TNZAPI TSAPI TS_RESULT tsSave	( TS_STRACK strack, TS_STRING szFileName, 
-                           AUDIOFRAME from, AUDIOFRAME to );
+TNZAPI TSAPI TS_RESULT tsSave	( TS_STRACK strack, TS_STRING szFileName,
+						   AUDIOFRAME from, AUDIOFRAME to );
 */
 TNZAPI TSAPI TS_RESULT tsSave(TS_STRACK strack, TS_STRING szFileName);
 
@@ -225,11 +218,9 @@ TNZAPI TSAPI void tsClear(TS_STRACK strack, AUDIOFRAME from, AUDIOFRAME to);
 TNZAPI TSAPI void tsBlank(TS_STRACK strack, AUDIOFRAME point, AUDIOFRAME range);
 /* insert zeros into a track */
 
-TNZAPI TSAPI TS_RESULT tsCopy(TS_STRACK src_strack,
-							  AUDIOFRAME src_from, AUDIOFRAME src_to,
+TNZAPI TSAPI TS_RESULT tsCopy(TS_STRACK src_strack, AUDIOFRAME src_from, AUDIOFRAME src_to,
 							  TS_STRACK dest_strack, AUDIOFRAME dest_from);
-TNZAPI TSAPI TS_RESULT tsInsert(TS_STRACK src_strack,
-								AUDIOFRAME src_from, AUDIOFRAME src_to,
+TNZAPI TSAPI TS_RESULT tsInsert(TS_STRACK src_strack, AUDIOFRAME src_from, AUDIOFRAME src_to,
 								TS_STRACK dest_strack, AUDIOFRAME dest_from);
 /* Insertion of data in an empty track : dest_strack->buffer = NULL */
 
@@ -259,24 +250,19 @@ TNZAPI TSAPI TBOOL tsRefill(void); /* call at least 4 times per sec while playin
 
 /*------------------------ Play/Rec Functions -----------------------------*/
 /* default asynch */
-TNZAPI TSAPI TS_RESULT tsPlay(TS_STRACK strack, TS_DEVICE dev,
-							  AUDIOFRAME from, AUDIOFRAME to);
-TNZAPI TSAPI TS_RESULT tsNewPlay(TS_STRACK strack, TS_DEVICE dev,
-								 AUDIOFRAME from, AUDIOFRAME to);
-TNZAPI TSAPI TS_RESULT tsPlayLoop(TS_STRACK strack, TS_DEVICE dev,
-								  AUDIOFRAME from, AUDIOFRAME to);
+TNZAPI TSAPI TS_RESULT tsPlay(TS_STRACK strack, TS_DEVICE dev, AUDIOFRAME from, AUDIOFRAME to);
+TNZAPI TSAPI TS_RESULT tsNewPlay(TS_STRACK strack, TS_DEVICE dev, AUDIOFRAME from, AUDIOFRAME to);
+TNZAPI TSAPI TS_RESULT tsPlayLoop(TS_STRACK strack, TS_DEVICE dev, AUDIOFRAME from, AUDIOFRAME to);
 TNZAPI TSAPI TBOOL tsIsPlaying(TS_STRACK strack, TS_DEVICE dev);
 TNZAPI TSAPI TBOOL tsIsNewPlaying(TS_STRACK strack, TS_DEVICE dev);
-TNZAPI TSAPI TS_RESULT tsSyncPlay(TS_STRACK strack, TS_DEVICE dev,
-								  AUDIOFRAME from, AUDIOFRAME to);
+TNZAPI TSAPI TS_RESULT tsSyncPlay(TS_STRACK strack, TS_DEVICE dev, AUDIOFRAME from, AUDIOFRAME to);
 TNZAPI TSAPI TS_RESULT tsStopPlaying(TS_STRACK strack, TS_DEVICE dev);
 TNZAPI TSAPI TS_RESULT tsStopNewPlaying(TS_STRACK strack, TS_DEVICE dev);
 
-TNZAPI TSAPI TS_RESULT tsRecord(TS_STRACK strack, TS_DEVICE dev,
-								AUDIOFRAME from, AUDIOFRAME to);
+TNZAPI TSAPI TS_RESULT tsRecord(TS_STRACK strack, TS_DEVICE dev, AUDIOFRAME from, AUDIOFRAME to);
 TNZAPI TSAPI TBOOL tsIsRecording(TS_STRACK strack, TS_DEVICE dev);
-TNZAPI TSAPI TS_RESULT tsSyncRecord(TS_STRACK strack, TS_DEVICE dev,
-									AUDIOFRAME from, AUDIOFRAME to);
+TNZAPI TSAPI TS_RESULT tsSyncRecord(TS_STRACK strack, TS_DEVICE dev, AUDIOFRAME from,
+									AUDIOFRAME to);
 TNZAPI TSAPI TS_RESULT tsStopRecording(TS_STRACK strack, TS_DEVICE dev);
 /* TSAPI void      tsSetEndPlayCb  (void(*end_play_cb)(void));*/
 

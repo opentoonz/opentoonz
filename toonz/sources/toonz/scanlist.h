@@ -15,7 +15,7 @@ class ScanListFrame
 	TXshSimpleLevel *m_xl;
 	TFrameId m_fid;
 
-public:
+  public:
 	ScanListFrame();
 	ScanListFrame(TXshSimpleLevel *xl, const TFrameId &fid);
 	~ScanListFrame();
@@ -37,7 +37,7 @@ class ScanList
 {
 	std::vector<ScanListFrame> m_frames;
 
-public:
+  public:
 	ScanList();
 
 	void addFrame(const ScanListFrame &frame);

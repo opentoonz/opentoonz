@@ -38,7 +38,7 @@ class SceneViewerPanel : public TPanel, public FlipConsoleOwner
 	TPanelTitleBarButton *m_previewButton;
 	TPanelTitleBarButton *m_subcameraPreviewButton;
 
-public:
+  public:
 #if QT_VERSION >= 0x050500
 	SceneViewerPanel(QWidget *parent = 0, Qt::WindowFlags flags = 0);
 #else
@@ -48,7 +48,7 @@ public:
 
 	void onDrawFrame(int frame, const ImagePainter::VisualSettings &settings);
 
-protected:
+  protected:
 	void showEvent(QShowEvent *);
 	void hideEvent(QHideEvent *);
 	void resizeEvent(QResizeEvent *);
@@ -58,7 +58,7 @@ protected:
 	void addColorMaskButton(QWidget *parent, const char *iconSVGName, int id);
 	void enableFlipConsoleForCamerastand(bool on);
 
-public slots:
+  public slots:
 
 	void changeWindowTitle();
 	void onSceneChanged();
@@ -66,7 +66,7 @@ public slots:
 	void updateFrameRange();
 	void updateFrameMarkers();
 
-protected slots:
+  protected slots:
 
 	void onFrameSwitched();
 	void onSceneSwitched();

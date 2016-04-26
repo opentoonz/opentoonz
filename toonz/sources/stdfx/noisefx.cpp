@@ -16,9 +16,8 @@ class NoiseFx : public TStandardRasterFx
 	TBoolParamP m_BW;
 	TBoolParamP m_Animate;
 
-public:
-	NoiseFx()
-		: m_value(100.0), m_Red(1.0), m_Green(1.0), m_Blue(1.0), m_BW(0.0), m_Animate(0.0)
+  public:
+	NoiseFx() : m_value(100.0), m_Red(1.0), m_Green(1.0), m_Blue(1.0), m_BW(0.0), m_Animate(0.0)
 	{
 		bindParam(this, "Intensity", m_value);
 		bindParam(this, "Red", m_Red);
@@ -52,12 +51,11 @@ public:
 
 namespace
 {
-template <class PIXEL>
-class RayleighNoise
+template <class PIXEL> class RayleighNoise
 {
 	std::vector<double> noise_buf;
 
-public:
+  public:
 	RayleighNoise(double sigma, int seed = 0)
 	{
 		noise_buf.resize(PIXEL::maxChannelValue + 1);
@@ -99,11 +97,11 @@ void doNoise(TRasterPT<PIXEL> &ras, double sigma, bool bw, bool red, bool green,
 			if (bw) {
 				double index;
 				double value;
-				index = random.getFloat() * pix->m; //PIXEL::maxChannelValue;
+				index = random.getFloat() * pix->m; // PIXEL::maxChannelValue;
 				value = noise.get_value(tfloor(index));
 
-				//value = (value<pix->m)?((value>0)?(int)value:0):PIXEL::maxChannelValue;
-				//if(value)
+				// value = (value<pix->m)?((value>0)?(int)value:0):PIXEL::maxChannelValue;
+				// if(value)
 				//{
 				int reference;
 				reference = PIXELGRAY::from(*pix).value;
@@ -114,17 +112,17 @@ void doNoise(TRasterPT<PIXEL> &ras, double sigma, bool bw, bool red, bool green,
 			} else {
 				double r, g, b, index;
 				if (red) {
-					index = random.getFloat() * pix->m; //PIXEL::maxChannelValue;
+					index = random.getFloat() * pix->m; // PIXEL::maxChannelValue;
 					r = noise.get_value(tfloor(index)) + pix->r;
 					pix->r = tcrop<int>(r, 0, pix->m);
 				}
 				if (green) {
-					index = random.getFloat() * pix->m; //PIXEL::maxChannelValue;
+					index = random.getFloat() * pix->m; // PIXEL::maxChannelValue;
 					g = noise.get_value(tfloor(index)) + pix->g;
 					pix->g = tcrop<int>(g, 0, pix->m);
 				}
 				if (blue) {
-					index = random.getFloat() * pix->m; //PIXEL::maxChannelValue;
+					index = random.getFloat() * pix->m; // PIXEL::maxChannelValue;
 					b = noise.get_value(tfloor(index)) + pix->b;
 					pix->b = tcrop<int>(b, 0, pix->m);
 				}
@@ -160,7 +158,8 @@ void NoiseFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 	else {
 		TRaster64P raster64 = tile.getRaster();
 		if (raster64)
-			doNoise<TPixel64, TPixelGR16, USHORT>(raster64, sigma, bw, red, green, blue, animate, frame);
+			doNoise<TPixel64, TPixelGR16, USHORT>(raster64, sigma, bw, red, green, blue, animate,
+												  frame);
 		else
 			throw TException("Brightness&Contrast: unsupported Pixel Type");
 	}

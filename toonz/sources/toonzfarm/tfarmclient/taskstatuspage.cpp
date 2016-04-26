@@ -25,7 +25,7 @@ namespace
 {
 class TaskTreeItemRoot : public TTreeViewItem
 {
-public:
+  public:
 	TaskTreeItemRoot(TTreeViewItem *parent = 0) : TTreeViewItem(parent) {}
 
 	wstring getName() const { return toWideString("tasks"); }
@@ -42,28 +42,22 @@ public:
 
 class TaskTreeItem : public TTreeViewItem
 {
-public:
+  public:
 	TaskTreeItem(TTreeViewItem *parent, string &id, string &name, TaskState status)
 		: TTreeViewItem(parent), m_id(id)
 	{
 		/*
-          setIsLeaf(true);
-          if(task.m_parentId =="")
-            setIsLeaf(false);
+		  setIsLeaf(true);
+		  if(task.m_parentId =="")
+			setIsLeaf(false);
 */
 		m_name = " <" + m_id + "> " + name;
 		m_status = status;
 	}
 
-	wstring getName() const
-	{
-		return toWideString(m_name);
-	}
+	wstring getName() const { return toWideString(m_name); }
 
-	string getId() const
-	{
-		return m_id;
-	}
+	string getId() const { return m_id; }
 
 	TDimension getIconSize() const { return TDimension(24, 22); }
 
@@ -87,7 +81,7 @@ public:
 		case Aborted:
 			w->rectwrite(casm_done_with_errors, rect.getP00());
 			break;
-			//case TaskUnknown:
+			// case TaskUnknown:
 		}
 	}
 
@@ -98,7 +92,7 @@ public:
 
 class SubtaskTreeItem : public TaskTreeItem
 {
-public:
+  public:
 	SubtaskTreeItem(TaskTreeItem *parent, string &id, string &name, TaskState status)
 		: TaskTreeItem(parent, id, name, status)
 	{
@@ -125,7 +119,7 @@ public:
 		case Aborted:
 			w->rectwrite(done_with_errors, rect.getP00());
 			break;
-			//case TaskUnknown:
+			// case TaskUnknown:
 		}
 	}
 };
@@ -136,7 +130,7 @@ class TaskTree : public TTreeView
 	TPopupMenu *m_popupMenu;
 	TPopupMenu *m_globalPopupMenu;
 
-public:
+  public:
 	TaskTree(TaskStatusPage *parent, string name = "taskTree")
 		: TTreeView(parent, name), m_statusPage(parent)
 	{
@@ -212,20 +206,20 @@ public:
 			}
 
 			/*
-        int count = tasks.size();
-        for (int j = 0; j< count; ++j)
-          if(tasks[j] != "")
-          {
-            TFarmTask task;
-            controller->queryTaskInfo(tasks[j], task);
-            //TMainshell::errorMessage("dopo queryTaskInfo" + tasks[j]);
+		int count = tasks.size();
+		for (int j = 0; j< count; ++j)
+		  if(tasks[j] != "")
+		  {
+			TFarmTask task;
+			controller->queryTaskInfo(tasks[j], task);
+			//TMainshell::errorMessage("dopo queryTaskInfo" + tasks[j]);
 
-            if(!item->getItem(task.m_name))
-              if(task.m_parentId == "")
-                item->addItem(new TaskTreeItem(0, task));
-              else
-                item->addItem(new SubtaskTreeItem(0, task));
-          }
+			if(!item->getItem(task.m_name))
+			  if(task.m_parentId == "")
+				item->addItem(new TaskTreeItem(0, task));
+			  else
+				item->addItem(new SubtaskTreeItem(0, task));
+		  }
 */
 		} catch (TException &e) {
 			TMessage::error(toString(e.getMessage()));
@@ -235,9 +229,9 @@ public:
 	void onCollapse(TTreeViewItem *item)
 	{
 		/*
-      string id = "";
-      TaskTreeItem *taskItem = dynamic_cast<TaskTreeItem*> (item);
-      if(taskItem) 
+	  string id = "";
+	  TaskTreeItem *taskItem = dynamic_cast<TaskTreeItem*> (item);
+	  if(taskItem)
 */
 		item->clearItems();
 	}
@@ -387,7 +381,7 @@ public:
 		if (item)
 			update(item);
 
-		//aggiungo i nuovi
+		// aggiungo i nuovi
 		vector<string> tasks;
 		try {
 			controller->getTasks("", tasks);
@@ -427,13 +421,13 @@ public:
 		invalidate();
 	}
 };
-}; //namespace
+}; // namespace
 
 //==============================================================================
 
 class TaskStatusPage::Data
 {
-public:
+  public:
 	Data(TaskStatusPage *parent);
 
 	void showTaskInfo(const TFarmTask &task);
@@ -443,17 +437,13 @@ public:
 	TFarmTask m_currTask;
 
 	TaskTree *m_tree;
-	TTextField *m_taskId, *m_cmdLine, *m_server,
-		*m_byUser, *m_onMachine, *m_priority,
-		*m_submissionDate, *m_startDate, *m_completionDate,
-		*m_taskStatus, *m_failedSteps, *m_successfullSteps,
-		*m_stepCount;
+	TTextField *m_taskId, *m_cmdLine, *m_server, *m_byUser, *m_onMachine, *m_priority,
+		*m_submissionDate, *m_startDate, *m_completionDate, *m_taskStatus, *m_failedSteps,
+		*m_successfullSteps, *m_stepCount;
 
-	TLabel *m_taskIdLbl, *m_cmdLineLbl, *m_serverLbl,
-		*m_byUserLbl, *m_onMachineLbl, *m_priorityLbl,
-		*m_submissionDateLbl, *m_startDateLbl, *m_completionDateLbl,
-		*m_taskStatusLbl, *m_failedStepsLbl, *m_successfullStepsLbl,
-		*m_stepCountLbl, *m_dependenciesLbl;
+	TLabel *m_taskIdLbl, *m_cmdLineLbl, *m_serverLbl, *m_byUserLbl, *m_onMachineLbl, *m_priorityLbl,
+		*m_submissionDateLbl, *m_startDateLbl, *m_completionDateLbl, *m_taskStatusLbl,
+		*m_failedStepsLbl, *m_successfullStepsLbl, *m_stepCountLbl, *m_dependenciesLbl;
 
 	TTextList *m_dependencies;
 
@@ -566,7 +556,7 @@ void TaskStatusPage::Data::configureNotify(const TDimension &size)
 	int y0 = size.ly - 30;
 	int x0;
 
-	//prima la parte a sx
+	// prima la parte a sx
 	const int scbSize = 15;
 	TRect rect = TRect(0, 0, leftSize, size.ly);
 	int x = leftSize;
@@ -681,8 +671,7 @@ void TaskStatusPage::Data::clearFields()
 
 //==============================================================================
 
-TaskStatusPage::TaskStatusPage(TWidget *parent)
-	: TabPage(parent, "Tasks")
+TaskStatusPage::TaskStatusPage(TWidget *parent) : TabPage(parent, "Tasks")
 {
 	m_data = new Data(this);
 }

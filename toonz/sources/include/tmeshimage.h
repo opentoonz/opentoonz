@@ -40,12 +40,16 @@
 struct RigidPoint : public TPointD {
 	double rigidity;
 
-public:
+  public:
 	RigidPoint() : TPointD(), rigidity(1.0) {}
 	explicit RigidPoint(double x, double y, double rigidity_ = 1.0)
-		: TPointD(x, y), rigidity(rigidity_) {}
+		: TPointD(x, y), rigidity(rigidity_)
+	{
+	}
 	explicit RigidPoint(const TPointD &point, double rigidity_ = 1.0)
-		: TPointD(point), rigidity(rigidity_) {}
+		: TPointD(point), rigidity(rigidity_)
+	{
+	}
 
 	RigidPoint &operator=(const TPointD &p)
 	{
@@ -53,7 +57,7 @@ public:
 		return *this;
 	}
 
-public:
+  public:
 	RigidPoint operator+(const RigidPoint &other) const
 	{
 		return RigidPoint(x + other.x, y + other.y, rigidity + other.rigidity);
@@ -107,8 +111,7 @@ typedef tcg::Vertex<RigidPoint> TTextureVertex;
 namespace tcg
 {
 
-template <>
-struct point_traits<RigidPoint> {
+template <> struct point_traits<RigidPoint> {
 	typedef RigidPoint point_type;
 	typedef double value_type;
 	typedef double float_type;
@@ -123,12 +126,14 @@ struct point_traits<RigidPoint> {
 //    TTextureMesh (Textured Mesh Type)  declaration
 //***********************************************************************************
 
-class DVAPI TTextureMesh : public tcg::TriMesh<TTextureVertex, tcg::Edge, tcg::FaceN<3>>, public TSmartObject, public TPersist
+class DVAPI TTextureMesh : public tcg::TriMesh<TTextureVertex, tcg::Edge, tcg::FaceN<3>>,
+						   public TSmartObject,
+						   public TPersist
 {
 	PERSIST_DECLARATION(TTextureMesh)
 	DECLARE_CLASS_CODE
 
-public:
+  public:
 	TTextureMesh();
 
 	TTextureMesh(const TTextureMesh &);
@@ -158,9 +163,8 @@ namespace boost
 
 template <>
 struct graph_traits<TTextureMesh>
-	: public graph_traits<tcg::Mesh<TTextureMesh::vertex_type,
-									TTextureMesh::edge_type,
-									TTextureMesh::face_type>> {
+	: public graph_traits<
+		  tcg::Mesh<TTextureMesh::vertex_type, TTextureMesh::edge_type, TTextureMesh::face_type>> {
 };
 
 } // namespace boost
@@ -174,10 +178,10 @@ class DVAPI TMeshImage : public TImage
 	class Imp;
 	std::shared_ptr<Imp> m_imp;
 
-public:
+  public:
 	typedef std::vector<TTextureMeshP> meshes_container;
 
-public:
+  public:
 	TMeshImage();
 	TMeshImage(std::shared_ptr<Imp> imp);
 	~TMeshImage();
@@ -196,10 +200,7 @@ public:
 	const meshes_container &meshes() const;
 	meshes_container &meshes();
 
-	friend void swap(TMeshImage &a, TMeshImage &b)
-	{
-		std::swap(a.m_imp, b.m_imp);
-	}
+	friend void swap(TMeshImage &a, TMeshImage &b) { std::swap(a.m_imp, b.m_imp); }
 };
 
 //-----------------------------------------------------------------------------
@@ -211,19 +212,14 @@ template class DVAPI TDerivedSmartPointerT<TMeshImage, TImage>;
 
 class DVAPI TMeshImageP : public TDerivedSmartPointerT<TMeshImage, TImage>
 {
-public:
+  public:
 	TMeshImageP() {}
 	TMeshImageP(TMeshImage *image) : DerivedSmartPointer(image) {}
 	TMeshImageP(TImageP image) : DerivedSmartPointer(image) {}
 #if !defined(_WIN32)
-	TMeshImageP(TImage *image) : DerivedSmartPointer(TImageP(image))
-	{
-	}
+	TMeshImageP(TImage *image) : DerivedSmartPointer(TImageP(image)) {}
 #endif
-	operator TImageP()
-	{
-		return TImageP(m_pointer);
-	}
+	operator TImageP() { return TImageP(m_pointer); }
 };
 
 #endif // TMESHIMAGE_INCLUDED

@@ -17,31 +17,26 @@
 
 //=========================================================
 
-template <class T>
-class DVAPI TSoundTrackT : public TSoundTrack
+template <class T> class DVAPI TSoundTrackT : public TSoundTrack
 {
-public:
+  public:
 	typedef T SampleType;
 
 	//----------------------------------------------------------------------------
 
 	TSoundTrackT(TUINT32 sampleRate, int channelCount, TINT32 sampleCount)
-		: TSoundTrack(
-			  sampleRate, T::getBitPerSample(),
-			  channelCount, sizeof(T), sampleCount, T::isSampleSigned()) {}
+		: TSoundTrack(sampleRate, T::getBitPerSample(), channelCount, sizeof(T), sampleCount,
+					  T::isSampleSigned())
+	{
+	}
 
 	//----------------------------------------------------------------------------
 
-	TSoundTrackT(TUINT32 sampleRate,
-				 int channelCount,
-				 TINT32 sampleCount,
-				 T *buffer,
+	TSoundTrackT(TUINT32 sampleRate, int channelCount, TINT32 sampleCount, T *buffer,
 				 TSoundTrackT<T> *parent)
 
-		: TSoundTrack(
-			  sampleRate, T::getBitPerSample(),
-			  channelCount, sizeof(T), sampleCount,
-			  reinterpret_cast<UCHAR *>(buffer), parent)
+		: TSoundTrack(sampleRate, T::getBitPerSample(), channelCount, sizeof(T), sampleCount,
+					  reinterpret_cast<UCHAR *>(buffer), parent)
 	{
 	}
 
@@ -51,30 +46,21 @@ public:
 
 	//----------------------------------------------------------------------------
 
-	bool isSampleSigned() const
-	{
-		return T::isSampleSigned();
-	}
+	bool isSampleSigned() const { return T::isSampleSigned(); }
 
 	//----------------------------------------------------------------------------
 
-	//!Returns the const samples array
-	const T *samples() const
-	{
-		return reinterpret_cast<T *>(m_buffer);
-	}
+	//! Returns the const samples array
+	const T *samples() const { return reinterpret_cast<T *>(m_buffer); }
 
 	//----------------------------------------------------------------------------
 
-	//!Returns the samples array
-	T *samples()
-	{
-		return reinterpret_cast<T *>(m_buffer);
-	}
+	//! Returns the samples array
+	T *samples() { return reinterpret_cast<T *>(m_buffer); }
 
 	//----------------------------------------------------------------------------
 
-	//!Returns a soundtrack whom is a clone of the object
+	//! Returns a soundtrack whom is a clone of the object
 	TSoundTrackP clone() const
 	{
 
@@ -86,32 +72,31 @@ public:
 
 	//----------------------------------------------------------------------------
 
-	//!Extract the subtrack in the samples range [s0,s1] given in samples
+	//! Extract the subtrack in the samples range [s0,s1] given in samples
 	TSoundTrackP extract(TINT32 s0, TINT32 s1)
 	{
 
 		if (!m_buffer || s0 > s1)
 			return TSoundTrackP();
 
-		//addRef();
+		// addRef();
 
 		TINT32 ss0, ss1;
 
 		ss0 = tcrop<TINT32>(s0, (TINT32)0, getSampleCount() - 1);
 		ss1 = tcrop<TINT32>(s1, (TINT32)0, getSampleCount() - 1);
 
-		return TSoundTrackP(
-			new TSoundTrackT<T>(
-				getSampleRate(), getChannelCount(), ss1 - ss0 + 1,
-				(T *)(m_buffer + (long)(ss0 * getSampleSize())), this));
+		return TSoundTrackP(new TSoundTrackT<T>(getSampleRate(), getChannelCount(), ss1 - ss0 + 1,
+												(T *)(m_buffer + (long)(ss0 * getSampleSize())),
+												this));
 	}
 
 	//----------------------------------------------------------------------------
 
 	/*!
-    Returns a soundtrack whom is a clone of the object for the spicified channel
-    A clone means that it's an object who lives indipendently from the other
-    from which it's created.It hasn't reference to the object.
+	Returns a soundtrack whom is a clone of the object for the spicified channel
+	A clone means that it's an object who lives indipendently from the other
+	from which it's created.It hasn't reference to the object.
   */
 	TSoundTrackP clone(TSound::Channel chan) const
 	{
@@ -119,8 +104,7 @@ public:
 			return clone();
 		else {
 			typedef typename T::ChannelSampleType TCST;
-			TSoundTrackT<TCST> *dst =
-				new TSoundTrackT<TCST>(m_sampleRate, 1, getSampleCount());
+			TSoundTrackT<TCST> *dst = new TSoundTrackT<TCST>(m_sampleRate, 1, getSampleCount());
 
 			const T *sample = samples();
 			const T *endSample = sample + getSampleCount();
@@ -138,7 +122,7 @@ public:
 
 	//----------------------------------------------------------------------------
 
-	//!Copies from sample dst_s0 of object the samples of the soundtrack src
+	//! Copies from sample dst_s0 of object the samples of the soundtrack src
 	void copy(const TSoundTrackP &src, TINT32 dst_s0)
 	{
 
@@ -161,7 +145,7 @@ public:
 
 //----------------------------------------------------------------------------
 
-//!Applies a trasformation (echo, reverb, ect) to the object and returns the transformed soundtrack
+//! Applies a trasformation (echo, reverb, ect) to the object and returns the transformed soundtrack
 #if defined(MACOSX) || defined(LINUX)
 	TSoundTrackP apply(TSoundTransform *transform);
 #else // _WIN32
@@ -185,10 +169,9 @@ public:
 
 	//----------------------------------------------------------------------------
 
-	//!Returns the soundtrack pressure max and min values in the given sample range and channel
-	void getMinMaxPressure(
-		TINT32 s0, TINT32 s1, TSound::Channel chan,
-		double &min, double &max) const
+	//! Returns the soundtrack pressure max and min values in the given sample range and channel
+	void getMinMaxPressure(TINT32 s0, TINT32 s1, TSound::Channel chan, double &min,
+						   double &max) const
 	{
 
 		TINT32 sampleCount = getSampleCount();
@@ -232,7 +215,7 @@ public:
 
 	//----------------------------------------------------------------------------
 
-	//!Returns the soundtrack pressure max value in the given sample range and channel
+	//! Returns the soundtrack pressure max value in the given sample range and channel
 	double getMaxPressure(TINT32 s0, TINT32 s1, TSound::Channel chan) const
 	{
 
@@ -268,7 +251,7 @@ public:
 
 	//----------------------------------------------------------------------------
 
-	//!Returns the soundtrack pressure min value in the given sample range and channel
+	//! Returns the soundtrack pressure min value in the given sample range and channel
 	double getMinPressure(TINT32 s0, TINT32 s1, TSound::Channel chan) const
 	{
 
@@ -306,18 +289,16 @@ public:
 	//----------------------------------------------------------------------------
 
 	/*!
-    Copies the samples in the given sample range and channel
-    inside the dstChan channel from sample dst_s0
+	Copies the samples in the given sample range and channel
+	inside the dstChan channel from sample dst_s0
   */
-	void copyChannel(
-		const TSoundTrackT<T> &src, TINT32 src_s0, TINT32 src_s1,
-		TSound::Channel srcChan, TINT32 dst_s0,
-		TSound::Channel dstChan)
+	void copyChannel(const TSoundTrackT<T> &src, TINT32 src_s0, TINT32 src_s1,
+					 TSound::Channel srcChan, TINT32 dst_s0, TSound::Channel dstChan)
 	{
 
 		TINT32 ss0, ss1;
-		//se i valori sono nel range ed uguali => voglio copiare il
-		//canale di un solo campione
+		// se i valori sono nel range ed uguali => voglio copiare il
+		// canale di un solo campione
 		if (src_s1 == src_s0 && src_s1 >= 0 && src_s1 < src.getSampleCount())
 			ss0 = ss1 = src_s1;
 		else {
@@ -325,8 +306,8 @@ public:
 			ss0 = tcrop(src_s0, (TINT32)0, (TINT32)(src.getSampleCount() - 1));
 			ss1 = tcrop(src_s1, (TINT32)0, (TINT32)(src.getSampleCount() - 1));
 			assert(ss1 >= ss0);
-			//esco perche' non ha senso copiare indiscriminatamente il primo
-			//o l'ultimo campione della sorgente
+			// esco perche' non ha senso copiare indiscriminatamente il primo
+			// o l'ultimo campione della sorgente
 			if (ss1 == ss0)
 				return;
 		}
@@ -346,13 +327,13 @@ public:
 
 	//----------------------------------------------------------------------------
 
-	//!Makes blank the samples in the given sample range
+	//! Makes blank the samples in the given sample range
 	void blank(TINT32 s0, TINT32 s1)
 	{
 
 		TINT32 ss0, ss1;
-		//se i valori sono nel range ed uguali => voglio pulire
-		//un solo campione
+		// se i valori sono nel range ed uguali => voglio pulire
+		// un solo campione
 		if (s1 == s0 && s1 >= 0 && s1 < getSampleCount())
 			ss0 = ss1 = s1;
 		else {
@@ -362,8 +343,8 @@ public:
 			ss1 = tcrop<TINT32>(s1, (TINT32)0, (TINT32)(getSampleCount() - 1));
 
 			assert(ss1 >= ss0);
-			//esco perche' non ha senso pulire indiscriminatamente
-			//il primo o l'ultimo campione
+			// esco perche' non ha senso pulire indiscriminatamente
+			// il primo o l'ultimo campione
 			if (ss1 == ss0)
 				return;
 		}
@@ -379,7 +360,7 @@ public:
 
 	//----------------------------------------------------------------------------
 
-	//!Makes blank the samples in the given sample range and channel
+	//! Makes blank the samples in the given sample range and channel
 	void blankChannel(TINT32 s0, TINT32 s1, TSound::Channel chan)
 	{
 
@@ -416,7 +397,7 @@ typedef TSoundTrackT<TStereo24Sample> TSoundTrackStereo24;
 
 class TSoundTransform
 {
-public:
+  public:
 	TSoundTransform() {}
 	virtual ~TSoundTransform() {}
 
@@ -432,8 +413,7 @@ public:
 
 //==============================================================================
 #if defined(MACOSX) || defined(LINUX)
-template <class T>
-DVAPI TSoundTrackP TSoundTrackT<T>::apply(TSoundTransform *transform)
+template <class T> DVAPI TSoundTrackP TSoundTrackT<T>::apply(TSoundTransform *transform)
 {
 	assert(transform);
 	return transform->compute(*this);

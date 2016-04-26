@@ -22,12 +22,9 @@
 
 class LinkToggleCommand : public MenuItemHandler
 {
-public:
+  public:
 	LinkToggleCommand() : MenuItemHandler("MI_Link") {}
-	void execute()
-	{
-		FlipConsole::toggleLinked();
-	}
+	void execute() { FlipConsole::toggleLinked(); }
 } linkToggleCommand;
 
 //-----------------------------------------------------------------------------
@@ -36,9 +33,11 @@ class VcrCommand : public MenuItemHandler
 {
 	FlipConsole::EGadget m_buttonId;
 
-public:
+  public:
 	VcrCommand(const char *cmdId, FlipConsole::EGadget buttonId)
-		: MenuItemHandler(cmdId), m_buttonId(buttonId) {}
+		: MenuItemHandler(cmdId), m_buttonId(buttonId)
+	{
+	}
 	void execute()
 	{
 		FlipConsole *console = FlipConsole::getCurrent();
@@ -51,7 +50,7 @@ public:
 
 class NextDrawingCommand : public MenuItemHandler
 {
-public:
+  public:
 	NextDrawingCommand() : MenuItemHandler(MI_NextDrawing) {}
 
 	void execute()
@@ -77,7 +76,7 @@ public:
 
 class PrevDrawingCommand : public MenuItemHandler
 {
-public:
+  public:
 	PrevDrawingCommand() : MenuItemHandler(MI_PrevDrawing) {}
 
 	void execute()
@@ -91,13 +90,15 @@ public:
 		if (cell.isEmpty())
 			return;
 
-		for (--row; row >= 0 && xsh->getCell(row, col) == cell; --row) // Get *last* cell in previous uniform
-			;														   // cell block
+		for (--row; row >= 0 && xsh->getCell(row, col) == cell;
+			 --row) // Get *last* cell in previous uniform
+			;		// cell block
 
 		if (row >= 0 && !xsh->getCell(row, col).isEmpty()) {
 			cell = xsh->getCell(row, col);
-			while (row > 0 && xsh->getCell(row - 1, col) == cell) // Get *first* cell in current uniform
-				--row;											  // cell block
+			while (row > 0 &&
+				   xsh->getCell(row - 1, col) == cell) // Get *first* cell in current uniform
+				--row;								   // cell block
 
 			TApp::instance()->getCurrentFrame()->setFrame(row);
 		}
@@ -108,7 +109,7 @@ public:
 
 class NextStepCommand : public MenuItemHandler
 {
-public:
+  public:
 	NextStepCommand() : MenuItemHandler(MI_NextStep) {}
 
 	void execute()
@@ -124,7 +125,7 @@ public:
 
 class PrevStepCommand : public MenuItemHandler
 {
-public:
+  public:
 	PrevStepCommand() : MenuItemHandler(MI_PrevStep) {}
 
 	void execute()
@@ -140,11 +141,8 @@ public:
 //    Commands  instantiation
 //**********************************************************************************
 
-VcrCommand
-	playCommand(MI_Play, FlipConsole::ePlay),
-	pauseCommand(MI_Pause, FlipConsole::ePause),
-	loopCommand(MI_Loop, FlipConsole::eLoop),
-	firstFrameCommand(MI_FirstFrame, FlipConsole::eFirst),
+VcrCommand playCommand(MI_Play, FlipConsole::ePlay), pauseCommand(MI_Pause, FlipConsole::ePause),
+	loopCommand(MI_Loop, FlipConsole::eLoop), firstFrameCommand(MI_FirstFrame, FlipConsole::eFirst),
 	lastFrameCommand(MI_LastFrame, FlipConsole::eLast),
 	nextFrameCommand(MI_NextFrame, FlipConsole::eNext),
 	prevFrameCommand(MI_PrevFrame, FlipConsole::ePrev),

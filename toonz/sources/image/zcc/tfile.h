@@ -9,11 +9,7 @@
 
 namespace TFileConsts
 {
-enum SeekMode {
-	seekStart = 0,
-	seekCur,
-	seekEnd
-};
+enum SeekMode { seekStart = 0, seekCur, seekEnd };
 
 enum eFlags {
 	kRead = 0x00000001,
@@ -34,7 +30,8 @@ enum eFlags {
 
 	kSequential = 0x00010000,
 	kRandomAccess = 0x00020000,
-	kUnbuffered = 0x00040000, // much faster on Win32 thanks to the crappy cache, but possibly bad in Unix?
+	kUnbuffered =
+		0x00040000, // much faster on Win32 thanks to the crappy cache, but possibly bad in Unix?
 	kWriteThrough = 0x00080000,
 
 	kAllFileFlags = 0xFFFFFFFF
@@ -48,15 +45,22 @@ class TFile
 	HANDLE m_hFile;
 	TINT64 m_FilePosition;
 
-public:
+  public:
 	TFile() {}
-	TFile(const TFilePath &fname, uint32 flags = TFileConsts::kRead | TFileConsts::kDenyWrite | TFileConsts::kOpenExisting);
-	//TFile(const wchar_t *pwszFileName, uint32 flags = TFileConsts::kRead | TFileConsts::kDenyWrite | TFileConsts::kOpenExisting);
-	//TFile(VDFileHandle h);
+	TFile(const TFilePath &fname,
+		  uint32 flags = TFileConsts::kRead | TFileConsts::kDenyWrite | TFileConsts::kOpenExisting);
+	// TFile(const wchar_t *pwszFileName, uint32 flags = TFileConsts::kRead |
+	// TFileConsts::kDenyWrite | TFileConsts::kOpenExisting);
+	// TFile(VDFileHandle h);
 	~TFile();
 
-	bool open(const TFilePath &fname, uint32 flags = TFileConsts::kRead | TFileConsts::kDenyWrite | TFileConsts::kOpenExisting); // false if failed due to not found or already exists
-	//bool	open(const wchar_t *pwszFileName, uint32 flags = TFileConsts::kRead | TFileConsts::kDenyWrite | TFileConsts::kOpenExisting);	// false if failed due to not found or already exists
+	bool open(const TFilePath &fname,
+			  uint32 flags =
+				  TFileConsts::kRead | TFileConsts::kDenyWrite |
+				  TFileConsts::kOpenExisting); // false if failed due to not found or already exists
+	// bool	open(const wchar_t *pwszFileName, uint32 flags = TFileConsts::kRead |
+	// TFileConsts::kDenyWrite | TFileConsts::kOpenExisting);	// false if failed due to not found or
+	// already exists
 	bool close();
 	bool truncate();
 
@@ -71,10 +75,10 @@ public:
 	bool isOpen();
 	std::string getLastError();
 
-protected:
+  protected:
 	bool open_internal(const TFilePath &fname, /* const wchar_t *pwszFilename, */ uint32 flags);
 
-private:
+  private:
 	TFile(const TFile &);
 	const TFile &operator=(const TFile &f);
 	DWORD m_ec;

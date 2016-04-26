@@ -43,9 +43,9 @@
 /*
   Toonz currently has THREE different APIs to deal with scene objects commands:
 
-    1. From the xsheet, see columncommand.cpp
-    2. From the stage schematic
-    3. From the fx schematic
+	1. From the xsheet, see columncommand.cpp
+	2. From the stage schematic
+	3. From the fx schematic
 
   *This* is the one version that should 'rule them all' - we still have to
   unify them, though.
@@ -109,14 +109,12 @@ bool isInsideAMacroFx(TFx *fx, TXsheet *xsh)
 	TXsheetFx *xfx = dynamic_cast<TXsheetFx *>(fx);
 	TOutputFx *ofx = dynamic_cast<TOutputFx *>(fx);
 
-	return !cfx && !xfx && !ofx &&
-		   !(xsh->getFxDag()->getInternalFxs()->containsFx(fx));
+	return !cfx && !xfx && !ofx && !(xsh->getFxDag()->getInternalFxs()->containsFx(fx));
 }
 
 //------------------------------------------------------
 
-template <typename ParamCont>
-void setParamsToCurrentScene(TXsheet *xsh, const ParamCont *cont)
+template <typename ParamCont> void setParamsToCurrentScene(TXsheet *xsh, const ParamCont *cont)
 {
 	for (int p = 0; p != cont->getParamCount(); ++p) {
 		TParam &param = *cont->getParam(p);
@@ -199,10 +197,7 @@ namespace
 
 struct FilterInsideAMacro {
 	TXsheet *m_xsh;
-	inline bool operator()(const TFxP &fx)
-	{
-		return ::isInsideAMacroFx(fx.getPointer(), m_xsh);
-	}
+	inline bool operator()(const TFxP &fx) { return ::isInsideAMacroFx(fx.getPointer(), m_xsh); }
 
 	inline bool operator()(const TFxCommand::Link &link)
 	{
@@ -228,7 +223,10 @@ struct FilterTerminalFxs {
 };
 
 struct FilterColumnFxs {
-	inline bool operator()(const TFxP &fx) { return dynamic_cast<TLevelColumnFx *>(fx.getPointer()); }
+	inline bool operator()(const TFxP &fx)
+	{
+		return dynamic_cast<TLevelColumnFx *>(fx.getPointer());
+	}
 };
 
 } // namespace
@@ -268,16 +266,14 @@ struct CloneFxFunctor {
 
 class FxCommandUndo : public TUndo
 {
-public:
+  public:
 	virtual ~FxCommandUndo() {}
 
 	virtual bool isConsistent() const = 0;
 
-public:
-	template <typename Pred>
-	static TFx *leftmostConnectedFx(TFx *fx, Pred pred);
-	template <typename Pred>
-	static TFx *rightmostConnectedFx(TFx *fx, Pred pred);
+  public:
+	template <typename Pred> static TFx *leftmostConnectedFx(TFx *fx, Pred pred);
+	template <typename Pred> static TFx *rightmostConnectedFx(TFx *fx, Pred pred);
 
 	static TFx *leftmostConnectedFx(TFx *fx);
 	static TFx *rightmostConnectedFx(TFx *fx);
@@ -287,9 +283,10 @@ public:
 
 	int getHistoryType() { return HistoryType::Schematic; }
 
-protected:
+  protected:
 	static TXshZeraryFxColumn *createZeraryFxColumn(TXsheet *xsh, TFx *zfx, int row = 0);
-	static void cloneGroupStack(const QStack<int> &groupIds, const QStack<std::wstring> &groupNames, TFx *toFx);
+	static void cloneGroupStack(const QStack<int> &groupIds, const QStack<std::wstring> &groupNames,
+								TFx *toFx);
 	static void cloneGroupStack(TFx *fromFx, TFx *toFx);
 	static void copyGroupEditLevel(int editGroupId, TFx *toFx);
 	static void copyGroupEditLevel(TFx *fromFx, TFx *toFx);
@@ -299,15 +296,15 @@ protected:
 	static void attachOutputs(TXsheet *xsh, TFx *insertedFx, TFx *inputFx);
 	static void detachFxs(TXsheet *xsh, TFx *fxLeft, TFx *fxRight, bool detachLeft = true);
 	static void insertFxs(TXsheet *xsh, const TFxCommand::Link &link, TFx *fxLeft, TFx *fxRight);
-	static void insertColumn(TXsheet *xsh, TXshColumn *column, int colIdx,
-							 bool removeHole = false, bool autoTerminal = false);
-	static void removeFxOrColumn(TXsheet *xsh, TFx *fx, int colIdx,
-								 bool insertHole = false, bool unlinkParams = true);
+	static void insertColumn(TXsheet *xsh, TXshColumn *column, int colIdx, bool removeHole = false,
+							 bool autoTerminal = false);
+	static void removeFxOrColumn(TXsheet *xsh, TFx *fx, int colIdx, bool insertHole = false,
+								 bool unlinkParams = true);
 	static void linkParams(TFx *fx, TFx *linkedFx);
 	static void unlinkParams(TFx *fx);
 	static void makeNotCurrent(TFxHandle *fxHandle, TFx *fx);
 
-private:
+  private:
 	static void removeColumn(TXsheet *xsh, int colIdx, bool insertHole);
 	static void removeNormalFx(TXsheet *xsh, TFx *fx);
 	static void removeOutputFx(TXsheet *xsh, TOutputFx *outputFx);
@@ -328,8 +325,8 @@ TXshZeraryFxColumn *FxCommandUndo::createZeraryFxColumn(TXsheet *xsh, TFx *zfx, 
 
 //------------------------------------------------------
 
-void FxCommandUndo::cloneGroupStack(
-	const QStack<int> &groupIds, const QStack<std::wstring> &groupNames, TFx *toFx)
+void FxCommandUndo::cloneGroupStack(const QStack<int> &groupIds,
+									const QStack<std::wstring> &groupNames, TFx *toFx)
 {
 	toFx->getAttributes()->removeFromAllGroup();
 
@@ -381,8 +378,7 @@ void FxCommandUndo::copyDagPosition(TFx *fromFx, TFx *toFx)
 
 //------------------------------------------------------
 
-void FxCommandUndo::attach(TXsheet *xsh, TFx *inputFx, TFx *outputFx, int link,
-						   bool copyGroupData)
+void FxCommandUndo::attach(TXsheet *xsh, TFx *inputFx, TFx *outputFx, int link, bool copyGroupData)
 {
 	if (outputFx) {
 		FxDag *fxDag = xsh->getFxDag();
@@ -408,7 +404,8 @@ void FxCommandUndo::attach(TXsheet *xsh, TFx *inputFx, TFx *outputFx, int link,
 
 void FxCommandUndo::attach(TXsheet *xsh, const TFxCommand::Link &link, bool copyGroupData)
 {
-	attach(xsh, link.m_inputFx.getPointer(), link.m_outputFx.getPointer(), link.m_index, copyGroupData);
+	attach(xsh, link.m_inputFx.getPointer(), link.m_outputFx.getPointer(), link.m_index,
+		   copyGroupData);
 }
 
 //------------------------------------------------------
@@ -423,10 +420,11 @@ void FxCommandUndo::attachOutputs(TXsheet *xsh, TFx *insertedFx, TFx *inputFx)
 	inputFx = ::getActualOut(inputFx);
 
 	int p, pCount = inputFx->getOutputConnectionCount();
-	for (p = pCount - 1; p >= 0; --p)					 // Backward iteration on output connections -
-	{													 // it's necessary since TFxPort::setFx() REMOVES
-		TFxPort *port = inputFx->getOutputConnection(p); // the corresponding port int the output connections
-		port->setFx(insertedFx);						 // container - thus, it's better to start from the end
+	for (p = pCount - 1; p >= 0; --p) // Backward iteration on output connections -
+	{								  // it's necessary since TFxPort::setFx() REMOVES
+		TFxPort *port =
+			inputFx->getOutputConnection(p); // the corresponding port int the output connections
+		port->setFx(insertedFx);			 // container - thus, it's better to start from the end
 	}
 
 	if (fxDag->getTerminalFxs()->containsFx(inputFx)) {
@@ -474,8 +472,7 @@ void FxCommandUndo::detachFxs(TXsheet *xsh, TFx *fxLeft, TFx *fxRight, bool deta
 
 //------------------------------------------------------
 
-void FxCommandUndo::insertFxs(TXsheet *xsh, const TFxCommand::Link &link,
-							  TFx *fxLeft, TFx *fxRight)
+void FxCommandUndo::insertFxs(TXsheet *xsh, const TFxCommand::Link &link, TFx *fxLeft, TFx *fxRight)
 {
 	assert(fxLeft && fxRight);
 
@@ -490,8 +487,8 @@ void FxCommandUndo::insertFxs(TXsheet *xsh, const TFxCommand::Link &link,
 
 //------------------------------------------------------
 
-void FxCommandUndo::insertColumn(TXsheet *xsh, TXshColumn *column, int col,
-								 bool removeHole, bool autoTerminal)
+void FxCommandUndo::insertColumn(TXsheet *xsh, TXshColumn *column, int col, bool removeHole,
+								 bool autoTerminal)
 {
 	FxDag *fxDag = xsh->getFxDag();
 	TFx *fx = column->getFx();
@@ -577,8 +574,8 @@ void FxCommandUndo::makeNotCurrent(TFxHandle *fxHandle, TFx *fx)
 
 //------------------------------------------------------
 
-void FxCommandUndo::removeFxOrColumn(TXsheet *xsh, TFx *fx, int colIdx,
-									 bool insertHole, bool unlinkParams)
+void FxCommandUndo::removeFxOrColumn(TXsheet *xsh, TFx *fx, int colIdx, bool insertHole,
+									 bool unlinkParams)
 {
 	assert(fx || colIdx >= 0);
 
@@ -612,8 +609,7 @@ void FxCommandUndo::removeFxOrColumn(TXsheet *xsh, TFx *fx, int colIdx,
 
 //------------------------------------------------------
 
-template <typename Pred>
-TFx *FxCommandUndo::leftmostConnectedFx(TFx *fx, Pred pred)
+template <typename Pred> TFx *FxCommandUndo::leftmostConnectedFx(TFx *fx, Pred pred)
 {
 	assert(fx);
 
@@ -622,8 +618,7 @@ TFx *FxCommandUndo::leftmostConnectedFx(TFx *fx, Pred pred)
 	do {
 		fx = ::getActualIn(fx);
 
-		if (!((fx->getInputPortCount() > 0) &&
-			  fx->getInputPort(0)->isConnected() &&
+		if (!((fx->getInputPortCount() > 0) && fx->getInputPort(0)->isConnected() &&
 			  pred(fx->getInputPort(0)->getFx())))
 			break;
 
@@ -635,16 +630,14 @@ TFx *FxCommandUndo::leftmostConnectedFx(TFx *fx, Pred pred)
 
 //------------------------------------------------------
 
-template <typename Pred>
-TFx *FxCommandUndo::rightmostConnectedFx(TFx *fx, Pred pred)
+template <typename Pred> TFx *FxCommandUndo::rightmostConnectedFx(TFx *fx, Pred pred)
 {
 	assert(fx);
 
 	do {
 		fx = ::getActualOut(fx);
 
-		if (!(fx->getOutputConnectionCount() > 0 &&
-			  pred(fx->getOutputConnection(0)->getOwnerFx())))
+		if (!(fx->getOutputConnectionCount() > 0 && pred(fx->getOutputConnection(0)->getOwnerFx())))
 			break;
 
 		fx = fx->getOutputConnection(0)->getOwnerFx();
@@ -735,11 +728,12 @@ class InsertFxUndo : public FxCommandUndo
 	bool m_columnReplacesHole;
 	bool m_attachOutputs;
 
-public:
-	InsertFxUndo(const TFxP &fx, int row, int col,
-				 const QList<TFxP> &selectedFxs, QList<TFxCommand::Link> selectedLinks,
-				 TApplication *app, bool attachOutputs = true)
-		: m_selectedFxs(selectedFxs), m_selectedLinks(selectedLinks), m_insertedColumn(0), m_app(app), m_colIdx(col), m_columnReplacesHole(false), m_attachOutputs(attachOutputs)
+  public:
+	InsertFxUndo(const TFxP &fx, int row, int col, const QList<TFxP> &selectedFxs,
+				 QList<TFxCommand::Link> selectedLinks, TApplication *app,
+				 bool attachOutputs = true)
+		: m_selectedFxs(selectedFxs), m_selectedLinks(selectedLinks), m_insertedColumn(0),
+		  m_app(app), m_colIdx(col), m_columnReplacesHole(false), m_attachOutputs(attachOutputs)
 	{
 		initialize(fx, row, col);
 	}
@@ -753,7 +747,7 @@ public:
 
 	QString getHistoryString();
 
-private:
+  private:
 	void initialize(const TFxP &newFx, int row, int col);
 };
 
@@ -775,7 +769,8 @@ bool containsInputFx(const QList<TFxP> &fxs, const TFxCommand::Link &link)
 {
 	return fxs.contains(link.m_inputFx);
 }
-typedef tcg::function<bool (*)(const QList<TFxP> &, const TFxCommand::Link &), containsInputFx> ContainsInputFx_fun;
+typedef tcg::function<bool (*)(const QList<TFxP> &, const TFxCommand::Link &), containsInputFx>
+	ContainsInputFx_fun;
 
 } // namespace
 
@@ -818,12 +813,14 @@ void InsertFxUndo::initialize(const TFxP &newFx, int row, int col)
 
 		// Remove all unacceptable input fxs
 		::FilterInsideAMacro filterInMacroFxs = {xsh};
-		m_selectedFxs.erase(std::remove_if(m_selectedFxs.begin(), m_selectedFxs.end(), filterInMacroFxs),
-							m_selectedFxs.end());
+		m_selectedFxs.erase(
+			std::remove_if(m_selectedFxs.begin(), m_selectedFxs.end(), filterInMacroFxs),
+			m_selectedFxs.end());
 
 		// Remove all unacceptable links or links whose input fx was already selected
-		m_selectedLinks.erase(std::remove_if(m_selectedLinks.begin(), m_selectedLinks.end(), filterInMacroFxs),
-							  m_selectedLinks.end());
+		m_selectedLinks.erase(
+			std::remove_if(m_selectedLinks.begin(), m_selectedLinks.end(), filterInMacroFxs),
+			m_selectedLinks.end());
 		m_selectedLinks.erase(std::remove_if(m_selectedLinks.begin(), m_selectedLinks.end(),
 											 tcg::bind1st(::ContainsInputFx_fun(), m_selectedFxs)),
 							  m_selectedLinks.end());
@@ -865,8 +862,8 @@ void InsertFxUndo::redo() const
 
 	// Zerary case
 	if (m_insertedColumn) {
-		FxCommandUndo::insertColumn(
-			xsh, m_insertedColumn.getPointer(), m_colIdx, m_columnReplacesHole, true);
+		FxCommandUndo::insertColumn(xsh, m_insertedColumn.getPointer(), m_colIdx,
+									m_columnReplacesHole, true);
 		return;
 	}
 
@@ -916,8 +913,8 @@ void InsertFxUndo::undo() const
 	for (i = 0; i != iCount; ++i) {
 		TFx *insertedFx = m_insertedFxs[i].getPointer();
 
-		FxCommandUndo::removeFxOrColumn(xsh, insertedFx, -1,
-										m_columnReplacesHole, false); // Skip parameter links removal
+		FxCommandUndo::removeFxOrColumn(xsh, insertedFx, -1, m_columnReplacesHole,
+										false); // Skip parameter links removal
 		FxCommandUndo::makeNotCurrent(m_app->getCurrentFx(), insertedFx);
 	}
 
@@ -930,7 +927,8 @@ void InsertFxUndo::undo() const
 
 QString InsertFxUndo::getHistoryString()
 {
-	QString str = (m_selectedLinks.isEmpty()) ? QObject::tr("Add Fx  : ") : QObject::tr("Insert Fx  : ");
+	QString str =
+		(m_selectedLinks.isEmpty()) ? QObject::tr("Add Fx  : ") : QObject::tr("Insert Fx  : ");
 	QList<TFxP>::iterator it;
 	for (it = m_insertedFxs.begin(); it != m_insertedFxs.end(); it++) {
 		if (it != m_insertedFxs.begin())
@@ -965,7 +963,8 @@ void TFxCommand::addFx(TFx *newFx, const QList<TFxP> &fxs, TApplication *app, in
 	if (!newFx)
 		return;
 
-	std::auto_ptr<FxCommandUndo> undo(new InsertFxUndo(newFx, row, col, fxs, QList<Link>(), app, false));
+	std::auto_ptr<FxCommandUndo> undo(
+		new InsertFxUndo(newFx, row, col, fxs, QList<Link>(), app, false));
 	if (!undo->isConsistent())
 		return;
 
@@ -986,7 +985,7 @@ class DuplicateFxUndo : public FxCommandUndo
 	TXsheetHandle *m_xshHandle;
 	TFxHandle *m_fxHandle;
 
-public:
+  public:
 	DuplicateFxUndo(const TFxP &originalFx, TXsheetHandle *xshHandle, TFxHandle *fxHandle)
 		: m_fx(originalFx), m_colIdx(-1), m_xshHandle(xshHandle), m_fxHandle(fxHandle)
 	{
@@ -1002,7 +1001,7 @@ public:
 
 	QString getHistoryString();
 
-private:
+  private:
 	void initialize();
 };
 
@@ -1015,8 +1014,8 @@ void DuplicateFxUndo::initialize()
 
 	fx = ::getActualOut(fx);
 
-	if (isInsideAMacroFx(fx, xsh) ||
-		dynamic_cast<TXsheetFx *>(fx) || dynamic_cast<TOutputFx *>(fx) ||
+	if (isInsideAMacroFx(fx, xsh) || dynamic_cast<TXsheetFx *>(fx) ||
+		dynamic_cast<TOutputFx *>(fx) ||
 		(dynamic_cast<TColumnFx *>(fx) && !dynamic_cast<TZeraryColumnFx *>(fx)))
 		return;
 
@@ -1071,8 +1070,7 @@ void DuplicateFxUndo::redo() const
 
 void DuplicateFxUndo::undo() const
 {
-	FxCommandUndo::removeFxOrColumn(
-		m_xshHandle->getXsheet(), m_dupFx.getPointer(), -1, true, true);
+	FxCommandUndo::removeFxOrColumn(m_xshHandle->getXsheet(), m_dupFx.getPointer(), -1, true, true);
 
 	m_fxHandle->setFx(0);
 	m_xshHandle->notifyXsheetChanged();
@@ -1086,8 +1084,7 @@ QString DuplicateFxUndo::getHistoryString()
 		return QObject::tr("Create Linked Fx  : %1")
 			.arg(QString::fromStdWString(zDup->getZeraryFx()->getFxId()));
 
-	return QObject::tr("Create Linked Fx  : %1")
-		.arg(QString::fromStdWString(m_dupFx->getFxId()));
+	return QObject::tr("Create Linked Fx  : %1").arg(QString::fromStdWString(m_dupFx->getFxId()));
 }
 
 //=============================================================
@@ -1116,10 +1113,11 @@ class ReplaceFxUndo : public FxCommandUndo
 	TXsheetHandle *m_xshHandle;
 	TFxHandle *m_fxHandle;
 
-public:
-	ReplaceFxUndo(const TFxP &replacementFx, const TFxP &replacedFx,
-				  TXsheetHandle *xshHandle, TFxHandle *fxHandle)
-		: m_fx(replacedFx), m_repFx(replacementFx), m_xshHandle(xshHandle), m_fxHandle(fxHandle), m_colIdx(-1), m_repColIdx(-1)
+  public:
+	ReplaceFxUndo(const TFxP &replacementFx, const TFxP &replacedFx, TXsheetHandle *xshHandle,
+				  TFxHandle *fxHandle)
+		: m_fx(replacedFx), m_repFx(replacementFx), m_xshHandle(xshHandle), m_fxHandle(fxHandle),
+		  m_colIdx(-1), m_repColIdx(-1)
 	{
 		initialize();
 	}
@@ -1133,11 +1131,10 @@ public:
 
 	QString getHistoryString();
 
-private:
+  private:
 	void initialize();
-	static void replace(TXsheet *xsh, TFx *fx, TFx *repFx,
-						TXshColumn *column, TXshColumn *repColumn,
-						int colIdx, int repColIdx);
+	static void replace(TXsheet *xsh, TFx *fx, TFx *repFx, TXshColumn *column,
+						TXshColumn *repColumn, int colIdx, int repColIdx);
 };
 
 //-------------------------------------------------------------
@@ -1151,8 +1148,8 @@ void ReplaceFxUndo::initialize()
 
 	fx = ::getActualOut(fx);
 
-	if (isInsideAMacroFx(fx, xsh) ||
-		dynamic_cast<TXsheetFx *>(fx) || dynamic_cast<TOutputFx *>(fx) ||
+	if (isInsideAMacroFx(fx, xsh) || dynamic_cast<TXsheetFx *>(fx) ||
+		dynamic_cast<TOutputFx *>(fx) ||
 		(dynamic_cast<TColumnFx *>(fx) && !dynamic_cast<TZeraryColumnFx *>(fx))) {
 		m_repFx = TFxP();
 		return;
@@ -1212,10 +1209,8 @@ void ReplaceFxUndo::initialize()
 
 //-------------------------------------------------------------
 
-void ReplaceFxUndo::replace(TXsheet *xsh,
-							TFx *fx, TFx *repFx,
-							TXshColumn *column, TXshColumn *repColumn,
-							int colIdx, int repColIdx)
+void ReplaceFxUndo::replace(TXsheet *xsh, TFx *fx, TFx *repFx, TXshColumn *column,
+							TXshColumn *repColumn, int colIdx, int repColIdx)
 {
 	FxDag *fxDag = xsh->getFxDag();
 
@@ -1250,7 +1245,8 @@ void ReplaceFxUndo::replace(TXsheet *xsh,
 
 	// Insert the new fx/column
 	if (repColumn)
-		FxCommandUndo::insertColumn(xsh, repColumn, repColIdx, column); // Not attached to the xsheet
+		FxCommandUndo::insertColumn(xsh, repColumn, repColIdx,
+									column); // Not attached to the xsheet
 	else
 		::addFxToCurrentScene(repFx, xsh, false);
 
@@ -1262,10 +1258,8 @@ void ReplaceFxUndo::replace(TXsheet *xsh,
 
 void ReplaceFxUndo::redo() const
 {
-	ReplaceFxUndo::replace(m_xshHandle->getXsheet(),
-						   m_fx.getPointer(), m_repFx.getPointer(),
-						   m_column.getPointer(), m_repColumn.getPointer(),
-						   m_colIdx, m_repColIdx);
+	ReplaceFxUndo::replace(m_xshHandle->getXsheet(), m_fx.getPointer(), m_repFx.getPointer(),
+						   m_column.getPointer(), m_repColumn.getPointer(), m_colIdx, m_repColIdx);
 	FxCommandUndo::unlinkParams(m_fx.getPointer());
 
 	m_fxHandle->setFx(0);
@@ -1276,10 +1270,8 @@ void ReplaceFxUndo::redo() const
 
 void ReplaceFxUndo::undo() const
 {
-	ReplaceFxUndo::replace(m_xshHandle->getXsheet(),
-						   m_repFx.getPointer(), m_fx.getPointer(),
-						   m_repColumn.getPointer(), m_column.getPointer(),
-						   m_repColIdx, m_colIdx);
+	ReplaceFxUndo::replace(m_xshHandle->getXsheet(), m_repFx.getPointer(), m_fx.getPointer(),
+						   m_repColumn.getPointer(), m_column.getPointer(), m_repColIdx, m_colIdx);
 
 	// Repair original input links for m_fx
 	m_fx->disconnectAll();
@@ -1309,7 +1301,8 @@ QString ReplaceFxUndo::getHistoryString()
 
 //=============================================================
 
-void TFxCommand::replaceFx(TFx *newFx, const QList<TFxP> &fxs, TXsheetHandle *xshHandle, TFxHandle *fxHandle)
+void TFxCommand::replaceFx(TFx *newFx, const QList<TFxP> &fxs, TXsheetHandle *xshHandle,
+						   TFxHandle *fxHandle)
 {
 	if (!newFx)
 		return;
@@ -1348,9 +1341,11 @@ class UnlinkFxUndo : public FxCommandUndo
 
 	TXsheetHandle *m_xshHandle;
 
-public:
+  public:
 	UnlinkFxUndo(const TFxP &fx, TXsheetHandle *xshHandle)
-		: m_fx(fx), m_linkedFx(fx->getLinkedFx()), m_xshHandle(xshHandle) {}
+		: m_fx(fx), m_linkedFx(fx->getLinkedFx()), m_xshHandle(xshHandle)
+	{
+	}
 
 	bool isConsistent() const { return bool(m_linkedFx); }
 
@@ -1396,16 +1391,12 @@ void TFxCommand::unlinkFx(TFx *fx, TFxHandle *fxHandle, TXsheetHandle *xshHandle
 
 class MakeMacroUndo : public FxCommandUndo
 {
-protected:
+  protected:
 	TFxP m_macroFx;
 	TApplication *m_app;
 
-public:
-	MakeMacroUndo(const std::vector<TFxP> &fxs, TApplication *app)
-		: m_app(app)
-	{
-		initialize(fxs);
-	}
+  public:
+	MakeMacroUndo(const std::vector<TFxP> &fxs, TApplication *app) : m_app(app) { initialize(fxs); }
 
 	bool isConsistent() const { return bool(m_macroFx); }
 
@@ -1420,12 +1411,11 @@ public:
 			.arg(QString::fromStdWString(m_macroFx->getFxId()));
 	}
 
-private:
+  private:
 	void initialize(const std::vector<TFxP> &fxs);
 
-protected:
-	MakeMacroUndo(TMacroFx *macroFx, TApplication *app)
-		: m_macroFx(macroFx), m_app(app) {}
+  protected:
+	MakeMacroUndo(TMacroFx *macroFx, TApplication *app) : m_macroFx(macroFx), m_app(app) {}
 };
 
 //-------------------------------------------------------------
@@ -1439,13 +1429,9 @@ void MakeMacroUndo::initialize(const std::vector<TFxP> &fxs)
 		// Only normal Fxs can be added in a macro
 		TFx *fx = fxs[f].getPointer();
 
-		if (isInsideAMacroFx(fx, xsh) ||
-			fx->isZerary() ||
-			dynamic_cast<TZeraryColumnFx *>(fx) ||
-			dynamic_cast<TMacroFx *>(fx) ||
-			dynamic_cast<TLevelColumnFx *>(fx) ||
-			dynamic_cast<TPaletteColumnFx *>(fx) ||
-			dynamic_cast<TXsheetFx *>(fx) ||
+		if (isInsideAMacroFx(fx, xsh) || fx->isZerary() || dynamic_cast<TZeraryColumnFx *>(fx) ||
+			dynamic_cast<TMacroFx *>(fx) || dynamic_cast<TLevelColumnFx *>(fx) ||
+			dynamic_cast<TPaletteColumnFx *>(fx) || dynamic_cast<TXsheetFx *>(fx) ||
 			dynamic_cast<TOutputFx *>(fx))
 			return;
 	}
@@ -1559,9 +1545,8 @@ void TFxCommand::makeMacroFx(const std::vector<TFxP> &fxs, TApplication *app)
 
 class ExplodeMacroUndo : public MakeMacroUndo
 {
-public:
-	ExplodeMacroUndo(TMacroFx *macro, TApplication *app)
-		: MakeMacroUndo(macro, app)
+  public:
+	ExplodeMacroUndo(TMacroFx *macro, TApplication *app) : MakeMacroUndo(macro, app)
 	{
 		initialize();
 	}
@@ -1577,7 +1562,7 @@ public:
 			.arg(QString::fromStdWString(m_macroFx->getFxId()));
 	}
 
-private:
+  private:
 	void initialize();
 };
 
@@ -1612,7 +1597,7 @@ class CreateOutputFxUndo : public FxCommandUndo
 	TFxP m_outputFx;
 	TXsheetHandle *m_xshHandle;
 
-public:
+  public:
 	CreateOutputFxUndo(TFx *fx, TXsheetHandle *xshHandle)
 		: m_outputFx(new TOutputFx), m_xshHandle(xshHandle)
 	{
@@ -1642,12 +1627,9 @@ public:
 
 	int getSize() const { return sizeof(*this); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Create Output Fx");
-	}
+	QString getHistoryString() { return QObject::tr("Create Output Fx"); }
 
-private:
+  private:
 	void initialize(TFx *fx)
 	{
 		TXsheet *xsh = m_xshHandle->getXsheet();
@@ -1697,11 +1679,11 @@ void TFxCommand::makeOutputFxCurrent(TFx *fx, TXsheetHandle *xshHandle)
 
 class ConnectNodesToXsheetUndo : public FxCommandUndo
 {
-protected:
+  protected:
 	std::vector<TFxP> m_fxs;
 	TXsheetHandle *m_xshHandle;
 
-public:
+  public:
 	ConnectNodesToXsheetUndo(const std::list<TFxP> &fxs, TXsheetHandle *xshHandle)
 		: m_fxs(fxs.begin(), fxs.end()), m_xshHandle(xshHandle)
 	{
@@ -1713,9 +1695,9 @@ public:
 	void redo() const
 	{
 		/*
-      Due to compatibility issues from *schematicnode.cpp files, the "do" operation must be
-      accessible without scene change notifications (see TFxCommand::setParent())
-    */
+	  Due to compatibility issues from *schematicnode.cpp files, the "do" operation must be
+	  accessible without scene change notifications (see TFxCommand::setParent())
+	*/
 
 		redo_();
 		m_xshHandle->notifyXsheetChanged();
@@ -1755,11 +1737,13 @@ public:
 		return str;
 	}
 
-protected:
+  protected:
 	ConnectNodesToXsheetUndo(const std::list<TFxP> &fxs, TXsheetHandle *xshHandle, bool)
-		: m_fxs(fxs.begin(), fxs.end()), m_xshHandle(xshHandle) {}
+		: m_fxs(fxs.begin(), fxs.end()), m_xshHandle(xshHandle)
+	{
+	}
 
-private:
+  private:
 	void initialize();
 };
 
@@ -1770,12 +1754,10 @@ void ConnectNodesToXsheetUndo::initialize()
 	TXsheet *xsh = m_xshHandle->getXsheet();
 
 	::FilterInsideAMacro filterInMacro = {xsh};
-	m_fxs.erase(std::remove_if(m_fxs.begin(), m_fxs.end(), filterInMacro),
-				m_fxs.end());
+	m_fxs.erase(std::remove_if(m_fxs.begin(), m_fxs.end(), filterInMacro), m_fxs.end());
 
 	::FilterTerminalFxs filterTerminalFxs = {xsh};
-	m_fxs.erase(std::remove_if(m_fxs.begin(), m_fxs.end(), filterTerminalFxs),
-				m_fxs.end());
+	m_fxs.erase(std::remove_if(m_fxs.begin(), m_fxs.end(), filterTerminalFxs), m_fxs.end());
 }
 
 //=============================================================
@@ -1795,9 +1777,12 @@ void TFxCommand::connectNodesToXsheet(const std::list<TFxP> &fxs, TXsheetHandle 
 
 class DisconnectNodesFromXsheetUndo : public ConnectNodesToXsheetUndo
 {
-public:
+  public:
 	DisconnectNodesFromXsheetUndo(const std::list<TFxP> &fxs, TXsheetHandle *xshHandle)
-		: ConnectNodesToXsheetUndo(fxs, xshHandle, true) { initialize(); }
+		: ConnectNodesToXsheetUndo(fxs, xshHandle, true)
+	{
+		initialize();
+	}
 
 	void redo() const { ConnectNodesToXsheetUndo::undo(); }
 	void undo() const { ConnectNodesToXsheetUndo::redo(); }
@@ -1814,7 +1799,7 @@ public:
 		return str;
 	}
 
-private:
+  private:
 	void initialize();
 };
 
@@ -1825,12 +1810,10 @@ void DisconnectNodesFromXsheetUndo::initialize()
 	TXsheet *xsh = m_xshHandle->getXsheet();
 
 	::FilterInsideAMacro filterInMacro = {xsh};
-	m_fxs.erase(std::remove_if(m_fxs.begin(), m_fxs.end(), filterInMacro),
-				m_fxs.end());
+	m_fxs.erase(std::remove_if(m_fxs.begin(), m_fxs.end(), filterInMacro), m_fxs.end());
 
 	::FilterNonTerminalFxs filterNonTerminalFxs = {xsh};
-	m_fxs.erase(std::remove_if(m_fxs.begin(), m_fxs.end(), filterNonTerminalFxs),
-				m_fxs.end());
+	m_fxs.erase(std::remove_if(m_fxs.begin(), m_fxs.end(), filterNonTerminalFxs), m_fxs.end());
 }
 
 //=============================================================
@@ -1858,18 +1841,19 @@ class DeleteLinksUndo : public FxCommandUndo
 
 	typedef std::vector<DynamicLink> DynamicLinksVector;
 
-protected:
+  protected:
 	std::list<TFxCommand::Link> m_links; //!< The input links to remove
 
-private:
-	std::list<TFxCommand::Link> m_normalLinks;			//!< Actual *common* links from m_links
-	std::list<TFx *> m_terminalFxs;						//!< Fxs connected to the xsheet (represents xsheet input links)
-														//   Why SMART pointers? No fx is deleted with this command... hmm...
-	std::map<TFx *, DynamicLinksVector> m_dynamicLinks; //!< Complete dynamic links configuration, per fx.
+  private:
+	std::list<TFxCommand::Link> m_normalLinks; //!< Actual *common* links from m_links
+	std::list<TFx *> m_terminalFxs; //!< Fxs connected to the xsheet (represents xsheet input links)
+	//   Why SMART pointers? No fx is deleted with this command... hmm...
+	std::map<TFx *, DynamicLinksVector>
+		m_dynamicLinks; //!< Complete dynamic links configuration, per fx.
 
 	TXsheetHandle *m_xshHandle;
 
-public:
+  public:
 	DeleteLinksUndo(const std::list<TFxCommand::Link> &links, TXsheetHandle *xshHandle)
 		: m_links(links), m_xshHandle(xshHandle)
 	{
@@ -1885,9 +1869,8 @@ public:
 
 	virtual QString getHistoryString();
 
-protected:
-	DeleteLinksUndo(TXsheetHandle *xshHandle)
-		: m_xshHandle(xshHandle) {}
+  protected:
+	DeleteLinksUndo(TXsheetHandle *xshHandle) : m_xshHandle(xshHandle) {}
 
 	void initialize();
 };
@@ -1905,7 +1888,9 @@ void DeleteLinksUndo::initialize()
 			TFx *inFx = ::getActualOut(link.m_inputFx.getPointer());
 			TFx *outFx = ::getActualIn(link.m_outputFx.getPointer());
 
-			return (link.m_index >= outFx->getInputPortCount()) ? true : (outFx->getInputPort(link.m_index)->getFx() != inFx);
+			return (link.m_index >= outFx->getInputPortCount())
+					   ? true
+					   : (outFx->getInputPort(link.m_index)->getFx() != inFx);
 		}
 	};
 
@@ -1914,13 +1899,12 @@ void DeleteLinksUndo::initialize()
 
 	// Forget links dealing with an open macro Fx. Note that this INCLUDES inside/outside links.
 	::FilterInsideAMacro filterInMacro = {xsh};
-	m_links.erase(std::remove_if(m_links.begin(), m_links.end(), filterInMacro),
-				  m_links.end());
+	m_links.erase(std::remove_if(m_links.begin(), m_links.end(), filterInMacro), m_links.end());
 
 	// Remove invalid links
-	m_links.erase(std::remove_if(m_links.begin(), m_links.end(),
-								 tcg::bind1st(&locals::isInvalid, fxDag)),
-				  m_links.end());
+	m_links.erase(
+		std::remove_if(m_links.begin(), m_links.end(), tcg::bind1st(&locals::isInvalid, fxDag)),
+		m_links.end());
 
 	std::list<TFxCommand::Link>::iterator lt, lEnd(m_links.end());
 	for (lt = m_links.begin(); lt != lEnd; ++lt) {
@@ -2094,8 +2078,7 @@ QString DeleteLinksUndo::getHistoryString()
 		for (ft = m_terminalFxs.begin(); ft != m_terminalFxs.end(); ++ft) {
 			if (ft != m_terminalFxs.begin())
 				str += QString(",  ");
-			str += QString("%1- -Xsheet")
-					   .arg(QString::fromStdWString((*it1)->getName()));
+			str += QString("%1- -Xsheet").arg(QString::fromStdWString((*it1)->getName()));
 		}
 	}
 
@@ -2119,7 +2102,7 @@ void deleteLinks(const std::list<TFxCommand::Link> &links, TXsheetHandle *xshHan
 
 class DeleteFxOrColumnUndo : public DeleteLinksUndo
 {
-protected:
+  protected:
 	TFxP m_fx;
 	TXshColumnP m_column;
 	int m_colIdx;
@@ -2127,15 +2110,14 @@ protected:
 	TFxP m_linkedFx;
 	std::vector<TFx *> m_nonTerminalInputs;
 
-	mutable std::auto_ptr<TStageObjectParams>
-		m_columnData;
+	mutable std::auto_ptr<TStageObjectParams> m_columnData;
 
 	TXsheetHandle *m_xshHandle;
 	TFxHandle *m_fxHandle;
 
 	using DeleteLinksUndo::m_links;
 
-public:
+  public:
 	DeleteFxOrColumnUndo(const TFxP &fx, TXsheetHandle *xshHandle, TFxHandle *fxHandle);
 	DeleteFxOrColumnUndo(int colIdx, TXsheetHandle *xshHandle, TFxHandle *fxHandle);
 
@@ -2148,21 +2130,24 @@ public:
 
 	QString getHistoryString();
 
-private:
+  private:
 	void initialize();
 };
 
 //-------------------------------------------------------------
 
-DeleteFxOrColumnUndo::DeleteFxOrColumnUndo(const TFxP &fx, TXsheetHandle *xshHandle, TFxHandle *fxHandle)
-	: DeleteLinksUndo(xshHandle), m_fx(fx), m_colIdx(-1), m_xshHandle(xshHandle), m_fxHandle(fxHandle)
+DeleteFxOrColumnUndo::DeleteFxOrColumnUndo(const TFxP &fx, TXsheetHandle *xshHandle,
+										   TFxHandle *fxHandle)
+	: DeleteLinksUndo(xshHandle), m_fx(fx), m_colIdx(-1), m_xshHandle(xshHandle),
+	  m_fxHandle(fxHandle)
 {
 	initialize();
 }
 
 //-------------------------------------------------------------
 
-DeleteFxOrColumnUndo::DeleteFxOrColumnUndo(int colIdx, TXsheetHandle *xshHandle, TFxHandle *fxHandle)
+DeleteFxOrColumnUndo::DeleteFxOrColumnUndo(int colIdx, TXsheetHandle *xshHandle,
+										   TFxHandle *fxHandle)
 	: DeleteLinksUndo(xshHandle), m_colIdx(colIdx), m_xshHandle(xshHandle), m_fxHandle(fxHandle)
 {
 	initialize();
@@ -2259,8 +2244,9 @@ void DeleteFxOrColumnUndo::initialize()
 		for (p = 0; p != ipCount; ++p) {
 			if (TFx *inputFx = ifx->getInputPort(p)->getFx()) {
 				m_links.push_back(TFxCommand::Link(inputFx, m_fx, p));
-				if (!fxDag->getTerminalFxs()->containsFx(inputFx)) // Store input fxs which DID NOT have an
-					m_nonTerminalInputs.push_back(inputFx);		   // xsheet link before the deletion
+				if (!fxDag->getTerminalFxs()->containsFx(
+						inputFx))							// Store input fxs which DID NOT have an
+					m_nonTerminalInputs.push_back(inputFx); // xsheet link before the deletion
 			}
 		}
 	}
@@ -2289,13 +2275,13 @@ void DeleteFxOrColumnUndo::redo() const
 	if (m_colIdx >= 0) {
 		assert(!m_columnData.get());
 
-		m_columnData.reset(xsh->getStageObject(TStageObjectId::ColumnId(m_colIdx)) // Cloned, ownership acquired
-							   ->getParams());									   // However, params stored there are NOT cloned.
-	}																			   // This is fine since we're deleting the column...
+		m_columnData.reset(
+			xsh->getStageObject(TStageObjectId::ColumnId(m_colIdx)) // Cloned, ownership acquired
+				->getParams()); // However, params stored there are NOT cloned.
+	}							// This is fine since we're deleting the column...
 
 	// Peform operation
-	FxCommandUndo::removeFxOrColumn(
-		xsh, m_fx.getPointer(), m_colIdx);
+	FxCommandUndo::removeFxOrColumn(xsh, m_fx.getPointer(), m_colIdx);
 
 	m_xshHandle->notifyXsheetChanged(); // Add the rest...
 }
@@ -2309,8 +2295,7 @@ void DeleteFxOrColumnUndo::undo() const
 
 		void insertColumnIn(TXsheet *xsh)
 		{
-			m_this->insertColumn(xsh, m_this->m_column.getPointer(),
-								 m_this->m_colIdx);
+			m_this->insertColumn(xsh, m_this->m_column.getPointer(), m_this->m_colIdx);
 
 			// Restore column data
 			TStageObject *sObj = xsh->getStageObject(TStageObjectId::ColumnId(m_this->m_colIdx));
@@ -2358,8 +2343,7 @@ void DeleteFxOrColumnUndo::undo() const
 
 QString DeleteFxOrColumnUndo::getHistoryString()
 {
-	return QObject::tr("Delete Fx Node : %1")
-		.arg(QString::fromStdWString(m_fx->getFxId()));
+	return QObject::tr("Delete Fx Node : %1").arg(QString::fromStdWString(m_fx->getFxId()));
 }
 
 //=============================================================
@@ -2374,7 +2358,8 @@ void deleteFxs(const std::list<TFxP> &fxs, TXsheetHandle *xshHandle, TFxHandle *
 	std::list<TFxP>::const_iterator ft, fEnd = fxs.end();
 	for (ft = fxs.begin(); ft != fEnd; ++ft) {
 		// Skip levels, as they are effectively supplied in here, AND in the deleteColumns() branch.
-		// This should NOT be performed here, though. TO BE MOVED TO deleteSelection or ABOVE, if any.
+		// This should NOT be performed here, though. TO BE MOVED TO deleteSelection or ABOVE, if
+		// any.
 		if (dynamic_cast<TLevelColumnFx *>(ft->getPointer()))
 			continue;
 
@@ -2427,7 +2412,8 @@ void deleteColumns(const std::list<int> &columns, TXsheetHandle *xshHandle, TFxH
 
 	size_t c, cCount = cols.size();
 	for (c = 0; c != cCount; ++c) {
-		std::auto_ptr<FxCommandUndo> undo(new DeleteFxOrColumnUndo(cols[c]->getIndex(), xshHandle, fxHandle));
+		std::auto_ptr<FxCommandUndo> undo(
+			new DeleteFxOrColumnUndo(cols[c]->getIndex(), xshHandle, fxHandle));
 		if (undo->isConsistent()) {
 			undo->redo();
 			undoManager->add(undo.release());
@@ -2441,10 +2427,9 @@ void deleteColumns(const std::list<int> &columns, TXsheetHandle *xshHandle, TFxH
 //    Delete Selection  command
 //**********************************************************************
 
-void TFxCommand::deleteSelection(const std::list<TFxP> &fxs,
-								 const std::list<Link> &links,
-								 const std::list<int> &columns,
-								 TXsheetHandle *xshHandle, TFxHandle *fxHandle)
+void TFxCommand::deleteSelection(const std::list<TFxP> &fxs, const std::list<Link> &links,
+								 const std::list<int> &columns, TXsheetHandle *xshHandle,
+								 TFxHandle *fxHandle)
 {
 	// Prepare selected fxs - column fxs would be done twice if the corresponding columns have
 	// been supplied for deletion too
@@ -2477,7 +2462,7 @@ void TFxCommand::deleteSelection(const std::list<TFxP> &fxs,
 
 class UndoPasteFxs : public FxCommandUndo
 {
-protected:
+  protected:
 	std::list<TFxP> m_fxs;				   //!< Fxs to be pasted
 	std::list<TXshColumnP> m_columns;	  //!< Columns to be pasted
 	std::vector<TFxCommand::Link> m_links; //!< Links to be re-established at the redo
@@ -2485,11 +2470,10 @@ protected:
 	TXsheetHandle *m_xshHandle;
 	TFxHandle *m_fxHandle;
 
-public:
+  public:
 	UndoPasteFxs(const std::list<TFxP> &fxs, const std::map<TFx *, int> &zeraryFxColumnSize,
 				 const std::list<TXshColumnP> &columns, const TPointD &pos,
-				 TXsheetHandle *xshHandle, TFxHandle *fxHandle,
-				 bool addOffset = true)
+				 TXsheetHandle *xshHandle, TFxHandle *fxHandle, bool addOffset = true)
 		: m_fxs(fxs), m_columns(columns), m_xshHandle(xshHandle), m_fxHandle(fxHandle)
 	{
 		initialize(zeraryFxColumnSize, pos, addOffset);
@@ -2504,18 +2488,18 @@ public:
 
 	QString getHistoryString();
 
-protected:
-	template <typename Func>
-	void for_each_fx(Func func) const;
+  protected:
+	template <typename Func> void for_each_fx(Func func) const;
 
-private:
-	void initialize(const std::map<TFx *, int> &zeraryFxColumnSize, const TPointD &pos, bool addOffset);
+  private:
+	void initialize(const std::map<TFx *, int> &zeraryFxColumnSize, const TPointD &pos,
+					bool addOffset);
 };
 
 //------------------------------------------------------
 
-void UndoPasteFxs::initialize(const std::map<TFx *, int> &zeraryFxColumnSize,
-							  const TPointD &pos, bool addOffset)
+void UndoPasteFxs::initialize(const std::map<TFx *, int> &zeraryFxColumnSize, const TPointD &pos,
+							  bool addOffset)
 {
 	struct locals {
 		static void buildDagPos(TFx *fromFx, TFx *toFx, bool copyPos, bool addOffset)
@@ -2577,10 +2561,11 @@ void UndoPasteFxs::initialize(const std::map<TFx *, int> &zeraryFxColumnSize,
 			zcfx->setZeraryFx(fx);
 
 			int op, opCount = fx->getOutputConnectionCount();
-			for (op = opCount - 1; op >= 0; --op)				// Output links in the zerary case were
-			{													// assigned to the *actual* zerary
-				TFxPort *outPort = fx->getOutputConnection(op); // and not to a related zerary column.
-				outPort->setFx(zcfx);							// This is an FxsData fault... BUGFIX REQUEST!
+			for (op = opCount - 1; op >= 0; --op) // Output links in the zerary case were
+			{									  // assigned to the *actual* zerary
+				TFxPort *outPort =
+					fx->getOutputConnection(op); // and not to a related zerary column.
+				outPort->setFx(zcfx);			 // This is an FxsData fault... BUGFIX REQUEST!
 			}
 
 			zcfx->getAttributes()->setDagNodePos(fx->getAttributes()->getDagNodePos());
@@ -2620,7 +2605,8 @@ void UndoPasteFxs::initialize(const std::map<TFx *, int> &zeraryFxColumnSize,
 	}
 
 	// Filter columns
-	m_columns.erase(std::remove_if(m_columns.begin(), m_columns.end(), tcg::bind1st(&locals::circularSubxsheet, xsh)),
+	m_columns.erase(std::remove_if(m_columns.begin(), m_columns.end(),
+								   tcg::bind1st(&locals::circularSubxsheet, xsh)),
 					m_columns.end());
 
 	// Initialize columns
@@ -2703,9 +2689,8 @@ void UndoPasteFxs::redo() const
 	std::list<TXshColumnP>::const_iterator ct, cEnd = m_columns.end();
 	for (ct = m_columns.begin(); ct != cEnd; ++ct) {
 		// Insert them
-		FxCommandUndo::insertColumn(
-			xsh, ct->getPointer(), xsh->getFirstFreeColumnIndex(),
-			true, false);
+		FxCommandUndo::insertColumn(xsh, ct->getPointer(), xsh->getFirstFreeColumnIndex(), true,
+									false);
 	}
 
 	// Restore links
@@ -2726,15 +2711,14 @@ void UndoPasteFxs::undo() const
 	for (ft = m_fxs.begin(); ft != fEnd; ++ft) {
 		TFx *fx = ft->getPointer();
 
-		FxCommandUndo::removeFxOrColumn(xsh, fx, -1,
-										true, false); // Skip parameter links removal
+		FxCommandUndo::removeFxOrColumn(xsh, fx, -1, true, false); // Skip parameter links removal
 		FxCommandUndo::makeNotCurrent(m_fxHandle, fx);
 	}
 
 	std::list<TXshColumnP>::const_iterator ct, cEnd = m_columns.end();
 	for (ct = m_columns.begin(); ct != cEnd; ++ct) {
-		FxCommandUndo::removeFxOrColumn(xsh, 0, (*ct)->getIndex(),
-										true, false); // Skip parameter links removal
+		FxCommandUndo::removeFxOrColumn(xsh, 0, (*ct)->getIndex(), true,
+										false); // Skip parameter links removal
 		FxCommandUndo::makeNotCurrent(m_fxHandle, (*ct)->getFx());
 	}
 
@@ -2743,8 +2727,7 @@ void UndoPasteFxs::undo() const
 
 //------------------------------------------------------
 
-template <typename Func>
-void UndoPasteFxs::for_each_fx(Func func) const
+template <typename Func> void UndoPasteFxs::for_each_fx(Func func) const
 {
 	std::list<TFxP>::const_iterator ft, fEnd = m_fxs.end();
 	for (ft = m_fxs.begin(); ft != fEnd; ++ft)
@@ -2765,20 +2748,20 @@ QString UndoPasteFxs::getHistoryString()
 	for (it = m_fxs.begin(); it != m_fxs.end(); it++) {
 		if (it != m_fxs.begin())
 			str += QString(",  ");
-		str += QString("%1")
-				   .arg(QString::fromStdWString((*it)->getName()));
+		str += QString("%1").arg(QString::fromStdWString((*it)->getName()));
 	}
 	return str;
 }
 
 //=============================================================
 
-void TFxCommand::pasteFxs(const std::list<TFxP> &fxs, const std::map<TFx *, int> &zeraryFxColumnSize,
+void TFxCommand::pasteFxs(const std::list<TFxP> &fxs,
+						  const std::map<TFx *, int> &zeraryFxColumnSize,
 						  const std::list<TXshColumnP> &columns, const TPointD &pos,
 						  TXsheetHandle *xshHandle, TFxHandle *fxHandle)
 {
-	std::auto_ptr<FxCommandUndo> undo(new UndoPasteFxs(
-		fxs, zeraryFxColumnSize, columns, pos, xshHandle, fxHandle));
+	std::auto_ptr<FxCommandUndo> undo(
+		new UndoPasteFxs(fxs, zeraryFxColumnSize, columns, pos, xshHandle, fxHandle));
 	if (undo->isConsistent()) {
 		undo->redo();
 		TUndoManager::manager()->add(undo.release());
@@ -2791,14 +2774,15 @@ void TFxCommand::pasteFxs(const std::list<TFxP> &fxs, const std::map<TFx *, int>
 
 class UndoAddPasteFxs : public UndoPasteFxs
 {
-protected:
+  protected:
 	TFxCommand::Link m_linkIn; //!< Input link to be re-established on redo
 
-public:
-	UndoAddPasteFxs(TFx *inFx, const std::list<TFxP> &fxs, const std::map<TFx *, int> &zeraryFxColumnSize,
-					const std::list<TXshColumnP> &columns, TXsheetHandle *xshHandle, TFxHandle *fxHandle)
-		: UndoPasteFxs(fxs, zeraryFxColumnSize, columns, TConst::nowhere,
-					   xshHandle, fxHandle)
+  public:
+	UndoAddPasteFxs(TFx *inFx, const std::list<TFxP> &fxs,
+					const std::map<TFx *, int> &zeraryFxColumnSize,
+					const std::list<TXshColumnP> &columns, TXsheetHandle *xshHandle,
+					TFxHandle *fxHandle)
+		: UndoPasteFxs(fxs, zeraryFxColumnSize, columns, TConst::nowhere, xshHandle, fxHandle)
 	{
 		initialize(inFx);
 	}
@@ -2807,7 +2791,7 @@ public:
 
 	int getSize() const { return sizeof(*this); }
 
-private:
+  private:
 	void initialize(TFx *inFx);
 };
 
@@ -2861,11 +2845,13 @@ void UndoAddPasteFxs::redo() const
 
 //=============================================================
 
-void TFxCommand::addPasteFxs(TFx *inFx, const std::list<TFxP> &fxs, const std::map<TFx *, int> &zeraryFxColumnSize,
-							 const std::list<TXshColumnP> &columns, TXsheetHandle *xshHandle, TFxHandle *fxHandle)
+void TFxCommand::addPasteFxs(TFx *inFx, const std::list<TFxP> &fxs,
+							 const std::map<TFx *, int> &zeraryFxColumnSize,
+							 const std::list<TXshColumnP> &columns, TXsheetHandle *xshHandle,
+							 TFxHandle *fxHandle)
 {
-	std::auto_ptr<FxCommandUndo> undo(new UndoAddPasteFxs(
-		inFx, fxs, zeraryFxColumnSize, columns, xshHandle, fxHandle));
+	std::auto_ptr<FxCommandUndo> undo(
+		new UndoAddPasteFxs(inFx, fxs, zeraryFxColumnSize, columns, xshHandle, fxHandle));
 	if (undo->isConsistent()) {
 		// NOTE: (inFx == 0) is considered consistent, as long as UndoPasteFxs::isConsistent()
 		undo->redo();
@@ -2881,12 +2867,13 @@ class UndoInsertPasteFxs : public UndoAddPasteFxs
 {
 	TFxCommand::Link m_linkOut; //!< Output link to be re-established
 								//!< on redo
-public:
+  public:
 	UndoInsertPasteFxs(const TFxCommand::Link &link, const std::list<TFxP> &fxs,
 					   const std::map<TFx *, int> &zeraryFxColumnSize,
-					   const std::list<TXshColumnP> &columns,
-					   TXsheetHandle *xshHandle, TFxHandle *fxHandle)
-		: UndoAddPasteFxs(link.m_inputFx.getPointer(), fxs, zeraryFxColumnSize, columns, xshHandle, fxHandle)
+					   const std::list<TXshColumnP> &columns, TXsheetHandle *xshHandle,
+					   TFxHandle *fxHandle)
+		: UndoAddPasteFxs(link.m_inputFx.getPointer(), fxs, zeraryFxColumnSize, columns, xshHandle,
+						  fxHandle)
 	{
 		initialize(link);
 	}
@@ -2896,7 +2883,7 @@ public:
 
 	int getSize() const { return sizeof(*this); }
 
-private:
+  private:
 	void initialize(const TFxCommand::Link &link);
 };
 
@@ -2955,12 +2942,13 @@ void UndoInsertPasteFxs::undo() const
 
 //=============================================================
 
-void TFxCommand::insertPasteFxs(
-	const Link &link, const std::list<TFxP> &fxs, const std::map<TFx *, int> &zeraryFxColumnSize,
-	const std::list<TXshColumnP> &columns, TXsheetHandle *xshHandle, TFxHandle *fxHandle)
+void TFxCommand::insertPasteFxs(const Link &link, const std::list<TFxP> &fxs,
+								const std::map<TFx *, int> &zeraryFxColumnSize,
+								const std::list<TXshColumnP> &columns, TXsheetHandle *xshHandle,
+								TFxHandle *fxHandle)
 {
-	std::auto_ptr<FxCommandUndo> undo(new UndoInsertPasteFxs(
-		link, fxs, zeraryFxColumnSize, columns, xshHandle, fxHandle));
+	std::auto_ptr<FxCommandUndo> undo(
+		new UndoInsertPasteFxs(link, fxs, zeraryFxColumnSize, columns, xshHandle, fxHandle));
 	if (undo->isConsistent()) {
 		undo->redo();
 		TUndoManager::manager()->add(undo.release());
@@ -2977,22 +2965,28 @@ class UndoReplacePasteFxs : public UndoAddPasteFxs
 
 	TFx *m_fx, *m_rightmostFx;
 
-public:
-	UndoReplacePasteFxs(TFx *fx, const std::list<TFxP> &fxs, const std::map<TFx *, int> &zeraryFxColumnSize,
-						const std::list<TXshColumnP> &columns, TXsheetHandle *xshHandle, TFxHandle *fxHandle)
-		: UndoAddPasteFxs(inFx(fx), fxs, zeraryFxColumnSize, columns, xshHandle, fxHandle), m_deleteFxUndo(new DeleteFxOrColumnUndo(fx, xshHandle, fxHandle)), m_fx(fx), m_rightmostFx()
+  public:
+	UndoReplacePasteFxs(TFx *fx, const std::list<TFxP> &fxs,
+						const std::map<TFx *, int> &zeraryFxColumnSize,
+						const std::list<TXshColumnP> &columns, TXsheetHandle *xshHandle,
+						TFxHandle *fxHandle)
+		: UndoAddPasteFxs(inFx(fx), fxs, zeraryFxColumnSize, columns, xshHandle, fxHandle),
+		  m_deleteFxUndo(new DeleteFxOrColumnUndo(fx, xshHandle, fxHandle)), m_fx(fx),
+		  m_rightmostFx()
 	{
 		initialize();
 	}
 
-	bool isConsistent() const { return UndoAddPasteFxs::isConsistent() &&
-									   m_deleteFxUndo->isConsistent(); }
+	bool isConsistent() const
+	{
+		return UndoAddPasteFxs::isConsistent() && m_deleteFxUndo->isConsistent();
+	}
 	void redo() const;
 	void undo() const;
 
 	int getSize() const { return sizeof(*this); }
 
-private:
+  private:
 	static TFx *inFx(const TFx *fx)
 	{
 		return (fx && fx->getInputPortCount() > 0) ? fx->getInputPort(0)->getFx() : 0;
@@ -3075,10 +3069,13 @@ void UndoReplacePasteFxs::undo() const
 
 //=============================================================
 
-void TFxCommand::replacePasteFxs(TFx *inFx, const std::list<TFxP> &fxs, const std::map<TFx *, int> &zeraryFxColumnSize,
-								 const std::list<TXshColumnP> &columns, TXsheetHandle *xshHandle, TFxHandle *fxHandle)
+void TFxCommand::replacePasteFxs(TFx *inFx, const std::list<TFxP> &fxs,
+								 const std::map<TFx *, int> &zeraryFxColumnSize,
+								 const std::list<TXshColumnP> &columns, TXsheetHandle *xshHandle,
+								 TFxHandle *fxHandle)
 {
-	std::auto_ptr<FxCommandUndo> undo(new UndoReplacePasteFxs(inFx, fxs, zeraryFxColumnSize, columns, xshHandle, fxHandle));
+	std::auto_ptr<FxCommandUndo> undo(
+		new UndoReplacePasteFxs(inFx, fxs, zeraryFxColumnSize, columns, xshHandle, fxHandle));
 	if (undo->isConsistent()) {
 		undo->redo();
 		TUndoManager::manager()->add(undo.release());
@@ -3091,7 +3088,7 @@ void TFxCommand::replacePasteFxs(TFx *inFx, const std::list<TFxP> &fxs, const st
 
 class UndoDisconnectFxs : public FxCommandUndo
 {
-protected:
+  protected:
 	std::list<TFxP> m_fxs;
 	TFx *m_leftFx, *m_rightFx;
 
@@ -3102,7 +3099,7 @@ protected:
 
 	TXsheetHandle *m_xshHandle;
 
-public:
+  public:
 	UndoDisconnectFxs(const std::list<TFxP> &fxs, const QList<QPair<TFxP, TPointD>> &oldFxPos,
 					  TXsheetHandle *xshHandle)
 		: m_fxs(fxs), m_xshHandle(xshHandle), m_undoDagPos(oldFxPos.begin(), oldFxPos.end())
@@ -3117,12 +3114,9 @@ public:
 
 	int getSize() const { return sizeof(*this); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Disconnect Fx");
-	}
+	QString getHistoryString() { return QObject::tr("Disconnect Fx"); }
 
-private:
+  private:
 	void initialize();
 
 	static void applyPos(const QPair<TFxP, TPointD> &pair)
@@ -3183,11 +3177,11 @@ void UndoDisconnectFxs::initialize()
 	std::vector<TFxCommand::Link>::const_iterator lt, lEnd = m_undoLinksIn.end();
 	for (lt = m_undoLinksIn.begin(); lt != lEnd; ++lt)
 		if (fxDag->getTerminalFxs()->containsFx(lt->m_inputFx.getPointer()))
-			m_undoTerminalLinks.push_back(TFxCommand::Link(lt->m_inputFx.getPointer(), fxDag->getXsheetFx(), -1));
+			m_undoTerminalLinks.push_back(
+				TFxCommand::Link(lt->m_inputFx.getPointer(), fxDag->getXsheetFx(), -1));
 
-	std::vector<QPair<TFxP, TPointD>>(
-		tcg::make_cast_it(m_undoDagPos.begin(), &locals::originalPos),
-		tcg::make_cast_it(m_undoDagPos.end(), &locals::originalPos))
+	std::vector<QPair<TFxP, TPointD>>(tcg::make_cast_it(m_undoDagPos.begin(), &locals::originalPos),
+									  tcg::make_cast_it(m_undoDagPos.end(), &locals::originalPos))
 		.swap(m_redoDagPos);
 }
 
@@ -3258,11 +3252,11 @@ class UndoConnectFxs : public UndoDisconnectFxs
 {
 	struct GroupData;
 
-private:
+  private:
 	TFxCommand::Link m_link;
 	std::vector<GroupData> m_undoGroupDatas;
 
-public:
+  public:
 	UndoConnectFxs(const TFxCommand::Link &link, const std::list<TFxP> &fxs,
 				   const QList<QPair<TFxP, TPointD>> &fxPos, TXsheetHandle *xshHandle)
 		: UndoDisconnectFxs(fxs, fxPos, xshHandle), m_link(link)
@@ -3279,7 +3273,7 @@ public:
 
 	QString getHistoryString();
 
-private:
+  private:
 	void initialize();
 
 	static void applyPos(const QPair<TFxP, TPointD> &pair)
@@ -3296,7 +3290,7 @@ struct UndoConnectFxs::GroupData {
 	QStack<std::wstring> m_groupNames;
 	int m_editingGroup;
 
-public:
+  public:
 	GroupData(TFx *fx);
 	void restore() const;
 };
@@ -3304,7 +3298,9 @@ public:
 //------------------------------------------------------
 
 UndoConnectFxs::GroupData::GroupData(TFx *fx)
-	: m_fx(fx), m_groupIds(fx->getAttributes()->getGroupIdStack()), m_groupNames(fx->getAttributes()->getGroupNameStack()), m_editingGroup(fx->getAttributes()->getEditingGroupId())
+	: m_fx(fx), m_groupIds(fx->getAttributes()->getGroupIdStack()),
+	  m_groupNames(fx->getAttributes()->getGroupNameStack()),
+	  m_editingGroup(fx->getAttributes()->getEditingGroupId())
 {
 }
 
@@ -3325,9 +3321,7 @@ void UndoConnectFxs::initialize()
 	if (!UndoDisconnectFxs::isConsistent())
 		return;
 
-	TCG_ASSERT(m_link.m_inputFx && m_link.m_outputFx,
-			   m_fxs.clear();
-			   return );
+	TCG_ASSERT(m_link.m_inputFx && m_link.m_outputFx, m_fxs.clear(); return );
 
 	// Store sensible original data for the undo
 	m_undoGroupDatas.reserve(m_fxs.size());
@@ -3415,7 +3409,7 @@ class SetParentUndo : public FxCommandUndo
 
 	TXsheetHandle *m_xshHandle;
 
-public:
+  public:
 	SetParentUndo(TFx *fx, TFx *parentFx, int parentFxPort, TXsheetHandle *xshHandle)
 		: m_newFx(fx), m_parentFx(parentFx), m_parentPort(parentFxPort), m_xshHandle(xshHandle)
 	{
@@ -3430,7 +3424,7 @@ public:
 
 	int getSize() const { return sizeof(*this); }
 
-private:
+  private:
 	void initialize();
 };
 
@@ -3453,13 +3447,15 @@ void SetParentUndo::initialize()
 
 	m_oldFx = parentFx->getInputPort(m_parentPort)->getFx();
 
-	m_removeFromXsheet =											  // This is a bit odd. The legacy behavior of the
-		(m_newFx &&													  // setParent() (ie connect 2 fxs with a link, I know
-		 (m_newFx->getOutputConnectionCount() == 0) &&				  // the name is bad) command is that of *removing terminal
-		 fxDag->getTerminalFxs()->containsFx(m_newFx.getPointer()) && // links* on the input fx (m_newFx in our case).
-		 m_parentFx != fxDag->getXsheetFx());						  // I've retained this behavior since it can be handy
-																	  // for users, but only if the xsheet link is the SOLE output
-	if (::isInsideAMacroFx(m_parentFx.getPointer(), xsh) ||			  // link.
+	m_removeFromXsheet = // This is a bit odd. The legacy behavior of the
+		(m_newFx &&		 // setParent() (ie connect 2 fxs with a link, I know
+		 (m_newFx->getOutputConnectionCount() ==
+		  0) && // the name is bad) command is that of *removing terminal
+		 fxDag->getTerminalFxs()->containsFx(
+			 m_newFx.getPointer()) &&		  // links* on the input fx (m_newFx in our case).
+		 m_parentFx != fxDag->getXsheetFx()); // I've retained this behavior since it can be handy
+	// for users, but only if the xsheet link is the SOLE output
+	if (::isInsideAMacroFx(m_parentFx.getPointer(), xsh) || // link.
 		::isInsideAMacroFx(m_oldFx.getPointer(), xsh) ||
 		::isInsideAMacroFx(m_newFx.getPointer(), xsh))
 		m_parentFx = TFxP();
@@ -3470,8 +3466,8 @@ void SetParentUndo::initialize()
 void SetParentUndo::redo() const
 {
 	/*
-    Due to compatibility issues from *schematicnode.cpp files, the "do" operation cannot
-    signal changes to the scene/xsheet... but the *re*do must.
+	Due to compatibility issues from *schematicnode.cpp files, the "do" operation cannot
+	signal changes to the scene/xsheet... but the *re*do must.
   */
 
 	redo_();
@@ -3511,7 +3507,8 @@ void SetParentUndo::undo() const
 void TFxCommand::setParent(TFx *fx, TFx *parentFx, int parentFxPort, TXsheetHandle *xshHandle)
 {
 	if (dynamic_cast<TXsheetFx *>(parentFx) || parentFxPort < 0) {
-		std::auto_ptr<ConnectNodesToXsheetUndo> undo(new ConnectNodesToXsheetUndo(std::list<TFxP>(1, fx), xshHandle));
+		std::auto_ptr<ConnectNodesToXsheetUndo> undo(
+			new ConnectNodesToXsheetUndo(std::list<TFxP>(1, fx), xshHandle));
 		if (undo->isConsistent()) {
 			undo->redo_();
 			TUndoManager::manager()->add(undo.release());
@@ -3536,9 +3533,13 @@ class UndoRenameFx : public FxCommandUndo
 
 	TXsheetHandle *m_xshHandle;
 
-public:
+  public:
 	UndoRenameFx(TFx *fx, const std::wstring &newName, TXsheetHandle *xshHandle)
-		: m_fx(fx), m_newName(newName), m_oldName(::getActualIn(fx)->getName()), m_xshHandle(xshHandle) { assert(fx); }
+		: m_fx(fx), m_newName(newName), m_oldName(::getActualIn(fx)->getName()),
+		  m_xshHandle(xshHandle)
+	{
+		assert(fx);
+	}
 
 	bool isConsistent() const { return true; }
 
@@ -3548,10 +3549,7 @@ public:
 		m_xshHandle->notifyXsheetChanged();
 	}
 
-	void redo_() const
-	{
-		::getActualIn(m_fx.getPointer())->setName(m_newName);
-	}
+	void redo_() const { ::getActualIn(m_fx.getPointer())->setName(m_newName); }
 
 	void undo() const
 	{
@@ -3589,22 +3587,21 @@ void TFxCommand::renameFx(TFx *fx, const std::wstring &newName, TXsheetHandle *x
 
 class UndoGroupFxs : public FxCommandUndo
 {
-public:
+  public:
 	struct GroupData {
 		TFxP m_fx;
 		mutable int m_groupIndex; //! AKA group \a position (not \a id).
 
-		GroupData(const TFxP &fx, int groupIdx = -1)
-			: m_fx(fx), m_groupIndex(groupIdx) {}
+		GroupData(const TFxP &fx, int groupIdx = -1) : m_fx(fx), m_groupIndex(groupIdx) {}
 	};
 
-protected:
+  protected:
 	std::vector<GroupData> m_groupData;
 	int m_groupId;
 
 	TXsheetHandle *m_xshHandle;
 
-public:
+  public:
 	UndoGroupFxs(const std::list<TFxP> &fxs, TXsheetHandle *xshHandle)
 		: m_groupData(fxs.begin(), fxs.end()), m_xshHandle(xshHandle)
 	{
@@ -3618,16 +3615,14 @@ public:
 
 	int getSize() const { return sizeof(*this); }
 
-	virtual QString getHistoryString()
+	virtual QString getHistoryString() { return QObject::tr("Group Fx"); }
+
+  protected:
+	UndoGroupFxs(int groupId, TXsheetHandle *xshHandle) : m_groupId(groupId), m_xshHandle(xshHandle)
 	{
-		return QObject::tr("Group Fx");
 	}
 
-protected:
-	UndoGroupFxs(int groupId, TXsheetHandle *xshHandle)
-		: m_groupId(groupId), m_xshHandle(xshHandle) {}
-
-private:
+  private:
 	void initialize();
 };
 
@@ -3649,9 +3644,8 @@ void UndoGroupFxs::initialize()
 	m_groupId = fxDag->getNewGroupId();
 
 	// The xsheet fx must never be grouped
-	m_groupData.erase(
-		std::remove_if(m_groupData.begin(), m_groupData.end(), &locals::isXsheetFx),
-		m_groupData.end());
+	m_groupData.erase(std::remove_if(m_groupData.begin(), m_groupData.end(), &locals::isXsheetFx),
+					  m_groupData.end());
 
 	// Scan for macro fxs. A macro's internal fxs must be added to the group data, too
 	// Yep, this is one of the few fx commands that do not require macro explosion.
@@ -3718,9 +3712,8 @@ void TFxCommand::groupFxs(const std::list<TFxP> &fxs, TXsheetHandle *xshHandle)
 
 class UndoUngroupFxs : public UndoGroupFxs
 {
-public:
-	UndoUngroupFxs(int groupId, TXsheetHandle *xshHandle)
-		: UndoGroupFxs(groupId, xshHandle)
+  public:
+	UndoUngroupFxs(int groupId, TXsheetHandle *xshHandle) : UndoGroupFxs(groupId, xshHandle)
 	{
 		initialize();
 	}
@@ -3728,12 +3721,9 @@ public:
 	void redo() const { UndoGroupFxs::undo(); }
 	void undo() const { UndoGroupFxs::redo(); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Ungroup Fx");
-	}
+	QString getHistoryString() { return QObject::tr("Ungroup Fx"); }
 
-private:
+  private:
 	void initialize();
 };
 
@@ -3818,8 +3808,9 @@ class UndoRenameGroup : public FxCommandUndo
 
 	TXsheetHandle *m_xshHandle;
 
-public:
-	UndoRenameGroup(const std::list<TFxP> &fxs, const std::wstring &newGroupName, bool fromEditor, TXsheetHandle *xshHandle)
+  public:
+	UndoRenameGroup(const std::list<TFxP> &fxs, const std::wstring &newGroupName, bool fromEditor,
+					TXsheetHandle *xshHandle)
 		: m_groupData(fxs.begin(), fxs.end()), m_newGroupName(newGroupName), m_xshHandle(xshHandle)
 	{
 		initialize(fromEditor);
@@ -3841,7 +3832,7 @@ public:
 			.arg(QString::fromStdWString(m_newGroupName));
 	}
 
-private:
+  private:
 	void initialize(bool fromEditor);
 };
 
@@ -3850,7 +3841,10 @@ private:
 void UndoRenameGroup::initialize(bool fromEditor)
 {
 	struct locals {
-		inline static bool isInvalid(const UndoGroupFxs::GroupData &gd) { return (gd.m_groupIndex < 0); }
+		inline static bool isInvalid(const UndoGroupFxs::GroupData &gd)
+		{
+			return (gd.m_groupIndex < 0);
+		}
 	};
 
 	if (!m_groupData.empty()) {
@@ -3905,8 +3899,8 @@ void UndoRenameGroup::undo() const
 
 //======================================================
 
-void TFxCommand::renameGroup(const std::list<TFxP> &fxs, const std::wstring &name,
-							 bool fromEditor, TXsheetHandle *xshHandle)
+void TFxCommand::renameGroup(const std::list<TFxP> &fxs, const std::wstring &name, bool fromEditor,
+							 TXsheetHandle *xshHandle)
 {
 	std::auto_ptr<UndoRenameGroup> undo(new UndoRenameGroup(fxs, name, fromEditor, xshHandle));
 	if (undo->isConsistent()) {

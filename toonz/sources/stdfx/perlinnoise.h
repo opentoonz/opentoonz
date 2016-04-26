@@ -6,10 +6,7 @@
 #include "tfxparam.h"
 #include "tspectrumparam.h"
 
-enum {
-	PNOISE_CLOUDS,
-	PNOISE_WOODS
-};
+enum { PNOISE_CLOUDS, PNOISE_WOODS };
 
 class PerlinNoise
 {
@@ -21,7 +18,7 @@ class PerlinNoise
 	std::unique_ptr<float[]> Noise;
 	double LinearNoise(double x, double y, double t);
 
-public:
+  public:
 	PerlinNoise();
 	double Turbolence(double u, double v, double k, double grain);
 	double Turbolence(double u, double v, double k, double grain, double min, double max);
@@ -29,16 +26,7 @@ public:
 	double Marble(double u, double v, double k, double grain, double min, double max);
 };
 /*---------------------------------------------------------------------------*/
-void doClouds(
-	const TRasterP &ras,
-	const TSpectrumParamP colors,
-	TPointD pos,
-	double evolution,
-	double size,
-	double min,
-	double max,
-	int type,
-	double scale,
-	double frame);
+void doClouds(const TRasterP &ras, const TSpectrumParamP colors, TPointD pos, double evolution,
+			  double size, double min, double max, int type, double scale, double frame);
 
 #endif

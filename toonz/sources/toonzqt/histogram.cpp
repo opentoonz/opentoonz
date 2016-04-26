@@ -51,8 +51,8 @@ void computeRGBMValues32(const TRaster32P &ras, int (*rgbmValues)[256])
 
 	for (y = 0; y < ly; ++y)
 		for (pix = ras->pixels(y), endPix = pix + lx; pix < endPix; ++pix) {
-			//NOTE: The insertion order is related to the way channels are
-			//displayed inside the histogram's QStackedWidget instance
+			// NOTE: The insertion order is related to the way channels are
+			// displayed inside the histogram's QStackedWidget instance
 			if (pix->m) {
 				++rgbmValues[0][pix->r];
 				++rgbmValues[1][pix->g];
@@ -71,8 +71,8 @@ void computeRGBMValues64(const TRaster64P &ras, int (*rgbmValues)[256])
 
 	for (y = 0; y < ly; ++y)
 		for (pix = ras->pixels(y), endPix = pix + lx; pix < endPix; ++pix) {
-			//NOTE: The insertion order is related to the way channels are
-			//displayed inside the histogram's QStackedWidget instance
+			// NOTE: The insertion order is related to the way channels are
+			// displayed inside the histogram's QStackedWidget instance
 			if (pix->m) {
 				++rgbmValues[0][pix->r >> 8];
 				++rgbmValues[1][pix->g >> 8];
@@ -128,11 +128,10 @@ void computeRGBM(int (*channelValues)[256], int *rgbmValues)
 	int i;
 	for (i = 0; i < 256; ++i)
 		rgbmValues[i] =
-			channelValues[0][i] + channelValues[1][i] +
-			channelValues[2][i] + channelValues[3][i];
+			channelValues[0][i] + channelValues[1][i] + channelValues[2][i] + channelValues[3][i];
 }
 
-} //namespace
+} // namespace
 
 //=============================================================================
 // HistogramGraph
@@ -252,14 +251,15 @@ void HistogramGraph::paintEvent(QPaintEvent *event)
 //-----------------------------------------------------------------------------
 
 ChannelBar::ChannelBar(QWidget *parent, QColor color, bool isHorizontal)
-	: QWidget(parent), m_color(color), m_isHorizontal(isHorizontal), m_colorBarLength(13), m_drawNumbers(true)
+	: QWidget(parent), m_color(color), m_isHorizontal(isHorizontal), m_colorBarLength(13),
+	  m_drawNumbers(true)
 {
 	int d = 256 + HistogramGraph::drawMargin * 2 + 2;
 
 	if (m_isHorizontal)
 		setMinimumWidth(d);
 	else
-		setFixedHeight(d); //La barra verticale ha la size fissa
+		setFixedHeight(d); // La barra verticale ha la size fissa
 
 	setDrawNumbers(m_drawNumbers);
 
@@ -287,7 +287,7 @@ void ChannelBar::setDrawNumbers(bool onOff)
 
 void ChannelBar::draw(QPainter *p, QPoint translation)
 {
-	//Calcolo i parametri necessari al draw a seconda del caso in cui mi trovo.
+	// Calcolo i parametri necessari al draw a seconda del caso in cui mi trovo.
 	int space = HistogramGraph::drawMargin;
 	int w, h, x0, y0;
 	QRect rect;
@@ -359,11 +359,10 @@ void ChannelBar::paintEvent(QPaintEvent *event)
 // HistogramView
 //-----------------------------------------------------------------------------
 
-HistogramView::HistogramView(QWidget *parent, QColor color)
-	: QWidget(parent), m_drawnWidget(parent)
+HistogramView::HistogramView(QWidget *parent, QColor color) : QWidget(parent), m_drawnWidget(parent)
 {
-	setMinimumWidth(256 + 10 * 2 + 2);  //10 == margin of internal widget
-	setMinimumHeight(120 + 10 * 2 + 2); //10 == margin of internal widget
+	setMinimumWidth(256 + 10 * 2 + 2); // 10 == margin of internal widget
+	setMinimumHeight(120 + 10 * 2 + 2); // 10 == margin of internal widget
 
 	QVBoxLayout *mainLayout = new QVBoxLayout(this);
 	mainLayout->setMargin(0);
@@ -399,7 +398,8 @@ void HistogramView::setValues(const int values[])
 void HistogramView::draw(QPainter *painter, QPoint translation)
 {
 	m_histogramGraph->draw(painter, translation);
-	m_colorBar->draw(painter, QPoint(translation.x(), translation.y() + m_histogramGraph->getHeight() + 17));
+	m_colorBar->draw(painter,
+					 QPoint(translation.x(), translation.y() + m_histogramGraph->getHeight() + 17));
 }
 
 //-----------------------------------------------------------------------------
@@ -413,7 +413,8 @@ HistogramView::~HistogramView()
 //-----------------------------------------------------------------------------
 
 Histograms::Histograms(QWidget *parent, bool rgba)
-	: QStackedWidget(parent), m_raster(0), m_palette(0), m_computeAlsoRGBA(rgba), m_channelsCount(rgba ? 6 : 5)
+	: QStackedWidget(parent), m_raster(0), m_palette(0), m_computeAlsoRGBA(rgba),
+	  m_channelsCount(rgba ? 6 : 5)
 {
 	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
 
@@ -526,8 +527,7 @@ HistogramView *Histograms::getHistogramView(int indexType) const
 // Histogram
 //-----------------------------------------------------------------------------
 
-Histogram::Histogram(QWidget *parent)
-	: QWidget(parent)
+Histogram::Histogram(QWidget *parent) : QWidget(parent)
 {
 	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
 
@@ -566,7 +566,8 @@ Histogram::Histogram(QWidget *parent)
 	m_histograms->setCurrentIndex(0);
 	mainLayout->addWidget(m_histograms);
 
-	connect(m_channelsListBox, SIGNAL(currentIndexChanged(int)), m_histograms, SLOT(setCurrentIndex(int)));
+	connect(m_channelsListBox, SIGNAL(currentIndexChanged(int)), m_histograms,
+			SLOT(setCurrentIndex(int)));
 	connect(logScaleButton, SIGNAL(toggled(bool)), this, SLOT(setLogScale(bool)));
 
 	updateChannelsList();

@@ -30,28 +30,28 @@
 
 
   {
-    Tofstream os(path);
-    os << "ok";
+	Tofstream os(path);
+	os << "ok";
   }
   {
-    Tofstream os(path);
-    int fd = os.fd();
-    _write(fd,"ok",2);
-  }
-
-  {
-    Tofstream os(path);
-    FILE *chan = fdopen(_dup(os.fd()),"wb");
-    fprintf(chan, "ok");
-    int ret = fclose(chan);
-    assert(ret==0);
+	Tofstream os(path);
+	int fd = os.fd();
+	_write(fd,"ok",2);
   }
 
   {
-    FILE *chan = fopen(path, mode);
-    fprintf(chan, "ok");
-    int ret = fclose(chan);
-    assert(ret==0);
+	Tofstream os(path);
+	FILE *chan = fdopen(_dup(os.fd()),"wb");
+	fprintf(chan, "ok");
+	int ret = fclose(chan);
+	assert(ret==0);
+  }
+
+  {
+	FILE *chan = fopen(path, mode);
+	fprintf(chan, "ok");
+	int ret = fclose(chan);
+	assert(ret==0);
   }
 
 
@@ -63,7 +63,7 @@ class DVAPI Tifstream : public std::ifstream
 {
 	FILE *m_file;
 
-public:
+  public:
 	Tifstream(const TFilePath &fp);
 	~Tifstream();
 	bool isOpen() const;
@@ -74,7 +74,7 @@ class DVAPI Tofstream : public std::ofstream
 {
 	FILE *m_file;
 
-public:
+  public:
 	Tofstream(const TFilePath &fp, bool append_existing = false);
 
 	~Tofstream();

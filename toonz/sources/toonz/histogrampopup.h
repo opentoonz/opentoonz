@@ -17,10 +17,10 @@ class HistogramPopup : public QDialog
 {
 	Q_OBJECT
 
-protected:
+  protected:
 	ComboHistogram *m_histogram;
 
-public:
+  public:
 	HistogramPopup(QString title = "");
 
 	void setTitle(QString title);
@@ -39,14 +39,14 @@ class ViewerHistogramPopup : public HistogramPopup
 {
 	Q_OBJECT
 
-public:
+  public:
 	ViewerHistogramPopup();
 
-protected:
+  protected:
 	void showEvent(QShowEvent *e);
 	void hideEvent(QHideEvent *e);
 
-protected slots:
+  protected slots:
 	void setCurrentRaster();
 };
 

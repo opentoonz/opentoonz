@@ -70,14 +70,16 @@ bool SavePresetPopup::apply()
 	std::wstring name = m_nameFld->text().toStdWString();
 	if (name.empty())
 		return 0;
-	TFilePath fp = ToonzFolder::getFxPresetFolder() + "presets" + fx->getFxType() + (name + (isMacro ? L".macrofx" : L".fx"));
+	TFilePath fp = ToonzFolder::getFxPresetFolder() + "presets" + fx->getFxType() +
+				   (name + (isMacro ? L".macrofx" : L".fx"));
 	if (!TFileStatus(fp.getParentDir()).doesExist()) {
 		try {
 			TFilePath parent = fp.getParentDir();
 			TSystem::mkDir(parent);
 			DvDirModel::instance()->refreshFolder(parent.getParentDir());
 		} catch (...) {
-			DVGui::error(tr("It is not possible to create the preset folder %1.").arg(QString::fromStdString(fp.getParentDir().getName())));
+			DVGui::error(tr("It is not possible to create the preset folder %1.")
+							 .arg(QString::fromStdString(fp.getParentDir().getName())));
 			return 0;
 		}
 	}

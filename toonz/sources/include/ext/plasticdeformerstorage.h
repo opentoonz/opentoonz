@@ -35,16 +35,16 @@ class PlasticSkeletonDeformation;
 struct DVAPI PlasticDeformerData {
 	PlasticDeformer m_deformer; //!< The mesh deformer itself
 
-	std::unique_ptr<double[]> m_so;	 //!< (owned) Faces' stacking order
+	std::unique_ptr<double[]> m_so;		//!< (owned) Faces' stacking order
 	std::unique_ptr<double[]> m_output; //!< (owned) Output vertex coordinates
 
 	std::vector<int> m_faceHints; //!< Handles' face hints
 
-public:
+  public:
 	PlasticDeformerData();
 	~PlasticDeformerData();
 
-private:
+  private:
 	// Not copyable
 
 	PlasticDeformerData(const PlasticDeformerData &);
@@ -56,7 +56,8 @@ private:
 //***********************************************************************************************
 
 struct DVAPI PlasticDeformerDataGroup {
-	std::unique_ptr<PlasticDeformerData[]> m_datas;		  //!< (owned) The deformer datas array. One per mesh.
+	std::unique_ptr<PlasticDeformerData[]>
+		m_datas;						  //!< (owned) The deformer datas array. One per mesh.
 	std::vector<PlasticHandle> m_handles; //!< Source handles (emanated from skeleton vertices).
 	std::vector<TPointD> m_dstHandles;	//!< Corresponding destination handle positions
 
@@ -69,15 +70,16 @@ struct DVAPI PlasticDeformerDataGroup {
 	TAffine m_skeletonAffine; //!< The skeleton affine applied to each handle.
 							  //!< In case it changes, the deformation is automatically recompiled.
 
-	double m_soMin, m_soMax;						//!< SO min and max across the whole group (useful while drawing
-													//!< due to the unboundedness of the SO parameter)
-	std::vector<std::pair<int, int>> m_sortedFaces; //!< Pairs of face-mesh indices, by sorted stacking order.
-													//!< This is the order that must be followed when drawing faces.
-public:
+	double m_soMin, m_soMax; //!< SO min and max across the whole group (useful while drawing
+							 //!< due to the unboundedness of the SO parameter)
+	std::vector<std::pair<int, int>>
+		m_sortedFaces; //!< Pairs of face-mesh indices, by sorted stacking order.
+					   //!< This is the order that must be followed when drawing faces.
+  public:
 	PlasticDeformerDataGroup();
 	~PlasticDeformerDataGroup();
 
-private:
+  private:
 	// Not copyable
 
 	PlasticDeformerDataGroup(const PlasticDeformerDataGroup &);
@@ -141,7 +143,7 @@ private:
   The mesh vertex coordinates resulting from a deformation will be stored in the resulting
   PlasticDeformerData::m_output member of each entry of the output array, one for each mesh
   of the input meshImage. The returned coordinates are intended in the mesh reference.
-  
+
 \par Lifetime and Ownership
 
   This class <B> does not claim ownerhip <\B> of neither the mesh nor the deformation that are
@@ -152,7 +154,7 @@ private:
   call to the appropriate release method in order to enforce the associated deformers destruction.
 
   \warning No call to the appropriate release method when either a mesh or a deformation which
-           has requested a deformer is destroyed \b will result in a \b leak.
+		   has requested a deformer is destroyed \b will result in a \b leak.
 */
 
 class DVAPI PlasticDeformerStorage
@@ -160,7 +162,7 @@ class DVAPI PlasticDeformerStorage
 	class Imp;
 	std::unique_ptr<Imp> m_imp;
 
-public:
+  public:
 	enum DataType {
 		NONE = 0x0,
 		HANDLES = 0x1, // Handles data
@@ -170,7 +172,7 @@ public:
 		ALL = HANDLES | SO | MESH
 	};
 
-public:
+  public:
 	PlasticDeformerStorage();
 	~PlasticDeformerStorage();
 
@@ -179,59 +181,53 @@ public:
 	//! This function processes the specified meshImage-deformation pair, returning a DataGroup
 	//! with the required data.
 	/*!
-    \note This function \b caches all required data, so that subsequent requests about the same
-    triplet can be sped up considerably in case of cache match.
+	\note This function \b caches all required data, so that subsequent requests about the same
+	triplet can be sped up considerably in case of cache match.
   */
-	const PlasticDeformerDataGroup *process(
-		double frame,
-		const TMeshImage *meshImage,
-		const PlasticSkeletonDeformation *deformation, int skeletonId,
-		const TAffine &deformationToMeshAffine,
-		DataType dataType = ALL);
+	const PlasticDeformerDataGroup *process(double frame, const TMeshImage *meshImage,
+											const PlasticSkeletonDeformation *deformation,
+											int skeletonId, const TAffine &deformationToMeshAffine,
+											DataType dataType = ALL);
 
 	//! Performs the specified deformation once, \b without caching data.
 	/*!
-    This method allows the user to perform a single-shot Platic deformation, without dealing with
-    caching issues.
+	This method allows the user to perform a single-shot Platic deformation, without dealing with
+	caching issues.
 
-    \note Since caching is disabled, this method is comparably \a slower than its cached counterpart,
-          in case the same deformation is repeatedly invoked.
-          It is meant to be used only in absence of user interaction.
+	\note Since caching is disabled, this method is comparably \a slower than its cached
+	counterpart,
+		  in case the same deformation is repeatedly invoked.
+		  It is meant to be used only in absence of user interaction.
 
-    \warning The returned pointer is owned by the \b caller, and must be manually deleted
-             when no longer needed.
+	\warning The returned pointer is owned by the \b caller, and must be manually deleted
+			 when no longer needed.
   */
-	static const PlasticDeformerDataGroup *processOnce(
-		double frame,
-		const TMeshImage *meshImage,
-		const PlasticSkeletonDeformation *deformation, int skeletonId,
-		const TAffine &deformationToMeshAffine,
-		DataType dataType = ALL);
+	static const PlasticDeformerDataGroup *
+	processOnce(double frame, const TMeshImage *meshImage,
+				const PlasticSkeletonDeformation *deformation, int skeletonId,
+				const TAffine &deformationToMeshAffine, DataType dataType = ALL);
 
 	//! Similarly to invalidateSkeleton(), for every deformer attached to the
 	//! specified mesh.
-	void invalidateMeshImage(const TMeshImage *meshImage,
-							 int recompiledDataType = NONE);
+	void invalidateMeshImage(const TMeshImage *meshImage, int recompiledDataType = NONE);
 
 	//! Schedules all stored deformers associated to the specified deformation for
 	//! either re-deformation (stage 3 invalidation) or re-compilation (stage 2 invalidation).
 	/*!
-    Recompilation should be selected whenever the deformation has sustained source domain
-    changes, such as a vertex addition or removal, or when the \a source skeletal
-    configuration has changed.
+	Recompilation should be selected whenever the deformation has sustained source domain
+	changes, such as a vertex addition or removal, or when the \a source skeletal
+	configuration has changed.
 
-    \note Recompilation is typically a slower process than the mere deformers update.
-    Select it explicitly only when it truly needs to be done.
+	\note Recompilation is typically a slower process than the mere deformers update.
+	Select it explicitly only when it truly needs to be done.
   */
-	void invalidateSkeleton(
-		const PlasticSkeletonDeformation *deformation, int skeletonId,
-		int recompiledDataType = NONE);
+	void invalidateSkeleton(const PlasticSkeletonDeformation *deformation, int skeletonId,
+							int recompiledDataType = NONE);
 
 	//! Similarly to invalidateSkeleton(), for everything attached to the
 	//! specified deformation.
-	void invalidateDeformation(
-		const PlasticSkeletonDeformation *deformation,
-		int recompiledDataType = NONE);
+	void invalidateDeformation(const PlasticSkeletonDeformation *deformation,
+							   int recompiledDataType = NONE);
 
 	//! Releases all deformers associated to the specified mesh image.
 	void releaseMeshData(const TMeshImage *meshImage);
@@ -245,11 +241,12 @@ public:
 	//! Releases all deformers, effectively returning the storage to its empty state.
 	void clear();
 
-private:
+  private:
 	//! Retrieves the group of deformers (one per mesh in the image) associated to the input
 	//! pair, eventually creating one if none did exist.
 	PlasticDeformerDataGroup *deformerData(const TMeshImage *meshImage,
-										   const PlasticSkeletonDeformation *deformation, int skeletonId);
+										   const PlasticSkeletonDeformation *deformation,
+										   int skeletonId);
 };
 
 #endif // PLASTIDEFORMERSTORAGE_H

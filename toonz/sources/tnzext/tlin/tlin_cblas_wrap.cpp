@@ -5,8 +5,8 @@
 #include <memory>
 #include <cstring>
 
-//blasint may either be common 4 bytes or extended 8 (long)...
-//Replace this and REBUILD the CBLAS with extended int if needed.
+// blasint may either be common 4 bytes or extended 8 (long)...
+// Replace this and REBUILD the CBLAS with extended int if needed.
 typedef int blasint;
 
 extern "C" {
@@ -22,25 +22,26 @@ extern "C" {
 
   Function names behave like:
 
-    cblas_[Precision][Matrix type][Operation specifier]
+	cblas_[Precision][Matrix type][Operation specifier]
 
   Precision can be:
 
-    S - REAL                C - COMPLEX
-    D - DOUBLE PRECISION    Z - COMPLEX*16  (may not be supported by all machines)
+	S - REAL                C - COMPLEX
+	D - DOUBLE PRECISION    Z - COMPLEX*16  (may not be supported by all machines)
 
-    In current wrapper implementation only D routines will be adopted.
+	In current wrapper implementation only D routines will be adopted.
 
   Matrix type can be:
 
-    GE - GEneral     GB - General Band
-    SY - SYmmetric   SB - Sym. Band     SP - Sym. Packed
-    HE - HErmitian   HB - Herm. Band    HP - Herm. Packed
-    TR - TRiangular  TB - Triang. Band  TP - Triang. Packed
+	GE - GEneral     GB - General Band
+	SY - SYmmetric   SB - Sym. Band     SP - Sym. Packed
+	HE - HErmitian   HB - Herm. Band    HP - Herm. Packed
+	TR - TRiangular  TB - Triang. Band  TP - Triang. Packed
 
-    In current wrapper implementation only GE routines will be adopted.
+	In current wrapper implementation only GE routines will be adopted.
 
-  Operation specifier depends on the operation. For example, mm means matrix * matrix, mv matrix * vector, etc..
+  Operation specifier depends on the operation. For example, mm means matrix * matrix, mv matrix *
+  vector, etc..
 */
 
 //========================================================================================
@@ -48,14 +49,15 @@ extern "C" {
 void sum(int n, const double *x, double *&y)
 {
 	/*
-    void cblas_daxpy(blasint n, double a, double *x, blasint incx, double *y, blasint incy);
+	void cblas_daxpy(blasint n, double a, double *x, blasint incx, double *y, blasint incy);
 
-    NOTE:
-    
-      Returns a * x + y.    Output is stored in y.
+	NOTE:
 
-      incx and incy are the increments in array access - ie x[incx * i] and y[incy * j] values only are
-      considered (=> we'll use 1). 
+	  Returns a * x + y.    Output is stored in y.
+
+	  incx and incy are the increments in array access - ie x[incx * i] and y[incy * j] values only
+	are
+	  considered (=> we'll use 1).
   */
 
 	double *_x = const_cast<double *>(x);
@@ -68,12 +70,13 @@ void sum(int n, const double *x, double *&y)
 void tlin::multiply(int rows, int cols, const double *A, const double *x, double *&y)
 {
 	/*
-    void cblas_dgemv(enum CBLAS_ORDER order,  enum CBLAS_TRANSPOSE trans,  blasint m, blasint n,
-		 double alpha, double  *a, blasint lda,  double  *x, blasint incx,  double beta,  double  *y, blasint incy);
+	void cblas_dgemv(enum CBLAS_ORDER order,  enum CBLAS_TRANSPOSE trans,  blasint m, blasint n,
+		 double alpha, double  *a, blasint lda,  double  *x, blasint incx,  double beta,  double
+	*y, blasint incy);
 
-     NOTE: 
+	 NOTE:
 
-      Returns alpha*A*x + beta*y.    Output is stored in y.
+	  Returns alpha*A*x + beta*y.    Output is stored in y.
   */
 
 	if (!y) {

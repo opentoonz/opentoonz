@@ -21,7 +21,7 @@
 
 class DVAPI Convert2Tlv
 {
-private:
+  private:
 	TLevelP m_level1;
 	TLevel::Iterator m_it;
 	TLevelReaderP m_lr1;
@@ -49,18 +49,20 @@ private:
 
 	void buildInksForNAAImage(TRasterCM32P &rout, const TRaster32P &rin);
 
-public:
+  public:
 	TFilePath m_levelIn1, m_levelIn2, m_levelOut, m_palettePath;
 	bool m_autoclose, m_premultiply;
 
 	// i livelli passati devono essere  tif o png.
 	// se filepath2=TFilePath(), viene creata una tlv unpainted, altrimenti painted.
-	// nel secondo caso, i due livelli specificati (in qualsiasi ordine, la classe capisce da sola qual'e' l'unpainted e la painted)
+	// nel secondo caso, i due livelli specificati (in qualsiasi ordine, la classe capisce da sola
+	// qual'e' l'unpainted e la painted)
 	// devono contenere la versione painted e quella unpainted della stessa sequenza di immagini
 	// la tlv e la tpl vengono salvate con il nome e il folder di filepath1.
-	Convert2Tlv(const TFilePath &filepath1, const TFilePath &filepath2, const TFilePath &outFolder, const QString &outName,
-				int from, int to, bool doAutoclose, const TFilePath &palettePath, int colorTolerance,
-				int antialiasType, int antialiasValue, bool isUnpaintedFromNAA);
+	Convert2Tlv(const TFilePath &filepath1, const TFilePath &filepath2, const TFilePath &outFolder,
+				const QString &outName, int from, int to, bool doAutoclose,
+				const TFilePath &palettePath, int colorTolerance, int antialiasType,
+				int antialiasValue, bool isUnpaintedFromNAA);
 
 	bool init(std::string &errorMessage);
 	int getFramesToConvertCount();
@@ -72,12 +74,13 @@ public:
 // it seems too complex to modify Convert2Tlv, that refer to file levels instead of memory levels.
 // RasterToToonzRasterConverter uses the same algorithms (more or less)
 // TODO: refactor the two classes
-// NOTE: you don't need to specify a palette (with RasterToToonzRasterConverter::setPalette()): in that case a suitable palette is generated
+// NOTE: you don't need to specify a palette (with RasterToToonzRasterConverter::setPalette()): in
+// that case a suitable palette is generated
 class DVAPI RasterToToonzRasterConverter
 {
 	TPaletteP m_palette;
 
-public:
+  public:
 	RasterToToonzRasterConverter();
 	~RasterToToonzRasterConverter();
 

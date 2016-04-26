@@ -13,7 +13,7 @@ class DVAPI Scene : public Wrapper
 	Q_OBJECT
 	ToonzScene *m_scene;
 
-public:
+  public:
 	Scene();
 	~Scene();
 
@@ -29,7 +29,8 @@ public:
 	Q_INVOKABLE QScriptValue save(const QScriptValue &fpArg);
 
 	QString doSetCell(int row, int col, const QScriptValue &level, const QScriptValue &fid);
-	Q_INVOKABLE QScriptValue setCell(int row, int col, const QScriptValue &level, const QScriptValue &fid);
+	Q_INVOKABLE QScriptValue setCell(int row, int col, const QScriptValue &level,
+									 const QScriptValue &fid);
 	Q_INVOKABLE QScriptValue setCell(int row, int col, const QScriptValue &cell);
 	Q_INVOKABLE QScriptValue getCell(int row, int col);
 

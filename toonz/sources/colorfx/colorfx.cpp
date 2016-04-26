@@ -28,15 +28,15 @@ void add(TColorStyle *s)
 
 void initColorFx()
 {
-	//add(new TFriezeStrokeStyle);
+	// add(new TFriezeStrokeStyle);
 
 	add(new TRopeStrokeStyle);
 
 	add(new TChainStrokeStyle);
 	add(new TFurStrokeStyle);
-	//add(new TChalkStrokeStyle);
-	//add(new TBumpStrokeStyle);
-	//add(new TBlendStrokeStyle);
+	// add(new TChalkStrokeStyle);
+	// add(new TBumpStrokeStyle);
+	// add(new TBlendStrokeStyle);
 
 	add(new TDottedLineStrokeStyle);
 
@@ -47,19 +47,19 @@ void initColorFx()
 	add(new TCrystallizeStrokeStyle);
 	add(new TSprayStrokeStyle);
 	add(new TTissueStrokeStyle);
-	//add(new TMultiLineStrokeStyle);
+	// add(new TMultiLineStrokeStyle);
 	add(new TBiColorStrokeStyle);
 	add(new TNormal2StrokeStyle);
-	//add(new TNormalStrokeStyle);
-	//add(new TLongBlendStrokeStyle);
+	// add(new TNormalStrokeStyle);
+	// add(new TLongBlendStrokeStyle);
 	add(new TChalkStrokeStyle2);
-	//add(new TDualColorStrokeStyle);
+	// add(new TDualColorStrokeStyle);
 
 	add(new TBlendStrokeStyle2);
 	add(new TTwirlStrokeStyle);
 
 	add(new TMultiLineStrokeStyle2);
-	add(new TZigzagStrokeStyle); //non funziona su linux, rivedere
+	add(new TZigzagStrokeStyle); // non funziona su linux, rivedere
 	add(new TSinStrokeStyle);
 
 	add(new TFriezeStrokeStyle2);
@@ -72,8 +72,8 @@ void initColorFx()
 	add(new OutlineViewerStyle());
 #endif
 
-	add(new MovingSolidColor(TPixel32::Blue, TPointD(10, 10))); //ok
-	//add(new MovingTexture(readTexture("chessboard.bmp"),TTextureStyle::NONE,TPointD(10,10) ));
+	add(new MovingSolidColor(TPixel32::Blue, TPointD(10, 10))); // ok
+	// add(new MovingTexture(readTexture("chessboard.bmp"),TTextureStyle::NONE,TPointD(10,10) ));
 
 	add(new ShadowStyle(TPixel32::White, TPixel32::Black));
 	add(new ShadowStyle2(TPixel32::Yellow, TPixel32::Magenta));
@@ -86,7 +86,7 @@ void initColorFx()
 	add(new TCheckedFillStyle(TPixel32(255, 0, 0, 128)));
 	add(new ArtisticSolidColor(TPixel32(0, 130, 255), TPointD(10, 10), 100));
 
-	add(new TChalkFillStyle(TPixel32::White, TPixel32::Black)); //non funziona
+	add(new TChalkFillStyle(TPixel32::White, TPixel32::Black)); // non funziona
 	add(new TChessFillStyle(TPixel32::Red));
 
 	add(new TSawToothStrokeStyle);

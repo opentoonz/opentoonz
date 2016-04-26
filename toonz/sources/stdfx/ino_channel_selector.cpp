@@ -25,12 +25,13 @@ class ino_channel_selector : public TStandardRasterFx
 	TIntEnumParamP m_blu_channel;
 	TIntEnumParamP m_alp_channel;
 
-public:
+  public:
 	ino_channel_selector()
 		: m_red_source(1), m_gre_source(1), m_blu_source(1), m_alp_source(1)
 
 		  ,
-		  m_red_channel(new TIntEnumParam(0, "Red")), m_gre_channel(new TIntEnumParam(1, "Green")), m_blu_channel(new TIntEnumParam(2, "Blue")), m_alp_channel(new TIntEnumParam(3, "Alpha"))
+		  m_red_channel(new TIntEnumParam(0, "Red")), m_gre_channel(new TIntEnumParam(1, "Green")),
+		  m_blu_channel(new TIntEnumParam(2, "Blue")), m_alp_channel(new TIntEnumParam(3, "Alpha"))
 	{
 		addInputPort("Source1", this->m_source1);
 		addInputPort("Source2", this->m_source2);
@@ -63,13 +64,11 @@ public:
 		this->m_alp_channel->addItem(1, "Green");
 		this->m_alp_channel->addItem(2, "Blue");
 	}
-	bool doGetBBox(
-		double frame, TRectD &bBox, const TRenderSettings &info)
+	bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info)
 	{
 		for (int ii = 0; ii < this->getInputPortCount(); ++ii) {
 			std::string nm = this->getInputPortName(ii);
-			TRasterFxPort *
-				tmp_port = (TRasterFxPort *)this->getInputPort(nm);
+			TRasterFxPort *tmp_port = (TRasterFxPort *)this->getInputPort(nm);
 			if (tmp_port->isConnected()) {
 				return (*tmp_port)->doGetBBox(frame, bBox, info);
 			}
@@ -77,12 +76,8 @@ public:
 		bBox = TRectD();
 		return false;
 	}
-	bool canHandle(const TRenderSettings &info, double frame)
-	{
-		return true;
-	}
-	void doCompute(
-		TTile &tile, double frame, const TRenderSettings &ri);
+	bool canHandle(const TRenderSettings &info, double frame) { return true; }
+	void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
 };
 FX_PLUGIN_IDENTIFIER(ino_channel_selector, "inoChannelSelectorFx");
 //--------------------------------------------------------------------
@@ -90,8 +85,8 @@ FX_PLUGIN_IDENTIFIER(ino_channel_selector, "inoChannelSelectorFx");
 namespace
 {
 template <typename IN_PIXEL, typename OUT_PIXEL>
-void fx_template(
-	const TRasterPT<IN_PIXEL> in_ras, const int in_sel, const TRasterPT<OUT_PIXEL> out_ras, const int out_sel)
+void fx_template(const TRasterPT<IN_PIXEL> in_ras, const int in_sel,
+				 const TRasterPT<OUT_PIXEL> out_ras, const int out_sel)
 {
 	for (int yy = 0; yy < out_ras->getLy(); ++yy) {
 		IN_PIXEL *sl_in = in_ras->pixels(yy);
@@ -129,8 +124,7 @@ void fx_template(
 		}
 	}
 }
-void fx_(
-	const TRasterP in_ras, const int in_sel, TRasterP out_ras, const int out_sel)
+void fx_(const TRasterP in_ras, const int in_sel, TRasterP out_ras, const int out_sel)
 {
 	if ((TRaster32P)in_ras && (TRaster32P)out_ras) {
 		fx_template<TPixel32, TPixel32>(in_ras, in_sel, out_ras, out_sel);
@@ -140,12 +134,10 @@ void fx_(
 }
 }
 //------------------------------------------------------------
-void ino_channel_selector::doCompute(
-	TTile &tile, double frame, const TRenderSettings &ri)
+void ino_channel_selector::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 {
 	/* ------ サポートしていないPixelタイプはエラーを投げる --- */
-	if (!((TRaster32P)tile.getRaster()) &&
-		!((TRaster64P)tile.getRaster())) {
+	if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster())) {
 		throw TRopException("unsupported input pixel type");
 	}
 
@@ -179,9 +171,9 @@ void ino_channel_selector::doCompute(
 	}
 
 	/* ------ 入力画像の参照を確保 ---------------------------- */
-	//TTile *source_tiles = new TTile[this->getInputPortCount()];
-	//int   *source_sw    = new int[this->getInputPortCount()];
-	//TRasterP *ras_a     = new TRasterP[this->getInputPortCount()];
+	// TTile *source_tiles = new TTile[this->getInputPortCount()];
+	// int   *source_sw    = new int[this->getInputPortCount()];
+	// TRasterP *ras_a     = new TRasterP[this->getInputPortCount()];
 
 	/* Not use boost at toonz-6.1 */
 	/******
@@ -202,8 +194,7 @@ void ino_channel_selector::doCompute(
 	/* ------ 画像生成 ---------------------------------------- */
 	for (int ii = 0; ii < this->getInputPortCount(); ++ii) {
 		std::string nm = this->getInputPortName(ii);
-		TRasterFxPort *
-			tmp_port = (TRasterFxPort *)this->getInputPort(nm);
+		TRasterFxPort *tmp_port = (TRasterFxPort *)this->getInputPort(nm);
 		if (tmp_port->isConnected() && ((ii == red_source) || (ii == gre_source) ||
 										(ii == blu_source) || (ii == alp_source))) {
 			(*tmp_port)->allocateAndCompute(
@@ -246,35 +237,26 @@ void ino_channel_selector::doCompute(
 
 	if (log_sw) {
 		std::ostringstream os;
-		os
-			<< "red"
-			<< "  s " << red_source << "  c " << red_channel
-			<< "   green"
-			<< "  s " << gre_source << "  c " << gre_channel
-			<< "   blue"
-			<< "  s " << blu_source << "  c " << blu_channel
-			<< "   alpha"
-			<< "  s " << alp_source << "  c " << alp_channel
-			<< "   tile w " << tile.getRaster()->getLx()
-			<< "  h " << tile.getRaster()->getLy()
-			<< "  b " << ino::pixel_bits(tile.getRaster());
-		os
-			<< "   s_count " << this->getInputPortCount();
+		os << "red"
+		   << "  s " << red_source << "  c " << red_channel << "   green"
+		   << "  s " << gre_source << "  c " << gre_channel << "   blue"
+		   << "  s " << blu_source << "  c " << blu_channel << "   alpha"
+		   << "  s " << alp_source << "  c " << alp_channel << "   tile w "
+		   << tile.getRaster()->getLx() << "  h " << tile.getRaster()->getLy() << "  b "
+		   << ino::pixel_bits(tile.getRaster());
+		os << "   s_count " << this->getInputPortCount();
 		for (int ii = 0; ii < this->getInputPortCount(); ++ii) {
 			if (source_sw[ii]) {
-				os
-					<< "   tile" << ii
-					<< "  w " << source_tiles[ii].getRaster()->getLx()
-					<< "  h " << source_tiles[ii].getRaster()->getLy()
-					<< "  b " << ino::pixel_bits(source_tiles[ii].getRaster());
+				os << "   tile" << ii << "  w " << source_tiles[ii].getRaster()->getLx() << "  h "
+				   << source_tiles[ii].getRaster()->getLy() << "  b "
+				   << ino::pixel_bits(source_tiles[ii].getRaster());
 			}
 		}
-		os
-			<< "   frame " << frame;
+		os << "   frame " << frame;
 	}
 	/* ------ 入力画像の参照開放 ------------------------------ */
-	//delete [] source_sw;
-	//delete [] source_tiles;
+	// delete [] source_sw;
+	// delete [] source_tiles;
 	/* ------ fx処理 ------------------------------------------ */
 	try {
 		tile.getRaster()->lock();
@@ -309,7 +291,7 @@ void ino_channel_selector::doCompute(
 			str += e.what();
 			str += '>';
 		}
-		//delete [] ras_a;
+		// delete [] ras_a;
 		throw;
 	} catch (std::exception &e) {
 		for (int ii = ras_s - 1; 0 <= ii; --ii) {
@@ -321,7 +303,7 @@ void ino_channel_selector::doCompute(
 			str += e.what();
 			str += '>';
 		}
-		//delete [] ras_a;
+		// delete [] ras_a;
 		throw;
 	} catch (...) {
 		for (int ii = ras_s - 1; 0 <= ii; --ii) {
@@ -331,8 +313,8 @@ void ino_channel_selector::doCompute(
 		if (log_sw) {
 			std::string str("other exception");
 		}
-		//delete [] ras_a;
+		// delete [] ras_a;
 		throw;
 	}
-	//delete [] ras_a;
+	// delete [] ras_a;
 }

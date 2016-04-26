@@ -12,12 +12,9 @@
 #include "tfilepath_io.h"
 #include "tsystem.h"
 
-void Tiio::createJpg(
-	std::vector<UCHAR> &buffer,
-	const TRaster32P &ras,
-	int quality)
+void Tiio::createJpg(std::vector<UCHAR> &buffer, const TRaster32P &ras, int quality)
 {
-	//FILE *chan = tmpfile();
+	// FILE *chan = tmpfile();
 	TFilePath fname = TSystem::getUniqueFile();
 	FILE *chan = fopen(fname, "w+b");
 	if (chan == 0)
@@ -53,7 +50,7 @@ void Tiio::createJpg(
 	delete writer;
 	fclose(chan);
 
-	//lo chiudo e lo riapro: altrimenti, gettava male  la filesize. boh.
+	// lo chiudo e lo riapro: altrimenti, gettava male  la filesize. boh.
 	FILE *chan1 = fopen(fname, "rb");
 	if (chan1 == 0)
 		throw TException(L". Can not create " + fname.getWideString());

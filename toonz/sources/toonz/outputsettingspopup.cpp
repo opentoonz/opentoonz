@@ -69,16 +69,9 @@ enum ResampleOption {
 	c_bilinear
 };
 
-enum ChannelWidth {
-	c_8bit,
-	c_16bit
-};
+enum ChannelWidth { c_8bit, c_16bit };
 
-enum DominantField {
-	c_odd,
-	c_even,
-	c_none
-};
+enum DominantField { c_odd, c_even, c_none };
 
 enum ThreadsOption {
 	c_single,
@@ -86,14 +79,9 @@ enum ThreadsOption {
 	c_all,
 };
 
-enum GranularityOption {
-	c_off,
-	c_large,
-	c_medium,
-	c_small
-};
+enum GranularityOption { c_off, c_large, c_medium, c_small };
 
-} //anonymous namespace
+} // anonymous namespace
 //-----------------------------------------------------------------------------
 
 //=============================================================================
@@ -110,11 +98,11 @@ enum GranularityOption {
 		to set values for frame and time stretch.
 */
 OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
-	: Dialog(TApp::instance()->getMainWindow(),
-			 false,
+	: Dialog(TApp::instance()->getMainWindow(), false,
 			 Preferences::instance()->getCurrentLanguage() == "english",
 			 isPreview ? "PreviewSettings" : "OutputSettings"),
-	  m_subcameraChk(0), m_applyShrinkChk(0), m_outputCameraOm(0), m_isPreviewSettings(isPreview), m_presetCombo(0)
+	  m_subcameraChk(0), m_applyShrinkChk(0), m_outputCameraOm(0), m_isPreviewSettings(isPreview),
+	  m_presetCombo(0)
 {
 	setWindowTitle(isPreview ? tr("Preview Settings") : tr("Output Settings"));
 
@@ -124,11 +112,11 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
 	QFrame *fileSettingsBox = new QFrame(this);
 	QFrame *cameraParametersBox;
 	if (!isPreview) {
-		//Save In
+		// Save In
 		m_saveInFileFld = new DVGui::FileField(0, QString(""));
-		//File Name
+		// File Name
 		m_fileNameFld = new DVGui::LineEdit(QString(""));
-		//File Format
+		// File Format
 		m_fileFormat = new QComboBox();
 		m_fileFormatButton = new QPushButton(tr("Options"));
 
@@ -136,30 +124,30 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
 		cameraParametersBox = new QFrame(this);
 	}
 #ifndef LINETEST
-	//Output Camera
+	// Output Camera
 	m_outputCameraOm = new QComboBox();
-//m_outputCameraOm->hide();
+// m_outputCameraOm->hide();
 #endif
 	if (isPreview) {
 #ifndef LINETEST
-		//Subcamera checkbox
+		// Subcamera checkbox
 		m_subcameraChk = new DVGui::CheckBox(tr("Use Sub-Camera"));
 #endif
 	}
 
-	//Frame Start-End
+	// Frame Start-End
 	m_startFld = new DVGui::IntLineEdit(this);
 	m_endFld = new DVGui::IntLineEdit(this);
-	//Step-Shrink
+	// Step-Shrink
 	m_stepFld = new DVGui::IntLineEdit(this);
 	m_shrinkFld = new DVGui::IntLineEdit(this);
 	if (isPreview)
 		m_applyShrinkChk = new DVGui::CheckBox(tr("Apply Shrink to Main Viewer"), this);
 	else
 		m_applyShrinkChk = 0;
-	//Resample Balance
+	// Resample Balance
 	m_resampleBalanceOm = new QComboBox();
-	//Channel Width
+	// Channel Width
 	m_channelWidthOm = new QComboBox();
 
 	QPushButton *showOtherSettingsButton = NULL;
@@ -175,15 +163,15 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
 		otherSettingsLabel = new QLabel(tr("Other Settings"), this);
 		otherSettingsFrame = new QFrame(this);
 
-		//Gamma
+		// Gamma
 		m_gammaFld = new DVGui::DoubleLineEdit();
-		//Dominant Field
+		// Dominant Field
 		m_dominantFieldOm = new QComboBox();
 
-		//Stretch
+		// Stretch
 		TRenderSettings rs = getProperties()->getRenderSettings();
 
-		//Scene Settings FPS
+		// Scene Settings FPS
 		double frameRate = getProperties()->getFrameRate();
 		m_frameRateFld = new DVGui::DoubleLineEdit(this, frameRate);
 
@@ -199,9 +187,9 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
 		m_doStereoscopy = new DVGui::CheckBox("Do stereoscopy", this);
 		m_stereoShift = new DVGui::DoubleLineEdit(this, 0.05);
 	}
-	//Threads
+	// Threads
 	m_threadsComboOm = new QComboBox();
-	//Granularity
+	// Granularity
 	m_rasterGranularityOm = new QComboBox();
 
 	//----プロパティの設定
@@ -212,7 +200,7 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
 	fileSettingsBox->setObjectName("OutputSettingsBox");
 
 	if (!isPreview) {
-		//File Format
+		// File Format
 		QStringList formats;
 		TImageWriter::getSupportedFormats(formats, true);
 		TLevelWriter::getSupportedFormats(formats, true);
@@ -222,29 +210,20 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
 		cameraParametersBox->setObjectName("OutputSettingsCameraBox");
 	}
 
-	//Resample Balance
+	// Resample Balance
 	QStringList resampleBalance;
-	resampleBalance << tr("Standard")
-					<< tr("Improved")
-					<< tr("High")
-					<< tr("Triangle filter")
-					<< tr("Mitchell-Netravali filter")
-					<< tr("Cubic convolution, a = .5")
-					<< tr("Cubic convolution, a = .75")
-					<< tr("Cubic convolution, a = 1")
-					<< tr("Hann window, rad = 2")
-					<< tr("Hann window, rad = 3")
-					<< tr("Hamming window, rad = 2")
-					<< tr("Hamming window, rad = 3")
-					<< tr("Lanczos window, rad = 2")
-					<< tr("Lanczos window, rad = 3")
-					<< tr("Gaussian convolution")
-					<< tr("Closest Pixel (Nearest Neighbor)")
+	resampleBalance << tr("Standard") << tr("Improved") << tr("High") << tr("Triangle filter")
+					<< tr("Mitchell-Netravali filter") << tr("Cubic convolution, a = .5")
+					<< tr("Cubic convolution, a = .75") << tr("Cubic convolution, a = 1")
+					<< tr("Hann window, rad = 2") << tr("Hann window, rad = 3")
+					<< tr("Hamming window, rad = 2") << tr("Hamming window, rad = 3")
+					<< tr("Lanczos window, rad = 2") << tr("Lanczos window, rad = 3")
+					<< tr("Gaussian convolution") << tr("Closest Pixel (Nearest Neighbor)")
 					<< tr("Bilinear");
 
 	m_resampleBalanceOm->addItems(resampleBalance);
 
-	//Channel Width
+	// Channel Width
 	QStringList chWidth;
 	chWidth << tr("8 bit") << tr("16 bit");
 	m_channelWidthOm->addItems(chWidth);
@@ -259,7 +238,7 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
 		otherSettingsFrame->setObjectName("OutputSettingsBox");
 		otherSettingsFrame->setVisible(false);
 
-		//Dominant Field
+		// Dominant Field
 		QStringList dominantField;
 		dominantField << tr("Odd (NTSC)") << tr("Even (PAL)") << tr("None");
 		m_dominantFieldOm->addItems(dominantField);
@@ -268,10 +247,11 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
 		m_stretchFromFld->setDecimals(2);
 		m_stretchToFld->setDecimals(2);
 
-		//Multimedia rendering enum
+		// Multimedia rendering enum
 		QStringList multimediaTypes;
 #ifndef LINETEST
-		multimediaTypes << tr("None") << tr("Fx Schematic Flows") << tr("Fx Schematic Terminal Nodes");
+		multimediaTypes << tr("None") << tr("Fx Schematic Flows")
+						<< tr("Fx Schematic Terminal Nodes");
 #else
 		multimediaTypes << tr("None") << tr("Columns");
 #endif
@@ -312,7 +292,8 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
 			presetLay->setSpacing(5);
 			{
 				presetLay->addStretch(1);
-				presetLay->addWidget(new QLabel(tr("Presets:"), this), 1, Qt::AlignRight | Qt::AlignVCenter);
+				presetLay->addWidget(new QLabel(tr("Presets:"), this), 1,
+									 Qt::AlignRight | Qt::AlignVCenter);
 				presetLay->addWidget(m_presetCombo, 1);
 				presetLay->addWidget(addPresetButton, 0);
 				presetLay->addWidget(removePresetButton, 0);
@@ -335,7 +316,7 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
 		camSetBoxLay->setMargin(10);
 		camSetBoxLay->setSpacing(10);
 		{
-			//Output Camera
+			// Output Camera
 			QHBoxLayout *outCamLay = new QHBoxLayout();
 			outCamLay->setMargin(0);
 			outCamLay->setSpacing(5);
@@ -357,7 +338,7 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
 				camSetBoxLay->addWidget(cameraParametersBox);
 			}
 
-			//Frame start/end
+			// Frame start/end
 			QHBoxLayout *frameLay = new QHBoxLayout();
 			frameLay->setMargin(0);
 			frameLay->setSpacing(5);
@@ -374,7 +355,7 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
 			}
 			camSetBoxLay->addLayout(frameLay);
 
-			//Frame Shrink
+			// Frame Shrink
 			QHBoxLayout *shrinkLay = new QHBoxLayout();
 			shrinkLay->setMargin(0);
 			shrinkLay->setSpacing(5);
@@ -382,7 +363,7 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
 				shrinkLay->addWidget(new QLabel(tr("Shrink:"), this), 0);
 				shrinkLay->addWidget(m_shrinkFld, 0);
 				shrinkLay->addStretch();
-				//Apply Shrink to MainViewer
+				// Apply Shrink to MainViewer
 				if (isPreview)
 					shrinkLay->addWidget(m_applyShrinkChk, 0);
 			}
@@ -393,7 +374,7 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
 
 		m_topLayout->addSpacing(10);
 
-		//File Settings
+		// File Settings
 		m_topLayout->addWidget(fileSettingsLabel, 0);
 
 		QVBoxLayout *fileSetBoxLay = new QVBoxLayout();
@@ -406,13 +387,15 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
 				upperGridLay->setHorizontalSpacing(5);
 				upperGridLay->setVerticalSpacing(10);
 				{
-					//Save In
-					upperGridLay->addWidget(new QLabel(tr("Save in:"), this), 0, 0, Qt::AlignRight | Qt::AlignVCenter);
+					// Save In
+					upperGridLay->addWidget(new QLabel(tr("Save in:"), this), 0, 0,
+											Qt::AlignRight | Qt::AlignVCenter);
 					upperGridLay->addWidget(m_saveInFileFld, 0, 1, 1, 3);
-					//File Name
-					upperGridLay->addWidget(new QLabel(tr("Name:"), this), 1, 0, Qt::AlignRight | Qt::AlignVCenter);
+					// File Name
+					upperGridLay->addWidget(new QLabel(tr("Name:"), this), 1, 0,
+											Qt::AlignRight | Qt::AlignVCenter);
 					upperGridLay->addWidget(m_fileNameFld, 1, 1);
-					//File Format
+					// File Format
 					upperGridLay->addWidget(m_fileFormat, 1, 2);
 					upperGridLay->addWidget(m_fileFormatButton, 1, 3);
 				}
@@ -429,17 +412,21 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
 			bottomGridLay->setHorizontalSpacing(5);
 			bottomGridLay->setVerticalSpacing(10);
 			{
-				//Resample Balance
-				bottomGridLay->addWidget(new QLabel(tr("Resample Balance:"), this), 0, 0, Qt::AlignRight | Qt::AlignVCenter);
+				// Resample Balance
+				bottomGridLay->addWidget(new QLabel(tr("Resample Balance:"), this), 0, 0,
+										 Qt::AlignRight | Qt::AlignVCenter);
 				bottomGridLay->addWidget(m_resampleBalanceOm, 0, 1, 1, 2);
-				//Channel Width
-				bottomGridLay->addWidget(new QLabel(tr("Channel Width:"), this), 1, 0, Qt::AlignRight | Qt::AlignVCenter);
+				// Channel Width
+				bottomGridLay->addWidget(new QLabel(tr("Channel Width:"), this), 1, 0,
+										 Qt::AlignRight | Qt::AlignVCenter);
 				bottomGridLay->addWidget(m_channelWidthOm, 1, 1, 1, 2);
-				//Threads
-				bottomGridLay->addWidget(new QLabel(tr("Dedicated CPUs:"), this), 2, 0, Qt::AlignRight | Qt::AlignVCenter);
+				// Threads
+				bottomGridLay->addWidget(new QLabel(tr("Dedicated CPUs:"), this), 2, 0,
+										 Qt::AlignRight | Qt::AlignVCenter);
 				bottomGridLay->addWidget(m_threadsComboOm, 2, 1, 1, 2);
-				//Granularity
-				bottomGridLay->addWidget(new QLabel(tr("Render Tile:"), this), 3, 0, Qt::AlignRight | Qt::AlignVCenter);
+				// Granularity
+				bottomGridLay->addWidget(new QLabel(tr("Render Tile:"), this), 3, 0,
+										 Qt::AlignRight | Qt::AlignVCenter);
 				bottomGridLay->addWidget(m_rasterGranularityOm, 3, 1, 1, 2);
 				if (m_subcameraChk) {
 					bottomGridLay->addWidget(m_subcameraChk, 4, 1, 1, 2);
@@ -450,7 +437,7 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
 
 			fileSetBoxLay->addLayout(bottomGridLay);
 
-			//shrinkable settings
+			// shrinkable settings
 			if (!isPreview) {
 				fileSetBoxLay->addSpacing(5);
 
@@ -469,27 +456,35 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
 				otherSettingsLay->setHorizontalSpacing(5);
 				otherSettingsLay->setVerticalSpacing(10);
 				{
-					//Gamma
-					otherSettingsLay->addWidget(new QLabel(tr("Gamma:"), this), 0, 0, Qt::AlignRight | Qt::AlignVCenter);
+					// Gamma
+					otherSettingsLay->addWidget(new QLabel(tr("Gamma:"), this), 0, 0,
+												Qt::AlignRight | Qt::AlignVCenter);
 					otherSettingsLay->addWidget(m_gammaFld, 0, 1, 1, 3);
-					//Dominant Field
-					otherSettingsLay->addWidget(new QLabel(tr("Dominant Field:"), this), 1, 0, Qt::AlignRight | Qt::AlignVCenter);
+					// Dominant Field
+					otherSettingsLay->addWidget(new QLabel(tr("Dominant Field:"), this), 1, 0,
+												Qt::AlignRight | Qt::AlignVCenter);
 					otherSettingsLay->addWidget(m_dominantFieldOm, 1, 1, 1, 4);
-					//Scene Settings' FPS
-					otherSettingsLay->addWidget(new QLabel(tr("Frame Rate (linked to Scene Settings):"), this), 2, 0, Qt::AlignRight | Qt::AlignVCenter);
+					// Scene Settings' FPS
+					otherSettingsLay->addWidget(
+						new QLabel(tr("Frame Rate (linked to Scene Settings):"), this), 2, 0,
+						Qt::AlignRight | Qt::AlignVCenter);
 					otherSettingsLay->addWidget(m_frameRateFld, 2, 1, 1, 3);
-					//Strech
-					otherSettingsLay->addWidget(new QLabel(tr("Stretch from FPS:"), this), 3, 0, Qt::AlignRight | Qt::AlignVCenter);
+					// Strech
+					otherSettingsLay->addWidget(new QLabel(tr("Stretch from FPS:"), this), 3, 0,
+												Qt::AlignRight | Qt::AlignVCenter);
 					otherSettingsLay->addWidget(m_stretchFromFld, 3, 1);
-					otherSettingsLay->addWidget(new QLabel(tr("  To:"), this), 3, 2, Qt::AlignRight | Qt::AlignVCenter);
+					otherSettingsLay->addWidget(new QLabel(tr("  To:"), this), 3, 2,
+												Qt::AlignRight | Qt::AlignVCenter);
 					otherSettingsLay->addWidget(m_stretchToFld, 3, 3);
-					//new in V6.1
-					//Multimedia rendering enum
-					otherSettingsLay->addWidget(new QLabel(tr("Multiple Rendering:"), this), 4, 0, Qt::AlignRight | Qt::AlignVCenter);
+					// new in V6.1
+					// Multimedia rendering enum
+					otherSettingsLay->addWidget(new QLabel(tr("Multiple Rendering:"), this), 4, 0,
+												Qt::AlignRight | Qt::AlignVCenter);
 					otherSettingsLay->addWidget(m_multimediaOm, 4, 1, 1, 4);
 
 					otherSettingsLay->addWidget(m_doStereoscopy, 5, 0);
-					otherSettingsLay->addWidget(new QLabel(tr("Camera Shift:")), 5, 1, Qt::AlignRight | Qt::AlignVCenter);
+					otherSettingsLay->addWidget(new QLabel(tr("Camera Shift:")), 5, 1,
+												Qt::AlignRight | Qt::AlignVCenter);
 					otherSettingsLay->addWidget(m_stereoShift, 5, 2);
 
 					otherSettingsLay->addLayout(bottomGridLay, 6, 0, 4, 5);
@@ -518,7 +513,8 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
 		ret = ret && connect(m_fileNameFld, SIGNAL(editingFinished()), SLOT(onNameChanged()));
 		ret = ret && connect(m_fileFormat, SIGNAL(currentIndexChanged(const QString &)),
 							 SLOT(onFormatChanged(const QString &)));
-		ret = ret && connect(m_fileFormatButton, SIGNAL(pressed()), this, SLOT(openSettingsPopup()));
+		ret =
+			ret && connect(m_fileFormatButton, SIGNAL(pressed()), this, SLOT(openSettingsPopup()));
 	}
 #ifndef LINETEST
 	ret = ret && connect(m_outputCameraOm, SIGNAL(currentIndexChanged(const QString &)),
@@ -530,26 +526,41 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
 	ret = ret && connect(m_shrinkFld, SIGNAL(editingFinished()), SLOT(onFrameFldEditFinished()));
 
 	if (isPreview) {
-		ret = ret && connect(m_applyShrinkChk, SIGNAL(stateChanged(int)), SLOT(onApplyShrinkChecked(int)));
+		ret = ret &&
+			  connect(m_applyShrinkChk, SIGNAL(stateChanged(int)), SLOT(onApplyShrinkChecked(int)));
 	}
 
-	ret = ret && connect(m_resampleBalanceOm, SIGNAL(currentIndexChanged(int)), SLOT(onResampleChanged(int)));
-	ret = ret && connect(m_channelWidthOm, SIGNAL(currentIndexChanged(int)), SLOT(onChannelWidthChanged(int)));
+	ret = ret && connect(m_resampleBalanceOm, SIGNAL(currentIndexChanged(int)),
+						 SLOT(onResampleChanged(int)));
+	ret = ret && connect(m_channelWidthOm, SIGNAL(currentIndexChanged(int)),
+						 SLOT(onChannelWidthChanged(int)));
 
 	if (!isPreview) {
 		ret = ret && connect(m_gammaFld, SIGNAL(editingFinished()), SLOT(onGammaFldEditFinished()));
-		ret = ret && connect(m_dominantFieldOm, SIGNAL(currentIndexChanged(int)), SLOT(onDominantFieldChanged(int)));
-		ret = ret && connect(m_frameRateFld, SIGNAL(editingFinished()), this, SLOT(onFrameRateEditingFinished()));
-		ret = ret && connect(m_stretchFromFld, SIGNAL(editingFinished()), SLOT(onStretchFldEditFinished()));
-		ret = ret && connect(m_stretchToFld, SIGNAL(editingFinished()), SLOT(onStretchFldEditFinished()));
-		ret = ret && connect(m_multimediaOm, SIGNAL(currentIndexChanged(int)), this, SLOT(onMultimediaChanged(int)));
-		ret = ret && connect(showOtherSettingsButton, SIGNAL(toggled(bool)), otherSettingsFrame, SLOT(setVisible(bool)));
-		ret = ret && connect(showCameraSettingsButton, SIGNAL(toggled(bool)), cameraSettingsBox, SLOT(setVisible(bool)));
-		ret = ret && connect(addPresetButton, SIGNAL(pressed()), this, SLOT(onAddPresetButtonPressed()));
-		ret = ret && connect(removePresetButton, SIGNAL(pressed()), this, SLOT(onRemovePresetButtonPressed()));
-		ret = ret && connect(m_presetCombo, SIGNAL(activated(const QString &)), this, SLOT(onPresetSelected(const QString &)));
-		ret = ret && connect(m_cameraSettings, SIGNAL(changed()), this, SLOT(onCameraSettingsChanged()));
-		ret = ret && connect(m_doStereoscopy, SIGNAL(stateChanged(int)), SLOT(onStereoChecked(int)));
+		ret = ret && connect(m_dominantFieldOm, SIGNAL(currentIndexChanged(int)),
+							 SLOT(onDominantFieldChanged(int)));
+		ret = ret && connect(m_frameRateFld, SIGNAL(editingFinished()), this,
+							 SLOT(onFrameRateEditingFinished()));
+		ret = ret && connect(m_stretchFromFld, SIGNAL(editingFinished()),
+							 SLOT(onStretchFldEditFinished()));
+		ret = ret &&
+			  connect(m_stretchToFld, SIGNAL(editingFinished()), SLOT(onStretchFldEditFinished()));
+		ret = ret && connect(m_multimediaOm, SIGNAL(currentIndexChanged(int)), this,
+							 SLOT(onMultimediaChanged(int)));
+		ret = ret && connect(showOtherSettingsButton, SIGNAL(toggled(bool)), otherSettingsFrame,
+							 SLOT(setVisible(bool)));
+		ret = ret && connect(showCameraSettingsButton, SIGNAL(toggled(bool)), cameraSettingsBox,
+							 SLOT(setVisible(bool)));
+		ret = ret &&
+			  connect(addPresetButton, SIGNAL(pressed()), this, SLOT(onAddPresetButtonPressed()));
+		ret = ret && connect(removePresetButton, SIGNAL(pressed()), this,
+							 SLOT(onRemovePresetButtonPressed()));
+		ret = ret && connect(m_presetCombo, SIGNAL(activated(const QString &)), this,
+							 SLOT(onPresetSelected(const QString &)));
+		ret = ret &&
+			  connect(m_cameraSettings, SIGNAL(changed()), this, SLOT(onCameraSettingsChanged()));
+		ret =
+			ret && connect(m_doStereoscopy, SIGNAL(stateChanged(int)), SLOT(onStereoChecked(int)));
 		ret = ret && connect(m_stereoShift, SIGNAL(editingFinished()), SLOT(onStereoChanged()));
 	}
 
@@ -559,7 +570,8 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
 						 SLOT(onRasterGranularityChanged(int)));
 
 	if (m_subcameraChk)
-		ret = ret && connect(m_subcameraChk, SIGNAL(stateChanged(int)), SLOT(onSubcameraChecked(int)));
+		ret = ret &&
+			  connect(m_subcameraChk, SIGNAL(stateChanged(int)), SLOT(onSubcameraChecked(int)));
 
 	assert(ret);
 }
@@ -583,7 +595,8 @@ TOutputProperties *OutputSettingsPopup::getProperties() const
 	if (!scene)
 		return 0;
 
-	return m_isPreviewSettings ? scene->getProperties()->getPreviewProperties() : scene->getProperties()->getOutputProperties();
+	return m_isPreviewSettings ? scene->getProperties()->getPreviewProperties()
+							   : scene->getProperties()->getOutputProperties();
 }
 
 //-----------------------------------------------------------------------------
@@ -592,13 +605,10 @@ void OutputSettingsPopup::showEvent(QShowEvent *)
 {
 	TSceneHandle *sceneHandle = TApp::instance()->getCurrentScene();
 	TXsheetHandle *xsheetHandle = TApp::instance()->getCurrentXsheet();
-	bool ret = connect(sceneHandle, SIGNAL(sceneChanged()),
-					   this, SLOT(updateField()));
-	ret = ret && connect(sceneHandle, SIGNAL(sceneSwitched()),
-						 this, SLOT(updateField()));
+	bool ret = connect(sceneHandle, SIGNAL(sceneChanged()), this, SLOT(updateField()));
+	ret = ret && connect(sceneHandle, SIGNAL(sceneSwitched()), this, SLOT(updateField()));
 
-	ret = ret && connect(xsheetHandle, SIGNAL(xsheetChanged()),
-						 this, SLOT(updateField()));
+	ret = ret && connect(xsheetHandle, SIGNAL(xsheetChanged()), this, SLOT(updateField()));
 	updateField();
 	assert(ret);
 }
@@ -609,13 +619,10 @@ void OutputSettingsPopup::hideEvent(QHideEvent *e)
 {
 	TSceneHandle *sceneHandle = TApp::instance()->getCurrentScene();
 	TXsheetHandle *xsheetHandle = TApp::instance()->getCurrentXsheet();
-	bool ret = disconnect(sceneHandle, SIGNAL(sceneChanged()),
-						  this, SLOT(updateField()));
-	ret = ret && disconnect(sceneHandle, SIGNAL(sceneSwitched()),
-							this, SLOT(updateField()));
+	bool ret = disconnect(sceneHandle, SIGNAL(sceneChanged()), this, SLOT(updateField()));
+	ret = ret && disconnect(sceneHandle, SIGNAL(sceneSwitched()), this, SLOT(updateField()));
 
-	ret = ret && disconnect(xsheetHandle, SIGNAL(xsheetChanged()),
-							this, SLOT(updateField()));
+	ret = ret && disconnect(xsheetHandle, SIGNAL(xsheetChanged()), this, SLOT(updateField()));
 	assert(ret);
 	Dialog::hideEvent(e);
 }
@@ -683,8 +690,9 @@ void OutputSettingsPopup::updateField()
 			name = QString::fromStdString(scene->getScenePath().getName());
 		m_saveInFileFld->setPath(toQString(path.getParentDir()));
 		m_fileNameFld->setText(name);
-		//RenderController::instance()->setMovieExt(path.getType());
-		m_fileFormat->setCurrentIndex(m_fileFormat->findText(QString::fromStdString(path.getType())));
+		// RenderController::instance()->setMovieExt(path.getType());
+		m_fileFormat->setCurrentIndex(
+			m_fileFormat->findText(QString::fromStdString(path.getType())));
 		m_multimediaOm->setCurrentIndex(prop->getMultimediaRendering());
 	}
 
@@ -695,7 +703,8 @@ void OutputSettingsPopup::updateField()
 	}
 	TStageObjectTree *tree = scene->getXsheet()->getStageObjectTree();
 	int cameraCount = tree->getCameraCount();
-	TStageObjectId cameraId = m_isPreviewSettings ? tree->getCurrentPreviewCameraId() : tree->getCurrentCameraId();
+	TStageObjectId cameraId =
+		m_isPreviewSettings ? tree->getCurrentPreviewCameraId() : tree->getCurrentCameraId();
 	QStringList cameras;
 	int tmpCameraId = 0;
 	int index = 0;
@@ -736,7 +745,8 @@ void OutputSettingsPopup::updateField()
 	m_stepFld->setValue(step);
 	m_shrinkFld->setValue(renderSettings.m_shrinkX);
 	if (m_applyShrinkChk)
-		m_applyShrinkChk->setCheckState(renderSettings.m_applyShrinkToViewer ? Qt::Checked : Qt::Unchecked);
+		m_applyShrinkChk->setCheckState(renderSettings.m_applyShrinkToViewer ? Qt::Checked
+																			 : Qt::Unchecked);
 	// resample
 	switch (renderSettings.m_quality) {
 	case TRenderSettings::ImprovedResampleQuality:
@@ -803,10 +813,10 @@ void OutputSettingsPopup::updateField()
 		break;
 	}
 
-	//Threads
+	// Threads
 	m_threadsComboOm->setCurrentIndex(prop->getThreadIndex());
 
-	//Raster granularity
+	// Raster granularity
 	m_rasterGranularityOm->setCurrentIndex(prop->getMaxTileSizeIndex());
 
 	if (m_isPreviewSettings)
@@ -878,7 +888,8 @@ void OutputSettingsPopup::onNameChanged()
 
 	QString name = m_fileNameFld->text();
 	if (!isValidFileName(name)) {
-		DVGui::error("A filename cannot be empty or contain any of the following characters:\n \\ / : * ? \" < > |");
+		DVGui::error("A filename cannot be empty or contain any of the following characters:\n \\ "
+					 "/ : * ? \" < > |");
 		TOutputProperties *prop = getProperties();
 		TFilePath fp = prop->getPath();
 		QString name = QString::fromStdString(fp.getName());
@@ -927,8 +938,8 @@ void OutputSettingsPopup::onNameChanged()
 */
 void OutputSettingsPopup::onFormatChanged(const QString &str)
 {
-	//string ext = RenderController::instance()->format2ext(str.toStdString());
-	//RenderController::instance()->setMovieExt(ext);
+	// string ext = RenderController::instance()->format2ext(str.toStdString());
+	// RenderController::instance()->setMovieExt(ext);
 
 	TOutputProperties *prop = getProperties();
 	TFilePath fp = prop->getPath().withType(str.toStdString());
@@ -983,7 +994,8 @@ void OutputSettingsPopup::onCameraChanged(const QString &str)
 		return;
 	TApp *app = TApp::instance();
 	TStageObjectId cameraId = TStageObjectId::CameraId(i);
-	TStageObjectId currentCameraId = m_isPreviewSettings ? tree->getCurrentPreviewCameraId() : tree->getCurrentCameraId();
+	TStageObjectId currentCameraId =
+		m_isPreviewSettings ? tree->getCurrentPreviewCameraId() : tree->getCurrentCameraId();
 	if (currentCameraId != cameraId) {
 		TXsheetHandle *xsheetHandle = app->getCurrentXsheet();
 		disconnect(xsheetHandle, SIGNAL(xsheetChanged()), this, SLOT(updateField()));
@@ -1074,7 +1086,8 @@ void OutputSettingsPopup::onFrameFldEditFinished()
 	prop->setRange(r0, r1, step);
 	TRenderSettings rs = prop->getRenderSettings();
 	rs.m_shrinkX = rs.m_shrinkY = shrink;
-	rs.m_applyShrinkToViewer = m_applyShrinkChk ? m_applyShrinkChk->checkState() == Qt::Checked : false;
+	rs.m_applyShrinkToViewer =
+		m_applyShrinkChk ? m_applyShrinkChk->checkState() == Qt::Checked : false;
 
 	prop->setRenderSettings(rs);
 
@@ -1270,10 +1283,8 @@ void OutputSettingsPopup::onAddPresetButtonPressed()
 {
 	//*-- プリセット名を取得 --*/
 	bool ok;
-	QString qs = DVGui::getText(
-		tr("Add preset"),
-		tr("Enter the name for the output settings preset."),
-		"", &ok);
+	QString qs = DVGui::getText(tr("Add preset"),
+								tr("Enter the name for the output settings preset."), "", &ok);
 	if (!ok || qs.isEmpty())
 		return;
 
@@ -1286,10 +1297,10 @@ void OutputSettingsPopup::onAddPresetButtonPressed()
 
 	/*-- すでに存在する場合、上書きを確認 --*/
 	if (TFileStatus(fp).doesExist()) {
-		int ret = QMessageBox::question(this, tr("Add output settings preset"),
-										QString("The file %1 does already exist.\nDo you want to overwrite it?").arg(qs),
-										QMessageBox::Save | QMessageBox::Cancel,
-										QMessageBox::Save);
+		int ret = QMessageBox::question(
+			this, tr("Add output settings preset"),
+			QString("The file %1 does already exist.\nDo you want to overwrite it?").arg(qs),
+			QMessageBox::Save | QMessageBox::Cancel, QMessageBox::Save);
 		if (ret == QMessageBox::Cancel)
 			return;
 	}
@@ -1312,7 +1323,8 @@ void OutputSettingsPopup::onAddPresetButtonPressed()
 	/*--  Saveinのプロジェクトフォルダ部分 --*/
 	QString saveInPath = m_saveInFileFld->getPath();
 	if (saveInPath.startsWith("+")) {
-		QString projectFolderName = (saveInPath.contains("\\")) ? saveInPath.left(saveInPath.indexOf("\\")) : saveInPath;
+		QString projectFolderName =
+			(saveInPath.contains("\\")) ? saveInPath.left(saveInPath.indexOf("\\")) : saveInPath;
 		os.child("savein_projectfolder") << projectFolderName.toStdString();
 	}
 
@@ -1346,16 +1358,16 @@ void OutputSettingsPopup::onAddPresetButtonPressed()
 	QString chanw = m_channelWidthOm->currentText();
 	os.child("bpp") << chanw.toStdString();
 
-	//140503 iwasawa Frame Rate (Scene Settings)
+	// 140503 iwasawa Frame Rate (Scene Settings)
 	os.child("frameRate") << m_frameRateFld->text().toStdString();
 
-	//140325 iwasawa stretch FPS
+	// 140325 iwasawa stretch FPS
 	os.child("stretchFrom") << m_stretchFromFld->text().toStdString();
 	os.child("stretchTo") << m_stretchToFld->text().toStdString();
-	//140325 iwasawa gamma
+	// 140325 iwasawa gamma
 	os.child("gamma") << m_gammaFld->text().toStdString();
 
-	os.closeChild(); //outputsettingspreset
+	os.closeChild(); // outputsettingspreset
 
 	m_presetCombo->blockSignals(true);
 	updatePresetComboItems();
@@ -1392,14 +1404,15 @@ void OutputSettingsPopup::onRemovePresetButtonPressed()
 	int index = m_presetCombo->currentIndex();
 	if (index <= 0)
 		return;
-	int ret = QMessageBox::question(this, tr("Remove preset"),
-									QString("Deleting \"%1\".\nAre you sure?").arg(m_presetCombo->currentText()),
-									QMessageBox::Ok | QMessageBox::Cancel,
-									QMessageBox::Ok);
+	int ret =
+		QMessageBox::question(this, tr("Remove preset"), QString("Deleting \"%1\".\nAre you sure?")
+															 .arg(m_presetCombo->currentText()),
+							  QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Ok);
 	if (ret == QMessageBox::Cancel)
 		return;
 
-	TFilePath fp = TEnv::getConfigDir() + "outputpresets" + QString("%1.txt").arg(m_presetCombo->currentText()).toStdString();
+	TFilePath fp = TEnv::getConfigDir() + "outputpresets" +
+				   QString("%1.txt").arg(m_presetCombo->currentText()).toStdString();
 	if (TFileStatus(fp).doesExist())
 		TSystem::deleteFile(fp);
 
@@ -1416,11 +1429,11 @@ void OutputSettingsPopup::onPresetSelected(const QString &str)
 	/*-- "<custom>"を選択したら何もせずreturn --*/
 	if (m_presetCombo->currentIndex() == 0)
 		return;
-	TFilePath fp = TEnv::getConfigDir() + "outputpresets" + QString("%1.txt").arg(str).toStdString();
+	TFilePath fp =
+		TEnv::getConfigDir() + "outputpresets" + QString("%1.txt").arg(str).toStdString();
 	if (!TFileStatus(fp).doesExist()) {
 		QMessageBox::warning(this, tr("Warning"),
-							 QString("The preset file %1.txt not found").arg(str),
-							 QMessageBox::Ok,
+							 QString("The preset file %1.txt not found").arg(str), QMessageBox::Ok,
 							 QMessageBox::Ok);
 		return;
 	}
@@ -1428,25 +1441,21 @@ void OutputSettingsPopup::onPresetSelected(const QString &str)
 	if (!is) {
 		QMessageBox::warning(this, tr("Warning"),
 							 QString("Failed to open the preset file %1.txt").arg(str),
-							 QMessageBox::Ok,
-							 QMessageBox::Ok);
+							 QMessageBox::Ok, QMessageBox::Ok);
 		return;
 	}
 
 	std::string tagName = "";
-	if (!is.matchTag(tagName) ||
-		tagName != "outputsettingspreset") {
-		QMessageBox::warning(this, tr("Warning"),
-							 QString("Bad file format: %1.txt").arg(str),
-							 QMessageBox::Ok,
-							 QMessageBox::Ok);
+	if (!is.matchTag(tagName) || tagName != "outputsettingspreset") {
+		QMessageBox::warning(this, tr("Warning"), QString("Bad file format: %1.txt").arg(str),
+							 QMessageBox::Ok, QMessageBox::Ok);
 		return;
 	}
 
 	TOutputProperties *prop = getProperties();
 	TRenderSettings rs = prop->getRenderSettings();
 	while (is.matchTag(tagName)) {
-		//Camera
+		// Camera
 		if (tagName == "camera") {
 			TXsheet *xsheet = TApp::instance()->getCurrentXsheet()->getXsheet();
 			TStageObjectId cameraId = xsheet->getStageObjectTree()->getCurrentCameraId();
@@ -1461,29 +1470,29 @@ void OutputSettingsPopup::onPresetSelected(const QString &str)
 			QString newProjectFolder = QString::fromStdString(projectFolderName);
 			QString fp = QString::fromStdWString(prop->getPath().getWideString());
 			/*-- 出力パスがプロジェクトフォルダで始まっている場合は、差し替える --*/
-			if (!newProjectFolder.isEmpty() &&
-				fp.startsWith("+")) {
+			if (!newProjectFolder.isEmpty() && fp.startsWith("+")) {
 				if (fp.indexOf("\\") >= 0)
-					fp = QString("%1\\%2").arg(newProjectFolder).arg(fp.right(fp.size() - fp.indexOf("\\") - 1));
+					fp = QString("%1\\%2")
+							 .arg(newProjectFolder)
+							 .arg(fp.right(fp.size() - fp.indexOf("\\") - 1));
 				else
 					fp = newProjectFolder;
 				prop->setPath(TFilePath(fp.toStdWString()));
 			}
 		}
-		//File format
+		// File format
 		else if (tagName == "format") {
 			std::string formatName;
 			is >> formatName;
 			TFilePath fp = prop->getPath().withType(formatName);
 			prop->setPath(fp);
 		}
-		//File options
+		// File options
 		else if (tagName == "formatsProperties") {
 			while (is.matchTag(tagName)) {
 				if (tagName == "formatProperties") {
 					std::string ext = is.getTagAttribute("ext");
-					TPropertyGroup *pg =
-						prop->getFileFormatProperties(ext);
+					TPropertyGroup *pg = prop->getFileFormatProperties(ext);
 					if (ext == "avi") {
 						TPropertyGroup appProperties;
 						appProperties.loadData(is);
@@ -1492,7 +1501,8 @@ void OutputSettingsPopup::onPresetSelected(const QString &str)
 							continue;
 						}
 						TEnumProperty *enumProp = dynamic_cast<TEnumProperty *>(pg->getProperty(0));
-						TEnumProperty *enumAppProp = dynamic_cast<TEnumProperty *>(appProperties.getProperty(0));
+						TEnumProperty *enumAppProp =
+							dynamic_cast<TEnumProperty *>(appProperties.getProperty(0));
 						assert(enumAppProp && enumProp);
 						if (enumAppProp && enumProp) {
 							try {
@@ -1525,7 +1535,7 @@ void OutputSettingsPopup::onPresetSelected(const QString &str)
 				m_channelWidthOm->setCurrentIndex(index);
 		}
 
-		//Frame Rate (Scene Settings)
+		// Frame Rate (Scene Settings)
 		else if (tagName == "frameRate") {
 			std::string strFps;
 			is >> strFps;

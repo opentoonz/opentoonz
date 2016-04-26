@@ -31,22 +31,22 @@ class TVectorImageP;
 //----------------------------------------------------------------------------
 
 /*!
-  \brief    The PlaneViewer class implements a basic OpenGL widget showing a plane in a 
-            standard top-down view, and supports image drawing from the Toonz images API.
+  \brief    The PlaneViewer class implements a basic OpenGL widget showing a plane in a
+			standard top-down view, and supports image drawing from the Toonz images API.
 
   \details  A PlaneViewer instance is designed to view bidimensional objects layed-out
-            on a plane, providing standard mouse interaction functions and some built-in
-            keyboard shortcuts to provide view navigation.
+			on a plane, providing standard mouse interaction functions and some built-in
+			keyboard shortcuts to provide view navigation.
 
-            The class implements the necessary methods to draw objects on the plane - 
-            prominently, functions to push both world and widget references for standard
-            OpenGL drawing, conversions between world and widget coordinates, and
-            efficient image-drawing functions for all Toonz image types.
+			The class implements the necessary methods to draw objects on the plane -
+			prominently, functions to push both world and widget references for standard
+			OpenGL drawing, conversions between world and widget coordinates, and
+			efficient image-drawing functions for all Toonz image types.
 */
 
 class DVAPI PlaneViewer : public QGLWidget
 {
-public:
+  public:
 	PlaneViewer(QWidget *parent = 0);
 
 	// Background functions
@@ -101,7 +101,7 @@ public:
 	TRaster32P rasterBuffer();
 	void flushRasterBuffer();
 
-protected:
+  protected:
 	int m_xpos, m_ypos; //!< Mouse position on mouse operations.
 	TAffine m_aff;		//!< Affine transform from world to widget coords.
 
@@ -112,7 +112,7 @@ protected:
 
 	double m_zoomRange[2]; //!< Viewport zoom range (default: [-1024, 1024]).
 
-protected:
+  protected:
 	virtual void mouseMoveEvent(QMouseEvent *event);
 	virtual void mousePressEvent(QMouseEvent *event);
 	virtual void wheelEvent(QWheelEvent *event);
@@ -122,9 +122,9 @@ protected:
 
 	void initMatrix();
 
-private:
+  private:
 	GLdouble m_matrix[16];
 	bool m_firstResize;
 };
 
-#endif //PLANE_VIEWER_H
+#endif // PLANE_VIEWER_H

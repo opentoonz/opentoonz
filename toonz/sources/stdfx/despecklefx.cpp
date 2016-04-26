@@ -19,9 +19,8 @@ class DespeckleFx : public TStandardRasterFx
 	TIntParamP m_size;
 	TIntEnumParamP m_transparenceType;
 
-public:
-	DespeckleFx()
-		: m_size(1), m_transparenceType(new TIntEnumParam(0, "Transparent Bg"))
+  public:
+	DespeckleFx() : m_size(1), m_transparenceType(new TIntEnumParam(0, "Transparent Bg"))
 	{
 		bindParam(this, "size", m_size);
 		bindParam(this, "detect_speckles_on", m_transparenceType);

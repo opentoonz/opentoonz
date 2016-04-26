@@ -29,7 +29,8 @@ QImage rasterToQImage(const TRasterP &ras, bool premultiplied, bool mirrored)
 			return image.mirrored();
 		return image;
 	} else if (TRasterGR8P ras8 = ras) {
-		QImage image(ras->getRawData(), ras->getLx(), ras->getLy(), ras->getWrap(), QImage::Format_Indexed8);
+		QImage image(ras->getRawData(), ras->getLx(), ras->getLy(), ras->getWrap(),
+					 QImage::Format_Indexed8);
 		static QVector<QRgb> colorTable;
 		if (colorTable.size() == 0) {
 			int i;
@@ -98,7 +99,8 @@ void rasterizeWholeStroke(TOfflineGL *&gl, TStroke *stroke, TPalette *palette, b
 
 //--------------------------------------------------------------------------
 
-TRect fastAddInkStroke(const TRasterImageP &ri, TStroke *stroke, TRectD clip, double opacity, bool doAntialiasing)
+TRect fastAddInkStroke(const TRasterImageP &ri, TStroke *stroke, TRectD clip, double opacity,
+					   bool doAntialiasing)
 {
 	TOfflineGL *gl = 0;
 	TRectD bbox = stroke->getBBox();
@@ -126,7 +128,8 @@ TRect fastAddInkStroke(const TRasterImageP &ri, TStroke *stroke, TRectD clip, do
 
 //-------------------------------------------------------------------
 
-TRect rasterizeRegion(TOfflineGL *&gl, TRect rasBounds, TRegion *region, TPalette *palette, TRectD clip)
+TRect rasterizeRegion(TOfflineGL *&gl, TRect rasBounds, TRegion *region, TPalette *palette,
+					  TRectD clip)
 {
 	TRectD regionBBox = region->getBBox();
 	if (!clip.isEmpty())
@@ -156,8 +159,8 @@ TRect rasterizeRegion(TOfflineGL *&gl, TRect rasBounds, TRegion *region, TPalett
 
 //-------------------------------------------------------------------
 
-void fastAddPaintRegion(const TRasterImageP &ri, TRegion *region,
-						int newPaintId, int maxStyleId, TRectD clip = TRectD())
+void fastAddPaintRegion(const TRasterImageP &ri, TRegion *region, int newPaintId, int maxStyleId,
+						TRectD clip = TRectD())
 {
 	TRaster32P ras = ri->getRaster();
 	TOfflineGL *gl;
@@ -224,35 +227,35 @@ TRectD TRasterImageUtils::convertRasterToWorld(const TRect &area, const TRasterI
 // DA RIFARE
 // e' lenta da far schifo
 
-//!Converts a TVectorImage into a TRasterImage. The input vector image
-//!is transformed through the passed affine \b aff, and put into a
-//!TRasterImage strictly covering the bounding box of the transformed
-//!vector image. The output image has its lower-left position in the
-//!world reference specified by the \b pos parameter, which is granted to
-//!be an integer displacement of the passed value. Additional parameters
-//!include an integer \b enlarge by which the output image is enlarged with
-//!respect to the transformed image's bbox, and the bool \b transformThickness
-//!to specify whether the transformation should involve strokes' thickensses
-//!or not.
+//! Converts a TVectorImage into a TRasterImage. The input vector image
+//! is transformed through the passed affine \b aff, and put into a
+//! TRasterImage strictly covering the bounding box of the transformed
+//! vector image. The output image has its lower-left position in the
+//! world reference specified by the \b pos parameter, which is granted to
+//! be an integer displacement of the passed value. Additional parameters
+//! include an integer \b enlarge by which the output image is enlarged with
+//! respect to the transformed image's bbox, and the bool \b transformThickness
+//! to specify whether the transformation should involve strokes' thickensses
+//! or not.
 TRasterImageP TRasterImageUtils::vectorToFullColorImage(
-	const TVectorImageP &vimage, const TAffine &aff, TPalette *palette,
-	const TPointD &outputPos, const TDimension &outputSize,
-	const std::vector<TRasterFxRenderDataP> *fxs, bool transformThickness)
+	const TVectorImageP &vimage, const TAffine &aff, TPalette *palette, const TPointD &outputPos,
+	const TDimension &outputSize, const std::vector<TRasterFxRenderDataP> *fxs,
+	bool transformThickness)
 {
 	if (!vimage || !palette)
 		return 0;
 
-	//Transform the vector image through aff
+	// Transform the vector image through aff
 	TVectorImageP vi = vimage->clone();
 	vi->transform(aff, transformThickness);
 
-	//Allocate the output ToonzImage
+	// Allocate the output ToonzImage
 	TRaster32P raster(outputSize.lx, outputSize.ly);
 	raster->clear();
 	TRasterImageP ri(raster);
 	ri->setPalette(palette->clone());
 
-	//Shift outputPos to the origin
+	// Shift outputPos to the origin
 	vi->transform(TTranslation(-outputPos));
 
 	int strokeCount = vi->getStrokeCount();
@@ -274,7 +277,8 @@ TRasterImageP TRasterImageUtils::vectorToFullColorImage(
 	set<int> colors;
 	if (fxs) {
 		for (i = 0; i < (int)fxs->size(); i++) {
-			SandorFxRenderData *sandorData = dynamic_cast<SandorFxRenderData *>((*fxs)[i].getPointer());
+			SandorFxRenderData *sandorData =
+				dynamic_cast<SandorFxRenderData *>((*fxs)[i].getPointer());
 			if (sandorData && sandorData->m_type == BlendTz) {
 				std::string indexes = toString(sandorData->m_blendParams.m_colorIndex);
 				std::vector<std::string> items;
@@ -334,7 +338,8 @@ TRect TRasterImageUtils::eraseRect(const TRasterImageP &ri, const TRectD &area)
 
 //-------------------------------------------------------------------
 
-std::vector<TRect> TRasterImageUtils::paste(const TRasterImageP &ri, const TTileSetFullColor *tileSet)
+std::vector<TRect> TRasterImageUtils::paste(const TRasterImageP &ri,
+											const TTileSetFullColor *tileSet)
 {
 	std::vector<TRect> rects;
 	TRasterP raster = ri->getRaster();
@@ -370,7 +375,7 @@ void TRasterImageUtils::addSceneNumbering(const TRasterImageP &ri, int globalInd
 	int fontHeight = fm.height();
 	int offset = fontHeight * 0.2;
 
-	//write the scenename and the scene frame
+	// write the scenename and the scene frame
 	QString sceneFrame = QString::number(sceneIndex);
 	while (sceneFrame.size() < 4)
 		sceneFrame.push_front("0");
@@ -385,7 +390,7 @@ void TRasterImageUtils::addSceneNumbering(const TRasterImageP &ri, int globalInd
 	p.setPen(Qt::white);
 	p.drawText(2 * offset, ly - 2 * offset, sceneNumberingString);
 
-	//write the global frame
+	// write the global frame
 	QString globalFrame = QString::number(globalIndex);
 	while (globalFrame.size() < 4)
 		globalFrame.push_front("0");
@@ -393,9 +398,11 @@ void TRasterImageUtils::addSceneNumbering(const TRasterImageP &ri, int globalInd
 	int gloablNumberingWidth = fm.width(globalFrame);
 	p.setPen(Qt::NoPen);
 	p.setBrush(QColor(255, 255, 255, 255));
-	p.drawRect(lx - 3 * offset - gloablNumberingWidth, ly - offset - fontHeight, gloablNumberingWidth + offset * 2, fontHeight);
+	p.drawRect(lx - 3 * offset - gloablNumberingWidth, ly - offset - fontHeight,
+			   gloablNumberingWidth + offset * 2, fontHeight);
 	p.setBrush(greyOverlay);
-	p.drawRect(lx - 3 * offset - gloablNumberingWidth, ly - offset - fontHeight, gloablNumberingWidth + offset * 2, fontHeight);
+	p.drawRect(lx - 3 * offset - gloablNumberingWidth, ly - offset - fontHeight,
+			   gloablNumberingWidth + offset * 2, fontHeight);
 	p.setPen(Qt::white);
 	p.drawText(lx - 2 * offset - gloablNumberingWidth, ly - 2 * offset, globalFrame);
 	p.end();
@@ -403,7 +410,8 @@ void TRasterImageUtils::addSceneNumbering(const TRasterImageP &ri, int globalInd
 
 //-------------------------------------------------------------------
 
-void TRasterImageUtils::addGlobalNumbering(const TRasterImageP &ri, const std::wstring &sceneName, int globalIndex)
+void TRasterImageUtils::addGlobalNumbering(const TRasterImageP &ri, const std::wstring &sceneName,
+										   int globalIndex)
 {
 	if (!ri)
 		return;

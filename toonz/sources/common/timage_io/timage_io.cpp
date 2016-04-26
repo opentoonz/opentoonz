@@ -43,7 +43,8 @@ bool TImageReader::m_safeMode = false;
 //-----------------------------------------------------------
 
 TImageReader::TImageReader(const TFilePath &path)
-	: TSmartObject(m_classCode), m_path(path), m_reader(0), m_vectorReader(0), m_readGreytones(true), m_file(NULL), m_is64BitEnabled(false), m_shrink(1), m_region(TRect())
+	: TSmartObject(m_classCode), m_path(path), m_reader(0), m_vectorReader(0),
+	  m_readGreytones(true), m_file(NULL), m_is64BitEnabled(false), m_shrink(1), m_region(TRect())
 {
 }
 
@@ -79,7 +80,7 @@ void TImageReader::close()
 		int err = 0;
 		err = fclose(m_file);
 
-		assert(err == 0); //il file e' stato chiuso senza errori
+		assert(err == 0); // il file e' stato chiuso senza errori
 	}
 
 	m_file = NULL;
@@ -92,7 +93,8 @@ void TImageReader::close()
 /*!
   Opens for reading using \b fopen().
 */
-void TImageReader::getTzpPaletteColorNames(std::map<int, std::pair<std::string, std::string>> &pltColorNames)
+void TImageReader::getTzpPaletteColorNames(
+	std::map<int, std::pair<std::string, std::string>> &pltColorNames)
 {
 	if (!m_file)
 		open();
@@ -111,10 +113,11 @@ void TImageReader::open()
 	assert(m_file == NULL);
 
 	std::string type = toLower(m_path.getType());
-	m_file = fopen(m_path, "rb"); //Opens for reading. If the file does not exist or cannot be found, the fopen_s call fails
+	m_file = fopen(m_path, "rb"); // Opens for reading. If the file does not exist or cannot be
+								  // found, the fopen_s call fails
 
-	if (m_file == NULL) //Non dovrebbe mai andarci!
-		close();		//close() chiude il file se e' aperto e setta m_file a NULL.
+	if (m_file == NULL) // Non dovrebbe mai andarci!
+		close(); // close() chiude il file se e' aperto e setta m_file a NULL.
 	else {
 		try {
 			m_reader = Tiio::makeReader(type);
@@ -128,7 +131,7 @@ void TImageReader::open()
 					throw TImageException(m_path, "Image format not supported");
 			}
 		} catch (TException &e) {
-			close(); //close() chiude il file e setta m_file a NULL.
+			close(); // close() chiude il file e setta m_file a NULL.
 			QString msg = QString::fromStdWString(e.getMessage());
 			if (msg == QString("Old 4.1 Palette"))
 				throw e;
@@ -173,36 +176,30 @@ TImageP TImageReader::load()
 
 //============================================================
 
-template <typename Pix>
-struct pixel_traits {
+template <typename Pix> struct pixel_traits {
 };
 
-template <>
-struct pixel_traits<TPixel32> {
+template <> struct pixel_traits<TPixel32> {
 	typedef TPixel32 rgbm_pixel_type;
 	typedef char buffer_type;
 };
 
-template <>
-struct pixel_traits<TPixel64> {
+template <> struct pixel_traits<TPixel64> {
 	typedef TPixel64 rgbm_pixel_type;
 	typedef short buffer_type;
 };
 
-template <>
-struct pixel_traits<TPixelGR8> {
+template <> struct pixel_traits<TPixelGR8> {
 	typedef TPixel32 rgbm_pixel_type;
 	typedef char buffer_type;
 };
 
-template <>
-struct pixel_traits<TPixelGR16> {
+template <> struct pixel_traits<TPixelGR16> {
 	typedef TPixel64 rgbm_pixel_type;
 	typedef short buffer_type;
 };
 
-template <>
-struct pixel_traits<TPixelCM32> {
+template <> struct pixel_traits<TPixelCM32> {
 	typedef TPixel32 rgbm_pixel_type;
 	typedef char buffer_type;
 };
@@ -210,7 +207,8 @@ struct pixel_traits<TPixelCM32> {
 //------------------------------------------------------------------------------------
 
 template <typename Pix>
-void copyLine(typename pixel_traits<Pix>::rgbm_pixel_type *lineIn, Pix *lineOut, int x0, int length, int shrink)
+void copyLine(typename pixel_traits<Pix>::rgbm_pixel_type *lineIn, Pix *lineOut, int x0, int length,
+			  int shrink)
 {
 	lineIn += x0;
 
@@ -239,9 +237,8 @@ void copyLine<TPixelGR16>(TPixel64 *lineIn, TPixelGR16 *lineOut, int x0, int len
 //------------------------------------------------------------------------------------
 
 template <typename Pix>
-void readRaster_copyLines(const TRasterPT<Pix> &ras, Tiio::Reader *reader,
-						  int x0, int y0, int x1, int y1,
-						  int inLx, int inLy, int shrink)
+void readRaster_copyLines(const TRasterPT<Pix> &ras, Tiio::Reader *reader, int x0, int y0, int x1,
+						  int y1, int inLx, int inLy, int shrink)
 {
 	typedef typename pixel_traits<Pix>::buffer_type buffer_type;
 	typedef typename pixel_traits<Pix>::rgbm_pixel_type rgbm_pixel_type;
@@ -292,8 +289,7 @@ void readRaster_copyLines(const TRasterPT<Pix> &ras, Tiio::Reader *reader,
 //------------------------------------------------------------------------------------
 
 template <typename Pix>
-void readRaster(const TRasterPT<Pix> &ras, Tiio::Reader *reader,
-				int x0, int y0, int x1, int y1,
+void readRaster(const TRasterPT<Pix> &ras, Tiio::Reader *reader, int x0, int y0, int x1, int y1,
 				int inLx, int inLy, int shrink)
 {
 	typedef typename pixel_traits<Pix>::buffer_type buffer_type;
@@ -585,8 +581,8 @@ void TImageWriter::save(const TImageP &img)
 		TRaster32P ras32 = ri->getRaster();
 		TRaster64P ras64 = ri->getRaster();
 
-		TEnumProperty *p = m_properties ? (TEnumProperty *)m_properties->getProperty("Bits Per Pixel")
-										: 0;
+		TEnumProperty *p =
+			m_properties ? (TEnumProperty *)m_properties->getProperty("Bits Per Pixel") : 0;
 
 		if (p && ri->isScanBW()) {
 			const std::vector<std::wstring> &range = p->getRange();
@@ -596,9 +592,11 @@ void TImageWriter::save(const TImageP &img)
 		int bpp = p ? atoi((toString(p->getValue()).c_str())) : 32;
 
 		//  bpp       1  8  16 24 32 40  48 56  64
-		int spp[] = {1, 1, 1, 4, 4, 0, 4, 0, 4};	// 0s are for pixel sizes which are normally unsupported
-		int bps[] = {1, 8, 16, 8, 8, 0, 16, 0, 16}; // by image formats, let alone by Toonz raster ones.
-													// The 24 and 48 cases get automatically promoted to 32 and 64.
+		int spp[] = {1, 1, 1, 4, 4,
+					 0, 4, 0, 4}; // 0s are for pixel sizes which are normally unsupported
+		int bps[] = {1, 8,  16, 8, 8,
+					 0, 16, 0,  16}; // by image formats, let alone by Toonz raster ones.
+									 // The 24 and 48 cases get automatically promoted to 32 and 64.
 		int bypp = bpp / 8;
 		assert(bypp < boost::size(spp) && spp[bypp] && bps[bypp]);
 
@@ -718,14 +716,14 @@ void TImageReader::load(const TRasterP &ras, const TPoint &pos, int shrinkX, int
 	TRaster32P srcRaster = srcRasImage->getRaster();
 	/*
 TRaster32P clippedRas = srcRaster->extractT
-        (shrinkX*pos.x, shrinkY*pos.y, 
-        (pos.x + ras->getLx()) * shrinkX - 1, (pos.y + ras->getLy()) * shrinkY - 1);
+		(shrinkX*pos.x, shrinkY*pos.y,
+		(pos.x + ras->getLx()) * shrinkX - 1, (pos.y + ras->getLy()) * shrinkY - 1);
 
 if (shrinkX != 1 || shrinkY != 1)
 {
   TRaster32P ras32 = ras;
   if (ras32)
-    ras32->fill(TPixel32::Transparent);
+	ras32->fill(TPixel32::Transparent);
   TRop::resample(ras, clippedRas, TScale(1./shrinkX, 1./shrinkY), TRop::ClosestPixel);
 }
 else*/
@@ -761,18 +759,14 @@ void TImageWriter::save(const TFilePath &path, const TImageP &image)
 //
 //===========================================================
 
-void TImageReader::define(
-	QString extension,
-	TImageReaderCreateProc *proc)
+void TImageReader::define(QString extension, TImageReaderCreateProc *proc)
 {
 	ImageReaderTable[extension] = proc;
 }
 
 //-----------------------------------------------------------
 
-void TImageWriter::define(
-	QString extension,
-	TImageWriterCreateProc *proc, bool isRenderFormat)
+void TImageWriter::define(QString extension, TImageWriterCreateProc *proc, bool isRenderFormat)
 {
 	ImageWriterTable[extension] = std::pair<TImageWriterCreateProc *, bool>(proc, isRenderFormat);
 }
@@ -782,8 +776,7 @@ void TImageWriter::define(
 void TImageReader::getSupportedFormats(QStringList &names)
 {
 	for (std::map<QString, TImageReaderCreateProc *>::iterator it = ImageReaderTable.begin();
-		 it != ImageReaderTable.end();
-		 ++it) {
+		 it != ImageReaderTable.end(); ++it) {
 		names.push_back(it->first);
 	}
 }
@@ -792,9 +785,9 @@ void TImageReader::getSupportedFormats(QStringList &names)
 
 void TImageWriter::getSupportedFormats(QStringList &names, bool onlyRenderFormat)
 {
-	for (std::map<QString, std::pair<TImageWriterCreateProc *, bool>>::iterator it = ImageWriterTable.begin();
-		 it != ImageWriterTable.end();
-		 ++it) {
+	for (std::map<QString, std::pair<TImageWriterCreateProc *, bool>>::iterator it =
+			 ImageWriterTable.begin();
+		 it != ImageWriterTable.end(); ++it) {
 		if (!onlyRenderFormat || it->second.second)
 			names.push_back(it->first);
 	}

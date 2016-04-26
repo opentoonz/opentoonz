@@ -34,10 +34,9 @@ namespace
 {
 
 struct PlaneViewerZoomer : public ImageUtils::ShortcutZoomer {
-	PlaneViewerZoomer(PlaneViewer *planeViewer)
-		: ShortcutZoomer(planeViewer) {}
+	PlaneViewerZoomer(PlaneViewer *planeViewer) : ShortcutZoomer(planeViewer) {}
 
-private:
+  private:
 	virtual bool zoom(bool zoomin, bool resetZoom);
 };
 
@@ -57,7 +56,8 @@ bool PlaneViewerZoomer::zoom(bool zoomin, bool resetZoom)
 //=========================================================================================
 
 PlaneViewer::PlaneViewer(QWidget *parent)
-	: QGLWidget(parent), m_firstResize(true), m_xpos(0), m_ypos(0), m_aff() // initialized at the first resize
+	: QGLWidget(parent), m_firstResize(true), m_xpos(0), m_ypos(0),
+	  m_aff() // initialized at the first resize
 	  ,
 	  m_chessSize(40.0)
 {
@@ -76,16 +76,20 @@ void PlaneViewer::setZoomRange(double zoomMin, double zoomMax)
 
 void PlaneViewer::setBgColor(const TPixel32 &color1, const TPixel32 &color2)
 {
-	m_bgColorF[0] = color1.r / 255.0, m_bgColorF[1] = color1.g / 255.0, m_bgColorF[2] = color1.b / 255.0;
-	m_bgColorF[3] = color2.r / 255.0, m_bgColorF[4] = color2.g / 255.0, m_bgColorF[5] = color2.b / 255.0;
+	m_bgColorF[0] = color1.r / 255.0, m_bgColorF[1] = color1.g / 255.0,
+	m_bgColorF[2] = color1.b / 255.0;
+	m_bgColorF[3] = color2.r / 255.0, m_bgColorF[4] = color2.g / 255.0,
+	m_bgColorF[5] = color2.b / 255.0;
 }
 
 //------------------------------------------------------------------------
 
 void PlaneViewer::getBgColor(TPixel32 &color1, TPixel32 &color2) const
 {
-	color1.r = m_bgColorF[0] * 255.0, color1.g = m_bgColorF[1] * 255.0, color1.b = m_bgColorF[2] * 255.0;
-	color2.r = m_bgColorF[3] * 255.0, color2.g = m_bgColorF[4] * 255.0, color2.b = m_bgColorF[5] * 255.0;
+	color1.r = m_bgColorF[0] * 255.0, color1.g = m_bgColorF[1] * 255.0,
+	color1.b = m_bgColorF[2] * 255.0;
+	color2.r = m_bgColorF[3] * 255.0, color2.g = m_bgColorF[4] * 255.0,
+	color2.b = m_bgColorF[5] * 255.0;
 }
 
 //------------------------------------------------------------------------
@@ -95,18 +99,16 @@ void PlaneViewer::drawBackground()
 	glClearColor(m_bgColorF[0], m_bgColorF[1], m_bgColorF[2], 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	if (m_bgColorF[0] != m_bgColorF[3] ||
-		m_bgColorF[1] != m_bgColorF[4] ||
+	if (m_bgColorF[0] != m_bgColorF[3] || m_bgColorF[1] != m_bgColorF[4] ||
 		m_bgColorF[2] != m_bgColorF[5]) {
-		//Cast the widget rect to world rect
+		// Cast the widget rect to world rect
 		TRectD rect(winToWorld(0, 0), winToWorld(width(), height()));
 
-		//Deduce chess geometry
-		TRect chessRect(
-			tfloor(rect.x0 / m_chessSize), tfloor(rect.y0 / m_chessSize),
-			tceil(rect.x1 / m_chessSize), tceil(rect.y1 / m_chessSize));
+		// Deduce chess geometry
+		TRect chessRect(tfloor(rect.x0 / m_chessSize), tfloor(rect.y0 / m_chessSize),
+						tceil(rect.x1 / m_chessSize), tceil(rect.y1 / m_chessSize));
 
-		//Draw chess squares
+		// Draw chess squares
 		glColor3f(m_bgColorF[3], m_bgColorF[4], m_bgColorF[5]);
 		glBegin(GL_QUADS);
 
@@ -117,8 +119,7 @@ void PlaneViewer::drawBackground()
 		for (y = chessRect.y0; y < chessRect.y1; ++y) {
 			pos.y = y * m_chessSize;
 			for (x = chessRect.x0 + ((chessRect.x0 + y) % 2), pos.x = x * m_chessSize;
-				 x < chessRect.x1;
-				 x += 2, pos.x += chessSize2) {
+				 x < chessRect.x1; x += 2, pos.x += chessSize2) {
 				glVertex2d(pos.x, pos.y);
 				glVertex2d(pos.x + m_chessSize, pos.y);
 				glVertex2d(pos.x + m_chessSize, pos.y + m_chessSize);
@@ -303,7 +304,8 @@ void PlaneViewer::popGLCoordinates()
 
 TRaster32P PlaneViewer::rasterBuffer()
 {
-	if (!m_rasterBuffer || m_rasterBuffer->getLx() != width() || m_rasterBuffer->getLy() != height())
+	if (!m_rasterBuffer || m_rasterBuffer->getLx() != width() ||
+		m_rasterBuffer->getLy() != height())
 		m_rasterBuffer = TRaster32P(width(), height());
 
 	return m_rasterBuffer;
@@ -317,8 +319,7 @@ void PlaneViewer::flushRasterBuffer()
 
 	glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 	glRasterPos2d(0, 0);
-	glDrawPixels(width(), height(),
-				 TGL_FMT, TGL_TYPE, m_rasterBuffer->getRawData());
+	glDrawPixels(width(), height(), TGL_FMT, TGL_TYPE, m_rasterBuffer->getRawData());
 }
 
 //=========================================================================================
@@ -333,9 +334,7 @@ void PlaneViewer::draw(TRasterP ras, double dpiX, double dpiY, TPalette *pal)
 	ras->lock();
 
 	glGetDoublev(GL_MODELVIEW_MATRIX, m_matrix);
-	TAffine viewAff(
-		m_matrix[0], m_matrix[4], m_matrix[12],
-		m_matrix[1], m_matrix[5], m_matrix[13]);
+	TAffine viewAff(m_matrix[0], m_matrix[4], m_matrix[12], m_matrix[1], m_matrix[5], m_matrix[13]);
 	viewAff = viewAff * TScale(Stage::inch / dpiX, Stage::inch / dpiY) * TTranslation(-rasCenter);
 
 	pushGLWinCoordinates();
@@ -351,8 +350,8 @@ void PlaneViewer::draw(TRasterP ras, double dpiX, double dpiY, TPalette *pal)
 }
 
 /*NOTE:
-    glRasterPos2d could be used, along glBitmap and glPixelZoom...
-    however, i've never been able to use them effectively...
+	glRasterPos2d could be used, along glBitmap and glPixelZoom...
+	however, i've never been able to use them effectively...
 */
 
 //------------------------------------------------------

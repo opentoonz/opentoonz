@@ -30,7 +30,8 @@ QScriptValue OutlineVectorizer::ctor(QScriptContext *context, QScriptEngine *eng
 	return create(engine, new OutlineVectorizer());
 }
 
-QScriptValue vectorizeImage(QScriptContext *context, QScriptEngine *engine, const TImageP &src, TPalette *palette, NewOutlineConfiguration *parameters)
+QScriptValue vectorizeImage(QScriptContext *context, QScriptEngine *engine, const TImageP &src,
+							TPalette *palette, NewOutlineConfiguration *parameters)
 {
 	VectorizerCore vc;
 	TAffine dpiAff;
@@ -79,7 +80,8 @@ QScriptValue OutlineVectorizer::vectorize(QScriptValue arg)
 			palette = ti->getPalette();
 		}
 	} else {
-		return context()->throwError(tr("Bad argument (%1): should be an Image or a Level").arg(arg.toString()));
+		return context()->throwError(
+			tr("Bad argument (%1): should be an Image or a Level").arg(arg.toString()));
 	}
 	if (palette == 0)
 		palette = new TPalette();
@@ -91,8 +93,10 @@ QScriptValue OutlineVectorizer::vectorize(QScriptValue arg)
 		level->getFrameIds(fids);
 		foreach (TFrameId fid, fids) {
 			TImageP srcImg = level->getImg(fid);
-			if (srcImg && (srcImg->getType() == TImage::RASTER || srcImg->getType() == TImage::TOONZ_RASTER)) {
-				QScriptValue newFrame = vectorizeImage(context(), engine(), srcImg, palette, m_parameters);
+			if (srcImg && (srcImg->getType() == TImage::RASTER ||
+						   srcImg->getType() == TImage::TOONZ_RASTER)) {
+				QScriptValue newFrame =
+					vectorizeImage(context(), engine(), srcImg, palette, m_parameters);
 				if (newFrame.isError()) {
 					return newFrame;
 				}
@@ -190,7 +194,8 @@ void OutlineVectorizer::setTransparentColor(const QString &colorName)
 	QColor color;
 	color.setNamedColor(colorName);
 	if (color.isValid()) {
-		m_parameters->m_transparentColor = TPixel32(color.red(), color.green(), color.blue(), color.alpha());
+		m_parameters->m_transparentColor =
+			TPixel32(color.red(), color.green(), color.blue(), color.alpha());
 	} else {
 		context()->throwError(tr("Invalid color : ").arg(colorName));
 	}

@@ -7,22 +7,21 @@
 namespace
 {
 template <class ST, class RT>
-void vert_change_template_(
-	ST *image, const int height, const int width, const int channels
+void vert_change_template_(ST *image, const int height, const int width, const int channels
 
-	,
-	const RT *refer // same as height,width,channels
-	,
-	const int refchannels, const int refcc
+						   ,
+						   const RT *refer // same as height,width,channels
+						   ,
+						   const int refchannels, const int refcc
 
-	,
-	const double offset, const double maxlen, const bool alpha_rendering_sw, const bool anti_aliasing_sw)
+						   ,
+						   const double offset, const double maxlen, const bool alpha_rendering_sw,
+						   const bool anti_aliasing_sw)
 {
 	const double smax = std::numeric_limits<ST>::max();
 	const double rmax = std::numeric_limits<RT>::max();
 
-	std::vector<std::vector<double>> buf_s1(channels),
-		buf_s2(channels);
+	std::vector<std::vector<double>> buf_s1(channels), buf_s2(channels);
 	for (int zz = 0; zz < channels; ++zz) {
 		buf_s1.at(zz).resize(height);
 		buf_s2.at(zz).resize(height);
@@ -38,8 +37,7 @@ void vert_change_template_(
 		}
 
 		for (int yy = 0; yy < height; ++yy) { // reference red of refer[]
-			double pos = static_cast<double>(
-				refer[yy * width * refchannels]);
+			double pos = static_cast<double>(refer[yy * width * refchannels]);
 			buf_r.at(yy) = ((pos / rmax) - offset) * maxlen;
 		}
 
@@ -64,8 +62,7 @@ void vert_change_template_(
 						buf_s2.at(zz).at(yy) = buf_s1.at(zz).at(yy);
 					} else {
 						buf_s2.at(zz).at(yy) =
-							buf_s1.at(zz).at(fl_pos) * (1.0 - div) +
-							buf_s1.at(zz).at(ce_pos) * div;
+							buf_s1.at(zz).at(fl_pos) * (1.0 - div) + buf_s1.at(zz).at(ce_pos) * div;
 					}
 				}
 			}
@@ -89,38 +86,42 @@ void vert_change_template_(
 
 		for (int yy = 0; yy < height; ++yy) {
 			for (int zz = 0; zz < channels; ++zz) {
-				image[yy * width * channels + zz] = static_cast<ST>(
-					buf_s2.at(zz).at(yy) * (smax + 0.999999));
+				image[yy * width * channels + zz] =
+					static_cast<ST>(buf_s2.at(zz).at(yy) * (smax + 0.999999));
 			}
 		}
 	}
 }
 }
 //--------------------------------------------------------------------
-void igs::warp::vert_change(
-	unsigned char *image, const int height, const int width, const int channels, const int bits
+void igs::warp::vert_change(unsigned char *image, const int height, const int width,
+							const int channels, const int bits
 
-	,
-	const unsigned char *refer // by height,width,channels
-	,
-	const int refchannels, const int refcc, const int refbit
+							,
+							const unsigned char *refer // by height,width,channels
+							,
+							const int refchannels, const int refcc, const int refbit
 
-	,
-	const double offset, const double maxlen, const bool alpha_rendering_sw, const bool anti_aliasing_sw)
+							,
+							const double offset, const double maxlen, const bool alpha_rendering_sw,
+							const bool anti_aliasing_sw)
 {
 	const int ucharb = std::numeric_limits<unsigned char>::digits;
 	const int ushortb = std::numeric_limits<unsigned short>::digits;
 	if ((ushortb == bits) && (ushortb == refbit)) {
-		vert_change_template_(
-			reinterpret_cast<unsigned short *>(image), height, width, channels, reinterpret_cast<const unsigned short *>(refer), refchannels, refcc, offset, maxlen, alpha_rendering_sw, anti_aliasing_sw);
+		vert_change_template_(reinterpret_cast<unsigned short *>(image), height, width, channels,
+							  reinterpret_cast<const unsigned short *>(refer), refchannels, refcc,
+							  offset, maxlen, alpha_rendering_sw, anti_aliasing_sw);
 	} else if ((ushortb == bits) && (ucharb == refbit)) {
-		vert_change_template_(
-			reinterpret_cast<unsigned short *>(image), height, width, channels, refer, refchannels, refcc, offset, maxlen, alpha_rendering_sw, anti_aliasing_sw);
+		vert_change_template_(reinterpret_cast<unsigned short *>(image), height, width, channels,
+							  refer, refchannels, refcc, offset, maxlen, alpha_rendering_sw,
+							  anti_aliasing_sw);
 	} else if ((ucharb == bits) && (ushortb == refbit)) {
-		vert_change_template_(
-			image, height, width, channels, reinterpret_cast<const unsigned short *>(refer), refchannels, refcc, offset, maxlen, alpha_rendering_sw, anti_aliasing_sw);
+		vert_change_template_(image, height, width, channels,
+							  reinterpret_cast<const unsigned short *>(refer), refchannels, refcc,
+							  offset, maxlen, alpha_rendering_sw, anti_aliasing_sw);
 	} else if ((ucharb == bits) && (ucharb == refbit)) {
-		vert_change_template_(
-			image, height, width, channels, refer, refchannels, refcc, offset, maxlen, alpha_rendering_sw, anti_aliasing_sw);
+		vert_change_template_(image, height, width, channels, refer, refchannels, refcc, offset,
+							  maxlen, alpha_rendering_sw, anti_aliasing_sw);
 	}
 }

@@ -23,7 +23,7 @@ class RenumberPopup : public DVGui::Dialog
 
 	DVGui::IntLineEdit *m_startFld, *m_stepFld;
 
-public:
+  public:
 	RenumberPopup();
 	void setValues(int start, int step);
 	void getValues(int &start, int &step);

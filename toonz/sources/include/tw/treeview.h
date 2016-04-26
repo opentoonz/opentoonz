@@ -35,7 +35,7 @@ class TContextMenu;
 
 class DVAPI TTreeViewItemUpdater
 {
-public:
+  public:
 	virtual bool done() const = 0;
 	virtual void next() = 0;
 	virtual bool matchItem(const TTreeViewItem *) const = 0;
@@ -49,17 +49,14 @@ class DVAPI TTreeViewItemParent
 {
 	TTreeView *m_treeView;
 
-protected:
+  protected:
 	bool m_valid;
 
 	typedef vector<TTreeViewItem *> ItemContainer;
 	ItemContainer m_children;
 
-public:
-	TTreeViewItemParent()
-		: m_treeView(0), m_valid(true)
-	{
-	}
+  public:
+	TTreeViewItemParent() : m_treeView(0), m_valid(true) {}
 	virtual ~TTreeViewItemParent();
 
 	void clearItems();
@@ -80,7 +77,7 @@ public:
 	void setTreeView(TTreeView *treeView) { m_treeView = treeView; }
 	TTreeView *getTreeView() const { return m_treeView; }
 
-private:
+  private:
 	// not implemented
 	TTreeViewItemParent(const TTreeViewItemParent &);
 	TTreeViewItemParent &operator=(const TTreeViewItemParent &);
@@ -94,7 +91,7 @@ class DVAPI TTreeViewItem : public TTreeViewItemParent
 	unsigned char m_status;
 	TTreeViewItemParent *m_parent;
 
-public:
+  public:
 	TTreeViewItem(TTreeViewItemParent *parent);
 	virtual ~TTreeViewItem();
 
@@ -139,10 +136,7 @@ public:
 	virtual bool isRenameEnabled() const { return false; }
 	virtual void rename(wstring name){};
 
-	virtual TContextMenu *createContextMenu()
-	{
-		return 0;
-	}
+	virtual TContextMenu *createContextMenu() { return 0; }
 
 	virtual bool acceptDrop(const TData *data) const { return false; }
 	virtual bool drop(const TData *data) { return false; }
@@ -150,7 +144,7 @@ public:
 	virtual bool drag(const TPoint &p) { return false; }
 	virtual bool rightClick(const TPoint &p);
 
-private:
+  private:
 	// not implemented
 	TTreeViewItem(const TTreeViewItem &);
 	TTreeViewItem &operator=(const TTreeViewItem &);
@@ -158,20 +152,17 @@ private:
 
 //-------------------------------------------------------------------
 
-class DVAPI TTreeView
-	: public TWidget,
-	  public TTreeViewItemParent,
-	  public TDragDropListener
+class DVAPI TTreeView : public TWidget, public TTreeViewItemParent, public TDragDropListener
 {
-public:
+  public:
 	class Listener
 	{
-	public:
+	  public:
 		virtual void onTreeViewSelect(TTreeView *treeView) = 0;
 		virtual ~Listener() {}
 	};
 
-protected:
+  protected:
 	struct VisibleItem {
 		TPoint m_pos;
 		// m_pos e' la coordinata del punto in basso a sinistra dell'icona
@@ -181,32 +172,26 @@ protected:
 
 		TTreeViewItem *m_item;
 
-		enum {
-			LastSiblingFlag = 0x1,
-			RootFlag = 0x2,
-			SonFlag = 0x4
-		};
+		enum { LastSiblingFlag = 0x1, RootFlag = 0x2, SonFlag = 0x4 };
 		int m_status;
-		//int m_siblingLinkLength;
-		//int m_childLinkLength;
+		// int m_siblingLinkLength;
+		// int m_childLinkLength;
 
 		VisibleItem();
 	};
 
-	int m_xMargin,
-		m_yMargin,
-		m_iconMargin; // distanza orizzontale fra il bottone "+/-" e l'icona
+	int m_xMargin, m_yMargin, m_iconMargin; // distanza orizzontale fra il bottone "+/-" e l'icona
 
 	vector<VisibleItem> m_visibleItems;
 
 #ifndef MACOSX
-	//togliere l'ifdef con il gcc3.3.2
+	// togliere l'ifdef con il gcc3.3.2
 	bool m_valid;
 #endif
 	int m_height;
 	int m_yoffset;
 	int m_xoffset;
-	//int m_selectedItemIndex;
+	// int m_selectedItemIndex;
 	std::set<int> m_selectedItemIndices;
 
 	TScrollbar *m_vScb, *m_hScb;
@@ -216,7 +201,7 @@ protected:
 	vector<Listener *> m_listeners;
 	TPoint m_lastMousePos;
 
-public:
+  public:
 	// costruttore/distruttore
 	TTreeView(TWidget *parent, string name = "treeView");
 	~TTreeView();
@@ -229,10 +214,7 @@ public:
 	// configure
 	void setScrollbars(TScrollbar *h, TScrollbar *v);
 	void enableMultiSelection(bool on);
-	bool isMultiSelectionEnabled() const
-	{
-		return m_multiSelectionEnabled;
-	}
+	bool isMultiSelectionEnabled() const { return m_multiSelectionEnabled; }
 
 	// resize
 	void configureNotify(const TDimension &s);
@@ -289,7 +271,7 @@ public:
 	string getContextHelpReference(const TPoint &p);
 
 #ifndef MACOSX
-	//togliere l'ifdef con il gcc3.3.2
+	// togliere l'ifdef con il gcc3.3.2
 	void onItemChange();
 #endif
 
@@ -299,7 +281,7 @@ public:
 	void renameCurrentItem(wstring s);
 	void updateVisibleItems();
 
-protected:
+  protected:
 	void getPlacement(int index, TRect &rect);
 	int getIndexFromY(int y);
 	void addItemAndSons(TTreeViewItem *item, int indentation);

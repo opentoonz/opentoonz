@@ -28,9 +28,11 @@ class DVAPI TParamVar
 	bool m_isHidden;
 	TParamObserver *m_paramObserver;
 
-public:
+  public:
 	TParamVar(std::string name, bool hidden = false)
-		: m_name(name), m_isHidden(hidden), m_paramObserver(0) {}
+		: m_name(name), m_isHidden(hidden), m_paramObserver(0)
+	{
+	}
 	virtual ~TParamVar() {}
 	virtual TParamVar *clone() const = 0;
 	std::string getName() const { return m_name; }
@@ -41,29 +43,21 @@ public:
 	void setParamObserver(TParamObserver *obs);
 };
 
-template <class T>
-class TParamVarT : public TParamVar
+template <class T> class TParamVarT : public TParamVar
 {
 	TParamP m_var;
 
-public:
+  public:
 	TParamVarT(std::string name, TParamP var, bool hidden = false)
 		: TParamVar(name, hidden), m_var(var)
 	{
 	}
-	TParamVarT(std::string name, T *var, bool hidden = false)
-		: TParamVar(name, hidden), m_var(var)
+	TParamVarT(std::string name, T *var, bool hidden = false) : TParamVar(name, hidden), m_var(var)
 	{
 	}
-	void setParam(TParam *param)
-	{
-		m_var = TParamP(param);
-	}
+	void setParam(TParam *param) { m_var = TParamP(param); }
 	virtual TParam *getParam() const { return m_var.getPointer(); }
-	TParamVar *clone() const
-	{
-		return new TParamVarT<T>(getName(), m_var, isHidden());
-	}
+	TParamVar *clone() const { return new TParamVarT<T>(getName(), m_var, isHidden()); }
 };
 
 class DVAPI TParamContainer
@@ -71,7 +65,7 @@ class DVAPI TParamContainer
 	class Imp;
 	std::unique_ptr<Imp> m_imp;
 
-public:
+  public:
 	TParamContainer();
 	~TParamContainer();
 
@@ -93,7 +87,7 @@ public:
 	void setParamObserver(TParamObserver *);
 	TParamObserver *getParamObserver() const;
 
-private:
+  private:
 	TParamContainer(const TParamContainer &);
 	TParamContainer &operator=(const TParamContainer &);
 };

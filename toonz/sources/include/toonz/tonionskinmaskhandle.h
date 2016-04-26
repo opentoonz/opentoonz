@@ -31,7 +31,7 @@ class DVAPI TOnionSkinMaskHandle : public QObject
 
 	OnionSkinMask m_onionSkinMask;
 
-public:
+  public:
 	TOnionSkinMaskHandle();
 	~TOnionSkinMaskHandle();
 
@@ -41,9 +41,9 @@ public:
 	void notifyOnionSkinMaskChanged() { emit onionSkinMaskChanged(); }
 	void clear();
 
-signals:
+  signals:
 	void onionSkinMaskChanged();
 	void onionSkinMaskSwitched();
 };
 
-#endif //TONIONSKINMASKHANDLE_H
+#endif // TONIONSKINMASKHANDLE_H

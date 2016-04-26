@@ -8,15 +8,8 @@
 //------------------------------------------------------------
 namespace
 {
-double level_value_(
-	double value,
-	double mul_max,
-	bool act_sw,
-	double in_min,
-	double in_max,
-	double out_min,
-	double out_max,
-	double gamma)
+double level_value_(double value, double mul_max, bool act_sw, double in_min, double in_max,
+					double out_min, double out_max, double gamma)
 {
 	if (act_sw) {
 		if (in_max == in_min) {
@@ -57,27 +50,26 @@ double level_value_(
 	return floor(value * mul_max);
 }
 //------------------------------------------------------------
-void level_ctable_template_(
-	const unsigned int channels,
-	const bool *act_sw,			// user setting
-	const int *in_min,			// image pixel value
-	const int *in_max,			// image pixel value
-	const double *in_min_shift, // user settting
-	const double *in_max_shift, // user settting
-	const double *out_min,		// user settting
-	const double *out_max,		// user settting
-	const double *gamma,		// user settting
-	const unsigned int div_num,
-	std::vector<std::vector<unsigned int>> &table_array
-	/*
-	std::vector< std::vector<T> > &table_array
- とするとvc2005mdで他プログラムとのリンク時、
-	allocatorの２重定義でエラーとなる。
-	std::vector< std::vector<unsigned int> >&table_array
- ならOK
- 2009-01-27
-*/
-	)
+void level_ctable_template_(const unsigned int channels,
+							const bool *act_sw,			// user setting
+							const int *in_min,			// image pixel value
+							const int *in_max,			// image pixel value
+							const double *in_min_shift, // user settting
+							const double *in_max_shift, // user settting
+							const double *out_min,		// user settting
+							const double *out_max,		// user settting
+							const double *gamma,		// user settting
+							const unsigned int div_num,
+							std::vector<std::vector<unsigned int>> &table_array
+							/*
+							std::vector< std::vector<T> > &table_array
+						 とするとvc2005mdで他プログラムとのリンク時、
+							allocatorの２重定義でエラーとなる。
+							std::vector< std::vector<unsigned int> >&table_array
+						 ならOK
+						 2009-01-27
+						*/
+							)
 {
 	const double div_val = static_cast<double>(div_num);
 	const double mul_val = div_val + 0.999999;
@@ -94,31 +86,18 @@ void level_ctable_template_(
 	for (unsigned int cc = 0; cc < channels; ++cc) {
 		table_array[cc].resize(div_num + 1);
 		for (unsigned int yy = 0; yy <= div_num; ++yy) {
-			table_array[cc][yy] =
-				static_cast<unsigned int>(level_value_(
-					yy / div_val,
-					mul_val,
-					act_sw[cc],
-					in_min_[cc], in_max_[cc],
-					out_min[cc], out_max[cc],
-					gamma[cc]));
+			table_array[cc][yy] = static_cast<unsigned int>(
+				level_value_(yy / div_val, mul_val, act_sw[cc], in_min_[cc], in_max_[cc],
+							 out_min[cc], out_max[cc], gamma[cc]));
 		}
 	}
 }
 //------------------------------------------------------------
 template <class T>
-void change_template_(
-	T *image_array,
-	const int height,
-	const int width,
-	const int channels,
+void change_template_(T *image_array, const int height, const int width, const int channels,
 
-	const bool *act_sw,
-	const double *in_min_shift,
-	const double *in_max_shift,
-	const double *out_min,
-	const double *out_max,
-	const double *gamma)
+					  const bool *act_sw, const double *in_min_shift, const double *in_max_shift,
+					  const double *out_min, const double *out_max, const double *gamma)
 {
 /* 1.まず最大値、最小値を求める */
 #if defined _WIN32
@@ -146,14 +125,8 @@ void change_template_(
 	/* 2.最大値、最小値から変換テーブルを求める */
 	std::vector<std::vector<unsigned int>> table_array;
 
-	level_ctable_template_(
-		channels,
-		act_sw,
-		in_min, in_max, in_min_shift, in_max_shift,
-		out_min, out_max,
-		gamma,
-		std::numeric_limits<T>::max(),
-		table_array);
+	level_ctable_template_(channels, act_sw, in_min, in_max, in_min_shift, in_max_shift, out_min,
+						   out_max, gamma, std::numeric_limits<T>::max(), table_array);
 
 	/* 3.変換テーブルを使ってlevel変換する */
 	image_crnt = image_array;
@@ -184,41 +157,30 @@ void change_template_(
 }
 }
 
-void igs::level_auto::change(
-	unsigned char *image_array,
+void igs::level_auto::change(unsigned char *image_array,
 
-	const int height,
-	const int width,
-	const int channels,
-	const int bits,
+							 const int height, const int width, const int channels, const int bits,
 
-	const bool *act_sw,			// channels array
-	const double *in_min_shift, // channels array
-	const double *in_max_shift, // channels array
-	const double *out_min,		// channels array
-	const double *out_max,		// channels array
-	const double *gamma			// channels array
-	)
+							 const bool *act_sw,		 // channels array
+							 const double *in_min_shift, // channels array
+							 const double *in_max_shift, // channels array
+							 const double *out_min,		 // channels array
+							 const double *out_max,		 // channels array
+							 const double *gamma		 // channels array
+							 )
 {
-	if ((igs::image::rgba::siz != channels) &&
-		(igs::image::rgb::siz != channels) &&
+	if ((igs::image::rgba::siz != channels) && (igs::image::rgb::siz != channels) &&
 		(1 != channels) /* grayscale */
 		) {
 		throw std::domain_error("Bad channels,Not rgba/rgb/grayscale");
 	}
 
 	if (std::numeric_limits<unsigned char>::digits == bits) {
-		change_template_(
-			image_array,
-			height, width, channels,
-			act_sw, in_min_shift, in_max_shift,
-			out_min, out_max, gamma);
+		change_template_(image_array, height, width, channels, act_sw, in_min_shift, in_max_shift,
+						 out_min, out_max, gamma);
 	} else if (std::numeric_limits<unsigned short>::digits == bits) {
-		change_template_(
-			reinterpret_cast<unsigned short *>(image_array),
-			height, width, channels,
-			act_sw, in_min_shift, in_max_shift,
-			out_min, out_max, gamma);
+		change_template_(reinterpret_cast<unsigned short *>(image_array), height, width, channels,
+						 act_sw, in_min_shift, in_max_shift, out_min, out_max, gamma);
 	} else {
 		throw std::domain_error("Bad bits,Not uchar/ushort");
 	}

@@ -55,8 +55,7 @@ int CYOMBInputParam::getRangeEnd(const char *s) const
 	return atoi(ss);
 }
 
-void CYOMBInputParam::strToColorIndex(const char *s, COLOR_INDEX_LIST &cil,
-									  const int maxIndex)
+void CYOMBInputParam::strToColorIndex(const char *s, COLOR_INDEX_LIST &cil, const int maxIndex)
 {
 	/* If s=="-1", all of the indices are put into the ColorIndexList
 */
@@ -115,8 +114,7 @@ int ushortCompare(const void *a, const void *b)
 	return 1;
 }
 
-void CYOMBInputParam::makeColorIndexList(const char *s, COLOR_INDEX_LIST &cil,
-										 const int maxIndex)
+void CYOMBInputParam::makeColorIndexList(const char *s, COLOR_INDEX_LIST &cil, const int maxIndex)
 {
 	int ln = strlen(s);
 	int i, j;
@@ -160,8 +158,7 @@ void CYOMBInputParam::makeColorIndexList(const char *s, COLOR_INDEX_LIST &cil,
 //		27. dSamples (Amount). The distance of sampling.
 //		28. isStopAtContour (Y/N) Stops the sampling at contour line.
 //		29. isRandomSampling (Y/N) Random or equal sampling.
-CYOMBInputParam::CYOMBInputParam(const int argc, const char *argv[],
-								 const int shrink)
+CYOMBInputParam::CYOMBInputParam(const int argc, const char *argv[], const int shrink)
 {
 	m_nbColor = m_nbSample = 0;
 	m_dSample = 0.0;
@@ -217,8 +214,8 @@ CYOMBInputParam::CYOMBInputParam(const int argc, const char *argv[],
 //		4. isStopAtContour (Y/N) Stops the sampling at contour line.
 //		5. isRandomSampling (Y/N) Random or equal sampling.
 // isCM16 - informs about the type of colormap CM16/CM24.
-CYOMBInputParam::CYOMBInputParam(const int argc, const char *argv[],
-								 const int shrink, const bool isCM16)
+CYOMBInputParam::CYOMBInputParam(const int argc, const char *argv[], const int shrink,
+								 const bool isCM16)
 {
 	int nbInk = isCM16 ? 31 : 4095;
 	int nbPaint = isCM16 ? 127 : 4095;

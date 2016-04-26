@@ -52,7 +52,7 @@ class TContentHistory;
   \brief    The \p TXshLevel specialization for image levels.
 
   \todo     Substitute m_frames with a sorted vector or
-            a boost flat_set.
+			a boost flat_set.
 */
 
 class DVAPI TXshSimpleLevel : public TXshLevel
@@ -62,37 +62,34 @@ class DVAPI TXshSimpleLevel : public TXshLevel
 	PERSIST_DECLARATION(TXshSimpleLevel)
 	DECLARE_CLASS_CODE
 
-public:
+  public:
 	/*! \details  Level frames may have special properties depending on
-                the level type they are part of.
-                  
-      \sa       \p TXshSimpleLevel::getFrameStatus() and
-                \p setFrameStatus() for further details.                  */
+				the level type they are part of.
 
-	enum FrameStatusBit //!  Describes a level's frame status.
-	{
-		Normal = 0x0,		 //!< Frame has no special status.
-		Scanned = 0x1,		 //!< A fullcolor frame (only tlv levels).
-		Cleanupped = 0x2,	//!< A cleanupped frame (only tlv levels).
-		CleanupPreview = 0x4 //!< A cleanup preview (only fullcolor levels).
+	  \sa       \p TXshSimpleLevel::getFrameStatus() and
+				\p setFrameStatus() for further details.                  */
+
+	enum FrameStatusBit	//!  Describes a level's frame status.
+	{ Normal = 0x0,		   //!< Frame has no special status.
+	  Scanned = 0x1,	   //!< A fullcolor frame (only tlv levels).
+	  Cleanupped = 0x2,	//!< A cleanupped frame (only tlv levels).
+	  CleanupPreview = 0x4 //!< A cleanup preview (only fullcolor levels).
 	};
 
-public:
+  public:
 	static bool m_rasterizePli;		   //!< \internal  Not the proper place for this data.
 	static bool m_fillFullColorRaster; //!< \internal  Not the proper place for this data.
 
-public:
-	TXshSimpleLevel(const std::wstring &name = std::wstring()); //!< Constructs a TXshSimpleLevel with a name
+  public:
+	TXshSimpleLevel(
+		const std::wstring &name = std::wstring()); //!< Constructs a TXshSimpleLevel with a name
 	~TXshSimpleLevel();
 
 	TXshSimpleLevel *getSimpleLevel() { return this; } //!< Reimplemented for TXshLevel.
 
 	bool isSubsequence() const { return m_isSubsequence; }
 
-	bool is16BitChannelLevel() const
-	{
-		return getType() == OVL_XSHLEVEL && m_16BitChannelLevel;
-	}
+	bool is16BitChannelLevel() const { return getType() == OVL_XSHLEVEL && m_16BitChannelLevel; }
 	void set16BitChannelLevel(bool value)
 	{
 		m_16BitChannelLevel = (value && getType() == OVL_XSHLEVEL);
@@ -112,20 +109,20 @@ public:
 	void setPalette(TPalette *palette); //!< Assigns a palette to the level.
 
 	TFilePath getPath() const { return m_path; }
-	void setPath(const TFilePath &path,
-				 bool retainCachedImages = false);
+	void setPath(const TFilePath &path, bool retainCachedImages = false);
 
 	TFilePath getScannedPath() const { return m_scannedPath; }
 	void setScannedPath(const TFilePath &path);
 
 	/*! \details      Each level frame have a corresponding image retrievable
-                    with the getFrame() method and similar.
+					with the getFrame() method and similar.
 
-      \remark       Consider using functions getFrameCount() and getFrameId()
-                    to avoid a container copy.                                      */
+	  \remark       Consider using functions getFrameCount() and getFrameId()
+					to avoid a container copy.                                      */
 
-	std::vector<TFrameId> getFids() const;			 //!< Returns a copy of the level's frame ids.
-	void getFids(std::vector<TFrameId> &fids) const; //!< Copies fids() into fids.  \deprecated  Use the return valued variation instead.
+	std::vector<TFrameId> getFids() const; //!< Returns a copy of the level's frame ids.
+	void getFids(std::vector<TFrameId> &fids)
+		const; //!< Copies fids() into fids.  \deprecated  Use the return valued variation instead.
 
 	TFrameId getFirstFid() const; //!< Returns the first level frame's id; roughly equivalent to
 								  //!  <TT>index2fid(0)</TT>.
@@ -133,28 +130,31 @@ public:
 								  //!  <TT>index2fid(getFrameCount()-1)</TT>.
 
 	bool isEmpty() const { return m_frames.empty(); } //!< Returns whether the level is empty.
-	bool isFid(const TFrameId &fid) const;			  //!< Returns whether a given frameId is in the level.
+	bool isFid(const TFrameId &fid) const; //!< Returns whether a given frameId is in the level.
 
 	/*! \details  Unlike function index2fid(), getFrameId() \a asserts
-                beyond current frames count.                              */
+				beyond current frames count.                              */
 
-	const TFrameId &getFrameId(int index) const;		  //!< Returns the frame id at specified index.
+	const TFrameId &getFrameId(int index) const; //!< Returns the frame id at specified index.
 	int getFrameCount() const { return m_frames.size(); } //!< Returns the level's frames count.
 
 	/*! \details  Function index2fid() attempts guessing frame ids for
-                frame indexes beyond current frames count. See function
-                guessStep() for further details.                          */
+				frame indexes beyond current frames count. See function
+				guessStep() for further details.                          */
 
-	TFrameId index2fid(int index) const;	  //!< Returns a frame id corresponding to the specified frame index, or
-											  //!  an invalid frame otherwise.
-	int fid2index(const TFrameId &fid) const; //!< Returns the frame \a index corresponding to the specified frame id,
-											  //!  or \p -1 if not found.
+	TFrameId index2fid(
+		int index) const; //!< Returns a frame id corresponding to the specified frame index, or
+						  //!  an invalid frame otherwise.
+	int fid2index(const TFrameId &fid)
+		const; //!< Returns the frame \a index corresponding to the specified frame id,
+			   //!  or \p -1 if not found.
 
 	/*
-    if the table contains 'fid' it returns fid2index(fid). 
-    if fid is greater than the last fid in the table, it returns a "guessed" index.
-    e.g. if fids = [1,3,5,7] then fid2index(11) == 5
-    if fid is smaller than the last fid in the table (and is not contained in the table) it returns the proper insertion index
+	if the table contains 'fid' it returns fid2index(fid).
+	if fid is greater than the last fid in the table, it returns a "guessed" index.
+	e.g. if fids = [1,3,5,7] then fid2index(11) == 5
+	if fid is smaller than the last fid in the table (and is not contained in the table) it returns
+	the proper insertion index
   */
 	int guessIndex(const TFrameId &fid) const;
 
@@ -190,8 +190,8 @@ public:
 	void invalidateFrame(const TFrameId &fid);
 
 	/*!
-    Set the range of frame that can be edited and saved.
-    Editable range is contained in \b m_editableRange.
+	Set the range of frame that can be edited and saved.
+	Editable range is contained in \b m_editableRange.
   */
 	void setEditableRange(unsigned int from, unsigned int to, const std::wstring &userName);
 	void mergeTemporaryHookFile(unsigned int from, unsigned int to, const TFilePath &hookFile);
@@ -204,14 +204,15 @@ public:
 	void setFrameStatus(const TFrameId &fid, int status);
 
 	/*! \details      This function will implicitly convert the input path
-                    extension to a correctly formatted \a tlv. Behavior
-                    is undefined in case the level is not of fullcolor type.
+					extension to a correctly formatted \a tlv. Behavior
+					is undefined in case the level is not of fullcolor type.
 
-      \deprecated   Function is obviously an implementation detail of the
-                    cleanup process. Should be moved there.                         */
+	  \deprecated   Function is obviously an implementation detail of the
+					cleanup process. Should be moved there.                         */
 
-	void makeTlv(const TFilePath &tlvPath); //!< Transforms the level from \a fullcolor to tlv (colormap),
-											//!  and assigns the specified level path.
+	void makeTlv(
+		const TFilePath &tlvPath); //!< Transforms the level from \a fullcolor to tlv (colormap),
+								   //!  and assigns the specified level path.
 	TImageP createEmptyFrame();
 
 	TDimension getResolution();
@@ -221,8 +222,8 @@ public:
 	TPointD getDpi(const TFrameId &fid = TFrameId::NO_FRAME, int frameStatus = -1);
 
 	/*! \brief    Returns the bbox for the level's fid, specified in standard
-                \a inch coordinates (which are \a different from Toonz's
-                standard world coordinates, by a \p Stage::inch factor).            */
+				\a inch coordinates (which are \a different from Toonz's
+				standard world coordinates, by a \p Stage::inch factor).            */
 
 	TRectD getBBox(const TFrameId &fid) const;
 
@@ -245,82 +246,77 @@ public:
 	void save();
 
 	/*!
-    Save the level in the specified fp.
-    The oldFp is used when the current scene path change...
+	Save the level in the specified fp.
+	The oldFp is used when the current scene path change...
   */
-	void save(const TFilePath &fp, const TFilePath &oldFp = TFilePath(), bool overwritePalette = true);
+	void save(const TFilePath &fp, const TFilePath &oldFp = TFilePath(),
+			  bool overwritePalette = true);
 
 	//! note gets the contentHistory. can be 0
-	const TContentHistory *getContentHistory() const
-	{
-		return m_contentHistory.get();
-	}
-	TContentHistory *getContentHistory()
-	{
-		return m_contentHistory.get();
-	}
+	const TContentHistory *getContentHistory() const { return m_contentHistory.get(); }
+	TContentHistory *getContentHistory() { return m_contentHistory.get(); }
 
 	//! destroys the old contentHistory and replaces it with the new one. Gets ownership
 	void setContentHistory(TContentHistory *contentHistory);
 
 	//! Set elements of m_renumberTable with m_frames.
 	void setRenumberTable();
-	const std::map<TFrameId, TFrameId> &renumberTable() const
-	{
-		return m_renumberTable;
-	}
+	const std::map<TFrameId, TFrameId> &renumberTable() const { return m_renumberTable; }
 
-	//! Renumbers the level frames to the specified fids (fids and this->fids() must have the same size).
+	//! Renumbers the level frames to the specified fids (fids and this->fids() must have the same
+	//! size).
 	void renumber(const std::vector<TFrameId> &fids);
 
-public:
+  public:
 	// Auxiliary files management: hooks, tpl, etc.
 	// May throw; copy and rename perform touchparentdir
 
-	static void copyFiles(const TFilePath &dst, const TFilePath &src);   //!< Copy files from src to dst.
-	static void renameFiles(const TFilePath &dst, const TFilePath &src); //!< Rename files from src to dst.
-	static void removeFiles(const TFilePath &fp);						 //!< Remove files at fp.
+	static void copyFiles(const TFilePath &dst,
+						  const TFilePath &src); //!< Copy files from src to dst.
+	static void renameFiles(const TFilePath &dst,
+							const TFilePath &src); //!< Rename files from src to dst.
+	static void removeFiles(const TFilePath &fp);  //!< Remove files at fp.
 
 	//! Get the auxiliary files list: hooks, tpl, etc.
 	static void getFiles(const TFilePath &fp, TFilePathSet &fpset);
 
 	/*!
-    Translates a level path into the corresponding hook path (no check for
-    the existence of said hook file).
+	Translates a level path into the corresponding hook path (no check for
+	the existence of said hook file).
   */
 	static TFilePath getHookPath(const TFilePath &levelPath);
 
 	/*!
-    \brief    Returns the list of \a existing hook files associated to the
-              specified level, sorted by modification date (last modified at front).
-              The list stores <I>local paths<\I> relative to
-              decodedLevelPath.getParentDir().
+	\brief    Returns the list of \a existing hook files associated to the
+			  specified level, sorted by modification date (last modified at front).
+			  The list stores <I>local paths<\I> relative to
+			  decodedLevelPath.getParentDir().
 
-    \note     A level may have multiple hook files if the hook set was edited
-              with older Toonz versions. Use this function if you need to access all
-              of them. Only the latest file format is considered when loading a level.
+	\note     A level may have multiple hook files if the hook set was edited
+			  with older Toonz versions. Use this function if you need to access all
+			  of them. Only the latest file format is considered when loading a level.
   */
 	static QStringList getHookFiles(const TFilePath &decodedLevelPath);
 
 	/*!
-    \brief    Returns the path of the newest \a existing hook file associated to the
-              specified \b decoded level path - or an empty path if none was found.
+	\brief    Returns the path of the newest \a existing hook file associated to the
+			  specified \b decoded level path - or an empty path if none was found.
 
-    \note     In case there are more than one hook file (ie files from older
-              Toonz version), the latest file version is used.
+	\note     In case there are more than one hook file (ie files from older
+			  Toonz version), the latest file version is used.
   */
 	static TFilePath getExistingHookFile(const TFilePath &decodedLevelPath);
 
 	static void setCompatibilityMasks(int writeMask, int neededMask, int forbiddenMask);
 
-public Q_SLOTS:
+  public Q_SLOTS:
 
 	void onPaletteChanged(); //!< Invoked when some colorstyle has been changed
 
-private:
+  private:
 	typedef boost::container::flat_set<TFrameId> FramesSet;
 
-private:
+  private:
 	std::unique_ptr<LevelProperties> m_properties;
 	std::unique_ptr<TContentHistory> m_contentHistory;
 
@@ -329,31 +325,29 @@ private:
 	FramesSet m_frames;
 
 	std::map<TFrameId, TFrameId> m_renumberTable; //!< Maps disk-frames to level-frames.
-												  //!  Typically, the 2 match - however, the situation changes
-												  //!  after an explicit frame renumbering process. In case
-												  //!  a level-frame is deleted, the table entry is removed;
-												  //!  it will be physically removed only when the level is saved.
-												  //!  A similar thing happens with newly inserted frames.
+	//!  Typically, the 2 match - however, the situation changes
+	//!  after an explicit frame renumbering process. In case
+	//!  a level-frame is deleted, the table entry is removed;
+	//!  it will be physically removed only when the level is saved.
+	//!  A similar thing happens with newly inserted frames.
 	std::map<TFrameId, int> m_framesStatus;
 
 	std::set<TFrameId> m_editableRange;
 
-	TFilePath m_path,
-		m_scannedPath;
+	TFilePath m_path, m_scannedPath;
 
 	std::string m_idBase;
 	std::wstring m_editableRangeUserInfo;
 
-	bool m_isSubsequence,
-		m_16BitChannelLevel,
-		m_isReadOnly,
+	bool m_isSubsequence, m_16BitChannelLevel, m_isReadOnly,
 		m_temporaryHookMerged; //!< Used only during hook merge (and hence during saving)
 
-private:
+  private:
 	//! Save simple level in scene-decoded path \p decodedFp.
-	void saveSimpleLevel(const TFilePath &decodedFp, bool overwritePalette = true); // Difference from save(..)?
+	void saveSimpleLevel(const TFilePath &decodedFp,
+						 bool overwritePalette = true); // Difference from save(..)?
 
-private:
+  private:
 	// Not copyable
 	TXshSimpleLevel(const TXshSimpleLevel &);
 	TXshSimpleLevel &operator=(const TXshSimpleLevel &);

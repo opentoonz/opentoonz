@@ -10,7 +10,8 @@
 //**********************************************************************************
 
 LevelOptions::LevelOptions()
-	: m_dpi(Stage::inch), m_subsampling(1), m_antialias(0), m_dpiPolicy(DP_ImageDpi), m_whiteTransp(false), m_premultiply(false)
+	: m_dpi(Stage::inch), m_subsampling(1), m_antialias(0), m_dpiPolicy(DP_ImageDpi),
+	  m_whiteTransp(false), m_premultiply(false)
 {
 }
 
@@ -18,7 +19,9 @@ LevelOptions::LevelOptions()
 
 bool LevelOptions::operator==(const LevelOptions &other) const
 {
-	return (m_premultiply == other.m_premultiply && m_whiteTransp == other.m_whiteTransp && m_dpiPolicy == other.m_dpiPolicy && m_antialias == other.m_antialias && (m_dpiPolicy == LevelOptions::DP_ImageDpi || m_dpi == other.m_dpi));
+	return (m_premultiply == other.m_premultiply && m_whiteTransp == other.m_whiteTransp &&
+			m_dpiPolicy == other.m_dpiPolicy && m_antialias == other.m_antialias &&
+			(m_dpiPolicy == LevelOptions::DP_ImageDpi || m_dpi == other.m_dpi));
 }
 
 //**********************************************************************************
@@ -26,7 +29,8 @@ bool LevelOptions::operator==(const LevelOptions &other) const
 //**********************************************************************************
 
 LevelProperties::LevelProperties()
-	: m_imageDpi(), m_creator(""), m_imageRes(0, 0), m_bpp(32), m_loadAtOnce(false), m_dirtyFlag(true), m_forbidden(false), m_hasAlpha(false)
+	: m_imageDpi(), m_creator(""), m_imageRes(0, 0), m_bpp(32), m_loadAtOnce(false),
+	  m_dirtyFlag(true), m_forbidden(false), m_hasAlpha(false)
 {
 }
 

@@ -14,9 +14,8 @@ class RadialBlurFx : public TStandardRasterFx
 	TDoubleParamP m_radius;
 	TDoubleParamP m_blur;
 
-public:
-	RadialBlurFx()
-		: m_point(TPointD(0.0, 0.0)), m_radius(0.0), m_blur(5.0)
+  public:
+	RadialBlurFx() : m_point(TPointD(0.0, 0.0)), m_radius(0.0), m_blur(5.0)
 	{
 		m_point->getX()->setMeasureName("fxLength");
 		m_point->getY()->setMeasureName("fxLength");
@@ -53,9 +52,8 @@ public:
 		return tround(tmax(sqrt(maxD) - radius, 0.0)) * intensity;
 	}
 
-	void enlarge(
-		const TRectD &bbox, TRectD &requestedGeom,
-		const TRenderSettings &ri, double frame);
+	void enlarge(const TRectD &bbox, TRectD &requestedGeom, const TRenderSettings &ri,
+				 double frame);
 
 	bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info)
 	{
@@ -70,11 +68,8 @@ public:
 		}
 	}
 
-	void transform(double frame,
-				   int port,
-				   const TRectD &rectOnOutput,
-				   const TRenderSettings &infoOnOutput,
-				   TRectD &rectOnInput,
+	void transform(double frame, int port, const TRectD &rectOnOutput,
+				   const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
 				   TRenderSettings &infoOnInput);
 
 	void doCompute(TTile &tile, double frame, const TRenderSettings &);
@@ -105,7 +100,8 @@ public:
 
 //------------------------------------------------------------------------------
 template <typename PIXEL, typename CHANNEL_TYPE, int MAX_CHANNEL_VALUE>
-void doRadialBlur(const TRasterPT<PIXEL> rout, const TRasterPT<PIXEL> rin, double blur, double radius, TPointD point)
+void doRadialBlur(const TRasterPT<PIXEL> rout, const TRasterPT<PIXEL> rin, double blur,
+				  double radius, TPointD point)
 {
 	/*-センター位置-*/
 	int dx = (int)point.x;
@@ -160,11 +156,11 @@ void doRadialBlur(const TRasterPT<PIXEL> rout, const TRasterPT<PIXEL> rin, doubl
 					if ((j + shiftx) < 0)
 						continue; // shiftx=-j;
 					if ((j + shiftx) >= lx)
-						continue; //shiftx=lx-j-1;
+						continue; // shiftx=lx-j-1;
 					if ((i + shifty) < 0)
-						continue; //shifty=-i;
+						continue; // shifty=-i;
 					if ((i + shifty) >= ly)
-						continue; //shifty=ly-i-1;
+						continue; // shifty=ly-i-1;
 					valr += rin->pixels(i + shifty)[j + shiftx].r;
 					valg += rin->pixels(i + shifty)[j + shiftx].g;
 					valb += rin->pixels(i + shifty)[j + shiftx].b;
@@ -191,11 +187,10 @@ void doRadialBlur(const TRasterPT<PIXEL> rout, const TRasterPT<PIXEL> rin, doubl
 
 //------------------------------------------------------------------------------
 
-//!Calculates the geometry we need for this node computation, given
-//!the known input data (bbox) and the requested output (requestedGeom).
-void RadialBlurFx::enlarge(
-	const TRectD &bbox, TRectD &requestedGeom,
-	const TRenderSettings &ri, double frame)
+//! Calculates the geometry we need for this node computation, given
+//! the known input data (bbox) and the requested output (requestedGeom).
+void RadialBlurFx::enlarge(const TRectD &bbox, TRectD &requestedGeom, const TRenderSettings &ri,
+						   double frame)
 {
 	TRectD enlargedBbox(bbox);
 	TRectD enlargedGeom(requestedGeom);
@@ -209,8 +204,8 @@ void RadialBlurFx::enlarge(
 	enlargedBbox = enlargedBbox.enlarge(maxRange);
 	enlargedGeom = enlargedGeom.enlarge(maxRange);
 
-	//We are to find out the geometry that is useful for the fx computation.
-	//There are some rules to follow:
+	// We are to find out the geometry that is useful for the fx computation.
+	// There are some rules to follow:
 	//  a) First, the interesting output we can generate is bounded by both
 	//     the requestedRect and the blurred bbox (i.e. enlarged by the blur radius).
 	//  b) Pixels contributing to any output are necessarily part of bbox - and only
@@ -219,7 +214,7 @@ void RadialBlurFx::enlarge(
 
 	requestedGeom = (enlargedGeom * bbox) + (enlargedBbox * requestedGeom);
 
-	//Finally, make sure that the result is coherent with the original P00
+	// Finally, make sure that the result is coherent with the original P00
 	requestedGeom -= originalP00;
 	requestedGeom.x0 = tfloor(requestedGeom.x0);
 	requestedGeom.y0 = tfloor(requestedGeom.y0);
@@ -230,13 +225,9 @@ void RadialBlurFx::enlarge(
 
 //------------------------------------------------------------------------------
 
-void RadialBlurFx::transform(
-	double frame,
-	int port,
-	const TRectD &rectOnOutput,
-	const TRenderSettings &infoOnOutput,
-	TRectD &rectOnInput,
-	TRenderSettings &infoOnInput)
+void RadialBlurFx::transform(double frame, int port, const TRectD &rectOnOutput,
+							 const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
+							 TRenderSettings &infoOnInput)
 {
 	TRectD rectOut(rectOnOutput);
 
@@ -293,8 +284,7 @@ void RadialBlurFx::doCompute(TTile &tile, double frame, const TRenderSettings &r
 	TPoint offset = convert(tile.m_pos - tileRect.getP00());
 	TTile tileIn;
 	if (raster32) {
-		m_input->allocateAndCompute(tileIn, tileRect.getP00(),
-									TDimension(rasInLx, rasInLy),
+		m_input->allocateAndCompute(tileIn, tileRect.getP00(), TDimension(rasInLx, rasInLy),
 									raster32, frame, ri);
 		TRaster32P rin = tileIn.getRaster();
 		TRaster32P app = raster32->create(rasInLx, rasInLy);
@@ -302,8 +292,7 @@ void RadialBlurFx::doCompute(TTile &tile, double frame, const TRenderSettings &r
 		raster32->copy(app, -offset);
 	} else if (raster64) {
 		TRaster64P raster64 = tile.getRaster();
-		m_input->allocateAndCompute(tileIn, tileRect.getP00(),
-									TDimension(rasInLx, rasInLy),
+		m_input->allocateAndCompute(tileIn, tileRect.getP00(), TDimension(rasInLx, rasInLy),
 									raster64, frame, ri);
 		TRaster64P rin = tileIn.getRaster();
 		TRaster64P app = raster64->create(rasInLx, rasInLy);
@@ -315,7 +304,8 @@ void RadialBlurFx::doCompute(TTile &tile, double frame, const TRenderSettings &r
 
 //------------------------------------------------------------------
 
-int RadialBlurFx::getMemoryRequirement(const TRectD &rect, double frame, const TRenderSettings &info)
+int RadialBlurFx::getMemoryRequirement(const TRectD &rect, double frame,
+									   const TRenderSettings &info)
 {
 	double scale = sqrt(fabs(info.m_affine.det()));
 	TPointD point = info.m_affine * m_point->getValue(frame);

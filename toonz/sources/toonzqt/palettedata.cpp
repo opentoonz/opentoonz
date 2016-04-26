@@ -16,8 +16,7 @@ PaletteData *PaletteData::clone() const
 
 //-----------------------------------------------------------------------------
 
-void PaletteData::setPaletteData(TPalette *palette, int pageIndex,
-								 std::set<int> styleIndicesInPage)
+void PaletteData::setPaletteData(TPalette *palette, int pageIndex, std::set<int> styleIndicesInPage)
 {
 	m_palette = palette;
 	m_pageIndex = pageIndex;

@@ -23,14 +23,13 @@ TNZ_LITTLE_ENDIAN undefined !!
 class TWAVChunk
 {
 
-public:
+  public:
 	static TINT32 HDR_LENGTH;
 
 	string m_name;
 	TINT32 m_length; // lunghezza del chunk in byte
 
-	TWAVChunk(string name, TINT32 length)
-		: m_name(name), m_length(length) {}
+	TWAVChunk(string name, TINT32 length) : m_name(name), m_length(length) {}
 
 	virtual ~TWAVChunk() {}
 
@@ -40,10 +39,7 @@ public:
 		return true;
 	}
 
-	void skip(Tifstream &is)
-	{
-		is.seekg(m_length, ios::cur);
-	}
+	void skip(Tifstream &is) { is.seekg(m_length, ios::cur); }
 
 	static bool readHeader(Tifstream &is, string &name, TINT32 &length)
 	{
@@ -81,7 +77,7 @@ TINT32 TWAVChunk::HDR_LENGTH = 8;
 class TFMTChunk : public TWAVChunk
 {
 
-public:
+  public:
 	static TINT32 LENGTH;
 
 	USHORT m_encodingType; // PCM, ...
@@ -91,8 +87,7 @@ public:
 	USHORT m_bytesPerSample;
 	USHORT m_bitPerSample;
 
-	TFMTChunk(TINT32 length)
-		: TWAVChunk("fmt ", length) {}
+	TFMTChunk(TINT32 length) : TWAVChunk("fmt ", length) {}
 
 	virtual bool read(Tifstream &is)
 	{
@@ -162,11 +157,10 @@ TINT32 TFMTChunk::LENGTH = TWAVChunk::HDR_LENGTH + 16;
 class TDATAChunk : public TWAVChunk
 {
 
-public:
+  public:
 	std::unique_ptr<UCHAR[]> m_samples;
 
-	TDATAChunk(TINT32 length)
-		: TWAVChunk("data", length) {}
+	TDATAChunk(TINT32 length) : TWAVChunk("data", length) {}
 
 	bool read(Tifstream &is)
 	{
@@ -197,8 +191,7 @@ public:
 
 //==============================================================================
 
-TSoundTrackReaderWav::TSoundTrackReaderWav(const TFilePath &fp)
-	: TSoundTrackReader(fp)
+TSoundTrackReaderWav::TSoundTrackReaderWav(const TFilePath &fp) : TSoundTrackReader(fp)
 {
 }
 
@@ -283,31 +276,23 @@ TSoundTrackP TSoundTrackReaderWav::load()
 		TINT32 sampleCount = dataChunk->m_length / fmtChunk->m_bytesPerSample;
 		bool signedSample = (fmtChunk->m_bitPerSample != 8);
 
-		track = TSoundTrack::create(
-			(int)fmtChunk->m_sampleRate,
-			fmtChunk->m_bitPerSample,
-			fmtChunk->m_chans,
-			sampleCount, signedSample);
+		track = TSoundTrack::create((int)fmtChunk->m_sampleRate, fmtChunk->m_bitPerSample,
+									fmtChunk->m_chans, sampleCount, signedSample);
 
 		if (track) {
 			switch (fmtChunk->m_bitPerSample) {
 			case 8:
-				memcpy(
-					(void *)track->getRawData(),
-					(void *)(dataChunk->m_samples.get()),
-					sampleCount * fmtChunk->m_bytesPerSample);
+				memcpy((void *)track->getRawData(), (void *)(dataChunk->m_samples.get()),
+					   sampleCount * fmtChunk->m_bytesPerSample);
 				break;
 			case 16:
 				if (!TNZ_LITTLE_ENDIAN)
-					swapAndCopySamples(
-						(short *)dataChunk->m_samples.get(),
-						(short *)track->getRawData(),
-						sampleCount * fmtChunk->m_chans);
+					swapAndCopySamples((short *)dataChunk->m_samples.get(),
+									   (short *)track->getRawData(),
+									   sampleCount * fmtChunk->m_chans);
 				else
-					memcpy(
-						(void *)track->getRawData(),
-						(void *)(dataChunk->m_samples.get()),
-						sampleCount * fmtChunk->m_bytesPerSample);
+					memcpy((void *)track->getRawData(), (void *)(dataChunk->m_samples.get()),
+						   sampleCount * fmtChunk->m_bytesPerSample);
 				//#endif
 				break;
 			case 24:
@@ -315,19 +300,15 @@ TSoundTrackP TSoundTrackReaderWav::load()
 					UCHAR *begin = (UCHAR *)track->getRawData();
 					for (int i = 0; i < (int)(sampleCount * fmtChunk->m_chans); ++i) {
 						*(begin + 4 * i) = 0;
-						*(begin + 4 * i + 1) =
-							*(dataChunk->m_samples.get() + 3 * i + 2);
-						*(begin + 4 * i + 2) =
-							*(dataChunk->m_samples.get() + 3 * i + 1);
-						*(begin + 4 * i + 3) =
-							*(dataChunk->m_samples.get() + 3 * i);
+						*(begin + 4 * i + 1) = *(dataChunk->m_samples.get() + 3 * i + 2);
+						*(begin + 4 * i + 2) = *(dataChunk->m_samples.get() + 3 * i + 1);
+						*(begin + 4 * i + 3) = *(dataChunk->m_samples.get() + 3 * i);
 					}
 				} else {
 					UCHAR *begin = (UCHAR *)track->getRawData();
 					for (int i = 0; i < (int)(sampleCount * fmtChunk->m_chans); ++i) {
-						memcpy(
-							(void *)(begin + 4 * i),
-							(void *)(dataChunk->m_samples.get() + 3 * i), 3);
+						memcpy((void *)(begin + 4 * i),
+							   (void *)(dataChunk->m_samples.get() + 3 * i), 3);
 						*(begin + 4 * i + 3) = 0;
 					}
 				}
@@ -337,26 +318,26 @@ TSoundTrackP TSoundTrackReaderWav::load()
 		}
 
 		/*if (!TNZ_LITTLE_ENDIAN)
-    {
-      if (fmtChunk->m_bitPerSample > 8)
-      {
-        assert(fmtChunk->m_bitPerSample <= 16);
-        swapAndCopySamples(
-          (short*)dataChunk->m_samples, 
-          (short*)track->getRawData(), 
-          sampleCount*fmtChunk->m_chans);
-      }
-      else
-        memcpy(
-	        (void*)track->getRawData(), 
-          (void*)(dataChunk->m_samples), 
-          sampleCount*fmtChunk->m_bytesPerSample);
-    }
-    else
-      memcpy(
-        (void*)track->getRawData(), 
-        (void*)(dataChunk->m_samples), 
-        sampleCount*fmtChunk->m_bytesPerSample);*/
+	{
+	  if (fmtChunk->m_bitPerSample > 8)
+	  {
+		assert(fmtChunk->m_bitPerSample <= 16);
+		swapAndCopySamples(
+		  (short*)dataChunk->m_samples,
+		  (short*)track->getRawData(),
+		  sampleCount*fmtChunk->m_chans);
+	  }
+	  else
+		memcpy(
+			(void*)track->getRawData(),
+		  (void*)(dataChunk->m_samples),
+		  sampleCount*fmtChunk->m_bytesPerSample);
+	}
+	else
+	  memcpy(
+		(void*)track->getRawData(),
+		(void*)(dataChunk->m_samples),
+		sampleCount*fmtChunk->m_bytesPerSample);*/
 	}
 
 	if (fmtChunk)
@@ -369,8 +350,7 @@ TSoundTrackP TSoundTrackReaderWav::load()
 
 //==============================================================================
 
-TSoundTrackWriterWav::TSoundTrackWriterWav(const TFilePath &fp)
-	: TSoundTrackWriter(fp)
+TSoundTrackWriterWav::TSoundTrackWriterWav(const TFilePath &fp) : TSoundTrackWriter(fp)
 {
 }
 
@@ -384,14 +364,16 @@ bool TSoundTrackWriterWav::save(const TSoundTrackP &sndtrack)
 	if (sndtrack->getBitPerSample() == 8 && sndtrack->isSampleSigned())
 		throw TException("The format (8 bit signed) is incompatible with WAV file");
 
-	TINT32 soundDataLenght = (TINT32)(sndtrack->getSampleCount() * (sndtrack->getBitPerSample() / 8) * sndtrack->getChannelCount() /*sndtrack->getSampleSize()*/);
+	TINT32 soundDataLenght =
+		(TINT32)(sndtrack->getSampleCount() * (sndtrack->getBitPerSample() / 8) *
+				 sndtrack->getChannelCount() /*sndtrack->getSampleSize()*/);
 
 	TINT32 RIFFChunkLength = TFMTChunk::LENGTH + TWAVChunk::HDR_LENGTH + soundDataLenght;
 
 	TFileStatus fs(m_path);
 	if (fs.doesExist() && !fs.isWritable())
-		throw TException(L"Unable to save the soundtrack: " +
-						 m_path.getWideString() + L" is read-only");
+		throw TException(L"Unable to save the soundtrack: " + m_path.getWideString() +
+						 L" is read-only");
 
 	Tofstream os(m_path);
 
@@ -400,9 +382,11 @@ bool TSoundTrackWriterWav::save(const TSoundTrackP &sndtrack)
 	fmtChunk.m_encodingType = 1; // PCM
 	fmtChunk.m_chans = sndtrack->getChannelCount();
 	fmtChunk.m_sampleRate = sndtrack->getSampleRate();
-	fmtChunk.m_avgBytesPerSecond = (sndtrack->getBitPerSample() / 8) * fmtChunk.m_chans * sndtrack->getSampleRate();
-	//sndtrack->getSampleSize()*sndtrack->getSampleRate();
-	fmtChunk.m_bytesPerSample = (sndtrack->getBitPerSample() / 8) * fmtChunk.m_chans; //sndtrack->getSampleSize();
+	fmtChunk.m_avgBytesPerSecond =
+		(sndtrack->getBitPerSample() / 8) * fmtChunk.m_chans * sndtrack->getSampleRate();
+	// sndtrack->getSampleSize()*sndtrack->getSampleRate();
+	fmtChunk.m_bytesPerSample =
+		(sndtrack->getBitPerSample() / 8) * fmtChunk.m_chans; // sndtrack->getSampleSize();
 	fmtChunk.m_bitPerSample = sndtrack->getBitPerSample();
 
 	TDATAChunk dataChunk(soundDataLenght);
@@ -416,16 +400,11 @@ bool TSoundTrackWriterWav::save(const TSoundTrackP &sndtrack)
 #if (!TNZ_LITTLE_ENDIAN)
 	{
 		if (fmtChunk.m_bitPerSample == 8)
-			memcpy(
-				(void *)waveData,
-				(void *)sndtrack->getRawData(),
-				soundDataLenght);
+			memcpy((void *)waveData, (void *)sndtrack->getRawData(), soundDataLenght);
 		else if (fmtChunk.m_bitPerSample == 16) {
-			swapAndCopySamples(
-				(short *)sndtrack->getRawData(),
-				(short *)waveData,
-				sndtrack->getSampleCount() * fmtChunk.m_chans);
-		} else if (fmtChunk.m_bitPerSample == 24) { //swap e togliere quarto byte
+			swapAndCopySamples((short *)sndtrack->getRawData(), (short *)waveData,
+							   sndtrack->getSampleCount() * fmtChunk.m_chans);
+		} else if (fmtChunk.m_bitPerSample == 24) { // swap e togliere quarto byte
 			UCHAR *begin = (UCHAR *)sndtrack->getRawData();
 			for (int i = 0; i < (int)sndtrack->getSampleCount() * fmtChunk.m_chans; ++i) {
 				*(waveData + 3 * i) = *(begin + 4 * i + 3);
@@ -437,11 +416,8 @@ bool TSoundTrackWriterWav::save(const TSoundTrackP &sndtrack)
 #else
 	{
 		if (fmtChunk.m_bitPerSample != 24)
-			memcpy(
-				(void *)waveData.get(),
-				(void *)sndtrack->getRawData(),
-				soundDataLenght);
-		else { //togliere quarto byte
+			memcpy((void *)waveData.get(), (void *)sndtrack->getRawData(), soundDataLenght);
+		else { // togliere quarto byte
 			UCHAR *begin = (UCHAR *)sndtrack->getRawData();
 			for (int i = 0; i < (int)sndtrack->getSampleCount() * fmtChunk.m_chans; ++i) {
 				*(waveData.get() + 3 * i) = *(begin + 4 * i);

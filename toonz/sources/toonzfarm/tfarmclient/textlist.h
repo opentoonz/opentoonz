@@ -10,21 +10,20 @@
 
 class TGenericTextListAction
 {
-public:
+  public:
 	virtual ~TGenericTextListAction() {}
 	virtual void sendCommand(int itemIndex) = 0;
 };
 
 //-------------------------------------------------------------------
 
-template <class T>
-class TTextListAction : public TGenericTextListAction
+template <class T> class TTextListAction : public TGenericTextListAction
 {
-public:
+  public:
 	typedef void (T::*Method)(int itemIndex);
 	TTextListAction(T *target, Method method) : m_target(target), m_method(method) {}
 	void sendCommand(int itemIndex) { (m_target->*m_method)(itemIndex); }
-private:
+  private:
 	T *m_target;
 	Method m_method;
 };
@@ -33,14 +32,14 @@ private:
 
 class TTextListItem
 {
-public:
+  public:
 	TTextListItem(const string &id, const string &caption);
 	virtual ~TTextListItem() {}
 
 	string getId() { return m_id; }
 	string getCaption() { return m_caption; }
 
-private:
+  private:
 	string m_id;
 	string m_caption;
 };
@@ -49,7 +48,7 @@ private:
 
 class TTextList : public TWidget
 {
-public:
+  public:
 	TTextList(TWidget *parent, string name = "textlist");
 	~TTextList();
 
@@ -86,7 +85,7 @@ public:
 
 	void scrollTo(int y);
 
-private:
+  private:
 	class Data;
 	Data *m_data;
 };

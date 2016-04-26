@@ -23,22 +23,21 @@ class TSpectrumParamImp
 
 	std::vector<ColorKeyParam> m_keys;
 
-public:
+  public:
 	bool m_draggingEnabled;
 	bool m_notificationEnabled;
 	bool m_isMatteEnabled;
 
 	std::set<TParamObserver *> m_observers;
 
-public:
-	TSpectrumParamImp(TSpectrumParam *sp) : m_sp(sp), m_keys(), m_draggingEnabled(false), m_notificationEnabled(true), m_isMatteEnabled(true)
+  public:
+	TSpectrumParamImp(TSpectrumParam *sp)
+		: m_sp(sp), m_keys(), m_draggingEnabled(false), m_notificationEnabled(true),
+		  m_isMatteEnabled(true)
 	{
 	}
 
-	TSpectrumParamImp(const TSpectrumParamImp &s)
-	{
-		copy(s);
-	}
+	TSpectrumParamImp(const TSpectrumParamImp &s) { copy(s); }
 
 	void copy(const TSpectrumParamImp &src)
 	{
@@ -55,8 +54,8 @@ public:
 	void addKey(const ColorKeyParam &colorKey)
 	{
 		/*
-    m_sp->addParam(colorKey.first);
-    m_sp->addParam(colorKey.second);
+	m_sp->addParam(colorKey.first);
+	m_sp->addParam(colorKey.second);
 */
 		m_keys.push_back(colorKey);
 	}
@@ -64,8 +63,8 @@ public:
 	void insertKey(int index, ColorKeyParam &colorKey)
 	{
 		/*
-    m_sp->addParam(colorKey.first);
-    m_sp->addParam(colorKey.second);
+	m_sp->addParam(colorKey.first);
+	m_sp->addParam(colorKey.second);
 */
 		std::vector<ColorKeyParam>::iterator it = m_keys.begin() + index;
 		m_keys.insert(it, colorKey);
@@ -75,36 +74,27 @@ public:
 	{
 		std::vector<ColorKeyParam>::iterator colorKeyIt = m_keys.begin() + index;
 		/*
-    m_sp->removeParam((*colorKeyIt).first);
-    m_sp->removeParam((*colorKeyIt).second);
+	m_sp->removeParam((*colorKeyIt).first);
+	m_sp->removeParam((*colorKeyIt).second);
 */
 		m_keys.erase(colorKeyIt);
 	}
 
-	int getKeyCount() const
-	{
-		return m_keys.size();
-	}
+	int getKeyCount() const { return m_keys.size(); }
 
-	ColorKeyParam getKey(int index) const
-	{
-		return m_keys[index];
-	}
+	ColorKeyParam getKey(int index) const { return m_keys[index]; }
 
-	void clearKeys()
-	{
-		m_keys.clear();
-	}
+	void clearKeys() { m_keys.clear(); }
 
 	void notify(const TParamChange &change)
 	{
-		for (std::set<TParamObserver *>::iterator it = m_observers.begin();
-			 it != m_observers.end(); ++it)
+		for (std::set<TParamObserver *>::iterator it = m_observers.begin(); it != m_observers.end();
+			 ++it)
 			(*it)->onChange(change);
 	}
 
-private:
-	TSpectrumParamImp &operator=(const TSpectrumParamImp &); //not implemented
+  private:
+	TSpectrumParamImp &operator=(const TSpectrumParamImp &); // not implemented
 };
 
 //=========================================================
@@ -113,7 +103,7 @@ PERSIST_IDENTIFIER(TSpectrumParam, "spectrumParam")
 
 //---------------------------------------------------------
 
-TSpectrumParam::TSpectrumParam(): m_imp(new TSpectrumParamImp(this)) //brutto...
+TSpectrumParam::TSpectrumParam() : m_imp(new TSpectrumParamImp(this)) // brutto...
 {
 	ColorKeyParam ck1(TDoubleParamP(0.0), TPixelParamP(TPixel32::Black));
 	ColorKeyParam ck2(TDoubleParamP(1.0), TPixelParamP(TPixel32::White));
@@ -124,8 +114,7 @@ TSpectrumParam::TSpectrumParam(): m_imp(new TSpectrumParamImp(this)) //brutto...
 //---------------------------------------------------------
 
 TSpectrumParam::TSpectrumParam(const TSpectrumParam &src)
-	: TParam(src.getName())
-	, m_imp(new TSpectrumParamImp(*src.m_imp))
+	: TParam(src.getName()), m_imp(new TSpectrumParamImp(*src.m_imp))
 {
 }
 
@@ -185,9 +174,7 @@ TSpectrum TSpectrumParam::getValue(double frame) const
 	int keyCount = m_imp->getKeyCount();
 	for (int i = 0; i < keyCount; i++) {
 		ColorKeyParam paramKey = m_imp->getKey(i);
-		TSpectrum::ColorKey key(
-			paramKey.first->getValue(frame),
-			paramKey.second->getValue(frame));
+		TSpectrum::ColorKey key(paramKey.first->getValue(frame), paramKey.second->getValue(frame));
 		keys.push_back(key);
 	}
 	return TSpectrum(keys.size(), &keys[0]);
@@ -202,9 +189,8 @@ TSpectrum64 TSpectrumParam::getValue64(double frame) const
 	int keyCount = m_imp->getKeyCount();
 	for (int i = 0; i < keyCount; i++) {
 		ColorKeyParam paramKey = m_imp->getKey(i);
-		TSpectrum64::ColorKey key(
-			paramKey.first->getValue(frame),
-			toPixel64(paramKey.second->getValue(frame)));
+		TSpectrum64::ColorKey key(paramKey.first->getValue(frame),
+								  toPixel64(paramKey.second->getValue(frame)));
 		keys.push_back(key);
 	}
 	return TSpectrum64(keys.size(), &keys[0]);
@@ -247,7 +233,8 @@ int TSpectrumParam::getKeyCount() const
 
 //---------------------------------------------------------
 
-void TSpectrumParam::setValue(double frame, int index, double s, const TPixel32 &color, bool undoing)
+void TSpectrumParam::setValue(double frame, int index, double s, const TPixel32 &color,
+							  bool undoing)
 {
 	assert(m_imp);
 	int keyCount = m_imp->getKeyCount();
@@ -261,7 +248,8 @@ void TSpectrumParam::setValue(double frame, int index, double s, const TPixel32 
 	key.second->setValue(frame, color);
 	//  endParameterChange();
 
-	m_imp->notify(TParamChange(this, TParamChange::m_minFrame, TParamChange::m_maxFrame, true, m_imp->m_draggingEnabled, false));
+	m_imp->notify(TParamChange(this, TParamChange::m_minFrame, TParamChange::m_maxFrame, true,
+							   m_imp->m_draggingEnabled, false));
 }
 
 //---------------------------------------------------------
@@ -370,15 +358,14 @@ void TSpectrumParam::clearKeyframes()
 		key.second->clearKeyframes();
 	}
 
-	m_imp->notify(TParamChange(this, TParamChange::m_minFrame, TParamChange::m_maxFrame, true, m_imp->m_draggingEnabled, false));
+	m_imp->notify(TParamChange(this, TParamChange::m_minFrame, TParamChange::m_maxFrame, true,
+							   m_imp->m_draggingEnabled, false));
 }
 
 //---------------------------------------------------------
 
-void TSpectrumParam::assignKeyframe(
-	double frame,
-	const TParamP &src, double srcFrame,
-	bool changedOnly)
+void TSpectrumParam::assignKeyframe(double frame, const TParamP &src, double srcFrame,
+									bool changedOnly)
 {
 	TSpectrumParamP spectrum = src;
 	if (!spectrum)
@@ -491,9 +478,7 @@ std::string TSpectrumParam::getValueAlias(double frame, int precision)
 	int keyCount = m_imp->getKeyCount();
 	for (int i = 0; i < keyCount; i++) {
 		ColorKeyParam paramKey = m_imp->getKey(i);
-		TSpectrum::ColorKey key(
-			paramKey.first->getValue(frame),
-			paramKey.second->getValue(frame));
+		TSpectrum::ColorKey key(paramKey.first->getValue(frame), paramKey.second->getValue(frame));
 		keys.push_back(key);
 	}
 

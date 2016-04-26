@@ -39,12 +39,14 @@ RowArea::RowArea(XsheetViewer *parent, Qt::WindowFlags flags)
 #else
 RowArea::RowArea(XsheetViewer *parent, Qt::WFlags flags)
 #endif
-	: QWidget(parent, flags), m_viewer(parent), m_xa(ColumnWidth / 2 - 12), m_row(-1), m_showOnionToSet(false), m_pos(-1, -1), m_playRangeActiveInMousePress(false), m_mousePressRow(-1), m_tooltip(tr("")), m_r0(0), m_r1(5), m_isPanning(false)
+	: QWidget(parent, flags), m_viewer(parent), m_xa(ColumnWidth / 2 - 12), m_row(-1),
+	  m_showOnionToSet(false), m_pos(-1, -1), m_playRangeActiveInMousePress(false),
+	  m_mousePressRow(-1), m_tooltip(tr("")), m_r0(0), m_r1(5), m_isPanning(false)
 {
 	setFocusPolicy(Qt::NoFocus);
 	setMouseTracking(true);
-	connect(TApp::instance()->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()),
-			this, SLOT(update()));
+	connect(TApp::instance()->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()), this,
+			SLOT(update()));
 }
 
 //-----------------------------------------------------------------------------
@@ -55,8 +57,14 @@ RowArea::~RowArea()
 
 //-----------------------------------------------------------------------------
 
-DragTool *RowArea::getDragTool() const { return m_viewer->getDragTool(); }
-void RowArea::setDragTool(DragTool *dragTool) { m_viewer->setDragTool(dragTool); }
+DragTool *RowArea::getDragTool() const
+{
+	return m_viewer->getDragTool();
+}
+void RowArea::setDragTool(DragTool *dragTool)
+{
+	m_viewer->setDragTool(dragTool);
+}
 
 //-----------------------------------------------------------------------------
 
@@ -82,7 +90,7 @@ void RowArea::drawRows(QPainter &p, int r0, int r1)
 	int distance, offset;
 	TApp::instance()->getCurrentScene()->getScene()->getProperties()->getMarkers(distance, offset);
 
-	//default value
+	// default value
 	if (distance == 0)
 		distance = 6;
 
@@ -97,73 +105,100 @@ void RowArea::drawRows(QPainter &p, int r0, int r1)
 		int y = m_viewer->rowToY(r);
 
 		//--- draw horizontal line
-		QColor color = ((r - offset) % distance != 0) ? m_viewer->getLightLineColor() : m_viewer->getMarkerLineColor();
+		QColor color = ((r - offset) % distance != 0) ? m_viewer->getLightLineColor()
+													  : m_viewer->getMarkerLineColor();
 		p.setPen(color);
 		p.drawLine(x0, y, x1, y);
 
 		// draw frame text
 		if (playR0 <= r && r <= playR1) {
-			p.setPen(((r - m_r0) % step == 0) ? m_viewer->getPreviewFrameTextColor() : m_viewer->getTextColor());
+			p.setPen(((r - m_r0) % step == 0) ? m_viewer->getPreviewFrameTextColor()
+											  : m_viewer->getTextColor());
 		}
-		//not in preview range
+		// not in preview range
 		else
 			p.setPen(m_viewer->getTextColor());
 
 		switch (m_viewer->getFrameDisplayStyle()) {
 		case XsheetViewer::SecAndFrame: {
-			int frameRate = TApp::instance()->getCurrentScene()->getScene()->getProperties()->getOutputProperties()->getFrameRate();
+			int frameRate = TApp::instance()
+								->getCurrentScene()
+								->getScene()
+								->getProperties()
+								->getOutputProperties()
+								->getFrameRate();
 			QString str;
 			int koma = (r + 1) % frameRate;
 			if (koma == 1) {
 				int sec = (r + 1) / frameRate;
-				str = QString("%1' %2\"").arg(QString::number(sec).rightJustified(2, '0')).arg(QString::number(koma).rightJustified(2, '0'));
+				str = QString("%1' %2\"")
+						  .arg(QString::number(sec).rightJustified(2, '0'))
+						  .arg(QString::number(koma).rightJustified(2, '0'));
 			} else {
 				if (koma == 0)
 					koma = frameRate;
 				str = QString("%1\"").arg(QString::number(koma).rightJustified(2, '0'));
 			}
 
-			p.drawText(QRect(width() / 2 - 15, y + 1, width() / 2 + 7, RowHeight - 2), Qt::AlignRight | Qt::AlignBottom, str);
+			p.drawText(QRect(width() / 2 - 15, y + 1, width() / 2 + 7, RowHeight - 2),
+					   Qt::AlignRight | Qt::AlignBottom, str);
 
 			break;
 		}
 
 		case XsheetViewer::Frame: {
 			QString number = QString::number(r + 1);
-			p.drawText(QRect(width() / 2 - 2, y + 1, width() / 2, RowHeight - 2), Qt::AlignHCenter | Qt::AlignBottom, number);
+			p.drawText(QRect(width() / 2 - 2, y + 1, width() / 2, RowHeight - 2),
+					   Qt::AlignHCenter | Qt::AlignBottom, number);
 			break;
 		}
 
-		//6 second sheet (144frames per page)
+		// 6 second sheet (144frames per page)
 		case XsheetViewer::SixSecSheet: {
-			int frameRate = TApp::instance()->getCurrentScene()->getScene()->getProperties()->getOutputProperties()->getFrameRate();
+			int frameRate = TApp::instance()
+								->getCurrentScene()
+								->getScene()
+								->getProperties()
+								->getOutputProperties()
+								->getFrameRate();
 			QString str;
 			int koma = (r + 1) % (frameRate * 6);
 			if ((r + 1) % frameRate == 1) {
 				int page = (r + 1) / (frameRate * 6) + 1;
-				str = QString("p%1  %2").arg(QString::number(page)).arg(QString::number(koma).rightJustified(3, '0'));
+				str = QString("p%1  %2")
+						  .arg(QString::number(page))
+						  .arg(QString::number(koma).rightJustified(3, '0'));
 			} else {
 				if (koma == 0)
 					koma = frameRate * 6;
 				str = QString("%1").arg(QString::number(koma).rightJustified(3, '0'));
 			}
-			p.drawText(QRect(width() / 2 - 21, y + 1, width() / 2 + 7, RowHeight - 2), Qt::AlignRight | Qt::AlignBottom, str);
+			p.drawText(QRect(width() / 2 - 21, y + 1, width() / 2 + 7, RowHeight - 2),
+					   Qt::AlignRight | Qt::AlignBottom, str);
 			break;
 		}
-		//3 second sheet (72frames per page)
+		// 3 second sheet (72frames per page)
 		case XsheetViewer::ThreeSecSheet: {
-			int frameRate = TApp::instance()->getCurrentScene()->getScene()->getProperties()->getOutputProperties()->getFrameRate();
+			int frameRate = TApp::instance()
+								->getCurrentScene()
+								->getScene()
+								->getProperties()
+								->getOutputProperties()
+								->getFrameRate();
 			QString str;
 			int koma = (r + 1) % (frameRate * 3);
 			if ((r + 1) % frameRate == 1) {
 				int page = (r + 1) / (frameRate * 3) + 1;
-				str = QString("p%1  %2").arg(QString::number(page)).arg(QString::number(koma).rightJustified(2, '0'));
+				str = QString("p%1  %2")
+						  .arg(QString::number(page))
+						  .arg(QString::number(koma).rightJustified(2, '0'));
 			} else {
 				if (koma == 0)
 					koma = frameRate * 3;
 				str = QString("%1").arg(QString::number(koma).rightJustified(2, '0'));
 			}
-			p.drawText(QRect(width() / 2 - 21, y + 1, width() / 2 + 7, RowHeight - 2), Qt::AlignRight | Qt::AlignBottom, str);
+			p.drawText(QRect(width() / 2 - 21, y + 1, width() / 2 + 7, RowHeight - 2),
+					   Qt::AlignRight | Qt::AlignBottom, str);
 			break;
 		}
 		}
@@ -187,7 +222,8 @@ void RowArea::drawPlayRange(QPainter &p, int r0, int r1)
 		int step;
 		XsheetGUI::getPlayRange(m_r0, m_r1, step);
 	}
-	// if the preview range is not set, then put markers at the first and the last frames of the scene
+	// if the preview range is not set, then put markers at the first and the last frames of the
+	// scene
 	else {
 		TXsheet *xsh = m_viewer->getXsheet();
 		m_r1 = xsh->getFrameCount() - 1;
@@ -200,17 +236,13 @@ void RowArea::drawPlayRange(QPainter &p, int r0, int r1)
 
 	if (m_r0 > r0 - 1 && r1 + 1 > m_r0) {
 		int y0 = m_viewer->rowToY(m_r0);
-		drawArrow(p, QPointF(m_xa, y0 + 1),
-				  QPointF(m_xa + 10, y0 + 1),
-				  QPointF(m_xa, y0 + 11),
+		drawArrow(p, QPointF(m_xa, y0 + 1), QPointF(m_xa + 10, y0 + 1), QPointF(m_xa, y0 + 11),
 				  true, ArrowColor);
 	}
 
 	if (m_r1 > r0 - 1 && r1 + 1 > m_r1) {
 		int y1 = m_viewer->rowToY(m_r1 + 1) - 12;
-		drawArrow(p, QPointF(m_xa, y1 + 1),
-				  QPointF(m_xa + 10, y1 + 11),
-				  QPointF(m_xa, y1 + 11),
+		drawArrow(p, QPointF(m_xa, y1 + 1), QPointF(m_xa + 10, y1 + 11), QPointF(m_xa, y1 + 11),
 				  true, ArrowColor);
 	}
 }
@@ -306,14 +338,14 @@ void RowArea::paintEvent(QPaintEvent *event)
 
 	p.setClipRect(toBeUpdated);
 
-	//fill background
+	// fill background
 	p.fillRect(toBeUpdated, m_viewer->getBGColor());
 
 	if (TApp::instance()->getCurrentFrame()->isEditingScene()) {
-		//current frame
+		// current frame
 		drawCurrentRowGadget(p, r0, r1);
-		//TODO: Scene上のオニオンスキン表示、オプション化するか検討 2016/1/6 shun_iwasawa
-		//drawOnionSkinSelection(p);
+		// TODO: Scene上のオニオンスキン表示、オプション化するか検討 2016/1/6 shun_iwasawa
+		// drawOnionSkinSelection(p);
 	}
 
 	drawRows(p, r0, r1);
@@ -345,7 +377,7 @@ void RowArea::mousePressEvent(QMouseEvent *event)
 			playR0 = 0;
 		}
 
-		if (playR1 == -1) { //getFrameCount = 0 i.e. xsheet is empty
+		if (playR1 == -1) { // getFrameCount = 0 i.e. xsheet is empty
 			setDragTool(XsheetGUI::DragTool::makeCurrentFrameModifierTool(m_viewer));
 		} else if (m_xa <= pos.x && pos.x <= m_xa + 10 && (row == playR0 || row == playR1)) {
 			if (!playRangeEnabled)
@@ -355,7 +387,7 @@ void RowArea::mousePressEvent(QMouseEvent *event)
 		} else
 			setDragTool(XsheetGUI::DragTool::makeCurrentFrameModifierTool(m_viewer));
 
-		//when shift+click the row area, select a single row region in the cell area
+		// when shift+click the row area, select a single row region in the cell area
 		if (!playRangeModifierisClicked && 0 != (event->modifiers() & Qt::ShiftModifier)) {
 			int filledCol;
 			for (filledCol = xsh->getColumnCount() - 1; filledCol >= 0; filledCol--) {
@@ -467,7 +499,7 @@ void RowArea::contextMenuEvent(QContextMenuEvent *event)
 	QAction *removeMarkers = menu->addAction(tr("Remove Markers"));
 	connect(removeMarkers, SIGNAL(triggered()), SLOT(onRemoveMarkers()));
 
-	//set both the from and to markers at the specified row
+	// set both the from and to markers at the specified row
 	QAction *previewThis = menu->addAction(tr("Preview This"));
 	connect(previewThis, SIGNAL(triggered()), SLOT(onPreviewThis()));
 
@@ -548,7 +580,7 @@ void RowArea::onSetStopMarker()
 }
 
 //-----------------------------------------------------------------------------
-//set both the from and to markers at the specified row
+// set both the from and to markers at the specified row
 void RowArea::onPreviewThis()
 {
 	assert(m_row >= 0);

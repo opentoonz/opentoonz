@@ -3,16 +3,16 @@
 #ifndef CLEANUPPREVIEW_H
 #define CLEANUPPREVIEW_H
 
-//STL includes
+// STL includes
 #include <vector>
 
-//ToonzLib includes
+// ToonzLib includes
 #include "toonz/txshsimplelevel.h"
 
-//ToonzQt includes
+// ToonzQt includes
 #include "toonzqt/menubarcommand.h"
 
-//Qt includes
+// Qt includes
 #include <QTimer>
 
 //========================================================
@@ -37,12 +37,12 @@ class PreviewToggleCommand : public MenuItemHandler
 
 	QTimer m_timer; //!< Processing timer - allows processing only
 					//!< after half a sec. without parameter changes
-public:
+  public:
 	PreviewToggleCommand();
 
 	void execute();
 
-protected:
+  protected:
 	friend class CameraTestToggleCommand;
 
 	void enable();
@@ -50,7 +50,7 @@ protected:
 
 	void clean();
 
-protected slots:
+  protected slots:
 
 	void onPreviewDataChanged();
 	void onModelChanged(bool needsPostProcess);
@@ -72,12 +72,12 @@ class CameraTestToggleCommand : public MenuItemHandler
 
 	QTimer m_timer;
 
-public:
+  public:
 	CameraTestToggleCommand();
 
 	void execute();
 
-protected:
+  protected:
 	friend class PreviewToggleCommand;
 
 	void enable();
@@ -85,10 +85,10 @@ protected:
 
 	void clean();
 
-protected slots:
+  protected slots:
 
 	void onPreviewDataChanged();
 	void postProcess();
 };
 
-#endif //CLEANUPPREVIEW_H
+#endif // CLEANUPPREVIEW_H

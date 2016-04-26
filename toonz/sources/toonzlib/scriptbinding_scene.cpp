@@ -124,10 +124,12 @@ QScriptValue Scene::newLevel(const QString &levelTypeStr, const QString &levelNa
 	else if (levelTypeStr == "Raster")
 		levelType = OVL_XSHLEVEL;
 	if (levelType == NO_XSHLEVEL)
-		return context()->throwError(tr("Bad level type (%1): must be Vector,Raster or ToonzRaster").arg(levelTypeStr));
+		return context()->throwError(
+			tr("Bad level type (%1): must be Vector,Raster or ToonzRaster").arg(levelTypeStr));
 
 	if (m_scene->getLevelSet()->hasLevel(levelName.toStdWString()))
-		return context()->throwError(tr("Can't add the level: name(%1) is already used").arg(levelName));
+		return context()->throwError(
+			tr("Can't add the level: name(%1) is already used").arg(levelName));
 
 	TXshLevel *xl = m_scene->createNewLevel(levelType, levelName.toStdWString());
 	xl->getSimpleLevel()->setDirtyFlag(true);
@@ -137,14 +139,16 @@ QScriptValue Scene::newLevel(const QString &levelTypeStr, const QString &levelNa
 QScriptValue Scene::loadLevel(const QString &levelName, const QScriptValue &fpArg) const
 {
 	if (m_scene->getLevelSet()->hasLevel(levelName.toStdWString()))
-		return context()->throwError(tr("Can't add the level: name(%1) is already used").arg(levelName));
+		return context()->throwError(
+			tr("Can't add the level: name(%1) is already used").arg(levelName));
 	TFilePath fp;
 	QScriptValue err = checkFilePath(context(), fpArg, fp);
 	if (err.isError())
 		return err;
 	TFileType::Type type = TFileType::getInfo(fp);
 	if ((type & TFileType::VIEWABLE) == 0)
-		return context()->throwError(tr("Can't load this kind of file as a level : %1").arg(fpArg.toString()));
+		return context()->throwError(
+			tr("Can't load this kind of file as a level : %1").arg(fpArg.toString()));
 	TXshLevel *xl = m_scene->loadLevel(fp);
 	if (!xl || !xl->getSimpleLevel())
 		return context()->throwError(tr("Could not load level %1").arg(fpArg.toString()));
@@ -197,8 +201,10 @@ QScriptValue Scene::setCell(int row, int col, const QScriptValue &cellArg)
 		if (row >= 0 && col >= 0)
 			m_scene->getXsheet()->setCell(row, col, TXshCell());
 	} else {
-		if (!cellArg.isObject() || cellArg.property("level").isUndefined() || cellArg.property("fid").isUndefined())
-			return context()->throwError("Third argument should be an object with attributes 'level' and 'fid'");
+		if (!cellArg.isObject() || cellArg.property("level").isUndefined() ||
+			cellArg.property("fid").isUndefined())
+			return context()->throwError(
+				"Third argument should be an object with attributes 'level' and 'fid'");
 		QScriptValue levelArg = cellArg.property("level");
 		QScriptValue fidArg = cellArg.property("fid");
 		QString err = doSetCell(row, col, levelArg, fidArg);

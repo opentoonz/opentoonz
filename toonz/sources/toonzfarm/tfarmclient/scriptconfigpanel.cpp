@@ -18,8 +18,7 @@ using namespace TwConsts;
 
 //==============================================================================
 
-PathFileField::PathFileField(TWidget *parent, string name)
-	: TTextField(parent, name)
+PathFileField::PathFileField(TWidget *parent, string name) : TTextField(parent, name)
 {
 	m_page = dynamic_cast<ScriptConfigPanel *>(parent);
 }
@@ -76,29 +75,17 @@ void PathFileField::keyDown(int key, unsigned long flags, const TPoint &p)
 
 //==============================================================================
 
-enum textFieldType {
-	M_ARG1 = 0,
-	M_ARG2,
-	M_ARG3,
-	M_ARG4,
-	M_ARG5
-};
+enum textFieldType { M_ARG1 = 0, M_ARG2, M_ARG3, M_ARG4, M_ARG5 };
 
 class ArgumentChanger : public TTextField::Action
 {
 	ScriptConfigPanel *m_scp;
 	textFieldType m_typeField;
 
-public:
-	ArgumentChanger(ScriptConfigPanel *scp, textFieldType type)
-		: m_scp(scp), m_typeField(type)
-	{
-	}
+  public:
+	ArgumentChanger(ScriptConfigPanel *scp, textFieldType type) : m_scp(scp), m_typeField(type) {}
 
-	void sendCommand(std::wstring value)
-	{
-		m_scp->onTextField(toString(value), m_typeField);
-	}
+	void sendCommand(std::wstring value) { m_scp->onTextField(toString(value), m_typeField); }
 };
 
 //==============================================================================
@@ -112,7 +99,7 @@ ScriptConfigPanel::ScriptConfigPanel(TWidget *parent)
 	m_browseBtn = new TButton(this);
 	m_browseBtn->setTitle("...");
 	tconnect(*m_browseBtn, this, &ScriptConfigPanel::browseFiles);
-	//m_file->addAction(new ArgumentChanger(this, M_ARG1));
+	// m_file->addAction(new ArgumentChanger(this, M_ARG1));
 
 	m_arg2Lbl = new TLabel(this);
 	m_arg2Lbl->setText("Arg #2:");
@@ -228,7 +215,7 @@ void ScriptConfigPanel::browseFiles()
 #endif
 
 	d -= popup->getSize();
-	//TDimension d = TMainshell::getMainshell()->getSize() - popup->getSize();
+	// TDimension d = TMainshell::getMainshell()->getSize() - popup->getSize();
 	popup->popup(TPoint(d.lx / 2, d.ly / 2));
 	popup->setCaption("Load Script");
 }
@@ -264,8 +251,8 @@ void ScriptConfigPanel::loadScript(const TFilePath &fp)
   int x = uncString.find("\\",2);
   while (x != string::npos)
   {
-    uncString.replace(x,1,"/",0,1);
-    x = uncString.find("\\",x+1);    
+	uncString.replace(x,1,"/",0,1);
+	x = uncString.find("\\",x+1);
   }
 #endif
 */

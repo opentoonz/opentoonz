@@ -18,8 +18,8 @@
 
 class DVAPI TCanvas : public TWidget
 {
-protected:
-public:
+  protected:
+  public:
 	TCanvas(TWidget *parent, string name = "canvas");
 	~TCanvas();
 

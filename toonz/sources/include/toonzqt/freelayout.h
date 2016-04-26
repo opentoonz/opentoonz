@@ -27,19 +27,19 @@
 
 /*!
   \brief    The DummyLayout class implements a layout whose items' geometry is not
-            enforced at all, ignoring parent size bounds or geometry.
+			enforced at all, ignoring parent size bounds or geometry.
 
   \details  A DummyLayout serves as a simple, inert container of layout items.
-            It does not enforce geometry to items added to it, allowing objects
-            using this layout to appear as a 'viewport' for free-geometry items.
+			It does not enforce geometry to items added to it, allowing objects
+			using this layout to appear as a 'viewport' for free-geometry items.
 
   \note     As this layout does not effectively manage its objects' geometry, these
-            must be managed outside.
+			must be managed outside.
 */
 
 class DVAPI DummyLayout : public QLayout
 {
-public:
+  public:
 	DummyLayout();
 	virtual ~DummyLayout();
 
@@ -54,9 +54,9 @@ public:
 	QLayoutItem *takeAt(int index) { return (index < count()) ? m_items.takeAt(index) : 0; }
 
 	void setGeometry(const QRect &r) {}
-	//Qt::Orientations	expandingDirections () const { return Qt::Orientations(); }
+	// Qt::Orientations	expandingDirections () const { return Qt::Orientations(); }
 
-protected:
+  protected:
 	QList<QLayoutItem *> m_items;
 };
 
@@ -66,21 +66,21 @@ protected:
 
 /*!
   \brief    The FreeLayout class implements a layout whose items can be freely
-            positioned, ignoring parent size bounds or geometry.
+			positioned, ignoring parent size bounds or geometry.
 
   \details  A FreeLayout instance can be used to achieve results similar to that
-            of a QScrollArea, with a more straightforward API and without restriction
-            to just one item at a time. Please observe that layouts can be inserted too.
+			of a QScrollArea, with a more straightforward API and without restriction
+			to just one item at a time. Please observe that layouts can be inserted too.
 
-            Specifically, FreeLayout is a convenience subclass of DummyLayout whose items'
-            sizes are enforced to their sizeHint() - in order to spare users from having to deal
-            with it externally. This complies with the idea that its items are comfortly
-            free to adapt to their preferred size, as it would be in a scrollable environment.
+			Specifically, FreeLayout is a convenience subclass of DummyLayout whose items'
+			sizes are enforced to their sizeHint() - in order to spare users from having to deal
+			with it externally. This complies with the idea that its items are comfortly
+			free to adapt to their preferred size, as it would be in a scrollable environment.
 */
 
 class FreeLayout : public DummyLayout
 {
-public:
+  public:
 	FreeLayout() : DummyLayout() {}
 	~FreeLayout() {}
 

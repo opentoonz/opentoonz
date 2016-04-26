@@ -19,9 +19,8 @@
 
 class DVAPI IKNode
 {
-public:
-	enum Purpose { JOINT,
-				   EFFECTOR };
+  public:
+	enum Purpose { JOINT, EFFECTOR };
 
 	IKNode() : m_parent(0), m_pos()
 	{
@@ -76,7 +75,7 @@ public:
 	void freeze() { freezed = true; } // mantiene l'angolo theta costante
 	void unFreeze() { freezed = false; }
 
-private:
+  private:
 	int m_index;
 	IKNode *m_parent;
 
@@ -87,7 +86,7 @@ private:
 
 	TPointD r; // Posizione relativa
 	TPointD s; // Posizione Globale
-	//TPointD w; // Rotazione Globale dell'asse
+	// TPointD w; // Rotazione Globale dell'asse
 
 	double theta;	 // angolo del joint (radianti)
 	double theta0;	// angolo iniziale del joint (radianti)
@@ -98,4 +97,4 @@ private:
 	bool freezed; // Se vero l'angolo è blocccato
 };
 
-#endif //IKNODE_H
+#endif // IKNODE_H

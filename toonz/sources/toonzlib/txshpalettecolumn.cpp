@@ -5,8 +5,7 @@
 #include "toonz/tcolumnfx.h"
 #include "tstream.h"
 
-TXshPaletteColumn::TXshPaletteColumn()
-	: TXshCellColumn(), m_fx(new TPaletteColumnFx())
+TXshPaletteColumn::TXshPaletteColumn() : TXshCellColumn(), m_fx(new TPaletteColumnFx())
 {
 	m_fx->addRef();
 	m_fx->setColumn(this);
@@ -31,7 +30,7 @@ TXshColumn *TXshPaletteColumn::clone() const
 	column->m_cells = m_cells;
 	column->m_first = m_first;
 
-	//column->updateIcon();
+	// column->updateIcon();
 	return column;
 }
 

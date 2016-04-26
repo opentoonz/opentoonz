@@ -26,22 +26,22 @@ class ShortcutViewer : public QWidget
 	Q_OBJECT
 	QAction *m_action;
 
-public:
+  public:
 	ShortcutViewer(QWidget *parent);
 	~ShortcutViewer();
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *);
 	bool event(QEvent *event);
 	void keyPressEvent(QKeyEvent *event);
 	void enterEvent(QEvent *event);
 	void leaveEvent(QEvent *event);
 
-public slots:
+  public slots:
 	void setAction(QAction *action);
 	void removeShortcut();
 
-signals:
+  signals:
 	void shortcutChanged();
 };
 
@@ -57,19 +57,19 @@ class ShortcutTree : public QTreeWidget
 	Q_OBJECT
 	std::vector<ShortcutItem *> m_items;
 
-public:
+  public:
 	ShortcutTree(QWidget *parent = 0);
 	~ShortcutTree();
 
-protected:
+  protected:
 	// aggiunge un blocco di QAction. commandType e' un CommandType::MenubarCommandType
 	void addFolder(const QString &title, int commandType, QTreeWidgetItem *folder = 0);
 
-public slots:
+  public slots:
 	void onCurrentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
 	void onShortcutChanged();
 
-signals:
+  signals:
 	void actionSelected(QAction *);
 };
 
@@ -86,7 +86,7 @@ class ShortcutPopup : public DVGui::Dialog
 	ShortcutViewer *m_sViewer;
 	ShortcutTree *m_list;
 
-public:
+  public:
 	ShortcutPopup();
 	~ShortcutPopup();
 };

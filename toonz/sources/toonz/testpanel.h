@@ -13,7 +13,7 @@ class TestPanel : public TPanel
 {
 	Q_OBJECT
 
-public:
+  public:
 #if QT_VERSION >= 0x050500
 	TestPanel(QWidget *parent = 0, Qt::WindowFlags flags = 0);
 #else
@@ -21,11 +21,11 @@ public:
 #endif
 	~TestPanel();
 
-public slots:
+  public slots:
 	void onDoubleValuesChanged(bool isDragging);
 	void onDoubleValueChanged(bool isDragging);
 	void onIntValueChanged(bool isDragging);
 	void onColorValueChanged(const TPixel32 &, bool isDragging);
 };
 
-#endif //TESTPANEL_H
+#endif // TESTPANEL_H

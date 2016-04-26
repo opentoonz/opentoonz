@@ -32,7 +32,7 @@ class TFARMAPI TTcpIpServer : public QThread
 {
 	int m_exitCode;
 
-public:
+  public:
 	TTcpIpServer(int port);
 	virtual ~TTcpIpServer();
 
@@ -47,7 +47,7 @@ public:
 
 	int getExitCode() const;
 
-private:
+  private:
 	std::shared_ptr<TTcpIpServerImp> m_imp;
 };
 
@@ -67,7 +67,7 @@ enum {
 
 class TFARMAPI TTcpIpClient
 {
-public:
+  public:
 	TTcpIpClient();
 	~TTcpIpClient();
 

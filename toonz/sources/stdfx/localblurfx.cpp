@@ -9,19 +9,22 @@
 /* (Daniele)
 
   NOTE: Current LocalBlurFx is effectively flawed. Following implementation relies on the idea that
-        the blurring filter is separable and therefore appliable on rows and columns, in sequence.
+		the blurring filter is separable and therefore appliable on rows and columns, in sequence.
 
-        It actually is not. It can be easily verified applying the fx on a chessboard with a strong
-        blur intensity. The squares will be cast vertically towards blurred regions.
+		It actually is not. It can be easily verified applying the fx on a chessboard with a strong
+		blur intensity. The squares will be cast vertically towards blurred regions.
 
-        Originally, this was a sub-optimal O(lx * ly * blur) algorithm. The following (still separated)
-        is O(lx * ly) using precomputed sums in an additional line.
+		Originally, this was a sub-optimal O(lx * ly * blur) algorithm. The following (still
+  separated)
+		is O(lx * ly) using precomputed sums in an additional line.
 
-        The 'correct' algorithm could be implemented again as O(lx * ly * blur), with additional O(lx * blur)
-        memory usage with precomputed sums along (blur) rows.
+		The 'correct' algorithm could be implemented again as O(lx * ly * blur), with additional
+  O(lx * blur)
+		memory usage with precomputed sums along (blur) rows.
 
-        Pixels would have to be filtered one by one, but the horizontal filtering per pixel convolution row
-        would take O(1). Thus it would be O(blur) (column filtering) per pixel.
+		Pixels would have to be filtered one by one, but the horizontal filtering per pixel
+  convolution row
+		would take O(1). Thus it would be O(blur) (column filtering) per pixel.
 */
 
 //********************************************************************************
@@ -42,19 +45,14 @@ struct Sums {
 	std::unique_ptr<TUINT64[]> m_sumsX_m;
 
 	Sums(int length)
-		: m_sumsIX_r(new TUINT64[length + 1])
-		, m_sumsIX_g(new TUINT64[length + 1])
-		, m_sumsIX_b(new TUINT64[length + 1])
-		, m_sumsIX_m(new TUINT64[length + 1])
-		, m_sumsX_r(new TUINT64[length + 1])
-		, m_sumsX_g(new TUINT64[length + 1])
-		, m_sumsX_b(new TUINT64[length + 1])
-		, m_sumsX_m(new TUINT64[length + 1])
+		: m_sumsIX_r(new TUINT64[length + 1]), m_sumsIX_g(new TUINT64[length + 1]),
+		  m_sumsIX_b(new TUINT64[length + 1]), m_sumsIX_m(new TUINT64[length + 1]),
+		  m_sumsX_r(new TUINT64[length + 1]), m_sumsX_g(new TUINT64[length + 1]),
+		  m_sumsX_b(new TUINT64[length + 1]), m_sumsX_m(new TUINT64[length + 1])
 	{
 	}
 
-	template <typename Pix>
-	void build(Pix *line, int wrap, int n)
+	template <typename Pix> void build(Pix *line, int wrap, int n)
 	{
 		++n;
 
@@ -83,8 +81,8 @@ struct Sums {
 //----------------------------------------------------------------------------
 
 template <typename Pix, typename Grey>
-void filterLine(Pix *lineIn, int wrapIn, Grey *lineGr, int wrapGr, Pix *lineOut, int wrapOut, int length,
-				double blurFactor, Sums &sums)
+void filterLine(Pix *lineIn, int wrapIn, Grey *lineGr, int wrapGr, Pix *lineOut, int wrapOut,
+				int length, double blurFactor, Sums &sums)
 {
 	// Build temporary sums
 	sums.build(lineIn, wrapIn, length);
@@ -102,7 +100,8 @@ void filterLine(Pix *lineIn, int wrapIn, Grey *lineGr, int wrapGr, Pix *lineOut,
 
 	for (i = 1, pixIn = lineIn, pixGr = lineGr, pixOut = lineOut; i < length;
 		 ++i, pixIn += wrapIn, pixGr += wrapGr, pixOut += wrapOut) {
-		blur = pixGr->value * blurFactor; // A table of factors should be made - since we have a finite
+		blur =
+			pixGr->value * blurFactor; // A table of factors should be made - since we have a finite
 
 		if (blur > 0.0) {
 			blur += 0.5; /*-- 0.5足すのは、注目ピクセルの半径分。例えばBlur0.5は、
@@ -122,23 +121,28 @@ void filterLine(Pix *lineIn, int wrapIn, Grey *lineGr, int wrapGr, Pix *lineOut,
 			cRight = blur / amount + dR * i;
 
 			// NOTE: The normalization factor with blur (not integer) would be:
-			//        1.0 / (1 + 2 * blurI - (blurI / blur) * (blurI + 1))                    -- could be done using a factors table
+			//        1.0 / (1 + 2 * blurI - (blurI / blur) * (blurI + 1))                    --
+			//        could be done using a factors table
 
 			iLeft = tmax(i - tfloor(blur) - 1, 0);
 			iRight = tmin(i + tfloor(blur), length - 1);
 
-			pixOut->r = troundp(
-				kLeft * (sums.m_sumsIX_r[i] - sums.m_sumsIX_r[iLeft]) + kRight * (sums.m_sumsIX_r[iRight] - sums.m_sumsIX_r[i]) +
-				cLeft * (sums.m_sumsX_r[i] - sums.m_sumsX_r[iLeft]) + cRight * (sums.m_sumsX_r[iRight] - sums.m_sumsX_r[i]));
-			pixOut->g = troundp(
-				kLeft * (sums.m_sumsIX_g[i] - sums.m_sumsIX_g[iLeft]) + kRight * (sums.m_sumsIX_g[iRight] - sums.m_sumsIX_g[i]) +
-				cLeft * (sums.m_sumsX_g[i] - sums.m_sumsX_g[iLeft]) + cRight * (sums.m_sumsX_g[iRight] - sums.m_sumsX_g[i]));
-			pixOut->b = troundp(
-				kLeft * (sums.m_sumsIX_b[i] - sums.m_sumsIX_b[iLeft]) + kRight * (sums.m_sumsIX_b[iRight] - sums.m_sumsIX_b[i]) +
-				cLeft * (sums.m_sumsX_b[i] - sums.m_sumsX_b[iLeft]) + cRight * (sums.m_sumsX_b[iRight] - sums.m_sumsX_b[i]));
-			pixOut->m = troundp(
-				kLeft * (sums.m_sumsIX_m[i] - sums.m_sumsIX_m[iLeft]) + kRight * (sums.m_sumsIX_m[iRight] - sums.m_sumsIX_m[i]) +
-				cLeft * (sums.m_sumsX_m[i] - sums.m_sumsX_m[iLeft]) + cRight * (sums.m_sumsX_m[iRight] - sums.m_sumsX_m[i]));
+			pixOut->r = troundp(kLeft * (sums.m_sumsIX_r[i] - sums.m_sumsIX_r[iLeft]) +
+								kRight * (sums.m_sumsIX_r[iRight] - sums.m_sumsIX_r[i]) +
+								cLeft * (sums.m_sumsX_r[i] - sums.m_sumsX_r[iLeft]) +
+								cRight * (sums.m_sumsX_r[iRight] - sums.m_sumsX_r[i]));
+			pixOut->g = troundp(kLeft * (sums.m_sumsIX_g[i] - sums.m_sumsIX_g[iLeft]) +
+								kRight * (sums.m_sumsIX_g[iRight] - sums.m_sumsIX_g[i]) +
+								cLeft * (sums.m_sumsX_g[i] - sums.m_sumsX_g[iLeft]) +
+								cRight * (sums.m_sumsX_g[iRight] - sums.m_sumsX_g[i]));
+			pixOut->b = troundp(kLeft * (sums.m_sumsIX_b[i] - sums.m_sumsIX_b[iLeft]) +
+								kRight * (sums.m_sumsIX_b[iRight] - sums.m_sumsIX_b[i]) +
+								cLeft * (sums.m_sumsX_b[i] - sums.m_sumsX_b[iLeft]) +
+								cRight * (sums.m_sumsX_b[iRight] - sums.m_sumsX_b[i]));
+			pixOut->m = troundp(kLeft * (sums.m_sumsIX_m[i] - sums.m_sumsIX_m[iLeft]) +
+								kRight * (sums.m_sumsIX_m[iRight] - sums.m_sumsIX_m[i]) +
+								cLeft * (sums.m_sumsX_m[i] - sums.m_sumsX_m[iLeft]) +
+								cRight * (sums.m_sumsX_m[iRight] - sums.m_sumsX_m[i]));
 		} else
 			*pixOut = *pixIn;
 	}
@@ -147,8 +151,8 @@ void filterLine(Pix *lineIn, int wrapIn, Grey *lineGr, int wrapGr, Pix *lineOut,
 //----------------------------------------------------------------------------
 
 template <typename Pix, typename Grey>
-void doLocalBlur(TRasterPT<Pix> rin, TRasterPT<Pix> rcontrol, TRasterPT<Pix> rout,
-				 double blur, const TPoint &displacement)
+void doLocalBlur(TRasterPT<Pix> rin, TRasterPT<Pix> rcontrol, TRasterPT<Pix> rout, double blur,
+				 const TPoint &displacement)
 {
 	assert(rin->getLx() == rcontrol->getLx() && rin->getLy() == rcontrol->getLy());
 
@@ -163,7 +167,8 @@ void doLocalBlur(TRasterPT<Pix> rin, TRasterPT<Pix> rcontrol, TRasterPT<Pix> rou
 	outLy = rout->getLy();
 	wrapOut = rout->getWrap();
 
-	// Convert the control raster to grey values (this avoids the overhead of performing the pixel-to-value
+	// Convert the control raster to grey values (this avoids the overhead of performing the
+	// pixel-to-value
 	// conversion twice, once per line filtering)
 	TRasterPT<Grey> rcontrolGrey(rcontrol->getLx(), rcontrol->getLy());
 	TRop::convert(rcontrolGrey, rcontrol);
@@ -184,8 +189,7 @@ void doLocalBlur(TRasterPT<Pix> rin, TRasterPT<Pix> rcontrol, TRasterPT<Pix> rou
 	{
 		Sums sums(inLx);
 
-		for (y = 0, lineIn = bufIn, lineC = bufC; y < inLy;
-			 ++y, lineIn += wrapIn, lineC += wrapC) {
+		for (y = 0, lineIn = bufIn, lineC = bufC; y < inLy; ++y, lineIn += wrapIn, lineC += wrapC) {
 			// Filter row
 			filterLine(lineIn, 1, lineC, 1, lineIn, 1, inLx, blurFactor, sums);
 		}
@@ -194,8 +198,7 @@ void doLocalBlur(TRasterPT<Pix> rin, TRasterPT<Pix> rcontrol, TRasterPT<Pix> rou
 	{
 		Sums sums(inLy);
 
-		for (x = 0, lineIn = bufIn, lineC = bufC; x < inLx;
-			 ++x, ++lineIn, ++lineC) {
+		for (x = 0, lineIn = bufIn, lineC = bufC; x < inLx; ++x, ++lineIn, ++lineC) {
 			// Filter column
 			filterLine(lineIn, wrapIn, lineC, wrapC, lineIn, wrapIn, inLy, blurFactor, sums);
 		}
@@ -211,7 +214,7 @@ void doLocalBlur(TRasterPT<Pix> rin, TRasterPT<Pix> rcontrol, TRasterPT<Pix> rou
 	TRop::copy(rout->extract(rectIn), rin->extract(rectOut));
 }
 
-} //namespace
+} // namespace
 
 //********************************************************************************
 //    LocalBlurFx implementation
@@ -221,13 +224,12 @@ class LocalBlurFx : public TStandardRasterFx
 {
 	FX_PLUGIN_DECLARATION(LocalBlurFx)
 
-protected:
+  protected:
 	TRasterFxPort m_up, m_ref;
 	TDoubleParamP m_value;
 
-public:
-	LocalBlurFx()
-		: m_value(20)
+  public:
+	LocalBlurFx() : m_value(20)
 	{
 		m_value->setMeasureName("fxLength");
 		addInputPort("Source", m_up);
@@ -362,16 +364,14 @@ void LocalBlurFx::doCompute(TTile &tile, double frame, const TRenderSettings &in
 	if (rectIn.isEmpty())
 		return;
 
-	//Finally, allocate and compute the blur argument
+	// Finally, allocate and compute the blur argument
 	TTile tileIn;
-	m_up->allocateAndCompute(
-		tileIn, rectIn.getP00(), TDimension(rectIn.getLx(), rectIn.getLy()),
-		tile.getRaster(), frame, info);
+	m_up->allocateAndCompute(tileIn, rectIn.getP00(), TDimension(rectIn.getLx(), rectIn.getLy()),
+							 tile.getRaster(), frame, info);
 
 	TTile tileRef;
-	m_ref->allocateAndCompute(
-		tileRef, rectIn.getP00(), TDimension(rectIn.getLx(), rectIn.getLy()),
-		tile.getRaster(), frame, info);
+	m_ref->allocateAndCompute(tileRef, rectIn.getP00(), TDimension(rectIn.getLx(), rectIn.getLy()),
+							  tile.getRaster(), frame, info);
 
 	// Perform Local Blur
 	TRasterP inRas(tileIn.getRaster());
@@ -382,8 +382,9 @@ void LocalBlurFx::doCompute(TTile &tile, double frame, const TRenderSettings &in
 	TRaster32P ref32(refRas);
 	TRaster32P out32(outRas);
 
-	TPoint displacement(convert(rectIn.getP00() - tile.m_pos)); // inTile position relative to (out)tile
-																// The difference already has integer coordinates due to enlarge()
+	TPoint displacement(
+		convert(rectIn.getP00() - tile.m_pos)); // inTile position relative to (out)tile
+	// The difference already has integer coordinates due to enlarge()
 
 	if (in32 && ref32 && out32)
 		doLocalBlur<TPixelRGBM32, TPixelGR8>(in32, ref32, out32, blur, displacement);

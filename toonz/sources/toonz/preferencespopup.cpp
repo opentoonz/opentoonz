@@ -54,8 +54,7 @@ namespace
 static const int unitsCount = 5, inchIdx = 2;
 static const QString units[unitsCount] = {"cm", "mm", "inch", "field", "pixel"};
 
-enum DpiPolicy { DP_ImageDpi,
-				 DP_CustomDpi };
+enum DpiPolicy { DP_ImageDpi, DP_CustomDpi };
 
 } // namespace
 
@@ -109,30 +108,27 @@ PreferencesPopup::FormatProperties::FormatProperties(PreferencesPopup *parent)
 	gridLayout->addWidget(dpiLabel, row, 0, Qt::AlignRight);
 
 	m_dpi = new DVGui::DoubleLineEdit;
-	m_dpi->setRange(1, (std::numeric_limits<double>::max)()); // Tried limits::min(), but input 0 was
-	gridLayout->addWidget(m_dpi, row++, 1);					  // then replaced with something * e^-128
+	m_dpi->setRange(1,
+					(std::numeric_limits<double>::max)()); // Tried limits::min(), but input 0 was
+	gridLayout->addWidget(m_dpi, row++, 1);				   // then replaced with something * e^-128
 
-	m_premultiply = new DVGui::CheckBox(
-		LevelSettingsPopup::tr("Premultiply"));
+	m_premultiply = new DVGui::CheckBox(LevelSettingsPopup::tr("Premultiply"));
 	gridLayout->addWidget(m_premultiply, row++, 1);
 
-	m_whiteTransp = new DVGui::CheckBox(
-		LevelSettingsPopup::tr("White As Transparent"));
+	m_whiteTransp = new DVGui::CheckBox(LevelSettingsPopup::tr("White As Transparent"));
 	gridLayout->addWidget(m_whiteTransp, row++, 1);
 
-	m_doAntialias = new DVGui::CheckBox(
-		LevelSettingsPopup::tr("Add Antialiasing"));
+	m_doAntialias = new DVGui::CheckBox(LevelSettingsPopup::tr("Add Antialiasing"));
 	gridLayout->addWidget(m_doAntialias, row++, 1);
 
-	QLabel *antialiasLabel = new QLabel(
-		LevelSettingsPopup::tr("Antialias Softness:"));
+	QLabel *antialiasLabel = new QLabel(LevelSettingsPopup::tr("Antialias Softness:"));
 	gridLayout->addWidget(antialiasLabel, row, 0, Qt::AlignRight);
 
-	m_antialias = new DVGui::IntLineEdit(this, 10, 0, 100); // Tried 1, but then m_doAntialias was forcedly
-	gridLayout->addWidget(m_antialias, row++, 1);			// initialized to true
+	m_antialias =
+		new DVGui::IntLineEdit(this, 10, 0, 100); // Tried 1, but then m_doAntialias was forcedly
+	gridLayout->addWidget(m_antialias, row++, 1); // initialized to true
 
-	QLabel *subsamplingLabel = new QLabel(
-		LevelSettingsPopup::tr("Subsampling:"));
+	QLabel *subsamplingLabel = new QLabel(LevelSettingsPopup::tr("Subsampling:"));
 	gridLayout->addWidget(subsamplingLabel, row, 0, Qt::AlignRight);
 
 	m_subsampling = new DVGui::IntLineEdit(this, 1, 1);
@@ -145,7 +141,8 @@ PreferencesPopup::FormatProperties::FormatProperties(PreferencesPopup *parent)
 	// Establish connections
 	bool ret = true;
 
-	ret = connect(m_dpiPolicy, SIGNAL(currentIndexChanged(int)), SLOT(updateEnabledStatus())) && ret;
+	ret =
+		connect(m_dpiPolicy, SIGNAL(currentIndexChanged(int)), SLOT(updateEnabledStatus())) && ret;
 	ret = connect(m_doAntialias, SIGNAL(clicked()), SLOT(updateEnabledStatus())) && ret;
 
 	assert(ret);
@@ -161,8 +158,7 @@ void PreferencesPopup::FormatProperties::updateEnabledStatus()
 
 //-----------------------------------------------------------------------------
 
-void PreferencesPopup::FormatProperties::setLevelFormat(
-	const Preferences::LevelFormat &lf)
+void PreferencesPopup::FormatProperties::setLevelFormat(const Preferences::LevelFormat &lf)
 {
 	const LevelOptions &lo = lf.m_options;
 
@@ -170,7 +166,8 @@ void PreferencesPopup::FormatProperties::setLevelFormat(
 	m_regExp->setText(lf.m_pathFormat.pattern());
 	m_priority->setValue(lf.m_priority);
 
-	m_dpiPolicy->setCurrentIndex(lo.m_dpiPolicy == LevelOptions::DP_ImageDpi ? DP_ImageDpi : DP_CustomDpi);
+	m_dpiPolicy->setCurrentIndex(lo.m_dpiPolicy == LevelOptions::DP_ImageDpi ? DP_ImageDpi
+																			 : DP_CustomDpi);
 	m_dpi->setValue(lo.m_dpi);
 	m_premultiply->setChecked(lo.m_premultiply);
 	m_whiteTransp->setChecked(lo.m_whiteTransp);
@@ -192,7 +189,9 @@ Preferences::LevelFormat PreferencesPopup::FormatProperties::levelFormat() const
 	lf.m_priority = m_priority->getValue();
 
 	// Assign level format values
-	lf.m_options.m_dpiPolicy = (m_dpiPolicy->currentIndex() == DP_ImageDpi) ? LevelOptions::DP_ImageDpi : LevelOptions::DP_CustomDpi;
+	lf.m_options.m_dpiPolicy = (m_dpiPolicy->currentIndex() == DP_ImageDpi)
+								   ? LevelOptions::DP_ImageDpi
+								   : LevelOptions::DP_CustomDpi;
 	lf.m_options.m_dpi = m_dpi->getValue();
 	lf.m_options.m_subsampling = m_subsampling->getValue();
 	lf.m_options.m_antialias = m_doAntialias->isChecked() ? m_antialias->getValue() : 0;
@@ -295,14 +294,16 @@ void PreferencesPopup::onSVNEnabledChanged(int index)
 
 //-----------------------------------------------------------------------------
 
-void invalidateIcons(); //implemented in sceneviewer.cpp; in which fucking header  I can put this declaration?!
+void invalidateIcons(); // implemented in sceneviewer.cpp; in which fucking header  I can put this
+						// declaration?!
 
 void PreferencesPopup::onTranspCheckDataChanged(const TPixel32 &, bool isDragging)
 {
 	if (isDragging)
 		return;
 
-	m_pref->setTranspCheckData(m_transpCheckBgColor->getColor(), m_transpCheckInkColor->getColor(), m_transpCheckPaintColor->getColor());
+	m_pref->setTranspCheckData(m_transpCheckBgColor->getColor(), m_transpCheckInkColor->getColor(),
+							   m_transpCheckPaintColor->getColor());
 
 	invalidateIcons();
 }
@@ -550,9 +551,8 @@ void PreferencesPopup::setChessboardColor2(const TPixel32 &color, bool isDraggin
 
 void PreferencesPopup::onColumnIconChange(const QString &value)
 {
-	m_pref->setColumnIconLoadingPolicy(value == QString("At Once")
-										   ? Preferences::LoadAtOnce
-										   : Preferences::LoadOnDemand);
+	m_pref->setColumnIconLoadingPolicy(value == QString("At Once") ? Preferences::LoadAtOnce
+																   : Preferences::LoadOnDemand);
 }
 
 //-----------------------------------------------------------------------------
@@ -755,8 +755,7 @@ void PreferencesPopup::onAddLevelFormat()
 {
 	bool ok = true;
 	QString formatName = DVGui::getText(
-		tr("New Level Format"), tr("Assign the new level format name:"),
-		tr("New Format"), &ok);
+		tr("New Level Format"), tr("Assign the new level format name:"), tr("New Format"), &ok);
 
 	if (ok) {
 		int formatIdx = Preferences::instance()->addLevelFormat(formatName);
@@ -785,8 +784,8 @@ void PreferencesPopup::onEditLevelFormat()
 		assert(ret);
 	}
 
-	const Preferences::LevelFormat &lf = Preferences::instance()->levelFormat(
-		m_levelFormatNames->currentIndex());
+	const Preferences::LevelFormat &lf =
+		Preferences::instance()->levelFormat(m_levelFormatNames->currentIndex());
 
 	m_formatProperties->setLevelFormat(lf);
 	m_formatProperties->show();
@@ -828,14 +827,15 @@ void PreferencesPopup::onRegionAntialiasChanged(int on)
 //**********************************************************************************
 
 PreferencesPopup::PreferencesPopup()
-	: QDialog(TApp::instance()->getMainWindow()), m_formatProperties(), m_inksOnly(0), m_blanksCount(0), m_blankColor(0)
+	: QDialog(TApp::instance()->getMainWindow()), m_formatProperties(), m_inksOnly(0),
+	  m_blanksCount(0), m_blankColor(0)
 {
 	setWindowTitle(tr("Preferences"));
 	setObjectName("PreferencesPopup");
 
 	m_pref = Preferences::instance();
 
-	//Category List
+	// Category List
 	QListWidget *categoryList = new QListWidget(this);
 
 	QStackedWidget *stackedWidget = new QStackedWidget(this);
@@ -844,10 +844,12 @@ PreferencesPopup::PreferencesPopup()
 	categoryList->addItem(tr("General"));
 
 	CheckBox *useDefaultViewerCB = new CheckBox(tr("Use Default Viewer for Movie Formats"), this);
-	CheckBox *minimizeRasterMemoryCB = new CheckBox(tr("Minimize Raster Memory Fragmentation *"), this);
+	CheckBox *minimizeRasterMemoryCB =
+		new CheckBox(tr("Minimize Raster Memory Fragmentation *"), this);
 	CheckBox *autoSaveCB = new CheckBox(tr("Save Automatically Every Minutes"));
 	m_minuteFld = new DVGui::IntLineEdit(this, 15, 1, 60);
-	CheckBox *replaceAfterSaveLevelAsCB = new CheckBox(tr("Replace Toonz Level after SaveLevelAs command"), this);
+	CheckBox *replaceAfterSaveLevelAsCB =
+		new CheckBox(tr("Replace Toonz Level after SaveLevelAs command"), this);
 
 	m_cellsDragBehaviour = new QComboBox();
 	m_undoMemorySize = new DVGui::IntLineEdit(this, m_pref->getUndoMemorySize(), 0, 2000);
@@ -884,24 +886,29 @@ PreferencesPopup::PreferencesPopup()
 	m_viewShrink = new DVGui::IntLineEdit(this, 1, 1, 20);
 	m_viewStep = new DVGui::IntLineEdit(this, 1, 1, 20);
 
-	CheckBox *moveCurrentFrameCB = new CheckBox(tr("Move Current Frame by Clicking on Xsheet / Numerical Columns Cell Area"), this);
-	//Viewer BG color
+	CheckBox *moveCurrentFrameCB = new CheckBox(
+		tr("Move Current Frame by Clicking on Xsheet / Numerical Columns Cell Area"), this);
+	// Viewer BG color
 	m_viewerBgColorFld = new ColorField(this, false, m_pref->getViewerBgColor());
-	//Preview BG color
+	// Preview BG color
 	m_previewBgColorFld = new ColorField(this, false, m_pref->getPreviewBgColor());
-	//bg chessboard colors
+	// bg chessboard colors
 	TPixel32 col1, col2;
 	m_pref->getChessboardColors(col1, col2);
 	m_chessboardColor1Fld = new ColorField(this, false, col1);
 	m_chessboardColor2Fld = new ColorField(this, false, col2);
 	CheckBox *openFlipbookAfterCB = new CheckBox(tr("Open Flipbook after Rendering"), this);
-	CheckBox *actualPixelOnSceneModeCB = new CheckBox(tr("Enable Actual Pixel View on Scene Editing Mode"), this);
+	CheckBox *actualPixelOnSceneModeCB =
+		new CheckBox(tr("Enable Actual Pixel View on Scene Editing Mode"), this);
 	CheckBox *levelNameOnEachMarkerCB = new CheckBox(tr("Display Level Name on Each Marker"), this);
-	CheckBox *showRasterImageDarkenBlendedInViewerCB = new CheckBox(tr("Show Raster Images Darken Blended in Camstand View"), this);
-	CheckBox *showShowFrameNumberWithLettersCB = new CheckBox(tr("Show \"ABC\" Appendix to the Frame Number in Xsheet Cell"), this);
+	CheckBox *showRasterImageDarkenBlendedInViewerCB =
+		new CheckBox(tr("Show Raster Images Darken Blended in Camstand View"), this);
+	CheckBox *showShowFrameNumberWithLettersCB =
+		new CheckBox(tr("Show \"ABC\" Appendix to the Frame Number in Xsheet Cell"), this);
 	QComboBox *viewerZoomCenterComboBox = new QComboBox(this);
 
-	QLabel *note_interface = new QLabel(tr("* Changes will take effect the next time you run Toonz"));
+	QLabel *note_interface =
+		new QLabel(tr("* Changes will take effect the next time you run Toonz"));
 	note_interface->setStyleSheet("font-size: 10px; font: italic;");
 
 	//--- Visualization ------------------------------
@@ -913,11 +920,13 @@ PreferencesPopup::PreferencesPopup()
 	categoryList->addItem(tr("Loading"));
 
 	CheckBox *exposeLoadedLevelsCB = new CheckBox(tr("Expose Loaded Levels in Xsheet"), this);
-	CheckBox *createSubfolderCB = new CheckBox(tr("Create Sub-folder when Importing Sub-xsheet"), this);
-	//Column Icon
+	CheckBox *createSubfolderCB =
+		new CheckBox(tr("Create Sub-folder when Importing Sub-xsheet"), this);
+	// Column Icon
 	m_columnIconOm = new QComboBox(this);
 	QComboBox *initialLoadTlvCachingBehaviorComboBox = new QComboBox(this);
-	CheckBox *removeSceneNumberFromLoadedLevelNameCB = new CheckBox(tr("Automatically Remove Scene Number from Loaded Level Name"), this);
+	CheckBox *removeSceneNumberFromLoadedLevelNameCB =
+		new CheckBox(tr("Automatically Remove Scene Number from Loaded Level Name"), this);
 
 	m_levelFormatNames = new QComboBox;
 	m_addLevelFormat = new QPushButton("+");
@@ -938,18 +947,24 @@ PreferencesPopup::PreferencesPopup()
 	m_defLevelDpi = new DoubleLineEdit(0, 66.76);
 	m_autocreationType = new QComboBox(this);
 
-	CheckBox *keepOriginalCleanedUpCB = new CheckBox(tr("Keep Original Cleaned Up Drawings As Backup"), this);
-	CheckBox *multiLayerStylePickerCB = new CheckBox(tr("Multi Layer Style Picker : Switch Levels by Picking"), this);
-	CheckBox *useSaveboxToLimitFillingOpCB = new CheckBox(tr("Use the TLV Savebox to Limit Filling Operations"), this);
-	CheckBox *minimizeSaveboxAfterEditingCB = new CheckBox(tr("Minimize Savebox after Editing"), this);
+	CheckBox *keepOriginalCleanedUpCB =
+		new CheckBox(tr("Keep Original Cleaned Up Drawings As Backup"), this);
+	CheckBox *multiLayerStylePickerCB =
+		new CheckBox(tr("Multi Layer Style Picker : Switch Levels by Picking"), this);
+	CheckBox *useSaveboxToLimitFillingOpCB =
+		new CheckBox(tr("Use the TLV Savebox to Limit Filling Operations"), this);
+	CheckBox *minimizeSaveboxAfterEditingCB =
+		new CheckBox(tr("Minimize Savebox after Editing"), this);
 
 	//--- Xsheet ------------------------------
 	categoryList->addItem(tr("Xsheet"));
 
-	CheckBox *xsheetAutopanDuringPlaybackCB = new CheckBox(tr("Xsheet Autopan during Playback"), this);
+	CheckBox *xsheetAutopanDuringPlaybackCB =
+		new CheckBox(tr("Xsheet Autopan during Playback"), this);
 	m_xsheetStep = new DVGui::IntLineEdit(this, Preferences::instance()->getXsheetStep(), 0);
 	m_cellsDragBehaviour = new QComboBox();
-	CheckBox *ignoreAlphaonColumn1CB = new CheckBox(tr("Ignore Alpha Channel on Levels in Column 1"), this);
+	CheckBox *ignoreAlphaonColumn1CB =
+		new CheckBox(tr("Ignore Alpha Channel on Levels in Column 1"), this);
 	CheckBox *showKeyframesOnCellAreaCB = new CheckBox(tr("Show Keyframes on Cell Area"), this);
 
 	//--- Animation ------------------------------
@@ -994,7 +1009,8 @@ PreferencesPopup::PreferencesPopup()
 	//--- Version Control ------------------------------
 	categoryList->addItem(tr("Version Control"));
 	m_enableVersionControl = new DVGui::CheckBox(tr("Enable Version Control*"));
-	CheckBox *autoRefreshFolderContentsCB = new CheckBox(tr("Automatically Refresh Folder Contents"), this);
+	CheckBox *autoRefreshFolderContentsCB =
+		new CheckBox(tr("Automatically Refresh Folder Contents"), this);
 
 	QLabel *note_version = new QLabel(tr("* Changes will take effect the next time you run Toonz"));
 	note_version->setStyleSheet("font-size: 10px; font: italic;");
@@ -1050,11 +1066,11 @@ PreferencesPopup::PreferencesPopup()
 	openFlipbookAfterCB->setChecked(m_pref->isGeneratedMovieViewEnabled());
 	actualPixelOnSceneModeCB->setChecked(m_pref->isActualPixelViewOnSceneEditingModeEnabled());
 	levelNameOnEachMarkerCB->setChecked(m_pref->isLevelNameOnEachMarkerEnabled());
-	showRasterImageDarkenBlendedInViewerCB->setChecked(m_pref->isShowRasterImagesDarkenBlendedInViewerEnabled());
+	showRasterImageDarkenBlendedInViewerCB->setChecked(
+		m_pref->isShowRasterImagesDarkenBlendedInViewerEnabled());
 	showShowFrameNumberWithLettersCB->setChecked(m_pref->isShowFrameNumberWithLettersEnabled());
 	QStringList zoomCenters;
-	zoomCenters << tr("Mouse Cursor")
-				<< tr("Viewer Center");
+	zoomCenters << tr("Mouse Cursor") << tr("Viewer Center");
 	viewerZoomCenterComboBox->addItems(zoomCenters);
 	viewerZoomCenterComboBox->setCurrentIndex(m_pref->getViewerZoomCenter());
 
@@ -1067,7 +1083,8 @@ PreferencesPopup::PreferencesPopup()
 	QStringList behaviors;
 	behaviors << tr("On Demand") << tr("All Icons") << tr("All Icons & Images");
 	initialLoadTlvCachingBehaviorComboBox->addItems(behaviors);
-	initialLoadTlvCachingBehaviorComboBox->setCurrentIndex(m_pref->getInitialLoadTlvCachingBehavior());
+	initialLoadTlvCachingBehaviorComboBox->setCurrentIndex(
+		m_pref->getInitialLoadTlvCachingBehavior());
 	QStringList formats;
 	formats << tr("At Once") << tr("On Demand");
 	m_columnIconOm->addItems(formats);
@@ -1075,7 +1092,8 @@ PreferencesPopup::PreferencesPopup()
 		m_columnIconOm->setCurrentIndex(m_columnIconOm->findText(tr("At Once")));
 	else
 		m_columnIconOm->setCurrentIndex(m_columnIconOm->findText(tr("On Demand")));
-	removeSceneNumberFromLoadedLevelNameCB->setChecked(m_pref->isRemoveSceneNumberFromLoadedLevelNameEnabled());
+	removeSceneNumberFromLoadedLevelNameCB->setChecked(
+		m_pref->isRemoveSceneNumberFromLoadedLevelNameEnabled());
 	createSubfolderCB->setChecked(m_pref->isSubsceneFolderEnabled());
 
 	m_addLevelFormat->setFixedSize(20, 20);
@@ -1084,9 +1102,11 @@ PreferencesPopup::PreferencesPopup()
 	rebuildFormatsList();
 
 	QStringList paletteTypes;
-	paletteTypes << tr("Pick Every Colors as Different Styles") << tr("Integrate Similar Colors as One Style");
+	paletteTypes << tr("Pick Every Colors as Different Styles")
+				 << tr("Integrate Similar Colors as One Style");
 	paletteTypeForRasterColorModelComboBox->addItems(paletteTypes);
-	paletteTypeForRasterColorModelComboBox->setCurrentIndex(m_pref->getPaletteTypeOnLoadRasterImageAsColorModel());
+	paletteTypeForRasterColorModelComboBox->setCurrentIndex(
+		m_pref->getPaletteTypeOnLoadRasterImageAsColorModel());
 
 	//--- Drawing ------------------------------
 	keepOriginalCleanedUpCB->setChecked(m_pref->isSaveUnpaintedInCleanupEnable());
@@ -1124,9 +1144,7 @@ PreferencesPopup::PreferencesPopup()
 	m_defLevelDpi->setRange(0.1, (std::numeric_limits<double>::max)());
 	m_defLevelDpi->setValue(m_pref->getDefLevelDpi());
 	QStringList autocreationTypes;
-	autocreationTypes << tr("Disabled")
-					  << tr("Enabled")
-					  << tr("Use Xsheet as Animation Sheet");
+	autocreationTypes << tr("Disabled") << tr("Enabled") << tr("Use Xsheet as Animation Sheet");
 	m_autocreationType->addItems(autocreationTypes);
 	int autocreationType = m_pref->getAutocreationType();
 	m_autocreationType->setCurrentIndex(autocreationType);
@@ -1141,7 +1159,8 @@ PreferencesPopup::PreferencesPopup()
 
 	//--- Animation ------------------------------
 	QStringList list;
-	list << tr("Linear") << tr("Speed In / Speed Out") << tr("Ease In / Ease Out") << tr("Ease In / Ease Out %");
+	list << tr("Linear") << tr("Speed In / Speed Out") << tr("Ease In / Ease Out")
+		 << tr("Ease In / Ease Out %");
 	m_keyframeType->addItems(list);
 	int keyframeType = m_pref->getKeyframeType();
 	m_keyframeType->setCurrentIndex(keyframeType - 2);
@@ -1174,12 +1193,13 @@ PreferencesPopup::PreferencesPopup()
 	mainLayout->setMargin(0);
 	mainLayout->setSpacing(0);
 	{
-		//Category
+		// Category
 		QVBoxLayout *categoryLayout = new QVBoxLayout();
 		categoryLayout->setMargin(5);
 		categoryLayout->setSpacing(10);
 		{
-			categoryLayout->addWidget(new QLabel(tr("Category"), this), 0, Qt::AlignLeft | Qt::AlignVCenter);
+			categoryLayout->addWidget(new QLabel(tr("Category"), this), 0,
+									  Qt::AlignLeft | Qt::AlignVCenter);
 			categoryLayout->addWidget(categoryList, 1);
 		}
 		mainLayout->addLayout(categoryLayout, 0);
@@ -1202,16 +1222,18 @@ PreferencesPopup::PreferencesPopup()
 			}
 			generalFrameLay->addLayout(saveAutoLay, 0);
 
-			//Unit, CameraUnit
+			// Unit, CameraUnit
 			QGridLayout *unitLay = new QGridLayout();
 			unitLay->setMargin(0);
 			unitLay->setHorizontalSpacing(5);
 			unitLay->setVerticalSpacing(10);
 			{
-				unitLay->addWidget(new QLabel(tr("Undo Memory Size (MB)"), this), 0, 0, Qt::AlignRight | Qt::AlignVCenter);
+				unitLay->addWidget(new QLabel(tr("Undo Memory Size (MB)"), this), 0, 0,
+								   Qt::AlignRight | Qt::AlignVCenter);
 				unitLay->addWidget(m_undoMemorySize, 0, 1);
 
-				unitLay->addWidget(new QLabel(tr("Render Task Chunk Size:"), this), 1, 0, Qt::AlignRight | Qt::AlignVCenter);
+				unitLay->addWidget(new QLabel(tr("Render Task Chunk Size:"), this), 1, 0,
+								   Qt::AlignRight | Qt::AlignVCenter);
 				unitLay->addWidget(m_chunkSizeFld, 1, 1);
 			}
 			unitLay->setColumnStretch(0, 0);
@@ -1220,7 +1242,8 @@ PreferencesPopup::PreferencesPopup()
 
 			generalFrameLay->addLayout(unitLay, 0);
 
-			generalFrameLay->addWidget(replaceAfterSaveLevelAsCB, 0, Qt::AlignLeft | Qt::AlignVCenter);
+			generalFrameLay->addWidget(replaceAfterSaveLevelAsCB, 0,
+									   Qt::AlignLeft | Qt::AlignVCenter);
 			generalFrameLay->addWidget(m_levelsBackup, 0, Qt::AlignLeft | Qt::AlignVCenter);
 			generalFrameLay->addWidget(sceneNumberingCB, 0, Qt::AlignLeft | Qt::AlignVCenter);
 			generalFrameLay->addStretch(1);
@@ -1241,13 +1264,16 @@ PreferencesPopup::PreferencesPopup()
 			styleLay->setHorizontalSpacing(5);
 			styleLay->setVerticalSpacing(10);
 			{
-				styleLay->addWidget(new QLabel(tr("Style:")), 0, 0, Qt::AlignRight | Qt::AlignVCenter);
+				styleLay->addWidget(new QLabel(tr("Style:")), 0, 0,
+									Qt::AlignRight | Qt::AlignVCenter);
 				styleLay->addWidget(styleSheetType, 0, 1);
 
-				styleLay->addWidget(new QLabel(tr("Unit:"), this), 1, 0, Qt::AlignRight | Qt::AlignVCenter);
+				styleLay->addWidget(new QLabel(tr("Unit:"), this), 1, 0,
+									Qt::AlignRight | Qt::AlignVCenter);
 				styleLay->addWidget(unitOm, 1, 1);
 
-				styleLay->addWidget(new QLabel(tr("Camera Unit:"), this), 2, 0, Qt::AlignRight | Qt::AlignVCenter);
+				styleLay->addWidget(new QLabel(tr("Camera Unit:"), this), 2, 0,
+									Qt::AlignRight | Qt::AlignVCenter);
 				styleLay->addWidget(cameraUnitOm, 2, 1);
 			}
 			styleLay->setColumnStretch(0, 0);
@@ -1255,45 +1281,60 @@ PreferencesPopup::PreferencesPopup()
 			styleLay->setColumnStretch(2, 1);
 			userInterfaceFrameLay->addLayout(styleLay, 0);
 
-			userInterfaceFrameLay->addWidget(openFlipbookAfterCB, 0, Qt::AlignLeft | Qt::AlignVCenter);
-			userInterfaceFrameLay->addWidget(moveCurrentFrameCB, 0, Qt::AlignLeft | Qt::AlignVCenter);
-			userInterfaceFrameLay->addWidget(actualPixelOnSceneModeCB, 0, Qt::AlignLeft | Qt::AlignVCenter);
-			userInterfaceFrameLay->addWidget(levelNameOnEachMarkerCB, 0, Qt::AlignLeft | Qt::AlignVCenter);
-			userInterfaceFrameLay->addWidget(showRasterImageDarkenBlendedInViewerCB, 0, Qt::AlignLeft | Qt::AlignVCenter);
-			userInterfaceFrameLay->addWidget(showShowFrameNumberWithLettersCB, 0, Qt::AlignLeft | Qt::AlignVCenter);
+			userInterfaceFrameLay->addWidget(openFlipbookAfterCB, 0,
+											 Qt::AlignLeft | Qt::AlignVCenter);
+			userInterfaceFrameLay->addWidget(moveCurrentFrameCB, 0,
+											 Qt::AlignLeft | Qt::AlignVCenter);
+			userInterfaceFrameLay->addWidget(actualPixelOnSceneModeCB, 0,
+											 Qt::AlignLeft | Qt::AlignVCenter);
+			userInterfaceFrameLay->addWidget(levelNameOnEachMarkerCB, 0,
+											 Qt::AlignLeft | Qt::AlignVCenter);
+			userInterfaceFrameLay->addWidget(showRasterImageDarkenBlendedInViewerCB, 0,
+											 Qt::AlignLeft | Qt::AlignVCenter);
+			userInterfaceFrameLay->addWidget(showShowFrameNumberWithLettersCB, 0,
+											 Qt::AlignLeft | Qt::AlignVCenter);
 
 			QGridLayout *bgColorsLay = new QGridLayout();
 			bgColorsLay->setMargin(0);
 			bgColorsLay->setHorizontalSpacing(5);
 			bgColorsLay->setVerticalSpacing(10);
 			{
-				bgColorsLay->addWidget(new QLabel(tr("Icon Size *"), this), 0, 0, Qt::AlignRight | Qt::AlignVCenter);
+				bgColorsLay->addWidget(new QLabel(tr("Icon Size *"), this), 0, 0,
+									   Qt::AlignRight | Qt::AlignVCenter);
 				bgColorsLay->addWidget(m_iconSizeLx, 0, 1);
 				bgColorsLay->addWidget(new QLabel(tr("X"), this), 0, 2, Qt::AlignCenter);
 				bgColorsLay->addWidget(m_iconSizeLy, 0, 3);
 
-				bgColorsLay->addWidget(new QLabel(tr("Viewer  Shrink"), this), 1, 0, Qt::AlignRight | Qt::AlignVCenter);
+				bgColorsLay->addWidget(new QLabel(tr("Viewer  Shrink"), this), 1, 0,
+									   Qt::AlignRight | Qt::AlignVCenter);
 				bgColorsLay->addWidget(m_viewShrink, 1, 1);
-				bgColorsLay->addWidget(new QLabel(tr("Step"), this), 1, 3, Qt::AlignRight | Qt::AlignVCenter);
+				bgColorsLay->addWidget(new QLabel(tr("Step"), this), 1, 3,
+									   Qt::AlignRight | Qt::AlignVCenter);
 				bgColorsLay->addWidget(m_viewStep, 1, 4);
 
-				bgColorsLay->addWidget(new QLabel(tr("Viewer BG Color"), this), 2, 0, Qt::AlignRight | Qt::AlignVCenter);
+				bgColorsLay->addWidget(new QLabel(tr("Viewer BG Color"), this), 2, 0,
+									   Qt::AlignRight | Qt::AlignVCenter);
 				bgColorsLay->addWidget(m_viewerBgColorFld, 2, 1, 1, 5);
 
-				bgColorsLay->addWidget(new QLabel(tr("Preview BG Color"), this), 3, 0, Qt::AlignRight | Qt::AlignVCenter);
+				bgColorsLay->addWidget(new QLabel(tr("Preview BG Color"), this), 3, 0,
+									   Qt::AlignRight | Qt::AlignVCenter);
 				bgColorsLay->addWidget(m_previewBgColorFld, 3, 1, 1, 5);
 
-				bgColorsLay->addWidget(new QLabel(tr("ChessBoard Color 1"), this), 4, 0, Qt::AlignRight | Qt::AlignVCenter);
+				bgColorsLay->addWidget(new QLabel(tr("ChessBoard Color 1"), this), 4, 0,
+									   Qt::AlignRight | Qt::AlignVCenter);
 				bgColorsLay->addWidget(m_chessboardColor1Fld, 4, 1, 1, 5);
 
-				bgColorsLay->addWidget(new QLabel(tr("Chessboard Color 2"), this), 5, 0, Qt::AlignRight | Qt::AlignVCenter);
+				bgColorsLay->addWidget(new QLabel(tr("Chessboard Color 2"), this), 5, 0,
+									   Qt::AlignRight | Qt::AlignVCenter);
 				bgColorsLay->addWidget(m_chessboardColor2Fld, 5, 1, 1, 5);
 
-				bgColorsLay->addWidget(new QLabel(tr("Viewer Zoom Center"), this), 6, 0, Qt::AlignRight | Qt::AlignVCenter);
+				bgColorsLay->addWidget(new QLabel(tr("Viewer Zoom Center"), this), 6, 0,
+									   Qt::AlignRight | Qt::AlignVCenter);
 				bgColorsLay->addWidget(viewerZoomCenterComboBox, 6, 1, 1, 4);
 
 				if (languageType) {
-					bgColorsLay->addWidget(new QLabel(tr("Language *:")), 7, 0, Qt::AlignRight | Qt::AlignVCenter);
+					bgColorsLay->addWidget(new QLabel(tr("Language *:")), 7, 0,
+										   Qt::AlignRight | Qt::AlignVCenter);
 					bgColorsLay->addWidget(languageType, 7, 1, 1, 4);
 				}
 			}
@@ -1333,26 +1374,32 @@ PreferencesPopup::PreferencesPopup()
 		{
 			loadingFrameLay->addWidget(exposeLoadedLevelsCB, 0, Qt::AlignLeft | Qt::AlignVCenter);
 			loadingFrameLay->addWidget(createSubfolderCB, 0, Qt::AlignLeft | Qt::AlignVCenter);
-			loadingFrameLay->addWidget(removeSceneNumberFromLoadedLevelNameCB, 0, Qt::AlignLeft | Qt::AlignVCenter);
+			loadingFrameLay->addWidget(removeSceneNumberFromLoadedLevelNameCB, 0,
+									   Qt::AlignLeft | Qt::AlignVCenter);
 
 			QGridLayout *cacheLay = new QGridLayout();
 			cacheLay->setMargin(0);
 			cacheLay->setHorizontalSpacing(5);
 			cacheLay->setVerticalSpacing(10);
 			{
-				cacheLay->addWidget(new QLabel(tr("Default TLV Caching Behavior")), 0, 0, Qt::AlignRight | Qt::AlignVCenter);
+				cacheLay->addWidget(new QLabel(tr("Default TLV Caching Behavior")), 0, 0,
+									Qt::AlignRight | Qt::AlignVCenter);
 				cacheLay->addWidget(initialLoadTlvCachingBehaviorComboBox, 0, 1);
 
-				cacheLay->addWidget(new QLabel(tr("Column Icon"), this), 1, 0, Qt::AlignRight | Qt::AlignVCenter);
+				cacheLay->addWidget(new QLabel(tr("Column Icon"), this), 1, 0,
+									Qt::AlignRight | Qt::AlignVCenter);
 				cacheLay->addWidget(m_columnIconOm, 1, 1);
 
-				cacheLay->addWidget(new QLabel(tr("Level Settings by File Format:")), 2, 0, Qt::AlignRight | Qt::AlignVCenter);
+				cacheLay->addWidget(new QLabel(tr("Level Settings by File Format:")), 2, 0,
+									Qt::AlignRight | Qt::AlignVCenter);
 				cacheLay->addWidget(m_levelFormatNames, 2, 1);
 				cacheLay->addWidget(m_addLevelFormat, 2, 2);
 				cacheLay->addWidget(m_removeLevelFormat, 2, 3);
 				cacheLay->addWidget(m_editLevelFormat, 2, 4);
 
-				cacheLay->addWidget(new QLabel(tr("Palette Type on Loading Raster Image as Color Model")), 3, 0, Qt::AlignRight | Qt::AlignVCenter);
+				cacheLay->addWidget(
+					new QLabel(tr("Palette Type on Loading Raster Image as Color Model")), 3, 0,
+					Qt::AlignRight | Qt::AlignVCenter);
 				cacheLay->addWidget(paletteTypeForRasterColorModelComboBox, 3, 1, 1, 5);
 			}
 			cacheLay->setColumnStretch(0, 0);
@@ -1384,7 +1431,8 @@ PreferencesPopup::PreferencesPopup()
 				drawingTopLay->addWidget(m_defScanLevelType, 0, 1, 1, 3);
 #endif
 
-				drawingTopLay->addWidget(new QLabel(tr("Default Level Type:")), 1, 0, Qt::AlignRight);
+				drawingTopLay->addWidget(new QLabel(tr("Default Level Type:")), 1, 0,
+										 Qt::AlignRight);
 				drawingTopLay->addWidget(m_defLevelType, 1, 1, 1, 3);
 
 				drawingTopLay->addWidget(new QLabel(tr("Width:")), 2, 0, Qt::AlignRight);
@@ -1400,10 +1448,14 @@ PreferencesPopup::PreferencesPopup()
 			}
 			drawingFrameLay->addLayout(drawingTopLay, 0);
 
-			drawingFrameLay->addWidget(keepOriginalCleanedUpCB, 0, Qt::AlignLeft | Qt::AlignVCenter);
-			drawingFrameLay->addWidget(minimizeSaveboxAfterEditingCB, 0, Qt::AlignLeft | Qt::AlignVCenter); //6.4
-			drawingFrameLay->addWidget(useSaveboxToLimitFillingOpCB, 0, Qt::AlignLeft | Qt::AlignVCenter);
-			drawingFrameLay->addWidget(multiLayerStylePickerCB, 0, Qt::AlignLeft | Qt::AlignVCenter);
+			drawingFrameLay->addWidget(keepOriginalCleanedUpCB, 0,
+									   Qt::AlignLeft | Qt::AlignVCenter);
+			drawingFrameLay->addWidget(minimizeSaveboxAfterEditingCB, 0,
+									   Qt::AlignLeft | Qt::AlignVCenter); // 6.4
+			drawingFrameLay->addWidget(useSaveboxToLimitFillingOpCB, 0,
+									   Qt::AlignLeft | Qt::AlignVCenter);
+			drawingFrameLay->addWidget(multiLayerStylePickerCB, 0,
+									   Qt::AlignLeft | Qt::AlignVCenter);
 			drawingFrameLay->addStretch(1);
 		}
 		drawingBox->setLayout(drawingFrameLay);
@@ -1416,12 +1468,14 @@ PreferencesPopup::PreferencesPopup()
 		xsheetFrameLay->setHorizontalSpacing(15);
 		xsheetFrameLay->setVerticalSpacing(10);
 		{
-			xsheetFrameLay->addWidget(new QLabel(tr("Next/Previous Step Frames:")), 0, 0, Qt::AlignRight | Qt::AlignVCenter);
+			xsheetFrameLay->addWidget(new QLabel(tr("Next/Previous Step Frames:")), 0, 0,
+									  Qt::AlignRight | Qt::AlignVCenter);
 			xsheetFrameLay->addWidget(m_xsheetStep, 0, 1);
 
 			xsheetFrameLay->addWidget(xsheetAutopanDuringPlaybackCB, 1, 0, 1, 2);
 
-			xsheetFrameLay->addWidget(new QLabel(tr("Cell-dragging Behaviour:")), 2, 0, Qt::AlignRight | Qt::AlignVCenter);
+			xsheetFrameLay->addWidget(new QLabel(tr("Cell-dragging Behaviour:")), 2, 0,
+									  Qt::AlignRight | Qt::AlignVCenter);
 			xsheetFrameLay->addWidget(m_cellsDragBehaviour, 2, 1);
 
 			xsheetFrameLay->addWidget(ignoreAlphaonColumn1CB, 3, 0, 1, 2);
@@ -1441,10 +1495,12 @@ PreferencesPopup::PreferencesPopup()
 		animationFrameLay->setHorizontalSpacing(15);
 		animationFrameLay->setVerticalSpacing(10);
 		{
-			animationFrameLay->addWidget(new QLabel(tr("Default Interpolation:")), 0, 0, Qt::AlignRight | Qt::AlignVCenter);
+			animationFrameLay->addWidget(new QLabel(tr("Default Interpolation:")), 0, 0,
+										 Qt::AlignRight | Qt::AlignVCenter);
 			animationFrameLay->addWidget(m_keyframeType, 0, 1);
 
-			animationFrameLay->addWidget(new QLabel(tr("Animation Step:")), 1, 0, Qt::AlignRight | Qt::AlignVCenter);
+			animationFrameLay->addWidget(new QLabel(tr("Animation Step:")), 1, 0,
+										 Qt::AlignRight | Qt::AlignVCenter);
 			animationFrameLay->addWidget(m_animationStepField, 1, 1);
 		}
 		animationFrameLay->setColumnStretch(0, 0);
@@ -1463,14 +1519,18 @@ PreferencesPopup::PreferencesPopup()
 		previewLayout->setHorizontalSpacing(15);
 		previewLayout->setVerticalSpacing(10);
 		{
-			previewLayout->addWidget(new QLabel(tr("Blank Frames:")), 0, 0, Qt::AlignRight | Qt::AlignVCenter);
+			previewLayout->addWidget(new QLabel(tr("Blank Frames:")), 0, 0,
+									 Qt::AlignRight | Qt::AlignVCenter);
 			previewLayout->addWidget(m_blanksCount, 0, 1);
 
-			previewLayout->addWidget(new QLabel(tr("Blank Frames Color:")), 1, 0, Qt::AlignRight | Qt::AlignVCenter);
+			previewLayout->addWidget(new QLabel(tr("Blank Frames Color:")), 1, 0,
+									 Qt::AlignRight | Qt::AlignVCenter);
 			previewLayout->addWidget(m_blankColor, 1, 1, 1, 2);
 
-			previewLayout->addWidget(rewindAfterPlaybackCB, 2, 0, 1, 3, Qt::AlignLeft | Qt::AlignVCenter);
-			previewLayout->addWidget(displayInNewFlipBookCB, 3, 0, 1, 3, Qt::AlignLeft | Qt::AlignVCenter);
+			previewLayout->addWidget(rewindAfterPlaybackCB, 2, 0, 1, 3,
+									 Qt::AlignLeft | Qt::AlignVCenter);
+			previewLayout->addWidget(displayInNewFlipBookCB, 3, 0, 1, 3,
+									 Qt::AlignLeft | Qt::AlignVCenter);
 			previewLayout->addWidget(fitToFlipbookCB, 4, 0, 1, 3, Qt::AlignLeft | Qt::AlignVCenter);
 		}
 		previewLayout->setColumnStretch(0, 0);
@@ -1494,13 +1554,16 @@ PreferencesPopup::PreferencesPopup()
 			onionLay->addWidget(m_onionSkinVisibility, 0, Qt::AlignLeft | Qt::AlignVCenter);
 			QGridLayout *onionColorLay = new QGridLayout();
 			{
-				onionColorLay->addWidget(new QLabel(tr("Paper Thickness:")), 0, 0, Qt::AlignRight | Qt::AlignVCenter);
+				onionColorLay->addWidget(new QLabel(tr("Paper Thickness:")), 0, 0,
+										 Qt::AlignRight | Qt::AlignVCenter);
 				onionColorLay->addWidget(m_onionPaperThickness, 0, 1);
 
-				onionColorLay->addWidget(new QLabel(tr("Previous  Frames Correction:")), 1, 0, Qt::AlignRight | Qt::AlignVCenter);
+				onionColorLay->addWidget(new QLabel(tr("Previous  Frames Correction:")), 1, 0,
+										 Qt::AlignRight | Qt::AlignVCenter);
 				onionColorLay->addWidget(m_backOnionColor, 1, 1);
 
-				onionColorLay->addWidget(new QLabel(tr("Following Frames Correction:")), 2, 0, Qt::AlignRight | Qt::AlignVCenter);
+				onionColorLay->addWidget(new QLabel(tr("Following Frames Correction:")), 2, 0,
+										 Qt::AlignRight | Qt::AlignVCenter);
 				onionColorLay->addWidget(m_frontOnionColor, 2, 1);
 			}
 			onionColorLay->setColumnStretch(0, 0);
@@ -1564,108 +1627,167 @@ PreferencesPopup::PreferencesPopup()
 	/*---- signal-slot connections -----*/
 
 	bool ret = true;
-	ret = ret && connect(categoryList, SIGNAL(currentRowChanged(int)), stackedWidget, SLOT(setCurrentIndex(int)));
+	ret = ret && connect(categoryList, SIGNAL(currentRowChanged(int)), stackedWidget,
+						 SLOT(setCurrentIndex(int)));
 
 	//--- General ----------------------
-	ret = ret && connect(useDefaultViewerCB, SIGNAL(stateChanged(int)), this, SLOT(onDefaultViewerChanged(int)));
-	ret = ret && connect(minimizeRasterMemoryCB, SIGNAL(stateChanged(int)), this, SLOT(onRasterOptimizedMemoryChanged(int)));
+	ret = ret && connect(useDefaultViewerCB, SIGNAL(stateChanged(int)), this,
+						 SLOT(onDefaultViewerChanged(int)));
+	ret = ret && connect(minimizeRasterMemoryCB, SIGNAL(stateChanged(int)), this,
+						 SLOT(onRasterOptimizedMemoryChanged(int)));
 	ret = ret && connect(autoSaveCB, SIGNAL(stateChanged(int)), SLOT(onAutoSaveChanged(int)));
 	ret = ret && connect(m_minuteFld, SIGNAL(editingFinished()), SLOT(onMinuteChanged()));
-	ret = ret && connect(m_cellsDragBehaviour, SIGNAL(currentIndexChanged(int)), SLOT(onDragCellsBehaviourChanged(int)));
-	ret = ret && connect(m_undoMemorySize, SIGNAL(editingFinished()), SLOT(onUndoMemorySizeChanged()));
-	ret = ret && connect(m_levelsBackup, SIGNAL(stateChanged(int)), SLOT(onLevelsBackupChanged(int)));
-	ret = ret && connect(sceneNumberingCB, SIGNAL(stateChanged(int)), SLOT(onSceneNumberingChanged(int)));
-	ret = ret && connect(m_chunkSizeFld, SIGNAL(editingFinished()), this, SLOT(onChunkSizeChanged()));
+	ret = ret && connect(m_cellsDragBehaviour, SIGNAL(currentIndexChanged(int)),
+						 SLOT(onDragCellsBehaviourChanged(int)));
+	ret = ret &&
+		  connect(m_undoMemorySize, SIGNAL(editingFinished()), SLOT(onUndoMemorySizeChanged()));
+	ret =
+		ret && connect(m_levelsBackup, SIGNAL(stateChanged(int)), SLOT(onLevelsBackupChanged(int)));
+	ret = ret &&
+		  connect(sceneNumberingCB, SIGNAL(stateChanged(int)), SLOT(onSceneNumberingChanged(int)));
+	ret =
+		ret && connect(m_chunkSizeFld, SIGNAL(editingFinished()), this, SLOT(onChunkSizeChanged()));
 
 	//--- Interface ----------------------
-	ret = ret && connect(styleSheetType, SIGNAL(currentIndexChanged(int)), SLOT(onStyleSheetTypeChanged(int)));
+	ret = ret && connect(styleSheetType, SIGNAL(currentIndexChanged(int)),
+						 SLOT(onStyleSheetTypeChanged(int)));
 	ret = ret && connect(unitOm, SIGNAL(currentIndexChanged(int)), SLOT(onUnitChanged(int)));
-	ret = ret && connect(cameraUnitOm, SIGNAL(currentIndexChanged(int)), SLOT(onCameraUnitChanged(int)));
-	ret = ret && connect(openFlipbookAfterCB, SIGNAL(stateChanged(int)), this, SLOT(onViewGeneratedMovieChanged(int)));
+	ret = ret &&
+		  connect(cameraUnitOm, SIGNAL(currentIndexChanged(int)), SLOT(onCameraUnitChanged(int)));
+	ret = ret && connect(openFlipbookAfterCB, SIGNAL(stateChanged(int)), this,
+						 SLOT(onViewGeneratedMovieChanged(int)));
 	ret = ret && connect(m_iconSizeLx, SIGNAL(editingFinished()), SLOT(onIconSizeChanged()));
 	ret = ret && connect(m_iconSizeLy, SIGNAL(editingFinished()), SLOT(onIconSizeChanged()));
 	ret = ret && connect(m_viewShrink, SIGNAL(editingFinished()), SLOT(onViewValuesChanged()));
 	ret = ret && connect(m_viewStep, SIGNAL(editingFinished()), SLOT(onViewValuesChanged()));
 	if (languageList.size() > 1)
-		ret = ret && connect(languageType, SIGNAL(currentIndexChanged(int)), SLOT(onLanguageTypeChanged(int)));
-	ret = ret && connect(moveCurrentFrameCB, SIGNAL(stateChanged(int)), this, SLOT(onMoveCurrentFrameChanged(int)));
-	ret = ret && connect(viewerZoomCenterComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onViewerZoomCenterChanged(int)));
-	ret = ret && connect(replaceAfterSaveLevelAsCB, SIGNAL(stateChanged(int)), this, SLOT(onReplaceAfterSaveLevelAsChanged(int)));
-	ret = ret && connect(showRasterImageDarkenBlendedInViewerCB, SIGNAL(stateChanged(int)), this, SLOT(onShowRasterImageDarkenBlendedInViewerChanged(int)));
-	ret = ret && connect(showShowFrameNumberWithLettersCB, SIGNAL(stateChanged(int)), this, SLOT(onShowFrameNumberWithLettersChanged(int)));
-	//Viewer BG color
-	ret = ret && connect(m_viewerBgColorFld, SIGNAL(colorChanged(const TPixel32 &, bool)), this, SLOT(setViewerBgColor(const TPixel32 &, bool)));
-	//Preview BG color
-	ret = ret && connect(m_previewBgColorFld, SIGNAL(colorChanged(const TPixel32 &, bool)), this, SLOT(setPreviewBgColor(const TPixel32 &, bool)));
-	//bg chessboard colors
-	ret = ret && connect(m_chessboardColor1Fld, SIGNAL(colorChanged(const TPixel32 &, bool)), this, SLOT(setChessboardColor1(const TPixel32 &, bool)));
-	ret = ret && connect(m_chessboardColor2Fld, SIGNAL(colorChanged(const TPixel32 &, bool)), this, SLOT(setChessboardColor2(const TPixel32 &, bool)));
-	//Column Icon
-	ret = ret && connect(m_columnIconOm, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(onColumnIconChange(const QString &)));
-	ret = ret && connect(actualPixelOnSceneModeCB, SIGNAL(stateChanged(int)), SLOT(onActualPixelOnSceneModeChanged(int)));
-	ret = ret && connect(levelNameOnEachMarkerCB, SIGNAL(stateChanged(int)), SLOT(onLevelNameOnEachMarkerChanged(int)));
+		ret = ret && connect(languageType, SIGNAL(currentIndexChanged(int)),
+							 SLOT(onLanguageTypeChanged(int)));
+	ret = ret && connect(moveCurrentFrameCB, SIGNAL(stateChanged(int)), this,
+						 SLOT(onMoveCurrentFrameChanged(int)));
+	ret = ret && connect(viewerZoomCenterComboBox, SIGNAL(currentIndexChanged(int)), this,
+						 SLOT(onViewerZoomCenterChanged(int)));
+	ret = ret && connect(replaceAfterSaveLevelAsCB, SIGNAL(stateChanged(int)), this,
+						 SLOT(onReplaceAfterSaveLevelAsChanged(int)));
+	ret = ret && connect(showRasterImageDarkenBlendedInViewerCB, SIGNAL(stateChanged(int)), this,
+						 SLOT(onShowRasterImageDarkenBlendedInViewerChanged(int)));
+	ret = ret && connect(showShowFrameNumberWithLettersCB, SIGNAL(stateChanged(int)), this,
+						 SLOT(onShowFrameNumberWithLettersChanged(int)));
+	// Viewer BG color
+	ret = ret && connect(m_viewerBgColorFld, SIGNAL(colorChanged(const TPixel32 &, bool)), this,
+						 SLOT(setViewerBgColor(const TPixel32 &, bool)));
+	// Preview BG color
+	ret = ret && connect(m_previewBgColorFld, SIGNAL(colorChanged(const TPixel32 &, bool)), this,
+						 SLOT(setPreviewBgColor(const TPixel32 &, bool)));
+	// bg chessboard colors
+	ret = ret && connect(m_chessboardColor1Fld, SIGNAL(colorChanged(const TPixel32 &, bool)), this,
+						 SLOT(setChessboardColor1(const TPixel32 &, bool)));
+	ret = ret && connect(m_chessboardColor2Fld, SIGNAL(colorChanged(const TPixel32 &, bool)), this,
+						 SLOT(setChessboardColor2(const TPixel32 &, bool)));
+	// Column Icon
+	ret = ret && connect(m_columnIconOm, SIGNAL(currentIndexChanged(const QString &)), this,
+						 SLOT(onColumnIconChange(const QString &)));
+	ret = ret && connect(actualPixelOnSceneModeCB, SIGNAL(stateChanged(int)),
+						 SLOT(onActualPixelOnSceneModeChanged(int)));
+	ret = ret && connect(levelNameOnEachMarkerCB, SIGNAL(stateChanged(int)),
+						 SLOT(onLevelNameOnEachMarkerChanged(int)));
 
 	//--- Visualization ---------------------
-	ret = ret && connect(show0ThickLinesCB, SIGNAL(stateChanged(int)), this, SLOT(onShow0ThickLinesChanged(int)));
-	ret = ret && connect(regionAntialiasCB, SIGNAL(stateChanged(int)), this, SLOT(onRegionAntialiasChanged(int)));
+	ret = ret && connect(show0ThickLinesCB, SIGNAL(stateChanged(int)), this,
+						 SLOT(onShow0ThickLinesChanged(int)));
+	ret = ret && connect(regionAntialiasCB, SIGNAL(stateChanged(int)), this,
+						 SLOT(onRegionAntialiasChanged(int)));
 
 	//--- Loading ----------------------
-	ret = ret && connect(exposeLoadedLevelsCB, SIGNAL(stateChanged(int)), this, SLOT(onAutoExposeChanged(int)));
-	ret = ret && connect(initialLoadTlvCachingBehaviorComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onInitialLoadTlvCachingBehaviorChanged(int)));
-	ret = ret && connect(createSubfolderCB, SIGNAL(stateChanged(int)), this, SLOT(onSubsceneFolderChanged(int)));
-	ret = ret && connect(removeSceneNumberFromLoadedLevelNameCB, SIGNAL(stateChanged(int)), this, SLOT(onRemoveSceneNumberFromLoadedLevelNameChanged(int)));
+	ret = ret && connect(exposeLoadedLevelsCB, SIGNAL(stateChanged(int)), this,
+						 SLOT(onAutoExposeChanged(int)));
+	ret = ret && connect(initialLoadTlvCachingBehaviorComboBox, SIGNAL(currentIndexChanged(int)),
+						 this, SLOT(onInitialLoadTlvCachingBehaviorChanged(int)));
+	ret = ret && connect(createSubfolderCB, SIGNAL(stateChanged(int)), this,
+						 SLOT(onSubsceneFolderChanged(int)));
+	ret = ret && connect(removeSceneNumberFromLoadedLevelNameCB, SIGNAL(stateChanged(int)), this,
+						 SLOT(onRemoveSceneNumberFromLoadedLevelNameChanged(int)));
 	ret = ret && connect(m_addLevelFormat, SIGNAL(clicked()), SLOT(onAddLevelFormat()));
 	ret = ret && connect(m_removeLevelFormat, SIGNAL(clicked()), SLOT(onRemoveLevelFormat()));
 	ret = ret && connect(m_editLevelFormat, SIGNAL(clicked()), SLOT(onEditLevelFormat()));
-	ret = ret && connect(paletteTypeForRasterColorModelComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onPaletteTypeForRasterColorModelChanged(int)));
+	ret = ret && connect(paletteTypeForRasterColorModelComboBox, SIGNAL(currentIndexChanged(int)),
+						 this, SLOT(onPaletteTypeForRasterColorModelChanged(int)));
 
 	//--- Drawing ----------------------
-	ret = ret && connect(keepOriginalCleanedUpCB, SIGNAL(stateChanged(int)), this, SLOT(onSaveUnpaintedInCleanupChanged(int)));
-	ret = ret && connect(multiLayerStylePickerCB, SIGNAL(stateChanged(int)), this, SLOT(onMultiLayerStylePickerChanged(int)));
-	ret = ret && connect(useSaveboxToLimitFillingOpCB, SIGNAL(stateChanged(int)), this, SLOT(onGetFillOnlySavebox(int)));
+	ret = ret && connect(keepOriginalCleanedUpCB, SIGNAL(stateChanged(int)), this,
+						 SLOT(onSaveUnpaintedInCleanupChanged(int)));
+	ret = ret && connect(multiLayerStylePickerCB, SIGNAL(stateChanged(int)), this,
+						 SLOT(onMultiLayerStylePickerChanged(int)));
+	ret = ret && connect(useSaveboxToLimitFillingOpCB, SIGNAL(stateChanged(int)), this,
+						 SLOT(onGetFillOnlySavebox(int)));
 #ifndef BRAVO
-	ret = ret && connect(m_defScanLevelType, SIGNAL(currentIndexChanged(const QString &)), SLOT(onScanLevelTypeChanged(const QString &)));
+	ret = ret && connect(m_defScanLevelType, SIGNAL(currentIndexChanged(const QString &)),
+						 SLOT(onScanLevelTypeChanged(const QString &)));
 #endif
-	ret = ret && connect(minimizeSaveboxAfterEditingCB, SIGNAL(stateChanged(int)), this, SLOT(onMinimizeSaveboxAfterEditing(int)));
-	ret = ret && connect(m_defLevelType, SIGNAL(currentIndexChanged(int)), SLOT(onDefLevelTypeChanged(int)));
-	ret = ret && connect(m_autocreationType, SIGNAL(currentIndexChanged(int)), SLOT(onAutocreationTypeChanged(int)));
-	ret = ret && connect(m_defLevelWidth, SIGNAL(valueChanged()), SLOT(onDefLevelParameterChanged()));
-	ret = ret && connect(m_defLevelHeight, SIGNAL(valueChanged()), SLOT(onDefLevelParameterChanged()));
+	ret = ret && connect(minimizeSaveboxAfterEditingCB, SIGNAL(stateChanged(int)), this,
+						 SLOT(onMinimizeSaveboxAfterEditing(int)));
+	ret = ret && connect(m_defLevelType, SIGNAL(currentIndexChanged(int)),
+						 SLOT(onDefLevelTypeChanged(int)));
+	ret = ret && connect(m_autocreationType, SIGNAL(currentIndexChanged(int)),
+						 SLOT(onAutocreationTypeChanged(int)));
+	ret =
+		ret && connect(m_defLevelWidth, SIGNAL(valueChanged()), SLOT(onDefLevelParameterChanged()));
+	ret = ret &&
+		  connect(m_defLevelHeight, SIGNAL(valueChanged()), SLOT(onDefLevelParameterChanged()));
 	ret = ret && connect(m_defLevelDpi, SIGNAL(valueChanged()), SLOT(onDefLevelParameterChanged()));
 
 	//--- Xsheet ----------------------
-	ret = ret && connect(xsheetAutopanDuringPlaybackCB, SIGNAL(stateChanged(int)), this, SLOT(onXsheetAutopanChanged(int)));
-	ret = ret && connect(ignoreAlphaonColumn1CB, SIGNAL(stateChanged(int)), this, SLOT(onIgnoreAlphaonColumn1Changed(int)));
+	ret = ret && connect(xsheetAutopanDuringPlaybackCB, SIGNAL(stateChanged(int)), this,
+						 SLOT(onXsheetAutopanChanged(int)));
+	ret = ret && connect(ignoreAlphaonColumn1CB, SIGNAL(stateChanged(int)), this,
+						 SLOT(onIgnoreAlphaonColumn1Changed(int)));
 	ret = ret && connect(m_xsheetStep, SIGNAL(editingFinished()), SLOT(onXsheetStepChanged()));
-	ret = ret && connect(m_cellsDragBehaviour, SIGNAL(currentIndexChanged(int)), SLOT(onDragCellsBehaviourChanged(int)));
-	ret = ret && connect(showKeyframesOnCellAreaCB, SIGNAL(stateChanged(int)), this, SLOT(onShowKeyframesOnCellAreaChanged(int)));
+	ret = ret && connect(m_cellsDragBehaviour, SIGNAL(currentIndexChanged(int)),
+						 SLOT(onDragCellsBehaviourChanged(int)));
+	ret = ret && connect(showKeyframesOnCellAreaCB, SIGNAL(stateChanged(int)), this,
+						 SLOT(onShowKeyframesOnCellAreaChanged(int)));
 
 	//--- Animation ----------------------
-	ret = ret && connect(m_keyframeType, SIGNAL(currentIndexChanged(int)), SLOT(onKeyframeTypeChanged(int)));
-	ret = ret && connect(m_animationStepField, SIGNAL(editingFinished()), SLOT(onAnimationStepChanged()));
+	ret = ret && connect(m_keyframeType, SIGNAL(currentIndexChanged(int)),
+						 SLOT(onKeyframeTypeChanged(int)));
+	ret = ret &&
+		  connect(m_animationStepField, SIGNAL(editingFinished()), SLOT(onAnimationStepChanged()));
 
 	//--- Preview ----------------------
 	ret = ret && connect(m_blanksCount, SIGNAL(editingFinished()), SLOT(onBlankCountChanged()));
-	ret = ret && connect(m_blankColor, SIGNAL(colorChanged(const TPixel32 &, bool)), SLOT(onBlankColorChanged(const TPixel32 &, bool)));
-	ret = ret && connect(rewindAfterPlaybackCB, SIGNAL(stateChanged(int)), this, SLOT(onRewindAfterPlayback(int)));
-	ret = ret && connect(displayInNewFlipBookCB, SIGNAL(stateChanged(int)), this, SLOT(onPreviewAlwaysOpenNewFlip(int)));
-	ret = ret && connect(fitToFlipbookCB, SIGNAL(stateChanged(int)), this, SLOT(onFitToFlipbook(int)));
+	ret = ret && connect(m_blankColor, SIGNAL(colorChanged(const TPixel32 &, bool)),
+						 SLOT(onBlankColorChanged(const TPixel32 &, bool)));
+	ret = ret && connect(rewindAfterPlaybackCB, SIGNAL(stateChanged(int)), this,
+						 SLOT(onRewindAfterPlayback(int)));
+	ret = ret && connect(displayInNewFlipBookCB, SIGNAL(stateChanged(int)), this,
+						 SLOT(onPreviewAlwaysOpenNewFlip(int)));
+	ret = ret &&
+		  connect(fitToFlipbookCB, SIGNAL(stateChanged(int)), this, SLOT(onFitToFlipbook(int)));
 
 	//--- Onion Skin ----------------------
-	ret = ret && connect(m_frontOnionColor, SIGNAL(colorChanged(const TPixel32 &, bool)), SLOT(onOnionDataChanged(const TPixel32 &, bool)));
-	ret = ret && connect(m_backOnionColor, SIGNAL(colorChanged(const TPixel32 &, bool)), SLOT(onOnionDataChanged(const TPixel32 &, bool)));
+	ret = ret && connect(m_frontOnionColor, SIGNAL(colorChanged(const TPixel32 &, bool)),
+						 SLOT(onOnionDataChanged(const TPixel32 &, bool)));
+	ret = ret && connect(m_backOnionColor, SIGNAL(colorChanged(const TPixel32 &, bool)),
+						 SLOT(onOnionDataChanged(const TPixel32 &, bool)));
 	ret = ret && connect(m_inksOnly, SIGNAL(stateChanged(int)), SLOT(onOnionDataChanged(int)));
-	ret = ret && connect(m_onionSkinVisibility, SIGNAL(stateChanged(int)), SLOT(onOnionSkinVisibilityChanged(int)));
-	ret = ret && connect(m_onionPaperThickness, SIGNAL(editingFinished()), SLOT(onOnionPaperThicknessChanged()));
+	ret = ret && connect(m_onionSkinVisibility, SIGNAL(stateChanged(int)),
+						 SLOT(onOnionSkinVisibilityChanged(int)));
+	ret = ret && connect(m_onionPaperThickness, SIGNAL(editingFinished()),
+						 SLOT(onOnionPaperThicknessChanged()));
 
 	//--- Transparency Check ----------------------
-	ret = ret && connect(m_transpCheckBgColor, SIGNAL(colorChanged(const TPixel32 &, bool)), SLOT(onTranspCheckDataChanged(const TPixel32 &, bool)));
-	ret = ret && connect(m_transpCheckInkColor, SIGNAL(colorChanged(const TPixel32 &, bool)), SLOT(onTranspCheckDataChanged(const TPixel32 &, bool)));
-	ret = ret && connect(m_transpCheckPaintColor, SIGNAL(colorChanged(const TPixel32 &, bool)), SLOT(onTranspCheckDataChanged(const TPixel32 &, bool)));
+	ret = ret && connect(m_transpCheckBgColor, SIGNAL(colorChanged(const TPixel32 &, bool)),
+						 SLOT(onTranspCheckDataChanged(const TPixel32 &, bool)));
+	ret = ret && connect(m_transpCheckInkColor, SIGNAL(colorChanged(const TPixel32 &, bool)),
+						 SLOT(onTranspCheckDataChanged(const TPixel32 &, bool)));
+	ret = ret && connect(m_transpCheckPaintColor, SIGNAL(colorChanged(const TPixel32 &, bool)),
+						 SLOT(onTranspCheckDataChanged(const TPixel32 &, bool)));
 
 	//--- Version Control ----------------------
-	ret = ret && connect(m_enableVersionControl, SIGNAL(stateChanged(int)), SLOT(onSVNEnabledChanged(int)));
-	ret = ret && connect(autoRefreshFolderContentsCB, SIGNAL(stateChanged(int)), SLOT(onAutomaticSVNRefreshChanged(int)));
+	ret = ret && connect(m_enableVersionControl, SIGNAL(stateChanged(int)),
+						 SLOT(onSVNEnabledChanged(int)));
+	ret = ret && connect(autoRefreshFolderContentsCB, SIGNAL(stateChanged(int)),
+						 SLOT(onAutomaticSVNRefreshChanged(int)));
 
 	assert(ret);
 }

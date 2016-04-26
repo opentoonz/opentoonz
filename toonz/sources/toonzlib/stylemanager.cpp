@@ -1,6 +1,6 @@
 
 
-//Toonz includes
+// Toonz includes
 #include "tvectorimage.h"
 #include "trasterimage.h"
 #include "tlevel_io.h"
@@ -9,7 +9,7 @@
 #include "tvectorrenderdata.h"
 #include "tsystem.h"
 
-//Qt includes
+// Qt includes
 #include <QDir>
 #include <QImage>
 
@@ -42,7 +42,7 @@ void convertRaster32ToImage(TRaster32P ras, QImage *image)
 	ras->unlock();
 }
 
-} //namespace
+} // namespace
 
 //********************************************************************************
 //    StyleLoaderTask definition
@@ -54,7 +54,7 @@ class CustomStyleManager::StyleLoaderTask : public TThread::Runnable
 	TFilePath m_fp;
 	PatternData m_data;
 
-public:
+  public:
 	StyleLoaderTask(CustomStyleManager *manager, const TFilePath &fp);
 
 	void run();
@@ -64,7 +64,8 @@ public:
 
 //-----------------------------------------------------------------------------
 
-CustomStyleManager::StyleLoaderTask::StyleLoaderTask(CustomStyleManager *manager, const TFilePath &fp)
+CustomStyleManager::StyleLoaderTask::StyleLoaderTask(CustomStyleManager *manager,
+													 const TFilePath &fp)
 	: m_manager(manager), m_fp(fp)
 {
 	connect(this, SIGNAL(finished(TThread::RunnableP)), this, SLOT(onFinished(TThread::RunnableP)));
@@ -75,19 +76,19 @@ CustomStyleManager::StyleLoaderTask::StyleLoaderTask(CustomStyleManager *manager
 void CustomStyleManager::StyleLoaderTask::run()
 {
 	try {
-		//Fetch the level
+		// Fetch the level
 		TLevelReaderP lr(m_fp);
 		TLevelP level = lr->loadInfo();
 		if (!level || level->getFrameCount() == 0)
 			return;
 
-		//Fetch the image of the first frame in the level
+		// Fetch the image of the first frame in the level
 		TLevel::Iterator frameIt = level->begin();
 		if (frameIt == level->end())
 			return;
 		TImageP img = lr->getFrameReader(frameIt->first)->load();
 
-		//Process the image
+		// Process the image
 		const QSize &qChipSize = m_manager->getChipSize();
 		TDimension chipSize(qChipSize.width(), qChipSize.height());
 
@@ -118,17 +119,17 @@ void CustomStyleManager::StyleLoaderTask::run()
 
 			glContext->draw(img, rd);
 
-			//No need to clone! The received raster already is a copy of the context's buffer
+			// No need to clone! The received raster already is a copy of the context's buffer
 			ras = glContext->getRaster(); //->clone();
 		} else if (rimg) {
 			TDimension size = rimg->getRaster()->getSize();
 			if (size == chipSize)
-				ras = rimg->getRaster()->clone(); //Yep, this may be necessary
+				ras = rimg->getRaster()->clone(); // Yep, this may be necessary
 			else {
 				TRaster32P rout(chipSize);
 
-				TRop::resample(rout, rimg->getRaster(),
-							   TScale((double)chipSize.lx / size.lx, (double)chipSize.ly / size.ly));
+				TRop::resample(rout, rimg->getRaster(), TScale((double)chipSize.lx / size.lx,
+															   (double)chipSize.ly / size.ly));
 
 				TRop::addBackground(rout, TPixel::White);
 				ras = rout;
@@ -150,8 +151,8 @@ void CustomStyleManager::StyleLoaderTask::run()
 
 void CustomStyleManager::StyleLoaderTask::onFinished(TThread::RunnableP sender)
 {
-	//On the main thread...
-	if (m_data.m_image) //Everything went ok
+	// On the main thread...
+	if (m_data.m_image) // Everything went ok
 	{
 		m_manager->m_patterns.push_back(m_data);
 		emit m_manager->patternAdded();
@@ -162,8 +163,8 @@ void CustomStyleManager::StyleLoaderTask::onFinished(TThread::RunnableP sender)
 //    CustomStyleManager implementation
 //********************************************************************************
 
-CustomStyleManager::CustomStyleManager(
-	const TFilePath &stylesFolder, QString filters, QSize chipSize)
+CustomStyleManager::CustomStyleManager(const TFilePath &stylesFolder, QString filters,
+									   QSize chipSize)
 	: m_stylesFolder(stylesFolder), m_filters(filters), m_chipSize(chipSize)
 {
 	m_executor.setMaxActiveTasks(1);
@@ -201,7 +202,7 @@ void CustomStyleManager::setRootPath(const TFilePath &rootPath)
 
 void CustomStyleManager::loadItems()
 {
-	//Build the folder to be read
+	// Build the folder to be read
 	const TFilePath &rootFP(getRootPath());
 
 	assert(rootFP != TFilePath());
@@ -211,7 +212,7 @@ void CustomStyleManager::loadItems()
 	QDir patternDir(QString::fromStdWString((rootFP + m_stylesFolder).getWideString()));
 	patternDir.setNameFilters(m_filters.split(' '));
 
-	//Read the said folder
+	// Read the said folder
 	TFilePathSet fps;
 	try {
 		TSystem::readDirectory(fps, patternDir);
@@ -219,7 +220,7 @@ void CustomStyleManager::loadItems()
 		return;
 	}
 
-	//Delete patterns no longer in the folder
+	// Delete patterns no longer in the folder
 	TFilePathSet newFps;
 	TFilePathSet::iterator it;
 	int i;
@@ -234,10 +235,10 @@ void CustomStyleManager::loadItems()
 			m_patterns.removeAt(i);
 			i--;
 		} else
-			fps.erase(it); //The style is not new, so don't generate tasks for it
+			fps.erase(it); // The style is not new, so don't generate tasks for it
 	}
 
-	//For each (now new) file entry, generate a fetching task
+	// For each (now new) file entry, generate a fetching task
 	for (TFilePathSet::iterator it = fps.begin(); it != fps.end(); it++)
 		m_executor.addTask(new StyleLoaderTask(this, *it));
 }

@@ -15,22 +15,19 @@ class IdentifierTable
 
 	IdentifierTable() : m_lastId(0) {}
 
-public:
+  public:
 	static IdentifierTable *instance()
 	{
 		// NON DEVE MORIRE
-		//static IdentifierTable _instance;
-		//return &_instance;
+		// static IdentifierTable _instance;
+		// return &_instance;
 		static IdentifierTable *_instance = 0;
 		if (!_instance)
 			_instance = new IdentifierTable;
 		return _instance;
 	}
 
-	unsigned long getNextId()
-	{
-		return ++m_lastId;
-	}
+	unsigned long getNextId() { return ++m_lastId; }
 
 	void insert(TIdentifiable *o)
 	{
@@ -65,8 +62,7 @@ public:
 
 } // namespace
 
-TIdentifiable::TIdentifiable()
-	: m_id(0)
+TIdentifiable::TIdentifiable() : m_id(0)
 {
 }
 
@@ -76,8 +72,7 @@ TIdentifiable::~TIdentifiable()
 		IdentifierTable::instance()->erase(this);
 }
 
-TIdentifiable::TIdentifiable(const TIdentifiable &src)
-	: m_id(src.m_id)
+TIdentifiable::TIdentifiable(const TIdentifiable &src) : m_id(src.m_id)
 {
 }
 

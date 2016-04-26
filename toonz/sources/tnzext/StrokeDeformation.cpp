@@ -68,8 +68,7 @@ void StrokeDeformation::activate(const ContextStatus *status)
 	if (state_ == RESETTED)
 		delete this->deactivate();
 
-	if (state_ == CREATED ||
-		state_ == DEACTIVE) {
+	if (state_ == CREATED || state_ == DEACTIVE) {
 		deformationImpl_ = this->retrieveDeformator(status);
 	} else {
 		// if it is a not valid entry state_ recover
@@ -105,8 +104,7 @@ void StrokeDeformation::update(const TPointD &delta)
 		return;
 	}
 
-	if (state_ != ACTIVE &&
-		state_ != UPDATING) {
+	if (state_ != ACTIVE && state_ != UPDATING) {
 		deformationImpl_->reset();
 		state_ = ACTIVE;
 		return;
@@ -118,8 +116,7 @@ void StrokeDeformation::update(const TPointD &delta)
 
 //-----------------------------------------------------------------------------
 
-TStroke *
-StrokeDeformation::deactivate()
+TStroke *StrokeDeformation::deactivate()
 {
 	QMutexLocker sl(&s_mutex);
 
@@ -128,16 +125,14 @@ StrokeDeformation::deactivate()
 		return 0;
 	}
 
-	if (state_ != ACTIVE &&
-		state_ != UPDATING) {
+	if (state_ != ACTIVE && state_ != UPDATING) {
 		state_ = DEACTIVE;
 		deformationImpl_->reset();
 		return 0;
 	}
 
 	state_ = DEACTIVE;
-	TStroke *
-		out = deformationImpl_->deactivate_impl();
+	TStroke *out = deformationImpl_->deactivate_impl();
 	deformationImpl_ = 0;
 	return out;
 }
@@ -158,8 +153,7 @@ void StrokeDeformation::draw(Designer *designer)
 	QMutexLocker sl(&s_mutex);
 
 	assert(designer && "Designer is null!!!");
-	if (!deformationImpl_ ||
-		!designer)
+	if (!deformationImpl_ || !designer)
 		return;
 
 	// this is to draw the icon
@@ -180,8 +174,7 @@ void StrokeDeformation::check(const ContextStatus *status)
 
 //-----------------------------------------------------------------------------
 
-const TStroke *
-StrokeDeformation::getCopiedStroke() const
+const TStroke *StrokeDeformation::getCopiedStroke() const
 {
 	QMutexLocker sl(&s_mutex);
 	if (deformationImpl_)
@@ -191,8 +184,7 @@ StrokeDeformation::getCopiedStroke() const
 
 //-----------------------------------------------------------------------------
 
-const TStroke *
-StrokeDeformation::getStroke() const
+const TStroke *StrokeDeformation::getStroke() const
 {
 	QMutexLocker sl(&s_mutex);
 	if (deformationImpl_)
@@ -202,8 +194,7 @@ StrokeDeformation::getStroke() const
 
 //-----------------------------------------------------------------------------
 
-const TStroke *
-StrokeDeformation::getTransformedStroke() const
+const TStroke *StrokeDeformation::getTransformedStroke() const
 {
 	QMutexLocker sl(&s_mutex);
 	if (deformationImpl_)
@@ -223,17 +214,16 @@ void StrokeDeformation::recover()
 	deformationImpl_->reset();
 	//  this->clearStatus();
 
-	//deformationImpl_ = DeformationSelector::instance()->getDeformation(status);
-	//assert(deformationImpl_ &&  "Deformation is null!!!" );
-	//if( !deformationImpl_ )
+	// deformationImpl_ = DeformationSelector::instance()->getDeformation(status);
+	// assert(deformationImpl_ &&  "Deformation is null!!!" );
+	// if( !deformationImpl_ )
 	//  return;
 	// deformationImpl_->activate_impl(status);
 }
 
 //-----------------------------------------------------------------------------
 
-const ContextStatus *
-StrokeDeformation::getStatus() const
+const ContextStatus *StrokeDeformation::getStatus() const
 {
 	QMutexLocker sl(&s_mutex);
 	if (deformationImpl_)
@@ -243,8 +233,7 @@ StrokeDeformation::getStatus() const
 
 //-----------------------------------------------------------------------------
 
-ToonzExt::Interval
-StrokeDeformation::getExtremes() const
+ToonzExt::Interval StrokeDeformation::getExtremes() const
 {
 	QMutexLocker sl(&s_mutex);
 	if (!deformationImpl_)
@@ -254,8 +243,7 @@ StrokeDeformation::getExtremes() const
 
 //-----------------------------------------------------------------------------
 
-StrokeDeformationImpl *
-StrokeDeformation::retrieveDeformator(const ContextStatus *status)
+StrokeDeformationImpl *StrokeDeformation::retrieveDeformator(const ContextStatus *status)
 {
 	QMutexLocker sl(&s_mutex);
 	return DeformationSelector::instance()->getDeformation(status);
@@ -275,8 +263,7 @@ int StrokeDeformation::getCursorId() const
 
 #ifdef _DEBUG
 
-const Potential *
-StrokeDeformation::getPotential() const
+const Potential *StrokeDeformation::getPotential() const
 {
 	assert(deformationImpl_ && "Deformation is null!!!");
 	if (!deformationImpl_)
@@ -286,8 +273,7 @@ StrokeDeformation::getPotential() const
 
 //-----------------------------------------------------------------------------
 
-const StrokeDeformationImpl *
-StrokeDeformation::getDeformationImpl() const
+const StrokeDeformationImpl *StrokeDeformation::getDeformationImpl() const
 {
 	return deformationImpl_;
 }

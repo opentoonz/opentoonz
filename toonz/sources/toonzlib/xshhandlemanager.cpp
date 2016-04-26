@@ -19,8 +19,7 @@ namespace
 {
 
 // Returns the sum of each pass hook between fid and precFid.
-TPointD forwardPass(const TFrameId &fid, const TFrameId &precFid,
-					TXshSimpleLevel *sl, Hook *hook)
+TPointD forwardPass(const TFrameId &fid, const TFrameId &precFid, TXshSimpleLevel *sl, Hook *hook)
 {
 	TPointD delta;
 	std::vector<TFrameId> levelFids;
@@ -45,8 +44,7 @@ TPointD forwardPass(const TFrameId &fid, const TFrameId &precFid,
 
 //-----------------------------------------------------------------------------
 // Returns subtraction of each pass hook between fid and precFid.
-TPointD backwardPass(const TFrameId &fid, const TFrameId &precFid,
-					 TXshSimpleLevel *sl, Hook *hook)
+TPointD backwardPass(const TFrameId &fid, const TFrameId &precFid, TXshSimpleLevel *sl, Hook *hook)
 {
 	TPointD delta;
 	std::vector<TFrameId> levelFids;
@@ -71,8 +69,8 @@ TPointD backwardPass(const TFrameId &fid, const TFrameId &precFid,
 
 //-----------------------------------------------------------------------------
 // Compute pass hook between fid and precFid
-TPointD computePassHook(const TFrameId &fid, const TFrameId &precFid,
-						TXshSimpleLevel *sl, Hook *hook)
+TPointD computePassHook(const TFrameId &fid, const TFrameId &precFid, TXshSimpleLevel *sl,
+						Hook *hook)
 {
 	if (fid < precFid && (precFid.getNumber() - fid.getNumber()) <= 2)
 		return backwardPass(fid, precFid, sl, hook);
@@ -86,10 +84,8 @@ TPointD computePassHook(const TFrameId &fid, const TFrameId &precFid,
 //    XshHandleManager  implementation
 //*******************************************************************************
 
-TPointD XshHandleManager::getHandlePos(
-	const TStageObjectId &id,
-	const std::string &handle,
-	int row) const
+TPointD XshHandleManager::getHandlePos(const TStageObjectId &id, const std::string &handle,
+									   int row) const
 {
 	static const double unit = 8.0;
 

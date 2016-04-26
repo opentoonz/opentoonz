@@ -22,16 +22,16 @@
 #endif
 
 #ifndef checkErrorsByGL
-#define checkErrorsByGL                      \
-	{                                        \
-		GLenum err = glGetError();           \
-		assert(err != GL_INVALID_ENUM);      \
-		assert(err != GL_INVALID_VALUE);     \
-		assert(err != GL_INVALID_OPERATION); \
-		assert(err != GL_STACK_OVERFLOW);    \
-		assert(err != GL_STACK_UNDERFLOW);   \
-		assert(err != GL_OUT_OF_MEMORY);     \
-		assert(err == GL_NO_ERROR);          \
+#define checkErrorsByGL                                                                            \
+	{                                                                                              \
+		GLenum err = glGetError();                                                                 \
+		assert(err != GL_INVALID_ENUM);                                                            \
+		assert(err != GL_INVALID_VALUE);                                                           \
+		assert(err != GL_INVALID_OPERATION);                                                       \
+		assert(err != GL_STACK_OVERFLOW);                                                          \
+		assert(err != GL_STACK_UNDERFLOW);                                                         \
+		assert(err != GL_OUT_OF_MEMORY);                                                           \
+		assert(err == GL_NO_ERROR);                                                                \
 	}
 #endif
 
@@ -49,8 +49,8 @@ DV_EXPORT_API void mylog(std::string s)
   std::ofstream os("C:\\gmt\\buttami\\bu.txt", std::ios::app);
 
   LARGE_INTEGER ticksPerSecond;
-  LARGE_INTEGER tick;   
-  static LARGE_INTEGER firstTick;   
+  LARGE_INTEGER tick;
+  static LARGE_INTEGER firstTick;
   static bool firstTime = true;
   long dt = 0;
 
@@ -59,7 +59,7 @@ DV_EXPORT_API void mylog(std::string s)
   if(firstTime) {firstTick = tick;firstTime=false;}
   else
   {
-    dt = (long)(1000000*(tick.QuadPart-firstTick.QuadPart)/ticksPerSecond.QuadPart);
+	dt = (long)(1000000*(tick.QuadPart-firstTick.QuadPart)/ticksPerSecond.QuadPart);
   }
   os << dt << ":" << s << std::endl;
 }
@@ -74,7 +74,7 @@ bool checkQuadraticDistance(TStroke *stroke, bool checkThickness)
 	const TThickQuadratic *q;
 	TThickPoint p1, p2, p3;
 
-	//se i punti coincidono e' una stroke puntiforme ed e' ammessa
+	// se i punti coincidono e' una stroke puntiforme ed e' ammessa
 	if (qCount == 1)
 		return true;
 
@@ -95,7 +95,8 @@ bool checkQuadraticDistance(TStroke *stroke, bool checkThickness)
 
 //-----------------------------------------------------------------------------
 
-void drawControlPoints(const TVectorRenderData &rd, TStroke *stroke, double pixelSize, bool allPoints = true)
+void drawControlPoints(const TVectorRenderData &rd, TStroke *stroke, double pixelSize,
+					   bool allPoints = true)
 {
 	int i;
 	TPointD p;
@@ -168,7 +169,7 @@ void tglDraw(const TVectorRenderData &rd, TRegion *r, bool pushAttribs)
 		style = rd.m_palette->getStyle(r->getStyle());
 
 	colorCount = style->getColorParamCount();
-	if (colorCount == 0) { //for example texture
+	if (colorCount == 0) { // for example texture
 		visible = true;
 	} else {
 		visible = false;
@@ -182,14 +183,14 @@ void tglDraw(const TVectorRenderData &rd, TRegion *r, bool pushAttribs)
 	}
 	if (visible) {
 		TRegionProp *prop = r->getProp(/*rd.m_palette*/);
-		///questo codice satva dentro tregion::getprop/////
+		/// questo codice satva dentro tregion::getprop/////
 		int styleId = r->getStyle();
 		if (styleId) {
 			// TColorStyle * style = rd.m_palette->getStyle(styleId);
 			if (!style->isRegionStyle() || style->isEnabled() == false) {
 				prop = 0;
 			} else {
-				//Warning: The same remark of stroke props holds here.
+				// Warning: The same remark of stroke props holds here.
 				if (!prop || style.getPointer() != prop->getColorStyle()) {
 					r->setProp(style->makeRegionProp(r));
 					prop = r->getProp();
@@ -236,7 +237,10 @@ void tglDraw(const TVectorRenderData &rd, TRegion *r, bool pushAttribs)
 
 			Index++;
 			if (rIndex == 2) {
-				double y = r->getEdge(0)->m_s->getThickPoint((r->getEdge(0)->m_w0 + r->getEdge(0)->m_w1) / 2.0).y;
+				double y =
+					r->getEdge(0)
+						->m_s->getThickPoint((r->getEdge(0)->m_w0 + r->getEdge(0)->m_w1) / 2.0)
+						.y;
 				tglDrawSegment(TPointD(-1000, y), TPointD(1000, y));
 			}
 
@@ -257,7 +261,8 @@ void tglDraw(const TVectorRenderData &rd, TRegion *r, bool pushAttribs)
 						drawPoint(s->getChunk(ii)->getP2(), .3);
 						if (ii < s->getChunkCount() - 1) {
 							tglColor(TPixel::Red);
-							tglDrawText(s->getChunk(ii)->getP2(), QString::number(ii + 1).toStdString());
+							tglDrawText(s->getChunk(ii)->getP2(),
+										QString::number(ii + 1).toStdString());
 						}
 					}
 				}
@@ -269,21 +274,21 @@ void tglDraw(const TVectorRenderData &rd, TRegion *r, bool pushAttribs)
 				GLboolean red, green, blue, alpha;
 				tglGetColorMask(red, green, blue, alpha);
 
-				//Draw RGB channels
+				// Draw RGB channels
 				tglEnableBlending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 				glColorMask(red, green, blue, GL_FALSE);
 				prop->draw(rd);
 
-				//Draw Matte channel
+				// Draw Matte channel
 				tglEnableBlending(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 				glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, alpha);
 				prop->draw(rd);
 
 				glColorMask(red, green, blue, alpha);
 			} else {
-				//pezza: in render, le aree fillate dei custom styles sparivano.
+				// pezza: in render, le aree fillate dei custom styles sparivano.
 				if (!rd.m_isOfflineRender || !rd.m_isImagePattern)
-					tglRgbOnlyColorMask(); //RGB components only
+					tglRgbOnlyColorMask(); // RGB components only
 
 				prop->draw(rd);
 			}
@@ -360,8 +365,11 @@ void tglDraw(const TVectorRenderData &rd, const TStroke *s, bool pushAttribs)
 		} else
 			style = rd.m_palette->getStyle(stroke->getStyle());
 
-		if (!rd.m_show0ThickStrokes && isOThick(s) && dynamic_cast<TSolidColorStyle *>(style.getPointer()) // This is probably to exclude TCenterlineStrokeStyle-like styles
-			&& !rd.m_tcheckEnabled)																		   // I wonder why this?
+		if (!rd.m_show0ThickStrokes && isOThick(s) &&
+			dynamic_cast<TSolidColorStyle *>(
+				style
+					.getPointer()) // This is probably to exclude TCenterlineStrokeStyle-like styles
+			&& !rd.m_tcheckEnabled) // I wonder why this?
 			return;
 
 		// const TStroke& stroke = *s;  //serve???
@@ -379,10 +387,10 @@ void tglDraw(const TVectorRenderData &rd, const TStroke *s, bool pushAttribs)
 
 			prop = 0;
 		} else {
-			//Warning: the following pointers check is conceptually wrong - we
-			//keep it because the props maintain SMART POINTER-like reference to
-			//the associated style. This prevents the style from being destroyed
-			//while still referenced by the prop.
+			// Warning: the following pointers check is conceptually wrong - we
+			// keep it because the props maintain SMART POINTER-like reference to
+			// the associated style. This prevents the style from being destroyed
+			// while still referenced by the prop.
 			if (!prop || style.getPointer() != prop->getColorStyle()) {
 				if (prop)
 					prop->getMutex()->unlock();
@@ -403,7 +411,8 @@ void tglDraw(const TVectorRenderData &rd, const TStroke *s, bool pushAttribs)
 
 		bool alphaChannel = rd.m_alphaChannel, antialias = rd.m_antiAliasing;
 		TVectorImagePatternStrokeProp *aux = dynamic_cast<TVectorImagePatternStrokeProp *>(prop);
-		if (aux) //gli image pattern vettoriali tornano in questa funzione....non facendo il corpo dell'else'si evita di disegnarli due volte!
+		if (aux) // gli image pattern vettoriali tornano in questa funzione....non facendo il corpo
+				 // dell'else'si evita di disegnarli due volte!
 			prop->draw(rd);
 		else {
 			if (antialias)
@@ -415,12 +424,12 @@ void tglDraw(const TVectorRenderData &rd, const TStroke *s, bool pushAttribs)
 				GLboolean red, green, blue, alpha;
 				tglGetColorMask(red, green, blue, alpha);
 
-				//Draw RGB channels
+				// Draw RGB channels
 				tglEnableBlending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 				glColorMask(red, green, blue, GL_FALSE);
 				prop->draw(rd);
 
-				//Draw Matte channel
+				// Draw Matte channel
 				tglEnableBlending(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 				glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, alpha);
 				prop->draw(rd);
@@ -456,7 +465,7 @@ void tglDoDraw(const TVectorRenderData &rd, TRegion *r)
 
 	TColorStyleP style = rd.m_palette->getStyle(r->getStyle());
 	colorCount = style->getColorParamCount();
-	if (colorCount == 0) //for example texture
+	if (colorCount == 0) // for example texture
 		visible = true;
 	else {
 		visible = false;
@@ -485,7 +494,7 @@ void tglDoDraw(const TVectorRenderData &rd, const TStroke *s)
 	const TPalette *palette = rd.m_palette;
 
 	int styleId = s->getStyle();
-	//assert(0<=styleId && styleId<stylesCount);
+	// assert(0<=styleId && styleId<stylesCount);
 	TColorStyleP style = palette->getStyle(styleId);
 	assert(style);
 	colorCount = style->getColorParamCount();
@@ -507,8 +516,8 @@ void tglDoDraw(const TVectorRenderData &rd, const TStroke *s)
 		tglDraw(rd, s, false);
 
 #ifdef _DEBUG
-//drawControlPoints(rd, vim->getStroke(i), sqrt(tglGetPixelSize2()), true);
-//assert(checkQuadraticDistance(vim->getStroke(i),true));
+// drawControlPoints(rd, vim->getStroke(i), sqrt(tglGetPixelSize2()), true);
+// assert(checkQuadraticDistance(vim->getStroke(i),true));
 #endif
 }
 
@@ -535,7 +544,8 @@ void doDraw(const TVectorImage *vim, const TVectorRenderData &_rd, bool drawEnte
 
 	TVectorRenderData rdRegions = rd;
 
-	/*if (rd.m_drawRegions && rd.m_isImagePattern)//gli image pattern hanno bisogno dell'antialiasig per le linee, ma sulle aree ci sarebbero un sacco di assert
+	/*if (rd.m_drawRegions && rd.m_isImagePattern)//gli image pattern hanno bisogno dell'antialiasig
+  per le linee, ma sulle aree ci sarebbero un sacco di assert
   rdRegions.m_alphaChannel = rdRegions.m_antiAliasing = false;*/
 	UINT strokeIndex = 0;
 	Index = 0;
@@ -546,7 +556,8 @@ void doDraw(const TVectorImage *vim, const TVectorRenderData &_rd, bool drawEnte
 		if (!rd.m_isIcon && vim->isInsideGroup() > 0 &&
 			((drawEnteredGroup && !vim->isEnteredGroupStroke(strokeIndex)) ||
 			 !drawEnteredGroup && vim->isEnteredGroupStroke(strokeIndex))) {
-			while (strokeIndex < vim->getStrokeCount() && vim->sameGroup(strokeIndex, currStrokeIndex))
+			while (strokeIndex < vim->getStrokeCount() &&
+				   vim->sameGroup(strokeIndex, currStrokeIndex))
 				strokeIndex++;
 			continue;
 		}
@@ -555,7 +566,8 @@ void doDraw(const TVectorImage *vim, const TVectorRenderData &_rd, bool drawEnte
 			for (UINT regionIndex = 0; regionIndex < vim->getRegionCount(); regionIndex++)
 				if (vim->sameGroupStrokeAndRegion(currStrokeIndex, regionIndex))
 					tglDoDraw(rdRegions, vim->getRegion(regionIndex));
-		while (strokeIndex < vim->getStrokeCount() && vim->sameGroup(strokeIndex, currStrokeIndex)) {
+		while (strokeIndex < vim->getStrokeCount() &&
+			   vim->sameGroup(strokeIndex, currStrokeIndex)) {
 #if DISEGNO_OUTLINE == 1
 			CurrStrokeIndex = strokeIndex;
 			CurrVimg = vim;
@@ -582,8 +594,8 @@ void tglDraw(const TVectorRenderData &rd, const TVectorImage *vim)
 
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 
-	//if(!rd.m_palette) rd.m_palette = vim->getPalette();
-	//mylog("tglDraw start; mutex=" + toString((unsigned long)&vim->getMutex()));
+	// if(!rd.m_palette) rd.m_palette = vim->getPalette();
+	// mylog("tglDraw start; mutex=" + toString((unsigned long)&vim->getMutex()));
 
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER, 0);
@@ -600,7 +612,7 @@ void tglDraw(const TVectorRenderData &rd, const TVectorImage *vim)
 	vim->drawAutocloses(rd);
 #endif
 	checkErrorsByGL;
-	//mylog("tglDraw stop");
+	// mylog("tglDraw stop");
 }
 
 //-----------------------------------------------------------------------------

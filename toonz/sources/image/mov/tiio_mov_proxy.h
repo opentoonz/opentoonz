@@ -5,7 +5,7 @@
 
 #if defined(x64) || defined(__LP64__)
 
-//Qt includes
+// Qt includes
 #include <QString>
 #include <QLocalSocket>
 
@@ -13,7 +13,7 @@
 
 //---------------------------------------------------------------------
 
-//QuickTime check
+// QuickTime check
 bool IsQuickTimeInstalled();
 
 //---------------------------------------------------------------------
@@ -26,7 +26,7 @@ class TLevelWriterMov : public TLevelWriter
 {
 	unsigned int m_id;
 
-public:
+  public:
 	TLevelWriterMov(const TFilePath &path, TPropertyGroup *winfo);
 	~TLevelWriterMov();
 
@@ -37,7 +37,7 @@ public:
 
 	void saveSoundTrack(TSoundTrack *st);
 
-public:
+  public:
 	static TLevelWriter *create(const TFilePath &f, TPropertyGroup *winfo)
 	{
 		return new TLevelWriterMov(f, winfo);
@@ -55,7 +55,7 @@ class TLevelReaderMov : public TLevelReader
 	unsigned int m_id;
 	int m_lx, m_ly;
 
-public:
+  public:
 	TLevelReaderMov(const TFilePath &path);
 	~TLevelReaderMov();
 	TImageReaderP getFrameReader(TFrameId fid);
@@ -65,15 +65,13 @@ public:
 	const TImageInfo *getImageInfo() { return m_info; }
 
 	void enableRandomAccessRead(bool enable);
-	void load(const TRasterP &rasP, int frameIndex, const TPoint &pos, int shrinkX = 1, int shrinkY = 1);
+	void load(const TRasterP &rasP, int frameIndex, const TPoint &pos, int shrinkX = 1,
+			  int shrinkY = 1);
 	TDimension getSize() const { return TDimension(m_lx, m_ly); }
 	TRect getBBox() const { return TRect(0, 0, m_lx - 1, m_ly - 1); }
 
-public:
-	static TLevelReader *create(const TFilePath &f)
-	{
-		return new TLevelReaderMov(f);
-	}
+  public:
+	static TLevelReader *create(const TFilePath &f) { return new TLevelReaderMov(f); }
 };
 
 //===========================================================================
@@ -82,13 +80,13 @@ namespace Tiio
 {
 class MovWriterProperties : public TPropertyGroup
 {
-public:
+  public:
 	MovWriterProperties();
 };
 }
 
 //===========================================================================
 
-#endif //x64
+#endif // x64
 
-#endif //TIIO_MOV_PROXY_H
+#endif // TIIO_MOV_PROXY_H

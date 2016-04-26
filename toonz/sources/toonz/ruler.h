@@ -14,7 +14,7 @@ class SceneViewer;
 //-----------------------------------------------------------------------------
 
 /*! La classe si occupa della visualizzazione e della gestione
-    di una linea guida (puo' essere orizzontale o verticale)
+	di una linea guida (puo' essere orizzontale o verticale)
 */
 class Ruler : public QWidget
 {
@@ -40,7 +40,7 @@ class Ruler : public QWidget
 
 	typedef TSceneProperties::Guides Guides;
 
-public:
+  public:
 	Ruler(QWidget *parent, SceneViewer *viewer, bool vertical);
 	Guides &getGuides() const;
 
@@ -48,8 +48,7 @@ public:
 	double getGuide(int index) const;
 
 	double getUnit() const;
-	void getIndices(double origin, double iunit, int size,
-					int &i0, int &i1, int &ic) const;
+	void getIndices(double origin, double iunit, int size, int &i0, int &i1, int &ic) const;
 
 	double getZoomScale() const;
 	double getPan() const;

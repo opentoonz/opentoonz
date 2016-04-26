@@ -36,15 +36,10 @@ class TXshSimpleLevel;
 
 class DVAPI OnionSkinMask
 {
-public:
-	enum ShiftTraceStatus {
-		DISABLED,
-		EDITING_GHOST,
-		ENABLED,
-		ENABLED_WITHOUT_GHOST_MOVEMENTS
-	};
+  public:
+	enum ShiftTraceStatus { DISABLED, EDITING_GHOST, ENABLED, ENABLED_WITHOUT_GHOST_MOVEMENTS };
 
-public:
+  public:
 	OnionSkinMask() : m_enabled(false), m_wholeScene(false) {}
 
 	void clear();
@@ -67,8 +62,9 @@ public:
 		return m_fos[index];
 	}
 
-	void setMos(int drow, bool on); //!< Sets a Mobile OS frame shifted by drow around current xsheet frame
-	void setFos(int row, bool on);  //!< Sets a Fixed OS frame to the specified xsheet row
+	void setMos(int drow,
+				bool on); //!< Sets a Mobile OS frame shifted by drow around current xsheet frame
+	void setFos(int row, bool on); //!< Sets a Fixed OS frame to the specified xsheet row
 
 	bool isMos(int drow) const;
 	bool isFos(int row) const;
@@ -84,9 +80,10 @@ public:
 	void setIsWholeScene(bool wholeScene) { m_wholeScene = wholeScene; }
 
 	/*!
-    Returns the fade (transparency) value, in the [0.0, 1.0] range, corresponding to the specified
-    distance from current frame. In case distance == 0, the returned value is 0.9, ie \a almost opaque,
-    since underlying onion-skinned drawings must be visible.
+	Returns the fade (transparency) value, in the [0.0, 1.0] range, corresponding to the specified
+	distance from current frame. In case distance == 0, the returned value is 0.9, ie \a almost
+	opaque,
+	since underlying onion-skinned drawings must be visible.
   */
 	static double getOnionSkinFade(int distance);
 
@@ -103,7 +100,7 @@ public:
 	const TPointD getShiftTraceGhostCenter(int index) const { return m_ghostCenter[index]; }
 	void setShiftTraceGhostCenter(int index, const TPointD &center);
 
-private:
+  private:
 	std::vector<int> m_fos, m_mos; //!< Fixed and Mobile Onion Skin indices
 	bool m_enabled;				   //!< Whether onion skin is enabled
 	bool m_wholeScene;			   //!< Whether the OS works on the entire scene
@@ -119,7 +116,7 @@ private:
 
 class DVAPI OnionSkinMaskModifier
 {
-public:
+  public:
 	OnionSkinMaskModifier(OnionSkinMask mask, int currentRow);
 
 	const OnionSkinMask &getMask() const { return m_curMask; }
@@ -128,7 +125,7 @@ public:
 	void drag(int row);
 	void release(int row);
 
-private:
+  private:
 	OnionSkinMask m_oldMask, m_curMask;
 
 	int m_firstRow, m_lastRow;

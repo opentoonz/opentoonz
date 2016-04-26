@@ -27,8 +27,8 @@
   <P> \f$
 
   \left{ \begin{array}{c}
-    v^t H v + v^t f + c   \rightarrow   \mbox{min} \\
-    A v + d = 0
+	v^t H v + v^t f + c   \rightarrow   \mbox{min} \\
+	A v + d = 0
   \end{array} \right.
 
   \f$ </P>
@@ -36,20 +36,22 @@
   which can be solved using the Lagrange Multipliers theorem:
 
   <P> \f$
-  
+
   \Rightarrow \left{ \begin{array}{c}
-    H v + f = A^t \lambda
-    A v + d = 0
+	H v + f = A^t \lambda
+	A v + d = 0
   \end{array} \right.
 
-  \Rightarrow \left( \begin{array}{c} H \\ A \end{array} \begin{array}{c} -A^t \\ 0 \end{array} \right)
-              \left( \begin{array}{c} v \\ \lambda \end{array} \right) = 
-              \left( \begin{array}{c} -f \\ -d \end{array} \right)
+  \Rightarrow \left( \begin{array}{c} H \\ A \end{array} \begin{array}{c} -A^t \\ 0 \end{array}
+  \right)
+			  \left( \begin{array}{c} v \\ \lambda \end{array} \right) =
+			  \left( \begin{array}{c} -f \\ -d \end{array} \right)
 
   \f$ </P>
 */
 
-//#define GL_DEBUG                                    // Debug using OpenGL. Must deform while drawing.
+//#define GL_DEBUG                                    // Debug using OpenGL. Must deform while
+//drawing.
 #ifdef GL_DEBUG  // NOTE: You should force deformations,
 #include "tgl.h" // see plasticdeformersstorage.cpp
 #endif
@@ -61,7 +63,8 @@
 namespace
 {
 
-//! A linear constraint of the kind   k[0] * v0 + k[1] * v1 + k[2] * v2 = b;     (b is not included though)
+//! A linear constraint of the kind   k[0] * v0 + k[1] * v1 + k[2] * v2 = b;     (b is not included
+//! though)
 struct LinearConstraint {
 	int m_h;	   //!< Original handle index corresponding to this constraint
 	int m_v[3];	//!< The mesh vertex indices v0, v1, v2
@@ -72,12 +75,11 @@ struct LinearConstraint {
 
 // Forced to implement a sloppy substitute to C++11's std::unique_ptr -- since we're still compiling
 // C++03 on MAC... ARGH !
-template <typename T, typename D>
-class UniquePtr
+template <typename T, typename D> class UniquePtr
 {
 	T *m_t;
 
-public:
+  public:
 	UniquePtr() : m_t() {}
 	UniquePtr(T *t) : m_t(t) {}
 	~UniquePtr() { D::destroy(m_t); }
@@ -128,8 +130,8 @@ typedef UniquePtr<TPointD, deleter> TPointDPtr;
 namespace
 {
 
-inline void vertices(const TTextureMesh &mesh, int faceIdx,
-					 const TPointD *&p0, const TPointD *&p1, const TPointD *&p2)
+inline void vertices(const TTextureMesh &mesh, int faceIdx, const TPointD *&p0, const TPointD *&p1,
+					 const TPointD *&p2)
 {
 	int v0, v1, v2;
 	mesh.faceVertices(faceIdx, v0, v1, v2);
@@ -146,8 +148,7 @@ inline void buildTriangularCoordinates(const TTextureMesh &mesh, int &faceIdx, c
 	const TPointD *p0, *p1, *p2;
 
 	// Follow the hint first
-	if (faceIdx >= 0 && faceIdx < mesh.facesCount() &&
-		mesh.faceContains(faceIdx, p)) {
+	if (faceIdx >= 0 && faceIdx < mesh.facesCount() && mesh.faceContains(faceIdx, p)) {
 		vertices(mesh, faceIdx, p0, p1, p2);
 		coords = tcg::point_ops::triCoords(p, *p0, *p1, *p2);
 		c1 = coords.x, c2 = coords.y, c0 = 1.0 - c1 - c2;
@@ -193,15 +194,12 @@ inline void addConstraint2d(int j, const LinearConstraint &cnstr, tlin::spmat &m
 
 //-------------------------------------------------------------------------------------------
 
-inline void addGValues(
-	int v0x, int v0y, int v1x, int v1y, int v2x, int v2y,
-	double px, double py, double w, tlin::spmat &G)
+inline void addGValues(int v0x, int v0y, int v1x, int v1y, int v2x, int v2y, double px, double py,
+					   double w, tlin::spmat &G)
 {
 	double sqPy = py * py, one_px = 1.0 - px;
-	double a = w * (one_px * one_px + sqPy),
-		   b = w * (px * one_px - sqPy),
-		   c = w * (py * one_px + px * py),
-		   d = w * (px * px + sqPy);
+	double a = w * (one_px * one_px + sqPy), b = w * (px * one_px - sqPy),
+		   c = w * (py * one_px + px * py), d = w * (px * px + sqPy);
 
 	sqPy *= w;
 	one_px *= w;
@@ -270,7 +268,8 @@ void buildF(double px, double py, tlin::spmat &F)
 
 //-------------------------------------------------------------------------------------------
 
-void build_c(double v0x, double v0y, double v1x, double v1y, double v2x, double v2y, double px, double py, double *c)
+void build_c(double v0x, double v0y, double v1x, double v1y, double v2x, double v2y, double px,
+			 double py, double *c)
 {
 	c[0] = (v0x + v2x * (1.0 - px) + v2y * py);
 	c[1] = (v0y - v2x * py + v2y * (1.0 - px));
@@ -305,13 +304,14 @@ inline void add_f_values(int v0, int v1, double fit0, double fit1, double w, dou
 
 class PlasticDeformer::Imp
 {
-public:
-	TTextureMeshP m_mesh;										  //!< Deformed mesh (cannot be changed)
-	std::vector<PlasticHandle> m_handles;						  //!< Compiled handles
-	std::vector<LinearConstraint> m_constraints1, m_constraints3; //!< Compiled constraints (depends on the above)
-	bool m_compiled;											  //!< Whether the deformer is ready to deform()
+  public:
+	TTextureMeshP m_mesh;				  //!< Deformed mesh (cannot be changed)
+	std::vector<PlasticHandle> m_handles; //!< Compiled handles
+	std::vector<LinearConstraint> m_constraints1,
+		m_constraints3; //!< Compiled constraints (depends on the above)
+	bool m_compiled;	//!< Whether the deformer is ready to deform()
 
-public:
+  public:
 	Imp();
 
 	void initialize(const TTextureMeshP &mesh);
@@ -320,7 +320,7 @@ public:
 
 	void copyOriginals(double *dstVerticesCoords);
 
-public:
+  public:
 	tlin::spmat m_G;		//!< Pre-initialized entries for the 1st
 							//!< linear system
 	SuperFactorsPtr m_invC; //!< C's factors (C is G plus linear constraints)
@@ -328,14 +328,15 @@ public:
 	DoublePtr m_out;		//!< Step 1's result
 
 	// Step 1 members:
-	//   The first step of a MeshDeformer instance is about building the desired vertices configuration.
+	//   The first step of a MeshDeformer instance is about building the desired vertices
+	//   configuration.
 	void initializeStep1();
 	void compileStep1(const std::vector<PlasticHandle> &handles);
 	void deformStep1(const TPointD *dstHandles, double *dstVerticesCoords);
 
 	void releaseInitializedData();
 
-public:
+  public:
 	std::vector<SuperFactorsPtr> m_invF; //!< Each of step 2's systems factorizations
 
 	TPointDPtr m_relativeCoords; //!< Faces' p2 coordinates in (p0, p1)'s orthogonal reference
@@ -350,7 +351,7 @@ public:
 	void compileStep2(const std::vector<PlasticHandle> &handles);
 	void deformStep2(const TPointD *dstHandles, double *dstVerticesCoords);
 
-public:
+  public:
 	// NOTE: This step accepts separation in the X and Y components
 
 	tlin::spmat m_H;		//!< Step 3's system entries
@@ -392,8 +393,7 @@ void PlasticDeformer::Imp::initialize(const TTextureMeshP &mesh)
 
 //-------------------------------------------------------------------------------------------
 
-void PlasticDeformer::Imp::compile(const std::vector<PlasticHandle> &handles,
-								   int *faceHints)
+void PlasticDeformer::Imp::compile(const std::vector<PlasticHandle> &handles, int *faceHints)
 {
 	assert(m_mesh);
 
@@ -407,7 +407,8 @@ void PlasticDeformer::Imp::compile(const std::vector<PlasticHandle> &handles,
 	for (h = 0; h < hCount; ++h) {
 		int localFaceIdx = -1, &faceIdx = faceHints ? faceHints[h] : localFaceIdx;
 
-		::buildTriangularCoordinates(*m_mesh, faceIdx, handles[h].m_pos, constr.m_k[0], constr.m_k[1], constr.m_k[2]);
+		::buildTriangularCoordinates(*m_mesh, faceIdx, handles[h].m_pos, constr.m_k[0],
+									 constr.m_k[1], constr.m_k[2]);
 
 		if (faceIdx >= 0) {
 			constr.m_h = h;
@@ -422,7 +423,8 @@ void PlasticDeformer::Imp::compile(const std::vector<PlasticHandle> &handles,
 		}
 	}
 
-	//m_handles = handles;                              // NOT directly copied like this: some handles could be
+	// m_handles = handles;                              // NOT directly copied like this: some
+	// handles could be
 	// (geometrically) OUTSIDE the mesh!
 
 	// Now, invoke the actual compilation procedures
@@ -584,7 +586,8 @@ void PlasticDeformer::Imp::compileStep1(const std::vector<PlasticHandle> &handle
 		m_q.reset((double *)malloc(cSize * sizeof(double)));
 		m_out.reset((double *)malloc(cSize * sizeof(double)));
 
-		memset(m_q.get(), 0, 2 * vCount * sizeof(double)); // Initialize the system's known term with 0
+		memset(m_q.get(), 0,
+			   2 * vCount * sizeof(double)); // Initialize the system's known term with 0
 	} else
 		m_compiled = false;
 }
@@ -698,17 +701,13 @@ void PlasticDeformer::Imp::deformStep2(const TPointD *dstHandles, double *dstVer
 		int v0, v1, v2;
 		m_mesh->faceVertices(f, v0, v1, v2);
 
-		const RigidPoint &p0 = mesh.vertex(v0).P(), &p1 = mesh.vertex(v1).P(), &p2 = mesh.vertex(v2).P();
+		const RigidPoint &p0 = mesh.vertex(v0).P(), &p1 = mesh.vertex(v1).P(),
+						 &p2 = mesh.vertex(v2).P();
 
-		double *v0x = out1 + (v0 << 1), *v0y = v0x + 1,
-			   *v1x = out1 + (v1 << 1), *v1y = v1x + 1,
+		double *v0x = out1 + (v0 << 1), *v0y = v0x + 1, *v1x = out1 + (v1 << 1), *v1y = v1x + 1,
 			   *v2x = out1 + (v2 << 1), *v2y = v2x + 1;
 
-		build_c(
-			*v0x, *v0y,
-			*v1x, *v1y,
-			*v2x, *v2y,
-			relCoord->x, relCoord->y, m_c);
+		build_c(*v0x, *v0y, *v1x, *v1y, *v2x, *v2y, relCoord->x, relCoord->y, m_c);
 
 		double *vPtr = (double *)m_v;
 		tlin::solve(m_invF[f].get(), (double *)m_c, vPtr);
@@ -716,24 +715,27 @@ void PlasticDeformer::Imp::deformStep2(const TPointD *dstHandles, double *dstVer
 		fitTri[0].x = m_v[0], fitTri[0].y = m_v[1];
 		fitTri[1].x = m_v[2], fitTri[1].y = m_v[3];
 
-		fitTri[2].x = fitTri[0].x + relCoord->x * (fitTri[1].x - fitTri[0].x) + relCoord->y * (fitTri[1].y - fitTri[0].y);
-		fitTri[2].y = fitTri[0].y + relCoord->x * (fitTri[1].y - fitTri[0].y) + relCoord->y * (fitTri[0].x - fitTri[1].x);
+		fitTri[2].x = fitTri[0].x + relCoord->x * (fitTri[1].x - fitTri[0].x) +
+					  relCoord->y * (fitTri[1].y - fitTri[0].y);
+		fitTri[2].y = fitTri[0].y + relCoord->x * (fitTri[1].y - fitTri[0].y) +
+					  relCoord->y * (fitTri[0].x - fitTri[1].x);
 
-		// Scale with respect to baricenter. The baricenter is used since it makes distance from vertices equally
-		// weighting - which is the same expected when minimizing positions (by collateral effect) in the next step.
-		TPointD baricenter(
-			(fitTri[0].x + fitTri[1].x + fitTri[2].x) / 3.0,
-			(fitTri[0].y + fitTri[1].y + fitTri[2].y) / 3.0);
+		// Scale with respect to baricenter. The baricenter is used since it makes distance from
+		// vertices equally
+		// weighting - which is the same expected when minimizing positions (by collateral effect)
+		// in the next step.
+		TPointD baricenter((fitTri[0].x + fitTri[1].x + fitTri[2].x) / 3.0,
+						   (fitTri[0].y + fitTri[1].y + fitTri[2].y) / 3.0);
 
-		double scale = sqrt(
-			norm2(TPointD(p1.x - p0.x, p1.y - p0.y)) /
-			norm2(TPointD(fitTri[1].x - fitTri[0].x, fitTri[1].y - fitTri[0].y)));
+		double scale = sqrt(norm2(TPointD(p1.x - p0.x, p1.y - p0.y)) /
+							norm2(TPointD(fitTri[1].x - fitTri[0].x, fitTri[1].y - fitTri[0].y)));
 
 		fitTri[0] = scale * (fitTri[0] - baricenter) + baricenter;
 		fitTri[1] = scale * (fitTri[1] - baricenter) + baricenter;
 		fitTri[2] = scale * (fitTri[2] - baricenter) + baricenter;
 
-		// Build f -- note: this should be part of step 3, we're just avoiding the same cycle twice :)
+		// Build f -- note: this should be part of step 3, we're just avoiding the same cycle twice
+		// :)
 		add_f_values(v0, v1, fitTri[0].x, fitTri[1].x, tmin(p0.rigidity, p1.rigidity), m_fx.get());
 		add_f_values(v0, v1, fitTri[0].y, fitTri[1].y, tmin(p0.rigidity, p1.rigidity), m_fy.get());
 
@@ -780,8 +782,7 @@ void PlasticDeformer::Imp::initializeStep3()
 		int v0, v1, v2;
 		mesh.faceVertices(f, v0, v1, v2);
 
-		const RigidPoint &p0 = mesh.vertex(v0).P(),
-						 &p1 = mesh.vertex(v1).P(),
+		const RigidPoint &p0 = mesh.vertex(v0).P(), &p1 = mesh.vertex(v1).P(),
 						 &p2 = mesh.vertex(v2).P();
 
 		addHValues(v0, v1, tmin(p0.rigidity, p1.rigidity), m_H);
@@ -816,7 +817,7 @@ void PlasticDeformer::Imp::compileStep3(const std::vector<PlasticHandle> &handle
 		tlin::spmat K(kSize, kSize);
 		K.entries() = m_H.entries();
 		K.entries().hashFunctor().m_cols = K.cols();
-		K.entries().rehash(K.entries().buckets().size()); //Rehash to entries according to K's size
+		K.entries().rehash(K.entries().buckets().size()); // Rehash to entries according to K's size
 
 		// Add the entries constraining handles
 		int c, cnstrCount = m_constraints3.size();
@@ -880,8 +881,7 @@ void PlasticDeformer::Imp::deformStep3(const TPointD *dstHandles, double *dstVer
 //    Plastic Deformer  implementation
 //**********************************************************************************************
 
-PlasticDeformer::PlasticDeformer()
-	: m_imp(new Imp)
+PlasticDeformer::PlasticDeformer() : m_imp(new Imp)
 {
 }
 

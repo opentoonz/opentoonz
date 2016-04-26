@@ -21,29 +21,27 @@
 
 #define P(d) tmsg_info(" - %d -\n", d)
 
-template <class EParam>
-class CParams
+template <class EParam> class CParams
 {
-public:
+  public:
 	std::vector<EParam> m_params;
 	double m_scale;
 
 	CParams() : m_params(0), m_scale(1.0){};
-	CParams(const CParams &cp) : m_params(cp.m_params),
-								 m_scale(cp.m_scale){};
+	CParams(const CParams &cp) : m_params(cp.m_params), m_scale(cp.m_scale){};
 	virtual ~CParams(){};
 
 	CParams(const CInputParam &ip) : m_scale(ip.m_scale)
 	{
 		if (ip.m_isEconf) {
-			//read(ip.m_econfFN);
+			// read(ip.m_econfFN);
 		} else {
 			m_params.resize(1);
 			m_params[0].read(ip);
 		}
 	}
 	/*
-void print() 
+void print()
 {	char s[1024];
 	int i;
 
@@ -51,7 +49,7 @@ void print()
 	sprintf(s,"Scale=%f\n",m_scale);
 	OutputDebugString(s);
 	i=0;
-	for( vector<EParam>::iterator p=m_params.begin(); 
+	for( vector<EParam>::iterator p=m_params.begin();
 		p!=m_params.end(); ++p,++i ){
 		sprintf(s,"--- %d. Param ---\n",i);
 		OutputDebugString(s);
@@ -64,12 +62,12 @@ void print()
 void read(const basic_string<char>& name)
 {	basic_ifstream<char> in(name.c_str());
 
-	for( bool isOK=true; isOK; ) { 
+	for( bool isOK=true; isOK; ) {
 		m_params.resize(m_params.size()+1);
 		vector<EParam>::iterator p=m_params.end();
 		p--;
 		isOK=p->read(in);
-		if ( !isOK ) 
+		if ( !isOK )
 			m_params.resize(m_params.size()-1);
 	}
 	in.close();

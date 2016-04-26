@@ -54,7 +54,8 @@ TEnv::IntVar FlipBookBlackBgToggle("FlipBookBlackBgToggle", 0);
 TEnv::IntVar FlipBookCheckBgToggle("FlipBookCheckBgToggle", 0);
 namespace
 {
-//Please refer to the "qss/standard/standard.qss" file for explanations of the following properties.
+// Please refer to the "qss/standard/standard.qss" file for explanations of the following
+// properties.
 
 int PBHeight;
 
@@ -77,48 +78,123 @@ QColor PBFinishedColor = QColor(235, 235, 235);
 
 //-----------------------------------------------------------------------------
 
-int FlipSlider::getPBHeight() const { return PBHeight; }
+int FlipSlider::getPBHeight() const
+{
+	return PBHeight;
+}
 void FlipSlider::setPBHeight(int height)
 {
 	setFixedHeight(height);
 	PBHeight = height;
 }
 
-QImage FlipSlider::getPBOverlay() const { return PBOverlay; }
-void FlipSlider::setPBOverlay(const QImage &img) { PBOverlay = img; }
+QImage FlipSlider::getPBOverlay() const
+{
+	return PBOverlay;
+}
+void FlipSlider::setPBOverlay(const QImage &img)
+{
+	PBOverlay = img;
+}
 
-QImage FlipSlider::getPBMarker() const { return PBMarker; }
-void FlipSlider::setPBMarker(const QImage &img) { PBMarker = img; }
+QImage FlipSlider::getPBMarker() const
+{
+	return PBMarker;
+}
+void FlipSlider::setPBMarker(const QImage &img)
+{
+	PBMarker = img;
+}
 
-int FlipSlider::getPBColorMarginLeft() const { return PBColorMarginLeft; }
-void FlipSlider::setPBColorMarginLeft(int margin) { PBColorMarginLeft = margin; }
+int FlipSlider::getPBColorMarginLeft() const
+{
+	return PBColorMarginLeft;
+}
+void FlipSlider::setPBColorMarginLeft(int margin)
+{
+	PBColorMarginLeft = margin;
+}
 
-int FlipSlider::getPBColorMarginTop() const { return PBColorMarginTop; }
-void FlipSlider::setPBColorMarginTop(int margin) { PBColorMarginTop = margin; }
+int FlipSlider::getPBColorMarginTop() const
+{
+	return PBColorMarginTop;
+}
+void FlipSlider::setPBColorMarginTop(int margin)
+{
+	PBColorMarginTop = margin;
+}
 
-int FlipSlider::getPBColorMarginRight() const { return PBColorMarginRight; }
-void FlipSlider::setPBColorMarginRight(int margin) { PBColorMarginRight = margin; }
+int FlipSlider::getPBColorMarginRight() const
+{
+	return PBColorMarginRight;
+}
+void FlipSlider::setPBColorMarginRight(int margin)
+{
+	PBColorMarginRight = margin;
+}
 
-int FlipSlider::getPBColorMarginBottom() const { return PBColorMarginBottom; }
-void FlipSlider::setPBColorMarginBottom(int margin) { PBColorMarginBottom = margin; }
+int FlipSlider::getPBColorMarginBottom() const
+{
+	return PBColorMarginBottom;
+}
+void FlipSlider::setPBColorMarginBottom(int margin)
+{
+	PBColorMarginBottom = margin;
+}
 
-int FlipSlider::getPBMarkerMarginLeft() const { return PBMarkerMarginLeft; }
-void FlipSlider::setPBMarkerMarginLeft(int margin) { PBMarkerMarginLeft = margin; }
+int FlipSlider::getPBMarkerMarginLeft() const
+{
+	return PBMarkerMarginLeft;
+}
+void FlipSlider::setPBMarkerMarginLeft(int margin)
+{
+	PBMarkerMarginLeft = margin;
+}
 
-int FlipSlider::getPBMarkerMarginRight() const { return PBMarkerMarginRight; }
-void FlipSlider::setPBMarkerMarginRight(int margin) { PBMarkerMarginRight = margin; }
+int FlipSlider::getPBMarkerMarginRight() const
+{
+	return PBMarkerMarginRight;
+}
+void FlipSlider::setPBMarkerMarginRight(int margin)
+{
+	PBMarkerMarginRight = margin;
+}
 
-QColor FlipSlider::getBaseColor() const { return PBBaseColor; }
-void FlipSlider::setBaseColor(const QColor &color) { PBBaseColor = color; }
+QColor FlipSlider::getBaseColor() const
+{
+	return PBBaseColor;
+}
+void FlipSlider::setBaseColor(const QColor &color)
+{
+	PBBaseColor = color;
+}
 
-QColor FlipSlider::getNotStartedColor() const { return PBNotStartedColor; }
-void FlipSlider::setNotStartedColor(const QColor &color) { PBNotStartedColor = color; }
+QColor FlipSlider::getNotStartedColor() const
+{
+	return PBNotStartedColor;
+}
+void FlipSlider::setNotStartedColor(const QColor &color)
+{
+	PBNotStartedColor = color;
+}
 
-QColor FlipSlider::getStartedColor() const { return PBStartedColor; }
-void FlipSlider::setStartedColor(const QColor &color) { PBStartedColor = color; }
+QColor FlipSlider::getStartedColor() const
+{
+	return PBStartedColor;
+}
+void FlipSlider::setStartedColor(const QColor &color)
+{
+	PBStartedColor = color;
+}
 
-QColor FlipSlider::getFinishedColor() const { return PBFinishedColor; }
-void FlipSlider::setFinishedColor(const QColor &color) { PBFinishedColor = color; }
+QColor FlipSlider::getFinishedColor() const
+{
+	return PBFinishedColor;
+}
+void FlipSlider::setFinishedColor(const QColor &color)
+{
+	PBFinishedColor = color;
+}
 
 FlipConsole *FlipConsole::m_currentConsole = 0;
 QList<FlipConsole *> FlipConsole::m_visibleConsoles;
@@ -127,8 +203,7 @@ bool FlipConsole::m_areLinked = false;
 
 //==========================================================================================
 
-PlaybackExecutor::PlaybackExecutor()
-	: m_fps(25), m_abort(false)
+PlaybackExecutor::PlaybackExecutor() : m_fps(25), m_abort(false)
 {
 }
 
@@ -202,7 +277,8 @@ void PlaybackExecutor::run()
 			// Store values
 			TUINT32 framesCount = playedFramesCount - lastFrameCounts[currSample];
 			TUINT32 elapsedTime = loadedInstant - lastSampleInstants[currSample];
-			double loadingTime = (sampleTotalLoadingTime - lastLoadingTimes[currSample]) / (double)framesCount;
+			double loadingTime =
+				(sampleTotalLoadingTime - lastLoadingTimes[currSample]) / (double)framesCount;
 
 			lastFrameCounts[currSample] = playedFramesCount;
 			lastSampleInstants[currSample] = loadedInstant;
@@ -215,12 +291,16 @@ void PlaybackExecutor::run()
 			fps = troundp((1000 * framesCount) / (double)elapsedTime);
 			targetFrameTime = 1000.0 / abs(m_fps); // m_fps could have changed...
 
-			// In case the playback is too slow to keep the required pace, reset the emission timeline.
-			// Otherwise, it should be kept as the difference needs to be compensated to get the required fps.
-			if ((int)emissionInstant - (int)emissionInstantD > 20) // Reset beyond, say, 20 msecs tolerance.
+			// In case the playback is too slow to keep the required pace, reset the emission
+			// timeline.
+			// Otherwise, it should be kept as the difference needs to be compensated to get the
+			// required fps.
+			if ((int)emissionInstant - (int)emissionInstantD >
+				20) // Reset beyond, say, 20 msecs tolerance.
 				emissionInstantD = (double)loadedInstant - loadingTime;
 			else
-				emissionInstantD += lastLoadingTime - loadingTime; // Otherwise, just adapt to the new loading time
+				emissionInstantD +=
+					lastLoadingTime - loadingTime; // Otherwise, just adapt to the new loading time
 
 			lastLoadingTime = loadingTime;
 		}
@@ -252,13 +332,10 @@ void FlipSlider::paintEvent(QPaintEvent *ev)
 {
 	QPainter p(this);
 
-	//Draw the progress status colorbar
+	// Draw the progress status colorbar
 	QRect sliderRect(QPoint(), size());
-	QRect colorRect(sliderRect.adjusted(
-		PBMarkerMarginLeft,
-		PBColorMarginTop,
-		-PBMarkerMarginRight,
-		-PBColorMarginBottom));
+	QRect colorRect(sliderRect.adjusted(PBMarkerMarginLeft, PBColorMarginTop, -PBMarkerMarginRight,
+										-PBColorMarginBottom));
 
 	int val, maxValuePlusStep = maximum() + singleStep();
 	int colorWidth = colorRect.width(), colorHeight = colorRect.height();
@@ -266,58 +343,57 @@ void FlipSlider::paintEvent(QPaintEvent *ev)
 	p.setPen(Qt::NoPen);
 	int currPos = PBColorMarginLeft, nextPos;
 
-	//paint the base of slider
+	// paint the base of slider
 	if (m_enabled && m_progressBarStatus && !m_progressBarStatus->empty()) {
 		unsigned int i, pbStatusSize = m_progressBarStatus->size();
-		for (i = 0, val = minimum() + singleStep();
-			 i < pbStatusSize;
-			 ++i, val += singleStep()) {
-			nextPos = sliderPositionFromValue(minimum(), maxValuePlusStep, val, colorWidth) + PBMarkerMarginLeft;
+		for (i = 0, val = minimum() + singleStep(); i < pbStatusSize; ++i, val += singleStep()) {
+			nextPos = sliderPositionFromValue(minimum(), maxValuePlusStep, val, colorWidth) +
+					  PBMarkerMarginLeft;
 			if (i == pbStatusSize - 1)
 				nextPos += PBMarkerMarginRight;
 			p.fillRect(currPos, PBColorMarginTop, nextPos - currPos, colorHeight,
-					   ((*m_progressBarStatus)[i] == PBFrameStarted) ? PBStartedColor : ((*m_progressBarStatus)[i] == PBFrameFinished) ? PBFinishedColor : PBNotStartedColor);
+					   ((*m_progressBarStatus)[i] == PBFrameStarted)
+						   ? PBStartedColor
+						   : ((*m_progressBarStatus)[i] == PBFrameFinished) ? PBFinishedColor
+																			: PBNotStartedColor);
 			currPos = nextPos;
 		}
 
-		//Draw frames outside the pb
+		// Draw frames outside the pb
 		if (val < maximum())
-			p.fillRect(currPos, PBColorMarginTop, width() - PBColorMarginRight - currPos, colorHeight, PBNotStartedColor);
+			p.fillRect(currPos, PBColorMarginTop, width() - PBColorMarginRight - currPos,
+					   colorHeight, PBNotStartedColor);
 	} else
-		p.fillRect(PBColorMarginLeft, PBColorMarginTop, sliderRect.width() - PBColorMarginLeft - PBColorMarginRight, colorHeight, PBBaseColor);
+		p.fillRect(PBColorMarginLeft, PBColorMarginTop,
+				   sliderRect.width() - PBColorMarginLeft - PBColorMarginRight, colorHeight,
+				   PBBaseColor);
 
-	//Draw the PB Overlay
+	// Draw the PB Overlay
 	int overlayInnerWidth = PBOverlay.width() - PBColorMarginLeft - PBColorMarginRight;
 	int markerInnerWidth = PBMarker.width() - PBMarkerMarginLeft - PBMarkerMarginRight;
 
+	p.drawImage(QRect(0, 0, PBColorMarginLeft, height()), PBOverlay,
+				QRect(0, 0, PBColorMarginLeft, PBOverlay.height()));
+	p.drawImage(QRect(PBColorMarginLeft, 0,
+					  sliderRect.width() - PBColorMarginLeft - PBColorMarginRight, height()),
+				PBOverlay, QRect(PBColorMarginLeft, 0, overlayInnerWidth, PBOverlay.height()));
 	p.drawImage(
-		QRect(0, 0, PBColorMarginLeft, height()),
-		PBOverlay,
-		QRect(0, 0, PBColorMarginLeft, PBOverlay.height()));
-	p.drawImage(
-		QRect(PBColorMarginLeft, 0, sliderRect.width() - PBColorMarginLeft - PBColorMarginRight, height()),
-		PBOverlay,
-		QRect(PBColorMarginLeft, 0, overlayInnerWidth, PBOverlay.height()));
-	p.drawImage(
-		QRect(width() - PBColorMarginRight, 0, PBColorMarginRight, height()),
-		PBOverlay,
+		QRect(width() - PBColorMarginRight, 0, PBColorMarginRight, height()), PBOverlay,
 		QRect(PBOverlay.width() - PBColorMarginRight, 0, PBColorMarginRight, PBOverlay.height()));
 
-	//Draw the position marker
-	currPos = sliderPositionFromValue(minimum(), maxValuePlusStep, value(), colorWidth) + PBMarkerMarginLeft;
-	nextPos = sliderPositionFromValue(minimum(), maxValuePlusStep, value() + singleStep(), colorWidth) + PBMarkerMarginLeft;
+	// Draw the position marker
+	currPos = sliderPositionFromValue(minimum(), maxValuePlusStep, value(), colorWidth) +
+			  PBMarkerMarginLeft;
+	nextPos =
+		sliderPositionFromValue(minimum(), maxValuePlusStep, value() + singleStep(), colorWidth) +
+		PBMarkerMarginLeft;
 
+	p.drawImage(QRect(currPos - PBMarkerMarginLeft, 0, PBMarkerMarginLeft, height()), PBMarker,
+				QRect(0, 0, PBMarkerMarginLeft, PBMarker.height()));
+	p.drawImage(QRect(currPos, 0, nextPos - currPos, height()), PBMarker,
+				QRect(PBMarkerMarginLeft, 0, markerInnerWidth, PBMarker.height()));
 	p.drawImage(
-		QRect(currPos - PBMarkerMarginLeft, 0, PBMarkerMarginLeft, height()),
-		PBMarker,
-		QRect(0, 0, PBMarkerMarginLeft, PBMarker.height()));
-	p.drawImage(
-		QRect(currPos, 0, nextPos - currPos, height()),
-		PBMarker,
-		QRect(PBMarkerMarginLeft, 0, markerInnerWidth, PBMarker.height()));
-	p.drawImage(
-		QRect(nextPos, 0, PBMarkerMarginRight, height()),
-		PBMarker,
+		QRect(nextPos, 0, PBMarkerMarginRight, height()), PBMarker,
 		QRect(PBMarker.width() - PBMarkerMarginRight, 0, PBMarkerMarginRight, PBMarker.height()));
 }
 
@@ -347,7 +423,7 @@ inline int FlipSlider::pageStepVal(int val)
 
 //-----------------------------------------------------------------------------
 
-//Mouse Press behaviour:
+// Mouse Press behaviour:
 //  a) If middle button, just put frame to cursor position
 //  b) If left button, and cursor on current frame pos, do like (a)
 //  c) If left button, and cursor NOT on curr.. perform a page up/down on
@@ -355,12 +431,13 @@ inline int FlipSlider::pageStepVal(int val)
 void FlipSlider::mousePressEvent(QMouseEvent *me)
 {
 	emit flipSliderPressed();
-	int cursorValue = sliderValueFromPosition(minimum(), maximum(), singleStep(), me->pos().x(), width());
+	int cursorValue =
+		sliderValueFromPosition(minimum(), maximum(), singleStep(), me->pos().x(), width());
 	if (me->button() == Qt::MidButton)
 		if (cursorValue == value())
 			setSliderDown(true);
 		else {
-			//Move the page step
+			// Move the page step
 			setValue(pageStepVal(cursorValue));
 		}
 
@@ -373,7 +450,8 @@ void FlipSlider::mousePressEvent(QMouseEvent *me)
 void FlipSlider::mouseMoveEvent(QMouseEvent *me)
 {
 	if (isSliderDown() || me->buttons() & Qt::LeftButton) {
-		int cursorValue = sliderValueFromPosition(minimum(), maximum(), singleStep(), me->pos().x(), width());
+		int cursorValue =
+			sliderValueFromPosition(minimum(), maximum(), singleStep(), me->pos().x(), width());
 		setValue(cursorValue);
 	}
 }
@@ -404,14 +482,20 @@ enum {
 	eShowHowMany = 0x1000
 };
 
-FlipConsole::FlipConsole(QVBoxLayout *mainLayout,
-						 UINT gadgetsMask,
-						 bool isLinkable,
-						 QWidget *customWidget,
-						 const QString &customizeId,
-						 FlipConsoleOwner *consoleOwner,
-						 bool enableBlanks)
-	: m_gadgetsMask(gadgetsMask), m_from(1), m_to(1), m_step(1), m_currentFrame(1), m_framesCount(1), m_settings(), m_fps(24), m_isPlay(false), m_reverse(false), m_doubleRed(0), m_doubleGreen(0), m_doubleBlue(0), m_doubleRedAction(0), m_doubleGreenAction(0), m_doubleBlueAction(0), m_fpsSlider(0), m_markerFrom(0), m_markerTo(-1), m_playbackExecutor(), m_drawBlanksEnabled(enableBlanks), m_blanksCount(0), m_blankColor(TPixel::Transparent), m_blanksToDraw(0), m_isLinkable(isLinkable), m_customAction(0), m_customizeMask(eShowHowMany - 1), m_fpsLabelAction(0), m_fpsSliderAction(0), m_fpsFieldAction(0), m_fpsField(0), m_customizeId(customizeId), m_histoSep(0), m_filledRasterSep(0), m_bgSep(0), m_vcrSep(0), m_compareSep(0), m_saveSep(0), m_colorFilterSep(0), m_subcamSep(0), m_playToolBar(0), m_colorFilterGroup(0), m_fpsLabel(0), m_consoleOwner(consoleOwner), m_enableBlankFrameButton(0)
+FlipConsole::FlipConsole(QVBoxLayout *mainLayout, UINT gadgetsMask, bool isLinkable,
+						 QWidget *customWidget, const QString &customizeId,
+						 FlipConsoleOwner *consoleOwner, bool enableBlanks)
+	: m_gadgetsMask(gadgetsMask), m_from(1), m_to(1), m_step(1), m_currentFrame(1),
+	  m_framesCount(1), m_settings(), m_fps(24), m_isPlay(false), m_reverse(false), m_doubleRed(0),
+	  m_doubleGreen(0), m_doubleBlue(0), m_doubleRedAction(0), m_doubleGreenAction(0),
+	  m_doubleBlueAction(0), m_fpsSlider(0), m_markerFrom(0), m_markerTo(-1), m_playbackExecutor(),
+	  m_drawBlanksEnabled(enableBlanks), m_blanksCount(0), m_blankColor(TPixel::Transparent),
+	  m_blanksToDraw(0), m_isLinkable(isLinkable), m_customAction(0),
+	  m_customizeMask(eShowHowMany - 1), m_fpsLabelAction(0), m_fpsSliderAction(0),
+	  m_fpsFieldAction(0), m_fpsField(0), m_customizeId(customizeId), m_histoSep(0),
+	  m_filledRasterSep(0), m_bgSep(0), m_vcrSep(0), m_compareSep(0), m_saveSep(0),
+	  m_colorFilterSep(0), m_subcamSep(0), m_playToolBar(0), m_colorFilterGroup(0), m_fpsLabel(0),
+	  m_consoleOwner(consoleOwner), m_enableBlankFrameButton(0)
 {
 	QString s = QSettings().value(m_customizeId).toString();
 	if (s != "")
@@ -420,10 +504,10 @@ FlipConsole::FlipConsole(QVBoxLayout *mainLayout,
 	if (m_gadgetsMask == 0)
 		return;
 
-	//mainLayout->setMargin(1);
-	//mainLayout->setSpacing(0);
+	// mainLayout->setMargin(1);
+	// mainLayout->setSpacing(0);
 
-	//create toolbars other than frame slider
+	// create toolbars other than frame slider
 	if (m_gadgetsMask & (~eFrames)) {
 		createPlayToolBar(customWidget != 0);
 
@@ -438,7 +522,7 @@ FlipConsole::FlipConsole(QVBoxLayout *mainLayout,
 			scrollableContainer->setWidget(m_playToolBar);
 			hLayout->addWidget(scrollableContainer);
 
-			//show fps
+			// show fps
 			if (m_gadgetsMask & eRate) {
 				QFrame *fpsSliderFrame = createFpsSlider();
 				hLayout->addWidget(fpsSliderFrame, 1);
@@ -462,11 +546,12 @@ FlipConsole::FlipConsole(QVBoxLayout *mainLayout,
 
 	applyCustomizeMask();
 
-	bool ret = connect(&m_playbackExecutor, SIGNAL(nextFrame(int)), this, SLOT(onNextFrame(int)), Qt::BlockingQueuedConnection);
+	bool ret = connect(&m_playbackExecutor, SIGNAL(nextFrame(int)), this, SLOT(onNextFrame(int)),
+					   Qt::BlockingQueuedConnection);
 
 	assert(ret);
 
-	//parent->setLayout(mainLayout);
+	// parent->setLayout(mainLayout);
 }
 
 //-----------------------------------------------------------------------------
@@ -524,9 +609,11 @@ class DoubleButton : public QToolButton
 	QIcon::State m_firstState, m_secondState;
 	bool m_enabled;
 
-public:
+  public:
 	DoubleButton(QAction *firstAction, QAction *secondAction, QWidget *parent = 0)
-		: QToolButton(parent), m_firstAction(firstAction), m_secondAction(secondAction), m_firstMode(QIcon::Normal), m_secondMode(QIcon::Normal), m_firstState(QIcon::Off), m_secondState(QIcon::Off), m_enabled(true)
+		: QToolButton(parent), m_firstAction(firstAction), m_secondAction(secondAction),
+		  m_firstMode(QIcon::Normal), m_secondMode(QIcon::Normal), m_firstState(QIcon::Off),
+		  m_secondState(QIcon::Off), m_enabled(true)
 	{
 		setFixedSize(LX, LY);
 		setMouseTracking(true);
@@ -539,16 +626,20 @@ public:
 		update();
 	}
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *e)
 	{
 		QPainter p(this);
 
-		p.drawPixmap(0, 0, m_firstAction->icon().pixmap(QSize(LX, LY / 2), m_firstAction->isChecked() ? QIcon::Normal : m_firstMode,
-														m_firstAction->isChecked() ? QIcon::On : m_firstState));
+		p.drawPixmap(0, 0, m_firstAction->icon().pixmap(
+							   QSize(LX, LY / 2),
+							   m_firstAction->isChecked() ? QIcon::Normal : m_firstMode,
+							   m_firstAction->isChecked() ? QIcon::On : m_firstState));
 
-		QIcon::Mode mode = m_enabled ? (m_secondAction->isChecked() ? QIcon::Normal : m_secondMode) : QIcon::Disabled;
-		QIcon::State state = m_enabled ? (m_secondAction->isChecked() ? QIcon::On : m_secondState) : QIcon::Off;
+		QIcon::Mode mode = m_enabled ? (m_secondAction->isChecked() ? QIcon::Normal : m_secondMode)
+									 : QIcon::Disabled;
+		QIcon::State state =
+			m_enabled ? (m_secondAction->isChecked() ? QIcon::On : m_secondState) : QIcon::Off;
 
 		p.drawPixmap(0, LY / 2 + 1, m_secondAction->icon().pixmap(QSize(LX, LY / 2), mode, state));
 	}
@@ -606,7 +697,7 @@ protected:
 
 void FlipConsole::enableButton(UINT button, bool enable, bool doShowHide)
 {
-#if defined(MACOSX) //on mac, the sound playback in flip is broken..
+#if defined(MACOSX) // on mac, the sound playback in flip is broken..
 	if (button == eSound)
 		enable = false;
 #endif
@@ -639,15 +730,13 @@ void FlipConsole::enableButton(UINT button, bool enable, bool doShowHide)
 			return;
 		}
 
-	//double buttons are special, they are not accessible directly from the playtoolbar...
+	// double buttons are special, they are not accessible directly from the playtoolbar...
 	switch ((EGadget)button) {
 	case eGRed:
 		if (m_doubleRed)
 			m_doubleRed->setEnabledSecondButton(enable);
-		CASE eGGreen : if (m_doubleGreen)
-						   m_doubleGreen->setEnabledSecondButton(enable);
-		CASE eGBlue : if (m_doubleBlue)
-						  m_doubleBlue->setEnabledSecondButton(enable);
+		CASE eGGreen : if (m_doubleGreen) m_doubleGreen->setEnabledSecondButton(enable);
+		CASE eGBlue : if (m_doubleBlue) m_doubleBlue->setEnabledSecondButton(enable);
 		break;
 	}
 }
@@ -669,7 +758,7 @@ void FlipConsole::toggleLinked()
 	if (i == m_visibleConsoles.size())
 		return;
 
-	//if we are here, flip is playing!
+	// if we are here, flip is playing!
 	m_isLinkedPlaying = m_areLinked;
 	int button = m_areLinked ? (playingConsole->m_isPlay ? ePlay : eLoop) : ePause;
 
@@ -689,13 +778,14 @@ bool FlipConsole::drawBlanks(int from, int to)
 	if (m_blanksCount == 0 || m_isPlay || m_framesCount <= 1)
 		return false;
 
-	//enable blanks only when the blank button is pressed
+	// enable blanks only when the blank button is pressed
 	if (m_enableBlankFrameButton && !m_enableBlankFrameButton->isChecked())
 		return false;
 
 	if (m_blanksToDraw > 1 ||
 		(m_blanksToDraw == 0 &&
-		 ((m_reverse && m_currentFrame - m_step < from) || (!m_reverse && m_currentFrame + m_step > to)))) //we are on the last frame of the loop
+		 ((m_reverse && m_currentFrame - m_step < from) ||
+		  (!m_reverse && m_currentFrame + m_step > to)))) // we are on the last frame of the loop
 	{
 		m_blanksToDraw = (m_blanksToDraw == 0 ? m_blanksCount : m_blanksToDraw - 1);
 		m_settings.m_blankColor = m_blankColor;
@@ -713,7 +803,8 @@ bool FlipConsole::drawBlanks(int from, int to)
 
 void FlipConsole::onNextFrame(int fps)
 {
-	if (fps < 0) //can be negative only if is a linked console; it means that the master console is playing backward
+	if (fps < 0) // can be negative only if is a linked console; it means that the master console is
+				 // playing backward
 	{
 		bool reverse = m_reverse;
 		m_reverse = true;
@@ -819,7 +910,8 @@ void FlipConsole::setCurrentFPS(int val)
 
 //-----------------------------------------------------------------------------
 
-void FlipConsole::createButton(UINT buttonMask, const char *iconStr, const QString &tip, bool checkable, QActionGroup *group)
+void FlipConsole::createButton(UINT buttonMask, const char *iconStr, const QString &tip,
+							   bool checkable, QActionGroup *group)
 {
 	QIcon icon = createQIconPNG(iconStr);
 	QAction *action = new QAction(icon, tip, m_playToolBar);
@@ -833,7 +925,9 @@ void FlipConsole::createButton(UINT buttonMask, const char *iconStr, const QStri
 
 //-----------------------------------------------------------------------------
 
-QAction *FlipConsole::createCheckedButtonWithBorderImage(UINT buttonMask, const char *iconStr, const QString &tip, bool checkable, QActionGroup *group, const char *cmdId)
+QAction *FlipConsole::createCheckedButtonWithBorderImage(UINT buttonMask, const char *iconStr,
+														 const QString &tip, bool checkable,
+														 QActionGroup *group, const char *cmdId)
 {
 	QIcon icon = createQIconPNG(iconStr);
 	QWidgetAction *action = new QWidgetAction(m_playToolBar);
@@ -857,17 +951,17 @@ QAction *FlipConsole::createCheckedButtonWithBorderImage(UINT buttonMask, const 
 	action->setDefaultWidget(button);
 	button->setObjectName("chackableButtonWithImageBorder");
 	connect(button, SIGNAL(triggered(QAction *)), this, SLOT(onButtonPressed(QAction *)));
-	//connect(action, SIGNAL(toggled(bool)), button, SLOT(setChecked(bool)));
+	// connect(action, SIGNAL(toggled(bool)), button, SLOT(setChecked(bool)));
 	m_playToolBar->addAction(action);
 	return action;
 }
 
 //-----------------------------------------------------------------------------
 
-QAction *FlipConsole::createDoubleButton(UINT buttonMask1, UINT buttonMask2,
-										 const char *iconStr1, const char *iconStr2,
-										 const QString &tip1, const QString &tip2,
-										 QActionGroup *group, DoubleButton *&widget)
+QAction *FlipConsole::createDoubleButton(UINT buttonMask1, UINT buttonMask2, const char *iconStr1,
+										 const char *iconStr2, const QString &tip1,
+										 const QString &tip2, QActionGroup *group,
+										 DoubleButton *&widget)
 {
 	QAction *action1 = new QAction(createQIconPNG(iconStr1), tip1, m_playToolBar);
 	QAction *action2 = new QAction(createQIconPNG(iconStr2), tip2, m_playToolBar);
@@ -887,13 +981,14 @@ QAction *FlipConsole::createDoubleButton(UINT buttonMask1, UINT buttonMask2,
 	widget = new DoubleButton(action1, action2, this);
 	return m_playToolBar->addWidget(widget);
 
-	//m_playToolBar->addAction(action1);
-	//m_playToolBar->addAction(action2);
+	// m_playToolBar->addAction(action1);
+	// m_playToolBar->addAction(action2);
 }
 
 //-----------------------------------------------------------------------------
 
-void FlipConsole::createOnOffButton(UINT buttonMask, const char *iconStr, const QString &tip, QActionGroup *group)
+void FlipConsole::createOnOffButton(UINT buttonMask, const char *iconStr, const QString &tip,
+									QActionGroup *group)
 {
 	QIcon icon = createQIconOnOffPNG(iconStr);
 	QAction *action = new QAction(icon, tip, m_playToolBar);
@@ -935,7 +1030,7 @@ void FlipConsole::onCustomizeButtonPressed(QAction *a)
 void FlipConsole::applyCustomizeMask()
 {
 	enableButton(eSave, m_customizeMask & eShowSave);
-	//if(m_saveSep)
+	// if(m_saveSep)
 	//  m_saveSep->setVisible(m_customizeMask&eShowSave);
 
 	enableButton(eSaveImg, m_customizeMask & eShowCompare);
@@ -947,10 +1042,9 @@ void FlipConsole::applyCustomizeMask()
 	enableButton(eDefineLoadBox, m_customizeMask & eShowDefineLoadBox);
 	enableButton(eUseLoadBox, m_customizeMask & eShowUseLoadBox);
 	if (m_subcamSep)
-		m_subcamSep->setVisible(
-			m_customizeMask & eShowDefineSubCamera ||
-			m_customizeMask & eShowDefineLoadBox ||
-			m_customizeMask & eShowUseLoadBox);
+		m_subcamSep->setVisible(m_customizeMask & eShowDefineSubCamera ||
+								m_customizeMask & eShowDefineLoadBox ||
+								m_customizeMask & eShowUseLoadBox);
 
 	enableButton(eWhiteBg, m_customizeMask & eShowBg);
 	enableButton(eBlackBg, m_customizeMask & eShowBg);
@@ -1021,7 +1115,9 @@ void FlipConsole::createCustomizeMenu(bool withCustomWidget)
 		button->setIcon(icon);
 		button->setPopupMode(QToolButton::MenuButtonPopup);
 		button->setObjectName("flipCustomize");
-		button->setStyleSheet("#flipCustomize { background-color: transparent; } #flipCustomize::menu-button { background-color: transparent; image: none; width: 34px; } #flipCustomize::menu-arrow { image: none; }");
+		button->setStyleSheet("#flipCustomize { background-color: transparent; } "
+							  "#flipCustomize::menu-button { background-color: transparent; image: "
+							  "none; width: 34px; } #flipCustomize::menu-arrow { image: none; }");
 
 		QMenu *menu = new QMenu();
 		button->setMenu(menu);
@@ -1049,8 +1145,8 @@ void FlipConsole::createCustomizeMenu(bool withCustomWidget)
 
 		addMenuItem(eShowVcr, tr("Playback Controls"), menu);
 
-		if ((m_gadgetsMask & eRed) || (m_gadgetsMask & eGreen) ||
-			(m_gadgetsMask & eBlue) || (m_gadgetsMask & eMatte))
+		if ((m_gadgetsMask & eRed) || (m_gadgetsMask & eGreen) || (m_gadgetsMask & eBlue) ||
+			(m_gadgetsMask & eMatte))
 			addMenuItem(eShowcolorFilter, tr("Color Channels"), menu);
 
 		if (withCustomWidget)
@@ -1062,7 +1158,8 @@ void FlipConsole::createCustomizeMenu(bool withCustomWidget)
 		if (m_gadgetsMask & eFilledRaster)
 			addMenuItem(eFilledRaster, tr("Display Areas as Filled"), menu);
 
-		bool ret = connect(menu, SIGNAL(triggered(QAction *)), this, SLOT(onCustomizeButtonPressed(QAction *)));
+		bool ret = connect(menu, SIGNAL(triggered(QAction *)), this,
+						   SLOT(onCustomizeButtonPressed(QAction *)));
 		assert(ret);
 	}
 }
@@ -1078,14 +1175,14 @@ void FlipConsole::createPlayToolBar(bool withCustomWidget)
 	m_playToolBar->setObjectName("FlipConsolePlayToolBar");
 	//	m_playToolBar->setObjectName("chackableButtonToolBar");
 
-	//m_playToolBar->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
+	// m_playToolBar->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
 
 	createCustomizeMenu(withCustomWidget);
 
 	if (m_gadgetsMask & eSave) {
-		//just reuse the icon file named "savepalette"
+		// just reuse the icon file named "savepalette"
 		createButton(eSave, "savepalette", tr("&Save Images"), false);
-		//m_saveSep = m_playToolBar->addSeparator();
+		// m_saveSep = m_playToolBar->addSeparator();
 	}
 
 	// snapshot
@@ -1136,11 +1233,14 @@ void FlipConsole::createPlayToolBar(bool withCustomWidget)
 	if (m_gadgetsMask & ePrev)
 		createButton(ePrev, "frameprev", tr("&Previous Frame"), false);
 	if (m_gadgetsMask & ePause)
-		createCheckedButtonWithBorderImage(ePause, "pause", tr("Pause"), true, playGroup, "A_Flip_Pause");
+		createCheckedButtonWithBorderImage(ePause, "pause", tr("Pause"), true, playGroup,
+										   "A_Flip_Pause");
 	if (m_gadgetsMask & ePlay)
-		createCheckedButtonWithBorderImage(ePlay, "play", tr("Play"), true, playGroup, "A_Flip_Play");
+		createCheckedButtonWithBorderImage(ePlay, "play", tr("Play"), true, playGroup,
+										   "A_Flip_Play");
 	if (m_gadgetsMask & eLoop)
-		createCheckedButtonWithBorderImage(eLoop, "loop", tr("Loop"), true, playGroup, "A_Flip_Loop");
+		createCheckedButtonWithBorderImage(eLoop, "loop", tr("Loop"), true, playGroup,
+										   "A_Flip_Loop");
 
 	if (m_gadgetsMask & eNext)
 		createButton(eNext, "framenext", tr("&Next frame"), false);
@@ -1151,25 +1251,32 @@ void FlipConsole::createPlayToolBar(bool withCustomWidget)
 	if (m_gadgetsMask & ePlay)
 		m_vcrSep = m_playToolBar->addSeparator();
 
-	//Channel Selector
+	// Channel Selector
 	m_colorFilterGroup = new QActionGroup(m_playToolBar);
 	m_colorFilterGroup->setExclusive(false);
 	if ((m_gadgetsMask & eRed) && !(m_gadgetsMask & eGRed))
 		createButton(eRed, "channelred", tr("Red Channel"), true);
 	else if ((m_gadgetsMask & eRed) && (m_gadgetsMask & eGRed))
-		m_doubleRedAction = createDoubleButton(eRed, eGRed, "half_R", "half_bw", tr("Red Channel"), tr("Red Channel in Grayscale"), m_colorFilterGroup, m_doubleRed);
+		m_doubleRedAction =
+			createDoubleButton(eRed, eGRed, "half_R", "half_bw", tr("Red Channel"),
+							   tr("Red Channel in Grayscale"), m_colorFilterGroup, m_doubleRed);
 
 	if ((m_gadgetsMask & eGreen) && !(m_gadgetsMask & eGGreen))
 		createButton(eGreen, "channelgreen", tr("Green Channel"), true);
 	else if ((m_gadgetsMask & eGreen) && (m_gadgetsMask & eGGreen))
-		m_doubleGreenAction = createDoubleButton(eGreen, eGGreen, "half_G", "half_bw", tr("Green Channel"), tr("Green Channel in Grayscale"), m_colorFilterGroup, m_doubleGreen);
+		m_doubleGreenAction =
+			createDoubleButton(eGreen, eGGreen, "half_G", "half_bw", tr("Green Channel"),
+							   tr("Green Channel in Grayscale"), m_colorFilterGroup, m_doubleGreen);
 
 	if ((m_gadgetsMask & eBlue) && !(m_gadgetsMask & eGBlue))
 		createButton(eBlue, "channelblue", tr("Blue Channel"), true);
 	else if ((m_gadgetsMask & eBlue) && (m_gadgetsMask & eGBlue))
-		m_doubleBlueAction = createDoubleButton(eBlue, eGBlue, "half_B", "half_bw", tr("Blue Channel"), tr("Blue Channel in Grayscale"), m_colorFilterGroup, m_doubleBlue);
+		m_doubleBlueAction =
+			createDoubleButton(eBlue, eGBlue, "half_B", "half_bw", tr("Blue Channel"),
+							   tr("Blue Channel in Grayscale"), m_colorFilterGroup, m_doubleBlue);
 
-	ret = ret && connect(m_colorFilterGroup, SIGNAL(triggered(QAction *)), this, SLOT(onButtonPressed(QAction *)));
+	ret = ret && connect(m_colorFilterGroup, SIGNAL(triggered(QAction *)), this,
+						 SLOT(onButtonPressed(QAction *)));
 
 	if (m_gadgetsMask & eMatte)
 		createButton(eMatte, "channelmatte", tr("Alpha Channel"), true);
@@ -1195,8 +1302,9 @@ void FlipConsole::createPlayToolBar(bool withCustomWidget)
 		m_filledRasterSep = m_playToolBar->addSeparator();
 	}
 
-	//for all actions in this toolbar
-	ret = ret && connect(m_playToolBar, SIGNAL(actionTriggered(QAction *)), this, SLOT(onButtonPressed(QAction *)));
+	// for all actions in this toolbar
+	ret = ret && connect(m_playToolBar, SIGNAL(actionTriggered(QAction *)), this,
+						 SLOT(onButtonPressed(QAction *)));
 
 	setChecked(ePause, true);
 	setChecked(eWhiteBg, FlipBookWhiteBgToggle);
@@ -1315,7 +1423,7 @@ void FlipConsole::onButtonPressed(int button)
 void FlipConsole::pressButton(EGadget buttonId)
 {
 	if (m_buttons.contains(buttonId)) {
-		//If you press "play" or "loop play" button while playing, which means "pause"
+		// If you press "play" or "loop play" button while playing, which means "pause"
 		if (m_playbackExecutor.isRunning() && (buttonId == ePlay || buttonId == eLoop)) {
 			m_buttons[ePause]->click();
 			return;
@@ -1376,13 +1484,14 @@ void FlipConsole::doButtonPressed(UINT button)
 	switch (button) {
 	case eFirst:
 		m_currentFrame = from;
-		CASE ePrev : m_currentFrame = (m_currentFrame - m_step < from) ? from : m_currentFrame - m_step;
+		CASE ePrev : m_currentFrame =
+						 (m_currentFrame - m_step < from) ? from : m_currentFrame - m_step;
 		CASE eNext : m_currentFrame = (m_currentFrame + m_step > to) ? to : m_currentFrame + m_step;
 		CASE eLast : m_currentFrame = to;
 		CASE ePlay : __OR eLoop:
 		{
-			//if (	  isChecked(ePlay,   false);
-			//setChecked(eLoop,   false);
+			// if (	  isChecked(ePlay,   false);
+			// setChecked(eLoop,   false);
 			m_editCurrFrame->disconnect();
 			m_currFrameSlider->disconnect();
 
@@ -1412,8 +1521,10 @@ void FlipConsole::doButtonPressed(UINT button)
 			m_reverse = (m_fps < 0);
 
 			if (!linked) {
-				//if the play button pressed at the end frame, then go back to the start frame and play
-				if (m_currentFrame <= from || m_currentFrame >= to) //the first frame of the playback is drawn right now
+				// if the play button pressed at the end frame, then go back to the start frame and
+				// play
+				if (m_currentFrame <= from ||
+					m_currentFrame >= to) // the first frame of the playback is drawn right now
 					m_currentFrame = m_reverse ? to : from;
 				m_settings.m_recomputeIfNeeded = true;
 				m_consoleOwner->onDrawFrame(m_currentFrame, m_settings);
@@ -1442,10 +1553,11 @@ void FlipConsole::doButtonPressed(UINT button)
 			m_fpsLabel->setText(tr(" FPS "));
 		if (m_fpsField)
 			m_fpsField->setLineEditBackgroundColor(Qt::transparent);
-		//setChecked(ePlay,   false);
-		//setChecked(eLoop,   false);
+		// setChecked(ePlay,   false);
+		// setChecked(eLoop,   false);
 		connect(m_editCurrFrame, SIGNAL(editingFinished()), this, SLOT(OnSetCurrentFrame()));
-		connect(m_currFrameSlider, SIGNAL(flipSliderReleased()), this, SLOT(OnFrameSliderRelease()));
+		connect(m_currFrameSlider, SIGNAL(flipSliderReleased()), this,
+				SLOT(OnFrameSliderRelease()));
 		connect(m_currFrameSlider, SIGNAL(flipSliderPressed()), this, SLOT(OnFrameSliderPress()));
 		connect(m_currFrameSlider, SIGNAL(valueChanged(int)), this, SLOT(OnSetCurrentFrame(int)));
 		connect(m_currFrameSlider, SIGNAL(flipSliderReleased()), this, SLOT(onSliderRelease()));
@@ -1464,15 +1576,16 @@ void FlipConsole::doButtonPressed(UINT button)
 			}
 		else
 			m_settings.m_colorMask = 0;
-			
+
 	if (m_doubleRed)
-    {
-    m_doubleRed->update();
+	{
+	m_doubleRed->update();
 	  m_doubleGreen->update();
 	  m_doubleBlue->update();
 	  }*/
 
-		CASE eGRed : __OR eGGreen : __OR eGBlue : __OR eRed : __OR eGreen : __OR eBlue : __OR eMatte:
+		CASE eGRed : __OR eGGreen : __OR eGBlue : __OR eRed : __OR eGreen : __OR eBlue : __OR eMatte
+																						 :
 		{
 
 			if (button != eGRed)
@@ -1514,17 +1627,17 @@ void FlipConsole::doButtonPressed(UINT button)
 				m_settings.m_colorMask = colorMask;
 		}
 		CASE eSound :
-			//emit soundEnabled(isChecked(eSound));
+			// emit soundEnabled(isChecked(eSound));
 			CASE eWhiteBg : __OR eBlackBg : __OR eCheckBg : m_settings.m_bg = (EGadget)button;
 		FlipBookWhiteBgToggle = isChecked(eWhiteBg);
 		FlipBookBlackBgToggle = isChecked(eBlackBg);
 		FlipBookCheckBgToggle = isChecked(eCheckBg);
 		CASE FlipConsole::eCompare : m_settings.m_doCompare = !m_settings.m_doCompare;
 		CASE eHisto : CASE eSaveImg : CASE eSave :
-									  //nothing to do
+									  // nothing to do
 									  return;
 		CASE eDefineSubCamera :
-			//nothing to do
+			// nothing to do
 			return;
 		CASE eDefineLoadBox : onLoadBox(true);
 		CASE eUseLoadBox : onLoadBox(false);
@@ -1565,7 +1678,7 @@ QFrame *FlipConsole::createFrameSlider()
 		m_enableBlankFrameButton->setObjectName("enableBlankFrameButton");
 	}
 
-	//layout
+	// layout
 	QHBoxLayout *frameSliderLayout = new QHBoxLayout();
 	frameSliderLayout->setSpacing(5);
 	frameSliderLayout->setMargin(2);
@@ -1577,12 +1690,9 @@ QFrame *FlipConsole::createFrameSlider()
 	}
 	frameSliderFrame->setLayout(frameSliderLayout);
 
-	connect(m_editCurrFrame, SIGNAL(editingFinished()),
-			this, SLOT(OnSetCurrentFrame()));
-	connect(m_currFrameSlider, SIGNAL(valueChanged(int)),
-			this, SLOT(OnSetCurrentFrame(int)));
-	connect(m_currFrameSlider, SIGNAL(flipSliderReleased()),
-			this, SLOT(OnFrameSliderRelease()));
+	connect(m_editCurrFrame, SIGNAL(editingFinished()), this, SLOT(OnSetCurrentFrame()));
+	connect(m_currFrameSlider, SIGNAL(valueChanged(int)), this, SLOT(OnSetCurrentFrame(int)));
+	connect(m_currFrameSlider, SIGNAL(flipSliderReleased()), this, SLOT(OnFrameSliderRelease()));
 
 	return frameSliderFrame;
 }
@@ -1592,7 +1702,7 @@ QFrame *FlipConsole::createFrameSlider()
 QFrame *FlipConsole::createFpsSlider()
 {
 	QFrame *fpsSliderFrame = new QFrame(this);
-	//frame per second
+	// frame per second
 	m_fpsLabel = new QLabel(QString(" FPS -- /"), fpsSliderFrame);
 	m_fpsSlider = new QScrollBar(Qt::Horizontal, fpsSliderFrame);
 	m_fpsField = new DVGui::IntLineEdit(fpsSliderFrame, m_fps, -60, 60);
@@ -1641,13 +1751,15 @@ void FlipConsole::setFrameRange(int from, int to, int step, int current)
 		m_to -= (m_to - m_from) % m_step;
 		m_framesCount = (m_to - m_from) / m_step + 1;
 		m_currFrameSlider->blockSignals(true);
-		//m_currFrameSlider->setRange(0, m_framesCount-1);
+		// m_currFrameSlider->setRange(0, m_framesCount-1);
 		m_currFrameSlider->setRange(m_from, m_to);
 		m_currFrameSlider->setSingleStep(m_step);
 		m_currFrameSlider->blockSignals(false);
 	}
 
-	if (m_playbackExecutor.isRunning() || m_isLinkedPlaying) //if in playing mode, the slider and the frame field are already set in the timer!
+	if (m_playbackExecutor.isRunning() || m_isLinkedPlaying) // if in playing mode, the slider and
+															 // the frame field are already set in
+															 // the timer!
 		return;
 
 	// limit the current frame in the range from-to
@@ -1768,7 +1880,9 @@ void FlipConsole::OnSetCurrentFrame(int index)
 void FlipConsole::setCurrentFrame(int frame, bool forceResetting)
 {
 	m_currentFrame = (frame == -1) ? m_from : frame;
-	if ((m_playbackExecutor.isRunning() || m_isLinkedPlaying) && !forceResetting) //if in playing mode, the slider and the frame field are already set in the timer!
+	if ((m_playbackExecutor.isRunning() || m_isLinkedPlaying) &&
+		!forceResetting) // if in playing mode, the slider and the frame field are already set in
+						 // the timer!
 		return;
 
 	m_editCurrFrame->setValue(m_currentFrame);
@@ -1816,9 +1930,8 @@ void FlipConsole::onPreferenceChanged()
 			//--- use white text for dark color and vice versa
 			QString textColor;
 			QString dimmedTextColor;
-			int val = (int)m_blankColor.r * 30 +
-					  (int)m_blankColor.g * 59 +
-					  (int)m_blankColor.b * 11;
+			int val =
+				(int)m_blankColor.r * 30 + (int)m_blankColor.g * 59 + (int)m_blankColor.b * 11;
 			if (val < 12800) {
 				textColor = QString("white");
 				dimmedTextColor = QString("rgb(200,200,200)");
@@ -1828,15 +1941,12 @@ void FlipConsole::onPreferenceChanged()
 			}
 
 			int dc = 150;
-			QColor lightBevel(tmin(m_blankColor.r + dc, 255),
-							  tmin(m_blankColor.g + dc, 255),
+			QColor lightBevel(tmin(m_blankColor.r + dc, 255), tmin(m_blankColor.g + dc, 255),
 							  tmin(m_blankColor.b + dc, 255));
-			QColor darkBevel(tmax(m_blankColor.r - dc, 0),
-							 tmax(m_blankColor.g - dc, 0),
+			QColor darkBevel(tmax(m_blankColor.r - dc, 0), tmax(m_blankColor.g - dc, 0),
 							 tmax(m_blankColor.b - dc, 0));
 
-			m_enableBlankFrameButton->setStyleSheet(
-				QString("#enableBlankFrameButton{ \
+			m_enableBlankFrameButton->setStyleSheet(QString("#enableBlankFrameButton{ \
 							background-color: transparent; \
 							padding: 2px;\
 							font-weight: bold; \
@@ -1859,17 +1969,17 @@ void FlipConsole::onPreferenceChanged()
 							border-right-color: rgb(%5,%6,%7); \
 							border-bottom-color: rgb(%5,%6,%7); \
 						} ")
-					.arg(m_blankColor.r)
-					.arg(m_blankColor.g)
-					.arg(m_blankColor.b)
-					.arg(textColor)
-					.arg(lightBevel.red())
-					.arg(lightBevel.green())
-					.arg(lightBevel.blue())
-					.arg(darkBevel.red())
-					.arg(darkBevel.green())
-					.arg(darkBevel.blue())
-					.arg(dimmedTextColor));
+														.arg(m_blankColor.r)
+														.arg(m_blankColor.g)
+														.arg(m_blankColor.b)
+														.arg(textColor)
+														.arg(lightBevel.red())
+														.arg(lightBevel.green())
+														.arg(lightBevel.blue())
+														.arg(darkBevel.red())
+														.arg(darkBevel.green())
+														.arg(darkBevel.blue())
+														.arg(dimmedTextColor));
 			m_enableBlankFrameButton->update();
 		}
 	}
@@ -1880,23 +1990,19 @@ void FlipConsole::onPreferenceChanged()
 class FlipConsoleActionsCreator : AuxActionsCreator
 {
 
-	void createToggleAction(
-		QObject *parent,
-		const char *cmdId,
-		const char *name,
-		int buttonId)
+	void createToggleAction(QObject *parent, const char *cmdId, const char *name, int buttonId)
 	{
 		QAction *action = new QAction(name, parent);
 		action->setData(QVariant(buttonId));
 		CommandManager::instance()->define(cmdId, MiscCommandType, "", action);
 	}
 
-public:
+  public:
 	void createActions(QObject *parent)
 	{
 		/*createToggleAction(parent, "A_Flip_Play",  "Play",  FlipConsole::ePlay);
-    createToggleAction(parent, "A_Flip_Pause", "Pause", FlipConsole::ePause);
-    createToggleAction(parent, "A_Flip_Loop",  "Loop",  FlipConsole::eLoop);*/
+	createToggleAction(parent, "A_Flip_Pause", "Pause", FlipConsole::ePause);
+	createToggleAction(parent, "A_Flip_Loop",  "Loop",  FlipConsole::eLoop);*/
 	}
 } flipConsoleActionsCreator;
 

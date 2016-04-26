@@ -30,7 +30,7 @@ using namespace TwConsts;
 
 class MyTabbedWindow : public TTabbedWindow
 {
-public:
+  public:
 	MyTabbedWindow(TWidget *parent) : TTabbedWindow(parent) {}
 
 	void leftButtonDown(const TMouseEvent &e)
@@ -51,9 +51,12 @@ public:
 
 class AppMainshell::Data
 {
-public:
+  public:
 	Data()
-		: m_tabbedWindow(0), m_menubar(0), m_updatePeriod(3000), m_retryCount(0), m_retryPeriod(15000) {}
+		: m_tabbedWindow(0), m_menubar(0), m_updatePeriod(3000), m_retryCount(0),
+		  m_retryPeriod(15000)
+	{
+	}
 
 	MyTabbedWindow *m_tabbedWindow;
 	TMenubar *m_menubar;
@@ -85,22 +88,20 @@ const int menuBarLy = 21;
 
 AppMainshell::AppMainshell() : TMainshell("mainshell")
 {
-	m_name = "TFarmClient, v1.0 alfa - " +
-			 TSystem::getUserName() + "@" + TSystem::getHostName();
+	m_name = "TFarmClient, v1.0 alfa - " + TSystem::getUserName() + "@" + TSystem::getHostName();
 
 	m_data = new Data;
 	m_data->m_tabbedWindow = new MyTabbedWindow(this);
 	m_data->m_tabbedWindow->addPanel(new TaskStatusPage(m_data->m_tabbedWindow));
 	m_data->m_tabbedWindow->addPanel(new ServerStatusPage(m_data->m_tabbedWindow));
-	//m_data->m_tabbedWindow->addPanel(new CasmSubmitPage(m_data->m_tabbedWindow));
+	// m_data->m_tabbedWindow->addPanel(new CasmSubmitPage(m_data->m_tabbedWindow));
 	m_data->m_tabbedWindow->addPanel(new SubmitPage(m_data->m_tabbedWindow));
 
 	m_data->m_menubar = new TMenubar(this);
 
 	TMenubarItem *menu = new TMenubarItem(m_data->m_menubar, "File");
 	menu->addItem("Quit");
-	TGuiCommand("Quit").setAction(
-		new TCommandAction<AppMainshell>(this, close));
+	TGuiCommand("Quit").setAction(new TCommandAction<AppMainshell>(this, close));
 
 	/*
   menu = new TMenubarItem(m_data->m_menubar, "Tasks");

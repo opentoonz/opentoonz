@@ -39,54 +39,43 @@ class DvDirTreeView : public QTreeView, public TSelection
 {
 	Q_OBJECT
 
-	QColor m_textColor;				  //text color (black)
-	QColor m_selectedTextColor;		  //selected item text color (white)
-	QColor m_folderTextColor;		  //folder item text color (blue)
-	QColor m_selectedFolderTextColor; //selected folder item text color (yellow)
-	QColor m_selectedItemBackground;  //selected item background color (0,0,128)
+	QColor m_textColor; // text color (black)
+	QColor m_selectedTextColor; // selected item text color (white)
+	QColor m_folderTextColor; // folder item text color (blue)
+	QColor m_selectedFolderTextColor; // selected folder item text color (yellow)
+	QColor m_selectedItemBackground; // selected item background color (0,0,128)
 
 	Q_PROPERTY(QColor TextColor READ getTextColor WRITE setTextColor)
 	Q_PROPERTY(QColor SelectedTextColor READ getSelectedTextColor WRITE setSelectedTextColor)
 	Q_PROPERTY(QColor FolderTextColor READ getFolderTextColor WRITE setFolderTextColor)
-	Q_PROPERTY(QColor SelectedFolderTextColor READ getSelectedFolderTextColor WRITE setSelectedFolderTextColor)
-	Q_PROPERTY(QColor SelectedItemBackground READ getSelectedItemBackground WRITE setSelectedItemBackground)
+	Q_PROPERTY(QColor SelectedFolderTextColor READ getSelectedFolderTextColor WRITE
+				   setSelectedFolderTextColor)
+	Q_PROPERTY(QColor SelectedItemBackground READ getSelectedItemBackground WRITE
+				   setSelectedItemBackground)
 
-public:
+  public:
 	DvDirTreeView(QWidget *parent = 0);
 
 	TFilePath getCurrentPath() const; //!< Returns the path of currently selected file or folder,
 									  //!  or an empty one in case it couldn't be extracted.
 	DvDirModelNode *getCurrentNode() const;
-	DvDirModelNode *getCurrentDropNode() const
-	{
-		return m_currentDropItem;
-	}
+	DvDirModelNode *getCurrentDropNode() const { return m_currentDropItem; }
 
 	// From TSelection
 	bool isEmpty() const { return false; }
 	void selectNone() {}
 	void enableCommands();
 
-	void enableGlobalSelection(bool enabled)
-	{
-		m_globalSelectionEnabled = enabled;
-	}
+	void enableGlobalSelection(bool enabled) { m_globalSelectionEnabled = enabled; }
 
 	void refreshVersionControl(DvDirVersionControlNode *node,
 							   const QStringList &files = QStringList());
 
-	void setRefreshVersionControlEnabled(bool value)
-	{
-		m_refreshVersionControlEnabled = value;
-	}
-	bool refreshVersionControlEnabled() const
-	{
-		return m_refreshVersionControlEnabled;
-	}
+	void setRefreshVersionControlEnabled(bool value) { m_refreshVersionControlEnabled = value; }
+	bool refreshVersionControlEnabled() const { return m_refreshVersionControlEnabled; }
 
-	DvItemListModel::Status getItemVersionControlStatus(
-		DvDirVersionControlNode *node,
-		const TFilePath &fp);
+	DvItemListModel::Status getItemVersionControlStatus(DvDirVersionControlNode *node,
+														const TFilePath &fp);
 
 	void setTextColor(const QColor &color) { m_textColor = color; }
 	QColor getTextColor() const { return m_textColor; }
@@ -99,17 +88,16 @@ public:
 	void setSelectedItemBackground(const QColor &color) { m_selectedItemBackground = color; }
 	QColor getSelectedItemBackground() const { return m_selectedItemBackground; }
 
-signals:
+  signals:
 
 	void currentNodeChanged(); //!< Emitted when user selectes a different node.
 
-public slots:
+  public slots:
 
 	void deleteFolder(); //!< Deletes the selected folder.
 
 	void setCurrentNode(DvDirModelNode *node); //!< Sets the current node, make it visible.
-	void setCurrentNode(const TFilePath &fp,
-						bool expandNode = false);
+	void setCurrentNode(const TFilePath &fp, bool expandNode = false);
 	void resizeToConts(void);
 
 	void cleanupVersionControl(DvDirVersionControlNode *node);
@@ -118,10 +106,10 @@ public slots:
 	void putVersionControl(DvDirVersionControlNode *node);
 	void updateVersionControl(DvDirVersionControlNode *node);
 
-	void listVersionControl(DvDirVersionControlNode *lastExistingNode,
-							const QString &relativePath);
+	void listVersionControl(DvDirVersionControlNode *lastExistingNode, const QString &relativePath);
 
-	// Only for tnz "special folder" and project folder (working in this case on project settings xml file)
+	// Only for tnz "special folder" and project folder (working in this case on project settings
+	// xml file)
 	void editCurrentVersionControlNode();
 	void unlockCurrentVersionControlNode();
 	void revertCurrentVersionControlNode();
@@ -145,7 +133,7 @@ public slots:
 	void onRefreshStatusDone(const QString &);
 	void onRefreshStatusError(const QString &);
 
-protected:
+  protected:
 	QSize sizeHint() const;
 
 	void currentChanged(const QModelIndex &current, const QModelIndex &previous);
@@ -163,7 +151,7 @@ protected:
 
 	void checkPartialLock(const QString &workingDir, const QStringList &files);
 
-private:
+  private:
 	bool m_globalSelectionEnabled;
 	DvDirModelNode *m_currentDropItem;
 	VersionControlThread m_thread;
@@ -185,25 +173,29 @@ class DvDirTreeViewDelegate : public QItemDelegate
 {
 	Q_OBJECT
 
-public:
+  public:
 	DvDirTreeViewDelegate(DvDirTreeView *parent);
 	~DvDirTreeViewDelegate();
 
-	QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+	QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
+						  const QModelIndex &index) const;
 
-	bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index);
-	void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+	bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option,
+					 const QModelIndex &index);
+	void paint(QPainter *painter, const QStyleOptionViewItem &option,
+			   const QModelIndex &index) const;
 
 	void setEditorData(QWidget *editor, const QModelIndex &index) const;
 	void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
 
 	QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
-	void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+	void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
+							  const QModelIndex &index) const;
 
-private:
+  private:
 	DvDirTreeView *m_treeView;
 
-private slots:
+  private slots:
 
 	void commitAndCloseEditor();
 };
@@ -216,24 +208,24 @@ class NodeEditor : public QWidget
 {
 	Q_OBJECT
 
-public:
+  public:
 	NodeEditor(QWidget *parent = 0, QRect rect = QRect(), int leftMargin = 0);
 
 	void setText(QString value) { m_lineEdit->setText(value); }
 	QString getText() const { return m_lineEdit->text(); }
 
-signals:
+  signals:
 
 	void editingFinished();
 
-protected:
+  protected:
 	void focusInEvent(QFocusEvent *event);
 
-protected slots:
+  protected slots:
 
 	void emitFinished();
 
-private:
+  private:
 	DVGui::LineEdit *m_lineEdit;
 };
 

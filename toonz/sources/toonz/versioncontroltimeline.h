@@ -22,7 +22,7 @@ class TimelineWidget : public QWidget
 	Q_OBJECT
 	QListWidget *m_listWidget;
 
-public:
+  public:
 	TimelineWidget(QWidget *parent = 0);
 
 	QListWidget *getListWidget() const { return m_listWidget; }
@@ -64,18 +64,19 @@ class SVNTimeline : public DVGui::Dialog
 	int m_currentAuxExportIndex;
 	int m_currentExportIndex;
 
-public:
-	SVNTimeline(QWidget *parent, const QString &workingDir, const QString &fileName, const QStringList &auxFiles);
+  public:
+	SVNTimeline(QWidget *parent, const QString &workingDir, const QString &fileName,
+				const QStringList &auxFiles);
 	~SVNTimeline();
 
-private:
+  private:
 	void exportToTemporaryFile(int index, bool isAuxFile = false);
 
 	QIcon createIcon(const QString &fileName);
 
 	void removeTempFiles();
 
-protected slots:
+  protected slots:
 
 	void onUpdateDone();
 	void onLogDone(const QString &);
@@ -94,7 +95,7 @@ protected slots:
 
 	void onSceneContentsToggled(bool);
 
-signals:
+  signals:
 	void commandDone(const QStringList &files);
 };
 

@@ -26,8 +26,7 @@ CasmTask::CasmTask()
 
 //------------------------------------------------------------------------------
 
-CasmTask::CasmTask(const string &s, const string &setupFilePath)
-	: m_setupFile(setupFilePath)
+CasmTask::CasmTask(const string &s, const string &setupFilePath) : m_setupFile(setupFilePath)
 {
 	setCommandLine(s);
 }
@@ -128,8 +127,7 @@ string CasmTask::getCommandLine() const
 		qualifiers += " -ac " + m_acScript + " ";
 
 	if (m_outputScript != "") {
-		bool outputToDdr = (m_outputScript ==
-							DDR_OUTPUTSCRIPT_FILENAME);
+		bool outputToDdr = (m_outputScript == DDR_OUTPUTSCRIPT_FILENAME);
 
 		if (!outputToDdr)
 			qualifiers += " -ac " + m_outputScript + " ";
@@ -142,7 +140,7 @@ string CasmTask::getCommandLine() const
 				parity = "even";
 				entry_point[i - 1] = '\0';
 			}
-			//convert_timecode_to_frame (entry_point);//??????
+			// convert_timecode_to_frame (entry_point);//??????
 			if (outputToDdr)
 				qualifiers += " -ddr " + entry_point + " ";
 			else {
@@ -176,7 +174,7 @@ string CasmTask::getCommandLine() const
 	if (m_start > m_firstFrame || m_end < m_lastFrame)
 		qualifiers += " -range " + toString(m_start) + " " + toString(m_end) + " ";
 
-	//qualifiers += " -chunk "+toString(m_taskChunksize)+" ";
+	// qualifiers += " -chunk "+toString(m_taskChunksize)+" ";
 
 	return qualifiers;
 }
@@ -282,11 +280,11 @@ void CasmTask::setCommandLine(const string &cmdLine)
 			m_moveType = M_INTMOVE;
 		}
 		/*     else
-     if (STR_EQ(word, "-64bit"))
-        task->prec = 64;
-     else 
-     if (STR_EQ(word, "-32bit"))
-        task->prec = 32;*/
+	 if (STR_EQ(word, "-64bit"))
+		task->prec = 64;
+	 else
+	 if (STR_EQ(word, "-32bit"))
+		task->prec = 32;*/
 		else if (word == "-tile") {
 			s = cpy_word(word, s);
 			if (is_num(word))
@@ -332,59 +330,59 @@ void CasmTask::setCommandLine(const string &cmdLine)
 			s = cpy_word(word, s);
 			m_outputScript = word;
 		} else if (word == "-ac_args") { /*
-       char output_script_argument[1024];
-       s = cpy_word(word, s);
-       if(parse_ac_args(output_script_argument, word))
-         task->output_script_argument = strsave(output_script_argument);*/
+	   char output_script_argument[1024];
+	   s = cpy_word(word, s);
+	   if(parse_ac_args(output_script_argument, word))
+		 task->output_script_argument = strsave(output_script_argument);*/
 		} else if (word == "-logfile") {
 			s = cpy_word(word, s);
 			m_logfile = true;
 		}
 		/*     else
-     if (!word.compare("-range"))
-      {
+	 if (!word.compare("-range"))
+	  {
 	s = cpy_word(word, s);
-        if (is_num(word))
+		if (is_num(word))
 	   task->start = atoi(word);
 	else
-         {
-           delete_job((TASK *)task);
-           return NULL;
-         }
-       s = cpy_word(word, s);
-       if (is_num(word))
-          task->end = atoi(word);
-       else
-        {
-          delete_job((TASK *)task);
-          return NULL;
-        }
-      }*/
+		 {
+		   delete_job((TASK *)task);
+		   return NULL;
+		 }
+	   s = cpy_word(word, s);
+	   if (is_num(word))
+		  task->end = atoi(word);
+	   else
+		{
+		  delete_job((TASK *)task);
+		  return NULL;
+		}
+	  }*/
 		/*     else
-     if (*word!='\n' && *word!='\0')
-      {
-        t = tim_get_type(word);
-        if (*t == '.') t++;
-        if (FILESTR_NE(t, "casm")) 
-         {
-           delete_job((TASK *)task);
+	 if (*word!='\n' && *word!='\0')
+	  {
+		t = tim_get_type(word);
+		if (*t == '.') t++;
+		if (FILESTR_NE(t, "casm"))
+		 {
+		   delete_job((TASK *)task);
 //           return NULL;
-         }
-        else
-         {
+		 }
+		else
+		 {
 	   TCALLOC(task->casm_file, strlen(word)+1);
 	   strcpy(task->casm_file, word);
-	   compute_casm_range(task->casm_file, &(task->first_frame), &(task->last_frame), &dummy); 
-	   if (task->start<task->first_frame) 
-	      task->start=task->first_frame;
-	   if (task->end>task->last_frame) 
-	      task->end=task->last_frame;
-           task->xsize = task->ysize = 0;
-           casm_camera_size(task->casm_file, &task->xsize, &task->ysize);
-  
+	   compute_casm_range(task->casm_file, &(task->first_frame), &(task->last_frame), &dummy);
+	   if (task->start<task->first_frame)
+		  task->start=task->first_frame;
+	   if (task->end>task->last_frame)
+		  task->end=task->last_frame;
+		   task->xsize = task->ysize = 0;
+		   casm_camera_size(task->casm_file, &task->xsize, &task->ysize);
 
-         }
-      }*/
+
+		 }
+	  }*/
 		it = s.begin();
 	}
 }
@@ -408,40 +406,26 @@ class NumFieldChanger : public TNumField::Action
 	CasmConfigPanel *m_ccp;
 	numFieldType m_typeField;
 
-public:
-	NumFieldChanger(CasmConfigPanel *ccp, numFieldType type)
-		: m_ccp(ccp), m_typeField(type)
-	{
-	}
+  public:
+	NumFieldChanger(CasmConfigPanel *ccp, numFieldType type) : m_ccp(ccp), m_typeField(type) {}
 
-	void sendCommand(const TNumField::Event &ev)
-	{
-		m_ccp->onNumField(ev.m_value, m_typeField);
-	}
+	void sendCommand(const TNumField::Event &ev) { m_ccp->onNumField(ev.m_value, m_typeField); }
 };
 
 class ColumnFieldChanger : public TTextField::Action
 {
 	CasmConfigPanel *m_ccp;
 
-public:
-	ColumnFieldChanger(CasmConfigPanel *ccp)
-		: m_ccp(ccp)
-	{
-	}
+  public:
+	ColumnFieldChanger(CasmConfigPanel *ccp) : m_ccp(ccp) {}
 
-	void sendCommand(std::wstring value)
-	{
-		m_ccp->onColumnField(value);
-	}
+	void sendCommand(std::wstring value) { m_ccp->onColumnField(value); }
 };
 
 class NumFieldChanger2 : public TNumField::Action
 {
-public:
-	NumFieldChanger2(CasmConfigPanel *ccp, double CasmTask::*)
-	{
-	}
+  public:
+	NumFieldChanger2(CasmConfigPanel *ccp, double CasmTask::*) {}
 
 	void sendCommand(double value)
 	{
@@ -453,8 +437,7 @@ public:
 
 //==============================================================================
 
-CasmConfigPanel::CasmConfigPanel(TWidget *parent)
-	: TWidget(parent)
+CasmConfigPanel::CasmConfigPanel(TWidget *parent) : TWidget(parent)
 {
 	m_task = new CasmTask();
 
@@ -514,14 +497,16 @@ CasmConfigPanel::CasmConfigPanel(TWidget *parent)
 	m_subPixelMove->addOption("None");
 	m_subPixelMove->addOption("RGB");
 	m_subPixelMove->addOption("All");
-	m_subPixelMove->setAction(new TOptionMenuAction<CasmConfigPanel>(this, &CasmConfigPanel::onSubPixelMove));
+	m_subPixelMove->setAction(
+		new TOptionMenuAction<CasmConfigPanel>(this, &CasmConfigPanel::onSubPixelMove));
 
 	m_processingLabel = new TLabel(this);
 	m_processingLabel->setText("Processing:");
 	m_processing = new TOptionMenu(this);
 	m_processing->addOption("32 Bit");
 	m_processing->addOption("64 Bit");
-	m_processing->setAction(new TOptionMenuAction<CasmConfigPanel>(this, &CasmConfigPanel::onProcessing));
+	m_processing->setAction(
+		new TOptionMenuAction<CasmConfigPanel>(this, &CasmConfigPanel::onProcessing));
 
 	m_resampleQualityLabel = new TLabel(this);
 	m_resampleQualityLabel->setText("Resample Quality:");
@@ -529,7 +514,8 @@ CasmConfigPanel::CasmConfigPanel(TWidget *parent)
 	m_resampleQuality->addOption("Standard");
 	m_resampleQuality->addOption("Improved");
 	m_resampleQuality->addOption("High");
-	m_resampleQuality->setAction(new TOptionMenuAction<CasmConfigPanel>(this, &CasmConfigPanel::onResampleQuality));
+	m_resampleQuality->setAction(
+		new TOptionMenuAction<CasmConfigPanel>(this, &CasmConfigPanel::onResampleQuality));
 
 	m_focus = new TCheckBox(this, "Constant Focus");
 	tconnect<CasmConfigPanel>(*m_focus, this, onConstantFocus);
@@ -563,13 +549,14 @@ CasmConfigPanel::CasmConfigPanel(TWidget *parent)
 	m_gammaValue->addAction(new NumFieldChanger(this, M_GAMMA));
 
 	m_clap = new TCheckBox(this, "Add Clap");
-	//tconnect<CasmConfigPanel>(*m_clap, this, onClap);
+	// tconnect<CasmConfigPanel>(*m_clap, this, onClap);
 	/*
   m_outputScriptLabel = new TLabel(this);
   m_outputScriptLabel->setText("Output Script:");
   m_outputScript = new TOptionMenu(this);
   m_outputScript->addOption("None");
-  //m_subPixelMove->setAction(new TOptionMenuAction<CasmConfigPanel>(this, &CasmConfigPanel::onOutputScript));
+  //m_subPixelMove->setAction(new TOptionMenuAction<CasmConfigPanel>(this,
+  &CasmConfigPanel::onOutputScript));
   m_entryPointLabel = new TLabel(this);
   m_entryPointLabel->setText("Entry Point:");
   m_entryPoint = new TTextField(this);
@@ -802,14 +789,9 @@ void CasmConfigPanel::onNumField(double v, int type)
 
 void CasmConfigPanel::onColumnField(std::wstring value)
 {
-	if (value == toWideString("") ||
-		value == toWideString("ALL") ||
-		value == toWideString("All") ||
-		value == toWideString("all") ||
-		value == toWideString("AL") ||
-		value == toWideString("Al") ||
-		value == toWideString("a") ||
-		value == toWideString("A"))
+	if (value == toWideString("") || value == toWideString("ALL") || value == toWideString("All") ||
+		value == toWideString("all") || value == toWideString("AL") ||
+		value == toWideString("Al") || value == toWideString("a") || value == toWideString("A"))
 		m_task->m_numColumn = -1;
 	else if (is_num(toString(value)))
 		m_task->m_numColumn = atoi(toString(value).c_str());
@@ -852,7 +834,7 @@ void CasmConfigPanel::browseSetupFiles()
 #endif
 
 	d -= popup->getSize();
-	//TDimension d = TMainshell::getMainshell()->getSize() - popup->getSize();
+	// TDimension d = TMainshell::getMainshell()->getSize() - popup->getSize();
 	popup->popup(TPoint(d.lx / 2, d.ly / 2));
 	popup->setCaption("Load Setup");
 }

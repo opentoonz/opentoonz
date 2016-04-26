@@ -13,12 +13,12 @@
 
 /*-----------------------------------------------------------------*/
 
-void Iwa_Particle::create_Animation(const particles_values &values,
-									int first, int last)
+void Iwa_Particle::create_Animation(const particles_values &values, int first, int last)
 {
 	switch (values.animation_val) {
 	case Iwa_TiledParticlesFx::ANIM_CYCLE:
-		__OR Iwa_TiledParticlesFx::ANIM_S_CYCLE : animswing = 0; /*frame <0 perche' c'e' il preroll dialmeno un frame*/
+		__OR Iwa_TiledParticlesFx::ANIM_S_CYCLE
+			: animswing = 0; /*frame <0 perche' c'e' il preroll dialmeno un frame*/
 		CASE Iwa_TiledParticlesFx::ANIM_SR_CYCLE : animswing = random.getFloat() > 0.5 ? 1 : 0;
 	DEFAULT:
 		break;
@@ -27,16 +27,9 @@ void Iwa_Particle::create_Animation(const particles_values &values,
 
 //------------------------------------------------------------------
 
-Iwa_Particle::Iwa_Particle(int g_lifetime,
-						   int seed,
-							 std::map<int, TTile *> porttiles,
-						   const particles_values &values,
-						   const particles_ranges &ranges,
-						   int howmany,
-						   int first,
-						   int level,
-						   int last,
-						   float posx, float posy,
+Iwa_Particle::Iwa_Particle(int g_lifetime, int seed, std::map<int, TTile *> porttiles,
+						   const particles_values &values, const particles_ranges &ranges,
+						   int howmany, int first, int level, int last, float posx, float posy,
 						   bool isUpward,		/*- 初期向き -*/
 						   int initSourceFrame) /*- Level内の初期フレーム位置 -*/
 {
@@ -58,10 +51,8 @@ Iwa_Particle::Iwa_Particle(int g_lifetime,
 	/*- 粒子パラメータに参照画像が使われている場合、
 		参照画像のとる値を先にまとめて得ておく -*/
 	for (std::map<int, TTile *>::iterator it = porttiles.begin(); it != porttiles.end(); ++it) {
-		if ((values.lifetime_ctrl_val == it->first ||
-			 values.speed_ctrl_val == it->first ||
-			 values.scale_ctrl_val == it->first ||
-			 values.rot_ctrl_val == it->first
+		if ((values.lifetime_ctrl_val == it->first || values.speed_ctrl_val == it->first ||
+			 values.scale_ctrl_val == it->first || values.rot_ctrl_val == it->first
 			 /*- Speed Angleを明るさでコントロールする場合 -*/
 			 || (values.speeda_ctrl_val == it->first && !values.speeda_use_gradient_val)) &&
 			it->second->getRaster()) {
@@ -139,7 +130,7 @@ Iwa_Particle::Iwa_Particle(int g_lifetime,
 	} else
 		angle = -(values.rot_val.first) - (ranges.rot_range) * random.getFloat();
 
-	//140212 初期粒子向き
+	// 140212 初期粒子向き
 	if (!isUpward)
 		angle += 180.0f;
 
@@ -187,15 +178,13 @@ Iwa_Particle::Iwa_Particle(int g_lifetime,
 
 int Iwa_Particle::check_Swing(const particles_values &values)
 {
-	return (values.randomx_val.first || values.randomx_val.second ||
-			values.randomy_val.first || values.randomy_val.second ||
-			values.rotsca_val.first || values.rotsca_val.second);
+	return (values.randomx_val.first || values.randomx_val.second || values.randomy_val.first ||
+			values.randomy_val.second || values.rotsca_val.first || values.rotsca_val.second);
 }
 
 /*-----------------------------------------------------------------*/
 
-void Iwa_Particle::create_Swing(const particles_values &values,
-								const particles_ranges &ranges,
+void Iwa_Particle::create_Swing(const particles_values &values, const particles_ranges &ranges,
 								double randomxreference, double randomyreference)
 {
 	changesignx = (int)(values.swing_val.first + random.getFloat() * (ranges.swing_range));
@@ -203,13 +192,17 @@ void Iwa_Particle::create_Swing(const particles_values &values,
 	changesigna = (int)(values.rotswing_val.first + random.getFloat() * (ranges.rotswing_range));
 	if (values.swingmode_val == Iwa_TiledParticlesFx::SWING_SMOOTH) {
 		if (values.randomx_ctrl_val)
-			smswingx = abs((int)values.randomx_val.first) + randomxreference * (ranges.randomx_range);
+			smswingx =
+				abs((int)values.randomx_val.first) + randomxreference * (ranges.randomx_range);
 		else
-			smswingx = abs((int)values.randomx_val.first) + random.getFloat() * (ranges.randomx_range);
+			smswingx =
+				abs((int)values.randomx_val.first) + random.getFloat() * (ranges.randomx_range);
 		if (values.randomy_ctrl_val)
-			smswingy = abs((int)values.randomy_val.first) + randomyreference * (ranges.randomy_range);
+			smswingy =
+				abs((int)values.randomy_val.first) + randomyreference * (ranges.randomy_range);
 		else
-			smswingy = abs((int)values.randomy_val.first) + random.getFloat() * (ranges.randomy_range);
+			smswingy =
+				abs((int)values.randomy_val.first) + random.getFloat() * (ranges.randomy_range);
 		smperiodx = changesignx;
 		smperiody = changesigny;
 	}
@@ -224,8 +217,7 @@ void Iwa_Particle::create_Swing(const particles_values &values,
 
 /*-----------------------------------------------------------------*/
 
-void Iwa_Particle::create_Colors(const particles_values &values,
-								 const particles_ranges &ranges,
+void Iwa_Particle::create_Colors(const particles_values &values, const particles_ranges &ranges,
 								 std::map<int, TTile *> porttiles)
 {
 	if (values.genfadecol_val) {
@@ -287,8 +279,7 @@ void Iwa_Particle::modify_colors(TPixel32 &color, double &intensity)
 {
 	float percent = 0;
 
-	if ((gencol.fadecol || fincol.fadecol) &&
-		(genlifetime - lifetime) <= fincol.rangecol) {
+	if ((gencol.fadecol || fincol.fadecol) && (genlifetime - lifetime) <= fincol.rangecol) {
 		if (fincol.rangecol)
 			percent = (genlifetime - lifetime) / (float)(fincol.rangecol);
 		color = blend(gencol.col, fincol.col, percent);
@@ -317,10 +308,8 @@ void Iwa_Particle::modify_colors(TPixel32 &color, double &intensity)
 /*-----------------------------------------------------------------*/
 
 /*- do_render から呼ばれる。各粒子の描画の直前に色を決めるところ -*/
-void Iwa_Particle::modify_colors_and_opacity(const particles_values &values,
-											 float curr_opacity,
-											 int dist_frame,
-											 TRaster32P raster32)
+void Iwa_Particle::modify_colors_and_opacity(const particles_values &values, float curr_opacity,
+											 int dist_frame, TRaster32P raster32)
 {
 	double intensity = 0;
 	TPixel32 col;
@@ -348,14 +337,14 @@ void Iwa_Particle::modify_colors_and_opacity(const particles_values &values,
 }
 
 /*-----------------------------------------------------------------*/
-void Iwa_Particle::update_Animation(const particles_values &values,
-									int first, int last, int keep)
+void Iwa_Particle::update_Animation(const particles_values &values, int first, int last, int keep)
 {
 	switch (values.animation_val) {
 	case Iwa_TiledParticlesFx::ANIM_RANDOM:
 		frame = (int)(first + random.getFloat() * (last - first));
-		CASE Iwa_TiledParticlesFx::ANIM_R_CYCLE : __OR Iwa_TiledParticlesFx::ANIM_CYCLE : if (!keep || frame != keep - 1)
-																							  frame = first + (frame + 1) % (last - first);
+		CASE Iwa_TiledParticlesFx::ANIM_R_CYCLE : __OR Iwa_TiledParticlesFx::ANIM_CYCLE
+												  : if (!keep || frame != keep - 1) frame =
+														first + (frame + 1) % (last - first);
 		CASE Iwa_TiledParticlesFx::ANIM_S_CYCLE : __OR Iwa_TiledParticlesFx::ANIM_SR_CYCLE:
 		{
 			if (!keep || frame != keep - 1) {
@@ -375,10 +364,9 @@ void Iwa_Particle::update_Animation(const particles_values &values,
 }
 
 /*-----------------------------------------------------------------*/
-void Iwa_Particle::update_Swing(const particles_values &values,
-								const particles_ranges &ranges,
-								struct pos_dummy &dummy,
-								double randomxreference, double randomyreference)
+void Iwa_Particle::update_Swing(const particles_values &values, const particles_ranges &ranges,
+								struct pos_dummy &dummy, double randomxreference,
+								double randomyreference)
 {
 
 	if (values.swingmode_val == Iwa_TiledParticlesFx::SWING_SMOOTH) {
@@ -425,7 +413,8 @@ void Iwa_Particle::update_Swing(const particles_values &values,
 	if (changesignx <= 0) {
 		//  if(random->getFloat()<0.5);
 		signx *= -1;
-		changesignx = abs((int)(values.swing_val.first) + (int)(random.getFloat() * (ranges.swing_range)));
+		changesignx =
+			abs((int)(values.swing_val.first) + (int)(random.getFloat() * (ranges.swing_range)));
 		if (values.swingmode_val == Iwa_TiledParticlesFx::SWING_SMOOTH) {
 			smperiodx = changesignx;
 			if (values.randomx_ctrl_val)
@@ -437,7 +426,8 @@ void Iwa_Particle::update_Swing(const particles_values &values,
 	if (changesigny <= 0) {
 		//  if(random->getFloat()<0.5);
 		signy *= -1;
-		changesigny = abs((int)(values.swing_val.first) + (int)(random.getFloat() * (ranges.swing_range)));
+		changesigny =
+			abs((int)(values.swing_val.first) + (int)(random.getFloat() * (ranges.swing_range)));
 		if (values.swingmode_val == Iwa_TiledParticlesFx::SWING_SMOOTH) {
 			smperiody = changesigny;
 			if (values.randomy_ctrl_val)
@@ -448,7 +438,8 @@ void Iwa_Particle::update_Swing(const particles_values &values,
 	}
 	if (changesigna <= 0) {
 		signa *= -1;
-		changesigna = abs((int)(values.rotswing_val.first) + (int)(random.getFloat() * (ranges.rotswing_range)));
+		changesigna = abs((int)(values.rotswing_val.first) +
+						  (int)(random.getFloat() * (ranges.rotswing_range)));
 		if (values.rotswingmode_val == Iwa_TiledParticlesFx::SWING_SMOOTH) {
 			smperioda = changesigna;
 			smswinga = values.rotsca_val.first + random.getFloat() * (ranges.rotsca_range);
@@ -456,9 +447,8 @@ void Iwa_Particle::update_Swing(const particles_values &values,
 	}
 }
 /*-----------------------------------------------------------------*/
-void Iwa_Particle::update_Scale(const particles_values &values,
-								const particles_ranges &ranges, double scalereference,
-								double scalestepreference)
+void Iwa_Particle::update_Scale(const particles_values &values, const particles_ranges &ranges,
+								double scalereference, double scalestepreference)
 {
 	double scalestep;
 
@@ -493,22 +483,19 @@ void Iwa_Particle::get_image_reference(TTile *ctrl, const particles_values &valu
 
 	switch (type) {
 	case Iwa_TiledParticlesFx::GRAY_REF:
-		if (raster32 &&
-			tmp.x >= 0 && tmp.x < raster32->getLx() &&
-			tmp.y >= 0 && troundp(tmp.y) < raster32->getLy()) {
+		if (raster32 && tmp.x >= 0 && tmp.x < raster32->getLx() && tmp.y >= 0 &&
+			troundp(tmp.y) < raster32->getLy()) {
 			TPixel32 pix = raster32->pixels(troundp(tmp.y))[(int)tmp.x];
 			imagereference = TPixelGR8::from(pix).value / (float)TPixelGR8::maxChannelValue;
-		} else if (raster64 && tmp.x >= 0 &&
-				   tmp.x < raster64->getLx() &&
-				   tmp.y >= 0 &&
+		} else if (raster64 && tmp.x >= 0 && tmp.x < raster64->getLx() && tmp.y >= 0 &&
 				   troundp(tmp.y) < raster64->getLy()) {
 			TPixel64 pix = raster64->pixels(troundp(tmp.y))[(int)tmp.x];
 			imagereference = TPixelGR16::from(pix).value / (float)TPixelGR16::maxChannelValue;
 		}
 
-		CASE Iwa_TiledParticlesFx::H_REF : if (raster32 &&
-											   tmp.x >= 0 && tmp.x < raster32->getLx() &&
-											   tmp.y >= 0 && tround(tmp.y) < raster32->getLy())
+		CASE Iwa_TiledParticlesFx::H_REF
+			: if (raster32 && tmp.x >= 0 && tmp.x < raster32->getLx() && tmp.y >= 0 &&
+				  tround(tmp.y) < raster32->getLy())
 		{
 			float aux = (float)TPixel32::maxChannelValue;
 			double h, s, v;
@@ -516,9 +503,8 @@ void Iwa_Particle::get_image_reference(TTile *ctrl, const particles_values &valu
 			OLDRGB2HSV(pix.r / aux, pix.g / aux, pix.b / aux, &h, &s, &v);
 			imagereference = (float)h / 360.0f;
 		}
-		else if (raster64 &&
-				 tmp.x >= 0 && tmp.x < raster64->getLx() &&
-				 tmp.y >= 0 && tround(tmp.y) < raster64->getLy())
+		else if (raster64 && tmp.x >= 0 && tmp.x < raster64->getLx() && tmp.y >= 0 &&
+				 tround(tmp.y) < raster64->getLy())
 		{
 			float aux = (float)TPixel64::maxChannelValue;
 			double h, s, v;
@@ -536,8 +522,8 @@ void Iwa_Particle::get_image_reference(TTile *ctrl, const particles_values &valu
 
 /*-----------------------------------------------------------------*/
 /*- ベクタ長を返す -*/
-float Iwa_Particle::get_image_gravity(TTile *ctrl1, const particles_values &values,
-									  float &gx, float &gy)
+float Iwa_Particle::get_image_gravity(TTile *ctrl1, const particles_values &values, float &gx,
+									  float &gy)
 {
 	TRaster32P raster32 = ctrl1->getRaster();
 	TRaster64P raster64 = ctrl1->getRaster();
@@ -551,9 +537,8 @@ float Iwa_Particle::get_image_gravity(TTile *ctrl1, const particles_values &valu
 
 	if (raster32) {
 		raster32->lock();
-		if (raster32 &&
-			tmp.x >= radius && tmp.x < raster32->getLx() - radius &&
-			tmp.y >= radius && tmp.y < raster32->getLy() - radius) {
+		if (raster32 && tmp.x >= radius && tmp.x < raster32->getLx() - radius && tmp.y >= radius &&
+			tmp.y < raster32->getLy() - radius) {
 			TPixel32 *pix = &(raster32->pixels(troundp(tmp.y))[(int)tmp.x]);
 
 			gx += 2 * TPixelGR8::from(*(pix + 1)).value;
@@ -585,9 +570,8 @@ float Iwa_Particle::get_image_gravity(TTile *ctrl1, const particles_values &valu
 
 	} else if (raster64) {
 		raster64->lock();
-		if (raster64 &&
-			tmp.x >= radius && tmp.x < raster64->getLx() - radius &&
-			tmp.y >= radius && tmp.y < raster64->getLy() - radius) {
+		if (raster64 && tmp.x >= radius && tmp.x < raster64->getLx() - radius && tmp.y >= radius &&
+			tmp.y < raster64->getLy() - radius) {
 			TPixel64 *pix = &(raster64->pixels(troundp(tmp.y))[(int)tmp.x]);
 
 			gx += 2 * TPixelGR16::from(*(pix + 1)).value;
@@ -622,9 +606,8 @@ float Iwa_Particle::get_image_gravity(TTile *ctrl1, const particles_values &valu
 
 /*-----------------------------------------------------------------*/
 
-bool Iwa_Particle::get_image_curl(TTile *ctrl1,
-								  const particles_values &values,
-								  float &cx, float &cy)
+bool Iwa_Particle::get_image_curl(TTile *ctrl1, const particles_values &values, float &cx,
+								  float &cy)
 {
 	TRaster32P raster32 = ctrl1->getRaster();
 	TRaster64P raster64 = ctrl1->getRaster();
@@ -638,12 +621,12 @@ bool Iwa_Particle::get_image_curl(TTile *ctrl1,
 
 	if (raster32) {
 		raster32->lock();
-		if (raster32 &&
-			tmp.x >= radius + 1 && tmp.x < raster32->getLx() - radius - 1 &&
+		if (raster32 && tmp.x >= radius + 1 && tmp.x < raster32->getLx() - radius - 1 &&
 			tmp.y >= radius + 1 && tmp.y < raster32->getLy() - radius - 1) {
 			TPixel32 *pix = &(raster32->pixels(troundp(tmp.y))[(int)tmp.x]);
 
-			cx = -TPixelGR8::from(*(pix + radius * raster32->getWrap())).value + TPixelGR8::from(*(pix - radius * raster32->getWrap())).value;
+			cx = -TPixelGR8::from(*(pix + radius * raster32->getWrap())).value +
+				 TPixelGR8::from(*(pix - radius * raster32->getWrap())).value;
 			cy = TPixelGR8::from(*(pix + radius)).value - TPixelGR8::from(*(pix - radius)).value;
 			ret = true;
 		} else
@@ -651,12 +634,12 @@ bool Iwa_Particle::get_image_curl(TTile *ctrl1,
 		raster32->unlock();
 	} else if (raster64) {
 		raster64->lock();
-		if (raster64 &&
-			tmp.x >= radius + 1 && tmp.x < raster64->getLx() - radius - 1 &&
+		if (raster64 && tmp.x >= radius + 1 && tmp.x < raster64->getLx() - radius - 1 &&
 			tmp.y >= radius + 1 && tmp.y < raster64->getLy() - radius - 1) {
 			TPixel64 *pix = &(raster64->pixels(troundp(tmp.y))[(int)tmp.x]);
 
-			cx = -TPixelGR16::from(*(pix + radius * raster64->getWrap())).value + TPixelGR16::from(*(pix - radius * raster64->getWrap())).value;
+			cx = -TPixelGR16::from(*(pix + radius * raster64->getWrap())).value +
+				 TPixelGR16::from(*(pix - radius * raster64->getWrap())).value;
 			cy = TPixelGR16::from(*(pix + radius)).value - TPixelGR16::from(*(pix - radius)).value;
 			cx /= 256.0f;
 			cy /= 256.0f;
@@ -670,8 +653,7 @@ bool Iwa_Particle::get_image_curl(TTile *ctrl1,
 
 /*-----------------------------------------------------------------*/
 
-void Iwa_Particle::get_image_reference(TTile *ctrl1,
-									   const particles_values &values,
+void Iwa_Particle::get_image_reference(TTile *ctrl1, const particles_values &values,
 									   TPixel32 &color)
 {
 	TRaster32P raster32 = ctrl1->getRaster();
@@ -680,15 +662,14 @@ void Iwa_Particle::get_image_reference(TTile *ctrl1,
 	TPointD tmp(x, y);
 	tmp -= ctrl1->m_pos;
 
-	if (raster32 &&
-		tmp.x >= 0 && tmp.x < raster32->getLx() &&
-		tmp.y >= 0 && troundp(tmp.y) < raster32->getLy()) {
+	if (raster32 && tmp.x >= 0 && tmp.x < raster32->getLx() && tmp.y >= 0 &&
+		troundp(tmp.y) < raster32->getLy()) {
 		color = raster32->pixels(troundp(tmp.y))[(int)tmp.x];
-	} else if (raster64 &&
-			   tmp.x >= 0 && tmp.x < raster64->getLx() &&
-			   tmp.y >= 0 && troundp(tmp.y) < raster64->getLy()) {
+	} else if (raster64 && tmp.x >= 0 && tmp.x < raster64->getLx() && tmp.y >= 0 &&
+			   troundp(tmp.y) < raster64->getLy()) {
 		TPixel64 pix64 = raster64->pixels(troundp(tmp.y))[(int)tmp.x];
-		color = TPixel32((int)pix64.r / 256, (int)pix64.g / 256, (int)pix64.b / 256, (int)pix64.m / 256);
+		color = TPixel32((int)pix64.r / 256, (int)pix64.g / 256, (int)pix64.b / 256,
+						 (int)pix64.m / 256);
 	}
 	/*- 参照画像のBBoxの外側で、粒子の色を透明にする -*/
 	else
@@ -697,10 +678,8 @@ void Iwa_Particle::get_image_reference(TTile *ctrl1,
 
 /*-----------------------------------------------------------------*/
 
-void Iwa_Particle::get_base_image_texture(TTile *ctrl1,
-										  const particles_values &values,
-										  TRasterP texRaster,
-										  const TRectD &texBBox,
+void Iwa_Particle::get_base_image_texture(TTile *ctrl1, const particles_values &values,
+										  TRasterP texRaster, const TRectD &texBBox,
 										  const TRenderSettings &ri)
 {
 	/*- ベースの絵を粒子の初期位置にあわせ移動させる -*/
@@ -779,10 +758,8 @@ void Iwa_Particle::get_base_image_texture(TTile *ctrl1,
 
 /*-----------------------------------------------------------------*/
 
-void Iwa_Particle::get_base_image_color(TTile *ctrl1,
-										const particles_values &values,
-										TRasterP texRaster,
-										const TRectD &texBBox,
+void Iwa_Particle::get_base_image_color(TTile *ctrl1, const particles_values &values,
+										TRasterP texRaster, const TRectD &texBBox,
 										const TRenderSettings &ri)
 {
 	/*- まず、色を拾う -*/
@@ -795,15 +772,14 @@ void Iwa_Particle::get_base_image_color(TTile *ctrl1,
 	tmp = ri.m_affine * tmp;
 
 	tmp -= ctrl1->m_pos;
-	if (baseRas32 &&
-		tmp.x >= 0 && tmp.x < baseRas32->getLx() &&
-		tmp.y >= 0 && troundp(tmp.y) < baseRas32->getLy()) {
+	if (baseRas32 && tmp.x >= 0 && tmp.x < baseRas32->getLx() && tmp.y >= 0 &&
+		troundp(tmp.y) < baseRas32->getLy()) {
 		color = baseRas32->pixels(troundp(tmp.y))[(int)tmp.x];
-	} else if (baseRas64 &&
-			   tmp.x >= 0 && tmp.x < baseRas64->getLx() &&
-			   tmp.y >= 0 && troundp(tmp.y) < baseRas64->getLy()) {
+	} else if (baseRas64 && tmp.x >= 0 && tmp.x < baseRas64->getLx() && tmp.y >= 0 &&
+			   troundp(tmp.y) < baseRas64->getLy()) {
 		TPixel64 pix64 = baseRas64->pixels(troundp(tmp.y))[(int)tmp.x];
-		color = TPixel32((int)pix64.r / 256, (int)pix64.g / 256, (int)pix64.b / 256, (int)pix64.m / 256);
+		color = TPixel32((int)pix64.r / 256, (int)pix64.g / 256, (int)pix64.b / 256,
+						 (int)pix64.m / 256);
 	} else
 		color = TPixel32::Transparent;
 
@@ -845,8 +821,7 @@ void Iwa_Particle::get_base_image_color(TTile *ctrl1,
 
 /*-----------------------------------------------------------------*/
 /*- 照明モードのとき、その明るさを色に格納 -*/
-void Iwa_Particle::set_illuminated_colors(float illuminant,
-										  TRasterP texRaster)
+void Iwa_Particle::set_illuminated_colors(float illuminant, TRasterP texRaster)
 {
 	TRaster32P texRas32 = texRaster;
 	TRaster64P texRas64 = texRaster;
@@ -903,13 +878,9 @@ void Iwa_Particle::spread_color(TPixel32 &color, double range)
  粒子の移動
 -----------------------------------------------*/
 
-void Iwa_Particle::move(std::map<int, TTile *> porttiles,
-						const particles_values &values,
-						const particles_ranges &ranges,
-						float windx, float windy,
-						float xgravity, float ygravity,
-						float dpicorr,
-						int lastframe)
+void Iwa_Particle::move(std::map<int, TTile *> porttiles, const particles_values &values,
+						const particles_ranges &ranges, float windx, float windy, float xgravity,
+						float ygravity, float dpicorr, int lastframe)
 {
 	struct pos_dummy dummy;
 	float frictx, fricty;
@@ -925,10 +896,8 @@ void Iwa_Particle::move(std::map<int, TTile *> porttiles,
 
 	/*-  移動に用いるパラメータに参照画像が刺さっている場合は、あらかじめ取得しておく -*/
 	for (std::map<int, TTile *>::iterator it = porttiles.begin(); it != porttiles.end(); ++it) {
-		if ((values.friction_ctrl_val == it->first ||
-			 values.scale_ctrl_val == it->first ||
-			 values.scalestep_ctrl_val == it->first ||
-			 values.randomx_ctrl_val == it->first ||
+		if ((values.friction_ctrl_val == it->first || values.scale_ctrl_val == it->first ||
+			 values.scalestep_ctrl_val == it->first || values.randomx_ctrl_val == it->first ||
 			 values.randomy_ctrl_val == it->first) &&
 			it->second->getRaster()) {
 			float tmpvalue;
@@ -964,7 +933,8 @@ void Iwa_Particle::move(std::map<int, TTile *> porttiles,
 
 	if (values.friction_val * frictreference) {
 		if (vx) {
-			frictx = vx * (1.0f + values.friction_val * frictreference) + (10.0f / vx) * values.friction_val * frictreference;
+			frictx = vx * (1.0f + values.friction_val * frictreference) +
+					 (10.0f / vx) * values.friction_val * frictreference;
 			if ((frictx / vx) < 0.0f)
 				frictx = 0.0f;
 			vx = frictx;
@@ -977,7 +947,8 @@ void Iwa_Particle::move(std::map<int, TTile *> porttiles,
 		}
 
 		if (vy) {
-			fricty = vy * (1.0f + values.friction_val * frictreference) + (10.0f / vy) * values.friction_val * frictreference;
+			fricty = vy * (1.0f + values.friction_val * frictreference) +
+					 (10.0f / vy) * values.friction_val * frictreference;
 			if ((fricty / vy) < 0.0f)
 				fricty = 0.0f;
 			vy = fricty;
@@ -1002,13 +973,14 @@ void Iwa_Particle::move(std::map<int, TTile *> porttiles,
 	vy += ygravity * mass;
 
 	/*- カールノイズ的動き 奥行き持たせる -*/
-	if (values.curl_ctrl_1_val &&
-		(porttiles.find(values.curl_ctrl_1_val) != porttiles.end())) {
+	if (values.curl_ctrl_1_val && (porttiles.find(values.curl_ctrl_1_val) != porttiles.end())) {
 		float tmpCurlx, tmpCurly;
 		if (get_image_curl(porttiles[values.curl_ctrl_1_val], values, tmpCurlx, tmpCurly)) {
-			if (values.curl_ctrl_2_val && (porttiles.find(values.curl_ctrl_2_val) != porttiles.end())) {
+			if (values.curl_ctrl_2_val &&
+				(porttiles.find(values.curl_ctrl_2_val) != porttiles.end())) {
 				float tmpCurlx2, tmpCurly2;
-				if (get_image_curl(porttiles[values.curl_ctrl_2_val], values, tmpCurlx2, tmpCurly2)) {
+				if (get_image_curl(porttiles[values.curl_ctrl_2_val], values, tmpCurlx2,
+								   tmpCurly2)) {
 					float length1 = sqrtf(tmpCurlx * tmpCurlx + tmpCurly * tmpCurly);
 					float length2 = sqrtf(tmpCurlx2 * tmpCurlx2 + tmpCurly2 * tmpCurly2);
 					float length = length1 * curlz + length2 * (1.0f - curlz);
@@ -1086,8 +1058,8 @@ void Iwa_Particle::move(std::map<int, TTile *> porttiles,
 
 /*-----------------------------------------------------------------*/
 
-double Iwa_Particle::set_Opacity(std::map<int, TTile *> porttiles,
-								 const particles_values &values, float opacity_range, double dist_frame)
+double Iwa_Particle::set_Opacity(std::map<int, TTile *> porttiles, const particles_values &values,
+								 float opacity_range, double dist_frame)
 {
 	double opacity = 1.0, trailcorr;
 
@@ -1097,12 +1069,15 @@ double Iwa_Particle::set_Opacity(std::map<int, TTile *> porttiles,
 		opacity *= (lifetime) / values.fadeout_val;
 
 	if (trail) {
-		trailcorr = values.trailopacity_val.first + (values.trailopacity_val.second - values.trailopacity_val.first) * (1 - (dist_frame) / trail);
+		trailcorr = values.trailopacity_val.first +
+					(values.trailopacity_val.second - values.trailopacity_val.first) *
+						(1 - (dist_frame) / trail);
 		opacity *= trailcorr;
 	}
 	if (values.opacity_ctrl_val && (porttiles.find(values.opacity_ctrl_val) != porttiles.end())) {
 		float opacityreference = 0.0f;
-		get_image_reference(porttiles[values.opacity_ctrl_val], values, opacityreference, Iwa_TiledParticlesFx::GRAY_REF);
+		get_image_reference(porttiles[values.opacity_ctrl_val], values, opacityreference,
+							Iwa_TiledParticlesFx::GRAY_REF);
 		opacity = values.opacity_val.first + (opacity_range)*opacityreference * opacity;
 	} else
 		opacity = values.opacity_val.first + opacity_range * opacity;

@@ -75,16 +75,13 @@ class AntialiasPopup::Swatch : public PlaneViewer
 {
 	TImageP m_img;
 
-public:
+  public:
 	Swatch(QWidget *parent = 0) : PlaneViewer(parent)
 	{
 		setBgColor(TPixel32::White, TPixel32::White);
 	}
 
-	TRasterP getRaster() const
-	{
-		return m_img->raster();
-	}
+	TRasterP getRaster() const { return m_img->raster(); }
 
 	void setImage(const TImageP &img) { m_img = img; }
 
@@ -96,10 +93,10 @@ public:
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
-			//Note GL_ONE instead of GL_SRC_ALPHA: it's needed since the input
-			//image is supposedly premultiplied - and it works because the
-			//viewer's background is opaque.
-			//See tpixelutils.h's overPixT function for comparison.
+			// Note GL_ONE instead of GL_SRC_ALPHA: it's needed since the input
+			// image is supposedly premultiplied - and it works because the
+			// viewer's background is opaque.
+			// See tpixelutils.h's overPixT function for comparison.
 
 			pushGLWorldCoordinates();
 			draw(m_img);
@@ -127,7 +124,8 @@ AntialiasPopup::AntialiasPopup()
 	beginVLayout();
 
 	QSplitter *splitter = new QSplitter(Qt::Vertical);
-	splitter->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
+	splitter->setSizePolicy(
+		QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
 	addWidget(splitter);
 
 	endVLayout();
@@ -141,7 +139,8 @@ AntialiasPopup::AntialiasPopup()
 	splitter->setStretchFactor(0, 1);
 
 	QFrame *topWidget = new QFrame(scrollArea);
-	topWidget->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
+	topWidget->setSizePolicy(
+		QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
 	scrollArea->setWidget(topWidget);
 
 	QGridLayout *topLayout = new QGridLayout(this);
@@ -149,7 +148,7 @@ AntialiasPopup::AntialiasPopup()
 
 	//------------------------- Parameters --------------------------
 
-	//Brightness
+	// Brightness
 	QLabel *brightnessLabel = new QLabel(tr("Threshold:"));
 	topLayout->addWidget(brightnessLabel, 0, 0, Qt::AlignRight | Qt::AlignVCenter);
 
@@ -158,7 +157,7 @@ AntialiasPopup::AntialiasPopup()
 	m_thresholdField->setValue(40);
 	topLayout->addWidget(m_thresholdField, 0, 1);
 
-	//Contrast
+	// Contrast
 	QLabel *contrastLabel = new QLabel(tr("Softness:"));
 	topLayout->addWidget(contrastLabel, 1, 0, Qt::AlignRight | Qt::AlignVCenter);
 
@@ -189,8 +188,10 @@ AntialiasPopup::AntialiasPopup()
 
 	bool ret = true;
 
-	ret = ret && connect(m_thresholdField, SIGNAL(valueChanged(bool)), this, SLOT(onValuesChanged(bool)));
-	ret = ret && connect(m_softnessField, SIGNAL(valueChanged(bool)), this, SLOT(onValuesChanged(bool)));
+	ret = ret &&
+		  connect(m_thresholdField, SIGNAL(valueChanged(bool)), this, SLOT(onValuesChanged(bool)));
+	ret = ret &&
+		  connect(m_softnessField, SIGNAL(valueChanged(bool)), this, SLOT(onValuesChanged(bool)));
 
 	assert(ret);
 
@@ -212,7 +213,8 @@ void AntialiasPopup::setCurrentSampleRaster()
 	if (cellSelection) {
 		TApp *app = TApp::instance();
 		TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
-		TXshCell cell = xsh->getCell(app->getCurrentFrame()->getFrameIndex(), app->getCurrentColumn()->getColumnIndex());
+		TXshCell cell = xsh->getCell(app->getCurrentFrame()->getFrameIndex(),
+									 app->getCurrentColumn()->getColumnIndex());
 		TImageP aux = cell.getImage(true);
 		if (aux)
 			image = aux->cloneImage();
@@ -247,9 +249,12 @@ void AntialiasPopup::showEvent(QShowEvent *se)
 {
 	TApp *app = TApp::instance();
 	bool ret = true;
-	ret = ret && connect(app->getCurrentFrame(), SIGNAL(frameTypeChanged()), this, SLOT(setCurrentSampleRaster()));
-	ret = ret && connect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this, SLOT(setCurrentSampleRaster()));
-	ret = ret && connect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this, SLOT(setCurrentSampleRaster()));
+	ret = ret && connect(app->getCurrentFrame(), SIGNAL(frameTypeChanged()), this,
+						 SLOT(setCurrentSampleRaster()));
+	ret = ret && connect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
+						 SLOT(setCurrentSampleRaster()));
+	ret = ret && connect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this,
+						 SLOT(setCurrentSampleRaster()));
 	assert(ret);
 	setCurrentSampleRaster();
 }
@@ -259,9 +264,12 @@ void AntialiasPopup::showEvent(QShowEvent *se)
 void AntialiasPopup::hideEvent(QHideEvent *he)
 {
 	TApp *app = TApp::instance();
-	disconnect(app->getCurrentFrame(), SIGNAL(frameTypeChanged()), this, SLOT(setCurrentSampleRaster()));
-	disconnect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this, SLOT(setCurrentSampleRaster()));
-	disconnect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this, SLOT(setCurrentSampleRaster()));
+	disconnect(app->getCurrentFrame(), SIGNAL(frameTypeChanged()), this,
+			   SLOT(setCurrentSampleRaster()));
+	disconnect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
+			   SLOT(setCurrentSampleRaster()));
+	disconnect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this,
+			   SLOT(setCurrentSampleRaster()));
 
 	Dialog::hideEvent(he);
 
@@ -278,18 +286,16 @@ class TRasterAntialiasUndo : public TUndo
 	QString m_rasId;
 	int m_rasSize;
 
-public:
+  public:
 	TRasterAntialiasUndo(int threshold, int softness, int r, int c, TRasterP ras)
-		: m_r(r), m_c(c), m_rasId(), m_threshold(threshold), m_softness(softness), m_rasSize(ras->getLx() * ras->getLy() * ras->getPixelSize())
+		: m_r(r), m_c(c), m_rasId(), m_threshold(threshold), m_softness(softness),
+		  m_rasSize(ras->getLx() * ras->getLy() * ras->getPixelSize())
 	{
 		m_rasId = QString("AntialiasUndo_") + QString::number(uintptr_t(this));
 		TImageCache::instance()->add(m_rasId, TRasterImageP(ras));
 	}
 
-	~TRasterAntialiasUndo()
-	{
-		TImageCache::instance()->remove(m_rasId);
-	}
+	~TRasterAntialiasUndo() { TImageCache::instance()->remove(m_rasId); }
 
 	void undo() const
 	{
@@ -301,9 +307,11 @@ public:
 		if (!rimg && !timg)
 			return;
 		if (rimg)
-			rimg->setRaster(((TRasterImageP)TImageCache::instance()->get(m_rasId, true))->getRaster()->clone());
+			rimg->setRaster(
+				((TRasterImageP)TImageCache::instance()->get(m_rasId, true))->getRaster()->clone());
 		else
-			timg->setCMapped(((TToonzImageP)TImageCache::instance()->get(m_rasId, true))->getRaster()->clone());
+			timg->setCMapped(
+				((TToonzImageP)TImageCache::instance()->get(m_rasId, true))->getRaster()->clone());
 
 		TXshSimpleLevel *simpleLevel = cell.getSimpleLevel();
 		assert(simpleLevel);
@@ -369,7 +377,8 @@ void AntialiasPopup::apply()
 					continue;
 				images.insert(image.getPointer());
 				oneImageChanged = true;
-				TUndoManager::manager()->add(new TRasterAntialiasUndo(threshold, softness, r, c, ras->clone()));
+				TUndoManager::manager()->add(
+					new TRasterAntialiasUndo(threshold, softness, r, c, ras->clone()));
 				onChange(ras, threshold, softness);
 				TXshSimpleLevel *simpleLevel = cell.getSimpleLevel();
 				assert(simpleLevel);
@@ -383,7 +392,8 @@ void AntialiasPopup::apply()
 			return;
 		}
 	}
-	TFilmstripSelection *filmstripSelection = dynamic_cast<TFilmstripSelection *>(TSelection::getCurrent());
+	TFilmstripSelection *filmstripSelection =
+		dynamic_cast<TFilmstripSelection *>(TSelection::getCurrent());
 	if (filmstripSelection) {
 		TXshSimpleLevel *simpleLevel = TApp::instance()->getCurrentLevel()->getSimpleLevel();
 		if (simpleLevel) {
@@ -421,7 +431,8 @@ void AntialiasPopup::onValuesChanged(bool dragging)
 	if (dragging || !m_startRas || !m_viewer->getRaster())
 		return;
 
-	onChange(m_startRas, m_viewer->getRaster(), m_thresholdField->getValue(), m_softnessField->getValue());
+	onChange(m_startRas, m_viewer->getRaster(), m_thresholdField->getValue(),
+			 m_softnessField->getValue());
 	m_viewer->update();
 }
 

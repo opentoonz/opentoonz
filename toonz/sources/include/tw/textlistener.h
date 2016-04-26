@@ -19,9 +19,9 @@
 
 class DVAPI TTextListener
 {
-public:
+  public:
 #ifndef MACOSX
-	//togliere ifndef con il gcc3.3.2
+	// togliere ifndef con il gcc3.3.2
 	virtual bool getCaret(TPoint &pos, int &height) = 0;
 #endif
 };

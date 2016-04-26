@@ -54,12 +54,15 @@ class DVAPI DoubleValuePairField : public QWidget
 {
 	Q_OBJECT
 
-protected:
-	QPixmap m_handleLeftPixmap, m_handleRightPixmap, m_handleLeftGrayPixmap, m_handleRightGrayPixmap;
+  protected:
+	QPixmap m_handleLeftPixmap, m_handleRightPixmap, m_handleLeftGrayPixmap,
+		m_handleRightGrayPixmap;
 	Q_PROPERTY(QPixmap HandleLeftPixmap READ getHandleLeftPixmap WRITE setHandleLeftPixmap);
 	Q_PROPERTY(QPixmap HandleRightPixmap READ getHandleRightPixmap WRITE setHandleRightPixmap);
-	Q_PROPERTY(QPixmap HandleLeftGrayPixmap READ getHandleLeftGrayPixmap WRITE setHandleLeftGrayPixmap);
-	Q_PROPERTY(QPixmap HandleRightGrayPixmap READ getHandleRightGrayPixmap WRITE setHandleRightGrayPixmap);
+	Q_PROPERTY(
+		QPixmap HandleLeftGrayPixmap READ getHandleLeftGrayPixmap WRITE setHandleLeftGrayPixmap);
+	Q_PROPERTY(
+		QPixmap HandleRightGrayPixmap READ getHandleRightGrayPixmap WRITE setHandleRightGrayPixmap);
 
 	QColor m_lightLineColor; /*-- スライダ溝の明るい色（白） --*/
 	QColor m_darkLineColor;  /*-- スライダ溝の暗い色（128,128,128） --*/
@@ -78,9 +81,9 @@ protected:
 
 	bool m_isMaxRangeLimited;
 
-public:
-	DoubleValuePairField(QWidget *parent, bool isMaxRangeLimited,
-						 DoubleValueLineEdit *leftLineEdit, DoubleValueLineEdit *rightLineEdit);
+  public:
+	DoubleValuePairField(QWidget *parent, bool isMaxRangeLimited, DoubleValueLineEdit *leftLineEdit,
+						 DoubleValueLineEdit *rightLineEdit);
 	~DoubleValuePairField() {}
 
 	/*! Set current values to \b values. */
@@ -116,7 +119,7 @@ public:
 	void setDarkLineColor(const QColor &color) { m_darkLineColor = color; }
 	QColor getDarkLineColor() const { return m_darkLineColor; }
 
-protected:
+  protected:
 	/*! Return value corresponding \b x position. */
 	double pos2value(int x) const;
 	/*! Return x position corresponding \b value. */
@@ -133,7 +136,7 @@ protected:
 	void mouseMoveEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *event);
 
-protected slots:
+  protected slots:
 	/*! Set current left value to value in left text field; if necessary, if left
 			value is greater than right, change also current right value.
 	\n	This protected slot is called when text editing is finished.
@@ -148,7 +151,7 @@ protected slots:
 	\n	If current right value is equal to right text field value return and do nothing. */
 	void onRightEditingFinished();
 
-signals:
+  signals:
 	/*!	This signal is emitted when change one of two DoubleField value;
 			if one slider grab position change or if one text field editing is finished. */
 	void valuesChanged(bool isDragging);
@@ -174,7 +177,7 @@ signals:
 
 class DVAPI DoublePairField : public DoubleValuePairField
 {
-public:
+  public:
 	DoublePairField(QWidget *parent = 0, bool isMaxRangeLimited = true);
 	~DoublePairField() {}
 };
@@ -199,7 +202,7 @@ public:
 
 class DVAPI MeasuredDoublePairField : public DoubleValuePairField
 {
-public:
+  public:
 	MeasuredDoublePairField(QWidget *parent = 0, bool isMaxRangeLimited = true);
 	~MeasuredDoublePairField() {}
 
@@ -209,7 +212,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-} //namespace DVGui
+} // namespace DVGui
 //-----------------------------------------------------------------------------
 
 #endif // DOUBLEPAIRFIELD_H

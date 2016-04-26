@@ -15,9 +15,8 @@ class DissolveFx : public TStandardRasterFx
 	TRasterFxPort m_input;
 	TDoubleParamP m_intensity;
 
-public:
-	DissolveFx()
-		: m_intensity(30.0)
+  public:
+	DissolveFx() : m_intensity(30.0)
 	{
 		bindParam(this, "intensity", m_intensity);
 		addInputPort("Source", m_input);

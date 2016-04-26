@@ -34,11 +34,12 @@ extern "C" {
 #endif
 
 #define P(d) tmsg_info(" - %d -\n", d)
-#define COPY_RASTER(inr, outr, border) tP.copy_raster(inr, outr, border, border, inr->lx - border - 1, inr->ly - border - 1, 0, 0)
+#define COPY_RASTER(inr, outr, border)                                                             \
+	tP.copy_raster(inr, outr, border, border, inr->lx - border - 1, inr->ly - border - 1, 0, 0)
 
 // ----- CALLIGRAPH for UCHAR pixels (range 0-255) --------------------------
-void calligraphUC(const RASTER *inr, RASTER *outr, CCallParam &par,
-				  const int border, bool isOutBorder) //throw(SMemAllocError,SWriteRasterError)
+void calligraphUC(const RASTER *inr, RASTER *outr, CCallParam &par, const int border,
+				  bool isOutBorder) // throw(SMemAllocError,SWriteRasterError)
 {
 	try {
 		SRECT rect = {border, border, inr->lx - border - 1, inr->ly - border - 1};
@@ -81,13 +82,13 @@ void calligraphUC(const RASTER *inr, RASTER *outr, CCallParam &par,
 	} catch (SMemAllocError) {
 		//	SMemAllocError();
 	} catch (SWriteRasterError) {
-		//SWriteRasterError();
+		// SWriteRasterError();
 	}
 }
 
 // ----- CALLIGRAPH for USHORT pixels (range 0-65535) ------------------------
-void calligraphUS(const RASTER *inr, RASTER *outr, CCallParam &par,
-				  const int border, bool isOutBorder) //throw(SMemAllocError,SWriteRasterError)
+void calligraphUS(const RASTER *inr, RASTER *outr, CCallParam &par, const int border,
+				  bool isOutBorder) // throw(SMemAllocError,SWriteRasterError)
 {
 	try {
 		SRECT rect = {border, border, inr->lx - border - 1, inr->ly - border - 1};
@@ -128,14 +129,14 @@ void calligraphUS(const RASTER *inr, RASTER *outr, CCallParam &par,
 			ipUS.write(outr, rect, p);
 
 	} catch (SMemAllocError) {
-		//SMemAllocError();
+		// SMemAllocError();
 	} catch (SWriteRasterError) {
-		//SWriteRasterError();
+		// SWriteRasterError();
 	}
 }
 
-int calligraph(const RASTER *inr, RASTER *outr, const int border,
-			   int argc, const char *argv[], const int shrink, bool isOutBorder)
+int calligraph(const RASTER *inr, RASTER *outr, const int border, int argc, const char *argv[],
+			   const int shrink, bool isOutBorder)
 {
 	// The input raster must be RAS_CM16 or RAS_CM32!!!!
 	CSTPic<UC_PIXEL> tP;

@@ -42,12 +42,12 @@ class DVAPI TFxPort
 {
 	friend class TFx;
 
-protected:
+  protected:
 	TFx *m_owner;   //!< This is an input port of m_owner
 	int m_groupIdx; //!< Dynamic group index this belongs to in m_owner (-1 if none)
 	bool m_isControl;
 
-public:
+  public:
 	TFxPort(bool isControl) : m_owner(0), m_groupIdx(-1), m_isControl(isControl) {}
 	virtual ~TFxPort() {}
 
@@ -62,7 +62,7 @@ public:
 	TFx *getOwnerFx() const { return m_owner; }
 	void setOwnerFx(TFx *fx) { m_owner = fx; }
 
-private:
+  private:
 	// Not copiable
 	TFxPort(const TFxPort &);
 	TFxPort &operator=(const TFxPort &);
@@ -70,16 +70,15 @@ private:
 
 //-------------------------------------------------------------------
 
-template <class T>
-class TFxPortT : public TFxPort
+template <class T> class TFxPortT : public TFxPort
 {
 
 	friend class TFx;
 
-protected:
+  protected:
 	T *m_fx;
 
-public:
+  public:
 	TFxPortT(bool isControl = false) : TFxPort(isControl), m_fx(0) {}
 	~TFxPortT()
 	{
@@ -132,10 +131,10 @@ public:
 */
 class DVAPI TFxPortDynamicGroup
 {
-public:
+  public:
 	typedef std::vector<TFxPort *> PortsContainer;
 
-public:
+  public:
 	TFxPortDynamicGroup(const std::string &portsPrefix, int minPortsCount = 1);
 	~TFxPortDynamicGroup();
 
@@ -157,13 +156,13 @@ public:
 		return (strncmp(m_portsPrefix.c_str(), portName.c_str(), m_portsPrefix.size()) == 0);
 	}
 
-private:
+  private:
 	std::string m_portsPrefix; //!< Name prefix of each stored port
 	int m_minPortsCount;	   //!< Ports count \a should not be smaller
 
 	std::vector<TFxPort *> m_ports; //!< \b Owned ports (deleted on destruction)
 
-private:
+  private:
 	friend class TFx;
 
 	// Not copyable
@@ -181,7 +180,7 @@ typedef TFxPortDynamicGroup TFxPortDG;
 
 class DVAPI TFxTimeRegion
 {
-public:
+  public:
 	TFxTimeRegion();
 	TFxTimeRegion(double start, double end);
 
@@ -201,10 +200,7 @@ public:
 		return *this;
 	}
 
-	TFxTimeRegion &operator-=(double shift)
-	{
-		return operator+=(-shift);
-	}
+	TFxTimeRegion &operator-=(double shift) { return operator+=(-shift); }
 
 	bool contains(double time) const;
 	bool isUnlimited() const;
@@ -237,7 +233,7 @@ inline DVAPI TFxTimeRegion operator-(const TFxTimeRegion &tr1, double shift)
 
 class DVAPI TFxChange
 {
-public:
+  public:
 	TFx *m_fx;
 
 	double m_firstAffectedFrame;
@@ -247,11 +243,14 @@ public:
 	static double m_minFrame;
 	static double m_maxFrame;
 
-public:
+  public:
 	TFxChange(TFx *fx, double firstAffectedFrame, double lastAffectedFrame, bool dragging)
-		: m_fx(fx), m_firstAffectedFrame(firstAffectedFrame), m_lastAffectedFrame(lastAffectedFrame), m_dragging(dragging) {}
+		: m_fx(fx), m_firstAffectedFrame(firstAffectedFrame),
+		  m_lastAffectedFrame(lastAffectedFrame), m_dragging(dragging)
+	{
+	}
 
-private:
+  private:
 	TFxChange();
 };
 
@@ -259,7 +258,7 @@ private:
 
 class TFxParamChange : public TFxChange
 {
-public:
+  public:
 	TFxParamChange(TFx *fx, double firstAffectedFrame, double lastAffectedFrame, bool dragging);
 	TFxParamChange(TFx *fx, const TParamChange &src);
 };
@@ -268,7 +267,7 @@ public:
 
 class TFxPortAdded : public TFxChange
 {
-public:
+  public:
 	TFxPortAdded(TFx *fx) : TFxChange(fx, m_minFrame, m_maxFrame, false) {}
 	~TFxPortAdded() {}
 };
@@ -277,7 +276,7 @@ public:
 
 class TFxPortRemoved : public TFxChange
 {
-public:
+  public:
 	TFxPortRemoved(TFx *fx) : TFxChange(fx, m_minFrame, m_maxFrame, false) {}
 	~TFxPortRemoved() {}
 };
@@ -286,7 +285,7 @@ public:
 
 class TFxParamAdded : public TFxChange
 {
-public:
+  public:
 	TFxParamAdded(TFx *fx) : TFxChange(fx, m_minFrame, m_maxFrame, false) {}
 	~TFxParamAdded() {}
 };
@@ -295,7 +294,7 @@ public:
 
 class TFxParamRemoved : public TFxChange
 {
-public:
+  public:
 	TFxParamRemoved(TFx *fx) : TFxChange(fx, m_minFrame, m_maxFrame, false) {}
 	~TFxParamRemoved() {}
 };
@@ -304,7 +303,7 @@ public:
 
 class TFxParamsUnlinked : public TFxChange
 {
-public:
+  public:
 	TFxParamsUnlinked(TFx *fx) : TFxChange(fx, m_minFrame, m_maxFrame, false) {}
 	~TFxParamsUnlinked() {}
 };
@@ -313,7 +312,7 @@ public:
 
 class DVAPI TFxObserver
 {
-public:
+  public:
 	TFxObserver() {}
 	virtual ~TFxObserver() {}
 
@@ -349,14 +348,13 @@ public:
 
 class TFxInfo
 {
-public:
+  public:
 	std::string m_name;
 	bool m_isHidden;
 
-public:
+  public:
 	TFxInfo() {}
-	TFxInfo(const std::string &name, bool isHidden)
-		: m_name(name), m_isHidden(isHidden) {}
+	TFxInfo(const std::string &name, bool isHidden) : m_name(name), m_isHidden(isHidden) {}
 };
 
 //===================================================================
@@ -374,7 +372,7 @@ class DVAPI TFx : public TSmartObject, public TPersist, public TParamObserver
 
 	TFxImp *m_imp;
 
-public:
+  public:
 	typedef TFx *CreateProc();
 
 	TFx();
@@ -397,17 +395,22 @@ public:
 
 	TFx *getLinkedFx() const;
 
-	bool addInputPort(const std::string &name, TFxPort &p); //!< Adds a port with given name, returns false on duplicate names.
-															//!  Ownership of the port belongs to derived implementations of TFx.
-	bool addInputPort(const std::string &name, TFxPort *p,
-					  int groupIndex);			   //!< Adds a port with given name to the specified dynamic group,
-												   //!  returns false on duplicate names. Ownership is transferred to the group.
-	bool removeInputPort(const std::string &name); //!< Removes the port with given name, returns false if not found.
+	bool
+	addInputPort(const std::string &name,
+				 TFxPort &p); //!< Adds a port with given name, returns false on duplicate names.
+							  //!  Ownership of the port belongs to derived implementations of TFx.
+	bool
+	addInputPort(const std::string &name, TFxPort *p,
+				 int groupIndex); //!< Adds a port with given name to the specified dynamic group,
+	//!  returns false on duplicate names. Ownership is transferred to the group.
+	bool removeInputPort(
+		const std::string &name); //!< Removes the port with given name, returns false if not found.
 
 	bool renamePort(const std::string &oldName, const std::string &newName);
 
-	bool connect(const std::string &name, TFx *other); //!< Equivalent to getInputPort(name)->setFx(other).
-	bool disconnect(const std::string &name);		   //!< Equivalent to getInputPort(name)->setFx(0).
+	bool connect(const std::string &name,
+				 TFx *other);				  //!< Equivalent to getInputPort(name)->setFx(other).
+	bool disconnect(const std::string &name); //!< Equivalent to getInputPort(name)->setFx(0).
 
 	int getInputPortCount() const;
 	TFxPort *getInputPort(int index) const;
@@ -423,8 +426,9 @@ public:
 	bool removeOutputConnection(TFxPort *port);
 
 	static void listFxs(std::vector<TFxInfo> &fxInfos);
-	static TFxInfo getFxInfo(const std::string &fxIdentifier); //!< Returns info associated to an fx identifier, or an
-															   //!  unnamed one if none was found.
+	static TFxInfo getFxInfo(
+		const std::string &fxIdentifier); //!< Returns info associated to an fx identifier, or an
+										  //!  unnamed one if none was found.
 	virtual bool isZerary() const { return getInputPortCount() == 0; }
 
 	// returns the column index that provides reference frame for the FX.
@@ -452,10 +456,7 @@ public:
 
 	//! Returns a list of User Interface Concepts to be displayed when editing the fx parameters.
 	//! \note Ownership of the returned array allocated with new[] is passed to callers.
-	virtual void getParamUIs(TParamUIConcept *&params, int &length)
-	{
-		params = 0, length = 0;
-	}
+	virtual void getParamUIs(TParamUIConcept *&params, int &length) { params = 0, length = 0; }
 
 	inline std::string getFxType() const;
 	virtual std::string getPluginId() const = 0;
@@ -485,7 +486,10 @@ public:
 
 	//! Compatibility function - used to translate a port name from older Toonz
 	//! versions into its current form.
-	virtual void compatibilityTranslatePort(int majorVersion, int minorVersion, std::string &portName) {}
+	virtual void compatibilityTranslatePort(int majorVersion, int minorVersion,
+											std::string &portName)
+	{
+	}
 
 	/*-- Rendering（目玉）ボタンがOFFのときに使用されるInputPort --*/
 	virtual int getPreferredInputPort() { return 0; }
@@ -496,14 +500,14 @@ public:
 	virtual void callStartRenderFrameHandler(const TRenderSettings *rs, double frame) {}
 	virtual void callEndRenderFrameHandler(const TRenderSettings *rs, double frame) {}
 
-public:
+  public:
 	// Id-related functions
 
 	unsigned long getIdentifier() const;
 	void setIdentifier(unsigned long id);
 	void setNewIdentifier();
 
-private:
+  private:
 	// not implemented
 	TFx(const TFx &);
 	TFx &operator=(const TFx &);
@@ -519,14 +523,13 @@ DVAPI TIStream &operator>>(TIStream &in, TFxP &p);
 
 class DVAPI TFxDeclaration : public TPersistDeclaration
 {
-public:
+  public:
 	TFxDeclaration(const TFxInfo &info);
 };
 
-template <class T>
-class TFxDeclarationT : public TFxDeclaration
+template <class T> class TFxDeclarationT : public TFxDeclaration
 {
-public:
+  public:
 	TFxDeclarationT(const TFxInfo &info) : TFxDeclaration(info) {}
 	TPersist *create() const { return new T; }
 };
@@ -540,22 +543,22 @@ inline std::string TFx::getFxType() const
 
 //-------------------------------------------------------------------
 
-#define FX_DECLARATION(T) \
-public:                   \
+#define FX_DECLARATION(T)                                                                          \
+  public:                                                                                          \
 	const TPersistDeclaration *getDeclaration() const;
 
-#define FX_IDENTIFIER(T, I)                        \
-	namespace                                      \
-	{                                              \
-	TFxDeclarationT<T> info##T(TFxInfo(I, false)); \
-	}                                              \
+#define FX_IDENTIFIER(T, I)                                                                        \
+	namespace                                                                                      \
+	{                                                                                              \
+	TFxDeclarationT<T> info##T(TFxInfo(I, false));                                                 \
+	}                                                                                              \
 	const TPersistDeclaration *T::getDeclaration() const { return &info##T; }
 
-#define FX_IDENTIFIER_IS_HIDDEN(T, I)             \
-	namespace                                     \
-	{                                             \
-	TFxDeclarationT<T> info##T(TFxInfo(I, true)); \
-	}                                             \
+#define FX_IDENTIFIER_IS_HIDDEN(T, I)                                                              \
+	namespace                                                                                      \
+	{                                                                                              \
+	TFxDeclarationT<T> info##T(TFxInfo(I, true));                                                  \
+	}                                                                                              \
 	const TPersistDeclaration *T::getDeclaration() const { return &info##T; }
 
 //===================================================================

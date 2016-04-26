@@ -34,9 +34,10 @@ int nanosleep(const struct timespec *rqtp, struct timespec *rmtp);
 
 using namespace std;
 
-CBlurMatrix::CBlurMatrix(const CBlurMatrix &m) : // throw(SBlurMatrixError) :
-												 m_isSAC(m.m_isSAC),
-												 m_isRS(m.m_isRS)
+CBlurMatrix::CBlurMatrix(const CBlurMatrix &m)
+	: // throw(SBlurMatrixError) :
+	  m_isSAC(m.m_isSAC),
+	  m_isRS(m.m_isRS)
 {
 	try {
 		for (int i = 0; i < NBRS; i++)
@@ -46,8 +47,7 @@ CBlurMatrix::CBlurMatrix(const CBlurMatrix &m) : // throw(SBlurMatrixError) :
 	}
 }
 
-CBlurMatrix::CBlurMatrix(const double d, const int nb,
-						 const bool isSAC, const bool isRS)
+CBlurMatrix::CBlurMatrix(const double d, const int nb, const bool isSAC, const bool isRS)
 // throw(SBlurMatrixError)
 {
 	try {
@@ -193,12 +193,12 @@ void CBlurMatrix::createEqual(const double d, const int nb)
 }
 
 void CBlurMatrix::addPath(vector<BLURSECTION>::iterator pBS)
-//throw(exception)
+// throw(exception)
 {
 	try {
 		if (pBS->size() > 0) {
 			BLURSECTION::iterator xyd = pBS->begin();
-			//SXYD* xyd= pBS->begin();
+			// SXYD* xyd= pBS->begin();
 			int x = xyd->x;
 			int y = xyd->y;
 			int l = std::max(std::abs(x), std::abs(y));
@@ -216,13 +216,11 @@ void CBlurMatrix::addPath(vector<BLURSECTION>::iterator pBS)
 	}
 }
 
-void CBlurMatrix::addPath() //throw(SBlurMatrixError)
+void CBlurMatrix::addPath() // throw(SBlurMatrixError)
 {
 	try {
 		for (int i = 0; i < (m_isRS ? NBRS : 1); i++) {
-			for (vector<BLURSECTION>::iterator pBS = m_m[i].begin();
-				 pBS != m_m[i].end();
-				 ++pBS) {
+			for (vector<BLURSECTION>::iterator pBS = m_m[i].begin(); pBS != m_m[i].end(); ++pBS) {
 				addPath(pBS);
 			}
 		}

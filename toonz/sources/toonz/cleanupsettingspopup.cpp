@@ -56,7 +56,7 @@ CleanupTab::CleanupTab()
 
 	QWidget *settingsBox = new QWidget(this);
 	mainLayout->addWidget(settingsBox);
-	mainLayout->addStretch(); //This is the reason we need mainLayout
+	mainLayout->addStretch(); // This is the reason we need mainLayout
 
 	QGridLayout *settingsLayout = new QGridLayout(settingsBox);
 	settingsBox->setLayout(settingsLayout);
@@ -201,7 +201,8 @@ void CleanupTab::onGenericSettingsChange()
 	CleanupSettingsModel *model = CleanupSettingsModel::instance();
 	CleanupParameters *params = model->getCurrentParameters();
 
-	params->m_autocenterType = m_autoCenter->isChecked() ? CleanupTypes::AUTOCENTER_FDG : CleanupTypes::AUTOCENTER_NONE;
+	params->m_autocenterType =
+		m_autoCenter->isChecked() ? CleanupTypes::AUTOCENTER_FDG : CleanupTypes::AUTOCENTER_NONE;
 	params->m_pegSide = (CleanupTypes::PEGS_SIDE)(m_pegHolesOm->currentIndex() + 1);
 	params->setFdgByName(m_fieldGuideOm->currentText().toStdString());
 	params->m_rotate = m_rotateOm->currentIndex() * 90;
@@ -336,7 +337,8 @@ ProcessingTab::ProcessingTab()
 	ret = ret && connect(m_lineProcessing, SIGNAL(activated(int)), SLOT(onGenericSettingsChange()));
 	ret = ret && connect(m_antialias, SIGNAL(activated(int)), SLOT(onGenericSettingsChange()));
 	ret = ret && connect(m_autoadjustOm, SIGNAL(activated(int)), SLOT(onGenericSettingsChange()));
-	ret = ret && connect(m_despeckling, SIGNAL(valueChanged(bool)), SLOT(onGenericSettingsChange()));
+	ret =
+		ret && connect(m_despeckling, SIGNAL(valueChanged(bool)), SLOT(onGenericSettingsChange()));
 	ret = ret && connect(m_aaValue, SIGNAL(valueChanged(bool)), SLOT(onGenericSettingsChange()));
 	assert(ret);
 }
@@ -426,8 +428,8 @@ void ProcessingTab::onSharpnessChange(bool dragging = false)
 CameraTab::CameraTab()
 {
 	bool ret = true;
-	ret = ret && connect(TApp::instance()->getCurrentLevel(),
-						 SIGNAL(xshLevelSwitched(TXshLevel *)), SLOT(onLevelSwitched()));
+	ret = ret && connect(TApp::instance()->getCurrentLevel(), SIGNAL(xshLevelSwitched(TXshLevel *)),
+						 SLOT(onLevelSwitched()));
 	ret = ret && connect(this, SIGNAL(cleanupSettingsChanged()), SLOT(onGenericSettingsChange()));
 	assert(ret);
 }
@@ -466,7 +468,8 @@ void CameraTab::updateImageInfo()
 	model->getCleanupFrame(sl, fid);
 
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
-	TFilePath outputPath(sl ? scene->decodeFilePath(model->getOutputPath(sl, params)) : TFilePath());
+	TFilePath outputPath(sl ? scene->decodeFilePath(model->getOutputPath(sl, params))
+							: TFilePath());
 
 	setImageInfo(outputPath);
 }
@@ -491,8 +494,7 @@ void CameraTab::onGenericSettingsChange()
 //    CleanupSettings implementation
 //**********************************************************************
 
-CleanupSettings::CleanupSettings(QWidget *parent)
-	: QWidget(parent), m_attached(false)
+CleanupSettings::CleanupSettings(QWidget *parent) : QWidget(parent), m_attached(false)
 {
 	QVBoxLayout *vLayout = new QVBoxLayout(this);
 	vLayout->setMargin(1); // NOTE: This works to show the 1-pix black border,
@@ -531,7 +533,7 @@ CleanupSettings::CleanupSettings(QWidget *parent)
 
 	QStackedWidget *stackedWidget = new QStackedWidget(split);
 	stackedWidget->setMinimumWidth(300);
-	//stackedWidget->setMinimumHeight(250);
+	// stackedWidget->setMinimumHeight(250);
 
 	split->addWidget(stackedWidget);
 	split->setStretchFactor(0, 1);
@@ -594,12 +596,14 @@ CleanupSettings::CleanupSettings(QWidget *parent)
 
 	leftToolBar->setFixedWidth(110);
 
-	m_swatchAct = new QAction(createQIconOnOffPNG("preview", true), tr("Toggle Swatch Preview"), this);
+	m_swatchAct =
+		new QAction(createQIconOnOffPNG("preview", true), tr("Toggle Swatch Preview"), this);
 	m_swatchAct->setCheckable(true);
 	leftToolBar->addAction(m_swatchAct);
 	leftToolBar->addSeparator();
 
-	m_opacityAct = new QAction(createQIconOnOffPNG("opacitycheck", true), tr("Toggle Opacity Check"), this);
+	m_opacityAct =
+		new QAction(createQIconOnOffPNG("opacitycheck", true), tr("Toggle Opacity Check"), this);
 	m_opacityAct->setCheckable(true);
 	leftToolBar->addAction(m_opacityAct);
 
@@ -618,7 +622,8 @@ CleanupSettings::CleanupSettings(QWidget *parent)
 	QAction *loadAct = new QAction(createQIconOnOffPNG("load", false), tr("Load Settings"), this);
 	rightToolBar->addAction(loadAct);
 	rightToolBar->addSeparator();
-	QAction *resetAct = new QAction(createQIconOnOffPNG("resetsize", false), tr("Reset Settings"), this);
+	QAction *resetAct =
+		new QAction(createQIconOnOffPNG("resetsize", false), tr("Reset Settings"), this);
 	rightToolBar->addAction(resetAct);
 
 	//  Model-related stuff
@@ -631,7 +636,8 @@ CleanupSettings::CleanupSettings(QWidget *parent)
 	assert(opacityCheckCmd);
 
 	bool ret = true;
-	ret = ret && connect(tabBar, SIGNAL(currentChanged(int)), stackedWidget, SLOT(setCurrentIndex(int)));
+	ret = ret &&
+		  connect(tabBar, SIGNAL(currentChanged(int)), stackedWidget, SLOT(setCurrentIndex(int)));
 	ret = ret && connect(m_swatchAct, SIGNAL(toggled(bool)), SLOT(enableSwatch(bool)));
 	ret = ret && connect(m_opacityAct, SIGNAL(triggered(bool)), opacityCheckCmd, SLOT(trigger()));
 	ret = ret && connect(saveAct, SIGNAL(triggered()), model, SLOT(promptSave()));
@@ -650,7 +656,7 @@ void CleanupSettings::showEvent(QShowEvent *se)
 	if (!m_attached) {
 		m_attached = true;
 
-		//Should ensure that swatch is off...
+		// Should ensure that swatch is off...
 		CleanupSettingsModel *model = CleanupSettingsModel::instance();
 
 		model->attach(CleanupSettingsModel::LISTENER);
@@ -668,7 +674,7 @@ void CleanupSettings::showEvent(QShowEvent *se)
 		onClnLoaded();
 
 		if (m_swatchAct->isChecked())
-			enableSwatch(true); //attach swatch
+			enableSwatch(true); // attach swatch
 	}
 }
 
@@ -683,7 +689,7 @@ void CleanupSettings::hideEvent(QHideEvent *he)
 	if (m_attached) {
 		m_attached = false;
 
-		//Should put swatch to off...
+		// Should put swatch to off...
 		CleanupSettingsModel *model = CleanupSettingsModel::instance();
 
 		model->detach(CleanupSettingsModel::LISTENER);
@@ -695,7 +701,7 @@ void CleanupSettings::hideEvent(QHideEvent *he)
 		assert(ret);
 
 		if (m_swatchAct->isChecked())
-			enableSwatch(false); //detach swatch
+			enableSwatch(false); // detach swatch
 	}
 
 	QWidget::hideEvent(he);
@@ -764,8 +770,7 @@ void CleanupSettings::onPreviewDataChanged()
 	TAffine transform;
 
 	CleanupSettingsModel::instance()->getPreviewData(original, transformed, transform);
-	m_swatch->setRaster(original ? original->getRaster() : TRasterP(),
-						transform,
+	m_swatch->setRaster(original ? original->getRaster() : TRasterP(), transform,
 						transformed ? transformed->getRaster() : TRasterP());
 }
 
@@ -782,7 +787,9 @@ void CleanupSettings::onClnLoaded()
 {
 	const TFilePath &fp = CleanupSettingsModel::instance()->clnPath();
 
-	const QString &newWindowTitle = (fp.isEmpty()) ? tr("Cleanup Settings") : tr("Cleanup Settings: %1").arg(toQString(fp.withoutParentDir()));
+	const QString &newWindowTitle =
+		(fp.isEmpty()) ? tr("Cleanup Settings")
+					   : tr("Cleanup Settings: %1").arg(toQString(fp.withoutParentDir()));
 
 	if (windowTitle() != newWindowTitle) {
 		setWindowTitle(newWindowTitle);
@@ -806,9 +813,8 @@ void CleanupSettings::onRestoreSceneSettings()
 
 class ToggleOpacityCheckCommand : public MenuItemHandler
 {
-public:
-	ToggleOpacityCheckCommand()
-		: MenuItemHandler(MI_OpacityCheck) {}
+  public:
+	ToggleOpacityCheckCommand() : MenuItemHandler(MI_OpacityCheck) {}
 
 	void execute()
 	{
@@ -835,19 +841,20 @@ public:
 
   void initialize(TPanel* panel)
   {
-    CleanupSettings* cleanupSettings = new CleanupSettings(panel);
-    panel->setWidget(cleanupSettings);
+	CleanupSettings* cleanupSettings = new CleanupSettings(panel);
+	panel->setWidget(cleanupSettings);
 
-    bool ret = QObject::connect(
-      cleanupSettings, SIGNAL(windowTitleChanged(const QString&)),
-      panel,           SLOT(setWindowTitle(const QString&)));
-    assert(ret);
+	bool ret = QObject::connect(
+	  cleanupSettings, SIGNAL(windowTitleChanged(const QString&)),
+	  panel,           SLOT(setWindowTitle(const QString&)));
+	assert(ret);
 
-    panel->setMinimumSize(320, 150);
-    panel->resize(600, 500);
+	panel->setMinimumSize(320, 150);
+	panel->resize(600, 500);
   }
 
 } cleanupSettingsFactory;
 */
 
-OpenFloatingPanel cleanupSettingsCommand(MI_CleanupSettings, "CleanupSettings", QObject::tr("Cleanup Settings"));
+OpenFloatingPanel cleanupSettingsCommand(MI_CleanupSettings, "CleanupSettings",
+										 QObject::tr("Cleanup Settings"));

@@ -58,8 +58,9 @@ class NewCameraUndo : public TUndo
 	TXsheetHandle *m_xshHandle;
 	TObjectHandle *m_objHandle;
 
-public:
-	NewCameraUndo(const TStageObjectId &cameraId, TXsheetHandle *xshHandle, TObjectHandle *objHandle)
+  public:
+	NewCameraUndo(const TStageObjectId &cameraId, TXsheetHandle *xshHandle,
+				  TObjectHandle *objHandle)
 		: m_cameraId(cameraId), m_stageObject(0), m_xshHandle(xshHandle), m_objHandle(objHandle)
 	{
 		assert(cameraId.isCamera());
@@ -68,10 +69,7 @@ public:
 		m_stageObject->addRef();
 		m_oldCurrentId = m_objHandle->getObjectId();
 	}
-	~NewCameraUndo()
-	{
-		m_stageObject->release();
-	}
+	~NewCameraUndo() { m_stageObject->release(); }
 	void undo() const
 	{
 		TXsheet *xsh = m_xshHandle->getXsheet();
@@ -93,12 +91,9 @@ public:
 	{
 		return QObject::tr("New Camera  %1").arg(QString::fromStdString(m_cameraId.toString()));
 	}
-	int getHistoryType()
-	{
-		return HistoryType::Schematic;
-	}
+	int getHistoryType() { return HistoryType::Schematic; }
 
-private:
+  private:
 	// not implemented
 	NewCameraUndo(const NewCameraUndo &);
 	NewCameraUndo &operator=(const NewCameraUndo &);
@@ -117,7 +112,7 @@ class NewPegbarUndo : public TUndo
 	TXsheetHandle *m_xshHandle;
 	TObjectHandle *m_objHandle;
 
-public:
+  public:
 	NewPegbarUndo(const TStageObjectId &id, TXsheetHandle *xshHandle, TObjectHandle *objHandle)
 		: m_id(id), m_stageObject(0), m_xshHandle(xshHandle), m_objHandle(objHandle)
 	{
@@ -128,10 +123,7 @@ public:
 		m_oldCurrentId = m_objHandle->getObjectId();
 	}
 
-	~NewPegbarUndo()
-	{
-		m_stageObject->release();
-	}
+	~NewPegbarUndo() { m_stageObject->release(); }
 
 	void undo() const
 	{
@@ -155,12 +147,9 @@ public:
 		return QObject::tr("New Pegbar  %1").arg(QString::fromStdString(m_id.toString()));
 	}
 
-	int getHistoryType()
-	{
-		return HistoryType::Schematic;
-	}
+	int getHistoryType() { return HistoryType::Schematic; }
 
-private:
+  private:
 	// not implemented
 	NewPegbarUndo(const NewPegbarUndo &);
 	NewPegbarUndo &operator=(const NewPegbarUndo &);
@@ -177,11 +166,9 @@ class SetActiveCameraUndo : public TUndo
 	TStageObjectId m_oldCameraId, m_newCameraId;
 	TXsheetHandle *m_xshHandle;
 
-public:
-	SetActiveCameraUndo(
-		const TStageObjectId &oldCameraId,
-		const TStageObjectId &newCameraId,
-		TXsheetHandle *xshHandle)
+  public:
+	SetActiveCameraUndo(const TStageObjectId &oldCameraId, const TStageObjectId &newCameraId,
+						TXsheetHandle *xshHandle)
 		: m_oldCameraId(oldCameraId), m_newCameraId(newCameraId), m_xshHandle(xshHandle)
 	{
 	}
@@ -211,10 +198,7 @@ public:
 			.arg(QString::fromStdString(m_newCameraId.toString()));
 	}
 
-	int getHistoryType()
-	{
-		return HistoryType::Schematic;
-	}
+	int getHistoryType() { return HistoryType::Schematic; }
 };
 
 //===================================================================
@@ -230,7 +214,7 @@ class RemoveSplineUndo : public TUndo
 	std::vector<TStageObjectId> m_ids;
 	TXsheetHandle *m_xshHandle;
 
-public:
+  public:
 	RemoveSplineUndo(TStageObjectSpline *spline, TXsheetHandle *xshHandle)
 		: m_spline(spline), m_xshHandle(xshHandle)
 	{
@@ -242,10 +226,7 @@ public:
 				m_ids.push_back(pegbar->getId());
 		}
 	}
-	~RemoveSplineUndo()
-	{
-		m_spline->release();
-	}
+	~RemoveSplineUndo() { m_spline->release(); }
 	void undo() const
 	{
 		TXsheet *xsh = m_xshHandle->getXsheet();
@@ -268,18 +249,17 @@ public:
 		xsh->getStageObjectTree()->removeSpline(m_spline);
 		m_xshHandle->notifyXsheetChanged();
 	}
-	int getSize() const { return sizeof *this + sizeof(TStageObjectSpline) + sizeof(TStageObjectId) * m_ids.size(); }
+	int getSize() const
+	{
+		return sizeof *this + sizeof(TStageObjectSpline) + sizeof(TStageObjectId) * m_ids.size();
+	}
 
 	QString getHistoryString()
 	{
-		return QObject::tr("Remove Spline  %1")
-			.arg(QString::fromStdString(m_id.toString()));
+		return QObject::tr("Remove Spline  %1").arg(QString::fromStdString(m_id.toString()));
 	}
 
-	int getHistoryType()
-	{
-		return HistoryType::Schematic;
-	}
+	int getHistoryType() { return HistoryType::Schematic; }
 };
 
 //===================================================================
@@ -294,16 +274,13 @@ class NewSplineUndo : public TUndo
 	TStageObjectSpline *m_spline;
 	TXsheetHandle *m_xshHandle;
 
-public:
+  public:
 	NewSplineUndo(const TStageObjectId &id, TStageObjectSpline *spline, TXsheetHandle *xshHandle)
 		: m_id(id), m_spline(spline), m_xshHandle(xshHandle)
 	{
 		m_spline->addRef();
 	}
-	~NewSplineUndo()
-	{
-		m_spline->release();
-	}
+	~NewSplineUndo() { m_spline->release(); }
 	void undo() const
 	{
 		TXsheet *xsh = m_xshHandle->getXsheet();
@@ -326,13 +303,9 @@ public:
 
 	QString getHistoryString()
 	{
-		return QObject::tr("New Motion Path  %1")
-			.arg(QString::fromStdString(m_spline->getName()));
+		return QObject::tr("New Motion Path  %1").arg(QString::fromStdString(m_spline->getName()));
 	}
-	int getHistoryType()
-	{
-		return HistoryType::Schematic;
-	}
+	int getHistoryType() { return HistoryType::Schematic; }
 };
 
 //===================================================================
@@ -347,17 +320,14 @@ class SplineLinkUndo : public TUndo
 	TStageObjectSpline *m_spline;
 	TXsheetHandle *m_xshHandle;
 
-public:
+  public:
 	SplineLinkUndo(const TStageObjectId &id, TStageObjectSpline *spline, TXsheetHandle *xshHandle)
 		: m_id(id), m_spline(spline), m_xshHandle(xshHandle)
 	{
 		m_spline->addRef();
 	}
 
-	~SplineLinkUndo()
-	{
-		m_spline->release();
-	}
+	~SplineLinkUndo() { m_spline->release(); }
 
 	void undo() const
 	{
@@ -381,10 +351,7 @@ public:
 			.arg(QString::fromStdString(m_spline->getName()))
 			.arg(QString::fromStdString(m_id.toString()));
 	}
-	int getHistoryType()
-	{
-		return HistoryType::Schematic;
-	}
+	int getHistoryType() { return HistoryType::Schematic; }
 };
 
 //===================================================================
@@ -400,7 +367,7 @@ class RemoveSplineLinkUndo : public TUndo
 	TXsheetHandle *m_xshHandle;
 	TObjectHandle *m_objHandle;
 
-public:
+  public:
 	RemoveSplineLinkUndo(const TStageObjectId &id, TStageObjectSpline *spline,
 						 TXsheetHandle *xshHandle, TObjectHandle *objHandle)
 		: m_id(id), m_spline(spline), m_xshHandle(xshHandle), m_objHandle(objHandle)
@@ -408,10 +375,7 @@ public:
 		m_spline->addRef();
 	}
 
-	~RemoveSplineLinkUndo()
-	{
-		m_spline->release();
-	}
+	~RemoveSplineLinkUndo() { m_spline->release(); }
 
 	void undo() const
 	{
@@ -456,7 +420,7 @@ class RemovePegbarNodeUndo : public TUndo
 	QList<TStageObjectId> m_linkedObj;
 	TXsheetHandle *m_xshHandle;
 
-public:
+  public:
 	RemovePegbarNodeUndo(TStageObjectId id, TXsheetHandle *xshHandle)
 		: TUndo(), m_objId(id), m_xshHandle(xshHandle), m_column(0)
 	{
@@ -468,19 +432,13 @@ public:
 			m_column = xsh->getColumn(id.getIndex());
 	}
 
-	~RemovePegbarNodeUndo()
-	{
-		delete m_params;
-	}
+	~RemovePegbarNodeUndo() { delete m_params; }
 
-	void setLinkedObjects(const QList<TStageObjectId> &linkedObj)
-	{
-		m_linkedObj = linkedObj;
-	}
+	void setLinkedObjects(const QList<TStageObjectId> &linkedObj) { m_linkedObj = linkedObj; }
 
 	void undo() const
 	{
-		//reinsert Object
+		// reinsert Object
 		TXsheet *xsh = m_xshHandle->getXsheet();
 		if (m_objId.isColumn() && m_column)
 			xsh->insertColumn(m_objId.getIndex(), m_column.getPointer());
@@ -516,20 +474,13 @@ public:
 		m_xshHandle->notifyXsheetChanged();
 	}
 
-	int getSize() const
-	{
-		return sizeof *this + sizeof(TStageObjectParams) + sizeof(m_xshHandle);
-	}
+	int getSize() const { return sizeof *this + sizeof(TStageObjectParams) + sizeof(m_xshHandle); }
 
 	QString getHistoryString()
 	{
-		return QObject::tr("Remove Object  %1")
-			.arg(QString::fromStdString(m_objId.toString()));
+		return QObject::tr("Remove Object  %1").arg(QString::fromStdString(m_objId.toString()));
 	}
-	int getHistoryType()
-	{
-		return HistoryType::Schematic;
-	}
+	int getHistoryType() { return HistoryType::Schematic; }
 };
 
 //===================================================================
@@ -546,12 +497,13 @@ class RemoveColumnsUndo : public TUndo
 	QList<TFx *> m_notTerminalColumns;
 	TXsheetHandle *m_xshHandle;
 
-public:
+  public:
 	RemoveColumnsUndo(const std::vector<TFx *> &deletedFx, const std::vector<TFx *> &terminalFx,
 					  const QMap<TStageObjectId, QList<TFxPort *>> columnFxConnections,
-					  const QList<TFx *> &notTerminalColumns,
-					  TXsheetHandle *xshHandle)
-		: TUndo(), m_deletedFx(deletedFx), m_terminalFx(terminalFx), m_columnFxConnections(columnFxConnections), m_notTerminalColumns(notTerminalColumns), m_xshHandle(xshHandle)
+					  const QList<TFx *> &notTerminalColumns, TXsheetHandle *xshHandle)
+		: TUndo(), m_deletedFx(deletedFx), m_terminalFx(terminalFx),
+		  m_columnFxConnections(columnFxConnections), m_notTerminalColumns(notTerminalColumns),
+		  m_xshHandle(xshHandle)
 	{
 		int i;
 		for (i = 0; i < (int)m_deletedFx.size(); i++)
@@ -606,12 +558,9 @@ public:
 
 	int getSize() const
 	{
-		return sizeof *this +
-			   m_deletedFx.size() * sizeof(TFx) +
-			   m_terminalFx.size() * sizeof(TFx) +
+		return sizeof *this + m_deletedFx.size() * sizeof(TFx) + m_terminalFx.size() * sizeof(TFx) +
 			   m_columnFxConnections.size() * (sizeof(TStageObjectId) + 10 * sizeof(TFxPort)) +
-			   m_notTerminalColumns.size() * sizeof(TFx) +
-			   sizeof(TXsheetHandle);
+			   m_notTerminalColumns.size() * sizeof(TFx) + sizeof(TXsheetHandle);
 	}
 
 	QString getHistoryString()
@@ -626,10 +575,7 @@ public:
 		}
 		return str;
 	}
-	int getHistoryType()
-	{
-		return HistoryType::Schematic;
-	}
+	int getHistoryType() { return HistoryType::Schematic; }
 };
 
 //===================================================================
@@ -645,15 +591,14 @@ class UndoGroup : public TUndo
 	QList<int> m_positions;
 	TXsheetHandle *m_xshHandle;
 
-public:
-	UndoGroup(const QList<TStageObjectId> &ids, int groupId, const QList<int> &positions, TXsheetHandle *xshHandle)
+  public:
+	UndoGroup(const QList<TStageObjectId> &ids, int groupId, const QList<int> &positions,
+			  TXsheetHandle *xshHandle)
 		: m_ids(ids), m_groupId(groupId), m_positions(positions), m_xshHandle(xshHandle)
 	{
 	}
 
-	~UndoGroup()
-	{
-	}
+	~UndoGroup() {}
 
 	void undo() const
 	{
@@ -702,7 +647,7 @@ class UndoUngroup : public TUndo
 	std::wstring m_groupName;
 	TXsheetHandle *m_xshHandle;
 
-public:
+  public:
 	UndoUngroup(const QList<TStageObject *> &objs, TXsheetHandle *xshHandle)
 		: m_xshHandle(xshHandle)
 	{
@@ -717,14 +662,9 @@ public:
 		}
 	}
 
-	~UndoUngroup()
-	{
-	}
+	~UndoUngroup() {}
 
-	void setStackPositions(const QList<int> &positions)
-	{
-		m_positions = positions;
-	}
+	void setStackPositions(const QList<int> &positions) { m_positions = positions; }
 
 	void undo() const
 	{
@@ -777,10 +717,12 @@ class UndoRenameGroup : public TUndo
 	std::wstring m_newGroupName;
 	TXsheetHandle *m_xshHandle;
 
-public:
+  public:
 	UndoRenameGroup(const QList<TStageObject *> &objs, const QList<int> &positions,
-					const std::wstring &newName, const std::wstring &oldName, TXsheetHandle *xshHandle)
-		: m_objs(objs), m_newGroupName(newName), m_oldGroupName(oldName), m_xshHandle(xshHandle), m_positions(positions)
+					const std::wstring &newName, const std::wstring &oldName,
+					TXsheetHandle *xshHandle)
+		: m_objs(objs), m_newGroupName(newName), m_oldGroupName(oldName), m_xshHandle(xshHandle),
+		  m_positions(positions)
 	{
 		assert(objs.size() > 0);
 		int i;
@@ -832,15 +774,17 @@ class UndoStatusChange : public TUndo
 	TStageObject::Status m_oldStatus, m_newStatus;
 	TXsheetHandle *m_xshHandle;
 
-public:
+  public:
 	UndoStatusChange(TStageObject *obj, TXsheetHandle *xshHandle)
 		: m_obj(obj), m_xshHandle(xshHandle)
 	{
 		m_obj->addRef();
-		//devo fare addref della spline altimenti crasha in uscita
-		//m_obj non fa addref della spline a lui associata, e quindi crasha perche' la spline viene distrutta
-		//prima di m_obj... sarebbe piu' corretto fare addref della spline quando viene settata all'oggetto
-		//piuttosto che farla qui?
+		// devo fare addref della spline altimenti crasha in uscita
+		// m_obj non fa addref della spline a lui associata, e quindi crasha perche' la spline viene
+		// distrutta
+		// prima di m_obj... sarebbe piu' corretto fare addref della spline quando viene settata
+		// all'oggetto
+		// piuttosto che farla qui?
 		TStageObjectSpline *spline = m_obj->getSpline();
 		if (spline)
 			spline->addRef();
@@ -855,10 +799,7 @@ public:
 			spline->release();
 	}
 
-	void onAdd()
-	{
-		m_newStatus = m_obj->getStatus();
-	}
+	void onAdd() { m_newStatus = m_obj->getStatus(); }
 
 	void undo() const
 	{
@@ -887,9 +828,8 @@ void removeStageObjectNode(const TStageObjectId &id, TXsheetHandle *xshHandle,
 	TXsheet *xsh = xshHandle->getXsheet();
 	TStageObject *pegbar = xsh->getStageObject(id);
 
-	//Lacamera corrente e il tavolo non si devono rimuovere
-	if (id.isTable() ||
-		(id.isCamera() && xsh->getStageObjectTree()->getCurrentCameraId() == id))
+	// Lacamera corrente e il tavolo non si devono rimuovere
+	if (id.isTable() || (id.isCamera() && xsh->getStageObjectTree()->getCurrentCameraId() == id))
 		return;
 
 	// stacco tutti i figli e li attacco al padre
@@ -965,8 +905,8 @@ void removeColums(const QVector<int> &columnIndexes, TXsheetHandle *xshHandle,
 	}
 
 	if (doUndo) {
-		RemoveColumnsUndo *undo = new RemoveColumnsUndo(fxsToKill, terminalFxsToKill, columnFxConnection,
-														notTerminalColumns, xshHandle);
+		RemoveColumnsUndo *undo = new RemoveColumnsUndo(
+			fxsToKill, terminalFxsToKill, columnFxConnection, notTerminalColumns, xshHandle);
 		TUndoManager::manager()->add(undo);
 	}
 
@@ -979,8 +919,10 @@ void removeColums(const QVector<int> &columnIndexes, TXsheetHandle *xshHandle,
 		int j, outputPortCount = fx->getOutputConnectionCount();
 		for (j = outputPortCount - 1; j >= 0; j--) {
 			TFxPort *port = fx->getOutputConnection(j);
-			std::vector<TFx *>::iterator it = std::find(fxsToKill.begin(), fxsToKill.end(), port->getOwnerFx());
-			std::set<TFx *>::iterator it2 = std::find(leafesFx.begin(), leafesFx.end(), port->getFx());
+			std::vector<TFx *>::iterator it =
+				std::find(fxsToKill.begin(), fxsToKill.end(), port->getOwnerFx());
+			std::set<TFx *>::iterator it2 =
+				std::find(leafesFx.begin(), leafesFx.end(), port->getFx());
 			if (it == fxsToKill.end() && it2 == leafesFx.end())
 				port->setFx(0);
 		}
@@ -989,7 +931,8 @@ void removeColums(const QVector<int> &columnIndexes, TXsheetHandle *xshHandle,
 	}
 
 	for (i = columnIndexes.size() - 1; i >= 0; i--)
-		removeStageObjectNode(TStageObjectId::ColumnId(columnIndexes[i]), xshHandle, objHandle, fxHandle, doUndo);
+		removeStageObjectNode(TStageObjectId::ColumnId(columnIndexes[i]), xshHandle, objHandle,
+							  fxHandle, doUndo);
 }
 
 //===================================================================
@@ -998,7 +941,8 @@ void removeColums(const QVector<int> &columnIndexes, TXsheetHandle *xshHandle,
 //
 //-------------------------------------------------------------------
 
-void removeSpline(TStageObjectSpline *spline, TXsheetHandle *xshHandle, TObjectHandle *objHandle, bool doUndo = true)
+void removeSpline(TStageObjectSpline *spline, TXsheetHandle *xshHandle, TObjectHandle *objHandle,
+				  bool doUndo = true)
 {
 	if (doUndo)
 		TUndoManager::manager()->add(new RemoveSplineUndo(spline, xshHandle));
@@ -1013,14 +957,14 @@ void removeSpline(TStageObjectSpline *spline, TXsheetHandle *xshHandle, TObjectH
 	}
 
 	pegbarTree->removeSpline(spline);
-	//xshHandle->notifyXsheetChanged();
+	// xshHandle->notifyXsheetChanged();
 }
 
 void removeLink(const QPair<TStageObjectId, TStageObjectId> &link, TXsheetHandle *xshHandle,
 				TObjectHandle *objHandle, bool doUndo = true)
 {
 	TStageObjectTree *objTree = xshHandle->getXsheet()->getStageObjectTree();
-	if (link.first == link.second) { //is a link connecting a spline with an object
+	if (link.first == link.second) { // is a link connecting a spline with an object
 		TStageObject *object = objTree->getStageObject(link.first, false);
 		if (!object)
 			return;
@@ -1039,8 +983,7 @@ void removeLink(const QPair<TStageObjectId, TStageObjectId> &link, TXsheetHandle
 		if (!object || !parentObject || object->isGrouped() || parentObject->isGrouped())
 			return;
 		assert(object->getParent() == parentObject->getId());
-		TStageObjectCmd::setParent(object->getId(), TStageObjectId::NoneId,
-								   "", xshHandle, doUndo);
+		TStageObjectCmd::setParent(object->getId(), TStageObjectId::NoneId, "", xshHandle, doUndo);
 	}
 }
 
@@ -1057,14 +1000,13 @@ namespace
 
 //-------------------------------------------------------------------
 
-template <class T>
-class SetAttributeUndo : public TUndo
+template <class T> class SetAttributeUndo : public TUndo
 {
 	TStageObjectId m_id;
 	T m_oldValue, m_newValue;
 	TXsheetHandle *m_xshHandle;
 
-public:
+  public:
 	SetAttributeUndo(const TStageObjectId &id, TXsheetHandle *xshHandle, T oldValue, T newValue)
 		: m_id(id), m_xshHandle(xshHandle), m_oldValue(oldValue), m_newValue(newValue)
 	{
@@ -1098,10 +1040,7 @@ public:
 	}
 	int getSize() const { return sizeof(*this); }
 
-	int getHistoryType()
-	{
-		return HistoryType::Unidentified;
-	}
+	int getHistoryType() { return HistoryType::Unidentified; }
 	QString getHistoryString()
 	{
 		return QString("%1 %2 : %3 -> %4")
@@ -1110,46 +1049,36 @@ public:
 			.arg(getStringFromValue(m_oldValue))
 			.arg(getStringFromValue(m_newValue));
 	}
-	virtual QString getActionName()
-	{
-		return QString();
-	}
-	virtual QString getStringFromValue(T value)
-	{
-		return QString();
-	}
+	virtual QString getActionName() { return QString(); }
+	virtual QString getStringFromValue(T value) { return QString(); }
 };
 
 //-------------------------------------------------------------------
 
 class StageObjectRenameUndo : public SetAttributeUndo<std::string>
 {
-public:
-	StageObjectRenameUndo(const TStageObjectId &id, TXsheetHandle *xshHandle, std::string oldName, std::string newName)
-		: SetAttributeUndo<std::string>(id, xshHandle, oldName, newName) {}
+  public:
+	StageObjectRenameUndo(const TStageObjectId &id, TXsheetHandle *xshHandle, std::string oldName,
+						  std::string newName)
+		: SetAttributeUndo<std::string>(id, xshHandle, oldName, newName)
+	{
+	}
 	void setAttribute(TStageObject *pegbar, std::string name) const { pegbar->setName(name); }
-	QString getActionName()
-	{
-		return QString("Rename Object");
-	}
-	QString getStringFromValue(std::string value)
-	{
-		return QString::fromStdString(value);
-	}
+	QString getActionName() { return QString("Rename Object"); }
+	QString getStringFromValue(std::string value) { return QString::fromStdString(value); }
 };
 
 //-------------------------------------------------------------------
 
 class ResetOffsetUndo : public SetAttributeUndo<TPointD>
 {
-public:
+  public:
 	ResetOffsetUndo(const TStageObjectId &id, TXsheetHandle *xshHandle, const TPointD &oldOffset)
-		: SetAttributeUndo<TPointD>(id, xshHandle, oldOffset, TPointD()) {}
-	void setAttribute(TStageObject *pegbar, TPointD offset) const { pegbar->setOffset(offset); }
-	QString getActionName()
+		: SetAttributeUndo<TPointD>(id, xshHandle, oldOffset, TPointD())
 	{
-		return QString("Reset Center");
 	}
+	void setAttribute(TStageObject *pegbar, TPointD offset) const { pegbar->setOffset(offset); }
+	QString getActionName() { return QString("Reset Center"); }
 	QString getStringFromValue(TPointD value)
 	{
 		return QString("(%1,%2)").arg(QString::number(value.x)).arg(QString::number(value.y));
@@ -1160,17 +1089,17 @@ public:
 
 class ResetCenterAndOffsetUndo : public SetAttributeUndo<TPointD>
 {
-public:
-	ResetCenterAndOffsetUndo(const TStageObjectId &id, TXsheetHandle *xshHandle, const TPointD &oldOffset)
-		: SetAttributeUndo<TPointD>(id, xshHandle, oldOffset, TPointD()) {}
+  public:
+	ResetCenterAndOffsetUndo(const TStageObjectId &id, TXsheetHandle *xshHandle,
+							 const TPointD &oldOffset)
+		: SetAttributeUndo<TPointD>(id, xshHandle, oldOffset, TPointD())
+	{
+	}
 	void setAttribute(TStageObject *pegbar, TPointD offset) const
 	{
 		pegbar->setCenterAndOffset(offset, offset);
 	}
-	QString getActionName()
-	{
-		return QString("Reset Center");
-	}
+	QString getActionName() { return QString("Reset Center"); }
 	QString getStringFromValue(TPointD value)
 	{
 		return QString("(%1,%2)").arg(QString::number(value.x)).arg(QString::number(value.y));
@@ -1184,8 +1113,9 @@ class SetHandleUndo : public SetAttributeUndo<std::string>
 	TPointD m_center, m_offset;
 	TXsheetHandle *m_xshHandle;
 
-public:
-	SetHandleUndo(const TStageObjectId &id, std::string oldHandle, std::string newHandle, TXsheetHandle *xshHandle)
+  public:
+	SetHandleUndo(const TStageObjectId &id, std::string oldHandle, std::string newHandle,
+				  TXsheetHandle *xshHandle)
 		: SetAttributeUndo<std::string>(id, xshHandle, oldHandle, newHandle), m_xshHandle(xshHandle)
 	{
 		TStageObject *pegbar = getStageObject();
@@ -1201,32 +1131,26 @@ public:
 			pegbar->setCenterAndOffset(m_center, m_offset);
 		m_xshHandle->notifyXsheetChanged();
 	}
-	QString getActionName()
-	{
-		return QString("Set Handle");
-	}
-	QString getStringFromValue(std::string value)
-	{
-		return QString::fromStdString(value);
-	}
+	QString getActionName() { return QString("Set Handle"); }
+	QString getStringFromValue(std::string value) { return QString::fromStdString(value); }
 };
 
 //-------------------------------------------------------------------
 
 class SetParentHandleUndo : public SetAttributeUndo<std::string>
 {
-public:
-	SetParentHandleUndo(const TStageObjectId &id, TXsheetHandle *xshHandle, std::string oldHandle, std::string newHandle)
-		: SetAttributeUndo<std::string>(id, xshHandle, oldHandle, newHandle) {}
-	void setAttribute(TStageObject *pegbar, std::string handle) const { pegbar->setParentHandle(handle); }
-	QString getActionName()
+  public:
+	SetParentHandleUndo(const TStageObjectId &id, TXsheetHandle *xshHandle, std::string oldHandle,
+						std::string newHandle)
+		: SetAttributeUndo<std::string>(id, xshHandle, oldHandle, newHandle)
 	{
-		return QString("Set Parent Handle");
 	}
-	QString getStringFromValue(std::string value)
+	void setAttribute(TStageObject *pegbar, std::string handle) const
 	{
-		return QString::fromStdString(value);
+		pegbar->setParentHandle(handle);
 	}
+	QString getActionName() { return QString("Set Parent Handle"); }
+	QString getStringFromValue(std::string value) { return QString::fromStdString(value); }
 };
 
 //-------------------------------------------------------------------
@@ -1235,23 +1159,21 @@ typedef std::pair<TStageObjectId, std::string> ParentIdAndHandle;
 
 class SetParentUndo : public SetAttributeUndo<ParentIdAndHandle>
 {
-public:
-	SetParentUndo(
-		const TStageObjectId &id, TXsheetHandle *xshHandle,
-		TStageObjectId oldParentId, std::string oldParentHandle,
-		TStageObjectId newParentId, std::string newParentHandle)
+  public:
+	SetParentUndo(const TStageObjectId &id, TXsheetHandle *xshHandle, TStageObjectId oldParentId,
+				  std::string oldParentHandle, TStageObjectId newParentId,
+				  std::string newParentHandle)
 		: SetAttributeUndo<ParentIdAndHandle>(id, xshHandle,
 											  ParentIdAndHandle(oldParentId, oldParentHandle),
-											  ParentIdAndHandle(newParentId, newParentHandle)) {}
+											  ParentIdAndHandle(newParentId, newParentHandle))
+	{
+	}
 	void setAttribute(TStageObject *pegbar, ParentIdAndHandle parent) const
 	{
 		pegbar->setParent(parent.first);
 		pegbar->setParentHandle(parent.second);
 	}
-	QString getActionName()
-	{
-		return QString("Set Parent Handle");
-	}
+	QString getActionName() { return QString("Set Parent Handle"); }
 	QString getStringFromValue(ParentIdAndHandle value)
 	{
 		return QString("(%1,%2)")
@@ -1293,12 +1215,9 @@ class ResetPositionUndo : public TUndo
 			param->setKeyframe(keyframes[i]);
 	}
 
-	TStageObject *getStageObject() const
-	{
-		return m_xshHandle->getXsheet()->getStageObject(m_id);
-	}
+	TStageObject *getStageObject() const { return m_xshHandle->getXsheet()->getStageObject(m_id); }
 
-public:
+  public:
 	ResetPositionUndo(const TStageObjectId &id, TXsheetHandle *xshHandle)
 		: m_xshHandle(xshHandle), m_id(id)
 	{
@@ -1332,7 +1251,8 @@ public:
 	}
 	int getSize() const
 	{
-		return sizeof(*this) + sizeof(TDoubleKeyframe) * (m_xKeyframes.size() + m_yKeyframes.size());
+		return sizeof(*this) +
+			   sizeof(TDoubleKeyframe) * (m_xKeyframes.size() + m_yKeyframes.size());
 	}
 };
 
@@ -1415,7 +1335,8 @@ void TStageObjectCmd::resetPosition(const TStageObjectId &id, TXsheetHandle *xsh
 //
 //-------------------------------------------------------------------
 
-void TStageObjectCmd::setHandle(const TStageObjectId &id, std::string handle, TXsheetHandle *xshHandle)
+void TStageObjectCmd::setHandle(const TStageObjectId &id, std::string handle,
+								TXsheetHandle *xshHandle)
 {
 	TStageObject *peg = xshHandle->getXsheet()->getStageObject(id);
 	if (!peg)
@@ -1431,7 +1352,8 @@ void TStageObjectCmd::setHandle(const TStageObjectId &id, std::string handle, TX
 //
 //-------------------------------------------------------------------
 
-void TStageObjectCmd::setParentHandle(const std::vector<TStageObjectId> &ids, std::string handle, TXsheetHandle *xshHandle)
+void TStageObjectCmd::setParentHandle(const std::vector<TStageObjectId> &ids, std::string handle,
+									  TXsheetHandle *xshHandle)
 {
 	for (int i = 0; i < (int)ids.size(); i++) {
 		TStageObjectId id = ids[i];
@@ -1450,11 +1372,8 @@ void TStageObjectCmd::setParentHandle(const std::vector<TStageObjectId> &ids, st
 //
 //-------------------------------------------------------------------
 
-void TStageObjectCmd::setParent(
-	const TStageObjectId &id,
-	TStageObjectId parentId,
-	std::string parentHandle,
-	TXsheetHandle *xshHandle, bool doUndo)
+void TStageObjectCmd::setParent(const TStageObjectId &id, TStageObjectId parentId,
+								std::string parentHandle, TXsheetHandle *xshHandle, bool doUndo)
 {
 	if (parentId == TStageObjectId::NoneId) {
 		if (id.isColumn() || id.isPegbar()) {
@@ -1486,12 +1405,10 @@ void TStageObjectCmd::setParent(
 //
 //-------------------------------------------------------------------
 
-void TStageObjectCmd::setSplineParent(TStageObjectSpline *spline,
-									  TStageObject *parentObj,
+void TStageObjectCmd::setSplineParent(TStageObjectSpline *spline, TStageObject *parentObj,
 									  TXsheetHandle *xshHandle)
 {
-	TUndoManager::manager()->add(
-		new SplineLinkUndo(parentObj->getId(), spline, xshHandle));
+	TUndoManager::manager()->add(new SplineLinkUndo(parentObj->getId(), spline, xshHandle));
 	parentObj->setSpline(spline);
 }
 
@@ -1501,7 +1418,8 @@ void TStageObjectCmd::setSplineParent(TStageObjectSpline *spline,
 //
 //-------------------------------------------------------------------
 
-void TStageObjectCmd::addNewCamera(TXsheetHandle *xshHandle, TObjectHandle *objHandle, QPointF initialPos)
+void TStageObjectCmd::addNewCamera(TXsheetHandle *xshHandle, TObjectHandle *objHandle,
+								   QPointF initialPos)
 {
 	TXsheet *xsh = xshHandle->getXsheet();
 	int cameraIndex = 0;
@@ -1536,7 +1454,8 @@ void TStageObjectCmd::addNewCamera(TXsheetHandle *xshHandle, TObjectHandle *objH
 //
 //-------------------------------------------------------------------
 
-void TStageObjectCmd::addNewPegbar(TXsheetHandle *xshHandle, TObjectHandle *objHandle, QPointF initialPos)
+void TStageObjectCmd::addNewPegbar(TXsheetHandle *xshHandle, TObjectHandle *objHandle,
+								   QPointF initialPos)
 {
 	TXsheet *xsh = xshHandle->getXsheet();
 	// crea la nuova pegbar
@@ -1572,8 +1491,7 @@ void TStageObjectCmd::setAsActiveCamera(TXsheetHandle *xshHandle, TObjectHandle 
 	// make the preview camera same as the final render camera
 	xsh->getStageObjectTree()->setCurrentPreviewCameraId(newCameraId);
 
-	TUndoManager::manager()->add(
-		new SetActiveCameraUndo(oldCameraId, newCameraId, xshHandle));
+	TUndoManager::manager()->add(new SetActiveCameraUndo(oldCameraId, newCameraId, xshHandle));
 
 	xshHandle->notifyXsheetChanged();
 }
@@ -1584,7 +1502,8 @@ void TStageObjectCmd::setAsActiveCamera(TXsheetHandle *xshHandle, TObjectHandle 
 //
 //-------------------------------------------------------------------
 
-void TStageObjectCmd::addNewSpline(TXsheetHandle *xshHandle, TObjectHandle *objHandle, TColumnHandle *colHandle, QPointF initialPos)
+void TStageObjectCmd::addNewSpline(TXsheetHandle *xshHandle, TObjectHandle *objHandle,
+								   TColumnHandle *colHandle, QPointF initialPos)
 {
 	TXsheet *xsh = xshHandle->getXsheet();
 	TStageObjectSpline *spline = xsh->getStageObjectTree()->createSpline();
@@ -1615,11 +1534,8 @@ void TStageObjectCmd::addNewSpline(TXsheetHandle *xshHandle, TObjectHandle *objH
 
 void TStageObjectCmd::deleteSelection(const std::vector<TStageObjectId> &objIds,
 									  const std::list<QPair<TStageObjectId, TStageObjectId>> &links,
-									  const std::list<int> &splineIds,
-									  TXsheetHandle *xshHandle,
-									  TObjectHandle *objHandle,
-									  TFxHandle *fxHandle,
-									  bool doUndo)
+									  const std::list<int> &splineIds, TXsheetHandle *xshHandle,
+									  TObjectHandle *objHandle, TFxHandle *fxHandle, bool doUndo)
 {
 	if (doUndo)
 		TUndoManager::manager()->beginBlock();
@@ -1644,13 +1560,15 @@ void TStageObjectCmd::deleteSelection(const std::vector<TStageObjectId> &objIds,
 	if (!cameraIndexes.isEmpty())
 		qSort(cameraIndexes);
 
-	//remove all selected objects
+	// remove all selected objects
 	removeColums(columnIndexes, xshHandle, objHandle, fxHandle, doUndo);
 	int i;
 	for (i = pegbarIndexes.size() - 1; i >= 0; i--)
-		removeStageObjectNode(TStageObjectId::PegbarId(pegbarIndexes[i]), xshHandle, objHandle, fxHandle, doUndo);
+		removeStageObjectNode(TStageObjectId::PegbarId(pegbarIndexes[i]), xshHandle, objHandle,
+							  fxHandle, doUndo);
 	for (i = cameraIndexes.size() - 1; i >= 0; i--)
-		removeStageObjectNode(TStageObjectId::CameraId(cameraIndexes[i]), xshHandle, objHandle, fxHandle, doUndo);
+		removeStageObjectNode(TStageObjectId::CameraId(cameraIndexes[i]), xshHandle, objHandle,
+							  fxHandle, doUndo);
 
 	std::list<QPair<TStageObjectId, TStageObjectId>>::const_iterator it1;
 	for (it1 = links.begin(); it1 != links.end() && objIds.empty(); it1++)
@@ -1737,7 +1655,8 @@ void TStageObjectCmd::ungroup(int groupId, TXsheetHandle *xshHandle)
 //
 //-------------------------------------------------------------------
 
-void TStageObjectCmd::renameGroup(const QList<TStageObject *> objs, const std::wstring &name, bool fromEditor, TXsheetHandle *xshHandle)
+void TStageObjectCmd::renameGroup(const QList<TStageObject *> objs, const std::wstring &name,
+								  bool fromEditor, TXsheetHandle *xshHandle)
 {
 	std::wstring oldName;
 	TStageObjectTree *pegTree = xshHandle->getXsheet()->getStageObjectTree();
@@ -1773,7 +1692,8 @@ void TStageObjectCmd::duplicateObject(const QList<TStageObjectId> ids, TXsheetHa
 			int index = 0;
 			TStageObjectId newId;
 			for (;;) {
-				newId = id.isPegbar() ? TStageObjectId::PegbarId(index) : TStageObjectId::CameraId(index);
+				newId = id.isPegbar() ? TStageObjectId::PegbarId(index)
+									  : TStageObjectId::CameraId(index);
 				if (objTree->getStageObject(newId, false)) {
 					index++;
 					continue;

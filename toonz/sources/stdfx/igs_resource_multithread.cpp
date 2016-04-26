@@ -11,8 +11,7 @@ void *
 	function_(void *param)
 {
 	igs::resource::thread_execute_interface *pp =
-		static_cast<
-			igs::resource::thread_execute_interface *>(param);
+		static_cast<igs::resource::thread_execute_interface *>(param);
 	pp->run();
 	return 0;
 };
@@ -28,9 +27,7 @@ void igs::resource::multithread::run(void)
 	if (1 == this->thre_exec_.size()) {
 		/* 指定が一個の場合はスレッド実行せず、ただ実行 */
 		igs::resource::thread_execute_interface *pp =
-			static_cast<
-				igs::resource::thread_execute_interface *>(
-				this->thre_exec_.at(0));
+			static_cast<igs::resource::thread_execute_interface *>(this->thre_exec_.at(0));
 		pp->run();
 		return;
 	}
@@ -44,8 +41,7 @@ void igs::resource::multithread::run(void)
 #endif
 	{
 		std::vector<void *>::iterator it;
-		for (it = this->thre_exec_.begin();
-			 it != this->thre_exec_.end(); ++it) {
+		for (it = this->thre_exec_.begin(); it != this->thre_exec_.end(); ++it) {
 			id.push_back(igs::resource::thread_run(function_, *it));
 		}
 	}

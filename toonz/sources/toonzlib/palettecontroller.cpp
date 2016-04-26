@@ -10,20 +10,27 @@
 #include "toonz/palettecontroller.h"
 
 PaletteController::PaletteController()
-	: QObject(), m_currentLevelPalette(0), m_currentCleanupPalette(0), m_originalCurrentPalette(0), m_currentPalette(0), m_colorAutoApplyEnabled(true), m_colorSample()
+	: QObject(), m_currentLevelPalette(0), m_currentCleanupPalette(0), m_originalCurrentPalette(0),
+	  m_currentPalette(0), m_colorAutoApplyEnabled(true), m_colorSample()
 {
 	m_currentLevelPalette = new TPaletteHandle;
 	m_currentCleanupPalette = new TPaletteHandle;
 	m_currentPalette = new TPaletteHandle;
 
-	QObject::connect(m_currentCleanupPalette, SIGNAL(paletteSwitched()), this, SLOT(editCleanupPalette()));
-	QObject::connect(m_currentCleanupPalette, SIGNAL(colorStyleSwitched()), this, SLOT(editCleanupPalette()));
+	QObject::connect(m_currentCleanupPalette, SIGNAL(paletteSwitched()), this,
+					 SLOT(editCleanupPalette()));
+	QObject::connect(m_currentCleanupPalette, SIGNAL(colorStyleSwitched()), this,
+					 SLOT(editCleanupPalette()));
 
-	QObject::connect(m_currentLevelPalette, SIGNAL(paletteSwitched()), this, SLOT(editLevelPalette()));
-	QObject::connect(m_currentLevelPalette, SIGNAL(colorStyleSwitched()), this, SLOT(editLevelPalette()));
-	//QObject::connect(m_currentLevelPalette, SIGNAL(colorStyleSwitched()), this, SLOT(setColorCheckIndex()));
+	QObject::connect(m_currentLevelPalette, SIGNAL(paletteSwitched()), this,
+					 SLOT(editLevelPalette()));
+	QObject::connect(m_currentLevelPalette, SIGNAL(colorStyleSwitched()), this,
+					 SLOT(editLevelPalette()));
+	// QObject::connect(m_currentLevelPalette, SIGNAL(colorStyleSwitched()), this,
+	// SLOT(setColorCheckIndex()));
 
-	QObject::connect(m_currentLevelPalette, SIGNAL(paletteLockChanged()), this, SLOT(editLevelPalette()));
+	QObject::connect(m_currentLevelPalette, SIGNAL(paletteLockChanged()), this,
+					 SLOT(editLevelPalette()));
 }
 
 //-----------------------------------------------------------------------------

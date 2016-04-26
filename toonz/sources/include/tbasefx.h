@@ -24,7 +24,7 @@
 //! Defines built-in Toonz fxs.
 class DVAPI TBaseRasterFx : public TRasterFx
 {
-public:
+  public:
 	std::string getPluginId() const { return "Base"; }
 };
 
@@ -35,7 +35,7 @@ public:
 //! Defines built-in Toonz zerary fxs.
 class DVAPI TBaseZeraryFx : public TZeraryFx
 {
-public:
+  public:
 	std::string getPluginId() const { return "Base"; }
 };
 

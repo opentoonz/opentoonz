@@ -29,39 +29,35 @@ accordingly (divide by 2 * softFactor).
 
 namespace
 {
-template <typename PIX>
-class PixelSelector
+template <typename PIX> class PixelSelector
 {
-public:
+  public:
 	typedef PIX pixel_type;
 
-private:
+  private:
 	int m_thresh;
 
-public:
+  public:
 	PixelSelector(int thresh) : m_thresh(thresh) {}
 
 	bool areEqual(const PIX &a, const PIX &b) const
 	{
-		return tmax(abs((int)a.r - b.r),
-					abs((int)a.g - b.g),
-					abs((int)a.b - b.b),
+		return tmax(abs((int)a.r - b.r), abs((int)a.g - b.g), abs((int)a.b - b.b),
 					abs((int)a.m - b.m)) < m_thresh;
 	}
 };
 
 //-----------------------------------------------------------------------------------------
 
-template <>
-class PixelSelector<TPixelCM32>
+template <> class PixelSelector<TPixelCM32>
 {
-public:
+  public:
 	typedef TPixelCM32 pixel_type;
 
-private:
+  private:
 	int m_thresh;
 
-public:
+  public:
 	PixelSelector(int thresh) : m_thresh(thresh) {}
 
 	bool areEqual(const TPixelCM32 &a, const TPixelCM32 &b) const
@@ -87,14 +83,13 @@ template <>
 inline void weightPix<TPixelCM32>(TPixelCM32 *out, const TPixelCM32 *a, const TPixelCM32 *b,
 								  double weightA, double weightB)
 {
-	*out = TPixelCM32(
-		out->isPurePaint() ? b->getInk() : a->getInk(), a->getPaint(),
-		a->getTone() * weightA + b->getTone() * weightB);
+	*out = TPixelCM32(out->isPurePaint() ? b->getInk() : a->getInk(), a->getPaint(),
+					  a->getTone() * weightA + b->getTone() * weightB);
 }
 
 //-----------------------------------------------------------------------------------------
 
-//Returns 0 if pixels to connect are on the 00-11 diagonal, 1 on the 01-10 one.
+// Returns 0 if pixels to connect are on the 00-11 diagonal, 1 on the 01-10 one.
 template <typename PIX, typename SELECTOR>
 inline bool checkNeighbourHood(int x, int y, PIX *pix, int lx, int ly, int dx, int dy,
 							   const SELECTOR &sel)
@@ -102,44 +97,35 @@ inline bool checkNeighbourHood(int x, int y, PIX *pix, int lx, int ly, int dx, i
 	int count1 = 0, count2 = 0;
 	int dx2 = 2 * dx, dy2 = 2 * dy;
 	if (y > 1) {
-		//Lower edge
-		count1 +=
-			(int)sel.areEqual(*(pix - dx), *(pix - dy2)) +
-			(int)sel.areEqual(*(pix - dx), *(pix - dy2 - dx));
+		// Lower edge
+		count1 += (int)sel.areEqual(*(pix - dx), *(pix - dy2)) +
+				  (int)sel.areEqual(*(pix - dx), *(pix - dy2 - dx));
 		count2 +=
-			(int)sel.areEqual(*pix, *(pix - dy2)) +
-			(int)sel.areEqual(*pix, *(pix - dy2 - dx));
+			(int)sel.areEqual(*pix, *(pix - dy2)) + (int)sel.areEqual(*pix, *(pix - dy2 - dx));
 	}
 	if (y < ly - 1) {
-		//Upper edge
-		count1 +=
-			(int)sel.areEqual(*(pix - dx), *(pix + dy)) +
-			(int)sel.areEqual(*(pix - dx), *(pix + dy - dx));
-		count2 +=
-			(int)sel.areEqual(*pix, *(pix + dy)) +
-			(int)sel.areEqual(*pix, *(pix + dy - dx));
+		// Upper edge
+		count1 += (int)sel.areEqual(*(pix - dx), *(pix + dy)) +
+				  (int)sel.areEqual(*(pix - dx), *(pix + dy - dx));
+		count2 += (int)sel.areEqual(*pix, *(pix + dy)) + (int)sel.areEqual(*pix, *(pix + dy - dx));
 	}
 	if (x > 1) {
-		//Left edge
-		count1 +=
-			(int)sel.areEqual(*(pix - dx), *(pix - dx2)) +
-			(int)sel.areEqual(*(pix - dx), *(pix - dx2 - dy));
+		// Left edge
+		count1 += (int)sel.areEqual(*(pix - dx), *(pix - dx2)) +
+				  (int)sel.areEqual(*(pix - dx), *(pix - dx2 - dy));
 		count2 +=
-			(int)sel.areEqual(*pix, *(pix - dx2)) +
-			(int)sel.areEqual(*pix, *(pix - dx2 - dy));
+			(int)sel.areEqual(*pix, *(pix - dx2)) + (int)sel.areEqual(*pix, *(pix - dx2 - dy));
 	}
 	if (x < lx - 1) {
-		//Left edge
-		count1 +=
-			(int)sel.areEqual(*(pix - dx), *(pix + dx)) +
-			(int)sel.areEqual(*(pix - dx), *(pix + dx - dy));
-		count2 +=
-			(int)sel.areEqual(*pix, *(pix + dx)) +
-			(int)sel.areEqual(*pix, *(pix + dx - dy));
+		// Left edge
+		count1 += (int)sel.areEqual(*(pix - dx), *(pix + dx)) +
+				  (int)sel.areEqual(*(pix - dx), *(pix + dx - dy));
+		count2 += (int)sel.areEqual(*pix, *(pix + dx)) + (int)sel.areEqual(*pix, *(pix + dx - dy));
 	}
 
-	//Connect by minority: if there are more pixels like those on the 00-11 diagonal, connect the other,
-	//and viceversa.
+	// Connect by minority: if there are more pixels like those on the 00-11 diagonal, connect the
+	// other,
+	// and viceversa.
 	return count1 > count2;
 }
 }
@@ -147,9 +133,8 @@ inline bool checkNeighbourHood(int x, int y, PIX *pix, int lx, int ly, int dx, i
 //========================================================================================
 
 template <typename PIX>
-inline void filterLine(PIX *inLPix, PIX *inUPix, PIX *outLPix, PIX *outUPix,
-					   int ll, int inDl, int outLDl, int outUDl,
-					   double hStart, double slope, bool filterLower)
+inline void filterLine(PIX *inLPix, PIX *inUPix, PIX *outLPix, PIX *outUPix, int ll, int inDl,
+					   int outLDl, int outUDl, double hStart, double slope, bool filterLower)
 {
 	assert(hStart >= 0.0 && slope > 0.0);
 
@@ -158,9 +143,8 @@ inline void filterLine(PIX *inLPix, PIX *inUPix, PIX *outLPix, PIX *outUPix,
 
 	int i, end = tmin(tfloor(base), ll);
 	if (filterLower) {
-		//Filter lower line
-		for (i = 0; i < end; ++i, h0 = h1,
-			inLPix += inDl, inUPix += inDl, outLPix += outLDl) {
+		// Filter lower line
+		for (i = 0; i < end; ++i, h0 = h1, inLPix += inDl, inUPix += inDl, outLPix += outLDl) {
 			h1 = h0 - slope;
 			area = 0.5 * (h0 + h1);
 			weightPix(outLPix, outLPix, inUPix, 1.0 - area, area);
@@ -172,9 +156,8 @@ inline void filterLine(PIX *inLPix, PIX *inUPix, PIX *outLPix, PIX *outUPix,
 			weightPix(outLPix, outLPix, inUPix, 1.0 - area, area);
 		}
 	} else {
-		//Filter upper line
-		for (i = 0; i < end; ++i, h0 = h1,
-			inLPix += inDl, inUPix += inDl, outUPix += outUDl) {
+		// Filter upper line
+		for (i = 0; i < end; ++i, h0 = h1, inLPix += inDl, inUPix += inDl, outUPix += outUDl) {
 			h1 = h0 - slope;
 			area = 0.5 * (h0 + h1);
 			weightPix(outUPix, outUPix, inLPix, 1.0 - area, area);
@@ -191,34 +174,33 @@ inline void filterLine(PIX *inLPix, PIX *inUPix, PIX *outLPix, PIX *outUPix,
 //---------------------------------------------------------------------------------------
 
 template <typename PIX, typename SELECTOR>
-inline bool checkLength(int lLine, int y, int ly, int dy,
-						PIX *pixL1, PIX *pixU1, PIX *pixL2, PIX *pixU2,
-						bool uniteU, bool do1Line,
-						const SELECTOR &sel)
+inline bool checkLength(int lLine, int y, int ly, int dy, PIX *pixL1, PIX *pixU1, PIX *pixL2,
+						PIX *pixU2, bool uniteU, bool do1Line, const SELECTOR &sel)
 {
-	//1-length edges must be processed (as primary edges) only if explicitly required,
-	//and only when its associated secondary edge is of the same length.
+	// 1-length edges must be processed (as primary edges) only if explicitly required,
+	// and only when its associated secondary edge is of the same length.
 
 	return (lLine > 1) ||
 		   (do1Line &&
-			((uniteU && (y > 1 && !(sel.areEqual(*pixL1, *(pixL1 - dy)) && sel.areEqual(*pixL2, *(pixL2 - dy))))) ||
-			 (y < ly - 1 && !(sel.areEqual(*pixU1, *(pixU1 + dy)) && sel.areEqual(*pixU2, *(pixU2 + dy))))));
+			((uniteU &&
+			  (y > 1 &&
+			   !(sel.areEqual(*pixL1, *(pixL1 - dy)) && sel.areEqual(*pixL2, *(pixL2 - dy))))) ||
+			 (y < ly - 1 &&
+			  !(sel.areEqual(*pixU1, *(pixU1 + dy)) && sel.areEqual(*pixU2, *(pixU2 + dy))))));
 }
 
 //---------------------------------------------------------------------------------------
 
 template <typename PIX, typename SELECTOR>
-void processLine(int r, int lx, int ly,
-				 PIX *inLRow, PIX *inURow, PIX *outLRow, PIX *outURow,
-				 int inDx, int inDy, int outLDx, int outUDx,
-				 bool do1Line, double hStart, double slope,
-				 const SELECTOR &sel)
+void processLine(int r, int lx, int ly, PIX *inLRow, PIX *inURow, PIX *outLRow, PIX *outURow,
+				 int inDx, int inDy, int outLDx, int outUDx, bool do1Line, double hStart,
+				 double slope, const SELECTOR &sel)
 {
-	//Using a 'horizontal' notation here - but the same applies in vertical too
+	// Using a 'horizontal' notation here - but the same applies in vertical too
 	++r;
 
-	//As long as we don't reach row end, process uninterrupted separation lines
-	//between colors
+	// As long as we don't reach row end, process uninterrupted separation lines
+	// between colors
 
 	PIX *inLL = inLRow, *inLR, *inUL = inURow, *inUR;
 	PIX *inLL_1, *inUL_1, *inLR_1, *inUR_1;
@@ -226,16 +208,16 @@ void processLine(int r, int lx, int ly,
 	int x, lLine;
 	bool uniteLL, uniteUL, uniteLR, uniteUR;
 
-	//Special case: a line at row start has different weights
+	// Special case: a line at row start has different weights
 	if (!sel.areEqual(*inLL, *inUL)) {
-		//Look for line ends
+		// Look for line ends
 		for (inLR = inLL + inDx, inUR = inUL + inDx;
 			 inLR != inLEnd && sel.areEqual(*inLL, *inLR) && sel.areEqual(*inUL, *inUR);
 			 inLR += inDx, inUR += inDx)
 			;
 
 		if (inLR != inLEnd) {
-			//Found a line to process
+			// Found a line to process
 			lLine = (inLR - inLL) / inDx;
 
 			inLR_1 = inLR - inDx, inUR_1 = inUR - inDx;
@@ -245,37 +227,39 @@ void processLine(int r, int lx, int ly,
 			uniteLR = sel.areEqual(*inLR_1, *inUR);
 			if (uniteUR || uniteLR) {
 				if (uniteUR && uniteLR)
-					//Ambiguous case. Check neighborhood to find out which one must be actually united.
+					// Ambiguous case. Check neighborhood to find out which one must be actually
+					// united.
 					uniteUR = !checkNeighbourHood(x + 1, r, inUR, lx, ly, inDx, inDy, sel);
 
-				if (checkLength(lLine, r, ly, inDy, inLR_1, inUR_1, inLR, inUR, uniteUR, do1Line, sel))
-					filterLine(inLR_1, inUR_1, outLRow + x * outLDx, outURow + x * outUDx,
-							   lLine, -inDx, -outLDx, -outUDx, hStart, slope / (lLine << 1), uniteUR);
+				if (checkLength(lLine, r, ly, inDy, inLR_1, inUR_1, inLR, inUR, uniteUR, do1Line,
+								sel))
+					filterLine(inLR_1, inUR_1, outLRow + x * outLDx, outURow + x * outUDx, lLine,
+							   -inDx, -outLDx, -outUDx, hStart, slope / (lLine << 1), uniteUR);
 			}
 		}
 
-		//Update lefts
+		// Update lefts
 		inLL = inLR, inUL = inUR;
 	}
 
-	//Search for a line start
+	// Search for a line start
 	for (; inLL != inLEnd && sel.areEqual(*inLL, *inUL); inLL += inDx, inUL += inDx)
 		;
 
 	while (inLL != inLEnd) {
-		//Look for line ends
+		// Look for line ends
 		for (inLR = inLL + inDx, inUR = inUL + inDx;
 			 inLR != inLEnd && sel.areEqual(*inLL, *inLR) && sel.areEqual(*inUL, *inUR);
 			 inLR += inDx, inUR += inDx)
 			;
 
 		if (inLR == inLEnd)
-			break; //Dealt with later
+			break; // Dealt with later
 
-		//Found a line to process
+		// Found a line to process
 		lLine = (inLR - inLL) / inDx;
 
-		//First, filter left to right
+		// First, filter left to right
 		inLL_1 = inLL - inDx, inUL_1 = inUL - inDx;
 		x = (inLL - inLRow) / inDx;
 
@@ -286,11 +270,11 @@ void processLine(int r, int lx, int ly,
 				uniteUL = checkNeighbourHood(x, r, inUL, lx, ly, inDx, inDy, sel);
 
 			if (checkLength(lLine, r, ly, inDy, inLL_1, inUL_1, inLL, inUL, uniteUL, do1Line, sel))
-				filterLine(inLL, inUL, outLRow + x * outLDx, outURow + x * outUDx,
-						   lLine, inDx, outLDx, outUDx, hStart, slope / lLine, uniteUL);
+				filterLine(inLL, inUL, outLRow + x * outLDx, outURow + x * outUDx, lLine, inDx,
+						   outLDx, outUDx, hStart, slope / lLine, uniteUL);
 		}
 
-		//Then, filter right to left
+		// Then, filter right to left
 		inLR_1 = inLR - inDx, inUR_1 = inUR - inDx;
 		x = (inLR_1 - inLRow) / inDx;
 
@@ -301,19 +285,19 @@ void processLine(int r, int lx, int ly,
 				uniteUR = !checkNeighbourHood(x + 1, r, inUR, lx, ly, inDx, inDy, sel);
 
 			if (checkLength(lLine, r, ly, inDy, inLR_1, inUR_1, inLR, inUR, uniteUR, do1Line, sel))
-				filterLine(inLR_1, inUR_1, outLRow + x * outLDx, outURow + x * outUDx,
-						   lLine, -inDx, -outLDx, -outUDx, hStart, slope / lLine, uniteUR);
+				filterLine(inLR_1, inUR_1, outLRow + x * outLDx, outURow + x * outUDx, lLine, -inDx,
+						   -outLDx, -outUDx, hStart, slope / lLine, uniteUR);
 		}
 
-		//Update lefts - search for a new line start
+		// Update lefts - search for a new line start
 		inLL = inLR, inUL = inUR;
 		for (; inLL != inLEnd && sel.areEqual(*inLL, *inUL); inLL += inDx, inUL += inDx)
 			;
 	}
 
-	//Special case: filter the last line in the row
+	// Special case: filter the last line in the row
 	if (inLL != inLEnd) {
-		//Found a line to process
+		// Found a line to process
 		lLine = (inLR - inLL) / inDx;
 
 		inLL_1 = inLL - inDx, inUL_1 = inUL - inDx;
@@ -326,8 +310,8 @@ void processLine(int r, int lx, int ly,
 				uniteUL = checkNeighbourHood(x, r, inUL, lx, ly, inDx, inDy, sel);
 
 			if (checkLength(lLine, r, ly, inDy, inLL_1, inUL_1, inLL, inUL, uniteUL, do1Line, sel))
-				filterLine(inLL, inUL, outLRow + x * outLDx, outURow + x * outUDx,
-						   lLine, inDx, outLDx, outUDx, hStart, slope / (lLine << 1), uniteUL);
+				filterLine(inLL, inUL, outLRow + x * outLDx, outURow + x * outUDx, lLine, inDx,
+						   outLDx, outUDx, hStart, slope / (lLine << 1), uniteUL);
 		}
 	}
 }
@@ -342,32 +326,25 @@ void makeAntialias(const TRasterPT<PIX> &src, TRasterPT<PIX> &dst, int threshold
 		return;
 
 	double slope = (50.0 / softness);
-	double hStart = 0.5; //fixed for now
+	double hStart = 0.5; // fixed for now
 
 	src->lock();
 	dst->lock();
 
 	PixelSelector<PIX> sel(threshold);
 
-	//First, filter by rows
+	// First, filter by rows
 	int x, y, lx = src->getLx(), ly = src->getLy(), lx_1 = lx - 1, ly_1 = ly - 1;
 	for (y = 0; y < ly_1; ++y) {
-		processLine(y, lx, ly,
-					src->pixels(y), src->pixels(y + 1),
-					dst->pixels(y), dst->pixels(y + 1),
-					1, src->getWrap(), 1, 1,
-					true, hStart, slope,
-					sel);
+		processLine(y, lx, ly, src->pixels(y), src->pixels(y + 1), dst->pixels(y),
+					dst->pixels(y + 1), 1, src->getWrap(), 1, 1, true, hStart, slope, sel);
 	}
 
-	//Then, go by columns
+	// Then, go by columns
 	for (x = 0; x < lx_1; ++x) {
-		processLine(x, ly, lx,
-					src->pixels(0) + x, src->pixels(0) + x + 1,
-					dst->pixels(0) + x, dst->pixels(0) + x + 1,
-					src->getWrap(), 1, dst->getWrap(), dst->getWrap(),
-					false, hStart, slope,
-					sel);
+		processLine(x, ly, lx, src->pixels(0) + x, src->pixels(0) + x + 1, dst->pixels(0) + x,
+					dst->pixels(0) + x + 1, src->getWrap(), 1, dst->getWrap(), dst->getWrap(),
+					false, hStart, slope, sel);
 	}
 
 	dst->unlock();

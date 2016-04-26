@@ -51,14 +51,14 @@ class FrameTaskNotifier;
 
 /*!
   \brief    Window class used in the convertion of levels between different
-            file formats.
+			file formats.
 */
 
 class ConvertPopup : public DVGui::Dialog
 {
 	Q_OBJECT
 
-public:
+  public:
 	ConvertPopup(bool specifyInput = false);
 	~ConvertPopup();
 
@@ -77,7 +77,7 @@ public:
 	QString SameAsPainted;
 	QString CreateNewPalette;
 
-public slots:
+  public slots:
 
 	void apply(); //!< Starts the convertion.
 	void onOptionsClicked();
@@ -91,41 +91,25 @@ public slots:
 
 	void onFormatChanged(const QString &);
 
-protected:
+  protected:
 	Convert2Tlv *makeTlvConverter(const TFilePath &sourceFilePath);
 	bool checkParameters() const;
 	TPalette *readUserProvidedPalette() const;
 	TFilePath getDestinationFilePath(const TFilePath &sourceFilePath);
 	void getFrameRange(const TFilePath &sourceFilePath, TFrameId &from, TFrameId &to);
 
-private:
-	DVGui::FileField *m_saveInFileFld,
-		*m_convertFileFld,
-		*m_unpaintedFolder,
-		*m_palettePath;
-	DVGui::IntLineEdit *m_fromFld,
-		*m_toFld,
-		*m_antialiasIntensity,
-		*m_tolerance;
-	DVGui::LineEdit *m_fileNameFld,
-		*m_unpaintedSuffix;
+  private:
+	DVGui::FileField *m_saveInFileFld, *m_convertFileFld, *m_unpaintedFolder, *m_palettePath;
+	DVGui::IntLineEdit *m_fromFld, *m_toFld, *m_antialiasIntensity, *m_tolerance;
+	DVGui::LineEdit *m_fileNameFld, *m_unpaintedSuffix;
 	DVGui::ColorField *m_bgColorField;
 	QFrame *m_tlvFrame;
-	QCheckBox *m_applyAutoclose,
-		*m_removeDotBeforeFrameNumber,
-		*m_saveBackupToNopaint;
+	QCheckBox *m_applyAutoclose, *m_removeDotBeforeFrameNumber, *m_saveBackupToNopaint;
 	DVGui::CheckBox *m_skip;
-	QComboBox *m_antialias,
-		*m_tlvMode,
-		*m_fileFormat;
-	QLabel *m_bgColorLabel,
-		*m_suffixLabel,
-		*m_unpaintedFolderLabel,
-		*m_antialiasLabel;
+	QComboBox *m_antialias, *m_tlvMode, *m_fileFormat;
+	QLabel *m_bgColorLabel, *m_suffixLabel, *m_unpaintedFolderLabel, *m_antialiasLabel;
 
-	QPushButton *m_okBtn,
-		*m_cancelBtn,
-		*m_formatOptions;
+	QPushButton *m_okBtn, *m_cancelBtn, *m_formatOptions;
 
 	class Converter;
 	Converter *m_converter;
@@ -134,12 +118,11 @@ private:
 	DVGui::ProgressDialog *m_progressDialog;
 
 	std::vector<TFilePath> m_srcFilePaths;
-	static QMap<std::string,
-				TPropertyGroup *> m_formatProperties;
+	static QMap<std::string, TPropertyGroup *> m_formatProperties;
 
 	bool m_isConverting;
 
-private:
+  private:
 	TPropertyGroup *getFormatProperties(const std::string &ext);
 	QFrame *createTlvSettings();
 	QFrame *createSvgSettings();
@@ -149,7 +132,7 @@ private:
 
 class ConvertPopupWithInput : public ConvertPopup
 {
-public:
+  public:
 	ConvertPopupWithInput() : ConvertPopup(true) {}
 };
 

@@ -23,8 +23,7 @@
 // SVNPurgeDialog
 //-----------------------------------------------------------------------------
 
-SVNPurgeDialog::SVNPurgeDialog(QWidget *parent,
-							   const QString &workingDir)
+SVNPurgeDialog::SVNPurgeDialog(QWidget *parent, const QString &workingDir)
 	: Dialog(TApp::instance()->getMainWindow(), true, false), m_workingDir(workingDir)
 {
 	setModal(false);
@@ -65,7 +64,8 @@ SVNPurgeDialog::SVNPurgeDialog(QWidget *parent,
 	connect(&m_thread, SIGNAL(error(const QString &)), this, SLOT(onError(const QString &)));
 
 	// 1. Getting status (with show-updates enabled...)
-	connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this, SLOT(onStatusRetrieved(const QString &)));
+	connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
+			SLOT(onStatusRetrieved(const QString &)));
 	m_thread.getSVNStatus(m_workingDir);
 }
 

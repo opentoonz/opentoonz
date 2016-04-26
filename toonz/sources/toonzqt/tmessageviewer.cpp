@@ -21,11 +21,10 @@ QIcon gYellowIcon;
 
 class MyQListView : public QListView
 {
-public:
-	MyQListView(QWidget *parent)
-		: QListView(parent) {}
+  public:
+	MyQListView(QWidget *parent) : QListView(parent) {}
 
-protected:
+  protected:
 	void rowsInserted(const QModelIndex &parent, int start, int end)
 	{
 		QListView::rowsInserted(parent, start, end);
@@ -35,13 +34,12 @@ protected:
 
 //----------------------------------------------------------------------------------
 
-} //namespace
+} // namespace
 
 class MySortFilterProxyModel : public QSortFilterProxyModel
 {
-public:
-	MySortFilterProxyModel(QObject *parent)
-		: QSortFilterProxyModel(parent) {}
+  public:
+	MySortFilterProxyModel(QObject *parent) : QSortFilterProxyModel(parent) {}
 
 	bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
 	{
@@ -69,7 +67,8 @@ void TMessageViewer::onClicked(bool)
 	/*return;
 	static int count=0;
 	count++;
-	DVGui::MsgBox((count%3)==1?INFORMATION:(count%3)==2?WARNING:CRITICAL, "messaggio "+QString::number(count));*/
+	DVGui::MsgBox((count%3)==1?INFORMATION:(count%3)==2?WARNING:CRITICAL, "messaggio
+	"+QString::number(count));*/
 }
 
 //-----------------------------------------------------------
@@ -88,8 +87,7 @@ void TMessageRepository::clear()
 
 //---------------------------------------------------
 
-TMessageRepository::TMessageRepository()
-	: m_sim(new QStandardItemModel())
+TMessageRepository::TMessageRepository() : m_sim(new QStandardItemModel())
 {
 }
 
@@ -100,9 +98,10 @@ TMessageRepository *TMessageRepository::instance()
 	static TMessageRepository *theObject = 0;
 	if (theObject == 0) {
 		theObject = new TMessageRepository();
-		bool ret = connect(TMsgCore::instance(), SIGNAL(sendMessage(int, const QString &)), theObject, SLOT(messageReceived(int, const QString &)));
+		bool ret = connect(TMsgCore::instance(), SIGNAL(sendMessage(int, const QString &)),
+						   theObject, SLOT(messageReceived(int, const QString &)));
 		assert(ret);
-		//TMsgCore::instance()->getConnectionName();
+		// TMsgCore::instance()->getConnectionName();
 	}
 	return theObject;
 }
@@ -143,8 +142,7 @@ bool TMessageViewer::isTMsgVisible()
 
 //--------------------------------------------------
 
-TMessageViewer::TMessageViewer(QWidget *parent)
-	: QFrame(parent)
+TMessageViewer::TMessageViewer(QWidget *parent) : QFrame(parent)
 {
 	m_tmsgViewers.push_back(this);
 

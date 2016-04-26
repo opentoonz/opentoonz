@@ -2,7 +2,7 @@
 
 #if (!(defined(x64) || defined(__LP64__) || defined(LINUX)))
 
-//Toonz stuff
+// Toonz stuff
 #include "tiio.h"
 #include "timage_io.h"
 #include "tlevel_io.h"
@@ -20,7 +20,7 @@
 #include <ApplicationServices/ApplicationServices.h>
 #endif
 
-//Qt stuff
+// Qt stuff
 #include <QString>
 #include <QHash>
 #include <QSharedMemory>
@@ -29,7 +29,7 @@
 #include <QLocalSocket>
 #include <QDataStream>
 
-//tipc includes
+// tipc includes
 #include "tipc.h"
 #include "tipcmsg.h"
 #include "tipcsrv.h"
@@ -110,24 +110,25 @@ void IsQTInstalledParser::operator()(Message &msg)
 
 void DefaultMovPropsParser::operator()(Message &msg)
 {
-	//Ensure the file path was passed - and retrieve it
+	// Ensure the file path was passed - and retrieve it
 	QString reply;
 	msg >> reply >> clr;
 	if (reply.isEmpty())
 		goto err;
 
 #ifdef WIN32
-	//Ensure that QuickTime is correctly running
+	// Ensure that QuickTime is correctly running
 	if (InitializeQTML(0) != noErr)
 		goto err;
 #endif
 
-	//Success - retrieve the props
+	// Success - retrieve the props
 	{
 		TPropertyGroup movProps;
 		{
-			//Low-level QuickTime stuff
-			ComponentInstance ci = OpenDefaultComponent(StandardCompressionType, StandardCompressionSubType);
+			// Low-level QuickTime stuff
+			ComponentInstance ci =
+				OpenDefaultComponent(StandardCompressionType, StandardCompressionSubType);
 			QTAtomContainer settings;
 
 			if (SCGetSettingsAsAtomContainer(ci, &settings) != noErr)
@@ -136,7 +137,7 @@ void DefaultMovPropsParser::operator()(Message &msg)
 			fromAtomsToProperties(settings, movProps);
 		}
 
-		//Write the retrieved properties
+		// Write the retrieved properties
 		TFilePath tfp(reply.toStdWString());
 		TOStream os(tfp);
 
@@ -158,11 +159,11 @@ err:
 
 void OpenMovSettingsPopupParser::operator()(Message &msg)
 {
-	//Open the properties file
+	// Open the properties file
 	QString fp;
 	msg >> fp >> clr;
 
-	//Retrieve the properties
+	// Retrieve the properties
 	TPropertyGroup *props = new TPropertyGroup;
 	TFilePath tfp(fp.toStdWString());
 	{
@@ -181,7 +182,7 @@ void OpenMovSettingsPopupParser::operator()(Message &msg)
 	openMovSettingsPopup(props, true);
 
 	{
-		TOStream os(tfp); //Should NOT append
+		TOStream os(tfp); // Should NOT append
 		props->saveData(os);
 	}
 
@@ -246,12 +247,12 @@ void LWImageWriteParser::operator()(Message &msg)
 
 	msg >> id >> frameIdx >> lx >> ly;
 
-	//Read the data through a shared memory segment
+	// Read the data through a shared memory segment
 	TRaster32P ras(lx, ly);
 	t32bitsrv::RasterExchanger<TPixel32> exch(ras);
 	tipc::readShMemBuffer(*stream(), msg, &exch);
 
-	//Save the image
+	// Save the image
 	try {
 		TImageWriterP iw(writers.find(id).value()->getFrameWriter(frameIdx + 1));
 		iw->save(TRasterImageP(ras));
@@ -278,12 +279,12 @@ void LWSaveSoundTrackParser::operator()(Message &msg)
 
 	msg >> id >> sampleRate >> bps >> chanCount >> sCount >> signedSample;
 
-	//Retrieve the soundtrack buffer
+	// Retrieve the soundtrack buffer
 	TSoundTrackP st = TSoundTrack::create(sampleRate, bps, chanCount, sCount, signedSample);
 	t32bitsrv::BufferExchanger exch((UCHAR *)st->getRawData());
 	tipc::readShMemBuffer(*stream(), msg, &exch);
 
-	//Write the soundtrack
+	// Write the soundtrack
 	try {
 		writers.find(id).value()->saveSoundTrack(st.getPointer());
 		msg << QString("ok");
@@ -325,7 +326,7 @@ void InitLRMovParser::operator()(Message &msg)
 	try {
 		TLevelReaderP lrm(tfp);
 
-		//Extract some info to be returned
+		// Extract some info to be returned
 		const TImageInfo *info = lrm->getImageInfo();
 		if (!info)
 			throw TImageException(tfp, "Couldn't retrieve image properties");
@@ -348,7 +349,7 @@ void InitLRMovParser::operator()(Message &msg)
 
 void LRLoadInfoParser::operator()(Message &msg)
 {
-	//Read command data
+	// Read command data
 	unsigned int id;
 	QString shMemId;
 	msg >> id >> shMemId >> clr;
@@ -357,7 +358,7 @@ void LRLoadInfoParser::operator()(Message &msg)
 	if (it == readers.end())
 		goto err;
 
-	//Read level infos
+	// Read level infos
 	{
 		TLevelP level;
 		try {
@@ -368,7 +369,7 @@ void LRLoadInfoParser::operator()(Message &msg)
 
 		int frameCount = level->getFrameCount();
 		if (!shMemId.isEmpty()) {
-			//Create a shared memory segment to transfer the infos to
+			// Create a shared memory segment to transfer the infos to
 			tipc::DefaultMessageParser<SHMEM_REQUEST> msgParser;
 			Message shMsg;
 
@@ -380,7 +381,7 @@ void LRLoadInfoParser::operator()(Message &msg)
 			if (str != QString("ok"))
 				goto err;
 
-			//Copy level data to the shared memory segment
+			// Copy level data to the shared memory segment
 			{
 				QSharedMemory shmem(shMemId);
 				shmem.attach();
@@ -507,9 +508,7 @@ void LRTimecodeParser::operator()(Message &msg)
 
 void LRImageReadParser::operator()(Message &msg)
 {
-	tipc_debug(
-		QTime fTime; QTime irTime; QTime shTime;
-		fTime.start(););
+	tipc_debug(QTime fTime; QTime irTime; QTime shTime; fTime.start(););
 
 	{
 		unsigned int id;
@@ -526,7 +525,7 @@ void LRImageReadParser::operator()(Message &msg)
 
 		tipc_debug(irTime.start());
 
-		//Load the raster
+		// Load the raster
 		TRaster32P ras(lx, ly);
 		try {
 			TImageReaderP ir(it.value()->getFrameReader(frameIdx + 1));
@@ -559,9 +558,7 @@ err:
 
 void LRImageReadSHMParser::operator()(Message &msg)
 {
-	tipc_debug(
-		QTime fTime; QTime irTime;
-		fTime.start(););
+	tipc_debug(QTime fTime; QTime irTime; fTime.start(););
 
 	unsigned int id;
 	int lx, ly, frameIdx;
@@ -575,14 +572,14 @@ void LRImageReadSHMParser::operator()(Message &msg)
 	if (it == readers.end())
 		goto err;
 
-	//Attach the shared memory segment the raster
+	// Attach the shared memory segment the raster
 	{
 		QSharedMemory shm(shMemId);
 		shm.attach();
 		if (!shm.isAttached())
 			goto err;
 
-		//Load the raster
+		// Load the raster
 		TRaster32P ras(lx, ly, lx, (TPixel32 *)shm.data());
 		try {
 			tipc_debug(qDebug() << "loading image...");
@@ -638,6 +635,6 @@ void CloseLRMovParser::operator()(Message &msg)
 	msg << QString("ok");
 }
 
-} //namespace mov_io
+} // namespace mov_io
 
 #endif // !x64 && !__LP64__

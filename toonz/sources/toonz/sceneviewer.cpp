@@ -186,13 +186,16 @@ void copyFrontBufferToBackBuffer()
 //-----------------------------------------------------------------------------
 /*! Compute new 3Dposition and new 2D position. */
 T3DPointD computeNew3DPosition(T3DPointD start3DPos, TPointD delta2D, TPointD &new2dPos,
-							   GLdouble modelView3D[16], GLdouble projection3D[16], GLint viewport3D[4])
+							   GLdouble modelView3D[16], GLdouble projection3D[16],
+							   GLint viewport3D[4])
 {
 	GLdouble pos2D_x, pos2D_y, pos2D_z;
-	gluProject(-start3DPos.x, -start3DPos.y, start3DPos.z, modelView3D, projection3D, viewport3D, &pos2D_x, &pos2D_y, &pos2D_z);
+	gluProject(-start3DPos.x, -start3DPos.y, start3DPos.z, modelView3D, projection3D, viewport3D,
+			   &pos2D_x, &pos2D_y, &pos2D_z);
 	new2dPos = TPointD(pos2D_x + delta2D.x, pos2D_y + delta2D.y);
 	GLdouble pos3D_x, pos3D_y, pos3D_z;
-	gluUnProject(new2dPos.x, new2dPos.y, 1, modelView3D, projection3D, viewport3D, &pos3D_x, &pos3D_y, &pos3D_z);
+	gluUnProject(new2dPos.x, new2dPos.y, 1, modelView3D, projection3D, viewport3D, &pos3D_x,
+				 &pos3D_y, &pos3D_z);
 	new2dPos.y = viewport3D[3] - new2dPos.y - 20;
 	return T3DPointD(pos3D_x, pos3D_y, pos3D_z);
 }
@@ -200,11 +203,12 @@ T3DPointD computeNew3DPosition(T3DPointD start3DPos, TPointD delta2D, TPointD &n
 //-----------------------------------------------------------------------------
 #ifdef DA_RIVEDERE
 
-//Il metodo copia una porzione del BACK_BUFFER definita da rect nel FRONTE_BUFFER
-//Attualmente si notano delle brutture intorno al rettangolo.
-//Per il momento si lavora nel BACK_BUFFER e sicopia tutto il FRONT_BUFFER.
-//Riattivando questo metodo bisogna ricordarsi di disattivare lo swapbuffer in GLInvalidateRect prima di
-//fare updateGL() e riattivarlo immediatamernte dopo!
+// Il metodo copia una porzione del BACK_BUFFER definita da rect nel FRONTE_BUFFER
+// Attualmente si notano delle brutture intorno al rettangolo.
+// Per il momento si lavora nel BACK_BUFFER e sicopia tutto il FRONT_BUFFER.
+// Riattivando questo metodo bisogna ricordarsi di disattivare lo swapbuffer in GLInvalidateRect
+// prima di
+// fare updateGL() e riattivarlo immediatamernte dopo!
 void copyBackBufferToFrontBuffer(const TRect &rect)
 {
 	static GLint viewport[4];
@@ -323,84 +327,63 @@ void executeCheck(int checkType)
 
 class TCheckToggleCommand : public MenuItemHandler
 {
-public:
+  public:
 	TCheckToggleCommand() : MenuItemHandler("MI_TCheck") {}
-	void execute()
-	{
-		executeCheck(ToonzCheck::eTransparency);
-	}
+	void execute() { executeCheck(ToonzCheck::eTransparency); }
 } tcheckToggle;
 
 //-----------------------------------------------------------------------------
 
 class ICheckToggleCommand : public MenuItemHandler
 {
-public:
+  public:
 	ICheckToggleCommand() : MenuItemHandler("MI_ICheck") {}
-	void execute()
-	{
-		executeCheck(ToonzCheck::eInk);
-	}
+	void execute() { executeCheck(ToonzCheck::eInk); }
 } icheckToggle;
 
 //-----------------------------------------------------------------------------
 
 class PCheckToggleCommand : public MenuItemHandler
 {
-public:
+  public:
 	PCheckToggleCommand() : MenuItemHandler("MI_PCheck") {}
-	void execute()
-	{
-		executeCheck(ToonzCheck::ePaint);
-	}
+	void execute() { executeCheck(ToonzCheck::ePaint); }
 } pcheckToggle;
 
 //-----------------------------------------------------------------------------
 
 class BCheckToggleCommand : public MenuItemHandler
 {
-public:
+  public:
 	BCheckToggleCommand() : MenuItemHandler("MI_BCheck") {}
-	void execute()
-	{
-		executeCheck(ToonzCheck::eBlackBg);
-	}
+	void execute() { executeCheck(ToonzCheck::eBlackBg); }
 } bcheckToggle;
 
 //-----------------------------------------------------------------------------
 
 class TAutocloseToggleCommand : public MenuItemHandler
 {
-public:
+  public:
 	TAutocloseToggleCommand() : MenuItemHandler("MI_ACheck") {}
-	void execute()
-	{
-		executeCheck(ToonzCheck::eAutoclose);
-	}
+	void execute() { executeCheck(ToonzCheck::eAutoclose); }
 } tautocloseToggle;
 
 //-----------------------------------------------------------------------------
 
 class TGapToggleCommand : public MenuItemHandler
 {
-public:
+  public:
 	TGapToggleCommand() : MenuItemHandler("MI_GCheck") {}
-	void execute()
-	{
-		executeCheck(ToonzCheck::eGap);
-	}
+	void execute() { executeCheck(ToonzCheck::eGap); }
 } tgapToggle;
 
 //-----------------------------------------------------------------------------
 
 class TInksOnlyToggleCommand : public MenuItemHandler
 {
-public:
+  public:
 	TInksOnlyToggleCommand() : MenuItemHandler("MI_IOnly") {}
-	void execute()
-	{
-		executeCheck(ToonzCheck::eInksOnly);
-	}
+	void execute() { executeCheck(ToonzCheck::eInksOnly); }
 } tinksOnlyToggle;
 
 //-----------------------------------------------------------------------------
@@ -408,12 +391,9 @@ public:
 */
 class Ink1CheckToggleCommand : public MenuItemHandler
 {
-public:
+  public:
 	Ink1CheckToggleCommand() : MenuItemHandler("MI_Ink1Check") {}
-	void execute()
-	{
-		executeCheck(ToonzCheck::eInk1);
-	}
+	void execute() { executeCheck(ToonzCheck::eInk1); }
 } ink1checkToggle;
 
 //=============================================================================
@@ -422,7 +402,7 @@ class TShiftTraceToggleCommand : public MenuItemHandler
 {
 	CommandId m_cmdId;
 
-public:
+  public:
 	TShiftTraceToggleCommand(CommandId cmdId) : MenuItemHandler(cmdId), m_cmdId(cmdId) {}
 	void execute()
 	{
@@ -474,14 +454,12 @@ public:
 	}
 };
 
-TShiftTraceToggleCommand
-	shiftTraceToggleCommand(MI_ShiftTrace),
-	editShiftToggleCommand(MI_EditShift),
-	noShiftToggleCommand(MI_NoShift);
+TShiftTraceToggleCommand shiftTraceToggleCommand(MI_ShiftTrace),
+	editShiftToggleCommand(MI_EditShift), noShiftToggleCommand(MI_NoShift);
 
 class TResetShiftTraceCommand : public MenuItemHandler
 {
-public:
+  public:
 	TResetShiftTraceCommand() : MenuItemHandler(MI_ResetShift) {}
 	void execute()
 	{
@@ -503,14 +481,24 @@ public:
 //-----------------------------------------------------------------------------
 
 SceneViewer::SceneViewer(ImageUtils::FullScreenWidget *parent)
-	: QGLWidget(parent, touchProxy()), m_pressure(0), m_lastMousePos(0, 0), m_mouseButton(Qt::NoButton), m_foregroundDrawing(false), m_tabletEvent(false), m_buttonClicked(false), m_referenceMode(NORMAL_REFERENCE), m_previewMode(NO_PREVIEW), m_isMouseEntered(false), m_forceGlFlush(true), m_freezedStatus(NO_FREEZED), m_viewGrabImage(0), m_FPS(0), m_hRuler(0), m_vRuler(0), m_viewMode(SCENE_VIEWMODE), m_pos(0, 0), m_pan3D(TPointD(0, 0)), m_zoomScale3D(0.1), m_theta3D(20), m_phi3D(30), m_dpiScale(TPointD(1, 1)), m_compareSettings(), m_minZ(0), m_tableDLId(-1), m_groupIndexToBeEntered(-1), m_pixelSize(1), m_eraserPointerOn(false), m_backupTool(""), m_clipRect(), m_isPicking(false), m_current3DDevice(NONE), m_sideRasterPos(), m_topRasterPos(), m_toolDisableReason(""), m_editPreviewSubCamera(false)
+	: QGLWidget(parent, touchProxy()), m_pressure(0), m_lastMousePos(0, 0),
+	  m_mouseButton(Qt::NoButton), m_foregroundDrawing(false), m_tabletEvent(false),
+	  m_buttonClicked(false), m_referenceMode(NORMAL_REFERENCE), m_previewMode(NO_PREVIEW),
+	  m_isMouseEntered(false), m_forceGlFlush(true), m_freezedStatus(NO_FREEZED),
+	  m_viewGrabImage(0), m_FPS(0), m_hRuler(0), m_vRuler(0), m_viewMode(SCENE_VIEWMODE),
+	  m_pos(0, 0), m_pan3D(TPointD(0, 0)), m_zoomScale3D(0.1), m_theta3D(20), m_phi3D(30),
+	  m_dpiScale(TPointD(1, 1)), m_compareSettings(), m_minZ(0), m_tableDLId(-1),
+	  m_groupIndexToBeEntered(-1), m_pixelSize(1), m_eraserPointerOn(false), m_backupTool(""),
+	  m_clipRect(), m_isPicking(false), m_current3DDevice(NONE), m_sideRasterPos(),
+	  m_topRasterPos(), m_toolDisableReason(""), m_editPreviewSubCamera(false)
 {
 	assert(parent);
 
-	m_visualSettings.m_sceneProperties = TApp::instance()->getCurrentScene()->getScene()->getProperties();
-	//Enables multiple key input.
+	m_visualSettings.m_sceneProperties =
+		TApp::instance()->getCurrentScene()->getScene()->getProperties();
+	// Enables multiple key input.
 	setAttribute(Qt::WA_KeyCompression);
-	//Enables input methods for Asian languages.
+	// Enables input methods for Asian languages.
 	setAttribute(Qt::WA_InputMethodEnabled);
 	setFocusPolicy(Qt::StrongFocus);
 	setAcceptDrops(true);
@@ -534,8 +522,9 @@ SceneViewer::SceneViewer(ImageUtils::FullScreenWidget *parent)
 	TGLDisplayListsManager::instance()->attachContext(l_displayListsSpaceId, context);
 	l_contexts.insert(context);
 
-	//iwsw commented out temporarily
-	//if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && Ghibli3DLutUtil::m_isValid)
+	// iwsw commented out temporarily
+	// if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() &&
+	// Ghibli3DLutUtil::m_isValid)
 	//  m_ghibli3DLutUtil = new Ghibli3DLutUtil();
 }
 
@@ -543,10 +532,12 @@ SceneViewer::SceneViewer(ImageUtils::FullScreenWidget *parent)
 
 void SceneViewer::setVisual(const ImagePainter::VisualSettings &settings)
 {
-	//m_visualSettings.m_blankColor = settings.m_blankColor;//for the blank frames, I don't have to repaint the viewer are using updateGl!
+	// m_visualSettings.m_blankColor = settings.m_blankColor;//for the blank frames, I don't have to
+	// repaint the viewer are using updateGl!
 	bool repaint = m_visualSettings.needRepaint(settings);
 	m_visualSettings = settings;
-	m_visualSettings.m_sceneProperties = TApp::instance()->getCurrentScene()->getScene()->getProperties();
+	m_visualSettings.m_sceneProperties =
+		TApp::instance()->getCurrentScene()->getScene()->getProperties();
 	if (repaint)
 		updateGL();
 }
@@ -557,7 +548,8 @@ SceneViewer::~SceneViewer()
 {
 	// Due to a BUG on some old driver we've tested, it's necessary to remove the proxy first,
 	// before any QGLWidget which shares the context gets killed in turn. The bug caused a crash
-	// when the destruction order of the SceneViewer was inverted with respect to the (shared) creation.
+	// when the destruction order of the SceneViewer was inverted with respect to the (shared)
+	// creation.
 	if (l_proxy) {
 		std::set<TGlContext>::iterator ct, cEnd(l_contexts.end());
 		for (ct = l_contexts.begin(); ct != cEnd; ++ct)
@@ -570,7 +562,7 @@ SceneViewer::~SceneViewer()
 		glDeleteLists(m_tableDLId, 1);
 	doneCurrent();
 
-	//iwsw commented out temporarily
+	// iwsw commented out temporarily
 	/*
   if (m_ghibli3DLutUtil)
   {
@@ -582,7 +574,7 @@ SceneViewer::~SceneViewer()
 
 //-------------------------------------------------------------------------------
 
-//Builds the view area, in camera reference
+// Builds the view area, in camera reference
 TRectD SceneViewer::getPreviewRect() const
 {
 	TApp *app = TApp::instance();
@@ -594,9 +586,8 @@ TRectD SceneViewer::getPreviewRect() const
 
 	TDimensionD cameraSize = app->getCurrentScene()->getScene()->getCurrentCamera()->getSize();
 	TDimension cameraRes = app->getCurrentScene()->getScene()->getCurrentCamera()->getRes();
-	TScale cameraScale(
-		Stage::inch * cameraSize.lx / cameraRes.lx,
-		Stage::inch * cameraSize.ly / cameraRes.ly);
+	TScale cameraScale(Stage::inch * cameraSize.lx / cameraRes.lx,
+					   Stage::inch * cameraSize.ly / cameraRes.ly);
 
 	TRectD viewRect(-width() * 0.5, -height() * 0.5, width() * 0.5, height() * 0.5);
 
@@ -721,7 +712,7 @@ void SceneViewer::enablePreview(int previewMode)
 	if (m_previewMode != NO_PREVIEW)
 		Previewer::instance(m_previewMode == SUBCAMERA_PREVIEW)->removeListener(this);
 
-	//Schedule as a listener to Previewer.
+	// Schedule as a listener to Previewer.
 	if (previewMode != NO_PREVIEW) {
 		Previewer *previewer = Previewer::instance(previewMode == SUBCAMERA_PREVIEW);
 		previewer->addListener(this);
@@ -740,12 +731,14 @@ void SceneViewer::enablePreview(int previewMode)
 
 TPointD SceneViewer::winToWorld(const QPoint &pos) const
 {
-	// coordinate window (origine in alto a sinistra) -> coordinate colonna (origine al centro dell'immagine)
+	// coordinate window (origine in alto a sinistra) -> coordinate colonna (origine al centro
+	// dell'immagine)
 	TPointD pp(pos.x() - width() / 2, -pos.y() + height() / 2);
 	if (is3DView()) {
 		TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
 		TStageObjectId cameraId = xsh->getStageObjectTree()->getCurrentCameraId();
-		double z = xsh->getStageObject(cameraId)->getZ(TApp::instance()->getCurrentFrame()->getFrame());
+		double z =
+			xsh->getStageObject(cameraId)->getZ(TApp::instance()->getCurrentFrame()->getFrame());
 
 		TPointD p(pp.x - m_pan3D.x, pp.y - m_pan3D.y);
 		p = p * (1 / m_zoomScale3D);
@@ -792,9 +785,10 @@ TPoint SceneViewer::worldToPos(const TPointD &worldPos) const
 
 void SceneViewer::showEvent(QShowEvent *)
 {
-	m_visualSettings.m_sceneProperties = TApp::instance()->getCurrentScene()->getScene()->getProperties();
+	m_visualSettings.m_sceneProperties =
+		TApp::instance()->getCurrentScene()->getScene()->getProperties();
 
-	//Se il viewer e' show e il preview e' attivo aggiungo il listner al preview
+	// Se il viewer e' show e il preview e' attivo aggiungo il listner al preview
 	if (m_previewMode != NO_PREVIEW)
 		Previewer::instance(m_previewMode == SUBCAMERA_PREVIEW)->addListener(this);
 
@@ -817,13 +811,15 @@ void SceneViewer::showEvent(QShowEvent *)
 
 	connect(app->getCurrentLevel(), SIGNAL(xshLevelChanged()), this, SLOT(update()));
 	connect(app->getCurrentLevel(), SIGNAL(xshCanvasSizeChanged()), this, SLOT(update()));
-	// when level is switched, update m_dpiScale in order to show white background for Ink&Paint work properly
-	connect(app->getCurrentLevel(), SIGNAL(xshLevelSwitched(TXshLevel *)), this, SLOT(onLevelSwitched()));
+	// when level is switched, update m_dpiScale in order to show white background for Ink&Paint
+	// work properly
+	connect(app->getCurrentLevel(), SIGNAL(xshLevelSwitched(TXshLevel *)), this,
+			SLOT(onLevelSwitched()));
 
 	connect(app->getCurrentXsheet(), SIGNAL(xsheetChanged()), this, SLOT(onXsheetChanged()));
 	connect(app->getCurrentXsheet(), SIGNAL(xsheetSwitched()), this, SLOT(update()));
 
-	//update tooltip when tool options are changed
+	// update tooltip when tool options are changed
 	connect(app->getCurrentTool(), SIGNAL(toolChanged()), this, SLOT(onToolChanged()));
 	connect(app->getCurrentTool(), SIGNAL(toolCursorTypeChanged()), this, SLOT(onToolChanged()));
 
@@ -842,7 +838,7 @@ void SceneViewer::showEvent(QShowEvent *)
 
 void SceneViewer::hideEvent(QHideEvent *)
 {
-	//Se il viewer e' hide e il preview e' attivo rimuovo il listner dal preview
+	// Se il viewer e' hide e il preview e' attivo rimuovo il listner dal preview
 	if (m_previewMode != NO_PREVIEW)
 		Previewer::instance(m_previewMode == SUBCAMERA_PREVIEW)->removeListener(this);
 
@@ -885,11 +881,11 @@ void SceneViewer::hideEvent(QHideEvent *)
 
 void SceneViewer::initializeGL()
 {
-	//glClearColor(1.0,1.0,1.0,1);
+	// glClearColor(1.0,1.0,1.0,1);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	//iwsw commented out temporarily
-	//if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
+	// iwsw commented out temporarily
+	// if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
 	//	  m_ghibli3DLutUtil->onInit();
 }
 
@@ -916,8 +912,8 @@ void SceneViewer::resizeGL(int w, int h)
 
 	// for updating the navigator in levelstrip
 	emit refreshNavi();
-	//iwsw commented out temporarily
-	//if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
+	// iwsw commented out temporarily
+	// if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
 	//	m_ghibli3DLutUtil->onResize(w, h);
 }
 
@@ -930,7 +926,7 @@ void SceneViewer::drawBuildVars()
 	int frame = app->getCurrentFrame()->getFrame();
 	TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
 
-	//Camera affine
+	// Camera affine
 	TStageObjectId cameraId = xsh->getStageObjectTree()->getCurrentCameraId();
 	TStageObject *camera = xsh->getStageObject(cameraId);
 	TAffine cameraPlacement = camera->getPlacement(frame);
@@ -938,20 +934,17 @@ void SceneViewer::drawBuildVars()
 
 	m_drawCameraAff = getViewMatrix() * cameraPlacement * TScale((1000 + cameraZ) / 1000);
 
-	//Table affine
+	// Table affine
 	TStageObject *table = xsh->getStageObject(TStageObjectId::TableId);
 	TAffine tablePlacement = table->getPlacement(frame);
 	double tableZ = table->getZ(frame);
 	TAffine placement;
 
-	m_drawIsTableVisible = TStageObject::perspective(
-		placement,
-		cameraPlacement, cameraZ,
-		tablePlacement, tableZ,
-		0);
+	m_drawIsTableVisible =
+		TStageObject::perspective(placement, cameraPlacement, cameraZ, tablePlacement, tableZ, 0);
 	m_drawTableAff = getViewMatrix() * tablePlacement;
 
-	//Camera test check
+	// Camera test check
 	m_drawCameraTest = CameraTestCheck::instance()->isEnabled();
 
 	if (m_previewMode == NO_PREVIEW) {
@@ -964,7 +957,7 @@ void SceneViewer::drawBuildVars()
 		m_draw3DMode = false;
 	}
 
-	//Clip rect
+	// Clip rect
 	if (!m_clipRect.isEmpty() && !m_draw3DMode) {
 		m_actualClipRect = getActualClipRect(getViewMatrix());
 		m_actualClipRect += TPoint(width() * 0.5, height() * 0.5);
@@ -981,7 +974,8 @@ void SceneViewer::drawEnableScissor()
 {
 	if (!m_clipRect.isEmpty() && !m_draw3DMode) {
 		glEnable(GL_SCISSOR_TEST);
-		glScissor(m_actualClipRect.x0, m_actualClipRect.y0, m_actualClipRect.getLx(), m_actualClipRect.getLy());
+		glScissor(m_actualClipRect.x0, m_actualClipRect.y0, m_actualClipRect.getLx(),
+				  m_actualClipRect.getLy());
 	}
 }
 
@@ -1082,7 +1076,8 @@ void SceneViewer::drawCameraStand()
 	assert(glGetError() == GL_NO_ERROR);
 
 	// draw table
-	if (!m_draw3DMode && viewTableToggle.getStatus() && m_drawIsTableVisible && m_visualSettings.m_colorMask == 0 && m_drawEditingLevel == false && !m_drawCameraTest) {
+	if (!m_draw3DMode && viewTableToggle.getStatus() && m_drawIsTableVisible &&
+		m_visualSettings.m_colorMask == 0 && m_drawEditingLevel == false && !m_drawCameraTest) {
 		glPushMatrix();
 		tglMultMatrix(m_drawTableAff);
 		ViewerDraw::drawDisk(m_tableDLId);
@@ -1162,15 +1157,16 @@ void SceneViewer::drawPreview()
 		TRectD previewStageRectD, cameraStageRectD = currCamera->getStageRect();
 
 		TRect subCameraRect(currCamera->getInterestRect());
-		if (m_previewMode == SUBCAMERA_PREVIEW &&
-			subCameraRect.getLx() > 0 && subCameraRect.getLy() > 0)
+		if (m_previewMode == SUBCAMERA_PREVIEW && subCameraRect.getLx() > 0 &&
+			subCameraRect.getLy() > 0)
 			previewStageRectD = currCamera->getInterestStageRect();
 		else
 			previewStageRectD = cameraStageRectD;
 
-		TAffine rasterToStageRef(
-			previewStageRectD.getLx() / ras->getLx(), 0.0, previewStageRectD.x0 + 0.5 * previewStageRectD.getLx(),
-			0.0, previewStageRectD.getLy() / ras->getLy(), previewStageRectD.y0 + 0.5 * previewStageRectD.getLy());
+		TAffine rasterToStageRef(previewStageRectD.getLx() / ras->getLx(), 0.0,
+								 previewStageRectD.x0 + 0.5 * previewStageRectD.getLx(), 0.0,
+								 previewStageRectD.getLy() / ras->getLy(),
+								 previewStageRectD.y0 + 0.5 * previewStageRectD.getLy());
 
 		TDimension dim(width(), height());
 		TAffine finalAff = m_drawCameraAff * rasterToStageRef;
@@ -1192,7 +1188,8 @@ void SceneViewer::drawPreview()
 		tglFillRect(frameRect);
 	}
 
-	if (!previewer->isFrameReady(row) || app->getCurrentFrame()->isPlaying() && previewer->isBusy()) {
+	if (!previewer->isFrameReady(row) ||
+		app->getCurrentFrame()->isPlaying() && previewer->isBusy()) {
 		glColor3d(1, 0, 0);
 
 		tglDrawRect(frameRect);
@@ -1227,12 +1224,11 @@ void SceneViewer::drawOverlay()
 	if (!m_drawCameraTest) {
 		// draw grid & guides
 		if (viewGuideToggle.getStatus() &&
-			(m_vRuler && m_vRuler->getGuideCount() ||
-			 m_hRuler && m_hRuler->getGuideCount())) {
+			(m_vRuler && m_vRuler->getGuideCount() || m_hRuler && m_hRuler->getGuideCount())) {
 			glPushMatrix();
 			tglMultMatrix(getViewMatrix());
-			ViewerDraw::drawGridAndGuides(this,
-										  (m_draw3DMode) ? m_zoomScale3D : m_viewAff[m_viewMode].det(),
+			ViewerDraw::drawGridAndGuides(this, (m_draw3DMode) ? m_zoomScale3D
+															   : m_viewAff[m_viewMode].det(),
 										  m_vRuler, m_hRuler, false);
 			glPopMatrix();
 		}
@@ -1277,7 +1273,7 @@ void SceneViewer::drawOverlay()
 		}
 		assert(glGetError() == GL_NO_ERROR);
 
-	} //!cameraTest
+	} //! cameraTest
 
 	// draw 3d Top/Side Buttons
 	if (m_draw3DMode && !m_isPicking) {
@@ -1292,25 +1288,37 @@ void SceneViewer::drawOverlay()
 		glGetIntegerv(GL_VIEWPORT, viewport3D);
 
 		if (m_phi3D > 0) {
-			T3DPointD topRasterPos3D = computeNew3DPosition(T3DPointD(500, 500, 1000), TPointD(-10, -10), m_topRasterPos, modelView3D, projection3D, viewport3D);
+			T3DPointD topRasterPos3D =
+				computeNew3DPosition(T3DPointD(500, 500, 1000), TPointD(-10, -10), m_topRasterPos,
+									 modelView3D, projection3D, viewport3D);
 			glRasterPos3f(topRasterPos3D.x, topRasterPos3D.y, topRasterPos3D.z);
 			glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-			glDrawPixels(m_3DTop->getWrap(), m_3DTop->getLy(), TGL_FMT, TGL_TYPE, m_3DTop->getRawData());
+			glDrawPixels(m_3DTop->getWrap(), m_3DTop->getLy(), TGL_FMT, TGL_TYPE,
+						 m_3DTop->getRawData());
 
-			T3DPointD sideRasterPos3D = computeNew3DPosition(T3DPointD(-500, -500, 1000), TPointD(-10, -10), m_sideRasterPos, modelView3D, projection3D, viewport3D);
+			T3DPointD sideRasterPos3D =
+				computeNew3DPosition(T3DPointD(-500, -500, 1000), TPointD(-10, -10),
+									 m_sideRasterPos, modelView3D, projection3D, viewport3D);
 			glRasterPos3f(sideRasterPos3D.x, sideRasterPos3D.y, sideRasterPos3D.z);
 			glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-			glDrawPixels(m_3DSideR->getWrap(), m_3DSideR->getLy(), TGL_FMT, TGL_TYPE, m_3DSideR->getRawData());
+			glDrawPixels(m_3DSideR->getWrap(), m_3DSideR->getLy(), TGL_FMT, TGL_TYPE,
+						 m_3DSideR->getRawData());
 		} else {
-			T3DPointD topRasterPos3D = computeNew3DPosition(T3DPointD(-500, 500, 1000), TPointD(-10, -10), m_topRasterPos, modelView3D, projection3D, viewport3D);
+			T3DPointD topRasterPos3D =
+				computeNew3DPosition(T3DPointD(-500, 500, 1000), TPointD(-10, -10), m_topRasterPos,
+									 modelView3D, projection3D, viewport3D);
 			glRasterPos3f(topRasterPos3D.x, topRasterPos3D.y, topRasterPos3D.z);
 			glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-			glDrawPixels(m_3DTop->getWrap(), m_3DTop->getLy(), TGL_FMT, TGL_TYPE, m_3DTop->getRawData());
+			glDrawPixels(m_3DTop->getWrap(), m_3DTop->getLy(), TGL_FMT, TGL_TYPE,
+						 m_3DTop->getRawData());
 
-			T3DPointD sideRasterPos3D = computeNew3DPosition(T3DPointD(500, -500, 1000), TPointD(-10, -10), m_sideRasterPos, modelView3D, projection3D, viewport3D);
+			T3DPointD sideRasterPos3D =
+				computeNew3DPosition(T3DPointD(500, -500, 1000), TPointD(-10, -10), m_sideRasterPos,
+									 modelView3D, projection3D, viewport3D);
 			glRasterPos3f(sideRasterPos3D.x, sideRasterPos3D.y, sideRasterPos3D.z);
 			glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-			glDrawPixels(m_3DSideL->getWrap(), m_3DSideL->getLy(), TGL_FMT, TGL_TYPE, m_3DSideL->getRawData());
+			glDrawPixels(m_3DSideL->getWrap(), m_3DSideL->getLy(), TGL_FMT, TGL_TYPE,
+						 m_3DSideL->getRawData());
 		}
 	}
 
@@ -1325,7 +1333,8 @@ void SceneViewer::drawOverlay()
 	TXshSimpleLevel *sl = app->getCurrentLevel()->getSimpleLevel();
 	// Call tool->draw() even if the level is read only (i.e. to show hooks)
 	if (tool && (tool->isEnabled() || (sl && sl->isReadOnly()))) {
-		//tool->setViewer(this);                            // Moved at drawBuildVars(), before drawing anything
+		// tool->setViewer(this);                            // Moved at drawBuildVars(), before
+		// drawing anything
 		glPushMatrix();
 		if (m_draw3DMode) {
 			mult3DMatrix();
@@ -1337,7 +1346,8 @@ void SceneViewer::drawOverlay()
 		m_pixelSize = sqrt(tglGetPixelSize2());
 		tool->draw();
 		glPopMatrix();
-		// Used (only in the T_RGBPicker tool) to notify and set the currentColor outside the draw() methods:
+		// Used (only in the T_RGBPicker tool) to notify and set the currentColor outside the draw()
+		// methods:
 		// using special style there was a conflict between the draw() methods of the tool
 		// and the genaration of the icon inside the style editor (makeIcon()) which use
 		// another glContext
@@ -1395,16 +1405,13 @@ class Qt_GLContextManager : public TGLContextManager
 {
 	QGLContext *m_context;
 
-public:
+  public:
 	Qt_GLContextManager() : m_context(0) {}
 	void store()
 	{
 		// m_context = const_cast<QGLContext *>(QGLContext::currentContext());
 	}
-	void store(QGLContext *context)
-	{
-		m_context = context;
-	}
+	void store(QGLContext *context) { m_context = context; }
 	void restore()
 	{
 		if (m_context)
@@ -1419,15 +1426,16 @@ public:
 void SceneViewer::paintGL()
 {
 	if (!check_framebuffer_status()) {
-		/* QGLWidget の widget 生成/削除のタイミングで(platform によって?) GL_FRAMEBUFFER_UNDEFINED の状態で paintGL() が呼ばれてしまうようだ */
+		/* QGLWidget の widget 生成/削除のタイミングで(platform によって?) GL_FRAMEBUFFER_UNDEFINED
+		 * の状態で paintGL() が呼ばれてしまうようだ */
 		return;
 	}
 #ifdef WIN32
-	//following line is necessary to solve a problem Windows 7
+	// following line is necessary to solve a problem Windows 7
 	SetWindowRgn((HWND)winId(), 0, FALSE);
 #else
-	//followin lines are necessary to solve a problem on iMac20
-	//It seems that for some errors in the openGl implementation, buffers are not set corretly.
+	// followin lines are necessary to solve a problem on iMac20
+	// It seems that for some errors in the openGl implementation, buffers are not set corretly.
 	if (m_isMouseEntered && m_forceGlFlush) {
 		m_isMouseEntered = false;
 		m_forceGlFlush = false;
@@ -1442,8 +1450,8 @@ void SceneViewer::paintGL()
 	time.start();
 #endif
 
-	//iwsw commented out temporarily
-	//if (!m_isPicking &&
+	// iwsw commented out temporarily
+	// if (!m_isPicking &&
 	//	Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
 	//	m_ghibli3DLutUtil->startDraw();
 
@@ -1451,13 +1459,14 @@ void SceneViewer::paintGL()
 		if (!viewRulerToggle.getStatus() && (m_hRuler->isVisible() || m_vRuler->isVisible())) {
 			m_hRuler->hide();
 			m_vRuler->hide();
-		} else if (viewRulerToggle.getStatus() && (!m_hRuler->isVisible() || !m_vRuler->isVisible())) {
+		} else if (viewRulerToggle.getStatus() &&
+				   (!m_hRuler->isVisible() || !m_vRuler->isVisible())) {
 			m_hRuler->show();
 			m_vRuler->show();
 		}
 	}
 
-	//Il freezed e' attivo ed e' in stato "normale": mostro l'immagine grabbata.
+	// Il freezed e' attivo ed e' in stato "normale": mostro l'immagine grabbata.
 	if (m_freezedStatus == NORMAL_FREEZED) {
 		assert(!!m_viewGrabImage);
 		m_viewGrabImage->lock();
@@ -1467,14 +1476,14 @@ void SceneViewer::paintGL()
 		glRasterPos2d(0, 0);
 		glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 
-		glDrawPixels(m_viewGrabImage->getLx(), m_viewGrabImage->getLy(),
-					 TGL_FMT, TGL_TYPE, m_viewGrabImage->getRawData());
+		glDrawPixels(m_viewGrabImage->getLx(), m_viewGrabImage->getLy(), TGL_FMT, TGL_TYPE,
+					 m_viewGrabImage->getRawData());
 
 		glPopMatrix();
 		m_viewGrabImage->unlock();
 
-		//iwsw commented out temporarily
-		//if (!m_isPicking &&
+		// iwsw commented out temporarily
+		// if (!m_isPicking &&
 		//	Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
 		//	m_ghibli3DLutUtil->endDraw();
 
@@ -1484,8 +1493,8 @@ void SceneViewer::paintGL()
 	drawBuildVars();
 
 	check_framebuffer_status();
-	//iwsw commented out temporarily
-	//if (!m_isPicking &&
+	// iwsw commented out temporarily
+	// if (!m_isPicking &&
 	//	  !Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() || !m_ghibli3DLutUtil)
 	copyFrontBufferToBackBuffer();
 	check_framebuffer_status();
@@ -1507,7 +1516,7 @@ void SceneViewer::paintGL()
 
 	drawDisableScissor();
 
-	//Il freezed e' attivo ed e' in stato "update": faccio il grab del viewer.
+	// Il freezed e' attivo ed e' in stato "update": faccio il grab del viewer.
 	if (m_freezedStatus == UPDATE_FREEZED) {
 		m_viewGrabImage = rasterFromQImage(grabFrameBuffer(false));
 		m_freezedStatus = NORMAL_FREEZED;
@@ -1522,8 +1531,8 @@ void SceneViewer::paintGL()
 #endif
 	// TOfflineGL::setContextManager(0);
 
-	//iwsw commented out temporarily
-	//if (!m_isPicking &&
+	// iwsw commented out temporarily
+	// if (!m_isPicking &&
 	//	Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
 	//	m_ghibli3DLutUtil->endDraw();
 }
@@ -1587,16 +1596,14 @@ void SceneViewer::drawScene()
 		Stage::RasterPainter painter(viewerSize, viewAff, clipRect, m_visualSettings, true);
 
 		// darken blended view mode for viewing the non-cleanuped and stacked drawings
-		painter.setRasterDarkenBlendedView(Preferences::instance()->isShowRasterImagesDarkenBlendedInViewerEnabled());
+		painter.setRasterDarkenBlendedView(
+			Preferences::instance()->isShowRasterImagesDarkenBlendedInViewerEnabled());
 
 		TFrameHandle *frameHandle = TApp::instance()->getCurrentFrame();
 		if (app->getCurrentFrame()->isEditingLevel()) {
-			Stage::visit(
-				painter,
-				app->getCurrentLevel()->getLevel(),
-				app->getCurrentFrame()->getFid(),
-				app->getCurrentOnionSkin()->getOnionSkinMask(),
-				frameHandle->isPlaying());
+			Stage::visit(painter, app->getCurrentLevel()->getLevel(),
+						 app->getCurrentFrame()->getFid(),
+						 app->getCurrentOnionSkin()->getOnionSkinMask(), frameHandle->isPlaying());
 		} else {
 			std::pair<TXsheet *, int> xr;
 			int xsheetLevel = 0;
@@ -1625,7 +1632,8 @@ void SceneViewer::drawScene()
 
 		assert(glGetError() == 0);
 		if (m_viewMode != LEVEL_VIEWMODE)
-			drawSpline(getViewMatrix(), clipRect, m_referenceMode == CAMERA3D_REFERENCE, m_pixelSize);
+			drawSpline(getViewMatrix(), clipRect, m_referenceMode == CAMERA3D_REFERENCE,
+					   m_pixelSize);
 		assert(glGetError() == 0);
 	}
 }
@@ -1695,7 +1703,8 @@ TRect SceneViewer::getActualClipRect(const TAffine &aff)
 
 TAffine SceneViewer::getViewMatrix() const
 {
-	int viewMode = TApp::instance()->getCurrentFrame()->isEditingLevel() ? LEVEL_VIEWMODE : SCENE_VIEWMODE;
+	int viewMode =
+		TApp::instance()->getCurrentFrame()->isEditingLevel() ? LEVEL_VIEWMODE : SCENE_VIEWMODE;
 	if (is3DView())
 		return TAffine();
 	if (m_referenceMode == CAMERA_REFERENCE) {
@@ -1711,7 +1720,8 @@ TAffine SceneViewer::getViewMatrix() const
 
 TAffine SceneViewer::getSceneMatrix() const
 {
-	int viewMode = TApp::instance()->getCurrentFrame()->isEditingLevel() ? LEVEL_VIEWMODE : SCENE_VIEWMODE;
+	int viewMode =
+		TApp::instance()->getCurrentFrame()->isEditingLevel() ? LEVEL_VIEWMODE : SCENE_VIEWMODE;
 	if (is3DView())
 		return TAffine();
 	return m_viewAff[viewMode];
@@ -1723,7 +1733,7 @@ void SceneViewer::setViewMatrix(const TAffine &aff, int viewMode)
 {
 	m_viewAff[viewMode] = aff;
 
-	//In case the previewer is on, request a delayed update
+	// In case the previewer is on, request a delayed update
 	if (m_previewMode != NO_PREVIEW)
 		requestTimedRefresh();
 }
@@ -1792,8 +1802,8 @@ void SceneViewer::panQt(const QPoint &delta)
 	if (is3DView())
 		m_pan3D += TPointD(delta.x(), -delta.y());
 	else {
-		//TAffine &viewAff = m_viewAff[m_viewMode];
-		//viewAff = TTranslation(delta.x(), -delta.y()) * viewAff;
+		// TAffine &viewAff = m_viewAff[m_viewMode];
+		// viewAff = TTranslation(delta.x(), -delta.y()) * viewAff;
 		setViewMatrix(TTranslation(delta.x(), -delta.y()) * m_viewAff[m_viewMode], m_viewMode);
 	}
 	invalidateAll();
@@ -1820,10 +1830,10 @@ void SceneViewer::zoomQt(bool forward, bool reset)
 		// add a zoom factor which can show image fitting with the screen size
 		double zoomScaleFittingWithScreen = 0.0f;
 		if (dpiFactor != 1.0) {
-			//check if the viewer is in full screen mode
-			ImageUtils::FullScreenWidget *fsWidget = dynamic_cast<ImageUtils::FullScreenWidget *>(parentWidget());
-			if (fsWidget &&
-				(fsWidget->windowState() & Qt::WindowFullScreen) != 0)
+			// check if the viewer is in full screen mode
+			ImageUtils::FullScreenWidget *fsWidget =
+				dynamic_cast<ImageUtils::FullScreenWidget *>(parentWidget());
+			if (fsWidget && (fsWidget->windowState() & Qt::WindowFullScreen) != 0)
 				zoomScaleFittingWithScreen = getZoomScaleFittingWithScreen();
 		}
 
@@ -1834,17 +1844,22 @@ void SceneViewer::zoomQt(bool forward, bool reset)
 			double scale2 = viewAff.det();
 			if (reset || ((scale2 < 100000 || !forward) && (scale2 > 0.001 * 0.05 || forward))) {
 				double oldZoomScale = sqrt(scale2) * dpiFactor;
-				double zoomScale = reset ? 1 : ImageUtils::getQuantizedZoomFactor(oldZoomScale, forward);
+				double zoomScale =
+					reset ? 1 : ImageUtils::getQuantizedZoomFactor(oldZoomScale, forward);
 
 				// threshold value -0.001 is intended to absorb the error of calculation
-				if ((oldZoomScale - zoomScaleFittingWithScreen) * (zoomScale - zoomScaleFittingWithScreen) < -0.001)
+				if ((oldZoomScale - zoomScaleFittingWithScreen) *
+						(zoomScale - zoomScaleFittingWithScreen) <
+					-0.001)
 					zoomScale = zoomScaleFittingWithScreen;
 				// zoom center = viewer center
 				if (Preferences::instance()->getViewerZoomCenter())
 					setViewMatrix(TScale(zoomScale / oldZoomScale) * viewAff, i);
 				// zoom center = mouse pos
 				else
-					setViewMatrix(TTranslation(delta) * TScale(zoomScale / oldZoomScale) * TTranslation(-delta) * viewAff, i);
+					setViewMatrix(TTranslation(delta) * TScale(zoomScale / oldZoomScale) *
+									  TTranslation(-delta) * viewAff,
+								  i);
 			}
 		}
 	}
@@ -1854,16 +1869,16 @@ void SceneViewer::zoomQt(bool forward, bool reset)
 }
 
 //-----------------------------------------------------------------------------
-/*! a factor for getting pixel-based zoom ratio 
+/*! a factor for getting pixel-based zoom ratio
 */
 double SceneViewer::getDpiFactor()
 {
-	//When preview mode, use a camera DPI
+	// When preview mode, use a camera DPI
 	if (isPreviewEnabled()) {
 		return Stage::inch /
 			   TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera()->getDpi().x;
 	}
-	//When level editing mode, use an image DPI
+	// When level editing mode, use an image DPI
 	else if (TApp::instance()->getCurrentFrame()->isEditingLevel()) {
 		TXshSimpleLevel *sl;
 		sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
@@ -1880,7 +1895,9 @@ double SceneViewer::getDpiFactor()
 	// When the special case in the scene editing mode:
 	// If the option "ActualPixelViewOnSceneEditingMode" is ON,
 	// use  current level's DPI set in the level settings.
-	else if (Preferences::instance()->isActualPixelViewOnSceneEditingModeEnabled() && !CleanupPreviewCheck::instance()->isEnabled() && !CameraTestCheck::instance()->isEnabled()) {
+	else if (Preferences::instance()->isActualPixelViewOnSceneEditingModeEnabled() &&
+			 !CleanupPreviewCheck::instance()->isEnabled() &&
+			 !CameraTestCheck::instance()->isEnabled()) {
 		TXshSimpleLevel *sl;
 		sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
 		if (!sl)
@@ -1900,7 +1917,7 @@ double SceneViewer::getDpiFactor()
 }
 
 //-----------------------------------------------------------------------------
-/*! when showing the viewer with full-screen mode, 
+/*! when showing the viewer with full-screen mode,
 	add a zoom factor which can show image fitting with the screen size
 */
 
@@ -1914,29 +1931,27 @@ double SceneViewer::getZoomScaleFittingWithScreen()
 		imgSize = TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera()->getRes();
 	else if (TApp::instance()->getCurrentFrame()->isEditingLevel()) {
 		TXshSimpleLevel *sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
-		if (!sl ||
-			sl->getType() == PLI_XSHLEVEL ||
-			sl->getImageDpi() == TPointD())
+		if (!sl || sl->getType() == PLI_XSHLEVEL || sl->getImageDpi() == TPointD())
 			return 0.0;
 
 		imgSize = sl->getResolution();
-	} else if (Preferences::instance()->isActualPixelViewOnSceneEditingModeEnabled() && !CleanupPreviewCheck::instance()->isEnabled() && !CameraTestCheck::instance()->isEnabled()) {
+	} else if (Preferences::instance()->isActualPixelViewOnSceneEditingModeEnabled() &&
+			   !CleanupPreviewCheck::instance()->isEnabled() &&
+			   !CameraTestCheck::instance()->isEnabled()) {
 		TXshSimpleLevel *sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
-		if (!sl ||
-			sl->getType() == PLI_XSHLEVEL ||
-			sl->getDpi() == TPointD())
+		if (!sl || sl->getType() == PLI_XSHLEVEL || sl->getDpi() == TPointD())
 			return 0.0;
 		imgSize = sl->getResolution();
 
 	} else // SCENE_VIEWMODE
 		return 0.0;
 
-	//add small margin on the edge of the image
+	// add small margin on the edge of the image
 	int margin = 20;
-	//get the desktop resolution
+	// get the desktop resolution
 	QRect rec = QApplication::desktop()->screenGeometry();
 
-	//fit to either direction
+	// fit to either direction
 	int moni_x = rec.width() - (margin * 2);
 	int moni_y = rec.height() - (margin * 2);
 	return tmin((double)moni_x / (double)imgSize.lx, (double)moni_y / (double)imgSize.ly);
@@ -1964,10 +1979,12 @@ void SceneViewer::zoomQt(const QPoint &center, double factor)
 			double scale2 = fabs(viewAff.det());
 			if ((scale2 < 100000 || factor < 1) && (scale2 > 0.001 * 0.05 || factor > 1))
 				if (i == m_viewMode)
-					//viewAff = TTranslation(delta) * TScale(factor) * TTranslation(-delta) * viewAff;
-					setViewMatrix(TTranslation(delta) * TScale(factor) * TTranslation(-delta) * viewAff, i);
+					// viewAff = TTranslation(delta) * TScale(factor) * TTranslation(-delta) *
+					// viewAff;
+					setViewMatrix(
+						TTranslation(delta) * TScale(factor) * TTranslation(-delta) * viewAff, i);
 				else
-					//viewAff = TScale(factor) * viewAff;
+					// viewAff = TScale(factor) * viewAff;
 					setViewMatrix(TScale(factor) * viewAff, i);
 		}
 	}
@@ -2015,7 +2032,8 @@ void SceneViewer::regeneratePreview()
 
 void SceneViewer::regeneratePreviewFrame()
 {
-	Previewer::instance(m_previewMode == SUBCAMERA_PREVIEW)->clear(TApp::instance()->getCurrentFrame()->getFrame());
+	Previewer::instance(m_previewMode == SUBCAMERA_PREVIEW)
+		->clear(TApp::instance()->getCurrentFrame()->getFrame());
 
 	update();
 }
@@ -2072,7 +2090,8 @@ void SceneViewer::fitToCamera()
 
 void SceneViewer::resetSceneViewer()
 {
-	m_visualSettings.m_sceneProperties = TApp::instance()->getCurrentScene()->getScene()->getProperties();
+	m_visualSettings.m_sceneProperties =
+		TApp::instance()->getCurrentScene()->getScene()->getProperties();
 
 	for (int i = 0; i < tArrayCount(m_viewAff); i++)
 		setViewMatrix(getNormalZoomScale(), i);
@@ -2101,8 +2120,8 @@ void SceneViewer::setActualPixelSize()
 
 	TPointD dpi;
 	if (CleanupPreviewCheck::instance()->isEnabled()) {
-		//The previewed cleanup image has no image infos yet - retrieve the dpi through
-		//the cleanup camera data
+		// The previewed cleanup image has no image infos yet - retrieve the dpi through
+		// the cleanup camera data
 		CleanupParameters *cleanupParams =
 			app->getCurrentScene()->getScene()->getProperties()->getCleanupParameters();
 
@@ -2113,7 +2132,8 @@ void SceneViewer::setActualPixelSize()
 
 	const double inch = Stage::inch;
 	for (int i = 0; i < tArrayCount(m_viewAff); i++)
-		setViewMatrix(dpi == TPointD(0, 0) ? getNormalZoomScale() : TScale(dpi.x / inch, dpi.y / inch), i);
+		setViewMatrix(
+			dpi == TPointD(0, 0) ? getNormalZoomScale() : TScale(dpi.x / inch, dpi.y / inch), i);
 
 	m_pos = QPoint(0, 0);
 	m_pan3D = TPointD(0, 0);
@@ -2139,7 +2159,8 @@ void SceneViewer::onLevelChanged()
 	}
 }
 //-----------------------------------------------------------------------------
-/*! when level is switched, update m_dpiScale in order to show white background for Ink&Paint work properly
+/*! when level is switched, update m_dpiScale in order to show white background for Ink&Paint work
+ * properly
 */
 void SceneViewer::onLevelSwitched()
 {
@@ -2242,9 +2263,9 @@ int SceneViewer::pick(const TPoint &point)
 	glInitNames();
 	assert(glGetError() == GL_NO_ERROR);
 
-	//WARNING: We have to draw the scene in CAMERASTAND mode. Observe that the preview mode may
-	//invoke event processing - therefore triggering other pick events while in GL_SELECT
-	//render mode...
+	// WARNING: We have to draw the scene in CAMERASTAND mode. Observe that the preview mode may
+	// invoke event processing - therefore triggering other pick events while in GL_SELECT
+	// render mode...
 	int previewMode = m_previewMode;
 	m_previewMode = NO_PREVIEW;
 
@@ -2258,7 +2279,7 @@ int SceneViewer::pick(const TPoint &point)
 	TRectD oldClipRect(m_clipRect);
 	m_clipRect = TRectD(point.x, point.y, point.x + 1, point.y + 1);
 
-	paintGL(); //draw identifiable objects
+	paintGL(); // draw identifiable objects
 
 	m_clipRect = oldClipRect;
 
@@ -2304,7 +2325,8 @@ int SceneViewer::posToColumnIndex(const TPoint &p, double distance, bool include
 
 //-----------------------------------------------------------------------------
 
-void SceneViewer::posToColumnIndexes(const TPoint &p, std::vector<int> &indexes, double distance, bool includeInvisible) const
+void SceneViewer::posToColumnIndexes(const TPoint &p, std::vector<int> &indexes, double distance,
+									 bool includeInvisible) const
 {
 	int oldRasterizePli = TXshSimpleLevel::m_rasterizePli;
 	TApp *app = TApp::instance();
@@ -2329,17 +2351,17 @@ void SceneViewer::posToColumnIndexes(const TPoint &p, std::vector<int> &indexes,
 	args.m_onlyVisible = includeInvisible;
 
 	Stage::visit(picker, args); /*
-    picker, 
-    scene,
-    xsh,
-    frame,
-    currentColumnIndex,
-    osm,
-    false,
-    0, 
-    false, 
-    includeInvisible);
-    */
+	picker,
+	scene,
+	xsh,
+	frame,
+	currentColumnIndex,
+	osm,
+	false,
+	0,
+	false,
+	includeInvisible);
+	*/
 
 	TXshSimpleLevel::m_rasterizePli = oldRasterizePli;
 	picker.getColumnIndexes(indexes);
@@ -2532,7 +2554,7 @@ void SceneViewer::invalidateToolStatus()
 
 //-----------------------------------------------------------------------------
 /*! return the viewer geometry in order to avoid picking the style outside of the viewer
-    when using the stylepicker and the finger tools
+	when using the stylepicker and the finger tools
 */
 
 TRectD SceneViewer::getGeometry() const

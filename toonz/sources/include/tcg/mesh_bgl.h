@@ -22,8 +22,7 @@
 namespace boost
 {
 
-template <typename V, typename E, typename F>
-struct graph_traits<typename tcg::Mesh<V, E, F>> {
+template <typename V, typename E, typename F> struct graph_traits<typename tcg::Mesh<V, E, F>> {
 	// Preliminar typedefs
 	typedef typename tcg::Mesh<V, E, F> mesh_type;
 	typedef typename mesh_type::vertex_type vertex_type;
@@ -51,7 +50,9 @@ struct graph_traits<typename tcg::Mesh<V, E, F>> {
 
 		out_edge_iterator() : edge_const_iterator(), m_src(-1) {}
 		out_edge_iterator(const edge_const_iterator &it, int src)
-			: edge_const_iterator(it), m_src(src) {}
+			: edge_const_iterator(it), m_src(src)
+		{
+		}
 
 		edge_descriptor operator*() const
 		{
@@ -66,7 +67,9 @@ struct graph_traits<typename tcg::Mesh<V, E, F>> {
 	typedef undirected_tag directed_category;
 	typedef allow_parallel_edge_tag edge_parallel_category;
 
-	typedef struct our_category : public bidirectional_graph_tag, public vertex_list_graph_tag, public edge_list_graph_tag {
+	typedef struct our_category : public bidirectional_graph_tag,
+								  public vertex_list_graph_tag,
+								  public edge_list_graph_tag {
 	} traversal_category;
 
 	// Sizes
@@ -95,7 +98,8 @@ namespace bgl
 {
 
 template <typename Mesh>
-inline int source(const typename boost::graph_traits<Mesh>::edge_descriptor &edge_descr, const Mesh &mesh)
+inline int source(const typename boost::graph_traits<Mesh>::edge_descriptor &edge_descr,
+				  const Mesh &mesh)
 {
 	return edge_descr.m_src;
 }
@@ -103,7 +107,8 @@ inline int source(const typename boost::graph_traits<Mesh>::edge_descriptor &edg
 //---------------------------------------------------------------------------------------
 
 template <typename Mesh>
-inline int target(const typename boost::graph_traits<Mesh>::edge_descriptor &edge_descr, const Mesh &mesh)
+inline int target(const typename boost::graph_traits<Mesh>::edge_descriptor &edge_descr,
+				  const Mesh &mesh)
 {
 	const typename Mesh::edge_type &ed = mesh.edge(edge_descr.m_e);
 	return (ed.vertex(0) == edge_descr.m_src) ? ed.vertex(1) : ed.vertex(0);
@@ -118,15 +123,13 @@ out_edges(int v, const Mesh &mesh)
 {
 	typedef typename boost::graph_traits<Mesh>::out_edge_iterator out_edge_iterator;
 
-	return make_pair(
-		out_edge_iterator(mesh.vertex(v).edgesBegin(), v),
-		out_edge_iterator(mesh.vertex(v).edgesEnd(), v));
+	return make_pair(out_edge_iterator(mesh.vertex(v).edgesBegin(), v),
+					 out_edge_iterator(mesh.vertex(v).edgesEnd(), v));
 }
 
 //---------------------------------------------------------------------------------------
 
-template <typename Mesh>
-inline int out_degree(int v, const Mesh &mesh)
+template <typename Mesh> inline int out_degree(int v, const Mesh &mesh)
 {
 	return mesh.vertex(v).edgesCount();
 }

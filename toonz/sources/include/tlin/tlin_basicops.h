@@ -13,19 +13,16 @@ void mult(const _IN1 &, const _IN2 &, _OUT &);
 
 //------------------------------------------------------------------------------
 
-template <typename _IN1, typename _IN2, typename _OUT>
-void sum(const _IN1 &, const _IN2 &, _OUT &);
+template <typename _IN1, typename _IN2, typename _OUT> void sum(const _IN1 &, const _IN2 &, _OUT &);
 
 //------------------------------------------------------------------------------
 
-template <typename _IN1, typename _IN2, typename _OUT>
-void sub(const _IN1 &, const _IN2 &, _OUT &);
+template <typename _IN1, typename _IN2, typename _OUT> void sub(const _IN1 &, const _IN2 &, _OUT &);
 
 //------------------------------------------------------------------------------
 
-template <typename _T>
-void transpose(const _T &);
+template <typename _T> void transpose(const _T &);
 
-} //namespace tlin
+} // namespace tlin
 
-#endif //TLIN_BASICOPS_H
+#endif // TLIN_BASICOPS_H

@@ -31,10 +31,9 @@ TGenericColorFunction::TGenericColorFunction(const double m[4], const double c[4
 
 TPixel32 TGenericColorFunction::operator()(const TPixel32 &color) const
 {
-	return TPixel32(tcrop(m_m[0] * color.r + m_c[0], 0.0, 255.0),
-					tcrop(m_m[1] * color.g + m_c[1], 0.0, 255.0),
-					tcrop(m_m[2] * color.b + m_c[2], 0.0, 255.0),
-					tcrop(m_m[3] * color.m + m_c[3], 0.0, 255.0));
+	return TPixel32(
+		tcrop(m_m[0] * color.r + m_c[0], 0.0, 255.0), tcrop(m_m[1] * color.g + m_c[1], 0.0, 255.0),
+		tcrop(m_m[2] * color.b + m_c[2], 0.0, 255.0), tcrop(m_m[3] * color.m + m_c[3], 0.0, 255.0));
 }
 
 //---------------------------------------

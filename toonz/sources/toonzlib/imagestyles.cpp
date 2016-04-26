@@ -30,12 +30,8 @@ TRandom Random;
 typedef std::pair<TPointD, TPointD> PointPair;
 typedef std::vector<TPointD> PointArray;
 
-PointPair computeTexParameters(const TPointD &p1,
-							   const TPointD &p2,
-							   const TPointD &tex1,
-							   const TPointD &tex2,
-							   const PointPair &newP,
-							   const TDimension &size)
+PointPair computeTexParameters(const TPointD &p1, const TPointD &p2, const TPointD &tex1,
+							   const TPointD &tex2, const PointPair &newP, const TDimension &size)
 {
 	// texture points
 	static PointPair tex;
@@ -61,8 +57,7 @@ PointPair computeTexParameters(const TPointD &p1,
 	texParameterOffset = disty / size.ly;
 
 	// fix values for t (oldValue + newValue)
-	tex.first.y =
-		tex.second.y = tex1.y + texParameterOffset;
+	tex.first.y = tex.second.y = tex1.y + texParameterOffset;
 
 	return tex;
 }
@@ -82,11 +77,12 @@ TPointD getTexCoords(const TOutlinePoint &p)
 	return TPointD(p.u, p.v);
 }
 
-} //namespace
+} // namespace
 
 //-----------------------------------------------------------------------------
 TTextureStyle::TTextureStyle(const TRasterP &ras, const TFilePath &texturePath)
-	: m_texture(ras), m_texturePath(texturePath), m_tessellator(new TglTessellator), m_params(), m_texturePathLoaded()
+	: m_texture(ras), m_texturePath(texturePath), m_tessellator(new TglTessellator), m_params(),
+	  m_texturePathLoaded()
 {
 	setAverageColor();
 }
@@ -99,7 +95,9 @@ ToonzScene *TImageStyle::m_currentScene = 0;
 //-----------------------------------------------------------------------------
 
 TTextureStyle::TTextureStyle(const TTextureStyle &other)
-	: TOutlineStyle(other), TRasterStyleFx(other), TImageStyle(other), m_texture(other.m_texture), m_texturePath(other.m_texturePath), m_texturePathLoaded(other.m_texturePathLoaded), m_params(other.m_params), m_tessellator(new TglTessellator)
+	: TOutlineStyle(other), TRasterStyleFx(other), TImageStyle(other), m_texture(other.m_texture),
+	  m_texturePath(other.m_texturePath), m_texturePathLoaded(other.m_texturePathLoaded),
+	  m_params(other.m_params), m_tessellator(new TglTessellator)
 {
 	setAverageColor();
 }
@@ -187,8 +185,7 @@ TPixel32 TTextureStyle::getAverageColor() const
 }
 //-----------------------------------------------------------------------------
 
-void TTextureStyle::computeOutline(const TStroke *stroke,
-								   TStrokeOutline &outline,
+void TTextureStyle::computeOutline(const TStroke *stroke, TStrokeOutline &outline,
 								   TOutlineUtil::OutlineParameter param) const
 {
 	TOutlineStyle::computeOutline(stroke, outline, param);
@@ -199,10 +196,8 @@ void TTextureStyle::computeOutline(const TStroke *stroke,
 	for (i = 2; i < v.size(); i += 2) {
 		newPnt.first = convert(v[i]);
 		newPnt.second = convert(v[i + 1]);
-		newPnt = computeTexParameters(convert(v[i - 2]), convert(v[i - 1]),
-									  getTexCoords(v[i - 2]), getTexCoords(v[i - 1]),
-									  newPnt,
-									  size);
+		newPnt = computeTexParameters(convert(v[i - 2]), convert(v[i - 1]), getTexCoords(v[i - 2]),
+									  getTexCoords(v[i - 1]), newPnt, size);
 		setTexCoords(newPnt.first, v[i]);
 		setTexCoords(newPnt.second, v[i + 1]);
 	}
@@ -212,25 +207,26 @@ void TTextureStyle::computeOutline(const TStroke *stroke,
 }
 
 //-----------------------------------------------------------------------------
-void TTextureStyle::drawStroke(const TColorFunction *cf, TStrokeOutline *outline, const TStroke *stroke) const
+void TTextureStyle::drawStroke(const TColorFunction *cf, TStrokeOutline *outline,
+							   const TStroke *stroke) const
 {
 	/*struct locals {
-    static float adaptToGLTextureFunction( USHORT style )
-    {
-      switch( style )
-      {
-      case TTextureStyle::DECAL:
-        return GL_DECAL;
-        break;
-      case TTextureStyle::MODULATE:
-        return GL_MODULATE;
-        break;
-      case TTextureStyle::BLEND:
-        return GL_BLEND;
-        break;
-      }
-      return GL_DECAL;
-    }
+	static float adaptToGLTextureFunction( USHORT style )
+	{
+	  switch( style )
+	  {
+	  case TTextureStyle::DECAL:
+		return GL_DECAL;
+		break;
+	  case TTextureStyle::MODULATE:
+		return GL_MODULATE;
+		break;
+	  case TTextureStyle::BLEND:
+		return GL_BLEND;
+		break;
+	  }
+	  return GL_DECAL;
+	}
   };    // locals;*/
 
 	UINT i;
@@ -282,9 +278,7 @@ void TTextureStyle::drawStroke(const TColorFunction *cf, TStrokeOutline *outline
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-	glTexEnvf(GL_TEXTURE_ENV,
-			  GL_TEXTURE_ENV_MODE,
-			  GL_MODULATE); // change texture blending function
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); // change texture blending function
 
 	glPixelStorei(GL_UNPACK_ROW_LENGTH,
 				  texImage->getWrap() != texImage->getLx() ? texImage->getWrap() : 0);
@@ -319,25 +313,27 @@ void TTextureStyle::drawStroke(const TColorFunction *cf, TStrokeOutline *outline
 
 	// Step 2: draw texturized stroke
 	/*
-  #ifdef MACOSX                   //NON SI CAPISCE PERCHE DRAWARRAY E DISPLAY LIST PROVOCHINO UN CRASH SU MAC
-  #warning "INDAGARE ANCORA!!!!"  //PER ADESSO CHIEDO SE STA REGISTANDO UNA DISPLAYLIST E IN QUEL CASO NON USO GLI ARRAY 
+  #ifdef MACOSX                   //NON SI CAPISCE PERCHE DRAWARRAY E DISPLAY LIST PROVOCHINO UN
+  CRASH SU MAC
+  #warning "INDAGARE ANCORA!!!!"  //PER ADESSO CHIEDO SE STA REGISTANDO UNA DISPLAYLIST E IN QUEL
+  CASO NON USO GLI ARRAY
   GLuint listId;
-  glGetIntegerv(GL_LIST_INDEX,(GLint*)&listId);   
+  glGetIntegerv(GL_LIST_INDEX,(GLint*)&listId);
   if(listId==0)
   {
-  #endif  
+  #endif
   */
 	glDrawArrays(QUAD_PRIMITIVE, 0, v.size());
 	/*
-  #ifdef MACOSX      
+  #ifdef MACOSX
   }
   else
   {
-    glBegin( GL_QUAD_STRIP );
-    for(UINT i=0; i< v.size(); i++) 
-      glVertex2dv( &v[i].x );
-    glEnd();
-  } 
+	glBegin( GL_QUAD_STRIP );
+	for(UINT i=0; i< v.size(); i++)
+	  glVertex2dv( &v[i].x );
+	glEnd();
+  }
   #endif
   */
 
@@ -350,8 +346,9 @@ void TTextureStyle::drawStroke(const TColorFunction *cf, TStrokeOutline *outline
 	glDisable(GL_TEXTURE_2D);
 }
 //-----------------------------------------------------------------------------
-//drawRegion( const TVectorRenderData &rd,  TRegionOutline &boundary ) const
-void TTextureStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &boundary) const
+// drawRegion( const TVectorRenderData &rd,  TRegionOutline &boundary ) const
+void TTextureStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing,
+							   TRegionOutline &boundary) const
 {
 	if (m_tessellator)
 		m_tessellator->tessellate(cf, antiAliasing, boundary, m_texture);
@@ -362,7 +359,7 @@ void TTextureStyle::drawRegion(TFlash &flash, const TRegion *r) const
 	flash.setTexture(m_texture);
 	flash.setFillStyleMatrix(TAffine());
 	flash.drawRegion(*r);
-	//rd.setTexture(m_colorStyle->getMainColor());
+	// rd.setTexture(m_colorStyle->getMainColor());
 }
 //-----------------------------------------------------------------------------
 
@@ -381,17 +378,17 @@ void tileRaster(const TRaster32P &tile, const TRaster32P &rout)
 {
 	int x0, y0;
 
-	if (rout->getLy() > tile->getLy()) ///tile must be centered in rout
+	if (rout->getLy() > tile->getLy()) /// tile must be centered in rout
 		y0 = tile->getLy() - (((rout->getLy() - tile->getLy()) / 2) % tile->getLy());
 	else
 		y0 = (tile->getLy() - rout->getLy()) / 2;
-	if (rout->getLx() > tile->getLx()) ///tile must be centered in rout
+	if (rout->getLx() > tile->getLx()) /// tile must be centered in rout
 		x0 = tile->getLx() - (((rout->getLx() - tile->getLx()) / 2) % tile->getLx());
 	else
 		x0 = (tile->getLx() - rout->getLx()) / 2;
 
-	//x0-=tround(offs.x);
-	//y0-=tround(offs.y);
+	// x0-=tround(offs.x);
+	// y0-=tround(offs.y);
 	while (x0 < 0)
 		x0 += tile->getLx();
 	while (y0 < 0)
@@ -552,7 +549,7 @@ void applyTexture(const TRaster32P &rTex, const TRaster32P &r, TPoint p)
 	rTex->unlock();
 }
 
-} //namespace
+} // namespace
 //---------------------------------------------------------------------------------------------------------------
 
 TPoint computeCentroid(const TRaster32P &r);
@@ -714,7 +711,10 @@ void TTextureStyle::setParamValue(int index, double value)
 	switch (index) {
 	case 0:
 		m_params.m_isPattern = (((int)value == 0) ? false : true);
-		CASE 1 : m_params.m_type = (((int)value == 0) ? TTextureParams::FIXED : ((int)value == 1) ? TTextureParams::AUTOMATIC : TTextureParams::RANDOM);
+		CASE 1 : m_params.m_type =
+			(((int)value == 0) ? TTextureParams::FIXED : ((int)value == 1)
+															 ? TTextureParams::AUTOMATIC
+															 : TTextureParams::RANDOM);
 
 		CASE 2 : m_params.m_scale = value;
 		CASE 3 : m_params.m_rotation = value;
@@ -735,7 +735,7 @@ bool TTextureStyle::loadTextureRaster()
 	m_texturePathLoaded = m_texturePath;
 
 	TFilePath path;
-	if (m_texturePath.getParentDir() != TFilePath()) //It's a custom texture
+	if (m_texturePath.getParentDir() != TFilePath()) // It's a custom texture
 	{
 		assert(m_currentScene);
 		path = m_currentScene->decodeFilePath(m_texturePath);
@@ -743,7 +743,7 @@ bool TTextureStyle::loadTextureRaster()
 			TLevelReader lr(path);
 			path = path.withFrame(lr.loadInfo()->begin()->first);
 		}
-	} else //is a library texture
+	} else // is a library texture
 	{
 		path = m_texturePath.withParentDir(m_libraryDir + "textures");
 	}
@@ -764,11 +764,12 @@ bool TTextureStyle::loadTextureRaster()
 //----------------------------------------------------------------------------
 TRaster32P TTextureStyle::loadTextureRasterWithFrame(int frame) const
 {
-	if (m_texturePathLoaded != TFilePath() && m_texturePath == m_texturePathLoaded && (!m_texturePath.isLevelName() || frame == 0))
+	if (m_texturePathLoaded != TFilePath() && m_texturePath == m_texturePathLoaded &&
+		(!m_texturePath.isLevelName() || frame == 0))
 		return m_texture->clone();
 
 	TFilePath path;
-	if (m_texturePath.getParentDir() != TFilePath()) //It's a custom texture
+	if (m_texturePath.getParentDir() != TFilePath()) // It's a custom texture
 	{
 		assert(m_currentScene);
 		path = m_currentScene->decodeFilePath(m_texturePath);
@@ -776,13 +777,13 @@ TRaster32P TTextureStyle::loadTextureRasterWithFrame(int frame) const
 			TLevelReader lr(path);
 			TLevelP info = lr.loadInfo();
 			TLevel::Iterator it = info->begin();
-			//frame = frame % (lr.loadInfo()->getFrameCount());
+			// frame = frame % (lr.loadInfo()->getFrameCount());
 			std::advance(it, frame % (info->getFrameCount()));
 
 			//
 			path = path.withFrame(it->first);
 		}
-	} else //is a library texture
+	} else // is a library texture
 	{
 		path = m_texturePath.withParentDir(m_libraryDir + "textures");
 	}
@@ -811,8 +812,8 @@ void TTextureStyle::loadData(TInputStreamInterface &is)
 	is >> path;
 	m_texturePath = TFilePath(path);
 
-	//TOutlineStyle::loadData(is);
-	//is >> m_texture;
+	// TOutlineStyle::loadData(is);
+	// is >> m_texture;
 	loadTextureRaster();
 
 	is >> m_params.m_patternColor;
@@ -824,7 +825,9 @@ void TTextureStyle::loadData(TInputStreamInterface &is)
 	m_params.m_isPattern = value == 1.0 ? true : false;
 
 	is >> value;
-	m_params.m_type = (((int)value == 0) ? TTextureParams::FIXED : ((int)value == 1) ? TTextureParams::AUTOMATIC : TTextureParams::RANDOM);
+	m_params.m_type =
+		(((int)value == 0) ? TTextureParams::FIXED : ((int)value == 1) ? TTextureParams::AUTOMATIC
+																	   : TTextureParams::RANDOM);
 
 	is >> m_params.m_scale;
 	is >> m_params.m_rotation;
@@ -842,8 +845,8 @@ void TTextureStyle::loadData(TInputStreamInterface &is)
 
 void TTextureStyle::saveData(TOutputStreamInterface &os) const
 {
-	//TOutlineStyle::saveData(os);
-	//os << m_texture;
+	// TOutlineStyle::saveData(os);
+	// os << m_texture;
 	std::wstring wstr = m_texturePath.getWideString();
 	std::string str;
 	str.assign(wstr.begin(), wstr.end());
@@ -853,7 +856,9 @@ void TTextureStyle::saveData(TOutputStreamInterface &os) const
 
 	os << ((double)m_params.m_isPattern);
 
-	double value = (m_params.m_type == TTextureParams::FIXED) ? 0 : ((m_params.m_type == TTextureParams::AUTOMATIC) ? 1 : 2);
+	double value = (m_params.m_type == TTextureParams::FIXED)
+					   ? 0
+					   : ((m_params.m_type == TTextureParams::AUTOMATIC) ? 1 : 2);
 	os << value;
 
 	os << m_params.m_scale;
@@ -916,7 +921,7 @@ void TTextureStyle::makeIcon(const TDimension &outputRect)
 
 	if (!loadTextureRaster()) {
 		fillCustomTextureIcon(m_icon);
-		//m_icon->fill(TPixel::Green);
+		// m_icon->fill(TPixel::Green);
 		return;
 	}
 	TRaster32P rTex;
@@ -932,18 +937,21 @@ void TTextureStyle::makeIcon(const TDimension &outputRect)
 	} else
 		rTex = m_texture;
 
-	double fitScale = tmin((double)(outputRect.lx) / m_texture->getLx(), (double)(outputRect.ly) / m_texture->getLy());
+	double fitScale = tmin((double)(outputRect.lx) / m_texture->getLx(),
+						   (double)(outputRect.ly) / m_texture->getLy());
 	TAffine affine = TScale(m_params.m_scale * (fitScale)) * TRotation(-m_params.m_rotation);
 
 	if (affine != TAffine()) {
 		int border = 2;
 		TRaster32P raux(m_icon->getLx() + 2 * border, m_icon->getLy() + 2 * border);
-		TRaster32P rin(convert(affine.inv() * TRectD(0, 0, raux->getLx() - 1, raux->getLy() - 1)).getSize());
+		TRaster32P rin(
+			convert(affine.inv() * TRectD(0, 0, raux->getLx() - 1, raux->getLy() - 1)).getSize());
 		tileRaster(rTex, rin);
 
 		TRop::resample(raux, rin, affine.place(rin->getCenterD(), raux->getCenterD()));
 
-		TRop::copy(m_icon, raux->extract(border, border, m_icon->getLx() + border - 1, m_icon->getLy() + border - 1));
+		TRop::copy(m_icon, raux->extract(border, border, m_icon->getLx() + border - 1,
+										 m_icon->getLy() + border - 1));
 	} else
 		applyTexture(rTex, m_icon, TPoint());
 }
@@ -956,7 +964,7 @@ bool TTextureStyle::doCompute(const Params &params) const
 {
 	TRaster32P rTex = loadTextureRasterWithFrame(params.m_frame);
 	TRaster32P r = params.m_r;
-	//TRaster32P rTex = m_texture->clone();
+	// TRaster32P rTex = m_texture->clone();
 
 	assert(r);
 

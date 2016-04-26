@@ -38,7 +38,7 @@ class DVAPI TFileStatus
 	bool m_exist;
 	QFileInfo m_fileInfo;
 
-public:
+  public:
 	TFileStatus(const TFilePath &path);
 	QString getGroup() const;
 	QString getUser() const;
@@ -54,10 +54,7 @@ public:
 	bool isWritable() const { return (getPermissions() & QFile::WriteUser) != 0; }
 	bool isReadable() const { return m_exist && (getPermissions() & QFile::ReadUser) != 0; }
 
-	bool isWritableDir() const
-	{
-		return doesExist() && isDirectory() && isWritable();
-	};
+	bool isWritableDir() const { return doesExist() && isDirectory() && isWritable(); };
 };
 
 #endif
@@ -68,7 +65,7 @@ class DVAPI TSystemException : public TException
 	int m_err;
 	TString m_msg;
 
-public:
+  public:
 	TSystemException() {}
 	TSystemException(const TFilePath &, int);
 	TSystemException(const TFilePath &, const std::string &);
@@ -87,34 +84,42 @@ namespace TSystem
 // i nomi composti (maiuscole e non '_'). Facciamo tutto minuscolo con l'iniziale maiuscola
 // es. MaxPathLen;
 
-extern const int MaxPathLen;	 //Maximum length of full path
-extern const int MaxFNameLen;	//Maximum length of filename component
-extern const int MaxHostNameLen; //Maximum length of the host name  ==64
+extern const int MaxPathLen; // Maximum length of full path
+extern const int MaxFNameLen; // Maximum length of filename component
+extern const int MaxHostNameLen; // Maximum length of the host name  ==64
 
 DVAPI bool doHaveMainLoop();
 DVAPI void hasMainLoop(bool state);
-//DVAPI void enableFrameGrouping(bool on);
-//DVAPI bool isFrameGroupingEnabled();
+// DVAPI void enableFrameGrouping(bool on);
+// DVAPI bool isFrameGroupingEnabled();
 
 // aggiungono (in coda) a set
 DVAPI void readDirectory(TFilePathSet &fpset, const QDir &dir, bool groupFrames = true);
 
-DVAPI void readDirectory(TFilePathSet &fpset, const TFilePath &path, bool groupFrames = true, bool onlyFiles = false, bool getHiddenFiles = false);
-DVAPI void readDirectory(TFilePathSet &fpset, const TFilePathSet &pathSet, bool groupFrames = true, bool onlyFiles = false, bool getHiddenFiles = false);
-DVAPI void readDirectoryTree(TFilePathSet &fpset, const TFilePath &path, bool groupFrames = true, bool onlyFiles = false);
-DVAPI void readDirectoryTree(TFilePathSet &fpset, const TFilePathSet &pathSet, bool groupFrames = true, bool onlyFiles = false);
+DVAPI void readDirectory(TFilePathSet &fpset, const TFilePath &path, bool groupFrames = true,
+						 bool onlyFiles = false, bool getHiddenFiles = false);
+DVAPI void readDirectory(TFilePathSet &fpset, const TFilePathSet &pathSet, bool groupFrames = true,
+						 bool onlyFiles = false, bool getHiddenFiles = false);
+DVAPI void readDirectoryTree(TFilePathSet &fpset, const TFilePath &path, bool groupFrames = true,
+							 bool onlyFiles = false);
+DVAPI void readDirectoryTree(TFilePathSet &fpset, const TFilePathSet &pathSet,
+							 bool groupFrames = true, bool onlyFiles = false);
 
-//to retrieve the both lists with groupFrames option = on and off.
+// to retrieve the both lists with groupFrames option = on and off.
 DVAPI void readDirectory(TFilePathSet &groupFpSet, TFilePathSet &allFpSet, const TFilePath &path);
 
-//return the file list which is readable and executable
+// return the file list which is readable and executable
 DVAPI void readDirectory_Dir_ReadExe(TFilePathSet &dst, const TFilePath &path);
 
 // creano un set nuovo
-DVAPI TFilePathSet readDirectory(const TFilePath &path, bool groupFrames = true, bool onlyFiles = false, bool getHiddenFiles = false);
-DVAPI TFilePathSet readDirectory(const TFilePathSet &pathSet, bool groupFrames = true, bool onlyFiles = false, bool getHiddenFiles = false);
-DVAPI TFilePathSet readDirectoryTree(const TFilePath &path, bool groupFrames = true, bool onlyFiles = false);
-DVAPI TFilePathSet readDirectoryTree(const TFilePathSet &pathSet, bool groupFrames = true, bool onlyFiles = false);
+DVAPI TFilePathSet readDirectory(const TFilePath &path, bool groupFrames = true,
+								 bool onlyFiles = false, bool getHiddenFiles = false);
+DVAPI TFilePathSet readDirectory(const TFilePathSet &pathSet, bool groupFrames = true,
+								 bool onlyFiles = false, bool getHiddenFiles = false);
+DVAPI TFilePathSet readDirectoryTree(const TFilePath &path, bool groupFrames = true,
+									 bool onlyFiles = false);
+DVAPI TFilePathSet readDirectoryTree(const TFilePathSet &pathSet, bool groupFrames = true,
+									 bool onlyFiles = false);
 
 //
 DVAPI TFilePathSet packLevelNames(const TFilePathSet &);
@@ -129,7 +134,7 @@ DVAPI TFilePath getDllDir();
 DVAPI int getProcessId();
 
 // n.b. queste possono buttare eccezioni!
-//mkdir crea anche il parent se non esiste
+// mkdir crea anche il parent se non esiste
 DVAPI void mkDir(const TFilePath &path);
 DVAPI void rmDir(const TFilePath &path);
 DVAPI void rmDirTree(const TFilePath &path);
@@ -144,20 +149,25 @@ DVAPI void hideFile(const TFilePath &dst);
 DVAPI void moveFileToRecycleBin(const TFilePath &fp);
 
 DVAPI void copyFileOrLevel_throw(const TFilePath &dst, const TFilePath &src);
-DVAPI void renameFileOrLevel_throw(const TFilePath &dst, const TFilePath &src, bool renamePalette = false);
+DVAPI void renameFileOrLevel_throw(const TFilePath &dst, const TFilePath &src,
+								   bool renamePalette = false);
 DVAPI void removeFileOrLevel_throw(const TFilePath &fp);
 DVAPI void hideFileOrLevel_throw(const TFilePath &fp);
 DVAPI void moveFileOrLevelToRecycleBin_throw(const TFilePath &fp);
 
 DVAPI bool doesExistFileOrLevel(const TFilePath &fp);
 DVAPI bool copyFileOrLevel(const TFilePath &dst, const TFilePath &src);
-DVAPI bool renameFileOrLevel(const TFilePath &dst, const TFilePath &src, bool renamePalette = false);
+DVAPI bool renameFileOrLevel(const TFilePath &dst, const TFilePath &src,
+							 bool renamePalette = false);
 DVAPI bool removeFileOrLevel(const TFilePath &fp);
 DVAPI bool hideFileOrLevel(const TFilePath &fp);
 DVAPI bool moveFileOrLevelToRecycleBin(const TFilePath &fp);
 
 DVAPI void sleep(TINT64 delay);
-inline void sleep(int ms) { sleep((TINT64)ms); }
+inline void sleep(int ms)
+{
+	sleep((TINT64)ms);
+}
 
 DVAPI TFilePathSet getDisks();
 
@@ -174,33 +184,34 @@ DVAPI TINT64 getFreeMemorySize(bool onlyPhisicalMemory);
 DVAPI TINT64 getMemorySize(bool onlyPhisicalMemory);
 
 /*! return true if not enough memory. It can happen for 2 reasons:
-      1) free phisical memory is close to 0;
-      2) the calling process has allocated the maximum amount of memory  allowed for a single process(tipically, for a 32 bits machine, 2GB)*/
+	  1) free phisical memory is close to 0;
+	  2) the calling process has allocated the maximum amount of memory  allowed for a single
+   process(tipically, for a 32 bits machine, 2GB)*/
 
 DVAPI bool memoryShortage();
 
 /*! run di un extern viewer */
-//DVAPI void showDocument(const TFilePath &dst);
+// DVAPI void showDocument(const TFilePath &dst);
 
 DVAPI int getProcessorCount();
 
 enum CPUExtensions {
 	CPUExtensionsNone = 0x00000000L,
-	//CpuSupportsCpuId      = 0x00000001L,
-	//CpuSupportsFpu        = 0x00000002L,
-	//CpuSupportsMmx        = 0x00000004L,
-	//CpuSupportsIntegerSse = 0x00000008L,
+	// CpuSupportsCpuId      = 0x00000001L,
+	// CpuSupportsFpu        = 0x00000002L,
+	// CpuSupportsMmx        = 0x00000004L,
+	// CpuSupportsIntegerSse = 0x00000008L,
 	CpuSupportsSse = 0x00000010L,
 	CpuSupportsSse2 = 0x00000020L,
-	//CpuSupports3DNow      = 0x00000040L,
-	//CpuSupports3DNowExt   = 0x00000080L
+	// CpuSupports3DNow      = 0x00000040L,
+	// CpuSupports3DNowExt   = 0x00000080L
 };
 
 /*! returns a bit mask containing the CPU extensions supported */
 DVAPI long getCPUExtensions();
 
 /*! enables/disables the CPU extensions, if available*/
-//DVAPI void enableCPUExtensions(bool on);
+// DVAPI void enableCPUExtensions(bool on);
 
 // cosette da fare:
 
@@ -218,18 +229,18 @@ void DVAPI outputDebug(std::string s);
 
 DVAPI bool isUNC(const TFilePath &fp);
 
-//!Returns the filepath in UNC format
+//! Returns the filepath in UNC format
 // ex.: TFilePath("O:\\temp").toUNC() == TFilePath("\\\\vega\\PERSONALI\\temp")
 // if "\\\\vega\\PERSONALI\\" is mounted as "O:\\" on the local host
-//A TException is thrown if the the conversion is not possible
+// A TException is thrown if the the conversion is not possible
 
 DVAPI TFilePath toUNC(const TFilePath &fp);
 
 /*!Returns the filepath in a format that refers to the local host
-	    ex.: TFilePath("\\\\dell530\\discoD\\temp").toLocalPath() == TFilePath("C:\\temp")
-      if the local host is "dell530"
-     No conversion is done if the filepath already refers to the local host
-     A TException is thrown if the the conversion is not possible
+		ex.: TFilePath("\\\\dell530\\discoD\\temp").toLocalPath() == TFilePath("C:\\temp")
+	  if the local host is "dell530"
+	 No conversion is done if the filepath already refers to the local host
+	 A TException is thrown if the the conversion is not possible
    */
 DVAPI TFilePath toLocalPath(const TFilePath &fp);
 

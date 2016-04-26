@@ -74,7 +74,7 @@ class PlasticSkeletonDeformation;
 
   TStageObjectId objectId = TApp::instance()->getCurrentObject()->getObjectId();
   TStageObject* stageObject = TApp::instance()->getCurrentXsheet()
-    ->getXsheet()->getStageObject(objectId);
+	->getXsheet()->getStageObject(objectId);
 
   \endcode
 
@@ -86,20 +86,21 @@ class DVAPI TStageObject : public TSmartObject, public TParamObserver
 {
 	DECLARE_CLASS_CODE
 
-public:
+  public:
 	/*!
-    Used to describe the object status - ie how the object can move.
-    The default value is XY.
+	Used to describe the object status - ie how the object can move.
+	The default value is XY.
   */
 	enum Status {
-		XY,				   //!< The object can move freely on a plane
-		PATH = 1,		   //!< The movement take place on a spline
-		PATH_AIM = 2,	  //!< The movement take place on a spline with the orientation of the object
-						   //!< defined by the user through \b TStageObject::T_Angle and the total angle is
-						   //!< the sum of the user angle plus the angle formed by
-						   //!< the tangent at the curve in the actual point
-		IK = 3,			   //!< The object is translated according to inverse kinematics
-		PATH_UPPK = 5,	 //!< PATH + UPPK (Update Pos Path Keyframe, when the spline is changed; see TStageObjectSpline)
+		XY,			  //!< The object can move freely on a plane
+		PATH = 1,	 //!< The movement take place on a spline
+		PATH_AIM = 2, //!< The movement take place on a spline with the orientation of the object
+		//!< defined by the user through \b TStageObject::T_Angle and the total angle is
+		//!< the sum of the user angle plus the angle formed by
+		//!< the tangent at the curve in the actual point
+		IK = 3,		   //!< The object is translated according to inverse kinematics
+		PATH_UPPK = 5, //!< PATH + UPPK (Update Pos Path Keyframe, when the spline is changed; see
+					   //!TStageObjectSpline)
 		PATH_AIM_UPPK = 6, //!< PATH_AIM + UPPK
 		UPPK_MASK = 4,	 //!< (status&UPPK_MASK)!=0 <==> UPPK enabled
 		STATUS_MASK = 3	//!< (status&STATUS_MASK) => old status
@@ -122,26 +123,26 @@ public:
 	};
 
 	/*!
-    The Keyframe struct define a keyframe.
-    A keyframe allows to define object values in a specific frame.
+	The Keyframe struct define a keyframe.
+	A keyframe allows to define object values in a specific frame.
 	 Keyframes are the starting and ending points of a transition in a scene.
-	 Its parameters are taken as references to make changes on the paramters of other frames, 
+	 Its parameters are taken as references to make changes on the paramters of other frames,
 	 as:
 
-    \li interpolation of parameters between two keyframes in the timeline,
-    \li extrapolation of parameters after or before a single keyframe.
+	\li interpolation of parameters between two keyframes in the timeline,
+	\li extrapolation of parameters after or before a single keyframe.
   */
 	struct Keyframe;
 
 	/*!
-	 Define a map of int and keyframe necessary to know object keyframe; 
-	 Its purpose is the indexing of the object's keyframes.	
+	 Define a map of int and keyframe necessary to know object keyframe;
+	 Its purpose is the indexing of the object's keyframes.
   */
 	typedef std::map<int, Keyframe> KeyframeMap;
 
-public:
+  public:
 	/*! Initializes a stage object in his \e tree with an unique id.
-   \n The constructor is called by \b TStageObjectTree  to create a new column in the tree or 
+   \n The constructor is called by \b TStageObjectTree  to create a new column in the tree or
 	in general a new node in the tree.
   */
 	TStageObject(TStageObjectTree *tree, TStageObjectId id);
@@ -190,19 +191,20 @@ public:
 	//! Returns the motion path associated to the object
 	TStageObjectSpline *getSpline() const;
 
-	/*! 
-	 Sets the motion path of the object. 
-	 A \e null pointer argument make \e this an object without a path and set the object status to  TStageObject::XY,
-    that is it can move on a palne.
+	/*!
+	 Sets the motion path of the object.
+	 A \e null pointer argument make \e this an object without a path and set the object status to
+	TStageObject::XY,
+	that is it can move on a palne.
 	 \e this gets ownership of \e spline.
-    \note does NOT take spline ownership
+	\note does NOT take spline ownership
   */
 	void setSpline(TStageObjectSpline *spline);
 
-	/*! 
-    As setSpline(), but doesn't notify; 
-    actually setSpline() calls doSetSpline() and then notifies
-    \note does NOT take spline ownership
+	/*!
+	As setSpline(), but doesn't notify;
+	actually setSpline() calls doSetSpline() and then notifies
+	\note does NOT take spline ownership
   */
 	void doSetSpline(TStageObjectSpline *spline);
 
@@ -229,32 +231,34 @@ public:
 	//! Returns object's position in the schematic view.
 	TPointD getDagNodePos() const { return m_dagNodePos; }
 
-	/*! 
-	 Sets the position of the object node object in the widget work area. 
-    This function is provided for status saving purpose of the interface that manages the schematic's view.
+	/*!
+	 Sets the position of the object node object in the widget work area.
+	This function is provided for status saving purpose of the interface that manages the
+	schematic's view.
   */
 	void setDagNodePos(const TPointD &p) { m_dagNodePos = p; }
 
-	/*! 
-    Returns string containing pegbar handle name like  A,B...Z, or H1,H2...H8.
-    \n It refers to the handle of the actual pegbar, ie the offset center of the pegbar.
-    The default value is B that centers the pegbar and corresponds to an hook with index equal to 0.
-    Hooks are column references (0 is the center) in the sheet and are data structures defined in the file hook.h. 
-    \n H1 has an index equal to 1, H2 => 2 and so on.
-    \sa setHandle() and getParentHandle()
+	/*!
+	Returns string containing pegbar handle name like  A,B...Z, or H1,H2...H8.
+	\n It refers to the handle of the actual pegbar, ie the offset center of the pegbar.
+	The default value is B that centers the pegbar and corresponds to an hook with index equal to 0.
+	Hooks are column references (0 is the center) in the sheet and are data structures defined in
+	the file hook.h.
+	\n H1 has an index equal to 1, H2 => 2 and so on.
+	\sa setHandle() and getParentHandle()
   */
 	const std::string &getHandle() const { return m_handle; }
 
 	/*!
-    Return string containing pegbar parent handle name. Es.: A,B...Z, or H1,H2...H8.
-    \sa setParentHandle() and getHandle()
+	Return string containing pegbar parent handle name. Es.: A,B...Z, or H1,H2...H8.
+	\sa setParentHandle() and getHandle()
   */
 	const std::string &getParentHandle() const { return m_parentHandle; }
 
-	/*! 
-    Sets the name of the pegbar handle name. 
-    An empty or an H1,...,H8  string sets the offset to the actual center of the object.
-    \sa getHandle()
+	/*!
+	Sets the name of the pegbar handle name.
+	An empty or an H1,...,H8  string sets the offset to the actual center of the object.
+	\sa getHandle()
   */
 	void setHandle(const std::string &s);
 
@@ -289,12 +293,13 @@ public:
 	//! Returns true if \e frame is a keyframe for all channels.
 	bool isFullKeyframe(int frame) const;
 
-	//! Returns true if \e frame is a keyframe for all channels with exeption of global scale channel.
+	//! Returns true if \e frame is a keyframe for all channels with exeption of global scale
+	//! channel.
 	bool is52FullKeyframe(int frame) const;
 
 	/*!
-    Retrieves from the list of the keyframes a keyframe object (TStageObject::Keyframe) associated 
-    with the frame.  
+	Retrieves from the list of the keyframes a keyframe object (TStageObject::Keyframe) associated
+	with the frame.
   */
 	Keyframe getKeyframe(int frame) const;
 
@@ -303,7 +308,8 @@ public:
 	void removeKeyframeWithoutUndo(int frame);
 
 	/*!
-	Moves Keyframe \e src to \e dst. All the Channels associated are copied and the reference to \e src is deleted.
+	Moves Keyframe \e src to \e dst. All the Channels associated are copied and the reference to \e
+	src is deleted.
 	Returns \e true on success.
   */
 	bool moveKeyframe(int dst, int src);
@@ -322,15 +328,14 @@ public:
 	void getKeyframes(KeyframeMap &keyframes) const;
 	bool getKeyframeRange(int &r0, int &r1) const;
 
-	bool getKeyframeSpan(int row, int &r0, double &ease0,
-						 int &r1, double &ease1) const;
+	bool getKeyframeSpan(int row, int &r0, double &ease0, int &r1, double &ease1) const;
 
 	TAffine getPlacement(double t);
 	TAffine getParentPlacement(double t) const;
 
 	/*!
-    Returns the object's depth at specified frame.
-    \sa Methods getGlobalNoScaleZ() and getNoScaleZ().
+	Returns the object's depth at specified frame.
+	\sa Methods getGlobalNoScaleZ() and getNoScaleZ().
   */
 	double getZ(double frame);
 
@@ -344,10 +349,10 @@ public:
 	double getNoScaleZ() const;
 
 	/*!
-    Returns the depth with no scale factor. 
-    Movig along Z axis results in a scale factor on the plane XY.
-    This method sets the original depth of the pegbar.
-    \n \sa getGlobalNoScaleZ().
+	Returns the depth with no scale factor.
+	Movig along Z axis results in a scale factor on the plane XY.
+	This method sets the original depth of the pegbar.
+	\n \sa getGlobalNoScaleZ().
   */
 	void setNoScaleZ(double noScaleZ);
 
@@ -362,21 +367,21 @@ public:
 	const std::list<TStageObject *> &getChildren() const { return m_children; }
 
 	/*!
-    Returns \e true if the objects cycle is enabled, 
-    i.e. if a finite sequence is a cycle.
+	Returns \e true if the objects cycle is enabled,
+	i.e. if a finite sequence is a cycle.
   */
 	bool isCycleEnabled() const;
 
 	/*!
-    Enables cycle of the object, this method is provided to take care 
-    of the position of the viewer in the sequence. 
-    \sa isCycleEnabled()
+	Enables cycle of the object, this method is provided to take care
+	of the position of the viewer in the sequence.
+	\sa isCycleEnabled()
   */
 	void enableCycle(bool on);
 
 	/*!
-    Gets local placement of the object taking care of translation, rotation, shear and scale 
-    of the \e frame
+	Gets local placement of the object taking care of translation, rotation, shear and scale
+	of the \e frame
   */
 	TAffine getLocalPlacement(double frame) { return computeLocalPlacement(frame); }
 
@@ -397,8 +402,8 @@ public:
 	const TCamera *getCamera() const { return m_camera; }
 
 	/*!
-    Removes this object from the list of children of his actual parent.
-    Doesn't delete \e this.
+	Removes this object from the list of children of his actual parent.
+	Doesn't delete \e this.
   */
 	void detachFromParent();
 
@@ -409,21 +414,19 @@ public:
 	void invalidate();
 
 	/*!
-    Return true if current object is visible, if object position in z-axis is
-    less than 1000; othrwise return false. 
-	\n Set \b TAffine \b aff to current object trasformation matrix computed 
+	Return true if current object is visible, if object position in z-axis is
+	less than 1000; othrwise return false.
+	\n Set \b TAffine \b aff to current object trasformation matrix computed
 	using camera and object trasformation matrix,
-    \b cameraAff, \b objectAff, and using camera and object position in z-axis,
-    \b cameraZ, \b objectZ.
+	\b cameraAff, \b objectAff, and using camera and object position in z-axis,
+	\b cameraZ, \b objectZ.
  \n \b objectZ default value is zero, big value describe the nearest camera object;
-    original distance between table and camera is 1000.
+	original distance between table and camera is 1000.
  \n \b cameraZ default value is zero, negative value suggest that camera is near to
-    the table, camera is in the table for cameraZ = -1000.
+	the table, camera is in the table for cameraZ = -1000.
   */
-	static bool perspective(TAffine &aff,
-							const TAffine &cameraAff, double cameraZ,
-							const TAffine &objectAff, double objectZ,
-							double objectNoScaleZ);
+	static bool perspective(TAffine &aff, const TAffine &cameraAff, double cameraZ,
+							const TAffine &objectAff, double objectZ, double objectNoScaleZ);
 
 	void loadData(TIStream &is);
 	void saveData(TOStream &os);
@@ -456,9 +459,9 @@ public:
 	void updateKeyframes(); //!< Rebuilds the internal keyframes table.
 
 	double paramsTime(double t) const; //!< Traduces the xsheet-time into the one suitable
-									   //!< for param values extraction (dealing with repeat/cycling)
+	//!< for param values extraction (dealing with repeat/cycling)
 
-private:
+  private:
 	// Lazily updated data
 
 	struct LazyData {
@@ -468,7 +471,7 @@ private:
 		LazyData();
 	};
 
-private:
+  private:
 	tcg::invalidable<LazyData> m_lazyData;
 
 	TStageObjectId m_id;
@@ -484,19 +487,11 @@ private:
 	TStageObjectSpline *m_spline;
 	Status m_status;
 
-	TDoubleParamP m_x,
-		m_y,
-		m_z,
-		m_so,
-		m_rot,
-		m_scalex,
-		m_scaley,
-		m_scale,
-		m_posPath,
-		m_shearx,
+	TDoubleParamP m_x, m_y, m_z, m_so, m_rot, m_scalex, m_scaley, m_scale, m_posPath, m_shearx,
 		m_sheary;
 
-	PlasticSkeletonDeformationP m_skeletonDeformation; //!< Deformation curves for a plastic skeleton
+	PlasticSkeletonDeformationP
+		m_skeletonDeformation; //!< Deformation curves for a plastic skeleton
 
 	TPointD m_center;
 	TPointD m_offset;
@@ -521,7 +516,7 @@ private:
 
 	bool m_locked;
 
-private:
+  private:
 	// Not copyable
 	TStageObject(const TStageObject &);
 	TStageObject &operator=(const TStageObject &);
@@ -531,7 +526,7 @@ private:
 	TStageObject *findRoot(double frame) const;
 	TStageObject *getPinnedDescendant(int frame);
 
-private:
+  private:
 	// Lazy data-related functions
 
 	LazyData &lazyData();
@@ -555,19 +550,19 @@ typedef TSmartPointerT<TStageObject> TStageObjectP;
 
 //=============================================================================
 
-//TODO: togliere questo include da qui.
+// TODO: togliere questo include da qui.
 // Bisogna: includere qui il contenuto del file e eliminare tstageobjectkeyframe.h
 // oppure creare un altro file con la dichiarazione di TStageObjectParams
 #include "tstageobjectkeyframe.h"
 
 //=============================================================================
 //
-//TStageObjectParams
+// TStageObjectParams
 //
 //=============================================================================
 class DVAPI TStageObjectParams
 {
-public:
+  public:
 	TStageObjectId m_id, m_parentId;
 	std::vector<TStageObjectId> m_children;
 	std::map<int, TStageObject::Keyframe> m_keyframes;
@@ -576,21 +571,12 @@ public:
 	TStageObject::Status m_status;
 	std::string m_handle, m_parentHandle;
 	TPinnedRangeSet *m_pinnedRangeSet;
-	TDoubleParamP m_x,
-		m_y,
-		m_z,
-		m_so,
-		m_rot,
-		m_scalex,
-		m_scaley,
-		m_scale,
-		m_posPath,
-		m_shearx,
+	TDoubleParamP m_x, m_y, m_z, m_so, m_rot, m_scalex, m_scaley, m_scale, m_posPath, m_shearx,
 		m_sheary;
-	PlasticSkeletonDeformationP m_skeletonDeformation; //!< Deformation curves for a plastic skeleton
+	PlasticSkeletonDeformationP
+		m_skeletonDeformation; //!< Deformation curves for a plastic skeleton
 	double m_noScaleZ;
-	TPointD m_center,
-		m_offset;
+	TPointD m_center, m_offset;
 	std::string m_name;
 
 	TStageObjectParams();

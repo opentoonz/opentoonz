@@ -44,7 +44,7 @@ class DVAPI RollerField : public QWidget
 
 	int m_xPos;
 
-public:
+  public:
 	RollerField(QWidget *parent = 0);
 
 	~RollerField() {}
@@ -55,12 +55,9 @@ public:
 	void setRange(double minValue, double maxValue);
 	void getRange(double &minValue, double &maxValue);
 
-	void setStep(double _step)
-	{
-		m_step = _step;
-	}
+	void setStep(double _step) { m_step = _step; }
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *e);
 	void mousePressEvent(QMouseEvent *);
 	void mouseMoveEvent(QMouseEvent *);
@@ -69,7 +66,7 @@ protected:
 	void addValue(bool isDragging);
 	void removeValue(bool isDragging);
 
-signals:
+  signals:
 	void valueChanged(bool isDragging);
 };
 
@@ -90,11 +87,10 @@ class DVAPI IntLineEdit : public LineEdit
 	//! If digits is less than 1 the line edit show the natural number without prepend zeros.
 	int m_showedDigits;
 
-public:
+  public:
 	IntLineEdit(QWidget *parent = 0, int value = 1,
 				int minValue = (-(std::numeric_limits<int>::max)()),
-				int maxValue = ((std::numeric_limits<int>::max)()),
-				int showedDigits = 0);
+				int maxValue = ((std::numeric_limits<int>::max)()), int showedDigits = 0);
 	~IntLineEdit() {}
 
 	/*! Set text in field to \b value. */
@@ -118,7 +114,7 @@ public:
 
 	void setLineEditBackgroundColor(QColor color);
 
-protected:
+  protected:
 	/*! If focus is lost and current text value is out of range emit signal
 			\b editingFinished.*/
 	void focusOutEvent(QFocusEvent *);
@@ -155,7 +151,7 @@ class DVAPI IntField : public QWidget
 	QSlider *m_slider;
 	bool m_isMaxRangeLimited;
 
-public:
+  public:
 	IntField(QWidget *parent = 0, bool isMaxRangeLimited = true, bool isRollerHide = true);
 	~IntField() {}
 
@@ -190,7 +186,7 @@ public:
 
 	void setLineEditBackgroundColor(QColor color);
 
-protected slots:
+  protected slots:
 	/*! Set to value the text field. If text field value is different from \b value
 			emit signal valueChanged(). */
 	void onSliderChanged(int value);
@@ -205,7 +201,7 @@ protected slots:
 			emit signal valueChanged(). */
 	void onRollerValueChanged(bool isDragging);
 
-signals:
+  signals:
 	/*! This is a signal emitted when IntField, slider or text field, value change;
 			if slider position change or text field editing is finished.
 			\sa onEditingFinished() and onSliderChanged(int value). */
@@ -216,7 +212,7 @@ signals:
 };
 
 //-----------------------------------------------------------------------------
-} //namespace DVGui
+} // namespace DVGui
 //-----------------------------------------------------------------------------
 
 #endif // INTFIELD_H

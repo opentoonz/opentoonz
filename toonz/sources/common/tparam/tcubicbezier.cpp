@@ -4,11 +4,8 @@
 
 //-----------------------------------------------------------------------------
 
-DVAPI double invCubicBezierX(double x,
-							 const TPointD &a,
-							 const TPointD &aSpeed,
-							 const TPointD &bSpeed,
-							 const TPointD &b)
+DVAPI double invCubicBezierX(double x, const TPointD &a, const TPointD &aSpeed,
+							 const TPointD &bSpeed, const TPointD &b)
 {
 	double aSpeedX = aSpeed.x;
 	double bSpeedX = bSpeed.x;
@@ -33,11 +30,8 @@ DVAPI double invCubicBezierX(double x,
 
 //-----------------------------------------------------------------------------
 
-DVAPI double getCubicBezierY(double x,
-							 const TPointD &a,
-							 const TPointD &aSpeed,
-							 const TPointD &bSpeed,
-							 const TPointD &b)
+DVAPI double getCubicBezierY(double x, const TPointD &a, const TPointD &aSpeed,
+							 const TPointD &bSpeed, const TPointD &b)
 {
 	double y0 = a.y;
 	double y1 = y0 + aSpeed.y;
@@ -56,10 +50,8 @@ DVAPI double getCubicBezierY(double x,
 
 //-----------------------------------------------------------------------------
 
-DVAPI std::pair<TPointD, TPointD> getMinMaxCubicBezierY(const TPointD &a,
-														const TPointD &aSpeed,
-														const TPointD &bSpeed,
-														const TPointD &b)
+DVAPI std::pair<TPointD, TPointD> getMinMaxCubicBezierY(const TPointD &a, const TPointD &aSpeed,
+														const TPointD &bSpeed, const TPointD &b)
 {
 	double y0 = a.y;
 	double y1 = y0 + aSpeed.y;
@@ -87,20 +79,16 @@ DVAPI std::pair<TPointD, TPointD> getMinMaxCubicBezierY(const TPointD &a,
 
 	if (aaY == 0) {
 		if (a.y < b.y)
-			return std::pair<TPointD, TPointD>(TPointD(a.x, a.y),
-											   TPointD(b.x, b.y));
+			return std::pair<TPointD, TPointD>(TPointD(a.x, a.y), TPointD(b.x, b.y));
 		else
-			return std::pair<TPointD, TPointD>(TPointD(b.x, b.y),
-										  TPointD(a.x, a.y));
+			return std::pair<TPointD, TPointD>(TPointD(b.x, b.y), TPointD(a.x, a.y));
 	} else {
 		double discr = bbY * bbY - 4 * aaY * ccY;
 		if (discr < 0) {
 			if (a.y < b.y)
-				return std::pair<TPointD, TPointD>(TPointD(a.x, a.y),
-												   TPointD(b.x, b.y));
+				return std::pair<TPointD, TPointD>(TPointD(a.x, a.y), TPointD(b.x, b.y));
 			else
-				return std::pair<TPointD, TPointD>(TPointD(b.x, b.y),
-											  TPointD(a.x, a.y));
+				return std::pair<TPointD, TPointD>(TPointD(b.x, b.y), TPointD(a.x, a.y));
 		} else {
 			double sqrt_discr = sqrt(discr);
 			double inv_2aY = 1.0 / (2.0 * aaY);

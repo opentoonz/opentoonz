@@ -22,24 +22,27 @@ namespace tcg
   The image_iterator class models an iterator accessing pixels of an image along its rows.
 */
 
-template <typename It>
-class image_iterator : public iterator_traits<It>::inheritable_iterator_type
+template <typename It> class image_iterator : public iterator_traits<It>::inheritable_iterator_type
 {
 	typedef typename iterator_traits<It>::inheritable_iterator_type iter;
 
-public:
+  public:
 	typedef typename iter::iterator_category iterator_category;
 	typedef typename iter::value_type value_type;
 	typedef typename iter::difference_type difference_type;
 	typedef typename iter::pointer pointer;
 	typedef typename iter::reference reference;
 
-public:
+  public:
 	image_iterator() {}
 
 	template <typename Img>
 	image_iterator(const Img &img, int x, int y)
-		: iter(image_traits<Img>::pixel(img, x, y)), m_base(image_traits<Img>::pixel(img, 0, 0)), m_lx(image_traits<Img>::width(img)), m_ly(image_traits<Img>::height(img)), m_wrap(image_traits<Img>::wrap(img)), m_skew(m_wrap - lx) {}
+		: iter(image_traits<Img>::pixel(img, x, y)), m_base(image_traits<Img>::pixel(img, 0, 0)),
+		  m_lx(image_traits<Img>::width(img)), m_ly(image_traits<Img>::height(img)),
+		  m_wrap(image_traits<Img>::wrap(img)), m_skew(m_wrap - lx)
+	{
+	}
 
 	int x() const { return (iter::operator-(m_base)) % m_wrap; }
 	int y() const { return (iter::operator-(m_base)) / m_wrap; }
@@ -99,7 +102,7 @@ public:
 		return *it;
 	}
 
-protected:
+  protected:
 	iter m_base;
 	int m_lx, m_ly, m_wrap, m_skew;
 };
@@ -108,42 +111,41 @@ protected:
 //    image_edge_iterator class
 //*********************************************************************************************************
 
-enum _iei_adherence_policy { LEFT_ADHERENCE,
-							 RIGHT_ADHERENCE };
+enum _iei_adherence_policy { LEFT_ADHERENCE, RIGHT_ADHERENCE };
 
 /*!
   The image_edge_iterator class models a forward iterator following the contour of
   an image area of uniform color.
 */
 
-template <typename It, _iei_adherence_policy _adherence = RIGHT_ADHERENCE>
-class image_edge_iterator
+template <typename It, _iei_adherence_policy _adherence = RIGHT_ADHERENCE> class image_edge_iterator
 {
 	typedef typename iterator_traits<It>::inheritable_iterator_type iter;
 
-public:
+  public:
 	typedef std::forward_iterator_tag iterator_category;
 	typedef typename iter::value_type value_type;
 	typedef typename iter::difference_type difference_type;
 	typedef typename iter::pointer pointer;
 	typedef typename iter::reference reference;
 
-public:
+  public:
 	enum { adherence = _adherence };
 
-	enum Direction { STRAIGHT = 0x0,
-					 LEFT = 0x1,
-					 RIGHT = 0x2,
-					 AMBIGUOUS = 0x4,
-					 UNKNOWN = 0x8,
-					 AMBIGUOUS_LEFT = LEFT | AMBIGUOUS,
-					 AMBIGUOUS_RIGHT = RIGHT | AMBIGUOUS };
+	enum Direction {
+		STRAIGHT = 0x0,
+		LEFT = 0x1,
+		RIGHT = 0x2,
+		AMBIGUOUS = 0x4,
+		UNKNOWN = 0x8,
+		AMBIGUOUS_LEFT = LEFT | AMBIGUOUS,
+		AMBIGUOUS_RIGHT = RIGHT | AMBIGUOUS
+	};
 
-public:
+  public:
 	image_edge_iterator() {}
 
-	template <typename Img>
-	image_edge_iterator(const Img &img, int x, int y, int dirX, int dirY);
+	template <typename Img> image_edge_iterator(const Img &img, int x, int y, int dirX, int dirY);
 
 	const Point &pos() const { return m_pos; }
 	const Point &dir() const { return m_dir; }
@@ -163,10 +165,13 @@ public:
 
 	Direction turn() const { return Direction(m_turn); }
 
-public:
+  public:
 	// Iterator functions
 
-	bool operator==(const image_edge_iterator &it) const { return (m_pos == it.m_pos) && (m_dir == it.m_dir); }
+	bool operator==(const image_edge_iterator &it) const
+	{
+		return (m_pos == it.m_pos) && (m_dir == it.m_dir);
+	}
 	bool operator!=(const image_edge_iterator &it) const { return !operator==(it); }
 
 	image_edge_iterator &operator++()
@@ -181,7 +186,7 @@ public:
 		return temp;
 	}
 
-private:
+  private:
 	void pixels(iter pixLeft, iter pixRight);
 	void colors(value_type &leftColor, value_type &rightColor);
 
@@ -206,9 +211,8 @@ private:
 	}
 	void turnAmbiguous(const value_type &newLeftColor, const value_type &newRightColor);
 
-private:
-	template <_iei_adherence_policy>
-	struct policy {
+  private:
+	template <_iei_adherence_policy> struct policy {
 	};
 
 	const value_type &color(policy<LEFT_ADHERENCE>) const { return m_leftColor; }
@@ -223,13 +227,15 @@ private:
 	iter oppositePixel(policy<LEFT_ADHERENCE>) const { return m_rightPix; }
 	iter oppositePixel(policy<RIGHT_ADHERENCE>) const { return m_leftPix; }
 
-	void turn(const value_type &newLeftColor, const value_type &newRightColor, policy<LEFT_ADHERENCE>);
-	void turn(const value_type &newLeftColor, const value_type &newRightColor, policy<RIGHT_ADHERENCE>);
+	void turn(const value_type &newLeftColor, const value_type &newRightColor,
+			  policy<LEFT_ADHERENCE>);
+	void turn(const value_type &newLeftColor, const value_type &newRightColor,
+			  policy<RIGHT_ADHERENCE>);
 
 	void advance(policy<LEFT_ADHERENCE>);
 	void advance(policy<RIGHT_ADHERENCE>);
 
-private:
+  private:
 	int m_lx_1, m_ly_1, m_wrap;
 
 	Point m_pos, m_dir;

@@ -27,13 +27,14 @@ class DVAPI TBigMemoryManager
 	UCHAR *allocate(UINT &size);
 
 	TUINT32 m_availableMemory, m_allocatedMemory;
-	std::map<UCHAR *, Chunkinfo>::iterator shiftBlock(const std::map<UCHAR *, Chunkinfo>::iterator &it, TUINT32 offset);
+	std::map<UCHAR *, Chunkinfo>::iterator
+	shiftBlock(const std::map<UCHAR *, Chunkinfo>::iterator &it, TUINT32 offset);
 	TRaster *findRaster(TRaster *ras);
 	void checkConsistency();
 	UCHAR *remap(TUINT32 RequestedSize);
 	void printLog(TUINT32 size);
 
-public:
+  public:
 	TBigMemoryManager();
 	~TBigMemoryManager();
 	bool init(TUINT32 sizeinKb);
@@ -44,13 +45,14 @@ public:
 	UCHAR *getBuffer(UINT size);
 	static TBigMemoryManager *instance();
 	bool isActive() const { return m_theMemory != 0; }
-	//void releaseSubraster(UCHAR *chunk, TRaster*subRas);
+	// void releaseSubraster(UCHAR *chunk, TRaster*subRas);
 	TUINT32 getAvailableMemoryinKb() const
 	{
 		assert(m_theMemory != 0);
 		return m_availableMemory >> 10;
 	}
-	void getRasterInfo(int &rasterCount, TUINT32 &totRasterMemInKb, int &notCachedRasterCount, TUINT32 &notCachedRasterMemInKb);
+	void getRasterInfo(int &rasterCount, TUINT32 &totRasterMemInKb, int &notCachedRasterCount,
+					   TUINT32 &notCachedRasterMemInKb);
 #ifdef _DEBUG
 	TUINT32 m_totRasterMemInKb;
 	void printMap();
@@ -60,7 +62,7 @@ public:
 
 	void setRunOutOfContiguousMemoryHandler(void (*callback)(unsigned long size));
 
-private:
+  private:
 	friend class TRaster;
 	void (*m_runOutCallback)(unsigned long);
 };

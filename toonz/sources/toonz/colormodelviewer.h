@@ -18,11 +18,11 @@ class ColorModelViewer : public FlipBook
 	/*-- ColorModelのファイルパスを覚えておいて、UseCurrentFrame間の移動に対応 --*/
 	TFilePath m_currentRefImgPath;
 
-public:
+  public:
 	ColorModelViewer(QWidget *parent = 0);
 	~ColorModelViewer();
 
-protected:
+  protected:
 	void dragEnterEvent(QDragEnterEvent *event);
 	void dropEvent(QDropEvent *event);
 	void loadImage(const TFilePath &fp);
@@ -46,7 +46,7 @@ protected:
 
 	/*- UseCurrentFrameのLevelに移動してきたときに、改めてCurrentFrameを格納しなおす -*/
 	void reloadCurrentFrame();
-protected slots:
+  protected slots:
 	void showCurrentImage();
 
 	void loadCurrentFrame();
@@ -58,8 +58,8 @@ protected slots:
 	/*- ツールのTypeに合わせてPickのタイプも変える。それにあわせカーソルも切り替える -*/
 	void changePickType();
 
-signals:
+  signals:
 	void refImageNotFound();
 };
 
-#endif //COLORMODELVIEWER_H
+#endif // COLORMODELVIEWER_H

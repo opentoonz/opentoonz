@@ -37,7 +37,7 @@ class MixAudioThread : public QThread
 	TSoundTrackP m_computedBuffer;
 	TSoundTrackP m_buffer;
 
-public:
+  public:
 	QMutex m_mutex;
 
 	MixAudioThread(QObject *parent = 0);
@@ -47,17 +47,17 @@ public:
 
 	TSoundTrackP getBuffer() { return m_buffer; }
 
-protected:
+  protected:
 	void run();
 
-signals:
+  signals:
 	void computedBuffer();
 };
 
 //=============================================================================
 // LineTestPanel
 //-----------------------------------------------------------------------------
-//Andrebbe messo a fattor comune del codice con ViewerPane
+// Andrebbe messo a fattor comune del codice con ViewerPane
 class LineTestPane : public TPanel
 {
 	Q_OBJECT
@@ -68,7 +68,7 @@ class LineTestPane : public TPanel
 	FlipConsole *m_flipConsole;
 	ViewerKeyframeNavigator *m_keyFrameButton;
 
-	TSoundTrackP m_mainTrack, m_startTrack; //used in loop
+	TSoundTrackP m_mainTrack, m_startTrack; // used in loop
 	TSoundTrackP m_buffer;
 	int m_bufferSize;	  // in Frames
 	int m_nextBufferSize;  // in Frames
@@ -83,11 +83,11 @@ class LineTestPane : public TPanel
 	int m_trackStartFrame;
 	int m_startPlayRange, m_endPlayRange;
 
-public:
+  public:
 	LineTestPane(QWidget *parent = 0, Qt::WFlags flags = 0);
 	~LineTestPane();
 
-protected:
+  protected:
 	void showEvent(QShowEvent *);
 	void hideEvent(QHideEvent *);
 
@@ -97,14 +97,14 @@ protected:
 	void playSound();
 	void initializeTitleBar(TPanelTitleBar *titleBar);
 
-public slots:
+  public slots:
 	void changeWindowTitle();
 	void onSceneChanged();
 	void onXshLevelSwitched(TXshLevel *);
 	void updateFrameRange();
 	void updateFrameMarkers();
 
-protected slots:
+  protected slots:
 	void setCurrentViewType(int index);
 	void onDrawFrame(int frame, const ImagePainter::VisualSettings &settings);
 	void onComputedBuffer();
@@ -115,6 +115,6 @@ protected slots:
 	void onFlipSliderReleased();
 };
 
-#endif //LINETEST
+#endif // LINETEST
 
 #endif

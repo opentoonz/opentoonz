@@ -5,11 +5,11 @@
 
 class XScopedLock
 {
-private:
+  private:
 	class Imp;
 	Imp *m_imp;
 
-public:
+  public:
 	XScopedLock();
 	~XScopedLock();
 };

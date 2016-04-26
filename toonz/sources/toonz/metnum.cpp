@@ -3,7 +3,7 @@
 /*------------------------  modulo metnum.cpp  --------------------------
  * SCOPO
  * Implementazione di alcuni algoritmi relativi a metodi numerici.
- * 
+ *
  * Autore: P. Foggia (1991)
  *---------------------------------------------------------------------*/
 
@@ -186,9 +186,7 @@ int MetNum::Approx(int n, int m, double **x, double y[], double c[])
 	}
 
 	/* risolve il sistema */
-	if (Cholesky(m, A) ||
-		CholForw(m, A, c, c) ||
-		CholBack(m, A, c, c))
+	if (Cholesky(m, A) || CholForw(m, A, c, c) || CholBack(m, A, c, c))
 		retval = -3;
 	else
 		retval = 0;

@@ -42,8 +42,7 @@ using namespace DVGui;
 // TimelineWidget
 //-----------------------------------------------------------------------------
 
-TimelineWidget::TimelineWidget(QWidget *parent)
-	: QWidget(parent)
+TimelineWidget::TimelineWidget(QWidget *parent) : QWidget(parent)
 {
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->setMargin(0);
@@ -57,7 +56,7 @@ TimelineWidget::TimelineWidget(QWidget *parent)
 	mainLayout->addWidget(label);
 
 	m_listWidget = new QListWidget;
-	//m_listWidget->setItemDelegate(new ItemDelegate(m_listWidget));
+	// m_listWidget->setItemDelegate(new ItemDelegate(m_listWidget));
 	m_listWidget->setFlow(QListView::TopToBottom);
 	m_listWidget->setViewMode(QListView::ListMode);
 	m_listWidget->setMovement(QListView::Static);
@@ -72,7 +71,8 @@ TimelineWidget::TimelineWidget(QWidget *parent)
 	label = new QLabel(tr("Older Version"));
 	label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	label->setAlignment(Qt::AlignHCenter);
-	label->setStyleSheet("background-color: rgb(220,220,220); border: 1px solid rgb(150,150,150); ");
+	label->setStyleSheet(
+		"background-color: rgb(220,220,220); border: 1px solid rgb(150,150,150); ");
 
 	mainLayout->addWidget(label);
 
@@ -90,9 +90,11 @@ int TimelineWidget::getCurrentIndex() const
 // SVNTimeline
 //-----------------------------------------------------------------------------
 
-SVNTimeline::SVNTimeline(QWidget *parent, const QString &workingDir,
-						 const QString &fileName, const QStringList &auxFiles)
-	: Dialog(TApp::instance()->getMainWindow(), true, true), m_workingDir(workingDir), m_auxFiles(auxFiles), m_fileName(fileName), m_currentExportIndex(0), m_currentAuxExportIndex(0)
+SVNTimeline::SVNTimeline(QWidget *parent, const QString &workingDir, const QString &fileName,
+						 const QStringList &auxFiles)
+	: Dialog(TApp::instance()->getMainWindow(), true, true), m_workingDir(workingDir),
+	  m_auxFiles(auxFiles), m_fileName(fileName), m_currentExportIndex(0),
+	  m_currentAuxExportIndex(0)
 {
 	setModal(false);
 	setAttribute(Qt::WA_DeleteOnClose, true);
@@ -116,15 +118,18 @@ SVNTimeline::SVNTimeline(QWidget *parent, const QString &workingDir,
 	hLayout->addStretch();
 
 	m_timelineWidget = new TimelineWidget;
-	m_timelineWidget->setStyleSheet("QListWidget { background-color: white; } QListWidget:item { margin: 5px; }");
+	m_timelineWidget->setStyleSheet(
+		"QListWidget { background-color: white; } QListWidget:item { margin: 5px; }");
 	m_timelineWidget->hide();
-	connect(m_timelineWidget->getListWidget(), SIGNAL(itemSelectionChanged()), this, SLOT(onSelectionChanged()));
+	connect(m_timelineWidget->getListWidget(), SIGNAL(itemSelectionChanged()), this,
+			SLOT(onSelectionChanged()));
 
 	QHBoxLayout *checkBoxLayout = new QHBoxLayout;
 	checkBoxLayout->setMargin(0);
 	m_sceneContentsCheckBox = new QCheckBox(this);
 	m_sceneContentsCheckBox->setVisible(m_fileName.endsWith(".tnz"));
-	connect(m_sceneContentsCheckBox, SIGNAL(toggled(bool)), this, SLOT(onSceneContentsToggled(bool)));
+	connect(m_sceneContentsCheckBox, SIGNAL(toggled(bool)), this,
+			SLOT(onSceneContentsToggled(bool)));
 	m_sceneContentsCheckBox->setChecked(false);
 	m_sceneContentsCheckBox->setText(tr("Get Scene Contents"));
 	checkBoxLayout->addStretch();
@@ -149,7 +154,8 @@ SVNTimeline::SVNTimeline(QWidget *parent, const QString &workingDir,
 	connect(m_updateButton, SIGNAL(clicked()), this, SLOT(onUpdateButtonClicked()));
 
 	m_updateToRevisionButton = new QPushButton(tr("Get Selected Revision"));
-	connect(m_updateToRevisionButton, SIGNAL(clicked()), this, SLOT(onUpdateToRevisionButtonClicked()));
+	connect(m_updateToRevisionButton, SIGNAL(clicked()), this,
+			SLOT(onUpdateToRevisionButtonClicked()));
 	m_updateToRevisionButton->setEnabled(false);
 
 	m_closeButton = new QPushButton(tr("Close"));
@@ -208,7 +214,7 @@ void SVNTimeline::onLogDone(const QString &xmlResponse)
 {
 	m_textLabel->hide();
 	m_waitingLabel->hide();
-	//qDebug(xmlResponse.toAscii());
+	// qDebug(xmlResponse.toAscii());
 
 	SVNLogReader lr(xmlResponse);
 	m_log = lr.getLog();
@@ -227,7 +233,7 @@ void SVNTimeline::onLogDone(const QString &xmlResponse)
 		QString text = "\n" + tr("Date") + ": " + d.toString("MM-dd-yyyy");
 
 		if (dayCount == 0) {
-			//text += "Today\nby " + log.m_author;
+			// text += "Today\nby " + log.m_author;
 			QString timeString = log.m_date.split("T").at(1);
 			timeString = timeString.left(5);
 
@@ -238,21 +244,26 @@ void SVNTimeline::onLogDone(const QString &xmlResponse)
 			QTime now = QTime::fromString(currentTime.toString("hh:mm"), "hh:mm");
 			int seconds = t.secsTo(now);
 			int minute = seconds / 60;
-			text += " ( " + QString::number(minute) + " minutes ago )\n" + tr("Author") + ": " + log.m_author + "\n" + tr("Comment") + ": " + log.m_msg;
+			text += " ( " + QString::number(minute) + " minutes ago )\n" + tr("Author") + ": " +
+					log.m_author + "\n" + tr("Comment") + ": " + log.m_msg;
 		} else
-			text += " ( " + QString::number(dayCount) + " days ago )\n" + tr("Author") + ": " + log.m_author + "\n" + tr("Comment") + ": " + log.m_msg;
+			text += " ( " + QString::number(dayCount) + " days ago )\n" + tr("Author") + ": " +
+					log.m_author + "\n" + tr("Comment") + ": " + log.m_msg;
 
-		QString tooltip = "<b>" + tr("Revision") + "</b>: " + log.m_revision + "<br><b>" + tr("Author") + "</b>: " + log.m_author +
-						  "<br><b>" + tr("Date") + "</b>: " + log.m_date + "<br><b>" + tr("Comment") + "</b>: " + log.m_msg;
+		QString tooltip = "<b>" + tr("Revision") + "</b>: " + log.m_revision + "<br><b>" +
+						  tr("Author") + "</b>: " + log.m_author + "<br><b>" + tr("Date") +
+						  "</b>: " + log.m_date + "<br><b>" + tr("Comment") + "</b>: " + log.m_msg;
 
 		QPixmap pixmap(ICON_WIDTH, ICON_HEIGHT);
 		pixmap.fill(Qt::lightGray);
 
-		QListWidgetItem *lwi = new QListWidgetItem(QIcon(pixmap), text, m_timelineWidget->getListWidget());
+		QListWidgetItem *lwi =
+			new QListWidgetItem(QIcon(pixmap), text, m_timelineWidget->getListWidget());
 		lwi->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 		lwi->setToolTip(tooltip);
 		lwi->setTextAlignment(Qt::AlignLeft);
-		m_tempFiles.append(new QTemporaryFile("svn_temp_img_" + QString::number(i) + "." + fileNameType));
+		m_tempFiles.append(
+			new QTemporaryFile("svn_temp_img_" + QString::number(i) + "." + fileNameType));
 
 		// Add also auxiliary files
 		TFilePath fp(TFilePath(m_workingDir.toStdWString()) + m_fileName.toStdWString());
@@ -264,7 +275,9 @@ void SVNTimeline::onLogDone(const QString &xmlResponse)
 			for (it = fpset.begin(); it != fpset.end(); ++it) {
 				TFilePath fp = *it;
 				if (fp.getType() == "tpl")
-					m_auxTempFiles.append(new QTemporaryFile("svn_temp_img_" + QString::number(i) + "." + QString::fromStdString(fp.getType())));
+					m_auxTempFiles.append(new QTemporaryFile("svn_temp_img_" + QString::number(i) +
+															 "." +
+															 QString::fromStdString(fp.getType())));
 			}
 		}
 		// Add sceneIcon (only for scene files)
@@ -276,7 +289,9 @@ void SVNTimeline::onLogDone(const QString &xmlResponse)
 				// Create the sceneIcons folder
 				QDir d;
 				d.mkdir("sceneIcons");
-				m_auxTempFiles.append(new QTemporaryFile(QDir::tempPath() + QString("/sceneicons/") + "svn_temp_img_" + QString::number(i) + " .png"));
+				m_auxTempFiles.append(new QTemporaryFile(QDir::tempPath() +
+														 QString("/sceneicons/") + "svn_temp_img_" +
+														 QString::number(i) + " .png"));
 			}
 		}
 
@@ -304,7 +319,7 @@ void SVNTimeline::onExportDone()
 	QListWidgetItem *lwi = m_listWidgetitems.at(m_currentExportIndex);
 	if (lwi) {
 		QFileInfo fi(*m_tempFiles.at(m_currentExportIndex));
-		//qDebug(fi.absoluteFilePath().toAscii());
+		// qDebug(fi.absoluteFilePath().toAscii());
 
 		// Create the icon if there isn't any auxiliary files associated (palette, sceneIcons..)
 		if (m_auxTempFiles.isEmpty())
@@ -337,7 +352,7 @@ void SVNTimeline::onExportAuxDone()
 	QListWidgetItem *lwi = m_listWidgetitems.at(m_currentAuxExportIndex);
 	if (lwi) {
 		QFileInfo fi(*m_tempFiles.at(m_currentAuxExportIndex));
-		//qDebug(fi.absoluteFilePath().toAscii());
+		// qDebug(fi.absoluteFilePath().toAscii());
 		lwi->setIcon(createIcon(fi.absoluteFilePath()));
 	}
 	m_currentAuxExportIndex++;
@@ -446,7 +461,8 @@ QIcon SVNTimeline::createIcon(const QString &fileName)
 		return QIcon();
 
 	if (filePixmap.size() != QSize(ICON_WIDTH, ICON_HEIGHT))
-		filePixmap = filePixmap.scaled(ICON_WIDTH, ICON_HEIGHT, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+		filePixmap = filePixmap.scaled(ICON_WIDTH, ICON_HEIGHT, Qt::KeepAspectRatio,
+									   Qt::SmoothTransformation);
 
 	if (filePixmap.size() == QSize(ICON_WIDTH, ICON_HEIGHT))
 		return QIcon(filePixmap);
@@ -487,7 +503,8 @@ void SVNTimeline::onUpdateButtonClicked()
 	files.append(m_auxFiles);
 
 	// Getting status to control if an update is needed
-	connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this, SLOT(onStatusRetrieved(const QString &)));
+	connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
+			SLOT(onStatusRetrieved(const QString &)));
 	m_thread.getSVNStatus(m_workingDir, files, true);
 }
 
@@ -507,9 +524,12 @@ void SVNTimeline::onUpdateToRevisionButtonClicked()
 	m_sceneContentsCheckBox->hide();
 	m_waitingLabel->show();
 	if (m_sceneResources.isEmpty())
-		m_textLabel->setText(tr("Getting %1 to revision %2...").arg(m_fileName).arg(log.m_revision));
+		m_textLabel->setText(
+			tr("Getting %1 to revision %2...").arg(m_fileName).arg(log.m_revision));
 	else
-		m_textLabel->setText(tr("Getting %1 items to revision %2...").arg(m_sceneResources.size() + 1).arg(log.m_revision));
+		m_textLabel->setText(tr("Getting %1 items to revision %2...")
+								 .arg(m_sceneResources.size() + 1)
+								 .arg(log.m_revision));
 	m_textLabel->show();
 
 	QStringList args;
@@ -553,9 +573,7 @@ void SVNTimeline::onStatusRetrieved(const QString &xmlResponse)
 
 			for (int i = 1; i < list.size(); i++) {
 				s = list.at(i);
-				if (s.m_item == "none" ||
-					s.m_item == "missing" ||
-					s.m_repoStatus == "modified")
+				if (s.m_item == "none" || s.m_item == "missing" || s.m_repoStatus == "modified")
 					args << s.m_path;
 			}
 

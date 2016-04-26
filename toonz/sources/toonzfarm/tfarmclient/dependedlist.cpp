@@ -11,8 +11,7 @@
 
 using namespace std;
 
-DependedList::DependedList(TWidget *parent)
-	: TWidget(parent)
+DependedList::DependedList(TWidget *parent) : TWidget(parent)
 {
 	m_depList = new TTextList(this);
 
@@ -81,8 +80,7 @@ void DependedList::onAdd()
 	if (!popup) {
 		popup = new DependedPopup(this);
 
-		popup->setOkAction(
-			new TDependedPopupAction<DependedList>(this, &DependedList::AddItems));
+		popup->setOkAction(new TDependedPopupAction<DependedList>(this, &DependedList::AddItems));
 	}
 
 	if (!popup)
@@ -155,8 +153,7 @@ void DependedList::setList(const std::map<string, string> &tasks)
 
 //==============================================================================
 
-DependedPopup::DependedPopup(TWidget *parent)
-	: TModalPopup(parent, "DependedList"), m_okAction(0)
+DependedPopup::DependedPopup(TWidget *parent) : TModalPopup(parent, "DependedList"), m_okAction(0)
 {
 	m_submitList = new TTextList(this);
 

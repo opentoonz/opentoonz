@@ -2,12 +2,12 @@
 
 #ifdef __LP64__
 
-//Toonz includes
+// Toonz includes
 #include "tvectorimage.h"
 #include "tstroke.h"
 #include "trop.h"
 
-//Qt includes
+// Qt includes
 #include <QSharedMemory>
 
 /*
@@ -18,7 +18,7 @@
 
 が T=TThickPoint でインスタンス化されようとして曖昧ですエラーになる
 */
-//tipc includes
+// tipc includes
 #include "tipc.h"
 #include "t32bitsrv_wrap.h"
 
@@ -40,7 +40,7 @@ void readVImage(TVectorImageP &vi, tipc::Message &msg)
 {
 	std::vector<TThickPoint> strokeCPs;
 
-	//Read in all strokes
+	// Read in all strokes
 	while (!msg.ds().atEnd()) {
 		strokeCPs.clear();
 		msg >> strokeCPs;
@@ -51,7 +51,7 @@ void readVImage(TVectorImageP &vi, tipc::Message &msg)
 	vi->group(0, vi->getStrokeCount());
 }
 
-} //namespace
+} // namespace
 
 //**************************************************************************
 //    TFontManager Private stuff
@@ -95,8 +95,8 @@ TFontManager *TFontManager::instance()
 
 //--------------------------------------------------------------
 
-//!This function is retained from old 32-bit legacy code.
-//!Its use is now forbidden - use the TFontManager directly instead.
+//! This function is retained from old 32-bit legacy code.
+//! Its use is now forbidden - use the TFontManager directly instead.
 TFont *TFontManager::getCurrentFont()
 {
 	assert(false);
@@ -108,7 +108,7 @@ TFont *TFontManager::getCurrentFont()
 //!\note Throws TFontLibraryLoadingError if fonts could not be loaded
 void TFontManager::loadFontNames()
 {
-	//Connect to the 32-bit background server process
+	// Connect to the 32-bit background server process
 	QLocalSocket socket;
 	tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1, t32bitsrv::srvCmdline());
 
@@ -123,7 +123,7 @@ void TFontManager::loadFontNames()
 //--------------------------------------------------------------
 
 //!\note Throws TFontCreationError if the font could not be created, and
-//!leaves the old font as current.
+//! leaves the old font as current.
 void TFontManager::setFamily(const std::wstring family)
 {
 	QLocalSocket socket;
@@ -140,7 +140,7 @@ void TFontManager::setFamily(const std::wstring family)
 //--------------------------------------------------------------
 
 //!\note Throws TFontCreationError if the font could not be created, and
-//!leaves the old font as current.
+//! leaves the old font as current.
 void TFontManager::setTypeface(const std::wstring typeface)
 {
 	QLocalSocket socket;
@@ -153,7 +153,7 @@ void TFontManager::setTypeface(const std::wstring typeface)
 	if (tipc::readMessage(stream, msg) != "ok")
 		throw TFontCreationError();
 
-	//Also, store the font's ascender and descender
+	// Also, store the font's ascender and descender
 	msg >> m_pimpl->m_ascender >> m_pimpl->m_descender;
 }
 
@@ -249,7 +249,7 @@ void TFontManager::setSize(int size)
 	if (tipc::readMessage(stream, msg) != "ok")
 		throw TException("Unexpected error");
 
-	//Also, update ascender and descender
+	// Also, update ascender and descender
 	msg >> m_pimpl->m_ascender >> m_pimpl->m_descender;
 }
 
@@ -338,7 +338,8 @@ TPoint TFontManager::drawChar(TVectorImageP &outImage, wchar_t charcode, wchar_t
 
 //--------------------------------------------------------------
 
-TPoint TFontManager::drawChar(TRasterGR8P &outImage, TPoint &glyphOrigin, wchar_t charcode, wchar_t nextCode)
+TPoint TFontManager::drawChar(TRasterGR8P &outImage, TPoint &glyphOrigin, wchar_t charcode,
+							  wchar_t nextCode)
 {
 	QLocalSocket socket;
 	tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1, t32bitsrv::srvCmdline());
@@ -348,9 +349,8 @@ TPoint TFontManager::drawChar(TRasterGR8P &outImage, TPoint &glyphOrigin, wchar_
 
 	QString shMemId(tipc::uniqueId()), res;
 	{
-		//Invoke the appropriate command
-		stream << (msg << QString("$FNTdrawCharGR")
-					   << shMemId << charcode << nextCode);
+		// Invoke the appropriate command
+		stream << (msg << QString("$FNTdrawCharGR") << shMemId << charcode << nextCode);
 		if (tipc::readMessage(stream, msg) != "ok")
 			throw TException("Unexpected error");
 	}
@@ -360,21 +360,21 @@ TPoint TFontManager::drawChar(TRasterGR8P &outImage, TPoint &glyphOrigin, wchar_
 	TPoint ret;
 	msg >> ret.x >> ret.y;
 
-	//Create outImage
+	// Create outImage
 	outImage = TRasterGR8P(dim.lx, dim.ly);
 
 	QSharedMemory shmem(shMemId);
 	shmem.attach();
 	shmem.lock();
 
-	//Copy the returned image to outImage
+	// Copy the returned image to outImage
 	TRasterGR8P ras(dim.lx, dim.ly, dim.lx, (TPixelGR8 *)shmem.data());
 	TRop::copy(outImage, ras);
 
 	shmem.unlock();
 	shmem.detach();
 
-	//Release the shared segment
+	// Release the shared segment
 	stream << (msg << tipc::clr << QString("$shmem_release") << shMemId);
 	if (tipc::readMessage(stream, msg) != "ok")
 		throw TException("Unexpected error");
@@ -384,8 +384,8 @@ TPoint TFontManager::drawChar(TRasterGR8P &outImage, TPoint &glyphOrigin, wchar_
 
 //--------------------------------------------------------------
 
-TPoint TFontManager::drawChar(TRasterCM32P &outImage, TPoint &glyphOrigin,
-							  int inkId, wchar_t charcode, wchar_t nextCode)
+TPoint TFontManager::drawChar(TRasterCM32P &outImage, TPoint &glyphOrigin, int inkId,
+							  wchar_t charcode, wchar_t nextCode)
 {
 	QLocalSocket socket;
 	tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1, t32bitsrv::srvCmdline());
@@ -395,9 +395,8 @@ TPoint TFontManager::drawChar(TRasterCM32P &outImage, TPoint &glyphOrigin,
 
 	QString shMemId(tipc::uniqueId()), res;
 	{
-		//Invoke the appropriate command
-		stream << (msg << QString("$FNTdrawCharCM")
-					   << inkId << shMemId << charcode << nextCode);
+		// Invoke the appropriate command
+		stream << (msg << QString("$FNTdrawCharCM") << inkId << shMemId << charcode << nextCode);
 		if (tipc::readMessage(stream, msg) != "ok")
 			throw TException("Unexpected error");
 	}
@@ -407,21 +406,21 @@ TPoint TFontManager::drawChar(TRasterCM32P &outImage, TPoint &glyphOrigin,
 	TPoint ret;
 	msg >> ret.x >> ret.y;
 
-	//Create outImage
+	// Create outImage
 	outImage = TRasterCM32P(dim.lx, dim.ly);
 
 	QSharedMemory shmem(shMemId);
 	shmem.attach();
 	shmem.lock();
 
-	//Copy the returned image to outImage
+	// Copy the returned image to outImage
 	TRasterCM32P ras(dim.lx, dim.ly, dim.lx, (TPixelCM32 *)shmem.data());
 	TRop::copy(outImage, ras);
 
 	shmem.unlock();
 	shmem.detach();
 
-	//Release the shared segment
+	// Release the shared segment
 	stream << (msg << tipc::clr << QString("$shmem_release") << shMemId);
 	if (tipc::readMessage(stream, msg) != "ok")
 		throw TException("Unexpected error");

@@ -58,23 +58,16 @@ class ReverseUndo : public TUndo
 {
 	int m_r0, m_c0, m_r1, m_c1;
 
-public:
-	ReverseUndo(int r0, int c0, int r1, int c1)
-		: m_r0(r0), m_c0(c0), m_r1(r1), m_c1(c1) {}
+  public:
+	ReverseUndo(int r0, int c0, int r1, int c1) : m_r0(r0), m_c0(c0), m_r1(r1), m_c1(c1) {}
 
 	void redo() const;
 	void undo() const { redo(); } // Reverse is idempotent :)
 
 	int getSize() const { return sizeof(*this); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Reverse");
-	}
-	int getHistoryType()
-	{
-		return HistoryType::Xsheet;
-	}
+	QString getHistoryString() { return QObject::tr("Reverse"); }
+	int getHistoryType() { return HistoryType::Xsheet; }
 };
 
 //-----------------------------------------------------------------------------
@@ -115,23 +108,16 @@ class SwingUndo : public TUndo
 {
 	int m_r0, m_c0, m_r1, m_c1;
 
-public:
-	SwingUndo(int r0, int c0, int r1, int c1)
-		: m_r0(r0), m_c0(c0), m_r1(r1), m_c1(c1) {}
+  public:
+	SwingUndo(int r0, int c0, int r1, int c1) : m_r0(r0), m_c0(c0), m_r1(r1), m_c1(c1) {}
 
 	void redo() const;
 	void undo() const;
 
 	int getSize() const { return sizeof(*this); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Swing");
-	}
-	int getHistoryType()
-	{
-		return HistoryType::Xsheet;
-	}
+	QString getHistoryString() { return QObject::tr("Swing"); }
+	int getHistoryType() { return HistoryType::Xsheet; }
 };
 
 //-----------------------------------------------------------------------------
@@ -151,8 +137,7 @@ void SwingUndo::undo() const
 	TCG_ASSERT(m_r1 >= m_r0 && m_c1 >= m_c0, return );
 
 	for (int c = m_c0; c <= m_c1; ++c)
-		TApp::instance()->getCurrentXsheet()->getXsheet()->removeCells(
-			m_r1 + 1, c, m_r1 - m_r0);
+		TApp::instance()->getCurrentXsheet()->getXsheet()->removeCells(m_r1 + 1, c, m_r1 - m_r0);
 
 	TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
 	TApp::instance()->getCurrentScene()->setDirtyFlag(true);
@@ -185,26 +170,22 @@ class IncrementUndo : public TUndo
 	int m_r0, m_c0, m_r1, m_c1;
 	mutable std::vector<std::pair<TRect, TXshCell>> m_undoCells;
 
-public:
+  public:
 	mutable bool m_ok;
 
-public:
+  public:
 	IncrementUndo(int r0, int c0, int r1, int c1)
-		: m_r0(r0), m_c0(c0), m_r1(r1), m_c1(c1), m_ok(true) {}
+		: m_r0(r0), m_c0(c0), m_r1(r1), m_c1(c1), m_ok(true)
+	{
+	}
 
 	void redo() const;
 	void undo() const;
 
 	int getSize() const { return sizeof(*this); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Autoexpose");
-	}
-	int getHistoryType()
-	{
-		return HistoryType::Xsheet;
-	}
+	QString getHistoryString() { return QObject::tr("Autoexpose"); }
+	int getHistoryType() { return HistoryType::Xsheet; }
 };
 
 //-----------------------------------------------------------------------------
@@ -214,8 +195,8 @@ void IncrementUndo::redo() const
 	TCG_ASSERT(m_r1 >= m_r0 && m_c1 >= m_c0, return );
 
 	m_undoCells.clear();
-	m_ok = TApp::instance()->getCurrentXsheet()->getXsheet()->incrementCells(
-		m_r0, m_c0, m_r1, m_c1, m_undoCells);
+	m_ok = TApp::instance()->getCurrentXsheet()->getXsheet()->incrementCells(m_r0, m_c0, m_r1, m_c1,
+																			 m_undoCells);
 
 	TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
 	TApp::instance()->getCurrentScene()->setDirtyFlag(true);
@@ -257,11 +238,12 @@ void TCellSelection::incrementCells()
 
 	TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
 
-	std::auto_ptr<IncrementUndo> undo(new IncrementUndo(
-		m_range.m_r0, m_range.m_c0, m_range.m_r1, m_range.m_c1));
+	std::auto_ptr<IncrementUndo> undo(
+		new IncrementUndo(m_range.m_r0, m_range.m_c0, m_range.m_r1, m_range.m_c1));
 
 	if (undo->redo(), !undo->m_ok) {
-		DVGui::error(QObject::tr("Invalid selection: each selected column must contain one single level with increasing frame numbering."));
+		DVGui::error(QObject::tr("Invalid selection: each selected column must contain one single "
+								 "level with increasing frame numbering."));
 		return;
 	}
 
@@ -282,7 +264,7 @@ class RandomUndo : public TUndo
 	std::vector<int> m_shuffle; //!< Shuffled indices
 	std::vector<int> m_elffuhs; //!< Inverse shuffle indices
 
-public:
+  public:
 	RandomUndo(int r0, int c0, int r1, int c1);
 
 	void shuffleCells(int row, int col, const std::vector<int> &data) const;
@@ -292,20 +274,13 @@ public:
 
 	int getSize() const { return sizeof(*this) + 2 * sizeof(int) * m_shuffle.size(); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Random");
-	}
-	int getHistoryType()
-	{
-		return HistoryType::Xsheet;
-	}
+	QString getHistoryString() { return QObject::tr("Random"); }
+	int getHistoryType() { return HistoryType::Xsheet; }
 };
 
 //-----------------------------------------------------------------------------
 
-RandomUndo::RandomUndo(int r0, int c0, int r1, int c1)
-	: m_r0(r0), m_c0(c0), m_r1(r1), m_c1(c1)
+RandomUndo::RandomUndo(int r0, int c0, int r1, int c1) : m_r0(r0), m_c0(c0), m_r1(r1), m_c1(c1)
 {
 	TCG_ASSERT(m_r1 >= m_r0 && m_c1 >= m_c0, return );
 
@@ -398,7 +373,7 @@ class StepUndo : public TUndo
 
 	tcg::unique_ptr<TXshCell[]> m_cells;
 
-public:
+  public:
 	StepUndo(int r0, int c0, int r1, int c1, int step);
 
 	void redo() const;
@@ -406,20 +381,16 @@ public:
 
 	int getSize() const { return sizeof(*this); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Step %1").arg(QString::number(m_step));
-	}
-	int getHistoryType()
-	{
-		return HistoryType::Xsheet;
-	}
+	QString getHistoryString() { return QObject::tr("Step %1").arg(QString::number(m_step)); }
+	int getHistoryType() { return HistoryType::Xsheet; }
 };
 
 //-----------------------------------------------------------------------------
 
 StepUndo::StepUndo(int r0, int c0, int r1, int c1, int step)
-	: m_r0(r0), m_c0(c0), m_r1(r1), m_c1(c1), m_rowsCount(r1 - r0 + 1), m_colsCount(c1 - c0 + 1), m_step(step), m_newRows(m_rowsCount * (step - 1)), m_cells(new TXshCell[m_rowsCount * m_colsCount])
+	: m_r0(r0), m_c0(c0), m_r1(r1), m_c1(c1), m_rowsCount(r1 - r0 + 1), m_colsCount(c1 - c0 + 1),
+	  m_step(step), m_newRows(m_rowsCount * (step - 1)),
+	  m_cells(new TXshCell[m_rowsCount * m_colsCount])
 {
 	assert(m_rowsCount > 0 && m_colsCount > 0 && step > 0);
 	assert(m_cells.get());
@@ -500,7 +471,7 @@ class EachUndo : public TUndo
 
 	tcg::unique_ptr<TXshCell[]> m_cells;
 
-public:
+  public:
 	EachUndo(int r0, int c0, int r1, int c1, int each);
 
 	void redo() const;
@@ -508,20 +479,16 @@ public:
 
 	int getSize() const { return sizeof(*this); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Each %1").arg(QString::number(m_each));
-	}
-	int getHistoryType()
-	{
-		return HistoryType::Xsheet;
-	}
+	QString getHistoryString() { return QObject::tr("Each %1").arg(QString::number(m_each)); }
+	int getHistoryType() { return HistoryType::Xsheet; }
 };
 
 //-----------------------------------------------------------------------------
 
 EachUndo::EachUndo(int r0, int c0, int r1, int c1, int each)
-	: m_r0(r0), m_c0(c0), m_r1(r1), m_c1(c1), m_rowsCount(r1 - r0 + 1), m_colsCount(c1 - c0 + 1), m_each(each), m_newRows((m_rowsCount % each) ? m_rowsCount / each + 1 : m_rowsCount / each), m_cells(new TXshCell[m_rowsCount * m_colsCount])
+	: m_r0(r0), m_c0(c0), m_r1(r1), m_c1(c1), m_rowsCount(r1 - r0 + 1), m_colsCount(c1 - c0 + 1),
+	  m_each(each), m_newRows((m_rowsCount % each) ? m_rowsCount / each + 1 : m_rowsCount / each),
+	  m_cells(new TXshCell[m_rowsCount * m_colsCount])
 {
 	assert(m_rowsCount > 0 && m_colsCount > 0 && each > 0);
 	assert(m_cells.get());
@@ -600,7 +567,7 @@ class ReframeUndo : public TUndo
 	int m_nr;
 	std::unique_ptr<TXshCell[]> m_cells;
 
-public:
+  public:
 	std::vector<int> m_newRows;
 
 	std::vector<int> m_columnIndeces;
@@ -611,19 +578,13 @@ public:
 	void redo() const;
 	void repeat() const;
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 
 	QString getHistoryString()
 	{
 		return QObject::tr("Reframe to %1's").arg(QString::number(m_type));
 	}
-	int getHistoryType()
-	{
-		return HistoryType::Xsheet;
-	}
+	int getHistoryType() { return HistoryType::Xsheet; }
 };
 
 //-----------------------------------------------------------------------------
@@ -638,7 +599,8 @@ ReframeUndo::ReframeUndo(int r0, int r1, std::vector<int> columnIndeces, int typ
 	int k = 0;
 	for (int r = r0; r <= r1; r++)
 		for (int c = 0; c < (int)m_columnIndeces.size(); c++)
-			m_cells[k++] = TApp::instance()->getCurrentXsheet()->getXsheet()->getCell(r, m_columnIndeces[c]);
+			m_cells[k++] =
+				TApp::instance()->getCurrentXsheet()->getXsheet()->getCell(r, m_columnIndeces[c]);
 
 	m_newRows.clear();
 }
@@ -719,7 +681,8 @@ void TCellSelection::reframeCells(int count)
 	ReframeUndo *undo = new ReframeUndo(m_range.m_r0, m_range.m_r1, colIndeces, count);
 
 	for (int c = m_range.m_c0; c <= m_range.m_c1; c++) {
-		int nrows = TApp::instance()->getCurrentXsheet()->getXsheet()->reframeCells(m_range.m_r0, m_range.m_r1, c, count);
+		int nrows = TApp::instance()->getCurrentXsheet()->getXsheet()->reframeCells(
+			m_range.m_r0, m_range.m_r1, c, count);
 		undo->m_newRows.push_back(nrows);
 	}
 
@@ -743,7 +706,8 @@ void TColumnSelection::reframeCells(int count)
 	ReframeUndo *undo = new ReframeUndo(0, rowCount - 1, colIndeces, count);
 
 	for (int c = 0; c < (int)colIndeces.size(); c++) {
-		int nrows = TApp::instance()->getCurrentXsheet()->getXsheet()->reframeCells(0, rowCount - 1, colIndeces[c], count);
+		int nrows = TApp::instance()->getCurrentXsheet()->getXsheet()->reframeCells(
+			0, rowCount - 1, colIndeces[c], count);
 		undo->m_newRows.push_back(nrows);
 	}
 
@@ -768,7 +732,7 @@ class ResetStepUndo : public TUndo
 	tcg::unique_ptr<TXshCell[]> m_cells;
 	QMap<int, int> m_insertedCells; //!< Count of inserted cells, by column
 
-public:
+  public:
 	ResetStepUndo(int r0, int c0, int r1, int c1);
 
 	void redo() const;
@@ -780,7 +744,8 @@ public:
 //-----------------------------------------------------------------------------
 
 ResetStepUndo::ResetStepUndo(int r0, int c0, int r1, int c1)
-	: m_r0(r0), m_c0(c0), m_r1(r1), m_c1(c1), m_rowsCount(m_r1 - m_r0 + 1), m_colsCount(m_c1 - m_c0 + 1), m_cells(new TXshCell[m_rowsCount * m_colsCount])
+	: m_r0(r0), m_c0(c0), m_r1(r1), m_c1(c1), m_rowsCount(m_r1 - m_r0 + 1),
+	  m_colsCount(m_c1 - m_c0 + 1), m_cells(new TXshCell[m_rowsCount * m_colsCount])
 {
 	assert(m_rowsCount > 0 && m_colsCount > 0);
 	assert(m_cells.get());
@@ -866,10 +831,10 @@ class IncreaseStepUndo : public TUndo
 	tcg::unique_ptr<TXshCell[]> m_cells;
 	QMap<int, int> m_insertedCells;
 
-public:
+  public:
 	mutable int m_newR1; //!< r1 updated by TXsheet::increaseStepCells()
 
-public:
+  public:
 	IncreaseStepUndo(int r0, int c0, int r1, int c1);
 
 	void redo() const;
@@ -881,7 +846,8 @@ public:
 //-----------------------------------------------------------------------------
 
 IncreaseStepUndo::IncreaseStepUndo(int r0, int c0, int r1, int c1)
-	: m_r0(r0), m_c0(c0), m_r1(r1), m_c1(c1), m_rowsCount(m_r1 - m_r0 + 1), m_colsCount(m_c1 - m_c0 + 1), m_cells(new TXshCell[m_rowsCount * m_colsCount]), m_newR1(m_r1)
+	: m_r0(r0), m_c0(c0), m_r1(r1), m_c1(c1), m_rowsCount(m_r1 - m_r0 + 1),
+	  m_colsCount(m_c1 - m_c0 + 1), m_cells(new TXshCell[m_rowsCount * m_colsCount]), m_newR1(m_r1)
 {
 	assert(m_cells.get());
 
@@ -942,7 +908,8 @@ void TCellSelection::increaseStepCells()
 	if (isEmpty() || areAllColSelectedLocked())
 		return;
 
-	IncreaseStepUndo *undo = new IncreaseStepUndo(m_range.m_r0, m_range.m_c0, m_range.m_r1, m_range.m_c1);
+	IncreaseStepUndo *undo =
+		new IncreaseStepUndo(m_range.m_r0, m_range.m_c0, m_range.m_r1, m_range.m_c1);
 	TUndoManager::manager()->add(undo);
 
 	undo->redo();
@@ -968,10 +935,10 @@ class DecreaseStepUndo : public TUndo
 	tcg::unique_ptr<TXshCell[]> m_cells;
 	QMap<int, int> m_removedCells;
 
-public:
+  public:
 	mutable int m_newR1; //!< r1 updated by TXsheet::decreaseStepCells()
 
-public:
+  public:
 	DecreaseStepUndo(int r0, int c0, int r1, int c1);
 
 	void redo() const;
@@ -983,7 +950,8 @@ public:
 //-----------------------------------------------------------------------------
 
 DecreaseStepUndo::DecreaseStepUndo(int r0, int c0, int r1, int c1)
-	: m_r0(r0), m_c0(c0), m_r1(r1), m_c1(c1), m_rowsCount(m_r1 - m_r0 + 1), m_colsCount(m_c1 - m_c0 + 1), m_cells(new TXshCell[m_rowsCount * m_colsCount]), m_newR1(m_r1)
+	: m_r0(r0), m_c0(c0), m_r1(r1), m_c1(c1), m_rowsCount(m_r1 - m_r0 + 1),
+	  m_colsCount(m_c1 - m_c0 + 1), m_cells(new TXshCell[m_rowsCount * m_colsCount]), m_newR1(m_r1)
 {
 	assert(m_cells.get());
 
@@ -1049,7 +1017,8 @@ void DecreaseStepUndo::undo() const
 
 void TCellSelection::decreaseStepCells()
 {
-	DecreaseStepUndo *undo = new DecreaseStepUndo(m_range.m_r0, m_range.m_c0, m_range.m_r1, m_range.m_c1);
+	DecreaseStepUndo *undo =
+		new DecreaseStepUndo(m_range.m_r0, m_range.m_c0, m_range.m_r1, m_range.m_c1);
 	TUndoManager::manager()->add(undo);
 
 	undo->redo();
@@ -1071,9 +1040,8 @@ class RollupUndo : public TUndo
 {
 	int m_r0, m_c0, m_r1, m_c1;
 
-public:
-	RollupUndo(int r0, int c0, int r1, int c1)
-		: m_r0(r0), m_c0(c0), m_r1(r1), m_c1(c1) {}
+  public:
+	RollupUndo(int r0, int c0, int r1, int c1) : m_r0(r0), m_c0(c0), m_r1(r1), m_c1(c1) {}
 
 	void redo() const
 	{
@@ -1099,14 +1067,8 @@ public:
 
 	int getSize() const { return sizeof(*this); }
 
-	virtual QString getHistoryString()
-	{
-		return QObject::tr("Roll Up");
-	}
-	int getHistoryType()
-	{
-		return HistoryType::Xsheet;
-	}
+	virtual QString getHistoryString() { return QObject::tr("Roll Up"); }
+	int getHistoryType() { return HistoryType::Xsheet; }
 };
 
 } // namespace
@@ -1130,16 +1092,13 @@ namespace
 
 class RolldownUndo : public RollupUndo
 {
-public:
+  public:
 	RolldownUndo(int r0, int c0, int r1, int c1) : RollupUndo(r0, c0, r1, c1) {}
 
 	void redo() const { RollupUndo::undo(); }
 	void undo() const { RollupUndo::redo(); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Roll Down");
-	}
+	QString getHistoryString() { return QObject::tr("Roll Down"); }
 };
 
 } // namespace
@@ -1216,19 +1175,21 @@ class CloneLevelUndo : public TUndo
 	struct ExistsFunc;
 	class LevelNamePopup;
 
-private:
+  private:
 	TCellSelection::Range m_range;
 
 	mutable InsertedLevelsMap m_insertedLevels;
 	mutable InsertedColumnsSet m_insertedColumns;
 	mutable bool m_clonedLevels;
 
-public:
+  public:
 	mutable bool m_ok;
 
-public:
+  public:
 	CloneLevelUndo(const TCellSelection::Range &range)
-		: m_range(range), m_clonedLevels(false), m_ok(false) {}
+		: m_range(range), m_clonedLevels(false), m_ok(false)
+	{
+	}
 
 	void redo() const;
 	void undo() const;
@@ -1259,18 +1220,15 @@ public:
 		}
 		return str;
 	}
-	int getHistoryType()
-	{
-		return HistoryType::Xsheet;
-	}
+	int getHistoryType() { return HistoryType::Xsheet; }
 
-private:
+  private:
 	TXshSimpleLevel *cloneLevel(const TXshSimpleLevel *srcSl, const TFilePath &dstPath,
 								const std::set<TFrameId> &frames) const;
 
 	bool chooseLevelName(TFilePath &fp) const;
-	bool chooseOverwrite(OverwriteDialog *dialog,
-						 TFilePath &dstPath, TXshSimpleLevel *&dstSl) const;
+	bool chooseOverwrite(OverwriteDialog *dialog, TFilePath &dstPath,
+						 TXshSimpleLevel *&dstSl) const;
 
 	void cloneLevels() const;
 	void insertLevels() const;
@@ -1282,18 +1240,18 @@ private:
 struct CloneLevelUndo::ExistsFunc : public OverwriteDialog::ExistsFunc {
 	ToonzScene *m_scene;
 
-public:
+  public:
 	ExistsFunc(ToonzScene *scene) : m_scene(scene) {}
 
 	QString conflictString(const TFilePath &fp) const
 	{
-		return OverwriteDialog::tr("Level \"%1\" already exists.\n\nWhat do you want to do?").arg(QString::fromStdWString(fp.withoutParentDir().getWideString()));
+		return OverwriteDialog::tr("Level \"%1\" already exists.\n\nWhat do you want to do?")
+			.arg(QString::fromStdWString(fp.withoutParentDir().getWideString()));
 	}
 
 	bool operator()(const TFilePath &fp) const
 	{
-		return TSystem::doesExistFileOrLevel(fp) ||
-			   m_scene->getLevelSet()->getLevel(*m_scene, fp);
+		return TSystem::doesExistFileOrLevel(fp) || m_scene->getLevelSet()->getLevel(*m_scene, fp);
 	}
 };
 
@@ -1304,7 +1262,7 @@ class CloneLevelUndo::LevelNamePopup : public DVGui::Dialog
 	DVGui::LineEdit *m_name;
 	QPushButton *m_ok, *m_cancel;
 
-public:
+  public:
 	LevelNamePopup(const std::wstring &defaultLevelName)
 		: DVGui::Dialog(TApp::instance()->getMainWindow(), true, true, "Clone Level")
 	{
@@ -1337,9 +1295,8 @@ public:
 
 //-----------------------------------------------------------------------------
 
-TXshSimpleLevel *CloneLevelUndo::cloneLevel(
-	const TXshSimpleLevel *srcSl, const TFilePath &dstPath,
-	const std::set<TFrameId> &frames) const
+TXshSimpleLevel *CloneLevelUndo::cloneLevel(const TXshSimpleLevel *srcSl, const TFilePath &dstPath,
+											const std::set<TFrameId> &frames) const
 {
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 
@@ -1397,8 +1354,8 @@ bool CloneLevelUndo::chooseLevelName(TFilePath &fp) const
 
 //-----------------------------------------------------------------------------
 
-bool CloneLevelUndo::chooseOverwrite(
-	OverwriteDialog *dialog, TFilePath &dstPath, TXshSimpleLevel *&dstSl) const
+bool CloneLevelUndo::chooseOverwrite(OverwriteDialog *dialog, TFilePath &dstPath,
+									 TXshSimpleLevel *&dstSl) const
 {
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 	ExistsFunc exists(scene);
@@ -1465,8 +1422,8 @@ void CloneLevelUndo::cloneLevels() const
 
 			// Build the destination level data
 			TXshSimpleLevel *dstSl = 0;
-			TFilePath dstPath = scene->decodeFilePath(
-				srcPath.withName(srcPath.getWideName() + L"_clone"));
+			TFilePath dstPath =
+				scene->decodeFilePath(srcPath.withName(srcPath.getWideName() + L"_clone"));
 
 			// Ask user to suggest an appropriate level name
 			if (askCloneName && !chooseLevelName(dstPath))
@@ -1482,7 +1439,8 @@ void CloneLevelUndo::cloneLevels() const
 					continue;
 			}
 
-			// If the destination level was not retained from existing data, it must be created and cloned
+			// If the destination level was not retained from existing data, it must be created and
+			// cloned
 			if (!dstSl)
 				dstSl = cloneLevel(srcSl, dstPath, lt->second);
 

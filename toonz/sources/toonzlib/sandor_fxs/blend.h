@@ -23,4 +23,4 @@ struct BlendParam {
 template <typename PIXEL>
 void blend(TToonzImageP ti, TRasterPT<PIXEL> rasOut, const std::vector<BlendParam> &params);
 
-#endif //BLEND_INCLUDE
+#endif // BLEND_INCLUDE

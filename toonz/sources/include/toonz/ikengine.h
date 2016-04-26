@@ -22,7 +22,7 @@ class DVAPI IKEngine
 
 	IKSkeleton m_skeleton;
 
-public:
+  public:
 	IKEngine();
 
 	// n.b. root index == 0
@@ -62,11 +62,11 @@ public:
 	// trascino il punto index
 	void drag(TPointD &pos);
 
-private:
+  private:
 	std::vector<TPointD> target;
 	void doUpdateStep(Jacobian &jacobian);
 	void setSequenceJoints();
 };
 
 //#endif
-#endif //IKENGINE_H
+#endif // IKENGINE_H

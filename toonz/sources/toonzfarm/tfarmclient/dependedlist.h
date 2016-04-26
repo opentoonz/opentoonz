@@ -16,21 +16,20 @@ class TaskShortInfo;
 
 class TGenericDependedPopupAction
 {
-public:
+  public:
 	virtual ~TGenericDependedPopupAction() {}
 	virtual void sendCommand(const vector<string> &) = 0;
 };
 
 //-------------------------------------------------------------------
 
-template <class T>
-class TDependedPopupAction : public TGenericDependedPopupAction
+template <class T> class TDependedPopupAction : public TGenericDependedPopupAction
 {
-public:
+  public:
 	typedef void (T::*Method)(const vector<string> &);
 	TDependedPopupAction(T *target, Method method) : m_target(target), m_method(method) {}
 	void sendCommand(const vector<string> &tasks) { (m_target->*m_method)(tasks); }
-private:
+  private:
 	T *m_target;
 	Method m_method;
 };
@@ -44,7 +43,7 @@ class DependedList : public TWidget
 	TButton *m_remove;
 	map<string, string> m_tasks;
 
-public:
+  public:
 	DependedList(TWidget *parent);
 
 	void configureNotify(const TDimension &size);
@@ -59,7 +58,7 @@ public:
 
 class DependedPopup : public TModalPopup
 {
-public:
+  public:
 	DependedPopup(TWidget *parent);
 
 	void configureNotify(const TDimension &d);
@@ -71,7 +70,7 @@ public:
 
 	void setOkAction(TGenericDependedPopupAction *action);
 
-private:
+  private:
 	TTextList *m_submitList;
 	TButton *m_ok;
 	TButton *m_cancel;

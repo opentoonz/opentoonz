@@ -127,20 +127,17 @@ class RectFullColorUndo : public TFullColorRasterUndo
 	std::wstring m_eraseType;
 	bool m_invert;
 
-public:
+  public:
 	RectFullColorUndo(TTileSetFullColor *tileSet, const TRectD &modifyArea, TStroke stroke,
-					  std::wstring eraseType,
-					  TXshSimpleLevel *level, bool invert,
+					  std::wstring eraseType, TXshSimpleLevel *level, bool invert,
 					  const TFrameId &frameId)
-		: TFullColorRasterUndo(tileSet, level, frameId, false, false, 0), m_modifyArea(modifyArea), m_eraseType(eraseType), m_invert(invert)
+		: TFullColorRasterUndo(tileSet, level, frameId, false, false, 0), m_modifyArea(modifyArea),
+		  m_eraseType(eraseType), m_invert(invert)
 	{
 		m_stroke = new TStroke(stroke);
 	}
 
-	~RectFullColorUndo()
-	{
-		delete m_stroke;
-	}
+	~RectFullColorUndo() { delete m_stroke; }
 
 	void redo() const
 	{
@@ -167,20 +164,12 @@ public:
 	int getSize() const
 	{
 		return TFullColorRasterUndo::getSize() +
-			   m_stroke->getControlPointCount() * sizeof(TThickPoint) +
-			   100 +
-			   sizeof(this);
+			   m_stroke->getControlPointCount() * sizeof(TThickPoint) + 100 + sizeof(this);
 	}
 
-	virtual QString getToolName()
-	{
-		return QString("Raster Eraser Tool (Rect)");
-	}
+	virtual QString getToolName() { return QString("Raster Eraser Tool (Rect)"); }
 
-	int getHistoryType()
-	{
-		return HistoryType::EraserTool;
-	}
+	int getHistoryType() { return HistoryType::EraserTool; }
 };
 
 //----------------------------------------------------------------------------------
@@ -192,12 +181,14 @@ class FullColorEraserUndo : public TFullColorRasterUndo
 	double m_hardness;
 	double m_opacity;
 
-public:
-	FullColorEraserUndo(TTileSetFullColor *tileSet,
-						const std::vector<TThickPoint> &points,
-						TXshSimpleLevel *level, const TFrameId &frameId,
-						int size, double hardness, double opacity)
-		: TFullColorRasterUndo(tileSet, level, frameId, false, false, 0), m_points(points), m_size(size), m_hardness(hardness), m_opacity(opacity) {}
+  public:
+	FullColorEraserUndo(TTileSetFullColor *tileSet, const std::vector<TThickPoint> &points,
+						TXshSimpleLevel *level, const TFrameId &frameId, int size, double hardness,
+						double opacity)
+		: TFullColorRasterUndo(tileSet, level, frameId, false, false, 0), m_points(points),
+		  m_size(size), m_hardness(hardness), m_opacity(opacity)
+	{
+	}
 
 	void redo() const
 	{
@@ -239,25 +230,16 @@ public:
 		notifyImageChanged();
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this) + TFullColorRasterUndo::getSize();
-	}
+	int getSize() const { return sizeof(*this) + TFullColorRasterUndo::getSize(); }
 
-	virtual QString getToolName()
-	{
-		return QString("Raster Eraser Tool");
-	}
-	int getHistoryType()
-	{
-		return HistoryType::EraserTool;
-	}
+	virtual QString getToolName() { return QString("Raster Eraser Tool"); }
+	int getHistoryType() { return HistoryType::EraserTool; }
 };
 
 //----------------------------------------------------------------------------------
 
-void eraseStroke(const TRasterImageP &ri, TStroke *stroke, std::wstring eraseType,
-				 bool invert, const TXshSimpleLevelP &level, const TFrameId &frameId)
+void eraseStroke(const TRasterImageP &ri, TStroke *stroke, std::wstring eraseType, bool invert,
+				 const TXshSimpleLevelP &level, const TFrameId &frameId)
 {
 	assert(stroke);
 	TPoint pos;
@@ -277,8 +259,8 @@ void eraseStroke(const TRasterImageP &ri, TStroke *stroke, std::wstring eraseTyp
 	TTileSetFullColor *tileSet = new TTileSetFullColor(ras->getSize());
 	tileSet->add(ras, area);
 
-	TUndoManager::manager()->add(new RectFullColorUndo(tileSet, convert(area), *stroke, eraseType, level.getPointer(),
-													   invert, frameId));
+	TUndoManager::manager()->add(new RectFullColorUndo(tileSet, convert(area), *stroke, eraseType,
+													   level.getPointer(), invert, frameId));
 
 	eraseImage(ri, image, pos, invert);
 }
@@ -293,7 +275,7 @@ class FullColorEraserTool : public TTool
 {
 	Q_DECLARE_TR_FUNCTIONS(FullColorEraserTool)
 
-public:
+  public:
 	FullColorEraserTool(std::string name);
 	~FullColorEraserTool();
 
@@ -320,21 +302,19 @@ public:
 	void onImageChanged();
 	void onEnter();
 
-	void update(const TRasterImageP &ri, TRectD selArea, const TXshSimpleLevelP &level, bool multi = false,
-				const TFrameId &frameId = -1);
+	void update(const TRasterImageP &ri, TRectD selArea, const TXshSimpleLevelP &level,
+				bool multi = false, const TFrameId &frameId = -1);
 	void multiUpdate(const TRectD firstRect, const TRectD lastRect);
 
-	void multiAreaEraser(TFrameId &firstFid, TFrameId &lastFid,
-						 TStroke *firstStroke, TStroke *lastStroke);
+	void multiAreaEraser(TFrameId &firstFid, TFrameId &lastFid, TStroke *firstStroke,
+						 TStroke *lastStroke);
 
-	void doMultiEraser(const TImageP &img, double t,
-					   const TFrameId &fid,
-					   const TVectorImageP &firstImage,
-					   const TVectorImageP &lastImage);
+	void doMultiEraser(const TImageP &img, double t, const TFrameId &fid,
+					   const TVectorImageP &firstImage, const TVectorImageP &lastImage);
 
 	void resetMulti();
 
-private:
+  private:
 	TPropertyGroup m_prop;
 
 	TIntProperty m_size;
@@ -347,8 +327,7 @@ private:
 	TXshSimpleLevelP m_level;
 	std::pair<int, int> m_currCell;
 
-	TFrameId m_firstFrameId,
-		m_veryFirstFrameId;
+	TFrameId m_firstFrameId, m_veryFirstFrameId;
 
 	TRaster32P m_workRaster;
 	TRasterP m_backUpRas;
@@ -365,26 +344,24 @@ private:
 	std::vector<TPointD> m_polyline;
 	TStroke *m_firstStroke;
 
-	TRectD m_selectingRect,
-		m_firstRect;
+	TRectD m_selectingRect, m_firstRect;
 
-	TPointD m_mousePos,
-		m_brushPos,
-		m_firstPos;
+	TPointD m_mousePos, m_brushPos, m_firstPos;
 
 	double m_thick;
 
-	bool m_firstTime,
-		m_selecting,
-		m_firstFrameSelected,
-		m_isXsheetCell;
+	bool m_firstTime, m_selecting, m_firstFrameSelected, m_isXsheetCell;
 
 } fullColorEraser(T_Eraser); // Tools are statically instantiated
 
 //===================================================================================================
 
 FullColorEraserTool::FullColorEraserTool(std::string name)
-	: TTool(name), m_size("Size:", 1, 100, 5, false), m_opacity("Opacity:", 0, 100, 100), m_hardness("Hardness:", 0, 100, 100), m_eraseType("Type:"), m_invertOption("Invert", false), m_multi("Frame Range", false), m_currCell(-1, -1), m_brush(0), m_tileSet(0), m_tileSaver(0), m_thick(0.5), m_firstTime(true), m_selecting(false), m_firstFrameSelected(false), m_isXsheetCell(false)
+	: TTool(name), m_size("Size:", 1, 100, 5, false), m_opacity("Opacity:", 0, 100, 100),
+	  m_hardness("Hardness:", 0, 100, 100), m_eraseType("Type:"), m_invertOption("Invert", false),
+	  m_multi("Frame Range", false), m_currCell(-1, -1), m_brush(0), m_tileSet(0), m_tileSaver(0),
+	  m_thick(0.5), m_firstTime(true), m_selecting(false), m_firstFrameSelected(false),
+	  m_isXsheetCell(false)
 {
 	bind(TTool::RasterImage);
 
@@ -505,7 +482,8 @@ void FullColorEraserTool::leftButtonDown(const TPointD &pos, const TMouseEvent &
 		m_track.add(TThickPoint(pos, m_thick), pixelSize2);
 		TPointD dpiScale = m_viewer->getDpiScale();
 
-		TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White : TPixel32::Black;
+		TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White
+																				  : TPixel32::Black;
 		tglColor(color);
 
 		getViewer()->startForegroundDrawing();
@@ -602,7 +580,8 @@ void FullColorEraserTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &
 	}
 	if (m_eraseType.getValue() == FREEHANDERASE) {
 		getViewer()->startForegroundDrawing();
-		TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White : TPixel32::Black;
+		TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White
+																				  : TPixel32::Black;
 		tglColor(color);
 		glPushMatrix();
 		tglMultMatrix(getMatrix());
@@ -659,8 +638,9 @@ void FullColorEraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e)
 		TXshLevel *level = app->getCurrentLevel()->getLevel();
 		TXshSimpleLevelP simLevel = level->getSimpleLevel();
 		TFrameId frameId = getCurrentFid();
-		TUndoManager::manager()->add(new FullColorEraserUndo(m_tileSet, m_points, simLevel.getPointer(),
-															 frameId, m_size.getValue(), m_hardness.getValue() * 0.01, opacity));
+		TUndoManager::manager()->add(
+			new FullColorEraserUndo(m_tileSet, m_points, simLevel.getPointer(), frameId,
+									m_size.getValue(), m_hardness.getValue() * 0.01, opacity));
 		notifyImageChanged();
 	} else if (m_eraseType.getValue() == RECTERASE) {
 		if (m_selectingRect.x0 > m_selectingRect.x1)
@@ -704,7 +684,8 @@ void FullColorEraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e)
 					rect01 = TRasterImageUtils::convertRasterToWorld(convert(rect01), ri);
 					update(ri, rect01, simLevel, false, frameId);
 				}
-				TRectD rect02 = TRectD(convert(rect.getP01()), TPointD((double)rect.x1, (double)dim.ly));
+				TRectD rect02 =
+					TRectD(convert(rect.getP01()), TPointD((double)rect.x1, (double)dim.ly));
 				if (rect02.getLx() > 0 && rect02.getLy() > 0) {
 					rect02 = TRasterImageUtils::convertRasterToWorld(convert(rect02), ri);
 					update(ri, rect02, simLevel, false, frameId);
@@ -714,7 +695,8 @@ void FullColorEraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e)
 					rect03 = TRasterImageUtils::convertRasterToWorld(convert(rect03), ri);
 					update(ri, rect03, simLevel, false, frameId);
 				}
-				TRectD rect04 = TRectD(TPointD((double)rect.x1, 0.), TPointD((double)dim.lx, (double)dim.ly));
+				TRectD rect04 =
+					TRectD(TPointD((double)rect.x1, 0.), TPointD((double)dim.lx, (double)dim.ly));
 				if (rect04.getLx() > 0 && rect04.getLy() > 0) {
 					rect04 = TRasterImageUtils::convertRasterToWorld(convert(rect04), ri);
 					update(ri, rect04, simLevel, false, frameId);
@@ -747,7 +729,7 @@ void FullColorEraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e)
 		m_track.clear();
 
 		TTool::Application *app = TTool::getApplication();
-		if (m_multi.getValue()) //stroke multi
+		if (m_multi.getValue()) // stroke multi
 		{
 			if (m_firstFrameSelected) {
 				TFrameId tmp = getCurrentFid();
@@ -772,21 +754,20 @@ void FullColorEraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e)
 					resetMulti();
 					delete stroke;
 				}
-			} else //primo frame
+			} else // primo frame
 			{
 				m_firstStroke = stroke;
 				m_isXsheetCell = app->getCurrentFrame()->isEditingScene();
 				m_currCell = std::pair<int, int>(getColumnIndex(), getFrame());
 				invalidate(m_firstStroke->getBBox().enlarge(2));
 			}
-		} else //stroke non multi
+		} else // stroke non multi
 		{
 			if (!getImage(true))
 				return;
 			TFrameId frameId = getCurrentFid();
-			eraseStroke(ri, stroke, m_eraseType.getValue(),
-						m_invertOption.getValue(), /*m_multi.getValue(),*/ m_level,
-						frameId);
+			eraseStroke(ri, stroke, m_eraseType.getValue(), m_invertOption.getValue(),
+						/*m_multi.getValue(),*/ m_level, frameId);
 			notifyImageChanged();
 			if (m_invertOption.getValue())
 				invalidate();
@@ -823,7 +804,7 @@ void FullColorEraserTool::leftButtonDoubleClick(const TPointD &pos, const TMouse
 	stroke = new TStroke(strokePoints);
 	assert(stroke->getPoint(0) == stroke->getPoint(1));
 
-	if (m_multi.getValue()) //stroke multi
+	if (m_multi.getValue()) // stroke multi
 	{
 		if (m_firstFrameSelected) {
 			TFrameId tmp = getFrameId();
@@ -847,7 +828,7 @@ void FullColorEraserTool::leftButtonDoubleClick(const TPointD &pos, const TMouse
 				resetMulti();
 				delete stroke;
 			}
-		} else //primo frame
+		} else // primo frame
 		{
 			m_firstStroke = stroke;
 			m_isXsheetCell = app->getCurrentFrame()->isEditingScene();
@@ -860,8 +841,8 @@ void FullColorEraserTool::leftButtonDoubleClick(const TPointD &pos, const TMouse
 		TXshLevel *level = app->getCurrentLevel()->getLevel();
 		TXshSimpleLevelP simLevel = level->getSimpleLevel();
 		TFrameId frameId = getFrameId();
-		eraseStroke(ri, stroke, m_eraseType.getValue(),
-					m_invertOption.getValue(), /*m_multi.getValue(),*/ m_level, frameId);
+		eraseStroke(ri, stroke, m_eraseType.getValue(), m_invertOption.getValue(),
+					/*m_multi.getValue(),*/ m_level, frameId);
 		notifyImageChanged();
 		if (m_invertOption.getValue())
 			invalidate();
@@ -923,21 +904,25 @@ void FullColorEraserTool::draw()
 		glColor3d(1.0, 0.0, 0.0);
 		tglDrawCircle(m_brushPos, (m_size.getValue() + 1) * 0.5);
 	} else if (m_eraseType.getValue() == RECTERASE) {
-		TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White : TPixel32::Black;
+		TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White
+																				  : TPixel32::Black;
 		if (m_multi.getValue() && m_firstFrameSelected)
 			drawRect(m_firstRect, color, 0x3F33, true);
 
 		if (m_selecting || (m_multi.getValue() && !m_firstFrameSelected))
 			drawRect(m_selectingRect, color, 0x3F33, true);
 	}
-	if ((m_eraseType.getValue() == FREEHANDERASE || m_eraseType.getValue() == POLYLINEERASE) && m_multi.getValue()) {
-		TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White : TPixel32::Black;
+	if ((m_eraseType.getValue() == FREEHANDERASE || m_eraseType.getValue() == POLYLINEERASE) &&
+		m_multi.getValue()) {
+		TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White
+																				  : TPixel32::Black;
 		tglColor(color);
 		if (m_firstStroke)
 			drawStrokeCenterline(*m_firstStroke, 1);
 	}
 	if (m_eraseType.getValue() == POLYLINEERASE && !m_polyline.empty()) {
-		TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White : TPixel32::Black;
+		TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White
+																				  : TPixel32::Black;
 		tglColor(color);
 		tglDrawCircle(m_polyline[0], 2 * m_thick);
 		glBegin(GL_LINE_STRIP);
@@ -970,8 +955,8 @@ bool FullColorEraserTool::onPropertyChanged(std::string propertyName)
 
 //----------------------------------------------------------------------------------------------------------
 
-void FullColorEraserTool::update(const TRasterImageP &ri, TRectD selArea, const TXshSimpleLevelP &level,
-								 bool multi, const TFrameId &frameId)
+void FullColorEraserTool::update(const TRasterImageP &ri, TRectD selArea,
+								 const TXshSimpleLevelP &level, bool multi, const TFrameId &frameId)
 {
 	if (m_selectingRect.x0 > m_selectingRect.x1) {
 		selArea.x1 = m_selectingRect.x0;
@@ -1005,9 +990,7 @@ void FullColorEraserTool::resetMulti()
 	m_firstRect.empty();
 	m_selectingRect.empty();
 	TTool::Application *app = TTool::getApplication();
-	m_level = app->getCurrentLevel()->getLevel()
-				  ? app->getCurrentLevel()->getSimpleLevel()
-				  : 0;
+	m_level = app->getCurrentLevel()->getLevel() ? app->getCurrentLevel()->getSimpleLevel() : 0;
 	m_firstFrameId = m_veryFirstFrameId = getCurrentFid();
 	if (m_firstStroke) {
 		delete m_firstStroke;
@@ -1029,8 +1012,9 @@ void FullColorEraserTool::onImageChanged()
 	if (!xshl || m_level.getPointer() != xshl || (m_selectingRect.isEmpty() && !m_firstStroke))
 		resetMulti();
 	else if (m_firstFrameId == getCurrentFid())
-		m_firstFrameSelected = false; //nel caso sono passato allo stato 1 e torno all'immagine iniziale, torno allo stato iniziale
-	else {							  //cambio stato.
+		m_firstFrameSelected = false; // nel caso sono passato allo stato 1 e torno all'immagine
+									  // iniziale, torno allo stato iniziale
+	else { // cambio stato.
 		m_firstFrameSelected = true;
 		if (m_eraseType.getValue() != FREEHANDERASE && m_eraseType.getValue() != POLYLINEERASE) {
 			assert(!m_selectingRect.isEmpty());
@@ -1101,9 +1085,7 @@ void FullColorEraserTool::onEnter()
 		return;
 
 	TTool::Application *app = TTool::getApplication();
-	m_level = app->getCurrentLevel()->getLevel()
-				  ? app->getCurrentLevel()->getSimpleLevel()
-				  : 0;
+	m_level = app->getCurrentLevel()->getLevel() ? app->getCurrentLevel()->getSimpleLevel() : 0;
 }
 
 //----------------------------------------------------------------------------------------------------------
@@ -1156,8 +1138,7 @@ void FullColorEraserTool::multiAreaEraser(TFrameId &firstFid, TFrameId &lastFid,
 
 //----------------------------------------------------------------------------------------------------------
 
-void FullColorEraserTool::doMultiEraser(const TImageP &img, double t,
-										const TFrameId &fid,
+void FullColorEraserTool::doMultiEraser(const TImageP &img, double t, const TFrameId &fid,
 										const TVectorImageP &firstImage,
 										const TVectorImageP &lastImage)
 {
@@ -1166,14 +1147,14 @@ void FullColorEraserTool::doMultiEraser(const TImageP &img, double t,
 		eraseStroke(img, firstImage->getStroke(0), m_eraseType.getValue(),
 					m_invertOption.getValue(), /*m_multi.getValue(),*/ m_level, fid);
 	else if (t == 1)
-		eraseStroke(img, lastImage->getStroke(0), m_eraseType.getValue(),
-					m_invertOption.getValue(), /*m_multi.getValue(),*/ m_level, fid);
+		eraseStroke(img, lastImage->getStroke(0), m_eraseType.getValue(), m_invertOption.getValue(),
+					/*m_multi.getValue(),*/ m_level, fid);
 	else {
 		assert(firstImage->getStrokeCount() == 1);
 		assert(lastImage->getStrokeCount() == 1);
 		TVectorImageP vi = TInbetween(firstImage, lastImage).tween(t);
 		assert(vi->getStrokeCount() == 1);
-		eraseStroke(img, vi->getStroke(0), m_eraseType.getValue(),
-					m_invertOption.getValue(), /*m_multi.getValue(),*/ m_level, fid);
+		eraseStroke(img, vi->getStroke(0), m_eraseType.getValue(), m_invertOption.getValue(),
+					/*m_multi.getValue(),*/ m_level, fid);
 	}
 }

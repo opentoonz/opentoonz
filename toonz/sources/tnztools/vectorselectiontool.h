@@ -31,17 +31,16 @@ class VectorSelectionTool;
 // Constants / Defines
 //-----------------------------------------------------------------------------
 
-enum SelectionTarget //! Possible selection targets in a SelectionTool.
-{
-	NORMAL_TYPE_IDX,				   //!< Normal selection (strokes at current frame).
-	SELECTED_FRAMES_TYPE_IDX,		   //!< Selection of whole frames.
-	ALL_LEVEL_TYPE_IDX,				   //!< Selection of an entire level.
-	SAME_STYLE_TYPE_IDX,			   //!< Selected styles at current frame.
-	STYLE_SELECTED_FRAMES_TYPE_IDX,	//!< Selected styles at selected frames.
-	STYLE_LEVEL_TYPE_IDX,			   //!< Selected styles at current frame on the whole level.
-	BOUNDARY_TYPE_IDX,				   //!< Boundary strokes on current frame.
-	BOUNDARY_SELECTED_FRAMES_TYPE_IDX, //!< Boundary strokes on selected frames.
-	BOUNDARY_LEVEL_TYPE_IDX,		   //!< Boundary strokes on the whole level.
+enum SelectionTarget				 //! Possible selection targets in a SelectionTool.
+{ NORMAL_TYPE_IDX,					 //!< Normal selection (strokes at current frame).
+  SELECTED_FRAMES_TYPE_IDX,			 //!< Selection of whole frames.
+  ALL_LEVEL_TYPE_IDX,				 //!< Selection of an entire level.
+  SAME_STYLE_TYPE_IDX,				 //!< Selected styles at current frame.
+  STYLE_SELECTED_FRAMES_TYPE_IDX,	//!< Selected styles at selected frames.
+  STYLE_LEVEL_TYPE_IDX,				 //!< Selected styles at current frame on the whole level.
+  BOUNDARY_TYPE_IDX,				 //!< Boundary strokes on current frame.
+  BOUNDARY_SELECTED_FRAMES_TYPE_IDX, //!< Boundary strokes on selected frames.
+  BOUNDARY_LEVEL_TYPE_IDX,			 //!< Boundary strokes on the whole level.
 };
 
 #define NORMAL_TYPE L"Standard"
@@ -75,7 +74,7 @@ class VectorFreeDeformer : public FreeDeformer
 
 	TThickPoint deform(TThickPoint point);
 
-public:
+  public:
 	VectorFreeDeformer(TVectorImageP vi, std::set<int> strokeIndexes);
 	~VectorFreeDeformer();
 
@@ -109,7 +108,7 @@ namespace DragSelectionTool
 
 class UndoChangeStrokes : public ToolUtils::TToolUndo
 {
-public:
+  public:
 	UndoChangeStrokes(TXshSimpleLevel *level, const TFrameId &frameId, VectorSelectionTool *tool,
 					  const StrokeSelection &selection);
 	UndoChangeStrokes(TXshSimpleLevel *level, const TFrameId &frameId, VectorSelectionTool *tool,
@@ -118,32 +117,28 @@ public:
 
 	void registerStrokes(bool beforeModify = false);
 	void setFlip(bool value) { m_flip = value; }
-	void transform(const std::vector<TStroke *> &strokes, FourPoints bbox, TPointD center, DeformValues deformValue) const;
+	void transform(const std::vector<TStroke *> &strokes, FourPoints bbox, TPointD center,
+				   DeformValues deformValue) const;
 	void restoreRegions() const;
 	void undo() const;
 	void redo() const;
 	int getSize() const;
 
-private:
+  private:
 	VectorSelectionTool *m_tool;
 
-	std::vector<TStroke *> m_oldStrokes,
-		m_newStrokes;
+	std::vector<TStroke *> m_oldStrokes, m_newStrokes;
 
 	std::vector<int> m_indexes; //!< Selected indexes at current frame.
-	std::vector<TFilledRegionInf>
-		m_regionsData;
+	std::vector<TFilledRegionInf> m_regionsData;
 
 	int m_selectionCount;
 
-	FourPoints m_oldBBox,
-		m_newBBox;
+	FourPoints m_oldBBox, m_newBBox;
 
-	TPointD m_oldCenter,
-		m_newCenter;
+	TPointD m_oldCenter, m_newCenter;
 
-	DeformValues m_oldDeformValues,
-		m_newDeformValues;
+	DeformValues m_oldDeformValues, m_newDeformValues;
 
 	bool m_flip;
 };
@@ -154,7 +149,7 @@ private:
 
 class VectorDeformTool : public DeformTool
 {
-public:
+  public:
 	VectorDeformTool(VectorSelectionTool *tool);
 	~VectorDeformTool();
 
@@ -165,15 +160,15 @@ public:
 	void transformWholeLevel();
 	bool isFlip();
 
-protected:
+  protected:
 	tcg::unique_ptr<UndoChangeStrokes> m_undo;
 
-protected:
+  protected:
 	virtual void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {}
 	virtual void leftButtonUp(const TPointD &pos, const TMouseEvent &e);
 	virtual void draw() {}
 
-private:
+  private:
 	struct VFDScopedBlock;
 	tcg::unique_ptr<VFDScopedBlock> m_vfdScopedBlock;
 };
@@ -186,7 +181,7 @@ class VectorRotationTool : public VectorDeformTool
 {
 	tcg::unique_ptr<Rotation> m_rotation;
 
-public:
+  public:
 	VectorRotationTool(VectorSelectionTool *tool);
 
 	void transform(TAffine aff, double angle);
@@ -202,7 +197,7 @@ class VectorFreeDeformTool : public VectorDeformTool
 {
 	tcg::unique_ptr<FreeDeform> m_freeDeform;
 
-public:
+  public:
 	VectorFreeDeformTool(VectorSelectionTool *tool);
 
 	void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
@@ -216,7 +211,7 @@ class VectorMoveSelectionTool : public VectorDeformTool
 {
 	tcg::unique_ptr<MoveSelection> m_moveSelection;
 
-public:
+  public:
 	VectorMoveSelectionTool(VectorSelectionTool *tool);
 
 	void transform(TAffine aff);
@@ -232,7 +227,7 @@ class VectorScaleTool : public VectorDeformTool
 {
 	tcg::unique_ptr<Scale> m_scale;
 
-public:
+  public:
 	VectorScaleTool(VectorSelectionTool *tool, int type);
 
 	TPointD transform(int index, TPointD newPos); //!< Returns scale value.
@@ -253,7 +248,7 @@ class VectorChangeThicknessTool : public DragTool
 
 	tcg::unique_ptr<UndoChangeStrokes> m_undo;
 
-public:
+  public:
 	VectorChangeThicknessTool(VectorSelectionTool *tool);
 	~VectorChangeThicknessTool();
 
@@ -269,7 +264,7 @@ public:
 	void draw() {}
 };
 
-} //namespace DragSelectionTool
+} // namespace DragSelectionTool
 
 //=============================================================================
 // VectorSelectionTool
@@ -283,7 +278,7 @@ class VectorSelectionTool : public SelectionTool
 {
 	Q_DECLARE_TR_FUNCTIONS(VectorSelectionTool)
 
-public:
+  public:
 	VectorSelectionTool(int targetType);
 
 	void setNewFreeDeformer();
@@ -296,28 +291,16 @@ public:
 	bool isSameStyleType() const;
 	bool isModifiableSelectionType() const;
 
-	const std::set<int> &selectedStyles() const
-	{
-		return m_levelSelection.styles();
-	}
-	std::set<int> &selectedStyles()
-	{
-		return m_levelSelection.styles();
-	}
+	const std::set<int> &selectedStyles() const { return m_levelSelection.styles(); }
+	std::set<int> &selectedStyles() { return m_levelSelection.styles(); }
 
 	int getSelectionCount() const { return m_selectionCount; }
 
 	void selectionOutlineStyle(int &capStyle, int &joinStyle);
 
-	const StrokeSelection &strokeSelection() const
-	{
-		return m_strokeSelection;
-	}
+	const StrokeSelection &strokeSelection() const { return m_strokeSelection; }
 
-	const LevelSelection &levelSelection() const
-	{
-		return m_levelSelection;
-	}
+	const LevelSelection &levelSelection() const { return m_levelSelection; }
 
 	TSelection *getSelection();
 	bool isSelectionEmpty();
@@ -326,7 +309,7 @@ public:
 
 	TPropertyGroup *getProperties(int targetType);
 
-protected:
+  protected:
 	void onActivate();
 	void onDeactivate();
 
@@ -343,27 +326,27 @@ protected:
 	bool onPropertyChanged(std::string propertyName);
 	void onImageChanged();
 
-private:
+  private:
 	class AttachedLevelSelection : public LevelSelection
 	{
 		StrokeSelection &m_strokeSelection; //!< Selection of strokes to be seen at current frame.
 
-	public:
+	  public:
 		AttachedLevelSelection(StrokeSelection &strokeSelection)
-			: m_strokeSelection(strokeSelection) {}
-
-		void selectNone()
+			: m_strokeSelection(strokeSelection)
 		{
-			LevelSelection::selectNone(), m_strokeSelection.selectNone();
 		}
+
+		void selectNone() { LevelSelection::selectNone(), m_strokeSelection.selectNone(); }
 	};
 
-private:
+  private:
 	TEnumProperty m_selectionTarget; //!< Selected target content (strokes, whole image, styles...).
 	TBoolProperty m_constantThickness;
 
-	StrokeSelection m_strokeSelection;		 //!< Standard selection of a set of strokes in current image.
-	AttachedLevelSelection m_levelSelection; //!< Selection across multiple frames and specific styles.
+	StrokeSelection m_strokeSelection; //!< Standard selection of a set of strokes in current image.
+	AttachedLevelSelection
+		m_levelSelection; //!< Selection across multiple frames and specific styles.
 
 	TEnumProperty m_capStyle;	  //!< Style of stroke caps.
 	TEnumProperty m_joinStyle;	 //!< Style of stroke joins.
@@ -372,10 +355,10 @@ private:
 	TPropertyGroup m_outlineProps;
 
 	int m_selectionCount; //!< \deprecated  This is \a not related to stroke selections;
-						  //!               but rather to bboxes count - and even that is deprecated.
+	//!               but rather to bboxes count - and even that is deprecated.
 	bool m_canEnterGroup; //!< \deprecated  Used in Manga and Kids
 
-private:
+  private:
 	void modifySelectionOnClick(TImageP image, const TPointD &pos, const TMouseEvent &e);
 	bool selectStroke(int index, bool toggle);
 
@@ -387,17 +370,18 @@ private:
 	void updateTranslation();
 
 	/*! \details  The updateSelectionTarget() function reads the selection
-                target (styles, frames, etc) selected by the user, and ensures
-                that the associated internal selection is configured and
-                \a current.
+				target (styles, frames, etc) selected by the user, and ensures
+				that the associated internal selection is configured and
+				\a current.
 
-                The selected strokes set is \a may be cleared appropriately
-                as a result of a change in target.                                  */
+				The selected strokes set is \a may be cleared appropriately
+				as a result of a change in target.                                  */
 
-	void updateSelectionTarget(); //!< Reads widget fields and updates the selection target accordingly.
-	void clearSelectedStrokes();  //!< Clears strokes visible in current selection.
-	void finalizeSelection();	 //!< Makes selection consistent, and invokes all related cached data
-								  //!  updates needed for visualization.
+	void
+	updateSelectionTarget(); //!< Reads widget fields and updates the selection target accordingly.
+	void clearSelectedStrokes(); //!< Clears strokes visible in current selection.
+	void finalizeSelection(); //!< Makes selection consistent, and invokes all related cached data
+							  //!  updates needed for visualization.
 	void drawInLevelType(const TVectorImage &vi);
 	void drawSelectedStrokes(const TVectorImage &vi);
 	void drawGroup(const TVectorImage &vi);

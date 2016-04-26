@@ -6,8 +6,7 @@
 
 #ifdef DOPO_LO_FACCIAMO
 
-#define PID_TAG(X) \
-	(((X) >> 24) | ((X >> 8) & 0x0000FF00) | ((X << 8) & 0x00FF0000) | ((X) << 24))
+#define PID_TAG(X) (((X) >> 24) | ((X >> 8) & 0x0000FF00) | ((X << 8) & 0x00FF0000) | ((X) << 24))
 
 /*
 
@@ -25,14 +24,14 @@ HEADER 'HDR '  32 bytes >
 
 FRAMEDATA 'FRME' >
   0 FRAMEDESCRIPTOR 'DSCR' 16 bytes >
-     0 |  4  |  Frame ID
-     4 |  4  |  Width
-     8 |  4  |  Height
-    12 |  4  |  RawData size
+	 0 |  4  |  Frame ID
+	 4 |  4  |  Width
+	 8 |  4  |  Height
+	12 |  4  |  RawData size
    <FRAMEDESCRIPTOR
 
   16 RAWDATA 'DATA' RawDataSize >
-     0 | 
+	 0 |
    <RAWDATA
 
 <FRAMEDATA
@@ -44,16 +43,16 @@ class ZCCParser {
 TFile &m_file;
 public:
   ZCCParser(TFile&file) : m_file(file)
-    {
-    m_file.seek(0);
-    string tag = readTag();
-    }
+	{
+	m_file.seek(0);
+	string tag = readTag();
+	}
 private:
   string readTag()
-    {
-    
+	{
 
-    }
+
+	}
 };
 
 */
@@ -91,30 +90,29 @@ TReaderWriterInfoZCC::~TReaderWriterInfoZCC()
 
 //-----------------------------------------------------------
 
-TReaderWriterInfoZCC::TReaderWriterInfoZCC(const TReaderWriterInfoZCC &src)
-	: TReaderWriterInfo(src)
+TReaderWriterInfoZCC::TReaderWriterInfoZCC(const TReaderWriterInfoZCC &src) : TReaderWriterInfo(src)
 {
 }
 
 //===========================================================
 class TImageReaderWriterZCC : public TImageReaderWriter
 {
-public:
+  public:
 	TImageReaderWriterZCC(const TFilePath &fp, int index, TLevelReaderWriterZCC *lrw);
 
-private:
-	//not implemented
+  private:
+	// not implemented
 	TImageReaderWriterZCC(const TImageReaderWriterZCC &);
 	TImageReaderWriterZCC &operator=(const TImageReaderWriterZCC &src);
 
-public:
+  public:
 	void save(const TImageP &);
 	TImageP load();
-	void load(const TRasterP &ras, const TPoint &pos = TPoint(0, 0),
-			  int shrinkX = 1, int shrinkY = 1);
+	void load(const TRasterP &ras, const TPoint &pos = TPoint(0, 0), int shrinkX = 1,
+			  int shrinkY = 1);
 	int m_index;
 
-private:
+  private:
 	TLevelReaderWriterZCC *m_lrw;
 };
 
@@ -122,7 +120,8 @@ private:
 
 using namespace TFileConsts;
 TLevelReaderWriterZCC::TLevelReaderWriterZCC(const TFilePath &path, TReaderWriterInfo *winfo)
-	: TLevelReaderWriter(path, winfo), m_file(path, kReadWrite | kUnbuffered | kOpenAlways), m_indexFile(path.withType("ndx"), kReadWrite | kOpenAlways), m_initDone(false), m_blockSize(0)
+	: TLevelReaderWriter(path, winfo), m_file(path, kReadWrite | kUnbuffered | kOpenAlways),
+	  m_indexFile(path.withType("ndx"), kReadWrite | kOpenAlways), m_initDone(false), m_blockSize(0)
 {
 	if (!m_file.isOpen())
 		throw TImageException(path, m_file.getLastError());
@@ -134,16 +133,13 @@ TLevelReaderWriterZCC::TLevelReaderWriterZCC(const TFilePath &path, TReaderWrite
 		disk = *it;
 		if (disk.isAncestorOf(m_path)) {
 			DWORD sectorsPerCluster;
-			//DWORD bytesPerSector;
+			// DWORD bytesPerSector;
 			DWORD numberOfFreeClusters;
 			DWORD totalNumberOfClusters;
 
-			BOOL rc = GetDiskFreeSpaceW(
-				disk.getWideString().c_str(),
-				&sectorsPerCluster,
-				&m_blockSize,
-				&numberOfFreeClusters,
-				&totalNumberOfClusters);
+			BOOL rc =
+				GetDiskFreeSpaceW(disk.getWideString().c_str(), &sectorsPerCluster, &m_blockSize,
+								  &numberOfFreeClusters, &totalNumberOfClusters);
 			break;
 		}
 	}
@@ -248,7 +244,8 @@ TLevelReaderWriterZCC::~TLevelReaderWriterZCC()
 
 //-----------------------------------------------------------
 
-TImageReaderWriterZCC::TImageReaderWriterZCC(const TFilePath &fp, int index, TLevelReaderWriterZCC *lrw)
+TImageReaderWriterZCC::TImageReaderWriterZCC(const TFilePath &fp, int index,
+											 TLevelReaderWriterZCC *lrw)
 	: TImageReaderWriter(fp), m_lrw(lrw), m_index(index)
 {
 }
@@ -285,8 +282,7 @@ void TImageReaderWriterZCC::save(const TImageP &img)
 
 	ULONG *height = (ULONG *)&buffer[8];
 	*height = ras->getLy();
-	bwww
-		ULONG *rawDataSize = (ULONG *)&buffer[12];
+	bwww ULONG *rawDataSize = (ULONG *)&buffer[12];
 	*rawDataSize = rasDataSize;
 	memcpy(&buffer[16], ras->getRawData(), rasDataSize);
 
@@ -308,12 +304,11 @@ TImageP TImageReaderWriterZCC::load()
 
 //-----------------------------------------------------------
 
-void TImageReaderWriterZCC::load(const TRasterP &ras, const TPoint &pos,
-								 int shrinkX, int shrinkY)
+void TImageReaderWriterZCC::load(const TRasterP &ras, const TPoint &pos, int shrinkX, int shrinkY)
 {
 	if (!m_lrw->m_initDone) {
 		//
-		//write header
+		// write header
 		//
 		m_lrw->m_initDone = true;
 	}

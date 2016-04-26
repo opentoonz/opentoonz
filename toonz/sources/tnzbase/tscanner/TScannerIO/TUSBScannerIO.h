@@ -11,7 +11,7 @@ class TUSBScannerIO : public TScannerIO
 {
 	TUSBScannerIOPD *m_data;
 
-public:
+  public:
 	TUSBScannerIO();
 	bool open();
 	void close();

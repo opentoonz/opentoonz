@@ -42,14 +42,14 @@ namespace
 
 class MergeCmappedPair
 {
-public:
+  public:
 	const TXshCell *m_cell;
 	TAffine m_imgAff;
 	const TXshCell *m_mcell;
 	TAffine m_matchAff;
 
-	MergeCmappedPair(const TXshCell &cell, const TAffine &imgAff,
-					 const TXshCell &mcell, const TAffine &matchAff)
+	MergeCmappedPair(const TXshCell &cell, const TAffine &imgAff, const TXshCell &mcell,
+					 const TAffine &matchAff)
 		: m_cell(&cell), m_imgAff(imgAff), m_mcell(&mcell), m_matchAff(matchAff){};
 };
 
@@ -63,7 +63,7 @@ void mergeCmapped(const std::vector<MergeCmappedPair> &matchingLevels)
 
 	TPalette::Page *page;
 
-	//upInkId -> downInkId
+	// upInkId -> downInkId
 	std::map<int, int> usedColors;
 
 	int i = 0;
@@ -95,12 +95,11 @@ void mergeCmapped(const std::vector<MergeCmappedPair> &matchingLevels)
 		int lyout = tround(out.getLy()) + 1 + ((offs.y < 0) ? offs.y : 0);
 
 		if (lxout <= 0 || lyout <= 0 || offs.x >= rlx || offs.y >= rly) {
-			//tmsg_error("no intersections between matchline and level");
+			// tmsg_error("no intersections between matchline and level");
 			continue;
 		}
 
-		aff = aff.place((double)(in.getLx() / 2.0),
-						(double)(in.getLy() / 2.0),
+		aff = aff.place((double)(in.getLx() / 2.0), (double)(in.getLy() / 2.0),
 						(out.getLx()) / 2.0 + ((offs.x < 0) ? offs.x : 0),
 						(out.getLy()) / 2.0 + ((offs.y < 0) ? offs.y : 0));
 
@@ -110,7 +109,7 @@ void mergeCmapped(const std::vector<MergeCmappedPair> &matchingLevels)
 			offs.y = 0;
 
 		if (lxout + offs.x > rlx || lyout + offs.y > rly) {
-			//PRINTF("TAGLIO L'IMMAGINE\n");
+			// PRINTF("TAGLIO L'IMMAGINE\n");
 			lxout = (lxout + offs.x > rlx) ? (rlx - offs.x) : lxout;
 			lyout = (lyout + offs.y > rly) ? (rly - offs.y) : lyout;
 		}
@@ -136,7 +135,8 @@ void mergeCmapped(const std::vector<MergeCmappedPair> &matchingLevels)
 		if (it->first != it->second)
 			break;
 
-	if (it == usedColors.end()) //this means that the merged palette does not differ from source palette.(all usedColors are not new color )
+	if (it == usedColors.end()) // this means that the merged palette does not differ from source
+								// palette.(all usedColors are not new color )
 		return;
 
 	std::wstring pageName = L"merged palettes";
@@ -165,7 +165,8 @@ void mergeCmapped(const std::vector<MergeCmappedPair> &matchingLevels)
 
 /*------------------------------------------------------------------------*/
 
-void applyDeleteMatchline(TXshSimpleLevel *sl, const std::vector<TFrameId> &fids, const std::vector<int> &_inkIndexes)
+void applyDeleteMatchline(TXshSimpleLevel *sl, const std::vector<TFrameId> &fids,
+						  const std::vector<int> &_inkIndexes)
 {
 	TPalette::Page *page = 0;
 	int i, j, pageIndex = 0;
@@ -191,7 +192,7 @@ void applyDeleteMatchline(TXshSimpleLevel *sl, const std::vector<TFrameId> &fids
 	}
 
 	for (i = 0; i < (int)fids.size(); i++) {
-		//level[i]->lock();
+		// level[i]->lock();
 		TToonzImageP image = sl->getFrame(fids[i], true);
 		assert(image);
 		TRasterCM32P ras = image->getRaster(); // level[i]->getCMapped(false);
@@ -206,31 +207,32 @@ void applyDeleteMatchline(TXshSimpleLevel *sl, const std::vector<TFrameId> &fids
 		TRect savebox;
 		TRop::computeBBox(ras, savebox);
 		image->setSavebox(savebox);
-		//level[i]->unlock();
+		// level[i]->unlock();
 	}
 
-	//if (page)
+	// if (page)
 	//  {
 	//  while (page->getStyleCount())
 	//   page->removeStyle(0);
-	//palette->erasePage(pageIndex);
+	// palette->erasePage(pageIndex);
 	// }
 }
 
 /*------------------------------------------------------------------------*/
-} //namespace
+} // namespace
 //-----------------------------------------------------------------------------
 
 class DeleteMatchlineUndo : public TUndo
 {
-public:
+  public:
 	TXshLevel *m_xl;
 	TXshSimpleLevel *m_sl;
 	std::vector<TFrameId> m_fids;
 	std::vector<int> m_indexes;
 	TPaletteP m_matchlinePalette;
 
-	DeleteMatchlineUndo(TXshLevel *xl, TXshSimpleLevel *sl, const std::vector<TFrameId> &fids, const std::vector<int> &indexes) //, TPalette*matchPalette)
+	DeleteMatchlineUndo(TXshLevel *xl, TXshSimpleLevel *sl, const std::vector<TFrameId> &fids,
+						const std::vector<int> &indexes) //, TPalette*matchPalette)
 		: TUndo(),
 		  m_xl(xl),
 		  m_sl(sl),
@@ -238,10 +240,11 @@ public:
 		  m_indexes(indexes)
 	//, m_matchlinePalette(matchPalette->clone())
 	{
-		//assert(matchPalette);
+		// assert(matchPalette);
 		int i;
 		for (i = 0; i < fids.size(); i++) {
-			QString id = "DeleteMatchlineUndo" + QString::number((uintptr_t) this) + "-" + QString::number(i);
+			QString id = "DeleteMatchlineUndo" + QString::number((uintptr_t) this) + "-" +
+						 QString::number(i);
 			TToonzImageP image = sl->getFrame(fids[i], false);
 			assert(image);
 			TImageCache::instance()->add(id, image->clone());
@@ -251,16 +254,17 @@ public:
 	void undo() const
 	{
 		int i;
-		//TPalette *palette = m_matchlinePalette->clone();
-		//m_sl->setPalette(palette);
+		// TPalette *palette = m_matchlinePalette->clone();
+		// m_sl->setPalette(palette);
 		for (i = 0; i < m_fids.size(); i++) {
-			QString id = "DeleteMatchlineUndo" + QString::number((uintptr_t) this) + "-" + QString::number(i);
+			QString id = "DeleteMatchlineUndo" + QString::number((uintptr_t) this) + "-" +
+						 QString::number(i);
 			TImageP img = TImageCache::instance()->get(id, false)->cloneImage();
 
 			m_sl->setFrame(m_fids[i], img);
 			ToolUtils::updateSaveBox(m_sl, m_fids[i]);
 		}
-		//TApp::instance()->getPaletteController()->getCurrentLevelPalette()->setPalette(palette);
+		// TApp::instance()->getPaletteController()->getCurrentLevelPalette()->setPalette(palette);
 
 		if (m_xl)
 			invalidateIcons(m_xl, m_fids);
@@ -272,7 +276,7 @@ public:
 	{
 		int i;
 
-		//for (i=0; i<m_fids.size(); i++)
+		// for (i=0; i<m_fids.size(); i++)
 		//  images.push_back(m_sl->getFrame(m_fids[i], true));
 
 		applyDeleteMatchline(m_sl, m_fids, m_indexes);
@@ -285,16 +289,15 @@ public:
 		TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 
 	~DeleteMatchlineUndo()
 	{
 		int i;
 		for (i = 0; i < m_fids.size(); i++)
-			TImageCache::instance()->remove("DeleteMatchlineUndo" + QString::number((uintptr_t) this) + "-" + QString::number(i));
+			TImageCache::instance()->remove("DeleteMatchlineUndo" +
+											QString::number((uintptr_t) this) + "-" +
+											QString::number(i));
 	}
 };
 
@@ -309,17 +312,17 @@ public:
 
   void undo() const {
 		ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
-    scene->getLevelSet()->insertLevel(m_xl.getPointer());
+	scene->getLevelSet()->insertLevel(m_xl.getPointer());
 		TApp::instance()->getCurrentScene()->notifyCastChange();
   }
   void redo() const {
 		ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
-    scene->getLevelSet()->removeLevel(m_xl.getPointer());
-    TApp::instance()->getCurrentScene()->notifyCastChange();
+	scene->getLevelSet()->removeLevel(m_xl.getPointer());
+	TApp::instance()->getCurrentScene()->notifyCastChange();
   }
 
   int getSize() const {
-    return sizeof *this + 100;
+	return sizeof *this + 100;
   }
 };
 
@@ -330,12 +333,13 @@ bool removeLevel(TXshLevel *level)
 {
 	TApp *app = TApp::instance();
 	ToonzScene *scene = app->getCurrentScene()->getScene();
-	//if(scene->getChildStack()->getTopXsheet()->isLevelUsed(level))
-	//	DVGui::error(QObject::tr("It is not possible to delete the used level %1.").arg(QString::fromStdWString(level->getName())));//"E_CantDeleteUsedLevel_%1"
-	//else
+	// if(scene->getChildStack()->getTopXsheet()->isLevelUsed(level))
+	//	DVGui::error(QObject::tr("It is not possible to delete the used level
+	//%1.").arg(QString::fromStdWString(level->getName())));//"E_CantDeleteUsedLevel_%1"
+	// else
 	{
-		//TUndoManager *um = TUndoManager::manager();
-		//um->add(new DeleteLevelUndo(level));
+		// TUndoManager *um = TUndoManager::manager();
+		// um->add(new DeleteLevelUndo(level));
 		scene->getLevelSet()->removeLevel(level, false);
 		TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
 		TApp::instance()->getCurrentScene()->notifyCastChange();
@@ -353,12 +357,12 @@ class MergeCmappedUndo : public TUndo
 	int m_column, m_mColumn;
 	std::wstring m_fullpath;
 
-public:
-	MergeCmappedUndo(TXshLevel *xl, int mergeCmappedSessionId,
-					 int column, TXshSimpleLevel *level, const std::map<TFrameId, QString> &images,
-					 int mColumn,
-					 TPalette *palette)
-		: TUndo(), m_xl(xl), m_mergeCmappedSessionId(mergeCmappedSessionId), m_palette(palette->clone()), m_level(level), m_column(column), m_mColumn(mColumn), m_images(images)
+  public:
+	MergeCmappedUndo(TXshLevel *xl, int mergeCmappedSessionId, int column, TXshSimpleLevel *level,
+					 const std::map<TFrameId, QString> &images, int mColumn, TPalette *palette)
+		: TUndo(), m_xl(xl), m_mergeCmappedSessionId(mergeCmappedSessionId),
+		  m_palette(palette->clone()), m_level(level), m_column(column), m_mColumn(mColumn),
+		  m_images(images)
 
 	{
 		m_fullpath = m_xl->getPath().getWideString();
@@ -372,7 +376,8 @@ public:
 		std::vector<TFrameId> fids;
 		for (; it != m_images.end(); ++it) //, ++mit)
 		{
-			QString id = "MergeCmappedUndo" + QString::number(m_mergeCmappedSessionId) + "-" + QString::number(it->first.getNumber());
+			QString id = "MergeCmappedUndo" + QString::number(m_mergeCmappedSessionId) + "-" +
+						 QString::number(it->first.getNumber());
 			TImageP img = TImageCache::instance()->get(id, false)->cloneImage();
 			img->setPalette(palette);
 			m_level->setFrame(it->first, img);
@@ -391,17 +396,15 @@ public:
 		mergeCmapped(m_column, m_mColumn, QString::fromStdWString(m_fullpath), true);
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 
 	~MergeCmappedUndo()
 	{
 		std::map<TFrameId, QString>::const_iterator it = m_images.begin();
 		for (; it != m_images.end(); ++it) //, ++mit)
 		{
-			QString id = "MergeCmappedUndo" + QString::number((uintptr_t) this) + "-" + QString::number(it->first.getNumber());
+			QString id = "MergeCmappedUndo" + QString::number((uintptr_t) this) + "-" +
+						 QString::number(it->first.getNumber());
 			TImageCache::instance()->remove(id);
 		}
 		delete m_palette;
@@ -414,11 +417,13 @@ static int LastMatchlineIndex = -1;
 
 class MergedPair
 {
-public:
+  public:
 	TFrameId m_f0, m_f1;
 	TAffine m_aff;
 	MergedPair(const TFrameId &f0, const TFrameId &f1, const TAffine &aff)
-		: m_f0(f0), m_f1(f1), m_aff(aff) {}
+		: m_f0(f0), m_f1(f1), m_aff(aff)
+	{
+	}
 
 	bool operator<(const MergedPair &p) const
 	{
@@ -494,7 +499,8 @@ void mergeCmapped(int column, int mColumn, const QString &fullpath, bool isRedo)
 
 	TFilePath fp(fullpath.toStdString());
 
-	TXshLevel *txl = level->getScene()->createNewLevel(level->getType(), fp.getWideName(), level->getResolution());
+	TXshLevel *txl = level->getScene()->createNewLevel(level->getType(), fp.getWideName(),
+													   level->getResolution());
 	TXshSimpleLevel *newLevel = txl->getSimpleLevel();
 	newLevel->setPalette(level->getPalette());
 	newLevel->clonePropertiesFrom(level);
@@ -514,7 +520,7 @@ void mergeCmapped(int column, int mColumn, const QString &fullpath, bool isRedo)
 		getColumnPlacement(imgAff, xsh, std::min(start, mStart) + i, column, false);
 		getColumnPlacement(matchAff, xsh, std::min(start, mStart) + i, mColumn, false);
 
-		//std::map<TFrameId, TFrameId>::iterator it;
+		// std::map<TFrameId, TFrameId>::iterator it;
 		MergedPair mp(cell[i].isEmpty() ? TFrameId() : cell[i].getFrameId(),
 					  mCell[i].isEmpty() ? TFrameId() : mCell[i].getFrameId(),
 					  imgAff.inv() * matchAff);
@@ -528,7 +534,7 @@ void mergeCmapped(int column, int mColumn, const QString &fullpath, bool isRedo)
 			continue;
 		}
 
-		TFrameId newFid(++count); //level->getLastFid().getNumber()+1);
+		TFrameId newFid(++count); // level->getLastFid().getNumber()+1);
 		TDimension dim = level->getResolution();
 		TToonzImageP newImage;
 		if (cell[i].isEmpty()) {
@@ -557,13 +563,15 @@ void mergeCmapped(int column, int mColumn, const QString &fullpath, bool isRedo)
 		TToonzImageP timg = (TToonzImageP)img;
 		TToonzImageP tmatch = (TToonzImageP)match;
 
-		QString id = "MergeCmappedUndo" + QString::number(MergeCmappedSessionId) + "-" + QString::number(fid.getNumber());
+		QString id = "MergeCmappedUndo" + QString::number(MergeCmappedSessionId) + "-" +
+					 QString::number(fid.getNumber());
 		TImageCache::instance()->add(id, timg->clone());
 		images[fid] = id;
 
 		TAffine dpiAff = getDpiAffine(level, fid);
 		TAffine mdpiAff = getDpiAffine(mLevel, mFid);
-		matchingLevels.push_back(MergeCmappedPair(cell[i], imgAff * dpiAff, mCell[i], matchAff * mdpiAff));
+		matchingLevels.push_back(
+			MergeCmappedPair(cell[i], imgAff * dpiAff, mCell[i], matchAff * mdpiAff));
 	}
 
 	if (!isRedo) {
@@ -573,11 +581,8 @@ void mergeCmapped(int column, int mColumn, const QString &fullpath, bool isRedo)
 		pltHandle->setPalette(plt);
 		int styleCount = plt->getStyleCount();
 
-		TUndoManager::manager()->add(new MergeCmappedUndo(txl, MergeCmappedSessionId,
-														  column,
-														  level, images,
-														  mColumn,
-														  plt));
+		TUndoManager::manager()->add(
+			new MergeCmappedUndo(txl, MergeCmappedSessionId, column, level, images, mColumn, plt));
 	}
 
 	removeLevel(xl);
@@ -585,7 +590,7 @@ void mergeCmapped(int column, int mColumn, const QString &fullpath, bool isRedo)
 	mergeCmapped(matchingLevels);
 	QApplication::restoreOverrideCursor();
 
-	for (int i = 0; i < (int)cell.size(); i++) //the saveboxes must be updated
+	for (int i = 0; i < (int)cell.size(); i++) // the saveboxes must be updated
 	{
 		if (cell[i].isEmpty() || mCell[i].isEmpty())
 			continue;
@@ -696,6 +701,6 @@ std::vector<int> string2Indexes(const QString &values)
 	return ret;
 }
 
-} //namespace
+} // namespace
 
 //-----------------------------------------------------------------------------

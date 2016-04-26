@@ -9,7 +9,7 @@
 
 //==================================================
 //
-//FullColorPalette
+// FullColorPalette
 //
 //==================================================
 
@@ -52,8 +52,8 @@ TPalette *FullColorPalette::getPalette(ToonzScene *scene)
 	m_palette->addRef();
 	TFilePath fullPath = scene->decodeFilePath(m_fullcolorPalettePath);
 	if (!TSystem::doesExistFileOrLevel(fullPath)) {
-		//Per I francesi che hanno il nome vecchio della paletta
-		//Verra' caricata la vecchia ma salvata col nome nuovo!
+		// Per I francesi che hanno il nome vecchio della paletta
+		// Verra' caricata la vecchia ma salvata col nome nuovo!
 		TFilePath app("+palettes\\fullcolorPalette.tpl");
 		fullPath = scene->decodeFilePath(app);
 	}

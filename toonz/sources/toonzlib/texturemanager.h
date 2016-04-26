@@ -14,11 +14,11 @@ class TextureManager
 
 	TextureManager();
 
-public:
+  public:
 	static TextureManager *instance();
 	TDimension getMaxSize(bool isRGBM);
 	void getFmtAndType(bool isRGBM, GLenum &fmt, GLenum &type);
 	TDimension selectTexture(TDimension reqSize, bool isRGBM);
 };
 
-#endif //TEXTURE_MANAGER
+#endif // TEXTURE_MANAGER

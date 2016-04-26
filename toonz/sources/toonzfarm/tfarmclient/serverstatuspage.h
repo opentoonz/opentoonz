@@ -10,7 +10,7 @@ class ServerStatusPage : public TabPage
 	class Data;
 	Data *m_data;
 
-public:
+  public:
 	ServerStatusPage(TWidget *parent);
 	~ServerStatusPage();
 
@@ -20,7 +20,7 @@ public:
 	void onDeactivate();
 	void update();
 
-	//void showServerInfo(const string &name);
+	// void showServerInfo(const string &name);
 };
 
 #endif

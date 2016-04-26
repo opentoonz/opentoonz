@@ -7,7 +7,7 @@
 
 class TScannerTwain : public TScanner
 {
-public:
+  public:
 	TScannerTwain();
 	~TScannerTwain();
 

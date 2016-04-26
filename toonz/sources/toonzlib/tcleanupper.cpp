@@ -1,6 +1,6 @@
 
 
-//Toonz includes
+// Toonz includes
 #include "tpixelutils.h"
 #include "tpalette.h"
 #include "tcolorstyles.h"
@@ -25,7 +25,7 @@ using namespace CleanupTypes;
 INTRODUCTION:
 
   The purpose of a Cleanup Process is hereby intended as the task of transforming
-  a fullcolor image (any bpp, matte supported*) into a TRasterCM32 - 
+  a fullcolor image (any bpp, matte supported*) into a TRasterCM32 -
   that is, a colormap image - given an externally specified palette of ink colors to
   be recognized. No paint color is assumed at this stage.
 
@@ -49,37 +49,37 @@ CONSTRAINTS:
 
   - Palette colors:
 
-    * Color 0 represents the PAPER color, and will just substitute it in the colormap.
+	* Color 0 represents the PAPER color, and will just substitute it in the colormap.
 
-    * Colors with index >= 2 are MATCH-LINE colors, and their HUE ONLY (the H in HSV coordinates)
-    is essential to line recognition. The hue of image pixels is compared to that of each
-    matchline color - and the nearest matchline color is associated to that pixel.
-    If that associated matchline color is still too 'hue-distant' from the pixel color
-    (beyond a user-specified parameter), the pixel is ignored (ie associated to paper).
-    Furthermore, each matchline color also has a parameter corresponding to a saturation
-    threshold; pixels whose color's saturation is below the threshold specified by the
-    associated color are reassociated to the PAPER color.
+	* Colors with index >= 2 are MATCH-LINE colors, and their HUE ONLY (the H in HSV coordinates)
+	is essential to line recognition. The hue of image pixels is compared to that of each
+	matchline color - and the nearest matchline color is associated to that pixel.
+	If that associated matchline color is still too 'hue-distant' from the pixel color
+	(beyond a user-specified parameter), the pixel is ignored (ie associated to paper).
+	Furthermore, each matchline color also has a parameter corresponding to a saturation
+	threshold; pixels whose color's saturation is below the threshold specified by the
+	associated color are reassociated to the PAPER color.
 
-    * Color 1 represents the OUTLINE color, and its VALUE (the V in HSV coordinates) is
-    assumed to be the image's lowest. Its H and S components are unused. 
-    Pixels whose value is below this value + a user-defined threshold parameter are
-    'outline-PRONE' pixels (even matchline-associated pixels can be).
-    They are assumed to be full outline pixels if their CHROMA (S*V) is above a
-    'Color threshold'. This condition lets the user settle how outline/matchline
-    disputed pixels should be considered.
+	* Color 1 represents the OUTLINE color, and its VALUE (the V in HSV coordinates) is
+	assumed to be the image's lowest. Its H and S components are unused.
+	Pixels whose value is below this value + a user-defined threshold parameter are
+	'outline-PRONE' pixels (even matchline-associated pixels can be).
+	They are assumed to be full outline pixels if their CHROMA (S*V) is above a
+	'Color threshold'. This condition lets the user settle how outline/matchline
+	disputed pixels should be considered.
 
   - The Colormap tone for a pixel is extracted according to these rules:
 
-    * Paper pixels are completely transparent (tone = 255).
+	* Paper pixels are completely transparent (tone = 255).
 
-    * Undisputed matchline colors build the tone upon the pixel's Saturation, scaled
-      so that 1.0 maps to 0, and the saturation threshold for that matchline
-      color maps to 255.
+	* Undisputed matchline colors build the tone upon the pixel's Saturation, scaled
+	  so that 1.0 maps to 0, and the saturation threshold for that matchline
+	  color maps to 255.
 
-    * Undisputed Outline colors do similarly, with the Value.
+	* Undisputed Outline colors do similarly, with the Value.
 
-    * Disputed outline/matchline colors result in the blend PRODUCT of the above tones.
-      This makes the tone smoother on outline/matchline intersections.
+	* Disputed outline/matchline colors result in the blend PRODUCT of the above tones.
+	  This makes the tone smoother on outline/matchline intersections.
 */
 
 //**************************************************************************************
@@ -89,7 +89,7 @@ CONSTRAINTS:
 namespace
 {
 
-//some useful functions for doing math
+// some useful functions for doing math
 
 inline double affMV1(const TAffine &aff, double v1, double v2)
 {
@@ -111,9 +111,8 @@ struct HSVColor {
 	double m_s;
 	double m_v;
 
-public:
-	HSVColor(double h = 0, double s = 0, double v = 0)
-		: m_h(h), m_s(s), m_v(v) {}
+  public:
+	HSVColor(double h = 0, double s = 0, double v = 0) : m_h(h), m_s(s), m_v(v) {}
 
 	static HSVColor fromRGB(double r, double g, double b);
 };
@@ -163,9 +162,12 @@ struct TargetColorData {
 	double m_saturationLower;	  //!< Pixel colors associated with this color must be above this
 	double m_hueLower, m_hueUpper; //!< Pixel colors associated with this color must in this range
 
-public:
+  public:
 	TargetColorData(const TargetColor &color)
-		: m_idx(-1), m_hsv(HSVColor::fromRGB(color.m_color.r / 255.0, color.m_color.g / 255.0, color.m_color.b / 255.0)), m_saturationLower(1.0 - color.m_threshold / 100.0), m_hueLower(m_hsv.m_h - color.m_hRange * 0.5), m_hueUpper(m_hsv.m_h + color.m_hRange * 0.5)
+		: m_idx(-1), m_hsv(HSVColor::fromRGB(color.m_color.r / 255.0, color.m_color.g / 255.0,
+											 color.m_color.b / 255.0)),
+		  m_saturationLower(1.0 - color.m_threshold / 100.0),
+		  m_hueLower(m_hsv.m_h - color.m_hRange * 0.5), m_hueUpper(m_hsv.m_h + color.m_hRange * 0.5)
 	{
 		if (m_hueLower < 0.0)
 			m_hueLower += 360.0;
@@ -214,7 +216,7 @@ class TransfFunction
 			TransfFun[pencil << 8 | i] = max;
 	}
 
-public:
+  public:
 	TransfFunction(const TargetColors &colors)
 	{
 		memset(TransfFun, 0, sizeof TransfFun);
@@ -296,12 +298,13 @@ void transparencyCheck(const TRasterCM32P &cmin, const TRaster32P &rasout)
 			if (ink == 4095)
 				*outPix = TPixel32::Green;
 			else
-				*outPix = (tone == 0) ? TPixel32::Black : (tone == 255) ? TPixel32::White : TPixel32::Red;
+				*outPix =
+					(tone == 0) ? TPixel32::Black : (tone == 255) ? TPixel32::White : TPixel32::Red;
 		}
 	}
 }
 
-} //namespace
+} // namespace
 
 //**************************************************************************************
 //    TCleanupper implementation - elementary functions
@@ -339,10 +342,8 @@ TToonzImageP CleanupPreprocessedImage::getImg() const
 
 //-----------------------------------------------------------------------------------
 
-CleanupPreprocessedImage::CleanupPreprocessedImage(
-	CleanupParameters *parameters,
-	TToonzImageP processed,
-	bool fromGr8)
+CleanupPreprocessedImage::CleanupPreprocessedImage(CleanupParameters *parameters,
+												   TToonzImageP processed, bool fromGr8)
 	: m_wasFromGR8(fromGr8), m_autocentered(false), m_size(processed->getSize())
 {
 	if (!processed)
@@ -358,11 +359,8 @@ CleanupPreprocessedImage::CleanupPreprocessedImage(
 		for (int i = 0; i < parameters->m_colors.getColorCount(); ++i) {
 			TPixel32 cc = parameters->m_colors.getColor(i).m_color;
 			for (int tone = 0; tone < 256; tone++) {
-				m_pixelsLut.push_back(
-					blend(parameters->m_colors.getColor(i).m_color,
-						  white,
-						  tone,
-						  TPixelCM32::getMaxTone()));
+				m_pixelsLut.push_back(blend(parameters->m_colors.getColor(i).m_color, white, tone,
+											TPixelCM32::getMaxTone()));
 			}
 		}
 	}
@@ -392,7 +390,8 @@ TRasterImageP CleanupPreprocessedImage::getPreviewImage() const
 //**************************************************************************************
 
 bool TCleanupper::getResampleValues(const TRasterImageP &image, TAffine &aff, double &blur,
-									TDimension &outDim, TPointD &outDpi, bool isCameraTest, bool &isSameDpi)
+									TDimension &outDim, TPointD &outDpi, bool isCameraTest,
+									bool &isSameDpi)
 {
 	double outlp, outlq;
 	double scalex, scaley;
@@ -418,7 +417,7 @@ bool TCleanupper::getResampleValues(const TRasterImageP &image, TAffine &aff, do
 	if (dpi == TPointD()) {
 		dpi = getCustomDpi();
 		if (dpi == TPointD())
-			dpi.x = dpi.y = 65.0; //using 65.0 as default DPI
+			dpi.x = dpi.y = 65.0; // using 65.0 as default DPI
 	} else if (!dpi.x)
 		dpi.x = dpi.y;
 	else if (!dpi.y)
@@ -427,7 +426,7 @@ bool TCleanupper::getResampleValues(const TRasterImageP &image, TAffine &aff, do
 	// Retrieve some cleanup parameters
 	int rotate = m_parameters->m_rotate;
 
-	//Build scaling/dpi data
+	// Build scaling/dpi data
 	{
 		m_parameters->getOutputImageInfo(outDim, outDpi.x, outDpi.y);
 
@@ -439,7 +438,8 @@ bool TCleanupper::getResampleValues(const TRasterImageP &image, TAffine &aff, do
 		outlq = outDim.ly;
 	}
 
-	/*--- 拡大／縮小をしていない場合（DPIが変わらない場合）、NearestNeighborでリサンプリングする。---*/
+	/*---
+	 * 拡大／縮小をしていない場合（DPIが変わらない場合）、NearestNeighborでリサンプリングする。---*/
 	isSameDpi = areAlmostEqual(outDpi.x, dpi.x, 0.1) && areAlmostEqual(outDpi.y, dpi.y, 0.1);
 
 	// Retrieve input center
@@ -460,13 +460,8 @@ bool TCleanupper::getResampleValues(const TRasterImageP &image, TAffine &aff, do
 	TAffine pre_aff;
 	image->getRaster()->lock();
 
-	bool autocentered =
-		doAutocenter(
-			angle, skew,
-			cxin, cyin, cqout, cpout,
-			dpi.x, dpi.y,
-			raster_is_savebox, saveBox,
-			image, scalex);
+	bool autocentered = doAutocenter(angle, skew, cxin, cyin, cqout, cpout, dpi.x, dpi.y,
+									 raster_is_savebox, saveBox, image, scalex);
 	image->getRaster()->unlock();
 
 	// Build the image transform as deduced by the autocenter
@@ -485,10 +480,14 @@ bool TCleanupper::getResampleValues(const TRasterImageP &image, TAffine &aff, do
 		aff = TRotation(-(double)m_parameters->m_rotate).place(pout, pout) * aff;
 
 	if (m_parameters->m_flipx || m_parameters->m_flipy)
-		aff = TScale(m_parameters->m_flipx ? -1 : 1, m_parameters->m_flipy ? -1 : 1).place(pout, pout) * aff;
+		aff = TScale(m_parameters->m_flipx ? -1 : 1, m_parameters->m_flipy ? -1 : 1)
+				  .place(pout, pout) *
+			  aff;
 
 	if (!isCameraTest)
-		aff = TTranslation(m_parameters->m_offx * outDpi.x / 2, m_parameters->m_offy * outDpi.y / 2) * aff;
+		aff =
+			TTranslation(m_parameters->m_offx * outDpi.x / 2, m_parameters->m_offy * outDpi.y / 2) *
+			aff;
 
 	max_blur = 20.0 * sqrt(fabs(scalex /*** * oversample_factor ***/));
 	blur = pow(max_blur, (100 - m_parameters->m_sharpness) / (100 - 1));
@@ -497,7 +496,8 @@ bool TCleanupper::getResampleValues(const TRasterImageP &image, TAffine &aff, do
 
 //------------------------------------------------------------------------------------
 
-//this one incorporate the preprocessColors and the finalize function; used for swatch.(tipically on very small rasters)
+// this one incorporate the preprocessColors and the finalize function; used for swatch.(tipically
+// on very small rasters)
 TRasterP TCleanupper::processColors(const TRasterP &rin)
 {
 	if (m_parameters->m_lineProcessingMode == lpNone)
@@ -510,16 +510,17 @@ TRasterP TCleanupper::processColors(const TRasterP &rin)
 	}
 
 	// Copy current cleanup palette to parameters' colors
-	m_parameters->m_colors.update(m_parameters->m_cleanupPalette.getPointer(), m_parameters->m_noAntialias);
+	m_parameters->m_colors.update(m_parameters->m_cleanupPalette.getPointer(),
+								  m_parameters->m_noAntialias);
 
 	bool toGr8 = (m_parameters->m_lineProcessingMode == lpGrey);
 	if (toGr8) {
-		//No (color) processing. Not even thresholding. This just means that all the important
-		//stuff here is made in the brightness/contrast stage...
+		// No (color) processing. Not even thresholding. This just means that all the important
+		// stuff here is made in the brightness/contrast stage...
 
-		//NOTE: Most of the color processing should be DISABLED in this case!!
+		// NOTE: Most of the color processing should be DISABLED in this case!!
 
-		//finalRas->clear();
+		// finalRas->clear();
 		rin->lock();
 		rcm->lock();
 
@@ -528,7 +529,7 @@ TRasterP TCleanupper::processColors(const TRasterP &rin)
 			TUINT32 *rowout = reinterpret_cast<TUINT32 *>(rcm->getRawData());
 			for (int i = 0; i < rin->getLy(); i++) {
 				for (int j = 0; j < rin->getLx(); j++)
-					*rowout++ = *rowin++; //Direct copy for now... :(
+					*rowout++ = *rowin++; // Direct copy for now... :(
 				rowin += rin->getWrap() - rin->getLx();
 				rowout += rcm->getWrap() - rcm->getLx();
 			}
@@ -550,7 +551,7 @@ TRasterP TCleanupper::processColors(const TRasterP &rin)
 		preprocessColors(rcm, rin, m_parameters->m_colors);
 	}
 
-	//outImg->setDpi(outDpi.x, outDpi.y);
+	// outImg->setDpi(outDpi.x, outDpi.y);
 	CleanupPreprocessedImage cpi(m_parameters, TToonzImageP(rcm, rcm->getBounds()), toGr8);
 	cpi.m_autocentered = true;
 
@@ -561,9 +562,10 @@ TRasterP TCleanupper::processColors(const TRasterP &rin)
 
 //------------------------------------------------------------------------------------
 
-CleanupPreprocessedImage *TCleanupper::process(
-	TRasterImageP &image, bool first_image, TRasterImageP &onlyResampledImage,
-	bool isCameraTest, bool returnResampled, bool onlyForSwatch, TAffine *resampleAff)
+CleanupPreprocessedImage *TCleanupper::process(TRasterImageP &image, bool first_image,
+											   TRasterImageP &onlyResampledImage, bool isCameraTest,
+											   bool returnResampled, bool onlyForSwatch,
+											   TAffine *resampleAff)
 {
 	TAffine aff;
 	double blur;
@@ -571,7 +573,8 @@ CleanupPreprocessedImage *TCleanupper::process(
 	TPointD outDpi;
 
 	bool isSameDpi = false;
-	bool autocentered = getResampleValues(image, aff, blur, outDim, outDpi, isCameraTest, isSameDpi);
+	bool autocentered =
+		getResampleValues(image, aff, blur, outDim, outDpi, isCameraTest, isSameDpi);
 	if (m_parameters->m_autocenterType != AUTOCENTER_NONE && !autocentered)
 		DVGui::warning(QObject::tr("The autocentering failed on the current drawing."));
 
@@ -579,15 +582,15 @@ CleanupPreprocessedImage *TCleanupper::process(
 	bool toGr8 = (m_parameters->m_lineProcessingMode == lpGrey);
 
 	// If necessary, perform auto-adjust
-	if (!isCameraTest && m_parameters->m_lineProcessingMode != lpNone && toGr8 && m_parameters->m_autoAdjustMode != AUTO_ADJ_NONE &&
-		!onlyForSwatch) {
+	if (!isCameraTest && m_parameters->m_lineProcessingMode != lpNone && toGr8 &&
+		m_parameters->m_autoAdjustMode != AUTO_ADJ_NONE && !onlyForSwatch) {
 		static int ref_cum[256];
 		UCHAR lut[256];
 		int cum[256];
 		double x0_src_f, y0_src_f, x1_src_f, y1_src_f;
 		int x0_src, y0_src, x1_src, y1_src;
 
-		//cleanup_message("Autoadjusting... \n");
+		// cleanup_message("Autoadjusting... \n");
 
 		TAffine inv = aff.inv();
 
@@ -604,16 +607,17 @@ CleanupPreprocessedImage *TCleanupper::process(
 		set_autoadjust_window(x0_src, y0_src, x1_src, y1_src);
 
 		if (!TRasterGR8P(image->getRaster())) {
-			//Auto-adjusting a 32-bit image. This means that a white background must be introduced first.
+			// Auto-adjusting a 32-bit image. This means that a white background must be introduced
+			// first.
 			TRaster32P ras32(image->getRaster()->clone());
 			TRop::addBackground(ras32, TPixel32::White);
-			image = TRasterImageP(ras32); //old image is released here
+			image = TRasterImageP(ras32); // old image is released here
 			ras32 = TRaster32P();
 
 			TRasterGR8P rgr(image->getRaster()->getSize());
 			TRop::copy(rgr, image->getRaster());
 
-			//This is now legit. It was NOT before the clone, since the original could be cached.
+			// This is now legit. It was NOT before the clone, since the original could be cached.
 			image->setRaster(rgr);
 		}
 		switch (m_parameters->m_autoAdjustMode) {
@@ -635,9 +639,9 @@ CleanupPreprocessedImage *TCleanupper::process(
 		}
 	}
 
-	fromGr8 = (bool)TRasterGR8P(image->getRaster()); //may have changed type due to auto-adjust
+	fromGr8 = (bool)TRasterGR8P(image->getRaster()); // may have changed type due to auto-adjust
 
-	assert(returnResampled || !onlyForSwatch); //if onlyForSwatch, then returnResampled
+	assert(returnResampled || !onlyForSwatch); // if onlyForSwatch, then returnResampled
 
 	// Allocate output colormap raster
 	TRasterCM32P finalRas;
@@ -650,12 +654,15 @@ CleanupPreprocessedImage *TCleanupper::process(
 		}
 	}
 
-	// In case the input raster was a greymap, we cannot reutilize finalRas's buffer to transform the final
-	// fullcolor pixels to colormap pixels directly (1 32-bit pixel would hold 4 8-bit pixels) - therefore,
+	// In case the input raster was a greymap, we cannot reutilize finalRas's buffer to transform
+	// the final
+	// fullcolor pixels to colormap pixels directly (1 32-bit pixel would hold 4 8-bit pixels) -
+	// therefore,
 	// a secondary greymap is allocated.
 
-	//NOTE: This should be considered obsolete? By using TRop::resample( <TRaster32P& instance> , ...) we
-	//should get the same effect!!
+	// NOTE: This should be considered obsolete? By using TRop::resample( <TRaster32P& instance> ,
+	// ...) we
+	// should get the same effect!!
 
 	TRasterP tmp_ras;
 
@@ -671,13 +678,14 @@ CleanupPreprocessedImage *TCleanupper::process(
 			return 0;
 		}
 	} else
-		//if finalRas is allocated, and the intermediate raster has to be 32-bit, we can perform pixel
-		//conversion directly on the same output buffer
+		// if finalRas is allocated, and the intermediate raster has to be 32-bit, we can perform
+		// pixel
+		// conversion directly on the same output buffer
 		tmp_ras = TRaster32P(outDim.lx, outDim.ly, outDim.lx, (TPixel32 *)finalRas->getRawData());
 
 	TRop::ResampleFilterType flt_type;
 	if (isSameDpi)
-		flt_type = TRop::ClosestPixel; //NearestNeighbor
+		flt_type = TRop::ClosestPixel; // NearestNeighbor
 	else if (isCameraTest)
 		flt_type = TRop::Triangle;
 	else
@@ -685,7 +693,7 @@ CleanupPreprocessedImage *TCleanupper::process(
 	TRop::resample(tmp_ras, image->getRaster(), aff, flt_type, blur);
 
 	if ((TRaster32P)tmp_ras)
-		//Add white background to deal with semitransparent pixels
+		// Add white background to deal with semitransparent pixels
 		TRop::addBackground(tmp_ras, TPixel32::White);
 
 	if (resampleAff)
@@ -705,13 +713,14 @@ CleanupPreprocessedImage *TCleanupper::process(
 	assert(finalRas);
 
 	// Copy current cleanup palette to parameters' colors
-	m_parameters->m_colors.update(m_parameters->m_cleanupPalette.getPointer(), m_parameters->m_noAntialias);
+	m_parameters->m_colors.update(m_parameters->m_cleanupPalette.getPointer(),
+								  m_parameters->m_noAntialias);
 
 	if (toGr8) {
-		//No (color) processing. Not even thresholding. This just means that all the important
-		//stuff here is made in the brightness/contrast stage...
+		// No (color) processing. Not even thresholding. This just means that all the important
+		// stuff here is made in the brightness/contrast stage...
 
-		//NOTE: Most of the color processing should be DISABLED in this case!!
+		// NOTE: Most of the color processing should be DISABLED in this case!!
 
 		tmp_ras->lock();
 		finalRas->lock();
@@ -725,7 +734,7 @@ CleanupPreprocessedImage *TCleanupper::process(
 			UCHAR *rowin = tmp_ras->getRawData();
 			TUINT32 *rowout = reinterpret_cast<TUINT32 *>(finalRas->getRawData());
 			for (int i = 0; i < pixCount; i++)
-				*rowout++ = *rowin++; //Direct copy for now... :(
+				*rowout++ = *rowin++; // Direct copy for now... :(
 		} else {
 			TPixel32 *rowin = reinterpret_cast<TPixel32 *>(tmp_ras->getRawData());
 			TUINT32 *rowout = reinterpret_cast<TUINT32 *>(finalRas->getRawData());
@@ -736,7 +745,7 @@ CleanupPreprocessedImage *TCleanupper::process(
 		tmp_ras->unlock();
 		finalRas->unlock();
 	} else {
-		//WARNING: finalRas and tmp_ras may share the SAME buffer!
+		// WARNING: finalRas and tmp_ras may share the SAME buffer!
 		assert(TRaster32P(tmp_ras));
 		preprocessColors(finalRas, tmp_ras, m_parameters->m_colors);
 	}
@@ -753,11 +762,11 @@ CleanupPreprocessedImage *TCleanupper::process(
 
 //------------------------------------------------------------------------------------
 
-TRasterImageP TCleanupper::autocenterOnly(
-	const TRasterImageP &image, bool isCameraTest, bool &autocentered)
+TRasterImageP TCleanupper::autocenterOnly(const TRasterImageP &image, bool isCameraTest,
+										  bool &autocentered)
 {
 	double xDpi, yDpi;
-	//double inlx, inly, zoom_factor, max_blur;
+	// double inlx, inly, zoom_factor, max_blur;
 	double skew = 0, angle = 0, dist = 0 /*lq_nozoom, lp_nozoom,, cx, cy, scalex, scaley*/;
 	double cxin, cyin, cpout, cqout;
 	int rasterIsSavebox = true;
@@ -776,7 +785,7 @@ TRasterImageP TCleanupper::autocenterOnly(
 
 	image->getDpi(xDpi, yDpi);
 
-	if (!xDpi) //using 65.0 as default DPI
+	if (!xDpi) // using 65.0 as default DPI
 		xDpi = (yDpi ? yDpi : 65);
 
 	if (!yDpi)
@@ -794,8 +803,8 @@ TRasterImageP TCleanupper::autocenterOnly(
 	cqout = (rasterLy - 1) / 2.0;
 
 	if (m_parameters->m_autocenterType != AUTOCENTER_NONE)
-		autocentered = doAutocenter(angle, skew, cxin, cyin, cqout, cpout,
-									xDpi, yDpi, rasterIsSavebox, saveBox, image, 1.0);
+		autocentered = doAutocenter(angle, skew, cxin, cyin, cqout, cpout, xDpi, yDpi,
+									rasterIsSavebox, saveBox, image, 1.0);
 	else
 		autocentered = true;
 
@@ -818,43 +827,46 @@ TRasterImageP TCleanupper::autocenterOnly(
 		aff = TRotation(-(double)rotate).place(pin, pout) * aff;
 
 	if (m_parameters->m_flipx || m_parameters->m_flipy)
-		aff = TScale(m_parameters->m_flipx ? -1 : 1, m_parameters->m_flipy ? -1 : 1).place(pout, pout) * aff;
+		aff = TScale(m_parameters->m_flipx ? -1 : 1, m_parameters->m_flipy ? -1 : 1)
+				  .place(pout, pout) *
+			  aff;
 
 	if (!isCameraTest)
-		aff = TTranslation(m_parameters->m_offx * xDpi / 2,
-						   m_parameters->m_offy * yDpi / 2) *
-			  aff;
+		aff = TTranslation(m_parameters->m_offx * xDpi / 2, m_parameters->m_offy * yDpi / 2) * aff;
 
 	TRasterP tmpRas;
 	TPoint dp;
-	if (isCameraTest) //in cameratest, I don't want to crop the image to be shown.
-					  // so, I resample without cropping, and I compute the offset needed to have it autocentered.
-					  // That offset is stored in the RasterImage(setOffset below) and then used when displaying the image in camerastand (in method RasterPainter::onRasterImage)
+	if (isCameraTest) // in cameratest, I don't want to crop the image to be shown.
+	// so, I resample without cropping, and I compute the offset needed to have it autocentered.
+	// That offset is stored in the RasterImage(setOffset below) and then used when displaying the
+	// image in camerastand (in method RasterPainter::onRasterImage)
 	{
-		//TPointD srcActualCenter = aff.inv()*TPointD(finalLx/2.0, finalLy/2.0);// the autocenter position in the source image
-		//TPointD srcCenter = imageToResample->getRaster()->getCenterD();*/
+		// TPointD srcActualCenter = aff.inv()*TPointD(finalLx/2.0, finalLy/2.0);// the autocenter
+		// position in the source image
+		// TPointD srcCenter = imageToResample->getRaster()->getCenterD();*/
 		TPointD dstActualCenter = TPointD(finalLx / 2.0, finalLy / 2.0);
 		TPointD dstCenter = aff * image->getRaster()->getCenterD();
 
-		dp = convert(dstCenter - dstActualCenter); //the amount to be offset in the destination image.
+		dp = convert(dstCenter -
+					 dstActualCenter); // the amount to be offset in the destination image.
 
 		TRect r = convert(aff * convert(image->getRaster()->getBounds()));
 		aff = (TTranslation(convert(-r.getP00())) * aff);
-		//aff = aff.place(srcActualCenter, dstActualCenter);
+		// aff = aff.place(srcActualCenter, dstActualCenter);
 		tmpRas = image->getRaster()->create(r.getLx(), r.getLy());
 
 	} else
 		tmpRas = image->getRaster()->create(finalLx, finalLy);
 
 	TRop::resample(tmpRas, image->getRaster(), aff);
-	//TImageWriter::save(TFilePath("C:\\temp\\incleanup.tif"), imageToResample);
-	//TImageWriter::save(TFilePath("C:\\temp\\outcleanup.tif"), tmp_ras);
+	// TImageWriter::save(TFilePath("C:\\temp\\incleanup.tif"), imageToResample);
+	// TImageWriter::save(TFilePath("C:\\temp\\outcleanup.tif"), tmp_ras);
 
 	TRasterImageP final(tmpRas);
 	final->setOffset(dp);
 
 	final->setDpi(xDpi, yDpi);
-	//final->sethPos(finalHPos);
+	// final->sethPos(finalHPos);
 
 	return final;
 }
@@ -865,15 +877,10 @@ TRasterImageP TCleanupper::autocenterOnly(
 
 bool TCleanupper::doAutocenter(
 
-	double &angle, double &skew,
-	double &cxin, double &cyin,
-	double &cqout, double &cpout,
+	double &angle, double &skew, double &cxin, double &cyin, double &cqout, double &cpout,
 
-	const double xdpi, const double ydpi,
-	const int raster_is_savebox,
-	const TRect saveBox,
-	const TRasterImageP &image,
-	const double scalex)
+	const double xdpi, const double ydpi, const int raster_is_savebox, const TRect saveBox,
+	const TRasterImageP &image, const double scalex)
 {
 	double sigma = 0, theta = 0;
 	FDG_INFO fdg_info = m_parameters->getFdgInfo();
@@ -893,7 +900,7 @@ bool TCleanupper::doAutocenter(
 
 	case AUTOCENTER_FDG: {
 		// e se image->raster_is_savebox?
-		//cleanup_message ("Autocentering...");
+		// cleanup_message ("Autocentering...");
 		int strip_width = compute_strip_pixel(&fdg_info, xdpi) + 1; /* ?!? */
 
 		switch (m_parameters->m_pegSide) {
@@ -931,15 +938,11 @@ bool TCleanupper::doAutocenter(
 			notMoreThan(image->getRaster()->getLy(), strip_width);
 		}
 
-		convert_dots_mm_to_pixel(
-			&fdg_info.dots[0],
-			fdg_info.dots.size(),
-			xdpi, ydpi);
+		convert_dots_mm_to_pixel(&fdg_info.dots[0], fdg_info.dots.size(), xdpi, ydpi);
 
 		double cx, cy;
-		if (!get_image_rotation_and_center(
-				image->getRaster(), strip_width, pegs_ras_side,
-				&angle, &cx, &cy, &fdg_info.dots[0], fdg_info.dots.size())) {
+		if (!get_image_rotation_and_center(image->getRaster(), strip_width, pegs_ras_side, &angle,
+										   &cx, &cy, &fdg_info.dots[0], fdg_info.dots.size())) {
 			return false;
 		} else {
 			angle *= TConsts::invOf_pi_180;
@@ -978,22 +981,25 @@ inline void preprocessColor(const TPixel32 &pix, const TargetColorData &blackCol
 							const std::vector<TargetColorData> &featureColors, int nFeatures,
 							TPixelCM32 &outpix)
 {
-	//Translate the pixel to HSV
+	// Translate the pixel to HSV
 	HSVColor pixHSV(HSVColor::fromRGB(pix.r / 255.0, pix.g / 255.0, pix.b / 255.0));
 
-	//First, check against matchline colors. This is needed as outline pixels' tone is based upon that
-	//extracted here.
+	// First, check against matchline colors. This is needed as outline pixels' tone is based upon
+	// that
+	// extracted here.
 	int idx = -1, tone = 255;
 	double hDist = (std::numeric_limits<double>::max)(), newHDist;
 
 	for (int i = 0; i < nFeatures; ++i) {
 		const TargetColorData &fColor = featureColors[i];
 
-		//Feature Color
+		// Feature Color
 
-		//Retrieve the hue distance and, in case it's less than current one, this idx better
-		//approximates the color.
-		newHDist = (pixHSV.m_h > fColor.m_hsv.m_h) ? tmin(pixHSV.m_h - fColor.m_hsv.m_h, fColor.m_hsv.m_h - pixHSV.m_h + 360.0) : tmin(fColor.m_hsv.m_h - pixHSV.m_h, pixHSV.m_h - fColor.m_hsv.m_h + 360.0);
+		// Retrieve the hue distance and, in case it's less than current one, this idx better
+		// approximates the color.
+		newHDist = (pixHSV.m_h > fColor.m_hsv.m_h)
+					   ? tmin(pixHSV.m_h - fColor.m_hsv.m_h, fColor.m_hsv.m_h - pixHSV.m_h + 360.0)
+					   : tmin(fColor.m_hsv.m_h - pixHSV.m_h, pixHSV.m_h - fColor.m_hsv.m_h + 360.0);
 		if (newHDist < hDist) {
 			hDist = newHDist;
 			idx = i;
@@ -1003,9 +1009,12 @@ inline void preprocessColor(const TPixel32 &pix, const TargetColorData &blackCol
 	if (idx >= 0) {
 		const TargetColorData &fColor = featureColors[idx];
 
-		//First, perform saturation check
-		bool saturationOk = (pixHSV.m_s > fColor.m_saturationLower) &&
-							((fColor.m_hueLower <= fColor.m_hueUpper) ? (pixHSV.m_h >= fColor.m_hueLower) && (pixHSV.m_h <= fColor.m_hueUpper) : (pixHSV.m_h >= fColor.m_hueLower) || (pixHSV.m_h <= fColor.m_hueUpper));
+		// First, perform saturation check
+		bool saturationOk =
+			(pixHSV.m_s > fColor.m_saturationLower) &&
+			((fColor.m_hueLower <= fColor.m_hueUpper)
+				 ? (pixHSV.m_h >= fColor.m_hueLower) && (pixHSV.m_h <= fColor.m_hueUpper)
+				 : (pixHSV.m_h >= fColor.m_hueLower) || (pixHSV.m_h <= fColor.m_hueUpper));
 
 		if (saturationOk) {
 			tone = 255.0 * (1.0 - pixHSV.m_s) / (1.0 - fColor.m_saturationLower);
@@ -1014,15 +1023,15 @@ inline void preprocessColor(const TPixel32 &pix, const TargetColorData &blackCol
 			idx = -1;
 	}
 
-	//Check against outline color
+	// Check against outline color
 	if (pixHSV.m_v < blackColor.m_hsv.m_v) {
-		//Outline-sensitive tone is imposed when the value check passes
+		// Outline-sensitive tone is imposed when the value check passes
 		tone = (tone * pixHSV.m_v / blackColor.m_hsv.m_v);
 
-		//A further Chroma test is applied to decide whether a would-be outline color
-		//is to be intended as a matchline color instead (it has too much color)
+		// A further Chroma test is applied to decide whether a would-be outline color
+		// is to be intended as a matchline color instead (it has too much color)
 		if ((idx < 0) || (pixHSV.m_s * pixHSV.m_v) < blackColor.m_saturationLower)
-			//Outline Color
+			// Outline Color
 			idx = 1;
 	}
 
@@ -1031,14 +1040,12 @@ inline void preprocessColor(const TPixel32 &pix, const TargetColorData &blackCol
 
 //-----------------------------------------------------------------------------------------
 
-void TCleanupper::preprocessColors(
-	const TRasterCM32P &outRas,
-	const TRaster32P &raster32,
-	const TargetColors &colors)
+void TCleanupper::preprocessColors(const TRasterCM32P &outRas, const TRaster32P &raster32,
+								   const TargetColors &colors)
 {
 	assert(outRas && outRas->getSize() == raster32->getSize());
 
-	//Convert the target palette to HSV colorspace
+	// Convert the target palette to HSV colorspace
 	std::vector<TargetColorData> pencilsHSV;
 	for (int i = 2; i < colors.getColorCount(); ++i) {
 		TargetColorData cdata(colors.getColor(i));
@@ -1046,7 +1053,7 @@ void TCleanupper::preprocessColors(
 		pencilsHSV.push_back(cdata);
 	}
 
-	//Extract the 'black' Value
+	// Extract the 'black' Value
 	TargetColor black = colors.getColor(1);
 	TargetColorData blackData(black);
 	blackData.m_hsv.m_v += (1.0 - black.m_threshold / 100.0);
@@ -1055,16 +1062,17 @@ void TCleanupper::preprocessColors(
 	raster32->lock();
 	outRas->lock();
 
-	//For every image pixel, process it
+	// For every image pixel, process it
 	for (int j = 0; j < raster32->getLy(); j++) {
 		TPixel32 *pix = raster32->pixels(j);
 		TPixel32 *endPix = pix + raster32->getLx();
 		TPixelCM32 *outPix = outRas->pixels(j);
 
 		while (pix < endPix) {
-			if (*pix == TPixel32::White || pix->m < 255) //sometimes the resampling produces semitransparent pixels
-														 //on the  border of the raster; I discards those pixels.
-														 //(which otherwise creates a black border in the final cleanupped image)  vinz
+			if (*pix == TPixel32::White ||
+				pix->m < 255) // sometimes the resampling produces semitransparent pixels
+				// on the  border of the raster; I discards those pixels.
+				//(which otherwise creates a black border in the final cleanupped image)  vinz
 				*outPix = TPixelCM32();
 			else
 				preprocessColor(*pix, blackData, pencilsHSV, pencilsHSV.size(), *outPix);
@@ -1082,9 +1090,7 @@ void TCleanupper::preprocessColors(
 //    Post-Processing
 //**************************************************************************************
 
-void TCleanupper::finalize(
-	const TRaster32P &outRas,
-	CleanupPreprocessedImage *srcImg)
+void TCleanupper::finalize(const TRaster32P &outRas, CleanupPreprocessedImage *srcImg)
 {
 	if (!outRas)
 		return;
@@ -1107,9 +1113,7 @@ TToonzImageP TCleanupper::finalize(CleanupPreprocessedImage *src, bool isCleanup
 
 //-----------------------------------------------------------------------------------------
 
-void TCleanupper::doPostProcessingGR8(
-	const TRaster32P &outRas,
-	CleanupPreprocessedImage *srcImg)
+void TCleanupper::doPostProcessingGR8(const TRaster32P &outRas, CleanupPreprocessedImage *srcImg)
 {
 	TToonzImageP image = srcImg->getImg();
 	TRasterCM32P rasCM32 = image->getRaster();
@@ -1117,19 +1121,21 @@ void TCleanupper::doPostProcessingGR8(
 	rasCM32->lock();
 	outRas->lock();
 
-	TRasterCM32P cmout(outRas->getLx(), outRas->getLy(), outRas->getWrap(), (TPixelCM32 *)outRas->getRawData());
+	TRasterCM32P cmout(outRas->getLx(), outRas->getLy(), outRas->getWrap(),
+					   (TPixelCM32 *)outRas->getRawData());
 	TRop::copy(cmout, rasCM32);
 
 	rasCM32->unlock();
 
-	//Apply brightness/contrast and grayscale conversion directly
+	// Apply brightness/contrast and grayscale conversion directly
 	brightnessContrastGR8(cmout, m_parameters->m_colors);
 
-	//Apply despeckling
+	// Apply despeckling
 	if (m_parameters->m_despeckling)
-		TRop::despeckle(cmout, m_parameters->m_despeckling, m_parameters->m_transparencyCheckEnabled);
+		TRop::despeckle(cmout, m_parameters->m_despeckling,
+						m_parameters->m_transparencyCheckEnabled);
 
-	//Morphological antialiasing
+	// Morphological antialiasing
 	if (m_parameters->m_postAntialias) {
 		TRasterCM32P newRas(cmout->getLx(), cmout->getLy());
 		TRop::antialias(cmout, newRas, 10, m_parameters->m_aaValue);
@@ -1139,11 +1145,11 @@ void TCleanupper::doPostProcessingGR8(
 		cmout->lock();
 	}
 
-	//Finally, do transparency check
+	// Finally, do transparency check
 	if (m_parameters->m_transparencyCheckEnabled)
 		transparencyCheck(cmout, outRas);
 	else
-		//TRop::convert(outRas, cmout, m_parameters->m_cleanupPalette);
+		// TRop::convert(outRas, cmout, m_parameters->m_cleanupPalette);
 		TRop::convert(outRas, cmout, createToonzPaletteFromCleanupPalette());
 
 	outRas->unlock();
@@ -1160,14 +1166,14 @@ TToonzImageP TCleanupper::doPostProcessingGR8(const CleanupPreprocessedImage *im
 
 	cmout->lock();
 
-	//Apply brightness/contrast and grayscale conversion directly
+	// Apply brightness/contrast and grayscale conversion directly
 	brightnessContrastGR8(cmout, m_parameters->m_colors);
 
-	//Apply despeckling
+	// Apply despeckling
 	if (m_parameters->m_despeckling)
 		TRop::despeckle(cmout, m_parameters->m_despeckling, false);
 
-	//Morphological antialiasing
+	// Morphological antialiasing
 	if (m_parameters->m_postAntialias) {
 		TRasterCM32P newRas(cmout->getLx(), cmout->getLy());
 		TRop::antialias(cmout, newRas, 10, m_parameters->m_aaValue);
@@ -1179,11 +1185,11 @@ TToonzImageP TCleanupper::doPostProcessingGR8(const CleanupPreprocessedImage *im
 
 	cmout->unlock();
 
-	//Rebuild the cmap's bbox
+	// Rebuild the cmap's bbox
 	TRect bbox;
 	TRop::computeBBox(cmout, bbox);
 
-	//Copy the dpi
+	// Copy the dpi
 	TToonzImageP outImg(cmout, bbox);
 	double dpix, dpiy;
 	image->getDpi(dpix, dpiy);
@@ -1194,9 +1200,7 @@ TToonzImageP TCleanupper::doPostProcessingGR8(const CleanupPreprocessedImage *im
 
 //-----------------------------------------------------------------------------------------
 
-void TCleanupper::doPostProcessingColor(
-	const TRaster32P &outRas,
-	CleanupPreprocessedImage *srcImg)
+void TCleanupper::doPostProcessingColor(const TRaster32P &outRas, CleanupPreprocessedImage *srcImg)
 {
 	assert(srcImg);
 	assert(outRas->getSize() == srcImg->getSize());
@@ -1207,19 +1211,21 @@ void TCleanupper::doPostProcessingColor(
 	rasCM32->lock();
 	outRas->lock();
 
-	TRasterCM32P cmout(outRas->getLx(), outRas->getLy(), outRas->getWrap(), (TPixelCM32 *)outRas->getRawData());
+	TRasterCM32P cmout(outRas->getLx(), outRas->getLy(), outRas->getWrap(),
+					   (TPixelCM32 *)outRas->getRawData());
 	TRop::copy(cmout, rasCM32);
 
 	rasCM32->unlock();
 
-	//First, deal with brightness/contrast
+	// First, deal with brightness/contrast
 	brightnessContrast(cmout, m_parameters->m_colors);
 
-	//Then, apply despeckling
+	// Then, apply despeckling
 	if (m_parameters->m_despeckling)
-		TRop::despeckle(cmout, m_parameters->m_despeckling, m_parameters->m_transparencyCheckEnabled);
+		TRop::despeckle(cmout, m_parameters->m_despeckling,
+						m_parameters->m_transparencyCheckEnabled);
 
-	//Morphological antialiasing
+	// Morphological antialiasing
 	if (m_parameters->m_postAntialias) {
 		TRasterCM32P newRas(cmout->getLx(), cmout->getLy());
 		TRop::antialias(cmout, newRas, 10, m_parameters->m_aaValue);
@@ -1229,11 +1235,11 @@ void TCleanupper::doPostProcessingColor(
 		cmout->lock();
 	}
 
-	//Finally, do transparency check
+	// Finally, do transparency check
 	if (m_parameters->m_transparencyCheckEnabled)
 		transparencyCheck(cmout, outRas);
 	else
-		//TRop::convert(outRas, cmout, m_parameters->m_cleanupPalette);
+		// TRop::convert(outRas, cmout, m_parameters->m_cleanupPalette);
 		TRop::convert(outRas, cmout, createToonzPaletteFromCleanupPalette());
 
 	outRas->unlock();
@@ -1253,18 +1259,18 @@ TToonzImageP TCleanupper::doPostProcessingColor(const TToonzImageP &imgToProcess
 	assert(outImage);
 	assert(m_parameters->m_colors.getColorCount() < 9);
 
-	//Perform post-processing
+	// Perform post-processing
 	TRasterCM32P outRasCM32 = outImage->getRaster();
 	outRasCM32->lock();
 
-	//Brightness/Contrast
+	// Brightness/Contrast
 	brightnessContrast(outRasCM32, m_parameters->m_colors);
 
-	//Despeckling
+	// Despeckling
 	if (m_parameters->m_despeckling)
 		TRop::despeckle(outRasCM32, m_parameters->m_despeckling, false);
 
-	//Morphological antialiasing
+	// Morphological antialiasing
 	if (m_parameters->m_postAntialias) {
 		TRasterCM32P newRas(outRasCM32->getLx(), outRasCM32->getLy());
 		TRop::antialias(outRasCM32, newRas, 10, m_parameters->m_aaValue);

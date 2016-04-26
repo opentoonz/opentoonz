@@ -12,7 +12,7 @@ class ScriptConsolePanel : public TPanel
 	Q_OBJECT
 	ScriptConsole *m_scriptConsole;
 
-public:
+  public:
 #if QT_VERSION >= 0x050500
 	ScriptConsolePanel(QWidget *parent = 0, Qt::WindowFlags flags = 0);
 #else
@@ -22,8 +22,8 @@ public:
 
 	void executeCommand(const QString &cmd);
 
-public slots:
+  public slots:
 	void selectNone();
 };
 
-#endif //TESTPANEL_H
+#endif // TESTPANEL_H

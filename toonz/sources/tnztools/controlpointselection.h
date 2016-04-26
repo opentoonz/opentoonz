@@ -15,10 +15,10 @@
 
 class ControlPointEditorStroke
 {
-private:
+  private:
 	class ControlPoint
 	{
-	public:
+	  public:
 		int m_pointIndex;
 		TThickPoint m_speedIn;
 		TThickPoint m_speedOut;
@@ -28,9 +28,7 @@ private:
 			: m_pointIndex(i), m_speedIn(speedIn), m_speedOut(speedOut), m_isCusp(isCusp)
 		{
 		}
-		ControlPoint()
-		{
-		}
+		ControlPoint() {}
 	};
 
 	QList<ControlPoint> m_controlPoints;
@@ -55,27 +53,17 @@ private:
 
 	void moveSingleControlPoint(int index, const TPointD &delta);
 
-public:
-	enum PointType {
-		CONTROL_POINT,
-		SPEED_IN,
-		SPEED_OUT,
-		SEGMENT,
-		NONE
-	};
+  public:
+	enum PointType { CONTROL_POINT, SPEED_IN, SPEED_OUT, SEGMENT, NONE };
 
-	ControlPointEditorStroke()
-		: m_vi() {}
+	ControlPointEditorStroke() : m_vi() {}
 
-	~ControlPointEditorStroke()
-	{
-		m_controlPoints.clear();
-	}
+	~ControlPointEditorStroke() { m_controlPoints.clear(); }
 
 	ControlPointEditorStroke *clone() const;
 
 	/*! Modify stroke: between two linear or cusp point must be a pair chunk number.
-      PAY ATTENTION: Can add control point in the stroke. */
+	  PAY ATTENTION: Can add control point in the stroke. */
 	void setStroke(const TVectorImageP &vi, int strokeIndex);
 	TStroke *getStroke() const { return m_vi ? m_vi->getStroke(m_strokeIndex) : 0; }
 
@@ -101,9 +89,10 @@ public:
 	void setLinearSpeedIn(int index, bool linear = true, bool updatePoints = true);
 	void setLinearSpeedOut(int index, bool linear = true, bool updatePoints = true);
 
-	/*! If isLinear==true set to "0" the speedIn and speedOut value of index point; otherwise set to default value.
-      Return true if speedIn or speedOut is modified.
-      If updatePoints is true update dependent point after.*/
+	/*! If isLinear==true set to "0" the speedIn and speedOut value of index point; otherwise set to
+	  default value.
+	  Return true if speedIn or speedOut is modified.
+	  If updatePoints is true update dependent point after.*/
 	bool setLinear(int index, bool isLinear, bool updatePoints = true);
 	bool setControlPointsLinear(std::set<int> points, bool isLinear);
 
@@ -139,15 +128,13 @@ class ControlPointSelection : public QObject, public TSelection
 {
 	Q_OBJECT
 
-private:
+  private:
 	std::set<int> m_selectedPoints;
 	int m_strokeIndex;
 	ControlPointEditorStroke *m_controlPointEditorStroke;
 
-public:
-	ControlPointSelection() : m_controlPointEditorStroke(0), m_strokeIndex(-1)
-	{
-	}
+  public:
+	ControlPointSelection() : m_controlPointEditorStroke(0), m_strokeIndex(-1) {}
 
 	void setControlPointEditorStroke(ControlPointEditorStroke *controlPointEditorStroke)
 	{
@@ -167,9 +154,9 @@ public:
 
 	void enableCommands();
 
-protected slots:
+  protected slots:
 	void setLinear();
 	void setUnlinear();
 };
 
-#endif //CONTROLPOINT_SELECTION_INCLUDED
+#endif // CONTROLPOINT_SELECTION_INCLUDED

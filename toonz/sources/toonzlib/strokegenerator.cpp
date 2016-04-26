@@ -68,7 +68,8 @@ void StrokeGenerator::filterPoints()
 		TThickPoint nextPoint = m_points[k + 1];
 		double dist = tdistance(currPoint, nextPoint);
 		double deltaThick = fabs(currPoint.thick - nextPoint.thick);
-		if (deltaThick > 0.6 * dist) //  deltaThick <= dist (condizione approssimata di non-autocontenimento per TTQ)
+		if (deltaThick > 0.6 * dist) //  deltaThick <= dist (condizione approssimata di
+									 //  non-autocontenimento per TTQ)
 		{
 			vector<TThickPoint>::iterator it1 = m_points.begin();
 			vector<TThickPoint>::iterator it2 = it1 + k + 1;
@@ -88,7 +89,8 @@ void StrokeGenerator::filterPoints()
 		TThickPoint prevPoint = m_points[k - 1];
 		double dist = tdistance(currPoint, prevPoint);
 		double deltaThick = fabs(currPoint.thick - prevPoint.thick);
-		if (deltaThick > 0.6 * dist) //  deltaThick <= dist (condizione approssimata di non-autocontenimento per TTQ)
+		if (deltaThick > 0.6 * dist) //  deltaThick <= dist (condizione approssimata di
+									 //  non-autocontenimento per TTQ)
 		{
 			int kTmp = k;
 			while (k <= kMax) //  cancella da m_points[k] a m_points[size2 - 1]
@@ -199,7 +201,7 @@ void StrokeGenerator::drawAllFragments()
   tglVertex(m_p1);
   tglVertex(p1);
   tglVertex(p0);
-  glEnd(); 
+  glEnd();
 */
 	a = m_points.back();
 	if (a.thick >= h)
@@ -208,7 +210,10 @@ void StrokeGenerator::drawAllFragments()
 
 //-------------------------------------------------------------------
 
-TRectD StrokeGenerator::getModifiedRegion() const { return m_modifiedRegion; }
+TRectD StrokeGenerator::getModifiedRegion() const
+{
+	return m_modifiedRegion;
+}
 
 //-------------------------------------------------------------------
 
@@ -227,7 +232,8 @@ TStroke *StrokeGenerator::makeStroke(double error, UINT onlyLastPoints) const
 		return TStroke::interpolate(m_points, error);
 
 	vector<TThickPoint> lastPoints(onlyLastPoints);
-	vector<TThickPoint>::const_iterator first = m_points.begin() + (m_points.size() - onlyLastPoints);
+	vector<TThickPoint>::const_iterator first =
+		m_points.begin() + (m_points.size() - onlyLastPoints);
 	copy(first, m_points.end(), lastPoints.begin());
 
 	return TStroke::interpolate(lastPoints, error);

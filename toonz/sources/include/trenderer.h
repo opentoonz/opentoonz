@@ -30,14 +30,13 @@ class TRenderResourceManagerGenerator;
 
 class TFxPair
 {
-public:
+  public:
 	TRasterFxP m_frameA, m_frameB;
 	TFxPair() : m_frameA(), m_frameB() {}
-	TFxPair(const TRasterFxP &frameA, TRasterFxP &frameB)
-		: m_frameA(frameA), m_frameB(frameB) {}
+	TFxPair(const TRasterFxP &frameA, TRasterFxP &frameB) : m_frameA(frameA), m_frameB(frameB) {}
 };
 
-//typedef std::pair<TRasterFxP, TRasterFxP> TFxPair;
+// typedef std::pair<TRasterFxP, TRasterFxP> TFxPair;
 
 //=========================================================
 
@@ -54,7 +53,7 @@ class DVAPI TRenderPort
 {
 	TRectD m_renderArea;
 
-public:
+  public:
 	struct RenderData;
 
 	TRenderPort();
@@ -79,22 +78,26 @@ public:
 //! rendered frames from TRenderer. In order to avoid recalculation of identical frames during a
 //! render process, they are merged in one 'equivalence cluster' of which only one representant is
 //! rendered; the m_frames member stores each frame of such cluster. The associated raster is stored
-//! in the m_ras member. Additional returned infos include the TRenderSettings under which the frames
+//! in the m_ras member. Additional returned infos include the TRenderSettings under which the
+//! frames
 //! were rendered, and unique identification vars.
 
 struct TRenderPort::RenderData {
 	std::vector<double> m_frames; //!< Frames this output represents
 	TRenderSettings m_info;		  //!< Output settings description
-	TRasterP m_rasA, m_rasB;	  //!< The output images; m_rasB is not empty only for interlacacing and stereoscopic.
-	unsigned long m_renderId;	 //!< Identifier of the rendering session this output belongs to
-	unsigned long m_taskId;		  //!< Task identifier in the rendering session. Starts at 0, preserves
-								  //!< the original submission order except for cluster equivalence.
+	TRasterP m_rasA,
+		m_rasB; //!< The output images; m_rasB is not empty only for interlacacing and stereoscopic.
+	unsigned long m_renderId; //!< Identifier of the rendering session this output belongs to
+	unsigned long m_taskId;   //!< Task identifier in the rendering session. Starts at 0, preserves
+							  //!< the original submission order except for cluster equivalence.
 
 	RenderData() : m_renderId((unsigned long)-1), m_taskId((unsigned long)-1) {}
-	RenderData(const std::vector<double> &frames,
-			   const TRenderSettings &info, const TRasterP &rasA, const TRasterP &rasB,
-			   unsigned long renderId, unsigned long taskId)
-		: m_frames(frames), m_info(info), m_rasA(rasA), m_rasB(rasB), m_renderId(renderId), m_taskId(taskId) {}
+	RenderData(const std::vector<double> &frames, const TRenderSettings &info, const TRasterP &rasA,
+			   const TRasterP &rasB, unsigned long renderId, unsigned long taskId)
+		: m_frames(frames), m_info(info), m_rasA(rasA), m_rasB(rasB), m_renderId(renderId),
+		  m_taskId(taskId)
+	{
+	}
 };
 
 //=================================================================================
@@ -133,9 +136,11 @@ struct TRenderPort::RenderData {
 //! \n \n
 //! Some final notes about methods dealing with Toonz's lower-level API. Direct invocation
 //! of rendering functions, such as the TRasterFx::compute() method, is discouraged. Further
-//! improvements of the TRenderer's API will eventually make the need for these calls obsolete. However,
+//! improvements of the TRenderer's API will eventually make the need for these calls obsolete.
+//! However,
 //! we've implemented the possibilty to rely on TRenderer's management support even in those cases -
-//! it can be done by declaring the render process' interesting events through the apposite <a> declare..() <\a>
+//! it can be done by declaring the render process' interesting events through the apposite <a>
+//! declare..() <\a>
 //! methods and invoking install() and uninstall() on each rendering thread you'll raise
 //! for the process.
 
@@ -146,19 +151,22 @@ class DVAPI TRenderer
 	friend class TRenderResourceManagerGenerator;
 	TRenderResourceManager *getManager(unsigned int id) const;
 
-public:
+  public:
 	//! The RenderData struct contains the frame specifics to supply for a
 	//! TRenderer::startRendering() call.
 	struct RenderData {
 		double m_frame;
 		TRenderSettings m_info;
-		TFxPair m_fxRoot; //The second of pair is used for field interlacing or stereoscopic render.
+		TFxPair m_fxRoot; // The second of pair is used for field interlacing or stereoscopic
+						  // render.
 
 		RenderData(double frame, const TRenderSettings &info, const TFxPair &fxRoot)
-			: m_frame(frame), m_info(info), m_fxRoot(fxRoot) {}
+			: m_frame(frame), m_info(info), m_fxRoot(fxRoot)
+		{
+		}
 	};
 
-public:
+  public:
 	TRenderer(int nThread = 1);
 	TRenderer(TRendererImp *);
 	~TRenderer();
@@ -190,12 +198,9 @@ public:
 
 	//-----------------------------------------
 
-	//Render instance properties
+	// Render instance properties
 
-	enum RenderStatus { IDLE = 0x0,
-						FIRSTRUN = 0x1,
-						TESTRUN = 0x2,
-						COMPUTING = 0x4 };
+	enum RenderStatus { IDLE = 0x0, FIRSTRUN = 0x1, TESTRUN = 0x2, COMPUTING = 0x4 };
 	int getRenderStatus(unsigned long renderId) const;
 	bool isAborted(unsigned long renderId) const;
 
@@ -213,8 +218,10 @@ public:
 	void install(unsigned long renderId);
 	void uninstall();
 
-	// Be sure that this method is called at least once before a rendering driven by a working thread
-	// (the TRendererStartInvoker singleton must be referred first by a thread that survives, e.g. the main thread)
+	// Be sure that this method is called at least once before a rendering driven by a working
+	// thread
+	// (the TRendererStartInvoker singleton must be referred first by a thread that survives, e.g.
+	// the main thread)
 	static void initialize();
 };
 

@@ -16,11 +16,11 @@
 #endif
 
 //=============================================================================
-//forward declarations
+// forward declarations
 class TPaletteColumnFx;
 
 //=============================================================================
-//!The TXshPaletteColumn class represent a column in xsheet containing TXshPaletteLevel
+//! The TXshPaletteColumn class represent a column in xsheet containing TXshPaletteLevel
 /*!Inherits \b TXshColumn.
 \n
 */
@@ -31,7 +31,7 @@ class DVAPI TXshPaletteColumn : public TXshCellColumn
 	PERSIST_DECLARATION(TXshPaletteColumn)
 	TPaletteColumnFx *m_fx;
 
-public:
+  public:
 	TXshPaletteColumn();
 	~TXshPaletteColumn();
 
@@ -50,7 +50,7 @@ public:
 	void loadData(TIStream &is);
 	void saveData(TOStream &is);
 
-private:
+  private:
 	// not implemented
 	TXshPaletteColumn(const TXshPaletteColumn &);
 	TXshPaletteColumn &operator=(const TXshPaletteColumn &);

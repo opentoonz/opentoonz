@@ -64,7 +64,7 @@ class FunctionSegmentViewer : public QFrame, public TParamObserver
 	QPushButton *m_prevLinkButton;
 	QPushButton *m_nextLinkButton;
 
-public:
+  public:
 	FunctionSegmentViewer(QWidget *parent, FunctionSheet *sheet = 0, FunctionPanel *panel = 0);
 	~FunctionSegmentViewer();
 
@@ -81,18 +81,18 @@ public:
 	void setXsheetHandle(TXsheetHandle *xshHandle) { m_xshHandle = xshHandle; }
 
 	bool anyWidgetHasFocus();
-	//in order to avoid FunctionViewer to get focus while editing the expression
+	// in order to avoid FunctionViewer to get focus while editing the expression
 	bool isExpressionPageActive();
 
-private:
+  private:
 	int typeToIndex(int type) const;
 	int indexToType(int typeIndex) const { return m_typeId[typeIndex]; }
 	bool segmentIsValid() const;
 
-	//for displaying the types of neighbor segments
+	// for displaying the types of neighbor segments
 	QString typeToString(int type) const;
 
-private slots:
+  private slots:
 	void onSegmentTypeChanged(int type);
 	void onCurveChanged();
 	void onStepFieldChanged(const QString &);
@@ -103,7 +103,7 @@ private slots:
 	void onPrevLinkButtonPressed();
 	void onNextLinkButtonPressed();
 
-public slots:
+  public slots:
 	void setSegment(TDoubleParam *curve, int segmentIndex);
 	void setSegmentByFrame(TDoubleParam *curve, int frame);
 };
@@ -115,7 +115,7 @@ class FunctionSegmentPage : public QWidget
 	Q_OBJECT
 	FunctionSegmentViewer *m_viewer;
 
-public:
+  public:
 	FunctionSegmentPage(FunctionSegmentViewer *parent);
 	~FunctionSegmentPage();
 
@@ -130,7 +130,7 @@ public:
 
 	virtual void init(int segmentLength) = 0;
 
-public slots:
+  public slots:
 	void onFieldChanged() { apply(); }
 };
 
@@ -148,7 +148,7 @@ class SpeedInOutSegmentPage : public FunctionSegmentPage
 	DVGui::MeasuredDoubleLineEdit *m_firstSpeedFld;
 	DVGui::MeasuredDoubleLineEdit *m_lastSpeedFld;
 
-public:
+  public:
 	SpeedInOutSegmentPage(FunctionSegmentViewer *parent = 0);
 	void refresh();
 	void apply(){};
@@ -156,7 +156,7 @@ public:
 	void getGuiValues(TPointD &speedIn, TPointD &speedOut);
 	void init(int segmentLength);
 
-public slots:
+  public slots:
 	void onFirstHandleXChanged();
 	void onFirstHandleYChanged();
 	void onLastHandleXChanged();
@@ -175,7 +175,7 @@ class EaseInOutSegmentPage : public FunctionSegmentPage
 
 	bool m_isPercentage;
 
-public:
+  public:
 	EaseInOutSegmentPage(bool percentage, FunctionSegmentViewer *parent = 0);
 	void refresh();
 	void apply() {}
@@ -183,7 +183,7 @@ public:
 	void getGuiValues(TPointD &easeIn, TPointD &easeOut);
 	void init(int segmentLength);
 
-public slots:
+  public slots:
 	void onEase0Changed();
 	void onEase1Changed();
 };
@@ -197,14 +197,13 @@ class FunctionExpressionSegmentPage : public FunctionSegmentPage
 	DVGui::ExpressionField *m_expressionFld;
 	DVGui::LineEdit *m_unitFld;
 
-public:
+  public:
 	FunctionExpressionSegmentPage(FunctionSegmentViewer *parent = 0);
 	void refresh();
 	void apply();
 
 	// return false if a circular reference is occured
-	bool getGuiValues(std::string &expressionText,
-					  std::string &unitName);
+	bool getGuiValues(std::string &expressionText, std::string &unitName);
 
 	void init(int segmentLength);
 };
@@ -218,7 +217,7 @@ class SimilarShapeSegmentPage : public FunctionSegmentPage
 	DVGui::ExpressionField *m_expressionFld;
 	DVGui::LineEdit *m_offsetFld;
 
-public:
+  public:
 	SimilarShapeSegmentPage(FunctionSegmentViewer *parent = 0);
 
 	void refresh();
@@ -226,8 +225,7 @@ public:
 
 	void init(int segmentLength);
 
-	void getGuiValues(std::string &expressionText,
-					  double &similarShapeOffset);
+	void getGuiValues(std::string &expressionText, double &similarShapeOffset);
 };
 
 #endif

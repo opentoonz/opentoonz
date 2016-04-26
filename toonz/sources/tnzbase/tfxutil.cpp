@@ -10,10 +10,7 @@
 
 //-------------------------------------------------------------------
 
-void TFxUtil::setParam(
-	const TFxP &fx,
-	std::string paramName,
-	double value)
+void TFxUtil::setParam(const TFxP &fx, std::string paramName, double value)
 {
 	TDoubleParamP param = TParamP(fx->getParams()->getParam(paramName));
 	assert(param);
@@ -22,10 +19,7 @@ void TFxUtil::setParam(
 
 //-------------------------------------------------------------------
 
-void TFxUtil::setParam(
-	const TFxP &fx,
-	std::string paramName,
-	TPixel32 color)
+void TFxUtil::setParam(const TFxP &fx, std::string paramName, TPixel32 color)
 {
 	TPixelParamP param = TParamP(fx->getParams()->getParam(paramName));
 	assert(param);
@@ -46,10 +40,7 @@ TFxP TFxUtil::makeColorCard(TPixel32 color)
 
 TFxP TFxUtil::makeCheckboard()
 {
-	return makeCheckboard(
-		TPixel32(255, 200, 200),
-		TPixel32(180, 190, 190),
-		50);
+	return makeCheckboard(TPixel32(255, 200, 200), TPixel32(180, 190, 190), 50);
 }
 //-------------------------------------------------------------------
 
@@ -169,15 +160,12 @@ void TFxUtil::deleteKeyframes(const TFxP &fx, int frame)
 
 //-------------------------------------------------------------------
 
-void TFxUtil::setKeyframe(
-	const TFxP &dstFx, int dstFrame,
-	const TFxP &srcFx, int srcFrame,
-	bool changedOnly)
+void TFxUtil::setKeyframe(const TFxP &dstFx, int dstFrame, const TFxP &srcFx, int srcFrame,
+						  bool changedOnly)
 {
 	if (dstFx->getFxType() != srcFx->getFxType())
 		return;
-	assert(dstFx->getParams()->getParamCount() ==
-		   srcFx->getParams()->getParamCount());
+	assert(dstFx->getParams()->getParamCount() == srcFx->getParams()->getParamCount());
 	for (int i = 0; i < dstFx->getParams()->getParamCount(); i++) {
 		TParamP dstParam = dstFx->getParams()->getParam(i);
 		TParamP srcParam = srcFx->getParams()->getParam(i);

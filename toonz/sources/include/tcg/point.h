@@ -14,10 +14,9 @@ namespace tcg
   The Point class models a point in a bidimensional vector space. It has 2 members,
   x and y, representing its coordinates, and a constructor prototype:
 
-    Point_class(const value_type& x, const value_type& y);
+	Point_class(const value_type& x, const value_type& y);
 */
-template <typename T>
-struct PointT {
+template <typename T> struct PointT {
 	typedef T value_type;
 	value_type x, y;
 
@@ -40,8 +39,7 @@ typedef PointT<double> PointD;
 //    tcg Generic Point Traits
 //*************************************************************
 
-template <typename P>
-struct point_traits {
+template <typename P> struct point_traits {
 	typedef P point_type;
 	typedef typename P::value_type value_type;
 	typedef typename P::value_type float_type;
@@ -50,8 +48,7 @@ struct point_traits {
 	inline static value_type y(const point_type &p) { return p.y; }
 };
 
-template <>
-struct point_traits<PointI> {
+template <> struct point_traits<PointI> {
 	typedef PointI point_type;
 	typedef PointI::value_type value_type;
 	typedef double float_type;
@@ -60,6 +57,6 @@ struct point_traits<PointI> {
 	inline static value_type y(const point_type &p) { return p.y; }
 };
 
-} //namespace tcg
+} // namespace tcg
 
-#endif //TCG_POINT_H
+#endif // TCG_POINT_H

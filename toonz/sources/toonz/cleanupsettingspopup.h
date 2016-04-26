@@ -60,28 +60,28 @@ class CleanupSettings : public QWidget
 	CleanupParameters m_backupParams;
 
 	bool m_attached; //!< Whether the settomgs are attached to the
-	//!< cleanup model
-public:
+					 //!< cleanup model
+  public:
 	CleanupSettings(QWidget *parent = 0);
 
-signals:
+  signals:
 
 	/*! \details   The window title may change to reflect updates of the underlying
-                 cleanup settings model.                                            */
+				 cleanup settings model.                                            */
 	void windowTitleChanged(const QString &title); //!< Signals a change of the window title.
 
-public slots:
+  public slots:
 
 	void updateGui(bool postProcessPreviews);
 
 	void enableSwatch(bool);
 	void enableOpacityCheck(bool);
 
-protected:
+  protected:
 	void showEvent(QShowEvent *);
 	void hideEvent(QHideEvent *);
 
-private slots:
+  private slots:
 
 	void onImageSwitched();
 	void onPreviewDataChanged();
@@ -105,17 +105,17 @@ class CleanupTab : public QFrame
 	TFilePath m_path; //!< Actual params' path, may be different
 					  //!< from the field
 
-public:
+  public:
 	CleanupTab();
 
 	void updateGui(CleanupParameters *params, CleanupParameters *oldParams);
 
-private slots:
+  private slots:
 
 	void onGenericSettingsChange();
 	void onPathChange();
 
-private:
+  private:
 	QString pathString(const TFilePath &path, bool lpNone);
 };
 
@@ -143,15 +143,15 @@ class ProcessingTab : public QFrame
 	DVGui::Separator *m_paletteSep;
 	QWidget *m_settingsFrame;
 
-public:
+  public:
 	ProcessingTab();
 
 	void updateGui(CleanupParameters *params, CleanupParameters *oldParams);
 
-private:
+  private:
 	void updateVisibility();
 
-private slots:
+  private slots:
 
 	void onGenericSettingsChange();
 	void onSharpnessChange(bool dragging);
@@ -165,13 +165,13 @@ class CameraTab : public CleanupCameraSettingsWidget
 {
 	Q_OBJECT
 
-public:
+  public:
 	CameraTab();
 
 	void updateGui(CleanupParameters *params, CleanupParameters *oldParams);
 	void updateImageInfo();
 
-private slots:
+  private slots:
 
 	void onLevelSwitched();
 	void onGenericSettingsChange();

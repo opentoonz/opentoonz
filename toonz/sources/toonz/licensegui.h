@@ -22,12 +22,12 @@ class LicenseWizardPage : public QWidget
 	QString m_screenPath;
 	QVBoxLayout *m_layout;
 
-public:
+  public:
 	LicenseWizardPage(QWidget *parent = 0);
 	void changeSplashScreen(int id);
 	void addWidget(QWidget *widget);
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *event);
 };
 
@@ -44,23 +44,23 @@ class LicenseWizard : public Dialog
 	QLabel *m_checkFld;
 	QLabel *m_info;
 	QPushButton *m_activateBtn;
-	QString m_codeFormat; //gestisce la formattazione(i trattini) di attivationCode e License.
+	QString m_codeFormat; // gestisce la formattazione(i trattini) di attivationCode e License.
 	int m_markCount;
 
 	QWidget *createTryBuyActivatePage();
 	QWidget *createActivatePage();
 	QWidget *createConnectionPage();
 
-public:
+  public:
 	LicenseWizard(QWidget *parent = 0);
 	QLabel *m_stateConnectionLbl;
 	QString getDaysLeftString(int dayLeft) const;
 	QString getLicenseStatusString() const;
 	void setPage(int pageIndex) { m_pages->setCurrentIndex(pageIndex); }
-protected:
+  protected:
 	void paintEvent(QPaintEvent *);
 
-protected slots:
+  protected slots:
 	void buy();
 #ifdef LINETEST
 	void tryAct();
@@ -72,7 +72,7 @@ protected slots:
 	void slotCursorPositionChanged();
 	void activate();
 
-private:
+  private:
 	LicenseWizard(const LicenseWizard &);
 	void createActivateButtonBox();
 	void createConnectionButtonBox();
@@ -89,14 +89,14 @@ class UpgradeLicense : public Dialog
 	QLineEdit *m_codeFld;
 	int m_markCount;
 
-public:
+  public:
 	UpgradeLicense(QWidget *parent = 0);
-protected slots:
+  protected slots:
 	void upgrade();
 	void codeChanged(const QString &text);
 	void slotCursorPositionChanged();
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *event);
 };
 
@@ -105,10 +105,10 @@ class MyWidget : public QWidget
 	Q_OBJECT
 	QPixmap *m_pixmap;
 
-public:
+  public:
 	MyWidget(QWidget *parent = 0);
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *event);
 };
 

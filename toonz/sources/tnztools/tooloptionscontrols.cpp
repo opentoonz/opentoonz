@@ -77,7 +77,7 @@ bool ToolOptionControl::isInVisibleViewer(QWidget *widget)
 	if (!grandParentTO)
 		return false;
 
-	//There must be a QFrame between a ComboViewerPanel and a ToolOptions
+	// There must be a QFrame between a ComboViewerPanel and a ToolOptions
 	QFrame *greatGrandParentFrame = dynamic_cast<QFrame *>(grandParentTO->parentWidget());
 	if (!greatGrandParentFrame)
 		return false;
@@ -91,7 +91,8 @@ bool ToolOptionControl::isInVisibleViewer(QWidget *widget)
 
 ToolOptionCheckbox::ToolOptionCheckbox(TTool *tool, TBoolProperty *property, ToolHandle *toolHandle,
 									   QWidget *parent)
-	: CheckBox(parent), ToolOptionControl(tool, property->getName(), toolHandle), m_property(property)
+	: CheckBox(parent), ToolOptionControl(tool, property->getName(), toolHandle),
+	  m_property(property)
 {
 	setText(property->getQStringName());
 	m_property->addListener(this);
@@ -188,7 +189,7 @@ void ToolOptionSlider::increase()
 	setValue(value);
 	m_property->setValue(getValue());
 	notifyTool();
-	//update the interface
+	// update the interface
 	repaint();
 }
 
@@ -213,7 +214,7 @@ void ToolOptionSlider::decrease()
 	setValue(value);
 	m_property->setValue(getValue());
 	notifyTool();
-	//update the interface
+	// update the interface
 	repaint();
 }
 
@@ -222,7 +223,8 @@ void ToolOptionSlider::decrease()
 ToolOptionPairSlider::ToolOptionPairSlider(TTool *tool, TDoublePairProperty *property,
 										   const QString &leftName, const QString &rightName,
 										   ToolHandle *toolHandle)
-	: DoublePairField(0, property->isMaxRangeLimited()), ToolOptionControl(tool, property->getName(), toolHandle), m_property(property)
+	: DoublePairField(0, property->isMaxRangeLimited()),
+	  ToolOptionControl(tool, property->getName(), toolHandle), m_property(property)
 {
 	setLeftText(leftName);
 	setRightText(rightName);
@@ -272,7 +274,7 @@ void ToolOptionPairSlider::increaseMaxValue()
 	setValues(values);
 	m_property->setValue(getValues());
 	notifyTool();
-	//update the interface
+	// update the interface
 	repaint();
 }
 
@@ -293,7 +295,7 @@ void ToolOptionPairSlider::decreaseMaxValue()
 	setValues(values);
 	m_property->setValue(getValues());
 	notifyTool();
-	//update the interface
+	// update the interface
 	repaint();
 }
 
@@ -314,7 +316,7 @@ void ToolOptionPairSlider::increaseMinValue()
 	setValues(values);
 	m_property->setValue(getValues());
 	notifyTool();
-	//update the interface
+	// update the interface
 	repaint();
 }
 
@@ -337,7 +339,7 @@ void ToolOptionPairSlider::decreaseMinValue()
 	setValues(values);
 	m_property->setValue(getValues());
 	notifyTool();
-	//update the interface
+	// update the interface
 	repaint();
 }
 
@@ -346,7 +348,8 @@ void ToolOptionPairSlider::decreaseMinValue()
 ToolOptionIntPairSlider::ToolOptionIntPairSlider(TTool *tool, TIntPairProperty *property,
 												 const QString &leftName, const QString &rightName,
 												 ToolHandle *toolHandle)
-	: IntPairField(0, property->isMaxRangeLimited()), ToolOptionControl(tool, property->getName(), toolHandle), m_property(property)
+	: IntPairField(0, property->isMaxRangeLimited()),
+	  ToolOptionControl(tool, property->getName(), toolHandle), m_property(property)
 {
 	setLeftText(leftName);
 	setRightText(rightName);
@@ -401,7 +404,7 @@ void ToolOptionIntPairSlider::increaseMaxValue()
 	setValues(values);
 	m_property->setValue(getValues());
 	notifyTool();
-	//update the interface
+	// update the interface
 	repaint();
 }
 
@@ -427,7 +430,7 @@ void ToolOptionIntPairSlider::decreaseMaxValue()
 	setValues(values);
 	m_property->setValue(getValues());
 	notifyTool();
-	//update the interface
+	// update the interface
 	repaint();
 }
 
@@ -448,7 +451,7 @@ void ToolOptionIntPairSlider::increaseMinValue()
 	setValues(values);
 	m_property->setValue(getValues());
 	notifyTool();
-	//update the interface
+	// update the interface
 	repaint();
 }
 
@@ -471,7 +474,7 @@ void ToolOptionIntPairSlider::decreaseMinValue()
 	setValues(values);
 	m_property->setValue(getValues());
 	notifyTool();
-	//update the interface
+	// update the interface
 	repaint();
 }
 
@@ -479,7 +482,8 @@ void ToolOptionIntPairSlider::decreaseMinValue()
 
 ToolOptionIntSlider::ToolOptionIntSlider(TTool *tool, TIntProperty *property,
 										 ToolHandle *toolHandle)
-	: IntField(0, property->isMaxRangeLimited()), ToolOptionControl(tool, property->getName(), toolHandle), m_property(property)
+	: IntField(0, property->isMaxRangeLimited()),
+	  ToolOptionControl(tool, property->getName(), toolHandle), m_property(property)
 {
 	m_property->addListener(this);
 	TIntProperty::Range range = property->getRange();
@@ -526,7 +530,7 @@ void ToolOptionIntSlider::increase()
 	setValue(value);
 	m_property->setValue(getValue());
 	notifyTool();
-	//update the interface
+	// update the interface
 	repaint();
 }
 
@@ -555,7 +559,7 @@ void ToolOptionIntSlider::decrease()
 	setValue(value);
 	m_property->setValue(getValue());
 	notifyTool();
-	//update the interface
+	// update the interface
 	repaint();
 }
 
@@ -641,12 +645,13 @@ void ToolOptionCombo::doOnActivated(int index)
 	if (itemText(0) != "Normal") {
 		onActivated(index);
 		setCurrentIndex(index);
-		//for updating the cursor
+		// for updating the cursor
 		m_toolHandle->notifyToolChanged();
 		return;
 	}
 
-	// If the first item of this combo box is "Normal", enable shortcut key toggle can "back and forth" behavior.
+	// If the first item of this combo box is "Normal", enable shortcut key toggle can "back and
+	// forth" behavior.
 	if (currentIndex() == index) {
 		// estimating that the "Normal" option is located at the index 0
 		onActivated(0);
@@ -761,9 +766,10 @@ void ToolOptionTextField::onValueChanged()
 
 //=============================================================================
 
-StyleIndexFieldAndChip::StyleIndexFieldAndChip(TTool *tool, TStyleIndexProperty *property, TPaletteHandle *pltHandle,
-											   ToolHandle *toolHandle)
-	: StyleIndexLineEdit(), ToolOptionControl(tool, property->getName(), toolHandle), m_property(property), m_pltHandle(pltHandle)
+StyleIndexFieldAndChip::StyleIndexFieldAndChip(TTool *tool, TStyleIndexProperty *property,
+											   TPaletteHandle *pltHandle, ToolHandle *toolHandle)
+	: StyleIndexLineEdit(), ToolOptionControl(tool, property->getName(), toolHandle),
+	  m_property(property), m_pltHandle(pltHandle)
 {
 	m_property->addListener(this);
 
@@ -817,9 +823,11 @@ void StyleIndexFieldAndChip::updateColor()
 
 //=============================================================================
 
-ToolOptionParamRelayField::ToolOptionParamRelayField(
-	TTool *tool, TDoubleParamRelayProperty *property, int decimals)
-	: MeasuredDoubleLineEdit(), ToolOptionControl(tool, property->getName()), m_param(), m_measure(), m_property(property), m_globalKey(), m_globalGroup()
+ToolOptionParamRelayField::ToolOptionParamRelayField(TTool *tool,
+													 TDoubleParamRelayProperty *property,
+													 int decimals)
+	: MeasuredDoubleLineEdit(), ToolOptionControl(tool, property->getName()), m_param(),
+	  m_measure(), m_property(property), m_globalKey(), m_globalGroup()
 {
 	setFixedSize(70, 20);
 	m_property->addListener(this);
@@ -906,9 +914,11 @@ void ToolOptionParamRelayField::onValueChanged()
 			double m_oldVal, m_newVal; //!< Values before and after the set action...
 			double m_frame;			   //!< ... at this frame
 
-		public:
+		  public:
 			SetValueUndo(const TDoubleParamP &param, double oldVal, double newVal, double frame)
-				: m_param(param), m_oldVal(oldVal), m_newVal(newVal), m_frame(frame) {}
+				: m_param(param), m_oldVal(oldVal), m_newVal(newVal), m_frame(frame)
+			{
+			}
 
 			int getSize() const { return sizeof(SetValueUndo) + sizeof(TDoubleParam); }
 			void undo() const { m_param->setValue(m_frame, m_oldVal); }
@@ -934,7 +944,8 @@ void ToolOptionParamRelayField::onValueChanged()
 		int p, pCount = m_globalGroup->getPropertyCount();
 		for (p = 0; p != pCount; ++p) {
 			TProperty *prop = m_globalGroup->getProperty(p);
-			if (TDoubleParamRelayProperty *relProp = dynamic_cast<TDoubleParamRelayProperty *>(prop))
+			if (TDoubleParamRelayProperty *relProp =
+					dynamic_cast<TDoubleParamRelayProperty *>(prop))
 				locals::setKeyframe(relProp);
 		}
 	} else {
@@ -960,7 +971,8 @@ void ToolOptionParamRelayField::onValueChanged()
 using namespace DVGui;
 
 MeasuredValueField::MeasuredValueField(QWidget *parent, QString name)
-	: LineEdit(name, parent), m_isGlobalKeyframe(false), m_modified(false), m_errorHighlighting(false), m_precision(2)
+	: LineEdit(name, parent), m_isGlobalKeyframe(false), m_modified(false),
+	  m_errorHighlighting(false), m_precision(2)
 {
 	setObjectName("MeasuredValueField");
 
@@ -1057,7 +1069,8 @@ void MeasuredValueField::errorHighlightingTick()
 		int v = 255 - (int)(m_errorHighlighting * 255);
 		m_errorHighlighting = m_errorHighlighting * 0.8;
 		int c = 255 << 16 | v << 8 | v;
-		setStyleSheet(QString("#MeasuredValueField {background-color:#%1}").arg(c, 6, 16, QLatin1Char('0')));
+		setStyleSheet(
+			QString("#MeasuredValueField {background-color:#%1}").arg(c, 6, 16, QLatin1Char('0')));
 	}
 }
 
@@ -1071,10 +1084,12 @@ void MeasuredValueField::setPrecision(int precision)
 
 //=============================================================================
 
-PegbarChannelField::PegbarChannelField(TTool *tool, enum TStageObject::Channel actionId, QString name,
-									   TFrameHandle *frameHandle, TObjectHandle *objHandle, TXsheetHandle *xshHandle,
+PegbarChannelField::PegbarChannelField(TTool *tool, enum TStageObject::Channel actionId,
+									   QString name, TFrameHandle *frameHandle,
+									   TObjectHandle *objHandle, TXsheetHandle *xshHandle,
 									   QWidget *parent)
-	: MeasuredValueField(parent, name), ToolOptionControl(tool, ""), m_actionId(actionId), m_frameHandle(frameHandle), m_objHandle(objHandle), m_xshHandle(xshHandle), m_scaleType(eNone)
+	: MeasuredValueField(parent, name), ToolOptionControl(tool, ""), m_actionId(actionId),
+	  m_frameHandle(frameHandle), m_objHandle(objHandle), m_xshHandle(xshHandle), m_scaleType(eNone)
 {
 	bool ret = connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)),
 					   SLOT(onChange(TMeasuredValue *)));
@@ -1203,9 +1218,10 @@ void PegbarChannelField::onScaleTypeChanged(int type)
 
 //=============================================================================
 
-PegbarCenterField::PegbarCenterField(TTool *tool, int index, QString name, TObjectHandle *objHandle, TXsheetHandle *xshHandle,
-									 QWidget *parent)
-	: MeasuredValueField(parent, name), ToolOptionControl(tool, ""), m_index(index), m_objHandle(objHandle), m_xshHandle(xshHandle)
+PegbarCenterField::PegbarCenterField(TTool *tool, int index, QString name, TObjectHandle *objHandle,
+									 TXsheetHandle *xshHandle, QWidget *parent)
+	: MeasuredValueField(parent, name), ToolOptionControl(tool, ""), m_index(index),
+	  m_objHandle(objHandle), m_xshHandle(xshHandle)
 {
 	TStageObjectId objId = m_tool->getObjectId();
 	setMeasure(m_index == 0 ? "length.x" : "length.y");
@@ -1235,7 +1251,8 @@ void PegbarCenterField::onChange(TMeasuredValue *fld)
 	obj->setCenter(frame, center);
 	m_tool->invalidate();
 
-	UndoStageObjectCenterMove *undo = new UndoStageObjectCenterMove(objId, frame, oldCenter, center);
+	UndoStageObjectCenterMove *undo =
+		new UndoStageObjectCenterMove(objId, frame, oldCenter, center);
 	undo->setObjectHandle(m_objHandle);
 	undo->setXsheetHandle(m_xshHandle);
 	TUndoManager::manager()->add(undo);
@@ -1266,8 +1283,7 @@ NoScaleField::NoScaleField(TTool *tool, QString name)
 {
 	TStageObjectId objId = m_tool->getObjectId();
 	setMeasure("zdepth");
-	connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)),
-			SLOT(onChange(TMeasuredValue *)));
+	connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)), SLOT(onChange(TMeasuredValue *)));
 	updateStatus();
 }
 
@@ -1308,8 +1324,8 @@ void NoScaleField::updateStatus()
 //=============================================================================
 
 PropertyMenuButton::PropertyMenuButton(QWidget *parent, TTool *tool,
-									   QList<TBoolProperty *> properties,
-									   QIcon icon, QString tooltip)
+									   QList<TBoolProperty *> properties, QIcon icon,
+									   QString tooltip)
 	: QToolButton(parent), ToolOptionControl(tool, ""), m_properties(properties)
 {
 	setPopupMode(QToolButton::InstantPopup);
@@ -1326,7 +1342,8 @@ PropertyMenuButton::PropertyMenuButton(QWidget *parent, TTool *tool,
 	for (i = 0; i < m_properties.count(); i++) {
 		TBoolProperty *prop = m_properties.at(i);
 		QString propertyName = prop->getQStringName();
-		//Se il tooltip essagnato e' contenuto nel nome della proprieta' lo levo dalla stringa dell'azione
+		// Se il tooltip essagnato e' contenuto nel nome della proprieta' lo levo dalla stringa
+		// dell'azione
 		if (propertyName.contains(tooltip))
 			propertyName.remove(tooltip);
 		QAction *action = menu->addAction(propertyName);
@@ -1335,7 +1352,8 @@ PropertyMenuButton::PropertyMenuButton(QWidget *parent, TTool *tool,
 		action->setData(QVariant(i));
 		actiongroup->addAction(action);
 	}
-	bool ret = connect(actiongroup, SIGNAL(triggered(QAction *)), SLOT(onActionTriggered(QAction *)));
+	bool ret =
+		connect(actiongroup, SIGNAL(triggered(QAction *)), SLOT(onActionTriggered(QAction *)));
 	assert(ret);
 
 	setMenu(menu);
@@ -1376,12 +1394,13 @@ void PropertyMenuButton::onActionTriggered(QAction *action)
 }
 
 //=============================================================================
-//id == 0 Scale X
-//id == 0 Scale Y
+// id == 0 Scale X
+// id == 0 Scale Y
 SelectionScaleField::SelectionScaleField(SelectionTool *tool, int id, QString name)
 	: MeasuredValueField(0, name), m_tool(tool), m_id(id)
 {
-	bool ret = connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)), SLOT(onChange(TMeasuredValue *)));
+	bool ret = connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)),
+					   SLOT(onChange(TMeasuredValue *)));
 	assert(ret);
 	setMeasure("scale");
 	updateStatus();
@@ -1471,7 +1490,8 @@ void SelectionScaleField::updateStatus()
 SelectionRotationField::SelectionRotationField(SelectionTool *tool, QString name)
 	: MeasuredValueField(0, name), m_tool(tool)
 {
-	bool ret = connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)), SLOT(onChange(TMeasuredValue *)));
+	bool ret = connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)),
+					   SLOT(onChange(TMeasuredValue *)));
 	assert(ret);
 	setMeasure("angle");
 	updateStatus();
@@ -1491,7 +1511,7 @@ void SelectionRotationField::onChange(TMeasuredValue *fld)
 
 	TAffine aff = TRotation(m_tool->getCenter(), p - deformValues.m_rotationAngle);
 
-	deformValues.m_rotationAngle = p;								// Instruction order is relevant here
+	deformValues.m_rotationAngle = p; // Instruction order is relevant here
 	rotationTool->transform(aff, p - deformValues.m_rotationAngle); //
 
 	if (!m_tool->isLevelType())
@@ -1515,12 +1535,13 @@ void SelectionRotationField::updateStatus()
 }
 
 //=============================================================================
-//id == 0 Move X
-//id == 0 Move Y
+// id == 0 Move X
+// id == 0 Move Y
 SelectionMoveField::SelectionMoveField(SelectionTool *tool, int id, QString name)
 	: MeasuredValueField(0, name), m_tool(tool), m_id(id)
 {
-	bool ret = connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)), SLOT(onChange(TMeasuredValue *)));
+	bool ret = connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)),
+					   SLOT(onChange(TMeasuredValue *)));
 	assert(ret);
 	if (m_id == 0)
 		setMeasure("length.x");
@@ -1546,8 +1567,9 @@ void SelectionMoveField::onChange(TMeasuredValue *fld)
 
 	TAffine aff = TTranslation(-oldDelta) * TTranslation(delta);
 
-	m_tool->m_deformValues.m_moveValue = 1 / Stage::inch * newMove; // Instruction order relevant here
-	moveTool->transform(aff);										//
+	m_tool->m_deformValues.m_moveValue =
+		1 / Stage::inch * newMove; // Instruction order relevant here
+	moveTool->transform(aff);	  //
 
 	if (!m_tool->isLevelType())
 		moveTool->addTransformUndo();
@@ -1579,7 +1601,8 @@ void SelectionMoveField::updateStatus()
 ThickChangeField::ThickChangeField(SelectionTool *tool, QString name)
 	: MeasuredValueField(0, name), m_tool(tool)
 {
-	bool ret = connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)), SLOT(onChange(TMeasuredValue *)));
+	bool ret = connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)),
+					   SLOT(onChange(TMeasuredValue *)));
 	assert(ret);
 	setMeasure("");
 	updateStatus();
@@ -1592,7 +1615,8 @@ void ThickChangeField::onChange(TMeasuredValue *fld)
 	if (!m_tool || (m_tool->isSelectionEmpty() && !m_tool->isLevelType()))
 		return;
 
-	DragSelectionTool::VectorChangeThicknessTool *changeThickTool = new DragSelectionTool::VectorChangeThicknessTool((VectorSelectionTool *)m_tool);
+	DragSelectionTool::VectorChangeThicknessTool *changeThickTool =
+		new DragSelectionTool::VectorChangeThicknessTool((VectorSelectionTool *)m_tool);
 
 	TVectorImageP vi = (TVectorImageP)m_tool->getImage(true);
 
@@ -1602,8 +1626,10 @@ void ThickChangeField::onChange(TMeasuredValue *fld)
 	changeThickTool->setThicknessChange(newThickness);
 	changeThickTool->changeImageThickness(*vi, newThickness);
 
-	//DragSelectionTool::DeformValues deformValues = m_tool->m_deformValues;          // Like when I found it - it's a noop.
-	//deformValues.m_maxSelectionThickness = p;                                       // Seems that the actual update is performed inside
+	// DragSelectionTool::DeformValues deformValues = m_tool->m_deformValues;          // Like when
+	// I found it - it's a noop.
+	// deformValues.m_maxSelectionThickness = p;                                       // Seems that
+	// the actual update is performed inside
 	// the above change..() instruction...   >_<
 	changeThickTool->addUndo();
 	m_tool->computeBBox();
@@ -1615,7 +1641,8 @@ void ThickChangeField::onChange(TMeasuredValue *fld)
 
 void ThickChangeField::updateStatus()
 {
-	if (!m_tool || m_tool->m_deformValues.m_isSelectionModified || (m_tool->isSelectionEmpty() && !m_tool->isLevelType())) {
+	if (!m_tool || m_tool->m_deformValues.m_isSelectionModified ||
+		(m_tool->isSelectionEmpty() && !m_tool->isLevelType())) {
 		setValue(0);
 		setDisabled(true);
 		return;

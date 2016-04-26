@@ -9,13 +9,12 @@
 
 class TRangeParamImp
 {
-public:
+  public:
 	TRangeParamImp(const DoublePair &v)
 		: m_min(new TDoubleParam(v.first)), m_max(new TDoubleParam(v.second))
 	{
 	}
-	TRangeParamImp(const TRangeParamImp &src)
-		: m_min(src.m_min->clone()), m_max(src.m_max->clone())
+	TRangeParamImp(const TRangeParamImp &src) : m_min(src.m_min->clone()), m_max(src.m_max->clone())
 	{
 	}
 
@@ -28,8 +27,7 @@ public:
 
 PERSIST_IDENTIFIER(TRangeParam, "rangeParam")
 
-TRangeParam::TRangeParam(const DoublePair &v)
-	: m_data(new TRangeParamImp(v))
+TRangeParam::TRangeParam(const DoublePair &v) : m_data(new TRangeParamImp(v))
 {
 	addParam(m_data->m_min, "min");
 	addParam(m_data->m_max, "max");

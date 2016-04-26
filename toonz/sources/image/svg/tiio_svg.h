@@ -9,26 +9,23 @@
 
 class TLevelReaderSvg : public TLevelReader
 {
-public:
+  public:
 	TLevelReaderSvg(const TFilePath &path);
 	~TLevelReaderSvg() {}
 
 	TLevelP loadInfo();
 	TImageReaderP getFrameReader(TFrameId fid);
 
-	//QString getCreator();
-	//friend class TImageReaderPli;
+	// QString getCreator();
+	// friend class TImageReaderPli;
 
-private:
+  private:
 	TLevelP m_level;
 
-public:
-	static TLevelReader *create(const TFilePath &f)
-	{
-		return new TLevelReaderSvg(f);
-	}
+  public:
+	static TLevelReader *create(const TFilePath &f) { return new TLevelReaderSvg(f); }
 
-private:
+  private:
 	// not implemented
 	TLevelReaderSvg(const TLevelReaderSvg &);
 	TLevelReaderSvg &operator=(const TLevelReaderSvg &);
@@ -39,7 +36,7 @@ namespace Tiio
 
 class SvgWriterProperties : public TPropertyGroup
 {
-public:
+  public:
 	TEnumProperty m_strokeMode;
 	TEnumProperty m_outlineQuality;
 	SvgWriterProperties();
@@ -57,21 +54,21 @@ class TLevelWriterSvg : public TLevelWriter
 	//  vettore da utilizzare per il calcolo della palette
 	// std::vector<TPixel> m_colorArray;
 
-public:
+  public:
 	TLevelWriterSvg(const TFilePath &path, TPropertyGroup *winfo);
 
 	TImageWriterP getFrameWriter(TFrameId fid);
 
 	friend class TImageWriterSvg;
 
-public:
+  public:
 	static TLevelWriter *create(const TFilePath &f, TPropertyGroup *winfo)
 	{
 		return new TLevelWriterSvg(f, winfo);
 	}
 
-private:
-	//not implemented
+  private:
+	// not implemented
 	TLevelWriterSvg(const TLevelWriterSvg &);
 	TLevelWriterSvg &operator=(const TLevelWriterSvg &);
 };

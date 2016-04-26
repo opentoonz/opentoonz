@@ -51,22 +51,22 @@ class TOfflineGL;
   \brief    The class responsible for icons management in Toonz.
 
   \details  It's a singleton class - in particular, rendered icons are stored in
-            a shared map container for fast retrieval upon repeated icon requests.
+			a shared map container for fast retrieval upon repeated icon requests.
 
-            IconGenerator provides methods to submit icon requests, and to invalidate or
-            remove icons from the internal database. In order to keep outer entities
-            informed of the icon generation status, an iconGenerated() signal is emitted
-            once an icon has been generated.
+			IconGenerator provides methods to submit icon requests, and to invalidate or
+			remove icons from the internal database. In order to keep outer entities
+			informed of the icon generation status, an iconGenerated() signal is emitted
+			once an icon has been generated.
 */
 
 class DVAPI IconGenerator : public QObject
 {
 	Q_OBJECT
 
-public:
+  public:
 	class Settings
 	{
-	public:
+	  public:
 		bool m_blackBgCheck;
 		bool m_transparencyCheck;
 		bool m_inksOnly;
@@ -74,12 +74,13 @@ public:
 		int m_paintIndex;
 
 		Settings()
-			: m_transparencyCheck(false), m_blackBgCheck(false), m_inksOnly(false), m_inkIndex(-1), m_paintIndex(-1)
+			: m_transparencyCheck(false), m_blackBgCheck(false), m_inksOnly(false), m_inkIndex(-1),
+			  m_paintIndex(-1)
 		{
 		}
 	};
 
-public:
+  public:
 	IconGenerator();
 	~IconGenerator();
 
@@ -99,7 +100,8 @@ public:
 	void remove(TStageObjectSpline *spline);
 
 	// icons from toonz levels
-	QPixmap getIcon(TXshLevel *sl, const TFrameId &fid, bool filmStrip = true, bool onDemand = false);
+	QPixmap getIcon(TXshLevel *sl, const TFrameId &fid, bool filmStrip = true,
+					bool onDemand = false);
 	void invalidate(TXshLevel *sl, const TFrameId &fid, bool onlyFilmStrip = false);
 	void remove(TXshLevel *sl, const TFrameId &fid, bool onlyFilmStrip = false);
 
@@ -108,7 +110,7 @@ public:
 	void invalidate(const TFilePath &path, const TFrameId &fid = TFrameId::NO_FRAME);
 	void remove(const TFilePath &path, const TFrameId &fid = TFrameId::NO_FRAME);
 
-	QPixmap getSceneIcon(ToonzScene *scene); //Unused in Toonz
+	QPixmap getSceneIcon(ToonzScene *scene); // Unused in Toonz
 	void invalidateSceneIcon();
 
 	void remap(const std::string &newIconId, const std::string &oldIconId);
@@ -116,17 +118,21 @@ public:
 	void clearRequests();
 	void clearSceneIcons();
 
-	static TRaster32P generateVectorFileIcon(const TFilePath &path, const TDimension &iconSize, const TFrameId &fid);
-	static TRaster32P generateRasterFileIcon(const TFilePath &path, const TDimension &iconSize, const TFrameId &fid);
-	static TRaster32P generateSceneFileIcon(const TFilePath &path, const TDimension &iconSize, int row);
+	static TRaster32P generateVectorFileIcon(const TFilePath &path, const TDimension &iconSize,
+											 const TFrameId &fid);
+	static TRaster32P generateRasterFileIcon(const TFilePath &path, const TDimension &iconSize,
+											 const TFrameId &fid);
+	static TRaster32P generateSceneFileIcon(const TFilePath &path, const TDimension &iconSize,
+											int row);
 	static TRaster32P generateSplineFileIcon(const TFilePath &path, const TDimension &iconSize);
-	static TRaster32P generateMeshFileIcon(const TFilePath &path, const TDimension &iconSize, const TFrameId &fid);
+	static TRaster32P generateMeshFileIcon(const TFilePath &path, const TDimension &iconSize,
+										   const TFrameId &fid);
 
-signals:
+  signals:
 
 	void iconGenerated();
 
-public slots:
+  public slots:
 
 	void onStarted(TThread::RunnableP iconRenderer);
 	void onCanceled(TThread::RunnableP iconRenderer);
@@ -134,7 +140,7 @@ public slots:
 	void onException(TThread::RunnableP iconRenderer);
 	void onTerminated(TThread::RunnableP iconRenderer);
 
-private:
+  private:
 	TThread::Executor m_executor;
 	QThreadStorage<TOfflineGL *> m_contexts;
 	TDimension m_iconSize;
@@ -143,7 +149,7 @@ private:
 
 	Settings m_settings;
 
-private:
+  private:
 	void addTask(const std::string &id, TThread::RunnableP iconRenderer);
 };
 

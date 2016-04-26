@@ -36,13 +36,14 @@ extern "C" {
 #endif
 
 //#define P(d) tmsg_warning(" - %d -\n",d)
-#define COPY_RASTER(iras, oras, border) tP.copy_raster(iras, oras, border, border, iras->lx - border - 1, iras->ly - border - 1, 0, 0)
+#define COPY_RASTER(iras, oras, border)                                                            \
+	tP.copy_raster(iras, oras, border, border, iras->lx - border - 1, iras->ly - border - 1, 0, 0)
 
 #define DIRACCURACY 12
 
 // ----- PatternMapping for UCHAR pixels (range 0-255) --------------------------
-void patternmapUC(const RASTER *iras, RASTER *oras, CPatternMapParam &pmP,
-				  const int border, RASTER *imgContour) // throw (SMemAllocError,SWriteRasterError,SFileReadError)
+void patternmapUC(const RASTER *iras, RASTER *oras, CPatternMapParam &pmP, const int border,
+				  RASTER *imgContour) // throw (SMemAllocError,SWriteRasterError,SFileReadError)
 {
 	try {
 		SRECT rect = {border, border, iras->lx - border - 1, iras->ly - border - 1};
@@ -70,33 +71,38 @@ void patternmapUC(const RASTER *iras, RASTER *oras, CPatternMapParam &pmP,
 				dir.doDir();
 				dir.getResult(ipUC.m_sel.get());
 			}
-			CPatternPosition pPos(ipUC, nbContourPixel, pmP.m_density, pmP.m_minDist, pmP.m_maxDist);
+			CPatternPosition pPos(ipUC, nbContourPixel, pmP.m_density, pmP.m_minDist,
+								  pmP.m_maxDist);
 			// Reads the pattern
 			CPattern pat(imgContour);
 
-			for (vector<SPOINT>::iterator pp = pPos.m_pos.begin();
-				 pp != pPos.m_pos.end();
-				 pp++) {
+			for (vector<SPOINT>::iterator pp = pPos.m_pos.begin(); pp != pPos.m_pos.end(); pp++) {
 
 				// Calculates the rotation angle
 				double angle = 0.0;
 				if (pmP.m_isRandomDir)
-					angle = pmP.m_minDirAngle + (double)(rand() % 1001) * 0.001 * (pmP.m_maxDirAngle - pmP.m_minDirAngle);
+					angle =
+						pmP.m_minDirAngle +
+						(double)(rand() % 1001) * 0.001 * (pmP.m_maxDirAngle - pmP.m_minDirAngle);
 				else {
 					if (pp->x >= 0 && pp->y >= 0 && pp->x < ipUC.m_lX && pp->y < ipUC.m_lY) {
 						UCHAR *sel = ipUC.m_sel.get() + pp->y * ipUC.m_lX + pp->x;
 						if (*sel > (UCHAR)0)
 							angle = (double)(*sel) - 50.0;
 					}
-					angle += pmP.m_minDirAngle + (double)(rand() % 1001) * 0.001 * (pmP.m_maxDirAngle - pmP.m_minDirAngle);
+					angle +=
+						pmP.m_minDirAngle +
+						(double)(rand() % 1001) * 0.001 * (pmP.m_maxDirAngle - pmP.m_minDirAngle);
 				}
 
 				// Calculates the scale
 				double scale = 1.0;
-				scale = pmP.m_minScale + (double)(rand() % 1001) * 0.001 * (pmP.m_maxScale - pmP.m_minScale);
+				scale = pmP.m_minScale +
+						(double)(rand() % 1001) * 0.001 * (pmP.m_maxScale - pmP.m_minScale);
 
 				// Mapping of Pattern
-				pat.mapIt(ipUC, ipOri, pp->x, pp->y, scale, angle, pmP.m_isUseInkColor, pmP.m_isIncludeAlpha);
+				pat.mapIt(ipUC, ipOri, pp->x, pp->y, scale, angle, pmP.m_isUseInkColor,
+						  pmP.m_isIncludeAlpha);
 			}
 		}
 
@@ -104,7 +110,7 @@ void patternmapUC(const RASTER *iras, RASTER *oras, CPatternMapParam &pmP,
 
 		ipUC.write(oras, rect, p);
 	} catch (SMemAllocError) {
-		//SMemAllocError();
+		// SMemAllocError();
 	} catch (SWriteRasterError) {
 		//	SWriteRasterError();
 	} catch (SFileReadError) {
@@ -113,8 +119,8 @@ void patternmapUC(const RASTER *iras, RASTER *oras, CPatternMapParam &pmP,
 }
 
 // ----- PatternMapping for USHORT pixels (range 0-255) --------------------------
-void patternmapUS(const RASTER *iras, RASTER *oras, CPatternMapParam &pmP,
-				  const int border, RASTER *imgContour) // throw (SMemAllocError,SWriteRasterError,SFileReadError)
+void patternmapUS(const RASTER *iras, RASTER *oras, CPatternMapParam &pmP, const int border,
+				  RASTER *imgContour) // throw (SMemAllocError,SWriteRasterError,SFileReadError)
 {
 	try {
 		SRECT rect = {border, border, iras->lx - border - 1, iras->ly - border - 1};
@@ -143,39 +149,44 @@ void patternmapUS(const RASTER *iras, RASTER *oras, CPatternMapParam &pmP,
 				dir.doDir();
 				dir.getResult(ipUS.m_sel.get());
 			}
-			CPatternPosition pPos(ipUS, nbContourPixel, pmP.m_density, pmP.m_minDist, pmP.m_maxDist);
+			CPatternPosition pPos(ipUS, nbContourPixel, pmP.m_density, pmP.m_minDist,
+								  pmP.m_maxDist);
 			// Reads the pattern
 			CPattern pat(imgContour);
 
-			for (vector<SPOINT>::iterator pp = pPos.m_pos.begin();
-				 pp != pPos.m_pos.end();
-				 pp++) {
+			for (vector<SPOINT>::iterator pp = pPos.m_pos.begin(); pp != pPos.m_pos.end(); pp++) {
 
 				// Calculates the rotation angle
 				double angle = 0.0;
 				if (pmP.m_isRandomDir)
-					angle = pmP.m_minDirAngle + (double)(rand() % 1001) * 0.001 * (pmP.m_maxDirAngle - pmP.m_minDirAngle);
+					angle =
+						pmP.m_minDirAngle +
+						(double)(rand() % 1001) * 0.001 * (pmP.m_maxDirAngle - pmP.m_minDirAngle);
 				else {
 					if (pp->x >= 0 && pp->y >= 0 && pp->x < ipUS.m_lX && pp->y < ipUS.m_lY) {
 						UCHAR *sel = ipUS.m_sel.get() + pp->y * ipUS.m_lX + pp->x;
 						if (*sel > (UCHAR)0)
 							angle = (double)(*sel) - 50.0;
 					}
-					angle += pmP.m_minDirAngle + (double)(rand() % 1001) * 0.001 * (pmP.m_maxDirAngle - pmP.m_minDirAngle);
+					angle +=
+						pmP.m_minDirAngle +
+						(double)(rand() % 1001) * 0.001 * (pmP.m_maxDirAngle - pmP.m_minDirAngle);
 				}
 
 				// Calculates the scale
 				double scale = 1.0;
-				scale = pmP.m_minScale + (double)(rand() % 1001) * 0.001 * (pmP.m_maxScale - pmP.m_minScale);
+				scale = pmP.m_minScale +
+						(double)(rand() % 1001) * 0.001 * (pmP.m_maxScale - pmP.m_minScale);
 
 				// Mapping of Pattern
-				pat.mapIt(ipUS, ipOri, pp->x, pp->y, scale, angle, pmP.m_isUseInkColor, pmP.m_isIncludeAlpha);
+				pat.mapIt(ipUS, ipOri, pp->x, pp->y, scale, angle, pmP.m_isUseInkColor,
+						  pmP.m_isIncludeAlpha);
 			}
 		}
 		//		ipUC.showSelection();
 		ipUS.write(oras, rect, p);
 	} catch (SMemAllocError) {
-		//SMemAllocError();
+		// SMemAllocError();
 	} catch (SWriteRasterError) {
 		//	SWriteRasterError();
 	} catch (SFileReadError) {
@@ -183,8 +194,8 @@ void patternmapUS(const RASTER *iras, RASTER *oras, CPatternMapParam &pmP,
 	}
 }
 
-int patternmap(const RASTER *iras, RASTER *oras, const int border,
-			   int argc, const char *argv[], const int shrink, RASTER *imgContour)
+int patternmap(const RASTER *iras, RASTER *oras, const int border, int argc, const char *argv[],
+			   const int shrink, RASTER *imgContour)
 {
 	// The input raster must be RAS_CM16 or RAS_CM24!!!!
 	CSTPic<UC_PIXEL> tP;

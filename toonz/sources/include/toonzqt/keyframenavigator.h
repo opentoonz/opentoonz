@@ -44,7 +44,7 @@ class DVAPI KeyframeNavigator : public QToolBar
 
 	TFrameHandle *m_frameHandle;
 
-public:
+  public:
 	KeyframeNavigator(QWidget *parent = 0, TFrameHandle *frameHandle = 0);
 
 	int getCurrentFrame() const
@@ -54,7 +54,7 @@ public:
 		return m_frameHandle->getFrameIndex();
 	}
 
-public slots:
+  public slots:
 	void setCurrentFrame(int frame)
 	{
 		m_frameHandle->setFrameIndex(frame);
@@ -68,7 +68,7 @@ public slots:
 	}
 	void update();
 
-protected slots:
+  protected slots:
 	void toggleKeyAct()
 	{
 		toggle();
@@ -85,7 +85,7 @@ protected slots:
 		update();
 	}
 
-protected:
+  protected:
 	virtual bool hasNext() const = 0;
 	virtual bool hasPrev() const = 0;
 	virtual bool hasKeyframes() const = 0;
@@ -110,7 +110,7 @@ class DVAPI ViewerKeyframeNavigator : public KeyframeNavigator
 	TObjectHandle *m_objectHandle;
 	TXsheetHandle *m_xsheetHandle;
 
-public:
+  public:
 	ViewerKeyframeNavigator(QWidget *parent, TFrameHandle *frameHandle = 0)
 		: KeyframeNavigator(parent, frameHandle), m_objectHandle(0), m_xsheetHandle(0)
 	{
@@ -120,7 +120,7 @@ public:
 	TObjectHandle *getObjectHandle() const { return m_objectHandle; }
 	TXsheetHandle *getXsheetHandle() const { return m_xsheetHandle; }
 
-public slots:
+  public slots:
 	void setObjectHandle(TObjectHandle *objectHandle)
 	{
 		m_objectHandle = objectHandle;
@@ -132,7 +132,7 @@ public slots:
 		update();
 	}
 
-protected:
+  protected:
 	TStageObject *getStageObject() const;
 	bool hasNext() const;
 	bool hasPrev() const;
@@ -158,7 +158,7 @@ class DVAPI PaletteKeyframeNavigator : public KeyframeNavigator
 	TPaletteHandle *m_paletteHandle;
 	TStyleSelection *m_selection;
 
-public:
+  public:
 	PaletteKeyframeNavigator(QWidget *parent, TFrameHandle *frameHandle = 0)
 		: KeyframeNavigator(parent, frameHandle), m_paletteHandle(0), m_selection(0)
 	{
@@ -182,14 +182,14 @@ public:
 
 	TPaletteHandle *getPaletteHandle() const { return m_paletteHandle; }
 
-public slots:
+  public slots:
 	void setPaletteHandle(TPaletteHandle *paletteHandle)
 	{
 		m_paletteHandle = paletteHandle;
 		update();
 	}
 
-protected:
+  protected:
 	bool hasNext() const;
 	bool hasPrev() const;
 	bool hasKeyframes() const;
@@ -213,7 +213,7 @@ class DVAPI FxKeyframeNavigator : public KeyframeNavigator
 
 	TFxHandle *m_fxHandle;
 
-public:
+  public:
 	FxKeyframeNavigator(QWidget *parent, TFrameHandle *frameHandle = 0)
 		: KeyframeNavigator(parent, frameHandle), m_fxHandle(0)
 	{
@@ -232,14 +232,14 @@ public:
 
 	TFxHandle *getFxHandle() const { return m_fxHandle; }
 
-public slots:
+  public slots:
 	void setFxHandle(TFxHandle *fxHandle)
 	{
 		m_fxHandle = fxHandle;
 		update();
 	}
 
-protected:
+  protected:
 	bool hasNext() const;
 	bool hasPrev() const;
 	bool hasKeyframes() const;

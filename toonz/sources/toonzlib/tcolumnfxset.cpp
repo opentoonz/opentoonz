@@ -45,9 +45,8 @@ void TFxSet::saveData(TOStream &os, int occupiedColumnCount)
 		TRasterFx *rasterFx = dynamic_cast<TRasterFx *>(*it);
 		if (rasterFx) {
 			TColumnFx *columnFx = dynamic_cast<TColumnFx *>(rasterFx);
-			if (columnFx &&
-				(columnFx->getColumnIndex() == -1 ||
-				 columnFx->getColumnIndex() >= occupiedColumnCount))
+			if (columnFx && (columnFx->getColumnIndex() == -1 ||
+							 columnFx->getColumnIndex() >= occupiedColumnCount))
 				continue;
 		}
 		os.openChild("fxnode");
@@ -86,7 +85,7 @@ TFx *TFxSet::getFx(const std::string &id) const
 	std::set<TFx *>::const_iterator it;
 	for (it = m_fxs.begin(); it != m_fxs.end(); ++it) {
 		//     TFx *fx = *it;
-		//if (fx->getId() == id)
+		// if (fx->getId() == id)
 		//  return fx;
 	}
 	return 0;

@@ -15,7 +15,7 @@
 #include "toonzqt/menubarcommand.h"
 //========================================================
 //
-//StageSchematicName
+// StageSchematicName
 //
 //========================================================
 
@@ -86,8 +86,7 @@ void SchematicName::keyPressEvent(QKeyEvent *ke)
 
 bool SchematicName::eventFilter(QObject *object, QEvent *event)
 {
-	if (event->type() == QEvent::Shortcut ||
-		event->type() == QEvent::ShortcutOverride) {
+	if (event->type() == QEvent::Shortcut || event->type() == QEvent::ShortcutOverride) {
 		if (!object->inherits("QGraphicsView")) {
 			event->accept();
 			return true;
@@ -110,7 +109,7 @@ void SchematicName::focusInEvent(QFocusEvent *fe)
 
 //========================================================
 //
-//class SchematicThumbnailToggle
+// class SchematicThumbnailToggle
 //
 //========================================================
 
@@ -134,7 +133,8 @@ QRectF SchematicThumbnailToggle::boundingRect() const
 
 //--------------------------------------------------------
 
-void SchematicThumbnailToggle::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void SchematicThumbnailToggle::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+									 QWidget *widget)
 {
 	QPixmap onPixmap(":Resources/schematic_thumbtoggle_on.png");
 	QPixmap offPixmap(":Resources/schematic_thumbtoggle_off.png");
@@ -163,19 +163,23 @@ void SchematicThumbnailToggle::mousePressEvent(QGraphicsSceneMouseEvent *me)
 
 //========================================================
 //
-//SchematicToggle
+// SchematicToggle
 //
 //========================================================
 
-SchematicToggle::SchematicToggle(SchematicNode *parent, const QPixmap &pixmap, int flags, bool isLargeScaled)
-	: QGraphicsItem(parent), m_pixmap1(pixmap), m_pixmap2(), m_state(0), m_flags(flags), m_width(isLargeScaled ? 18 : 30), m_height(isLargeScaled ? 7 : 5)
+SchematicToggle::SchematicToggle(SchematicNode *parent, const QPixmap &pixmap, int flags,
+								 bool isLargeScaled)
+	: QGraphicsItem(parent), m_pixmap1(pixmap), m_pixmap2(), m_state(0), m_flags(flags),
+	  m_width(isLargeScaled ? 18 : 30), m_height(isLargeScaled ? 7 : 5)
 {
 }
 
 //--------------------------------------------------------
 
-SchematicToggle::SchematicToggle(SchematicNode *parent, const QPixmap &pixmap1, const QPixmap &pixmap2, int flags, bool isLargeScaled)
-	: QGraphicsItem(parent), m_pixmap1(pixmap1), m_pixmap2(pixmap2), m_state(0), m_flags(flags), m_width(isLargeScaled ? 18 : 30), m_height(isLargeScaled ? 7 : 5)
+SchematicToggle::SchematicToggle(SchematicNode *parent, const QPixmap &pixmap1,
+								 const QPixmap &pixmap2, int flags, bool isLargeScaled)
+	: QGraphicsItem(parent), m_pixmap1(pixmap1), m_pixmap2(pixmap2), m_state(0), m_flags(flags),
+	  m_width(isLargeScaled ? 18 : 30), m_height(isLargeScaled ? 7 : 5)
 {
 }
 
@@ -194,7 +198,8 @@ QRectF SchematicToggle::boundingRect() const
 
 //--------------------------------------------------------
 
-void SchematicToggle::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void SchematicToggle::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+							QWidget *widget)
 {
 	if (m_state != 0) {
 		QPixmap &pix = (m_state == 2 && !m_pixmap2.isNull()) ? m_pixmap2 : m_pixmap1;
@@ -257,7 +262,8 @@ void SchematicToggle::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme)
 //--------------------------------------------------------
 /*! for Spline Aim and CP toggles
 */
-void SchematicToggle_SplineOptions::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void SchematicToggle_SplineOptions::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+										  QWidget *widget)
 {
 	QRectF rect = boundingRect();
 	painter->fillRect(rect, Qt::white);
@@ -281,7 +287,7 @@ void SchematicToggle_SplineOptions::mousePressEvent(QGraphicsSceneMouseEvent *me
 
 //========================================================
 //
-//SchematicHandleSpinBox
+// SchematicHandleSpinBox
 //
 //========================================================
 
@@ -308,8 +314,8 @@ QRectF SchematicHandleSpinBox::boundingRect() const
 
 //--------------------------------------------------------
 
-void SchematicHandleSpinBox::paint(QPainter *painter,
-								   const QStyleOptionGraphicsItem *option, QWidget *widget)
+void SchematicHandleSpinBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+								   QWidget *widget)
 {
 	QRectF rect = boundingRect();
 	painter->drawPixmap(rect.toRect(), m_pixmap);
@@ -359,7 +365,7 @@ void SchematicHandleSpinBox::mouseReleaseEvent(QGraphicsSceneMouseEvent *me)
 
 //========================================================
 //
-//class SchematicLink
+// class SchematicLink
 //
 //========================================================
 
@@ -404,11 +410,11 @@ QPainterPath SchematicLink::shape() const
 
 //--------------------------------------------------------
 
-void SchematicLink::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void SchematicLink::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+						  QWidget *widget)
 {
-	if (getStartPort() &&
-		(getStartPort()->getType() == 100		 //eStageSplinePort
-		 || getStartPort()->getType() == 202)) { //eFxLinkPort
+	if (getStartPort() && (getStartPort()->getType() == 100 // eStageSplinePort
+						   || getStartPort()->getType() == 202)) { // eFxLinkPort
 		if (isSelected() || isHighlighted())
 			painter->setPen(QColor(255, 255, 10));
 		else
@@ -560,12 +566,13 @@ void SchematicLink::mouseReleaseEvent(QGraphicsSceneMouseEvent *me)
 
 //========================================================
 //
-//class SchematicPort
+// class SchematicPort
 //
 //========================================================
 
 SchematicPort::SchematicPort(QGraphicsItem *parent, SchematicNode *node, int type)
-	: QGraphicsItem(parent), m_node(node), m_buttonState(Qt::NoButton), m_highlighted(false), m_ghostLink(0), m_linkingTo(0), m_hook(0, 0), m_type(type)
+	: QGraphicsItem(parent), m_node(node), m_buttonState(Qt::NoButton), m_highlighted(false),
+	  m_ghostLink(0), m_linkingTo(0), m_hook(0, 0), m_type(type)
 {
 #if QT_VERSION >= 0x050000
 	setAcceptHoverEvents(false);
@@ -596,7 +603,7 @@ void SchematicPort::mouseMoveEvent(QGraphicsSceneMouseEvent *me)
 		showSnappedLinks();
 		m_linkingTo = 0;
 	}
-	//Snapping
+	// Snapping
 	SchematicPort *linkingTo = searchPort(me->scenePos());
 	if (!linkingTo) {
 		if (m_linkingTo) {
@@ -612,7 +619,7 @@ void SchematicPort::mouseMoveEvent(QGraphicsSceneMouseEvent *me)
 		m_linkingTo = linkingTo;
 		hideSnappedLinks();
 	}
-	//autopan
+	// autopan
 	QGraphicsView *viewer = scene()->views()[0];
 	viewer->setInteractive(false);
 	viewer->ensureVisible(QRectF(me->scenePos(), QSizeF(1, 1)), 5, 5);
@@ -663,10 +670,9 @@ void SchematicPort::mouseReleaseEvent(QGraphicsSceneMouseEvent *me)
 	if (m_buttonState == Qt::LeftButton)
 		emit(isReleased(me->scenePos()));
 
-	//The link is added to the scene only if the user released the left mouse button over
-	//a SchematicPort different from SchematicPort of the parent node.
-	if (m_buttonState == Qt::LeftButton &&
-		m_linkingTo && !isLinkedTo(m_linkingTo) &&
+	// The link is added to the scene only if the user released the left mouse button over
+	// a SchematicPort different from SchematicPort of the parent node.
+	if (m_buttonState == Qt::LeftButton && m_linkingTo && !isLinkedTo(m_linkingTo) &&
 		linkTo(m_linkingTo, true)) {
 		linkTo(m_linkingTo);
 		m_buttonState = Qt::NoButton;
@@ -766,7 +772,7 @@ QPointF SchematicPort::getLinkEndPoint() const
 
 //========================================================
 //
-//class SchematicNode
+// class SchematicNode
 //
 //========================================================
 
@@ -823,7 +829,8 @@ QRectF SchematicNode::boundingRect() const
 
 /*! Reimplements the pure virtual QGraphicsItem::paint() method.
 */
-void SchematicNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void SchematicNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+						  QWidget *widget)
 {
 	QPen pen;
 	if (isSelected()) {
@@ -922,7 +929,7 @@ void SchematicNode::erasePort(int portId)
 //--------------------------------------------------------
 
 /*! Returns a pointer to the SchematicPort mapped from \b portId.\n
-    Returns 0 if \b portId doesn't map no SchematicPort.
+	Returns 0 if \b portId doesn't map no SchematicPort.
 */
 SchematicPort *SchematicNode::getPort(int portId) const
 {

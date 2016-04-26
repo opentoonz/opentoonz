@@ -24,11 +24,17 @@ double VerticalCameraFldUnitConverter::m_factor = 1;
 namespace UnitParameters
 {
 
-std::pair<double, double> dummyCurrentDpiGetter() { return std::make_pair<double, double>(72, 72); }
+std::pair<double, double> dummyCurrentDpiGetter()
+{
+	return std::make_pair<double, double>(72, 72);
+}
 
 CurrentDpiGetter currentDpiGetter = &dummyCurrentDpiGetter;
 
-void setCurrentDpiGetter(CurrentDpiGetter f) { currentDpiGetter = f; }
+void setCurrentDpiGetter(CurrentDpiGetter f)
+{
+	currentDpiGetter = f;
+}
 }
 
 //-------------------------------------------------------------------
@@ -37,7 +43,7 @@ class VerticalFldUnitConverter : public TUnitConverter
 {
 	double m_factor;
 
-public:
+  public:
 	static double m_fieldGuideAspectRatio;
 
 	VerticalFldUnitConverter(double factor) : m_factor(factor) {}
@@ -68,7 +74,7 @@ double getFieldGuideAspectRatio()
 
 class TangentConverter : public TUnitConverter
 {
-public:
+  public:
 	TangentConverter() {}
 	TUnitConverter *clone() const { return new TangentConverter(*this); }
 	double convertTo(double v) const { return 180.0 * atan(v) / TConsts::pi; }
@@ -79,7 +85,7 @@ public:
 
 class TPixelUnitXConverter : public TUnitConverter
 {
-public:
+  public:
 	TPixelUnitXConverter() {}
 	TUnitConverter *clone() const { return new TPixelUnitXConverter(*this); }
 	double convertTo(double v) const { return v * UnitParameters::currentDpiGetter().first; }
@@ -88,7 +94,7 @@ public:
 
 class TPixelUnitYConverter : public TUnitConverter
 {
-public:
+  public:
 	TPixelUnitYConverter() {}
 	TUnitConverter *clone() const { return new TPixelUnitYConverter(*this); }
 	double convertTo(double v) const { return v * UnitParameters::currentDpiGetter().second; }
@@ -108,7 +114,8 @@ TUnit::TUnit(std::wstring ext, TUnitConverter *converter)
 //-------------------------------------------------------------------
 
 TUnit::TUnit(const TUnit &src)
-	: m_defaultExtension(src.m_defaultExtension), m_extensions(src.m_extensions), m_converter(src.m_converter->clone())
+	: m_defaultExtension(src.m_defaultExtension), m_extensions(src.m_extensions),
+	  m_converter(src.m_converter->clone())
 {
 }
 
@@ -123,8 +130,7 @@ TUnit::~TUnit()
 
 void TUnit::addExtension(std::wstring ext)
 {
-	if (std::find(
-			m_extensions.begin(), m_extensions.end(), ext) == m_extensions.end())
+	if (std::find(m_extensions.begin(), m_extensions.end(), ext) == m_extensions.end())
 		m_extensions.push_back(ext);
 	if (m_defaultExtension.empty())
 		m_defaultExtension = ext;
@@ -134,15 +140,15 @@ void TUnit::addExtension(std::wstring ext)
 
 bool TUnit::isExtension(std::wstring ext) const
 {
-	return std::find(
-			   m_extensions.begin(), m_extensions.end(), ext) != m_extensions.end();
+	return std::find(m_extensions.begin(), m_extensions.end(), ext) != m_extensions.end();
 }
 
 //-------------------------------------------------------------------
 
 void TUnit::setDefaultExtension(std::wstring ext)
 {
-	if (!ext.empty() && std::find(m_extensions.begin(), m_extensions.end(), ext) == m_extensions.end())
+	if (!ext.empty() &&
+		std::find(m_extensions.begin(), m_extensions.end(), ext) == m_extensions.end())
 		m_extensions.push_back(ext);
 	m_defaultExtension = ext;
 }
@@ -159,11 +165,11 @@ TMeasure::TMeasure(std::string name, TUnit *mainUnit)
 //-------------------------------------------------------------------
 
 TMeasure::TMeasure(const TMeasure &src)
-	: m_name(src.m_name), m_mainUnit(src.m_mainUnit), m_currentUnit(src.m_currentUnit), m_standardUnit(src.m_standardUnit), m_defaultValue(src.m_defaultValue)
+	: m_name(src.m_name), m_mainUnit(src.m_mainUnit), m_currentUnit(src.m_currentUnit),
+	  m_standardUnit(src.m_standardUnit), m_defaultValue(src.m_defaultValue)
 {
 	std::map<std::wstring, TUnit *>::const_iterator it;
-	for (it = src.m_extensions.begin();
-		 it != src.m_extensions.end(); ++it) {
+	for (it = src.m_extensions.begin(); it != src.m_extensions.end(); ++it) {
 		TUnit *u = it->second;
 		assert(u);
 		const std::vector<std::wstring> &e = u->getExtensions();
@@ -221,13 +227,10 @@ void TMeasure::setStandardUnit(TUnit *unit)
 
 TMeasureManager::TMeasureManager()
 {
-	TUnit
-		inch(L"in"),
-		cm(L"cm", new TSimpleUnitConverter(2.54)),
+	TUnit inch(L"in"), cm(L"cm", new TSimpleUnitConverter(2.54)),
 		mm(L"mm", new TSimpleUnitConverter(25.4)),
 
-		xfld(L"fld", new TSimpleUnitConverter(2)),
-		cameraXFld(L"fld", new TSimpleUnitConverter(1)),
+		xfld(L"fld", new TSimpleUnitConverter(2)), cameraXFld(L"fld", new TSimpleUnitConverter(1)),
 
 		yfld(L"fld", new VerticalFldUnitConverter(2)),
 		cameraYFld(L"fld", new VerticalFldUnitConverter(1)),
@@ -235,18 +238,12 @@ TMeasureManager::TMeasureManager()
 		levelXFld(L"fld", new TSimpleUnitConverter(1)),
 		levelYFld(L"fld", new VerticalFldUnitConverter(1)),
 
-		internalZDepth(L"internal.zdepth"),
-		zdepth(L"zdepth", new TSimpleUnitConverter(1)),
-		degree(L"\u00b0"),
-		scale(L"*"),
-		percentage2(L"%"),
-		shear(L"sh"),
+		internalZDepth(L"internal.zdepth"), zdepth(L"zdepth", new TSimpleUnitConverter(1)),
+		degree(L"\u00b0"), scale(L"*"), percentage2(L"%"), shear(L"sh"),
 		shearAngle(L"\u00b0", new TangentConverter()),
 		percentage(L"%", new TSimpleUnitConverter(100)),
-		colorChannel(L"", new TSimpleUnitConverter(255)),
-		dummy(L""),
-		xPixel(L"px", new TPixelUnitXConverter()),
-		yPixel(L"px", new TPixelUnitYConverter());
+		colorChannel(L"", new TSimpleUnitConverter(255)), dummy(L""),
+		xPixel(L"px", new TPixelUnitXConverter()), yPixel(L"px", new TPixelUnitYConverter());
 
 	inch.addExtension(L"inch");
 	inch.addExtension(L"\"");
@@ -346,8 +343,7 @@ TMeasureManager::TMeasureManager()
 	m->add(cameraYFld.clone());
 	add(m);
 
-	TUnit fxLength(L"fxLength"),
-		fxInch(L"in", new TSimpleUnitConverter(1 / 53.33333)),
+	TUnit fxLength(L"fxLength"), fxInch(L"in", new TSimpleUnitConverter(1 / 53.33333)),
 		fxCm(L"cm", new TSimpleUnitConverter(2.54 / 53.33333)),
 		fxMm(L"mm", new TSimpleUnitConverter(25.4 / 53.33333)),
 		fxXfld(L"fld", new TSimpleUnitConverter(2 / 53.33333));
@@ -427,8 +423,7 @@ TMeasure *TMeasureManager::get(std::string name) const
 
 //===================================================================
 
-TMeasuredValue::TMeasuredValue(std::string measureName)
-	: m_measure(0), m_value(0)
+TMeasuredValue::TMeasuredValue(std::string measureName) : m_measure(0), m_value(0)
 {
 	setMeasure(measureName);
 }
@@ -561,21 +556,15 @@ class ZDepthUnitConverter : public TUnitConverter
 {
 	TMeasureManager::CameraSizeProvider *m_cameraSizeProvider;
 
-public:
+  public:
 	ZDepthUnitConverter(TMeasureManager::CameraSizeProvider *cameraSizeProvider)
 		: m_cameraSizeProvider(cameraSizeProvider)
 	{
 	}
 	TUnitConverter *clone() const { return new ZDepthUnitConverter(m_cameraSizeProvider); }
 	inline double getCameraSize() const { return (*m_cameraSizeProvider)(); }
-	double convertTo(double v) const
-	{
-		return (1 - v * 0.001) * getCameraSize();
-	}
-	double convertFrom(double v) const
-	{
-		return (1 - v / getCameraSize()) * 1000.0;
-	}
+	double convertTo(double v) const { return (1 - v * 0.001) * getCameraSize(); }
+	double convertFrom(double v) const { return (1 - v / getCameraSize()) * 1000.0; }
 };
 
 //-------------------------------------------------------------------
@@ -584,21 +573,15 @@ class CameraZDepthUnitConverter : public TUnitConverter
 {
 	TMeasureManager::CameraSizeProvider *m_cameraSizeProvider;
 
-public:
+  public:
 	CameraZDepthUnitConverter(TMeasureManager::CameraSizeProvider *cameraSizeProvider)
 		: m_cameraSizeProvider(cameraSizeProvider)
 	{
 	}
 	TUnitConverter *clone() const { return new CameraZDepthUnitConverter(m_cameraSizeProvider); }
 	inline double getCameraSize() const { return (*m_cameraSizeProvider)(); }
-	double convertTo(double v) const
-	{
-		return (1 + v * 0.001) * getCameraSize();
-	}
-	double convertFrom(double v) const
-	{
-		return (v / getCameraSize() - 1) * 1000.0;
-	}
+	double convertTo(double v) const { return (1 + v * 0.001) * getCameraSize(); }
+	double convertFrom(double v) const { return (v / getCameraSize() - 1) * 1000.0; }
 };
 
 //===================================================================
@@ -608,7 +591,7 @@ class ZDepthHandleUnitConverter : public TUnitConverter
 
 	TMeasureManager::CameraSizeProvider *m_cameraSizeProvider;
 
-public:
+  public:
 	ZDepthHandleUnitConverter(TMeasureManager::CameraSizeProvider *cameraSizeProvider)
 		: m_cameraSizeProvider(cameraSizeProvider)
 	{
@@ -616,14 +599,8 @@ public:
 
 	TUnitConverter *clone() const { return new ZDepthHandleUnitConverter(m_cameraSizeProvider); }
 	inline double getCameraSize() const { return (*m_cameraSizeProvider)(); }
-	double convertTo(double v) const
-	{
-		return -v * 0.001 * getCameraSize();
-	}
-	double convertFrom(double v) const
-	{
-		return (-v / getCameraSize()) * 1000.0;
-	}
+	double convertTo(double v) const { return -v * 0.001 * getCameraSize(); }
+	double convertFrom(double v) const { return (-v / getCameraSize()) * 1000.0; }
 };
 
 class CameraZDepthHandleUnitConverter : public TUnitConverter
@@ -631,22 +608,19 @@ class CameraZDepthHandleUnitConverter : public TUnitConverter
 
 	TMeasureManager::CameraSizeProvider *m_cameraSizeProvider;
 
-public:
+  public:
 	CameraZDepthHandleUnitConverter(TMeasureManager::CameraSizeProvider *cameraSizeProvider)
 		: m_cameraSizeProvider(cameraSizeProvider)
 	{
 	}
 
-	TUnitConverter *clone() const { return new CameraZDepthHandleUnitConverter(m_cameraSizeProvider); }
+	TUnitConverter *clone() const
+	{
+		return new CameraZDepthHandleUnitConverter(m_cameraSizeProvider);
+	}
 	inline double getCameraSize() const { return (*m_cameraSizeProvider)(); }
-	double convertTo(double v) const
-	{
-		return v * 0.001 * getCameraSize();
-	}
-	double convertFrom(double v) const
-	{
-		return (v / getCameraSize()) * 1000.0;
-	}
+	double convertTo(double v) const { return v * 0.001 * getCameraSize(); }
+	double convertFrom(double v) const { return (v / getCameraSize()) * 1000.0; }
 };
 
 } // namespace
@@ -655,9 +629,7 @@ public:
 
 void TMeasureManager::addCameraMeasures(CameraSizeProvider *cameraSizeProvider)
 {
-	TUnit
-		u0(L"z"),
-		u1(L"fld", new ZDepthUnitConverter(cameraSizeProvider)),
+	TUnit u0(L"z"), u1(L"fld", new ZDepthUnitConverter(cameraSizeProvider)),
 		u2(L"fld", new CameraZDepthUnitConverter(cameraSizeProvider)),
 		u3(L"fld", new ZDepthHandleUnitConverter(cameraSizeProvider)),
 		u4(L"fld", new CameraZDepthHandleUnitConverter(cameraSizeProvider));

@@ -58,8 +58,8 @@ bool CPattern::readTTT(const char *fn)
 {
 	/*
 	int fd;
-		
-	if ( (fd=_open(fn, _O_RDONLY | _O_BINARY ))==-1 ) 
+
+	if ( (fd=_open(fn, _O_RDONLY | _O_BINARY ))==-1 )
 		return false;
 	if ( _read(fd,&m_lX,sizeof(int))!=sizeof(int) ) {
 		_close(fd);
@@ -73,7 +73,7 @@ bool CPattern::readTTT(const char *fn)
 		_close(fd);
 		return false;
 	}
-	
+
 	UCHAR *buffer=0;
 	buffer=new UCHAR[sizeof(UCHAR)*4*m_lX*m_lY];
 	if ( !buffer ) {
@@ -92,9 +92,9 @@ bool CPattern::readTTT(const char *fn)
 	if ( _read(fd,buffer,length)!=length ) {
 		delete [] buffer;
 		_close(fd);
-		return false;				
+		return false;
 	}
-	
+
 	int xy=m_lX*m_lY;
 	UCHAR* pb=buffer;
 	UC_PIXEL* pPat=m_pat;
@@ -148,15 +148,15 @@ bool CPattern::readPattern(RASTER *imgContour)
 				//	TRop::releaseRaster46(r, true);
 				return false;
 			}
-			//TRop::releaseRaster46(r, true);
+			// TRop::releaseRaster46(r, true);
 		} else
 			return false;
 	}
 	return true;
 }
 
-void CPattern::getMapPixel(const int xx, const int yy, const double invScale,
-						   const double si, const double co, UC_PIXEL *&pucp)
+void CPattern::getMapPixel(const int xx, const int yy, const double invScale, const double si,
+						   const double co, UC_PIXEL *&pucp)
 {
 	pucp = 0;
 	double dxx = (double)xx * invScale;
@@ -171,8 +171,7 @@ void CPattern::getMapPixel(const int xx, const int yy, const double invScale,
 	}
 }
 
-void CPattern::getMapPixel(const int xx, const int yy, const double invScale,
-						   UC_PIXEL *&pucp)
+void CPattern::getMapPixel(const int xx, const int yy, const double invScale, UC_PIXEL *&pucp)
 {
 	pucp = 0;
 	double dxx = (double)xx * invScale + (double)(m_lX - 1) * 0.5;

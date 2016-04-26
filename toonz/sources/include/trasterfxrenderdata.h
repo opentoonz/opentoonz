@@ -24,7 +24,7 @@
 //! downstrem fx.
 class DVAPI TRasterFxRenderData : public TSmartObject
 {
-public:
+  public:
 	virtual ~TRasterFxRenderData() {}
 
 	virtual bool operator==(const TRasterFxRenderData &data) const = 0;

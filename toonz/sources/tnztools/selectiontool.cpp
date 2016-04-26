@@ -74,7 +74,7 @@ namespace
 {
 //-----------------------------------------------------------------------------
 
-//Return index of point with min x or y
+// Return index of point with min x or y
 int tminPoint(std::vector<TPointD> points, bool isX)
 {
 	int i;
@@ -100,7 +100,7 @@ int tminPoint(TPointD p0, TPointD p1, bool isX)
 }
 
 //=============================================================================
-} //namespace
+} // namespace
 //-----------------------------------------------------------------------------
 
 //=============================================================================
@@ -257,7 +257,8 @@ FourPoints &DragSelectionTool::FourPoints::operator=(const TRectD &r)
 
 bool DragSelectionTool::FourPoints::operator==(const FourPoints &p) const
 {
-	return getP00() == p.getP00() && getP01() == p.getP01() && getP10() == p.getP10() && getP11() == p.getP11();
+	return getP00() == p.getP00() && getP01() == p.getP01() && getP10() == p.getP10() &&
+		   getP11() == p.getP11();
 }
 
 //-----------------------------------------------------------------------------
@@ -274,7 +275,8 @@ FourPoints DragSelectionTool::FourPoints::operator*(const TAffine &aff) const
 
 //-----------------------------------------------------------------------------
 
-void DragSelectionTool::drawFourPoints(const FourPoints &rect, const TPixel32 &color, unsigned short stipple, bool doContrast)
+void DragSelectionTool::drawFourPoints(const FourPoints &rect, const TPixel32 &color,
+									   unsigned short stipple, bool doContrast)
 {
 	GLint src, dst;
 	bool isEnabled;
@@ -323,14 +325,9 @@ class UndoMoveCenter : public TUndo
 	SelectionTool *m_tool;
 	TAffine m_aff;
 
-public:
-	UndoMoveCenter(SelectionTool *tool, const TAffine &aff)
-		: m_tool(tool), m_aff(aff)
-	{
-	}
-	~UndoMoveCenter()
-	{
-	}
+  public:
+	UndoMoveCenter(SelectionTool *tool, const TAffine &aff) : m_tool(tool), m_aff(aff) {}
+	~UndoMoveCenter() {}
 	void undo() const
 	{
 		m_tool->setCenter(m_aff.inv() * m_tool->getCenter());
@@ -343,10 +340,7 @@ public:
 	}
 	int getSize() const { return sizeof(*this) + sizeof(*m_tool); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Move Center");
-	}
+	QString getHistoryString() { return QObject::tr("Move Center"); }
 };
 
 //=============================================================================
@@ -358,21 +352,15 @@ class MoveCenterTool : public DragTool
 	TPointD m_startPos;
 	TAffine m_transform;
 
-public:
-	MoveCenterTool(SelectionTool *tool)
-		: DragTool(tool), m_startPos(), m_transform()
-	{
-	}
+  public:
+	MoveCenterTool(SelectionTool *tool) : DragTool(tool), m_startPos(), m_transform() {}
 	void translateCenter(TAffine aff)
 	{
 		getTool()->setCenter(aff * getTool()->getCenter());
 		m_transform *= aff;
 		getTool()->invalidate();
 	}
-	void leftButtonDown(const TPointD &pos, const TMouseEvent &e)
-	{
-		m_startPos = pos;
-	}
+	void leftButtonDown(const TPointD &pos, const TMouseEvent &e) { m_startPos = pos; }
 	void leftButtonDrag(const TPointD &pos, const TMouseEvent &e)
 	{
 		TPointD delta = pos - m_startPos;
@@ -395,7 +383,7 @@ public:
 };
 
 //=============================================================================
-} //namespace
+} // namespace
 //-----------------------------------------------------------------------------
 
 //=============================================================================
@@ -403,7 +391,8 @@ public:
 //-----------------------------------------------------------------------------
 
 DragSelectionTool::DeformTool::DeformTool(SelectionTool *tool)
-	: DragTool(tool), m_curPos(), m_isDragging(false), m_startScaleValue(tool->m_deformValues.m_scaleValue)
+	: DragTool(tool), m_curPos(), m_isDragging(false),
+	  m_startScaleValue(tool->m_deformValues.m_scaleValue)
 {
 }
 
@@ -531,8 +520,7 @@ void DragSelectionTool::Rotation::draw()
 // FreeDeform
 //-----------------------------------------------------------------------------
 
-DragSelectionTool::FreeDeform::FreeDeform(DeformTool *deformTool)
-	: m_deformTool(deformTool)
+DragSelectionTool::FreeDeform::FreeDeform(DeformTool *deformTool) : m_deformTool(deformTool)
 {
 }
 
@@ -598,7 +586,8 @@ void DragSelectionTool::MoveSelection::leftButtonDrag(const TPointD &pos, const 
 	} else
 		aff = TTranslation(delta);
 	double factor = 1.0 / Stage::inch;
-	m_deformTool->getTool()->m_deformValues.m_moveValue = m_deformTool->getTool()->m_deformValues.m_moveValue + factor * delta;
+	m_deformTool->getTool()->m_deformValues.m_moveValue =
+		m_deformTool->getTool()->m_deformValues.m_moveValue + factor * delta;
 	m_deformTool->transform(aff);
 	m_deformTool->setCurPos(pos);
 	TTool::getApplication()->getCurrentTool()->notifyToolChanged();
@@ -609,7 +598,8 @@ void DragSelectionTool::MoveSelection::leftButtonDrag(const TPointD &pos, const 
 //-----------------------------------------------------------------------------
 
 DragSelectionTool::Scale::Scale(DeformTool *deformTool, int type)
-	: m_deformTool(deformTool), m_startCenter(deformTool->getTool()->getCenter()), m_type(type), m_isShiftPressed(false), m_isAltPressed(false), m_scaleInCenter(true)
+	: m_deformTool(deformTool), m_startCenter(deformTool->getTool()->getCenter()), m_type(type),
+	  m_isShiftPressed(false), m_isAltPressed(false), m_scaleInCenter(true)
 {
 	int i;
 	for (i = 0; i < (int)m_deformTool->getTool()->getBBoxsCount(); i++)
@@ -619,17 +609,18 @@ DragSelectionTool::Scale::Scale(DeformTool *deformTool, int type)
 //-----------------------------------------------------------------------------
 
 TPointD DragSelectionTool::Scale::getIntersectionPoint(const TPointD &point0, const TPointD &point1,
-													   const TPointD &point2, const TPointD &point3, const TPointD &p) const
+													   const TPointD &point2, const TPointD &point3,
+													   const TPointD &p) const
 {
-	//Parametri della retta passante per point0, point1
+	// Parametri della retta passante per point0, point1
 	double d1x = point0.x - point1.x;
 	double m1 = d1x == 0 ? 0 : (point0.y - point1.y) / d1x;
 	double q1 = point1.y - m1 * point1.x;
-	//Parametri della retta passante per p parallela alla retta passante per point1, point2
+	// Parametri della retta passante per p parallela alla retta passante per point1, point2
 	double d2x = point2.x - point3.x;
 	double m2 = d2x == 0 ? 0 : (point2.y - point3.y) / d2x;
 	double q2 = p.y - m2 * p.x;
-	//Calcolo l'intersezione tra le due rette
+	// Calcolo l'intersezione tra le due rette
 	double x, y, m, q;
 	if (d1x == 0) {
 		x = point0.x;
@@ -651,7 +642,8 @@ TPointD DragSelectionTool::Scale::getIntersectionPoint(const TPointD &point0, co
 
 //-----------------------------------------------------------------------------
 
-DragSelectionTool::FourPoints DragSelectionTool::Scale::bboxScale(int index, const FourPoints &oldBbox, const TPointD &pos)
+DragSelectionTool::FourPoints
+DragSelectionTool::Scale::bboxScale(int index, const FourPoints &oldBbox, const TPointD &pos)
 {
 	FourPoints bbox = oldBbox;
 	TPointD p = oldBbox.getPoint(index);
@@ -707,11 +699,15 @@ TPointD DragSelectionTool::Scale::computeScaleValue(int movedIndex, const FourPo
 	double f = sqrt(newD / oldD) - 1;
 	TPointD startScaleValue = m_deformTool->getStartScaleValue();
 	if (movedIndex % 2 == 1) {
-		double sign = (pc.x < center.x && newpc.x < center.x) || (pc.x > center.x && newpc.x > center.x) ? 1 : -1;
+		double sign =
+			(pc.x < center.x && newpc.x < center.x) || (pc.x > center.x && newpc.x > center.x) ? 1
+																							   : -1;
 		double x = startScaleValue.x == 0 ? f : startScaleValue.x + startScaleValue.x * f;
 		return TPointD(sign * x, startScaleValue.y);
 	} else {
-		double sign = (pc.y < center.y && newpc.y < center.y) || (pc.y > center.y && newpc.y > center.y) ? 1 : -1;
+		double sign =
+			(pc.y < center.y && newpc.y < center.y) || (pc.y > center.y && newpc.y > center.y) ? 1
+																							   : -1;
 		double y = startScaleValue.y == 0 ? f : startScaleValue.y + startScaleValue.y * f;
 		return TPointD(startScaleValue.x, sign * y);
 	}
@@ -743,7 +739,8 @@ TPointD DragSelectionTool::Scale::getScaledPoint(int index, const FourPoints &ol
 		return pc;
 	TPointD v = normalize(center - pc);
 	double currentD = tdistance(sc, pc);
-	double startD = (index % 2 == 1) ? currentD / m_deformTool->getStartScaleValue().x : currentD / m_deformTool->getStartScaleValue().y;
+	double startD = (index % 2 == 1) ? currentD / m_deformTool->getStartScaleValue().x
+									 : currentD / m_deformTool->getStartScaleValue().y;
 	double factor = (index % 2 == 1) ? scaleValue.x : scaleValue.y;
 	double d = (currentD - startD * factor) * tdistance(center, pc) / currentD;
 	return TPointD(pc.x + d * v.x, pc.y + d * v.y);
@@ -751,7 +748,8 @@ TPointD DragSelectionTool::Scale::getScaledPoint(int index, const FourPoints &ol
 
 //-----------------------------------------------------------------------------
 
-TPointD DragSelectionTool::Scale::getNewCenter(int index, const FourPoints bbox, const TPointD scaleValue)
+TPointD DragSelectionTool::Scale::getNewCenter(int index, const FourPoints bbox,
+											   const TPointD scaleValue)
 {
 	int xIndex, yIndex;
 	if (index < 4) {
@@ -764,17 +762,22 @@ TPointD DragSelectionTool::Scale::getNewCenter(int index, const FourPoints bbox,
 	if (index % 2 == 1)
 		tswap(xIndex, yIndex);
 	FourPoints xBbox = bboxScale(xIndex, bbox, m_startCenter);
-	TPointD xCenter = getScaledPoint(xIndex, xBbox, scaleValue, xBbox.getPoint(m_deformTool->getSimmetricPointIndex(xIndex)));
+	TPointD xCenter = getScaledPoint(xIndex, xBbox, scaleValue,
+									 xBbox.getPoint(m_deformTool->getSimmetricPointIndex(xIndex)));
 	FourPoints yBbox = bboxScale(yIndex, bbox, m_startCenter);
-	TPointD yCenter = getScaledPoint(yIndex, yBbox, scaleValue, yBbox.getPoint(m_deformTool->getSimmetricPointIndex(yIndex)));
-	TPointD in = getIntersectionPoint(bbox.getP00(), bbox.getP10(), bbox.getP10(), bbox.getP11(), xCenter);
+	TPointD yCenter = getScaledPoint(yIndex, yBbox, scaleValue,
+									 yBbox.getPoint(m_deformTool->getSimmetricPointIndex(yIndex)));
+	TPointD in =
+		getIntersectionPoint(bbox.getP00(), bbox.getP10(), bbox.getP10(), bbox.getP11(), xCenter);
 	return getIntersectionPoint(in, xCenter, bbox.getP00(), bbox.getP10(), yCenter);
 }
 
 //-----------------------------------------------------------------------------
 
-FourPoints DragSelectionTool::Scale::bboxScaleInCenter(int index, const FourPoints &oldBbox, const TPointD newPos,
-													   TPointD &scaleValue, const TPointD center, bool recomputeScaleValue)
+FourPoints DragSelectionTool::Scale::bboxScaleInCenter(int index, const FourPoints &oldBbox,
+													   const TPointD newPos, TPointD &scaleValue,
+													   const TPointD center,
+													   bool recomputeScaleValue)
 {
 	TPointD oldp = oldBbox.getPoint(index);
 	if (areAlmostEqual(oldp.x, newPos.x, 1e-2) && areAlmostEqual(oldp.y, newPos.y, 1e-2))
@@ -785,13 +788,17 @@ FourPoints DragSelectionTool::Scale::bboxScaleInCenter(int index, const FourPoin
 	if (!m_scaleInCenter)
 		return bbox;
 	int simmetricIndex = m_deformTool->getSimmetricPointIndex(index);
-	//Gestisco il caso particolare in cui uno dei fattori di scalatura e' -100% e center e' al centro della bbox
+	// Gestisco il caso particolare in cui uno dei fattori di scalatura e' -100% e center e' al
+	// centro della bbox
 	if (bbox.getPoint(index) == oldBbox.getPoint(simmetricIndex)) {
 		bbox.setPoint(simmetricIndex, oldBbox.getPoint(index));
-		bbox.setPoint(m_deformTool->getNextPointIndex(simmetricIndex), oldBbox.getPoint(m_deformTool->getBeforePointIndex(index)));
-		bbox.setPoint(m_deformTool->getBeforePointIndex(simmetricIndex), oldBbox.getPoint(m_deformTool->getNextPointIndex(index)));
+		bbox.setPoint(m_deformTool->getNextPointIndex(simmetricIndex),
+					  oldBbox.getPoint(m_deformTool->getBeforePointIndex(index)));
+		bbox.setPoint(m_deformTool->getBeforePointIndex(simmetricIndex),
+					  oldBbox.getPoint(m_deformTool->getNextPointIndex(index)));
 	} else
-		bbox = bboxScale(simmetricIndex, bbox, getScaledPoint(simmetricIndex, oldBbox, scaleValue, center));
+		bbox = bboxScale(simmetricIndex, bbox,
+						 getScaledPoint(simmetricIndex, oldBbox, scaleValue, center));
 	return bbox;
 }
 
@@ -844,7 +851,10 @@ void DragSelectionTool::Scale::leftButtonDrag(const TPointD &pos, const TMouseEv
 //-----------------------------------------------------------------------------
 
 SelectionTool::SelectionTool(int targetType)
-	: TTool("T_Selection"), m_firstTime(true), m_dragTool(0), m_what(Outside), m_leftButtonMousePressed(false), m_shiftPressed(false), m_selecting(false), m_mousePosition(TPointD()), m_stroke(0), m_justSelected(false), m_strokeSelectionType("Type:"), m_deformValues(), m_cursorId(ToolCursor::CURSOR_ARROW)
+	: TTool("T_Selection"), m_firstTime(true), m_dragTool(0), m_what(Outside),
+	  m_leftButtonMousePressed(false), m_shiftPressed(false), m_selecting(false),
+	  m_mousePosition(TPointD()), m_stroke(0), m_justSelected(false),
+	  m_strokeSelectionType("Type:"), m_deformValues(), m_cursorId(ToolCursor::CURSOR_ARROW)
 {
 #ifndef STUDENT
 	bind(targetType);
@@ -998,11 +1008,14 @@ void SelectionTool::updateAction(TPointD pos, const TMouseEvent &e)
 		}
 		maxDist = 5 * pixelSize;
 		maxDist2 = maxDist * maxDist;
-		if (tdistance2(bbox.getP00(), pos) < maxDist2 || tdistance2(bbox.getP11(), pos) < maxDist2 ||
-			tdistance2(bbox.getP01(), pos) < maxDist2 || tdistance2(bbox.getP10(), pos) < maxDist2) {
+		if (tdistance2(bbox.getP00(), pos) < maxDist2 ||
+			tdistance2(bbox.getP11(), pos) < maxDist2 ||
+			tdistance2(bbox.getP01(), pos) < maxDist2 ||
+			tdistance2(bbox.getP10(), pos) < maxDist2) {
 			if (!e.isCtrlPressed() || isLevelType() || isSelectedFramesType()) {
 				m_what = SCALE;
-				if (tdistance2(bbox.getTopRight(), pos) < maxDist2 || tdistance2(bbox.getBottomLeft(), pos) < maxDist2)
+				if (tdistance2(bbox.getTopRight(), pos) < maxDist2 ||
+					tdistance2(bbox.getBottomLeft(), pos) < maxDist2)
 					m_cursorId = ToolCursor::ScaleCursor;
 				else
 					m_cursorId = ToolCursor::ScaleInvCursor;
@@ -1045,8 +1058,10 @@ void SelectionTool::updateAction(TPointD pos, const TMouseEvent &e)
 			return;
 		}
 		TPointD hpos = bbox.getP10() - TPointD(14 * pixelSize, 15 * pixelSize);
-		TRectD rect(hpos - TPointD(14 * pixelSize, 5 * pixelSize), hpos + TPointD(14 * pixelSize, 5 * pixelSize));
-		if (!m_deformValues.m_isSelectionModified && rect.contains(pos) && vi && !TTool::getApplication()->getCurrentObject()->isSpline()) {
+		TRectD rect(hpos - TPointD(14 * pixelSize, 5 * pixelSize),
+					hpos + TPointD(14 * pixelSize, 5 * pixelSize));
+		if (!m_deformValues.m_isSelectionModified && rect.contains(pos) && vi &&
+			!TTool::getApplication()->getCurrentObject()->isSpline()) {
 			m_what = GLOBAL_THICKNESS;
 			m_cursorId = ToolCursor::PumpCursor;
 			return;
@@ -1200,7 +1215,8 @@ void SelectionTool::drawPolylineSelection()
 {
 	if (m_polyline.empty())
 		return;
-	TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White : TPixel32::Black;
+	TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White
+																			  : TPixel32::Black;
 	tglColor(color);
 	tglDrawCircle(m_polyline[0], 2);
 	glBegin(GL_LINE_STRIP);
@@ -1303,7 +1319,8 @@ bool SelectionTool::onPropertyChanged(std::string propertyName)
 
 //-----------------------------------------------------------------------------
 
-//!Viene aggiunto \b pos a \b m_track e disegnato il primo pezzetto del lazzo. Viene inizializzato \b m_firstPos
+//! Viene aggiunto \b pos a \b m_track e disegnato il primo pezzetto del lazzo. Viene inizializzato
+//! \b m_firstPos
 void SelectionTool::startFreehand(const TPointD &pos)
 {
 	m_track.clear();
@@ -1314,7 +1331,8 @@ void SelectionTool::startFreehand(const TPointD &pos)
 #if defined(MACOSX)
 //			m_viewer->prepareForegroundDrawing();
 #endif
-	TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White : TPixel32::Black;
+	TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White
+																			  : TPixel32::Black;
 	tglColor(color);
 	m_viewer->startForegroundDrawing();
 	glPushMatrix();
@@ -1327,7 +1345,7 @@ void SelectionTool::startFreehand(const TPointD &pos)
 
 //-----------------------------------------------------------------------------
 
-//!Viene aggiunto \b pos a \b m_track e disegnato un altro pezzetto del lazzo.
+//! Viene aggiunto \b pos a \b m_track e disegnato un altro pezzetto del lazzo.
 void SelectionTool::freehandDrag(const TPointD &pos)
 {
 #if defined(MACOSX)
@@ -1336,7 +1354,8 @@ void SelectionTool::freehandDrag(const TPointD &pos)
 
 	double pixelSize = getPixelSize();
 	m_viewer->startForegroundDrawing();
-	TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White : TPixel32::Black;
+	TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White
+																			  : TPixel32::Black;
 	tglColor(color);
 	glPushMatrix();
 	tglMultMatrix(getMatrix());
@@ -1350,7 +1369,8 @@ void SelectionTool::freehandDrag(const TPointD &pos)
 
 //-----------------------------------------------------------------------------
 
-//!Viene chiuso il lazzo (si aggiunge l'ultimo punto ad m_track) e viene creato lo stroke rappresentante il lazzo.
+//! Viene chiuso il lazzo (si aggiunge l'ultimo punto ad m_track) e viene creato lo stroke
+//! rappresentante il lazzo.
 void SelectionTool::closeFreehand(const TPointD &pos)
 {
 #if defined(MACOSX)
@@ -1368,7 +1388,7 @@ void SelectionTool::closeFreehand(const TPointD &pos)
 
 //-----------------------------------------------------------------------------
 
-//!Viene aggiunto un punto al vettore m_polyline.
+//! Viene aggiunto un punto al vettore m_polyline.
 void SelectionTool::addPointPolyline(const TPointD &pos)
 {
 	m_firstPos = pos;
@@ -1379,7 +1399,8 @@ void SelectionTool::addPointPolyline(const TPointD &pos)
 #if defined(MACOSX)
 //		 m_viewer->prepareForegroundDrawing();
 #endif
-	TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White : TPixel32::Black;
+	TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White
+																			  : TPixel32::Black;
 	tglColor(color);
 	m_viewer->startForegroundDrawing();
 
@@ -1396,7 +1417,8 @@ void SelectionTool::addPointPolyline(const TPointD &pos)
 
 //-----------------------------------------------------------------------------
 
-//!Agginge l'ultimo pos a \b m_polyline e chiude la spezzata (aggiunge \b m_polyline.front() alla fine del vettore).
+//! Agginge l'ultimo pos a \b m_polyline e chiude la spezzata (aggiunge \b m_polyline.front() alla
+//! fine del vettore).
 void SelectionTool::closePolyline(const TPointD &pos)
 {
 	if (m_polyline.size() <= 1)

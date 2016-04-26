@@ -28,22 +28,22 @@ class AntialiasPopup : public DVGui::Dialog
 	QPushButton *m_okBtn;
 	TRasterP m_startRas;
 
-private:
+  private:
 	class Swatch;
 	Swatch *m_viewer;
 
-public:
+  public:
 	AntialiasPopup();
 
-protected:
+  protected:
 	void showEvent(QShowEvent *e);
 	void hideEvent(QHideEvent *e);
 
-protected slots:
+  protected slots:
 
 	void setCurrentSampleRaster();
 
-public slots:
+  public slots:
 
 	void apply();
 	void onValuesChanged(bool dragging);

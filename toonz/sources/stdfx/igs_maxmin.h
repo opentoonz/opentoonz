@@ -38,31 +38,31 @@ IGS_MAXMIN_EXPORT void convert(
 	,
 	const int polygon_number /* =2    2...16...INT_MAX */
 							 /*	polygon_numberで3以上の値で
-			半径radiusの円に内接する多角形となる
-			絵では、円の右端が開始点
-		*/
+			 半径radiusの円に内接する多角形となる
+			 絵では、円の右端が開始点
+		 */
 	,
 	const double roll_degree /* =0.0  0...360...DOUBLE_MAX */
 							 /*	roll_degreeがプラスで時計回り方向に回転する
-		*/
+		 */
 
 	/* 処理の方法、動作スイッチ(action type/sw) */
 	,
 	const bool min_sw /* =false */
-					  /*	min_sw==trueだと、小さい値のピクセルを拡大する
-			falseなら、大きい値のピクセルを拡大する
-		*/
+	/*	min_sw==trueだと、小さい値のピクセルを拡大する
+falseなら、大きい値のピクセルを拡大する
+*/
 	,
 	const bool alpha_rendering_sw /* =true  */
 								  /*	alpha_rendering_sw==trueなら、
-			alphaチャンネルにも処理を行う。
-		*/
+			  alphaチャンネルにも処理を行う。
+		  */
 	,
 	const bool add_blend_sw /* =false  */
-							/*	add_blend_sw==trueだと、黒が入り込むべきところに、
-			alphaのマスクによってエッジが残ってしまう。
-			よってfalse固定 --> でなく、、、2013-12-21
-		*/
+	/*	add_blend_sw==trueだと、黒が入り込むべきところに、
+alphaのマスクによってエッジが残ってしまう。
+よってfalse固定 --> でなく、、、2013-12-21
+*/
 
 	/* 高速化のためのスレッド指定(thread count for speed up) */
 	,

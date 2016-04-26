@@ -6,10 +6,12 @@
 #include "tproperty.h"
 
 //-----------------------------------------------------------------------------
-//CaptureParameters
+// CaptureParameters
 
 CaptureParameters::CaptureParameters()
-	: m_deviceName(L""), m_resolution(), m_brightness(0), m_contranst(0), m_useWhiteImage(false), m_upsideDown(false), m_filePath(TFilePath("+inputs")), m_increment(1), m_step(1), m_format("tif")
+	: m_deviceName(L""), m_resolution(), m_brightness(0), m_contranst(0), m_useWhiteImage(false),
+	  m_upsideDown(false), m_filePath(TFilePath("+inputs")), m_increment(1), m_step(1),
+	  m_format("tif")
 {
 }
 
@@ -60,8 +62,8 @@ void CaptureParameters::saveData(TOStream &os)
 	os.child("useWhiteImage") << (int)m_useWhiteImage;
 	os.child("upsideDown") << (int)m_upsideDown;
 	os.child("filePath") << m_filePath;
-	//os.child("increment") << m_increment;
-	//os.child("step") << m_step;
+	// os.child("increment") << m_increment;
+	// os.child("step") << m_step;
 	os.child("format") << m_format;
 
 	os.openChild("formatsProperties");
@@ -107,9 +109,9 @@ void CaptureParameters::loadData(TIStream &is)
 			is >> str;
 			m_filePath = TFilePath(str);
 		}
-		//else if(tagName == "increment")
+		// else if(tagName == "increment")
 		//  is >> m_increment;
-		//else if(tagName == "step")
+		// else if(tagName == "step")
 		//  is >> m_step;
 		else if (tagName == "format")
 			is >> m_format;
@@ -127,7 +129,8 @@ void CaptureParameters::loadData(TIStream &is)
 							continue;
 						}
 						TEnumProperty *enumProp = dynamic_cast<TEnumProperty *>(pg->getProperty(0));
-						TEnumProperty *enumAppProp = dynamic_cast<TEnumProperty *>(appProperties.getProperty(0));
+						TEnumProperty *enumAppProp =
+							dynamic_cast<TEnumProperty *>(appProperties.getProperty(0));
 						assert(enumAppProp && enumProp);
 						if (enumAppProp && enumProp) {
 							try {

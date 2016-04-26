@@ -19,21 +19,20 @@
 
 class DVAPI TGenericTimerAction
 {
-public:
+  public:
 	virtual ~TGenericTimerAction() {}
 	virtual void sendCommand(TUINT64 tick) = 0;
 };
 
 //-------------------------------------------------------------------
 
-template <class T>
-class TTimerAction : public TGenericTimerAction
+template <class T> class TTimerAction : public TGenericTimerAction
 {
-public:
+  public:
 	typedef void (T::*Method)(TUINT64 tick);
 	TTimerAction(T *target, Method method) : m_target(target), m_method(method) {}
 	void sendCommand(TUINT64 tick) { (m_target->*m_method)(tick); }
-private:
+  private:
 	T *m_target;
 	Method m_method;
 };
@@ -41,12 +40,12 @@ private:
 //------------------------------------------------------------------------------
 //! THis class is manages general time events.
 /*!
-		This class defines a timer, 
+		This class defines a timer,
 		i.e a system which, at user defined time steps, sends events through a callback function.
 	*/
 class DVAPI TTimer
 {
-public:
+  public:
 	/*!
 		Specifies which is the type of timer of this object.
 	*/
@@ -70,7 +69,7 @@ public:
 	*/
 	void start(UINT delay); // delay expressed in milliseconds
 							/*!
-		Stops the timer immediately. 
+		Stops the timer immediately.
 		Doesn't delete the timer.
 	*/
 	void stop();
@@ -87,7 +86,7 @@ public:
 	*/
 	TUINT64 getTicks() const;
 	/*!
-		Returns the initial start delay of the timer. 
+		Returns the initial start delay of the timer.
 	*/
 	UINT getDelay() const;
 	/*!
@@ -97,7 +96,7 @@ public:
 
 	class Imp;
 
-private:
+  private:
 	std::unique_ptr<Imp> m_imp;
 
 	TTimer(const TTimer &);

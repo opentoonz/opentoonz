@@ -68,12 +68,10 @@ class DVAPI FunctionViewer : public QSplitter
 {
 	Q_OBJECT
 
-public:
-	enum IoType { eSaveCurve,
-				  eLoadCurve,
-				  eExportCurve };
+  public:
+	enum IoType { eSaveCurve, eLoadCurve, eExportCurve };
 
-public:
+  public:
 #if QT_VERSION >= 0x050500
 	FunctionViewer(QWidget *parent = 0, Qt::WindowFlags flags = 0);
 #else
@@ -81,34 +79,41 @@ public:
 #endif
 	~FunctionViewer();
 
-	void setXsheetHandle(TXsheetHandle *xshHandle);	//!< Associates an xsheet to the function editor.
-	void setFrameHandle(TFrameHandle *frameHandle);	//!< Synchronizes an external timeline with the function editor.
-	void setObjectHandle(TObjectHandle *objectHandle); //!< Associates a stage objects selector to the function editor.
-	void setFxHandle(TFxHandle *fxHandle);			   //!< Associates an fx selector to the function editor.
-	void setColumnHandle(TColumnHandle *columnHandle); //!< Associates a column selector to the function editor.
+	void
+	setXsheetHandle(TXsheetHandle *xshHandle); //!< Associates an xsheet to the function editor.
+	void setFrameHandle(
+		TFrameHandle *frameHandle); //!< Synchronizes an external timeline with the function editor.
+	void setObjectHandle(TObjectHandle *objectHandle); //!< Associates a stage objects selector to
+													   //!the function editor.
+	void setFxHandle(TFxHandle *fxHandle); //!< Associates an fx selector to the function editor.
+	void setColumnHandle(
+		TColumnHandle *columnHandle); //!< Associates a column selector to the function editor.
 
-	FunctionSelection *getSelection() const
-	{
-		return m_selection;
-	}
+	FunctionSelection *getSelection() const { return m_selection; }
 
 	void openContextMenu(TreeModel::Item *item, const QPoint &globalPos);
 
 	void addParameter(TParam *parameter,
-					  const TFilePath &folder = TFilePath()); //!< Adds the specified parameter to the function editor.               \param parameter Parameter to be added. Ownership remains \a external. \param folder Host folder (created if necessary) the parameter will be added to.
+					  const TFilePath &folder = TFilePath()); //!< Adds the specified parameter to
+															  //!the function editor.
+															  //!\param parameter Parameter to be
+															  //!added. Ownership remains \a
+															  //!external. \param folder Host folder
+															  //!(created if necessary) the
+															  //!parameter will be added to.
 
 	void setFocusColumnsOrGraph();
 	void clearFocusColumnsAndGraph();
 	bool columnsOrGraphHasFocus();
 	void setSceneHandle(TSceneHandle *sceneHandle);
 
-signals:
+  signals:
 
 	void curveChanged();
 	void curveIo(int type, TDoubleParam *curve, const std::string &name);
 	void editObject();
 
-public slots:
+  public slots:
 
 	void refreshModel();
 	void rebuildModel();
@@ -127,10 +132,10 @@ public slots:
 	void doSwitchCurrentObject(TStageObject *obj);
 	void doSwitchCurrentFx(TFx *fx);
 
-	//in order to avoid FunctionViewer to get focus while editing the expression
+	// in order to avoid FunctionViewer to get focus while editing the expression
 	bool isExpressionPageActive();
 
-private:
+  private:
 	// Handles
 
 	TXsheetHandle *m_xshHandle;
@@ -155,20 +160,21 @@ private:
 	TDoubleParam *m_curve;
 	FunctionSelection *m_selection;
 
-private:
+  private:
 	void showEvent(QShowEvent *);
 	void hideEvent(QHideEvent *);
 
-public:												 //  :(
+  public:											 //  :(
 	void emitCurveChanged() { emit curveChanged(); } //!< \deprecated  Should not be public.
 	void emitIoCurve(int type, TDoubleParam *curve, const std::string &name)
 	{
 		emit curveIo(type, curve, name);
 	} //!< \deprecated  Should not be public.
 
-private slots:
+  private slots:
 
-	void propagateExternalSetFrame(); //!< Forwards m_frameHandle's setFrame() invocations to m_localFrame.
+	void propagateExternalSetFrame(); //!< Forwards m_frameHandle's setFrame() invocations to
+									  //!m_localFrame.
 };
 
 #endif // FUNCTIONEDITORVIEWER_H

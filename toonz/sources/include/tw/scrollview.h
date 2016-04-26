@@ -26,7 +26,7 @@ class DVAPI TScrollView : public TWidget
 	TPoint m_autopanningPos;
 	int m_autopanningOldT;
 
-public:
+  public:
 	TScrollView(TWidget *parent, std::string name = "scrollview");
 	~TScrollView();
 
@@ -41,16 +41,10 @@ public:
 	inline void doScrollTo_x(int x) { doScrollTo(TPoint(x, m_yoff)); }
 	inline void doScrollTo_y(int y) { doScrollTo(TPoint(m_xoff, y)); }
 
-	virtual void scrollTo(const TPoint &p)
-	{
-		doScrollTo(p);
-	}
+	virtual void scrollTo(const TPoint &p) { doScrollTo(p); }
 	inline void scrollTo(int x, int y) { scrollTo(TPoint(x, y)); }
 
-	inline TPoint getScrollPosition() const
-	{
-		return TPoint(m_xoff, m_yoff);
-	}
+	inline TPoint getScrollPosition() const { return TPoint(m_xoff, m_yoff); }
 
 	void setScrollbars(TScrollbar *hsb, TScrollbar *vsb);
 	void setContentSize(const TDimension &d);

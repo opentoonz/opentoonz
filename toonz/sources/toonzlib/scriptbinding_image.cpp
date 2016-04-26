@@ -16,13 +16,11 @@ Image::Image()
 {
 }
 
-Image::Image(const TImageP img)
-	: m_img(img)
+Image::Image(const TImageP img) : m_img(img)
 {
 }
 
-Image::Image(TImage *img)
-	: m_img(img)
+Image::Image(TImage *img) : m_img(img)
 {
 }
 
@@ -137,7 +135,8 @@ QScriptValue Image::load(const QScriptValue &fpArg)
 					return context()->throwError(QString("Could not read %1").arg(fpStr));
 				}
 				m_img->setPalette(level->getPalette());
-				if (n > 1 && (fp.getFrame() == TFrameId::EMPTY_FRAME || fp.getFrame() == TFrameId::NO_FRAME)) {
+				if (n > 1 && (fp.getFrame() == TFrameId::EMPTY_FRAME ||
+							  fp.getFrame() == TFrameId::NO_FRAME)) {
 					// warning: a multi-frame level read into an Image
 					warning(tr("Loaded first frame of %1").arg(n));
 				}
@@ -148,7 +147,8 @@ QScriptValue Image::load(const QScriptValue &fpArg)
 		} else {
 			// plain image: try to read it
 			if (!TImageReader::load(fp, m_img)) {
-				return context()->throwError(QString("File %1 not found or not readable").arg(fpStr));
+				return context()->throwError(
+					QString("File %1 not found or not readable").arg(fpStr));
 			}
 		}
 		// return a reference to the Image object
@@ -189,7 +189,8 @@ QScriptValue Image::save(const QScriptValue &fpArg)
 		return context()->throwError(tr("Unrecognized file type :").arg(fpStr));
 	}
 	if (!isCompatible) {
-		return context()->throwError(tr("Can't save a %1 image to this file type : %2").arg(getType()).arg(fpStr));
+		return context()->throwError(
+			tr("Can't save a %1 image to this file type : %2").arg(getType()).arg(fpStr));
 	}
 
 	try {
@@ -216,7 +217,8 @@ QScriptValue checkImage(QScriptContext *context, const QScriptValue &value, Imag
 {
 	img = qscriptvalue_cast<Image *>(value);
 	if (!img || !img->getImg())
-		return context->throwError(QObject::tr("Bad argument (%1): should be an Image (not empty)").arg(value.toString()));
+		return context->throwError(
+			QObject::tr("Bad argument (%1): should be an Image (not empty)").arg(value.toString()));
 	else
 		return QScriptValue();
 }

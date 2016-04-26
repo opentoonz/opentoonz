@@ -37,7 +37,7 @@ namespace Tiio
 
 class SwfWriterProperties : public TPropertyGroup
 {
-public:
+  public:
 	TEnumProperty m_lineQuality;
 	TBoolProperty m_isCompressed;
 	TBoolProperty m_autoplay;
@@ -53,12 +53,15 @@ public:
 
 class DVAPI TFlash
 {
-public:
+  public:
 	static const std::wstring ConstantLines;
 	static const std::wstring MixedLines;
 	static const std::wstring VariableLines;
-        
-	TFlash(int lx, int ly, int frameCount, int frameRate, TPropertyGroup *properties, bool keepImages = true) {}
+
+	TFlash(int lx, int ly, int frameCount, int frameRate, TPropertyGroup *properties,
+		   bool keepImages = true)
+	{
+	}
 	~TFlash() {}
 	void enableAlphaChannelForRaster(bool doSaveIt) {}
 	void setSoundRate(int soundrate) {}
@@ -68,7 +71,9 @@ public:
 	void setLineColor(const TPixel32 &color) {}
 	void setTexture(const TRaster32P &texture) {}
 	void setFillStyleMatrix(const TAffine &aff) {}
-	void setGradientFill(bool isLinear, const TPixel &color1, const TPixel &color2, double smooth) {}
+	void setGradientFill(bool isLinear, const TPixel &color1, const TPixel &color2, double smooth)
+	{
+	}
 	void drawLine(const TPointD &a, const TPointD &b) {}
 	void drawPolygon(std::vector<std::vector<TQuadratic *>> &quads, int clippedShapes = 0) {}
 	int drawRaster(TRaster32P r) { return 0; }
@@ -93,7 +98,7 @@ public:
 	void drawPolygon(const std::list<TQuadratic *> &poly, bool isOutline) {}
 	std::wstring getLineQuality() { return nullptr; }
 	void cleanCachedImages() {}
-	void enableMask() {} 
+	void enableMask() {}
 	void disableMask() {}
 	void beginMask() {}
 	void endMask() {}

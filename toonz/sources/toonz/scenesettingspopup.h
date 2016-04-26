@@ -35,15 +35,15 @@ class SceneSettingsPopup : public QDialog
 
 	TSceneProperties *getProperties() const;
 
-public:
+  public:
 	SceneSettingsPopup();
 	void configureNotify();
 
-protected:
+  protected:
 	void showEvent(QShowEvent *);
 	void hideEvent(QHideEvent *);
 
-public slots:
+  public slots:
 
 	void update();
 

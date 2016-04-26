@@ -13,15 +13,14 @@ class WarpFx : public TStandardRasterFx
 {
 	FX_PLUGIN_DECLARATION(WarpFx)
 
-protected:
+  protected:
 	TRasterFxPort m_warped, m_warper;
 	TDoubleParamP m_intensity;
 	TDoubleParamP m_gridStep;
 	TBoolParamP m_sharpen;
 
-public:
-	WarpFx()
-		: m_intensity(20), m_gridStep(2), m_sharpen(true)
+  public:
+	WarpFx() : m_intensity(20), m_gridStep(2), m_sharpen(true)
 	{
 		addInputPort("Source", m_warped);
 		addInputPort("warper", m_warper);
@@ -65,9 +64,7 @@ public:
 
 	//-------------------------------------------------------------------
 
-	void doDryCompute(TRectD &rect,
-					  double frame,
-					  const TRenderSettings &info)
+	void doDryCompute(TRectD &rect, double frame, const TRenderSettings &info)
 	{
 		bool isWarped = m_warped.isConnected();
 		bool isWarper = m_warper.isConnected();
@@ -138,8 +135,8 @@ public:
 		double scale = sqrt(fabs(info.m_affine.det()));
 		double gridStep = 1.5 * m_gridStep->getValue(frame);
 
-		//NOTE: The gridStep is absorbed by the warper scale and the intensity - the former
-		//balancing the latter.
+		// NOTE: The gridStep is absorbed by the warper scale and the intensity - the former
+		// balancing the latter.
 
 		WarpParams params;
 		params.m_intensity = m_intensity->getValue(frame) / gridStep;
@@ -147,20 +144,20 @@ public:
 		params.m_sharpen = m_sharpen->getValue();
 		params.m_shrink = shrink;
 
-		//The warper is calculated with a fixed dpi. This makes sure that the lattice
-		//created for the warp does not depend on camera resolutions / affine scales.
+		// The warper is calculated with a fixed dpi. This makes sure that the lattice
+		// created for the warp does not depend on camera resolutions / affine scales.
 		TRenderSettings warperInfo(info);
 		double warperScaleFactor = 1.0 / params.m_warperScale;
 		warperInfo.m_affine = TScale(warperScaleFactor) * info.m_affine;
 
-		//Retrieve tile's geometry
+		// Retrieve tile's geometry
 		TRectD tileRect;
 		{
 			TRasterP tileRas = tile.getRaster();
 			tileRect = TRectD(tile.m_pos, TDimensionD(tileRas->getLx(), tileRas->getLy()));
 		}
 
-		//Build the compute rect
+		// Build the compute rect
 		TRectD warpedBox, warpedComputeRect, tileComputeRect;
 		m_warped->getBBox(frame, warpedBox, info);
 
@@ -179,19 +176,21 @@ public:
 		warperComputeRect.x1 = tceil(warperComputeRect.x1);
 		warperComputeRect.y1 = tceil(warperComputeRect.y1);
 
-		//Compute the warped tile
+		// Compute the warped tile
 		TTile tileIn;
-		m_warped->allocateAndCompute(tileIn, warpedComputeRect.getP00(),
-									 TDimension(warpedComputeRect.getLx(), warpedComputeRect.getLy()),
-									 tile.getRaster(), frame, info);
+		m_warped->allocateAndCompute(
+			tileIn, warpedComputeRect.getP00(),
+			TDimension(warpedComputeRect.getLx(), warpedComputeRect.getLy()), tile.getRaster(),
+			frame, info);
 
-		//Compute the warper tile
+		// Compute the warper tile
 		TTile tileWarper;
-		m_warper->allocateAndCompute(tileWarper, warperComputeRect.getP00(),
-									 TDimension(warperComputeRect.getLx(), warperComputeRect.getLy()),
-									 tile.getRaster(), frame, warperInfo);
+		m_warper->allocateAndCompute(
+			tileWarper, warperComputeRect.getP00(),
+			TDimension(warperComputeRect.getLx(), warperComputeRect.getLy()), tile.getRaster(),
+			frame, warperInfo);
 
-		//Warp
+		// Warp
 		TRasterP rasIn = tileIn.getRaster();
 		TRasterP rasWarper = tileWarper.getRaster();
 
@@ -200,7 +199,8 @@ public:
 		TRasterP tileRas = tile.getRaster()->extract(rasComputeRectI);
 
 		TPointD rasInPos(warpedComputeRect.getP00() - tileComputeRect.getP00());
-		TPointD warperPos((TScale(params.m_warperScale) * warperComputeRect.getP00()) - tileComputeRect.getP00());
+		TPointD warperPos((TScale(params.m_warperScale) * warperComputeRect.getP00()) -
+						  tileComputeRect.getP00());
 		warp(tileRas, rasIn, rasWarper, rasInPos, warperPos, params);
 	}
 
@@ -208,7 +208,7 @@ public:
 
 	int getMemoryRequirement(const TRectD &rect, double frame, const TRenderSettings &info)
 	{
-		//return 0;   //For debug purpose
+		// return 0;   //For debug purpose
 
 		int shrink = (info.m_shrinkX + info.m_shrinkY) / 2;
 		double scale = sqrt(fabs(info.m_affine.det()));
@@ -231,9 +231,8 @@ public:
 		double warperEnlargement = getWarperEnlargement(params);
 		warperComputeRect = warperComputeRect.enlarge(warperEnlargement);
 
-		return tmax(
-			TRasterFx::memorySize(warpedComputeRect, info.m_bpp),
-			TRasterFx::memorySize(warperComputeRect, info.m_bpp));
+		return tmax(TRasterFx::memorySize(warpedComputeRect, info.m_bpp),
+					TRasterFx::memorySize(warperComputeRect, info.m_bpp));
 	}
 };
 

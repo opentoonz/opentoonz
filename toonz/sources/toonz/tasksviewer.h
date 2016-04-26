@@ -21,15 +21,15 @@ class TaskTreeModel : public TreeModel
 {
 	Q_OBJECT
 
-	//QModelIndex m_selectedIndex;
+	// QModelIndex m_selectedIndex;
 	TaskTreeView *m_view;
 
-public:
+  public:
 	class Item : public TreeModel::Item
 	{
 		friend class TaskTreeModel;
 
-	public:
+	  public:
 		Item(const QString &name);
 		Item(TFarmTask *task);
 		//~Item();
@@ -38,18 +38,18 @@ public:
 		void setName(QString name) { m_name = name; }
 		QString getName() const { return m_name; }
 
-	private:
+	  private:
 		TFarmTask *m_task;
 		QString m_name;
-	}; //class TaskItem
+	}; // class TaskItem
 
 	TaskTreeModel(TaskTreeView *parent = 0);
 	//~TaskTreeModel();
-	//void setSelected(const QModelIndex& index) {m_selectedIndex=index;}
+	// void setSelected(const QModelIndex& index) {m_selectedIndex=index;}
 	// void openContextMenu(const QPoint& p);
 
 	void update();
-public slots:
+  public slots:
 	void start(bool);
 	void stop(bool);
 	void remove(bool);
@@ -61,10 +61,10 @@ public slots:
 
 	void setupModelData();
 
-protected:
+  protected:
 	QVariant data(const QModelIndex &index, int role) const;
 
-private:
+  private:
 	// void setLayout(Item *oldPegs);
 };
 
@@ -75,13 +75,13 @@ class TaskTreeView : public TreeView
 {
 	Q_OBJECT
 
-public:
+  public:
 	TasksViewer *m_mainViewer;
 	TaskTreeView(TasksViewer *parent, TaskTreeModel *treeModel);
 
 	QModelIndexList getSelectedIndexes() const { return selectedIndexes(); }
 
-protected:
+  protected:
 	void onClick(TreeModel::Item *item, const QPoint &pos, QMouseEvent *e);
 	void openContextMenu(TreeModel::Item *item, const QPoint &globalPos);
 };
@@ -134,7 +134,7 @@ class TaskSheet : public QScrollArea
 	QComboBox *m_threadsCombo;
 	QComboBox *m_rasterGranularityCombo;
 
-protected slots:
+  protected slots:
 
 	void onAdded(bool);
 	void onRemoved(bool);
@@ -155,7 +155,7 @@ protected slots:
 	void setGranularityCombo(int);
 	void setPriority();
 
-public:
+  public:
 	TaskSheet(TasksViewer *owner);
 	void update(TFarmTask *task);
 	void updateChunks(TFarmTask *task);
@@ -168,7 +168,7 @@ class TasksViewer : public QSplitter, public BatchesController::Observer
 {
 	Q_OBJECT
 
-public:
+  public:
 	TaskSheet *m_taskSheet;
 	TaskTreeView *m_treeView;
 	QTimer *m_timer;
@@ -188,10 +188,10 @@ public:
 	void startTimer();
 	void stopTimer();
 
-public slots:
+  public slots:
 	void onTimer();
 
-protected:
+  protected:
 	QWidget *createToolBar();
 	std::vector<QAction *> m_actions;
 	void add(const QString &iconName, QString text, QToolBar *toolBar, const char *slot,
@@ -203,4 +203,4 @@ protected:
 
 //=============================================================================
 
-#endif //TASKSVIEWER_H
+#endif // TASKSVIEWER_H

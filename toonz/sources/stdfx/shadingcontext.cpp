@@ -36,12 +36,9 @@ struct CompiledShader {
 	QGLShaderProgramP m_program;
 	QDateTime m_lastModified;
 
-public:
+  public:
 	CompiledShader() {}
-	CompiledShader(const CompiledShader &)
-	{
-		assert(!m_program.get());
-	}
+	CompiledShader(const CompiledShader &) { assert(!m_program.get()); }
 };
 
 } // namespace
@@ -54,17 +51,16 @@ struct ShadingContext::Imp {
 	QGLPixelBufferP m_pixelBuffer; //!< OpenGL context.
 	QGLFramebufferObjectP m_fbo;   //!< Output buffer.
 
-	std::map<QString,
-			 CompiledShader> m_shaderPrograms; //!< Shader Programs stored in the context.
-											   //!  \warning   Values have \p auto_ptr members.
-public:
+	std::map<QString, CompiledShader> m_shaderPrograms; //!< Shader Programs stored in the context.
+	//!  \warning   Values have \p auto_ptr members.
+  public:
 	Imp();
 
 	static QGLFormat format();
 
 	void initMatrix(int lx, int ly);
 
-private:
+  private:
 	// Not copyable
 	Imp(const Imp &);
 	Imp &operator=(const Imp &);
@@ -72,8 +68,7 @@ private:
 
 //--------------------------------------------------------
 
-ShadingContext::Imp::Imp()
-	: m_pixelBuffer(new QGLPixelBuffer(1, 1, format()))
+ShadingContext::Imp::Imp() : m_pixelBuffer(new QGLPixelBuffer(1, 1, format()))
 {
 }
 
@@ -107,8 +102,7 @@ void ShadingContext::Imp::initMatrix(int lx, int ly)
 //    ShadingContext  implementation
 //*****************************************************************
 
-ShadingContext::ShadingContext()
-	: m_imp(new Imp)
+ShadingContext::ShadingContext() : m_imp(new Imp)
 {
 	makeCurrent();
 	glewExperimental = GL_TRUE;
@@ -126,7 +120,9 @@ ShadingContext::~ShadingContext()
 
 ShadingContext::Support ShadingContext::support()
 {
-	return !QGLPixelBuffer::hasOpenGLPbuffers() ? NO_PIXEL_BUFFER : !QGLShaderProgram::hasOpenGLShaderPrograms() ? NO_SHADERS : OK;
+	return !QGLPixelBuffer::hasOpenGLPbuffers()
+			   ? NO_PIXEL_BUFFER
+			   : !QGLShaderProgram::hasOpenGLShaderPrograms() ? NO_SHADERS : OK;
 }
 
 //--------------------------------------------------------
@@ -141,16 +137,19 @@ bool ShadingContext::isValid() const
 QGLFormat ShadingContext::defaultFormat(int channelsSize)
 {
   QGL::FormatOptions opts =
-    QGL::SingleBuffer     |
-    QGL::NoAccumBuffer    |
-    QGL::NoDepthBuffer    |                           // I guess it could be necessary to let at least
-    QGL::NoOverlay        |                           // the depth buffer enabled... Fragment shaders could
-    QGL::NoSampleBuffers  |                           // use it...
-    QGL::NoStencilBuffer  |
-    QGL::NoStereoBuffers;
+	QGL::SingleBuffer     |
+	QGL::NoAccumBuffer    |
+	QGL::NoDepthBuffer    |                           // I guess it could be necessary to let at
+least
+	QGL::NoOverlay        |                           // the depth buffer enabled... Fragment
+shaders could
+	QGL::NoSampleBuffers  |                           // use it...
+	QGL::NoStencilBuffer  |
+	QGL::NoStereoBuffers;
 
   QGLFormat fmt(opts);
-  fmt.setDirectRendering(true);                       // Just to be explicit - USE HARDWARE ACCELERATION
+  fmt.setDirectRendering(true);                       // Just to be explicit - USE HARDWARE
+ACCELERATION
 
   fmt.setRedBufferSize(channelsSize);
   fmt.setGreenBufferSize(channelsSize);
@@ -180,9 +179,7 @@ void ShadingContext::doneCurrent()
 
 void ShadingContext::resize(int lx, int ly, const QGLFramebufferObjectFormat &fmt)
 {
-	if (m_imp->m_fbo.get() &&
-		m_imp->m_fbo->width() == lx &&
-		m_imp->m_fbo->height() == ly &&
+	if (m_imp->m_fbo.get() && m_imp->m_fbo->width() == lx && m_imp->m_fbo->height() == ly &&
 		m_imp->m_fbo->format() == fmt)
 		return;
 
@@ -214,8 +211,7 @@ TDimension ShadingContext::size() const
 
 //--------------------------------------------------------
 
-void ShadingContext::addShaderProgram(
-	const QString &shaderName, QGLShaderProgram *program)
+void ShadingContext::addShaderProgram(const QString &shaderName, QGLShaderProgram *program)
 {
 	std::map<QString, CompiledShader>::iterator st =
 		m_imp->m_shaderPrograms.insert(std::make_pair(shaderName, CompiledShader())).first;
@@ -225,8 +221,8 @@ void ShadingContext::addShaderProgram(
 
 //--------------------------------------------------------
 
-void ShadingContext::addShaderProgram(
-	const QString &shaderName, QGLShaderProgram *program, const QDateTime &lastModified)
+void ShadingContext::addShaderProgram(const QString &shaderName, QGLShaderProgram *program,
+									  const QDateTime &lastModified)
 {
 	std::map<QString, CompiledShader>::iterator st =
 		m_imp->m_shaderPrograms.insert(std::make_pair(shaderName, CompiledShader())).first;
@@ -246,8 +242,7 @@ bool ShadingContext::removeShaderProgram(const QString &shaderName)
 
 QGLShaderProgram *ShadingContext::shaderProgram(const QString &shaderName) const
 {
-	std::map<QString, CompiledShader>::iterator st =
-		m_imp->m_shaderPrograms.find(shaderName);
+	std::map<QString, CompiledShader>::iterator st = m_imp->m_shaderPrograms.find(shaderName);
 
 	return (st != m_imp->m_shaderPrograms.end()) ? st->second.m_program.get() : 0;
 }
@@ -256,21 +251,20 @@ QGLShaderProgram *ShadingContext::shaderProgram(const QString &shaderName) const
 
 QDateTime ShadingContext::lastModified(const QString &shaderName) const
 {
-	std::map<QString, CompiledShader>::iterator st =
-		m_imp->m_shaderPrograms.find(shaderName);
+	std::map<QString, CompiledShader>::iterator st = m_imp->m_shaderPrograms.find(shaderName);
 
 	return (st != m_imp->m_shaderPrograms.end()) ? st->second.m_lastModified : QDateTime();
 }
 
 //--------------------------------------------------------
 
-std::pair<QGLShaderProgram *, QDateTime> ShadingContext::shaderData(
-	const QString &shaderName) const
+std::pair<QGLShaderProgram *, QDateTime> ShadingContext::shaderData(const QString &shaderName) const
 {
-	std::map<QString, CompiledShader>::iterator st =
-		m_imp->m_shaderPrograms.find(shaderName);
+	std::map<QString, CompiledShader>::iterator st = m_imp->m_shaderPrograms.find(shaderName);
 
-	return (st != m_imp->m_shaderPrograms.end()) ? std::make_pair(st->second.m_program.get(), st->second.m_lastModified) : std::make_pair((QGLShaderProgram *)0, QDateTime());
+	return (st != m_imp->m_shaderPrograms.end())
+			   ? std::make_pair(st->second.m_program.get(), st->second.m_lastModified)
+			   : std::make_pair((QGLShaderProgram *)0, QDateTime());
 }
 
 //--------------------------------------------------------
@@ -283,9 +277,12 @@ GLuint ShadingContext::loadTexture(const TRasterP &src, GLuint texUnit)
 	glGenTextures(1, &texId);
 	glBindTexture(GL_TEXTURE_2D, texId);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);	   // These must be used on a bound texture,
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);	   // and are remembered in the OpenGL context.
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // They can be set here, no need for
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+					GL_CLAMP); // These must be used on a bound texture,
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
+					GL_CLAMP); // and are remembered in the OpenGL context.
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+					GL_NEAREST); // They can be set here, no need for
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // the user to do it.
 
 	glPixelStorei(GL_UNPACK_ROW_LENGTH, src->getWrap());
@@ -319,7 +316,8 @@ void ShadingContext::unloadTexture(GLuint texId)
 
 void ShadingContext::draw(const TRasterP &dst)
 {
-	assert("ShadingContext::resize() must be invoked at least once before this" && m_imp->m_fbo.get());
+	assert("ShadingContext::resize() must be invoked at least once before this" &&
+		   m_imp->m_fbo.get());
 
 	int lx = dst->getLx(), ly = dst->getLy(); // NOTE: We're not using m_imp->m_fbo's size, since
 											  // it could be possibly greater than the required
@@ -354,8 +352,8 @@ void ShadingContext::draw(const TRasterP &dst)
 
 //--------------------------------------------------------
 
-void ShadingContext::transformFeedback(
-	int varyingsCount, const GLsizeiptr *varyingSizes, GLvoid **bufs)
+void ShadingContext::transformFeedback(int varyingsCount, const GLsizeiptr *varyingSizes,
+									   GLvoid **bufs)
 {
 	// Generate buffer objects
 	std::vector<GLuint> bufferObjectNames(varyingsCount, 0);

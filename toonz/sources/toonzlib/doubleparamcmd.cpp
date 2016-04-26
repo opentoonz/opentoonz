@@ -9,10 +9,8 @@
 #include <QString>
 #include <map>
 
-DV_IMPORT_API void splitSpeedInOutSegment(
-	TDoubleKeyframe &k,
-	TDoubleKeyframe &k0,
-	TDoubleKeyframe &k1);
+DV_IMPORT_API void splitSpeedInOutSegment(TDoubleKeyframe &k, TDoubleKeyframe &k0,
+										  TDoubleKeyframe &k1);
 
 //=============================================================================
 //
@@ -27,7 +25,7 @@ class KeyframesUndo : public TUndo
 	Keyframes m_oldKeyframes;
 	Keyframes m_newKeyframes;
 
-public:
+  public:
 	KeyframesUndo(TDoubleParam *param) : m_param(param) {}
 	void addKeyframe(int kIndex)
 	{
@@ -83,10 +81,7 @@ public:
 	{
 		return sizeof(*this) + sizeof(*m_oldKeyframes.begin()) * 2 * m_oldKeyframes.size();
 	}
-	QString getHistoryString()
-	{
-		return QObject::tr("Set Keyframe");
-	}
+	QString getHistoryString() { return QObject::tr("Set Keyframe"); }
 };
 
 //=============================================================================
@@ -96,7 +91,8 @@ public:
 //-----------------------------------------------------------------------------
 
 KeyframeSetter::KeyframeSetter(TDoubleParam *param, int kIndex, bool enableUndo)
-	: m_param(param), m_kIndex(-1), m_extraDFrame(0), m_enableUndo(enableUndo), m_undo(new KeyframesUndo(param)), m_changed(false), m_pixelRatio(1)
+	: m_param(param), m_kIndex(-1), m_extraDFrame(0), m_enableUndo(enableUndo),
+	  m_undo(new KeyframesUndo(param)), m_changed(false), m_pixelRatio(1)
 {
 	if (kIndex >= 0)
 		selectKeyframe(kIndex);
@@ -155,7 +151,8 @@ int KeyframeSetter::createKeyframe(double frame)
 		// a single keyframe created in a empty curve
 	} else if (kCount == 2) {
 		// two keyframes => a linear segment
-		TDoubleKeyframe::Type type = TDoubleKeyframe::Type(Preferences::instance()->getKeyframeType());
+		TDoubleKeyframe::Type type =
+			TDoubleKeyframe::Type(Preferences::instance()->getKeyframeType());
 		setType(0, type);
 	} else {
 		// there are at least other two keyframes (and therefore at least a segment)
@@ -164,14 +161,16 @@ int KeyframeSetter::createKeyframe(double frame)
 			setType(TDoubleKeyframe::Type(Preferences::instance()->getKeyframeType()));
 		} else if (m_kIndex == kCount - 1) {
 			// a new segment added after the others. use the preference value too
-			setType(m_kIndex - 1, TDoubleKeyframe::Type(Preferences::instance()->getKeyframeType()));
+			setType(m_kIndex - 1,
+					TDoubleKeyframe::Type(Preferences::instance()->getKeyframeType()));
 		} else {
 			// a new point in a segment
 			TDoubleKeyframe ka = m_param->getKeyframe(m_kIndex - 1);
 			TDoubleKeyframe kb = m_param->getKeyframe(m_kIndex + 1);
 			TDoubleKeyframe::Type segmentType = ka.m_type;
 			m_keyframe.m_type = ka.m_type;
-			m_keyframe.m_step = ka.m_step; //An existing segment step should prevail over the preference
+			m_keyframe.m_step =
+				ka.m_step; // An existing segment step should prevail over the preference
 
 			/*---Segment内にKeyを打った場合は、Step値も元のSegmentの値を引き継ぐようにする---*/
 			m_param->setKeyframe(m_kIndex, m_keyframe);
@@ -199,7 +198,8 @@ int KeyframeSetter::createKeyframe(double frame)
 				m_undo->addKeyframe(m_kIndex - 1);
 				m_undo->addKeyframe(m_kIndex + 1);
 				m_param->setKeyframes(keyframes);
-			} else if (segmentType == TDoubleKeyframe::Expression || segmentType == TDoubleKeyframe::SimilarShape) {
+			} else if (segmentType == TDoubleKeyframe::Expression ||
+					   segmentType == TDoubleKeyframe::SimilarShape) {
 				std::string expressionText = ka.m_expressionText;
 
 				setExpression(expressionText);
@@ -229,10 +229,8 @@ bool KeyframeSetter::isEaseInOut(int segmentIndex) const
 
 // find the speedInOut handles which will change when moving keyframe kIndex
 // rotatingSpeeds: { <speed, keyframe index> }
-void KeyframeSetter::getRotatingSpeedHandles(
-	std::vector<std::pair<double, int>> &rotatingSpeeds,
-	TDoubleParam *param,
-	int kIndex) const
+void KeyframeSetter::getRotatingSpeedHandles(std::vector<std::pair<double, int>> &rotatingSpeeds,
+											 TDoubleParam *param, int kIndex) const
 {
 	const double epsilon = 1.0e-7;
 	int ty[4] = {0, 0, 0, 0};
@@ -326,7 +324,8 @@ void KeyframeSetter::moveKeyframes(int dFrame, double dValue)
 		dFrame = dFrameSgn * tmax(0, dFrame);
 		if (dFrame != preferredDFrame)
 			m_extraDFrame = preferredDFrame - dFrame;
-		// at this point dFrame (possibly ==0) is ok (no keyframe collisions, no segment type mismatches)
+		// at this point dFrame (possibly ==0) is ok (no keyframe collisions, no segment type
+		// mismatches)
 	}
 
 	std::map<int, TDoubleKeyframe> change;
@@ -373,35 +372,35 @@ void KeyframeSetter::moveKeyframes(int dFrame, double dValue)
 
 		// update segment types (because of swaps)
 		/*
-    for(int i=0;i+1<n;i++)
-    {
-      TDoubleKeyframe &kfa = keyframes[i].first;
-      TDoubleKeyframe &kfb = keyframes[i+1].first;
-      if(kfa.m_type == TDoubleKeyframe::None)
-      {
-        kfa.m_type = TDoubleKeyframe::SpeedInOut;
-        kfa.m_speedOut = TPointD(0,0);
-      }
-      if(kfb.m_prevType == TDoubleKeyframe::None)
-      {
-        kfa.m_prevType = TDoubleKeyframe::SpeedInOut;
-        kfa.m_speedIn = TPointD(0,0);
-      }
-    }
-    */
+	for(int i=0;i+1<n;i++)
+	{
+	  TDoubleKeyframe &kfa = keyframes[i].first;
+	  TDoubleKeyframe &kfb = keyframes[i+1].first;
+	  if(kfa.m_type == TDoubleKeyframe::None)
+	  {
+		kfa.m_type = TDoubleKeyframe::SpeedInOut;
+		kfa.m_speedOut = TPointD(0,0);
+	  }
+	  if(kfb.m_prevType == TDoubleKeyframe::None)
+	  {
+		kfa.m_prevType = TDoubleKeyframe::SpeedInOut;
+		kfa.m_speedIn = TPointD(0,0);
+	  }
+	}
+	*/
 
 		m_changed = true;
 		for (int i = 0; i < n; i++) {
 			if (keyframes[i].second != i) {
 
 				/*
-        // i-th keyframe has changed is order position
-        if(keyframes[i].first.m_type == TDoubleKeyframe::None)
-        {
-          if(i==n-1) keyframes[i].first.m_type = TDoubleKeyframe::Linear;
-          else keyframes[i].first.m_type = keyframes[i+1].first.m_type;
-        }
-        */
+		// i-th keyframe has changed is order position
+		if(keyframes[i].first.m_type == TDoubleKeyframe::None)
+		{
+		  if(i==n-1) keyframes[i].first.m_type = TDoubleKeyframe::Linear;
+		  else keyframes[i].first.m_type = keyframes[i+1].first.m_type;
+		}
+		*/
 
 				m_undo->addKeyframe(i);
 				change[i] = keyframes[i].first;
@@ -413,19 +412,19 @@ void KeyframeSetter::moveKeyframes(int dFrame, double dValue)
 	/*
   if(!rotatingSpeedHandles.empty())
   {
-    for(int i=0;i<(int)rotatingSpeedHandles.size();i++)
-    {
-      double speedLength = rotatingSpeedHandles[i].first;
-      int kIndex = rotatingSpeedHandles[i].second;
-      TDoubleKeyframe kf = m_param->getKeyframe(kIndex);
-      TPointD speed = speedLength<0 ? m_param->getSpeedIn(kIndex) : m_param->getSpeedOut(kIndex);
-      speed = fabs(speedLength/getNorm(speed)) * speed;
-      if(speedLength<0)
-        kf.m_speedIn = speed;
-      else
-        kf.m_speedOut = speed;
-      m_param->setKeyframe(kf);
-    }
+	for(int i=0;i<(int)rotatingSpeedHandles.size();i++)
+	{
+	  double speedLength = rotatingSpeedHandles[i].first;
+	  int kIndex = rotatingSpeedHandles[i].second;
+	  TDoubleKeyframe kf = m_param->getKeyframe(kIndex);
+	  TPointD speed = speedLength<0 ? m_param->getSpeedIn(kIndex) : m_param->getSpeedOut(kIndex);
+	  speed = fabs(speedLength/getNorm(speed)) * speed;
+	  if(speedLength<0)
+		kf.m_speedIn = speed;
+	  else
+		kf.m_speedOut = speed;
+	  m_param->setKeyframe(kf);
+	}
   }
   */
 }
@@ -621,9 +620,9 @@ void KeyframeSetter::setSpeedIn(const TPointD &speedIn)
 		m_keyframe.m_speedIn.x = 0;
 	if (m_keyframe.m_linkedHandles && m_kIndex + 1 <= m_param->getKeyframeCount()) {
 		double outNorm = getNorm(m_keyframe.m_speedOut);
-		if (m_kIndex + 1 == m_param->getKeyframeCount() ||
-			isSpeedInOut(m_kIndex) ||
-			(m_keyframe.m_type == TDoubleKeyframe::Expression && m_keyframe.m_expressionText.find("cycle") != std::string::npos)) {
+		if (m_kIndex + 1 == m_param->getKeyframeCount() || isSpeedInOut(m_kIndex) ||
+			(m_keyframe.m_type == TDoubleKeyframe::Expression &&
+			 m_keyframe.m_expressionText.find("cycle") != std::string::npos)) {
 			// update next segment speed vector
 			double inNorm = getNorm(m_keyframe.m_speedIn);
 			if (inNorm < eps)
@@ -657,7 +656,7 @@ void KeyframeSetter::setSpeedOut(const TPointD &speedOut)
 			double outNorm = getNorm(m_keyframe.m_speedOut);
 			if (outNorm > eps)
 				m_keyframe.m_speedIn = -inNorm / outNorm * m_keyframe.m_speedOut;
-			//else
+			// else
 			//  m_keyframe.m_speedIn = TPointD(inNorm,0);
 
 		} else {
@@ -726,11 +725,8 @@ void KeyframeSetter::setEaseOut(double easeOut)
 //=============================================================================
 
 // set the curve params adaptively by clicking apply button
-void KeyframeSetter::setAllParams(int step,
-								  TDoubleKeyframe::Type comboType,
-								  const TPointD &speedIn,
-								  const TPointD &speedOut,
-								  std::string expressionText,
+void KeyframeSetter::setAllParams(int step, TDoubleKeyframe::Type comboType, const TPointD &speedIn,
+								  const TPointD &speedOut, std::string expressionText,
 								  std::string unitName,
 								  const TDoubleKeyframe::FileParams &fileParam,
 								  double similarShapeOffset)
@@ -740,7 +736,7 @@ void KeyframeSetter::setAllParams(int step,
 	TDoubleKeyframe keyframe = m_param->getKeyframe(m_kIndex);
 	TDoubleKeyframe nextKeyframe;
 
-	//get the next key
+	// get the next key
 	if (m_kIndex + 1 < m_param->getKeyframeCount())
 		nextKeyframe = m_param->getKeyframe(m_kIndex + 1);
 	else
@@ -751,15 +747,15 @@ void KeyframeSetter::setAllParams(int step,
 	m_indices.insert(m_kIndex);
 	m_changed = true;
 
-	//set step
+	// set step
 	if (step < 1)
 		step = 1;
 	keyframe.m_step = step;
 
-	//set type
+	// set type
 	keyframe.m_type = comboType;
 
-	//set parameters according to the type
+	// set parameters according to the type
 	std::map<int, TDoubleKeyframe> keyframes;
 	switch (comboType) {
 	case TDoubleKeyframe::SpeedInOut:
@@ -803,7 +799,8 @@ void KeyframeSetter::setAllParams(int step,
 
 	/*--- リンクされたカーブの処理 ---*/
 	const double eps = 0.00001;
-	if (m_kIndex != 0 && keyframe.m_linkedHandles && keyframe.m_prevType == TDoubleKeyframe::SpeedInOut) {
+	if (m_kIndex != 0 && keyframe.m_linkedHandles &&
+		keyframe.m_prevType == TDoubleKeyframe::SpeedInOut) {
 		double inNorm = getNorm(keyframe.m_speedIn);
 		// update previous segment speed vector
 		double outNorm = getNorm(keyframe.m_speedOut);
@@ -811,8 +808,9 @@ void KeyframeSetter::setAllParams(int step,
 			keyframe.m_speedIn = -inNorm / outNorm * keyframe.m_speedOut;
 	}
 
-	//Next curve
-	if (m_kIndex + 2 < m_param->getKeyframeCount() && nextKeyframe.m_linkedHandles && nextKeyframe.m_type == TDoubleKeyframe::SpeedInOut) {
+	// Next curve
+	if (m_kIndex + 2 < m_param->getKeyframeCount() && nextKeyframe.m_linkedHandles &&
+		nextKeyframe.m_type == TDoubleKeyframe::SpeedInOut) {
 		double outNorm = getNorm(nextKeyframe.m_speedOut);
 		// update next segment speed vector
 		double inNorm = getNorm(nextKeyframe.m_speedIn);
@@ -837,34 +835,18 @@ class RemoveKeyframeUndo : public TUndo
 	TDoubleParam *m_param;
 	TDoubleKeyframe m_keyframe;
 
-public:
-	RemoveKeyframeUndo(TDoubleParam *param, int kIndex)
-		: m_param(param)
+  public:
+	RemoveKeyframeUndo(TDoubleParam *param, int kIndex) : m_param(param)
 	{
 		m_param->addRef();
 		m_keyframe = m_param->getKeyframe(kIndex);
 	}
-	~RemoveKeyframeUndo()
-	{
-		m_param->release();
-	}
-	void undo() const
-	{
-		m_param->setKeyframe(m_keyframe);
-	}
-	void redo() const
-	{
-		m_param->deleteKeyframe(m_keyframe.m_frame);
-	}
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	~RemoveKeyframeUndo() { m_param->release(); }
+	void undo() const { m_param->setKeyframe(m_keyframe); }
+	void redo() const { m_param->deleteKeyframe(m_keyframe.m_frame); }
+	int getSize() const { return sizeof(*this); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Remove Keyframe");
-	}
+	QString getHistoryString() { return QObject::tr("Remove Keyframe"); }
 };
 
 //=============================================================================
@@ -885,38 +867,19 @@ class EnableCycleUndo : public TUndo
 {
 	TDoubleParam *m_param;
 
-public:
-	EnableCycleUndo(TDoubleParam *param)
-		: m_param(param)
-	{
-		m_param->addRef();
-	}
-	~EnableCycleUndo()
-	{
-		m_param->release();
-	}
+  public:
+	EnableCycleUndo(TDoubleParam *param) : m_param(param) { m_param->addRef(); }
+	~EnableCycleUndo() { m_param->release(); }
 	void invertCycleEnabled() const
 	{
 		bool isEnabled = m_param->isCycleEnabled();
 		m_param->enableCycle(!isEnabled);
 	}
-	void undo() const
-	{
-		invertCycleEnabled();
-	}
-	void redo() const
-	{
-		invertCycleEnabled();
-	}
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	void undo() const { invertCycleEnabled(); }
+	void redo() const { invertCycleEnabled(); }
+	int getSize() const { return sizeof(*this); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Cycle");
-	}
+	QString getHistoryString() { return QObject::tr("Cycle"); }
 };
 
 //=============================================================================

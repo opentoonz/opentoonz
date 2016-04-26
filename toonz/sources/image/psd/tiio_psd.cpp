@@ -5,12 +5,14 @@
 #include "timageinfo.h"
 
 // forward declaration
-//class TImageReaderLayerPsd;
+// class TImageReaderLayerPsd;
 
 // if path = :
 //  filename.psd									to load float image. TLevel frames number is 1
-//	filename#layerId.psd					to load only one psd layer from layerId. TLevel frames number is 1
-//  filename#layerId#frames.psd	  to load only one psd layer from layerId. TLevel frames number is psd layers number
+//	filename#layerId.psd					to load only one psd layer from layerId. TLevel frames number is
+//1
+//  filename#layerId#frames.psd	  to load only one psd layer from layerId. TLevel frames number
+//  is psd layers number
 //  filename#layerId#group.psd		to load only one psd layer from layerId. TLevel frames number is psd layers folder number \
 //																where fodler is the folder belongs psd layer.
 
@@ -99,28 +101,29 @@ TLevelReader *TLevelReaderPsd::create(const TFilePath &f)
 class TImageReaderLayerPsd : public TImageReader
 {
 
-public:
+  public:
 	TImageReaderLayerPsd(const TFilePath &, int layerId, TLevelReaderPsd *lr, TImageInfo *info);
 	~TImageReaderLayerPsd() { m_lr->release(); }
 
-private:
-	//not implemented
+  private:
+	// not implemented
 	TImageReaderLayerPsd(const TImageReaderLayerPsd &);
 	TImageReaderLayerPsd &operator=(const TImageReaderLayerPsd &src);
 
-public:
+  public:
 	TImageP load();
 
 	const TImageInfo *getImageInfo() const { return m_info; }
 
-private:
+  private:
 	TPSDReader *m_psdreader;
 	TLevelReaderPsd *m_lr;
 	TImageInfo *m_info;
 	int m_layerId;
 };
 
-TImageReaderLayerPsd::TImageReaderLayerPsd(const TFilePath &path, int layerId, TLevelReaderPsd *lr, TImageInfo *info)
+TImageReaderLayerPsd::TImageReaderLayerPsd(const TFilePath &path, int layerId, TLevelReaderPsd *lr,
+										   TImageInfo *info)
 	: TImageReader(path), m_lr(lr), m_layerId(layerId), m_info(info)
 {
 	m_lr->setLayerId(layerId);
@@ -150,20 +153,20 @@ class TImageWriterPsd : public TImageWriter
 
 	int m_layerId;
 
-public:
+  public:
 	TImageWriterPsd(const TFilePath &, int frameIndex, TLevelWriterPsd *);
 	~TImageWriterPsd() { m_lwm->release(); }
 
-private:
-	//not implemented
+  private:
+	// not implemented
 	TImageWriterPsd(const TImageWriterPsd &);
 	TImageWriterPsd &operator=(const TImageWriterPsd &src);
 
-public:
-	//not implemented
+  public:
+	// not implemented
 	void save(const TImageP &);
 
-private:
+  private:
 	TLevelWriterPsd *m_lwm;
 };
 

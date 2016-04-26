@@ -50,7 +50,8 @@
 
 //=============================================================================
 /*! \namespace Stage
-		\brief The Stage namespace provides a set of objects, class and method, useful to view images in display.
+		\brief The Stage namespace provides a set of objects, class and method, useful to view
+   images in display.
 */
 using namespace Stage;
 
@@ -90,7 +91,10 @@ void updateOnionSkinSize(const PlayerSet &players)
 
 //-----------------------------------------------------------------------------
 
-bool descending(int i, int j) { return (i > j); }
+bool descending(int i, int j)
+{
+	return (i > j);
+}
 
 //----------------------------------------------------------------
 }
@@ -102,7 +106,7 @@ bool descending(int i, int j) { return (i > j); }
 
 class ZPlacement
 {
-public:
+  public:
 	TAffine m_aff;
 	double m_z;
 	ZPlacement() : m_aff(), m_z(0) {}
@@ -117,11 +121,9 @@ public:
 
 class PlayerLt
 {
-public:
+  public:
 	PlayerLt() {}
-	inline bool operator()(
-		const Player &a,
-		const Player &b) const
+	inline bool operator()(const Player &a, const Player &b) const
 	{
 		if (a.m_bingoOrder < b.m_bingoOrder)
 			return true;
@@ -135,11 +137,9 @@ public:
 
 class StackingOrder
 {
-public:
+  public:
 	StackingOrder() {}
-	inline bool operator()(
-		const std::pair<double, int> &a,
-		const std::pair<double, int> &b) const
+	inline bool operator()(const std::pair<double, int> &a, const std::pair<double, int> &b) const
 	{
 		return a.first < b.first;
 	}
@@ -149,27 +149,22 @@ public:
 /*! The StageBuilder class finds and provides data for frame visualization.
 \n	The class contains a \b PlayerSet, a vector of player, of all necessary information.
 */
-//Tutto cio che riguarda una "colonna maschera" non e' utilizzato in TOONZ ma in TAB Pro.
+// Tutto cio che riguarda una "colonna maschera" non e' utilizzato in TOONZ ma in TAB Pro.
 //=============================================================================
 
 class StageBuilder
 {
-public:
+  public:
 	struct SubXSheet {
 		ZPlacement m_camera;
 		TAffine m_aff, m_zaff;
 		double m_z;
 	};
 
-public:
-	enum ShiftTraceGhostId {
-		NO_GHOST,
-		FIRST_GHOST,
-		SECOND_GHOST,
-		TRACED
-	};
+  public:
+	enum ShiftTraceGhostId { NO_GHOST, FIRST_GHOST, SECOND_GHOST, TRACED };
 
-public:
+  public:
 	PlayerSet m_players;
 	std::vector<PlayerSet *> m_maskPool;
 
@@ -197,7 +192,7 @@ public:
 
 	const ImagePainter::VisualSettings *m_vs;
 
-public:
+  public:
 	StageBuilder();
 	virtual ~StageBuilder();
 
@@ -214,19 +209,18 @@ public:
 			cell and recall \b addCell(). If onion-skin is not active recall \b addCell()
 			with argument current cell.
 	*/
-	void addCellWithOnionSkin(PlayerSet &players, ToonzScene *scene, TXsheet *xsh, int row, int col, int level);
+	void addCellWithOnionSkin(PlayerSet &players, ToonzScene *scene, TXsheet *xsh, int row, int col,
+							  int level);
 
 	/*!Recall \b addCellWithOnionSkin() for each cell of row \b row.*/
-	void addFrame(PlayerSet &players, ToonzScene *scene, TXsheet *xsh, int row, int level, bool includeUnvisible, bool checkPreviewVisibility);
+	void addFrame(PlayerSet &players, ToonzScene *scene, TXsheet *xsh, int row, int level,
+				  bool includeUnvisible, bool checkPreviewVisibility);
 
 	/*! Add in \b players vector informations about \b level cell with \b TFrameId \b fid.
 	\n	Compute information for all cell with active onion-skin, if onion-skin is not active
 			compute information only for current cell.
 	*/
-	void addSimpleLevelFrame(
-		PlayerSet &players,
-		TXshSimpleLevel *level,
-		const TFrameId &fid);
+	void addSimpleLevelFrame(PlayerSet &players, TXshSimpleLevel *level, const TFrameId &fid);
 
 	/*! Recall \b visitor.onImage(player) for each \b player contained in \b players vector.
 	*/
@@ -242,7 +236,9 @@ public:
 //-----------------------------------------------------------------------------
 
 StageBuilder::StageBuilder()
-	: m_onionSkinDistance(c_noOnionSkin), m_camera3d(false), m_currentColumnIndex(-1), m_ancestorColumnIndex(-1), m_fade(0), m_shiftTraceGhostId(NO_GHOST), m_currentXsheetLevel(0), m_xsheetLevel(0)
+	: m_onionSkinDistance(c_noOnionSkin), m_camera3d(false), m_currentColumnIndex(-1),
+	  m_ancestorColumnIndex(-1), m_fade(0), m_shiftTraceGhostId(NO_GHOST), m_currentXsheetLevel(0),
+	  m_xsheetLevel(0)
 {
 	m_placementStack.push_back(ZPlacement());
 }
@@ -292,15 +288,14 @@ void StageBuilder::dumpAll(std::ostream &out)
 
 //-----------------------------------------------------------------------------
 
-void StageBuilder::addCell(
-	PlayerSet &players,
-	ToonzScene *scene,
-	TXsheet *xsh, int row, int col, int level)
+void StageBuilder::addCell(PlayerSet &players, ToonzScene *scene, TXsheet *xsh, int row, int col,
+						   int level)
 {
 	// Local functions
 	struct locals {
 
-		static inline bool isMeshDeformed(TXsheet *xsh, TStageObject *obj, const ImagePainter::VisualSettings *vs)
+		static inline bool isMeshDeformed(TXsheet *xsh, TStageObject *obj,
+										  const ImagePainter::VisualSettings *vs)
 		{
 			const TStageObjectId &parentId = obj->getParent();
 			if (parentId.isColumn() && obj->getParentHandle()[0] != 'H') {
@@ -318,7 +313,8 @@ void StageBuilder::addCell(
 
 		//-----------------------------------------------------------------------------
 
-		static inline bool applyPlasticDeform(TXshColumn *col, const ImagePainter::VisualSettings *vs)
+		static inline bool applyPlasticDeform(TXshColumn *col,
+											  const ImagePainter::VisualSettings *vs)
 		{
 			const PlasticVisualSettings &pvs = vs->m_plasticVisualSettings;
 			return pvs.m_applyPlasticDeformation && (col != pvs.m_showOriginalColumn);
@@ -348,20 +344,16 @@ void StageBuilder::addCell(
 		cameraPlacement = m_subXSheetStack.back().m_camera;
 	TAffine columnZaff;
 	bool columnBehindCamera = TStageObject::perspective(
-		columnZaff,
-		cameraPlacement.m_aff, cameraPlacement.m_z,
-		columnAff, columnZ,
-		columnNoScaleZ);
+		columnZaff, cameraPlacement.m_aff, cameraPlacement.m_z, columnAff, columnZ, columnNoScaleZ);
 
 	if (!columnBehindCamera)
 		return;
 
 	TXshSimpleLevel *sl = xl->getSimpleLevel();
 
-	bool storePlayer = sl ||
-					   (xl->getChildLevel() &&
-						locals::applyPlasticDeform(column.getPointer(), m_vs) &&
-						locals::isMeshDeformed(xsh, pegbar, m_vs));
+	bool storePlayer =
+		sl || (xl->getChildLevel() && locals::applyPlasticDeform(column.getPointer(), m_vs) &&
+			   locals::isMeshDeformed(xsh, pegbar, m_vs));
 
 	if (storePlayer) {
 		// Build and store a player
@@ -394,17 +386,20 @@ void StageBuilder::addCell(
 				player.m_opacity = 127;
 			int opacity = player.m_opacity;
 			player.m_bingoOrder = 10;
-			if (m_onionSkinMask.getShiftTraceStatus() != OnionSkinMask::ENABLED_WITHOUT_GHOST_MOVEMENTS) {
+			if (m_onionSkinMask.getShiftTraceStatus() !=
+				OnionSkinMask::ENABLED_WITHOUT_GHOST_MOVEMENTS) {
 				if (m_shiftTraceGhostId == FIRST_GHOST) {
 					player.m_opacity = 30;
 					players.push_back(player);
 					player.m_opacity = opacity;
-					player.m_placement = m_onionSkinMask.getShiftTraceGhostAff(0) * player.m_placement;
+					player.m_placement =
+						m_onionSkinMask.getShiftTraceGhostAff(0) * player.m_placement;
 				} else if (m_shiftTraceGhostId == SECOND_GHOST) {
 					player.m_opacity = 30;
 					players.push_back(player);
 					player.m_opacity = opacity;
-					player.m_placement = m_onionSkinMask.getShiftTraceGhostAff(1) * player.m_placement;
+					player.m_placement =
+						m_onionSkinMask.getShiftTraceGhostAff(1) * player.m_placement;
 				}
 			}
 		}
@@ -429,7 +424,8 @@ void StageBuilder::addCell(
 		subXSheet.m_camera = ZPlacement(childCameraAff, childCameraZ);
 		subXSheet.m_z = columnZ;
 
-		TAffine childCameraZaff = childCameraAff * TScale((1000 + childCameraZ) / 1000); // TODO: put in some lib
+		TAffine childCameraZaff =
+			childCameraAff * TScale((1000 + childCameraZ) / 1000); // TODO: put in some lib
 		TAffine invChildCameraZaff = childCameraZaff.inv();
 
 		subXSheet.m_aff = columnAff * invChildCameraZaff;
@@ -471,15 +467,14 @@ bool alreadyAdded(TXsheet *xsh, int row, int index, const std::vector<int> &rows
 
 //-----------------------------------------------------------------------------
 
-void StageBuilder::addCellWithOnionSkin(
-	PlayerSet &players,
-	ToonzScene *scene,
-	TXsheet *xsh, int row, int col, int level)
+void StageBuilder::addCellWithOnionSkin(PlayerSet &players, ToonzScene *scene, TXsheet *xsh,
+										int row, int col, int level)
 {
 	struct locals {
 		static inline bool hasOnionSkinnedMeshParent(StageBuilder *sb, TXsheet *xsh, int col)
 		{
-			const TStageObjectId &parentId = xsh->getStageObject(TStageObjectId::ColumnId(col))->getParent();
+			const TStageObjectId &parentId =
+				xsh->getStageObject(TStageObjectId::ColumnId(col))->getParent();
 
 			return parentId.isColumn() && (parentId.getIndex() == sb->m_currentColumnIndex);
 		}
@@ -490,10 +485,8 @@ void StageBuilder::addCellWithOnionSkin(
 		{
 			const OnionSkinMask &osm = sb->m_onionSkinMask;
 
-			return level == sb->m_xsheetLevel &&
-				   osm.isEnabled() && !osm.isEmpty() &&
-				   (osm.isWholeScene() ||
-					col == sb->m_currentColumnIndex ||
+			return level == sb->m_xsheetLevel && osm.isEnabled() && !osm.isEmpty() &&
+				   (osm.isWholeScene() || col == sb->m_currentColumnIndex ||
 					locals::hasOnionSkinnedMeshParent(sb, xsh, col));
 		}
 	}; // locals
@@ -508,7 +501,8 @@ void StageBuilder::addCellWithOnionSkin(
 		if (cell.isEmpty())
 			r--;
 
-		if (r >= 0 && (cell.getSimpleLevel() == 0 || xsh->getCell(r, col).getSimpleLevel() == cell.getSimpleLevel())) {
+		if (r >= 0 && (cell.getSimpleLevel() == 0 ||
+					   xsh->getCell(r, col).getSimpleLevel() == cell.getSimpleLevel())) {
 			m_shiftTraceGhostId = FIRST_GHOST;
 			addCell(players, scene, xsh, r, col, level);
 		}
@@ -544,7 +538,8 @@ void StageBuilder::addCellWithOnionSkin(
 #ifdef NUOVO_ONION
 			m_onionSkinDistance = rows[i] - row;
 #else
-			if (!Preferences::instance()->isAnimationSheetEnabled() || !alreadyAdded(xsh, row, i, rows, col)) {
+			if (!Preferences::instance()->isAnimationSheetEnabled() ||
+				!alreadyAdded(xsh, row, i, rows, col)) {
 				m_onionSkinDistance = (rows[i] - row) < 0 ? --backPos : ++frontPos;
 				addCell(players, scene, xsh, rows[i], col, level);
 			}
@@ -561,11 +556,8 @@ void StageBuilder::addCellWithOnionSkin(
 
 //-----------------------------------------------------------------------------
 
-void StageBuilder::addFrame(
-	PlayerSet &players,
-	ToonzScene *scene,
-	TXsheet *xsh, int row, int level,
-	bool includeUnvisible, bool checkPreviewVisibility)
+void StageBuilder::addFrame(PlayerSet &players, ToonzScene *scene, TXsheet *xsh, int row, int level,
+							bool includeUnvisible, bool checkPreviewVisibility)
 {
 	int columnCount = xsh->getColumnCount();
 	unsigned int maskCount = m_masks.size();
@@ -622,16 +614,13 @@ void StageBuilder::addFrame(
 
 //-----------------------------------------------------------------------------
 
-void StageBuilder::addSimpleLevelFrame(
-	PlayerSet &players,
-	TXshSimpleLevel *level,
-	const TFrameId &fid)
+void StageBuilder::addSimpleLevelFrame(PlayerSet &players, TXshSimpleLevel *level,
+									   const TFrameId &fid)
 {
 	int index = -1;
 
 	int row = level->guessIndex(fid);
-	if (!m_onionSkinMask.isEmpty() &&
-		m_onionSkinMask.isEnabled()) {
+	if (!m_onionSkinMask.isEmpty() && m_onionSkinMask.isEnabled()) {
 		std::vector<int> rows;
 		m_onionSkinMask.getAll(row, rows);
 
@@ -666,8 +655,7 @@ void StageBuilder::addSimpleLevelFrame(
 	player.m_sl = level;
 	player.m_frame = level->guessIndex(fid);
 	player.m_fid = fid;
-	if (!m_onionSkinMask.isEmpty() &&
-		m_onionSkinMask.isEnabled())
+	if (!m_onionSkinMask.isEmpty() && m_onionSkinMask.isEnabled())
 		player.m_onionSkinDistance = 0;
 	player.m_isCurrentColumn = true;
 	player.m_isCurrentXsheetLevel = true;
@@ -685,11 +673,11 @@ void StageBuilder::visit(PlayerSet &players, Visitor &visitor, bool isPlaying)
 	for (; h < m; h++) {
 		Player &player = players[h];
 		unsigned int i = 0;
-		//vale solo per TAB pro
+		// vale solo per TAB pro
 		for (; i < masks.size() && i < player.m_masks.size(); i++)
 			if (masks[i] != player.m_masks[i])
 				break;
-		//vale solo per TAB pro
+		// vale solo per TAB pro
 		if (i < masks.size() || i < player.m_masks.size()) {
 			while (i < masks.size()) {
 				masks.pop_back();
@@ -708,7 +696,7 @@ void StageBuilder::visit(PlayerSet &players, Visitor &visitor, bool isPlaying)
 		player.m_isPlaying = isPlaying;
 		visitor.onImage(player);
 	}
-	//vale solo per TAB pro
+	// vale solo per TAB pro
 	for (h = 0; h < (int)masks.size(); h++)
 		visitor.disableMask();
 }
@@ -721,7 +709,7 @@ class DummyVisitor : public Visitor
 {
 	std::ostrstream m_ss;
 
-public:
+  public:
 	void onImage(const Stage::Player &data) { m_ss << "img "; }
 	void beginMask() { m_ss << "beginMask "; }
 	void endMask() { m_ss << "endMask "; }
@@ -767,7 +755,8 @@ void Stage::visit(Visitor &visitor, const VisitArgs &args)
 	sb.m_onionSkinMask = *osm;
 	Player::m_onionSkinFrontSize = 0;
 	Player::m_onionSkinBackSize = 0;
-	sb.addFrame(sb.m_players, scene, xsh, row, 0, args.m_onlyVisible, args.m_checkPreviewVisibility);
+	sb.addFrame(sb.m_players, scene, xsh, row, 0, args.m_onlyVisible,
+				args.m_checkPreviewVisibility);
 
 	updateOnionSkinSize(sb.m_players);
 
@@ -776,10 +765,7 @@ void Stage::visit(Visitor &visitor, const VisitArgs &args)
 
 //-----------------------------------------------------------------------------
 
-void Stage::visit(
-	Visitor &visitor,
-	ToonzScene *scene,
-	TXsheet *xsh, int row)
+void Stage::visit(Visitor &visitor, ToonzScene *scene, TXsheet *xsh, int row)
 {
 	Stage::VisitArgs args;
 	args.m_scene = scene;
@@ -796,12 +782,8 @@ void Stage::visit(
 /*! Declare a \b StageBuilder object and recall \b StageBuilder::addSimpleLevelFrame()
 		and \b StageBuilder::visit().
 */
-void Stage::visit(
-	Visitor &visitor,
-	TXshSimpleLevel *level,
-	const TFrameId &fid,
-	const OnionSkinMask &osm,
-	bool isPlaying)
+void Stage::visit(Visitor &visitor, TXshSimpleLevel *level, const TFrameId &fid,
+				  const OnionSkinMask &osm, bool isPlaying)
 {
 	StageBuilder sb;
 	sb.m_vs = &visitor.m_vs;
@@ -815,12 +797,8 @@ void Stage::visit(
 
 //-----------------------------------------------------------------------------
 
-void Stage::visit(
-	Visitor &visitor,
-	TXshLevel *level,
-	const TFrameId &fid,
-	const OnionSkinMask &osm,
-	bool isPlaying)
+void Stage::visit(Visitor &visitor, TXshLevel *level, const TFrameId &fid, const OnionSkinMask &osm,
+				  bool isPlaying)
 {
 	if (level && level->getSimpleLevel())
 		visit(visitor, level->getSimpleLevel(), fid, osm, isPlaying);

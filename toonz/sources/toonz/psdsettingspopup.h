@@ -32,12 +32,10 @@ class PsdSettingsPopup : public DVGui::Dialog
 	// FRAMES: all psd layers are frames of a single Tlevel
 	// COLUMNS: each psd layer is a TLevel with only one frame.
 	// FOLDER: each psd layer is a TLevel and
-	//				 each psd folder is a TLevel where each psd layer contained into folder is a frame of TLevel
+	//				 each psd folder is a TLevel where each psd layer contained into folder is a frame of
+	//TLevel
 
-	enum Mode { FLAT,
-				FRAMES,
-				COLUMNS,
-				FOLDER };
+	enum Mode { FLAT, FRAMES, COLUMNS, FOLDER };
 
 	TFilePath m_path;
 	std::vector<TFilePath> m_psdLevelPaths;
@@ -50,17 +48,18 @@ class PsdSettingsPopup : public DVGui::Dialog
 	DVGui::CheckBox *m_createSubXSheet;
 	QButtonGroup *m_psdFolderOptions;
 
-	//QTreeWidget *m_psdTree;	// per adesso non serve. Servirà in un secondo momento quando implemento la scelta dei livelli
+	// QTreeWidget *m_psdTree;	// per adesso non serve. Servirà in un secondo momento quando
+	// implemento la scelta dei livelli
 	// da caricare
 	QTextEdit *m_modeDescription;
 	TPSDParser *m_psdparser;
 	QLabel *m_filename;  // Name
 	QLabel *m_parentDir; // Path
 
-public slots:
+  public slots:
 	void onOk();
 
-public:
+  public:
 	PsdSettingsPopup();
 
 	void setPath(const TFilePath &path);
@@ -75,10 +74,10 @@ public:
 	int getFolderOption();
 	int getSubfolderLevelIndex(int psdLevelIndex, int frameIndex);
 
-private:
+  private:
 	void doPsdParser();
 
-protected slots:
+  protected slots:
 	void onModeChanged(const QString &mode);
 	void onFolderOptionChange(int id);
 };

@@ -1,13 +1,13 @@
 
 
-//Toonz core includes
+// Toonz core includes
 #include "timagecache.h"
 #include "trasterimage.h"
 #include "ttoonzimage.h"
 #include "tmeshimage.h"
 #include "timage_io.h"
 
-//Qt includes (mutexing classes)
+// Qt includes (mutexing classes)
 #include <QMutex>
 #include <QMutexLocker>
 #include <QReadWriteLock>
@@ -25,23 +25,23 @@
 
   Most of the image manager's job is that of caching hard-built image data so that successive
   queries avoid rebuilding the same images again.
-  
+
   In a multithreaded environment, we must make sure that multiple threads block each other out
   as little as possible.
 
   Here are the main performance and threading notes:
 
-    - Image infos are completely cached, while image cachability is user-specified.
-      This is needed as some images must be loaded only temporarily.
+	- Image infos are completely cached, while image cachability is user-specified.
+	  This is needed as some images must be loaded only temporarily.
 
-    - One mutex will be used to protect the bindings table. It is the outermost mutex.
+	- One mutex will be used to protect the bindings table. It is the outermost mutex.
 
-    - One mutex (read/write lock) will be used to protect access to EACH individual image.
-      Testing should be required. If file access is found to be too strictly sequential,
-      perhaps a single mutex could suffice.
+	- One mutex (read/write lock) will be used to protect access to EACH individual image.
+	  Testing should be required. If file access is found to be too strictly sequential,
+	  perhaps a single mutex could suffice.
 
-    - Having different mutexes to protect images and image infos is currently not implemented,
-      but could be. Testing required.
+	- Having different mutexes to protect images and image infos is currently not implemented,
+	  but could be. Testing required.
 */
 
 /*
@@ -59,7 +59,8 @@ DEFINE_CLASS_CODE(ImageBuilder, 100)
 //-----------------------------------------------------------------------------
 
 ImageBuilder::ImageBuilder()
-	: TSmartObject(m_classCode), m_imageBuildingLock(QReadWriteLock::Recursive), m_cached(false), m_modified(false), m_imFlags(ImageManager::none)
+	: TSmartObject(m_classCode), m_imageBuildingLock(QReadWriteLock::Recursive), m_cached(false),
+	  m_modified(false), m_imFlags(ImageManager::none)
 {
 }
 
@@ -159,10 +160,10 @@ bool ImageBuilder::setImageInfo(TImageInfo &info, TImageReader *ir)
 //************************************************************************************
 
 struct ImageManager::Imp {
-	QReadWriteLock m_tableLock;					//!< Lock for the builders table
+	QReadWriteLock m_tableLock;						 //!< Lock for the builders table
 	std::map<std::string, ImageBuilderP> m_builders; //!< identifier -> ImageBuilder table
 
-public:
+  public:
 	Imp() : m_tableLock(QReadWriteLock::Recursive) {}
 
 	void clear() { m_builders.clear(); }
@@ -172,8 +173,7 @@ public:
 //    Image Manager implementation
 //************************************************************************************
 
-ImageManager::ImageManager()
-	: m_imp(new Imp)
+ImageManager::ImageManager() : m_imp(new Imp)
 {
 }
 
@@ -341,10 +341,10 @@ TImageP ImageManager::getImage(const std::string &id, int imFlags, void *extData
 		}
 	}
 
-	//Lock for image building
+	// Lock for image building
 	QWriteLocker imageBuildingLocker(&builder->m_imageBuildingLock);
 
-	//As multiple threads may block on filesLocker, re-check if the image is now available
+	// As multiple threads may block on filesLocker, re-check if the image is now available
 	if (builder->m_cached) {
 		if (modified || builder->isImageCompatible(imFlags, extData)) {
 			img = TImageCache::instance()->get(id, _toBeModified);
@@ -358,7 +358,7 @@ TImageP ImageManager::getImage(const std::string &id, int imFlags, void *extData
 	// The image was either not available or not conforming to the required specifications.
 	// We have to build it now, then.
 
-	//Build the image
+	// Build the image
 	img = builder->build(imFlags, extData);
 
 	if (img && _putInCache) {
@@ -373,23 +373,26 @@ TImageP ImageManager::getImage(const std::string &id, int imFlags, void *extData
 
 //-----------------------------------------------------------------------------
 // load icon (and image) data of all frames into cache
-void ImageManager::loadAllTlvIconsAndPutInCache(TXshSimpleLevel *level, std::vector<TFrameId> fids, std::vector<std::string> iconIds, bool cacheImagesAsWell)
+void ImageManager::loadAllTlvIconsAndPutInCache(TXshSimpleLevel *level, std::vector<TFrameId> fids,
+												std::vector<std::string> iconIds,
+												bool cacheImagesAsWell)
 {
 	if (fids.empty() || iconIds.empty())
 		return;
-	//number of fid and iconId should be the same
+	// number of fid and iconId should be the same
 	if ((int)fids.size() != (int)iconIds.size())
 		return;
 
-	//obtain ImageLoader with the first fId
+	// obtain ImageLoader with the first fId
 	TImageInfo info;
-	std::map<std::string, ImageBuilderP>::iterator it = m_imp->m_builders.find(level->getImageId(fids[0]));
+	std::map<std::string, ImageBuilderP>::iterator it =
+		m_imp->m_builders.find(level->getImageId(fids[0]));
 	if (it != m_imp->m_builders.end()) {
 		const ImageBuilderP &builder = it->second;
 		assert(builder);
 		assert(builder->getRefCount() > 0);
 
-		//this function in reimpremented only in ImageLoader
+		// this function in reimpremented only in ImageLoader
 		builder->buildAllIconsAndPutInCache(level, fids, iconIds, cacheImagesAsWell);
 		builder->getInfo(info, ImageManager::none, 0);
 	}
@@ -401,7 +404,8 @@ void ImageManager::loadAllTlvIconsAndPutInCache(TXshSimpleLevel *level, std::vec
 
 		// put flags to all builders
 		for (int f = 0; f < fids.size(); f++) {
-			std::map<std::string, ImageBuilderP>::iterator it = m_imp->m_builders.find(level->getImageId(fids[f]));
+			std::map<std::string, ImageBuilderP>::iterator it =
+				m_imp->m_builders.find(level->getImageId(fids[f]));
 			if (it != m_imp->m_builders.end()) {
 				const ImageBuilderP &builder = it->second;
 				builder->setImageCachedAndModified();
@@ -446,8 +450,9 @@ bool ImageManager::setImage(const std::string &id, const TImageP &img)
 
 	ImageBuilderP &builder = it->second;
 
-	builder->invalidate();										   // WARNING: Not all infos are correctly restored
-	ImageBuilder::setImageInfo(builder->m_info, img.getPointer()); // from supplied image - must investigate further...
+	builder->invalidate(); // WARNING: Not all infos are correctly restored
+	ImageBuilder::setImageInfo(
+		builder->m_info, img.getPointer()); // from supplied image - must investigate further...
 
 	TImageCache::instance()->add(id, img, true);
 	builder->m_cached = builder->m_modified = true;

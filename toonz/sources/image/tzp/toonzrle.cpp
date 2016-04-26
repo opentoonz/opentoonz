@@ -18,13 +18,10 @@
 #endif
 
 extern "C" {
-static int tif_toonz1_decode_cm24(UCHAR *buf_in, int *buf_in_len,
-								  TUINT32 *buf_out);
+static int tif_toonz1_decode_cm24(UCHAR *buf_in, int *buf_in_len, TUINT32 *buf_out);
 
-static int tif_toonz1_decode_cm16(UCHAR *buf_in, int *buf_in_len,
-								  USHORT *buf_out, int tone_bits,
-								  int color_offs, int color_bits,
-								  int pencil_offs, int pencil_bits,
+static int tif_toonz1_decode_cm16(UCHAR *buf_in, int *buf_in_len, USHORT *buf_out, int tone_bits,
+								  int color_offs, int color_bits, int pencil_offs, int pencil_bits,
 								  USHORT offset_mask);
 static int Toonz1Decode(TIFF *tif, tidataval_t *buffer, tsize_t bytes, tsample_t s);
 
@@ -33,7 +30,7 @@ static int TIFFInitToonz1(TIFF *tif, int)
 	tif->tif_decoderow = Toonz1Decode;
 	tif->tif_decodestrip = 0;
 	tif->tif_decodetile = 0;
-	tif->tif_encoderow = 0; //Toonz1Encode;
+	tif->tif_encoderow = 0; // Toonz1Encode;
 	tif->tif_encodestrip = 0;
 	tif->tif_encodetile = 0;
 	return 1;
@@ -44,7 +41,7 @@ static int Toonz1Decode(TIFF *tif, tidataval_t *buffer, tsize_t bytes, tsample_t
 {
 	int enc, dec;
 	short bitspersample;
-	//USHORT *palette;
+	// USHORT *palette;
 	int tone_bits, color_offs, color_bits, pencil_offs, pencil_bits;
 	USHORT offset_mask;
 
@@ -55,8 +52,8 @@ static int Toonz1Decode(TIFF *tif, tidataval_t *buffer, tsize_t bytes, tsample_t
 	case 8:
 		assert(!"Not Implemented");
 		/*
-    dec = tif_toonz1_decode_extra ((UCHAR *)tif->tif_rawcp, &enc,
-                                   (UCHAR *)buffer);
+	dec = tif_toonz1_decode_extra ((UCHAR *)tif->tif_rawcp, &enc,
+								   (UCHAR *)buffer);
 */
 		break;
 
@@ -78,16 +75,12 @@ static int Toonz1Decode(TIFF *tif, tidataval_t *buffer, tsize_t bytes, tsample_t
 			pencil_bits = 5;
 			offset_mask = 0;
 		}
-		dec = tif_toonz1_decode_cm16((UCHAR *)tif->tif_rawcp, &enc,
-									 (USHORT *)buffer,
-									 tone_bits,
-									 color_offs, color_bits,
-									 pencil_offs, pencil_bits, offset_mask);
+		dec = tif_toonz1_decode_cm16((UCHAR *)tif->tif_rawcp, &enc, (USHORT *)buffer, tone_bits,
+									 color_offs, color_bits, pencil_offs, pencil_bits, offset_mask);
 	} break;
 
 	case 32:
-		dec = tif_toonz1_decode_cm24((UCHAR *)tif->tif_rawcp, &enc,
-									 (TUINT32 *)buffer);
+		dec = tif_toonz1_decode_cm24((UCHAR *)tif->tif_rawcp, &enc, (TUINT32 *)buffer);
 		break;
 
 	default:
@@ -103,11 +96,8 @@ static int Toonz1Decode(TIFF *tif, tidataval_t *buffer, tsize_t bytes, tsample_t
 
 //-------------------- DECODE CM16 ----------------------------
 
-static int tif_toonz1_decode_cm16(UCHAR *buf_in, int *buf_in_len,
-								  USHORT *buf_out,
-								  int tone_bits,
-								  int color_offs, int color_bits,
-								  int pencil_offs, int pencil_bits,
+static int tif_toonz1_decode_cm16(UCHAR *buf_in, int *buf_in_len, USHORT *buf_out, int tone_bits,
+								  int color_offs, int color_bits, int pencil_offs, int pencil_bits,
 								  USHORT offset_mask)
 
 {
@@ -406,8 +396,7 @@ rle_decoding_error:
 
 //-------------------- DECODE CM24 ----------------------------
 
-static int tif_toonz1_decode_cm24(UCHAR *buf_in, int *buf_in_len,
-								  TUINT32 *buf_out)
+static int tif_toonz1_decode_cm24(UCHAR *buf_in, int *buf_in_len, TUINT32 *buf_out)
 {
 	UCHAR *in;
 	TUINT32 *out;
@@ -538,7 +527,7 @@ class ToonzRleCodecRegisterer
 
 	static TIFFCodec *m_codec;
 
-public:
+  public:
 	ToonzRleCodecRegisterer()
 	{
 		uint16 scheme = 32881;
@@ -571,14 +560,14 @@ extern "C" {
 
 /*---------------------------------------------------------------------------*/
 
-#define GET_INVAL      \
-	{                  \
-		inval = *in++; \
-		remain--;      \
+#define GET_INVAL                                                                                  \
+	{                                                                                              \
+		inval = *in++;                                                                             \
+		remain--;                                                                                  \
 	}
-#define PUT_OUTVAL              \
-	{                           \
-		*out++ = (UCHAR)outval; \
+#define PUT_OUTVAL                                                                                 \
+	{                                                                                              \
+		*out++ = (UCHAR)outval;                                                                    \
 	}
 
 /*---------------------------------------------------------------------------*/

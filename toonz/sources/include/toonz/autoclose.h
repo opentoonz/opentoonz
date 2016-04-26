@@ -18,13 +18,13 @@
 
 class DVAPI TAutocloser
 {
-public:
+  public:
 	typedef std::pair<TPoint, TPoint> Segment;
 
 	TAutocloser(const TRasterP &r, int distance, double angle, int index, int opacity);
 	~TAutocloser();
 
-	//calcola i segmenti e li disegna sul raster
+	// calcola i segmenti e li disegna sul raster
 	void exec();
 
 	// non modifica il raster. Si limita a calcolare i segmenti
@@ -33,11 +33,11 @@ public:
 	// disegna sul raster i segmenti
 	void draw(const std::vector<Segment> &segments);
 
-private:
+  private:
 	class Imp;
 	std::unique_ptr<Imp> m_imp;
 
-	//not implemented
+	// not implemented
 	TAutocloser();
 	TAutocloser(const TAutocloser &a);
 	TAutocloser &operator=(const TAutocloser &a);

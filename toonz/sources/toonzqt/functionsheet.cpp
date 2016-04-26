@@ -35,7 +35,8 @@ const int cColumnDragHandleWidth = 8;
 
 const int cGroupShortNameY = 0; //!< Column header's y pos for channel groups' short name tabs
 const int cGroupLongNameY = 27; //!< Same for its long name tabs
-const int cChannelNameY = 50;   //!< Column header's y pos of channel name tabs, up to the widget's height
+const int cChannelNameY =
+	50; //!< Column header's y pos of channel name tabs, up to the widget's height
 const int cColHeadersEndY = 87; //!< End of column headers y pos
 
 } // namespace
@@ -53,7 +54,7 @@ class MoveChannelsDragTool : public Spreadsheet::DragTool
 	QRect m_selectedCells;
 	int m_firstKeyframeRow;
 
-public:
+  public:
 	MoveChannelsDragTool(FunctionSheet *sheet) : m_sheet(sheet), m_firstKeyframeRow(-1) {}
 
 	void click(int row, int col, QMouseEvent *e)
@@ -70,7 +71,7 @@ public:
 			k0 = curve->getPrevKeyframe(row);
 			k1 = curve->getNextKeyframe(row);
 		}
-		//return if clicking outside of the segments
+		// return if clicking outside of the segments
 		if (k0 < 0 || k1 < 0)
 			return;
 		int r0 = tround(curve->keyframeIndexToFrame(k0));
@@ -136,9 +137,11 @@ class FunctionSheetSelectionTool : public Spreadsheet::DragTool
 	int m_firstRow, m_firstCol;
 	FunctionSheet *m_sheet;
 
-public:
+  public:
 	FunctionSheetSelectionTool(FunctionSheet *sheet)
-		: m_sheet(sheet), m_firstRow(-1), m_firstCol(-1) {}
+		: m_sheet(sheet), m_firstRow(-1), m_firstCol(-1)
+	{
+	}
 
 	void click(int row, int col, QMouseEvent *e)
 	{
@@ -210,7 +213,7 @@ FunctionSheetRowViewer::FunctionSheetRowViewer(FunctionSheet *parent)
 
 void FunctionSheetRowViewer::paintEvent(QPaintEvent *e)
 {
-	//calls GenericPanel's event
+	// calls GenericPanel's event
 	Spreadsheet::RowPanel::paintEvent(e);
 }
 
@@ -218,7 +221,7 @@ void FunctionSheetRowViewer::paintEvent(QPaintEvent *e)
 
 void FunctionSheetRowViewer::mousePressEvent(QMouseEvent *e)
 {
-	//calls GenericPanel's event
+	// calls GenericPanel's event
 	Spreadsheet::RowPanel::mousePressEvent(e);
 }
 
@@ -226,7 +229,7 @@ void FunctionSheetRowViewer::mousePressEvent(QMouseEvent *e)
 
 void FunctionSheetRowViewer::mouseMoveEvent(QMouseEvent *e)
 {
-	//calls GenericPanel's event
+	// calls GenericPanel's event
 	Spreadsheet::RowPanel::mouseMoveEvent(e);
 }
 
@@ -314,7 +317,7 @@ void FunctionSheetColumnHeadViewer::paintEvent(QPaintEvent *e)
 			continue;
 		int x0 = getViewer()->columnToX(c);
 		int x1 = getViewer()->columnToX(c + 1) - 1;
-		//Column Width
+		// Column Width
 		int width = x1 - x0 + 1;
 
 		painter.fillRect(x0, y0, width, y3 - y0, getViewer()->getBGColor());
@@ -326,10 +329,9 @@ void FunctionSheetColumnHeadViewer::paintEvent(QPaintEvent *e)
 			continue;
 		int i = c - c0 + 1;
 		/*---- 現在のColumnと前後のColumnのChannelGroup ---*/
-		FunctionTreeModel::ChannelGroup
-			*prevGroup = channelGroups[c - c0],
-			*group = channelGroups[c - c0 + 1],
-			*nextGroup = channelGroups[c - c0 + 2];
+		FunctionTreeModel::ChannelGroup *prevGroup = channelGroups[c - c0],
+										*group = channelGroups[c - c0 + 1],
+										*nextGroup = channelGroups[c - c0 + 2];
 
 		/*---- 前後とグループが違ってた場合、それぞれフラグを立てる ---*/
 		bool firstGroupColumn = prevGroup != group;
@@ -338,44 +340,46 @@ void FunctionSheetColumnHeadViewer::paintEvent(QPaintEvent *e)
 		/*--- 現在のカラムの左右座標 ---*/
 		int x0 = getViewer()->columnToX(c);
 		int x1 = getViewer()->columnToX(c + 1) - 1;
-		//Column width
+		// Column width
 		int width = x1 - x0 + 1;
 
 		QRect selectedRect = m_sheet->getSelectedCells();
 		bool isSelected = (selectedRect.left() <= c && c <= selectedRect.right()) ? true : false;
 
-		//paint with light color if selected
+		// paint with light color if selected
 		if (isSelected)
 			painter.fillRect(x0, y1, width, y3 - y1, getViewer()->getCurrentRowBgColor());
 
-		//draw horizonntal lines
+		// draw horizonntal lines
 		painter.setPen(QPen(getViewer()->getColumnHeaderBorderColor(), 3));
 		painter.drawLine(x0, y0, x1, y0);
 		painter.setPen(getViewer()->getColumnHeaderBorderColor());
 		painter.drawLine(x0, y1, x1, y1);
 
-		//draw vertical bar
+		// draw vertical bar
 		painter.fillRect(x0, y1, 6, y3 - y1, getViewer()->getColumnHeaderBorderColor());
 		if (firstGroupColumn)
 			painter.fillRect(x0, y0, 6, y1 - y0, getViewer()->getColumnHeaderBorderColor());
 
-		//channel name
+		// channel name
 		painter.setPen(getViewer()->getTextColor());
 		if (channel->isCurrent())
 			painter.setPen(getViewer()->getSelectedColumnTextColor());
 
 		QString text = channel->getShortName();
 		int d = 8;
-		painter.drawText(x0 + d, y1, width - d, y3 - y1 + 1, Qt::TextWrapAnywhere | Qt::AlignLeft | Qt::AlignVCenter, text);
+		painter.drawText(x0 + d, y1, width - d, y3 - y1 + 1,
+						 Qt::TextWrapAnywhere | Qt::AlignLeft | Qt::AlignVCenter, text);
 
-		//group name
+		// group name
 		if (firstGroupColumn) {
 			int tmpwidth = (lastGroupColumn) ? width : width * 2;
 			painter.setPen(getViewer()->getTextColor());
 			if (group == currentGroup)
 				painter.setPen(getViewer()->getSelectedColumnTextColor());
 			text = group->getShortName();
-			painter.drawText(x0 + d, y0, tmpwidth - d, y1 - y0 + 1, Qt::AlignLeft | Qt::AlignVCenter, text);
+			painter.drawText(x0 + d, y0, tmpwidth - d, y1 - y0 + 1,
+							 Qt::AlignLeft | Qt::AlignVCenter, text);
 		}
 	}
 }
@@ -385,8 +389,7 @@ void FunctionSheetColumnHeadViewer::paintEvent(QPaintEvent *e)
 */
 void FunctionSheetColumnHeadViewer::mouseMoveEvent(QMouseEvent *e)
 {
-	if ((e->buttons() & Qt::MidButton) &&
-		m_draggingChannel &&
+	if ((e->buttons() & Qt::MidButton) && m_draggingChannel &&
 		(e->pos() - m_dragStartPosition).manhattanLength() >= QApplication::startDragDistance()) {
 		QDrag *drag = new QDrag(this);
 		QMimeData *mimeData = new QMimeData;
@@ -430,11 +433,11 @@ void FunctionSheetColumnHeadViewer::mousePressEvent(QMouseEvent *e)
 	if (!channel)
 		return;
 
-	//Open folder
+	// Open folder
 	FunctionTreeModel::ChannelGroup *channelGroup = channel->getChannelGroup();
 	if (!channelGroup->isOpen())
 		channelGroup->getModel()->setExpandedItem(channelGroup->createIndex(), true);
-	//Select all segment
+	// Select all segment
 	std::set<double> frames;
 	channel->getParam()->getKeyframes(frames);
 
@@ -493,14 +496,16 @@ void FunctionSheetColumnHeadViewer::contextMenuEvent(QContextMenuEvent *ce)
 		if (action == &showAll) {
 			int c, cCount = group->getChildCount();
 			for (c = 0; c != cCount; ++c) {
-				FunctionTreeModel::Channel *channel = dynamic_cast<FunctionTreeModel::Channel *>(group->getChild(c));
+				FunctionTreeModel::Channel *channel =
+					dynamic_cast<FunctionTreeModel::Channel *>(group->getChild(c));
 				if (channel && !channel->isHidden())
 					channel->setIsActive(true);
 			}
 		} else if (action == &showAnimatedOnly) {
 			int c, cCount = group->getChildCount();
 			for (c = 0; c != cCount; ++c) {
-				FunctionTreeModel::Channel *channel = dynamic_cast<FunctionTreeModel::Channel *>(group->getChild(c));
+				FunctionTreeModel::Channel *channel =
+					dynamic_cast<FunctionTreeModel::Channel *>(group->getChild(c));
 				if (channel && !channel->isHidden())
 					channel->setIsActive(channel->isAnimated());
 			}
@@ -520,7 +525,8 @@ FunctionSheetCellViewer::FunctionSheetCellViewer(FunctionSheet *parent)
 	m_lineEdit = new DVGui::LineEdit(this);
 	// lineEdit->setGeometry(10,10,100,30);
 	m_lineEdit->hide();
-	bool ret = connect(m_lineEdit, SIGNAL(editingFinished()), this, SLOT(onCellEditorEditingFinished()));
+	bool ret =
+		connect(m_lineEdit, SIGNAL(editingFinished()), this, SLOT(onCellEditorEditingFinished()));
 	assert(ret);
 	setMouseTracking(true);
 
@@ -559,20 +565,20 @@ Spreadsheet::DragTool *FunctionSheetCellViewer::createDragTool(QMouseEvent *e)
 
 void FunctionSheetCellViewer::drawCells(QPainter &painter, int r0, int c0, int r1, int c1)
 {
-	//key frames
+	// key frames
 	QColor KeyFrameColor = getViewer()->getKeyFrameColor();
 	QColor KeyFrameBorderColor = getViewer()->getKeyFrameBorderColor();
 	QColor SelectedKeyFrameColor = getViewer()->getSelectedKeyFrameColor();
-	//inbetween
+	// inbetween
 	QColor InBetweenColor = getViewer()->getInBetweenColor();
 	QColor InBetweenBorderColor = getViewer()->getInBetweenBorderColor();
 	QColor SelectedInBetweenColor = getViewer()->getSelectedInBetweenColor();
-	//empty cells
+	// empty cells
 	QColor SelectedEmptyColor = getViewer()->getSelectedEmptyColor();
-	//empty cells in scene frame range
+	// empty cells in scene frame range
 	QColor SelectedSceneRangeEmptyColor = getViewer()->getSelectedSceneRangeEmptyColor();
 
-	//top and bottom pos
+	// top and bottom pos
 	int y0 = getViewer()->rowToY(r0);
 	int y1 = getViewer()->rowToY(r1 + 1) - 1;
 	for (int c = c0; c <= c1; c++) {
@@ -580,7 +586,7 @@ void FunctionSheetCellViewer::drawCells(QPainter &painter, int r0, int c0, int r
 		/*--- もしカラムcにパラメータが無ければcurveには０が返る ---*/
 		if (!curve)
 			continue;
-		//left and right pos
+		// left and right pos
 		int x0 = getViewer()->columnToX(c);
 		int x1 = getViewer()->columnToX(c + 1) - 1;
 
@@ -592,11 +598,11 @@ void FunctionSheetCellViewer::drawCells(QPainter &painter, int r0, int c0, int r
 			kr1 = curve->keyframeIndexToFrame(kCount - 1);
 		}
 
-		//get the unit
+		// get the unit
 		TMeasure *measure = curve->getMeasure();
 		const TUnit *unit = measure ? measure->getCurrentUnit() : 0;
 
-		//draw each cell
+		// draw each cell
 		for (int row = r0; row <= r1; row++) {
 			int ya = m_sheet->rowToY(row);
 			int yb = m_sheet->rowToY(row + 1) - 1;
@@ -624,17 +630,15 @@ void FunctionSheetCellViewer::drawCells(QPainter &painter, int r0, int c0, int r
 				painter.fillRect(cellRect, cellColor);
 				painter.fillRect(borderRect, borderColor);
 
-				//display whether segment are Linked
+				// display whether segment are Linked
 				if (curve->isKeyframe(row)) {
 					TDoubleKeyframe kf = curve->getKeyframeAt(row);
-					//if the segments are NOT linked, then cut off the side bar
+					// if the segments are NOT linked, then cut off the side bar
 					if (!kf.m_linkedHandles) {
 						int rowCenterPos = (ya + yb) / 2;
 						QPoint points[4] = {
-							QPoint(x0, rowCenterPos),
-							QPoint(x0 + 7, rowCenterPos + 3),
-							QPoint(x0 + 7, rowCenterPos - 3),
-							QPoint(x0, rowCenterPos)};
+							QPoint(x0, rowCenterPos), QPoint(x0 + 7, rowCenterPos + 3),
+							QPoint(x0 + 7, rowCenterPos - 3), QPoint(x0, rowCenterPos)};
 						QBrush oldBrush = painter.brush();
 						painter.setBrush(QBrush(cellColor));
 						painter.drawPolygon(points, 4);
@@ -642,7 +646,7 @@ void FunctionSheetCellViewer::drawCells(QPainter &painter, int r0, int c0, int r
 					}
 				}
 
-				//draw cell value
+				// draw cell value
 				painter.setPen(getViewer()->getTextColor());
 
 				/*--- 整数から小数点以下3桁以内の場合はそれ以降の0000を描かない ---*/
@@ -670,9 +674,10 @@ void FunctionSheetCellViewer::drawCells(QPainter &painter, int r0, int c0, int r
 				static QFont font("Helvetica", 9, QFont::Normal);
 #endif
 				painter.setFont(font);
-				painter.drawText(cellRect.adjusted(10, 0, 0, 0), Qt::AlignVCenter | Qt::AlignLeft, text);
+				painter.drawText(cellRect.adjusted(10, 0, 0, 0), Qt::AlignVCenter | Qt::AlignLeft,
+								 text);
 			}
-			//empty and selected cell
+			// empty and selected cell
 			else if (isSelected) {
 				int rowCount = getViewer()->getRowCount();
 				cellColor = (row >= rowCount) ? SelectedEmptyColor : SelectedSceneRangeEmptyColor;
@@ -707,7 +712,7 @@ void FunctionSheetCellViewer::mouseDoubleClickEvent(QMouseEvent *e)
 			v = unit->convertTo(v);
 
 		m_lineEdit->setText(QString::number(v, 'f', 4));
-		//in order to put the cursor to the left end
+		// in order to put the cursor to the left end
 		m_lineEdit->setSelection(m_lineEdit->text().length(), -m_lineEdit->text().length());
 	} else
 		m_lineEdit->setText("");
@@ -719,7 +724,8 @@ void FunctionSheetCellViewer::mouseDoubleClickEvent(QMouseEvent *e)
 #endif
 	m_lineEdit->setFont(font);
 
-	m_lineEdit->setGeometry(x0 - 2, y0 - 2, x1 - x0 + 1 + 4, y1 - y0 + 1 + 4); // x0,y0,x1-x0+1,y0-y1+1);
+	m_lineEdit->setGeometry(x0 - 2, y0 - 2, x1 - x0 + 1 + 4,
+							y1 - y0 + 1 + 4); // x0,y0,x1-x0+1,y0-y1+1);
 	m_lineEdit->show();
 	m_lineEdit->raise();
 	m_lineEdit->setFocus();
@@ -751,7 +757,7 @@ void FunctionSheetCellViewer::onCellEditorEditingFinished()
 
 void FunctionSheetCellViewer::mousePressEvent(QMouseEvent *e)
 {
-	//escape from the line edit by clicking outside
+	// escape from the line edit by clicking outside
 	if (m_lineEdit->isVisible()) {
 		m_lineEdit->hide();
 		m_lineEdit->clearFocus();
@@ -795,11 +801,8 @@ void FunctionSheetCellViewer::mouseMoveEvent(QMouseEvent *e)
 void FunctionSheetCellViewer::openContextMenu(QMouseEvent *e)
 {
 	struct locals {
-		static void sheet__setSegmentType(
-			FunctionSelection *selection,
-			TDoubleParam *curve,
-			int segmentIndex,
-			TDoubleKeyframe::Type type)
+		static void sheet__setSegmentType(FunctionSelection *selection, TDoubleParam *curve,
+										  int segmentIndex, TDoubleKeyframe::Type type)
 		{
 			selection->selectSegment(curve, segmentIndex);
 			KeyframeSetter setter(curve, segmentIndex);
@@ -844,7 +847,7 @@ void FunctionSheetCellViewer::openContextMenu(QMouseEvent *e)
 
 	// build menu
 	QMenu menu(0);
-	if (!isKeyframe) //menu.addAction(&deleteKeyframeAction); else
+	if (!isKeyframe) // menu.addAction(&deleteKeyframeAction); else
 		menu.addAction(&insertKeyframeAction);
 
 	if (!isEmpty && !isKeyframe && kIndex >= 0) {
@@ -902,7 +905,8 @@ void FunctionSheetCellViewer::openContextMenu(QMouseEvent *e)
 	else if (action == &setEaseInOutAction)
 		locals::sheet__setSegmentType(selection, curve, kIndex, TDoubleKeyframe::EaseInOut);
 	else if (action == &setEaseInOut2Action)
-		locals::sheet__setSegmentType(selection, curve, kIndex, TDoubleKeyframe::EaseInOutPercentage);
+		locals::sheet__setSegmentType(selection, curve, kIndex,
+									  TDoubleKeyframe::EaseInOutPercentage);
 	else if (action == &setExponentialAction)
 		locals::sheet__setSegmentType(selection, curve, kIndex, TDoubleKeyframe::Exponential);
 	else if (action == &setExpressionAction)
@@ -931,7 +935,7 @@ class FunctionSheetColumnToCurveMapper : public ColumnToCurveMapper
 {
 	FunctionSheet *m_sheet;
 
-public:
+  public:
 	FunctionSheetColumnToCurveMapper(FunctionSheet *sheet) : m_sheet(sheet) {}
 	TDoubleParam *getCurve(int columnIndex) const
 	{
@@ -967,9 +971,7 @@ FunctionSheet::~FunctionSheet()
 
 bool FunctionSheet::anyWidgetHasFocus()
 {
-	return hasFocus() ||
-		   m_rowViewer->hasFocus() ||
-		   m_columnHeadViewer->hasFocus() ||
+	return hasFocus() || m_rowViewer->hasFocus() || m_columnHeadViewer->hasFocus() ||
 		   m_cellViewer->hasFocus();
 }
 
@@ -1124,7 +1126,7 @@ int FunctionSheet::getColumnIndexByCurve(TDoubleParam *param) const
 }
 
 //-----------------------------------------------------------------------------
-/*! scroll column to show the current one 
+/*! scroll column to show the current one
 */
 void FunctionSheet::onCurrentChannelChanged(FunctionTreeModel::Channel *channel)
 {

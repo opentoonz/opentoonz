@@ -44,7 +44,7 @@ TEnv::IntVar EraseVectorInvert("InknpaintEraseVectorInvert", 0);
 TEnv::IntVar EraseVectorRange("InknpaintEraseVectorRange", 0);
 
 //=============================================================================
-//Eraser Tool
+// Eraser Tool
 //=============================================================================
 
 namespace
@@ -57,7 +57,7 @@ namespace
 
 //-----------------------------------------------------------------------------
 
-const double minDistance2 = 16.0; //4 pixel
+const double minDistance2 = 16.0; // 4 pixel
 
 //-----------------------------------------------------------------------------
 
@@ -80,7 +80,7 @@ class UndoEraser : public ToolUtils::TToolUndo
 	int m_row;
 	int m_column;
 
-public:
+  public:
 	std::map<int, VIStroke *> m_originalStrokes;
 	std::map<int, VIStroke *> m_newStrokes;
 
@@ -163,8 +163,9 @@ public:
 		}
 
 		if (image->isComputedRegionAlmostOnce())
-			image->findRegions(); //in futuro togliere. Serve perche' la  removeStrokes, se gli si dice
-		//di non calcolare le regioni, e' piu' veloce ma poi chrash tutto
+			image->findRegions(); // in futuro togliere. Serve perche' la  removeStrokes, se gli si
+								  // dice
+		// di non calcolare le regioni, e' piu' veloce ma poi chrash tutto
 
 		UINT size = m_oldFillInformation.size();
 		if (!size) {
@@ -220,8 +221,9 @@ public:
 		}
 
 		if (image->isComputedRegionAlmostOnce())
-			image->findRegions(); //in futuro togliere. Serve perche' la  removeStrokes, se gli si dice
-		//di non calcolare le regioni, e' piu' veloce ma poi chrash tutto
+			image->findRegions(); // in futuro togliere. Serve perche' la  removeStrokes, se gli si
+								  // dice
+		// di non calcolare le regioni, e' piu' veloce ma poi chrash tutto
 
 		UINT size = m_newFillInformation.size();
 		if (!size) {
@@ -244,18 +246,15 @@ public:
 
 	int getSize() const
 	{
-		return sizeof(*this) + (m_oldFillInformation.capacity() + m_newFillInformation.capacity()) * sizeof(TFilledRegionInf) + 500;
+		return sizeof(*this) +
+			   (m_oldFillInformation.capacity() + m_newFillInformation.capacity()) *
+				   sizeof(TFilledRegionInf) +
+			   500;
 	}
 
-	QString getToolName()
-	{
-		return QString("Vector Eraser Tool");
-	}
+	QString getToolName() { return QString("Vector Eraser Tool"); }
 
-	int getHistoryType()
-	{
-		return HistoryType::EraserTool;
-	}
+	int getHistoryType() { return HistoryType::EraserTool; }
 };
 
 } // namespace
@@ -268,7 +267,7 @@ class EraserTool : public TTool
 {
 	Q_DECLARE_TR_FUNCTIONS(EraserTool)
 
-public:
+  public:
 	EraserTool();
 	~EraserTool();
 
@@ -300,7 +299,7 @@ public:
 	/*-- ドラッグ中にツールが切り替わった場合、Eraseの終了処理を行う --*/
 	void onDeactivate();
 
-private:
+  private:
 	TPropertyGroup m_prop;
 
 	TEnumProperty m_eraseType;
@@ -309,8 +308,7 @@ private:
 	TBoolProperty m_invertOption;
 	TBoolProperty m_multi;
 
-	double m_pointSize,
-		m_distance2;
+	double m_pointSize, m_distance2;
 
 	TPointD m_mousePos, //!< Current mouse position.
 		m_oldMousePos,  //!< Previous mouse position.
@@ -320,11 +318,9 @@ private:
 	UndoEraser *m_undo;
 	std::vector<int> m_indexes;
 
-	TRectD m_selectingRect,
-		m_firstRect;
+	TRectD m_selectingRect, m_firstRect;
 
-	TFrameId m_firstFrameId,
-		m_veryFirstFrameId;
+	TFrameId m_firstFrameId, m_veryFirstFrameId;
 
 	TXshSimpleLevelP m_level;
 	std::pair<int, int> m_currCell;
@@ -338,30 +334,28 @@ private:
 
 	double m_thick;
 
-	bool m_firstTime,
-		m_active,
-		m_firstFrameSelected;
+	bool m_firstTime, m_active, m_firstFrameSelected;
 
-private:
+  private:
 	void resetMulti();
 
 	void updateTranslation();
 
-	//Metodi per disegnare la linea della modalita' Freehand
+	// Metodi per disegnare la linea della modalita' Freehand
 	void startFreehand(const TPointD &pos);
 	void freehandDrag(const TPointD &pos);
 	void closeFreehand(const TPointD &pos);
 
-	//Metodi per disegnare la linea della modalita' Polyline
+	// Metodi per disegnare la linea della modalita' Polyline
 	void addPointPolyline(const TPointD &pos);
 	void closePolyline(const TPointD &pos);
 
 	void eraseRegion(const TVectorImageP vi, TStroke *stroke);
 
-	void multiEraseRect(TFrameId firstFrameId, TFrameId lastFrameId,
-						TRectD firstRect, TRectD lastRect, bool invert);
-	void doMultiErase(TFrameId &firstFrameId, TFrameId &lastFrameId,
-					  const TStroke *firstStroke, const TStroke *lastStroke);
+	void multiEraseRect(TFrameId firstFrameId, TFrameId lastFrameId, TRectD firstRect,
+						TRectD lastRect, bool invert);
+	void doMultiErase(TFrameId &firstFrameId, TFrameId &lastFrameId, const TStroke *firstStroke,
+					  const TStroke *lastStroke);
 	void doErase(double t, const TXshSimpleLevelP &sl, const TFrameId &fid,
 				 const TVectorImageP &firstImage, const TVectorImageP &lastImage);
 	void multiEreserRegion(TStroke *stroke, const TMouseEvent &e);
@@ -383,7 +377,8 @@ EraserTool::EraserTool()
 	  ,
 	  m_multi("Frame Range", false) // "W_ToolOptions_FrameRange"
 	  ,
-	  m_pointSize(-1), m_undo(0), m_currCell(-1, -1), m_stroke(0), m_thick(5), m_active(false), m_firstTime(true)
+	  m_pointSize(-1), m_undo(0), m_currCell(-1, -1), m_stroke(0), m_thick(5), m_active(false),
+	  m_firstTime(true)
 {
 	bind(TTool::VectorImage);
 
@@ -451,7 +446,9 @@ void EraserTool::draw()
 			tglColor(TPixel32(255, 0, 255));
 			tglDrawCircle(m_brushPos, m_pointSize);
 		}
-		if ((m_eraseType.getValue() == FREEHAND_ERASE || m_eraseType.getValue() == POLYLINE_ERASE) && m_multi.getValue()) {
+		if ((m_eraseType.getValue() == FREEHAND_ERASE ||
+			 m_eraseType.getValue() == POLYLINE_ERASE) &&
+			m_multi.getValue()) {
 			TPixel color = blackBg ? TPixel32::White : TPixel32::Black;
 			tglColor(color);
 			if (m_firstStroke)
@@ -495,7 +492,8 @@ void EraserTool::resetMulti()
 
 //-----------------------------------------------------------------------------
 
-void EraserTool::startErase(TVectorImageP vi, const TPointD &pos) //, const TImageLocation &imageLocation)
+void EraserTool::startErase(TVectorImageP vi,
+							const TPointD &pos) //, const TImageLocation &imageLocation)
 {
 	UINT size = vi->getStrokeCount();
 	m_indexes.resize(size);
@@ -524,8 +522,9 @@ void EraserTool::erase(TVectorImageP vi, const TPointD &pos)
 	m_distance2 = 0;
 	m_oldMousePos = pos;
 
-	//quadrato circoscritto alla circonferenza
-	TRectD circumscribedSquare(pos.x - m_pointSize, pos.y - m_pointSize, pos.x + m_pointSize, pos.y + m_pointSize);
+	// quadrato circoscritto alla circonferenza
+	TRectD circumscribedSquare(pos.x - m_pointSize, pos.y - m_pointSize, pos.x + m_pointSize,
+							   pos.y + m_pointSize);
 	if (!circumscribedSquare.overlaps(vi->getBBox())) {
 		invalidate();
 		return;
@@ -537,8 +536,9 @@ void EraserTool::erase(TVectorImageP vi, const TPointD &pos)
 	std::vector<TStroke *> splitStrokes;
 	double rectEdge_2 = m_pointSize * TConsts::sqrt2_2;
 
-	//quadrato iscritto nella circonferenza
-	TRectD enrolledSquare(pos.x - rectEdge_2, pos.y - rectEdge_2, pos.x + rectEdge_2, pos.y + rectEdge_2);
+	// quadrato iscritto nella circonferenza
+	TRectD enrolledSquare(pos.x - rectEdge_2, pos.y - rectEdge_2, pos.x + rectEdge_2,
+						  pos.y + rectEdge_2);
 
 	UINT i = 0;
 	double pointSize2 = sq(m_pointSize);
@@ -558,13 +558,15 @@ void EraserTool::erase(TVectorImageP vi, const TPointD &pos)
 
 		TRectD strokeBBox = oldStroke->getBBox();
 
-		if (!circumscribedSquare.overlaps(strokeBBox)) { //stroke all'esterno del quadrato circoscritto alla circonferenxa
+		if (!circumscribedSquare.overlaps(
+				strokeBBox)) { // stroke all'esterno del quadrato circoscritto alla circonferenxa
 			i++;
 			it++;
 			continue;
 		}
 
-		if (enrolledSquare.contains(strokeBBox)) { //stroke tutta contenuta nel quadrato iscritto nella circonferenza
+		if (enrolledSquare.contains(
+				strokeBBox)) { // stroke tutta contenuta nel quadrato iscritto nella circonferenza
 			if (*it != -1)
 				m_undo->addOldStroke(*it, vi->getVIStroke(i));
 			oneStrokeIndex[0] = i;
@@ -579,40 +581,43 @@ void EraserTool::erase(TVectorImageP vi, const TPointD &pos)
 		/*int intersNum=*/intersect(*oldStroke, pos, m_pointSize, intersections);
 
 		/*
-    #ifdef _DEBUG
-    if(intersections.size()==2 && intersections[0]==intersections[1])
-    {
-      intersections.clear();
-      intersect( *oldStroke, pos, m_pointSize, intersections );   
-    }
-    #endif
-    */
+	#ifdef _DEBUG
+	if(intersections.size()==2 && intersections[0]==intersections[1])
+	{
+	  intersections.clear();
+	  intersect( *oldStroke, pos, m_pointSize, intersections );
+	}
+	#endif
+	*/
 
 		if (intersections.empty()) {
-			//BASTEREBBE CONTROLLARE UN SOLO PUNTO PERCHE' SE LA
-			//STROKE NON INTERSECA IL CERCHIO E CONTENTIENE ALMENO
-			//UN PUNTO, LA CONTIENE TUTTA. MA SICCOME NON MI FIDO
-			//DELLA INTERSECT, NE CONTROLLO UN PAIO E AVVANTAGGIO (CON L' AND)
-			//IL NON CONTENIMENTO, DATO CHE E' MEGLIO CANCELLARE UNA COSA IN
+			// BASTEREBBE CONTROLLARE UN SOLO PUNTO PERCHE' SE LA
+			// STROKE NON INTERSECA IL CERCHIO E CONTENTIENE ALMENO
+			// UN PUNTO, LA CONTIENE TUTTA. MA SICCOME NON MI FIDO
+			// DELLA INTERSECT, NE CONTROLLO UN PAIO E AVVANTAGGIO (CON L' AND)
+			// IL NON CONTENIMENTO, DATO CHE E' MEGLIO CANCELLARE UNA COSA IN
 			// MENO, CHE UNA IN PIU'
 			if (tdistance2(oldStroke->getPoint(0), pos) < pointSize2 &&
-				tdistance2(oldStroke->getPoint(1), pos) < pointSize2) { //stroke tutta contenuta nella circonferenxa
+				tdistance2(oldStroke->getPoint(1), pos) <
+					pointSize2) { // stroke tutta contenuta nella circonferenxa
 				if (*it != -1)
 					m_undo->addOldStroke(*it, vi->getVIStroke(i));
 				oneStrokeIndex[0] = i;
 				vi->removeStrokes(oneStrokeIndex, true, true);
 				it = m_indexes.erase(it);
-			} else { //non colpita
+			} else { // non colpita
 				i++;
 				it++;
 			}
 			continue;
 		}
 
-		//------------------------ almeno un'intersezione ---------------------------------------------------------
+		//------------------------ almeno un'intersezione
+		//---------------------------------------------------------
 
 		if (intersections.size() == 1) {
-			if (oldStroke->isSelfLoop()) { // una sola intersezione di una stroke chiusa con un cerchio dovrebbe accadere
+			if (oldStroke->isSelfLoop()) { // una sola intersezione di una stroke chiusa con un
+										   // cerchio dovrebbe accadere
 				// solo in caso di sfioramento, quindi faccio finta di nulla
 				i++;
 				it++;
@@ -666,7 +671,7 @@ void EraserTool::erase(TVectorImageP vi, const TPointD &pos)
 
 			oldStroke->reshape(&(points[0]), points.size());
 
-			vi->notifyChangedStrokes(i); //per adesso cosi', pero' e' lento
+			vi->notifyChangedStrokes(i); // per adesso cosi', pero' e' lento
 
 			*it = -1;
 			i++;
@@ -676,14 +681,14 @@ void EraserTool::erase(TVectorImageP vi, const TPointD &pos)
 
 		//---------- piu' intersezioni--------------------------------------------------------
 
-		if (intersections.size() & 1 && oldStroke->isSelfLoop()) { //non dovrebbe mai accadere
+		if (intersections.size() & 1 && oldStroke->isSelfLoop()) { // non dovrebbe mai accadere
 			assert(0);
 			i++;
 			it++;
 			continue;
 		}
 
-		if (intersections.size() == 2 && intersections[0] == intersections[1]) { //solo sfiorata
+		if (intersections.size() == 2 && intersections[0] == intersections[1]) { // solo sfiorata
 			i++;
 			it++;
 			continue;
@@ -754,12 +759,14 @@ void EraserTool::erase(TVectorImageP vi, TRectD &rect)
 			continue;
 		TStroke *stroke = vi->getStroke(i);
 		if (!m_invertOption.getValue()) {
-			if ((!m_selective.getValue() || stroke->getStyle() == index) && rect.contains(stroke->getBBox())) {
+			if ((!m_selective.getValue() || stroke->getStyle() == index) &&
+				rect.contains(stroke->getBBox())) {
 				m_undo->addOldStroke(i, vi->getVIStroke(i));
 				eraseStrokes.push_back(i);
 			}
 		} else {
-			if ((!m_selective.getValue() || stroke->getStyle() == index) && !rect.contains(stroke->getBBox())) {
+			if ((!m_selective.getValue() || stroke->getStyle() == index) &&
+				!rect.contains(stroke->getBBox())) {
 				m_undo->addOldStroke(i, vi->getVIStroke(i));
 				eraseStrokes.push_back(i);
 			}
@@ -842,8 +849,8 @@ void EraserTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e)
 
 //-----------------------------------------------------------------------------
 
-void EraserTool::multiEraseRect(TFrameId firstFrameId, TFrameId lastFrameId,
-								TRectD firstRect, TRectD lastRect, bool invert)
+void EraserTool::multiEraseRect(TFrameId firstFrameId, TFrameId lastFrameId, TRectD firstRect,
+								TRectD lastRect, bool invert)
 {
 	int r0 = firstFrameId.getNumber();
 	int r1 = lastFrameId.getNumber();
@@ -879,9 +886,10 @@ void EraserTool::multiEraseRect(TFrameId firstFrameId, TFrameId lastFrameId,
 		assert(img);
 		double t = m > 1 ? (double)i / (double)(m - 1) : 0.5;
 		TRectD rect = interpolateRect(firstRect, lastRect, t);
-		//m_level->setFrame(fid, img); //necessario: se la getFrame ha scompattato una img compressa, senza setFrame le modifiche sulla img fatte qui andrebbero perse.
+		// m_level->setFrame(fid, img); //necessario: se la getFrame ha scompattato una img
+		// compressa, senza setFrame le modifiche sulla img fatte qui andrebbero perse.
 
-		//Setto fid come corrente per notificare il cambiamento dell'immagine
+		// Setto fid come corrente per notificare il cambiamento dell'immagine
 		TTool::Application *app = TTool::getApplication();
 		if (app) {
 			if (app->getCurrentFrame()->isEditingScene())
@@ -910,12 +918,15 @@ void EraserTool::onImageChanged()
 	if (application->getCurrentLevel()->getLevel())
 		xshl = application->getCurrentLevel()->getLevel()->getSimpleLevel();
 
-	if (!xshl || m_level.getPointer() != xshl || (m_eraseType.getValue() == RECT_ERASE && m_selectingRect.isEmpty()) ||
-		((m_eraseType.getValue() == FREEHAND_ERASE || m_eraseType.getValue() == POLYLINE_ERASE) && !m_firstStroke))
+	if (!xshl || m_level.getPointer() != xshl ||
+		(m_eraseType.getValue() == RECT_ERASE && m_selectingRect.isEmpty()) ||
+		((m_eraseType.getValue() == FREEHAND_ERASE || m_eraseType.getValue() == POLYLINE_ERASE) &&
+		 !m_firstStroke))
 		resetMulti();
 	else if (m_firstFrameId == getCurrentFid())
-		m_firstFrameSelected = false; //nel caso sono passato allo stato 1 e torno all'immagine iniziale, torno allo stato iniziale
-	else {							  //cambio stato.
+		m_firstFrameSelected = false; // nel caso sono passato allo stato 1 e torno all'immagine
+									  // iniziale, torno allo stato iniziale
+	else { // cambio stato.
 		m_firstFrameSelected = true;
 		if (m_eraseType.getValue() == RECT_ERASE) {
 			assert(!m_selectingRect.isEmpty());
@@ -946,8 +957,9 @@ void EraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e)
 
 		if (m_multi.getValue()) {
 			if (m_firstFrameSelected) {
-				multiEraseRect(m_firstFrameId, getCurrentFid(), m_firstRect, m_selectingRect, m_invertOption.getValue());
-				invalidate(); //invalidate(m_selectingRect.enlarge(2));
+				multiEraseRect(m_firstFrameId, getCurrentFid(), m_firstRect, m_selectingRect,
+							   m_invertOption.getValue());
+				invalidate(); // invalidate(m_selectingRect.enlarge(2));
 				if (e.isShiftPressed()) {
 					m_firstRect = m_selectingRect;
 					m_firstFrameId = getCurrentFid();
@@ -961,8 +973,9 @@ void EraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e)
 				}
 			} else {
 				if (application->getCurrentFrame()->isEditingScene())
-					m_currCell = std::pair<int, int>(application->getCurrentColumn()->getColumnIndex(),
-													 application->getCurrentFrame()->getFrame());
+					m_currCell =
+						std::pair<int, int>(application->getCurrentColumn()->getColumnIndex(),
+											application->getCurrentFrame()->getFrame());
 			}
 			return;
 		} else {
@@ -987,9 +1000,10 @@ void EraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e)
 
 //-----------------------------------------------------------------------------
 
-//!Viene chiusa la polyline e si da il via alla cancellazione.
-/*!Viene creato lo \b stroke rappresentante la polyline disegnata. 
-  Se e' selzionato il metodo di cancellazione "frame range" viene richiamato il metodo \b multiEreserRegion, altrimenti
+//! Viene chiusa la polyline e si da il via alla cancellazione.
+/*!Viene creato lo \b stroke rappresentante la polyline disegnata.
+  Se e' selzionato il metodo di cancellazione "frame range" viene richiamato il metodo \b
+  multiEreserRegion, altrimenti
   viene richiamato il metodo \b eraseRegion*/
 void EraserTool::leftButtonDoubleClick(const TPointD &pos, const TMouseEvent &e)
 {
@@ -1124,7 +1138,8 @@ void EraserTool::onActivate()
 
 //-----------------------------------------------------------------------------
 
-//!Viene aggiunto \b pos a \b m_track e disegnato il primo pezzetto del lazzo. Viene inizializzato \b m_firstPos
+//! Viene aggiunto \b pos a \b m_track e disegnato il primo pezzetto del lazzo. Viene inizializzato
+//! \b m_firstPos
 void EraserTool::startFreehand(const TPointD &pos)
 {
 	m_track.clear();
@@ -1135,7 +1150,8 @@ void EraserTool::startFreehand(const TPointD &pos)
 //			m_viewer->prepareForegroundDrawing();
 #endif
 	//	m_viewer->makeCurrent();
-	TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White : TPixel32::Black;
+	TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White
+																			  : TPixel32::Black;
 	tglColor(color);
 	m_viewer->startForegroundDrawing();
 	glPushMatrix();
@@ -1148,7 +1164,7 @@ void EraserTool::startFreehand(const TPointD &pos)
 
 //-----------------------------------------------------------------------------
 
-//!Viene aggiunto \b pos a \b m_track e disegnato un altro pezzetto del lazzo.
+//! Viene aggiunto \b pos a \b m_track e disegnato un altro pezzetto del lazzo.
 void EraserTool::freehandDrag(const TPointD &pos)
 {
 #if defined(MACOSX)
@@ -1156,7 +1172,8 @@ void EraserTool::freehandDrag(const TPointD &pos)
 #endif
 
 	m_viewer->startForegroundDrawing();
-	TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White : TPixel32::Black;
+	TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White
+																			  : TPixel32::Black;
 	tglColor(color);
 	glPushMatrix();
 	tglMultMatrix(getMatrix());
@@ -1170,7 +1187,8 @@ void EraserTool::freehandDrag(const TPointD &pos)
 
 //-----------------------------------------------------------------------------
 
-//!Viene chiuso il lazzo (si aggiunge l'ultimo punto ad m_track) e viene creato lo stroke rappresentante il lazzo.
+//! Viene chiuso il lazzo (si aggiunge l'ultimo punto ad m_track) e viene creato lo stroke
+//! rappresentante il lazzo.
 void EraserTool::closeFreehand(const TPointD &pos)
 {
 #if defined(MACOSX)
@@ -1187,7 +1205,7 @@ void EraserTool::closeFreehand(const TPointD &pos)
 
 //-----------------------------------------------------------------------------
 
-//!Viene aggiunto un punto al vettore m_polyline.
+//! Viene aggiunto un punto al vettore m_polyline.
 void EraserTool::addPointPolyline(const TPointD &pos)
 {
 	m_firstPos = pos;
@@ -1198,7 +1216,8 @@ void EraserTool::addPointPolyline(const TPointD &pos)
 //		 m_viewer->prepareForegroundDrawing();
 #endif
 	//      m_viewer->makeCurrent();
-	TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White : TPixel32::Black;
+	TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White
+																			  : TPixel32::Black;
 	tglColor(color);
 //	  m_viewer->startForegroundDrawing();
 
@@ -1215,7 +1234,8 @@ void EraserTool::addPointPolyline(const TPointD &pos)
 
 //-----------------------------------------------------------------------------
 
-//!Agginge l'ultimo pos a \b m_polyline e chiude la spezzata (aggiunge \b m_polyline.front() alla fine del vettore)
+//! Agginge l'ultimo pos a \b m_polyline e chiude la spezzata (aggiunge \b m_polyline.front() alla
+//! fine del vettore)
 void EraserTool::closePolyline(const TPointD &pos)
 {
 	if (m_polyline.size() <= 1)
@@ -1229,11 +1249,13 @@ void EraserTool::closePolyline(const TPointD &pos)
 
 //-----------------------------------------------------------------------------
 
-//!Cancella stroke presenti in \b vi e contenuti nella regione delimitata da \b stroke.
-/*!Vengono cercati gli stroke da cancellare facendo i dovuti controlli sui parametri \b m_invertOption e \b m_selective.
+//! Cancella stroke presenti in \b vi e contenuti nella regione delimitata da \b stroke.
+/*!Vengono cercati gli stroke da cancellare facendo i dovuti controlli sui parametri \b
+   m_invertOption e \b m_selective.
 	Se uno stroke deve essere cancellato viene inserito in \b eraseStrokes.
 	Gli stroke vengono cancellati tutti alla fine.*/
-void EraserTool::eraseRegion(const TVectorImageP vi, TStroke *stroke) //, const TImageLocation &imageLocation)
+void EraserTool::eraseRegion(const TVectorImageP vi,
+							 TStroke *stroke) //, const TImageLocation &imageLocation)
 {
 	if (!vi || !stroke)
 		return;
@@ -1255,7 +1277,8 @@ void EraserTool::eraseRegion(const TVectorImageP vi, TStroke *stroke) //, const 
 			TStroke *currentStroke = vi->getStroke(strokeIndex);
 			for (regionIndex = 0; regionIndex < (int)eraseImg.getRegionCount(); regionIndex++) {
 				TRegion *region = eraseImg.getRegion(regionIndex);
-				if ((!m_selective.getValue() || (m_selective.getValue() && currentStroke->getStyle() == colorStyle)) &&
+				if ((!m_selective.getValue() ||
+					 (m_selective.getValue() && currentStroke->getStyle() == colorStyle)) &&
 					region->contains(*currentStroke, true)) {
 					eraseStrokes.push_back(strokeIndex);
 					m_undo->addOldStroke(strokeIndex, vi->getVIStroke(strokeIndex));
@@ -1269,7 +1292,8 @@ void EraserTool::eraseRegion(const TVectorImageP vi, TStroke *stroke) //, const 
 			bool eraseIt = false;
 			for (regionIndex = 0; regionIndex < (int)eraseImg.getRegionCount(); regionIndex++) {
 				TRegion *region = eraseImg.getRegion(regionIndex);
-				if (!m_selective.getValue() || (m_selective.getValue() && currentStroke->getStyle() == colorStyle))
+				if (!m_selective.getValue() ||
+					(m_selective.getValue() && currentStroke->getStyle() == colorStyle))
 					eraseIt = true;
 				if (region->contains(*currentStroke, true)) {
 					eraseIt = false;
@@ -1291,8 +1315,9 @@ void EraserTool::eraseRegion(const TVectorImageP vi, TStroke *stroke) //, const 
 
 //-----------------------------------------------------------------------------
 
-//!Viene richiamata la doErase sui frame compresi tra \b firstFrameId e \b lastFrameId.
-/*!Viene caricato il vettore \b fids con i TFrameId delle immagini sulle quali si deve effettuare una cancellazione.*/
+//! Viene richiamata la doErase sui frame compresi tra \b firstFrameId e \b lastFrameId.
+/*!Viene caricato il vettore \b fids con i TFrameId delle immagini sulle quali si deve effettuare
+ * una cancellazione.*/
 void EraserTool::doMultiErase(TFrameId &firstFrameId, TFrameId &lastFrameId,
 							  const TStroke *firstStroke, const TStroke *lastStroke)
 {
@@ -1333,7 +1358,7 @@ void EraserTool::doMultiErase(TFrameId &firstFrameId, TFrameId &lastFrameId,
 		TFrameId fid = fids[i];
 		assert(firstFrameId <= fid && fid <= lastFrameId);
 		double t = m > 1 ? (double)i / (double)(m - 1) : 0.5;
-		//Setto il fid come corrente per notificare il cambiamento dell'immagine
+		// Setto il fid come corrente per notificare il cambiamento dell'immagine
 		TTool::Application *app = TTool::getApplication();
 		if (app) {
 			if (app->getCurrentFrame()->isEditingScene())
@@ -1349,9 +1374,11 @@ void EraserTool::doMultiErase(TFrameId &firstFrameId, TFrameId &lastFrameId,
 
 //-----------------------------------------------------------------------------
 
-//!Viene richiamata la \b eraseRegion per il frame giusto nel caso della modalita' "Frame Range".
-/*!Nei casi in cui \b t e' diverso da zero e uno, viene generata una nuova \b TVectorImageP richiamando la \b TInbetween. 
-	La nuova immagine contiene lo stroke da dare alla eraseRegion. \b fid e' il TFrameId dell'immagine sulla quale 
+//! Viene richiamata la \b eraseRegion per il frame giusto nel caso della modalita' "Frame Range".
+/*!Nei casi in cui \b t e' diverso da zero e uno, viene generata una nuova \b TVectorImageP
+   richiamando la \b TInbetween.
+	La nuova immagine contiene lo stroke da dare alla eraseRegion. \b fid e' il TFrameId
+   dell'immagine sulla quale
 	bisogna effettuare la cancellazione.*/
 void EraserTool::doErase(double t, const TXshSimpleLevelP &sl, const TFrameId &fid,
 						 const TVectorImageP &firstImage, const TVectorImageP &lastImage)
@@ -1373,8 +1400,9 @@ void EraserTool::doErase(double t, const TXshSimpleLevelP &sl, const TFrameId &f
 
 //-----------------------------------------------------------------------------
 
-//!Effettua la cancellazione nella modalita' "Frame range".
-/*! Se il primo frame e' gia stato selezionato richiama la \b doMultiErase; altrimenti viene inizializzato 
+//! Effettua la cancellazione nella modalita' "Frame range".
+/*! Se il primo frame e' gia stato selezionato richiama la \b doMultiErase; altrimenti viene
+ inizializzato
  \b m_firstStroke.*/
 void EraserTool::multiEreserRegion(TStroke *stroke, const TMouseEvent &e)
 {
@@ -1416,7 +1444,8 @@ void EraserTool::onDeactivate()
 
 	m_active = false;
 
-	//TODO : finishing erase procedure is only available for normal type. Supporting other types is needed. 2016/1/22 shun_iwasawa
+	// TODO : finishing erase procedure is only available for normal type. Supporting other types is
+	// needed. 2016/1/22 shun_iwasawa
 	if (m_eraseType.getValue() != NORMAL_ERASE)
 		return;
 

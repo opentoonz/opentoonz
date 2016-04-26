@@ -4,15 +4,15 @@
 #include "tpixelutils.h"
 
 /* NOTE: Scale operations can be performed using Look-Up-Tables.
-         This is convenient for 8-bit channels, but perhaps not for 16-bit ones:
+		 This is convenient for 8-bit channels, but perhaps not for 16-bit ones:
 
-            In the 32-bit case, we perform max 256 channel operations,
-            equal to performing plain scale on a 16 x 16 image.
+			In the 32-bit case, we perform max 256 channel operations,
+			equal to performing plain scale on a 16 x 16 image.
 
-            In the 64-bit case, the cost is 65536 channel operations,
-            equal to performing plain scale on a 256 x 256 image.
+			In the 64-bit case, the cost is 65536 channel operations,
+			equal to performing plain scale on a 256 x 256 image.
 
-         The raster size is used to discriminate LUT usage in the latter case
+		 The raster size is used to discriminate LUT usage in the latter case
 */
 
 //-----------------------------------------------------------------------------
@@ -20,12 +20,11 @@
 namespace
 {
 
-template <typename Chan>
-void buildLUT(Chan *lut, double a, double k, int chanLow, int chanHigh)
+template <typename Chan> void buildLUT(Chan *lut, double a, double k, int chanLow, int chanHigh)
 {
 	int i, max = (std::numeric_limits<Chan>::max)();
 
-	a += 0.5; //round rather than trunc
+	a += 0.5; // round rather than trunc
 	for (i = 0; i <= max; ++i)
 		lut[i] = tcrop((int)(a + i * k), chanLow, chanHigh);
 }
@@ -33,8 +32,7 @@ void buildLUT(Chan *lut, double a, double k, int chanLow, int chanHigh)
 //-----------------------------------------------------------------------------
 
 template <typename T>
-void do_greyScale_lut(TRasterPT<T> rout, TRasterPT<T> rin,
-					  double a, double k, int out0, int out1)
+void do_greyScale_lut(TRasterPT<T> rout, TRasterPT<T> rin, double a, double k, int out0, int out1)
 {
 	assert(rout->getSize() == rin->getSize());
 
@@ -44,11 +42,11 @@ void do_greyScale_lut(TRasterPT<T> rout, TRasterPT<T> rin,
 	int fac = chanValuesCount / 256;
 	out0 = tmax(fac * out0, 0), out1 = tmin(fac * out1, T::maxChannelValue);
 
-	//Build lut
+	// Build lut
 	Channel *lut = new Channel[chanValuesCount];
 	buildLUT(lut, a, k, out0, out1);
 
-	//Perform scale
+	// Perform scale
 	T *in, *end, *out;
 
 	int y, lx = rin->getLx(), ly = rin->getLy();
@@ -64,14 +62,14 @@ void do_greyScale_lut(TRasterPT<T> rout, TRasterPT<T> rin,
 //-----------------------------------------------------------------------------
 
 template <typename T>
-void do_greyAdjust(TRasterPT<T> rout, TRasterPT<T> rin,
-				   const int in0, const int in1, const int out0, const int out1)
+void do_greyAdjust(TRasterPT<T> rout, TRasterPT<T> rin, const int in0, const int in1,
+				   const int out0, const int out1)
 {
 	typedef typename T::Channel Channel;
 
 	assert(rout->getSize() == rin->getSize());
 
-	//Build scale parameters
+	// Build scale parameters
 	double k = (out1 - out0) / (double)(in1 - in0);
 	double a = out0 - k * in0;
 
@@ -81,8 +79,7 @@ void do_greyAdjust(TRasterPT<T> rout, TRasterPT<T> rin,
 //-----------------------------------------------------------------------------
 
 template <typename T>
-void do_rgbmScale_lut(TRasterPT<T> rout, TRasterPT<T> rin,
-					  const double *a, const double *k,
+void do_rgbmScale_lut(TRasterPT<T> rout, TRasterPT<T> rin, const double *a, const double *k,
 					  const int *out0, const int *out1)
 {
 	assert(rout->getSize() == rin->getSize());
@@ -96,7 +93,7 @@ void do_rgbmScale_lut(TRasterPT<T> rout, TRasterPT<T> rin,
 	int out0B = tmax(fac * out0[2], 0), out1B = tmin(fac * out1[2], T::maxChannelValue);
 	int out0M = tmax(fac * out0[3], 0), out1M = tmin(fac * out1[3], T::maxChannelValue);
 
-	//Build luts
+	// Build luts
 	Channel *lut_r = new Channel[chanValuesCount];
 	buildLUT(lut_r, a[0], k[0], out0R, out1R);
 
@@ -109,12 +106,12 @@ void do_rgbmScale_lut(TRasterPT<T> rout, TRasterPT<T> rin,
 	Channel *lut_m = new Channel[chanValuesCount];
 	buildLUT(lut_m, a[3], k[3], out0M, out1M);
 
-	//Retrieve de/premultiplication luts
+	// Retrieve de/premultiplication luts
 	const double *lut_prem = premultiplyTable<Channel>();
 	const double *lut_deprem = depremultiplyTable<Channel>();
 	double premFac, depremFac;
 
-	//Process raster
+	// Process raster
 	int y, lx = rin->getLx(), ly = rin->getLy();
 	T *in, *end, *out;
 
@@ -141,8 +138,7 @@ void do_rgbmScale_lut(TRasterPT<T> rout, TRasterPT<T> rin,
 //-----------------------------------------------------------------------------
 
 template <typename T>
-void do_rgbmScale(TRasterPT<T> rout, TRasterPT<T> rin,
-				  const double *a, const double *k,
+void do_rgbmScale(TRasterPT<T> rout, TRasterPT<T> rin, const double *a, const double *k,
 				  const int *out0, const int *out1)
 {
 	assert(rout->getSize() == rin->getSize());
@@ -157,12 +153,12 @@ void do_rgbmScale(TRasterPT<T> rout, TRasterPT<T> rin,
 	int out0B = tmax(fac * out0[2], 0), out1B = tmin(fac * out1[2], T::maxChannelValue);
 	int out0M = tmax(fac * out0[3], 0), out1M = tmin(fac * out1[3], T::maxChannelValue);
 
-	//Retrieve de/premultiplication luts
+	// Retrieve de/premultiplication luts
 	const double *lut_prem = premultiplyTable<Channel>();
 	const double *lut_deprem = depremultiplyTable<Channel>();
 	double premFac, depremFac;
 
-	//Process raster
+	// Process raster
 	int y, lx = rin->getLx(), ly = rin->getLy();
 	T *in, *end, *out;
 
@@ -184,14 +180,14 @@ void do_rgbmScale(TRasterPT<T> rout, TRasterPT<T> rin,
 //-----------------------------------------------------------------------------
 
 template <typename T, typename ScaleFunc>
-void do_rgbmAdjust(TRasterPT<T> rout, TRasterPT<T> rin, ScaleFunc scaleFunc,
-				   const int *in0, const int *in1, const int *out0, const int *out1)
+void do_rgbmAdjust(TRasterPT<T> rout, TRasterPT<T> rin, ScaleFunc scaleFunc, const int *in0,
+				   const int *in1, const int *out0, const int *out1)
 {
 	assert(rout->getSize() == rin->getSize());
 
 	double a[5], k[5];
 
-	//Build scale parameters
+	// Build scale parameters
 	int i;
 	for (i = 0; i < 5; ++i) {
 		k[i] = (out1[i] - out0[i]) / (double)(in1[i] - in0[i]);
@@ -202,7 +198,7 @@ void do_rgbmAdjust(TRasterPT<T> rout, TRasterPT<T> rin, ScaleFunc scaleFunc,
 		k[i] *= k[0];
 	}
 
-	//Ensure that the output is cropped according to output params
+	// Ensure that the output is cropped according to output params
 	int out0i[4], out1i[4];
 
 	out0i[0] = tmax(out0[0], tcrop((int)(a[0] + k[0] * out0[1]), 0, 255));
@@ -220,12 +216,12 @@ void do_rgbmAdjust(TRasterPT<T> rout, TRasterPT<T> rin, ScaleFunc scaleFunc,
 	scaleFunc(rout, rin, &a[1], &k[1], out0i, out1i);
 }
 
-} //namespace
+} // namespace
 
 //-----------------------------------------------------------------------------
 
-void TRop::rgbmScale(TRasterP rout, TRasterP rin,
-					 const double *k, const double *a, const int *out0, const int *out1)
+void TRop::rgbmScale(TRasterP rout, TRasterP rin, const double *k, const double *a, const int *out0,
+					 const int *out1)
 {
 	if (rout->getSize() != rin->getSize())
 		throw TRopException("size mismatch");
@@ -256,8 +252,7 @@ void TRop::rgbmScale(TRasterP rout, TRasterP rin,
 
 //-----------------------------------------------------------------------------
 
-void TRop::rgbmScale(TRasterP rout, TRasterP rin,
-					 double kr, double kg, double kb, double km,
+void TRop::rgbmScale(TRasterP rout, TRasterP rin, double kr, double kg, double kb, double km,
 					 double ar, double ag, double ab, double am)
 {
 	double k[4], a[4];
@@ -275,8 +270,8 @@ void TRop::rgbmScale(TRasterP rout, TRasterP rin,
 
 //-----------------------------------------------------------------------------
 
-void TRop::rgbmAdjust(TRasterP rout, TRasterP rin,
-					  const int *in0, const int *in1, const int *out0, const int *out1)
+void TRop::rgbmAdjust(TRasterP rout, TRasterP rin, const int *in0, const int *in1, const int *out0,
+					  const int *out1)
 {
 	if (rout->getSize() != rin->getSize())
 		throw TRopException("size mismatch");

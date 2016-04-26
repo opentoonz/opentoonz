@@ -30,10 +30,10 @@ class ToonzScene;
 //**********************************************************************************
 class TTextureParams
 {
-public:
+  public:
 	enum TYPE {
-		FIXED = 0, //texture is applied fixed respect the image raster borders.
-		AUTOMATIC, //texture is centered on the centroid of the filled area to texture
+		FIXED = 0, // texture is applied fixed respect the image raster borders.
+		AUTOMATIC, // texture is centered on the centroid of the filled area to texture
 		RANDOM
 	};
 
@@ -45,7 +45,11 @@ public:
 	bool m_isPattern;
 	TPixel32 m_patternColor;
 
-	TTextureParams() : m_type(AUTOMATIC), m_scale(1.0), m_rotation(0.0), m_displacement(), m_contrast(1.0), m_isPattern(false), m_patternColor(TPixel::White) {}
+	TTextureParams()
+		: m_type(AUTOMATIC), m_scale(1.0), m_rotation(0.0), m_displacement(), m_contrast(1.0),
+		  m_isPattern(false), m_patternColor(TPixel::White)
+	{
+	}
 
 	bool operator==(const TTextureParams &p) const
 	{
@@ -69,11 +73,11 @@ public:
 
 class DVAPI TImageStyle
 {
-protected:
+  protected:
 	static TFilePath m_libraryDir;
 	static ToonzScene *m_currentScene;
 
-public:
+  public:
 	TImageStyle(){};
 	static void setLibraryDir(const TFilePath &fp) { m_libraryDir = fp; }
 	static void setCurrentScene(ToonzScene *currentScene) { m_currentScene = currentScene; }
@@ -83,8 +87,8 @@ public:
 
 class DVAPI TTextureStyle : public TOutlineStyle, TRasterStyleFx, TImageStyle
 {
-public:
-private:
+  public:
+  private:
 	TTextureParams m_params;
 	TRaster32P m_texture;
 	TFilePath m_texturePath, m_texturePathLoaded;
@@ -92,15 +96,15 @@ private:
 	TTessellator *m_tessellator;
 	TPixel32 m_averageColor;
 
-protected:
+  protected:
 	void makeIcon(const TDimension &d);
 
 	virtual void loadData(TInputStreamInterface &);
 	virtual void saveData(TOutputStreamInterface &) const;
 
-public:
-	//TTextureStyle();
-	//TTextureStyle(const TFilePath &path);
+  public:
+	// TTextureStyle();
+	// TTextureStyle(const TFilePath &path);
 	TTextureStyle(const TRasterP &ras, const TFilePath &m_texturePath);
 	TTextureStyle(const TTextureStyle &);
 
@@ -137,19 +141,19 @@ public:
 	TPixel32 getMainColor() const { return m_averageColor; }
 	void setMainColor(const TPixel32 &color) { m_params.m_patternColor = color; }
 
-	//void draw(const TVectorRenderData &rd,  TStrokeOutline* outline) const;
-	void drawRegion(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &outline) const;
-	//void drawRegion( const TVectorRenderData &rd, TRegionOutline &boundary ) const;
+	// void draw(const TVectorRenderData &rd,  TStrokeOutline* outline) const;
+	void drawRegion(const TColorFunction *cf, const bool antiAliasing,
+					TRegionOutline &outline) const;
+	// void drawRegion( const TVectorRenderData &rd, TRegionOutline &boundary ) const;
 	void drawRegion(TFlash &flash, const TRegion *r) const;
 	void drawStroke(const TColorFunction *cf, TStrokeOutline *outline, const TStroke *stroke) const;
-	//void drawStroke(TFlash& flash, const TStroke* s) const;
+	// void drawStroke(TFlash& flash, const TStroke* s) const;
 
 	TRasterStyleFx *getRasterStyleFx() { return this; }
 
 	bool isRasterStyle() const { return true; }
 
-	void computeOutline(const TStroke *stroke,
-						TStrokeOutline &outline,
+	void computeOutline(const TStroke *stroke, TStrokeOutline &outline,
 						TOutlineUtil::OutlineParameter param) const;
 
 	void setTexture(const TRasterP &color);
@@ -159,16 +163,19 @@ public:
 
 	int getTagId() const;
 
-	//static TRaster32P loadTexture(const TFilePath &path);
+	// static TRaster32P loadTexture(const TFilePath &path);
 	void setFill(TFlash &flash) const;
 
 	bool isPaintStyle() const { return true; }
 	bool isInkStyle() const { return true; }
 	bool inkFxNeedRGBMRaster() const { return true; }
 
-	bool compute(const Params &params) const { return doCompute(params); } //faccio questo per compilare su mac! le virtuali pubbliche devono essere inline
+	bool compute(const Params &params) const
+	{
+		return doCompute(params);
+	} // faccio questo per compilare su mac! le virtuali pubbliche devono essere inline
 
-private:
+  private:
 	bool doCompute(const Params &params) const;
 	void setAverageColor();
 	bool loadTextureRaster();

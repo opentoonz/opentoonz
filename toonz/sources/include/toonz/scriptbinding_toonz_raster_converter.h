@@ -16,7 +16,7 @@ class DVAPI ToonzRasterConverter : public Wrapper
 	Q_OBJECT
 	bool m_flatSource;
 
-public:
+  public:
 	ToonzRasterConverter();
 	~ToonzRasterConverter();
 

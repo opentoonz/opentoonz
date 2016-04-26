@@ -183,7 +183,8 @@ void do_convert(const TRasterCM32P &dst, const TRaster32P &src)
 
 	bool isOverlay = false;
 
-	for (int y = 0; y < src->getLy(); y++) //if it is an overlay, I use the matte value for inks, otherwise I use the brightness.
+	for (int y = 0; y < src->getLy(); y++) // if it is an overlay, I use the matte value for inks,
+										   // otherwise I use the brightness.
 	{
 		TPixel32 *inPix = src->pixels(y);
 		TPixel32 *inEndPix = inPix + lx;

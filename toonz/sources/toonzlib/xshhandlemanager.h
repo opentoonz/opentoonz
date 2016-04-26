@@ -22,13 +22,10 @@ class XshHandleManager : public HandleManager
 {
 	TXsheet *m_xsh;
 
-public:
+  public:
 	XshHandleManager(TXsheet *xsh) : m_xsh(xsh) {}
 
-	TPointD getHandlePos(
-		const TStageObjectId &id,
-		const std::string &handle,
-		int row) const;
+	TPointD getHandlePos(const TStageObjectId &id, const std::string &handle, int row) const;
 };
 
 #endif

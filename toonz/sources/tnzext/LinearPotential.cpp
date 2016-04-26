@@ -9,9 +9,7 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 
-void ToonzExt::LinearPotential::setParameters_(const TStroke *ref,
-											   double par,
-											   double al)
+void ToonzExt::LinearPotential::setParameters_(const TStroke *ref, double par, double al)
 {
 	ref_ = ref;
 	par_ = par;
@@ -40,11 +38,9 @@ ToonzExt::LinearPotential::~LinearPotential()
 
 //-----------------------------------------------------------------------------
 
-double
-ToonzExt::LinearPotential::value_(double value2test) const
+double ToonzExt::LinearPotential::value_(double value2test) const
 {
-	assert(0.0 <= value2test &&
-		   value2test <= 1.0);
+	assert(0.0 <= value2test && value2test <= 1.0);
 	return this->compute_value(value2test);
 }
 
@@ -63,8 +59,7 @@ double ToonzExt::LinearPotential::compute_shape(double value2test) const
 
 //-----------------------------------------------------------------------------
 
-double
-ToonzExt::LinearPotential::compute_value(double value2test) const
+double ToonzExt::LinearPotential::compute_value(double value2test) const
 {
 	// use
 	//
@@ -79,8 +74,7 @@ ToonzExt::LinearPotential::compute_value(double value2test) const
 
 	double tmp_al = actionLength_ * 0.5;
 
-	if (isAlmostZero(par_) ||
-		areAlmostEqual(par_, 1.0))
+	if (isAlmostZero(par_) || areAlmostEqual(par_, 1.0))
 		tmp_al = actionLength_;
 
 	// this is ckecked from wrapper class
@@ -96,11 +90,9 @@ ToonzExt::LinearPotential::compute_value(double value2test) const
 	else if (rightFactor_ == 0.0)
 		x = (x - (strokeLength_ - tmp_al)) / tmp_al;
 	else {
-		if (x <= lenghtAtParam_ &&
-			((lenghtAtParam_ - x) <= leftFactor_))
+		if (x <= lenghtAtParam_ && ((lenghtAtParam_ - x) <= leftFactor_))
 			x = (x - (lenghtAtParam_ - leftFactor_)) / leftFactor_;
-		else if (x > lenghtAtParam_ &&
-				 ((x - lenghtAtParam_) < rightFactor_))
+		else if (x > lenghtAtParam_ && ((x - lenghtAtParam_) < rightFactor_))
 			x = (rightFactor_ - (x - lenghtAtParam_)) / rightFactor_;
 		else
 			x = -1;
@@ -108,7 +100,7 @@ ToonzExt::LinearPotential::compute_value(double value2test) const
 
 	if (x < 0.0)
 		return 0.0;
-	//assert( 0.0 <= x &&
+	// assert( 0.0 <= x &&
 	//  x <= 1.0 + TConsts::epsilon );
 	res = x;
 
@@ -117,8 +109,7 @@ ToonzExt::LinearPotential::compute_value(double value2test) const
 
 //-----------------------------------------------------------------------------
 
-ToonzExt::Potential *
-ToonzExt::LinearPotential::clone()
+ToonzExt::Potential *ToonzExt::LinearPotential::clone()
 {
 	return new LinearPotential;
 }

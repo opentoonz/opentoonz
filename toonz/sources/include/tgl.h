@@ -68,15 +68,15 @@ class TCubic;
 //=============================================================================
 
 #ifdef _DEBUG
-#define CHECK_ERRORS_BY_GL                     \
-	{                                          \
-		GLenum glErr = glGetError();           \
-		assert(glErr != GL_INVALID_ENUM);      \
-		assert(glErr != GL_INVALID_VALUE);     \
-		assert(glErr != GL_INVALID_OPERATION); \
-		assert(glErr != GL_STACK_OVERFLOW);    \
-		assert(glErr != GL_STACK_UNDERFLOW);   \
-		assert(glErr != GL_OUT_OF_MEMORY);     \
+#define CHECK_ERRORS_BY_GL                                                                         \
+	{                                                                                              \
+		GLenum glErr = glGetError();                                                               \
+		assert(glErr != GL_INVALID_ENUM);                                                          \
+		assert(glErr != GL_INVALID_VALUE);                                                         \
+		assert(glErr != GL_INVALID_OPERATION);                                                     \
+		assert(glErr != GL_STACK_OVERFLOW);                                                        \
+		assert(glErr != GL_STACK_UNDERFLOW);                                                       \
+		assert(glErr != GL_OUT_OF_MEMORY);                                                         \
 	}
 #else
 #define CHECK_ERRORS_BY_GL ;
@@ -84,7 +84,7 @@ class TCubic;
 
 //=============================================================================
 
-//forward declarations
+// forward declarations
 class TStroke;
 class TVectorImage;
 class TVectorRenderData;
@@ -92,12 +92,24 @@ class TVectorRenderData;
 //=============================================================================
 
 //! Extension to set a vertex
-inline void tglVertex(const TPointD &p) { glVertex2d(p.x, p.y); }
-inline void tglVertex(const TPoint &p) { glVertex2i(p.x, p.y); }
+inline void tglVertex(const TPointD &p)
+{
+	glVertex2d(p.x, p.y);
+}
+inline void tglVertex(const TPoint &p)
+{
+	glVertex2i(p.x, p.y);
+}
 
 //! Extension to set a color
-inline void tglColor(const TPixel &p) { glColor4ub(p.r, p.g, p.b, p.m); }
-inline void tglColor(const TPixelD &p) { glColor4d(p.r, p.g, p.b, p.m); }
+inline void tglColor(const TPixel &p)
+{
+	glColor4ub(p.r, p.g, p.b, p.m);
+}
+inline void tglColor(const TPixelD &p)
+{
+	glColor4d(p.r, p.g, p.b, p.m);
+}
 
 //! retrieve the square of pixel size from current GL_MODELVIEW matrix
 DVAPI double tglGetPixelSize2();
@@ -138,7 +150,7 @@ inline void tglDrawSegment(double x0, double y0, double x1, double y1)
 	tglDrawSegment(TPointD(x0, y0), TPointD(x1, y1));
 }
 
-//inline  void  glDrawSegment(const TSegment& s){
+// inline  void  glDrawSegment(const TSegment& s){
 //  glDrawSegment( s.getP0(), s.getP1() );
 //}
 
@@ -174,12 +186,8 @@ inline void DVAPI tglFillRect(double x0, double y0, double x1, double y1)
 
 inline void tglMultMatrix(const TAffine &aff)
 {
-	GLdouble m[] =
-		{
-			aff.a11, aff.a21, 0, 0,
-			aff.a12, aff.a22, 0, 0,
-			0, 0, 1, 0,
-			aff.a13, aff.a23, 0, 1};
+	GLdouble m[] = {aff.a11, aff.a21, 0, 0, aff.a12, aff.a22, 0, 0,
+					0,		 0,		  1, 0, aff.a13, aff.a23, 0, 1};
 	glMultMatrixd(m);
 }
 
@@ -188,8 +196,7 @@ inline void tglMultMatrix(const TAffine &aff)
 void DVAPI tglRgbOnlyColorMask();
 void DVAPI tglAlphaOnlyColorMask();
 
-void DVAPI tglEnableBlending(GLenum src = GL_SRC_ALPHA,
-							 GLenum dst = GL_ONE_MINUS_SRC_ALPHA);
+void DVAPI tglEnableBlending(GLenum src = GL_SRC_ALPHA, GLenum dst = GL_ONE_MINUS_SRC_ALPHA);
 
 void DVAPI tglEnableLineSmooth(bool enable = true, double lineSize = 1.0);
 void DVAPI tglEnablePointSmooth(double pointSize = 1.0);
@@ -218,35 +225,27 @@ void DVAPI tglDrawMask(const TVectorRenderData &rd, const TVectorImage* vim);
  */
 /*
 void DVAPI  drawVectorImage(
-                     const TVectorImageP& vim,
-                     const TRect& clippingRect, 
-                     const TAffine& aff,
-                     const TColorFunction *cf = 0);
+					 const TVectorImageP& vim,
+					 const TRect& clippingRect,
+					 const TAffine& aff,
+					 const TColorFunction *cf = 0);
 */
 
 //-----------------------------------------------------------------------------
 
 #define NEW_DRAW_TEXT
 
-enum GlDrawTextIndentation {
-	Left = 0,
-	Right = 1,
-	Center = 2
-};
+enum GlDrawTextIndentation { Left = 0, Right = 1, Center = 2 };
 
 // precision is the number of segments to draw the curve
 void DVAPI tglDraw(const TCubic &cubic, int precision, GLenum pointOrLine = GL_LINE);
 
-void DVAPI tglDraw(const TRectD &rect,
-				   const std::vector<TRaster32P> &textures,
+void DVAPI tglDraw(const TRectD &rect, const std::vector<TRaster32P> &textures,
 				   bool blending = true);
 
-void DVAPI tglDraw(const TRectD &rect,
-				   const TRaster32P &tex,
-				   bool blending = true);
+void DVAPI tglDraw(const TRectD &rect, const TRaster32P &tex, bool blending = true);
 
-void DVAPI tglBuildMipmaps(std::vector<TRaster32P> &rasters,
-						   const TFilePath &filepath);
+void DVAPI tglBuildMipmaps(std::vector<TRaster32P> &rasters, const TFilePath &filepath);
 
 //-----------------------------------------------------------------------------
 

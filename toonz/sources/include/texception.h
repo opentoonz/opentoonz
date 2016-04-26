@@ -19,7 +19,7 @@ class DVAPI TException
 {
 	TString m_msg;
 
-public:
+  public:
 	explicit TException(const std::string &msg = "Toonz Exception");
 	explicit TException(const std::wstring &msg) : m_msg(msg) {}
 	virtual ~TException() {}
@@ -28,4 +28,4 @@ public:
 
 // DVAPI ostream& operator<<(ostream &out, const TException &e);
 
-#endif //T_EXCEPTION_INCLUDED
+#endif // T_EXCEPTION_INCLUDED

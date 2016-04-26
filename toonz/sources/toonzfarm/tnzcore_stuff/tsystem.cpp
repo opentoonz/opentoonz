@@ -42,7 +42,7 @@
 
 extern "C" {
 int gethostname(char *, size_t);
-//int L_cuserid;
+// int L_cuserid;
 char *cuserid(char *);
 char *tempnam(const char *, const char *);
 }
@@ -79,7 +79,8 @@ const int TSystem::MaxHostNameLen = 64;
 const unsigned short TFileStatus::UserReadable = _S_IREAD;
 const unsigned short TFileStatus::UserWritable = _S_IWRITE;
 const unsigned short TFileStatus::UserExecutable = _S_IEXEC;
-const unsigned short TFileStatus::OwnerReadWriteExec = TFileStatus::UserReadable | TFileStatus::UserWritable | TFileStatus::UserExecutable;
+const unsigned short TFileStatus::OwnerReadWriteExec =
+	TFileStatus::UserReadable | TFileStatus::UserWritable | TFileStatus::UserExecutable;
 const unsigned short TFileStatus::OwnerReadable = TFileStatus::UserReadable;
 const unsigned short TFileStatus::OwnerWritable = TFileStatus::UserWritable;
 const unsigned short TFileStatus::OwnerExecutable = TFileStatus::UserExecutable;
@@ -87,7 +88,8 @@ const unsigned short TFileStatus::GroupReadWriteExec = TFileStatus::OwnerReadWri
 const unsigned short TFileStatus::GroupReadable = TFileStatus::UserReadable;
 const unsigned short TFileStatus::GroupWritable = TFileStatus::UserWritable;
 const unsigned short TFileStatus::GroupExecutable = TFileStatus::UserExecutable;
-const unsigned short TFileStatus::OtherReadWriteExec = TFileStatus::UserReadable | TFileStatus::UserWritable | TFileStatus::UserExecutable;
+const unsigned short TFileStatus::OtherReadWriteExec =
+	TFileStatus::UserReadable | TFileStatus::UserWritable | TFileStatus::UserExecutable;
 ;
 const unsigned short TFileStatus::OtherReadable = TFileStatus::UserReadable;
 const unsigned short TFileStatus::OtherWritable = TFileStatus::UserWritable;
@@ -105,7 +107,7 @@ const unsigned short TFileStatus::IfDir = _S_IFDIR;
 using std::ifstream;
 using std::ofstream;
 using std::filebuf;
-#else //these are common for IRIX & LINUX
+#else // these are common for IRIX & LINUX
 const int TSystem::MaxPathLen = MAXPATHLEN;
 const int TSystem::MaxHostNameLen = MAXHOSTNAMELEN;
 
@@ -154,7 +156,7 @@ ostream &operator<<(ostream &out, const TSystemException &e)
 }
 
 //-----------------------------------------------------------------------------------
-//conversion functions
+// conversion functions
 namespace
 {
 
@@ -176,8 +178,7 @@ void makeTm(const TTime &t, tm *p)
 
 TTime makeTTime(const tm &p, int msec = 0)
 {
-	return TTime(p.tm_year + 1900, p.tm_mon + 1, p.tm_mday,
-				 p.tm_hour, p.tm_min, p.tm_sec, msec);
+	return TTime(p.tm_year + 1900, p.tm_mon + 1, p.tm_mday, p.tm_hour, p.tm_min, p.tm_sec, msec);
 }
 
 //---------------------------------------------------------
@@ -190,7 +191,7 @@ time_t makeTimeT(const TTime &t)
 	return tt;
 }
 
-} //namespace
+} // namespace
 
 //-----------------------------------------------------------------------------------
 
@@ -260,8 +261,7 @@ ostream &operator<<(ostream &out, const TDeltaTime &dt)
 // un TTIme invalid danno un risultato invalid
 //
 //
-TTime::TTime(int yyyy, int mm, int dd, int hh,
-			 int min, int sec, int msec)
+TTime::TTime(int yyyy, int mm, int dd, int hh, int min, int sec, int msec)
 {
 	if (yyyy < 10)
 		yyyy += 2000;
@@ -292,7 +292,9 @@ TTime::TTime(int yyyy, int mm, int dd, int hh,
 
 //-----------------------------------------------------------------------------------
 
-TTime::TTime(const TTime &t) : m_y(t.m_y), m_m(t.m_m), m_d(t.m_d), m_h(t.m_h), m_min(t.m_min), m_sec(t.m_sec), m_msec(t.m_msec)
+TTime::TTime(const TTime &t)
+	: m_y(t.m_y), m_m(t.m_m), m_d(t.m_d), m_h(t.m_h), m_min(t.m_min), m_sec(t.m_sec),
+	  m_msec(t.m_msec)
 {
 }
 
@@ -300,29 +302,23 @@ TTime::TTime(const TTime &t) : m_y(t.m_y), m_m(t.m_m), m_d(t.m_d), m_h(t.m_h), m
 
 bool TTime::operator==(const TTime &time) const
 {
-	return (m_y == time.m_y) &&
-		   (m_m == time.m_m) &&
-		   (m_d == time.m_d) &&
-		   (m_h == time.m_h) &&
-		   (m_min == time.m_min) &&
-		   (m_sec == time.m_sec) &&
-		   (m_msec == time.m_msec);
+	return (m_y == time.m_y) && (m_m == time.m_m) && (m_d == time.m_d) && (m_h == time.m_h) &&
+		   (m_min == time.m_min) && (m_sec == time.m_sec) && (m_msec == time.m_msec);
 }
 
 //-----------------------------------------------------------------------------------
 
 bool TTime::operator>(const TTime &time) const
 {
-	return (m_y > time.m_y) ||
-		   (m_y == time.m_y && m_m > time.m_m) ||
+	return (m_y > time.m_y) || (m_y == time.m_y && m_m > time.m_m) ||
 		   (m_y == time.m_y && m_m == time.m_m && m_d > time.m_d) ||
 		   (m_y == time.m_y && m_m == time.m_m && m_d == time.m_d && m_h > time.m_h) ||
-		   (m_y == time.m_y && m_m == time.m_m && m_d == time.m_d &&
-			m_h == time.m_h && m_min > time.m_min) ||
-		   (m_y == time.m_y && m_m == time.m_m && m_d == time.m_d &&
-			m_h == time.m_h && m_min == time.m_min && m_sec > time.m_sec) ||
-		   (m_y == time.m_y && m_m == time.m_m && m_d == time.m_d &&
-			m_h == time.m_h && m_min == time.m_min && m_sec == time.m_sec && m_msec > time.m_msec);
+		   (m_y == time.m_y && m_m == time.m_m && m_d == time.m_d && m_h == time.m_h &&
+			m_min > time.m_min) ||
+		   (m_y == time.m_y && m_m == time.m_m && m_d == time.m_d && m_h == time.m_h &&
+			m_min == time.m_min && m_sec > time.m_sec) ||
+		   (m_y == time.m_y && m_m == time.m_m && m_d == time.m_d && m_h == time.m_h &&
+			m_min == time.m_min && m_sec == time.m_sec && m_msec > time.m_msec);
 }
 
 //-----------------------------------------------------------------------------------
@@ -388,7 +384,7 @@ string TTime::getFormattedString(char *fmt) const
 	makeTm(*this, &x);
 	char strDest[256];
 	if (!fmt)
-		//fmt="%b %d %Y %X";
+		// fmt="%b %d %Y %X";
 		return getDate() + " " + getTime();
 	strftime(strDest, 256, fmt, &x);
 	return string(strDest);
@@ -434,11 +430,12 @@ TFileStatus::TFileStatus(const TFilePath &path)
 {
 	int acc = ACCESS(path.getFullPath().c_str(), 00); // 00 == solo esistenza
 	m_exist = acc != -1;
-	//gestire eccezioni controllando il valore di ritorno di access
-	//controllare il valore di errno
-	//int ret=
-	STAT(path.getFullPath().c_str(), &m_fStatus); //returns 0 if the file-status information is obtained
-												  /* if(ret!=0) ::memset(&m_fStatus,0,sizeof(m_fStatus)):*/
+	// gestire eccezioni controllando il valore di ritorno di access
+	// controllare il valore di errno
+	// int ret=
+	STAT(path.getFullPath().c_str(),
+		 &m_fStatus); // returns 0 if the file-status information is obtained
+	/* if(ret!=0) ::memset(&m_fStatus,0,sizeof(m_fStatus)):*/
 }
 
 //-----------------------------------------------------------------------------------
@@ -483,8 +480,7 @@ long TFileStatus::getSize() const
 TTime TFileStatus::getLastAccessTime() const
 {
 	struct tm *t = localtime(&(m_fStatus.st_atime));
-	return TTime(t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour,
-				 t->tm_min, t->tm_sec);
+	return TTime(t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec);
 }
 
 //-----------------------------------------------------------------------------------
@@ -492,8 +488,7 @@ TTime TFileStatus::getLastAccessTime() const
 TTime TFileStatus::getLastModificationTime() const
 {
 	struct tm *t = localtime(&(m_fStatus.st_mtime));
-	return TTime(t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour,
-				 t->tm_min, t->tm_sec);
+	return TTime(t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec);
 }
 
 //-----------------------------------------------------------------------------------
@@ -501,8 +496,7 @@ TTime TFileStatus::getLastModificationTime() const
 TTime TFileStatus::getCreationTime() const
 {
 	struct tm *t = localtime(&(m_fStatus.st_ctime));
-	return TTime(t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour,
-				 t->tm_min, t->tm_sec);
+	return TTime(t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec);
 }
 
 //-----------------------------------------------------------------------------------
@@ -614,8 +608,8 @@ TFilePath TSystem::getHomeDirectory()
 TFilePath TSystem::getTempDir()
 {
 #ifdef WIN32
-	//gestire eccezioni se dw==0
-	DWORD dw = GetTempPath(0, 0); //non include il terminatore
+	// gestire eccezioni se dw==0
+	DWORD dw = GetTempPath(0, 0); // non include il terminatore
 	char *path = new char[dw + 1];
 	GetTempPath(dw, path);
 	TFilePath tempDir(path);
@@ -721,7 +715,7 @@ TTime TSystem::getCurrentTime()
 }
 
 //------------------------------------------------------------
-//gestire exception
+// gestire exception
 void TSystem::mkDir(const TFilePath &path)
 {
 	if (path == "") {
@@ -734,7 +728,7 @@ void TSystem::mkDir(const TFilePath &path)
 		mkDir(path.getParentDir());
 	}
 #ifdef WIN32
-	int ret = MKDIR(path.getFullPath().c_str()); //ret e' EEXIST o ENOENT
+	int ret = MKDIR(path.getFullPath().c_str()); // ret e' EEXIST o ENOENT
 #else
 	umask(0);
 	mode_t attr = TFileStatus::UserReadable | TFileStatus::UserWritable |
@@ -747,13 +741,13 @@ void TSystem::mkDir(const TFilePath &path)
 }
 
 //------------------------------------------------------------
-//gestire exception
+// gestire exception
 void TSystem::rmDir(const TFilePath &path)
 {
 	//  if (!TFileStatus(path).doesExist())
 	//	return;
 	int ret = RMDIR(path.getFullPath().c_str());
-	if (ret == -1) //ret e' ENOTEMPTY o ENOENT
+	if (ret == -1) // ret e' ENOTEMPTY o ENOENT
 		throw TSystemException(path, errno);
 }
 
@@ -819,22 +813,16 @@ namespace
 string getFormattedMessage(DWORD lastError)
 {
 	LPVOID lpMsgBuf;
-	FormatMessage(
-		FORMAT_MESSAGE_ALLOCATE_BUFFER |
-			FORMAT_MESSAGE_FROM_SYSTEM |
-			FORMAT_MESSAGE_IGNORE_INSERTS,
-		NULL,
-		lastError,
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-		(LPTSTR)&lpMsgBuf,
-		0,
-		NULL);
+	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
+					  FORMAT_MESSAGE_IGNORE_INSERTS,
+				  NULL, lastError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
+				  (LPTSTR)&lpMsgBuf, 0, NULL);
 	return (char *)lpMsgBuf;
 }
 
 //------------------------------------------------------------
 
-} //namespace
+} // namespace
 #endif
 //------------------------------------------------------------
 
@@ -873,13 +861,13 @@ void TSystem::renameFile(const TFilePath &dst, const TFilePath &src)
 
 //------------------------------------------------------------
 
-//gestire gli errori con GetLastError?
+// gestire gli errori con GetLastError?
 void TSystem::deleteFile(const TFilePath &dst)
 {
 #ifdef WIN32
 	BOOL res = DeleteFile(dst.getFullPath().c_str()); // pointer to name of file to delete
-	//se fallisce perche' un file e' aperto chiudiamo prima il file?
-	//To close an open file, use the CloseHandle function.
+	// se fallisce perche' un file e' aperto chiudiamo prima il file?
+	// To close an open file, use the CloseHandle function.
 	if (res == 0)
 		throw TSystemException(dst, getFormattedMessage(GetLastError()));
 #else
@@ -960,9 +948,7 @@ void TSystem::readDirectory(TFilePathSet &dst, const TFilePath &path)
 
 //------------------------------------------------------------
 
-void TSystem::readDirectory(
-	TFilePathSet &dst,
-	const TFilePathSet &pathSet)
+void TSystem::readDirectory(TFilePathSet &dst, const TFilePathSet &pathSet)
 {
 	for (TFilePathSet::const_iterator it = pathSet.begin(); it != pathSet.end(); it++)
 		readDirectory(dst, *it);
@@ -988,9 +974,7 @@ TFilePathSet TSystem::readDirectory(const TFilePathSet &pathSet)
 
 //------------------------------------------------------------
 
-void TSystem::readDirectoryTree(
-	TFilePathSet &dst,
-	const TFilePath &path)
+void TSystem::readDirectoryTree(TFilePathSet &dst, const TFilePath &path)
 {
 	if (!TFileStatus(path).isDirectory()) {
 		throw TSystemException(path, " is not a directory");
@@ -1034,9 +1018,7 @@ void TSystem::readDirectoryTree(
 
 //------------------------------------------------------------
 
-void TSystem::readDirectoryTree(
-	TFilePathSet &dst,
-	const TFilePathSet &pathSet)
+void TSystem::readDirectoryTree(TFilePathSet &dst, const TFilePathSet &pathSet)
 {
 	for (TFilePathSet::const_iterator it = pathSet.begin(); it != pathSet.end(); it++)
 		readDirectoryTree(dst, *it);
@@ -1070,7 +1052,8 @@ TFilePathSet TSystem::packLevelNames(const TFilePathSet &fps)
 		tmpSet.insert(cit->getParentDir() + cit->getLevelName());
 
 	TFilePathSet fps2;
-	for (std::set<TFilePath>::const_iterator c_sit = tmpSet.begin(); c_sit != tmpSet.end(); ++c_sit) {
+	for (std::set<TFilePath>::const_iterator c_sit = tmpSet.begin(); c_sit != tmpSet.end();
+		 ++c_sit) {
 		fps2.push_back(*c_sit);
 	}
 	return fps2;
@@ -1103,7 +1086,8 @@ TFilePathSet TSystem::getDisks()
 	FILE *f = setmntent("/etc/fstab", "r");
 	if (f) {
 		while (struct mntent *m = getmntent(f)) {
-			//cout << "machine "<< m->mnt_fsname << " dir " <<m->mnt_dir << " type " <<  m->mnt_type << endl;
+			// cout << "machine "<< m->mnt_fsname << " dir " <<m->mnt_dir << " type " <<
+			// m->mnt_type << endl;
 			filePathSet.push_back(m->mnt_dir);
 		}
 		endmntent(f);
@@ -1181,7 +1165,7 @@ ULONG TSystem::getFreeDiskSize(const TFilePath &diskName)
 							   &totalNumberOfClusters		   // total clusters
 							   );
 
-	if (!rc) //eccezione... getLastError etc...
+	if (!rc) // eccezione... getLastError etc...
 		throw TSystemException(diskName, getFormattedMessage(GetLastError()));
 	else
 		size = (numberOfFreeClusters * sectorsPerCluster * bytesPerSector) >> 10;
@@ -1206,14 +1190,15 @@ ULONG TSystem::getFreeMemorySize()
 	totalFree = (physicalFree + virtualFree) >> 10;
 #else
 #ifdef __sgi
-	//check for virtual memory
+	// check for virtual memory
 	int numberOfResources = swapctl(SC_GETNSWP, 0); /* get number of swapping resources configued */
 
 	if (numberOfResources == 0)
 		return 0;
 
-	//avrei voluto fare: struct swaptable *table = new struct swaptable[...]
-	struct swaptable *table = (struct swaptable *)calloc(1, sizeof(struct swapent) * numberOfResources + sizeof(int));
+	// avrei voluto fare: struct swaptable *table = new struct swaptable[...]
+	struct swaptable *table =
+		(struct swaptable *)calloc(1, sizeof(struct swapent) * numberOfResources + sizeof(int));
 
 	table->swt_n = numberOfResources;
 	swapctl(SC_LIST, table); /* list all the swapping resources */
@@ -1243,7 +1228,7 @@ ULONG TSystem::getFreeMemorySize()
 #endif
 #endif //__sgi
 
-#endif //WIN32
+#endif // WIN32
 
 #ifndef WIN32
 #else
@@ -1305,8 +1290,7 @@ TSystemException::TSystemException(const TFilePath &fname, const string &msg)
 
 //--------------------------------------------------------------
 
-TSystemException::TSystemException(const string &msg)
-	: m_fname(""), m_err(-1), m_msg(msg)
+TSystemException::TSystemException(const string &msg) : m_fname(""), m_err(-1), m_msg(msg)
 {
 }
 
@@ -1320,32 +1304,52 @@ string TSystemException::getMessage() const
 		// nothing
 		msg += ": ";
 		msg += m_msg;
-		CASE EEXIST : msg += ": Directory was not created because filename is the name of an existing file, directory, or device";
-		CASE ENOENT : msg += ": Path was not found, or the named file does not exist or is a null pathname.";
-		CASE ENOTEMPTY : msg += ": Given path is not a directory; directory is not empty; or directory is either current working directory or root directory";
-		CASE EACCES : msg += ": Search permission is denied by a component of the path prefix, or write permission on the file named by path is denied, or times is NULL, and write access is denied";
-		CASE EFAULT : msg += ": Times is not NULL and, or points outside the process's allocated address space.";
+		CASE EEXIST : msg += ": Directory was not created because filename is the name of an "
+							 "existing file, directory, or device";
+		CASE ENOENT
+			: msg +=
+			  ": Path was not found, or the named file does not exist or is a null pathname.";
+		CASE ENOTEMPTY : msg += ": Given path is not a directory; directory is not empty; or "
+								"directory is either current working directory or root directory";
+		CASE EACCES : msg += ": Search permission is denied by a component of the path prefix, or "
+							 "write permission on the file named by path is denied, or times is "
+							 "NULL, and write access is denied";
+		CASE EFAULT
+			: msg +=
+			  ": Times is not NULL and, or points outside the process's allocated address space.";
 		CASE EINTR : msg += ": A signal was caught during the utime system call.";
-		CASE ENAMETOOLONG : msg += ": The length of the path argument exceeds {PATH_MAX}, or the length of a path component exceeds {NAME_MAX} while _POSIX_NO_TRUNC is in effect.";
+		CASE ENAMETOOLONG : msg += ": The length of the path argument exceeds {PATH_MAX}, or the "
+								   "length of a path component exceeds {NAME_MAX} while "
+								   "_POSIX_NO_TRUNC is in effect.";
 		CASE ENOTDIR : msg += ": A component of the path prefix is not a directory.";
-		CASE EPERM : msg += ": The calling process does not have the super-user privilege, the effective user ID is not the owner of the file, and times is not NULL, or the file system containing the file is mounted read-only";
-		CASE EROFS : msg += ": The current file system level range does not envelop the level of the file named by path, and the calling process does not have the super-user privilege.";
-		CASE ENOSYS : msg += ": When the named file cannot have its time reset.  The file is on a file system that doesn't have this operation.";
+		CASE EPERM : msg += ": The calling process does not have the super-user privilege, the "
+							"effective user ID is not the owner of the file, and times is not "
+							"NULL, or the file system containing the file is mounted read-only";
+		CASE EROFS : msg += ": The current file system level range does not envelop the level of "
+							"the file named by path, and the calling process does not have the "
+							"super-user privilege.";
+		CASE ENOSYS : msg += ": When the named file cannot have its time reset.  The file is on a "
+							 "file system that doesn't have this operation.";
 		CASE EMFILE : msg += ": The maximum number of file descriptors are currently open.";
 		CASE ENFILE : msg += ": The system file table is full.";
-		CASE EBADF : msg += ": The file descriptor determined by the DIR stream is no longer valid.  This result occurs if the DIR stream has been closed.";
+		CASE EBADF : msg += ": The file descriptor determined by the DIR stream is no longer "
+							"valid.  This result occurs if the DIR stream has been closed.";
 		CASE EINVAL : msg += ": 64-bit and non-64-bit calls were mixed in a sequence of calls.";
 	DEFAULT:
 		msg += ": Unknown error";
 
 #ifndef WIN32
 		CASE ELOOP : msg += ": Too many symbolic links were encountered in translating path.";
-		CASE EMULTIHOP : msg += ": Components of path require hopping to multiple remote machines and the file system does not allow it.";
-		CASE ENOLINK : msg += ": Path points to a remote machine and the link to that machine is no longer active.";
+		CASE EMULTIHOP : msg += ": Components of path require hopping to multiple remote machines "
+								"and the file system does not allow it.";
+		CASE ENOLINK
+			: msg +=
+			  ": Path points to a remote machine and the link to that machine is no longer active.";
 #ifndef LINUX
 		CASE EDIRCORRUPTED : msg += ": The directory is corrupted on disk.";
 #endif
-		CASE EOVERFLOW : msg += ": One of the inode number values or offset values did not fit in 32 bits, and the 64-bit interfaces were not used.";
+		CASE EOVERFLOW : msg += ": One of the inode number values or offset values did not fit in "
+								"32 bits, and the 64-bit interfaces were not used.";
 #endif
 	}
 	return msg;
@@ -1371,10 +1375,12 @@ static std::vector<void *> PluginInstanceTable;
 extern "C" void unloadPlugins()
 {
 #ifdef WIN32
-	for (std::vector<HINSTANCE>::iterator it = PluginInstanceTable.begin(); it != PluginInstanceTable.end(); ++it)
+	for (std::vector<HINSTANCE>::iterator it = PluginInstanceTable.begin();
+		 it != PluginInstanceTable.end(); ++it)
 		FreeLibrary(*it);
 #else
-	for (std::vector<void *>::iterator it = PluginInstanceTable.begin(); it != PluginInstanceTable.end(); ++it)
+	for (std::vector<void *>::iterator it = PluginInstanceTable.begin();
+		 it != PluginInstanceTable.end(); ++it)
 		dlclose(*it);
 #endif
 	PluginInstanceTable.clear();
@@ -1408,13 +1414,12 @@ void TSystem::loadPlugins(const TFilePath &dir)
 	if (dirContent.empty())
 		return;
 
-	for (TFilePathSet::iterator it = dirContent.begin();
-		 it != dirContent.end(); it++) {
+	for (TFilePathSet::iterator it = dirContent.begin(); it != dirContent.end(); it++) {
 		TFilePath fp = *it;
 		if (fp.getType() != extension)
 			continue;
 
-//cout << "Loading..." << fp << endl;
+// cout << "Loading..." << fp << endl;
 #ifdef WIN32
 		HINSTANCE handle = LoadLibrary(fp.getFullPath().c_str());
 #else
@@ -1426,7 +1431,8 @@ void TSystem::loadPlugins(const TFilePath &dir)
 #ifdef WIN32
 			DWORD err = GetLastError();
 			string s;
-			s = "*Error* unable to load " + fp.getFullPath() + ": " + getFormattedMessage(err) + '\0';
+			s = "*Error* unable to load " + fp.getFullPath() + ": " + getFormattedMessage(err) +
+				'\0';
 			TSystem::outputDebug(s);
 #else
 			cout << "*ERROR* couldn't load " << fp << ":";
@@ -1434,7 +1440,7 @@ void TSystem::loadPlugins(const TFilePath &dir)
 #endif
 		} else {
 			PluginInstanceTable.push_back(handle);
-//cout << "loaded" << endl;
+// cout << "loaded" << endl;
 #ifdef WIN32
 			TnzLibMainProcType *tnzLibMain =
 				(TnzLibMainProcType *)GetProcAddress(handle, TnzLibMainProcName);
@@ -1447,8 +1453,8 @@ void TSystem::loadPlugins(const TFilePath &dir)
 				// per ora niente messaggi di errore
 				// cout<< "Unable to load TLibMain" << endl;
 				/*
-        #ifdef WIN32
-        FreeLibrary(handle);
+		#ifdef WIN32
+		FreeLibrary(handle);
 	#else
 	dlclose(handle);
 	#endif
@@ -1519,9 +1525,7 @@ const TPluginInfo *TSystem::getLoadedPluginInfo(string name)
 void TSystem::showDocument(const TFilePath &path)
 {
 #ifdef WIN32
-	int ret = (int)
-		ShellExecute(0, "open", path.getFullPath().c_str(),
-					 0, 0, SW_SHOWNORMAL);
+	int ret = (int)ShellExecute(0, "open", path.getFullPath().c_str(), 0, 0, SW_SHOWNORMAL);
 	if (ret <= 32) {
 		throw TException(path.getFullPath() + " : can't open");
 	}

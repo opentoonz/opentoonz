@@ -35,8 +35,7 @@ void main(int argc, char *argv[])
 	strcpy(inname, argv[1]);
 
 	len = strlen(argv[2]);
-	if (len < 4 ||
-		(STR_NE(argv[2] + len - 4, ".tzu") && STR_NE(argv[2] + len - 4, ".tzp"))) {
+	if (len < 4 || (STR_NE(argv[2] + len - 4, ".tzu") && STR_NE(argv[2] + len - 4, ".tzp"))) {
 		printf("%s error: file %s is not tz(up)\n", argv[0], argv[2]);
 		exit(0);
 	}
@@ -51,10 +50,8 @@ void main(int argc, char *argv[])
 		exit(0);
 	}
 
-	printf(">> Immagine di dimensioni: %dx%d\n",
-		   img->pixmap.xsize, img->pixmap.ysize);
-	printf(">Con savebox: %dx%d di dim %d,%d\n",
-		   img->pixmap.xD, img->pixmap.yD,
+	printf(">> Immagine di dimensioni: %dx%d\n", img->pixmap.xsize, img->pixmap.ysize);
+	printf(">Con savebox: %dx%d di dim %d,%d\n", img->pixmap.xD, img->pixmap.yD,
 		   img->pixmap.xSBsize, img->pixmap.ySBsize);
 
 	printf(">> Writing %s\n", outname);
@@ -71,10 +68,9 @@ void main(int argc, char *argv[])
 		exit(0);
 	}
 
-	printf(">> Immagine di dimensioni: %dx%d con %dx%d, %dx%d\n",
-		   newimg->pixmap.xsize, newimg->pixmap.ysize,
-		   newimg->pixmap.xD, newimg->pixmap.yD,
-		   newimg->pixmap.xSBsize, newimg->pixmap.ySBsize);
+	printf(">> Immagine di dimensioni: %dx%d con %dx%d, %dx%d\n", newimg->pixmap.xsize,
+		   newimg->pixmap.ysize, newimg->pixmap.xD, newimg->pixmap.yD, newimg->pixmap.xSBsize,
+		   newimg->pixmap.ySBsize);
 	total = newimg->pixmap.xsize * newimg->pixmap.ysize;
 
 #ifdef QUANDO_SERVE
@@ -96,7 +92,7 @@ void main(int argc, char *argv[])
 	newimg->type = RGB;
 	newimg->pixmap.buffer = (unsigned short *)gl_buffer;
 
-	/* 
+	/*
  newimg->cmap.name = NIL;
  newimg->cmap.size = 2048;
  newimg->cmap.offset = 2048;
@@ -104,7 +100,7 @@ void main(int argc, char *argv[])
  newimg->cmap.pencil_n = 4;
 
  newimg->cmap.buffer = (struct cmap_color*)
-                      malloc(sizeof(struct cmap_color)*newimg->cmap.size);
+					  malloc(sizeof(struct cmap_color)*newimg->cmap.size);
 
  cmap = newimg->cmap.buffer;
  j = 0;
@@ -118,7 +114,7 @@ void main(int argc, char *argv[])
   }
 
  newimg->cmap.names = NIL;
- 
+
  force_to_rgb(newimg, NIL);
 */
 

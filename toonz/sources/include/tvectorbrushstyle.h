@@ -30,7 +30,7 @@ class DVAPI TVectorBrushStyle : public TColorStyle
 	TVectorImageP m_brush;
 	int m_colorCount;
 
-public:
+  public:
 	TVectorBrushStyle();
 	TVectorBrushStyle(const std::string &brushName, TVectorImageP vi = TVectorImageP());
 	~TVectorBrushStyle();
@@ -65,12 +65,12 @@ public:
 	TPixel32 getColorParamValue(int index) const;
 	void setColorParamValue(int index, const TPixel32 &color);
 
-protected:
+  protected:
 	void loadData(TInputStreamInterface &);
 	void saveData(TOutputStreamInterface &) const;
 
-private:
+  private:
 	int getColorStyleId(int index) const;
 };
 
-#endif //T_VECTOR_BRUSH_STYLE_H
+#endif // T_VECTOR_BRUSH_STYLE_H

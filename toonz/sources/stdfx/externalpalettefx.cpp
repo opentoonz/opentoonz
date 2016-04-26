@@ -18,7 +18,7 @@ class ExternalPaletteFx : public TStandardRasterFx
 	TRasterFxPort m_input;
 	TRasterFxPort m_expalette;
 
-public:
+  public:
 	ExternalPaletteFx()
 
 	{
@@ -127,8 +127,7 @@ void ExternalPaletteFx::doDryCompute(TRectD &rect, double frame, const TRenderSe
 			pltAlias += toString(frame);
 
 		TRenderSettings ri2(ri);
-		ExternalPaletteFxRenderData *data =
-			new ExternalPaletteFxRenderData(palette, pltAlias);
+		ExternalPaletteFxRenderData *data = new ExternalPaletteFxRenderData(palette, pltAlias);
 		ri2.m_data.push_back(data);
 		ri2.m_userCachable = false;
 
@@ -153,8 +152,7 @@ void ExternalPaletteFx::doCompute(TTile &tile, double frame, const TRenderSettin
 			pltAlias += toString(frame);
 
 		TRenderSettings ri2(ri);
-		ExternalPaletteFxRenderData *data =
-			new ExternalPaletteFxRenderData(palette, pltAlias);
+		ExternalPaletteFxRenderData *data = new ExternalPaletteFxRenderData(palette, pltAlias);
 		ri2.m_data.push_back(data);
 		m_input->compute(tile, frame, ri2);
 	} else

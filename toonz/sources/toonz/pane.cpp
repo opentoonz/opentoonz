@@ -37,14 +37,16 @@ extern TEnv::StringVar EnvSafeAreaName;
 extern QWidget *CurrentOpenedBrowser;
 
 TPanel::TPanel(QWidget *parent, Qt::WindowFlags flags, TDockWidget::Orientation orientation)
-	: TDockWidget(parent, flags), m_panelType(""), m_isMaximizable(true), m_isMaximized(false), m_isActive(true), m_panelTitleBar(0), m_multipleInstancesAllowed(true)
+	: TDockWidget(parent, flags), m_panelType(""), m_isMaximizable(true), m_isMaximized(false),
+	  m_isActive(true), m_panelTitleBar(0), m_multipleInstancesAllowed(true)
 {
-	//setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
-	//setFloating(false);
+	// setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
+	// setFloating(false);
 	m_panelTitleBar = new TPanelTitleBar(this, orientation);
 	setTitleBarWidget(m_panelTitleBar);
-	//connect(m_panelTitleBar,SIGNAL(doubleClick()),this,SLOT(onDoubleClick()));
-	connect(m_panelTitleBar, SIGNAL(doubleClick(QMouseEvent *)), this, SIGNAL(doubleClick(QMouseEvent *)));
+	// connect(m_panelTitleBar,SIGNAL(doubleClick()),this,SLOT(onDoubleClick()));
+	connect(m_panelTitleBar, SIGNAL(doubleClick(QMouseEvent *)), this,
+			SIGNAL(doubleClick(QMouseEvent *)));
 	connect(m_panelTitleBar, SIGNAL(closeButtonPressed()), this, SLOT(onCloseButtonPressed()));
 	setOrientation(orientation);
 }
@@ -53,7 +55,7 @@ void TPanel::hideEvent(QHideEvent *)
 {
 	if (CurrentOpenedBrowser) {
 		CurrentOpenedBrowser->setWindowModality(Qt::ApplicationModal);
-		//setWindowModality(Qt::NonModal);
+		// setWindowModality(Qt::NonModal);
 	}
 }
 
@@ -61,7 +63,7 @@ void TPanel::showEvent(QShowEvent *)
 {
 	if (CurrentOpenedBrowser) {
 		CurrentOpenedBrowser->setWindowModality(Qt::NonModal);
-		//setWindowModality(Qt::WindowModal);
+		// setWindowModality(Qt::WindowModal);
 	}
 }
 
@@ -105,26 +107,26 @@ void TPanel::onCloseButtonPressed()
 {
 	emit closeButtonPressed();
 
-	//Currently, Toonz panels that get closed indeed just remain hidden -
-	//ready to reappair if they are needed again. However, the user expects
-	//a new panel to be created - so we just reset the panel here.
-	//reset();    //Moved to panel invocation in floatingpanelcommand.cpp
+	// Currently, Toonz panels that get closed indeed just remain hidden -
+	// ready to reappair if they are needed again. However, the user expects
+	// a new panel to be created - so we just reset the panel here.
+	// reset();    //Moved to panel invocation in floatingpanelcommand.cpp
 
-	//Also, remove widget from its dock layout control
+	// Also, remove widget from its dock layout control
 	if (parentLayout())
 		parentLayout()->removeWidget(this);
 }
 
 //-----------------------------------------------------------------------------
-/*! activate the panel and set focus specified widget when mouse enters 
+/*! activate the panel and set focus specified widget when mouse enters
 */
 void TPanel::enterEvent(QEvent *event)
 {
-	//Only when Toonz application is active
+	// Only when Toonz application is active
 	if (qApp->activeWindow()) {
 		widgetFocusOnEnter();
-		//Some panels (e.g. Viewer, StudioPalette, Palette, ColorModel) are
-		//activated when mouse enters. Viewer is activatable only when being docked.
+		// Some panels (e.g. Viewer, StudioPalette, Palette, ColorModel) are
+		// activated when mouse enters. Viewer is activatable only when being docked.
 		if (isActivatableOnEnter())
 			activateWindow();
 		event->accept();
@@ -144,21 +146,19 @@ void TPanel::leaveEvent(QEvent *event)
 // TPanelTitleBarButton
 //-----------------------------------------------------------------------------
 
-TPanelTitleBarButton::TPanelTitleBarButton(
-	QWidget *parent,
-	const QString &standardPixmapName,
-	const QString &rolloverPixmapName,
-	const QString &pressedPixmapName)
-	: QWidget(parent), m_standardPixmap(standardPixmapName), m_rolloverPixmap(rolloverPixmapName), m_pressedPixmap(pressedPixmapName), m_rollover(false), m_pressed(false), m_buttonSet(0), m_id(0)
+TPanelTitleBarButton::TPanelTitleBarButton(QWidget *parent, const QString &standardPixmapName,
+										   const QString &rolloverPixmapName,
+										   const QString &pressedPixmapName)
+	: QWidget(parent), m_standardPixmap(standardPixmapName), m_rolloverPixmap(rolloverPixmapName),
+	  m_pressedPixmap(pressedPixmapName), m_rollover(false), m_pressed(false), m_buttonSet(0),
+	  m_id(0)
 {
 	setFixedSize(m_standardPixmap.size());
 }
 
 //-----------------------------------------------------------------------------
 
-void TPanelTitleBarButton::setButtonSet(
-	TPanelTitleBarButtonSet *buttonSet,
-	int id)
+void TPanelTitleBarButton::setButtonSet(TPanelTitleBarButtonSet *buttonSet, int id)
 {
 	m_buttonSet = buttonSet;
 	m_id = id;
@@ -180,8 +180,8 @@ void TPanelTitleBarButton::setPressed(bool pressed)
 void TPanelTitleBarButton::paintEvent(QPaintEvent *event)
 {
 	QPainter painter(this);
-	painter.drawPixmap(0, 0, m_pressed ? m_pressedPixmap
-									   : m_rollover ? m_rolloverPixmap : m_standardPixmap);
+	painter.drawPixmap(0, 0, m_pressed ? m_pressedPixmap : m_rollover ? m_rolloverPixmap
+																	  : m_standardPixmap);
 	painter.end();
 }
 
@@ -239,7 +239,8 @@ void TPanelTitleBarButtonForSafeArea::getSafeAreaNameList(QList<QString> &nameLi
 
 	std::string safeAreaFileName = "safeArea.ini";
 
-	while (!TFileStatus(fp + safeAreaFileName).doesExist() && !fp.isRoot() && fp.getParentDir() != TFilePath())
+	while (!TFileStatus(fp + safeAreaFileName).doesExist() && !fp.isRoot() &&
+		   fp.getParentDir() != TFilePath())
 		fp = fp.getParentDir();
 
 	fp = fp + safeAreaFileName;
@@ -298,7 +299,7 @@ void TPanelTitleBarButtonForSafeArea::onSetSafeArea()
 	// change safearea if the different one is selected
 	if (QString::fromStdString(EnvSafeAreaName) != safeAreaName) {
 		EnvSafeAreaName = safeAreaName.toStdString();
-		//emit sceneChanged without setting dirty flag
+		// emit sceneChanged without setting dirty flag
 		TApp::instance()->getCurrentScene()->notifySceneChanged(false);
 	}
 }
@@ -394,8 +395,7 @@ void TPanelTitleBar::paintEvent(QPaintEvent *)
 
 	if (dw->getOrientation() == TDockWidget::vertical) {
 		QString titleText =
-			painter.fontMetrics().elidedText(
-				dw->windowTitle(), Qt::ElideRight, rect.width() - 50);
+			painter.fontMetrics().elidedText(dw->windowTitle(), Qt::ElideRight, rect.width() - 50);
 
 		painter.setBrush(Qt::NoBrush);
 		painter.setPen(titleColor);
@@ -494,8 +494,7 @@ void TPanelTitleBar::resizeEvent(QResizeEvent *e)
 // TPanelFactory
 //-----------------------------------------------------------------------------
 
-TPanelFactory::TPanelFactory(QString panelType)
-	: m_panelType(panelType)
+TPanelFactory::TPanelFactory(QString panelType) : m_panelType(panelType)
 {
 	assert(m_table.count(panelType) == 0);
 	m_table[m_panelType] = this;

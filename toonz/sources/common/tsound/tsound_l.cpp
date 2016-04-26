@@ -17,9 +17,9 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 
-//using namespace std;
+// using namespace std;
 
-//forward declaration
+// forward declaration
 namespace
 {
 int openMixer();
@@ -43,11 +43,8 @@ class SmartWatch
 	TINT32 m_totalus;
 	bool m_stopped;
 
-public:
-	SmartWatch() : m_totalus(0), m_stopped(true)
-	{
-		timerclear(&m_start_tv);
-	}
+  public:
+	SmartWatch() : m_totalus(0), m_stopped(true) { timerclear(&m_start_tv); }
 	void start()
 	{
 		m_stopped = false;
@@ -62,7 +59,7 @@ public:
 	}
 	double getTotalTime()
 	{
-		if (!m_stopped) //questa e' una porcata!
+		if (!m_stopped) // questa e' una porcata!
 		{
 			stop();
 			m_stopped = false;
@@ -70,10 +67,7 @@ public:
 		return m_totalus / 1000.;
 	}
 
-	void addDelay(double ms)
-	{
-		m_start_tv.tv_usec += (long)(ms * 1000.);
-	}
+	void addDelay(double ms) { m_start_tv.tv_usec += (long)(ms * 1000.); }
 };
 
 //======================================================================
@@ -83,10 +77,10 @@ public:
 //======================================================================
 class TSoundOutputDeviceImp
 {
-private:
+  private:
 	static int m_count;
 
-public:
+  public:
 	int m_dev;
 	bool m_stopped;
 	bool m_isPlaying;
@@ -106,7 +100,7 @@ public:
 	{
 		/*
   if (m_count != 0)
-    throw TException("unable to create second instance of TSoundOutputDeviceImp");
+	throw TException("unable to create second instance of TSoundOutputDeviceImp");
 */
 		++m_count;
 		checkSupportedFormat();
@@ -136,17 +130,16 @@ bool TSoundOutputDeviceImp::doOpenDevice()
 	m_dev = open("/dev/dsp", O_WRONLY, 0);
 	if (m_dev < 0) {
 		string errMsg = strerror(errno);
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnableOpenDevice, errMsg + " /dev/dsp"
-			/*"Unable to open device /dev/dsp; check permissions"*/);
+		throw TSoundDeviceException(TSoundDeviceException::UnableOpenDevice, errMsg + " /dev/dsp"
+									/*"Unable to open device /dev/dsp; check permissions"*/);
 	}
 
-	//le chiamate a questa ioctl sono state commentate perche' pag 36 doc OSS
+	// le chiamate a questa ioctl sono state commentate perche' pag 36 doc OSS
 	//"this ioctl stop the device immadiately	and returns it to a state where it
-	//can accept new parameters. It Should not be called after opening the device
-	//as it may cause unwanted side effect in his situation. require to abort play
-	//or secord.Generally recommended to open and close device after using the RESET"
-	//ioctl(m_dev, SNDCTL_DSP_RESET,0);
+	// can accept new parameters. It Should not be called after opening the device
+	// as it may cause unwanted side effect in his situation. require to abort play
+	// or secord.Generally recommended to open and close device after using the RESET"
+	// ioctl(m_dev, SNDCTL_DSP_RESET,0);
 
 	// N.B. e' bene che la dimensione sia piccola cosi' l'attesa, in seguito
 	// alla richiesta di stop,
@@ -157,19 +150,20 @@ bool TSoundOutputDeviceImp::doOpenDevice()
 	// zcomp, quindi e' meglio settarla. 32 rappresenta il numero di frammenti
 	// di solito e' documentato che 2 siano sufficienti ma potrebbero essere pochi
 	// soprattutto se si interagisce con altre console
-	//int fraginfo = ( 32<<16)|8;
+	// int fraginfo = ( 32<<16)|8;
 
 	int fraginfo = 0xffffffff;
 	if (ioctl(m_dev, SNDCTL_DSP_SETFRAGMENT, &fraginfo) == -1)
 		perror("SETFRAGMENT");
-	//if(fraginfo != ((32<<16)|8))
-	//std::cout << std::hex << fraginfo<<std::endl;
-	//exit(0);
+	// if(fraginfo != ((32<<16)|8))
+	// std::cout << std::hex << fraginfo<<std::endl;
+	// exit(0);
 	audio_buf_info info;
 	if (ioctl(m_dev, SNDCTL_DSP_GETOSPACE, &info) == -1)
 		perror("GETOSPACE");
 
-	//std::cout << info.fragments << " frammenti " << " da " << info.fragsize << "  = " << info.fragsize*info.fragments << " bytes" <<std::endl;
+	// std::cout << info.fragments << " frammenti " << " da " << info.fragsize << "  = " <<
+	// info.fragsize*info.fragments << " bytes" <<std::endl;
 
 	return true;
 }
@@ -194,7 +188,7 @@ bool TSoundOutputDeviceImp::doCloseDevice()
 			if (!not_closed)
 				break;
 		}
-		//return false;
+		// return false;
 	}
 	ioctl(m_dev, SNDCTL_DSP_RESET, 0);
 	m_dev = -1;
@@ -220,13 +214,11 @@ bool TSoundOutputDeviceImp::verifyRate()
 {
 	std::set<int>::iterator it;
 
-	for (it = m_supportedRate.begin();
-		 it != m_supportedRate.end(); ++it) {
+	for (it = m_supportedRate.begin(); it != m_supportedRate.end(); ++it) {
 		int sampleRate = *it;
 		if (ioctl(m_dev, SNDCTL_DSP_SPEED, &sampleRate) == -1)
-			throw TSoundDeviceException(
-				TSoundDeviceException::UnablePrepare,
-				"Failed setting the specified sample rate  aaaa");
+			throw TSoundDeviceException(TSoundDeviceException::UnablePrepare,
+										"Failed setting the specified sample rate  aaaa");
 		if (sampleRate != *it)
 			m_supportedRate.erase(*it);
 	}
@@ -242,43 +234,29 @@ void TSoundOutputDeviceImp::checkSupportedFormat()
 {
 	if (!m_supportFormats.empty())
 		return;
-	int test_formats[] = {
-		AFMT_U8,
-		AFMT_S8,
-		AFMT_S16_LE,
-		AFMT_S16_BE,
-		/* // servono per supportare traccie a 24 e 32 bit ma non compaiono in 
-   // nessun file linux/soundcard.h in distribuzione sulle macchine che abbiamo
-   // il che fa pensare che non sono supportati ancora
-   AFMT_S32_LE,  
-   AFMT_S32_BE,  
-*/
-		0};
+	int test_formats[] = {AFMT_U8, AFMT_S8, AFMT_S16_LE, AFMT_S16_BE,
+						  /* // servono per supportare traccie a 24 e 32 bit ma non compaiono in
+					 // nessun file linux/soundcard.h in distribuzione sulle macchine che abbiamo
+					 // il che fa pensare che non sono supportati ancora
+					 AFMT_S32_LE,
+					 AFMT_S32_BE,
+				  */
+						  0};
 
-	int test_channels[] = {
-		1,
-		2,
-		0};
+	int test_channels[] = {1, 2, 0};
 
-	TUINT32 test_sample_rates[] = {
-		8000,
-		11025,
-		16000,
-		22050,
-		32000,
-		44100,
-		48000,
-		0};
+	TUINT32 test_sample_rates[] = {8000, 11025, 16000, 22050, 32000, 44100, 48000, 0};
 
 	// Open the device nonblocking, so the open call returns immediately.
 	if (m_dev)
 		if ((m_dev = open("/dev/dsp", O_WRONLY | O_NONBLOCK)) == -1) {
 			/*
-      m_dev = -1;
-      string errMsg = strerror(errno);
-      throw TSoundDeviceException(
-				  TSoundDeviceException::UnableOpenDevice, errMsg + " /dev/dsp\n: impossible check supported formats");
-      */
+	  m_dev = -1;
+	  string errMsg = strerror(errno);
+	  throw TSoundDeviceException(
+				  TSoundDeviceException::UnableOpenDevice, errMsg + " /dev/dsp\n: impossible check
+	  supported formats");
+	  */
 			return;
 		}
 
@@ -289,7 +267,7 @@ void TSoundOutputDeviceImp::checkSupportedFormat()
 	  throw TSoundDeviceException(
 			TSoundDeviceException::UnsupportedFormat,
 			"Getting supported formats failed.");
-    */
+	*/
 		return;
 	} else {
 		for (int i = 0; test_formats[i] != 0; i++) {
@@ -304,7 +282,7 @@ void TSoundOutputDeviceImp::checkSupportedFormat()
 				int fmt = test_formats[i];
 				// Try to set the format...
 				if (ioctl(m_dev, SNDCTL_DSP_SETFMT, &fmt) == -1)
-					continue; //gli altri formati potrebbero essere supportati
+					continue; // gli altri formati potrebbero essere supportati
 				else {
 					// and always check the variable after doing an ioctl!
 					if (fmt == test_formats[i]) {
@@ -316,17 +294,20 @@ void TSoundOutputDeviceImp::checkSupportedFormat()
 
 							// Try to set the channel number.
 							if (ioctl(m_dev, SNDCTL_DSP_CHANNELS, &test_channel) == -1)
-								continue; //altri canali potrebbero essere supportati
+								continue; // altri canali potrebbero essere supportati
 							else {
 								if (test_channel == test_channels[j]) {
-									// Last step: Test the supported sample rates for the current channel number
+									// Last step: Test the supported sample rates for the current
+									// channel number
 									//            and format.
-									// Note: If you need a sample rate that is not tested here, simply add it to
-									//       the definition of the array test_sample_rates in this file.
+									// Note: If you need a sample rate that is not tested here,
+									// simply add it to
+									//       the definition of the array test_sample_rates in this
+									//       file.
 									for (int k = 0; test_sample_rates[k] != 0; k++) {
 										TUINT32 test_rate = test_sample_rates[k];
 										if (ioctl(m_dev, SNDCTL_DSP_SPEED, &test_rate) == -1)
-											continue; //altri rates ppotrebbero essere supportati
+											continue; // altri rates ppotrebbero essere supportati
 										else {
 											bool sign = true;
 											int bits;
@@ -338,12 +319,15 @@ void TSoundOutputDeviceImp::checkSupportedFormat()
 											} else if (fmt == AFMT_S16_LE || fmt == AFMT_S16_BE)
 												bits = 16;
 											/*// vedi commento alla variabile test_formats
-                      else if(fmt == AFMT_S32_LE || fmt == AFMT_S32_BE)
-                        bits = 24;
-                      */
+					  else if(fmt == AFMT_S32_LE || fmt == AFMT_S32_BE)
+						bits = 24;
+					  */
 											// Add it to the format in the input property.
-											//std::cout << test_rate << " " <<bits<<" "<<test_channel<<std::endl;
-											m_supportFormats.insert(std::make_pair(test_rate, TSoundTrackFormat(test_rate, bits, test_channel, sign)));
+											// std::cout << test_rate << " " <<bits<<"
+											// "<<test_channel<<std::endl;
+											m_supportFormats.insert(std::make_pair(
+												test_rate, TSoundTrackFormat(test_rate, bits,
+																			 test_channel, sign)));
 										}
 									}
 								} // loop over the test_sample_rates
@@ -357,18 +341,19 @@ void TSoundOutputDeviceImp::checkSupportedFormat()
 			// This is necessary to configure it to another format in a secure way.
 			if (close(m_dev) == -1) {
 				/*
-        throw TSoundDeviceException(
+		throw TSoundDeviceException(
 				  TSoundDeviceException::UnableCloseDevice,
 				  "Problem to close the output device checking formats");
-        */
+		*/
 				continue;
 			} else if ((m_dev = open("/dev/dsp", O_WRONLY | O_NONBLOCK)) == -1) {
 				/*
-        m_dev = -1;
-        string errMsg = strerror(errno);
-        throw TSoundDeviceException(
-				    TSoundDeviceException::UnableOpenDevice, errMsg + " /dev/dsp\n: impossible check supported formats");
-        */
+		m_dev = -1;
+		string errMsg = strerror(errno);
+		throw TSoundDeviceException(
+					TSoundDeviceException::UnableOpenDevice, errMsg + " /dev/dsp\n: impossible check
+		supported formats");
+		*/
 				return;
 			}
 		} // format set correctly ?
@@ -378,14 +363,14 @@ void TSoundOutputDeviceImp::checkSupportedFormat()
 
 	if (close(m_dev) == -1) {
 		/*
-    throw TSoundDeviceException(
+	throw TSoundDeviceException(
 			TSoundDeviceException::UnableCloseDevice,
 			"Problem to close the output device checking formats");
-    */
+	*/
 		return;
 	} else
 		m_dev = -1;
-	//std::cout << "FINITO " << m_supportFormats.size()<< std::endl;
+	// std::cout << "FINITO " << m_supportFormats.size()<< std::endl;
 }
 
 //------------------------------------------------------------------------------
@@ -400,7 +385,8 @@ bool TSoundOutputDeviceImp::isSupportFormat(const TSoundTrackFormat &fmt)
 	}
 
 	std::multimap<TUINT32, TSoundTrackFormat>::iterator it;
-	pair<std::multimap<TUINT32, TSoundTrackFormat>::iterator, std::multimap<TUINT32, TSoundTrackFormat>::iterator> findRange;
+	pair<std::multimap<TUINT32, TSoundTrackFormat>::iterator,
+		 std::multimap<TUINT32, TSoundTrackFormat>::iterator> findRange;
 	findRange = m_supportFormats.equal_range(fmt.m_sampleRate);
 
 	it = findRange.first;
@@ -439,21 +425,18 @@ void TSoundOutputDeviceImp::setFormat(const TSoundTrackFormat &fmt)
 
 	status = ioctl(m_dev, SNDCTL_DSP_SETFMT, &bps);
 	if (status == -1) {
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnablePrepare,
-			"Failed setting the specified number of bits");
+		throw TSoundDeviceException(TSoundDeviceException::UnablePrepare,
+									"Failed setting the specified number of bits");
 	}
 
 	status = ioctl(m_dev, SNDCTL_DSP_CHANNELS, &ch);
 	if (status == -1)
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnablePrepare,
-			"Failed setting the specified number of channel");
+		throw TSoundDeviceException(TSoundDeviceException::UnablePrepare,
+									"Failed setting the specified number of channel");
 
 	if (ioctl(m_dev, SNDCTL_DSP_SPEED, &sampleRate) == -1)
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnablePrepare,
-			"Failed setting the specified sample rate");
+		throw TSoundDeviceException(TSoundDeviceException::UnablePrepare,
+									"Failed setting the specified sample rate");
 
 	if (ch != fmt.m_channelCount || bps != bitPerSample || sampleRate != fmt.m_sampleRate) {
 		doCloseDevice();
@@ -469,7 +452,7 @@ class TPlayTask : public TThread::Runnable
 {
 	SmartWatch *m_stopWatch;
 
-public:
+  public:
 	TSoundOutputDeviceImp *m_devImp;
 	TSoundTrackP m_sndtrack;
 	static int m_skipBytes;
@@ -506,9 +489,9 @@ void TPlayTask::run()
 
 	TThread::milestone();
 	double startupDelay = m_stopWatch->getTotalTime();
-	//std::cout << "ritardo iniziale " << startupDelay << std::endl;
+	// std::cout << "ritardo iniziale " << startupDelay << std::endl;
 	int miss = 0;
-	m_stopWatch->start(); //e' meglio ignorare il ritardo iniziale
+	m_stopWatch->start(); // e' meglio ignorare il ritardo iniziale
 	if (done > 0) {
 		m_stopWatch->addDelay(((done / sampleSize) * 1000) / double(m_sndtrack->getSampleRate()));
 	}
@@ -519,10 +502,10 @@ void TPlayTask::run()
 	TSoundTrackP dst = src;
 	TSoundTrackP newSrc = src;
 	try {
-		do //gia' tracce accodate
+		do // gia' tracce accodate
 		{
 			bool changeSnd = false;
-			do //c'e' il flag loop settato
+			do // c'e' il flag loop settato
 			{
 				while ((bytesLeft > 0)) {
 					TThread::milestone();
@@ -535,22 +518,26 @@ void TPlayTask::run()
 					double curTime = m_stopWatch->getTotalTime();
 					double delta = curTime - trackTime;
 
-					/* 
+					/*
 					 delta
 									 == 0 sync
-									 <	 0 audio piu' veloce del tempo di playback  --> simuliamo un ritardo con un continue;
-									 >  0 audio piu' lento del playback -> skip una porzione di audio
+									 <	 0 audio piu' veloce del tempo di playback  --> simuliamo
+					 un ritardo con un continue;
+									 >  0 audio piu' lento del playback -> skip una porzione di
+					 audio
 				 */
 
 					const double minDelay = -10;
 					const double maxDelay = 0;
-					//if (delta>maxDelay)
-					//std::cout << "buffer underrun:" << delta << std::endl;
-					//std::cout << "buffer " << (delta<minDelay?"overrun":delta>maxDelay?"underrun":"sync")  << " " << delta<< std::endl;
+					// if (delta>maxDelay)
+					// std::cout << "buffer underrun:" << delta << std::endl;
+					// std::cout << "buffer " <<
+					// (delta<minDelay?"overrun":delta>maxDelay?"underrun":"sync")  << " " <<
+					// delta<< std::endl;
 
-					if (delta < minDelay) //overrun
+					if (delta < minDelay) // overrun
 					{
-						//std::cout << "out of sync -> audio troppo veloce" << std::endl;
+						// std::cout << "out of sync -> audio troppo veloce" << std::endl;
 						continue;
 					}
 
@@ -561,27 +548,28 @@ void TPlayTask::run()
 
 					int fragmentsFree_bytes = info.fragsize * info.fragments;
 					if (fragmentsFree_bytes == 0) {
-						//std::cout << "no bytes left on device" << std::endl;
+						// std::cout << "no bytes left on device" << std::endl;
 						continue;
 					}
 
 					int bytesToSkip = 0;
 					bytesToSkipNext = 0;
-					if (delta > maxDelay) //underrun
+					if (delta > maxDelay) // underrun
 					{
-						//std::cout << "out of sync -> audio troppo lento"<<std::endl;
-						//skip di una porzione... delta in ms
-						bytesToSkip = tceil(delta * msToBytes); //numero di bytes da skippare
-						//lo arrotondo al sample size
+						// std::cout << "out of sync -> audio troppo lento"<<std::endl;
+						// skip di una porzione... delta in ms
+						bytesToSkip = tceil(delta * msToBytes); // numero di bytes da skippare
+						// lo arrotondo al sample size
 						bytesToSkip += sampleSize - (bytesToSkip % sampleSize);
-						//std::cout << "bytes skippati "<< bytesToSkip << std::endl;
-					} else { //sto fra minDelay e maxDelay
+						// std::cout << "bytes skippati "<< bytesToSkip << std::endl;
+					} else { // sto fra minDelay e maxDelay
 						bytesToSkip = 0;
 					}
 
 					bytesToSkipNext = bytesToSkip;
 					bytesToSkip = tmin(bytesLeft, bytesToSkip);
-					bytesToSkipNext -= bytesToSkip; //se !=0 => la corrente traccia non basta per avere il sync
+					bytesToSkipNext -=
+						bytesToSkip; // se !=0 => la corrente traccia non basta per avere il sync
 					bytesLeft -= bytesToSkip;
 					done += bytesToSkip;
 
@@ -590,19 +578,21 @@ void TPlayTask::run()
 					assert(bytesToWrite >= 0);
 					assert(bytesToWriteNext >= 0);
 
-					if (bytesToWrite % info.fragsize != 0) { //cerco di gestire il write di un frammento non intero
+					if (bytesToWrite % info.fragsize !=
+						0) { // cerco di gestire il write di un frammento non intero
 						auxbuffersize = ((bytesToWrite / info.fragsize) + 1) * info.fragsize;
 					} else
 						auxbuffersize = 0;
 
 					//--------------write
-					if (bytesToSkipNext == 0) //la corrente traccia basta per lo skip
+					if (bytesToSkipNext == 0) // la corrente traccia basta per lo skip
 					{
 						std::cout << " QUI 0 " << std::endl;
-						dst = m_sndtrack->extract(done / sampleSize, (done + bytesToWrite) / sampleSize);
+						dst = m_sndtrack->extract(done / sampleSize,
+												  (done + bytesToWrite) / sampleSize);
 						if (bytesToSkip != 0) {
-							//costruisco traccia su cui fare il crossfade
-							//utilizzo il contenuto della traccia di crossfade
+							// costruisco traccia su cui fare il crossfade
+							// utilizzo il contenuto della traccia di crossfade
 							dst = TSop::crossFade(0.2, src, dst);
 						}
 						char *auxbuf = new char[fragmentsFree_bytes];
@@ -613,7 +603,8 @@ void TPlayTask::run()
 								offset += bytesToWriteNext;
 								preWrittenBytes = bytesToWriteNext;
 								memcpy(auxbuf + offset, buf, preWrittenBytes);
-								newSrc = m_sndtrack->extract(preWrittenBytes / sampleSize, preWrittenBytes / sampleSize);
+								newSrc = m_sndtrack->extract(preWrittenBytes / sampleSize,
+															 preWrittenBytes / sampleSize);
 								std::cout << " QUI 1" << std::endl;
 							} else {
 								while (!m_devImp->m_waitingTracks.empty()) {
@@ -626,41 +617,50 @@ void TPlayTask::run()
 										offset += count;
 										std::cout << " QUI 2" << std::endl;
 										if (m_devImp->m_waitingTracks[0].second) {
-											m_devImp->m_looped = m_devImp->m_waitingTracks[0].second;
-											m_devImp->m_waitingTracks.erase(m_devImp->m_waitingTracks.begin());
-											newSrc = m_sndtrack->extract(count / sampleSize, count / sampleSize);
+											m_devImp->m_looped =
+												m_devImp->m_waitingTracks[0].second;
+											m_devImp->m_waitingTracks.erase(
+												m_devImp->m_waitingTracks.begin());
+											newSrc = m_sndtrack->extract(count / sampleSize,
+																		 count / sampleSize);
 											m_sndtrack = st;
 											preWrittenBytes = 0;
 											std::cout << " QUI 3" << std::endl;
 											break;
 										}
-										m_devImp->m_waitingTracks.erase(m_devImp->m_waitingTracks.begin());
-										newSrc = m_sndtrack->extract(count / sampleSize, count / sampleSize);
+										m_devImp->m_waitingTracks.erase(
+											m_devImp->m_waitingTracks.begin());
+										newSrc = m_sndtrack->extract(count / sampleSize,
+																	 count / sampleSize);
 									} else {
 										m_sndtrack = st;
 										m_devImp->m_looped = m_devImp->m_waitingTracks[0].second;
 										preWrittenBytes = bytesToWriteNext;
 										buf = (char *)m_sndtrack->getRawData();
 										memcpy(auxbuf + offset, buf, bytesToWriteNext);
-										m_devImp->m_waitingTracks.erase(m_devImp->m_waitingTracks.begin());
-										newSrc = m_sndtrack->extract((bytesToWriteNext) / sampleSize, (bytesToWriteNext) / sampleSize);
+										m_devImp->m_waitingTracks.erase(
+											m_devImp->m_waitingTracks.begin());
+										newSrc =
+											m_sndtrack->extract((bytesToWriteNext) / sampleSize,
+																(bytesToWriteNext) / sampleSize);
 										std::cout << " QUI 4" << std::endl;
 										break;
 									}
-								} //end while
+								} // end while
 							}
 
 							if (fragmentsFree_bytes > offset) {
 								std::cout << " QUI 5" << std::endl;
 								int val = m_sndtrack->isSampleSigned() ? 0 : 127;
-								memset(auxbuf + offset, val, fragmentsFree_bytes - offset); // ci metto silenzio
+								memset(auxbuf + offset, val,
+									   fragmentsFree_bytes - offset); // ci metto silenzio
 								newSrc = TSoundTrack::create(m_sndtrack->getFormat(), 1);
 							}
 						}
 
 						written = write(m_devImp->m_dev, auxbuf, fragmentsFree_bytes);
 						delete[] auxbuf;
-					} else //devo skippare anche parte di una delle seguenti
+					} else // devo skippare anche parte di una delle seguenti
 					{
 						std::cout << " QUI 6a" << std::endl;
 						assert(bytesToWriteNext > 0);
@@ -668,9 +668,11 @@ void TPlayTask::run()
 						assert(bytesToWrite == 0);
 						assert(bytesToSkip != 0);
 						char *auxbuf = new char[fragmentsFree_bytes];
-						//memcpy(auxbuf, buf+done, bytesToWrite);
-						//TSoundTrackP subCross = m_sndtrack->extract((done+bytesToWrite)/sampleSize, (done+bytesToWrite)/sampleSize);
-						//togli quelle da skippare
+						// memcpy(auxbuf, buf+done, bytesToWrite);
+						// TSoundTrackP subCross =
+						// m_sndtrack->extract((done+bytesToWrite)/sampleSize,
+						// (done+bytesToWrite)/sampleSize);
+						// togli quelle da skippare
 						int backupSkipNext = bytesToSkipNext;
 						while (!m_devImp->m_waitingTracks.empty()) {
 							TSoundTrackP st = m_devImp->m_waitingTracks[0].first;
@@ -688,20 +690,29 @@ void TPlayTask::run()
 								break;
 							}
 						}
-						//scrivi byteWriteNext fai crossfade e cerca quella successiva
-						//con cui riempire
-						TINT32 displacement = 0; //deve essere in munero di campioni non bytes
-						dst = TSoundTrack::create(m_sndtrack->getFormat(), (fragmentsFree_bytes - bytesToWrite) / sampleSize);
+						// scrivi byteWriteNext fai crossfade e cerca quella successiva
+						// con cui riempire
+						TINT32 displacement = 0; // deve essere in munero di campioni non bytes
+						dst =
+							TSoundTrack::create(m_sndtrack->getFormat(),
+												(fragmentsFree_bytes - bytesToWrite) / sampleSize);
 						int count = m_sndtrack->getSampleCount() * sampleSize;
-						if (count >= bytesToSkipNext + bytesToWriteNext) //la traccia trovata e' suff sia per skippare che per scrivere
+						if (count >= bytesToSkipNext + bytesToWriteNext) // la traccia trovata e'
+																		 // suff sia per skippare
+																		 // che per scrivere
 						{
 							preWrittenBytes = bytesToSkipNext + bytesToWriteNext;
-							dst = m_sndtrack->extract(bytesToSkipNext / sampleSize, preWrittenBytes / sampleSize);
-							newSrc = m_sndtrack->extract(preWrittenBytes / sampleSize, preWrittenBytes / sampleSize);
-						} else //non e' suff per scrivere
+							dst = m_sndtrack->extract(bytesToSkipNext / sampleSize,
+													  preWrittenBytes / sampleSize);
+							newSrc = m_sndtrack->extract(preWrittenBytes / sampleSize,
+														 preWrittenBytes / sampleSize);
+						} else // non e' suff per scrivere
 						{
-							dst->copy(m_sndtrack->extract(bytesToSkipNext / sampleSize, m_sndtrack->getSampleCount() - 1), 0);
-							displacement = m_sndtrack->getSampleCount() - bytesToSkipNext / sampleSize;
+							dst->copy(m_sndtrack->extract(bytesToSkipNext / sampleSize,
+														  m_sndtrack->getSampleCount() - 1),
+									  0);
+							displacement =
+								m_sndtrack->getSampleCount() - bytesToSkipNext / sampleSize;
 							bytesToWriteNext -= displacement * sampleSize;
 							while (!m_devImp->m_waitingTracks.empty()) {
 								TSoundTrackP st = m_devImp->m_waitingTracks[0].first;
@@ -714,24 +725,31 @@ void TPlayTask::run()
 									if (m_devImp->m_waitingTracks[0].second) {
 										std::cout << " QUI 9" << std::endl;
 										m_devImp->m_looped = m_devImp->m_waitingTracks[0].second;
-										m_devImp->m_waitingTracks.erase(m_devImp->m_waitingTracks.begin());
-										newSrc = m_sndtrack->extract(count / sampleSize, count / sampleSize);
+										m_devImp->m_waitingTracks.erase(
+											m_devImp->m_waitingTracks.begin());
+										newSrc = m_sndtrack->extract(count / sampleSize,
+																	 count / sampleSize);
 										m_sndtrack = st;
 										break;
 									}
-									m_devImp->m_waitingTracks.erase(m_devImp->m_waitingTracks.begin());
-									newSrc = m_sndtrack->extract(count / sampleSize, count / sampleSize);
+									m_devImp->m_waitingTracks.erase(
+										m_devImp->m_waitingTracks.begin());
+									newSrc =
+										m_sndtrack->extract(count / sampleSize, count / sampleSize);
 								} else {
 									std::cout << " QUI 10" << std::endl;
-									dst->copy(st->extract(0L, bytesToWriteNext / sampleSize), displacement);
+									dst->copy(st->extract(0L, bytesToWriteNext / sampleSize),
+											  displacement);
 									m_sndtrack = st;
 									m_devImp->m_looped = m_devImp->m_waitingTracks[0].second;
 									preWrittenBytes = bytesToWriteNext;
 									done = preWrittenBytes;
 									bytesLeft = m_sndtrack->getSampleCount() * sampleSize - done;
 									buf = (char *)m_sndtrack->getRawData();
-									m_devImp->m_waitingTracks.erase(m_devImp->m_waitingTracks.begin());
-									newSrc = m_sndtrack->extract(preWrittenBytes / sampleSize, preWrittenBytes / sampleSize);
+									m_devImp->m_waitingTracks.erase(
+										m_devImp->m_waitingTracks.begin());
+									newSrc = m_sndtrack->extract(preWrittenBytes / sampleSize,
+																 preWrittenBytes / sampleSize);
 									break;
 								}
 							}
@@ -739,11 +757,12 @@ void TPlayTask::run()
 						}
 
 						TSoundTrackP st = TSop::crossFade(0.2, src, dst);
-						memcpy(auxbuf + bytesToWrite, (char *)st->getRawData(), fragmentsFree_bytes - bytesToWrite);
+						memcpy(auxbuf + bytesToWrite, (char *)st->getRawData(),
+							   fragmentsFree_bytes - bytesToWrite);
 
-						//devo ricercare quella giusta che non deve essere skippata
-						//ma sostitutita come traccia corrente
-						//devo fare un cross fade
+						// devo ricercare quella giusta che non deve essere skippata
+						// ma sostitutita come traccia corrente
+						// devo fare un cross fade
 						written = write(m_devImp->m_dev, auxbuf, fragmentsFree_bytes);
 						delete[] auxbuf;
 					}
@@ -757,14 +776,15 @@ void TPlayTask::run()
 					std::cout << " update done 2" << std::endl;
 					bytesLeft -= written;
 					done += written;
-				} //chiudo il while((bytesLeft > 0))
+				} // chiudo il while((bytesLeft > 0))
 				std::cout << " QUI 11" << std::endl;
 				done = preWrittenBytes + bytesToSkipNext;
 				written = 0;
 				bytesLeft = m_sndtrack->getSampleCount() * sampleSize - done;
 				m_stopWatch->start();
 				if (done > 0) {
-					m_stopWatch->addDelay(((done / m_sndtrack->getSampleSize()) * 1000) / double(m_sndtrack->getSampleRate()));
+					m_stopWatch->addDelay(((done / m_sndtrack->getSampleSize()) * 1000) /
+										  double(m_sndtrack->getSampleRate()));
 				}
 				preWrittenBytes = 0;
 			} while (m_devImp->m_looped || changeSnd);
@@ -779,17 +799,19 @@ void TPlayTask::run()
 			done = 0;
 			written = 0;
 
-			m_stopWatch->start(); //ignoro il ritardo iniziale
+			m_stopWatch->start(); // ignoro il ritardo iniziale
 			if (done > 0) {
-				m_stopWatch->addDelay(((done / m_sndtrack->getSampleSize()) * 1000) / double(m_sndtrack->getSampleRate()));
+				m_stopWatch->addDelay(((done / m_sndtrack->getSampleSize()) * 1000) /
+									  double(m_sndtrack->getSampleRate()));
 			}
-		} while (true); //ci sono gia' tracce accodate
+		} while (true); // ci sono gia' tracce accodate
 
 		if (!m_devImp->m_waitingTracks.empty()) {
 			m_devImp->m_looped = m_devImp->m_waitingTracks[0].second;
-			m_devImp->m_executor.addTask(new TPlayTask(m_devImp, m_devImp->m_waitingTracks[0].first));
+			m_devImp->m_executor.addTask(
+				new TPlayTask(m_devImp, m_devImp->m_waitingTracks[0].first));
 			m_devImp->m_waitingTracks.erase(m_devImp->m_waitingTracks.begin());
-			//std::cout<<"OPS ..... erase 4"<<std::endl;
+			// std::cout<<"OPS ..... erase 4"<<std::endl;
 		} else if (m_devImp->m_dev != -1) {
 			if (ioctl(m_devImp->m_dev, SNDCTL_DSP_SYNC) == -1) {
 				std::cout << "unable to sync! " << std::endl;
@@ -800,7 +822,7 @@ void TPlayTask::run()
 			m_devImp->m_stopped = true;
 			m_devImp->m_looped = false;
 
-			//std::cout << "miss = " << miss << std::endl;
+			// std::cout << "miss = " << miss << std::endl;
 		}
 	} catch (TThread::Interrupt &e) {
 		std::cout << "Play interrupted " << e.getMessage() << std::endl;
@@ -828,9 +850,9 @@ void TPlayTask::run2()
 
 	TThread::milestone();
 	double startupDelay = m_stopWatch->getTotalTime();
-	//std::cout << "ritardo iniziale " << startupDelay << std::endl;
+	// std::cout << "ritardo iniziale " << startupDelay << std::endl;
 	int miss = 0;
-	m_stopWatch->start(); //e' meglio ignorare il ritardo iniziale
+	m_stopWatch->start(); // e' meglio ignorare il ritardo iniziale
 	if (done > 0) {
 		m_stopWatch->addDelay(((done / sampleSize) * 1000) / double(m_sndtrack->getSampleRate()));
 	}
@@ -839,10 +861,10 @@ void TPlayTask::run2()
 	TSoundTrackP src = TSoundTrack::create(m_sndtrack->getFormat(), 1);
 	TSoundTrackP dst = src;
 	try {
-		do //gia' tracce accodate
+		do // gia' tracce accodate
 		{
 			bool changeSnd = false;
-			do //c'e' il flag loop settato
+			do // c'e' il flag loop settato
 			{
 				while ((bytesLeft > 0)) {
 					changeSnd = false;
@@ -854,22 +876,26 @@ void TPlayTask::run2()
 					double curTime = m_stopWatch->getTotalTime();
 					double delta = curTime - trackTime;
 
-					/* 
+					/*
 					 delta
 									 == 0 sync
-									 <	 0 audio piu' veloce del tempo di playback  --> simuliamo un ritardo con un continue;
-									 >  0 audio piu' lento del playback -> skip una porzione di audio
+									 <	 0 audio piu' veloce del tempo di playback  --> simuliamo
+					 un ritardo con un continue;
+									 >  0 audio piu' lento del playback -> skip una porzione di
+					 audio
 				 */
 
 					const double minDelay = -10;
 					const double maxDelay = 0;
-					//if (delta>maxDelay)
-					//std::cout << "buffer underrun:" << delta << std::endl;
-					//std::cout << "buffer " << (delta<minDelay?"overrun":delta>maxDelay?"underrun":"sync")  << " " << delta<< std::endl;
+					// if (delta>maxDelay)
+					// std::cout << "buffer underrun:" << delta << std::endl;
+					// std::cout << "buffer " <<
+					// (delta<minDelay?"overrun":delta>maxDelay?"underrun":"sync")  << " " <<
+					// delta<< std::endl;
 
-					if (delta < minDelay) //overrun
+					if (delta < minDelay) // overrun
 					{
-						//std::cout << "out of sync -> audio troppo veloce" << std::endl;
+						// std::cout << "out of sync -> audio troppo veloce" << std::endl;
 						continue;
 					}
 
@@ -880,22 +906,22 @@ void TPlayTask::run2()
 
 					int fragmentsFree_bytes = info.fragsize * info.fragments;
 					if (fragmentsFree_bytes == 0) {
-						//std::cout << "no bytes left on device" << std::endl;
+						// std::cout << "no bytes left on device" << std::endl;
 						continue;
 					}
 
 					int bytesToSkip = 0;
 					int bigSkip = 0;
-					if (delta > maxDelay) //underrun
+					if (delta > maxDelay) // underrun
 					{
-						//std::cout << "out of sync -> audio troppo lento"<<std::endl;
-						//skip di una porzione... delta in ms
-						bytesToSkip = tceil(delta * msToBytes); //numero di bytes da skippare
-						//lo arrotondo al sample size
+						// std::cout << "out of sync -> audio troppo lento"<<std::endl;
+						// skip di una porzione... delta in ms
+						bytesToSkip = tceil(delta * msToBytes); // numero di bytes da skippare
+						// lo arrotondo al sample size
 						bytesToSkip += sampleSize - (bytesToSkip % sampleSize);
-						//std::cout << "bytes skippati "<< bytesToSkip << std::endl;
+						// std::cout << "bytes skippati "<< bytesToSkip << std::endl;
 						bigSkip = bytesToSkip;
-					} else { //sto fra minDelay e maxDelay
+					} else { // sto fra minDelay e maxDelay
 						bytesToSkip = 0;
 					}
 
@@ -906,7 +932,8 @@ void TPlayTask::run2()
 
 					bytesToWrite = tmin(bytesLeft, fragmentsFree_bytes);
 
-					if (bytesToWrite % info.fragsize != 0) { //cerco di gestire il write di un frammento non intero
+					if (bytesToWrite % info.fragsize !=
+						0) { // cerco di gestire il write di un frammento non intero
 						auxbuffersize = ((bytesToWrite / info.fragsize) + 1) * info.fragsize;
 					}
 
@@ -924,86 +951,117 @@ void TPlayTask::run2()
 					preWrittenBytes = 0;
 					if (auxbuffersize == 0) {
 						if (bytesToSkip != 0) {
-							//costruisco traccia su cui fare il crossfade
-							//utilizzo il contenuto della traccia di crossfade
-							dst = m_sndtrack->extract(done / sampleSize, (done + bytesToWrite) / sampleSize);
+							// costruisco traccia su cui fare il crossfade
+							// utilizzo il contenuto della traccia di crossfade
+							dst = m_sndtrack->extract(done / sampleSize,
+													  (done + bytesToWrite) / sampleSize);
 							TSoundTrackP st = TSop::crossFade(0.2, src, dst);
 							char *buffer = (char *)st->getRawData();
 							written = write(m_devImp->m_dev, buffer, bytesToWrite);
 						} else
 							written = write(m_devImp->m_dev, buf + done, bytesToWrite);
-						src = m_sndtrack->extract((done + bytesToWrite) / sampleSize, (done + bytesToWrite) / sampleSize);
-					} else { //auxbuffersize != 0 sse il numero di bytes residui nella traccia e' inferiore alla dimensione del frammento
+						src = m_sndtrack->extract((done + bytesToWrite) / sampleSize,
+												  (done + bytesToWrite) / sampleSize);
+					} else { // auxbuffersize != 0 sse il numero di bytes residui nella traccia e'
+							 // inferiore alla dimensione del frammento
 						char *auxbuf = new char[auxbuffersize];
 						TSoundTrackP newSrc;
-						dst = TSoundTrack::create(m_sndtrack->getFormat(), auxbuffersize / sampleSize);
+						dst = TSoundTrack::create(m_sndtrack->getFormat(),
+												  auxbuffersize / sampleSize);
 						memcpy(auxbuf, buf + done, bytesToWrite);
-						dst->copy(m_sndtrack->extract(done / sampleSize, (done + bytesToWrite) / sampleSize), 0);
+						dst->copy(m_sndtrack->extract(done / sampleSize,
+													  (done + bytesToWrite) / sampleSize),
+								  0);
 						preWrittenBytes = auxbuffersize - bytesToWrite;
 						if (m_devImp->m_looped) {
 							memcpy(auxbuf + bytesToWrite, buf, preWrittenBytes);
-							dst->copy(m_sndtrack->extract(0, preWrittenBytes / sampleSize), bytesToWrite / sampleSize);
-							newSrc = m_sndtrack->extract(preWrittenBytes / sampleSize, preWrittenBytes / sampleSize);
+							dst->copy(m_sndtrack->extract(0, preWrittenBytes / sampleSize),
+									  bytesToWrite / sampleSize);
+							newSrc = m_sndtrack->extract(preWrittenBytes / sampleSize,
+														 preWrittenBytes / sampleSize);
 						} else {
 							newSrc = TSoundTrack::create(m_sndtrack->getFormat(), 1);
 							static int added = 0;
-							//se non c'e' alcuna altra traccia o e di diverso format
-							//riempo il frammento con del silenzio
+							// se non c'e' alcuna altra traccia o e di diverso format
+							// riempo il frammento con del silenzio
 							if (m_devImp->m_waitingTracks.empty() ||
-								(m_sndtrack->getFormat() != m_devImp->m_waitingTracks[0].first->getFormat())) {
+								(m_sndtrack->getFormat() !=
+								 m_devImp->m_waitingTracks[0].first->getFormat())) {
 								int val = m_sndtrack->isSampleSigned() ? 0 : 127;
-								memset(auxbuf + bytesToWrite, val, preWrittenBytes); // ci metto silenzio
+								memset(auxbuf + bytesToWrite, val,
+									   preWrittenBytes); // ci metto silenzio
 							} else
-								while (true) //ci sono altre tracce accodate
+								while (true) // ci sono altre tracce accodate
 								{
 									TSoundTrackP st = m_devImp->m_waitingTracks[0].first;
 									int sampleBytes = st->getSampleCount() * st->getSampleSize();
 									if (sampleBytes >= preWrittenBytes - added) {
-										//La traccia ha abbastanza campioni per riempire il frammento
-										//quindi la sostituisco alla corrente del runnable e continuo
+										// La traccia ha abbastanza campioni per riempire il
+										// frammento
+										// quindi la sostituisco alla corrente del runnable e
+										// continuo
 										buf = (char *)st->getRawData();
 										memcpy(auxbuf + bytesToWrite, buf, preWrittenBytes - added);
 										m_sndtrack = st;
 										m_devImp->m_looped = m_devImp->m_waitingTracks[0].second;
-										m_devImp->m_waitingTracks.erase(m_devImp->m_waitingTracks.begin());
+										m_devImp->m_waitingTracks.erase(
+											m_devImp->m_waitingTracks.begin());
 										changeSnd = true;
-										dst->copy(m_sndtrack->extract(0, (preWrittenBytes - added) / sampleSize), bytesToWrite / sampleSize + added);
-										newSrc = m_sndtrack->extract((preWrittenBytes - added) / sampleSize, (preWrittenBytes - added) / sampleSize);
+										dst->copy(m_sndtrack->extract(0, (preWrittenBytes - added) /
+																			 sampleSize),
+												  bytesToWrite / sampleSize + added);
+										newSrc = m_sndtrack->extract(
+											(preWrittenBytes - added) / sampleSize,
+											(preWrittenBytes - added) / sampleSize);
 										break;
-									} else { //occhio al loop
-											 //La traccia successiva e' piu corta del frammento da riempire quindi
-											 //ce la metto tutta e se non ha il flag di loop settato cerco di aggiungere
-											 //i byte della successiva
-										memcpy(auxbuf + bytesToWrite, st->getRawData(), sampleBytes);
-										dst->copy(st->extract(0, st->getSampleCount() - 1), bytesToWrite / sampleSize);
+									} else { // occhio al loop
+										// La traccia successiva e' piu corta del frammento da
+										// riempire quindi
+										// ce la metto tutta e se non ha il flag di loop settato
+										// cerco di aggiungere
+										// i byte della successiva
+										memcpy(auxbuf + bytesToWrite, st->getRawData(),
+											   sampleBytes);
+										dst->copy(st->extract(0, st->getSampleCount() - 1),
+												  bytesToWrite / sampleSize);
 										added += st->getSampleCount();
-										if (m_devImp->m_waitingTracks[0].second) //e' quella che deve essere in loop
+										if (m_devImp->m_waitingTracks[0]
+												.second) // e' quella che deve essere in loop
 										{
 											buf = (char *)st->getRawData();
 											m_sndtrack = st;
-											m_devImp->m_looped = m_devImp->m_waitingTracks[0].second;
+											m_devImp->m_looped =
+												m_devImp->m_waitingTracks[0].second;
 											preWrittenBytes = 0;
 											bytesLeft = 0;
-											m_devImp->m_waitingTracks.erase(m_devImp->m_waitingTracks.begin());
+											m_devImp->m_waitingTracks.erase(
+												m_devImp->m_waitingTracks.begin());
 											changeSnd = true;
 											break;
 										}
 
-										//la elimino e vedo se esiste la successiva altrimenti metto campioni "zero"
-										m_devImp->m_waitingTracks.erase(m_devImp->m_waitingTracks.begin());
+										// la elimino e vedo se esiste la successiva altrimenti
+										// metto campioni "zero"
+										m_devImp->m_waitingTracks.erase(
+											m_devImp->m_waitingTracks.begin());
 										if (!m_devImp->m_waitingTracks.empty()) {
 											st = m_devImp->m_waitingTracks[0].first;
-											std::cout << " Traccia con meno campioni cerco la successiva" << std::endl;
+											std::cout
+												<< " Traccia con meno campioni cerco la successiva"
+												<< std::endl;
 										} else {
 											int val = m_sndtrack->isSampleSigned() ? 0 : 127;
-											memset(auxbuf + bytesToWrite, val, preWrittenBytes - sampleBytes); // ci metto silenzio
+											memset(auxbuf + bytesToWrite, val,
+												   preWrittenBytes -
+													   sampleBytes); // ci metto silenzio
 											std::cout << "OPS ..... silence" << std::endl;
 											break;
 										}
 									}
-								} //end while(true)
+								} // end while(true)
 						}
-						//qui andrebbe fatto un cross-fade se c'erano da skippare campioni => bytesToSkip != 0
+						// qui andrebbe fatto un cross-fade se c'erano da skippare campioni =>
+						// bytesToSkip != 0
 						if (bytesToSkip != 0) {
 							TSoundTrackP st = TSop::crossFade(0.2, src, dst);
 							char *buffer = (char *)st->getRawData();
@@ -1020,22 +1078,23 @@ void TPlayTask::run2()
 						break;
 					bytesLeft -= written;
 					done += written;
-				} //chiudo il while((bytesLeft > 0))
+				} // chiudo il while((bytesLeft > 0))
 				done = preWrittenBytes;
 				written = 0;
 				bytesLeft = m_sndtrack->getSampleCount() * m_sndtrack->getSampleSize() - done;
 				m_stopWatch->start();
 				if (done > 0) {
-					m_stopWatch->addDelay(((done / m_sndtrack->getSampleSize()) * 1000) / double(m_sndtrack->getSampleRate()));
+					m_stopWatch->addDelay(((done / m_sndtrack->getSampleSize()) * 1000) /
+										  double(m_sndtrack->getSampleRate()));
 				}
 			} while (m_devImp->m_looped || changeSnd);
 
 			if (m_devImp->m_waitingTracks.empty()) {
-				//std::cout<<"OPS ..... non accodato"<<std::endl;
+				// std::cout<<"OPS ..... non accodato"<<std::endl;
 				break;
 			}
 
-			//std::cout<<"OPS ..... accodato"<<std::endl;
+			// std::cout<<"OPS ..... accodato"<<std::endl;
 			m_sndtrack = m_devImp->m_waitingTracks[0].first;
 			m_devImp->m_looped = m_devImp->m_waitingTracks[0].second;
 			m_devImp->m_waitingTracks.erase(m_devImp->m_waitingTracks.begin());
@@ -1044,17 +1103,19 @@ void TPlayTask::run2()
 			done = 0;
 			written = 0;
 
-			m_stopWatch->start(); //ignoro il ritardo iniziale
+			m_stopWatch->start(); // ignoro il ritardo iniziale
 			if (done > 0) {
-				m_stopWatch->addDelay(((done / m_sndtrack->getSampleSize()) * 1000) / double(m_sndtrack->getSampleRate()));
+				m_stopWatch->addDelay(((done / m_sndtrack->getSampleSize()) * 1000) /
+									  double(m_sndtrack->getSampleRate()));
 			}
-		} while (true); //ci sono gia' tracce accodate
+		} while (true); // ci sono gia' tracce accodate
 
 		if (!m_devImp->m_waitingTracks.empty()) {
 			m_devImp->m_looped = m_devImp->m_waitingTracks[0].second;
-			m_devImp->m_executor.addTask(new TPlayTask(m_devImp, m_devImp->m_waitingTracks[0].first));
+			m_devImp->m_executor.addTask(
+				new TPlayTask(m_devImp, m_devImp->m_waitingTracks[0].first));
 			m_devImp->m_waitingTracks.erase(m_devImp->m_waitingTracks.begin());
-			//std::cout<<"OPS ..... erase 4"<<std::endl;
+			// std::cout<<"OPS ..... erase 4"<<std::endl;
 		} else if (m_devImp->m_dev != -1) {
 			if (ioctl(m_devImp->m_dev, SNDCTL_DSP_SYNC) == -1) {
 				std::cout << "unable to sync! " << std::endl;
@@ -1065,7 +1126,7 @@ void TPlayTask::run2()
 			m_devImp->m_stopped = true;
 			m_devImp->m_looped = false;
 
-			//std::cout << "miss = " << miss << std::endl;
+			// std::cout << "miss = " << miss << std::endl;
 		}
 	} catch (TThread::Interrupt &e) {
 		std::cout << "Play interrupted " << e.getMessage() << std::endl;
@@ -1088,9 +1149,8 @@ TSoundOutputDevice::TSoundOutputDevice() : m_imp(new TSoundOutputDeviceImp)
 		m_imp->insertAllRate();
 		try {
 			if (!m_imp->verifyRate())
-				throw TSoundDeviceException(
-					TSoundDeviceException::UnablePrepare,
-					"No default samplerate are supported");
+				throw TSoundDeviceException(TSoundDeviceException::UnablePrepare,
+											"No default samplerate are supported");
 		} catch (TSoundDeviceException &e) {
 			throw TSoundDeviceException(e.getType(), e.getMessage());
 		}
@@ -1139,9 +1199,8 @@ bool TSoundOutputDevice::close()
 	if (m_imp->m_dev != -1) {
 		bool closed = m_imp->doCloseDevice();
 		if (!closed)
-			throw TSoundDeviceException(
-				TSoundDeviceException::UnableCloseDevice,
-				"Error during the closing of the output device");
+			throw TSoundDeviceException(TSoundDeviceException::UnableCloseDevice,
+										"Error during the closing of the output device");
 	}
 	return true;
 }
@@ -1162,7 +1221,8 @@ void TSoundOutputDevice::detach(TSoundOutputDeviceListener *listener)
 
 //------------------------------------------------------------------------------
 
-void TSoundOutputDevice::play(const TSoundTrackP &st, TINT32 s0, TINT32 s1, bool loop, bool scrubbing)
+void TSoundOutputDevice::play(const TSoundTrackP &st, TINT32 s0, TINT32 s1, bool loop,
+							  bool scrubbing)
 {
 	assert((scrubbing && !loop) || !scrubbing);
 	if (!st->getSampleCount())
@@ -1176,16 +1236,15 @@ void TSoundOutputDevice::play(const TSoundTrackP &st, TINT32 s0, TINT32 s1, bool
 
 	TSoundTrackFormat format = st->getFormat();
 	if (!m_imp->isSupportFormat(format)) {
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnsupportedFormat,
-			"Unsupported format for playback");
+		throw TSoundDeviceException(TSoundDeviceException::UnsupportedFormat,
+									"Unsupported format for playback");
 	}
 
 	if (m_imp->m_isPlaying) {
 		assert(s1 >= s0);
 		TSoundTrackP subTrack = st->extract(s0, s1);
 		m_imp->m_waitingTracks.push_back(std::make_pair(subTrack, loop));
-		//std::cout<<"Sono in pushback"<<std::endl;
+		// std::cout<<"Sono in pushback"<<std::endl;
 		return;
 	}
 
@@ -1201,7 +1260,7 @@ void TSoundOutputDevice::play(const TSoundTrackP &st, TINT32 s0, TINT32 s1, bool
 	m_imp->m_isPlaying = true;
 	m_imp->m_stopped = false;
 	m_imp->m_looped = loop;
-	//m_imp->m_currentFormat = st->getFormat();
+	// m_imp->m_currentFormat = st->getFormat();
 
 	assert(s1 >= s0);
 	TSoundTrackP subTrack = st->extract(s0, s1);
@@ -1228,32 +1287,27 @@ double TSoundOutputDevice::getVolume()
 {
 	int mixer;
 	if ((mixer = openMixer()) < 0)
-		throw TSoundDeviceException(
-			TSoundDeviceException::NoMixer,
-			"Can't open the mixer device");
+		throw TSoundDeviceException(TSoundDeviceException::NoMixer, "Can't open the mixer device");
 
 	int devmask;
 	if (ioctl(mixer, SOUND_MIXER_READ_DEVMASK, &devmask) == -1) {
 		::close(mixer);
-		throw TSoundDeviceException(
-			TSoundDeviceException::NoMixer,
-			"Error in ioctl with mixer device");
+		throw TSoundDeviceException(TSoundDeviceException::NoMixer,
+									"Error in ioctl with mixer device");
 	}
 
 	int recmask;
 	if (ioctl(mixer, SOUND_MIXER_READ_RECMASK, &recmask) == -1) {
 		::close(mixer);
-		throw TSoundDeviceException(
-			TSoundDeviceException::NoMixer,
-			"Error in ioctl with mixer device");
+		throw TSoundDeviceException(TSoundDeviceException::NoMixer,
+									"Error in ioctl with mixer device");
 	}
 
 	int stereo;
 	if (ioctl(mixer, SOUND_MIXER_READ_STEREODEVS, &stereo) == -1) {
 		::close(mixer);
-		throw TSoundDeviceException(
-			TSoundDeviceException::NoMixer,
-			"Error in ioctl with mixer device");
+		throw TSoundDeviceException(TSoundDeviceException::NoMixer,
+									"Error in ioctl with mixer device");
 	}
 
 	int outmask = devmask | ~recmask;
@@ -1267,9 +1321,8 @@ double TSoundOutputDevice::getVolume()
 	int level;
 	if (ioctl(mixer, MIXER_READ(index), &level) == -1) {
 		::close(mixer);
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnableVolume,
-			"Error to read the volume");
+		throw TSoundDeviceException(TSoundDeviceException::UnableVolume,
+									"Error to read the volume");
 	}
 	if ((1 << index) & stereo) {
 		int left = level & 0xff;
@@ -1288,32 +1341,27 @@ bool TSoundOutputDevice::setVolume(double volume)
 {
 	int mixer;
 	if ((mixer = openMixer()) < 0)
-		throw TSoundDeviceException(
-			TSoundDeviceException::NoMixer,
-			"Can't open the mixer device");
+		throw TSoundDeviceException(TSoundDeviceException::NoMixer, "Can't open the mixer device");
 
 	int devmask;
 	if (ioctl(mixer, SOUND_MIXER_READ_DEVMASK, &devmask) == -1) {
 		::close(mixer);
-		throw TSoundDeviceException(
-			TSoundDeviceException::NoMixer,
-			"Error in ioctl with mixer device");
+		throw TSoundDeviceException(TSoundDeviceException::NoMixer,
+									"Error in ioctl with mixer device");
 	}
 
 	int recmask;
 	if (ioctl(mixer, SOUND_MIXER_READ_DEVMASK, &recmask) == -1) {
 		::close(mixer);
-		throw TSoundDeviceException(
-			TSoundDeviceException::NoMixer,
-			"Error in ioctl with mixer device");
+		throw TSoundDeviceException(TSoundDeviceException::NoMixer,
+									"Error in ioctl with mixer device");
 	}
 
 	int stereo;
 	if (ioctl(mixer, SOUND_MIXER_READ_STEREODEVS, &stereo) == -1) {
 		::close(mixer);
-		throw TSoundDeviceException(
-			TSoundDeviceException::NoMixer,
-			"Error in ioctl with mixer device");
+		throw TSoundDeviceException(TSoundDeviceException::NoMixer,
+									"Error in ioctl with mixer device");
 	}
 
 	int outmask = devmask | ~recmask;
@@ -1328,9 +1376,8 @@ bool TSoundOutputDevice::setVolume(double volume)
 
 		if (!writeVolume(vol, mixer, index)) {
 			::close(mixer);
-			throw TSoundDeviceException(
-				TSoundDeviceException::UnableVolume,
-				"Can't write the volume");
+			throw TSoundDeviceException(TSoundDeviceException::UnableVolume,
+										"Can't write the volume");
 		}
 
 		// metto anche l'altro ad un livello di sensibilita' adeguata
@@ -1345,9 +1392,8 @@ bool TSoundOutputDevice::setVolume(double volume)
 
 			if (!writeVolume(vol, mixer, index)) {
 				::close(mixer);
-				throw TSoundDeviceException(
-					TSoundDeviceException::UnableVolume,
-					"Can't write the volume");
+				throw TSoundDeviceException(TSoundDeviceException::UnableVolume,
+											"Can't write the volume");
 			}
 		}
 	} else if (outmask & (1 << SOUND_MIXER_PCM)) {
@@ -1360,9 +1406,7 @@ bool TSoundOutputDevice::setVolume(double volume)
 
 		if (!writeVolume(vol, mixer, index)) {
 			::close(mixer);
-			throw TSoundDeviceException(
-				TSoundDeviceException::NoMixer,
-				"Can't write the volume");
+			throw TSoundDeviceException(TSoundDeviceException::NoMixer, "Can't write the volume");
 		}
 	}
 
@@ -1400,32 +1444,27 @@ bool TSoundOutputDevice::supportsVolume()
 {
 	int mixer;
 	if ((mixer = openMixer()) < 0)
-		throw TSoundDeviceException(
-			TSoundDeviceException::NoMixer,
-			"Can't open the mixer device");
+		throw TSoundDeviceException(TSoundDeviceException::NoMixer, "Can't open the mixer device");
 
 	int devmask;
 	if (ioctl(mixer, SOUND_MIXER_READ_DEVMASK, &devmask) == -1) {
 		::close(mixer);
-		throw TSoundDeviceException(
-			TSoundDeviceException::NoMixer,
-			"Error in ioctl with mixer device");
+		throw TSoundDeviceException(TSoundDeviceException::NoMixer,
+									"Error in ioctl with mixer device");
 	}
 
 	int recmask;
 	if (ioctl(mixer, SOUND_MIXER_READ_DEVMASK, &recmask) == -1) {
 		::close(mixer);
-		throw TSoundDeviceException(
-			TSoundDeviceException::NoMixer,
-			"Error in ioctl with mixer device");
+		throw TSoundDeviceException(TSoundDeviceException::NoMixer,
+									"Error in ioctl with mixer device");
 	}
 
 	int stereo;
 	if (ioctl(mixer, SOUND_MIXER_READ_STEREODEVS, &stereo) == -1) {
 		::close(mixer);
-		throw TSoundDeviceException(
-			TSoundDeviceException::NoMixer,
-			"Error in ioctl with mixer device");
+		throw TSoundDeviceException(TSoundDeviceException::NoMixer,
+									"Error in ioctl with mixer device");
 	}
 
 	int outmask = devmask | ~recmask;
@@ -1440,8 +1479,8 @@ bool TSoundOutputDevice::supportsVolume()
 
 //------------------------------------------------------------------------------
 
-TSoundTrackFormat TSoundOutputDevice::getPreferredFormat(
-	TUINT32 sampleRate, int channelCount, int bitPerSample)
+TSoundTrackFormat TSoundOutputDevice::getPreferredFormat(TUINT32 sampleRate, int channelCount,
+														 int bitPerSample)
 {
 	TSoundTrackFormat fmt;
 	if (bitPerSample == 8)
@@ -1470,38 +1509,33 @@ TSoundTrackFormat TSoundOutputDevice::getPreferredFormat(
 	status = ioctl(m_imp->m_dev, SNDCTL_DSP_SETFMT, &bitPerSample);
 	if (status == -1) {
 		perror("CHE palle ");
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnablePrepare,
-			"Failed setting the specified number of bits");
+		throw TSoundDeviceException(TSoundDeviceException::UnablePrepare,
+									"Failed setting the specified number of bits");
 	}
 	fmt.m_bitPerSample = bitPerSample;
 
 	status = ioctl(m_imp->m_dev, SNDCTL_DSP_CHANNELS, &channelCount);
 	if (status == -1)
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnablePrepare,
-			"Failed setting the specified number of channel");
+		throw TSoundDeviceException(TSoundDeviceException::UnablePrepare,
+									"Failed setting the specified number of channel");
 	fmt.m_channelCount = channelCount;
 
 	if (m_imp->m_supportedRate.find((int)sampleRate) == m_imp->m_supportedRate.end()) {
 		std::set<int>::iterator it = m_imp->m_supportedRate.lower_bound((int)sampleRate);
 		if (it == m_imp->m_supportedRate.end()) {
-			it = std::max_element(m_imp->m_supportedRate.begin(),
-								  m_imp->m_supportedRate.end());
+			it = std::max_element(m_imp->m_supportedRate.begin(), m_imp->m_supportedRate.end());
 			if (it != m_imp->m_supportedRate.end())
 				sampleRate = *(m_imp->m_supportedRate.rbegin());
 			else
-				throw TSoundDeviceException(
-					TSoundDeviceException::UnsupportedFormat,
-					"There isn't a supported rate");
+				throw TSoundDeviceException(TSoundDeviceException::UnsupportedFormat,
+											"There isn't a supported rate");
 		} else
 			sampleRate = *it;
 	}
 
 	if (ioctl(m_imp->m_dev, SNDCTL_DSP_SPEED, &sampleRate) == -1)
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnablePrepare,
-			"Failed setting the specified sample rate");
+		throw TSoundDeviceException(TSoundDeviceException::UnablePrepare,
+									"Failed setting the specified sample rate");
 	fmt.m_sampleRate = sampleRate;
 
 	if (ch != channelCount || bps != bitPerSample) {
@@ -1512,12 +1546,11 @@ TSoundTrackFormat TSoundOutputDevice::getPreferredFormat(
 }
 
 //------------------------------------------------------------------------------
-TSoundTrackFormat TSoundOutputDevice::getPreferredFormat(
-	const TSoundTrackFormat &format)
+TSoundTrackFormat TSoundOutputDevice::getPreferredFormat(const TSoundTrackFormat &format)
 {
 	try {
-		return getPreferredFormat(
-			format.m_sampleRate, format.m_channelCount, format.m_bitPerSample);
+		return getPreferredFormat(format.m_sampleRate, format.m_channelCount,
+								  format.m_bitPerSample);
 	} catch (TSoundDeviceException &e) {
 		throw TSoundDeviceException(e.getType(), e.getMessage());
 	}
@@ -1531,7 +1564,7 @@ TSoundTrackFormat TSoundOutputDevice::getPreferredFormat(
 
 class TSoundInputDeviceImp
 {
-public:
+  public:
 	int m_dev;
 	bool m_stopped;
 	bool m_isRecording;
@@ -1547,14 +1580,14 @@ public:
 	TThread::Executor m_executor;
 
 	TSoundInputDeviceImp()
-		: m_dev(-1), m_stopped(false), m_isRecording(false), m_st(0), m_supportedRate(), m_recordedBlocks(), m_samplePerBlocks(), m_oneShotRecording(false)
+		: m_dev(-1), m_stopped(false), m_isRecording(false), m_st(0), m_supportedRate(),
+		  m_recordedBlocks(), m_samplePerBlocks(), m_oneShotRecording(false)
 	{
 	}
 
 	~TSoundInputDeviceImp() {}
 
-	bool doOpenDevice(const TSoundTrackFormat &format,
-					  TSoundInputDevice::Source devType);
+	bool doOpenDevice(const TSoundTrackFormat &format, TSoundInputDevice::Source devType);
 	bool doCloseDevice();
 	void insertAllRate();
 	bool verifyRate();
@@ -1567,11 +1600,10 @@ bool TSoundInputDeviceImp::doOpenDevice(const TSoundTrackFormat &format,
 {
 	m_dev = open("/dev/dsp", O_RDONLY);
 	if (m_dev < 0)
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnableOpenDevice,
-			"Cannot open the dsp device");
+		throw TSoundDeviceException(TSoundDeviceException::UnableOpenDevice,
+									"Cannot open the dsp device");
 
-	//ioctl(m_dev, SNDCTL_DSP_RESET,0);
+	// ioctl(m_dev, SNDCTL_DSP_RESET,0);
 
 	return true;
 }
@@ -1581,9 +1613,8 @@ bool TSoundInputDeviceImp::doOpenDevice(const TSoundTrackFormat &format,
 bool TSoundInputDeviceImp::doCloseDevice()
 {
 	if (close(m_dev) < 0)
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnableCloseDevice,
-			"Cannot close the dsp device");
+		throw TSoundDeviceException(TSoundDeviceException::UnableCloseDevice,
+									"Cannot close the dsp device");
 	m_dev = -1;
 	return true;
 }
@@ -1607,13 +1638,11 @@ bool TSoundInputDeviceImp::verifyRate()
 {
 	std::set<int>::iterator it;
 
-	for (it = m_supportedRate.begin();
-		 it != m_supportedRate.end(); ++it) {
+	for (it = m_supportedRate.begin(); it != m_supportedRate.end(); ++it) {
 		int sampleRate = *it;
 		if (ioctl(m_dev, SNDCTL_DSP_SPEED, &sampleRate) == -1)
-			throw TSoundDeviceException(
-				TSoundDeviceException::UnablePrepare,
-				"Failed setting the specified sample rate");
+			throw TSoundDeviceException(TSoundDeviceException::UnablePrepare,
+										"Failed setting the specified sample rate");
 		if (sampleRate != *it)
 			m_supportedRate.erase(*it);
 	}
@@ -1626,11 +1655,10 @@ bool TSoundInputDeviceImp::verifyRate()
 
 class TRecordTask : public TThread::Runnable
 {
-public:
+  public:
 	TSoundInputDeviceImp *m_devImp;
 
-	TRecordTask(TSoundInputDeviceImp *devImp)
-		: Runnable(), m_devImp(devImp){};
+	TRecordTask(TSoundInputDeviceImp *devImp) : Runnable(), m_devImp(devImp){};
 
 	~TRecordTask(){};
 
@@ -1704,16 +1732,14 @@ TSoundInputDevice::TSoundInputDevice() : m_imp(new TSoundInputDeviceImp)
 {
 	m_imp->m_dev = open("/dev/dsp", O_RDONLY);
 	if (m_imp->m_dev < 0)
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnableOpenDevice,
-			"Cannot open the dsp device");
+		throw TSoundDeviceException(TSoundDeviceException::UnableOpenDevice,
+									"Cannot open the dsp device");
 
 	m_imp->insertAllRate();
 	try {
 		if (!m_imp->verifyRate())
-			throw TSoundDeviceException(
-				TSoundDeviceException::UnablePrepare,
-				"No default samplerate are supported");
+			throw TSoundDeviceException(TSoundDeviceException::UnablePrepare,
+										"No default samplerate are supported");
 	} catch (TSoundDeviceException &e) {
 		throw TSoundDeviceException(e.getType(), e.getMessage());
 	}
@@ -1749,22 +1775,20 @@ void TSoundInputDevice::record(const TSoundTrackFormat &format, TSoundInputDevic
 	m_imp->m_recordedBlocks.clear();
 	m_imp->m_samplePerBlocks.clear();
 
-	//registra creando una nuova traccia
+	// registra creando una nuova traccia
 	m_imp->m_oneShotRecording = false;
 	try {
 		if (m_imp->m_dev == -1)
 			m_imp->doOpenDevice(format, type);
 
 		if (!selectInputDevice(type))
-			throw TSoundDeviceException(
-				TSoundDeviceException::UnableSetDevice,
-				"Input device is not supported for recording");
+			throw TSoundDeviceException(TSoundDeviceException::UnableSetDevice,
+										"Input device is not supported for recording");
 
 		TSoundTrackFormat fmt = getPreferredFormat(format);
 		if (fmt != format)
-			throw TSoundDeviceException(
-				TSoundDeviceException::UnsupportedFormat,
-				"Unsupported format");
+			throw TSoundDeviceException(TSoundDeviceException::UnsupportedFormat,
+										"Unsupported format");
 	} catch (TSoundDeviceException &e) {
 		throw TSoundDeviceException(e.getType(), e.getMessage());
 	}
@@ -1783,13 +1807,13 @@ void TSoundInputDevice::record(const TSoundTrackFormat &format, TSoundInputDevic
 	m_imp->m_stopped = false;
 	m_imp->m_recordedSampleCount = 0;
 
-	//far partire il thread
+	// far partire il thread
 	/*TRecordThread *recordThread = new TRecordThread(m_imp);
-    if (!recordThread)
-    throw TSoundDeviceException(
-    TSoundDeviceException::UnablePrepare,
-    "Problemi per creare il thread");
-    recordThread->start();*/
+	if (!recordThread)
+	throw TSoundDeviceException(
+	TSoundDeviceException::UnablePrepare,
+	"Problemi per creare il thread");
+	recordThread->start();*/
 	m_imp->m_executor.addTask(new TRecordTask(m_imp));
 }
 
@@ -1805,15 +1829,13 @@ void TSoundInputDevice::record(const TSoundTrackP &st, TSoundInputDevice::Source
 			m_imp->doOpenDevice(st->getFormat(), type);
 
 		if (!selectInputDevice(type))
-			throw TSoundDeviceException(
-				TSoundDeviceException::UnableSetDevice,
-				"Input device is not supported for recording");
+			throw TSoundDeviceException(TSoundDeviceException::UnableSetDevice,
+										"Input device is not supported for recording");
 
 		TSoundTrackFormat fmt = getPreferredFormat(st->getFormat());
 		if (fmt != st->getFormat())
-			throw TSoundDeviceException(
-				TSoundDeviceException::UnsupportedFormat,
-				"Unsupported format");
+			throw TSoundDeviceException(TSoundDeviceException::UnsupportedFormat,
+										"Unsupported format");
 
 		if (getVolume() == 0.0) {
 			double volume = 5.0;
@@ -1823,7 +1845,7 @@ void TSoundInputDevice::record(const TSoundTrackP &st, TSoundInputDevice::Source
 		throw TSoundDeviceException(e.getType(), e.getMessage());
 	}
 
-	//Sovrascive un'intera o parte di traccia gia' esistente
+	// Sovrascive un'intera o parte di traccia gia' esistente
 	m_imp->m_oneShotRecording = true;
 	m_imp->m_currentFormat = st->getFormat();
 	m_imp->m_isRecording = true;
@@ -1833,13 +1855,13 @@ void TSoundInputDevice::record(const TSoundTrackP &st, TSoundInputDevice::Source
 
 	m_imp->m_recordedBlocks.push_back((char *)st->getRawData());
 
-	//far partire il thread
+	// far partire il thread
 	/*TRecordThread *recordThread = new TRecordThread(m_imp);
-    if (!recordThread)
-    throw TSoundDeviceException(
-    TSoundDeviceException::UnablePrepare,
-    "Problemi per creare il thread");
-    recordThread->start();*/
+	if (!recordThread)
+	throw TSoundDeviceException(
+	TSoundDeviceException::UnablePrepare,
+	"Problemi per creare il thread");
+	recordThread->start();*/
 	m_imp->m_executor.addTask(new TRecordTask(m_imp));
 }
 
@@ -1871,10 +1893,8 @@ TSoundTrackP TSoundInputDevice::stop()
 		TINT32 bytesCopied = 0;
 
 		for (int i = 0; i < (int)m_imp->m_recordedBlocks.size(); ++i) {
-			memcpy(
-				(void *)(st->getRawData() + bytesCopied),
-				m_imp->m_recordedBlocks[i],
-				m_imp->m_samplePerBlocks[i]);
+			memcpy((void *)(st->getRawData() + bytesCopied), m_imp->m_recordedBlocks[i],
+				   m_imp->m_samplePerBlocks[i]);
 			delete[] m_imp->m_recordedBlocks[i];
 
 			bytesCopied += m_imp->m_samplePerBlocks[i];
@@ -1891,32 +1911,27 @@ double TSoundInputDevice::getVolume()
 {
 	int mixer;
 	if ((mixer = openMixer()) < 0)
-		throw TSoundDeviceException(
-			TSoundDeviceException::NoMixer,
-			"Can't have the mixer");
+		throw TSoundDeviceException(TSoundDeviceException::NoMixer, "Can't have the mixer");
 
 	int index;
 	if ((index = getCurrentRecordSource(mixer)) == -1) {
 		::close(mixer);
-		throw TSoundDeviceException(
-			TSoundDeviceException::NoMixer,
-			"Can't obtain information by mixer");
+		throw TSoundDeviceException(TSoundDeviceException::NoMixer,
+									"Can't obtain information by mixer");
 	}
 
 	int stereo;
 	if (ioctl(mixer, SOUND_MIXER_READ_STEREODEVS, &stereo) == -1) {
 		::close(mixer);
-		throw TSoundDeviceException(
-			TSoundDeviceException::NoMixer,
-			"Can't obtain information by mixer");
+		throw TSoundDeviceException(TSoundDeviceException::NoMixer,
+									"Can't obtain information by mixer");
 	}
 
 	int level;
 	if (ioctl(mixer, MIXER_READ(index), &level) == -1) {
 		::close(mixer);
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnableVolume,
-			"Can't read the volume value");
+		throw TSoundDeviceException(TSoundDeviceException::UnableVolume,
+									"Can't read the volume value");
 	}
 
 	if ((1 << index) & stereo) {
@@ -1936,25 +1951,21 @@ bool TSoundInputDevice::setVolume(double volume)
 {
 	int mixer;
 	if ((mixer = openMixer()) < 0)
-		throw TSoundDeviceException(
-			TSoundDeviceException::NoMixer,
-			"Can't have the mixer");
+		throw TSoundDeviceException(TSoundDeviceException::NoMixer, "Can't have the mixer");
 
 	int caps;
 	if (ioctl(mixer, SOUND_MIXER_READ_CAPS, &caps) == -1) {
 		::close(mixer);
-		throw TSoundDeviceException(
-			TSoundDeviceException::NoMixer,
-			"Can't obtain information by mixer");
+		throw TSoundDeviceException(TSoundDeviceException::NoMixer,
+									"Can't obtain information by mixer");
 	}
 
 	if (!(caps & SOUND_CAP_EXCL_INPUT)) {
 		int rec;
 		if (ioctl(mixer, SOUND_MIXER_READ_RECMASK, &rec) == -1) {
 			::close(mixer);
-			throw TSoundDeviceException(
-				TSoundDeviceException::NoMixer,
-				"Can't obtain information by mixer");
+			throw TSoundDeviceException(TSoundDeviceException::NoMixer,
+										"Can't obtain information by mixer");
 		}
 		int i;
 		int nosound = 0;
@@ -1962,26 +1973,23 @@ bool TSoundInputDevice::setVolume(double volume)
 			if (rec & (1 << i))
 				if (!writeVolume(nosound, mixer, i)) {
 					::close(mixer);
-					throw TSoundDeviceException(
-						TSoundDeviceException::UnableVolume,
-						"Can't set the volume value");
+					throw TSoundDeviceException(TSoundDeviceException::UnableVolume,
+												"Can't set the volume value");
 				}
 	}
 
 	int index;
 	if ((index = getCurrentRecordSource(mixer)) == -1) {
 		::close(mixer);
-		throw TSoundDeviceException(
-			TSoundDeviceException::NoMixer,
-			"Can't obtain information by mixer");
+		throw TSoundDeviceException(TSoundDeviceException::NoMixer,
+									"Can't obtain information by mixer");
 	}
 
 	int stereo;
 	if (ioctl(mixer, SOUND_MIXER_READ_STEREODEVS, &stereo) == -1) {
 		::close(mixer);
-		throw TSoundDeviceException(
-			TSoundDeviceException::NoMixer,
-			"Can't obtain information by mixer");
+		throw TSoundDeviceException(TSoundDeviceException::NoMixer,
+									"Can't obtain information by mixer");
 	}
 
 	int vol;
@@ -1993,9 +2001,8 @@ bool TSoundInputDevice::setVolume(double volume)
 
 	if (!writeVolume(vol, mixer, index)) {
 		::close(mixer);
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnableVolume,
-			"Can't write the volume value");
+		throw TSoundDeviceException(TSoundDeviceException::UnableVolume,
+									"Can't write the volume value");
 	}
 	::close(mixer);
 	return true;
@@ -2010,8 +2017,8 @@ bool TSoundInputDevice::isRecording()
 
 //------------------------------------------------------------------------------
 
-TSoundTrackFormat TSoundInputDevice::getPreferredFormat(
-	TUINT32 sampleRate, int channelCount, int bitPerSample)
+TSoundTrackFormat TSoundInputDevice::getPreferredFormat(TUINT32 sampleRate, int channelCount,
+														int bitPerSample)
 {
 	TSoundTrackFormat fmt;
 	int status;
@@ -2026,39 +2033,32 @@ TSoundTrackFormat TSoundInputDevice::getPreferredFormat(
 
 	status = ioctl(m_imp->m_dev, SNDCTL_DSP_SETFMT, &bitPerSample);
 	if (status == -1)
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnablePrepare,
-			"Failed setting the specified number of bits");
+		throw TSoundDeviceException(TSoundDeviceException::UnablePrepare,
+									"Failed setting the specified number of bits");
 	fmt.m_bitPerSample = bitPerSample;
 
 	status = ioctl(m_imp->m_dev, SNDCTL_DSP_CHANNELS, &channelCount);
 	if (status == -1)
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnablePrepare,
-			"Failed setting the specified number of channel");
+		throw TSoundDeviceException(TSoundDeviceException::UnablePrepare,
+									"Failed setting the specified number of channel");
 	fmt.m_channelCount = channelCount;
 
-	if (m_imp->m_supportedRate.find((int)sampleRate) ==
-		m_imp->m_supportedRate.end()) {
-		std::set<int>::iterator it =
-			m_imp->m_supportedRate.lower_bound((int)sampleRate);
+	if (m_imp->m_supportedRate.find((int)sampleRate) == m_imp->m_supportedRate.end()) {
+		std::set<int>::iterator it = m_imp->m_supportedRate.lower_bound((int)sampleRate);
 		if (it == m_imp->m_supportedRate.end()) {
-			it = std::max_element(m_imp->m_supportedRate.begin(),
-								  m_imp->m_supportedRate.end());
+			it = std::max_element(m_imp->m_supportedRate.begin(), m_imp->m_supportedRate.end());
 			if (it != m_imp->m_supportedRate.end())
 				sampleRate = *(m_imp->m_supportedRate.rbegin());
 			else
-				throw TSoundDeviceException(
-					TSoundDeviceException::UnsupportedFormat,
-					"There isn't a supported rate");
+				throw TSoundDeviceException(TSoundDeviceException::UnsupportedFormat,
+											"There isn't a supported rate");
 		} else
 			sampleRate = *it;
 	}
 
 	if (ioctl(m_imp->m_dev, SNDCTL_DSP_SPEED, &sampleRate) == -1)
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnablePrepare,
-			"Failed setting the specified sample rate");
+		throw TSoundDeviceException(TSoundDeviceException::UnablePrepare,
+									"Failed setting the specified sample rate");
 	fmt.m_sampleRate = sampleRate;
 
 	return fmt;
@@ -2066,12 +2066,11 @@ TSoundTrackFormat TSoundInputDevice::getPreferredFormat(
 
 //------------------------------------------------------------------------------
 
-TSoundTrackFormat TSoundInputDevice::getPreferredFormat(
-	const TSoundTrackFormat &format)
+TSoundTrackFormat TSoundInputDevice::getPreferredFormat(const TSoundTrackFormat &format)
 {
 	try {
-		return getPreferredFormat(
-			format.m_sampleRate, format.m_channelCount, format.m_bitPerSample);
+		return getPreferredFormat(format.m_sampleRate, format.m_channelCount,
+								  format.m_bitPerSample);
 	} catch (TSoundDeviceException &e) {
 		throw TSoundDeviceException(e.getType(), e.getMessage());
 	}
@@ -2100,7 +2099,8 @@ string parseError(int error)
 	case ENOTTY:
 		return string("Fieldes isn't associated with a device that accepts control");
 	case ENXIO:
-		return string("Request/arg  valid, but the requested cannot be performed on this subdevice");
+		return string(
+			"Request/arg  valid, but the requested cannot be performed on this subdevice");
 	default:
 		return string("Unknown error");
 		break;
@@ -2221,7 +2221,7 @@ bool selectInputDevice(TSoundInputDevice::Source dev)
 	int mixer;
 	if ((mixer = openMixer()) < 0) {
 		close(mixer);
-		return false; //throw TException("Can't open the mixer device");
+		return false; // throw TException("Can't open the mixer device");
 	}
 	int index = isInputDeviceSupported(dev, mixer);
 	if (index == -1)
@@ -2243,7 +2243,7 @@ bool selectInputDevice(TSoundInputDevice::Source dev)
 
 	if (!controlEnableRecord(mixer)) {
 		close(mixer);
-		return false; //throw TException("Can't enable recording");
+		return false; // throw TException("Can't enable recording");
 	}
 	::close(mixer);
 	return true;

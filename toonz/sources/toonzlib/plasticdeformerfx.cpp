@@ -40,8 +40,8 @@ namespace
 std::string toString(const TAffine &aff)
 {
 	return
-		//Observe that toString distinguishes + and - 0. That is a problem
-		//when comparing aliases - so near 0 values are explicitly rounded to 0.
+		// Observe that toString distinguishes + and - 0. That is a problem
+		// when comparing aliases - so near 0 values are explicitly rounded to 0.
 		(areAlmostEqual(aff.a11, 0.0) ? "0" : ::toString(aff.a11, 5)) + "," +
 		(areAlmostEqual(aff.a12, 0.0) ? "0" : ::toString(aff.a12, 5)) + "," +
 		(areAlmostEqual(aff.a13, 0.0) ? "0" : ::toString(aff.a13, 5)) + "," +
@@ -99,8 +99,7 @@ std::string toString(const PlasticSkeletonDeformationP &sd, double sdFrame)
 //    PlasticDeformerFx  implementation
 //***************************************************************************************************
 
-PlasticDeformerFx::PlasticDeformerFx()
-	: TRasterFx()
+PlasticDeformerFx::PlasticDeformerFx() : TRasterFx()
 {
 	addInputPort("source", m_port);
 }
@@ -180,8 +179,8 @@ void PlasticDeformerFx::buildRenderSettings(double frame, TRenderSettings &info)
 
 //-----------------------------------------------------------------------------------
 
-bool PlasticDeformerFx::buildTextureDataSl(
-	double frame, TRenderSettings &info, TAffine &worldLevelToLevelAff)
+bool PlasticDeformerFx::buildTextureDataSl(double frame, TRenderSettings &info,
+										   TAffine &worldLevelToLevelAff)
 {
 	int row = (int)frame;
 
@@ -204,7 +203,8 @@ bool PlasticDeformerFx::buildTextureDataSl(
 
 	// Build reference transforms data
 
-	// NOTE: TAffine() corresponds to IMAGE coordinates here, not WORLD coordinates. This is achieved
+	// NOTE: TAffine() corresponds to IMAGE coordinates here, not WORLD coordinates. This is
+	// achieved
 	// by removing the level's dpi affine during render-tree build-up (see scenefx.cpp).
 
 	worldLevelToLevelAff = TScale(texDpi.x / Stage::inch, texDpi.y / Stage::inch);
@@ -214,8 +214,10 @@ bool PlasticDeformerFx::buildTextureDataSl(
 	// In the case of vector images, in order to retain the image quality required by info.m_affine,
 	// the scale component is allowed too.
 
-	// In the raster image case, we'll use the original image reference IF the affine is a magnification
-	// (ie the scale is > 1.0) - OTHERWISE, the OpenGL minification filter is too crude since it renders
+	// In the raster image case, we'll use the original image reference IF the affine is a
+	// magnification
+	// (ie the scale is > 1.0) - OTHERWISE, the OpenGL minification filter is too crude since it
+	// renders
 	// a fragment using its 4 adjacent pixels ONLY; in this case, we'll pass the affine below.
 
 	const TAffine &handledAff = TRasterFx::handledAffine(info, frame);
@@ -237,8 +239,8 @@ bool PlasticDeformerFx::buildTextureDataSl(
 
 //-----------------------------------------------------------------------------------
 
-bool PlasticDeformerFx::buildTextureData(
-	double frame, TRenderSettings &info, TAffine &worldLevelToLevelAff)
+bool PlasticDeformerFx::buildTextureData(double frame, TRenderSettings &info,
+										 TAffine &worldLevelToLevelAff)
 {
 	// Common case (typically happen with sub-xsheets)
 
@@ -307,7 +309,8 @@ void PlasticDeformerFx::doCompute(TTile &tile, double frame, const TRenderSettin
 	const TAffine &worldTexLevelToWorldMeshAff = m_texPlacement;
 	const TAffine &meshToWorldMeshAff = TScale(Stage::inch / meshDpi.x, Stage::inch / meshDpi.y);
 
-	const TAffine &meshToTexLevelAff = worldTexLevelToTexLevelAff * worldTexLevelToWorldMeshAff.inv() * meshToWorldMeshAff;
+	const TAffine &meshToTexLevelAff =
+		worldTexLevelToTexLevelAff * worldTexLevelToWorldMeshAff.inv() * meshToWorldMeshAff;
 	const TAffine &meshToTextureAff = imageToTextureAff * meshToTexLevelAff;
 
 	// Retrieve deformer data
@@ -315,8 +318,9 @@ void PlasticDeformerFx::doCompute(TTile &tile, double frame, const TRenderSettin
 	TScale worldMeshToMeshAff(meshDpi.x / Stage::inch, meshDpi.y / Stage::inch);
 
 	std::auto_ptr<const PlasticDeformerDataGroup> dataGroup(
-		PlasticDeformerStorage::instance()->processOnce(
-			sdFrame, mi.getPointer(), sd.getPointer(), sd->skeletonId(sdFrame), worldMeshToMeshAff));
+		PlasticDeformerStorage::instance()->processOnce(sdFrame, mi.getPointer(), sd.getPointer(),
+														sd->skeletonId(sdFrame),
+														worldMeshToMeshAff));
 
 	// Build texture
 
@@ -361,8 +365,7 @@ void PlasticDeformerFx::doCompute(TTile &tile, double frame, const TRenderSettin
 
 		// Draw
 		glPushMatrix();
-		tglMultMatrix(TTranslation(-tile.m_pos) * info.m_affine *
-					  meshToWorldMeshAff);
+		tglMultMatrix(TTranslation(-tile.m_pos) * info.m_affine * meshToWorldMeshAff);
 
 		glEnable(GL_BLEND);
 		glEnable(GL_TEXTURE_2D);
@@ -376,7 +379,8 @@ void PlasticDeformerFx::doCompute(TTile &tile, double frame, const TRenderSettin
 
 		// No need to disable stuff - the context dies here
 
-		// ts->unloadTexture(texId);                                // Auto-released due to display list destruction
+		// ts->unloadTexture(texId);                                // Auto-released due to display
+		// list destruction
 		context->doneCurrent();
 	}
 }
@@ -423,8 +427,8 @@ void PlasticDeformerFx::doDryCompute(TRectD &rect, double frame, const TRenderSe
 	const TAffine &worldImageToWorldMeshAff = m_texPlacement;
 	const TAffine &meshToWorldMeshAff = TScale(Stage::inch / meshDpi.x, Stage::inch / meshDpi.y);
 
-	const TAffine &meshToTextureAff =
-		textureToImageAff.inv() * worldTexLevelToTexLevelAff * worldImageToWorldMeshAff.inv() * meshToWorldMeshAff;
+	const TAffine &meshToTextureAff = textureToImageAff.inv() * worldTexLevelToTexLevelAff *
+									  worldImageToWorldMeshAff.inv() * meshToWorldMeshAff;
 
 	// Build the mesh's bounding box and map it to input reference
 	TRectD meshBBox(meshToTextureAff * mi->getBBox());

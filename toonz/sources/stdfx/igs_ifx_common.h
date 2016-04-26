@@ -19,38 +19,25 @@ namespace image
   */
 namespace rgba
 {
-enum num { blu = 0,
-		   gre,
-		   red,
-		   alp,
-		   siz };
+enum num { blu = 0, gre, red, alp, siz };
 }
 namespace rgb
 {
-enum num { blu = 0,
-		   gre,
-		   red,
-		   siz };
+enum num { blu = 0, gre, red, siz };
 }
 #elif defined RGBA_ORDER_OF_OPENGL
 // OpenGL order
 namespace rgba
 {
-enum num { red = 0,
-		   gre,
-		   blu,
-		   alp,
-		   siz };
+enum num { red = 0, gre, blu, alp, siz };
 }
 namespace rgb
 {
-enum num { red = 0,
-		   gre,
-		   blu,
-		   siz };
+enum num { red = 0, gre, blu, siz };
 }
 #else
-Must be define / DRGBA_ORDER_OF_TOONZ6 or / DRGBA_ORDER_OF_OPENGL
+Must be define / DRGBA_ORDER_OF_TOONZ6 or
+	/ DRGBA_ORDER_OF_OPENGL
 #endif
 
 // Direct 3D, Apple Packed Pixel order
@@ -60,8 +47,8 @@ Must be define / DRGBA_ORDER_OF_TOONZ6 or / DRGBA_ORDER_OF_OPENGL
 // namespace rgba {enum num { alp=0, blu, gre, red, siz }; }
 
 template <class T>
-void copy_except_margin(
-	const T *in, const int margin, T *out, const int hh, const int ww, const int cc)
+void copy_except_margin(const T *in, const int margin, T *out, const int hh, const int ww,
+						const int cc)
 {
 	const T *p_in = in + margin * (ww + margin * 2) * cc + margin * cc;
 	T *pout = out;
@@ -77,8 +64,7 @@ void copy_except_margin(
 namespace color
 {
 template <class T>
-double ref_value(
-	const T *ref, const int cc, const int ref_max, const int ref_mode)
+double ref_value(const T *ref, const int cc, const int ref_max, const int ref_mode)
 {
 	if (igs::image::rgba::siz == cc) {
 		using namespace igs::image::rgba;

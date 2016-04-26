@@ -16,37 +16,23 @@ namespace
 
 const char *s_version = "version",
 
-		   *s_generalConfiguration = "generalConfiguration",
-		   *s_outline = "outline",
-		   *s_threshold = "threshold",
-		   *s_leaveUnpainted = "leaveUnpainted",
+		   *s_generalConfiguration = "generalConfiguration", *s_outline = "outline",
+		   *s_threshold = "threshold", *s_leaveUnpainted = "leaveUnpainted",
 		   *s_visibilityBits = "visibilityBits",
 
-		   *s_Centerline = "Centerline",
-		   *s_despeckling = "despeckling",
-		   *s_maxThickness = "maxThickness",
-		   *s_penalty = "penalty",
-		   *s_thicknessRatio = "thicknessRatio",
-		   *s_makeFrame = "makeFrame",
+		   *s_Centerline = "Centerline", *s_despeckling = "despeckling",
+		   *s_maxThickness = "maxThickness", *s_penalty = "penalty",
+		   *s_thicknessRatio = "thicknessRatio", *s_makeFrame = "makeFrame",
 		   *s_naaSource = "naaSource",
 
-		   *s_accuracy = "accuracy",
-		   *s_thicknessRatioFirst = "thicknessRatioFirst",
-		   *s_thicknessRatioLast = "thicknessRatioLast",
-		   *s_paintFill = "paintFill",
+		   *s_accuracy = "accuracy", *s_thicknessRatioFirst = "thicknessRatioFirst",
+		   *s_thicknessRatioLast = "thicknessRatioLast", *s_paintFill = "paintFill",
 
-		   *s_Outline = "Outline",
-		   *s_adherenceTol = "adherenceTol",
-		   *s_angleTol = "angleTol",
-		   *s_relativeTol = "relativeTol",
-		   *s_mergeTol = "mergeTol",
-		   *s_maxColors = "maxColors",
-		   *s_transparentColor = "transparentColor",
-		   *s_toneTol = "toneTol",
+		   *s_Outline = "Outline", *s_adherenceTol = "adherenceTol", *s_angleTol = "angleTol",
+		   *s_relativeTol = "relativeTol", *s_mergeTol = "mergeTol", *s_maxColors = "maxColors",
+		   *s_transparentColor = "transparentColor", *s_toneTol = "toneTol",
 
-		   *s_adherence = "adherence",
-		   *s_angle = "angle",
-		   *s_relative = "relative",
+		   *s_adherence = "adherence", *s_angle = "angle", *s_relative = "relative",
 		   *s_toneThreshold = "toneThreshold";
 
 } // namespace
@@ -190,7 +176,7 @@ void convert(const CenterlineConfiguration &conf, VectorizerParameters &params)
 	params.m_cAccuracy = 10 - conf.m_penalty;
 	params.m_cDespeckling = conf.m_despeckling / 2.0;
 	params.m_cMaxThickness = conf.m_maxThickness * 2;
-	//params.m_cThicknessRatio        = centConf.m_thicknessRatio;
+	// params.m_cThicknessRatio        = centConf.m_thicknessRatio;
 	params.m_cThicknessRatioFirst = conf.m_thicknessRatio;
 	params.m_cThicknessRatioLast = conf.m_thicknessRatio;
 	params.m_cMakeFrame = conf.m_makeFrame;
@@ -246,7 +232,7 @@ CenterlineConfiguration VectorizerParameters::getCenterlineConfiguration(double 
 	conf.m_penalty = 10 - m_cAccuracy; // m_cAccuracy in [1,10]
 	conf.m_despeckling = m_cDespeckling * 2;
 	conf.m_maxThickness = m_cMaxThickness / 2.0;
-	//conf.m_thicknessRatio   = m_cThicknessRatio;
+	// conf.m_thicknessRatio   = m_cThicknessRatio;
 	conf.m_thicknessRatio = (1 - frame) * m_cThicknessRatioFirst + frame * m_cThicknessRatioLast;
 	conf.m_leaveUnpainted = !m_cPaintFill;
 	conf.m_makeFrame = m_cMakeFrame;

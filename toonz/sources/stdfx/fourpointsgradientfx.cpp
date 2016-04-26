@@ -8,8 +8,14 @@
 
 namespace
 {
-inline void pixelConvert(TPixel32 &dst, const TPixel32 &src) { dst = src; }
-inline void pixelConvert(TPixel64 &dst, const TPixel32 &src) { dst = toPixel64(src); }
+inline void pixelConvert(TPixel32 &dst, const TPixel32 &src)
+{
+	dst = src;
+}
+inline void pixelConvert(TPixel64 &dst, const TPixel32 &src)
+{
+	dst = toPixel64(src);
+}
 } // namespace
 
 class FourPointsGradientFx : public TStandardZeraryFx
@@ -25,9 +31,12 @@ class FourPointsGradientFx : public TStandardZeraryFx
 	TPixelParamP m_color3;
 	TPixelParamP m_color4;
 
-public:
+  public:
 	FourPointsGradientFx()
-		: m_point1(TPointD(200.0, 200.0)), m_point2(TPointD(-200.0, 200.0)), m_point3(TPointD(-200.0, -200.0)), m_point4(TPointD(200.0, -200.0)), m_color1(TPixel32::Red), m_color2(TPixel32::Green), m_color3(TPixel32::Blue), m_color4(TPixel32::Yellow)
+		: m_point1(TPointD(200.0, 200.0)), m_point2(TPointD(-200.0, 200.0)),
+		  m_point3(TPointD(-200.0, -200.0)), m_point4(TPointD(200.0, -200.0)),
+		  m_color1(TPixel32::Red), m_color2(TPixel32::Green), m_color3(TPixel32::Blue),
+		  m_color4(TPixel32::Yellow)
 	{
 		m_point1->getX()->setMeasureName("fxLength");
 		m_point1->getY()->setMeasureName("fxLength");
@@ -92,11 +101,9 @@ public:
 };
 
 template <typename PIXEL, typename CHANNEL_TYPE>
-void doFourPointsGradient(
-	const TRasterPT<PIXEL> &ras,
-	TPointD tilepos,
-	TPointD pos1, TPointD pos2, TPointD pos3, TPointD pos4,
-	TPixel32 ccol1, TPixel32 ccol2, TPixel32 ccol3, TPixel32 ccol4)
+void doFourPointsGradient(const TRasterPT<PIXEL> &ras, TPointD tilepos, TPointD pos1, TPointD pos2,
+						  TPointD pos3, TPointD pos4, TPixel32 ccol1, TPixel32 ccol2,
+						  TPixel32 ccol3, TPixel32 ccol4)
 {
 	PIXEL col1, col2, col3, col4;
 	pixelConvert(col1, ccol1);
@@ -112,28 +119,32 @@ void doFourPointsGradient(
 		PIXEL *pix = ras->pixels(j);
 		PIXEL *endPix = pix + ras->getLx();
 		while (pix < endPix) {
-			double d1 = sqrt((pos1.x - pos.x) * (pos1.x - pos.x) + (pos1.y - pos.y) * (pos1.y - pos.y));
+			double d1 =
+				sqrt((pos1.x - pos.x) * (pos1.x - pos.x) + (pos1.y - pos.y) * (pos1.y - pos.y));
 			if (!d1) {
 				*pix = col1;
 				pos.x += 1;
 				++pix;
 				continue;
 			}
-			double d2 = sqrt((pos2.x - pos.x) * (pos2.x - pos.x) + (pos2.y - pos.y) * (pos2.y - pos.y));
+			double d2 =
+				sqrt((pos2.x - pos.x) * (pos2.x - pos.x) + (pos2.y - pos.y) * (pos2.y - pos.y));
 			if (!d2) {
 				*pix = col2;
 				pos.x += 1;
 				++pix;
 				continue;
 			}
-			double d3 = sqrt((pos3.x - pos.x) * (pos3.x - pos.x) + (pos3.y - pos.y) * (pos3.y - pos.y));
+			double d3 =
+				sqrt((pos3.x - pos.x) * (pos3.x - pos.x) + (pos3.y - pos.y) * (pos3.y - pos.y));
 			if (!d3) {
 				*pix = col3;
 				pos.x += 1;
 				++pix;
 				continue;
 			}
-			double d4 = sqrt((pos4.x - pos.x) * (pos4.x - pos.x) + (pos4.y - pos.y) * (pos4.y - pos.y));
+			double d4 =
+				sqrt((pos4.x - pos.x) * (pos4.x - pos.x) + (pos4.y - pos.y) * (pos4.y - pos.y));
 			if (!d4) {
 				*pix = col4;
 				pos.x += 1;
@@ -141,10 +152,14 @@ void doFourPointsGradient(
 				continue;
 			}
 			double dtotal = 1 / d1 + 1 / d2 + 1 / d3 + 1 / d4;
-			pix->r = (CHANNEL_TYPE)(((1 / d1) / dtotal) * col1.r + ((1 / d2) / dtotal) * col2.r + ((1 / d3) / dtotal) * col3.r + ((1 / d4) / dtotal) * col4.r);
-			pix->g = (CHANNEL_TYPE)(((1 / d1) / dtotal) * col1.g + ((1 / d2) / dtotal) * col2.g + ((1 / d3) / dtotal) * col3.g + ((1 / d4) / dtotal) * col4.g);
-			pix->b = (CHANNEL_TYPE)(((1 / d1) / dtotal) * col1.b + ((1 / d2) / dtotal) * col2.b + ((1 / d3) / dtotal) * col3.b + ((1 / d4) / dtotal) * col4.b);
-			pix->m = (CHANNEL_TYPE)(((1 / d1) / dtotal) * col1.m + ((1 / d2) / dtotal) * col2.m + ((1 / d3) / dtotal) * col3.m + ((1 / d4) / dtotal) * col4.m);
+			pix->r = (CHANNEL_TYPE)(((1 / d1) / dtotal) * col1.r + ((1 / d2) / dtotal) * col2.r +
+									((1 / d3) / dtotal) * col3.r + ((1 / d4) / dtotal) * col4.r);
+			pix->g = (CHANNEL_TYPE)(((1 / d1) / dtotal) * col1.g + ((1 / d2) / dtotal) * col2.g +
+									((1 / d3) / dtotal) * col3.g + ((1 / d4) / dtotal) * col4.g);
+			pix->b = (CHANNEL_TYPE)(((1 / d1) / dtotal) * col1.b + ((1 / d2) / dtotal) * col2.b +
+									((1 / d3) / dtotal) * col3.b + ((1 / d4) / dtotal) * col4.b);
+			pix->m = (CHANNEL_TYPE)(((1 / d1) / dtotal) * col1.m + ((1 / d2) / dtotal) * col2.m +
+									((1 / d3) / dtotal) * col3.m + ((1 / d4) / dtotal) * col4.m);
 			pos.x += 1.0;
 			++pix;
 		}
@@ -171,11 +186,13 @@ void FourPointsGradientFx::doCompute(TTile &tile, double frame, const TRenderSet
 	TRaster32P raster32 = tile.getRaster();
 
 	if (raster32)
-		doFourPointsGradient<TPixel32, UCHAR>(raster32, pos, pos1, pos2, pos3, pos4, col1, col2, col3, col4);
+		doFourPointsGradient<TPixel32, UCHAR>(raster32, pos, pos1, pos2, pos3, pos4, col1, col2,
+											  col3, col4);
 	else {
 		TRaster64P raster64 = tile.getRaster();
 		if (raster64)
-			doFourPointsGradient<TPixel64, USHORT>(raster64, pos, pos1, pos2, pos3, pos4, col1, col2, col3, col4);
+			doFourPointsGradient<TPixel64, USHORT>(raster64, pos, pos1, pos2, pos3, pos4, col1,
+												   col2, col3, col4);
 		else
 			throw TException("Brightness&Contrast: unsupported Pixel Type");
 	}

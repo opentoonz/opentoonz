@@ -159,14 +159,11 @@ namespace
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
-void vec_poi_to_len_pos_(
-	const double xv,
-	const double yv, /* vector */
-	const double xp,
-	const double yp, /* point */
-	double &len,	 /* vectorからpointまでの距離 */
-	double &pos		 /* vector方向でvector原点からpointまでの距離 */
-	)
+void vec_poi_to_len_pos_(const double xv, const double yv, /* vector */
+						 const double xp, const double yp, /* point */
+						 double &len,					   /* vectorからpointまでの距離 */
+						 double &pos /* vector方向でvector原点からpointまでの距離 */
+						 )
 {
 	/*
 	 * ベクトルの角度を求める
@@ -217,8 +214,7 @@ void vec_poi_to_len_pos_(
 	}
 	/* ベクトルより大きい場合、ベクトル終点からの距離 */
 	else if (xv_rot < xp_rot) {
-		len = sqrt((xp - xv) * (xp - xv) +
-				   (yp - yv) * (yp - yv));
+		len = sqrt((xp - xv) * (xp - xv) + (yp - yv) * (yp - yv));
 	}
 	/* ベクトルの横範囲内なら、上下位置が距離となる */
 	else {
@@ -249,15 +245,12 @@ namespace
 	|   |
 	+---+
  */
-int count_nearly_vector_(
-	const double xv,
-	const double yv, /* vector */
-	const double x_tgt,
-	const double y_tgt, /* 調査(vectorの原点からの)pixel位置 */
-	const long x_div,
-	const long y_div,	  /* 調査pixelを分割する(サブpixel)数 */
-	const double valid_len /* vectorからの有効距離 */
-	)
+int count_nearly_vector_(const double xv, const double yv, /* vector */
+						 const double x_tgt,
+						 const double y_tgt, /* 調査(vectorの原点からの)pixel位置 */
+						 const long x_div, const long y_div, /* 調査pixelを分割する(サブpixel)数 */
+						 const double valid_len				 /* vectorからの有効距離 */
+						 )
 {
 	int count = 0;
 	for (int yy = 0; yy < y_div; ++yy) {
@@ -275,15 +268,12 @@ int count_nearly_vector_(
 	return count;
 }
 /* リニア減衰計算 */
-double liner_decrement_(
-	const double xv,
-	const double yv, /* vector */
-	const double x_tgt,
-	const double y_tgt, /* 調査(vectorの原点からの)pixel位置 */
-	const long x_div,
-	const long y_div,	  /* 調査pixelを分割する(サブpixel)数 */
-	const double valid_len /* vectorからの有効距離 */
-	)
+double liner_decrement_(const double xv, const double yv, /* vector */
+						const double x_tgt,
+						const double y_tgt, /* 調査(vectorの原点からの)pixel位置 */
+						const long x_div, const long y_div, /* 調査pixelを分割する(サブpixel)数 */
+						const double valid_len				/* vectorからの有効距離 */
+						)
 {
 	int count = 0;
 	double accum = 0.0;
@@ -308,15 +298,12 @@ double liner_decrement_(
 	return accum / (double)count;
 }
 /* ぶれ画像計算 */
-double bure_decrement_(
-	const double xv,
-	const double yv, /* vector */
-	const double x_tgt,
-	const double y_tgt, /* 調査(vectorの原点からの)pixel位置 */
-	const long x_div,
-	const long y_div,		/* 調査pixelを分割する(サブpixel)数 */
-	const double valid_len, /* vectorからの有効距離 */
-	const int zanzo_length)
+double bure_decrement_(const double xv, const double yv, /* vector */
+					   const double x_tgt,
+					   const double y_tgt, /* 調査(vectorの原点からの)pixel位置 */
+					   const long x_div, const long y_div, /* 調査pixelを分割する(サブpixel)数 */
+					   const double valid_len,			   /* vectorからの有効距離 */
+					   const int zanzo_length)
 {
 	long count_in = 0;
 	long count_out = 0;
@@ -360,23 +347,16 @@ double bure_decrement_(
 	}
 
 	/* ????????????????? */
-	return (double)count_in / (count_in + count_out) *
-		   (1.0 - pos / line_len);
+	return (double)count_in / (count_in + count_out) * (1.0 - pos / line_len);
 }
 }
 
 namespace
 {
-void set_smooth_(
-	const double x_vector,
-	const double y_vector,
-	const double vector_scale,
-	const double curve,
-	const int zanzo_length,
-	const double zanzo_power,
-	std::vector<double> &ratio_array,
-	std::vector<int> &x_array,
-	std::vector<int> &y_array)
+void set_smooth_(const double x_vector, const double y_vector, const double vector_scale,
+				 const double curve, const int zanzo_length, const double zanzo_power,
+				 std::vector<double> &ratio_array, std::vector<int> &x_array,
+				 std::vector<int> &y_array)
 {
 	/* blur効果なしならなにもしない */
 	if (curve <= 0.0) {
@@ -413,8 +393,7 @@ void set_smooth_(
 	int size = 0;
 	for (int yy = y1; yy <= y2; ++yy) {
 		for (int xx = x1; xx <= x2; ++xx) {
-			if (0 < count_nearly_vector_(
-						xv, yv, (double)xx, (double)yy, 16, 16, 0.5)) {
+			if (0 < count_nearly_vector_(xv, yv, (double)xx, (double)yy, 16, 16, 0.5)) {
 				++size;
 			}
 		}
@@ -434,8 +413,7 @@ void set_smooth_(
 	int ii = 0;
 	for (int yy = y1; yy <= y2; ++yy) {
 		for (int xx = x1; xx <= x2; ++xx) {
-			const int count = count_nearly_vector_(
-				xv, yv, (double)xx, (double)yy, 16, 16, 0.5);
+			const int count = count_nearly_vector_(xv, yv, (double)xx, (double)yy, 16, 16, 0.5);
 			if (0 < count) {
 				ratio_array.at(ii) = (double)count / (16 * 16);
 				x_array.at(ii) = xx;
@@ -447,10 +425,8 @@ void set_smooth_(
 
 	/* リニア減衰効果 */
 	for (unsigned int ii = 0; ii < ratio_array.size(); ++ii) {
-		ratio_array.at(ii) *= liner_decrement_(
-			xv, yv,
-			(double)(x_array.at(ii)),
-			(double)(y_array.at(ii)), 16, 16, 0.5);
+		ratio_array.at(ii) *= liner_decrement_(xv, yv, (double)(x_array.at(ii)),
+											   (double)(y_array.at(ii)), 16, 16, 0.5);
 	}
 
 	/* 段々の分割指定があれば設定する */
@@ -459,11 +435,8 @@ void set_smooth_(
 		for (unsigned int ii = 0; ii < ratio_array.size(); ++ii) {
 			ratio_array.at(ii) =
 				(1.0 - zanzo_power) * ratio_array.at(ii) +
-				zanzo_power * bure_decrement_(
-								  xv, yv,
-								  (double)(x_array.at(ii)),
-								  (double)(y_array.at(ii)),
-								  16, 16, 0.5, zanzo_length);
+				zanzo_power * bure_decrement_(xv, yv, (double)(x_array.at(ii)),
+											  (double)(y_array.at(ii)), 16, 16, 0.5, zanzo_length);
 		}
 	}
 
@@ -495,17 +468,9 @@ void set_smooth_(
 namespace
 {
 template <class T>
-T pixel_value(
-	const T *image_array,
-	const int height,
-	const int width,
-	const int channels,
-	const int xx,
-	const int yy,
-	const int zz,
-	const std::vector<double> &ratio_array,
-	const std::vector<int> &x_array,
-	const std::vector<int> &y_array)
+T pixel_value(const T *image_array, const int height, const int width, const int channels,
+			  const int xx, const int yy, const int zz, const std::vector<double> &ratio_array,
+			  const std::vector<int> &x_array, const std::vector<int> &y_array)
 {
 	double ratio_accum = 0.0;
 	double accum = 0.0;
@@ -527,11 +492,8 @@ T pixel_value(
 		}
 
 		ratio_accum += ratio_array.at(ii);
-		accum += ratio_array.at(ii) * static_cast<double>(*(
-										  image_array +
-										  channels * width * yp +
-										  channels * xp +
-										  zz));
+		accum += ratio_array.at(ii) *
+				 static_cast<double>(*(image_array + channels * width * yp + channels * xp + zz));
 	}
 
 	/* can not calculate */
@@ -548,16 +510,9 @@ T pixel_value(
 	return static_cast<T>(accum / ratio_accum + 0.5);
 }
 template <class T>
-void convert_template_(
-	const T *in,
-	T *image_out,
-	const int hh,
-	const int ww,
-	const int cc,
-	const std::vector<double> &ra,
-	const std::vector<int> &xa,
-	const std::vector<int> &ya,
-	const bool alpha_rend_sw)
+void convert_template_(const T *in, T *image_out, const int hh, const int ww, const int cc,
+					   const std::vector<double> &ra, const std::vector<int> &xa,
+					   const std::vector<int> &ya, const bool alpha_rend_sw)
 {
 	/* 効果なしならimageをcopyして終る */
 	if (ra.size() <= 0) {
@@ -572,7 +527,8 @@ void convert_template_(
 			T *pout = image_out;
 			for (int yy = 0; yy < hh; ++yy) {
 				for (int xx = 0; xx < ww; ++xx, p_in += cc, pout += cc) {
-					/*Alpha処理-->*/ pout[alp] = pixel_value(in, hh, ww, cc, xx, yy, alp, ra, xa, ya);
+					/*Alpha処理-->*/ pout[alp] =
+						pixel_value(in, hh, ww, cc, xx, yy, alp, ra, xa, ya);
 					if (0 == pout[alp]) { /* AlphaがゼロならRGB処理しない */
 						pout[red] = p_in[red];
 						pout[gre] = p_in[gre];
@@ -603,15 +559,18 @@ void convert_template_(
 						if (p_in[alp] < val_max) {
 							const unsigned int aa = static_cast<unsigned int>(p_in[alp]);
 							if (p_in[red] < pout[red]) { /* 増分のみMask! */
-								const unsigned int dif = static_cast<unsigned int>(pout[red] - p_in[red]);
+								const unsigned int dif =
+									static_cast<unsigned int>(pout[red] - p_in[red]);
 								pout[red] = static_cast<T>(p_in[red] + dif * aa / val_max);
 							}
 							if (p_in[gre] < pout[gre]) { /* 増分のみMask! */
-								const unsigned int dif = static_cast<unsigned int>(pout[gre] - p_in[gre]);
+								const unsigned int dif =
+									static_cast<unsigned int>(pout[gre] - p_in[gre]);
 								pout[gre] = static_cast<T>(p_in[gre] + dif * aa / val_max);
 							}
 							if (p_in[blu] < pout[blu]) { /* 増分のみMask! */
-								const unsigned int dif = static_cast<unsigned int>(pout[blu] - p_in[blu]);
+								const unsigned int dif =
+									static_cast<unsigned int>(pout[blu] - p_in[blu]);
 								pout[blu] = static_cast<T>(p_in[blu] + dif * aa / val_max);
 							}
 						}
@@ -631,53 +590,37 @@ void convert_template_(
 	}
 }
 }
-void igs::motion_blur::convert(
-	const unsigned char *image_in,
-	unsigned char *image_out,
+void igs::motion_blur::convert(const unsigned char *image_in, unsigned char *image_out,
 
-	const int height,
-	const int width,
-	const int channels,
-	const int bits,
+							   const int height, const int width, const int channels,
+							   const int bits,
 
-	const double x_vector,
-	const double y_vector,
-	const double vector_scale,
-	const double curve,
-	const int zanzo_length,
-	const double zanzo_power,
-	const bool alpha_rend_sw)
+							   const double x_vector, const double y_vector,
+							   const double vector_scale, const double curve,
+							   const int zanzo_length, const double zanzo_power,
+							   const bool alpha_rend_sw)
 {
 	std::vector<double> ratio_array;
 	std::vector<int> x_array;
 	std::vector<int> y_array;
 
-	set_smooth_(
-		x_vector, y_vector, vector_scale, curve,
-		zanzo_length, zanzo_power,
-		ratio_array, x_array, y_array);
+	set_smooth_(x_vector, y_vector, vector_scale, curve, zanzo_length, zanzo_power, ratio_array,
+				x_array, y_array);
 	/***set_jaggy_(
 		x_vector, y_vector, vector_scale, curve,
 		ratio_array, x_array, y_array
 	);***/
 
 	if (std::numeric_limits<unsigned char>::digits == bits) {
-		convert_template_(
-			image_in,
-			image_out,
-			height, width, channels,
-			ratio_array, x_array, y_array,
-			alpha_rend_sw);
+		convert_template_(image_in, image_out, height, width, channels, ratio_array, x_array,
+						  y_array, alpha_rend_sw);
 		y_array.clear();
 		x_array.clear();
 		ratio_array.clear();
 	} else if (std::numeric_limits<unsigned short>::digits == bits) {
-		convert_template_(
-			reinterpret_cast<const unsigned short *>(image_in),
-			reinterpret_cast<unsigned short *>(image_out),
-			height, width, channels,
-			ratio_array, x_array, y_array,
-			alpha_rend_sw);
+		convert_template_(reinterpret_cast<const unsigned short *>(image_in),
+						  reinterpret_cast<unsigned short *>(image_out), height, width, channels,
+						  ratio_array, x_array, y_array, alpha_rend_sw);
 		y_array.clear();
 		x_array.clear();
 		ratio_array.clear();

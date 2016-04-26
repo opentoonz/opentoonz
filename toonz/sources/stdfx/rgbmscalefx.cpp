@@ -16,9 +16,8 @@ class RGBMScaleFx : public TStandardRasterFx
 	TDoubleParamP m_blue;
 	TDoubleParamP m_matte;
 
-public:
-	RGBMScaleFx()
-		: m_red(100.0), m_green(100.0), m_blue(100.0), m_matte(100.0)
+  public:
+	RGBMScaleFx() : m_red(100.0), m_green(100.0), m_blue(100.0), m_matte(100.0)
 	{
 		bindParam(this, "red", m_red);
 		bindParam(this, "green", m_green);
@@ -48,8 +47,7 @@ public:
 
 //------------------------------------------------------------------------------
 
-void RGBMScaleFx::doCompute(TTile &tile, double frame,
-							const TRenderSettings &ri)
+void RGBMScaleFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 {
 	if (!m_input.isConnected())
 		return;
@@ -60,8 +58,8 @@ void RGBMScaleFx::doCompute(TTile &tile, double frame,
 	double blue = m_blue->getValue(frame) / 100;
 	double matte = m_matte->getValue(frame) / 100;
 
-	//TRaster32P raster32 = tile.getRaster();
-	//assert(raster32); // per ora gestisco solo i Raster32
+	// TRaster32P raster32 = tile.getRaster();
+	// assert(raster32); // per ora gestisco solo i Raster32
 
 	TRop::rgbmScale(tile.getRaster(), tile.getRaster(), red, green, blue, matte);
 }

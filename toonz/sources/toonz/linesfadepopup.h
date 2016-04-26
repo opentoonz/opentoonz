@@ -30,22 +30,22 @@ class LinesFadePopup : public DVGui::Dialog
 	QPushButton *m_okBtn;
 	TRaster32P m_startRas;
 
-private:
+  private:
 	class Swatch;
 	Swatch *m_viewer;
 
-public:
+  public:
 	LinesFadePopup();
 
-protected:
+  protected:
 	void showEvent(QShowEvent *e);
 	void hideEvent(QHideEvent *e);
 
-protected slots:
+  protected slots:
 
 	void setCurrentSampleRaster();
 
-public slots:
+  public slots:
 
 	void apply();
 	void onLinesColorChanged(const TPixel32 &, bool);

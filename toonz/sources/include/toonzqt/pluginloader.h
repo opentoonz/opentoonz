@@ -22,8 +22,10 @@ class TFx;
 
 class DVAPI PluginLoader
 {
-public:
-	static std::map<std::string, QTreeWidgetItem *> create_menu_items(std::function<void(QTreeWidgetItem *)> &&, std::function<void(QTreeWidgetItem *)> &&);
+  public:
+	static std::map<std::string, QTreeWidgetItem *>
+	create_menu_items(std::function<void(QTreeWidgetItem *)> &&,
+					  std::function<void(QTreeWidgetItem *)> &&);
 	static TFx *create_host(const std::string &id);
 	static bool load_entries(const std::string &basepath);
 };

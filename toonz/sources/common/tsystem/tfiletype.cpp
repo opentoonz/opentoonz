@@ -9,10 +9,10 @@ namespace
 
 class FileTypeData
 {
-public:
+  public:
 	std::map<std::string, int> m_table;
 
-public:
+  public:
 	FileTypeData()
 	{
 		// Base, hard-coded known file types

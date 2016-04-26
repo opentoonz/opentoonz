@@ -35,12 +35,12 @@ DVVAR extern const double bigBoxSize[];
 
 /*!
   \brief    Singleton class storing on/off switches related to special
-            level viewing modes.
+			level viewing modes.
 */
 
 class DVAPI ToonzCheck
 {
-public:
+  public:
 	enum Type {
 		eTransparency = 0x1, //!< Transparency check.
 		eBlackBg = 0x2,		 //!< Black background check.
@@ -52,14 +52,14 @@ public:
 		eInk1 = 0x80		 //!< Ink#1 check (show style#1 on inks).
 	};
 
-public:
+  public:
 	static ToonzCheck *instance();
 
 	int getChecks() const { return m_mask; }
 	void toggleCheck(int checkType)
 	{
 		m_mask ^= checkType;
-		//make "ink check" and "ink#1 check" exclusive
+		// make "ink check" and "ink#1 check" exclusive
 		if (checkType == eInk)
 			m_mask = m_mask & ~eInk1;
 		else if (checkType == eInk1)
@@ -77,13 +77,12 @@ public:
 		return true;
 	}
 
-private:
+  private:
 	int m_mask;
 	int m_colorIndex;
 
-private:
-	ToonzCheck()
-		: m_mask(0), m_colorIndex(-1) {}
+  private:
+	ToonzCheck() : m_mask(0), m_colorIndex(-1) {}
 };
 
 //*****************************************************************************
@@ -94,7 +93,7 @@ class DVAPI CameraTestCheck
 {
 	QAction *m_toggle;
 
-public:
+  public:
 	static CameraTestCheck *instance();
 
 	void setToggle(QAction *toggle);
@@ -102,7 +101,7 @@ public:
 	bool isEnabled() const;
 	void setIsEnabled(bool on);
 
-private:
+  private:
 	CameraTestCheck();
 };
 
@@ -112,7 +111,7 @@ class DVAPI CleanupPreviewCheck
 {
 	QAction *m_toggle;
 
-public:
+  public:
 	static CleanupPreviewCheck *instance();
 
 	void setToggle(QAction *toggle);
@@ -120,7 +119,7 @@ public:
 	bool isEnabled() const;
 	void setIsEnabled(bool on);
 
-private:
+  private:
 	CleanupPreviewCheck();
 };
 
@@ -131,7 +130,7 @@ class DVAPI SetScanCropboxCheck
 	bool m_enabled;
 	QAction *m_toggle;
 
-public:
+  public:
 	static SetScanCropboxCheck *instance();
 
 	void setToggle(QAction *toggle);
@@ -141,7 +140,7 @@ public:
 
 	void uncheck();
 
-private:
+  private:
 	SetScanCropboxCheck();
 };
 

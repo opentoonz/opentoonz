@@ -41,19 +41,13 @@ typedef std::vector<LevelFormat> LevelFormatVector;
 
 const char *s_bool[2] = {"0", "1"};
 
-const char *s_show0ThickLines = "show0ThickLines",
-		   *s_regionAntialias = "regionAntialias",
+const char *s_show0ThickLines = "show0ThickLines", *s_regionAntialias = "regionAntialias",
 		   *s_levelFormats = "levelFormats";
 
-const char *s_name = "name",
-		   *s_regexp = "regexp",
-		   *s_priority = "priority";
+const char *s_name = "name", *s_regexp = "regexp", *s_priority = "priority";
 
-const char *s_dpiPolicy = "dpiPolicy",
-		   *s_dpi = "dpi",
-		   *s_subsampling = "subsampling",
-		   *s_antialias = "antialias",
-		   *s_premultiply = "premultiply",
+const char *s_dpiPolicy = "dpiPolicy", *s_dpi = "dpi", *s_subsampling = "subsampling",
+		   *s_antialias = "antialias", *s_premultiply = "premultiply",
 		   *s_whiteTransp = "whiteTransp";
 
 //=================================================================
@@ -107,8 +101,7 @@ inline void getValue(const QSettings &s, QString key, TPixel32 &ret)
 
 //-----------------------------------------------------------------
 
-inline bool formatLess(const Preferences::LevelFormat &a,
-					   const Preferences::LevelFormat &b)
+inline bool formatLess(const Preferences::LevelFormat &a, const Preferences::LevelFormat &b)
 {
 	return (a.m_priority > b.m_priority		   // Observe '>' used here - we want inverse
 			|| (!(b.m_priority > a.m_priority) // sorting on priority, higher priorities come first
@@ -170,8 +163,8 @@ void setValue(QSettings &settings, const LevelFormat &lf)
 void getValue(const QSettings &settings, LevelFormat &lf)
 {
 	lf.m_name = settings.value(s_name, lf.m_name).toString();
-	lf.m_pathFormat = QRegExp(settings.value(s_regexp, lf.m_pathFormat).toString(),
-							  Qt::CaseInsensitive);
+	lf.m_pathFormat =
+		QRegExp(settings.value(s_regexp, lf.m_pathFormat).toString(), Qt::CaseInsensitive);
 	lf.m_priority = settings.value(s_priority, lf.m_priority).toInt();
 	getValue(settings, lf.m_options);
 }
@@ -197,7 +190,7 @@ void setValue(QSettings &settings, const LevelFormatVector &lfv)
 //-----------------------------------------------------------------
 
 void getValue(QSettings &settings, LevelFormatVector &lfv) // Why does QSettings' interface require
-{														   // non-const access on reading arrays/groups?
+{ // non-const access on reading arrays/groups?
 	if (!settings.childGroups().contains(s_levelFormats))
 		return; // Default is no level formats - use builtins
 
@@ -227,7 +220,34 @@ bool Preferences::LevelFormat::matches(const TFilePath &fp) const
 //**********************************************************************************
 
 Preferences::Preferences()
-	: m_units("mm"), m_cameraUnits("inch"), m_scanLevelType("tif"), m_defLevelWidth(0.0), m_defLevelHeight(0.0), m_defLevelDpi(0.0), m_iconSize(160, 120), m_blankColor(TPixel32::White), m_frontOnionColor(TPixel::Black), m_backOnionColor(TPixel::Black), m_transpCheckBg(TPixel::White), m_transpCheckInk(TPixel::Black), m_transpCheckPaint(TPixel(127, 127, 127)), m_autosavePeriod(15), m_chunkSize(10), m_rasterOptimizedMemory(0), m_shrink(1), m_step(1), m_blanksCount(0), m_keyframeType(3), m_animationStep(1), m_textureSize(0), m_xsheetStep(10), m_shmmax(-1), m_shmseg(-1), m_shmall(-1), m_shmmni(-1), m_onionPaperThickness(50), m_currentLanguage(0), m_currentStyleSheet(0), m_undoMemorySize(100), m_dragCellsBehaviour(0), m_lineTestFpsCapture(25), m_defLevelType(0), m_autocreationType(1), m_autoExposeEnabled(true), m_autoCreateEnabled(true), m_subsceneFolderEnabled(true), m_generatedMovieViewEnabled(true), m_xsheetAutopanEnabled(true), m_ignoreAlphaonColumn1Enabled(false), m_rewindAfterPlaybackEnabled(true), m_fitToFlipbookEnabled(false), m_previewAlwaysOpenNewFlipEnabled(false), m_autosaveEnabled(false), m_defaultViewerEnabled(false), m_saveUnpaintedInCleanup(true), m_askForOverrideRender(true), m_automaticSVNFolderRefreshEnabled(true), m_SVNEnabled(false), m_minimizeSaveboxAfterEditing(true), m_levelsBackupEnabled(false), m_sceneNumberingEnabled(false), m_animationSheetEnabled(false), m_inksOnly(false), m_fillOnlySavebox(false), m_show0ThickLines(true), m_regionAntialias(false), m_viewerBGColor(128, 128, 128, 255), m_previewBGColor(64, 64, 64, 255), m_chessboardColor1(180, 180, 180), m_chessboardColor2(230, 230, 230), m_showRasterImagesDarkenBlendedInViewer(false), m_actualPixelViewOnSceneEditingMode(false), m_viewerZoomCenter(0), m_initialLoadTlvCachingBehavior(0), m_removeSceneNumberFromLoadedLevelName(false), m_replaceAfterSaveLevelAs(true), m_showFrameNumberWithLetters(false), m_levelNameOnEachMarker(false), m_columnIconLoadingPolicy((int)LoadAtOnce), m_moveCurrentFrameByClickCellArea(true), m_onionSkinEnabled(false), m_multiLayerStylePickerEnabled(false), m_paletteTypeOnLoadRasterImageAsColorModel(0), m_showKeyframesOnXsheetCellArea(true)
+	: m_units("mm"), m_cameraUnits("inch"), m_scanLevelType("tif"), m_defLevelWidth(0.0),
+	  m_defLevelHeight(0.0), m_defLevelDpi(0.0), m_iconSize(160, 120),
+	  m_blankColor(TPixel32::White), m_frontOnionColor(TPixel::Black),
+	  m_backOnionColor(TPixel::Black), m_transpCheckBg(TPixel::White),
+	  m_transpCheckInk(TPixel::Black), m_transpCheckPaint(TPixel(127, 127, 127)),
+	  m_autosavePeriod(15), m_chunkSize(10), m_rasterOptimizedMemory(0), m_shrink(1), m_step(1),
+	  m_blanksCount(0), m_keyframeType(3), m_animationStep(1), m_textureSize(0), m_xsheetStep(10),
+	  m_shmmax(-1), m_shmseg(-1), m_shmall(-1), m_shmmni(-1), m_onionPaperThickness(50),
+	  m_currentLanguage(0), m_currentStyleSheet(0), m_undoMemorySize(100), m_dragCellsBehaviour(0),
+	  m_lineTestFpsCapture(25), m_defLevelType(0), m_autocreationType(1), m_autoExposeEnabled(true),
+	  m_autoCreateEnabled(true), m_subsceneFolderEnabled(true), m_generatedMovieViewEnabled(true),
+	  m_xsheetAutopanEnabled(true), m_ignoreAlphaonColumn1Enabled(false),
+	  m_rewindAfterPlaybackEnabled(true), m_fitToFlipbookEnabled(false),
+	  m_previewAlwaysOpenNewFlipEnabled(false), m_autosaveEnabled(false),
+	  m_defaultViewerEnabled(false), m_saveUnpaintedInCleanup(true), m_askForOverrideRender(true),
+	  m_automaticSVNFolderRefreshEnabled(true), m_SVNEnabled(false),
+	  m_minimizeSaveboxAfterEditing(true), m_levelsBackupEnabled(false),
+	  m_sceneNumberingEnabled(false), m_animationSheetEnabled(false), m_inksOnly(false),
+	  m_fillOnlySavebox(false), m_show0ThickLines(true), m_regionAntialias(false),
+	  m_viewerBGColor(128, 128, 128, 255), m_previewBGColor(64, 64, 64, 255),
+	  m_chessboardColor1(180, 180, 180), m_chessboardColor2(230, 230, 230),
+	  m_showRasterImagesDarkenBlendedInViewer(false), m_actualPixelViewOnSceneEditingMode(false),
+	  m_viewerZoomCenter(0), m_initialLoadTlvCachingBehavior(0),
+	  m_removeSceneNumberFromLoadedLevelName(false), m_replaceAfterSaveLevelAs(true),
+	  m_showFrameNumberWithLetters(false), m_levelNameOnEachMarker(false),
+	  m_columnIconLoadingPolicy((int)LoadAtOnce), m_moveCurrentFrameByClickCellArea(true),
+	  m_onionSkinEnabled(false), m_multiLayerStylePickerEnabled(false),
+	  m_paletteTypeOnLoadRasterImageAsColorModel(0), m_showKeyframesOnXsheetCellArea(true)
 {
 	TCamera camera;
 	m_defLevelType = PLI_XSHLEVEL;
@@ -238,8 +258,8 @@ Preferences::Preferences()
 	TFilePath layoutDir = ToonzFolder::getMyModuleDir();
 	TFilePath savePath = layoutDir + TFilePath("preferences.ini");
 
-	m_settings.reset(new QSettings(QString::fromStdWString(savePath.getWideString()),
-								   QSettings::IniFormat));
+	m_settings.reset(
+		new QSettings(QString::fromStdWString(savePath.getWideString()), QSettings::IniFormat));
 
 	getValue(*m_settings, "autoExposeEnabled", m_autoExposeEnabled);
 	getValue(*m_settings, "autoCreateEnabled", m_autoCreateEnabled);
@@ -348,7 +368,7 @@ Preferences::Preferences()
 	TFilePath lang_path = TEnv::getConfigDir() + "loc";
 	TFilePathSet lang_fpset;
 	m_languageMaps[0] = "english";
-	//m_currentLanguage=0;
+	// m_currentLanguage=0;
 	try {
 		TFileStatus langPathFs(lang_path);
 
@@ -410,11 +430,13 @@ Preferences::Preferences()
 	getValue(*m_settings, "previewBGColor", m_previewBGColor);
 	getValue(*m_settings, "chessboardColor1", m_chessboardColor1);
 	getValue(*m_settings, "chessboardColor2", m_chessboardColor2);
-	getValue(*m_settings, "showRasterImagesDarkenBlendedInViewer", m_showRasterImagesDarkenBlendedInViewer);
+	getValue(*m_settings, "showRasterImagesDarkenBlendedInViewer",
+			 m_showRasterImagesDarkenBlendedInViewer);
 	getValue(*m_settings, "actualPixelViewOnSceneEditingMode", m_actualPixelViewOnSceneEditingMode);
 	getValue(*m_settings, "viewerZoomCenter", m_viewerZoomCenter);
 	getValue(*m_settings, "initialLoadTlvCachingBehavior", m_initialLoadTlvCachingBehavior);
-	getValue(*m_settings, "removeSceneNumberFromLoadedLevelName", m_removeSceneNumberFromLoadedLevelName);
+	getValue(*m_settings, "removeSceneNumberFromLoadedLevelName",
+			 m_removeSceneNumberFromLoadedLevelName);
 	getValue(*m_settings, "replaceAfterSaveLevelAs", m_replaceAfterSaveLevelAs);
 	getValue(*m_settings, "showFrameNumberWithLetters", m_showFrameNumberWithLetters);
 	getValue(*m_settings, "levelNameOnEachMarkerEnabled", m_levelNameOnEachMarker);
@@ -422,7 +444,8 @@ Preferences::Preferences()
 	getValue(*m_settings, "moveCurrentFrameByClickCellArea", m_moveCurrentFrameByClickCellArea);
 	getValue(*m_settings, "onionSkinEnabled", m_onionSkinEnabled);
 	getValue(*m_settings, "multiLayerStylePickerEnabled", m_multiLayerStylePickerEnabled);
-	getValue(*m_settings, "paletteTypeOnLoadRasterImageAsColorModel", m_paletteTypeOnLoadRasterImageAsColorModel);
+	getValue(*m_settings, "paletteTypeOnLoadRasterImageAsColorModel",
+			 m_paletteTypeOnLoadRasterImageAsColorModel);
 	getValue(*m_settings, "showKeyframesOnXsheetCellArea", m_showKeyframesOnXsheetCellArea);
 }
 
@@ -631,7 +654,8 @@ void Preferences::setTranspCheckData(const TPixel &bg, const TPixel &ink, const 
 
 //-----------------------------------------------------------
 
-void Preferences::setOnionData(const TPixel &frontOnionColor, const TPixel &backOnionColor, bool inksOnly)
+void Preferences::setOnionData(const TPixel &frontOnionColor, const TPixel &backOnionColor,
+							   bool inksOnly)
 {
 	m_frontOnionColor = frontOnionColor;
 	m_backOnionColor = backOnionColor;
@@ -1071,13 +1095,12 @@ void Preferences::setPaletteTypeOnLoadRasterImageAsColorModel(int type)
 int Preferences::addLevelFormat(const LevelFormat &format)
 {
 	LevelFormatVector::iterator lft = m_levelFormats.insert(
-		std::upper_bound(m_levelFormats.begin(), m_levelFormats.end(),
-						 format, formatLess),
-		format);
+		std::upper_bound(m_levelFormats.begin(), m_levelFormats.end(), format, formatLess), format);
 
-	int formatIdx = int(lft - m_levelFormats.begin()); // NOTE: Must be disjoint from the instruction
-													   //       above, since operator-'s param evaluation
-													   //       order is unspecified
+	int formatIdx =
+		int(lft - m_levelFormats.begin()); // NOTE: Must be disjoint from the instruction
+										   //       above, since operator-'s param evaluation
+										   //       order is unspecified
 	setValue(*m_settings, m_levelFormats);
 
 	return formatIdx;

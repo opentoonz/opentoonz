@@ -34,15 +34,12 @@ TTool *tool()
 //========================================================================
 
 struct StrokeData {
-	UCHAR m_hasColor,
-		m_hasRegion;
+	UCHAR m_hasColor, m_hasRegion;
 };
 
 void getBoundaries(TVectorImage &vi, std::vector<int> &strokes)
 {
-	enum { FORWARD = 0x1,
-		   BACKWARD = 0x2,
-		   INTERNAL = FORWARD | BACKWARD };
+	enum { FORWARD = 0x1, BACKWARD = 0x2, INTERNAL = FORWARD | BACKWARD };
 
 	struct locals {
 
@@ -117,7 +114,8 @@ void getBoundaries(TVectorImage &vi, std::vector<int> &strokes)
 	}
 
 	// Output all not internal regions
-	boost_a::copy_if(boost::make_counting_iterator(0u), boost::make_counting_iterator(vi.getStrokeCount()),
+	boost_a::copy_if(boost::make_counting_iterator(0u),
+					 boost::make_counting_iterator(vi.getStrokeCount()),
 					 std::back_inserter(strokes), boost::bind(locals::isBoundary, sData, _1));
 }
 
@@ -127,8 +125,7 @@ void getBoundaries(TVectorImage &vi, std::vector<int> &strokes)
 //    VectorLevelSelection  implementation
 //*******************************************************************************
 
-LevelSelection::LevelSelection()
-	: m_framesMode(FRAMES_NONE), m_filter(EMPTY)
+LevelSelection::LevelSelection() : m_framesMode(FRAMES_NONE), m_filter(EMPTY)
 {
 }
 
@@ -183,10 +180,12 @@ std::vector<int> getSelectedStrokes(TVectorImage &vi, const LevelSelection &leve
 	switch (levelSelection.filter()) {
 	case LevelSelection::EMPTY:;
 
-		CASE LevelSelection::WHOLE : strokes.assign(boost::make_counting_iterator(0u),
-													boost::make_counting_iterator(vi.getStrokeCount()));
+		CASE LevelSelection::WHOLE
+			: strokes.assign(boost::make_counting_iterator(0u),
+							 boost::make_counting_iterator(vi.getStrokeCount()));
 
-		CASE LevelSelection::SELECTED_STYLES : locals::selectStyles(vi, levelSelection.styles(), strokes);
+		CASE LevelSelection::SELECTED_STYLES
+			: locals::selectStyles(vi, levelSelection.styles(), strokes);
 
 		CASE LevelSelection::BOUNDARY_STROKES : getBoundaries(vi, strokes);
 	}

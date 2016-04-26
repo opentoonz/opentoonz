@@ -24,7 +24,7 @@ class DVAPI StylePicker
 	TImageP m_image;
 	TPaletteP m_palette;
 
-public:
+  public:
 	StylePicker() {}
 
 	// usa come palette la palette dell'immagine
@@ -55,7 +55,8 @@ public:
 	//
 	// Nota: se non trova niente ritorna -1
 
-	/*-- (StylePickerTool内で)LineとAreaを切り替えてPickできる。mode: 0=Area, 1=Line, 2=Line&Areas(default)  --*/
+	/*-- (StylePickerTool内で)LineとAreaを切り替えてPickできる。mode: 0=Area, 1=Line,
+	 * 2=Line&Areas(default)  --*/
 	int pickStyleId(const TPointD &point, double radius2 = 1, int mode = 2) const;
 
 	/*--- Toonz Raster LevelのToneを拾う。 ---*/

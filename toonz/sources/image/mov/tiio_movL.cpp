@@ -27,9 +27,8 @@ enum {
 
 class TQTException : public TImageException
 {
-public:
-	TQTException(const TFilePath &fp, int ec)
-		: TImageException(fp, getErrorMessage(ec)) {}
+  public:
+	TQTException(const TFilePath &fp, int ec) : TImageException(fp, getErrorMessage(ec)) {}
 	TQTException(const TFilePath &fp, int ec, int v)
 		: TImageException(fp, getErrorMessage(ec) + toString(v))
 	{
@@ -61,21 +60,21 @@ public:
 class TImageWriterMov : public TImageWriter
 {
 
-public:
+  public:
 	TImageWriterMov(const TFilePath &, int frameIndex, TLevelWriterMov *);
 	~TImageWriterMov() {}
 	bool is64bitOutputSupported() { return false; }
 
-private:
-	//not implemented
+  private:
+	// not implemented
 	TImageWriterMov(const TImageWriterMov &);
 	TImageWriterMov &operator=(const TImageWriterMov &src);
 
-public:
+  public:
 	void save(const TImageP &);
 	int m_frameIndex;
 
-private:
+  private:
 	TLevelWriterMov *m_lwm;
 };
 
@@ -85,23 +84,23 @@ private:
 class TImageReaderMov : public TImageReader
 {
 
-public:
+  public:
 	TImageReaderMov(const TFilePath &, int frameIndex, TLevelReaderMov *);
 	~TImageReaderMov() {}
 
-private:
-	//not implemented
+  private:
+	// not implemented
 	TImageReaderMov(const TImageReaderMov &);
 	TImageReaderMov &operator=(const TImageReaderMov &src);
 
-public:
+  public:
 	TImageP load();
 	int m_frameIndex;
 
 	TDimension getSize() const { return TDimension(m_lrm->m_lx, m_lrm->m_ly); }
 	TRect getBBox() const { return TRect(0, 0, m_lrm->m_lx - 1, m_lrm->m_ly - 1); }
 
-private:
+  private:
 	TLevelReaderMov *m_lrm;
 };
 
@@ -195,7 +194,8 @@ TImageReaderMov::TImageReaderMov(const TFilePath &path, int frameIndex, TLevelRe
 using namespace std;
 
 TLevelReaderMov::TLevelReaderMov(const TFilePath &path)
-	: TLevelReader(path), m_IOError(QTNoError), m_lastFrameDecoded(-1), m_fileMov(0), m_lx(0), m_ly(0)
+	: TLevelReader(path), m_IOError(QTNoError), m_lastFrameDecoded(-1), m_fileMov(0), m_lx(0),
+	  m_ly(0)
 {
 	if (!TFileStatus(path).doesExist()) {
 		m_IOError = QTNoSuchFile;
@@ -211,18 +211,18 @@ TLevelReaderMov::TLevelReaderMov(const TFilePath &path)
 
 	/*
   if(!oqt_get_video_track_count(m_fileMov))
-    {
-      m_status = !DM_SUCCESS;
-      m_IOError = QTCheckLibError;
-      return;
-    }
+	{
+	  m_status = !DM_SUCCESS;
+	  m_IOError = QTCheckLibError;
+	  return;
+	}
   */
 
 	m_lx = oqt_get_video_width(m_fileMov, 0);
 	m_ly = oqt_get_video_height(m_fileMov, 0);
 	/*
   char *vc = oqt_get_video_compressor(m_fileMov, 0);
-  cout << "video compressor = " << vc[0] << vc[1] << vc[2] << vc[3] << endl;  
+  cout << "video compressor = " << vc[0] << vc[1] << vc[2] << vc[3] << endl;
   */
 }
 
@@ -254,7 +254,8 @@ TLevelP TLevelReaderMov::loadInfo()
 
 #ifdef DUMP_KEYFRAMES
 	for (int k = 1; k < frameCount; k++) {
-		cout << "frame = " << k << "; keyframe before = " << oqt_get_video_keyframe_before(m_fileMov, 0, k)
+		cout << "frame = " << k
+			 << "; keyframe before = " << oqt_get_video_keyframe_before(m_fileMov, 0, k)
 			 << "; keyframe after = " << oqt_get_video_keyframe_after(m_fileMov, 0, k) << endl;
 	}
 #endif
@@ -291,10 +292,7 @@ TImageP TImageReaderMov::load()
 		frame = m_lrm->m_lastFrameDecoded;
 
 	do {
-		rc = oqt_decode_video(m_lrm->m_fileMov,
-							  0,
-							  cmodel,
-							  data);
+		rc = oqt_decode_video(m_lrm->m_fileMov, 0, cmodel, data);
 		frame++;
 	} while (frame != m_frameIndex);
 

@@ -18,9 +18,10 @@ class HSVScaleFx : public TStandardRasterFx
 	TDoubleParamP m_satScale;
 	TDoubleParamP m_valueScale;
 
-public:
+  public:
 	HSVScaleFx()
-		: m_hue(0.0), m_sat(0.0), m_value(0.0), m_hueScale(100.0), m_satScale(100.0), m_valueScale(100.0)
+		: m_hue(0.0), m_sat(0.0), m_value(0.0), m_hueScale(100.0), m_satScale(100.0),
+		  m_valueScale(100.0)
 
 	{
 		bindParam(this, "hue", m_hue);
@@ -56,8 +57,8 @@ public:
 };
 
 template <typename PIXEL, typename CHANNEL_TYPE>
-void doHSVScale(const TRasterPT<PIXEL> &ras, double hue, double sat, double value,
-				double hueScale, double satScale, double valueScale)
+void doHSVScale(const TRasterPT<PIXEL> &ras, double hue, double sat, double value, double hueScale,
+				double satScale, double valueScale)
 {
 	int j;
 	ras->lock();
@@ -73,16 +74,16 @@ void doHSVScale(const TRasterPT<PIXEL> &ras, double hue, double sat, double valu
 			double m = pix->m;
 
 			double r, g, b, h, s, v;
-			//depremult(pix);
+			// depremult(pix);
 			r = pix->r / m;
 			g = pix->g / m;
 			b = pix->b / m;
 			OLDRGB2HSV(r, g, b, &h, &s, &v);
 			/*     int hsv[3];
-       rgb2hsv(hsv, *pix);
-       h =((double)hsv[0]/255.)*360.;
-       s =hsv[1]/255.;
-       v =hsv[2]/255.;*/
+	   rgb2hsv(hsv, *pix);
+	   h =((double)hsv[0]/255.)*360.;
+	   s =hsv[1]/255.;
+	   v =hsv[2]/255.;*/
 			h += hue;
 			s += sat;
 			v += value;
@@ -90,15 +91,15 @@ void doHSVScale(const TRasterPT<PIXEL> &ras, double hue, double sat, double valu
 			s *= satScale;
 			v *= valueScale;
 			/*     hsv[0]=tcrop((int)((h/360.)*255.),0,255);
-       hsv[1]=tcrop((int)s*255, 0,255);
-       hsv[2]=tcrop((int)v*255, 0,255);  
-       hsv2rgb(*pix,hsv);*/
+	   hsv[1]=tcrop((int)s*255, 0,255);
+	   hsv[2]=tcrop((int)v*255, 0,255);
+	   hsv2rgb(*pix,hsv);*/
 
 			OLDHSV2RGB(h, s, v, &r, &g, &b);
 			pix->r = (CHANNEL_TYPE)(r * m);
 			pix->g = (CHANNEL_TYPE)(g * m);
 			pix->b = (CHANNEL_TYPE)(b * m);
-			//premultiply(*pix);
+			// premultiply(*pix);
 		}
 	}
 	ras->unlock();

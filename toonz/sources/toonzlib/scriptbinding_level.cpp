@@ -32,8 +32,7 @@
 namespace TScriptBinding
 {
 
-Level::Level()
-	: m_sl(0), m_type(NO_XSHLEVEL), m_scene(new ToonzScene()), m_sceneOwner(true)
+Level::Level() : m_sl(0), m_type(NO_XSHLEVEL), m_scene(new ToonzScene()), m_sceneOwner(true)
 {
 }
 
@@ -132,13 +131,15 @@ void Level::setPath(const QScriptValue &pathArg)
 	else if (pathArg.isString())
 		fp = TFilePath(pathArg.toString().toStdString());
 	else
-		context()->throwError(tr("Bad argument (%1). It should be FilePath or string").arg(pathArg.toString()));
+		context()->throwError(
+			tr("Bad argument (%1). It should be FilePath or string").arg(pathArg.toString()));
 	if (m_sl) {
 		m_sl->setPath(fp);
 		try {
 			m_sl->load();
 		} catch (...) {
-			context()->throwError(tr("Exception loading level (%1)").arg(QString::fromStdWString(fp.getWideString())));
+			context()->throwError(tr("Exception loading level (%1)")
+									  .arg(QString::fromStdWString(fp.getWideString())));
 		}
 	}
 }
@@ -213,13 +214,15 @@ QScriptValue Level::save(const QScriptValue &fpArg)
 		return context()->throwError(tr("Unrecognized file type :").arg(fpStr));
 	}
 	if (!isCompatible) {
-		return context()->throwError(tr("Can't save a %1 level to this file type : %2").arg(getType()).arg(fpStr));
+		return context()->throwError(
+			tr("Can't save a %1 level to this file type : %2").arg(getType()).arg(fpStr));
 	}
 
 	try {
 		m_sl->save(fp);
 	} catch (TSystemException se) {
-		return context()->throwError(tr("Exception writing %1").arg(QString::fromStdWString(se.getMessage())));
+		return context()->throwError(
+			tr("Exception writing %1").arg(QString::fromStdWString(se.getMessage())));
 	}
 	return context()->thisObject();
 }
@@ -280,11 +283,13 @@ QScriptValue Level::getFrameByIndex(const QScriptValue &indexArg)
 	if (getFrameCount() == 0)
 		return context()->throwError("An empty level has no frames");
 	if (!indexArg.isNumber()) {
-		return context()->throwError(tr("frame index (%1) must be a number").arg(indexArg.toString()));
+		return context()->throwError(
+			tr("frame index (%1) must be a number").arg(indexArg.toString()));
 	}
 	int index = indexArg.toInteger();
 	if (index < 0 || index >= getFrameCount()) {
-		return context()->throwError(tr("frame index (%1) is out of range (0-%2)").arg(index).arg(getFrameCount() - 1));
+		return context()->throwError(
+			tr("frame index (%1) is out of range (0-%2)").arg(index).arg(getFrameCount() - 1));
 	}
 	TFrameId fid = m_sl->index2fid(index);
 	TImageP content = m_sl->getFrame(fid, false);
@@ -305,7 +310,8 @@ QScriptValue Level::setFrame(const QScriptValue &fidArg, const QScriptValue &ima
 		return context()->throwError(err);
 	Image *img = qscriptvalue_cast<Image *>(imageArg);
 	if (!img) {
-		return context()->throwError(tr("second argument (%1) is not an image").arg(imageArg.toString()));
+		return context()->throwError(
+			tr("second argument (%1) is not an image").arg(imageArg.toString()));
 	}
 
 	QString imgType = img->getType();
@@ -338,7 +344,8 @@ QScriptValue Level::setFrame(const QScriptValue &fidArg, const QScriptValue &ima
 			// lprop->setHasAlpha(true);
 		}
 	} else if (m_type != levelType) {
-		return context()->throwError(tr("can not insert a %1 image to a %2 level").arg(imgType).arg(getType()));
+		return context()->throwError(
+			tr("can not insert a %1 image to a %2 level").arg(imgType).arg(getType()));
 	}
 	if (m_sl->getFrameCount() == 0)
 		m_sl->setPalette(img->getImg()->getPalette());

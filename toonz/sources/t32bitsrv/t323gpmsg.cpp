@@ -2,7 +2,7 @@
 
 #if (!(defined(x64) || defined(__LP64__) || defined(LINUX)))
 
-//Toonz stuff
+// Toonz stuff
 #include "tiio.h"
 #include "timage_io.h"
 #include "tlevel_io.h"
@@ -19,7 +19,7 @@
 #include "../image/3gp/tiio_3gpM.h"
 #endif
 
-//Qt stuff
+// Qt stuff
 #include <QString>
 #include <QHash>
 #include <QSharedMemory>
@@ -28,7 +28,7 @@
 #include <QLocalSocket>
 #include <QDataStream>
 
-//tipc includes
+// tipc includes
 #include "tipc.h"
 #include "tipcmsg.h"
 #include "tipcsrv.h"
@@ -123,12 +123,12 @@ void LWImageWriteParser::operator()(Message &msg)
 
 	msg >> id >> frameIdx >> lx >> ly;
 
-	//Read the data through a shared memory segment
+	// Read the data through a shared memory segment
 	TRaster32P ras(lx, ly);
 	t32bitsrv::RasterExchanger<TPixel32> exch(ras);
 	tipc::readShMemBuffer(*stream(), msg, &exch);
 
-	//Save the image
+	// Save the image
 	try {
 		TImageWriterP iw(writers.find(id).value()->getFrameWriter(frameIdx + 1));
 		iw->save(TRasterImageP(ras));
@@ -155,12 +155,12 @@ void LWSaveSoundTrackParser::operator()(Message &msg)
 
 	msg >> id >> sampleRate >> bps >> chanCount >> sCount >> signedSample;
 
-	//Retrieve the soundtrack buffer
+	// Retrieve the soundtrack buffer
 	TSoundTrackP st = TSoundTrack::create(sampleRate, bps, chanCount, sCount, signedSample);
 	t32bitsrv::BufferExchanger exch((UCHAR *)st->getRawData());
 	tipc::readShMemBuffer(*stream(), msg, &exch);
 
-	//Write the soundtrack
+	// Write the soundtrack
 	try {
 		writers.find(id).value()->saveSoundTrack(st.getPointer());
 		msg << QString("ok");
@@ -202,7 +202,7 @@ void InitLR3gpParser::operator()(Message &msg)
 	try {
 		TLevelReaderP lrm(tfp);
 
-		//Extract some info to be returned
+		// Extract some info to be returned
 		const TImageInfo *info = lrm->getImageInfo();
 		if (!info)
 			throw TImageException(tfp, "Couldn't retrieve image properties");
@@ -224,7 +224,7 @@ void InitLR3gpParser::operator()(Message &msg)
 
 void LRLoadInfoParser::operator()(Message &msg)
 {
-	//Read command data
+	// Read command data
 	unsigned int id;
 	QString shMemId;
 	msg >> id >> shMemId >> clr;
@@ -233,7 +233,7 @@ void LRLoadInfoParser::operator()(Message &msg)
 	if (it == readers.end())
 		goto err;
 
-	//Read level infos
+	// Read level infos
 	{
 		TLevelP level;
 		try {
@@ -244,7 +244,7 @@ void LRLoadInfoParser::operator()(Message &msg)
 
 		int frameCount = level->getFrameCount();
 		if (!shMemId.isEmpty()) {
-			//Create a shared memory segment to transfer the infos to
+			// Create a shared memory segment to transfer the infos to
 			tipc::DefaultMessageParser<SHMEM_REQUEST> msgParser;
 			Message shMsg;
 
@@ -256,7 +256,7 @@ void LRLoadInfoParser::operator()(Message &msg)
 			if (str != QString("ok"))
 				goto err;
 
-			//Copy level data to the shared memory segment
+			// Copy level data to the shared memory segment
 			{
 				QSharedMemory shmem(shMemId);
 				shmem.attach();
@@ -325,7 +325,7 @@ void LRImageReadParser::operator()(Message &msg)
 		if (it == readers.end())
 			goto err;
 
-		//Load the raster
+		// Load the raster
 		TRaster32P ras(lx, ly);
 		try {
 			TImageReaderP ir(it.value()->getFrameReader(frameIdx + 1));
@@ -359,6 +359,6 @@ void CloseLR3gpParser::operator()(Message &msg)
 	msg << QString("ok");
 }
 
-} //namespace mov_io
+} // namespace mov_io
 
 #endif // !x64 && !__LP64__

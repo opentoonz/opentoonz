@@ -45,7 +45,7 @@ class DVAPI TPluginInfo
 {
 	std::string m_name;
 
-public:
+  public:
 	TPluginInfo(std::string name = "") : m_name(name){};
 	~TPluginInfo(){};
 	std::string getName() const { return m_name; };
@@ -56,13 +56,9 @@ public:
 // L'entry point del plugin e' TLIBMAIN {....}
 //
 #ifdef _WIN32
-#define TLIBMAIN                     \
-	extern "C" __declspec(dllexport) \
-		const TPluginInfo *          \
-		TLibMain()
+#define TLIBMAIN extern "C" __declspec(dllexport) const TPluginInfo *TLibMain()
 #else
-#define TLIBMAIN \
-	extern "C" const TPluginInfo *TLibMain()
+#define TLIBMAIN extern "C" const TPluginInfo *TLibMain()
 #endif
 
 //-----------------------------------------------------------------------------
@@ -79,7 +75,7 @@ class DVAPI TPluginManager
 
 	TPluginManager();
 
-public:
+  public:
 	~TPluginManager();
 	static TPluginManager *instance();
 

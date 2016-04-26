@@ -22,7 +22,7 @@ class TCellKeyframeSelection : public TSelection
 
 	TXsheetHandle *m_xsheetHandle;
 
-public:
+  public:
 	TCellKeyframeSelection(TCellSelection *cellSelection, TKeyframeSelection *keyframeSelection);
 	~TCellKeyframeSelection();
 
@@ -79,4 +79,4 @@ public:
   void openTimeStretchPopup();*/
 };
 
-#endif //TCELLKEYFRAMESELECTION_H
+#endif // TCELLKEYFRAMESELECTION_H

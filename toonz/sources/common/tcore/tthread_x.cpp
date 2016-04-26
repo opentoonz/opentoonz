@@ -11,7 +11,7 @@ class TMutexImp
 {
 	pthread_mutex_t id;
 
-public:
+  public:
 	TMutexImp();
 	~TMutexImp();
 	void lock();
@@ -25,7 +25,7 @@ class TThreadGroupImp
 {
 	list<TThread *> threads;
 
-public:
+  public:
 	TThreadGroupImp();
 	~TThreadGroupImp();
 	void add(TThread *);
@@ -63,8 +63,7 @@ void TMutexImp::unlock()
 
 //---------------------------------------------------------------------------
 
-TMutex::TMutex()
-	: m_imp(new TMutexImp)
+TMutex::TMutex() : m_imp(new TMutexImp)
 {
 }
 
@@ -98,7 +97,7 @@ class TThreadImp
 {
 	pthread_t threadId;
 
-public:
+  public:
 	TThreadImp();
 	~TThreadImp();
 
@@ -125,7 +124,7 @@ public:
 		mutex.unlock();
 	}
 
-	//some static stuff
+	// some static stuff
 	static TUINT32 nThreads;
 	static TMutex mutex;
 
@@ -138,8 +137,7 @@ TUINT32 TThreadImp::nThreads = 0;
 TMutex TThreadImp::mutex = TMutex();
 //---------------------------------------------------------------------------
 
-TThreadImp::TThreadImp()
-	: isRunning(false), owner(0), thread(0)
+TThreadImp::TThreadImp() : isRunning(false), owner(0), thread(0)
 {
 }
 
@@ -147,7 +145,7 @@ TThreadImp::TThreadImp()
 
 TThreadImp::~TThreadImp()
 {
-	//CloseHandle(threadId);
+	// CloseHandle(threadId);
 }
 //---------------------------------------------------------------------------
 
@@ -210,8 +208,7 @@ bool TThreadImp::setPreferredProcessor(int processorId)
 
 //---------------------------------------------------------------------------
 
-TThread::TThread()
-	: m_imp(new TThreadImp())
+TThread::TThread() : m_imp(new TThreadImp())
 {
 	m_imp->thread = this;
 }
@@ -279,12 +276,12 @@ void TThreadGroupImp::remove(TThread *t)
 
 static void * /*__stdcall*/ mainFun(void *data)
 {
-	//cout << "mainfun" << endl;
+	// cout << "mainfun" << endl;
 	list<TThread *> *threads = (list<TThread *> *)data;
-	//lockForTheList.lock();
+	// lockForTheList.lock();
 	ULONG s = threads->size();
-	//lockForTheList.unlock();
-	//cout <<"ci sono " << s << "thread in ballo..." << endl;
+	// lockForTheList.unlock();
+	// cout <<"ci sono " << s << "thread in ballo..." << endl;
 
 	while (s != 0) {
 		lockForTheList.lock();
@@ -297,7 +294,7 @@ static void * /*__stdcall*/ mainFun(void *data)
 //---------------------------------------------------------------------------
 void TThreadGroupImp::wait()
 {
-	//cout << "wait()" << endl;
+	// cout << "wait()" << endl;
 	lockForTheList.lock();
 	ULONG count = threads.size();
 
@@ -311,16 +308,15 @@ void TThreadGroupImp::wait()
 		return;
 	void *mainRet = 0;
 	pthread_t mainThread;
-	//cout << "creo il main" << endl;
+	// cout << "creo il main" << endl;
 	pthread_create(&mainThread, 0, mainFun, &threads);
-	//cout << mainThread << endl;
+	// cout << mainThread << endl;
 	pthread_join(mainThread, &mainRet);
 }
 
 //---------------------------------------------------------------------------
 
-TThreadGroup::TThreadGroup()
-	: m_imp(new TThreadGroupImp())
+TThreadGroup::TThreadGroup() : m_imp(new TThreadGroupImp())
 
 {
 }

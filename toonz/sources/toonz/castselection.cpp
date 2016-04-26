@@ -25,8 +25,7 @@
 //
 //-----------------------------------------------------------------------------
 
-CastSelection::CastSelection()
-	: m_browser(0)
+CastSelection::CastSelection() : m_browser(0)
 {
 }
 
@@ -41,7 +40,7 @@ CastSelection::~CastSelection()
 void CastSelection::getSelectedLevels(std::vector<TXshLevel *> &levels)
 {
 	assert(m_browser);
-	CastItems const& castItems = m_browser->getCastItems();
+	CastItems const &castItems = m_browser->getCastItems();
 	for (int i = 0; i < castItems.getItemCount(); i++) {
 		if (!isSelected(i))
 			continue;
@@ -120,7 +119,8 @@ QPixmap LevelCastItem::getPixmap(bool isSelected) const
 bool LevelCastItem::exists() const
 {
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
-	return TSystem::doesExistFileOrLevel(scene->decodeFilePath(m_level->getPath())) || !getPixmap(false).isNull();
+	return TSystem::doesExistFileOrLevel(scene->decodeFilePath(m_level->getPath())) ||
+		   !getPixmap(false).isNull();
 }
 
 //-------------------------------------------------------
@@ -213,8 +213,7 @@ bool PaletteCastItem::exists() const
 //
 //-----------------------------------------------------------------------------
 
-CastItems::CastItems()
-	: QMimeData()
+CastItems::CastItems() : QMimeData()
 {
 }
 

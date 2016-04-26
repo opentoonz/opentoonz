@@ -15,10 +15,9 @@ namespace tcg
   The hash class implements a hash map using tcg lists
 */
 
-template <typename K, typename T, typename Hash_functor = size_t (*)(const K &)>
-class hash
+template <typename K, typename T, typename Hash_functor = size_t (*)(const K &)> class hash
 {
-public:
+  public:
 	typedef K key_type;
 	typedef T value_type;
 	typedef Hash_functor hash_type;
@@ -30,7 +29,10 @@ public:
 		size_t m_prev;
 
 		BucketNode(const K &key, const T &val) : m_key(key), m_val(val), m_next(-1), m_prev(-1) {}
-		BucketNode(const std::pair<K, T> &pair) : m_key(pair.first), m_val(pair.second), m_next(-1), m_prev(-1) {}
+		BucketNode(const std::pair<K, T> &pair)
+			: m_key(pair.first), m_val(pair.second), m_next(-1), m_prev(-1)
+		{
+		}
 		~BucketNode() {}
 	};
 
@@ -39,12 +41,12 @@ public:
 	typedef typename tcg::list<BucketNode>::iterator iterator;
 	typedef typename tcg::list<BucketNode>::const_iterator const_iterator;
 
-private:
+  private:
 	std::vector<size_t> m_bucketsIdx;
 	tcg::list<BucketNode> m_items;
 	Hash_functor m_hash;
 
-private:
+  private:
 	bool createItem(const K &key, const T &val)
 	{
 		m_items.push_back(BucketNode(key, val));
@@ -68,30 +70,29 @@ private:
 		size_t oldIdx = _neg;
 
 		if (bucketIdx == _neg) {
-			//A new bucket is created
+			// A new bucket is created
 			bool rehashed = createItem(key, val);
 			bucketIdx = m_items.last().m_idx;
 
 			if (!rehashed)
-				//Need to manually update the stored bucket index
+				// Need to manually update the stored bucket index
 				m_bucketsIdx[hashValue] = bucketIdx;
 
 			return bucketIdx;
 		} else {
-			//Bucket exists - search key in it
-			for (;
-				 bucketIdx != _neg && m_items[bucketIdx].m_key != key;
+			// Bucket exists - search key in it
+			for (; bucketIdx != _neg && m_items[bucketIdx].m_key != key;
 				 oldIdx = bucketIdx, bucketIdx = m_items[bucketIdx].m_next)
 				;
 		}
 
 		if (bucketIdx == _neg) {
-			//Key was not found - create an item and insert it
+			// Key was not found - create an item and insert it
 			bool rehashed = createItem(key, val);
 			bucketIdx = m_items.last().m_idx;
 
 			if (!rehashed && oldIdx != _neg) {
-				//Need to relink manually
+				// Need to relink manually
 				m_items[oldIdx].m_next = bucketIdx;
 				m_items[bucketIdx].m_prev = oldIdx;
 			}
@@ -100,15 +101,18 @@ private:
 		return bucketIdx;
 	}
 
-public:
+  public:
 	// NOTE: The defaulted 89 is a *good* initial buckets size when expanding by the (2n+1) rule.
 	// See http://www.concentric.net/~ttwang/tech/hashsize.htm for details
 
 	hash(const Hash_functor &func = Hash_functor(), size_t bucketsCount = 89)
-		: m_bucketsIdx(bucketsCount, _neg), m_hash(func) {}
+		: m_bucketsIdx(bucketsCount, _neg), m_hash(func)
+	{
+	}
 
 	template <typename ForIt>
-	hash(ForIt begin, ForIt end, const Hash_functor &func = Hash_functor(), size_t bucketsCount = 89)
+	hash(ForIt begin, ForIt end, const Hash_functor &func = Hash_functor(),
+		 size_t bucketsCount = 89)
 		: m_items(begin, end), m_hash(func)
 	{
 		for (size_t nCount = m_items.nodesCount(); bucketsCount < nCount;
@@ -119,7 +123,8 @@ public:
 
 	//! Constructs from a range of (index, value) item pairs
 	template <typename BidIt>
-	hash(BidIt begin, BidIt end, size_t nodesCount, const Hash_functor &func = Hash_functor(), size_t bucketsCount = 89)
+	hash(BidIt begin, BidIt end, size_t nodesCount, const Hash_functor &func = Hash_functor(),
+		 size_t bucketsCount = 89)
 		: m_items(begin, end, nodesCount), m_hash(func)
 	{
 		for (size_t nCount = m_items.nodesCount(); bucketsCount < nCount;
@@ -185,8 +190,7 @@ public:
 		if (bucketIdx == _neg)
 			return end();
 
-		for (;
-			 bucketIdx != _neg && m_items[bucketIdx].m_key != key;
+		for (; bucketIdx != _neg && m_items[bucketIdx].m_key != key;
 			 bucketIdx = m_items[bucketIdx].m_next)
 			;
 
@@ -210,26 +214,17 @@ public:
 	//--------------------------------------------------------------------------
 
 	//!\warning Assignment of the kind hash_map[i1] = hash_map[i2] are DANGEROUS! The
-	//!reference returned on the right may be INVALIDATED if the first key is inserted!
-	T &operator[](const K &key)
-	{
-		return m_items[touchKey(key)].m_val;
-	}
+	//! reference returned on the right may be INVALIDATED if the first key is inserted!
+	T &operator[](const K &key) { return m_items[touchKey(key)].m_val; }
 
 	//--------------------------------------------------------------------------
 
 	//!\warning The same remark of operator[] applies here!
-	T &touch(const K &key, const T &val)
-	{
-		return m_items[touchKey(key, val)].m_val;
-	}
+	T &touch(const K &key, const T &val) { return m_items[touchKey(key, val)].m_val; }
 
 	//--------------------------------------------------------------------------
 
-	iterator insert(const std::pair<K, T> &pair)
-	{
-		return insert(pair.first, pair.second);
-	}
+	iterator insert(const std::pair<K, T> &pair) { return insert(pair.first, pair.second); }
 
 	//--------------------------------------------------------------------------
 
@@ -278,10 +273,10 @@ public:
 
 	const Hash_functor &hashFunctor() const { return m_hash; }
 
-	//!Remember to rehash() if the hash functor changes
+	//! Remember to rehash() if the hash functor changes
 	Hash_functor &hashFunctor() { return m_hash; }
 };
 
-} //namespace tcg
+} // namespace tcg
 
 #endif // TCG_HASH_H

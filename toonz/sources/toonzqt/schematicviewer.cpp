@@ -49,7 +49,7 @@ namespace
 
 class SchematicZoomer : public ImageUtils::ShortcutZoomer
 {
-public:
+  public:
 	SchematicZoomer(QWidget *parent) : ShortcutZoomer(parent) {}
 
 	bool zoom(bool zoomin, bool resetZoom)
@@ -67,8 +67,7 @@ public:
 //
 //==================================================================
 
-SchematicScene::SchematicScene(QWidget *parent)
-	: QGraphicsScene(parent)
+SchematicScene::SchematicScene(QWidget *parent) : QGraphicsScene(parent)
 {
 	setSceneRect(0, 0, 50000, 50000);
 	setItemIndexMethod(NoIndex);
@@ -86,7 +85,8 @@ SchematicScene::~SchematicScene()
 void SchematicScene::showEvent(QShowEvent *se)
 {
 	TSelectionHandle *selHandle = TSelectionHandle::getCurrent();
-	connect(selHandle, SIGNAL(selectionSwitched(TSelection *, TSelection *)), this, SLOT(onSelectionSwitched(TSelection *, TSelection *)));
+	connect(selHandle, SIGNAL(selectionSwitched(TSelection *, TSelection *)), this,
+			SLOT(onSelectionSwitched(TSelection *, TSelection *)));
 	clearSelection();
 }
 
@@ -95,7 +95,8 @@ void SchematicScene::showEvent(QShowEvent *se)
 void SchematicScene::hideEvent(QHideEvent *se)
 {
 	TSelectionHandle *selHandle = TSelectionHandle::getCurrent();
-	disconnect(selHandle, SIGNAL(selectionSwitched(TSelection *, TSelection *)), this, SLOT(onSelectionSwitched(TSelection *, TSelection *)));
+	disconnect(selHandle, SIGNAL(selectionSwitched(TSelection *, TSelection *)), this,
+			   SLOT(onSelectionSwitched(TSelection *, TSelection *)));
 }
 
 //------------------------------------------------------------------
@@ -113,7 +114,7 @@ void SchematicScene::clearAllItems()
 	int i;
 	QList<QGraphicsItem *> sceneItems = items();
 	int size = sceneItems.size();
-	//create nodes and links list
+	// create nodes and links list
 	for (i = 0; i < size; i++) {
 		QGraphicsItem *item = sceneItems.at(i);
 		SchematicWindowEditor *editor = dynamic_cast<SchematicWindowEditor *>(item);
@@ -200,7 +201,8 @@ QVector<SchematicNode *> SchematicScene::getPlacedNode(SchematicNode *node)
 //==================================================================
 
 SchematicSceneViewer::SchematicSceneViewer(QWidget *parent)
-	: QGraphicsView(parent), m_buttonState(Qt::NoButton), m_oldWinPos(), m_oldScenePos(), m_firstShowing(true)
+	: QGraphicsView(parent), m_buttonState(Qt::NoButton), m_oldWinPos(), m_oldScenePos(),
+	  m_firstShowing(true)
 {
 	setObjectName("SchematicSceneViewer");
 
@@ -224,7 +226,7 @@ SchematicSceneViewer::~SchematicSceneViewer()
 
 //------------------------------------------------------------------
 
-/*! Reimplemets the QGraphicsView::mousePressEvent() 
+/*! Reimplemets the QGraphicsView::mousePressEvent()
 */
 void SchematicSceneViewer::mousePressEvent(QMouseEvent *me)
 {
@@ -250,20 +252,22 @@ void SchematicSceneViewer::mousePressEvent(QMouseEvent *me)
 
 //------------------------------------------------------------------
 
-/*! Reimplemets the QGraphicsView::mouseMoveEvent() 
+/*! Reimplemets the QGraphicsView::mouseMoveEvent()
 */
 void SchematicSceneViewer::mouseMoveEvent(QMouseEvent *me)
 {
 	QPoint currWinPos = me->pos();
 	QPointF currScenePos = mapToScene(currWinPos);
 	if (m_buttonState == Qt::MidButton) {
-		//Panning
+		// Panning
 		setInteractive(false);
-		// I need to disable QGraphicsView event handling to avoid the generation of 'virtual' mouseMoveEvent
+		// I need to disable QGraphicsView event handling to avoid the generation of 'virtual'
+		// mouseMoveEvent
 		QPointF delta = currScenePos - m_oldScenePos;
 		translate(delta.x(), delta.y());
 		currScenePos = mapToScene(currWinPos);
-		// translate has changed the matrix affecting the mapToScene() method. I have to recompute currScenePos
+		// translate has changed the matrix affecting the mapToScene() method. I have to recompute
+		// currScenePos
 		setInteractive(true);
 	}
 	m_oldWinPos = currWinPos;
@@ -273,14 +277,14 @@ void SchematicSceneViewer::mouseMoveEvent(QMouseEvent *me)
 
 //------------------------------------------------------------------
 
-/*! Reimplemets the QGraphicsView::mouseReleaseEvent() 
+/*! Reimplemets the QGraphicsView::mouseReleaseEvent()
 */
 void SchematicSceneViewer::mouseReleaseEvent(QMouseEvent *me)
 {
 	m_buttonState = Qt::NoButton;
 	QGraphicsView::mouseReleaseEvent(me);
 	setDragMode(QGraphicsView::NoDrag);
-	//update();
+	// update();
 }
 
 //------------------------------------------------------------------
@@ -295,7 +299,7 @@ void SchematicSceneViewer::keyPressEvent(QKeyEvent *ke)
 
 //------------------------------------------------------------------
 
-/*! Reimplemets the QGraphicsView::wheelEvent() 
+/*! Reimplemets the QGraphicsView::wheelEvent()
 */
 void SchematicSceneViewer::wheelEvent(QWheelEvent *me)
 {
@@ -322,7 +326,7 @@ void SchematicSceneViewer::zoomQt(bool zoomin, bool resetZoom)
 		double zoomScale = resetZoom ? 1 : ImageUtils::getQuantizedZoomFactor(oldZoomScale, zoomin);
 		QMatrix scale = QMatrix().scale(zoomScale / oldZoomScale, zoomScale / oldZoomScale);
 
-		//See QGraphicsView::mapToScene()'s doc for details
+		// See QGraphicsView::mapToScene()'s doc for details
 		QRect rect(0, 0, width(), height());
 		QRectF sceneCenterRect(mapToScene(QRect(rect.center(), QSize(2, 2))).boundingRect());
 		setMatrix(scale, true);
@@ -426,7 +430,7 @@ void SchematicSceneViewer::normalizeScene()
 #else
 	bool beforeIsLarge = (matrix().det() >= 1.0);
 #endif
-	//See QGraphicsView::mapToScene()'s doc for details
+	// See QGraphicsView::mapToScene()'s doc for details
 	QRect rect(0, 0, width(), height());
 	QRectF sceneCenterRect(mapToScene(QRect(rect.center(), QSize(2, 2))).boundingRect());
 	resetMatrix();
@@ -512,10 +516,14 @@ SchematicViewer::SchematicViewer(QWidget *parent)
 	setLayout(mainLayout);
 
 	connect(m_fxScene, SIGNAL(showPreview(TFxP)), this, SIGNAL(showPreview(TFxP)));
-	connect(m_fxScene, SIGNAL(doCollapse(const QList<TFxP> &)), this, SIGNAL(doCollapse(const QList<TFxP> &)));
-	connect(m_stageScene, SIGNAL(doCollapse(QList<TStageObjectId>)), this, SIGNAL(doCollapse(QList<TStageObjectId>)));
-	connect(m_fxScene, SIGNAL(doExplodeChild(const QList<TFxP> &)), this, SIGNAL(doExplodeChild(const QList<TFxP> &)));
-	connect(m_stageScene, SIGNAL(doExplodeChild(QList<TStageObjectId>)), this, SIGNAL(doExplodeChild(QList<TStageObjectId>)));
+	connect(m_fxScene, SIGNAL(doCollapse(const QList<TFxP> &)), this,
+			SIGNAL(doCollapse(const QList<TFxP> &)));
+	connect(m_stageScene, SIGNAL(doCollapse(QList<TStageObjectId>)), this,
+			SIGNAL(doCollapse(QList<TStageObjectId>)));
+	connect(m_fxScene, SIGNAL(doExplodeChild(const QList<TFxP> &)), this,
+			SIGNAL(doExplodeChild(const QList<TFxP> &)));
+	connect(m_stageScene, SIGNAL(doExplodeChild(QList<TStageObjectId>)), this,
+			SIGNAL(doExplodeChild(QList<TStageObjectId>)));
 	connect(m_stageScene, SIGNAL(editObject()), this, SIGNAL(editObject()));
 	connect(m_fxScene, SIGNAL(editObject()), this, SIGNAL(editObject()));
 
@@ -594,8 +602,8 @@ void SchematicViewer::createToolbars()
 void SchematicViewer::createActions()
 {
 	// Create all actions
-	QAction *addPegbar = 0, *addSpline = 0, *addCamera = 0,
-			*insertFx = 0, *addOutputFx = 0, *switchPort = 0;
+	QAction *addPegbar = 0, *addSpline = 0, *addCamera = 0, *insertFx = 0, *addOutputFx = 0,
+			*switchPort = 0;
 	{
 		// Fit schematic
 		QIcon fitSchematicIcon = createQIconOnOffPNG("fit", false);
@@ -612,13 +620,16 @@ void SchematicViewer::createActions()
 		m_reorder = new QAction(reorderIcon, tr("&Reorder Nodes"), m_commonToolbar);
 		connect(m_reorder, SIGNAL(triggered()), m_viewer, SLOT(reorderScene()));
 
-		//Normalize schematic schematic
+		// Normalize schematic schematic
 		QIcon normalizeIcon = createQIconOnOffPNG("resetsize", false);
 		m_normalize = new QAction(normalizeIcon, tr("&Reset Size"), m_commonToolbar);
 		connect(m_normalize, SIGNAL(triggered()), m_viewer, SLOT(normalizeScene()));
 
-		QIcon nodeSizeIcon = createQIconOnOffPNG(m_maximizedNode ? "minimizenodes" : "maximizenodes", false);
-		m_nodeSize = new QAction(nodeSizeIcon, m_maximizedNode ? tr("&Minimize Nodes") : tr("&Maximize Nodes"), m_commonToolbar);
+		QIcon nodeSizeIcon =
+			createQIconOnOffPNG(m_maximizedNode ? "minimizenodes" : "maximizenodes", false);
+		m_nodeSize = new QAction(nodeSizeIcon,
+								 m_maximizedNode ? tr("&Minimize Nodes") : tr("&Maximize Nodes"),
+								 m_commonToolbar);
 		connect(m_nodeSize, SIGNAL(triggered()), this, SLOT(changeNodeSize()));
 
 		if (m_fullSchematic) {
@@ -640,14 +651,15 @@ void SchematicViewer::createActions()
 			addSpline->setIcon(addSplineIcon);
 			connect(addSpline, SIGNAL(triggered()), m_stageScene, SLOT(onSplineAdded()));
 
-			//Switch display of stage schematic's output port
+			// Switch display of stage schematic's output port
 			switchPort = new QAction(tr("&Swtich output port display mode"), m_stageToolbar);
 			switchPort->setCheckable(true);
 			switchPort->setChecked(m_stageScene->isShowLetterOnPortFlagEnabled());
 			QIcon switchPortIcon = createQIconOnOffPNG("switchport");
 			switchPort->setIcon(switchPortIcon);
-			connect(switchPort, SIGNAL(toggled(bool)), m_stageScene, SLOT(onSwitchPortModeToggled(bool)));
-			
+			connect(switchPort, SIGNAL(toggled(bool)), m_stageScene,
+					SLOT(onSwitchPortModeToggled(bool)));
+
 			// InsertFx
 			insertFx = CommandManager::instance()->getAction("MI_InsertFx");
 			if (insertFx) {
@@ -732,7 +744,7 @@ void SchematicViewer::setFxSchematic()
 		m_stageToolbar->hide();
 		m_fxToolbar->show();
 
-		//check if the fx scene was small scaled (icon view mode)
+		// check if the fx scene was small scaled (icon view mode)
 		if (!m_fxScene->isLargeScaled())
 			m_fxScene->updateScene();
 
@@ -760,8 +772,10 @@ void SchematicViewer::onSceneChanged()
 
 void SchematicViewer::onSceneSwitched()
 {
-	m_maximizedNode = m_fxScene->getXsheetHandle()->getXsheet()->getFxDag()->getDagGridDimension() == 0;
-	QIcon nodeSizeIcon = createQIconOnOffPNG(m_maximizedNode ? "minimizenodes" : "maximizenodes", false);
+	m_maximizedNode =
+		m_fxScene->getXsheetHandle()->getXsheet()->getFxDag()->getDagGridDimension() == 0;
+	QIcon nodeSizeIcon =
+		createQIconOnOffPNG(m_maximizedNode ? "minimizenodes" : "maximizenodes", false);
 	m_nodeSize->setIcon(nodeSizeIcon);
 	QString label(m_maximizedNode ? tr("&Minimize Nodes") : tr("&Maximize Nodes"));
 	m_nodeSize->setText(label);
@@ -822,10 +836,11 @@ void SchematicViewer::updateScenes()
 void SchematicViewer::changeNodeSize()
 {
 	m_maximizedNode = !m_maximizedNode;
-	//aggiono l'icona del pulsante;
+	// aggiono l'icona del pulsante;
 	m_fxScene->resizeNodes(m_maximizedNode);
 	m_stageScene->resizeNodes(m_maximizedNode);
-	QIcon nodeSizeIcon = createQIconOnOffPNG(m_maximizedNode ? "minimizenodes" : "maximizenodes", false);
+	QIcon nodeSizeIcon =
+		createQIconOnOffPNG(m_maximizedNode ? "minimizenodes" : "maximizenodes", false);
 	m_nodeSize->setIcon(nodeSizeIcon);
 	QString label(m_maximizedNode ? tr("&Minimize Nodes") : tr("&Maximize Nodes"));
 	m_nodeSize->setText(label);

@@ -61,7 +61,10 @@
 namespace
 {
 
-bool filterNegatives(int c) { return (c < 0); }
+bool filterNegatives(int c)
+{
+	return (c < 0);
+}
 typedef tcg::function<bool (*)(int), filterNegatives> filterNegatives_fun;
 
 //-----------------------------------------------------------------------------
@@ -113,7 +116,7 @@ void cloneNotColumnLinkedFxsAndOutputsFx(TXsheet *xsh, TXsheet *newXsh)
 	int columnCount = xsh->getColumnCount();
 	assert(newXsh->getColumnCount() == columnCount);
 
-	//Riempio un mapping (fx del vecchio xsheet -> fx del nuovo xsheet)
+	// Riempio un mapping (fx del vecchio xsheet -> fx del nuovo xsheet)
 	QMap<TFx *, TFx *> clonedFxs;
 	int i;
 	for (i = 0; i < columnCount; i++) {
@@ -129,7 +132,7 @@ void cloneNotColumnLinkedFxsAndOutputsFx(TXsheet *xsh, TXsheet *newXsh)
 	FxDag *fxDag = xsh->getFxDag();
 	FxDag *newFxDag = newXsh->getFxDag();
 
-	//aggiungo nel mapping tutti gli effetti che non sono connessi da un cammino con una colonna
+	// aggiungo nel mapping tutti gli effetti che non sono connessi da un cammino con una colonna
 	std::vector<TFx *> fxs, newFxs;
 	fxDag->getFxs(fxs);
 	newFxDag->getFxs(newFxs);
@@ -149,7 +152,7 @@ void cloneNotColumnLinkedFxsAndOutputsFx(TXsheet *xsh, TXsheet *newXsh)
 		}
 	}
 
-	//Aggiungo tutti gli outputFx mancanti
+	// Aggiungo tutti gli outputFx mancanti
 	for (i = 0; i < fxDag->getOutputFxCount(); i++) {
 		if (i >= newFxDag->getOutputFxCount())
 			newFxDag->addOutputFx();
@@ -157,7 +160,7 @@ void cloneNotColumnLinkedFxsAndOutputsFx(TXsheet *xsh, TXsheet *newXsh)
 			fxDag->getOutputFx(i)->getAttributes()->getDagNodePos());
 	}
 
-	//connetto tutti i nuovi effetti aggiunti
+	// connetto tutti i nuovi effetti aggiunti
 	for (i = 0; i < notColumnLinkedClonedFxs.size(); i++) {
 		TFx *newFx = notColumnLinkedClonedFxs[i];
 		TFx *fx = clonedFxs.key(newFx);
@@ -192,7 +195,7 @@ void cloneNotColumnLinkedFxsAndOutputsFx(TXsheet *xsh, TXsheet *newXsh)
 			newOutputFx->getInputPort(index)->setFx(newFx);
 		}
 	}
-	//Connetto tutti gli output
+	// Connetto tutti gli output
 	for (i = 0; i < fxDag->getOutputFxCount(); i++) {
 		TOutputFx *outputFx = fxDag->getOutputFx(i);
 		TOutputFx *newOutputFx = newFxDag->getOutputFx(i);
@@ -223,7 +226,7 @@ void cloneXsheetTStageObjectTree(TXsheet *xsh, TXsheet *newXsh)
 	std::set<TStageObjectId> pegbarIds;
 	TStageObjectTree *tree = xsh->getStageObjectTree();
 	TStageObjectTree *newTree = newXsh->getStageObjectTree();
-	//Ricostruisco l'intero albero
+	// Ricostruisco l'intero albero
 	int i;
 	for (i = 0; i < tree->getStageObjectCount(); i++) {
 		TStageObject *stageObject = tree->getStageObject(i);
@@ -233,7 +236,7 @@ void cloneXsheetTStageObjectTree(TXsheet *xsh, TXsheet *newXsh)
 			TCamera *camera = stageObject->getCamera();
 			*newStageObject->getCamera() = *camera;
 		}
-		//Gestisco le spline delle colonne in modo differente perche' sono state gia' settate.
+		// Gestisco le spline delle colonne in modo differente perche' sono state gia' settate.
 		TStageObjectSpline *spline = newStageObject->getSpline();
 		TStageObjectParams *data = stageObject->getParams();
 		newStageObject->assignParams(data);
@@ -242,7 +245,7 @@ void cloneXsheetTStageObjectTree(TXsheet *xsh, TXsheet *newXsh)
 		if (id.isColumn() && spline)
 			newStageObject->setSpline(spline);
 
-		//Gestisco le spline che non sono di colonna (spline di camera)
+		// Gestisco le spline che non sono di colonna (spline di camera)
 		TStageObjectSpline *oldSpline = stageObject->getSpline();
 		if (oldSpline && !id.isColumn()) {
 			TStageObjectSpline *newSpline = newTree->createSpline();
@@ -267,12 +270,14 @@ bool pasteColumnsWithoutUndo(std::set<int> *indices, bool doClone, const StageOb
 	TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
 	// Check Circular References
 	if (data->checkCircularReferences(xsh)) {
-		DVGui::error(QObject::tr("It is not possible to paste the columns: there is a circular reference."));
+		DVGui::error(
+			QObject::tr("It is not possible to paste the columns: there is a circular reference."));
 		return false;
 	}
 
 	std::list<int> restoredSplineIds;
-	data->restoreObjects(*indices, restoredSplineIds, xsh, doClone ? StageObjectsData::eDoClone : 0);
+	data->restoreObjects(*indices, restoredSplineIds, xsh,
+						 doClone ? StageObjectsData::eDoClone : 0);
 	app->getCurrentXsheet()->notifyXsheetChanged();
 	app->getCurrentObject()->notifyObjectIdSwitched();
 	return true;
@@ -367,7 +372,8 @@ void deleteColumnsWithoutUndo(std::set<int> *indices, bool onlyColumns = false)
 
 //-----------------------------------------------------------------------------
 
-void resetColumns(const QMimeData *mimeData, std::set<int> *indices, const QMap<TFxPort *, TFx *> &columnFxLinks,
+void resetColumns(const QMimeData *mimeData, std::set<int> *indices,
+				  const QMap<TFxPort *, TFx *> &columnFxLinks,
 				  const QMap<TStageObjectId, TStageObjectId> &columnObjParents,
 				  const QMap<TStageObjectId, QList<TStageObjectId>> &columnObjChildren)
 {
@@ -382,9 +388,9 @@ void resetColumns(const QMimeData *mimeData, std::set<int> *indices, const QMap<
 	for (it = columnFxLinks.begin(); it != columnFxLinks.end(); it++)
 		it.key()->setFx(it.value());
 
-	//Devo rimettere le stesse connessioni tra gli stage object
+	// Devo rimettere le stesse connessioni tra gli stage object
 	QMap<TStageObjectId, TStageObjectId>::const_iterator it2;
-	for (it2 = columnObjParents.begin(); it2 != columnObjParents.end(); it2++) { //Parents
+	for (it2 = columnObjParents.begin(); it2 != columnObjParents.end(); it2++) { // Parents
 		TStageObject *obj = xsh->getStageObject(it2.key());
 		if (obj) {
 			obj->setParent(it2.value());
@@ -392,7 +398,7 @@ void resetColumns(const QMimeData *mimeData, std::set<int> *indices, const QMap<
 	}
 
 	QMap<TStageObjectId, QList<TStageObjectId>>::const_iterator it3;
-	for (it3 = columnObjChildren.begin(); it3 != columnObjChildren.end(); it3++) { //Children
+	for (it3 = columnObjChildren.begin(); it3 != columnObjChildren.end(); it3++) { // Children
 		QList<TStageObjectId> children = it3.value();
 		int i;
 		for (i = 0; i < children.size(); i++) {
@@ -461,11 +467,12 @@ void cloneSubXsheets(TXsheet *xsh)
 						if (cell.m_level && cell.m_level->getChildLevel()) {
 							TXsheet *subxsh = cell.m_level->getChildLevel()->getXsheet();
 
-							std::map<TXsheet *, TXshChildLevel *>::iterator it = visited.find(subxsh);
+							std::map<TXsheet *, TXshChildLevel *>::iterator it =
+								visited.find(subxsh);
 							if (it == visited.end()) {
 								it = visited.insert(std::make_pair(
-														subxsh,
-														cloneChildLevel(cell.m_level->getChildLevel())))
+														subxsh, cloneChildLevel(
+																	cell.m_level->getChildLevel())))
 										 .first;
 								toVisit.insert(subxsh);
 							}
@@ -490,9 +497,8 @@ class PasteColumnsUndo : public TUndo
 	StageObjectsData *m_data;
 	QMap<TFxPort *, TFx *> m_columnLinks;
 
-public:
-	PasteColumnsUndo(std::set<int> indices)
-		: m_indices(indices)
+  public:
+	PasteColumnsUndo(std::set<int> indices) : m_indices(indices)
 	{
 		TApp *app = TApp::instance();
 		m_data = new StageObjectsData();
@@ -511,10 +517,7 @@ public:
 		}
 	}
 
-	~PasteColumnsUndo()
-	{
-		delete m_data;
-	}
+	~PasteColumnsUndo() { delete m_data; }
 
 	void undo() const
 	{
@@ -531,14 +534,11 @@ public:
 		std::set<int>::const_iterator indicesIt = m_indices.begin();
 		while (indicesIt != m_indices.end())
 			indices.insert(*indicesIt++);
-		resetColumns(m_data, &indices, m_columnLinks,
-					 QMap<TStageObjectId, TStageObjectId>(), QMap<TStageObjectId, QList<TStageObjectId>>());
+		resetColumns(m_data, &indices, m_columnLinks, QMap<TStageObjectId, TStageObjectId>(),
+					 QMap<TStageObjectId, QList<TStageObjectId>>());
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 
 	QString getHistoryString()
 	{
@@ -553,10 +553,7 @@ public:
 		return str;
 	}
 
-	int getHistoryType()
-	{
-		return HistoryType::Xsheet;
-	}
+	int getHistoryType() { return HistoryType::Xsheet; }
 };
 
 //=============================================================================
@@ -573,7 +570,7 @@ class DeleteColumnsUndo : public TUndo
 
 	mutable std::auto_ptr<StageObjectsData> m_data;
 
-public:
+  public:
 	DeleteColumnsUndo(const std::set<int> &indices)
 		: m_indices(indices), m_data(new StageObjectsData)
 	{
@@ -611,12 +608,12 @@ public:
 					continue;
 
 				if (other->getParent() == id) {
-					//other->setParent(pegbar->getParent());
+					// other->setParent(pegbar->getParent());
 					m_columnObjChildren[id].append(other->getId());
 				}
 			}
 
-			//Mi salvo il parent
+			// Mi salvo il parent
 			m_columnObjParents[id] = pegbar->getParent();
 		}
 	}
@@ -638,15 +635,13 @@ public:
 	void undo() const
 	{
 		std::set<int> indices = m_indices;
-		resetColumns(m_data.get(), &indices, m_columnFxLinks, m_columnObjParents, m_columnObjChildren);
+		resetColumns(m_data.get(), &indices, m_columnFxLinks, m_columnObjParents,
+					 m_columnObjChildren);
 
 		m_data.reset();
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 
 	QString getHistoryString()
 	{
@@ -661,10 +656,7 @@ public:
 		return str;
 	}
 
-	int getHistoryType()
-	{
-		return HistoryType::Xsheet;
-	}
+	int getHistoryType() { return HistoryType::Xsheet; }
 };
 
 } // namespace
@@ -675,11 +667,11 @@ public:
 
 class ColumnCommandUndo : public TUndo
 {
-public:
+  public:
 	virtual ~ColumnCommandUndo() {}
 	virtual bool isConsistent() const = 0;
 
-protected:
+  protected:
 };
 
 //*************************************************************************
@@ -690,11 +682,8 @@ class InsertEmptyColumnsUndo : public ColumnCommandUndo
 {
 	std::vector<std::pair<int, int>> m_columnBlocks;
 
-public:
-	InsertEmptyColumnsUndo(const std::vector<int> &indices)
-	{
-		initialize(indices);
-	}
+  public:
+	InsertEmptyColumnsUndo(const std::vector<int> &indices) { initialize(indices); }
 
 	bool isConsistent() const { return true; }
 
@@ -716,12 +705,9 @@ public:
 		return str;
 	}
 
-	int getHistoryType()
-	{
-		return HistoryType::Xsheet;
-	}
+	int getHistoryType() { return HistoryType::Xsheet; }
 
-private:
+  private:
 	void initialize(const std::vector<int> &indices);
 };
 
@@ -732,15 +718,13 @@ void InsertEmptyColumnsUndo::initialize(const std::vector<int> &indices)
 	TApp *app = TApp::instance();
 	TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
 
-	std::vector<int>::const_iterator
-		cb,
-		ce, cEnd = indices.end();
+	std::vector<int>::const_iterator cb, ce, cEnd = indices.end();
 
 	for (cb = indices.begin(); cb != cEnd; cb = ce) // As long as block end is ok
 	{
 		int c = *cb;										  // Find a corresponding block start
 		for (ce = cb, ++ce, ++c; (ce != cEnd) && (*ce == c);) // by iterating as long as the next
-			++ce, ++c;										  // column index is the previous one + 1
+			++ce, ++c; // column index is the previous one + 1
 
 		m_columnBlocks.push_back(std::make_pair(*cb, c - *cb));
 	}
@@ -820,8 +804,10 @@ void copyColumns_internal(const std::set<int> &indices)
 
 	TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
 
-	data->storeColumns(indices, xsh, StageObjectsData::eDoClone | StageObjectsData::eResetFxDagPositions);
-	data->storeColumnFxs(indices, xsh, StageObjectsData::eDoClone | StageObjectsData::eResetFxDagPositions);
+	data->storeColumns(indices, xsh,
+					   StageObjectsData::eDoClone | StageObjectsData::eResetFxDagPositions);
+	data->storeColumnFxs(indices, xsh,
+						 StageObjectsData::eDoClone | StageObjectsData::eResetFxDagPositions);
 
 	QApplication::clipboard()->setMimeData(data);
 }
@@ -908,9 +894,8 @@ class ResequenceUndo : public TUndo
 	std::vector<TFrameId> m_oldFrames;
 	int m_newFramesCount;
 
-public:
-	ResequenceUndo(int col, int count)
-		: m_index(col), m_r0(0), m_newFramesCount(count)
+  public:
+	ResequenceUndo(int col, int count) : m_index(col), m_r0(0), m_newFramesCount(count)
 	{
 		TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
 		int r0, r1;
@@ -967,20 +952,14 @@ public:
 		TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this) + m_oldFrames.size() * sizeof(TFrameId);
-	}
+	int getSize() const { return sizeof(*this) + m_oldFrames.size() * sizeof(TFrameId); }
 
 	QString getHistoryString()
 	{
 		return QObject::tr("Resequence :  Col%1").arg(QString::number(m_index + 1));
 	}
 
-	int getHistoryType()
-	{
-		return HistoryType::Xsheet;
-	}
+	int getHistoryType() { return HistoryType::Xsheet; }
 };
 
 //=============================================================================
@@ -1038,8 +1017,7 @@ void ColumnCmd::resequence(int index)
 	if (frameCount < 1)
 		frameCount = 1;
 
-	TUndoManager::manager()->add(
-		new ResequenceUndo(index, frameCount));
+	TUndoManager::manager()->add(new ResequenceUndo(index, frameCount));
 
 	lcolumn->clearCells(r0, r1 - r0 + 1);
 	for (int i = 0; i < frameCount; i++) {
@@ -1062,7 +1040,7 @@ class CloneChildUndo : public TUndo
 	TXshChildLevelP m_childLevel;
 	int m_columnIndex;
 
-public:
+  public:
 	CloneChildUndo(TXshChildLevel *childLevel, int columnIndex)
 		: m_childLevel(childLevel), m_columnIndex(columnIndex)
 	{
@@ -1098,10 +1076,7 @@ public:
 		return QObject::tr("Clone Sub-xsheet :  Col%1").arg(QString::number(m_columnIndex + 1));
 	}
 
-	int getHistoryType()
-	{
-		return HistoryType::Xsheet;
-	}
+	int getHistoryType() { return HistoryType::Xsheet; }
 };
 
 //=============================================================================
@@ -1160,12 +1135,13 @@ void ColumnCmd::cloneChild(int index)
 	cloneXsheetTStageObjectTree(childXsh, newChildXsh);
 	/*--以下は、Clone SubXsheet するときに、SubXsheet内にある子SubXsheetをクローンする関数
 	クローンされた中にある子SubXsheetは、同じもので良いので、スキップする --*/
-	//cloneSubXsheets(newChildXsh);
+	// cloneSubXsheets(newChildXsh);
 
 	/*-- XSheetノードのFxSchematicでのDagNodePosを再現
 	FxやColumnノードの位置の再現は上のsetColumnで行っている
   --*/
-	newChildXsh->getFxDag()->getXsheetFx()->getAttributes()->setDagNodePos(childXsh->getFxDag()->getXsheetFx()->getAttributes()->getDagNodePos());
+	newChildXsh->getFxDag()->getXsheetFx()->getAttributes()->setDagNodePos(
+		childXsh->getFxDag()->getXsheetFx()->getAttributes()->getDagNodePos());
 
 	newChildXsh->updateFrameCount();
 
@@ -1182,7 +1158,8 @@ void ColumnCmd::cloneChild(int index)
 	}
 
 	TStageObjectId currentObjectId = TApp::instance()->getCurrentObject()->getObjectId();
-	xsh->getStageObject(TStageObjectId::ColumnId(newColumnIndex))->setParent(xsh->getStageObjectParent(currentObjectId));
+	xsh->getStageObject(TStageObjectId::ColumnId(newColumnIndex))
+		->setParent(xsh->getStageObjectParent(currentObjectId));
 
 	xsh->updateFrameCount();
 	TUndoManager::manager()->add(new CloneChildUndo(newChildLevel, newColumnIndex));
@@ -1225,9 +1202,8 @@ class ClearColumnCellsUndo : public TUndo
 	int m_r0;
 	std::vector<TXshCell> m_oldFrames;
 
-public:
-	ClearColumnCellsUndo(int col)
-		: m_col(col), m_r0(0)
+  public:
+	ClearColumnCellsUndo(int col) : m_col(col), m_r0(0)
 	{
 		TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
 		int r0, r1;
@@ -1261,20 +1237,14 @@ public:
 		}
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this) + m_oldFrames.size() * sizeof(m_oldFrames[0]);
-	}
+	int getSize() const { return sizeof(*this) + m_oldFrames.size() * sizeof(m_oldFrames[0]); }
 
 	QString getHistoryString()
 	{
 		return QObject::tr("Clear Cells :  Col%1").arg(QString::number(m_col + 1));
 	}
 
-	int getHistoryType()
-	{
-		return HistoryType::Xsheet;
-	}
+	int getHistoryType() { return HistoryType::Xsheet; }
 };
 
 //=============================================================================
@@ -1322,18 +1292,16 @@ class ColumnsStatusCommand : public MenuItemHandler
 {
 	int m_cmd, m_target;
 
-public:
-	ColumnsStatusCommand(
-		CommandId id,
-		int cmd, int target)
+  public:
+	ColumnsStatusCommand(CommandId id, int cmd, int target)
 		: MenuItemHandler(id), m_cmd(cmd), m_target(target)
 	{
 	}
 
 	void execute()
 	{
-		TColumnSelection *selection =
-			dynamic_cast<TColumnSelection *>(TApp::instance()->getCurrentSelection()->getSelection());
+		TColumnSelection *selection = dynamic_cast<TColumnSelection *>(
+			TApp::instance()->getCurrentSelection()->getSelection());
 		TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
 		int cc = TApp::instance()->getCurrentColumn()->getColumnIndex();
 		for (int i = 0; i < xsh->getColumnCount(); i++) {
@@ -1349,7 +1317,9 @@ public:
 			if (m_target == TARGET_SELECTED && !isSelected)
 				continue;
 
-			/*- ターゲットが「カレントカラムより右側」のモードで、iがカレントカラムより左の場合は飛ばす -*/
+			/*-
+			 * ターゲットが「カレントカラムより右側」のモードで、iがカレントカラムより左の場合は飛ばす
+			 * -*/
 			if (m_target == TARGET_UPPER && i < cc)
 				continue;
 
@@ -1384,24 +1354,24 @@ public:
 					column->setCamstandVisible(!column->isCamstandVisible());
 			}
 			/*TAB
-      if(cmd & (CMD_ENABLE_PREVIEW|CMD_DISABLE_PREVIEW|CMD_TOGGLE_PREVIEW))
-      { //In Tab preview e cameraStand vanno settati entrambi
-        if(cmd&CMD_ENABLE_PREVIEW)
-        {
-          column->setPreviewVisible(!negate);
-          column->setCamstandVisible(!negate);
-        }
-        else if(cmd&CMD_DISABLE_PREVIEW) 
-        {
-          column->setPreviewVisible(negate);
-          column->setCamstandVisible(negate);
-        }
-        else 
-        {
-          column->setPreviewVisible(!column->isPreviewVisible());
-          column->setCamstandVisible(!column->isCamstandVisible());
-        }
-      }
+	  if(cmd & (CMD_ENABLE_PREVIEW|CMD_DISABLE_PREVIEW|CMD_TOGGLE_PREVIEW))
+	  { //In Tab preview e cameraStand vanno settati entrambi
+		if(cmd&CMD_ENABLE_PREVIEW)
+		{
+		  column->setPreviewVisible(!negate);
+		  column->setCamstandVisible(!negate);
+		}
+		else if(cmd&CMD_DISABLE_PREVIEW)
+		{
+		  column->setPreviewVisible(negate);
+		  column->setCamstandVisible(negate);
+		}
+		else
+		{
+		  column->setPreviewVisible(!column->isPreviewVisible());
+		  column->setCamstandVisible(!column->isCamstandVisible());
+		}
+	  }
 			*/
 		}
 		TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
@@ -1428,8 +1398,7 @@ ColumnsStatusCommand
 	c10(MI_EnableSelectedColumns, CMD_ENABLE_PREVIEW, TARGET_SELECTED),
 	c11(MI_DisableSelectedColumns, CMD_DISABLE_PREVIEW, TARGET_SELECTED),
 
-	c12(MI_LockAllColumns, CMD_LOCK, TARGET_ALL),
-	c13(MI_UnlockAllColumns, CMD_UNLOCK, TARGET_ALL),
+	c12(MI_LockAllColumns, CMD_LOCK, TARGET_ALL), c13(MI_UnlockAllColumns, CMD_UNLOCK, TARGET_ALL),
 	c14(MI_LockThisColumnOnly, CMD_LOCK, TARGET_CURRENT),
 	c15(MI_ToggleColumnLocks, CMD_TOGGLE_LOCK, TARGET_ALL),
 	c16(MI_LockSelectedColumns, CMD_LOCK, TARGET_SELECTED),

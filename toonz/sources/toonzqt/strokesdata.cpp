@@ -149,15 +149,16 @@ ToonzImageData *StrokesData::toToonzImageData(const TToonzImageP &imageToPaste) 
 	bbox.x1 = tceil(bbox.x1);
 	bbox.y1 = tceil(bbox.y1);
 	TDimension size(bbox.getLx(), bbox.getLy());
-	TToonzImageP app = ToonzImageUtils::vectorToToonzImage(
-		m_image, sc, m_image->getPalette(), bbox.getP00(), size, 0, true);
+	TToonzImageP app = ToonzImageUtils::vectorToToonzImage(m_image, sc, m_image->getPalette(),
+														   bbox.getP00(), size, 0, true);
 
 	vector<TRectD> rects;
 	vector<TStroke> strokes;
 	TStroke stroke = getStrokeByRect(bbox);
 	strokes.push_back(stroke);
 	ToonzImageData *data = new ToonzImageData();
-	data->setData(app->getRaster(), m_image->getPalette(), dpix, dpiy, TDimension(), rects, strokes, strokes, TAffine());
+	data->setData(app->getRaster(), m_image->getPalette(), dpix, dpiy, TDimension(), rects, strokes,
+				  strokes, TAffine());
 	return data;
 }
 
@@ -184,6 +185,7 @@ FullColorImageData *StrokesData::toFullColorImageData(const TRasterImageP &image
 	TStroke stroke = getStrokeByRect(bbox);
 	strokes.push_back(stroke);
 	FullColorImageData *data = new FullColorImageData();
-	data->setData(app->getRaster(), m_image->getPalette(), dpix, dpiy, TDimension(), rects, strokes, strokes, TAffine());
+	data->setData(app->getRaster(), m_image->getPalette(), dpix, dpiy, TDimension(), rects, strokes,
+				  strokes, TAffine());
 	return data;
 }

@@ -7,10 +7,10 @@
 #include "tiio_mov_proxy.h"
 #else
 
-//Windows include
+// Windows include
 #include <windows.h>
 
-//QuickTime includes
+// QuickTime includes
 namespace QuickTime
 {
 #define list List
@@ -31,9 +31,9 @@ namespace QuickTime
 #undef map
 #undef iterator
 #undef float_t
-} //namespace QuickTime
+} // namespace QuickTime
 
-//Toonz includes
+// Toonz includes
 #include "tlevel_io.h"
 #include "tthreadmessage.h"
 #include "tcommon.h"
@@ -87,7 +87,7 @@ class TLevelWriterMov : public TLevelWriter
 	TThread::Mutex m_mutex;
 	ComponentInstance m_ci;
 
-public:
+  public:
 	TLevelWriterMov(const TFilePath &path, TPropertyGroup *winfo);
 	~TLevelWriterMov();
 
@@ -96,7 +96,7 @@ public:
 	void save(const TImageP &img, int frameIndex);
 	void saveSoundTrack(TSoundTrack *st);
 
-public:
+  public:
 	static TLevelWriter *create(const TFilePath &f, TPropertyGroup *winfo)
 	{
 		return new TLevelWriterMov(f, winfo);
@@ -109,9 +109,9 @@ public:
 
 class DVAPI TLevelReaderMov : public TLevelReader
 {
-	bool m_readAsToonzOutput; //default: false
-	bool m_yMirror;			  //default: true
-	bool m_loadTimecode;	  //default: false
+	bool m_readAsToonzOutput; // default: false
+	bool m_yMirror; // default: true
+	bool m_loadTimecode; // default: false
 	int m_IOError;
 
 	short m_refNum;
@@ -124,13 +124,14 @@ class DVAPI TLevelReaderMov : public TLevelReader
 	int m_hh, m_mm, m_ss, m_ff;
 	TThread::Mutex m_mutex;
 
-public:
+  public:
 	TLevelReaderMov(const TFilePath &path);
 	~TLevelReaderMov();
 
 	TImageReaderP getFrameReader(TFrameId fid);
 	TLevelP loadInfo();
-	void load(const TRasterP &rasP, int frameIndex, const TPoint &pos, int shrinkX = 1, int shrinkY = 1);
+	void load(const TRasterP &rasP, int frameIndex, const TPoint &pos, int shrinkX = 1,
+			  int shrinkY = 1);
 
 	void timecode(int frame, UCHAR &hh, UCHAR &mm, UCHAR &ss, UCHAR &ff);
 	void loadedTimecode(UCHAR &hh, UCHAR &mm, UCHAR &ss, UCHAR &ff);
@@ -145,10 +146,10 @@ public:
 	TDimension getSize() const { return TDimension(m_lx, m_ly); }
 	TRect getBBox() const { return TRect(0, 0, m_lx - 1, m_ly - 1); }
 
-public:
+  public:
 	static TLevelReader *create(const TFilePath &f);
 
-private:
+  private:
 	TLevelP loadToonzOutputFormatInfo();
 };
 
@@ -161,14 +162,14 @@ namespace Tiio
 
 class MovWriterProperties : public TPropertyGroup
 {
-public:
+  public:
 	MovWriterProperties();
 };
 
-} //namespace Tiio
+} // namespace Tiio
 
 //===========================================================================
 
-#endif //!x64
+#endif //! x64
 
-#endif //TIIO_MOV_H
+#endif // TIIO_MOV_H

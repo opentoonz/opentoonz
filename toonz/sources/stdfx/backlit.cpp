@@ -11,13 +11,13 @@ class BacklitFx : public TStandardRasterFx
 	FX_PLUGIN_DECLARATION(BacklitFx)
 
 	TRasterFxPort m_input;
-	//TDoubleParamP m_value;
+	// TDoubleParamP m_value;
 
-public:
+  public:
 	BacklitFx()
 	//    , m_value (args, "Blur")
 	{
-		//m_value->setDefaultValue(100);
+		// m_value->setDefaultValue(100);
 		addInputPort("Source", m_input);
 	}
 
@@ -50,18 +50,16 @@ namespace
 {
 
 template <class T>
-void computeBacklit(TRasterPT<T> dst,
-					TRasterPT<T> src,
-					const TPoint &srcPos,
+void computeBacklit(TRasterPT<T> dst, TRasterPT<T> src, const TPoint &srcPos,
 					// cordinate di src[0,0] rispetto a dst;
 					// in genere srcPos.x,.y <= 0
 					const TPoint &center
 					// coordinate della sorgente di luce rispetto a dst;
 					)
 {
-	//TRect srcRect = src->getBounds() + srcPos;
-	//assert(srcRect.contains(dst->getBounds()));
-	//assert(srcRect.contains(center));
+	// TRect srcRect = src->getBounds() + srcPos;
+	// assert(srcRect.contains(dst->getBounds()));
+	// assert(srcRect.contains(center));
 	UINT max = T::maxChannelValue;
 	dst->lock();
 	for (int x = 0; x < dst->getLx(); x++)
@@ -152,7 +150,7 @@ void BacklitFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 		computeBacklit<TPixel64>(dst, src, srcPos, center);
 	}
 
-	//dst->copy(src,srcPos);
+	// dst->copy(src,srcPos);
 }
 
 //---------------------------------------------------------------------
@@ -183,4 +181,4 @@ TRect BacklitFx::getInvalidRect(const TRect &max)
 	return ris;
 }
 
-//FX_PLUGIN_IDENTIFIER(BacklitFx        , "backlitFx")
+// FX_PLUGIN_IDENTIFIER(BacklitFx        , "backlitFx")

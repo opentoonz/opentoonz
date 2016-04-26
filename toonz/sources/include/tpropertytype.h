@@ -6,23 +6,16 @@
 #include <vector>
 using namespace std;
 
-template <typename T>
-class TEnumerationT
+template <typename T> class TEnumerationT
 {
-public:
+  public:
 	typedef T value_type;
 
 	TEnumerationT() {}
 
-	void addItem(const string &id, T item)
-	{
-		m_items.push_back(std::make_pair(id, item));
-	}
+	void addItem(const string &id, T item) { m_items.push_back(std::make_pair(id, item)); }
 
-	int getItemCount() const
-	{
-		return m_items.size();
-	}
+	int getItemCount() const { return m_items.size(); }
 	void getItem(unsigned int i, string &idstring, T &value) const
 	{
 		assert(i < m_items.size());
@@ -45,43 +38,36 @@ public:
 		return it != m_items.end();
 	}
 
-private:
+  private:
 	typedef pair<string, T> ItemData;
 	vector<ItemData> m_items;
 
 	class MatchesItem
 	{
-	public:
+	  public:
 		MatchesItem(const T &item) : m_item(item) {}
 
-		bool operator()(const ItemData &itemData)
-		{
-			return itemData.second == m_item;
-		}
+		bool operator()(const ItemData &itemData) { return itemData.second == m_item; }
 
-	private:
+	  private:
 		T m_item;
 	};
 };
 
 typedef TEnumerationT<int> TIntEnumeration;
 
-template <typename T>
-class TValueRangeT
+template <typename T> class TValueRangeT
 {
-public:
+  public:
 	typedef T value_type;
 	TValueRangeT() : m_min(-1), m_max(1) {}
 	TValueRangeT(T min, T max) : m_min(min), m_max(max) {}
 
 	void getRange(T &min, T &max) const;
 
-	bool isValid(T value) const
-	{
-		return m_min <= value && value <= m_max;
-	}
+	bool isValid(T value) const { return m_min <= value && value <= m_max; }
 
-private:
+  private:
 	T m_min, m_max;
 };
 

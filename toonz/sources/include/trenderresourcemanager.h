@@ -49,7 +49,7 @@ camstand preview and render/preview commands build different managers.
 
 class TRenderResourceManager
 {
-public:
+  public:
 	TRenderResourceManager() {}
 	virtual ~TRenderResourceManager() {}
 
@@ -87,7 +87,7 @@ class DVAPI TRenderResourceManagerGenerator
 	int m_managerIndex;
 	bool m_instanceScope;
 
-public:
+  public:
 	TRenderResourceManagerGenerator(bool renderInstanceScope = false);
 	~TRenderResourceManagerGenerator() {}
 
@@ -129,12 +129,12 @@ static TRenderResourceManagerGenerator* gen();
 \endcode
 */
 
-#define T_RENDER_RESOURCE_MANAGER                   \
-public:                                             \
-	static TRenderResourceManagerGenerator *gen();  \
-	static TRenderResourceManagerGenerator *deps(); \
-                                                    \
-private:
+#define T_RENDER_RESOURCE_MANAGER                                                                  \
+  public:                                                                                          \
+	static TRenderResourceManagerGenerator *gen();                                                 \
+	static TRenderResourceManagerGenerator *deps();                                                \
+                                                                                                   \
+  private:
 
 //--------------------------------------------------------------------------------
 
@@ -145,22 +145,18 @@ instance - just place it after the generator definition.
 \c MANAGER_FILESCOPE_DECLARATION_DEP macro instead.
 */
 
-#define MANAGER_FILESCOPE_DECLARATION(managerClass, generatorClass) \
-                                                                    \
-	TRenderResourceManagerGenerator *managerClass::gen()            \
-	{                                                               \
-		static generatorClass theInstance;                          \
-		return &theInstance;                                        \
-	}                                                               \
-	TRenderResourceManagerGenerator *managerClass::deps()           \
-	{                                                               \
-		return managerClass::gen();                                 \
-	}                                                               \
-                                                                    \
-	namespace                                                       \
-	{                                                               \
-	generatorClass *generatorClass##Instance =                      \
-		(generatorClass *)managerClass::deps();                     \
+#define MANAGER_FILESCOPE_DECLARATION(managerClass, generatorClass)                                \
+                                                                                                   \
+	TRenderResourceManagerGenerator *managerClass::gen()                                           \
+	{                                                                                              \
+		static generatorClass theInstance;                                                         \
+		return &theInstance;                                                                       \
+	}                                                                                              \
+	TRenderResourceManagerGenerator *managerClass::deps() { return managerClass::gen(); }          \
+                                                                                                   \
+	namespace                                                                                      \
+	{                                                                                              \
+	generatorClass *generatorClass##Instance = (generatorClass *)managerClass::deps();             \
 	}
 
 //--------------------------------------------------------------------------------
@@ -175,32 +171,31 @@ calls separated by a comma.
 Here is an example:
 \code
 MANAGER_FILESCOPE_DECLARATION_DEP(
-  MyResourceManager, 
+  MyResourceManager,
   MyResourceManagerGenerator,
   TPredictiveCacheManager::deps(); TOfflineGLManager::deps(); \\etc...
 )
 \endcode
 */
 
-#define MANAGER_FILESCOPE_DECLARATION_DEP(managerClass, generatorClass, depsList) \
-                                                                                  \
-	TRenderResourceManagerGenerator *managerClass::gen()                          \
-	{                                                                             \
-		static generatorClass theInstance;                                        \
-		return &theInstance;                                                      \
-	}                                                                             \
-	TRenderResourceManagerGenerator *managerClass::deps()                         \
-	{                                                                             \
-		depsList;                                                                 \
-		return managerClass::gen();                                               \
-	}                                                                             \
-                                                                                  \
-	namespace                                                                     \
-	{                                                                             \
-	generatorClass *generatorClass##Instance =                                    \
-		(generatorClass *)managerClass::deps();                                   \
+#define MANAGER_FILESCOPE_DECLARATION_DEP(managerClass, generatorClass, depsList)                  \
+                                                                                                   \
+	TRenderResourceManagerGenerator *managerClass::gen()                                           \
+	{                                                                                              \
+		static generatorClass theInstance;                                                         \
+		return &theInstance;                                                                       \
+	}                                                                                              \
+	TRenderResourceManagerGenerator *managerClass::deps()                                          \
+	{                                                                                              \
+		depsList;                                                                                  \
+		return managerClass::gen();                                                                \
+	}                                                                                              \
+                                                                                                   \
+	namespace                                                                                      \
+	{                                                                                              \
+	generatorClass *generatorClass##Instance = (generatorClass *)managerClass::deps();             \
 	}
 
 //===============================================================================
 
-#endif //TRENDERRESOURCEMANAGER_INCLUDED
+#endif // TRENDERRESOURCEMANAGER_INCLUDED

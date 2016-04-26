@@ -18,7 +18,7 @@
 #endif
 
 //=============================================================================
-//forward declarations
+// forward declarations
 class TXshLevelColumn;
 class TXshSoundColumn;
 class TXshSoundTextColumn;
@@ -31,10 +31,10 @@ class TXshCell;
 class TFx;
 
 //=============================================================================
-//!The TXshColumn class is the base class of column managers in xsheet.
+//! The TXshColumn class is the base class of column managers in xsheet.
 /*!Inherits \b TColumnHeader and \b TPersist.
 \n This is an abstract base class inherited by the concrete classes
-   \b TXshCellColumn, \b TXshSoundColumn and TXshPaletteColumn. 
+   \b TXshCellColumn, \b TXshSoundColumn and TXshPaletteColumn.
 
    The class contains all features about a generic xsheet column and gives
    all methods to access to these informations.
@@ -59,34 +59,34 @@ class DVAPI TXshColumn : public TColumnHeader, public TPersist
 
 	int m_status;
 	TXsheet *m_xsheet;
-	int m_colorTag; //Usato solo in tabkids
+	int m_colorTag; // Usato solo in tabkids
 	UCHAR m_opacity;
 
-protected:
+  protected:
 	enum {
 		eCamstandVisible = 0x1,
 		ePreviewVisible = 0x2,
 		eLocked = 0x8,
 		eMasked = 0x10,
-		eCamstandTransparent43 = 0x20 //obsoleto, solo per retrocompatibilita'
+		eCamstandTransparent43 = 0x20 // obsoleto, solo per retrocompatibilita'
 	};
 
 	TRaster32P m_icon;
 
 	/*!
-    Set \b m_status to \b status.
-    \sa getStatusWord()
+	Set \b m_status to \b status.
+	\sa getStatusWord()
   */
 	void setStatusWord(int status);
 	/*!
-    Return \b m_status.
-    \sa setStatusWord()
+	Return \b m_status.
+	\sa setStatusWord()
   */
 	int getStatusWord() const { return m_status; };
 
-public:
+  public:
 	/*!
-    Constructs a TXshColumn with default value.
+	Constructs a TXshColumn with default value.
   */
 	TXshColumn() : m_status(0), m_xsheet(0), m_colorTag(0), m_opacity(255) {}
 
@@ -120,73 +120,76 @@ public:
 	virtual TXshColumn *clone() const = 0;
 
 	/*!
-    Return true if camera stand is visible.
-    \sa setCamstandVisible()
+	Return true if camera stand is visible.
+	\sa setCamstandVisible()
   */
 	bool isCamstandVisible() const;
 	/*!
-    Set column status camera stand visibility to \b on.
-    \sa isCamstandVisible()
+	Set column status camera stand visibility to \b on.
+	\sa isCamstandVisible()
   */
 	void setCamstandVisible(bool on);
 
 	/*!
-    Return true if camera stand is transparent.notice: this value is not relevant if camerastandVisible is off.
-    \sa setCamstandTransparent()
+	Return true if camera stand is transparent.notice: this value is not relevant if
+	camerastandVisible is off.
+	\sa setCamstandTransparent()
   */
 	UCHAR getOpacity() const { return m_opacity; }
 	/*!
-    Set column status camera stand transparent to \b on. notice: this value is not relevant if camerastandVisible is off.
-    \sa isCamstandTransparent()
+	Set column status camera stand transparent to \b on. notice: this value is not relevant if
+	camerastandVisible is off.
+	\sa isCamstandTransparent()
   */
 	void setOpacity(UCHAR val) { m_opacity = val; }
 
-	// switch to next camera stand state. It's a 3-state-toggle: notvisible -> visible+nottransparent -> visible+transparent
+	// switch to next camera stand state. It's a 3-state-toggle: notvisible ->
+	// visible+nottransparent -> visible+transparent
 	// void setCamstandNextState();
 	/*!
-    Return true if preview is visible.
-    \sa setPreviewVisible()
+	Return true if preview is visible.
+	\sa setPreviewVisible()
   */
 	bool isPreviewVisible() const;
 	/*!
-    Set column status preview to \b on.
-    \sa isPreviewVisible()
+	Set column status preview to \b on.
+	\sa isPreviewVisible()
   */
 	void setPreviewVisible(bool on);
 
 	/*!
-    Return true if column is locked.
-    \sa lock()
+	Return true if column is locked.
+	\sa lock()
   */
 	bool isLocked() const;
 	/*!
-    Set column status look to \b on.
-    \sa isLocked()
+	Set column status look to \b on.
+	\sa isLocked()
   */
 	void lock(bool on);
 
 	/*!
-    Return true if column is a mask.
-    \sa setMask()
+	Return true if column is a mask.
+	\sa setMask()
   */
 	bool isMask() const;
 	/*!
-    Set column status mask to \b on.
-    \sa isMask()
+	Set column status mask to \b on.
+	\sa isMask()
   */
 	void setIsMask(bool on);
 
 	virtual bool isEmpty() const { return true; }
 
 	/*!
-    Return \b m_icon.
+	Return \b m_icon.
   */
 	virtual TRaster32P getIcon() { return m_icon; }
 
 	virtual bool isCellEmpty(int row) const = 0;
 
 	/*!
-    If r0=r1=row return false.
+	If r0=r1=row return false.
   */
 	virtual bool getLevelRange(int row, int &r0, int &r1) const = 0;
 
@@ -198,38 +201,38 @@ public:
 	}
 
 	/*!
-    Set \b m_xsheet to \b xsheet.
-    \sa getXsheet()
+	Set \b m_xsheet to \b xsheet.
+	\sa getXsheet()
   */
 	virtual void setXsheet(TXsheet *xsheet) { m_xsheet = xsheet; }
 	/*!
-    Return \b m_xsheet.
-    \sa setXsheet()
+	Return \b m_xsheet.
+	\sa setXsheet()
   */
 	TXsheet *getXsheet() const { return m_xsheet; }
 
 	virtual TFx *getFx() const { return 0; }
 
 	/*!
-    Return true if column affects the final render 
+	Return true if column affects the final render
   */
 	virtual bool isRendered() const;
 
 	/*!
-    Return true if column is control.
+	Return true if column is control.
   */
 	virtual bool isControl() const;
 
 	/*!
-    Return column color tag.
-    \sa setColorTag()
+	Return column color tag.
+	\sa setColorTag()
   */
-	int getColorTag() const { return m_colorTag; } //Usato solo in tabkids
+	int getColorTag() const { return m_colorTag; } // Usato solo in tabkids
 	/*!
-    Set column color tag to \b colorTag.
-    \sa getColorTag()
+	Set column color tag to \b colorTag.
+	\sa getColorTag()
   */
-	void setColorTag(int colorTag) { m_colorTag = colorTag; } //Usato solo in tabkids
+	void setColorTag(int colorTag) { m_colorTag = colorTag; } // Usato solo in tabkids
 };
 
 #ifdef _WIN32
@@ -238,10 +241,10 @@ template class DV_EXPORT_API TSmartPointerT<TXshColumn>;
 typedef TSmartPointerT<TXshColumn> TXshColumnP;
 
 //=============================================================================
-//!The TXshCellColumn class is the base class of column cell managers in xsheet.
+//! The TXshCellColumn class is the base class of column cell managers in xsheet.
 /*!Inherits \b TXshColumn.
 \n This is an abstract base class inherited by the concrete classes
-   \b TXshLevelColumn and \b TXshZeraryFxColumn. 
+   \b TXshLevelColumn and \b TXshZeraryFxColumn.
 
    The class defines column by cells getCellColumn(). TXshCellColumn is an object
    composed of a \b TXshCell vector and of an integer to memorize first not empty cell.
@@ -258,104 +261,104 @@ typedef TSmartPointerT<TXshColumn> TXshColumnP;
 
 class DVAPI TXshCellColumn : public TXshColumn
 {
-protected:
+  protected:
 	std::vector<TXshCell> m_cells;
 	int m_first;
 
-public:
+  public:
 	/*!
-    Constructs a TXshCellColumn with default value.
+	Constructs a TXshCellColumn with default value.
   */
 	TXshCellColumn();
 	/*!
-    Destroys the TXshCellColumn object.
+	Destroys the TXshCellColumn object.
   */
 	~TXshCellColumn();
 
 	/*!
-    Return \b TXshCellColumn.
+	Return \b TXshCellColumn.
   */
 	TXshCellColumn *getCellColumn() { return this; }
 
 	virtual bool canSetCell(const TXshCell &cell) const = 0;
 
 	/*!
-    Return not empty cell range. Set \b r0 and \b r1 to first
-    and last row with not empty cell.
-    \sa isEmpty() and getRowCount()
+	Return not empty cell range. Set \b r0 and \b r1 to first
+	and last row with not empty cell.
+	\sa isEmpty() and getRowCount()
   */
 	virtual int getRange(int &r0, int &r1) const;
 	/*!
-    Return row count.
-    \sa isEmpty() and getRange()
+	Return row count.
+	\sa isEmpty() and getRange()
   */
 	virtual int getRowCount() const;
 	/*!
-    Return true if row count is null.
-    \sa isCellEmpty(), getRowCount(), getRange()
+	Return true if row count is null.
+	\sa isCellEmpty(), getRowCount(), getRange()
   */
 	virtual bool isEmpty() const { return getRowCount() == 0; }
 
 	/*!
-    Return true if cell in \b row is empty.
-    \sa isEmpty()
+	Return true if cell in \b row is empty.
+	\sa isEmpty()
   */
 	virtual bool isCellEmpty(int row) const;
 
 	/*!
-    Return cell in \b row.
-    \sa getCells and setCell()
+	Return cell in \b row.
+	\sa getCells and setCell()
   */
 	virtual const TXshCell &getCell(int row) const;
 	/*!
-    Set cell in \b row to \b TXshCell \b cell.
-    \sa setCells() and getCell(); return false if cannot set cells.
+	Set cell in \b row to \b TXshCell \b cell.
+	\sa setCells() and getCell(); return false if cannot set cells.
   */
 	virtual bool setCell(int row, const TXshCell &cell);
 
 	/*!
-    Set \b cells[] from \b row to \b row + \b rowCount to column cells.
-    \sa getCell and setCells()
+	Set \b cells[] from \b row to \b row + \b rowCount to column cells.
+	\sa getCell and setCells()
   */
 	virtual void getCells(int row, int rowCount, TXshCell cells[]);
 	/*!
-    Set column cells from \b row to \b row + \b rowCount to cells[].
-    \sa setCell() and getCell(); return false if cannot set cells[].
+	Set column cells from \b row to \b row + \b rowCount to cells[].
+	\sa setCell() and getCell(); return false if cannot set cells[].
   */
 	virtual bool setCells(int row, int rowCount, const TXshCell cells[]);
 
 	/*!
-    Insert \b rowCount empty cells from line \b row.
+	Insert \b rowCount empty cells from line \b row.
   */
 	virtual void insertEmptyCells(int row, int rowCount = 1);
 	/*!
-    Remove \b rowCount cells from line \b row, with shift.
+	Remove \b rowCount cells from line \b row, with shift.
   */
 	virtual void removeCells(int row, int rowCount = 1);
 	/*!
-    Clear \b rowCount cells from line \b row, without shift.
+	Clear \b rowCount cells from line \b row, without shift.
   */
 	virtual void clearCells(int row, int rowCount = 1);
 
 	/*!
-    Return last row with not empty cell.
+	Return last row with not empty cell.
   */
 	virtual int getMaxFrame() const;
 
 	/*!
-    Return first not empty row.
+	Return first not empty row.
   */
 	virtual int getFirstRow() const;
-	//debug only
+	// debug only
 	virtual void checkColumn() const;
 
 	/*!
-    Return true if cell in row is not empty. Set \b r0 and \b r1 to first and
-    last row with not empty cell of same level.
+	Return true if cell in row is not empty. Set \b r0 and \b r1 to first and
+	last row with not empty cell of same level.
   */
 	virtual bool getLevelRange(int row, int &r0, int &r1) const;
 
-	//virtual void updateIcon() = 0;
+	// virtual void updateIcon() = 0;
 };
 
 #endif

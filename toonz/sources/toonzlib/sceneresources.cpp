@@ -42,7 +42,7 @@ bool changeSavePath(TFilePath &path, TFilePath oldSavePath, TFilePath newSavePat
 
 //-----------------------------------------------------------------------------
 
-//From ../../../filename#type.psd to ../../../filename.psd
+// From ../../../filename#type.psd to ../../../filename.psd
 TFilePath restorePsdPath(const TFilePath &fp)
 {
 	QString path = QString::fromStdWString(fp.getWideString());
@@ -117,7 +117,8 @@ ResourceImportStrategy::ResourceImportStrategy(int strategy)
 
 //-----------------------------------------------------------------------------
 
-TFilePath ResourceImportStrategy::process(ToonzScene *scene, ToonzScene *srcScene, TFilePath srcPath)
+TFilePath ResourceImportStrategy::process(ToonzScene *scene, ToonzScene *srcScene,
+										  TFilePath srcPath)
 {
 	TFilePath srcActualPath = srcScene->decodeFilePath(srcPath);
 	if (!scene->isExternPath(srcActualPath) || m_strategy == DONT_IMPORT)
@@ -132,7 +133,7 @@ TFilePath ResourceImportStrategy::process(ToonzScene *scene, ToonzScene *srcScen
 	assert(actualDstPath != TFilePath());
 
 	if (m_strategy == IMPORT_AND_OVERWRITE) {
-		//bool overwritten = false;
+		// bool overwritten = false;
 		if (TSystem::doesExistFileOrLevel(actualDstPath)) {
 			TSystem::removeFileOrLevel(actualDstPath);
 			//  overwritten = true;
@@ -198,11 +199,14 @@ void SceneResource::updatePath(TFilePath &fp)
 //-----------------------------------------------------------------------------
 
 SceneLevel::SceneLevel(ToonzScene *scene, TXshSimpleLevel *sl)
-	: SceneResource(scene), m_sl(sl), m_oldPath(sl->getPath()), m_oldActualPath(scene->decodeFilePath(sl->getPath())), m_oldScannedPath(sl->getScannedPath()), m_oldRefImgPath(), m_oldActualRefImgPath()
+	: SceneResource(scene), m_sl(sl), m_oldPath(sl->getPath()),
+	  m_oldActualPath(scene->decodeFilePath(sl->getPath())), m_oldScannedPath(sl->getScannedPath()),
+	  m_oldRefImgPath(), m_oldActualRefImgPath()
 {
 	if (m_oldScannedPath != TFilePath())
 		m_oldActualScannedPath = m_scene->decodeFilePath(m_oldScannedPath);
-	if ((sl->getPath().getType() == "tlv" || sl->getPath().getType() == "pli") && sl->getPalette()) {
+	if ((sl->getPath().getType() == "tlv" || sl->getPath().getType() == "pli") &&
+		sl->getPalette()) {
 		m_oldRefImgPath = sl->getPalette()->getRefImgPath();
 		m_oldActualRefImgPath = m_scene->decodeFilePath(m_oldRefImgPath);
 	}
@@ -218,26 +222,28 @@ void SceneLevel::save()
 	actualFp = restorePsdPath(actualFp);
 	TFilePath oldActualPath = restorePsdPath(m_oldActualPath);
 	assert(actualFp.getWideString() == L"" || actualFp.getWideString()[0] != L'+');
-	if (actualFp != oldActualPath || !TSystem::doesExistFileOrLevel(oldActualPath) || m_sl->getProperties()->getDirtyFlag() || (m_sl->getPalette() && m_sl->getPalette()->getDirtyFlag())) {
+	if (actualFp != oldActualPath || !TSystem::doesExistFileOrLevel(oldActualPath) ||
+		m_sl->getProperties()->getDirtyFlag() ||
+		(m_sl->getPalette() && m_sl->getPalette()->getDirtyFlag())) {
 		try {
 			TSystem::touchParentDir(actualFp);
-			if (actualFp != oldActualPath &&
-				TSystem::doesExistFileOrLevel(oldActualPath) &&
+			if (actualFp != oldActualPath && TSystem::doesExistFileOrLevel(oldActualPath) &&
 				m_sl->getProperties()->getDirtyFlag() == false &&
-				(!m_sl->getPalette() || (m_sl->getPalette() && m_sl->getPalette()->getDirtyFlag() == false))) {
+				(!m_sl->getPalette() ||
+				 (m_sl->getPalette() && m_sl->getPalette()->getDirtyFlag() == false))) {
 				try {
 					TXshSimpleLevel::copyFiles(actualFp, oldActualPath);
 				} catch (...) {
 				}
-				//Must NOT KEEP FRAMES, it generate a level frames bind necessary to imageBuilder path refresh.
+				// Must NOT KEEP FRAMES, it generate a level frames bind necessary to imageBuilder
+				// path refresh.
 				m_sl->setPath(fp, false);
 			} else {
 				m_sl->save(actualFp, oldActualPath);
 
 				if ((actualFp.getType() == "tlv" || actualFp.getType() == "pli") &&
-					actualFp != oldActualPath &&
-					m_oldRefImgPath != TFilePath()) {
-					//Devo preoccuparmi dell'eventuale livello colormodel
+					actualFp != oldActualPath && m_oldRefImgPath != TFilePath()) {
+					// Devo preoccuparmi dell'eventuale livello colormodel
 					TFilePath actualRefImagPath = m_scene->decodeFilePath(m_oldRefImgPath);
 					TFilePath actualRefImagPathTpl = actualRefImagPath.withType("tpl");
 					TFilePath oldRefImagPathTpl = m_oldActualRefImgPath.withType("tpl");
@@ -246,23 +252,32 @@ void SceneLevel::save()
 						TSystem::copyFile(actualRefImagPathTpl, oldRefImagPathTpl);
 				}
 
-				if (actualFp.getType() == "tif" || actualFp.getType() == "tiff" || actualFp.getType() == "tga" || actualFp.getType() == "tzi") {
+				if (actualFp.getType() == "tif" || actualFp.getType() == "tiff" ||
+					actualFp.getType() == "tga" || actualFp.getType() == "tzi") {
 					TFilePath clnin = oldActualPath.withNoFrame().withType("cln");
 					if (TSystem::doesExistFileOrLevel(clnin))
 						TSystem::copyFile(actualFp.withNoFrame().withType("cln"), clnin);
 				}
 			}
-			//Se il livello e' tlv verifico se esiste il corrispondente unpainted ed in caso affermativo lo copio.
-			//Questo controllo viene fatto qui e non nella copia o nel salvataggio del livello perche' in generale
-			//non si vuole che il livello unpainted venga copiato con il livello.
+			// Se il livello e' tlv verifico se esiste il corrispondente unpainted ed in caso
+			// affermativo lo copio.
+			// Questo controllo viene fatto qui e non nella copia o nel salvataggio del livello
+			// perche' in generale
+			// non si vuole che il livello unpainted venga copiato con il livello.
 			if (actualFp.getType() == "tlv") {
-				TFilePath oldUnpaintedLevelPath = oldActualPath.getParentDir() + TFilePath(oldActualPath.getName() + "-unpainted." + oldActualPath.getType());
-				TFilePath unpaintedLevelPath = actualFp.getParentDir() + TFilePath(actualFp.getName() + "-unpainted." + actualFp.getType());
-				if (TSystem::doesExistFileOrLevel(oldUnpaintedLevelPath) && !TSystem::doesExistFileOrLevel(unpaintedLevelPath))
+				TFilePath oldUnpaintedLevelPath =
+					oldActualPath.getParentDir() +
+					TFilePath(oldActualPath.getName() + "-unpainted." + oldActualPath.getType());
+				TFilePath unpaintedLevelPath =
+					actualFp.getParentDir() +
+					TFilePath(actualFp.getName() + "-unpainted." + actualFp.getType());
+				if (TSystem::doesExistFileOrLevel(oldUnpaintedLevelPath) &&
+					!TSystem::doesExistFileOrLevel(unpaintedLevelPath))
 					TSystem::copyFile(unpaintedLevelPath, oldUnpaintedLevelPath);
 				TFilePath oldUnpaintedPalettePath = oldUnpaintedLevelPath.withType("tpl");
 				TFilePath unpaintedPalettePath = unpaintedLevelPath.withType("tpl");
-				if (TSystem::doesExistFileOrLevel(oldUnpaintedPalettePath) && !TSystem::doesExistFileOrLevel(unpaintedPalettePath))
+				if (TSystem::doesExistFileOrLevel(oldUnpaintedPalettePath) &&
+					!TSystem::doesExistFileOrLevel(unpaintedPalettePath))
 					TSystem::copyFile(unpaintedPalettePath, oldUnpaintedPalettePath);
 			}
 		} catch (...) {
@@ -333,7 +348,8 @@ QString SceneLevel::getResourceName()
 		if (levelIsDirty)
 			string += " and ";
 		if (m_sl->getPath().getType() == "pli")
-			string += QString::fromStdWString(m_sl->getPalette()->getPaletteName()) + ".pli (palette)";
+			string +=
+				QString::fromStdWString(m_sl->getPalette()->getPaletteName()) + ".pli (palette)";
 		else
 			string += QString::fromStdWString(m_sl->getPalette()->getPaletteName()) + ".tpl";
 	}
@@ -348,7 +364,8 @@ QString SceneLevel::getResourceName()
 //-----------------------------------------------------------------------------
 
 ScenePalette::ScenePalette(ToonzScene *scene, TXshPaletteLevel *pl)
-	: SceneResource(scene), m_pl(pl), m_oldPath(pl->getPath()), m_oldActualPath(scene->decodeFilePath(pl->getPath()))
+	: SceneResource(scene), m_pl(pl), m_oldPath(pl->getPath()),
+	  m_oldActualPath(scene->decodeFilePath(pl->getPath()))
 {
 }
 
@@ -409,7 +426,8 @@ QString ScenePalette::getResourceName()
 //-----------------------------------------------------------------------------
 
 SceneSound::SceneSound(ToonzScene *scene, TXshSoundLevel *sl)
-	: SceneResource(scene), m_sl(sl), m_oldPath(sl->getPath()), m_oldActualPath(scene->decodeFilePath(sl->getPath()))
+	: SceneResource(scene), m_sl(sl), m_oldPath(sl->getPath()),
+	  m_oldActualPath(scene->decodeFilePath(sl->getPath()))
 {
 }
 
@@ -457,7 +475,8 @@ void SceneSound::rollbackPath()
 //-----------------------------------------------------------------------------
 
 SceneResources::SceneResources(ToonzScene *scene, TXsheet *subXsheet)
-	: m_scene(scene), m_commitDone(false), m_wasUntitled(scene->isUntitled()), m_subXsheet(subXsheet)
+	: m_scene(scene), m_commitDone(false), m_wasUntitled(scene->isUntitled()),
+	  m_subXsheet(subXsheet)
 {
 	getResources();
 }
@@ -531,7 +550,7 @@ void SceneResources::accept(ResourceProcessor *processor, bool autoCommit)
 }
 
 //-----------------------------------------------------------------------------
-//return the name list of dirty resources
+// return the name list of dirty resources
 void SceneResources::getDirtyResources(std::vector<QString> &dirtyResources)
 {
 	for (int i = 0; i < (int)m_resources.size(); i++)
@@ -546,15 +565,14 @@ void SceneResources::getDirtyResources(std::vector<QString> &dirtyResources)
 //
 //-----------------------------------------------------------------------------
 
-ResourceImporter::ResourceImporter(
-	ToonzScene *scene,
-	TProject *dstProject,
-	ResourceImportStrategy &importStrategy)
-	: m_scene(scene), m_dstProject(dstProject), m_dstScene(new ToonzScene()), m_importStrategy(importStrategy)
+ResourceImporter::ResourceImporter(ToonzScene *scene, TProject *dstProject,
+								   ResourceImportStrategy &importStrategy)
+	: m_scene(scene), m_dstProject(dstProject), m_dstScene(new ToonzScene()),
+	  m_importStrategy(importStrategy)
 {
 	m_dstScene->setProject(dstProject);
-	TFilePath newFp =
-		dstProject->getScenesPath() + (scene->getScenePath() - scene->getProject()->getScenesPath());
+	TFilePath newFp = dstProject->getScenesPath() +
+					  (scene->getScenePath() - scene->getProject()->getScenesPath());
 	makeUnique(newFp);
 	m_dstScene->setScenePath(newFp);
 }
@@ -624,7 +642,8 @@ void ResourceImporter::process(TXshSimpleLevel *sl)
 	if (sl->getPalette())
 		imgRefPath = sl->getPalette()->getRefImgPath();
 	newPath = m_importStrategy.process(m_dstScene, m_scene, slPath);
-	if (imgRefPath != TFilePath() && !m_dstScene->isExternPath(m_dstScene->decodeFilePath(imgRefPath)))
+	if (imgRefPath != TFilePath() &&
+		!m_dstScene->isExternPath(m_dstScene->decodeFilePath(imgRefPath)))
 		m_importStrategy.process(m_dstScene, m_scene, imgRefPath);
 
 	if (suffix != "")
@@ -666,8 +685,7 @@ void ResourceImporter::process(TXshSoundLevel *sl)
 //
 //-----------------------------------------------------------------------------
 
-ResourceCollector::ResourceCollector(ToonzScene *scene)
-	: m_scene(scene), m_count(0)
+ResourceCollector::ResourceCollector(ToonzScene *scene) : m_scene(scene), m_count(0)
 {
 }
 

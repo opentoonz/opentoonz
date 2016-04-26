@@ -11,7 +11,7 @@
 
 //=========================================================
 
-//forward declarations
+// forward declarations
 class TSoundOutputDeviceImp;
 class TSoundInputDeviceImp;
 
@@ -19,40 +19,21 @@ class TSoundInputDeviceImp;
 
 namespace
 {
-void CALLBACK recordCB(
-	HWAVEIN hwi,
-	UINT uMsg,
-	DWORD dwInstance,
-	DWORD dwParam1,
-	DWORD dwParam2);
+void CALLBACK recordCB(HWAVEIN hwi, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2);
 
 bool setRecordLine(TSoundInputDevice::Source typeInput);
 
-MMRESULT getLineInfo(
-	HMIXEROBJ hMixer,
-	DWORD dwComponentType,
-	MIXERLINE &mxl);
+MMRESULT getLineInfo(HMIXEROBJ hMixer, DWORD dwComponentType, MIXERLINE &mxl);
 
-MMRESULT getLineControl(
-	MIXERCONTROL &mxc,
-	HMIXEROBJ hMixer,
-	DWORD dwLineID,
-	DWORD dwControlType);
+MMRESULT getLineControl(MIXERCONTROL &mxc, HMIXEROBJ hMixer, DWORD dwLineID, DWORD dwControlType);
 
-MMRESULT setControlDetails(
-	HMIXEROBJ hMixer,
-	DWORD dwSelectControlID,
-	DWORD dwMultipleItems,
-	MIXERCONTROLDETAILS_UNSIGNED *mxcdSelectValue);
+MMRESULT setControlDetails(HMIXEROBJ hMixer, DWORD dwSelectControlID, DWORD dwMultipleItems,
+						   MIXERCONTROLDETAILS_UNSIGNED *mxcdSelectValue);
 
-MMRESULT getControlDetails(
-	HMIXEROBJ hMixer,
-	DWORD dwSelectControlID,
-	DWORD dwMultipleItems,
-	MIXERCONTROLDETAILS_UNSIGNED *mxcdSelectValue);
+MMRESULT getControlDetails(HMIXEROBJ hMixer, DWORD dwSelectControlID, DWORD dwMultipleItems,
+						   MIXERCONTROLDETAILS_UNSIGNED *mxcdSelectValue);
 
-MMRESULT isaFormatSupported(
-	int sampleRate, int channelCount, int bitPerSample, bool input);
+MMRESULT isaFormatSupported(int sampleRate, int channelCount, int bitPerSample, bool input);
 
 DWORD WINAPI MyWaveOutCallbackThread(LPVOID lpParameter);
 void getAmplitude(int &amplitude, const TSoundTrackP st, TINT32 sample);
@@ -64,23 +45,14 @@ void getAmplitude(int &amplitude, const TSoundTrackP st, TINT32 sample);
 #ifndef TNZCORE_LIGHT
 class EndPlayMsg : public TThread::Message
 {
-public:
-	EndPlayMsg(TSoundOutputDeviceListener *notifier)
-	{
-		m_listener = notifier;
-	}
+  public:
+	EndPlayMsg(TSoundOutputDeviceListener *notifier) { m_listener = notifier; }
 
-	TThread::Message *clone() const
-	{
-		return new EndPlayMsg(*this);
-	}
+	TThread::Message *clone() const { return new EndPlayMsg(*this); }
 
-	void onDeliver()
-	{
-		m_listener->onPlayCompleted();
-	}
+	void onDeliver() { m_listener->onPlayCompleted(); }
 
-private:
+  private:
 	TSoundOutputDeviceListener *m_listener;
 };
 #endif
@@ -97,7 +69,7 @@ class WavehdrQueue;
 
 class TSoundOutputDeviceImp
 {
-public:
+  public:
 	HWAVEOUT m_wout;
 	WavehdrQueue *m_whdrQueue;
 	TSoundTrackFormat m_currentFormat;
@@ -130,9 +102,10 @@ public:
 
 class WavehdrQueue
 {
-public:
+  public:
 	WavehdrQueue(TSoundOutputDeviceImp *devImp, int slotCount)
-		: m_devImp(devImp), m_items(), m_queuedItems(), m_slotCount(slotCount), m_mutex(), m_lastOffset(0)
+		: m_devImp(devImp), m_items(), m_queuedItems(), m_slotCount(slotCount), m_mutex(),
+		  m_lastOffset(0)
 	{
 	}
 
@@ -146,7 +119,7 @@ public:
 	void clear();
 	bool isAllQueuedItemsPlayed();
 
-private:
+  private:
 	std::list<std::pair<WAVEHDR *, TSoundTrackP>> m_items;
 	std::list<WAVEHDR *> m_queuedItems;
 
@@ -186,11 +159,11 @@ void WavehdrQueue::put(TSoundTrackP &subTrack)
 	assert(subTrack->getRawData());
 	static ULONG count = 1;
 
-	//codice messo per tab: facendo il play al rilascio del mouse e su piu'
-	//colonne in cui le traccie potrebbe avere diversi formati siccome qui in
-	//alcune situazioni si fa subito waveOutWrite c'e' bisogno di controllare
-	//se il formato con cui e' stato aperto in precedenza il device e' uguale
-	//a quello della traccia
+	// codice messo per tab: facendo il play al rilascio del mouse e su piu'
+	// colonne in cui le traccie potrebbe avere diversi formati siccome qui in
+	// alcune situazioni si fa subito waveOutWrite c'e' bisogno di controllare
+	// se il formato con cui e' stato aperto in precedenza il device e' uguale
+	// a quello della traccia
 	if (m_devImp->m_wout && m_devImp->m_currentFormat != subTrack->getFormat()) {
 		m_devImp->doCloseDevice();
 		TSystem::sleep(300);
@@ -201,7 +174,7 @@ void WavehdrQueue::put(TSoundTrackP &subTrack)
 	if (!m_devImp->m_scrubbing) {
 		WAVEHDR *whdr2 = 0;
 
-		//traccia
+		// traccia
 		whdr2 = prepareWaveHeader(m_devImp->m_wout, subTrack, count);
 		getAmplitude(m_lastOffset, subTrack, subTrack->getSampleCount() - 1L);
 
@@ -229,16 +202,16 @@ void WavehdrQueue::put(TSoundTrackP &subTrack)
 		TSoundTrackP riseTrack, decayTrack;
 		int sampleSize = subTrack->getSampleSize();
 
-		//cresce
+		// cresce
 		riseTrack = TSop::fadeIn(subTrack, 0.9);
 		whdr1 = prepareWaveHeader(m_devImp->m_wout, riseTrack, count);
 
-		//traccia
+		// traccia
 		whdr2 = prepareWaveHeader(m_devImp->m_wout, subTrack, count);
 
 		getAmplitude(m_lastOffset, subTrack, subTrack->getSampleCount() - 1L);
 
-		//decresce
+		// decresce
 		decayTrack = 0;
 		if (m_lastOffset) {
 			decayTrack = TSop::fadeOut(subTrack, 0.9);
@@ -287,7 +260,7 @@ void WavehdrQueue::put(TSoundTrackP &subTrack)
 		int sampleSize = subTrack->getSampleSize();
 		TSoundTrackP riseTrack = 0;
 
-		if (m_lastOffset) ///devo fare ilcross fade
+		if (m_lastOffset) /// devo fare ilcross fade
 		{
 			int offset;
 			getAmplitude(offset, subTrack, 0L);
@@ -316,7 +289,7 @@ void WavehdrQueue::put(TSoundTrackP &subTrack)
 
 		TSoundTrackP decayTrack = 0;
 		if (m_queuedItems.size() <= 7) {
-			if (m_lastOffset) //devo fare il fadeOut
+			if (m_lastOffset) // devo fare il fadeOut
 			{
 				decayTrack = TSop::fadeOut(subTrack, 0.3);
 				whdr2 = prepareWaveHeader(m_devImp->m_wout, decayTrack, count);
@@ -359,8 +332,7 @@ void WavehdrQueue::put(TSoundTrackP &subTrack)
 
 	if ((int)m_items.size() == m_slotCount) {
 		WAVEHDR *item = m_items.front().first;
-		MMRESULT ret = waveOutUnprepareHeader(
-			m_devImp->m_wout, item, sizeof(WAVEHDR));
+		MMRESULT ret = waveOutUnprepareHeader(m_devImp->m_wout, item, sizeof(WAVEHDR));
 
 		if (ret == MMSYSERR_NOERROR) {
 			delete[] item->lpData;
@@ -377,8 +349,7 @@ void WavehdrQueue::put(TSoundTrackP &subTrack)
 
 			offset = m_lastOffset - offset;
 			if (offset) {
-				TSoundTrackP st = TSop::crossFade(
-					m_lastTrack, m_items.front().second, 0.3);
+				TSoundTrackP st = TSop::crossFade(m_lastTrack, m_items.front().second, 0.3);
 				memcpy(item->lpData, st->getRawData(), st->getSampleCount() * sampleSize);
 			}
 		}
@@ -404,8 +375,8 @@ WAVEHDR *WavehdrQueue::get()
 	assert(whdr->dwFlags & WHDR_PREPARED);
 
 	pushBack(whdr, m_items.front().second);
-	getAmplitude(
-		m_lastOffset, m_items.front().second, m_items.front().second->getSampleCount() - 1L);
+	getAmplitude(m_lastOffset, m_items.front().second,
+				 m_items.front().second->getSampleCount() - 1L);
 	m_items.pop_front();
 
 	return whdr;
@@ -417,15 +388,14 @@ WAVEHDR *WavehdrQueue::get()
 bool WavehdrQueue::popFront(int count)
 {
 	TThread::MutexLocker sl(&m_mutex);
-	//assert(m_queuedItems.size() > 0);
+	// assert(m_queuedItems.size() > 0);
 	if (m_queuedItems.size() <= 0)
 		return false;
 	WAVEHDR *whdr = m_queuedItems.front();
 	// controllo introdotto pr via che su win2k si perde alcune
 	// notifiche di WHDR_DONE
 	while ((DWORD)count > whdr->dwUser) {
-		MMRESULT ret = waveOutUnprepareHeader(
-			m_devImp->m_wout, whdr, sizeof(WAVEHDR));
+		MMRESULT ret = waveOutUnprepareHeader(m_devImp->m_wout, whdr, sizeof(WAVEHDR));
 		if (ret == MMSYSERR_NOERROR) {
 			m_queuedItems.pop_front();
 			delete[] whdr->lpData;
@@ -496,15 +466,13 @@ TSoundOutputDeviceImp::TSoundOutputDeviceImp()
 
 	insertAllRate();
 	if (!verifyRate())
-		throw TSoundDeviceException(
-			TSoundDeviceException::FailedInit,
-			"Unable to verify supported rates");
+		throw TSoundDeviceException(TSoundDeviceException::FailedInit,
+									"Unable to verify supported rates");
 
-	m_closeDevice = CreateEvent(
-		NULL,  // no security attributes
-		FALSE, // auto-reset event
-		FALSE, // initial state is not signaled
-		NULL); // object not named
+	m_closeDevice = CreateEvent(NULL,  // no security attributes
+								FALSE, // auto-reset event
+								FALSE, // initial state is not signaled
+								NULL); // object not named
 }
 
 //----------------------------------------------------------------------------
@@ -528,11 +496,12 @@ bool TSoundOutputDeviceImp::doOpenDevice(const TSoundTrackFormat &format)
 	wf.cbSize = 0;
 
 	TThread::MutexLocker sl(&m_mutex);
-	CloseHandle(CreateThread(NULL, 0, MyWaveOutCallbackThread, (LPVOID) this, 0, &m_notifyThreadId));
+	CloseHandle(
+		CreateThread(NULL, 0, MyWaveOutCallbackThread, (LPVOID) this, 0, &m_notifyThreadId));
 
 	MMRESULT ret;
-	if ((ret = waveOutOpen(&m_wout, WAVE_MAPPER,
-						   &wf, (DWORD)m_notifyThreadId, (DWORD) this, CALLBACK_THREAD)) != MMSYSERR_NOERROR) {
+	if ((ret = waveOutOpen(&m_wout, WAVE_MAPPER, &wf, (DWORD)m_notifyThreadId, (DWORD) this,
+						   CALLBACK_THREAD)) != MMSYSERR_NOERROR) {
 		while (!PostThreadMessage(m_notifyThreadId, WM_QUIT, 0, 0))
 			;
 	}
@@ -604,8 +573,7 @@ bool TSoundOutputDeviceImp::verifyRate()
 {
 	std::set<int>::iterator it;
 
-	for (it = m_supportedRate.begin();
-		 it != m_supportedRate.end();) {
+	for (it = m_supportedRate.begin(); it != m_supportedRate.end();) {
 		MMRESULT ret;
 		WAVEFORMATEX wf;
 
@@ -687,8 +655,7 @@ DWORD WINAPI MyWaveOutCallbackThread(LPVOID lpParameter)
 				WaitForSingleObject(devImp->m_closeDevice, INFINITE);
 				CloseHandle(devImp->m_closeDevice);
 
-				MMRESULT ret = waveOutUnprepareHeader(
-					devImp->m_wout, pWaveHdr, sizeof(WAVEHDR));
+				MMRESULT ret = waveOutUnprepareHeader(devImp->m_wout, pWaveHdr, sizeof(WAVEHDR));
 				if (ret == MMSYSERR_NOERROR) {
 					delete pWaveHdr->lpData;
 					delete pWaveHdr;
@@ -767,8 +734,8 @@ void TSoundOutputDevice::detach(TSoundOutputDeviceListener *listener)
 
 //------------------------------------------------------------------------------
 
-void TSoundOutputDevice::play(
-	const TSoundTrackP &st, TINT32 s0, TINT32 s1, bool loop, bool scrubbing)
+void TSoundOutputDevice::play(const TSoundTrackP &st, TINT32 s0, TINT32 s1, bool loop,
+							  bool scrubbing)
 {
 	assert((scrubbing && !loop) || !scrubbing);
 	if (!st->getSampleCount())
@@ -787,14 +754,11 @@ void TSoundOutputDevice::play(
 		try {
 			TSoundTrackFormat fmt = getPreferredFormat(format);
 			if (fmt != format) {
-				throw TSoundDeviceException(
-					TSoundDeviceException::UnsupportedFormat,
-					"Unsupported Format");
+				throw TSoundDeviceException(TSoundDeviceException::UnsupportedFormat,
+											"Unsupported Format");
 			}
 		} catch (TSoundDeviceException &e) {
-			throw TSoundDeviceException(
-				TSoundDeviceException::UnsupportedFormat,
-				e.getMessage());
+			throw TSoundDeviceException(TSoundDeviceException::UnsupportedFormat, e.getMessage());
 		}
 
 		assert(s1 >= s0);
@@ -865,22 +829,20 @@ void TSoundOutputDevice::setLooping(bool loop)
 
 //------------------------------------------------------------------------------
 
-TSoundTrackFormat TSoundOutputDevice::getPreferredFormat(
-	TUINT32 sampleRate, int channelCount, int bitPerSample)
+TSoundTrackFormat TSoundOutputDevice::getPreferredFormat(TUINT32 sampleRate, int channelCount,
+														 int bitPerSample)
 {
 	TSoundTrackFormat fmt;
 
-	//avvvicinarsi al sample rate => dovrebbe esser OK avendo selezionato i piu' vicini
+	// avvvicinarsi al sample rate => dovrebbe esser OK avendo selezionato i piu' vicini
 	std::set<int>::iterator it = m_imp->m_supportedRate.lower_bound(sampleRate);
 	if (it == m_imp->m_supportedRate.end()) {
-		it = std::max_element(m_imp->m_supportedRate.begin(),
-							  m_imp->m_supportedRate.end());
+		it = std::max_element(m_imp->m_supportedRate.begin(), m_imp->m_supportedRate.end());
 		if (it != m_imp->m_supportedRate.end())
 			sampleRate = *(m_imp->m_supportedRate.rbegin());
 		else
-			throw TSoundDeviceException(
-				TSoundDeviceException::UnsupportedFormat,
-				"There isn't a supported format");
+			throw TSoundDeviceException(TSoundDeviceException::UnsupportedFormat,
+										"There isn't a supported format");
 	} else
 		sampleRate = *it;
 
@@ -894,7 +856,7 @@ TSoundTrackFormat TSoundOutputDevice::getPreferredFormat(
 	else
 		fmt.m_signedSample = false;
 
-	//switch mono/stereo
+	// switch mono/stereo
 	if (channelCount <= 1)
 		channelCount = 1;
 	else
@@ -912,12 +874,10 @@ TSoundTrackFormat TSoundOutputDevice::getPreferredFormat(
 TSoundTrackFormat TSoundOutputDevice::getPreferredFormat(const TSoundTrackFormat &format)
 {
 	try {
-		return getPreferredFormat(
-			format.m_sampleRate, format.m_channelCount, format.m_bitPerSample);
+		return getPreferredFormat(format.m_sampleRate, format.m_channelCount,
+								  format.m_bitPerSample);
 	} catch (TSoundDeviceException &e) {
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnsupportedFormat,
-			e.getMessage());
+		throw TSoundDeviceException(TSoundDeviceException::UnsupportedFormat, e.getMessage());
 	}
 }
 
@@ -931,17 +891,14 @@ TSoundTrackFormat TSoundOutputDevice::getPreferredFormat(const TSoundTrackFormat
 
 class WaveFormat : public WAVEFORMATEX
 {
-public:
+  public:
 	WaveFormat(){};
-	WaveFormat(unsigned char channelCount,
-			   unsigned TINT32 sampleRate,
-			   unsigned char bitPerSample);
+	WaveFormat(unsigned char channelCount, unsigned TINT32 sampleRate, unsigned char bitPerSample);
 
 	~WaveFormat(){};
 };
 
-WaveFormat::WaveFormat(unsigned char channelCount,
-					   unsigned TINT32 sampleRate,
+WaveFormat::WaveFormat(unsigned char channelCount, unsigned TINT32 sampleRate,
 					   unsigned char bitPerSample)
 {
 	wFormatTag = WAVE_FORMAT_PCM;
@@ -957,16 +914,14 @@ WaveFormat::WaveFormat(unsigned char channelCount,
 
 class WinSoundInputDevice
 {
-public:
+  public:
 	WinSoundInputDevice();
 	~WinSoundInputDevice();
 
 	void open(const WaveFormat &wf);
 	void close();
 
-	void prepareHeader(char *sampleBuffer,
-					   unsigned TINT32 sampleBufferSize,
-					   WAVEHDR &whdr);
+	void prepareHeader(char *sampleBuffer, unsigned TINT32 sampleBufferSize, WAVEHDR &whdr);
 
 	void unprepareHeader(WAVEHDR &whdr);
 
@@ -979,20 +934,18 @@ public:
 
 	HANDLE m_hBlockDone;
 
-private:
+  private:
 	HWAVEIN m_hWaveIn;
 };
 
 //--------------------------------------------------------------------
 
-WinSoundInputDevice::WinSoundInputDevice()
-	: m_hWaveIn(0)
+WinSoundInputDevice::WinSoundInputDevice() : m_hWaveIn(0)
 {
-	m_hBlockDone = CreateEvent(
-		NULL,  // no security attributes
-		FALSE, // auto-reset event
-		FALSE, // initial state is not signaled
-		NULL); // object not named
+	m_hBlockDone = CreateEvent(NULL,  // no security attributes
+							   FALSE, // auto-reset event
+							   FALSE, // initial state is not signaled
+							   NULL); // object not named
 }
 
 //--------------------------------------------------------------------
@@ -1009,10 +962,8 @@ void WinSoundInputDevice::open(const WaveFormat &wf)
 	if (m_hWaveIn)
 		close();
 
-	MMRESULT ret = waveInOpen(
-		&m_hWaveIn, WAVE_MAPPER,
-		&wf, (DWORD)recordCB,
-		(DWORD)m_hBlockDone, CALLBACK_FUNCTION);
+	MMRESULT ret = waveInOpen(&m_hWaveIn, WAVE_MAPPER, &wf, (DWORD)recordCB, (DWORD)m_hBlockDone,
+							  CALLBACK_FUNCTION);
 
 	if (ret != MMSYSERR_NOERROR) {
 		throw TException("Error to open the input device");
@@ -1036,8 +987,7 @@ void WinSoundInputDevice::close()
 
 //--------------------------------------------------------------------
 
-void WinSoundInputDevice::prepareHeader(char *sampleBuffer,
-										unsigned TINT32 sampleBufferSize,
+void WinSoundInputDevice::prepareHeader(char *sampleBuffer, unsigned TINT32 sampleBufferSize,
 										WAVEHDR &whdr)
 {
 	whdr.lpData = sampleBuffer;
@@ -1109,9 +1059,8 @@ void WinSoundInputDevice::stop()
 #ifndef TNZCORE_LIGHT
 class RecordTask : public TThread::Runnable
 {
-public:
-	RecordTask(std::shared_ptr<TSoundInputDeviceImp> dev)
-		: Runnable(), m_dev(std::move(dev)) {}
+  public:
+	RecordTask(std::shared_ptr<TSoundInputDeviceImp> dev) : Runnable(), m_dev(std::move(dev)) {}
 
 	~RecordTask() {}
 
@@ -1126,7 +1075,7 @@ public:
 
 class TSoundInputDeviceImp : public WinSoundInputDevice
 {
-public:
+  public:
 	bool m_allocateBuff;
 	bool m_isRecording;
 	bool m_supportVolume;
@@ -1155,13 +1104,13 @@ public:
 //------------------------------------------------------------------------------
 
 TSoundInputDeviceImp::TSoundInputDeviceImp()
-	: m_allocateBuff(false), m_isRecording(false), m_supportVolume(false), m_index(0), m_byteRecorded(0), m_format(), m_whdr(3), m_recordedBlocks(), m_supportedRate()
+	: m_allocateBuff(false), m_isRecording(false), m_supportVolume(false), m_index(0),
+	  m_byteRecorded(0), m_format(), m_whdr(3), m_recordedBlocks(), m_supportedRate()
 {
-	m_hLastBlockDone = CreateEvent(
-		NULL,  // no security attributes
-		FALSE, // is manual-reset event?
-		FALSE, // is signaled?
-		NULL); // object not named
+	m_hLastBlockDone = CreateEvent(NULL,  // no security attributes
+								   FALSE, // is manual-reset event?
+								   FALSE, // is signaled?
+								   NULL); // object not named
 }
 
 //------------------------------------------------------------------------------
@@ -1201,8 +1150,7 @@ bool TSoundInputDeviceImp::verifyRate()
 {
 	std::set<int>::iterator it;
 
-	for (it = m_supportedRate.begin();
-		 it != m_supportedRate.end();) {
+	for (it = m_supportedRate.begin(); it != m_supportedRate.end();) {
 		MMRESULT ret;
 		WAVEFORMATEX wf;
 
@@ -1234,12 +1182,7 @@ bool TSoundInputDeviceImp::verifyRate()
 //====================================================================
 namespace
 {
-void CALLBACK recordCB(
-	HWAVEIN hwi,
-	UINT uMsg,
-	DWORD dwInstance,
-	DWORD dwParam1,
-	DWORD dwParam2)
+void CALLBACK recordCB(HWAVEIN hwi, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2)
 {
 	WAVEHDR *whdr = (WAVEHDR *)dwParam1;
 	HANDLE *blockDone = (HANDLE *)dwInstance;
@@ -1256,9 +1199,8 @@ TSoundInputDevice::TSoundInputDevice() : m_imp(new TSoundInputDeviceImp())
 {
 	m_imp->insertAllRate();
 	if (!m_imp->verifyRate())
-		throw TSoundDeviceException(
-			TSoundDeviceException::FailedInit,
-			"Unable to verify supported rates");
+		throw TSoundDeviceException(TSoundDeviceException::FailedInit,
+									"Unable to verify supported rates");
 	if (supportsVolume())
 		m_imp->m_supportVolume = true;
 }
@@ -1286,30 +1228,25 @@ bool TSoundInputDevice::installed()
 void TSoundInputDevice::record(const TSoundTrackFormat &format, Source devtype)
 {
 	if (m_imp->m_isRecording)
-		throw TSoundDeviceException(
-			TSoundDeviceException::Busy,
-			"Just another recoding is in progress");
+		throw TSoundDeviceException(TSoundDeviceException::Busy,
+									"Just another recoding is in progress");
 
 	/*if ((format.m_bitPerSample == 8 && format.m_signedSample) ||
-      (format.m_bitPerSample == 24))
-    throw TException("This format is not supported for recording");*/
+	  (format.m_bitPerSample == 24))
+	throw TException("This format is not supported for recording");*/
 	try {
 		TSoundTrackFormat fmt = getPreferredFormat(format);
 		if (fmt != format) {
-			throw TSoundDeviceException(
-				TSoundDeviceException::UnsupportedFormat,
-				"Unsupported Format");
+			throw TSoundDeviceException(TSoundDeviceException::UnsupportedFormat,
+										"Unsupported Format");
 		}
 	} catch (TSoundDeviceException &e) {
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnsupportedFormat,
-			e.getMessage());
+		throw TSoundDeviceException(TSoundDeviceException::UnsupportedFormat, e.getMessage());
 	}
 
 	if (!setRecordLine(devtype))
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnableSetDevice,
-			"Problems to set input source line to record");
+		throw TSoundDeviceException(TSoundDeviceException::UnableSetDevice,
+									"Problems to set input source line to record");
 
 	m_imp->m_format = format;
 	m_imp->m_st = 0;
@@ -1320,24 +1257,21 @@ void TSoundInputDevice::record(const TSoundTrackFormat &format, Source devtype)
 	m_imp->m_index = 0;
 	m_imp->m_recordedBlocks.clear();
 	m_imp->m_byteRecorded = 0;
-	TINT32 bytePerSec = format.m_sampleRate * ((format.m_bitPerSample * format.m_channelCount) >> 3);
+	TINT32 bytePerSec =
+		format.m_sampleRate * ((format.m_bitPerSample * format.m_channelCount) >> 3);
 
 	try {
-		WaveFormat wf(m_imp->m_format.m_channelCount,
-					  m_imp->m_format.m_sampleRate,
+		WaveFormat wf(m_imp->m_format.m_channelCount, m_imp->m_format.m_sampleRate,
 					  m_imp->m_format.m_bitPerSample);
 
 		m_imp->open(wf);
 	} catch (TException &e) {
 		m_imp->m_isRecording = false;
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnableOpenDevice, e.getMessage());
+		throw TSoundDeviceException(TSoundDeviceException::UnableOpenDevice, e.getMessage());
 	}
 	for (; m_imp->m_index < (int)(m_imp->m_whdr.size() - 1); ++m_imp->m_index) {
 		try {
-			m_imp->prepareHeader(new char[bytePerSec],
-								 bytePerSec,
-								 m_imp->m_whdr[m_imp->m_index]);
+			m_imp->prepareHeader(new char[bytePerSec], bytePerSec, m_imp->m_whdr[m_imp->m_index]);
 			m_imp->addBlock(m_imp->m_whdr[m_imp->m_index]);
 		} catch (TException &e) {
 			m_imp->m_isRecording = false;
@@ -1346,15 +1280,14 @@ void TSoundInputDevice::record(const TSoundTrackFormat &format, Source devtype)
 					try {
 						m_imp->unprepareHeader(m_imp->m_whdr[j]);
 					} catch (TException &e) {
-						throw TSoundDeviceException(
-							TSoundDeviceException::UnableCloseDevice, e.getMessage());
+						throw TSoundDeviceException(TSoundDeviceException::UnableCloseDevice,
+													e.getMessage());
 					}
 					delete[] m_imp->m_whdr[j].lpData;
 				} else if (j == m_imp->m_index)
 					delete[] m_imp->m_whdr[j].lpData;
 			}
-			throw TSoundDeviceException(
-				TSoundDeviceException::UnablePrepare, e.getMessage());
+			throw TSoundDeviceException(TSoundDeviceException::UnablePrepare, e.getMessage());
 		}
 	}
 
@@ -1366,31 +1299,26 @@ void TSoundInputDevice::record(const TSoundTrackFormat &format, Source devtype)
 void TSoundInputDevice::record(const TSoundTrackP &st, Source devtype)
 {
 	if (m_imp->m_isRecording)
-		throw TSoundDeviceException(
-			TSoundDeviceException::Busy,
-			"Just another recoding is in progress");
+		throw TSoundDeviceException(TSoundDeviceException::Busy,
+									"Just another recoding is in progress");
 
 	m_imp->m_format = st->getFormat();
 	/*if ((m_imp->m_format.m_bitPerSample == 8 && m_imp->m_format.m_signedSample) ||
-      (m_imp->m_format.m_bitPerSample == 24))
-    throw TException("This format is not supported for recording");*/
+	  (m_imp->m_format.m_bitPerSample == 24))
+	throw TException("This format is not supported for recording");*/
 	try {
 		TSoundTrackFormat fmt = getPreferredFormat(st->getFormat());
 		if (fmt != st->getFormat()) {
-			throw TSoundDeviceException(
-				TSoundDeviceException::UnsupportedFormat,
-				"Unsupported Format");
+			throw TSoundDeviceException(TSoundDeviceException::UnsupportedFormat,
+										"Unsupported Format");
 		}
 	} catch (TSoundDeviceException &e) {
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnsupportedFormat,
-			e.getMessage());
+		throw TSoundDeviceException(TSoundDeviceException::UnsupportedFormat, e.getMessage());
 	}
 
 	if (!setRecordLine(devtype))
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnableSetDevice,
-			"Problems to set input source line to record");
+		throw TSoundDeviceException(TSoundDeviceException::UnableSetDevice,
+									"Problems to set input source line to record");
 
 	m_imp->m_st = st;
 	m_imp->m_allocateBuff = false;
@@ -1401,13 +1329,13 @@ void TSoundInputDevice::record(const TSoundTrackP &st, Source devtype)
 	m_imp->m_recordedBlocks.clear();
 	m_imp->m_byteRecorded = 0;
 	try {
-		WaveFormat wf(m_imp->m_format.m_channelCount,
-					  m_imp->m_format.m_sampleRate,
+		WaveFormat wf(m_imp->m_format.m_channelCount, m_imp->m_format.m_sampleRate,
 					  m_imp->m_format.m_bitPerSample);
 
 		m_imp->open(wf);
 		m_imp->prepareHeader((char *)st->getRawData(),
-							 st->getSampleCount() * ((st->getBitPerSample() * st->getChannelCount()) >> 3),
+							 st->getSampleCount() *
+								 ((st->getBitPerSample() * st->getChannelCount()) >> 3),
 							 m_imp->m_whdr[m_imp->m_index]);
 		m_imp->addBlock(m_imp->m_whdr[m_imp->m_index]);
 	} catch (TException &e) {
@@ -1415,8 +1343,7 @@ void TSoundInputDevice::record(const TSoundTrackP &st, Source devtype)
 		if (m_imp->m_whdr[m_imp->m_index].dwFlags & WHDR_PREPARED)
 			m_imp->unprepareHeader(m_imp->m_whdr[m_imp->m_index]);
 
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnablePrepare, e.getMessage());
+		throw TSoundDeviceException(TSoundDeviceException::UnablePrepare, e.getMessage());
 	}
 
 	m_imp->m_executor.addTask(new RecordTask(m_imp));
@@ -1439,14 +1366,13 @@ TSoundTrackP TSoundInputDevice::stop()
 				try {
 					m_imp->unprepareHeader(m_imp->m_whdr[j]);
 				} catch (TException &e) {
-					throw TSoundDeviceException(
-						TSoundDeviceException::UnablePrepare, e.getMessage());
+					throw TSoundDeviceException(TSoundDeviceException::UnablePrepare,
+												e.getMessage());
 				}
 				delete[] m_imp->m_whdr[j].lpData;
 			}
 		}
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnableCloseDevice, e.getMessage());
+		throw TSoundDeviceException(TSoundDeviceException::UnableCloseDevice, e.getMessage());
 	}
 
 	if (m_imp->m_allocateBuff) {
@@ -1454,25 +1380,24 @@ TSoundTrackP TSoundInputDevice::stop()
 
 		TSoundTrackP st = TSoundTrack::create(
 			m_imp->m_format,
-			m_imp->m_byteRecorded / ((m_imp->m_format.m_bitPerSample * m_imp->m_format.m_channelCount) >> 3));
+			m_imp->m_byteRecorded /
+				((m_imp->m_format.m_bitPerSample * m_imp->m_format.m_channelCount) >> 3));
 
-		TINT32 bytePerSec = m_imp->m_format.m_sampleRate *
-							((m_imp->m_format.m_bitPerSample * m_imp->m_format.m_channelCount) >> 3);
+		TINT32 bytePerSec =
+			m_imp->m_format.m_sampleRate *
+			((m_imp->m_format.m_bitPerSample * m_imp->m_format.m_channelCount) >> 3);
 
 		int i;
 		for (i = 0; i < (int)(m_imp->m_recordedBlocks.size() - 1); ++i) {
-			memcpy(
-				(void *)(st->getRawData() + bytePerSec * i),
-				m_imp->m_recordedBlocks[i],
-				bytePerSec);
+			memcpy((void *)(st->getRawData() + bytePerSec * i), m_imp->m_recordedBlocks[i],
+				   bytePerSec);
 			delete[] m_imp->m_recordedBlocks[i];
 		}
 
 		TINT32 lastBlockSize = m_imp->m_byteRecorded - (bytePerSec * i);
 
 		if (lastBlockSize != 0) {
-			memcpy((void *)(st->getRawData() + bytePerSec * i),
-				   m_imp->m_recordedBlocks[i],
+			memcpy((void *)(st->getRawData() + bytePerSec * i), m_imp->m_recordedBlocks[i],
 				   lastBlockSize);
 			delete[] m_imp->m_recordedBlocks[i];
 		}
@@ -1480,8 +1405,7 @@ TSoundTrackP TSoundInputDevice::stop()
 		try {
 			m_imp->close();
 		} catch (TException &e) {
-			throw TSoundDeviceException(
-				TSoundDeviceException::UnableCloseDevice, e.getMessage());
+			throw TSoundDeviceException(TSoundDeviceException::UnableCloseDevice, e.getMessage());
 		}
 		return st;
 	} else {
@@ -1489,8 +1413,7 @@ TSoundTrackP TSoundInputDevice::stop()
 		try {
 			m_imp->close();
 		} catch (TException &e) {
-			throw TSoundDeviceException(
-				TSoundDeviceException::UnableCloseDevice, e.getMessage());
+			throw TSoundDeviceException(TSoundDeviceException::UnableCloseDevice, e.getMessage());
 		}
 		return m_imp->m_st;
 	}
@@ -1504,8 +1427,9 @@ void RecordTask::run()
 	m_dev->start();
 
 	if (m_dev->m_allocateBuff) {
-		TINT32 bytePerSec = m_dev->m_format.m_sampleRate *
-							((m_dev->m_format.m_bitPerSample * m_dev->m_format.m_channelCount) >> 3);
+		TINT32 bytePerSec =
+			m_dev->m_format.m_sampleRate *
+			((m_dev->m_format.m_bitPerSample * m_dev->m_format.m_channelCount) >> 3);
 
 		while (m_dev->m_whdr[(m_dev->m_index + 1) % m_dev->m_whdr.size()].dwFlags & WHDR_PREPARED) {
 			if (m_dev->m_isRecording)
@@ -1537,8 +1461,7 @@ void RecordTask::run()
 				// dopo che e' stata chiamata la waveInReset
 				if (m_dev->m_isRecording) {
 					try {
-						m_dev->prepareHeader(new char[bytePerSec],
-											 bytePerSec,
+						m_dev->prepareHeader(new char[bytePerSec], bytePerSec,
 											 m_dev->m_whdr[indexToPrepare]);
 
 						m_dev->addBlock(m_dev->m_whdr[indexToPrepare]);
@@ -1583,42 +1506,34 @@ double TSoundInputDevice::getVolume()
 	nNumMixers = mixerGetNumDevs();
 
 	if (nNumMixers == 0)
-		throw TSoundDeviceException(
-			TSoundDeviceException::NoMixer,
-			"Doesn't exist a audio mixer device");
+		throw TSoundDeviceException(TSoundDeviceException::NoMixer,
+									"Doesn't exist a audio mixer device");
 
 	// get dwLineID
 	ret = getLineInfo((HMIXEROBJ)0, MIXERLINE_COMPONENTTYPE_DST_WAVEIN, mxl);
 	if (ret != MMSYSERR_NOERROR)
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnableVolume,
-			"Error to obtain info by mixer");
+		throw TSoundDeviceException(TSoundDeviceException::UnableVolume,
+									"Error to obtain info by mixer");
 
 	// get dwControlID
 	MIXERCONTROL mxc;
 	ret = getLineControl(mxc, (HMIXEROBJ)0, mxl.dwLineID, MIXERCONTROL_CONTROLTYPE_VOLUME);
 	if (ret == MIXERR_INVALCONTROL)
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnableVolume,
-			"Is not possible to obtain info of volume by mixer");
+		throw TSoundDeviceException(TSoundDeviceException::UnableVolume,
+									"Is not possible to obtain info of volume by mixer");
 
 	if (ret != MMSYSERR_NOERROR)
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnableVolume,
-			"Error to obtain info by mixer");
+		throw TSoundDeviceException(TSoundDeviceException::UnableVolume,
+									"Error to obtain info by mixer");
 
 	dwVolumeControlID = mxc.dwControlID;
 
 	MIXERCONTROLDETAILS_UNSIGNED mxcdVolume;
 
-	ret = getControlDetails((HMIXEROBJ)0,
-							dwVolumeControlID,
-							mxc.cMultipleItems,
-							&mxcdVolume);
+	ret = getControlDetails((HMIXEROBJ)0, dwVolumeControlID, mxc.cMultipleItems, &mxcdVolume);
 	if (ret != MMSYSERR_NOERROR)
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnableVolume,
-			"Error to obtain info by mixer");
+		throw TSoundDeviceException(TSoundDeviceException::UnableVolume,
+									"Error to obtain info by mixer");
 
 	DWORD dwVal = mxcdVolume.dwValue;
 
@@ -1629,8 +1544,7 @@ double TSoundInputDevice::getVolume()
 
 bool TSoundInputDevice::setVolume(double value)
 {
-	DWORD dwVolumeControlID,
-		dwMaximum;
+	DWORD dwVolumeControlID, dwMaximum;
 
 	UINT nNumMixers;
 	MMRESULT ret;
@@ -1639,9 +1553,8 @@ bool TSoundInputDevice::setVolume(double value)
 	nNumMixers = mixerGetNumDevs();
 
 	if (nNumMixers == 0)
-		throw TSoundDeviceException(
-			TSoundDeviceException::NoMixer,
-			"Doesn't exist a audio mixer device");
+		throw TSoundDeviceException(TSoundDeviceException::NoMixer,
+									"Doesn't exist a audio mixer device");
 
 	// get dwLineID
 	ret = getLineInfo((HMIXEROBJ)0, MIXERLINE_COMPONENTTYPE_DST_WAVEIN, mxl);
@@ -1652,9 +1565,8 @@ bool TSoundInputDevice::setVolume(double value)
 	MIXERCONTROL mxc;
 	ret = getLineControl(mxc, (HMIXEROBJ)0, mxl.dwLineID, MIXERCONTROL_CONTROLTYPE_VOLUME);
 	if (ret != MMSYSERR_NOERROR)
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnableVolume,
-			"Error to obtain info by mixer");
+		throw TSoundDeviceException(TSoundDeviceException::UnableVolume,
+									"Error to obtain info by mixer");
 
 	dwMaximum = mxc.Bounds.dwMaximum;
 	dwVolumeControlID = mxc.dwControlID;
@@ -1665,14 +1577,10 @@ bool TSoundInputDevice::setVolume(double value)
 	newValue = (int)(tround(fattProp) * delta);
 
 	MIXERCONTROLDETAILS_UNSIGNED mxcdVolume = {newValue};
-	ret = setControlDetails((HMIXEROBJ)0,
-							dwVolumeControlID,
-							mxc.cMultipleItems,
-							&mxcdVolume);
+	ret = setControlDetails((HMIXEROBJ)0, dwVolumeControlID, mxc.cMultipleItems, &mxcdVolume);
 	if (ret != MMSYSERR_NOERROR)
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnableVolume,
-			"Error to obtain info by mixer");
+		throw TSoundDeviceException(TSoundDeviceException::UnableVolume,
+									"Error to obtain info by mixer");
 	return true;
 }
 
@@ -1687,16 +1595,14 @@ bool TSoundInputDevice::supportsVolume()
 	nNumMixers = mixerGetNumDevs();
 
 	if (nNumMixers == 0)
-		throw TSoundDeviceException(
-			TSoundDeviceException::NoMixer,
-			"Doesn't exist a audio mixer device");
+		throw TSoundDeviceException(TSoundDeviceException::NoMixer,
+									"Doesn't exist a audio mixer device");
 
 	// get dwLineID
 	ret = getLineInfo((HMIXEROBJ)0, MIXERLINE_COMPONENTTYPE_DST_WAVEIN, mxl);
 	if (ret != MMSYSERR_NOERROR)
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnableVolume,
-			"Error to obtain info by mixer");
+		throw TSoundDeviceException(TSoundDeviceException::UnableVolume,
+									"Error to obtain info by mixer");
 
 	// get dwControlID
 	MIXERCONTROL mxc;
@@ -1705,9 +1611,8 @@ bool TSoundInputDevice::supportsVolume()
 		return false;
 
 	if (ret != MMSYSERR_NOERROR)
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnableVolume,
-			"Error to obtain info by mixer");
+		throw TSoundDeviceException(TSoundDeviceException::UnableVolume,
+									"Error to obtain info by mixer");
 
 	return true;
 }
@@ -1722,127 +1627,125 @@ bool TSoundInputDevice::isRecording()
 //------------------------------------------------------------------------------
 
 /*TSoundTrackFormat TSoundInputDevice::getPreferredFormat(
-      ULONG sampleRate, int channelCount, int bitPerSample)
+	  ULONG sampleRate, int channelCount, int bitPerSample)
 {
   MMRESULT ret;
   TSoundTrackFormat fmt;
- 
+
   ret = isaFormatSupported(sampleRate, channelCount, bitPerSample, true);
 
   if (ret == MMSYSERR_NOERROR)
   {
-    fmt.m_bitPerSample = bitPerSample;
-    fmt.m_channelCount = channelCount;
-    fmt.m_sampleRate = sampleRate;
+	fmt.m_bitPerSample = bitPerSample;
+	fmt.m_channelCount = channelCount;
+	fmt.m_sampleRate = sampleRate;
 
-    if (bitPerSample >= 16)
-      fmt.m_signedSample = true;
-    else
-      fmt.m_signedSample = false;
-    return fmt;
+	if (bitPerSample >= 16)
+	  fmt.m_signedSample = true;
+	else
+	  fmt.m_signedSample = false;
+	return fmt;
   }
   if (ret == WAVERR_BADFORMAT)
   {
-    //avvvicinarsi al sample rate => dovrebbe esser OK avendo selezionato i piu' vicini
-    std::set<int>::iterator it = m_imp->m_supportedRate.lower_bound(sampleRate);
-    if (it == m_imp->m_supportedRate.end())
-    {
+	//avvvicinarsi al sample rate => dovrebbe esser OK avendo selezionato i piu' vicini
+	std::set<int>::iterator it = m_imp->m_supportedRate.lower_bound(sampleRate);
+	if (it == m_imp->m_supportedRate.end())
+	{
 		  it = std::max_element(m_imp->m_supportedRate.begin(),
-			                 m_imp->m_supportedRate.end());
+							 m_imp->m_supportedRate.end());
 			if (it != m_imp->m_supportedRate.end())
-  		  sampleRate = *(m_imp->m_supportedRate.rbegin());
-      else
-        throw TSoundDeviceException(
-          TSoundDeviceException::UnsupportedFormat,
-          "There isn't a supported format");
-    }
-    else
-      sampleRate = *it;
-    ret = isaFormatSupported(sampleRate, channelCount, bitPerSample, true);
-    if (ret == MMSYSERR_NOERROR)
-    {
-      fmt.m_bitPerSample = bitPerSample;
-      fmt.m_channelCount = channelCount;
-      fmt.m_sampleRate = sampleRate;
+		  sampleRate = *(m_imp->m_supportedRate.rbegin());
+	  else
+		throw TSoundDeviceException(
+		  TSoundDeviceException::UnsupportedFormat,
+		  "There isn't a supported format");
+	}
+	else
+	  sampleRate = *it;
+	ret = isaFormatSupported(sampleRate, channelCount, bitPerSample, true);
+	if (ret == MMSYSERR_NOERROR)
+	{
+	  fmt.m_bitPerSample = bitPerSample;
+	  fmt.m_channelCount = channelCount;
+	  fmt.m_sampleRate = sampleRate;
 
-      if (bitPerSample >= 16)
-        fmt.m_signedSample = true;
-      else
-        fmt.m_signedSample = false;
-      return fmt;
-    }
-    if (ret == WAVERR_BADFORMAT)
-    {
-      //cambiare bps
-      if (bitPerSample <= 8)
-        bitPerSample = 8;
-      else if ((bitPerSample > 8 && bitPerSample < 16) || bitPerSample >= 16)
-        bitPerSample = 16;
+	  if (bitPerSample >= 16)
+		fmt.m_signedSample = true;
+	  else
+		fmt.m_signedSample = false;
+	  return fmt;
+	}
+	if (ret == WAVERR_BADFORMAT)
+	{
+	  //cambiare bps
+	  if (bitPerSample <= 8)
+		bitPerSample = 8;
+	  else if ((bitPerSample > 8 && bitPerSample < 16) || bitPerSample >= 16)
+		bitPerSample = 16;
 
-      ret = isaFormatSupported(sampleRate, channelCount, bitPerSample, true);
-      if (ret == MMSYSERR_NOERROR)
-      {
-        fmt.m_bitPerSample = bitPerSample;
-        fmt.m_channelCount = channelCount;
-        fmt.m_sampleRate = sampleRate;
+	  ret = isaFormatSupported(sampleRate, channelCount, bitPerSample, true);
+	  if (ret == MMSYSERR_NOERROR)
+	  {
+		fmt.m_bitPerSample = bitPerSample;
+		fmt.m_channelCount = channelCount;
+		fmt.m_sampleRate = sampleRate;
 
-        if (bitPerSample >= 16)
-          fmt.m_signedSample = true;
-        else
-          fmt.m_signedSample = false;
-        return fmt;
-      }
-      if (ret == WAVERR_BADFORMAT)
-      {
-        //switch mono/stereo
-        if (channelCount <= 1)
-          channelCount = 1;
-        else 
-          channelCount = 2;
-     
-        ret = isaFormatSupported(sampleRate, channelCount, bitPerSample, true);
-        if (ret == MMSYSERR_NOERROR)
-        {
-          fmt.m_bitPerSample = bitPerSample;
-          fmt.m_channelCount = channelCount;
-          fmt.m_sampleRate = sampleRate;
+		if (bitPerSample >= 16)
+		  fmt.m_signedSample = true;
+		else
+		  fmt.m_signedSample = false;
+		return fmt;
+	  }
+	  if (ret == WAVERR_BADFORMAT)
+	  {
+		//switch mono/stereo
+		if (channelCount <= 1)
+		  channelCount = 1;
+		else
+		  channelCount = 2;
 
-          if (bitPerSample >= 16)
-            fmt.m_signedSample = true;
-          else
-            fmt.m_signedSample = false;
-          return fmt;
-        }
-        if (ret == WAVERR_BADFORMAT)
-        {
-          throw TSoundDeviceException(
-            TSoundDeviceException::UnsupportedFormat,
-            "Doesn't exist a preferred format");
-        }
-      }
-    }
+		ret = isaFormatSupported(sampleRate, channelCount, bitPerSample, true);
+		if (ret == MMSYSERR_NOERROR)
+		{
+		  fmt.m_bitPerSample = bitPerSample;
+		  fmt.m_channelCount = channelCount;
+		  fmt.m_sampleRate = sampleRate;
+
+		  if (bitPerSample >= 16)
+			fmt.m_signedSample = true;
+		  else
+			fmt.m_signedSample = false;
+		  return fmt;
+		}
+		if (ret == WAVERR_BADFORMAT)
+		{
+		  throw TSoundDeviceException(
+			TSoundDeviceException::UnsupportedFormat,
+			"Doesn't exist a preferred format");
+		}
+	  }
+	}
   }
   throw TSoundDeviceException(
-    TSoundDeviceException::UnsupportedFormat,
-    "Error to query supported format");
+	TSoundDeviceException::UnsupportedFormat,
+	"Error to query supported format");
 }
 */
-TSoundTrackFormat TSoundInputDevice::getPreferredFormat(
-	TUINT32 sampleRate, int channelCount, int bitPerSample)
+TSoundTrackFormat TSoundInputDevice::getPreferredFormat(TUINT32 sampleRate, int channelCount,
+														int bitPerSample)
 {
 	TSoundTrackFormat fmt;
 
-	//avvvicinarsi al sample rate => dovrebbe esser OK avendo selezionato i piu' vicini
+	// avvvicinarsi al sample rate => dovrebbe esser OK avendo selezionato i piu' vicini
 	std::set<int>::iterator it = m_imp->m_supportedRate.lower_bound(sampleRate);
 	if (it == m_imp->m_supportedRate.end()) {
-		it = std::max_element(m_imp->m_supportedRate.begin(),
-							  m_imp->m_supportedRate.end());
+		it = std::max_element(m_imp->m_supportedRate.begin(), m_imp->m_supportedRate.end());
 		if (it != m_imp->m_supportedRate.end())
 			sampleRate = *(m_imp->m_supportedRate.rbegin());
 		else
-			throw TSoundDeviceException(
-				TSoundDeviceException::UnsupportedFormat,
-				"There isn't a supported format");
+			throw TSoundDeviceException(TSoundDeviceException::UnsupportedFormat,
+										"There isn't a supported format");
 	} else
 		sampleRate = *it;
 
@@ -1856,7 +1759,7 @@ TSoundTrackFormat TSoundInputDevice::getPreferredFormat(
 	else
 		fmt.m_signedSample = false;
 
-	//switch mono/stereo
+	// switch mono/stereo
 	if (channelCount <= 1)
 		channelCount = 1;
 	else
@@ -1874,12 +1777,10 @@ TSoundTrackFormat TSoundInputDevice::getPreferredFormat(
 TSoundTrackFormat TSoundInputDevice::getPreferredFormat(const TSoundTrackFormat &format)
 {
 	try {
-		return getPreferredFormat(
-			format.m_sampleRate, format.m_channelCount, format.m_bitPerSample);
+		return getPreferredFormat(format.m_sampleRate, format.m_channelCount,
+								  format.m_bitPerSample);
 	} catch (TSoundDeviceException &e) {
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnsupportedFormat,
-			e.getMessage());
+		throw TSoundDeviceException(TSoundDeviceException::UnsupportedFormat, e.getMessage());
 	}
 }
 
@@ -1895,10 +1796,7 @@ namespace
 // restituisce dentro la struttura mxc le informazioni relative
 // al controllo di tipo dwControlType associato alla linea
 // identificata da dwLineID
-MMRESULT getLineControl(MIXERCONTROL &mxc,
-						HMIXEROBJ hMixer,
-						DWORD dwLineID,
-						DWORD dwControlType)
+MMRESULT getLineControl(MIXERCONTROL &mxc, HMIXEROBJ hMixer, DWORD dwLineID, DWORD dwControlType)
 {
 	MIXERLINECONTROLS mxlc;
 	mxlc.cbStruct = sizeof(MIXERLINECONTROLS);
@@ -1907,8 +1805,7 @@ MMRESULT getLineControl(MIXERCONTROL &mxc,
 	mxlc.cControls = 1;
 	mxlc.cbmxctrl = sizeof(MIXERCONTROL);
 	mxlc.pamxctrl = &mxc;
-	MMRESULT ret = mixerGetLineControls((HMIXEROBJ)hMixer,
-										&mxlc,
+	MMRESULT ret = mixerGetLineControls((HMIXEROBJ)hMixer, &mxlc,
 										MIXER_OBJECTF_HMIXER | MIXER_GETLINECONTROLSF_ONEBYTYPE);
 	return ret;
 }
@@ -1917,10 +1814,7 @@ MMRESULT getLineControl(MIXERCONTROL &mxc,
 
 // restituisce nella struttura mxl le informazioni relative alla linea
 // sorgente individuata dagli estremi destination e source
-MMRESULT getLineInfo(HMIXEROBJ hMixer,
-					 MIXERLINE &mxl,
-					 DWORD destination,
-					 DWORD source)
+MMRESULT getLineInfo(HMIXEROBJ hMixer, MIXERLINE &mxl, DWORD destination, DWORD source)
 {
 	MMRESULT ret;
 
@@ -1935,17 +1829,14 @@ MMRESULT getLineInfo(HMIXEROBJ hMixer,
 
 // restituisce nella struttura mxl le informazioni relative alla linea
 // individuata da dwLineID
-MMRESULT getLineInfo(HMIXEROBJ hMixer,
-					 MIXERLINE &mxl,
-					 DWORD dwLineID)
+MMRESULT getLineInfo(HMIXEROBJ hMixer, MIXERLINE &mxl, DWORD dwLineID)
 {
 	MMRESULT ret;
 
 	mxl.cbStruct = sizeof(mxl);
 	mxl.dwLineID = dwLineID;
-	ret = mixerGetLineInfo((HMIXEROBJ)hMixer,
-						   &mxl,
-						   MIXER_OBJECTF_HMIXER | MIXER_GETLINEINFOF_LINEID);
+	ret =
+		mixerGetLineInfo((HMIXEROBJ)hMixer, &mxl, MIXER_OBJECTF_HMIXER | MIXER_GETLINEINFOF_LINEID);
 	return ret;
 }
 
@@ -1953,16 +1844,13 @@ MMRESULT getLineInfo(HMIXEROBJ hMixer,
 
 // restituisce nella struttura mxl le informazioni relative alla linea
 // individuata dal tipo specificato in dwComponentType
-MMRESULT getLineInfo(HMIXEROBJ hMixer,
-					 DWORD dwComponentType,
-					 MIXERLINE &mxl)
+MMRESULT getLineInfo(HMIXEROBJ hMixer, DWORD dwComponentType, MIXERLINE &mxl)
 {
 	MMRESULT ret;
 
 	mxl.cbStruct = sizeof(MIXERLINE);
 	mxl.dwComponentType = dwComponentType;
-	ret = mixerGetLineInfo((HMIXEROBJ)hMixer,
-						   &mxl,
+	ret = mixerGetLineInfo((HMIXEROBJ)hMixer, &mxl,
 						   MIXER_OBJECTF_HMIXER | MIXER_GETLINEINFOF_COMPONENTTYPE);
 	return ret;
 }
@@ -1971,9 +1859,7 @@ MMRESULT getLineInfo(HMIXEROBJ hMixer,
 
 // consente di settare il valore booleano specificato in mxcdSelectValue
 // relativo al controllo specificato in dwSelectControlID
-MMRESULT setControlDetails(HMIXEROBJ hMixer,
-						   DWORD dwSelectControlID,
-						   DWORD dwMultipleItems,
+MMRESULT setControlDetails(HMIXEROBJ hMixer, DWORD dwSelectControlID, DWORD dwMultipleItems,
 						   MIXERCONTROLDETAILS_BOOLEAN *mxcdSelectValue)
 {
 	MMRESULT ret;
@@ -1984,8 +1870,7 @@ MMRESULT setControlDetails(HMIXEROBJ hMixer,
 	mxcd.cMultipleItems = dwMultipleItems;
 	mxcd.cbDetails = sizeof(MIXERCONTROLDETAILS_BOOLEAN);
 	mxcd.paDetails = mxcdSelectValue;
-	ret = mixerSetControlDetails((HMIXEROBJ)hMixer,
-								 &mxcd,
+	ret = mixerSetControlDetails((HMIXEROBJ)hMixer, &mxcd,
 								 MIXER_OBJECTF_HMIXER | MIXER_SETCONTROLDETAILSF_VALUE);
 	return ret;
 }
@@ -1994,9 +1879,7 @@ MMRESULT setControlDetails(HMIXEROBJ hMixer,
 
 // consente di settare il valore UNSIGNED specificato in mxcdSelectValue
 // relativo al controllo specificato in dwSelectControlID
-MMRESULT setControlDetails(HMIXEROBJ hMixer,
-						   DWORD dwSelectControlID,
-						   DWORD dwMultipleItems,
+MMRESULT setControlDetails(HMIXEROBJ hMixer, DWORD dwSelectControlID, DWORD dwMultipleItems,
 						   MIXERCONTROLDETAILS_UNSIGNED *mxcdSelectValue)
 {
 	MMRESULT ret;
@@ -2007,8 +1890,7 @@ MMRESULT setControlDetails(HMIXEROBJ hMixer,
 	mxcd.cMultipleItems = dwMultipleItems;
 	mxcd.cbDetails = sizeof(MIXERCONTROLDETAILS_UNSIGNED);
 	mxcd.paDetails = mxcdSelectValue;
-	ret = mixerSetControlDetails((HMIXEROBJ)hMixer,
-								 &mxcd,
+	ret = mixerSetControlDetails((HMIXEROBJ)hMixer, &mxcd,
 								 MIXER_OBJECTF_HMIXER | MIXER_SETCONTROLDETAILSF_VALUE);
 	return ret;
 }
@@ -2017,9 +1899,7 @@ MMRESULT setControlDetails(HMIXEROBJ hMixer,
 
 // consente di ottenere il valore UNSIGNED specificato in mxcdSelectValue
 // relativo al controllo specificato in dwSelectControlID
-MMRESULT getControlDetails(HMIXEROBJ hMixer,
-						   DWORD dwSelectControlID,
-						   DWORD dwMultipleItems,
+MMRESULT getControlDetails(HMIXEROBJ hMixer, DWORD dwSelectControlID, DWORD dwMultipleItems,
 						   MIXERCONTROLDETAILS_UNSIGNED *mxcdSelectValue)
 {
 	MMRESULT ret;
@@ -2030,8 +1910,7 @@ MMRESULT getControlDetails(HMIXEROBJ hMixer,
 	mxcd.cMultipleItems = dwMultipleItems;
 	mxcd.cbDetails = sizeof(MIXERCONTROLDETAILS_UNSIGNED);
 	mxcd.paDetails = mxcdSelectValue;
-	ret = mixerGetControlDetails((HMIXEROBJ)hMixer,
-								 &mxcd,
+	ret = mixerGetControlDetails((HMIXEROBJ)hMixer, &mxcd,
 								 MIXER_OBJECTF_HMIXER | MIXER_SETCONTROLDETAILSF_VALUE);
 	return ret;
 }
@@ -2039,9 +1918,7 @@ MMRESULT getControlDetails(HMIXEROBJ hMixer,
 
 // consente di ottenere la lista di informazioni in pmxcdSelectText
 // relativo al controllo specificato in dwSelectControlID
-MMRESULT getControlDetails(HMIXEROBJ hMixer,
-						   DWORD dwSelectControlID,
-						   DWORD dwMultipleItems,
+MMRESULT getControlDetails(HMIXEROBJ hMixer, DWORD dwSelectControlID, DWORD dwMultipleItems,
 						   MIXERCONTROLDETAILS_LISTTEXT *pmxcdSelectText)
 {
 	MMRESULT ret;
@@ -2053,9 +1930,7 @@ MMRESULT getControlDetails(HMIXEROBJ hMixer,
 	mxcd.cMultipleItems = dwMultipleItems;
 	mxcd.cbDetails = sizeof(MIXERCONTROLDETAILS_LISTTEXT);
 	mxcd.paDetails = pmxcdSelectText;
-	ret = mixerGetControlDetails((HMIXEROBJ)0,
-								 &mxcd,
-								 MIXER_GETCONTROLDETAILSF_LISTTEXT);
+	ret = mixerGetControlDetails((HMIXEROBJ)0, &mxcd, MIXER_GETCONTROLDETAILSF_LISTTEXT);
 	return ret;
 }
 
@@ -2088,8 +1963,8 @@ std::list<DWORD> getMixerSrcLines(DWORD dstComponentType)
 
 	ret = getLineInfo((HMIXEROBJ)0, MIXERLINE_COMPONENTTYPE_DST_WAVEIN, mxl);
 	if (ret != MMSYSERR_NOERROR)
-		//forse bisognerebbe lanciare un'eccezione
-		return srcList; //non ha linea di dst per la registrazione
+		// forse bisognerebbe lanciare un'eccezione
+		return srcList; // non ha linea di dst per la registrazione
 
 	int v;
 	for (v = 0; v < (int)mxl.cConnections; v++) {
@@ -2114,8 +1989,8 @@ std::list<DWORD> getMixerSrcLines(DWORD dstComponentType, DWORD srcComponentType
 
 	ret = getLineInfo((HMIXEROBJ)0, MIXERLINE_COMPONENTTYPE_DST_WAVEIN, mxl);
 	if (ret != MMSYSERR_NOERROR)
-		//forse bisognerebbe lanciare un'eccezione
-		return srcList; //non ha linea di dst per la registrazione
+		// forse bisognerebbe lanciare un'eccezione
+		return srcList; // non ha linea di dst per la registrazione
 
 	int v;
 	for (v = 0; v < (int)mxl.cConnections; v++) {
@@ -2142,7 +2017,7 @@ bool isSrcLineSupported(DWORD dstComponentType, DWORD srcComponentType)
 
 	ret = getLineInfo((HMIXEROBJ)0, MIXERLINE_COMPONENTTYPE_DST_WAVEIN, mxl);
 	if (ret != MMSYSERR_NOERROR)
-		return false; //non ha linea di dst per la registrazione
+		return false; // non ha linea di dst per la registrazione
 
 	int v;
 	for (v = 0; v < (int)mxl.cConnections; v++) {
@@ -2173,16 +2048,14 @@ bool activateSrcLine(const MIXERLINE &mxlDst, DWORD componentTypeSrc)
 		if (ret == MMSYSERR_NOERROR) {
 			// chiedo il controllo di tipo MUTE della linea sorgente
 			MIXERCONTROL mxc;
-			ret = getLineControl(
-				mxc, (HMIXEROBJ)0, mxlSrc.dwLineID,
-				MIXERCONTROL_CONTROLTYPE_MUTE);
+			ret = getLineControl(mxc, (HMIXEROBJ)0, mxlSrc.dwLineID, MIXERCONTROL_CONTROLTYPE_MUTE);
 
 			if (ret == MMSYSERR_NOERROR) {
 				MIXERCONTROLDETAILS_BOOLEAN mxcdSelectValue;
 				mxcdSelectValue.fValue = mxlSrc.dwComponentType == componentTypeSrc ? 0L : 1L;
 
-				ret = setControlDetails((HMIXEROBJ)0, mxc.dwControlID,
-										mxc.cMultipleItems, &mxcdSelectValue);
+				ret = setControlDetails((HMIXEROBJ)0, mxc.dwControlID, mxc.cMultipleItems,
+										&mxcdSelectValue);
 				if (ret != MMSYSERR_NOERROR)
 					bRetVal = false;
 			}
@@ -2210,13 +2083,13 @@ bool setSrcMixMuxControl(MIXERCONTROL mxc, DWORD componentTypeSrc)
 	// determino l'indice dell'item corrispondente alla linea sorgente
 	// di tipo componentTypeSrc
 
-	std::unique_ptr<MIXERCONTROLDETAILS_LISTTEXT[]>
-		pmxcdSelectText(new MIXERCONTROLDETAILS_LISTTEXT[dwMultipleItems]);
+	std::unique_ptr<MIXERCONTROLDETAILS_LISTTEXT[]> pmxcdSelectText(
+		new MIXERCONTROLDETAILS_LISTTEXT[dwMultipleItems]);
 
 	if (pmxcdSelectText) {
 		// estraggo le info su tutte le linee associate al controllo
-		ret = getControlDetails((HMIXEROBJ)0, dwSelectControlID,
-								dwMultipleItems, pmxcdSelectText.get());
+		ret = getControlDetails((HMIXEROBJ)0, dwSelectControlID, dwMultipleItems,
+								pmxcdSelectText.get());
 
 		if (ret == MMSYSERR_NOERROR) {
 			for (DWORD dwi = 0; dwi < dwMultipleItems; dwi++) {
@@ -2240,8 +2113,8 @@ bool setSrcMixMuxControl(MIXERCONTROL mxc, DWORD componentTypeSrc)
 
 	bool bRetVal = false;
 
-	std::unique_ptr<MIXERCONTROLDETAILS_BOOLEAN[]>
-		pmxcdSelectValue(new MIXERCONTROLDETAILS_BOOLEAN[dwMultipleItems]);
+	std::unique_ptr<MIXERCONTROLDETAILS_BOOLEAN[]> pmxcdSelectValue(
+		new MIXERCONTROLDETAILS_BOOLEAN[dwMultipleItems]);
 
 	if (pmxcdSelectValue) {
 		::ZeroMemory(pmxcdSelectValue.get(), dwMultipleItems * sizeof(MIXERCONTROLDETAILS_BOOLEAN));
@@ -2249,9 +2122,7 @@ bool setSrcMixMuxControl(MIXERCONTROL mxc, DWORD componentTypeSrc)
 		// impostazione del valore
 		pmxcdSelectValue[dwIndexLine].fValue = (TINT32)1; // lVal; //dovrebbe esser uno
 
-		ret = setControlDetails((HMIXEROBJ)0,
-								dwSelectControlID,
-								dwMultipleItems,
+		ret = setControlDetails((HMIXEROBJ)0, dwSelectControlID, dwMultipleItems,
 								pmxcdSelectValue.get());
 		if (ret == MMSYSERR_NOERROR)
 			bRetVal = true;
@@ -2294,22 +2165,18 @@ bool setRecordLine(TSoundInputDevice::Source typeInput)
 	// vedo se il device ha una linea dst per il wave_input
 	ret = getLineInfo((HMIXEROBJ)0, MIXERLINE_COMPONENTTYPE_DST_WAVEIN, mxl);
 	if (ret != MMSYSERR_NOERROR)
-		return false; //non ha linea di dst per la registrazione
+		return false; // non ha linea di dst per la registrazione
 
-	//vediamo che tipo controllo ha questa linea dst
+	// vediamo che tipo controllo ha questa linea dst
 
 	// sara' un MIXER?
 	MIXERCONTROL mxc = {0};
 
-	ret = getLineControl(mxc,
-						 (HMIXEROBJ)0,
-						 mxl.dwLineID, MIXERCONTROL_CONTROLTYPE_MIXER);
+	ret = getLineControl(mxc, (HMIXEROBJ)0, mxl.dwLineID, MIXERCONTROL_CONTROLTYPE_MIXER);
 
 	if (ret != MMSYSERR_NOERROR) {
 		// no mixer, try MUX
-		ret = getLineControl(mxc,
-							 (HMIXEROBJ)0,
-							 mxl.dwLineID, MIXERCONTROL_CONTROLTYPE_MUX);
+		ret = getLineControl(mxc, (HMIXEROBJ)0, mxl.dwLineID, MIXERCONTROL_CONTROLTYPE_MUX);
 
 		if (ret != MMSYSERR_NOERROR) {
 			// vediamo se e' uno di quei device ne' MIXER ne' MUX
@@ -2326,8 +2193,7 @@ bool setRecordLine(TSoundInputDevice::Source typeInput)
 
 //------------------------------------------------------------------------------
 
-MMRESULT isaFormatSupported(
-	int sampleRate, int channelCount, int bitPerSample, bool input)
+MMRESULT isaFormatSupported(int sampleRate, int channelCount, int bitPerSample, bool input)
 {
 	WAVEFORMATEX wf;
 	MMRESULT ret;

@@ -14,7 +14,7 @@ class ChangeColorFx : public TStandardRasterFx
 	TDoubleParamP m_range;
 	TDoubleParamP m_falloff;
 
-public:
+  public:
 	ChangeColorFx()
 		: m_from_color(TPixel32::Red), m_to_color(TPixel32::Blue), m_range(0.0), m_falloff(0.0)
 	{

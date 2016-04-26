@@ -17,23 +17,23 @@
 using namespace TSyntax;
 
 //=============================================================================
-//!The struct TStageObjectTree::TStageObjectTreeImp contains all element necessary to define a pegbar tree.
+//! The struct TStageObjectTree::TStageObjectTreeImp contains all element necessary to define a
+//! pegbar tree.
 
 struct TStageObjectTree::TStageObjectTreeImp {
-	enum DagGridDimension { eLarge = 0,
-							eSmall = 1 };
+	enum DagGridDimension { eLarge = 0, eSmall = 1 };
 
-	//!The map contains generic pegbar of pegbar tree.
+	//! The map contains generic pegbar of pegbar tree.
 	std::map<TStageObjectId, TStageObject *> m_pegbarTable;
 
-	//!Define pegbar tree current camera .
+	//! Define pegbar tree current camera .
 	TStageObjectId m_currentCameraId;
 	TStageObjectId m_currentPreviewCameraId;
 
-	//!Allows to manager pegbar handle.
+	//! Allows to manager pegbar handle.
 	HandleManager *m_handleManager;
 
-	//!The vector contains all spline \b TStageObjectSpline of pegbar tree.
+	//! The vector contains all spline \b TStageObjectSpline of pegbar tree.
 	std::map<int, TStageObjectSpline *> m_splines;
 
 	int m_cameraCount;
@@ -44,15 +44,15 @@ struct TStageObjectTree::TStageObjectTreeImp {
 	Grammar *m_grammar;
 
 	/*!
-    Constructs a TStageObjectTreeImp with default value.
+	Constructs a TStageObjectTreeImp with default value.
   */
 	TStageObjectTreeImp();
 	/*!
-    Destroys the TStageObjectTreeImp object.
+	Destroys the TStageObjectTreeImp object.
   */
 	~TStageObjectTreeImp();
 
-	//not implemented
+	// not implemented
 	TStageObjectTreeImp(const TStageObjectTreeImp &);
 	TStageObjectTreeImp &operator=(const TStageObjectTreeImp &);
 };
@@ -60,7 +60,9 @@ struct TStageObjectTree::TStageObjectTreeImp {
 //-----------------------------------------------------------------------------
 
 TStageObjectTree::TStageObjectTreeImp::TStageObjectTreeImp()
-	: m_currentCameraId(TStageObjectId::CameraId(0)), m_currentPreviewCameraId(TStageObjectId::CameraId(0)), m_handleManager(0), m_cameraCount(0), m_groupIdCount(0), m_splineCount(0), m_grammar(0), m_dagGridDimension(eSmall)
+	: m_currentCameraId(TStageObjectId::CameraId(0)),
+	  m_currentPreviewCameraId(TStageObjectId::CameraId(0)), m_handleManager(0), m_cameraCount(0),
+	  m_groupIdCount(0), m_splineCount(0), m_grammar(0), m_dagGridDimension(eSmall)
 {
 }
 
@@ -89,9 +91,9 @@ TStageObjectTree::TStageObjectTree() : m_imp(new TStageObjectTreeImp)
   static bool firstTime = true;
   if(firstTime)
   {
-    firstTime = false;
-    Grammar*grammar = ExprGrammar::instance();
-    grammar->addPattern("leaf", new ParamReferencePattern());
+	firstTime = false;
+	Grammar*grammar = ExprGrammar::instance();
+	grammar->addPattern("leaf", new ParamReferencePattern());
   }
 */
 #ifndef NDEBUG
@@ -134,8 +136,7 @@ void TStageObjectTree::checkIntegrity()
 			columnIndexTable.insert(index);
 		} else if (id.isPegbar()) {
 			assert(imp->getParent() != TStageObjectId());
-			assert(imp->getParent().isPegbar() ||
-				   imp->getParent().isTable());
+			assert(imp->getParent().isPegbar() || imp->getParent().isTable());
 		} else if (id.isTable())
 			assert(imp->getParent() == TStageObjectId());
 		else if (id.isCamera()) // la camera puo' essere attaccata dovunque
@@ -151,8 +152,8 @@ void TStageObjectTree::checkIntegrity()
 		int m = columnIndexTable.size();
 		assert(m == count);
 		int k = minColumnIndex;
-		for (std::set<int>::iterator it = columnIndexTable.begin();
-			 it != columnIndexTable.end(); ++it) {
+		for (std::set<int>::iterator it = columnIndexTable.begin(); it != columnIndexTable.end();
+			 ++it) {
 			assert(*it == k);
 			k++;
 		}
@@ -260,10 +261,10 @@ void TStageObjectTree::removeColumn(int index)
 		TStageObjectId parentId = imp->getParent();
 		imp->detachFromParent();
 		/* while(! m_children.empty())
-    {
-      TStageObject*son = *imp->m_children.begin();
-      son->setParent(parentId);
-    }*/
+	{
+	  TStageObject*son = *imp->m_children.begin();
+	  son->setParent(parentId);
+	}*/
 		imp->attachChildrenToParent(parentId);
 		imp->release();
 	}
@@ -500,8 +501,7 @@ TStageObject *TStageObjectTree::getStageObject(int index) const
 	assert(0 <= index && index < getStageObjectCount());
 	std::map<TStageObjectId, TStageObject *>::const_iterator it;
 	int i = 0;
-	for (it = m_imp->m_pegbarTable.begin();
-		 it != m_imp->m_pegbarTable.end() && i < index;
+	for (it = m_imp->m_pegbarTable.begin(); it != m_imp->m_pegbarTable.end() && i < index;
 		 ++it, ++i) {
 	}
 	assert(it != m_imp->m_pegbarTable.end());
@@ -543,9 +543,7 @@ void TStageObjectTree::setCurrentPreviewCameraId(const TStageObjectId &id)
 void TStageObjectTree::invalidateAll()
 {
 	std::map<TStageObjectId, TStageObject *>::iterator it;
-	for (it = m_imp->m_pegbarTable.begin();
-		 it != m_imp->m_pegbarTable.end();
-		 ++it) {
+	for (it = m_imp->m_pegbarTable.begin(); it != m_imp->m_pegbarTable.end(); ++it) {
 		it->second->invalidate();
 	}
 }
@@ -661,9 +659,7 @@ void TStageObjectTree::createGrammar(TXsheet *xsh)
 	m_imp->m_grammar = createXsheetGrammar(xsh);
 
 	std::map<TStageObjectId, TStageObject *>::iterator it;
-	for (it = m_imp->m_pegbarTable.begin();
-		 it != m_imp->m_pegbarTable.end();
-		 ++it) {
+	for (it = m_imp->m_pegbarTable.begin(); it != m_imp->m_pegbarTable.end(); ++it) {
 		TStageObject *obj = it->second;
 
 		int c, cCount = TStageObject::T_ChannelCount;

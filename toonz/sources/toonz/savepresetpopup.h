@@ -16,12 +16,12 @@ class SavePresetPopup : public DVGui::Dialog
 
 	DVGui::LineEdit *m_nameFld;
 
-public:
+  public:
 	SavePresetPopup();
 	~SavePresetPopup();
 	bool apply();
 
-protected slots:
+  protected slots:
 	void onOkBtn();
 };
 

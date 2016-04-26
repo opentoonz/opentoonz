@@ -10,8 +10,7 @@
 
 //---------------------------------------------------------
 
-Hook::Hook()
-	: m_id(0), m_trackerObjectId(-1)
+Hook::Hook() : m_id(0), m_trackerObjectId(-1)
 {
 }
 
@@ -52,7 +51,7 @@ Hook::Frames::const_iterator Hook::find(TFrameId fid) const
 
 TPointD Hook::getPos(const TFrameId &fid) const
 {
-	//return TPointD(0,0);
+	// return TPointD(0,0);
 	Frames::const_iterator it = find(fid);
 	if (it == m_frames.end())
 		return TPointD();
@@ -141,8 +140,7 @@ TRectD Hook::getTrackerRegion(const TFrameId &fid)
 void Hook::update()
 {
 	TPointD delta;
-	for (Frames::iterator it = m_frames.begin();
-		 it != m_frames.end(); ++it) {
+	for (Frames::iterator it = m_frames.begin(); it != m_frames.end(); ++it) {
 		it->second.m_pos = it->second.m_aPos + delta;
 		delta -= it->second.m_bPos - it->second.m_aPos;
 	}
@@ -218,8 +216,7 @@ void Hook::loadData(TIStream &is)
 
 //=========================================================
 
-HookSet::HookSet()
-	: m_trackerObjectsSet(new TrackerObjectsSet)
+HookSet::HookSet() : m_trackerObjectsSet(new TrackerObjectsSet)
 {
 }
 

@@ -49,7 +49,7 @@ class DVAPI ExpressionField : public QTextEdit
 	int m_completerStartPos;
 	TSyntax::Grammar::Suggestions m_suggestions;
 
-public:
+  public:
 	ExpressionField(QWidget *parent = 0);
 	~ExpressionField();
 
@@ -59,13 +59,13 @@ public:
 	void setGrammar(const TSyntax::Grammar *grammar);
 	const TSyntax::Grammar *getGrammar() const { return m_grammar; }
 
-private:
+  private:
 	void openCompleterPopup();
 	bool updateCompleterPopup();
 	void insertCompletion();
 	int computeSuggestions();
 
-protected:
+  protected:
 	bool event(QEvent *e);
 	void keyPressEvent(QKeyEvent *e);
 	void focusInEvent(QFocusEvent *e);
@@ -74,17 +74,17 @@ protected:
 	void hideEvent(QHideEvent *);
 	bool eventFilter(QObject *obj, QEvent *e);
 
-private slots:
+  private slots:
 	void onTextChanged();
 	void onCursorPositionChanged();
 	void insertCompletion(const QModelIndex &index);
 
-signals:
+  signals:
 	void expressionChanged();
 };
 
 //-----------------------------------------------------------------------------
-} //namespace DVGui
+} // namespace DVGui
 //-----------------------------------------------------------------------------
 
 #endif // FILEFIELD_H

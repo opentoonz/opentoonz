@@ -34,20 +34,21 @@ enum SelectionType {
 
 class FreeDeformer
 {
-protected:
+  protected:
 	TPointD m_originalP00;
 	TPointD m_originalP11;
 
 	std::vector<TPointD> m_newPoints;
 
-public:
+  public:
 	FreeDeformer() {}
 	virtual ~FreeDeformer() {}
 
 	/*! Set \b index point to \b p, with index from 0 to 3. */
 	virtual void setPoint(int index, const TPointD &p) = 0;
 	/*! Helper function. */
-	virtual void setPoints(const TPointD &p0, const TPointD &p1, const TPointD &p2, const TPointD &p3) = 0;
+	virtual void setPoints(const TPointD &p0, const TPointD &p1, const TPointD &p2,
+						   const TPointD &p3) = 0;
 	virtual void deformImage() = 0;
 };
 
@@ -66,7 +67,7 @@ class FourPoints
 {
 	TPointD m_p00, m_p01, m_p10, m_p11;
 
-public:
+  public:
 	FourPoints(TPointD p00, TPointD p01, TPointD p10, TPointD p11)
 		: m_p00(p00), m_p01(p01), m_p10(p10), m_p11(p11)
 	{
@@ -106,8 +107,8 @@ public:
 };
 
 //=============================================================================
-void drawFourPoints(const FourPoints &rect, const TPixel32 &color,
-					unsigned short stipple, bool doContrast);
+void drawFourPoints(const FourPoints &rect, const TPixel32 &color, unsigned short stipple,
+					bool doContrast);
 //-----------------------------------------------------------------------------
 
 //=============================================================================
@@ -120,8 +121,11 @@ struct DeformValues {
 	bool m_isSelectionModified;
 
 	DeformValues(double rotationAngle = 0, double maxSelectionThickness = 0,
-				 TPointD scaleValue = TPointD(1, 1), TPointD moveValue = TPointD(), bool isSelectionModified = false)
-		: m_rotationAngle(rotationAngle), m_maxSelectionThickness(maxSelectionThickness), m_scaleValue(scaleValue), m_moveValue(moveValue), m_isSelectionModified(isSelectionModified)
+				 TPointD scaleValue = TPointD(1, 1), TPointD moveValue = TPointD(),
+				 bool isSelectionModified = false)
+		: m_rotationAngle(rotationAngle), m_maxSelectionThickness(maxSelectionThickness),
+		  m_scaleValue(scaleValue), m_moveValue(moveValue),
+		  m_isSelectionModified(isSelectionModified)
 	{
 	}
 
@@ -141,14 +145,11 @@ struct DeformValues {
 
 class DragTool
 {
-protected:
+  protected:
 	SelectionTool *m_tool;
 
-public:
-	DragTool(SelectionTool *tool)
-		: m_tool(tool)
-	{
-	}
+  public:
+	DragTool(SelectionTool *tool) : m_tool(tool) {}
 	virtual ~DragTool() {}
 
 	SelectionTool *getTool() const { return m_tool; }
@@ -170,13 +171,13 @@ public:
 
 class DeformTool : public DragTool
 {
-protected:
+  protected:
 	TPointD m_curPos;
 	bool m_isDragging;
 	TPointD m_startScaleValue;
 	TPointD m_startPos;
 
-public:
+  public:
 	DeformTool(SelectionTool *tool);
 
 	virtual void applyTransform(FourPoints bbox) = 0;
@@ -184,9 +185,11 @@ public:
 	virtual void addTransformUndo() = 0;
 
 	int getSimmetricPointIndex(int index) const;
-	/*! Return before point \b index between possible point index {0,4,1,5,2,6,3,7}, include middle point. */
+	/*! Return before point \b index between possible point index {0,4,1,5,2,6,3,7}, include middle
+	 * point. */
 	int getBeforePointIndex(int index) const;
-	/*! Return next point \b index between possible point index {0,4,1,5,2,6,3,7}, include middle point. */
+	/*! Return next point \b index between possible point index {0,4,1,5,2,6,3,7}, include middle
+	 * point. */
 	int getNextPointIndex(int index) const;
 	/*! Return before vertex \b index between possible point vertex index {0,1,2,3}*/
 	int getBeforeVertexIndex(int index) const;
@@ -215,7 +218,7 @@ class Rotation
 	double m_curAng, m_dstAng;
 	DeformTool *m_deformTool;
 
-public:
+  public:
 	Rotation(DeformTool *deformTool);
 	TPointD getStartCenter() const;
 	void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
@@ -230,7 +233,7 @@ class FreeDeform
 {
 	DeformTool *m_deformTool;
 
-public:
+  public:
 	FreeDeform(DeformTool *deformTool);
 	void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
 };
@@ -244,7 +247,7 @@ class MoveSelection
 	DeformTool *m_deformTool;
 	TPointD m_lastDelta, m_firstPos;
 
-public:
+  public:
 	MoveSelection(DeformTool *deformTool);
 	void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
 	void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
@@ -264,29 +267,31 @@ class Scale
 
 	DeformTool *m_deformTool;
 
-public:
-	enum Type { GLOBAL = 0,
-				HORIZONTAL = 1,
-				VERTICAL = 2 };
+  public:
+	enum Type { GLOBAL = 0, HORIZONTAL = 1, VERTICAL = 2 };
 	int m_type;
 	Scale(DeformTool *deformTool, int type);
 
 	/*! Return intersection between straight line in \b point0, \b point1 and straight line for
-      \b p parallel to straight line in \b point2, \b point3. */
+	  \b p parallel to straight line in \b point2, \b point3. */
 	TPointD getIntersectionPoint(const TPointD &point0, const TPointD &point1,
-								 const TPointD &point2, const TPointD &point3, const TPointD &p) const;
+								 const TPointD &point2, const TPointD &point3,
+								 const TPointD &p) const;
 	/*! Scale \b index point of \b bbox in \b pos and return scaled bbox. */
 	FourPoints bboxScale(int index, const FourPoints &oldBbox, const TPointD &pos);
 	/*! Compute new scale value take care of new position of \b movedIndex point in \b bbox. */
 	TPointD computeScaleValue(int movedIndex, const FourPoints newBbox);
 	/*! Return \b index point scaled in \b center of \b scaleValue. */
-	TPointD getScaledPoint(int index, const FourPoints &oldBbox, const TPointD scaleValue, const TPointD center);
+	TPointD getScaledPoint(int index, const FourPoints &oldBbox, const TPointD scaleValue,
+						   const TPointD center);
 	/*! Compute new center after scale of \b bbox \b index point. */
 	TPointD getNewCenter(int index, const FourPoints bbox, const TPointD scaleValue);
-	/*! Scale \b bbox \b index point in pos and if \b m_scaleInCenter is true scale in \b center \b bbox simmetric point;
-      compute scaleValue. */
-	FourPoints bboxScaleInCenter(int index, const FourPoints &oldBbox, const TPointD newPos, TPointD &scaleValue,
-								 const TPointD center, bool recomputeScaleValue);
+	/*! Scale \b bbox \b index point in pos and if \b m_scaleInCenter is true scale in \b center \b
+	  bbox simmetric point;
+	  compute scaleValue. */
+	FourPoints bboxScaleInCenter(int index, const FourPoints &oldBbox, const TPointD newPos,
+								 TPointD &scaleValue, const TPointD center,
+								 bool recomputeScaleValue);
 
 	void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
 	void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
@@ -314,7 +319,7 @@ class SelectionTool : public TTool, public TSelection::View
 {
 	Q_DECLARE_TR_FUNCTIONS(SelectionTool)
 
-protected:
+  protected:
 	bool m_firstTime;
 	DragSelectionTool::DragTool *m_dragTool;
 
@@ -323,7 +328,7 @@ protected:
 	TPointD m_mousePosition;
 	TStroke *m_stroke;
 
-	//To modify selection
+	// To modify selection
 	TPointD m_curPos;
 	TPointD m_firstPos;
 
@@ -331,25 +336,29 @@ protected:
 	bool m_justSelected;
 	bool m_shiftPressed;
 
-	enum { Outside,
-		   Inside,
-		   DEFORM,
-		   ROTATION,
-		   MOVE_CENTER,
-		   SCALE,
-		   SCALE_X,
-		   SCALE_Y,
-		   GLOBAL_THICKNESS,
-		   ADD_SELECTION } m_what; //RV
-	enum { P00 = 0,
-		   P10 = 1,
-		   P11 = 2,
-		   P01 = 3,
-		   PM0 = 4,
-		   P1M = 5,
-		   PM1 = 6,
-		   P0M = 7,
-		   NONE } m_selectedPoint; //RV
+	enum {
+		Outside,
+		Inside,
+		DEFORM,
+		ROTATION,
+		MOVE_CENTER,
+		SCALE,
+		SCALE_X,
+		SCALE_Y,
+		GLOBAL_THICKNESS,
+		ADD_SELECTION
+	} m_what; // RV
+	enum {
+		P00 = 0,
+		P10 = 1,
+		P11 = 2,
+		P01 = 3,
+		PM0 = 4,
+		P1M = 5,
+		PM1 = 6,
+		P0M = 7,
+		NONE
+	} m_selectedPoint; // RV
 
 	int m_cursorId;
 
@@ -366,17 +375,18 @@ protected:
 
 	virtual void updateAction(TPointD pos, const TMouseEvent &e);
 
-	virtual void modifySelectionOnClick(TImageP image, const TPointD &pos, const TMouseEvent &e) = 0;
+	virtual void modifySelectionOnClick(TImageP image, const TPointD &pos,
+										const TMouseEvent &e) = 0;
 
 	virtual void doOnActivate() = 0;
 	virtual void doOnDeactivate() = 0;
 
-	//Metodi per disegnare la linea della selezione Freehand
+	// Metodi per disegnare la linea della selezione Freehand
 	void startFreehand(const TPointD &pos);
 	void freehandDrag(const TPointD &pos);
 	void closeFreehand(const TPointD &pos);
 
-	//Metodi per disegnare la linea della selezione Polyline
+	// Metodi per disegnare la linea della selezione Polyline
 	void addPointPolyline(const TPointD &pos);
 	void closePolyline(const TPointD &pos);
 
@@ -386,7 +396,7 @@ protected:
 	void drawRectSelection(const TImage *image);
 	void drawCommandHandle(const TImage *image);
 
-public:
+  public:
 	DragSelectionTool::DeformValues m_deformValues;
 
 	SelectionTool(int targetType);
@@ -445,4 +455,4 @@ public:
 	bool onPropertyChanged(std::string propertyName);
 };
 
-#endif //SELECTIONTOOL_INCLUDED
+#endif // SELECTIONTOOL_INCLUDED

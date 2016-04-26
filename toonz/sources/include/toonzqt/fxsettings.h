@@ -73,7 +73,7 @@ class DVAPI ParamsPage : public QFrame
 
 	ParamViewer *m_paramViewer;
 
-public:
+  public:
 	ParamsPage(QWidget *parent = 0, ParamViewer *paramViewer = 0);
 	~ParamsPage();
 
@@ -96,18 +96,17 @@ public:
 	void setTextColor(const QColor &color) { m_textColor = color; }
 	QColor getTextColor() const { return m_textColor; }
 
-protected:
+  protected:
 	void setPageField(TIStream &is, const TFxP &fx, bool isVertical = true);
 
-public:
+  public:
 	void setPageSpace();
 	void beginGroup(const char *name);
 	void endGroup();
 
 	void addWidget(QWidget *, bool isVertical = true);
 
-#define TOONZ_DECLARE_NEW_COMPONENT(NAME) \
-	QWidget *NAME(TFx *fx, const char *name)
+#define TOONZ_DECLARE_NEW_COMPONENT(NAME) QWidget *NAME(TFx *fx, const char *name)
 
 	TOONZ_DECLARE_NEW_COMPONENT(newParamField);
 	TOONZ_DECLARE_NEW_COMPONENT(newLineEdit);
@@ -135,7 +134,7 @@ class DVAPI ParamsPageSet : public QWidget
 
 	ParamViewer *m_parent;
 
-	//!Allows to map page and index, useful to display a macro.
+	//! Allows to map page and index, useful to display a macro.
 	QMap<ParamsPage *, int> m_pageFxIndexTable;
 
 	QSize m_preferedSize;
@@ -147,7 +146,7 @@ class DVAPI ParamsPageSet : public QWidget
 	std::string m_helpUrl;
 	QPushButton *m_helpButton;
 
-public:
+  public:
 #if QT_VERSION >= 0x050500
 	ParamsPageSet(QWidget *parent = 0, Qt::WindowFlags flags = 0);
 #else
@@ -172,10 +171,10 @@ public:
 
 	QSize getPreferedSize() { return m_preferedSize; }
 
-protected:
+  protected:
 	void createPage(TIStream &is, const TFxP &fx, int index);
 
-protected slots:
+  protected slots:
 	void setPage(int);
 	void openHelpFile();
 	void openHelpUrl();
@@ -195,7 +194,7 @@ class DVAPI ParamViewer : public QFrame
 	QStackedWidget *m_tablePageSet;
 	QMap<std::string, int> m_tableFxIndex;
 
-public:
+  public:
 #if QT_VERSION >= 0x050500
 	ParamViewer(QWidget *parent = 0, Qt::WindowFlags flags = 0);
 #else
@@ -211,10 +210,10 @@ public:
 
 	void setPointValue(int index, const TPointD &p);
 
-protected:
+  protected:
 	ParamsPageSet *getCurrentPageSet() const;
 
-signals:
+  signals:
 	void currentFxParamChanged();
 	void actualFxParamChanged();
 	void paramKeyChanged();
@@ -255,11 +254,11 @@ class DVAPI FxSettings : public QSplitter
 
 	int m_container_height;
 
-public:
+  public:
 	FxSettings(QWidget *parent, const TPixel32 &checkCol1, const TPixel32 &checkCol2);
 	~FxSettings();
 
-	//Devono essere settati!
+	// Devono essere settati!
 	void setFxHandle(TFxHandle *fxHandle);
 	TFxHandle *getFxHandle() const { return m_fxHandle; }
 	void setFrameHandle(TFrameHandle *frameHandle);
@@ -273,13 +272,13 @@ public:
 	void setObjectHandle(TObjectHandle *objectHandle);
 	TObjectHandle *getObjectHandle() const { return m_objectHandle; }
 
-public slots:
+  public slots:
 	void setCurrentFrame();
 	void setCurrentFx();
 	void setCurrentScene();
 	void notifySceneChanged();
 
-protected:
+  protected:
 	/*! \b currentFx is fx with parent, \b actualFx is simple fx. */
 	void setFx(const TFxP &currentFx, const TFxP &actualFx);
 
@@ -290,7 +289,7 @@ protected:
 
 	void changeTitleBar(TFx *fx);
 
-protected slots:
+  protected slots:
 	void updateViewer();
 	void updateParamViewer();
 	void onPointChanged(int index, const TPointD &p);

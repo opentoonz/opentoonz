@@ -30,22 +30,21 @@ class CPattern
 			return true;
 		return false;
 	}
-	void getMapPixel(const int xx, const int yy, const double invScale,
-					 const double si, const double co, UC_PIXEL *&pucp);
+	void getMapPixel(const int xx, const int yy, const double invScale, const double si,
+					 const double co, UC_PIXEL *&pucp);
 	void getMapPixel(const int xx, const int yy, const double invScale, UC_PIXEL *&pucp);
 	bool readTTT(const char *fn);
 	void getBBox(SRECT &bb);
 	void eraseBuffer(const int lX, const int lY, UC_PIXEL *buffer);
 
-public:
+  public:
 	CPattern() : m_lX(0), m_lY(0) { m_fn[0] = '\0'; };
 	CPattern(RASTER *imgContour);
 	virtual ~CPattern();
 	void rotate(const double angle);
 	void optimalizeSize();
 
-	template <class P>
-	void test(CSTColSelPic<P> &pic, I_PIXEL &eCol, int ox, int oy)
+	template <class P> void test(CSTColSelPic<P> &pic, I_PIXEL &eCol, int ox, int oy)
 	{
 		for (int y = 0; y < m_lY; y++)
 			for (int x = 0; x < m_lX; x++)
@@ -73,9 +72,9 @@ public:
 
 	// Maps the pattern. Long and optimalized version.
 	template <class P>
-	void mapIt(CSTColSelPic<P> &pic, const CSTColSelPic<P> &oriPic,
-			   const int xx, const int yy,
-			   const double scale, const double rot, const bool isUseOriColor, const bool isIncludeAlpha)
+	void mapIt(CSTColSelPic<P> &pic, const CSTColSelPic<P> &oriPic, const int xx, const int yy,
+			   const double scale, const double rot, const bool isUseOriColor,
+			   const bool isIncludeAlpha)
 	{
 
 		if (scale < 0.01)
@@ -184,22 +183,22 @@ public:
 				}
 	}
 
-	/*	Optimized version. Doesn't use the ROTATION parameter. 
+	/*	Optimized version. Doesn't use the ROTATION parameter.
 	!!! Semi-finished version !!!
 template<class P>
-void mapIt(CSTColSelPic<P>& pic, const CSTColSelPic<P>& oriPic, 
-		   const int xx, const int yy, 
+void mapIt(CSTColSelPic<P>& pic, const CSTColSelPic<P>& oriPic,
+		   const int xx, const int yy,
 		   const double scale, const bool isUseOriColor)
-{	
-	
-	if ( scale<0.01 ) 
+{
+
+	if ( scale<0.01 )
 		return;
 
 	double scaleInv=1.0/scale;
 	double sDiag=scale*sqrt(m_lX*m_lX+m_lY*m_lY);
 	int iSDiag=(int)sDiag+1;
 	int iSDiag2=iSDiag/2+1;
-	if ( iSDiag<=0 ) 
+	if ( iSDiag<=0 )
 		return;
 
 	bool isUC= pic.getType()==ST_RGBM ? true : false;
@@ -211,10 +210,10 @@ void mapIt(CSTColSelPic<P>& pic, const CSTColSelPic<P>& oriPic,
 	int xEnd=MIN(xx+iSDiag2,pic.m_lX-1);
 	I_PIXEL eCol;
 	for( int y=yBeg; y<=yEnd; y++ )
-		for( int x=xBeg; x<=xEnd; x++ ) 
+		for( int x=xBeg; x<=xEnd; x++ )
 			if ( x>=0 && x<pic.m_lX && y>=0 && y<pic.m_lY ) {
-// Gets the pointer to the proper pattern pixel		
-					UC_PIXEL* pPatPixel=0;	
+// Gets the pointer to the proper pattern pixel
+					UC_PIXEL* pPatPixel=0;
 					double dxx=(double)(x-xx)*scaleInv+(double)(m_lX-1)*0.5;
 					double dyy=(double)(y-yy)*scaleInv+(double)(m_lY-1)*0.5;
 					int x1=I_ROUND(dxx);
@@ -223,7 +222,7 @@ void mapIt(CSTColSelPic<P>& pic, const CSTColSelPic<P>& oriPic,
 						pPatPixel=m_pat+y1*m_lX+x1;
 						pPatPixel= pPatPixel->m>(UCHAR)0 ? pPatPixel : 0;
 					}
-						
+
 //					getMapPixel(x-xx,y-yy,scale,ucp);
 					if ( pPatPixel ) {
 						int xy=y*pic.m_lX+x;
@@ -238,7 +237,7 @@ void mapIt(CSTColSelPic<P>& pic, const CSTColSelPic<P>& oriPic,
 							eCol.r=(int)pPat->r;
 							eCol.g=(int)pPat->g;
 							eCol.b=(int)pPat->b;
-							eCol.m=(int)pPat->m;						
+							eCol.m=(int)pPat->m;
 						}
 						double q= ((double)pPatPixel->m/255.0)*((double)eCol.m/maxPixVal);
 						double r=(1.0-q)*(double)pPic->r+q*(double)eCol.r;
@@ -262,7 +261,7 @@ void mapIt(CSTColSelPic<P>& pic, const CSTColSelPic<P>& oriPic,
 						}
 					}
 			}
-}	
+}
 */
 };
 

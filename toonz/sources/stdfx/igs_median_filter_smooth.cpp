@@ -15,9 +15,9 @@ enum outside_of_image_ {
 /* 影響範囲(radius)の各ピクセルのgeometry情報 */
 class pixel_geometry_
 {
-public:
-	pixel_geometry_(
-		const double radius, const outside_of_image_ type) : type_(type), ratio_total(0.0)
+  public:
+	pixel_geometry_(const double radius, const outside_of_image_ type)
+		: type_(type), ratio_total(0.0)
 	{
 		/* 辿るためピクセル整数位置 */
 		const int radius_int = static_cast<int>(ceil(radius));
@@ -27,8 +27,7 @@ public:
 		for (int yy = -radius_int; yy <= radius_int; ++yy) {
 			const double yxy = static_cast<double>(yy) * yy;
 			for (int xx = -radius_int; xx <= radius_int; ++xx) {
-				const double xxx_plus_yxy =
-					static_cast<double>(xx) * xx + yxy;
+				const double xxx_plus_yxy = static_cast<double>(xx) * xx + yxy;
 				if (xxx_plus_yxy <= rxr) { /* 円の内部なら */
 					/* 円の中心位置を原点(0,0)とした座標 */
 					this->xp.push_back(xx);
@@ -135,15 +134,15 @@ public:
 	std::vector<double> in_out_ratio;
 	double ratio_total;
 
-private:
+  private:
 	pixel_geometry_();
 
 	outside_of_image_ type_;
 };
 /* 指定位置のピクセルの値 */
 template <class T>
-T get_pixel_value_(
-	pixel_geometry_ &pixg, const T *image_top, const int hh, const int ww, const int ch, int xx, int yy, const int zz)
+T get_pixel_value_(pixel_geometry_ &pixg, const T *image_top, const int hh, const int ww,
+				   const int ch, int xx, int yy, const int zz)
 {
 	pixg.re_position(ww, hh, xx, yy);
 	if ((xx < 0) || (yy < 0)) {
@@ -171,17 +170,15 @@ namespace
 	--> ...Smoothing...
 */
 template <class T>
-double median_filter_smooth_(
-	pixel_geometry_ &pixg, const T *image_top, const int hh, const int ww, const int ch, const int xx, const int yy, const int zz)
+double median_filter_smooth_(pixel_geometry_ &pixg, const T *image_top, const int hh, const int ww,
+							 const int ch, const int xx, const int yy, const int zz)
 {
 	/* ピクセル値と影響値のペアにして、ソートしたリストを作成 */
 	std::multimap<double, double> pixels;
 	for (unsigned int ii = 0; ii < pixg.xp.size(); ++ii) {
 		const double value = static_cast<double>(get_pixel_value_(
-			pixg, image_top, hh, ww, ch,
-			xx + pixg.xp.at(ii), yy + pixg.yp.at(ii), zz));
-		pixels.insert(std::pair<double, double>(
-			value, pixg.in_out_ratio.at(ii)));
+			pixg, image_top, hh, ww, ch, xx + pixg.xp.at(ii), yy + pixg.yp.at(ii), zz));
+		pixels.insert(std::pair<double, double>(value, pixg.in_out_ratio.at(ii)));
 	}
 
 	/* 取り出しやすいようにvectorに移し変える */
@@ -200,7 +197,8 @@ double median_filter_smooth_(
 	double before_value = 0.0;
 	double before_ratio = 0.0;
 	double before_accum = 0.0;
-	for (std::multimap<double, double>::iterator it = pixels.begin(); it != pixels.end(); ++it, before_value = (*it).first, before_ratio = (*it).second, before_accum = accum) {
+	for (std::multimap<double, double>::iterator it = pixels.begin(); it != pixels.end();
+		 ++it, before_value = (*it).first, before_ratio = (*it).second, before_accum = accum) {
 		/* ピクセル間の距離 */
 		const double pixw = (*it).second / 2.0 + before_ratio / 2.0;
 
@@ -214,13 +212,10 @@ double median_filter_smooth_(
 			}
 
 			if (before_value < (*it).first) {
-				return ((*it).first - before_value) *
-						   (len_median - before_accum) / pixw +
+				return ((*it).first - before_value) * (len_median - before_accum) / pixw +
 					   before_value;
 			}
-			return (before_value - (*it).first) *
-					   (accum - len_median) / pixw +
-				   (*it).first;
+			return (before_value - (*it).first) * (accum - len_median) / pixw + (*it).first;
 		}
 	}
 	return before_value;
@@ -363,8 +358,7 @@ void igs::median_filter_smooth::convert(
 	}
 
 	/*--- 指定(out_side_type)から、実際の処理方法(type)を設定 ---*/
-	outside_of_image_ type =
-		is_spread_edge_;
+	outside_of_image_ type = is_spread_edge_;
 	switch (out_side_type) {
 	case 0:
 		type = is_spread_edge_;
@@ -381,37 +375,51 @@ void igs::median_filter_smooth::convert(
 	}
 
 	/* 処理 */
-	if ((std::numeric_limits<unsigned char>::digits == bits) && ((std::numeric_limits<unsigned char>::digits == ref_bits) || (0 == ref_bits))) {
+	if ((std::numeric_limits<unsigned char>::digits == bits) &&
+		((std::numeric_limits<unsigned char>::digits == ref_bits) || (0 == ref_bits))) {
 		if ((0 <= z2) && (z2 < channels)) {
-			convert_each_to_all_channels_template_(
-				in_image, out_image, height, width, channels, ref, ref_mode, z2, radius, type);
+			convert_each_to_all_channels_template_(in_image, out_image, height, width, channels,
+												   ref, ref_mode, z2, radius, type);
 		} else {
-			convert_each_to_each_channel_template_(
-				in_image, out_image, height, width, channels, ref, ref_mode, radius, type);
+			convert_each_to_each_channel_template_(in_image, out_image, height, width, channels,
+												   ref, ref_mode, radius, type);
 		}
-	} else if ((std::numeric_limits<unsigned short>::digits == bits) && ((std::numeric_limits<unsigned char>::digits == ref_bits) || (0 == ref_bits))) {
+	} else if ((std::numeric_limits<unsigned short>::digits == bits) &&
+			   ((std::numeric_limits<unsigned char>::digits == ref_bits) || (0 == ref_bits))) {
 		if ((0 <= z2) && (z2 < channels)) {
 			convert_each_to_all_channels_template_(
-				reinterpret_cast<const unsigned short *>(in_image), reinterpret_cast<unsigned short *>(out_image), height, width, channels, ref, ref_mode, z2, radius, type);
+				reinterpret_cast<const unsigned short *>(in_image),
+				reinterpret_cast<unsigned short *>(out_image), height, width, channels, ref,
+				ref_mode, z2, radius, type);
 		} else {
 			convert_each_to_each_channel_template_(
-				reinterpret_cast<const unsigned short *>(in_image), reinterpret_cast<unsigned short *>(out_image), height, width, channels, ref, ref_mode, radius, type);
+				reinterpret_cast<const unsigned short *>(in_image),
+				reinterpret_cast<unsigned short *>(out_image), height, width, channels, ref,
+				ref_mode, radius, type);
 		}
-	} else if ((std::numeric_limits<unsigned short>::digits == bits) && (std::numeric_limits<unsigned short>::digits == ref_bits)) {
+	} else if ((std::numeric_limits<unsigned short>::digits == bits) &&
+			   (std::numeric_limits<unsigned short>::digits == ref_bits)) {
 		if ((0 <= z2) && (z2 < channels)) {
 			convert_each_to_all_channels_template_(
-				reinterpret_cast<const unsigned short *>(in_image), reinterpret_cast<unsigned short *>(out_image), height, width, channels, reinterpret_cast<const unsigned short *>(ref), ref_mode, z2, radius, type);
+				reinterpret_cast<const unsigned short *>(in_image),
+				reinterpret_cast<unsigned short *>(out_image), height, width, channels,
+				reinterpret_cast<const unsigned short *>(ref), ref_mode, z2, radius, type);
 		} else {
 			convert_each_to_each_channel_template_(
-				reinterpret_cast<const unsigned short *>(in_image), reinterpret_cast<unsigned short *>(out_image), height, width, channels, reinterpret_cast<const unsigned short *>(ref), ref_mode, radius, type);
+				reinterpret_cast<const unsigned short *>(in_image),
+				reinterpret_cast<unsigned short *>(out_image), height, width, channels,
+				reinterpret_cast<const unsigned short *>(ref), ref_mode, radius, type);
 		}
-	} else if ((std::numeric_limits<unsigned char>::digits == bits) && (std::numeric_limits<unsigned short>::digits == ref_bits)) {
+	} else if ((std::numeric_limits<unsigned char>::digits == bits) &&
+			   (std::numeric_limits<unsigned short>::digits == ref_bits)) {
 		if ((0 <= z2) && (z2 < channels)) {
-			convert_each_to_all_channels_template_(
-				in_image, out_image, height, width, channels, reinterpret_cast<const unsigned short *>(ref), ref_mode, z2, radius, type);
+			convert_each_to_all_channels_template_(in_image, out_image, height, width, channels,
+												   reinterpret_cast<const unsigned short *>(ref),
+												   ref_mode, z2, radius, type);
 		} else {
-			convert_each_to_each_channel_template_(
-				in_image, out_image, height, width, channels, reinterpret_cast<const unsigned short *>(ref), ref_mode, radius, type);
+			convert_each_to_each_channel_template_(in_image, out_image, height, width, channels,
+												   reinterpret_cast<const unsigned short *>(ref),
+												   ref_mode, radius, type);
 		}
 	} else {
 		throw std::domain_error("Bad bits,Not uchar/ushort");

@@ -3,8 +3,7 @@
 #include "trop.h"
 #include "hsvutil.h"
 
-void OLDRGB2HSV(double r, double g, double b,
-				double *h, double *s, double *v)
+void OLDRGB2HSV(double r, double g, double b, double *h, double *s, double *v)
 {
 	double max, min;
 	double delta;
@@ -36,8 +35,7 @@ void OLDRGB2HSV(double r, double g, double b,
 	}
 }
 
-void OLDHSV2RGB(double hue, double sat, double value,
-				double *red, double *green, double *blue)
+void OLDHSV2RGB(double hue, double sat, double value, double *red, double *green, double *blue)
 {
 	int i;
 	double p, q, t, f;
@@ -46,10 +44,10 @@ void OLDHSV2RGB(double hue, double sat, double value,
 	//    hue=0;
 	if (hue > 360)
 		hue -= ((int)hue / 360) * 360;
-	//hue-=360;
+	// hue-=360;
 	if (hue < 0)
 		hue += (1 - (int)hue / 360) * 360;
-	//hue+=360;
+	// hue+=360;
 	if (sat < 0)
 		sat = 0;
 	if (sat > 1)
@@ -74,28 +72,22 @@ void OLDHSV2RGB(double hue, double sat, double value,
 		t = value * (1 - (sat * (1 - f)));
 
 		switch (i) {
-			CASE 0 :
-				*red = value;
+			CASE 0 : *red = value;
 			*green = t;
 			*blue = p;
-			CASE 1 :
-				*red = q;
+			CASE 1 : *red = q;
 			*green = value;
 			*blue = p;
-			CASE 2 :
-				*red = p;
+			CASE 2 : *red = p;
 			*green = value;
 			*blue = t;
-			CASE 3 :
-				*red = p;
+			CASE 3 : *red = p;
 			*green = q;
 			*blue = value;
-			CASE 4 :
-				*red = t;
+			CASE 4 : *red = t;
 			*green = p;
 			*blue = value;
-			CASE 5 :
-				*red = value;
+			CASE 5 : *red = value;
 			*green = p;
 			*blue = q;
 		}

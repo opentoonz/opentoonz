@@ -28,10 +28,10 @@ void addParsers(tipc::Server *srv);
 
 class IsQTInstalledParser : public tipc::MessageParser
 {
-	//Syntax : $isQTInstalled
-	//Reply: yes | no
+	// Syntax : $isQTInstalled
+	// Reply: yes | no
 
-public:
+  public:
 	QString header() const { return "$isQTInstalled"; }
 	void operator()(Message &stream);
 };
@@ -40,10 +40,10 @@ public:
 
 class DefaultMovPropsParser : public tipc::MessageParser
 {
-	//Syntax : $defaultMovProps <props fp>\n
-	//Reply: ok | err
+	// Syntax : $defaultMovProps <props fp>\n
+	// Reply: ok | err
 
-public:
+  public:
 	QString header() const { return "$defaultMovProps"; }
 	void operator()(Message &stream);
 };
@@ -52,10 +52,10 @@ public:
 
 class OpenMovSettingsPopupParser : public tipc::MessageParser
 {
-	//Syntax : $openMovPopup <props fp>\n
-	//Reply: ok
+	// Syntax : $openMovPopup <props fp>\n
+	// Reply: ok
 
-public:
+  public:
 	QString header() const { return "$openMovSettingsPopup"; }
 	void operator()(Message &stream);
 };
@@ -66,10 +66,10 @@ public:
 
 class InitLWMovParser : public tipc::MessageParser
 {
-	//Syntax: $initLWMov <id> <fp> <props fp>
-	//Reply: ok | err
+	// Syntax: $initLWMov <id> <fp> <props fp>
+	// Reply: ok | err
 
-public:
+  public:
 	QString header() const { return "$initLWMov"; }
 	void operator()(Message &stream);
 };
@@ -78,10 +78,10 @@ public:
 
 class LWSetFrameRateParser : public tipc::MessageParser
 {
-	//Syntax: $LWMovSetFrameRate <id> <fps>
-	//Reply: ok | err
+	// Syntax: $LWMovSetFrameRate <id> <fps>
+	// Reply: ok | err
 
-public:
+  public:
 	QString header() const { return "$LWMovSetFrameRate"; }
 	void operator()(Message &stream);
 };
@@ -90,10 +90,10 @@ public:
 
 class LWImageWriteParser : public tipc::MessageParser
 {
-	//Syntax: [$LWMovImageWrite <id> <frameIdx> <lx> <ly>] [data writer]
-	//Reply: ok | err
+	// Syntax: [$LWMovImageWrite <id> <frameIdx> <lx> <ly>] [data writer]
+	// Reply: ok | err
 
-public:
+  public:
 	QString header() const { return "$LWMovImageWrite"; }
 	void operator()(Message &stream);
 };
@@ -102,10 +102,11 @@ public:
 
 class LWSaveSoundTrackParser : public tipc::MessageParser
 {
-	//Syntax: [$LWMovSaveSoundTrack <id> <sampleRate> <bps> <chanCount> <sCount> <signedSample>] [data writer]
-	//Reply: ok | err
+	// Syntax: [$LWMovSaveSoundTrack <id> <sampleRate> <bps> <chanCount> <sCount> <signedSample>]
+	// [data writer]
+	// Reply: ok | err
 
-public:
+  public:
 	QString header() const { return "$LWMovSaveSoundTrack"; }
 	void operator()(Message &stream);
 };
@@ -114,10 +115,10 @@ public:
 
 class CloseLWMovParser : public tipc::MessageParser
 {
-	//Syntax: $closeLWMov <id>
-	//Reply: ok | err
+	// Syntax: $closeLWMov <id>
+	// Reply: ok | err
 
-public:
+  public:
 	QString header() const { return "$closeLWMov"; }
 	void operator()(Message &stream);
 };
@@ -128,10 +129,10 @@ public:
 
 class InitLRMovParser : public tipc::MessageParser
 {
-	//Syntax: $initLRMov <id> <fp>
-	//Reply: ok <lx> <ly> <framerate> | err
+	// Syntax: $initLRMov <id> <fp>
+	// Reply: ok <lx> <ly> <framerate> | err
 
-public:
+  public:
 	QString header() const { return "$initLRMov"; }
 	void operator()(Message &stream);
 };
@@ -140,13 +141,13 @@ public:
 
 class LRLoadInfoParser : public tipc::MessageParser
 {
-	//Syntax: $LRMovLoadInfo <id> <shmem id>
-	//Reply: ok <frameCount> | err
+	// Syntax: $LRMovLoadInfo <id> <shmem id>
+	// Reply: ok <frameCount> | err
 
-	//NOTE: Expects an external call to $shmem_release <shmem_id> after data is dealt with.
+	// NOTE: Expects an external call to $shmem_release <shmem_id> after data is dealt with.
 	//      If the shmem_id is empty, the level infos are not returned.
 
-public:
+  public:
 	QString header() const { return "$LRMovLoadInfo"; }
 	void operator()(Message &stream);
 };
@@ -155,24 +156,24 @@ public:
 
 class LREnableRandomAccessReadParser : public tipc::MessageParser
 {
-	//Syntax: $LRMovEnableRandomAccessRead <id> <"true" | "false">
-	//Reply: ok | err
+	// Syntax: $LRMovEnableRandomAccessRead <id> <"true" | "false">
+	// Reply: ok | err
 
-public:
+  public:
 	QString header() const { return "$LRMovEnableRandomAccessRead"; }
 	void operator()(Message &stream);
 };
 
 //------------------------------------------------------------------------------
 
-#ifdef WIN32 //The following commands are used only from Digital Dailies Lab - Windows only
+#ifdef WIN32 // The following commands are used only from Digital Dailies Lab - Windows only
 
 class LRSetYMirrorParser : public tipc::MessageParser
 {
-	//Syntax: $LRMovSetYMirror <id> <"true" | "false">
-	//Reply: ok | err
+	// Syntax: $LRMovSetYMirror <id> <"true" | "false">
+	// Reply: ok | err
 
-public:
+  public:
 	QString header() const { return "$LRMovSetYMirror"; }
 	void operator()(Message &stream);
 };
@@ -181,10 +182,10 @@ public:
 
 class LRSetLoadTimecodeParser : public tipc::MessageParser
 {
-	//Syntax: $LRMovSetLoadTimecode <id> <"true" | "false">
-	//Reply: ok | err
+	// Syntax: $LRMovSetLoadTimecode <id> <"true" | "false">
+	// Reply: ok | err
 
-public:
+  public:
 	QString header() const { return "$LRMovSetLoadTimecode"; }
 	void operator()(Message &stream);
 };
@@ -193,10 +194,10 @@ public:
 
 class LRTimecodeParser : public tipc::MessageParser
 {
-	//Syntax: $LRMovTimecode <id> <frame>
-	//Reply: ok <hh> <mm> <ss> <ff> | err
+	// Syntax: $LRMovTimecode <id> <frame>
+	// Reply: ok <hh> <mm> <ss> <ff> | err
 
-public:
+  public:
 	QString header() const { return "$LRMovTimecode"; }
 	void operator()(Message &stream);
 };
@@ -207,10 +208,10 @@ public:
 
 class LRImageReadParser : public tipc::MessageParser
 {
-	//Syntax: $LRMovImageRead <id> <lx> <ly> <bypp> <frameIdx> <x> <y> <shrinkX> <shrinkY>
-	//Reply: [data reader]
+	// Syntax: $LRMovImageRead <id> <lx> <ly> <bypp> <frameIdx> <x> <y> <shrinkX> <shrinkY>
+	// Reply: [data reader]
 
-public:
+  public:
 	QString header() const { return "$LRMovImageRead"; }
 	void operator()(Message &stream);
 };
@@ -219,10 +220,10 @@ public:
 
 class LRImageReadSHMParser : public tipc::MessageParser
 {
-	//Syntax: $LRMovImageReadSHM <id> <lx> <ly> <frameIdx> <shmem id>
-	//Reply: ok <hh> <mm> <ss> <ff> | err
+	// Syntax: $LRMovImageReadSHM <id> <lx> <ly> <frameIdx> <shmem id>
+	// Reply: ok <hh> <mm> <ss> <ff> | err
 
-public:
+  public:
 	QString header() const { return "$LRMovImageReadSHM"; }
 	void operator()(Message &stream);
 };
@@ -231,14 +232,14 @@ public:
 
 class CloseLRMovParser : public tipc::MessageParser
 {
-	//Syntax: $closeLRMov <id>
-	//Reply: ok | err
+	// Syntax: $closeLRMov <id>
+	// Reply: ok | err
 
-public:
+  public:
 	QString header() const { return "$closeLRMov"; }
 	void operator()(Message &stream);
 };
 
-} //namespace tlevelwriter_mov
+} // namespace tlevelwriter_mov
 
-#endif //T32MOVMSG_H
+#endif // T32MOVMSG_H

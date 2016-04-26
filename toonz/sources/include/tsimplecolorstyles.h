@@ -47,7 +47,7 @@ class TVectorImage;
 
 class DVAPI TSimpleStrokeStyle : public TColorStyle
 {
-public:
+  public:
 	bool isRegionStyle() const { return false; }
 	bool isStrokeStyle() const { return true; }
 
@@ -67,11 +67,11 @@ public:
 
 class DVAPI TOutlineStyle : public TColorStyle
 {
-public:
+  public:
 	class StrokeOutlineModifier
 	{
 
-	public:
+	  public:
 		StrokeOutlineModifier() {}
 		virtual ~StrokeOutlineModifier() {}
 		virtual StrokeOutlineModifier *clone() const = 0;
@@ -82,7 +82,7 @@ public:
 	class RegionOutlineModifier
 	{
 
-	public:
+	  public:
 		RegionOutlineModifier() {}
 		virtual ~RegionOutlineModifier() {}
 		virtual RegionOutlineModifier *clone() const = 0;
@@ -90,17 +90,17 @@ public:
 		virtual void modify(TRegionOutline &outline) const = 0;
 	};
 
-protected:
+  protected:
 	//  StrokeOutlineModifier *m_strokeOutlineModifier;
 	RegionOutlineModifier *m_regionOutlineModifier;
 
-public:
+  public:
 	TOutlineStyle();
 	TOutlineStyle(const TOutlineStyle &);
 	virtual ~TOutlineStyle();
 
-	//StrokeOutlineModifier* getStrokeOutlineModifier() const { return m_strokeOutlineModifier; }
-	//void setStrokeOutlineModifier(StrokeOutlineModifier *modifier);
+	// StrokeOutlineModifier* getStrokeOutlineModifier() const { return m_strokeOutlineModifier; }
+	// void setStrokeOutlineModifier(StrokeOutlineModifier *modifier);
 
 	RegionOutlineModifier *getRegionOutlineModifier() const { return m_regionOutlineModifier; }
 	void setRegionOutlineModifier(RegionOutlineModifier *modifier);
@@ -108,23 +108,27 @@ public:
 	bool isRegionStyle() const { return true; }
 	bool isStrokeStyle() const { return true; }
 
-	virtual void computeOutline(const TStroke *stroke,
-								TStrokeOutline &outline,
+	virtual void computeOutline(const TStroke *stroke, TStrokeOutline &outline,
 								TOutlineUtil::OutlineParameter param) const;
 
 	TStrokeProp *makeStrokeProp(const TStroke *stroke);
 	TRegionProp *makeRegionProp(const TRegion *region);
 
-	//virtual void drawRegion( const TVectorRenderData &rd, TRegionOutline &outline ) const =0 ;
-	virtual void drawRegion(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &outline) const = 0;
+	// virtual void drawRegion( const TVectorRenderData &rd, TRegionOutline &outline ) const =0 ;
+	virtual void drawRegion(const TColorFunction *cf, const bool antiAliasing,
+							TRegionOutline &outline) const = 0;
 
 	virtual void drawRegion(TFlash &, const TRegion *) const {};
-	virtual void drawStroke(const TColorFunction *cf, TStrokeOutline *outline, const TStroke *stroke) const = 0;
+	virtual void drawStroke(const TColorFunction *cf, TStrokeOutline *outline,
+							const TStroke *stroke) const = 0;
 
-	virtual void drawStroke(TFlash &flash, const TStroke *stroke) const { TColorStyle::drawStroke(flash, stroke); }
+	virtual void drawStroke(TFlash &flash, const TStroke *stroke) const
+	{
+		TColorStyle::drawStroke(flash, stroke);
+	}
 	virtual void setFill(TFlash &) const {};
 
-protected:
+  protected:
 	// Not assignable
 	TOutlineStyle &operator=(const TOutlineStyle &);
 };
@@ -142,13 +146,13 @@ class DVAPI TSolidColorStyle : public TOutlineStyle
 	TPixel32 m_color;
 	TTessellator *m_tessellator;
 
-protected:
+  protected:
 	void makeIcon(const TDimension &d);
 
 	virtual void loadData(TInputStreamInterface &);
 	virtual void saveData(TOutputStreamInterface &) const;
 
-public:
+  public:
 	TSolidColorStyle(const TPixel32 &color = TPixel32::Black);
 	TSolidColorStyle(const TSolidColorStyle &);
 	~TSolidColorStyle();
@@ -161,7 +165,8 @@ public:
 	TPixel32 getMainColor() const { return m_color; }
 	void setMainColor(const TPixel32 &color) { m_color = color; }
 
-	void drawRegion(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &outline) const;
+	void drawRegion(const TColorFunction *cf, const bool antiAliasing,
+					TRegionOutline &outline) const;
 	virtual void drawRegion(TFlash &flash, const TRegion *r) const;
 
 	void drawStroke(const TColorFunction *cf, TStrokeOutline *outline, const TStroke *s) const;
@@ -170,7 +175,7 @@ public:
 
 	int getTagId() const;
 
-private:
+  private:
 	// Not assignable
 	TSolidColorStyle &operator=(const TSolidColorStyle &);
 };
@@ -189,9 +194,8 @@ class DVAPI TCenterLineStrokeStyle : public TSimpleStrokeStyle
 	USHORT m_stipple;
 	double m_width;
 
-public:
-	TCenterLineStrokeStyle(const TPixel32 &color = TPixel32(0, 0, 0, 255),
-						   USHORT stipple = 0x0,
+  public:
+	TCenterLineStrokeStyle(const TPixel32 &color = TPixel32(0, 0, 0, 255), USHORT stipple = 0x0,
 						   double width = 1.0);
 
 	TColorStyle *clone() const;
@@ -219,11 +223,11 @@ public:
 
 	int getTagId() const;
 
-protected:
+  protected:
 	void loadData(TInputStreamInterface &);
 	void saveData(TOutputStreamInterface &) const;
 
-private:
+  private:
 	// Not assignable
 	TCenterLineStrokeStyle &operator=(const TCenterLineStrokeStyle &);
 };
@@ -238,13 +242,12 @@ class DVAPI TRasterImagePatternStrokeStyle : public TColorStyle
 {
 	static TFilePath m_rootDir;
 
-protected:
+  protected:
 	TLevelP m_level;
 	std::string m_name;
-	double m_space,
-		m_rotation;
+	double m_space, m_rotation;
 
-public:
+  public:
 	TRasterImagePatternStrokeStyle();
 	TRasterImagePatternStrokeStyle(const std::string &patternName);
 
@@ -254,7 +257,8 @@ public:
 	int getLevelFrameCount() { return m_level->getFrameCount(); }
 
 	void computeTransformations(std::vector<TAffine> &positions, const TStroke *stroke) const;
-	void drawStroke(const TVectorRenderData &rd, const std::vector<TAffine> &positions, const TStroke *stroke) const;
+	void drawStroke(const TVectorRenderData &rd, const std::vector<TAffine> &positions,
+					const TStroke *stroke) const;
 	void drawStroke(TFlash &flash, const TStroke *stroke) const;
 
 	void invalidate(){};
@@ -289,7 +293,7 @@ public:
 	double getParamValue(TColorStyle::double_tag, int index) const;
 	void setParamValue(int index, double value);
 
-protected:
+  protected:
 	void makeIcon(const TDimension &d);
 
 	void loadData(TInputStreamInterface &);
@@ -297,7 +301,7 @@ protected:
 
 	void saveData(TOutputStreamInterface &) const;
 
-private:
+  private:
 	// Not assignable
 	TRasterImagePatternStrokeStyle &operator=(const TRasterImagePatternStrokeStyle &);
 };
@@ -310,12 +314,12 @@ class DVAPI TVectorImagePatternStrokeStyle : public TColorStyle
 {
 	static TFilePath m_rootDir;
 
-protected:
+  protected:
 	TLevelP m_level;
 	std::string m_name;
 	double m_space, m_rotation;
 
-public:
+  public:
 	TVectorImagePatternStrokeStyle();
 	TVectorImagePatternStrokeStyle(const std::string &patternName);
 
@@ -325,7 +329,8 @@ public:
 	int getLevelFrameCount() { return m_level->getFrameCount(); }
 
 	void computeTransformations(std::vector<TAffine> &positions, const TStroke *stroke) const;
-	void drawStroke(const TVectorRenderData &rd, const std::vector<TAffine> &positions, const TStroke *stroke) const;
+	void drawStroke(const TVectorRenderData &rd, const std::vector<TAffine> &positions,
+					const TStroke *stroke) const;
 	void drawStroke(TFlash &flash, const TStroke *stroke) const;
 
 	void invalidate(){};
@@ -362,7 +367,7 @@ public:
 
 	static void clearGlDisplayLists();
 
-protected:
+  protected:
 	void makeIcon(const TDimension &d);
 
 	void loadData(TInputStreamInterface &);
@@ -370,7 +375,7 @@ protected:
 
 	void saveData(TOutputStreamInterface &) const;
 
-private:
+  private:
 	// Not assignable
 	TVectorImagePatternStrokeStyle &operator=(const TVectorImagePatternStrokeStyle &);
 };

@@ -84,7 +84,7 @@ TFx *createMacroFxByPath(TFilePath path, TXsheet *xsheet)
 		if (!fx)
 			return 0;
 		fx->setName(path.getWideName());
-		//Assign a unic ID to each fx in the macro!
+		// Assign a unic ID to each fx in the macro!
 		if (!xsheet)
 			return fx;
 		FxDag *fxDag = xsheet->getFxDag();
@@ -100,40 +100,43 @@ TFx *createMacroFxByPath(TFilePath path, TXsheet *xsheet)
 			std::wstring newId = fxs[i]->getFxId();
 			oldNewId[oldId] = newId;
 
-			//cambiando l'id degli effetti interni di una macro si rompono i legami tra il nome della porta
-			//e la porta a cui e' legato: devo cambiare i nomei delle porte e rimapparli all'interno della macro
+			// cambiando l'id degli effetti interni di una macro si rompono i legami tra il nome
+			// della porta
+			// e la porta a cui e' legato: devo cambiare i nomei delle porte e rimapparli
+			// all'interno della macro
 			int j;
 			for (j = 0; j < fx->getInputPortCount(); j++) {
 				QString inputName = QString::fromStdString(fx->getInputPortName(j));
 				if (inputName.endsWith(QString::fromStdWString(oldId))) {
 					QString newInputName = inputName;
-					newInputName.replace(QString::fromStdWString(oldId), QString::fromStdWString(newId));
+					newInputName.replace(QString::fromStdWString(oldId),
+										 QString::fromStdWString(newId));
 					fx->renamePort(inputName.toStdString(), newInputName.toStdString());
 				}
 			}
 		}
 		/* QStack<QPair<std::string, TFxPort*> > newPortNames;
 
-      //Devo cambiare il nome alle porte: contengono l'id dei vecchi effetti
-      for(i=fx->getInputPortCount()-1; i>=0; i--)
-      {
-        string oldPortName = fx->getInputPortName(i);
-        string inFxOldId = oldPortName;
-        inFxOldId.erase(0,inFxOldId.find_last_of("_")+1);
-        assert(oldNewId.contains(toWideString(inFxOldId)));
-        string inFxNewId = toString(oldNewId[toWideString(inFxOldId)]);
-        string newPortName = oldPortName;
-        newPortName.erase(newPortName.find_last_of("_")+1,newPortName.size()-1);
-        newPortName.append(inFxNewId);
-        TFxPort* fxPort = fx->getInputPort(i);
-        newPortNames.append(QPair<std::string, TFxPort*>(newPortName,fxPort));
-        fx->removeInputPort(oldPortName);
-      }
-      while(!newPortNames.isEmpty())
-      {
-        QPair<std::string, TFxPort*> newPort = newPortNames.pop();
-        fx->addInputPort(newPort.first,*newPort.second);
-      }*/
+	  //Devo cambiare il nome alle porte: contengono l'id dei vecchi effetti
+	  for(i=fx->getInputPortCount()-1; i>=0; i--)
+	  {
+		string oldPortName = fx->getInputPortName(i);
+		string inFxOldId = oldPortName;
+		inFxOldId.erase(0,inFxOldId.find_last_of("_")+1);
+		assert(oldNewId.contains(toWideString(inFxOldId)));
+		string inFxNewId = toString(oldNewId[toWideString(inFxOldId)]);
+		string newPortName = oldPortName;
+		newPortName.erase(newPortName.find_last_of("_")+1,newPortName.size()-1);
+		newPortName.append(inFxNewId);
+		TFxPort* fxPort = fx->getInputPort(i);
+		newPortNames.append(QPair<std::string, TFxPort*>(newPortName,fxPort));
+		fx->removeInputPort(oldPortName);
+	  }
+	  while(!newPortNames.isEmpty())
+	  {
+		QPair<std::string, TFxPort*> newPort = newPortNames.pop();
+		fx->addInputPort(newPort.first,*newPort.second);
+	  }*/
 
 		return fx;
 	} catch (...) {
@@ -157,11 +160,11 @@ TFx *createFx(QAction *action, TXsheetHandle *xshHandle)
 
 	if (TFileStatus(path).doesExist() && TFileStatus(path.getParentDir()).isDirectory()) {
 		std::string folder = path.getParentDir().getName();
-		if (folder == "macroFx") //have to load a Macro
+		if (folder == "macroFx") // have to load a Macro
 			fx = createMacroFxByPath(path, xsh);
 		else {
 			folder = path.getParentDir().getParentDir().getName();
-			if (folder == "presets") //have to load a preset
+			if (folder == "presets") // have to load a preset
 				fx = createPresetFxByName(path);
 		}
 	} else
@@ -170,11 +173,11 @@ TFx *createFx(QAction *action, TXsheetHandle *xshHandle)
 	return fx;
 }
 
-} //namespace
+} // namespace
 
 //***************************************************
 //
-//AddFxContextMenu
+// AddFxContextMenu
 //
 //***************************************************
 
@@ -237,7 +240,7 @@ void AddFxContextMenu::fillMenus()
 
 void scan_all_plugins(const std::string &basedir, QObject *listener)
 {
-	//clear_all_plugins();
+	// clear_all_plugins();
 	new PluginLoadController(basedir, listener);
 }
 
@@ -248,8 +251,8 @@ void AddFxContextMenu::result(PluginInformation *pi)
 	/* addfxcontextmenu.cpp の dict に登録する */
 	if (pi)
 		plugin_dict_.insert(std::pair<std::string, PluginInformation *>(pi->desc_->id_, pi));
-	//RasterFxPluginHost* plug = new RasterFxPluginHost(pi);
-	//pi->handler_->create(plug);
+	// RasterFxPluginHost* plug = new RasterFxPluginHost(pi);
+	// pi->handler_->create(plug);
 }
 
 void AddFxContextMenu::fixup()
@@ -366,9 +369,7 @@ void AddFxContextMenu::loadFxPlugins(QMenu *insertFxGroup, QMenu *addFxGroup, QM
 	}
 
 	// sort actions
-	auto const comp = [](QAction *lhs, QAction *rhs) {
-		return lhs->text() < rhs->text();
-	};
+	auto const comp = [](QAction *lhs, QAction *rhs) { return lhs->text() < rhs->text(); };
 
 	for (auto &&ins : insVendors) {
 		QList<QAction *> actions = ins.second->actions();
@@ -392,7 +393,8 @@ void AddFxContextMenu::loadFxPlugins(QMenu *insertFxGroup, QMenu *addFxGroup, QM
 	}
 }
 
-void AddFxContextMenu::loadFx(TIStream *is, QMenu *insertFxGroup, QMenu *addFxGroup, QMenu *replaceFxGroup)
+void AddFxContextMenu::loadFx(TIStream *is, QMenu *insertFxGroup, QMenu *addFxGroup,
+							  QMenu *replaceFxGroup)
 {
 	while (!is->eos()) {
 		std::string fxName;
@@ -424,30 +426,36 @@ void AddFxContextMenu::loadFx(TIStream *is, QMenu *insertFxGroup, QMenu *addFxGr
 
 //---------------------------------------------------
 
-bool AddFxContextMenu::loadPreset(const std::string &name,
-								  QMenu *insertFxGroup, QMenu *addFxGroup, QMenu *replaceFxGroup)
+bool AddFxContextMenu::loadPreset(const std::string &name, QMenu *insertFxGroup, QMenu *addFxGroup,
+								  QMenu *replaceFxGroup)
 {
 	TFilePath presetsFilepath(m_presetPath + name);
 	if (TFileStatus(presetsFilepath).isDirectory()) {
 		TFilePathSet presets = TSystem::readDirectory(presetsFilepath, false);
 		if (!presets.empty()) {
-			QMenu *inserMenu = new QMenu(QString::fromStdWString(TStringTable::translate(name)), insertFxGroup);
+			QMenu *inserMenu =
+				new QMenu(QString::fromStdWString(TStringTable::translate(name)), insertFxGroup);
 			insertFxGroup->addMenu(inserMenu);
-			QMenu *addMenu = new QMenu(QString::fromStdWString(TStringTable::translate(name)), addFxGroup);
+			QMenu *addMenu =
+				new QMenu(QString::fromStdWString(TStringTable::translate(name)), addFxGroup);
 			addFxGroup->addMenu(addMenu);
-			QMenu *replaceMenu = new QMenu(QString::fromStdWString(TStringTable::translate(name)), replaceFxGroup);
+			QMenu *replaceMenu =
+				new QMenu(QString::fromStdWString(TStringTable::translate(name)), replaceFxGroup);
 			replaceFxGroup->addMenu(replaceMenu);
 
-			//This is a workaround to set the bold style to the first element of this menu
-			//Setting a font directly to a QAction is not enought; style sheet definitions
-			//preval over QAction font settings.
+			// This is a workaround to set the bold style to the first element of this menu
+			// Setting a font directly to a QAction is not enought; style sheet definitions
+			// preval over QAction font settings.
 			inserMenu->setObjectName("fxMenu");
 			addMenu->setObjectName("fxMenu");
 			replaceMenu->setObjectName("fxMenu");
 
-			QAction *insertAction = new QAction(QString::fromStdWString(TStringTable::translate(name)), inserMenu);
-			QAction *addAction = new QAction(QString::fromStdWString(TStringTable::translate(name)), addMenu);
-			QAction *replaceAction = new QAction(QString::fromStdWString(TStringTable::translate(name)), replaceMenu);
+			QAction *insertAction =
+				new QAction(QString::fromStdWString(TStringTable::translate(name)), inserMenu);
+			QAction *addAction =
+				new QAction(QString::fromStdWString(TStringTable::translate(name)), addMenu);
+			QAction *replaceAction =
+				new QAction(QString::fromStdWString(TStringTable::translate(name)), replaceMenu);
 
 			insertAction->setCheckable(true);
 			addAction->setCheckable(true);
@@ -473,9 +481,11 @@ bool AddFxContextMenu::loadPreset(const std::string &name,
 				addAction = new QAction(qPresetName, addMenu);
 				replaceAction = new QAction(qPresetName, replaceMenu);
 
-				insertAction->setData(QVariant(QString::fromStdWString(presetName.getWideString())));
+				insertAction->setData(
+					QVariant(QString::fromStdWString(presetName.getWideString())));
 				addAction->setData(QVariant(QString::fromStdWString(presetName.getWideString())));
-				replaceAction->setData(QVariant(QString::fromStdWString(presetName.getWideString())));
+				replaceAction->setData(
+					QVariant(QString::fromStdWString(presetName.getWideString())));
 
 				inserMenu->addAction(insertAction);
 				addMenu->addAction(addAction);
@@ -521,7 +531,8 @@ void AddFxContextMenu::loadMacro()
 
 				insertAction->setData(QVariant(QString::fromStdWString(macroPath.getWideString())));
 				addAction->setData(QVariant(QString::fromStdWString(macroPath.getWideString())));
-				replaceAction->setData(QVariant(QString::fromStdWString(macroPath.getWideString())));
+				replaceAction->setData(
+					QVariant(QString::fromStdWString(macroPath.getWideString())));
 
 				insertMacroMenu->addAction(insertAction);
 				addMacroMenu->addAction(addAction);
@@ -546,10 +557,10 @@ void AddFxContextMenu::onInsertFx(QAction *action)
 	if (fx) {
 		QList<TFxP> fxs = m_selection->getFxs();
 		QList<TFxCommand::Link> links = m_selection->getLinks();
-		TFxCommand::insertFx(fx, fxs, links, m_app,
-							 m_app->getCurrentColumn()->getColumnIndex(), m_app->getCurrentFrame()->getFrameIndex());
+		TFxCommand::insertFx(fx, fxs, links, m_app, m_app->getCurrentColumn()->getColumnIndex(),
+							 m_app->getCurrentFrame()->getFrameIndex());
 		m_app->getCurrentXsheet()->notifyXsheetChanged();
-		//memorize the latest operation
+		// memorize the latest operation
 		m_app->getCurrentFx()->setPreviousActionString(QString("I ") + action->data().toString());
 	}
 }
@@ -566,16 +577,17 @@ void AddFxContextMenu::onAddFx(QAction *action)
 		QList<TFxP> fxs = m_selection->getFxs();
 		// try to add node at cursor position
 		if (m_currentCursorScenePos.x() != 0 || m_currentCursorScenePos.y() != 0) {
-			fx->getAttributes()->setDagNodePos(TPointD(m_currentCursorScenePos.x(), m_currentCursorScenePos.y()));
+			fx->getAttributes()->setDagNodePos(
+				TPointD(m_currentCursorScenePos.x(), m_currentCursorScenePos.y()));
 			m_currentCursorScenePos.setX(0);
 			m_currentCursorScenePos.setY(0);
 		}
 
-		TFxCommand::addFx(fx, fxs, m_app,
-						  m_app->getCurrentColumn()->getColumnIndex(), m_app->getCurrentFrame()->getFrameIndex());
+		TFxCommand::addFx(fx, fxs, m_app, m_app->getCurrentColumn()->getColumnIndex(),
+						  m_app->getCurrentFrame()->getFrameIndex());
 
 		m_app->getCurrentXsheet()->notifyXsheetChanged();
-		//memorize the latest operation
+		// memorize the latest operation
 		m_app->getCurrentFx()->setPreviousActionString(QString("A ") + action->data().toString());
 	}
 }
@@ -591,7 +603,7 @@ void AddFxContextMenu::onReplaceFx(QAction *action)
 		QList<TFxP> fxs = m_selection->getFxs();
 		TFxCommand::replaceFx(fx, fxs, m_app->getCurrentXsheet(), m_app->getCurrentFx());
 		m_app->getCurrentXsheet()->notifyXsheetChanged();
-		//memorize the latest operation
+		// memorize the latest operation
 		m_app->getCurrentFx()->setPreviousActionString(QString("R ") + action->data().toString());
 	}
 }
@@ -608,16 +620,16 @@ void AddFxContextMenu::onFxPresetHandled()
 
 //---------------------------------------------------
 /*! repeat the last fx creation command done in the schematic.
-    arrgument "command" is sum of the ids of available commands(Insert, Add, Replace)
+	arrgument "command" is sum of the ids of available commands(Insert, Add, Replace)
 */
 QAction *AddFxContextMenu::getAgainCommand(int command)
 {
 	QString commandName = m_app->getCurrentFx()->getPreviousActionString();
-	//return if the last action is not registered
+	// return if the last action is not registered
 	if (commandName.isEmpty())
 		return 0;
 
-	//classify action by commandName
+	// classify action by commandName
 	Commands com;
 	QString commandStr;
 	if (commandName.startsWith("I ")) {
@@ -632,25 +644,26 @@ QAction *AddFxContextMenu::getAgainCommand(int command)
 	} else
 		return 0;
 
-	//return if the action is not available
+	// return if the action is not available
 	if (!(command & com))
 		return 0;
 
 	QString fxStr = commandName.right(commandName.size() - 2);
-	QString translatedCommandName = commandStr + QString::fromStdWString(TStringTable::translate(fxStr.toStdString()));
-	//return the action if the command is the exactly same
+	QString translatedCommandName =
+		commandStr + QString::fromStdWString(TStringTable::translate(fxStr.toStdString()));
+	// return the action if the command is the exactly same
 	if (m_againCommand && translatedCommandName == m_againCommand->text())
 		return m_againCommand;
 
-	//create an action
+	// create an action
 	if (!m_againCommand) {
 		m_againCommand = new QAction(translatedCommandName, 0);
 		m_againCommand->setData(QVariant(fxStr));
 		connect(m_againCommand, SIGNAL(triggered()), this, SLOT(onAgainCommand()));
 	}
-	//compare the m_againCommand's name and commandName
+	// compare the m_againCommand's name and commandName
 	else if (translatedCommandName != m_againCommand->text()) {
-		//change the action name
+		// change the action name
 		m_againCommand->setText(translatedCommandName);
 		m_againCommand->setData(QVariant(fxStr));
 	}

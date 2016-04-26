@@ -19,13 +19,13 @@ class TFilePath;
 
 class DVAPI TStringTable
 {
-public:
+  public:
 	static const TStringTable *instance();
 	static std::wstring translate(std::string);
 
 	class Item
 	{
-	public:
+	  public:
 		std::wstring m_name, m_help, m_tip;
 		Item() : m_name(), m_help(), m_tip(){};
 	};
@@ -36,11 +36,11 @@ public:
 
 	virtual std::string getDefaultMacFontName() const = 0;
 
-protected:
+  protected:
 	TStringTable();
 	virtual ~TStringTable();
 
-private:
+  private:
 	// not implemented
 	TStringTable(const TStringTable &);
 	TStringTable &operator=(const TStringTable &);

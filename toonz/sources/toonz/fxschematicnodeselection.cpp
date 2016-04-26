@@ -31,7 +31,7 @@ class DeleteFxsUndo : public TUndo
 	QList<Node> m_fxs;
 	QList<TFxP> m_inputConnectedToXsheet;
 
-public:
+  public:
 	DeleteFxsUndo(const QList<TFx *> &fxs)
 	{
 		TApp *app = TApp::instance();
@@ -120,10 +120,7 @@ public:
 		}
 		TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
 	}
-	int getSize() const
-	{
-		return sizeof(*this) + m_fxs.size() * (sizeof(TFx) + 100);
-	}
+	int getSize() const { return sizeof(*this) + m_fxs.size() * (sizeof(TFx) + 100); }
 };
 
 //=========================================================
@@ -202,8 +199,7 @@ void FxSchematicNodeSelection::deleteSelection()
 	QList<FxSchematicNode *>::const_iterator it;
 	for (it = m_selectedNodes.begin(); it != m_selectedNodes.end(); ++it) {
 		TFx *fx = (*it)->getFx();
-		if (0 != dynamic_cast<TXsheetFx *>(fx) ||
-			0 != dynamic_cast<TLevelColumnFx *>(fx))
+		if (0 != dynamic_cast<TXsheetFx *>(fx) || 0 != dynamic_cast<TLevelColumnFx *>(fx))
 			continue;
 		fxs.push_back((*it)->getFx());
 	}

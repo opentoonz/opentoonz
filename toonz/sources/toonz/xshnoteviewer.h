@@ -38,10 +38,10 @@ class NotePopup : public DVGui::Dialog
 	DVGui::DvTextEdit *m_textEditor;
 	int m_currentColorIndex;
 	QList<DVGui::ColorField *> m_colorFields;
-	//!Used to avoid double click in discard or post button.
+	//! Used to avoid double click in discard or post button.
 	bool m_isOneButtonPressed;
 
-public:
+  public:
 	NotePopup(XsheetViewer *viewer, int noteIndex);
 	~NotePopup() {}
 
@@ -49,7 +49,7 @@ public:
 
 	void update();
 
-protected:
+  protected:
 	TXshNoteSet *getNotes();
 	QList<TPixel32> getColors();
 
@@ -61,7 +61,7 @@ protected:
 	void showEvent(QShowEvent *);
 	void hideEvent(QHideEvent *);
 
-protected slots:
+  protected slots:
 	void onColor1Switched(const TPixel32 &, bool isDragging);
 	void onColor2Switched(const TPixel32 &, bool isDragging);
 	void onColor3Switched(const TPixel32 &, bool isDragging);
@@ -90,7 +90,7 @@ class NoteWidget : public QWidget
 	std::unique_ptr<NotePopup> m_noteEditor;
 	bool m_isHovered;
 
-public:
+  public:
 	NoteWidget(XsheetViewer *parent = 0, int noteIndex = -1);
 
 	int getNoteIndex() const { return m_noteIndex; }
@@ -105,7 +105,7 @@ public:
 
 	void openNotePopup();
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *event);
 };
 
@@ -117,7 +117,7 @@ class NoteArea : public QFrame
 {
 	Q_OBJECT
 
-	std::unique_ptr<NotePopup> m_newNotePopup; //Popup used to create new note
+	std::unique_ptr<NotePopup> m_newNotePopup; // Popup used to create new note
 	XsheetViewer *m_viewer;
 
 	QToolButton *m_nextNoteButton;
@@ -125,20 +125,17 @@ class NoteArea : public QFrame
 
 	QComboBox *m_frameDisplayStyleCombo;
 
-public:
+  public:
 #if QT_VERSION >= 0x050500
 	NoteArea(XsheetViewer *parent = 0, Qt::WindowFlags flags = 0);
 #else
 	NoteArea(XsheetViewer *parent = 0, Qt::WFlags flags = 0);
 #endif
 
-	void updatePopup()
-	{
-		m_newNotePopup->update();
-	}
+	void updatePopup() { m_newNotePopup->update(); }
 	void updateButtons();
 
-protected slots:
+  protected slots:
 	void toggleNewNote();
 	void nextNote();
 	void precNote();

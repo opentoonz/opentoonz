@@ -8,8 +8,7 @@
 class TImageReaderWriterZCC;
 struct C {
 	C() : m_offset(0), m_size(0), m_lx(0), m_ly(0) {}
-	C(TINT64 offset, long size, int lx, int ly)
-		: m_offset(offset), m_size(size), m_lx(lx), m_ly(ly)
+	C(TINT64 offset, long size, int lx, int ly) : m_offset(offset), m_size(size), m_lx(lx), m_ly(ly)
 	{
 	}
 	TINT64 m_offset;
@@ -27,7 +26,7 @@ class TLevelReaderWriterZCC : public TLevelReaderWriter
 	ULONG m_blockSize;
 	std::map<int, C> m_map;
 
-public:
+  public:
 	TLevelReaderWriterZCC(const TFilePath &path, TReaderWriterInfo *winfo);
 	~TLevelReaderWriterZCC();
 	TImageReaderWriterP getFrameReaderWriter(TFrameId fid);
@@ -44,15 +43,15 @@ public:
 
 class TReaderWriterInfoZCC : public TReaderWriterInfo
 {
-public:
+  public:
 	friend TLevelReaderWriterZCC;
 
-public:
+  public:
 	static TReaderWriterInfo *create(const string &ext);
 	~TReaderWriterInfoZCC();
 	TReaderWriterInfo *clone() const;
 
-private:
+  private:
 	TReaderWriterInfoZCC();
 
 	TReaderWriterInfoZCC(const TReaderWriterInfoZCC &);

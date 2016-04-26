@@ -19,7 +19,7 @@ inline bool NearZero(double x, double tolerance)
 #ifdef _DYNAMIC
 const double BASEMAXDIST = 0.02;
 #else
-const double MAXDIST = 0.08;	
+const double MAXDIST = 0.08;
 #endif
 
 
@@ -152,7 +152,8 @@ void MatrixRmn::SetRow(long i, const VectorRn &d)
 // The first row and column position are given by startRow, startCol.
 // Successive positions are found by using the deltaRow, deltaCol values
 //	to increment the row and column indices.  There is no wrapping around.
-void MatrixRmn::SetSequence(const VectorRn &d, long startRow, long startCol, long deltaRow, long deltaCol)
+void MatrixRmn::SetSequence(const VectorRn &d, long startRow, long startCol, long deltaRow,
+							long deltaCol)
 {
 	long length = d.length;
 	assert(startRow >= 0 && startRow < NumRows && startCol >= 0 && startCol < NumCols);
@@ -380,9 +381,11 @@ void MatrixRmn::Solve(const VectorRn &b, VectorRn *xVec) const
 	AugMat.ConvertToRefNoFree();
 
 	// Solve for x vector values using back substitution
-	double *xLast = xVec->x + NumRows - 1;			   // Last entry in xVec
-	double *endRow = AugMat.x + NumRows * NumCols - 1; // Last entry in the current row of the coefficient part of Augmented Matrix
-	double *bPtr = endRow + NumRows;				   // Last entry in augmented matrix (end of last column, in augmented part)
+	double *xLast = xVec->x + NumRows - 1; // Last entry in xVec
+	double *endRow = AugMat.x + NumRows * NumCols -
+					 1; // Last entry in the current row of the coefficient part of Augmented Matrix
+	double *bPtr =
+		endRow + NumRows; // Last entry in augmented matrix (end of last column, in augmented part)
 	for (long i = NumRows; i > 0; i--) {
 		double accum = *(bPtr--);
 		// Next loop computes back substitution terms
@@ -528,10 +531,12 @@ void MatrixRmn::PostApplyGivens(double c, double s, long idx1, long idx2)
 // ********************************************************************************************
 void MatrixRmn::ComputeSVD(MatrixRmn &U, VectorRn &w, MatrixRmn &V) const
 {
-	assert(U.NumRows == NumRows && V.NumCols == NumCols && U.NumRows == U.NumCols && V.NumRows == V.NumCols && w.GetLength() == tmin(NumRows, NumCols));
+	assert(U.NumRows == NumRows && V.NumCols == NumCols && U.NumRows == U.NumCols &&
+		   V.NumRows == V.NumCols && w.GetLength() == tmin(NumRows, NumCols));
 
 	double temp = 0.0;
-	VectorRn &superDiag = VectorRn::GetWorkVector(w.GetLength() - 1); // Some extra work space.  Will get passed around.
+	VectorRn &superDiag = VectorRn::GetWorkVector(
+		w.GetLength() - 1); // Some extra work space.  Will get passed around.
 
 	// Choose larger of U, V to hold intermediate results
 	// If U is larger than V, use U to store intermediate results
@@ -591,7 +596,8 @@ void MatrixRmn::CalcBidiagonal(MatrixRmn &U, MatrixRmn &V, VectorRn &w, VectorRn
 		}
 
 		// Apply a Householder xform on the right to zero part of a row
-		SvdHouseholder(diagPtr + rowStep, rowLengthLeft - 1, colLengthLeft, rowStep, 1, superDiagPtr);
+		SvdHouseholder(diagPtr + rowStep, rowLengthLeft - 1, colLengthLeft, rowStep, 1,
+					   superDiagPtr);
 
 		rowLengthLeft--;
 		colLengthLeft--;
@@ -626,9 +632,8 @@ void MatrixRmn::CalcBidiagonal(MatrixRmn &U, MatrixRmn &V, VectorRn &w, VectorRn
 //   is stored into the first row/column being transformed.
 // The leading term of that row (= plus/minus its magnitude is returned
 //	 separately into "retFirstEntry"
-void MatrixRmn::SvdHouseholder(double *basePt,
-							   long colLength, long numCols, long colStride, long rowStride,
-							   double *retFirstEntry)
+void MatrixRmn::SvdHouseholder(double *basePt, long colLength, long numCols, long colStride,
+							   long rowStride, double *retFirstEntry)
 {
 
 	// Calc norm of vector u
@@ -701,7 +706,8 @@ void MatrixRmn::SvdHouseholder(double *basePt,
 //	 colStride, rowStride: Householder xforms are stored in "columns"
 //   numZerosSkipped is the number of implicit zeros on the front each
 //			Householder transformation vector (only values supported are 0 and 1).
-void MatrixRmn::ExpandHouseholders(long numXforms, int numZerosSkipped, const double *basePt, long colStride, long rowStride)
+void MatrixRmn::ExpandHouseholders(long numXforms, int numZerosSkipped, const double *basePt,
+								   long colStride, long rowStride)
 {
 	// Number of applications of the last Householder transform
 	//     (That are not trivial!)
@@ -716,14 +722,16 @@ void MatrixRmn::ExpandHouseholders(long numXforms, int numZerosSkipped, const do
 	// Handle the first one separately as a special case,
 	// "this" matrix will be treated to simulate being preloaded with the identity
 	long hDiagStride = rowStride + colStride;
-	const double *hBase = basePt + hDiagStride * (numXforms - 1);	  // Pointer to the last Householder vector
-	const double *hDiagPtr = hBase + colStride * (numToTransform - 1); // Pointer to last entry in that vector
+	const double *hBase =
+		basePt + hDiagStride * (numXforms - 1); // Pointer to the last Householder vector
+	const double *hDiagPtr =
+		hBase + colStride * (numToTransform - 1); // Pointer to last entry in that vector
 	long i;
-	double *diagPtr = x + NumCols * NumRows - 1;	 // Last entry in matrix (points to diagonal entry)
+	double *diagPtr = x + NumCols * NumRows - 1; // Last entry in matrix (points to diagonal entry)
 	double *colPtr = diagPtr - (numToTransform - 1); // Pointer to column in matrix
 	for (i = numToTransform; i > 0; i--) {
 		CopyArrayScale(numToTransform, hBase, colStride, colPtr, 1, -2.0 * (*hDiagPtr));
-		*diagPtr += 1.0;		  // Add back in 1 to the diagonal entry (since xforming the identity)
+		*diagPtr += 1.0; // Add back in 1 to the diagonal entry (since xforming the identity)
 		diagPtr -= (NumRows + 1); // Next diagonal entry in this matrix
 		colPtr -= NumRows;		  // Next column in this matrix
 		hDiagPtr -= colStride;
@@ -733,14 +741,16 @@ void MatrixRmn::ExpandHouseholders(long numXforms, int numZerosSkipped, const do
 	// A row of zeros must be in effect added to the top of each old column (in each loop)
 	double *colLastPtr = x + NumRows * NumCols - numToTransform - 1;
 	for (i = numXforms - 1; i > 0; i--) {
-		numToTransform++;	 // Number of non-trivial applications of this Householder transformation
+		numToTransform++; // Number of non-trivial applications of this Householder transformation
 		hBase -= hDiagStride; // Pointer to the beginning of the Householder transformation
 		colPtr = colLastPtr;
 		for (long j = numToTransform - 1; j > 0; j--) {
 			// Get dot product
-			double dotProd2N = -2.0 * DotArray(numToTransform - 1, hBase + colStride, colStride, colPtr + 1, 1);
+			double dotProd2N =
+				-2.0 * DotArray(numToTransform - 1, hBase + colStride, colStride, colPtr + 1, 1);
 			*colPtr = dotProd2N * (*hBase); // Adding onto zero at initial point
-			AddArrayScale(numToTransform - 1, hBase + colStride, colStride, colPtr + 1, 1, dotProd2N);
+			AddArrayScale(numToTransform - 1, hBase + colStride, colStride, colPtr + 1, 1,
+						  dotProd2N);
 			colPtr -= NumRows;
 		}
 		// Do last one as a special case (may overwrite the Householder vector)
@@ -752,7 +762,8 @@ void MatrixRmn::ExpandHouseholders(long numXforms, int numZerosSkipped, const do
 
 	if (numZerosSkipped != 0) {
 		assert(numZerosSkipped == 1);
-		// Fill first row and column with identity (More generally: first numZerosSkipped many rows and columns)
+		// Fill first row and column with identity (More generally: first numZerosSkipped many rows
+		// and columns)
 		double *d = x;
 		*d = 1;
 		double *d2 = d;
@@ -767,13 +778,14 @@ void MatrixRmn::ExpandHouseholders(long numXforms, int numZerosSkipped, const do
 // Do the iterative transformation from bidiagonal form to diagonal form using
 //		Givens transformation.  (Golub-Reinsch)
 // U and V are square.  Size of U less than or equal to that of U.
-void MatrixRmn::ConvertBidiagToDiagonal(MatrixRmn &U, MatrixRmn &V, VectorRn &w, VectorRn &superDiag) const
+void MatrixRmn::ConvertBidiagToDiagonal(MatrixRmn &U, MatrixRmn &V, VectorRn &w,
+										VectorRn &superDiag) const
 {
 	// These two index into the last bidiagonal block  (last in the matrix, it will be
 	//	first one handled.
 	long lastBidiagIdx = V.NumRows - 1;
 	long firstBidiagIdx = 0;
-	//togliere
+	// togliere
 	double aa = w.MaxAbs();
 	double bb = superDiag.MaxAbs();
 
@@ -833,7 +845,8 @@ void MatrixRmn::ConvertBidiagToDiagonal(MatrixRmn &U, MatrixRmn &V, VectorRn &w,
 			U.PostApplyGivens(c, -s, i);
 			// Push non-zero from M[i,i+2] to M[1+2,i+1]
 			CalcGivensValues(*sdPtr, extraOffDiag, &c, &s);
-			ApplyGivensCBTD(c, s, sdPtr, wPtr + 1, &extraOffDiag, extraOffDiag, sdPtr + 1, wPtr + 2);
+			ApplyGivensCBTD(c, s, sdPtr, wPtr + 1, &extraOffDiag, extraOffDiag, sdPtr + 1,
+							wPtr + 2);
 			V.PostApplyGivens(c, -s, i + 1);
 			wPtr++;
 			sdPtr++;
@@ -848,11 +861,14 @@ void MatrixRmn::ConvertBidiagToDiagonal(MatrixRmn &U, MatrixRmn &V, VectorRn &w,
 	}
 }
 
-// This is called when there is a zero diagonal entry, with a non-zero superdiagonal entry on the same row.
+// This is called when there is a zero diagonal entry, with a non-zero superdiagonal entry on the
+// same row.
 // We use Givens rotations to "chase" the non-zero entry across the row; when it reaches the last
 //	column, it is finally zeroed away.
-// wPtr points to the zero entry on the diagonal.  sdPtr points to the non-zero superdiagonal entry on the same row.
-void MatrixRmn::ClearRowWithDiagonalZero(long firstBidiagIdx, long lastBidiagIdx, MatrixRmn &U, double *wPtr, double *sdPtr, double eps)
+// wPtr points to the zero entry on the diagonal.  sdPtr points to the non-zero superdiagonal entry
+// on the same row.
+void MatrixRmn::ClearRowWithDiagonalZero(long firstBidiagIdx, long lastBidiagIdx, MatrixRmn &U,
+										 double *wPtr, double *sdPtr, double eps)
 {
 	double curSd = *sdPtr; // Value being chased across the row
 	*sdPtr = 0.0;
@@ -872,11 +888,14 @@ void MatrixRmn::ClearRowWithDiagonalZero(long firstBidiagIdx, long lastBidiagIdx
 	}
 }
 
-// This is called when there is a zero diagonal entry, with a non-zero superdiagonal entry in the same column.
+// This is called when there is a zero diagonal entry, with a non-zero superdiagonal entry in the
+// same column.
 // We use Givens rotations to "chase" the non-zero entry up the column; when it reaches the last
 //	column, it is finally zeroed away.
-// wPtr points to the zero entry on the diagonal.  sdPtr points to the non-zero superdiagonal entry in the same column.
-void MatrixRmn::ClearColumnWithDiagonalZero(long endIdx, MatrixRmn &V, double *wPtr, double *sdPtr, double eps)
+// wPtr points to the zero entry on the diagonal.  sdPtr points to the non-zero superdiagonal entry
+// in the same column.
+void MatrixRmn::ClearColumnWithDiagonalZero(long endIdx, MatrixRmn &V, double *wPtr, double *sdPtr,
+											double eps)
 {
 	double curSd = *sdPtr; // Value being chased up the column
 	*sdPtr = 0.0;
@@ -900,7 +919,8 @@ void MatrixRmn::ClearColumnWithDiagonalZero(long endIdx, MatrixRmn &V, double *w
 
 // Matrix A is  ( ( a c ) ( b d ) ), i.e., given in column order.
 // Mult's G[c,s]  times  A, replaces A.
-void MatrixRmn::ApplyGivensCBTD(double cosine, double sine, double *a, double *b, double *c, double *d)
+void MatrixRmn::ApplyGivensCBTD(double cosine, double sine, double *a, double *b, double *c,
+								double *d)
 {
 	double temp = *a;
 	*a = cosine * (*a) - sine * (*b);
@@ -925,7 +945,8 @@ void MatrixRmn::ApplyGivensCBTD(double cosine, double sine, double *a, double *b
 }
 
 // Helper routine for SVD conversion from bidiagonal to diagonal
-bool MatrixRmn::UpdateBidiagIndices(long *firstBidiagIdx, long *lastBidiagIdx, VectorRn &w, VectorRn &superDiag, double eps)
+bool MatrixRmn::UpdateBidiagIndices(long *firstBidiagIdx, long *lastBidiagIdx, VectorRn &w,
+									VectorRn &superDiag, double eps)
 {
 	long lastIdx = *lastBidiagIdx;
 	double *sdPtr = superDiag.GetPtr(lastIdx - 1); // Entry above the last diagonal entry
@@ -1009,7 +1030,7 @@ Jacobian::Jacobian(IKSkeleton *skeleton, std::vector<TPointD> &targetPos)
 {
 	Jacobian::skeleton = skeleton;
 	nEffector = skeleton->getNumEffector();
-	nJoint = skeleton->getNodeCount() - nEffector; //numero dei giunti meno gli effettori
+	nJoint = skeleton->getNodeCount() - nEffector; // numero dei giunti meno gli effettori
 	nRow = 2 * nEffector;
 	nCol = nJoint;
 
@@ -1052,7 +1073,7 @@ void Jacobian::Reset()
 		DampingLambdaSqV[i] = DampingLambdaSq;
 	for (int i = 0; i < diagMatIdentity.GetLength(); i++)
 		diagMatIdentity[i] = 1.0;
-	//DampingLambdaSDLS = 1.5*DefaultDampingLambda;
+	// DampingLambdaSDLS = 1.5*DefaultDampingLambda;
 
 	dSclamp.Fill(HUGE_VAL);
 }
@@ -1087,9 +1108,10 @@ void Jacobian::computeJacobian()
 
 			while (m) {
 				int j = m->getJointNum();
-				//assert(j>=0 && j<skeleton->GetNumJoint());
+				// assert(j>=0 && j<skeleton->GetNumJoint());
 				int numnode = skeleton->getNodeCount();
-				assert(0 <= i && i < nEffector && 0 <= j && j < (skeleton->getNodeCount() - skeleton->getNumEffector()));
+				assert(0 <= i && i < nEffector && 0 <= j &&
+					   j < (skeleton->getNodeCount() - skeleton->getNumEffector()));
 				if (m->isFrozen()) {
 					Jend.SetCouple(i, j, TPointD(0.0, 0.0));
 
@@ -1225,7 +1247,8 @@ void Jacobian::CalcDeltaThetasPseudoinverse()
 		double alpha = *(wPtr++);
 		if (fabs(alpha) > pseudoInverseThreshold) {
 			alpha = 1.0 / alpha;
-			MatrixRmn::AddArrayScale(V.getNumRows(), V.GetColumnPtr(i), 1, dTheta.GetPtr(), 1, dotProdCol * alpha);
+			MatrixRmn::AddArrayScale(V.getNumRows(), V.GetColumnPtr(i), 1, dTheta.GetPtr(), 1,
+									 dotProdCol * alpha);
 		}
 	}
 
@@ -1260,7 +1283,7 @@ void Jacobian::CalcDeltaThetasPseudoinverse()
 		JProjPre.AddToDiagonal(diagMatIdentity);
 	}
 
-	//task priority strategy
+	// task priority strategy
 	for (int i = 1; i < skeleton->getNumEffector(); i++) {
 		// costruisco matrice Jcurrent (Ji)
 		MatrixRmn Jcurrent(2, J.getNumColumns());
@@ -1278,7 +1301,8 @@ void Jacobian::CalcDeltaThetasPseudoinverse()
 		MatrixRmn::Multiply(Jcurrent, JProjPre, Jdst);
 
 		// Calcolo la pseudoinversa di Jdst
-		MatrixRmn UU(Jdst.getNumRows(), Jdst.getNumRows()), VV(Jdst.getNumColumns(), Jdst.getNumColumns());
+		MatrixRmn UU(Jdst.getNumRows(), Jdst.getNumRows()),
+			VV(Jdst.getNumColumns(), Jdst.getNumColumns());
 		VectorRn ww(min(Jdst.getNumRows(), Jdst.getNumColumns()));
 
 		Jdst.ComputeSVD(UU, ww, VV);
@@ -1314,7 +1338,8 @@ void Jacobian::CalcDeltaThetasPseudoinverse()
 		for (int k = 0; k < dTheta.GetLength(); k++)
 			dTheta[k] += dThetaCurrent[k];
 
-		// Infine mi calcolo la pseudoinversa di Jcurrent e quindi la sua proiezione che servirà al passo successivo
+		// Infine mi calcolo la pseudoinversa di Jcurrent e quindi la sua proiezione che servirà al
+		// passo successivo
 
 		// calcolo la pseudoinversa di Jcurrent
 		Jcurrent.ComputeSVD(U, w, V);
@@ -1347,10 +1372,10 @@ void Jacobian::CalcDeltaThetasPseudoinverse()
 		JProjPre.AddToDiagonal(diagMatIdentity);
 	}
 
-	//sw.stop();
-	//std::ofstream os("C:\\buttami.txt", std::ios::app);
-	//sw.print(os);
-	//os.close();
+	// sw.stop();
+	// std::ofstream os("C:\\buttami.txt", std::ios::app);
+	// sw.print(os);
+	// os.close();
 
 	// Scale back to not exceed maximum angle changes
 	double maxChange = 10 * dTheta.MaxAbs();
@@ -1367,7 +1392,8 @@ void Jacobian::CalcDeltaThetasDLS()
 
 	U.AddToDiagonal(DampingLambdaSqV);
 
-	// Use the next four lines instead of the succeeding two lines for the DLS method with clamped error vector e.
+	// Use the next four lines instead of the succeeding two lines for the DLS method with clamped
+	// error vector e.
 	// CalcdTClampedFromdS();
 	// VectorRn dTextra(2*nEffector);
 	// U.Solve( dT, &dTextra );
@@ -1405,7 +1431,8 @@ void Jacobian::CalcDeltaThetasDLSwithSVD()
 		double dotProdCol = U.DotProductColumn(dS, i); // Dot product with i-th column of U
 		double alpha = *(wPtr++);
 		alpha = alpha / (Square(alpha) + DampingLambdaSq);
-		MatrixRmn::AddArrayScale(V.getNumRows(), V.GetColumnPtr(i), 1, dTheta.GetPtr(), 1, dotProdCol * alpha);
+		MatrixRmn::AddArrayScale(V.getNumRows(), V.GetColumnPtr(i), 1, dTheta.GetPtr(), 1,
+								 dotProdCol * alpha);
 	}
 
 	// Scale back to not exceed maximum angle changes
@@ -1429,7 +1456,8 @@ void Jacobian::CalcDeltaThetasSDLS()
 	// Calculate response vector dTheta that is the SDLS solution.
 	//	Delta target values are the dS values
 	int nRows = J.getNumRows();
-	int numEndEffectors = skeleton->getNumEffector(); // Equals the number of rows of J divided by three
+	int numEndEffectors =
+		skeleton->getNumEffector(); // Equals the number of rows of J divided by three
 	int nCols = J.getNumColumns();
 	dTheta.SetZero();
 
@@ -1473,7 +1501,8 @@ void Jacobian::CalcDeltaThetasSDLS()
 			N += sqrt(tmp);
 		}
 
-		// M is the quasi-1-norm of the response to angles changing according to the i-th column of V
+		// M is the quasi-1-norm of the response to angles changing according to the i-th column of
+		// V
 		//		Then is multiplied by the wiInv value.
 		double M = 0.0;
 		double *vx = V.GetColumnPtr(i);
@@ -1511,7 +1540,7 @@ void Jacobian::CalcDeltaThetasSDLS()
 	double maxChange = dTheta.MaxAbs();
 	if (maxChange > 100 * MaxAngleSDLS) {
 		dTheta *= MaxAngleSDLS / (MaxAngleSDLS + maxChange);
-		//dTheta *= MaxAngleSDLS/maxChange;
+		// dTheta *= MaxAngleSDLS/maxChange;
 	}
 }
 
@@ -1525,11 +1554,11 @@ void Jacobian::CalcdTClampedFromdS()
 			double factor = dSclamp[j] / sqrt(normSq);
 			dT[i] = dS[i] * factor;
 			dT[i + 1] = dS[i + 1] * factor;
-			//dT[i+2] = dS[i+2]*factor;
+			// dT[i+2] = dS[i+2]*factor;
 		} else {
 			dT[i] = dS[i];
 			dT[i + 1] = dS[i + 1];
-			//dT[i+2] = dS[i+2];
+			// dT[i+2] = dS[i+2];
 		}
 	}
 }

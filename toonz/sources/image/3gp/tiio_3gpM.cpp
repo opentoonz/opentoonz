@@ -23,7 +23,7 @@ int CompressionNoneId = 0;
 class QuickTimeCleanUp;
 class QuickTimeStuff
 {
-public:
+  public:
 	static QuickTimeStuff *instance()
 	{
 		if (!m_singleton)
@@ -31,11 +31,9 @@ public:
 		return m_singleton;
 	}
 	OSErr getStatus() { return m_status; }
-	~QuickTimeStuff()
-	{
-	}
+	~QuickTimeStuff() {}
 
-private:
+  private:
 	QuickTimeStuff() : m_status(noErr)
 	{
 		m_status = noErr;
@@ -45,21 +43,25 @@ private:
 	static QuickTimeStuff *m_singleton;
 
 	OSErr m_status;
-	friend class QuickTimeCleanUp; //questa DEVE essere friend, cosi' posso controllare direttamente
-								   //lo stato del singleton.
+	friend class QuickTimeCleanUp; // questa DEVE essere friend, cosi' posso controllare
+								   // direttamente
+	// lo stato del singleton.
 };
 
 class QuickTimeCleanUp
 {
-public:
+  public:
 	QuickTimeCleanUp() {}
 	~QuickTimeCleanUp()
 	{ /*
-                        Nel caso si arrivasse qui senza il singleton instanziato, e si facesse direttamente
-                        'delete QuickTimeStuff::instance();' Quicktime non farebbe in tempo a terminare le
-                        sue routine di inizializzazione (che sono ANCHE su altri thread) e la chiamata a
-                        TerminateQTML() causerebbe un crash
-                        */
+						Nel caso si arrivasse qui senza il singleton instanziato, e si facesse
+		 direttamente
+						'delete QuickTimeStuff::instance();' Quicktime non farebbe in tempo a
+		 terminare le
+						sue routine di inizializzazione (che sono ANCHE su altri thread) e la
+		 chiamata a
+						TerminateQTML() causerebbe un crash
+						*/
 		if (QuickTimeStuff::m_singleton)
 			delete QuickTimeStuff::m_singleton;
 	}
@@ -150,7 +152,7 @@ string long2fourchar(TINT32 fcc)
 const string CodecNamesId = "PU_CodecName";
 const string CodecQualityId = "PU_CodecQuality";
 
-} //namespace
+} // namespace
 
 //------------------------------------------------------------------------------
 //  TImageWriter3gp
@@ -159,21 +161,21 @@ const string CodecQualityId = "PU_CodecQuality";
 class TImageWriter3gp : public TImageWriter
 {
 
-public:
+  public:
 	TImageWriter3gp(const TFilePath &, int frameIndex, TLevelWriter3gp *);
 	~TImageWriter3gp() { m_lwm->release(); }
 	bool is64bitOutputSupported() { return false; }
 
-private:
-	//not implemented
+  private:
+	// not implemented
 	TImageWriter3gp(const TImageWriter3gp &);
 	TImageWriter3gp &operator=(const TImageWriter3gp &src);
 
-public:
+  public:
 	void save(const TImageP &);
 	int m_frameIndex;
 
-private:
+  private:
 	TLevelWriter3gp *m_lwm;
 };
 
@@ -183,24 +185,25 @@ private:
 class TImageReader3gp : public TImageReader
 {
 
-public:
+  public:
 	TImageReader3gp(const TFilePath &, int frameIndex, TLevelReader3gp *);
 	~TImageReader3gp() { m_lrm->release(); }
 
-private:
-	//not implemented
+  private:
+	// not implemented
 	TImageReader3gp(const TImageReader3gp &);
 	TImageReader3gp &operator=(const TImageReader3gp &src);
 
-public:
+  public:
 	TImageP load();
-	void load(const TRasterP &rasP, const TPoint &pos = TPoint(0, 0), int shrinkX = 1, int shrinkY = 1);
+	void load(const TRasterP &rasP, const TPoint &pos = TPoint(0, 0), int shrinkX = 1,
+			  int shrinkY = 1);
 	int m_frameIndex;
 
 	TDimension getSize() const { return m_lrm->getSize(); }
 	TRect getBBox() const { return m_lrm->getBBox(); }
 
-private:
+  private:
 	TLevelReader3gp *m_lrm;
 };
 
@@ -224,7 +227,8 @@ void copy(TRasterP rin, PixelXRGB *bufout, int lx, int ly, unsigned short rowbyt
 	rin->lock();
 	TRaster32P rin32 = rin;
 	assert(rin32);
-	int lineOffset = (rowbytes == 0) ? lx : rowbytes / sizeof(PixelXRGB); //in pixelsize, cioe 4 bytes
+	int lineOffset =
+		(rowbytes == 0) ? lx : rowbytes / sizeof(PixelXRGB); // in pixelsize, cioe 4 bytes
 
 	PixelXRGB *rowout = &(bufout[(ly - 1) * lineOffset]) /*-startOffset*/;
 	for (int y = 0; y < rin32->getLy(); y++) {
@@ -242,7 +246,7 @@ void copy(TRasterP rin, PixelXRGB *bufout, int lx, int ly, unsigned short rowbyt
 		rowout -= lineOffset;
 	}
 	rin->unlock();
-} //end function
+} // end function
 };
 //-----------------------------------------------------------
 /*
@@ -254,9 +258,9 @@ return new TWriterInfo3gp();
 //-----------------------------------------------------------
 
 TWriterInfo3gp::TWriterInfo3gp(const TWriterInfo3gp&src)
-               :TWriterInfo(src)
-               ,m_codecTable(src.m_codecTable)
-               ,m_qualityTable(src.m_qualityTable)
+			   :TWriterInfo(src)
+			   ,m_codecTable(src.m_codecTable)
+			   ,m_qualityTable(src.m_qualityTable)
 {
 }
 
@@ -269,8 +273,8 @@ return new TWriterInfo3gp(*this);
 
 //-----------------------------------------------------------
 
-TWriterInfo3gp::TWriterInfo3gp() 
-               :TWriterInfo()
+TWriterInfo3gp::TWriterInfo3gp()
+			   :TWriterInfo()
 {
 if (QuickTimeStuff::instance()->getStatus()!=noErr)
   {
@@ -305,7 +309,7 @@ int q = 0;
 
 TIntEnumeration  codecQuality;
 
-codecQuality.addItem("min quality",q); 
+codecQuality.addItem("min quality",q);
 m_qualityTable.insert(QualityTable::value_type(q++, codecMinQuality));
 
 codecQuality.addItem("low quality",q);
@@ -350,7 +354,7 @@ void getFSRefFromPosixPath(const char *filepath, FSRef *fileRef, bool writing)
 		fclose(fp);
 	}
 	OSErr err = FSPathMakeRef(filename, fileRef, 0);
-	//assert(err==noErr);
+	// assert(err==noErr);
 }
 
 void getFSSpecFromPosixPath(const char *filepath, FSSpec *fileSpec, bool writing)
@@ -371,7 +375,7 @@ void TLevelWriter3gp::save(const TImageP &img, int frameIndex)
 	TRasterImageP image(img);
 	int lx = image->getRaster()->getLx();
 	int ly = image->getRaster()->getLy();
-	//void *buffer = image->getRaster()->getRawData();
+	// void *buffer = image->getRaster()->getRawData();
 	int pixSize = image->getRaster()->getPixelSize();
 	if (pixSize != 4)
 		throw TImageException(getFilePath(), "Unsupported pixel type");
@@ -383,16 +387,17 @@ void TLevelWriter3gp::save(const TImageP &img, int frameIndex)
 
 	Tiio::MovWriterProperties *prop = (Tiio::MovWriterProperties *)(m_properties);
 
-	//CodecType compression = StandardCompressionType;  prop->getCurrentCodec();
-	//CodecQ quality = StandardQualityType;  prop->getCurrentQuality();
+	// CodecType compression = StandardCompressionType;  prop->getCurrentCodec();
+	// CodecQ quality = StandardQualityType;  prop->getCurrentQuality();
 
 	if (!m_initDone) {
-		//FSSpec fspec;
+		// FSSpec fspec;
 		Rect frame;
 		long max_compressed_size;
 		QDErr err;
 
-		m_videoTrack = NewMovieTrack(m_movie, FixRatio((short)lx, 1), FixRatio((short)ly, 1), kNoVolume);
+		m_videoTrack =
+			NewMovieTrack(m_movie, FixRatio((short)lx, 1), FixRatio((short)ly, 1), kNoVolume);
 
 		if ((err = GetMoviesError() != noErr))
 			throw TImageException(getFilePath(), "can't create video track");
@@ -406,7 +411,8 @@ void TLevelWriter3gp::save(const TImageP &img, int frameIndex)
 		if ((err = GetMoviesError() != noErr))
 			throw TImageException(getFilePath(), "can't create Data Ref");
 
-		m_videoMedia = NewTrackMedia(m_videoTrack, VideoMediaType, (TINT32)m_frameRate, m_dataRef, HandleDataHandlerSubType);
+		m_videoMedia = NewTrackMedia(m_videoTrack, VideoMediaType, (TINT32)m_frameRate, m_dataRef,
+									 HandleDataHandlerSubType);
 
 		OpenADefaultComponent(MovieExportType, '3gpp', &m_myExporter);
 
@@ -431,9 +437,8 @@ void TLevelWriter3gp::save(const TImageP &img, int frameIndex)
 		throw TImageException(getFilePath(), "can't create movie buffer");
 #ifdef WIN32
 		LockPixels(m_gworld->portPixMap);
-		if ((err = GetMaxCompressionSize(m_gworld->portPixMap, &frame, 0,
-										 quality, compression, anyCodec,
-										 &max_compressed_size)) != noErr)
+		if ((err = GetMaxCompressionSize(m_gworld->portPixMap, &frame, 0, quality, compression,
+										 anyCodec, &max_compressed_size)) != noErr)
 			throw TImageException(getFilePath(), "can't get max compression size");
 
 #else
@@ -446,10 +451,10 @@ void TLevelWriter3gp::save(const TImageP &img, int frameIndex)
 #endif
 		max_compressed_size = lx * ly * 4 * 20;
 
-/*if ((err = GetMaxCompressionSize(pixmapH, &frame, 0, 
-                                quality,  compression,anyCodec, 
+/*if ((err = GetMaxCompressionSize(pixmapH, &frame, 0,
+								quality,  compression,anyCodec,
 				 &max_compressed_size))!=noErr)
-    throw TImageException(getFilePath(), "can't get max compression size");*/
+	throw TImageException(getFilePath(), "can't get max compression size");*/
 #endif
 
 		m_compressedData = NewHandle(max_compressed_size);
@@ -503,10 +508,8 @@ void TLevelWriter3gp::save(const TImageP &img, int frameIndex)
 	img_descr = (ImageDescriptionHandle)NewHandle(4);
 
 #ifdef WIN32
-	if ((err = CompressImage(m_gworld->portPixMap,
-							 &frame,
-							 quality, compression,
-							 img_descr, compressed_data_ptr)) != noErr)
+	if ((err = CompressImage(m_gworld->portPixMap, &frame, quality, compression, img_descr,
+							 compressed_data_ptr)) != noErr)
 		throw TImageException(getFilePath(), "can't compress image");
 #else
 
@@ -522,10 +525,8 @@ void TLevelWriter3gp::save(const TImageP &img, int frameIndex)
 #endif
 #endif
 
-	if ((err = AddMediaSample(m_videoMedia, m_compressedData, 0,
-							  (*img_descr)->dataSize, 1,
-							  (SampleDescriptionHandle)img_descr,
-							  1, 0, 0)) != noErr)
+	if ((err = AddMediaSample(m_videoMedia, m_compressedData, 0, (*img_descr)->dataSize, 1,
+							  (SampleDescriptionHandle)img_descr, 1, 0, 0)) != noErr)
 		throw TImageException(getFilePath(), "can't add image to movie media");
 
 	DisposeHandle((Handle)img_descr);
@@ -536,12 +537,14 @@ void TLevelWriter3gp::save(const TImageP &img, int frameIndex)
 //-----------------------------------------------------------
 
 TLevelWriter3gp::TLevelWriter3gp(const TFilePath &path, TPropertyGroup *winfo)
-	: TLevelWriter(path, winfo), m_initDone(false), m_IOError(QTNoError), m_pixmap(0), m_compressedData(0), m_gworld(0), m_videoMedia(0), m_videoTrack(0), m_movie(0), m_cancelled(false), m_soundDataRef(0), m_hSoundMovieData(0)
+	: TLevelWriter(path, winfo), m_initDone(false), m_IOError(QTNoError), m_pixmap(0),
+	  m_compressedData(0), m_gworld(0), m_videoMedia(0), m_videoTrack(0), m_movie(0),
+	  m_cancelled(false), m_soundDataRef(0), m_hSoundMovieData(0)
 
 {
 	m_frameRate = 12.;
 	QDErr err;
-	//FSSpec fspec;
+	// FSSpec fspec;
 	if (QuickTimeStuff::instance()->getStatus() != noErr) {
 		m_IOError = QTNotInstalled;
 		throw TImageException(m_path, buildQTErrorString(m_IOError));
@@ -555,38 +558,38 @@ TLevelWriter3gp::TLevelWriter3gp(const TFilePath &path, TPropertyGroup *winfo)
 //-----------------------------------------------------------
 
 #ifdef _DEBUG
-#define FailIf(cond, handler)                                 \
-	if (cond) {                                               \
-		DebugStr((ConstStr255Param) #cond " goto " #handler); \
-		goto handler;                                         \
-	} else                                                    \
+#define FailIf(cond, handler)                                                                      \
+	if (cond) {                                                                                    \
+		DebugStr((ConstStr255Param) #cond " goto " #handler);                                      \
+		goto handler;                                                                              \
+	} else                                                                                         \
 	0
 #else
-#define FailIf(cond, handler) \
-	if (cond) {               \
-		goto handler;         \
-	} else                    \
+#define FailIf(cond, handler)                                                                      \
+	if (cond) {                                                                                    \
+		goto handler;                                                                              \
+	} else                                                                                         \
 	0
 #endif
 
 #ifdef _DEBUG
-#define FailWithAction(cond, action, handler)                 \
-	if (cond) {                                               \
-		DebugStr((ConstStr255Param) #cond " goto " #handler); \
-		{                                                     \
-			action;                                           \
-		}                                                     \
-		goto handler;                                         \
-	} else                                                    \
+#define FailWithAction(cond, action, handler)                                                      \
+	if (cond) {                                                                                    \
+		DebugStr((ConstStr255Param) #cond " goto " #handler);                                      \
+		{                                                                                          \
+			action;                                                                                \
+		}                                                                                          \
+		goto handler;                                                                              \
+	} else                                                                                         \
 	0
 #else
-#define FailWithAction(cond, action, handler) \
-	if (cond) {                               \
-		{                                     \
-			action;                           \
-		}                                     \
-		goto handler;                         \
-	} else                                    \
+#define FailWithAction(cond, action, handler)                                                      \
+	if (cond) {                                                                                    \
+		{                                                                                          \
+			action;                                                                                \
+		}                                                                                          \
+		goto handler;                                                                              \
+	} else                                                                                         \
 	0
 #endif
 
@@ -639,7 +642,8 @@ void TLevelWriter3gp::saveSoundTrack(TSoundTrack *st)
 	if ((err = GetMoviesError() != noErr))
 		throw TImageException(getFilePath(), "can't create Data Ref");
 
-	myMedia = NewTrackMedia(theTrack, SoundMediaType, st->getSampleRate(), m_soundDataRef, HandleDataHandlerSubType); //track->rate >> 16
+	myMedia = NewTrackMedia(theTrack, SoundMediaType, st->getSampleRate(), m_soundDataRef,
+							HandleDataHandlerSubType); // track->rate >> 16
 
 	myErr = GetMoviesError();
 	if (myErr != noErr)
@@ -662,9 +666,8 @@ void TLevelWriter3gp::saveSoundTrack(TSoundTrack *st)
 	sourceInfo.buffer = (unsigned char *)st->getRawData();
 	sourceInfo.reserved = 0x0;
 
-	destInfo.flags = kNoSampleRateConversion | kNoSampleSizeConversion |
-					 kNoSampleFormatConversion | kNoChannelConversion |
-					 kNoDecompression | kNoVolumeConversion |
+	destInfo.flags = kNoSampleRateConversion | kNoSampleSizeConversion | kNoSampleFormatConversion |
+					 kNoChannelConversion | kNoDecompression | kNoVolumeConversion |
 					 kNoRealtimeProcessing;
 
 	destInfo.format = k16BitNativeEndianFormat;
@@ -682,7 +685,8 @@ void TLevelWriter3gp::saveSoundTrack(TSoundTrack *st)
 	if (myErr != noErr)
 		throw TImageException(m_path, "error getting audio converter info");
 
-	myErr = GetCompressionInfo(fixedCompression, sourceInfo.format, sourceInfo.numChannels, sourceInfo.sampleSize, &compressionInfo);
+	myErr = GetCompressionInfo(fixedCompression, sourceInfo.format, sourceInfo.numChannels,
+							   sourceInfo.sampleSize, &compressionInfo);
 	if (myErr != noErr)
 		throw TImageException(m_path, "error getting audio compression info");
 	FailIf(myErr != noErr, ConverterErr);
@@ -696,7 +700,8 @@ void TLevelWriter3gp::saveSoundTrack(TSoundTrack *st)
 	//////////
 
 	// use the SoundDescription format 1 because it adds fields for data size information
-	// and is required by AddSoundDescriptionExtension if an extension is required for the compression format
+	// and is required by AddSoundDescriptionExtension if an extension is required for the
+	// compression format
 
 	mySampleDesc = (SoundDescriptionV1Handle)NewHandleClear(sizeof(SoundDescriptionV1));
 	FailWithAction(myErr != noErr, myErr = MemError(), Exit);
@@ -725,14 +730,10 @@ void TLevelWriter3gp::saveSoundTrack(TSoundTrack *st)
 	//
 	//////////
 
-	myErr = AddMediaSample(myMedia, myDestHandle,
-						   0,
-						   destInfo.sampleCount * compressionInfo.bytesPerFrame,
-						   1,
+	myErr = AddMediaSample(myMedia, myDestHandle, 0,
+						   destInfo.sampleCount * compressionInfo.bytesPerFrame, 1,
 						   (SampleDescriptionHandle)mySampleDesc,
-						   destInfo.sampleCount * compressionInfo.samplesPerPacket,
-						   0,
-						   NULL);
+						   destInfo.sampleCount * compressionInfo.samplesPerPacket, 0, NULL);
 
 	if (myErr != noErr)
 		throw TImageException(m_path, "error adding audio samples");
@@ -796,8 +797,8 @@ if (m_gworld)
 		} // throw TImageException(getFilePath(), "can't end edit media");
 
 	if (m_videoTrack)
-		if ((err = InsertMediaIntoTrack(m_videoTrack, 0, 0,
-										GetMediaDuration(m_videoMedia), fixed1))) {
+		if ((err = InsertMediaIntoTrack(m_videoTrack, 0, 0, GetMediaDuration(m_videoMedia),
+										fixed1))) {
 		} // throw TImageException(getFilePath(), "can't insert media into track");
 
 	short resId = movieInDataForkResID;
@@ -805,24 +806,23 @@ if (m_gworld)
 		FSSpec fspec;
 		long myFlags = 0L;
 		OSErr myErr = noErr;
-		//UCHAR myCancelled = FALSE;
+		// UCHAR myCancelled = FALSE;
 
 		const char *pStr = toString(m_path.getWideString()).c_str();
 		getFSSpecFromPosixPath(pStr, &fspec, true);
 
 		myFlags = createMovieFileDeleteCurFile; // |
-												//movieFileSpecValid | movieToFileOnlyExport;
+		// movieFileSpecValid | movieToFileOnlyExport;
 
-		myErr = ConvertMovieToFile(
-			m_movie,				// the movie to convert
-			NULL,					// all tracks in the movie
-			&fspec,					// the output file
-			'3gpp',					// the output file type
-			FOUR_CHAR_CODE('TVOD'), // the output file creator
-			smSystemScript,			// the script
-			&resId,					// no resource ID to be returned
-			myFlags,				// export flags
-			m_myExporter);			// no specific exp
+		myErr = ConvertMovieToFile(m_movie,				   // the movie to convert
+								   NULL,				   // all tracks in the movie
+								   &fspec,				   // the output file
+								   '3gpp',				   // the output file type
+								   FOUR_CHAR_CODE('TVOD'), // the output file creator
+								   smSystemScript,		   // the script
+								   &resId,				   // no resource ID to be returned
+								   myFlags,				   // export flags
+								   m_myExporter);		   // no specific exp
 	}
 
 	DisposeHandle(m_hMovieData);
@@ -877,15 +877,14 @@ TLevelReader3gp::TLevelReader3gp(const TFilePath &path)
 
 	m_resId = 0;
 	Str255 name;
-	err = NewMovieFromFile(&m_movie, m_refNum, &m_resId,
-						   name, fsRdPerm, &dataRefWasChanged);
+	err = NewMovieFromFile(&m_movie, m_refNum, &m_resId, name, fsRdPerm, &dataRefWasChanged);
 
 	int numTracks = GetMovieTrackCount(m_movie);
 	assert(numTracks == 1 || numTracks == 2);
 
 	m_track = GetMovieIndTrackType(m_movie, 1, VideoMediaType, movieTrackMediaType);
 
-	//m_track=GetMovieTrack(m_movie,numTracks);
+	// m_track=GetMovieTrack(m_movie,numTracks);
 
 	ImageDescriptionHandle imageH;
 	imageH = (ImageDescriptionHandle)NewHandleClear(sizeof(ImageDescription));
@@ -932,8 +931,8 @@ TLevelReader3gp::~TLevelReader3gp()
 		CloseMovieFile(m_refNum);
 	if (m_movie)
 		DisposeMovie(m_movie);
-	//ExitMovies();
-	//TerminateQTML();
+	// ExitMovies();
+	// TerminateQTML();
 }
 
 //------------------------------------------------
@@ -948,10 +947,11 @@ TLevelP TLevelReader3gp::loadInfo()
 	TimeValue nextTime, currentTime;
 	currentTime = 0;
 	nextTime = 0;
-	//per il primo
+	// per il primo
 	int f = 1;
 	// io vorrei fare '|', ma sul manuale c'e' scritto '+'
-	GetMovieNextInterestingTime(m_movie, nextTimeMediaSample + nextTimeEdgeOK, 1, &mediaType, currentTime, 0, &nextTime, 0);
+	GetMovieNextInterestingTime(m_movie, nextTimeMediaSample + nextTimeEdgeOK, 1, &mediaType,
+								currentTime, 0, &nextTime, 0);
 	if (nextTime != -1) {
 		TFrameId frame(f);
 		level->setFrame(frame, TImageP());
@@ -960,7 +960,8 @@ TLevelP TLevelReader3gp::loadInfo()
 	}
 	currentTime = nextTime;
 	while (nextTime != -1) {
-		GetMovieNextInterestingTime(m_movie, nextTimeMediaSample, 1, &mediaType, currentTime, 0, &nextTime, 0);
+		GetMovieNextInterestingTime(m_movie, nextTimeMediaSample, 1, &mediaType, currentTime, 0,
+									&nextTime, 0);
 		if (nextTime != -1) {
 			TFrameId frame(f);
 			level->setFrame(frame, TImageP());
@@ -998,7 +999,7 @@ inline void setMatteAndYMirror(const TRaster32P &ras)
 	ras->lock();
 	TPixel32 *upRow = ras->pixels();
 	TPixel32 *dwRow = ras->pixels(ras->getLy() - 1);
-	int hLy = (int)(ras->getLy() / 2. + 0.5); //piccola pessimizzazione...
+	int hLy = (int)(ras->getLy() / 2. + 0.5); // piccola pessimizzazione...
 	int wrap = ras->getWrap();
 	int lx = ras->getLx();
 	TPixel32 *upPix = 0;
@@ -1023,7 +1024,8 @@ inline void setMatteAndYMirror(const TRaster32P &ras)
 
 //------------------------------------------------
 
-void TLevelReader3gp::load(const TRasterP &rasP, int frameIndex, const TPoint &pos, int shrinkX, int shrinkY)
+void TLevelReader3gp::load(const TRasterP &rasP, int frameIndex, const TPoint &pos, int shrinkX,
+						   int shrinkY)
 {
 	TRaster32P ras = rasP;
 
@@ -1048,9 +1050,8 @@ void TLevelReader3gp::load(const TRasterP &rasP, int frameIndex, const TPoint &p
 		OSType pixelFormat = k32ARGBPixelFormat;
 #endif
 
-		err = QTNewGWorldFromPtr(
-			&offscreenGWorld, pixelFormat,
-			&rect, 0, 0, 0, ras->getRawData(), ras->getWrap() * 4);
+		err = QTNewGWorldFromPtr(&offscreenGWorld, pixelFormat, &rect, 0, 0, 0, ras->getRawData(),
+								 ras->getWrap() * 4);
 
 		if (err != noErr) {
 			m_IOError = QTUnableToCreateResource;

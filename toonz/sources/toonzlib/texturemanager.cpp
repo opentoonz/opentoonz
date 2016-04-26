@@ -6,7 +6,7 @@
 
 //==============================================================================
 //
-//TextureManager
+// TextureManager
 //
 //==============================================================================
 
@@ -38,9 +38,7 @@ TDimensionI TextureManager::getMaxSize(bool isRGBM)
 						 texLx, // size width
 						 texLy, // height
 						 0,		// size of a border
-						 fmt,
-						 type,
-						 0);
+						 fmt, type, 0);
 			glGetTexLevelParameteriv(GL_PROXY_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &outX);
 			glGetTexLevelParameteriv(GL_PROXY_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &outY);
 
@@ -56,7 +54,9 @@ TDimensionI TextureManager::getMaxSize(bool isRGBM)
 
 			if (outX && outY) {
 				std::ostrstream os;
-				os << "texture size = " << outX << "x" << outY << " fmt " << intFmt << " cmpt# " << cmpt << " " << rSize << "," << gSize << "," << bSize << "," << aSize << '\n' << '\0';
+				os << "texture size = " << outX << "x" << outY << " fmt " << intFmt << " cmpt# "
+				   << cmpt << " " << rSize << "," << gSize << "," << bSize << "," << aSize << '\n'
+				   << '\0';
 				TSystem::outputDebug(os.str());
 				os.freeze(false);
 			}
@@ -126,23 +126,19 @@ TDimension TextureManager::selectTexture(TDimension reqSize, bool isRGBM)
 	GLenum fmt, type;
 	getFmtAndType(isRGBM, fmt, type);
 
-	glTexImage2D(
-		GL_TEXTURE_2D, // target (is a 2D texture)
-		0,			   // is one level only
-		4,			   //  number of component of a pixel
-		lx,			   // size width
-		ly,			   //      height
-		0,			   // size of a border
-		fmt,
-		type,
-		0);
+	glTexImage2D(GL_TEXTURE_2D, // target (is a 2D texture)
+				 0,				// is one level only
+				 4,				//  number of component of a pixel
+				 lx,			// size width
+				 ly,			//      height
+				 0,				// size of a border
+				 fmt, type, 0);
 	return TDimension(lx, ly);
 }
 
-UCHAR *m_transpRow; //comune a RGBM e GR8...
+UCHAR *m_transpRow; // comune a RGBM e GR8...
 
-TextureManager::TextureManager()
-	: m_textureSize(0, 0), m_isRGBM(true)
+TextureManager::TextureManager() : m_textureSize(0, 0), m_isRGBM(true)
 {
 }
 

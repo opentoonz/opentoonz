@@ -8,7 +8,10 @@ static const TRenderSettings &restore_render_settings(const toonz_rendering_sett
 	return *reinterpret_cast<const TRenderSettings *>(src->context);
 }
 
-int fxnode_compute_to_tile(toonz_fxnode_handle_t fxnode, const toonz_rendering_setting_t *rendering_setting, double frame, const toonz_rect_t *rect, toonz_tile_handle_t intile, toonz_tile_handle_t tile)
+int fxnode_compute_to_tile(toonz_fxnode_handle_t fxnode,
+						   const toonz_rendering_setting_t *rendering_setting, double frame,
+						   const toonz_rect_t *rect, toonz_tile_handle_t intile,
+						   toonz_tile_handle_t tile)
 {
 	if (!fxnode || !rendering_setting || !rect || !tile)
 		return TOONZ_ERROR_NULL; // inval
@@ -30,7 +33,9 @@ int fxnode_compute_to_tile(toonz_fxnode_handle_t fxnode, const toonz_rendering_s
 }
 
 struct fxnode_dipatch {
-	int operator()(toonz_fxnode_handle_t fxnode, const toonz_rendering_setting_t *rs, toonz_rect_t *rect, int *ret, std::function<int(TRasterFx *, const TRenderSettings &, TRectD &)> f)
+	int operator()(toonz_fxnode_handle_t fxnode, const toonz_rendering_setting_t *rs,
+				   toonz_rect_t *rect, int *ret,
+				   std::function<int(TRasterFx *, const TRenderSettings &, TRectD &)> f)
 	{
 		using namespace plugin::utils;
 		TRasterFx *trasterfx = dynamic_cast<TRasterFx *>(reinterpret_cast<TFx *>(fxnode));
@@ -44,15 +49,19 @@ struct fxnode_dipatch {
 	}
 };
 
-int fxnode_get_bbox(toonz_fxnode_handle_t fxnode, const toonz_rendering_setting_t *rendering_setting, double frame, toonz_rect_t *iorect, int *ret)
+int fxnode_get_bbox(toonz_fxnode_handle_t fxnode,
+					const toonz_rendering_setting_t *rendering_setting, double frame,
+					toonz_rect_t *iorect, int *ret)
 {
 	fxnode_dipatch disp;
-	return disp(fxnode, rendering_setting, iorect, ret, [&](TRasterFx *fx, const TRenderSettings &rs, TRectD &rect) {
-		return fx->getBBox(frame, rect, rs);
-	});
+	return disp(fxnode, rendering_setting, iorect, ret,
+				[&](TRasterFx *fx, const TRenderSettings &rs, TRectD &rect) {
+					return fx->getBBox(frame, rect, rs);
+				});
 }
 
-int fxnode_can_handle(toonz_fxnode_handle_t fxnode, const toonz_rendering_setting_t *rendering_setting, double frame, int *ret)
+int fxnode_can_handle(toonz_fxnode_handle_t fxnode,
+					  const toonz_rendering_setting_t *rendering_setting, double frame, int *ret)
 {
 	TRasterFx *trasterfx = dynamic_cast<TRasterFx *>(reinterpret_cast<TFx *>(fxnode));
 	if (!trasterfx) {

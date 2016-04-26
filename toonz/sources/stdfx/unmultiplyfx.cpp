@@ -11,10 +11,8 @@ TPixel32 unmultiply(const TPixel32 &pix)
 	if (!pix.m)
 		return pix;
 	double depremult = 255.0 / pix.m;
-	return TPixel32((UCHAR)(pix.r * depremult),
-					(UCHAR)(pix.g * depremult),
-					(UCHAR)(pix.b * depremult),
-					pix.m);
+	return TPixel32((UCHAR)(pix.r * depremult), (UCHAR)(pix.g * depremult),
+					(UCHAR)(pix.b * depremult), pix.m);
 }
 }
 
@@ -25,7 +23,7 @@ class UnmultiplyFx : public TStandardRasterFx
 	FX_PLUGIN_DECLARATION(UnmultiplyFx)
 	TRasterFxPort m_input;
 
-public:
+  public:
 	UnmultiplyFx() { addInputPort("Source", m_input); }
 	~UnmultiplyFx(){};
 
@@ -45,8 +43,7 @@ public:
 
 //------------------------------------------------------------------------------
 
-void UnmultiplyFx::doCompute(TTile &tile, double frame,
-							 const TRenderSettings &ri)
+void UnmultiplyFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 {
 	if (!m_input.isConnected())
 		return;

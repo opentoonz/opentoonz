@@ -30,7 +30,7 @@ struct PN_Params {
 	float p_size;	  /* 世代間のサイズ比 */
 	float p_offset;	/* 世代間のオフセット比 */
 	float2 eyeLevel;   /* 視点位置 */
-	int drawLevel;	 /* 描画範囲の下からの距離 描画を開始するスキャンライン位置 */
+	int drawLevel; /* 描画範囲の下からの距離 描画を開始するスキャンライン位置 */
 	bool alp_rend_sw;
 	float waveHeight; /* warpHV / フレネル反射のときのみ使う */
 	float fy_2;
@@ -49,14 +49,14 @@ class Iwa_PNPerspectiveFx : public TStandardZeraryFx
 	FX_PLUGIN_DECLARATION(Iwa_PNPerspectiveFx)
 
 	TIntEnumParamP m_renderMode; /* 描画モード
-											    - 強度
-											    - 強度（リサンプルなし）
-											    - WarpHV用オフセット
-											    - フレネル反射 */
+												- 強度
+												- 強度（リサンプルなし）
+												- WarpHV用オフセット
+												- フレネル反射 */
 
 	TIntEnumParamP m_noiseType; /* ノイズのタイプ
-											    - Perlin Noise
-											    - Simplex Noise */
+												- Perlin Noise
+												- Simplex Noise */
 
 	TDoubleParamP m_size;	  /* ベースとなる大きさ */
 	TDoubleParamP m_evolution; /* 展開 */
@@ -77,49 +77,31 @@ class Iwa_PNPerspectiveFx : public TStandardZeraryFx
 
 	/* 出力結果をChannel値に変換して格納 */
 	template <typename RASTER, typename PIXEL>
-	void setOutputRaster(float4 *srcMem,
-						 const RASTER dstRas,
-						 TDimensionI dim,
-						 int drawLevel,
+	void setOutputRaster(float4 *srcMem, const RASTER dstRas, TDimensionI dim, int drawLevel,
 						 const bool alp_rend_sw);
 
 	/* PerlinNoiseのパラメータを取得 */
-	void getPNParameters(TTile &tile,
-						 double frame,
-						 const TRenderSettings &settings,
-						 PN_Params &params,
-						 TDimensionI &dimOut);
+	void getPNParameters(TTile &tile, double frame, const TRenderSettings &settings,
+						 PN_Params &params, TDimensionI &dimOut);
 
 	/* 通常のノイズのCPU計算 */
-	void calcPerinNoise_CPU(float4 *out_host,
-							TDimensionI &dimOut,
-							PN_Params &p,
-							bool doResample);
+	void calcPerinNoise_CPU(float4 *out_host, TDimensionI &dimOut, PN_Params &p, bool doResample);
 
 	/* WarpHVモード、Fresnel反射モード */
-	void calcPNNormal_CPU(float4 *out_host,
-						  TDimensionI &dimOut,
-						  PN_Params &p,
+	void calcPNNormal_CPU(float4 *out_host, TDimensionI &dimOut, PN_Params &p,
 						  bool isSubWave = false);
 
-public:
+  public:
 	Iwa_PNPerspectiveFx();
 
-	bool doGetBBox(
-		double frame, TRectD &bBox, const TRenderSettings &info);
+	bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info);
 
-	bool canHandle(
-		const TRenderSettings &info, double frame);
+	bool canHandle(const TRenderSettings &info, double frame);
 
-	void doCompute(
-		TTile &tile, double frame, const TRenderSettings &rend_sets);
+	void doCompute(TTile &tile, double frame, const TRenderSettings &rend_sets);
 
-	void doCompute_CPU(TTile &tile,
-					   double frame,
-					   const TRenderSettings &settings,
-					   float4 *out_host,
-					   TDimensionI &dimOut,
-					   PN_Params &pnParams);
+	void doCompute_CPU(TTile &tile, double frame, const TRenderSettings &settings, float4 *out_host,
+					   TDimensionI &dimOut, PN_Params &pnParams);
 
 	void getParamUIs(TParamUIConcept *&concepts, int &length);
 };

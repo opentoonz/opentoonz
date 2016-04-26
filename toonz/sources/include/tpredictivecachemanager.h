@@ -29,15 +29,14 @@ The TPredictiveCacheManager is the TFxCacheManagerDelegate used to cache interme
 render results due to predictive analysis of the scene schematic.
 */
 
-class DVAPI TPredictiveCacheManager
-	: public TFxCacheManagerDelegate
+class DVAPI TPredictiveCacheManager : public TFxCacheManagerDelegate
 {
 	T_RENDER_RESOURCE_MANAGER
 
 	class Imp;
 	std::unique_ptr<Imp> m_imp;
 
-public:
+  public:
 	TPredictiveCacheManager();
 	~TPredictiveCacheManager();
 
@@ -49,13 +48,11 @@ public:
 	void setMaxTileSize(int maxTileSize);
 	void setBPP(int bpp);
 
-	void getResource(
-		TCacheResourceP &resource, const std::string &alias,
-		const TFxP &fx, double frame, const TRenderSettings &rs,
-		ResourceDeclaration *resData);
+	void getResource(TCacheResourceP &resource, const std::string &alias, const TFxP &fx,
+					 double frame, const TRenderSettings &rs, ResourceDeclaration *resData);
 
 	void onRenderStatusStart(int renderStatus);
 	void onRenderStatusEnd(int renderStatus);
 };
 
-#endif //TPREDICTIVECACHEMANAGER_H
+#endif // TPREDICTIVECACHEMANAGER_H

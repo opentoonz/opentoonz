@@ -152,16 +152,17 @@ ScriptConsolePanel::ScriptConsolePanel(QWidget *parent, Qt::WFlags flags)
 	def(teng, "view", viewFun);
 	def(teng, "dummy", dummyFun);
 
-	// teng->getQScriptEngine()->evaluate("console={version:'1.0'};function version() {print('Toonz '+toonz.version+'\nscript '+script.version);};");
+	// teng->getQScriptEngine()->evaluate("console={version:'1.0'};function version() {print('Toonz
+	// '+toonz.version+'\nscript '+script.version);};");
 
 	/*
   QFile initFile(":/Resources/init.js");
   if (initFile.open(QIODevice::ReadOnly))
   {
-    QTextStream stream(&initFile);
-    QString contents = stream.readAll();
-    initFile.close();
-    teng->getQScriptEngine()->evaluate(contents, "init.js");
+	QTextStream stream(&initFile);
+	QString contents = stream.readAll();
+	initFile.close();
+	teng->getQScriptEngine()->evaluate(contents, "init.js");
   }
   */
 

@@ -68,7 +68,8 @@ int modifiers = 0;
 
 //-----------------------------------------------------------------------------
 
-void initToonzEvent(TMouseEvent &toonzEvent, QMouseEvent *event, int widgetHeight, double pressure, bool isTablet, bool isClick)
+void initToonzEvent(TMouseEvent &toonzEvent, QMouseEvent *event, int widgetHeight, double pressure,
+					bool isTablet, bool isClick)
 {
 	toonzEvent.m_pos = TPoint(event->pos().x(), widgetHeight - 1 - event->pos().y());
 	toonzEvent.m_pressure = isTablet ? int(255 * pressure) : 255;
@@ -103,7 +104,7 @@ class SceneViewerShortcutReceiver
 {
 	SceneViewer *m_viewer;
 
-public:
+  public:
 	SceneViewerShortcutReceiver(SceneViewer *viewer) : m_viewer(viewer) {}
 	~SceneViewerShortcutReceiver() {}
 
@@ -122,7 +123,8 @@ public:
 		}
 
 		if (event->key() == cManager->getKeyFromId(MI_SavePreviewedFrames)) {
-			Previewer::instance(m_viewer->getPreviewMode() == SceneViewer::SUBCAMERA_PREVIEW)->saveRenderedFrames();
+			Previewer::instance(m_viewer->getPreviewMode() == SceneViewer::SUBCAMERA_PREVIEW)
+				->saveRenderedFrames();
 			return true;
 		}
 
@@ -144,7 +146,8 @@ void SceneViewer::onButtonPressed(FlipConsole::EGadget button)
 		CASE FlipConsole::eSaveImg:
 		{
 			if (m_previewMode == NO_PREVIEW) {
-				DVGui::warning(QObject::tr("It is not possible to save images in camera stand view."));
+				DVGui::warning(
+					QObject::tr("It is not possible to save images in camera stand view."));
 				return;
 			}
 			TApp *app = TApp::instance();
@@ -161,7 +164,8 @@ void SceneViewer::onButtonPressed(FlipConsole::EGadget button)
 			TImageCache::instance()->add(QString("TnzCompareImg"), TRasterImageP(ras->clone()));
 		}
 
-		CASE FlipConsole::eSave : Previewer::instance(m_previewMode == SUBCAMERA_PREVIEW)->saveRenderedFrames();
+		CASE FlipConsole::eSave : Previewer::instance(m_previewMode == SUBCAMERA_PREVIEW)
+									  ->saveRenderedFrames();
 		CASE FlipConsole::eHisto:
 		{
 			QAction *action = CommandManager::instance()->getAction(MI_Histogram);
@@ -273,7 +277,8 @@ void SceneViewer::mouseMoveEvent(QMouseEvent *event)
 			return;
 	}
 
-	// if the "compare with snapshot" mode is activated, change the mouse cursor on the border handle
+	// if the "compare with snapshot" mode is activated, change the mouse cursor on the border
+	// handle
 	if (m_visualSettings.m_doCompare) {
 		if (abs(curPos.x() - width() * m_compareSettings.m_compareX) < 20) {
 			cursorSet = true;
@@ -323,7 +328,7 @@ void SceneViewer::mouseMoveEvent(QMouseEvent *event)
 		Qt::MouseButtons mousebuttons;
 		mousebuttons = event->buttons();
 		if (mousebuttons & Qt::MidButton) {
-			//panning
+			// panning
 			QPoint p = curPos - m_pos;
 			if (m_pos == QPoint(0, 0) && p.manhattanLength() > 300)
 				return;
@@ -348,10 +353,11 @@ void SceneViewer::mouseMoveEvent(QMouseEvent *event)
 			pos.y /= m_dpiScale.y;
 		}
 
-		//qDebug() << "mouseMoveEvent. "  << (m_tabletEvent?"tablet":"mouse")
-		//         << " pressure=" << m_pressure << " mouseButton=" << m_mouseButton << " buttonClicked=" << m_buttonClicked;
+		// qDebug() << "mouseMoveEvent. "  << (m_tabletEvent?"tablet":"mouse")
+		//         << " pressure=" << m_pressure << " mouseButton=" << m_mouseButton << "
+		//         buttonClicked=" << m_buttonClicked;
 		if ((m_tabletEvent && m_pressure > 0) || m_mouseButton == Qt::LeftButton) {
-			//sometimes the mousePressedEvent is postponed to a wrong  mouse move event!
+			// sometimes the mousePressedEvent is postponed to a wrong  mouse move event!
 			if (m_buttonClicked)
 				tool->leftButtonDrag(pos, toonzEvent);
 		} else if (m_pressure == 0) {
@@ -365,7 +371,7 @@ void SceneViewer::mouseMoveEvent(QMouseEvent *event)
 		if ((event->buttons() & Qt::MidButton) == 0)
 			m_mouseButton = Qt::NoButton;
 		else
-			//panning
+			// panning
 			panQt(curPos - m_pos);
 		m_pos = curPos;
 		return;
@@ -567,7 +573,8 @@ bool SceneViewer::event(QEvent *e)
 	if (e->type() == QEvent::KeyRelease) {
 		if (!((QKeyEvent *)e)->isAutoRepeat()) {
 			QWidget *focusWidget = QApplication::focusWidget();
-			if (focusWidget == 0 || QString(focusWidget->metaObject()->className()) == "SceneViewer")
+			if (focusWidget == 0 ||
+				QString(focusWidget->metaObject()->className()) == "SceneViewer")
 				TApp::instance()->getCurrentTool()->restoreTool();
 		}
 	}
@@ -588,36 +595,36 @@ bool SceneViewer::event(QEvent *e)
   switch(e->type())
   {
   case QEvent::Enter:
-    qDebug() << "************************** Enter";
-    break;
+	qDebug() << "************************** Enter";
+	break;
   case QEvent::Leave:
-    qDebug() << "************************** Leave";
-    break;
+	qDebug() << "************************** Leave";
+	break;
 
   case QEvent::TabletPress:
-    qDebug() << "************************** TabletPress"  << m_pressure;
-    break;
+	qDebug() << "************************** TabletPress"  << m_pressure;
+	break;
   case QEvent::TabletMove:
-    qDebug() << "************************** TabletMove";
-    break;
+	qDebug() << "************************** TabletMove";
+	break;
   case QEvent::TabletRelease:
-    qDebug() << "************************** TabletRelease";
-    break;
+	qDebug() << "************************** TabletRelease";
+	break;
 
 
   case QEvent::MouseButtonPress:
-    qDebug() << "**************************MouseButtonPress"  << m_pressure << " " << m_tabletEvent;
-    break;
+	qDebug() << "**************************MouseButtonPress"  << m_pressure << " " << m_tabletEvent;
+	break;
   case QEvent::MouseMove:
-    qDebug() << "**************************MouseMove" <<  m_pressure;
-    break;
+	qDebug() << "**************************MouseMove" <<  m_pressure;
+	break;
   case QEvent::MouseButtonRelease:
-    qDebug() << "**************************MouseButtonRelease";
-    break;
+	qDebug() << "**************************MouseButtonRelease";
+	break;
 
   case QEvent::MouseButtonDblClick:
-    qDebug() << "============================== MouseButtonDblClick";
-    break;
+	qDebug() << "============================== MouseButtonDblClick";
+	break;
   }
   */
 
@@ -628,7 +635,7 @@ bool SceneViewer::event(QEvent *e)
 
 class ViewerZoomer : public ImageUtils::ShortcutZoomer
 {
-public:
+  public:
 	ViewerZoomer(SceneViewer *parent) : ShortcutZoomer(parent) {}
 
 	bool zoom(bool zoomin, bool resetZoom)
@@ -666,7 +673,8 @@ public:
 
 bool changeFrameSkippingHolds(QKeyEvent *e)
 {
-	if ((e->modifiers() & Qt::ShiftModifier) == 0 || e->key() != Qt::Key_Down && e->key() != Qt::Key_Up)
+	if ((e->modifiers() & Qt::ShiftModifier) == 0 ||
+		e->key() != Qt::Key_Down && e->key() != Qt::Key_Up)
 		return false;
 	TApp *app = TApp::instance();
 	TFrameHandle *fh = app->getCurrentFrame();
@@ -716,8 +724,7 @@ void SceneViewer::keyPressEvent(QKeyEvent *event)
 	if (changeFrameSkippingHolds(event)) {
 		return;
 	}
-	if ((event->modifiers() & Qt::ShiftModifier) &&
-		(key == Qt::Key_Down || key == Qt::Key_Up)) {
+	if ((event->modifiers() & Qt::ShiftModifier) && (key == Qt::Key_Down || key == Qt::Key_Up)) {
 	}
 
 	TTool *tool = TApp::instance()->getCurrentTool()->getTool();
@@ -744,9 +751,7 @@ void SceneViewer::keyPressEvent(QKeyEvent *event)
 	else if (key == Qt::Key_Alt || key == Qt::Key_AltGr)
 		modifiers |= Qt::ALT;
 
-	if (key == Qt::Key_Shift ||
-		key == Qt::Key_Control ||
-		key == Qt::Key_Alt ||
+	if (key == Qt::Key_Shift || key == Qt::Key_Control || key == Qt::Key_Alt ||
 		key == Qt::Key_AltGr) {
 		// quando l'utente preme shift/ctrl ecc. alcuni tool (es. pinch) devono
 		// cambiare subito la forma del cursore, senza aspettare il prossimo move
@@ -883,9 +888,7 @@ void SceneViewer::keyReleaseEvent(QKeyEvent *event)
 
 	int key = event->key();
 
-	if (key == Qt::Key_Shift ||
-		key == Qt::Key_Control ||
-		key == Qt::Key_Alt ||
+	if (key == Qt::Key_Shift || key == Qt::Key_Control || key == Qt::Key_Alt ||
 		key == Qt::Key_AltGr) {
 		if (key == Qt::Key_Shift)
 			modifiers &= ~Qt::ShiftModifier;
@@ -961,8 +964,8 @@ void SceneViewer::contextMenuEvent(QContextMenuEvent *e)
 	/* On windows the widget receive the release event before the menu
 	   is shown, on linux and osx the release event is lost, never
 	   received by the widget */
-	QMouseEvent fakeRelease(QEvent::MouseButtonRelease, e->pos(),
-		Qt::RightButton, Qt::NoButton, Qt::NoModifier);
+	QMouseEvent fakeRelease(QEvent::MouseButtonRelease, e->pos(), Qt::RightButton, Qt::NoButton,
+							Qt::NoModifier);
 
 	QApplication::instance()->sendEvent(this, &fakeRelease);
 #endif
@@ -984,7 +987,8 @@ void SceneViewer::contextMenuEvent(QContextMenuEvent *e)
 
 	menu->addLevelCommands(columnIndices);
 
-	ComboViewerPanel *cvp = qobject_cast<ComboViewerPanel *>(parentWidget()->parentWidget()->parentWidget());
+	ComboViewerPanel *cvp =
+		qobject_cast<ComboViewerPanel *>(parentWidget()->parentWidget()->parentWidget());
 	if (cvp) {
 		menu->addSeparator();
 		cvp->addShowHideContextMenu(menu);
@@ -1000,10 +1004,8 @@ void SceneViewer::inputMethodEvent(QInputMethodEvent *e)
 {
 	TTool *tool = TApp::instance()->getCurrentTool()->getTool();
 	if (tool && tool->isEnabled()) {
-		tool->onInputText(e->preeditString().toStdWString(),
-						  e->commitString().toStdWString(),
-						  e->replacementStart(),
-						  e->replacementLength());
+		tool->onInputText(e->preeditString().toStdWString(), e->commitString().toStdWString(),
+						  e->replacementStart(), e->replacementLength());
 	}
 }
 //-----------------------------------------------------------------------------

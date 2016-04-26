@@ -27,21 +27,21 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-#define WRAPPER_STD_METHODS(T)                                                \
-	static QScriptValue ctor(QScriptContext *context, QScriptEngine *engine); \
-	static QScriptValue toScriptValue(QScriptEngine *engine, T *const &in)    \
-	{                                                                         \
-		return engine->newQObject(in);                                        \
-	}                                                                         \
-	static void fromScriptValue(const QScriptValue &object, T *&out)          \
-	{                                                                         \
-		out = qobject_cast<T *>(object.toQObject());                          \
+#define WRAPPER_STD_METHODS(T)                                                                     \
+	static QScriptValue ctor(QScriptContext *context, QScriptEngine *engine);                      \
+	static QScriptValue toScriptValue(QScriptEngine *engine, T *const &in)                         \
+	{                                                                                              \
+		return engine->newQObject(in);                                                             \
+	}                                                                                              \
+	static void fromScriptValue(const QScriptValue &object, T *&out)                               \
+	{                                                                                              \
+		out = qobject_cast<T *>(object.toQObject());                                               \
 	}
 
-#define WRAPPER_STD_CTOR_IMPL(T)                                          \
-	QScriptValue T::ctor(QScriptContext *context, QScriptEngine *engine)  \
-	{                                                                     \
-		return engine->newQObject(new T(), QScriptEngine::AutoOwnership); \
+#define WRAPPER_STD_CTOR_IMPL(T)                                                                   \
+	QScriptValue T::ctor(QScriptContext *context, QScriptEngine *engine)                           \
+	{                                                                                              \
+		return engine->newQObject(new T(), QScriptEngine::AutoOwnership);                          \
 	}
 
 class TAffine;
@@ -55,7 +55,7 @@ namespace TScriptBinding
 class DVAPI Void : public QObject
 {
 	Q_OBJECT
-public:
+  public:
 	WRAPPER_STD_METHODS(Void)
 };
 
@@ -66,7 +66,7 @@ class DVAPI Wrapper : public QObject, protected QScriptable
 	static int m_count;
 	int m_id;
 
-public:
+  public:
 	Wrapper();
 	virtual ~Wrapper();
 
@@ -78,19 +78,20 @@ public:
 
 	void warning(const QString &msg);
 
-	template <class T>
-	QScriptValue create(QScriptEngine *engine) { return create(engine, static_cast<T *>(this)); }
-
-	template <class T>
-	static QScriptValue create(QScriptEngine *engine, T *obj)
+	template <class T> QScriptValue create(QScriptEngine *engine)
 	{
-		return engine->newQObject(obj, QScriptEngine::AutoOwnership,
-								  QScriptEngine::ExcludeSuperClassContents | QScriptEngine::ExcludeChildObjects);
+		return create(engine, static_cast<T *>(this));
 	}
 
-protected:
-	template <class T>
-	QScriptValue create(T *obj) { return create(engine(), obj); }
+	template <class T> static QScriptValue create(QScriptEngine *engine, T *obj)
+	{
+		return engine->newQObject(obj, QScriptEngine::AutoOwnership,
+								  QScriptEngine::ExcludeSuperClassContents |
+									  QScriptEngine::ExcludeChildObjects);
+	}
+
+  protected:
+	template <class T> QScriptValue create(T *obj) { return create(engine(), obj); }
 };
 
 void bindAll(QScriptEngine &engine);
@@ -98,7 +99,8 @@ void bindAll(QScriptEngine &engine);
 // helper functions
 
 // check the number of arguments: if it is out of range returns an error object
-QScriptValue checkArgumentCount(QScriptContext *context, const QString &name, int minCount, int maxCount);
+QScriptValue checkArgumentCount(QScriptContext *context, const QString &name, int minCount,
+								int maxCount);
 QScriptValue checkArgumentCount(QScriptContext *context, const QString &name, int count);
 
 // check the color. if colorName is not valid then an error is returned

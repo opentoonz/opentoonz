@@ -12,7 +12,7 @@
 
 class BaseRaylitFx : public TStandardRasterFx
 {
-protected:
+  protected:
 	TRasterFxPort m_input;
 	TPointParamP m_p;
 	TDoubleParamP m_z;
@@ -21,9 +21,10 @@ protected:
 	TDoubleParamP m_smoothness;
 	TBoolParamP m_includeInput;
 
-public:
+  public:
 	BaseRaylitFx()
-		: m_p(TPointD(0, 0)), m_z(300.0), m_intensity(60), m_decay(1.0), m_smoothness(100), m_includeInput(false)
+		: m_p(TPointD(0, 0)), m_z(300.0), m_intensity(60), m_decay(1.0), m_smoothness(100),
+		  m_includeInput(false)
 	{
 		m_p->getX()->setMeasureName("fxLength");
 		m_p->getY()->setMeasureName("fxLength");
@@ -74,9 +75,7 @@ bool BaseRaylitFx::doGetBBox(double frame, TRectD &bBox, const TRenderSettings &
 
 //-------------------------------------------------------------------
 
-void BaseRaylitFx::doDryCompute(TRectD &rect,
-								double frame,
-								const TRenderSettings &ri)
+void BaseRaylitFx::doDryCompute(TRectD &rect, double frame, const TRenderSettings &ri)
 {
 	if (!m_input.isConnected())
 		return;
@@ -93,7 +92,8 @@ void BaseRaylitFx::doDryCompute(TRectD &rect,
 
 //---------------------------------------------------------------------------
 
-int BaseRaylitFx::getMemoryRequirement(const TRectD &rect, double frame, const TRenderSettings &info)
+int BaseRaylitFx::getMemoryRequirement(const TRectD &rect, double frame,
+									   const TRenderSettings &info)
 {
 	TRectD bboxIn;
 	m_input->getBBox(frame, bboxIn, info);
@@ -112,13 +112,12 @@ class RaylitFx : public BaseRaylitFx
 {
 	FX_PLUGIN_DECLARATION(RaylitFx)
 
-protected:
+  protected:
 	TPixelParamP m_color;
 	TBoolParamP m_invert;
 
-public:
-	RaylitFx()
-		: m_color(TPixel(255, 80, 0)), m_invert(false)
+  public:
+	RaylitFx() : m_color(TPixel(255, 80, 0)), m_invert(false)
 	{
 		bindParam(this, "color", m_color);
 		bindParam(this, "invert", m_invert);
@@ -141,7 +140,8 @@ void RaylitFx::doCompute(TTile &tileOut, double frame, const TRenderSettings &ri
 
 	TPointD p(ri.m_affine * m_p->getValue(frame));
 
-	TRectD rectIn(tileOut.m_pos, TDimensionD(tileOut.getRaster()->getLx(), tileOut.getRaster()->getLy()));
+	TRectD rectIn(tileOut.m_pos,
+				  TDimensionD(tileOut.getRaster()->getLx(), tileOut.getRaster()->getLy()));
 	TRectD bboxIn;
 	m_input->getBBox(frame, bboxIn, ri);
 	if (bboxIn == TConsts::infiniteRectD)
@@ -152,8 +152,8 @@ void RaylitFx::doCompute(TTile &tileOut, double frame, const TRenderSettings &ri
 
 		TTile tileIn;
 		TDimension sizeIn(tmax(tceil(bboxIn.getLx()), 1), tmax(tceil(bboxIn.getLy()), 1));
-		m_input->allocateAndCompute(tileIn, bboxIn.getP00(), sizeIn,
-									tileOut.getRaster(), frame, ri);
+		m_input->allocateAndCompute(tileIn, bboxIn.getP00(), sizeIn, tileOut.getRaster(), frame,
+									ri);
 
 		TRop::RaylitParams params;
 
@@ -183,7 +183,7 @@ class ColorRaylitFx : public BaseRaylitFx
 {
 	FX_PLUGIN_DECLARATION(ColorRaylitFx)
 
-public:
+  public:
 	ColorRaylitFx() : BaseRaylitFx() {}
 
 	void doCompute(TTile &tile, double frame, const TRenderSettings &);
@@ -201,7 +201,8 @@ void ColorRaylitFx::doCompute(TTile &tileOut, double frame, const TRenderSetting
 
 	TPointD p(ri.m_affine * m_p->getValue(frame));
 
-	TRectD rectIn(tileOut.m_pos, TDimensionD(tileOut.getRaster()->getLx(), tileOut.getRaster()->getLy()));
+	TRectD rectIn(tileOut.m_pos,
+				  TDimensionD(tileOut.getRaster()->getLx(), tileOut.getRaster()->getLy()));
 	TRectD bboxIn;
 	m_input->getBBox(frame, bboxIn, ri);
 	if (bboxIn == TConsts::infiniteRectD)
@@ -212,8 +213,8 @@ void ColorRaylitFx::doCompute(TTile &tileOut, double frame, const TRenderSetting
 
 		TTile tileIn;
 		TDimension sizeIn(tmax(tceil(bboxIn.getLx()), 1), tmax(tceil(bboxIn.getLy()), 1));
-		m_input->allocateAndCompute(tileIn, bboxIn.getP00(), sizeIn,
-									tileOut.getRaster(), frame, ri);
+		m_input->allocateAndCompute(tileIn, bboxIn.getP00(), sizeIn, tileOut.getRaster(), frame,
+									ri);
 
 		TRop::RaylitParams params;
 

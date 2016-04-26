@@ -41,7 +41,7 @@ bool Sthutdown = false;
 
 class TTcpIpServerImp
 {
-public:
+  public:
 	TTcpIpServerImp(int port) : m_port(port), m_s(-1), m_server(0) {}
 
 	int readData(int sock, QString &data);
@@ -81,8 +81,7 @@ int TTcpIpServerImp::readData(int sock, QString &data)
 		return 0;
 
 #ifdef TRACE
-	cout << buff << endl
-		 << endl;
+	cout << buff << endl << endl;
 #endif
 
 	string aa(buff);
@@ -122,14 +121,13 @@ int TTcpIpServerImp::readData(int sock, QString &data)
 		} else if (cnt < (int)sizeof(buff)) {
 			buff[cnt] = '\0';
 			data += QString(buff);
-			//break;  // break out of loop
+			// break;  // break out of loop
 		} else {
 			data += QString(buff);
 		}
 
 #ifdef TRACE
-		cout << buff << endl
-			 << endl;
+		cout << buff << endl << endl;
 #endif
 
 		size -= cnt;
@@ -220,7 +218,7 @@ int TTcpIpServerImp::readData(int sock, string &data)
 			break; // break out of loop
 		} else if (cnt < sizeof(buff)) {
 			data += string(buff);
-			//break;  // break out of loop
+			// break;  // break out of loop
 		} else {
 			data += string(buff);
 		}
@@ -241,8 +239,7 @@ void TTcpIpServerImp::onReceive(int sock, const QString &data)
 
 //---------------------------------------------------------------------
 
-TTcpIpServer::TTcpIpServer(int port)
-	: m_imp(new TTcpIpServerImp(port))
+TTcpIpServer::TTcpIpServer(int port) : m_imp(new TTcpIpServerImp(port))
 {
 	m_imp->m_server = this;
 
@@ -288,9 +285,11 @@ static void shutdown_cb(int)
 
 class DataReader : public TThread::Runnable
 {
-public:
+  public:
 	DataReader(int clientSocket, std::shared_ptr<TTcpIpServerImp> serverImp)
-		: m_clientSocket(clientSocket), m_serverImp(std::move(serverImp)) {}
+		: m_clientSocket(clientSocket), m_serverImp(std::move(serverImp))
+	{
+	}
 
 	void run();
 
@@ -319,9 +318,11 @@ void DataReader::run()
 
 class DataReceiver : public TThread::Runnable
 {
-public:
+  public:
 	DataReceiver(int clientSocket, const QString &data, std::shared_ptr<TTcpIpServerImp> serverImp)
-		: m_clientSocket(clientSocket), m_data(data), m_serverImp(std::move(serverImp)) {}
+		: m_clientSocket(clientSocket), m_data(data), m_serverImp(std::move(serverImp))
+	{
+	}
 
 	void run();
 
@@ -366,7 +367,7 @@ void TTcpIpServer::run()
 				int ret = m_imp->readData(t, data);
 				if (ret != -1 && data != "") {
 					if (data == QString("shutdown")) {
-						//DebugBreak();
+						// DebugBreak();
 						Sthutdown = true;
 					} else {
 						// creo un nuovo thread per la gestione dei dati ricevuti

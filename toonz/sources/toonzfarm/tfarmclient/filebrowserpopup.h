@@ -10,21 +10,20 @@
 
 class TGenericFileBrowserPopupAction
 {
-public:
+  public:
 	virtual ~TGenericFileBrowserPopupAction() {}
 	virtual void sendCommand(const TFilePath &) = 0;
 };
 
 //-------------------------------------------------------------------
 
-template <class T>
-class TFileBrowserPopupAction : public TGenericFileBrowserPopupAction
+template <class T> class TFileBrowserPopupAction : public TGenericFileBrowserPopupAction
 {
-public:
+  public:
 	typedef void (T::*Method)(const TFilePath &);
 	TFileBrowserPopupAction(T *target, Method method) : m_target(target), m_method(method) {}
 	void sendCommand(const TFilePath &fp) { (m_target->*m_method)(fp); }
-private:
+  private:
 	T *m_target;
 	Method m_method;
 };
@@ -33,7 +32,7 @@ private:
 
 class FileBrowserPopup : public TPopup
 {
-public:
+  public:
 	FileBrowserPopup(TWidget *parent);
 	FileBrowserPopup(TWidget *parent, const vector<string> &fileTypes);
 
@@ -50,7 +49,7 @@ public:
 
 	void popup(const TPoint &p);
 
-private:
+  private:
 	class Data;
 	Data *m_data;
 };

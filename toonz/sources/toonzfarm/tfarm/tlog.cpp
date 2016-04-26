@@ -26,12 +26,7 @@ using namespace TSysLog;
 namespace
 {
 
-enum LEVEL {
-	LEVEL_SUCCESS,
-	LEVEL_ERROR,
-	LEVEL_WARNING,
-	LEVEL_INFO
-};
+enum LEVEL { LEVEL_SUCCESS, LEVEL_ERROR, LEVEL_WARNING, LEVEL_INFO };
 
 #ifdef _WIN32
 WORD Level2WinEventType(LEVEL level)
@@ -42,11 +37,11 @@ WORD Level2WinEventType(LEVEL level)
 	case LEVEL_ERROR:
 		return EVENTLOG_ERROR_TYPE; // Error event
 	case LEVEL_WARNING:
-		return EVENTLOG_WARNING_TYPE; //Warning event
+		return EVENTLOG_WARNING_TYPE; // Warning event
 	case LEVEL_INFO:
 		return EVENTLOG_INFORMATION_TYPE; // Information event
-										  //      case : return EVENTLOG_AUDIT_SUCCESS Success audit event
-										  //      case : return EVENTLOG_AUDIT_FAILURE Failure audit event
+	//      case : return EVENTLOG_AUDIT_SUCCESS Success audit event
+	//      case : return EVENTLOG_AUDIT_FAILURE Failure audit event
 	default:
 		return LEVEL_WARNING;
 	}
@@ -84,8 +79,7 @@ void notify(LEVEL level, const QString &msg)
 	DWORD dwErr = 1;
 	_stprintf(szMsg, TEXT("%s error: %d"), "appname", dwErr);
 
-	lpszStrings[0] =
-		lpszStrings[1] = (LPCTSTR)msg.data();
+	lpszStrings[0] = lpszStrings[1] = (LPCTSTR)msg.data();
 	ReportEvent(handle,					   // event log handle
 				Level2WinEventType(level), // event type
 				0,						   // category zero
@@ -105,7 +99,7 @@ void notify(LEVEL level, const QString &msg)
 }
 
 static TThread::Mutex MyMutex;
-} //namespace
+} // namespace
 
 //------------------------------------------------------------------------------
 
@@ -143,11 +137,10 @@ void TSysLog::info(const QString &msg)
 
 class TUserLog::Imp
 {
-public:
+  public:
 	Imp() : m_os(&std::cout), m_streamOwner(false) {}
 
-	Imp(const TFilePath &fp)
-		: m_os(new Tofstream(fp)), m_streamOwner(true) {}
+	Imp(const TFilePath &fp) : m_os(new Tofstream(fp)), m_streamOwner(true) {}
 
 	~Imp()
 	{

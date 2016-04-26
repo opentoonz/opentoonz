@@ -44,7 +44,11 @@ const std::string Rgbcolors = "RGB Color";
 //-------------------------------------------------------------------
 
 TScannerParameters::TScannerParameters()
-	: m_bw(false), m_gray(false), m_rgb(false), m_scanType(None), m_scanArea(TRectD()), m_cropBox(TRectD()), m_isPreview(false), m_maxPaperSize(TDimensionD(0, 0)), m_paperOverflow(false), m_brightness(), m_contrast(), m_threshold(), m_dpi(), m_paperFeeder(), m_twainVersion(), m_manufacturer(), m_prodFamily(), m_productName(), m_version(), m_reverseOrder(false), m_validatedByCurrentScanner(false)
+	: m_bw(false), m_gray(false), m_rgb(false), m_scanType(None), m_scanArea(TRectD()),
+	  m_cropBox(TRectD()), m_isPreview(false), m_maxPaperSize(TDimensionD(0, 0)),
+	  m_paperOverflow(false), m_brightness(), m_contrast(), m_threshold(), m_dpi(), m_paperFeeder(),
+	  m_twainVersion(), m_manufacturer(), m_prodFamily(), m_productName(), m_version(),
+	  m_reverseOrder(false), m_validatedByCurrentScanner(false)
 {
 	m_threshold.m_value = 127;
 	m_brightness.m_value = 127;
@@ -190,7 +194,7 @@ void TScannerParameters::adaptToCurrentScanner()
 			m_validatedByCurrentScanner = true;
 		}
 	} catch (TException &) {
-		//TMessage::error("%1", e.getMessage());
+		// TMessage::error("%1", e.getMessage());
 	}
 }
 
@@ -321,7 +325,7 @@ namespace
 {
 class Cleaner
 {
-public:
+  public:
 	bool m_activated;
 	Cleaner() : m_activated(false) {}
 	~Cleaner()
@@ -341,7 +345,7 @@ Cleaner MyCleaner;
 #ifdef DUMMYSCAN
 class TScannerDummy : public TScanner
 {
-public:
+  public:
 	TScannerDummy() {}
 	~TScannerDummy() {}
 	void selectDevice() {}
@@ -377,15 +381,15 @@ TScanner *TScanner::instance()
 		if (instanceEpson) {
 			TScannerEpson *se = (TScannerEpson *)instanceEpson;
 			se->closeIO();
-			//delete m_instanceEpson; //e' singletone, perche' buttarlo? (vinz)
-			//m_instanceEpson=0;
+			// delete m_instanceEpson; //e' singletone, perche' buttarlo? (vinz)
+			// m_instanceEpson=0;
 		}
 		if (!instanceTwain)
 			instanceTwain = new TScannerTwain();
 	} else if (!m_isTwain) {
 		if (instanceTwain) {
-			//delete m_instanceTwain;  //e' singletone, perche' buttarlo? (vinz)
-			//m_instanceTwain=0;
+			// delete m_instanceTwain;  //e' singletone, perche' buttarlo? (vinz)
+			// m_instanceTwain=0;
 			TTWAIN_CloseAll(0);
 		}
 		if (!instanceEpson)
@@ -397,8 +401,7 @@ TScanner *TScanner::instance()
 }
 
 //-----------------------------------------------------------------------------
-TScanner::TScanner()
-	: m_paperLeft(0)
+TScanner::TScanner() : m_paperLeft(0)
 {
 }
 
@@ -486,7 +489,8 @@ bool TScanner::isScanningCanceled()
 
 namespace
 {
-const std::pair<std::string, TDimensionD> defaultPaperFormat("A4 paper", TDimensionD(210.00, 297.00));
+const std::pair<std::string, TDimensionD> defaultPaperFormat("A4 paper",
+															 TDimensionD(210.00, 297.00));
 }
 
 //-----------------------------------------------------------------------------
@@ -511,8 +515,7 @@ TPaperFormatManager *TPaperFormatManager::instance()
 
 void TPaperFormatManager::getFormats(std::vector<std::string> &names) const
 {
-	for (FormatTable::const_iterator it = m_formats.begin();
-		 it != m_formats.end(); ++it)
+	for (FormatTable::const_iterator it = m_formats.begin(); it != m_formats.end(); ++it)
 		names.push_back(it->first);
 }
 

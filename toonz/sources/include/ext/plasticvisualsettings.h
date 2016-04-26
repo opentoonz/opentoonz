@@ -28,9 +28,12 @@ struct PlasticVisualSettings {
 	bool m_drawRigidity;			  //!< Whether mesh rigidities should be displayed
 	bool m_drawSO;					  //!< Whether mesh vertices' stacking order should
 									  //!< be displayed
-public:
+  public:
 	PlasticVisualSettings()
-		: m_applyPlasticDeformation(true), m_showOriginalColumn(), m_drawMeshesWireframe(true), m_drawRigidity(false), m_drawSO(false) {}
+		: m_applyPlasticDeformation(true), m_showOriginalColumn(), m_drawMeshesWireframe(true),
+		  m_drawRigidity(false), m_drawSO(false)
+	{
+	}
 };
 
-#endif //PLASTICVISUALSETTINGS_H
+#endif // PLASTICVISUALSETTINGS_H

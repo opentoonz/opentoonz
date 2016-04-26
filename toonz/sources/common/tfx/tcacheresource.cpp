@@ -1,28 +1,28 @@
 
 
-//String includes
+// String includes
 #include "tconvert.h"
 
-//Image includes
+// Image includes
 #include "timage_io.h"
 
-//Toonz Image cache
+// Toonz Image cache
 #include "timagecache.h"
 
-//TTile class
+// TTile class
 #include "ttile.h"
 
-//Trop include
+// Trop include
 #include "trop.h"
 
-//File I/O includes
+// File I/O includes
 //#include "tstream.h"
 
-//Qt classes
+// Qt classes
 #include <QRegion>
 #include <QByteArray>
 
-//Resources pool manager
+// Resources pool manager
 #include "tcacheresourcepool.h"
 
 #include "tcacheresource.h"
@@ -40,21 +40,21 @@ namespace
 
   QString traduce(const TRectD& rect)
   {
-    return "[" + QString::number(rect.x0) + " " + QString::number(rect.y0) + " "
-               + QString::number(rect.x1) + " " + QString::number(rect.y1) + "]";
+	return "[" + QString::number(rect.x0) + " " + QString::number(rect.y0) + " "
+			   + QString::number(rect.x1) + " " + QString::number(rect.y1) + "]";
   }
 
   QString traduce(const TRect& rect)
   {
-    return "[" + QString::number(rect.x0) + " " + QString::number(rect.y0) + " "
-               + QString::number(rect.x1+1) + " " + QString::number(rect.y1+1) + "]";
+	return "[" + QString::number(rect.x0) + " " + QString::number(rect.y0) + " "
+			   + QString::number(rect.x1+1) + " " + QString::number(rect.y1+1) + "]";
   }
 
   QString traduce(const TTile& tile)
   {
-    TDimension size(tile.getRaster()->getSize());
-    TRectD tileRect(tile.m_pos, TDimensionD(size.lx,size.ly));
-    return traduce(tileRect);
+	TDimension size(tile.getRaster()->getSize());
+	TRectD tileRect(tile.m_pos, TDimensionD(size.lx,size.ly));
+	return traduce(tileRect);
   }
 }
 */
@@ -112,7 +112,7 @@ clear(getAvailableRegion()), supplied for convience.
 
 namespace
 {
-//Store tile textures of 512 x 512 pixels. Their memory usage ranges around 1-2 MB each.
+// Store tile textures of 512 x 512 pixels. Their memory usage ranges around 1-2 MB each.
 const int latticeStep = 512;
 
 static unsigned long cacheId = 0;
@@ -148,26 +148,36 @@ inline TRasterP getRaster(const TImageP &img)
 
 //-----------------------------------------------------------------
 
-inline bool isEmpty(const TRect &rect) { return rect.x0 > rect.x1 || rect.y0 > rect.y1; }
+inline bool isEmpty(const TRect &rect)
+{
+	return rect.x0 > rect.x1 || rect.y0 > rect.y1;
+}
 
 //-----------------------------------------------------------------
 
-inline QRect toQRect(const TRect &r) { return QRect(r.x0, r.y0, r.getLx(), r.getLy()); }
-inline TRect toTRect(const QRect &r) { return TRect(r.left(), r.top(), r.right(), r.bottom()); }
-inline QPoint toQPoint(const TPoint &p) { return QPoint(p.x, p.y); }
+inline QRect toQRect(const TRect &r)
+{
+	return QRect(r.x0, r.y0, r.getLx(), r.getLy());
+}
+inline TRect toTRect(const QRect &r)
+{
+	return TRect(r.left(), r.top(), r.right(), r.bottom());
+}
+inline QPoint toQPoint(const TPoint &p)
+{
+	return QPoint(p.x, p.y);
+}
 
 //----------------------------------------------------------------------------
 
 inline TRect getTileRect(const TTile &tile)
 {
-	return TRect(
-		TPoint(tfloor(tile.m_pos.x), tfloor(tile.m_pos.y)),
-		tile.getRaster()->getSize());
+	return TRect(TPoint(tfloor(tile.m_pos.x), tfloor(tile.m_pos.y)), tile.getRaster()->getSize());
 }
 
 //----------------------------------------------------------------------------
 
-//Qt's contains actually returns QRegion::intersected... I wonder why...
+// Qt's contains actually returns QRegion::intersected... I wonder why...
 inline bool contains(const QRegion &region, const TRect &rect)
 {
 	return QRegion(toQRect(rect)).subtracted(region).isEmpty();
@@ -212,7 +222,7 @@ inline void loadCompressed(const TFilePath &fp, TRasterP &ras, TCacheResource::T
 	is.read((char *)&dataSize, sizeof(unsigned int));
 	is.read(rawData, dataSize);
 
-	//Observe that QByteArray::fromRawData does NOT cause a deep copy to occur.
+	// Observe that QByteArray::fromRawData does NOT cause a deep copy to occur.
 	QByteArray data(QByteArray::fromRawData(rawData, dataSize));
 	data = qUncompress(data);
 	memcpy(rawData, data.constData(), data.size());
@@ -251,7 +261,8 @@ TCacheResourceP::~TCacheResourceP()
 //---------------------
 
 TCacheResource::TCacheResource()
-	: m_id(cacheId++), m_tileType(NONE), m_cellsCount(0), m_locksCount(0), m_backEnabled(false), m_invalidated(false)
+	: m_id(cacheId++), m_tileType(NONE), m_cellsCount(0), m_locksCount(0), m_backEnabled(false),
+	  m_invalidated(false)
 {
 }
 
@@ -267,7 +278,7 @@ TCacheResource::~TCacheResource()
 void TCacheResource::release()
 {
 	if ((--m_refCount) <= 0) {
-		//Attempt release from the resource pool
+		// Attempt release from the resource pool
 		TCacheResourcePool::instance()->releaseResource(this);
 	}
 }
@@ -276,9 +287,7 @@ void TCacheResource::release()
 
 inline TCacheResource::PointLess TCacheResource::getCellIndex(const TPoint &pos) const
 {
-	return PointLess(
-		tfloor(pos.x / (double)latticeStep),
-		tfloor(pos.y / (double)latticeStep));
+	return PointLess(tfloor(pos.x / (double)latticeStep), tfloor(pos.y / (double)latticeStep));
 }
 
 //-----------------------------------------------------------------
@@ -290,23 +299,19 @@ inline TPoint TCacheResource::getCellPos(const PointLess &cellIndex) const
 
 //-----------------------------------------------------------------
 
-//Returns the lattice cell containing the position pos.
+// Returns the lattice cell containing the position pos.
 inline TPoint TCacheResource::getCellPos(const TPoint &pos) const
 {
-	TPoint cellIndex(
-		tfloor(pos.x / (double)latticeStep),
-		tfloor(pos.y / (double)latticeStep));
+	TPoint cellIndex(tfloor(pos.x / (double)latticeStep), tfloor(pos.y / (double)latticeStep));
 	return TPoint(cellIndex.x * latticeStep, cellIndex.y * latticeStep);
 }
 
 //-----------------------------------------------------------------
 
-//Returns the lattice cell containing the relative position pos.
+// Returns the lattice cell containing the relative position pos.
 inline TPoint TCacheResource::getCellPos(const TPointD &pos) const
 {
-	TPoint cellIndex(
-		tfloor(pos.x / (double)latticeStep),
-		tfloor(pos.y / (double)latticeStep));
+	TPoint cellIndex(tfloor(pos.x / (double)latticeStep), tfloor(pos.y / (double)latticeStep));
 	return TPoint(cellIndex.x * latticeStep, cellIndex.y * latticeStep);
 }
 
@@ -348,7 +353,7 @@ TRasterP TCacheResource::buildCompatibleRaster(const TDimension &size)
 
 bool TCacheResource::checkTile(const TTile &tile) const
 {
-	//Ensure that tile has integer geoometry.
+	// Ensure that tile has integer geoometry.
 	TPointD tileFracPos(tile.m_pos.x - tfloor(tile.m_pos.x), tile.m_pos.y - tfloor(tile.m_pos.y));
 	if (tileFracPos.x != 0.0 || tileFracPos.y != 0.0) {
 		assert(!"The passed tile must have integer geometry!");
@@ -406,7 +411,7 @@ inline TRasterP TCacheResource::createCellRaster(int rasterType, const std::stri
 	TImageCache::instance()->add(cacheId, img);
 	++m_cellsCount;
 
-	//DIAGNOSTICS_GLOADD("crCellsCnt", 1);
+	// DIAGNOSTICS_GLOADD("crCellsCnt", 1);
 
 	return result;
 }
@@ -465,18 +470,18 @@ bool TCacheResource::upload(const TPoint &pos, TRasterP ras)
 	if (m_tileType == NONE)
 		m_tileType = tileType;
 
-	//For all cells of the lattice which intersect the tile, upload the content in the
-	//complex
+	// For all cells of the lattice which intersect the tile, upload the content in the
+	// complex
 	TRect tileRect(ras->getBounds() + pos);
 	TPoint initialPos(getCellPos(tileRect.getP00()));
 
-	//DIAGNOSTICS_NUMBEREDSTRSET(prefix + QString::number((UINT) this) + " | Stack | ",
+	// DIAGNOSTICS_NUMBEREDSTRSET(prefix + QString::number((UINT) this) + " | Stack | ",
 	//"crStack", "upload", ::traduce(TRect(pos, ras->getSize())));
 
 	TPoint currPos;
 	for (currPos.x = initialPos.x; currPos.x <= tileRect.x1; currPos.x += latticeStep)
 		for (currPos.y = initialPos.y; currPos.y <= tileRect.y1; currPos.y += latticeStep) {
-			//Copy tile's content into the cell's raster.
+			// Copy tile's content into the cell's raster.
 			TRect cellRect(currPos, TDimension(latticeStep, latticeStep));
 
 			TRect overlapRect(tileRect * cellRect);
@@ -497,7 +502,7 @@ bool TCacheResource::upload(const TPoint &pos, TRasterP ras)
 			cellInfos.second->m_modified = true;
 		}
 
-	//Update the complex's content region
+	// Update the complex's content region
 	m_region += toQRect(tileRect);
 
 	return true;
@@ -524,14 +529,14 @@ QRegion TCacheResource::download(const TPoint &pos, TRasterP ras)
 	if (!checkRasterType(ras, tileType))
 		return QRegion();
 
-	//Build the tile's rect
+	// Build the tile's rect
 	TRect tileRect(ras->getBounds() + pos);
 
 	if (!m_region.intersects(toQRect(tileRect)))
 		return QRegion();
 
-	//For all cells intersecting the tile's rect, copy all those intersecting the
-	//complex's content region.
+	// For all cells intersecting the tile's rect, copy all those intersecting the
+	// complex's content region.
 	TPoint initialPos(getCellPos(tileRect.getP00()));
 
 	TPoint currPos;
@@ -544,7 +549,7 @@ QRegion TCacheResource::download(const TPoint &pos, TRasterP ras)
 			QRect overlapQRect(toQRect(overlapRect));
 
 			if (m_region.intersects(overlapQRect)) {
-				//Extract the associated rasters and perform the copy to the input tile.
+				// Extract the associated rasters and perform the copy to the input tile.
 				std::pair<TRasterP, CellData *> cellInfos(touch(getCellIndex(currPos)));
 				TRasterP cellRas(cellInfos.first);
 
@@ -578,17 +583,17 @@ bool TCacheResource::downloadAll(const TPoint &pos, TRasterP ras)
 	if (!checkRasterType(ras, tileType))
 		return false;
 
-	//Build the tile's rect
+	// Build the tile's rect
 	TRect tileRect(ras->getBounds() + pos);
 
 	if (!contains(m_region, tileRect))
 		return false;
 
-	//DIAGNOSTICS_NUMBEREDSTRSET(prefix + QString::number((UINT) this) + " | Stack | ",
+	// DIAGNOSTICS_NUMBEREDSTRSET(prefix + QString::number((UINT) this) + " | Stack | ",
 	//"crStack", "downloadAll", ::traduce(TRect(pos, ras->getSize())));
 
-	//For all cells intersecting the tile's rect, copy all those intersecting the
-	//complex's content region.
+	// For all cells intersecting the tile's rect, copy all those intersecting the
+	// complex's content region.
 	TPoint initialPos(getCellPos(tileRect.getP00()));
 
 	TPoint currPos;
@@ -601,7 +606,7 @@ bool TCacheResource::downloadAll(const TPoint &pos, TRasterP ras)
 			QRect overlapQRect(toQRect(overlapRect));
 
 			if (m_region.intersects(overlapQRect)) {
-				//Extract the associated rasters and perform the copy to the input tile.
+				// Extract the associated rasters and perform the copy to the input tile.
 				std::pair<TRasterP, CellData *> cellInfos(touch(getCellIndex(currPos)));
 				TRasterP cellRas(cellInfos.first);
 
@@ -630,17 +635,18 @@ bool TCacheResource::downloadAll(TTile &tile)
 //-----------------------------------------------------------------
 
 //! Clears the complex on the specified region. Please observe that the actually cleared region
-//! consists of all lattice cells intersecting the passed region, therefore resulting in a cleared region
+//! consists of all lattice cells intersecting the passed region, therefore resulting in a cleared
+//! region
 //! typically larger than passed one, up to the lattice granularity.
 void TCacheResource::clear(QRegion region)
 {
 	if (!m_region.intersects(region))
 		return;
 
-	//Get the region bbox
+	// Get the region bbox
 	TRect bbox(toTRect(region.boundingRect()));
 
-	//For all cells intersecting the bbox
+	// For all cells intersecting the bbox
 	TPoint initialPos(getCellPos(bbox.getP00()));
 	TPoint pos;
 	for (pos.x = initialPos.x; pos.x <= bbox.x1; pos.x += latticeStep)
@@ -648,15 +654,16 @@ void TCacheResource::clear(QRegion region)
 			QRect cellQRect(toQRect(TRect(pos, TDimension(latticeStep, latticeStep))));
 
 			if (region.intersects(cellQRect) && m_region.intersects(cellQRect)) {
-				//Release the associated cell from cache and clear the cell from the content region.
+				// Release the associated cell from cache and clear the cell from the content
+				// region.
 				TImageCache::instance()->remove(getCellCacheId(pos));
 				m_region -= cellQRect;
 
 				--m_cellsCount;
 
-				//DIAGNOSTICS_GLOADD("crCellsCnt", -1);
+				// DIAGNOSTICS_GLOADD("crCellsCnt", -1);
 
-				//Release the cell from m_cellDatas
+				// Release the cell from m_cellDatas
 				m_cellDatas[getCellIndex(pos)].m_modified = true;
 			}
 		}
@@ -698,10 +705,10 @@ void TCacheResource::downloadPalette(TPaletteP &palette)
 
 void TCacheResource::addRef2(const TRect &rect)
 {
-	//DIAGNOSTICS_NUMBEREDSTRSET(prefix + QString::number((UINT) this) + " | Stack | ",
+	// DIAGNOSTICS_NUMBEREDSTRSET(prefix + QString::number((UINT) this) + " | Stack | ",
 	//"crStack", "addRef", ::traduce(rect));
 
-	//Add a reference to all cells intersecting the passed one
+	// Add a reference to all cells intersecting the passed one
 	TPoint initialPos(getCellPos(rect.getP00()));
 	TPoint pos;
 	for (pos.x = initialPos.x; pos.x <= rect.x1; pos.x += latticeStep)
@@ -717,7 +724,7 @@ void TCacheResource::addRef2(const TRect &rect)
 
 void TCacheResource::release2(const TRect &rect)
 {
-	//DIAGNOSTICS_NUMBEREDSTRSET(prefix + QString::number((UINT) this) + " | Stack | ",
+	// DIAGNOSTICS_NUMBEREDSTRSET(prefix + QString::number((UINT) this) + " | Stack | ",
 	//"crStack", "release", ::traduce(rect));
 
 	if (m_locksCount > 0)
@@ -752,7 +759,7 @@ void TCacheResource::release2(const TRect &rect)
 
 void TCacheResource::addLock()
 {
-	//DIAGNOSTICS_NUMBEREDSTR(prefix + QString::number((UINT) this) + " | Stack | ",
+	// DIAGNOSTICS_NUMBEREDSTR(prefix + QString::number((UINT) this) + " | Stack | ",
 	//"crStack", "addLock");
 
 	++m_locksCount;
@@ -762,7 +769,7 @@ void TCacheResource::addLock()
 
 void TCacheResource::releaseLock()
 {
-	//DIAGNOSTICS_NUMBEREDSTR(prefix + QString::number((UINT) this) + " | Stack | ",
+	// DIAGNOSTICS_NUMBEREDSTR(prefix + QString::number((UINT) this) + " | Stack | ",
 	//"crStack", "releaseLock");
 
 	m_locksCount = tmax(m_locksCount - 1, 0);
@@ -770,7 +777,7 @@ void TCacheResource::releaseLock()
 	if (m_locksCount > 0)
 		return;
 
-	//Check for released cells
+	// Check for released cells
 	std::map<PointLess, CellData>::iterator it;
 	for (it = m_cellDatas.begin(); it != m_cellDatas.end();)
 		if (it->second.m_referenced) {
@@ -797,7 +804,7 @@ void TCacheResource::releaseCell(const QRect &cellQRect, const PointLess &cellIn
 		TImageCache::instance()->remove(cellCacheId);
 		--m_cellsCount;
 
-		//DIAGNOSTICS_GLOADD("crCellsCnt", -1);
+		// DIAGNOSTICS_GLOADD("crCellsCnt", -1);
 	}
 }
 
@@ -806,10 +813,11 @@ void TCacheResource::releaseCell(const QRect &cellQRect, const PointLess &cellIn
 //! Returns the current size, in MB, of the cache resource.
 int TCacheResource::size() const
 {
-	//NOTE: It's better to store the size incrementally. This complies
-	//with the possibility of specifying a bbox to fit the stored cells to...
+	// NOTE: It's better to store the size incrementally. This complies
+	// with the possibility of specifying a bbox to fit the stored cells to...
 
-	return m_tileType == NONE ? 0 : m_tileType == RGBM64 ? (m_cellsCount << 11) : (m_cellsCount << 10);
+	return m_tileType == NONE ? 0 : m_tileType == RGBM64 ? (m_cellsCount << 11)
+														 : (m_cellsCount << 10);
 }
 
 //****************************************************************************************************
@@ -854,12 +862,13 @@ bool TCacheResource::save(const PointLess &cellIndex, TRasterP cellRas) const
 	assert(!m_path.isEmpty());
 
 	if (!cellRas)
-		cellRas = getRaster(TImageCache::instance()->get(
-			getCellCacheId(cellIndex.x, cellIndex.y), false));
+		cellRas = getRaster(
+			TImageCache::instance()->get(getCellCacheId(cellIndex.x, cellIndex.y), false));
 
 	assert(m_tileType != NONE);
 
-	TFilePath fp(TCacheResourcePool::instance()->getPath() + m_path + getCellName(cellIndex.x, cellIndex.y));
+	TFilePath fp(TCacheResourcePool::instance()->getPath() + m_path +
+				 getCellName(cellIndex.x, cellIndex.y));
 
 	if (m_tileType == CM32) {
 		::saveCompressed(fp, cellRas);
@@ -877,7 +886,8 @@ TRasterP TCacheResource::load(const PointLess &cellPos)
 	if (m_path.isEmpty())
 		return 0;
 
-	TFilePath cellPath(TCacheResourcePool::instance()->getPath() + m_path + TFilePath(getCellName(cellPos.x, cellPos.y)));
+	TFilePath cellPath(TCacheResourcePool::instance()->getPath() + m_path +
+					   TFilePath(getCellName(cellPos.x, cellPos.y)));
 	TRasterP ras;
 	if (m_tileType == CM32) {
 		::loadCompressed(cellPath, ras, CM32);
@@ -896,7 +906,7 @@ std::pair<TRasterP, TCacheResource::CellData *> TCacheResource::touch(const Poin
 
 	std::map<PointLess, CellData>::iterator it = m_cellDatas.find(cellIndex);
 	if (it != m_cellDatas.end()) {
-		//Retrieve the raster from image cache
+		// Retrieve the raster from image cache
 		TImageP img(TImageCache::instance()->get(cellId, true));
 		if (img)
 			return std::make_pair(getRaster(img), &it->second);
@@ -904,17 +914,16 @@ std::pair<TRasterP, TCacheResource::CellData *> TCacheResource::touch(const Poin
 
 	it = m_cellDatas.insert(std::make_pair(cellIndex, CellData())).first;
 
-	//Then, attempt retrieval from back resource
+	// Then, attempt retrieval from back resource
 	TRasterP ras(load(cellIndex));
 	if (ras) {
 		TImageCache::instance()->add(cellId, TRasterImageP(ras));
 		return std::make_pair(ras, &it->second);
 	}
 
-	//Else, create it
-	return std::make_pair(
-		createCellRaster(m_tileType, cellId), //increases m_cellsCount too
-		&it->second);
+	// Else, create it
+	return std::make_pair(createCellRaster(m_tileType, cellId), // increases m_cellsCount too
+						  &it->second);
 }
 
 //-----------------------------------------------------------------
@@ -924,22 +933,22 @@ void TCacheResource::save()
 	if (m_backEnabled && !m_invalidated) {
 		assert(!m_path.isEmpty());
 
-		//Save each modified cell raster
+		// Save each modified cell raster
 		std::map<PointLess, CellData>::iterator it;
 		for (it = m_cellDatas.begin(); it != m_cellDatas.end(); ++it) {
 			if (it->second.m_modified)
 				save(it->first);
 		}
 
-		//Save the palette, if any
-		//SHOULD BE MOVED TO THE CACHERESOURCEPOOL!!
+		// Save the palette, if any
+		// SHOULD BE MOVED TO THE CACHERESOURCEPOOL!!
 		/*if(m_palette)
-    {
-      TFilePath fp(TCacheResourcePool::instance()->getPath() + m_path);
-      TOStream oss(fp);
+	{
+	  TFilePath fp(TCacheResourcePool::instance()->getPath() + m_path);
+	  TOStream oss(fp);
 
-      m_palette->saveData(oss);
-    }*/
+	  m_palette->saveData(oss);
+	}*/
 	}
 }
 
@@ -951,8 +960,8 @@ void TCacheResource::save(const TFilePath &fp)
 
 	std::map<PointLess, CellData>::iterator it;
 	for (it = m_cellDatas.begin(); it != m_cellDatas.end(); ++it) {
-		TRasterP cellRas = getRaster(TImageCache::instance()->get(
-			getCellCacheId(it->first.x, it->first.y), false));
+		TRasterP cellRas = getRaster(
+			TImageCache::instance()->get(getCellCacheId(it->first.x, it->first.y), false));
 
 		assert(m_tileType != NONE);
 
@@ -988,8 +997,9 @@ void TCacheResource::clear()
 TCacheResource::DiskReference::DiskReference(const TFilePath& fp)
 {
   QSettings settings(
-    QString::fromStdWString((TCacheResourcePool::instance()->getPath() + m_path + "resource.ini").getWideString()),
-    QSettings::IniFormat);
+	QString::fromStdWString((TCacheResourcePool::instance()->getPath() + m_path +
+"resource.ini").getWideString()),
+	QSettings::IniFormat);
 
   settings.setValue("MemReference", 1);
 }
@@ -999,11 +1009,12 @@ TCacheResource::DiskReference::DiskReference(const TFilePath& fp)
 TCacheResource::DiskReference::~DiskReference()
 {
   QSettings settings(
-    QString::fromStdWString((TCacheResourcePool::instance()->getPath() + m_path + "resource.ini").getWideString()),
-    QSettings::IniFormat);
+	QString::fromStdWString((TCacheResourcePool::instance()->getPath() + m_path +
+"resource.ini").getWideString()),
+	QSettings::IniFormat);
 
   int diskReference = settings.value("DiskReference").toInt();
   if(diskReference == 0)
-    TCacheResourcePool::instance()->clearResource(QString::fromStdWString(m_path.getWideString()));
+	TCacheResourcePool::instance()->clearResource(QString::fromStdWString(m_path.getWideString()));
 }
 */

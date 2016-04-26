@@ -11,8 +11,8 @@ RubberDeform::RubberDeform() : m_pPolyOri(0), m_polyLoc()
 {
 }
 
-RubberDeform::RubberDeform(std::vector<T3DPointD> *pPolyOri, const double rf) : m_pPolyOri(pPolyOri),
-																		   m_polyLoc()
+RubberDeform::RubberDeform(std::vector<T3DPointD> *pPolyOri, const double rf)
+	: m_pPolyOri(pPolyOri), m_polyLoc()
 {
 	copyOri2Loc();
 	TRectD bbox;
@@ -35,7 +35,8 @@ void RubberDeform::deformStep()
 		std::vector<T3DPointD>::iterator it1 = it == (ite - 1) ? itb : it + 1;
 		double q = 0.5;
 		double qq = 1.0 - q;
-		tmpv.push_back(T3DPointD(qq * it->x + q * it1->x, qq * it->y + q * it1->y, qq * it->z + q * it1->z));
+		tmpv.push_back(
+			T3DPointD(qq * it->x + q * it1->x, qq * it->y + q * it1->y, qq * it->z + q * it1->z));
 	}
 	m_polyLoc = tmpv;
 }
@@ -106,7 +107,8 @@ void RubberDeform::refinePoly(const double rf)
 			for (int i = 1; i < n; i++) {
 				double qq = q * (double)i;
 				double qq1 = 1.0 - qq;
-				T3DPointD p(T3DPointD(qq1 * a.x + qq * b.x, qq1 * a.y + qq * b.y, qq1 * a.z + qq * b.z));
+				T3DPointD p(
+					T3DPointD(qq1 * a.x + qq * b.x, qq1 * a.y + qq * b.y, qq1 * a.z + qq * b.z));
 				tmpv.push_back(p);
 			}
 		}
@@ -116,8 +118,7 @@ void RubberDeform::refinePoly(const double rf)
 
 // ------------------- SFlashUtils -------------------------------------------
 
-void SFlashUtils::computeOutline(const TRegion *region,
-								 TRegionOutline::PointVector &polyline) const
+void SFlashUtils::computeOutline(const TRegion *region, TRegionOutline::PointVector &polyline) const
 {
 	if (!region)
 		return;
@@ -308,11 +309,11 @@ int SFlashUtils::nbDiffVerts(const std::vector<TPointD> &pv) const
 		p[2]=pv[1];
 		col[0]=c2;
 		col[1]=c1;
-	} 
+	}
 
 
-	TPointD pt1[4]={pv[0],pv[1],pv[2],pv[3]};	
-	TPointD pt2[3]={p[0],p[1],p[2]};	
+	TPointD pt1[4]={pv[0],pv[1],pv[2],pv[3]};
+	TPointD pt2[3]={p[0],p[1],p[2]};
 
 	TPointD uu=p[0]-p[1];
 	TPointD up=(p[0]+p[1])*0.5;
@@ -342,25 +343,25 @@ int SFlashUtils::nbDiffVerts(const std::vector<TPointD> &pv) const
 	u=normalize(u);
 	TPointD q(p[1]+u*x);
 
-    const double flashGrad=16384.0;  // size of gradient square
-    flash.setGradientFill(true,col[0],col[1]);
+	const double flashGrad=16384.0;  // size of gradient square
+	flash.setGradientFill(true,col[0],col[1]);
 //	TPointD center=pv[0]*0.75+((p[1]+p[2])*0.5)*0.25;
 	TPointD center=pv[0];
 	TPointD e(p[2]-p[1]);
 
 	double angle=rad2degree(atan(e));
 	angle= angle<=0 ? 270+angle : angle-90;
-    TRotation rM(angle);
+	TRotation rM(angle);
 	TTranslation tM(center.x,center.y);
 	TScale sM(m/flashGrad,2*tmax(x,a-x)/flashGrad);
 
-    flash.setFillStyleMatrix(tM*rM*sM);
+	flash.setFillStyleMatrix(tM*rM*sM);
 	std::vector<TPointD> pp;
 	pp.push_back(p[0]);
 	pp.push_back(p[1]);
 	pp.push_back(p[2]);
 
-    flash.drawPolyline(pp);	
+	flash.drawPolyline(pp);
 
 
 */
@@ -394,9 +395,7 @@ void SFlashUtils::Triangle2Quad(std::vector<TPointD> &p) const
 	p[j] = p[i] + e * 0.001;
 }
 
-void SFlashUtils::drawGradedPolyline(TFlash &flash,
-									 std::vector<TPointD> &pvv,
-									 const TPixel32 &c1,
+void SFlashUtils::drawGradedPolyline(TFlash &flash, std::vector<TPointD> &pvv, const TPixel32 &c1,
 									 const TPixel32 &c2) const
 {
 	std::vector<TPointD> pv;
@@ -450,9 +449,7 @@ void SFlashUtils::drawGradedPolyline(TFlash &flash,
 //------------------------------------------------------------
 
 //------------------------------------------------------------
-void SFlashUtils::drawGradedRegion(TFlash &flash,
-								   std::vector<TPointD> &pvv,
-								   const TPixel32 &c1,
+void SFlashUtils::drawGradedRegion(TFlash &flash, std::vector<TPointD> &pvv, const TPixel32 &c1,
 								   const TPixel32 &c2, const TRegion &r) const
 {
 	std::vector<TPointD> pv;

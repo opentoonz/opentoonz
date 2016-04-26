@@ -4,8 +4,8 @@
 //#include "tfxparam.h"
 #include "perlinnoise.h"
 
-//using std::cout;
-//using std::endl;
+// using std::cout;
+// using std::endl;
 //-------------------------------------------------------------------
 
 double PerlinNoise::LinearNoise(double x, double y, double t)
@@ -145,34 +145,33 @@ double PerlinNoise::Marble(double u, double v, double k, double grain, double mi
 	return t;
 }
 
-PerlinNoise::PerlinNoise()
-	: Noise(new float[Size * Size * TimeSize])
+PerlinNoise::PerlinNoise() : Noise(new float[Size * Size * TimeSize])
 {
 	TRandom random(1);
 	for (int i = 0; i < Size; i++) {
 		for (int j = 0; j < Size; j++) {
 			for (int k = 0; k < TimeSize; k++) {
 				float tmp = random.getFloat();
-				//cout << "tmp = " << tmp << "HM = "<< HowMany<< endl;
+				// cout << "tmp = " << tmp << "HM = "<< HowMany<< endl;
 				Noise[k + TimeSize * j + TimeSize * Size * i] = tmp;
 			}
 		}
 	}
 
-	//cout << "HowMany = " << HowMany <<endl;
+	// cout << "HowMany = " << HowMany <<endl;
 }
 
 int PerlinNoise::Size = 60;
 int PerlinNoise::TimeSize = 20;
 int PerlinNoise::Offset = 1000000;
-double PerlinNoise::Pixel_size = 0.01; //il pixel size va animato da 1 (escluso)
-									   //a 0.1 (consigliato) fino ad un min di 0.001
+double PerlinNoise::Pixel_size = 0.01; // il pixel size va animato da 1 (escluso)
+// a 0.1 (consigliato) fino ad un min di 0.001
 
 namespace
 {
 template <typename PIXEL>
-void doCloudsT(const TRasterPT<PIXEL> &ras, const TSpectrumT<PIXEL> &spectrum,
-			   TPointD &tilepos, double evolution, double size, double min, double max, int type, double scale)
+void doCloudsT(const TRasterPT<PIXEL> &ras, const TSpectrumT<PIXEL> &spectrum, TPointD &tilepos,
+			   double evolution, double size, double min, double max, int type, double scale)
 {
 	int j;
 	TAffine aff = TScale(1 / scale);
@@ -209,29 +208,16 @@ void doCloudsT(const TRasterPT<PIXEL> &ras, const TSpectrumT<PIXEL> &spectrum,
 }
 }
 
-void doClouds(
-	const TRasterP &ras,
-	const TSpectrumParamP colors,
-	TPointD pos,
-	double evolution,
-	double size,
-	double min,
-	double max,
-	int type,
-	double scale,
-	double frame)
+void doClouds(const TRasterP &ras, const TSpectrumParamP colors, TPointD pos, double evolution,
+			  double size, double min, double max, int type, double scale, double frame)
 {
 
 	if ((TRaster32P)ras)
-		doCloudsT<TPixel32>(
-			ras,
-			colors->getValue(frame),
-			pos, evolution, size, min, max, type, scale);
+		doCloudsT<TPixel32>(ras, colors->getValue(frame), pos, evolution, size, min, max, type,
+							scale);
 	else if ((TRaster64P)ras)
-		doCloudsT<TPixel64>(
-			ras,
-			colors->getValue64(frame),
-			pos, evolution, size, min, max, type, scale);
+		doCloudsT<TPixel64>(ras, colors->getValue64(frame), pos, evolution, size, min, max, type,
+							scale);
 	else
 		throw TException("CloudsFx: unsupported Pixel Type");
 }

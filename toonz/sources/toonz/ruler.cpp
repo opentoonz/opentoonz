@@ -66,8 +66,7 @@ double Ruler::getUnit() const
 
 //-----------------------------------------------------------------------------
 
-void Ruler::getIndices(double origin, double iunit,
-					   int size, int &i0, int &i1, int &ic) const
+void Ruler::getIndices(double origin, double iunit, int size, int &i0, int &i1, int &ic) const
 {
 	i0 = 0;
 	i1 = -1;
@@ -104,13 +103,13 @@ double Ruler::getPan() const
 {
 	TAffine aff = m_viewer->getViewMatrix();
 	if (m_vertical)
-		if (m_viewer->is3DView()) //Vertical   3D
+		if (m_viewer->is3DView()) // Vertical   3D
 			return m_viewer->getPan3D().y;
-		else //Vertical   2D
+		else // Vertical   2D
 			return aff.a23;
-	else if (m_viewer->is3DView()) //Horizontal 3D
+	else if (m_viewer->is3DView()) // Horizontal 3D
 		return m_viewer->getPan3D().x;
-	return aff.a13; //Horizontal 2D
+	return aff.a13; // Horizontal 2D
 }
 
 //-----------------------------------------------------------------------------
@@ -332,7 +331,7 @@ void Ruler::mouseReleaseEvent(QMouseEvent *e)
 
 //-----------------------------------------------------------------------------
 /*
-std::wstring Ruler::getTooltipString(const TPoint &pos) 
+std::wstring Ruler::getTooltipString(const TPoint &pos)
 {
   Guides &guides = getGuides();
   double v = posToValue(pos);
@@ -344,31 +343,31 @@ std::wstring Ruler::getTooltipString(const TPoint &pos)
   int i;
   for(i=0; i<(int)guides.size(); i++)
   {
-    double g = guides[i];
-    double dist2 = (g-v)*(g-v);
-    if(selected<0 || dist2<minDist2) {minDist2 = dist2; selected = i;}
+	double g = guides[i];
+	double dist2 = (g-v)*(g-v);
+	if(selected<0 || dist2<minDist2) {minDist2 = dist2; selected = i;}
   }
   if(selected<0 || minDist2>25)
   {
-    // crea una nuova guida
-    if (!m_vertical)
-      return TStringTable::translate("W_VRuler");
-    else
-      return TStringTable::translate("W_HRuler");
+	// crea una nuova guida
+	if (!m_vertical)
+	  return TStringTable::translate("W_VRuler");
+	else
+	  return TStringTable::translate("W_HRuler");
   }
   else
   {
-    // muove la guida vecchia
-    if (!m_vertical)
-      return TStringTable::translate("W_VGuide");
-    else
-      return TStringTable::translate("W_HGuide");
+	// muove la guida vecchia
+	if (!m_vertical)
+	  return TStringTable::translate("W_VGuide");
+	else
+	  return TStringTable::translate("W_HGuide");
   }
 }
 
 //-----------------------------------------------------------------------------
 
-string Ruler::getContextHelpReference(const TPoint &pos) 
+string Ruler::getContextHelpReference(const TPoint &pos)
 {
   Guides &guides = getGuides();
   double v = posToValue(pos);
@@ -380,25 +379,25 @@ string Ruler::getContextHelpReference(const TPoint &pos)
   int i;
   for(i=0; i<(int)guides.size(); i++)
   {
-    double g = guides[i];
-    double dist2 = (g-v)*(g-v);
-    if(selected<0 || dist2<minDist2) {minDist2 = dist2; selected = i;}
+	double g = guides[i];
+	double dist2 = (g-v)*(g-v);
+	if(selected<0 || dist2<minDist2) {minDist2 = dist2; selected = i;}
   }
   if(selected<0 || minDist2>25)
   {
-    // crea una nuova guida
-    if (!m_vertical)
-      return "W_VRuler";
-    else
-      return "W_HRuler";
+	// crea una nuova guida
+	if (!m_vertical)
+	  return "W_VRuler";
+	else
+	  return "W_HRuler";
   }
   else
   {
-    // muove la guida vecchia
-    if (!m_vertical)
-      return "W_VGuide";
-    else
-      return "W_HGuide";
+	// muove la guida vecchia
+	if (!m_vertical)
+	  return "W_VGuide";
+	else
+	  return "W_HGuide";
   }
 }
 */

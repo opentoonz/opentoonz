@@ -27,17 +27,17 @@ class DuplicatePopup : public QDialog
 
 	int m_count, m_upTo;
 
-public:
+  public:
 	DuplicatePopup();
 	void getValues(int &start, int &step);
 
-public slots:
+  public slots:
 	void updateValues();
 	void onApplyPressed();
 	void onOKPressed();
 	void onSelectionChanged();
 
-protected:
+  protected:
 	void showEvent(QShowEvent *);
 };
 

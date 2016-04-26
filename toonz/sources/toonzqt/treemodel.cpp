@@ -17,8 +17,7 @@
 // Item
 //----------------------------------------------------------------------------------------------------
 
-TreeModel::Item::Item()
-	: m_model(0), m_parent(0), m_depth(0), m_row(0), m_opened(false)
+TreeModel::Item::Item() : m_model(0), m_parent(0), m_depth(0), m_row(0), m_opened(false)
 {
 }
 
@@ -72,11 +71,11 @@ void TreeModel::Item::deleteChild(Item *child)
   int index = m_childItems.indexOf(child);
   if(index != -1)
   {
-    m_childItems.takeAt(index);
-    assert(!m_childItems.contains(child)); 
-    // m_childItems is not supposed to contain duplicated entries
-    delete child;
-    updateChildren();
+	m_childItems.takeAt(index);
+	assert(!m_childItems.contains(child));
+	// m_childItems is not supposed to contain duplicated entries
+	delete child;
+	updateChildren();
   }
 }
 */
@@ -89,8 +88,8 @@ Item* matchItem(Item*item, QList<Item*> &items)
   if(!itemData) return 0;
   int i;
   for(i=0;i<items.size();i++)
-    if(items.at(i)->getInternalPointer()==itemData)
-      return items.at(i);
+	if(items.at(i)->getInternalPointer()==itemData)
+	  return items.at(i);
   return 0;
 }
 */
@@ -154,9 +153,7 @@ void TreeModel::Item::setChildren(QList<Item *> &newChildren)
 QVariant TreeModel::Item::data(int role) const
 {
 	if (role == Qt::DecorationRole)
-		return QIcon(isOpen()
-						 ? ":Resources/folder_open.png"
-						 : ":Resources/folder_close.png");
+		return QIcon(isOpen() ? ":Resources/folder_open.png" : ":Resources/folder_close.png");
 	else
 		return QVariant();
 }
@@ -172,8 +169,7 @@ QModelIndex TreeModel::Item::createIndex()
 // TreeModel
 //----------------------------------------------------------------------------------------------------
 
-TreeModel::TreeModel(TreeView *parent)
-	: QAbstractItemModel(parent), m_rootItem(0), m_view(parent)
+TreeModel::TreeModel(TreeView *parent) : QAbstractItemModel(parent), m_rootItem(0), m_view(parent)
 {
 }
 
@@ -212,7 +208,7 @@ void TreeModel::endRefresh()
 		QModelIndex parentIndex = parentItem ? parentItem->createIndex() : QModelIndex();
 
 		beginRemoveRows(parentIndex, row, row);
-		removeRow(row, parentIndex); //NOTE: This is currently doing NOTHING? (see Qt's manual)
+		removeRow(row, parentIndex); // NOTE: This is currently doing NOTHING? (see Qt's manual)
 		endRemoveRows();
 	}
 
@@ -361,8 +357,7 @@ void TreeModel::setRowHidden(int row, const QModelIndex &parent, bool hide)
 // TreeView
 //----------------------------------------------------------------------------------------------------
 
-TreeView::TreeView(QWidget *parent)
-	: QTreeView(parent), m_dragging(false)
+TreeView::TreeView(QWidget *parent) : QTreeView(parent), m_dragging(false)
 {
 	header()->hide();
 	setUniformRowHeights(true);
@@ -371,7 +366,7 @@ TreeView::TreeView(QWidget *parent)
 
 //-----------------------------------------------------------------------------
 
-//!Resizes viewport to contents
+//! Resizes viewport to contents
 void TreeView::resizeToConts(void)
 {
 	resizeColumnToContents(0);
@@ -392,30 +387,26 @@ void TreeView::setModel(TreeModel *model)
 	QTreeView::setModel(model);
 	disconnect();
 
-	connect(this, SIGNAL(expanded(const QModelIndex &)), model, SLOT(onExpanded(const QModelIndex &)));
-	connect(this, SIGNAL(collapsed(const QModelIndex &)), model, SLOT(onCollapsed(const QModelIndex &)));
+	connect(this, SIGNAL(expanded(const QModelIndex &)), model,
+			SLOT(onExpanded(const QModelIndex &)));
+	connect(this, SIGNAL(collapsed(const QModelIndex &)), model,
+			SLOT(onCollapsed(const QModelIndex &)));
 	// setItemDelegate(new Delegate(this));
 
-	//Connect all possible changes that can alter the
-	//bottom horizontal scrollbar to resize contents...
-	connect(
-		this, SIGNAL(expanded(const QModelIndex &)),
-		this, SLOT(resizeToConts()));
+	// Connect all possible changes that can alter the
+	// bottom horizontal scrollbar to resize contents...
+	connect(this, SIGNAL(expanded(const QModelIndex &)), this, SLOT(resizeToConts()));
 
-	connect(
-		this, SIGNAL(collapsed(const QModelIndex &)),
-		this, SLOT(resizeToConts()));
+	connect(this, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(resizeToConts()));
 
-	connect(
-		this->model(), SIGNAL(layoutChanged()),
-		this, SLOT(resizeToConts()));
+	connect(this->model(), SIGNAL(layoutChanged()), this, SLOT(resizeToConts()));
 }
 
 //----------------------------------------------------------------------------------------------------------------
 
 void TreeView::mouseDoubleClickEvent(QMouseEvent *)
 {
-	//ignore double click!
+	// ignore double click!
 }
 
 void TreeView::mousePressEvent(QMouseEvent *e)
@@ -477,7 +468,8 @@ void TreeView::mouseReleaseEvent(QMouseEvent *e)
 //----------------------------------------------------------------------------------------------------------------
 
 /*
-bool TreeView::Delegate::editorEvent(QEvent *e, QAbstractItemModel *abstractModel, const QStyleOptionViewItem &option, const QModelIndex &index)  
+bool TreeView::Delegate::editorEvent(QEvent *e, QAbstractItemModel *abstractModel, const
+QStyleOptionViewItem &option, const QModelIndex &index)
 {
   if(e->type() != QEvent::MouseButtonPress) return false;
   TreeModel *model = dynamic_cast<TreeModel *>(abstractModel);
@@ -487,7 +479,7 @@ bool TreeView::Delegate::editorEvent(QEvent *e, QAbstractItemModel *abstractMode
   QMouseEvent* mouseEvent = dynamic_cast<QMouseEvent*>(e);
   QPoint pos = mouseEvent->pos();
 
-  m_treeView->onClick(item, pos, option); 
+  m_treeView->onClick(item, pos, option);
   return true;
 }
 */

@@ -35,32 +35,32 @@ class RoomTabWidget : public QTabBar
 	int m_clickedTabIndex;
 	int m_tabToDeleteIndex;
 	int m_renameTabIndex;
-	DVGui::LineEdit* m_renameTextField;
+	DVGui::LineEdit *m_renameTextField;
 	bool m_isLocked;
 
-public:
+  public:
 	RoomTabWidget(QWidget *parent);
-	~RoomTabWidget();	
+	~RoomTabWidget();
 
-	bool isLocked(){ return m_isLocked; }
+	bool isLocked() { return m_isLocked; }
 
-protected:
+  protected:
 	void swapIndex(int firstIndex, int secondIndex);
 
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *event);
-	void mouseDoubleClickEvent(QMouseEvent * event);
+	void mouseDoubleClickEvent(QMouseEvent *event);
 	void contextMenuEvent(QContextMenuEvent *event);
 
-protected slots:
+  protected slots:
 	void updateTabName();
 	void addNewTab();
 	void deleteTab();
 	void setIsLocked(bool lock);
 	void onCustomizeMenuBar();
 
-signals:
+  signals:
 	void indexSwapped(int firstIndex, int secondIndex);
 	void insertNewTabRoom();
 	void deleteTabRoom(int index);
@@ -80,15 +80,15 @@ class SubSheetBar : public QFrame
 
   void setParentBGColor(const QColor& color) {m_parentBgColor = color;}
   QColor getParentBGColor() const { return m_parentBgColor; }
-  
+
   bool m_mouseOverArrow;
   QPoint m_arrowPosition;
   QSize m_arrowSize;
-   
+
   // Offset used to draw the subsheet in the bottom of the widget
   int m_pixmapYOffset;
   int m_pixmapXOffset;
-  
+
 public:
   SubSheetBar(QWidget *parent);
   ~SubSheetBar();
@@ -97,7 +97,7 @@ protected:
 
   void paintArrow(QPainter &p, int sceneLevel);
 	int getDelta(const QPoint &pos);
-  void paintEvent(QPaintEvent *);    
+  void paintEvent(QPaintEvent *);
   void mousePressEvent(QMouseEvent *event);
   void mouseMoveEvent(QMouseEvent *event);
 
@@ -131,10 +131,10 @@ class UrlOpener : public QObject
 	Q_OBJECT
 	QUrl m_url;
 
-public:
+  public:
 	UrlOpener(const QUrl &url) : m_url(url) {}
 
-public slots:
+  public slots:
 	void open();
 };
 
@@ -144,27 +144,27 @@ class StackedMenuBar : public QStackedWidget
 {
 	Q_OBJECT
 
-	QMenuBar* createCleanupMenuBar();
-	QMenuBar* createPltEditMenuBar();
-	QMenuBar* createInknPaintMenuBar();
-	QMenuBar* createXsheetMenuBar();
-	QMenuBar* createBatchesMenuBar();
-	QMenuBar* createBrowserMenuBar();
-	QMenuBar* createFullMenuBar();
-	QMenuBar* loadMenuBar(const TFilePath & fp);
+	QMenuBar *createCleanupMenuBar();
+	QMenuBar *createPltEditMenuBar();
+	QMenuBar *createInknPaintMenuBar();
+	QMenuBar *createXsheetMenuBar();
+	QMenuBar *createBatchesMenuBar();
+	QMenuBar *createBrowserMenuBar();
+	QMenuBar *createFullMenuBar();
+	QMenuBar *loadMenuBar(const TFilePath &fp);
 
-public:
+  public:
 	StackedMenuBar(QWidget *parent);
 	~StackedMenuBar(){};
 
 	void createMenuBarByName(const QString &roomName);
-	void loadAndAddMenubar(const TFilePath & fp);
-	bool readMenuRecursive( QXmlStreamReader&, QMenu*);
+	void loadAndAddMenubar(const TFilePath &fp);
+	bool readMenuRecursive(QXmlStreamReader &, QMenu *);
 
 	QMenu *addMenu(const QString &, QMenuBar *);
 	void addMenuItem(QMenu *, const char *);
 
-protected slots:
+  protected slots:
 	void onIndexSwapped(int firstIndex, int secondIndex);
 	void insertNewMenuBar();
 	void deleteMenuBar(int index);
@@ -180,28 +180,19 @@ class TopBar : public QToolBar
 	QFrame *m_containerFrame;
 	RoomTabWidget *m_roomTabBar;
 	StackedMenuBar *m_stackedMenuBar;
-	QCheckBox* m_lockRoomCB;
+	QCheckBox *m_lockRoomCB;
 
-public:
+  public:
 	TopBar(QWidget *parent);
 	~TopBar(){};
 
-	QTabBar *getRoomTabWidget() const
-	{
-		return m_roomTabBar;
-	}
+	QTabBar *getRoomTabWidget() const { return m_roomTabBar; }
 
-	StackedMenuBar *getStackedMenuBar() const
-	{
-		return m_stackedMenuBar;
-	}
+	StackedMenuBar *getStackedMenuBar() const { return m_stackedMenuBar; }
 
-protected:
+  protected:
 	/*--  右クリックで消えないようにする--*/
-	void contextMenuEvent(QContextMenuEvent *event)
-	{
-		event->accept();
-	}
+	void contextMenuEvent(QContextMenuEvent *event) { event->accept(); }
 };
 
 #endif // MENUBAR_H

@@ -84,7 +84,8 @@ inline bool angleLess(const TPointD &a, const TPointD &b)
 // a, b, ref assumed normalized
 inline bool angleLess(const TPointD &a, const TPointD &b, const TPointD &ref)
 {
-	return angleLess(a, ref) ? angleLess(b, ref) ? angleLess(a, b) : 0 : angleLess(b, ref) ? 1 : angleLess(a, b);
+	return angleLess(a, ref) ? angleLess(b, ref) ? angleLess(a, b) : 0
+							 : angleLess(b, ref) ? 1 : angleLess(a, b);
 }
 
 //--------------------------------------------------------------------------
@@ -97,8 +98,7 @@ inline bool angleLess(const TPointD &a, const TPointD &b, const TPointD &ref)
 // NOTE: Merge could be used... but it requires operator< and we don't...
 
 //! warning: must be I == T::Reverse_iterator; explicited because on Mac it was not compiling!
-template <class T, class I>
-void append(T &cont1, T &cont2)
+template <class T, class I> void append(T &cont1, T &cont2)
 {
 	I i, j;
 
@@ -116,28 +116,29 @@ typedef unsigned int UINT;
 /*!
   \brief    Graph class used by the centerline vectorization process.
 
-  \details  Introducing a directed graph structure that allows local access: main feature is that a graph edge
-            physically belongs to the node that emitted it, by storing it in a 'link vector' inside the node.
-            No full-scale edge search method is therefore needed to find node neighbours.
+  \details  Introducing a directed graph structure that allows local access: main feature is that a
+  graph edge
+			physically belongs to the node that emitted it, by storing it in a 'link vector' inside
+  the node.
+			No full-scale edge search method is therefore needed to find node neighbours.
 
-            No specific iterator class is needed, just use unsigned ints to perform random access to nodes and
-            links vectors.
+			No specific iterator class is needed, just use unsigned ints to perform random access to
+  nodes and
+			links vectors.
 */
-template <typename NodeContentType, typename ArcType>
-class Graph
+template <typename NodeContentType, typename ArcType> class Graph
 {
-public:
+  public:
 	class Link
 	{
 		UINT m_next;   //!< Index of the node pointed by this link.
 		ArcType m_arc; //!< Edge data associated to this link.
 		int m_access;  //!< Whether access to a node is allowed
 					   //!  through this link.
-	public:
+	  public:
 		Link() : m_access(1) {}
 		Link(UINT _next) : m_next(_next), m_access(1) {}
-		Link(UINT _next, ArcType _arc)
-			: m_next(_next), m_arc(_arc), m_access(1) {}
+		Link(UINT _next, ArcType _arc) : m_next(_next), m_arc(_arc), m_access(1) {}
 		~Link() {}
 
 		ArcType &operator*() { return m_arc; }
@@ -163,7 +164,7 @@ public:
 		NodeContentType m_content; //!< The node's content.
 		int m_attributes;		   //!< Node attributes.
 
-	public:
+	  public:
 		Node() : m_attributes(0) {}
 		Node(const NodeContentType &_cont) : m_content(_cont), m_attributes(0) {}
 		~Node() {}
@@ -187,9 +188,9 @@ public:
 		int degree() const { return int(m_links.size()); }
 
 		/*!
-      \warning    If more links can be set between the same nodes, the
-                  returned link index will be ambiguous.
-    */
+	  \warning    If more links can be set between the same nodes, the
+				  returned link index will be ambiguous.
+	*/
 		UINT linkOfNode(UINT next) const
 		{
 			UINT i = 0;
@@ -199,11 +200,11 @@ public:
 		}
 	};
 
-public:
+  public:
 	std::vector<Node> m_nodes; //!< Nodes container.
 	UINT m_linksCount;		   //!< Links counter.
 
-public:
+  public:
 	Graph() : m_linksCount(0) {}
 	virtual ~Graph() {}
 
@@ -279,21 +280,20 @@ class ContourEdge;
 
 class ContourNode
 {
-public:
-	enum Attributes //! Node attributes
-	{
-		HEAD = 0x1,		  //!< Node is the 'first' of a nodes ring.
-		ELIMINATED = 0x4, //!< Node was eliminated by the SS process.
-		SK_NODE_DROPPED = 0x8,
-		AMBIGUOUS_LEFT = 0x10,  //!< Node represents an ambiguous \a left turn in
-								//!  the original image.
-		AMBIGUOUS_RIGHT = 0x20, //!< Node represents an ambiguous \a right turn in
-								//!  the original image.
-		JR_RESERVED = 0x40,		//!< Reserved for joints recovery.
-		LINEAR_ADDED = 0x80		//!< Node was added by the linear skeleton technique.
+  public:
+	enum Attributes		//! Node attributes
+	{ HEAD = 0x1,		//!< Node is the 'first' of a nodes ring.
+	  ELIMINATED = 0x4, //!< Node was eliminated by the SS process.
+	  SK_NODE_DROPPED = 0x8,
+	  AMBIGUOUS_LEFT = 0x10,  //!< Node represents an ambiguous \a left turn in
+							  //!  the original image.
+	  AMBIGUOUS_RIGHT = 0x20, //!< Node represents an ambiguous \a right turn in
+							  //!  the original image.
+	  JR_RESERVED = 0x40,	 //!< Reserved for joints recovery.
+	  LINEAR_ADDED = 0x80	 //!< Node was added by the linear skeleton technique.
 	};
 
-public:
+  public:
 	// Node kinematics infos
 	T3DPointD m_position,	 //!< Node's position.
 		m_direction,		  //!< Node's direction.
@@ -302,13 +302,14 @@ public:
 		m_AuxiliaryMomentum2; // Used only when this vertex is convex
 
 	// Further node properties
-	bool m_concave;							   //!< Whether the node represents a concave angle.
-	unsigned int m_attributes,				   //!< Bitwise signatures of this node
-		m_updateTime,						   //!< \a Algoritmic time in which the node was updated.
-		m_ancestor,							   //!< Index of the original node from which this one evolved.
-		m_ancestorContour;					   //!< Contour index of the original node from which this one evolved.
-	std::vector<ContourEdge *> m_notOpposites; //!< List of edges \a not to be used as possible opposites.
-	int m_outputNode;						   //!< Skeleton node produced by this ContourNode.
+	bool m_concave;			   //!< Whether the node represents a concave angle.
+	unsigned int m_attributes, //!< Bitwise signatures of this node
+		m_updateTime,		   //!< \a Algoritmic time in which the node was updated.
+		m_ancestor,			   //!< Index of the original node from which this one evolved.
+		m_ancestorContour;	 //!< Contour index of the original node from which this one evolved.
+	std::vector<ContourEdge *>
+		m_notOpposites; //!< List of edges \a not to be used as possible opposites.
+	int m_outputNode;   //!< Skeleton node produced by this ContourNode.
 
 	// Connective data
 	ContourEdge *m_edge; //!< Edge departing from this, keeping adjacent black
@@ -317,18 +318,20 @@ public:
 	ContourNode *m_next; //!< Next node on the contour.
 	ContourNode *m_prev; //!< Previous node on the contour.
 
-public:
+  public:
 	ContourNode() : m_attributes(0) {}
 	ContourNode(double x, double y) : m_position(x, y, 0), m_attributes(0) {}
 	ContourNode(const TPointD &P) : m_position(P.x, P.y, 0), m_attributes(0) {}
 	ContourNode(double x, double y, unsigned short attrib)
-		: m_position(x, y, 0), m_attributes(attrib) {}
+		: m_position(x, y, 0), m_attributes(attrib)
+	{
+	}
 
 	int hasAttribute(int attr) const { return m_attributes & attr; }
 	void setAttribute(int attr) { m_attributes |= attr; }
 	void clearAttribute(int attr) { m_attributes &= ~attr; }
 
-public:
+  public:
 	// Private Node Methods
 	inline void buildNodeInfos(bool forceConvex = false);
 };
@@ -348,24 +351,20 @@ typedef std::vector<ContourFamily> Contours;
 class SkeletonArc
 {
 	double m_slope;
-	unsigned int m_leftGeneratingNode,
-		m_leftContour,
-		m_rightGeneratingNode,
-		m_rightContour;
+	unsigned int m_leftGeneratingNode, m_leftContour, m_rightGeneratingNode, m_rightContour;
 	int m_attributes;
 
 	// NOTE:  Typically an arc is generated by a couple of *edges* of the original
 	//        contours; but we store instead the *nodes* which address those edges.
 
-public:
+  public:
 	SkeletonArc() : m_attributes(0) {}
 	SkeletonArc(ContourNode *node)
-		: m_slope(node->m_direction.z),
-		  m_leftGeneratingNode(node->m_ancestor),
-		  m_leftContour(node->m_ancestorContour),
-		  m_rightGeneratingNode(node->m_prev->m_ancestor),
-		  m_rightContour(node->m_prev->m_ancestorContour),
-		  m_attributes(0) {}
+		: m_slope(node->m_direction.z), m_leftGeneratingNode(node->m_ancestor),
+		  m_leftContour(node->m_ancestorContour), m_rightGeneratingNode(node->m_prev->m_ancestor),
+		  m_rightContour(node->m_prev->m_ancestorContour), m_attributes(0)
+	{
+	}
 
 	enum { ROAD = 0x1 };
 
@@ -376,8 +375,7 @@ public:
 	unsigned int getLeftContour() const { return m_leftContour; }
 	unsigned int getRightContour() const { return m_rightContour; }
 
-	enum { SS_OUTLINE = 0x10,
-		   SS_OUTLINE_REVERSED = 0x20 };
+	enum { SS_OUTLINE = 0x10, SS_OUTLINE_REVERSED = 0x20 };
 
 	int hasAttribute(int attr) const { return m_attributes & attr; }
 	void setAttribute(int attr) { m_attributes |= attr; }
@@ -406,7 +404,7 @@ typedef std::vector<SkeletonGraph *> SkeletonList;
 
 class Sequence
 {
-public:
+  public:
 	UINT m_head;
 	UINT m_headLink;
 	UINT m_tail;
@@ -418,28 +416,29 @@ public:
 	int m_strokeIndex;
 	int m_strokeHeight;
 
-public:
+  public:
 	Sequence() : m_graphHolder(0) {}
 	~Sequence() {}
 
-	//Impose a property dependant only on the extremity we consider first
+	// Impose a property dependant only on the extremity we consider first
 	// - so that the same sequence is not considered twice when head and tail
 	// are exchanged
 	bool isForward() const
 	{
-		return (m_head < m_tail) ||
-			   (m_head == m_tail && m_headLink < m_tailLink);
+		return (m_head < m_tail) || (m_head == m_tail && m_headLink < m_tailLink);
 	}
 
-	//Advances a couple (old, current) of sequence nodes
+	// Advances a couple (old, current) of sequence nodes
 	void advance(UINT &old, UINT &current) const
 	{
 		UINT temp = current;
-		current = m_graphHolder->getNode(current).getLink(0).getNext() == old ? m_graphHolder->getNode(current).getLink(1).getNext() : m_graphHolder->getNode(current).getLink(0).getNext();
+		current = m_graphHolder->getNode(current).getLink(0).getNext() == old
+					  ? m_graphHolder->getNode(current).getLink(1).getNext()
+					  : m_graphHolder->getNode(current).getLink(0).getNext();
 		old = temp;
 	}
 
-	//Advances a couple (current, link) of a sequence node plus its link direction
+	// Advances a couple (current, link) of a sequence node plus its link direction
 	void next(UINT &current, UINT &link) const
 	{
 		UINT temp = current;
@@ -452,14 +451,13 @@ public:
 
 class JointSequenceGraph : public Graph<UINT, Sequence>
 {
-public:
+  public:
 	JointSequenceGraph() {}
 	~JointSequenceGraph() {}
 
-	enum { REACHED = 0x1,
-		   ELIMINATED = 0x2 };
+	enum { REACHED = 0x1, ELIMINATED = 0x2 };
 
-	//Extracts JSG tail link of input node-link
+	// Extracts JSG tail link of input node-link
 	inline UINT tailLinkOf(UINT node, UINT link)
 	{
 		UINT i, next = getNode(node).getLink(link).getNext();
@@ -484,13 +482,13 @@ typedef std::vector<T3DPointD> PointList;
 //----------------
 
 //!\b FOR \b INTERNAL \b USE \b ONLY!
-//!EXPLANATION: Some variables are used widely used and shared by all the "tcenterline*.cpp"
-//sources. Instead than passing each variable repeatedly, it is easier to define a Global
-//class passed to each file, which gets immediatly pointed in an anonymous namespace.
+//! EXPLANATION: Some variables are used widely used and shared by all the "tcenterline*.cpp"
+// sources. Instead than passing each variable repeatedly, it is easier to define a Global
+// class passed to each file, which gets immediatly pointed in an anonymous namespace.
 
 class VectorizerCoreGlobals
 {
-public:
+  public:
 	const CenterlineConfiguration *currConfig;
 
 	JointSequenceGraphList organizedGraphs;
@@ -503,11 +501,9 @@ public:
 
 namespace
 {
-//SkeletonGraph nodes global signatures - used for various purposes
-enum { ORGANIZEGRAPHS_SIGN = 0x10,
-	   SAMPLECOLOR_SIGN = 0x20,
-	   COLORORDERING_SIGN = 0x40 };
-const int infinity = 1000000; //just a great enough number
+// SkeletonGraph nodes global signatures - used for various purposes
+enum { ORGANIZEGRAPHS_SIGN = 0x10, SAMPLECOLOR_SIGN = 0x20, COLORORDERING_SIGN = 0x40 };
+const int infinity = 1000000; // just a great enough number
 };
 
 //--------------------------------------------------------------------------

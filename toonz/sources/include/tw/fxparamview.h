@@ -24,13 +24,13 @@ class DVAPI TFxParamView : public TWidget, public TFxObserver
 {
 	TFxParamViewData *m_data;
 
-public:
+  public:
 	TFxParamView(TWidget *parent, string name = "fxParamView");
 	~TFxParamView();
 
 	void setFx(TFx *fx, const wstring &fxCaption);
 
-	//TFxObserver methods
+	// TFxObserver methods
 	void onChange(const TFxChange &);
 	void onChange(const TFxParamAdded &change);
 	void onChange(const TFxParamRemoved &change);

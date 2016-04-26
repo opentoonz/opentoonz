@@ -27,7 +27,7 @@ TFarmController *TFarmStuff::getTFarmController()
 		::loadControllerData(fp, CtrlData);
 
 		TFarmControllerFactory factory;
-		//int ret =
+		// int ret =
 		factory.create(CtrlData, &FarmController);
 	}
 
@@ -102,7 +102,7 @@ void TFarmStuff::getControllerData(QString &hostName, QString &ipAddr, int &port
 //------------------------------------------------------------------------------
 
 TEnv::StringVar GRootEnvVar("TFarmGlobalRoot", "");
-//TEnv::FilePathVar GRootEnvVar("TFarmGlobalRoot" , TFilePath());
+// TEnv::FilePathVar GRootEnvVar("TFarmGlobalRoot" , TFilePath());
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -118,5 +118,5 @@ TFilePath TFarmStuff::getGlobalRoot()
 void TFarmStuff::setGlobalRoot(const TFilePath &fp)
 {
 	GRootEnvVar = toString(fp.getWideString());
-	//GRootEnvVar = fp;
+	// GRootEnvVar = fp;
 }

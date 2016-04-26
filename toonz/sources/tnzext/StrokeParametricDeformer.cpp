@@ -18,8 +18,7 @@ using namespace std;
 //-----------------------------------------------------------------------------
 
 ToonzExt::StrokeParametricDeformer::StrokeParametricDeformer(double actionLenght,
-															 double startParameter,
-															 TStroke *s,
+															 double startParameter, TStroke *s,
 															 Potential *pot)
 	: startParameter_(startParameter), actionLenght_(actionLenght), vx_(1.0), vy_(1.0), pot_(0)
 {
@@ -31,10 +30,9 @@ ToonzExt::StrokeParametricDeformer::StrokeParametricDeformer(double actionLenght
 		throw std::invalid_argument("Not possible to have a copy of stroke!!!");
 	}
 
-	assert(0.0 <= startParameter_ &&
-		   startParameter_ <= 1.0);
+	assert(0.0 <= startParameter_ && startParameter_ <= 1.0);
 
-	//double
+	// double
 	//  max_length = s->getLength();
 
 	//  if( actionLenght == -1 )
@@ -49,7 +47,7 @@ ToonzExt::StrokeParametricDeformer::StrokeParametricDeformer(double actionLenght
 
 	if (0.0 > actionLenght_)
 		actionLenght_ = 0.0;
-	//else if ( actionLenght_ > max_length )
+	// else if ( actionLenght_ > max_length )
 	//  actionLenght_ = max_length;
 	//}
 
@@ -57,17 +55,14 @@ ToonzExt::StrokeParametricDeformer::StrokeParametricDeformer(double actionLenght
 	if (!pot_)
 		throw std::invalid_argument("Not Possible to have a ref of Potential!!!");
 
-	pot_->setParameters(ref_copy_,
-						startParameter_,
-						actionLenght_);
+	pot_->setParameters(ref_copy_, startParameter_, actionLenght_);
 	assert(pot_);
 	startLenght_ = startParameter_;
 }
 
 //-----------------------------------------------------------------------------
 
-void ToonzExt::StrokeParametricDeformer::setMouseMove(double vx,
-													  double vy)
+void ToonzExt::StrokeParametricDeformer::setMouseMove(double vx, double vy)
 {
 	vx_ = vx;
 	vy_ = vy;
@@ -83,9 +78,8 @@ ToonzExt::StrokeParametricDeformer::~StrokeParametricDeformer()
 
 //-----------------------------------------------------------------------------
 
-TThickPoint
-ToonzExt::StrokeParametricDeformer::getDisplacement(const TStroke &stroke,
-													double w) const
+TThickPoint ToonzExt::StrokeParametricDeformer::getDisplacement(const TStroke &stroke,
+																double w) const
 {
 	// conversion in absolute system for shape deformation
 	double val = pot_->value(w);
@@ -99,9 +93,8 @@ ToonzExt::StrokeParametricDeformer::getDisplacement(const TStroke &stroke,
 //-----------------------------------------------------------------------------
 
 TThickPoint
-ToonzExt::StrokeParametricDeformer::getDisplacementForControlPoint(
-	const TStroke &stroke,
-	UINT n) const
+ToonzExt::StrokeParametricDeformer::getDisplacementForControlPoint(const TStroke &stroke,
+																   UINT n) const
 {
 	double w = stroke.getParameterAtControlPoint(n);
 	return this->getDisplacement(stroke, w);
@@ -110,18 +103,15 @@ ToonzExt::StrokeParametricDeformer::getDisplacementForControlPoint(
 //-----------------------------------------------------------------------------
 
 TThickPoint
-ToonzExt::StrokeParametricDeformer::getDisplacementForControlPointLen(
-	const TStroke &stroke,
-	double cpLen) const
+ToonzExt::StrokeParametricDeformer::getDisplacementForControlPointLen(const TStroke &stroke,
+																	  double cpLen) const
 {
 	return this->getDisplacement(stroke, cpLen);
 }
 
 //-----------------------------------------------------------------------------
 
-double
-ToonzExt::StrokeParametricDeformer::getDelta(const TStroke &stroke,
-											 double w) const
+double ToonzExt::StrokeParametricDeformer::getDelta(const TStroke &stroke, double w) const
 {
 #if 0
   double  w0 = w;
@@ -166,16 +156,14 @@ ToonzExt::StrokeParametricDeformer::getDelta(const TStroke &stroke,
 
 //-----------------------------------------------------------------------------
 
-double
-ToonzExt::StrokeParametricDeformer::getMaxDiff() const
+double ToonzExt::StrokeParametricDeformer::getMaxDiff() const
 {
 	return diff_;
 }
 
 //-----------------------------------------------------------------------------
 
-void ToonzExt::StrokeParametricDeformer::getRange(double &from,
-												  double &to)
+void ToonzExt::StrokeParametricDeformer::getRange(double &from, double &to)
 {
 	double x = ref_copy_->getLength(startParameter_);
 	double delta = x - actionLenght_ * 0.5;

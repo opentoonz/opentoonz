@@ -34,8 +34,8 @@
 //    FormatSettingsPopup  implementation
 //**********************************************************************************
 
-FormatSettingsPopup::FormatSettingsPopup(
-	QWidget *parent, const std::string &format, TPropertyGroup *props)
+FormatSettingsPopup::FormatSettingsPopup(QWidget *parent, const std::string &format,
+										 TPropertyGroup *props)
 	: Dialog(parent), m_format(format), m_props(props), m_levelPath(TFilePath())
 #ifdef _WIN32
 	  ,
@@ -107,7 +107,8 @@ void FormatSettingsPopup::buildPropertyComboBox(int index, TPropertyGroup *props
 
 	DVGui::PropertyComboBox *comboBox = new DVGui::PropertyComboBox(this, prop);
 	m_widgets[prop->getName()] = comboBox;
-	connect(comboBox, SIGNAL(currentIndexChanged(const QString)), this, SLOT(onComboBoxIndexChanged(const QString)));
+	connect(comboBox, SIGNAL(currentIndexChanged(const QString)), this,
+			SLOT(onComboBoxIndexChanged(const QString)));
 	TEnumProperty::Range range = prop->getRange();
 	int currIndex = -1;
 	std::wstring defaultVal = prop->getValue();
@@ -115,10 +116,12 @@ void FormatSettingsPopup::buildPropertyComboBox(int index, TPropertyGroup *props
 	for (int i = 0; i < (int)range.size(); i++) {
 		std::wstring nameProp = range[i];
 
-		if (nameProp.find(L"16(GREYTONES)") != -1) //pezza per il tif: il 16 lo scrive male, e il 48 lo legge male...
+		if (nameProp.find(L"16(GREYTONES)") !=
+			-1) // pezza per il tif: il 16 lo scrive male, e il 48 lo legge male...
 			continue;
-		/* if (nameProp.find(L"ThunderScan")!=-1) //pezza epr il tif, molte compressioni non vanno..scive male il file
-      break;*/
+		/* if (nameProp.find(L"ThunderScan")!=-1) //pezza epr il tif, molte compressioni non
+	  vanno..scive male il file
+	  break;*/
 
 		if (nameProp == defaultVal)
 			currIndex = comboBox->count();
@@ -128,7 +131,8 @@ void FormatSettingsPopup::buildPropertyComboBox(int index, TPropertyGroup *props
 		comboBox->setCurrentIndex(currIndex);
 
 	int row = m_mainLayout->rowCount();
-	m_mainLayout->addWidget(new QLabel(tr(prop->getName().c_str()) + ":", this), row, 0, Qt::AlignRight | Qt::AlignVCenter);
+	m_mainLayout->addWidget(new QLabel(tr(prop->getName().c_str()) + ":", this), row, 0,
+							Qt::AlignRight | Qt::AlignVCenter);
 	m_mainLayout->addWidget(comboBox, row, 1);
 
 #ifdef _WIN32
@@ -148,7 +152,8 @@ void FormatSettingsPopup::buildValueField(int index, TPropertyGroup *props)
 	m_widgets[prop->getName()] = v;
 
 	int row = m_mainLayout->rowCount();
-	m_mainLayout->addWidget(new QLabel(tr(prop->getName().c_str()) + ":", this), row, 0, Qt::AlignRight | Qt::AlignVCenter);
+	m_mainLayout->addWidget(new QLabel(tr(prop->getName().c_str()) + ":", this), row, 0,
+							Qt::AlignRight | Qt::AlignVCenter);
 	m_mainLayout->addWidget(v, row, 1);
 
 	v->setValues(prop->getValue(), prop->getRange().first, prop->getRange().second);
@@ -161,7 +166,8 @@ void FormatSettingsPopup::buildPropertyCheckBox(int index, TPropertyGroup *props
 	TBoolProperty *prop = (TBoolProperty *)(props->getProperty(index));
 	assert(prop);
 
-	DVGui::PropertyCheckBox *v = new DVGui::PropertyCheckBox(tr(prop->getName().c_str()), this, prop);
+	DVGui::PropertyCheckBox *v =
+		new DVGui::PropertyCheckBox(tr(prop->getName().c_str()), this, prop);
 	m_widgets[prop->getName()] = v;
 
 	m_mainLayout->addWidget(v, m_mainLayout->rowCount(), 1);
@@ -181,7 +187,8 @@ void FormatSettingsPopup::buildPropertyLineEdit(int index, TPropertyGroup *props
 	lineEdit->setText(tr(toString(prop->getValue()).c_str()));
 
 	int row = m_mainLayout->rowCount();
-	m_mainLayout->addWidget(new QLabel(tr(prop->getName().c_str()) + ":", this), row, 0, Qt::AlignRight | Qt::AlignVCenter);
+	m_mainLayout->addWidget(new QLabel(tr(prop->getName().c_str()) + ":", this), row, 0,
+							Qt::AlignRight | Qt::AlignVCenter);
 	m_mainLayout->addWidget(lineEdit, row, 1);
 }
 
@@ -241,7 +248,8 @@ void FormatSettingsPopup::showEvent(QShowEvent *se)
 		QMap<std::wstring, bool> usableCodecs = AviCodecRestrictions::getUsableCodecs(res);
 		for (int i = 0; i < (int)range.size(); i++) {
 			std::wstring nameProp = range[i];
-			if (nameProp == L"Uncompressed" || (usableCodecs.contains(nameProp) && usableCodecs[nameProp])) {
+			if (nameProp == L"Uncompressed" ||
+				(usableCodecs.contains(nameProp) && usableCodecs[nameProp])) {
 				if (nameProp == defaultVal)
 					currIndex = m_codecComboBox->count();
 				m_codecComboBox->addItem(QString::fromStdWString(nameProp));
@@ -261,13 +269,15 @@ void FormatSettingsPopup::showEvent(QShowEvent *se)
 //    API  functions
 //**********************************************************************************
 
-FormatSettingsPopup *openFormatSettingsPopup(
-	QWidget *parent, const std::string &format, TPropertyGroup *props, const TFilePath &levelPath)
+FormatSettingsPopup *openFormatSettingsPopup(QWidget *parent, const std::string &format,
+											 TPropertyGroup *props, const TFilePath &levelPath)
 {
-	if (format == "mov" || format == "3gp") // trattato diversamente; il format popup dei mov e' quello di quicktime
+	if (format == "mov" ||
+		format == "3gp") // trattato diversamente; il format popup dei mov e' quello di quicktime
 	{
 		// gmt 26/9/07. con la penna capita spesso di premere ripetutamente il bottone.
-		// si aprono due popup uno sopra l'altro (brutto di per se e puo' causare dei crash misteriosi)
+		// si aprono due popup uno sopra l'altro (brutto di per se e puo' causare dei crash
+		// misteriosi)
 		static bool popupIsOpen = false;
 		if (popupIsOpen)
 			return 0;

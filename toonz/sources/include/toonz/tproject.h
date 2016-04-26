@@ -29,7 +29,7 @@ class DVAPI TProject : public TSmartObject
 	std::map<std::string, bool> m_useScenePathFlags;
 	TSceneProperties *m_sprop;
 
-public:
+  public:
 	// default folders names
 	static const std::string Inputs;
 	static const std::string Drawings;
@@ -68,10 +68,7 @@ public:
 	bool isCurrent() const;
 
 	void setSceneProperties(const TSceneProperties &sprop);
-	const TSceneProperties &getSceneProperties() const
-	{
-		return *m_sprop;
-	}
+	const TSceneProperties &getSceneProperties() const { return *m_sprop; }
 
 	//?????????????????????????????????????????????
 	void setUseScenePath(std::string folderName, bool on);
@@ -89,7 +86,7 @@ public:
 
 	static bool isAProjectPath(const TFilePath &fp);
 
-private:
+  private:
 	// not implemented
 	TProject(const TProject &src);
 	TProject &operator=(const TProject &);
@@ -104,16 +101,16 @@ typedef TSmartPointerT<TProject> TProjectP;
 
 class DVAPI TProjectManager
 { // singleton
-public:
+  public:
 	class Listener
 	{
-	public:
+	  public:
 		virtual void onProjectSwitched() = 0;
 		virtual void onProjectChanged() = 0;
 		virtual ~Listener() {}
 	};
 
-private:
+  private:
 	std::vector<TFilePath> m_projectsRoots;
 	std::vector<TFilePath> m_svnProjectsRoots;
 	std::set<Listener *> m_listeners;
@@ -126,7 +123,7 @@ private:
 	bool m_tabMode;
 	bool m_tabKidsMode;
 
-public:
+  public:
 	~TProjectManager();
 
 	void notifyProjectChanged();
@@ -144,7 +141,8 @@ public:
 	void addProjectsRoot(const TFilePath &fp);
 	void addSVNProjectsRoot(const TFilePath &fp);
 
-	//! returns the project root of the current project (if this fails, then returns the first project root)
+	//! returns the project root of the current project (if this fails, then returns the first
+	//! project root)
 	TFilePath getCurrentProjectRoot();
 
 	TFilePath projectPathToProjectName(const TFilePath &projectPath);
@@ -170,7 +168,10 @@ public:
 	TFilePath getSandboxProjectFolder();
 	TFilePath getSandboxProjectPath();
 
-	void getProjectRoots(std::vector<TFilePath> &projectRoots) const { projectRoots = m_projectsRoots; }
+	void getProjectRoots(std::vector<TFilePath> &projectRoots) const
+	{
+		projectRoots = m_projectsRoots;
+	}
 
 	bool isProject(const TFilePath &projectFolder);
 };

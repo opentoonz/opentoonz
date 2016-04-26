@@ -29,9 +29,7 @@ inline float dot(float3 a, float3 b)
 /* 外積を返す */
 inline float3 cross(float3 a, float3 b)
 {
-	float3 ret = {a.y * b.z - a.z * b.y,
-				  a.z * b.x - a.x * b.z,
-				  a.x * b.y - a.y * b.x};
+	float3 ret = {a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x};
 	return ret;
 }
 
@@ -39,9 +37,7 @@ inline float3 cross(float3 a, float3 b)
 inline float3 normalize(float3 v)
 {
 	float length = sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
-	float3 ret = {v.x / length,
-				  v.y / length,
-				  v.z / length};
+	float3 ret = {v.x / length, v.y / length, v.z / length};
 	return ret;
 }
 }
@@ -51,11 +47,8 @@ inline float3 normalize(float3 v)
 ------------------------------------------------------------*/
 
 template <typename RASTER, typename PIXEL>
-void Iwa_PNPerspectiveFx::setOutputRaster(float4 *srcMem,
-										  const RASTER dstRas,
-										  TDimensionI dim,
-										  int drawLevel,
-										  const bool alp_rend_sw)
+void Iwa_PNPerspectiveFx::setOutputRaster(float4 *srcMem, const RASTER dstRas, TDimensionI dim,
+										  int drawLevel, const bool alp_rend_sw)
 {
 
 	typename PIXEL::Channel halfChan = (typename PIXEL::Channel)(PIXEL::maxChannelValue / 2);
@@ -70,13 +63,17 @@ void Iwa_PNPerspectiveFx::setOutputRaster(float4 *srcMem,
 		for (int i = 0; i < dstRas->getLx(); i++, chan_p++, pix++) {
 			float val;
 			val = (*chan_p).x * (float)PIXEL::maxChannelValue + 0.5f;
-			pix->r = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
+			pix->r = (typename PIXEL::Channel)(
+				(val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
 			val = (*chan_p).y * (float)PIXEL::maxChannelValue + 0.5f;
-			pix->g = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
+			pix->g = (typename PIXEL::Channel)(
+				(val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
 			val = (*chan_p).z * (float)PIXEL::maxChannelValue + 0.5f;
-			pix->b = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
+			pix->b = (typename PIXEL::Channel)(
+				(val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
 			val = (*chan_p).w * (float)PIXEL::maxChannelValue + 0.5f;
-			pix->m = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
+			pix->m = (typename PIXEL::Channel)(
+				(val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
 		}
 	}
 }
@@ -85,8 +82,7 @@ void Iwa_PNPerspectiveFx::setOutputRaster(float4 *srcMem,
  PerlinNoiseのパラメータを取得
 ------------------------------------------------------------*/
 void Iwa_PNPerspectiveFx::getPNParameters(TTile &tile, double frame,
-										  const TRenderSettings &settings,
-										  PN_Params &params,
+										  const TRenderSettings &settings, PN_Params &params,
 										  TDimensionI &dimOut)
 {
 	/*  動作パラメータを得る */
@@ -97,8 +93,7 @@ void Iwa_PNPerspectiveFx::getPNParameters(TTile &tile, double frame,
 	if (params.noiseType == 1)
 		params.size *= 1.41421356f;
 	params.octaves = m_octaves->getValue() + 1;
-	params.offset = float2{(float)m_offset->getValue(frame).x,
-						   (float)m_offset->getValue(frame).y};
+	params.offset = float2{(float)m_offset->getValue(frame).x, (float)m_offset->getValue(frame).y};
 	params.p_intensity = (float)m_persistance_intensity->getValue(frame);
 	params.p_size = (float)m_persistance_size->getValue(frame);
 	params.p_offset = (float)m_persistance_offset->getValue(frame);
@@ -134,8 +129,7 @@ void Iwa_PNPerspectiveFx::getPNParameters(TTile &tile, double frame,
 
 	/* カメラたて方向のmmサイズの半分の寸法 */
 	int camHeight = settings.m_cameraBox.getLy();
-	TPointD vec_p0p1((double)camHeight * aff_pn.a12,
-					 (double)camHeight * aff_pn.a22);
+	TPointD vec_p0p1((double)camHeight * aff_pn.a12, (double)camHeight * aff_pn.a22);
 	params.fy_2 = sqrtf(vec_p0p1.x * vec_p0p1.x + vec_p0p1.y * vec_p0p1.y) / 2.0f;
 
 	float fov_radian_2 = (fov / 2.0f) * M_PI / 180.0f;
@@ -158,8 +152,7 @@ void Iwa_PNPerspectiveFx::getPNParameters(TTile &tile, double frame,
 	if (phi >= 0.0f && phi < 90.0f) {
 		int index = (int)phi;
 		float ratio = phi - (float)index;
-		params.base_fresnel_ref = fresnel[index] * (1.0f - ratio) +
-								  fresnel[index + 1] * ratio;
+		params.base_fresnel_ref = fresnel[index] * (1.0f - ratio) + fresnel[index + 1] * ratio;
 	}
 
 	/*強度の正規化のため、合計値を算出*/
@@ -174,7 +167,11 @@ void Iwa_PNPerspectiveFx::getPNParameters(TTile &tile, double frame,
 //------------------------------------------------------------
 
 Iwa_PNPerspectiveFx::Iwa_PNPerspectiveFx()
-	: m_renderMode(new TIntEnumParam(0, "Noise")), m_noiseType(new TIntEnumParam(0, "Perlin Noise")), m_size(10.0), m_evolution(0.0), m_octaves(new TIntEnumParam(0, "1")), m_offset(TPointD(0, 0)), m_persistance_intensity(0.5), m_persistance_size(0.5), m_persistance_evolution(0.5), m_persistance_offset(0.5), m_fov(30), m_eyeLevel(TPointD(0, 0)), m_alpha_rendering(true), m_waveHeight(10.0)
+	: m_renderMode(new TIntEnumParam(0, "Noise")),
+	  m_noiseType(new TIntEnumParam(0, "Perlin Noise")), m_size(10.0), m_evolution(0.0),
+	  m_octaves(new TIntEnumParam(0, "1")), m_offset(TPointD(0, 0)), m_persistance_intensity(0.5),
+	  m_persistance_size(0.5), m_persistance_evolution(0.5), m_persistance_offset(0.5), m_fov(30),
+	  m_eyeLevel(TPointD(0, 0)), m_alpha_rendering(true), m_waveHeight(10.0)
 {
 	bindParam(this, "renderMode", m_renderMode);
 	bindParam(this, "noiseType", m_noiseType);
@@ -245,8 +242,7 @@ bool Iwa_PNPerspectiveFx::canHandle(const TRenderSettings &info, double frame)
 void Iwa_PNPerspectiveFx::doCompute(TTile &tile, double frame, const TRenderSettings &settings)
 {
 	/* サポートしていないPixelタイプはエラーを投げる */
-	if (!((TRaster32P)tile.getRaster()) &&
-		!((TRaster64P)tile.getRaster())) {
+	if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster())) {
 		throw TRopException("unsupported input pixel type");
 	}
 
@@ -271,49 +267,33 @@ void Iwa_PNPerspectiveFx::doCompute(TTile &tile, double frame, const TRenderSett
 	out_host_ras->lock();
 	out_host = (float4 *)out_host_ras->getRawData();
 
-	doCompute_CPU(tile, frame, settings,
-				  out_host,
-				  dimOut,
-				  pnParams);
+	doCompute_CPU(tile, frame, settings, out_host, dimOut, pnParams);
 
 	/* 出力結果をChannel値に変換して格納 */
 	tile.getRaster()->clear();
 	TRaster32P outRas32 = (TRaster32P)tile.getRaster();
 	TRaster64P outRas64 = (TRaster64P)tile.getRaster();
 	if (outRas32)
-		setOutputRaster<TRaster32P, TPixel32>(out_host, outRas32, dimOut, pnParams.drawLevel, pnParams.alp_rend_sw);
+		setOutputRaster<TRaster32P, TPixel32>(out_host, outRas32, dimOut, pnParams.drawLevel,
+											  pnParams.alp_rend_sw);
 	else if (outRas64)
-		setOutputRaster<TRaster64P, TPixel64>(out_host, outRas64, dimOut, pnParams.drawLevel, pnParams.alp_rend_sw);
+		setOutputRaster<TRaster64P, TPixel64>(out_host, outRas64, dimOut, pnParams.drawLevel,
+											  pnParams.alp_rend_sw);
 
 	out_host_ras->unlock();
 }
 
 //------------------------------------------------------------
-void Iwa_PNPerspectiveFx::doCompute_CPU(TTile &tile,
-										double frame,
-										const TRenderSettings &settings,
-										float4 *out_host,
-										TDimensionI &dimOut,
-										PN_Params &pnParams)
+void Iwa_PNPerspectiveFx::doCompute_CPU(TTile &tile, double frame, const TRenderSettings &settings,
+										float4 *out_host, TDimensionI &dimOut, PN_Params &pnParams)
 {
 	/* モードで分ける */
 	if (pnParams.renderMode == 0 || pnParams.renderMode == 1) {
-		calcPerinNoise_CPU(
-			out_host,
-			dimOut,
-			pnParams,
-			(bool)(pnParams.renderMode == 0));
+		calcPerinNoise_CPU(out_host, dimOut, pnParams, (bool)(pnParams.renderMode == 0));
 	} else if (pnParams.renderMode == 2 || pnParams.renderMode == 3 || pnParams.renderMode == 4) {
-		calcPNNormal_CPU(
-			out_host,
-			dimOut,
-			pnParams);
+		calcPNNormal_CPU(out_host, dimOut, pnParams);
 		if (pnParams.renderMode == 4) {
-			calcPNNormal_CPU(
-				out_host,
-				dimOut,
-				pnParams,
-				true);
+			calcPNNormal_CPU(out_host, dimOut, pnParams, true);
 		}
 	}
 }
@@ -321,9 +301,7 @@ void Iwa_PNPerspectiveFx::doCompute_CPU(TTile &tile,
 /*------------------------------------------------------------
  通常のノイズのCPU計算
 ------------------------------------------------------------*/
-void Iwa_PNPerspectiveFx::calcPerinNoise_CPU(float4 *out_host,
-											 TDimensionI &dimOut,
-											 PN_Params &p,
+void Iwa_PNPerspectiveFx::calcPerinNoise_CPU(float4 *out_host, TDimensionI &dimOut, PN_Params &p,
 											 bool doResample)
 {
 	int reso = (doResample) ? 10 : 1;
@@ -343,15 +321,15 @@ void Iwa_PNPerspectiveFx::calcPerinNoise_CPU(float4 *out_host,
 										tmpPixPos.x * p.a21 + tmpPixPos.y * p.a22 + p.a23};
 					/* ② Perlin Noise 平面上の座標を計算する */
 					float2 noisePos;
-					noisePos.x = -(p.eyeLevel.y + p.fy_2) *
-									 (screenPos.x - p.eyeLevel.x) / (screenPos.y - p.eyeLevel.y) +
+					noisePos.x = -(p.eyeLevel.y + p.fy_2) * (screenPos.x - p.eyeLevel.x) /
+									 (screenPos.y - p.eyeLevel.y) +
 								 p.eyeLevel.x;
 					noisePos.y = (p.fy_2 + screenPos.y) * p.A / (p.eyeLevel.y - screenPos.y);
 					float tmpVal = 0.5f;
 					float currentSize = p.size;
 					float2 currentOffset = p.offset;
 					float currentIntensity = 1.0f;
-					//float2* basis_p = basis;
+					// float2* basis_p = basis;
 
 					float currentEvolution = p.time;
 
@@ -361,14 +339,14 @@ void Iwa_PNPerspectiveFx::calcPerinNoise_CPU(float4 *out_host,
 												  (noisePos.y - currentOffset.y) / currentSize};
 
 						if (p.noiseType == 0) {
-							tmpVal += currentIntensity * Noise1234::noise(currentNoisePos.x,
-																		  currentNoisePos.y,
-																		  currentEvolution) /
+							tmpVal += currentIntensity *
+									  Noise1234::noise(currentNoisePos.x, currentNoisePos.y,
+													   currentEvolution) /
 									  p.int_sum;
 						} else {
-							tmpVal += currentIntensity * SimplexNoise::noise(currentNoisePos.x,
-																			 currentNoisePos.y,
-																			 currentEvolution) /
+							tmpVal += currentIntensity *
+									  SimplexNoise::noise(currentNoisePos.x, currentNoisePos.y,
+														  currentEvolution) /
 									  p.int_sum;
 						}
 
@@ -399,9 +377,7 @@ void Iwa_PNPerspectiveFx::calcPerinNoise_CPU(float4 *out_host,
 /*------------------------------------------------------------
  WarpHVモード、Fresnel反射モード
 ------------------------------------------------------------*/
-void Iwa_PNPerspectiveFx::calcPNNormal_CPU(float4 *out_host,
-										   TDimensionI &dimOut,
-										   PN_Params &p,
+void Iwa_PNPerspectiveFx::calcPNNormal_CPU(float4 *out_host, TDimensionI &dimOut, PN_Params &p,
 										   bool isSubWave)
 {
 	/* 結果を収めるイテレータ */
@@ -415,8 +391,8 @@ void Iwa_PNPerspectiveFx::calcPNNormal_CPU(float4 *out_host,
 			/*  ② Perlin Noise 平面上の座標を計算する */
 			float2 noisePos;
 
-			noisePos.x = -(p.eyeLevel.y + p.fy_2) *
-							 (screenPos.x - p.eyeLevel.x) / (screenPos.y - p.eyeLevel.y) +
+			noisePos.x = -(p.eyeLevel.y + p.fy_2) * (screenPos.x - p.eyeLevel.x) /
+							 (screenPos.y - p.eyeLevel.y) +
 						 p.eyeLevel.x;
 
 			noisePos.y = (p.fy_2 + screenPos.y) * p.A / (p.eyeLevel.y - screenPos.y);
@@ -438,71 +414,65 @@ void Iwa_PNPerspectiveFx::calcPNNormal_CPU(float4 *out_host,
 				float currentSize = p.size;
 				float2 currentOffset = p.offset;
 				float currentIntensity = 1.0f;
-				//float2* basis_p = basis;
+				// float2* basis_p = basis;
 				float currentEvolution = (isSubWave) ? p.time + 100.0f : p.time;
 				/* 各世代について */
-				for (int o = 0; o < p.octaves;
-					 o++,
-						 currentSize *= p.p_size,
-						 currentOffset.x *= p.p_offset,
-						 currentOffset.y *= p.p_offset,
+				for (int o = 0; o < p.octaves; o++, currentSize *= p.p_size,
+						 currentOffset.x *= p.p_offset, currentOffset.y *= p.p_offset,
 						 currentIntensity *= p.p_intensity) {
 					/* プラス方向、マイナス方向それぞれオフセットしたノイズ座標を求める */
 					float2 currentOffsetNoisePos[2];
 					for (int mp = 0; mp < 2; mp++)
-						currentOffsetNoisePos[mp] = float2{(kinbouNoisePos[mp].x - currentOffset.x) / currentSize,
-														   (kinbouNoisePos[mp].y - currentOffset.y) / currentSize};
+						currentOffsetNoisePos[mp] =
+							float2{(kinbouNoisePos[mp].x - currentOffset.x) / currentSize,
+								   (kinbouNoisePos[mp].y - currentOffset.y) / currentSize};
 
 					/* ノイズの差分を積算していく */
 					float noiseDiff;
-					//Perlin Noise
+					// Perlin Noise
 					if (p.noiseType == 0) {
 						noiseDiff = Noise1234::noise(currentOffsetNoisePos[1].x,
-													 currentOffsetNoisePos[1].y,
-													 currentEvolution) -
+													 currentOffsetNoisePos[1].y, currentEvolution) -
 									Noise1234::noise(currentOffsetNoisePos[0].x,
-													 currentOffsetNoisePos[0].y,
-													 currentEvolution);
+													 currentOffsetNoisePos[0].y, currentEvolution);
 					} else {
 						/* インデックスをチェック */
 						/* まず、前後 */
-						CellIds kinbouIds[2] = {SimplexNoise::getCellIds(currentOffsetNoisePos[0].x,
-																		 currentOffsetNoisePos[0].y,
-																		 currentEvolution),
-												SimplexNoise::getCellIds(currentOffsetNoisePos[1].x,
-																		 currentOffsetNoisePos[1].y,
-																		 currentEvolution)};
+						CellIds kinbouIds[2] = {
+							SimplexNoise::getCellIds(currentOffsetNoisePos[0].x,
+													 currentOffsetNoisePos[0].y, currentEvolution),
+							SimplexNoise::getCellIds(currentOffsetNoisePos[1].x,
+													 currentOffsetNoisePos[1].y, currentEvolution)};
 						/* 同じセルに入っていたら、普通に差分を計算 */
 						if (kinbouIds[0] == kinbouIds[1]) {
-							noiseDiff = SimplexNoise::noise(currentOffsetNoisePos[1].x,
-															currentOffsetNoisePos[1].y,
-															currentEvolution) -
-										SimplexNoise::noise(currentOffsetNoisePos[0].x,
-															currentOffsetNoisePos[0].y,
-															currentEvolution);
+							noiseDiff =
+								SimplexNoise::noise(currentOffsetNoisePos[1].x,
+													currentOffsetNoisePos[1].y, currentEvolution) -
+								SimplexNoise::noise(currentOffsetNoisePos[0].x,
+													currentOffsetNoisePos[0].y, currentEvolution);
 						}
 						/* 違うセルの場合、中心位置を用いる */
 						else {
-							float2 currentCenterNoisePos = {(noisePos.x - currentOffset.x) / currentSize,
-															(noisePos.y - currentOffset.y) / currentSize};
-							CellIds centerIds = SimplexNoise::getCellIds(currentCenterNoisePos.x,
-																		 currentCenterNoisePos.y,
-																		 currentEvolution);
+							float2 currentCenterNoisePos = {
+								(noisePos.x - currentOffset.x) / currentSize,
+								(noisePos.y - currentOffset.y) / currentSize};
+							CellIds centerIds = SimplexNoise::getCellIds(
+								currentCenterNoisePos.x, currentCenterNoisePos.y, currentEvolution);
 							if (kinbouIds[0] == centerIds) {
-								noiseDiff = SimplexNoise::noise(currentCenterNoisePos.x,
-																currentCenterNoisePos.y,
-																currentEvolution) -
-											SimplexNoise::noise(currentOffsetNoisePos[0].x,
-																currentOffsetNoisePos[0].y,
-																currentEvolution);
+								noiseDiff =
+									SimplexNoise::noise(currentCenterNoisePos.x,
+														currentCenterNoisePos.y, currentEvolution) -
+									SimplexNoise::noise(currentOffsetNoisePos[0].x,
+														currentOffsetNoisePos[0].y,
+														currentEvolution);
 							} else // if(kinbouIds[1] == centerIds)
 							{
-								noiseDiff = SimplexNoise::noise(currentOffsetNoisePos[1].x,
-																currentOffsetNoisePos[1].y,
-																currentEvolution) -
-											SimplexNoise::noise(currentCenterNoisePos.x,
-																currentCenterNoisePos.y,
-																currentEvolution);
+								noiseDiff =
+									SimplexNoise::noise(currentOffsetNoisePos[1].x,
+														currentOffsetNoisePos[1].y,
+														currentEvolution) -
+									SimplexNoise::noise(currentCenterNoisePos.x,
+														currentCenterNoisePos.y, currentEvolution);
 							}
 							/* 片端→中心の変位を使っているので、片端→片端に合わせて変位を2倍する */
 							noiseDiff *= 2.0f;
@@ -521,9 +491,7 @@ void Iwa_PNPerspectiveFx::calcPNNormal_CPU(float4 *out_host,
 			float3 normal = normalize(cross(vec_x, vec_y));
 
 			/* カメラから平面へのベクトル */
-			float3 cam_vec = {noisePos.x - p.cam_pos.x,
-							  noisePos.y - p.cam_pos.y,
-							  -p.cam_pos.z};
+			float3 cam_vec = {noisePos.x - p.cam_pos.x, noisePos.y - p.cam_pos.y, -p.cam_pos.z};
 			cam_vec = normalize(cam_vec);
 			/* WarpHVの参照画像モード */
 			if (p.renderMode == 2 || p.renderMode == 4) {
@@ -533,9 +501,7 @@ void Iwa_PNPerspectiveFx::calcPNNormal_CPU(float4 *out_host,
 									  2.0f * alpha * normal.y - cam_vec.y,
 									  2.0f * alpha * normal.z - cam_vec.z}; /* これの長さは１ */
 				/* 完全に水平な面で反射した場合の反射ベクトル */
-				float3 reflect_cam_mirror = {cam_vec.x,
-											 cam_vec.y,
-											 -cam_vec.z};
+				float3 reflect_cam_mirror = {cam_vec.x, cam_vec.y, -cam_vec.z};
 				/* 角度のずれを格納する */
 				/*  -PI/2 ～ PI/2 */
 				float angle_h = atanf(reflect_cam.x / reflect_cam.y) -
@@ -576,10 +542,9 @@ void Iwa_PNPerspectiveFx::calcPNNormal_CPU(float4 *out_host,
 				if (diffuse_angle >= 0.0f && diffuse_angle < 90.0f) {
 					int index = (int)diffuse_angle;
 					float ratio = diffuse_angle - (float)index;
-					float fresnel_ref = fresnel[index] * (1.0f - ratio) +
-										fresnel[index + 1] * ratio;
-					ref = (fresnel_ref - p.base_fresnel_ref) /
-						  (1.0f - p.base_fresnel_ref);
+					float fresnel_ref =
+						fresnel[index] * (1.0f - ratio) + fresnel[index + 1] * ratio;
+					ref = (fresnel_ref - p.base_fresnel_ref) / (1.0f - p.base_fresnel_ref);
 				} else if (diffuse_angle >= 90.0f)
 					ref = 1.0f;
 

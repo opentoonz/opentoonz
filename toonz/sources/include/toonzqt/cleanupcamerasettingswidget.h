@@ -48,12 +48,12 @@ class DVAPI CleanupCameraSettingsWidget : public QFrame
 	Q_OBJECT
 	CameraSettingsWidget *m_cameraWidget;
 
-public:
+  public:
 	DVGui::MeasuredDoubleLineEdit *m_offsX, *m_offsY;
 	/*--- オフセットを軸毎にロックする ---*/
 	QCheckBox *m_offsx_lock, *m_offsy_lock;
 
-public:
+  public:
 	CleanupCameraSettingsWidget();
 	~CleanupCameraSettingsWidget();
 
@@ -75,7 +75,7 @@ public:
 	// needed by the "use level settings" button
 	void setCurrentLevel(TXshLevel *);
 
-signals:
+  signals:
 	void cleanupSettingsChanged();
 };
 

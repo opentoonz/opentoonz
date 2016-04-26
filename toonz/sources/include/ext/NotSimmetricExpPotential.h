@@ -9,10 +9,10 @@
 
 /**
  * @brief This class is to use a not symmetric exponential potential.
- * 
+ *
  *  @code
  *          __|_
- *        /   | |  
+ *        /   | |
  *    __/     |  \___
  *
  *                                         2
@@ -21,11 +21,11 @@
  *                    {
  *      potential(x)= {
  *                    {                     2
- *                    {   -[(x  - t) / d2] 
+ *                    {   -[(x  - t) / d2]
  *                    {  e [             ] for x >= 0
- *                     
+ *
  * con d   min( length_at_param, action_length *0.5)
- *      1 
+ *      1
  * ed  d   min( curve_lenght - length_at_param, action_length *0.5)
  *      2
  *  @endcode
@@ -47,25 +47,18 @@
 
 namespace ToonzExt
 {
-class DVAPI
-	NotSimmetricExpPotential
-	: public Potential
+class DVAPI NotSimmetricExpPotential : public Potential
 {
-public:
+  public:
 	virtual ~NotSimmetricExpPotential();
 
 	// chiama compute_value ma effettua un controllo del parametro
-	virtual double
-	value_(double radiusToTest) const;
+	virtual double value_(double radiusToTest) const;
 
-	virtual void
-	setParameters_(const TStroke *ref,
-				   double par,
-				   double al);
-	Potential *
-	clone();
+	virtual void setParameters_(const TStroke *ref, double par, double al);
+	Potential *clone();
 
-private:
+  private:
 	double compute_shape(double) const; // funzione ausiliaria per
 	// il calcolo del parametro
 	// da usare

@@ -15,15 +15,13 @@ class SquareGradientFx : public TStandardZeraryFx
 	TSpectrumParamP m_colors;
 	TDoubleParamP m_size;
 
-public:
-	SquareGradientFx()
-		: m_size(200.0)
+  public:
+	SquareGradientFx() : m_size(200.0)
 	{
 		m_size->setMeasureName("fxLength");
-		TSpectrum::ColorKey colors[] = {
-			TSpectrum::ColorKey(0, TPixel32::White),
-			//TSpectrum::ColorKey(0.5,TPixel32::Yellow),
-			TSpectrum::ColorKey(1, TPixel32::Red)};
+		TSpectrum::ColorKey colors[] = {TSpectrum::ColorKey(0, TPixel32::White),
+										// TSpectrum::ColorKey(0.5,TPixel32::Yellow),
+										TSpectrum::ColorKey(1, TPixel32::Red)};
 		m_colors = TSpectrumParamP(tArrayCount(colors), colors);
 		bindParam(this, "colors", m_colors);
 		bindParam(this, "size", m_size);
@@ -50,7 +48,8 @@ public:
 };
 
 template <typename PIXEL>
-void doSquareGradient(const TRasterPT<PIXEL> &ras, const TSpectrumT<PIXEL> &spectrum, TPointD &posTrasf, TAffine aff, double size)
+void doSquareGradient(const TRasterPT<PIXEL> &ras, const TSpectrumT<PIXEL> &spectrum,
+					  TPointD &posTrasf, TAffine aff, double size)
 {
 	PIXEL outpixel = spectrum.getPremultipliedValue(1.);
 	int j;
@@ -80,8 +79,7 @@ void doSquareGradient(const TRasterPT<PIXEL> &ras, const TSpectrumT<PIXEL> &spec
 
 //------------------------------------------------------------------------------
 
-void SquareGradientFx::doCompute(TTile &tile, double frame,
-								 const TRenderSettings &ri)
+void SquareGradientFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 {
 	double size = m_size->getValue(frame) / ri.m_shrinkX;
 
@@ -90,15 +88,9 @@ void SquareGradientFx::doCompute(TTile &tile, double frame,
 	TPointD posTrasf = aff * tile.m_pos;
 
 	if (TRaster32P raster32 = tile.getRaster())
-		doSquareGradient<TPixel32>(
-			raster32,
-			m_colors->getValue(frame),
-			posTrasf, aff, size);
+		doSquareGradient<TPixel32>(raster32, m_colors->getValue(frame), posTrasf, aff, size);
 	else if (TRaster64P raster64 = tile.getRaster())
-		doSquareGradient<TPixel64>(
-			raster64,
-			m_colors->getValue64(frame),
-			posTrasf, aff, size);
+		doSquareGradient<TPixel64>(raster64, m_colors->getValue64(frame), posTrasf, aff, size);
 	else
 		throw TException("SquareGradientFx: unsupported Pixel Type");
 }

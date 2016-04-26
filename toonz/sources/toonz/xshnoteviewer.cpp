@@ -33,7 +33,9 @@ QString computeBackgroundStyleSheetString(QColor color)
 	QVariant vG(color.green());
 	QVariant vB(color.blue());
 	QVariant vA(color.alpha());
-	return QString("#noteTextEdit { border-image: 0; background: rgbm(") + vR.toString() + QString(",") + vG.toString() + QString(",") + vB.toString() + QString(",") + vA.toString() + QString("); }");
+	return QString("#noteTextEdit { border-image: 0; background: rgbm(") + vR.toString() +
+		   QString(",") + vG.toString() + QString(",") + vB.toString() + QString(",") +
+		   vA.toString() + QString("); }");
 }
 }
 
@@ -47,7 +49,8 @@ namespace XsheetGUI
 //-----------------------------------------------------------------------------
 
 NotePopup::NotePopup(XsheetViewer *viewer, int noteIndex)
-	: DVGui::Dialog(TApp::instance()->getMainWindow(), false, false, "NotePopup"), m_viewer(viewer), m_noteIndex(noteIndex), m_currentColorIndex(0), m_isOneButtonPressed(false)
+	: DVGui::Dialog(TApp::instance()->getMainWindow(), false, false, "NotePopup"), m_viewer(viewer),
+	  m_noteIndex(noteIndex), m_currentColorIndex(0), m_isOneButtonPressed(false)
 {
 	setWindowTitle(tr("Memo"));
 	bool ret = true;
@@ -80,7 +83,8 @@ NotePopup::NotePopup(XsheetViewer *viewer, int noteIndex)
 	m_textEditor = new DVGui::DvTextEdit(this);
 	m_textEditor->setObjectName("noteTextEdit");
 	m_textEditor->setHtml(text);
-	m_textEditor->setStyleSheet(computeBackgroundStyleSheetString(QColor(color.r, color.g, color.b, color.m)));
+	m_textEditor->setStyleSheet(
+		computeBackgroundStyleSheetString(QColor(color.r, color.g, color.b, color.m)));
 	layout->addWidget(m_textEditor, row, col, 1, 9);
 	layout->setRowStretch(row, 10);
 	ret = ret && connect(m_textEditor, SIGNAL(focusIn()), this, SLOT(onTextEditFocusIn()));
@@ -88,37 +92,44 @@ NotePopup::NotePopup(XsheetViewer *viewer, int noteIndex)
 
 	int index = 0;
 	DVGui::ColorField *color1 = createColorField(index);
-	ret = ret && connect(color1, SIGNAL(editingChanged(const TPixel32 &, bool)), SLOT(onColor1Switched(const TPixel32 &, bool)));
+	ret = ret && connect(color1, SIGNAL(editingChanged(const TPixel32 &, bool)),
+						 SLOT(onColor1Switched(const TPixel32 &, bool)));
 	layout->addWidget(color1, row, index, 1, 1);
 	m_colorFields.push_back(color1);
 	index++;
 	DVGui::ColorField *color2 = createColorField(index);
-	ret = ret && connect(color2, SIGNAL(editingChanged(const TPixel32 &, bool)), SLOT(onColor2Switched(const TPixel32 &, bool)));
+	ret = ret && connect(color2, SIGNAL(editingChanged(const TPixel32 &, bool)),
+						 SLOT(onColor2Switched(const TPixel32 &, bool)));
 	layout->addWidget(color2, row, index, 1, 1);
 	m_colorFields.push_back(color2);
 	index++;
 	DVGui::ColorField *color3 = createColorField(index);
-	ret = ret && connect(color3, SIGNAL(editingChanged(const TPixel32 &, bool)), SLOT(onColor3Switched(const TPixel32 &, bool)));
+	ret = ret && connect(color3, SIGNAL(editingChanged(const TPixel32 &, bool)),
+						 SLOT(onColor3Switched(const TPixel32 &, bool)));
 	layout->addWidget(color3, row, index, 1, 1);
 	m_colorFields.push_back(color3);
 	index++;
 	DVGui::ColorField *color4 = createColorField(index);
-	ret = ret && connect(color4, SIGNAL(editingChanged(const TPixel32 &, bool)), SLOT(onColor4Switched(const TPixel32 &, bool)));
+	ret = ret && connect(color4, SIGNAL(editingChanged(const TPixel32 &, bool)),
+						 SLOT(onColor4Switched(const TPixel32 &, bool)));
 	layout->addWidget(color4, row, index, 1, 1);
 	m_colorFields.push_back(color4);
 	index++;
 	DVGui::ColorField *color5 = createColorField(index);
-	ret = ret && connect(color5, SIGNAL(editingChanged(const TPixel32 &, bool)), SLOT(onColor5Switched(const TPixel32 &, bool)));
+	ret = ret && connect(color5, SIGNAL(editingChanged(const TPixel32 &, bool)),
+						 SLOT(onColor5Switched(const TPixel32 &, bool)));
 	layout->addWidget(color5, row, index, 1, 1);
 	m_colorFields.push_back(color5);
 	index++;
 	DVGui::ColorField *color6 = createColorField(index);
-	ret = ret && connect(color6, SIGNAL(editingChanged(const TPixel32 &, bool)), SLOT(onColor6Switched(const TPixel32 &, bool)));
+	ret = ret && connect(color6, SIGNAL(editingChanged(const TPixel32 &, bool)),
+						 SLOT(onColor6Switched(const TPixel32 &, bool)));
 	layout->addWidget(color6, row, index, 1, 1);
 	m_colorFields.push_back(color6);
 	index++;
 	DVGui::ColorField *color7 = createColorField(index);
-	ret = ret && connect(color7, SIGNAL(editingChanged(const TPixel32 &, bool)), SLOT(onColor7Switched(const TPixel32 &, bool)));
+	ret = ret && connect(color7, SIGNAL(editingChanged(const TPixel32 &, bool)),
+						 SLOT(onColor7Switched(const TPixel32 &, bool)));
 	layout->addWidget(color7, row, index, 1, 1);
 	m_colorFields.push_back(color7);
 
@@ -138,8 +149,9 @@ NotePopup::NotePopup(XsheetViewer *viewer, int noteIndex)
 
 	endVLayout();
 
-	//bad patch to bug:
-	//when you write  some text to an existing note, appending it, the resulting html is corrupted and nothing is shown. setting a font (for example) fix it!
+	// bad patch to bug:
+	// when you write  some text to an existing note, appending it, the resulting html is corrupted
+	// and nothing is shown. setting a font (for example) fix it!
 	m_textEditor->changeFont(QFont("Arial", 10));
 
 	assert(ret);
@@ -157,7 +169,8 @@ void NotePopup::setCurrentNoteIndex(int index)
 void NotePopup::update()
 {
 	TPixel32 color = getColors().at(m_currentColorIndex);
-	m_textEditor->setStyleSheet(computeBackgroundStyleSheetString(QColor(color.r, color.g, color.b, color.m)));
+	m_textEditor->setStyleSheet(
+		computeBackgroundStyleSheetString(QColor(color.r, color.g, color.b, color.m)));
 	DVGui::Dialog::update();
 }
 
@@ -168,7 +181,8 @@ DVGui::ColorField *NotePopup::createColorField(int index)
 	TPixel32 color = getColors().at(index);
 	DVGui::ColorField *colorField = new DVGui::ColorField(this, true, color, 20);
 	colorField->hideChannelsFields(true);
-	bool ret = connect(colorField, SIGNAL(colorChanged(const TPixel32 &, bool)), SLOT(onColorChanged(const TPixel32 &, bool)));
+	bool ret = connect(colorField, SIGNAL(colorChanged(const TPixel32 &, bool)),
+					   SLOT(onColorChanged(const TPixel32 &, bool)));
 	assert(ret);
 	return colorField;
 }
@@ -216,7 +230,8 @@ void NotePopup::hideEvent(QHideEvent *)
 void NotePopup::onColorChanged(const TPixel32 &color, bool isDragging)
 {
 	if (!isDragging)
-		m_textEditor->setStyleSheet(computeBackgroundStyleSheetString(QColor(color.r, color.g, color.b, color.m)));
+		m_textEditor->setStyleSheet(
+			computeBackgroundStyleSheetString(QColor(color.r, color.g, color.b, color.m)));
 
 	TSceneProperties *sp = m_viewer->getXsheet()->getScene()->getProperties();
 	sp->setNoteColor(color, m_currentColorIndex);
@@ -243,7 +258,8 @@ void NotePopup::onColorFieldEditingChanged(const TPixel32 &color, bool isEditing
 {
 	if (!isEditing)
 		return;
-	m_textEditor->setStyleSheet(computeBackgroundStyleSheetString(QColor(color.r, color.g, color.b, color.m)));
+	m_textEditor->setStyleSheet(
+		computeBackgroundStyleSheetString(QColor(color.r, color.g, color.b, color.m)));
 	DVGui::ColorField *colorField = m_colorFields.at(m_currentColorIndex);
 	colorField->setEditingChangeNotified(false);
 	colorField->setIsEditing(false);
@@ -357,7 +373,8 @@ void NotePopup::onXsheetSwitched()
 		return;
 	m_currentColorIndex = getNotes()->getNoteColorIndex(m_noteIndex);
 	TPixel32 color = getColors().at(m_currentColorIndex);
-	m_textEditor->setStyleSheet(computeBackgroundStyleSheetString(QColor(color.r, color.g, color.b, color.m)));
+	m_textEditor->setStyleSheet(
+		computeBackgroundStyleSheetString(QColor(color.r, color.g, color.b, color.m)));
 	m_textEditor->setHtml(notes->getNoteHtmlText(m_noteIndex));
 }
 
@@ -366,10 +383,7 @@ void NotePopup::onXsheetSwitched()
 //-----------------------------------------------------------------------------
 
 NoteWidget::NoteWidget(XsheetViewer *parent, int noteIndex)
-	: QWidget(parent)
-	, m_viewer(parent)
-	, m_noteIndex(noteIndex)
-	, m_isHovered(false)
+	: QWidget(parent), m_viewer(parent), m_noteIndex(noteIndex), m_isHovered(false)
 {
 	int width = (m_noteIndex < 0) ? 40 : NoteWidth;
 	setFixedSize(width, NoteHeight);
@@ -405,7 +419,8 @@ void NoteWidget::paint(QPainter *painter, QPoint pos, bool isCurrent)
 	painter->fillPath(rectPath, QBrush(color));
 	painter->drawPath(rectPath);
 
-	color = QColor(tcrop(c.r - 20, 0, 255), tcrop(c.g - 20, 0, 255), tcrop(c.b - 20, 0, 255), tcrop(c.m - 20, 0, 255));
+	color = QColor(tcrop(c.r - 20, 0, 255), tcrop(c.g - 20, 0, 255), tcrop(c.b - 20, 0, 255),
+				   tcrop(c.m - 20, 0, 255));
 	QPainterPath path(topLeft + QPoint(d, 0));
 	path.lineTo(topLeft + QPoint(d, d));
 	path.lineTo(topLeft + QPoint(0, d));
@@ -421,7 +436,8 @@ void NoteWidget::paint(QPainter *painter, QPoint pos, bool isCurrent)
 		document.drawContents(painter, rect.adjusted(0, 0, -2 * d, 0));
 		painter->translate(-d, 1);
 	} else
-		painter->drawText(rect.adjusted(d + 1, 1, -d, 0), Qt::AlignCenter | Qt::AlignTop, QString("+"));
+		painter->drawText(rect.adjusted(d + 1, 1, -d, 0), Qt::AlignCenter | Qt::AlignTop,
+						  QString("+"));
 
 	painter->translate(-pos);
 }
@@ -436,8 +452,7 @@ void NoteWidget::openNotePopup()
 
 	if (m_noteEditor->isVisible()) {
 		m_noteEditor->activateWindow();
-	}
-	else {
+	} else {
 		m_noteEditor->show();
 	}
 }
@@ -459,8 +474,7 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WindowFlags flags)
 #else
 NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
 #endif
-	: QFrame(parent)
-	, m_viewer(parent)
+	: QFrame(parent), m_viewer(parent)
 {
 	setFrameStyle(QFrame::StyledPanel);
 	setObjectName("cornerWidget");
@@ -498,7 +512,7 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
 	m_frameDisplayStyleCombo->addItems(frameDisplayStyles);
 	m_frameDisplayStyleCombo->setCurrentIndex((int)m_viewer->getFrameDisplayStyle());
 
-	//layout
+	// layout
 	QVBoxLayout *mainLay = new QVBoxLayout();
 	mainLay->setMargin(0);
 	mainLay->setSpacing(5);
@@ -523,15 +537,15 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
 	}
 	setLayout(mainLay);
 
-	//signal-slot connections
+	// signal-slot connections
 	bool ret = true;
 
 	ret = ret && connect(toolButton, SIGNAL(clicked()), SLOT(toggleNewNote()));
 	ret = ret && connect(m_precNoteButton, SIGNAL(clicked()), this, SLOT(precNote()));
 	ret = ret && connect(m_nextNoteButton, SIGNAL(clicked()), this, SLOT(nextNote()));
 
-	ret = ret && connect(m_frameDisplayStyleCombo, SIGNAL(currentIndexChanged(int)),
-						 this, SLOT(onFrameDisplayStyleChanged(int)));
+	ret = ret && connect(m_frameDisplayStyleCombo, SIGNAL(currentIndexChanged(int)), this,
+						 SLOT(onFrameDisplayStyleChanged(int)));
 
 	updateButtons();
 
@@ -569,8 +583,7 @@ void NoteArea::toggleNewNote()
 
 	if (m_newNotePopup->isVisible()) {
 		m_newNotePopup->activateWindow();
-	}
-	else {
+	} else {
 		m_newNotePopup->show();
 	}
 }
@@ -581,7 +594,7 @@ void NoteArea::nextNote()
 {
 	int currentNoteIndex = m_viewer->getCurrentNoteIndex();
 	TXshNoteSet *notes = m_viewer->getXsheet()->getNotes();
-	//Se ho una sola nota la rendo corrente e la visualizzo
+	// Se ho una sola nota la rendo corrente e la visualizzo
 	if (notes->getCount() == 1) {
 		m_viewer->setCurrentNoteIndex(0);
 		return;

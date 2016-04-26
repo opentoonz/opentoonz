@@ -34,11 +34,7 @@ namespace ToonzExt
 {
 namespace Type
 {
-enum Corner {
-	STRAIGHT,
-	SPIRE,
-	UNKNOWN
-};
+enum Corner { STRAIGHT, SPIRE, UNKNOWN };
 }
 
 /**
@@ -46,12 +42,9 @@ enum Corner {
    */
 typedef std::pair<double, double> Interval;
 
-inline std::ostream &operator<<(std::ostream &os,
-								const Interval &interval)
+inline std::ostream &operator<<(std::ostream &os, const Interval &interval)
 {
-	return os << '[' << interval.first
-			  << ',' << interval.second
-			  << ']';
+	return os << '[' << interval.first << ',' << interval.second << ']';
 }
 
 /**
@@ -61,68 +54,66 @@ typedef std::vector<Interval> Intervals;
 
 /**
    * @brief This class is an abstraction to wrap all odd number.
-   * 
+   *
    * It is useful if you need to manage parameter of a function,
    * that are in some sub set of integer.
    * @sa EvenInt.
    */
 // -3 -1 1 3
-class DVAPI
-	OddInt
+class DVAPI OddInt
 {
 	int val_;
 
-public:
+  public:
 	OddInt(int);
 	/**
-     * @brief Cast an integer, if is not an even exception is
-     *        thrown.
-     */
+	 * @brief Cast an integer, if is not an even exception is
+	 *        thrown.
+	 */
 	operator int() const;
 
 	/**
-     * @copydoc operator int() const
-     */
+	 * @copydoc operator int() const
+	 */
 	operator int();
 
 	/**
-     * @brief Simple check to verify that a number is odd,
-     *        without exception.
-     */
+	 * @brief Simple check to verify that a number is odd,
+	 *        without exception.
+	 */
 	bool isOdd() const;
 };
 
 /**
    * @brief This class is an abstraction to wrap all odd number.
-   * 
+   *
    * It is useful if you need to manage parameter of a function,
    * that are in some sub set of integer.
    * @sa EvenInt.
    */
 // -4 -2 0 2 4..
-class DVAPI
-	EvenInt
+class DVAPI EvenInt
 {
 	int val_;
 
-public:
+  public:
 	EvenInt(int);
 
 	/**
-     * @brief Cast an integer, if is not an even exception is
-     *        thrown.
-     */
+	 * @brief Cast an integer, if is not an even exception is
+	 *        thrown.
+	 */
 	operator int() const;
 
 	/**
-     * @copydoc operator int() const
-     */
+	 * @copydoc operator int() const
+	 */
 	operator int();
 
 	/**
-     * @brief Simple check to verify that a number is even,
-     *        without exception.
-     */
+	 * @brief Simple check to verify that a number is even,
+	 *        without exception.
+	 */
 	bool isEven() const;
 };
 }

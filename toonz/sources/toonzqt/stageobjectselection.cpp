@@ -34,11 +34,14 @@ class TPasteSelectionUndo : public TUndo
 	TFxHandle *m_fxHandle;
 	TPointD m_pastedPos;
 
-public:
-	TPasteSelectionUndo(StageObjectsData *objData, int index, const std::vector<TStageObjectId> &pastedId,
-						const std::list<int> pastedSplineIds, const TPointD &pastedPos, TXsheetHandle *xshHandle,
-						TObjectHandle *objHandle, TFxHandle *fxHandle)
-		: TUndo(), m_objData(objData), m_index(index), m_pastedSplineIds(pastedSplineIds), m_pastedId(pastedId), m_xshHandle(xshHandle), m_objHandle(objHandle), m_fxHandle(fxHandle), m_pastedPos(pastedPos)
+  public:
+	TPasteSelectionUndo(StageObjectsData *objData, int index,
+						const std::vector<TStageObjectId> &pastedId,
+						const std::list<int> pastedSplineIds, const TPointD &pastedPos,
+						TXsheetHandle *xshHandle, TObjectHandle *objHandle, TFxHandle *fxHandle)
+		: TUndo(), m_objData(objData), m_index(index), m_pastedSplineIds(pastedSplineIds),
+		  m_pastedId(pastedId), m_xshHandle(xshHandle), m_objHandle(objHandle),
+		  m_fxHandle(fxHandle), m_pastedPos(pastedPos)
 	{
 		std::vector<TStageObjectId>::const_iterator it;
 		for (it = m_pastedId.begin(); it != m_pastedId.end(); it++) {
@@ -54,15 +57,14 @@ public:
 		}
 	}
 
-	~TPasteSelectionUndo()
-	{
-	}
+	~TPasteSelectionUndo() {}
 
 	void undo() const
 	{
 		m_xshHandle->blockSignals(true);
-		TStageObjectCmd::deleteSelection(m_pastedId, std::list<QPair<TStageObjectId, TStageObjectId>>(),
-										 m_pastedSplineIds, m_xshHandle, m_objHandle, m_fxHandle, false);
+		TStageObjectCmd::deleteSelection(
+			m_pastedId, std::list<QPair<TStageObjectId, TStageObjectId>>(), m_pastedSplineIds,
+			m_xshHandle, m_objHandle, m_fxHandle, false);
 		m_xshHandle->blockSignals(false);
 		m_xshHandle->notifyXsheetChanged();
 	}
@@ -87,10 +89,7 @@ public:
 		m_xshHandle->notifyXsheetChanged();
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this) + sizeof(StageObjectsData);
-	}
+	int getSize() const { return sizeof(*this) + sizeof(StageObjectsData); }
 
 	QString getHistoryString()
 	{
@@ -103,16 +102,13 @@ public:
 		}
 		return str;
 	}
-	int getHistoryType()
-	{
-		return HistoryType::Schematic;
-	}
+	int getHistoryType() { return HistoryType::Schematic; }
 };
 }
 
 //======================================================================
 //
-//StageObjectSelection
+// StageObjectSelection
 //
 //======================================================================
 
@@ -124,7 +120,9 @@ StageObjectSelection::StageObjectSelection()
 //-------------------------------------------------------
 
 StageObjectSelection::StageObjectSelection(const StageObjectSelection &src)
-	: m_selectedObjects(src.m_selectedObjects), m_selectedLinks(src.m_selectedLinks), m_selectedSplines(src.m_selectedSplines), m_xshHandle(src.m_xshHandle), m_objHandle(src.m_objHandle), m_fxHandle(src.m_fxHandle), m_pastePosition(TConst::nowhere)
+	: m_selectedObjects(src.m_selectedObjects), m_selectedLinks(src.m_selectedLinks),
+	  m_selectedSplines(src.m_selectedSplines), m_xshHandle(src.m_xshHandle),
+	  m_objHandle(src.m_objHandle), m_fxHandle(src.m_fxHandle), m_pastePosition(TConst::nowhere)
 {
 }
 
@@ -245,8 +243,8 @@ QPair<TStageObjectId, TStageObjectId> StageObjectSelection::getBoundingObjects(S
 
 //-------------------------------------------------------
 
-QPair<TStageObjectId, TStageObjectId> StageObjectSelection::getBoundingObjects(SchematicPort *inputPort,
-																			   SchematicPort *outputPort)
+QPair<TStageObjectId, TStageObjectId>
+StageObjectSelection::getBoundingObjects(SchematicPort *inputPort, SchematicPort *outputPort)
 {
 	QPair<TStageObjectId, TStageObjectId> boundingObjects;
 	StageSchematicNode *inputNode = dynamic_cast<StageSchematicNode *>(inputPort->getNode());
@@ -346,14 +344,15 @@ void StageObjectSelection::copySelection()
 {
 	StageObjectsData *data = new StageObjectsData();
 	bool pegSelected = false;
-	data->storeObjects(m_selectedObjects.toVector().toStdVector(),
-					   m_xshHandle->getXsheet(), StageObjectsData::eDoClone | StageObjectsData::eResetFxDagPositions);
+	data->storeObjects(m_selectedObjects.toVector().toStdVector(), m_xshHandle->getXsheet(),
+					   StageObjectsData::eDoClone | StageObjectsData::eResetFxDagPositions);
 	std::set<int> columnIndexes;
 	int i;
 	for (i = 0; i < m_selectedObjects.size(); i++)
 		if (m_selectedObjects[i].isColumn())
 			columnIndexes.insert(m_selectedObjects[i].getIndex());
-	data->storeColumnFxs(columnIndexes, m_xshHandle->getXsheet(), StageObjectsData::eDoClone | StageObjectsData::eResetFxDagPositions);
+	data->storeColumnFxs(columnIndexes, m_xshHandle->getXsheet(),
+						 StageObjectsData::eDoClone | StageObjectsData::eResetFxDagPositions);
 	data->storeSplines(m_selectedSplines.toStdList(), m_xshHandle->getXsheet(),
 					   StageObjectsData::eDoClone | StageObjectsData::eResetFxDagPositions);
 
@@ -375,13 +374,16 @@ void StageObjectSelection::pasteSelection()
 	std::set<int> indexes;
 	indexes.insert(index);
 	std::list<int> restoredSplineIds;
-	std::vector<TStageObjectId> ids = objData->restoreObjects(indexes, restoredSplineIds, m_xshHandle->getXsheet(), StageObjectsData::eDoClone, m_pastePosition);
+	std::vector<TStageObjectId> ids =
+		objData->restoreObjects(indexes, restoredSplineIds, m_xshHandle->getXsheet(),
+								StageObjectsData::eDoClone, m_pastePosition);
 	StageObjectsData *undoData = new StageObjectsData();
 	undoData->storeObjects(ids, m_xshHandle->getXsheet(), 0);
 	undoData->storeColumnFxs(indexes, m_xshHandle->getXsheet(), 0);
 	undoData->storeSplines(restoredSplineIds, m_xshHandle->getXsheet(), 0);
-	TUndoManager::manager()->add(new TPasteSelectionUndo(undoData, index, ids, restoredSplineIds, m_pastePosition, m_xshHandle,
-														 m_objHandle, m_fxHandle));
+	TUndoManager::manager()->add(new TPasteSelectionUndo(undoData, index, ids, restoredSplineIds,
+														 m_pastePosition, m_xshHandle, m_objHandle,
+														 m_fxHandle));
 	m_xshHandle->notifyXsheetChanged();
 	m_pastePosition = TConst::nowhere;
 }

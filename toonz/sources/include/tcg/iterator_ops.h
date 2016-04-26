@@ -17,13 +17,11 @@ namespace tcg
 //    Traits
 //****************************************************************************
 
-template <typename It>
-struct iterator_traits : public std::iterator_traits<It> {
+template <typename It> struct iterator_traits : public std::iterator_traits<It> {
 	typedef It inheritable_iterator_type;
 };
 
-template <typename T>
-struct iterator_traits<T *> : public std::iterator_traits<T *> {
+template <typename T> struct iterator_traits<T *> : public std::iterator_traits<T *> {
 	typedef ptr<T> inheritable_iterator_type;
 };
 
@@ -31,11 +29,12 @@ struct iterator_traits<T *> : public std::iterator_traits<T *> {
 //    Derived Iterator  definition
 //****************************************************************************
 
-template <typename It, typename Der, typename iterator_tag = typename std::iterator_traits<It>::iterator_category>
+template <typename It, typename Der,
+		  typename iterator_tag = typename std::iterator_traits<It>::iterator_category>
 struct derived_iterator : public tcg::iterator_traits<It>::inheritable_iterator_type {
 	typedef typename tcg::iterator_traits<It>::inheritable_iterator_type base_iterator;
 
-public:
+  public:
 	derived_iterator() : base_iterator() {}
 	derived_iterator(const base_iterator &it) : base_iterator(it) {}
 
@@ -52,7 +51,7 @@ struct derived_iterator<It, Der, std::bidirectional_iterator_tag>
 	: public derived_iterator<It, Der, std::forward_iterator_tag> {
 	typedef typename tcg::iterator_traits<It>::inheritable_iterator_type base_iterator;
 
-public:
+  public:
 	derived_iterator() : _iter() {}
 	derived_iterator(const base_iterator &it) : _iter(it) {}
 
@@ -63,7 +62,7 @@ public:
 	}
 	Der operator--(int) { return Der(base_iterator::operator--(0), static_cast<Der &>(*this)); }
 
-private:
+  private:
 	typedef derived_iterator<It, Der, std::forward_iterator_tag> _iter;
 };
 
@@ -73,14 +72,13 @@ struct derived_iterator<It, Der, std::random_access_iterator_tag>
 	typedef typename tcg::iterator_traits<It>::inheritable_iterator_type base_iterator;
 	typedef typename base_iterator::difference_type difference_type;
 
-public:
+  public:
 	derived_iterator() : _iter() {}
 	derived_iterator(const base_iterator &it) : _iter(it) {}
 
 	Der operator+(difference_type d) const
 	{
-		return Der(static_cast<const base_iterator &>(*this) + d,
-				   static_cast<const Der &>(*this));
+		return Der(static_cast<const base_iterator &>(*this) + d, static_cast<const Der &>(*this));
 	}
 	Der &operator+=(difference_type d)
 	{
@@ -90,8 +88,7 @@ public:
 
 	Der operator-(difference_type d) const
 	{
-		return Der(static_cast<const base_iterator &>(*this) - d,
-				   static_cast<const Der &>(*this));
+		return Der(static_cast<const base_iterator &>(*this) - d, static_cast<const Der &>(*this));
 	}
 	Der &operator-=(difference_type d)
 	{
@@ -105,7 +102,7 @@ public:
 			   static_cast<const base_iterator &>(other);
 	}
 
-private:
+  private:
 	typedef derived_iterator<It, Der, std::bidirectional_iterator_tag> _iter;
 };
 
@@ -122,8 +119,10 @@ private:
 
 template <typename It, typename Func,
 		  typename Val = typename traits<typename function_traits<Func>::ret_type>::referenced_type,
-		  typename Ref = typename choose_if_match<typename function_traits<Func>::ret_type &, typename traits<Val>::reference_type>::type,
-		  typename Ptr = typename choose_if_match<Ref, void, typename traits<Val>::pointer_type>::type>
+		  typename Ref = typename choose_if_match<typename function_traits<Func>::ret_type &,
+												  typename traits<Val>::reference_type>::type,
+		  typename Ptr =
+			  typename choose_if_match<Ref, void, typename traits<Val>::pointer_type>::type>
 class cast_iterator : public derived_iterator<It, cast_iterator<It, Func, Val, Ref, Ptr>>
 {
 	typedef derived_iterator<It, cast_iterator> iterator;
@@ -131,12 +130,12 @@ class cast_iterator : public derived_iterator<It, cast_iterator<It, Func, Val, R
 	typedef Func function;
 	typedef typename function_traits<Func>::ret_type ret_type;
 
-public:
+  public:
 	typedef Ref reference;
 	typedef Ptr pointer;
 	typedef Val value_type;
 
-public:
+  public:
 	cast_iterator() : iterator(), m_func() {}
 	cast_iterator(const Func &func) : iterator(), m_func(func) {}
 
@@ -144,17 +143,20 @@ public:
 	cast_iterator(const base_iterator &it, const Func &func) : iterator(it), m_func(func) {}
 
 	cast_iterator(const base_iterator &it, const cast_iterator &other)
-		: iterator(it), m_func(other.m_func) {}
+		: iterator(it), m_func(other.m_func)
+	{
+	}
 
 	ret_type operator*() { return m_func(iterator::operator*()); }
 	pointer operator->() { return ptr(0); }
 
-private:
+  private:
 	Func m_func;
 
-private:
+  private:
 	template <typename T>
-	pointer ptr(T, typename tcg::enable_if<tcg::type_mismatch<pointer, void>::value, T>::type = 0) const
+	pointer
+	ptr(T, typename tcg::enable_if<tcg::type_mismatch<pointer, void>::value, T>::type = 0) const
 	{
 		return &operator*();
 	}
@@ -185,19 +187,21 @@ inline cast_iterator<It, Func> make_cast_it(const It &it, Func func)
 */
 
 template <typename RanIt>
-class step_iterator
-	: public std::iterator<std::random_access_iterator_tag,
-						   typename std::iterator_traits<RanIt>::value_type,
-						   typename std::iterator_traits<RanIt>::difference_type,
-						   typename std::iterator_traits<RanIt>::pointer,
-						   typename std::iterator_traits<RanIt>::reference>
+class step_iterator : public std::iterator<std::random_access_iterator_tag,
+										   typename std::iterator_traits<RanIt>::value_type,
+										   typename std::iterator_traits<RanIt>::difference_type,
+										   typename std::iterator_traits<RanIt>::pointer,
+										   typename std::iterator_traits<RanIt>::reference>
 {
 	RanIt m_it;
 	typename step_iterator::difference_type m_step;
 
-public:
+  public:
 	step_iterator() {}
-	step_iterator(const RanIt &it, typename step_iterator::difference_type step) : m_it(it), m_step(step) {}
+	step_iterator(const RanIt &it, typename step_iterator::difference_type step)
+		: m_it(it), m_step(step)
+	{
+	}
 
 	step_iterator &operator++()
 	{
@@ -271,6 +275,6 @@ public:
 	bool operator>=(const step_iterator &it) const { return m_it >= it.m_it; }
 };
 
-} //namespace tcg
+} // namespace tcg
 
-#endif //TCG_ITERATOR_OPS_H
+#endif // TCG_ITERATOR_OPS_H

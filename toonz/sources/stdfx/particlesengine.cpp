@@ -50,8 +50,8 @@ for(i=0; i<myParticles.size();i++)
  {
   j=(int)((size)*tnz_random_float());
   k=(int)((size)*tnz_random_float());
-  
- } 
+
+ }
 }
 */
 /*-----------------------------------------------------------------*/
@@ -159,29 +159,22 @@ void Particles_Engine::fill_range_struct(struct particles_values &values,
 bool Particles_Engine::port_is_used(int i, struct particles_values &values)
 {
 
-	return values.fincol_ctrl_val == i ||
-		   values.foutcol_ctrl_val == i ||
-		   values.friction_ctrl_val == i ||
-		   values.gencol_ctrl_val == i ||
-		   values.gravity_ctrl_val == i ||
-		   values.opacity_ctrl_val == i ||
-		   values.rot_ctrl_val == i ||
-		   values.scale_ctrl_val == i ||
-		   values.scalestep_ctrl_val == i ||
-		   values.source_ctrl_val == i ||
-		   values.speed_ctrl_val == i ||
-		   values.speeda_ctrl_val == i ||
-		   values.lifetime_ctrl_val == i ||
-		   values.randomx_ctrl_val == i ||
+	return values.fincol_ctrl_val == i || values.foutcol_ctrl_val == i ||
+		   values.friction_ctrl_val == i || values.gencol_ctrl_val == i ||
+		   values.gravity_ctrl_val == i || values.opacity_ctrl_val == i ||
+		   values.rot_ctrl_val == i || values.scale_ctrl_val == i ||
+		   values.scalestep_ctrl_val == i || values.source_ctrl_val == i ||
+		   values.speed_ctrl_val == i || values.speeda_ctrl_val == i ||
+		   values.lifetime_ctrl_val == i || values.randomx_ctrl_val == i ||
 		   values.randomy_ctrl_val == i;
 }
 /*-----------------------------------------------------------------*/
 /*-- Startフレームからカレントフレームまで順番に回す関数 --*/
-void Particles_Engine::roll_particles(
-	TTile *tile, std::map<int, TTile *> porttiles,
-	const TRenderSettings &ri, std::list<Particle> &myParticles, struct particles_values &values,
-	float cx, float cy, int frame, int curr_frame, int level_n, bool *random_level,
-	float dpi, std::vector<int> lastframe, int &totalparticles)
+void Particles_Engine::roll_particles(TTile *tile, std::map<int, TTile *> porttiles,
+									  const TRenderSettings &ri, std::list<Particle> &myParticles,
+									  struct particles_values &values, float cx, float cy,
+									  int frame, int curr_frame, int level_n, bool *random_level,
+									  float dpi, std::vector<int> lastframe, int &totalparticles)
 {
 	particles_ranges ranges;
 	int i, newparticles;
@@ -196,7 +189,8 @@ void Particles_Engine::roll_particles(
 
 	std::vector<std::vector<TPointD>> myregions;
 
-	/*-- [1〜255] そのIndexに対応するアルファ値を持つピクセルのインデックス値を保存。 [0] 使用せず --*/
+	/*-- [1〜255] そのIndexに対応するアルファ値を持つピクセルのインデックス値を保存。 [0] 使用せず
+	 * --*/
 	std::vector<std::vector<int>> myHistogram;
 	/*-- アルファ値255から下がっていき、ピクセル数×重み又はアルファ値を次々足した値を格納 --*/
 	std::vector<float> myWeight;
@@ -207,9 +201,11 @@ void Particles_Engine::roll_particles(
 	if (values.perspective_distribution_val && (sizeIt != porttiles.end())) {
 		/*-- ソース画像にコントロールが付いていた場合、そのアルファ値をマスクに使う --*/
 		if (values.source_ctrl_val && (it != porttiles.end()))
-			fill_regions_with_size_map(myregions, myHistogram, sizeIt->second, it->second, values.bright_thres_val);
+			fill_regions_with_size_map(myregions, myHistogram, sizeIt->second, it->second,
+									   values.bright_thres_val);
 		else
-			fill_regions_with_size_map(myregions, myHistogram, sizeIt->second, 0, values.bright_thres_val);
+			fill_regions_with_size_map(myregions, myHistogram, sizeIt->second, 0,
+									   values.bright_thres_val);
 		/*- パーティクルを作る前に myregion内の候補数を合計する--*/
 		if ((int)myHistogram.size() == 256) {
 			for (int m = 255; m >= 0; m--) {
@@ -228,10 +224,12 @@ void Particles_Engine::roll_particles(
 		/*- ソース画像にコントロールが付いていた場合 -*/
 		if (values.source_ctrl_val && (it != porttiles.end()))
 			/*-- 入力画像のアルファ値に比例して発生濃度を変える --*/
-			fill_regions(1, myregions, it->second, values.multi_source_val, values.bright_thres_val, values.source_gradation_val, myHistogram);
+			fill_regions(1, myregions, it->second, values.multi_source_val, values.bright_thres_val,
+						 values.source_gradation_val, myHistogram);
 
 		/*- パーティクルを作る前に myregion内の候補数を合計する--*/
-		/*-- myWeight の中には、アルファ255から0まで、各アルファ値×ポイント数を足しこんでいったものが格納される。--*/
+		/*-- myWeight
+		 * の中には、アルファ255から0まで、各アルファ値×ポイント数を足しこんでいったものが格納される。--*/
 		if ((int)myHistogram.size() == 256) {
 			for (int m = 255; m > 0; m--) {
 				float tmpSum = (float)(m * (int)myHistogram[m].size());
@@ -256,9 +254,12 @@ void Particles_Engine::roll_particles(
 			if (values.column_lifetime_val)
 				lifetime = lastframe[level];
 			else
-				lifetime = (int)(values.lifetime_val.first + ranges.lifetime_range * values.random_val->getFloat());
+				lifetime = (int)(values.lifetime_val.first +
+								 ranges.lifetime_range * values.random_val->getFloat());
 			if (lifetime > curr_frame - frame)
-				myParticles.push_back(Particle(lifetime, seed, porttiles, values, ranges, myregions, totalparticles, 0, level, lastframe[level], myHistogram, myWeight));
+				myParticles.push_back(Particle(lifetime, seed, porttiles, values, ranges, myregions,
+											   totalparticles, 0, level, lastframe[level],
+											   myHistogram, myWeight));
 
 			totalparticles++;
 		}
@@ -269,10 +270,12 @@ void Particles_Engine::roll_particles(
 			++it;
 
 			Particle &part = (*current);
-			if (part.lifetime <= 0)			// Note: This is in line with the above "lifetime>curr_frame-frame"
+			if (part.lifetime <=
+				0) // Note: This is in line with the above "lifetime>curr_frame-frame"
 				myParticles.erase(current); // insertion counterpart
 			else
-				part.move(porttiles, values, ranges, windx, windy, xgravity, ygravity, dpi, lastframe[part.level]);
+				part.move(porttiles, values, ranges, windx, windy, xgravity, ygravity, dpi,
+						  lastframe[part.level]);
 		}
 
 		int oldparticles = myParticles.size();
@@ -286,10 +289,13 @@ void Particles_Engine::roll_particles(
 				if (values.column_lifetime_val)
 					lifetime = lastframe[level];
 				else
-					lifetime = (int)(values.lifetime_val.first + ranges.lifetime_range * values.random_val->getFloat());
+					lifetime = (int)(values.lifetime_val.first +
+									 ranges.lifetime_range * values.random_val->getFloat());
 
 				if (lifetime > curr_frame - frame)
-					myParticles.push_front(Particle(lifetime, seed, porttiles, values, ranges, myregions, totalparticles, 0, level, lastframe[level], myHistogram, myWeight));
+					myParticles.push_front(Particle(lifetime, seed, porttiles, values, ranges,
+													myregions, totalparticles, 0, level,
+													lastframe[level], myHistogram, myWeight));
 
 				totalparticles++;
 			}
@@ -302,16 +308,21 @@ void Particles_Engine::roll_particles(
 					for (int j = 0; j < tmp; j++, it++)
 						;
 					{
-						int seed = (int)((std::numeric_limits<int>::max)() * values.random_val->getFloat());
+						int seed = (int)((std::numeric_limits<int>::max)() *
+										 values.random_val->getFloat());
 						int level = (int)(values.random_val->getFloat() * level_n);
 						int lifetime = 0;
 
 						if (values.column_lifetime_val)
 							lifetime = lastframe[level];
 						else
-							lifetime = (int)(values.lifetime_val.first + ranges.lifetime_range * values.random_val->getFloat());
+							lifetime = (int)(values.lifetime_val.first +
+											 ranges.lifetime_range * values.random_val->getFloat());
 						if (lifetime > curr_frame - frame)
-							myParticles.insert(it, Particle(lifetime, seed, porttiles, values, ranges, myregions, totalparticles, 0, level, lastframe[level], myHistogram, myWeight));
+							myParticles.insert(it,
+											   Particle(lifetime, seed, porttiles, values, ranges,
+														myregions, totalparticles, 0, level,
+														lastframe[level], myHistogram, myWeight));
 
 						totalparticles++;
 					}
@@ -326,9 +337,12 @@ void Particles_Engine::roll_particles(
 				if (values.column_lifetime_val)
 					lifetime = lastframe[level];
 				else
-					lifetime = (int)(values.lifetime_val.first + ranges.lifetime_range * values.random_val->getFloat());
+					lifetime = (int)(values.lifetime_val.first +
+									 ranges.lifetime_range * values.random_val->getFloat());
 				if (lifetime > curr_frame - frame)
-					myParticles.push_back(Particle(lifetime, seed, porttiles, values, ranges, myregions, totalparticles, 0, level, lastframe[level], myHistogram, myWeight));
+					myParticles.push_back(Particle(lifetime, seed, porttiles, values, ranges,
+												   myregions, totalparticles, 0, level,
+												   lastframe[level], myHistogram, myWeight));
 
 				totalparticles++;
 			}
@@ -339,8 +353,7 @@ void Particles_Engine::roll_particles(
 
 /*-----------------------------------------------------------------*/
 
-void Particles_Engine::normalize_values(struct particles_values &values,
-										const TRenderSettings &ri)
+void Particles_Engine::normalize_values(struct particles_values &values, const TRenderSettings &ri)
 {
 	double dpicorr = 1;
 	TPointD pos(values.x_pos_val, values.y_pos_val);
@@ -381,15 +394,10 @@ void Particles_Engine::normalize_values(struct particles_values &values,
 /*-----------------------------------------------------------------*/
 
 void Particles_Engine::render_particles(
-	TFlash *flash, TTile *tile, std::vector<TRasterFxPort *> part_ports,
-	const TRenderSettings &ri, TDimension &p_size,
-	TPointD &p_offset,
-	std::map<int, TRasterFxPort *> ctrl_ports,
-	std::vector<TLevelP> partLevel,
-	float dpi,
-	int curr_frame, int shrink, double startx, double starty,
-	double endx, double endy, std::vector<int> last_frame,
-	unsigned long fxId)
+	TFlash *flash, TTile *tile, std::vector<TRasterFxPort *> part_ports, const TRenderSettings &ri,
+	TDimension &p_size, TPointD &p_offset, std::map<int, TRasterFxPort *> ctrl_ports,
+	std::vector<TLevelP> partLevel, float dpi, int curr_frame, int shrink, double startx,
+	double starty, double endx, double endy, std::vector<int> last_frame, unsigned long fxId)
 {
 	int frame, startframe, intpart = 0, level_n = 0;
 	struct particles_values values;
@@ -442,13 +450,16 @@ void Particles_Engine::render_particles(
 	/*- スタートからカレントフレームまでループ -*/
 	for (frame = startframe - 1; frame <= curr_frame; ++frame) {
 		int dist_frame = curr_frame - frame;
-		/*- ループ内の現在のフレームでのパラメータを取得。スタートが負ならフレーム=0のときの値を格納 -*/
+		/*- ループ内の現在のフレームでのパラメータを取得。スタートが負ならフレーム=0のときの値を格納
+		 * -*/
 		fill_value_struct(values, frame < 0 ? 0 : frame * values.step_val);
 		/*- パラメータの正規化 -*/
 		normalize_values(values, ri);
 		/*- maxnum_valは"birth_rate"のパラメータ -*/
 		intpart = (int)values.maxnum_val;
-		/*- /birth_rateが小数だったとき、各フレームの小数部分を足しこんだ結果の整数部分をintpartに渡す。 -*/
+		/*-
+		 * /birth_rateが小数だったとき、各フレームの小数部分を足しこんだ結果の整数部分をintpartに渡す。
+		 * -*/
 		fractpart = fractpart + values.maxnum_val - intpart;
 		if ((int)fractpart) {
 			values.maxnum_val += (int)fractpart;
@@ -469,9 +480,11 @@ void Particles_Engine::render_particles(
 		else
 			r_frame = frame;
 		/*- 出力画像のバウンディングボックス -*/
-		TRectD outTileBBox(tile->m_pos, TDimensionD(tile->getRaster()->getLx(), tile->getRaster()->getLy()));
+		TRectD outTileBBox(tile->m_pos,
+						   TDimensionD(tile->getRaster()->getLx(), tile->getRaster()->getLy()));
 		/*- Controlに刺さっている各ポートについて -*/
-		for (std::map<int, TRasterFxPort *>::iterator it = ctrl_ports.begin(); it != ctrl_ports.end(); ++it) {
+		for (std::map<int, TRasterFxPort *>::iterator it = ctrl_ports.begin();
+			 it != ctrl_ports.end(); ++it) {
 			TTile *tmp;
 			/*- ポートが接続されていて、Fx内で実際に使用されていたら -*/
 			if ((it->second)->isConnected() && port_is_used(it->first, values)) {
@@ -479,26 +492,34 @@ void Particles_Engine::render_particles(
 				(*(it->second))->getBBox(r_frame, bbox, riAux);
 				/*- 素材が存在する場合、portTilesにコントロール画像タイルを格納 -*/
 				if (!bbox.isEmpty()) {
-					if (bbox == TConsts::infiniteRectD) // There could be an infinite bbox - deal with it
+					if (bbox ==
+						TConsts::infiniteRectD) // There could be an infinite bbox - deal with it
 						bbox = ri.m_affine.inv() * outTileBBox;
 
 					if (frame <= pcFrame) {
-						// This frame will not actually be rolled. However, it was dryComputed - so, declare the same here.
+						// This frame will not actually be rolled. However, it was dryComputed - so,
+						// declare the same here.
 						(*it->second)->dryCompute(bbox, r_frame, riAux);
 					} else {
 						tmp = new TTile;
 
 						if (isPrecomputingEnabled)
-							(*it->second)->allocateAndCompute(*tmp, bbox.getP00(), convert(bbox).getSize(), 0, r_frame, riAux);
+							(*it->second)
+								->allocateAndCompute(*tmp, bbox.getP00(), convert(bbox).getSize(),
+													 0, r_frame, riAux);
 						else {
-							std::string alias = "CTRL: " + (*(it->second))->getAlias(r_frame, riAux);
+							std::string alias =
+								"CTRL: " + (*(it->second))->getAlias(r_frame, riAux);
 							TRasterImageP rimg = TImageCache::instance()->get(alias, false);
 
 							if (rimg) {
 								tmp->m_pos = bbox.getP00();
 								tmp->setRaster(rimg->getRaster());
 							} else {
-								(*it->second)->allocateAndCompute(*tmp, bbox.getP00(), convert(bbox).getSize(), 0, r_frame, riAux);
+								(*it->second)
+									->allocateAndCompute(*tmp, bbox.getP00(),
+														 convert(bbox).getSize(), 0, r_frame,
+														 riAux);
 
 								addRenderCache(alias, TRasterImageP(tmp->getRaster()));
 							}
@@ -512,10 +533,12 @@ void Particles_Engine::render_particles(
 
 		if (frame > pcFrame) {
 			// Invoke the actual rolling procedure
-			roll_particles(tile, porttiles, riAux, myParticles, values, 0, 0, frame, curr_frame, level_n, &random_level, 1, last_frame, totalparticles);
+			roll_particles(tile, porttiles, riAux, myParticles, values, 0, 0, frame, curr_frame,
+						   level_n, &random_level, 1, last_frame, totalparticles);
 
 			// Store the rolled data in the particles manager
-			if (!particlesData->m_calculated || particlesData->m_frame + particlesData->m_maxTrail < frame) {
+			if (!particlesData->m_calculated ||
+				particlesData->m_frame + particlesData->m_maxTrail < frame) {
 				particlesData->m_frame = frame;
 				particlesData->m_particles = myParticles;
 				particlesData->m_random = myRandom;
@@ -535,8 +558,7 @@ void Particles_Engine::render_particles(
 				int ndx = part.frame % last_frame[part.level];
 				std::pair<int, int> ndxPair(part.level, ndx);
 
-				std::map<std::pair<int, int>, double>::iterator it =
-					partScales.find(ndxPair);
+				std::map<std::pair<int, int>, double>::iterator it = partScales.find(ndxPair);
 
 				if (it != partScales.end())
 					it->second = tmax(part.scale, it->second);
@@ -544,7 +566,8 @@ void Particles_Engine::render_particles(
 					partScales[ndxPair] = part.scale;
 			}
 
-			if (values.toplayer_val == ParticlesFx::TOP_SMALLER || values.toplayer_val == ParticlesFx::TOP_BIGGER)
+			if (values.toplayer_val == ParticlesFx::TOP_SMALLER ||
+				values.toplayer_val == ParticlesFx::TOP_BIGGER)
 				myParticles.sort(ComparebySize());
 
 			if (values.toplayer_val == ParticlesFx::TOP_SMALLER) {
@@ -554,7 +577,9 @@ void Particles_Engine::render_particles(
 					if (dist_frame <= part.trail && part.scale && part.lifetime > 0 &&
 						part.lifetime <= part.genlifetime) // This last... shouldn't always be?
 					{
-						do_render(flash, &part, tile, part_ports, porttiles, ri, p_size, p_offset, last_frame[part.level], partLevel, values, opacity_range, dist_frame, partScales);
+						do_render(flash, &part, tile, part_ports, porttiles, ri, p_size, p_offset,
+								  last_frame[part.level], partLevel, values, opacity_range,
+								  dist_frame, partScales);
 					}
 				}
 			} else {
@@ -564,7 +589,9 @@ void Particles_Engine::render_particles(
 					if (dist_frame <= part.trail && part.scale && part.lifetime > 0 &&
 						part.lifetime <= part.genlifetime) // Same here..?
 					{
-						do_render(flash, &part, tile, part_ports, porttiles, ri, p_size, p_offset, last_frame[part.level], partLevel, values, opacity_range, dist_frame, partScales);
+						do_render(flash, &part, tile, part_ports, porttiles, ri, p_size, p_offset,
+								  last_frame[part.level], partLevel, values, opacity_range,
+								  dist_frame, partScales);
 					}
 				}
 			}
@@ -580,10 +607,10 @@ void Particles_Engine::render_particles(
 /*- render_particles から呼ばれる。粒子の数だけ繰り返し -*/
 void Particles_Engine::do_render(TFlash *flash, Particle *part, TTile *tile,
 								 std::vector<TRasterFxPort *> part_ports,
-								 std::map<int, TTile *> porttiles,
-								 const TRenderSettings &ri,
-								 TDimension &p_size, TPointD &p_offset, int lastframe, std::vector<TLevelP> partLevel,
-								 struct particles_values &values, double opacity_range, int dist_frame,
+								 std::map<int, TTile *> porttiles, const TRenderSettings &ri,
+								 TDimension &p_size, TPointD &p_offset, int lastframe,
+								 std::vector<TLevelP> partLevel, struct particles_values &values,
+								 double opacity_range, int dist_frame,
 								 std::map<std::pair<int, int>, double> &partScales)
 {
 	// Retrieve the particle frame - that is, the *column frame* from which we are picking
@@ -612,7 +639,7 @@ void Particles_Engine::do_render(TFlash *flash, Particle *part, TTile *tile,
 
 	// Retrieve the bounding box in the standard reference
 	TRectD bbox(-5.0, -5.0, 5.0, 5.0), standardRefBBox;
-	if (part->level < (int)part_ports.size() && //Not the default levelless cases
+	if (part->level < (int)part_ports.size() && // Not the default levelless cases
 		part_ports[part->level]->isConnected()) {
 		TRenderSettings riIdentity(ri);
 		riIdentity.m_affine = TAffine();
@@ -653,12 +680,13 @@ void Particles_Engine::do_render(TFlash *flash, Particle *part, TTile *tile,
 
 		flash->multMatrix(scaleM * aff.place(0, 0, part->x, part->y));
 
-		//if(curr_opacity!=1.0 || part->gencol.fadecol || part->fincol.fadecol || part->foutcol.fadecol)
+		// if(curr_opacity!=1.0 || part->gencol.fadecol || part->fincol.fadecol ||
+		// part->foutcol.fadecol)
 		{
 			TColorFader cf(TPixel32::Red, .5);
 			flash->draw(partLevel[part->level]->frame(ndx), &cf);
 		}
-		//flash->draw(partLevel->frame(ndx), 0);
+		// flash->draw(partLevel->frame(ndx), 0);
 
 		flash->popMatrix();
 	} else {
@@ -674,8 +702,7 @@ void Particles_Engine::do_render(TFlash *flash, Particle *part, TTile *tile,
 				ras = rimg->getRaster();
 
 				// Check that the raster resolution is sufficient for our purposes
-				if (ras->getLx() < partResolution.lx ||
-					ras->getLy() < partResolution.ly)
+				if (ras->getLx() < partResolution.lx || ras->getLy() < partResolution.ly)
 					ras = 0;
 				else
 					partResolution = TDimensionD(ras->getLx(), ras->getLy());
@@ -683,7 +710,8 @@ void Particles_Engine::do_render(TFlash *flash, Particle *part, TTile *tile,
 		}
 
 		// We are interested in making the relation between scale and (integer) resolution
-		// bijective - since we shall cache by using resolution as a partial identification parameter.
+		// bijective - since we shall cache by using resolution as a partial identification
+		// parameter.
 		// Therefore, we find the current bbox Lx and take a unique scale out of it.
 		partScale = partResolution.lx / standardRefBBox.getLx();
 		riNew.m_affine = TScale(partScale);
@@ -692,7 +720,10 @@ void Particles_Engine::do_render(TFlash *flash, Particle *part, TTile *tile,
 		// If no image was retrieved from the cache (or it was not scaled enough), calculate it
 		if (!ras) {
 			TTile auxTile;
-			(*part_ports[part->level])->allocateAndCompute(auxTile, bbox.getP00(), TDimension(partResolution.lx, partResolution.ly), tile->getRaster(), ndx, riNew);
+			(*part_ports[part->level])
+				->allocateAndCompute(auxTile, bbox.getP00(),
+									 TDimension(partResolution.lx, partResolution.ly),
+									 tile->getRaster(), ndx, riNew);
 			ras = auxTile.getRaster();
 
 			// For now, we'll just use 32 bit particles
@@ -709,16 +740,18 @@ void Particles_Engine::do_render(TFlash *flash, Particle *part, TTile *tile,
 		}
 
 		if (!ras)
-			return; //At this point, it should never happen anyway...
+			return; // At this point, it should never happen anyway...
 
 		// Deal with particle colors/opacity
 		TRaster32P rfinalpart;
 		double curr_opacity = part->set_Opacity(porttiles, values, opacity_range, dist_frame);
-		if (curr_opacity != 1.0 || part->gencol.fadecol || part->fincol.fadecol || part->foutcol.fadecol) {
+		if (curr_opacity != 1.0 || part->gencol.fadecol || part->fincol.fadecol ||
+			part->foutcol.fadecol) {
 			/*- 毎フレーム現在位置のピクセル色を参照 -*/
-			if (values.pick_color_for_every_frame_val &&
-				values.gencol_ctrl_val && (porttiles.find(values.gencol_ctrl_val) != porttiles.end()))
-				part->get_image_reference(porttiles[values.gencol_ctrl_val], values, part->gencol.col);
+			if (values.pick_color_for_every_frame_val && values.gencol_ctrl_val &&
+				(porttiles.find(values.gencol_ctrl_val) != porttiles.end()))
+				part->get_image_reference(porttiles[values.gencol_ctrl_val], values,
+										  part->gencol.col);
 
 			rfinalpart = ras->clone();
 			part->modify_colors_and_opacity(values, curr_opacity, dist_frame, rfinalpart);
@@ -736,7 +769,8 @@ void Particles_Engine::do_render(TFlash *flash, Particle *part, TTile *tile,
 		pos = ri.m_affine * pos;
 
 		// Finally, add the translational component to the particle
-		// NOTE: p_offset is added to account for the particle relative position inside its level's bbox
+		// NOTE: p_offset is added to account for the particle relative position inside its level's
+		// bbox
 		M = TTranslation(pos - tile->m_pos) * M * TTranslation(bbox.getP00());
 
 		if (TRaster32P myras32 = tile->getRaster())
@@ -750,8 +784,8 @@ void Particles_Engine::do_render(TFlash *flash, Particle *part, TTile *tile,
 
 /*-----------------------------------------------------------------*/
 
-void Particles_Engine::fill_array(TTile *ctrl1, int &regioncount,
-								  std::vector<int> &myarray, std::vector<int> &lista, std::vector<int> &listb, int threshold)
+void Particles_Engine::fill_array(TTile *ctrl1, int &regioncount, std::vector<int> &myarray,
+								  std::vector<int> &lista, std::vector<int> &listb, int threshold)
 {
 
 	int pr = 0;
@@ -821,15 +855,17 @@ void Particles_Engine::fill_array(TTile *ctrl1, int &regioncount,
 
 /*-----------------------------------------------------------------*/
 
-void Particles_Engine::normalize_array(std::vector<std::vector<TPointD>> &myregions, TPointD pos, int lx, int ly, int regioncounter,
-																			 std::vector<int> &myarray, std::vector<int> &lista, std::vector<int> &listb, std::vector<int> &final)
+void Particles_Engine::normalize_array(std::vector<std::vector<TPointD>> &myregions, TPointD pos,
+									   int lx, int ly, int regioncounter, std::vector<int> &myarray,
+									   std::vector<int> &lista, std::vector<int> &listb,
+									   std::vector<int> &final)
 {
 	int i, j, k, l;
 
 	std::vector<int> tmp;
 	int maxregioncounter = 0;
 	int listsize = (int)lista.size();
-	//TMSG_INFO("regioncounter %d, eqcount=%d\n", regioncounter, eqcount);
+	// TMSG_INFO("regioncounter %d, eqcount=%d\n", regioncounter, eqcount);
 	for (k = 1; k <= regioncounter; k++)
 		final[k] = k;
 
@@ -845,7 +881,7 @@ void Particles_Engine::normalize_array(std::vector<std::vector<TPointD>> &myregi
 		if (j != k)
 			final[j] = k;
 	}
-	//TMSG_INFO("esco dal for\n");
+	// TMSG_INFO("esco dal for\n");
 	for (j = 1; j <= regioncounter; j++)
 		while (final[j] != final[final[j]])
 			final[j] = final[final[j]];
@@ -892,7 +928,8 @@ void Particles_Engine::normalize_array(std::vector<std::vector<TPointD>> &myregi
 
 /*-----------------------------------------------------------------*/
 /*- multiがONのときのSource画像（ctrl1）の領域を分析 -*/
-void Particles_Engine::fill_subregions(int cont_index, std::vector<std::vector<TPointD>> &myregions, TTile *ctrl1, int thres)
+void Particles_Engine::fill_subregions(int cont_index, std::vector<std::vector<TPointD>> &myregions,
+									   TTile *ctrl1, int thres)
 {
 
 	int regioncounter = 0;
@@ -908,14 +945,16 @@ void Particles_Engine::fill_subregions(int cont_index, std::vector<std::vector<T
 
 	if (regioncounter) {
 		std::vector<int> final(regioncounter + 1);
-		normalize_array(myregions, ctrl1->m_pos, lx, ly, regioncounter, myarray, lista, listb, final);
+		normalize_array(myregions, ctrl1->m_pos, lx, ly, regioncounter, myarray, lista, listb,
+						final);
 	}
 }
 
 /*-----------------------------------------------------------------*/
 /*- 入力画像のアルファ値に比例して発生濃度を変える。各Pointにウェイトを持たせる -*/
-void Particles_Engine::fill_single_region(std::vector<std::vector<TPointD>> &myregions, TTile *ctrl1, int threshold,
-										  bool do_source_gradation, std::vector<std::vector<int>> &myHistogram)
+void Particles_Engine::fill_single_region(std::vector<std::vector<TPointD>> &myregions,
+										  TTile *ctrl1, int threshold, bool do_source_gradation,
+										  std::vector<std::vector<int>> &myHistogram)
 {
 
 	TRaster32P raster32 = ctrl1->getRaster();
@@ -994,8 +1033,9 @@ void Particles_Engine::fill_single_region(std::vector<std::vector<TPointD>> &myr
 
 /*-----------------------------------------------------------------*/
 /*- 入力画像のアルファ値に比例して発生濃度を変える。Histogramを格納しながら領域を登録 -*/
-void Particles_Engine::fill_regions(int frame, std::vector<std::vector<TPointD>> &myregions, TTile *ctrl1, bool multi, int thres,
-									bool do_source_gradation, std::vector<std::vector<int>> &myHistogram)
+void Particles_Engine::fill_regions(int frame, std::vector<std::vector<TPointD>> &myregions,
+									TTile *ctrl1, bool multi, int thres, bool do_source_gradation,
+									std::vector<std::vector<int>> &myHistogram)
 {
 	TRaster32P ctrl1ras = ctrl1->getRaster();
 	if (!ctrl1ras)
@@ -1020,9 +1060,7 @@ void Particles_Engine::fill_regions(int frame, std::vector<std::vector<TPointD>>
 
 void Particles_Engine::fill_regions_with_size_map(std::vector<std::vector<TPointD>> &myregions,
 												  std::vector<std::vector<int>> &myHistogram,
-												  TTile *sizeTile,
-												  TTile *sourceTile,
-												  int thres)
+												  TTile *sizeTile, TTile *sourceTile, int thres)
 {
 	TRaster32P sizeRas = sizeTile->getRaster();
 	if (!sizeRas)
@@ -1068,7 +1106,8 @@ void Particles_Engine::fill_regions_with_size_map(std::vector<std::vector<TPoint
 			/*- Source画像があって、ピクセルがバウンディング外またはアルファが０なら抜かす。 -*/
 			if (sourceRas && (!sourcePix || sourcePix->m <= thres)) {
 			}
-			/*- 明度に比例してパーティクルを発生させる。そのピクセルのアルファ値の数だけ「立候補」させる。-*/
+			/*-
+			   明度に比例してパーティクルを発生させる。そのピクセルのアルファ値の数だけ「立候補」させる。-*/
 			else {
 				TPointD tmp;
 				tmp.y = j;

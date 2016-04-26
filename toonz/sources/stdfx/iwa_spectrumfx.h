@@ -22,7 +22,7 @@ class Iwa_SpectrumFx : public TStandardRasterFx
 
 	FX_PLUGIN_DECLARATION(Iwa_SpectrumFx)
 
-protected:
+  protected:
 	TRasterFxPort m_input; /*- 位相差マップの入力 -*/
 	TRasterFxPort m_light; /*- 光源用マップの入力 -*/
 
@@ -41,49 +41,30 @@ protected:
 	void calcBubbleMap(float3 *bubbleColor, double frame);
 
 	template <typename RASTER, typename PIXEL>
-	void convertRaster(const RASTER ras,
-					   TDimensionI dim,
-					   float3 *bubbleColor);
+	void convertRaster(const RASTER ras, TDimensionI dim, float3 *bubbleColor);
 	template <typename RASTER, typename PIXEL>
-	void convertRasterWithLight(const RASTER ras,
-								TDimensionI dim,
-								float3 *bubbleColor,
-								const RASTER lightRas,
-								float lightThres,
-								float lightIntensity);
+	void convertRasterWithLight(const RASTER ras, TDimensionI dim, float3 *bubbleColor,
+								const RASTER lightRas, float lightThres, float lightIntensity);
 
 	/*- 素材タイルを０〜１に正規化して格納 -*/
 	template <typename RASTER, typename PIXEL>
-	void setSourceRasters(const RASTER ras,
-						  float4 *in_out_tile_host,
-						  const RASTER light_ras,
-						  float4 *light_host,
-						  TDimensionI dim,
-						  bool useLight);
+	void setSourceRasters(const RASTER ras, float4 *in_out_tile_host, const RASTER light_ras,
+						  float4 *light_host, TDimensionI dim, bool useLight);
 
 	/*- 出力結果をChannel値に変換してタイルに格納 -*/
 	template <typename RASTER, typename PIXEL>
-	void outputRasters(const RASTER outRas,
-					   float4 *in_out_tile_host,
-					   TDimensionI dim);
+	void outputRasters(const RASTER outRas, float4 *in_out_tile_host, TDimensionI dim);
 
-public:
+  public:
 	Iwa_SpectrumFx();
 
-	void doCompute(TTile &tile,
-				   double frame,
-				   const TRenderSettings &settings);
+	void doCompute(TTile &tile, double frame, const TRenderSettings &settings);
 
-	void doCompute_CUDA(TTile &tile,
-						double frame,
-						const TRenderSettings &settings);
+	void doCompute_CUDA(TTile &tile, double frame, const TRenderSettings &settings);
 
-	bool doGetBBox(double frame,
-				   TRectD &bBox,
-				   const TRenderSettings &info);
+	bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info);
 
-	bool canHandle(const TRenderSettings &info,
-				   double frame);
+	bool canHandle(const TRenderSettings &info, double frame);
 };
 
 #endif

@@ -24,7 +24,7 @@ class DVAPI TClipboard
 	TClipboard();
 	~TClipboard();
 
-public:
+  public:
 	static TClipboard *instance();
 	//! la clipboard mantiene l'ownership
 

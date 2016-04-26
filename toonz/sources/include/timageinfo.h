@@ -29,17 +29,18 @@ class TPropertyGroup;
   \brief    Stores description data about a generic image.
 
   \todo     Stores useless/redundant/improper data which should be moved or
-            removed.
+			removed.
 */
 
 class DVAPI TImageInfo
 {
-public:
+  public:
 	// NOTE: Fields ordered by type size - minimizes padding
 
 	double m_dpix,   //!< Horizontal image dpi.
 		m_dpiy,		 //!< Vertical image dpi.
-		m_frameRate; //!< Movie frame rate. \deprecated Should not be here. An image has \a no frame rate!
+		m_frameRate; //!< Movie frame rate. \deprecated Should not be here. An image has \a no frame
+					 //!rate!
 
 	TPropertyGroup *m_properties; //!< Format-specific image data.
 
@@ -51,16 +52,24 @@ public:
 		m_y1,			  //!< Image contents rect's top coordinate.
 		m_samplePerPixel, //!< Number of samples (channels) per pixel.
 		m_bitsPerSample,  //!< Number of bits per sample (channel).
-		m_fileSize;		  //!< Total size (in bytes) of the image file. \deprecated Possibly useless.
+		m_fileSize; //!< Total size (in bytes) of the image file. \deprecated Possibly useless.
 
 	bool m_valid; //!< \a Deprecated. \deprecated Just... wrong.
 
-public:
+  public:
 	TImageInfo()
-		: m_dpix(0), m_dpiy(0), m_frameRate(12), m_properties(0), m_lx(0), m_ly(0), m_x0(0), m_y0(0), m_x1(-1), m_y1(-1), m_samplePerPixel(0), m_bitsPerSample(8), m_fileSize(0), m_valid(false) {}
+		: m_dpix(0), m_dpiy(0), m_frameRate(12), m_properties(0), m_lx(0), m_ly(0), m_x0(0),
+		  m_y0(0), m_x1(-1), m_y1(-1), m_samplePerPixel(0), m_bitsPerSample(8), m_fileSize(0),
+		  m_valid(false)
+	{
+	}
 
 	TImageInfo(int lx, int ly)
-		: m_dpix(0), m_dpiy(0), m_frameRate(12), m_properties(0), m_lx(lx), m_ly(ly), m_x0(0), m_y0(0), m_x1(-1), m_y1(-1), m_samplePerPixel(0), m_bitsPerSample(8), m_fileSize(0), m_valid(false) {}
+		: m_dpix(0), m_dpiy(0), m_frameRate(12), m_properties(0), m_lx(lx), m_ly(ly), m_x0(0),
+		  m_y0(0), m_x1(-1), m_y1(-1), m_samplePerPixel(0), m_bitsPerSample(8), m_fileSize(0),
+		  m_valid(false)
+	{
+	}
 };
 
 #endif // TIMAGEINFO_H

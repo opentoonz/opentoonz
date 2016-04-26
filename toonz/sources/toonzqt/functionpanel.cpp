@@ -56,13 +56,16 @@ void drawRoundedSquare(QPainter &painter, const QPointF &p, double r)
 	painter.drawRoundRect(p.x() - r, p.y() - r, 2 * r, 2 * r, 99, 99);
 }
 
-double norm2(const QPointF &p) { return p.x() * p.x() + p.y() * p.y(); }
+double norm2(const QPointF &p)
+{
+	return p.x() * p.x() + p.y() * p.y();
+}
 
 class FunctionPanelZoomer : public ImageUtils::ShortcutZoomer
 {
 	FunctionPanel *m_panel;
 
-public:
+  public:
 	FunctionPanelZoomer(FunctionPanel *panel) : ShortcutZoomer(panel), m_panel(panel) {}
 
 	bool zoom(bool zoomin, bool resetZoom)
@@ -98,7 +101,7 @@ class Ruler
 	int m_minLabelDistance, m_minDistance;
 	double m_minStep;
 
-public:
+  public:
 	Ruler();
 
 	// unit,pan define the world to viewport transformation: pixel = value * unit + pan
@@ -123,7 +126,8 @@ public:
 	// set minimum distance (pixel) between two consecutive ticks
 	void setMinDistance(int distance) { m_minDistance = distance; }
 
-	// use setMinStep to define a minimum tick (e.g. for integer rulers as 'frame' call setMinStep(1);)
+	// use setMinStep to define a minimum tick (e.g. for integer rulers as 'frame' call
+	// setMinStep(1);)
 	void setMinStep(double step) { m_minStep = step; }
 
 	void compute(); // call compute() once, before calling the following methods
@@ -136,7 +140,8 @@ public:
 //-----------------------------------------------------------------------------
 
 Ruler::Ruler()
-	: m_minValue(0), m_step(1), m_labelPeriod(2), m_labelOffset(0), m_tickCount(0), m_unit(1), m_pan(0), m_x0(0), m_x1(100), m_minLabelDistance(20), m_minDistance(5), m_minStep(0)
+	: m_minValue(0), m_step(1), m_labelPeriod(2), m_labelOffset(0), m_tickCount(0), m_unit(1),
+	  m_pan(0), m_x0(0), m_x1(100), m_minLabelDistance(20), m_minDistance(5), m_minStep(0)
 {
 }
 
@@ -163,7 +168,8 @@ void Ruler::compute()
 	m_step = 1;
 	m_labelPeriod = 5;
 	if (m_step * m_labelPeriod >= minLabelWorldDistance && m_step >= minWorldDistance) {
-		while (m_step >= minLabelWorldDistance && m_step / (7 - m_labelPeriod) >= minWorldDistance) {
+		while (m_step >= minLabelWorldDistance &&
+			   m_step / (7 - m_labelPeriod) >= minWorldDistance) {
 			m_labelPeriod = 7 - m_labelPeriod;
 			m_step /= m_labelPeriod;
 		}
@@ -207,13 +213,11 @@ void Ruler::compute()
 //
 //-----------------------------------------------------------------------------
 
-FunctionPanel::Gadget::Gadget(
-	FunctionPanel::Handle handle,
-	int kIndex,
-	const QPointF &p,
-	int rx, int ry,
-	const QPointF &pointPos)
-	: m_handle(handle), m_kIndex(kIndex), m_hitRegion(QRect((int)p.x() - rx, (int)p.y() - ry, 2 * rx, 2 * ry)), m_pos(p), m_pointPos(pointPos), m_channel(0), m_keyframePosition(0)
+FunctionPanel::Gadget::Gadget(FunctionPanel::Handle handle, int kIndex, const QPointF &p, int rx,
+							  int ry, const QPointF &pointPos)
+	: m_handle(handle), m_kIndex(kIndex),
+	  m_hitRegion(QRect((int)p.x() - rx, (int)p.y() - ry, 2 * rx, 2 * ry)), m_pos(p),
+	  m_pointPos(pointPos), m_channel(0), m_keyframePosition(0)
 {
 }
 
@@ -224,7 +228,9 @@ FunctionPanel::Gadget::Gadget(
 //-----------------------------------------------------------------------------
 
 FunctionPanel::FunctionPanel(QWidget *parent)
-	: QDialog(parent), m_functionTreeModel(0), m_viewTransform(), m_valueAxisX(50), m_frameAxisY(50), m_graphViewportY(50), m_frameHandle(0), m_dragTool(0), m_currentFrameStatus(0), m_selection(0), m_curveShape(SMOOTH)
+	: QDialog(parent), m_functionTreeModel(0), m_viewTransform(), m_valueAxisX(50),
+	  m_frameAxisY(50), m_graphViewportY(50), m_frameHandle(0), m_dragTool(0),
+	  m_currentFrameStatus(0), m_selection(0), m_curveShape(SMOOTH)
 {
 	setWindowTitle(tr("Function Curves"));
 
@@ -240,7 +246,7 @@ FunctionPanel::FunctionPanel(QWidget *parent)
 	m_curveLabel.text = "";
 	m_curveLabel.curve = 0;
 
-	//load the dialog size
+	// load the dialog size
 	TFilePath fp(ToonzFolder::getMyModuleDir() + TFilePath(mySettingsFileName));
 	QSettings mySettings(toQString(fp), QSettings::IniFormat);
 
@@ -253,7 +259,7 @@ FunctionPanel::FunctionPanel(QWidget *parent)
 
 FunctionPanel::~FunctionPanel()
 {
-	//save the dialog size
+	// save the dialog size
 	TFilePath fp(ToonzFolder::getMyModuleDir() + TFilePath(mySettingsFileName));
 	QSettings mySettings(toQString(fp), QSettings::IniFormat);
 
@@ -370,7 +376,8 @@ int FunctionPanel::getCurveDistance(TDoubleParam *curve, const QPoint &winPos)
 
 //-----------------------------------------------------------------------------
 
-FunctionTreeModel::Channel *FunctionPanel::findClosestChannel(const QPoint &winPos, int maxWinDistance)
+FunctionTreeModel::Channel *FunctionPanel::findClosestChannel(const QPoint &winPos,
+															  int maxWinDistance)
 {
 	FunctionTreeModel::Channel *closestChannel = 0;
 	int minDistance = maxWinDistance;
@@ -436,7 +443,8 @@ TDoubleParam *FunctionPanel::getCurrentCurve() const
 
 //-----------------------------------------------------------------------------
 
-QPainterPath FunctionPanel::getSegmentPainterPath(TDoubleParam *curve, int segmentIndex, int x0, int x1)
+QPainterPath FunctionPanel::getSegmentPainterPath(TDoubleParam *curve, int segmentIndex, int x0,
+												  int x1)
 {
 	double frame0 = xToFrame(x0), frame1 = xToFrame(x1);
 	int kCount = curve->getKeyframeCount();
@@ -462,7 +470,7 @@ QPainterPath FunctionPanel::getSegmentPainterPath(TDoubleParam *curve, int segme
 
 	if (m_curveShape == SMOOTH) {
 		frame = frame0;
-	} else //FRAME_BASED
+	} else // FRAME_BASED
 	{
 		frame = (double)tfloor(frame0);
 		df = tmax(df, 1.0);
@@ -639,7 +647,7 @@ void FunctionPanel::drawOtherCurves(QPainter &painter)
 			painter.setPen(dashedPen);
 			painter.drawPath(getSegmentPainterPath(curve, 0, x0, x1));
 		}
-		//draw control points and handles
+		// draw control points and handles
 		else {
 			for (int k = -1; k < kCount; k++) {
 				painter.setPen((k < 0 || k >= kCount - 1) ? dashedPen : solidPen);
@@ -682,14 +690,17 @@ void FunctionPanel::updateGadgets(TDoubleParam *curve)
 
 		TDoubleKeyframe kf = curve->getKeyframe(i);
 		kf.m_value = curve->getValue(kf.m_frame); // Some keyframe values do NOT correspond to the
-												  // actual displayed curve value (eg with expressions)
+		// actual displayed curve value (eg with expressions)
 		// Build keyframe positions
 		QPointF p = getWinPos(curve, kf.m_frame);
 		QPointF pLeft = p;
 
-		if (i == keyframeCount - 1 && curve->isCycleEnabled())					 // This is probably OBSOLETE. I don't think the
-			p = getWinPos(curve, kf.m_frame, curve->getValue(kf.m_frame, true)); // GUI allows cycling single curves nowadays...
-																				 // However, is the assignment correct?
+		if (i == keyframeCount - 1 &&
+			curve->isCycleEnabled()) // This is probably OBSOLETE. I don't think the
+			p = getWinPos(
+				curve, kf.m_frame,
+				curve->getValue(kf.m_frame, true)); // GUI allows cycling single curves nowadays...
+													// However, is the assignment correct?
 		// Add keyframe gadget(s)
 		m_gadgets.push_back(Gadget(Point, i, p, pointHitRadius, pointHitRadius));
 
@@ -698,9 +709,12 @@ void FunctionPanel::updateGadgets(TDoubleParam *curve)
 
 		// If the previous segment or the current segment are not keyframe based,
 		// the curve can have two different values in kf.m_frame
-		if (i > 0 && (!TDoubleKeyframe::isKeyframeBased(kf.m_type) ||						// Keyframe-based are the above mentioned curves
-					  !TDoubleKeyframe::isKeyframeBased(curve->getKeyframe(i - 1).m_type))) // where values stored in keyframes are not used
-		{																					// to calculate the actual curve values.
+		if (i > 0 && (!TDoubleKeyframe::isKeyframeBased(
+						  kf.m_type) || // Keyframe-based are the above mentioned curves
+					  !TDoubleKeyframe::isKeyframeBased(
+						  curve->getKeyframe(i - 1)
+							  .m_type))) // where values stored in keyframes are not used
+		{								 // to calculate the actual curve values.
 			currentPointLeft.y = curve->getValue(kf.m_frame, true);
 			pLeft = getWinPos(curve, currentPointLeft);
 			m_gadgets.push_back(Gadget(Point, i, pLeft, pointHitRadius, pointHitRadius));
@@ -714,7 +728,8 @@ void FunctionPanel::updateGadgets(TDoubleParam *curve)
 				TPointD speedIn = curve->getSpeedIn(i);
 				if (norm2(speedIn) > 0) {
 					QPointF q = getWinPos(curve, currentPointLeft + speedIn);
-					m_gadgets.push_back(Gadget(SpeedIn, i, q, handleHitRadius, handleHitRadius, pLeft));
+					m_gadgets.push_back(
+						Gadget(SpeedIn, i, q, handleHitRadius, handleHitRadius, pLeft));
 				}
 			}
 
@@ -739,7 +754,8 @@ void FunctionPanel::updateGadgets(TDoubleParam *curve)
 					TPointD speedOut = curve->getSpeedOut(i);
 					if (norm2(speedOut) > 0) {
 						QPointF q = getWinPos(curve, currentPointRight + speedOut);
-						m_gadgets.push_back(Gadget(SpeedOut, i, q, handleHitRadius, handleHitRadius, p));
+						m_gadgets.push_back(
+							Gadget(SpeedOut, i, q, handleHitRadius, handleHitRadius, p));
 					}
 				}
 
@@ -764,11 +780,14 @@ void FunctionPanel::updateGadgets(TDoubleParam *curve)
 		oldKf = kf;
 	}
 
-	// Add group gadgets (ie those that can be added when multiple channels share the same keyframe data)
+	// Add group gadgets (ie those that can be added when multiple channels share the same keyframe
+	// data)
 	int channelCount = m_functionTreeModel->getActiveChannelCount();
 
-	// Using a map of vectors. Yes, really. The *ideal* way would be that of copying the first keyframes
-	// vector, and then comparing it with the others from each channel - keeping the common data only...
+	// Using a map of vectors. Yes, really. The *ideal* way would be that of copying the first
+	// keyframes
+	// vector, and then comparing it with the others from each channel - keeping the common data
+	// only...
 
 	typedef std::map<double, std::vector<TDoubleKeyframe>> KeyframeTable; // frame -> { keyframes }
 	KeyframeTable keyframes;
@@ -780,8 +799,9 @@ void FunctionPanel::updateGadgets(TDoubleParam *curve)
 
 		TDoubleParam *curve = channel->getParam();
 		for (int j = 0; j != curve->getKeyframeCount(); ++j) {
-			TDoubleKeyframe kf = curve->getKeyframe(j); // Well... this stuff gets called upon *painting*  o_o'
-			keyframes[kf.m_frame].push_back(kf);		// It's bound to be slow. Do we really need it?
+			TDoubleKeyframe kf =
+				curve->getKeyframe(j); // Well... this stuff gets called upon *painting*  o_o'
+			keyframes[kf.m_frame].push_back(kf); // It's bound to be slow. Do we really need it?
 		}
 	}
 
@@ -794,7 +814,8 @@ void FunctionPanel::updateGadgets(TDoubleParam *curve)
 		double frame = it->first; // redundant, already in the key... oh well
 		QPointF p(frameToX(frame), groupHandleY);
 
-		Gadget gadget((FunctionPanel::Handle)100, -1, p, 6, 6); // No idea what the '100' type value mean...
+		Gadget gadget((FunctionPanel::Handle)100, -1, p, 6,
+					  6); // No idea what the '100' type value mean...
 		gadget.m_keyframePosition = frame;
 
 		m_gadgets.push_back(gadget);
@@ -829,7 +850,8 @@ void FunctionPanel::updateGadgets(TDoubleParam *curve)
 			m_gadgets.push_back(gadget);
 		}
 
-		if ((kf.m_prevType == TDoubleKeyframe::SpeedInOut || kf.m_prevType == TDoubleKeyframe::EaseInOut) &&
+		if ((kf.m_prevType == TDoubleKeyframe::SpeedInOut ||
+			 kf.m_prevType == TDoubleKeyframe::EaseInOut) &&
 			kf.m_speedIn.x != 0) {
 			QPointF p(frameToX(frame + kf.m_speedIn.x), groupHandleY);
 			Gadget gadget((FunctionPanel::Handle)102, -1, p, 6, 15); // type value...
@@ -875,7 +897,9 @@ void FunctionPanel::drawCurrentCurve(QPainter &painter)
 			} else {
 				TDoubleKeyframe::Type segmentType = curve->getKeyframe(k).m_type;
 				QColor color = Qt::red;
-				if (segmentType == TDoubleKeyframe::Expression || segmentType == TDoubleKeyframe::SimilarShape || segmentType == TDoubleKeyframe::File)
+				if (segmentType == TDoubleKeyframe::Expression ||
+					segmentType == TDoubleKeyframe::SimilarShape ||
+					segmentType == TDoubleKeyframe::File)
 					color = QColor(185, 0, 0);
 				if (getSelection()->isSegmentSelected(curve, k))
 					solidPen.setWidth(2);
@@ -901,7 +925,8 @@ void FunctionPanel::drawCurrentCurve(QPainter &painter)
 	solidPen.setColor(Qt::red);
 	painter.setPen(solidPen);
 	for (int j = 0; j < (int)m_gadgets.size() - 1; j++)
-		if (m_gadgets[j].m_handle == Point && m_gadgets[j + 1].m_handle && m_gadgets[j + 1].m_handle != 100 &&
+		if (m_gadgets[j].m_handle == Point && m_gadgets[j + 1].m_handle &&
+			m_gadgets[j + 1].m_handle != 100 &&
 			m_gadgets[j].m_pos.x() == m_gadgets[j + 1].m_pos.x())
 			painter.drawLine(m_gadgets[j].m_pos, m_gadgets[j + 1].m_pos);
 
@@ -941,8 +966,10 @@ void FunctionPanel::drawCurrentCurve(QPainter &painter)
 				easeDx = easeTick;
 			else
 				easeDx = -easeTick;
-			painter.drawLine(p.x(), p.y() - easeHeight, p.x() + easeDx, p.y() - easeHeight - easeTick);
-			painter.drawLine(p.x(), p.y() + easeHeight, p.x() + easeDx, p.y() + easeHeight + easeTick);
+			painter.drawLine(p.x(), p.y() - easeHeight, p.x() + easeDx,
+							 p.y() - easeHeight - easeTick);
+			painter.drawLine(p.x(), p.y() + easeHeight, p.x() + easeDx,
+							 p.y() + easeHeight + easeTick);
 			break;
 
 			painter.setBrush(Qt::NoBrush); // isSelected ? QColor(255,126,0) : Qt::white);
@@ -1106,14 +1133,14 @@ void FunctionPanel::paintEvent(QPaintEvent *e)
 		painter.drawText(m_curveLabel.labelPos, QString::fromStdString(m_curveLabel.text));
 	}
 
-	//painter.setPen(Qt::black);
-	//painter.drawText(QPointF(70,70),
+	// painter.setPen(Qt::black);
+	// painter.drawText(QPointF(70,70),
 	//  "f0=" + QString::number(xToFrame(ox)) +
 	//  " f1=" + QString::number(xToFrame(width())));
 
-	//painter.setPen(Qt::black);
-	//painter.setBrush(Qt::NoBrush);
-	//painter.drawRect(ox+10,oy+10,width()-ox-20,height()-oy-20);
+	// painter.setPen(Qt::black);
+	// painter.setBrush(Qt::NoBrush);
+	// painter.drawRect(ox+10,oy+10,width()-ox-20,height()-oy-20);
 }
 
 //-----------------------------------------------------------------------------
@@ -1144,7 +1171,8 @@ void FunctionPanel::mousePressEvent(QMouseEvent *e)
 	const int maxDistance = 20;
 	int closestGadgetId = findClosestGadget(e->pos(), handle, maxDistance);
 
-	if (e->pos().x() > m_valueAxisX && e->pos().y() < m_frameAxisY && closestGadgetId < 0 && (e->modifiers() & Qt::ControlModifier) == 0) {
+	if (e->pos().x() > m_valueAxisX && e->pos().y() < m_frameAxisY && closestGadgetId < 0 &&
+		(e->modifiers() & Qt::ControlModifier) == 0) {
 		// click on topbar => frame zoom
 		m_dragTool = new ZoomDragTool(this, ZoomDragTool::FrameZoom);
 	} else if (e->pos().x() < m_valueAxisX && e->pos().y() > m_graphViewportY) {
@@ -1163,7 +1191,8 @@ void FunctionPanel::mousePressEvent(QMouseEvent *e)
 			dragTool->selectKeyframes(m_gadgets[closestGadgetId].m_keyframePosition);
 			m_dragTool = dragTool;
 		} else if (handle == 101 || handle == 102) {
-			m_dragTool = new MoveGroupHandleDragTool(this, m_gadgets[closestGadgetId].m_keyframePosition, handle);
+			m_dragTool = new MoveGroupHandleDragTool(
+				this, m_gadgets[closestGadgetId].m_keyframePosition, handle);
 		}
 	}
 
@@ -1175,14 +1204,13 @@ void FunctionPanel::mousePressEvent(QMouseEvent *e)
 	FunctionTreeModel::Channel *currentChannel =
 		m_functionTreeModel ? m_functionTreeModel->getCurrentChannel() : 0;
 	if (!currentChannel ||
-		getCurveDistance(currentChannel->getParam(), winPos) > maxDistance &&
-			closestGadgetId < 0) {
+		getCurveDistance(currentChannel->getParam(), winPos) > maxDistance && closestGadgetId < 0) {
 		// if current channel is undefined or its curve is too far from the clicked point
 		// the user is possibly trying to select a different curve
 		FunctionTreeModel::Channel *channel = findClosestChannel(winPos, maxDistance);
 		if (channel) {
 			channel->setIsCurrent(true);
-			//Open folder
+			// Open folder
 			FunctionTreeModel::ChannelGroup *channelGroup = channel->getChannelGroup();
 			if (!channelGroup->isOpen())
 				channelGroup->getModel()->setExpandedItem(channelGroup->createIndex(), true);
@@ -1222,10 +1250,12 @@ void FunctionPanel::mousePressEvent(QMouseEvent *e)
 				int curveDistance = getCurveDistance(currentChannel->getParam(), winPos);
 				bool isKeyframeable = true;
 				bool isGroup = abs(winPos.y() - (m_graphViewportY - 5)) < 5;
-				if (0 != (e->modifiers() & Qt::ControlModifier) && (curveDistance < maxDistance || isGroup) && isKeyframeable) {
+				if (0 != (e->modifiers() & Qt::ControlModifier) &&
+					(curveDistance < maxDistance || isGroup) && isKeyframeable) {
 					// ctrl-clicked near curve => create a new keyframe
 					double frame = tround(xToFrame(winPos.x()));
-					MovePointDragTool *dragTool = new MovePointDragTool(this, isGroup ? 0 : currentCurve);
+					MovePointDragTool *dragTool =
+						new MovePointDragTool(this, isGroup ? 0 : currentCurve);
 					//          if(curveDistance>=maxDistance)
 					//            dragTool->m_channelGroup = currentChannel->getChannelGroup();
 					dragTool->createKeyframe(frame);
@@ -1233,14 +1263,14 @@ void FunctionPanel::mousePressEvent(QMouseEvent *e)
 					m_dragTool = dragTool;
 
 					/*
-          int kIndex = dragTool->createKeyframe(frame);
+		  int kIndex = dragTool->createKeyframe(frame);
 					if(kIndex!=-1)
 					{
 						getSelection()->deselectAllKeyframes();
 						getSelection()->select(currentCurve, kIndex);
 						m_dragTool = dragTool;
 					}
-          */
+		  */
 					// assert(0);
 				} else if (curveDistance < maxDistance) {
 					// clicked near curve (but far from keyframes)
@@ -1324,7 +1354,8 @@ void FunctionPanel::mouseMoveEvent(QMouseEvent *e)
 			if (curve && m_curveLabel.curve != curve) {
 				m_curveLabel.curve = curve;
 				QString channelName = closestChannel->data(Qt::DisplayRole).toString();
-				QString parentChannelName = closestChannel->getChannelGroup()->data(Qt::DisplayRole).toString();
+				QString parentChannelName =
+					closestChannel->getChannelGroup()->data(Qt::DisplayRole).toString();
 				QString name = parentChannelName + QString(", ") + channelName;
 				m_curveLabel.text = name.toStdString();
 
@@ -1466,11 +1497,8 @@ void FunctionPanel::fitRegion(double f0, double v0, double f1, double v1)
 
 //-----------------------------------------------------------------------------
 
-void setSegmentType(
-	FunctionSelection *selection,
-	TDoubleParam *curve,
-	int segmentIndex,
-	TDoubleKeyframe::Type type)
+void setSegmentType(FunctionSelection *selection, TDoubleParam *curve, int segmentIndex,
+					TDoubleKeyframe::Type type)
 {
 	selection->selectSegment(curve, segmentIndex);
 	KeyframeSetter setter(curve, segmentIndex);
@@ -1513,8 +1541,7 @@ void FunctionPanel::openContextMenu(QMouseEvent *e)
 
 	// build menu
 	QMenu menu(0);
-	if (m_highlighted.handle == Point &&
-		m_highlighted.gIndex >= 0 &&
+	if (m_highlighted.handle == Point && m_highlighted.gIndex >= 0 &&
 		m_gadgets[m_highlighted.gIndex].m_handle != 100) {
 		kf = curve->getKeyframe(m_gadgets[m_highlighted.gIndex].m_kIndex);
 		if (kf.m_linkedHandles)
@@ -1599,8 +1626,10 @@ void FunctionPanel::openContextMenu(QMouseEvent *e)
 	Highlighted highlighted(m_highlighted);
 
 	// execute menu
-	QAction *action = menu.exec(e->globalPos()); // Will process events, possibly altering m_highlighted (MAC-verified)
-	if (action == &linkHandlesAction)			 // Let's just *hope* that doesn't happen to m_gadgets though...  :/
+	QAction *action = menu.exec(
+		e->globalPos()); // Will process events, possibly altering m_highlighted (MAC-verified)
+	if (action ==
+		&linkHandlesAction) // Let's just *hope* that doesn't happen to m_gadgets though...  :/
 	{
 		if (m_gadgets[highlighted.gIndex].m_handle != 100)
 			KeyframeSetter(curve, m_gadgets[highlighted.gIndex].m_kIndex).linkHandles();

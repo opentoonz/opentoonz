@@ -28,33 +28,24 @@ using namespace DVGui;
 */
 class FxSettingsUndo : public TUndo
 {
-protected:
+  protected:
 	TFxHandle *m_fxHandle;
 	QString m_name;
 
-public:
-	FxSettingsUndo(QString name, TFxHandle *fxHandle)
-		: m_name(name), m_fxHandle(fxHandle)
-	{
-	}
+  public:
+	FxSettingsUndo(QString name, TFxHandle *fxHandle) : m_name(name), m_fxHandle(fxHandle) {}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
-	int getHistoryType()
-	{
-		return HistoryType::Fx;
-	}
+	int getSize() const { return sizeof(*this); }
+	int getHistoryType() { return HistoryType::Fx; }
 };
 
 class AnimatableFxSettingsUndo : public FxSettingsUndo
 {
-protected:
+  protected:
 	bool m_wasKeyframe;
 	int m_frame;
 
-public:
+  public:
 	AnimatableFxSettingsUndo(QString name, int frame, TFxHandle *fxHandle)
 		: FxSettingsUndo(name, fxHandle), m_frame(frame)
 	{
@@ -62,8 +53,7 @@ public:
 
 	QString getHistoryString()
 	{
-		QString str = QObject::tr("Modify Fx Param : %1")
-						  .arg(m_name);
+		QString str = QObject::tr("Modify Fx Param : %1").arg(m_name);
 		if (m_wasKeyframe)
 			str += QString("  Frame : %1").arg(QString::number(m_frame + 1));
 		else
@@ -78,11 +68,11 @@ public:
 class MeasuredDoubleParamFieldUndo : public AnimatableFxSettingsUndo
 {
 	TDoubleParamP m_param;
-	double m_oldValue,
-		m_newValue;
+	double m_oldValue, m_newValue;
 
-public:
-	MeasuredDoubleParamFieldUndo(const TDoubleParamP param, QString name, int frame, TFxHandle *fxHandle)
+  public:
+	MeasuredDoubleParamFieldUndo(const TDoubleParamP param, QString name, int frame,
+								 TFxHandle *fxHandle)
 		: AnimatableFxSettingsUndo(name, frame, fxHandle), m_param(param)
 	{
 		m_oldValue = param->getValue(frame);
@@ -90,10 +80,7 @@ public:
 		m_wasKeyframe = m_param->isKeyframe(frame);
 	}
 
-	void onAdd()
-	{
-		m_newValue = m_param->getValue(m_frame);
-	}
+	void onAdd() { m_newValue = m_param->getValue(m_frame); }
 
 	void undo() const
 	{
@@ -124,10 +111,9 @@ public:
 class RangeParamFieldUndo : public AnimatableFxSettingsUndo
 {
 	TRangeParamP m_param;
-	DoublePair m_oldValue,
-		m_newValue;
+	DoublePair m_oldValue, m_newValue;
 
-public:
+  public:
 	RangeParamFieldUndo(const TRangeParamP param, QString name, int frame, TFxHandle *fxHandle)
 		: AnimatableFxSettingsUndo(name, frame, fxHandle), m_param(param)
 	{
@@ -136,10 +122,7 @@ public:
 		m_wasKeyframe = m_param->isKeyframe(frame);
 	}
 
-	void onAdd()
-	{
-		m_newValue = m_param->getValue(m_frame);
-	}
+	void onAdd() { m_newValue = m_param->getValue(m_frame); }
 
 	void undo() const
 	{
@@ -170,10 +153,9 @@ public:
 class PixelParamFieldUndo : public AnimatableFxSettingsUndo
 {
 	TPixelParamP m_param;
-	TPixel32 m_oldValue,
-		m_newValue;
+	TPixel32 m_oldValue, m_newValue;
 
-public:
+  public:
 	PixelParamFieldUndo(const TPixelParamP param, QString name, int frame, TFxHandle *fxHandle)
 		: AnimatableFxSettingsUndo(name, frame, fxHandle), m_param(param)
 	{
@@ -182,10 +164,7 @@ public:
 		m_wasKeyframe = m_param->isKeyframe(frame);
 	}
 
-	void onAdd()
-	{
-		m_newValue = m_param->getValue(m_frame);
-	}
+	void onAdd() { m_newValue = m_param->getValue(m_frame); }
 
 	void undo() const
 	{
@@ -216,10 +195,9 @@ public:
 class PointParamFieldUndo : public AnimatableFxSettingsUndo
 {
 	TPointParamP m_param;
-	TPointD m_oldValue,
-		m_newValue;
+	TPointD m_oldValue, m_newValue;
 
-public:
+  public:
 	PointParamFieldUndo(const TPointParamP param, QString name, int frame, TFxHandle *fxHandle)
 		: AnimatableFxSettingsUndo(name, frame, fxHandle), m_param(param)
 	{
@@ -228,10 +206,7 @@ public:
 		m_wasKeyframe = m_param->isKeyframe(frame);
 	}
 
-	void onAdd()
-	{
-		m_newValue = m_param->getValue(m_frame);
-	}
+	void onAdd() { m_newValue = m_param->getValue(m_frame); }
 
 	void undo() const
 	{
@@ -261,16 +236,13 @@ public:
 class EnumParamFieldUndo : public FxSettingsUndo
 {
 	TIntEnumParamP m_param;
-	std::string m_oldString,
-		m_newString;
+	std::string m_oldString, m_newString;
 
-public:
-	EnumParamFieldUndo(const TIntEnumParamP param,
-					   std::string oldString,
-					   std::string newString,
-					   QString name,
-					   TFxHandle *fxHandle)
-		: FxSettingsUndo(name, fxHandle), m_param(param), m_oldString(oldString), m_newString(newString)
+  public:
+	EnumParamFieldUndo(const TIntEnumParamP param, std::string oldString, std::string newString,
+					   QString name, TFxHandle *fxHandle)
+		: FxSettingsUndo(name, fxHandle), m_param(param), m_oldString(oldString),
+		  m_newString(newString)
 	{
 	}
 
@@ -304,23 +276,17 @@ public:
 class IntParamFieldUndo : public FxSettingsUndo
 {
 	TIntParamP m_param;
-	int m_oldValue,
-		m_newValue;
+	int m_oldValue, m_newValue;
 
-public:
-	IntParamFieldUndo(const TIntParamP param,
-					  QString name,
-					  TFxHandle *fxHandle)
+  public:
+	IntParamFieldUndo(const TIntParamP param, QString name, TFxHandle *fxHandle)
 		: FxSettingsUndo(name, fxHandle), m_param(param)
 	{
 		m_oldValue = param->getValue();
 		m_newValue = m_oldValue;
 	}
 
-	void onAdd()
-	{
-		m_newValue = m_param->getValue();
-	}
+	void onAdd() { m_newValue = m_param->getValue(); }
 
 	void undo() const
 	{
@@ -354,10 +320,8 @@ class BoolParamFieldUndo : public FxSettingsUndo
 	TBoolParamP m_param;
 	bool m_newState;
 
-public:
-	BoolParamFieldUndo(const TBoolParamP param,
-					   QString name,
-					   TFxHandle *fxHandle)
+  public:
+	BoolParamFieldUndo(const TBoolParamP param, QString name, TFxHandle *fxHandle)
 		: FxSettingsUndo(name, fxHandle), m_param(param)
 	{
 		m_newState = param->getValue();
@@ -394,11 +358,11 @@ public:
 class SpectrumParamFieldUndo : public AnimatableFxSettingsUndo
 {
 	TSpectrumParamP m_param;
-	TSpectrum m_oldSpectrum,
-		m_newSpectrum;
+	TSpectrum m_oldSpectrum, m_newSpectrum;
 
-public:
-	SpectrumParamFieldUndo(const TSpectrumParamP param, QString name, int frame, TFxHandle *fxHandle)
+  public:
+	SpectrumParamFieldUndo(const TSpectrumParamP param, QString name, int frame,
+						   TFxHandle *fxHandle)
 		: AnimatableFxSettingsUndo(name, frame, fxHandle), m_param(param)
 	{
 		m_oldSpectrum = param->getValue(frame);
@@ -406,10 +370,7 @@ public:
 		m_wasKeyframe = m_param->isKeyframe(frame);
 	}
 
-	void onAdd()
-	{
-		m_newSpectrum = m_param->getValue(m_frame);
-	}
+	void onAdd() { m_newSpectrum = m_param->getValue(m_frame); }
 
 	void undo() const
 	{
@@ -448,15 +409,12 @@ class SpectrumParamFieldAddRemoveKeyUndo : public FxSettingsUndo
 
 	bool m_isAddUndo;
 
-public:
+  public:
 	SpectrumParamFieldAddRemoveKeyUndo(const TSpectrumParamP actualParam,
-									   const TSpectrumParamP currentParam,
-									   TSpectrum::ColorKey key,
-									   int index,
-									   bool isAddUndo,
-									   QString name,
-									   TFxHandle *fxHandle)
-		: FxSettingsUndo(name, fxHandle), m_actualParam(actualParam), m_currentParam(currentParam), m_key(key), m_index(index), m_isAddUndo(isAddUndo)
+									   const TSpectrumParamP currentParam, TSpectrum::ColorKey key,
+									   int index, bool isAddUndo, QString name, TFxHandle *fxHandle)
+		: FxSettingsUndo(name, fxHandle), m_actualParam(actualParam), m_currentParam(currentParam),
+		  m_key(key), m_index(index), m_isAddUndo(isAddUndo)
 	{
 	}
 
@@ -495,7 +453,9 @@ public:
 
 	QString getHistoryString()
 	{
-		QString str = QObject::tr("Modify Fx Param : %1 : %2 Key").arg(m_name).arg((m_isAddUndo) ? QObject::tr("Add") : QObject::tr("Remove"));
+		QString str = QObject::tr("Modify Fx Param : %1 : %2 Key")
+						  .arg(m_name)
+						  .arg((m_isAddUndo) ? QObject::tr("Add") : QObject::tr("Remove"));
 		return str;
 	}
 };
@@ -506,23 +466,17 @@ public:
 class StringParamFieldUndo : public FxSettingsUndo
 {
 	TStringParamP m_param;
-	std::wstring m_oldValue,
-		m_newValue;
+	std::wstring m_oldValue, m_newValue;
 
-public:
-	StringParamFieldUndo(const TStringParamP param,
-						 QString name,
-						 TFxHandle *fxHandle)
+  public:
+	StringParamFieldUndo(const TStringParamP param, QString name, TFxHandle *fxHandle)
 		: FxSettingsUndo(name, fxHandle), m_param(param)
 	{
 		m_oldValue = param->getValue();
 		m_newValue = m_oldValue;
 	}
 
-	void onAdd()
-	{
-		m_newValue = m_param->getValue();
-	}
+	void onAdd() { m_newValue = m_param->getValue(); }
 
 	void undo() const
 	{
@@ -554,11 +508,11 @@ public:
 class ToneCurveParamFieldUndo : public AnimatableFxSettingsUndo
 {
 	TToneCurveParamP m_param;
-	QList<TPointD> m_oldPoints,
-		m_newPoints;
+	QList<TPointD> m_oldPoints, m_newPoints;
 
-public:
-	ToneCurveParamFieldUndo(const TToneCurveParamP param, QString name, int frame, TFxHandle *fxHandle)
+  public:
+	ToneCurveParamFieldUndo(const TToneCurveParamP param, QString name, int frame,
+							TFxHandle *fxHandle)
 		: AnimatableFxSettingsUndo(name, frame, fxHandle), m_param(param)
 	{
 		m_oldPoints = param->getValue(frame);
@@ -566,10 +520,7 @@ public:
 		m_wasKeyframe = m_param->isKeyframe(frame);
 	}
 
-	void onAdd()
-	{
-		m_newPoints = m_param->getValue(m_frame);
-	}
+	void onAdd() { m_newPoints = m_param->getValue(m_frame); }
 
 	void undo() const
 	{
@@ -608,15 +559,13 @@ class ToneCurveParamFieldAddRemovePointUndo : public FxSettingsUndo
 
 	bool m_isAddUndo;
 
-public:
+  public:
 	ToneCurveParamFieldAddRemovePointUndo(const TToneCurveParamP actualParam,
-										  const TToneCurveParamP currentParam,
-										  QList<TPointD> value,
-										  int index,
-										  bool isAddUndo,
-										  QString name,
+										  const TToneCurveParamP currentParam, QList<TPointD> value,
+										  int index, bool isAddUndo, QString name,
 										  TFxHandle *fxHandle)
-		: FxSettingsUndo(name, fxHandle), m_actualParam(actualParam), m_currentParam(currentParam), m_value(value), m_index(index), m_isAddUndo(isAddUndo)
+		: FxSettingsUndo(name, fxHandle), m_actualParam(actualParam), m_currentParam(currentParam),
+		  m_value(value), m_index(index), m_isAddUndo(isAddUndo)
 	{
 	}
 
@@ -655,7 +604,9 @@ public:
 
 	QString getHistoryString()
 	{
-		QString str = QObject::tr("Modify Fx Param : %1 : %2 Point").arg(m_name).arg((m_isAddUndo) ? QObject::tr("Add") : QObject::tr("Remove"));
+		QString str = QObject::tr("Modify Fx Param : %1 : %2 Point")
+						  .arg(m_name)
+						  .arg((m_isAddUndo) ? QObject::tr("Add") : QObject::tr("Remove"));
 		return str;
 	}
 };
@@ -669,10 +620,9 @@ class ToneCurveParamFieldToggleLinearUndo : public FxSettingsUndo
 	TToneCurveParamP m_currentParam;
 	bool m_newState;
 
-public:
+  public:
 	ToneCurveParamFieldToggleLinearUndo(const TToneCurveParamP actualParam,
-										const TToneCurveParamP currentParam,
-										QString name,
+										const TToneCurveParamP currentParam, QString name,
 										TFxHandle *fxHandle)
 		: FxSettingsUndo(name, fxHandle), m_actualParam(actualParam), m_currentParam(currentParam)
 	{
@@ -710,9 +660,11 @@ public:
 // ParamField
 //-----------------------------------------------------------------------------
 
-ParamField::ParamField(QWidget *parent, QString paramName, const TParamP &param,
-					   bool addEmptyLabel)
-	: QWidget(parent), m_paramName(paramName), m_interfaceName(param->hasUILabel() ? QString::fromStdString(param->getUILabel()) : paramName), m_description(QString::fromStdString(param->getDescription()))
+ParamField::ParamField(QWidget *parent, QString paramName, const TParamP &param, bool addEmptyLabel)
+	: QWidget(parent), m_paramName(paramName),
+	  m_interfaceName(param->hasUILabel() ? QString::fromStdString(param->getUILabel())
+										  : paramName),
+	  m_description(QString::fromStdString(param->getDescription()))
 {
 	QString str;
 	m_layout = new QHBoxLayout(this);
@@ -825,7 +777,8 @@ void ParamFieldKeyToggle::leaveEvent(QEvent *)
 // MeasuredDoubleParamField
 //-----------------------------------------------------------------------------
 
-MeasuredDoubleParamField::MeasuredDoubleParamField(QWidget *parent, QString name, const TDoubleParamP &param)
+MeasuredDoubleParamField::MeasuredDoubleParamField(QWidget *parent, QString name,
+												   const TDoubleParamP &param)
 	: AnimatedParamField<double, TDoubleParamP>(parent, name, param)
 {
 	QString str;
@@ -875,12 +828,12 @@ void MeasuredDoubleParamField::onChange(bool dragging)
 	/*-- Undoを登録する条件：
 		値が変更されていて、かつ
 		キーフレーム上か、または、まだキーフレームが無い
-		（すなわち、実際にシーンの情報を変えることになる）場合 
+		（すなわち、実際にシーンの情報を変えることになる）場合
 	--*/
-	if (doubleParam &&
-		doubleParam->getValue(m_frame) != m_measuredDoubleField->getValue() &&
+	if (doubleParam && doubleParam->getValue(m_frame) != m_measuredDoubleField->getValue() &&
 		(m_actualParam->isKeyframe(m_frame) || !m_actualParam.getPointer()->hasKeyframes()))
-		undo = new MeasuredDoubleParamFieldUndo(doubleParam, m_interfaceName, m_frame, ParamField::m_fxHandleStat);
+		undo = new MeasuredDoubleParamFieldUndo(doubleParam, m_interfaceName, m_frame,
+												ParamField::m_fxHandleStat);
 
 	setValue(m_measuredDoubleField->getValue());
 
@@ -899,7 +852,8 @@ void MeasuredDoubleParamField::onKeyToggled()
 // MeasuredRangeParamField
 //-----------------------------------------------------------------------------
 
-MeasuredRangeParamField::MeasuredRangeParamField(QWidget *parent, QString name, const TRangeParamP &param)
+MeasuredRangeParamField::MeasuredRangeParamField(QWidget *parent, QString name,
+												 const TRangeParamP &param)
 	: AnimatedParamField<DoublePair, TRangeParamP>(parent, name, param)
 {
 	QString str;
@@ -951,10 +905,10 @@ void MeasuredRangeParamField::onChange(bool dragging)
 		キーフレーム上か、または、まだキーフレームが無い
 		（すなわち、実際にシーンの情報を変えることになる）場合
 	--*/
-	if (rangeParam &&
-		rangeParam->getValue(m_frame) != value &&
+	if (rangeParam && rangeParam->getValue(m_frame) != value &&
 		(m_actualParam->isKeyframe(m_frame) || !m_actualParam.getPointer()->hasKeyframes()))
-		undo = new RangeParamFieldUndo(rangeParam, m_interfaceName, m_frame, ParamField::m_fxHandleStat);
+		undo = new RangeParamFieldUndo(rangeParam, m_interfaceName, m_frame,
+									   ParamField::m_fxHandleStat);
 
 	setValue(value);
 
@@ -991,13 +945,18 @@ PointParamField::PointParamField(QWidget *parent, QString name, const TPointPara
 	QLabel *yLabel = new QLabel(tr("Y:"), this);
 	m_yFld = new MeasuredDoubleField(this, false);
 
-	double xmin = -(std::numeric_limits<double>::max)(), xmax = (std::numeric_limits<double>::max)();
-	double ymin = -(std::numeric_limits<double>::max)(), ymax = (std::numeric_limits<double>::max)();
+	double xmin = -(std::numeric_limits<double>::max)(),
+		   xmax = (std::numeric_limits<double>::max)();
+	double ymin = -(std::numeric_limits<double>::max)(),
+		   ymax = (std::numeric_limits<double>::max)();
 
 #if 1
 	/* これを有効にすれば PointParamField に範囲が設定できることが UI の見た目が変わってしまう.
-	   これまで誰も TPointParam に対して range を設定していないなら(どうせ効いてなかったのだから)無条件に設定してもよさそうだが
-	   実際は Pinned Texture などの FX が設定しており(効いてないなかったが、この修正により)動作が変わってしまうので plugin から要求された場合でのみ range を有効にする. */
+	   これまで誰も TPointParam に対して range
+	   を設定していないなら(どうせ効いてなかったのだから)無条件に設定してもよさそうだが
+	   実際は Pinned Texture などの FX
+	   が設定しており(効いてないなかったが、この修正により)動作が変わってしまうので plugin
+	   から要求された場合でのみ range を有効にする. */
 	if (param->isFromPlugin()) {
 		double xstep, ystep;
 		param->getX()->getValueRange(xmin, xmax, xstep);
@@ -1064,15 +1023,15 @@ void PointParamField::onChange(bool dragging)
 	TPointD pos(m_xFld->getValue(), m_yFld->getValue());
 
 	TUndo *undo = 0;
-	/*-- Undoを登録する条件：	
+	/*-- Undoを登録する条件：
 		値が変更されていて
 		キーフレーム上か、または、まだキーフレームが無い
-		（すなわち、実際にシーンの情報を変えることになる）場合 
+		（すなわち、実際にシーンの情報を変えることになる）場合
 	--*/
-	if (pointParam &&
-		pointParam->getValue(m_frame) != pos &&
+	if (pointParam && pointParam->getValue(m_frame) != pos &&
 		(m_actualParam->isKeyframe(m_frame) || !m_actualParam.getPointer()->hasKeyframes()))
-		undo = new PointParamFieldUndo(pointParam, m_interfaceName, m_frame, ParamField::m_fxHandleStat);
+		undo = new PointParamFieldUndo(pointParam, m_interfaceName, m_frame,
+									   ParamField::m_fxHandleStat);
 
 	setValue(pos);
 
@@ -1106,8 +1065,8 @@ PixelParamField::PixelParamField(QWidget *parent, QString name, const TPixelPara
 	setLayout(m_layout);
 
 	//----signal-slot connections
-	bool ret = connect(m_colorField, SIGNAL(colorChanged(const TPixel32 &, bool)),
-					   this, SLOT(onChange(const TPixel32 &, bool)));
+	bool ret = connect(m_colorField, SIGNAL(colorChanged(const TPixel32 &, bool)), this,
+					   SLOT(onChange(const TPixel32 &, bool)));
 	ret = ret && connect(m_keyToggle, SIGNAL(keyToggled()), SLOT(onKeyToggled()));
 	assert(ret);
 }
@@ -1134,10 +1093,10 @@ void PixelParamField::onChange(const TPixel32 &value, bool isDragging)
 		キーフレーム上か、または、まだキーフレームが無い
 		（すなわち、実際にシーンの情報を変えることになる）場合
 	--*/
-	if (pixelParam &&
-		pixelParam->getValue(m_frame) != value &&
+	if (pixelParam && pixelParam->getValue(m_frame) != value &&
 		(m_actualParam->isKeyframe(m_frame) || !m_actualParam.getPointer()->hasKeyframes()))
-		undo = new PixelParamFieldUndo(pixelParam, m_interfaceName, m_frame, ParamField::m_fxHandleStat);
+		undo = new PixelParamFieldUndo(pixelParam, m_interfaceName, m_frame,
+									   ParamField::m_fxHandleStat);
 
 	setValue(value);
 
@@ -1171,7 +1130,8 @@ void PixelParamField::setColor(TPixel32 value)
 // RGB Link Button
 //-----------------------------------------------------------------------------
 
-RgbLinkButton::RgbLinkButton(QString str, QWidget *parent, PixelParamField *field1, PixelParamField *field2)
+RgbLinkButton::RgbLinkButton(QString str, QWidget *parent, PixelParamField *field1,
+							 PixelParamField *field2)
 	: QPushButton(str, parent), m_field1(field1), m_field2(field2)
 {
 }
@@ -1198,8 +1158,7 @@ void RgbLinkButton::onButtonClicked()
 // SpectrumParamField
 //-----------------------------------------------------------------------------
 
-SpectrumParamField::SpectrumParamField(QWidget *parent, QString name,
-									   const TSpectrumParamP &param)
+SpectrumParamField::SpectrumParamField(QWidget *parent, QString name, const TSpectrumParamP &param)
 	: AnimatedParamField<TSpectrum, TSpectrumParamP>(parent, name, param)
 {
 	QString str;
@@ -1216,8 +1175,10 @@ SpectrumParamField::SpectrumParamField(QWidget *parent, QString name,
 
 	//--- signal-slot connections
 	bool ret = true;
-	ret = ret && connect(m_spectrumField, SIGNAL(keyColorChanged(bool)), this, SLOT(onChange(bool)));
-	ret = ret && connect(m_spectrumField, SIGNAL(keyPositionChanged(bool)), this, SLOT(onChange(bool)));
+	ret =
+		ret && connect(m_spectrumField, SIGNAL(keyColorChanged(bool)), this, SLOT(onChange(bool)));
+	ret = ret &&
+		  connect(m_spectrumField, SIGNAL(keyPositionChanged(bool)), this, SLOT(onChange(bool)));
 	ret = ret && connect(m_spectrumField, SIGNAL(keyAdded(int)), this, SLOT(onKeyAdded(int)));
 	ret = ret && connect(m_spectrumField, SIGNAL(keyRemoved(int)), this, SLOT(onKeyRemoved(int)));
 	ret = ret && connect(m_keyToggle, SIGNAL(keyToggled()), SLOT(onKeyToggled()));
@@ -1238,7 +1199,7 @@ void SpectrumParamField::updateField(TSpectrum value)
 void SpectrumParamField::setParams()
 {
 	TSpectrum spectrum = m_spectrumField->getSpectrum();
-	//if(m_currentParam->getValue(0) == spectrum) return; //Rivedi quando sistemi lo SwatchViewer
+	// if(m_currentParam->getValue(0) == spectrum) return; //Rivedi quando sistemi lo SwatchViewer
 
 	m_currentParam->setValue(m_frame, spectrum);
 	if (m_actualParam->isKeyframe(m_frame)) {
@@ -1269,10 +1230,10 @@ void SpectrumParamField::onChange(bool isDragging)
 
 	TSpectrumParamP spectrumParam = m_actualParam;
 	TUndo *undo = 0;
-	if (spectrumParam &&
-		spectrumParam->getValue(m_frame) != m_spectrumField->getSpectrum() &&
+	if (spectrumParam && spectrumParam->getValue(m_frame) != m_spectrumField->getSpectrum() &&
 		(m_actualParam->isKeyframe(m_frame) || !m_actualParam.getPointer()->hasKeyframes()))
-		undo = new SpectrumParamFieldUndo(spectrumParam, m_interfaceName, m_frame, ParamField::m_fxHandleStat);
+		undo = new SpectrumParamFieldUndo(spectrumParam, m_interfaceName, m_frame,
+										  ParamField::m_fxHandleStat);
 
 	setParams();
 
@@ -1294,13 +1255,9 @@ void SpectrumParamField::onKeyAdded(int keyIndex)
 	assert(currentSpectrumParam);
 	currentSpectrumParam->addKey(key.first, key.second);
 
-	TUndoManager::manager()->add(new SpectrumParamFieldAddRemoveKeyUndo(actualSpectrumParam,
-																		currentSpectrumParam,
-																		key,
-																		keyIndex,
-																		true,
-																		m_interfaceName,
-																		ParamField::m_fxHandleStat));
+	TUndoManager::manager()->add(new SpectrumParamFieldAddRemoveKeyUndo(
+		actualSpectrumParam, currentSpectrumParam, key, keyIndex, true, m_interfaceName,
+		ParamField::m_fxHandleStat));
 }
 
 //-----------------------------------------------------------------------------
@@ -1312,12 +1269,8 @@ void SpectrumParamField::onKeyRemoved(int keyIndex)
 	TSpectrumParamP currentSpectrumParam = m_currentParam;
 	if (currentSpectrumParam && actualSpectrumParam) {
 		TSpectrum::ColorKey key = actualSpectrumParam->getValue(m_frame).getKey(keyIndex);
-		undo = new SpectrumParamFieldAddRemoveKeyUndo(actualSpectrumParam,
-													  currentSpectrumParam,
-													  key,
-													  keyIndex,
-													  false,
-													  m_interfaceName,
+		undo = new SpectrumParamFieldAddRemoveKeyUndo(actualSpectrumParam, currentSpectrumParam,
+													  key, keyIndex, false, m_interfaceName,
 													  ParamField::m_fxHandleStat);
 	}
 
@@ -1349,8 +1302,7 @@ EnumParamField::EnumParamField(QWidget *parent, QString name, const TIntEnumPara
 		QString str;
 		m_om->addItem(str.fromStdString(caption));
 	}
-	connect(m_om, SIGNAL(activated(const QString &)),
-			this, SLOT(onChange(const QString &)));
+	connect(m_om, SIGNAL(activated(const QString &)), this, SLOT(onChange(const QString &)));
 	m_layout->addWidget(m_om);
 
 	m_layout->addStretch();
@@ -1379,8 +1331,8 @@ void EnumParamField::onChange(const QString &str)
 			}
 		}
 
-		undo = new EnumParamFieldUndo(intEnumParam, oldStr, newStdStr,
-									  m_interfaceName, ParamField::m_fxHandleStat);
+		undo = new EnumParamFieldUndo(intEnumParam, oldStr, newStdStr, m_interfaceName,
+									  ParamField::m_fxHandleStat);
 	}
 
 	m_currentParam->setValue(newStdStr);
@@ -1460,7 +1412,8 @@ void BoolParamField::onToggled(bool checked)
 
 	TBoolParamP boolParam = m_actualParam;
 	if (boolParam)
-		TUndoManager::manager()->add(new BoolParamFieldUndo(boolParam, m_interfaceName, ParamField::m_fxHandleStat));
+		TUndoManager::manager()->add(
+			new BoolParamFieldUndo(boolParam, m_interfaceName, ParamField::m_fxHandleStat));
 }
 
 //-----------------------------------------------------------------------------
@@ -1529,8 +1482,7 @@ void IntParamField::onChange(bool isDragging)
 	TUndo *undo = 0;
 
 	TIntParamP intParam = m_actualParam;
-	if (intParam &&
-		intParam->getValue() != value)
+	if (intParam && intParam->getValue() != value)
 		undo = new IntParamFieldUndo(intParam, m_interfaceName, ParamField::m_fxHandleStat);
 
 	m_actualParam->setValue(value);
@@ -1592,8 +1544,7 @@ void StringParamField::onChange()
 	TUndo *undo = 0;
 
 	TStringParamP stringParam = m_actualParam;
-	if (stringParam &&
-		stringParam->getValue() != value)
+	if (stringParam && stringParam->getValue() != value)
 		undo = new StringParamFieldUndo(stringParam, m_interfaceName, ParamField::m_fxHandleStat);
 
 	m_actualParam->setValue(value);
@@ -1629,9 +1580,9 @@ void StringParamField::update(int frame)
 		return;
 	m_textFld->setText(strValue);
 
-	//Faccio in modo che il cursore sia sulla prima cifra, cosi' se la stringa
-	//da visualizzare e' piu' lunga del campo le cifre che vengono troncate sono
-	//le ultime e non le prime (dovrebbero essere quelle dopo la virgola).
+	// Faccio in modo che il cursore sia sulla prima cifra, cosi' se la stringa
+	// da visualizzare e' piu' lunga del campo le cifre che vengono troncate sono
+	// le ultime e non le prime (dovrebbero essere quelle dopo la virgola).
 	m_textFld->setCursorPosition(0);
 }
 
@@ -1639,7 +1590,8 @@ void StringParamField::update(int frame)
 // ToneCurveParamField
 //-----------------------------------------------------------------------------
 
-ToneCurveParamField::ToneCurveParamField(QWidget *parent, QString name, const TToneCurveParamP &param)
+ToneCurveParamField::ToneCurveParamField(QWidget *parent, QString name,
+										 const TToneCurveParamP &param)
 	: AnimatedParamField<const QList<TPointD>, TToneCurveParamP>(parent, name, param, false)
 {
 	QString str;
@@ -1676,7 +1628,8 @@ ToneCurveParamField::ToneCurveParamField(QWidget *parent, QString name, const TT
 void ToneCurveParamField::updateField(const QList<TPointD> value)
 {
 	if (m_actualParam) {
-		assert(m_currentParam && m_currentParam->getCurrentChannel() == m_actualParam->getCurrentChannel());
+		assert(m_currentParam &&
+			   m_currentParam->getCurrentChannel() == m_actualParam->getCurrentChannel());
 		m_toneCurveField->setCurrentChannel(m_actualParam->getCurrentChannel());
 		assert(m_currentParam && m_currentParam->isLinear() == m_actualParam->isLinear());
 		m_toneCurveField->setIsLinearCheckBox(m_actualParam->isLinear());
@@ -1734,9 +1687,11 @@ void ToneCurveParamField::onChange(bool isDragging)
 		（すなわち、実際にシーンの情報を変えることになる）場合
 	---*/
 	if (toneCurveParam &&
-		toneCurveParam->getValue(m_frame) != m_toneCurveField->getCurrentChannelEditor()->getPoints() &&
+		toneCurveParam->getValue(m_frame) !=
+			m_toneCurveField->getCurrentChannelEditor()->getPoints() &&
 		(m_actualParam->isKeyframe(m_frame) || !m_actualParam.getPointer()->hasKeyframes()))
-		undo = new ToneCurveParamFieldUndo(toneCurveParam, m_interfaceName, m_frame, ParamField::m_fxHandleStat);
+		undo = new ToneCurveParamFieldUndo(toneCurveParam, m_interfaceName, m_frame,
+										   ParamField::m_fxHandleStat);
 
 	setParams();
 
@@ -1758,13 +1713,9 @@ void ToneCurveParamField::onPointAdded(int index)
 	TToneCurveParamP toneCurveActualParam = m_actualParam;
 	TToneCurveParamP toneCurveCurrentParam = m_currentParam;
 	if (toneCurveActualParam && toneCurveCurrentParam)
-		TUndoManager::manager()->add(new ToneCurveParamFieldAddRemovePointUndo(toneCurveActualParam,
-																			   toneCurveCurrentParam,
-																			   value,
-																			   index,
-																			   true,
-																			   m_interfaceName,
-																			   ParamField::m_fxHandleStat));
+		TUndoManager::manager()->add(new ToneCurveParamFieldAddRemovePointUndo(
+			toneCurveActualParam, toneCurveCurrentParam, value, index, true, m_interfaceName,
+			ParamField::m_fxHandleStat));
 }
 
 //-----------------------------------------------------------------------------
@@ -1776,13 +1727,9 @@ void ToneCurveParamField::onPointRemoved(int index)
 	if (toneCurveActualParam && toneCurveCurrentParam) {
 		QList<TPointD> value = m_toneCurveField->getCurrentChannelEditor()->getPoints();
 
-		TUndoManager::manager()->add(new ToneCurveParamFieldAddRemovePointUndo(toneCurveActualParam,
-																			   toneCurveCurrentParam,
-																			   value,
-																			   index,
-																			   false,
-																			   m_interfaceName,
-																			   ParamField::m_fxHandleStat));
+		TUndoManager::manager()->add(new ToneCurveParamFieldAddRemovePointUndo(
+			toneCurveActualParam, toneCurveCurrentParam, value, index, false, m_interfaceName,
+			ParamField::m_fxHandleStat));
 	}
 
 	m_currentParam->removeValue(0, index);
@@ -1805,10 +1752,9 @@ void ToneCurveParamField::onIsLinearChanged(bool isLinear)
 	TToneCurveParamP toneCurveActualParam = m_actualParam;
 	TToneCurveParamP toneCurveCurrentParam = m_currentParam;
 	if (toneCurveActualParam && toneCurveCurrentParam)
-		TUndoManager::manager()->add(new ToneCurveParamFieldToggleLinearUndo(toneCurveActualParam,
-																			 toneCurveCurrentParam,
-																			 m_interfaceName,
-																			 ParamField::m_fxHandleStat));
+		TUndoManager::manager()->add(
+			new ToneCurveParamFieldToggleLinearUndo(toneCurveActualParam, toneCurveCurrentParam,
+													m_interfaceName, ParamField::m_fxHandleStat));
 }
 
 //-----------------------------------------------------------------------------
@@ -1867,7 +1813,8 @@ LineEdit_double::LineEdit_double(QWidget *parent, QString name, TDoubleParamP co
 	value_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 	value_->setText(QString::number(param->getValue(0)));
 
-	connect(value_, SIGNAL(textChanged(QString const &)), this, SLOT(update_value(QString const &)));
+	connect(value_, SIGNAL(textChanged(QString const &)), this,
+			SLOT(update_value(QString const &)));
 
 	m_layout->addWidget(value_);
 
@@ -2041,7 +1988,8 @@ LineEdit_int::LineEdit_int(QWidget *parent, QString name, TIntParamP const &para
 	value_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 	value_->setText(QString::number(param->getValue()));
 
-	connect(value_, SIGNAL(textChanged(QString const &)), this, SLOT(update_value(QString const &)));
+	connect(value_, SIGNAL(textChanged(QString const &)), this,
+			SLOT(update_value(QString const &)));
 
 	m_layout->addWidget(value_);
 
@@ -2387,7 +2335,8 @@ LineEdit_string::LineEdit_string(QWidget *parent, QString name, TStringParamP co
 	value_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 	value_->setText(QString::fromStdWString(param->getValue()));
 
-	connect(value_, SIGNAL(textChanged(QString const &)), this, SLOT(update_value(QString const &)));
+	connect(value_, SIGNAL(textChanged(QString const &)), this,
+			SLOT(update_value(QString const &)));
 
 	m_layout->addWidget(value_);
 

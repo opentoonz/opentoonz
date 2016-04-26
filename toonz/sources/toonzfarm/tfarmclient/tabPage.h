@@ -7,7 +7,7 @@
 
 class TabPage : public TWidget
 {
-public:
+  public:
 	TabPage(TWidget *parent, const string &name) : TWidget(parent, name) {}
 	virtual ~TabPage() {}
 

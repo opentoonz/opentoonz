@@ -152,8 +152,9 @@ bool canMergeColumns(int column, int mColumn, bool forMatchlines)
 		else if (mLevel != mCell[i].getSimpleLevel())
 			return false;
 
-		if (!mLevel || !level || //potrebbero non essere dei simplelevel
-			(forMatchlines && (level->getType() != TZP_XSHLEVEL || mLevel->getType() != TZP_XSHLEVEL)))
+		if (!mLevel || !level || // potrebbero non essere dei simplelevel
+			(forMatchlines &&
+			 (level->getType() != TZP_XSHLEVEL || mLevel->getType() != TZP_XSHLEVEL)))
 			return false;
 		else if (!forMatchlines) {
 			if (level->getType() != mLevel->getType())
@@ -245,7 +246,7 @@ void TColumnSelection::hideColumns()
 		columnFan->deactivate(*it);
 	m_indices.clear();
 	app->getCurrentXsheet()->notifyXsheetChanged();
-	//DA FARE (non c'e una notica per il solo cambiamento della testa delle colonne)
+	// DA FARE (non c'e una notica per il solo cambiamento della testa delle colonne)
 	//  TApp::instance()->->notify(TColumnHeadChange());
 	app->getCurrentScene()->setDirtyFlag(true);
 }

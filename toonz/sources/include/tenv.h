@@ -27,11 +27,11 @@ namespace TEnv
 
 class DVAPI Variable
 {
-public:
+  public:
 	class Imp;
 	Imp *m_imp;
 
-public:
+  public:
 	Variable(std::string name, std::string defaultValue);
 	Variable(std::string name);
 	virtual ~Variable();
@@ -44,7 +44,7 @@ public:
 
 class DVAPI IntVar : public Variable
 {
-public:
+  public:
 	IntVar(std::string name, int defValue);
 	IntVar(std::string name);
 	operator int() const;
@@ -53,7 +53,7 @@ public:
 
 class DVAPI DoubleVar : public Variable
 {
-public:
+  public:
 	DoubleVar(std::string name, double defValue);
 	DoubleVar(std::string name);
 	operator double() const;
@@ -62,7 +62,7 @@ public:
 
 class DVAPI StringVar : public Variable
 {
-public:
+  public:
 	StringVar(std::string name, const std::string &defValue);
 	StringVar(std::string name);
 	operator std::string() const;
@@ -71,7 +71,7 @@ public:
 
 class DVAPI FilePathVar : public Variable
 {
-public:
+  public:
 	FilePathVar(std::string name, const TFilePath &defValue);
 	FilePathVar(std::string name);
 	operator TFilePath() const;
@@ -80,7 +80,7 @@ public:
 
 class DVAPI RectVar : public Variable
 {
-public:
+  public:
 	RectVar(std::string name, const TRect &defValue);
 	RectVar(std::string name);
 	operator TRect() const;
@@ -134,7 +134,7 @@ DVAPI TFilePathSet getSystemVarPathSetValue(std::string varName);
 
 DVAPI TFilePath getStuffDir();
 DVAPI TFilePath getConfigDir();
-//DVAPI TFilePath getProfilesDir();
+// DVAPI TFilePath getProfilesDir();
 
 // per l'utilizzo di ToonzLib senza che sia definita una TOONZROOT
 // bisogna chiamare TEnv::setStuffDir(stuffdir) prima di ogni altra operazione
@@ -148,15 +148,15 @@ DVAPI void saveAllEnvVariables();
 /*
 
   enum SystemFileId {
-    StuffDir,
-    ConfigDir,
-    ProfilesDir
+	StuffDir,
+	ConfigDir,
+	ProfilesDir
   };
 
 
 
   // bisogna assegnare (in qualsiasi ordine) tutti i vari nomi dei registry alle varie
-  // directory di sistema. 
+  // directory di sistema.
   // StuffDir e' obbligatoria, tutte le altre hanno un valore di default relativo a StuffDir
   DVAPI void defineSystemPath(SystemFileId id, const TFilePath &registryName);
 

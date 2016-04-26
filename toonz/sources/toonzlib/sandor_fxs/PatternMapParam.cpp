@@ -24,17 +24,16 @@ CPatternMapParam::CPatternMapParam()
 	null();
 }
 
-CPatternMapParam::CPatternMapParam(const int argc, const char *argv[],
-								   const int shrink)
+CPatternMapParam::CPatternMapParam(const int argc, const char *argv[], const int shrink)
 {
 	try {
 		null();
 		if (argc == 12) {
 			double scale = shrink > 0 ? 1.0 / (double)shrink : 1.0;
 
-			//strcpy(m_patternFn, argv[0]);
-			//CFNSequence fns(argv[0]);
-			//fns.getFn(m_patternFn,drawingFn);
+			// strcpy(m_patternFn, argv[0]);
+			// CFNSequence fns(argv[0]);
+			// fns.getFn(m_patternFn,drawingFn);
 
 			m_ink.set(argv[0], 4095);
 

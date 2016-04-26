@@ -27,12 +27,7 @@ class ToolOptions;
 //=============================================================================
 // ComboViewerPanel
 //-----------------------------------------------------------------------------
-enum CV_Parts {
-	CVPARTS_TOOLBAR = 0,
-	CVPARTS_TOOLOPTIONS,
-	CVPARTS_FLIPCONSOLE,
-	CVPARTS_COUNT
-};
+enum CV_Parts { CVPARTS_TOOLBAR = 0, CVPARTS_TOOLOPTIONS, CVPARTS_FLIPCONSOLE, CVPARTS_COUNT };
 //-----------------------------------------------------------------------------
 
 class ComboViewerPanel : public TPanel, public FlipConsoleOwner
@@ -53,7 +48,7 @@ class ComboViewerPanel : public TPanel, public FlipConsoleOwner
 	TPanelTitleBarButton *m_previewButton;
 	TPanelTitleBarButton *m_subcameraPreviewButton;
 
-public:
+  public:
 #if QT_VERSION >= 0x050500
 	ComboViewerPanel(QWidget *parent = 0, Qt::WindowFlags flags = 0);
 #else
@@ -63,29 +58,20 @@ public:
 
 	SceneViewer *getSceneViewer() { return m_sceneViewer; }
 
-	//toggle show/hide of the widgets according to m_visibleFlag
+	// toggle show/hide of the widgets according to m_visibleFlag
 	void updateShowHide();
 	void addShowHideContextMenu(QMenu *);
-	void setShowHideFlag(CV_Parts parts, bool visible)
-	{
-		m_visibleFlag[parts] = visible;
-	}
-	bool getShowHideFlag(CV_Parts parts)
-	{
-		return m_visibleFlag[parts];
-	}
+	void setShowHideFlag(CV_Parts parts, bool visible) { m_visibleFlag[parts] = visible; }
+	bool getShowHideFlag(CV_Parts parts) { return m_visibleFlag[parts]; }
 	// reimplementation of TPanel::widgetInThisPanelIsFocused
-	bool widgetInThisPanelIsFocused()
-	{
-		return m_sceneViewer->hasFocus();
-	}
+	bool widgetInThisPanelIsFocused() { return m_sceneViewer->hasFocus(); }
 
 	void onDrawFrame(int frame, const ImagePainter::VisualSettings &settings);
 
 	// reimplementation of FlipConsoleOwner::isFrameAlreadyCached
 	bool isFrameAlreadyCached(int frame);
 
-protected:
+  protected:
 	void showEvent(QShowEvent *);
 	void hideEvent(QHideEvent *);
 	void initializeTitleBar(TPanelTitleBar *titleBar);
@@ -100,22 +86,19 @@ protected:
 		// activate shortcut key for this flipconsole
 		m_flipConsole->makeCurrent();
 	};
-	void widgetClearFocusOnLeave()
-	{
-		m_sceneViewer->clearFocus();
-	};
+	void widgetClearFocusOnLeave() { m_sceneViewer->clearFocus(); };
 
-public slots:
+  public slots:
 	void onSceneChanged();
 	void changeWindowTitle();
 	void updateFrameRange();
 	void onXshLevelSwitched(TXshLevel *);
 
-	//for showing/hiding the parts
+	// for showing/hiding the parts
 	void onShowHideActionTriggered(QAction *);
 	void enableFlipConsoleForCamerastand(bool on);
 
-protected slots:
+  protected slots:
 	void onFrameChanged();
 
 	// need to update the preview marker as well as the frame range in flipconsole

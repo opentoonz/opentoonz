@@ -37,7 +37,7 @@ class ShortcutItem : public QTreeWidgetItem
 {
 	QAction *m_action;
 
-public:
+  public:
 	ShortcutItem(QTreeWidgetItem *parent, QAction *action)
 		: QTreeWidgetItem(parent, UserType), m_action(action)
 	{
@@ -60,8 +60,7 @@ public:
 // ShortcutViewer
 //-----------------------------------------------------------------------------
 
-ShortcutViewer::ShortcutViewer(QWidget *parent)
-	: QWidget(parent), m_action(0)
+ShortcutViewer::ShortcutViewer(QWidget *parent) : QWidget(parent), m_action(0)
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
@@ -78,7 +77,8 @@ void ShortcutViewer::paintEvent(QPaintEvent *)
 {
 	QPainter p(this);
 	// sfondo azzurro se il widget ha il focus (e quindi si accorge dei tasti premuti)
-	p.fillRect(1, 1, width() - 1, height() - 1, QBrush(hasFocus() ? QColor(171, 206, 255) : Qt::white));
+	p.fillRect(1, 1, width() - 1, height() - 1,
+			   QBrush(hasFocus() ? QColor(171, 206, 255) : Qt::white));
 	// bordo
 	p.setPen(QColor(184, 188, 127));
 	p.drawRect(0, 0, width() - 1, height() - 1);
@@ -122,8 +122,12 @@ void ShortcutViewer::keyPressEvent(QKeyEvent *event)
 	Qt::KeyboardModifiers modifiers = event->modifiers();
 
 	// Tasti che non possono essere utilizzati come shortcut
-	if ((modifiers | (Qt::CTRL | Qt::SHIFT | Qt::ALT)) != (Qt::CTRL | Qt::SHIFT | Qt::ALT) || key == Qt::Key_Home || key == Qt::Key_End || key == Qt::Key_PageDown || key == Qt::Key_PageUp || key == Qt::Key_Escape || key == Qt::Key_Print || key == Qt::Key_Pause || key == Qt::Key_ScrollLock) {
-		if (key != Qt::Key_Plus && key != Qt::Key_Minus && key != Qt::Key_Asterisk && key != Qt::Key_Slash) {
+	if ((modifiers | (Qt::CTRL | Qt::SHIFT | Qt::ALT)) != (Qt::CTRL | Qt::SHIFT | Qt::ALT) ||
+		key == Qt::Key_Home || key == Qt::Key_End || key == Qt::Key_PageDown ||
+		key == Qt::Key_PageUp || key == Qt::Key_Escape || key == Qt::Key_Print ||
+		key == Qt::Key_Pause || key == Qt::Key_ScrollLock) {
+		if (key != Qt::Key_Plus && key != Qt::Key_Minus && key != Qt::Key_Asterisk &&
+			key != Qt::Key_Slash) {
 			event->ignore();
 			return;
 		} else
@@ -138,7 +142,10 @@ void ShortcutViewer::keyPressEvent(QKeyEvent *event)
 		if (oldAction == m_action)
 			return;
 		if (oldAction) {
-			QString msg = tr("%1 is already assigned to '%2'\nAssign to '%3'?").arg(keySequence.toString()).arg(oldAction->iconText()).arg(m_action->iconText());
+			QString msg = tr("%1 is already assigned to '%2'\nAssign to '%3'?")
+							  .arg(keySequence.toString())
+							  .arg(oldAction->iconText())
+							  .arg(m_action->iconText());
 			int ret = DVGui::MsgBox(msg, tr("Yes"), tr("No"), 1);
 			activateWindow();
 			if (ret == 2 || ret == 0)
@@ -182,8 +189,7 @@ void ShortcutViewer::leaveEvent(QEvent *event)
 // ShortcutTree
 //-----------------------------------------------------------------------------
 
-ShortcutTree::ShortcutTree(QWidget *parent)
-	: QTreeWidget(parent)
+ShortcutTree::ShortcutTree(QWidget *parent) : QTreeWidget(parent)
 {
 
 	setObjectName("ShortcutTree");
@@ -192,7 +198,8 @@ ShortcutTree::ShortcutTree(QWidget *parent)
 
 	setColumnCount(1);
 	header()->close();
-	//setStyleSheet("border-bottom:1px solid rgb(120,120,120); border-left:1px solid rgb(120,120,120); border-top:1px solid rgb(120,120,120)");
+	// setStyleSheet("border-bottom:1px solid rgb(120,120,120); border-left:1px solid
+	// rgb(120,120,120); border-top:1px solid rgb(120,120,120)");
 
 	QTreeWidgetItem *menuCommandFolder = new QTreeWidgetItem(this);
 	menuCommandFolder->setText(0, tr("Menu Commands"));
@@ -221,9 +228,8 @@ ShortcutTree::ShortcutTree(QWidget *parent)
 
 	sortItems(0, Qt::AscendingOrder);
 
-	connect(
-		this, SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
-		this, SLOT(onCurrentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)));
+	connect(this, SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)), this,
+			SLOT(onCurrentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)));
 }
 
 //-----------------------------------------------------------------------------
@@ -273,8 +279,7 @@ void ShortcutTree::onShortcutChanged()
 // ShortcutPopup
 //-----------------------------------------------------------------------------
 
-ShortcutPopup::ShortcutPopup()
-	: Dialog(TApp::instance()->getMainWindow(), false, false, "Shortcut")
+ShortcutPopup::ShortcutPopup() : Dialog(TApp::instance()->getMainWindow(), false, false, "Shortcut")
 {
 	setWindowTitle(tr("Configure Shortcuts"));
 
@@ -301,17 +306,11 @@ ShortcutPopup::ShortcutPopup()
 		m_topLayout->addLayout(bottomLayout, 0);
 	}
 
-	connect(
-		m_list, SIGNAL(actionSelected(QAction *)),
-		m_sViewer, SLOT(setAction(QAction *)));
+	connect(m_list, SIGNAL(actionSelected(QAction *)), m_sViewer, SLOT(setAction(QAction *)));
 
-	connect(
-		m_removeBtn, SIGNAL(clicked()),
-		m_sViewer, SLOT(removeShortcut()));
+	connect(m_removeBtn, SIGNAL(clicked()), m_sViewer, SLOT(removeShortcut()));
 
-	connect(
-		m_sViewer, SIGNAL(shortcutChanged()),
-		m_list, SLOT(onShortcutChanged()));
+	connect(m_sViewer, SIGNAL(shortcutChanged()), m_list, SLOT(onShortcutChanged()));
 }
 
 //-----------------------------------------------------------------------------

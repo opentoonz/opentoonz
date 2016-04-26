@@ -65,8 +65,8 @@ TRect convertWorldToRaster(const TRectD area, const TImageP image)
 	TRasterImageP ri(image);
 	TToonzImageP ti(image);
 
-	//Watch out! TToonzImage::getRaster() returns a TRasterCM32P, while
-	//TRasterImage::getRaster() returns a TRasterP!
+	// Watch out! TToonzImage::getRaster() returns a TRasterCM32P, while
+	// TRasterImage::getRaster() returns a TRasterP!
 	TRasterP ras = (ri) ? ri->getRaster() : (TRasterP)ti->getRaster();
 	return convertWorldToRaster(area, ras);
 }
@@ -98,27 +98,28 @@ TRectD intersection(const TRectD &area, const TImageP image)
 
 //-----------------------------------------------------------------------------
 
-//The stroke is in raster coordinates
+// The stroke is in raster coordinates
 template <class PIXEL1, class PIXEL2>
 TRasterPT<PIXEL1> getImageFromStroke(TRasterPT<PIXEL2> ras, const TStroke &stroke)
 {
 	TRectD regionsBoxD = stroke.getBBox();
-	//E' volutamente allargato di un pixel!
-	TRect regionsBox(tfloor(regionsBoxD.x0), tfloor(regionsBoxD.y0), tceil(regionsBoxD.x1), tceil(regionsBoxD.y1));
+	// E' volutamente allargato di un pixel!
+	TRect regionsBox(tfloor(regionsBoxD.x0), tfloor(regionsBoxD.y0), tceil(regionsBoxD.x1),
+					 tceil(regionsBoxD.y1));
 	regionsBox *= ras->getBounds();
 	if (regionsBox.isEmpty())
 		return (TRasterPT<PIXEL1>)0;
 	TRasterPT<PIXEL1> buffer(regionsBox.getSize());
 	buffer->clear();
 
-	//Compute regions created by the std::vector
+	// Compute regions created by the std::vector
 	TVectorImage app;
 	app.addStroke(new TStroke(stroke));
 	app.findRegions();
 	int reg, j, k, y;
 	ras->lock();
 	for (reg = 0; reg < (int)app.getRegionCount(); reg++) {
-		//For each region, pixels inside the region are copied in buffer!
+		// For each region, pixels inside the region are copied in buffer!
 		TRectD bBoxD = stroke.getBBox();
 		TRect bBox(tfloor(bBoxD.x0), tfloor(bBoxD.y0), tceil(bBoxD.x1) - 1, tceil(bBoxD.y1) - 1);
 		bBox *= ras->getBounds();
@@ -185,7 +186,8 @@ TRasterPT<PIXEL1> getImageFromSelection(TRasterPT<PIXEL2> &ras, RasterSelection 
 		if (!app)
 			continue;
 		TRectD strokeRectD = stroke.getBBox();
-		TRect strokeRect(tfloor(strokeRectD.x0), tfloor(strokeRectD.y0), tceil(strokeRectD.x1) - 1, tceil(strokeRectD.y1) - 1);
+		TRect strokeRect(tfloor(strokeRectD.x0), tfloor(strokeRectD.y0), tceil(strokeRectD.x1) - 1,
+						 tceil(strokeRectD.y1) - 1);
 		TPoint offset((strokeRect * rSelectionBound).getP00() - rSelectionBound.getP00());
 		TPoint startP = rSelectionBound.getP00() + offset;
 		startPosition = TPoint(tmin(startPosition.x, startP.x), tmin(startPosition.y, startP.y));
@@ -217,7 +219,8 @@ TRasterP getImageFromSelection(const TImageP &image, RasterSelection &selection)
 //-----------------------------------------------------------------------------
 
 template <typename PIXEL>
-void deleteSelectionWithoutUndo(TRasterPT<PIXEL> &ras, const std::vector<TStroke> &strokes, PIXEL emptyValue)
+void deleteSelectionWithoutUndo(TRasterPT<PIXEL> &ras, const std::vector<TStroke> &strokes,
+								PIXEL emptyValue)
 {
 	if (!ras)
 		return;
@@ -226,12 +229,13 @@ void deleteSelectionWithoutUndo(TRasterPT<PIXEL> &ras, const std::vector<TStroke
 		TStroke s = strokes[i];
 		s.transform(TTranslation(ras->getCenterD()));
 		TRectD strokeRectD = s.getBBox();
-		//E' volutamente allargato di un pixel!
-		TRect strokeRect(tfloor(strokeRectD.x0), tfloor(strokeRectD.y0), tceil(strokeRectD.x1), tceil(strokeRectD.y1));
+		// E' volutamente allargato di un pixel!
+		TRect strokeRect(tfloor(strokeRectD.x0), tfloor(strokeRectD.y0), tceil(strokeRectD.x1),
+						 tceil(strokeRectD.y1));
 		if (!strokeRect.overlaps(ras->getBounds()))
 			continue;
 
-		//Compute regions created by the std::vector
+		// Compute regions created by the std::vector
 		TVectorImage app;
 		app.addStroke(new TStroke(s));
 		app.findRegions();
@@ -239,9 +243,10 @@ void deleteSelectionWithoutUndo(TRasterPT<PIXEL> &ras, const std::vector<TStroke
 		ras->lock();
 		TRect rasRect(ras->getBounds());
 		for (reg = 0; reg < (int)app.getRegionCount(); reg++) {
-			//For each region, pixels inside the region are erased!
+			// For each region, pixels inside the region are erased!
 			TRectD bBoxD = app.getRegion(reg)->getBBox();
-			TRect bBox(tfloor(bBoxD.x0), tfloor(bBoxD.y0), tceil(bBoxD.x1) - 1, tceil(bBoxD.y1) - 1);
+			TRect bBox(tfloor(bBoxD.x0), tfloor(bBoxD.y0), tceil(bBoxD.x1) - 1,
+					   tceil(bBoxD.y1) - 1);
 			bBox *= rasRect;
 			for (y = bBox.y0; y <= bBox.y1; y++) {
 				PIXEL *selectedLine = ras->pixels(y);
@@ -313,9 +318,10 @@ class UndoDeleteSelection : public TUndo
 	std::vector<TStroke> m_strokes;
 	TTool *m_tool;
 
-public:
+  public:
 	UndoDeleteSelection(RasterSelection *selection, TXshSimpleLevel *level)
-		: TUndo(), m_level(level), m_frameId(selection->getFrameId()), m_strokes(selection->getOriginalStrokes())
+		: TUndo(), m_level(level), m_frameId(selection->getFrameId()),
+		  m_strokes(selection->getOriginalStrokes())
 	{
 		TImageP image = m_level->getFrame(m_frameId, true);
 		m_erasedImageId = "UndoDeleteSelection" + toString(m_id++);
@@ -378,10 +384,7 @@ public:
 		m_tool->invalidate();
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 };
 
 int UndoDeleteSelection::m_id = 0;
@@ -394,15 +397,13 @@ class UndoPasteSelection : public TUndo
 {
 	RasterSelection *m_currentSelection, m_newSelection;
 
-public:
+  public:
 	UndoPasteSelection(RasterSelection *currentSelection)
 		: TUndo(), m_currentSelection(currentSelection), m_newSelection(*currentSelection)
 	{
 	}
 
-	~UndoPasteSelection()
-	{
-	}
+	~UndoPasteSelection() {}
 
 	void undo() const
 	{
@@ -417,15 +418,9 @@ public:
 		m_currentSelection->notify();
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Paste");
-	}
+	QString getHistoryString() { return QObject::tr("Paste"); }
 };
 
 //=============================================================================
@@ -450,9 +445,17 @@ class UndoPasteFloatingSelection : public TUndo
 	TTool *m_tool;
 	TFrameId m_frameId;
 
-public:
-	UndoPasteFloatingSelection(RasterSelection *currentSelection, TPalette *oldPalette, bool noAntialiasing)
-		: TUndo(), m_imageCell(currentSelection->getCurrentImageCell()), m_oldPalette(oldPalette ? oldPalette->clone() : 0), m_strokes(currentSelection->getOriginalStrokes()), m_selectionRect(currentSelection->getSelectionBbox()), m_transformation(currentSelection->getTransformation()), m_isPastedSelection(currentSelection->isPastedSelection()), m_noAntialiasing(noAntialiasing), m_undoImageId(""), m_frameId(currentSelection->getFrameId())
+  public:
+	UndoPasteFloatingSelection(RasterSelection *currentSelection, TPalette *oldPalette,
+							   bool noAntialiasing)
+		: TUndo(), m_imageCell(currentSelection->getCurrentImageCell()),
+		  m_oldPalette(oldPalette ? oldPalette->clone() : 0),
+		  m_strokes(currentSelection->getOriginalStrokes()),
+		  m_selectionRect(currentSelection->getSelectionBbox()),
+		  m_transformation(currentSelection->getTransformation()),
+		  m_isPastedSelection(currentSelection->isPastedSelection()),
+		  m_noAntialiasing(noAntialiasing), m_undoImageId(""),
+		  m_frameId(currentSelection->getFrameId())
 	{
 		TImageP image(currentSelection->getCurrentImage());
 		if (!image)
@@ -570,7 +573,8 @@ public:
 			deleteSelectionWithoutUndo(image, m_strokes);
 
 		TRasterP ras = getRaster(image);
-		pasteFloatingSelectionWithoutUndo(image, floatingRas, m_transformation, m_selectionRect, m_noAntialiasing);
+		pasteFloatingSelectionWithoutUndo(image, floatingRas, m_transformation, m_selectionRect,
+										  m_noAntialiasing);
 
 		ToolUtils::updateSaveBox(sl, fid);
 
@@ -584,15 +588,9 @@ public:
 		m_tool->invalidate();
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Paste");
-	}
+	QString getHistoryString() { return QObject::tr("Paste"); }
 };
 
 int UndoPasteFloatingSelection::m_id = 0;
@@ -640,9 +638,9 @@ void addPointToVector(TThickPoint point, std::vector<TThickPoint> &points, bool 
 
 //-----------------------------------------------------------------------------
 /*! Return intersection between \b bbox and \b chuck;
-    set segmentIndex to index of segment that contains intersection. */
-TThickPoint getIntersectionPoint(TRectD bbox, const TThickQuadratic *chunk,
-								 int &segmentIndex, bool secondChunkIntersection)
+	set segmentIndex to index of segment that contains intersection. */
+TThickPoint getIntersectionPoint(TRectD bbox, const TThickQuadratic *chunk, int &segmentIndex,
+								 bool secondChunkIntersection)
 {
 	TStroke stroke;
 	std::vector<TThickPoint> points;
@@ -722,8 +720,9 @@ TThickPoint getIntersectionPoint(TRectD bbox, const TThickQuadratic *chunk,
 
 //-----------------------------------------------------------------------------
 /*! Insert \b bbox corners in \b points if \b bbox corners are contained in \b outPoints stroke. */
-void insertBoxCorners(TRectD bbox, std::vector<TThickPoint> &points, std::vector<TThickPoint> outPoints,
-					  int currentSegmentIndex, int precSegmentIndex)
+void insertBoxCorners(TRectD bbox, std::vector<TThickPoint> &points,
+					  std::vector<TThickPoint> outPoints, int currentSegmentIndex,
+					  int precSegmentIndex)
 {
 	if (outPoints[0] != outPoints[(int)outPoints.size() - 1])
 		addPointToVector(outPoints[0], outPoints, true);
@@ -741,7 +740,8 @@ void insertBoxCorners(TRectD bbox, std::vector<TThickPoint> &points, std::vector
 	for (j = sameIndex ? 1 : 0; j < 2; j++) {
 		bool clockwise = j;
 		if (sameIndex)
-			clockwise = isClockwise(bbox, currentSegmentIndex, outPoints[outPoints.size() - 2], outPoints[outPoints.size() - 1]);
+			clockwise = isClockwise(bbox, currentSegmentIndex, outPoints[outPoints.size() - 2],
+									outPoints[outPoints.size() - 1]);
 		int segmentIndex = precSegmentIndex;
 		if (sameIndex)
 			segmentIndex = clockwise ? currentSegmentIndex - 1 : currentSegmentIndex + 1;
@@ -750,7 +750,7 @@ void insertBoxCorners(TRectD bbox, std::vector<TThickPoint> &points, std::vector
 		if (segmentIndex > 3)
 			segmentIndex = 0;
 		while (segmentIndex != currentSegmentIndex) {
-			if (sameIndex) //controllo anche il segmento di partenza.
+			if (sameIndex) // controllo anche il segmento di partenza.
 			{
 				segmentIndex = currentSegmentIndex;
 				sameIndex = false;
@@ -802,7 +802,8 @@ TStroke getIntersectedStroke(TStroke &stroke, TRectD bbox)
 	int cpCount = stroke.getControlPointCount();
 	if (cpCount == 0)
 		return stroke;
-	//isFirstTime, startSegmentIndex e startOutPoints sono usati nel il caso in cui lo stroke inizia fuori dalla bbox.
+	// isFirstTime, startSegmentIndex e startOutPoints sono usati nel il caso in cui lo stroke
+	// inizia fuori dalla bbox.
 	bool isFirstTime = true;
 	std::vector<TThickPoint> points, outPoints, startOutPoints;
 	TThickPoint precPoint = stroke.getControlPoint(0);
@@ -819,11 +820,13 @@ TStroke getIntersectedStroke(TStroke &stroke, TRectD bbox)
 		if (isPointInternal && isPrecPointInternal)
 			addPointToVector(point, points, (int)points.size() % 2 != i % 2);
 		if (!isPointInternal && !isPrecPointInternal)
-			addPointToVector(point, outPoints, (int)outPoints.size() > 0 && (int)outPoints.size() % 2 != i % 2);
+			addPointToVector(point, outPoints,
+							 (int)outPoints.size() > 0 && (int)outPoints.size() % 2 != i % 2);
 		if (isPointInternal != isPrecPointInternal) {
-			//Devo trovare l'intersezione
+			// Devo trovare l'intersezione
 			int chunkIndex = (i % 2 == 0) ? (i * 0.5) - 1 : i * 0.5;
-			TThickPoint p = getIntersectionPoint(bbox, stroke.getChunk(chunkIndex), currentSegmentIndex, chunkIndex == precChunkIndex);
+			TThickPoint p = getIntersectionPoint(bbox, stroke.getChunk(chunkIndex),
+												 currentSegmentIndex, chunkIndex == precChunkIndex);
 			precChunkIndex = chunkIndex;
 			addPointToVector(p, outPoints, (int)outPoints.size() % 2 == 1);
 			if (!isPrecPointInternal && points.size() > 0 && outPoints.size() > 0) {
@@ -842,10 +845,11 @@ TStroke getIntersectedStroke(TStroke &stroke, TRectD bbox)
 		if (isPointInternal && !isPrecPointInternal)
 			addPointToVector(point, points, (int)points.size() % 2 != i % 2);
 		if (!isPointInternal && isPrecPointInternal)
-			addPointToVector(point, outPoints, (int)outPoints.size() > 0 && (int)outPoints.size() % 2 != i % 2);
+			addPointToVector(point, outPoints,
+							 (int)outPoints.size() > 0 && (int)outPoints.size() % 2 != i % 2);
 		isPrecPointInternal = isPointInternal;
 	}
-	//Caso in cui lo stroke aveva il primo punto fuori dalla bbox
+	// Caso in cui lo stroke aveva il primo punto fuori dalla bbox
 	if (!isPrecPointInternal && points.size() > 0 && outPoints.size() > 0) {
 		int t;
 		for (t = 0; t < (int)outPoints.size(); t++)
@@ -854,8 +858,8 @@ TStroke getIntersectedStroke(TStroke &stroke, TRectD bbox)
 		outPoints.clear();
 	}
 
-	//Caso particolare in cui lo stroke non ha intersezione con la bbox
-	if (points.size() == 0) { //Lo stroke e' completamente contenuto nella bbox
+	// Caso particolare in cui lo stroke non ha intersezione con la bbox
+	if (points.size() == 0) { // Lo stroke e' completamente contenuto nella bbox
 		if (bbox.contains(precPoint))
 			return stroke;
 		else
@@ -878,7 +882,9 @@ TStroke getIntersectedStroke(TStroke &stroke, TRectD bbox)
 //-----------------------------------------------------------------------------
 
 RasterSelection::RasterSelection()
-	: TSelection(), m_currentImage(), m_oldPalette(0), m_selectionBbox(), m_affine(), m_startPosition(), m_floatingSelection(), m_originalfloatingSelection(), m_fid(), m_transformationCount(0), m_isPastedSelection(false), m_noAntialiasing(false)
+	: TSelection(), m_currentImage(), m_oldPalette(0), m_selectionBbox(), m_affine(),
+	  m_startPosition(), m_floatingSelection(), m_originalfloatingSelection(), m_fid(),
+	  m_transformationCount(0), m_isPastedSelection(false), m_noAntialiasing(false)
 {
 	m_strokes.clear();
 	m_originalStrokes.clear();
@@ -887,7 +893,12 @@ RasterSelection::RasterSelection()
 //-----------------------------------------------------------------------------
 
 RasterSelection::RasterSelection(const RasterSelection &src)
-	: TSelection(), m_currentImage(src.m_currentImage), m_oldPalette(src.m_oldPalette), m_selectionBbox(src.m_selectionBbox), m_strokes(src.m_strokes), m_originalStrokes(src.m_originalStrokes), m_affine(src.m_affine), m_startPosition(src.m_startPosition), m_fid(src.m_fid), m_transformationCount(src.m_transformationCount), m_isPastedSelection(src.m_isPastedSelection), m_noAntialiasing(src.m_noAntialiasing)
+	: TSelection(), m_currentImage(src.m_currentImage), m_oldPalette(src.m_oldPalette),
+	  m_selectionBbox(src.m_selectionBbox), m_strokes(src.m_strokes),
+	  m_originalStrokes(src.m_originalStrokes), m_affine(src.m_affine),
+	  m_startPosition(src.m_startPosition), m_fid(src.m_fid),
+	  m_transformationCount(src.m_transformationCount),
+	  m_isPastedSelection(src.m_isPastedSelection), m_noAntialiasing(src.m_noAntialiasing)
 
 {
 	setView(src.getView());
@@ -901,7 +912,7 @@ RasterSelection::RasterSelection(const RasterSelection &src)
 
 //-----------------------------------------------------------------------------
 
-//!Returns the clone of this selection
+//! Returns the clone of this selection
 TSelection *RasterSelection::clone() const
 {
 	RasterSelection *rs = new RasterSelection(*this);
@@ -913,14 +924,15 @@ TSelection *RasterSelection::clone() const
 //! Notify to the viewer that the selection is changed.
 void RasterSelection::notify()
 {
-	RasterSelection *selection = dynamic_cast<RasterSelection *>(TTool::getApplication()->getCurrentSelection()->getSelection());
+	RasterSelection *selection = dynamic_cast<RasterSelection *>(
+		TTool::getApplication()->getCurrentSelection()->getSelection());
 	if (selection)
 		selection->notifyView();
 }
 
 //-----------------------------------------------------------------------------
 
-//!Empty the selection.
+//! Empty the selection.
 //! If the selection is floating, the floating image is pasted using the current tranformation.
 void RasterSelection::selectNone()
 {
@@ -1049,16 +1061,16 @@ void RasterSelection::pasteFloatingSelection()
 		TUndoManager::manager()->popUndo(m_transformationCount);
 
 	if (m_transformationCount > 0 || m_isPastedSelection)
-		TUndoManager::manager()->add(new UndoPasteFloatingSelection(
-			this, m_oldPalette.getPointer(), m_noAntialiasing));
+		TUndoManager::manager()->add(
+			new UndoPasteFloatingSelection(this, m_oldPalette.getPointer(), m_noAntialiasing));
 	else if (m_transformationCount == 0)
 		TUndoManager::manager()->popUndo(-1, true);
 
 	TRectD wRect = getSelectionBbox();
-	pasteFloatingSelectionWithoutUndo(m_currentImage, m_floatingSelection, m_affine, wRect, m_noAntialiasing);
+	pasteFloatingSelectionWithoutUndo(m_currentImage, m_floatingSelection, m_affine, wRect,
+									  m_noAntialiasing);
 
-	ToolUtils::updateSaveBox(m_currentImageCell.getSimpleLevel(),
-							 m_currentImageCell.getFrameId());
+	ToolUtils::updateSaveBox(m_currentImageCell.getSimpleLevel(), m_currentImageCell.getFrameId());
 
 	setFloatingSeletion(TRasterP());
 	selectNone();
@@ -1117,12 +1129,14 @@ void RasterSelection::copySelection()
 	if (TToonzImageP ti = (TToonzImageP)(m_currentImage)) {
 		ToonzImageData *data = new ToonzImageData();
 		ti->getDpi(dpix, dpiy);
-		data->setData(ras, ti->getPalette(), dpix, dpiy, ti->getSize(), rect, m_strokes, m_originalStrokes, m_affine);
+		data->setData(ras, ti->getPalette(), dpix, dpiy, ti->getSize(), rect, m_strokes,
+					  m_originalStrokes, m_affine);
 		QApplication::clipboard()->setMimeData(cloneData(data));
 	} else if (TRasterImageP ri = (TRasterImageP)(m_currentImage)) {
 		FullColorImageData *data = new FullColorImageData();
 		ri->getDpi(dpix, dpiy);
-		data->setData(ras, ri->getPalette(), dpix, dpiy, ri->getRaster()->getSize(), rect, m_strokes, m_originalStrokes, m_affine);
+		data->setData(ras, ri->getPalette(), dpix, dpiy, ri->getRaster()->getSize(), rect,
+					  m_strokes, m_originalStrokes, m_affine);
 		QApplication::clipboard()->setMimeData(cloneData(data));
 	}
 }
@@ -1148,17 +1162,20 @@ void RasterSelection::pasteSelection(const RasterImageData *riData)
 		ti->getDpi(currentDpiX, currentDpiY);
 		TRasterP cmRas;
 		if (fullColorData) {
-			DVGui::error(QObject::tr("The copied selection cannot be pasted in the current drawing."));
+			DVGui::error(
+				QObject::tr("The copied selection cannot be pasted in the current drawing."));
 			return;
 		}
-		riData->getData(cmRas, dpiX, dpiY, rect, m_strokes, m_originalStrokes, m_affine, m_currentImage->getPalette());
+		riData->getData(cmRas, dpiX, dpiY, rect, m_strokes, m_originalStrokes, m_affine,
+						m_currentImage->getPalette());
 		if (!cmRas)
 			return;
 		m_floatingSelection = cmRas;
 	} else if (TRasterImageP ri = (TRasterImageP)m_currentImage) {
 		ri->getDpi(currentDpiX, currentDpiY);
 		TRasterP ras;
-		riData->getData(ras, dpiX, dpiY, rect, m_strokes, m_originalStrokes, m_affine, ri->getPalette());
+		riData->getData(ras, dpiX, dpiY, rect, m_strokes, m_originalStrokes, m_affine,
+						ri->getPalette());
 		if (!ras)
 			return;
 		if (TRasterCM32P rasCM = ras) {

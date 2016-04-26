@@ -104,12 +104,13 @@ class UndoTypeTool : public ToolUtils::TToolUndo
 	std::vector<TFilledRegionInf> *m_fillInformationBefore, *m_fillInformationAfter;
 	TVectorImageP m_image;
 
-public:
+  public:
 	UndoTypeTool(std::vector<TFilledRegionInf> *fillInformationBefore,
-				 std::vector<TFilledRegionInf> *fillInformationAfter,
-				 TXshSimpleLevel *level, const TFrameId &frameId,
-				 bool isFrameCreated, bool isLevelCreated)
-		: ToolUtils::TToolUndo(level, frameId, isFrameCreated, isLevelCreated), m_fillInformationBefore(fillInformationBefore), m_fillInformationAfter(fillInformationAfter)
+				 std::vector<TFilledRegionInf> *fillInformationAfter, TXshSimpleLevel *level,
+				 const TFrameId &frameId, bool isFrameCreated, bool isLevelCreated)
+		: ToolUtils::TToolUndo(level, frameId, isFrameCreated, isLevelCreated),
+		  m_fillInformationBefore(fillInformationBefore),
+		  m_fillInformationAfter(fillInformationAfter)
 	{
 	}
 
@@ -197,18 +198,14 @@ public:
 	int getSize() const
 	{
 		if (m_fillInformationAfter && m_fillInformationBefore)
-			return sizeof(*this) +
-				   m_fillInformationBefore->capacity() * sizeof(TFilledRegionInf) +
+			return sizeof(*this) + m_fillInformationBefore->capacity() * sizeof(TFilledRegionInf) +
 				   m_fillInformationAfter->capacity() * sizeof(TFilledRegionInf) +
 				   +m_strokes.capacity() * sizeof(TStroke) + 500;
 		else
 			return sizeof(*this) + m_strokes.capacity() * sizeof(TStroke) + 500;
 	}
 
-	QString getToolName()
-	{
-		return QString("Type Tool");
-	}
+	QString getToolName() { return QString("Type Tool"); }
 };
 
 //---------------------------------------------------------
@@ -217,17 +214,15 @@ class RasterUndoTypeTool : public TRasterUndo
 {
 	TTileSetCM32 *m_afterTiles;
 
-public:
+  public:
 	RasterUndoTypeTool(TTileSetCM32 *beforeTiles, TTileSetCM32 *afterTiles, TXshSimpleLevel *level,
 					   const TFrameId &id, bool createdFrame, bool createdLevel)
-		: TRasterUndo(beforeTiles, level, id, createdFrame, createdLevel, 0), m_afterTiles(afterTiles)
+		: TRasterUndo(beforeTiles, level, id, createdFrame, createdLevel, 0),
+		  m_afterTiles(afterTiles)
 	{
 	}
 
-	~RasterUndoTypeTool()
-	{
-		delete m_afterTiles;
-	}
+	~RasterUndoTypeTool() { delete m_afterTiles; }
 
 	void redo() const
 	{
@@ -252,10 +247,7 @@ public:
 			return TRasterUndo::getSize();
 	}
 
-	QString getToolName()
-	{
-		return QString("Type Tool");
-	}
+	QString getToolName() { return QString("Type Tool"); }
 };
 
 //---------------------------------------------------------
@@ -269,8 +261,8 @@ public:
 
 class StrokeChar
 {
-public:
-	//TVectorImageP m_char;
+  public:
+	// TVectorImageP m_char;
 
 	TImageP m_char;
 
@@ -280,14 +272,12 @@ public:
 	int m_styleId;
 
 	StrokeChar(TImageP _char, double offset, int key, int styleId)
-		: m_char(_char), m_offset(offset), m_charPosition(TPointD(0, 0)), m_key(key), m_styleId(styleId)
+		: m_char(_char), m_offset(offset), m_charPosition(TPointD(0, 0)), m_key(key),
+		  m_styleId(styleId)
 	{
 	}
 
-	bool isReturn() const
-	{
-		return m_key == TK_Return;
-	}
+	bool isReturn() const { return m_key == TK_Return; }
 
 	void update(TAffine scale, int nextCode = 0)
 	{
@@ -301,8 +291,9 @@ public:
 			} else {
 				TRasterCM32P newRasterCM;
 				TPoint p;
-				TPoint adv = TFontManager::instance()->drawChar((TRasterCM32P &)newRasterCM, p, m_styleId, (wchar_t)m_key, (wchar_t)nextCode);
-				//m_char->transform(scale);
+				TPoint adv = TFontManager::instance()->drawChar(
+					(TRasterCM32P &)newRasterCM, p, m_styleId, (wchar_t)m_key, (wchar_t)nextCode);
+				// m_char->transform(scale);
 				m_offset = (scale * TPointD((double)(adv.x), (double)(adv.y))).x;
 
 				m_char = new TToonzImage(newRasterCM, newRasterCM->getBounds());
@@ -337,7 +328,7 @@ class TypeTool : public TTool
 	std::wstring m_typeface;
 	double m_dimension;
 
-	bool m_validFonts; //false iff there are problems with font loading
+	bool m_validFonts; // false iff there are problems with font loading
 	bool m_initialized;
 
 	int m_cursorId;
@@ -350,8 +341,9 @@ class TypeTool : public TTool
 	std::pair<int, int> m_preeditRange;
 	// posizione (dentro m_string) della preeditString (cfr. IME)
 	// n.b. la preeditString va da range.first a range.second-1
-	TRectD m_textBox;	  // bbox della stringa
-	TScale m_scale;		   // la dimensione dei char ottenuti dal text manager e' fissa perche' influisce sula qualita'. Quindi lo scalo
+	TRectD m_textBox; // bbox della stringa
+	TScale m_scale;   // la dimensione dei char ottenuti dal text manager e' fissa perche' influisce
+					  // sula qualita'. Quindi lo scalo
 	TPointD m_cursorPoint; // punto piu alto del cursore
 	TPointD m_startPoint;  // punto dove si poggia la prima lettera (coincide col mouse click)
 	double m_fontYOffset;  // spazio per le parti delle lettere sotto il rigo (dipende dal font)
@@ -359,7 +351,7 @@ class TypeTool : public TTool
 
 	TUndo *m_undo;
 
-public:
+  public:
 	TypeTool();
 	~TypeTool();
 
@@ -389,7 +381,8 @@ public:
 	void leftButtonDown(const TPointD &pos, const TMouseEvent &);
 	void rightButtonDown(const TPointD &pos, const TMouseEvent &);
 	bool keyDown(int key, std::wstring unicodeChar, TUINT32 flags, const TPoint &pos);
-	void onInputText(std::wstring preedit, std::wstring commit, int replacementStart, int replacementLen);
+	void onInputText(std::wstring preedit, std::wstring commit, int replacementStart,
+					 int replacementLen);
 
 	// cancella gli StrokeChar fra from e to-1 e inserisce nuovi StrokeChar
 	// corrispondenti a text a partire da from
@@ -403,7 +396,8 @@ public:
 	void cursorRight();
 	void deleteKey();
 	void addTextToImage();
-	void addTextToVectorImage(const TVectorImageP &currentImage, std::vector<const TVectorImage *> &images);
+	void addTextToVectorImage(const TVectorImageP &currentImage,
+							  std::vector<const TVectorImage *> &images);
 	void addTextToToonzImage(const TToonzImageP &currentImage);
 	void stopEditing();
 
@@ -413,17 +407,11 @@ public:
 	void onDeactivate();
 	void onImageChanged();
 
-	int getCursorId() const
-	{
-		return m_cursorId;
-	}
+	int getCursorId() const { return m_cursorId; }
 
 	bool onPropertyChanged(std::string propertyName);
 
-	TPropertyGroup *getProperties(int targetType)
-	{
-		return &m_prop;
-	}
+	TPropertyGroup *getProperties(int targetType) { return &m_prop; }
 
 	int getColorClass() const { return 1; }
 
@@ -436,9 +424,12 @@ public:
 //---------------------------------------------------------
 
 TypeTool::TypeTool()
-	: TTool("T_Type"), m_textBox(TRectD(0, 0, 0, 0)), m_cursorPoint(TPointD(0, 0)), m_startPoint(TPointD(0, 0)), m_dimension(70), m_validFonts(true) //false)
+	: TTool("T_Type"), m_textBox(TRectD(0, 0, 0, 0)), m_cursorPoint(TPointD(0, 0)),
+	  m_startPoint(TPointD(0, 0)), m_dimension(70), m_validFonts(true) // false)
 	  ,
-	  m_fontYOffset(0), m_cursorId(ToolCursor::CURSOR_NO), m_pixelSize(1), m_cursorIndex(0), m_preeditRange(0, 0), m_isVertical(false), m_initialized(false), m_fontFamilyMenu("Font:") // W_ToolOptions_FontName
+	  m_fontYOffset(0), m_cursorId(ToolCursor::CURSOR_NO), m_pixelSize(1), m_cursorIndex(0),
+	  m_preeditRange(0, 0), m_isVertical(false), m_initialized(false),
+	  m_fontFamilyMenu("Font:") // W_ToolOptions_FontName
 	  ,
 	  m_typeFaceMenu("Style:") // W_ToolOptions_TypeFace
 	  ,
@@ -450,7 +441,7 @@ TypeTool::TypeTool()
 {
 	bind(TTool::CommonLevels | TTool::EmptyTarget);
 	m_prop.bind(m_fontFamilyMenu);
-//Su mac non e' visibile il menu dello style perche' e' stato inserito nel nome della font.
+// Su mac non e' visibile il menu dello style perche' e' stato inserito nel nome della font.
 #ifndef MACOSX
 	m_prop.bind(m_typeFaceMenu);
 #endif
@@ -596,9 +587,9 @@ void TypeTool::setFont(std::wstring family)
 			}
 		}
 
-		//assert chiaramente vero se oldTypeface!=m_typeFaceMenu.getValue().
-		//Assume che il TFontManager quando cambia family, si ricordi
-		//il vecchio typeface e lo imposti se anche la nuova family lo ha
+		// assert chiaramente vero se oldTypeface!=m_typeFaceMenu.getValue().
+		// Assume che il TFontManager quando cambia family, si ricordi
+		// il vecchio typeface e lo imposti se anche la nuova family lo ha
 		assert(instance->getCurrentTypeface() == m_typeFaceMenu.getValue());
 
 		updateStrokeChar();
@@ -743,7 +734,8 @@ void TypeTool::updateCharPositions(int updateFrom)
 		currentOffset = m_string[updateFrom - 1].m_charPosition - m_startPoint;
 		if (m_isVertical && !instance->hasVertical()) {
 			if (m_string[updateFrom - 1].isReturn())
-				currentOffset = TPointD(currentOffset.x - m_dimension, -m_dimension - m_fontYOffset);
+				currentOffset =
+					TPointD(currentOffset.x - m_dimension, -m_dimension - m_fontYOffset);
 			else
 				currentOffset = currentOffset + TPointD(0, -m_dimension);
 		} else {
@@ -760,7 +752,8 @@ void TypeTool::updateCharPositions(int updateFrom)
 
 		if (m_isVertical && !instance->hasVertical()) {
 			if (m_string[j].isReturn() || m_string[j].m_key == ' ')
-				currentOffset = TPointD(currentOffset.x - m_dimension, -m_dimension - m_fontYOffset);
+				currentOffset =
+					TPointD(currentOffset.x - m_dimension, -m_dimension - m_fontYOffset);
 			else
 				currentOffset = currentOffset + TPointD(0, -m_dimension);
 		} else {
@@ -800,17 +793,19 @@ void TypeTool::updateCursorPoint()
 					TPointD(m_startPoint.x, m_string.back().m_charPosition.y + m_fontYOffset);
 			else
 				m_cursorPoint = m_string.back().m_charPosition +
-								TPointD(m_string.back().m_offset, 0) + TPointD(0, m_dimension + m_fontYOffset);
+								TPointD(m_string.back().m_offset, 0) +
+								TPointD(0, m_dimension + m_fontYOffset);
 		} else if (m_string.back().isReturn())
-			m_cursorPoint =
-				TPointD(m_string.back().m_charPosition.x - m_dimension, m_startPoint.y);
+			m_cursorPoint = TPointD(m_string.back().m_charPosition.x - m_dimension, m_startPoint.y);
 		else
 			m_cursorPoint = m_string.back().m_charPosition + TPointD(0, m_fontYOffset);
 	} else {
 		if (!m_isVertical || instance->hasVertical())
-			m_cursorPoint = m_string[m_cursorIndex].m_charPosition + TPointD(0, m_dimension + m_fontYOffset);
+			m_cursorPoint =
+				m_string[m_cursorIndex].m_charPosition + TPointD(0, m_dimension + m_fontYOffset);
 		else
-			m_cursorPoint = m_string[m_cursorIndex].m_charPosition + TPointD(0, m_dimension + m_fontYOffset);
+			m_cursorPoint =
+				m_string[m_cursorIndex].m_charPosition + TPointD(0, m_dimension + m_fontYOffset);
 	}
 }
 
@@ -836,25 +831,23 @@ void TypeTool::updateTextBox()
 			currentLineLength = 0;
 			returnNumber++;
 		} else {
-			currentLineLength += (m_isVertical && !instance->hasVertical()) ? m_dimension : m_string[j].m_offset;
+			currentLineLength +=
+				(m_isVertical && !instance->hasVertical()) ? m_dimension : m_string[j].m_offset;
 		}
 	}
 
-	if (currentLineLength > maxXLength) //last line
+	if (currentLineLength > maxXLength) // last line
 		maxXLength = currentLineLength;
 
 	if (m_isVertical && !instance->hasVertical())
-		m_textBox = TRectD(m_startPoint.x - m_dimension * returnNumber,
-						   m_startPoint.y - maxXLength,
-						   m_startPoint.x + m_dimension,
-						   m_startPoint.y)
+		m_textBox = TRectD(m_startPoint.x - m_dimension * returnNumber, m_startPoint.y - maxXLength,
+						   m_startPoint.x + m_dimension, m_startPoint.y)
 						.enlarge(cBorderSize * m_pixelSize);
 	else
-		m_textBox = TRectD(m_startPoint.x,
-						   m_startPoint.y - (m_dimension * returnNumber) + m_fontYOffset,
-						   m_startPoint.x + maxXLength,
-						   m_startPoint.y + m_dimension + m_fontYOffset)
-						.enlarge(cBorderSize * m_pixelSize);
+		m_textBox =
+			TRectD(m_startPoint.x, m_startPoint.y - (m_dimension * returnNumber) + m_fontYOffset,
+				   m_startPoint.x + maxXLength, m_startPoint.y + m_dimension + m_fontYOffset)
+				.enlarge(cBorderSize * m_pixelSize);
 }
 
 //---------------------------------------------------------
@@ -866,7 +859,9 @@ void TypeTool::updateMouseCursor(const TPointD &pos)
 	if (!m_validFonts)
 		m_cursorId = ToolCursor::CURSOR_NO;
 	else {
-		TPointD clickPoint = (TFontManager::instance()->hasVertical() && m_isVertical) ? TRotation(m_startPoint, 90) * pos : pos;
+		TPointD clickPoint = (TFontManager::instance()->hasVertical() && m_isVertical)
+								 ? TRotation(m_startPoint, 90) * pos
+								 : pos;
 		if (m_textBox == TRectD(0, 0, 0, 0) || m_string.empty() || !m_textBox.contains(clickPoint))
 			m_cursorId = ToolCursor::TypeOutCursor;
 		else
@@ -886,7 +881,7 @@ void TypeTool::draw()
 
 	TFontManager *instance = TFontManager::instance();
 
-	/*TAffine viewMatrix = getViewer()->getViewMatrix(); 
+	/*TAffine viewMatrix = getViewer()->getViewMatrix();
   glPushMatrix();
 	tglMultMatrix(viewMatrix);*/
 
@@ -895,7 +890,7 @@ void TypeTool::draw()
 		tglMultMatrix(TRotation(m_startPoint, -90));
 	}
 
-	//draw text
+	// draw text
 	UINT size = m_string.size();
 
 	TPoint descenderP(0, TFontManager::instance()->getLineDescender());
@@ -940,7 +935,7 @@ void TypeTool::draw()
 		}
 	}
 
-	//draw textbox
+	// draw textbox
 	double pixelSize = sqrt(tglGetPixelSize2());
 	if (!isAlmostZero(pixelSize - m_pixelSize)) {
 		m_textBox = m_textBox.enlarge((pixelSize - m_pixelSize) * cBorderSize);
@@ -950,7 +945,7 @@ void TypeTool::draw()
 	ToolUtils::drawRect(m_textBox, boxColor, 0x5555);
 
 	if (m_active) {
-		//draw cursor
+		// draw cursor
 		tglColor(TPixel32::Black);
 		if (!m_isVertical || instance->hasVertical())
 			tglDrawSegment(m_cursorPoint, m_cursorPoint + TPointD(0, -m_dimension));
@@ -964,7 +959,7 @@ void TypeTool::draw()
 		glPopMatrix();
 	}
 
-	//glPopMatrix();
+	// glPopMatrix();
 
 	//  TPoint ipos = m_viewer->toolToMouse(drawableCursor);
 	//  setImePosition(ipos.x, ipos.y, (int)m_dimension);
@@ -972,17 +967,20 @@ void TypeTool::draw()
 
 //---------------------------------------------------------
 
-void TypeTool::addTextToVectorImage(const TVectorImageP &currentImage, std::vector<const TVectorImage *> &images)
+void TypeTool::addTextToVectorImage(const TVectorImageP &currentImage,
+									std::vector<const TVectorImage *> &images)
 {
 	UINT oldSize = currentImage->getStrokeCount();
 
 	std::vector<TFilledRegionInf> *fillInformationBefore = new std::vector<TFilledRegionInf>;
-	ImageUtils::getFillingInformationOverlappingArea(currentImage, *fillInformationBefore, m_textBox);
+	ImageUtils::getFillingInformationOverlappingArea(currentImage, *fillInformationBefore,
+													 m_textBox);
 
 	currentImage->mergeImage(images);
 
 	std::vector<TFilledRegionInf> *fillInformationAfter = new std::vector<TFilledRegionInf>;
-	ImageUtils::getFillingInformationOverlappingArea(currentImage, *fillInformationAfter, m_textBox);
+	ImageUtils::getFillingInformationOverlappingArea(currentImage, *fillInformationAfter,
+													 m_textBox);
 
 	UINT newSize = currentImage->getStrokeCount();
 
@@ -1006,8 +1004,8 @@ void TypeTool::addTextToToonzImage(const TToonzImageP &currentImage)
 	if (size == 0)
 		return;
 
-	//TPalette *palette  = currentImage->getPalette();
-	//currentImage->lock();
+	// TPalette *palette  = currentImage->getPalette();
+	// currentImage->lock();
 
 	TRasterCM32P targetRaster = currentImage->getRaster();
 	TRect changedArea;
@@ -1023,9 +1021,9 @@ void TypeTool::addTextToToonzImage(const TToonzImageP &currentImage)
 			TRectD srcBBox = ti->getBBox() + m_string[j].m_charPosition;
 			changedArea += ToonzImageUtils::convertWorldToRaster(srcBBox, currentImage);
 			/*
-      if( instance->hasVertical() && m_isVertical)
-        vi->transform( TRotation(m_startPoint,-90) );
-      */
+	  if( instance->hasVertical() && m_isVertical)
+		vi->transform( TRotation(m_startPoint,-90) );
+	  */
 		}
 	}
 
@@ -1042,7 +1040,8 @@ void TypeTool::addTextToToonzImage(const TToonzImageP &currentImage)
 			if (TToonzImageP srcTi = m_string[j].m_char) {
 				TRasterCM32P srcRaster = srcTi->getRaster();
 				TTranslation transl1(convert(descenderP));
-				TTranslation transl2(m_string[j].m_charPosition + convert(targetRaster->getCenter()));
+				TTranslation transl2(m_string[j].m_charPosition +
+									 convert(targetRaster->getCenter()));
 				TRop::over(targetRaster, srcRaster, transl2 * m_scale * transl1);
 			}
 		}
@@ -1053,7 +1052,8 @@ void TypeTool::addTextToToonzImage(const TToonzImageP &currentImage)
 		TXshSimpleLevel *sl = TTool::getApplication()->getCurrentLevel()->getSimpleLevel();
 		TFrameId id = getCurrentFid();
 
-		TUndoManager::manager()->add(new RasterUndoTypeTool(beforeTiles, afterTiles, sl, id, m_isFrameCreated, m_isLevelCreated));
+		TUndoManager::manager()->add(new RasterUndoTypeTool(beforeTiles, afterTiles, sl, id,
+															m_isFrameCreated, m_isLevelCreated));
 		if (m_undo) {
 			delete m_undo;
 			m_undo = 0;
@@ -1147,7 +1147,8 @@ void TypeTool::setCursorIndexFromPoint(TPointD point)
 				currentDispl += m_string[j].m_offset;
 
 				if (currentDispl > point.x) {
-					if (fabs(currentDispl - m_string[j].m_offset - point.x) < fabs(currentDispl - point.x))
+					if (fabs(currentDispl - m_string[j].m_offset - point.x) <
+						fabs(currentDispl - point.x))
 						m_cursorIndex = j;
 					else
 						m_cursorIndex = j + 1;
@@ -1158,7 +1159,8 @@ void TypeTool::setCursorIndexFromPoint(TPointD point)
 				if (!TFontManager::instance()->hasVertical()) {
 					currentDispl -= m_dimension;
 					if (currentDispl < point.y) {
-						if (fabs(currentDispl + m_dimension - point.y) < fabs(currentDispl - point.y))
+						if (fabs(currentDispl + m_dimension - point.y) <
+							fabs(currentDispl - point.y))
 							m_cursorIndex = j;
 						else
 							m_cursorIndex = j + 1;
@@ -1169,7 +1171,8 @@ void TypeTool::setCursorIndexFromPoint(TPointD point)
 					currentDispl -= m_string[j].m_offset;
 
 					if (currentDispl < point.y) {
-						if (fabs(currentDispl + m_string[j].m_offset - point.y) < fabs(currentDispl - point.y))
+						if (fabs(currentDispl + m_string[j].m_offset - point.y) <
+							fabs(currentDispl - point.y))
 							m_cursorIndex = j;
 						else
 							m_cursorIndex = j + 1;
@@ -1223,8 +1226,9 @@ void TypeTool::leftButtonDown(const TPointD &pos, const TMouseEvent &)
 			m_undo = new UndoTypeTool(0, 0, getApplication()->getCurrentLevel()->getSimpleLevel(),
 									  getCurrentFid(), m_isFrameCreated, m_isLevelCreated);
 		else
-			m_undo = new RasterUndoTypeTool(0, 0, getApplication()->getCurrentLevel()->getSimpleLevel(),
-											getCurrentFid(), m_isFrameCreated, m_isLevelCreated);
+			m_undo =
+				new RasterUndoTypeTool(0, 0, getApplication()->getCurrentLevel()->getSimpleLevel(),
+									   getCurrentFid(), m_isFrameCreated, m_isLevelCreated);
 	}
 
 	//  closeImeWindow();
@@ -1233,7 +1237,9 @@ void TypeTool::leftButtonDown(const TPointD &pos, const TMouseEvent &)
 
 	if (!m_string.empty()) {
 
-		TPointD clickPoint = (TFontManager::instance()->hasVertical() && m_isVertical) ? TRotation(m_startPoint, 90) * pos : pos;
+		TPointD clickPoint = (TFontManager::instance()->hasVertical() && m_isVertical)
+								 ? TRotation(m_startPoint, 90) * pos
+								 : pos;
 		if (m_textBox.contains(clickPoint)) {
 			setCursorIndexFromPoint(pos);
 			updateCursorPoint();
@@ -1302,8 +1308,7 @@ void TypeTool::replaceText(std::wstring text, int from, int to)
 			// se il font ha kerning bisogna tenere conto del carattere successivo
 			// (se c'e' e non e' un CR) per calcolare correttamente la distanza adv
 			TPoint adv;
-			if (instance->hasKerning() &&
-				index < m_string.size() && !m_string[index].isReturn())
+			if (instance->hasKerning() && index < m_string.size() && !m_string[index].isReturn())
 				adv = instance->drawChar(characterImage, character, m_string[index].m_key);
 			else
 				adv = instance->drawChar(characterImage, character);
@@ -1313,16 +1318,20 @@ void TypeTool::replaceText(std::wstring text, int from, int to)
 			// colora le aree chiuse
 			paintChar(characterImage, styleId);
 
-			m_string.insert(m_string.begin() + index, StrokeChar(characterImage, advD.x, character, styleId));
+			m_string.insert(m_string.begin() + index,
+							StrokeChar(characterImage, advD.x, character, styleId));
 		} else if (ti) {
 			TRasterCM32P newRasterCM;
 			TPoint p;
 			unsigned int index = from + i;
 
-			if (instance->hasKerning() && (UINT)m_cursorIndex < m_string.size() && !m_string[index].isReturn())
-				adv = instance->drawChar((TRasterCM32P &)newRasterCM, p, styleId, (wchar_t)character, (wchar_t)m_string[index].m_key);
+			if (instance->hasKerning() && (UINT)m_cursorIndex < m_string.size() &&
+				!m_string[index].isReturn())
+				adv = instance->drawChar((TRasterCM32P &)newRasterCM, p, styleId,
+										 (wchar_t)character, (wchar_t)m_string[index].m_key);
 			else
-				adv = instance->drawChar((TRasterCM32P &)newRasterCM, p, styleId, (wchar_t)character, (wchar_t)0);
+				adv = instance->drawChar((TRasterCM32P &)newRasterCM, p, styleId,
+										 (wchar_t)character, (wchar_t)0);
 
 			d_adv = m_scale * TPointD((double)(adv.x), (double)(adv.y));
 
@@ -1332,12 +1341,14 @@ void TypeTool::replaceText(std::wstring text, int from, int to)
 			assert(vPalette);
 			newTImage->setPalette(vPalette);
 
-			m_string.insert(m_string.begin() + index, StrokeChar(newTImage, d_adv.x, character, styleId));
+			m_string.insert(m_string.begin() + index,
+							StrokeChar(newTImage, d_adv.x, character, styleId));
 		}
 	}
 
 	// se necessario ricalcolo il kerning del carattere precedente all'inserimento/cancellazione
-	if (instance->hasKerning() && from - 1 >= 0 && !m_string[from - 1].isReturn() && from < (int)m_string.size() && !m_string[from].isReturn()) {
+	if (instance->hasKerning() && from - 1 >= 0 && !m_string[from - 1].isReturn() &&
+		from < (int)m_string.size() && !m_string[from].isReturn()) {
 		TPoint adv = instance->getDistance(m_string[from - 1].m_key, m_string[from].m_key);
 		TPointD advD = m_scale * TPointD((double)(adv.x), (double)(adv.y));
 		m_string[from - 1].m_offset = advD.x;
@@ -1379,14 +1390,15 @@ void TypeTool::addBaseChar(std::wstring text)
 	if (vi) {
 		TVectorImageP newVImage(new TVectorImage);
 
-		if (instance->hasKerning() && (UINT)m_cursorIndex < m_string.size() && !m_string[m_cursorIndex].isReturn())
+		if (instance->hasKerning() && (UINT)m_cursorIndex < m_string.size() &&
+			!m_string[m_cursorIndex].isReturn())
 			adv = instance->drawChar(newVImage, character, m_string[m_cursorIndex].m_key);
 		else
 			adv = instance->drawChar(newVImage, character);
 
 		newVImage->transform(m_scale);
 		paintChar(newVImage, styleId);
-		//if(isSketchStyle(styleId))
+		// if(isSketchStyle(styleId))
 		//    enableSketchStyle();
 
 		d_adv = m_scale * TPointD((double)(adv.x), (double)(adv.y));
@@ -1394,17 +1406,21 @@ void TypeTool::addBaseChar(std::wstring text)
 		if ((UINT)m_cursorIndex == m_string.size())
 			m_string.push_back(StrokeChar(newVImage, d_adv.x, character, styleId));
 		else
-			m_string.insert(m_string.begin() + m_cursorIndex, StrokeChar(newVImage, d_adv.x, character, styleId));
+			m_string.insert(m_string.begin() + m_cursorIndex,
+							StrokeChar(newVImage, d_adv.x, character, styleId));
 	} else if (ti) {
 		TRasterCM32P newRasterCM;
 		TPoint p;
 
-		if (instance->hasKerning() && (UINT)m_cursorIndex < m_string.size() && !m_string[m_cursorIndex].isReturn())
-			adv = instance->drawChar((TRasterCM32P &)newRasterCM, p, styleId, (wchar_t)character, (wchar_t)m_string[m_cursorIndex].m_key);
+		if (instance->hasKerning() && (UINT)m_cursorIndex < m_string.size() &&
+			!m_string[m_cursorIndex].isReturn())
+			adv = instance->drawChar((TRasterCM32P &)newRasterCM, p, styleId, (wchar_t)character,
+									 (wchar_t)m_string[m_cursorIndex].m_key);
 		else
-			adv = instance->drawChar((TRasterCM32P &)newRasterCM, p, styleId, (wchar_t)character, (wchar_t)0);
+			adv = instance->drawChar((TRasterCM32P &)newRasterCM, p, styleId, (wchar_t)character,
+									 (wchar_t)0);
 
-		//textImage->transform(m_scale);
+		// textImage->transform(m_scale);
 
 		d_adv = m_scale * TPointD((double)(adv.x), (double)(adv.y));
 
@@ -1420,7 +1436,8 @@ void TypeTool::addBaseChar(std::wstring text)
 		if ((UINT)m_cursorIndex == m_string.size())
 			m_string.push_back(StrokeChar(newTImage, d_adv.x, character, styleId));
 		else
-			m_string.insert(m_string.begin() + m_cursorIndex, StrokeChar(newTImage, d_adv.x, character, styleId));
+			m_string.insert(m_string.begin() + m_cursorIndex,
+							StrokeChar(newTImage, d_adv.x, character, styleId));
 	}
 
 	if (instance->hasKerning() && m_cursorIndex > 0 && !m_string[m_cursorIndex - 1].isReturn()) {
@@ -1482,7 +1499,8 @@ void TypeTool::deleteKey()
 	if (instance->hasKerning() && m_cursorIndex > 0 && !m_string[m_cursorIndex - 1].isReturn()) {
 		TPoint adv;
 		if ((UINT)m_cursorIndex < m_string.size() && !m_string[m_cursorIndex].isReturn()) {
-			adv = instance->getDistance(m_string[m_cursorIndex - 1].m_key, m_string[m_cursorIndex].m_key);
+			adv = instance->getDistance(m_string[m_cursorIndex - 1].m_key,
+										m_string[m_cursorIndex].m_key);
 		} else {
 			adv = instance->getDistance(m_string[m_cursorIndex - 1].m_key, 0);
 		}
@@ -1613,13 +1631,15 @@ bool TypeTool::keyDown(int key, std::wstring unicodeChar, TUINT32 flags, const T
 
 //-----------------------------------------------------------------------------
 
-void TypeTool::onInputText(std::wstring preedit, std::wstring commit, int replacementStart, int replacementLen)
+void TypeTool::onInputText(std::wstring preedit, std::wstring commit, int replacementStart,
+						   int replacementLen)
 {
 	// butto la vecchia preedit string
 	m_preeditRange.first = tmax(0, m_preeditRange.first);
 	m_preeditRange.second = tmin((int)m_string.size(), m_preeditRange.second);
 	if (m_preeditRange.first < m_preeditRange.second)
-		m_string.erase(m_string.begin() + m_preeditRange.first, m_string.begin() + m_preeditRange.second);
+		m_string.erase(m_string.begin() + m_preeditRange.first,
+					   m_string.begin() + m_preeditRange.second);
 
 	// inserisco la commit string
 	int stringLength = m_string.size();
@@ -1680,7 +1700,10 @@ void TypeTool::onImageChanged()
 
 //=========================================================
 
-TTool *getTypeTool() { return &typeTool; }
+TTool *getTypeTool()
+{
+	return &typeTool;
+}
 
 /*void resetTypetTool(TTool*tool)
 {
@@ -1688,5 +1711,5 @@ TTool *getTypeTool() { return &typeTool; }
 if (!tool) return;
 TypeTool*tt = dynamic_cast<TypeTool*>(tool);
   if (tt)
-    tt->stopEditing();
+	tt->stopEditing();
 }*/

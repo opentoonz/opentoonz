@@ -4,8 +4,7 @@
 #include <toonz_params.h>
 #include <functional>
 
-template <typename First, typename Second>
-struct param_bind_t {
+template <typename First, typename Second> struct param_bind_t {
 	typedef First traittype;
 	typedef Second realtype;
 	typedef typename std::is_compound<typename First::valuetype>::value_type complextype;
@@ -25,91 +24,107 @@ typedef param_bind_t<toonz_param_traits_spectrum_t, TSpectrumParam> tpbind_spc_t
 typedef param_bind_t<toonz_param_traits_string_t, TStringParam> tpbind_str_t;
 typedef param_bind_t<toonz_param_traits_tonecurve_t, TToneCurveParam> tpbind_tcv_t;
 
-template <typename T>
-inline bool is_type_of(const toonz_param_desc_t *desc)
+template <typename T> inline bool is_type_of(const toonz_param_desc_t *desc)
 {
 	if (desc->traits_tag == T::E)
 		return true;
 	return false;
 }
 
-/* Complex なパラメータは直接 setRangeValue() などを持たず、集約しているサブタイプを返すものがあるので、そのサブタイプを得る関数を取得する */
-template <typename RT, typename F = TDoubleParamP>
-inline F &get_func_a(RT *t) { assert(false); }
-template <typename RT, typename F = TDoubleParamP>
-inline F &get_func_b(RT *t) { assert(false); }
+/* Complex なパラメータは直接 setRangeValue()
+ * などを持たず、集約しているサブタイプを返すものがあるので、そのサブタイプを得る関数を取得する */
+template <typename RT, typename F = TDoubleParamP> inline F &get_func_a(RT *t)
+{
+	assert(false);
+}
+template <typename RT, typename F = TDoubleParamP> inline F &get_func_b(RT *t)
+{
+	assert(false);
+}
 
 /* TRangeParam */
-template <>
-inline TDoubleParamP &get_func_a<TRangeParam, TDoubleParamP>(TRangeParam *t)
+template <> inline TDoubleParamP &get_func_a<TRangeParam, TDoubleParamP>(TRangeParam *t)
 {
 	printf("get_func_a< TRangeParam, TDoubleParamP& >(TRangeParam* t)\n");
 	return std::mem_fun(&TRangeParam::getMin)(t);
 }
 
-template <>
-inline TDoubleParamP &get_func_b<TRangeParam, TDoubleParamP>(TRangeParam *t)
-//template<> std::mem_fun_ref_t< TDoubleParamP&, TRangeParam > get_func_b< TRangeParam, std::mem_fun_ref_t< TDoubleParamP&, TRangeParam > >(TRangeParam* t)
+template <> inline TDoubleParamP &get_func_b<TRangeParam, TDoubleParamP>(TRangeParam *t)
+// template<> std::mem_fun_ref_t< TDoubleParamP&, TRangeParam > get_func_b< TRangeParam,
+// std::mem_fun_ref_t< TDoubleParamP&, TRangeParam > >(TRangeParam* t)
 {
 	printf("get_func_b< TRangeParam, TDoubleParamP& >(TRangeParam* t)\n");
 	return std::mem_fun(&TRangeParam::getMax)(t);
 }
 
 /* TPointParam */
-template <>
-inline TDoubleParamP &get_func_a<TPointParam, TDoubleParamP>(TPointParam *t)
-//template<> std::mem_fun_ref_t< TDoubleParamP&, TPointParam > get_func_a< TPointParam, std::mem_fun_ref_t< TDoubleParamP&, TPointParam > >(TPointParam* t)
+template <> inline TDoubleParamP &get_func_a<TPointParam, TDoubleParamP>(TPointParam *t)
+// template<> std::mem_fun_ref_t< TDoubleParamP&, TPointParam > get_func_a< TPointParam,
+// std::mem_fun_ref_t< TDoubleParamP&, TPointParam > >(TPointParam* t)
 {
 	printf("get_func_a< TPointParam, TDoubleParamP& >(TPointParam* t)\n");
 	return std::mem_fun(&TPointParam::getX)(t);
 }
 
-template <>
-inline TDoubleParamP &get_func_b<TPointParam, TDoubleParamP>(TPointParam *t)
-//template<> std::mem_fun_ref_t< TDoubleParamP&, TPointParam > get_func_b< TPointParam, std::mem_fun_ref_t< TDoubleParamP&, TPointParam > >(TPointParam* t)
+template <> inline TDoubleParamP &get_func_b<TPointParam, TDoubleParamP>(TPointParam *t)
+// template<> std::mem_fun_ref_t< TDoubleParamP&, TPointParam > get_func_b< TPointParam,
+// std::mem_fun_ref_t< TDoubleParamP&, TPointParam > >(TPointParam* t)
 {
 	printf("get_func_b< TPointParam, TDoubleParamP& >(TPointParam* t)\n");
 	return std::mem_fun(&TPointParam::getY)(t);
 }
 
 /* valuetype が集約型の場合、 スカラを取得するための関数 */
-template <typename T, typename V>
-inline V get_1st_value(const T &) {}
-template <typename T, typename V>
-inline V get_2nd_value(const T &) {}
+template <typename T, typename V> inline V get_1st_value(const T &)
+{
+}
+template <typename T, typename V> inline V get_2nd_value(const T &)
+{
+}
 
-template <>
-inline double get_1st_value(const toonz_param_traits_range_t::valuetype &r) { return r.a; }
-template <>
-inline double get_2nd_value(const toonz_param_traits_range_t::valuetype &r) { return r.b; }
+template <> inline double get_1st_value(const toonz_param_traits_range_t::valuetype &r)
+{
+	return r.a;
+}
+template <> inline double get_2nd_value(const toonz_param_traits_range_t::valuetype &r)
+{
+	return r.b;
+}
 
-template <>
-inline double get_1st_value(const toonz_param_traits_point_t::valuetype &p) { return p.x; }
-template <>
-inline double get_2nd_value(const toonz_param_traits_point_t::valuetype &p) { return p.y; }
+template <> inline double get_1st_value(const toonz_param_traits_point_t::valuetype &p)
+{
+	return p.x;
+}
+template <> inline double get_2nd_value(const toonz_param_traits_point_t::valuetype &p)
+{
+	return p.y;
+}
 
-template <typename Bind, typename Comp = typename std::is_compound<typename Bind::valuetype>::type, int Ranged = Bind::RANGED>
-//template < int Ranged, typename Comp, typename Bind >
+template <typename Bind, typename Comp = typename std::is_compound<typename Bind::valuetype>::type,
+		  int Ranged = Bind::RANGED>
+// template < int Ranged, typename Comp, typename Bind >
 struct set_param_range_t {
 	static bool set_param_range(Param *param, const toonz_param_desc_t *desc)
 	{
 		/* 範囲を持たない(Ranged == std::false_type)なら何もすることはない */
-		printf("(none)set_param_range: p:%p type:%s (Comp:%s Ranged:%d)\n", param, typeid(Bind).name(), typeid(Comp).name(), Ranged);
+		printf("(none)set_param_range: p:%p type:%s (Comp:%s Ranged:%d)\n", param,
+			   typeid(Bind).name(), typeid(Comp).name(), Ranged);
 		return false;
 	}
 };
 
-//static_assert(std::is_compound< const char* >(), "false");
+// static_assert(std::is_compound< const char* >(), "false");
 
 /* ranged complextype */
-template <typename Bind>
-struct set_param_range_t<Bind, std::true_type, 1> {
+template <typename Bind> struct set_param_range_t<Bind, std::true_type, 1> {
 	static bool set_param_range(Param *param, const toonz_param_desc_t *desc)
 	{
 		auto smartptr = param->param();
-		typename Bind::realtype *p = reinterpret_cast<typename Bind::realtype *>(smartptr.getPointer());
+		typename Bind::realtype *p =
+			reinterpret_cast<typename Bind::realtype *>(smartptr.getPointer());
 		if (p) {
-			const typename Bind::traittype &t = *reinterpret_cast<const typename Bind::traittype *>(&desc->traits.d);
+			const typename Bind::traittype &t =
+				*reinterpret_cast<const typename Bind::traittype *>(&desc->traits.d);
 			auto subtype_a = get_func_a<typename Bind::realtype>(p);
 			auto subtype_b = get_func_b<typename Bind::realtype>(p);
 			auto a_minval = get_1st_value<typename Bind::valuetype, double>(t.min);
@@ -127,14 +142,15 @@ struct set_param_range_t<Bind, std::true_type, 1> {
 
 /* range のとき、スライダの左と右それぞれに限界が設定できるように見えるが、そうではない.
    getMin(), getMax() の結果それぞれに range を設定できるように見えて
-   実際は getMin() には (min, max) のうち min, getMax() には (min, max) のうち max しか有効でないように見える.
+   実際は getMin() には (min, max) のうち min, getMax() には (min, max) のうち max
+   しか有効でないように見える.
    このため range に対しても特殊版を用意するハメになった. */
-template <>
-struct set_param_range_t<tpbind_rng_t, std::true_type, 1> {
+template <> struct set_param_range_t<tpbind_rng_t, std::true_type, 1> {
 	static bool set_param_range(Param *param, const toonz_param_desc_t *desc)
 	{
 		auto smartptr = param->param();
-		tpbind_rng_t::realtype *p = reinterpret_cast<tpbind_rng_t::realtype *>(smartptr.getPointer());
+		tpbind_rng_t::realtype *p =
+			reinterpret_cast<tpbind_rng_t::realtype *>(smartptr.getPointer());
 		if (p) {
 			const tpbind_rng_t::traittype &t = desc->traits.rd;
 			auto subtype_a = get_func_a<tpbind_rng_t::realtype>(p);
@@ -154,9 +170,11 @@ struct set_param_range_t< tpbind_pnt_t, std::true_type, 1 >  {
 	static bool set_param_range(Param* param, const toonz_param_desc_t* desc)
 	{
 		auto smartptr = param->param();
-		tpbind_pnt_t::realtype* p = reinterpret_cast< tpbind_pnt_t::realtype* >(smartptr.getPointer());
+		tpbind_pnt_t::realtype* p = reinterpret_cast< tpbind_pnt_t::realtype*
+>(smartptr.getPointer());
 		if (p) {
-			const tpbind_pnt_t::traittype& t = *reinterpret_cast< const tpbind_pnt_t::traittype* >(&desc->traits.d);
+			const tpbind_pnt_t::traittype& t = *reinterpret_cast< const tpbind_pnt_t::traittype*
+>(&desc->traits.d);
 			auto subtype_a = get_func_a< tpbind_pnt_t::realtype >(p);
 			auto subtype_b = get_func_b< tpbind_pnt_t::realtype >(p);
 			auto a_minval = get_1st_value< tpbind_pnt_t::valuetype, double >(t.min);
@@ -174,25 +192,26 @@ struct set_param_range_t< tpbind_pnt_t, std::true_type, 1 >  {
 */
 
 /* ranged primitive: */
-template <typename Bind>
-struct set_param_range_t<Bind, std::false_type, 1> {
+template <typename Bind> struct set_param_range_t<Bind, std::false_type, 1> {
 	static bool set_param_range(Param *param, const toonz_param_desc_t *desc)
 	{
 		if (!is_type_of<typename Bind::traittype>(desc))
 			return false;
 		auto smartptr = param->param();
-		typename Bind::realtype *p = reinterpret_cast<typename Bind::realtype *>(smartptr.getPointer());
+		typename Bind::realtype *p =
+			reinterpret_cast<typename Bind::realtype *>(smartptr.getPointer());
 		if (p) {
-			const typename Bind::traittype &t = *reinterpret_cast<const typename Bind::traittype *>(&desc->traits.d);
-			printf("p(%p)->set_param_range: typeid:%s desc:%p (%p)\n", p, typeid(typename Bind::traittype).name(), desc, &desc->traits.d);
+			const typename Bind::traittype &t =
+				*reinterpret_cast<const typename Bind::traittype *>(&desc->traits.d);
+			printf("p(%p)->set_param_range: typeid:%s desc:%p (%p)\n", p,
+				   typeid(typename Bind::traittype).name(), desc, &desc->traits.d);
 			p->setValueRange(t.min, t.max);
 		}
 		return true;
 	}
 };
 
-template <typename Bind>
-bool set_param_range(Param *param, const toonz_param_desc_t *desc)
+template <typename Bind> bool set_param_range(Param *param, const toonz_param_desc_t *desc)
 {
 	if (!is_type_of<typename Bind::traittype>(desc))
 		return false;
@@ -201,22 +220,20 @@ bool set_param_range(Param *param, const toonz_param_desc_t *desc)
 
 template <typename Bind, typename Comp = typename std::is_compound<typename Bind::valuetype>::type>
 struct set_param_default_t {
-	static bool set_param_default(Param *param, const toonz_param_desc_t *desc)
-	{
-		return false;
-	}
+	static bool set_param_default(Param *param, const toonz_param_desc_t *desc) { return false; }
 };
 
 /* Default complextype */
 /* Point/Range */
-template <typename Bind>
-struct set_param_default_t<Bind, std::true_type> {
+template <typename Bind> struct set_param_default_t<Bind, std::true_type> {
 	static bool set_param_default(Param *param, const toonz_param_desc_t *desc)
 	{
 		auto smartptr = param->param();
-		typename Bind::realtype *p = reinterpret_cast<typename Bind::realtype *>(smartptr.getPointer());
+		typename Bind::realtype *p =
+			reinterpret_cast<typename Bind::realtype *>(smartptr.getPointer());
 		if (p) {
-			const typename Bind::traittype &t = *reinterpret_cast<const typename Bind::traittype *>(&desc->traits.d);
+			const typename Bind::traittype &t =
+				*reinterpret_cast<const typename Bind::traittype *>(&desc->traits.d);
 			auto subtype_a = get_func_a<typename Bind::realtype>(p);
 			auto subtype_b = get_func_b<typename Bind::realtype>(p);
 			auto a_defval = get_1st_value<typename Bind::valuetype, double>(t.def);
@@ -230,14 +247,15 @@ struct set_param_default_t<Bind, std::true_type> {
 };
 
 /* Default Color */
-template <>
-struct set_param_default_t<tpbind_col_t, std::true_type> {
+template <> struct set_param_default_t<tpbind_col_t, std::true_type> {
 	static bool set_param_default(Param *param, const toonz_param_desc_t *desc)
 	{
 		auto smartptr = param->param();
-		tpbind_col_t::realtype *p = reinterpret_cast<tpbind_col_t::realtype *>(smartptr.getPointer());
+		tpbind_col_t::realtype *p =
+			reinterpret_cast<tpbind_col_t::realtype *>(smartptr.getPointer());
 		if (p) {
-			const tpbind_col_t::traittype &t = *reinterpret_cast<const tpbind_col_t::traittype *>(&desc->traits.d);
+			const tpbind_col_t::traittype &t =
+				*reinterpret_cast<const tpbind_col_t::traittype *>(&desc->traits.d);
 			p->setDefaultValue(TPixel32(t.def.c0, t.def.c1, t.def.c2, t.def.m));
 		}
 		return true;
@@ -245,14 +263,15 @@ struct set_param_default_t<tpbind_col_t, std::true_type> {
 };
 
 /* Default String */
-template <>
-struct set_param_default_t<tpbind_str_t, std::true_type> {
+template <> struct set_param_default_t<tpbind_str_t, std::true_type> {
 	static bool set_param_default(Param *param, const toonz_param_desc_t *desc)
 	{
 		auto smartptr = param->param();
-		tpbind_str_t::realtype *p = reinterpret_cast<tpbind_str_t::realtype *>(smartptr.getPointer());
+		tpbind_str_t::realtype *p =
+			reinterpret_cast<tpbind_str_t::realtype *>(smartptr.getPointer());
 		if (p) {
-			const tpbind_str_t::traittype &t = *reinterpret_cast<const tpbind_str_t::traittype *>(&desc->traits.d);
+			const tpbind_str_t::traittype &t =
+				*reinterpret_cast<const tpbind_str_t::traittype *>(&desc->traits.d);
 			printf("a->set_param_default: str\n");
 			std::wstring wstr = QString::fromStdString(t.def).toStdWString();
 			p->setDefaultValue(wstr);
@@ -263,26 +282,27 @@ struct set_param_default_t<tpbind_str_t, std::true_type> {
 };
 
 /* Default Spectrum */
-template <>
-struct set_param_default_t<tpbind_spc_t, std::true_type> {
+template <> struct set_param_default_t<tpbind_spc_t, std::true_type> {
 	static bool set_param_default(Param *param, const toonz_param_desc_t *desc)
 	{
-		/* unfortunatly, TSpectrumParam's default values must be set within the constructor, for now.
+		/* unfortunatly, TSpectrumParam's default values must be set within the constructor, for
+		 now.
 		 see param_factory_< TSpectrumParam >() */
 		return false;
 	}
 };
 
 /* Default ToneCurve */
-template <>
-struct set_param_default_t<tpbind_tcv_t, std::true_type> {
+template <> struct set_param_default_t<tpbind_tcv_t, std::true_type> {
 	static bool set_param_default(Param *param, const toonz_param_desc_t *desc)
 	{
 		/*
 		auto smartptr = param->param();
-		tpbind_tcv_t::realtype* p = reinterpret_cast< tpbind_tcv_t::realtype* >(smartptr.getPointer());
+		tpbind_tcv_t::realtype* p = reinterpret_cast< tpbind_tcv_t::realtype*
+		>(smartptr.getPointer());
 		if (p) {
-			const tpbind_tcv_t::traittype& t = *reinterpret_cast< const tpbind_tcv_t::traittype* >(&desc->traits.d);
+			const tpbind_tcv_t::traittype& t = *reinterpret_cast< const tpbind_tcv_t::traittype*
+		>(&desc->traits.d);
 			printf("a->set_param_default: spec\n");
 			QList< TPointD > pt;
 			for (int i = 0; i < t.cps; i ++) {
@@ -296,15 +316,17 @@ struct set_param_default_t<tpbind_tcv_t, std::true_type> {
 };
 
 /* primitive: TDoubleParam */
-template <>
-struct set_param_default_t<tpbind_dbl_t, std::false_type> {
+template <> struct set_param_default_t<tpbind_dbl_t, std::false_type> {
 	static bool set_param_default(Param *param, const toonz_param_desc_t *desc)
 	{
 		auto smartptr = param->param();
-		tpbind_dbl_t::realtype *p = reinterpret_cast<tpbind_dbl_t::realtype *>(smartptr.getPointer());
+		tpbind_dbl_t::realtype *p =
+			reinterpret_cast<tpbind_dbl_t::realtype *>(smartptr.getPointer());
 		if (p) {
-			const tpbind_dbl_t::traittype &t = *reinterpret_cast<const tpbind_dbl_t::traittype *>(&desc->traits.d);
-			printf("p(%p)->set_param_default: typeid:%s desc:%p (%p)\n", p, typeid(tpbind_dbl_t::traittype).name(), desc, &desc->traits.d);
+			const tpbind_dbl_t::traittype &t =
+				*reinterpret_cast<const tpbind_dbl_t::traittype *>(&desc->traits.d);
+			printf("p(%p)->set_param_default: typeid:%s desc:%p (%p)\n", p,
+				   typeid(tpbind_dbl_t::traittype).name(), desc, &desc->traits.d);
 			p->setDefaultValue(t.def);
 		}
 		return true;
@@ -312,15 +334,17 @@ struct set_param_default_t<tpbind_dbl_t, std::false_type> {
 };
 
 /* primitive: TNotAnimatableParam */
-template <typename Bind>
-struct set_param_default_t<Bind, std::false_type> {
+template <typename Bind> struct set_param_default_t<Bind, std::false_type> {
 	static bool set_param_default(Param *param, const toonz_param_desc_t *desc)
 	{
 		auto smartptr = param->param();
-		typename Bind::realtype *p = reinterpret_cast<typename Bind::realtype *>(smartptr.getPointer());
+		typename Bind::realtype *p =
+			reinterpret_cast<typename Bind::realtype *>(smartptr.getPointer());
 		if (p) {
-			const typename Bind::traittype &t = *reinterpret_cast<const typename Bind::traittype *>(&desc->traits.d);
-			printf("p(%p)->set_param_default: typeid:%s desc:%p (%p)\n", p, typeid(typename Bind::traittype).name(), desc, &desc->traits.d);
+			const typename Bind::traittype &t =
+				*reinterpret_cast<const typename Bind::traittype *>(&desc->traits.d);
+			printf("p(%p)->set_param_default: typeid:%s desc:%p (%p)\n", p,
+				   typeid(typename Bind::traittype).name(), desc, &desc->traits.d);
 			p->setDefaultValue(t.def);
 			p->setValue(t.def, false);
 		}
@@ -329,14 +353,15 @@ struct set_param_default_t<Bind, std::false_type> {
 };
 
 /* Default Enum */
-template <>
-struct set_param_default_t<tpbind_enm_t, std::false_type> {
+template <> struct set_param_default_t<tpbind_enm_t, std::false_type> {
 	static bool set_param_default(Param *param, const toonz_param_desc_t *desc)
 	{
 		auto smartptr = param->param();
-		tpbind_enm_t::realtype *p = reinterpret_cast<tpbind_enm_t::realtype *>(smartptr.getPointer());
+		tpbind_enm_t::realtype *p =
+			reinterpret_cast<tpbind_enm_t::realtype *>(smartptr.getPointer());
 		if (p) {
-			const tpbind_enm_t::traittype &t = *reinterpret_cast<const tpbind_enm_t::traittype *>(&desc->traits.d);
+			const tpbind_enm_t::traittype &t =
+				*reinterpret_cast<const tpbind_enm_t::traittype *>(&desc->traits.d);
 			for (int i = 0; i < t.enums; i++) {
 				p->addItem(i, t.array[i]);
 			}
@@ -346,39 +371,37 @@ struct set_param_default_t<tpbind_enm_t, std::false_type> {
 	}
 };
 
-template <typename Bind>
-bool set_param_default(Param *param, const toonz_param_desc_t *desc)
+template <typename Bind> bool set_param_default(Param *param, const toonz_param_desc_t *desc)
 {
 	if (!is_type_of<typename Bind::traittype>(desc))
 		return false;
 	return set_param_default_t<Bind>::set_param_default(param, desc);
 }
 
-template <typename T>
-inline T *param_factory_(const toonz_param_desc_t *desc)
+template <typename T> inline T *param_factory_(const toonz_param_desc_t *desc)
 {
 	return new T;
 }
 
-template <>
-inline TPointParam *param_factory_(const toonz_param_desc_t *desc)
+template <> inline TPointParam *param_factory_(const toonz_param_desc_t *desc)
 {
 	return new TPointParam(TPointD(), true /* instanciate from plugin */);
 }
 
-template <>
-inline TSpectrumParam *param_factory_(const toonz_param_desc_t *desc)
+template <> inline TSpectrumParam *param_factory_(const toonz_param_desc_t *desc)
 {
 	const toonz_param_traits_spectrum_t &t = desc->traits.g;
 	if (t.points) {
 		std::vector<TSpectrum::ColorKey> keys(t.points);
 		for (int i = 0; i < t.points; i++) {
 			keys[i].first = t.array[i].w;
-			keys[i].second = toPixel32(TPixelD(t.array[i].c0, t.array[i].c1, t.array[i].c2, t.array[i].m));
+			keys[i].second =
+				toPixel32(TPixelD(t.array[i].c0, t.array[i].c1, t.array[i].c2, t.array[i].m));
 		}
 		return new TSpectrumParam(t.points, keys.data());
 	} else {
-		return new TSpectrumParam(); /* use default constructor: デフォルトでは [black:white] の単純なものが設定される */
+		return new TSpectrumParam(); /* use default constructor: デフォルトでは [black:white]
+										の単純なものが設定される */
 	}
 }
 
@@ -411,16 +434,14 @@ inline TParam *parameter_factory(const toonz_param_desc_t *desc)
 	return NULL;
 }
 
-template <typename T>
-inline int check_pollution_(const T &t)
+template <typename T> inline int check_pollution_(const T &t)
 {
 	if (t.reserved_)
 		return TOONZ_PARAM_ERROR_POLLUTED;
 	return 0;
 }
 
-template <typename T>
-inline int check_traits_sanity_(const toonz_param_desc_t *desc)
+template <typename T> inline int check_traits_sanity_(const toonz_param_desc_t *desc)
 {
 	const T &t = reinterpret_cast<const T &>(desc->traits.d);
 	return check_pollution_<T>(t);
@@ -481,7 +502,8 @@ inline int check_traits_sanity_<toonz_param_traits_spectrum_t>(const toonz_param
 }
 
 /*
-template <> int check_traits_sanity_< toonz_param_traits_tonecurve_t >(const toonz_param_desc_t* desc)
+template <> int check_traits_sanity_< toonz_param_traits_tonecurve_t >(const toonz_param_desc_t*
+desc)
 {
 	int err = 0;
 	const toonz_param_traits_tonecurve_t& t = desc->traits.tcv;
@@ -490,7 +512,7 @@ template <> int check_traits_sanity_< toonz_param_traits_tonecurve_t >(const too
 		return err;
 	if (t.points < 0)
 		err |= TOONZ_PARAM_ERROR_ARRAY_NUM;
-	if (t.array == NULL) 
+	if (t.array == NULL)
 		err |= TOONZ_PARAM_ERROR_ARRAY;
 	return err;
 }
@@ -579,10 +601,11 @@ inline bool parameter_type_check(TParam *p, const toonz_param_desc_t *desc, size
 }
 
 template <typename T>
-inline bool param_read_value_(TParam *p, const toonz_param_desc_t *desc, void *ptr, double frame, size_t isize, size_t &osize)
+inline bool param_read_value_(TParam *p, const toonz_param_desc_t *desc, void *ptr, double frame,
+							  size_t isize, size_t &osize)
 {
 	/* isize は iovaluetype の size でなく count になったのでサイズチェックは無効 */
-	//if (isize == sizeof(typename T::traittype::iovaluetype)) {
+	// if (isize == sizeof(typename T::traittype::iovaluetype)) {
 	auto r = reinterpret_cast<typename T::realtype *>(p);
 	auto v = r->getValue();
 	*reinterpret_cast<typename T::traittype::iovaluetype *>(ptr) = v;
@@ -593,9 +616,10 @@ inline bool param_read_value_(TParam *p, const toonz_param_desc_t *desc, void *p
 }
 
 template <>
-inline bool param_read_value_<tpbind_dbl_t>(TParam *p, const toonz_param_desc_t *desc, void *ptr, double frame, size_t isize, size_t &osize)
+inline bool param_read_value_<tpbind_dbl_t>(TParam *p, const toonz_param_desc_t *desc, void *ptr,
+											double frame, size_t isize, size_t &osize)
 {
-	//if (isize == sizeof(tpbind_dbl_t::traittype::iovaluetype)) {
+	// if (isize == sizeof(tpbind_dbl_t::traittype::iovaluetype)) {
 	auto r = reinterpret_cast<tpbind_dbl_t::realtype *>(p);
 	auto v = r->getValue(frame);
 	*reinterpret_cast<tpbind_dbl_t::traittype::iovaluetype *>(ptr) = v;
@@ -606,14 +630,16 @@ inline bool param_read_value_<tpbind_dbl_t>(TParam *p, const toonz_param_desc_t 
 }
 
 template <>
-inline bool param_read_value_<tpbind_str_t>(TParam *p, const toonz_param_desc_t *desc, void *ptr, double frame, size_t isize, size_t &osize)
+inline bool param_read_value_<tpbind_str_t>(TParam *p, const toonz_param_desc_t *desc, void *ptr,
+											double frame, size_t isize, size_t &osize)
 {
 	auto r = reinterpret_cast<tpbind_str_t::realtype *>(p);
 	const std::string str = QString::fromStdWString(r->getValue()).toStdString();
 	std::size_t len = str.length() + 1;
 	/* get_type() の返す大きさも文字列長+1 を含んでいる */
 	if (isize < len)
-		len = isize; /* 要求サイズが実際の長さより短くても良いが切り詰める(ただし 1 以上であること) */
+		len =
+			isize; /* 要求サイズが実際の長さより短くても良いが切り詰める(ただし 1 以上であること) */
 
 	if (len > 0) {
 		auto dst = reinterpret_cast<char *>(ptr);
@@ -626,9 +652,10 @@ inline bool param_read_value_<tpbind_str_t>(TParam *p, const toonz_param_desc_t 
 }
 
 template <>
-inline bool param_read_value_<tpbind_rng_t>(TParam *p, const toonz_param_desc_t *desc, void *ptr, double frame, size_t isize, size_t &osize)
+inline bool param_read_value_<tpbind_rng_t>(TParam *p, const toonz_param_desc_t *desc, void *ptr,
+											double frame, size_t isize, size_t &osize)
 {
-	//if (isize == sizeof(tpbind_rng_t::traittype::iovaluetype)) {
+	// if (isize == sizeof(tpbind_rng_t::traittype::iovaluetype)) {
 	auto r = reinterpret_cast<tpbind_rng_t::realtype *>(p);
 	auto v = r->getValue(frame);
 	auto dst = reinterpret_cast<tpbind_rng_t::traittype::iovaluetype *>(ptr);
@@ -641,12 +668,13 @@ inline bool param_read_value_<tpbind_rng_t>(TParam *p, const toonz_param_desc_t 
 }
 
 template <>
-inline bool param_read_value_<tpbind_col_t>(TParam *p, const toonz_param_desc_t *desc, void *ptr, double frame, size_t isize, size_t &osize)
+inline bool param_read_value_<tpbind_col_t>(TParam *p, const toonz_param_desc_t *desc, void *ptr,
+											double frame, size_t isize, size_t &osize)
 {
-	//if (isize == sizeof(tpbind_col_t::traittype::iovaluetype)) {
+	// if (isize == sizeof(tpbind_col_t::traittype::iovaluetype)) {
 	auto r = reinterpret_cast<tpbind_col_t::realtype *>(p);
 	/* getValueD() だと 16bit * 4 が返る */
-	//auto v = r->getValueD(frame);
+	// auto v = r->getValueD(frame);
 	auto v = r->getValue(frame);
 	auto dst = reinterpret_cast<tpbind_col_t::traittype::iovaluetype *>(ptr);
 	dst->c0 = v.r;
@@ -660,9 +688,10 @@ inline bool param_read_value_<tpbind_col_t>(TParam *p, const toonz_param_desc_t 
 }
 
 template <>
-inline bool param_read_value_<tpbind_pnt_t>(TParam *p, const toonz_param_desc_t *desc, void *ptr, double frame, size_t isize, size_t &osize)
+inline bool param_read_value_<tpbind_pnt_t>(TParam *p, const toonz_param_desc_t *desc, void *ptr,
+											double frame, size_t isize, size_t &osize)
 {
-	//if (isize == sizeof(tpbind_pnt_t::traittype::iovaluetype)) {
+	// if (isize == sizeof(tpbind_pnt_t::traittype::iovaluetype)) {
 	auto r = reinterpret_cast<tpbind_pnt_t::realtype *>(p);
 	auto v = r->getValue(frame);
 	auto dst = reinterpret_cast<tpbind_pnt_t::traittype::iovaluetype *>(ptr);
@@ -675,9 +704,10 @@ inline bool param_read_value_<tpbind_pnt_t>(TParam *p, const toonz_param_desc_t 
 }
 
 template <>
-inline bool param_read_value_<tpbind_spc_t>(TParam *p, const toonz_param_desc_t *desc, void *ptr, double frame, size_t isize, size_t &osize)
+inline bool param_read_value_<tpbind_spc_t>(TParam *p, const toonz_param_desc_t *desc, void *ptr,
+											double frame, size_t isize, size_t &osize)
 {
-	//if (isize == sizeof(tpbind_spc_t::traittype::iovaluetype)) {
+	// if (isize == sizeof(tpbind_spc_t::traittype::iovaluetype)) {
 	auto r = reinterpret_cast<tpbind_spc_t::realtype *>(p);
 	auto dst = reinterpret_cast<tpbind_spc_t::traittype::iovaluetype *>(ptr);
 	/* getValue64() だと 1channle 16bit が返るがデフォルト型に合わせる */
@@ -693,7 +723,8 @@ inline bool param_read_value_<tpbind_spc_t>(TParam *p, const toonz_param_desc_t 
 }
 
 template <>
-inline bool param_read_value_<tpbind_tcv_t>(TParam *p, const toonz_param_desc_t *desc, void *ptr, double frame, size_t isize, size_t &osize)
+inline bool param_read_value_<tpbind_tcv_t>(TParam *p, const toonz_param_desc_t *desc, void *ptr,
+											double frame, size_t isize, size_t &osize)
 {
 	auto r = reinterpret_cast<tpbind_tcv_t::realtype *>(p);
 	QList<TPointD> points = r->getValue(frame);
@@ -716,7 +747,8 @@ inline bool param_read_value_<tpbind_tcv_t>(TParam *p, const toonz_param_desc_t 
 	return false;
 }
 
-inline bool parameter_read_value(TParam *p, const toonz_param_desc_t *desc, void *ptr, double frame, size_t isize, size_t &osize)
+inline bool parameter_read_value(TParam *p, const toonz_param_desc_t *desc, void *ptr, double frame,
+								 size_t isize, size_t &osize)
 {
 	size_t sz = 0;
 	if (!parameter_type_check(p, desc, sz)) { // typecheck

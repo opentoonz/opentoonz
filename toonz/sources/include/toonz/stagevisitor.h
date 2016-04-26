@@ -82,10 +82,10 @@ DVVAR extern const double inch;
 
 class DVAPI Visitor
 {
-public:
+  public:
 	const ImagePainter::VisualSettings &m_vs; //!< Generic painting visual options
 
-public:
+  public:
 	Visitor(const ImagePainter::VisualSettings &vs) : m_vs(vs) {}
 	virtual ~Visitor() {}
 
@@ -122,11 +122,13 @@ struct DVAPI VisitArgs {
 	bool m_checkPreviewVisibility;
 	bool m_rasterizePli;
 
-public:
-	VisitArgs() : m_scene(0), m_xsh(0), m_row(0), m_col(0),
-				  m_osm(0), m_xsheetLevel(0), m_camera3d(false), m_isPlaying(false),
-				  m_onlyVisible(false), m_checkPreviewVisibility(false),
-				  m_rasterizePli(false) {}
+  public:
+	VisitArgs()
+		: m_scene(0), m_xsh(0), m_row(0), m_col(0), m_osm(0), m_xsheetLevel(0), m_camera3d(false),
+		  m_isPlaying(false), m_onlyVisible(false), m_checkPreviewVisibility(false),
+		  m_rasterizePli(false)
+	{
+	}
 };
 
 //=============================================================================
@@ -135,24 +137,16 @@ DVAPI void visit(Visitor &visitor, const VisitArgs &args);
 
 //-----------------------------------------------------------------------------
 
-DVAPI void visit(Visitor &visitor,
-				 ToonzScene *scene,
-				 TXsheet *xsh, int row);
+DVAPI void visit(Visitor &visitor, ToonzScene *scene, TXsheet *xsh, int row);
 
 //-----------------------------------------------------------------------------
 
-DVAPI void visit(Visitor &visitor,
-				 TXshSimpleLevel *level,
-				 const TFrameId &fid,
-				 const OnionSkinMask &osm,
-				 bool isPlaying);
+DVAPI void visit(Visitor &visitor, TXshSimpleLevel *level, const TFrameId &fid,
+				 const OnionSkinMask &osm, bool isPlaying);
 
 //-----------------------------------------------------------------------------
 
-DVAPI void visit(Visitor &visitor,
-				 TXshLevel *level,
-				 const TFrameId &fid,
-				 const OnionSkinMask &osm,
+DVAPI void visit(Visitor &visitor, TXshLevel *level, const TFrameId &fid, const OnionSkinMask &osm,
 				 bool isPlaying);
 
 //**********************************************************************************************
@@ -171,7 +165,7 @@ DVAPI void visit(Visitor &visitor,
 
 class DVAPI RasterPainter : public Visitor
 {
-private:
+  private:
 	//! Class used to deal with composition of raster images. A Node instance represents a
 	//! raster image to be flushed on VRAM. Observe that at the moment raster composition
 	//! is on the RAM side - the composed product is then flushed entirely.
@@ -179,9 +173,7 @@ private:
 		// NOTE: This class should be considered obsolete. In theory, each onImage() should be
 		// able to write on top of the composition on its own.
 
-		enum OnionMode { eOnionSkinNone,
-						 eOnionSkinFront,
-						 eOnionSkinBack };
+		enum OnionMode { eOnionSkinNone, eOnionSkinFront, eOnionSkinBack };
 
 		TRasterP m_raster;   //!< The raster to be rendered
 		TPalette *m_palette; //!< Its palette for colormap rasters
@@ -196,10 +188,16 @@ private:
 		bool m_doPremultiply; //!< Whether the image must be premultiplied
 		bool m_whiteTransp;   //!< Whether white must be intended as transparent
 
-	public:
-		Node(const TRasterP &raster, TPalette *palette, int alpha, const TAffine &aff, const TRect &savebox, const TRectD &bbox,
-			 int frame, bool isCurrentColumn, OnionMode onionMode, bool doPremultiply, bool whiteTransp, bool isFirstColumn)
-			: m_raster(raster), m_aff(aff), m_savebox(savebox), m_bbox(bbox), m_palette(palette), m_alpha(alpha), m_frame(frame), m_isCurrentColumn(isCurrentColumn), m_onionMode(onionMode), m_doPremultiply(doPremultiply), m_whiteTransp(whiteTransp), m_isFirstColumn(isFirstColumn) {}
+	  public:
+		Node(const TRasterP &raster, TPalette *palette, int alpha, const TAffine &aff,
+			 const TRect &savebox, const TRectD &bbox, int frame, bool isCurrentColumn,
+			 OnionMode onionMode, bool doPremultiply, bool whiteTransp, bool isFirstColumn)
+			: m_raster(raster), m_aff(aff), m_savebox(savebox), m_bbox(bbox), m_palette(palette),
+			  m_alpha(alpha), m_frame(frame), m_isCurrentColumn(isCurrentColumn),
+			  m_onionMode(onionMode), m_doPremultiply(doPremultiply), m_whiteTransp(whiteTransp),
+			  m_isFirstColumn(isFirstColumn)
+		{
+		}
 	};
 
 	struct VisualizationOptions {
@@ -207,7 +205,7 @@ private:
 		bool m_checkFlags;			//   ... o.o? ....
 	};
 
-private:
+  private:
 	TDimension m_dim;		   //!< Size of the associated OpenGL context to render on
 	TRect m_clipRect;		   //!< Clipping rect on the OpenGL context
 	TAffine m_viewAff;		   //!< Affine each image must be transformed through
@@ -219,13 +217,9 @@ private:
 	// darken blended view mode for viewing the non-cleanuped and stacked drawings
 	bool m_doRasterDarkenBlendedView;
 
-public:
-	RasterPainter(
-		const TDimension &dim,
-		const TAffine &viewAff,
-		const TRect &rect,
-		const ImagePainter::VisualSettings &vs,
-		bool checkFlags);
+  public:
+	RasterPainter(const TDimension &dim, const TAffine &viewAff, const TRect &rect,
+				  const ImagePainter::VisualSettings &vs, bool checkFlags);
 
 	void onImage(const Stage::Player &data);
 	void onVectorImage(TVectorImage *vi, const Stage::Player &data);
@@ -260,7 +254,7 @@ class DVAPI Picker : public Visitor
 	TAffine m_viewAff;
 	double m_minDist2;
 
-public:
+  public:
 	Picker(const TAffine &viewAff, const TPointD &p, const ImagePainter::VisualSettings &vs);
 
 	void setDistance(double d);
@@ -290,13 +284,9 @@ class DVAPI OpenGlPainter : public Visitor // Yep, the name sucks...
 	bool m_isViewer, m_alphaEnabled, m_paletteHasChanged;
 	double m_minZ;
 
-public:
-	OpenGlPainter(
-		const TAffine &viewAff,
-		const TRect &rect,
-		const ImagePainter::VisualSettings &vs,
-		bool isViewer,
-		bool isAlphaEnabled);
+  public:
+	OpenGlPainter(const TAffine &viewAff, const TRect &rect, const ImagePainter::VisualSettings &vs,
+				  bool isViewer, bool isAlphaEnabled);
 
 	bool isViewer() const { return m_isViewer; }
 	void enableCamera3D(bool on) { m_camera3d = on; }

@@ -22,7 +22,7 @@ class ColorCardFx : public TBaseZeraryFx
 
 	TPixelParamP m_color;
 
-public:
+  public:
 	ColorCardFx() : m_color(TPixel32::Green)
 	{
 		bindParam(this, "color", m_color);
@@ -62,7 +62,7 @@ class CheckBoardFx : public TBaseZeraryFx
 	TPixelParamP m_color1, m_color2;
 	TDoubleParamP m_size;
 
-public:
+  public:
 	CheckBoardFx() : m_color1(TPixel32::Black), m_color2(TPixel32::White), m_size(50)
 	{
 		m_size->setMeasureName("fxLength");

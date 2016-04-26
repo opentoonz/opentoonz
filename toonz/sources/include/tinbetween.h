@@ -22,7 +22,7 @@ class DVAPI TInbetween
 	class Imp;
 	std::unique_ptr<Imp> m_imp;
 
-public:
+  public:
 	TInbetween(const TVectorImageP firstImage, const TVectorImageP lastImage);
 
 	virtual ~TInbetween();

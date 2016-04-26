@@ -76,7 +76,12 @@ bool ImageLoader::getInfo(TImageInfo &info, int imFlags, void *extData)
 
 inline int ImageLoader::buildSubsampling(int imFlags, BuildExtData *data)
 {
-	return (imFlags & ImageManager::toBeModified) ? 1 : (data->m_subs > 0) ? data->m_subs : (m_subsampling > 0) ? m_subsampling : data->m_sl->getProperties()->getSubsampling();
+	return (imFlags & ImageManager::toBeModified)
+			   ? 1
+			   : (data->m_subs > 0)
+					 ? data->m_subs
+					 : (m_subsampling > 0) ? m_subsampling
+										   : data->m_sl->getProperties()->getSubsampling();
 }
 
 //-------------------------------------------------------------------------
@@ -99,7 +104,8 @@ TImageP ImageLoader::build(int imFlags, void *extData)
 		// Load info in cases where it's required first
 		lr->doReadPalette(false);
 
-		if ((m_path.getType() == "pli") || (m_path.getType() == "svg") || (m_path.getType() == "psd"))
+		if ((m_path.getType() == "pli") || (m_path.getType() == "svg") ||
+			(m_path.getType() == "psd"))
 			lr->loadInfo();
 
 		lr->doReadPalette(true); // Allow palette loading
@@ -179,8 +185,7 @@ void ImageLoader::invalidate()
 //-------------------------------------------------------------------------
 /*-- ImageBuilder仮想関数の実装。アイコン、画像をLoad時に全てキャッシュに格納する --*/
 
-void ImageLoader::buildAllIconsAndPutInCache(TXshSimpleLevel *level,
-											 std::vector<TFrameId> fids,
+void ImageLoader::buildAllIconsAndPutInCache(TXshSimpleLevel *level, std::vector<TFrameId> fids,
 											 std::vector<std::string> iconIds,
 											 bool cacheImagesAsWell)
 {
@@ -268,7 +273,8 @@ TImageP ImageRasterizer::build(int imFlags, void *extData)
 			off = TPoint((int)bbox.x0, (int)bbox.y0);
 
 			TPalette *vpalette = vi->getPalette();
-			TVectorRenderData rd(TTranslation(-off.x, -off.y), TRect(TPoint(0, 0), d), vpalette, 0, true, true);
+			TVectorRenderData rd(TTranslation(-off.x, -off.y), TRect(TPoint(0, 0), d), vpalette, 0,
+								 true, true);
 
 			TGlContext oldContext = tglGetCurrentContext();
 
@@ -298,7 +304,8 @@ TImageP ImageRasterizer::build(int imFlags, void *extData)
 				glMatrixMode(GL_MODELVIEW), glPushMatrix();
 				glMatrixMode(GL_PROJECTION), glPushMatrix();
 				{
-					std::unique_ptr<QOpenGLFramebufferObject> fb(new QOpenGLFramebufferObject(d.lx, d.ly));
+					std::unique_ptr<QOpenGLFramebufferObject> fb(
+						new QOpenGLFramebufferObject(d.lx, d.ly));
 
 					fb->bind();
 					assert(glGetError() == 0);
@@ -323,7 +330,8 @@ TImageP ImageRasterizer::build(int imFlags, void *extData)
 					glFlush();
 					assert(glGetError() == 0);
 
-					QImage img = fb->toImage().scaled(QSize(d.lx, d.ly), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+					QImage img = fb->toImage().scaled(QSize(d.lx, d.ly), Qt::IgnoreAspectRatio,
+													  Qt::SmoothTransformation);
 
 					int wrap = ras->getLx() * sizeof(TPixel32);
 					uchar *srcPix = img.bits();

@@ -19,14 +19,14 @@
 
 class CInputParam
 {
-public:
+  public:
 	double m_scale;
 	bool m_isEconf;
 	std::basic_string<char> m_econfFN;
 
 	CInputParam() : m_scale(0), m_isEconf(false), m_econfFN(""){};
-	CInputParam(const CInputParam &p) : m_scale(p.m_scale), m_isEconf(p.m_isEconf),
-										m_econfFN(p.m_econfFN){};
+	CInputParam(const CInputParam &p)
+		: m_scale(p.m_scale), m_isEconf(p.m_isEconf), m_econfFN(p.m_econfFN){};
 	virtual ~CInputParam(){};
 };
 

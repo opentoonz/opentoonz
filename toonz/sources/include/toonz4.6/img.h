@@ -62,16 +62,11 @@ struct s_cmap {
 
 /* Enum per l'identificazione dell' algoritmo di riduzione dei colori */
 
-typedef enum {
-	CM_NONEB = -1,
-	CM_STANDARD,
-	CM_CUSTOM
-} IMG_CM_ALGORITHM;
+typedef enum { CM_NONEB = -1, CM_STANDARD, CM_CUSTOM } IMG_CM_ALGORITHM;
 
 /* Struttura per le modalita' di scrittura dei formati di file supportati  */
 
-typedef struct
-	{
+typedef struct {
 
 	char rgb_is_compressed;
 	char rgb_write_matte;
@@ -82,32 +77,32 @@ typedef struct
 	char tga_is_compressed;
 
 	/*
-    * Microsoft Windows Bitmap (BMP and DIB)
-    * 
-    *                         | compression | colorstyle | numcolors |
-    * ---------------------------------------------------------------
-    *       BLack & White     |      0      |     0      |     2     |
-    * ----------------------------------------------------------------
-    *    16 Grey Tones        |      0      |    GR8     |     16    |
-    * ---------------------------------------------------------------
-    *    16 Grey Tones Comp.  |      1      |    GR8     |     16    |
-    * ---------------------------------------------------------------
-    *   256 Grey Tones        |      0      |    GR8     |     256   |
-    * ---------------------------------------------------------------
-    *   256 Grey Tones Comp.  |      1      |    GR8     |     256   |
-    * ---------------------------------------------------------------
-    *    16 Color Mapped      |      0      |  CMAPPED   |     16    |
-    * ---------------------------------------------------------------
-    *    16 Color Mapped Comp.|      1      |  CMAPPED   |     16    |
-    * ---------------------------------------------------------------
-    *   256 Color Mapped      |      0      |  CMAPPED   |     256   |
-    * ---------------------------------------------------------------
-    *   256 Color Mapped Comp.|      1      |  CMAPPED   |     256   |
-    * ---------------------------------------------------------------
-    *       Full Color        |      0      |    RGB     |     0     |
-    * ---------------------------------------------------------------
-    * 
-    */
+	* Microsoft Windows Bitmap (BMP and DIB)
+	*
+	*                         | compression | colorstyle | numcolors |
+	* ---------------------------------------------------------------
+	*       BLack & White     |      0      |     0      |     2     |
+	* ----------------------------------------------------------------
+	*    16 Grey Tones        |      0      |    GR8     |     16    |
+	* ---------------------------------------------------------------
+	*    16 Grey Tones Comp.  |      1      |    GR8     |     16    |
+	* ---------------------------------------------------------------
+	*   256 Grey Tones        |      0      |    GR8     |     256   |
+	* ---------------------------------------------------------------
+	*   256 Grey Tones Comp.  |      1      |    GR8     |     256   |
+	* ---------------------------------------------------------------
+	*    16 Color Mapped      |      0      |  CMAPPED   |     16    |
+	* ---------------------------------------------------------------
+	*    16 Color Mapped Comp.|      1      |  CMAPPED   |     16    |
+	* ---------------------------------------------------------------
+	*   256 Color Mapped      |      0      |  CMAPPED   |     256   |
+	* ---------------------------------------------------------------
+	*   256 Color Mapped Comp.|      1      |  CMAPPED   |     256   |
+	* ---------------------------------------------------------------
+	*       Full Color        |      0      |    RGB     |     0     |
+	* ---------------------------------------------------------------
+	*
+	*/
 	unsigned short bmp_compression;
 	unsigned short bmp_colorstyle;
 	unsigned short bmp_numcolors;
@@ -145,8 +140,7 @@ typedef struct
 } IMG_IO_SETTINGS;
 
 /* Struttura IMAGE */
-typedef struct
-	{
+typedef struct {
 	enum img_type type;
 	char *filename;
 	char *history;
@@ -156,11 +150,9 @@ typedef struct
 	IMG_IO_SETTINGS io_settings;
 } IMAGE;
 
-TNZAPI void img_set_mem_functions(MALLOC_TYPE new_malloc_func,
-								  REALLOC_TYPE new_realloc_func,
+TNZAPI void img_set_mem_functions(MALLOC_TYPE new_malloc_func, REALLOC_TYPE new_realloc_func,
 								  FREE_TYPE new_free_func);
-TNZAPI void img_get_mem_functions(MALLOC_TYPE *new_malloc_func,
-								  REALLOC_TYPE *new_realloc_func,
+TNZAPI void img_get_mem_functions(MALLOC_TYPE *new_malloc_func, REALLOC_TYPE *new_realloc_func,
 								  FREE_TYPE *new_free_func);
 TNZAPI IMAGE *new_img(void);
 TNZAPI IMAGE *new_img_f(char *filename);
@@ -181,23 +173,18 @@ TNZAPI void remove_white(struct s_cmap *cmap);
 TNZAPI LPIXEL premult(LPIXEL color);
 TNZAPI LPIXEL unpremult(LPIXEL color);
 TNZAPI void check_premultiplied(struct s_cmap *cmap);
-TNZAPI void fill_cmap_ramp(LPIXEL *buffer, TCM_INFO info,
-						   LPIXEL color, LPIXEL pencil,
-						   int color_index, int pencil_index,
-						   int already_premultiplied);
-TNZAPI void fill_cmap_colramp(LPIXEL *colbuffer, TCM_INFO info,
-							  LPIXEL color, int color_index,
+TNZAPI void fill_cmap_ramp(LPIXEL *buffer, TCM_INFO info, LPIXEL color, LPIXEL pencil,
+						   int color_index, int pencil_index, int already_premultiplied);
+TNZAPI void fill_cmap_colramp(LPIXEL *colbuffer, TCM_INFO info, LPIXEL color, int color_index,
 							  int already_premultiplied);
-TNZAPI void fill_cmap_penramp(LPIXEL *penbuffer, TCM_INFO info,
-							  LPIXEL pencil, int pencil_index,
+TNZAPI void fill_cmap_penramp(LPIXEL *penbuffer, TCM_INFO info, LPIXEL pencil, int pencil_index,
 							  int already_premultiplied);
-TNZAPI void fill_cmap_buffer(LPIXEL *buffer, TCM_INFO info,
-							 LPIXEL *color, LPIXEL *pencil,
+TNZAPI void fill_cmap_buffer(LPIXEL *buffer, TCM_INFO info, LPIXEL *color, LPIXEL *pencil,
 							 int already_premultiplied);
-TNZAPI void fill_cmap_colbuffer(LPIXEL *colbuffer, TCM_INFO info,
-								LPIXEL *color, int already_premultiplied);
-TNZAPI void fill_cmap_penbuffer(LPIXEL *penbuffer, TCM_INFO info,
-								LPIXEL *pencil, int already_premultiplied);
+TNZAPI void fill_cmap_colbuffer(LPIXEL *colbuffer, TCM_INFO info, LPIXEL *color,
+								int already_premultiplied);
+TNZAPI void fill_cmap_penbuffer(LPIXEL *penbuffer, TCM_INFO info, LPIXEL *pencil,
+								int already_premultiplied);
 TNZAPI void convert_cmap(struct s_cmap *cmap, TCM_INFO new_tcm);
 
 /* funzioni per cmap di vecchio tipo */

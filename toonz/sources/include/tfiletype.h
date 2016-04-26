@@ -48,16 +48,19 @@ enum Type {
 	VIEWABLE = RASTER_IMAGE | VECTOR_IMAGE | CMAPPED_IMAGE
 };
 
-/*! 
-   * getInfo() returns the TFileType::Type of the filepath. 
-   * e.g. 'a.tif' => RASTER_IMAGE, 'a..tif' => RASTER_LEVEL, 'a.mov' => RASTER_LEVEL, 'a.tlv' => CMAPPED_LEVEL, etc.
-   * Note!!: in the current implementation, a.0001.tif => RASTER_LEVEL, (probably a bad choice: should be RASTER IMAGE)
+/*!
+   * getInfo() returns the TFileType::Type of the filepath.
+   * e.g. 'a.tif' => RASTER_IMAGE, 'a..tif' => RASTER_LEVEL, 'a.mov' => RASTER_LEVEL, 'a.tlv' =>
+ * CMAPPED_LEVEL, etc.
+   * Note!!: in the current implementation, a.0001.tif => RASTER_LEVEL, (probably a bad choice:
+ * should be RASTER IMAGE)
    */
 //!
 DVAPI Type getInfo(const TFilePath &fp);
 
-/*! 
-   * getInfoFromExtension() returns the TFileType::Type "naturally" associated to a given type (file extension)
+/*!
+   * getInfoFromExtension() returns the TFileType::Type "naturally" associated to a given type (file
+ * extension)
    * e.g. 'tif' => RASTER_IMAGE, 'mov' => RASTER_LEVEL, 'tlv' => CMAPPED_LEVEL, etc.
    */
 //!
@@ -66,17 +69,44 @@ DVAPI Type getInfoFromExtension(const QString &ext);
 
 DVAPI void declare(std::string extension, Type type);
 
-inline bool isResource(Type type) { return (type != UNKNOW_FILE); }
-inline bool isViewable(Type type) { return (type & VIEWABLE) != 0; }
-inline bool isLevel(Type type) { return (type & LEVEL) != 0; }
-inline bool isScene(Type type) { return (type & SCENE) != 0; }
-inline bool isFullColor(Type type) { return (type & RASTER_IMAGE) != 0; }
-inline bool isVector(Type type) { return (type & VECTOR_IMAGE) != 0; }
+inline bool isResource(Type type)
+{
+	return (type != UNKNOW_FILE);
+}
+inline bool isViewable(Type type)
+{
+	return (type & VIEWABLE) != 0;
+}
+inline bool isLevel(Type type)
+{
+	return (type & LEVEL) != 0;
+}
+inline bool isScene(Type type)
+{
+	return (type & SCENE) != 0;
+}
+inline bool isFullColor(Type type)
+{
+	return (type & RASTER_IMAGE) != 0;
+}
+inline bool isVector(Type type)
+{
+	return (type & VECTOR_IMAGE) != 0;
+}
 
-inline bool isLevelExtension(const std::string &fileExtension) { return (getInfoFromExtension(fileExtension) & LEVEL) != 0; }
-inline bool isLevelExtension(const QString &fileExtension) { return (getInfoFromExtension(fileExtension) & LEVEL) != 0; }
+inline bool isLevelExtension(const std::string &fileExtension)
+{
+	return (getInfoFromExtension(fileExtension) & LEVEL) != 0;
+}
+inline bool isLevelExtension(const QString &fileExtension)
+{
+	return (getInfoFromExtension(fileExtension) & LEVEL) != 0;
+}
 
-inline bool isLevelFilePath(const TFilePath &fp) { return (getInfo(fp) & LEVEL) != 0; }
+inline bool isLevelFilePath(const TFilePath &fp)
+{
+	return (getInfo(fp) & LEVEL) != 0;
+}
 
 } // namespace
 

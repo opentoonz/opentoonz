@@ -19,9 +19,11 @@ class KaleidoDistorter : public TDistorter
 	TAffine m_aff;
 	TPointD m_shift;
 
-public:
+  public:
 	KaleidoDistorter(double angle, const TAffine &aff, const TPointD shift)
-		: m_angle(angle), m_aff(aff), m_shift(shift) {}
+		: m_angle(angle), m_aff(aff), m_shift(shift)
+	{
+	}
 
 	TPointD map(const TPointD &p) const { return TPointD(); }
 	int maxInvCount() const { return 1; }
@@ -76,9 +78,8 @@ class KaleidoFx : public TStandardRasterFx
 	TDoubleParamP m_angle;
 	TIntParamP m_count;
 
-public:
-	KaleidoFx()
-		: m_center(TPointD()), m_angle(0.0), m_count(3)
+  public:
+	KaleidoFx() : m_center(TPointD()), m_angle(0.0), m_count(3)
 	{
 		m_center->getX()->setMeasureName("fxLength");
 		m_center->getY()->setMeasureName("fxLength");
@@ -106,12 +107,11 @@ public:
 		return isAlmostIsotropic(info.m_affine);
 	}
 
-private:
+  private:
 	void buildSectionRect(TRectD &inRect, double angle);
 	void rotate(TRectD &rect);
 
-	TAffine buildInputReference(double frame,
-								TRectD &inRect, TRenderSettings &inInfo,
+	TAffine buildInputReference(double frame, TRectD &inRect, TRenderSettings &inInfo,
 								const TRectD &outRect, const TRenderSettings &outInfo);
 };
 
@@ -138,10 +138,8 @@ void KaleidoFx::rotate(TRectD &rect)
 
 //-------------------------------------------------------------------
 
-TAffine KaleidoFx::buildInputReference(
-	double frame,
-	TRectD &inRect, TRenderSettings &inInfo,
-	const TRectD &outRect, const TRenderSettings &outInfo)
+TAffine KaleidoFx::buildInputReference(double frame, TRectD &inRect, TRenderSettings &inInfo,
+									   const TRectD &outRect, const TRenderSettings &outInfo)
 {
 	double scale = fabs(sqrt(outInfo.m_affine.det()));
 	double angle = TConsts::pi / m_count->getValue();
@@ -171,9 +169,9 @@ TAffine KaleidoFx::buildInputReference(
 
 bool KaleidoFx::doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info)
 {
-	//Remember: info.m_affine MUST NOT BE CONSIDERED in doGetBBox's implementation
+	// Remember: info.m_affine MUST NOT BE CONSIDERED in doGetBBox's implementation
 
-	//Retrieve the input bbox without applied affines.
+	// Retrieve the input bbox without applied affines.
 
 	if (!m_input.getFx())
 		return false;
@@ -181,17 +179,16 @@ bool KaleidoFx::doGetBBox(double frame, TRectD &bBox, const TRenderSettings &inf
 	double angle = TConsts::pi / m_count->getValue();
 
 	TRenderSettings inInfo(info);
-	inInfo.m_affine = TRotation(-m_angle->getValue(frame) - angle) *
-					  TTranslation(-m_center->getValue(frame));
+	inInfo.m_affine =
+		TRotation(-m_angle->getValue(frame) - angle) * TTranslation(-m_center->getValue(frame));
 
 	if (!m_input->getBBox(frame, bBox, inInfo))
 		return false;
 
 	TRectD infiniteRect(TConsts::infiniteRectD);
 
-	TRectD kaleidoRect(
-		(m_count->getValue() > 1) ? 0.0 : infiniteRect.x0, 0.0,
-		infiniteRect.x1, infiniteRect.y1);
+	TRectD kaleidoRect((m_count->getValue() > 1) ? 0.0 : infiniteRect.x0, 0.0, infiniteRect.x1,
+					   infiniteRect.y1);
 
 	bBox *= kaleidoRect;
 	if (bBox.x0 == infiniteRect.x0 || bBox.x1 == infiniteRect.x1 || bBox.y1 == infiniteRect.y1) {

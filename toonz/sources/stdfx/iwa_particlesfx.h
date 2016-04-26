@@ -19,7 +19,7 @@ class Iwa_TiledParticlesFx : public TStandardZeraryFx
 
 	TFxPortDG m_source, m_control;
 
-public:
+  public:
 	TIntParamP source_ctrl_val;
 	TIntParamP bright_thres_val;
 	TPointParamP center_val;
@@ -118,35 +118,17 @@ public:
 	/*- 重力を徐々に与えるためのフレーム長 -*/
 	TIntParamP iw_gravityBufferFrame_val;
 
-public:
-	enum { UNIT_SMALL_INCH,
-		   UNIT_INCH };
-	enum { MATTE_REF,
-		   GRAY_REF,
-		   H_REF };
-	enum { SWING_RANDOM,
-		   SWING_SMOOTH };
-	enum { ANIM_HOLD,
-		   ANIM_RANDOM,
-		   ANIM_CYCLE,
-		   ANIM_R_CYCLE,
-		   ANIM_S_CYCLE,
-		   ANIM_SR_CYCLE };
-	enum { TOP_YOUNGER,
-		   TOP_OLDER,
-		   TOP_SMALLER,
-		   TOP_BIGGER,
-		   TOP_RANDOM };
-	enum { CTRL_NONE = -1,
-		   CTRL_1,
-		   CTRL_2 };
+  public:
+	enum { UNIT_SMALL_INCH, UNIT_INCH };
+	enum { MATTE_REF, GRAY_REF, H_REF };
+	enum { SWING_RANDOM, SWING_SMOOTH };
+	enum { ANIM_HOLD, ANIM_RANDOM, ANIM_CYCLE, ANIM_R_CYCLE, ANIM_S_CYCLE, ANIM_SR_CYCLE };
+	enum { TOP_YOUNGER, TOP_OLDER, TOP_SMALLER, TOP_BIGGER, TOP_RANDOM };
+	enum { CTRL_NONE = -1, CTRL_1, CTRL_2 };
 	/*- 計算モード （背景＋粒子／粒子／背景／照明された粒子） -*/
-	enum { REND_ALL,
-		   REND_PARTICLES,
-		   REND_BG,
-		   REND_ILLUMINATED };
+	enum { REND_ALL, REND_PARTICLES, REND_BG, REND_ILLUMINATED };
 
-public:
+  public:
 	Iwa_TiledParticlesFx();
 	~Iwa_TiledParticlesFx();
 

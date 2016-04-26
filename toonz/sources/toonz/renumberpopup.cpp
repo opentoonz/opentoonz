@@ -15,8 +15,7 @@
 // RenumberPopup
 //-----------------------------------------------------------------------------
 
-RenumberPopup::RenumberPopup()
-	: Dialog(TApp::instance()->getMainWindow(), true, true, "Renumber")
+RenumberPopup::RenumberPopup() : Dialog(TApp::instance()->getMainWindow(), true, true, "Renumber")
 {
 	setWindowTitle(tr("Renumber"));
 

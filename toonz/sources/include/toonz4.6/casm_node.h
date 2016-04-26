@@ -9,24 +9,24 @@
 #include "affine.h"
 #include "toonzproc.h"
 
-#define CASM_NODE_HD            \
-	struct CASM_NODEPROC *proc; \
-	char bg_flag, bad_branch;   \
-	ULONG mask;                 \
+#define CASM_NODE_HD                                                                               \
+	struct CASM_NODEPROC *proc;                                                                    \
+	char bg_flag, bad_branch;                                                                      \
+	ULONG mask;                                                                                    \
 	int label;
 
-#define CASM_UNARY_NODE_HD \
-	CASM_NODE_HD           \
+#define CASM_UNARY_NODE_HD                                                                         \
+	CASM_NODE_HD                                                                                   \
 	CASM_NODE *arg;
 
-#define CASM_BINARY_NODE_HD     \
-	CASM_NODE_HD                \
-	CASM_NODE *arg_dn, *arg_up; \
+#define CASM_BINARY_NODE_HD                                                                        \
+	CASM_NODE_HD                                                                                   \
+	CASM_NODE *arg_dn, *arg_up;                                                                    \
 	int marker_dn, marker_up;
 
-#define CASM_N_ARY_NODE_HD \
-	CASM_NODE_HD           \
-	int num_args;          \
+#define CASM_N_ARY_NODE_HD                                                                         \
+	CASM_NODE_HD                                                                                   \
+	int num_args;                                                                                  \
 	CASM_NODE **args;
 
 typedef struct CASM_NODE {
@@ -77,13 +77,10 @@ enum CASM_NODE_TYPE {
 	CASM_NODE_TYPE_HOW_MANY
 };
 
-typedef int CASM_COMPUTE_FUNCTION(CASM_NODE *node,
-								  int x1, int y1, int x2, int y2,
-								  float dx, float dy,
-								  RASTER *raster, CASM_TILE *out);
+typedef int CASM_COMPUTE_FUNCTION(CASM_NODE *node, int x1, int y1, int x2, int y2, float dx,
+								  float dy, RASTER *raster, CASM_TILE *out);
 
-typedef void CASM_CE_FUNCTION(float *pars, int cx, int cy,
-							  RASTER *rin, RASTER *rout, int shrink);
+typedef void CASM_CE_FUNCTION(float *pars, int cx, int cy, RASTER *rin, RASTER *rout, int shrink);
 
 typedef struct CASM_RENDER_INFO {
 	float dx, dy;
@@ -258,9 +255,7 @@ typedef struct CASM_NODE_READ {
 	int out_size;
 	int argc;
 	char **argv;
-	void (*op_function)(OLD_USR_IMAGE *img_in,
-						OLD_USR_IMAGE *img_out,
-						int argc, char **argv);
+	void (*op_function)(OLD_USR_IMAGE *img_in, OLD_USR_IMAGE *img_out, int argc, char **argv);
 	enum img_type type;
 	int xsize, ysize, border;
 	int sbx1, sby1, sbx2, sby2;

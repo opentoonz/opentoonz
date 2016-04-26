@@ -16,17 +16,18 @@ enum MotionObjectType {
 class MotionAwareBaseFx : public TStandardRasterFx
 {
 
-protected:
+  protected:
 	TDoubleParamP m_shutterStart; /*-- 現時点より前のシャッター解放時間 (単位Frame) --*/
-	TDoubleParamP m_shutterEnd;   /*-- 現時点より後のシャッター解放時間 (単位Frame) --*/
+	TDoubleParamP m_shutterEnd; /*-- 現時点より後のシャッター解放時間 (単位Frame) --*/
 	TIntParamP m_traceResolution;
 	/*-- 他のカラム/Pegの動きを参照できるように --*/
 	TIntEnumParamP m_motionObjectType;
 	TIntParamP m_motionObjectIndex;
 
-public:
+  public:
 	MotionAwareBaseFx()
-		: m_shutterStart(0.05), m_shutterEnd(0.05), m_traceResolution(4), m_motionObjectType(new TIntEnumParam(OBJTYPE_OWN, "Own Motion")), m_motionObjectIndex(0)
+		: m_shutterStart(0.05), m_shutterEnd(0.05), m_traceResolution(4),
+		  m_motionObjectType(new TIntEnumParam(OBJTYPE_OWN, "Own Motion")), m_motionObjectIndex(0)
 	{
 		m_shutterStart->setValueRange(0.0, 1.0);
 		m_shutterEnd->setValueRange(0.0, 1.0);
@@ -43,7 +44,10 @@ public:
 	TDoubleParamP getShutterStart() { return m_shutterStart; }
 	TDoubleParamP getShutterEnd() { return m_shutterEnd; }
 	TIntParamP getTraceResolution() { return m_traceResolution; }
-	MotionObjectType getMotionObjectType() { return (MotionObjectType)m_motionObjectType->getValue(); }
+	MotionObjectType getMotionObjectType()
+	{
+		return (MotionObjectType)m_motionObjectType->getValue();
+	}
 	TIntParamP getMotionObjectIndex() { return m_motionObjectIndex; }
 };
 

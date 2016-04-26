@@ -31,7 +31,7 @@ class TValuePairFieldActionInterface;
 
 class DVAPI TValueField : public TWidget
 {
-protected:
+  protected:
 	wstring m_labelText;
 	int m_labelWidth, m_fieldWidth;
 	double m_value, m_minValue, m_maxValue;
@@ -54,7 +54,7 @@ protected:
 
 	void sendCommand(bool dragging);
 
-public:
+  public:
 	TValueField(TWidget *parent, string name = "floatfield", bool withField = true);
 	~TValueField();
 
@@ -95,20 +95,19 @@ public:
 
 class DVAPI TValueFieldActionInterface
 {
-public:
+  public:
 	TValueFieldActionInterface() {}
 	virtual ~TValueFieldActionInterface() {}
 	virtual void triggerAction(TValueField *vf, double value, bool dragging) = 0;
 };
 
-template <class T>
-class TValueFieldAction : public TValueFieldActionInterface
+template <class T> class TValueFieldAction : public TValueFieldActionInterface
 {
 	typedef void (T::*Method)(TValueField *vf, double value, bool dragging);
 	T *m_target;
 	Method m_method;
 
-public:
+  public:
 	TValueFieldAction(T *target, Method method) : m_target(target), m_method(method) {}
 	void triggerAction(TValueField *vf, double value, bool dragging)
 	{
@@ -117,7 +116,8 @@ public:
 };
 
 template <class T>
-inline void tconnect(TValueField &src, T *target, void (T::*method)(TValueField *vf, double value, bool dragging))
+inline void tconnect(TValueField &src, T *target,
+					 void (T::*method)(TValueField *vf, double value, bool dragging))
 {
 	src.addAction(new TValueFieldAction<T>(target, method));
 }
@@ -126,7 +126,7 @@ inline void tconnect(TValueField &src, T *target, void (T::*method)(TValueField 
 
 class DVAPI TValuePairField : public TWidget
 {
-protected:
+  protected:
 	wstring m_labelText;
 	int m_labelWidth;
 	double m_value0, m_value1, m_minValue, m_maxValue;
@@ -147,7 +147,7 @@ protected:
 	void sendCommand(bool dragging);
 	void onMMTimer(TUINT64 tick);
 
-public:
+  public:
 	TValuePairField(TWidget *parent, string name = "valuepairfield");
 	~TValuePairField();
 
@@ -164,10 +164,7 @@ public:
 	void addAction(TValuePairFieldActionInterface *action);
 
 	double getValue0() const { return m_value0; }
-	double getValue1() const
-	{
-		return m_value1;
-	}
+	double getValue1() const { return m_value1; }
 	void setValue0(double value, bool dragging = true);
 	void setValue1(double value, bool dragging = true);
 	void setValues(double value0, double value1, bool dragging = true);
@@ -189,20 +186,20 @@ public:
 
 class DVAPI TValuePairFieldActionInterface
 {
-public:
+  public:
 	TValuePairFieldActionInterface() {}
 	virtual ~TValuePairFieldActionInterface() {}
-	virtual void triggerAction(TValuePairField *vf, double value0, double value1, bool dragging) = 0;
+	virtual void triggerAction(TValuePairField *vf, double value0, double value1,
+							   bool dragging) = 0;
 };
 
-template <class T>
-class TValuePairFieldAction : public TValuePairFieldActionInterface
+template <class T> class TValuePairFieldAction : public TValuePairFieldActionInterface
 {
 	typedef void (T::*Method)(TValuePairField *vf, double value0, double value1, bool dragging);
 	T *m_target;
 	Method m_method;
 
-public:
+  public:
 	TValuePairFieldAction(T *target, Method method) : m_target(target), m_method(method) {}
 	void triggerAction(TValuePairField *vf, double value0, double value1, bool dragging)
 	{
@@ -212,7 +209,8 @@ public:
 
 template <class T>
 inline void tconnect(TValuePairField &src, T *target,
-					 void (T::*method)(TValuePairField *vf, double value0, double value1, bool dragging))
+					 void (T::*method)(TValuePairField *vf, double value0, double value1,
+									   bool dragging))
 {
 	src.addAction(new TValuePairFieldAction<T>(target, method));
 }

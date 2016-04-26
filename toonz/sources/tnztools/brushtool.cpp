@@ -87,10 +87,8 @@ TEnv::DoubleVar RasterBrushHardness("RasterBrushHardness", 100);
 // note: stroke is unchanged
 //
 
-void split(
-	TStroke *stroke,
-	const std::vector<double> &parameterValues,
-	std::vector<TStroke *> &strokes)
+void split(TStroke *stroke, const std::vector<double> &parameterValues,
+		   std::vector<TStroke *> &strokes)
 {
 	TThickPoint p2;
 	std::vector<TThickPoint> points;
@@ -185,8 +183,8 @@ void split(
 	points.clear();
 }
 
-//Compute Parametric Curve Curvature
-//By Formula:
+// Compute Parametric Curve Curvature
+// By Formula:
 // k(t)=(|p'(t) x p''(t)|)/Norm2(p')^3
 // p(t) is parametric curve
 // Input:
@@ -194,7 +192,8 @@ void split(
 //      ddp = Second Derivate
 // Output:
 //      return curvature value.
-//      Note: if the curve is a single point (that's dp=0) or it is a straight line (that's ddp=0) return 0
+//      Note: if the curve is a single point (that's dp=0) or it is a straight line (that's ddp=0)
+//      return 0
 
 double curvature(TPointD dp, TPointD ddp)
 {
@@ -214,11 +213,8 @@ double curvature(TPointD dp, TPointD ddp)
 // Output:
 //      parameterValues = vector of max curvature parameter points
 
-void findMaxCurvPoints(
-	TStroke *stroke,
-	const float &angoloLim,
-	const float &curvMaxLim,
-	std::vector<double> &parameterValues)
+void findMaxCurvPoints(TStroke *stroke, const float &angoloLim, const float &curvMaxLim,
+					   std::vector<double> &parameterValues)
 {
 	TPointD tg1, tg2; // Tangent vectors
 
@@ -241,9 +237,10 @@ void findMaxCurvPoints(
 			// Compute corner between two tangent vectors
 			double angolo = acos(prod_scal / (pow(norm2(tg2), 0.5) * pow(norm2(tg1), 0.5)));
 
-			//Add corner point
+			// Add corner point
 			if (angolo > angoloLim) {
-				double w = getWfromChunkAndT(stroke, (UINT)(0.5 * (j - 2)), 0); //  transform lacal t to global t
+				double w = getWfromChunkAndT(stroke, (UINT)(0.5 * (j - 2)),
+											 0); //  transform lacal t to global t
 				parameterValues.push_back(w);
 			}
 		}
@@ -257,7 +254,9 @@ void findMaxCurvPoints(
 		double estremo_int = 0;
 		double t = -1;
 		if (q != TPointD(0, 0)) {
-			t = 0.25 * (2 * q.x * q.x + 2 * q.y * q.y - q.x * p0.x + q.x * p2.x - q.y * p0.y + q.y * p2.y) / (q.x * q.x + q.y * q.y);
+			t = 0.25 * (2 * q.x * q.x + 2 * q.y * q.y - q.x * p0.x + q.x * p2.x - q.y * p0.y +
+						q.y * p2.y) /
+				(q.x * q.x + q.y * q.y);
 
 			dp = -p0 + p2 + 2 * q - 4 * t * q; // First derivate of the curve
 			ddp = -4 * q;					   // Second derivate of the curve
@@ -275,12 +274,12 @@ void findMaxCurvPoints(
 		}
 		double curv_max = estremo_int;
 
-		//Compute curvature at the extreme of interval [0,1]
-		//Compute curvature at t=0 (Left extreme)
+		// Compute curvature at the extreme of interval [0,1]
+		// Compute curvature at t=0 (Left extreme)
 		dp = -p0 + p2 + 2 * q;
 		double estremo_sx = curvature(dp, ddp);
 
-		//Compute curvature at t=1 (Right extreme)
+		// Compute curvature at t=1 (Right extreme)
 		dp = -p0 + p2 - 2 * q;
 		double estremo_dx = curvature(dp, ddp);
 
@@ -298,7 +297,8 @@ void findMaxCurvPoints(
 
 		// Add max curvature point
 		if (t >= 0 && t <= 1 && curv_max > curvMaxLim) {
-			double w = getWfromChunkAndT(stroke, (UINT)(0.5 * (j - 2)), t); // transform local t to global t
+			double w = getWfromChunkAndT(stroke, (UINT)(0.5 * (j - 2)),
+										 t); // transform local t to global t
 			parameterValues.push_back(w);
 		}
 		// End search max curvature point
@@ -307,12 +307,13 @@ void findMaxCurvPoints(
 	// Because some max cuvature point can coincide with the corner point
 	if ((int)parameterValues.size() > 1) {
 		std::sort(parameterValues.begin(), parameterValues.end());
-		parameterValues.erase(std::unique(parameterValues.begin(), parameterValues.end()), parameterValues.end());
+		parameterValues.erase(std::unique(parameterValues.begin(), parameterValues.end()),
+							  parameterValues.end());
 	}
 }
 
-void addStroke(TTool::Application *application, const TVectorImageP &vi, TStroke *stroke, bool breakAngles,
-			   bool frameCreated, bool levelCreated)
+void addStroke(TTool::Application *application, const TVectorImageP &vi, TStroke *stroke,
+			   bool breakAngles, bool frameCreated, bool levelCreated)
 {
 	QMutexLocker lock(vi->getMutex());
 
@@ -327,7 +328,7 @@ void addStroke(TTool::Application *application, const TVectorImageP &vi, TStroke
 	const float angoloLim = 1;	// Value (radians) of the Corner between two tangent vector.
 								  // Up this value the two corner can be considered angular.
 	const float curvMaxLim = 0.8; // Value of the max curvature.
-								  // Up this value the point can be considered a max curvature point.
+	// Up this value the point can be considered a max curvature point.
 
 	findMaxCurvPoints(stroke, angoloLim, curvMaxLim, corners);
 	TXshSimpleLevel *sl = application->getCurrentLevel()->getSimpleLevel();
@@ -344,10 +345,12 @@ void addStroke(TTool::Application *application, const TVectorImageP &vi, TStroke
 		TUndoManager::manager()->beginBlock();
 		for (int i = 0; i < n; i++) {
 			std::vector<TFilledRegionInf> *fillInformation = new std::vector<TFilledRegionInf>;
-			ImageUtils::getFillingInformationOverlappingArea(vi, *fillInformation, stroke->getBBox());
+			ImageUtils::getFillingInformationOverlappingArea(vi, *fillInformation,
+															 stroke->getBBox());
 			TStroke *str = new TStroke(*strokes[i]);
 			vi->addStroke(str);
-			TUndoManager::manager()->add(new UndoPencil(str, fillInformation, sl, id, frameCreated, levelCreated));
+			TUndoManager::manager()->add(
+				new UndoPencil(str, fillInformation, sl, id, frameCreated, levelCreated));
 		}
 		TUndoManager::manager()->endBlock();
 	} else {
@@ -355,7 +358,8 @@ void addStroke(TTool::Application *application, const TVectorImageP &vi, TStroke
 		ImageUtils::getFillingInformationOverlappingArea(vi, *fillInformation, stroke->getBBox());
 		TStroke *str = new TStroke(*stroke);
 		vi->addStroke(str);
-		TUndoManager::manager()->add(new UndoPencil(str, fillInformation, sl, id, frameCreated, levelCreated));
+		TUndoManager::manager()->add(
+			new UndoPencil(str, fillInformation, sl, id, frameCreated, levelCreated));
 	}
 
 	for (int k = 0; k < (int)strokes.size(); k++)
@@ -382,13 +386,13 @@ namespace
 
 //-------------------------------------------------------------------
 
-void addStrokeToImage(TTool::Application *application, const TVectorImageP &vi, TStroke *stroke, bool breakAngles,
-					  bool frameCreated, bool levelCreated)
+void addStrokeToImage(TTool::Application *application, const TVectorImageP &vi, TStroke *stroke,
+					  bool breakAngles, bool frameCreated, bool levelCreated)
 {
 	QMutexLocker lock(vi->getMutex());
 	addStroke(application, vi.getPointer(), stroke, breakAngles, frameCreated, levelCreated);
-	//la notifica viene gia fatta da addStroke!
-	//getApplication()->getCurrentTool()->getTool()->notifyImageChanged();
+	// la notifica viene gia fatta da addStroke!
+	// getApplication()->getCurrentTool()->getTool()->notifyImageChanged();
 }
 
 //=========================================================================================================
@@ -400,13 +404,12 @@ class RasterBrushUndo : public TRasterUndo
 	bool m_selective;
 	bool m_isPencil;
 
-public:
-	RasterBrushUndo(TTileSetCM32 *tileSet,
-					const std::vector<TThickPoint> &points,
-					int styleId, bool selective,
-					TXshSimpleLevel *level, const TFrameId &frameId, bool isPencil,
+  public:
+	RasterBrushUndo(TTileSetCM32 *tileSet, const std::vector<TThickPoint> &points, int styleId,
+					bool selective, TXshSimpleLevel *level, const TFrameId &frameId, bool isPencil,
 					bool isFrameCreated, bool isLevelCreated)
-		: TRasterUndo(tileSet, level, frameId, isFrameCreated, isLevelCreated, 0), m_points(points), m_styleId(styleId), m_selective(selective), m_isPencil(isPencil)
+		: TRasterUndo(tileSet, level, frameId, isFrameCreated, isLevelCreated, 0), m_points(points),
+		  m_styleId(styleId), m_selective(selective), m_isPencil(isPencil)
 	{
 	}
 
@@ -415,27 +418,20 @@ public:
 		insertLevelAndFrameIfNeeded();
 		TToonzImageP image = getImage();
 		TRasterCM32P ras = image->getRaster();
-		RasterStrokeGenerator m_rasterTrack(ras, BRUSH, NONE, m_styleId, m_points[0], m_selective, 0, !m_isPencil);
+		RasterStrokeGenerator m_rasterTrack(ras, BRUSH, NONE, m_styleId, m_points[0], m_selective,
+											0, !m_isPencil);
 		m_rasterTrack.setPointsSequence(m_points);
 		m_rasterTrack.generateStroke(m_isPencil);
-		image->setSavebox(image->getSavebox() + m_rasterTrack.getBBox(m_rasterTrack.getPointsSequence()));
+		image->setSavebox(image->getSavebox() +
+						  m_rasterTrack.getBBox(m_rasterTrack.getPointsSequence()));
 		ToolUtils::updateSaveBox();
 		TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
 		notifyImageChanged();
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this) + TRasterUndo::getSize();
-	}
-	QString getToolName()
-	{
-		return QString("Brush Tool");
-	}
-	int getHistoryType()
-	{
-		return HistoryType::BrushTool;
-	}
+	int getSize() const { return sizeof(*this) + TRasterUndo::getSize(); }
+	QString getToolName() { return QString("Brush Tool"); }
+	int getHistoryType() { return HistoryType::BrushTool; }
 };
 
 //=========================================================================================================
@@ -448,11 +444,13 @@ class RasterBluredBrushUndo : public TRasterUndo
 	int m_maxThick;
 	double m_hardness;
 
-public:
+  public:
 	RasterBluredBrushUndo(TTileSetCM32 *tileSet, const std::vector<TThickPoint> &points,
-						  int styleId, bool selective, TXshSimpleLevel *level, const TFrameId &frameId,
-						  int maxThick, double hardness, bool isFrameCreated, bool isLevelCreated)
-		: TRasterUndo(tileSet, level, frameId, isFrameCreated, isLevelCreated, 0), m_points(points), m_styleId(styleId), m_selective(selective), m_maxThick(maxThick), m_hardness(hardness)
+						  int styleId, bool selective, TXshSimpleLevel *level,
+						  const TFrameId &frameId, int maxThick, double hardness,
+						  bool isFrameCreated, bool isLevelCreated)
+		: TRasterUndo(tileSet, level, frameId, isFrameCreated, isLevelCreated, 0), m_points(points),
+		  m_styleId(styleId), m_selective(selective), m_maxThick(maxThick), m_hardness(hardness)
 	{
 	}
 
@@ -497,19 +495,10 @@ public:
 		notifyImageChanged();
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this) + TRasterUndo::getSize();
-	}
+	int getSize() const { return sizeof(*this) + TRasterUndo::getSize(); }
 
-	virtual QString getToolName()
-	{
-		return QString("Brush Tool");
-	}
-	int getHistoryType()
-	{
-		return HistoryType::BrushTool;
-	}
+	virtual QString getToolName() { return QString("Brush Tool"); }
+	int getHistoryType() { return HistoryType::BrushTool; }
 };
 
 //=========================================================================================================
@@ -549,7 +538,13 @@ int computeThickness(int pressure, const TIntPairProperty &property, bool isPath
 //-----------------------------------------------------------------------------
 
 BrushTool::BrushTool(std::string name, int targetType)
-	: TTool(name), m_thickness("Size", 0, 100, 0, 5), m_rasThickness("Size", 1, 100, 1, 5), m_accuracy("Accuracy:", 1, 100, 20), m_hardness("Hardness:", 0, 100, 100), m_preset("Preset:"), m_selective("Selective", false), m_breakAngles("Break", true), m_pencil("Pencil", false), m_pressure("Pressure", true), m_capStyle("Cap"), m_joinStyle("Join"), m_miterJoinLimit("Miter:", 0, 100, 4), m_rasterTrack(0), m_styleId(0), m_modifiedRegion(), m_bluredBrush(0), m_active(false), m_enabled(false), m_isPrompting(false), m_firstTime(true), m_presetsLoaded(false), m_workingFrameId(TFrameId())
+	: TTool(name), m_thickness("Size", 0, 100, 0, 5), m_rasThickness("Size", 1, 100, 1, 5),
+	  m_accuracy("Accuracy:", 1, 100, 20), m_hardness("Hardness:", 0, 100, 100),
+	  m_preset("Preset:"), m_selective("Selective", false), m_breakAngles("Break", true),
+	  m_pencil("Pencil", false), m_pressure("Pressure", true), m_capStyle("Cap"),
+	  m_joinStyle("Join"), m_miterJoinLimit("Miter:", 0, 100, 4), m_rasterTrack(0), m_styleId(0),
+	  m_modifiedRegion(), m_bluredBrush(0), m_active(false), m_enabled(false), m_isPrompting(false),
+	  m_firstTime(true), m_presetsLoaded(false), m_workingFrameId(TFrameId())
 {
 	bind(targetType);
 
@@ -600,73 +595,123 @@ BrushTool::BrushTool(std::string name, int targetType)
 
 ToolOptionsBox *BrushTool::createOptionsBox()
 {
-	TPaletteHandle *currPalette = TTool::getApplication()->getPaletteController()->getCurrentLevelPalette();
+	TPaletteHandle *currPalette =
+		TTool::getApplication()->getPaletteController()->getCurrentLevelPalette();
 	ToolHandle *currTool = TTool::getApplication()->getCurrentTool();
 	return new BrushToolOptionsBox(0, this, currPalette, currTool);
 }
 
 //-------------------------------------------------------------------------------------------------------
 
-void BrushTool::drawLine(const TPointD &point, const TPointD &centre, bool horizontal, bool isDecimal)
+void BrushTool::drawLine(const TPointD &point, const TPointD &centre, bool horizontal,
+						 bool isDecimal)
 {
 	if (!isDecimal) {
 		if (horizontal) {
-			tglDrawSegment(TPointD(point.x - 1.5, point.y + 0.5) + centre, TPointD(point.x - 0.5, point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(point.y - 0.5, -point.x + 1.5) + centre, TPointD(point.y - 0.5, -point.x + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.x + 0.5, -point.y + 0.5) + centre, TPointD(-point.x - 0.5, -point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 0.5, point.x - 0.5) + centre, TPointD(-point.y - 0.5, point.x + 0.5) + centre);
+			tglDrawSegment(TPointD(point.x - 1.5, point.y + 0.5) + centre,
+						   TPointD(point.x - 0.5, point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(point.y - 0.5, -point.x + 1.5) + centre,
+						   TPointD(point.y - 0.5, -point.x + 0.5) + centre);
+			tglDrawSegment(TPointD(-point.x + 0.5, -point.y + 0.5) + centre,
+						   TPointD(-point.x - 0.5, -point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(-point.y - 0.5, point.x - 0.5) + centre,
+						   TPointD(-point.y - 0.5, point.x + 0.5) + centre);
 
-			tglDrawSegment(TPointD(point.y - 0.5, point.x + 0.5) + centre, TPointD(point.y - 0.5, point.x - 0.5) + centre);
-			tglDrawSegment(TPointD(point.x - 0.5, -point.y + 0.5) + centre, TPointD(point.x - 1.5, -point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 0.5, -point.x + 0.5) + centre, TPointD(-point.y - 0.5, -point.x + 1.5) + centre);
-			tglDrawSegment(TPointD(-point.x - 0.5, point.y + 0.5) + centre, TPointD(-point.x + 0.5, point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(point.y - 0.5, point.x + 0.5) + centre,
+						   TPointD(point.y - 0.5, point.x - 0.5) + centre);
+			tglDrawSegment(TPointD(point.x - 0.5, -point.y + 0.5) + centre,
+						   TPointD(point.x - 1.5, -point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(-point.y - 0.5, -point.x + 0.5) + centre,
+						   TPointD(-point.y - 0.5, -point.x + 1.5) + centre);
+			tglDrawSegment(TPointD(-point.x - 0.5, point.y + 0.5) + centre,
+						   TPointD(-point.x + 0.5, point.y + 0.5) + centre);
 		} else {
-			tglDrawSegment(TPointD(point.x - 1.5, point.y + 1.5) + centre, TPointD(point.x - 1.5, point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(point.x - 1.5, point.y + 0.5) + centre, TPointD(point.x - 0.5, point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(point.y + 0.5, -point.x + 1.5) + centre, TPointD(point.y - 0.5, -point.x + 1.5) + centre);
-			tglDrawSegment(TPointD(point.y - 0.5, -point.x + 1.5) + centre, TPointD(point.y - 0.5, -point.x + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.x + 0.5, -point.y - 0.5) + centre, TPointD(-point.x + 0.5, -point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.x + 0.5, -point.y + 0.5) + centre, TPointD(-point.x - 0.5, -point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 1.5, point.x - 0.5) + centre, TPointD(-point.y - 0.5, point.x - 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 0.5, point.x - 0.5) + centre, TPointD(-point.y - 0.5, point.x + 0.5) + centre);
+			tglDrawSegment(TPointD(point.x - 1.5, point.y + 1.5) + centre,
+						   TPointD(point.x - 1.5, point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(point.x - 1.5, point.y + 0.5) + centre,
+						   TPointD(point.x - 0.5, point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(point.y + 0.5, -point.x + 1.5) + centre,
+						   TPointD(point.y - 0.5, -point.x + 1.5) + centre);
+			tglDrawSegment(TPointD(point.y - 0.5, -point.x + 1.5) + centre,
+						   TPointD(point.y - 0.5, -point.x + 0.5) + centre);
+			tglDrawSegment(TPointD(-point.x + 0.5, -point.y - 0.5) + centre,
+						   TPointD(-point.x + 0.5, -point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(-point.x + 0.5, -point.y + 0.5) + centre,
+						   TPointD(-point.x - 0.5, -point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(-point.y - 1.5, point.x - 0.5) + centre,
+						   TPointD(-point.y - 0.5, point.x - 0.5) + centre);
+			tglDrawSegment(TPointD(-point.y - 0.5, point.x - 0.5) + centre,
+						   TPointD(-point.y - 0.5, point.x + 0.5) + centre);
 
-			tglDrawSegment(TPointD(point.y + 0.5, point.x - 0.5) + centre, TPointD(point.y - 0.5, point.x - 0.5) + centre);
-			tglDrawSegment(TPointD(point.y - 0.5, point.x - 0.5) + centre, TPointD(point.y - 0.5, point.x + 0.5) + centre);
-			tglDrawSegment(TPointD(point.x - 1.5, -point.y - 0.5) + centre, TPointD(point.x - 1.5, -point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(point.x - 1.5, -point.y + 0.5) + centre, TPointD(point.x - 0.5, -point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 1.5, -point.x + 1.5) + centre, TPointD(-point.y - 0.5, -point.x + 1.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 0.5, -point.x + 1.5) + centre, TPointD(-point.y - 0.5, -point.x + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.x + 0.5, point.y + 1.5) + centre, TPointD(-point.x + 0.5, point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.x + 0.5, point.y + 0.5) + centre, TPointD(-point.x - 0.5, point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(point.y + 0.5, point.x - 0.5) + centre,
+						   TPointD(point.y - 0.5, point.x - 0.5) + centre);
+			tglDrawSegment(TPointD(point.y - 0.5, point.x - 0.5) + centre,
+						   TPointD(point.y - 0.5, point.x + 0.5) + centre);
+			tglDrawSegment(TPointD(point.x - 1.5, -point.y - 0.5) + centre,
+						   TPointD(point.x - 1.5, -point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(point.x - 1.5, -point.y + 0.5) + centre,
+						   TPointD(point.x - 0.5, -point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(-point.y - 1.5, -point.x + 1.5) + centre,
+						   TPointD(-point.y - 0.5, -point.x + 1.5) + centre);
+			tglDrawSegment(TPointD(-point.y - 0.5, -point.x + 1.5) + centre,
+						   TPointD(-point.y - 0.5, -point.x + 0.5) + centre);
+			tglDrawSegment(TPointD(-point.x + 0.5, point.y + 1.5) + centre,
+						   TPointD(-point.x + 0.5, point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(-point.x + 0.5, point.y + 0.5) + centre,
+						   TPointD(-point.x - 0.5, point.y + 0.5) + centre);
 		}
 	} else {
 		if (horizontal) {
-			tglDrawSegment(TPointD(point.x - 0.5, point.y + 0.5) + centre, TPointD(point.x + 0.5, point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(point.y + 0.5, point.x - 0.5) + centre, TPointD(point.y + 0.5, point.x + 0.5) + centre);
-			tglDrawSegment(TPointD(point.y + 0.5, -point.x + 0.5) + centre, TPointD(point.y + 0.5, -point.x - 0.5) + centre);
-			tglDrawSegment(TPointD(point.x + 0.5, -point.y - 0.5) + centre, TPointD(point.x - 0.5, -point.y - 0.5) + centre);
-			tglDrawSegment(TPointD(-point.x - 0.5, -point.y - 0.5) + centre, TPointD(-point.x + 0.5, -point.y - 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 0.5, -point.x + 0.5) + centre, TPointD(-point.y - 0.5, -point.x - 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 0.5, point.x - 0.5) + centre, TPointD(-point.y - 0.5, point.x + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.x + 0.5, point.y + 0.5) + centre, TPointD(-point.x - 0.5, point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(point.x - 0.5, point.y + 0.5) + centre,
+						   TPointD(point.x + 0.5, point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(point.y + 0.5, point.x - 0.5) + centre,
+						   TPointD(point.y + 0.5, point.x + 0.5) + centre);
+			tglDrawSegment(TPointD(point.y + 0.5, -point.x + 0.5) + centre,
+						   TPointD(point.y + 0.5, -point.x - 0.5) + centre);
+			tglDrawSegment(TPointD(point.x + 0.5, -point.y - 0.5) + centre,
+						   TPointD(point.x - 0.5, -point.y - 0.5) + centre);
+			tglDrawSegment(TPointD(-point.x - 0.5, -point.y - 0.5) + centre,
+						   TPointD(-point.x + 0.5, -point.y - 0.5) + centre);
+			tglDrawSegment(TPointD(-point.y - 0.5, -point.x + 0.5) + centre,
+						   TPointD(-point.y - 0.5, -point.x - 0.5) + centre);
+			tglDrawSegment(TPointD(-point.y - 0.5, point.x - 0.5) + centre,
+						   TPointD(-point.y - 0.5, point.x + 0.5) + centre);
+			tglDrawSegment(TPointD(-point.x + 0.5, point.y + 0.5) + centre,
+						   TPointD(-point.x - 0.5, point.y + 0.5) + centre);
 		} else {
-			tglDrawSegment(TPointD(point.x - 0.5, point.y + 1.5) + centre, TPointD(point.x - 0.5, point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(point.x - 0.5, point.y + 0.5) + centre, TPointD(point.x + 0.5, point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(point.y + 1.5, point.x - 0.5) + centre, TPointD(point.y + 0.5, point.x - 0.5) + centre);
-			tglDrawSegment(TPointD(point.y + 0.5, point.x - 0.5) + centre, TPointD(point.y + 0.5, point.x + 0.5) + centre);
-			tglDrawSegment(TPointD(point.y + 1.5, -point.x + 0.5) + centre, TPointD(point.y + 0.5, -point.x + 0.5) + centre);
-			tglDrawSegment(TPointD(point.y + 0.5, -point.x + 0.5) + centre, TPointD(point.y + 0.5, -point.x - 0.5) + centre);
-			tglDrawSegment(TPointD(point.x - 0.5, -point.y - 1.5) + centre, TPointD(point.x - 0.5, -point.y - 0.5) + centre);
-			tglDrawSegment(TPointD(point.x - 0.5, -point.y - 0.5) + centre, TPointD(point.x + 0.5, -point.y - 0.5) + centre);
+			tglDrawSegment(TPointD(point.x - 0.5, point.y + 1.5) + centre,
+						   TPointD(point.x - 0.5, point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(point.x - 0.5, point.y + 0.5) + centre,
+						   TPointD(point.x + 0.5, point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(point.y + 1.5, point.x - 0.5) + centre,
+						   TPointD(point.y + 0.5, point.x - 0.5) + centre);
+			tglDrawSegment(TPointD(point.y + 0.5, point.x - 0.5) + centre,
+						   TPointD(point.y + 0.5, point.x + 0.5) + centre);
+			tglDrawSegment(TPointD(point.y + 1.5, -point.x + 0.5) + centre,
+						   TPointD(point.y + 0.5, -point.x + 0.5) + centre);
+			tglDrawSegment(TPointD(point.y + 0.5, -point.x + 0.5) + centre,
+						   TPointD(point.y + 0.5, -point.x - 0.5) + centre);
+			tglDrawSegment(TPointD(point.x - 0.5, -point.y - 1.5) + centre,
+						   TPointD(point.x - 0.5, -point.y - 0.5) + centre);
+			tglDrawSegment(TPointD(point.x - 0.5, -point.y - 0.5) + centre,
+						   TPointD(point.x + 0.5, -point.y - 0.5) + centre);
 
-			tglDrawSegment(TPointD(-point.x + 0.5, -point.y - 1.5) + centre, TPointD(-point.x + 0.5, -point.y - 0.5) + centre);
-			tglDrawSegment(TPointD(-point.x + 0.5, -point.y - 0.5) + centre, TPointD(-point.x - 0.5, -point.y - 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 1.5, -point.x + 0.5) + centre, TPointD(-point.y - 0.5, -point.x + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 0.5, -point.x + 0.5) + centre, TPointD(-point.y - 0.5, -point.x - 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 1.5, point.x - 0.5) + centre, TPointD(-point.y - 0.5, point.x - 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 0.5, point.x - 0.5) + centre, TPointD(-point.y - 0.5, point.x + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.x + 0.5, point.y + 1.5) + centre, TPointD(-point.x + 0.5, point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.x + 0.5, point.y + 0.5) + centre, TPointD(-point.x - 0.5, point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(-point.x + 0.5, -point.y - 1.5) + centre,
+						   TPointD(-point.x + 0.5, -point.y - 0.5) + centre);
+			tglDrawSegment(TPointD(-point.x + 0.5, -point.y - 0.5) + centre,
+						   TPointD(-point.x - 0.5, -point.y - 0.5) + centre);
+			tglDrawSegment(TPointD(-point.y - 1.5, -point.x + 0.5) + centre,
+						   TPointD(-point.y - 0.5, -point.x + 0.5) + centre);
+			tglDrawSegment(TPointD(-point.y - 0.5, -point.x + 0.5) + centre,
+						   TPointD(-point.y - 0.5, -point.x - 0.5) + centre);
+			tglDrawSegment(TPointD(-point.y - 1.5, point.x - 0.5) + centre,
+						   TPointD(-point.y - 0.5, point.x - 0.5) + centre);
+			tglDrawSegment(TPointD(-point.y - 0.5, point.x - 0.5) + centre,
+						   TPointD(-point.y - 0.5, point.x + 0.5) + centre);
+			tglDrawSegment(TPointD(-point.x + 0.5, point.y + 1.5) + centre,
+						   TPointD(-point.x + 0.5, point.y + 0.5) + centre);
+			tglDrawSegment(TPointD(-point.x + 0.5, point.y + 0.5) + centre,
+						   TPointD(-point.x - 0.5, point.y + 0.5) + centre);
 		}
 	}
 }
@@ -711,7 +756,7 @@ void BrushTool::updateTranslation()
 	m_hardness.setQStringName(tr("Hardness:"));
 	m_accuracy.setQStringName(tr("Accuracy:"));
 	m_selective.setQStringName(tr("Selective"));
-	//m_filled.setQStringName(tr("Filled"));
+	// m_filled.setQStringName(tr("Filled"));
 	m_preset.setQStringName(tr("Preset:"));
 	m_breakAngles.setQStringName(tr("Break"));
 	m_pencil.setQStringName(tr("Pencil"));
@@ -769,17 +814,19 @@ void BrushTool::onActivate()
 		m_hardness.setValue(RasterBrushHardness);
 	}
 	if (m_targetType & TTool::ToonzImage) {
-		m_brushPad = ToolUtils::getBrushPad(m_rasThickness.getValue().second, m_hardness.getValue() * 0.01);
+		m_brushPad =
+			ToolUtils::getBrushPad(m_rasThickness.getValue().second, m_hardness.getValue() * 0.01);
 		setWorkAndBackupImages();
 	}
-	//TODO:app->editImageOrSpline();
+	// TODO:app->editImageOrSpline();
 }
 
 //--------------------------------------------------------------------------------------------------
 
 void BrushTool::onDeactivate()
 {
-	/*--- ドラッグ中にツールが切り替わった場合に備え、onDeactivateにもMouseReleaseと同じ処理を行う ---*/
+	/*--- ドラッグ中にツールが切り替わった場合に備え、onDeactivateにもMouseReleaseと同じ処理を行う
+	 * ---*/
 	if (m_tileSaver && !m_isPath) {
 		bool isValid = m_enabled && m_active;
 		m_enabled = false;
@@ -845,7 +892,7 @@ void BrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e)
 		m_currentColor = TPixel32::Red;
 		m_active = true;
 	}
-	//assert(0<=m_styleId && m_styleId<2);
+	// assert(0<=m_styleId && m_styleId<2);
 	TImageP img = getImage(true);
 	TToonzImageP ri(img);
 	if (ri) {
@@ -855,7 +902,9 @@ void BrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e)
 			m_tileSet = new TTileSetCM32(ras->getSize());
 			m_tileSaver = new TTileSaverCM32(ras, m_tileSet);
 			double maxThick = m_rasThickness.getValue().second;
-			double thickness = (m_pressure.getValue() || m_isPath) ? computeThickness(e.m_pressure, m_rasThickness, m_isPath) * 2 : maxThick;
+			double thickness = (m_pressure.getValue() || m_isPath)
+								   ? computeThickness(e.m_pressure, m_rasThickness, m_isPath) * 2
+								   : maxThick;
 
 			/*--- ストロークの最初にMaxサイズの円が描かれてしまう不具合を防止する ---*/
 			if (m_pressure.getValue() && e.m_pressure == 255)
@@ -868,9 +917,10 @@ void BrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e)
 				if (!m_pencil.getValue())
 					thickness -= 1.0;
 
-				m_rasterTrack = new RasterStrokeGenerator(ras, BRUSH, NONE, m_styleId,
-														  TThickPoint(pos + convert(ras->getCenter()), thickness),
-														  m_selective.getValue(), 0, !m_pencil.getValue());
+				m_rasterTrack = new RasterStrokeGenerator(
+					ras, BRUSH, NONE, m_styleId,
+					TThickPoint(pos + convert(ras->getCenter()), thickness), m_selective.getValue(),
+					0, !m_pencil.getValue());
 				m_tileSaver->save(m_rasterTrack->getLastRect());
 				m_rasterTrack->generateLastPieceOfStroke(m_pencil.getValue());
 			} else {
@@ -883,7 +933,8 @@ void BrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e)
 				updateWorkAndBackupRasters(m_strokeRect);
 				m_tileSaver->save(m_strokeRect);
 				m_bluredBrush->addPoint(point, 1);
-				m_bluredBrush->updateDrawing(ri->getRaster(), m_backupRas, m_strokeRect, m_styleId, m_selective.getValue());
+				m_bluredBrush->updateDrawing(ri->getRaster(), m_backupRas, m_strokeRect, m_styleId,
+											 m_selective.getValue());
 				m_lastRect = m_strokeRect;
 			}
 			/*-- 作業中のFidを登録 --*/
@@ -893,7 +944,9 @@ void BrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e)
 		}
 	} else {
 		m_track.clear();
-		double thickness = (m_pressure.getValue() || m_isPath) ? computeThickness(e.m_pressure, m_thickness, m_isPath) : m_thickness.getValue().second * 0.5;
+		double thickness = (m_pressure.getValue() || m_isPath)
+							   ? computeThickness(e.m_pressure, m_thickness, m_isPath)
+							   : m_thickness.getValue().second * 0.5;
 
 		/*--- ストロークの最初にMaxサイズの円が描かれてしまう不具合を防止する ---*/
 		if (m_pressure.getValue() && e.m_pressure == 255)
@@ -917,7 +970,9 @@ void BrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e)
 	if (TToonzImageP ti = TImageP(getImage(true))) {
 		TPointD rasCenter = ti->getRaster()->getCenterD();
 		int maxThickness = m_rasThickness.getValue().second;
-		double thickness = (m_pressure.getValue() || m_isPath) ? computeThickness(e.m_pressure, m_rasThickness, m_isPath) * 2 : maxThickness;
+		double thickness = (m_pressure.getValue() || m_isPath)
+							   ? computeThickness(e.m_pressure, m_rasThickness, m_isPath) * 2
+							   : maxThickness;
 		TRectD invalidateRect;
 		if (m_rasterTrack && (m_hardness.getValue() == 100 || m_pencil.getValue())) {
 			/*-- Pencilモードでなく、Hardness=100 の場合のブラシサイズを1段階下げる --*/
@@ -942,7 +997,7 @@ void BrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e)
 				invalidateRect = ToolUtils::getBounds(points, maxThickness) - rasCenter;
 			}
 		} else {
-			//antialiased brush
+			// antialiased brush
 			assert(m_workRas.getPointer() && m_backupRas.getPointer());
 
 			TThickPoint old = m_points.back();
@@ -978,12 +1033,15 @@ void BrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e)
 				m_lastRect += bbox;
 			}
 			invalidateRect = ToolUtils::getBounds(points, maxThickness) - rasCenter;
-			m_bluredBrush->updateDrawing(ti->getRaster(), m_backupRas, bbox, m_styleId, m_selective.getValue());
+			m_bluredBrush->updateDrawing(ti->getRaster(), m_backupRas, bbox, m_styleId,
+										 m_selective.getValue());
 			m_strokeRect += bbox;
 		}
 		invalidate(invalidateRect.enlarge(2));
 	} else {
-		double thickness = (m_pressure.getValue() || m_isPath) ? computeThickness(e.m_pressure, m_thickness, m_isPath) : m_thickness.getValue().second * 0.5;
+		double thickness = (m_pressure.getValue() || m_isPath)
+							   ? computeThickness(e.m_pressure, m_thickness, m_isPath)
+							   : m_thickness.getValue().second * 0.5;
 		m_track.add(TThickPoint(pos, thickness), getPixelSize() * getPixelSize());
 
 		invalidate();
@@ -1061,10 +1119,15 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e)
 		m_styleId = 0;
 
 		QMutexLocker lock(vi->getMutex());
-		if (stroke->getControlPointCount() == 3 && stroke->getControlPoint(0) != stroke->getControlPoint(2)) // gli stroke con solo 1 chunk vengono fatti dal tape tool...e devono venir riconosciuti come speciali di autoclose proprio dal fatto che hanno 1 solo chunk.
+		if (stroke->getControlPointCount() == 3 &&
+			stroke->getControlPoint(0) !=
+				stroke->getControlPoint(2)) // gli stroke con solo 1 chunk vengono fatti dal tape
+											// tool...e devono venir riconosciuti come speciali di
+											// autoclose proprio dal fatto che hanno 1 solo chunk.
 			stroke->insertControlPoints(0.5);
 
-		addStrokeToImage(getApplication(), vi, stroke, m_breakAngles.getValue(), m_isFrameCreated, m_isLevelCreated);
+		addStrokeToImage(getApplication(), vi, stroke, m_breakAngles.getValue(), m_isFrameCreated,
+						 m_isLevelCreated);
 		TRectD bbox = stroke->getBBox().enlarge(2) + m_track.getModifiedRegion();
 		invalidate();
 		assert(stroke);
@@ -1093,7 +1156,9 @@ void BrushTool::finishRasterBrush(const TPointD &pos, int pressureVal)
 	TFrameId frameId = m_workingFrameId.isEmptyFrame() ? getCurrentFid() : m_workingFrameId;
 
 	if (m_rasterTrack && (m_hardness.getValue() == 100 || m_pencil.getValue())) {
-		double thickness = m_pressure.getValue() ? computeThickness(pressureVal, m_rasThickness, m_isPath) : m_rasThickness.getValue().second;
+		double thickness = m_pressure.getValue()
+							   ? computeThickness(pressureVal, m_rasThickness, m_isPath)
+							   : m_rasThickness.getValue().second;
 
 		/*--- ストロークの最初にMaxサイズの円が描かれてしまう不具合を防止する ---*/
 		if (m_pressure.getValue() && pressureVal == 255)
@@ -1103,7 +1168,8 @@ void BrushTool::finishRasterBrush(const TPointD &pos, int pressureVal)
 		if (!m_pencil.getValue())
 			thickness -= 1.0;
 
-		bool isAdded = m_rasterTrack->add(TThickPoint(pos + convert(ti->getRaster()->getCenter()), thickness));
+		bool isAdded =
+			m_rasterTrack->add(TThickPoint(pos + convert(ti->getRaster()->getCenter()), thickness));
 		if (isAdded) {
 			m_tileSaver->save(m_rasterTrack->getLastRect());
 			m_rasterTrack->generateLastPieceOfStroke(m_pencil.getValue(), true);
@@ -1124,22 +1190,19 @@ void BrushTool::finishRasterBrush(const TPointD &pos, int pressureVal)
 		}
 
 		if (m_tileSet->getTileCount() > 0) {
-			TUndoManager::manager()->add(new RasterBrushUndo(m_tileSet,
-															 m_rasterTrack->getPointsSequence(),
-															 m_rasterTrack->getStyleId(),
-															 m_rasterTrack->isSelective(),
-															 simLevel.getPointer(),
-															 frameId, m_pencil.getValue(),
-															 m_isFrameCreated,
-															 m_isLevelCreated));
+			TUndoManager::manager()->add(new RasterBrushUndo(
+				m_tileSet, m_rasterTrack->getPointsSequence(), m_rasterTrack->getStyleId(),
+				m_rasterTrack->isSelective(), simLevel.getPointer(), frameId, m_pencil.getValue(),
+				m_isFrameCreated, m_isLevelCreated));
 		}
 		delete m_rasterTrack;
 		m_rasterTrack = 0;
 	} else {
 		if (m_points.size() != 1) {
 			double maxThickness = m_rasThickness.getValue().second;
-			double thickness = (m_pressure.getValue() || m_isPath) ? computeThickness(pressureVal, m_rasThickness, m_isPath)
-																   : maxThickness;
+			double thickness = (m_pressure.getValue() || m_isPath)
+								   ? computeThickness(pressureVal, m_rasThickness, m_isPath)
+								   : maxThickness;
 			TPointD rasCenter = ti->getRaster()->getCenterD();
 			TThickPoint point(pos + rasCenter, thickness);
 			m_points.push_back(point);
@@ -1152,7 +1215,8 @@ void BrushTool::finishRasterBrush(const TPointD &pos, int pressureVal)
 			updateWorkAndBackupRasters(bbox);
 			m_tileSaver->save(bbox);
 			m_bluredBrush->addArc(points[0], points[1], points[2], 1, 1);
-			m_bluredBrush->updateDrawing(ti->getRaster(), m_backupRas, bbox, m_styleId, m_selective.getValue());
+			m_bluredBrush->updateDrawing(ti->getRaster(), m_backupRas, bbox, m_styleId,
+										 m_selective.getValue());
 			TRectD invalidateRect = ToolUtils::getBounds(points, maxThickness);
 			invalidate(invalidateRect.enlarge(2) - rasCenter);
 			m_strokeRect += bbox;
@@ -1162,16 +1226,10 @@ void BrushTool::finishRasterBrush(const TPointD &pos, int pressureVal)
 		m_bluredBrush = 0;
 
 		if (m_tileSet->getTileCount() > 0) {
-			TUndoManager::manager()->add(new RasterBluredBrushUndo(m_tileSet,
-																   m_points,
-																   m_styleId,
-																   m_selective.getValue(),
-																   simLevel.getPointer(),
-																   frameId,
-																   m_rasThickness.getValue().second,
-																   m_hardness.getValue() * 0.01,
-																   m_isFrameCreated,
-																   m_isLevelCreated));
+			TUndoManager::manager()->add(new RasterBluredBrushUndo(
+				m_tileSet, m_points, m_styleId, m_selective.getValue(), simLevel.getPointer(),
+				frameId, m_rasThickness.getValue().second, m_hardness.getValue() * 0.01,
+				m_isFrameCreated, m_isLevelCreated));
 		}
 	}
 	delete m_tileSaver;
@@ -1222,7 +1280,9 @@ void BrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e)
 	} locals = {this};
 
 	switch (e.getModifiersMask()) {
-	/*-- Altキー+マウス移動で、ブラシサイズ（Min/Maxとも）を変える（CtrlやShiftでは誤操作の恐れがある） --*/
+	/*--
+	 * Altキー+マウス移動で、ブラシサイズ（Min/Maxとも）を変える（CtrlやShiftでは誤操作の恐れがある）
+	 * --*/
 	case TMouseEvent::ALT_KEY: {
 		// User wants to alter the minimum brush size
 		const TPointD &diff = pos - m_mousePos;
@@ -1267,9 +1327,11 @@ void BrushTool::draw()
 		return;
 
 	// Draw the brush outline - change color when the Ink / Paint check is activated
-	if ((ToonzCheck::instance()->getChecks() & ToonzCheck::eInk) || (ToonzCheck::instance()->getChecks() & ToonzCheck::ePaint) || (ToonzCheck::instance()->getChecks() & ToonzCheck::eInk1))
+	if ((ToonzCheck::instance()->getChecks() & ToonzCheck::eInk) ||
+		(ToonzCheck::instance()->getChecks() & ToonzCheck::ePaint) ||
+		(ToonzCheck::instance()->getChecks() & ToonzCheck::eInk1))
 		glColor3d(0.5, 0.8, 0.8);
-	//normally draw in red
+	// normally draw in red
 	else
 		glColor3d(1.0, 0.0, 0.0);
 
@@ -1278,8 +1340,10 @@ void BrushTool::draw()
 		int lx = ras->getLx();
 		int ly = ras->getLy();
 
-		drawEmptyCircle(m_brushPos, tround(m_minThick), lx % 2 == 0, ly % 2 == 0, m_pencil.getValue());
-		drawEmptyCircle(m_brushPos, tround(m_maxThick), lx % 2 == 0, ly % 2 == 0, m_pencil.getValue());
+		drawEmptyCircle(m_brushPos, tround(m_minThick), lx % 2 == 0, ly % 2 == 0,
+						m_pencil.getValue());
+		drawEmptyCircle(m_brushPos, tround(m_maxThick), lx % 2 == 0, ly % 2 == 0,
+						m_pencil.getValue());
 	} else {
 		tglDrawCircle(m_brushPos, 0.5 * m_minThick);
 		tglDrawCircle(m_brushPos, 0.5 * m_maxThick);
@@ -1374,8 +1438,8 @@ void BrushTool::setWorkAndBackupImages()
 
 bool BrushTool::onPropertyChanged(std::string propertyName)
 {
-	//Set the following to true whenever a different piece of interface must
-	//be refreshed - done once at the end.
+	// Set the following to true whenever a different piece of interface must
+	// be refreshed - done once at the end.
 	bool notifyTool = false;
 
 	/*--- 変更されたPropertyに合わせて処理を分ける ---*/
@@ -1384,21 +1448,21 @@ bool BrushTool::onPropertyChanged(std::string propertyName)
 		扱っている画像がラスタかどうかで区別する---*/
 	if (propertyName == m_thickness.getName()) {
 		TImageP img = getImage(false);
-		if (TToonzImageP(img)) //raster
+		if (TToonzImageP(img)) // raster
 		{
 			RasterBrushMinSize = m_rasThickness.getValue().first;
 			RasterBrushMaxSize = m_rasThickness.getValue().second;
 
 			m_minThick = m_rasThickness.getValue().first;
 			m_maxThick = m_rasThickness.getValue().second;
-		} else //vector
+		} else // vector
 		{
 			VectorBrushMinSize = m_thickness.getValue().first;
 			VectorBrushMaxSize = m_thickness.getValue().second;
 
 			m_minThick = m_thickness.getValue().first;
 			m_maxThick = m_thickness.getValue().second;
-		}		
+		}
 	} else if (propertyName == m_accuracy.getName()) {
 		BrushAccuracy = m_accuracy.getValue();
 	} else if (propertyName == m_preset.getName()) {
@@ -1428,7 +1492,8 @@ bool BrushTool::onPropertyChanged(std::string propertyName)
 		if (propertyName == m_hardness.getName())
 			setWorkAndBackupImages();
 		if (propertyName == m_hardness.getName() || propertyName == m_thickness.getName()) {
-			m_brushPad = getBrushPad(m_rasThickness.getValue().second, m_hardness.getValue() * 0.01);
+			m_brushPad =
+				getBrushPad(m_rasThickness.getValue().second, m_hardness.getValue() * 0.01);
 			TRectD rect(m_mousePos - TPointD(m_maxThick + 2, m_maxThick + 2),
 						m_mousePos + TPointD(m_maxThick + 2, m_maxThick + 2));
 			invalidate(rect);
@@ -1451,7 +1516,7 @@ bool BrushTool::onPropertyChanged(std::string propertyName)
 void BrushTool::initPresets()
 {
 	if (!m_presetsLoaded) {
-		//If necessary, load the presets from file
+		// If necessary, load the presets from file
 		m_presetsLoaded = true;
 		if (getTargetType() & TTool::Vectors)
 			m_presetsManager.load(TEnv::getConfigDir() + "brush_vector.txt");
@@ -1459,7 +1524,7 @@ void BrushTool::initPresets()
 			m_presetsManager.load(TEnv::getConfigDir() + "brush_toonzraster.txt");
 	}
 
-	//Rebuild the presets property entries
+	// Rebuild the presets property entries
 	const std::set<BrushData> &presets = m_presetsManager.presets();
 
 	m_preset.deleteAllValues();
@@ -1483,7 +1548,7 @@ void BrushTool::loadPreset()
 
 	const BrushData &preset = *it;
 
-	try //Don't bother with RangeErrors
+	try // Don't bother with RangeErrors
 	{
 		if (getTargetType() & TTool::Vectors) {
 			m_thickness.setValue(TDoublePairProperty::Value(preset.m_min, preset.m_max));
@@ -1494,7 +1559,8 @@ void BrushTool::loadPreset()
 			m_joinStyle.setIndex(preset.m_join);
 			m_miterJoinLimit.setValue(preset.m_miter);
 		} else {
-			m_rasThickness.setValue(TDoublePairProperty::Value(tmax(preset.m_min, 1.0), preset.m_max));
+			m_rasThickness.setValue(
+				TDoublePairProperty::Value(tmax(preset.m_min, 1.0), preset.m_max));
 			m_brushPad = ToolUtils::getBrushPad(preset.m_max, preset.m_hardness * 0.01);
 			m_hardness.setValue(preset.m_hardness, true);
 			m_selective.setValue(preset.m_selective);
@@ -1509,7 +1575,7 @@ void BrushTool::loadPreset()
 
 void BrushTool::addPreset(QString name)
 {
-	//Build the preset
+	// Build the preset
 	BrushData preset(name.toStdWString());
 
 	if (getTargetType() & TTool::Vectors) {
@@ -1530,13 +1596,13 @@ void BrushTool::addPreset(QString name)
 	preset.m_join = m_joinStyle.getIndex();
 	preset.m_miter = m_miterJoinLimit.getValue();
 
-	//Pass the preset to the manager
+	// Pass the preset to the manager
 	m_presetsManager.addPreset(preset);
 
-	//Reinitialize the associated preset enum
+	// Reinitialize the associated preset enum
 	initPresets();
 
-	//Set the value to the specified one
+	// Set the value to the specified one
 	m_preset.setValue(preset.m_name);
 }
 
@@ -1551,7 +1617,7 @@ void BrushTool::removePreset()
 	m_presetsManager.removePreset(name);
 	initPresets();
 
-	//No parameter change, and set the preset value to custom
+	// No parameter change, and set the preset value to custom
 	m_preset.setValue(CUSTOM_WSTR);
 }
 
@@ -1575,14 +1641,18 @@ BrushTool toonzPencil("T_Brush", TTool::ToonzImage | TTool::EmptyTarget);
 //*******************************************************************************
 
 BrushData::BrushData()
-	: m_name(), m_min(0.0), m_max(0.0), m_acc(0.0), m_hardness(0.0), m_opacityMin(0.0), m_opacityMax(0.0), m_selective(false), m_pencil(false), m_breakAngles(false), m_pressure(false), m_cap(0), m_join(0), m_miter(0)
+	: m_name(), m_min(0.0), m_max(0.0), m_acc(0.0), m_hardness(0.0), m_opacityMin(0.0),
+	  m_opacityMax(0.0), m_selective(false), m_pencil(false), m_breakAngles(false),
+	  m_pressure(false), m_cap(0), m_join(0), m_miter(0)
 {
 }
 
 //----------------------------------------------------------------------------------------------------------
 
 BrushData::BrushData(const std::wstring &name)
-	: m_name(name), m_min(0.0), m_max(0.0), m_acc(0.0), m_hardness(0.0), m_opacityMin(0.0), m_opacityMax(0.0), m_selective(false), m_pencil(false), m_breakAngles(false), m_pressure(false), m_cap(0), m_join(0), m_miter(0)
+	: m_name(name), m_min(0.0), m_max(0.0), m_acc(0.0), m_hardness(0.0), m_opacityMin(0.0),
+	  m_opacityMax(0.0), m_selective(false), m_pencil(false), m_breakAngles(false),
+	  m_pressure(false), m_cap(0), m_join(0), m_miter(0)
 {
 }
 
@@ -1732,7 +1802,7 @@ void BrushPresetManager::save()
 
 void BrushPresetManager::addPreset(const BrushData &data)
 {
-	m_presets.erase(data); //Overwriting insertion
+	m_presets.erase(data); // Overwriting insertion
 	m_presets.insert(data);
 	save();
 }

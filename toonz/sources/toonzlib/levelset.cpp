@@ -21,8 +21,7 @@ const TFilePath defaultSoundRootFolder("Audio");
 //=============================================================================
 // TLevelSet
 
-TLevelSet::TLevelSet()
-	: m_defaultFolder(defaultRootFolder)
+TLevelSet::TLevelSet() : m_defaultFolder(defaultRootFolder)
 {
 	m_folders.push_back(defaultRootFolder);
 	m_folders.push_back(defaultSoundRootFolder);
@@ -39,8 +38,7 @@ TLevelSet::~TLevelSet()
 
 void TLevelSet::clear()
 {
-	for (std::vector<TXshLevel *>::iterator it = m_levels.begin();
-		 it != m_levels.end(); ++it) {
+	for (std::vector<TXshLevel *>::iterator it = m_levels.begin(); it != m_levels.end(); ++it) {
 		TXshLevel *level = *it;
 		if (level->getSimpleLevel())
 			level->getSimpleLevel()->clearFrames();
@@ -60,12 +58,10 @@ void TLevelSet::clear()
 
 void TLevelSet::removeLevel(TXshLevel *level, bool deleteIt)
 {
-	//if(level->getSimpleLevel())
+	// if(level->getSimpleLevel())
 	//  level->getSimpleLevel()->clearFrames();
 
-	m_levels.erase(
-		std::remove(m_levels.begin(), m_levels.end(), level),
-		m_levels.end());
+	m_levels.erase(std::remove(m_levels.begin(), m_levels.end(), level), m_levels.end());
 	m_levelTable.erase(level->getName());
 	if (deleteIt)
 		level->release();

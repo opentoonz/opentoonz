@@ -56,7 +56,8 @@ QImage rasterToQImage(const TRasterP &ras, bool premultiplied, bool mirrored)
 			return image.mirrored();
 		return image;
 	} else if (TRasterGR8P ras8 = ras) {
-		QImage image(ras->getRawData(), ras->getLx(), ras->getLy(), ras->getWrap(), QImage::Format_Indexed8);
+		QImage image(ras->getRawData(), ras->getLx(), ras->getLy(), ras->getWrap(),
+					 QImage::Format_Indexed8);
 		static QVector<QRgb> colorTable;
 		if (colorTable.size() == 0) {
 			int i;
@@ -81,10 +82,12 @@ QPixmap rasterToQPixmap(const TRaster32P &ras, bool premultiplied)
 
 //-----------------------------------------------------------------------------
 
-TRaster32P rasterFromQImage(QImage image, bool premultiply, bool mirror) //no need of const& - Qt uses implicit sharing...
+TRaster32P rasterFromQImage(QImage image, bool premultiply,
+							bool mirror) // no need of const& - Qt uses implicit sharing...
 {
 	QImage copyImage = mirror ? image.mirrored() : image;
-	TRaster32P ras(image.width(), image.height(), image.width(), (TPixelRGBM32 *)copyImage.bits(), false);
+	TRaster32P ras(image.width(), image.height(), image.width(), (TPixelRGBM32 *)copyImage.bits(),
+				   false);
 	if (premultiply)
 		TRop::premultiply(ras);
 	return ras->clone();
@@ -92,7 +95,8 @@ TRaster32P rasterFromQImage(QImage image, bool premultiply, bool mirror) //no ne
 
 //-----------------------------------------------------------------------------
 
-TRaster32P rasterFromQPixmap(QPixmap pixmap, bool premultiply, bool mirror) //no need of const& - Qt uses implicit sharing...
+TRaster32P rasterFromQPixmap(QPixmap pixmap, bool premultiply,
+							 bool mirror) // no need of const& - Qt uses implicit sharing...
 {
 	QImage image = pixmap.toImage();
 	return rasterFromQImage(image, premultiply, mirror);
@@ -100,10 +104,7 @@ TRaster32P rasterFromQPixmap(QPixmap pixmap, bool premultiply, bool mirror) //no
 
 //-----------------------------------------------------------------------------
 
-void drawPolygon(QPainter &p,
-				 const std::vector<QPointF> &points,
-				 bool fill,
-				 const QColor colorFill,
+void drawPolygon(QPainter &p, const std::vector<QPointF> &points, bool fill, const QColor colorFill,
 				 const QColor colorLine)
 {
 	if (points.size() == 0)
@@ -124,11 +125,8 @@ void drawPolygon(QPainter &p,
 
 //-----------------------------------------------------------------------------
 
-void drawArrow(QPainter &p,
-			   const QPointF a, const QPointF b, const QPointF c,
-			   bool fill,
-			   const QColor colorFill,
-			   const QColor colorLine)
+void drawArrow(QPainter &p, const QPointF a, const QPointF b, const QPointF c, bool fill,
+			   const QColor colorFill, const QColor colorLine)
 {
 	std::vector<QPointF> pts;
 	pts.push_back(a);
@@ -143,13 +141,13 @@ QPixmap scalePixmapKeepingAspectRatio(QPixmap pixmap, QSize size, QColor color)
 {
 	if (pixmap.isNull() || pixmap.size() == size)
 		return pixmap;
-	QPixmap scaledPixmap = pixmap.scaled(size.width(), size.height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+	QPixmap scaledPixmap =
+		pixmap.scaled(size.width(), size.height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 	QPixmap newPixmap(size);
 	newPixmap.fill(color);
 	QPainter painter(&newPixmap);
 	painter.drawPixmap(double(size.width() - scaledPixmap.width()) * 0.5,
-					   double(size.height() - scaledPixmap.height()) * 0.5,
-					   scaledPixmap);
+					   double(size.height() - scaledPixmap.height()) * 0.5, scaledPixmap);
 	return newPixmap;
 }
 
@@ -245,17 +243,10 @@ bool isSpaceString(const QString &str)
 
 bool isValidFileName(const QString &fileName)
 {
-	if (fileName.isEmpty() ||
-		fileName.contains(":") ||
-		fileName.contains("\\") ||
-		fileName.contains("/") ||
-		fileName.contains(">") ||
-		fileName.contains("<") ||
-		fileName.contains("*") ||
-		fileName.contains("|") ||
-		fileName.contains("\"") ||
-		fileName.contains("?") ||
-		fileName.trimmed().isEmpty())
+	if (fileName.isEmpty() || fileName.contains(":") || fileName.contains("\\") ||
+		fileName.contains("/") || fileName.contains(">") || fileName.contains("<") ||
+		fileName.contains("*") || fileName.contains("|") || fileName.contains("\"") ||
+		fileName.contains("?") || fileName.trimmed().isEmpty())
 		return false;
 	return true;
 }
@@ -264,9 +255,12 @@ bool isValidFileName(const QString &fileName)
 
 bool isValidFileName_message(const QString &fileName)
 {
-	return isValidFileName(fileName) ? true : (DVGui::error(QObject::tr("The file name cannot be empty or contain any of the following "
-																			"characters: (new line) \\ / : * ? \" |")),
-											   false);
+	return isValidFileName(fileName)
+			   ? true
+			   : (DVGui::error(
+					  QObject::tr("The file name cannot be empty or contain any of the following "
+								  "characters: (new line) \\ / : * ? \" |")),
+				  false);
 }
 
 //-----------------------------------------------------------------------------
@@ -300,7 +294,8 @@ QString elideText(const QString &srcText, const QFont &font, int width)
 
 //-----------------------------------------------------------------------------
 
-QString elideText(const QString &srcText, const QFontMetrics &fm, int width, const QString &elideSymbol)
+QString elideText(const QString &srcText, const QFontMetrics &fm, int width,
+				  const QString &elideSymbol)
 {
 	QString text(srcText);
 
@@ -324,7 +319,9 @@ bool isResource(const QString &path)
 	const TFilePath fp(path.toStdWString());
 	TFileType::Type type = TFileType::getInfo(fp);
 
-	return (TFileType::isViewable(type) || type & TFileType::MESH_IMAGE || type == TFileType::AUDIO_LEVEL || type == TFileType::TABSCENE || type == TFileType::TOONZSCENE || fp.getType() == "tpl");
+	return (TFileType::isViewable(type) || type & TFileType::MESH_IMAGE ||
+			type == TFileType::AUDIO_LEVEL || type == TFileType::TABSCENE ||
+			type == TFileType::TOONZSCENE || fp.getType() == "tpl");
 }
 
 //-----------------------------------------------------------------------------
@@ -339,10 +336,7 @@ bool isResource(const QUrl &url)
 bool isResourceOrFolder(const QUrl &url)
 {
 	struct locals {
-		static inline bool isDir(const QString &path)
-		{
-			return QFileInfo(path).isDir();
-		}
+		static inline bool isDir(const QString &path) { return QFileInfo(path).isDir(); }
 	}; // locals
 
 	const QString &path = url.toLocalFile();
@@ -398,8 +392,7 @@ QPainterPath strokeToPainterPath(TStroke *stroke)
 // TabBarContainter
 //-----------------------------------------------------------------------------
 
-TabBarContainter::TabBarContainter(QWidget *parent)
-	: QFrame(parent)
+TabBarContainter::TabBarContainter(QWidget *parent) : QFrame(parent)
 {
 	setObjectName("TabBarContainer");
 	setFrameStyle(QFrame::StyledPanel);
@@ -420,8 +413,7 @@ void TabBarContainter::paintEvent(QPaintEvent *event)
 // ToolBarContainer
 //-----------------------------------------------------------------------------
 
-ToolBarContainer::ToolBarContainer(QWidget *parent)
-	: QFrame(parent)
+ToolBarContainer::ToolBarContainer(QWidget *parent) : QFrame(parent)
 {
 	setObjectName("ToolBarContainer");
 	setFrameStyle(QFrame::StyledPanel);

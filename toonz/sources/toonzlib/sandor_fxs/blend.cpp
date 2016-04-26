@@ -2,10 +2,10 @@
 
 #include "blend.h"
 
-//TPoint structure
+// TPoint structure
 #include "tgeometry.h"
 
-//Palette - pixel functions
+// Palette - pixel functions
 #include "tpalette.h"
 #include "tpixelutils.h"
 
@@ -25,7 +25,7 @@
 
 class BlurPattern
 {
-public:
+  public:
 	typedef std::vector<TPoint> SamplePath;
 
 	std::vector<TPoint> m_samples;
@@ -37,31 +37,33 @@ public:
 
 //---------------------------------------------------------------------------------
 
-//Builds the specified number of samples count, inside the specified distance
-//from the origin. If the pattern is radial, paths to the samples points are
-//calculated.
+// Builds the specified number of samples count, inside the specified distance
+// from the origin. If the pattern is radial, paths to the samples points are
+// calculated.
 BlurPattern::BlurPattern(double distance, unsigned int samplesCount, bool radial)
 {
 	const double randFactor = 2.0 * distance / RAND_MAX;
 
 	m_samples.resize(samplesCount);
 
-	//Build the samples
+	// Build the samples
 	unsigned int i;
 	for (i = 0; i < samplesCount; ++i) {
-		//NOTE: The following method ensures a perfectly flat probability distribution.
+		// NOTE: The following method ensures a perfectly flat probability distribution.
 
-		TPoint candidatePoint(tround(rand() * randFactor - distance), tround(rand() * randFactor - distance));
+		TPoint candidatePoint(tround(rand() * randFactor - distance),
+							  tround(rand() * randFactor - distance));
 		double distanceSq = sq(distance);
 		while (sq(candidatePoint.x) + sq(candidatePoint.y) > distanceSq)
-			candidatePoint = TPoint(tround(rand() * randFactor - distance), tround(rand() * randFactor - distance));
+			candidatePoint = TPoint(tround(rand() * randFactor - distance),
+									tround(rand() * randFactor - distance));
 
 		m_samples[i] = candidatePoint;
 	}
 
 	m_samplePaths.resize(samplesCount);
 
-	//If necessary, build the paths
+	// If necessary, build the paths
 	if (radial) {
 		for (i = 0; i < samplesCount; ++i) {
 			TPoint &sample = m_samples[i];
@@ -96,33 +98,26 @@ struct SelectionData {
 
 //=================================================================================
 
-// Implements an array of selection infos using bitfields. It seems that bitfields are more optimized than
-// using raw bits and bitwise operators, and use just the double of the space required with bit arrays.
+// Implements an array of selection infos using bitfields. It seems that bitfields are more
+// optimized than
+// using raw bits and bitwise operators, and use just the double of the space required with bit
+// arrays.
 class SelectionArrayPtr
 {
 	std::unique_ptr<SelectionData[]> m_buffer;
 
-public:
+  public:
 	inline void allocate(unsigned int count)
 	{
 		m_buffer.reset(new SelectionData[count]);
 		memset(m_buffer.get(), 0, count * sizeof(SelectionData));
 	}
 
-	inline void destroy()
-	{
-		m_buffer.reset();
-	}
+	inline void destroy() { m_buffer.reset(); }
 
-	inline SelectionData *data() const
-	{
-		return m_buffer.get();
-	}
+	inline SelectionData *data() const { return m_buffer.get(); }
 
-	inline SelectionData *data()
-	{
-		return m_buffer.get();
-	}
+	inline SelectionData *data() { return m_buffer.get(); }
 };
 
 //=================================================================================
@@ -134,75 +129,36 @@ class SelectionRaster
 
 	int m_wrap;
 
-public:
+  public:
 	SelectionRaster(TRasterCM32P cm);
 
 	void updateSelection(TRasterCM32P cm, const BlendParam &param);
 
-	SelectionData *data() const
-	{
-		return m_selection.data();
-	}
+	SelectionData *data() const { return m_selection.data(); }
 
-	SelectionData *data()
-	{
-		return m_selection.data();
-	}
+	SelectionData *data() { return m_selection.data(); }
 
-	void destroy()
-	{
-		m_selection.destroy();
-	}
+	void destroy() { m_selection.destroy(); }
 
-	bool isSelectedInk(int xy) const
-	{
-		return (m_selection.data() + xy)->m_selectedInk;
-	}
+	bool isSelectedInk(int xy) const { return (m_selection.data() + xy)->m_selectedInk; }
 
-	bool isSelectedInk(int x, int y) const
-	{
-		return isSelectedInk(x + y * m_wrap);
-	}
+	bool isSelectedInk(int x, int y) const { return isSelectedInk(x + y * m_wrap); }
 
-	bool isSelectedPaint(int xy) const
-	{
-		return (m_selection.data() + xy)->m_selectedPaint;
-	}
+	bool isSelectedPaint(int xy) const { return (m_selection.data() + xy)->m_selectedPaint; }
 
-	bool isSelectedPaint(int x, int y) const
-	{
-		return isSelectedPaint(x + y * m_wrap);
-	}
+	bool isSelectedPaint(int x, int y) const { return isSelectedPaint(x + y * m_wrap); }
 
-	bool isPureInk(int xy) const
-	{
-		return (m_selection.data() + xy)->m_pureInk;
-	}
+	bool isPureInk(int xy) const { return (m_selection.data() + xy)->m_pureInk; }
 
-	bool isPureInk(int x, int y) const
-	{
-		return isPureInk(x + y * m_wrap);
-	}
+	bool isPureInk(int x, int y) const { return isPureInk(x + y * m_wrap); }
 
-	bool isPurePaint(int xy) const
-	{
-		return (m_selection.data() + xy)->m_purePaint;
-	}
+	bool isPurePaint(int xy) const { return (m_selection.data() + xy)->m_purePaint; }
 
-	bool isPurePaint(int x, int y) const
-	{
-		return isPurePaint(x + y * m_wrap);
-	}
+	bool isPurePaint(int x, int y) const { return isPurePaint(x + y * m_wrap); }
 
-	bool isToneColor(int xy) const
-	{
-		return !(isPureInk(xy) || isPurePaint(xy));
-	}
+	bool isToneColor(int xy) const { return !(isPureInk(xy) || isPurePaint(xy)); }
 
-	bool isToneColor(int x, int y) const
-	{
-		return isToneColor(x + y * m_wrap);
-	}
+	bool isToneColor(int x, int y) const { return isToneColor(x + y * m_wrap); }
 };
 
 //---------------------------------------------------------------------------------
@@ -222,7 +178,7 @@ inline UCHAR linearSearch(const int *v, unsigned int vSize, int k)
 // but I guess this is the fastest version possible.
 inline UCHAR binarySearch(const int *v, unsigned int vSize, int k)
 {
-	//NOTE: v.size() > 0 due to external restrictions. See SelectionRaster's constructor.
+	// NOTE: v.size() > 0 due to external restrictions. See SelectionRaster's constructor.
 
 	int a = -1, b, c = vSize;
 
@@ -270,24 +226,24 @@ SelectionRaster::SelectionRaster(TRasterCM32P cm)
 
 void SelectionRaster::updateSelection(TRasterCM32P cm, const BlendParam &param)
 {
-	//Make a hard copy of color indexes. We do so since we absolutely prefer
-	//having them SORTED!
+	// Make a hard copy of color indexes. We do so since we absolutely prefer
+	// having them SORTED!
 	std::vector<int> cIndexes = param.colorsIndexes;
 	std::sort(cIndexes.begin(), cIndexes.end());
 
 	unsigned int lx = cm->getLx(), ly = cm->getLy(), wrap = cm->getWrap();
 
-	//Scan each cm pixel, looking if its ink or paint is in param's colorIndexes.
+	// Scan each cm pixel, looking if its ink or paint is in param's colorIndexes.
 	cm->lock();
 	TPixelCM32 *pix, *pixBegin = (TPixelCM32 *)cm->getRawData();
 
 	SelectionData *selData = data();
 
-	const int *v = &cIndexes[0]; //NOTE: cIndexes.size() > 0 due to external check.
+	const int *v = &cIndexes[0]; // NOTE: cIndexes.size() > 0 due to external check.
 	unsigned int vSize = cIndexes.size();
 	unsigned int i, j;
 
-	//NOTE: It seems that linear searches are definitely best for small color indexes.
+	// NOTE: It seems that linear searches are definitely best for small color indexes.
 	if (vSize > 50) {
 		for (i = 0; i < ly; ++i) {
 			pix = pixBegin + i * wrap;
@@ -339,11 +295,10 @@ inline void getFactors(int tone, double &inkFactor, double &paintFactor)
 //---------------------------------------------------------------------------------
 
 // Copies the cmIn paint and ink colors to the output rasters.
-void buildLayers(
-	const TRasterCM32P &cmIn, const std::vector<TPixel32> &palColors,
-	TRaster32P &inkRaster, TRaster32P &paintRaster)
+void buildLayers(const TRasterCM32P &cmIn, const std::vector<TPixel32> &palColors,
+				 TRaster32P &inkRaster, TRaster32P &paintRaster)
 {
-	//Separate cmIn by copying the ink & paint colors directly to the layer rasters.
+	// Separate cmIn by copying the ink & paint colors directly to the layer rasters.
 	TPixelCM32 *cmPix, *cmBegin = (TPixelCM32 *)cmIn->getRawData();
 	TPixel32 *inkPix = (TPixel32 *)inkRaster->getRawData();
 	TPixel32 *paintPix = (TPixel32 *)paintRaster->getRawData();
@@ -356,7 +311,7 @@ void buildLayers(
 			*inkPix = palColors[cmPix->getInk()];
 			*paintPix = palColors[cmPix->getPaint()];
 
-			//Should pure colors be checked...?
+			// Should pure colors be checked...?
 		}
 	}
 }
@@ -365,11 +320,8 @@ void buildLayers(
 
 // Returns true or false whether the selectedColor is the only selectable color
 // in the neighbourhood. If so, the blend copies it to the output layer pixel directly.
-inline bool isFlatNeighbourhood(
-	int selectedColor,
-	const TRasterCM32P &cmIn, const TPoint &pos,
-	const SelectionRaster &selRas,
-	const BlurPattern &blurPattern)
+inline bool isFlatNeighbourhood(int selectedColor, const TRasterCM32P &cmIn, const TPoint &pos,
+								const SelectionRaster &selRas, const BlurPattern &blurPattern)
 {
 	TPixelCM32 &pix = cmIn->pixels(pos.y)[pos.x];
 	int lx = cmIn->getLx(), ly = cmIn->getLy();
@@ -379,10 +331,10 @@ inline bool isFlatNeighbourhood(
 
 	const TPoint *samplePoint = blurPattern.m_samples.empty() ? 0 : &blurPattern.m_samples[0];
 
-	//Read the samples to determine if they only have posSelectedColor
+	// Read the samples to determine if they only have posSelectedColor
 	unsigned int i, samplesCount = blurPattern.m_samples.size();
 	for (i = 0; i < samplesCount; ++i, ++samplePoint) {
-		//Make sure the sample is inside the image
+		// Make sure the sample is inside the image
 		samplePix.x = pos.x + samplePoint->x;
 		samplePix.y = pos.y + samplePoint->y;
 
@@ -407,12 +359,9 @@ inline bool isFlatNeighbourhood(
 
 // Calculates the estimate of blend selection in the neighbourhood specified by
 // blurPattern.
-inline void addSamples(
-	const TRasterCM32P &cmIn, const TPoint &pos,
-	const TRaster32P &inkRas, const TRaster32P &paintRas,
-	const SelectionRaster &selRas,
-	const BlurPattern &blurPattern,
-	DoubleRGBMPixel &pixSum, double &factorsSum)
+inline void addSamples(const TRasterCM32P &cmIn, const TPoint &pos, const TRaster32P &inkRas,
+					   const TRaster32P &paintRas, const SelectionRaster &selRas,
+					   const BlurPattern &blurPattern, DoubleRGBMPixel &pixSum, double &factorsSum)
 {
 	double inkFactor, paintFactor;
 	unsigned int xy, j, l;
@@ -425,13 +374,13 @@ inline void addSamples(
 
 	unsigned int i, blurSamplesCount = blurPattern.m_samples.size();
 	for (i = 0; i < blurSamplesCount; ++i, ++samplePoint) {
-		//Add each samples contribute to the sum
+		// Add each samples contribute to the sum
 		samplePos.x = pos.x + samplePoint->x;
 		samplePos.y = pos.y + samplePoint->y;
 		if (samplePos.x < 0 || samplePos.y < 0 || samplePos.x >= lx || samplePos.y >= ly)
 			continue;
 
-		//Ensure that each pixel on the sample's path (if any) is selected
+		// Ensure that each pixel on the sample's path (if any) is selected
 		l = blurPattern.m_samplePaths[i].size();
 		pathPoint = blurPattern.m_samplePaths[i].empty() ? 0 : &blurPattern.m_samplePaths[i][0];
 		for (j = 0; j < l; ++j, ++pathPoint) {
@@ -483,83 +432,80 @@ typedef std::pair<TRaster32P, TRaster32P> RGBMRasterPair;
 
 // Performs a single color blending. This function can be repeatedly invoked to
 // perform multiple color blending.
-inline void doBlend(
-	const TRasterCM32P &cmIn,
-	RGBMRasterPair &inkLayer, RGBMRasterPair &paintLayer,
-	const SelectionRaster &selRas,
-	const std::vector<BlurPattern> &blurPatterns)
+inline void doBlend(const TRasterCM32P &cmIn, RGBMRasterPair &inkLayer, RGBMRasterPair &paintLayer,
+					const SelectionRaster &selRas, const std::vector<BlurPattern> &blurPatterns)
 {
-	//Declare some vars
+	// Declare some vars
 	unsigned int blurPatternsCount = blurPatterns.size();
 	int lx = cmIn->getLx(), ly = cmIn->getLy();
 	double totalFactor;
 
 	TPixelCM32 *cmPix, *cmBegin = (TPixelCM32 *)cmIn->getRawData();
 
-	TPixel32
-		*inkIn = (TPixel32 *)inkLayer.first->getRawData(),
-		*inkOut = (TPixel32 *)inkLayer.second->getRawData(),
-		*paintIn = (TPixel32 *)paintLayer.first->getRawData(),
-		*paintOut = (TPixel32 *)paintLayer.second->getRawData();
+	TPixel32 *inkIn = (TPixel32 *)inkLayer.first->getRawData(),
+			 *inkOut = (TPixel32 *)inkLayer.second->getRawData(),
+			 *paintIn = (TPixel32 *)paintLayer.first->getRawData(),
+			 *paintOut = (TPixel32 *)paintLayer.second->getRawData();
 
 	const BlurPattern *blurPattern, *blurPatternsBegin = &blurPatterns[0];
 	bool builtSamples = false;
 
 	DoubleRGBMPixel samplesSum;
 
-	//For every cmIn pixel
+	// For every cmIn pixel
 	TPoint pos;
 	SelectionData *selData = selRas.data();
 	cmPix = cmBegin;
 	for (pos.y = 0; pos.y < ly; ++pos.y, cmPix = cmBegin + pos.y * cmIn->getWrap())
-		for (pos.x = 0; pos.x < lx; ++pos.x, ++inkIn, ++inkOut, ++paintIn, ++paintOut, ++selData, ++cmPix) {
+		for (pos.x = 0; pos.x < lx;
+			 ++pos.x, ++inkIn, ++inkOut, ++paintIn, ++paintOut, ++selData, ++cmPix) {
 			blurPattern = blurPatternsBegin + (rand() % blurPatternsCount);
 
-			//Build the ink blend color
+			// Build the ink blend color
 			if (!selData->m_purePaint && selData->m_selectedInk) {
 				if (!builtSamples) {
-					//Build samples contributes
+					// Build samples contributes
 					totalFactor = 1.0;
 					samplesSum.r = samplesSum.g = samplesSum.b = samplesSum.m = 0.0;
 
 					if (!isFlatNeighbourhood(cmPix->getInk(), cmIn, pos, selRas, *blurPattern))
-						addSamples(cmIn, pos, inkLayer.first, paintLayer.first, selRas, *blurPattern,
-								   samplesSum, totalFactor);
+						addSamples(cmIn, pos, inkLayer.first, paintLayer.first, selRas,
+								   *blurPattern, samplesSum, totalFactor);
 
 					builtSamples = true;
 				}
 
-				//Output the blended pixel
+				// Output the blended pixel
 				inkOut->r = (samplesSum.r + inkIn->r) / totalFactor;
 				inkOut->g = (samplesSum.g + inkIn->g) / totalFactor;
 				inkOut->b = (samplesSum.b + inkIn->b) / totalFactor;
 				inkOut->m = (samplesSum.m + inkIn->m) / totalFactor;
 			} else {
-				//If the color is not blended, then just copy the old layer pixel
+				// If the color is not blended, then just copy the old layer pixel
 				*inkOut = *inkIn;
 			}
 
-			//Build the paint blend color
+			// Build the paint blend color
 			if (!selData->m_pureInk && selData->m_selectedPaint) {
 				if (!builtSamples) {
-					//Build samples contributes
+					// Build samples contributes
 					totalFactor = 1.0;
 					samplesSum.r = samplesSum.g = samplesSum.b = samplesSum.m = 0.0;
 
 					if (!isFlatNeighbourhood(cmPix->getPaint(), cmIn, pos, selRas, *blurPattern))
-						addSamples(cmIn, pos, inkLayer.first, paintLayer.first, selRas, *blurPattern,
-								   samplesSum, totalFactor);
+						addSamples(cmIn, pos, inkLayer.first, paintLayer.first, selRas,
+								   *blurPattern, samplesSum, totalFactor);
 
 					builtSamples = true;
 				}
 
-				//Output the blended pixel
+				// Output the blended pixel
 				paintOut->r = (samplesSum.r + paintIn->r) / totalFactor;
 				paintOut->g = (samplesSum.g + paintIn->g) / totalFactor;
 				paintOut->b = (samplesSum.b + paintIn->b) / totalFactor;
 				paintOut->m = (samplesSum.m + paintIn->m) / totalFactor;
 			} else {
-				//If the color is not blended, then just copy the old layer pixel
+				// If the color is not blended, then just copy the old layer pixel
 				*paintOut = *paintIn;
 			}
 
@@ -574,13 +520,13 @@ typedef std::vector<BlurPattern> BlurPatternContainer;
 //---------------------------------------------------------------------------------
 
 /*! This function performs a group of <a> spatial color blending <\a> operations on Toonz Images.
-    The BlendParam structure stores the blend options recognized by this function; it includes
-    a list of the palette indexes involved in the blend operation, plus:
-    \li \b Intensity represents the \a radius of the blur operation between blend colors.
-    \li \b Smoothness is the number of samples per pixel used to approximate the blur.
-    <li> <b> Stop at Contour <\b> specifies if lines from pixels to neighbouring samples
-         should not trespass color indexes not included in the blend operation <\li>
-    The succession of input blend parameters are applied in the order.
+	The BlendParam structure stores the blend options recognized by this function; it includes
+	a list of the palette indexes involved in the blend operation, plus:
+	\li \b Intensity represents the \a radius of the blur operation between blend colors.
+	\li \b Smoothness is the number of samples per pixel used to approximate the blur.
+	<li> <b> Stop at Contour <\b> specifies if lines from pixels to neighbouring samples
+		 should not trespass color indexes not included in the blend operation <\li>
+	The succession of input blend parameters are applied in the order.
 */
 
 template <typename PIXEL>
@@ -588,8 +534,8 @@ void blend(TToonzImageP ti, TRasterPT<PIXEL> rasOut, const std::vector<BlendPara
 {
 	assert(ti->getRaster()->getSize() == rasOut->getSize());
 
-	//Extract the interesting raster. It should be the savebox of passed cmap, plus - if
-	//some param has the 0 index as blending color - the intensity of that blend param.
+	// Extract the interesting raster. It should be the savebox of passed cmap, plus - if
+	// some param has the 0 index as blending color - the intensity of that blend param.
 	unsigned int i, j;
 	TRect saveBox(ti->getSavebox());
 
@@ -603,14 +549,14 @@ void blend(TToonzImageP ti, TRasterPT<PIXEL> rasOut, const std::vector<BlendPara
 	TRasterCM32P cmIn(ti->getRaster()->extract(saveBox));
 	TRasterPT<PIXEL> rasOutExtract = rasOut->extract(saveBox);
 
-	//Ensure that cmIn and rasOut have the same size
+	// Ensure that cmIn and rasOut have the same size
 	unsigned int lx = cmIn->getLx(), ly = cmIn->getLy();
 
-	//Build the pure colors infos
+	// Build the pure colors infos
 	SelectionRaster selectionRaster(cmIn);
 
-	//Now, build a little group of BlurPatterns - and for each, one for passed param.
-	//A small number of patterns per param is needed to make the pattern look not ever the same.
+	// Now, build a little group of BlurPatterns - and for each, one for passed param.
+	// A small number of patterns per param is needed to make the pattern look not ever the same.
 	const int blurPatternsPerParam = 10;
 	std::vector<BlurPatternContainer> blurGroup(params.size());
 
@@ -619,20 +565,24 @@ void blend(TToonzImageP ti, TRasterPT<PIXEL> rasOut, const std::vector<BlendPara
 		blurContainer.reserve(blurPatternsPerParam);
 
 		for (j = 0; j < blurPatternsPerParam; ++j)
-			blurContainer.push_back(BlurPattern(params[i].intensity, params[i].smoothness, params[i].stopAtCountour));
+			blurContainer.push_back(
+				BlurPattern(params[i].intensity, params[i].smoothness, params[i].stopAtCountour));
 	}
 
-	//Build the palette
+	// Build the palette
 	TPalette *palette = ti->getPalette();
 	std::vector<TPixel32> paletteColors;
 	paletteColors.resize(palette->getStyleCount());
 	for (i = 0; i < paletteColors.size(); ++i)
 		paletteColors[i] = premultiply(palette->getStyle(i)->getAverageColor());
 
-	//Build the 4 auxiliary rasters for the blending procedure: they are ink / paint versus input / output in the blend.
-	//The output raster is reused to spare some memory - it should be, say, the inkLayer's second at the end of the overall
-	//blending procedure. It could be the first, without the necessity of clearing it before blending the layers, but things
-	//get more complicated when PIXEL is TPixel64...
+	// Build the 4 auxiliary rasters for the blending procedure: they are ink / paint versus input /
+	// output in the blend.
+	// The output raster is reused to spare some memory - it should be, say, the inkLayer's second
+	// at the end of the overall
+	// blending procedure. It could be the first, without the necessity of clearing it before
+	// blending the layers, but things
+	// get more complicated when PIXEL is TPixel64...
 	RGBMRasterPair inkLayer, paintLayer;
 
 	TRaster32P rasOut32P_1(lx, ly, lx, (TPixel32 *)rasOut->getRawData(), false);
@@ -653,7 +603,7 @@ void blend(TToonzImageP ti, TRasterPT<PIXEL> rasOut, const std::vector<BlendPara
 	paintLayer.first->clear();
 	paintLayer.second->clear();
 
-	//Now, we have to perform the blur of each of the cm's pixels.
+	// Now, we have to perform the blur of each of the cm's pixels.
 	cmIn->lock();
 	rasOut->lock();
 
@@ -662,10 +612,10 @@ void blend(TToonzImageP ti, TRasterPT<PIXEL> rasOut, const std::vector<BlendPara
 	paintLayer.first->lock();
 	paintLayer.second->lock();
 
-	//Convert the initial cmIn to fullcolor ink - paint layers
+	// Convert the initial cmIn to fullcolor ink - paint layers
 	buildLayers(cmIn, paletteColors, inkLayer.first, paintLayer.first);
 
-	//Perform the blend on separated ink - paint layers
+	// Perform the blend on separated ink - paint layers
 	for (i = 0; i < params.size(); ++i) {
 		if (params[i].colorsIndexes.size() == 0)
 			continue;
@@ -677,16 +627,16 @@ void blend(TToonzImageP ti, TRasterPT<PIXEL> rasOut, const std::vector<BlendPara
 		tswap(paintLayer.first, paintLayer.second);
 	}
 
-	//Release the unnecessary rasters
+	// Release the unnecessary rasters
 	inkLayer.second->unlock();
 	paintLayer.second->unlock();
 	inkLayer.second = TRaster32P();
 	paintLayer.second = TRaster32P();
 
-	//Clear rasOut - since it was reused to spare space...
+	// Clear rasOut - since it was reused to spare space...
 	rasOut->clear();
 
-	//Add the ink & paint layers on the output raster
+	// Add the ink & paint layers on the output raster
 	double PIXELmaxChannelValue = PIXEL::maxChannelValue;
 	double toPIXELFactor = PIXELmaxChannelValue / (double)TPixel32::maxChannelValue;
 	double inkFactor, paintFactor;
@@ -705,10 +655,14 @@ void blend(TToonzImageP ti, TRasterPT<PIXEL> rasOut, const std::vector<BlendPara
 		for (j = 0; j < lx; ++j, ++outPix, ++cmPix, ++inkPix, ++paintPix) {
 			getFactors(cmPix->getTone(), inkFactor, paintFactor);
 
-			outPix->r = tcrop(toPIXELFactor * (inkFactor * inkPix->r + paintFactor * paintPix->r), 0.0, PIXELmaxChannelValue);
-			outPix->g = tcrop(toPIXELFactor * (inkFactor * inkPix->g + paintFactor * paintPix->g), 0.0, PIXELmaxChannelValue);
-			outPix->b = tcrop(toPIXELFactor * (inkFactor * inkPix->b + paintFactor * paintPix->b), 0.0, PIXELmaxChannelValue);
-			outPix->m = tcrop(toPIXELFactor * (inkFactor * inkPix->m + paintFactor * paintPix->m), 0.0, PIXELmaxChannelValue);
+			outPix->r = tcrop(toPIXELFactor * (inkFactor * inkPix->r + paintFactor * paintPix->r),
+							  0.0, PIXELmaxChannelValue);
+			outPix->g = tcrop(toPIXELFactor * (inkFactor * inkPix->g + paintFactor * paintPix->g),
+							  0.0, PIXELmaxChannelValue);
+			outPix->b = tcrop(toPIXELFactor * (inkFactor * inkPix->b + paintFactor * paintPix->b),
+							  0.0, PIXELmaxChannelValue);
+			outPix->m = tcrop(toPIXELFactor * (inkFactor * inkPix->m + paintFactor * paintPix->m),
+							  0.0, PIXELmaxChannelValue);
 		}
 	}
 
@@ -718,9 +672,11 @@ void blend(TToonzImageP ti, TRasterPT<PIXEL> rasOut, const std::vector<BlendPara
 	cmIn->unlock();
 	rasOut->unlock();
 
-	//Destroy the auxiliary bitmaps
+	// Destroy the auxiliary bitmaps
 	selectionRaster.destroy();
 }
 
-template void blend<TPixel32>(TToonzImageP cmIn, TRasterPT<TPixel32> rasOut, const std::vector<BlendParam> &params);
-template void blend<TPixel64>(TToonzImageP cmIn, TRasterPT<TPixel64> rasOut, const std::vector<BlendParam> &params);
+template void blend<TPixel32>(TToonzImageP cmIn, TRasterPT<TPixel32> rasOut,
+							  const std::vector<BlendParam> &params);
+template void blend<TPixel64>(TToonzImageP cmIn, TRasterPT<TPixel64> rasOut,
+							  const std::vector<BlendParam> &params);

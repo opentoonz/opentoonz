@@ -32,7 +32,7 @@ using namespace DVGui;
 
 class InfoViewerImp
 {
-public:
+  public:
 	enum {
 		eFullpath = 0,
 		eFileType,
@@ -64,7 +64,7 @@ public:
 		eOutputPath,
 		eEndianess,
 
-		//sound info
+		// sound info
 		eLength,
 		eChannels,
 		eSampleRate,
@@ -88,7 +88,7 @@ public:
 	void setFileInfo(const TFileStatus &status);
 	void setImageInfo();
 	void setSoundInfo();
-	//void cleanFileInfo();
+	// void cleanFileInfo();
 	void cleanLevelInfo();
 	void setToonzSceneInfo();
 	void setPaletteInfo();
@@ -102,25 +102,20 @@ public:
 	void create(int index, QString str);
 	void loadPalette(const TFilePath &path);
 
-	inline void setVal(int index, const QString &str)
-	{
-		m_labels[index].second->setText(str);
-	}
+	inline void setVal(int index, const QString &str) { m_labels[index].second->setText(str); }
 
-public slots:
+  public slots:
 
 	bool setItem(const TLevelP &level, TPalette *palette, const TFilePath &path);
 };
 
 //----------------------------------------------------------------
 
-InfoViewer::InfoViewer(QWidget *parent)
-	: Dialog()
-	, m_imp(new InfoViewerImp())
+InfoViewer::InfoViewer(QWidget *parent) : Dialog(), m_imp(new InfoViewerImp())
 {
 	setWindowTitle(tr("File Info"));
 	setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
-	//setAttribute(Qt::WA_DeleteOnClose);
+	// setAttribute(Qt::WA_DeleteOnClose);
 
 	m_parent = parent;
 
@@ -153,7 +148,7 @@ void InfoViewer::hideEvent(QHideEvent *)
 
 	if (m_parent) {
 		m_parent->setWindowModality(Qt::ApplicationModal);
-		//setWindowModality(Qt::NonModal);
+		// setWindowModality(Qt::NonModal);
 	}
 }
 
@@ -161,7 +156,7 @@ void InfoViewer::showEvent(QShowEvent *)
 {
 	if (m_parent) {
 		m_parent->setWindowModality(Qt::NonModal);
-		//setWindowModality(Qt::WindowModal);
+		// setWindowModality(Qt::WindowModal);
 	}
 }
 
@@ -204,7 +199,8 @@ void InfoViewerImp::create(int index, QString str)
 //----------------------------------------------------------------
 
 InfoViewerImp::InfoViewerImp()
-	: m_palette(0), m_framesLabel("Current Frame: "), m_framesSlider(), m_history(), m_historyLabel("File History")
+	: m_palette(0), m_framesLabel("Current Frame: "), m_framesSlider(), m_history(),
+	  m_historyLabel("File History")
 {
 	setLabelStyle(&m_framesLabel);
 
@@ -223,7 +219,7 @@ InfoViewerImp::InfoViewerImp()
 	create(eModified, QObject::tr("Modified:     "));
 	create(eLastAccess, QObject::tr("Last Access:  "));
 
-	//level info
+	// level info
 
 	create(eImageSize, QObject::tr("Image Size:   "));
 	create(eSaveBox, QObject::tr("SaveBox:      "));
@@ -248,7 +244,7 @@ InfoViewerImp::InfoViewerImp()
 	create(eOutputPath, QObject::tr("Output Path:      "));
 	create(eEndianess, QObject::tr("Endianess:      "));
 
-	//sound info
+	// sound info
 	create(eLength, QObject::tr("Length:       "));
 	create(eChannels, QObject::tr("Channels: "));
 	create(eSampleRate, QObject::tr("Sample Rate: "));
@@ -256,7 +252,7 @@ InfoViewerImp::InfoViewerImp()
 
 	m_historyLabel.setStyleSheet("color: rgb(0, 0, 200);");
 	m_history.setStyleSheet("font-size: 12px; font-family: \"courier\";");
-	//m_history.setStyleSheet("font-family: \"courier\";");
+	// m_history.setStyleSheet("font-family: \"courier\";");
 	m_history.setReadOnly(true);
 	m_history.setFixedWidth(490);
 }
@@ -290,7 +286,7 @@ InfoViewerImp::~InfoViewerImp()
 
 void InfoViewerImp::setFileInfo(const TFileStatus &status)
 {
-	//m_fPath.setText(status.
+	// m_fPath.setText(status.
 }
 
 //----------------------------------------------------------------
@@ -363,7 +359,9 @@ bool InfoViewerImp::setLabel(TPropertyGroup *pg, int index, std::string type)
 void InfoViewerImp::setImageInfo()
 {
 	if (m_path != TFilePath() && !m_fids.empty())
-		setGeneralFileInfo(m_path.getType() == "tlv" || !m_path.isLevelName() ? m_path : m_path.withFrame(m_fids[m_currentIndex]));
+		setGeneralFileInfo(m_path.getType() == "tlv" || !m_path.isLevelName()
+							   ? m_path
+							   : m_path.withFrame(m_fids[m_currentIndex]));
 
 	assert(m_level);
 
@@ -379,17 +377,22 @@ void InfoViewerImp::setImageInfo()
 	if (!m_fids.empty() && lr && ii) {
 		setVal(eImageSize, QString::number(ii->m_lx) + " X " + QString::number(ii->m_ly));
 		if (ii->m_x0 <= ii->m_x1)
-			setVal(eSaveBox, "(" + QString::number(ii->m_x0) + ", " + QString::number(ii->m_y0) + ", " + QString::number(ii->m_x1) + ", " + QString::number(ii->m_y1) + ")");
+			setVal(eSaveBox, "(" + QString::number(ii->m_x0) + ", " + QString::number(ii->m_y0) +
+								 ", " + QString::number(ii->m_x1) + ", " +
+								 QString::number(ii->m_y1) + ")");
 		if (ii->m_bitsPerSample > 0)
 			setVal(eBitsSample, QString::number(ii->m_bitsPerSample));
 		if (ii->m_samplePerPixel > 0)
 			setVal(eSamplePixel, QString::number(ii->m_samplePerPixel));
 		if (ii->m_dpix > 0 || ii->m_dpiy > 0)
-			setVal(eDpi, "(" + QString::number(ii->m_dpix) + ", " + QString::number(ii->m_dpiy) + ")");
+			setVal(eDpi,
+				   "(" + QString::number(ii->m_dpix) + ", " + QString::number(ii->m_dpiy) + ")");
 		TPropertyGroup *pg = ii->m_properties;
 		if (pg) {
 			setLabel(pg, eOrientation, "Orientation");
-			if (!setLabel(pg, eCompression, "Compression") && !setLabel(pg, eCompression, "Compression Type") && !setLabel(pg, eCompression, "RLE-Compressed"))
+			if (!setLabel(pg, eCompression, "Compression") &&
+				!setLabel(pg, eCompression, "Compression Type") &&
+				!setLabel(pg, eCompression, "RLE-Compressed"))
 				setLabel(pg, eCompression, "File Compression");
 			setLabel(pg, eQuality, "Quality");
 			setLabel(pg, eSmoothing, "Smoothing");
@@ -422,13 +425,14 @@ void InfoViewerImp::setImageInfo()
 	if (img) {
 		TRect r = convert(timg->getBBox());
 		if (r.x0 <= r.x1)
-			setVal(eSaveBox, "(" + QString::number(r.x0) + ", " + QString::number(r.y0) + ", " + QString::number(r.x1) + ", " + QString::number(r.y1) + ")");
+			setVal(eSaveBox, "(" + QString::number(r.x0) + ", " + QString::number(r.y0) + ", " +
+								 QString::number(r.x1) + ", " + QString::number(r.y1) + ")");
 	}
 
 	double dpix, dpiy;
 
 	if (timg) {
-		//setVal(eHPos, QString::number(timg->gethPos()));
+		// setVal(eHPos, QString::number(timg->gethPos()));
 		timg->getDpi(dpix, dpiy);
 		setVal(eDpi, "(" + QString::number(dpix) + ", " + QString::number(dpiy) + ")");
 		TDimension dim = timg->getRaster()->getSize();
@@ -442,7 +446,7 @@ void InfoViewerImp::setImageInfo()
 	} else if (vimg)
 		m_palette = vimg->getPalette();
 
-	//TImageP img = m_level->frame(m_fids[m_currentIndex]);
+	// TImageP img = m_level->frame(m_fids[m_currentIndex]);
 }
 
 //----------------------------------------------------------------
@@ -584,7 +588,8 @@ bool InfoViewerImp::setItem(const TLevelP &level, TPalette *palette, const TFile
 		assert(!m_level);
 
 		if (!TSystem::doesExistFileOrLevel(m_path)) {
-			DVGui::warning(QObject::tr("The file %1 does not exist.").arg(QString::fromStdWString(path.getWideString())));
+			DVGui::warning(QObject::tr("The file %1 does not exist.")
+							   .arg(QString::fromStdWString(path.getWideString())));
 
 			return false;
 		}
@@ -623,8 +628,7 @@ bool InfoViewerImp::setItem(const TLevelP &level, TPalette *palette, const TFile
 			// Image or level of images case
 
 			// TLVs are not intended as movie file here (why?). Neither are those
-			bool isMovieFile =
-				(ext != "tlv" && m_formats.contains(ext) && !m_path.isLevelName());
+			bool isMovieFile = (ext != "tlv" && m_formats.contains(ext) && !m_path.isLevelName());
 
 			m_frameCount = m_level->getFrameCount();
 			assert(m_frameCount);

@@ -43,21 +43,20 @@ class SVNRevertDialog : public DVGui::Dialog
 
 	int m_sceneIconAdded;
 
-public:
-	SVNRevertDialog(QWidget *parent,
-					const QString &workingDir, const QStringList &files, bool folderOnly = false,
-					int sceneIconAdded = 0);
+  public:
+	SVNRevertDialog(QWidget *parent, const QString &workingDir, const QStringList &files,
+					bool folderOnly = false, int sceneIconAdded = 0);
 
 	void checkFiles();
 
-private:
+  private:
 	void switchToCloseButton();
 
 	void revertFiles();
 
 	void initTreeWidget();
 
-protected slots:
+  protected slots:
 
 	void onRevertButtonClicked();
 	void onRevertDone();
@@ -67,7 +66,7 @@ protected slots:
 
 	void onRevertSceneContentsToggled(bool checked);
 
-signals:
+  signals:
 	void done(const QStringList &);
 };
 
@@ -92,23 +91,23 @@ class SVNRevertFrameRangeDialog : public DVGui::Dialog
 	QList<QString> m_filesToRevert;
 	QStringList m_files;
 
-public:
-	SVNRevertFrameRangeDialog(QWidget *parent,
-							  const QString &workingDir, const QString &file, const QString &tempFileName);
+  public:
+	SVNRevertFrameRangeDialog(QWidget *parent, const QString &workingDir, const QString &file,
+							  const QString &tempFileName);
 
-private:
+  private:
 	void switchToCloseButton();
 	void revertFiles();
 
 	void checkFiles();
 
-protected slots:
+  protected slots:
 	void onRevertButtonClicked();
 	void onError(const QString &);
 	void onStatusRetrieved(const QString &);
 	void onRevertDone();
 
-signals:
+  signals:
 	void done(const QStringList &);
 };
 

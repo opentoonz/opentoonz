@@ -31,7 +31,7 @@ namespace DVGui
 {
 class DoubleField;
 class IntField;
-//class LineEdit;
+// class LineEdit;
 class CheckBox;
 }
 
@@ -39,7 +39,7 @@ class CheckBox;
 // TrackerPopup
 //-----------------------------------------------------------------------------
 
-//!La classe si occupa di visualizzare il popup "convert-To-Vector Settings".
+//! La classe si occupa di visualizzare il popup "convert-To-Vector Settings".
 /*!Consente di cambiare modalita' di vettorizzazione e quindi in funzione
    di questa di cambiare i parametri da settare.*/
 
@@ -57,7 +57,7 @@ class TrackerPopup : public DVGui::Dialog
 	DVGui::IntField *m_from;
 	DVGui::IntField *m_to;
 
-public:
+  public:
 #if QT_VERSION >= 0x050500
 	TrackerPopup(QWidget *parent = 0, Qt::WindowFlags flags = Qt::Tool);
 #else
@@ -66,14 +66,14 @@ public:
 
 	bool apply();
 
-private:
+  private:
 	DVGui::ProgressDialog *m_progress;
 	MyThread *m_myThread;
 	Tracker *m_tracker;
 	int m_progressBarIndex;
 	bool m_stoppedProcess;
-public slots:
-	//!Se la vettorializzazione e' andata a buon fine chiude il popup.
+  public slots:
+	//! Se la vettorializzazione e' andata a buon fine chiude il popup.
 	void onTrack();
 	//! Inizia il tracking in un nuovo thread
 	void startNewThread();
@@ -96,7 +96,7 @@ class Tracker
 	int m_framesNumber;
 	short m_trackerCount;
 	int *m_numstart;
-	//TLevel::Iterator m_currentFrameIt;
+	// TLevel::Iterator m_currentFrameIt;
 	int m_currentFrame;
 	int m_num;
 
@@ -116,18 +116,16 @@ class Tracker
 	TLevelP m_level;
 	TAffine m_affine;
 
-public:
-	Tracker(double threshold, double sensibility,
-			int activeBackground, int manageOcclusion,
-			int variationWindow, int frameStart,
-			int framesNumber);
+  public:
+	Tracker(double threshold, double sensibility, int activeBackground, int manageOcclusion,
+			int variationWindow, int frameStart, int framesNumber);
 	~Tracker();
 	// ritorna true se è tutto ok
 	bool trackCurrentFrame();
 	int getFramesNumber() { return m_framesNumber; }
 	int getStartFrameIndex() { return m_indexFrameStart; }
 	QString getLastError() { return getErrorMessage(m_lastErrorCode); }
-private:
+  private:
 	// Inizializzazione Variabili
 	// ritorna true se è tutto ok
 	bool setup();
@@ -140,13 +138,13 @@ class MyThread : public QThread
 {
 	Tracker *m_tracker;
 
-public:
+  public:
 	MyThread(Tracker *tracker);
 	void run();
 	// Ritorna 0 se non c'è stato alcun errore nell'esecuzione del thread
 	// altrimenti ritorna il codice di errore del tracker
 	int getLastError() { return m_trackerError; };
-private:
+  private:
 	int m_trackerError;
 };
 

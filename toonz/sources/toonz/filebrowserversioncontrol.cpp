@@ -37,7 +37,8 @@ QStringList getLevelFileNames(TFilePath path)
 
 DvItemListModel::Status FileBrowser::getItemVersionControlStatus(const FileBrowser::Item &item)
 {
-	DvDirVersionControlNode *node = dynamic_cast<DvDirVersionControlNode *>(m_folderTreeView->getCurrentNode());
+	DvDirVersionControlNode *node =
+		dynamic_cast<DvDirVersionControlNode *>(m_folderTreeView->getCurrentNode());
 	return m_folderTreeView->getItemVersionControlStatus(node, item.m_path);
 }
 
@@ -52,7 +53,8 @@ void FileBrowser::setupVersionControlCommand(QString &file, QString &path)
 	fs->getSelectedFiles(filePaths);
 	if (filePaths.empty())
 		return;
-	DvDirVersionControlNode *node = dynamic_cast<DvDirVersionControlNode *>(m_folderTreeView->getCurrentNode());
+	DvDirVersionControlNode *node =
+		dynamic_cast<DvDirVersionControlNode *>(m_folderTreeView->getCurrentNode());
 	if (!node)
 		return;
 
@@ -70,7 +72,8 @@ void FileBrowser::setupVersionControlCommand(QString &file, QString &path)
 
 //-----------------------------------------------------------------------------
 
-void FileBrowser::setupVersionControlCommand(QStringList &files, QString &path, int &sceneIconsCount)
+void FileBrowser::setupVersionControlCommand(QStringList &files, QString &path,
+											 int &sceneIconsCount)
 {
 	std::vector<TFilePath> filePaths;
 	FileSelection *fs = dynamic_cast<FileSelection *>(m_itemViewer->getPanel()->getSelection());
@@ -80,7 +83,8 @@ void FileBrowser::setupVersionControlCommand(QStringList &files, QString &path, 
 	if (filePaths.empty())
 		return;
 
-	DvDirVersionControlNode *node = dynamic_cast<DvDirVersionControlNode *>(m_folderTreeView->getCurrentNode());
+	DvDirVersionControlNode *node =
+		dynamic_cast<DvDirVersionControlNode *>(m_folderTreeView->getCurrentNode());
 	if (!node)
 		return;
 
@@ -159,7 +163,8 @@ void FileBrowser::editVersionControl()
 	bool hasCurrentSceneFile = false;
 
 	// Check the scene file
-	TFilePath fp = TApp::instance()->getCurrentScene()->getScene()->getScenePath().withoutParentDir();
+	TFilePath fp =
+		TApp::instance()->getCurrentScene()->getScene()->getScenePath().withoutParentDir();
 	if (files.contains(toQString(fp)))
 		hasCurrentSceneFile = true;
 
@@ -181,7 +186,8 @@ void FileBrowser::editVersionControl()
 	}
 
 	if (hasCurrentSceneFile) {
-		DVGui::warning(tr("Some files that you want to edit are currently opened. Close them first."));
+		DVGui::warning(
+			tr("Some files that you want to edit are currently opened. Close them first."));
 		return;
 	}
 
@@ -204,7 +210,9 @@ void FileBrowser::editFrameRangeVersionControl()
 		VersionControl::instance()->lockFrameRange(this, path, list);
 	} else {
 		const std::set<int> &indices = m_itemViewer->getSelectedIndices();
-		int frameCount = m_itemViewer->getModel()->getItemData(*indices.begin(), DvItemListModel::FrameCount).toInt();
+		int frameCount = m_itemViewer->getModel()
+							 ->getItemData(*indices.begin(), DvItemListModel::FrameCount)
+							 .toInt();
 
 		VersionControl::instance()->lockFrameRange(this, path, file, frameCount);
 	}
@@ -251,7 +259,8 @@ void FileBrowser::revertFrameRangeVersionControl()
 	if (file.isEmpty() || path.isEmpty())
 		return;
 
-	DvDirVersionControlNode *node = dynamic_cast<DvDirVersionControlNode *>(m_folderTreeView->getCurrentNode());
+	DvDirVersionControlNode *node =
+		dynamic_cast<DvDirVersionControlNode *>(m_folderTreeView->getCurrentNode());
 	if (!node)
 		return;
 
@@ -265,7 +274,9 @@ void FileBrowser::revertFrameRangeVersionControl()
 		QString hostName = TSystem::getHostName();
 
 		TFilePath fp(s.m_path.toStdWString());
-		QString tempFileName = QString::fromStdWString(fp.getWideName()) + "_" + userName + "_" + hostName + "_" + from + "-" + to + "." + QString::fromStdString(fp.getType());
+		QString tempFileName = QString::fromStdWString(fp.getWideName()) + "_" + userName + "_" +
+							   hostName + "_" + from + "-" + to + "." +
+							   QString::fromStdString(fp.getType());
 
 		TFilePath fullPath = node->getPath() + tempFileName.toStdWString();
 
@@ -281,7 +292,9 @@ void FileBrowser::revertFrameRangeVersionControl()
 		int listCount = list.size();
 
 		if (listCount > 0) {
-			QString prefix = QString::fromStdWString(fp.getWideName()) + "_" + VersionControl::instance()->getUserName() + "_" + TSystem::getHostName();
+			QString prefix = QString::fromStdWString(fp.getWideName()) + "_" +
+							 VersionControl::instance()->getUserName() + "_" +
+							 TSystem::getHostName();
 
 			for (int i = 0; i < listCount; i++) {
 				QString str = list.at(i);
@@ -308,7 +321,8 @@ void FileBrowser::updateAndEditVersionControl()
 	fs->getSelectedFiles(filePaths);
 	if (filePaths.empty())
 		return;
-	DvDirVersionControlNode *node = dynamic_cast<DvDirVersionControlNode *>(m_folderTreeView->getCurrentNode());
+	DvDirVersionControlNode *node =
+		dynamic_cast<DvDirVersionControlNode *>(m_folderTreeView->getCurrentNode());
 	if (!node)
 		return;
 
@@ -382,7 +396,8 @@ void FileBrowser::unlockVersionControl()
 	bool hasCurrentSceneFile = false;
 
 	// Check the scene file
-	TFilePath fp = TApp::instance()->getCurrentScene()->getScene()->getScenePath().withoutParentDir();
+	TFilePath fp =
+		TApp::instance()->getCurrentScene()->getScene()->getScenePath().withoutParentDir();
 	if (files.contains(toQString(fp)))
 		hasCurrentSceneFile = true;
 
@@ -404,7 +419,8 @@ void FileBrowser::unlockVersionControl()
 	}
 
 	if (hasCurrentSceneFile) {
-		DVGui::warning(tr("Some files that you want to unlock are currently opened. Close them first."));
+		DVGui::warning(
+			tr("Some files that you want to unlock are currently opened. Close them first."));
 		return;
 	}
 	vc->unlock(this, path, files, sceneIconsCount);
@@ -497,7 +513,8 @@ void FileBrowser::getRevisionHistory()
 	files.removeAt(files.indexOf(file));
 
 	SVNTimeline *timelineDialog = new SVNTimeline(this, path, file, files);
-	connect(timelineDialog, SIGNAL(commandDone(const QStringList &)), this, SLOT(onVersionControlCommandDone(const QStringList &)));
+	connect(timelineDialog, SIGNAL(commandDone(const QStringList &)), this,
+			SLOT(onVersionControlCommandDone(const QStringList &)));
 
 	timelineDialog->show();
 	timelineDialog->raise();
@@ -507,7 +524,8 @@ void FileBrowser::getRevisionHistory()
 
 void FileBrowser::onVersionControlCommandDone(const QStringList &files)
 {
-	DvDirVersionControlNode *node = dynamic_cast<DvDirVersionControlNode *>(m_folderTreeView->getCurrentNode());
+	DvDirVersionControlNode *node =
+		dynamic_cast<DvDirVersionControlNode *>(m_folderTreeView->getCurrentNode());
 	if (!node)
 		return;
 
@@ -529,7 +547,8 @@ void FileBrowser::onVersionControlCommandDone(const QStringList &files)
 		if (!path.isAbsolute()) {
 			TFilePath tempPath = TFilePath(node->getPath()) + path;
 			if (!TFileStatus(path).doesExist()) {
-				DvDirVersionControlNode *parent = dynamic_cast<DvDirVersionControlNode *>(node->getParent());
+				DvDirVersionControlNode *parent =
+					dynamic_cast<DvDirVersionControlNode *>(node->getParent());
 				while (parent && !TFileStatus(tempPath).doesExist()) {
 					tempPath = TFilePath(node->getPath()) + path;
 					parent = dynamic_cast<DvDirVersionControlNode *>(parent->getParent());
@@ -572,7 +591,8 @@ void FileBrowser::showLockInformation()
 	if (filePaths.empty())
 		return;
 
-	DvDirVersionControlNode *node = dynamic_cast<DvDirVersionControlNode *>(m_folderTreeView->getCurrentNode());
+	DvDirVersionControlNode *node =
+		dynamic_cast<DvDirVersionControlNode *>(m_folderTreeView->getCurrentNode());
 	if (!node)
 		return;
 

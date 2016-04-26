@@ -12,7 +12,7 @@ class TFilePath;
 
 class TaskConfigPanel : public TWidget
 {
-public:
+  public:
 	TaskConfigPanel(TWidget *parent) : TWidget(parent) {}
 
 	virtual void setTask(SubmitPageTask *task) = 0;
@@ -23,7 +23,7 @@ public:
 
 class SubmitPage : public TabPage
 {
-public:
+  public:
 	SubmitPage(TWidget *parent);
 	~SubmitPage();
 
@@ -36,7 +36,7 @@ public:
 	void setTask(SubmitPageTask *task);
 	void onTextField(const string &name, bool isName);
 
-private:
+  private:
 	class Data;
 	Data *m_data;
 };

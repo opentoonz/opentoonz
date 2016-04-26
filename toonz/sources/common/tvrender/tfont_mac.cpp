@@ -15,7 +15,8 @@
 
 using namespace std;
 
-//----------------------------------------- structures -------------------------------------------------------------------
+//----------------------------------------- structures
+//-------------------------------------------------------------------
 
 typedef struct {
 	Float32Point origin;  // The origin of the current glyph
@@ -33,24 +34,26 @@ typedef struct {
 	Float32Point relativeOrigin; // The origin of this glyph -- relative to the origin of the line.
 } MyGlyphRecord;
 
-//----------------------------------------- callback---------------------------------------------------------------------
+//-----------------------------------------
+//callback---------------------------------------------------------------------
 
-OSStatus MyQuadraticLineProc(const Float32Point *pt1, const Float32Point *pt2, void *callBackDataPtr)
+OSStatus MyQuadraticLineProc(const Float32Point *pt1, const Float32Point *pt2,
+							 void *callBackDataPtr)
 {
 	/*
-    // Adjust the points according to the glyph origin
-    float x1 = ((MyCurveCallbackData *)callBackDataPtr)->origin.x + pt1->x;
-    float y1 = ((MyCurveCallbackData *)callBackDataPtr)->origin.y + pt1->y;
-    float x2 = ((MyCurveCallbackData *)callBackDataPtr)->origin.x + pt2->x;
-    float y2 = ((MyCurveCallbackData *)callBackDataPtr)->origin.y + pt2->y;
-    */
+	// Adjust the points according to the glyph origin
+	float x1 = ((MyCurveCallbackData *)callBackDataPtr)->origin.x + pt1->x;
+	float y1 = ((MyCurveCallbackData *)callBackDataPtr)->origin.y + pt1->y;
+	float x2 = ((MyCurveCallbackData *)callBackDataPtr)->origin.x + pt2->x;
+	float y2 = ((MyCurveCallbackData *)callBackDataPtr)->origin.y + pt2->y;
+	*/
 
 	MyCurveCallbackData *data = (MyCurveCallbackData *)callBackDataPtr;
 
 	if (data->m_points.empty())
 		data->m_points.push_back(TThickPoint(pt1->x, pt1->y, 0));
-	//else
-	//assert(isAlmostEqual(pt1 e back)
+	// else
+	// assert(isAlmostEqual(pt1 e back)
 
 	TThickPoint lastPoint = TThickPoint(pt2->x, pt2->y, 0);
 	data->m_points.push_back((data->m_points.back() + lastPoint) * 0.5);
@@ -59,23 +62,24 @@ OSStatus MyQuadraticLineProc(const Float32Point *pt1, const Float32Point *pt2, v
 	return noErr;
 }
 
-OSStatus MyQuadraticCurveProc(const Float32Point *pt1, const Float32Point *controlPt, const Float32Point *pt2, void *callBackDataPtr)
+OSStatus MyQuadraticCurveProc(const Float32Point *pt1, const Float32Point *controlPt,
+							  const Float32Point *pt2, void *callBackDataPtr)
 {
 	/*
-    // Adjust the points according to the glyph origin    
-    float x1 = ((MyCurveCallbackData *)callBackDataPtr)->origin.x + pt1->x;
-    float y1 = ((MyCurveCallbackData *)callBackDataPtr)->origin.y + pt1->y;
-    float x2 = ((MyCurveCallbackData *)callBackDataPtr)->origin.x + pt2->x;
-    float y2 = ((MyCurveCallbackData *)callBackDataPtr)->origin.y + pt2->y;
-    float cpx = ((MyCurveCallbackData *)callBackDataPtr)->origin.x + controlPt->x;
-    float cpy = ((MyCurveCallbackData *)callBackDataPtr)->origin.y + controlPt->y;    
-    */
+	// Adjust the points according to the glyph origin
+	float x1 = ((MyCurveCallbackData *)callBackDataPtr)->origin.x + pt1->x;
+	float y1 = ((MyCurveCallbackData *)callBackDataPtr)->origin.y + pt1->y;
+	float x2 = ((MyCurveCallbackData *)callBackDataPtr)->origin.x + pt2->x;
+	float y2 = ((MyCurveCallbackData *)callBackDataPtr)->origin.y + pt2->y;
+	float cpx = ((MyCurveCallbackData *)callBackDataPtr)->origin.x + controlPt->x;
+	float cpy = ((MyCurveCallbackData *)callBackDataPtr)->origin.y + controlPt->y;
+	*/
 	MyCurveCallbackData *data = (MyCurveCallbackData *)callBackDataPtr;
 
 	if (data->m_points.empty())
 		data->m_points.push_back(TThickPoint(pt1->x, pt1->y, 0));
-	//else
-	//assert(isAlmostEqual(pt1 e back)
+	// else
+	// assert(isAlmostEqual(pt1 e back)
 
 	data->m_points.push_back(TThickPoint(controlPt->x, controlPt->y, 0));
 	data->m_points.push_back(TThickPoint(pt2->x, pt2->y, 0));
@@ -93,7 +97,9 @@ OSStatus MyQuadraticClosePathProc(void *callBackDataPtr)
 {
 	MyCurveCallbackData *data = (MyCurveCallbackData *)callBackDataPtr;
 
-	assert(data->m_points.size() >= 3 && data->m_points.size() & 1); //il numero di punti di controllo devono essere dispari e >= 3
+	assert(data->m_points.size() >= 3 &&
+		   data->m_points.size() &
+			   1); // il numero di punti di controllo devono essere dispari e >= 3
 
 	TStroke *stroke = new TStroke(data->m_points);
 	stroke->setSelfLoop(true);
@@ -106,9 +112,12 @@ OSStatus MyQuadraticClosePathProc(void *callBackDataPtr)
 
 //------------------------------------------------------------------------------------------------------------------
 
-void GetGlyphIDsAndPositions(ATSUTextLayout iLayout, UniCharArrayOffset iStart, UniCharCount iLength, MyGlyphRecord **oGlyphRecordArray, ItemCount *oNumGlyphs)
+void GetGlyphIDsAndPositions(ATSUTextLayout iLayout, UniCharArrayOffset iStart,
+							 UniCharCount iLength, MyGlyphRecord **oGlyphRecordArray,
+							 ItemCount *oNumGlyphs)
 {
-	// This block of code uses the new Direct Access APIs, which are only available on Mac OS X 10.2 and later systems
+	// This block of code uses the new Direct Access APIs, which are only available on Mac OS X 10.2
+	// and later systems
 	//
 
 	ATSLayoutRecord *layoutRecords;
@@ -120,15 +129,12 @@ void GetGlyphIDsAndPositions(ATSUTextLayout iLayout, UniCharArrayOffset iStart, 
 
 	// Get the arrays of glyph information
 	status = ATSUDirectGetLayoutDataArrayPtrFromTextLayout(
-		iLayout, iStart,
-		kATSUDirectDataLayoutRecordATSLayoutRecordCurrent,
-		(void **)&layoutRecords, &numRecords);
+		iLayout, iStart, kATSUDirectDataLayoutRecordATSLayoutRecordCurrent, (void **)&layoutRecords,
+		&numRecords);
 	assert(status == noErr);
 
 	status = ATSUDirectGetLayoutDataArrayPtrFromTextLayout(
-		iLayout, iStart,
-		kATSUDirectDataBaselineDeltaFixedArray,
-		(void **)&deltaYs, &numDeltaYs);
+		iLayout, iStart, kATSUDirectDataBaselineDeltaFixedArray, (void **)&deltaYs, &numDeltaYs);
 	assert(status == noErr);
 
 	// Build the array of MyGlyphRecords
@@ -142,7 +148,8 @@ void GetGlyphIDsAndPositions(ATSUTextLayout iLayout, UniCharArrayOffset iStart, 
 		// Set up the relative origin of the glyph
 		//
 		// The real position is the x coordinate of the glyph, relative to the beginning of the line
-		// The baseline delta (deltaY), if any, is the y coordinate of the glyph, relative to the baseline
+		// The baseline delta (deltaY), if any, is the y coordinate of the glyph, relative to the
+		// baseline
 		//
 		(*oGlyphRecordArray)[i].relativeOrigin.x = Fix2X(layoutRecords[i].realPos);
 
@@ -155,16 +162,19 @@ void GetGlyphIDsAndPositions(ATSUTextLayout iLayout, UniCharArrayOffset iStart, 
 
 	// Free the arrays of glyph information
 	if (deltaYs != NULL) {
-		status = ATSUDirectReleaseLayoutDataArrayPtr(NULL, kATSUDirectDataBaselineDeltaFixedArray, (void **)&deltaYs);
+		status = ATSUDirectReleaseLayoutDataArrayPtr(NULL, kATSUDirectDataBaselineDeltaFixedArray,
+													 (void **)&deltaYs);
 		assert(status == noErr);
 	}
-	status = ATSUDirectReleaseLayoutDataArrayPtr(NULL, kATSUDirectDataLayoutRecordATSLayoutRecordCurrent, (void **)&layoutRecords);
+	status = ATSUDirectReleaseLayoutDataArrayPtr(
+		NULL, kATSUDirectDataLayoutRecordATSLayoutRecordCurrent, (void **)&layoutRecords);
 	assert(status == noErr);
 }
 
-void drawQuadratics(ATSUTextLayout iLayout, ATSUStyle iStyle, UniCharArrayOffset start, UniCharCount length, MyCurveCallbackData &data)
+void drawQuadratics(ATSUTextLayout iLayout, ATSUStyle iStyle, UniCharArrayOffset start,
+					UniCharCount length, MyCurveCallbackData &data)
 {
-	//boh ----------------
+	// boh ----------------
 	Fixed penX = 0;
 	Fixed penY = 0;
 	// -------------------
@@ -195,12 +205,14 @@ void drawQuadratics(ATSUTextLayout iLayout, ATSUStyle iStyle, UniCharArrayOffset
 		data.origin.x = Fix2X(penX) + glyphRecordArray[i].relativeOrigin.x;
 		data.origin.y = Fix2X(penY) + glyphRecordArray[i].relativeOrigin.y;
 
-		// Reset state for quadratic drawing (the callbacks only do a MoveTo on the very first segment)
+		// Reset state for quadratic drawing (the callbacks only do a MoveTo on the very first
+		// segment)
 		data.first = true;
 
 		// If this is a deleted glyph (-1), don't draw it.  Otherwise, go ahead.
 		if (glyphRecordArray[i].glyphID != kATSDeletedGlyphcode) {
-			status = ATSUGlyphGetQuadraticPaths(iStyle, glyphRecordArray[i].glyphID, newPathProc, lineProc, curveProc, closePathProc, &data, &status);
+			status = ATSUGlyphGetQuadraticPaths(iStyle, glyphRecordArray[i].glyphID, newPathProc,
+												lineProc, curveProc, closePathProc, &data, &status);
 			assert(status == noErr);
 		}
 	}
@@ -233,7 +245,7 @@ struct TFont::Impl {
 	Impl(ATSUFontID fontId, int size);
 	~Impl();
 
-	//void getChar();
+	// void getChar();
 };
 
 //-----------------------------------------------------------------------------
@@ -252,8 +264,7 @@ TFont::~TFont()
 
 //-----------------------------------------------------------------------------
 
-TFont::Impl::Impl(ATSUFontID fontId, int size)
-	: m_fontId(fontId), m_size(Long2Fix(size))
+TFont::Impl::Impl(ATSUFontID fontId, int size) : m_fontId(fontId), m_size(Long2Fix(size))
 {
 	OSStatus status;
 
@@ -277,20 +288,18 @@ TFont::Impl::Impl(ATSUFontID fontId, int size)
 	values[1] = &m_size;
 
 	status = ATSUSetAttributes(m_style, 2, tags, sizes, values);
-	//assert(status==noErr);
+	// assert(status==noErr);
 
 	UniChar dummyStr[] = {'H', 'e', 'l', 'l', 'o'};
 	UniCharCount length = sizeof(dummyStr) / sizeof(UniChar);
 
-	status = ATSUCreateTextLayoutWithTextPtr(
-		dummyStr, kATSUFromTextBeginning, kATSUToTextEnd, length, 1,
-		&length, &m_style, &m_layout);
-	//assert(status==noErr);
+	status = ATSUCreateTextLayoutWithTextPtr(dummyStr, kATSUFromTextBeginning, kATSUToTextEnd,
+											 length, 1, &length, &m_style, &m_layout);
+	// assert(status==noErr);
 
 	ATSTrapezoid glyphBounds;
-	status = ATSUGetGlyphBounds(m_layout, 0, 0,
-								kATSUFromTextBeginning, kATSUToTextEnd, kATSUseFractionalOrigins,
-								1, &glyphBounds, NULL);
+	status = ATSUGetGlyphBounds(m_layout, 0, 0, kATSUFromTextBeginning, kATSUToTextEnd,
+								kATSUseFractionalOrigins, 1, &glyphBounds, NULL);
 
 	m_ascender = -FixedToInt(glyphBounds.upperLeft.y);
 	assert(m_ascender > 0);
@@ -315,15 +324,16 @@ TPoint TFont::drawChar(TVectorImageP &image, wchar_t charcode, wchar_t nextCharC
 	subString[1] = 0 /*nextCharCode*/;
 	UniCharCount length = sizeof(subString) / sizeof(UniChar);
 
-	status = ATSUCreateTextLayoutWithTextPtr(subString, kATSUFromTextBeginning, kATSUToTextEnd,
-											 length, 1,
-											 &length, &(m_pimpl->m_style), &(m_pimpl->m_layout));
+	status =
+		ATSUCreateTextLayoutWithTextPtr(subString, kATSUFromTextBeginning, kATSUToTextEnd, length,
+										1, &length, &(m_pimpl->m_style), &(m_pimpl->m_layout));
 	assert(status == noErr);
 
 	MyCurveCallbackData data;
 	data.m_image = image;
 
-	drawQuadratics(m_pimpl->m_layout, m_pimpl->m_style, kATSUFromTextBeginning, kATSUToTextEnd, data);
+	drawQuadratics(m_pimpl->m_layout, m_pimpl->m_style, kATSUFromTextBeginning, kATSUToTextEnd,
+				   data);
 	image->transform(TScale(1, -1));
 
 	image->group(0, image->getStrokeCount());
@@ -343,15 +353,14 @@ void appDrawChar(TRasterGR8P &outImage, TFont::Impl *pimpl, wchar_t charcode)
 	subString[1] = 0;
 	UniCharCount length = sizeof(subString) / sizeof(UniChar);
 
-	status = ATSUCreateTextLayoutWithTextPtr(subString, kATSUFromTextBeginning, kATSUToTextEnd,
-											 length, 1,
-											 &length, &(pimpl->m_style), &(pimpl->m_layout));
+	status =
+		ATSUCreateTextLayoutWithTextPtr(subString, kATSUFromTextBeginning, kATSUToTextEnd, length,
+										1, &length, &(pimpl->m_style), &(pimpl->m_layout));
 	assert(status == noErr);
 
 	ATSTrapezoid glyphBounds;
-	status = ATSUGetGlyphBounds(pimpl->m_layout, 0, 0,
-								kATSUFromTextBeginning, kATSUToTextEnd, kATSUseFractionalOrigins,
-								1, &glyphBounds, NULL);
+	status = ATSUGetGlyphBounds(pimpl->m_layout, 0, 0, kATSUFromTextBeginning, kATSUToTextEnd,
+								kATSUseFractionalOrigins, 1, &glyphBounds, NULL);
 
 	int height = FixedToInt(glyphBounds.lowerLeft.y) - FixedToInt(glyphBounds.upperLeft.y);
 	int width = tmax(FixedToInt(glyphBounds.lowerRight.x), FixedToInt(glyphBounds.upperRight.x)) -
@@ -364,7 +373,8 @@ void appDrawChar(TRasterGR8P &outImage, TFont::Impl *pimpl, wchar_t charcode)
 	void *data = outImage->getRawData();
 
 	CGColorSpaceRef grayColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceGenericGray);
-	CGContextRef gContext = CGBitmapContextCreate(data, width, height, 8, width, grayColorSpace, kCGImageAlphaNone);
+	CGContextRef gContext =
+		CGBitmapContextCreate(data, width, height, 8, width, grayColorSpace, kCGImageAlphaNone);
 
 #if defined(DEBUG) || defined(_DEBUG)
 
@@ -379,8 +389,7 @@ void appDrawChar(TRasterGR8P &outImage, TFont::Impl *pimpl, wchar_t charcode)
 	int bytesPerRow = CGBitmapContextGetBytesPerRow(gContext);
 	int newWidth = CGBitmapContextGetWidth(gContext);
 	if (bytesPerRow != width || newWidth != width)
-		std::cout << "BytesPerRow: " << bytesPerRow
-				  << " Old width= " << width
+		std::cout << "BytesPerRow: " << bytesPerRow << " Old width= " << width
 				  << " New width= " << newWidth << std::endl;
 
 	int newHeight = CGBitmapContextGetHeight(gContext);
@@ -401,12 +410,14 @@ void appDrawChar(TRasterGR8P &outImage, TFont::Impl *pimpl, wchar_t charcode)
 	status = ATSUSetLayoutControls(pimpl->m_layout, 1, tags, sizes, values);
 	assert(status == noErr);
 
-	ATSUDrawText(pimpl->m_layout, kATSUFromTextBeginning, kATSUToTextEnd, 0, glyphBounds.lowerLeft.y);
+	ATSUDrawText(pimpl->m_layout, kATSUFromTextBeginning, kATSUToTextEnd, 0,
+				 glyphBounds.lowerLeft.y);
 }
 }
 //-----------------------------------------------------------------------------
 
-TPoint TFont::drawChar(TRasterGR8P &outImage, TPoint &unused, wchar_t charcode, wchar_t nextCharCode) const
+TPoint TFont::drawChar(TRasterGR8P &outImage, TPoint &unused, wchar_t charcode,
+					   wchar_t nextCharCode) const
 {
 	appDrawChar(outImage, m_pimpl, charcode);
 	outImage->yMirror();
@@ -415,7 +426,8 @@ TPoint TFont::drawChar(TRasterGR8P &outImage, TPoint &unused, wchar_t charcode, 
 
 //-----------------------------------------------------------------------------
 
-TPoint TFont::drawChar(TRasterCM32P &outImage, TPoint &unused, int inkId, wchar_t charcode, wchar_t nextCharCode) const
+TPoint TFont::drawChar(TRasterCM32P &outImage, TPoint &unused, int inkId, wchar_t charcode,
+					   wchar_t nextCharCode) const
 {
 	TRasterGR8P grayAppImage;
 	appDrawChar(grayAppImage, m_pimpl, charcode);
@@ -461,29 +473,33 @@ TPoint TFont::getDistance(wchar_t firstChar, wchar_t secondChar) const
 	subString[1] = secondChar;
 	UniCharCount length = sizeof(subString) / sizeof(UniChar);
 
-	status = ATSUCreateTextLayoutWithTextPtr(subString, kATSUFromTextBeginning, kATSUToTextEnd,
-											 length, 1,
-											 &length, &(m_pimpl->m_style), &(m_pimpl->m_layout));
+	status =
+		ATSUCreateTextLayoutWithTextPtr(subString, kATSUFromTextBeginning, kATSUToTextEnd, length,
+										1, &length, &(m_pimpl->m_style), &(m_pimpl->m_layout));
 	assert(status == noErr);
 
 	MyGlyphRecord *glyphRecordArray;
 	ItemCount numGlyphs;
 
 	// Get the array of glyph information
-	GetGlyphIDsAndPositions(m_pimpl->m_layout, kATSUFromTextBeginning, kATSUToTextEnd, &glyphRecordArray, &numGlyphs);
+	GetGlyphIDsAndPositions(m_pimpl->m_layout, kATSUFromTextBeginning, kATSUToTextEnd,
+							&glyphRecordArray, &numGlyphs);
 
 	assert(numGlyphs >= 2);
 
 	assert(glyphRecordArray[0].relativeOrigin.x == 0);
-	int advance = (int)(glyphRecordArray[1].relativeOrigin.x - glyphRecordArray[0].relativeOrigin.x);
+	int advance =
+		(int)(glyphRecordArray[1].relativeOrigin.x - glyphRecordArray[0].relativeOrigin.x);
 	if (advance == 0) {
 		subString[1] = 0;
 		status = ATSUCreateTextLayoutWithTextPtr(subString, kATSUFromTextBeginning, kATSUToTextEnd,
-												 length, 1,
-												 &length, &(m_pimpl->m_style), &(m_pimpl->m_layout));
+												 length, 1, &length, &(m_pimpl->m_style),
+												 &(m_pimpl->m_layout));
 
-		GetGlyphIDsAndPositions(m_pimpl->m_layout, kATSUFromTextBeginning, kATSUToTextEnd, &glyphRecordArray, &numGlyphs);
-		advance = (int)(glyphRecordArray[1].relativeOrigin.x - glyphRecordArray[0].relativeOrigin.x);
+		GetGlyphIDsAndPositions(m_pimpl->m_layout, kATSUFromTextBeginning, kATSUToTextEnd,
+								&glyphRecordArray, &numGlyphs);
+		advance =
+			(int)(glyphRecordArray[1].relativeOrigin.x - glyphRecordArray[0].relativeOrigin.x);
 	}
 	return TPoint(advance, 0);
 }
@@ -548,10 +564,7 @@ struct TFontManager::Impl {
 	wstring m_currentTypeface;
 	int m_size;
 
-	Impl()
-		: m_currentAtsuFontId(0), m_currentFont(0), m_loaded(false), m_size(70)
-	{
-	}
+	Impl() : m_currentAtsuFontId(0), m_currentFont(0), m_loaded(false), m_size(70) {}
 
 	bool setFontName(ATSUFontID fontId, int platform, int script, int lang);
 	bool addFont(ATSUFontID);
@@ -571,28 +584,16 @@ bool TFontManager::Impl::setFontName(ATSUFontID fontId, int platform, int script
 	char *buffer2 = 0;
 
 	// chiedo la lunhezza del Full Family Name per allocare il buffer
-	status = ATSUFindFontName(fontId,
-							  kFontFullName,
-							  platform,
-							  script,
-							  lang,
-							  0, 0,
-							  &oActualNameLength,
-							  0);
+	status = ATSUFindFontName(fontId, kFontFullName, platform, script, lang, 0, 0,
+							  &oActualNameLength, 0);
 
 	if (status != noErr || oActualNameLength <= 1)
 		return false;
 
 	buffer = new char[oActualNameLength + 1];
 	// chiedo il Full Family Name
-	status = ATSUFindFontName(fontId,
-							  kFontFullName,
-							  platform,
-							  script,
-							  lang,
-							  oActualNameLength, buffer,
-							  &oActualNameLength,
-							  &oFontCount);
+	status = ATSUFindFontName(fontId, kFontFullName, platform, script, lang, oActualNameLength,
+							  buffer, &oActualNameLength, &oFontCount);
 
 	if (status != noErr || oActualNameLength <= 1 || buffer[0] == '\0') {
 		delete[] buffer;
@@ -603,14 +604,8 @@ bool TFontManager::Impl::setFontName(ATSUFontID fontId, int platform, int script
 	//-------------------
 
 	// chiedo la lunhezza del Typeface Name per allocare il buffer
-	status = ATSUFindFontName(fontId,
-							  kFontStyleName,
-							  platform,
-							  script,
-							  lang,
-							  0, 0,
-							  &oActualNameLength,
-							  0);
+	status = ATSUFindFontName(fontId, kFontStyleName, platform, script, lang, 0, 0,
+							  &oActualNameLength, 0);
 
 	if (status != noErr || oActualNameLength <= 1) {
 		delete[] buffer;
@@ -619,14 +614,8 @@ bool TFontManager::Impl::setFontName(ATSUFontID fontId, int platform, int script
 	buffer2 = new char[oActualNameLength + 1];
 
 	// chiedo il Typeface Name
-	status = ATSUFindFontName(fontId,
-							  kFontStyleName,
-							  platform,
-							  script,
-							  lang,
-							  oActualNameLength, buffer2,
-							  &oActualNameLength,
-							  &oFontCount);
+	status = ATSUFindFontName(fontId, kFontStyleName, platform, script, lang, oActualNameLength,
+							  buffer2, &oActualNameLength, &oFontCount);
 
 	if (status != noErr || oActualNameLength <= 1 || buffer2[0] == '\0') {
 		delete[] buffer;
@@ -655,16 +644,15 @@ bool TFontManager::Impl::addFont(ATSUFontID fontId)
 				if (setFontName(fontId, platform, script, lang))
 					return true;
 
-	//poi li provo tutti
+	// poi li provo tutti
 	for (lang = -1; lang <= 139; lang++)
 		for (script = -1; script <= 32; script++)
 			for (platform = -1; platform <= 4; platform++) {
 				// escludo quelli nel tri-ciclo for precedente.
 				// Purtoppo si deve fare cosi:
 				// non si puo' fare partendo con indici piu' alti nei cicli for!
-				if (-1 <= lang && lang <= 0 &&
-					-1 <= script && script <= 0 &&
-					-1 <= platform && platform <= 1)
+				if (-1 <= lang && lang <= 0 && -1 <= script && script <= 0 && -1 <= platform &&
+					platform <= 1)
 					continue;
 
 				if (setFontName(fontId, platform, script, lang))
@@ -845,7 +833,9 @@ void TFontManager::getAllTypefaces(vector<wstring> &typefaces) const
 
 //---------------------------------------------------------
 
-void TFontManager::setVertical(bool vertical) {}
+void TFontManager::setVertical(bool vertical)
+{
+}
 
 //---------------------------------------------------------
 

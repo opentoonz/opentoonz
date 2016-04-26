@@ -72,8 +72,7 @@ typedef TFilePath (*PathFunc)(const TFilePath &);
 
 struct FormatData {
 	QRegExp m_regExp;
-	PathFunc m_resourcePathFunc,
-		m_componentPathFunc;
+	PathFunc m_resourcePathFunc, m_componentPathFunc;
 };
 
 //************************************************************************
@@ -86,8 +85,8 @@ struct Resource //!  A single resource to be loaded.
 	{
 		TFilePath m_rootFp, //!< Selected root folder hosting the resource.
 			m_relFp;		//!< Path representing the resource, \a relative
-		//!  to \p m_rootFolder.
-	public:
+							//!  to \p m_rootFolder.
+	  public:
 		Path(const TFilePath &rootPath, const TFilePath &relativeFilePath)
 			: m_rootFp(rootPath), m_relFp(relativeFilePath)
 		{
@@ -95,14 +94,12 @@ struct Resource //!  A single resource to be loaded.
 			assert(!m_relFp.isAbsolute());
 		}
 
-		TFilePath absoluteResourcePath() const
-		{
-			return m_rootFp + m_relFp;
-		}
+		TFilePath absoluteResourcePath() const { return m_rootFp + m_relFp; }
 
 		bool operator<(const Path &other) const
 		{
-			return (m_rootFp < other.m_rootFp || (!(other.m_relFp < m_relFp) && m_relFp < other.m_relFp));
+			return (m_rootFp < other.m_rootFp ||
+					(!(other.m_relFp < m_relFp) && m_relFp < other.m_relFp));
 		}
 	};
 
@@ -110,7 +107,7 @@ struct Resource //!  A single resource to be loaded.
 		TFilePath m_srcFp;   //!< Source path, <I>relative to parent folder</I>.
 		PathFunc m_pathFunc; //!< Possible callback function transforming source
 							 //!  paths into their imported counterparts.
-	public:
+	  public:
 		Component(const TFilePath &srcPath, PathFunc pathFunc)
 			: m_srcFp(srcPath), m_pathFunc(pathFunc)
 		{
@@ -120,19 +117,22 @@ struct Resource //!  A single resource to be loaded.
 
 	typedef std::vector<Component> CompSeq;
 
-public:
+  public:
 	Path m_path;		  //!< The level path.
 	CompSeq m_components; //!< File Paths for level components. The first path
 						  //!  is intended as the resource's file representant.
 	boost::optional<LevelOptions>
 		m_levelOptions; //!< Level Options to be loaded for a level resource.
 
-public:
+  public:
 	Resource(const Path &path) : m_path(path) {}
 	Resource(const TFilePath &rootPath, const TFilePath &relativeFilePath)
-		: m_path(rootPath, relativeFilePath) {}
-	Resource(const Path &path, const CompSeq &components)
-		: m_path(path), m_components(components) {}
+		: m_path(rootPath, relativeFilePath)
+	{
+	}
+	Resource(const Path &path, const CompSeq &components) : m_path(path), m_components(components)
+	{
+	}
 };
 
 //************************************************************************
@@ -141,7 +141,7 @@ public:
 
 class OverwriteDialog : public DVGui::ValidatedChoiceDialog
 {
-public:
+  public:
 	enum Resolution {
 		NO_RESOLUTION,
 		CANCEL,
@@ -154,11 +154,10 @@ public:
 		Resource &m_rsrc;
 	};
 
-public:
+  public:
 	OverwriteDialog(QWidget *parent);
 
-	virtual QString acceptResolution(
-		void *obj, int resolution, bool applyToAll);
+	virtual QString acceptResolution(void *obj, int resolution, bool applyToAll);
 };
 
 //************************************************************************
@@ -181,8 +180,7 @@ bool isLoadable(const TFilePath &resourcePath)
 
 //--------------------------------------------------------------
 
-template <typename RegStruct>
-bool exactMatch(const RegStruct &regStruct, const TFilePath &fp)
+template <typename RegStruct> bool exactMatch(const RegStruct &regStruct, const TFilePath &fp)
 {
 	return regStruct.m_regExp.exactMatch(fp.getQString());
 }
@@ -214,9 +212,9 @@ TFilePath retasResourcePath(const TFilePath &fp)
 
 //--------------------------------------------------------------
 
-static const FormatData l_formatDatas[] =
-	{{QRegExp(".+\\.[0-9]{4,4}.*\\..*"), &multiframeResourcePath, 0},
-	 {QRegExp(".+[0-9]{4,4}\\.tga", Qt::CaseInsensitive), &retasResourcePath, &retasComponentPath}};
+static const FormatData l_formatDatas[] = {
+	{QRegExp(".+\\.[0-9]{4,4}.*\\..*"), &multiframeResourcePath, 0},
+	{QRegExp(".+[0-9]{4,4}\\.tga", Qt::CaseInsensitive), &retasResourcePath, &retasComponentPath}};
 
 //==============================================================
 
@@ -235,8 +233,7 @@ struct buildResources_locals {
 		return (isLoadable(rsrcVal.first.first.m_relFp) && !rsrcVal.second.empty());
 	}
 
-	typedef tcg::function<bool (*)(const RsrcMap::value_type &,
-								   const RsrcMap::value_type &),
+	typedef tcg::function<bool (*)(const RsrcMap::value_type &, const RsrcMap::value_type &),
 						  &differentPath> DifferentPath;
 
 	static Resource toResource(const RsrcMap::value_type &rsrcVal)
@@ -254,20 +251,17 @@ struct buildResources_locals {
 		// NOTE: This algorithm works for 1-level-deep inclusions. I guess this is sufficient,
 		//       for now.
 
-		static const std::string componentsTable[] =
-			{"cln",
-			 "tpl", "hst"};
+		static const std::string componentsTable[] = {"cln", "tpl", "hst"};
 
-		static const MergeData mergeTable[] =
-			{{QRegExp(".*\\.\\..*"), 0},
-			 {QRegExp(".*\\.tlv"), 1},
-			 {QRegExp(), 3}};
+		static const MergeData mergeTable[] = {
+			{QRegExp(".*\\.\\..*"), 0}, {QRegExp(".*\\.tlv"), 1}, {QRegExp(), 3}};
 
 		// Lookup rd's path in the mergeTable
-		const MergeData *mdt, *mdEnd = mergeTable + boost::size(mergeTable) - 1; // Last item is fake
+		const MergeData *mdt,
+			*mdEnd = mergeTable + boost::size(mergeTable) - 1; // Last item is fake
 
-		mdt = std::find_if(mergeTable, mdEnd, boost::bind(
-												  exactMatch<MergeData>, _1, boost::cref(rt->first.first.m_relFp)));
+		mdt = std::find_if(mergeTable, mdEnd, boost::bind(exactMatch<MergeData>, _1,
+														  boost::cref(rt->first.first.m_relFp)));
 
 		if (mdt != mdEnd) {
 			// Lookup every possible resource component to merge
@@ -275,16 +269,16 @@ struct buildResources_locals {
 							  *cEnd = componentsTable + (mdt + 1)->m_componentIdx;
 
 			for (const std::string *ct = cBegin; ct != cEnd; ++ct) {
-				RsrcKey childKey(Resource::Path(rt->first.first.m_rootFp,
-												rt->first.first.m_relFp.withNoFrame().withType(*ct)),
-								 rt->first.second);
+				RsrcKey childKey(
+					Resource::Path(rt->first.first.m_rootFp,
+								   rt->first.first.m_relFp.withNoFrame().withType(*ct)),
+					rt->first.second);
 
 				RsrcMap::iterator chrt = rsrcMap.find(childKey);
 
 				if (chrt != rsrcMap.end()) {
 					// Move every component into rsrc
-					rt->second.insert(rt->second.end(),
-									  chrt->second.begin(), chrt->second.end());
+					rt->second.insert(rt->second.end(), chrt->second.begin(), chrt->second.end());
 					chrt->second.clear();
 				}
 			}
@@ -306,9 +300,8 @@ struct buildResources_locals {
 
 }; // buildResources_locals
 
-void buildResources(
-	std::vector<Resource> &resources,
-	const TFilePath &rootPath, const TFilePath &subPath = TFilePath())
+void buildResources(std::vector<Resource> &resources, const TFilePath &rootPath,
+					const TFilePath &subPath = TFilePath())
 {
 	typedef buildResources_locals locals;
 
@@ -331,8 +324,8 @@ void buildResources(
 			TFilePath relPath = relativePath(rootPath, folderPath + compPath);
 
 			const FormatData *fdt, *fdEnd = l_formatDatas + boost::size(l_formatDatas);
-			fdt = std::find_if(l_formatDatas, fdEnd, boost::bind(
-														 exactMatch<FormatData>, _1, boost::cref(relPath)));
+			fdt = std::find_if(l_formatDatas, fdEnd,
+							   boost::bind(exactMatch<FormatData>, _1, boost::cref(relPath)));
 
 			if (fdt != fdEnd) {
 				relPath = fdt->m_resourcePathFunc(relPath);
@@ -351,14 +344,15 @@ void buildResources(
 			locals::mergeInto(rt, rsrcMap);
 
 		// Export valid data into the output resources collection
-		boost::copy(rsrcMap | boost::adaptors::filtered(locals::isValid) | boost::adaptors::adjacent_filtered(locals::DifferentPath()) // E.g. A.xxxx.tga and Axxxx.tga
+		boost::copy(rsrcMap | boost::adaptors::filtered(locals::isValid) |
+						boost::adaptors::adjacent_filtered(
+							locals::DifferentPath()) // E.g. A.xxxx.tga and Axxxx.tga
 						| boost::adaptors::transformed(locals::toResource),
 					std::back_inserter(resources));
 	}
 
 	// Look for level options associated to each level
-	std::for_each(resources.begin(), resources.end(),
-				  locals::assignLevelOptions);
+	std::for_each(resources.begin(), resources.end(), locals::assignLevelOptions);
 
 	// Recursive on sub-folders
 	const QStringList &dirs = folderDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
@@ -383,18 +377,17 @@ struct import_Locals {
 
 	void switchToDst(Resource::Path &path)
 	{
-		path.m_rootFp = m_scene.decodeFilePath(
-			m_scene.getImportedLevelPath(path.absoluteResourcePath()).getParentDir() // E.g. +drawings/
-			+ path.m_rootFp.getWideName()											 // Root dir name
-			);
+		path.m_rootFp =
+			m_scene.decodeFilePath(m_scene.getImportedLevelPath(path.absoluteResourcePath())
+									   .getParentDir()			 // E.g. +drawings/
+								   + path.m_rootFp.getWideName() // Root dir name
+								   );
 	}
 
 	static void copy(const TFilePath &srcDir, const TFilePath &dstDir,
-					 const Resource::Component &comp,
-					 bool overwrite)
+					 const Resource::Component &comp, bool overwrite)
 	{
-		TSystem::copyFile(dstPath(dstDir, comp),
-						  srcDir + comp.m_srcFp, overwrite);
+		TSystem::copyFile(dstPath(dstDir, comp), srcDir + comp.m_srcFp, overwrite);
 	}
 
 	void import(Resource &rsrc)
@@ -425,9 +418,9 @@ struct import_Locals {
 			}
 
 			// Perform resource copy
-			std::for_each(rsrc.m_components.begin(), rsrc.m_components.end(),
-						  boost::bind(copy, boost::cref(srcDir), boost::cref(dstDir),
-									  _1, overwrite));
+			std::for_each(
+				rsrc.m_components.begin(), rsrc.m_components.end(),
+				boost::bind(copy, boost::cref(srcDir), boost::cref(dstDir), _1, overwrite));
 		} catch (const TException &e) {
 			DVGui::error(QString::fromStdWString(e.getMessage()));
 		} catch (...) {
@@ -455,15 +448,15 @@ void import(const ToonzScene &scene, std::vector<Resource> &resources,
 	}
 
 	// Perform import
-	locals.m_overwriteDialog.reset(new OverwriteDialog(progressDialog ? (QWidget *)progressDialog : (QWidget *)TApp::instance()->getMainWindow()));
+	locals.m_overwriteDialog.reset(new OverwriteDialog(
+		progressDialog ? (QWidget *)progressDialog : (QWidget *)TApp::instance()->getMainWindow()));
 
 	for (r = 0; r != rCount; ++r) {
 		Resource &rsrc = resources[r];
 
 		if (progressDialog) {
-			progressDialog->setLabelText(DVGui::ProgressDialog::
-											 tr("Importing \"%1\"...")
-												 .arg(rsrc.m_path.m_relFp.getQString()));
+			progressDialog->setLabelText(DVGui::ProgressDialog::tr("Importing \"%1\"...")
+											 .arg(rsrc.m_path.m_relFp.getQString()));
 			progressDialog->setValue(r);
 
 			QCoreApplication::processEvents();
@@ -506,18 +499,15 @@ OverwriteDialog::OverwriteDialog(QWidget *parent)
 
 //--------------------------------------------------------------
 
-QString OverwriteDialog::acceptResolution(
-	void *obj_, int resolution, bool applyToAll)
+QString OverwriteDialog::acceptResolution(void *obj_, int resolution, bool applyToAll)
 {
 	struct locals {
-		static bool existsComponent(const TFilePath &dstDir,
-									const Resource::Component &comp)
+		static bool existsComponent(const TFilePath &dstDir, const Resource::Component &comp)
 		{
 			return QFile::exists(dstPath(dstDir, comp).getQString());
 		}
 
-		static bool existsResource(const TFilePath &dstDir,
-								   const Resource &rsrc)
+		static bool existsResource(const TFilePath &dstDir, const Resource &rsrc)
 		{
 			return ba::any_of(rsrc.m_components.begin(), rsrc.m_components.end(),
 							  boost::bind(existsComponent, boost::cref(dstDir), _1));
@@ -544,8 +534,7 @@ QString OverwriteDialog::acceptResolution(
 //    API functions
 //************************************************************************
 
-int IoCmd::loadResourceFolders(LoadResourceArguments &args,
-							   LoadResourceArguments::ScopedBlock *sb)
+int IoCmd::loadResourceFolders(LoadResourceArguments &args, LoadResourceArguments::ScopedBlock *sb)
 {
 	struct locals {
 		static LRArgs::ResourceData toResourceData(const Resource &rsrc)
@@ -556,8 +545,7 @@ int IoCmd::loadResourceFolders(LoadResourceArguments &args,
 			return rd;
 		}
 
-		static bool isExternPath(const ToonzScene &scene,
-								 const LRArgs::ResourceData &rd)
+		static bool isExternPath(const ToonzScene &scene, const LRArgs::ResourceData &rd)
 		{
 			return scene.isExternPath(rd.m_path);
 		}
@@ -583,10 +571,7 @@ int IoCmd::loadResourceFolders(LoadResourceArguments &args,
 							"Do you want to import them or load from their original location?"),
 				QObject::tr("Load"), QObject::tr("Import"), QObject::tr("Cancel"));
 
-			enum { CLOSED,
-				   LOAD,
-				   IMPORT,
-				   CANCELED };
+			enum { CLOSED, LOAD, IMPORT, CANCELED };
 			switch (resolutionButton) {
 			case CLOSED:
 			case CANCELED:
@@ -601,8 +586,9 @@ int IoCmd::loadResourceFolders(LoadResourceArguments &args,
 	// Select resources to be loaded
 	std::vector<Resource> resources;
 
-	boost::for_each(args.resourceDatas | boost::adaptors::transformed(
-											 boost::bind<const TFilePath &>(&LRArgs::ResourceData::m_path, _1)),
+	boost::for_each(args.resourceDatas |
+						boost::adaptors::transformed(
+							boost::bind<const TFilePath &>(&LRArgs::ResourceData::m_path, _1)),
 					boost::bind(::buildResources, boost::ref(resources), _1, TFilePath()));
 
 	// Import them if required
@@ -614,8 +600,7 @@ int IoCmd::loadResourceFolders(LoadResourceArguments &args,
 		LRArgs &m_args;
 		LRArgs::ImportPolicy m_policy;
 
-		SubstImportPolicy(LRArgs &args,
-						  LRArgs::ImportPolicy policy)
+		SubstImportPolicy(LRArgs &args, LRArgs::ImportPolicy policy)
 			: m_args(args), m_policy(args.importPolicy)
 		{
 			args.importPolicy = policy;

@@ -21,17 +21,16 @@ namespace tlin
   efficiency. This is achieved using a single, fast, dynamic hash container that maps
   (row, col) entries into their values, the hash function being like:
 
-    (row, col) -> row * nCols + col;    (taken modulo nBuckets)
-  
+	(row, col) -> row * nCols + col;    (taken modulo nBuckets)
+
   Observe that if the number of buckets of the hash map is nCols, the resulting
   representation is similar to a CCS (Harwell-Boeing), with the difference that
   buckets are not sorted by row.
 */
 
-template <typename T>
-class sparse_matrix
+template <typename T> class sparse_matrix
 {
-public:
+  public:
 	struct IdxFunctor {
 		int m_cols;
 
@@ -39,18 +38,21 @@ public:
 		int operator()(const std::pair<int, int> &key) { return key.first * m_cols + key.second; }
 	};
 
-private:
+  private:
 	int m_rows;
 	int m_cols;
 
 	tcg::hash<std::pair<int, int>, T, IdxFunctor> m_hash;
 
-public:
+  public:
 	sparse_matrix() : m_rows(0), m_cols(0), m_hash(IdxFunctor(0)) {}
 	sparse_matrix(int rows, int cols) : m_rows(rows), m_cols(cols), m_hash(cols) {}
 	~sparse_matrix() {}
 
-	sparse_matrix(const sparse_matrix &mat) : m_rows(mat.m_rows), m_cols(mat.m_cols), m_hash(mat.m_hash) {}
+	sparse_matrix(const sparse_matrix &mat)
+		: m_rows(mat.m_rows), m_cols(mat.m_cols), m_hash(mat.m_hash)
+	{
+	}
 
 	sparse_matrix &operator=(const sparse_matrix &mat)
 	{
@@ -66,7 +68,7 @@ public:
 	const tcg::hash<std::pair<int, int>, T, IdxFunctor> &entries() const { return m_hash; }
 
 	//!\warning Assignments of kind: A.at(1,1) = A.at(0,0) are potentially harmful.
-	//!Use A.get(x,y) on the right side instead.
+	//! Use A.get(x,y) on the right side instead.
 	T &at(int row, int col) { return m_hash.touch(std::make_pair(row, col), 0); }
 	const T get(int row, int col) const
 	{
@@ -93,4 +95,4 @@ public:
 typedef tlin::sparse_matrix<double> spmat;
 }
 
-#endif //TLIN_SPARSEMAT_H
+#endif // TLIN_SPARSEMAT_H

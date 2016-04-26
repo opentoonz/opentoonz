@@ -17,7 +17,7 @@
 
 class DVAPI TFileBrowser : public TTreeView
 {
-public:
+  public:
 	TFileBrowser(TWidget *parent, string name = "fileBrowser");
 };
 

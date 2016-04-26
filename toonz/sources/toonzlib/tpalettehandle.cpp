@@ -6,8 +6,7 @@
 // TPaletteHandle
 //-----------------------------------------------------------------------------
 
-TPaletteHandle::TPaletteHandle()
-	: m_palette(0), m_styleIndex(-1), m_styleParamIndex(-1)
+TPaletteHandle::TPaletteHandle() : m_palette(0), m_styleIndex(-1), m_styleParamIndex(-1)
 {
 	connectBroadcasts(this);
 }
@@ -54,12 +53,19 @@ bool TPaletteHandle::connectBroadcasts(const QObject *receiver)
 {
 	bool ret = true;
 
-	ret = connect(this, SIGNAL(broadcastPaletteChanged()), receiver, SIGNAL(paletteChanged())) && ret;
-	ret = connect(this, SIGNAL(broadcastPaletteTitleChanged()), receiver, SIGNAL(paletteTitleChanged())) && ret;
-	ret = connect(this, SIGNAL(broadcastColorStyleSwitched()), receiver, SIGNAL(colorStyleSwitched())) && ret;
-	ret = connect(this, SIGNAL(broadcastColorStyleChanged()), receiver, SIGNAL(colorStyleChanged())) && ret;
-	ret = connect(this, SIGNAL(broadcastColorStyleChangedOnMouseRelease()),
-				  receiver, SIGNAL(colorStyleChangedOnMouseRelease())) &&
+	ret =
+		connect(this, SIGNAL(broadcastPaletteChanged()), receiver, SIGNAL(paletteChanged())) && ret;
+	ret = connect(this, SIGNAL(broadcastPaletteTitleChanged()), receiver,
+				  SIGNAL(paletteTitleChanged())) &&
+		  ret;
+	ret = connect(this, SIGNAL(broadcastColorStyleSwitched()), receiver,
+				  SIGNAL(colorStyleSwitched())) &&
+		  ret;
+	ret = connect(this, SIGNAL(broadcastColorStyleChanged()), receiver,
+				  SIGNAL(colorStyleChanged())) &&
+		  ret;
+	ret = connect(this, SIGNAL(broadcastColorStyleChangedOnMouseRelease()), receiver,
+				  SIGNAL(colorStyleChangedOnMouseRelease())) &&
 		  ret;
 
 	return ret;
@@ -71,12 +77,19 @@ bool TPaletteHandle::disconnectBroadcasts(const QObject *receiver)
 {
 	bool ret = true;
 
-	ret = disconnect(this, SIGNAL(broadcastPaletteChanged()), receiver, SIGNAL(paletteChanged())) && ret;
-	ret = disconnect(this, SIGNAL(broadcastPaletteTitleChanged()), receiver, SIGNAL(paletteTitleChanged())) && ret;
-	ret = disconnect(this, SIGNAL(broadcastColorStyleSwitched()), receiver, SIGNAL(colorStyleSwitched())) && ret;
-	ret = disconnect(this, SIGNAL(broadcastColorStyleChanged()), receiver, SIGNAL(colorStyleChanged())) && ret;
-	ret = disconnect(this, SIGNAL(broadcastColorStyleChangedOnMouseRelease()),
-					 receiver, SIGNAL(colorStyleChangedOnMouseRelease())) &&
+	ret = disconnect(this, SIGNAL(broadcastPaletteChanged()), receiver, SIGNAL(paletteChanged())) &&
+		  ret;
+	ret = disconnect(this, SIGNAL(broadcastPaletteTitleChanged()), receiver,
+					 SIGNAL(paletteTitleChanged())) &&
+		  ret;
+	ret = disconnect(this, SIGNAL(broadcastColorStyleSwitched()), receiver,
+					 SIGNAL(colorStyleSwitched())) &&
+		  ret;
+	ret = disconnect(this, SIGNAL(broadcastColorStyleChanged()), receiver,
+					 SIGNAL(colorStyleChanged())) &&
+		  ret;
+	ret = disconnect(this, SIGNAL(broadcastColorStyleChangedOnMouseRelease()), receiver,
+					 SIGNAL(colorStyleChangedOnMouseRelease())) &&
 		  ret;
 
 	return ret;

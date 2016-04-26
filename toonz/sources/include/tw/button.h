@@ -21,14 +21,14 @@ class TButtonSet;
 
 class DVAPI TButton : public TWidget, public TCommandSource
 {
-protected:
+  protected:
 	bool m_pressed, m_active;
 	int m_border;
 
 	vector<TButtonSet *> *m_buttonSets;
 	friend class TButtonSet;
 
-public:
+  public:
 	TButton(TWidget *parent, string name = "button");
 	~TButton();
 
@@ -45,9 +45,10 @@ class DVAPI TIconButton : public TButton
 {
 	TRaster32P m_rasterUp, m_rasterDown;
 
-public:
+  public:
 	TIconButton(TWidget *parent, TRaster32P raster, string name = "button");
-	TIconButton(TWidget *parent, TRaster32P rasterUp, TRaster32P rasterDown, string name = "button");
+	TIconButton(TWidget *parent, TRaster32P rasterUp, TRaster32P rasterDown,
+				string name = "button");
 	void repaint();
 	void leftButtonDown(const TMouseEvent &);
 	void leftButtonUp(const TMouseEvent &);
@@ -57,10 +58,8 @@ class DVAPI TIconToggle : public TButton
 {
 	TRaster32P m_up, m_down;
 
-public:
-	TIconToggle(TWidget *parent,
-				TRaster32P up, TRaster32P down,
-				string name = "button");
+  public:
+	TIconToggle(TWidget *parent, TRaster32P up, TRaster32P down, string name = "button");
 	void repaint();
 	void setStatus(bool v);
 	bool getStatus();
@@ -70,16 +69,15 @@ public:
 
 class TButtonSetAction
 {
-public:
+  public:
 	TButtonSetAction(){};
 	virtual ~TButtonSetAction(){};
 	virtual void sendCommand(string value) = 0;
 };
 
-template <class T>
-class TButtonSetActionT : public TButtonSetAction
+template <class T> class TButtonSetActionT : public TButtonSetAction
 {
-public:
+  public:
 	typedef void (T::*CommandMethod)(string);
 
 	T *m_target;
@@ -95,16 +93,16 @@ class DVAPI TButtonSet
 	string m_currentValue;
 	TButtonSetAction *m_action;
 
-public:
+  public:
 	TButtonSet();
 	~TButtonSet();
 
-private:
+  private:
 	// not implemented
 	TButtonSet(const TButtonSet &);
 	TButtonSet &operator=(const TButtonSet &);
 
-public:
+  public:
 	void addButton(TButton *button, string value);
 	void removeButton(TButton *button);
 	void setValue(string value);

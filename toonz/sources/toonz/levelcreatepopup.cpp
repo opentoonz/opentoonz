@@ -77,23 +77,18 @@ class CreateLevelUndo : public TUndo
 	TXshSimpleLevelP m_sl;
 	bool m_areColumnsShifted;
 
-public:
+  public:
 	CreateLevelUndo(int row, int column, int frameCount, int step, bool areColumnsShifted)
-		: m_rowIndex(row), m_columnIndex(column), m_frameCount(frameCount), m_step(step), m_sl(0), m_areColumnsShifted(areColumnsShifted)
+		: m_rowIndex(row), m_columnIndex(column), m_frameCount(frameCount), m_step(step), m_sl(0),
+		  m_areColumnsShifted(areColumnsShifted)
 	{
 		TApp *app = TApp::instance();
 		ToonzScene *scene = app->getCurrentScene()->getScene();
 		m_oldLevelCount = scene->getLevelSet()->getLevelCount();
 	}
-	~CreateLevelUndo()
-	{
-		m_sl = 0;
-	}
+	~CreateLevelUndo() { m_sl = 0; }
 
-	void onAdd(TXshSimpleLevelP sl)
-	{
-		m_sl = sl;
-	}
+	void onAdd(TXshSimpleLevelP sl) { m_sl = sl; }
 
 	void undo() const
 	{
@@ -148,10 +143,7 @@ public:
 		app->getCurrentXsheet()->notifyXsheetChanged();
 	}
 
-	int getSize() const
-	{
-		return sizeof *this;
-	}
+	int getSize() const { return sizeof *this; }
 	QString getHistoryString()
 	{
 		return QObject::tr("Create Level %1  at Column %2")
@@ -161,7 +153,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-} //anonymous namespace
+} // anonymous namespace
 //-----------------------------------------------------------------------------
 
 //=============================================================================
@@ -196,8 +188,8 @@ LevelCreatePopup::LevelCreatePopup()
 	QPushButton *cancelBtn = new QPushButton(tr("Cancel"), this);
 	QPushButton *applyBtn = new QPushButton(tr("Apply"), this);
 
-	//Exclude all character which cannot fit in a filepath (Win).
-	//Dots are also prohibited since they are internally managed by Toonz.
+	// Exclude all character which cannot fit in a filepath (Win).
+	// Dots are also prohibited since they are internally managed by Toonz.
 	QRegExp rx("[^\\\\/:?*.\"<>|]+");
 	m_nameFld->setValidator(new QRegExpValidator(rx, this));
 
@@ -223,37 +215,38 @@ LevelCreatePopup::LevelCreatePopup()
 		guiLay->setVerticalSpacing(10);
 		guiLay->setHorizontalSpacing(5);
 		{
-			//Name
+			// Name
 			guiLay->addWidget(new QLabel(tr("Name:")), 0, 0, Qt::AlignRight | Qt::AlignVCenter);
 			guiLay->addWidget(m_nameFld, 0, 1, 1, 4);
 
-			//From-To
+			// From-To
 			guiLay->addWidget(new QLabel(tr("From:")), 1, 0, Qt::AlignRight | Qt::AlignVCenter);
 			guiLay->addWidget(m_fromFld, 1, 1);
 			guiLay->addWidget(new QLabel(tr("To:")), 1, 2, Qt::AlignRight | Qt::AlignVCenter);
 			guiLay->addWidget(m_toFld, 1, 3);
 
-			//Step-Inc
+			// Step-Inc
 			guiLay->addWidget(new QLabel(tr("Step:")), 2, 0, Qt::AlignRight | Qt::AlignVCenter);
 			guiLay->addWidget(m_stepFld, 2, 1);
-			guiLay->addWidget(new QLabel(tr("Increment:")), 2, 2, Qt::AlignRight | Qt::AlignVCenter);
+			guiLay->addWidget(new QLabel(tr("Increment:")), 2, 2,
+							  Qt::AlignRight | Qt::AlignVCenter);
 			guiLay->addWidget(m_incFld, 2, 3);
 
-			//Type
+			// Type
 			guiLay->addWidget(new QLabel(tr("Type:")), 3, 0, Qt::AlignRight | Qt::AlignVCenter);
 			guiLay->addWidget(m_levelTypeOm, 3, 1, 1, 3);
 
-			//Save In
+			// Save In
 			guiLay->addWidget(new QLabel(tr("Save In:")), 4, 0, Qt::AlignRight | Qt::AlignVCenter);
 			guiLay->addWidget(m_pathFld, 4, 1, 1, 4);
 
-			//Width - Height
+			// Width - Height
 			guiLay->addWidget(m_widthLabel, 5, 0, Qt::AlignRight | Qt::AlignVCenter);
 			guiLay->addWidget(m_widthFld, 5, 1);
 			guiLay->addWidget(m_heightLabel, 5, 2, Qt::AlignRight | Qt::AlignVCenter);
 			guiLay->addWidget(m_heightFld, 5, 3);
 
-			//DPI
+			// DPI
 			guiLay->addWidget(m_dpiLabel, 6, 0, Qt::AlignRight | Qt::AlignVCenter);
 			guiLay->addWidget(m_dpiFld, 6, 1, 1, 3);
 		}
@@ -300,7 +293,8 @@ void LevelCreatePopup::updatePath()
 		/*--- 名称未設定シーンのとき、+satsuei直下に ---*/
 		if (scene->isUntitled())
 			defaultPath = TFilePath("+" + TProject::Scenes);
-		/*--- 保存済みシーンのとき、そのシーンファイルの入っているフォルダの1階層上のフォルダにする ---*/
+		/*--- 保存済みシーンのとき、そのシーンファイルの入っているフォルダの1階層上のフォルダにする
+		 * ---*/
 		else
 			defaultPath = scene->codeFilePath(scene->getScenePath().getParentDir().getParentDir());
 	} else
@@ -362,7 +356,7 @@ void LevelCreatePopup::onOkBtn()
 	apply();
 	close();
 	/*if(apply())
-    this->accept();*/
+	this->accept();*/
 }
 
 //-----------------------------------------------------------------------------
@@ -444,7 +438,8 @@ bool LevelCreatePopup::apply()
 		QString question;
 		/*question = "Folder " +toQString(parentDir) +
 								 " doesn't exist.\nDo you want to create it?";*/
-		question = tr("Folder %1 doesn't exist.\nDo you want to create it?").arg(toQString(parentDir));
+		question =
+			tr("Folder %1 doesn't exist.\nDo you want to create it?").arg(toQString(parentDir));
 		int ret = DVGui::MsgBox(question, QObject::tr("Yes"), QObject::tr("No"));
 		if (ret == 0 || ret == 2)
 			return false;
@@ -524,7 +519,7 @@ bool LevelCreatePopup::apply()
 	app->getCurrentScene()->notifyCastChange();
 	app->getCurrentXsheet()->notifyXsheetChanged();
 
-	//Cambia l'immagine corrente ma non cambiano ne' il frame ne' la colonna corrente
+	// Cambia l'immagine corrente ma non cambiano ne' il frame ne' la colonna corrente
 	// (entrambi notificano il cambiamento dell'immagine al tool).
 	// devo verfificare che sia settato il tool giusto.
 	app->getCurrentTool()->onImageChanged((TImage::Type)app->getCurrentImageType());
@@ -567,10 +562,10 @@ void LevelCreatePopup::update()
 	m_widthFld->setValue(cameraSize.lx);
 	m_heightFld->setValue(cameraSize.ly);
   if(camera->isXPrevalence())
-    m_dpiFld->setValue(camera->getDpi().x);
+	m_dpiFld->setValue(camera->getDpi().x);
   else
-    m_dpiFld->setValue(camera->getDpi().y);
-    */
+	m_dpiFld->setValue(camera->getDpi().y);
+	*/
 }
 
 //-----------------------------------------------------------------------------

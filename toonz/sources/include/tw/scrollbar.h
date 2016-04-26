@@ -19,16 +19,15 @@
 
 class TScrollbarGenericAction
 {
-public:
+  public:
 	TScrollbarGenericAction() {}
 	virtual ~TScrollbarGenericAction() {}
 	virtual void notify(int value) = 0;
 };
 
-template <class T>
-class TScrollbarAction : public TScrollbarGenericAction
+template <class T> class TScrollbarAction : public TScrollbarGenericAction
 {
-public:
+  public:
 	typedef void (T::*CommandMethod)(int value);
 
 	T *m_target;
@@ -52,16 +51,15 @@ class DVAPI TScrollbar : public TWidget
 	bool m_maxOverflowEnabled;
 	int m_buttonIncrement;
 
-protected:
+  protected:
 	void updatePositions();
 
 	void drawHCursor(int x0, int x1);
 	void drawVCursor(int y0, int y1);
-	enum ButtonId { FIRST_BUTTON,
-					SECOND_BUTTON };
+	enum ButtonId { FIRST_BUTTON, SECOND_BUTTON };
 	void drawButton(ButtonId id);
 
-public:
+  public:
 	TScrollbar(TWidget *parent, string name = "scrollbar");
 	~TScrollbar();
 

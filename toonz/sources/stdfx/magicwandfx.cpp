@@ -15,7 +15,8 @@
 // TODO
 // v integrare in zcomp
 // v aggiungere: selezioni multiple, antialias, feather, .
-// v aggiungere: gestione del mouse, indicatore del colore del pixel selezionato, media sui vicini del pixel selezionato
+// v aggiungere: gestione del mouse, indicatore del colore del pixel selezionato, media sui vicini
+// del pixel selezionato
 // . maglass
 // . verifiche ed ottimizzazioni
 
@@ -26,11 +27,15 @@ namespace
 static int invocazioni = 0; // tmp: numero di invocazioni della MagicWand
 
 // Shadow Segment
-// "Ombra" proiettata da una riga di pixel idonei sulle righe adiacenti superiore ed inferiore; vedi [1].
+// "Ombra" proiettata da una riga di pixel idonei sulle righe adiacenti superiore ed inferiore; vedi
+// [1].
 class ShadowSegment
 {
-public:
-	ShadowSegment(int Lx, int Rx, int pLx, int pRx, int y, int dir) : m_lx(Lx), m_rx(Rx), m_pLx(pLx), m_pRx(pRx), m_y(y), m_dir(dir) {}
+  public:
+	ShadowSegment(int Lx, int Rx, int pLx, int pRx, int y, int dir)
+		: m_lx(Lx), m_rx(Rx), m_pLx(pLx), m_pRx(pRx), m_y(y), m_dir(dir)
+	{
+	}
 	int m_rx,  // Right endpoint
 		m_lx,  // Left endpoint
 		m_pRx, // parent Right endpoint
@@ -50,17 +55,16 @@ class MagicWandFx : public TStandardRasterFx
 	TDoubleParamP m_tolerance;  // tolleranza
 	TDoubleParamP m_blurRadius; // ampiezza del campione per il SEED
 
-	TPointParamP m_point;		  // coordinate del SEED (passate da zviewer)
-	TBoolParamP m_contiguous;	 // selezione di regioni non connesse alla regione contentente il SEED
-	TBoolParamP m_antialiased;	// applicazione dell'antialiasing
-	TBoolParamP m_euclideanD;	 // funzione alternativa per il calcolo della "similitudine" tra punti
-	TBoolParamP m_preMolt;		  // premoltiplicazione
+	TPointParamP m_point;	  // coordinate del SEED (passate da zviewer)
+	TBoolParamP m_contiguous;  // selezione di regioni non connesse alla regione contentente il SEED
+	TBoolParamP m_antialiased; // applicazione dell'antialiasing
+	TBoolParamP m_euclideanD;  // funzione alternativa per il calcolo della "similitudine" tra punti
+	TBoolParamP m_preMolt;	 // premoltiplicazione
 	TBoolParamP m_isShiftPressed; // per le selezioni multiple: SUB
 	TBoolParamP m_isAltPressed;   // per le selezioni multiple: ADD
 
-public:
-	MagicWandFx()
-		: m_tolerance(15.0), m_blurRadius(0.0), m_point(TPointD(0, 0))
+  public:
+	MagicWandFx() : m_tolerance(15.0), m_blurRadius(0.0), m_point(TPointD(0, 0))
 
 	{
 		m_contiguous = TBoolParamP(true);
@@ -104,10 +108,14 @@ public:
 
 	int m_imageHeigth; // altezza del raster
 	int m_imageWidth;  // larghezza del raster
-	double m_tol;	  // le uso per evitare di dover richiamare la funzione getValue per ogni punto: sistemare?
-	int m_cont;		   // le uso per evitare di dover richiamare la funzione getValue per ogni punto: sistemare?
-	bool m_antial;	 // le uso per evitare di dover richiamare la funzione getValue per ogni punto: sistemare?
-	bool m_euclid;	 // le uso per evitare di dover richiamare la funzione getValue per ogni punto: sistemare?
+	double m_tol;  // le uso per evitare di dover richiamare la funzione getValue per ogni punto:
+				   // sistemare?
+	int m_cont;	// le uso per evitare di dover richiamare la funzione getValue per ogni punto:
+				   // sistemare?
+	bool m_antial; // le uso per evitare di dover richiamare la funzione getValue per ogni punto:
+				   // sistemare?
+	bool m_euclid; // le uso per evitare di dover richiamare la funzione getValue per ogni punto:
+				   // sistemare?
 	bool m_add;
 	bool m_sub;
 	int m_id_invocazione;		  // contatore delle invocazioni
@@ -136,7 +144,9 @@ bool MagicWandFx::pixelProcessor(TPixel32 *testPix, TPixelGR8 *maskPix)
 	// valuto la distanza tra il testPix ed il SEED e la metto in diff
 	if (m_euclid) {
 		// calcolo la Distanza Euclidea tra i punti nello spazio RGB
-		diff = sqrt((m_pickedPix->r - testPix->r) * (m_pickedPix->r - testPix->r) + (m_pickedPix->g - testPix->g) * (m_pickedPix->g - testPix->g) + (m_pickedPix->b - testPix->b) * (m_pickedPix->b - testPix->b));
+		diff = sqrt((m_pickedPix->r - testPix->r) * (m_pickedPix->r - testPix->r) +
+					(m_pickedPix->g - testPix->g) * (m_pickedPix->g - testPix->g) +
+					(m_pickedPix->b - testPix->b) * (m_pickedPix->b - testPix->b));
 	} else {
 		// GIMP-like: confronto la tolleranza con il massimo tra gli scarti delle componenti
 		diff = abs(m_pickedPix->r - testPix->r);
@@ -195,19 +205,25 @@ void MagicWandFx::EnqueueSegment(int num, int dir, int pLx, int pRx, int Lx, int
 	int pushRx = Rx + 1;
 	int pushLx = Lx + 1;
 
-	//  TSystem::outputDebug("[MWfx("+toString(m_id_invocazione)+":"+toString(num)+")<PUSH 1>]\tStack Size:"+toString((int) m_sSStack.size())+"\tLx:"+toString(Lx)+"\tRx:"+toString(Rx)+"\tpLx:"+toString(pushLx)+"\tpRx:"+toString(pushRx)+"\ty:"+toString(y)+"\tdir:"+toString(dir)+"\n");
+	//  TSystem::outputDebug("[MWfx("+toString(m_id_invocazione)+":"+toString(num)+")<PUSH
+	//  1>]\tStack Size:"+toString((int)
+	//  m_sSStack.size())+"\tLx:"+toString(Lx)+"\tRx:"+toString(Rx)+"\tpLx:"+toString(pushLx)+"\tpRx:"+toString(pushRx)+"\ty:"+toString(y)+"\tdir:"+toString(dir)+"\n");
 	assert((Lx <= Rx) && (pushLx <= pushRx) && (Lx >= 0));
 	m_sSStack.push(ShadowSegment(Lx, Rx, pushLx, pushRx, (y + dir), dir));
 	shadowEnqueued++;
 
 	if (Rx > pRx) { // U-turn a destra
-					//  TSystem::outputDebug("[MWfx("+toString(m_id_invocazione)+":"+toString(num)+")<PUSH 2>]\tStack Size:"+toString((int) m_sSStack.size())+"\tLx:"+toString(pRx+1)+"\tRx:"+toString(Rx)+"\tpLx:"+toString(pushLx)+"\tpRx:"+toString(pushRx)+"\ty:"+toString(y-dir)+"\tdir:"+toString(dir)+"\n");
+		//  TSystem::outputDebug("[MWfx("+toString(m_id_invocazione)+":"+toString(num)+")<PUSH
+		//  2>]\tStack Size:"+toString((int)
+		//  m_sSStack.size())+"\tLx:"+toString(pRx+1)+"\tRx:"+toString(Rx)+"\tpLx:"+toString(pushLx)+"\tpRx:"+toString(pushRx)+"\ty:"+toString(y-dir)+"\tdir:"+toString(dir)+"\n");
 		assert(((pRx + 1) <= (Rx)) && (pushLx <= pushRx) && ((pRx + 1) >= 0));
 		m_sSStack.push(ShadowSegment((pRx + 1), Rx, pushLx, pushRx, (y - dir), (-dir)));
 		shadowEnqueued++;
 	}
 	if (Lx < pLx) { // U-turn a sinistra
-					//    TSystem::outputDebug("[MWfx("+toString(m_id_invocazione)+":"+toString(num)+")<PUSH 3>]\tStack Size:"+toString((int) m_sSStack.size())+"\tLx:"+toString(Lx)+"\tRx:"+toString(pLx-1)+"\tpLx:"+toString(pushLx)+"\tpRx:"+toString(pushRx)+"\ty:"+toString(y-dir)+"\tdir:"+toString(dir)+"\n");
+		//    TSystem::outputDebug("[MWfx("+toString(m_id_invocazione)+":"+toString(num)+")<PUSH
+		//    3>]\tStack Size:"+toString((int)
+		//    m_sSStack.size())+"\tLx:"+toString(Lx)+"\tRx:"+toString(pLx-1)+"\tpLx:"+toString(pushLx)+"\tpRx:"+toString(pushRx)+"\ty:"+toString(y-dir)+"\tdir:"+toString(dir)+"\n");
 		assert(((Lx) <= (pLx - 1)) && (pushLx <= pushRx) && (Lx >= 0));
 		m_sSStack.push(ShadowSegment(Lx, (pLx - 1), pushLx, pushRx, (y - dir), (-dir)));
 		shadowEnqueued++;
@@ -225,7 +241,8 @@ void MagicWandFx::doMagicWand(TTile &tile, double frame, const TRasterFxRenderIn
 	m_tol = m_tolerance->getValue(frame);
 	m_antial = m_antialiased->getValue();
 	m_euclid = m_euclideanD->getValue(); // temporaneo?
-	m_cont = m_contiguous->getValue();   // selezione di aree cromaticamente compatibili ma non contigue: Selezione ByColor
+	m_cont = m_contiguous->getValue();   // selezione di aree cromaticamente compatibili ma non
+										 // contigue: Selezione ByColor
 	m_add = m_isShiftPressed->getValue();
 	m_sub = m_isAltPressed->getValue();
 
@@ -248,7 +265,7 @@ void MagicWandFx::doMagicWand(TTile &tile, double frame, const TRasterFxRenderIn
 
 		m_imageWidth = ras32->getLx();
 		m_imageHeigth = ras32->getLy();
-		//assert(m_imageWidth == 800);
+		// assert(m_imageWidth == 800);
 		assert(m_imageHeigth <= 600);
 		int lx = m_imageWidth;
 		int ly = m_imageHeigth;
@@ -309,7 +326,13 @@ void MagicWandFx::doMagicWand(TTile &tile, double frame, const TRasterFxRenderIn
 		int x = tcrop((int)(point.x + m_imageWidth / 2), 0, (m_imageWidth - 1));
 		int y = tcrop((int)(point.y + m_imageHeigth / 2), 0, (m_imageHeigth - 1));
 
-		TSystem::outputDebug("\n[MWfx(" + toString(m_id_invocazione) + ")<begin>]\nSize:" + toString(m_imageWidth) + "x" + toString(m_imageHeigth) + "\tx:" + toString(x) + "\ty:" + toString(y) + "\tToll:" + toString(m_tol) + /*      "\tRadius:" + toString(radius) +*/ ((m_cont) ? "\tContiguous" : "\tNon Contiguous") + ((m_antial) ? "\tAnti Aliased" : "\tAliased") + ((m_euclid) ? "\tEuclidean\n" : "\tNon Euclidean\n"));
+		TSystem::outputDebug("\n[MWfx(" + toString(m_id_invocazione) + ")<begin>]\nSize:" +
+							 toString(m_imageWidth) + "x" + toString(m_imageHeigth) + "\tx:" +
+							 toString(x) + "\ty:" + toString(y) + "\tToll:" + toString(m_tol) +
+							 /*      "\tRadius:" + toString(radius) +*/ (
+								 (m_cont) ? "\tContiguous" : "\tNon Contiguous") +
+							 ((m_antial) ? "\tAnti Aliased" : "\tAliased") +
+							 ((m_euclid) ? "\tEuclidean\n" : "\tNon Euclidean\n"));
 
 		lx = m_imageWidth;
 		ly = m_imageHeigth;
@@ -366,16 +389,22 @@ void MagicWandFx::doMagicWand(TTile &tile, double frame, const TRasterFxRenderIn
 			assert((lxAux <= rxAux) && (lxAux >= 0));
 
 			// metto nella pila delle ombre la riga sopra e sotto quella contentente il seed.
-			//            TSystem::outputDebug("[MWfx("+toString(m_id_invocazione)+")]\tStack Size:"+toString((int) m_sSStack.size())+"\tLx:"+toString(lxAux)+"\tRx:"+toString(rxAux)+"\tpLx:"+toString(lxAux)+"\tpRx:"+toString(rxAux)+"\ty:"+toString(y+1)+"\tdir:"+toString(1)+"\n");
+			//            TSystem::outputDebug("[MWfx("+toString(m_id_invocazione)+")]\tStack
+			//            Size:"+toString((int)
+			//            m_sSStack.size())+"\tLx:"+toString(lxAux)+"\tRx:"+toString(rxAux)+"\tpLx:"+toString(lxAux)+"\tpRx:"+toString(rxAux)+"\ty:"+toString(y+1)+"\tdir:"+toString(1)+"\n");
 			m_sSStack.push(ShadowSegment(lxAux, rxAux, lxAux, rxAux, y + 1, +1)); // cerca in alto
-																				  //            TSystem::outputDebug("[MWfx("+toString(m_id_invocazione)+")]\tStack Size:"+toString((int) m_sSStack.size())+"\tLx:"+toString(lxAux)+"\tRx:"+toString(rxAux)+"\tpLx:"+toString(lxAux)+"\tpRx:"+toString(rxAux)+"\ty:"+toString(y-1)+"\tdir:"+toString(-1)+"\n");
+			//            TSystem::outputDebug("[MWfx("+toString(m_id_invocazione)+")]\tStack
+			//            Size:"+toString((int)
+			//            m_sSStack.size())+"\tLx:"+toString(lxAux)+"\tRx:"+toString(rxAux)+"\tpLx:"+toString(lxAux)+"\tpRx:"+toString(rxAux)+"\ty:"+toString(y-1)+"\tdir:"+toString(-1)+"\n");
 			m_sSStack.push(ShadowSegment(lxAux, rxAux, lxAux, rxAux, y - 1, -1)); // cerca in basso
 
 			while (!m_sSStack.empty()) {
 
 				ShadowSegment sSegment = m_sSStack.top();
 				m_sSStack.pop();
-				//        TSystem::outputDebug("[MWfx("+toString(m_id_invocazione)+":0)<POP   >]\tStack Size:"+toString((int) m_sSStack.size())+"\tLx:"+toString(sSegment.m_lx)+"\tRx:"+toString(sSegment.m_rx)+"\tpLx:"+toString(sSegment.m_pLx)+"\tpRx:"+toString(sSegment.m_pRx)+"\ty:"+toString(sSegment.m_y)+"\tdir:"+toString(sSegment.m_dir)+"\n");
+				//        TSystem::outputDebug("[MWfx("+toString(m_id_invocazione)+":0)<POP
+				//        >]\tStack Size:"+toString((int)
+				//        m_sSStack.size())+"\tLx:"+toString(sSegment.m_lx)+"\tRx:"+toString(sSegment.m_rx)+"\tpLx:"+toString(sSegment.m_pLx)+"\tpRx:"+toString(sSegment.m_pRx)+"\ty:"+toString(sSegment.m_y)+"\tdir:"+toString(sSegment.m_dir)+"\n");
 
 				dirAux = sSegment.m_dir;
 				pRxAux = sSegment.m_pRx;
@@ -386,7 +415,8 @@ void MagicWandFx::doMagicWand(TTile &tile, double frame, const TRasterFxRenderIn
 
 				if ((yAux < 0) || (yAux >= m_imageHeigth)) {
 					shadowOutOfBorder++;
-					continue; // questo segmento sta fuori dal raster oppure l'ho gia' colorato: lo salto
+					continue; // questo segmento sta fuori dal raster oppure l'ho gia' colorato: lo
+							  // salto
 				}
 				assert((lxAux <= rxAux) && (pLxAux <= pRxAux));
 				assert((m_sSStack.size() <= 1000));
@@ -449,20 +479,24 @@ void MagicWandFx::doMagicWand(TTile &tile, double frame, const TRasterFxRenderIn
 						}
 					} // non ero nello span
 					xAux++;
-					//          TSystem::outputDebug("[MWfx("+toString(m_id_invocazione)+")]\tStack Size:"+toString((int) m_sSStack.size())+"\txAux:"+toString(xAux)+"\ty:"+toString(yAux)+"\n");
+					//          TSystem::outputDebug("[MWfx("+toString(m_id_invocazione)+")]\tStack
+					//          Size:"+toString((int)
+					//          m_sSStack.size())+"\txAux:"+toString(xAux)+"\ty:"+toString(yAux)+"\n");
 				} // mi sposto a destra lungo la X: endloop 1
 				if (inSpan) {
 					EnqueueSegment(2, dirAux, pLxAux, pRxAux, lxAux, (xAux - 1), yAux);
 				}
 			}  // finche' la pila non e' vuota: endloop 2
 		}	  // if m_cont
-		else { // anche le regioni simili NON contigue: questo rimane anche in caso di modifica della parte m_cont
+		else { // anche le regioni simili NON contigue: questo rimane anche in caso di modifica
+			   // della parte m_cont
 			for (int iy = 0; iy < m_imageHeigth; iy++) {
 				tmpPix = ras32->pixels(iy);
 				maskPix = m_maskGR8->pixels(iy);
 				for (int ix = 0; ix < m_imageWidth; ix++) {
 					maskValue = pixelProcessor(tmpPix, maskPix);
-					//                 if (maskValue) { } // if// il colore e' simile => va incluso nella selezione // fa tutto nella pixel processor
+					//                 if (maskValue) { } // if// il colore e' simile => va incluso
+					//                 nella selezione // fa tutto nella pixel processor
 					tmpPix++;
 					maskPix++;
 				} // ix
@@ -485,15 +519,27 @@ void MagicWandFx::doMagicWand(TTile &tile, double frame, const TRasterFxRenderIn
 				tmpPix->m = maskPix->value;
 				tmpPix++;
 				maskPix++;
-			} //ix
-		}	 //iy
+			} // ix
+		} // iy
 
 		if (m_preMolt->getValue())
 			TRop::premultiply(ras32);
 		stop_time = clock();
 		double durata = (double)(stop_time - start_time) / CLOCKS_PER_SEC;
 
-		TSystem::outputDebug("\n#Pixel:\t" + toString(m_imageWidth * m_imageHeigth) + "\nProc:\t" + toString(pixelProcessed) + "\t[" + toString((pixelProcessed * 100 / (m_imageWidth * m_imageHeigth))) + "%t]" + "\nMask:\t" + toString(pixelMasked) + "\t[" + toString((pixelMasked * 100 / (m_imageWidth * m_imageHeigth))) + "%t]" + "\t[" + toString((pixelMasked * 100 / (pixelProcessed))) + "%p]" + "\nEnqu:\t" + toString(shadowEnqueued) + "\nRepr:\t" + toString(pixelReprocessed) + "\t[" + toString((pixelReprocessed * 100 / (m_imageWidth * m_imageHeigth))) + "%t]" + "\t[" + toString((pixelReprocessed * 100 / (pixelProcessed))) + "%p]" + "\nOutB:\t" + toString(shadowOutOfBorder) + "\t[" + toString((shadowOutOfBorder * 100 / (shadowEnqueued))) + "%t]" + "\nTime:\t" + toString(durata, 3) + " sec\n[MagicWandFX <end>]\n");
+		TSystem::outputDebug("\n#Pixel:\t" + toString(m_imageWidth * m_imageHeigth) + "\nProc:\t" +
+							 toString(pixelProcessed) + "\t[" +
+							 toString((pixelProcessed * 100 / (m_imageWidth * m_imageHeigth))) +
+							 "%t]" + "\nMask:\t" + toString(pixelMasked) + "\t[" +
+							 toString((pixelMasked * 100 / (m_imageWidth * m_imageHeigth))) +
+							 "%t]" + "\t[" + toString((pixelMasked * 100 / (pixelProcessed))) +
+							 "%p]" + "\nEnqu:\t" + toString(shadowEnqueued) + "\nRepr:\t" +
+							 toString(pixelReprocessed) + "\t[" +
+							 toString((pixelReprocessed * 100 / (m_imageWidth * m_imageHeigth))) +
+							 "%t]" + "\t[" + toString((pixelReprocessed * 100 / (pixelProcessed))) +
+							 "%p]" + "\nOutB:\t" + toString(shadowOutOfBorder) + "\t[" +
+							 toString((shadowOutOfBorder * 100 / (shadowEnqueued))) + "%t]" +
+							 "\nTime:\t" + toString(durata, 3) + " sec\n[MagicWandFX <end>]\n");
 
 	} // if (ras32)
 	else {

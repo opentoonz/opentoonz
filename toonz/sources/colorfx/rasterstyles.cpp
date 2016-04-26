@@ -58,8 +58,7 @@ void TAirbrushRasterStyle::makeIcon(const TDimension &d)
 
 /*---------------------------------------------------------------------------*/
 
-void TAirbrushRasterStyle::arrangeIcon(const TDimension &d,
-									   const TRasterP &normalIc)
+void TAirbrushRasterStyle::arrangeIcon(const TDimension &d, const TRasterP &normalIc)
 {
 	if (normalIc == TRasterP()) {
 		m_icon = TRaster32P(d);
@@ -147,7 +146,8 @@ bool inline doIsBorderPix(int index, TPixelCM32 *pix, TPixelGR8 *pixGr, int pain
 
 //-----------------------------------------------------------------------------
 
-bool inline isBorderPix(int index, TPixelCM32 *pix, int wrap, TPixelGR8 *pixGr, int wrapGr, int color)
+bool inline isBorderPix(int index, TPixelCM32 *pix, int wrap, TPixelGR8 *pixGr, int wrapGr,
+						int color)
 {
 	return doIsBorderPix(index, pix + 1, pixGr + 1, color) ||
 		   doIsBorderPix(index, pix - 1, pixGr - 1, color) ||
@@ -181,8 +181,8 @@ double TBlendRasterStyle::computeFactor(const Params &params) const
 	int num_lines = 0;
 	double tot_sum = 0;
 
-	//interactive!
-	//if (Factor == 0)
+	// interactive!
+	// if (Factor == 0)
 	rGr->lock();
 	rCm->lock();
 	for (i = 1; i < params.m_r->getLy() - 1; i++) {

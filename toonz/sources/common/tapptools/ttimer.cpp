@@ -8,7 +8,7 @@
 
 #include <windows.h>
 
-//moto strano: se togliamo l'include della glut non linka
+// moto strano: se togliamo l'include della glut non linka
 #include <GL/glut.h>
 
 //------------------------------------------------------------------------------
@@ -16,16 +16,14 @@
 namespace
 {
 
-void CALLBACK ElapsedTimeCB(UINT uID, UINT uMsg,
-							DWORD dwUser, DWORD dw1,
-							DWORD dw2);
+void CALLBACK ElapsedTimeCB(UINT uID, UINT uMsg, DWORD dwUser, DWORD dw1, DWORD dw2);
 };
 
 //------------------------------------------------------------------------------
 
 class TTimer::Imp
 {
-public:
+  public:
 	Imp(std::string name, UINT timerRes, TTimer::Type type, TTimer *timer);
 	~Imp();
 
@@ -34,8 +32,7 @@ public:
 		if (m_started)
 			throw TException("The timer is already started");
 
-		m_timerID = timeSetEvent(delay, m_timerRes,
-								 (LPTIMECALLBACK)ElapsedTimeCB, (DWORD) this,
+		m_timerID = timeSetEvent(delay, m_timerRes, (LPTIMECALLBACK)ElapsedTimeCB, (DWORD) this,
 								 m_type | TIME_CALLBACK_FUNCTION);
 
 		m_delay = delay;
@@ -74,7 +71,8 @@ public:
 //------------------------------------------------------------------------------
 
 TTimer::Imp::Imp(std::string name, UINT timerRes, TTimer::Type type, TTimer *timer)
-	: m_name(name), m_timerRes(timerRes), m_timer(timer), m_type(type), m_timerID(NULL), m_ticks(0), m_delay(0), m_started(false), m_action(0)
+	: m_name(name), m_timerRes(timerRes), m_timer(timer), m_type(type), m_timerID(NULL), m_ticks(0),
+	  m_delay(0), m_started(false), m_action(0)
 {
 
 	TIMECAPS tc;
@@ -117,9 +115,7 @@ TTimer::Imp::~Imp()
 namespace
 {
 
-void CALLBACK ElapsedTimeCB(UINT uID, UINT uMsg,
-							DWORD dwUser, DWORD dw1,
-							DWORD dw2)
+void CALLBACK ElapsedTimeCB(UINT uID, UINT uMsg, DWORD dwUser, DWORD dw1, DWORD dw2)
 {
 	TTimer::Imp *imp = reinterpret_cast<TTimer::Imp *>(dwUser);
 	imp->m_ticks++;
@@ -139,9 +135,8 @@ Uint32 ElapsedTimeCB(Uint32 interval, void *param);
 
 class TTimer::Imp
 {
-public:
-	Imp(std::string name, UINT timerRes, TTimer::Type type, TTimer *timer)
-		: m_action(0), m_ticks(0)
+  public:
+	Imp(std::string name, UINT timerRes, TTimer::Type type, TTimer *timer) : m_action(0), m_ticks(0)
 	{
 	}
 	~Imp() {}
@@ -156,10 +151,7 @@ public:
 		m_timerID = SDL_AddTimer(delay, ElapsedTimeCB, this);
 	}
 
-	void stop()
-	{
-		SDL_RemoveTimer(m_timerID);
-	}
+	void stop() { SDL_RemoveTimer(m_timerID); }
 
 	std::string getName() { return m_name; }
 	TUINT64 getTicks() { return m_ticks; }
@@ -183,10 +175,8 @@ class SendCommandMSG : public TThread::Message
 {
 	TTimer::Imp *m_ztimp;
 
-public:
-	SendCommandMSG(TTimer::Imp *ztimp) : TThread::Message(), m_ztimp(ztimp)
-	{
-	}
+  public:
+	SendCommandMSG(TTimer::Imp *ztimp) : TThread::Message(), m_ztimp(ztimp) {}
 	~SendCommandMSG() {}
 	TThread::Message *clone() const { return new SendCommandMSG(*this); }
 	void onDeliver()
@@ -210,9 +200,8 @@ Uint32 ElapsedTimeCB(Uint32 interval, void *param)
 #elif __sgi
 class TTimer::Imp
 {
-public:
-	Imp(std::string name, UINT timerRes, TTimer::Type type, TTimer *timer)
-		: m_action(0) {}
+  public:
+	Imp(std::string name, UINT timerRes, TTimer::Type type, TTimer *timer) : m_action(0) {}
 	~Imp() {}
 
 	void start(UINT delay)
@@ -223,10 +212,7 @@ public:
 		m_started = true;
 	}
 
-	void stop()
-	{
-		m_started = false;
-	}
+	void stop() { m_started = false; }
 
 	std::string getName() { return m_name; }
 	TUINT64 getTicks() { return m_ticks; }
@@ -248,9 +234,8 @@ public:
 #elif MACOSX
 class TTimer::Imp
 {
-public:
-	Imp(std::string name, UINT timerRes, TTimer::Type type, TTimer *timer)
-		: m_action(0) {}
+  public:
+	Imp(std::string name, UINT timerRes, TTimer::Type type, TTimer *timer) : m_action(0) {}
 	~Imp() {}
 
 	void start(UINT delay)
@@ -261,10 +246,7 @@ public:
 		m_started = true;
 	}
 
-	void stop()
-	{
-		m_started = false;
-	}
+	void stop() { m_started = false; }
 
 	std::string getName() { return m_name; }
 	TUINT64 getTicks() { return m_ticks; }

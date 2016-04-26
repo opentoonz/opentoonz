@@ -19,6 +19,5 @@ TFunctorInvoker *TFunctorInvoker::instance()
 
 void TFunctorInvoker::invokeQueued(BaseFunctor *functor)
 {
-	QMetaObject::invokeMethod(
-		this, "invoke", Qt::QueuedConnection, Q_ARG(void *, functor));
+	QMetaObject::invokeMethod(this, "invoke", Qt::QueuedConnection, Q_ARG(void *, functor));
 }

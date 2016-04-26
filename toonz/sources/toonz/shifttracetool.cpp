@@ -31,8 +31,12 @@ bool circumCenter(TPointD &out, const TPointD &a, const TPointD &b, const TPoint
 		out = TPointD();
 		return false;
 	}
-	out.x = ((a.y * a.y + a.x * a.x) * (b.y - c.y) + (b.y * b.y + b.x * b.x) * (c.y - a.y) + (c.y * c.y + c.x * c.x) * (a.y - b.y)) / d;
-	out.y = ((a.y * a.y + a.x * a.x) * (c.x - b.x) + (b.y * b.y + b.x * b.x) * (a.x - c.x) + (c.y * c.y + c.x * c.x) * (b.x - a.x)) / d;
+	out.x = ((a.y * a.y + a.x * a.x) * (b.y - c.y) + (b.y * b.y + b.x * b.x) * (c.y - a.y) +
+			 (c.y * c.y + c.x * c.x) * (a.y - b.y)) /
+			d;
+	out.y = ((a.y * a.y + a.x * a.x) * (c.x - b.x) + (b.y * b.y + b.x * b.x) * (a.x - c.x) +
+			 (c.y * c.y + c.x * c.x) * (b.x - a.x)) /
+			d;
 	return true;
 }
 
@@ -40,7 +44,7 @@ bool circumCenter(TPointD &out, const TPointD &a, const TPointD &b, const TPoint
 
 class ShiftTraceTool : public TTool
 {
-public:
+  public:
 	enum CurveStatus {
 		NoCurve,
 		TwoPointsCurve, // just during the first click&drag
@@ -61,7 +65,7 @@ public:
 		return CurveP0Gadget <= id && id <= CurvePmGadget;
 	}
 
-private:
+  private:
 	TPointD m_oldPos, m_startPos;
 	int m_ghostIndex;
 	TPointD m_p0, m_p1, m_p2;
@@ -76,7 +80,7 @@ private:
 	TAffine m_aff[2];
 	TPointD m_center[2];
 
-public:
+  public:
 	ShiftTraceTool();
 
 	ToolType getToolType() const { return GenericTool; }
@@ -126,7 +130,8 @@ public:
 };
 
 ShiftTraceTool::ShiftTraceTool()
-	: TTool("T_ShiftTrace"), m_ghostIndex(0), m_curveStatus(NoCurve), m_gadget(NoGadget), m_highlightedGadget(NoGadget)
+	: TTool("T_ShiftTrace"), m_ghostIndex(0), m_curveStatus(NoCurve), m_gadget(NoGadget),
+	  m_highlightedGadget(NoGadget)
 {
 	bind(TTool::AllTargets); // Deals with tool deactivation internally
 }
@@ -302,7 +307,8 @@ void ShiftTraceTool::drawControlRect()
 	glPushMatrix();
 	tglMultMatrix(getGhostAff());
 	TPixel32 color;
-	color = m_highlightedGadget == TranslateGadget ? TPixel32(200, 100, 100) : TPixel32(120, 120, 120);
+	color =
+		m_highlightedGadget == TranslateGadget ? TPixel32(200, 100, 100) : TPixel32(120, 120, 120);
 	tglColor(color);
 	glBegin(GL_LINE_STRIP);
 	glVertex2d(box.x0, box.y0);

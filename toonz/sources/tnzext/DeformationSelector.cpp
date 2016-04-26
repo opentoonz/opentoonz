@@ -22,8 +22,7 @@ DeformationSelector::~DeformationSelector()
 
 //-----------------------------------------------------------------------------
 
-DeformationSelector *
-DeformationSelector::instance()
+DeformationSelector *DeformationSelector::instance()
 {
 	static DeformationSelector singleton;
 	return &singleton;
@@ -31,8 +30,7 @@ DeformationSelector::instance()
 
 //-----------------------------------------------------------------------------
 
-void DeformationSelector::add(StrokeDeformationImpl *deformation,
-							  int priority)
+void DeformationSelector::add(StrokeDeformationImpl *deformation, int priority)
 {
 	assert(deformation && "Not deformation available!!!");
 	if (!deformation)
@@ -43,8 +41,7 @@ void DeformationSelector::add(StrokeDeformationImpl *deformation,
 
 //-----------------------------------------------------------------------------
 
-StrokeDeformationImpl *
-DeformationSelector::getDeformation(const ContextStatus *status)
+StrokeDeformationImpl *DeformationSelector::getDeformation(const ContextStatus *status)
 {
 	assert(status && "Not status available!!!");
 	if (!status)
@@ -57,25 +54,18 @@ DeformationSelector::getDeformation(const ContextStatus *status)
 	if (!ref_.empty())
 		default_def = ref_[0];
 
-	vector<Deformation>::iterator
-		it,
-		end = ref_.end();
-	for (it = ref_.begin();
-		 it != end;
-		 ++it) {
-		StrokeDeformationImpl
-			*tmp = it->first;
+	vector<Deformation>::iterator it, end = ref_.end();
+	for (it = ref_.begin(); it != end; ++it) {
+		StrokeDeformationImpl *tmp = it->first;
 
 		if (tmp->check(status)) {
-			if (it->second >
-				candidate.second) {
+			if (it->second > candidate.second) {
 				candidate = *it;
 				if (it->second < default_def.second)
 					default_def = *it;
 			}
 		}
-		if (tmp->getShortcutKey() ==
-			status->key_event_) {
+		if (tmp->getShortcutKey() == status->key_event_) {
 			return tmp;
 		}
 	}

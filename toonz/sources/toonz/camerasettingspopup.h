@@ -44,7 +44,7 @@ class CameraSettingsPopup : public QDialog
 	TCamera *getCamera();
 	void updateWindowTitle();
 
-public:
+  public:
 	CameraSettingsPopup();
 
 	void attachToCamera(const TStageObjectId &id) { m_cameraId = id; }
@@ -52,12 +52,12 @@ public:
 	// create a popup attached to camera id (or return the already existent one)
 	static CameraSettingsPopup *createPopup(const TStageObjectId &id);
 
-protected:
+  protected:
 	void showEvent(QShowEvent *e);
 	void hideEvent(QHideEvent *e);
 	void moveEvent(QMoveEvent *e);
 
-protected slots:
+  protected slots:
 
 	void onChanged();
 	void onNameChanged();
@@ -65,7 +65,7 @@ protected slots:
 	void updateFields(bool) { updateFields(); } // to be connected to objectChanged(bool)
 	void onLevelSwitched(TXshLevel *);
 
-signals:
+  signals:
 	void changed();
 };
 

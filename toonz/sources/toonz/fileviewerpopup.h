@@ -35,7 +35,7 @@ class FileViewer : public QWidget
 	TSoundTrack *m_snd;
 	bool m_soundOn;
 
-public:
+  public:
 #if QT_VERSION >= 0x050500
 	FileViewer(QWidget *parent = 0, Qt::WindowFlags flags = Qt::Tool);
 #else
@@ -50,7 +50,7 @@ public:
 
 	void showFrame(int frameIndex);
 
-protected:
+  protected:
 	void dragEnterEvent(QDragEnterEvent *event);
 	void dropEvent(QDropEvent *event);
 
@@ -58,8 +58,8 @@ protected:
 };
 
 /*
-class FileViewerPanel 
-: public ImageViewer 
+class FileViewerPanel
+: public ImageViewer
 , public TDragDropListener
 , public TSoundOutputDeviceListener
 , public FlipPanel::VCR
@@ -67,10 +67,10 @@ class FileViewerPanel
 public:
   class Listener {
   public:
-    virtual void onPathChange(const TFilePath &fp) = 0;
-    virtual void onFrameChange(const TFrameId &fid) = 0;
-    virtual void onZoomChange() = 0;
-    virtual ~Listener(){}
+	virtual void onPathChange(const TFilePath &fp) = 0;
+	virtual void onFrameChange(const TFrameId &fid) = 0;
+	virtual void onZoomChange() = 0;
+	virtual ~Listener(){}
   };
 
 private:
@@ -107,10 +107,10 @@ public:
   void resetZoom();
   wstring getLevelName() const {return m_levelName;}
   const vector<TFrameId>& getLevelFids()const {return m_fids;}
-  
+
   void showFrame(int frameIndex);
   TFrameId getFrameId() const {
-    return 0<=m_index && m_index<(int)m_fids.size() ? m_fids[m_index] : TFrameId::NO_FRAME;
+	return 0<=m_index && m_index<(int)m_fids.size() ? m_fids[m_index] : TFrameId::NO_FRAME;
   }
 
   int getFrameCount() const {return m_fids.size();}
@@ -129,12 +129,12 @@ public:
   int getCurrentFrame() const {return m_index;}
   void setColorFilter(UCHAR colorMask)  {setColorMask(colorMask); invalidate();}
   void setSound(bool on) {m_soundOn = on;}
-  
-  void setFrame(int index) 
-    {
-    if(index>=(int)m_fids.size()) return;
-    showFrame(index);
-    }
+
+  void setFrame(int index)
+	{
+	if(index>=(int)m_fids.size()) return;
+	showFrame(index);
+	}
   void onPlayCompleted(){}
   void clearViewerCache();
 };
@@ -152,7 +152,7 @@ class FileViewerPopup : public QWidget
 
 	FileViewer *m_viewer;
 
-public:
+  public:
 #if QT_VERSION >= 0x050500
 	FileViewerPopup(QWidget *parent = 0, Qt::WindowFlags flags = Qt::Tool);
 #else
@@ -167,4 +167,4 @@ void setFrameRateInViewers(int frameRate);
 
 //cancella le immagini
 void resetViewer();*/
-#endif //FILEVIEWERPOPUP_H
+#endif // FILEVIEWERPOPUP_H

@@ -16,7 +16,7 @@
 //-----------------------------------------------------------------------------
 /*
 class ViewerPopup : public FlipBook
-{	
+{
   Q_OBJECT
 public:
 	ViewerPopup(QWidget *parent = 0, Qt::WFlags flags=0);

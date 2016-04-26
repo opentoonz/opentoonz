@@ -15,7 +15,7 @@
 
 class Deformation
 {
-public:
+  public:
 	std::vector<TPointD> m_controlPoints;
 	int m_selected;
 	TAffine m_aff;
@@ -108,8 +108,7 @@ public:
 	}
 };
 
-Deformation::Deformation()
-	: m_selected(-1)
+Deformation::Deformation() : m_selected(-1)
 {
 	m_controlPoints.resize(6);
 	m_controlPoints[0] = TPointD(-250, 100);
@@ -145,8 +144,7 @@ TThickPoint deform(const TThickPoint &p)
 }
 */
 
-MorphTool::MorphTool()
-	: m_pixelSize(1)
+MorphTool::MorphTool() : m_pixelSize(1)
 {
 }
 
@@ -234,12 +232,12 @@ void MorphTool::draw()
   for(double x = -200; x<=200; x+=20)
   for(double y = -200; y<=200; y+=20)
   {
-    TPointD p0(x,y);
-    TPointD p1 = deformation.apply(p0);
-    glColor3d(0,1,0);
-    tglVertex(p0);
-    glColor3d(1,0,0);
-    tglVertex(p1);
+	TPointD p0(x,y);
+	TPointD p1 = deformation.apply(p0);
+	glColor3d(0,1,0);
+	tglVertex(p0);
+	glColor3d(1,0,0);
+	tglVertex(p1);
   }
   glEnd();
   */

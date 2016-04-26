@@ -13,17 +13,17 @@
   \file     tcg_observer_notifier.h
 
   \brief    This file contains the barebone of an elementary, classical
-            implementation of the Observer pattern requiring derivation.
+			implementation of the Observer pattern requiring derivation.
 
   \details  This is intended as a convenient and lightweight predefined
-            implementation when hardwiring the Observer pattern in a
-            known class using derivation.
+			implementation when hardwiring the Observer pattern in a
+			known class using derivation.
 
-            Observe that this implementation <I>does not deal with the
-            actual notifications forwarding</I> - it just manages the
-            set of observers/notifiers in a notifier/observer instance.
+			Observe that this implementation <I>does not deal with the
+			actual notifications forwarding</I> - it just manages the
+			set of observers/notifiers in a notifier/observer instance.
 
-            No multithreading is taken into consideration.
+			No multithreading is taken into consideration.
 
   \remark   See elsewhere for more advanced implementations.
 */
@@ -42,22 +42,26 @@ class notifier_base;
 
 class observer_base
 {
-public:
+  public:
 	virtual ~observer_base() {}
 
-	virtual void attach(notifier_base *notifier) = 0; //!< Adds the specified notifier to the internal set of notifiers.
-	virtual void detach(notifier_base *notifier) = 0; //!< Removes the specified notifier from the internal set of notifiers.
+	virtual void attach(notifier_base *notifier) = 0; //!< Adds the specified notifier to the
+													  //!internal set of notifiers.
+	virtual void detach(notifier_base *notifier) = 0; //!< Removes the specified notifier from the
+													  //!internal set of notifiers.
 };
 
 //------------------------------------------------------------
 
 class notifier_base
 {
-public:
+  public:
 	virtual ~notifier_base() {}
 
-	virtual void attach(observer_base *observer) = 0; //!< Adds the specified observer to the internal set of observers.
-	virtual void detach(observer_base *observer) = 0; //!< Removes the specified observer from the internal set of observers.
+	virtual void attach(observer_base *observer) = 0; //!< Adds the specified observer to the
+													  //!internal set of observers.
+	virtual void detach(observer_base *observer) = 0; //!< Removes the specified observer from the
+													  //!internal set of observers.
 };
 
 //************************************************************************
@@ -69,20 +73,21 @@ class observer_single : public noncopyable<Base>
 {
 	Notifier *m_notifier; // Not owned
 
-public:
+  public:
 	typedef Notifier notifier_type;
 
-public:
+  public:
 	observer_single() : m_notifier() {}
 	~observer_single()
 	{
 		if (m_notifier)
-			static_cast<notifier_base *>(m_notifier)->detach(this); // The detaching function is most probably \a private in
-	}																// reimplemented notifier classes (like in this observer).
-																	// Besides, it would be a virtual function call anyway.
+			static_cast<notifier_base *>(m_notifier)
+				->detach(this); // The detaching function is most probably \a private in
+	}							// reimplemented notifier classes (like in this observer).
+								// Besides, it would be a virtual function call anyway.
 	notifier_type *notifier() const { return m_notifier; }
 
-private:
+  private:
 	void attach(notifier_base *notifier)
 	{
 		assert(notifier && !m_notifier);
@@ -103,10 +108,10 @@ class notifier_single : public noncopyable<Base>
 {
 	Observer *m_observer; // Not owned
 
-public:
+  public:
 	typedef Observer observer_type;
 
-public:
+  public:
 	notifier_single() : m_observer() {}
 	~notifier_single()
 	{
@@ -118,9 +123,11 @@ public:
 
 	void addObserver(observer_type *observer)
 	{
-		notifier_single::attach(observer);					  // No reason to go polymorphic here - it's this very class.
-		static_cast<observer_base *>(observer)->attach(this); // However, here it's necessary - like above, downcast to
-	}														  // the very base.
+		notifier_single::attach(
+			observer); // No reason to go polymorphic here - it's this very class.
+		static_cast<observer_base *>(observer)
+			->attach(this); // However, here it's necessary - like above, downcast to
+	}						// the very base.
 
 	void removeObserver(observer_type *observer)
 	{
@@ -128,7 +135,7 @@ public:
 		notifier_single::detach(observer);
 	}
 
-private:
+  private:
 	void attach(observer_base *observer)
 	{
 		assert(observer && !m_observer);
@@ -152,11 +159,11 @@ class observer : public noncopyable<Base>
 {
 	Set m_notifiers; // Not owned
 
-public:
+  public:
 	typedef Notifier notifier_type;
 	typedef Set notifiers_container;
 
-public:
+  public:
 	~observer()
 	{
 		typename Set::iterator nt, nEnd = m_notifiers.end();
@@ -164,12 +171,9 @@ public:
 			static_cast<notifier_base *>(*nt)->detach(this);
 	}
 
-	const notifiers_container &notifiers() const
-	{
-		return m_notifiers;
-	}
+	const notifiers_container &notifiers() const { return m_notifiers; }
 
-private:
+  private:
 	void attach(notifier_base *notifier)
 	{
 		assert(notifier);
@@ -191,11 +195,11 @@ class notifier : public noncopyable<Base>
 {
 	Set m_observers; // Not owned
 
-public:
+  public:
 	typedef Observer observer_type;
 	typedef Set observers_container;
 
-public:
+  public:
 	~notifier()
 	{
 		typename Set::iterator ot, oEnd = m_observers.end();
@@ -203,10 +207,7 @@ public:
 			static_cast<observer_base *>(*ot)->detach(this);
 	}
 
-	const observers_container &observers() const
-	{
-		return m_observers;
-	}
+	const observers_container &observers() const { return m_observers; }
 
 	void addObserver(observer_type *observer)
 	{
@@ -220,7 +221,7 @@ public:
 		notifier::detach(observer);
 	}
 
-private:
+  private:
 	void attach(observer_base *observer)
 	{
 		assert(observer);

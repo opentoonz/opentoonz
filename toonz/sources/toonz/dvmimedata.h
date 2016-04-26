@@ -12,7 +12,7 @@
 class DvMimeData : public QMimeData
 {
 
-public:
+  public:
 	DvMimeData();
 	~DvMimeData();
 
@@ -21,4 +21,4 @@ public:
 
 QMimeData *cloneData(const QMimeData *data);
 
-#endif //DVMIMEDATA_INCLUDED
+#endif // DVMIMEDATA_INCLUDED

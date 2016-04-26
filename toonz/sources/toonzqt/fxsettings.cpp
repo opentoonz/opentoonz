@@ -135,7 +135,8 @@ ParamsPage::~ParamsPage()
 
 void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical)
 {
-	//m_horizontalLayout dovrebbe essere stato inizializzato prima di entrare nel metodo, per sicurezza verifico.
+	// m_horizontalLayout dovrebbe essere stato inizializzato prima di entrare nel metodo, per
+	// sicurezza verifico.
 	if (isVertical == false && !m_horizontalLayout) {
 		m_horizontalLayout = new QHBoxLayout();
 		m_horizontalLayout->setMargin(0);
@@ -177,22 +178,28 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical)
 						label->setObjectName("FxSettingsLabel");
 						if (isFirstParamInRow) {
 							int currentRow = m_mainLayout->rowCount();
-							m_mainLayout->addWidget(label, currentRow, 0, Qt::AlignRight | Qt::AlignVCenter);
+							m_mainLayout->addWidget(label, currentRow, 0,
+													Qt::AlignRight | Qt::AlignVCenter);
 							isFirstParamInRow = false;
 						} else
-							m_horizontalLayout->addWidget(label, 0, Qt::AlignRight | Qt::AlignVCenter);
+							m_horizontalLayout->addWidget(label, 0,
+														  Qt::AlignRight | Qt::AlignVCenter);
 						m_horizontalLayout->addWidget(field);
 						m_horizontalLayout->addSpacing(10);
 					} else {
 						int currentRow = m_mainLayout->rowCount();
 						QLabel *label = new QLabel(str, this);
 						label->setObjectName("FxSettingsLabel");
-						m_mainLayout->addWidget(label, currentRow, 0, Qt::AlignRight | Qt::AlignVCenter);
+						m_mainLayout->addWidget(label, currentRow, 0,
+												Qt::AlignRight | Qt::AlignVCenter);
 						m_mainLayout->addWidget(field, currentRow, 1);
 					}
-					connect(field, SIGNAL(currentParamChanged()), m_paramViewer, SIGNAL(currentFxParamChanged()));
-					connect(field, SIGNAL(actualParamChanged()), m_paramViewer, SIGNAL(actualFxParamChanged()));
-					connect(field, SIGNAL(paramKeyToggle()), m_paramViewer, SIGNAL(paramKeyChanged()));
+					connect(field, SIGNAL(currentParamChanged()), m_paramViewer,
+							SIGNAL(currentFxParamChanged()));
+					connect(field, SIGNAL(actualParamChanged()), m_paramViewer,
+							SIGNAL(actualFxParamChanged()));
+					connect(field, SIGNAL(paramKeyToggle()), m_paramViewer,
+							SIGNAL(paramKeyChanged()));
 				}
 			}
 		} else if (tagName == "label") {
@@ -227,7 +234,7 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical)
 			}
 		} else if (tagName == "test") {
 			// <test/>
-			//box->add(new WidgetBox(new TestSeparator(page)));
+			// box->add(new WidgetBox(new TestSeparator(page)));
 		} else if (tagName == "hbox") {
 			int currentRow = m_mainLayout->rowCount();
 			m_horizontalLayout = new QHBoxLayout();
@@ -333,8 +340,8 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical)
 					throw TException("expected tag");
 
 				if (tagName == "controller" || /*-- 表示をコントロールするチェックボックス --*/
-					tagName == "on" ||		   /*-- ONのとき表示されるインタフェース --*/
-					tagName == "off")		   /*-- OFFのとき表示されるインタフェース --*/
+					tagName == "on" || /*-- ONのとき表示されるインタフェース --*/
+					tagName == "off")  /*-- OFFのとき表示されるインタフェース --*/
 				{
 					std::string name;
 					is >> name;
@@ -353,10 +360,12 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical)
 									controller_bpf = dynamic_cast<BoolParamField *>(pf);
 								else if (tagName == "on") {
 									on_items.push_back(w);
-									on_items.push_back(m_mainLayout->itemAtPosition(r, 0)->widget());
+									on_items.push_back(
+										m_mainLayout->itemAtPosition(r, 0)->widget());
 								} else if (tagName == "off") {
 									off_items.push_back(w);
-									off_items.push_back(m_mainLayout->itemAtPosition(r, 0)->widget());
+									off_items.push_back(
+										m_mainLayout->itemAtPosition(r, 0)->widget());
 								}
 							}
 						}
@@ -376,10 +385,12 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical)
 											controller_bpf = dynamic_cast<BoolParamField *>(pf_s);
 										else if (tagName == "on") {
 											on_items.push_back(pf_s);
-											on_items.push_back(gridLay->itemAtPosition(r_s, 0)->widget());
+											on_items.push_back(
+												gridLay->itemAtPosition(r_s, 0)->widget());
 										} else if (tagName == "off") {
 											off_items.push_back(pf_s);
-											off_items.push_back(gridLay->itemAtPosition(r_s, 0)->widget());
+											off_items.push_back(
+												gridLay->itemAtPosition(r_s, 0)->widget());
 										}
 									}
 								}
@@ -393,11 +404,13 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical)
 			if (controller_bpf) {
 				/*-- ラベルとWidgetを両方表示/非表示 --*/
 				for (int i = 0; i < on_items.size(); i++) {
-					connect(controller_bpf, SIGNAL(toggled(bool)), on_items[i], SLOT(setVisible(bool)));
+					connect(controller_bpf, SIGNAL(toggled(bool)), on_items[i],
+							SLOT(setVisible(bool)));
 					on_items[i]->hide();
 				}
 				for (int i = 0; i < off_items.size(); i++) {
-					connect(controller_bpf, SIGNAL(toggled(bool)), off_items[i], SLOT(setHidden(bool)));
+					connect(controller_bpf, SIGNAL(toggled(bool)), off_items[i],
+							SLOT(setHidden(bool)));
 					off_items[i]->show();
 				}
 			} else
@@ -475,21 +488,23 @@ void ParamsPage::addWidget(QWidget *field, bool isVertical)
 	}
 }
 
-#define TOONZ_DEFINE_NEW_COMPONENT(NAME, MAKE)                                                         \
-	QWidget *ParamsPage::NAME(TFx *fx, const char *name)                                               \
-	{                                                                                                  \
-		TParamP param = fx->getParams()->getParam(name);                                               \
-		if (!param)                                                                                    \
-			return NULL;                                                                               \
-		QString const paramName = QString::fromStdString(fx->getFxType() + "." + name);                \
-		ParamField *field = MAKE(this, paramName, param);                                              \
-		if (!field)                                                                                    \
-			return NULL;                                                                               \
-		m_fields.push_back(field);                                                                     \
-		connect(field, SIGNAL(currentParamChanged()), m_paramViewer, SIGNAL(currentFxParamChanged())); \
-		connect(field, SIGNAL(actualParamChanged()), m_paramViewer, SIGNAL(actualFxParamChanged()));   \
-		connect(field, SIGNAL(paramKeyToggle()), m_paramViewer, SIGNAL(paramKeyChanged()));            \
-		return field;                                                                                  \
+#define TOONZ_DEFINE_NEW_COMPONENT(NAME, MAKE)                                                     \
+	QWidget *ParamsPage::NAME(TFx *fx, const char *name)                                           \
+	{                                                                                              \
+		TParamP param = fx->getParams()->getParam(name);                                           \
+		if (!param)                                                                                \
+			return NULL;                                                                           \
+		QString const paramName = QString::fromStdString(fx->getFxType() + "." + name);            \
+		ParamField *field = MAKE(this, paramName, param);                                          \
+		if (!field)                                                                                \
+			return NULL;                                                                           \
+		m_fields.push_back(field);                                                                 \
+		connect(field, SIGNAL(currentParamChanged()), m_paramViewer,                               \
+				SIGNAL(currentFxParamChanged()));                                                  \
+		connect(field, SIGNAL(actualParamChanged()), m_paramViewer,                                \
+				SIGNAL(actualFxParamChanged()));                                                   \
+		connect(field, SIGNAL(paramKeyToggle()), m_paramViewer, SIGNAL(paramKeyChanged()));        \
+		return field;                                                                              \
 	}
 
 TOONZ_DEFINE_NEW_COMPONENT(newParamField, ParamField::create);
@@ -548,7 +563,8 @@ void ParamsPage::update(int frame)
 namespace
 {
 
-void updateMaximumPageSize(QGridLayout *layout, int &maxLabelWidth, int &maxWidgetWidth, int &fieldsHeight)
+void updateMaximumPageSize(QGridLayout *layout, int &maxLabelWidth, int &maxWidgetWidth,
+						   int &fieldsHeight)
 {
 	/*-- Label側の横幅の最大値を得る --*/
 	for (int r = 0; r < layout->rowCount(); r++) {
@@ -672,7 +688,7 @@ ParamsPageSet::ParamsPageSet(QWidget *parent, Qt::WFlags flags)
 #endif
 	: QWidget(parent, flags), m_preferedSize(0, 0), m_helpFilePath(""), m_helpCommand("")
 {
-	//TabBar
+	// TabBar
 	m_tabBar = new TabBar(this);
 	// This widget is used to set the background color of the tabBar
 	// using the styleSheet.
@@ -821,7 +837,9 @@ void ParamsPageSet::addParamsPage(ParamsPage *page, const char *name)
 {
 	/*-- このFxで最大サイズのページに合わせてダイアログをリサイズ --*/
 	QSize pagePreferedSize = page->getPreferedSize();
-	m_preferedSize = m_preferedSize.expandedTo(pagePreferedSize + QSize(m_tabBarContainer->height() + 2, 2)); /*-- 2は上下左右のマージン --*/
+	m_preferedSize =
+		m_preferedSize.expandedTo(pagePreferedSize + QSize(m_tabBarContainer->height() + 2,
+														   2)); /*-- 2は上下左右のマージン --*/
 
 	QScrollArea *pane = new QScrollArea(this);
 	pane->setWidgetResizable(true);
@@ -917,7 +935,9 @@ void ParamsPageSet::createPage(TIStream &is, const TFxP &fx, int index)
 
 	/*-- このFxで最大サイズのページに合わせてダイアログをリサイズ --*/
 	QSize pagePreferedSize = paramsPage->getPreferedSize();
-	m_preferedSize = m_preferedSize.expandedTo(pagePreferedSize + QSize(m_tabBarContainer->height() + 2, 2)); /*-- 2は上下左右のマージン --*/
+	m_preferedSize =
+		m_preferedSize.expandedTo(pagePreferedSize + QSize(m_tabBarContainer->height() + 2,
+														   2)); /*-- 2は上下左右のマージン --*/
 
 	QScrollArea *scrollAreaPage = new QScrollArea(this);
 	scrollAreaPage->setWidgetResizable(true);
@@ -940,15 +960,15 @@ void ParamsPageSet::openHelpFile()
 	if (m_helpFilePath == "")
 		return;
 
-	//if (m_helpCommand != "")
+	// if (m_helpCommand != "")
 	//	commandString += m_helpCommand + " ";
 
 	TFilePath helpFp = TEnv::getStuffDir() + TFilePath("doc") + TFilePath(m_helpFilePath);
-	//commandString += QString::fromStdWString(helpFp.getWideString()).toStdString();
-	//QString command = QString::fromStdString(m_helpFilePath);
-	//system(commandString.c_str());
-	//QProcess process;
-	//process.start(command);
+	// commandString += QString::fromStdWString(helpFp.getWideString()).toStdString();
+	// QString command = QString::fromStdString(m_helpFilePath);
+	// system(commandString.c_str());
+	// QProcess process;
+	// process.start(command);
 	QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdWString(helpFp.getWideString())));
 }
 
@@ -1083,7 +1103,7 @@ void ParamViewer::update(int frame, bool onlyParam)
 
 void ParamViewer::setPointValue(int index, const TPointD &p)
 {
-	//Search the index-th param among all pages
+	// Search the index-th param among all pages
 	ParamsPageSet *pageSet = getCurrentPageSet();
 	ParamsPage *page = 0;
 
@@ -1112,7 +1132,9 @@ ParamsPageSet *ParamViewer::getCurrentPageSet() const
 //-----------------------------------------------------------------------------
 
 FxSettings::FxSettings(QWidget *parent, const TPixel32 &checkCol1, const TPixel32 &checkCol2)
-	: QSplitter(Qt::Vertical, parent), m_frameHandle(0), m_fxHandle(0), m_xsheetHandle(0), m_sceneHandle(0), m_levelHandle(0), m_objectHandle(0), m_checkCol1(checkCol1), m_checkCol2(checkCol2), m_isCameraModeView(false), m_container_height(177)
+	: QSplitter(Qt::Vertical, parent), m_frameHandle(0), m_fxHandle(0), m_xsheetHandle(0),
+	  m_sceneHandle(0), m_levelHandle(0), m_objectHandle(0), m_checkCol1(checkCol1),
+	  m_checkCol2(checkCol2), m_isCameraModeView(false), m_container_height(177)
 {
 	// param viewer
 	m_paramViewer = new ParamViewer(this);
@@ -1149,13 +1171,15 @@ FxSettings::FxSettings(QWidget *parent, const TPixel32 &checkCol1, const TPixel3
 	ret = ret && connect(m_paramViewer, SIGNAL(currentFxParamChanged()), SLOT(updateViewer()));
 	ret = ret && connect(m_viewer, SIGNAL(pointPositionChanged(int, const TPointD &)),
 						 SLOT(onPointChanged(int, const TPointD &)));
-	ret = ret && connect(m_paramViewer, SIGNAL(preferedSizeChanged(QSize)), this, SLOT(onPreferedSizeChanged(QSize)));
-	ret = ret && connect(m_paramViewer, SIGNAL(showSwatchButtonToggled(bool)), this, SLOT(onShowSwatchButtonToggled(bool)));
+	ret = ret && connect(m_paramViewer, SIGNAL(preferedSizeChanged(QSize)), this,
+						 SLOT(onPreferedSizeChanged(QSize)));
+	ret = ret && connect(m_paramViewer, SIGNAL(showSwatchButtonToggled(bool)), this,
+						 SLOT(onShowSwatchButtonToggled(bool)));
 	assert(ret);
 
 	swatchContainer->hide();
 
-	//Swatch updates should happen only at the end of a separator resize op.
+	// Swatch updates should happen only at the end of a separator resize op.
 	setStretchFactor(0, 1);
 	setStretchFactor(1, 0);
 	setOpaqueResize(false);
@@ -1223,18 +1247,18 @@ void FxSettings::createToolBar()
 	m_toolBar->setMovable(false);
 	m_toolBar->setFixedHeight(23);
 	m_toolBar->setIconSize(QSize(23, 21));
-	//m_toolBar->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+	// m_toolBar->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
-	//View mode
+	// View mode
 	QActionGroup *viewModeActGroup = new QActionGroup(m_toolBar);
 	viewModeActGroup->setExclusive(false);
-	//camera
+	// camera
 	QIcon camera = createQIconOnOffPNG("viewcamera");
 	QAction *cameraAct = new QAction(camera, tr("&Camera Preview"), m_toolBar);
 	cameraAct->setCheckable(true);
 	viewModeActGroup->addAction(cameraAct);
 	m_toolBar->addAction(cameraAct);
-	//preview
+	// preview
 	QIcon preview = createQIconOnOffPNG("preview");
 	QAction *previewAct = new QAction(preview, tr("&Preview"), m_toolBar);
 	previewAct->setCheckable(true);
@@ -1247,20 +1271,23 @@ void FxSettings::createToolBar()
 	QActionGroup *viewModeGroup = new QActionGroup(m_toolBar);
 	viewModeGroup->setExclusive(true);
 
-	QAction *whiteBg = new QAction(createQIconOnOffPNG("preview_white"), tr("&White Background"), m_toolBar);
+	QAction *whiteBg =
+		new QAction(createQIconOnOffPNG("preview_white"), tr("&White Background"), m_toolBar);
 	whiteBg->setCheckable(true);
 	whiteBg->setChecked(true);
 	viewModeGroup->addAction(whiteBg);
 	connect(whiteBg, SIGNAL(triggered()), this, SLOT(setWhiteBg()));
 	m_toolBar->addAction(whiteBg);
 
-	QAction *blackBg = new QAction(createQIconOnOffPNG("preview_black"), tr("&Black Background"), m_toolBar);
+	QAction *blackBg =
+		new QAction(createQIconOnOffPNG("preview_black"), tr("&Black Background"), m_toolBar);
 	blackBg->setCheckable(true);
 	viewModeGroup->addAction(blackBg);
 	connect(blackBg, SIGNAL(triggered()), this, SLOT(setBlackBg()));
 	m_toolBar->addAction(blackBg);
 
-	m_checkboardBg = new QAction(createQIconOnOffPNG("preview_checkboard"), tr("&Checkered Background"), m_toolBar);
+	m_checkboardBg = new QAction(createQIconOnOffPNG("preview_checkboard"),
+								 tr("&Checkered Background"), m_toolBar);
 	m_checkboardBg->setCheckable(true);
 	viewModeGroup->addAction(m_checkboardBg);
 	connect(m_checkboardBg, SIGNAL(triggered()), this, SLOT(setCheckboardBg()));
@@ -1282,7 +1309,7 @@ void FxSettings::createToolBar()
 
 void FxSettings::setFx(const TFxP &currentFx, const TFxP &actualFx)
 {
-	//disconnecting from the fxChanged() signals avoid useless and dangerous updates!!!
+	// disconnecting from the fxChanged() signals avoid useless and dangerous updates!!!
 	if (m_fxHandle)
 		disconnect(m_fxHandle, SIGNAL(fxChanged()), this, SLOT(updateParamViewer()));
 
@@ -1291,7 +1318,8 @@ void FxSettings::setFx(const TFxP &currentFx, const TFxP &actualFx)
 		currentFxWithoutCamera = getCurrentFx(currentFx, actualFx->getFxId());
 
 	if (currentFxWithoutCamera)
-		TFxUtil::setKeyframe(currentFxWithoutCamera, m_frameHandle->getFrameIndex(), actualFx, m_frameHandle->getFrameIndex());
+		TFxUtil::setKeyframe(currentFxWithoutCamera, m_frameHandle->getFrameIndex(), actualFx,
+							 m_frameHandle->getFrameIndex());
 
 	ToonzScene *scene = 0;
 	if (m_sceneHandle)
@@ -1323,7 +1351,7 @@ void FxSettings::setCurrentFrame()
 	int frame = m_frameHandle->getFrameIndex();
 	m_paramViewer->update(frame, false);
 
-	//if(m_isCameraModeView)
+	// if(m_isCameraModeView)
 	setCurrentFx();
 	m_viewer->updateFrame(frame);
 }
@@ -1375,7 +1403,8 @@ void FxSettings::setCurrentFx()
 		if (!m_isCameraModeView)
 			currentFx = buildSceneFx(scene, frame, actualFx, false);
 		else {
-			const TRenderSettings rs = scene->getProperties()->getPreviewProperties()->getRenderSettings();
+			const TRenderSettings rs =
+				scene->getProperties()->getPreviewProperties()->getRenderSettings();
 			currentFx = buildPartialSceneFx(scene, (double)frame, actualFx, 1, false);
 		}
 	}

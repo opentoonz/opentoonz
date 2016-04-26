@@ -17,7 +17,7 @@ using namespace TwConsts;
 
 class FileBrowserPopup::Data
 {
-public:
+  public:
 	Data() : m_okAction(0) {}
 
 	FileBrowserPopup *m_popup;
@@ -140,9 +140,9 @@ void FileBrowserPopup::configureNotify(const TDimension &d)
 	y += 20 + 4;
 
 	int x = 200;
-	//m_importTray->setGeometry(x,y,d.lx-1,y+m_importTrayH-4);
+	// m_importTray->setGeometry(x,y,d.lx-1,y+m_importTrayH-4);
 
-	//y = y + (m_importTrayH + 8);
+	// y = y + (m_importTrayH + 8);
 	m_data->m_fileBrowser->setGeometry(0, y, d.lx - 1, d.ly - 10);
 	invalidate();
 }

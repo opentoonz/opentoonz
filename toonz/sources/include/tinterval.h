@@ -29,7 +29,7 @@ class TInterval
 {
 	double m_min, m_max;
 
-public:
+  public:
 	//  costruisce l'intervallo vuoto
 	//  TInterval (m_min = 1, m_max = -1) rappresenta l'intervallo vuoto
 	TInterval() : m_min(1), m_max(-1) {}
@@ -46,16 +46,14 @@ public:
 	//-----------------------------------------------------
 	TInterval(const TInterval &w)
 	{
-		assert(w.m_min <= w.m_max ||
-			   (w.m_min == 1 && w.m_max == -1)); //  intervallo vuoto
+		assert(w.m_min <= w.m_max || (w.m_min == 1 && w.m_max == -1)); //  intervallo vuoto
 		m_min = w.m_min;
 		m_max = w.m_max;
 	}
 	//-----------------------------------------------------
 	inline TInterval &operator=(const TInterval &w)
 	{
-		assert(w.m_min <= w.m_max ||
-			   (w.m_min == 1 && w.m_max == -1)); //  intervallo vuoto
+		assert(w.m_min <= w.m_max || (w.m_min == 1 && w.m_max == -1)); //  intervallo vuoto
 		m_min = w.m_min;
 		m_max = w.m_max;
 		return *this;
@@ -110,10 +108,9 @@ public:
 	//-----------------------------------------------------
 	inline TInterval operator/(const TInterval &w) const
 	{
-		assert(m_min <= m_max);		//  non vuoto
-		assert(w.m_min <= w.m_max); //  non vuoto
-		assert((0 < w.m_min && 0 < w.m_max) ||
-			   (0 > w.m_min && 0 > w.m_max)); //  divisore non nullo
+		assert(m_min <= m_max);												  //  non vuoto
+		assert(w.m_min <= w.m_max);											  //  non vuoto
+		assert((0 < w.m_min && 0 < w.m_max) || (0 > w.m_min && 0 > w.m_max)); //  divisore non nullo
 		double value[4];
 		value[0] = m_min / w.m_min;
 		value[1] = m_min / w.m_max;
@@ -133,13 +130,12 @@ public:
 	//-----------------------------------------------------
 	inline bool operator==(const TInterval &w) const
 	{
-		assert(w.m_min <= w.m_max ||
-			   (w.m_min == 1 && w.m_max == -1)); //  intervallo vuoto
+		assert(w.m_min <= w.m_max || (w.m_min == 1 && w.m_max == -1)); //  intervallo vuoto
 		return (m_min == w.m_min && m_max == w.m_max);
 	}
 	//-----------------------------------------------------
 	/*  la definizione e' discutibile...
-  inline bool operator!=(const TInterval &w) const 
+  inline bool operator!=(const TInterval &w) const
   {return (m_min != w.m_min  ||  m_max != w.m_max);}
   */
 	//-----------------------------------------------------
@@ -158,17 +154,17 @@ public:
 	}
 	//-----------------------------------------------------
 	/*  la definizione e' discutibile...
-    //  A >= B  
-    inline bool operator>=(const TInterval &w) const {
-    assert (m_min <= m_max);  //  non vuoto
-    assert (w.m_min <= w.m_max);  //  non vuoto
-    return (m_min >= w.m_min && m_max >= w.m_max);}
+	//  A >= B
+	inline bool operator>=(const TInterval &w) const {
+	assert (m_min <= m_max);  //  non vuoto
+	assert (w.m_min <= w.m_max);  //  non vuoto
+	return (m_min >= w.m_min && m_max >= w.m_max);}
   //-----------------------------------------------------
-    //  A <= B
-    inline bool operator<=(const TInterval &w) const {
-    assert (m_min <= m_max);  //  non vuoto
-    assert (w.m_min <= w.m_max);  //  non vuoto
-    return (m_min <= w.m_min  && m_max <= w.m_max);}
+	//  A <= B
+	inline bool operator<=(const TInterval &w) const {
+	assert (m_min <= m_max);  //  non vuoto
+	assert (w.m_min <= w.m_max);  //  non vuoto
+	return (m_min <= w.m_min  && m_max <= w.m_max);}
   */
 	//-----------------------------------------------------
 	inline void setMin(double min)
@@ -214,8 +210,7 @@ public:
 	inline bool isEmpty() const
 	{
 		//  TInterval (m_min = 1, m_max = -1) rappresenta l'intervallo vuoto
-		assert(m_min <= m_max ||
-			   (m_min == 1 && m_max == -1)); //  intervallo vuoto
+		assert(m_min <= m_max || (m_min == 1 && m_max == -1)); //  intervallo vuoto
 		return (m_min > m_max);
 	}
 
@@ -224,15 +219,13 @@ public:
 	{
 		//  isProper() <=> !isEmpty() && m_min < m_max (cioe' non degenere)
 		//  TInterval (m_min = 1, m_max = -1) rappresenta l'intervallo vuoto
-		assert(m_min <= m_max ||
-			   (m_min == 1 && m_max == -1)); //  intervallo vuoto
+		assert(m_min <= m_max || (m_min == 1 && m_max == -1)); //  intervallo vuoto
 		return (m_min < m_max);
 	}
 	//-----------------------------------------------------
 	inline bool contain(double t) const
 	{
-		assert(m_min <= m_max ||
-			   (m_min == 1 && m_max == -1)); //  intervallo vuoto
+		assert(m_min <= m_max || (m_min == 1 && m_max == -1)); //  intervallo vuoto
 		return (m_min <= t && t <= m_max);
 	} //  isEmpty() => return false
 	//-----------------------------------------------------
@@ -267,7 +260,7 @@ public:
 	friend TInterval sqrt(const TInterval &w);
 };
 //---------------------------------------------------------------------------
-//friend functions
+// friend functions
 inline TInterval operator*(const double s, const TInterval &w)
 {
 	assert(w.m_min <= w.m_max); //  non vuoto
@@ -323,8 +316,7 @@ inline TInterval createTInterval(double center, double radius)
 }
 //-----------------------------------------------------
 inline TInterval createErrorTInterval(double center,
-									  double minError =
-										  (std::numeric_limits<double>::min)())
+									  double minError = (std::numeric_limits<double>::min)())
 {
 	//  type double standard IEEE (1 bit segno + 11 bit esponente + 52 bit mantissa)
 	//  corrisponde ad almeno 15 decimali significativi.

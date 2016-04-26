@@ -22,7 +22,7 @@ namespace TDebugMessage
 
 class Manager
 {
-public:
+  public:
 	virtual std::ostream &getStream() = 0;
 	virtual void flush(int code = 0) = 0;
 	virtual ~Manager() {}

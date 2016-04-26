@@ -31,7 +31,7 @@ void CYOMBParam::print()
 	/*
 	char s[1024];
 
-	OutputDebugString("   ----- YOMB Param -----\n");	
+	OutputDebugString("   ----- YOMB Param -----\n");
 	sprintf(s,"   Name=%s\n",m_name.c_str());
 	OutputDebugString(s);
 	sprintf(s,"   RandomSampling=%d\n",m_isRandomSampling);
@@ -49,13 +49,13 @@ void CYOMBParam::print()
 	sprintf(s,"   dAB=%f\n",m_dAB);
 	OutputDebugString(s);
 
-	for( vector<I_PIXEL>::iterator p=m_color.begin(); 
+	for( vector<I_PIXEL>::iterator p=m_color.begin();
 		 p!=m_color.end();
 		 ++p ) {
 		sprintf(s,"   RGBM=(%d,%d,%d,%d)\n",p->r,p->g,p->b,p->m);
 		OutputDebugString(s);
 	}
-	OutputDebugString("   ----------------------\n");	
+	OutputDebugString("   ----------------------\n");
 */
 }
 
@@ -203,9 +203,7 @@ void CYOMBParam::makeItUS()
 
 void CYOMBParam::makeColorsUS()
 {
-	for (vector<I_PIXEL>::iterator p = m_color.begin();
-		 p != m_color.end();
-		 ++p) {
+	for (vector<I_PIXEL>::iterator p = m_color.begin(); p != m_color.end(); ++p) {
 		p->r = PIX_USHORT_FROM_BYTE((UCHAR)p->r);
 		p->g = PIX_USHORT_FROM_BYTE((UCHAR)p->g);
 		p->b = PIX_USHORT_FROM_BYTE((UCHAR)p->b);

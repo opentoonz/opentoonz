@@ -29,29 +29,28 @@ class TimeStretchPopup : public DVGui::Dialog
 	DVGui::IntLineEdit *m_newRangeFld;
 	QLabel *m_oldRange;
 
-public:
-	enum STRETCH_TYPE {
-		eRegion = 0,
-		eFrameRange = 1,
-		eWholeXsheet = 2
-	};
+  public:
+	enum STRETCH_TYPE { eRegion = 0, eFrameRange = 1, eWholeXsheet = 2 };
 
-private:
+  private:
 	STRETCH_TYPE m_currentStretchType;
 
-public:
+  public:
 	TimeStretchPopup();
 
-protected:
+  protected:
 	void showEvent(QShowEvent *);
 	void hideEvent(QHideEvent *);
 
-protected slots:
+  protected slots:
 	void setCurrentStretchType(int index);
 	void stretch();
 	void updateValues();
 	void updateValues(TSelection *selection);
-	void updateValues(TSelection *selection, TSelection *newSelection) { updateValues(newSelection); }
+	void updateValues(TSelection *selection, TSelection *newSelection)
+	{
+		updateValues(newSelection);
+	}
 };
 
 #endif // TIMESTRETCHPOPUP_H

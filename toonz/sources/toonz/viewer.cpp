@@ -9,8 +9,7 @@
 // Viewer
 //-----------------------------------------------------------------------------
 
-Viewer::Viewer(QWidget *parent)
-	: QGLWidget(parent), m_raster(0), m_processor(0), update_frame(true)
+Viewer::Viewer(QWidget *parent) : QGLWidget(parent), m_raster(0), m_processor(0), update_frame(true)
 {
 }
 
@@ -49,7 +48,8 @@ void Viewer::paintGL()
 	if (m_raster) {
 		glRasterPos2d(0, 0);
 		glPixelStorei(GL_UNPACK_ROW_LENGTH, 0); // ras->getWrap());
-		glDrawPixels(m_raster->getLx(), m_raster->getLy(), TGL_FMT, TGL_TYPE, m_raster->getRawData());
+		glDrawPixels(m_raster->getLx(), m_raster->getLy(), TGL_FMT, TGL_TYPE,
+					 m_raster->getRawData());
 	}
 	if (m_processor) {
 		m_processor->draw();

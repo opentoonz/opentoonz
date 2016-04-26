@@ -40,8 +40,8 @@
 #ifdef MACOSX
 namespace
 {
-//spostare magari in misc;
-//ATTENZIONE: cosi' com'e' il codice e' SBAGLITO. Controllare. Inoltre non si capisce
+// spostare magari in misc;
+// ATTENZIONE: cosi' com'e' il codice e' SBAGLITO. Controllare. Inoltre non si capisce
 // perche' e' sotto ifdef
 void checkAndCorrectPremultipliedImage(TRaster32P ras)
 {
@@ -69,7 +69,7 @@ void checkAndCorrectPremultipliedImage(TRaster32P ras)
 
 class MovieGenerator::Imp
 {
-public:
+  public:
 	TFilePath m_filepath;
 	MovieGenerator::Listener *m_listener;
 	TDimension m_cameraSize;
@@ -83,7 +83,9 @@ public:
 	OnionSkinMask m_osMask;
 
 	Imp(const TFilePath &fp, const TDimension cameraSize, double fps)
-		: m_filepath(fp), m_listener(0), m_cameraSize(cameraSize), m_bgColor(TPixel32::White), m_fps(fps), m_valid(false), m_renderRange(0, -1), m_useMarkers(false), m_sceneCount(1), m_columnIndex(-1), m_osMask()
+		: m_filepath(fp), m_listener(0), m_cameraSize(cameraSize), m_bgColor(TPixel32::White),
+		  m_fps(fps), m_valid(false), m_renderRange(0, -1), m_useMarkers(false), m_sceneCount(1),
+		  m_columnIndex(-1), m_osMask()
 	{
 	}
 	virtual ~Imp() {}
@@ -105,7 +107,7 @@ class AlphaChecker : public TProperty::Visitor
 {
 	bool m_alphaEnabled;
 
-public:
+  public:
 	AlphaChecker() : m_alphaEnabled(false) {}
 	bool isAlphaEnabled() const { return m_alphaEnabled; }
 
@@ -128,11 +130,10 @@ public:
 // RasterMovieGenerator ( animazioni raster)
 //-----------------------------------------------------------------------------
 
-class RasterMovieGenerator
-	: public MovieGenerator::Imp
+class RasterMovieGenerator : public MovieGenerator::Imp
 {
 
-public:
+  public:
 	bool m_isFrames;
 	TLevelWriterP m_lw;
 	bool m_alphaEnabled; //! alpha channel is generated (to disk)
@@ -147,11 +148,11 @@ public:
 	TPropertyGroup *m_fileOptions;
 	int m_status;
 
-	RasterMovieGenerator(
-		const TFilePath &fp,
-		const TDimension cameraSize,
-		TOutputProperties &properties)
-		: Imp(fp, cameraSize, properties.getFrameRate()), m_frameIndex(1), m_started(false), m_offlineGlContext(*TOfflineGL::getStock(cameraSize)), m_st(0), m_whiteSample(0), m_fileOptions(0), m_alphaEnabled(false), m_alphaNeeded(false), m_status(0)
+	RasterMovieGenerator(const TFilePath &fp, const TDimension cameraSize,
+						 TOutputProperties &properties)
+		: Imp(fp, cameraSize, properties.getFrameRate()), m_frameIndex(1), m_started(false),
+		  m_offlineGlContext(*TOfflineGL::getStock(cameraSize)), m_st(0), m_whiteSample(0),
+		  m_fileOptions(0), m_alphaEnabled(false), m_alphaNeeded(false), m_status(0)
 	{
 		m_bgColor = TPixel32(255, 255, 255, 0);
 		TPointD center(0.5 * cameraSize.lx, 0.5 * cameraSize.ly);
@@ -199,9 +200,9 @@ public:
 
 		double dpiScale = (1.0 / Stage::inch) * (double)cameraRes.lx / cameraSize.lx;
 
-		//TAffine viewAff = TScale(dpiScale*sc) * TTranslation(center)* cameraAff.inv();
-		TAffine viewAff =
-			TTranslation(0.5 * cameraRes.lx, 0.5 * cameraRes.ly) * TScale(dpiScale * sc) * cameraAff.inv();
+		// TAffine viewAff = TScale(dpiScale*sc) * TTranslation(center)* cameraAff.inv();
+		TAffine viewAff = TTranslation(0.5 * cameraRes.lx, 0.5 * cameraRes.ly) *
+						  TScale(dpiScale * sc) * cameraAff.inv();
 
 		TRect clipRect(m_offlineGlContext.getBounds());
 		TPixel32 bgColor = scene.getProperties()->getBgColor();
@@ -230,12 +231,12 @@ public:
 
 		Stage::visit(painter, args);
 		/*
-       painter, 
-       &scene,
-       scene.getXsheet(), row, 
-       m_columnIndex, m_osMask, 
-       false,0);
-     */
+	   painter,
+	   &scene,
+	   scene.getXsheet(), row,
+	   m_columnIndex, m_osMask,
+	   false,0);
+	 */
 		TImageWriterP writer = m_lw->getFrameWriter(m_frameIndex++);
 		if (!writer)
 			return false;
@@ -252,7 +253,8 @@ public:
 #endif
 
 		if (Preferences::instance()->isSceneNumberingEnabled())
-			TRasterImageUtils::addSceneNumbering(TRasterImageP(raster), m_frameIndex - 1, scene.getSceneName(), row + 1);
+			TRasterImageUtils::addSceneNumbering(TRasterImageP(raster), m_frameIndex - 1,
+												 scene.getSceneName(), row + 1);
 		TRasterImageP img(raster);
 		writer->save(img);
 
@@ -271,15 +273,15 @@ public:
 			return;
 		}
 		long samplePerFrame = snd->getSampleRate() / m_fps;
-		TSoundTrackP snd1 = snd->extract(frameOffset * samplePerFrame, (TINT32)((frameOffset + sceneFrameCount - 1) * samplePerFrame));
+		TSoundTrackP snd1 =
+			snd->extract(frameOffset * samplePerFrame,
+						 (TINT32)((frameOffset + sceneFrameCount - 1) * samplePerFrame));
 		if (!m_st) {
 			m_st = TSoundTrack::create(snd1->getFormat(), m_whiteSample);
 			m_whiteSample = 0;
 		}
 		TINT32 fromSample = m_st->getSampleCount();
-		TINT32 numSample = tmax(
-			TINT32(sceneFrameCount * samplePerFrame),
-			snd1->getSampleCount());
+		TINT32 numSample = tmax(TINT32(sceneFrameCount * samplePerFrame), snd1->getSampleCount());
 		m_st = TSop::insertBlank(m_st, fromSample, numSample + m_whiteSample);
 		m_st->copy(snd1, TINT32(fromSample + m_whiteSample));
 		m_whiteSample = 0;
@@ -308,11 +310,12 @@ class FlashStagePainter : public Stage::Visitor
 	TAffine m_cameraAff;
 	TPixel32 m_bgColor;
 
-public:
-	FlashStagePainter(
-		TFlash &flash, TAffine &cameraAff,
-		const ImagePainter::VisualSettings &vs, const TPixel32 &bgColor)
-		: Visitor(vs), m_flash(flash), m_cameraAff(cameraAff), m_bgColor(bgColor) {}
+  public:
+	FlashStagePainter(TFlash &flash, TAffine &cameraAff, const ImagePainter::VisualSettings &vs,
+					  const TPixel32 &bgColor)
+		: Visitor(vs), m_flash(flash), m_cameraAff(cameraAff), m_bgColor(bgColor)
+	{
+	}
 
 	void onImage(const Stage::Player &player)
 	{
@@ -323,7 +326,8 @@ public:
 		TColorFunction *cf = 0;
 		TColorFader fader;
 		if (player.m_onionSkinDistance != c_noOnionSkin) {
-			fader = TColorFader(m_bgColor, OnionSkinMask::getOnionSkinFade(player.m_onionSkinDistance));
+			fader =
+				TColorFader(m_bgColor, OnionSkinMask::getOnionSkinFade(player.m_onionSkinDistance));
 			cf = &fader;
 		}
 
@@ -343,11 +347,10 @@ public:
 // FlashMovieGenerator
 //-----------------------------------------------------------------------------
 
-class FlashMovieGenerator
-	: public MovieGenerator::Imp
+class FlashMovieGenerator : public MovieGenerator::Imp
 {
 
-public:
+  public:
 	TFlash m_flash;
 	TAffine m_viewAff;
 	int m_frameIndex;
@@ -355,11 +358,12 @@ public:
 	int m_frameCountLoader;
 	bool m_screenSaverMode;
 
-	FlashMovieGenerator(
-		const TFilePath &fp,
-		const TDimension cameraSize,
-		TOutputProperties &properties)
-		: Imp(fp, cameraSize, properties.getFrameRate()), m_flash(cameraSize.lx, cameraSize.ly, 0, properties.getFrameRate(), properties.getFileFormatProperties("swf")), m_frameIndex(0), m_sceneIndex(0), m_frameCountLoader(0), m_screenSaverMode(false)
+	FlashMovieGenerator(const TFilePath &fp, const TDimension cameraSize,
+						TOutputProperties &properties)
+		: Imp(fp, cameraSize, properties.getFrameRate()),
+		  m_flash(cameraSize.lx, cameraSize.ly, 0, properties.getFrameRate(),
+				  properties.getFileFormatProperties("swf")),
+		  m_frameIndex(0), m_sceneIndex(0), m_frameCountLoader(0), m_screenSaverMode(false)
 	{
 
 		TPointD center(0.5 * cameraSize.lx, 0.5 * cameraSize.ly);
@@ -367,9 +371,7 @@ public:
 		m_screenSaverMode = fp.getType() == "scr";
 	}
 
-	void addSoundtrack(const ToonzScene &scene, int frameOffset, int sceneFrameCount)
-	{
-	}
+	void addSoundtrack(const ToonzScene &scene, int frameOffset, int sceneFrameCount) {}
 
 	void startScene(const ToonzScene &scene, int r)
 	{
@@ -398,7 +400,8 @@ public:
 
 	bool addFrame(ToonzScene &scene, int row, bool isLast)
 	{
-		TAffine cameraView = scene.getXsheet()->getPlacement(TStageObjectId::CameraId(0), row).inv();
+		TAffine cameraView =
+			scene.getXsheet()->getPlacement(TStageObjectId::CameraId(0), row).inv();
 		TPixel32 bgColor = scene.getProperties()->getBgColor();
 
 		TStageObject *cameraPegbar = scene.getXsheet()->getStageObject(TStageObjectId::CameraId(0));
@@ -422,16 +425,15 @@ public:
 
 		Stage::visit(painter, args);
 		/*
-		             &scene,
-				         scene.getXsheet(),
+					 &scene,
+						 scene.getXsheet(),
 								 row,
 								 m_columnIndex,
 								 m_osMask,
 								 false, 0);
-                 */
+				 */
 
-		m_frameIndex =
-			m_flash.endFrame(isLast, m_frameCountLoader, (m_sceneCount == m_sceneIndex));
+		m_frameIndex = m_flash.endFrame(isLast, m_frameCountLoader, (m_sceneCount == m_sceneIndex));
 		return true;
 	}
 
@@ -453,11 +455,8 @@ public:
 // MovieGenerator
 //-----------------------------------------------------------------------------
 
-MovieGenerator::MovieGenerator(
-	const TFilePath &path,
-	const TDimension &resolution,
-	TOutputProperties &outputProperties,
-	bool useMarkers)
+MovieGenerator::MovieGenerator(const TFilePath &path, const TDimension &resolution,
+							   TOutputProperties &outputProperties, bool useMarkers)
 {
 	if (path.getType() == "swf" || path.getType() == "scr")
 		m_imp.reset(new FlashMovieGenerator(path, resolution, outputProperties));

@@ -5,8 +5,7 @@
 
 #include <QDebug>
 
-TSegmentAdjuster::TSegmentAdjuster()
-	: m_traceEnabled(false)
+TSegmentAdjuster::TSegmentAdjuster() : m_traceEnabled(false)
 {
 }
 

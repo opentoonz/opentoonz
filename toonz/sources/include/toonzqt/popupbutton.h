@@ -3,7 +3,7 @@
 #ifndef POPUP_BUTTON_H
 #define POPUP_BUTTON_H
 
-//DVAPI includes
+// DVAPI includes
 #include "tcommon.h"
 
 #undef DVAPI
@@ -16,14 +16,14 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-//Qt includes
+// Qt includes
 #include <QPushButton>
 #include <QString>
 #include <QIcon>
 #include <QPushButton>
 #include <QList>
 
-//Forward declarations
+// Forward declarations
 class QAction;
 
 //********************************************************************************
@@ -45,7 +45,7 @@ class DVAPI PopupButton : public QPushButton
 	QList<QAction *> m_actions;
 	int m_index;
 
-public:
+  public:
 	PopupButton(QWidget *parent = 0);
 
 	int currentIndex() const;
@@ -58,18 +58,18 @@ public:
 
 	int findText(const QString &text, Qt::CaseSensitivity cs = Qt::CaseSensitive) const;
 
-signals:
+  signals:
 
 	void activated(int index);
 	void currentIndexChanged(int index);
 
-public slots:
+  public slots:
 
 	void setCurrentIndex(int index);
 
-private slots:
+  private slots:
 
 	void onIndexChange();
 };
 
-#endif //POPUP_BUTTON_H
+#endif // POPUP_BUTTON_H

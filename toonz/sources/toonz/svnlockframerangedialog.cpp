@@ -18,9 +18,10 @@
 // SVNLockFrameRangeDialog
 //-----------------------------------------------------------------------------
 
-SVNLockFrameRangeDialog::SVNLockFrameRangeDialog(QWidget *parent,
-												 const QString &workingDir, const QString &file, int frameCount)
-	: Dialog(TApp::instance()->getMainWindow(), true, false), m_workingDir(workingDir), m_file(file), m_hasError(false), m_fromIsValid(true), m_toIsValid(true)
+SVNLockFrameRangeDialog::SVNLockFrameRangeDialog(QWidget *parent, const QString &workingDir,
+												 const QString &file, int frameCount)
+	: Dialog(TApp::instance()->getMainWindow(), true, false), m_workingDir(workingDir),
+	  m_file(file), m_hasError(false), m_fromIsValid(true), m_toIsValid(true)
 {
 	setModal(false);
 	setAttribute(Qt::WA_DeleteOnClose, true);
@@ -69,13 +70,15 @@ SVNLockFrameRangeDialog::SVNLockFrameRangeDialog(QWidget *parent,
 	m_fromLineEdit = new DVGui::IntLineEdit;
 	m_fromLineEdit->setRange(1, frameCount);
 	m_fromLineEdit->hide();
-	connect(m_fromLineEdit, SIGNAL(textChanged(const QString &)), this, SLOT(onFromLineEditTextChanged()));
+	connect(m_fromLineEdit, SIGNAL(textChanged(const QString &)), this,
+			SLOT(onFromLineEditTextChanged()));
 
 	m_toLineEdit = new DVGui::IntLineEdit;
 	m_toLineEdit->setRange(1, frameCount);
 	m_toLineEdit->hide();
 	m_toLineEdit->setValue(frameCount);
-	connect(m_toLineEdit, SIGNAL(textChanged(const QString &)), this, SLOT(onToLineEditTextChanged()));
+	connect(m_toLineEdit, SIGNAL(textChanged(const QString &)), this,
+			SLOT(onToLineEditTextChanged()));
 
 	fromToLayout->addStretch();
 	fromToLayout->addWidget(m_fromLabel);
@@ -169,7 +172,11 @@ void SVNLockFrameRangeDialog::onPropGetDone(const QString &xmlResponse)
 				if (i != 0)
 					temp.append("\n\n");
 				SVNPartialLockInfo lock = m_lockInfos.at(i);
-				temp.append(tr("%1 on %2 is editing frames from %3 to %4.").arg(lock.m_userName).arg(lock.m_hostName).arg(lock.m_from).arg(lock.m_to));
+				temp.append(tr("%1 on %2 is editing frames from %3 to %4.")
+								.arg(lock.m_userName)
+								.arg(lock.m_hostName)
+								.arg(lock.m_from)
+								.arg(lock.m_to));
 			}
 			m_textLabel->setText(temp);
 		}
@@ -304,7 +311,8 @@ void SVNLockFrameRangeDialog::onLockDone()
 		args << "--xml";
 
 		m_thread.disconnect(SIGNAL(done(const QString &)));
-		connect(&m_thread, SIGNAL(done(const QString &)), this, SLOT(onPropGetDone(const QString &)));
+		connect(&m_thread, SIGNAL(done(const QString &)), this,
+				SLOT(onPropGetDone(const QString &)));
 		m_thread.executeCommand(m_workingDir, "svn", args, true);
 	}
 }
@@ -320,7 +328,8 @@ void SVNLockFrameRangeDialog::onPropSetDone()
 	if (!m_commentTextEdit->toPlainText().isEmpty())
 		args << QString("-m").append(m_commentTextEdit->toPlainText());
 	else
-		args << QString("-m").append(VersionControl::instance()->getUserName() + " edit frame range.");
+		args << QString("-m")
+					.append(VersionControl::instance()->getUserName() + " edit frame range.");
 	m_thread.disconnect(SIGNAL(done(const QString &)));
 	connect(&m_thread, SIGNAL(done(const QString &)), this, SLOT(finish()));
 	m_thread.executeCommand(m_workingDir, "svn", args, true);
@@ -343,7 +352,8 @@ void SVNLockFrameRangeDialog::finish()
 SVNLockMultiFrameRangeDialog::SVNLockMultiFrameRangeDialog(QWidget *parent,
 														   const QString &workingDir,
 														   const QStringList &files)
-	: Dialog(TApp::instance()->getMainWindow(), true, false), m_workingDir(workingDir), m_files(files), m_hasError(false), m_fromIsValid(true), m_toIsValid(true)
+	: Dialog(TApp::instance()->getMainWindow(), true, false), m_workingDir(workingDir),
+	  m_files(files), m_hasError(false), m_fromIsValid(true), m_toIsValid(true)
 {
 	setModal(false);
 	setAttribute(Qt::WA_DeleteOnClose, true);
@@ -394,13 +404,15 @@ SVNLockMultiFrameRangeDialog::SVNLockMultiFrameRangeDialog(QWidget *parent,
 	m_fromLineEdit = new DVGui::IntLineEdit;
 	m_fromLineEdit->setRange(1, frameCount);
 	m_fromLineEdit->hide();
-	connect(m_fromLineEdit, SIGNAL(textChanged(const QString &)), this, SLOT(onFromLineEditTextChanged()));
+	connect(m_fromLineEdit, SIGNAL(textChanged(const QString &)), this,
+			SLOT(onFromLineEditTextChanged()));
 
 	m_toLineEdit = new DVGui::IntLineEdit;
 	m_toLineEdit->setRange(1, frameCount);
 	m_toLineEdit->hide();
 	m_toLineEdit->setValue(frameCount);
-	connect(m_toLineEdit, SIGNAL(textChanged(const QString &)), this, SLOT(onToLineEditTextChanged()));
+	connect(m_toLineEdit, SIGNAL(textChanged(const QString &)), this,
+			SLOT(onToLineEditTextChanged()));
 
 	fromToLayout->addStretch();
 	fromToLayout->addWidget(m_fromLabel);
@@ -447,7 +459,8 @@ SVNLockMultiFrameRangeDialog::SVNLockMultiFrameRangeDialog(QWidget *parent,
 	connect(&m_thread, SIGNAL(error(const QString &)), this, SLOT(onError(const QString &)));
 
 	// 1. Getting status
-	connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this, SLOT(onStatusRetrieved(const QString &)));
+	connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
+			SLOT(onStatusRetrieved(const QString &)));
 	m_thread.getSVNStatus(m_workingDir, m_files, true);
 }
 
@@ -514,7 +527,10 @@ void SVNLockMultiFrameRangeDialog::onStatusRetrieved(const QString &xmlResponse)
 			if (i != 0)
 				temp.append("\n\n");
 			SVNPartialLockInfo lock = m_lockInfos.at(i);
-			temp.append(tr("%1 is editing frames from %2 to %3").arg(lock.m_userName).arg(lock.m_from).arg(lock.m_to));
+			temp.append(tr("%1 is editing frames from %2 to %3")
+							.arg(lock.m_userName)
+							.arg(lock.m_from)
+							.arg(lock.m_to));
 		}
 		m_textLabel->setText(temp);
 	}
@@ -607,7 +623,8 @@ void SVNLockMultiFrameRangeDialog::onLockButtonClicked()
 	if (!m_commentTextEdit->toPlainText().isEmpty())
 		args << QString("-m").append(m_commentTextEdit->toPlainText());
 	else
-		args << QString("-m").append(VersionControl::instance()->getUserName() + " edit frame range.");
+		args << QString("-m")
+					.append(VersionControl::instance()->getUserName() + " edit frame range.");
 	m_thread.disconnect(SIGNAL(done(const QString &)));
 	connect(&m_thread, SIGNAL(done(const QString &)), SLOT(onLockDone()));
 	m_thread.executeCommand(m_workingDir, "svn", args);
@@ -631,9 +648,10 @@ void SVNLockMultiFrameRangeDialog::onLockDone()
 // SVNUnlockFrameRangeDialog
 //-----------------------------------------------------------------------------
 
-SVNUnlockFrameRangeDialog::SVNUnlockFrameRangeDialog(QWidget *parent,
-													 const QString &workingDir, const QString &file)
-	: Dialog(TApp::instance()->getMainWindow(), true, false), m_workingDir(workingDir), m_file(file), m_hasError(false)
+SVNUnlockFrameRangeDialog::SVNUnlockFrameRangeDialog(QWidget *parent, const QString &workingDir,
+													 const QString &file)
+	: Dialog(TApp::instance()->getMainWindow(), true, false), m_workingDir(workingDir),
+	  m_file(file), m_hasError(false)
 {
 	setModal(false);
 	setAttribute(Qt::WA_DeleteOnClose, true);
@@ -824,7 +842,8 @@ void SVNUnlockFrameRangeDialog::onPropSetDone()
 	args << "commit";
 	args << m_file;
 	args << QString("-m").append(m_myInfo.m_userName + " on " + m_myInfo.m_hostName +
-								 " unlock frames from " + QString::number(m_myInfo.m_from) + " to " + QString::number(m_myInfo.m_to) + ".");
+								 " unlock frames from " + QString::number(m_myInfo.m_from) +
+								 " to " + QString::number(m_myInfo.m_to) + ".");
 
 	m_thread.disconnect(SIGNAL(done(const QString &)));
 	connect(&m_thread, SIGNAL(done(const QString &)), this, SLOT(onCommitDone()));
@@ -865,8 +884,10 @@ void SVNUnlockFrameRangeDialog::switchToCloseButton()
 //-----------------------------------------------------------------------------
 
 SVNUnlockMultiFrameRangeDialog::SVNUnlockMultiFrameRangeDialog(QWidget *parent,
-															   const QString &workingDir, const QStringList &files)
-	: Dialog(TApp::instance()->getMainWindow(), true, false), m_workingDir(workingDir), m_files(files), m_hasError(false)
+															   const QString &workingDir,
+															   const QStringList &files)
+	: Dialog(TApp::instance()->getMainWindow(), true, false), m_workingDir(workingDir),
+	  m_files(files), m_hasError(false)
 {
 	setModal(false);
 	setAttribute(Qt::WA_DeleteOnClose, true);
@@ -922,7 +943,8 @@ SVNUnlockMultiFrameRangeDialog::SVNUnlockMultiFrameRangeDialog(QWidget *parent,
 	connect(&m_thread, SIGNAL(error(const QString &)), this, SLOT(onError(const QString &)));
 
 	// 1. Getting status
-	connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this, SLOT(onStatusRetrieved(const QString &)));
+	connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
+			SLOT(onStatusRetrieved(const QString &)));
 	m_thread.getSVNStatus(m_workingDir, m_files, true);
 }
 //-----------------------------------------------------------------------------
@@ -1017,8 +1039,8 @@ void SVNUnlockMultiFrameRangeDialog::onUnlockDone()
 // SVNFrameRangeLockInfoDialog
 //-----------------------------------------------------------------------------
 
-SVNFrameRangeLockInfoDialog::SVNFrameRangeLockInfoDialog(QWidget *parent,
-														 const QString &workingDir, const QString &file)
+SVNFrameRangeLockInfoDialog::SVNFrameRangeLockInfoDialog(QWidget *parent, const QString &workingDir,
+														 const QString &file)
 	: Dialog(TApp::instance()->getMainWindow(), true, false), m_workingDir(workingDir), m_file(file)
 {
 	setModal(false);
@@ -1097,7 +1119,11 @@ void SVNFrameRangeLockInfoDialog::onPropGetDone(const QString &xmlResponse)
 				if (i != 0)
 					temp.append("\n\n");
 				SVNPartialLockInfo lock = lockInfos.at(i);
-				temp.append(tr("%1 on %2 is editing frames from %3 to %4.").arg(lock.m_userName).arg(lock.m_hostName).arg(lock.m_from).arg(lock.m_to));
+				temp.append(tr("%1 on %2 is editing frames from %3 to %4.")
+								.arg(lock.m_userName)
+								.arg(lock.m_hostName)
+								.arg(lock.m_from)
+								.arg(lock.m_to));
 			}
 			m_textLabel->setText(temp);
 		}
@@ -1109,8 +1135,10 @@ void SVNFrameRangeLockInfoDialog::onPropGetDone(const QString &xmlResponse)
 //-----------------------------------------------------------------------------
 
 SVNMultiFrameRangeLockInfoDialog::SVNMultiFrameRangeLockInfoDialog(QWidget *parent,
-																   const QString &workingDir, const QStringList &files)
-	: Dialog(TApp::instance()->getMainWindow(), true, false), m_workingDir(workingDir), m_files(files)
+																   const QString &workingDir,
+																   const QStringList &files)
+	: Dialog(TApp::instance()->getMainWindow(), true, false), m_workingDir(workingDir),
+	  m_files(files)
 {
 	setModal(false);
 	setAttribute(Qt::WA_DeleteOnClose, true);
@@ -1150,7 +1178,8 @@ SVNMultiFrameRangeLockInfoDialog::SVNMultiFrameRangeLockInfoDialog(QWidget *pare
 	connect(&m_thread, SIGNAL(error(const QString &)), this, SLOT(onError(const QString &)));
 
 	// 1. Getting status
-	connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this, SLOT(onStatusRetrieved(const QString &)));
+	connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
+			SLOT(onStatusRetrieved(const QString &)));
 	m_thread.getSVNStatus(m_workingDir, m_files, true);
 }
 
@@ -1203,7 +1232,10 @@ void SVNMultiFrameRangeLockInfoDialog::onStatusRetrieved(const QString &xmlRespo
 			if (i != 0)
 				temp.append("\n\n");
 			SVNPartialLockInfo lock = lockInfos.at(i);
-			temp.append(tr("%1 is editing frames from %2 to %3").arg(lock.m_userName).arg(lock.m_from).arg(lock.m_to));
+			temp.append(tr("%1 is editing frames from %2 to %3")
+							.arg(lock.m_userName)
+							.arg(lock.m_from)
+							.arg(lock.m_to));
 		}
 		m_textLabel->setText(temp);
 	}

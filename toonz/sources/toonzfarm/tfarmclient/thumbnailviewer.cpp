@@ -22,7 +22,7 @@ class ThumbnailViewer::NameField : public TTextField
 {
 	Thumbnail *m_thumbnail;
 
-public:
+  public:
 	NameField(TWidget *parent) : TTextField(parent), m_thumbnail(0) {}
 	void onFocusChange(bool on)
 	{
@@ -61,7 +61,11 @@ public:
 //===================================================================
 
 ThumbnailViewer::ThumbnailViewer(TWidget *parent, string name)
-	: TScrollView(parent, name), m_selectedItemIndex(-1), m_itemSize(94, 100), m_itemSpace(10, 10), m_margins(10, 10), m_playButtonBox(TPoint(85, 2), TDimension(10, 10)), m_iconBox(TPoint(2 + 4 - 3, 20 + 4), TDimension(96 - 8, 78 - 8)), m_textBox(TPoint(2 + 4 + 2 + 10, 2 + 2), TDimension(65, 18)), m_flag(false), m_playing(false), m_loading(false), m_timerActive(false), m_dragDropArmed(false), m_oldPos(0, 0)
+	: TScrollView(parent, name), m_selectedItemIndex(-1), m_itemSize(94, 100), m_itemSpace(10, 10),
+	  m_margins(10, 10), m_playButtonBox(TPoint(85, 2), TDimension(10, 10)),
+	  m_iconBox(TPoint(2 + 4 - 3, 20 + 4), TDimension(96 - 8, 78 - 8)),
+	  m_textBox(TPoint(2 + 4 + 2 + 10, 2 + 2), TDimension(65, 18)), m_flag(false), m_playing(false),
+	  m_loading(false), m_timerActive(false), m_dragDropArmed(false), m_oldPos(0, 0)
 {
 	setBackgroundColor(White);
 	m_nameField = new NameField(this);
@@ -164,8 +168,8 @@ void ThumbnailViewer::drawItem(int index)
 		return;
 	}
 
-	//setColor(Black);
-	//fillRect(TRect(base, m_itemSize));
+	// setColor(Black);
+	// fillRect(TRect(base, m_itemSize));
 
 	Thumbnail *item = m_items[index];
 	bool selected = item != 0 && index == m_selectedItemIndex;
@@ -319,9 +323,9 @@ void ThumbnailViewer::repaint()
 		if (m_selectedItemIndex)
 			drawFrame(m_selectedItemIndex);
 	} else {
-		//m_loadingDirectory = false;
-		//setColor(Black);
-		//fillRect(getBounds());
+		// m_loadingDirectory = false;
+		// setColor(Black);
+		// fillRect(getBounds());
 
 		drawBackground();
 

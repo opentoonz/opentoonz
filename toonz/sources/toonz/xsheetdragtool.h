@@ -19,7 +19,7 @@ class DragTool
 {
 	XsheetViewer *m_viewer;
 
-public:
+  public:
 	DragTool(XsheetViewer *viewer);
 	virtual ~DragTool();
 

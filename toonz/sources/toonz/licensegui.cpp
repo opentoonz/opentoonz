@@ -46,8 +46,7 @@ QString LicenseWizard::getLicenseStatusString() const
 		return tr("Valid license.");
 	}
 }
-LicenseWizardPage::LicenseWizardPage(QWidget *parent)
-	: QWidget(parent)
+LicenseWizardPage::LicenseWizardPage(QWidget *parent) : QWidget(parent)
 {
 	m_layout = new QVBoxLayout;
 	m_layout->setAlignment(Qt::AlignCenter);
@@ -92,14 +91,14 @@ QWidget *LicenseWizard::createConnectionPage()
 	layout->setMargin(0);
 	layout->setSpacing(0);
 	layout->addWidget(splashScreen);
-	//layout->addWidget(m_stateConnectionLbl);
+	// layout->addWidget(m_stateConnectionLbl);
 	page->setLayout(layout);
 
 	return page;
 }
 void LicenseWizard::paintEvent(QPaintEvent *)
 {
-	//disegno il bordo
+	// disegno il bordo
 	QPainter painter(this);
 	QPen pen; // = new QPen;
 	pen.setColor(1);
@@ -126,7 +125,7 @@ QWidget *LicenseWizard::createTryBuyActivatePage()
 	layout->setMargin(0);
 	layout->setSpacing(0);
 	layout->addWidget(splashScreen);
-	//layout->addWidget(label);
+	// layout->addWidget(label);
 	page->setLayout(layout);
 	return page;
 }
@@ -142,12 +141,14 @@ QWidget *LicenseWizard::createActivatePage()
 	splashScreen->changeSplashScreen(1);
 
 	// info
-	QLabel *info1 = new QLabel(tr("Enter your Activation Code, or your License Code, here:")); //QString::fromStdString(License::getMachineCode()));
+	QLabel *info1 = new QLabel(tr(
+		"Enter your Activation Code, or your License Code, here:")); // QString::fromStdString(License::getMachineCode()));
 	info1->setStyleSheet("background-color: rgb(255,255,255,0);");
 	m_info = new QLabel;
 	m_info->setStyleSheet("background-color: rgb(255,255,255,0);");
 	m_info->setTextFormat(Qt::RichText);
-	m_info->setText(QString(tr("<font color=\"#ff1010\">The Activation Code requires an active Internet connection.</font>")));
+	m_info->setText(QString(tr("<font color=\"#ff1010\">The Activation Code requires an active "
+							   "Internet connection.</font>")));
 	m_checkFld = new QLabel("");
 	m_checkFld->setStyleSheet("background-color: rgb(255,255,255,0);");
 	m_checkFld->setFixedSize(22, 22);
@@ -156,11 +157,13 @@ QWidget *LicenseWizard::createActivatePage()
 	QLineEdit *codeFld = new QLineEdit();
 	codeFld->setFixedWidth(320);
 	codeFld->setInputMask(QString(">NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"));
-	//m_codeFormat = ">NNNNNN";
+	// m_codeFormat = ">NNNNNN";
 	m_markCount = 0;
 	m_codeFld = codeFld;
-	connect(codeFld, SIGNAL(textChanged(const QString &)), this, SLOT(codeChanged(const QString &)));
-	connect(codeFld, SIGNAL(cursorPositionChanged(int, int)), this, SLOT(slotCursorPositionChanged()));
+	connect(codeFld, SIGNAL(textChanged(const QString &)), this,
+			SLOT(codeChanged(const QString &)));
+	connect(codeFld, SIGNAL(cursorPositionChanged(int, int)), this,
+			SLOT(slotCursorPositionChanged()));
 	QVBoxLayout *layout = new QVBoxLayout;
 
 	QWidget *centerWidget = new QWidget;
@@ -259,7 +262,7 @@ void LicenseWizard::createActivateButtonBox()
 	m_activateBtn = activateButton;
 	m_activateBtn->setEnabled(false);
 
-	//parent->addButtonBarWidget(m_activationPageButtonBox);
+	// parent->addButtonBarWidget(m_activationPageButtonBox);
 	return;
 }
 
@@ -270,7 +273,7 @@ void LicenseWizard::codeChanged(const QString &text)
 	int cursorPosition = m_codeFld->cursorPosition();
 	bool enabled = false;
 
-	//formattazione
+	// formattazione
 	int i = 0;
 	QString codeFormat;
 	codeFormat = ">NNNNN";
@@ -296,27 +299,30 @@ void LicenseWizard::codeChanged(const QString &text)
 	if (License::checkLicense(code) != License::INVALID_LICENSE) {
 		enabled = true;
 		m_info->setTextFormat(Qt::RichText);
-		m_info->setText(QString(tr("<font color=\"#006600\">Click the Activate button to license the software.</font>")));
+		m_info->setText(QString(tr(
+			"<font color=\"#006600\">Click the Activate button to license the software.</font>")));
 		QPixmap pixmap(":Resources/check.png");
 		QPainter painter(this);
 		painter.drawPixmap(0, 0, pixmap);
 		m_checkFld->setPixmap(pixmap);
-		//m_checkFld->setText("OK(L)");
+		// m_checkFld->setText("OK(L)");
 	} else if (License::isActivationCode(code)) {
 		enabled = true;
 		m_info->setTextFormat(Qt::RichText);
-		m_info->setText(QString(tr("<font color=\"#006600\">Click the Activate button to connect and license the software.</font>")));
+		m_info->setText(QString(tr("<font color=\"#006600\">Click the Activate button to connect "
+								   "and license the software.</font>")));
 		QPixmap pixmap(":Resources/check.png");
 		QPainter painter(this);
 		painter.drawPixmap(0, 0, pixmap);
 		m_checkFld->setPixmap(pixmap);
-		//m_checkFld->setText("OK(A)");
+		// m_checkFld->setText("OK(A)");
 	} else
 		m_checkFld->setText(" ");
 	m_activateBtn->setEnabled(enabled);
 	if (!enabled) {
 		m_info->setTextFormat(Qt::RichText);
-		m_info->setText(QString("<font color=\"#ff1010\">The Activation Code requires an active Internet connection.</font>"));
+		m_info->setText(QString("<font color=\"#ff1010\">The Activation Code requires an active "
+								"Internet connection.</font>"));
 	}
 }
 
@@ -327,21 +333,21 @@ void LicenseWizard::activate()
 		gotoConnectionPage();
 		License::ActivateStatus status = License::activate(code, this);
 		/*
-    if(status==License::OK)
-    {
-      QMessageBox::information(0, QString("Congratulations"), "Activation successfully!");
-      m_licenseWizard->accept();
-    }
-    else if(status==License::ACTIVATION_REFUSED)
-    {
-      QMessageBox::information(0, QString("Activation failed"), "Activation refused");
-    }
-    */
+	if(status==License::OK)
+	{
+	  QMessageBox::information(0, QString("Congratulations"), "Activation successfully!");
+	  m_licenseWizard->accept();
+	}
+	else if(status==License::ACTIVATION_REFUSED)
+	{
+	  QMessageBox::information(0, QString("Activation failed"), "Activation refused");
+	}
+	*/
 	} else if (License::checkLicense(code) != License::INVALID_LICENSE) {
 		bool ok = License::setLicense(code);
 		if (ok) {
 			this->accept();
-			//DvMsgBox(INFORMATION,tr("Activation successfully!"));
+			// DvMsgBox(INFORMATION,tr("Activation successfully!"));
 		}
 	} else {
 		MsgBox(CRITICAL, "Activation failed: the code is invalid.");
@@ -349,8 +355,7 @@ void LicenseWizard::activate()
 	}
 }
 
-MyWidget::MyWidget(QWidget *parent)
-	: QWidget(parent)
+MyWidget::MyWidget(QWidget *parent) : QWidget(parent)
 {
 	QString screenPath = ":Resources/splashLT_trial_activate.png";
 	m_pixmap = new QPixmap(screenPath);
@@ -362,8 +367,7 @@ void MyWidget::paintEvent(QPaintEvent *)
 	QPainter painter(this);
 	painter.drawPixmap(1, 1, *(m_pixmap));
 }
-UpgradeLicense::UpgradeLicense(QWidget *parent)
-	: Dialog(TApp::instance()->getMainWindow(), true)
+UpgradeLicense::UpgradeLicense(QWidget *parent) : Dialog(TApp::instance()->getMainWindow(), true)
 {
 	setStyleSheet("margin: 1px;");
 	setTopMargin(0);
@@ -377,8 +381,10 @@ UpgradeLicense::UpgradeLicense(QWidget *parent)
 	m_codeFld->setFixedWidth(320);
 	m_codeFld->setInputMask(QString(">NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"));
 	m_markCount = 0;
-	connect(m_codeFld, SIGNAL(textChanged(const QString &)), this, SLOT(codeChanged(const QString &)));
-	connect(m_codeFld, SIGNAL(cursorPositionChanged(int, int)), this, SLOT(slotCursorPositionChanged()));
+	connect(m_codeFld, SIGNAL(textChanged(const QString &)), this,
+			SLOT(codeChanged(const QString &)));
+	connect(m_codeFld, SIGNAL(cursorPositionChanged(int, int)), this,
+			SLOT(slotCursorPositionChanged()));
 	m_checkFld = new QLabel("");
 	m_checkFld->setStyleSheet("background-color: rgb(255,255,255,0);");
 	m_checkFld->setFixedSize(22, 22);
@@ -417,7 +423,8 @@ UpgradeLicense::UpgradeLicense(QWidget *parent)
 	buttonBox->addButton(m_upgradeButton, QDialogButtonBox::ActionRole);
 	connect(m_upgradeButton, SIGNAL(pressed()), this, SLOT(upgrade()));
 	m_buttonFrame->setObjectName("LicenseDialogButtonFrame");
-	m_buttonFrame->setStyleSheet("LicenseDialogButtonFrame: {border: 0px; background-color: rgb(225,225,225);}");
+	m_buttonFrame->setStyleSheet(
+		"LicenseDialogButtonFrame: {border: 0px; background-color: rgb(225,225,225);}");
 	addButtonBarWidget(buttonBox);
 }
 void UpgradeLicense::upgrade()
@@ -437,7 +444,7 @@ void UpgradeLicense::codeChanged(const QString &text)
 	int cursorPosition = m_codeFld->cursorPosition();
 	bool enabled = false;
 
-	//formattazione
+	// formattazione
 	int i = 0;
 	QString codeFormat;
 	codeFormat = ">NNNNN";
@@ -483,7 +490,7 @@ void UpgradeLicense::slotCursorPositionChanged()
 }
 void UpgradeLicense::paintEvent(QPaintEvent *)
 {
-	//disegno il bordo
+	// disegno il bordo
 	QPainter painter(this);
 	QPen pen; // = new QPen;
 	pen.setColor(1);
@@ -493,12 +500,11 @@ void UpgradeLicense::paintEvent(QPaintEvent *)
 	int width = this->width();
 	painter.drawRect(0, 0, width - 1, height - 1);
 }
-LicenseWizard::LicenseWizard(QWidget *parent)
-	: Dialog(TApp::instance()->getMainWindow(), true)
+LicenseWizard::LicenseWizard(QWidget *parent) : Dialog(TApp::instance()->getMainWindow(), true)
 {
 	setStyleSheet("margin: 1px;");
 	setWindowFlags(Qt::Dialog | Qt::FramelessWindowHint);
-	//setWindowTitle(tr("Try, Buy or Activate?"));
+	// setWindowTitle(tr("Try, Buy or Activate?"));
 	setTopMargin(0);
 	QStackedWidget *stackedWidget = new QStackedWidget(this);
 	stackedWidget->addWidget(createTryBuyActivatePage());
@@ -507,7 +513,8 @@ LicenseWizard::LicenseWizard(QWidget *parent)
 	m_pages = stackedWidget;
 	addWidget(stackedWidget);
 	m_buttonFrame->setObjectName("LicenseDialogButtonFrame");
-	m_buttonFrame->setStyleSheet("LicenseDialogButtonFrame: {border: 0px; background-color: rgb(225,225,225);}");
+	m_buttonFrame->setStyleSheet(
+		"LicenseDialogButtonFrame: {border: 0px; background-color: rgb(225,225,225);}");
 	createTryBuyActivateButtonBox();
 	gotoFirstPage();
 }
@@ -531,16 +538,18 @@ void LicenseWizard::buy()
 	std::wstring appname = qappname.toStdWString();
 
 #ifdef WIN32
-	std::wstring url(L"http://www.the-tab.com/cgi-shl/buy.asp?Version=" + tabversion + L"&Name=" + appname + L"&MAC_Address=" + toWideString(License::getFirstValidMacAddress()));
+	std::wstring url(L"http://www.the-tab.com/cgi-shl/buy.asp?Version=" + tabversion + L"&Name=" +
+					 appname + L"&MAC_Address=" + toWideString(License::getFirstValidMacAddress()));
 	int ret = (int)
 
-		ShellExecute(0, L"open", url.c_str(),
-					 0, 0, SW_SHOWNORMAL);
+		ShellExecute(0, L"open", url.c_str(), 0, 0, SW_SHOWNORMAL);
 	if (ret <= 32) {
 		throw TException(url + L" : can't open");
 	}
 #else
-	std::wstring url(L"http://www.the-tab.com/cgi-shl/buy.asp?Version=" + tabversion + L"\\&Name=" + appname + L"\\&MAC_Address=" + toWideString(License::getFirstValidMacAddress()));
+	std::wstring url(L"http://www.the-tab.com/cgi-shl/buy.asp?Version=" + tabversion + L"\\&Name=" +
+					 appname + L"\\&MAC_Address=" +
+					 toWideString(License::getFirstValidMacAddress()));
 
 	string cmd = "open ";
 	cmd = cmd + toString(url);

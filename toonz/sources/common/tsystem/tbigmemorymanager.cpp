@@ -22,11 +22,11 @@ std::set<TRaster *> Rasters;
 
 class Chunkinfo
 {
-public:
+  public:
 	TUINT32 m_size;
-	//int m_locks;
+	// int m_locks;
 	std::vector<TRaster *> m_rasters;
-	//bool m_putInNormalMemory;
+	// bool m_putInNormalMemory;
 	Chunkinfo(TUINT32 size, TRaster *ras) //, bool putInNormalMemory=false)
 		: m_size(size)
 		  //, m_locks(0)
@@ -155,9 +155,10 @@ bool TBigMemoryManager::init(TUINT32 sizeinKb)
 		m_availableMemory = 0;
 		return false;
 	}
-	//char str[1024];
-	//sprintf_s(str, "chiesto %d MB, allocato un big chunk di %d MB", sizeinKb/1024, m_availableMemory/(1024*1024));
-	//MessageBox( NULL, str, "Warning", MB_OK);
+	// char str[1024];
+	// sprintf_s(str, "chiesto %d MB, allocato un big chunk di %d MB", sizeinKb/1024,
+	// m_availableMemory/(1024*1024));
+	// MessageBox( NULL, str, "Warning", MB_OK);
 
 	m_chunks[m_theMemory + m_availableMemory] = Chunkinfo(0, 0);
 	return true;
@@ -209,7 +210,7 @@ UCHAR *TBigMemoryManager::getBuffer(UINT size)
 	UCHAR *address = 0;
 	while (it != m_chunks.end()) {
 		/*if (it->second.m_putInNormalMemory)
-    {it++; continue;}*/
+	{it++; continue;}*/
 
 		if ((TUINT32)((it->first) - (buffer + chunkSize)) >= size) {
 			address = buffer + chunkSize;
@@ -227,7 +228,8 @@ UCHAR *TBigMemoryManager::getBuffer(UINT size)
 
 #ifdef _DEBUG
 
-void TBigMemoryManager::getRasterInfo(int &rasterCount, TUINT32 &totRasterMemInKb, int &notCachedRasterCount, TUINT32 &notCachedRasterMemInKb)
+void TBigMemoryManager::getRasterInfo(int &rasterCount, TUINT32 &totRasterMemInKb,
+									  int &notCachedRasterCount, TUINT32 &notCachedRasterMemInKb)
 {
 	totRasterMemInKb = 0;
 	notCachedRasterMemInKb = 0;
@@ -271,7 +273,7 @@ bool TBigMemoryManager::putRaster(TRaster *ras, bool canPutOnDisk)
 		return true;
 	}
 
-	if (m_theMemory == 0) //il bigmemorymanager e' inattivo
+	if (m_theMemory == 0) // il bigmemorymanager e' inattivo
 	{
 		if (!ras->m_parent) {
 			int sizeKB = size >> 10;
@@ -281,23 +283,25 @@ bool TBigMemoryManager::putRaster(TRaster *ras, bool canPutOnDisk)
 		}
 
 		if (!ras->m_parent && !(ras->m_buffer = (UCHAR *)calloc(size, 1))) {
-			//MessageBox( NULL, "Ouch!can't allocate!", "Warning", MB_OK);
-			//non c'e' memoria; provo a comprimere
+			// MessageBox( NULL, "Ouch!can't allocate!", "Warning", MB_OK);
+			// non c'e' memoria; provo a comprimere
 			/*TImageCache::instance()->doCompress(); 
-    if (!(ras->m_buffer = (UCHAR *)malloc(size)))*/ //andata male pure cosi'; metto tutto su disco
-			//TImageCache::instance()->outputMap(size, "C:\\logCacheFailure");
+    if (!(ras->m_buffer = (UCHAR *)malloc(size)))*/ // andata male pure cosi'; metto tutto su
+													  // disco
+			// TImageCache::instance()->outputMap(size, "C:\\logCacheFailure");
 			TINT64 availMemInKb = TSystem::getFreeMemorySize(true);
 			if (availMemInKb > (size >> 10)) {
-				//char str[1024];
-				//sprintf_s(str, "Non alloco, ma : memoria (KB) richiesta : %d - memoria disponibile : %d", size>>10, availMemInKb);
-				//MessageBox( NULL, (LPCSTR)str, (LPCSTR)"Segmentation!", MB_OK);
+				// char str[1024];
+				// sprintf_s(str, "Non alloco, ma : memoria (KB) richiesta : %d - memoria
+				// disponibile : %d", size>>10, availMemInKb);
+				// MessageBox( NULL, (LPCSTR)str, (LPCSTR)"Segmentation!", MB_OK);
 			}
 			ras->m_buffer = TImageCache::instance()->compressAndMalloc(size);
 
 			if (!ras->m_buffer) {
-				//char str[1024];
-				//sprintf_s(str, "E' andata male: faccio il log della cache.");
-				//MessageBox( NULL, (LPCSTR)str, (LPCSTR)"Segmentation!", MB_OK);
+				// char str[1024];
+				// sprintf_s(str, "E' andata male: faccio il log della cache.");
+				// MessageBox( NULL, (LPCSTR)str, (LPCSTR)"Segmentation!", MB_OK);
 				TImageCache::instance()->outputMap(size, "C:\\logCacheTotalFailure");
 			} else {
 #ifdef _DEBUG
@@ -317,7 +321,7 @@ bool TBigMemoryManager::putRaster(TRaster *ras, bool canPutOnDisk)
 		}
 	}
 
-	//il bigmemorymanager e' attivo
+	// il bigmemorymanager e' attivo
 	TThread::MutexLocker sl(&m_mutex);
 
 	/*
@@ -325,11 +329,11 @@ if (m_availableMemory<size && !ras->m_parent)
   {
   TImageCache::instance()->compressAndMalloc(size);
   if (m_availableMemory>=size)
-    return TBigMemoryManager::instance()->putRaster(ras);
+	return TBigMemoryManager::instance()->putRaster(ras);
   else
    return (ras->m_buffer = (UCHAR *)malloc(size))!=0;
-  
-    
+
+
   }*/
 
 	if (ras->m_parent) {
@@ -338,8 +342,8 @@ if (m_availableMemory<size && !ras->m_parent)
 		if (it != m_chunks.end()) {
 
 #ifdef _DEBUG
-//assert(!it->second.m_rasters.empty());
-//for (UINT i=0; i<it->second.m_rasters.size(); i++)
+// assert(!it->second.m_rasters.empty());
+// for (UINT i=0; i<it->second.m_rasters.size(); i++)
 //  assert (it->second.m_rasters[i]!=ras);
 #endif
 
@@ -359,7 +363,7 @@ if (m_availableMemory<size && !ras->m_parent)
 	/*if (m_chunks.size()==1) //c'e' solo l'elemento che marca la fine del bufferone
   {
   if ((TUINT32)(m_chunks.begin()->first-m_theMemory)>=size)
-    address = m_theMemory;
+	address = m_theMemory;
   }
 else
   {*/
@@ -378,7 +382,7 @@ else
 #endif
 	} else if (address == 0) {
 		printLog(size);
-		//assert(!"la bigmemory e' piena...scritto log");
+		// assert(!"la bigmemory e' piena...scritto log");
 	}
 	//}
 	if (address == 0) {
@@ -388,7 +392,7 @@ else
 			return (ras->m_buffer = (UCHAR *)calloc(size, 1)) != 0;
 	}
 
-	//assert(address);
+	// assert(address);
 
 	ras->m_buffer = address;
 	m_chunks[address] = Chunkinfo(size, ras);
@@ -404,7 +408,7 @@ else
 
 TRaster *TBigMemoryManager::findRaster(TRaster *ras)
 {
-	//return 0;
+	// return 0;
 
 	std::map<UCHAR *, Chunkinfo>::iterator it = m_chunks.begin();
 	while (it != m_chunks.end()) {
@@ -427,13 +431,9 @@ void TBigMemoryManager::printMap()
 	int count = 0;
 
 	while (it != m_chunks.end()) {
-		TSystem::outputDebug("chunk #" +
-							 toString((int)count++) +
-							 "dimensione(kb):" +
-							 toString((int)(it->second.m_size >> 10)) +
-							 "num raster:" +
-							 toString((int)(it->second.m_rasters.size())) +
-							 "\n");
+		TSystem::outputDebug("chunk #" + toString((int)count++) + "dimensione(kb):" +
+							 toString((int)(it->second.m_size >> 10)) + "num raster:" +
+							 toString((int)(it->second.m_rasters.size())) + "\n");
 
 		it++;
 	}
@@ -457,14 +457,14 @@ bool TBigMemoryManager::releaseRaster(TRaster *ras)
 #endif
 		}
 
-		//assert(findRaster(ras)==0);
+		// assert(findRaster(ras)==0);
 
 		return false;
 	}
 
 	assert(ras->m_lockCount == 0);
 
-	if (it->second.m_rasters.size() > 1) //non e' il solo raster ad usare il buffer; non libero
+	if (it->second.m_rasters.size() > 1) // non e' il solo raster ad usare il buffer; non libero
 	{
 		std::vector<TRaster *>::iterator it2 = it->second.m_rasters.begin();
 		for (; it2 != it->second.m_rasters.end(); ++it2) {
@@ -472,8 +472,8 @@ bool TBigMemoryManager::releaseRaster(TRaster *ras)
 				it->second.m_rasters.erase(it2);
 
 #ifdef _DEBUG
-//assert(!it->second.m_rasters.empty());
-//assert(findRaster(ras)==0);
+// assert(!it->second.m_rasters.empty());
+// assert(findRaster(ras)==0);
 #endif
 
 				return true;
@@ -481,7 +481,7 @@ bool TBigMemoryManager::releaseRaster(TRaster *ras)
 		}
 		assert(false);
 		return false;
-	} else if (ras->m_bufferOwner) //libero!
+	} else if (ras->m_bufferOwner) // libero!
 	{
 #ifdef _DEBUG
 		checkConsistency();
@@ -494,7 +494,7 @@ bool TBigMemoryManager::releaseRaster(TRaster *ras)
 	}
 
 #ifdef _DEBUG
-	//assert(findRaster(ras)==0);
+	// assert(findRaster(ras)==0);
 	checkConsistency();
 #endif
 
@@ -506,17 +506,17 @@ void TBigMemoryManager::checkConsistency()
 {
 	return;
 
-	//QMutexLocker sl(m_mutex);
+	// QMutexLocker sl(m_mutex);
 
 	int count = 0;
-	//int size = m_chunks.size();
+	// int size = m_chunks.size();
 	std::map<UCHAR *, Chunkinfo>::iterator it = m_chunks.begin();
 	UCHAR *endAddress = m_theMemory;
 	TUINT32 freeMem = 0, allocMem = 0;
 
 	while (it != m_chunks.end()) {
 		count++;
-		//assert(it->second.m_rasters.size()==0 || it->second.m_rasters.size()>0);
+		// assert(it->second.m_rasters.size()==0 || it->second.m_rasters.size()>0);
 
 		if (endAddress != 0 /*&& !it->second.m_putInNormalMemory*/) {
 			freeMem += (TUINT32)(it->first - endAddress);
@@ -527,7 +527,7 @@ void TBigMemoryManager::checkConsistency()
 		for (UINT i = 0; i < it->second.m_rasters.size(); i++) {
 
 			TRaster *ras = it->second.m_rasters[i];
-			it->second.m_rasters[i] = 0; //ogni raster deve apparire una sola volta
+			it->second.m_rasters[i] = 0; // ogni raster deve apparire una sola volta
 			assert(findRaster(ras) == 0);
 			it->second.m_rasters[i] = ras;
 
@@ -536,7 +536,8 @@ void TBigMemoryManager::checkConsistency()
 			assert(buf1 == buf2);
 			UINT size;
 			if (ras->m_parent)
-				size = ras->m_parent->getLx() * ras->m_parent->getLy() * ras->m_parent->getPixelSize();
+				size =
+					ras->m_parent->getLx() * ras->m_parent->getLy() * ras->m_parent->getPixelSize();
 			else
 				size = ras->getLx() * ras->getLy() * ras->getPixelSize();
 			assert(size == it->second.m_size);
@@ -553,21 +554,23 @@ void TBigMemoryManager::checkConsistency()
 
 //------------------------------------------------------------------------------
 
-std::map<UCHAR *, Chunkinfo>::iterator TBigMemoryManager::shiftBlock(const std::map<UCHAR *, Chunkinfo>::iterator &it, TUINT32 offset)
+std::map<UCHAR *, Chunkinfo>::iterator
+TBigMemoryManager::shiftBlock(const std::map<UCHAR *, Chunkinfo>::iterator &it, TUINT32 offset)
 {
 	UCHAR *newAddress = it->first - offset;
 
 	if (offset > it->second.m_size)
-		memcpy(newAddress, it->first, it->second.m_size); //se NON overlappano.
+		memcpy(newAddress, it->first, it->second.m_size); // se NON overlappano.
 	else
-		memmove(newAddress, it->first, it->second.m_size); //se overlappano.
+		memmove(newAddress, it->first, it->second.m_size); // se overlappano.
 
 	m_chunks[newAddress] = Chunkinfo(it->second.m_size, it->second.m_rasters[0]);
 	std::map<UCHAR *, Chunkinfo>::iterator it1 = m_chunks.find(newAddress);
 
 	assert(it1->first < it1->second.m_rasters[0]->m_buffer);
 	UINT i = 0;
-	for (i = 0; i < it->second.m_rasters.size(); i++) //prima rimappo i subraster, senza toccare il buffer del parent...
+	for (i = 0; i < it->second.m_rasters.size();
+		 i++) // prima rimappo i subraster, senza toccare il buffer del parent...
 	{
 		TRaster *ras = it->second.m_rasters[i];
 		assert(i > 0 || !ras->m_parent);
@@ -579,33 +582,33 @@ std::map<UCHAR *, Chunkinfo>::iterator TBigMemoryManager::shiftBlock(const std::
 			it1->second.m_rasters.push_back(ras);
 	}
 
-	it->second.m_rasters[0]->remap(newAddress); //ORA rimappo il parent
+	it->second.m_rasters[0]->remap(newAddress); // ORA rimappo il parent
 
 #ifdef _DEBUG
 	for (i = 1; i < it->second.m_rasters.size(); i++) //..poi i raster padri
 	{
-		//TRaster*ras = it->second.m_rasters[i];
+		// TRaster*ras = it->second.m_rasters[i];
 
 		assert(it->second.m_rasters[i]->m_parent);
-		//ras->remap(newAddress);
-		//if (i>0)
+		// ras->remap(newAddress);
+		// if (i>0)
 		//  it1->second.m_rasters.push_back(ras);
 	}
 	assert(it1->second.m_rasters.size() == it->second.m_rasters.size());
 #endif
 
 	m_chunks.erase(it);
-	it1 = m_chunks.find(newAddress); //non dovrebbe servire, ma per prudenza...
+	it1 = m_chunks.find(newAddress); // non dovrebbe servire, ma per prudenza...
 	assert(it1->first == it1->second.m_rasters[0]->m_buffer);
 	return it1;
 }
 
 //------------------------------------------------------------------------------
 
-UCHAR *TBigMemoryManager::remap(TUINT32 size) //size==0 -> remappo tutto
+UCHAR *TBigMemoryManager::remap(TUINT32 size) // size==0 -> remappo tutto
 {
 	bool locked = false;
-//QMutexLocker sl(m_mutex); //gia' scopata
+// QMutexLocker sl(m_mutex); //gia' scopata
 
 #ifdef _DEBUG
 	checkConsistency();
@@ -618,17 +621,20 @@ UCHAR *TBigMemoryManager::remap(TUINT32 size) //size==0 -> remappo tutto
 		TUINT32 chunkSize = 0;
 		while (it != m_chunks.end()) {
 			/*if (it->second.m_putInNormalMemory)
-      {it++; continue;}*/
+	  {it++; continue;}*/
 
 			TUINT32 gap = (TUINT32)((it->first) - (buffer + chunkSize));
-			if (size > 0 && gap >= size) //trovato chunk sufficiente
+			if (size > 0 && gap >= size) // trovato chunk sufficiente
 				return buffer + chunkSize;
-			else if (gap > 0 && it->second.m_size > 0) //c'e' un frammento di memoria, accorpo; ma solo se non sto in fondo
+			else if (gap > 0 &&
+					 it->second.m_size >
+						 0) // c'e' un frammento di memoria, accorpo; ma solo se non sto in fondo
 			{
 				std::vector<TRaster *> &rasters = it->second.m_rasters;
 				assert(rasters[0]->m_parent == 0);
 
-				//devo controllare il lockCount solo sul parent, la funzione lock() locka solo il parent;
+				// devo controllare il lockCount solo sul parent, la funzione lock() locka solo il
+				// parent;
 				for (i = 0; i < rasters.size(); i++)
 					rasters[i]->beginRemapping();
 
@@ -640,7 +646,7 @@ UCHAR *TBigMemoryManager::remap(TUINT32 size) //size==0 -> remappo tutto
 				for (i = 0; i < rasters.size(); i++)
 					rasters[i]->endRemapping();
 
-				//rasters.clear();
+				// rasters.clear();
 			}
 
 			buffer = it->first;
@@ -653,12 +659,13 @@ UCHAR *TBigMemoryManager::remap(TUINT32 size) //size==0 -> remappo tutto
 			it->second.m_rasters[i]->endRemapping();
 	}
 
-	if (size > 0) //e' andata male...non liberato un blocco di grandezza sufficiente
+	if (size > 0) // e' andata male...non liberato un blocco di grandezza sufficiente
 	{
 		printLog(size);
 		assert(!"Niente memoria! scritto log");
 		if (!locked)
-			assert(false); //se entro nella remap, di sicuro c'e' 'size'  memoria disponibile; basta deframmentarla
+			assert(false); // se entro nella remap, di sicuro c'e' 'size'  memoria disponibile;
+						   // basta deframmentarla
 	}
 	return 0;
 }
@@ -682,7 +689,8 @@ void TBigMemoryManager::printLog(TUINT32 size)
 		if (gap > 0)
 			os << "- gap di " << gap / 1024 << " KB\n";
 		if (it->second.m_size > 0)
-			os << "- raster di " << it->second.m_size / 1024 << " KB" << ((it->second.m_rasters[0]->m_lockCount > 0) ? " LOCCATO!\n" : "\n");
+			os << "- raster di " << it->second.m_size / 1024 << " KB"
+			   << ((it->second.m_rasters[0]->m_lockCount > 0) ? " LOCCATO!\n" : "\n");
 		buffer = it->first;
 		chunkSize = it->second.m_size;
 	}

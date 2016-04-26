@@ -14,7 +14,7 @@
 using namespace std;
 class TUSBScannerIOPD
 {
-public:
+  public:
 	TUSBScannerIOPD();
 	struct usb_device *m_epson;
 	struct usb_dev_handle *m_handle;
@@ -27,8 +27,7 @@ static pthread_t T = 0;
 //#define TRACE cout << __PRETTY_FUNCTION__ << endl;
 #define TRACE
 
-TUSBScannerIOPD::TUSBScannerIOPD()
-	: m_epson(0), m_handle(0), m_epR(0), m_epW(0), m_trace(false)
+TUSBScannerIOPD::TUSBScannerIOPD() : m_epson(0), m_handle(0), m_epR(0), m_epW(0), m_trace(false)
 {
 	/*initialize libusb*/
 	TRACE
@@ -69,8 +68,7 @@ void buf2printable(const unsigned char *buffer, const int size, ostrstream &os)
 }
 //-----------------------------------------------------------------------------
 
-TUSBScannerIO::TUSBScannerIO()
-	: m_data(new TUSBScannerIOPD())
+TUSBScannerIO::TUSBScannerIO() : m_data(new TUSBScannerIOPD())
 {
 	TRACE
 }
@@ -80,7 +78,7 @@ namespace
 {
 
 #if defined(HAS_LIBUSB)
-//looking for an Epson device
+// looking for an Epson device
 struct usb_device *doCheck(struct usb_device *dev, int level)
 {
 	if (!dev)
@@ -121,8 +119,10 @@ bool TUSBScannerIO::open()
 	if (!m_data->m_handle)
 		return false;
 	cout << "opened" << endl;
-	m_data->m_epR = m_data->m_epson->config[0].interface[0].altsetting[0].endpoint[0].bEndpointAddress;
-	m_data->m_epW = m_data->m_epson->config[0].interface[0].altsetting[0].endpoint[1].bEndpointAddress;
+	m_data->m_epR =
+		m_data->m_epson->config[0].interface[0].altsetting[0].endpoint[0].bEndpointAddress;
+	m_data->m_epW =
+		m_data->m_epson->config[0].interface[0].altsetting[0].endpoint[1].bEndpointAddress;
 
 	int rc;
 	rc = usb_set_configuration(m_data->m_handle, m_data->m_epson->config[0].bConfigurationValue);

@@ -7,8 +7,7 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 
-TStrokeOutline::TStrokeOutline(const TStrokeOutline &stroke)
-	: m_outline(stroke.m_outline)
+TStrokeOutline::TStrokeOutline(const TStrokeOutline &stroke) : m_outline(stroke.m_outline)
 {
 }
 

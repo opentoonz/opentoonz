@@ -5,7 +5,7 @@
 
 class TScannerIO
 {
-public:
+  public:
 	TScannerIO() {}
 	virtual bool open() = 0;
 	virtual void close() = 0;

@@ -27,9 +27,8 @@ class ScrollLayout : public DummyLayout
 {
 	DvScrollWidget *m_scrollWidget;
 
-public:
-	ScrollLayout(DvScrollWidget *scrollWidget)
-		: m_scrollWidget(scrollWidget)
+  public:
+	ScrollLayout(DvScrollWidget *scrollWidget) : m_scrollWidget(scrollWidget)
 	{
 		assert(m_scrollWidget);
 	}
@@ -43,10 +42,10 @@ public:
 			}
 		};
 
-		QSize minSize = std::accumulate(m_items.begin(), m_items.end(),
-										QSize(), locals::expand);
+		QSize minSize = std::accumulate(m_items.begin(), m_items.end(), QSize(), locals::expand);
 
-		return (m_scrollWidget->getOrientation() == Qt::Horizontal) ? QSize(0, minSize.height()) : QSize(minSize.width(), 0);
+		return (m_scrollWidget->getOrientation() == Qt::Horizontal) ? QSize(0, minSize.height())
+																	: QSize(minSize.width(), 0);
 	}
 
 	QSize maximumSize() const
@@ -61,7 +60,9 @@ public:
 		QSize maxSize = std::accumulate(m_items.begin(), m_items.end(),
 										QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX), locals::bound);
 
-		return (m_scrollWidget->getOrientation() == Qt::Horizontal) ? QSize(QWIDGETSIZE_MAX, maxSize.height()) : QSize(maxSize.width(), QWIDGETSIZE_MAX);
+		return (m_scrollWidget->getOrientation() == Qt::Horizontal)
+				   ? QSize(QWIDGETSIZE_MAX, maxSize.height())
+				   : QSize(maxSize.width(), QWIDGETSIZE_MAX);
 	}
 
 	void setGeometry(const QRect &r)
@@ -81,8 +82,7 @@ public:
 					targetSize.setHeight(r.height());
 			}
 
-			const QSize &minSize = item->minimumSize(),
-						&maxSize = item->maximumSize();
+			const QSize &minSize = item->minimumSize(), &maxSize = item->maximumSize();
 
 			targetSize.setWidth(tcrop(targetSize.width(), minSize.width(), maxSize.width()));
 			targetSize.setHeight(tcrop(targetSize.height(), minSize.height(), maxSize.height()));
@@ -101,7 +101,7 @@ public:
 
 qreal heldScrollEasing(qreal progress)
 {
-	//Equilibrate sum of Linear and InQuad
+	// Equilibrate sum of Linear and InQuad
 	return 0.5 * progress * (1.0 + progress);
 }
 
@@ -112,7 +112,9 @@ qreal heldScrollEasing(qreal progress)
 //****************************************************************************
 
 DvScrollWidget::DvScrollWidget(QWidget *parent, Qt::Orientation orientation)
-	: QFrame(parent), m_content(0), m_animation(0), m_clickEase(QEasingCurve::OutCubic), m_holdEase(QEasingCurve::Linear), m_backwardTimer(new QTimer(this)), m_forwardTimer(new QTimer(this)), m_pressed(false), m_heldRelease(false), m_heldClick(false)
+	: QFrame(parent), m_content(0), m_animation(0), m_clickEase(QEasingCurve::OutCubic),
+	  m_holdEase(QEasingCurve::Linear), m_backwardTimer(new QTimer(this)),
+	  m_forwardTimer(new QTimer(this)), m_pressed(false), m_heldRelease(false), m_heldClick(false)
 {
 	ScrollLayout *scrollLayout = new ScrollLayout(this);
 	setLayout(scrollLayout);

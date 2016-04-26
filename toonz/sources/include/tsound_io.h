@@ -33,10 +33,10 @@ class DVAPI TSoundTrackReader : public TSmartObject
 
 	DECLARE_CLASS_CODE
 
-protected:
+  protected:
 	TFilePath m_path;
 
-public:
+  public:
 	TSoundTrackReader(const TFilePath &fp);
 	~TSoundTrackReader();
 
@@ -49,9 +49,7 @@ public:
 	static bool load(const TFilePath &, TSoundTrackP &);
 
 	static void getSupportedFormats(QStringList &names);
-	static void define(
-		QString extension,
-		TSoundTrackReaderCreateProc *proc);
+	static void define(QString extension, TSoundTrackReaderCreateProc *proc);
 };
 
 #ifdef _WIN32
@@ -60,7 +58,7 @@ template class DVAPI TSmartPointerT<TSoundTrackReader>;
 
 class DVAPI TSoundTrackReaderP : public TSmartPointerT<TSoundTrackReader>
 {
-public:
+  public:
 	TSoundTrackReaderP(const TFilePath &fp);
 };
 
@@ -80,10 +78,10 @@ class DVAPI TSoundTrackWriter : public TSmartObject
 
 	DECLARE_CLASS_CODE
 
-protected:
+  protected:
 	TFilePath m_path;
 
-public:
+  public:
 	TSoundTrackWriter(const TFilePath &fp);
 	~TSoundTrackWriter();
 
@@ -93,9 +91,7 @@ public:
 
 	static void getSupportedFormats(QStringList &names);
 
-	static void define(
-		QString extension,
-		TSoundTrackWriterCreateProc *proc);
+	static void define(QString extension, TSoundTrackWriterCreateProc *proc);
 };
 
 #ifdef _WIN32
@@ -104,7 +100,7 @@ template class DVAPI TSmartPointerT<TSoundTrackWriter>;
 
 class DVAPI TSoundTrackWriterP : public TSmartPointerT<TSoundTrackWriter>
 {
-public:
+  public:
 	TSoundTrackWriterP(const TFilePath &fp);
 };
 

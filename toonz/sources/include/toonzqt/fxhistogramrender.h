@@ -32,13 +32,14 @@ class ToonzScene;
 //=========================================================
 // FxHistogramRenderPort
 //---------------------------------------------------------
-//!Implements the TRenderPort virtual class
-//!This class receives and handles signals from the TThread::Runnable class that make the render of frame.
+//! Implements the TRenderPort virtual class
+//! This class receives and handles signals from the TThread::Runnable class that make the render of
+//! frame.
 class FxHistogramRenderPort : public QObject, public TRenderPort
 {
 	Q_OBJECT
 
-public:
+  public:
 	FxHistogramRenderPort();
 	~FxHistogramRenderPort();
 
@@ -46,7 +47,7 @@ public:
 	void onRenderFailure(const RenderData &renderData, TException &e){};
 	void onRenderFinished(){};
 
-signals:
+  signals:
 
 	void renderCompleted(const TRasterP &, UINT);
 	void renderFailure(double);
@@ -60,13 +61,12 @@ class DVAPI FxHistogramRender : public QObject
 {
 	Q_OBJECT
 
-private:
+  private:
 	//! Stores some information about the frame to render needed to the PreviewFxManager class
 	class FrameInfo
 	{
-	public:
-		FrameInfo()
-			: m_frame(-1), m_renderId((UINT)-1) {}
+	  public:
+		FrameInfo() : m_frame(-1), m_renderId((UINT)-1) {}
 
 		TFxP m_fx;
 		std::string m_fxAlias;
@@ -84,7 +84,7 @@ private:
 	Histograms *m_histograms;
 	bool m_isCameraViewMode;
 
-public:
+  public:
 	FxHistogramRender();
 	~FxHistogramRender();
 
@@ -99,11 +99,11 @@ public:
 	void computeHistogram(TFxP fx, int frame);
 	void invalidateFrame(int frame);
 
-private:
+  private:
 	void remakeRender();
 	void updateRenderer(int frame);
 
-protected slots:
+  protected slots:
 	void onRenderCompleted(const TRasterP &, UINT);
 };
 

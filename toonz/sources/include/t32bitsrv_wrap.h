@@ -53,8 +53,7 @@ static QString srvCmdline()
 #else
 static QString srvCmdline()
 {
-	return "\"" + QCoreApplication::applicationDirPath() +
-		   "/t32bitsrv\" " + srvName();
+	return "\"" + QCoreApplication::applicationDirPath() + "/t32bitsrv\" " + srvName();
 }
 #endif
 
@@ -67,7 +66,7 @@ class DVAPI BufferExchanger : public tipc::ShMemReader, public tipc::ShMemWriter
 	UCHAR *m_buf;
 	UCHAR *m_data;
 
-public:
+  public:
 	BufferExchanger(UCHAR *buf) : m_buf(buf), m_data(buf) {}
 	~BufferExchanger() {}
 
@@ -89,7 +88,7 @@ class DVAPI RasterExchanger : public tipc::ShMemReader, public tipc::ShMemWriter
 	TRasterPT<PIXEL> m_ras;
 	PIXEL *m_pix;
 
-public:
+  public:
 	RasterExchanger(TRasterP ras) : m_ras(ras)
 	{
 		m_ras->lock();
@@ -103,6 +102,6 @@ public:
 	int write(char *dstBuf, int len);
 };
 
-} //namespace t32bitsrv
+} // namespace t32bitsrv
 
-#endif //T32BITSRV_WRAP
+#endif // T32BITSRV_WRAP

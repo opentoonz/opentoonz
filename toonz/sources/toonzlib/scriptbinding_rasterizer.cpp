@@ -32,7 +32,8 @@ QScriptValue Rasterizer::ctor(QScriptContext *context, QScriptEngine *engine)
 	return create(engine, new Rasterizer());
 }
 
-TToonzImageP vectorToToonzRaster(const TVectorImageP &vi, const TDimension &size, const TAffine &aff, const TPointD &dpi)
+TToonzImageP vectorToToonzRaster(const TVectorImageP &vi, const TDimension &size,
+								 const TAffine &aff, const TPointD &dpi)
 {
 	/*
   TScale sc(dpi.x/Stage::inch, dpi.y/Stage::inch);
@@ -45,13 +46,14 @@ TToonzImageP vectorToToonzRaster(const TVectorImageP &vi, const TDimension &size
 
   */
 
-	TToonzImageP ti = ToonzImageUtils::vectorToToonzImage(
-		vi, aff, vi->getPalette(), TPointD(0, 0), size, 0, true);
+	TToonzImageP ti = ToonzImageUtils::vectorToToonzImage(vi, aff, vi->getPalette(), TPointD(0, 0),
+														  size, 0, true);
 	ti->setPalette(vi->getPalette()); // e' necessario?
 	return ti;
 }
 
-TImageP renderVectorImage(TOfflineGL *glContext, const TVectorRenderData &rd, const TPointD &dpi, const TImageP &img, const TPixel32 &color)
+TImageP renderVectorImage(TOfflineGL *glContext, const TVectorRenderData &rd, const TPointD &dpi,
+						  const TImageP &img, const TPixel32 &color)
 {
 	glContext->clear(color);
 	glContext->draw(img, rd);
@@ -60,10 +62,12 @@ TImageP renderVectorImage(TOfflineGL *glContext, const TVectorRenderData &rd, co
 	return rimg;
 }
 
-void setFrame(QScriptEngine *engine, QScriptValue &level, const TFrameId &fid, const TImageP &drawing)
+void setFrame(QScriptEngine *engine, QScriptValue &level, const TFrameId &fid,
+			  const TImageP &drawing)
 {
 	QScriptValueList args;
-	args << QString::fromStdString(fid.expand()) << Wrapper::create(engine, new Image(drawing.getPointer()));
+	args << QString::fromStdString(fid.expand())
+		 << Wrapper::create(engine, new Image(drawing.getPointer()));
 	level.property("setFrame").call(level, args);
 }
 
@@ -81,7 +85,8 @@ Q_INVOKABLE QScriptValue Rasterizer::rasterize(QScriptValue arg)
 			return context()->throwError(tr("Expected a vector level: %1").arg(arg.toString()));
 		palette = level->getSimpleLevel() ? level->getSimpleLevel()->getPalette() : 0;
 	} else {
-		return context()->throwError(tr("Argument must be a vector level or image : ").arg(arg.toString()));
+		return context()->throwError(
+			tr("Argument must be a vector level or image : ").arg(arg.toString()));
 	}
 	if (!palette) {
 		return context()->throwError(tr("%1 has no palette").arg(arg.toString()));
@@ -123,8 +128,7 @@ Q_INVOKABLE QScriptValue Rasterizer::rasterize(QScriptValue arg)
 		TOfflineGL *glContext = new TOfflineGL(res);
 		glContext->makeCurrent();
 
-		TVectorRenderData rd(TVectorRenderData::ProductionSettings(),
-							 aff, TRect(), palette);
+		TVectorRenderData rd(TVectorRenderData::ProductionSettings(), aff, TRect(), palette);
 		rd.m_antiAliasing = m_antialiasing;
 
 		if (img) {

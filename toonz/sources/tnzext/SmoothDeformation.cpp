@@ -56,9 +56,7 @@ bool SmoothDeformation::check_(const ContextStatus *status)
 {
 	assert(status && "Not status available");
 
-	if (!isASpireCorner(status->stroke2change_,
-						status->w_,
-						status->cornerSize_,
+	if (!isASpireCorner(status->stroke2change_, status->w_, status->cornerSize_,
 						&this->getSpiresList()))
 		return true;
 
@@ -67,20 +65,15 @@ bool SmoothDeformation::check_(const ContextStatus *status)
 
 //-----------------------------------------------------------------------------
 
-bool SmoothDeformation::findExtremes_(const ContextStatus *status,
-									  Interval &ret)
+bool SmoothDeformation::findExtremes_(const ContextStatus *status, Interval &ret)
 {
-	return ToonzExt::findNearestSpireCorners(status->stroke2change_,
-											 status->w_,
-											 ret,
-											 status->cornerSize_,
-											 &this->getSpiresList());
+	return ToonzExt::findNearestSpireCorners(status->stroke2change_, status->w_, ret,
+											 status->cornerSize_, &this->getSpiresList());
 }
 
 //-----------------------------------------------------------------------------
 
-double
-SmoothDeformation::findActionLength()
+double SmoothDeformation::findActionLength()
 {
 	// this means that all length needs to be used
 	return 2.0 * stroke2manipulate_->getLength();
@@ -88,8 +81,7 @@ SmoothDeformation::findActionLength()
 
 //-----------------------------------------------------------------------------
 
-SmoothDeformation *
-SmoothDeformation::instance()
+SmoothDeformation *SmoothDeformation::instance()
 {
 	static SmoothDeformation singleton;
 	return &singleton;

@@ -16,7 +16,7 @@
 class RandomWaveFx : public TStandardRasterFx
 {
 	FX_PLUGIN_DECLARATION(RandomWaveFx)
-protected:
+  protected:
 	TRasterFxPort m_warped;
 	TDoubleParamP m_intensity;
 	TDoubleParamP m_gridStep;
@@ -25,7 +25,7 @@ protected:
 	TDoubleParamP m_posy;
 	TBoolParamP m_sharpen;
 
-public:
+  public:
 	RandomWaveFx()
 		: m_intensity(20), m_gridStep(2), m_evol(0.0), m_posx(0.0), m_posy(0.0), m_sharpen(false)
 	{
@@ -91,9 +91,7 @@ public:
 
 	//-------------------------------------------------------------------
 
-	void doDryCompute(TRectD &rect,
-					  double frame,
-					  const TRenderSettings &info)
+	void doDryCompute(TRectD &rect, double frame, const TRenderSettings &info)
 	{
 		bool isWarped = m_warped.isConnected();
 		if (!isWarped)
@@ -151,20 +149,21 @@ public:
 		double size = 100.0 / info.m_shrinkX;
 		TPointD pos(m_posx->getValue(frame), m_posy->getValue(frame));
 
-		//The warper is calculated on a standard reference, with fixed dpi. This makes sure
-		//that the lattice created for the warp does not depend on camera transforms and resolution.
+		// The warper is calculated on a standard reference, with fixed dpi. This makes sure
+		// that the lattice created for the warp does not depend on camera transforms and
+		// resolution.
 		TRenderSettings warperInfo(info);
 		double warperScaleFactor = 1.0 / params.m_warperScale;
 		warperInfo.m_affine = TScale(warperScaleFactor) * info.m_affine;
 
-		//Retrieve tile's geometry
+		// Retrieve tile's geometry
 		TRectD tileRect;
 		{
 			TRasterP tileRas = tile.getRaster();
 			tileRect = TRectD(tile.m_pos, TDimensionD(tileRas->getLx(), tileRas->getLy()));
 		}
 
-		//Build the compute rect
+		// Build the compute rect
 		TRectD warpedBox, warpedComputeRect, tileComputeRect;
 		m_warped->getBBox(frame, warpedBox, info);
 
@@ -183,21 +182,21 @@ public:
 		warperComputeRect.x1 = tceil(warperComputeRect.x1);
 		warperComputeRect.y1 = tceil(warperComputeRect.y1);
 
-		//Compute the warped tile
+		// Compute the warped tile
 		TTile tileIn;
-		m_warped->allocateAndCompute(tileIn, warpedComputeRect.getP00(),
-									 TDimension(warpedComputeRect.getLx(), warpedComputeRect.getLy()),
-									 tile.getRaster(), frame, info);
+		m_warped->allocateAndCompute(
+			tileIn, warpedComputeRect.getP00(),
+			TDimension(warpedComputeRect.getLx(), warpedComputeRect.getLy()), tile.getRaster(),
+			frame, info);
 		TRasterP rasIn = tileIn.getRaster();
 
-		//Compute the warper tile
-		TSpectrum::ColorKey colors[] = {
-			TSpectrum::ColorKey(0, TPixel32::White),
-			TSpectrum::ColorKey(1, TPixel32::Black)};
+		// Compute the warper tile
+		TSpectrum::ColorKey colors[] = {TSpectrum::ColorKey(0, TPixel32::White),
+										TSpectrum::ColorKey(1, TPixel32::Black)};
 
 		TSpectrumParamP cloudscolors = TSpectrumParamP(tArrayCount(colors), colors);
 
-		//Build the warper
+		// Build the warper
 		warperInfo.m_affine = warperInfo.m_affine;
 		TAffine aff = warperInfo.m_affine.inv();
 
@@ -209,7 +208,7 @@ public:
 		{
 			TRenderSettings info2(warperInfo);
 
-			//Now, separate the part of the affine the Fx can handle from the rest.
+			// Now, separate the part of the affine the Fx can handle from the rest.
 			TAffine fxHandledAffine = handledAffine(warperInfo, frame);
 			info2.m_affine = fxHandledAffine;
 
@@ -219,30 +218,35 @@ public:
 
 			TRectD rectIn = aff.inv() * warperComputeRect;
 
-			//rectIn = rectIn.enlarge(getResampleFilterRadius(info));  //Needed to counter the resample filter
+			// rectIn = rectIn.enlarge(getResampleFilterRadius(info));  //Needed to counter the
+			// resample filter
 
-			TRect rectInI(tfloor(rectIn.x0), tfloor(rectIn.y0), tceil(rectIn.x1) - 1, tceil(rectIn.y1) - 1);
+			TRect rectInI(tfloor(rectIn.x0), tfloor(rectIn.y0), tceil(rectIn.x1) - 1,
+						  tceil(rectIn.y1) - 1);
 
 			// rasIn e' un raster dello stesso tipo di tile.getRaster()
 
-			TTile auxtile(warperTile.getRaster()->create(rectInI.getLx(), rectInI.getLy()), convert(rectInI.getP00()));
+			TTile auxtile(warperTile.getRaster()->create(rectInI.getLx(), rectInI.getLy()),
+						  convert(rectInI.getP00()));
 
 			TPointD mypos(auxtile.m_pos - pos);
 
 			double scale2 = sqrt(fabs(info2.m_affine.det()));
-			doClouds(auxtile.getRaster(), cloudscolors, mypos, evolution, size, 0.0, 1.0, PNOISE_CLOUDS, scale2, frame);
+			doClouds(auxtile.getRaster(), cloudscolors, mypos, evolution, size, 0.0, 1.0,
+					 PNOISE_CLOUDS, scale2, frame);
 
 			info2.m_affine = aff;
 			TRasterFx::applyAffine(warperTile, auxtile, info2);
 		}
 
-		//Warp
+		// Warp
 		TPointD db;
 		TRect rasComputeRectI(convert(tileComputeRect - tileRect.getP00(), db));
 		TRasterP tileRas = tile.getRaster()->extract(rasComputeRectI);
 
 		TPointD rasInPos(warpedComputeRect.getP00() - tileComputeRect.getP00());
-		TPointD warperPos((TScale(params.m_warperScale) * warperComputeRect.getP00()) - tileComputeRect.getP00());
+		TPointD warperPos((TScale(params.m_warperScale) * warperComputeRect.getP00()) -
+						  tileComputeRect.getP00());
 		warp(tileRas, rasIn, rasWarper, rasInPos, warperPos, params);
 	}
 
@@ -250,7 +254,7 @@ public:
 
 	int getMemoryRequirement(const TRectD &rect, double frame, const TRenderSettings &info)
 	{
-		//return -1;   //Deactivated. This fx is currently very inefficient if subdivided!
+		// return -1;   //Deactivated. This fx is currently very inefficient if subdivided!
 
 		int shrink = (info.m_shrinkX + info.m_shrinkY) / 2;
 		double scale = sqrt(fabs(info.m_affine.det()));
@@ -273,9 +277,8 @@ public:
 		double warperEnlargement = getWarperEnlargement(params);
 		warperComputeRect = warperComputeRect.enlarge(warperEnlargement);
 
-		return tmax(
-			TRasterFx::memorySize(warpedComputeRect, info.m_bpp),
-			TRasterFx::memorySize(warperComputeRect, info.m_bpp));
+		return tmax(TRasterFx::memorySize(warpedComputeRect, info.m_bpp),
+					TRasterFx::memorySize(warperComputeRect, info.m_bpp));
 	}
 };
 

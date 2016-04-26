@@ -58,7 +58,8 @@ DvDirModelNode *ProjectDvDirModelFileFolderNode::makeChild(std::wstring name)
 
 //-----------------------------------------------------------------------------
 
-DvDirModelFileFolderNode *ProjectDvDirModelFileFolderNode::createNode(DvDirModelNode *parent, const TFilePath &path)
+DvDirModelFileFolderNode *ProjectDvDirModelFileFolderNode::createNode(DvDirModelNode *parent,
+																	  const TFilePath &path)
 {
 	DvDirModelFileFolderNode *node;
 	if (TProjectManager::instance()->isProject(path))
@@ -76,8 +77,7 @@ DvDirModelFileFolderNode *ProjectDvDirModelFileFolderNode::createNode(DvDirModel
 // ProjectDvDirModelRootNode [Root]
 //-----------------------------------------------------------------------------
 
-ProjectDvDirModelRootNode::ProjectDvDirModelRootNode()
-	: DvDirModelNode(0, L"Root")
+ProjectDvDirModelRootNode::ProjectDvDirModelRootNode() : DvDirModelNode(0, L"Root")
 {
 	m_nodeType = "Root";
 }
@@ -98,7 +98,8 @@ void ProjectDvDirModelRootNode::refreshChildren()
 			TFilePath projectRoot = projectRoots[i];
 			std::wstring rootDir = projectRoot.getWideString();
 			ProjectDvDirModelSpecialFileFolderNode *projectRootNode =
-				new ProjectDvDirModelSpecialFileFolderNode(this, L"Project root (" + rootDir + L")", projectRoot);
+				new ProjectDvDirModelSpecialFileFolderNode(this, L"Project root (" + rootDir + L")",
+														   projectRoot);
 			projectRootNode->setPixmap(QPixmap(":Resources/projects.png"));
 			addChild(projectRootNode);
 		}
@@ -110,7 +111,8 @@ void ProjectDvDirModelRootNode::refreshChildren()
 			SVNRepository repo = repositories.at(i);
 
 			ProjectDvDirModelSpecialFileFolderNode *node =
-				new ProjectDvDirModelSpecialFileFolderNode(this, repo.m_name.toStdWString(), TFilePath(repo.m_localPath.toStdWString()));
+				new ProjectDvDirModelSpecialFileFolderNode(
+					this, repo.m_name.toStdWString(), TFilePath(repo.m_localPath.toStdWString()));
 			node->setPixmap(QPixmap(":Resources/vcroot.png"));
 			addChild(node);
 		}
@@ -346,16 +348,16 @@ ProjectPopup::ProjectPopup(bool isModal)
 			QString qName = QString::fromStdString(name);
 			FileField *ff = new FileField(0, qName);
 			m_folderFlds.append(qMakePair(name, ff));
-			upperLayout->addWidget(new QLabel("+" + qName, this), i + 2, 0, Qt::AlignRight | Qt::AlignVCenter);
+			upperLayout->addWidget(new QLabel("+" + qName, this), i + 2, 0,
+								   Qt::AlignRight | Qt::AlignVCenter);
 			upperLayout->addWidget(ff, i + 2, 1);
 		}
 		struct {
 			QString name;
 			std::string folderName;
-		} cbs[] = {
-			{tr("Append $scenepath to +drawings"), TProject::Drawings},
-			{tr("Append $scenepath to +inputs"), TProject::Inputs},
-			{tr("Append $scenepath to +extras"), TProject::Extras}};
+		} cbs[] = {{tr("Append $scenepath to +drawings"), TProject::Drawings},
+				   {tr("Append $scenepath to +inputs"), TProject::Inputs},
+				   {tr("Append $scenepath to +extras"), TProject::Extras}};
 		int currentRow = upperLayout->rowCount();
 
 		for (i = 0; i < tArrayCount(cbs); i++) {
@@ -458,7 +460,7 @@ void ProjectPopup::onProjectSwitched()
 
 void ProjectPopup::showEvent(QShowEvent *)
 {
-	//Must refresh the tree.
+	// Must refresh the tree.
 	DvDirModelNode *rootNode = m_model->getNode(QModelIndex());
 	QModelIndex index = m_model->getIndexByNode(rootNode);
 	m_model->refreshFolderChild(index);
@@ -474,8 +476,7 @@ void ProjectPopup::showEvent(QShowEvent *)
 */
 //-----------------------------------------------------------------------------
 
-ProjectSettingsPopup::ProjectSettingsPopup()
-	: ProjectPopup(false)
+ProjectSettingsPopup::ProjectSettingsPopup() : ProjectPopup(false)
 {
 	setWindowTitle(tr("Project Settings"));
 
@@ -553,8 +554,7 @@ OpenPopupCommandHandler<ProjectSettingsPopup> openProjectSettingsPopup(MI_Projec
 */
 //-----------------------------------------------------------------------------
 
-ProjectCreatePopup::ProjectCreatePopup()
-	: ProjectPopup(true)
+ProjectCreatePopup::ProjectCreatePopup() : ProjectPopup(true)
 {
 	setWindowTitle(tr("New Project"));
 
@@ -594,7 +594,8 @@ void ProjectCreatePopup::createProject()
 	QFileInfo fi(m_nameFld->text());
 
 	if (!isValidFileName(fi.baseName())) {
-		error(tr("Project Name cannot be empty or contain any of the following characters:\n \\ / : * ? \" < > |"));
+		error(tr("Project Name cannot be empty or contain any of the following characters:\n \\ / "
+				 ": * ? \" < > |"));
 		return;
 	}
 
@@ -616,7 +617,8 @@ void ProjectCreatePopup::createProject()
 	}
 
 	TFilePath currentProjectRoot;
-	DvDirModelFileFolderNode *node = dynamic_cast<DvDirModelFileFolderNode *>(m_treeView->getCurrentNode());
+	DvDirModelFileFolderNode *node =
+		dynamic_cast<DvDirModelFileFolderNode *>(m_treeView->getCurrentNode());
 	if (node)
 		currentProjectRoot = node->getPath();
 	else
@@ -631,7 +633,8 @@ void ProjectCreatePopup::createProject()
 	try {
 		bool isSaved = project->save(projectPath);
 		if (!isSaved)
-			DVGui::error(tr("It is not possible to create the %1 project.").arg(toQString(projectPath)));
+			DVGui::error(
+				tr("It is not possible to create the %1 project.").arg(toQString(projectPath)));
 	} catch (TSystemException se) {
 		DVGui::warning(QString::fromStdWString(se.getMessage()));
 		return;
@@ -658,7 +661,7 @@ void ProjectCreatePopup::showEvent(QShowEvent *)
 	}
 
 	m_nameFld->setText("");
-	//Must refresh the tree.
+	// Must refresh the tree.
 	DvDirModelNode *rootNode = m_model->getNode(QModelIndex());
 	QModelIndex index = m_model->getIndexByNode(rootNode);
 	m_model->refreshFolderChild(index);

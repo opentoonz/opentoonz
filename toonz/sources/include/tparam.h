@@ -22,7 +22,7 @@ class TParamObserver;
 //=========================================================
 //! This class is an abstract class and is a generic interface to the features of an object.
 /*!
-	It is used to access to the parameters of an object, with the purpose  
+	It is used to access to the parameters of an object, with the purpose
 	to store and retrieve the key features.
 */
 class DVAPI TParam : public TSmartObject, public TPersist
@@ -33,14 +33,16 @@ class DVAPI TParam : public TSmartObject, public TPersist
 	std::string m_description;
 	std::string m_label;
 
-public:
+  public:
 	/*!
-		The contructor store the name of the parameter and initialize his 
+		The contructor store the name of the parameter and initialize his
 		interface with I/O through the class TPersist.
 	*/
 	TParam(std::string name = "", std::string description = "", std::string label = "")
 		: TSmartObject(m_classCode), TPersist(), m_name(name), m_description(description),
-		  m_label(label) {}
+		  m_label(label)
+	{
+	}
 
 	virtual ~TParam() {}
 	/*!
@@ -66,8 +68,8 @@ public:
 	std::string getUILabel() const { return m_label; };
 
 	/*!
-		This method must be implemented with a clone function, i.e a function that make 
-		a new copy of the parameter. 
+		This method must be implemented with a clone function, i.e a function that make
+		a new copy of the parameter.
 	*/
 	virtual TParam *clone() const = 0;
 	/*!
@@ -76,18 +78,19 @@ public:
 	virtual void copy(TParam *src) = 0;
 	/*!
 		An observer is a generic class that takes care and manages of canghes in the parameters.
-		This method must be implemented with a function that add objects to an observer internal list.   
+		This method must be implemented with a function that add objects to an observer internal
+	   list.
 	*/
 	virtual void addObserver(TParamObserver *) = 0;
 	/*!
-		Removes \e this from the observer. 
+		Removes \e this from the observer.
 		\sa addObserver()
 	*/
 	virtual void removeObserver(TParamObserver *) = 0;
 	/*!
-		This method is used to sets the status changing notification of the parameter. i.e the 
-		observer must take care of the changes. 
-     */
+		This method is used to sets the status changing notification of the parameter. i.e the
+		observer must take care of the changes.
+	 */
 	virtual void enableNotification(bool on) {}
 	/*!
 		This method must return \e true if the  notification status is enabled.
@@ -95,7 +98,7 @@ public:
 	virtual bool isNotificationEnabled() const { return true; }
 
 	/*!
-		This pure virtual method must return a string with the value of the parameter 
+		This pure virtual method must return a string with the value of the parameter
 		and the precision needed.
 	*/
 	virtual std::string getValueAlias(double frame, int precision) = 0;
@@ -106,7 +109,7 @@ public:
 	*/
 	virtual bool isKeyframe(double frame) const = 0;
 	/*!
-		Removes \e frame from the list of the keyframes associated to this parameter.	
+		Removes \e frame from the list of the keyframes associated to this parameter.
 	*/
 	virtual void deleteKeyframe(double frame) = 0;
 	/*!
@@ -116,13 +119,11 @@ public:
 	/*!
 		Makes the \e frame associated to this parameter a keyframe
 	*/
-	virtual void assignKeyframe(
-		double frame,
-		const TSmartPointerT<TParam> &src, double srcFrame,
-		bool changedOnly = false) = 0;
+	virtual void assignKeyframe(double frame, const TSmartPointerT<TParam> &src, double srcFrame,
+								bool changedOnly = false) = 0;
 	/*!
-		This function must be overridden with a method that returns as a reference 
-		a list of keyframes in the form of a standard list.  
+		This function must be overridden with a method that returns as a reference
+		a list of keyframes in the form of a standard list.
 	*/
 	virtual void getKeyframes(std::set<double> &frames) const {}
 	/*!
@@ -130,22 +131,23 @@ public:
 	*/
 	virtual bool hasKeyframes() const { return false; }
 	/*!
-		This method must return the index of the keyframe (if any) after the \e frame, otherwiswe 
+		This method must return the index of the keyframe (if any) after the \e frame, otherwiswe
 		returns -1.
 	*/
 	virtual int getNextKeyframe(double frame) const { return -1; }
 	/*!
-		This method must return the index of the keyframe (if any) before the \e frame, otherwiswe 
+		This method must return the index of the keyframe (if any) before the \e frame, otherwiswe
 		returns -1.
 	*/
 	virtual int getPrevKeyframe(double frame) const { return -1; }
 	/*!
-		This method must returns a frame given the index \e index. A frame is a double value representing 
+		This method must returns a frame given the index \e index. A frame is a double value
+	   representing
 		a frame.
 	*/
 	virtual double keyframeIndexToFrame(int index) const { return 0.0; }
 
-private:
+  private:
 	// not implemented
 	TParam(const TParam &);
 	TParam &operator=(const TParam &);
@@ -161,24 +163,24 @@ typedef TSmartPointerT<TParam> TParamP;
 //=========================================================
 
 #ifdef _WIN32
-#define DVAPI_PARAM_SMARTPOINTER(PARAM)         \
-	template class DVAPI TSmartPointerT<PARAM>; \
+#define DVAPI_PARAM_SMARTPOINTER(PARAM)                                                            \
+	template class DVAPI TSmartPointerT<PARAM>;                                                    \
 	template class DVAPI TDerivedSmartPointerT<PARAM, TParam>;
 #else
 #define DVAPI_PARAM_SMARTPOINTER(PARAM)
 #endif
 
-#define DEFINE_PARAM_SMARTPOINTER(PARAM, TYPE)                         \
-	DVAPI_PARAM_SMARTPOINTER(PARAM)                                    \
-                                                                       \
-	class DVAPI PARAM##P : public TDerivedSmartPointerT<PARAM, TParam> \
-	{                                                                  \
-	public:                                                            \
-		PARAM##P(PARAM *p = 0) : DerivedSmartPointer(p) {}             \
-		PARAM##P(TYPE v) : DerivedSmartPointer(new PARAM(v)) {}        \
-		PARAM##P(TParamP &p) : DerivedSmartPointer(p) {}               \
-		PARAM##P(const TParamP &p) : DerivedSmartPointer(p) {}         \
-		operator TParamP() const { return TParamP(m_pointer); }        \
+#define DEFINE_PARAM_SMARTPOINTER(PARAM, TYPE)                                                     \
+	DVAPI_PARAM_SMARTPOINTER(PARAM)                                                                \
+                                                                                                   \
+	class DVAPI PARAM##P : public TDerivedSmartPointerT<PARAM, TParam>                             \
+	{                                                                                              \
+	  public:                                                                                      \
+		PARAM##P(PARAM *p = 0) : DerivedSmartPointer(p) {}                                         \
+		PARAM##P(TYPE v) : DerivedSmartPointer(new PARAM(v)) {}                                    \
+		PARAM##P(TParamP &p) : DerivedSmartPointer(p) {}                                           \
+		PARAM##P(const TParamP &p) : DerivedSmartPointer(p) {}                                     \
+		operator TParamP() const { return TParamP(m_pointer); }                                    \
 	};
 
 #endif

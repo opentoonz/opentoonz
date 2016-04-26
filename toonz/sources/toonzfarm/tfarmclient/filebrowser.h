@@ -10,21 +10,20 @@
 
 class GenericFileBrowserAction
 {
-public:
+  public:
 	virtual ~GenericFileBrowserAction() {}
 	virtual void sendCommand(const TFilePath &) = 0;
 };
 
 //-------------------------------------------------------------------
 
-template <class T>
-class FileBrowserAction : public GenericFileBrowserAction
+template <class T> class FileBrowserAction : public GenericFileBrowserAction
 {
-public:
+  public:
 	typedef void (T::*Method)(const TFilePath &);
 	FileBrowserAction(T *target, Method method) : m_target(target), m_method(method) {}
 	void sendCommand(const TFilePath &fp) { (m_target->*m_method)(fp); }
-private:
+  private:
 	T *m_target;
 	Method m_method;
 };
@@ -33,7 +32,7 @@ private:
 
 class FileBrowser : public TWidget
 {
-public:
+  public:
 	FileBrowser(TWidget *parent, string name, const vector<string> &fileTypes);
 	~FileBrowser();
 
@@ -51,7 +50,7 @@ public:
 
 	void selectParentDirectory();
 
-private:
+  private:
 	class Data;
 	Data *m_data;
 };

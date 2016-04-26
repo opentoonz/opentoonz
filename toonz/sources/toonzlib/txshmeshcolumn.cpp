@@ -53,8 +53,9 @@ TFrameId qstringToFrameId(QString str)
 //    TXshMeshColumn  implementation
 //*******************************************************************************
 
-TXshMeshColumn::TXshMeshColumn()
-	: TXshCellColumn() {}
+TXshMeshColumn::TXshMeshColumn() : TXshCellColumn()
+{
+}
 
 //------------------------------------------------------------------
 
@@ -97,12 +98,14 @@ void TXshMeshColumn::saveData(TOStream &os)
 				TFrameId fid = cell.m_frameId;
 				int n = 1, inc = 0, dr = fid.getNumber();
 
-				// If fid has no letter save more than one cell and its increment - otherwise save just one cell
+				// If fid has no letter save more than one cell and its increment - otherwise save
+				// just one cell
 				if (r < r1 && fid.getLetter() == 0) {
 					TXshCell cell2 = getCell(r + 1);
 					TFrameId fid2 = cell2.m_frameId;
 
-					if (cell2.m_level.getPointer() == cell.m_level.getPointer() && fid2.getLetter() == 0) {
+					if (cell2.m_level.getPointer() == cell.m_level.getPointer() &&
+						fid2.getLetter() == 0) {
 						inc = cell2.m_frameId.getNumber() - dr;
 						for (++n;; ++n) {
 							if (r + n > r1)
@@ -111,7 +114,8 @@ void TXshMeshColumn::saveData(TOStream &os)
 							cell2 = getCell(r + n);
 							TFrameId fid2 = cell2.m_frameId;
 
-							if (cell2.m_level.getPointer() != cell.m_level.getPointer() || fid2.getLetter() != 0)
+							if (cell2.m_level.getPointer() != cell.m_level.getPointer() ||
+								fid2.getLetter() != 0)
 								break;
 
 							if (fid2.getNumber() != dr + n * inc)
@@ -162,7 +166,8 @@ void TXshMeshColumn::loadData(TIStream &is)
 					is >> row >> rowCount >> p >> str >> increment;
 
 					TFrameId fid = qstringToFrameId(str);
-					assert((fid.getLetter() == 0 && rowCount >= 0) || (fid.getLetter() != 0 && rowCount == 1));
+					assert((fid.getLetter() == 0 && rowCount >= 0) ||
+						   (fid.getLetter() != 0 && rowCount == 1));
 
 					TXshLevel *xshLevel = dynamic_cast<TXshLevel *>(p);
 					if (xshLevel) {
@@ -171,7 +176,7 @@ void TXshMeshColumn::loadData(TIStream &is)
 							TXshCell cell(xshLevel, fid);
 							setCell(row++, cell);
 
-							//rowCount>1 => fid has not letter.
+							// rowCount>1 => fid has not letter.
 							fidNumber += increment;
 							fid = TFrameId(fidNumber);
 						}

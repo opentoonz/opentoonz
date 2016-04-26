@@ -25,8 +25,7 @@ class TIStream;
 class DVAPI FxDag
 {
 
-	enum DagGridDimension { eLarge = 0,
-							eSmall = 1 };
+	enum DagGridDimension { eLarge = 0, eSmall = 1 };
 
 	TFxSet *m_internalFxs, *m_terminalFxs;
 	TFx *m_xsheetFx;
@@ -36,7 +35,7 @@ class DVAPI FxDag
 	int m_groupIdCount;
 	int m_dagGridDimension;
 
-public:
+  public:
 	FxDag();
 	~FxDag();
 
@@ -78,7 +77,7 @@ public:
 	void saveData(TOStream &os, int occupiedColumnCount);
 	void loadData(TIStream &os);
 
-private:
+  private:
 	// not implemented
 	FxDag(const FxDag &);
 	FxDag &operator=(const FxDag &);

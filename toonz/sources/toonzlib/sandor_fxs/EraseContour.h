@@ -39,22 +39,13 @@ class CEraseContour
 	bool findClosestPaint(const int xx, const int yy, I_PIXEL &ip);
 	void sel0123To01();
 
-public:
-	CEraseContour()
-		: m_picUC(0)
-		, m_picUS(0)
-		, m_ras(0)
-		, m_lX(0)
-		, m_lY(0)
-		, m_cil()
-	{
-	}
+  public:
+	CEraseContour() : m_picUC(0), m_picUS(0), m_ras(0), m_lX(0), m_lY(0), m_cil() {}
 	virtual ~CEraseContour();
 	int makeSelection(const CCIL &iil);
 	int doIt(const CCIL &iil);
 
-	template <class P>
-	CEraseContour(CSTColSelPic<P> &p)
+	template <class P> CEraseContour(CSTColSelPic<P> &p)
 	{
 		null();
 		if (p.m_lX > 0 && p.m_lY > 0 && p.m_sel && p.m_pic && p.m_ras) {

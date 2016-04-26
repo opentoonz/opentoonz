@@ -26,16 +26,9 @@ namespace
 {
 class Header
 {
-	enum RasType {
-		Raster32RGBM,
-		Raster64RGBM,
-		Raster32CM,
-		RasterGR8,
-		RasterGR16,
-		RasterUnknown
-	};
+	enum RasType { Raster32RGBM, Raster64RGBM, Raster32CM, RasterGR8, RasterGR16, RasterUnknown };
 
-public:
+  public:
 	Header(const TRasterP &ras);
 	~Header() {}
 	TRasterP createRaster() const;
@@ -45,7 +38,7 @@ public:
 	RasType m_rasType;
 	Header(void *mem) { memcpy(this, mem, sizeof(Header)); }
 
-private:
+  private:
 	Header(); // not implemented
 };
 
@@ -137,7 +130,7 @@ int Header::getRasterSize() const
 	}
 }
 //------------------------------------------------------------------------------
-} //anonymous namespace
+} // anonymous namespace
 
 //------------------------------------------------------------------------------
 //	TRasterCodecSnappy
@@ -156,9 +149,9 @@ int Header::getRasterSize() const
 TRasterCodecSnappy::~TRasterCodecSnappy()
 {
   if (m_useCache)
-    TImageCache::instance()->remove(m_cacheId);
+	TImageCache::instance()->remove(m_cacheId);
   else
-    m_raster = TRasterGR8P();
+	m_raster = TRasterGR8P();
 }
 
 //------------------------------------------------------------------------------
@@ -174,32 +167,32 @@ UINT TRasterCodecSnappy::doCompress(const TRasterP &inRas, int allocUnit, TRaste
   size_t maxReqSize = snappy_max_compressed_length(inDataSize);
 
   if (m_useCache)
-    {
-    if (m_cacheId=="")
-      m_cacheId = TImageCache::instance()->getUniqueId();
-    else
-      outRas = ((TRasterImageP)TImageCache::instance()->get(m_cacheId, true))->getRaster();
-    }
+	{
+	if (m_cacheId=="")
+	  m_cacheId = TImageCache::instance()->getUniqueId();
+	else
+	  outRas = ((TRasterImageP)TImageCache::instance()->get(m_cacheId, true))->getRaster();
+	}
   else
-    outRas = m_raster;
+	outRas = m_raster;
 
   if (!outRas || outRas->getLx()<(int)maxReqSize)
   {
-    outRas = TRasterGR8P();
-    m_raster = TRasterGR8P();
-    if (m_useCache)
-      TImageCache::instance()->remove(m_cacheId);
-    outRas = TRasterGR8P(maxReqSize, 1);
-    if (m_useCache)
-      TImageCache::instance()->add(m_cacheId, TRasterImageP(outRas), true);
-    else
-      m_raster = outRas;
+	outRas = TRasterGR8P();
+	m_raster = TRasterGR8P();
+	if (m_useCache)
+	  TImageCache::instance()->remove(m_cacheId);
+	outRas = TRasterGR8P(maxReqSize, 1);
+	if (m_useCache)
+	  TImageCache::instance()->add(m_cacheId, TRasterImageP(outRas), true);
+	else
+	  m_raster = outRas;
   }
 
   outRas->lock();
   char* buffer = (char*) outRas->getRawData();
   if (!buffer)
-    return 0;
+	return 0;
 
   inRas->lock();
   char* inData = (char*) inRas->getRawData();
@@ -211,7 +204,7 @@ UINT TRasterCodecSnappy::doCompress(const TRasterP &inRas, int allocUnit, TRaste
   inRas->unlock();
 
   if(r != SNAPPY_OK)
-    throw TException("compress... something goes bad");
+	throw TException("compress... something goes bad");
 
   return outSize;
  }
@@ -223,18 +216,18 @@ TRasterP TRasterCodecSnappy::compress(const TRasterP &inRas, int allocUnit, TINT
   TRasterGR8P rasOut;
   UINT outSize = doCompress(inRas, allocUnit, rasOut);
   if (outSize==0)
-    return TRasterP();
-    
-  UINT headerSize = sizeof(Header);
-  if (TBigMemoryManager::instance()->isActive() && 
-      TBigMemoryManager::instance()->getAvailableMemoryinKb()<((outSize + headerSize)>>10))
 	return TRasterP();
-    
+
+  UINT headerSize = sizeof(Header);
+  if (TBigMemoryManager::instance()->isActive() &&
+	  TBigMemoryManager::instance()->getAvailableMemoryinKb()<((outSize + headerSize)>>10))
+	return TRasterP();
+
   TRasterGR8P r8(outSize + headerSize, 1);
   r8->lock();
   UCHAR *memoryChunk = r8->getRawData();
   if (!memoryChunk)
-    return TRasterP();
+	return TRasterP();
   Header head(inRas);
 
   memcpy(memoryChunk, &head, headerSize);
@@ -249,22 +242,23 @@ TRasterP TRasterCodecSnappy::compress(const TRasterP &inRas, int allocUnit, TINT
 
 //------------------------------------------------------------------------------
 
-bool TRasterCodecSnappy::decompress(const UCHAR* inData, TINT32 inDataSize, TRasterP &outRas, bool safeMode)
+bool TRasterCodecSnappy::decompress(const UCHAR* inData, TINT32 inDataSize, TRasterP &outRas, bool
+safeMode)
 {
   int headerSize = sizeof(Header);
 
   Header *header= (Header *)inData;
   if (!outRas)
-    {
-    outRas = header->createRaster();
-    if (!outRas)
-      throw TException();
-    }
+	{
+	outRas = header->createRaster();
+	if (!outRas)
+	  throw TException();
+	}
   else
-    {
-    if (outRas->getLx() != outRas->getWrap())
-      throw TException();
-    }
+	{
+	if (outRas->getLx() != outRas->getWrap())
+	  throw TException();
+	}
 
   int outDataSize = header->getRasterSize();
 
@@ -279,15 +273,15 @@ bool TRasterCodecSnappy::decompress(const UCHAR* inData, TINT32 inDataSize, TRas
   outRas->unlock();
 
   if (rc != SNAPPY_OK)
-    {
-    if (safeMode)
-      return false;
-    else
-      {
-      throw TException("decompress... something goes bad");   
-      return false;
-      }
-    }
+	{
+	if (safeMode)
+	  return false;
+	else
+	  {
+	  throw TException("decompress... something goes bad");
+	  return false;
+	  }
+	}
 
   assert(outSize == (size_t)outDataSize);
   return true;
@@ -308,16 +302,16 @@ void TRasterCodecSnappy::decompress(const TRasterP & compressedRas, TRasterP &ou
   Header header(inData);
 
   if (!outRas)
-    {
-    outRas = header.createRaster();
-    if (!outRas)
-      throw TException();
-    }
+	{
+	outRas = header.createRaster();
+	if (!outRas)
+	  throw TException();
+	}
   else
-    {
-    if (outRas->getLx() != outRas->getWrap())
-      throw TException();
-    }
+	{
+	if (outRas->getLx() != outRas->getWrap())
+	  throw TException();
+	}
 
   int outDataSize = header.getRasterSize();
 
@@ -337,7 +331,7 @@ void TRasterCodecSnappy::decompress(const TRasterP & compressedRas, TRasterP &ou
   compressedRas->unlock();
 
   if (rc != SNAPPY_OK)
-    throw TException("decompress... something goes bad");
+	throw TException("decompress... something goes bad");
 
   assert(outSize == (size_t)outDataSize);
 }*/
@@ -348,12 +342,10 @@ void TRasterCodecSnappy::decompress(const TRasterP & compressedRas, TRasterP &ou
 
 namespace
 {
-bool lz4decompress(LZ4F_decompressionContext_t lz4dctx,
-				   char *out, size_t *out_len_res,
+bool lz4decompress(LZ4F_decompressionContext_t lz4dctx, char *out, size_t *out_len_res,
 				   const char *in, size_t in_len)
 {
-	size_t out_len = *out_len_res,
-		   in_read, out_written;
+	size_t out_len = *out_len_res, in_read, out_written;
 
 	*out_len_res = 0;
 
@@ -361,8 +353,8 @@ bool lz4decompress(LZ4F_decompressionContext_t lz4dctx,
 		out_written = out_len;
 		in_read = in_len;
 
-		size_t res = LZ4F_decompress(
-			lz4dctx, (void *)out, &out_written, (const void *)in, &in_read, NULL);
+		size_t res =
+			LZ4F_decompress(lz4dctx, (void *)out, &out_written, (const void *)in, &in_read, NULL);
 
 		if (LZ4F_isError(res))
 			return false;
@@ -477,7 +469,8 @@ TRasterP TRasterCodecLz4::compress(const TRasterP &inRas, int allocUnit, TINT32 
 
 //------------------------------------------------------------------------------
 
-bool TRasterCodecLz4::decompress(const UCHAR *inData, TINT32 inDataSize, TRasterP &outRas, bool safeMode)
+bool TRasterCodecLz4::decompress(const UCHAR *inData, TINT32 inDataSize, TRasterP &outRas,
+								 bool safeMode)
 {
 	int headerSize = sizeof(Header);
 
@@ -506,7 +499,7 @@ bool TRasterCodecLz4::decompress(const UCHAR *inData, TINT32 inDataSize, TRaster
 	char *outData = (char *)outRas->getRawData();
 
 	outRas->lock();
-	//err = LZ4F_decompress(lz4dctx, outData, &outSize, mc, &ds, NULL);
+	// err = LZ4F_decompress(lz4dctx, outData, &outSize, mc, &ds, NULL);
 	bool ok = lz4decompress(lz4dctx, outData, &outSize, mc, ds);
 	LZ4F_freeDecompressionContext(lz4dctx);
 	outRas->unlock();
@@ -563,7 +556,7 @@ void TRasterCodecLz4::decompress(const TRasterP &compressedRas, TRasterP &outRas
 
 	outRas->lock();
 
-	//err = LZ4F_decompress(lz4dctx, outData, &outSize, mc, &ds, NULL);
+	// err = LZ4F_decompress(lz4dctx, outData, &outSize, mc, &ds, NULL);
 	bool ok = lz4decompress(lz4dctx, outData, &outSize, mc, ds);
 	LZ4F_freeDecompressionContext(lz4dctx);
 
@@ -603,7 +596,8 @@ bool lzoDecompress(const QByteArray src, int dstSize, QByteArray &dst)
 	QDir exeDir(QCoreApplication::applicationDirPath());
 	QString decompressExe = exeDir.filePath("lzodecompress");
 	QProcess process;
-	process.start(decompressExe, QStringList() << QString::number(dstSize) << QString::number(src.size()));
+	process.start(decompressExe, QStringList() << QString::number(dstSize)
+											   << QString::number(src.size()));
 	if (!process.waitForStarted())
 		return false;
 	process.write(src);
@@ -650,7 +644,8 @@ UINT TRasterCodecLZO::doCompress(const TRasterP &inRas, int allocUnit, TRasterGR
 
 	inRas->unlock();
 
-	size_t maxReqSize = compressedBuffer.size(); // we have just done the compression: we know the actual size
+	size_t maxReqSize =
+		compressedBuffer.size(); // we have just done the compression: we know the actual size
 
 	if (m_useCache) {
 		if (m_cacheId == "")
@@ -718,7 +713,8 @@ TRasterP TRasterCodecLZO::compress(const TRasterP &inRas, int allocUnit, TINT32 
 
 //------------------------------------------------------------------------------
 
-bool TRasterCodecLZO::decompress(const UCHAR *inData, TINT32 inDataSize, TRasterP &outRas, bool safeMode)
+bool TRasterCodecLZO::decompress(const UCHAR *inData, TINT32 inDataSize, TRasterP &outRas,
+								 bool safeMode)
 {
 	int headerSize = sizeof(Header);
 
@@ -751,15 +747,15 @@ bool TRasterCodecLZO::decompress(const UCHAR *inData, TINT32 inDataSize, TRaster
 
 	/*
   if (rc != true)                                     // Check success code here
-    {
-    if (safeMode)
-      return false;
-    else
-      {
-      throw TException("decompress... something goes bad");   
-      return false;
-      }
-    }
+	{
+	if (safeMode)
+	  return false;
+	else
+	  {
+	  throw TException("decompress... something goes bad");
+	  return false;
+	  }
+	}
 	*/
 
 	assert(outSize == (size_t)outDataSize);

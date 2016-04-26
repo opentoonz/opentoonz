@@ -11,13 +11,12 @@ class GammaFx : public TStandardRasterFx
 	TRasterFxPort m_input;
 	TDoubleParamP m_gamma;
 
-public:
-	GammaFx()
-		: m_gamma(1.0)
+  public:
+	GammaFx() : m_gamma(1.0)
 	{
 		bindParam(this, "value", m_gamma);
 		addInputPort("Source", m_input);
-		//m_gamma->setValueRange(0, std::numeric_limits<double>::max());
+		// m_gamma->setValueRange(0, std::numeric_limits<double>::max());
 		m_gamma->setValueRange(0.0, 200.0);
 	}
 

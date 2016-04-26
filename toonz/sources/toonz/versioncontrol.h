@@ -37,26 +37,27 @@ class VersionControlThread : public QThread
 
 	QProcess *m_process;
 
-public:
+  public:
 	QMutex m_mutex;
 
 	VersionControlThread(QObject *parent = 0);
 	~VersionControlThread();
 
-	void executeCommand(const QString &workingDir,
-						const QString &binary,
-						const QStringList &args, bool readOutputOnDone = true);
+	void executeCommand(const QString &workingDir, const QString &binary, const QStringList &args,
+						bool readOutputOnDone = true);
 
-	void getSVNStatus(const QString &path, bool showUpdates = false, bool nonRecursive = false, bool depthInfinity = false);
-	void getSVNStatus(const QString &path, const QStringList &files, bool showUpdates = false, bool nonRecursive = false, bool depthInfinity = false);
+	void getSVNStatus(const QString &path, bool showUpdates = false, bool nonRecursive = false,
+					  bool depthInfinity = false);
+	void getSVNStatus(const QString &path, const QStringList &files, bool showUpdates = false,
+					  bool nonRecursive = false, bool depthInfinity = false);
 
-protected:
+  protected:
 	void run();
 
-protected slots:
+  protected slots:
 	void onStandardOutputReady();
 
-signals:
+  signals:
 	void error(const QString &errorString);
 	void done(const QString &response);
 	void outputRetrieved(const QString &text);
@@ -80,11 +81,11 @@ class VersionControlManager : public QObject
 	bool m_isRunning;
 	bool m_deleteLater;
 
-public:
+  public:
 	static VersionControlManager *instance();
 	void setFrameRange(TLevelSet *levelSet, bool deleteLater = false);
 
-protected slots:
+  protected slots:
 	void onFrameRangeDone(const QString &text);
 	void onError(const QString &text);
 };
@@ -104,7 +105,7 @@ class VersionControl : public QObject
 
 	QString m_executablePath;
 
-public:
+  public:
 	static VersionControl *instance();
 
 	// Read Version Control repositories from config files
@@ -123,30 +124,41 @@ public:
 
 	// filesToCommit must have relative path to the working dir
 	// Convert QStringList to TFilePath
-	void commit(QWidget *parent, const QString &workingDir, const QStringList &filesToCommit, bool folderOnly, int sceneIconAdded = 0);
+	void commit(QWidget *parent, const QString &workingDir, const QStringList &filesToCommit,
+				bool folderOnly, int sceneIconAdded = 0);
 
-	void update(QWidget *parent, const QString &workingDir, const QStringList &filesToUpdate, int sceneIconsCounts, bool folderOnly = true, bool updateToRevision = false, bool nonRecursive = false);
-	void updateAndLock(QWidget *parent, const QString &workingDir, const QStringList &files, int workingRevision, int sceneIconAdded);
+	void update(QWidget *parent, const QString &workingDir, const QStringList &filesToUpdate,
+				int sceneIconsCounts, bool folderOnly = true, bool updateToRevision = false,
+				bool nonRecursive = false);
+	void updateAndLock(QWidget *parent, const QString &workingDir, const QStringList &files,
+					   int workingRevision, int sceneIconAdded);
 
-	void revert(QWidget *parent, const QString &workingDir, const QStringList &filesToRevert, bool folderOnly, int sceneIconAdded = 0);
+	void revert(QWidget *parent, const QString &workingDir, const QStringList &filesToRevert,
+				bool folderOnly, int sceneIconAdded = 0);
 
-	void lock(QWidget *parent, const QString &workingDir, const QStringList &filesToLock, int sceneIconAdded);
-	void unlock(QWidget *parent, const QString &workingDir, const QStringList &filesToUnlock, int sceneIconAdded);
+	void lock(QWidget *parent, const QString &workingDir, const QStringList &filesToLock,
+			  int sceneIconAdded);
+	void unlock(QWidget *parent, const QString &workingDir, const QStringList &filesToUnlock,
+				int sceneIconAdded);
 
-	void lockFrameRange(QWidget *parent, const QString &workingDir, const QString &file, int frameCount);
+	void lockFrameRange(QWidget *parent, const QString &workingDir, const QString &file,
+						int frameCount);
 	void lockFrameRange(QWidget *parent, const QString &workingDir, const QStringList &files);
 
 	void unlockFrameRange(QWidget *parent, const QString &workingDir, const QString &file);
 	void unlockFrameRange(QWidget *parent, const QString &workingDir, const QStringList &files);
 
 	void showFrameRangeLockInfo(QWidget *parent, const QString &workingDir, const QString &file);
-	void showFrameRangeLockInfo(QWidget *parent, const QString &workingDir, const QStringList &files);
+	void showFrameRangeLockInfo(QWidget *parent, const QString &workingDir,
+								const QStringList &files);
 
 	void commitFrameRange(QWidget *parent, const QString &workingDir, const QString &file);
 
-	void revertFrameRange(QWidget *parent, const QString &workingDir, const QString &file, const QString &tempFileName);
+	void revertFrameRange(QWidget *parent, const QString &workingDir, const QString &file,
+						  const QString &tempFileName);
 
-	void deleteFiles(QWidget *parent, const QString &workingDir, const QStringList &filesToDelete, int sceneIconAdded = 0);
+	void deleteFiles(QWidget *parent, const QString &workingDir, const QStringList &filesToDelete,
+					 int sceneIconAdded = 0);
 
 	void deleteFolder(QWidget *parent, const QString &workingDir, const QString &folderName);
 
@@ -155,8 +167,7 @@ public:
 	void purgeFolder(QWidget *parent, const QString &workingDir);
 
 	// Utility methods
-	QStringList getSceneContents(const QString &wokingDir,
-								 const QString &sceneFileName);
+	QStringList getSceneContents(const QString &wokingDir, const QString &sceneFileName);
 
 	QStringList getCurrentSceneContents() const;
 
@@ -164,7 +175,7 @@ public:
 
 	QString getExecutablePath() const { return m_executablePath; }
 
-signals:
+  signals:
 	void commandDone(const QStringList &files);
 };
 

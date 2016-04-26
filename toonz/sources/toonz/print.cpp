@@ -39,7 +39,8 @@ void printCurrentFrame()
 	TRaster32P raster(lx, ly);
 	if (scene->getFrameCount() <= 0) {
 		// Ricordarsi di usare DvMsgBox !! (se si decommenta questo codice :) )
-		// QMessageBox::warning(0,"Print",tr("It is not possible to generate an animation\nbecause the scene is empty.", "WARNING"));
+		// QMessageBox::warning(0,"Print",tr("It is not possible to generate an animation\nbecause
+		// the scene is empty.", "WARNING"));
 		return;
 	}
 	raster->fill(scene->getProperties()->getBgColor());
@@ -58,7 +59,7 @@ void printCurrentFrame()
 
 class PrintCommand : public MenuItemHandler
 {
-public:
+  public:
 	PrintCommand() : MenuItemHandler(MI_Print) {}
 	void execute()
 	{

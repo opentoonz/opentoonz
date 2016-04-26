@@ -59,7 +59,7 @@ class OpenCameraStageCommandHandler : public MenuItemHandler
 {
 	CommandId m_id;
 
-public:
+  public:
 	OpenCameraStageCommandHandler(CommandId cmdId) : MenuItemHandler(cmdId) {}
 	void execute()
 	{
@@ -78,8 +78,7 @@ public:
 
 std::map<TStageObjectId, CameraSettingsPopup *> CameraSettingsPopup::m_popups;
 
-CameraSettingsPopup::CameraSettingsPopup()
-	: QDialog(TApp::instance()->getMainWindow())
+CameraSettingsPopup::CameraSettingsPopup() : QDialog(TApp::instance()->getMainWindow())
 {
 	m_nameFld = new LineEdit();
 	m_cameraSettingsWidget = new CameraSettingsWidget();
@@ -136,7 +135,8 @@ void CameraSettingsPopup::showEvent(QShowEvent *e)
 	ret = ret && connect(objectHandle, SIGNAL(objectSwitched()), SLOT(updateFields()));
 	ret = ret && connect(xsheetHandle, SIGNAL(xsheetSwitched()), SLOT(updateFields()));
 	ret = ret && connect(xsheetHandle, SIGNAL(xsheetChanged()), SLOT(updateFields()));
-	ret = ret && connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), SLOT(onLevelSwitched(TXshLevel *)));
+	ret = ret && connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)),
+						 SLOT(onLevelSwitched(TXshLevel *)));
 	assert(ret);
 }
 
@@ -145,7 +145,7 @@ void CameraSettingsPopup::hideEvent(QHideEvent *e)
 	m_cameraSettingsWidget->setCurrentLevel(0);
 
 	if (m_cameraId != TStageObjectId::NoneId) {
-		//Remove the popup from currentlyOpened ones and schedule for deletion
+		// Remove the popup from currentlyOpened ones and schedule for deletion
 		m_popups.erase(m_cameraId);
 		m_cameraId = TStageObjectId::NoneId;
 		deleteLater();
@@ -159,11 +159,13 @@ void CameraSettingsPopup::hideEvent(QHideEvent *e)
 	bool ret = true;
 	ret = ret && disconnect(sceneHandle, SIGNAL(sceneChanged()), this, SLOT(updateFields()));
 	ret = ret && disconnect(sceneHandle, SIGNAL(sceneSwitched()), this, SLOT(updateFields()));
-	ret = ret && disconnect(objectHandle, SIGNAL(objectChanged(bool)), this, SLOT(updateFields(bool)));
+	ret = ret &&
+		  disconnect(objectHandle, SIGNAL(objectChanged(bool)), this, SLOT(updateFields(bool)));
 	ret = ret && disconnect(objectHandle, SIGNAL(objectSwitched()), this, SLOT(updateFields()));
 	ret = ret && disconnect(xsheetHandle, SIGNAL(xsheetSwitched()), this, SLOT(updateFields()));
 	ret = ret && disconnect(xsheetHandle, SIGNAL(xsheetChanged()), this, SLOT(updateFields()));
-	ret = ret && disconnect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this, SLOT(onLevelSwitched(TXshLevel *)));
+	ret = ret && disconnect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
+							SLOT(onLevelSwitched(TXshLevel *)));
 	assert(ret);
 }
 

@@ -15,9 +15,11 @@ namespace
 
 class Controller : public TFarmController, public TFarmProxy
 {
-public:
+  public:
 	Controller(const QString &hostName, const QString &addr, int port)
-		: TFarmProxy(hostName, addr, port) {}
+		: TFarmProxy(hostName, addr, port)
+	{
+	}
 
 	// TFarmController interface implementation
 
@@ -34,11 +36,7 @@ public:
 
 	void queryTaskInfo(const QString &id, TFarmTask &task);
 
-	void queryTaskShortInfo(
-		const QString &id,
-		QString &parentId,
-		QString &name,
-		TaskState &status);
+	void queryTaskShortInfo(const QString &id, QString &parentId, QString &name, TaskState &status);
 
 	void attachServer(const QString &name, const QString &addr, int port);
 
@@ -46,12 +44,8 @@ public:
 
 	void taskSubmissionError(const QString &taskId, int errCode);
 
-	void taskProgress(
-		const QString &taskId,
-		int step,
-		int stepCount,
-		int frameNumber,
-		FrameState state);
+	void taskProgress(const QString &taskId, int step, int stepCount, int frameNumber,
+					  FrameState state);
 
 	void taskCompleted(const QString &taskId, int exitCode);
 
@@ -125,7 +119,7 @@ QString Controller::addTask(const TFarmTask &task, bool suspended)
 	}
 
 	QString reply = sendToStub(data);
-	//MessageBox(NULL, data.c_str(), "ciao", 0);
+	// MessageBox(NULL, data.c_str(), "ciao", 0);
 	return reply;
 }
 
@@ -290,9 +284,8 @@ void Controller::queryTaskInfo(const QString &id, TFarmTask &task)
 
 //------------------------------------------------------------------------------
 
-void Controller::queryTaskShortInfo(
-	const QString &id, QString &parentId,
-	QString &name, TaskState &status)
+void Controller::queryTaskShortInfo(const QString &id, QString &parentId, QString &name,
+									TaskState &status)
 {
 	QString data("queryTaskShortInfo");
 	data += ",";
@@ -356,12 +349,8 @@ void Controller::taskSubmissionError(const QString &taskId, int errCode)
 
 //------------------------------------------------------------------------------
 
-void Controller::taskProgress(
-	const QString &taskId,
-	int step,
-	int stepCount,
-	int frameNumber,
-	FrameState state)
+void Controller::taskProgress(const QString &taskId, int step, int stepCount, int frameNumber,
+							  FrameState state)
 {
 	QString data("taskProgress");
 	data += ",";
@@ -495,8 +484,7 @@ TFarmControllerFactory::TFarmControllerFactory()
 
 //------------------------------------------------------------------------------
 
-int TFarmControllerFactory::create(const ControllerData &data,
-								   TFarmController **controller)
+int TFarmControllerFactory::create(const ControllerData &data, TFarmController **controller)
 
 {
 	*controller = new Controller(data.m_hostName, data.m_ipAddress, data.m_port);
@@ -517,8 +505,8 @@ void loadControllerData(const TFilePath &fp, ControllerData &data)
 {
 	Tifstream is(fp);
 	if (!is || !is.good()) {
-		throw TException(
-			L"Unable to get Farm Controller Data (looking for '" + fp.getWideString() + L"')");
+		throw TException(L"Unable to get Farm Controller Data (looking for '" + fp.getWideString() +
+						 L"')");
 	}
 
 	while (!is.eof()) {

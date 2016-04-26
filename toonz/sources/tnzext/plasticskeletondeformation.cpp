@@ -57,12 +57,13 @@ struct VDKey {
 
 //----------------------------------------------------------------------
 
-typedef boost::multi_index_container<VDKey, indexed_by<
+typedef boost::multi_index_container<
+	VDKey, indexed_by<
 
-												ordered_unique<tag<QString>, member<VDKey, QString, &VDKey::m_name>>,
-												ordered_unique<tag<int>, member<VDKey, int, &VDKey::m_hookNumber>>
+			   ordered_unique<tag<QString>, member<VDKey, QString, &VDKey::m_name>>,
+			   ordered_unique<tag<int>, member<VDKey, int, &VDKey::m_hookNumber>>
 
-												>> SkVDSet;
+			   >> SkVDSet;
 
 //----------------------------------------------------------------------
 
@@ -143,8 +144,7 @@ bool SkVD::setKeyframe(const SkVD::Keyframe &values)
 
 //------------------------------------------------------------------
 
-bool SkVD::setKeyframe(
-	const SkVD::Keyframe &values, double frame, double easeIn, double easeOut)
+bool SkVD::setKeyframe(const SkVD::Keyframe &values, double frame, double easeIn, double easeOut)
 {
 	bool keyWasSet = false;
 
@@ -230,7 +230,7 @@ void SkVD::loadData(TIStream &is)
 
 class PlasticSkeletonDeformation::Imp : public TParamObserver
 {
-public:
+  public:
 	PlasticSkeletonDeformation *m_back; //!< Back-pointer to the interface class
 
 	SkeletonSet m_skeletons; //!< Skeletons owned by the deformation
@@ -243,10 +243,12 @@ public:
 	TSyntax::Grammar *m_grammar; //!< The params' grammar. Weird though - it's a VERY
 								 //!< occult requirement to TDoubleParams...
 
-	// NOTE: There \a is a deformation even for a skeleton's root node. This is now required due to the
-	// onwership of \a multiple skeletons at once. However, its angle and distance params will be unused.
+	// NOTE: There \a is a deformation even for a skeleton's root node. This is now required due to
+	// the
+	// onwership of \a multiple skeletons at once. However, its angle and distance params will be
+	// unused.
 
-public:
+  public:
 	Imp(PlasticSkeletonDeformation *back);
 	~Imp();
 
@@ -266,13 +268,12 @@ public:
 	void touchParams(SkVD &vd);
 
 	//! Applies stored vertex deformations to the skeleton branch starting at v
-	void updateBranchPositions(
-		const PlasticSkeleton &originalSkeleton, PlasticSkeleton &deformedSkeleton,
-		double frame, int v);
+	void updateBranchPositions(const PlasticSkeleton &originalSkeleton,
+							   PlasticSkeleton &deformedSkeleton, double frame, int v);
 
 	void onChange(const TParamChange &change); // Passes param notifications to external observers
 
-private:
+  private:
 	// Not directly copy-constructible
 	Imp(const Imp &other);
 };
@@ -309,8 +310,8 @@ PlasticSkeletonDeformation::Imp::Imp(PlasticSkeletonDeformation *back, const Imp
 	// Clone the skeletons
 	SkeletonSet::const_iterator st, sEnd(other.m_skeletons.end());
 	for (st = other.m_skeletons.begin(); st != sEnd; ++st)
-		m_skeletons.insert(SkeletonSet::value_type(
-			st->get_left(), new PlasticSkeleton(*st->get_right())));
+		m_skeletons.insert(
+			SkeletonSet::value_type(st->get_left(), new PlasticSkeleton(*st->get_right())));
 
 	// Clone each parameters curve
 	SkVD vd;
@@ -427,7 +428,8 @@ void PlasticSkeletonDeformation::Imp::attachVertex(const QString &name, int skel
 			int h = 1;
 
 			SkVDByHookNumber::iterator vdt, vdEnd(imp->m_vds.get<int>().end());
-			for (vdt = imp->m_vds.get<int>().begin(); vdt != vdEnd && vdt->m_hookNumber == h; ++vdt, ++h)
+			for (vdt = imp->m_vds.get<int>().begin(); vdt != vdEnd && vdt->m_hookNumber == h;
+				 ++vdt, ++h)
 				;
 
 			return h;
@@ -472,8 +474,8 @@ void PlasticSkeletonDeformation::Imp::detachVertex(const QString &name, int skel
 
 //------------------------------------------------------------------
 
-void PlasticSkeletonDeformation::Imp::rebindVertex(
-	const QString &name, int skelId, const QString &newName)
+void PlasticSkeletonDeformation::Imp::rebindVertex(const QString &name, int skelId,
+												   const QString &newName)
 {
 	if (name == newName)
 		return;
@@ -542,8 +544,7 @@ void PlasticSkeletonDeformation::Imp::onChange(const TParamChange &change)
 {
 	// Since the deformation was changed, any associated deformer
 	// must be invalidated (at the animation-deform level only)
-	PlasticDeformerStorage::instance()->invalidateDeformation(
-		m_back, PlasticDeformerStorage::NONE);
+	PlasticDeformerStorage::instance()->invalidateDeformation(m_back, PlasticDeformerStorage::NONE);
 
 	// Propagate notification to this object's observers
 	std::set<TParamObserver *>::iterator ot, oEnd(m_observers.end());
@@ -553,9 +554,9 @@ void PlasticSkeletonDeformation::Imp::onChange(const TParamChange &change)
 
 //------------------------------------------------------------------
 
-void PlasticSkeletonDeformation::Imp::updateBranchPositions(
-	const PlasticSkeleton &originalSkeleton, PlasticSkeleton &deformedSkeleton,
-	double frame, int v)
+void PlasticSkeletonDeformation::Imp::updateBranchPositions(const PlasticSkeleton &originalSkeleton,
+															PlasticSkeleton &deformedSkeleton,
+															double frame, int v)
 {
 	struct locals {
 
@@ -569,8 +570,7 @@ void PlasticSkeletonDeformation::Imp::updateBranchPositions(
 			if (vParent < 0)
 				return; // dir remains as passed
 
-			const TPointD &dir_ = tcg::point_ops::direction(
-				skel.vertex(vParent).P(), vx.P(), 1e-4);
+			const TPointD &dir_ = tcg::point_ops::direction(skel.vertex(vParent).P(), vx.P(), 1e-4);
 
 			if (dir_ != tcg::point_ops::NaP<TPointD>())
 				dir = dir_;
@@ -601,8 +601,8 @@ void PlasticSkeletonDeformation::Imp::updateBranchPositions(
 		double aDelta = vd.m_params[SkVD::ANGLE]->getValue(frame);
 		double dDelta = vd.m_params[SkVD::DISTANCE]->getValue(frame);
 
-		dvx.P() = deformedSkeleton.vertex(vParent).P() +
-				  (d + dDelta) * (TRotation(a + aDelta) * dDir);
+		dvx.P() =
+			deformedSkeleton.vertex(vParent).P() + (d + dDelta) * (TRotation(a + aDelta) * dDir);
 	}
 
 	// Finally, update children positions
@@ -620,8 +620,7 @@ void PlasticSkeletonDeformation::Imp::updateBranchPositions(
 //    PlasticSkeletonDeformation  implementation
 //**************************************************************************************
 
-PlasticSkeletonDeformation::PlasticSkeletonDeformation()
-	: m_imp(new Imp(this))
+PlasticSkeletonDeformation::PlasticSkeletonDeformation() : m_imp(new Imp(this))
 {
 }
 
@@ -648,7 +647,8 @@ PlasticSkeletonDeformation::~PlasticSkeletonDeformation()
 
 //------------------------------------------------------------------
 
-PlasticSkeletonDeformation &PlasticSkeletonDeformation::operator=(const PlasticSkeletonDeformation &other)
+PlasticSkeletonDeformation &PlasticSkeletonDeformation::
+operator=(const PlasticSkeletonDeformation &other)
 {
 	// The meaning of operator= is DIFFERENT from that implemented in the copy constructor.
 	// Skeletons are NOT cloned.
@@ -680,7 +680,10 @@ namespace skeletonIds
 typedef boost::bimap<int, PlasticSkeletonP>::left_map::const_iterator iter_type;
 typedef iter_type::value_type value_type;
 
-inline int func_(const value_type &val) { return val.first; }
+inline int func_(const value_type &val)
+{
+	return val.first;
+}
 }
 } // namespace ::skeletonIds
 
@@ -813,8 +816,8 @@ inline std::pair<int, int> func_(const std::map<int, int>::value_type &val)
 }
 } // namespace ::vdSkeletonVertices
 
-void PlasticSkeletonDeformation::vdSkeletonVertices(const QString &vertexName,
-													vx_iterator &begin, vx_iterator &end) const
+void PlasticSkeletonDeformation::vdSkeletonVertices(const QString &vertexName, vx_iterator &begin,
+													vx_iterator &end) const
 {
 	using namespace ::vdSkeletonVertices;
 
@@ -922,8 +925,8 @@ bool PlasticSkeletonDeformation::setKeyframe(const SkDKey &keyframe)
 
 //------------------------------------------------------------------
 
-bool PlasticSkeletonDeformation::setKeyframe(
-	const SkDKey &keyframe, double frame, double easeIn, double easeOut)
+bool PlasticSkeletonDeformation::setKeyframe(const SkDKey &keyframe, double frame, double easeIn,
+											 double easeOut)
 {
 	bool keyWasSet = false;
 
@@ -994,7 +997,8 @@ void PlasticSkeletonDeformation::deleteKeyframe(double frame)
 
 //------------------------------------------------------------------
 
-void PlasticSkeletonDeformation::storeDeformedSkeleton(int skelId, double frame, PlasticSkeleton &skeleton) const
+void PlasticSkeletonDeformation::storeDeformedSkeleton(int skelId, double frame,
+													   PlasticSkeleton &skeleton) const
 {
 	// Copy the un-deformed skeleton to the output one
 	const PlasticSkeletonP &origSkel = this->skeleton(skelId);
@@ -1007,9 +1011,9 @@ void PlasticSkeletonDeformation::storeDeformedSkeleton(int skelId, double frame,
 
 //------------------------------------------------------------------
 
-void PlasticSkeletonDeformation::updatePosition(
-	const PlasticSkeleton &originalSkeleton, PlasticSkeleton &deformedSkeleton,
-	double frame, int v, const TPointD &pos)
+void PlasticSkeletonDeformation::updatePosition(const PlasticSkeleton &originalSkeleton,
+												PlasticSkeleton &deformedSkeleton, double frame,
+												int v, const TPointD &pos)
 {
 	const PlasticSkeletonVertex &vx = deformedSkeleton.vertex(v);
 	int vParent = vx.parent();
@@ -1019,13 +1023,16 @@ void PlasticSkeletonDeformation::updatePosition(
 
 	SkVD &vd = m_imp->m_vds.find(vx.name())->m_vd;
 
-	// NOTE: The following aDelta calculation should be done as a true difference - this is still ok and spares
+	// NOTE: The following aDelta calculation should be done as a true difference - this is still ok
+	// and spares
 	// access to v's grandParent...
 
-	double aDelta = tcg::consts::rad_to_deg * tcg::point_ops::angle(vPos - vParentPos, pos - vParentPos),
+	double aDelta =
+			   tcg::consts::rad_to_deg * tcg::point_ops::angle(vPos - vParentPos, pos - vParentPos),
 		   dDelta = tcg::point_ops::dist(vParentPos, pos) - tcg::point_ops::dist(vParentPos, vPos),
 
-		   a = tcrop(vd.m_params[SkVD::ANGLE]->getValue(frame) + aDelta, vx.m_minAngle, vx.m_maxAngle),
+		   a = tcrop(vd.m_params[SkVD::ANGLE]->getValue(frame) + aDelta, vx.m_minAngle,
+					 vx.m_maxAngle),
 		   d = vd.m_params[SkVD::DISTANCE]->getValue(frame) + dDelta;
 
 	vd.m_params[SkVD::ANGLE]->setValue(frame, a);
@@ -1036,9 +1043,9 @@ void PlasticSkeletonDeformation::updatePosition(
 
 //------------------------------------------------------------------
 
-void PlasticSkeletonDeformation::updateAngle(
-	const PlasticSkeleton &originalSkeleton, PlasticSkeleton &deformedSkeleton,
-	double frame, int v, const TPointD &pos)
+void PlasticSkeletonDeformation::updateAngle(const PlasticSkeleton &originalSkeleton,
+											 PlasticSkeleton &deformedSkeleton, double frame, int v,
+											 const TPointD &pos)
 {
 	const PlasticSkeletonVertex &vx = deformedSkeleton.vertex(v);
 	int vParent = vx.parent();
@@ -1049,8 +1056,10 @@ void PlasticSkeletonDeformation::updateAngle(
 
 	SkVD &vd = m_imp->m_vds.find(vx.name())->m_vd;
 
-	double aDelta = tcg::consts::rad_to_deg * tcg::point_ops::angle(vx.P() - vParentPos, pos - vParentPos),
-		   a = tcrop(vd.m_params[SkVD::ANGLE]->getValue(frame) + aDelta, vx.m_minAngle, vx.m_maxAngle);
+	double aDelta = tcg::consts::rad_to_deg *
+					tcg::point_ops::angle(vx.P() - vParentPos, pos - vParentPos),
+		   a = tcrop(vd.m_params[SkVD::ANGLE]->getValue(frame) + aDelta, vx.m_minAngle,
+					 vx.m_maxAngle);
 
 	vd.m_params[SkVD::ANGLE]->setValue(frame, a);
 
@@ -1092,8 +1101,8 @@ void PlasticSkeletonDeformation::deleteVertex(PlasticSkeleton *skel, int v)
 
 //------------------------------------------------------------------
 
-void PlasticSkeletonDeformation::vertexNameChange(
-	PlasticSkeleton *skel, int v, const QString &newName)
+void PlasticSkeletonDeformation::vertexNameChange(PlasticSkeleton *skel, int v,
+												  const QString &newName)
 {
 	int skelId = skeletonId(skel);
 	assert(skelId >= 0);
@@ -1246,8 +1255,7 @@ void PlasticSkeletonDeformation::loadData_prerelease(TIStream &is)
 			if (vParent < 0)
 				return; // dir remains as passed
 
-			const TPointD &dir_ = tcg::point_ops::direction(
-				skel.vertex(vParent).P(), vx.P(), 1e-4);
+			const TPointD &dir_ = tcg::point_ops::direction(skel.vertex(vParent).P(), vx.P(), 1e-4);
 
 			if (dir_ != tcg::point_ops::NaP<TPointD>())
 				dir = dir_;
@@ -1277,7 +1285,8 @@ void PlasticSkeletonDeformation::loadData_prerelease(TIStream &is)
 				// Now, rebuild vx's position
 				SkVD &vd = sd.m_imp->m_vds.find(vx.name())->m_vd;
 
-				double a = tcg::consts::rad_to_deg * tcg::point_ops::angle(dir, vxPos - vxParentPos);
+				double a =
+					tcg::consts::rad_to_deg * tcg::point_ops::angle(dir, vxPos - vxParentPos);
 				double d = tcg::point_ops::dist(vxParentPos, vxPos);
 
 				{

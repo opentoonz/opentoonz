@@ -28,17 +28,17 @@ class TCursor;
 
 class DVAPI TCursorFactory
 {
-protected:
+  protected:
 	TCursorFactory() {}
 
-	//typedef vector<TCursor*> CursorList;
-	//static CursorList m_cursorList;
+	// typedef vector<TCursor*> CursorList;
+	// static CursorList m_cursorList;
 	typedef TCursor *CursorList[100];
 	static CursorList m_cursorList;
 
 	static bool m_init;
 
-public:
+  public:
 	enum {
 		CURSOR_NONE,				  // no cursor...
 		CURSOR_DEFAULT = CURSOR_NONE, // window class cursor...
@@ -62,7 +62,7 @@ public:
 	static void defineCursor(TWidget::CursorIndex new_cursor_id, const TFilePath &cursor_filename);
 	static void defineCursorAs(TWidget::CursorIndex new_cursor_id, TWidget::CursorIndex source);
 
-protected:
+  protected:
 	friend class TMouse;
 	static TCursor *getCursor(TWidget::CursorIndex cursor_id);
 	// PD methods
@@ -72,7 +72,7 @@ protected:
 
 class DVAPI TMouse
 {
-public:
+  public:
 	~TMouse() {}
 
 	// PD methods
@@ -81,37 +81,28 @@ public:
 
 	void setCursor(TWidget::CursorIndex id);
 
-	enum CursorMode {
-		MODE_NORMAL,
-		MODE_HOURGLASS
-	};
+	enum CursorMode { MODE_NORMAL, MODE_HOURGLASS };
 	void setCursorMode(CursorMode mode);
-	//CursorMode getCursorMode();
+	// CursorMode getCursorMode();
 
-private:
+  private:
 	void setCursor(TCursor *);
 	TWidget::CursorIndex m_currentCursorId;
 	// to enforce singleton...
 	TMouse();
 
-protected:
+  protected:
 	CursorMode m_cursorMode;
 
-public:
+  public:
 	static TMouse theMouse;
 };
 
 class DVAPI THourglassCursor
 {
-public:
-	THourglassCursor()
-	{
-		TMouse::theMouse.setCursorMode(TMouse::MODE_HOURGLASS);
-	}
-	~THourglassCursor()
-	{
-		TMouse::theMouse.setCursorMode(TMouse::MODE_NORMAL);
-	}
+  public:
+	THourglassCursor() { TMouse::theMouse.setCursorMode(TMouse::MODE_HOURGLASS); }
+	~THourglassCursor() { TMouse::theMouse.setCursorMode(TMouse::MODE_NORMAL); }
 };
 
 #ifdef WIN32

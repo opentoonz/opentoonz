@@ -12,8 +12,7 @@ namespace TScriptBinding
 
 //===========================================================================
 
-FilePath::FilePath(const QString &filePath)
-	: m_filePath(filePath)
+FilePath::FilePath(const QString &filePath) : m_filePath(filePath)
 {
 }
 
@@ -128,14 +127,15 @@ QScriptValue FilePath::concat(const QScriptValue &value) const
 	if (err.isError())
 		return err;
 	/*
-    if(!isDirectory())
-    {
-      QScriptValue v = toString();
-      return context()->throwError(tr("%1 is not a directory").arg(toString().toString()));
-    }
-    */
+	if(!isDirectory())
+	{
+	  QScriptValue v = toString();
+	  return context()->throwError(tr("%1 is not a directory").arg(toString().toString()));
+	}
+	*/
 	if (fp.isAbsolute())
-		return context()->throwError(tr("can't concatenate an absolute path : %1").arg(value.toString()));
+		return context()->throwError(
+			tr("can't concatenate an absolute path : %1").arg(value.toString()));
 	fp = getToonzFilePath() + fp;
 	return create(engine(), new FilePath(fp));
 }
@@ -168,7 +168,8 @@ QScriptValue checkFilePath(QScriptContext *context, const QScriptValue &value, T
 	} else if (value.isString()) {
 		fp = TFilePath(value.toString().toStdWString());
 	} else {
-		return context->throwError(QObject::tr("Argument doesn't look like a file path : %1").arg(value.toString()));
+		return context->throwError(
+			QObject::tr("Argument doesn't look like a file path : %1").arg(value.toString()));
 	}
 	return QScriptValue();
 }

@@ -15,7 +15,7 @@ class TMutexImp
 {
 	HANDLE id;
 
-public:
+  public:
 	TMutexImp();
 	~TMutexImp();
 	void lock();
@@ -28,7 +28,7 @@ class TThreadGroupImp
 {
 	list<TThread *> threads;
 
-public:
+  public:
 	TThreadGroupImp();
 	~TThreadGroupImp();
 	void add(TThread *);
@@ -64,8 +64,7 @@ void TMutexImp::unlock()
 
 //---------------------------------------------------------------------------
 
-TMutex::TMutex()
-	: m_imp(new TMutexImp())
+TMutex::TMutex() : m_imp(new TMutexImp())
 {
 }
 
@@ -96,7 +95,7 @@ void TMutex::unlock()
 
 class TThreadImp
 {
-public:
+  public:
 	friend class TThreadGroupImp;
 
 	HANDLE threadId;
@@ -107,7 +106,7 @@ public:
 	TThreadGroupImp *owner;
 	TThread *thread;
 
-	//some static stuff
+	// some static stuff
 	static TUINT32 nThreads;
 	static TMutex mutex;
 
@@ -229,8 +228,7 @@ bool TThreadImp::setPreferredProcessor(int processorId)
 
 //---------------------------------------------------------------------------
 
-TThread::TThread()
-	: m_imp(new TThreadImp())
+TThread::TThread() : m_imp(new TThreadImp())
 {
 	m_imp->thread = this;
 }
@@ -359,8 +357,7 @@ void TThreadGroupImp::wait()
 
 //---------------------------------------------------------------------------
 
-TThreadGroup::TThreadGroup()
-	: m_imp(new TThreadGroupImp())
+TThreadGroup::TThreadGroup() : m_imp(new TThreadGroupImp())
 
 {
 }

@@ -13,13 +13,12 @@ namespace tcg
 //    Generic Reader declaration
 //******************************************************************************
 
-template <typename Val>
-class generic_containers_reader
+template <typename Val> class generic_containers_reader
 {
-public:
+  public:
 	typedef Val value_type;
 
-public:
+  public:
 	virtual void openContainer() = 0;
 	virtual void addElement(const value_type &value) = 0;
 	virtual void closeContainer() = 0;
@@ -32,18 +31,16 @@ public:
 //    Some Actual Container Readers
 //******************************************************************************
 
-template <typename Container, typename Val = typename Container::value_type>
-class sequential_reader
+template <typename Container, typename Val = typename Container::value_type> class sequential_reader
 {
 	Container *m_values;
 
-public:
+  public:
 	typedef Container container_type;
 	typedef Val value_type;
 
-public:
-	sequential_reader(Container *container)
-		: m_values(container) {}
+  public:
+	sequential_reader(Container *container) : m_values(container) {}
 
 	void openContainer() { m_values->clear(); }
 	void addElement(const value_type &val) { m_values->push_back(val); }
@@ -55,18 +52,16 @@ public:
 
 //------------------------------------------------------------------
 
-template <typename Container, typename Val = typename Container::value_type>
-class ordered_reader
+template <typename Container, typename Val = typename Container::value_type> class ordered_reader
 {
 	Container *m_values;
 
-public:
+  public:
 	typedef Container container_type;
 	typedef Val value_type;
 
-public:
-	ordered_reader(Container &container)
-		: m_values(container) {}
+  public:
+	ordered_reader(Container &container) : m_values(container) {}
 
 	void openContainer() { m_values->clear(); }
 	void addElement(const value_type &val) { m_values->insert(val); }
@@ -81,18 +76,17 @@ public:
 template <typename Container, typename ReaderType, typename Val = typename ReaderType::value_type>
 class multiple_reader
 {
-public:
+  public:
 	typedef Container container_type;
 	typedef ReaderType reader_type;
 	typedef Val value_type;
 
-protected:
+  protected:
 	Container *m_storage;
 	std::stack<reader_type> m_stack;
 
-public:
-	multiple_reader(Container *storage)
-		: m_storage(storage) {}
+  public:
+	multiple_reader(Container *storage) : m_storage(storage) {}
 
 	reader_type &reader() { return m_stack.top(); }
 
@@ -112,6 +106,6 @@ public:
 	container_type &storage() { return m_storage; }
 };
 
-} //namespace tcg
+} // namespace tcg
 
-#endif //TCG_CONTAINERS_READER_H
+#endif // TCG_CONTAINERS_READER_H

@@ -22,7 +22,7 @@ class DVAPI TItemBrowser : public TWidget
 	class Data;
 	Data *m_data;
 
-public:
+  public:
 	TItemBrowser(TWidget *parent, const TFilePath &rootDir, string name = "ItemBrowser");
 	~TItemBrowser();
 
@@ -32,11 +32,7 @@ public:
 	TDimension getItemSize() const;
 
 	virtual int getItemCount() const = 0;
-	virtual void drawItem(
-		TWidget *w,
-		const TRect &rect,
-		int index,
-		bool selected) const = 0;
+	virtual void drawItem(TWidget *w, const TRect &rect, int index, bool selected) const = 0;
 	virtual bool isItemWide(int index) const { return false; };
 	virtual void loadItems(const TFilePath &rootDir) {}
 

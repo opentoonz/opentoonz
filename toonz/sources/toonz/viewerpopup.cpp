@@ -41,12 +41,12 @@ ViewerPopup::ViewerPopup(QWidget *parent , Qt::WFlags flags)
 
 //-----------------------------------------------------------------------------
 
-void ViewerPopup::onVisibilityChange (bool visible) 
+void ViewerPopup::onVisibilityChange (bool visible)
 {
-	if (!visible) 
+	if (!visible)
 		openViewers.remove(this);
 	else if (openViewers.empty())
-		openViewers.insert(this);  
+		openViewers.insert(this);
 }
 
 
@@ -54,7 +54,7 @@ void ViewerPopup::onVisibilityChange (bool visible)
 TFilePath getFirstFullPath(const TFilePath &levelPath)
 {
 	TLevelReaderP lr = TLevelReaderP(levelPath);
-  if (!lr) return TFilePath();    
+  if (!lr) return TFilePath();
   TLevelP level =  lr->loadInfo();
   if(!level || level->getFrameCount()==0) return TFilePath();
   TLevel::Iterator it = level->begin();

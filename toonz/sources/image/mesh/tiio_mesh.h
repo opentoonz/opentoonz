@@ -11,20 +11,20 @@
 
 class TLevelWriterMesh : public TLevelWriter
 {
-public:
+  public:
 	TLevelWriterMesh(const TFilePath &path, TPropertyGroup *winfo);
 	~TLevelWriterMesh();
 
 	TImageWriterP getFrameWriter(TFrameId fid);
 
-public:
+  public:
 	static TLevelWriter *create(const TFilePath &f, TPropertyGroup *winfo)
 	{
 		return new TLevelWriterMesh(f, winfo);
 	}
 
-private:
-	//not implemented
+  private:
+	// not implemented
 	TLevelWriterMesh(const TLevelWriterMesh &);
 	TLevelWriterMesh &operator=(const TLevelWriterMesh &);
 };
@@ -35,16 +35,16 @@ private:
 
 class TLevelReaderMesh : public TLevelReader
 {
-public:
+  public:
 	TLevelReaderMesh(const TFilePath &path);
 	~TLevelReaderMesh();
 
 	TImageReaderP getFrameReader(TFrameId fid);
 
-public:
+  public:
 	static TLevelReader *create(const TFilePath &f) { return new TLevelReaderMesh(f); }
 
-private:
+  private:
 	// not implemented
 	TLevelReaderMesh(const TLevelReaderMesh &);
 	TLevelReaderMesh &operator=(const TLevelReaderMesh &);

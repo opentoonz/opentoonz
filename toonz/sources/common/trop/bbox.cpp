@@ -7,16 +7,14 @@ namespace
 
 //-------------------------------------------------------------------
 
-template <typename PIXEL, typename CHANNEL_TYPE>
-void computeBBox(TRasterPT<PIXEL> ras, TRect &bbox)
+template <typename PIXEL, typename CHANNEL_TYPE> void computeBBox(TRasterPT<PIXEL> ras, TRect &bbox)
 {
 	bbox = ras->getBounds();
 	int lx = ras->getLx();
 	int ly = ras->getLy();
 
 	// se c'e' un pixel opaco in alto a sin e in basso a destra allora bbox = bounds
-	if (ras->pixels(0)[0].m != 0 &&
-		ras->pixels(ly - 1)[lx - 1].m != 0)
+	if (ras->pixels(0)[0].m != 0 && ras->pixels(ly - 1)[lx - 1].m != 0)
 		return;
 
 	int y;
@@ -72,8 +70,8 @@ void computeBBox(TRasterPT<PIXEL> ras, TRect &bbox)
   UCHAR *m, *max_m, *min_m;
 
   for(y=0;y<ly;y++)
-	  {   
-     max_m = row_m + lx * 4;
+	  {
+	 max_m = row_m + lx * 4;
 		 for(m = row_m; m<max_m && *m==0; m+=4) {}
 		 if(m<max_m) break;
 		 row_m += wrap4;
@@ -100,22 +98,22 @@ void computeBBox(TRasterPT<PIXEL> ras, TRect &bbox)
 	row_m += wrap4;
 
   for(y++;y<ly;y++)
-	  {   
-     max_m = row_m + lx * 4;
+	  {
+	 max_m = row_m + lx * 4;
 		 for(m = row_m; m<max_m && *m==0; m+=4) {}
-		 if(m<max_m) 
+		 if(m<max_m)
 		   {
 			  int x = (m - row_m)/4;
-				if(x<bbox.x0) 
+				if(x<bbox.x0)
 				  {
 					 bbox.x0 = x;
-           assert(0<=bbox.x0 && bbox.x0<lx);
-           assert(ras->pixels(y)[bbox.x0].m>0);
-           assert(bbox.x0 == 0 || ras->pixels(y)[bbox.x0-1].m==0);
-          }
-        min_m = row_m + bbox.x1*4;
+		   assert(0<=bbox.x0 && bbox.x0<lx);
+		   assert(ras->pixels(y)[bbox.x0].m>0);
+		   assert(bbox.x0 == 0 || ras->pixels(y)[bbox.x0-1].m==0);
+		  }
+		min_m = row_m + bbox.x1*4;
 			  for(m = max_m - 4;m>min_m && *m==0;m-=4) {}
-				if(m>min_m) 
+				if(m>min_m)
 				  {
 					 x = (m - row_m)/4;
 					 assert(x>bbox.x1);
@@ -146,8 +144,7 @@ void computeBBoxCM32(TRasterCM32P ras, TRect &bbox)
 	int ly = ras->getLy();
 
 	// se c'e' un pixel opaco in alto a sin e in basso a destra allora bbox = bounds
-	if (!isTransparent(&(ras->pixels(0)[0])) &&
-		!isTransparent(&(ras->pixels(ly - 1)[lx - 1])))
+	if (!isTransparent(&(ras->pixels(0)[0])) && !isTransparent(&(ras->pixels(ly - 1)[lx - 1])))
 		return;
 
 	int y;
@@ -195,7 +192,7 @@ void computeBBoxCM32(TRasterCM32P ras, TRect &bbox)
 
 //-------------------------------------------------------------------
 
-} //namespace
+} // namespace
 
 //-------------------------------------------------------------------
 

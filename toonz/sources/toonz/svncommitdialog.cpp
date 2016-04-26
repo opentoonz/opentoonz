@@ -37,10 +37,12 @@
 // SVNCommitDialog
 //-----------------------------------------------------------------------------
 
-SVNCommitDialog::SVNCommitDialog(QWidget *parent,
-								 const QString &workingDir, const QStringList &files, bool folderOnly,
-								 int sceneIconAdded)
-	: Dialog(TApp::instance()->getMainWindow(), true, false), m_commitSceneContentsCheckBox(0), m_workingDir(workingDir), m_files(files), m_folderOnly(folderOnly), m_targetTempFile(0), m_selectionCheckBox(0), m_selectionLabel(0), m_sceneIconAdded(sceneIconAdded), m_folderAdded(0)
+SVNCommitDialog::SVNCommitDialog(QWidget *parent, const QString &workingDir,
+								 const QStringList &files, bool folderOnly, int sceneIconAdded)
+	: Dialog(TApp::instance()->getMainWindow(), true, false), m_commitSceneContentsCheckBox(0),
+	  m_workingDir(workingDir), m_files(files), m_folderOnly(folderOnly), m_targetTempFile(0),
+	  m_selectionCheckBox(0), m_selectionLabel(0), m_sceneIconAdded(sceneIconAdded),
+	  m_folderAdded(0)
 {
 	setModal(false);
 	setAttribute(Qt::WA_DeleteOnClose, true);
@@ -74,7 +76,8 @@ SVNCommitDialog::SVNCommitDialog(QWidget *parent,
 		belowTreeLayout->setMargin(0);
 
 		m_selectionCheckBox = new QCheckBox(tr("Select / Deselect All"), 0);
-		connect(m_selectionCheckBox, SIGNAL(clicked(bool)), this, SLOT(onSelectionCheckBoxClicked(bool)));
+		connect(m_selectionCheckBox, SIGNAL(clicked(bool)), this,
+				SLOT(onSelectionCheckBoxClicked(bool)));
 
 		m_selectionLabel = new QLabel;
 		m_selectionLabel->setText(tr("0 Selected / 0 Total"));
@@ -132,7 +135,8 @@ SVNCommitDialog::SVNCommitDialog(QWidget *parent,
 
 	if (!m_folderOnly) {
 		m_commitSceneContentsCheckBox = new QCheckBox(this);
-		connect(m_commitSceneContentsCheckBox, SIGNAL(toggled(bool)), this, SLOT(onCommiSceneContentsToggled(bool)));
+		connect(m_commitSceneContentsCheckBox, SIGNAL(toggled(bool)), this,
+				SLOT(onCommiSceneContentsToggled(bool)));
 		m_commitSceneContentsCheckBox->setChecked(false);
 		m_commitSceneContentsCheckBox->hide();
 		m_commitSceneContentsCheckBox->setText(tr("Put Scene Contents"));
@@ -160,7 +164,8 @@ SVNCommitDialog::SVNCommitDialog(QWidget *parent,
 	connect(&m_thread, SIGNAL(error(const QString &)), this, SLOT(onError(const QString &)));
 
 	// 1. Getting status (with show-updates enabled...)
-	connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this, SLOT(onStatusRetrieved(const QString &)));
+	connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
+			SLOT(onStatusRetrieved(const QString &)));
 	m_thread.getSVNStatus(m_workingDir, m_files, true);
 }
 
@@ -189,7 +194,8 @@ void SVNCommitDialog::onCommitButtonClicked()
 	// to be added or can be directly committed
 	if (!m_folderOnly && !m_sceneResourcesToCommit.empty()) {
 		m_thread.disconnect(SIGNAL(statusRetrieved(const QString &)));
-		connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this, SLOT(onResourcesStatusRetrieved(const QString &)));
+		connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
+				SLOT(onResourcesStatusRetrieved(const QString &)));
 		m_thread.getSVNStatus(m_workingDir, m_sceneResourcesToCommit, true);
 		return;
 	}
@@ -214,7 +220,8 @@ void SVNCommitDialog::addFiles()
 
 	int fileToAddCount = m_filesToAdd.size();
 	if (fileToAddCount + m_sceneResourcesToCommit.size() > 0) {
-		m_textLabel->setText(tr("Adding %1 items...").arg(QString::number(fileToAddCount - m_sceneIconAdded)));
+		m_textLabel->setText(
+			tr("Adding %1 items...").arg(QString::number(fileToAddCount - m_sceneIconAdded)));
 
 		QStringList args;
 		args << "add";
@@ -279,7 +286,8 @@ void SVNCommitDialog::commitFiles()
 		if (!m_commentTextEdit->toPlainText().isEmpty())
 			args << QString("-m").append(m_commentTextEdit->toPlainText());
 		else
-			args << QString("-m").append(VersionControl::instance()->getUserName() + " commit changes.");
+			args << QString("-m")
+						.append(VersionControl::instance()->getUserName() + " commit changes.");
 		m_thread.disconnect(SIGNAL(statusRetrieved(const QString &)));
 		m_thread.disconnect(SIGNAL(done(const QString &)));
 		connect(&m_thread, SIGNAL(done(const QString &)), SLOT(onCommitDone()));
@@ -348,7 +356,8 @@ void SVNCommitDialog::onAddDone()
 		m_textLabel->setText(tr("Getting repository status..."));
 
 		m_thread.disconnect(SIGNAL(statusRetrieved(const QString &)));
-		connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this, SLOT(onStatusRetrievedAfterAdd(const QString &)));
+		connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
+				SLOT(onStatusRetrievedAfterAdd(const QString &)));
 
 		QStringList oldFilesAndResources;
 		oldFilesAndResources.append(m_files);
@@ -389,7 +398,8 @@ void SVNCommitDialog::onAddDone()
 	} else {
 		int fileToCommitCount = m_filesToCommit.size();
 		if (fileToCommitCount > 0)
-			m_textLabel->setText(tr("Committing %1 items...").arg(QString::number(fileToCommitCount - m_sceneIconAdded)));
+			m_textLabel->setText(tr("Committing %1 items...")
+									 .arg(QString::number(fileToCommitCount - m_sceneIconAdded)));
 		// Then we commits changes (add, remove, modified files)
 		commitFiles();
 	}
@@ -466,7 +476,8 @@ void SVNCommitDialog::onStatusRetrieved(const QString &xmlResponse)
 	checkFiles(m_folderOnly);
 
 	if (!m_folderOnly) {
-		// Add, if necessary the scene icons: only when the folder "sceneIcons" is unversioned the status
+		// Add, if necessary the scene icons: only when the folder "sceneIcons" is unversioned the
+		// status
 		// doesn't contains the scene icon information, so I added here manually...
 		if (m_sceneIconAdded != 0) {
 			for (int i = 0; i < m_files.size(); i++) {
@@ -512,7 +523,8 @@ void SVNCommitDialog::onStatusRetrieved(const QString &xmlResponse)
 
 		if (m_folderOnly) {
 			updateTreeSelectionLabel();
-			connect(m_treeWidget, SIGNAL(itemChanged(QTreeWidgetItem *, int)), this, SLOT(onItemChanged(QTreeWidgetItem *)));
+			connect(m_treeWidget, SIGNAL(itemChanged(QTreeWidgetItem *, int)), this,
+					SLOT(onItemChanged(QTreeWidgetItem *)));
 			m_treeWidget->show();
 			m_selectionCheckBox->show();
 			m_selectionLabel->show();
@@ -753,7 +765,8 @@ void SVNCommitDialog::addModifiedItem(const QString &relativePath)
 
 void SVNCommitDialog::onItemChanged(QTreeWidgetItem *item)
 {
-	disconnect(m_treeWidget, SIGNAL(itemChanged(QTreeWidgetItem *, int)), this, SLOT(onItemChanged(QTreeWidgetItem *)));
+	disconnect(m_treeWidget, SIGNAL(itemChanged(QTreeWidgetItem *, int)), this,
+			   SLOT(onItemChanged(QTreeWidgetItem *)));
 
 	Qt::CheckState state = item->checkState(0);
 
@@ -764,7 +777,8 @@ void SVNCommitDialog::onItemChanged(QTreeWidgetItem *item)
 			selItem->setCheckState(0, state);
 	}
 
-	connect(m_treeWidget, SIGNAL(itemChanged(QTreeWidgetItem *, int)), this, SLOT(onItemChanged(QTreeWidgetItem *)));
+	connect(m_treeWidget, SIGNAL(itemChanged(QTreeWidgetItem *, int)), this,
+			SLOT(onItemChanged(QTreeWidgetItem *)));
 
 	updateTreeSelectionLabel();
 }
@@ -786,7 +800,8 @@ void SVNCommitDialog::onSelectionCheckBoxClicked(bool checked)
 		}
 	}
 
-	m_selectionLabel->setText(tr("%1 Selected / %2 Total").arg(checked ? totalCount : 0).arg(totalCount));
+	m_selectionLabel->setText(
+		tr("%1 Selected / %2 Total").arg(checked ? totalCount : 0).arg(totalCount));
 }
 
 //-----------------------------------------------------------------------------
@@ -891,16 +906,20 @@ void SVNCommitDialog::onCommiSceneContentsToggled(bool checked)
 			}
 		}
 	}
-	m_textLabel->setText(tr("%1 items to put.").arg(m_filesToPut.size() + m_sceneResourcesToCommit.size() - m_sceneIconAdded));
+	m_textLabel->setText(
+		tr("%1 items to put.")
+			.arg(m_filesToPut.size() + m_sceneResourcesToCommit.size() - m_sceneIconAdded));
 }
 
 //=============================================================================
 // SVNCommitFrameRangeDialog
 //-----------------------------------------------------------------------------
 
-SVNCommitFrameRangeDialog::SVNCommitFrameRangeDialog(QWidget *parent,
-													 const QString &workingDir, const QString &file)
-	: Dialog(TApp::instance()->getMainWindow(), true, false), m_workingDir(workingDir), m_file(file), m_hasError(false), m_hookFileName(QString()), m_newHookFileName(QString()), m_isOVLLevel(false)
+SVNCommitFrameRangeDialog::SVNCommitFrameRangeDialog(QWidget *parent, const QString &workingDir,
+													 const QString &file)
+	: Dialog(TApp::instance()->getMainWindow(), true, false), m_workingDir(workingDir),
+	  m_file(file), m_hasError(false), m_hookFileName(QString()), m_newHookFileName(QString()),
+	  m_isOVLLevel(false)
 {
 	setModal(false);
 	setAttribute(Qt::WA_DeleteOnClose, true);
@@ -1140,7 +1159,9 @@ void SVNCommitFrameRangeDialog::onPropSetDone()
 		int listCount = list.size();
 
 		if (listCount > 0) {
-			QString prefix = QString::fromStdWString(levelPath.getWideName()) + "_" + VersionControl::instance()->getUserName() + "_" + TSystem::getHostName();
+			QString prefix = QString::fromStdWString(levelPath.getWideName()) + "_" +
+							 VersionControl::instance()->getUserName() + "_" +
+							 TSystem::getHostName();
 
 			QString tempFile;
 			QString hookFileName;
@@ -1166,8 +1187,8 @@ void SVNCommitFrameRangeDialog::onPropSetDone()
 
 					// Merge and then delete temporary hook file
 					if (TFileStatus(hookFile).doesExist()) {
-						m_level->getSimpleLevel()->mergeTemporaryHookFile(rangeString.at(0).toInt() - 1,
-																		  rangeString.at(1).toInt() - 1, hookFile);
+						m_level->getSimpleLevel()->mergeTemporaryHookFile(
+							rangeString.at(0).toInt() - 1, rangeString.at(1).toInt() - 1, hookFile);
 						TSystem::removeFileOrLevel(hookFile);
 					}
 
@@ -1179,8 +1200,7 @@ void SVNCommitFrameRangeDialog::onPropSetDone()
 			}
 		}
 	} else {
-		m_level->getSimpleLevel()->setEditableRange(m_myInfo.m_from - 1,
-													m_myInfo.m_to - 1,
+		m_level->getSimpleLevel()->setEditableRange(m_myInfo.m_from - 1, m_myInfo.m_to - 1,
 													m_myInfo.m_userName.toStdWString());
 		m_level->setDirtyFlag(true);
 		m_level->save();
@@ -1188,7 +1208,10 @@ void SVNCommitFrameRangeDialog::onPropSetDone()
 		m_scene = 0;
 
 		// Delete temporary file
-		QString tempFileName = QString::fromStdWString(levelPath.getWideName()) + "_" + m_myInfo.m_userName + "_" + m_myInfo.m_hostName + "_" + QString::number(m_myInfo.m_from) + "-" + QString::number(m_myInfo.m_to) + "." + QString::fromStdString(levelPath.getType());
+		QString tempFileName =
+			QString::fromStdWString(levelPath.getWideName()) + "_" + m_myInfo.m_userName + "_" +
+			m_myInfo.m_hostName + "_" + QString::number(m_myInfo.m_from) + "-" +
+			QString::number(m_myInfo.m_to) + "." + QString::fromStdString(levelPath.getType());
 
 		TFilePath pathToRemove = TFilePath(levelPath.getParentDir() + tempFileName.toStdWString());
 		if (TSystem::doesExistFileOrLevel(pathToRemove))
@@ -1205,14 +1228,17 @@ void SVNCommitFrameRangeDialog::onPropSetDone()
 			TSystem::removeFileOrLevel(hookFilePath);
 	}
 
-	// If, after saving the level, a new hook file has been created (and previously there isn't an hook file)
-	// we have to add the new hook file to the repository and set its needs-lock property before committing
+	// If, after saving the level, a new hook file has been created (and previously there isn't an
+	// hook file)
+	// we have to add the new hook file to the repository and set its needs-lock property before
+	// committing
 	if (m_hookFileName.isEmpty()) {
 		// Check if a new hook file exist
 		TFilePath path = TFilePath(m_workingDir.toStdWString()) + m_file.toStdWString();
 		TFilePath hookFile = TXshSimpleLevel::getHookPath(path);
 		if (TFileStatus(hookFile).doesExist()) {
-			m_newHookFileName = QString::fromStdWString(hookFile.withoutParentDir().getWideString());
+			m_newHookFileName =
+				QString::fromStdWString(hookFile.withoutParentDir().getWideString());
 
 			m_textLabel->setText(tr("Adding hook file to repository..."));
 
@@ -1285,7 +1311,8 @@ void SVNCommitFrameRangeDialog::commit()
 	if (!m_commentTextEdit->toPlainText().isEmpty())
 		args << QString("-m").append(m_commentTextEdit->toPlainText());
 	else
-		args << QString("-m").append(VersionControl::instance()->getUserName() + " commit changes.");
+		args << QString("-m")
+					.append(VersionControl::instance()->getUserName() + " commit changes.");
 
 	m_thread.disconnect(SIGNAL(done(const QString &)));
 	connect(&m_thread, SIGNAL(done(const QString &)), this, SLOT(onCommitDone()));

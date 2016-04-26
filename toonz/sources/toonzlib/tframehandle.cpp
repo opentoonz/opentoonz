@@ -17,31 +17,31 @@ namespace
 
 /* int getCurrentSceneFrameCount()
   {
-    return 100; // TApp::instance()->getCurrentScene()->getScene()->getFrameCount();
+	return 100; // TApp::instance()->getCurrentScene()->getScene()->getFrameCount();
   }*/
 
 /*void getCurrentScenePlayRange(int &r0, int &r1, int &step)
   {
-    /*
-    ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
-    scene->getProperties()->getPreviewProperties()->getRange(r0, r1, step);
-    if(r0>r1)
-    {
-      r0 = 0;
-      r1 = scene->getFrameCount()-1;
-    }
-    */
+	/*
+	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+	scene->getProperties()->getPreviewProperties()->getRange(r0, r1, step);
+	if(r0>r1)
+	{
+	  r0 = 0;
+	  r1 = scene->getFrameCount()-1;
+	}
+	*/
 /*   r0 = 0;
-    r1 = getCurrentSceneFrameCount()-1;
+	r1 = getCurrentSceneFrameCount()-1;
   }*/
 
 bool getCurrentLevelFids(std::vector<TFrameId> &fids)
 {
 	/*
-    TXshSimpleLevel *sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
-    if(!sl) return false;
-    sl->getFids(fids);
-    */
+	TXshSimpleLevel *sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
+	if(!sl) return false;
+	sl->getFids(fids);
+	*/
 	fids.push_back(TFrameId(1));
 	return !fids.empty();
 }
@@ -58,7 +58,9 @@ TFrameId getLastLevelFid()
 //-----------------------------------------------------------------------------
 
 TFrameHandle::TFrameHandle()
-	: m_frame(-1), m_fid(), m_timerId(0), m_previewFrameRate(25), m_frameType(SceneFrame), m_looping(false), m_isPlaying(false), m_scrubRange(0, -1), m_audioColumn(0), m_xsheet(0), m_fps(0), m_frame0(-1), m_frame1(-1)
+	: m_frame(-1), m_fid(), m_timerId(0), m_previewFrameRate(25), m_frameType(SceneFrame),
+	  m_looping(false), m_isPlaying(false), m_scrubRange(0, -1), m_audioColumn(0), m_xsheet(0),
+	  m_fps(0), m_frame0(-1), m_frame1(-1)
 {
 }
 
@@ -80,8 +82,8 @@ int TFrameHandle::getFrame() const
 void TFrameHandle::setCurrentFrame(int frame)
 {
 	if (m_frameType == LevelFrame) {
-		//std::vector<TFrameId> fids;
-		//if(!getCurrentLevelFids(fids)) return;
+		// std::vector<TFrameId> fids;
+		// if(!getCurrentLevelFids(fids)) return;
 
 		if (m_fids.size() <= 0)
 			return;
@@ -133,8 +135,8 @@ void TFrameHandle::setFid(const TFrameId &fid)
 void TFrameHandle::nextFrame()
 {
 	if (m_frameType == LevelFrame) {
-		//std::vector<TFrameId> fids;
-		//if(!getCurrentLevelFids(fids)) return;
+		// std::vector<TFrameId> fids;
+		// if(!getCurrentLevelFids(fids)) return;
 		if (m_fids.size() <= 0)
 			return;
 		std::vector<TFrameId>::iterator it;
@@ -142,7 +144,7 @@ void TFrameHandle::nextFrame()
 		if (it == m_fids.end()) {
 			// non c'e' nessun frame del livello oltre m_fid. Non vado oltre al primo
 			// frame dopo l'ultimo.
-			//TXshSimpleLevel *sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
+			// TXshSimpleLevel *sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
 			TFrameId fid = m_fids.back(); // sl->index2fid(sl->getFrameCount());
 			setFid(fid);
 		} else
@@ -157,7 +159,7 @@ void TFrameHandle::nextFrame()
 void TFrameHandle::prevFrame()
 {
 	if (m_frameType == LevelFrame) {
-		//std::vector<TFrameId> fids;
+		// std::vector<TFrameId> fids;
 		if (m_fids.size() <= 0)
 			return;
 		std::vector<TFrameId>::iterator it;
@@ -182,13 +184,13 @@ void TFrameHandle::prevFrame()
 void TFrameHandle::firstFrame()
 {
 	if (m_frameType == LevelFrame) {
-		//std::vector<TFrameId> fids;
+		// std::vector<TFrameId> fids;
 		if (m_fids.size() <= 0)
 			return;
 		setFid(m_fids.front());
 	} else {
 		/*int r0,r1,step;
-    getCurrentScenePlayRange(r0,r1,step);*/
+	getCurrentScenePlayRange(r0,r1,step);*/
 		setFrame(m_frame0);
 	}
 }
@@ -198,13 +200,13 @@ void TFrameHandle::firstFrame()
 void TFrameHandle::lastFrame()
 {
 	if (m_frameType == LevelFrame) {
-		//std::vector<TFrameId> fids;
+		// std::vector<TFrameId> fids;
 		if (m_fids.size() <= 0)
 			return;
 		setFid(m_fids.back());
 	} else {
 		/*int r0,r1,step;
-    getCurrentScenePlayRange(r0,r1,step);*/
+	getCurrentScenePlayRange(r0,r1,step);*/
 		if (m_frame1 > 0)
 			setFrame(m_frame1);
 	}
@@ -279,13 +281,13 @@ void TFrameHandle::timerEvent(QTimerEvent *event)
 int TFrameHandle::getMaxFrameIndex() const
 {
 	if (m_frameType == LevelFrame) {
-		//std::vector<TFrameId> fids;
+		// std::vector<TFrameId> fids;
 		if (m_fids.size() <= 0)
 			return -1;
 		else
 			return m_fids.size() - 1;
 	} else
-		//return getCurrentSceneFrameCount()-1;
+		// return getCurrentSceneFrameCount()-1;
 		return m_sceneFrameSize - 1;
 }
 
@@ -294,9 +296,10 @@ int TFrameHandle::getMaxFrameIndex() const
 int TFrameHandle::getFrameIndex() const
 {
 	if (m_frameType == LevelFrame) {
-		//std::vector<TFrameId> fids;
+		// std::vector<TFrameId> fids;
 		if (m_fids.size() > 0) {
-			std::vector<TFrameId>::const_iterator it = std::find(m_fids.begin(), m_fids.end(), m_fid);
+			std::vector<TFrameId>::const_iterator it =
+				std::find(m_fids.begin(), m_fids.end(), m_fid);
 			if (it != m_fids.end())
 				return std::distance(m_fids.begin(), it);
 			else {
@@ -328,7 +331,7 @@ QString TFrameHandle::getFrameIndexName(int index) const
 void TFrameHandle::setFrameIndex(int index)
 {
 	if (m_frameType == LevelFrame) {
-		//std::vector<TFrameId> fids;
+		// std::vector<TFrameId> fids;
 		if (m_fids.size() > 0 && 0 <= index && index < (int)m_fids.size())
 			setFid(m_fids[index]);
 	} else

@@ -9,8 +9,7 @@
 // TXsheeHandle
 //-----------------------------------------------------------------------------
 
-TXsheetHandle::TXsheetHandle()
-	: m_xsheet(0)
+TXsheetHandle::TXsheetHandle() : m_xsheet(0)
 {
 }
 
@@ -37,7 +36,8 @@ void TXsheetHandle::setXsheet(TXsheet *xsheet)
 	m_xsheet = xsheet;
 
 	if (m_xsheet) {
-		texture_utils::invalidateTextures(m_xsheet); // We'll be editing m_xsheet - so destroy every texture of his
+		texture_utils::invalidateTextures(
+			m_xsheet); // We'll be editing m_xsheet - so destroy every texture of his
 		emit xsheetSwitched();
 	}
 }

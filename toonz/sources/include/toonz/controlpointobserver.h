@@ -5,7 +5,7 @@
 
 class TControlPointObserver
 {
-public:
+  public:
 	virtual void controlPointChanged() = 0;
 	virtual ~TControlPointObserver() {}
 };

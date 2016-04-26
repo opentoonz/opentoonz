@@ -16,7 +16,7 @@
 #endif
 
 //=============================================================================
-//forward declarations
+// forward declarations
 class TStageObjectSpline;
 class TCamera;
 
@@ -27,24 +27,23 @@ class TXsheet;
 
 class HandleManager
 {
-public:
-	virtual TPointD getHandlePos(
-		const TStageObjectId &id,
-		const std::string &handle,
-		int row) const = 0;
+  public:
+	virtual TPointD getHandlePos(const TStageObjectId &id, const std::string &handle,
+								 int row) const = 0;
 	virtual ~HandleManager() {}
 };
 
 //=============================================================================
-//!The class TStageObjectTree permits to collect a set of a stage object in a hierarchical tree structure.
+//! The class TStageObjectTree permits to collect a set of a stage object in a hierarchical tree
+//! structure.
 /*!Inherits \b TPersist.
 		\n In each tree each index for each type of TStageObjectId is unique.
 		\n The class provides a collection of functions that returns stage object tree element,
 		defined in struct \b TStageObjectTreeImp, and enables manipulation of these.
 
-	    Same class methods allows to menage generic stage objects through specialization,
-	    \b getStageObject(const TStageObjectId &id, bool create= true), or through them tree
-		index, \b getStageObject(); it's possible to remove or insert stage object in the 
+		Same class methods allows to menage generic stage objects through specialization,
+		\b getStageObject(const TStageObjectId &id, bool create= true), or through them tree
+		index, \b getStageObject(); it's possible to remove or insert stage object in the
 		tree, removeStageObject() and insertStageObject() respectively.
 
 		Others methods concerns specific stage object; it's possible to insert or remove
@@ -61,8 +60,8 @@ public:
 		insert a new spline,and  remove it  by using removeSpline(). It's
 		possible to know if spline is in tree using containsSpline().
 
-	    The class allows to manage tree stage object handle setHandleManager(), and to
-	    know stage object handle position getHandlePos().
+		The class allows to manage tree stage object handle setHandleManager(), and to
+		know stage object handle position getHandlePos().
 	*/
 //=============================================================================
 
@@ -75,7 +74,7 @@ class DVAPI TStageObjectTree : public TPersist
 	//  usato solo sotto #ifndef NDEBUG
 	void checkIntegrity();
 
-public:
+  public:
 	TStageObjectTree();
 	~TStageObjectTree();
 
@@ -87,27 +86,30 @@ public:
 	TStageObject *getStageObject(const TStageObjectId &id, bool create = true);
 
 	/*!
-		Inserts in current stage object tree a column object (TStageObjectId::ColumnId()) with index \b \e index.
-    \sa removeColumn() and insertStageObject()
+		Inserts in current stage object tree a column object (TStageObjectId::ColumnId()) with index
+	\b \e index.
+	\sa removeColumn() and insertStageObject()
   */
 	void insertColumn(int index);
 	/*!
-		Removes from the current stage object tree the stage object column (TStageObjectId::ColumnId),
-		of index \b \e index. Children of the removed column are linked to the parent of the removed column.
-    \sa insertColumn() and removeStageObject()
+		Removes from the current stage object tree the stage object column
+	(TStageObjectId::ColumnId),
+		of index \b \e index. Children of the removed column are linked to the parent of the removed
+	column.
+	\sa insertColumn() and removeStageObject()
   */
 	void removeColumn(int index);
 
 	/*!
 		Remove from current stage objetc tree the stage objetc with \b TStageObjectId \b \e id.
 	 \n It doesn't delete the stage object.
-    \sa insertStageObject() and removeColumn()
+	\sa insertStageObject() and removeColumn()
   */
 	void removeStageObject(const TStageObjectId &id);
 	/*!
-		Inserts in current stage object tree the object \b \e object. 
+		Inserts in current stage object tree the object \b \e object.
 		The \b \e object must exist.
-    \sa removeStageObject() and insertColumn()
+	\sa removeStageObject() and insertColumn()
   */
 	void insertStageObject(TStageObject *object);
 	/*!
@@ -116,37 +118,39 @@ public:
 	*/
 	void swapColumns(int i, int j);
 
-	/*! 
+	/*!
 		Retrieves  object's data from a tagged data stream \b \e is.
 	\sa saveData()
 	*/
 	void loadData(TIStream &is);
-	/*! 
-		Saves object's data (name, center coords, etc ) to a tagged data stream \b \e os saved on a file. 
+	/*!
+		Saves object's data (name, center coords, etc ) to a tagged data stream \b \e os saved on a
+	   file.
 		This method call iteratively all stage objects in the tree and save their data.
 	*/
 	void saveData(TOStream &os, int occupiedColumnCount);
-	void saveData(TOStream &os){}; //not used
-								   /*!
-		Returns the numbers of the objects in the tree.
-	*/
+	void saveData(TOStream &os){}; // not used
+	/*!
+Returns the numbers of the objects in the tree.
+*/
 	int getStageObjectCount() const;
 	/*!
-		Returns a pointer to a generic stage object \b TStageObject of index \b \e index in the stage object tree.
+		Returns a pointer to a generic stage object \b TStageObject of index \b \e index in the
+	   stage object tree.
 		Index must be positive and less then the number of the objects.
 	*/
 	TStageObject *getStageObject(int index) const;
 
 	/*!
 		Returns \b TStageObjectId of stage object tree current camera.
-    \sa setCurrentCameraId() and getCurrentCamera()
+	\sa setCurrentCameraId() and getCurrentCamera()
   */
 	TStageObjectId getCurrentCameraId() const;
 	TStageObjectId getCurrentPreviewCameraId() const;
 
 	/*!
 		Sets stage object tree current camera to \b TStageObjectId \b id.
-    \sa getCurrentCameraId()
+	\sa getCurrentCameraId()
 	*/
 	void setCurrentCameraId(const TStageObjectId &id);
 	void setCurrentPreviewCameraId(const TStageObjectId &id);
@@ -165,7 +169,8 @@ public:
 	void setHandleManager(HandleManager *hm);
 	/*!
 		Returns the point position of the handle \b \e handle.
-		If an Handle Manager has not been implemented this method returns a point of coordinates (0,0). 
+		If an Handle Manager has not been implemented this method returns a point of coordinates
+	   (0,0).
 		\sa setHandleManager().
 	*/
 	TPointD getHandlePos(const TStageObjectId &id, std::string handle, int row) const;
@@ -174,19 +179,19 @@ public:
 	*/
 	int getSplineCount() const;
 	/*!
-    Returns stage object tree spline \b TStageObjectSpline identified by tree index \b \e index.
-    \sa insertSpline(), createSpline() and removeSpline()
+	Returns stage object tree spline \b TStageObjectSpline identified by tree index \b \e index.
+	\sa insertSpline(), createSpline() and removeSpline()
   */
 	TStageObjectSpline *getSpline(int index) const;
 	/*!
-    Returns stage object tree spline \b TStageObjectSpline identified \b \e splineId.
-    Returns 0 if StageObjectTree doesn't contains the spline.
-    \sa insertSpline(), createSpline() and removeSpline()
+	Returns stage object tree spline \b TStageObjectSpline identified \b \e splineId.
+	Returns 0 if StageObjectTree doesn't contains the spline.
+	\sa insertSpline(), createSpline() and removeSpline()
   */
 	TStageObjectSpline *getSplineById(int splineId) const;
 	/*!
-    Create a new spline and add it in stage object tree; returns a pointer to the new spline.
-    \sa insertSpline() and removeSpline()
+	Create a new spline and add it in stage object tree; returns a pointer to the new spline.
+	\sa insertSpline() and removeSpline()
   */
 	TStageObjectSpline *createSpline();
 
@@ -194,9 +199,9 @@ public:
   */
 	void assignUniqueSplineId(TStageObjectSpline *spline);
 	/*!
-    Removes from stage object tree the spline \b spline.
+	Removes from stage object tree the spline \b spline.
 	It deletes the object.
-    \sa insertSpline() and createSpline()
+	\sa insertSpline() and createSpline()
   */
 	void removeSpline(TStageObjectSpline *spline);
 	/*!
@@ -204,10 +209,10 @@ public:
 	*/
 	bool containsSpline(TStageObjectSpline *) const;
 	/*!
-    Inserts in the stage object tree the spline \b \e spline.
-	If \b \e spline is already present it does nothing, 
+	Inserts in the stage object tree the spline \b \e spline.
+	If \b \e spline is already present it does nothing,
 	otherwise it gets ownership of the spline object.
-    \sa removeSpline() and createSpline()
+	\sa removeSpline() and createSpline()
   */
 	void insertSpline(TStageObjectSpline *); // get ownership
 
@@ -224,34 +229,29 @@ public:
 
 	/*!
 		Returns a pointer to stage object tree camera \b TCamera identified by \b TStageObjectId
-    \b \e cameraId.
+	\b \e cameraId.
 	*/
 	TCamera *getCamera(const TStageObjectId &cameraId);
 	/*!
-		Return a pointer to stage object tree camera \b TCamera identified by index \b \e cameraIndex.
-    \sa getCurrentCamera()
+		Return a pointer to stage object tree camera \b TCamera identified by index \b \e
+	cameraIndex.
+	\sa getCurrentCamera()
 	*/
 	inline TCamera *getCamera(int cameraIndex)
 	{
 		return getCamera(TStageObjectId::CameraId(cameraIndex));
 	}
 	/*!
-    Return a pointer to current stage objetc tree camera \b TCamera.
-    \sa getCamera() and getCurrentCameraId()
+	Return a pointer to current stage objetc tree camera \b TCamera.
+	\sa getCamera() and getCurrentCameraId()
   */
-	inline TCamera *getCurrentCamera()
-	{
-		return getCamera(getCurrentCameraId());
-	}
-	inline TCamera *getCurrentPreviewCamera()
-	{
-		return getCamera(getCurrentPreviewCameraId());
-	}
+	inline TCamera *getCurrentCamera() { return getCamera(getCurrentCameraId()); }
+	inline TCamera *getCurrentPreviewCamera() { return getCamera(getCurrentPreviewCameraId()); }
 
 	void setDagGridDimension(int dim);
 	int getDagGridDimension() const;
 
-private:
+  private:
 	// not implemented
 	TStageObjectTree(const TStageObjectTree &);
 	TStageObjectTree &operator=(const TStageObjectTree &);

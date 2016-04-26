@@ -36,7 +36,7 @@ class FdgManager
 
 	void loadFieldGuideInfo();
 	FdgManager() { loadFieldGuideInfo(); }
-public:
+  public:
 	static FdgManager *instance()
 	{
 		static FdgManager _instance;
@@ -63,17 +63,17 @@ public:
 
 //---------------------------------------------------------
 
-#define REMOVE_CR(s)                                 \
-	{                                                \
-		while (*(s) && *(s) != '\n' && *(s) != '\r') \
-			(s)++;                                   \
-		*(s) = '\0';                                 \
+#define REMOVE_CR(s)                                                                               \
+	{                                                                                              \
+		while (*(s) && *(s) != '\n' && *(s) != '\r')                                               \
+			(s)++;                                                                                 \
+		*(s) = '\0';                                                                               \
 	}
 
-#define SKIP_BLANKS(s)                                \
-	{                                                 \
-		while (*(s) && (*(s) == ' ' || *(s) == '\t')) \
-			(s)++;                                    \
+#define SKIP_BLANKS(s)                                                                             \
+	{                                                                                              \
+		while (*(s) && (*(s) == ' ' || *(s) == '\t'))                                              \
+			(s)++;                                                                                 \
 	}
 
 #define STR_EQ(s1, s2) (!strcmp((s1), (s2)))
@@ -97,7 +97,7 @@ void FdgManager::loadFieldGuideInfo()
 				continue;
 			FDG_INFO fdg_info;
 
-			//memset(&fdg_info,0, sizeof(FDG_INFO));
+			// memset(&fdg_info,0, sizeof(FDG_INFO));
 
 			fdg_info.dots.resize(3);
 
@@ -174,7 +174,7 @@ void FdgManager::loadFieldGuideInfo()
 		}
 	} catch (...) {
 	}
-	//return TRUE;
+	// return TRUE;
 }
 
 } // namespace
@@ -182,10 +182,14 @@ void FdgManager::loadFieldGuideInfo()
 //=========================================================
 
 CleanupParameters::CleanupParameters()
-	: m_autocenterType(AUTOCENTER_NONE), m_pegSide(PEGS_BOTTOM), m_fdgInfo(), m_rotate(0), m_flipx(false), m_flipy(false), m_offx(0), m_offy(0)
+	: m_autocenterType(AUTOCENTER_NONE), m_pegSide(PEGS_BOTTOM), m_fdgInfo(), m_rotate(0),
+	  m_flipx(false), m_flipy(false), m_offx(0), m_offy(0)
 	  //, m_scale(1)
 	  ,
-	  m_lineProcessingMode(lpGrey), m_noAntialias(false), m_postAntialias(false), m_despeckling(2), m_aaValue(70), m_closestField(10.), m_sharpness(90.), m_autoAdjustMode(AUTO_ADJ_NONE), m_transparencyCheckEnabled(false), m_colors(), m_path(), m_cleanupPalette(createStandardCleanupPalette()), m_camera(), m_dirtyFlag(false)
+	  m_lineProcessingMode(lpGrey), m_noAntialias(false), m_postAntialias(false), m_despeckling(2),
+	  m_aaValue(70), m_closestField(10.), m_sharpness(90.), m_autoAdjustMode(AUTO_ADJ_NONE),
+	  m_transparencyCheckEnabled(false), m_colors(), m_path(),
+	  m_cleanupPalette(createStandardCleanupPalette()), m_camera(), m_dirtyFlag(false)
 	  //, m_resName("")
 	  ,
 	  m_offx_lock(false), m_offy_lock(false)
@@ -237,8 +241,8 @@ void CleanupParameters::setPath(ToonzScene *scene, TFilePath fp)
 
 //------------------------------------------------------------------------------
 
-void CleanupParameters::getOutputImageInfo(
-	TDimension &outDim, double &outDpiX, double &outDpiY) const
+void CleanupParameters::getOutputImageInfo(TDimension &outDim, double &outDpiX,
+										   double &outDpiY) const
 {
 	double lq_nozoom, lp_nozoom;
 	double zoom_factor;
@@ -271,7 +275,7 @@ void CleanupParameters::getOutputImageInfo(
 
 void CleanupParameters::assign(const CleanupParameters *param, bool clonePalette)
 {
-	//m_resName        = param->m_resName;
+	// m_resName        = param->m_resName;
 	m_camera = param->m_camera;
 	m_autocenterType = param->m_autocenterType;
 	m_pegSide = param->m_pegSide;
@@ -279,7 +283,7 @@ void CleanupParameters::assign(const CleanupParameters *param, bool clonePalette
 	m_rotate = param->m_rotate;
 	m_flipx = param->m_flipx;
 	m_flipy = param->m_flipy;
-	//m_scale          = param->m_scale;
+	// m_scale          = param->m_scale;
 	m_offx = param->m_offx;
 	m_offy = param->m_offy;
 	m_closestField = param->m_closestField;
@@ -295,8 +299,8 @@ void CleanupParameters::assign(const CleanupParameters *param, bool clonePalette
 	m_despeckling = param->m_despeckling;
 	m_aaValue = param->m_aaValue;
 
-	//In modern Toonz scenes, there always is a cleanup palette.
-	//In older Toonz scenes, it may be missing. In this case, leave the current one.
+	// In modern Toonz scenes, there always is a cleanup palette.
+	// In older Toonz scenes, it may be missing. In this case, leave the current one.
 	if (clonePalette && param->m_cleanupPalette)
 		m_cleanupPalette = param->m_cleanupPalette->clone();
 
@@ -323,7 +327,7 @@ void CleanupParameters::saveData(TOStream &os) const
 		attr.clear();
 		attr["type"] = toString((int)m_autocenterType);
 		attr["pegHoles"] = toString((int)m_pegSide);
-		//attr["fieldGuide"] = toString((int)m_pegSide);
+		// attr["fieldGuide"] = toString((int)m_pegSide);
 		os.openCloseChild("autoCenter", attr);
 	}
 
@@ -335,7 +339,7 @@ void CleanupParameters::saveData(TOStream &os) const
 			attr["flip"] = flip;
 		if (m_rotate != 0)
 			attr["rotate"] = toString(m_rotate);
-		//if(m_scale!=1) attr["scale"] = toString(m_scale);
+		// if(m_scale!=1) attr["scale"] = toString(m_scale);
 		if (m_offx != 0.0)
 			attr["xoff"] = toString(m_offx);
 		if (m_offy != 0.0)
@@ -377,10 +381,10 @@ void CleanupParameters::saveData(TOStream &os) const
 	// attr["path"] = toString(m_path.getWideString());
 	// os.openCloseChild("path", attr);
 
-	//m_closestField = param->m_closestField;
-	//m_autoAdjustMode = param->m_autoAdjustMode;
-	//m_sharpness = param->m_sharpness;
-	//m_transparencyCheckEnabled = param->m_transparencyCheckEnabled;
+	// m_closestField = param->m_closestField;
+	// m_autoAdjustMode = param->m_autoAdjustMode;
+	// m_sharpness = param->m_sharpness;
+	// m_transparencyCheckEnabled = param->m_transparencyCheckEnabled;
 }
 
 //---------------------------------------------------------
@@ -477,8 +481,7 @@ const CleanupTypes::FDG_INFO &CleanupParameters::getFdgInfo()
 		std::vector<std::string> names;
 		FdgManager::instance()->getFdgNames(names);
 		if (names.size() > 1) {
-			const CleanupTypes::FDG_INFO *info =
-				FdgManager::instance()->getFdg(names[0]);
+			const CleanupTypes::FDG_INFO *info = FdgManager::instance()->getFdg(names[0]);
 			if (info)
 				m_fdgInfo = *info;
 		}

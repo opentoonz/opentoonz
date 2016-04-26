@@ -47,23 +47,20 @@ const TPixelGR16 TPixelGR16::Black(0);
 
 std::ostream &operator<<(std::ostream &out, const TPixel32 &pixel)
 {
-	return out << "PixRGBM32("
-			   << (int)pixel.r << ", " << (int)pixel.g << ", "
-			   << (int)pixel.b << ", " << (int)pixel.m << ")";
+	return out << "PixRGBM32(" << (int)pixel.r << ", " << (int)pixel.g << ", " << (int)pixel.b
+			   << ", " << (int)pixel.m << ")";
 }
 
 std::ostream &operator<<(std::ostream &out, const TPixel64 &pixel)
 {
-	return out
-		   << "PixRGBM64(" << pixel.r << ", " << pixel.g
-		   << ", " << pixel.b << ", " << pixel.m << ")";
+	return out << "PixRGBM64(" << pixel.r << ", " << pixel.g << ", " << pixel.b << ", " << pixel.m
+			   << ")";
 }
 
 std::ostream &operator<<(std::ostream &out, const TPixelD &pixel)
 {
-	return out
-		   << "PixD(" << pixel.r << ", " << pixel.g << ", "
-		   << pixel.b << ", " << pixel.m << ")";
+	return out << "PixD(" << pixel.r << ", " << pixel.g << ", " << pixel.b << ", " << pixel.m
+			   << ")";
 }
 
 //=============================================================================
@@ -103,7 +100,7 @@ TPixelD DVAPI TPixelD::from(const TPixelGR16 &pix)
 */
 //-----------------------------------------------------------------------------
 
-//TPixelGR8 TPixelGR8::from(const TPixelD &pix)
+// TPixelGR8 TPixelGR8::from(const TPixelD &pix)
 //{
 //  return from(TPixel32::from(pix));
 //}
@@ -112,21 +109,17 @@ TPixelD DVAPI TPixelD::from(const TPixelGR16 &pix)
 
 TPixelGR8 DVAPI TPixelGR8::from(const TPixel32 &pix)
 {
-	return TPixelGR8((((UINT)(pix.r) * 19594 +
-					   (UINT)(pix.g) * 38472 +
-					   (UINT)(pix.b) * 7470 +
-					   (UINT)(1 << 15)) >>
-					  16));
+	return TPixelGR8(
+		(((UINT)(pix.r) * 19594 + (UINT)(pix.g) * 38472 + (UINT)(pix.b) * 7470 + (UINT)(1 << 15)) >>
+		 16));
 }
 
 //-----------------------------------------------------------------------------
 TPixelGR16 DVAPI TPixelGR16::from(const TPixel64 &pix)
 {
-	return TPixelGR16((((UINT)(pix.r) * 19594 +
-						(UINT)(pix.g) * 38472 +
-						(UINT)(pix.b) * 7470 +
-						(UINT)(1 << 15)) >>
-					   16));
+	return TPixelGR16(
+		(((UINT)(pix.r) * 19594 + (UINT)(pix.g) * 38472 + (UINT)(pix.b) * 7470 + (UINT)(1 << 15)) >>
+		 16));
 }
 
 //-----------------------------------------------------------------------------

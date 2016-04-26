@@ -65,8 +65,8 @@ int tile_interface_get_element_type(toonz_tile_handle_t handle, int *element)
 	return 0;
 }
 
-int tile_interface_copy_rect(toonz_tile_handle_t handle, int left, int top,
-							 int width, int height, void *dst, int dststride)
+int tile_interface_copy_rect(toonz_tile_handle_t handle, int left, int top, int width, int height,
+							 void *dst, int dststride)
 {
 	if (!handle || !dst || !dststride)
 		return -1; // inval
@@ -76,8 +76,8 @@ int tile_interface_copy_rect(toonz_tile_handle_t handle, int left, int top,
 	TTile *tile = reinterpret_cast<TTile *>(handle);
 	TRasterP raster = tile->getRaster();
 
-	if (!(0 <= left && left + width <= raster->getLx() &&
-		  0 <= top && top + height <= raster->getLy())) {
+	if (!(0 <= left && left + width <= raster->getLx() && 0 <= top &&
+		  top + height <= raster->getLy())) {
 		return -1;
 	}
 

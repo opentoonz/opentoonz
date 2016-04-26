@@ -12,7 +12,7 @@
 namespace
 {
 
-//singleton
+// singleton
 class StencilControlManager
 {
 
@@ -20,7 +20,7 @@ class StencilControlManager
 
 	StencilControlManager() {}
 
-public:
+  public:
 	static StencilControlManager *instance()
 	{
 		static StencilControlManager theInstance;
@@ -36,27 +36,25 @@ public:
 		return m_storage.localData();
 	}
 
-	~StencilControlManager()
-	{
-	}
+	~StencilControlManager() {}
 };
 
-} //Local namepace
+} // Local namepace
 
 //-----------------------------------------------------------------------------------------
 
 class TStencilControl::Imp
 {
-public:
+  public:
 	int m_stencilBitCount;
 	int m_pushCount;
-	int m_currentWriting; //current stencil bit plane.
-	//0 is the first bit plane ; -1 menas no stencil mask is writing
+	int m_currentWriting; // current stencil bit plane.
+	// 0 is the first bit plane ; -1 menas no stencil mask is writing
 
 	int m_virtualState;
-//the state of the (eventually virtual) top mask.
-//A mask is virtual if overflows stencil buffer
-//0 is closed and disabled, 1 closed and enabled and 2 is opened
+// the state of the (eventually virtual) top mask.
+// A mask is virtual if overflows stencil buffer
+// 0 is closed and disabled, 1 closed and enabled and 2 is opened
 
 #ifdef _DEBUG
 	std::stack<bool> fullState;
@@ -65,10 +63,11 @@ public:
 // Used only for assert
 #endif
 
-	unsigned char m_writingMask;	  //bit mask. The i-th bit=1 iff the i-th mask is opened to write
-	unsigned char m_drawOnScreenMask; //bitmsk.The ith bit=1 iff the ith mask WRITE also ON SCREEN WHEN WRITE ON STENCIL BIT PLANE
-	unsigned char m_enabledMask;	  //bit mask. The i-th bit=1 iff the i-th mask is enabled
-	unsigned char m_inOrOutMask;	  //bit mask. The i-th bit=1 iff the i-th mask is inside
+	unsigned char m_writingMask; // bit mask. The i-th bit=1 iff the i-th mask is opened to write
+	unsigned char m_drawOnScreenMask; // bitmsk.The ith bit=1 iff the ith mask WRITE also ON SCREEN
+									  // WHEN WRITE ON STENCIL BIT PLANE
+	unsigned char m_enabledMask; // bit mask. The i-th bit=1 iff the i-th mask is enabled
+	unsigned char m_inOrOutMask; // bit mask. The i-th bit=1 iff the i-th mask is inside
 	unsigned char m_drawOnlyOnceMask;
 
 	Imp();
@@ -102,12 +101,14 @@ public:
 //-----------------------------------------------------------------------------------------
 
 TStencilControl::Imp::Imp()
-	: m_stencilBitCount(0), m_pushCount(1), m_currentWriting(-1), m_enabledMask(0), m_writingMask(0), m_inOrOutMask(0), m_drawOnScreenMask(0), m_drawOnlyOnceMask(0), m_virtualState(0)
+	: m_stencilBitCount(0), m_pushCount(1), m_currentWriting(-1), m_enabledMask(0),
+	  m_writingMask(0), m_inOrOutMask(0), m_drawOnScreenMask(0), m_drawOnlyOnceMask(0),
+	  m_virtualState(0)
 {
 	glGetIntegerv(GL_STENCIL_BITS, (GLint *)&m_stencilBitCount);
 
 	glStencilMask(0xFFFFFFFF);
-	//glClearStencil(0);
+	// glClearStencil(0);
 	glClear(GL_STENCIL_BUFFER_BIT);
 }
 
@@ -121,8 +122,7 @@ TStencilControl *TStencilControl::instance()
 
 //---------------------------------------------------------
 
-TStencilControl::TStencilControl()
-	: m_imp(new Imp)
+TStencilControl::TStencilControl() : m_imp(new Imp)
 {
 }
 
@@ -136,7 +136,7 @@ TStencilControl::~TStencilControl()
 
 void TStencilControl::Imp::updateOpenGlState()
 {
-	if (m_currentWriting >= 0) { //writing on stencil buffer
+	if (m_currentWriting >= 0) { // writing on stencil buffer
 		unsigned char currentWritingMask = 1 << m_currentWriting;
 
 		bool drawOnlyOnce = (currentWritingMask & m_drawOnlyOnceMask) != 0;
@@ -150,7 +150,7 @@ void TStencilControl::Imp::updateOpenGlState()
 					break;
 			}
 			if (lastWriting < 0) {
-				//glColorMask(1,1,1,1);
+				// glColorMask(1,1,1,1);
 
 				if (drawOnlyOnce)
 					m_enabledMask |= currentWritingMask;
@@ -158,14 +158,15 @@ void TStencilControl::Imp::updateOpenGlState()
 					m_enabledMask &= ~currentWritingMask;
 			} else {
 				tglMultColorMask(0, 0, 0, 0);
-				//glDrawBuffer(GL_NONE);
+				// glDrawBuffer(GL_NONE);
 
-				drawOnlyOnce = false; //essendo solo un'effetto visivo, se sto scrivendo su una maschera e non a schermo, e' inutile
+				drawOnlyOnce = false; // essendo solo un'effetto visivo, se sto scrivendo su una
+									  // maschera e non a schermo, e' inutile
 				currentWritingMask |= lastWritingMask;
 			}
 		} else
 			tglMultColorMask(0, 0, 0, 0);
-		//glDrawBuffer(GL_NONE);
+		// glDrawBuffer(GL_NONE);
 
 		glStencilMask(currentWritingMask);
 
@@ -177,11 +178,11 @@ void TStencilControl::Imp::updateOpenGlState()
 			glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
 		}
 
-	} else { //writing on screen buffer
+	} else { // writing on screen buffer
 		glStencilMask(0xFFFFFFFF);
 		glStencilFunc(GL_EQUAL, m_inOrOutMask, m_enabledMask);
 		glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-		//glColorMask(1,1,1,1);
+		// glColorMask(1,1,1,1);
 	}
 
 	if (!m_enabledMask && m_currentWriting < 0)
@@ -230,7 +231,7 @@ void TStencilControl::Imp::endMask()
 
 	unsigned char currentMask = 1 << (m_pushCount - 1);
 
-	m_writingMask &= ~currentMask; //stop writing
+	m_writingMask &= ~currentMask; // stop writing
 	m_enabledMask &= ~currentMask;
 	m_drawOnScreenMask &= ~currentMask;
 	m_drawOnlyOnceMask &= ~currentMask;
@@ -286,22 +287,22 @@ void TStencilControl::Imp::disableMask()
 void TStencilControl::Imp::popMask()
 {
 	--m_pushCount;
-	assert(m_pushCount > 0); //there is at least one mask in the stack
+	assert(m_pushCount > 0); // there is at least one mask in the stack
 }
 
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-//questo forse e' un po' brutto:
-//La maschera e' chiusa.
-//Se e' abilitata,    open = push+open
-//Se e' disabilitata, open =      open
+// questo forse e' un po' brutto:
+// La maschera e' chiusa.
+// Se e' abilitata,    open = push+open
+// Se e' disabilitata, open =      open
 
 void TStencilControl::beginMask(DrawMode drawMode)
 {
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 
-	if (m_imp->m_virtualState) //opened or enabled
+	if (m_imp->m_virtualState) // opened or enabled
 	{
 #ifdef _DEBUG
 		m_imp->fullState.push(m_imp->m_virtualState == 2);
@@ -310,7 +311,7 @@ void TStencilControl::beginMask(DrawMode drawMode)
 		m_imp->pushMask();
 	}
 
-	m_imp->m_virtualState = 2; //opened
+	m_imp->m_virtualState = 2; // opened
 
 	if (m_imp->m_pushCount <= m_imp->m_stencilBitCount)
 		m_imp->beginMask(drawMode);
@@ -320,17 +321,17 @@ void TStencilControl::beginMask(DrawMode drawMode)
 
 void TStencilControl::endMask()
 {
-	if (!m_imp->m_virtualState) //closed and disabled
+	if (!m_imp->m_virtualState) // closed and disabled
 	{
 		m_imp->popMask();
 
 #ifdef _DEBUG
-		assert(m_imp->fullState.top()); //the state before last push must be opened
+		assert(m_imp->fullState.top()); // the state before last push must be opened
 		m_imp->fullState.pop();
 #endif
 	}
 
-	assert(m_imp->m_virtualState != 1); //yet closed
+	assert(m_imp->m_virtualState != 1); // yet closed
 
 	m_imp->m_virtualState = 0;
 
@@ -344,9 +345,9 @@ void TStencilControl::endMask()
 
 void TStencilControl::enableMask(MaskType maskType)
 {
-	assert(m_imp->m_virtualState != 2); //cannot enable an opened mask
+	assert(m_imp->m_virtualState != 2); // cannot enable an opened mask
 
-	m_imp->m_virtualState = 1; //enabled
+	m_imp->m_virtualState = 1; // enabled
 
 	if (m_imp->m_pushCount <= m_imp->m_stencilBitCount)
 		m_imp->enableMask(maskType);
@@ -356,19 +357,19 @@ void TStencilControl::enableMask(MaskType maskType)
 
 void TStencilControl::disableMask()
 {
-	assert(m_imp->m_virtualState != 2); //cannot disable an opened mask
+	assert(m_imp->m_virtualState != 2); // cannot disable an opened mask
 
-	if (!m_imp->m_virtualState) //closed and disabled
+	if (!m_imp->m_virtualState) // closed and disabled
 	{
 		m_imp->popMask();
 
 #ifdef _DEBUG
-		assert(!m_imp->fullState.top()); //the state before last push must be enabled
+		assert(!m_imp->fullState.top()); // the state before last push must be enabled
 		m_imp->fullState.pop();
 #endif
 	}
 
-	m_imp->m_virtualState = 0; //close and disabled
+	m_imp->m_virtualState = 0; // close and disabled
 
 	if (m_imp->m_pushCount <= m_imp->m_stencilBitCount)
 		m_imp->disableMask();

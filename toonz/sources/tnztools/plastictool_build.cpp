@@ -53,7 +53,8 @@ TPointD closestMeshVertexPos(const TPointD &pos, double *distance = 0)
 	const std::pair<double, PlasticTool::MeshIndex> &closest =
 		PlasticToolLocals::closestVertex(*mi, pos_mesh);
 
-	const TPointD &vxPos_mesh = mi->meshes()[closest.second.m_meshIdx]->vertex(closest.second.m_idx).P();
+	const TPointD &vxPos_mesh =
+		mi->meshes()[closest.second.m_meshIdx]->vertex(closest.second.m_idx).P();
 
 	if (distance)
 		*distance = tmin(Stage::inch / dpi.x, Stage::inch / dpi.y) * closest.first;
@@ -79,8 +80,7 @@ TPointD closestSkeletonVertexPos(const TPointD &pos)
 
 	const PlasticSkeleton::vertices_container &vertices = skeleton->vertices();
 
-	return tcg::min_transform(vertices.begin(), vertices.end(),
-							  tcg::bind1st(&locals::dist2, pos))
+	return tcg::min_transform(vertices.begin(), vertices.end(), tcg::bind1st(&locals::dist2, pos))
 		->P();
 }
 
@@ -95,7 +95,7 @@ namespace
 
 class VertexUndo : public TUndo
 {
-protected:
+  protected:
 	int m_row, m_col; //!< Xsheet coordinates
 
 	int m_v, m_vParent;			//!< Indices of the added vertex and its parent
@@ -103,7 +103,7 @@ protected:
 
 	std::vector<int> m_children; //!< Children of the vertex to insert
 
-public:
+  public:
 	VertexUndo() : m_row(::row()), m_col(::column()), m_v(-1), m_vParent(-1) {}
 
 	int getSize() const { return sizeof(*this); } // sizeof this is roughly ok
@@ -198,7 +198,7 @@ public:
 
 class AddVertexUndo : public VertexUndo
 {
-public:
+  public:
 	AddVertexUndo(int vParent, const PlasticSkeletonVertex &vx)
 	{
 		m_vParent = vParent, m_vx = vx;
@@ -213,7 +213,7 @@ public:
 
 class RemoveVertexUndo : public VertexUndo
 {
-public:
+  public:
 	RemoveVertexUndo(int v)
 	{
 		assert(v >= 0);
@@ -228,7 +228,7 @@ public:
 
 class InsertVertexUndo : public VertexUndo
 {
-public:
+  public:
 	InsertVertexUndo(int e, const PlasticSkeletonVertex &vx)
 	{
 		const PlasticSkeleton &skeleton = *l_plasticTool.skeleton();
@@ -238,10 +238,7 @@ public:
 		std::vector<int>(1, ed.vertex(1)).swap(m_children);
 	}
 
-	void redo() const
-	{
-		const_cast<InsertVertexUndo &>(*this).VertexUndo::insertVertex();
-	}
+	void redo() const { const_cast<InsertVertexUndo &>(*this).VertexUndo::insertVertex(); }
 
 	void undo() const
 	{
@@ -255,15 +252,17 @@ public:
 
 class AddSkeletonUndo : public TUndo
 {
-protected:
+  protected:
 	int m_row, m_col; //!< Xsheet coordinates
 
 	int m_skelId;				 //!< The added skeleton's id
 	PlasticSkeletonP m_skeleton; //!< A COPY of the added skeleton
 
-public:
+  public:
 	AddSkeletonUndo(int skelId, const PlasticSkeletonP &skeletonCopy)
-		: m_row(::row()), m_col(::column()), m_skelId(skelId), m_skeleton(skeletonCopy) {}
+		: m_row(::row()), m_col(::column()), m_skelId(skelId), m_skeleton(skeletonCopy)
+	{
+	}
 
 	// This is not correct... it's tough to build the right one! We're like storing the whole
 	// cleared deformation! So, I guess 1 MB (100 of these in the standard undos pool)
@@ -290,7 +289,7 @@ public:
 
 class RemoveSkeletonUndo : public AddSkeletonUndo
 {
-public:
+  public:
 	RemoveSkeletonUndo(int skelId) : AddSkeletonUndo(skelId, l_plasticTool.skeleton()) {}
 
 	void redo() const { AddSkeletonUndo::undo(); }
@@ -303,7 +302,7 @@ class RemoveSkeletonUndo_WithKeyframes : public RemoveSkeletonUndo
 {
 	mutable std::vector<TDoubleKeyframe> m_skelIdsKeyframes; //!< Skeleton Ids param curve keyframes
 															 //!< for m_skelId
-public:
+  public:
 	RemoveSkeletonUndo_WithKeyframes(int skelId) : RemoveSkeletonUndo(skelId) {}
 
 	void redo() const
@@ -360,9 +359,8 @@ class SetSkeletonIdUndo : public TUndo
 	mutable TDoubleKeyframe m_oldKf; //!< Old keyframe values for skelIds parameter
 	mutable bool m_added1stKeyframe; //!< Whether the redo() added the first skelIds keyframe
 
-public:
-	SetSkeletonIdUndo(int skelId)
-		: m_row(::row()), m_col(::column()), m_skelId(skelId) {}
+  public:
+	SetSkeletonIdUndo(int skelId) : m_row(::row()), m_col(::column()), m_skelId(skelId) {}
 
 	int getSize() const { return sizeof(*this); }
 
@@ -431,17 +429,19 @@ class MoveVertexUndo_Build : public TUndo
 	std::vector<TPointD> m_origVxsPos; //!< Original vertex positions
 	TPointD m_posShift;				   //!< Vertex positions shift
 
-public:
-	MoveVertexUndo_Build(
-		const std::vector<int> &vIdxs,
-		const std::vector<TPointD> &origVxsPos,
-		const TPointD &posShift)
-		: m_row(::row()), m_col(::column()), m_vIdxs(vIdxs), m_origVxsPos(origVxsPos), m_posShift(posShift)
+  public:
+	MoveVertexUndo_Build(const std::vector<int> &vIdxs, const std::vector<TPointD> &origVxsPos,
+						 const TPointD &posShift)
+		: m_row(::row()), m_col(::column()), m_vIdxs(vIdxs), m_origVxsPos(origVxsPos),
+		  m_posShift(posShift)
 	{
 		assert(m_vIdxs.size() == m_origVxsPos.size());
 	}
 
-	int getSize() const { return int(sizeof(*this) + m_vIdxs.size() * (sizeof(int) + 2 * sizeof(TPointD))); }
+	int getSize() const
+	{
+		return int(sizeof(*this) + m_vIdxs.size() * (sizeof(int) + 2 * sizeof(TPointD)));
+	}
 
 	void redo() const
 	{
@@ -501,9 +501,10 @@ void PlasticTool::mouseMove_build(const TPointD &pos, const TMouseEvent &me)
 		// No highlighted skeleton primitive. Mouse position may be
 		// a candidate for vertex addition - snap to mesh if required
 		if (m_snapToMesh.getValue()) {
-			const TPointD &mvPos = ::closestMeshVertexPos(pos, &d); // No need to check against closest skeleton vertex,
-																	// since vertex highlighting kicks in at the same time
-			if (d < highlightRadius)								// the snapping would take place.
+			const TPointD &mvPos = ::closestMeshVertexPos(
+				pos, &d);			 // No need to check against closest skeleton vertex,
+									 // since vertex highlighting kicks in at the same time
+			if (d < highlightRadius) // the snapping would take place.
 				m_pos = mvPos;
 		}
 	}
@@ -523,7 +524,9 @@ void PlasticTool::leftButtonDown_build(const TPointD &pos, const TMouseEvent &me
 		const PlasticSkeletonP &skel = skeleton();
 
 		if (m_svHigh >= 0) {
-			PlasticVertexSelection vSel(me.isShiftPressed() ? PlasticVertexSelection(branchSelection(m_svHigh)) : PlasticVertexSelection(m_svHigh));
+			PlasticVertexSelection vSel(me.isShiftPressed()
+											? PlasticVertexSelection(branchSelection(m_svHigh))
+											: PlasticVertexSelection(m_svHigh));
 
 			if (me.isCtrlPressed())
 				toggleSkeletonSelection(vSel);
@@ -531,8 +534,8 @@ void PlasticTool::leftButtonDown_build(const TPointD &pos, const TMouseEvent &me
 				setSkeletonSelection(vSel);
 		} else if (m_seHigh >= 0) {
 			// Insert a vertex in the edge
-			TUndo *op = new InsertVertexUndo(m_seHigh, PlasticSkeletonVertex(
-														   projection(*skel, m_seHigh, m_pos)));
+			TUndo *op = new InsertVertexUndo(
+				m_seHigh, PlasticSkeletonVertex(projection(*skel, m_seHigh, m_pos)));
 			TUndoManager::manager()->add(op);
 
 			op->redo();
@@ -541,8 +544,9 @@ void PlasticTool::leftButtonDown_build(const TPointD &pos, const TMouseEvent &me
 			if (m_snapToMesh.getValue()) {
 				double d, highlightRadius = getPixelSize() * HIGHLIGHT_DISTANCE;
 
-				const TPointD &mvPos = ::closestMeshVertexPos(pos, &d); // Again, no need to check against closest
-																		// skeleton vertex.
+				const TPointD &mvPos =
+					::closestMeshVertexPos(pos, &d); // Again, no need to check against closest
+													 // skeleton vertex.
 				if (d < highlightRadius)
 					m_pos = mvPos;
 			}
@@ -592,11 +596,12 @@ void PlasticTool::leftButtonDrag_build(const TPointD &pos, const TMouseEvent &me
 		const TPointD &mvPos = ::closestMeshVertexPos(pos),
 					  &svPos = ::closestSkeletonVertexPos(mvPos);
 
-		if (tcg::point_ops::dist(mvPos, svPos) > getPixelSize()) // 1) If said distance is sub-pixel, the user
-			m_pos = mvPos;										 //    just cannot see the assignment - so it's not safe.
-	}															 // 2) The moveVertex_build() below manipulates m_pos
-	else														 //    (not how m_pressedPos is subtracted), so !=
-		m_pos = pos;											 //    is not a choice.
+		if (tcg::point_ops::dist(mvPos, svPos) >
+			getPixelSize()) // 1) If said distance is sub-pixel, the user
+			m_pos = mvPos;  //    just cannot see the assignment - so it's not safe.
+	}						// 2) The moveVertex_build() below manipulates m_pos
+	else					//    (not how m_pressedPos is subtracted), so !=
+		m_pos = pos;		//    is not a choice.
 
 	moveVertex_build(m_pressedVxsPos, m_pos - m_pressedPos);
 	invalidate();
@@ -617,8 +622,8 @@ void PlasticTool::leftButtonUp_build(const TPointD &pos, const TMouseEvent &me)
 		m_pos = pos;
 
 	if (!m_svSel.isEmpty() && m_dragged) {
-		TUndoManager::manager()->add(new MoveVertexUndo_Build(
-			m_svSel.objects(), m_pressedVxsPos, m_pos - m_pressedPos));
+		TUndoManager::manager()->add(
+			new MoveVertexUndo_Build(m_svSel.objects(), m_pressedVxsPos, m_pos - m_pressedPos));
 
 		::stageObject()->invalidate(); // Should be a TStageObject's implementation detail ...
 		invalidate();				   // .. it's that it caches placement data and we must
@@ -633,7 +638,8 @@ void PlasticTool::addContextMenuActions_build(QMenu *menu)
 
 	if (!m_svSel.isEmpty()) {
 		QAction *deleteVertex = menu->addAction(tr("Delete Vertex"));
-		ret = ret && connect(deleteVertex, SIGNAL(triggered()), &l_plasticTool, SLOT(deleteSelectedVertex_undo()));
+		ret = ret && connect(deleteVertex, SIGNAL(triggered()), &l_plasticTool,
+							 SLOT(deleteSelectedVertex_undo()));
 
 		menu->addSeparator();
 	}
@@ -654,8 +660,8 @@ void PlasticTool::moveVertex_build(const std::vector<TPointD> &origVxsPos, const
 			skeleton->moveVertex(m_svSel.objects()[v], origVxsPos[v] + posShift);
 
 		// Deformation must be recompiled
-		PlasticDeformerStorage::instance()->invalidateSkeleton(
-			m_sd.getPointer(), ::skeletonId(), PlasticDeformerStorage::ALL);
+		PlasticDeformerStorage::instance()->invalidateSkeleton(m_sd.getPointer(), ::skeletonId(),
+															   PlasticDeformerStorage::ALL);
 
 		if (m_mode.getIndex() == ANIMATE_IDX)
 			storeDeformation(); // Rebuild deformed skeleton - default values have changed
@@ -671,7 +677,8 @@ void PlasticTool::addVertex(const PlasticSkeletonVertex &vx)
 
 	l_suspendParamsObservation = true; // Some vertex parameters change during insert
 
-	assert(m_svSel.isEmpty() || m_svSel.hasSingleObject()); // Could there be no parent (inserting the root)
+	assert(m_svSel.isEmpty() ||
+		   m_svSel.hasSingleObject()); // Could there be no parent (inserting the root)
 	setSkeletonSelection(skeleton->addVertex(vx, m_svSel));
 
 	l_suspendParamsObservation = false;
@@ -683,14 +690,14 @@ void PlasticTool::addVertex(const PlasticSkeletonVertex &vx)
 	// Xsheet change notification is necessary to inform the Function Editor that new
 	// channels (the vertex deformation ones) have been introduced
 	TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
-	PlasticDeformerStorage::instance()->invalidateSkeleton(
-		m_sd.getPointer(), ::skeletonId(), PlasticDeformerStorage::ALL);
+	PlasticDeformerStorage::instance()->invalidateSkeleton(m_sd.getPointer(), ::skeletonId(),
+														   PlasticDeformerStorage::ALL);
 }
 
 //------------------------------------------------------------------------
 
-void PlasticTool::insertVertex(const PlasticSkeletonVertex &vx,
-							   int parent, const std::vector<int> &children)
+void PlasticTool::insertVertex(const PlasticSkeletonVertex &vx, int parent,
+							   const std::vector<int> &children)
 {
 	const PlasticSkeletonP &skeleton = this->skeleton();
 	assert(skeleton);
@@ -703,8 +710,8 @@ void PlasticTool::insertVertex(const PlasticSkeletonVertex &vx,
 	onChange(); // Update once after insertion
 
 	TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
-	PlasticDeformerStorage::instance()->invalidateSkeleton(
-		m_sd.getPointer(), ::skeletonId(), PlasticDeformerStorage::ALL);
+	PlasticDeformerStorage::instance()->invalidateSkeleton(m_sd.getPointer(), ::skeletonId(),
+														   PlasticDeformerStorage::ALL);
 }
 
 //------------------------------------------------------------------------
@@ -728,8 +735,8 @@ void PlasticTool::removeVertex()
 	l_suspendParamsObservation = true; // Some vertex parameters change during removal.
 									   // We need to avoid updating WHILE removing.
 	skeleton->removeVertex(m_svSel);
-	PlasticDeformerStorage::instance()->invalidateSkeleton(
-		m_sd.getPointer(), ::skeletonId(), PlasticDeformerStorage::ALL);
+	PlasticDeformerStorage::instance()->invalidateSkeleton(m_sd.getPointer(), ::skeletonId(),
+														   PlasticDeformerStorage::ALL);
 
 	l_suspendParamsObservation = false;
 	onChange();
@@ -738,7 +745,8 @@ void PlasticTool::removeVertex()
 
 	// Xsheet change notification is necessary to inform the Function Editor that some
 	// channels (the vertex deformation ones) have been removed
-	TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged(); // NOTE: This COULD invoke invalidate()...
+	TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged(); // NOTE: This COULD invoke
+																		// invalidate()...
 
 	// Rebuild the stage object's keyframes table
 	stageObject()->updateKeyframes();
@@ -816,8 +824,9 @@ void PlasticTool::deleteSelectedVertex_undo()
 	} else {
 		typedef PlasticVertexSelection::objects_container objects_container;
 
-		objects_container vertexIdxs = m_svSel.objects(); // Each undo will reset the vertex selection,
-														  // so we need a copy
+		objects_container vertexIdxs =
+			m_svSel.objects(); // Each undo will reset the vertex selection,
+							   // so we need a copy
 		manager->beginBlock();
 		{
 			objects_container::const_iterator vit, viEnd = vertexIdxs.end();

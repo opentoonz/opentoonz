@@ -21,11 +21,16 @@ class QRadioButton;
 
 class ExportSceneDvDirModelFileFolderNode : public DvDirModelFileFolderNode
 {
-public:
-	ExportSceneDvDirModelFileFolderNode(DvDirModelNode *parent, std::wstring name, const TFilePath &path)
-		: DvDirModelFileFolderNode(parent, name, path) {}
+  public:
+	ExportSceneDvDirModelFileFolderNode(DvDirModelNode *parent, std::wstring name,
+										const TFilePath &path)
+		: DvDirModelFileFolderNode(parent, name, path)
+	{
+	}
 	ExportSceneDvDirModelFileFolderNode(DvDirModelNode *parent, const TFilePath &path)
-		: DvDirModelFileFolderNode(parent, path) {}
+		: DvDirModelFileFolderNode(parent, path)
+	{
+	}
 
 	DvDirModelNode *makeChild(std::wstring name);
 	DvDirModelFileFolderNode *createExposeSceneNode(DvDirModelNode *parent, const TFilePath &path);
@@ -38,9 +43,12 @@ class ExportSceneDvDirModelSpecialFileFolderNode : public ExportSceneDvDirModelF
 {
 	QPixmap m_pixmap;
 
-public:
-	ExportSceneDvDirModelSpecialFileFolderNode(DvDirModelNode *parent, std::wstring name, const TFilePath &path)
-		: ExportSceneDvDirModelFileFolderNode(parent, name, path) {}
+  public:
+	ExportSceneDvDirModelSpecialFileFolderNode(DvDirModelNode *parent, std::wstring name,
+											   const TFilePath &path)
+		: ExportSceneDvDirModelFileFolderNode(parent, name, path)
+	{
+	}
 	QPixmap getPixmap(bool isOpen) const { return m_pixmap; }
 	void setPixmap(const QPixmap &pixmap) { m_pixmap = pixmap; }
 };
@@ -50,9 +58,11 @@ public:
 
 class ExportSceneDvDirModelProjectNode : public ExportSceneDvDirModelFileFolderNode
 {
-public:
+  public:
 	ExportSceneDvDirModelProjectNode(DvDirModelNode *parent, const TFilePath &path)
-		: ExportSceneDvDirModelFileFolderNode(parent, path) {}
+		: ExportSceneDvDirModelFileFolderNode(parent, path)
+	{
+	}
 	void makeCurrent() {}
 	QPixmap getPixmap(bool isOpen) const;
 };
@@ -66,7 +76,7 @@ class ExportSceneDvDirModelRootNode : public DvDirModelNode
 	ExportSceneDvDirModelFileFolderNode *m_sandboxProjectNode;
 	void add(std::wstring name, const TFilePath &path);
 
-public:
+  public:
 	ExportSceneDvDirModelRootNode();
 
 	void refreshChildren();
@@ -80,7 +90,7 @@ class ExportSceneDvDirModel : public QAbstractItemModel
 {
 	DvDirModelNode *m_root;
 
-public:
+  public:
 	ExportSceneDvDirModel();
 	~ExportSceneDvDirModel();
 
@@ -105,10 +115,11 @@ class ExportSceneTreeViewDelegate : public QItemDelegate
 	Q_OBJECT
 	ExportSceneTreeView *m_treeView;
 
-public:
+  public:
 	ExportSceneTreeViewDelegate(ExportSceneTreeView *parent);
 	~ExportSceneTreeViewDelegate();
-	void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+	void paint(QPainter *painter, const QStyleOptionViewItem &option,
+			   const QModelIndex &index) const;
 	QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
 };
 
@@ -120,20 +131,20 @@ class ExportSceneTreeView : public QTreeView
 	Q_OBJECT
 	ExportSceneDvDirModel *m_model;
 
-public:
+  public:
 	ExportSceneTreeView(QWidget *parent);
 	QSize sizeHint() const;
 	DvDirModelNode *getCurrentNode() const;
 
-protected:
+  protected:
 	void refresh();
 	void showEvent(QShowEvent *);
 	void focusInEvent(QFocusEvent *event);
 
-public slots:
+  public slots:
 	void resizeToConts();
 
-signals:
+  signals:
 	void focusIn();
 };
 
@@ -154,7 +165,7 @@ class ExportScenePopup : public DVGui::Dialog
 
 	bool m_createNewProject;
 
-public:
+  public:
 	ExportScenePopup(std::vector<TFilePath> scenes);
 
 	void setScenes(std::vector<TFilePath> scenes)
@@ -163,14 +174,14 @@ public:
 		//    updateCommandLabel();
 	}
 
-protected slots:
+  protected slots:
 	void switchMode(int id);
 	void onProjectTreeViweFocusIn();
 	void onProjectNameFocusIn();
 	void onExport();
 
-protected:
-	//!Create new project and return new project path.
+  protected:
+	//! Create new project and return new project path.
 	TFilePath createNewProject();
 	//  void updateCommandLabel();
 };

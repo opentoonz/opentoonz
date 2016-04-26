@@ -15,9 +15,10 @@ class PaletteFilterFx : public TStandardRasterFx
 	TIntEnumParamP m_keep;
 	TIntEnumParamP m_type;
 
-public:
+  public:
 	PaletteFilterFx()
-		: m_string(L"1,2,3"), m_type(new TIntEnumParam(0, "Lines & Areas")), m_keep(new TIntEnumParam(0, "Delete"))
+		: m_string(L"1,2,3"), m_type(new TIntEnumParam(0, "Lines & Areas")),
+		  m_keep(new TIntEnumParam(0, "Delete"))
 
 	{
 
@@ -57,8 +58,7 @@ public:
 
 //-------------------------------------------------------------------
 
-void PaletteFilterFx::doDryCompute(TRectD &rect, double frame,
-								   const TRenderSettings &info)
+void PaletteFilterFx::doDryCompute(TRectD &rect, double frame, const TRenderSettings &info)
 {
 	if (!m_input.isConnected())
 		return;

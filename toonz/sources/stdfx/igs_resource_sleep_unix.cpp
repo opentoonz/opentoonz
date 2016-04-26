@@ -15,8 +15,7 @@ void igs::resource::sleep_sn(const time_t seconds, const long nano_seconds)
 	rem.tv_sec = 0;
 	rem.tv_nsec = 0;
 	if (::nanosleep(&req, &rem) < 0) {
-		throw std::domain_error(igs_resource_msg_from_err(
-			TEXT("nanosleep(-)"), errno));
+		throw std::domain_error(igs_resource_msg_from_err(TEXT("nanosleep(-)"), errno));
 	}
 }
 /*
@@ -27,8 +26,8 @@ void igs::resource::sleep_m(const DWORD milli_seconds)
 {
 	const time_t seconds = milli_seconds / 1000;
 	const long nano_seconds = (milli_seconds % 1000) * 1000000;
-	//std::cout << "milli_seconds=" << milli_seconds << std::endl;
-	//std::cout << "      seconds=" << seconds << std::endl;
-	//std::cout << " nano_seconds=" << nano_seconds << std::endl;
+	// std::cout << "milli_seconds=" << milli_seconds << std::endl;
+	// std::cout << "      seconds=" << seconds << std::endl;
+	// std::cout << " nano_seconds=" << nano_seconds << std::endl;
 	igs::resource::sleep_sn(seconds, nano_seconds);
 }

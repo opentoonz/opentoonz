@@ -2,15 +2,14 @@
 #include "igs_resource_thread.h"
 #include "igs_resource_msg_from_err.h"
 
-const HANDLE igs::resource::thread_run(
-	unsigned(__stdcall *function)(void *), void *func_arg, const int priority)
+const HANDLE igs::resource::thread_run(unsigned(__stdcall *function)(void *), void *func_arg,
+									   const int priority)
 {
-	//unsigned thread_addr=0;
-	HANDLE thread_id = reinterpret_cast<HANDLE>(::_beginthreadex(
-		NULL, 0, function, func_arg, 0, NULL));
+	// unsigned thread_addr=0;
+	HANDLE thread_id =
+		reinterpret_cast<HANDLE>(::_beginthreadex(NULL, 0, function, func_arg, 0, NULL));
 	if (0 == thread_id) {
-		throw std::domain_error(igs_resource_msg_from_err(
-			TEXT("_beginthreadex(-)"), errno));
+		throw std::domain_error(igs_resource_msg_from_err(TEXT("_beginthreadex(-)"), errno));
 	}
 	/*
 	vc2005 MSDN より
@@ -25,8 +24,8 @@ const HANDLE igs::resource::thread_run(
 	THREAD_PRIORITY_IDLE			プロセスにより1 or 16
 	*/
 	if (0 == ::SetThreadPriority(thread_id, priority)) {
-		throw std::domain_error(igs_resource_msg_from_err(
-			TEXT("SetThreadPriority(-)"), ::GetLastError()));
+		throw std::domain_error(
+			igs_resource_msg_from_err(TEXT("SetThreadPriority(-)"), ::GetLastError()));
 	}
 	return thread_id;
 }
@@ -40,8 +39,8 @@ const bool igs::resource::thread_was_done(const HANDLE thread_id)
 {
 	DWORD exit_code = 0;
 	if (0 == ::GetExitCodeThread(thread_id, &exit_code)) {
-		throw std::domain_error(igs_resource_msg_from_err(
-			"GetExitCodeThread(-)", ::GetLastError()));
+		throw std::domain_error(
+			igs_resource_msg_from_err("GetExitCodeThread(-)", ::GetLastError()));
 	}
 	if (exit_code == STILL_ACTIVE) {
 		return false;
@@ -57,14 +56,14 @@ void igs::resource::thread_wait(const HANDLE thread_id)
 {
 	/* _endthreadex(-)はスレッドハンドルを閉じない??? */
 	if (WAIT_FAILED == ::WaitForSingleObject(thread_id, INFINITE)) {
-		throw std::domain_error(igs_resource_msg_from_err(
-			TEXT("WaitForSingleObject(-)"), ::GetLastError()));
+		throw std::domain_error(
+			igs_resource_msg_from_err(TEXT("WaitForSingleObject(-)"), ::GetLastError()));
 	}
 }
 void igs::resource::thread_close(const HANDLE thread_id)
 {
 	if (0 == ::CloseHandle(thread_id)) {
-		throw std::domain_error(igs_resource_msg_from_err(
-			TEXT("CloseHandle(-)"), ::GetLastError()));
+		throw std::domain_error(
+			igs_resource_msg_from_err(TEXT("CloseHandle(-)"), ::GetLastError()));
 	}
 }

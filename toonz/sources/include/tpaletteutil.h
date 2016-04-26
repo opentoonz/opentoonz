@@ -28,17 +28,12 @@
 // se non c'e' ne crea uno nuovo (nella prima pagina di targetPalette)
 // indexTable assicura la conversione <indici in sourcePalette> -> <indici in targetPalette>
 
-DVAPI void mergePalette(
-	const TPaletteP &targetPalette,
-	std::map<int, int> &indexTable,
-	const TPaletteP &sourcePalette,
-	const std::set<int> &sourceIndices);
+DVAPI void mergePalette(const TPaletteP &targetPalette, std::map<int, int> &indexTable,
+						const TPaletteP &sourcePalette, const std::set<int> &sourceIndices);
 
 // replace palette and lacking amount of styles will be copied from the other one
 // return value will be true if the style amount is changed after the operation
-DVAPI bool mergePalette_Overlap(
-	const TPaletteP &dstPalette,
-	const TPaletteP &copiedPalette,
-	bool keepOriginalPalette);
+DVAPI bool mergePalette_Overlap(const TPaletteP &dstPalette, const TPaletteP &copiedPalette,
+								bool keepOriginalPalette);
 
 #endif

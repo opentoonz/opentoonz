@@ -20,10 +20,10 @@ typedef unary_function<double, double> unary_functionDD;
 
 class myBlendFunc : unary_functionDD
 {
-	//TCubic  c;
+	// TCubic  c;
 	TQuadratic curve;
 
-public:
+  public:
 	myBlendFunc(double t = 0.0)
 	{
 		curve.setP0(TPointD(0.0, 1.0));
@@ -51,9 +51,7 @@ ToonzExt::NotSimmetricBezierPotential::~NotSimmetricBezierPotential()
 
 //-----------------------------------------------------------------------------
 
-void ToonzExt::NotSimmetricBezierPotential::setParameters_(const TStroke *ref,
-														   double w,
-														   double al)
+void ToonzExt::NotSimmetricBezierPotential::setParameters_(const TStroke *ref, double w, double al)
 {
 	assert(ref);
 	ref_ = ref;
@@ -64,21 +62,17 @@ void ToonzExt::NotSimmetricBezierPotential::setParameters_(const TStroke *ref,
 	lenghtAtParam_ = ref->getLength(par_);
 
 	// lunghezza dal pto di click all'inizio della curva
-	leftFactor_ = min(lenghtAtParam_,
-					  actionLength_ * 0.5); //lenghtAtParam_ / strokeLength_;
+	leftFactor_ = min(lenghtAtParam_, actionLength_ * 0.5); // lenghtAtParam_ / strokeLength_;
 
 	// lunghezza dal pto di click alla fine
-	rightFactor_ = min(strokeLength_ - lenghtAtParam_,
-					   actionLength_ * 0.5);
+	rightFactor_ = min(strokeLength_ - lenghtAtParam_, actionLength_ * 0.5);
 }
 
 //-----------------------------------------------------------------------------
 
-double
-ToonzExt::NotSimmetricBezierPotential::value_(double value2test) const
+double ToonzExt::NotSimmetricBezierPotential::value_(double value2test) const
 {
-	assert(0.0 <= value2test &&
-		   value2test <= 1.0);
+	assert(0.0 <= value2test && value2test <= 1.0);
 	return this->compute_value(value2test);
 }
 
@@ -97,8 +91,7 @@ double ToonzExt::NotSimmetricBezierPotential::compute_shape(double value2test) c
 
 //-----------------------------------------------------------------------------
 
-double
-ToonzExt::NotSimmetricBezierPotential::compute_value(double value2test) const
+double ToonzExt::NotSimmetricBezierPotential::compute_value(double value2test) const
 {
 	myBlendFunc me;
 
@@ -134,8 +127,7 @@ ToonzExt::NotSimmetricBezierPotential::compute_value(double value2test) const
 
 		if (x < 0.0)
 			return 0.0;
-		assert(0.0 <= x &&
-			   x <= 1.0 + TConsts::epsilon);
+		assert(0.0 <= x && x <= 1.0 + TConsts::epsilon);
 		x = std::min(x, 1.0); // just to avoid problem in production code
 		res = sq(x);
 	} else // when is not an extreme
@@ -157,16 +149,14 @@ ToonzExt::NotSimmetricBezierPotential::compute_value(double value2test) const
 				else
 					x = 0.0;
 
-				assert(0.0 - TConsts::epsilon <= x &&
-					   x <= 1.0 + TConsts::epsilon);
+				assert(0.0 - TConsts::epsilon <= x && x <= 1.0 + TConsts::epsilon);
 				if (isAlmostZero(x))
 					x = 0.0;
 				if (areAlmostEqual(x, 1.0))
 					x = 1.0;
 
 				double how_many_of_shape = (strokeLength_ - lenghtAtParam_) / (actionLength_ * 0.5);
-				assert(0.0 <= how_many_of_shape &&
-					   how_many_of_shape <= 1.0);
+				assert(0.0 <= how_many_of_shape && how_many_of_shape <= 1.0);
 
 				myBlendFunc bf(how_many_of_shape);
 
@@ -178,15 +168,13 @@ ToonzExt::NotSimmetricBezierPotential::compute_value(double value2test) const
 			double tmp_res = me(tmp_x);
 			if (tmp_res > min_level) {
 				double x = lenght_at_value2test / leftFactor_;
-				assert(0.0 <= x &&
-					   x <= 1.0);
+				assert(0.0 <= x && x <= 1.0);
 
 				// then movement use another shape
 				double diff = x - 1.0;
 
 				double how_many_of_shape = lenghtAtParam_ / (actionLength_ * 0.5);
-				assert(0.0 <= how_many_of_shape &&
-					   how_many_of_shape <= 1.0);
+				assert(0.0 <= how_many_of_shape && how_many_of_shape <= 1.0);
 
 				myBlendFunc bf(how_many_of_shape);
 				return bf(diff);
@@ -202,8 +190,7 @@ ToonzExt::NotSimmetricBezierPotential::compute_value(double value2test) const
 
 //-----------------------------------------------------------------------------
 
-ToonzExt::Potential *
-ToonzExt::NotSimmetricBezierPotential::clone()
+ToonzExt::Potential *ToonzExt::NotSimmetricBezierPotential::clone()
 {
 	return new NotSimmetricBezierPotential;
 }

@@ -18,7 +18,8 @@ using namespace DVGui;
 //-----------------------------------------------------------------------------
 
 RollerField::RollerField(QWidget *parent)
-	: QWidget(parent), m_value(0), m_minValue(-100000.0), m_maxValue(100000.0), m_xPos(0), m_step(1.0)
+	: QWidget(parent), m_value(0), m_minValue(-100000.0), m_maxValue(100000.0), m_xPos(0),
+	  m_step(1.0)
 {
 	setMinimumSize(43, 7);
 }
@@ -69,7 +70,8 @@ void RollerField::paintEvent(QPaintEvent *e)
 	int w = width();
 
 	drawArrow(p, QPointF(3, 3), QPointF(5, 5), QPointF(5, 1), true, Qt::black, Qt::black);
-	drawArrow(p, QPointF(w - 4, 3), QPointF(w - 6, 5), QPointF(w - 6, 1), true, Qt::black, Qt::black);
+	drawArrow(p, QPointF(w - 4, 3), QPointF(w - 6, 5), QPointF(w - 6, 1), true, Qt::black,
+			  Qt::black);
 
 	p.drawLine(QPoint(3, 3), QPoint(w - 4, 3));
 }
@@ -132,10 +134,7 @@ void RollerField::removeValue(bool isDragging)
 // IntLineEdit
 //-----------------------------------------------------------------------------
 
-IntLineEdit::IntLineEdit(QWidget *parent,
-						 int value,
-						 int minValue, int maxValue,
-						 int showedDigits)
+IntLineEdit::IntLineEdit(QWidget *parent, int value, int minValue, int maxValue, int showedDigits)
 	: LineEdit(parent), m_showedDigits(showedDigits)
 {
 	setFixedWidth(54);
@@ -166,8 +165,8 @@ void IntLineEdit::setValue(int value)
 	}
 	setText(str);
 
-	//Faccio in modo che il cursore sia sulla prima cifra, cosi' se la stringa da visualizzare
-	//e' piu' lunga del campo le cifre che vengono troncate sono le ultime e non le prime.
+	// Faccio in modo che il cursore sia sulla prima cifra, cosi' se la stringa da visualizzare
+	// e' piu' lunga del campo le cifre che vengono troncate sono le ultime e non le prime.
 	setCursorPosition(0);
 }
 
@@ -226,7 +225,10 @@ void IntLineEdit::focusOutEvent(QFocusEvent *e)
 // for fps edit in flip console
 void IntLineEdit::setLineEditBackgroundColor(QColor color)
 {
-	QString sheet = QString("background-color: rgb(") + QString::number(color.red()) + QString(",") + QString::number(color.green()) + QString(",") + QString::number(color.blue()) + QString(",") + QString::number(color.alpha()) + QString(");");
+	QString sheet = QString("background-color: rgb(") + QString::number(color.red()) +
+					QString(",") + QString::number(color.green()) + QString(",") +
+					QString::number(color.blue()) + QString(",") + QString::number(color.alpha()) +
+					QString(");");
 	setStyleSheet(sheet);
 }
 
@@ -235,7 +237,8 @@ void IntLineEdit::setLineEditBackgroundColor(QColor color)
 //-----------------------------------------------------------------------------
 
 IntField::IntField(QWidget *parent, bool isMaxRangeLimited, bool isRollerHide)
-	: QWidget(parent), m_lineEdit(0), m_slider(0), m_roller(0), m_isMaxRangeLimited(isMaxRangeLimited)
+	: QWidget(parent), m_lineEdit(0), m_slider(0), m_roller(0),
+	  m_isMaxRangeLimited(isMaxRangeLimited)
 {
 	setObjectName("IntField");
 	QHBoxLayout *layout = new QHBoxLayout(this);
@@ -253,7 +256,8 @@ IntField::IntField(QWidget *parent, bool isMaxRangeLimited, bool isRollerHide)
 	vLayout->addWidget(m_lineEdit);
 
 	m_roller = new RollerField(field);
-	ret = ret && connect(m_roller, SIGNAL(valueChanged(bool)), this, SLOT(onRollerValueChanged(bool)));
+	ret = ret &&
+		  connect(m_roller, SIGNAL(valueChanged(bool)), this, SLOT(onRollerValueChanged(bool)));
 	vLayout->addWidget(m_roller);
 
 	if (isRollerHide)
@@ -289,7 +293,8 @@ void IntField::getRange(int &minValue, int &maxValue)
 
 void IntField::setRange(int minValue, int maxValue)
 {
-	m_lineEdit->setRange(minValue, m_isMaxRangeLimited ? maxValue : (std::numeric_limits<int>::max)());
+	m_lineEdit->setRange(minValue,
+						 m_isMaxRangeLimited ? maxValue : (std::numeric_limits<int>::max)());
 	m_slider->setRange(minValue, maxValue);
 	m_roller->setRange(minValue, maxValue);
 }
@@ -367,15 +372,15 @@ void IntField::setLineEditBackgroundColor(QColor color)
 
 void IntField::onSliderChanged(int value)
 {
-	//Controllo necessario per evitare che il segnale di cambiamento venga emesso piu' volte.
+	// Controllo necessario per evitare che il segnale di cambiamento venga emesso piu' volte.
 	if (m_lineEdit->getValue() == value ||
 		((int)m_roller->getValue() == value && m_roller->isVisible()))
 		return;
 	m_lineEdit->setValue(value);
 	m_roller->setValue((double)value);
-	//Faccio in modo che il cursore sia sulla prima cifra, cosi' se la stringa
-	//da visualizzare e' piu' lunga del campo le cifre che vengono troncate sono
-	//le ultime e non le prime (dovrebbero essere quelle dopo la virgola).
+	// Faccio in modo che il cursore sia sulla prima cifra, cosi' se la stringa
+	// da visualizzare e' piu' lunga del campo le cifre che vengono troncate sono
+	// le ultime e non le prime (dovrebbero essere quelle dopo la virgola).
 	m_lineEdit->setCursorPosition(0);
 	emit valueChanged(true);
 }
@@ -385,7 +390,7 @@ void IntField::onSliderChanged(int value)
 void IntField::onEditingFinished()
 {
 	double value = m_lineEdit->getValue();
-	//Controllo necessario per evitare che il segnale di cambiamento venga emesso piu' volte.
+	// Controllo necessario per evitare che il segnale di cambiamento venga emesso piu' volte.
 	if ((m_slider->value() == value && m_slider->isVisible()) ||
 		(int)m_roller->getValue() == value && m_roller->isVisible())
 		return;
@@ -409,9 +414,9 @@ void IntField::onRollerValueChanged(bool isDragging)
 	m_slider->setValue(value);
 	m_lineEdit->setValue(value);
 
-	//Faccio in modo che il cursore sia sulla prima cifra, cosi' se la stringa
-	//da visualizzare e' piu' lunga del campo le cifre che vengono troncate sono
-	//le ultime e non le prime (dovrebbero essere quelle dopo la virgola).
+	// Faccio in modo che il cursore sia sulla prima cifra, cosi' se la stringa
+	// da visualizzare e' piu' lunga del campo le cifre che vengono troncate sono
+	// le ultime e non le prime (dovrebbero essere quelle dopo la virgola).
 	m_lineEdit->setCursorPosition(0);
 
 	emit valueChanged(isDragging);

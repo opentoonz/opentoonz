@@ -16,9 +16,8 @@ class SaltPepperNoiseFx : public TStandardRasterFx
 	TDoubleParamP m_Intensity;
 	TBoolParamP m_Animate;
 
-public:
-	SaltPepperNoiseFx()
-		: m_Intensity(30.0), m_Animate(0.0)
+  public:
+	SaltPepperNoiseFx() : m_Intensity(30.0), m_Animate(0.0)
 	{
 		bindParam(this, "Intensity", m_Intensity);
 		bindParam(this, "Animate", m_Animate);

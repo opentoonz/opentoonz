@@ -22,10 +22,10 @@ class TColorStyle;
 
 class DVAPI StudioPalette
 { // singleton; methods can throw exceptions
-public:
+  public:
 	class Listener
 	{
-	public:
+	  public:
 		virtual void onStudioPaletteTreeChange() {}
 		virtual void onStudioPaletteMove(const TFilePath &dstPath, const TFilePath &srcPath) {}
 		virtual void onStudioPaletteChange(const TFilePath &palette) {}
@@ -36,7 +36,7 @@ public:
 	{ // serve per il drag&drop
 		TFilePath m_palettePath;
 
-	public:
+	  public:
 		Palette(const TFilePath &path) : m_palettePath(path) {}
 		const TFilePath &getPath() const { return m_palettePath; }
 	};
@@ -66,14 +66,13 @@ public:
 	TFilePath createPalette(const TFilePath &folderPath, std::string paletteName = "");
 
 	// DOESN'T get ownership
-	void setPalette(const TFilePath &palettePath, const TPalette *palette, bool notifyPaletteChanged);
+	void setPalette(const TFilePath &palettePath, const TPalette *palette,
+					bool notifyPaletteChanged);
 
 	void deletePalette(const TFilePath &palettePath);
 	void deleteFolder(const TFilePath &folderPath);
 
-	TFilePath importPalette(
-		const TFilePath &dstFolder,
-		const TFilePath &srcPath);
+	TFilePath importPalette(const TFilePath &dstFolder, const TFilePath &srcPath);
 
 	void movePalette(const TFilePath &dstPath, const TFilePath &srcPath);
 
@@ -108,7 +107,7 @@ public:
 
 	void save(const TFilePath &path, TPalette *palette);
 
-private:
+  private:
 	StudioPalette();
 	TFilePath m_root;
 	std::map<std::wstring, TFilePath> m_table;

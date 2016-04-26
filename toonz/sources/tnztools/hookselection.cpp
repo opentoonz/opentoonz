@@ -21,8 +21,7 @@
 //
 //=============================================================================
 
-HookUndo::HookUndo(const TXshLevelP &level)
-	: m_level(level)
+HookUndo::HookUndo(const TXshLevelP &level) : m_level(level)
 {
 	HookSet *hookSet = m_level->getHookSet();
 	assert(hookSet);
@@ -90,8 +89,7 @@ int HookUndo::getSize() const
 //
 //=============================================================================
 
-HooksData::HooksData(const TXshLevelP &level)
-	: m_level(level)
+HooksData::HooksData(const TXshLevelP &level) : m_level(level)
 {
 }
 

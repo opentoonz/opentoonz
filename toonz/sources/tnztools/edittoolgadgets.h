@@ -41,11 +41,11 @@ class FxGadget : public TParamObserver
 	TUndo *m_undo;
 	double m_scaleFactor;
 
-protected:
+  protected:
 	FxGadgetController *m_controller;
 
-public:
-	static GLdouble m_selectedColor[3]; //rgb
+  public:
+	static GLdouble m_selectedColor[3]; // rgb
 
 	FxGadget(FxGadgetController *controller);
 	virtual ~FxGadget();
@@ -100,7 +100,7 @@ namespace EditToolGadgets
 
 class DragTool
 {
-public:
+  public:
 	virtual void leftButtonDown(const TPointD &pos, const TMouseEvent &) = 0;
 	virtual void leftButtonDrag(const TPointD &pos, const TMouseEvent &) = 0;
 	virtual void leftButtonUp(const TPointD &pos, const TMouseEvent &) = 0;
@@ -125,7 +125,7 @@ class FxGadgetController : public QObject
 	FxGadget *m_selectedGadget;
 	bool m_editingNonZeraryFx;
 
-public:
+  public:
 	FxGadgetController(TTool *tool);
 	~FxGadgetController();
 
@@ -149,11 +149,11 @@ public:
 
 	bool hasGadget() { return m_gadgets.size() != 0; }
 
-public slots:
+  public slots:
 
 	void onFxSwitched();
 
-private:
+  private:
 	FxGadget *allocateGadget(const TParamUIConcept &uiConcept);
 };
 

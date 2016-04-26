@@ -20,7 +20,7 @@ class MorphTool
 	bool m_dragging;
 	double m_pixelSize;
 
-public:
+  public:
 	MorphTool();
 	~MorphTool();
 

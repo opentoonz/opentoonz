@@ -45,7 +45,7 @@ class TVectorRenderData;
 
 class DVAPI TColumnFx : public TRasterFx
 {
-public:
+  public:
 	TColumnFx() : TRasterFx() {}
 
 	virtual int getColumnIndex() const = 0;
@@ -68,7 +68,7 @@ class TLevelColumnFx : public TColumnFx
 	TThread::Mutex m_mutex;
 	TOfflineGL *m_offlineContext;
 
-public:
+  public:
 	TLevelColumnFx();
 	~TLevelColumnFx();
 
@@ -106,14 +106,14 @@ public:
 	const TPersistDeclaration *getDeclaration() const;
 	std::string getPluginId() const;
 
-private:
+  private:
 	void getImageInfo(TImageInfo &imageInfo, TXshSimpleLevel *sl, TFrameId frameId);
 
 	TImageP applyTzpFxs(TToonzImageP &ti, double frame, const TRenderSettings &info);
-	void applyTzpFxsOnVector(const TVectorImageP &vi,
-							 TTile &tile, double frame, const TRenderSettings &info);
+	void applyTzpFxsOnVector(const TVectorImageP &vi, TTile &tile, double frame,
+							 const TRenderSettings &info);
 
-private:
+  private:
 	// not implemented
 	TLevelColumnFx(const TLevelColumnFx &);
 	TLevelColumnFx &operator=(const TLevelColumnFx &);
@@ -127,7 +127,7 @@ class TPaletteColumnFx : public TColumnFx
 {
 	TXshPaletteColumn *m_paletteColumn;
 
-public:
+  public:
 	TPaletteColumnFx();
 	~TPaletteColumnFx();
 
@@ -159,7 +159,7 @@ public:
 	const TPersistDeclaration *getDeclaration() const;
 	std::string getPluginId() const;
 
-private:
+  private:
 	// not implemented
 	TPaletteColumnFx(const TPaletteColumnFx &);
 	TPaletteColumnFx &operator=(const TPaletteColumnFx &);
@@ -174,7 +174,7 @@ class DVAPI TZeraryColumnFx : public TColumnFx
 	TXshZeraryFxColumn *m_zeraryFxColumn;
 	TZeraryFx *m_fx;
 
-public:
+  public:
 	TZeraryColumnFx();
 	~TZeraryColumnFx();
 
@@ -203,7 +203,7 @@ public:
 	const TPersistDeclaration *getDeclaration() const;
 	std::string getPluginId() const;
 
-private:
+  private:
 	// not implemented
 	TZeraryColumnFx(const TZeraryColumnFx &);
 	TZeraryColumnFx &operator=(const TZeraryColumnFx &);
@@ -217,7 +217,7 @@ class TXsheetFx : public TRasterFx
 {
 	FxDag *m_fxDag;
 
-public:
+  public:
 	TXsheetFx();
 
 	FxDag *getFxDag() const { return m_fxDag; }
@@ -232,7 +232,7 @@ public:
 	const TPersistDeclaration *getDeclaration() const;
 	std::string getPluginId() const;
 
-private:
+  private:
 	friend class FxDag;
 	void setFxDag(FxDag *fxDag);
 
@@ -249,7 +249,7 @@ class TOutputFx : public TRasterFx
 {
 	TRasterFxPort m_input;
 
-public:
+  public:
 	TOutputFx();
 
 	bool canHandle(const TRenderSettings &info, double frame) { return false; }
@@ -261,7 +261,7 @@ public:
 	const TPersistDeclaration *getDeclaration() const;
 	std::string getPluginId() const;
 
-private:
+  private:
 	// not implemented
 	TOutputFx(const TOutputFx &);
 	TOutputFx &operator=(const TOutputFx &);

@@ -20,7 +20,7 @@ const double infDouble = (std::numeric_limits<double>::max)();
 /*
 ONLY FOT TEST
 
-TSegment  g_tangEnvelope_1;  
+TSegment  g_tangEnvelope_1;
 TSegment  g_tangEnvelope_2;
 
 vector<TQuadratic>  g_testOutline;
@@ -43,17 +43,18 @@ namespace
 /*
   This formule is derived from Graphic Gems pag. 600
 
-    e = h^2 |a|/8
-  
-      e = pixel size
-      h = step
-      a = acceleration of curve (for a quadratic is a costant value)
+	e = h^2 |a|/8
+
+	  e = pixel size
+	  h = step
+	  a = acceleration of curve (for a quadratic is a costant value)
   */
 double localComputeStep(const TQuadratic &quad, double pixelSize)
 {
 	double step = 2;
 
-	TPointD A = quad.getP0() - 2.0 * quad.getP1() + quad.getP2(); // 2*A is the acceleration of the curve
+	TPointD A =
+		quad.getP0() - 2.0 * quad.getP1() + quad.getP2(); // 2*A is the acceleration of the curve
 
 	double A_len = norm(A);
 	if (A_len > 0)
@@ -79,8 +80,7 @@ const double ratio_2_3 = 2.0 / 3.0;
 //---------------------------------------------------------------------------
 
 // torna la curvature per t=0
-template <class T>
-double curvature_t0(const T *curve)
+template <class T> double curvature_t0(const T *curve)
 {
 	assert(curve);
 	TPointD v1 = curve->getP1() - curve->getP0();
@@ -128,17 +128,13 @@ TPointD getPointInOutline(const TThickQuadratic *tq, double t, int upOrDown)
 
 //---------------------------------------------------------------------------
 
-bool checkPointInOutline(const TPointD &pointToTest,
-						 const TThickQuadratic *tq,
-						 double t,
+bool checkPointInOutline(const TPointD &pointToTest, const TThickQuadratic *tq, double t,
 						 double error)
 {
 	assert(tq);
 	TThickPoint tpnt = tq->getThickPoint(t);
 
-	if (fabs(sq(pointToTest.x - tpnt.x) +
-			 sq(pointToTest.y - tpnt.y) -
-			 sq(tpnt.thick)) < error)
+	if (fabs(sq(pointToTest.x - tpnt.x) + sq(pointToTest.y - tpnt.y) - sq(tpnt.thick)) < error)
 		return true;
 
 	return false;
@@ -152,9 +148,8 @@ TQuadratic *makeOutlineForThickQuadratic(const TThickQuadratic *tq, int upOrDown
 	assert(tq);
 	// if(!outline) return 0;
 
-	TThickPoint
-		p0 = tq->getThickP0(),
-		//p1 = tq->getThickP0(),
+	TThickPoint p0 = tq->getThickP0(),
+				// p1 = tq->getThickP0(),
 		p2 = tq->getThickP2();
 
 	TPointD t0 = tq->getP1() - tq->getP0();
@@ -163,9 +158,7 @@ TQuadratic *makeOutlineForThickQuadratic(const TThickQuadratic *tq, int upOrDown
 	if (t0 == t1)
 		return 0;
 
-	TPointD
-		N0 = tq->getSpeed(0.0),
-		N2 = tq->getSpeed(1.0);
+	TPointD N0 = tq->getSpeed(0.0), N2 = tq->getSpeed(1.0);
 
 	if (!norm2(N0) && !norm2(N2))
 		throw Outline::notValidOutline();
@@ -183,17 +176,13 @@ TQuadratic *makeOutlineForThickQuadratic(const TThickQuadratic *tq, int upOrDown
 	TPointD p0aux = (convert(p0) + p0.thick * N0);
 	TPointD p2aux = (convert(p2) + p2.thick * N2);
 
-	TQuadratic
-		radius(TPointD(tq->getThickP0().thick, 0.0),
-			   TPointD(tq->getThickP1().thick, 0.0),
-			   TPointD(tq->getThickP2().thick, 0.0));
+	TQuadratic radius(TPointD(tq->getThickP0().thick, 0.0), TPointD(tq->getThickP1().thick, 0.0),
+					  TPointD(tq->getThickP2().thick, 0.0));
 
 	TPointD r0 = radius.getSpeed(0.0);
 	TPointD r1 = radius.getSpeed(1.0);
 
-	TPointD
-		v0,
-		v2;
+	TPointD v0, v2;
 
 	double ct0 = curvature_t0(tq);
 
@@ -210,18 +199,18 @@ TQuadratic *makeOutlineForThickQuadratic(const TThickQuadratic *tq, int upOrDown
 		v2 = r1.x * N2;
 
 	/*
-    try {
-      v0 = (1 + p0.thick * curvature_t0( tq )) * t0 + 0.5 * r0.x * N0;
-    }
-    catch( Outline::infinityCurvature& ) {
-    }
-    
-    try {
-      v2 = (1 + p2.thick * curvature_t1( tq )) * t1 + 0.5 * r1.x * N2;
-    }
-    catch( Outline::infinityCurvature& ) {
-    }
-    */
+	try {
+	  v0 = (1 + p0.thick * curvature_t0( tq )) * t0 + 0.5 * r0.x * N0;
+	}
+	catch( Outline::infinityCurvature& ) {
+	}
+
+	try {
+	  v2 = (1 + p2.thick * curvature_t1( tq )) * t1 + 0.5 * r1.x * N2;
+	}
+	catch( Outline::infinityCurvature& ) {
+	}
+	*/
 	//    g_tangEnvelope_1.setP0( outline.getP0() );
 	//    g_tangEnvelope_1.setP1( outline.getP0() + v0 );
 
@@ -236,9 +225,10 @@ TQuadratic *makeOutlineForThickQuadratic(const TThickQuadratic *tq, int upOrDown
 	double xsol;
 	try {
 		xsol = ((p0aux.x - p2aux.x) * v2.y - (p0aux.y - p2aux.y) * v2.x) / det;
-		//tsolveSistem( A, 2, b );
+		// tsolveSistem( A, 2, b );
 	} catch (TMathException &) {
-		return new TQuadratic((upOrDown) ? p0aux : p2aux, (p0aux + p2aux) * 0.5, (upOrDown) ? p2aux : p0aux);
+		return new TQuadratic((upOrDown) ? p0aux : p2aux, (p0aux + p2aux) * 0.5,
+							  (upOrDown) ? p2aux : p0aux);
 	} catch (std::exception &e) {
 		std::string s(e.what());
 		abort();
@@ -246,19 +236,18 @@ TQuadratic *makeOutlineForThickQuadratic(const TThickQuadratic *tq, int upOrDown
 		abort();
 	}
 
-	return new TQuadratic((upOrDown) ? p0aux : p2aux, p0aux + xsol * v0, (upOrDown) ? p2aux : p0aux);
+	return new TQuadratic((upOrDown) ? p0aux : p2aux, p0aux + xsol * v0,
+						  (upOrDown) ? p2aux : p0aux);
 }
 
 //---------------------------------------------------------------------------
 
 /*
-    costruisce l'outline per una singola quadratica senza 
-    inserire le semicirconferenze iniziali e finali
+	costruisce l'outline per una singola quadratica senza
+	inserire le semicirconferenze iniziali e finali
    */
 void makeOutline(/*std::ofstream& cout,*/
-				 outlineBoundary &outl,
-				 const TThickQuadratic &t,
-				 double error)
+				 outlineBoundary &outl, const TThickQuadratic &t, double error)
 {
 	outlineEdge edge;
 	const TThickQuadratic *tq = &t;
@@ -277,14 +266,14 @@ void makeOutline(/*std::ofstream& cout,*/
 	const double parameterTest = 0.5;
 
 	// forza l'uscita per valori troppo piccoli
-	bool isAlmostAPoint =
-		areAlmostEqual(tq->getThickP0(), tq->getThickP1(), 1e-2) &&
-		areAlmostEqual(tq->getThickP1(), tq->getThickP2(), 1e-2) /*&&
+	bool isAlmostAPoint = areAlmostEqual(tq->getThickP0(), tq->getThickP1(), 1e-2) &&
+						  areAlmostEqual(tq->getThickP1(), tq->getThickP2(), 1e-2) /*&&
       areAlmostEqual( tq.getThickP0(), tq.getThickP2(), 1e-2 )*/;
 
 	if (isAlmostAPoint ||
 		q_up && checkPointInOutline(q_up->getPoint(parameterTest), tq, parameterTest, error) &&
-			q_down && checkPointInOutline(q_down->getPoint(parameterTest), tq, parameterTest, error)) {
+			q_down &&
+			checkPointInOutline(q_down->getPoint(parameterTest), tq, parameterTest, error)) {
 		/*	if (edge.first)
 		  cout << "left: "<< *(edge.first);
 	 else
@@ -293,7 +282,7 @@ void makeOutline(/*std::ofstream& cout,*/
 		  cout << "right: "<<*(edge.second);
 	 else
 		  cout << "right: "<< 0;
-		
+
 		cout<<std::endl;*/
 
 		outl.push_back(edge);
@@ -303,9 +292,7 @@ void makeOutline(/*std::ofstream& cout,*/
 		delete edge.second;
 	}
 
-	TThickQuadratic
-		tq_left,
-		tq_rigth;
+	TThickQuadratic tq_left, tq_rigth;
 
 	tq->split(0.5, tq_left, tq_rigth);
 
@@ -315,10 +302,8 @@ void makeOutline(/*std::ofstream& cout,*/
 
 //---------------------------------------------------------------------------
 
-void splitCircularArcIntoQuadraticCurves(const TPointD &Center,
-										 const TPointD &Pstart,
-										 const TPointD &Pend,
-										 std::vector<TQuadratic *> &quadArray)
+void splitCircularArcIntoQuadraticCurves(const TPointD &Center, const TPointD &Pstart,
+										 const TPointD &Pend, std::vector<TQuadratic *> &quadArray)
 {
 	// It splits a circular anticlockwise arc into a sequence of quadratic bezier curves
 	// Every quadratic curve can approximate an arc no TLonger than 45 degrees (or 60).
@@ -363,13 +348,13 @@ void splitCircularArcIntoQuadraticCurves(const TPointD &Center,
 	while ((cross_prod <= 0) || (dot_prod <= cos_ang * sqr_radius)) // the circular arc is TLonger
 																	// than a 'ang' degrees arc
 	{
-		if ((int)quadArray.size() == N_QUAD) // this is possible if Pstart or Pend is not onto the circumference
+		if ((int)quadArray.size() ==
+			N_QUAD) // this is possible if Pstart or Pend is not onto the circumference
 			return;
 		TPointD Rstart_rot_ang(cos_ang * Rstart.x - sin_ang * Rstart.y,
 							   sin_ang * Rstart.x + cos_ang * Rstart.y);
 		TPointD Rstart_rot_90(-Rstart.y, Rstart.x);
-		quad = new TQuadratic(aliasPstart,
-							  aliasPstart + tan_semiang * Rstart_rot_90,
+		quad = new TQuadratic(aliasPstart, aliasPstart + tan_semiang * Rstart_rot_90,
 							  Center + Rstart_rot_ang);
 		quadArray.push_back(quad);
 
@@ -387,14 +372,17 @@ void splitCircularArcIntoQuadraticCurves(const TPointD &Center,
 			return;
 	}
 
-	if ((cross_prod > 0) && (dot_prod > 0)) // the last quadratic curve approximates an arc shorter than a 'ang' degrees arc
+	if ((cross_prod > 0) &&
+		(dot_prod >
+		 0)) // the last quadratic curve approximates an arc shorter than a 'ang' degrees arc
 	{
 		TPointD Rstart_rot_90(-Rstart.y, Rstart.x);
 
 		double deg_index = (sqr_radius - dot_prod) / (sqr_radius + dot_prod);
 
 		quad = new TQuadratic(aliasPstart,
-							  (deg_index < 0) ? 0.5 * (aliasPstart + Pend) : aliasPstart + sqrt(deg_index) * Rstart_rot_90,
+							  (deg_index < 0) ? 0.5 * (aliasPstart + Pend)
+											  : aliasPstart + sqrt(deg_index) * Rstart_rot_90,
 							  Pend);
 		quadArray.push_back(quad);
 
@@ -409,8 +397,7 @@ void splitCircularArcIntoQuadraticCurves(const TPointD &Center,
 // minore di quadratiche viene riempito con quadratiche degeneri
 // con i punti di controllo coincidenti nell'ultimo estremo valido
 void copy(/*std::ofstream& cout,*/
-		  const std::vector<TQuadratic *> &arrayUp,
-		  const std::vector<TQuadratic *> &arrayDown,
+		  const std::vector<TQuadratic *> &arrayUp, const std::vector<TQuadratic *> &arrayDown,
 		  outlineBoundary &ob)
 {
 	int minSize = tmin(arrayUp.size(), arrayDown.size());
@@ -420,25 +407,29 @@ void copy(/*std::ofstream& cout,*/
 	int i;
 
 	for (i = 0; i < minSize; ++i) {
-		//cout<<"left: "<< *(arrayUp[i])<< "right: "<<*(arrayDown[i])<<std::endl;
-		//cout<"left: "<< arrayUp[i].getP0()<<", "arrayUp[i].getP1()<<", "arrayUp[i].getP2()<< "right: "<< << arrayDown[i].getP0()<<", "arrayDown[i].getP1()<<", "arrayDown[i].getP2()<<endl;
+		// cout<<"left: "<< *(arrayUp[i])<< "right: "<<*(arrayDown[i])<<std::endl;
+		// cout<"left: "<< arrayUp[i].getP0()<<", "arrayUp[i].getP1()<<", "arrayUp[i].getP2()<<
+		// "right: "<< << arrayDown[i].getP0()<<", "arrayDown[i].getP1()<<",
+		// "arrayDown[i].getP2()<<endl;
 		ob.push_back(outlineEdge(arrayUp[i], arrayDown[i]));
 	}
 	if (arrayUp.size() != arrayDown.size()) {
-		const std::vector<TQuadratic *> &vMaxSize = arrayUp.size() > arrayDown.size() ? arrayUp : arrayDown;
-		const std::vector<TQuadratic *> &vMinSize = arrayUp.size() < arrayDown.size() ? arrayUp : arrayDown;
+		const std::vector<TQuadratic *> &vMaxSize =
+			arrayUp.size() > arrayDown.size() ? arrayUp : arrayDown;
+		const std::vector<TQuadratic *> &vMinSize =
+			arrayUp.size() < arrayDown.size() ? arrayUp : arrayDown;
 
 		int delta = vMaxSize.size() - vMinSize.size();
 
 		if (arrayUp.size() > arrayDown.size())
 			while (i < minSize + delta) {
-				//cout<<"left: "<< arrayUp[i]<< "right: "<< 0<<std::endl;
+				// cout<<"left: "<< arrayUp[i]<< "right: "<< 0<<std::endl;
 				ob.push_back(outlineEdge(arrayUp[i], (TQuadratic *)0));
 				i++;
 			}
 		else
 			while (i < minSize + delta) {
-				//cout<<"left: "<< 0 << "right: "<< arrayDown[i]<<std::endl;
+				// cout<<"left: "<< 0 << "right: "<< arrayDown[i]<<std::endl;
 				ob.push_back(outlineEdge((TQuadratic *)0, arrayDown[i]));
 				i++;
 			}
@@ -547,10 +538,10 @@ void drawQuadratic(const TQuadratic &quad, double pixelSize)
 
 //-----------------------------------------------------------------------------
 
-void makeOutline(const TStroke *stroke, int startQuad, int endQuad,
-				 outlineBoundary &ob, double error2)
+void makeOutline(const TStroke *stroke, int startQuad, int endQuad, outlineBoundary &ob,
+				 double error2)
 {
-	//std::ofstream cout("c:\\temp\\outline.txt");
+	// std::ofstream cout("c:\\temp\\outline.txt");
 
 	assert(stroke);
 	assert(startQuad >= 0);
@@ -562,15 +553,14 @@ void makeOutline(const TStroke *stroke, int startQuad, int endQuad,
 
 	if (!stroke->getChunkCount())
 		return;
-	//if (startQuad==0)
+	// if (startQuad==0)
 	{
 		const TThickQuadratic *tq = stroke->getChunk(startQuad);
 
 		// trova i punti sul cerchio che corrispondono
 		// a due fette di 90 gradi.
 		// Ritorna una quadratica invece di tre singoli punti solo per compattezza.
-		TQuadratic
-			arc = getCircleQuarter(tq, QUARTER_BEGIN);
+		TQuadratic arc = getCircleQuarter(tq, QUARTER_BEGIN);
 
 		// estrae le quadratiche che corrispondono ad i due archi...
 		splitCircularArcIntoQuadraticCurves(tq->getP0(), arc.getP0(), arc.getP1(), arrayUp);
@@ -582,7 +572,7 @@ void makeOutline(const TStroke *stroke, int startQuad, int endQuad,
 		// copia le curve nell'outline; se gli array non hanno la stessa dimensione
 		//  quello con meno curve viene riempito con curve improprie
 		//  che hanno i punti di controllo coincidente con l'ultimo estremo valido
-		//cout<<"quads del semicerchio left:"<<std::endl;
+		// cout<<"quads del semicerchio left:"<<std::endl;
 		copy(/*cout,  */ arrayUp, arrayDown, ob);
 	}
 
@@ -611,7 +601,7 @@ void makeOutline(const TStroke *stroke, int startQuad, int endQuad,
 				tq = new TThickQuadratic(p0, 0.5 * (p0 + p1), p1);
 		}
 
-		//cout<<"quad# "<<i<<":" <<*tq<<std::endl;
+		// cout<<"quad# "<<i<<":" <<*tq<<std::endl;
 		makeOutline(/*cout, */ ob, *tq, error2);
 		if (tq != stroke->getChunk(i))
 			delete tq;
@@ -628,7 +618,7 @@ void makeOutline(const TStroke *stroke, int startQuad, int endQuad,
 		changeDirection(arrayUp);
 		splitCircularArcIntoQuadraticCurves(tq->getP2(), arc.getP2(), arc.getP1(), arrayDown);
 		changeDirection(arrayDown, true);
-		//cout<<"quads del semicerchio right:"<<std::endl;
+		// cout<<"quads del semicerchio right:"<<std::endl;
 
 		copy(/*cout,*/ arrayUp, arrayDown, ob);
 	}

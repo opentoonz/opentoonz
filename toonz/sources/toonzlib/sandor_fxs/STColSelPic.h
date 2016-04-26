@@ -30,27 +30,22 @@
 #include "CIL.h"
 #include "SError.h"
 
-template <class P>
-class CSTColSelPic : public CSTPic<P>
+template <class P> class CSTColSelPic : public CSTPic<P>
 {
-public:
+  public:
 	std::shared_ptr<UCHAR> m_sel;
 
 	CSTColSelPic() : CSTPic<P>() {}
-	virtual ~CSTColSelPic()
-	{
-	};
+	virtual ~CSTColSelPic(){};
 
-	void nullSel()
-	{
-		m_sel.reset();
-	}
+	void nullSel() { m_sel.reset(); }
 
-	void initSel() //throw(SMemAllocError)
+	void initSel() // throw(SMemAllocError)
 	{
 		nullSel();
 		if (CSTPic<P>::m_lX > 0 && CSTPic<P>::m_lY > 0) {
-			m_sel.reset(new UCHAR[CSTPic<P>::m_lX * CSTPic<P>::m_lY], std::default_delete<UCHAR[]>());
+			m_sel.reset(new UCHAR[CSTPic<P>::m_lX * CSTPic<P>::m_lY],
+						std::default_delete<UCHAR[]>());
 			if (!m_sel)
 				throw SMemAllocError(" in initColorSelection");
 		} else {
@@ -103,8 +98,7 @@ public:
 		return -1;
 	}
 
-	int makeSelectionCMAP32(const COLOR_INDEX_LIST &ink,
-							const COLOR_INDEX_LIST &paint)
+	int makeSelectionCMAP32(const COLOR_INDEX_LIST &ink, const COLOR_INDEX_LIST &paint)
 	{
 		UCHAR *pSel = m_sel.get();
 		P *pic = CSTPic<P>::m_pic;
@@ -144,19 +138,18 @@ public:
 		return nbSel;
 	}
 
-	int makeSelectionCMAP(const COLOR_INDEX_LIST &ink,
-						  const COLOR_INDEX_LIST &paint)
+	int makeSelectionCMAP(const COLOR_INDEX_LIST &ink, const COLOR_INDEX_LIST &paint)
 	{
 		copySel((UCHAR)0);
-		if (CSTPic<P>::m_lX > 0 && CSTPic<P>::m_lY > 0 && m_sel && CSTPic<P>::m_pic && CSTPic<P>::m_ras) {
+		if (CSTPic<P>::m_lX > 0 && CSTPic<P>::m_lY > 0 && m_sel && CSTPic<P>::m_pic &&
+			CSTPic<P>::m_ras) {
 			if (CSTPic<P>::m_ras->type == RAS_CM32)
 				return makeSelectionCMAP32(ink, paint);
 		}
 		return 0;
 	}
 
-	int makeSelectionCMAP(const CCIL &ink,
-						  const CCIL &paint)
+	int makeSelectionCMAP(const CCIL &ink, const CCIL &paint)
 	{
 		copySel((UCHAR)0);
 		COLOR_INDEX_LIST hink, hpaint;
@@ -170,15 +163,15 @@ public:
 		for (i = 0; i < paint.m_nb; i++)
 			hpaint.ci[i] = (USHORT)paint.m_ci[i];
 
-		if (CSTPic<P>::m_lX > 0 && CSTPic<P>::m_lY > 0 && m_sel && CSTPic<P>::m_pic && CSTPic<P>::m_ras) {
+		if (CSTPic<P>::m_lX > 0 && CSTPic<P>::m_lY > 0 && m_sel && CSTPic<P>::m_pic &&
+			CSTPic<P>::m_ras) {
 			if (CSTPic<P>::m_ras->type == RAS_CM32)
 				return makeSelectionCMAP32(hink, hpaint);
 		}
 		return 0;
 	}
 
-	int makeSelectionRGB(const std::vector<I_PIXEL> &col,
-						 const double dA, const double dAB)
+	int makeSelectionRGB(const std::vector<I_PIXEL> &col, const double dA, const double dAB)
 	{
 		int nbCol;
 
@@ -222,7 +215,8 @@ public:
 
 	double distRGB(const I_PIXEL &c1, const I_PIXEL &c2) const
 	{
-		int qd = (c1.r - c2.r) * (c1.r - c2.r) + (c1.g - c2.g) * (c1.g - c2.g) + (c1.b - c2.b) * (c1.b - c2.b);
+		int qd = (c1.r - c2.r) * (c1.r - c2.r) + (c1.g - c2.g) * (c1.g - c2.g) +
+				 (c1.b - c2.b) * (c1.b - c2.b);
 		return sqrt((double)qd);
 	}
 
@@ -295,7 +289,8 @@ public:
 			return false;
 		/*
 //if ( c.m!=0 )
-//	tmsg_info("A=(%d,%d,%d,%d) B=(%d,%d,%d,%d) C=(%d,%d,%d,%d)\n",a.r,a.g,a.b,a.m,b.r,b.g,b.b,b.m,c.r,c.g,c.b,c.m);
+//	tmsg_info("A=(%d,%d,%d,%d) B=(%d,%d,%d,%d)
+C=(%d,%d,%d,%d)\n",a.r,a.g,a.b,a.m,b.r,b.g,b.b,b.m,c.r,c.g,c.b,c.m);
 	if ( c.r<a.r && c.r<b.r )
 		return false;
 	if ( c.r>a.r && c.r>b.r )
@@ -318,8 +313,7 @@ public:
 		return true;
 	}
 
-	bool isLinComb(const I_PIXEL &a, const I_PIXEL &b, const I_PIXEL &c,
-				   const double dAB)
+	bool isLinComb(const I_PIXEL &a, const I_PIXEL &b, const I_PIXEL &c, const double dAB)
 	{
 		//	if ( isSameColor(a,b) && isSameColor(a,c) )
 		//		return true;
@@ -337,8 +331,7 @@ public:
 */
 	}
 
-	int makeSelectionRGB2(const std::vector<I_PIXEL> &col,
-						  const double dA, const double dAB)
+	int makeSelectionRGB2(const std::vector<I_PIXEL> &col, const double dA, const double dAB)
 	{
 		P *pPic;
 		UCHAR *pSel;
@@ -370,8 +363,7 @@ public:
 		return nbPixel;
 	}
 
-	int makeSelectionRGB3(const std::vector<I_PIXEL> &col,
-						  const double dA, const double dAB)
+	int makeSelectionRGB3(const std::vector<I_PIXEL> &col, const double dA, const double dAB)
 	{
 		P *pPic = CSTPic<P>::m_pic;
 		UCHAR *pSel = m_sel;
@@ -407,8 +399,7 @@ public:
 		return nbPixel;
 	}
 
-	int makeSelectionRGBMore(const std::vector<I_PIXEL> &col,
-							 const double dA, const double dAB)
+	int makeSelectionRGBMore(const std::vector<I_PIXEL> &col, const double dA, const double dAB)
 	{
 		int nbPixel = 0, i, j, k;
 		int nbCol = col.size();
@@ -420,8 +411,7 @@ public:
 		return nbPixel;
 	}
 
-	int makeSelectionRGBMore(const std::vector<I_PIXEL> &col,
-							 const double dA, const double dAB,
+	int makeSelectionRGBMore(const std::vector<I_PIXEL> &col, const double dA, const double dAB,
 							 const int i, const int j, const int k)
 	{
 		P *pPic = CSTPic<P>::m_pic;
@@ -489,13 +479,13 @@ public:
 			pPic->g=0;
 			pPic->b=fcolor;
 			pPic->m=fcolor;
-		} 
+		}
 		if (*pSel==(UCHAR)3) {
 			pPic->r=fcolor;
 			pPic->g=0;
 			pPic->b=0;
 			pPic->m=fcolor;
-		} 
+		}
 */
 			/*		if (*pSel==(UCHAR)255) {
 			pPic->r=0;
@@ -638,7 +628,7 @@ void expand(const int border) throw(SMemAllocError)
 		int olY=m_lY;
 		CSTPic<P>::expand(border);
 		UCHAR* nSel=new UCHAR[m_lX*m_lY];
-		if ( !nSel ) 
+		if ( !nSel )
 			throw SMemAllocError("in expand");
 		UCHAR* pNSel=nSel;
 		for( int y=0; y<m_lY; y++ )
@@ -647,7 +637,7 @@ void expand(const int border) throw(SMemAllocError)
 				int oy=y-border;
 				if ( ox>=0 && ox<olX && oy>=0 && oy<olY ) {
 					*pNSel=*(m_sel+oy*olX+ox);
-				} else 
+				} else
 					*pNSel=(UCHAR)0;
 			}
 		delete [] m_sel;

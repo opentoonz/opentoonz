@@ -12,9 +12,11 @@ namespace
 
 class FarmServerProxy : public TFarmServer, public TFarmProxy
 {
-public:
+  public:
 	FarmServerProxy(const QString &hostName, const QString &addr, int port)
-		: TFarmProxy(hostName, addr, port) {}
+		: TFarmProxy(hostName, addr, port)
+	{
+	}
 
 	// TFarmServer interface implementation
 	int addTask(const QString &taskid, const QString &cmdline);
@@ -156,8 +158,8 @@ TFarmServerFactory::~TFarmServerFactory()
 
 //------------------------------------------------------------------------------
 
-int TFarmServerFactory::create(
-	const QString &hostName, const QString &addr, int port, TFarmServer **tfserver)
+int TFarmServerFactory::create(const QString &hostName, const QString &addr, int port,
+							   TFarmServer **tfserver)
 {
 	*tfserver = new FarmServerProxy(hostName, addr, port);
 	return 0;

@@ -28,7 +28,7 @@ class DVAPI TColumnHeader : public TSmartObject
 	bool m_inColumnsSet; //!< (TO BE REMOVED ASAP) Whether the header
 						 //!< belongs to a columns set. Should be
 						 //!< redirected to a negative m_index.
-public:
+  public:
 	TColumnHeader();
 	virtual ~TColumnHeader() {}
 
@@ -47,9 +47,8 @@ public:
 
 	bool inColumnsSet() const { return m_inColumnsSet; }
 
-private:
-	template <class T>
-	friend class TColumnSetT;
+  private:
+	template <class T> friend class TColumnSetT;
 };
 
 //---------------------------------------------------------
@@ -62,20 +61,16 @@ typedef TSmartPointerT<TColumnHeader> TColumnHeaderP;
 
 //=============================================================================
 
-template <class T>
-class TColumnSetT
+template <class T> class TColumnSetT
 {
 	typedef TSmartPointerT<T> ColumnP;
 
 	std::vector<ColumnP> m_columns;
 	int m_defaultWidth;
 
-	static bool compareColumnPos(const int pos, const ColumnP &ch2)
-	{
-		return pos <= ch2->getX1();
-	}
+	static bool compareColumnPos(const int pos, const ColumnP &ch2) { return pos <= ch2->getX1(); }
 
-public:
+  public:
 	TColumnSetT(int defaultWidth = 100) : m_defaultWidth(defaultWidth) {}
 	~TColumnSetT() {}
 
@@ -92,13 +87,14 @@ public:
 		if (index < columnCount)
 			m_columns[index]->getCoords(x0, x1);
 		else {
-			x0 = (columnCount > 0 ? m_columns.back()->getX1() + 1 : 0) + (index - columnCount) * m_defaultWidth;
+			x0 = (columnCount > 0 ? m_columns.back()->getX1() + 1 : 0) +
+				 (index - columnCount) * m_defaultWidth;
 			x1 = x0 + m_defaultWidth - 1;
 		}
 	}
 
 	//---------------------------------------------------------
-	//versione con upper_bound
+	// versione con upper_bound
 
 	int pos2col(int pos) const
 	{
@@ -151,7 +147,7 @@ public:
 
 	const ColumnP &insertColumn(int index, const ColumnP &column)
 	{
-		//assert(column && column->m_index < 0);
+		// assert(column && column->m_index < 0);
 		assert(column && !column->m_inColumnsSet);
 
 		if (index > 0)
@@ -174,7 +170,8 @@ public:
 			return ColumnP();
 
 		ColumnP column = m_columns[index];
-		//column->m_index = -1;                           // We should enforce this. Unfortunately, must be tested extensively.
+		// column->m_index = -1;                           // We should enforce this. Unfortunately,
+		// must be tested extensively.
 		column->m_inColumnsSet = false;
 
 		m_columns.erase(m_columns.begin() + index);
@@ -263,7 +260,7 @@ public:
 		}
 	}
 
-private:
+  private:
 	// Not copyable
 	TColumnSetT(const TColumnSetT &);
 	TColumnSetT &operator=(const TColumnSetT &);

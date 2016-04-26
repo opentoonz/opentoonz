@@ -1,6 +1,6 @@
 
 
-//Qt includes
+// Qt includes
 #include <QCoreApplication>
 #include <QThread>
 #include <QTime>
@@ -12,7 +12,7 @@
 #include <QEventLoop>
 #include <QTimer>
 
-//System-specific includes
+// System-specific includes
 #ifdef _WIN32
 #include <windows.h>
 #elif MACOSX
@@ -112,7 +112,7 @@ bool tipc::Stream::readData(char *data, qint64 dataSize, int msecs)
 			return false;
 		}
 
-		//Read the supplied data
+		// Read the supplied data
 		currData += r = m_socket->read(currData, dataSize - dataRead);
 		dataRead += r;
 	}
@@ -147,7 +147,7 @@ bool tipc::Stream::readDataNB(char *data, qint64 dataSize, int msecs,
 			}
 		}
 
-		//Read the supplied data
+		// Read the supplied data
 		currData += r = m_socket->read(currData, dataSize - dataRead);
 		dataRead += r;
 	}
@@ -186,8 +186,7 @@ bool tipc::Stream::readMessage(Message &msg, int msecs)
   performs event processing in a local event loop until all
   message data has been received.
 */
-bool tipc::Stream::readMessageNB(Message &msg, int msecs,
-								 QEventLoop::ProcessEventsFlag flag)
+bool tipc::Stream::readMessageNB(Message &msg, int msecs, QEventLoop::ProcessEventsFlag flag)
 {
 	TINT32 msgSize = 0;
 	if (!readDataNB((char *)&msgSize, sizeof(TINT32), msecs, flag))
@@ -216,7 +215,8 @@ bool tipc::Stream::flush(int msecs)
 	while (m_socket->bytesToWrite() > 0) {
 		tipc_debug(qDebug() << "bytes to write:" << m_socket->bytesToWrite());
 		bool ok = m_socket->flush();
-		tipc_debug(qDebug() << "flush success:" << ok << "bytes to write:" << m_socket->bytesToWrite());
+		tipc_debug(qDebug() << "flush success:" << ok
+							<< "bytes to write:" << m_socket->bytesToWrite());
 		if (m_socket->bytesToWrite() > 0 && !m_socket->waitForBytesWritten(msecs))
 			return false;
 	}
@@ -309,18 +309,18 @@ bool tipc::startSlaveServer(QString srvName, QString cmdline)
 
 	QString mainSrvName(srvName + "_main");
 
-	//Establish a dummy socket connection to provide a mean for the process
-	//to tell whether the calling process exited unexpectedly.
+	// Establish a dummy socket connection to provide a mean for the process
+	// to tell whether the calling process exited unexpectedly.
 	QLocalSocket *dummySock = new QLocalSocket;
 	dummySock->connectToServer(mainSrvName);
 
-	//Wait up to msecs until the socket is connecting. Wait a small amount of time
-	//until the server is up and listening to connection (there is no other way to tell).
+	// Wait up to msecs until the socket is connecting. Wait a small amount of time
+	// until the server is up and listening to connection (there is no other way to tell).
 	while (dummySock->state() == QLocalSocket::UnconnectedState) {
 #ifdef _WIN32
 		Sleep(10);
 #else
-		usleep(10 << 10); //10.24 msecs
+		usleep(10 << 10); // 10.24 msecs
 #endif
 
 		dummySock->connectToServer(mainSrvName);
@@ -331,23 +331,24 @@ bool tipc::startSlaveServer(QString srvName, QString cmdline)
 	tipc::Stream stream(dummySock);
 	tipc::Message msg;
 
-	//Supply the 'quit if this socket connection fails' command
-	//This command ensure termination of the child process in case of some errors
-	//or ending of the program
+	// Supply the 'quit if this socket connection fails' command
+	// This command ensure termination of the child process in case of some errors
+	// or ending of the program
 	stream << (msg << QString("$quit_on_error"));
 	if (tipc::readMessage(stream, msg, 3000) == QString()) {
 		std::cout << "tipc::startSlaveServer - tipc::readMessage TIMEOUT" << std::endl;
 		return false;
 	}
 
-	//The server should die if dummyDock is destroyed. This should happen when the *MAIN* thread
-	//in *this process* exits. So, if this is not the main thread, we must move the socket there.
+	// The server should die if dummyDock is destroyed. This should happen when the *MAIN* thread
+	// in *this process* exits. So, if this is not the main thread, we must move the socket there.
 	if (QThread::currentThread() != QCoreApplication::instance()->thread())
 		dummySock->moveToThread(QCoreApplication::instance()->thread());
 
-	//If a connection error takes place, release the dummy socket.
-	//Please, observe that this QObject::connect is invoked *AFTER* the connection trials above...
-	QObject::connect(dummySock, SIGNAL(error(QLocalSocket::LocalSocketError)), dummySock, SLOT(deleteLater()));
+	// If a connection error takes place, release the dummy socket.
+	// Please, observe that this QObject::connect is invoked *AFTER* the connection trials above...
+	QObject::connect(dummySock, SIGNAL(error(QLocalSocket::LocalSocketError)), dummySock,
+					 SLOT(deleteLater()));
 
 	return true;
 }
@@ -364,8 +365,8 @@ bool tipc::startSlaveServer(QString srvName, QString cmdline)
   \warning Please, observe that a correct slave server name should be
   ensured to be unique to the parent process.
 */
-bool tipc::startSlaveConnection(QLocalSocket *socket, QString srvName, int msecs,
-								QString cmdline, QString threadName)
+bool tipc::startSlaveConnection(QLocalSocket *socket, QString srvName, int msecs, QString cmdline,
+								QString threadName)
 {
 	QTime time;
 	time.start();
@@ -376,23 +377,23 @@ bool tipc::startSlaveConnection(QLocalSocket *socket, QString srvName, int msecs
 	QString fullSrvName(srvName + threadName);
 	socket->connectToServer(fullSrvName);
 
-	//If the socket is not connecting, the server lookup table returned that the no server with
-	//the passed name exists. This means that a server must be created.
+	// If the socket is not connecting, the server lookup table returned that the no server with
+	// the passed name exists. This means that a server must be created.
 	if (socket->state() == QLocalSocket::UnconnectedState && !cmdline.isEmpty()) {
-		//Completely serialize the server start
+		// Completely serialize the server start
 		static QMutex mutex;
 		QMutexLocker locker(&mutex);
 
-		//Retry connection - this is required due to the mutex
+		// Retry connection - this is required due to the mutex
 		socket->connectToServer(fullSrvName);
 		if (socket->state() != QLocalSocket::UnconnectedState)
 			goto connecting;
 
-		//Invoke the supplied command line to start the server
+		// Invoke the supplied command line to start the server
 		if (!tipc::startSlaveServer(srvName, cmdline))
 			return false;
 
-		//Reconnect to the server
+		// Reconnect to the server
 		socket->connectToServer(fullSrvName);
 		if (socket->state() == QLocalSocket::UnconnectedState)
 			return false;
@@ -400,7 +401,7 @@ bool tipc::startSlaveConnection(QLocalSocket *socket, QString srvName, int msecs
 
 connecting:
 
-	//Now, the server is connecting or already connected. Wait until the socket is connected.
+	// Now, the server is connecting or already connected. Wait until the socket is connected.
 	socket->waitForConnected(msecs - time.elapsed());
 	if (socket->state() != QLocalSocket::ConnectedState)
 		return false;
@@ -472,14 +473,14 @@ int tipc::shm_maxSegmentSize()
 {
 	if (shm_max < 0) {
 #ifdef MACOSX
-		//Retrieve it by invoking sysctl
+		// Retrieve it by invoking sysctl
 		size_t valSize = sizeof(TINT64);
 		TINT64 val;
 		sysctlbyname("kern.sysv.shmmax", &val, &valSize, NULL, 0);
 		shm_max = tmin(val, (TINT64)(std::numeric_limits<int>::max)());
 #else
-		//Windows case: no such limit
-		//Observe that QSharedMemory accepts only an int size - so the num_lim is against int.
+		// Windows case: no such limit
+		// Observe that QSharedMemory accepts only an int size - so the num_lim is against int.
 		shm_max = (std::numeric_limits<int>::max)();
 #endif
 	}
@@ -499,7 +500,7 @@ int tipc::shm_maxSegmentCount()
 		sysctlbyname("kern.sysv.shmseg", &val, &valSize, NULL, 0);
 		shm_seg = tmin(val, (TINT64)(std::numeric_limits<int>::max)());
 #else
-		//Windows case: no such limit - again, using limit against max due to Qt
+		// Windows case: no such limit - again, using limit against max due to Qt
 		shm_seg = (std::numeric_limits<int>::max)();
 #endif
 	}
@@ -553,7 +554,8 @@ int tipc::shm_maxSharedCount()
 */
 void tipc::shm_set(int shmmax, int shmseg, int shmall, int shmmni)
 {
-	tipc_debug(qDebug("shmmax: %i, shmseg: %i, shmall: %i, shmmni: %i", shmmax, shmseg, shmall, shmmni));
+	tipc_debug(
+		qDebug("shmmax: %i, shmseg: %i, shmall: %i, shmmni: %i", shmmax, shmseg, shmall, shmmni));
 #ifdef MACOSX
 	TINT64 val;
 	int err;
@@ -613,13 +615,16 @@ retry:
 
 	ok = shmem.create(size);
 	if (!ok) {
-		tipc_debug(qDebug() << "Error: Shared Segment could not be created: #" << shmem.errorString());
+		tipc_debug(qDebug() << "Error: Shared Segment could not be created: #"
+							<< shmem.errorString());
 
-		//Unix-specific error recovery follows. See Qt's docs about it.
+		// Unix-specific error recovery follows. See Qt's docs about it.
 
-		//Try to recover error #AlreadyExists - supposedly, the server crashed in a previous instance.
-		//As shared memory segments that happen to go this way are owned by the server process with 1
-		//reference count, detaching it now may solve the issue.
+		// Try to recover error #AlreadyExists - supposedly, the server crashed in a previous
+		// instance.
+		// As shared memory segments that happen to go this way are owned by the server process with
+		// 1
+		// reference count, detaching it now may solve the issue.
 		if (shmem.error() == QSharedMemory::AlreadyExists && !retried) {
 			retried = true; // We're trying this only once... for now it works.
 			shmem.attach();
@@ -647,22 +652,23 @@ bool tipc::writeShMemBuffer(Stream &stream, Message &msg, int bufSize, ShMemWrit
 	sem.acquire(1);
 
 	{
-		//Create a shared memory segment, possibly of passed size
+		// Create a shared memory segment, possibly of passed size
 		QSharedMemory shmem(tipc::uniqueId());
 		bool ok = (tipc::create(shmem, bufSize) > 0);
 		if (!ok)
 			goto err;
 
-		//Communicate the shared memory id and bufSize to the reader
+		// Communicate the shared memory id and bufSize to the reader
 		msg << QString("shm") << shmem.key() << bufSize;
 
-		//Fill in data until all the buffer has been sent
+		// Fill in data until all the buffer has been sent
 		int chunkData, remainingData = bufSize;
 		while (remainingData > 0) {
-			//Write to the shared memory segment
+			// Write to the shared memory segment
 			tipc_debug(QTime xchTime; xchTime.start());
 			shmem.lock();
-			remainingData -= chunkData = dataWriter->write((char *)shmem.data(), tmin(shmem.size(), remainingData));
+			remainingData -= chunkData =
+				dataWriter->write((char *)shmem.data(), tmin(shmem.size(), remainingData));
 			shmem.unlock();
 			tipc_debug(qDebug() << "exchange time:" << xchTime.elapsed());
 
@@ -699,19 +705,19 @@ bool tipc::readShMemBuffer(Stream &stream, Message &msg, ShMemReader *dataReader
 	tipc_debug(QTime time; time.start(););
 	tipc_debug(qDebug("tipc::readShMemBuffer entry"));
 
-	//Read the id from stream
+	// Read the id from stream
 	QString res(tipc::readMessage(stream, msg));
 	if (res != "shm") {
 		tipc_debug(qDebug("tipc::readShMemBuffer exit (res != \"shm\")"));
 		return false;
 	}
 
-	//Read message and reply
+	// Read message and reply
 	QString id, chkStr;
 	int bufSize;
 	msg >> id >> bufSize >> chkStr;
 
-	//Data is ready to be read - attach to the shared memory segment.
+	// Data is ready to be read - attach to the shared memory segment.
 	QSharedMemory shmem(id);
 	shmem.attach();
 	if (!shmem.isAttached()) {
@@ -719,7 +725,7 @@ bool tipc::readShMemBuffer(Stream &stream, Message &msg, ShMemReader *dataReader
 		return false;
 	}
 
-	//Start reading from it
+	// Start reading from it
 	int chunkData, remainingData = bufSize;
 	while (true) {
 		msg >> chunkData;
@@ -730,14 +736,14 @@ bool tipc::readShMemBuffer(Stream &stream, Message &msg, ShMemReader *dataReader
 		shmem.unlock();
 		tipc_debug(qDebug() << "exchange time:" << xchTime.elapsed());
 
-		//Data was read. Inform the writer
+		// Data was read. Inform the writer
 		stream << (msg << clr << QString("ok"));
 		stream.flush();
 
 		if (remainingData <= 0)
 			break;
 
-		//Wait for more chunks
+		// Wait for more chunks
 		if (tipc::readMessage(stream, msg) != "chk") {
 			tipc_debug(qDebug("tipc::readShMemBuffer exit (unexpected chunk absence)"));
 			return false;

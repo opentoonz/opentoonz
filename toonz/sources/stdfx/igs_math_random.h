@@ -21,7 +21,7 @@ namespace math
 {
 class random
 {
-public:
+  public:
 	random();
 
 	/* 乱数種 seed(0〜std::numeric_limits<long>::max()) */
@@ -31,7 +31,7 @@ public:
 	/* 乱数生成 0〜std::numeric_limits<long>::max() */
 	long next(void);
 	double next_d(void); /* 0 ... 1 */
-private:
+  private:
 	unsigned long seed_;
 };
 }

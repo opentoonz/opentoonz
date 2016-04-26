@@ -26,8 +26,7 @@
 
 namespace
 {
-void extglDrawText(const TPointD &p,
-				   const std::string &s,
+void extglDrawText(const TPointD &p, const std::string &s,
 				   void *character = GLUT_BITMAP_TIMES_ROMAN_10)
 {
 	glPushMatrix();
@@ -46,9 +45,7 @@ void extglDrawText(const TPointD &p,
 
 //---------------------------------------------------------------------------
 
-void drawSign(const TPointD &p,
-			  const TPointD &v,
-			  double size)
+void drawSign(const TPointD &p, const TPointD &v, double size)
 {
 	if (size == 0.0)
 		return;
@@ -75,13 +72,10 @@ void drawSign(const TPointD &p,
 
 //---------------------------------------------------------------------------
 
-void drawCross(const TPointD &p,
-			   double size)
+void drawCross(const TPointD &p, double size)
 {
-	TPointD
-		v1 = TPointD(1, 1);
-	TPointD
-		v2 = TPointD(1, -1);
+	TPointD v1 = TPointD(1, 1);
+	TPointD v2 = TPointD(1, -1);
 
 	drawSign(p, v1, size);
 	drawSign(p, v2, size);
@@ -97,136 +91,91 @@ bool isValid(const TStroke *s)
 {
 	if (!s)
 		return false;
-	const int
-		cpCount = s->getControlPointCount();
-	int
-		i;
-	for (i = 0;
-		 i < cpCount;
-		 ++i)
+	const int cpCount = s->getControlPointCount();
+	int i;
+	for (i = 0; i < cpCount; ++i)
 		s->getControlPoint(i);
-	const int
-		chunkCount = s->getChunkCount();
-	for (i = 0;
-		 i < chunkCount;
-		 ++i)
+	const int chunkCount = s->getChunkCount();
+	for (i = 0; i < chunkCount; ++i)
 		s->getChunk(i);
 	return true;
 }
 
 //---------------------------------------------------------------------------
 
-void showCP(const TStroke *s,
-			double pixelSize)
+void showCP(const TStroke *s, double pixelSize)
 {
 	if (!s)
 		return;
 
 	// show control points
-	const int
-		countCP = s->getControlPointCount();
-	TThickPoint
-		p1;
+	const int countCP = s->getControlPointCount();
+	TThickPoint p1;
 
-	for (int i = 0;
-		 i < countCP;
-		 ++i) {
+	for (int i = 0; i < countCP; ++i) {
 		p1 = s->getControlPoint(i);
 		if (i & 1)
 			glColor3d(1.0, 0.0, 0.0);
 		else
 			glColor3d(1.0, 1.0, 0.0);
 
-		drawCross(convert(p1),
-				  p1.thick * pixelSize);
-		tglDrawCircle(convert(p1),
-					  p1.thick * pixelSize);
+		drawCross(convert(p1), p1.thick * pixelSize);
+		tglDrawCircle(convert(p1), p1.thick * pixelSize);
 	}
 }
 
 //---------------------------------------------------------------------------
 
-void drawStrokeCenterLine(const TStroke *stroke,
-						  double pixelSize,
-						  const ToonzExt::Interval &vals)
+void drawStrokeCenterLine(const TStroke *stroke, double pixelSize, const ToonzExt::Interval &vals)
 {
-	double
-		from = vals.first,
-		to = vals.second;
+	double from = vals.first, to = vals.second;
 
-	if (!stroke ||
-		pixelSize < 0.0)
+	if (!stroke || pixelSize < 0.0)
 		return;
 
 	from = std::max(std::min(from, 1.0), 0.0);
 	to = std::max(std::min(to, 1.0), 0.0);
 
 	if (from < to) {
-		drawStrokeCenterline(*stroke,
-							 pixelSize,
-							 from,
-							 to);
+		drawStrokeCenterline(*stroke, pixelSize, from, to);
 	} else {
-		drawStrokeCenterline(*stroke,
-							 pixelSize,
-							 from,
-							 1.0);
-		drawStrokeCenterline(*stroke,
-							 pixelSize,
-							 0.0,
-							 to);
+		drawStrokeCenterline(*stroke, pixelSize, from, 1.0);
+		drawStrokeCenterline(*stroke, pixelSize, 0.0, to);
 	}
-	tglDrawDisk(stroke->getPoint(from),
-				5.0 * pixelSize);
-	tglDrawDisk(stroke->getPoint(to),
-				5.0 * pixelSize);
+	tglDrawDisk(stroke->getPoint(from), 5.0 * pixelSize);
+	tglDrawDisk(stroke->getPoint(to), 5.0 * pixelSize);
 
 #ifdef _DEBUG
 	glColor3d(1.0, 0.0, 0.0);
-	tglDrawDisk(stroke->getPoint(0.0),
-				9.0 * pixelSize);
+	tglDrawDisk(stroke->getPoint(0.0), 9.0 * pixelSize);
 #endif
 }
 
 //---------------------------------------------------------------------------
 
-void showCorners(const TStroke *s,
-				 int cornerSize,
-				 double pixelSize)
+void showCorners(const TStroke *s, int cornerSize, double pixelSize)
 {
 	if (!s)
 		return;
 
-	const TPointD
-		offset(20, 20);
+	const TPointD offset(20, 20);
 
 	// show corners
-	std::vector<double>
-		corners;
+	std::vector<double> corners;
 
-	ToonzExt::cornersDetector(s,
-							  cornerSize,
-							  corners);
+	ToonzExt::cornersDetector(s, cornerSize, corners);
 	if (corners.empty())
 		return;
 
-	int
-		i,
-		size = corners.size();
+	int i, size = corners.size();
 
 	glColor3d(0.8, 1.0, 0.3);
 	// find interval with corner like extremes
-	for (i = 0;
-		 i < size;
-		 ++i) {
-		double
-			tmp = corners[i];
-		TPointD
-			pnt = s->getPoint(tmp);
-		double
-			large = 5.0;
-		drawCross(pnt,
-				  large * pixelSize);
+	for (i = 0; i < size; ++i) {
+		double tmp = corners[i];
+		TPointD pnt = s->getPoint(tmp);
+		double large = 5.0;
+		drawCross(pnt, large * pixelSize);
 
 		glColor3d(0.7, 0.7, 0.7);
 		std::ostringstream oss;
@@ -236,25 +185,18 @@ void showCorners(const TStroke *s,
 
 	corners.clear();
 
-	ToonzExt::straightCornersDetector(s,
-									  corners);
+	ToonzExt::straightCornersDetector(s, corners);
 	if (corners.empty())
 		return;
 
 	size = corners.size();
 	glColor3d(0.8, 1.0, 0.3);
 	// find interval with corner like extremes
-	for (i = 0;
-		 i < size;
-		 ++i) {
-		double
-			tmp = corners[i];
-		TPointD
-			pnt = s->getPoint(tmp);
-		double
-			large = 5.0;
-		drawCross(pnt,
-				  large * pixelSize);
+	for (i = 0; i < size; ++i) {
+		double tmp = corners[i];
+		TPointD pnt = s->getPoint(tmp);
+		double large = 5.0;
+		drawCross(pnt, large * pixelSize);
 
 		glColor3d(0.7, 0.2, 0.2);
 		std::ostringstream oss;
@@ -266,9 +208,7 @@ void showCorners(const TStroke *s,
 
 //-----------------------------------------------------------------------------
 
-ToonzExt::OverallDesigner::OverallDesigner(int x,
-										   int y)
-	: x_(x), y_(y)
+ToonzExt::OverallDesigner::OverallDesigner(int x, int y) : x_(x), y_(y)
 {
 	pixelSize_ = sqrt(this->getPixelSize2());
 	scale_ = pixelSize_ != 0.0 ? pixelSize_ : 1.0;
@@ -349,73 +289,57 @@ void ToonzExt::OverallDesigner::draw(ToonzExt::StraightCornerDeformation *sd)
 void ToonzExt::OverallDesigner::draw(ToonzExt::StrokeDeformation *sd)
 {
 	if (sd) {
-		const TStroke *
-			s;
+		const TStroke *s;
 
-		//glColor3d(1.0,0.0,1.0);
+		// glColor3d(1.0,0.0,1.0);
 		s = sd->getCopiedStroke();
 		if (s) {
-			const ContextStatus *
-				status = sd->getStatus();
-			double
-				w = 0.0,
-				pixelSize = 1.0;
+			const ContextStatus *status = sd->getStatus();
+			double w = 0.0, pixelSize = 1.0;
 
 			if (status) {
 				w = status->w_;
 				pixelSize = status->pixelSize_ < 0 ? 1.0 : status->pixelSize_;
 			}
 #ifdef _DEBUG
-			drawCross(s->getPoint(0),
-					  2 * pixelSize);
+			drawCross(s->getPoint(0), 2 * pixelSize);
 
 			tglDrawCircle(s->getPoint(w), 8 * pixelSize);
 			drawCross(s->getPoint(w), 8 * pixelSize);
 #endif
-			ToonzExt::Interval
-				ex = sd->getExtremes();
-			drawStrokeCenterLine(s,
-								 pixelSize_,
-								 ex);
+			ToonzExt::Interval ex = sd->getExtremes();
+			drawStrokeCenterLine(s, pixelSize_, ex);
 			if (status) {
 #ifdef _DEBUG
 				glColor3d(0, 0, 0);
-				showCorners(s,
-							status->cornerSize_,
-							pixelSize);
+				showCorners(s, status->cornerSize_, pixelSize);
 
 				glColor3d(0, 0, 0);
-				TPointD
-					offset = normalize(TPointD(1.0, 1.0)) * 20.0;
+				TPointD offset = normalize(TPointD(1.0, 1.0)) * 20.0;
 				std::ostringstream oss;
-				oss << "(" << this->x_
-					<< "," << this->y_
-					<< ")\n{" << w
-					<< ",{" << sd->getExtremes().first
-					<< "," << sd->getExtremes().second
-					<< "}}";
+				oss << "(" << this->x_ << "," << this->y_ << ")\n{" << w << ",{"
+					<< sd->getExtremes().first << "," << sd->getExtremes().second << "}}";
 				extglDrawText(TPointD(x_, y_) + offset, oss.str());
 
 				glColor3d(0.5, 1.0, 0.5);
-				showCP(s,
-					   pixelSize);
+				showCP(s, pixelSize);
 #endif
 			}
 		}
 
 		/*
-    glColor3d(1.0,1.0,0.0);
-    s = sd->getStroke();
-    if(s)
-    {
-      drawCross( s->getPoint(0),
-                 4);
+	glColor3d(1.0,1.0,0.0);
+	s = sd->getStroke();
+	if(s)
+	{
+	  drawCross( s->getPoint(0),
+				 4);
 
-      drawStrokeCenterLine(s,
-                           pixelSize_,
-                           ToonzExt::Interval(0,1));
-    }
-    */
+	  drawStrokeCenterLine(s,
+						   pixelSize_,
+						   ToonzExt::Interval(0,1));
+	}
+	*/
 
 		s = sd->getTransformedStroke();
 
@@ -424,29 +348,21 @@ void ToonzExt::OverallDesigner::draw(ToonzExt::StrokeDeformation *sd)
 #ifdef _DEBUG
 			isValid(s);
 #endif
-			drawStrokeCenterline(*s,
-								 pixelSize_);
+			drawStrokeCenterline(*s, pixelSize_);
 		}
 
 #ifdef _DEBUG
 		{
-			const TStroke
-				*c = sd->getCopiedStroke(),
-				*s = sd->getStroke();
+			const TStroke *c = sd->getCopiedStroke(), *s = sd->getStroke();
 			if (c && s) {
-				//glColor3d(1,1,0);
-				//tglDrawDisk(s->getPoint(0.0),
+				// glColor3d(1,1,0);
+				// tglDrawDisk(s->getPoint(0.0),
 				//            5*pixelSize_);
 
-				int count = std::min(c->getControlPointCount(),
-									 s->getControlPointCount());
-				for (int i = 0;
-					 i < count;
-					 ++i) {
-					TThickPoint
-						ccp = c->getControlPoint(i);
-					TThickPoint
-						scp = s->getControlPoint(i);
+				int count = std::min(c->getControlPointCount(), s->getControlPointCount());
+				for (int i = 0; i < count; ++i) {
+					TThickPoint ccp = c->getControlPoint(i);
+					TThickPoint scp = s->getControlPoint(i);
 				}
 			}
 		}
@@ -458,15 +374,10 @@ void ToonzExt::OverallDesigner::draw(ToonzExt::StrokeDeformation *sd)
 
 void ToonzExt::OverallDesigner::setPosition()
 {
-	TPointD
-		offset(1, -1);
+	TPointD offset(1, -1);
 	offset = normalize(offset) * (20.0 * scale_);
-	glTranslated(x_ + offset.x,
-				 y_ + offset.y,
-				 0.0);
-	glScalef(scale_,
-			 scale_,
-			 scale_);
+	glTranslated(x_ + offset.x, y_ + offset.y, 0.0);
+	glScalef(scale_, scale_, scale_);
 }
 
 //-----------------------------------------------------------------------------
@@ -476,19 +387,15 @@ void ToonzExt::OverallDesigner::draw(ToonzExt::Selector *selector)
 	if (!selector)
 		return;
 
-	const TStroke *
-		ref = selector->getStroke();
+	const TStroke *ref = selector->getStroke();
 
 	if (!ref)
 		return;
 
-	double
-		length_at_w = ref->getLength(selector->getW()),
-		emi_selector_length = selector->getLength() * 0.5,
-		stroke_length = ref->getLength();
+	double length_at_w = ref->getLength(selector->getW()),
+		   emi_selector_length = selector->getLength() * 0.5, stroke_length = ref->getLength();
 
-	ToonzExt::Interval
-		interval;
+	ToonzExt::Interval interval;
 
 	if (ref->isSelfLoop()) {
 		interval.first = length_at_w - emi_selector_length;
@@ -503,20 +410,18 @@ void ToonzExt::OverallDesigner::draw(ToonzExt::Selector *selector)
 
 		interval.second = ref->getParameterAtLength(interval.second);
 	} else {
-		interval.first = ref->getParameterAtLength(std::max(0.0, length_at_w - emi_selector_length));
-		interval.second = ref->getParameterAtLength(std::min(stroke_length, length_at_w + emi_selector_length));
+		interval.first =
+			ref->getParameterAtLength(std::max(0.0, length_at_w - emi_selector_length));
+		interval.second =
+			ref->getParameterAtLength(std::min(stroke_length, length_at_w + emi_selector_length));
 	}
 
-	float
-		prev_line_width = 1.0;
+	float prev_line_width = 1.0;
 
-	glGetFloatv(GL_LINE_WIDTH,
-				&prev_line_width);
+	glGetFloatv(GL_LINE_WIDTH, &prev_line_width);
 
 	glLineWidth(2.0);
-	drawStrokeCenterLine(ref,
-						 pixelSize_,
-						 interval);
+	drawStrokeCenterLine(ref, pixelSize_, interval);
 	glLineWidth(prev_line_width);
 }
 

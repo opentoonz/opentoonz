@@ -8,8 +8,7 @@
 //=============================================================================
 // TCamera
 
-TCamera::TCamera()
-	: m_size(12, 9), m_res(768, 576), m_xPrevalence(true)
+TCamera::TCamera() : m_size(12, 9), m_res(768, 576), m_xPrevalence(true)
 {
 }
 
@@ -22,7 +21,8 @@ void TCamera::setSize(const TDimensionD &size, bool preserveDpi, bool preserveAR
 	TPointD currDpi = getDpi();
 	m_size.lx = size.lx;
 	if (preserveAR)
-		m_size.ly = m_size.lx / currAR; //WARNING! if also preserveDpi==true, the AR could lose precision...
+		m_size.ly = m_size.lx /
+					currAR; // WARNING! if also preserveDpi==true, the AR could lose precision...
 	else
 		m_size.ly = size.ly;
 
@@ -83,9 +83,8 @@ bool TCamera::isPixelSquared() const
 
 TAffine TCamera::getStageToCameraRef() const
 {
-	return TAffine(
-		m_res.lx / (Stage::inch * m_size.lx), 0, 0.5 * m_res.lx,
-		0, m_res.ly / (Stage::inch * m_size.ly), 0.5 * m_res.ly);
+	return TAffine(m_res.lx / (Stage::inch * m_size.lx), 0, 0.5 * m_res.lx, 0,
+				   m_res.ly / (Stage::inch * m_size.ly), 0.5 * m_res.ly);
 }
 
 //-------------------------------------------------------------------
@@ -99,9 +98,8 @@ TAffine TCamera::getCameraToStageRef() const
 	cameraSize.ly *= factor;
 	TPointD center(0.5 * cameraSize.lx, 0.5 * cameraSize.ly);
 
-	return TAffine(
-		factor * m_size.lx / (double)m_res.lx, 0, -center.x,
-		0, factor * m_size.ly / (double)m_res.ly, -center.y);
+	return TAffine(factor * m_size.lx / (double)m_res.lx, 0, -center.x, 0,
+				   factor * m_size.ly / (double)m_res.ly, -center.y);
 }
 
 //-------------------------------------------------------------------
@@ -121,10 +119,10 @@ TRectD TCamera::getStageRect() const
 
 void TCamera::setInterestRect(const TRect &rect)
 {
-	//Not using the TRect's common intersection. Unfortunately, in case
-	//the rect's coordinates have lx or ly < 0, the intersection returns
-	//the default (empty) rect. We want to maintain the coordinates instead.
-	//m_interestRect = rect * TRect(m_res);
+	// Not using the TRect's common intersection. Unfortunately, in case
+	// the rect's coordinates have lx or ly < 0, the intersection returns
+	// the default (empty) rect. We want to maintain the coordinates instead.
+	// m_interestRect = rect * TRect(m_res);
 
 	m_interestRect.x0 = tmax(rect.x0, 0);
 	m_interestRect.y0 = tmax(rect.y0, 0);
@@ -136,21 +134,18 @@ void TCamera::setInterestRect(const TRect &rect)
 
 TRectD TCamera::getInterestStageRect() const
 {
-	return getCameraToStageRef() * TRectD(m_interestRect.x0, m_interestRect.y0, m_interestRect.x1 + 1, m_interestRect.y1 + 1);
+	return getCameraToStageRef() * TRectD(m_interestRect.x0, m_interestRect.y0,
+										  m_interestRect.x1 + 1, m_interestRect.y1 + 1);
 }
 
 //-------------------------------------------------------------------
 
 void TCamera::setInterestStageRect(const TRectD &rect)
 {
-	TRectD cameraInterestRectD(
-		getStageToCameraRef() * rect);
+	TRectD cameraInterestRectD(getStageToCameraRef() * rect);
 
-	setInterestRect(TRect(
-		tfloor(cameraInterestRectD.x0),
-		tfloor(cameraInterestRectD.y0),
-		tceil(cameraInterestRectD.x1) - 1,
-		tceil(cameraInterestRectD.y1) - 1));
+	setInterestRect(TRect(tfloor(cameraInterestRectD.x0), tfloor(cameraInterestRectD.y0),
+						  tceil(cameraInterestRectD.x1) - 1, tceil(cameraInterestRectD.y1) - 1));
 }
 
 //-------------------------------------------------------------------
@@ -160,7 +155,8 @@ void TCamera::saveData(TOStream &os) const
 	os.child("cameraSize") << m_size.lx << m_size.ly;
 	os.child("cameraRes") << m_res.lx << m_res.ly;
 	os.child("cameraXPrevalence") << (int)m_xPrevalence;
-	os.child("interestRect") << m_interestRect.x0 << m_interestRect.y0 << m_interestRect.x1 << m_interestRect.y1;
+	os.child("interestRect") << m_interestRect.x0 << m_interestRect.y0 << m_interestRect.x1
+							 << m_interestRect.y1;
 }
 
 //-------------------------------------------------------------------

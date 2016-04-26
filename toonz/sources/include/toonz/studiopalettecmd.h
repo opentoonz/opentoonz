@@ -23,29 +23,23 @@ class TXshSimpleLevel;
 namespace StudioPaletteCmd
 {
 
-DVAPI void loadIntoCurrentPalette(TPaletteHandle *paletteHandle,
-								  const TFilePath &fp);
-DVAPI void loadIntoCurrentPalette(TPaletteHandle *paletteHandle,
-								  TPalette *palette);
+DVAPI void loadIntoCurrentPalette(TPaletteHandle *paletteHandle, const TFilePath &fp);
+DVAPI void loadIntoCurrentPalette(TPaletteHandle *paletteHandle, TPalette *palette);
 
-DVAPI void loadIntoCurrentPalette(TPaletteHandle *paletteHandle, TPalette *palette, TXshLevelHandle *currentLevelHandle, int tolerance);
+DVAPI void loadIntoCurrentPalette(TPaletteHandle *paletteHandle, TPalette *palette,
+								  TXshLevelHandle *currentLevelHandle, int tolerance);
 
-DVAPI void mergeIntoCurrentPalette(TPaletteHandle *paletteHandle,
-								   const TFilePath &fp);
-DVAPI void mergeIntoCurrentPalette(TPaletteHandle *paletteHandle,
-								   TPalette *palette);
+DVAPI void mergeIntoCurrentPalette(TPaletteHandle *paletteHandle, const TFilePath &fp);
+DVAPI void mergeIntoCurrentPalette(TPaletteHandle *paletteHandle, TPalette *palette);
 
 DVAPI void replaceWithCurrentPalette(TPaletteHandle *paletteHandle,
-									 TPaletteHandle *stdPaletteHandle,
-									 const TFilePath &fp);
+									 TPaletteHandle *stdPaletteHandle, const TFilePath &fp);
 
-DVAPI void updateAllLinkedStyles(TPaletteHandle *paletteHandle,
-								 TXsheetHandle *xsheetHandle);
+DVAPI void updateAllLinkedStyles(TPaletteHandle *paletteHandle, TXsheetHandle *xsheetHandle);
 
 DVAPI void deletePalette(const TFilePath &fp);
 DVAPI void movePalette(const TFilePath &dstPath, const TFilePath &srcPath);
-DVAPI TFilePath createPalette(const TFilePath &folderPath,
-							  std::string paletteName,
+DVAPI TFilePath createPalette(const TFilePath &folderPath, std::string paletteName,
 							  const TPalette *palette);
 
 DVAPI TFilePath addFolder(const TFilePath &parentFolderPath);

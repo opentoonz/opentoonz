@@ -37,7 +37,7 @@ class AddFxContextMenu : public QObject
 	// for reproduce the last added fx
 	QAction *m_againCommand;
 
-public:
+  public:
 	AddFxContextMenu();
 	~AddFxContextMenu();
 
@@ -50,30 +50,27 @@ public:
 
 	void setCurrentCursorScenePos(const QPointF &scenePos) { m_currentCursorScenePos = scenePos; }
 
-	enum Commands {
-		Insert = 0x1,
-		Add = 0x2,
-		Replace = 0x4
-	};
+	enum Commands { Insert = 0x1, Add = 0x2, Replace = 0x4 };
 	QAction *getAgainCommand(int command);
 
-private:
+  private:
 	void fillMenus();
 	void loadFxs();
 	void loadFxGroup(TIStream *is);
 	void loadFx(TIStream *is, QMenu *insertFxGroup, QMenu *addFxGroup, QMenu *replaceFxGroup);
-	bool loadPreset(const std::string &name, QMenu *insertFxGroup, QMenu *addFxGroup, QMenu *replaceFxGroup);
+	bool loadPreset(const std::string &name, QMenu *insertFxGroup, QMenu *addFxGroup,
+					QMenu *replaceFxGroup);
 	void loadMacro();
 	void loadFxPluginGroup();
 	void loadFxPlugins(QMenu *insertFxGroup, QMenu *addFxGroup, QMenu *replaceFxGroup);
 
-private slots:
+  private slots:
 	void onInsertFx(QAction *);
 	void onAddFx(QAction *);
 	void onReplaceFx(QAction *);
 	void onFxPresetHandled();
 	void onAgainCommand();
-public slots:
+  public slots:
 	void result(PluginInformation *);
 	void fixup();
 };

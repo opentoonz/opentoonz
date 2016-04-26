@@ -36,16 +36,19 @@ class DVAPI PaletteController : public QObject
 {
 	Q_OBJECT
 
-	TPaletteHandle *m_currentLevelPalette;   //!< (\p owned) Handle to the palette of current level.
-	TPaletteHandle *m_currentCleanupPalette; //!< (\p owned) Handle to the palette of current cleanup settings.
-	TPaletteHandle *m_currentPalette;		 //!< (\p owned) Handle to the palette of currently selected object.
+	TPaletteHandle *m_currentLevelPalette; //!< (\p owned) Handle to the palette of current level.
+	TPaletteHandle
+		*m_currentCleanupPalette; //!< (\p owned) Handle to the palette of current cleanup settings.
+	TPaletteHandle
+		*m_currentPalette; //!< (\p owned) Handle to the palette of currently selected object.
 
-	TPaletteHandle *m_originalCurrentPalette; //!< Pointer to the \a original current palette handle specified on
+	TPaletteHandle *m_originalCurrentPalette; //!< Pointer to the \a original current palette handle
+											  //!specified on
 											  //!  the last setCurrentPalette() invocation.
 	TPixel32 m_colorSample;
 	bool m_colorAutoApplyEnabled;
 
-public:
+  public:
 	PaletteController();
 	~PaletteController();
 
@@ -64,25 +67,29 @@ public:
 	void setColorSample(const TPixel32 &color);
 	TPixel32 getColorSample() const { return m_colorSample; }
 
-	//used for "passive pick" feature in the tool options bar of the rgb picker tool
+	// used for "passive pick" feature in the tool options bar of the rgb picker tool
 	void notifyColorPassivePicked(const QColor &col) { emit colorPassivePicked(col); }
-	//used for "passive pick" feature in the tool options bar of the style picker tool
-	void notifyStylePassivePicked(const int ink, const int paint, const int tone) { emit stylePassivePicked(ink, paint, tone); }
+	// used for "passive pick" feature in the tool options bar of the style picker tool
+	void notifyStylePassivePicked(const int ink, const int paint, const int tone)
+	{
+		emit stylePassivePicked(ink, paint, tone);
+	}
 
-public slots:
+  public slots:
 
 	void editLevelPalette();
 	void editCleanupPalette();
-	//void setColorCheckIndex();// sets the  index to be used to perform the inkCheck and paintcheck;
+	// void setColorCheckIndex();// sets the  index to be used to perform the inkCheck and
+	// paintcheck;
 
-signals:
+  signals:
 
 	void colorAutoApplyEnabled(bool enabled);
 	void colorSampleChanged(const TPixel32 &);
 
-	//used for "passive pick" feature in the tool options bar of the rgb picker tool
+	// used for "passive pick" feature in the tool options bar of the rgb picker tool
 	void colorPassivePicked(const QColor &);
-	//used for "passive pick" feature in the tool options bar of the style picker tool
+	// used for "passive pick" feature in the tool options bar of the style picker tool
 	void stylePassivePicked(const int, const int, const int);
 };
 

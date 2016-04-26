@@ -91,7 +91,7 @@ bool TXshZeraryFxColumn::setCell(int row, const TXshCell &cell)
 	if (cell.isEmpty())
 		return false;
 	TXshCell newCell = cell;
-	//Sto settando delle celle in una colonna nuova, devo settare anche l'effetto.
+	// Sto settando delle celle in una colonna nuova, devo settare anche l'effetto.
 	if (isEmpty() && getZeraryColumnFx()->getZeraryFx() == 0) {
 		newCell = TXshCell(m_zeraryFxLevel, cell.getFrameId());
 		TXshZeraryFxLevel *fxLevel = cell.m_level->getZeraryFxLevel();
@@ -115,14 +115,15 @@ bool TXshZeraryFxColumn::setCells(int row, int rowCount, const TXshCell cells[])
 		else
 			newCells.push_back(cells[i]);
 	}
-	//Sto settando delle celle in una colonna nuova, devo settare anche l'effetto.
+	// Sto settando delle celle in una colonna nuova, devo settare anche l'effetto.
 	if (isEmptyColumn) {
 		i = 0;
 		while (i < rowCount && cells[i].isEmpty())
 			i++;
 		if (i >= rowCount)
 			return false;
-		TXshZeraryFxLevel *fxLevel = dynamic_cast<TXshZeraryFxLevel *>(cells[i].m_level.getPointer());
+		TXshZeraryFxLevel *fxLevel =
+			dynamic_cast<TXshZeraryFxLevel *>(cells[i].m_level.getPointer());
 		TXshZeraryFxColumn *fxColumn = fxLevel->getColumn();
 		m_zeraryColumnFx->setZeraryFx(fxColumn->getZeraryColumnFx()->getZeraryFx());
 	}

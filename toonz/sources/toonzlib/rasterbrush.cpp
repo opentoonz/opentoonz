@@ -12,19 +12,18 @@ namespace
 
 //=====================================================================================
 // forward declaration
-void lightPixel(const TRasterCM32P &ras, const TPoint &pix, double distance, int styleId, bool checkAntialiasedPixel);
+void lightPixel(const TRasterCM32P &ras, const TPoint &pix, double distance, int styleId,
+				bool checkAntialiasedPixel);
 
 class ConeSubVolume
 {
 
 	const static double m_values[21];
 
-public:
-	ConeSubVolume()
-	{
-	}
+  public:
+	ConeSubVolume() {}
 
-	//calcola il sottovolume di un cono di raggio e volume unitario in base
+	// calcola il sottovolume di un cono di raggio e volume unitario in base
 	static double compute(double cover)
 	{
 		double x = (10 * tcrop(cover, -1.0, 1.0)) + 10;
@@ -33,29 +32,27 @@ public:
 		if (i == 20)
 			return m_values[i];
 		else
-			//Interpolazione lineare.
+			// Interpolazione lineare.
 			return (-(x - (i + 1)) * m_values[i]) - (-(x - i) * m_values[i + 1]);
 	}
 };
 
 const double ConeSubVolume::m_values[] = {
 
-	1.0, 0.99778, 0.987779, 0.967282, 0.934874,
-	0.889929, 0.832457, 0.763067, 0.683002, 0.594266,
-	0.5, 0.405734, 0.316998, 0.236933, 0.167543,
-	0.110071, 0.0651259, 0.0327182, 0.0122208, 0.00221986,
-	0.0};
+	1.0,	  0.99778,  0.987779,  0.967282,  0.934874,  0.889929,   0.832457,
+	0.763067, 0.683002, 0.594266,  0.5,		  0.405734,  0.316998,   0.236933,
+	0.167543, 0.110071, 0.0651259, 0.0327182, 0.0122208, 0.00221986, 0.0};
 
 //========================================================================================================
 
-//Permette di disegnare un disco pieno
+// Permette di disegnare un disco pieno
 class Disk
 {
 	TPointD m_centre;
 	double m_radius;
 	bool m_doAntialias;
 
-	//Traccia una linea tra due punti per riempire il disco
+	// Traccia una linea tra due punti per riempire il disco
 	void fill(const TRasterCM32P &ras, const TPoint &p1, const TPoint &p2, int styleId) const
 	{
 		if (p1.y == p2.y) {
@@ -85,16 +82,18 @@ class Disk
 		}
 	}
 
-	//Calcola la distanza di un pixel dal centro "reale"
+	// Calcola la distanza di un pixel dal centro "reale"
 	inline double distancePointToCentre(const TPoint &point) const
 	{
-		double d = sqrt((point.x - m_centre.x) * (point.x - m_centre.x) + (point.y - m_centre.y) * (point.y - m_centre.y));
+		double d = sqrt((point.x - m_centre.x) * (point.x - m_centre.x) +
+						(point.y - m_centre.y) * (point.y - m_centre.y));
 		return d;
 	}
 
-	//Calcola la distanza tra un punto della cironferenza ideale ed il pixel che la approssima
-	//Inoltre calcola la distanza dei pixel vicini per gestire l'antialias
-	void computeDistances(double distances[3], const TPoint &point, const TPoint &centre, bool upperPoint) const
+	// Calcola la distanza tra un punto della cironferenza ideale ed il pixel che la approssima
+	// Inoltre calcola la distanza dei pixel vicini per gestire l'antialias
+	void computeDistances(double distances[3], const TPoint &point, const TPoint &centre,
+						  bool upperPoint) const
 	{
 		TPoint p = point - centre;
 		if (upperPoint) {
@@ -116,76 +115,100 @@ class Disk
 		}
 	}
 
-	//Illumina otto pixel simmetrici per ottenere la circonferenza del disco.
-	//Per ogni pixel illumina anche i vicini per gestire l'antialias.
-	void makeAntiAliasedDiskBorder(const TRasterCM32P &ras,
-								   const TPoint &centre,
-								   const TPoint &point,
-								   double distancesAntialias[3],
-								   int styleId,
+	// Illumina otto pixel simmetrici per ottenere la circonferenza del disco.
+	// Per ogni pixel illumina anche i vicini per gestire l'antialias.
+	void makeAntiAliasedDiskBorder(const TRasterCM32P &ras, const TPoint &centre,
+								   const TPoint &point, double distancesAntialias[3], int styleId,
 								   int maxPointToFill) const
 	{
 		computeDistances(distancesAntialias, point + centre, centre, true);
 		lightPixel(ras, point + centre, distancesAntialias[0], styleId, false);
-		lightPixel(ras, TPoint(point.x, point.y + 1) + centre, distancesAntialias[1], styleId, false);
-		lightPixel(ras, TPoint(point.x, point.y - 1) + centre, distancesAntialias[2], styleId, false);
+		lightPixel(ras, TPoint(point.x, point.y + 1) + centre, distancesAntialias[1], styleId,
+				   false);
+		lightPixel(ras, TPoint(point.x, point.y - 1) + centre, distancesAntialias[2], styleId,
+				   false);
 
 		computeDistances(distancesAntialias, TPoint(point.y, point.x) + centre, centre, false);
 		lightPixel(ras, TPoint(point.y, point.x) + centre, distancesAntialias[0], styleId, false);
-		lightPixel(ras, TPoint(point.y + 1, point.x) + centre, distancesAntialias[1], styleId, false);
-		lightPixel(ras, TPoint(point.y - 1, point.x) + centre, distancesAntialias[2], styleId, false);
+		lightPixel(ras, TPoint(point.y + 1, point.x) + centre, distancesAntialias[1], styleId,
+				   false);
+		lightPixel(ras, TPoint(point.y - 1, point.x) + centre, distancesAntialias[2], styleId,
+				   false);
 
 		computeDistances(distancesAntialias, TPoint(-point.x, -point.y) + centre, centre, true);
 		lightPixel(ras, TPoint(-point.x, -point.y) + centre, distancesAntialias[0], styleId, false);
-		lightPixel(ras, TPoint(-point.x, -point.y - 1) + centre, distancesAntialias[2], styleId, false);
-		lightPixel(ras, TPoint(-point.x, -point.y + 1) + centre, distancesAntialias[1], styleId, false);
+		lightPixel(ras, TPoint(-point.x, -point.y - 1) + centre, distancesAntialias[2], styleId,
+				   false);
+		lightPixel(ras, TPoint(-point.x, -point.y + 1) + centre, distancesAntialias[1], styleId,
+				   false);
 
-		computeDistances(distancesAntialias, TPoint(-point.y + centre.x, point.x + centre.y), centre, false);
+		computeDistances(distancesAntialias, TPoint(-point.y + centre.x, point.x + centre.y),
+						 centre, false);
 		lightPixel(ras, TPoint(-point.y, point.x) + centre, distancesAntialias[0], styleId, false);
-		lightPixel(ras, TPoint(-point.y - 1, point.x) + centre, distancesAntialias[2], styleId, false);
-		lightPixel(ras, TPoint(-point.y + 1, point.x) + centre, distancesAntialias[1], styleId, false);
+		lightPixel(ras, TPoint(-point.y - 1, point.x) + centre, distancesAntialias[2], styleId,
+				   false);
+		lightPixel(ras, TPoint(-point.y + 1, point.x) + centre, distancesAntialias[1], styleId,
+				   false);
 
 		if ((point.x + centre.x) != (centre.x)) {
 			computeDistances(distancesAntialias, TPoint(point.y, -point.x) + centre, centre, false);
-			lightPixel(ras, TPoint(point.y, -point.x) + centre, distancesAntialias[0], styleId, false);
-			lightPixel(ras, TPoint(point.y + 1, -point.x) + centre, distancesAntialias[1], styleId, false);
-			lightPixel(ras, TPoint(point.y - 1, -point.x) + centre, distancesAntialias[2], styleId, false);
+			lightPixel(ras, TPoint(point.y, -point.x) + centre, distancesAntialias[0], styleId,
+					   false);
+			lightPixel(ras, TPoint(point.y + 1, -point.x) + centre, distancesAntialias[1], styleId,
+					   false);
+			lightPixel(ras, TPoint(point.y - 1, -point.x) + centre, distancesAntialias[2], styleId,
+					   false);
 
 			computeDistances(distancesAntialias, TPoint(point.x, -point.y) + centre, centre, true);
-			lightPixel(ras, TPoint(point.x, -point.y) + centre, distancesAntialias[0], styleId, false);
-			lightPixel(ras, TPoint(point.x, -point.y - 1) + centre, distancesAntialias[2], styleId, false);
-			lightPixel(ras, TPoint(point.x, -point.y + 1) + centre, distancesAntialias[1], styleId, false);
+			lightPixel(ras, TPoint(point.x, -point.y) + centre, distancesAntialias[0], styleId,
+					   false);
+			lightPixel(ras, TPoint(point.x, -point.y - 1) + centre, distancesAntialias[2], styleId,
+					   false);
+			lightPixel(ras, TPoint(point.x, -point.y + 1) + centre, distancesAntialias[1], styleId,
+					   false);
 
-			computeDistances(distancesAntialias, TPoint(-point.y, -point.x) + centre, centre, false);
-			lightPixel(ras, TPoint(-point.y, -point.x) + centre, distancesAntialias[0], styleId, false);
-			lightPixel(ras, TPoint(-point.y - 1, -point.x) + centre, distancesAntialias[2], styleId, false);
-			lightPixel(ras, TPoint(-point.y + 1, -point.x) + centre, distancesAntialias[1], styleId, false);
+			computeDistances(distancesAntialias, TPoint(-point.y, -point.x) + centre, centre,
+							 false);
+			lightPixel(ras, TPoint(-point.y, -point.x) + centre, distancesAntialias[0], styleId,
+					   false);
+			lightPixel(ras, TPoint(-point.y - 1, -point.x) + centre, distancesAntialias[2], styleId,
+					   false);
+			lightPixel(ras, TPoint(-point.y + 1, -point.x) + centre, distancesAntialias[1], styleId,
+					   false);
 
 			computeDistances(distancesAntialias, TPoint(-point.x, point.y) + centre, centre, true);
-			lightPixel(ras, TPoint(-point.x, point.y) + centre, distancesAntialias[0], styleId, false);
-			lightPixel(ras, TPoint(-point.x, point.y + 1) + centre, distancesAntialias[1], styleId, false);
-			lightPixel(ras, TPoint(-point.x, point.y - 1) + centre, distancesAntialias[2], styleId, false);
+			lightPixel(ras, TPoint(-point.x, point.y) + centre, distancesAntialias[0], styleId,
+					   false);
+			lightPixel(ras, TPoint(-point.x, point.y + 1) + centre, distancesAntialias[1], styleId,
+					   false);
+			lightPixel(ras, TPoint(-point.x, point.y - 1) + centre, distancesAntialias[2], styleId,
+					   false);
 		}
 		if (maxPointToFill <= point.y - 2) {
-			fill(ras, TPoint(point.x, maxPointToFill) + centre, TPoint(point.x, point.y - 2) + centre, styleId);
-			fill(ras, TPoint(maxPointToFill, point.x) + centre, TPoint(point.y - 2, point.x) + centre, styleId);
-			fill(ras, TPoint(point.x, -maxPointToFill) + centre, TPoint(point.x, -point.y + 2) + centre, styleId);
-			fill(ras, TPoint(-maxPointToFill, -point.x) + centre, TPoint(-point.y + 2, -point.x) + centre, styleId);
+			fill(ras, TPoint(point.x, maxPointToFill) + centre,
+				 TPoint(point.x, point.y - 2) + centre, styleId);
+			fill(ras, TPoint(maxPointToFill, point.x) + centre,
+				 TPoint(point.y - 2, point.x) + centre, styleId);
+			fill(ras, TPoint(point.x, -maxPointToFill) + centre,
+				 TPoint(point.x, -point.y + 2) + centre, styleId);
+			fill(ras, TPoint(-maxPointToFill, -point.x) + centre,
+				 TPoint(-point.y + 2, -point.x) + centre, styleId);
 
 			if (point.x != 0) {
-				fill(ras, TPoint(maxPointToFill, -point.x) + centre, TPoint(point.y - 2, -point.x) + centre, styleId);
-				fill(ras, TPoint(-point.x, -maxPointToFill) + centre, TPoint(-point.x, -point.y + 2) + centre, styleId);
-				fill(ras, TPoint(-maxPointToFill, point.x) + centre, TPoint(-point.y + 2, point.x) + centre, styleId);
-				fill(ras, TPoint(-point.x, maxPointToFill) + centre, TPoint(-point.x, point.y - 2) + centre, styleId);
+				fill(ras, TPoint(maxPointToFill, -point.x) + centre,
+					 TPoint(point.y - 2, -point.x) + centre, styleId);
+				fill(ras, TPoint(-point.x, -maxPointToFill) + centre,
+					 TPoint(-point.x, -point.y + 2) + centre, styleId);
+				fill(ras, TPoint(-maxPointToFill, point.x) + centre,
+					 TPoint(-point.y + 2, point.x) + centre, styleId);
+				fill(ras, TPoint(-point.x, maxPointToFill) + centre,
+					 TPoint(-point.x, point.y - 2) + centre, styleId);
 			}
 		}
 	}
 
-	void makeNoAntiAliasedDiskBorder(const TRasterCM32P &ras,
-									 const TPoint &centre,
-									 const TPoint &point,
-									 int styleId,
-									 int maxPointToFill) const
+	void makeNoAntiAliasedDiskBorder(const TRasterCM32P &ras, const TPoint &centre,
+									 const TPoint &point, int styleId, int maxPointToFill) const
 	{
 		if (((int)(m_radius * 2)) % 2 == 0) {
 			lightPixel(ras, TPoint(point.x - 1, point.y) + centre, -1, styleId, false);
@@ -214,40 +237,49 @@ class Disk
 		}
 		if (maxPointToFill <= point.y - 1) {
 			if (((int)(m_radius * 2)) % 2 == 0) {
-				fill(ras, TPoint(point.x - 1, 0) + centre, TPoint(point.x - 1, point.y) + centre, styleId);
-				fill(ras, TPoint(0, -point.x + 1) + centre, TPoint(point.y - 1, -point.x + 1) + centre, styleId);
-				fill(ras, TPoint(-point.x, 0) + centre, TPoint(-point.x, -point.y + 1) + centre, styleId);
+				fill(ras, TPoint(point.x - 1, 0) + centre, TPoint(point.x - 1, point.y) + centre,
+					 styleId);
+				fill(ras, TPoint(0, -point.x + 1) + centre,
+					 TPoint(point.y - 1, -point.x + 1) + centre, styleId);
+				fill(ras, TPoint(-point.x, 0) + centre, TPoint(-point.x, -point.y + 1) + centre,
+					 styleId);
 				fill(ras, TPoint(0, point.x) + centre, TPoint(-point.y, point.x) + centre, styleId);
 				if (point.x != 0) {
-					fill(ras, TPoint(0, point.x) + centre, TPoint(point.y - 1, point.x) + centre, styleId);
-					fill(ras, TPoint(point.x - 1, 0) + centre, TPoint(point.x - 1, -point.y + 1) + centre, styleId);
-					fill(ras, TPoint(0, -point.x + 1) + centre, TPoint(-point.y, -point.x + 1) + centre, styleId);
-					fill(ras, TPoint(-point.x, 0) + centre, TPoint(-point.x, point.y) + centre, styleId);
+					fill(ras, TPoint(0, point.x) + centre, TPoint(point.y - 1, point.x) + centre,
+						 styleId);
+					fill(ras, TPoint(point.x - 1, 0) + centre,
+						 TPoint(point.x - 1, -point.y + 1) + centre, styleId);
+					fill(ras, TPoint(0, -point.x + 1) + centre,
+						 TPoint(-point.y, -point.x + 1) + centre, styleId);
+					fill(ras, TPoint(-point.x, 0) + centre, TPoint(-point.x, point.y) + centre,
+						 styleId);
 				}
 			} else {
 				fill(ras, TPoint(point.x, 0) + centre, TPoint(point.x, point.y) + centre, styleId);
-				fill(ras, TPoint(0, -point.x) + centre, TPoint(point.y, -point.x) + centre, styleId);
-				fill(ras, TPoint(-point.x, 0) + centre, TPoint(-point.x, -point.y) + centre, styleId);
+				fill(ras, TPoint(0, -point.x) + centre, TPoint(point.y, -point.x) + centre,
+					 styleId);
+				fill(ras, TPoint(-point.x, 0) + centre, TPoint(-point.x, -point.y) + centre,
+					 styleId);
 				fill(ras, TPoint(0, point.x) + centre, TPoint(-point.y, point.x) + centre, styleId);
 
 				if (point.x != 0) {
-					fill(ras, TPoint(0, point.x) + centre, TPoint(point.y, point.x) + centre, styleId);
-					fill(ras, TPoint(point.x, -0) + centre, TPoint(point.x, -point.y) + centre, styleId);
-					fill(ras, TPoint(0, -point.x) + centre, TPoint(-point.y, -point.x) + centre, styleId);
-					fill(ras, TPoint(-point.x, 0) + centre, TPoint(-point.x, point.y) + centre, styleId);
+					fill(ras, TPoint(0, point.x) + centre, TPoint(point.y, point.x) + centre,
+						 styleId);
+					fill(ras, TPoint(point.x, -0) + centre, TPoint(point.x, -point.y) + centre,
+						 styleId);
+					fill(ras, TPoint(0, -point.x) + centre, TPoint(-point.y, -point.x) + centre,
+						 styleId);
+					fill(ras, TPoint(-point.x, 0) + centre, TPoint(-point.x, point.y) + centre,
+						 styleId);
 				}
 			}
 		}
 	}
 
-public:
-	Disk()
-		: m_centre(0.0, 0.0), m_radius(1.0), m_doAntialias(true)
-	{
-	}
+  public:
+	Disk() : m_centre(0.0, 0.0), m_radius(1.0), m_doAntialias(true) {}
 
-	Disk(const TThickPoint &p, bool doAntialias)
-		: m_doAntialias(doAntialias)
+	Disk(const TThickPoint &p, bool doAntialias) : m_doAntialias(doAntialias)
 	{
 		if (m_doAntialias) {
 			m_centre = TPointD(p.x, p.y);
@@ -258,7 +290,7 @@ public:
 		}
 	}
 
-	//Disegna un disco
+	// Disegna un disco
 	void draw(const TRasterCM32P &ras, int styleId) const
 	{
 		double distances[3];
@@ -306,20 +338,11 @@ public:
 		}
 	}
 
-	TPointD getCentre() const
-	{
-		return m_centre;
-	}
+	TPointD getCentre() const { return m_centre; }
 
-	double getRadius() const
-	{
-		return m_radius;
-	}
+	double getRadius() const { return m_radius; }
 
-	void setCentre(const TPointD &centre)
-	{
-		m_centre = centre;
-	}
+	void setCentre(const TPointD &centre) { m_centre = centre; }
 
 	void setCentre(double x, double y)
 	{
@@ -327,15 +350,13 @@ public:
 		m_centre.y = y;
 	}
 
-	void setRadius(double radius)
-	{
-		m_radius = radius;
-	}
+	void setRadius(double radius) { m_radius = radius; }
 };
 
 //===============================================================================================================
 
-//Calcola la distanza di una curva al parametro "t" dalla retta che unisce i punti nei parametri "tPrevious" e "tNext"
+// Calcola la distanza di una curva al parametro "t" dalla retta che unisce i punti nei parametri
+// "tPrevious" e "tNext"
 double findChordalDeviation(const TQuadratic &quadratic, double t, double tPrevious, double tNext)
 {
 	TPointD pPrevious = quadratic.getPoint(tPrevious);
@@ -347,9 +368,10 @@ double findChordalDeviation(const TQuadratic &quadratic, double t, double tPrevi
 	return norm(P - (PQ / QQ) * Q);
 }
 
-//Accende un pixel calcolandone l'intensita'
+// Accende un pixel calcolandone l'intensita'
 /*-- 筆先のアンチエイリアス部分の描画 --*/
-void lightPixel(const TRasterCM32P &ras, const TPoint &pix, double distance, int styleId, bool checkAntialiasedPixel)
+void lightPixel(const TRasterCM32P &ras, const TPoint &pix, double distance, int styleId,
+				bool checkAntialiasedPixel)
 {
 	TPixelCM32 pixel = ras->pixels(pix.y)[pix.x];
 	double volumeParziale = ConeSubVolume::compute(distance);
@@ -360,7 +382,8 @@ void lightPixel(const TRasterCM32P &ras, const TPoint &pix, double distance, int
 	ras->pixels(pix.y)[pix.x] = TPixelCM32(styleId, pixel.getPaint(), newTone);
 }
 
-bool isDiskNecessaryNecessary(const TQuadratic &quadratic, double tCurrent, double lastT, double nextT, bool &idLastDiskDrown)
+bool isDiskNecessaryNecessary(const TQuadratic &quadratic, double tCurrent, double lastT,
+							  double nextT, bool &idLastDiskDrown)
 {
 	TPoint currentPoint = convert(quadratic.getPoint(tCurrent));
 	TPoint lastPoint = convert(quadratic.getPoint(lastT));
@@ -378,7 +401,7 @@ bool isDiskNecessaryNecessary(const TQuadratic &quadratic, double tCurrent, doub
 	return true;
 }
 
-//Disegna una porzione di del tratto (un piccolo arco)
+// Disegna una porzione di del tratto (un piccolo arco)
 void makeLittleArch(const TRasterCM32P &ras, const Disk &disk1, const Disk &disk2,
 					const Disk &disk3, int styleId, bool doAntialias)
 {
@@ -400,7 +423,8 @@ void makeLittleArch(const TRasterCM32P &ras, const Disk &disk1, const Disk &disk
 		Disk disk(TThickPoint(center, radius * 2), doAntialias);
 		bool drawDisk = true;
 		if (!doAntialias)
-			drawDisk = isDiskNecessaryNecessary(quadratic, t, t - step, t + step > 1 ? 1 : t + step, idLastDiskDrown);
+			drawDisk = isDiskNecessaryNecessary(quadratic, t, t - step, t + step > 1 ? 1 : t + step,
+												idLastDiskDrown);
 		if (t != 1 && drawDisk) {
 			disk.draw(ras, styleId);
 			idLastDiskDrown = true;
@@ -409,9 +433,9 @@ void makeLittleArch(const TRasterCM32P &ras, const Disk &disk1, const Disk &disk
 	disk3.draw(ras, styleId);
 }
 
-//Disegna un piccolo segmento, invece di un archetto.
-void makeLittleSegment(const TRasterCM32P &ras, const Disk &disk1, const Disk &disk2,
-					   int styleId, bool doAntialias)
+// Disegna un piccolo segmento, invece di un archetto.
+void makeLittleSegment(const TRasterCM32P &ras, const Disk &disk1, const Disk &disk2, int styleId,
+					   bool doAntialias)
 {
 	TPointD center1 = disk1.getCentre();
 	TPointD center2 = disk2.getCentre();
@@ -427,8 +451,9 @@ void makeLittleSegment(const TRasterCM32P &ras, const Disk &disk1, const Disk &d
 
 //=============================================================================
 
-//Preso un vettore di punti, disegna una pennelata che li approssima in un raster trasparente
-void rasterBrush(const TRasterCM32P &rasBuffer, const vector<TThickPoint> &points, int styleId, bool doAntialias)
+// Preso un vettore di punti, disegna una pennelata che li approssima in un raster trasparente
+void rasterBrush(const TRasterCM32P &rasBuffer, const vector<TThickPoint> &points, int styleId,
+				 bool doAntialias)
 {
 	int i, n = points.size();
 	if (n == 0)
@@ -438,22 +463,19 @@ void rasterBrush(const TRasterCM32P &rasBuffer, const vector<TThickPoint> &point
 		disk.draw(rasBuffer, styleId);
 		return;
 	} else if (n == 2) {
-		makeLittleSegment(rasBuffer, Disk(points[0], doAntialias), Disk(points[1], doAntialias), styleId, doAntialias);
+		makeLittleSegment(rasBuffer, Disk(points[0], doAntialias), Disk(points[1], doAntialias),
+						  styleId, doAntialias);
 		return;
 	} else if (n == 4) {
-		makeLittleArch(rasBuffer,
-					   Disk(points[0], doAntialias),
-					   Disk(points[1], doAntialias),
-					   Disk(points[2], doAntialias),
-					   styleId, doAntialias);
-		makeLittleSegment(rasBuffer, Disk(points[2], doAntialias), Disk(points[3], doAntialias), styleId, doAntialias);
+		makeLittleArch(rasBuffer, Disk(points[0], doAntialias), Disk(points[1], doAntialias),
+					   Disk(points[2], doAntialias), styleId, doAntialias);
+		makeLittleSegment(rasBuffer, Disk(points[2], doAntialias), Disk(points[3], doAntialias),
+						  styleId, doAntialias);
 		return;
 	} else {
 		for (i = 0; i + 2 < n; i += 2)
-			makeLittleArch(rasBuffer,
-						   Disk(points[i], doAntialias),
-						   Disk(points[i + 1], doAntialias),
-						   Disk(points[i + 2], doAntialias),
+			makeLittleArch(rasBuffer, Disk(points[i], doAntialias),
+						   Disk(points[i + 1], doAntialias), Disk(points[i + 2], doAntialias),
 						   styleId, doAntialias);
 	}
 }

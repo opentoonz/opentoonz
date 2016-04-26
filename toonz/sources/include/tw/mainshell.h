@@ -29,19 +29,16 @@ class Usage;
 
 class DVAPI TMainshell : public TWidget
 {
-protected:
+  protected:
 	static TMainshell *theShell;
 	virtual void create();
 
-public:
+  public:
 #ifndef WIN32
 	bool m_ending;
 #endif
 
-	static TMainshell *getMainshell()
-	{
-		return theShell;
-	}
+	static TMainshell *getMainshell() { return theShell; }
 	static TMainshell *instance() { return theShell; }
 
 	TMainshell(string name);
@@ -52,29 +49,26 @@ public:
 	virtual bool beforeShow() { return true; }
 	virtual void close();
 	virtual void closeWithoutQuestion();
-	//void pushStatusMessage(string );
-	//virtual void pushStatusMessage(std::wstring ) {}
-	//virtual void popStatusMessage() {};
+	// void pushStatusMessage(string );
+	// virtual void pushStatusMessage(std::wstring ) {}
+	// virtual void popStatusMessage() {};
 
-	//static void errorMessage(const string &str);
-	//static bool questionMessage(const string &str);
+	// static void errorMessage(const string &str);
+	// static bool questionMessage(const string &str);
 	// static int multipleChoicesMessage(const string &str, vector<string> &choices);
 
 	// brutto (ma veloce da implementare :-)
 	// restituisce 0=yes, 1=no, 2=cancel
-	//static int yesNoCancelMessage(const string &str);
+	// static int yesNoCancelMessage(const string &str);
 
-	virtual TDimension getPreferredSize()
-	{
-		return TDimension(800, 600);
-	}
+	virtual TDimension getPreferredSize() { return TDimension(800, 600); }
 
 	virtual bool isResizable() const { return true; }
 
 	virtual int getMainIconId() { return 0; }			// ha senso solo su NT
 	virtual int getSplashScreenBitmapId() { return 0; } // ha senso solo su NT
 
-	//void setAccelerator(
+	// void setAccelerator(
 	//    string acc,
 	//    TGenericCommandAction *onKeyDown);
 
@@ -95,7 +89,7 @@ class DVAPI TKeyListener
 {
 	string m_keyName;
 
-public:
+  public:
 	TKeyListener(string keyName);
 	virtual ~TKeyListener();
 
@@ -108,21 +102,19 @@ public:
 
 //-------------------------------------------------------------------
 
-template <class T>
-class TCommandKey : public TKeyListener
+template <class T> class TCommandKey : public TKeyListener
 {
 	typedef void (T::*Method)();
 	T *m_target;
 	Method m_method;
 
-public:
+  public:
 	TCommandKey(string keyName, T *target, Method method)
-		: TKeyListener(keyName), m_target(target), m_method(method) {}
-
-	void onKeyDown()
+		: TKeyListener(keyName), m_target(target), m_method(method)
 	{
-		(m_target->*m_method)();
 	}
+
+	void onKeyDown() { (m_target->*m_method)(); }
 	void onKeyUp(bool mouseEventReceived) {}
 };
 

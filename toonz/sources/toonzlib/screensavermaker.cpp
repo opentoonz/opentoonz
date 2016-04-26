@@ -16,10 +16,7 @@
 #include <QUrl>
 #include <QDesktopServices>
 
-void makeScreenSaver(
-	TFilePath scrFn,
-	TFilePath swfFn,
-	std::string screenSaverName)
+void makeScreenSaver(TFilePath scrFn, TFilePath swfFn, std::string screenSaverName)
 {
 	struct _stat results;
 	if (_wstat(swfFn.getWideString().c_str(), &results) != 0)
@@ -35,36 +32,29 @@ void makeScreenSaver(
 
 	TFilePath svscrn = TSystem::getBinDir() + "screensaver.dat";
 	if (!TFileStatus(svscrn).doesExist()) {
-		throw TException(
-			std::wstring(L"Screensaver template not found: ") +
-			svscrn.getWideString());
+		throw TException(std::wstring(L"Screensaver template not found: ") +
+						 svscrn.getWideString());
 	}
 	TSystem::copyFile(scrFn, svscrn);
-	HANDLE hUpdateRes =
-		BeginUpdateResourceW(scrFn.getWideString().c_str(), FALSE);
+	HANDLE hUpdateRes = BeginUpdateResourceW(scrFn.getWideString().c_str(), FALSE);
 	if (hUpdateRes == NULL)
 		throw TException(L"can't write " + scrFn.getWideString());
 
-	BOOL result = UpdateResource(
-		hUpdateRes,
-		"FLASHFILE",
-		MAKEINTRESOURCE(101),
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL),
-		swf.get(),
-		swfSize);
+	BOOL result = UpdateResource(hUpdateRes, "FLASHFILE", MAKEINTRESOURCE(101),
+								 MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL), swf.get(), swfSize);
 	if (result == FALSE)
 		throw TException(L"can't add resource to " + scrFn.getWideString());
 	/*
   result = UpdateResource(
-     hUpdateRes,      
-     RT_STRING,  
-     MAKEINTRESOURCE(1),                  
-     MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL),  
-     (void*)screenSaverName.c_str(),                   
-     screenSaverName.size());
+	 hUpdateRes,
+	 RT_STRING,
+	 MAKEINTRESOURCE(1),
+	 MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL),
+	 (void*)screenSaverName.c_str(),
+	 screenSaverName.size());
 
-  if (result == FALSE) 
-    throw TException(L"can't add name to "+scrFn.getWideString());
+  if (result == FALSE)
+	throw TException(L"can't add name to "+scrFn.getWideString());
  */
 
 	if (!EndUpdateResource(hUpdateRes, FALSE))
@@ -82,18 +72,14 @@ void previewScreenSaver(TFilePath scr)
 void installScreenSaver(TFilePath scr)
 {
 	std::wstring cmd = L"desk.cpl,InstallScreenSaver " + scr.getWideString();
-	int ret = (int)
-		ShellExecuteW(0, L"open", L"rundll32.exe", cmd.c_str(), 0, SW_SHOWNORMAL);
+	int ret = (int)ShellExecuteW(0, L"open", L"rundll32.exe", cmd.c_str(), 0, SW_SHOWNORMAL);
 	if (ret <= 32)
 		throw;
 }
 
 #else
 
-void makeScreenSaver(
-	TFilePath scrFn,
-	TFilePath swfFn,
-	std::string screenSaverName)
+void makeScreenSaver(TFilePath scrFn, TFilePath swfFn, std::string screenSaverName)
 {
 }
 /*

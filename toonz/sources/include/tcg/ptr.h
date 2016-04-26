@@ -11,14 +11,13 @@ namespace tcg
 
 /*!
   \brief    The ptr_wrapper class implements the basic functions necessary
-            to wrap a generic pointer object. The use case for this class
-            is to allow pointer inheritance.
+			to wrap a generic pointer object. The use case for this class
+			is to allow pointer inheritance.
 */
 
-template <typename T>
-class ptr
+template <typename T> class ptr
 {
-public:
+  public:
 	typedef T *ptr_type;
 
 	typedef typename std::iterator_traits<ptr_type>::iterator_category iterator_category;
@@ -27,7 +26,7 @@ public:
 	typedef typename std::iterator_traits<ptr_type>::pointer pointer;
 	typedef typename std::iterator_traits<ptr_type>::reference reference;
 
-public:
+  public:
 	explicit ptr(ptr_type p = ptr_type()) : m_ptr(p) {}
 
 	operator bool() const { return m_ptr; } // There should be no need to use
@@ -74,14 +73,16 @@ public:
 	reference operator*() const { return *m_ptr; }
 	reference operator[](difference_type d) const { return m_ptr[d]; }
 
-protected:
+  protected:
 	ptr_type m_ptr;
 };
 
 //=======================================================
 
-template <typename T>
-ptr<T> make_ptr(T *p) { return ptr<T>(p); }
+template <typename T> ptr<T> make_ptr(T *p)
+{
+	return ptr<T>(p);
+}
 
 } // namespace tcg
 

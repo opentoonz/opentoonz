@@ -42,17 +42,14 @@ class DVAPI StrokeGenerator
 
 	//! Visualizza i frammenti
 	/*!
-  	\param first Indice del primo punto di m_points da visualizzare
-    \param last  Indice dell'ulimo punto di m_points da visualizzare
+	\param first Indice del primo punto di m_points da visualizzare
+	\param last  Indice dell'ulimo punto di m_points da visualizzare
 	*/
 	void drawFragments(int first, int last);
 
-public:
+  public:
 	//! Costruttore
-	StrokeGenerator()
-		: m_paintedPointCount(0)
-	{
-	}
+	StrokeGenerator() : m_paintedPointCount(0) {}
 
 	//! Distruttore
 	~StrokeGenerator() {}
@@ -74,8 +71,9 @@ public:
 
 	//! Filtra i punti di m_points
 	/*!
-	  Verifica se i primi sei e gli ultimi sei punti successivi hanno una variazione di thickness elevata.
-    In caso affermativo li cancella.
+	  Verifica se i primi sei e gli ultimi sei punti successivi hanno una variazione di thickness
+	elevata.
+	In caso affermativo li cancella.
 	*/
 	void filterPoints();
 
@@ -91,11 +89,12 @@ public:
 	//! Restituisce il rettangolo che contiene l'ultima regione modificata
 	TRectD getLastModifiedRegion();
 
-	//if onlyLastPoints is not 0, create the stroke only on last 'onlyLastPoints' points
+	// if onlyLastPoints is not 0, create the stroke only on last 'onlyLastPoints' points
 	//! Genera uno stroke usando TStroke::interpolate
 	/*!
 	  Se onlyLastPoints e' uguale a 0 genera lo stroke sulla base di m_points.
-    Se onlyLastPoints e' diverso da zero genera lo stroke sulla base degli ultimi onlyLastPoint elementi di m_points
+	Se onlyLastPoints e' diverso da zero genera lo stroke sulla base degli ultimi onlyLastPoint
+	elementi di m_points
 
 		\param error          Errore che viene passato a TStroke::interpolate
 		\param onlyLastPoints Numero elementi sulla base dei quali creare la stroke

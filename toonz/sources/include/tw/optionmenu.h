@@ -27,41 +27,39 @@ class TPopupMenu;
 
 class DVAPI TGenericOptionMenuAction
 {
-public:
+  public:
 	virtual ~TGenericOptionMenuAction() {}
 	virtual void sendCommand(string item) = 0;
 };
 
 class DVAPI TGenericOptionMenuWAction
 {
-public:
+  public:
 	virtual ~TGenericOptionMenuWAction() {}
 	virtual void sendCommand(wstring item) = 0;
 };
 
 //-------------------------------------------------------------------
 
-template <class T>
-class TOptionMenuAction : public TGenericOptionMenuAction
+template <class T> class TOptionMenuAction : public TGenericOptionMenuAction
 {
-public:
+  public:
 	typedef void (T::*Method)(string item);
 	TOptionMenuAction(T *target, Method method) : m_target(target), m_method(method) {}
 	void sendCommand(string item) { (m_target->*m_method)(item); }
-private:
+  private:
 	T *m_target;
 	Method m_method;
 };
 
 //-------------------------------------------------------------------
-template <class T>
-class TOptionMenuActionW : public TGenericOptionMenuWAction
+template <class T> class TOptionMenuActionW : public TGenericOptionMenuWAction
 {
-public:
+  public:
 	typedef void (T::*Method)(wstring item);
 	TOptionMenuActionW(T *target, Method method) : m_target(target), m_method(method) {}
 	void sendCommand(wstring item) { (m_target->*m_method)(item); }
-private:
+  private:
 	T *m_target;
 	Method m_method;
 };
@@ -71,14 +69,11 @@ private:
 class DVAPI TOptionMenu : public TWidget
 {
 
-public:
+  public:
 	TOptionMenu(TWidget *parent, string name = "optionMenu");
 	~TOptionMenu();
 
-	void setAction(TGenericOptionMenuAction *action)
-	{
-		m_action = action;
-	}
+	void setAction(TGenericOptionMenuAction *action) { m_action = action; }
 
 	void repaint();
 
@@ -100,7 +95,7 @@ public:
 	void deleteOption(string s);
 	void deleteAllOptions();
 
-private:
+  private:
 	TPopupMenu *m_menu;
 	string m_currentOption;
 	wstring m_currentOptionTitle;
@@ -115,14 +110,13 @@ private:
 
 //-------------------------------------------------------------------
 
-template <class T>
-class TOptionMenuWAction : public TGenericOptionMenuWAction
+template <class T> class TOptionMenuWAction : public TGenericOptionMenuWAction
 {
-public:
+  public:
 	typedef void (T::*Method)(wstring item);
 	TOptionMenuWAction(T *target, Method method) : m_target(target), m_method(method) {}
 	void sendCommand(wstring item) { (m_target->*m_method)(item); }
-private:
+  private:
 	T *m_target;
 	Method m_method;
 };
@@ -132,14 +126,11 @@ private:
 class DVAPI TOptionMenuW : public TWidget
 {
 
-public:
+  public:
 	TOptionMenuW(TWidget *parent, string name = "optionMenu");
 	~TOptionMenuW();
 
-	void setAction(TGenericOptionMenuWAction *action)
-	{
-		m_action = action;
-	}
+	void setAction(TGenericOptionMenuWAction *action) { m_action = action; }
 
 	void repaint();
 
@@ -160,7 +151,7 @@ public:
 
 	typedef std::vector<wstring> OptionList;
 	const OptionList getOptions() const { return m_options; };
-private:
+  private:
 	TPopupMenu *m_menu;
 	wstring m_currentOption;
 	wstring m_label;
@@ -190,8 +181,8 @@ class TComboBoxAction : public TComboBoxActionInterface {
   Method m_method;
 public:
   TComboBoxAction(T*target, Method method) : m_target(target), m_method(method) {}
-  void triggerAction(TComboBox*vf, string text) 
-    {(m_target->*m_method)(vf, text); }
+  void triggerAction(TComboBox*vf, string text)
+	{(m_target->*m_method)(vf, text); }
 };
 
 //-------------------------------------------------------------------
@@ -206,16 +197,14 @@ inline void tconnect(TComboBox&src, T *target, void (T::*method)(TComboBox *vf, 
 
 //-------------------------------------------------------------------
 
-template <class T>
-void tconnect(TOptionMenu &menu, T *target, void (T::*method)(string))
+template <class T> void tconnect(TOptionMenu &menu, T *target, void (T::*method)(string))
 {
 	menu.setAction(new TOptionMenuAction<T>(target, method));
 }
 
 //-------------------------------------------------------------------
 
-template <class T>
-void tconnect(TOptionMenuW &menu, T *target, void (T::*method)(wstring))
+template <class T> void tconnect(TOptionMenuW &menu, T *target, void (T::*method)(wstring))
 {
 	menu.setAction(new TOptionMenuActionW<T>(target, method));
 }

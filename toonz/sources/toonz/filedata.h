@@ -12,17 +12,14 @@
 
 class FileData : public DvMimeData
 {
-public:
+  public:
 	std::vector<TFilePath> m_files;
 
 	FileData();
 	FileData(const FileData *src);
 	~FileData();
 
-	FileData *clone() const
-	{
-		return new FileData(this);
-	}
+	FileData *clone() const { return new FileData(this); }
 
 	// data <- files.
 	void setFiles(std::vector<TFilePath> &files);
@@ -37,4 +34,4 @@ public:
 	}
 };
 
-#endif //FILEDATA_H
+#endif // FILEDATA_H

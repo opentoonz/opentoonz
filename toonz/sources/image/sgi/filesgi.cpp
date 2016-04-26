@@ -115,8 +115,7 @@ static int img_badrow(IMAGERGB *image, int y, int z);
 static TUINT32 img_seek(IMAGERGB *image, UINT y, UINT z, UINT offs);
 static TINT32 RGB_img_write(IMAGERGB *image, char *buffer, TINT32 count);
 static void img_setrowsize(IMAGERGB *image, UINT cnt, UINT y, UINT z);
-static TINT32 img_rle_compact(USHORT *expbuf, int ibpp, USHORT *rlebuf,
-							  int obpp, int cnt);
+static TINT32 img_rle_compact(USHORT *expbuf, int ibpp, USHORT *rlebuf, int obpp, int cnt);
 static int iflush(IMAGERGB *image);
 
 /*-------------------------------------------------------------------------*/
@@ -151,7 +150,7 @@ static int do_rgb_write_header(IMAGERGB *img, int fd)
 	count += write(fd, &img->rleend, (int)sizeof(TUINT32));
 	count += write(fd, &img->rowstart, (int)sizeof(TUINT32 *));
 	count += write(fd, &img->rowsize, (int)sizeof(TINT32 *));
-	if (sizeof(void *) == 8) //siamo a 64bit: l'header side ha dei padding bytes.
+	if (sizeof(void *) == 8) // siamo a 64bit: l'header side ha dei padding bytes.
 		count = (count + 0x7) & (~0x7);
 	return count;
 }
@@ -188,22 +187,18 @@ static int do_rgb_read_header(IMAGERGB *img, int fd)
 	count += read(fd, &img->rleend, sizeof(TUINT32));
 	count += read(fd, &img->rowstart, sizeof(TUINT32 *));
 	count += read(fd, &img->rowsize, sizeof(TINT32 *));
-	if (sizeof(void *) == 8) //siamo a 64bit: l'header side ha dei padding bytes.
+	if (sizeof(void *) == 8) // siamo a 64bit: l'header side ha dei padding bytes.
 		count = (count + 0x7) & (~0x7);
 	return count;
 }
 
 /*-------------------------------------------------------------------------*/
-enum OpenMode {
-	OpenRead,
-	OpenWrite
-};
+enum OpenMode { OpenRead, OpenWrite };
 
 /*-------------------------------------------------------------------------*/
 
-static IMAGERGB *iopen(int fd, OpenMode openMode,
-					   unsigned int type, unsigned int dim, unsigned int xsize,
-					   unsigned int ysize, unsigned int zsize, short dorev)
+static IMAGERGB *iopen(int fd, OpenMode openMode, unsigned int type, unsigned int dim,
+					   unsigned int xsize, unsigned int ysize, unsigned int zsize, short dorev)
 {
 	IMAGERGB *image;
 	extern int errno;
@@ -214,7 +209,7 @@ static IMAGERGB *iopen(int fd, OpenMode openMode,
 	memset(image, 0, sizeof(IMAGERGB));
 
 	if (openMode == OpenWrite) {
-		//WRITE
+		// WRITE
 
 		image->imagic = IMAGIC;
 		image->type = type;
@@ -247,7 +242,7 @@ static IMAGERGB *iopen(int fd, OpenMode openMode,
 		}
 		image->flags = _IOWRT;
 	} else {
-		//READ
+		// READ
 		if (do_rgb_read_header(image, f) != IMAGERGB_HEADER_SIZE) {
 			cout << "iopen: error on read of image header" << endl;
 			return NULL;
@@ -279,14 +274,14 @@ static IMAGERGB *iopen(int fd, OpenMode openMode,
 		image->rleend = 512L + 2 * tablesize;
 
 		if (openMode == OpenWrite) {
-			//WRITE
+			// WRITE
 			int max = image->ysize * image->zsize;
 			for (int i = 0; i < max; i++) {
 				image->rowstart[i] = 0;
 				image->rowsize[i] = -1;
 			}
 		} else {
-			//READ
+			// READ
 			tablesize = image->ysize * image->zsize * (int)sizeof(TINT32);
 			lseek(f, 512L, 0);
 			if (read(f, image->rowstart, tablesize) != tablesize) {
@@ -312,7 +307,7 @@ static IMAGERGB *iopen(int fd, OpenMode openMode,
 			if (image->dorev)
 				cvtTINT32s((TUINT32 *)image->rowsize, tablesize);
 		}
-	} //END ISRLE
+	} // END ISRLE
 
 	image->cnt = 0;
 	image->ptr = 0;
@@ -358,7 +353,7 @@ static void cvtshorts(unsigned short buffer[], TINT32 n)
 
 /*-----------------------------------------------------------------------------*/
 /*
- *  INVERTE I LONG DEL BUFFER 
+ *  INVERTE I LONG DEL BUFFER
    */
 /*-----------------------------------------------------------------------------*/
 
@@ -367,17 +362,14 @@ static void cvtTINT32s(TUINT32 buffer[], TINT32 n)
 	TINT32 nTINT32s = n >> 2;
 	for (int i = 0; i < nTINT32s; i++) {
 		TUINT32 lwrd = buffer[i];
-		buffer[i] = ((lwrd >> 24) |
-					 (lwrd >> 8 & 0xff00) |
-					 (lwrd << 8 & 0xff0000) |
-					 (lwrd << 24));
+		buffer[i] = ((lwrd >> 24) | (lwrd >> 8 & 0xff00) | (lwrd << 8 & 0xff0000) | (lwrd << 24));
 	}
 	return;
 }
 
 /*-----------------------------------------------------------------------------*/
 /*
- *  INVERTE I LONG E GLI SHORT DEL BUFFER 
+ *  INVERTE I LONG E GLI SHORT DEL BUFFER
 */
 /*-----------------------------------------------------------------------------*/
 
@@ -392,29 +384,28 @@ static void cvtimage(IMAGERGB *image)
 
 /*-----------------------------------------------------------------------------*/
 
-#define EXPAND_CODE(TYPE)                \
-	while (1) {                          \
-		pixel = *iptr++;                 \
-		if (!(count = (pixel & 0x7f)))   \
-			return;                      \
-		if (pixel & 0x80) {              \
-			while (count--)              \
-				*optr++ = (TYPE)*iptr++; \
-		} else {                         \
-			pixel = *iptr++;             \
-			while (count--)              \
-				*optr++ = (TYPE)pixel;   \
-		}                                \
+#define EXPAND_CODE(TYPE)                                                                          \
+	while (1) {                                                                                    \
+		pixel = *iptr++;                                                                           \
+		if (!(count = (pixel & 0x7f)))                                                             \
+			return;                                                                                \
+		if (pixel & 0x80) {                                                                        \
+			while (count--)                                                                        \
+				*optr++ = (TYPE)*iptr++;                                                           \
+		} else {                                                                                   \
+			pixel = *iptr++;                                                                       \
+			while (count--)                                                                        \
+				*optr++ = (TYPE)pixel;                                                             \
+		}                                                                                          \
 	}
 
 /*-----------------------------------------------------------------------------*/
 /*
- *  ESPANDE UNA IMMAGINE FORMATO RGB-RLE  
+ *  ESPANDE UNA IMMAGINE FORMATO RGB-RLE
 */
 /*-----------------------------------------------------------------------------*/
 
-static void img_rle_expand(unsigned short *rlebuf, int ibpp,
-						   unsigned short *expbuf, int obpp)
+static void img_rle_expand(unsigned short *rlebuf, int ibpp, unsigned short *expbuf, int obpp)
 {
 	if (ibpp == 1 && obpp == 1) {
 		unsigned char *iptr = (unsigned char *)rlebuf;
@@ -480,7 +471,7 @@ static TUINT32 img_optseek(IMAGERGB *image, TUINT32 offset)
 
 /*-----------------------------------------------------------------------------*/
 /*
- *  LEGGE DAL FILE RGB E RIEMPE IL BUFFER 
+ *  LEGGE DAL FILE RGB E RIEMPE IL BUFFER
 */
 /*-----------------------------------------------------------------------------*/
 
@@ -517,8 +508,7 @@ static int img_badrow(IMAGERGB *image, int y, int z)
  */
 /*-----------------------------------------------------------------------------*/
 
-static TUINT32 img_seek(IMAGERGB *image,
-						unsigned int y, unsigned int z, unsigned int offs)
+static TUINT32 img_seek(IMAGERGB *image, unsigned int y, unsigned int z, unsigned int offs)
 {
 	if (img_badrow(image, y, z)) {
 		cout << "imglib: row number out of range" << endl;
@@ -534,8 +524,9 @@ static TUINT32 img_seek(IMAGERGB *image,
 		case 2:
 			return img_optseek(image, 512L + offs + (y * image->xsize) * BPP(image->type));
 		case 3:
-			return img_optseek(image,
-							   512L + offs + (y * image->xsize + z * image->xsize * image->ysize) * BPP(image->type));
+			return img_optseek(image, 512L + offs +
+										  (y * image->xsize + z * image->xsize * image->ysize) *
+											  BPP(image->type));
 		default:
 			cout << "img_seek: wierd dim" << endl;
 			break;
@@ -675,39 +666,39 @@ static void img_setrowsize(IMAGERGB *image, UINT cnt, UINT y, UINT z)
 
 /*-----------------------------------------------------------------------------*/
 
-#define COMPACT_CODE(TYPE)                                                            \
-	while (iptr < ibufend) {                                                          \
-		sptr = iptr;                                                                  \
-		iptr += 2;                                                                    \
-		while ((iptr < ibufend) && ((iptr[-2] != iptr[-1]) || (iptr[-1] != iptr[0]))) \
-			iptr++;                                                                   \
-		iptr -= 2;                                                                    \
-		count = iptr - sptr;                                                          \
-		while (count) {                                                               \
-			todo = (TYPE)(count > 126 ? 126 : count);                                 \
-			count -= todo;                                                            \
-			*optr++ = (TYPE)(0x80 | todo);                                            \
-			while (todo--)                                                            \
-				*optr++ = (TYPE)*sptr++;                                              \
-		}                                                                             \
-		sptr = iptr;                                                                  \
-		cc = *iptr++;                                                                 \
-		while ((iptr < ibufend) && (*iptr == cc))                                     \
-			iptr++;                                                                   \
-		count = iptr - sptr;                                                          \
-		while (count) {                                                               \
-			todo = (TYPE)(count > 126 ? 126 : count);                                 \
-			count -= todo;                                                            \
-			*optr++ = (TYPE)todo;                                                     \
-			*optr++ = (TYPE)cc;                                                       \
-		}                                                                             \
-	}                                                                                 \
+#define COMPACT_CODE(TYPE)                                                                         \
+	while (iptr < ibufend) {                                                                       \
+		sptr = iptr;                                                                               \
+		iptr += 2;                                                                                 \
+		while ((iptr < ibufend) && ((iptr[-2] != iptr[-1]) || (iptr[-1] != iptr[0])))              \
+			iptr++;                                                                                \
+		iptr -= 2;                                                                                 \
+		count = iptr - sptr;                                                                       \
+		while (count) {                                                                            \
+			todo = (TYPE)(count > 126 ? 126 : count);                                              \
+			count -= todo;                                                                         \
+			*optr++ = (TYPE)(0x80 | todo);                                                         \
+			while (todo--)                                                                         \
+				*optr++ = (TYPE)*sptr++;                                                           \
+		}                                                                                          \
+		sptr = iptr;                                                                               \
+		cc = *iptr++;                                                                              \
+		while ((iptr < ibufend) && (*iptr == cc))                                                  \
+			iptr++;                                                                                \
+		count = iptr - sptr;                                                                       \
+		while (count) {                                                                            \
+			todo = (TYPE)(count > 126 ? 126 : count);                                              \
+			count -= todo;                                                                         \
+			*optr++ = (TYPE)todo;                                                                  \
+			*optr++ = (TYPE)cc;                                                                    \
+		}                                                                                          \
+	}                                                                                              \
 	*optr++ = 0;
 
 /*-----------------------------------------------------------------------------*/
 
-static TINT32 img_rle_compact(unsigned short *expbuf, int ibpp, unsigned short *rlebuf,
-							  int obpp, int cnt)
+static TINT32 img_rle_compact(unsigned short *expbuf, int ibpp, unsigned short *rlebuf, int obpp,
+							  int cnt)
 {
 	if (ibpp == 1 && obpp == 1) {
 		unsigned char *iptr = (unsigned char *)expbuf;
@@ -895,7 +886,7 @@ class SgiReader : public Tiio::Reader
 	IMAGERGB *m_header;
 	int m_currentY;
 
-public:
+  public:
 	SgiReader() : m_header(0), m_currentY(0) {}
 
 	~SgiReader();
@@ -967,15 +958,16 @@ SgiReader::~SgiReader()
 
 void SgiReader::readLine(short *buffer, int x0, int x1, int shrink)
 {
-	//assert(shrink == 1);
-	//assert(x0 == 0);
-	//assert(x1 == m_info.m_lx-1);
+	// assert(shrink == 1);
+	// assert(x0 == 0);
+	// assert(x1 == m_info.m_lx-1);
 
 	assert(BPP(m_header->type) == 2);
 
 	{ // 64 -> 32
 		TPixel64 *pix = (TPixel64 *)buffer;
-		std::vector<USHORT> rbuf(m_info.m_lx), gbuf(m_info.m_lx), bbuf(m_info.m_lx), mbuf(m_info.m_lx);
+		std::vector<USHORT> rbuf(m_info.m_lx), gbuf(m_info.m_lx), bbuf(m_info.m_lx),
+			mbuf(m_info.m_lx);
 		if (m_header->zsize == 4) {
 			new_getrow(m_header, &rbuf[0], m_currentY, 0);
 			new_getrow(m_header, &gbuf[0], m_currentY, 1);
@@ -1008,19 +1000,20 @@ void SgiReader::readLine(short *buffer, int x0, int x1, int shrink)
 
 void SgiReader::readLine(char *buffer, int x0, int x1, int shrink)
 {
-	//assert(shrink == 1);
-	//assert(x0 == 0);
-	//assert(x1 == m_info.m_lx-1);
+	// assert(shrink == 1);
+	// assert(x0 == 0);
+	// assert(x1 == m_info.m_lx-1);
 
-	//Non ancora implementata la lettura parziale
+	// Non ancora implementata la lettura parziale
 	x0 = 0;
 	x1 = m_info.m_lx - 1;
 	shrink = 1;
 
-	if (BPP(m_header->type) == 1) //32 -> 32
+	if (BPP(m_header->type) == 1) // 32 -> 32
 	{
 		TPixel32 *pix = (TPixel32 *)buffer;
-		std::vector<UCHAR> rbuf(m_info.m_lx), gbuf(m_info.m_lx), bbuf(m_info.m_lx), mbuf(m_info.m_lx);
+		std::vector<UCHAR> rbuf(m_info.m_lx), gbuf(m_info.m_lx), bbuf(m_info.m_lx),
+			mbuf(m_info.m_lx);
 		if (m_header->zsize == 4) {
 			new_getrow(m_header, &rbuf[0], m_currentY, 0);
 			new_getrow(m_header, &gbuf[0], m_currentY, 1);
@@ -1057,7 +1050,8 @@ void SgiReader::readLine(char *buffer, int x0, int x1, int shrink)
 		}
 	} else { // 64 -> 32
 		TPixel32 *pix = (TPixel32 *)buffer;
-		std::vector<USHORT> rbuf(m_info.m_lx), gbuf(m_info.m_lx), bbuf(m_info.m_lx), mbuf(m_info.m_lx);
+		std::vector<USHORT> rbuf(m_info.m_lx), gbuf(m_info.m_lx), bbuf(m_info.m_lx),
+			mbuf(m_info.m_lx);
 		if (m_header->zsize == 4) {
 			new_getrow(m_header, &rbuf[0], m_currentY, 0);
 			new_getrow(m_header, &gbuf[0], m_currentY, 1);
@@ -1106,10 +1100,10 @@ class SgiWriter : public Tiio::Writer
 	int m_currentY;
 	IMAGERGB *m_header;
 
-protected:
+  protected:
 	TImageInfo m_info;
 
-public:
+  public:
 	SgiWriter() : m_currentY(0), m_header(0){};
 	~SgiWriter()
 	{
@@ -1132,7 +1126,7 @@ public:
 
 	void setProperties(TPropertyGroup *properties);
 
-private:
+  private:
 	// not implemented
 	SgiWriter(const SgiWriter &);
 	SgiWriter &operator=(const SgiWriter &);
@@ -1200,8 +1194,9 @@ void SgiWriter::open(FILE *file, const TImageInfo &info)
 	str = toString(p->getValue());
 	bool bigEndian = (str == "Big Endian");
 
-	m_header = iopen(fileno(file), OpenWrite, compressed ? RLE(BPP(channelBytesNum)) : VERBATIM(BPP(channelBytesNum)),
-					 dim, m_info.m_lx, m_info.m_ly, zsize, bigEndian ? 1 : 0);
+	m_header = iopen(fileno(file), OpenWrite,
+					 compressed ? RLE(BPP(channelBytesNum)) : VERBATIM(BPP(channelBytesNum)), dim,
+					 m_info.m_lx, m_info.m_ly, zsize, bigEndian ? 1 : 0);
 }
 //---------------------------------------------------------
 
@@ -1212,7 +1207,8 @@ void SgiWriter::writeLine(char *buffer)
 		{
 			new_putrow(m_header, buffer, m_currentY, 0);
 		} else {
-			std::vector<UCHAR> rbuf(m_info.m_lx), gbuf(m_info.m_lx), bbuf(m_info.m_lx), mbuf(m_info.m_lx);
+			std::vector<UCHAR> rbuf(m_info.m_lx), gbuf(m_info.m_lx), bbuf(m_info.m_lx),
+				mbuf(m_info.m_lx);
 			TPixelRGBM32 *pix = (TPixelRGBM32 *)buffer;
 			for (int i = 0; i < m_info.m_lx; ++i) {
 				rbuf[i] = pix->r;
@@ -1247,7 +1243,8 @@ void SgiWriter::writeLine(short *buffer)
 			}
 			new_putrow(m_header, &tmp[0], m_currentY, 0);
 		} else {
-			std::vector<USHORT> rbuf(m_info.m_lx), gbuf(m_info.m_lx), bbuf(m_info.m_lx), mbuf(m_info.m_lx);
+			std::vector<USHORT> rbuf(m_info.m_lx), gbuf(m_info.m_lx), bbuf(m_info.m_lx),
+				mbuf(m_info.m_lx);
 			TPixelRGBM64 *pix = (TPixelRGBM64 *)buffer;
 			for (int i = 0; i < m_info.m_lx; ++i) {
 				rbuf[i] = pix->r;

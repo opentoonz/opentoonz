@@ -24,8 +24,7 @@
 // KeyframeMover
 //-----------------------------------------------------------------------------
 
-KeyframeMover::KeyframeMover()
-	: m_qualifiers(eMoveKeyframes), m_lastKeyframeData(0)
+KeyframeMover::KeyframeMover() : m_qualifiers(eMoveKeyframes), m_lastKeyframeData(0)
 {
 }
 
@@ -102,8 +101,9 @@ void KeyframeMover::start(TKeyframeSelection *selection, int qualifiers)
 }
 
 //-----------------------------------------------------------------------------
-//If can't move keyframe return false; otherwise move keyframe
-bool KeyframeMover::moveKeyframes(int dr, std::set<TKeyframeSelection::Position> &newPositions, TKeyframeSelection *selection)
+// If can't move keyframe return false; otherwise move keyframe
+bool KeyframeMover::moveKeyframes(int dr, std::set<TKeyframeSelection::Position> &newPositions,
+								  TKeyframeSelection *selection)
 {
 	TXsheet *xsh = getXsheet();
 	std::set<TKeyframeSelection::Position> positions;
@@ -119,7 +119,8 @@ bool KeyframeMover::moveKeyframes(int dr, std::set<TKeyframeSelection::Position>
 		for (posIt = positions.begin(); posIt != positions.end(); ++posIt) {
 			int c = posIt->second;
 			int r = posIt->first;
-			TStageObjectId objId = c >= 0 ? TStageObjectId::ColumnId(c) : TStageObjectId::CameraId(0);
+			TStageObjectId objId =
+				c >= 0 ? TStageObjectId::ColumnId(c) : TStageObjectId::CameraId(0);
 			TStageObject *stObj = xsh->getStageObject(objId);
 			if (r + dr < 0)
 				dr = -r;
@@ -131,7 +132,8 @@ bool KeyframeMover::moveKeyframes(int dr, std::set<TKeyframeSelection::Position>
 		for (posIt = positions.begin(); posIt != positions.end(); ++posIt) {
 			int c = posIt->second;
 			int r = posIt->first;
-			TStageObjectId objId = c >= 0 ? TStageObjectId::ColumnId(c) : TStageObjectId::CameraId(0);
+			TStageObjectId objId =
+				c >= 0 ? TStageObjectId::ColumnId(c) : TStageObjectId::CameraId(0);
 			TStageObject *stObj = xsh->getStageObject(objId);
 			if (m_qualifiers & eCopyKeyframes) {
 				firstTime = true;
@@ -149,7 +151,8 @@ bool KeyframeMover::moveKeyframes(int dr, std::set<TKeyframeSelection::Position>
 
 	setKeyframes();
 	bool notChange = false;
-	for (posIt = m_startSelectedKeyframes.begin(); posIt != m_startSelectedKeyframes.end(); ++posIt) {
+	for (posIt = m_startSelectedKeyframes.begin(); posIt != m_startSelectedKeyframes.end();
+		 ++posIt) {
 		int c = posIt->second;
 		int r = posIt->first;
 		TStageObjectId objId = c >= 0 ? TStageObjectId::ColumnId(c) : TStageObjectId::CameraId(0);
@@ -164,7 +167,8 @@ bool KeyframeMover::moveKeyframes(int dr, std::set<TKeyframeSelection::Position>
 		return true;
 
 	newPositions.clear();
-	for (posIt = m_startSelectedKeyframes.begin(); posIt != m_startSelectedKeyframes.end(); ++posIt) {
+	for (posIt = m_startSelectedKeyframes.begin(); posIt != m_startSelectedKeyframes.end();
+		 ++posIt) {
 		int c = posIt->second;
 		int r = posIt->first;
 		TStageObjectId objId = c >= 0 ? TStageObjectId::ColumnId(c) : TStageObjectId::CameraId(0);
@@ -210,11 +214,8 @@ class UndoMoveKeyFrame : public TUndo
 	int m_dr;
 	KeyframeMover *m_mover;
 
-public:
-	UndoMoveKeyFrame(int dr, KeyframeMover *mover)
-		: m_dr(dr), m_mover(mover)
-	{
-	}
+  public:
+	UndoMoveKeyFrame(int dr, KeyframeMover *mover) : m_dr(dr), m_mover(mover) {}
 
 	void undo() const
 	{
@@ -229,20 +230,11 @@ public:
 		TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Move Keyframe");
-	}
+	QString getHistoryString() { return QObject::tr("Move Keyframe"); }
 
-	int getHistoryType()
-	{
-		return HistoryType::Xsheet;
-	}
+	int getHistoryType() { return HistoryType::Xsheet; }
 };
 
 //-----------------------------------------------------------------------------
@@ -254,7 +246,9 @@ public:
 //-----------------------------------------------------------------------------
 
 KeyframeMoverTool::KeyframeMoverTool(XsheetViewer *viewer, bool justMovement)
-	: XsheetGUI::DragTool(viewer), m_startSelection(), m_offset(0), m_firstRow(0), m_firstCol(0), m_selecting(false), m_startPos(), m_curPos(), m_firstKeyframeMovement(false), m_justMovement(justMovement)
+	: XsheetGUI::DragTool(viewer), m_startSelection(), m_offset(0), m_firstRow(0), m_firstCol(0),
+	  m_selecting(false), m_startPos(), m_curPos(), m_firstKeyframeMovement(false),
+	  m_justMovement(justMovement)
 {
 	m_mover = new KeyframeMover();
 }

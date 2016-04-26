@@ -9,10 +9,9 @@ namespace igs
 {
 namespace gaussian_blur_hv
 {
-IGS_GAUSSIAN_BLUR_HV_EXPORT const int int_radius(
-	const double real_radius);
-IGS_GAUSSIAN_BLUR_HV_EXPORT const int buffer_bytes(
-	const int height_with_margin, const int width_with_margin, const int int_radius);
+IGS_GAUSSIAN_BLUR_HV_EXPORT const int int_radius(const double real_radius);
+IGS_GAUSSIAN_BLUR_HV_EXPORT const int
+buffer_bytes(const int height_with_margin, const int width_with_margin, const int int_radius);
 IGS_GAUSSIAN_BLUR_HV_EXPORT void convert(
 	/* 入出力画像 */
 	const void *in_with_margin, void *out_no_margin

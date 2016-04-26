@@ -53,8 +53,7 @@ void doesExist(const TFilePath &fp)
 	TFilePath path = fp.getParentDir() + (fp.getName() + "." + fp.getDottedType());
 	if (TSystem::doesExistFileOrLevel(fp) || TSystem::doesExistFileOrLevel(path)) {
 		msg = "File " + fp.getLevelName() + " already exists:";
-		cout << endl
-			 << msg << endl;
+		cout << endl << msg << endl;
 		char answer = ' ';
 		while (answer != 'Y' && answer != 'N' && answer != 'y' && answer != 'n') {
 			msg = "do you want to replace it? [Y/N] ";
@@ -62,8 +61,7 @@ void doesExist(const TFilePath &fp)
 			cin >> answer;
 			if (answer == 'N' || answer == 'n') {
 				msg = "Conversion aborted.";
-				cout << endl
-					 << msg << endl;
+				cout << endl << msg << endl;
 				exit(1);
 			}
 		}
@@ -72,7 +70,7 @@ void doesExist(const TFilePath &fp)
 
 //--------------------------------------------------------------------
 
-//Ritorna un vettore contenete i soli TFrameId corrispondenti al range inserito dall'utente
+// Ritorna un vettore contenete i soli TFrameId corrispondenti al range inserito dall'utente
 vector<TFrameId> getFrameIds(const RangeQualifier &range, const TLevelP &level)
 {
 	string msg;
@@ -94,13 +92,13 @@ vector<TFrameId> getFrameIds(const RangeQualifier &range, const TLevelP &level)
 		r0 = begin->first;
 		r1 = end->first;
 	}
-	//cerco il primo TFrameId
+	// cerco il primo TFrameId
 	TLevel::Iterator it = begin;
 	if (r0 <= end->first)
 		while (it->first < r0)
 			++it;
 	while (it != level->end() && r1 >= it->first) {
-		//Riempio il vettore fino all'ultimo TFrameId che mi serve
+		// Riempio il vettore fino all'ultimo TFrameId che mi serve
 		frames.push_back(it->first);
 		++it;
 	}
@@ -109,11 +107,12 @@ vector<TFrameId> getFrameIds(const RangeQualifier &range, const TLevelP &level)
 
 //--------------------------------------------------------------------
 
-void convertFromCM(const TLevelReaderP &lr, const TPaletteP &plt, const TLevelWriterP &lw, const vector<TFrameId> &frames,
-				   const TAffine &aff, const TRop::ResampleFilterType &resType)
+void convertFromCM(const TLevelReaderP &lr, const TPaletteP &plt, const TLevelWriterP &lw,
+				   const vector<TFrameId> &frames, const TAffine &aff,
+				   const TRop::ResampleFilterType &resType)
 {
 
-	TDimension dim(0, 0); //Serve per controllare che non ci siano frame di diverse dimensioni
+	TDimension dim(0, 0); // Serve per controllare che non ci siano frame di diverse dimensioni
 	for (int i = 0; i < (int)frames.size(); i++) {
 		try {
 			TImageReaderP ir = lr->getFrameReader(frames[i]);
@@ -127,7 +126,7 @@ void convertFromCM(const TLevelReaderP &lr, const TPaletteP &plt, const TLevelWr
 				if (i == 0)
 					dim = rasCMImage->getSize();
 				else if (dim != rasCMImage->getSize()) {
-					//dimensioni diverse dei frame
+					// dimensioni diverse dei frame
 					string msg = "Cannot continue to convert: not valid level!";
 					cout << msg << endl;
 					exit(1);
@@ -151,14 +150,16 @@ void convertFromCM(const TLevelReaderP &lr, const TPaletteP &plt, const TLevelWr
 
 //--------------------------------------------------------------------
 
-void convertFromVI(const TLevelReaderP &lr, const TPaletteP &plt, const TLevelWriterP &lw, const vector<TFrameId> &frames,
-				   const TRop::ResampleFilterType &resType, int width)
+void convertFromVI(const TLevelReaderP &lr, const TPaletteP &plt, const TLevelWriterP &lw,
+				   const vector<TFrameId> &frames, const TRop::ResampleFilterType &resType,
+				   int width)
 {
 	int i;
 	vector<TVectorImageP> images;
 	TRectD maxBbox;
 	TAffine aff;
-	for (i = 0; i < (int)frames.size(); i++) { //trovo la bbox che possa contenere tutte le immagini
+	for (i = 0; i < (int)frames.size(); i++) { // trovo la bbox che possa contenere tutte le
+											   // immagini
 		try {
 			TImageReaderP ir = lr->getFrameReader(frames[i]);
 			TVectorImageP img = ir->load();
@@ -170,7 +171,7 @@ void convertFromVI(const TLevelReaderP &lr, const TPaletteP &plt, const TLevelWr
 		}
 	}
 	maxBbox = maxBbox.enlarge(2);
-	if (width) //calcolo l'affine
+	if (width) // calcolo l'affine
 		aff = TScale((double)width / maxBbox.getLx());
 	maxBbox = aff * maxBbox;
 
@@ -179,9 +180,10 @@ void convertFromVI(const TLevelReaderP &lr, const TPaletteP &plt, const TLevelWr
 			TVectorImageP vectorImage = images[i];
 			assert(vectorImage);
 			if (vectorImage) {
-				//faccio il render dell'immagine
+				// faccio il render dell'immagine
 				vectorImage->transform(aff, true);
-				const TVectorRenderData rd(TTranslation(-maxBbox.getP00()), TRect(), plt.getPointer(), 0, true, true);
+				const TVectorRenderData rd(TTranslation(-maxBbox.getP00()), TRect(),
+										   plt.getPointer(), 0, true, true);
 				TOfflineGL *glContext = new TOfflineGL(convert(maxBbox).getSize());
 				glContext->clear(TPixel32::Transparent);
 				glContext->draw(vectorImage, rd);
@@ -198,8 +200,9 @@ void convertFromVI(const TLevelReaderP &lr, const TPaletteP &plt, const TLevelWr
 
 //-----------------------------------------------------------------------
 
-void convertFromFullRaster(const TLevelReaderP &lr, const TLevelWriterP &lw, const vector<TFrameId> &frames,
-						   const TAffine &aff, const TRop::ResampleFilterType &resType)
+void convertFromFullRaster(const TLevelReaderP &lr, const TLevelWriterP &lw,
+						   const vector<TFrameId> &frames, const TAffine &aff,
+						   const TRop::ResampleFilterType &resType)
 {
 	for (int i = 0; i < (int)frames.size(); i++) {
 		try {
@@ -225,8 +228,9 @@ void convertFromFullRaster(const TLevelReaderP &lr, const TLevelWriterP &lw, con
 
 //-----------------------------------------------------------------------
 
-void convertFromFullRasterToCm(const TLevelReaderP &lr, const TLevelWriterP &lw, const vector<TFrameId> &frames,
-							   const TAffine &aff, const TRop::ResampleFilterType &resType)
+void convertFromFullRasterToCm(const TLevelReaderP &lr, const TLevelWriterP &lw,
+							   const vector<TFrameId> &frames, const TAffine &aff,
+							   const TRop::ResampleFilterType &resType)
 {
 	TPalette *plt = new TPalette();
 
@@ -274,11 +278,11 @@ void convert(const TFilePath &source, const TFilePath &dest, const RangeQualifie
 			 const TRenderSettings::ResampleQuality &resQuality)
 {
 	string msg;
-	//Carico le informazione del livello
+	// Carico le informazione del livello
 	TLevelReaderP lr(source);
 	TLevelP level = lr->loadInfo();
 
-	//Trovo i TFrameId corrispondenti al range
+	// Trovo i TFrameId corrispondenti al range
 	vector<TFrameId> frames = getFrameIds(range, level);
 
 	doesExist(dest);
@@ -290,12 +294,12 @@ void convert(const TFilePath &source, const TFilePath &dest, const RangeQualifie
 
 	TAffine aff;
 	if (width.isSelected()) {
-		//calcolo un affine per fare la resample
+		// calcolo un affine per fare la resample
 		int imgLx = lr->getImageInfo()->m_lx;
 		aff = TScale((double)width / (double)imgLx);
 	}
 
-	//setto il FilterResempleType giusto
+	// setto il FilterResempleType giusto
 	TRop::ResampleFilterType resType;
 	if (resQuality == TRenderSettings::StandardResampleQuality)
 		resType = TRop::Triangle;
@@ -339,13 +343,13 @@ void convert(const TFilePath &source, const TFilePath &dest, const RangeQualifie
 			convertFromFullRasterToCm(lr, lw, frames, aff, resType);
 		else
 			convertFromFullRaster(lr, lw, frames, aff, resType);
-	} else if (ext == "tlv") //ToonzImage
+	} else if (ext == "tlv") // ToonzImage
 		convertFromCM(lr, level->getPalette(), lw, frames, aff, resType);
-	else if (ext == "pli") //VectorImage
+	else if (ext == "pli") // VectorImage
 		convertFromVI(lr, level->getPalette(), lw, frames, resType, width.getValue());
 }
 
-} //namespace
+} // namespace
 
 //------------------------------------------------------------------------
 
@@ -357,7 +361,7 @@ int main(int argc, char *argv[])
 	TFilePath fp = TEnv::getStuffDir();
 
 	string msg;
-	//Inizializzo i qualificatori
+	// Inizializzo i qualificatori
 	TCli::FilePathArgument srcName("srcName", "Source file");
 	TCli::FilePathArgument dstName("dstName", "Target file");
 	FilePathQualifier tnzName("-s sceneName", "Scene file");
@@ -371,7 +375,7 @@ int main(int argc, char *argv[])
 
 	try {
 		Tiio::defineStd();
-		//TPluginManager::instance()->loadStandardPlugins();
+		// TPluginManager::instance()->loadStandardPlugins();
 
 		TSystem::hasMainLoop(false);
 		TPropertyGroup *prop = 0;
@@ -382,16 +386,14 @@ int main(int argc, char *argv[])
 		TFilePath srcFilePath = srcName.getValue();
 		if (!TSystem::doesExistFileOrLevel(srcFilePath)) {
 			msg = srcFilePath.getLevelName() + " level doesn't exist.";
-			cout << endl
-				 << msg << endl;
+			cout << endl << msg << endl;
 			exit(1);
 		}
 		msg = "Loading " + srcFilePath.getLevelName();
-		cout << endl
-			 << msg << endl;
+		cout << endl << msg << endl;
 
 		string ext = dstFilePath.getType();
-		//controllo che ci sia un'estensione
+		// controllo che ci sia un'estensione
 		if (ext == "") {
 			ext = toString(dstFilePath.getWideString());
 			if (ext == "") {
@@ -400,10 +402,10 @@ int main(int argc, char *argv[])
 				exit(1);
 			}
 		}
-		if (dstFilePath.getParentDir().isEmpty()) //ho specificato solo l'estensione
+		if (dstFilePath.getParentDir().isEmpty()) // ho specificato solo l'estensione
 			dstFilePath = srcFilePath.getParentDir() + (srcFilePath.getName() + "." + ext);
 		if (tnzName.isSelected()) {
-			//Devo prendermi i settaggi degli "output setting" dalla scena!
+			// Devo prendermi i settaggi degli "output setting" dalla scena!
 			TFilePath tnzFilePath = tnzName.getValue();
 			if (tnzFilePath.getType() != "tnz") {
 				msg = "Invalid scene file: conversion terminated!";
@@ -418,14 +420,15 @@ int main(int argc, char *argv[])
 				scene->loadTnzFile(tnzFilePath);
 			} catch (...) {
 				string msg;
-				msg = "There were problems loading the scene " + toString(srcFilePath.getWideString()) +
-					  ".\n Some files may be missing.";
+				msg = "There were problems loading the scene " +
+					  toString(srcFilePath.getWideString()) + ".\n Some files may be missing.";
 				cout << msg << endl;
-				//return false;
+				// return false;
 			}
 
 			if (scene) {
-				resQuality = scene->getProperties()->getOutputProperties()->getRenderSettings().m_quality;
+				resQuality =
+					scene->getProperties()->getOutputProperties()->getRenderSettings().m_quality;
 				prop = scene->getProperties()->getOutputProperties()->getFileFormatProperties(ext);
 			} else {
 				msg = "Invalid scene file: conversion terminated!";
@@ -434,7 +437,7 @@ int main(int argc, char *argv[])
 			}
 		}
 		if (ext != "3gp" && ext != "pli") {
-			//assert(ext!="3gp" && ext!="pli" && ext!="tlv");
+			// assert(ext!="3gp" && ext!="pli" && ext!="tlv");
 			convert(srcFilePath, dstFilePath, range, width, prop, resQuality);
 		} else {
 			msg = "Cannot convert to ." + ext + " format.";
@@ -447,7 +450,6 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	msg = "Conversion terminated!";
-	cout << endl
-		 << msg << endl;
+	cout << endl << msg << endl;
 	return 0;
 }

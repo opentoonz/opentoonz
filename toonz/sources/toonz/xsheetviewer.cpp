@@ -49,18 +49,14 @@ namespace XsheetGUI
 const int ColumnWidth = 74;
 const int RowHeight = 20;
 
-} //namespace XsheetGUI
+} // namespace XsheetGUI
 
 //=============================================================================
 // XsheetViewer
 //-----------------------------------------------------------------------------
 
-void XsheetViewer::getCellTypeAndColors(
-	int &ltype,
-	QColor &cellColor,
-	QColor &sideColor,
-	const TXshCell &cell,
-	bool isSelected)
+void XsheetViewer::getCellTypeAndColors(int &ltype, QColor &cellColor, QColor &sideColor,
+										const TXshCell &cell, bool isSelected)
 {
 	if (cell.isEmpty())
 		ltype = NO_XSHLEVEL;
@@ -69,7 +65,8 @@ void XsheetViewer::getCellTypeAndColors(
 		switch (ltype) {
 		case TZI_XSHLEVEL:
 		case OVL_XSHLEVEL:
-			cellColor = (isSelected) ? getSelectedFullcolorColumnColor() : getFullcolorColumnColor();
+			cellColor =
+				(isSelected) ? getSelectedFullcolorColumnColor() : getFullcolorColumnColor();
 			sideColor = getFullcolorColumnBorderColor();
 			break;
 		case PLI_XSHLEVEL:
@@ -89,7 +86,8 @@ void XsheetViewer::getCellTypeAndColors(
 			sideColor = getChildColumnBorderColor();
 			break;
 		case SND_XSHLEVEL:
-			cellColor = (isSelected) ? XsheetGUI::SelectedSoundColumnColor : XsheetGUI::SoundColumnColor;
+			cellColor =
+				(isSelected) ? XsheetGUI::SelectedSoundColumnColor : XsheetGUI::SoundColumnColor;
 			sideColor = XsheetGUI::SoundColumnBorderColor;
 			break;
 		case SND_TXT_XSHLEVEL:
@@ -119,7 +117,7 @@ void XsheetViewer::getColumnColor(QColor &color, QColor &sideColor, int index, T
 	int r0, r1;
 	xsh->getCellRange(index, r0, r1);
 	if (0 <= r0 && r0 <= r1) {
-		//column color depends on the level type in the top-most occupied cell
+		// column color depends on the level type in the top-most occupied cell
 		TXshCell cell = xsh->getCell(r0, index);
 		int ltype;
 		getCellTypeAndColors(ltype, color, sideColor, cell);
@@ -138,13 +136,20 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
 	: QFrame(parent), m_x0(XsheetGUI::ColumnWidth + 1)
 #ifndef LINETEST
 	  ,
-	  m_y0(XsheetGUI::RowHeight * 3 + 60) //Per tab il numero delle righe era 8 perche c'e' il linkBox
+	  m_y0(XsheetGUI::RowHeight * 3 +
+		   60) // Per tab il numero delle righe era 8 perche c'e' il linkBox
 #else
 	  ,
-	  m_y0(XsheetGUI::RowHeight * 8 + 5) //Per tab il numero delle righe era 8 perche c'e' il linkBox
+	  m_y0(XsheetGUI::RowHeight * 8 +
+		   5) // Per tab il numero delle righe era 8 perche c'e' il linkBox
 #endif
 	  ,
-	  m_timerId(0), m_autoPanSpeed(0, 0), m_dragTool(0), m_columnSelection(new TColumnSelection()), m_cellKeyframeSelection(new TCellKeyframeSelection(new TCellSelection(), new TKeyframeSelection())), m_scrubCol(-1), m_scrubRow0(-1), m_scrubRow1(-1), m_isCurrentFrameSwitched(false), m_isCurrentColumnSwitched(false), m_isComputingSize(false), m_currentNoteIndex(0), m_qtModifiers(0), m_frameDisplayStyle(to_enum(FrameDisplayStyleInXsheetRowArea))
+	  m_timerId(0), m_autoPanSpeed(0, 0), m_dragTool(0), m_columnSelection(new TColumnSelection()),
+	  m_cellKeyframeSelection(
+		  new TCellKeyframeSelection(new TCellSelection(), new TKeyframeSelection())),
+	  m_scrubCol(-1), m_scrubRow0(-1), m_scrubRow1(-1), m_isCurrentFrameSwitched(false),
+	  m_isCurrentColumnSwitched(false), m_isComputingSize(false), m_currentNoteIndex(0),
+	  m_qtModifiers(0), m_frameDisplayStyle(to_enum(FrameDisplayStyleInXsheetRowArea))
 {
 	setFocusPolicy(Qt::StrongFocus);
 
@@ -305,8 +310,8 @@ void XsheetViewer::setCurrentColumn(int col)
 	TColumnHandle *columnHandle = TApp::instance()->getCurrentColumn();
 	if (col != columnHandle->getColumnIndex()) {
 		columnHandle->setColumnIndex(col);
-		//E' necessario per il caso in cui si passa da colonna di camera a altra colonna
-		//o nel caso in cui si passa da una spline a una colonna.
+		// E' necessario per il caso in cui si passa da colonna di camera a altra colonna
+		// o nel caso in cui si passa da una spline a una colonna.
 		TObjectHandle *objectHandle = TApp::instance()->getCurrentObject();
 		if (col >= 0 && objectHandle->isSpline())
 			objectHandle->setIsSpline(false);
@@ -328,20 +333,21 @@ void XsheetViewer::setCurrentColumn(int col)
 
 void XsheetViewer::setCurrentRow(int row)
 {
-	//POTREBBE NON ESSER PIU' NECESSARIO CON LE NUOVE MODIFICHE PER CLEANUP A COLORI
+	// POTREBBE NON ESSER PIU' NECESSARIO CON LE NUOVE MODIFICHE PER CLEANUP A COLORI
 	/*TFrameHandle* frameHandle = TApp::instance()->getCurrentFrame();
   if(row == frameHandle->getFrameIndex() && frameHandle->getFrameType() == TFrameHandle::SceneFrame)
   {
-    //E' necessario per il caso in cui la paletta corrente e' la paletta di cleanup.
-    TPaletteHandle* levelPaletteHandle = TApp::instance()->getPaletteController()->getCurrentLevelPalette();
-    TXshLevel *xl = TApp::instance()->getCurrentLevel()->getLevel();
-    if(xl && xl->getSimpleLevel())
+	//E' necessario per il caso in cui la paletta corrente e' la paletta di cleanup.
+	TPaletteHandle* levelPaletteHandle =
+  TApp::instance()->getPaletteController()->getCurrentLevelPalette();
+	TXshLevel *xl = TApp::instance()->getCurrentLevel()->getLevel();
+	if(xl && xl->getSimpleLevel())
 			levelPaletteHandle->setPalette(xl->getSimpleLevel()->getPalette());
-    else if(xl && xl->getPaletteLevel())
+	else if(xl && xl->getPaletteLevel())
 			levelPaletteHandle->setPalette(xl->getPaletteLevel()->getPalette());
-    else
-      levelPaletteHandle->setPalette(0);
-    return;
+	else
+	  levelPaletteHandle->setPalette(0);
+	return;
   }
   frameHandle->setFrame(row);*/
 	TApp::instance()->getCurrentFrame()->setFrame(row);
@@ -369,10 +375,12 @@ void XsheetViewer::scroll(QPoint delta)
 	else if (!notUpdateSizeH && notUpdateSizeV) // Resize orizzontale
 		refreshContentSize(x, 0);
 
-	if (valueH > maxValueH && x > 0) // Se il valore e' maggiore del max e x>0 scrollo al massimo valore orizzontale
+	if (valueH > maxValueH &&
+		x > 0) // Se il valore e' maggiore del max e x>0 scrollo al massimo valore orizzontale
 		valueH = m_cellScrollArea->horizontalScrollBar()->maximum();
 
-	if (valueV > maxValueV && y > 0) // Se il valore e' maggiore del max e y>0 scrollo al massimo valore verticale
+	if (valueV > maxValueV &&
+		y > 0) // Se il valore e' maggiore del max e y>0 scrollo al massimo valore verticale
 		valueV = m_cellScrollArea->verticalScrollBar()->maximum();
 
 	m_cellScrollArea->horizontalScrollBar()->setValue(valueH);
@@ -435,7 +443,8 @@ void XsheetViewer::timerEvent(QTimerEvent *)
 	scroll(m_autoPanSpeed);
 	if (!m_dragTool)
 		return;
-	QMouseEvent mouseEvent(QEvent::MouseMove, m_lastAutoPanPos - m_autoPanSpeed, Qt::NoButton, 0, m_qtModifiers);
+	QMouseEvent mouseEvent(QEvent::MouseMove, m_lastAutoPanPos - m_autoPanSpeed, Qt::NoButton, 0,
+						   m_qtModifiers);
 	m_dragTool->onDrag(&mouseEvent);
 	m_lastAutoPanPos += m_autoPanSpeed;
 }
@@ -622,12 +631,17 @@ void XsheetViewer::showEvent(QShowEvent *)
 
 	TApp *app = TApp::instance();
 
-	bool ret = connect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this, SLOT(onCurrentColumnSwitched()));
-	ret = ret && connect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this, SLOT(onCurrentFrameSwitched()));
-	ret = ret && connect(app->getCurrentFrame(), SIGNAL(isPlayingStatusChanged()), this, SLOT(onPlayingStatusChanged()));
-	ret = ret && connect(app->getCurrentFrame(), SIGNAL(scrubStopped()), this, SLOT(onScrubStopped()));
+	bool ret = connect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this,
+					   SLOT(onCurrentColumnSwitched()));
+	ret = ret && connect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
+						 SLOT(onCurrentFrameSwitched()));
+	ret = ret && connect(app->getCurrentFrame(), SIGNAL(isPlayingStatusChanged()), this,
+						 SLOT(onPlayingStatusChanged()));
+	ret = ret &&
+		  connect(app->getCurrentFrame(), SIGNAL(scrubStopped()), this, SLOT(onScrubStopped()));
 
-	ret = ret && connect(app->getCurrentObject(), SIGNAL(objectChanged(bool)), this, SLOT(updateAllAree(bool)));
+	ret = ret && connect(app->getCurrentObject(), SIGNAL(objectChanged(bool)), this,
+						 SLOT(updateAllAree(bool)));
 
 	TSceneHandle *sceneHandle = app->getCurrentScene();
 	ret = ret && connect(sceneHandle, SIGNAL(sceneSwitched()), this, SLOT(onSceneSwitched()));
@@ -639,14 +653,18 @@ void XsheetViewer::showEvent(QShowEvent *)
 	ret = ret && connect(xsheetHandle, SIGNAL(xsheetChanged()), this, SLOT(onXsheetChanged()));
 	ret = ret && connect(xsheetHandle, SIGNAL(xsheetChanged()), this, SLOT(changeWindowTitle()));
 
-	ret = ret && connect(app->getCurrentSelection(), SIGNAL(selectionSwitched(TSelection *, TSelection *)),
-						 this, SLOT(onSelectionSwitched(TSelection *, TSelection *)));
+	ret = ret &&
+		  connect(app->getCurrentSelection(), SIGNAL(selectionSwitched(TSelection *, TSelection *)),
+				  this, SLOT(onSelectionSwitched(TSelection *, TSelection *)));
 	// update titlebar when the cell selection region is changed
-	ret = ret && connect(app->getCurrentSelection(), SIGNAL(selectionChanged(TSelection *)), this, SLOT(onSelectionChanged(TSelection *)));
+	ret = ret && connect(app->getCurrentSelection(), SIGNAL(selectionChanged(TSelection *)), this,
+						 SLOT(onSelectionChanged(TSelection *)));
 	// show the current level name to title bar
-	ret = ret && connect(app->getCurrentLevel(), SIGNAL(xshLevelSwitched(TXshLevel *)), this, SLOT(changeWindowTitle()));
+	ret = ret && connect(app->getCurrentLevel(), SIGNAL(xshLevelSwitched(TXshLevel *)), this,
+						 SLOT(changeWindowTitle()));
 
-	ret = ret && connect(IconGenerator::instance(), SIGNAL(iconGenerated()), this, SLOT(updateColumnArea()));
+	ret = ret && connect(IconGenerator::instance(), SIGNAL(iconGenerated()), this,
+						 SLOT(updateColumnArea()));
 
 	assert(ret);
 	refreshContentSize(0, 0);
@@ -661,11 +679,14 @@ void XsheetViewer::hideEvent(QHideEvent *)
 
 	TApp *app = TApp::instance();
 
-	disconnect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this, SLOT(onCurrentColumnSwitched()));
-	disconnect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this, SLOT(onCurrentFrameSwitched()));
+	disconnect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this,
+			   SLOT(onCurrentColumnSwitched()));
+	disconnect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
+			   SLOT(onCurrentFrameSwitched()));
 	disconnect(app->getCurrentFrame(), SIGNAL(scrubStopped()), this, SLOT(onScrubStopped()));
 
-	disconnect(app->getCurrentObject(), SIGNAL(objectChanged(bool)), this, SLOT(updateAllAree(bool)));
+	disconnect(app->getCurrentObject(), SIGNAL(objectChanged(bool)), this,
+			   SLOT(updateAllAree(bool)));
 
 	TSceneHandle *sceneHandle = app->getCurrentScene();
 	disconnect(sceneHandle, SIGNAL(sceneSwitched()), this, SLOT(onSceneSwitched()));
@@ -679,9 +700,11 @@ void XsheetViewer::hideEvent(QHideEvent *)
 	disconnect(app->getCurrentSelection(), SIGNAL(selectionSwitched(TSelection *, TSelection *)),
 			   this, SLOT(onSelectionSwitched(TSelection *, TSelection *)));
 
-	disconnect(app->getCurrentSelection(), SIGNAL(selectionChanged(TSelection *)), this, SLOT(onSelectionChanged(TSelection *)));
+	disconnect(app->getCurrentSelection(), SIGNAL(selectionChanged(TSelection *)), this,
+			   SLOT(onSelectionChanged(TSelection *)));
 
-	disconnect(app->getCurrentLevel(), SIGNAL(xshLevelSwitched(TXshLevel *)), this, SLOT(changeWindowTitle()));
+	disconnect(app->getCurrentLevel(), SIGNAL(xshLevelSwitched(TXshLevel *)), this,
+			   SLOT(changeWindowTitle()));
 
 	disconnect(IconGenerator::instance(), SIGNAL(iconGenerated()), this, SLOT(updateColumnArea()));
 }
@@ -708,7 +731,7 @@ void XsheetViewer::resizeEvent(QResizeEvent *event)
 	m_rowScrollArea->setGeometry(1, m_y0, m_x0 - 1, h - m_y0 - 20);
 
 	//(Nuovo Layout Manager) Reintrodotto per il refresh automatico
-	refreshContentSize(0, 0); //Non updateAreeSize() perche' si deve tener conto degli scrollbar.
+	refreshContentSize(0, 0); // Non updateAreeSize() perche' si deve tener conto degli scrollbar.
 	updateAllAree();
 }
 
@@ -744,8 +767,7 @@ void XsheetViewer::keyPressEvent(QKeyEvent *event)
 		return;
 
 	int frameCount = getXsheet()->getFrameCount();
-	int row = getCurrentRow(),
-		col = getCurrentColumn();
+	int row = getCurrentRow(), col = getCurrentColumn();
 
 	switch (int key = event->key()) {
 	case Qt::Key_Up:
@@ -765,15 +787,18 @@ void XsheetViewer::keyPressEvent(QKeyEvent *event)
 		int visibleRowCount = visibleRect.height() / XsheetGUI::RowHeight;
 
 		switch (key) {
-			CASE Qt::Key_PageUp : locals.scrollTo(visibleRect.top() - visibleRowCount * XsheetGUI::RowHeight,
-												  visibleRect);
+			CASE Qt::Key_PageUp
+				: locals.scrollTo(visibleRect.top() - visibleRowCount * XsheetGUI::RowHeight,
+								  visibleRect);
 
-			CASE Qt::Key_PageDown : locals.scrollTo(visibleRect.bottom() + visibleRowCount * XsheetGUI::RowHeight,
-													visibleRect);
+			CASE Qt::Key_PageDown
+				: locals.scrollTo(visibleRect.bottom() + visibleRowCount * XsheetGUI::RowHeight,
+								  visibleRect);
 
 			CASE Qt::Key_Home : locals.scrollTo(0, visibleRect);
 
-			CASE Qt::Key_End : locals.scrollTo((frameCount + 1) * XsheetGUI::RowHeight, visibleRect);
+			CASE Qt::Key_End
+				: locals.scrollTo((frameCount + 1) * XsheetGUI::RowHeight, visibleRect);
 		}
 	}
 	}
@@ -798,8 +823,7 @@ void XsheetViewer::enterEvent(QEvent *)
 void XsheetViewer::scrollTo(int row, int col)
 {
 	QRect visibleRect = m_cellArea->visibleRegion().boundingRect();
-	QRect cellRect(columnToX(col), rowToY(row),
-				   XsheetGUI::ColumnWidth, XsheetGUI::RowHeight);
+	QRect cellRect(columnToX(col), rowToY(row), XsheetGUI::ColumnWidth, XsheetGUI::RowHeight);
 
 	int deltaX = 0;
 	int deltaY = 0;
@@ -892,12 +916,12 @@ void XsheetViewer::scrollToHorizontalRange(int x0, int x1)
 	int visibleLeft = visibleRect.left();
 	int visibleRight = visibleRect.right();
 
-	if (visibleLeft > x1) { //Se sono fuori dalla regione visibile in alto
+	if (visibleLeft > x1) { // Se sono fuori dalla regione visibile in alto
 		int deltaX = x0 - visibleLeft;
 		scroll(QPoint(deltaX, 0));
 		return;
 	}
-	if (visibleRight < x1) { //Se sono fuori dalla regione visibile in basso
+	if (visibleRight < x1) { // Se sono fuori dalla regione visibile in basso
 		int deltaX = x1 + 2 - visibleRight;
 		scroll(QPoint(deltaX, 0));
 		return;
@@ -923,17 +947,19 @@ void XsheetViewer::scrollToVerticalRange(int y0, int y1)
 	int visibleTop = visibleRect.top();
 	int visibleBottom = visibleRect.bottom();
 
-	if (visibleTop > y0) { //Se sono fuori dalla regione visibile in alto
+	if (visibleTop > y0) { // Se sono fuori dalla regione visibile in alto
 		int deltaY = y0 - visibleTop;
-		if (!TApp::instance()->getCurrentFrame()->isPlaying() || Preferences::instance()->isXsheetAutopanEnabled()) {
+		if (!TApp::instance()->getCurrentFrame()->isPlaying() ||
+			Preferences::instance()->isXsheetAutopanEnabled()) {
 			scroll(QPoint(0, deltaY));
 			return;
 		}
 	}
 
-	if (visibleBottom < y1) { //Se sono fuori dalla regione visibile in basso
+	if (visibleBottom < y1) { // Se sono fuori dalla regione visibile in basso
 		int deltaY = y1 + 2 - visibleBottom;
-		if (!TApp::instance()->getCurrentFrame()->isPlaying() || Preferences::instance()->isXsheetAutopanEnabled()) {
+		if (!TApp::instance()->getCurrentFrame()->isPlaying() ||
+			Preferences::instance()->isXsheetAutopanEnabled()) {
 			scroll(QPoint(0, deltaY));
 			return;
 		}
@@ -1131,8 +1157,10 @@ void XsheetViewer::changeWindowTitle()
 		!getCellSelection()->isEmpty()) {
 		int r0, r1, c0, c1;
 		getCellSelection()->getSelectedCells(r0, c0, r1, c1);
-		name += tr("   Selected: ") + QString::number(r1 - r0 + 1) + ((r1 - r0 + 1 == 1) ? tr(" frame : ") : tr(" frames * ")) +
-				QString::number(c1 - c0 + 1) + ((c1 - c0 + 1 == 1) ? tr(" column") : tr(" columns"));
+		name += tr("   Selected: ") + QString::number(r1 - r0 + 1) +
+				((r1 - r0 + 1 == 1) ? tr(" frame : ") : tr(" frames * ")) +
+				QString::number(c1 - c0 + 1) +
+				((c1 - c0 + 1 == 1) ? tr(" column") : tr(" columns"));
 	}
 
 	parentWidget()->setWindowTitle(name);

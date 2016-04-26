@@ -28,7 +28,7 @@
 #include "tools/toolutils.h"
 #include "tools/RGBpicker.h"
 
-//iwsw  commented out temporarily
+// iwsw  commented out temporarily
 //#include "toonzqt/ghibli_3dlut_util.h"
 
 #define NORMAL_PICK L"Normal"
@@ -55,9 +55,11 @@ class UndoPickRGBM : public TUndo
 	TXshSimpleLevelP m_level;
 	bool m_colorAutoApplyEnabled;
 
-public:
-	UndoPickRGBM(TPalette *palette, int styleId, const TPixel32 newValue, const TXshSimpleLevelP &level)
-		: m_palette(palette), m_styleId(styleId), m_newValue(newValue), m_level(level), m_colorAutoApplyEnabled(true)
+  public:
+	UndoPickRGBM(TPalette *palette, int styleId, const TPixel32 newValue,
+				 const TXshSimpleLevelP &level)
+		: m_palette(palette), m_styleId(styleId), m_newValue(newValue), m_level(level),
+		  m_colorAutoApplyEnabled(true)
 	{
 		PaletteController *controller = TTool::getApplication()->getPaletteController();
 		m_colorAutoApplyEnabled = controller->isColorAutoApplyEnabled();
@@ -90,15 +92,9 @@ public:
 		}
 	}
 
-	void undo() const
-	{
-		setColor(m_oldValue);
-	}
+	void undo() const { setColor(m_oldValue); }
 
-	void redo() const
-	{
-		setColor(m_newValue);
-	}
+	void redo() const { setColor(m_newValue); }
 
 	int getSize() const { return sizeof(*this); }
 
@@ -110,7 +106,7 @@ public:
 			.arg(QString::number((int)m_newValue.b));
 	}
 
-private:
+  private:
 	void updateLevel() const
 	{
 		std::vector<TFrameId> fids;
@@ -190,7 +186,10 @@ using namespace RGBPicker;
 //----------------------------------------------------------------------------------------------
 
 RGBPickerTool::RGBPickerTool()
-	: TTool("T_RGBPicker"), m_currentStyleId(0), m_pickType("Type:"), m_drawingTrack(), m_workingTrack(), m_firstDrawingPos(), m_firstWorkingPos(), m_mousePosition(), m_thick(0.5), m_stroke(0), m_firstStroke(0), m_makePick(false), m_firstTime(true), m_passivePick("Passive Pick", false), m_toolOptionsBox(0)
+	: TTool("T_RGBPicker"), m_currentStyleId(0), m_pickType("Type:"), m_drawingTrack(),
+	  m_workingTrack(), m_firstDrawingPos(), m_firstWorkingPos(), m_mousePosition(), m_thick(0.5),
+	  m_stroke(0), m_firstStroke(0), m_makePick(false), m_firstTime(true),
+	  m_passivePick("Passive Pick", false), m_toolOptionsBox(0)
 {
 	bind(TTool::CommonLevels);
 	m_prop.bind(m_pickType);
@@ -253,9 +252,10 @@ void RGBPickerTool::draw()
 	m_thick = sqrt(pixelSize2) / 2.0;
 	if (m_makePick) {
 		if (m_currentStyleId != 0) {
-			//Il pick in modalita' polyline e rectangular deve essere fatto soltanto dopo aver cancellato il
+			// Il pick in modalita' polyline e rectangular deve essere fatto soltanto dopo aver
+			// cancellato il
 			//"disegno" della polyline altrimenti alcuni pixels neri delle spezzate che la
-			//compongono vengono presi in considerazione nel calcolo del "colore medio"
+			// compongono vengono presi in considerazione nel calcolo del "colore medio"
 			if (m_pickType.getValue() == POLYLINE_PICK && m_drawingPolyline.empty())
 				doPolylinePick();
 			else if (m_pickType.getValue() == RECT_PICK && m_drawingRect.isEmpty())
@@ -264,11 +264,13 @@ void RGBPickerTool::draw()
 		return;
 	}
 	if (m_pickType.getValue() == RECT_PICK && !m_makePick) {
-		TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White : TPixel32::Red;
+		TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White
+																				  : TPixel32::Red;
 		ToolUtils::drawRect(m_drawingRect, color, 0x3F33, true);
 	}
 	if (m_pickType.getValue() == POLYLINE_PICK && !m_drawingPolyline.empty()) {
-		TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White : TPixel32::Black;
+		TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White
+																				  : TPixel32::Black;
 		tglColor(color);
 		tglDrawCircle(m_drawingPolyline[0], 2);
 		glBegin(GL_LINE_STRIP);
@@ -364,7 +366,8 @@ void RGBPickerTool::leftButtonDoubleClick(const TPointD &pos, const TMouseEvent 
 		std::vector<TThickPoint> strokePoints;
 		for (UINT i = 0; i < m_workingPolyline.size() - 1; i++) {
 			strokePoints.push_back(TThickPoint(m_workingPolyline[i], 1));
-			strokePoints.push_back(TThickPoint(0.5 * (m_workingPolyline[i] + m_workingPolyline[i + 1]), 1));
+			strokePoints.push_back(
+				TThickPoint(0.5 * (m_workingPolyline[i] + m_workingPolyline[i + 1]), 1));
 		}
 		strokePoints.push_back(TThickPoint(m_workingPolyline.back(), 1));
 		m_drawingPolyline.clear();
@@ -384,24 +387,26 @@ void RGBPickerTool::mouseMove(const TPointD &pos, const TMouseEvent &e)
 		TImageP image = TImageP(getImage(false));
 		if (image) {
 			TRectD area = TRectD(e.m_pos.x, e.m_pos.y, e.m_pos.x, e.m_pos.y);
-			//TRectD area=TRectD(e.m_pos.x-1,e.m_pos.y-1,e.m_pos.x+1,e.m_pos.y+1);
+			// TRectD area=TRectD(e.m_pos.x-1,e.m_pos.y-1,e.m_pos.x+1,e.m_pos.y+1);
 			StylePicker picker(image);
 
-			//iwsw commented out temporarily
-			//if (m_viewer->get3DLutUtil() && Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
+			// iwsw commented out temporarily
+			// if (m_viewer->get3DLutUtil() &&
+			// Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
 			//	m_viewer->get3DLutUtil()->bindFBO();
 
 			TPixel32 pix = picker.pickColor(area);
 
-			//iwsw commented out temporarily
-			//if (m_viewer->get3DLutUtil() && Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
+			// iwsw commented out temporarily
+			// if (m_viewer->get3DLutUtil() &&
+			// Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
 			//	m_viewer->get3DLutUtil()->releaseFBO();
 
 			QColor col((int)pix.r, (int)pix.g, (int)pix.b);
 
 			PaletteController *controller = TTool::getApplication()->getPaletteController();
 			controller->notifyColorPassivePicked(col);
-			//for (int i = 0; i<(int)m_toolOptionsBox.size(); i++)
+			// for (int i = 0; i<(int)m_toolOptionsBox.size(); i++)
 			//{
 			//	if (m_toolOptionsBox[i]->isVisible())
 			//		m_toolOptionsBox[i]->updateRealTimePickLabel(col);
@@ -430,14 +435,16 @@ void RGBPickerTool::pick(TPoint pos)
 	TRectD area = TRectD(pos.x - 1, pos.y - 1, pos.x + 1, pos.y + 1);
 	StylePicker picker(image, palette);
 
-	//iwsw commented out temporarily
-	//if (m_viewer->get3DLutUtil() && Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
+	// iwsw commented out temporarily
+	// if (m_viewer->get3DLutUtil() &&
+	// Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
 	//	m_viewer->get3DLutUtil()->bindFBO();
 
 	m_currentValue = picker.pickColor(area);
 
-	//iwsw commented out temporarily
-	//if (m_viewer->get3DLutUtil() && Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
+	// iwsw commented out temporarily
+	// if (m_viewer->get3DLutUtil() &&
+	// Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
 	//	m_viewer->get3DLutUtil()->releaseFBO();
 
 	TXshSimpleLevel *level = app->getCurrentLevel()->getSimpleLevel();
@@ -445,14 +452,14 @@ void RGBPickerTool::pick(TPoint pos)
 	TUndoManager::manager()->add(cmd);
 	cmd->redo();
 	/*
-    setCurrentColor(m_currentValue);
-    if(level)
-    {
-      vector<TFrameId> fids;
-      level->getFids(fids);
-      invalidateIcons(level,fids);
-    }
-    */
+	setCurrentColor(m_currentValue);
+	if(level)
+	{
+	  vector<TFrameId> fids;
+	  level->getFids(fids);
+	  invalidateIcons(level,fids);
+	}
+	*/
 }
 //---------------------------------------------------------
 
@@ -480,14 +487,16 @@ void RGBPickerTool::pickRect()
 		return;
 	StylePicker picker(image, palette);
 
-	//iwsw commented out temporarily
-	//if (m_viewer->get3DLutUtil() && Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
+	// iwsw commented out temporarily
+	// if (m_viewer->get3DLutUtil() &&
+	// Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
 	//	m_viewer->get3DLutUtil()->bindFBO();
 
 	m_currentValue = picker.pickColor(area);
 
-	//iwsw commented out temporarily
-	//if (m_viewer->get3DLutUtil() && Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
+	// iwsw commented out temporarily
+	// if (m_viewer->get3DLutUtil() &&
+	// Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
 	//	m_viewer->get3DLutUtil()->releaseFBO();
 }
 
@@ -507,14 +516,16 @@ void RGBPickerTool::pickStroke()
 	StylePicker picker(image, palette);
 	TStroke *stroke = new TStroke(*m_stroke);
 
-	//iwsw commented out temporarily
-	//if (m_viewer->get3DLutUtil() && Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
+	// iwsw commented out temporarily
+	// if (m_viewer->get3DLutUtil() &&
+	// Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
 	//	m_viewer->get3DLutUtil()->bindFBO();
 
 	m_currentValue = picker.pickColor(stroke);
 
-	//iwsw commented out temporarily
-	//if (m_viewer->get3DLutUtil() && Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
+	// iwsw commented out temporarily
+	// if (m_viewer->get3DLutUtil() &&
+	// Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
 	//	m_viewer->get3DLutUtil()->releaseFBO();
 
 	if (!(m_pickType.getValue() == POLYLINE_PICK)) {
@@ -553,13 +564,17 @@ void RGBPickerTool::onActivate()
 
 //---------------------------------------------------------
 
-TPropertyGroup *RGBPickerTool::getProperties(int targetType) { return &m_prop; }
+TPropertyGroup *RGBPickerTool::getProperties(int targetType)
+{
+	return &m_prop;
+}
 
 //---------------------------------------------------------
 
 int RGBPickerTool::getCursorId() const
 {
-	int currentStyleId = getApplication()->getPaletteController()->getCurrentPalette()->getStyleIndex();
+	int currentStyleId =
+		getApplication()->getPaletteController()->getCurrentPalette()->getStyleIndex();
 	if (currentStyleId == 0)
 		return ToolCursor::ForbiddenCursor;
 	if (ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg)
@@ -581,7 +596,8 @@ void RGBPickerTool::doPolylinePick()
 
 //---------------------------------------------------------
 
-//!Viene aggiunto \b pos a \b m_track e disegnato il primo pezzetto del lazzo. Viene inizializzato \b m_firstPos
+//! Viene aggiunto \b pos a \b m_track e disegnato il primo pezzetto del lazzo. Viene inizializzato
+//! \b m_firstPos
 void RGBPickerTool::startFreehand(const TPointD &drawingPos, const TPointD &workingPos)
 {
 	m_drawingTrack.clear();
@@ -592,9 +608,10 @@ void RGBPickerTool::startFreehand(const TPointD &drawingPos, const TPointD &work
 	m_drawingTrack.add(TThickPoint(drawingPos, m_thick), pixelSize2);
 	m_workingTrack.add(TThickPoint(workingPos, m_thick), pixelSize2);
 #if defined(MACOSX)
-//m_viewer->prepareForegroundDrawing();
+// m_viewer->prepareForegroundDrawing();
 #endif
-	TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White : TPixel32::Black;
+	TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White
+																			  : TPixel32::Black;
 	tglColor(color);
 	getViewer()->startForegroundDrawing();
 	glPushMatrix();
@@ -605,15 +622,16 @@ void RGBPickerTool::startFreehand(const TPointD &drawingPos, const TPointD &work
 
 //---------------------------------------------------------
 
-//!Viene aggiunto \b pos a \b m_track e disegnato un altro pezzetto del lazzo.
+//! Viene aggiunto \b pos a \b m_track e disegnato un altro pezzetto del lazzo.
 void RGBPickerTool::freehandDrag(const TPointD &drawingPos, const TPointD &workingPos)
 {
 #if defined(MACOSX)
-//getViewer()->enableRedraw(false);
+// getViewer()->enableRedraw(false);
 #endif
 
 	getViewer()->startForegroundDrawing();
-	TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White : TPixel32::Black;
+	TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White
+																			  : TPixel32::Black;
 	tglColor(color);
 	glPushMatrix();
 	tglMultMatrix(getMatrix());
@@ -627,11 +645,12 @@ void RGBPickerTool::freehandDrag(const TPointD &drawingPos, const TPointD &worki
 
 //---------------------------------------------------------
 
-//!Viene chiuso il lazzo (si aggiunge l'ultimo punto ad m_track) e viene creato lo stroke rappresentante il lazzo.
+//! Viene chiuso il lazzo (si aggiunge l'ultimo punto ad m_track) e viene creato lo stroke
+//! rappresentante il lazzo.
 void RGBPickerTool::closeFreehand()
 {
 #if defined(MACOSX)
-//getViewer()->enableRedraw(true);
+// getViewer()->enableRedraw(true);
 #endif
 	if (m_drawingTrack.isEmpty() || m_workingTrack.isEmpty())
 		return;
@@ -646,7 +665,7 @@ void RGBPickerTool::closeFreehand()
 
 //---------------------------------------------------------
 
-//!Viene aggiunto un punto al vettore m_polyline.
+//! Viene aggiunto un punto al vettore m_polyline.
 void RGBPickerTool::addPointPolyline(const TPointD &drawingPos, const TPointD &workingPos)
 {
 	m_mousePosition = drawingPos;
@@ -657,7 +676,8 @@ void RGBPickerTool::addPointPolyline(const TPointD &drawingPos, const TPointD &w
 
 //---------------------------------------------------------
 
-//!Agginge l'ultimo pos a \b m_polyline e chiude la spezzata (aggiunge \b m_polyline.front() alla fine del vettore)
+//! Agginge l'ultimo pos a \b m_polyline e chiude la spezzata (aggiunge \b m_polyline.front() alla
+//! fine del vettore)
 void RGBPickerTool::closePolyline(const TPointD &drawingPos, const TPointD &workingPos)
 {
 	if (m_drawingPolyline.size() <= 1 || m_workingPolyline.size() <= 1)
@@ -686,4 +706,4 @@ void RGBPickerTool::showFlipPickedColor(const TPixel32 &pix)
 
 RGBPickerTool RGBpicktool;
 
-//TTool *getPickRGBMTool() {return &pickRBGMTool;}
+// TTool *getPickRGBMTool() {return &pickRBGMTool;}

@@ -32,26 +32,21 @@ union _MaxAlign {
 
 //---------------------------------------------------------------
 
-template <typename T, bool>
-struct _AlignTypeDetail;
+template <typename T, bool> struct _AlignTypeDetail;
 
-template <typename T>
-struct _AlignTypeDetail<T, false> {
+template <typename T> struct _AlignTypeDetail<T, false> {
 	typedef T type;
 };
 
-template <typename T>
-struct _AlignTypeDetail<T, true> {
+template <typename T> struct _AlignTypeDetail<T, true> {
 	typedef char type;
 };
 
-template <size_t alignment, typename U>
-struct _AlignType {
+template <size_t alignment, typename U> struct _AlignType {
 	typedef typename _AlignTypeDetail<U, (alignment < sizeof(U))>::type type;
 };
 
-template <typename T>
-struct _Aligner {
+template <typename T> struct _Aligner {
 	char c;
 	T t;
 };
@@ -60,9 +55,8 @@ struct _Aligner {
 //    TCG alignment  unions
 //**************************************************************************
 
-template <int alignment>
-union aligner_type {
-private:
+template <int alignment> union aligner_type {
+  private:
 	typename _AlignType<alignment, char>::type c;
 	typename _AlignType<alignment, short>::type s;
 	typename _AlignType<alignment, int>::type i;
@@ -78,14 +72,13 @@ private:
 
 //---------------------------------------------------------------
 
-template <typename T>
-union aligned_buffer {
+template <typename T> union aligned_buffer {
 	typedef aligner_type<sizeof(_Aligner<T>) - sizeof(T)> aligner_type;
 
 	aligner_type m_aligner;
 	char m_buf[sizeof(T)];
 
-private:
+  private:
 	TCG_STATIC_ASSERT(sizeof(_Aligner<T>) - sizeof(T) ==
 					  sizeof(_Aligner<aligner_type>) - sizeof(aligner_type));
 };
@@ -94,8 +87,7 @@ private:
 //    TCG alignment  traits
 //**************************************************************************
 
-template <typename T>
-struct alignment_traits {
+template <typename T> struct alignment_traits {
 	static const int alignment = sizeof(_Aligner<T>) - sizeof(T);
 
 	typedef aligner_type<alignment> aligner_type;

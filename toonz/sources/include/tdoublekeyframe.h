@@ -22,7 +22,7 @@ class TUnit;
 
 class DVAPI TDoubleKeyframe
 {
-public:
+  public:
 	enum Type {
 		None = 0,
 		Constant,
@@ -38,7 +38,7 @@ public:
 
 	class DVAPI FileParams
 	{
-	public:
+	  public:
 		TFilePath m_path;
 		int m_fieldIndex;
 		FileParams() : m_path(), m_fieldIndex(0) {}
@@ -49,7 +49,7 @@ public:
 		return type < TDoubleKeyframe::Expression && type != TDoubleKeyframe::SimilarShape;
 	}
 
-	//private:
+	// private:
 	Type m_type;
 	Type m_prevType;
 	double m_frame;
@@ -67,7 +67,7 @@ public:
 	void saveData(TOStream &os) const;
 	void loadData(TIStream &is);
 
-public:
+  public:
 	TDoubleKeyframe(double frame = 0, double value = 0);
 	~TDoubleKeyframe();
 

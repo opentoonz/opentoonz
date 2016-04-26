@@ -186,7 +186,10 @@ void Separator::paintEvent(QPaintEvent *)
 QSettings *Dialog::m_settings = 0;
 
 Dialog::Dialog(QWidget *parent, bool hasButton, bool hasFixedSize, const QString &name)
-	: QDialog(parent, Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint), m_hasButton(hasButton), m_mainHLayout(0), m_leftVLayout(0), m_rightVLayout(0), m_isMainVLayout(false), m_isMainHLayout(false), m_layoutSpacing(5), m_layoutMargin(0), m_labelWidth(100), m_name()
+	: QDialog(parent, Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
+	  m_hasButton(hasButton), m_mainHLayout(0), m_leftVLayout(0), m_rightVLayout(0),
+	  m_isMainVLayout(false), m_isMainHLayout(false), m_layoutSpacing(5), m_layoutMargin(0),
+	  m_labelWidth(100), m_name()
 {
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->setMargin(0);
@@ -231,7 +234,7 @@ Dialog::Dialog(QWidget *parent, bool hasButton, bool hasFixedSize, const QString
 		mainLayout->setSizeConstraint(QLayout::SetMinimumSize);
 
 	setLayout(mainLayout);
-//this->setGeometry(30, 30, 300, 300);
+// this->setGeometry(30, 30, 300, 300);
 #ifdef MACOSX
 	setWindowFlags(Qt::Tool);
 #endif
@@ -239,7 +242,8 @@ Dialog::Dialog(QWidget *parent, bool hasButton, bool hasFixedSize, const QString
 	if (!m_settings) {
 		TFilePath layoutDir = ToonzFolder::getMyModuleDir();
 		TFilePath savePath = layoutDir + TFilePath("popups.ini");
-		m_settings = new QSettings(QString::fromStdWString(savePath.getWideString()), QSettings::IniFormat);
+		m_settings =
+			new QSettings(QString::fromStdWString(savePath.getWideString()), QSettings::IniFormat);
 	}
 
 	if (name == QString())
@@ -249,7 +253,8 @@ Dialog::Dialog(QWidget *parent, bool hasButton, bool hasFixedSize, const QString
 	if (geo != QString()) {
 		QStringList values = geo.split(" ");
 		assert(values.size() == 4);
-		setGeometry(values.at(0).toInt(), tmax(30, values.at(1).toInt()), values.at(2).toInt(), values.at(3).toInt());
+		setGeometry(values.at(0).toInt(), tmax(30, values.at(1).toInt()), values.at(2).toInt(),
+					values.at(3).toInt());
 	}
 }
 
@@ -266,7 +271,9 @@ void Dialog::moveEvent(QMoveEvent *e)
 		return;
 
 	QRect r = geometry();
-	m_settings->setValue(m_name, QString::number(r.left()) + " " + QString::number(r.top()) + " " + QString::number(r.width()) + " " + QString::number(r.height()));
+	m_settings->setValue(m_name, QString::number(r.left()) + " " + QString::number(r.top()) + " " +
+									 QString::number(r.width()) + " " +
+									 QString::number(r.height()));
 }
 
 //---------------------------------------------------------------------------------
@@ -284,7 +291,9 @@ void Dialog::resizeEvent(QResizeEvent *e)
 		return;
 
 	QRect r = geometry();
-	m_settings->setValue(m_name, QString::number(r.left()) + " " + QString::number(r.top()) + " " + QString::number(r.width()) + " " + QString::number(r.height()));
+	m_settings->setValue(m_name, QString::number(r.left()) + " " + QString::number(r.top()) + " " +
+									 QString::number(r.width()) + " " +
+									 QString::number(r.height()));
 }
 
 //-----------------------------------------------------------------------------
@@ -712,8 +721,9 @@ void Dialog::addButtonBarWidget(QWidget *first, QWidget *second, QWidget *third)
 
 //=============================================================================
 
-RadioButtonDialog::RadioButtonDialog(const QString &labelText, const QList<QString> &radioButtonList,
-									 QWidget *parent, Qt::WindowFlags f)
+RadioButtonDialog::RadioButtonDialog(const QString &labelText,
+									 const QList<QString> &radioButtonList, QWidget *parent,
+									 Qt::WindowFlags f)
 	: Dialog(parent, true, true), m_result(1)
 {
 	setWindowTitle(tr("Toonz"));
@@ -757,7 +767,7 @@ RadioButtonDialog::RadioButtonDialog(const QString &labelText, const QList<QStri
 
 void RadioButtonDialog::onButtonClicked(int id)
 {
-	//Add "1" because "0" is cancel button.
+	// Add "1" because "0" is cancel button.
 	m_result = id + 1;
 }
 
@@ -898,11 +908,8 @@ void ProgressDialog::onCancel()
 
 //=============================================================================
 
-int DVGui::MsgBox(MsgType type,
-				  const QString &text,
-				  const std::vector<QString> &buttons,
-				  int defaultButtonIndex,
-				  QWidget *parent)
+int DVGui::MsgBox(MsgType type, const QString &text, const std::vector<QString> &buttons,
+				  int defaultButtonIndex, QWidget *parent)
 {
 	Dialog dialog(parent, true);
 	dialog.setWindowFlags(dialog.windowFlags() | Qt::WindowStaysOnTopHint);
@@ -956,7 +963,8 @@ void DVGui::MsgBoxInPopup(MsgType type, const QString &text)
 
 	Q_ASSERT(QApplication::instance()->thread() == QThread::currentThread());
 
-	// a working thread can trigger a call to this function (by the main thread) also when a popup is already open
+	// a working thread can trigger a call to this function (by the main thread) also when a popup
+	// is already open
 	// therefore we need a messageQueue
 	// note: no mutex are needed because only the main thread call this function
 	static QList<QPair<MsgType, QString>> messageQueue;
@@ -1017,12 +1025,8 @@ void DVGui::MsgBoxInPopup(MsgType type, const QString &text)
 
 //-----------------------------------------------------------------------------
 
-int DVGui::MsgBox(const QString &text,
-				  const QString &button1Text,
-				  const QString &button2Text,
-				  const QString &button3Text,
-				  int defaultButtonIndex,
-				  QWidget *parent)
+int DVGui::MsgBox(const QString &text, const QString &button1Text, const QString &button2Text,
+				  const QString &button3Text, int defaultButtonIndex, QWidget *parent)
 {
 	Dialog dialog(parent, true);
 	dialog.setWindowFlags(dialog.windowFlags() | Qt::WindowStaysOnTopHint);
@@ -1075,11 +1079,8 @@ int DVGui::MsgBox(const QString &text,
 
 //-----------------------------------------------------------------------------
 
-int DVGui::MsgBox(const QString &text,
-				  const QString &button1,
-				  const QString &button2,
-				  int defaultButtonIndex,
-				  QWidget *parent)
+int DVGui::MsgBox(const QString &text, const QString &button1, const QString &button2,
+				  int defaultButtonIndex, QWidget *parent)
 {
 	Dialog dialog(parent, true);
 	dialog.setWindowFlags(dialog.windowFlags() | Qt::WindowStaysOnTopHint);
@@ -1091,11 +1092,8 @@ int DVGui::MsgBox(const QString &text,
 
 //-----------------------------------------------------------------------------
 
-Dialog *DVGui::createMsgBox(MsgType type,
-							const QString &text,
-							const QStringList &buttons,
-							int defaultButtonIndex,
-							QWidget *parent)
+Dialog *DVGui::createMsgBox(MsgType type, const QString &text, const QStringList &buttons,
+							int defaultButtonIndex, QWidget *parent)
 {
 	Dialog *dialog = new Dialog(parent, true);
 	dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
@@ -1140,15 +1138,13 @@ Dialog *DVGui::createMsgBox(MsgType type,
 
 //-----------------------------------------------------------------------------
 
-QString DVGui::getText(const QString &title, const QString &labelText,
-					   const QString &text, bool *ok)
+QString DVGui::getText(const QString &title, const QString &labelText, const QString &text,
+					   bool *ok)
 {
 	Dialog dialog(0, true);
 
 	dialog.setWindowTitle(title);
-	dialog.setWindowFlags(Qt::WindowStaysOnTopHint |
-						  Qt::WindowTitleHint |
-						  Qt::CustomizeWindowHint);
+	dialog.setWindowFlags(Qt::WindowStaysOnTopHint | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
 
 	QVBoxLayout *layout = new QVBoxLayout(&dialog);
 	dialog.addLayout(layout);
@@ -1186,7 +1182,7 @@ bool isStyleIdInPalette(int styleId, const TPalette *palette)
 	for (i = 0; i < palette->getPageCount(); i++) {
 		const TPalette::Page *page = palette->getPage(i);
 		if (!page)
-			return false; //La pagina dovrebbe esserci sempre
+			return false; // La pagina dovrebbe esserci sempre
 		int j;
 		for (j = 0; j < page->getStyleCount(); j++)
 			if (page->getStyleId(j) == styleId)
@@ -1198,19 +1194,21 @@ bool isStyleIdInPalette(int styleId, const TPalette *palette)
 
 //-----------------------------------------------------------------------------
 
-int DVGui::eraseStylesInDemand(TPalette *palette, const TXsheetHandle *xsheetHandle, TPalette *newPalette)
+int DVGui::eraseStylesInDemand(TPalette *palette, const TXsheetHandle *xsheetHandle,
+							   TPalette *newPalette)
 {
-	//Verifico se gli stili della paletta sono usati : eraseStylesInDemand()
+	// Verifico se gli stili della paletta sono usati : eraseStylesInDemand()
 	std::vector<int> styleIds;
 	int h;
 	for (h = 0; h < palette->getPageCount(); h++) {
 		TPalette::Page *page = palette->getPage(h);
 		if (!page)
-			continue; //La pagina dovrebbe esserci sempre
+			continue; // La pagina dovrebbe esserci sempre
 		int k;
 		for (k = 0; k < page->getStyleCount(); k++) {
 			int styleId = page->getStyleId(k);
-			bool isStyleIdInNewPalette = (!newPalette) ? false : isStyleIdInPalette(styleId, newPalette);
+			bool isStyleIdInNewPalette =
+				(!newPalette) ? false : isStyleIdInPalette(styleId, newPalette);
 			if (styleId > 0 && !isStyleIdInNewPalette)
 				styleIds.push_back(styleId);
 		}
@@ -1236,7 +1234,8 @@ int DVGui::eraseStylesInDemand(TPalette *palette, std::vector<int> styleIds,
 	int row, column;
 	findPaletteLevels(levels, row, column, palette, xsheetHandle->getXsheet());
 
-	bool someStyleIsUsed = !levels.empty() || styleIds.empty(); // I guess this is wrong... but I'm not touching it
+	bool someStyleIsUsed =
+		!levels.empty() || styleIds.empty(); // I guess this is wrong... but I'm not touching it
 	if (someStyleIsUsed)
 		someStyleIsUsed = areStylesUsed(levels, styleIds);
 
@@ -1246,11 +1245,13 @@ int DVGui::eraseStylesInDemand(TPalette *palette, std::vector<int> styleIds,
 	// At least a style is selected and present in some level - ask user if and how styles
 	// should be deleted
 
-	QString question = QObject::tr("Styles you are going to delete are used to paint lines and areas in the animation level.\n") + QObject::tr("How do you want to proceed?");
+	QString question = QObject::tr("Styles you are going to delete are used to paint lines and "
+								   "areas in the animation level.\n") +
+					   QObject::tr("How do you want to proceed?");
 
-	int ret = DVGui::MsgBox(question, QObject::tr("Delete Styles Only"),
-							QObject::tr("Delete Styles, Lines and Areas"),
-							QObject::tr("Cancel"), 0);
+	int ret =
+		DVGui::MsgBox(question, QObject::tr("Delete Styles Only"),
+					  QObject::tr("Delete Styles, Lines and Areas"), QObject::tr("Cancel"), 0);
 	if (ret != 2)
 		return (ret == 0 || ret == 3) ? 0 : 1;
 
@@ -1259,9 +1260,12 @@ int DVGui::eraseStylesInDemand(TPalette *palette, std::vector<int> styleIds,
 		std::vector<QString> buttons(2);
 		buttons[0] = QObject::tr("Ok"), buttons[1] = QObject::tr("Cancel");
 
-		if (DVGui::MsgBox(DVGui::WARNING,
-			QObject::tr("Deletion of Lines and Areas from raster-based levels is not undoable.\n""Are you sure?"),
-						  buttons) != 1)
+		if (DVGui::MsgBox(
+				DVGui::WARNING,
+				QObject::tr(
+					"Deletion of Lines and Areas from raster-based levels is not undoable.\n"
+					"Are you sure?"),
+				buttons) != 1)
 			return 0;
 	}
 
@@ -1293,7 +1297,9 @@ void DVGui::featureNotAvelaible(QString webSiteName, QString url)
 	mainLayout->setSpacing(0);
 
 	QHBoxLayout *msgLayout = new QHBoxLayout;
-	QString msg = QObject::tr("This feature is not available in the demo version.\nFor more information visit the %1 site:").arg(webSiteName);
+	QString msg = QObject::tr("This feature is not available in the demo version.\nFor more "
+							  "information visit the %1 site:")
+					  .arg(webSiteName);
 
 	QLabel *mainTextLabel = new QLabel(msg, &dialog);
 	QPixmap iconPixmap = getMsgBoxPixmap(DVGui::WARNING);
@@ -1344,7 +1350,7 @@ void DVGui::requestTrialLicense(QString url, QString mail)
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->setSpacing(0);
 
-	//Request Licence
+	// Request Licence
 	QHBoxLayout *requestLicenseLayout = new QHBoxLayout;
 	QString msg = QObject::tr("To request a trial license please contact ");
 	QLabel *requestLicenseTextLabel = new QLabel(msg, &dialog);
@@ -1360,7 +1366,7 @@ void DVGui::requestTrialLicense(QString url, QString mail)
 	mainLayout->addLayout(requestLicenseLayout);
 	mainLayout->addSpacing(5);
 
-	//Request info
+	// Request info
 	QHBoxLayout *infoLayout = new QHBoxLayout;
 	QString infoMsg = QObject::tr("For further information visit ");
 	QLabel *infoMsgLabel = new QLabel(infoMsg, &dialog);

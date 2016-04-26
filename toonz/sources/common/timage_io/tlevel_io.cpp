@@ -18,19 +18,20 @@ using namespace std;
 
 DEFINE_CLASS_CODE(TLevelReader, 8)
 DEFINE_CLASS_CODE(TLevelWriter, 9)
-//DEFINE_CLASS_CODE(TLevelReaderWriter, 25)  //brutto
+// DEFINE_CLASS_CODE(TLevelReaderWriter, 25)  //brutto
 
 //-----------------------------------------------------------
 
 typedef std::pair<QString, int> LevelReaderKey;
 std::map<LevelReaderKey, TLevelReaderCreateProc *> LevelReaderTable;
 std::map<QString, std::pair<TLevelWriterCreateProc *, bool>> LevelWriterTable;
-//std::map<std::string, TLevelReaderWriterCreateProc*> LevelReaderWriterTable;
+// std::map<std::string, TLevelReaderWriterCreateProc*> LevelReaderWriterTable;
 
 //-----------------------------------------------------------
 
 TLevelReader::TLevelReader(const TFilePath &path)
-	: TSmartObject(m_classCode), m_info(0), m_path(path), m_contentHistory(0), m_frameFormat(TFrameId::FOUR_ZEROS)
+	: TSmartObject(m_classCode), m_info(0), m_path(path), m_contentHistory(0),
+	  m_frameFormat(TFrameId::FOUR_ZEROS)
 {
 }
 
@@ -166,8 +167,7 @@ TImageReaderP TLevelReader::getFrameReader(TFrameId fid)
 void TLevelReader::getSupportedFormats(QStringList &names)
 {
 	for (std::map<LevelReaderKey, TLevelReaderCreateProc *>::iterator it = LevelReaderTable.begin();
-		 it != LevelReaderTable.end();
-		 ++it) {
+		 it != LevelReaderTable.end(); ++it) {
 		names.push_back(it->first.first);
 	}
 }
@@ -205,9 +205,11 @@ TLevelWriterP::TLevelWriterP(const TFilePath &path, TPropertyGroup *winfo)
 	std::map<QString, std::pair<TLevelWriterCreateProc *, bool>>::iterator it;
 	it = LevelWriterTable.find(type);
 	if (it != LevelWriterTable.end())
-		m_pointer = it->second.first(path, winfo ? winfo->clone() : Tiio::makeWriterProperties(path.getType()));
+		m_pointer = it->second.first(path, winfo ? winfo->clone()
+												 : Tiio::makeWriterProperties(path.getType()));
 	else
-		m_pointer = new TLevelWriter(path, winfo ? winfo->clone() : Tiio::makeWriterProperties(path.getType()));
+		m_pointer = new TLevelWriter(path, winfo ? winfo->clone()
+												 : Tiio::makeWriterProperties(path.getType()));
 
 	assert(m_pointer);
 	m_pointer->addRef();
@@ -242,9 +244,9 @@ void TLevelWriter::setFrameRate(double fps)
 
 void TLevelWriter::getSupportedFormats(QStringList &names, bool onlyRenderFormats)
 {
-	for (std::map<QString, std::pair<TLevelWriterCreateProc *, bool>>::iterator it = LevelWriterTable.begin();
-		 it != LevelWriterTable.end();
-		 ++it) {
+	for (std::map<QString, std::pair<TLevelWriterCreateProc *, bool>>::iterator it =
+			 LevelWriterTable.begin();
+		 it != LevelWriterTable.end(); ++it) {
 		if (!onlyRenderFormats || it->second.second)
 			names.push_back(it->first);
 	}
@@ -280,10 +282,7 @@ void TLevelWriter::renumberFids(const std::map<TFrameId, TFrameId> &table)
 		{
 			return QString::fromStdWString(fp.getWideString());
 		}
-		static inline QString temp(const QString &str)
-		{
-			return str + QString("_");
-		}
+		static inline QString temp(const QString &str) { return str + QString("_"); }
 	};
 
 	if (m_path.getDots() == "..") {
@@ -292,10 +291,8 @@ void TLevelWriter::renumberFids(const std::map<TFrameId, TFrameId> &table)
 			QDir parentDir(QString::fromStdWString(m_path.getParentDir().getWideString()));
 			parentDir.setFilter(QDir::Files);
 
-			QStringList nameFilters(
-				QString::fromStdWString(m_path.getWideName()) +
-				".*." +
-				QString::fromStdString(m_path.getType()));
+			QStringList nameFilters(QString::fromStdWString(m_path.getWideName()) + ".*." +
+									QString::fromStdString(m_path.getType()));
 			parentDir.setNameFilters(nameFilters);
 
 			TFilePathSet fpset;
@@ -307,7 +304,8 @@ void TLevelWriter::renumberFids(const std::map<TFrameId, TFrameId> &table)
 			TFilePathSet::iterator st, sEnd(fpset.end());
 			for (st = fpset.begin(); st != sEnd; ++st) {
 				const QString &src = locals::qstring(*st);
-				const TFrameId &fid = st->getFrame(); // Could throw ! (and I'm quite appalled of that  o.o')
+				const TFrameId &fid =
+					st->getFrame(); // Could throw ! (and I'm quite appalled of that  o.o')
 
 				Table::const_iterator dt(table.find(fid));
 				if (dt == table.end()) {
@@ -326,7 +324,8 @@ void TLevelWriter::renumberFids(const std::map<TFrameId, TFrameId> &table)
 						if (QFile::rename(locals::qstring(*st), locals::temp(dst)))
 							storedDstPaths.push_back(dst);
 
-						// If the second rename did not happen, the problem was not on dst, but on src.
+						// If the second rename did not happen, the problem was not on dst, but on
+						// src.
 						// Alas, it means that rename on source is not possible - skip.
 					}
 				}
@@ -348,22 +347,17 @@ void TLevelWriter::renumberFids(const std::map<TFrameId, TFrameId> &table)
 
 //============================================================
 
-void TLevelReader::define(
-	QString extension,
-	int reader,
-	TLevelReaderCreateProc *proc)
+void TLevelReader::define(QString extension, int reader, TLevelReaderCreateProc *proc)
 {
 	LevelReaderKey key(extension, reader);
 	LevelReaderTable[key] = proc;
-	//cout << "LevelReader " << extension << " registred" << endl;
+	// cout << "LevelReader " << extension << " registred" << endl;
 }
 
 //-----------------------------------------------------------
 
-void TLevelWriter::define(
-	QString extension,
-	TLevelWriterCreateProc *proc, bool isRenderFormat)
+void TLevelWriter::define(QString extension, TLevelWriterCreateProc *proc, bool isRenderFormat)
 {
 	LevelWriterTable[extension] = std::pair<TLevelWriterCreateProc *, bool>(proc, isRenderFormat);
-	//cout << "LevelWriter " << extension << " registred" << endl;
+	// cout << "LevelWriter " << extension << " registred" << endl;
 }

@@ -21,16 +21,16 @@ class SocketController : public QObject
 {
 	Q_OBJECT
 
-public:
+  public:
 	Server *m_server;
 	QLocalSocket *m_socket;
 
-public Q_SLOTS:
+  public Q_SLOTS:
 
 	void onReadyRead();
 	void onDisconnected();
 };
 
-} //namespace tipc
+} // namespace tipc
 
-#endif //TIPC_SERVER_PRIVATE_H
+#endif // TIPC_SERVER_PRIVATE_H

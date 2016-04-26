@@ -18,7 +18,7 @@
 #endif
 
 //=============================================================================
-//forward declarations
+// forward declarations
 class TIStream;
 class TOStream;
 
@@ -27,21 +27,18 @@ class TOStream;
 
 class DVAPI TXshNoteSet
 {
-public:
+  public:
 	struct Note {
-		//!Default colors are defined in TSceneProperties
+		//! Default colors are defined in TSceneProperties
 		int m_colorIndex;
-		//!Is html test, contains font inforamtion.
+		//! Is html test, contains font inforamtion.
 		QString m_text;
 		int m_row;
 		int m_col;
-		//!Top left point of note rect in cell.
+		//! Top left point of note rect in cell.
 		TPointD m_pos;
 
-		Note()
-			: m_colorIndex(0), m_text(), m_row(0), m_col(0), m_pos(TPointD(5, 5))
-		{
-		}
+		Note() : m_colorIndex(0), m_text(), m_row(0), m_col(0), m_pos(TPointD(5, 5)) {}
 		~Note() {}
 	};
 	QList<Note> m_notes;
@@ -57,7 +54,7 @@ public:
 	int getNoteColorIndex(int noteIndex) const;
 	void setNoteColorIndex(int noteIndex, int colorIndex);
 
-	//!Return html text, text with font information.
+	//! Return html text, text with font information.
 	QString getNoteHtmlText(int noteIndex) const;
 	void setNoteHtmlText(int noteIndex, QString text);
 
@@ -74,4 +71,4 @@ public:
 	void saveData(TOStream &os);
 };
 
-#endif //TXSHNOTESET_INCLUDED
+#endif // TXSHNOTESET_INCLUDED

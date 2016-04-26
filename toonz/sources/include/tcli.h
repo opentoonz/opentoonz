@@ -20,7 +20,7 @@
 
 //=========================================================
 
-//forward declaration
+// forward declaration
 class TFilePath;
 //=========================================================
 
@@ -62,7 +62,7 @@ class UsageError
 {
 	std::string m_msg;
 
-public:
+  public:
 	UsageError(std::string msg) : m_msg(msg){};
 	~UsageError(){};
 	std::string getError() const { return m_msg; };
@@ -72,11 +72,11 @@ public:
 
 class DVAPI UsageElement
 {
-protected:
+  protected:
 	std::string m_name, m_help;
 	bool m_selected;
 
-public:
+  public:
 	UsageElement(std::string name, std::string help);
 	virtual ~UsageElement(){};
 	std::string getName() const { return m_name; };
@@ -94,7 +94,7 @@ public:
 	virtual void dumpValue(std::ostream &out) const = 0;
 	virtual void resetValue() = 0;
 
-private:
+  private:
 	// not implemented
 	UsageElement(const UsageElement &);
 	UsageElement &operator=(const UsageElement &);
@@ -104,12 +104,11 @@ private:
 
 class DVAPI Qualifier : public UsageElement
 {
-protected:
+  protected:
 	bool m_switcher;
 
-public:
-	Qualifier(std::string name, std::string help)
-		: UsageElement(name, help), m_switcher(false){};
+  public:
+	Qualifier(std::string name, std::string help) : UsageElement(name, help), m_switcher(false){};
 	~Qualifier(){};
 
 	virtual bool isSwitcher() const { return m_switcher; };
@@ -124,9 +123,8 @@ public:
 
 class DVAPI SimpleQualifier : public Qualifier
 {
-public:
-	SimpleQualifier(std::string name, std::string help)
-		: Qualifier(name, help){};
+  public:
+	SimpleQualifier(std::string name, std::string help) : Qualifier(name, help){};
 	~SimpleQualifier(){};
 	void fetch(int index, int &argc, char *argv[]);
 	void dumpValue(std::ostream &out) const;
@@ -137,22 +135,22 @@ public:
 
 class DVAPI Switcher : public SimpleQualifier
 {
-public:
-	Switcher(std::string name, std::string help)
-		: SimpleQualifier(name, help) { m_switcher = true; };
+  public:
+	Switcher(std::string name, std::string help) : SimpleQualifier(name, help)
+	{
+		m_switcher = true;
+	};
 	~Switcher(){};
 };
 
 //---------------------------------------------------------
 
-template <class T>
-class QualifierT : public Qualifier
+template <class T> class QualifierT : public Qualifier
 {
 	T m_value;
 
-public:
-	QualifierT<T>(std::string name, std::string help)
-		: Qualifier(name, help), m_value(){};
+  public:
+	QualifierT<T>(std::string name, std::string help) : Qualifier(name, help), m_value(){};
 	~QualifierT<T>(){};
 
 	T getValue() const { return m_value; };
@@ -162,8 +160,7 @@ public:
 		if (index + 1 >= argc)
 			throw UsageError("missing argument");
 		if (!fromStr(m_value, argv[index + 1]))
-			throw UsageError(
-				m_name + ": bad argument type /" + std::string(argv[index + 1]) + "/");
+			throw UsageError(m_name + ": bad argument type /" + std::string(argv[index + 1]) + "/");
 		for (int i = index; i < argc - 1; i++)
 			argv[i] = argv[i + 2];
 		argc -= 2;
@@ -171,8 +168,7 @@ public:
 
 	void dumpValue(std::ostream &out) const
 	{
-		out << m_name << " = " << (isSelected() ? "on" : "off") << " : "
-			<< m_value << "\n";
+		out << m_name << " = " << (isSelected() ? "on" : "off") << " : " << m_value << "\n";
 	};
 
 	void resetValue()
@@ -186,9 +182,8 @@ public:
 
 class DVAPI Argument : public UsageElement
 {
-public:
-	Argument(std::string name, std::string help)
-		: UsageElement(name, help){};
+  public:
+	Argument(std::string name, std::string help) : UsageElement(name, help){};
 	~Argument(){};
 	virtual void fetch(int index, int &argc, char *argv[]);
 	virtual bool assign(char *) = 0;
@@ -197,22 +192,18 @@ public:
 
 //---------------------------------------------------------
 
-template <class T>
-class ArgumentT : public Argument
+template <class T> class ArgumentT : public Argument
 {
 	T m_value;
 
-public:
+  public:
 	ArgumentT<T>(std::string name, std::string help) : Argument(name, help){};
 	~ArgumentT<T>(){};
 	operator T() const { return m_value; };
 	T getValue() const { return m_value; };
 
 	bool assign(char *src) { return fromStr(m_value, src); };
-	void dumpValue(std::ostream &out) const
-	{
-		out << m_name << " = " << m_value << "\n";
-	};
+	void dumpValue(std::ostream &out) const { out << m_name << " = " << m_value << "\n"; };
 	void resetValue()
 	{
 		m_value = T();
@@ -224,10 +215,10 @@ public:
 
 class DVAPI MultiArgument : public Argument
 {
-protected:
+  protected:
 	int m_count, m_index;
 
-public:
+  public:
 	MultiArgument(std::string name, std::string help)
 		: Argument(name, help), m_count(0), m_index(0){};
 	~MultiArgument(){};
@@ -239,14 +230,12 @@ public:
 
 //---------------------------------------------------------
 
-template <class T>
-class MultiArgumentT : public MultiArgument
+template <class T> class MultiArgumentT : public MultiArgument
 {
 	std::unique_ptr<T[]> m_values;
 
-public:
-	MultiArgumentT(std::string name, std::string help)
-		: MultiArgument(name, help) {}
+  public:
+	MultiArgumentT(std::string name, std::string help) : MultiArgument(name, help) {}
 	T operator[](int index)
 	{
 		assert(0 <= index && index < m_count);
@@ -288,11 +277,11 @@ typedef UsageElement *UsageElementPtr;
 
 class DVAPI UsageLine
 {
-protected:
+  protected:
 	std::unique_ptr<UsageElementPtr[]> m_elements;
 	int m_count;
 
-public:
+  public:
 	UsageLine();
 	virtual ~UsageLine();
 	UsageLine(const UsageLine &ul);
@@ -318,7 +307,7 @@ DVAPI UsageLine operator+(UsageElement &a, UsageElement &b);
 
 class DVAPI Optional : public UsageLine
 {
-public:
+  public:
 	Optional(const UsageLine &ul);
 	~Optional(){};
 };
@@ -335,7 +324,7 @@ class DVAPI Usage
 {
 	std::unique_ptr<UsageImp> m_imp;
 
-public:
+  public:
 	Usage(std::string progName);
 	~Usage();
 	void add(const UsageLine &);
@@ -347,8 +336,8 @@ public:
 	bool parse(const char *argvString, std::ostream &err = std::cerr);
 	void clear(); // per debug
 
-private:
-	//not implemented
+  private:
+	// not implemented
 	Usage(const Usage &);
 	Usage &operator=(const Usage &);
 };
@@ -375,16 +364,13 @@ class DVAPI RangeQualifier : public Qualifier
 {
 	int m_from, m_to;
 
-public:
+  public:
 	RangeQualifier();
 	~RangeQualifier(){};
 
 	int getFrom() const { return m_from; };
 	int getTo() const { return m_to; };
-	bool contains(int frame) const
-	{
-		return m_from <= frame && frame <= m_to;
-	};
+	bool contains(int frame) const { return m_from <= frame && frame <= m_to; };
 	void fetch(int index, int &argc, char *argv[]);
 	void dumpValue(std::ostream &out) const;
 	void resetValue();

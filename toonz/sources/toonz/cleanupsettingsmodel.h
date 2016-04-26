@@ -3,13 +3,13 @@
 #ifndef CLEANUPSETTINGSMODEL_H
 #define CLEANUPSETTINGSMODEL_H
 
-//TnzCore includes
+// TnzCore includes
 #include "trasterimage.h"
 
-//ToonzLib includes
+// ToonzLib includes
 #include "toonz/cleanupparameters.h"
 
-//Qt includes
+// Qt includes
 #include <QObject>
 
 //================================================
@@ -44,11 +44,12 @@ class CleanupSettingsPopup;
   performed by this class once for all views.
 \n\n
   Post-processing performs further local or pixel-per-pixel adjustments that are sufficiently
-  fast to be carried out by single views on their preview area. This includes <I> colors recognition,
+  fast to be carried out by single views on their preview area. This includes <I> colors
+recognition,
   colors adjustment, despeckling <\I> and \a antialiasing-related effects.
 
 \note This class also acts as a wrapper to CleanupParamaters' palette, attaching to the
-      "current cleanup palette handle" accessible through the TPaletteController.
+	  "current cleanup palette handle" accessible through the TPaletteController.
 */
 class CleanupSettingsModel : public QObject
 {
@@ -73,16 +74,11 @@ class CleanupSettingsModel : public QObject
 	TRasterImageP m_cameraTestTransformed; //!< The camera test-transformed image
 	TAffine m_transform;				   //!< The preview transform (no camera test for now)
 
-public:
-	enum { LISTENER = 0x1,
-		   PREVIEWER = 0x2,
-		   CAMERATEST = 0x4 };
-	enum CommitMask { NONE = 0,
-					  INTERFACE,
-					  POSTPROCESS,
-					  FULLPROCESS };
+  public:
+	enum { LISTENER = 0x1, PREVIEWER = 0x2, CAMERATEST = 0x4 };
+	enum CommitMask { NONE = 0, INTERFACE, POSTPROCESS, FULLPROCESS };
 
-public:
+  public:
 	CleanupSettingsModel();
 	~CleanupSettingsModel();
 
@@ -93,16 +89,20 @@ public:
 
 	const TFilePath &clnPath() const { return m_clnPath; }
 
-	//! Attaches an object to the model. It is not necessary to supply the object itself, but a description of its role
-	//! is required. The object could be any combination of the LISTENER, PREVIEWER or CAMERATEST flags. The role information
+	//! Attaches an object to the model. It is not necessary to supply the object itself, but a
+	//! description of its role
+	//! is required. The object could be any combination of the LISTENER, PREVIEWER or CAMERATEST
+	//! flags. The role information
 	//! is used to activate centralized preview or camera test processing.
 	void attach(int objectFlag, bool doPreview = true);
 
-	//! The inverse of attach(), it's used to deactivate the specified role activities when no more attached objects to that role
+	//! The inverse of attach(), it's used to deactivate the specified role activities when no more
+	//! attached objects to that role
 	//! remain.
 	void detach(int objectFlag);
 
-	//! Returns the interesting info about a cleanup preview process. Specifically, we have both the original and
+	//! Returns the interesting info about a cleanup preview process. Specifically, we have both the
+	//! original and
 	//! affine-transformed images, and the applied transform.
 	void getPreviewData(TRasterImageP &original, TRasterImageP &transformed, TAffine &transform)
 	{
@@ -111,7 +111,8 @@ public:
 		transform = m_transform;
 	}
 
-	//! Returns the interesting info about a camera test process. This includes both the original and affine-transformed
+	//! Returns the interesting info about a camera test process. This includes both the original
+	//! and affine-transformed
 	//! image.
 	void getCameraTestData(TRasterImageP &original, TRasterImageP &transformed)
 	{
@@ -119,11 +120,16 @@ public:
 		transformed = m_cameraTestTransformed;
 	}
 
-	//! Specifies the model behavior upon a cleanup parameters change commit. Once the model receives a commitChanges()
-	//! notification, it tracks the changed parameters and decides how deep the image under cleanup focus must be
-	//! re-processed to stick to the changes. The commit mask can be specified to force the model to limit the performed
-	//! cleanup up to the specified stage. This is especially useful in case a parameter changes frequently enough
-	//! that only the last of a long sequence of updates should be processed (e.g. when dragging a parameter slider).
+	//! Specifies the model behavior upon a cleanup parameters change commit. Once the model
+	//! receives a commitChanges()
+	//! notification, it tracks the changed parameters and decides how deep the image under cleanup
+	//! focus must be
+	//! re-processed to stick to the changes. The commit mask can be specified to force the model to
+	//! limit the performed
+	//! cleanup up to the specified stage. This is especially useful in case a parameter changes
+	//! frequently enough
+	//! that only the last of a long sequence of updates should be processed (e.g. when dragging a
+	//! parameter slider).
 	void setCommitMask(CommitMask allowedProcessing);
 
 	void saveSettings(const TFilePath &clnPath);
@@ -133,18 +139,22 @@ public:
 	//! user decided to keep the settings and stop (cancel) any action affecting them.
 	bool saveSettingsIfNeeded();
 
-public:
-	//NOTE: These should be moved to TCleanupper as soon as I get the chance
+  public:
+	// NOTE: These should be moved to TCleanupper as soon as I get the chance
 
-	static TFilePath getInputPath(TXshSimpleLevel *sl); //!< Returns the \b encoded input cleanup path for the specified level.
+	static TFilePath getInputPath(TXshSimpleLevel *sl); //!< Returns the \b encoded input cleanup
+														//!path for the specified level.
 	static TFilePath getOutputPath(TXshSimpleLevel *sl,
-								   const CleanupParameters *params); //!< Returns the \b encoded output cleanup path for the specified level.
+								   const CleanupParameters *params); //!< Returns the \b encoded
+																	 //!output cleanup path for the
+																	 //!specified level.
 
-	static TFilePath getClnPath(TXshSimpleLevel *sl); //!< Returns the \b decoded path for the level's \a cln file.
+	static TFilePath
+	getClnPath(TXshSimpleLevel *sl); //!< Returns the \b decoded path for the level's \a cln file.
 	static void saveSettings(CleanupParameters *params, const TFilePath &clnPath);
 	static bool loadSettings(CleanupParameters *params, const TFilePath &clnPath);
 
-public slots:
+  public slots:
 
 	//! Informs the model that current settings have changed. Settings analysis
 	//! and cleanup refreshes ensue. The modelChanged() signal is then emitted to
@@ -156,7 +166,7 @@ public slots:
 
 	void restoreGlobalSettings(); //!< Reloads the project's cleanup settings (no prompts)
 
-signals:
+  signals:
 
 	//! Emitted whenever the model has finished processing a cleanup settings change.
 	//! This happens after an explicit commitChange() has been invoked from a view,
@@ -175,7 +185,7 @@ signals:
 	//! a cln has been loaded.
 	void clnLoaded();
 
-private:
+  private:
 	void commitChanges(int action);
 
 	void connectSignals();
@@ -184,11 +194,11 @@ private:
 	void rebuildPreview();
 	void processFrame(TXshSimpleLevel *sl, TFrameId fid);
 
-private slots:
+  private slots:
 
 	void onSceneSwitched();
 	void onCellChanged();
 	void onPaletteChanged();
 };
 
-#endif //CLEANUPSETTINGSMODEL_H
+#endif // CLEANUPSETTINGSMODEL_H

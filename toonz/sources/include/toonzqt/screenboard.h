@@ -29,52 +29,52 @@ namespace DVGui
 //! be rendered on the whole desktop surface.
 
 /*! The Qt Framework does not provide a standard way to draw directly on the
-    desktop.
+	desktop.
 \n\n
-    Typically, users have to allocate a QWidget to host any drawing command
-    to be rendered - but the rendering surface only covers the entirety of the
-    widget geometry, and nothing more.
+	Typically, users have to allocate a QWidget to host any drawing command
+	to be rendered - but the rendering surface only covers the entirety of the
+	widget geometry, and nothing more.
 
-    Plus, the maximal drawing geometry should be known in advance when using a
-    host widget, or else heavy flickering will result from attempts to move
-    \a and resize the widget to cover new portions of the desktop.
+	Plus, the maximal drawing geometry should be known in advance when using a
+	host widget, or else heavy flickering will result from attempts to move
+	\a and resize the widget to cover new portions of the desktop.
 \n\n
-    Another important use for the ScreenBoard is that of allowing dektop-wide mouse
-    grabbing through the grabMouse() and releaseMouse() functions.
+	Another important use for the ScreenBoard is that of allowing dektop-wide mouse
+	grabbing through the grabMouse() and releaseMouse() functions.
 \n\n
-    The ScreenBoard stores a private collection of static, inert and transparent
-    <I> screen widgets <\I>, each overlapping a desktop screen, to be used as
-    drawable surfaces for self-drawing objects (ScreenBoard::Drawing instances)
-    that are added to the board.
+	The ScreenBoard stores a private collection of static, inert and transparent
+	<I> screen widgets <\I>, each overlapping a desktop screen, to be used as
+	drawable surfaces for self-drawing objects (ScreenBoard::Drawing instances)
+	that are added to the board.
 \n\n
-    Drawings can be added to the board by direct manipulation of the drawings()
-    container list.
+	Drawings can be added to the board by direct manipulation of the drawings()
+	container list.
 
-    Use the update() method to refresh the screen after drawing insertions or
-    removals.
+	Use the update() method to refresh the screen after drawing insertions or
+	removals.
 \n\n
-    Screen widgets redirect any event they receive to drawings that accept redirection
-    through the Drawings::accpetScreenEvents() method.
+	Screen widgets redirect any event they receive to drawings that accept redirection
+	through the Drawings::accpetScreenEvents() method.
 
-    The drawings() list sorting affects the order in which events from screen widgets
-    are delivered to drawings.
+	The drawings() list sorting affects the order in which events from screen widgets
+	are delivered to drawings.
 
-    In particular, drawings' <I> stacking order <\I> is \b inverse to the their list
-    ordering - so, paint events are received in \b reverse with respect to other
-    events. Event acceptance is ignored to determine event delivery to drawings.
+	In particular, drawings' <I> stacking order <\I> is \b inverse to the their list
+	ordering - so, paint events are received in \b reverse with respect to other
+	events. Event acceptance is ignored to determine event delivery to drawings.
 \n\n
-    Observe that upon every update() invocation, the screen widgets pool will
-    be refreshed to keep it to a minimum.
+	Observe that upon every update() invocation, the screen widgets pool will
+	be refreshed to keep it to a minimum.
 */
 
 class DVAPI ScreenBoard : public QObject
 {
 	Q_OBJECT
 
-public:
+  public:
 	class Drawing;
 
-private:
+  private:
 	class ScreenWidget;
 
 	QVector<ScreenWidget *> m_screenWidgets;
@@ -86,7 +86,7 @@ private:
 	bool m_mouseOnAScreen;
 	bool m_updated;
 
-public:
+  public:
 	static ScreenBoard *instance();
 
 	const QList<Drawing *> &drawings() const { return m_drawings; }
@@ -97,17 +97,17 @@ public:
 
 	bool grabbingMouse() const { return m_grabbing; } //!< Whether mouse grabbing is on.
 
-private:
+  private:
 	ScreenBoard();
 
 	void reallocScreenWidgets();
 	void ensureMouseOnAScreen();
 
-public slots:
+  public slots:
 
 	void update(); //!< Refreshes the screen widgets pool and updates them.
 
-private slots:
+  private slots:
 
 	friend class ScreenWidget;
 
@@ -123,11 +123,11 @@ private slots:
 //! in screen coordinates through the ScreenBoard.
 class ScreenBoard::Drawing
 {
-public:
+  public:
 	//! Generic event handler for drawings.
 	/*! Reimplement it to receive events from screen widgets other than paint events.
-      Paint events are \b not received in this handler, since they must be delivered
-      in reverse order.
+	  Paint events are \b not received in this handler, since they must be delivered
+	  in reverse order.
   */
 	virtual void event(QWidget *widget, QEvent *e) {}
 
@@ -140,6 +140,6 @@ public:
 	virtual bool acceptScreenEvents(const QRect &screenRect) const = 0;
 };
 
-} //namespace DVGui
+} // namespace DVGui
 
-#endif //SCREENBOARD_H
+#endif // SCREENBOARD_H

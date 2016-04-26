@@ -18,13 +18,13 @@
 
 class TAutocloser
 {
-public:
+  public:
 	typedef std::pair<TPoint, TPoint> Segment;
 
 	TAutocloser(const TRasterP &r);
 	~TAutocloser();
 
-	//if this function is never used, use default values
+	// if this function is never used, use default values
 	void setClosingDistance(int d);
 	int getClosingDistance() const;
 
@@ -36,11 +36,11 @@ public:
 
 	void compute(vector<Segment> &closingSegmentArray);
 
-private:
+  private:
 	class Imp;
 	Imp *m_imp;
 
-	//not implemented
+	// not implemented
 	TAutocloser();
 	TAutocloser(const TAutocloser &a);
 	TAutocloser &operator=(const TAutocloser &a);

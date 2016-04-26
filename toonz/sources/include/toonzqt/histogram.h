@@ -45,10 +45,10 @@ class DVAPI HistogramGraph : public QWidget
 	QVector<int> m_values, m_viewValues, m_logViewValues;
 	bool m_logScale;
 
-public:
+  public:
 	static const int drawMargin;
 
-public:
+  public:
 	HistogramGraph(QWidget *parent = 0, QColor m_color = QColor());
 	~HistogramGraph();
 
@@ -65,7 +65,7 @@ public:
 
 	void draw(QPainter *painter, QPoint translation = QPoint(0, 0));
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *pe);
 };
 
@@ -83,9 +83,8 @@ class DVAPI ChannelBar : public QWidget
 	bool m_isHorizontal;
 	bool m_drawNumbers;
 
-public:
-	ChannelBar(QWidget *parent = 0, QColor m_color = QColor(),
-			   bool isHorizontal = true);
+  public:
+	ChannelBar(QWidget *parent = 0, QColor m_color = QColor(), bool isHorizontal = true);
 	~ChannelBar();
 
 	QColor getColor() const { return m_color; }
@@ -95,7 +94,7 @@ public:
 
 	void draw(QPainter *painter, QPoint translation = QPoint(0, 0));
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *event);
 };
 
@@ -112,7 +111,7 @@ class DVAPI HistogramView : public QWidget
 
 	QWidget *m_drawnWidget;
 
-public:
+  public:
 	HistogramView(QWidget *parent = 0, QColor color = Qt::black);
 	~HistogramView();
 
@@ -124,7 +123,7 @@ public:
 
 	QColor getChannelBarColor() const { return m_colorBar->getColor(); }
 
-	//Deve essere fatto prima di chiamare setValues()
+	// Deve essere fatto prima di chiamare setValues()
 	void setGraphHeight(int height) { m_histogramGraph->setHeight(height); }
 	void setGraphAlphaMask(int value) { m_histogramGraph->setAlphaMask(value); }
 	void setDrawnWidget(QWidget *widget);
@@ -144,12 +143,12 @@ class DVAPI Histograms : public QStackedWidget
 	Q_OBJECT
 
 	TRasterP m_raster;
-	TPaletteP m_palette; //Necessario per le tlv
+	TPaletteP m_palette; // Necessario per le tlv
 	int m_channelValue[6][256];
 	int m_channelsCount;
 	bool m_computeAlsoRGBA;
 
-public:
+  public:
 	Histograms(QWidget *parent = 0, bool rgba = false);
 	~Histograms();
 
@@ -159,7 +158,7 @@ public:
 	HistogramView *getHistogramView(int indexType) const;
 	int channelsCount() const { return m_channelsCount; }
 
-protected:
+  protected:
 	void computeChannelsValue();
 };
 
@@ -174,7 +173,7 @@ class DVAPI Histogram : public QWidget
 	QComboBox *m_channelsListBox;
 	Histograms *m_histograms;
 
-public:
+  public:
 	Histogram(QWidget *parent = 0);
 	~Histogram() {}
 
@@ -183,11 +182,11 @@ public:
 	TRasterP getRaster() const { return m_histograms->getRaster(); }
 	void setRaster(const TRasterP &raster, const TPaletteP &palette = 0);
 
-public slots:
+  public slots:
 
 	void setLogScale(bool onOff);
 
-private:
+  private:
 	void updateChannelsList();
 };
 

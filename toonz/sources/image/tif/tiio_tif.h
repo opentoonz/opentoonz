@@ -44,13 +44,13 @@ namespace Tiio
 
 class TifWriterProperties : public TPropertyGroup
 {
-public:
+  public:
 	TEnumProperty m_byteOrdering;
 	TEnumProperty m_compressionType;
 	TEnumProperty m_bitsPerPixel;
 	TEnumProperty m_orientation;
 
-	//TBoolProperty m_matte;
+	// TBoolProperty m_matte;
 	TifWriterProperties();
 };
 
@@ -63,4 +63,4 @@ Tiio::Reader *makeTziReader();
 
 } // namespace
 
-#endif //TTIO_TIF_INCLUDED
+#endif // TTIO_TIF_INCLUDED

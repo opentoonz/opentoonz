@@ -40,8 +40,7 @@ void Skeleton::Bone::setParent(Bone *parent)
 
 //=============================================================================
 
-Skeleton::Skeleton()
-	: m_rootBone(0)
+Skeleton::Skeleton() : m_rootBone(0)
 {
 }
 

@@ -48,16 +48,10 @@ class TextFieldChanger : public TTextField::Action
 	SubmitPage *m_submit;
 	bool m_isName;
 
-public:
-	TextFieldChanger(SubmitPage *submit, bool isName)
-		: m_submit(submit), m_isName(isName)
-	{
-	}
+  public:
+	TextFieldChanger(SubmitPage *submit, bool isName) : m_submit(submit), m_isName(isName) {}
 
-	void sendCommand(wstring name)
-	{
-		m_submit->onTextField(toString(name), m_isName);
-	}
+	void sendCommand(wstring name) { m_submit->onTextField(toString(name), m_isName); }
 };
 
 //==============================================================================
@@ -69,7 +63,7 @@ class SubmitPage::Data
 	{
 		SubmitPage::Data *m_data;
 
-	public:
+	  public:
 		FilePathField(SubmitPage::Data *data, TWidget *parent, string name = "")
 			: TTextField(parent, name), m_data(data)
 		{
@@ -117,7 +111,7 @@ class SubmitPage::Data
 		}
 	};
 
-public:
+  public:
 	Data(SubmitPage *page);
 	~Data();
 
@@ -162,8 +156,7 @@ public:
 
 //------------------------------------------------------------------------------
 
-SubmitPage::Data::Data(SubmitPage *page)
-	: m_page(page), m_task(0)
+SubmitPage::Data::Data(SubmitPage *page) : m_page(page), m_task(0)
 {
 	m_taskTypeLbl = new TLabel(page);
 	m_taskTypeLbl->setText("Task type:");
@@ -194,7 +187,7 @@ SubmitPage::Data::Data(SubmitPage *page)
 	m_filepathLbl->setText("File Path:");
 
 	m_filepathTextField = new FilePathField(this, page);
-	//m_filepathTextField->addAction(new TextFieldChanger(page, false));
+	// m_filepathTextField->addAction(new TextFieldChanger(page, false));
 	m_casmBrowseBtn = new TButton(page);
 	m_casmBrowseBtn->setTitle("...");
 	tconnect(*m_casmBrowseBtn, this, &SubmitPage::Data::browseCasmFiles);
@@ -269,7 +262,7 @@ void SubmitPage::Data::configureNotify(const TDimension &size)
 
 	x = x0;
 	y -= 90;
-	//m_configPanel->setGeometry(0,0,size.lx-1,y);
+	// m_configPanel->setGeometry(0,0,size.lx-1,y);
 	std::map<string, TaskConfigPanel *>::iterator it;
 	it = m_configPanels.begin();
 	for (; it != m_configPanels.end(); ++it)
@@ -332,7 +325,7 @@ void SubmitPage::Data::browseCasmFiles()
 #endif
 
 	d -= popup->getSize();
-	//TDimension d = TMainshell::getMainshell()->getSize() - popup->getSize();
+	// TDimension d = TMainshell::getMainshell()->getSize() - popup->getSize();
 	popup->popup(TPoint(d.lx / 2, d.ly / 2));
 	popup->setCaption("Load " + m_taskType->getText());
 }
@@ -385,8 +378,7 @@ void SubmitPage::Data::load(const TFilePath &fp)
 	else
 		assert(false);
 
-	std::map<string, SubmitPageTask *>::iterator it =
-		m_tasks.find(type);
+	std::map<string, SubmitPageTask *>::iterator it = m_tasks.find(type);
 	if (it != m_tasks.end()) {
 		delete it->second;
 		it->second = m_task;
@@ -430,7 +422,8 @@ void SubmitPage::Data::submit()
 		}
 #endif
 		else {
-			TMessage::error("Verify if " + toString(m_filepathTextField->getText()) + " is correct");
+			TMessage::error("Verify if " + toString(m_filepathTextField->getText()) +
+							" is correct");
 			return;
 		}
 	} catch (TException &e) {
@@ -462,8 +455,8 @@ void SubmitPage::Data::submitCasm(CasmTask2 *casm)
 	string host = TSystem::getHostName();
 	int stepCount = casm->m_end - casm->m_start + 1;
 
-	TFarmTaskGroup task(
-		casmName, nativeCmdLine, user, host, stepCount, (int)m_priority->getValue());
+	TFarmTaskGroup task(casmName, nativeCmdLine, user, host, stepCount,
+						(int)m_priority->getValue());
 
 	map<string, string> dep = casm->getDependencies();
 	map<string, string>::iterator itDep = dep.begin();
@@ -502,8 +495,8 @@ void SubmitPage::Data::submitCasm(CasmTask2 *casm)
 				string name = casmName + " " + toString(ra) + "-" + toString(rb);
 				stepCount = rb - ra + 1;
 
-				TFarmTask *subTask =
-					new TFarmTask(name, cmdLine, user, host, stepCount, (int)m_priority->getValue());
+				TFarmTask *subTask = new TFarmTask(name, cmdLine, user, host, stepCount,
+												   (int)m_priority->getValue());
 				subTask->m_dependencies = new TFarmTask::Dependencies(*task.m_dependencies);
 				task.addTask(subTask);
 			} catch (TException &e) {
@@ -563,8 +556,7 @@ void SubmitPage::Data::onTaskType(string type)
 		TaskConfigPanel *configPanel = it->second;
 		m_configPanel = configPanel;
 		m_configPanel->show();
-		std::map<string, SubmitPageTask *>::iterator it1 =
-			m_tasks.find(type);
+		std::map<string, SubmitPageTask *>::iterator it1 = m_tasks.find(type);
 		if (it1 != m_tasks.end()) {
 			m_task = it1->second;
 			m_depList->setList(m_task->getDependencies());
@@ -582,8 +574,7 @@ void SubmitPage::Data::onTaskType(string type)
 
 //==============================================================================
 
-SubmitPage::SubmitPage(TWidget *parent)
-	: TabPage(parent, "Submit Task")
+SubmitPage::SubmitPage(TWidget *parent) : TabPage(parent, "Submit Task")
 {
 	m_data = new SubmitPage::Data(this);
 }
@@ -649,15 +640,13 @@ void SubmitPage::setTask(SubmitPageTask *task)
 		assert(false);
 	}
 
-	std::map<string, SubmitPageTask *>::iterator it =
-		m_data->m_tasks.find(type);
+	std::map<string, SubmitPageTask *>::iterator it = m_data->m_tasks.find(type);
 	if (it == m_data->m_tasks.end()) {
 		m_data->m_tasks.insert(std::make_pair(type, m_data->m_task));
 	} else
 		it->second = m_data->m_task;
 
-	std::map<string, TaskConfigPanel *>::iterator it1 =
-		m_data->m_configPanels.find(type);
+	std::map<string, TaskConfigPanel *>::iterator it1 = m_data->m_configPanels.find(type);
 	if (it1 != m_data->m_configPanels.end()) {
 		it1->second->setTask(task);
 		m_data->m_configPanel = it1->second;

@@ -5,10 +5,8 @@
 #include "tnz4.h"
 /*---------------------------------------------------------------------------*/
 
-void getInfoRegion(
-	INFO_REGION *region,
-	int x1_out, int y1_out, int x2_out, int y2_out, int scale,
-	int width_in, int height_in)
+void getInfoRegion(INFO_REGION *region, int x1_out, int y1_out, int x2_out, int y2_out, int scale,
+				   int width_in, int height_in)
 {
 
 	/*
@@ -19,12 +17,12 @@ void getInfoRegion(
 
 	int x1_in, y1_in, x2_in, y2_in;
 
-#define SWAP(a, b)        \
-	{                     \
-		int tmp; \
-		tmp = a;          \
-		a = b;            \
-		b = tmp;          \
+#define SWAP(a, b)                                                                                 \
+	{                                                                                              \
+		int tmp;                                                                                   \
+		tmp = a;                                                                                   \
+		a = b;                                                                                     \
+		b = tmp;                                                                                   \
 	}
 
 	/* Scambia le coordinate della regione da leggere se invertite */
@@ -77,7 +75,7 @@ void getInfoRegion(
 	region->startScanRow = y1_out;
 	region->startScanCol = x1_out - x1_in;
 
-	/* 
+	/*
    * Questi offset sono relativi al buffer di uscita, nel caso
    * in cui una parte della regione sfora rispetto all'immagine
    * sorgente.
@@ -126,9 +124,8 @@ void getInfoRegion(
 
 /*---------------------------------------------------------------------------*/
 
-int get_info_region(EXT_INFO_REGION *region,
-					int x1_out, int y1_out, int x2_out, int y2_out, int scale,
-					int width_in, int height_in, int orientation)
+int get_info_region(EXT_INFO_REGION *region, int x1_out, int y1_out, int x2_out, int y2_out,
+					int scale, int width_in, int height_in, int orientation)
 {
 
 	/*
@@ -140,12 +137,12 @@ int get_info_region(EXT_INFO_REGION *region,
 	int x1_in, y1_in, x2_in, y2_in;
 	int appo, appoNcol, appoNrow;
 
-#define SWAP(a, b)        \
-	{                     \
-		int tmp; \
-		tmp = a;          \
-		a = b;            \
-		b = tmp;          \
+#define SWAP(a, b)                                                                                 \
+	{                                                                                              \
+		int tmp;                                                                                   \
+		tmp = a;                                                                                   \
+		a = b;                                                                                     \
+		b = tmp;                                                                                   \
 	}
 
 	/* Scambia le coordinate della regione da leggere se invertite */
@@ -198,7 +195,7 @@ int get_info_region(EXT_INFO_REGION *region,
 	region->startScanRow = y1_out;
 	region->startScanCol = x1_out;
 
-	/* 
+	/*
    * Questi offset sono relativi al buffer di uscita, nel caso
    * in cui una parte della regione sfora rispetto all'immagine
    * sorgente.
@@ -325,24 +322,18 @@ void print_info_region(EXT_INFO_REGION *region)
 		return;
 
 	printf("IMAGE INPUT:\n");
-	printf(" size              (lx_in, ly_in)........ (%d,%d)\n",
-		   region->lx_in, region->ly_in);
-	printf(" start offset      (sScanCol, sScanRow).. (%d,%d)\n",
-		   region->startScanCol, region->startScanRow);
-	printf(" region size       (scanNcol, scanNrow).. (%d,%d)\n",
-		   region->scanNcol, region->scanNrow);
-	printf(" bottom-left       (sxpix, sypix)........ (%d,%d)\n",
-		   region->sxpix, region->sypix);
-	printf(" scale             (step)................ (   %d)\n",
-		   region->step);
+	printf(" size              (lx_in, ly_in)........ (%d,%d)\n", region->lx_in, region->ly_in);
+	printf(" start offset      (sScanCol, sScanRow).. (%d,%d)\n", region->startScanCol,
+		   region->startScanRow);
+	printf(" region size       (scanNcol, scanNrow).. (%d,%d)\n", region->scanNcol,
+		   region->scanNrow);
+	printf(" bottom-left       (sxpix, sypix)........ (%d,%d)\n", region->sxpix, region->sypix);
+	printf(" scale             (step)................ (   %d)\n", region->step);
 
 	printf("IMAGE OUTPUT:\n");
-	printf(" size              (xsize, ysize)........ (%d,%d)\n",
-		   region->xsize, region->ysize);
-	printf(" start offset      (x_offset, y_offset).. (%d,%d)\n",
-		   region->x_offset, region->y_offset);
-	printf(" verso             (verso_x, verso_y).... (%d,%d)\n",
-		   region->verso_x, region->verso_y);
-	printf(" buffer increment  (buf_inc)............. (   %d)\n",
-		   region->buf_inc);
+	printf(" size              (xsize, ysize)........ (%d,%d)\n", region->xsize, region->ysize);
+	printf(" start offset      (x_offset, y_offset).. (%d,%d)\n", region->x_offset,
+		   region->y_offset);
+	printf(" verso             (verso_x, verso_y).... (%d,%d)\n", region->verso_x, region->verso_y);
+	printf(" buffer increment  (buf_inc)............. (   %d)\n", region->buf_inc);
 }

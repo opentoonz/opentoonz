@@ -14,7 +14,7 @@ using std::endl;
 
 class TLogger::Imp
 {
-public:
+  public:
 	std::vector<TLogger::Message> m_messages;
 	std::set<TLogger::Listener *> m_listeners;
 	TThread::Mutex m_mutex;
@@ -23,14 +23,13 @@ public:
 	{
 		Imp *m_imp;
 
-	public:
+	  public:
 		ListenerNotifier(Imp *imp) : m_imp(imp) {}
 		void onDeliver()
 		{
 			QMutexLocker sl(&m_imp->m_mutex);
 			std::set<TLogger::Listener *>::iterator it;
-			for (it = m_imp->m_listeners.begin();
-				 it != m_imp->m_listeners.end(); ++it)
+			for (it = m_imp->m_listeners.begin(); it != m_imp->m_listeners.end(); ++it)
 				(*it)->onLogChanged();
 		}
 		TThread::Message *clone() const { return new ListenerNotifier(*this); }
@@ -38,16 +37,14 @@ public:
 
 	void notify()
 	{
-		//ListenerNotifier(this).send();//onDeliver()
+		// ListenerNotifier(this).send();//onDeliver()
 		std::set<TLogger::Listener *>::iterator it;
-		for (it = m_listeners.begin();
-			 it != m_listeners.end(); ++it)
+		for (it = m_listeners.begin(); it != m_listeners.end(); ++it)
 			(*it)->onLogChanged();
 	}
 };
 
-TLogger::TLogger()
-	: m_imp(new Imp())
+TLogger::TLogger() : m_imp(new Imp())
 {
 }
 
@@ -61,8 +58,7 @@ TLogger *TLogger::instance()
 	return &_instance;
 }
 
-TLogger::Message::Message(MessageType type, std::string text)
-	: m_type(type), m_text(text)
+TLogger::Message::Message(MessageType type, std::string text) : m_type(type), m_text(text)
 {
 	QTime t = QTime::currentTime();
 	m_timestamp = t.toString("hh:mm:ss.zzz").toStdString();
@@ -105,8 +101,7 @@ void TLogger::removeListener(TLogger::Listener *listener)
 	m_imp->m_listeners.erase(listener);
 }
 
-TLogger::Stream::Stream(MessageType type)
-	: m_type(type), m_text()
+TLogger::Stream::Stream(MessageType type) : m_type(type), m_text()
 {
 }
 

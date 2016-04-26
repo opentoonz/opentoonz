@@ -10,13 +10,12 @@ using namespace TwConsts;
 
 class TGridColumn::Imp
 {
-public:
+  public:
 	vector<TGridCell> m_cells;
 	string m_name;
 	TGridColumn::Alignment m_alignment;
 
-	Imp(const string &name, Alignment alignment)
-		: m_name(name), m_alignment(alignment) {}
+	Imp(const string &name, Alignment alignment) : m_name(name), m_alignment(alignment) {}
 
 	~Imp() {}
 
@@ -26,15 +25,14 @@ public:
 		return *this;
 	}
 
-private:
-	//not implemented
+  private:
+	// not implemented
 	Imp(const Imp &);
 };
 
 //-------------------------------------------------------------------
 
-TGridColumn::TGridColumn(const string &name, Alignment alignment)
-	: m_imp(new Imp(name, alignment))
+TGridColumn::TGridColumn(const string &name, Alignment alignment) : m_imp(new Imp(name, alignment))
 {
 }
 
@@ -64,10 +62,10 @@ void TGridColumn::setCell(int row, const TGridCell &cell)
 	assert(m_imp);
 	assert(row >= 0);
 
-	//checkColumn();
+	// checkColumn();
 
 	int firstRow = 0;
-	if (m_imp->m_cells.empty()) //se la colonna e' vuota
+	if (m_imp->m_cells.empty()) // se la colonna e' vuota
 	{
 		//    if(!cell.isEmpty())
 		{
@@ -81,22 +79,23 @@ void TGridColumn::setCell(int row, const TGridCell &cell)
 	assert(oldCellCount > 0);
 	int lastRow = firstRow + oldCellCount - 1;
 
-	if (row < firstRow) //prima
+	if (row < firstRow) // prima
 	{
 		//    if(cell.isEmpty()) return; //non faccio nulla
 		int delta = firstRow - row;
 		assert(delta > 0);
-		m_imp->m_cells.insert(m_imp->m_cells.begin(), delta - 1, TGridCell()); //celle vuote
-		m_imp->m_cells.insert(m_imp->m_cells.begin(), cell);				   //devo settare la prima comp. del vettore
-		firstRow = row;														   //row 'e la nuova firstrow
-																			   //    updateIcon();
-																			   //    checkColumn();
+		m_imp->m_cells.insert(m_imp->m_cells.begin(), delta - 1, TGridCell()); // celle vuote
+		m_imp->m_cells.insert(m_imp->m_cells.begin(),
+							  cell); // devo settare la prima comp. del vettore
+		firstRow = row; // row 'e la nuova firstrow
+		//    updateIcon();
+		//    checkColumn();
 		return;
-	} else if (row > lastRow) //dopo
+	} else if (row > lastRow) // dopo
 	{
 		//    if(cell.isEmpty()) return; //non faccio nulla
 		int count = row - lastRow - 1;
-		//se necessario, inserisco celle vuote
+		// se necessario, inserisco celle vuote
 		for (int i = 0; i < count; ++i)
 			m_imp->m_cells.push_back(TGridCell());
 		m_imp->m_cells.push_back(cell);
@@ -112,25 +111,25 @@ void TGridColumn::setCell(int row, const TGridCell &cell)
 	/*
   if(cell.isEmpty())
   {
-    if(row==lastRow)
-    {
-      // verifico la presenza di celle bianche alla fine     
-      while(!m_imp->m_cells.empty() && m_imp->m_cells.back().isEmpty()) 
-        m_imp->m_cells.pop_back();     
-    }
-    else
-    if(row==firstRow)
-    {
-      // verifico la presenza di celle bianche all'inizio
-      while(!m_imp->m_cells.empty() && m_imp->m_cells.front().isEmpty()) 
-      {
-       m_imp->m_cells.erase(m_imp->m_cells.begin());  
-       firstRow++;
-      }
-    }
-  
-    if(m_imp->m_cells.empty())
-      firstRow = 0;
+	if(row==lastRow)
+	{
+	  // verifico la presenza di celle bianche alla fine
+	  while(!m_imp->m_cells.empty() && m_imp->m_cells.back().isEmpty())
+		m_imp->m_cells.pop_back();
+	}
+	else
+	if(row==firstRow)
+	{
+	  // verifico la presenza di celle bianche all'inizio
+	  while(!m_imp->m_cells.empty() && m_imp->m_cells.front().isEmpty())
+	  {
+	   m_imp->m_cells.erase(m_imp->m_cells.begin());
+	   firstRow++;
+	  }
+	}
+
+	if(m_imp->m_cells.empty())
+	  firstRow = 0;
   }
   checkColumn();
 */
@@ -143,15 +142,15 @@ void TGridColumn::insertEmptyCells(int row, int rowCount)
 {
 	assert(m_imp);
 	if (m_imp->m_cells.empty())
-		return; //se la colonna e' vuota non devo inserire celle
+		return; // se la colonna e' vuota non devo inserire celle
 
 	int firstRow = 0;
 	if (row >= firstRow + (int)m_imp->m_cells.size())
-		return;			 //dopo:non inserisco nulla
-	if (row <= firstRow) //prima
+		return; // dopo:non inserisco nulla
+	if (row <= firstRow) // prima
 	{
 		firstRow += rowCount;
-	} else //in mezzo
+	} else // in mezzo
 	{
 		int delta = row - firstRow;
 		std::vector<TGridCell>::iterator it = m_imp->m_cells.begin();
@@ -165,21 +164,21 @@ void TGridColumn::removeCells(int row, int rowCount)
 	if (rowCount <= 0)
 		return;
 	if (m_imp->m_cells.empty())
-		return; //se la colonna e' vuota
+		return; // se la colonna e' vuota
 	assert(m_imp);
 
-	int firstRow = 0; //m_imp->m_first;
+	int firstRow = 0; // m_imp->m_first;
 	int cellCount = m_imp->m_cells.size();
 
 	if (row >= firstRow + cellCount)
-		return; //sono "sotto" l'ultima cella
+		return; // sono "sotto" l'ultima cella
 	if (row < firstRow) {
 		if (row + rowCount <= firstRow) //"sono sopra la prima cella"
 		{								// aggiorno solo m_first
 			firstRow -= rowCount;
 			return;
 		}
-		rowCount += row - firstRow; //rowCount = row+rowCount-firstRow;
+		rowCount += row - firstRow; // rowCount = row+rowCount-firstRow;
 		firstRow = row;
 	}
 
@@ -191,12 +190,12 @@ void TGridColumn::removeCells(int row, int rowCount)
 		return;
 
 	if (row == firstRow) {
-		//cancello all'inizio
+		// cancello all'inizio
 		assert(rowCount <= cellCount);
 		std::vector<TGridCell>::iterator it = m_imp->m_cells.begin();
 		std::vector<TGridCell>::iterator it2 = m_imp->m_cells.begin();
 		std::advance(it2, rowCount);
-		//m_imp->m_cells.erase(&m_imp->m_cells[0],&m_imp->m_cells[rowCount]);
+		// m_imp->m_cells.erase(&m_imp->m_cells[0],&m_imp->m_cells[rowCount]);
 		m_imp->m_cells.erase(it, it2);
 		// verifico la presenza di celle bianche all'inizio
 		while (!m_imp->m_cells.empty() /*&& m_imp->m_cells.front().isEmpty()*/) {
@@ -210,7 +209,7 @@ void TGridColumn::removeCells(int row, int rowCount)
 		std::vector<TGridCell>::iterator it2 = m_imp->m_cells.begin();
 		std::advance(it, d);
 		std::advance(it2, d + rowCount);
-		//m_imp->m_cells.erase(&m_imp->m_cells[d],&m_imp->m_cells[d+rowCount]);
+		// m_imp->m_cells.erase(&m_imp->m_cells[d],&m_imp->m_cells[d+rowCount]);
 		m_imp->m_cells.erase(it, it2);
 		if (row + rowCount == firstRow + cellCount) {
 			// verifico la presenza di celle bianche alla fine
@@ -223,7 +222,7 @@ void TGridColumn::removeCells(int row, int rowCount)
 	if (m_imp->m_cells.empty()) {
 		firstRow = 0;
 	}
-	//updateIcon();
+	// updateIcon();
 }
 
 void TGridColumn::clearCells(int row, int rowCount)
@@ -247,8 +246,9 @@ TGridColumn::Alignment TGridColumn::getAlignment() const
 
 class TGrid::Data
 {
-public:
-	Data(TWidget *w) : m_w(w), m_selAction(0), m_dblClickAction(0), m_scrollbar(new TScrollbar(w)), m_yoffset(0)
+  public:
+	Data(TWidget *w)
+		: m_w(w), m_selAction(0), m_dblClickAction(0), m_scrollbar(new TScrollbar(w)), m_yoffset(0)
 	{
 	}
 
@@ -273,9 +273,9 @@ public:
 		TGridColumnP col = m_columnSet.getColumn(0);
 
 		if ((col->getRowCount() * m_rowHeight) > ly)
-			m_scrollbar->show(); //m_scrollbar->setValue(m_yoffset,0, yrange-ly, ly);
+			m_scrollbar->show(); // m_scrollbar->setValue(m_yoffset,0, yrange-ly, ly);
 		else
-			m_scrollbar->hide(); //m_scrollbar->setValue(0,0, 0, 0);
+			m_scrollbar->hide(); // m_scrollbar->setValue(0,0, 0, 0);
 		m_scrollbar->invalidate();
 	}
 
@@ -310,14 +310,12 @@ int TGrid::Data::posToRow(const TPoint &p)
 //-------------------------------------------------------------------
 //-------------------------------------------------------------------
 
-TGrid::TGrid(TWidget *parent, string name)
-	: TWidget(parent, name), m_data(0)
+TGrid::TGrid(TWidget *parent, string name) : TWidget(parent, name), m_data(0)
 {
 	m_data = new Data(this);
-	m_data->m_scrollbar->setAction(
-		new TScrollbarAction<TGrid>(this, &TGrid::scrollTo));
+	m_data->m_scrollbar->setAction(new TScrollbarAction<TGrid>(this, &TGrid::scrollTo));
 
-	//setBackgroundColor(White);
+	// setBackgroundColor(White);
 }
 
 //-------------------------------------------------------------------
@@ -466,7 +464,7 @@ void TGrid::draw()
 {
 	TDimension size = getSize();
 
-	//TRect gridHeaderPlacement(TPoint(0,size.ly-1), TDimension(size.lx-1, -m_data->m_rowHeight));
+	// TRect gridHeaderPlacement(TPoint(0,size.ly-1), TDimension(size.lx-1, -m_data->m_rowHeight));
 
 	TRect gridHeaderPlacement(0, size.ly - 1 - m_data->m_rowHeight, size.lx - 1, size.ly - 1);
 
@@ -482,12 +480,14 @@ void TGrid::draw()
 
 		// draw column header
 		setColor(Black);
-		drawText(TRect(x0, gridHeaderY0, x1, gridHeaderY0 + m_data->m_rowHeight - 1), col->getName());
+		drawText(TRect(x0, gridHeaderY0, x1, gridHeaderY0 + m_data->m_rowHeight - 1),
+				 col->getName());
 
 		int rowY = gridHeaderY0; // - m_data->m_rowHeight;
 
 		int y = size.ly - 1 - m_data->m_rowHeight;
-		for (int j = m_data->m_yoffset / m_data->m_rowHeight; j < col->getRowCount() && y; ++j, y -= m_data->m_rowHeight) {
+		for (int j = m_data->m_yoffset / m_data->m_rowHeight; j < col->getRowCount() && y;
+			 ++j, y -= m_data->m_rowHeight) {
 			drawHLine(TPoint(0, rowY), size.lx);
 
 			TRect cellRect(x0, rowY - m_data->m_rowHeight - 1, x1, rowY);

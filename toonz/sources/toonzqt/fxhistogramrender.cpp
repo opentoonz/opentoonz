@@ -37,8 +37,8 @@ FxHistogramRenderPort::~FxHistogramRenderPort()
 
 void FxHistogramRenderPort::onRenderRasterCompleted(const RenderData &renderData)
 {
-	//It is necessary to clone the raster. The raster is the same for each render and
-	//each new render modify the images in the filpBooks showing old previews.
+	// It is necessary to clone the raster. The raster is the same for each render and
+	// each new render modify the images in the filpBooks showing old previews.
 	emit renderCompleted(renderData.m_rasA->clone(), renderData.m_renderId);
 }
 
@@ -47,7 +47,8 @@ void FxHistogramRenderPort::onRenderRasterCompleted(const RenderData &renderData
 //*******************************************************************************************************
 
 FxHistogramRender::FxHistogramRender()
-	: QObject(), m_renderer(TSystem::getProcessorCount()), m_lastFrameInfo(), m_scene(), m_histograms(), m_isCameraViewMode(false)
+	: QObject(), m_renderer(TSystem::getProcessorCount()), m_lastFrameInfo(), m_scene(),
+	  m_histograms(), m_isCameraViewMode(false)
 {
 	m_renderPort = new FxHistogramRenderPort();
 	m_renderer.enablePrecomputing(false);
@@ -56,7 +57,8 @@ FxHistogramRender::FxHistogramRender()
 
 	qRegisterMetaType<TRasterP>("TRasterP");
 	qRegisterMetaType<UINT>("UINT");
-	connect(m_renderPort, SIGNAL(renderCompleted(const TRasterP &, UINT)), this, SLOT(onRenderCompleted(const TRasterP &, UINT)));
+	connect(m_renderPort, SIGNAL(renderCompleted(const TRasterP &, UINT)), this,
+			SLOT(onRenderCompleted(const TRasterP &, UINT)));
 }
 
 //-----------------------------------------------------------------------------
@@ -150,7 +152,7 @@ void FxHistogramRender::updateRenderer(int frame)
 		m_histograms->setRaster(0);
 		return;
 	}
-	//abort old render
+	// abort old render
 	UINT renderId = m_lastFrameInfo.m_renderId;
 	m_renderer.abortRendering(renderId);
 	m_abortedRendering.append(renderId);
@@ -177,15 +179,18 @@ void FxHistogramRender::remakeRender()
 	TDimension size = m_scene->getCurrentCamera()->getRes();
 	TRectD area(TPointD(-0.5 * size.lx, -0.5 * size.ly), TDimensionD(size.lx, size.ly));
 	m_renderPort->setRenderArea(area);
-	const TRenderSettings rs = m_scene->getProperties()->getPreviewProperties()->getRenderSettings();
-	TFxP buildedFx = buildPartialSceneFx(m_scene, (double)m_lastFrameInfo.m_frame, m_lastFrameInfo.m_fx, rs.m_shrinkX, true);
+	const TRenderSettings rs =
+		m_scene->getProperties()->getPreviewProperties()->getRenderSettings();
+	TFxP buildedFx = buildPartialSceneFx(m_scene, (double)m_lastFrameInfo.m_frame,
+										 m_lastFrameInfo.m_fx, rs.m_shrinkX, true);
 	TRasterFxP rasterFx(buildedFx);
 	if (!rasterFx)
 		return;
 	std::string alias = rasterFx->getAlias(m_lastFrameInfo.m_frame, rs);
 	TFxPair fxPair;
 	fxPair.m_frameA = buildedFx;
-	m_lastFrameInfo.m_renderId = m_renderer.startRendering((double)m_lastFrameInfo.m_frame, rs, fxPair);
+	m_lastFrameInfo.m_renderId =
+		m_renderer.startRendering((double)m_lastFrameInfo.m_frame, rs, fxPair);
 	if (m_lastFrameInfo.m_renderId == (UINT)-1)
 		return;
 
@@ -203,7 +208,8 @@ void FxHistogramRender::onRenderCompleted(const TRasterP &raster, UINT renderId)
 
 	QMutexLocker sl(&m_mutex);
 	TRasterImageP img(raster);
-	std::string id = toString(m_lastFrameInfo.m_fx->getIdentifier()) + ".noext" + toString(m_lastFrameInfo.m_frame);
+	std::string id = toString(m_lastFrameInfo.m_fx->getIdentifier()) + ".noext" +
+					 toString(m_lastFrameInfo.m_frame);
 	TImageCache::instance()->add(id, img, true);
 
 	m_histograms->setRaster(raster);

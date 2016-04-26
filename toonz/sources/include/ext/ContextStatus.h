@@ -32,56 +32,41 @@ class StrokeParametricDeformer;
 /**
    * @brief This class maintains data required from manipulator.
    */
-struct DVAPI
-	ContextStatus {
+struct DVAPI ContextStatus {
 	// useful for special key status
-	enum {
-		CTRL = 0x0001,
-		ALT = 0x0002,
-		SHIFT = 0x0004,
-		NONE = 0x0000
-	};
+	enum { CTRL = 0x0001, ALT = 0x0002, SHIFT = 0x0004, NONE = 0x0000 };
 
 	// cached information
-	TStroke
-		*stroke2change_;
+	TStroke *stroke2change_;
 
 	// parameter of selected stroke
-	double
-		w_;
+	double w_;
 
 	//  how much curve to move
-	double
-		lengthOfAction_;
+	double lengthOfAction_;
 
 	//  how much curve to move
-	double
-		deformerSensibility_;
+	double deformerSensibility_;
 
 	// pixel size
-	double
-		pixelSize_;
+	double pixelSize_;
 
 	// degree of an angle to be a corner
-	int
-		cornerSize_;
+	int cornerSize_;
 
-	int
-		key_event_;
+	int key_event_;
 
-	StrokeParametricDeformer *
-		deformer_;
+	StrokeParametricDeformer *deformer_;
 
 	/*
-    ToonzExt::Intervals*
-      spireCorners_;
+	ToonzExt::Intervals*
+	  spireCorners_;
 
-    ToonzExt::Intervals*
-      straightCorners_;
-    */
+	ToonzExt::Intervals*
+	  straightCorners_;
+	*/
 	// select between manual or automatic mode
-	bool
-		isManual_;
+	bool isManual_;
 
 	ContextStatus();
 	~ContextStatus();
@@ -90,8 +75,7 @@ struct DVAPI
 	ContextStatus(const ContextStatus &);
 
 	// not a deep copy is performed!!!
-	ContextStatus &
-	operator=(const ContextStatus &);
+	ContextStatus &operator=(const ContextStatus &);
 
 	void init();
 };

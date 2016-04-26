@@ -21,9 +21,11 @@ class ino_hls_add : public TStandardRasterFx
 	TBoolParamP m_anti_alias;
 	TIntEnumParamP m_ref_mode;
 
-public:
+  public:
 	ino_hls_add()
-		: m_from_rgba(new TIntEnumParam(0, "Red")), m_offset(0.5 * ino::param_range()), m_hue(0.0 * ino::param_range()), m_lig(0.25 * ino::param_range()), m_sat(0.0 * ino::param_range()), m_alp(0.0 * ino::param_range())
+		: m_from_rgba(new TIntEnumParam(0, "Red")), m_offset(0.5 * ino::param_range()),
+		  m_hue(0.0 * ino::param_range()), m_lig(0.25 * ino::param_range()),
+		  m_sat(0.0 * ino::param_range()), m_alp(0.0 * ino::param_range())
 
 		  ,
 		  m_anti_alias(true), m_ref_mode(new TIntEnumParam(0, "Red"))
@@ -46,16 +48,11 @@ public:
 		this->m_from_rgba->addItem(2, "Blue");
 		this->m_from_rgba->addItem(3, "Alpha");
 
-		this->m_offset->setValueRange(
-			-1.0 * ino::param_range(), 1.0 * ino::param_range());
-		this->m_hue->setValueRange(
-			-1.0 * ino::param_range(), 1.0 * ino::param_range());
-		this->m_lig->setValueRange(
-			-1.0 * ino::param_range(), 1.0 * ino::param_range());
-		this->m_sat->setValueRange(
-			-1.0 * ino::param_range(), 1.0 * ino::param_range());
-		this->m_alp->setValueRange(
-			-1.0 * ino::param_range(), 1.0 * ino::param_range());
+		this->m_offset->setValueRange(-1.0 * ino::param_range(), 1.0 * ino::param_range());
+		this->m_hue->setValueRange(-1.0 * ino::param_range(), 1.0 * ino::param_range());
+		this->m_lig->setValueRange(-1.0 * ino::param_range(), 1.0 * ino::param_range());
+		this->m_sat->setValueRange(-1.0 * ino::param_range(), 1.0 * ino::param_range());
+		this->m_alp->setValueRange(-1.0 * ino::param_range(), 1.0 * ino::param_range());
 
 		this->m_ref_mode->addItem(1, "Green");
 		this->m_ref_mode->addItem(2, "Blue");
@@ -72,43 +69,40 @@ public:
 			return false;
 		}
 	}
-	bool canHandle(const TRenderSettings &rend_sets, double frame)
-	{
-		return true;
-	}
-	void doCompute(
-		TTile &tile, double frame, const TRenderSettings &rend_sets);
+	bool canHandle(const TRenderSettings &rend_sets, double frame) { return true; }
+	void doCompute(TTile &tile, double frame, const TRenderSettings &rend_sets);
 };
 FX_PLUGIN_IDENTIFIER(ino_hls_add, "inohlsAddFx");
 //------------------------------------------------------------
 #include "igs_hls_add.h"
 namespace
 {
-void fx_(
-	TRasterP in_ras, const TRasterP noise_ras, const TRasterP refer_ras, const int ref_mode
+void fx_(TRasterP in_ras, const TRasterP noise_ras, const TRasterP refer_ras, const int ref_mode
 
-	,
-	const int xoffset, const int yoffset, const int from_rgba, const double offset, const double hue_scale, const double lig_scale, const double sat_scale, const double alp_scale, const bool anti_alias_sw)
+		 ,
+		 const int xoffset, const int yoffset, const int from_rgba, const double offset,
+		 const double hue_scale, const double lig_scale, const double sat_scale,
+		 const double alp_scale, const bool anti_alias_sw)
 {
 	/***std::vector<unsigned char> in_vec;
 	ino::ras_to_vec( in_ras, ino::channels(), in_vec );
 	std::vector<unsigned char> refer_vec;
 	ino::ras_to_vec( noise_ras, ino::channels(), refer_vec );***/
 
-	TRasterGR8P in_gr8(
-		in_ras->getLy(), in_ras->getLx() * ino::channels() *
-							 ((TRaster64P)in_ras ? sizeof(unsigned short) : sizeof(unsigned char)));
+	TRasterGR8P in_gr8(in_ras->getLy(),
+					   in_ras->getLx() * ino::channels() *
+						   ((TRaster64P)in_ras ? sizeof(unsigned short) : sizeof(unsigned char)));
 	in_gr8->lock();
 	ino::ras_to_arr(in_ras, ino::channels(), in_gr8->getRawData());
 
-	TRasterGR8P noise_gr8(
-		noise_ras->getLy(), noise_ras->getLx() * ino::channels() *
-								((TRaster64P)noise_ras ? sizeof(unsigned short) : sizeof(unsigned char)));
+	TRasterGR8P noise_gr8(noise_ras->getLy(), noise_ras->getLx() * ino::channels() *
+												  ((TRaster64P)noise_ras ? sizeof(unsigned short)
+																		 : sizeof(unsigned char)));
 	noise_gr8->lock();
 	ino::ras_to_arr(noise_ras, ino::channels(), noise_gr8->getRawData());
 
 	igs::hls_add::change(
-		//in_ras->getRawData() // BGRA
+		// in_ras->getRawData() // BGRA
 		//&in_vec.at(0) // RGBA
 		in_gr8->getRawData()
 
@@ -126,7 +120,7 @@ void fx_(
 		noise_ras->getLy(), noise_ras->getLx(), ino::channels(), ino::bits(noise_ras)
 
 																	 ,
-		(((0 <= ref_mode) && (0 != refer_ras)) ? refer_ras->getRawData() : 0) //BGRA
+		(((0 <= ref_mode) && (0 != refer_ras)) ? refer_ras->getRawData() : 0) // BGRA
 		,
 		(((0 <= ref_mode) && (0 != refer_ras)) ? ino::bits(refer_ras) : 0), ref_mode
 
@@ -146,8 +140,7 @@ void fx_(
 }
 }
 //------------------------------------------------------------
-void ino_hls_add::doCompute(
-	TTile &tile, double frame, const TRenderSettings &rend_sets)
+void ino_hls_add::doCompute(TTile &tile, double frame, const TRenderSettings &rend_sets)
 {
 	/* ------ 両方とも接続していなければ処理しない ------------ */
 	const bool in_cn_is = this->m_input.isConnected();
@@ -158,8 +151,7 @@ void ino_hls_add::doCompute(
 	}
 
 	/* ------ サポートしていないPixelタイプはエラーを投げる --- */
-	if (!((TRaster32P)tile.getRaster()) &&
-		!((TRaster64P)tile.getRaster())) {
+	if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster())) {
 		throw TRopException("unsupported input pixel type");
 	}
 
@@ -167,16 +159,11 @@ void ino_hls_add::doCompute(
 	const int xoffset = 0.0;
 	const int yoffset = 0.0;
 	const int from_rgba = this->m_from_rgba->getValue();
-	const double offset = this->m_offset->getValue(frame) /
-						  ino::param_range();
-	const double hue_scale = this->m_hue->getValue(frame) /
-							 ino::param_range();
-	const double lig_scale = this->m_lig->getValue(frame) /
-							 ino::param_range();
-	const double sat_scale = this->m_sat->getValue(frame) /
-							 ino::param_range();
-	const double alp_scale = this->m_alp->getValue(frame) /
-							 ino::param_range();
+	const double offset = this->m_offset->getValue(frame) / ino::param_range();
+	const double hue_scale = this->m_hue->getValue(frame) / ino::param_range();
+	const double lig_scale = this->m_lig->getValue(frame) / ino::param_range();
+	const double sat_scale = this->m_sat->getValue(frame) / ino::param_range();
+	const double alp_scale = this->m_alp->getValue(frame) / ino::param_range();
 	const bool anti_alias_sw = this->m_anti_alias->getValue();
 	const int ref_mode = this->m_ref_mode->getValue();
 
@@ -185,19 +172,19 @@ void ino_hls_add::doCompute(
 
 	/* ------ noise画像生成 ------------------------------------ */
 	TTile noise_tile;
-	this->m_noise->allocateAndCompute(
-		noise_tile,
-		tile.m_pos,
-		tile.getRaster()->getSize(),
-		tile.getRaster(), frame, rend_sets);
+	this->m_noise->allocateAndCompute(noise_tile, tile.m_pos, tile.getRaster()->getSize(),
+									  tile.getRaster(), frame, rend_sets);
 	/*------ 参照画像生成 --------------------------------------*/
 	TTile reference_tile;
 	bool reference_sw = false;
 	if (this->m_refer.isConnected()) {
 		reference_sw = true;
 		this->m_refer->allocateAndCompute(
-			reference_tile, tile.m_pos, TDimensionI(													  /* Pixel単位 */
-													tile.getRaster()->getLx(), tile.getRaster()->getLy()) /* ここtile.getRaster()->getSize()と同じ、将来修正する */
+			reference_tile, tile.m_pos,
+			TDimensionI(/* Pixel単位 */
+						tile.getRaster()->getLx(),
+						tile.getRaster()
+							->getLy()) /* ここtile.getRaster()->getSize()と同じ、将来修正する */
 			,
 			tile.getRaster(), frame, rend_sets);
 	}
@@ -208,27 +195,17 @@ void ino_hls_add::doCompute(
 	if (log_sw) {
 		std::ostringstream os;
 		os << "params"
-		   << "  xo " << xoffset
-		   << "  yo " << yoffset
-		   << "  rgba " << from_rgba
-		   << "  offs " << offset
-		   << "  h " << hue_scale
-		   << "  l " << lig_scale
-		   << "  s " << sat_scale
-		   << "  a " << alp_scale
-		   << "  anti_alias " << anti_alias_sw
-		   << "  reference " << ref_mode
-		   << "   tile w " << tile.getRaster()->getLx()
-		   << "  h " << tile.getRaster()->getLy()
-		   << "  pixbits " << ino::pixel_bits(tile.getRaster())
-		   << "   noise_tile w " << noise_tile.getRaster()->getLx()
-		   << "  h " << noise_tile.getRaster()->getLy()
+		   << "  xo " << xoffset << "  yo " << yoffset << "  rgba " << from_rgba << "  offs "
+		   << offset << "  h " << hue_scale << "  l " << lig_scale << "  s " << sat_scale << "  a "
+		   << alp_scale << "  anti_alias " << anti_alias_sw << "  reference " << ref_mode
+		   << "   tile w " << tile.getRaster()->getLx() << "  h " << tile.getRaster()->getLy()
+		   << "  pixbits " << ino::pixel_bits(tile.getRaster()) << "   noise_tile w "
+		   << noise_tile.getRaster()->getLx() << "  h " << noise_tile.getRaster()->getLy()
 		   << "   frame " << frame;
 		if (reference_sw) {
-			os
-				<< "  reference_tile.m_pos " << reference_tile.m_pos
-				<< "  reference_tile_getLx " << reference_tile.getRaster()->getLx()
-				<< "  y " << reference_tile.getRaster()->getLy();
+			os << "  reference_tile.m_pos " << reference_tile.m_pos << "  reference_tile_getLx "
+			   << reference_tile.getRaster()->getLx() << "  y "
+			   << reference_tile.getRaster()->getLy();
 		}
 	}
 	/* ------ fx処理 ------------------------------------------ */
@@ -236,11 +213,11 @@ void ino_hls_add::doCompute(
 		tile.getRaster()->lock();
 		noise_tile.getRaster()->lock();
 		reference_tile.getRaster()->lock();
-		fx_(
-			tile.getRaster(), noise_tile.getRaster(), reference_tile.getRaster(), ref_mode
+		fx_(tile.getRaster(), noise_tile.getRaster(), reference_tile.getRaster(), ref_mode
 
 			,
-			xoffset, yoffset, from_rgba, offset, hue_scale, lig_scale, sat_scale, alp_scale, anti_alias_sw // --> add_blend_sw, default is true
+			xoffset, yoffset, from_rgba, offset, hue_scale, lig_scale, sat_scale, alp_scale,
+			anti_alias_sw // --> add_blend_sw, default is true
 			);
 		reference_tile.getRaster()->unlock();
 		noise_tile.getRaster()->unlock();

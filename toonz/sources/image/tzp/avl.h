@@ -47,7 +47,7 @@ extern double Avl_Dummy[];
 
 #endif
 
-#define avl_offset(structure, member) \
+#define avl_offset(structure, member)                                                              \
 	((unsigned)((char *)&((structure *)Avl_Dummy)->member - (char *)Avl_Dummy))
 
 #define AVL_NODUP_MBR (0 << 1)
@@ -74,50 +74,48 @@ extern double Avl_Dummy[];
 
 #define AVL_AVLCMP (int (*)())0
 
-#define avl_tree_nodup(usrcmp) \
-	avl__tree(AVL_NODUP_MBR, (unsigned)0, (usrcmp))
-#define avl_tree_nodup_mbr(structure, member, usrcmp) \
+#define avl_tree_nodup(usrcmp) avl__tree(AVL_NODUP_MBR, (unsigned)0, (usrcmp))
+#define avl_tree_nodup_mbr(structure, member, usrcmp)                                              \
 	avl__tree(AVL_NODUP_MBR, avl_offset(structure, member), (usrcmp))
-#define avl_tree_nodup_ptr(structure, member, usrcmp) \
+#define avl_tree_nodup_ptr(structure, member, usrcmp)                                              \
 	avl__tree(AVL_NODUP_PTR, avl_offset(structure, member), (usrcmp))
-#define avl_tree_nodup_str(structure, member) \
+#define avl_tree_nodup_str(structure, member)                                                      \
 	avl__tree(AVL_NODUP_STR, avl_offset(structure, member), AVL_AVLCMP)
-#define avl_tree_nodup_long(structure, member) \
+#define avl_tree_nodup_long(structure, member)                                                     \
 	avl__tree(AVL_NODUP_LNG, avl_offset(structure, member), AVL_AVLCMP)
-#define avl_tree_nodup_int(structure, member) \
+#define avl_tree_nodup_int(structure, member)                                                      \
 	avl__tree(AVL_NODUP_INT, avl_offset(structure, member), AVL_AVLCMP)
-#define avl_tree_nodup_short(structure, member) \
+#define avl_tree_nodup_short(structure, member)                                                    \
 	avl__tree(AVL_NODUP_SHT, avl_offset(structure, member), AVL_AVLCMP)
-#define avl_tree_nodup_ulong(structure, member) \
+#define avl_tree_nodup_ulong(structure, member)                                                    \
 	avl__tree(AVL_NODUP_ULN, avl_offset(structure, member), AVL_AVLCMP)
-#define avl_tree_nodup_uint(structure, member) \
+#define avl_tree_nodup_uint(structure, member)                                                     \
 	avl__tree(AVL_NODUP_UIN, avl_offset(structure, member), AVL_AVLCMP)
-#define avl_tree_nodup_ushort(structure, member) \
+#define avl_tree_nodup_ushort(structure, member)                                                   \
 	avl__tree(AVL_NODUP_USH, avl_offset(structure, member), AVL_AVLCMP)
-#define avl_tree_nodup_char(structure, member) \
+#define avl_tree_nodup_char(structure, member)                                                     \
 	avl__tree(AVL_NODUP_CHR, avl_offset(structure, member), AVL_AVLCMP)
 
-#define avl_tree_dup(usrcmp) \
-	avl__tree(AVL_DUP_MBR, (unsigned)0, (usrcmp))
-#define avl_tree_dup_mbr(structure, member, usrcmp) \
+#define avl_tree_dup(usrcmp) avl__tree(AVL_DUP_MBR, (unsigned)0, (usrcmp))
+#define avl_tree_dup_mbr(structure, member, usrcmp)                                                \
 	avl__tree(AVL_DUP_MBR, avl_offset(structure, member), (usrcmp))
-#define avl_tree_dup_ptr(structure, member, usrcmp) \
+#define avl_tree_dup_ptr(structure, member, usrcmp)                                                \
 	avl__tree(AVL_DUP_PTR, avl_offset(structure, member), (usrcmp))
-#define avl_tree_dup_str(structure, member) \
+#define avl_tree_dup_str(structure, member)                                                        \
 	avl__tree(AVL_DUP_STR, avl_offset(structure, member), AVL_AVLCMP)
-#define avl_tree_dup_long(structure, member) \
+#define avl_tree_dup_long(structure, member)                                                       \
 	avl__tree(AVL_DUP_LNG, avl_offset(structure, member), AVL_AVLCMP)
-#define avl_tree_dup_int(structure, member) \
+#define avl_tree_dup_int(structure, member)                                                        \
 	avl__tree(AVL_DUP_INT, avl_offset(structure, member), AVL_AVLCMP)
-#define avl_tree_dup_short(structure, member) \
+#define avl_tree_dup_short(structure, member)                                                      \
 	avl__tree(AVL_DUP_SHT, avl_offset(structure, member), AVL_AVLCMP)
-#define avl_tree_dup_ulong(structure, member) \
+#define avl_tree_dup_ulong(structure, member)                                                      \
 	avl__tree(AVL_DUP_ULN, avl_offset(structure, member), AVL_AVLCMP)
-#define avl_tree_dup_uint(structure, member) \
+#define avl_tree_dup_uint(structure, member)                                                       \
 	avl__tree(AVL_DUP_UIN, avl_offset(structure, member), AVL_AVLCMP)
-#define avl_tree_dup_ushort(structure, member) \
+#define avl_tree_dup_ushort(structure, member)                                                     \
 	avl__tree(AVL_DUP_USH, avl_offset(structure, member), AVL_AVLCMP)
-#define avl_tree_dup_char(structure, member) \
+#define avl_tree_dup_char(structure, member)                                                       \
 	avl__tree(AVL_DUP_CHR, avl_offset(structure, member), AVL_AVLCMP)
 
 #define avl_nodes(tree) ((tree)->nodes)
@@ -135,10 +133,8 @@ extern double Avl_Dummy[];
 #define avl_start(tree, key) avl__start((tree), (long)(key), 0)
 #define avl_backstart(tree, key) avl__start((tree), (long)(key), 1)
 
-#define avl_link(tree, structure, member) \
-	avl__link((tree), avl_offset(structure, member), 0)
-#define avl_backlink(tree, structure, member) \
-	avl__link((tree), avl_offset(structure, member), 1)
+#define avl_link(tree, structure, member) avl__link((tree), avl_offset(structure, member), 0)
+#define avl_backlink(tree, structure, member) avl__link((tree), avl_offset(structure, member), 1)
 
 #define AVL_MAX_PATHDEPTH ((int)sizeof(long) * 8 * 3 / 2 - 2)
 

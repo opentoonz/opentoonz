@@ -12,7 +12,7 @@ class TFarmController;
 
 class RenderFarmTasksObserver
 {
-public:
+  public:
 	virtual void onChange() = 0;
 };
 
@@ -20,7 +20,7 @@ public:
 
 class Application
 { // singleton
-public:
+  public:
 	~Application();
 	static Application *instance();
 
@@ -33,7 +33,7 @@ public:
 	void setCurrentFolder(const TFilePath &fp);
 	TFilePath getCurrentFolder();
 
-private:
+  private:
 	class Imp;
 	Imp *m_imp;
 

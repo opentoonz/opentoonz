@@ -3,17 +3,14 @@
 //------------------------------------------------------------
 namespace
 {
-template <class T>
-void change_channel_(
-	T *ima, const int pix_size, const int channels)
+template <class T> void change_channel_(T *ima, const int pix_size, const int channels)
 {
 	for (int ii = 0; ii < pix_size; ++ii, ima += channels) {
 		ima[0] = ~ima[0];
 	}
 }
 template <class T>
-void change_multiplied_rgb(
-	T *ima, T *alp, const int pix_size, const int channels)
+void change_multiplied_rgb(T *ima, T *alp, const int pix_size, const int channels)
 {
 	for (int ii = 0; ii < pix_size; ++ii, ima += channels, alp += channels) {
 		if (alp[0] < ima[0]) {
@@ -24,13 +21,9 @@ void change_multiplied_rgb(
 	}
 }
 template <class T>
-void change_template_(
-	T *ima,
-	const int hh,
-	const int ww,
-	const int ch,
-	const bool *sw /* each channels switch */
-	)
+void change_template_(T *ima, const int hh, const int ww, const int ch,
+					  const bool *sw /* each channels switch */
+					  )
 {
 	const int sz = hh * ww;
 
@@ -69,29 +62,21 @@ void change_template_(
 //------------------------------------------------------------
 #include <limits>
 #include "igs_negate.h"
-void igs::negate::change(
-	unsigned char *image_array,
-	const int height,
-	const int width,
-	const int channels,
-	const int bits,
-	const bool *sw_array /* each channel switch  */
-	)
+void igs::negate::change(unsigned char *image_array, const int height, const int width,
+						 const int channels, const int bits,
+						 const bool *sw_array /* each channel switch  */
+						 )
 {
-	if ((igs::image::rgba::siz != channels) &&
-		(igs::image::rgb::siz != channels) &&
+	if ((igs::image::rgba::siz != channels) && (igs::image::rgb::siz != channels) &&
 		(1 != channels) /* bit(monoBW) */
 		) {
 		throw std::domain_error("Bad channels,Not rgba/rgb/grayscale");
 	}
 	if (std::numeric_limits<unsigned char>::digits == bits) {
-		change_template_(
-			image_array,
-			height, width, channels, sw_array);
+		change_template_(image_array, height, width, channels, sw_array);
 	} else if (std::numeric_limits<unsigned short>::digits == bits) {
-		change_template_(
-			reinterpret_cast<unsigned short *>(image_array),
-			height, width, channels, sw_array);
+		change_template_(reinterpret_cast<unsigned short *>(image_array), height, width, channels,
+						 sw_array);
 	} else if (1 == bits) {
 		const int bi = width * channels * bits;
 		const int dg = std::numeric_limits<unsigned char>::digits;

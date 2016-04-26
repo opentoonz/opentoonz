@@ -18,7 +18,7 @@ class DragTool;
 // RowArea
 //-----------------------------------------------------------------------------
 
-//!La classe si occupa della visualizzazione dell'area che gestisce le righe.
+//! La classe si occupa della visualizzazione dell'area che gestisce le righe.
 class RowArea : public QWidget
 {
 	Q_OBJECT
@@ -36,7 +36,7 @@ class RowArea : public QWidget
 	int m_mousePressRow;
 	QString m_tooltip;
 
-	//panning by middle-drag
+	// panning by middle-drag
 	bool m_isPanning;
 
 	void drawRows(QPainter &p, int r0, int r1);
@@ -47,7 +47,7 @@ class RowArea : public QWidget
 	DragTool *getDragTool() const;
 	void setDragTool(DragTool *dragTool);
 
-public:
+  public:
 #if QT_VERSION >= 0x050500
 	RowArea(XsheetViewer *parent, Qt::WindowFlags flags = 0);
 #else
@@ -55,7 +55,7 @@ public:
 #endif
 	~RowArea();
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *);
 
 	void mousePressEvent(QMouseEvent *event);
@@ -66,13 +66,13 @@ protected:
 
 	void setMarker(int index);
 
-protected slots:
+  protected slots:
 
 	void onSetStartMarker();
 	void onSetStopMarker();
 	void onRemoveMarkers();
 
-	//set both the from and to markers at the specified row
+	// set both the from and to markers at the specified row
 	void onPreviewThis();
 };
 

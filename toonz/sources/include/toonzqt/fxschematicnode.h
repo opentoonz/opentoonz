@@ -68,8 +68,9 @@ class FxColumnPainter : public QObject, public QGraphicsItem
 	QString m_name;
 	int m_type;
 
-public:
-	FxColumnPainter(FxSchematicColumnNode *parent, double width, double height, const QString &name);
+  public:
+	FxColumnPainter(FxSchematicColumnNode *parent, double width, double height,
+					const QString &name);
 	virtual ~FxColumnPainter();
 
 	QRectF boundingRect() const;
@@ -78,11 +79,11 @@ public:
 
 	QLinearGradient getGradientByLevelType(int type);
 
-public slots:
+  public slots:
 
 	void onIconGenerated();
 
-protected:
+  protected:
 	void contextMenuEvent(QGraphicsSceneContextMenuEvent *cme);
 };
 
@@ -96,15 +97,16 @@ class FxPalettePainter : public QGraphicsItem, public QObject
 	double m_width, m_height;
 	QString m_name;
 
-public:
-	FxPalettePainter(FxSchematicPaletteNode *parent, double width, double height, const QString &name);
+  public:
+	FxPalettePainter(FxSchematicPaletteNode *parent, double width, double height,
+					 const QString &name);
 	~FxPalettePainter();
 
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 	void setName(const QString &name) { m_name = name; }
 
-protected:
+  protected:
 	void contextMenuEvent(QGraphicsSceneContextMenuEvent *cme);
 };
 
@@ -122,21 +124,22 @@ class FxPainter : public QObject, public QGraphicsItem
 	QString m_name, m_label;
 	eFxType m_type;
 
-	//to obtain the fx icons for zoom out view of the schematic
+	// to obtain the fx icons for zoom out view of the schematic
 	std::string m_fxType;
 
 	QLinearGradient getGradientByLevelType(eFxType);
 	void paint_small(QPainter *painter);
 
-public:
-	FxPainter(FxSchematicNode *parent, double width, double height, const QString &name, eFxType type, std::string fxType);
+  public:
+	FxPainter(FxSchematicNode *parent, double width, double height, const QString &name,
+			  eFxType type, std::string fxType);
 	~FxPainter();
 
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 	void setName(const QString &name) { m_name = name; }
 
-protected:
+  protected:
 	void contextMenuEvent(QGraphicsSceneContextMenuEvent *cme);
 };
 
@@ -153,14 +156,14 @@ class FxXSheetPainter : public QObject, public QGraphicsItem
 
 	FxSchematicXSheetNode *m_parent;
 
-public:
+  public:
 	FxXSheetPainter(FxSchematicXSheetNode *parent, double width, double height);
 	~FxXSheetPainter();
 
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
-protected:
+  protected:
 	void contextMenuEvent(QGraphicsSceneContextMenuEvent *cme);
 };
 
@@ -177,14 +180,14 @@ class FxOutputPainter : public QObject, public QGraphicsItem
 	bool m_isActive;
 	FxSchematicOutputNode *m_parent;
 
-public:
+  public:
 	FxOutputPainter(FxSchematicOutputNode *parent, double width, double height);
 	~FxOutputPainter();
 
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
-protected:
+  protected:
 	void contextMenuEvent(QGraphicsSceneContextMenuEvent *cme);
 };
 
@@ -196,11 +199,11 @@ class FxSchematicLink : public SchematicLink
 {
 	Q_OBJECT
 
-public:
+  public:
 	FxSchematicLink(QGraphicsItem *parent, QGraphicsScene *scene);
 	~FxSchematicLink();
 
-protected:
+  protected:
 	void contextMenuEvent(QGraphicsSceneContextMenuEvent *cme);
 };
 
@@ -215,7 +218,7 @@ class FxSchematicPort : public SchematicPort
 	QList<SchematicLink *> m_hiddenLinks;
 	QList<SchematicLink *> m_ghostLinks;
 
-public:
+  public:
 	FxSchematicPort(FxSchematicDock *parent, int type);
 	~FxSchematicPort();
 
@@ -225,20 +228,22 @@ public:
 	FxSchematicDock *getDock() const;
 	SchematicLink *makeLink(SchematicPort *port);
 
-protected:
+  protected:
 	void contextMenuEvent(QGraphicsSceneContextMenuEvent *cme);
 	void mouseMoveEvent(QGraphicsSceneMouseEvent *me);
 	void mouseReleaseEvent(QGraphicsSceneMouseEvent *me);
 	TFx *getOwnerFx() const;
 
-private:
+  private:
 	void linkEffects(TFx *inputFx, TFx *fx, int inputId);
 	SchematicPort *searchPort(const QPointF &scenePos);
 
-	//!Handles hiding of existing link and showing of ghost links for snapping after creation link only for fx having
-	//!dynamic ports.
-	//!If \b secondIndex is -1 consider the last port in the groupedPorts of the node.
-	void handleSnappedLinksOnDynamicPortFx(const std::vector<TFxPort *> &groupedPorts, int targetIndex, int startIndex = -1);
+	//! Handles hiding of existing link and showing of ghost links for snapping after creation link
+	//! only for fx having
+	//! dynamic ports.
+	//! If \b secondIndex is -1 consider the last port in the groupedPorts of the node.
+	void handleSnappedLinksOnDynamicPortFx(const std::vector<TFxPort *> &groupedPorts,
+										   int targetIndex, int startIndex = -1);
 
 	void resetSnappedLinksOnDynamicPortFx();
 
@@ -256,8 +261,9 @@ class FxSchematicDock : public QGraphicsItem, public QObject
 	double m_width;
 	FxSchematicPort *m_port;
 
-public:
-	FxSchematicDock(FxSchematicNode *parent, const QString &string, double width, eFxSchematicPortType type);
+  public:
+	FxSchematicDock(FxSchematicNode *parent, const QString &string, double width,
+					eFxSchematicPortType type);
 	~FxSchematicDock();
 
 	QRectF boundingRect() const;
@@ -274,13 +280,10 @@ class FxSchematicNode : public SchematicNode
 {
 	Q_OBJECT
 
-protected:
-	enum eDropActionMode {
-		eShift,
-		eNone
-	};
+  protected:
+	enum eDropActionMode { eShift, eNone };
 
-protected:
+  protected:
 	QString m_name;  //!< Node's name (displayed on top, editable)
 	TFxP m_fx;		 //!< The node's associated fx (could be a wrapper to the actual fx)
 	TFxP m_actualFx; //!< The actual node's associated fx
@@ -295,16 +298,19 @@ protected:
 
 	bool m_isLargeScaled;
 
-protected:
-	//! If the fx has dynamic port groups, ensures that each group always has at least one unlinked port
-	//! that users can attach to, while keeping the number of unlinked ports to the minimum allowed by the
+  protected:
+	//! If the fx has dynamic port groups, ensures that each group always has at least one unlinked
+	//! port
+	//! that users can attach to, while keeping the number of unlinked ports to the minimum allowed
+	//! by the
 	//! group's specifics.
 	virtual void checkDynamicInputPortSize() const;
 
 	//! Adds a dynamic group port to the associated fx.
 	void addDynamicInputPort(int groupIndex) const;
 
-	//! Removes the port with specified name from the associated fx. Returns false (ie operation refused)
+	//! Removes the port with specified name from the associated fx. Returns false (ie operation
+	//! refused)
 	//! if the specified port does not exists, is connected, or is not in a dynamic port group.
 	bool removeDynamicInputPort(const std::string &name) const;
 
@@ -313,7 +319,7 @@ protected:
 
 	void updateOutputDockToolTips(const QString &name);
 
-public:
+  public:
 	FxSchematicNode(FxSchematicScene *parent, TFx *fx, qreal width, qreal height, eFxType type);
 
 	void setWidth(const qreal &width) { m_width = width; }
@@ -344,7 +350,7 @@ public:
 	virtual void resize(bool maximizeNode) {}
 
 	bool isLargeScaled() { return m_isLargeScaled; }
-signals:
+  signals:
 
 	void switchCurrentFx(TFx *fx);
 	void currentColumnChanged(int index);
@@ -360,14 +366,14 @@ class FxSchematicOutputNode : public FxSchematicNode
 {
 	FxOutputPainter *m_outputPainter;
 
-public:
+  public:
 	FxSchematicOutputNode(FxSchematicScene *scene, TOutputFx *fx);
 	~FxSchematicOutputNode();
 
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
-protected:
+  protected:
 	void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *me);
 };
 
@@ -379,14 +385,14 @@ class FxSchematicXSheetNode : public FxSchematicNode
 {
 	FxXSheetPainter *m_xsheetPainter;
 
-public:
+  public:
 	FxSchematicXSheetNode(FxSchematicScene *scene, TXsheetFx *fx);
 	~FxSchematicXSheetNode();
 
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
-protected:
+  protected:
 	void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *me);
 };
 
@@ -401,7 +407,7 @@ class FxSchematicNormalFxNode : public FxSchematicNode
 	FxPainter *m_painter;
 	SchematicToggle *m_renderToggle;
 
-public:
+  public:
 	FxSchematicNormalFxNode(FxSchematicScene *scene, TFx *fx);
 	~FxSchematicNormalFxNode();
 
@@ -410,10 +416,10 @@ public:
 
 	void resize(bool maximizeNode);
 
-protected:
+  protected:
 	void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *me);
 
-protected slots:
+  protected slots:
 
 	void onNameChanged();
 	void onRenderToggleClicked(bool);
@@ -431,22 +437,23 @@ class FxSchematicZeraryNode : public FxSchematicNode
 	int m_columnIndex;
 	SchematicToggle *m_renderToggle, *m_cameraStandToggle;
 
-public:
+  public:
 	FxSchematicZeraryNode(FxSchematicScene *scene, TZeraryColumnFx *fx);
 	~FxSchematicZeraryNode();
 
 	QRectF boundingRect() const;
-	virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
+	virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+					   QWidget *widget = 0);
 
 	void resize(bool maximizeNode);
 
 	int getColumnIndex() { return m_columnIndex; }
 	bool isCached() const;
 
-protected:
+  protected:
 	void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *me);
 
-protected slots:
+  protected slots:
 
 	void onRenderToggleClicked(bool);
 	void onNameChanged();
@@ -466,7 +473,7 @@ class FxSchematicColumnNode : public FxSchematicNode
 	int m_columnIndex;
 	bool m_isOpened;
 
-public:
+  public:
 	FxSchematicColumnNode(FxSchematicScene *scene, TLevelColumnFx *fx);
 	~FxSchematicColumnNode();
 
@@ -480,13 +487,13 @@ public:
 	void resize(bool maximizeNode);
 	int getColumnIndex() { return m_columnIndex; }
 
-protected:
+  protected:
 	void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *me);
 
-private:
+  private:
 	void renameObject(const TStageObjectId &id, std::string name);
 
-protected slots:
+  protected slots:
 
 	void onRenderToggleClicked(bool);
 	void onCameraStandToggleClicked(int);
@@ -506,7 +513,7 @@ class FxSchematicPaletteNode : public FxSchematicNode
 	FxPalettePainter *m_palettePainter;
 	int m_columnIndex;
 
-public:
+  public:
 	FxSchematicPaletteNode(FxSchematicScene *scene, TPaletteColumnFx *fx);
 	~FxSchematicPaletteNode();
 
@@ -518,15 +525,15 @@ public:
 
 	QString getPaletteName();
 
-protected:
+  protected:
 	void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *me);
 
-protected slots:
+  protected slots:
 
 	void onRenderToggleClicked(bool);
 	void onNameChanged();
 
-private:
+  private:
 	void renameObject(const TStageObjectId &id, std::string name);
 };
 
@@ -545,7 +552,7 @@ class FxGroupNode : public FxSchematicNode
 	SchematicToggle *m_renderToggle;
 	bool m_isOpened;
 
-public:
+  public:
 	FxGroupNode(FxSchematicScene *scene, const QList<TFxP> &groupedFx, const QList<TFxP> &roots,
 				int groupId, const std::wstring &groupName);
 	~FxGroupNode();
@@ -558,23 +565,26 @@ public:
 	QList<TFxP> getRootFxs() const { return m_roots; }
 	int getRootCount() { return m_roots.size(); }
 	int getFxCount() const { return m_groupedFxs.size(); }
-	TFx *getFx(int i) const { return 0 <= i && i < m_groupedFxs.size() ? m_groupedFxs[i].getPointer() : 0; }
+	TFx *getFx(int i) const
+	{
+		return 0 <= i && i < m_groupedFxs.size() ? m_groupedFxs[i].getPointer() : 0;
+	}
 
 	QList<TFxP> getGroupedFxs() const { return m_groupedFxs; }
 	void updateFxsDagPosition(const TPointD &pos) const;
 	bool isOpened() { return m_isOpened; }
 	void resize(bool maximized);
 	bool contains(TFxP fx);
-	//returns the number of ports that take the group in input... it consider also the node xsheet
+	// returns the number of ports that take the group in input... it consider also the node xsheet
 	int getOutputConnectionsCount() const;
 	bool isEnabled() const;
 	virtual bool isCached() const;
 
-protected:
+  protected:
 	void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *me);
 	QPointF computePos() const;
 
-protected slots:
+  protected slots:
 
 	void onNameChanged();
 	void onRenderToggleClicked(bool);

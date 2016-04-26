@@ -12,83 +12,122 @@
 
 /* PRACTICAL EXPLANATION:
 
-The TPassiveCacheManager's purpose is that of storing render results from a specified set of fx nodes.
+The TPassiveCacheManager's purpose is that of storing render results from a specified set of fx
+nodes.
 
-When an fx is passed to the manager to be cached, a structure of type FxData is generated for the fx.
-It is stored inside the manager and ASSOCIATED to the fx through an INDEX key - this one being stored
+When an fx is passed to the manager to be cached, a structure of type FxData is generated for the
+fx.
+It is stored inside the manager and ASSOCIATED to the fx through an INDEX key - this one being
+stored
 inside the fx data.
 
-In particular, the FxData instances contain a PERSISTANT identifier (passiveCacheId) that is saved inside
-the scene data, a flag specifying the cache status of the fx node (like, if it's enabled or not), and
+In particular, the FxData instances contain a PERSISTANT identifier (passiveCacheId) that is saved
+inside
+the scene data, a flag specifying the cache status of the fx node (like, if it's enabled or not),
+and
 a description of the schematic dag below the associated fx.
 
-Now, when a resource request is made to the TPassiveCacheManager, it checks the FxData about the generating
-fx - if it contains the flag specifying that it must be cached, a resource is allocated (if not already
+Now, when a resource request is made to the TPassiveCacheManager, it checks the FxData about the
+generating
+fx - if it contains the flag specifying that it must be cached, a resource is allocated (if not
+already
 present), a reference to it is stored, and finally the resource is returned.
 
-References to interesting resources are stored in a TABLE container, indexed by "rendering context" and
-fx. A rendering context is hereby intended as a SEQUENCE of render processes where the next render of the
+References to interesting resources are stored in a TABLE container, indexed by "rendering context"
+and
+fx. A rendering context is hereby intended as a SEQUENCE of render processes where the next render
+of the
 sequence is assumed to REPLACE the previous one.
-We therefore have one context for the swatch viewer, one for File>Preview, one for the Preview Fx of each
-fx node, and one context for EACH FRAME of the sceneviewer preview (one frame is not supposed to replace
+We therefore have one context for the swatch viewer, one for File>Preview, one for the Preview Fx of
+each
+fx node, and one context for EACH FRAME of the sceneviewer preview (one frame is not supposed to
+replace
 another in that case).
 
-The table is in practice a map of maps (a kind of 'comb' structure) - where the primary map is associated
-by render context and the secondary ones by fx. This mean that we are able to address and iterate contexts
+The table is in practice a map of maps (a kind of 'comb' structure) - where the primary map is
+associated
+by render context and the secondary ones by fx. This mean that we are able to address and iterate
+contexts
 easier than fxs. Values of the table are set of resources.
 
 RESOURCES MAINTENANCE POLICY:
 
-As resources use a concrete amount of memory for storage, they should be kept in the resources table only
+As resources use a concrete amount of memory for storage, they should be kept in the resources table
+only
 for the time they are supposedly useful to the user. There are 2 ways of dealing with this issue.
 
-1) First, we can track scene changes and eliminate those resources that will no longer be accessed due to the
-applied change. This happens, for example, when a level is being drawn, fxs are inserted, moved or removed.
+1) First, we can track scene changes and eliminate those resources that will no longer be accessed
+due to the
+applied change. This happens, for example, when a level is being drawn, fxs are inserted, moved or
+removed.
 
-Level changes are delivered immediately to the ::invalidateLevel(..) method, which removes all resources
-whose name contains the level's name. Unfortunately, this cannot be done at frame precision (ie you cannot
+Level changes are delivered immediately to the ::invalidateLevel(..) method, which removes all
+resources
+whose name contains the level's name. Unfortunately, this cannot be done at frame precision (ie you
+cannot
 invalidate a single frame of the level, but ALL the level).
 
-Xsheet (schematic) changes are tracked through the schematic node description stored inside the FxData structure.
-Once one such change happens, all resources update their description - if that changes, the associated resources
+Xsheet (schematic) changes are tracked through the schematic node description stored inside the
+FxData structure.
+Once one such change happens, all resources update their description - if that changes, the
+associated resources
 are released.
 
-The same schematic description is used to track and release resources affected by changes on a downstream fx's
+The same schematic description is used to track and release resources affected by changes on a
+downstream fx's
 parameters.
 
-There are also scene changes that are inherently hard to track or intercept. For example, pegbar affines changes,
-fx nodes expressions referencing data not directly connected to the fx, and possibly others. These are currently
+There are also scene changes that are inherently hard to track or intercept. For example, pegbar
+affines changes,
+fx nodes expressions referencing data not directly connected to the fx, and possibly others. These
+are currently
 NOT handled by direct tracking.
 
-2) As there may be resources which escape the resource control by point (1), we need some extra control
+2) As there may be resources which escape the resource control by point (1), we need some extra
+control
 policies. Here they are:
 
-We assume that the pool of resources accessed by render processes of a same render context should be CONSTANT
-IF NO SCENE CHANGE HAPPENS. In other words, we are guessing that only those resources used in the last
-rendering will be used in the next. Resources accessed in a render but NOT in the next (of the same context)
+We assume that the pool of resources accessed by render processes of a same render context should be
+CONSTANT
+IF NO SCENE CHANGE HAPPENS. In other words, we are guessing that only those resources used in the
+last
+rendering will be used in the next. Resources accessed in a render but NOT in the next (of the same
+context)
 are released.
 
-However, it could be that the sequence of render processes from a context is halted from a certain moment on.
-In that case, it is a waste to keep the resources accessed by its last render if no new render will ever take
-place. We then assume further that a rendering context can be ENABLED or DISABLED - when a render context is
+However, it could be that the sequence of render processes from a context is halted from a certain
+moment on.
+In that case, it is a waste to keep the resources accessed by its last render if no new render will
+ever take
+place. We then assume further that a rendering context can be ENABLED or DISABLED - when a render
+context is
 enabled, it will most likely have a next render - and therefore can keep its resources in memory.
 Once a context is DISABLED, it moves the resources to a TEMPORARY context.
 
-Resources in the temporary context are those 'on their way for release'. They will be KEPT only if the
-next rendering - INDEPENDENTLY FROM THE RENDER CONTEXT - requires them (in this case, they will be adopted
-by the new context). This is necessary since context disables typically happen when a preview window closes.
-It is not unfrequent that users close the preview window, modify the scene, and then restore the preview.
+Resources in the temporary context are those 'on their way for release'. They will be KEPT only if
+the
+next rendering - INDEPENDENTLY FROM THE RENDER CONTEXT - requires them (in this case, they will be
+adopted
+by the new context). This is necessary since context disables typically happen when a preview window
+closes.
+It is not unfrequent that users close the preview window, modify the scene, and then restore the
+preview.
 
 CONSIDERATIONS:
 
-* The File>Render generates NO CONTEXT - and therefore does NOT PASSIVELY CACHE RESOURCES, since it cannot be
-  stated whether it is in the 'enabled' or 'disabled' state. It could be considered coherent with what tcomposer
+* The File>Render generates NO CONTEXT - and therefore does NOT PASSIVELY CACHE RESOURCES, since it
+cannot be
+  stated whether it is in the 'enabled' or 'disabled' state. It could be considered coherent with
+what tcomposer
   does, by the way...
 
-* Our resources maintenance policy ensures that the memory usage should be stable over time - that is, no
+* Our resources maintenance policy ensures that the memory usage should be stable over time - that
+is, no
   useless resource is kept in memory.
-  Of course, it is possibly more restrictive than what the user may desire. For example, closing 2 preview
-  windows marks their resources for deletion, but only one of the two restored previews will keep its
+  Of course, it is possibly more restrictive than what the user may desire. For example, closing 2
+preview
+  windows marks their resources for deletion, but only one of the two restored previews will keep
+its
   resources intact...
 
 */
@@ -109,18 +148,18 @@ namespace
 
   inline std::string traduce(const TRectD& rect)
   {
-    return "[" + toString(rect.x0) + " " + toString(rect.y0) + " " +
-      toString(rect.x1) + " " + toString(rect.y1) + "]";
+	return "[" + toString(rect.x0) + " " + toString(rect.y0) + " " +
+	  toString(rect.x1) + " " + toString(rect.y1) + "]";
   }
 
   //--------------------------------------------------------------------------------------------------
 
   inline std::string traduce(const TAffine& aff)
   {
-    return "(" + 
-      toString(aff.a11) + " " + toString(aff.a12) + " " +
-      toString(aff.a13) + " " + toString(aff.a21) + " " +
-      toString(aff.a22) + " " + toString(aff.a23) + ")";
+	return "(" +
+	  toString(aff.a11) + " " + toString(aff.a12) + " " +
+	  toString(aff.a13) + " " + toString(aff.a21) + " " +
+	  toString(aff.a22) + " " + toString(aff.a23) + ")";
   }
 }
 */
@@ -132,27 +171,33 @@ namespace
 //  Local stuff - inlines
 namespace
 {
-inline QRect toQRect(const TRect &r) { return QRect(r.x0, r.y0, r.getLx(), r.getLy()); }
-inline TRect toTRect(const QRect &r) { return TRect(r.left(), r.top(), r.right(), r.bottom()); }
+inline QRect toQRect(const TRect &r)
+{
+	return QRect(r.x0, r.y0, r.getLx(), r.getLy());
+}
+inline TRect toTRect(const QRect &r)
+{
+	return TRect(r.left(), r.top(), r.right(), r.bottom());
+}
 }
 
 //---------------------------------------------------------------------------
 
 TFx *TPassiveCacheManager::getNotAllowingAncestor(TFx *fx)
 {
-	//Trace all output ports
+	// Trace all output ports
 	int outputPortsCount = fx->getOutputConnectionCount();
 	/*if(!outputPortsCount)   //We have no access to TApp here!!
   {
-    //It could be a terminal fx. In that case, pass to the xsheet fx
-    FxDag* dag = TApp::instance()->getCurrentXsheet()->getXsheet()->getFxDag();
-    if(dag->getTerminalFxs()->containsFx(fx))
-      return getNotAllowingAncestor(dag->getXsheetFx());
+	//It could be a terminal fx. In that case, pass to the xsheet fx
+	FxDag* dag = TApp::instance()->getCurrentXsheet()->getXsheet()->getFxDag();
+	if(dag->getTerminalFxs()->containsFx(fx))
+	  return getNotAllowingAncestor(dag->getXsheetFx());
   }*/
 
-	//Now, for common ports
+	// Now, for common ports
 	for (int i = 0; i < outputPortsCount; ++i) {
-		//Find the output Fx and the port connected to our fx
+		// Find the output Fx and the port connected to our fx
 		TFxPort *port = fx->getOutputConnection(i);
 		TRasterFx *outFx = static_cast<TRasterFx *>(port->getOwnerFx());
 
@@ -177,24 +222,23 @@ TFx *TPassiveCacheManager::getNotAllowingAncestor(TFx *fx)
 //    Resources Container Definition
 //*****************************************************************************************
 
-template <typename RowKey, typename ColKey, typename Val>
-class Table
+template <typename RowKey, typename ColKey, typename Val> class Table
 {
-public:
+  public:
 	typedef typename std::map<ColKey, Val> Row;
 
-private:
+  private:
 	std::map<RowKey, Row> m_table;
 
 	friend class Iterator;
 	friend class ColIterator;
 
-public:
+  public:
 	typedef typename std::map<RowKey, Row>::iterator RowsIterator;
 
 	class Iterator
 	{
-	protected:
+	  protected:
 		Table *m_table;
 		RowsIterator m_rowIt;
 		typename Row::iterator m_it;
@@ -211,7 +255,7 @@ public:
 			}
 		}
 
-	public:
+	  public:
 		const RowKey &row() { return m_rowIt->first; }
 		const ColKey &col() { return m_it->first; }
 
@@ -226,15 +270,9 @@ public:
 		Val &operator*() { return m_it->second; }
 		Val *operator->() { return &m_it->second; }
 
-		bool operator==(const Iterator &it)
-		{
-			return m_it == it.m_it;
-		}
+		bool operator==(const Iterator &it) { return m_it == it.m_it; }
 
-		bool operator!=(const Iterator &it)
-		{
-			return !operator==(it);
-		}
+		bool operator!=(const Iterator &it) { return !operator==(it); }
 	};
 
 	class ColIterator : public Iterator
@@ -255,7 +293,7 @@ public:
 			}
 		}
 
-	public:
+	  public:
 		void operator++()
 		{
 			++Iterator::m_rowIt;
@@ -270,7 +308,7 @@ public:
 
 		void makeConsistent() {}
 
-	public:
+	  public:
 		RowIterator(const RowsIterator rowIt) : Iterator(0)
 		{
 			Iterator::m_rowIt = rowIt;
@@ -281,7 +319,7 @@ public:
 		operator bool() { return Iterator::m_it != Iterator::m_rowIt->second.end(); }
 	};
 
-public:
+  public:
 	Table() {}
 	~Table() {}
 
@@ -313,10 +351,7 @@ public:
 		return result;
 	}
 
-	Val &value(const RowKey &r, const ColKey &c)
-	{
-		return m_table[r][c];
-	}
+	Val &value(const RowKey &r, const ColKey &c) { return m_table[r][c]; }
 
 	Iterator insert(const RowKey &r, const ColKey &c, const Val &val)
 	{
@@ -372,10 +407,7 @@ public:
 		}
 	}
 
-	void erase(const RowKey &r)
-	{
-		m_table.erase(r);
-	}
+	void erase(const RowKey &r) { m_table.erase(r); }
 
 	void clear() { m_table.clear(); }
 };
@@ -395,10 +427,7 @@ struct LockedResourceP {
 		m_resource->addLock();
 	}
 
-	~LockedResourceP()
-	{
-		m_resource->releaseLock();
-	}
+	~LockedResourceP() { m_resource->releaseLock(); }
 
 	LockedResourceP &operator=(const LockedResourceP &src)
 	{
@@ -411,7 +440,10 @@ struct LockedResourceP {
 
 	operator bool() const { return m_resource; }
 
-	bool operator<(const LockedResourceP &resource) const { return m_resource < resource.m_resource; }
+	bool operator<(const LockedResourceP &resource) const
+	{
+		return m_resource < resource.m_resource;
+	}
 
 	TCacheResource *operator->() const { return m_resource.getPointer(); }
 	TCacheResource &operator*() const { return *m_resource.getPointer(); }
@@ -425,7 +457,7 @@ class TPassiveCacheManager::ResourcesContainer
 {
 	ResourcesTable m_resources;
 
-public:
+  public:
 	ResourcesContainer() {}
 	~ResourcesContainer() {}
 
@@ -436,8 +468,7 @@ public:
 //    FxData implementation
 //*****************************************************************************************
 
-TPassiveCacheManager::FxData::FxData()
-	: m_storageFlag(0), m_passiveCacheId(0)
+TPassiveCacheManager::FxData::FxData() : m_storageFlag(0), m_passiveCacheId(0)
 {
 }
 
@@ -459,15 +490,13 @@ class TPassiveCacheManagerGenerator : public TRenderResourceManagerGenerator
 {
 	TRenderResourceManager *operator()(void)
 	{
-		//return new TPassiveCacheManager;
+		// return new TPassiveCacheManager;
 		return TPassiveCacheManager::instance();
 	}
 };
 
-MANAGER_FILESCOPE_DECLARATION_DEP(
-	TPassiveCacheManager,
-	TPassiveCacheManagerGenerator,
-	TFxCacheManager::deps())
+MANAGER_FILESCOPE_DECLARATION_DEP(TPassiveCacheManager, TPassiveCacheManagerGenerator,
+								  TFxCacheManager::deps())
 
 //*****************************************************************************************
 //    Implementation
@@ -480,7 +509,8 @@ TPassiveCacheManager::TPassiveCacheManager()
 	: m_currStorageFlag(IN_MEMORY)
 #endif
 	  ,
-	  m_enabled(true), m_descriptorCallback(0), m_mutex(QMutex::Recursive), m_resources(new ResourcesContainer)
+	  m_enabled(true), m_descriptorCallback(0), m_mutex(QMutex::Recursive),
+	  m_resources(new ResourcesContainer)
 {
 	reset();
 }
@@ -506,7 +536,7 @@ void TPassiveCacheManager::setContextName(unsigned long renderId, const std::str
 {
 	QMutexLocker locker(&m_mutex);
 
-	//Retrieve the context data if already present
+	// Retrieve the context data if already present
 	std::map<std::string, UCHAR>::iterator it = m_contextNames.find(name);
 	if (it == m_contextNames.end())
 		it = m_contextNames.insert(std::make_pair(name, 0)).first;
@@ -521,7 +551,7 @@ std::string TPassiveCacheManager::getContextName()
 {
 	QMutexLocker locker(&m_mutex);
 
-	//First, search the context name
+	// First, search the context name
 	std::map<unsigned long, std::string>::iterator it =
 		m_contextNamesByRenderId.find(TRenderer::renderId());
 
@@ -591,8 +621,8 @@ void TPassiveCacheManager::onSceneLoaded()
 {
 	m_updatingPassiveCacheIds = false;
 
-//Initialize the fxs tree description. This was not possible before, as the
-//scene was yet incomplete (in loading state).
+// Initialize the fxs tree description. This was not possible before, as the
+// scene was yet incomplete (in loading state).
 #ifndef USE_SQLITE_HDPOOL
 	unsigned int count = m_fxDataVector.size();
 	for (unsigned int i = 0; i < count; ++i) {
@@ -663,7 +693,7 @@ int TPassiveCacheManager::getPassiveCacheId(TFx *fx)
 	if (idx < 0)
 		return 0;
 
-	//This needs not be mutex locked
+	// This needs not be mutex locked
 
 	assert(idx < (int)m_fxDataVector.size());
 	return m_fxDataVector[idx].m_passiveCacheId;
@@ -709,7 +739,8 @@ void TPassiveCacheManager::enableCache(TFx *fx)
 			data.m_passiveCacheId = getNewPassiveCacheId();
 
 		if ((storedFlag & ON_DISK) && !(oldFlag & ON_DISK)) {
-			ResourcesTable::ColIterator it = m_resources->getTable().colBegin(data.m_passiveCacheId);
+			ResourcesTable::ColIterator it =
+				m_resources->getTable().colBegin(data.m_passiveCacheId);
 			for (; it; ++it) {
 				std::set<LockedResourceP> &resources = *it;
 
@@ -761,7 +792,8 @@ void TPassiveCacheManager::disableCache(TFx *fx)
 
 #ifdef USE_SQLITE_HDPOOL
 		if ((oldFlag & ON_DISK) && !(storedFlag & ON_DISK))
-			TCacheResourcePool::instance()->releaseReferences("P" + QString::number(data.m_passiveCacheId));
+			TCacheResourcePool::instance()->releaseReferences(
+				"P" + QString::number(data.m_passiveCacheId));
 #endif
 	}
 }
@@ -786,14 +818,16 @@ void TPassiveCacheManager::toggleCache(TFx *fx)
 
 #ifdef DIAGNOSTICS
 		DIAGNOSTICS_STR("#activity.txt | " + QTime::currentTime().toString() + " " +
-						QString("Toggle Cache (now ") + ((storedFlag & IN_MEMORY) ? "enabled)" : "disabled)"));
+						QString("Toggle Cache (now ") +
+						((storedFlag & IN_MEMORY) ? "enabled)" : "disabled)"));
 #endif
 
 		if (data.m_passiveCacheId == 0)
 			data.m_passiveCacheId = getNewPassiveCacheId();
 
 		if ((storedFlag & ON_DISK) && !(oldFlag & ON_DISK)) {
-			ResourcesTable::ColIterator it = m_resources->getTable().colBegin(data.m_passiveCacheId);
+			ResourcesTable::ColIterator it =
+				m_resources->getTable().colBegin(data.m_passiveCacheId);
 			for (; it; ++it) {
 				std::set<LockedResourceP> &resources = *it;
 
@@ -803,9 +837,9 @@ void TPassiveCacheManager::toggleCache(TFx *fx)
 			}
 		}
 
-		//Implementa la versione contraria - eliminazione dell'fx nell'hdPool...
-		//Metti anche questo in versione ritardata con flush... Il flush e' da unificare...
-		//e magari da spostare direttamente nell'hdPool
+		// Implementa la versione contraria - eliminazione dell'fx nell'hdPool...
+		// Metti anche questo in versione ritardata con flush... Il flush e' da unificare...
+		// e magari da spostare direttamente nell'hdPool
 
 		if ((oldFlag & IN_MEMORY) && !(storedFlag & IN_MEMORY)) {
 			m_resources->getTable().erase(data.m_passiveCacheId);
@@ -823,7 +857,8 @@ void TPassiveCacheManager::toggleCache(TFx *fx)
 
 #ifdef USE_SQLITE_HDPOOL
 		if ((oldFlag & ON_DISK) && !(storedFlag & ON_DISK))
-			TCacheResourcePool::instance()->releaseReferences("P" + QString::number(data.m_passiveCacheId));
+			TCacheResourcePool::instance()->releaseReferences(
+				"P" + QString::number(data.m_passiveCacheId));
 #endif
 	}
 }
@@ -834,7 +869,7 @@ void TPassiveCacheManager::invalidateLevel(const std::string &levelName)
 {
 	QMutexLocker locker(&m_mutex);
 
-	//Traverse the managed resources for passed levelName.
+	// Traverse the managed resources for passed levelName.
 	ResourcesTable &table = m_resources->getTable();
 	ResourcesTable::Iterator it = table.begin();
 	while (it) {
@@ -855,7 +890,7 @@ void TPassiveCacheManager::invalidateLevel(const std::string &levelName)
 	}
 
 #ifdef USE_SQLITE_HDPOOL
-	//Store the level name until the invalidation is forced
+	// Store the level name until the invalidation is forced
 	m_invalidatedLevels.insert(levelName);
 #endif
 }
@@ -867,7 +902,7 @@ void TPassiveCacheManager::forceInvalidate()
 #ifdef USE_SQLITE_HDPOOL
 	TCacheResourcePool *pool = TCacheResourcePool::instance();
 
-	//Clear all invalidated levels from the resource pool
+	// Clear all invalidated levels from the resource pool
 	std::set<std::string>::iterator it;
 	for (it = m_invalidatedLevels.begin(); it != m_invalidatedLevels.end(); ++it)
 		pool->clearKeyword(*it);
@@ -878,8 +913,8 @@ void TPassiveCacheManager::forceInvalidate()
 
 //-------------------------------------------------------------------------
 
-//Generate the fx's tree description. If it is contained in one of those
-//stored with cached fxs, release their associated resources.
+// Generate the fx's tree description. If it is contained in one of those
+// stored with cached fxs, release their associated resources.
 void TPassiveCacheManager::onFxChanged(const TFxP &fx)
 {
 #ifndef USE_SQLITE_HDPOOL
@@ -903,8 +938,8 @@ void TPassiveCacheManager::onFxChanged(const TFxP &fx)
 
 //-------------------------------------------------------------------------
 
-//Regenerate the tree descriptions of cached fxs. If the new description does
-//not match the previous one, release the associated resources.
+// Regenerate the tree descriptions of cached fxs. If the new description does
+// not match the previous one, release the associated resources.
 void TPassiveCacheManager::onXsheetChanged()
 {
 #ifndef USE_SQLITE_HDPOOL
@@ -934,10 +969,9 @@ void TPassiveCacheManager::onXsheetChanged()
 
 //-------------------------------------------------------------------------
 
-void TPassiveCacheManager::getResource(
-	TCacheResourceP &resource, const std::string &alias,
-	const TFxP &fx, double frame, const TRenderSettings &rs,
-	ResourceDeclaration *resData)
+void TPassiveCacheManager::getResource(TCacheResourceP &resource, const std::string &alias,
+									   const TFxP &fx, double frame, const TRenderSettings &rs,
+									   ResourceDeclaration *resData)
 {
 	if (!(m_enabled && fx && rs.m_userCachable))
 		return;
@@ -950,7 +984,7 @@ void TPassiveCacheManager::getResource(
 	if (contextName.empty())
 		return;
 
-	//Build a resource if none was passed.
+	// Build a resource if none was passed.
 	if (!resource)
 		resource = TCacheResourceP(alias, true);
 
@@ -958,15 +992,18 @@ void TPassiveCacheManager::getResource(
 	if (flag & ON_DISK) {
 		resource->enableBackup();
 
-		int passiveCacheId = m_fxDataVector[fx->getAttributes()->passiveCacheDataIdx()].m_passiveCacheId;
-		TCacheResourcePool::instance()->addReference(resource, "P" + QString::number(passiveCacheId));
+		int passiveCacheId =
+			m_fxDataVector[fx->getAttributes()->passiveCacheDataIdx()].m_passiveCacheId;
+		TCacheResourcePool::instance()->addReference(resource,
+													 "P" + QString::number(passiveCacheId));
 	}
 #endif
 
 	if (flag & IN_MEMORY) {
 		QMutexLocker locker(&m_mutex);
 
-		int passiveCacheId = m_fxDataVector[fx->getAttributes()->passiveCacheDataIdx()].m_passiveCacheId;
+		int passiveCacheId =
+			m_fxDataVector[fx->getAttributes()->passiveCacheDataIdx()].m_passiveCacheId;
 		m_resources->getTable().value(contextName, passiveCacheId).insert(resource);
 	}
 }
@@ -982,7 +1019,7 @@ void TPassiveCacheManager::releaseContextNamesWithPrefix(const std::string &pref
 					" Release Context Name (" + QString::fromStdString(prefix) + ")");
 #endif
 
-	//Retrieve the context range
+	// Retrieve the context range
 	std::string prefixPlus1 = prefix;
 	prefixPlus1[prefix.size() - 1]++;
 
@@ -993,7 +1030,7 @@ void TPassiveCacheManager::releaseContextNamesWithPrefix(const std::string &pref
 		m_contextNames.erase(it, jt);
 	}
 
-	//Transfer to temporary
+	// Transfer to temporary
 	ResourcesTable &table = m_resources->getTable();
 	std::map<std::string, ResourcesTable::Row> &rows = m_resources->getTable().rows();
 
@@ -1016,10 +1053,10 @@ void TPassiveCacheManager::releaseOldResources()
 {
 	QMutexLocker locker(&m_mutex);
 
-	//Release all the resources that were stored in the old render instance of the
-	//context, PLUS those of the temporary container.
-	//Resources that were held by the TPassiveCacheManager::getResource() procedure
-	//are now duplicated in a proper row of the table - and will not be freed.
+	// Release all the resources that were stored in the old render instance of the
+	// context, PLUS those of the temporary container.
+	// Resources that were held by the TPassiveCacheManager::getResource() procedure
+	// are now duplicated in a proper row of the table - and will not be freed.
 	std::string contextName(getContextName());
 	if (contextName.empty())
 		return;
@@ -1039,7 +1076,7 @@ void TPassiveCacheManager::onRenderInstanceStart(unsigned long renderId)
 	TFxCacheManagerDelegate::onRenderInstanceStart(renderId);
 
 #ifdef USE_SQLITE_HDPOOL
-	//Force invalidation of levels before the render starts
+	// Force invalidation of levels before the render starts
 	forceInvalidate();
 #endif
 }

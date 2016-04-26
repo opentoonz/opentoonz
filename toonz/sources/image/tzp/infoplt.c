@@ -57,15 +57,12 @@ void main(int argc, char *argv[])
 		}
 
 		printf(" > IMAGE: %s \n\n", inname);
-		printf("   > Dimension:    xsize=%d\t\tysize=%d\n",
-			   img->pixmap.xsize, img->pixmap.ysize);
+		printf("   > Dimension:    xsize=%d\t\tysize=%d\n", img->pixmap.xsize, img->pixmap.ysize);
 		printf("   > Savebox:\n");
-		printf("   >   Start       x0=%d\t\ty0=%d \n",
-			   img->pixmap.xD, img->pixmap.yD);
-		printf("   >   Dimensions  xsize=%d\t\tysize=%d \n",
-			   img->pixmap.xSBsize, img->pixmap.ySBsize);
-		printf("   > Resolution:   x_dpi=%g\ty_dpi=%g \n",
-			   img->pixmap.x_dpi, img->pixmap.y_dpi);
+		printf("   >   Start       x0=%d\t\ty0=%d \n", img->pixmap.xD, img->pixmap.yD);
+		printf("   >   Dimensions  xsize=%d\t\tysize=%d \n", img->pixmap.xSBsize,
+			   img->pixmap.ySBsize);
+		printf("   > Resolution:   x_dpi=%g\ty_dpi=%g \n", img->pixmap.x_dpi, img->pixmap.y_dpi);
 
 		printf("\n");
 		if (img->history)

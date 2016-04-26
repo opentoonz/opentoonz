@@ -44,57 +44,57 @@ class DVAPI PlasticDeformer
 	class Imp;
 	std::unique_ptr<Imp> m_imp;
 
-public:
+  public:
 	PlasticDeformer();
 	~PlasticDeformer();
 
 	friend void swap(PlasticDeformer &a, PlasticDeformer &b) { std::swap(a.m_imp, b.m_imp); }
 
 	/*!
-    Returns whether the last compilation procedure succeeded, or it either failed
-    or was never invoked after the last initialize() call.
+	Returns whether the last compilation procedure succeeded, or it either failed
+	or was never invoked after the last initialize() call.
   */
 	bool compiled() const;
 
 	/*!
-    Initializes a deformation on the specified mesh object.
+	Initializes a deformation on the specified mesh object.
   */
 	void initialize(const TTextureMeshP &mesh);
 
 	/*!
   \brief Compiles the deformer against a group of deformation handles, and returns
-    whether the procedure was successful.
+	whether the procedure was successful.
 
   \note Accepts hints about the mesh face containing each handle; the hinted face
-    is checked before scanning the whole mesh. In case hints are supplied, they will be
-    returned with the correct face indices containing each handle.
+	is checked before scanning the whole mesh. In case hints are supplied, they will be
+	returned with the correct face indices containing each handle.
 
   \warning Requires a previous initialize() call. The compilation may legitimately
-    fail to process handle configurations that \a cannot result in suitable
-    deformations (eg, if more than 3 handles lie in the same mesh face).
+	fail to process handle configurations that \a cannot result in suitable
+	deformations (eg, if more than 3 handles lie in the same mesh face).
   */
 	bool compile(const std::vector<PlasticHandle> &handles, int *faceHints = 0);
 
 	/*!
-    Applies the deformation specified with input handles deformed positions, returning
-    the deformed mesh vertices positions.
+	Applies the deformation specified with input handles deformed positions, returning
+	the deformed mesh vertices positions.
 
   \note In case the compilation step failed or was never invoked, this function
-    will silently return the original, undeformed mesh vertices.
+	will silently return the original, undeformed mesh vertices.
 
   \warning Requires previous compile() invocation.
   */
 	void deform(const TPointD *dstHandlePos, double *dstVerticesCoords) const;
 
 	/*!
-    Releases data from the initialize() step that is unnecessary during deform().
+	Releases data from the initialize() step that is unnecessary during deform().
 
   \warning Initialization data is still necessary to invoke compile(), which will
-    therefore need to be preceded by a new call to initialize().
+	therefore need to be preceded by a new call to initialize().
   */
 	void releaseInitializedData();
 
-private:
+  private:
 	// Not copyable
 	PlasticDeformer(const PlasticDeformer &);
 	PlasticDeformer &operator=(const PlasticDeformer &);

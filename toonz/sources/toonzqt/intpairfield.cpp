@@ -25,7 +25,8 @@ using namespace DVGui;
 //-----------------------------------------------------------------------------
 
 IntPairField::IntPairField(QWidget *parent, bool isMaxRangeLimited)
-	: QWidget(parent), m_values(0, 0), m_minValue(0), m_maxValue(100), m_grabOffset(0), m_grabIndex(-1), m_leftMargin(52), m_rightMargin(52), m_isMaxRangeLimited(isMaxRangeLimited)
+	: QWidget(parent), m_values(0, 0), m_minValue(0), m_maxValue(100), m_grabOffset(0),
+	  m_grabIndex(-1), m_leftMargin(52), m_rightMargin(52), m_isMaxRangeLimited(isMaxRangeLimited)
 {
 	setObjectName("IntPairField");
 	setFixedHeight(WidgetHeight);
@@ -55,7 +56,8 @@ IntPairField::IntPairField(QWidget *parent, bool isMaxRangeLimited)
 
 	//---signal-slot connections
 	bool ret = connect(m_leftLineEdit, SIGNAL(editingFinished()), SLOT(onLeftEditingFinished()));
-	ret = ret && connect(m_rightLineEdit, SIGNAL(editingFinished()), SLOT(onRightEditingFinished()));
+	ret =
+		ret && connect(m_rightLineEdit, SIGNAL(editingFinished()), SLOT(onRightEditingFinished()));
 
 	assert(ret);
 }
@@ -109,7 +111,8 @@ void IntPairField::paintEvent(QPaintEvent *)
 	if (sliderRect.contains(QPoint(x, 0)))
 		p.drawPixmap(x - m_handleLeftPixmap.width() + 1, 2, m_handleLeftPixmap);
 	else
-		p.drawPixmap(sliderRect.right() - m_handleLeftPixmap.width() + 1, 2, m_handleLeftGrayPixmap);
+		p.drawPixmap(sliderRect.right() - m_handleLeftPixmap.width() + 1, 2,
+					 m_handleLeftGrayPixmap);
 
 	x = value2pos(m_values.second);
 
@@ -166,7 +169,7 @@ void IntPairField::setValue(int value)
 
 	value = tcrop(value, m_minValue, m_maxValue);
 	value = tround(value * 100) * 0.01;
-	if (m_grabIndex == 0) //Left grab
+	if (m_grabIndex == 0) // Left grab
 	{
 		m_values.first = value;
 		m_leftLineEdit->setValue(m_values.first);
@@ -175,7 +178,7 @@ void IntPairField::setValue(int value)
 			m_values.second = value;
 			m_rightLineEdit->setValue(m_values.second);
 		}
-	} else //Right grab
+	} else // Right grab
 	{
 		m_values.second = value;
 		m_rightLineEdit->setValue(m_values.second);

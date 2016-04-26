@@ -98,8 +98,7 @@ bool scrambledRooms = false;
 
 //=============================================================================
 
-bool readRoomList(std::vector<TFilePath> &roomPaths,
-				  const QString &argumentLayoutFileName)
+bool readRoomList(std::vector<TFilePath> &roomPaths, const QString &argumentLayoutFileName)
 {
 	bool argumentLayoutFileLoaded = false;
 
@@ -191,18 +190,18 @@ void makePrivate(Room *room)
 	/*- create private menubar settings if not exists -*/
 	std::string mbDstFileName = roomPath.getName() + "_menubar.xml";
 	TFilePath myMBPath = layoutDir + mbDstFileName;
-	if (!TFileStatus(myMBPath).isReadable())
-	{
+	if (!TFileStatus(myMBPath).isReadable()) {
 		TFilePath templateRoomMBPath = ToonzFolder::getTemplateModuleDir() + mbSrcFileName;
 		if (TFileStatus(templateRoomMBPath).doesExist())
 			TSystem::copyFile(myMBPath, templateRoomMBPath);
-		else
-		{
-			TFilePath templateFullMBPath = ToonzFolder::getTemplateModuleDir() + "menubar_template.xml";
+		else {
+			TFilePath templateFullMBPath =
+				ToonzFolder::getTemplateModuleDir() + "menubar_template.xml";
 			if (TFileStatus(templateFullMBPath).doesExist())
 				TSystem::copyFile(myMBPath, templateFullMBPath);
 			else
-				DVGui::warning(QObject::tr("Cannot open menubar settings template file. Re-installing Toonz will solve this problem."));
+				DVGui::warning(QObject::tr("Cannot open menubar settings template file. "
+										   "Re-installing Toonz will solve this problem."));
 		}
 	}
 }
@@ -226,7 +225,7 @@ void Room::save()
 {
 	DockLayout *layout = dockLayout();
 
-	//Now save layout state
+	// Now save layout state
 	DockLayout::State state = layout->saveState();
 	std::vector<QRect> &geometries = state.first;
 
@@ -240,19 +239,19 @@ void Room::save()
 		settings.beginGroup("pane_" + QString::number(i));
 		TPanel *pane = static_cast<TPanel *>(layout->itemAt(i)->widget());
 		settings.setValue("name", pane->objectName());
-		settings.setValue("geometry", geometries[i]); //Use passed geometry
+		settings.setValue("geometry", geometries[i]); // Use passed geometry
 		if (pane->getViewType() != -1)
-			//If panel has different viewtypes, store current one
+			// If panel has different viewtypes, store current one
 			settings.setValue("viewtype", pane->getViewType());
 		if (pane->objectName() == "FlipBook") {
-			//Store flipbook's identification number
+			// Store flipbook's identification number
 			FlipBook *flip = static_cast<FlipBook *>(pane->widget());
 			settings.setValue("index", flip->getPoolIndex());
 		}
 		settings.endGroup();
 	}
 
-	//Adding hierarchy string
+	// Adding hierarchy string
 	settings.setValue("hierarchy", state.second);
 	settings.setValue("name", QVariant(QString(m_name)));
 
@@ -275,24 +274,24 @@ void Room::load(const TFilePath &fp)
 	std::vector<QRect> geometries;
 	unsigned int i;
 	for (i = 0; i < itemsList.size(); i++) {
-		//Panel i
-		//NOTE: Panels have to be retrieved in the precise order they were saved.
-		//settings.beginGroup(itemsList[i]);  //NO! itemsList has lexicographical ordering!!
+		// Panel i
+		// NOTE: Panels have to be retrieved in the precise order they were saved.
+		// settings.beginGroup(itemsList[i]);  //NO! itemsList has lexicographical ordering!!
 		settings.beginGroup("pane_" + QString::number(i));
 
 		TPanel *pane = 0;
 		QString paneObjectName;
 
-		//Retrieve panel name
+		// Retrieve panel name
 		QVariant name = settings.value("name");
 		if (name.canConvert(QVariant::String)) {
-			//Allocate panel
+			// Allocate panel
 			paneObjectName = name.toString();
 			pane = TPanelFactory::createPanel(this, paneObjectName);
 		}
 
 		if (!pane) {
-			//Allocate a message panel
+			// Allocate a message panel
 			MessagePanel *message = new MessagePanel(this);
 			message->setWindowTitle(name.toString());
 			message->setMessage("This panel is not supported by the currently set license!");
@@ -304,17 +303,17 @@ void Room::load(const TFilePath &fp)
 
 		pane->setObjectName(paneObjectName);
 
-		//Add panel to room
+		// Add panel to room
 		addDockWidget(pane);
 
-		//Store its geometry
+		// Store its geometry
 		geometries.push_back(settings.value("geometry").toRect());
 
-		//Restore view type if present
+		// Restore view type if present
 		if (settings.contains("viewtype"))
 			pane->setViewType(settings.value("viewtype").toInt());
 
-		//Restore flipbook pool indices
+		// Restore flipbook pool indices
 		if (paneObjectName == "FlipBook") {
 			int index = settings.value("index").toInt();
 			dynamic_cast<FlipBook *>(pane->widget())->setPoolIndex(index);
@@ -339,7 +338,8 @@ void Room::load(const TFilePath &fp)
 //-----------------------------------------------------------------------------
 
 #if QT_VERSION >= 0x050500
-MainWindow::MainWindow(const QString &argumentLayoutFileName, QWidget *parent, Qt::WindowFlags flags)
+MainWindow::MainWindow(const QString &argumentLayoutFileName, QWidget *parent,
+					   Qt::WindowFlags flags)
 #else
 MainWindow::MainWindow(const QString &argumentLayoutFileName, QWidget *parent, Qt::WFlags flags)
 #endif
@@ -375,23 +375,26 @@ MainWindow::MainWindow(const QString &argumentLayoutFileName, QWidget *parent, Q
 
 	setCentralWidget(m_stackedWidget);
 
-	//Leggo i settings
+	// Leggo i settings
 	readSettings(argumentLayoutFileName);
 
-	//Setto le stanze
+	// Setto le stanze
 	QTabBar *roomTabWidget = m_topBar->getRoomTabWidget();
 	connect(m_stackedWidget, SIGNAL(currentChanged(int)), SLOT(onCurrentRoomChanged(int)));
-	connect(roomTabWidget, SIGNAL(currentChanged(int)), m_stackedWidget, SLOT(setCurrentIndex(int)));
+	connect(roomTabWidget, SIGNAL(currentChanged(int)), m_stackedWidget,
+			SLOT(setCurrentIndex(int)));
 
 	/*-- タイトルバーにScene名を表示する --*/
-	connect(TApp::instance()->getCurrentScene(), SIGNAL(nameSceneChanged()), this, SLOT(changeWindowTitle()));
+	connect(TApp::instance()->getCurrentScene(), SIGNAL(nameSceneChanged()), this,
+			SLOT(changeWindowTitle()));
 	changeWindowTitle();
 
-	//Connetto i comandi che sono in RoomTabWidget
-	connect(roomTabWidget, SIGNAL(indexSwapped(int , int )), SLOT(onIndexSwapped(int ,int )));
+	// Connetto i comandi che sono in RoomTabWidget
+	connect(roomTabWidget, SIGNAL(indexSwapped(int, int)), SLOT(onIndexSwapped(int, int)));
 	connect(roomTabWidget, SIGNAL(insertNewTabRoom()), SLOT(insertNewRoom()));
 	connect(roomTabWidget, SIGNAL(deleteTabRoom(int)), SLOT(deleteRoom(int)));
-	connect(roomTabWidget, SIGNAL(renameTabRoom(int, const QString)), SLOT(renameRoom(int, const QString)));
+	connect(roomTabWidget, SIGNAL(renameTabRoom(int, const QString)),
+			SLOT(renameRoom(int, const QString)));
 
 	setCommandHandler("MI_Quit", this, &MainWindow::onQuit);
 	setCommandHandler("MI_Undo", this, &MainWindow::onUndo);
@@ -453,7 +456,7 @@ void MainWindow::changeWindowTitle(QString &str)
 
 void MainWindow::startupFloatingPanels()
 {
-	//Show all floating panels
+	// Show all floating panels
 	DockLayout *currDockLayout = getCurrentRoom()->dockLayout();
 	int i;
 	for (i = 0; i < currDockLayout->count(); ++i) {
@@ -503,9 +506,12 @@ void MainWindow::readSettings(const QString &argumentLayoutFileName)
 	/*-- Palette-PageViewerのチップサイズのロード --*/
 	mySettings.beginGroup("PaletteChipSizes");
 	{
-		PaletteViewerGUI::ChipSizeManager::instance()->chipSize_Palette = mySettings.value("PaletteViewer", 2).toInt();
-		PaletteViewerGUI::ChipSizeManager::instance()->chipSize_Cleanup = mySettings.value("CleanupSettings", 0).toInt();
-		PaletteViewerGUI::ChipSizeManager::instance()->chipSize_Studio = mySettings.value("StudioPalette", 1).toInt();
+		PaletteViewerGUI::ChipSizeManager::instance()->chipSize_Palette =
+			mySettings.value("PaletteViewer", 2).toInt();
+		PaletteViewerGUI::ChipSizeManager::instance()->chipSize_Cleanup =
+			mySettings.value("CleanupSettings", 0).toInt();
+		PaletteViewerGUI::ChipSizeManager::instance()->chipSize_Studio =
+			mySettings.value("StudioPalette", 1).toInt();
 	}
 	mySettings.endGroup();
 
@@ -521,8 +527,12 @@ void MainWindow::readSettings(const QString &argumentLayoutFileName)
 
 	if (readRoomList(roomPaths, argumentLayoutFileName)) {
 		if (!argumentLayoutFileName.isEmpty()) {
-			/*-- タイトルバーに表示するレイアウト名を作る：_layoutがあればそこから省く。無ければ.txtのみ省く --*/
-			int pos = (argumentLayoutFileName.indexOf("_layout") == -1) ? argumentLayoutFileName.indexOf(".txt") : argumentLayoutFileName.indexOf("_layout");
+			/*--
+			 * タイトルバーに表示するレイアウト名を作る：_layoutがあればそこから省く。無ければ.txtのみ省く
+			 * --*/
+			int pos = (argumentLayoutFileName.indexOf("_layout") == -1)
+						  ? argumentLayoutFileName.indexOf(".txt")
+						  : argumentLayoutFileName.indexOf("_layout");
 			m_layoutName = argumentLayoutFileName.left(pos);
 		}
 	}
@@ -540,50 +550,51 @@ void MainWindow::readSettings(const QString &argumentLayoutFileName)
 			std::string mbFileName = roomPath.getName() + "_menubar.xml";
 			stackedMenuBar->loadAndAddMenubar(ToonzFolder::getModuleFile(mbFileName));
 
-			//room->setDockOptions(QMainWindow::DockOptions(
-			//  (QMainWindow::AnimatedDocks | QMainWindow::AllowNestedDocks) & ~QMainWindow::AllowTabbedDocks));
+			// room->setDockOptions(QMainWindow::DockOptions(
+			//  (QMainWindow::AnimatedDocks | QMainWindow::AllowNestedDocks) &
+			//  ~QMainWindow::AllowTabbedDocks));
 			rooms.push_back(room);
 		}
 	}
 
-	//Read the flipbook history
+	// Read the flipbook history
 	FlipBookPool::instance()->load(ToonzFolder::getMyModuleDir() + TFilePath("fliphistory.ini"));
 
 	/*- レイアウト設定ファイルが見つからなかった場合、初期Roomの生成 -*/
-	//Se leggendo i settings non ho inizializzato le stanze lo faccio ora.
+	// Se leggendo i settings non ho inizializzato le stanze lo faccio ora.
 	// Puo' accadere se si buttano i file di inizializzazione.
 	if (rooms.empty()) {
-		//CleanupRoom
+		// CleanupRoom
 		Room *cleanupRoom = createCleanupRoom();
 		m_stackedWidget->addWidget(cleanupRoom);
 		rooms.push_back(cleanupRoom);
 		stackedMenuBar->createMenuBarByName(cleanupRoom->getName());
 
-		//PltEditRoom
+		// PltEditRoom
 		Room *pltEditRoom = createPltEditRoom();
 		m_stackedWidget->addWidget(pltEditRoom);
 		rooms.push_back(pltEditRoom);
 		stackedMenuBar->createMenuBarByName(pltEditRoom->getName());
 
-		//InknPaintRoom
+		// InknPaintRoom
 		Room *inknPaintRoom = createInknPaintRoom();
 		m_stackedWidget->addWidget(inknPaintRoom);
 		rooms.push_back(inknPaintRoom);
 		stackedMenuBar->createMenuBarByName(inknPaintRoom->getName());
 
-		//XsheetRoom
+		// XsheetRoom
 		Room *xsheetRoom = createXsheetRoom();
 		m_stackedWidget->addWidget(xsheetRoom);
 		rooms.push_back(xsheetRoom);
 		stackedMenuBar->createMenuBarByName(xsheetRoom->getName());
 
-		//BatchesRoom
+		// BatchesRoom
 		Room *batchesRoom = createBatchesRoom();
 		m_stackedWidget->addWidget(batchesRoom);
 		rooms.push_back(batchesRoom);
 		stackedMenuBar->createMenuBarByName(batchesRoom->getName());
 
-		//BrowserRoom
+		// BrowserRoom
 		Room *browserRoom = createBrowserRoom();
 		m_stackedWidget->addWidget(browserRoom);
 		rooms.push_back(browserRoom);
@@ -593,7 +604,7 @@ void MainWindow::readSettings(const QString &argumentLayoutFileName)
 	/*- If the layout files were loaded from template, then save them as private ones -*/
 	makePrivate(rooms);
 	writeRoomList(rooms);
-	
+
 	// Imposto la stanza corrente
 	fp = ToonzFolder::getModuleFile(currentRoomFileName);
 	Tifstream is(fp);
@@ -629,12 +640,15 @@ void MainWindow::readSettings(const QString &argumentLayoutFileName)
 			if (tmpRoom) {
 				ComboViewerPanel *cvp = tmpRoom->getCentralViewerPanel();
 				if (cvp) {
-					if (r == 0) //InknPaintRoom
+					if (r == 0) // InknPaintRoom
 						TApp::instance()->setInknPaintViewerPanel(cvp);
 					mySettings.beginGroup(tmpRoomName);
-					cvp->setShowHideFlag(CVPARTS_TOOLBAR, mySettings.value("Toolbar", false).toBool());
-					cvp->setShowHideFlag(CVPARTS_TOOLOPTIONS, mySettings.value("ToolOptions", false).toBool());
-					cvp->setShowHideFlag(CVPARTS_FLIPCONSOLE, mySettings.value("Console", false).toBool());
+					cvp->setShowHideFlag(CVPARTS_TOOLBAR,
+										 mySettings.value("Toolbar", false).toBool());
+					cvp->setShowHideFlag(CVPARTS_TOOLOPTIONS,
+										 mySettings.value("ToolOptions", false).toBool());
+					cvp->setShowHideFlag(CVPARTS_FLIPCONSOLE,
+										 mySettings.value("Console", false).toBool());
 					cvp->updateShowHide();
 					mySettings.endGroup();
 				}
@@ -651,11 +665,11 @@ void MainWindow::writeSettings()
 	std::vector<Room *> rooms;
 	int i;
 
-	//Flipbook history
+	// Flipbook history
 	DockLayout *currRoomLayout(getCurrentRoom()->dockLayout());
 	for (i = 0; i < currRoomLayout->count(); ++i) {
-		//Remove all floating flipbooks from current room and return them into
-		//the flipbook pool.
+		// Remove all floating flipbooks from current room and return them into
+		// the flipbook pool.
 		TPanel *panel = static_cast<TPanel *>(currRoomLayout->itemAt(i)->widget());
 		if (panel->isFloating() && panel->getPanelType() == "FlipBook") {
 			currRoomLayout->removeWidget(panel);
@@ -667,7 +681,7 @@ void MainWindow::writeSettings()
 
 	FlipBookPool::instance()->save();
 
-	//Room layouts
+	// Room layouts
 	for (i = 0; i < m_stackedWidget->count(); i++) {
 		Room *room = getRoom(i);
 		rooms.push_back(room);
@@ -675,18 +689,18 @@ void MainWindow::writeSettings()
 	}
 	writeRoomList(rooms);
 
-	//Current room settings
+	// Current room settings
 	Tofstream os(ToonzFolder::getMyModuleDir() + currentRoomFileName);
 	os << getCurrentRoom()->getName().toStdString();
 
-	//Main window settings
+	// Main window settings
 	TFilePath fp = ToonzFolder::getMyModuleDir() + TFilePath("mainwindow.ini");
 	QSettings settings(toQString(fp), QSettings::IniFormat);
 
 	settings.setValue("MainWindowGeometry", saveGeometry());
 
-	//Recent Files
-	//RecentFiles::instance()->saveRecentFiles();
+	// Recent Files
+	// RecentFiles::instance()->saveRecentFiles();
 
 	fp = ToonzFolder::getMyModuleDir() + TFilePath(mySettingsFileName);
 	QSettings mySettings(toQString(fp), QSettings::IniFormat);
@@ -743,7 +757,7 @@ Room *MainWindow::createCleanupRoom()
 
 	DockLayout *layout = cleanupRoom->dockLayout();
 
-	//Viewer
+	// Viewer
 	TPanel *viewer = TPanelFactory::createPanel(cleanupRoom, "ComboViewer");
 	if (viewer) {
 		cleanupRoom->addDockWidget(viewer);
@@ -760,14 +774,14 @@ Room *MainWindow::createCleanupRoom()
 		}
 	}
 
-	//CleanupSettings
+	// CleanupSettings
 	TPanel *cleanupSettingsPane = TPanelFactory::createPanel(cleanupRoom, "CleanupSettings");
 	if (cleanupSettingsPane) {
 		cleanupRoom->addDockWidget(cleanupSettingsPane);
 		layout->dockItem(cleanupSettingsPane, viewer, Region::right);
 	}
 
-	//Xsheet
+	// Xsheet
 	TPanel *xsheetPane = TPanelFactory::createPanel(cleanupRoom, "Xsheet");
 	if (xsheetPane) {
 		cleanupRoom->addDockWidget(xsheetPane);
@@ -789,7 +803,7 @@ Room *MainWindow::createPltEditRoom()
 
 	DockLayout *layout = pltEditRoom->dockLayout();
 
-	//Viewer
+	// Viewer
 	TPanel *viewer = TPanelFactory::createPanel(pltEditRoom, "ComboViewer");
 	if (viewer) {
 		pltEditRoom->addDockWidget(viewer);
@@ -803,28 +817,28 @@ Room *MainWindow::createPltEditRoom()
 		}
 	}
 
-	//Palette
+	// Palette
 	TPanel *palettePane = TPanelFactory::createPanel(pltEditRoom, "LevelPalette");
 	if (palettePane) {
 		pltEditRoom->addDockWidget(palettePane);
 		layout->dockItem(palettePane, viewer, Region::bottom);
 	}
 
-	//StyleEditor
+	// StyleEditor
 	TPanel *styleEditorPane = TPanelFactory::createPanel(pltEditRoom, "StyleEditor");
 	if (styleEditorPane) {
 		pltEditRoom->addDockWidget(styleEditorPane);
 		layout->dockItem(styleEditorPane, viewer, Region::left);
 	}
 
-	//Xsheet
+	// Xsheet
 	TPanel *xsheetPane = TPanelFactory::createPanel(pltEditRoom, "Xsheet");
 	if (xsheetPane) {
 		pltEditRoom->addDockWidget(xsheetPane);
 		layout->dockItem(xsheetPane, palettePane, Region::left);
 	}
 
-	//Studio Palette
+	// Studio Palette
 	TPanel *studioPaletteViewer = TPanelFactory::createPanel(pltEditRoom, "StudioPalette");
 	if (studioPaletteViewer) {
 		pltEditRoom->addDockWidget(studioPaletteViewer);
@@ -846,7 +860,7 @@ Room *MainWindow::createInknPaintRoom()
 
 	DockLayout *layout = inknPaintRoom->dockLayout();
 
-	//Viewer
+	// Viewer
 	TPanel *viewer = TPanelFactory::createPanel(inknPaintRoom, "ComboViewer");
 	if (viewer) {
 		inknPaintRoom->addDockWidget(viewer);
@@ -859,14 +873,14 @@ Room *MainWindow::createInknPaintRoom()
 		}
 	}
 
-	//Palette
+	// Palette
 	TPanel *palettePane = TPanelFactory::createPanel(inknPaintRoom, "LevelPalette");
 	if (palettePane) {
 		inknPaintRoom->addDockWidget(palettePane);
 		layout->dockItem(palettePane, viewer, Region::bottom);
 	}
 
-	//Filmstrip
+	// Filmstrip
 	TPanel *filmStripPane = TPanelFactory::createPanel(inknPaintRoom, "FilmStrip");
 	if (filmStripPane) {
 		inknPaintRoom->addDockWidget(filmStripPane);
@@ -888,14 +902,14 @@ Room *MainWindow::createXsheetRoom()
 
 	DockLayout *layout = xsheetRoom->dockLayout();
 
-	//Xsheet
+	// Xsheet
 	TPanel *xsheetPane = TPanelFactory::createPanel(xsheetRoom, "Xsheet");
 	if (xsheetPane) {
 		xsheetRoom->addDockWidget(xsheetPane);
 		layout->dockItem(xsheetPane);
 	}
 
-	//FunctionEditor
+	// FunctionEditor
 	TPanel *functionEditorPane = TPanelFactory::createPanel(xsheetRoom, "FunctionEditor");
 	if (functionEditorPane) {
 		xsheetRoom->addDockWidget(functionEditorPane);
@@ -917,7 +931,7 @@ Room *MainWindow::createBatchesRoom()
 
 	DockLayout *layout = batchesRoom->dockLayout();
 
-	//Tasks
+	// Tasks
 	TPanel *tasksViewer = TPanelFactory::createPanel(batchesRoom, "Tasks");
 	if (tasksViewer) {
 		batchesRoom->addDockWidget(tasksViewer);
@@ -953,7 +967,7 @@ Room *MainWindow::createBrowserRoom()
 		layout->dockItem(browserPane);
 	}
 
-	//Scene Cast
+	// Scene Cast
 	TPanel *sceneCastPanel = TPanelFactory::createPanel(browserRoom, "SceneCast");
 	if (sceneCastPanel) {
 		browserRoom->addDockWidget(sceneCastPanel);
@@ -1084,19 +1098,19 @@ void MainWindow::onCurrentRoomChanged(int newRoomIndex)
 	Room *newRoom = getRoom(newRoomIndex);
 	QList<TPanel *> paneList = oldRoom->findChildren<TPanel *>();
 
-	//Change the parent of all the floating dockWidgets
+	// Change the parent of all the floating dockWidgets
 	for (int i = 0; i < paneList.size(); i++) {
 		TPanel *pane = paneList.at(i);
 		if (pane->isFloating() && !pane->isHidden()) {
 			QRect oldGeometry = pane->geometry();
 
-			//Just setting the new parent is not enough for the new layout manager.
-			//Must be removed from the old and added to the new.
+			// Just setting the new parent is not enough for the new layout manager.
+			// Must be removed from the old and added to the new.
 			oldRoom->removeDockWidget(pane);
 			newRoom->addDockWidget(pane);
-			//pane->setParent(newRoom);
+			// pane->setParent(newRoom);
 
-			//Some flags are lost when the parent changes.
+			// Some flags are lost when the parent changes.
 			pane->setFloating(true);
 			pane->setGeometry(oldGeometry);
 			pane->show();
@@ -1126,7 +1140,7 @@ void MainWindow::insertNewRoom()
 		makePrivate(room);
 	m_stackedWidget->insertWidget(0, room);
 
-	//Finally, old room index is increased by 1
+	// Finally, old room index is increased by 1
 	m_oldRoomIndex++;
 }
 
@@ -1141,7 +1155,7 @@ void MainWindow::deleteRoom(int index)
 		TSystem::deleteFile(fp);
 	} catch (...) {
 		DVGui::error(tr("Cannot delete") + toQString(fp));
-		//Se non ho rimosso la stanza devo rimettere il tab!!
+		// Se non ho rimosso la stanza devo rimettere il tab!!
 		m_topBar->getRoomTabWidget()->insertTab(index, room->getName());
 		return;
 	}
@@ -1151,7 +1165,7 @@ void MainWindow::deleteRoom(int index)
 	TFilePath mbFp = fp.getParentDir() + mbFileName;
 	TSystem::deleteFile(mbFp);
 
-	//The old room index must be updated if index < of it
+	// The old room index must be updated if index < of it
 	if (index < m_oldRoomIndex)
 		m_oldRoomIndex--;
 
@@ -1235,7 +1249,7 @@ void MainWindow::onMenuCheckboxChanged()
 
 void MainWindow::showEvent(QShowEvent *event)
 {
-	getCurrentRoom()->layout()->setEnabled(true); //See main function in main.cpp
+	getCurrentRoom()->layout()->setEnabled(true); // See main function in main.cpp
 }
 extern const char *applicationName;
 extern const char *applicationVersion;
@@ -1262,7 +1276,9 @@ void MainWindow::checkForLicense()
 	if (!License::isTemporaryLicense(license)) {
 		QString requestUrl = "http://www.the-tab.com/cgi-shl/check/check.asp";
 
-		m_licenseChecker = new LicenseChecker(requestUrl, LicenseChecker::TAB, License::getInstalledLicense(), applicationName, "6.5");
+		m_licenseChecker =
+			new LicenseChecker(requestUrl, LicenseChecker::TAB, License::getInstalledLicense(),
+							   applicationName, "6.5");
 		connect(m_licenseChecker, SIGNAL(done(bool)), this, SLOT(onLicenseCheckerDone(bool)));
 	}
 }
@@ -1274,7 +1290,7 @@ void MainWindow::onUpdateCheckerDone(bool error)
 	if (!error) {
 		// Get the last update date
 		const TFilePath lastUpdateFilePath = TEnv::getConfigDir() + "lastUpdate.dat";
-		//QFile data(toQString(lastUpdateFilePath));
+		// QFile data(toQString(lastUpdateFilePath));
 
 		QFile data(QString::fromStdWString(lastUpdateFilePath.getWideString()));
 		QString dateString;
@@ -1297,7 +1313,11 @@ void MainWindow::onUpdateCheckerDone(bool error)
 				std::vector<QString> buttons;
 				buttons.push_back(QString(tr("Visit Web Site")));
 				buttons.push_back(QString(tr("Cancel")));
-				int ret = DVGui::MsgBox(DVGui::INFORMATION, QObject::tr("An update is available for this software.\nVisit the Web site for more information."), buttons);
+				int ret =
+					DVGui::MsgBox(DVGui::INFORMATION,
+								  QObject::tr("An update is available for this software.\nVisit "
+											  "the Web site for more information."),
+								  buttons);
 				if (ret == 1)
 					QDesktopServices::openUrl(webPageUrl);
 
@@ -1324,7 +1344,9 @@ void MainWindow::onLicenseCheckerDone(bool error)
 {
 	if (!error) {
 		if (!m_licenseChecker->isLicenseValid()) {
-			DVGui::error(QObject::tr("The license validation process was not able to confirm the right to use this software on this computer.\n Please contact [ support@toonz.com ] for assistance."));
+			DVGui::error(QObject::tr("The license validation process was not able to confirm the "
+									 "right to use this software on this computer.\n Please "
+									 "contact [ support@toonz.com ] for assistance."));
 			qApp->exit(0);
 		}
 	}
@@ -1337,8 +1359,9 @@ void MainWindow::onLicenseCheckerDone(bool error)
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-	//il riferimento alla variabile booleana doExit viene passato a tutti gli slot che catturano l'emissione
-	//del segnale. Impostando a false tale variabile, l'applicazione non viene chiusa!
+	// il riferimento alla variabile booleana doExit viene passato a tutti gli slot che catturano
+	// l'emissione
+	// del segnale. Impostando a false tale variabile, l'applicazione non viene chiusa!
 	bool doExit = true;
 	emit exit(doExit);
 	if (!doExit) {
@@ -1398,7 +1421,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 //-----------------------------------------------------------------------------
 
-QAction *MainWindow::createAction(const char *id, const QString &name, const QString &defaultShortcut, CommandType type)
+QAction *MainWindow::createAction(const char *id, const QString &name,
+								  const QString &defaultShortcut, CommandType type)
 {
 	QAction *action = new DVAction(name, this);
 	addAction(action);
@@ -1416,84 +1440,96 @@ QAction *MainWindow::createAction(const char *id, const QString &name, const QSt
 
 //-----------------------------------------------------------------------------
 
-QAction *MainWindow::createRightClickMenuAction(const char *id, const QString &name, const QString &defaultShortcut)
+QAction *MainWindow::createRightClickMenuAction(const char *id, const QString &name,
+												const QString &defaultShortcut)
 {
 	return createAction(id, name, defaultShortcut, RightClickMenuCommandType);
 }
 
 //-----------------------------------------------------------------------------
 
-QAction *MainWindow::createMenuFileAction(const char *id, const QString &name, const QString &defaultShortcut)
+QAction *MainWindow::createMenuFileAction(const char *id, const QString &name,
+										  const QString &defaultShortcut)
 {
 	return createAction(id, name, defaultShortcut, MenuFileCommandType);
 }
 
 //-----------------------------------------------------------------------------
 
-QAction *MainWindow::createMenuEditAction(const char *id, const QString &name, const QString &defaultShortcut)
+QAction *MainWindow::createMenuEditAction(const char *id, const QString &name,
+										  const QString &defaultShortcut)
 {
 	return createAction(id, name, defaultShortcut, MenuEditCommandType);
 }
 
 //-----------------------------------------------------------------------------
 
-QAction *MainWindow::createMenuScanCleanupAction(const char *id, const QString &name, const QString &defaultShortcut)
+QAction *MainWindow::createMenuScanCleanupAction(const char *id, const QString &name,
+												 const QString &defaultShortcut)
 {
 	return createAction(id, name, defaultShortcut, MenuScanCleanupCommandType);
 }
 
 //-----------------------------------------------------------------------------
 
-QAction *MainWindow::createMenuLevelAction(const char *id, const QString &name, const QString &defaultShortcut)
+QAction *MainWindow::createMenuLevelAction(const char *id, const QString &name,
+										   const QString &defaultShortcut)
 {
 	return createAction(id, name, defaultShortcut, MenuLevelCommandType);
 }
 
 //-----------------------------------------------------------------------------
 
-QAction *MainWindow::createMenuXsheetAction(const char *id, const QString &name, const QString &defaultShortcut)
+QAction *MainWindow::createMenuXsheetAction(const char *id, const QString &name,
+											const QString &defaultShortcut)
 {
 	return createAction(id, name, defaultShortcut, MenuXsheetCommandType);
 }
 
 //-----------------------------------------------------------------------------
 
-QAction *MainWindow::createMenuCellsAction(const char *id, const QString &name, const QString &defaultShortcut)
+QAction *MainWindow::createMenuCellsAction(const char *id, const QString &name,
+										   const QString &defaultShortcut)
 {
 	return createAction(id, name, defaultShortcut, MenuCellsCommandType);
 }
 
 //-----------------------------------------------------------------------------
 
-QAction *MainWindow::createMenuViewAction(const char *id, const QString &name, const QString &defaultShortcut)
+QAction *MainWindow::createMenuViewAction(const char *id, const QString &name,
+										  const QString &defaultShortcut)
 {
 	return createAction(id, name, defaultShortcut, MenuViewCommandType);
 }
 
 //-----------------------------------------------------------------------------
 
-QAction *MainWindow::createMenuWindowsAction(const char *id, const QString &name, const QString &defaultShortcut)
+QAction *MainWindow::createMenuWindowsAction(const char *id, const QString &name,
+											 const QString &defaultShortcut)
 {
 	return createAction(id, name, defaultShortcut, MenuWindowsCommandType);
 }
 
 //-----------------------------------------------------------------------------
 
-QAction *MainWindow::createPlaybackAction(const char *id, const QString &name, const QString &defaultShortcut)
+QAction *MainWindow::createPlaybackAction(const char *id, const QString &name,
+										  const QString &defaultShortcut)
 {
 	return createAction(id, name, defaultShortcut, PlaybackCommandType);
 }
 
 //-----------------------------------------------------------------------------
 
-QAction *MainWindow::createRGBAAction(const char *id, const QString &name, const QString &defaultShortcut)
+QAction *MainWindow::createRGBAAction(const char *id, const QString &name,
+									  const QString &defaultShortcut)
 {
 	return createAction(id, name, defaultShortcut, RGBACommandType);
 }
 
 //-----------------------------------------------------------------------------
 
-QAction *MainWindow::createFillAction(const char *id, const QString &name, const QString &defaultShortcut)
+QAction *MainWindow::createFillAction(const char *id, const QString &name,
+									  const QString &defaultShortcut)
 {
 	return createAction(id, name, defaultShortcut, FillCommandType);
 }
@@ -1509,14 +1545,16 @@ QAction *MainWindow::createMenuAction(const char *id, const QString &name, QList
 
 //-----------------------------------------------------------------------------
 
-QAction *MainWindow::createViewerAction(const char *id, const QString &name, const QString &defaultShortcut)
+QAction *MainWindow::createViewerAction(const char *id, const QString &name,
+										const QString &defaultShortcut)
 {
 	return createAction(id, name, defaultShortcut, ZoomCommandType);
 }
 
 //-----------------------------------------------------------------------------
 
-QAction *MainWindow::createMiscAction(const char *id, const QString &name, const char *defaultShortcut)
+QAction *MainWindow::createMiscAction(const char *id, const QString &name,
+									  const char *defaultShortcut)
 {
 	QAction *action = new DVAction(name, this);
 	CommandManager::instance()->define(id, MiscCommandType, defaultShortcut, action);
@@ -1525,18 +1563,21 @@ QAction *MainWindow::createMiscAction(const char *id, const QString &name, const
 
 //-----------------------------------------------------------------------------
 
-QAction *MainWindow::createToolOptionsAction(const char *id, const QString &name, const QString &defaultShortcut)
+QAction *MainWindow::createToolOptionsAction(const char *id, const QString &name,
+											 const QString &defaultShortcut)
 {
 	QAction *action = new DVAction(name, this);
 	addAction(action);
-	CommandManager::instance()->define(id, ToolModifierCommandType, defaultShortcut.toStdString(), action);
+	CommandManager::instance()->define(id, ToolModifierCommandType, defaultShortcut.toStdString(),
+									   action);
 	return action;
 }
 
 //-----------------------------------------------------------------------------
 
 QAction *MainWindow::createToggle(const char *id, const QString &name,
-								  const QString &defaultShortcut, bool startStatus, CommandType type)
+								  const QString &defaultShortcut, bool startStatus,
+								  CommandType type)
 {
 	QAction *action = createAction(id, name, defaultShortcut, type);
 	action->setCheckable(true);
@@ -1549,8 +1590,8 @@ QAction *MainWindow::createToggle(const char *id, const QString &name,
 
 //-----------------------------------------------------------------------------
 
-QAction *MainWindow::createToolAction(const char *id, const char *iconName,
-									  const QString &name, const QString &defaultShortcut)
+QAction *MainWindow::createToolAction(const char *id, const char *iconName, const QString &name,
+									  const QString &defaultShortcut)
 {
 	QString normalResource = QString(":Resources/") + iconName + ".svg";
 	QString overResource = QString(":Resources/") + iconName + "_rollover.svg";
@@ -1562,9 +1603,10 @@ QAction *MainWindow::createToolAction(const char *id, const char *iconName,
 	action->setCheckable(true);
 	action->setActionGroup(m_toolsActionGroup);
 
-	//When the viewer is maximized (not fullscreen) the toolbar is hided and the action are disabled,
-	//so the tool shortcuts don't work.
-	//Adding tool actions to the main window solve this problem!
+	// When the viewer is maximized (not fullscreen) the toolbar is hided and the action are
+	// disabled,
+	// so the tool shortcuts don't work.
+	// Adding tool actions to the main window solve this problem!
 	addAction(action);
 
 	CommandManager::instance()->define(id, ToolCommandType, defaultShortcut.toStdString(), action);
@@ -1618,9 +1660,10 @@ void MainWindow::defineActions()
 	createRightClickMenuAction(MI_ClonePreview, tr("&Clone Preview"), "");
 #ifndef LINETEST
 	createRightClickMenuAction(MI_FreezePreview, tr("&Freeze//Unfreeze Preview"), "");
-	CommandManager::instance()->setToggleTexts(MI_FreezePreview, tr("Freeze Preview"), tr("Unfreeze Preview"));
+	CommandManager::instance()->setToggleTexts(MI_FreezePreview, tr("Freeze Preview"),
+											   tr("Unfreeze Preview"));
 #endif
-	//createAction(MI_SavePreview,         "&Save Preview",		"");
+	// createAction(MI_SavePreview,         "&Save Preview",		"");
 	createRightClickMenuAction(MI_SavePreset, tr("&Save As Preset"), "");
 	createMenuFileAction(MI_Preferences, tr("&Preferences..."), "");
 	createMenuFileAction(MI_ShortcutPopup, tr("&Configure Shortcuts..."), "");
@@ -1644,13 +1687,14 @@ void MainWindow::defineActions()
 	createMenuEditAction(MI_Cut, tr("&Cut"), "Ctrl+X");
 	createMenuEditAction(MI_Copy, tr("&Copy"), "Ctrl+C");
 	createMenuEditAction(MI_Paste, tr("&Insert Paste"), "Ctrl+V");
-	//createMenuEditAction(MI_PasteNew,     tr("&Paste New"),  "");
+	// createMenuEditAction(MI_PasteNew,     tr("&Paste New"),  "");
 	createMenuCellsAction(MI_MergeFrames, tr("&Merge"), "");
 	createMenuEditAction(MI_PasteInto, tr("&Paste Into"), "");
 	createRightClickMenuAction(MI_PasteValues, tr("&Paste Color && Name"), "");
 	createRightClickMenuAction(MI_PasteColors, tr("Paste Color"), "");
 	createRightClickMenuAction(MI_PasteNames, tr("Paste Name"), "");
-	createRightClickMenuAction(MI_GetColorFromStudioPalette, tr("Get Color from Studio Palette"), "");
+	createRightClickMenuAction(MI_GetColorFromStudioPalette, tr("Get Color from Studio Palette"),
+							   "");
 	createMenuEditAction(MI_Clear, tr("&Delete"), "");
 	createMenuEditAction(MI_Insert, tr("&Insert"), "Ins");
 	createMenuEditAction(MI_Group, tr("&Group"), "");
@@ -1668,7 +1712,8 @@ void MainWindow::defineActions()
 	createMenuScanCleanupAction(MI_Scan, tr("&Scan"), "");
 	createMenuScanCleanupAction(MI_Autocenter, tr("&Autocenter..."), "");
 
-	QAction *toggle = createToggle(MI_SetScanCropbox, tr("&Set Cropbox"), "", 0, MenuScanCleanupCommandType);
+	QAction *toggle =
+		createToggle(MI_SetScanCropbox, tr("&Set Cropbox"), "", 0, MenuScanCleanupCommandType);
 	if (toggle) {
 		SetScanCropboxCheck::instance()->setToggle(toggle);
 		QString scannerType = QSettings().value("CurrentScannerType").toString();
@@ -1681,7 +1726,8 @@ void MainWindow::defineActions()
 
 	createMenuScanCleanupAction(MI_CleanupSettings, tr("&Cleanup Settings..."), "");
 
-	toggle = createToggle(MI_CleanupPreview, tr("&Preview Cleanup"), "", 0, MenuScanCleanupCommandType);
+	toggle =
+		createToggle(MI_CleanupPreview, tr("&Preview Cleanup"), "", 0, MenuScanCleanupCommandType);
 	CleanupPreviewCheck::instance()->setToggle(toggle);
 	toggle = createToggle(MI_CameraTest, tr("&Camera Test"), "", 0, MenuScanCleanupCommandType);
 	CameraTestCheck::instance()->setToggle(toggle);
@@ -1772,28 +1818,42 @@ void MainWindow::defineActions()
 
 	createRightClickMenuAction(MI_SetKeyframes, tr("&Set Key"), "");
 
-	createToggle(MI_ViewCamera, tr("&Camera Box"), "", ViewCameraToggleAction ? 1 : 0, MenuViewCommandType);
-	createToggle(MI_ViewTable, tr("&Table"), "", ViewTableToggleAction ? 1 : 0, MenuViewCommandType);
-	createToggle(MI_FieldGuide, tr("&Field Guide"), "", FieldGuideToggleAction ? 1 : 0, MenuViewCommandType);
-	createToggle(MI_ViewBBox, tr("&Raster Bounding Box"), "", ViewBBoxToggleAction ? 1 : 0, MenuViewCommandType);
+	createToggle(MI_ViewCamera, tr("&Camera Box"), "", ViewCameraToggleAction ? 1 : 0,
+				 MenuViewCommandType);
+	createToggle(MI_ViewTable, tr("&Table"), "", ViewTableToggleAction ? 1 : 0,
+				 MenuViewCommandType);
+	createToggle(MI_FieldGuide, tr("&Field Guide"), "", FieldGuideToggleAction ? 1 : 0,
+				 MenuViewCommandType);
+	createToggle(MI_ViewBBox, tr("&Raster Bounding Box"), "", ViewBBoxToggleAction ? 1 : 0,
+				 MenuViewCommandType);
 #ifdef LINETEST
-	createToggle(MI_CapturePanelFieldGuide, tr("&Field Guide in Capture Window"), "", CapturePanelFieldGuideToggleAction ? 1 : 0, MenuViewCommandType);
+	createToggle(MI_CapturePanelFieldGuide, tr("&Field Guide in Capture Window"), "",
+				 CapturePanelFieldGuideToggleAction ? 1 : 0, MenuViewCommandType);
 #endif
-	createToggle(MI_SafeArea, tr("&Safe Area"), "", SafeAreaToggleAction ? 1 : 0, MenuViewCommandType);
-	createToggle(MI_ViewColorcard, tr("&Camera BG Color"), "", ViewColorcardToggleAction ? 1 : 0, MenuViewCommandType);
-	createToggle(MI_ViewGuide, tr("&Guide"), "", ViewGuideToggleAction ? 1 : 0, MenuViewCommandType);
-	createToggle(MI_ViewRuler, tr("&Ruler"), "", ViewRulerToggleAction ? 1 : 0, MenuViewCommandType);
-	createToggle(MI_TCheck, tr("&Transparency Check  "), "", TCheckToggleAction ? 1 : 0, MenuViewCommandType);
-	QAction *inkCheckAction = createToggle(MI_ICheck, tr("&Ink Check"), "", ICheckToggleAction ? 1 : 0, MenuViewCommandType);
-	QAction *ink1CheckAction = createToggle(MI_Ink1Check, tr("&Ink#1 Check"), "", Ink1CheckToggleAction ? 1 : 0, MenuViewCommandType);
+	createToggle(MI_SafeArea, tr("&Safe Area"), "", SafeAreaToggleAction ? 1 : 0,
+				 MenuViewCommandType);
+	createToggle(MI_ViewColorcard, tr("&Camera BG Color"), "", ViewColorcardToggleAction ? 1 : 0,
+				 MenuViewCommandType);
+	createToggle(MI_ViewGuide, tr("&Guide"), "", ViewGuideToggleAction ? 1 : 0,
+				 MenuViewCommandType);
+	createToggle(MI_ViewRuler, tr("&Ruler"), "", ViewRulerToggleAction ? 1 : 0,
+				 MenuViewCommandType);
+	createToggle(MI_TCheck, tr("&Transparency Check  "), "", TCheckToggleAction ? 1 : 0,
+				 MenuViewCommandType);
+	QAction *inkCheckAction = createToggle(MI_ICheck, tr("&Ink Check"), "",
+										   ICheckToggleAction ? 1 : 0, MenuViewCommandType);
+	QAction *ink1CheckAction = createToggle(MI_Ink1Check, tr("&Ink#1 Check"), "",
+											Ink1CheckToggleAction ? 1 : 0, MenuViewCommandType);
 	/*-- Ink Check と Ink1Checkを排他的にする --*/
 	connect(inkCheckAction, SIGNAL(triggered(bool)), this, SLOT(onInkCheckTriggered(bool)));
 	connect(ink1CheckAction, SIGNAL(triggered(bool)), this, SLOT(onInk1CheckTriggered(bool)));
 
-	createToggle(MI_PCheck, tr("&Paint Check"), "", PCheckToggleAction ? 1 : 0, MenuViewCommandType);
+	createToggle(MI_PCheck, tr("&Paint Check"), "", PCheckToggleAction ? 1 : 0,
+				 MenuViewCommandType);
 	createToggle(MI_IOnly, tr("Inks &Only"), "", IOnlyToggleAction ? 1 : 0, MenuViewCommandType);
 	createToggle(MI_GCheck, tr("&Fill Check"), "", GCheckToggleAction ? 1 : 0, MenuViewCommandType);
-	createToggle(MI_BCheck, tr("&Black BG Check"), "", BCheckToggleAction ? 1 : 0, MenuViewCommandType);
+	createToggle(MI_BCheck, tr("&Black BG Check"), "", BCheckToggleAction ? 1 : 0,
+				 MenuViewCommandType);
 	createToggle(MI_ACheck, tr("&Gap Check"), "", ACheckToggleAction ? 1 : 0, MenuViewCommandType);
 #ifndef LINETEST
 	createToggle(MI_ShiftTrace, tr("Shift and Trace"), "", false, MenuViewCommandType);
@@ -1803,13 +1863,14 @@ void MainWindow::defineActions()
 #endif
 
 	if (QGLPixelBuffer::hasOpenGLPbuffers())
-		createToggle(MI_RasterizePli, tr("&Visualize Vector As Raster"), "", RasterizePliToggleAction ? 1 : 0, MenuViewCommandType);
+		createToggle(MI_RasterizePli, tr("&Visualize Vector As Raster"), "",
+					 RasterizePliToggleAction ? 1 : 0, MenuViewCommandType);
 	else
 		RasterizePliToggleAction = 0;
 
 	createRightClickMenuAction(MI_Histogram, tr("&Histogram"), "");
 
-	//createToolOptionsAction("A_ToolOption_Link", tr("Link"), "");
+	// createToolOptionsAction("A_ToolOption_Link", tr("Link"), "");
 	createToggle(MI_Link, tr("Link Flipbooks"), "", LinkToggleAction ? 1 : 0, MenuViewCommandType);
 
 	createPlaybackAction(MI_Play, tr("Play"), "");
@@ -1837,10 +1898,11 @@ void MainWindow::defineActions()
 
 	createFillAction(MI_AutoFillToggle, tr("Toggle Autofill on Current Palette Color"), "");
 
-	toggle = createToggle(MI_DockingCheck, tr("&Lock Room Panes"), "", DockingCheckToggleAction ? 1 : 0, MenuWindowsCommandType);
+	toggle = createToggle(MI_DockingCheck, tr("&Lock Room Panes"), "",
+						  DockingCheckToggleAction ? 1 : 0, MenuWindowsCommandType);
 	DockingCheck::instance()->setToggle(toggle);
 
-//createRightClickMenuAction(MI_OpenCurrentScene,   tr("&Current Scene"),		"");
+// createRightClickMenuAction(MI_OpenCurrentScene,   tr("&Current Scene"),		"");
 #ifdef LINETEST
 	createMenuWindowsAction(MI_OpenExport, tr("&Export"), "");
 #endif
@@ -1883,8 +1945,8 @@ void MainWindow::defineActions()
 
 	createToggle(MI_OnionSkin, tr("Onion Skin"), "", false, RightClickMenuCommandType);
 
-	//createRightClickMenuAction(MI_LoadSubSceneFile,     tr("Load As Sub-xsheet"),   "");
-	//createRightClickMenuAction(MI_LoadResourceFile,     tr("Load"),								  "");
+	// createRightClickMenuAction(MI_LoadSubSceneFile,     tr("Load As Sub-xsheet"),   "");
+	// createRightClickMenuAction(MI_LoadResourceFile,     tr("Load"), "");
 	createRightClickMenuAction(MI_DuplicateFile, tr("Duplicate"), "");
 	createRightClickMenuAction(MI_ShowFolderContents, tr("Show Folder Contents"), "");
 	createRightClickMenuAction(MI_ConvertFiles, tr("Convert..."), "");
@@ -1892,7 +1954,7 @@ void MainWindow::defineActions()
 	createRightClickMenuAction(MI_ImportScenes, tr("Import Scene"), "");
 	createRightClickMenuAction(MI_ExportScenes, tr("Export Scene..."), "");
 
-	//createRightClickMenuAction(MI_PremultiplyFile,      tr("Premultiply"),					"");
+	// createRightClickMenuAction(MI_PremultiplyFile,      tr("Premultiply"),					"");
 	createMenuLevelAction(MI_ConvertToVectors, tr("Convert to Vectors..."), "");
 #ifndef BRAVOEXPRESS
 	createMenuLevelAction(MI_Tracking, tr("Tracking..."), "");
@@ -1906,10 +1968,14 @@ void MainWindow::defineActions()
 	createRightClickMenuAction(MI_SelectAllKeyframes, tr("Select All Keys"), "");
 	createRightClickMenuAction(MI_SelectAllKeyframesNotBefore, tr("Select All Following Keys"), "");
 	createRightClickMenuAction(MI_SelectAllKeyframesNotAfter, tr("Select All Previous Keys"), "");
-	createRightClickMenuAction(MI_SelectPreviousKeysInColumn, tr("Select Previous Keys in this Column"), "");
-	createRightClickMenuAction(MI_SelectFollowingKeysInColumn, tr("Select Following Keys in this Column"), "");
-	createRightClickMenuAction(MI_SelectPreviousKeysInRow, tr("Select Previous Keys in this Row"), "");
-	createRightClickMenuAction(MI_SelectFollowingKeysInRow, tr("Select Following Keys in this Row"), "");
+	createRightClickMenuAction(MI_SelectPreviousKeysInColumn,
+							   tr("Select Previous Keys in this Column"), "");
+	createRightClickMenuAction(MI_SelectFollowingKeysInColumn,
+							   tr("Select Following Keys in this Column"), "");
+	createRightClickMenuAction(MI_SelectPreviousKeysInRow, tr("Select Previous Keys in this Row"),
+							   "");
+	createRightClickMenuAction(MI_SelectFollowingKeysInRow, tr("Select Following Keys in this Row"),
+							   "");
 	createRightClickMenuAction(MI_InvertKeyframeSelection, tr("Invert Key Selection"), "");
 
 	createRightClickMenuAction(MI_SetAcceleration, tr("Set Acceleration"), "");
@@ -1951,7 +2017,8 @@ void MainWindow::defineActions()
 	createToolAction(T_Tape, "tape", tr("Tape Tool"), "");
 	createToolAction(T_StylePicker, "stylepicker", tr("Style Picker Tool"), "");
 	createToolAction(T_RGBPicker, "RGBpicker", tr("RGB Picker Tool"), "");
-	createToolAction(T_ControlPointEditor, "controlpointeditor", tr("Control Point Editor Tool"), "");
+	createToolAction(T_ControlPointEditor, "controlpointeditor", tr("Control Point Editor Tool"),
+					 "");
 	createToolAction(T_Pinch, "pinch", tr("Pinch Tool"), "");
 	createToolAction(T_Pump, "pump", tr("Pump Tool"), "");
 	createToolAction(T_Magnet, "magnet", tr("Magnet Tool"), "");
@@ -1974,7 +2041,8 @@ void MainWindow::defineActions()
 	createViewerAction(V_ZoomFit, tr("Fit to Window"), "");
 	createViewerAction(V_ActualPixelSize, tr("Actual Pixel Size"), "");
 	createViewerAction(V_ShowHideFullScreen, tr("Show//Hide Full Screen"), "");
-	CommandManager::instance()->setToggleTexts(V_ShowHideFullScreen, tr("Full Screen Mode"), tr("Exit Full Screen Mode"));
+	CommandManager::instance()->setToggleTexts(V_ShowHideFullScreen, tr("Full Screen Mode"),
+											   tr("Exit Full Screen Mode"));
 
 	createMiscAction(MI_RefreshTree, "Refresh Folder Tree", "");
 
@@ -2006,9 +2074,10 @@ void MainWindow::defineActions()
 	createToolOptionsAction("A_ToolOption_AutoSelectDrawing", tr("Auto Select Drawing"), "");
 	createToolOptionsAction("A_ToolOption_Autofill", tr("Auto Fill"), "");
 	createToolOptionsAction("A_ToolOption_JoinVectors", tr("Join Vectors"), "");
-	createToolOptionsAction("A_ToolOption_ShowOnlyActiveSkeleton", tr("Show Only Active Skeleton"), "");
+	createToolOptionsAction("A_ToolOption_ShowOnlyActiveSkeleton", tr("Show Only Active Skeleton"),
+							"");
 
-	//Option Menu
+	// Option Menu
 	createToolOptionsAction("A_ToolOption_BrushPreset", tr("Brush Preset"), "");
 	createToolOptionsAction("A_ToolOption_GeometricShape", tr("Geometric Shape"), "");
 	createToolOptionsAction("A_ToolOption_GeometricEdge", tr("Geometric Edge"), "");
@@ -2026,15 +2095,19 @@ void MainWindow::defineActions()
 	createToolOptionsAction("A_ToolOption_TypeStyle", tr("TypeTool Style"), "");
 
 	createToolOptionsAction("A_ToolOption_EditToolActiveAxis", "Active Axis", "");
-	createToolOptionsAction("A_ToolOption_EditToolActiveAxis:Position", "Active Axis - Position", "");
-	createToolOptionsAction("A_ToolOption_EditToolActiveAxis:Rotation", "Active Axis - Rotation", "");
+	createToolOptionsAction("A_ToolOption_EditToolActiveAxis:Position", "Active Axis - Position",
+							"");
+	createToolOptionsAction("A_ToolOption_EditToolActiveAxis:Rotation", "Active Axis - Rotation",
+							"");
 	createToolOptionsAction("A_ToolOption_EditToolActiveAxis:Scale", "Active Axis - Scale", "");
 	createToolOptionsAction("A_ToolOption_EditToolActiveAxis:Shear", "Active Axis - Shear", "");
 	createToolOptionsAction("A_ToolOption_EditToolActiveAxis:Center", "Active Axis - Center", "");
 
-	createToolOptionsAction("A_ToolOption_SkeletonMode:Build Skeleton", tr("Build Skeleton Mode"), "");
+	createToolOptionsAction("A_ToolOption_SkeletonMode:Build Skeleton", tr("Build Skeleton Mode"),
+							"");
 	createToolOptionsAction("A_ToolOption_SkeletonMode:Animate", tr("Animate Mode"), "");
-	createToolOptionsAction("A_ToolOption_SkeletonMode:Inverse Kinematics", tr("Inverse Kinematics Mode"), "");
+	createToolOptionsAction("A_ToolOption_SkeletonMode:Inverse Kinematics",
+							tr("Inverse Kinematics Mode"), "");
 	createToolOptionsAction("A_ToolOption_AutoSelect:None", tr("None Pick Mode"), "");
 	createToolOptionsAction("A_ToolOption_AutoSelect:Column", tr("Column Pick Mode"), "");
 	createToolOptionsAction("A_ToolOption_AutoSelect:Pegbar", tr("Pegbar Pick Mode"), "");
@@ -2106,7 +2179,7 @@ void MainWindow::togglePickStyleLines()
 
 class ReloadStyle : public MenuItemHandler
 {
-public:
+  public:
 	ReloadStyle() : MenuItemHandler("MI_ReloadStyle") {}
 	void execute()
 	{
@@ -2128,8 +2201,7 @@ void MainWindow::onQuit()
 // RecentFiles
 //=============================================================================
 
-RecentFiles::RecentFiles()
-	: m_recentScenes(), m_recentLevels()
+RecentFiles::RecentFiles() : m_recentScenes(), m_recentLevels()
 {
 }
 
@@ -2151,7 +2223,9 @@ RecentFiles::~RecentFiles()
 
 void RecentFiles::addFilePath(QString path, FileType fileType)
 {
-	QList<QString> files = (fileType == Scene) ? m_recentScenes : (fileType == Level) ? m_recentLevels : m_recentFlipbookImages;
+	QList<QString> files = (fileType == Scene) ? m_recentScenes : (fileType == Level)
+																	  ? m_recentLevels
+																	  : m_recentFlipbookImages;
 	int i;
 	for (i = 0; i < files.size(); i++)
 		if (files.at(i) == path)
@@ -2189,7 +2263,9 @@ void RecentFiles::moveFilePath(int fromIndex, int toIndex, FileType fileType)
 
 QString RecentFiles::getFilePath(int index, FileType fileType) const
 {
-	return (fileType == Scene) ? m_recentScenes[index] : (fileType == Level) ? m_recentLevels[index] : m_recentFlipbookImages[index];
+	return (fileType == Scene) ? m_recentScenes[index] : (fileType == Level)
+															 ? m_recentLevels[index]
+															 : m_recentFlipbookImages[index];
 }
 
 //-----------------------------------------------------------------------------
@@ -2229,7 +2305,8 @@ void RecentFiles::loadRecentFiles()
 		for (i = 0; i < levels.size(); i++) {
 			QString path = levels.at(i).toString();
 #ifdef x64
-			if (path.endsWith(".mov") || path.endsWith(".3gp") || path.endsWith(".pct") || path.endsWith(".pict"))
+			if (path.endsWith(".mov") || path.endsWith(".3gp") || path.endsWith(".pct") ||
+				path.endsWith(".pict"))
 				continue;
 #endif
 			m_recentLevels.append(path);
@@ -2270,13 +2347,16 @@ void RecentFiles::saveRecentFiles()
 
 QList<QString> RecentFiles::getFilesNameList(FileType fileType)
 {
-	QList<QString> files = (fileType == Scene) ? m_recentScenes : (fileType == Level) ? m_recentLevels : m_recentFlipbookImages;
+	QList<QString> files = (fileType == Scene) ? m_recentScenes : (fileType == Level)
+																	  ? m_recentLevels
+																	  : m_recentFlipbookImages;
 	QList<QString> names;
 	int i;
 	for (i = 0; i < files.size(); i++) {
 		TFilePath path(files.at(i).toStdWString());
 		QString str, number;
-		names.append(number.number(i + 1) + QString(". ") + str.fromStdWString(path.getWideString()));
+		names.append(number.number(i + 1) + QString(". ") +
+					 str.fromStdWString(path.getWideString()));
 	}
 	return names;
 }
@@ -2285,7 +2365,9 @@ QList<QString> RecentFiles::getFilesNameList(FileType fileType)
 
 void RecentFiles::refreshRecentFilesMenu(FileType fileType)
 {
-	CommandId id = (fileType == Scene) ? MI_OpenRecentScene : (fileType == Level) ? MI_OpenRecentLevel : MI_LoadRecentImage;
+	CommandId id = (fileType == Scene) ? MI_OpenRecentScene : (fileType == Level)
+																  ? MI_OpenRecentLevel
+																  : MI_LoadRecentImage;
 	QAction *act = CommandManager::instance()->getAction(id);
 	if (!act)
 		return;
@@ -2296,7 +2378,9 @@ void RecentFiles::refreshRecentFilesMenu(FileType fileType)
 	if (names.isEmpty())
 		menu->setEnabled(false);
 	else {
-		CommandId clearActionId = (fileType == Scene) ? MI_ClearRecentScene : (fileType == Level) ? MI_ClearRecentLevel : MI_ClearRecentImage;
+		CommandId clearActionId =
+			(fileType == Scene) ? MI_ClearRecentScene : (fileType == Level) ? MI_ClearRecentLevel
+																			: MI_ClearRecentImage;
 		menu->setActions(names);
 		menu->addSeparator();
 		QAction *clearAction = CommandManager::instance()->getAction(clearActionId);

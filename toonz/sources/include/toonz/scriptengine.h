@@ -25,7 +25,7 @@ class QScriptEngine;
 
 class DVAPI ScriptCommand
 {
-public:
+  public:
 	ScriptCommand() {}
 	virtual ~ScriptCommand() {}
 
@@ -43,7 +43,7 @@ class DVAPI ScriptEngine : public QObject
 	MainThreadEvaluationData *m_mainThreadEvaluationData;
 	QScriptValue *m_voidValue;
 
-public:
+  public:
 	ScriptEngine();
 	~ScriptEngine();
 
@@ -61,16 +61,17 @@ public:
 	};
 	void emitOutput(OutputType type, const QString &value) { emit output((int)type, value); }
 
-	const QScriptValue &evaluateOnMainThread(const QScriptValue &fun, const QScriptValue &arguments);
+	const QScriptValue &evaluateOnMainThread(const QScriptValue &fun,
+											 const QScriptValue &arguments);
 
 	QScriptEngine *getQScriptEngine() const { return m_engine; }
 	const QScriptValue &voidValue() const { return *m_voidValue; }
 
-protected slots:
+  protected slots:
 	void onTerminated();
 	void onMainThreadEvaluationPosted();
 
-signals:
+  signals:
 	void evaluationDone();
 	void output(int type, const QString &);
 

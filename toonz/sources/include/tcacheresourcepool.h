@@ -48,8 +48,8 @@ class DVAPI TCacheResourcePool : public QObject
 	TCacheResourcePool();
 	~TCacheResourcePool();
 
-public:
-	//General functions
+  public:
+	// General functions
 
 	static TCacheResourcePool *instance();
 
@@ -60,8 +60,8 @@ public:
 	void beginCachedSearch();
 	void endCachedSearch();
 
-public:
-	//Pool management functions
+  public:
+	// Pool management functions
 
 	void flushResources();
 
@@ -83,7 +83,7 @@ public:
 	void clearAccessedAfterDays(int days);
 	void clearAccessedAfterSessions(int sessionsCount);
 
-	//Automatic management functions
+	// Automatic management functions
 
 	void setMaximumSize(int MB);
 	int getMaximumSize() const;
@@ -91,10 +91,10 @@ public:
 	void setResourcesAccessTimeOut(int days);
 	int getResourcesAccessTimeOut() const;
 
-	//void setAutomaticCleanupInterval(int days, int minutes);
+	// void setAutomaticCleanupInterval(int days, int minutes);
 
-private:
-	//Resources interaction functions
+  private:
+	// Resources interaction functions
 
 	friend class TCacheResource;
 	friend class TCacheResourceP;
@@ -104,8 +104,8 @@ private:
 
 	void invalidateAll();
 
-private:
-	//HD Pool functions
+  private:
+	// HD Pool functions
 
 	bool isHDActive();
 	void startBacking(TCacheResource *resource);
@@ -115,4 +115,4 @@ private:
 	void clearResource(QString path);
 };
 
-#endif //TCACHERESOURCEPOOL_INCLUDED
+#endif // TCACHERESOURCEPOOL_INCLUDED

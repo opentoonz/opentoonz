@@ -35,12 +35,11 @@
 // SVNDeleteDialog
 //-----------------------------------------------------------------------------
 
-SVNDeleteDialog::SVNDeleteDialog(QWidget *parent,
-								 const QString &workingDir,
-								 const QStringList &files,
-								 bool isFolder,
-								 int sceneIconAdded)
-	: Dialog(TApp::instance()->getMainWindow(), true, false), m_deleteSceneContentsCheckBox(0), m_workingDir(workingDir), m_files(files), m_targetTempFile(0), m_isFolder(isFolder), m_sceneIconAdded(sceneIconAdded)
+SVNDeleteDialog::SVNDeleteDialog(QWidget *parent, const QString &workingDir,
+								 const QStringList &files, bool isFolder, int sceneIconAdded)
+	: Dialog(TApp::instance()->getMainWindow(), true, false), m_deleteSceneContentsCheckBox(0),
+	  m_workingDir(workingDir), m_files(files), m_targetTempFile(0), m_isFolder(isFolder),
+	  m_sceneIconAdded(sceneIconAdded)
 {
 	setModal(false);
 	setAttribute(Qt::WA_DeleteOnClose, true);
@@ -72,7 +71,8 @@ SVNDeleteDialog::SVNDeleteDialog(QWidget *parent,
 		QDir dir(m_workingDir + "/" + m_files.at(0));
 		int filesCount = dir.entryList(QDir::Files | QDir::Dirs).count();
 		if (filesCount > 0)
-			m_textLabel->setText(tr("Delete folder that contains %1 items.").arg(filesCount - m_sceneIconAdded));
+			m_textLabel->setText(
+				tr("Delete folder that contains %1 items.").arg(filesCount - m_sceneIconAdded));
 		else
 			m_textLabel->setText(tr("Delete empty folder."));
 	} else
@@ -111,7 +111,8 @@ SVNDeleteDialog::SVNDeleteDialog(QWidget *parent,
 	if (!m_isFolder) {
 
 		m_deleteSceneContentsCheckBox = new QCheckBox(this);
-		connect(m_deleteSceneContentsCheckBox, SIGNAL(toggled(bool)), this, SLOT(onDeleteSceneContentsToggled(bool)));
+		connect(m_deleteSceneContentsCheckBox, SIGNAL(toggled(bool)), this,
+				SLOT(onDeleteSceneContentsToggled(bool)));
 		m_deleteSceneContentsCheckBox->setChecked(false);
 		m_deleteSceneContentsCheckBox->hide();
 		m_deleteSceneContentsCheckBox->setText(tr("Delete Scene Contents"));
@@ -208,7 +209,8 @@ void SVNDeleteDialog::onDeleteLocalButtonClicked()
 	// Delete files locally
 	int fileCount = m_files.size();
 	m_waitingLabel->show();
-	m_textLabel->setText(tr("Deleting %1 items...").arg(fileCount + m_sceneResources.size() - m_sceneIconAdded));
+	m_textLabel->setText(
+		tr("Deleting %1 items...").arg(fileCount + m_sceneResources.size() - m_sceneIconAdded));
 	m_textLabel->show();
 
 	for (int i = 0; i < fileCount; i++) {
@@ -269,7 +271,9 @@ void SVNDeleteDialog::onDeleteServerButtonClicked()
 void SVNDeleteDialog::deleteFiles()
 {
 	m_waitingLabel->show();
-	m_textLabel->setText(tr("Deleting %1 items...").arg(QString::number(m_files.size() + m_sceneResources.size() - m_sceneIconAdded)));
+	m_textLabel->setText(
+		tr("Deleting %1 items...")
+			.arg(QString::number(m_files.size() + m_sceneResources.size() - m_sceneIconAdded)));
 	m_commentLabel->hide();
 	m_commentTextEdit->hide();
 	m_treeWidget->hide();
@@ -402,5 +406,6 @@ void SVNDeleteDialog::onDeleteSceneContentsToggled(bool checked)
 			}
 		}
 	}
-	m_textLabel->setText(tr("Delete %1 items.").arg(m_files.size() - m_sceneIconAdded + m_sceneResources.size()));
+	m_textLabel->setText(
+		tr("Delete %1 items.").arg(m_files.size() - m_sceneIconAdded + m_sceneResources.size()));
 }
