@@ -321,7 +321,7 @@ qt5_wrap_cpp(SOURCES ${MOC_HEADERS})
 
 add_library(toonzlib SHARED ${HEADERS} ${SOURCES})
 if (APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtoonzlib.${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtoonzlib${CMAKE_SHARED_LIBRARY_SUFFIX}")
 endif (APPLE)
 
 add_definitions(-DTOONZLIB_EXPORTS)
@@ -341,9 +341,9 @@ if(WIN32)
         tnzcore tnzbase tnzext)
 elseif(APPLE)
     set(EXTRA_LIBS
-        ${CMAKE_CURRENT_BINARY_DIR}/../tnzcore/libtnzcore.${CMAKE_SHARED_LIBRARY_SUFFIX}
-        ${CMAKE_CURRENT_BINARY_DIR}/../tnzbase/libtnzbase.${CMAKE_SHARED_LIBRARY_SUFFIX}
-        ${CMAKE_CURRENT_BINARY_DIR}/../tnzext/libtnzext.${CMAKE_SHARED_LIBRARY_SUFFIX}
+        ${CMAKE_CURRENT_BINARY_DIR}/../tnzcore/libtnzcore${CMAKE_SHARED_LIBRARY_SUFFIX}
+        ${CMAKE_CURRENT_BINARY_DIR}/../tnzbase/libtnzbase${CMAKE_SHARED_LIBRARY_SUFFIX}
+        ${CMAKE_CURRENT_BINARY_DIR}/../tnzext/libtnzext${CMAKE_SHARED_LIBRARY_SUFFIX}
         ${USB_LIB})
 
     target_link_libraries(toonzlib Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Script ${GLUT_LIB} ${GL_LIB} ${EXTRA_LIBS})
