@@ -1,0 +1,14 @@
+﻿---
+BasedOnStyle: LLVM
+AlignAfterOpenBracket: 'true'
+AllowShortFunctionsOnASingleLine: Inline
+BreakBeforeBraces: Linux
+ColumnLimit: '100'
+IndentCaseLabels: 'false'
+IndentWidth: '4'
+MaxEmptyLinesToKeep: '2'
+Standard: Cpp11
+TabWidth: '4'
+UseTab: Always
+
+...
