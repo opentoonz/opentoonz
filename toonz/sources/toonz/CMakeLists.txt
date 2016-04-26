@@ -370,10 +370,7 @@ elseif(UNIX)
     _find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase;toonzlib;colorfx;tnzext;image;sound;toonzqt;tnztools")
 
     # 変なところにライブラリ生成するカスども
-    get_target_property(TNZSTDFX_Location tnzstdfx LOCATION)
-    get_target_property(TFARM_Location tfarm LOCATION)
-
-    set(EXTRA_LIBS ${EXTRA_LIBS} ${TNZSTDFX_Location} ${TFARM_Location})
+    set(EXTRA_LIBS ${EXTRA_LIBS} "$<TARGET_FILE:tnzstdfx>" "$<TARGET_FILE:tfarm>")
 
     set(EXTRA_LIBS ${EXTRA_LIBS} ${Boost_LIBRARIES} ${OPENBLAS_LIB})
 
