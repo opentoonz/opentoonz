@@ -538,15 +538,45 @@ quit:
 
 //-----------------------------------------------------------------------------
 
-void SceneViewer::wheelEvent(QWheelEvent *e)
+void SceneViewer::wheelEvent(QWheelEvent *event)
 {
 	if (m_freezedStatus != NO_FREEZED)
 		return;
-	if (e->orientation() == Qt::Horizontal)
-		return;
-	int delta = e->delta() > 0 ? 120 : -120;
-	zoomQt(e->pos(), exp(0.001 * delta));
-	e->accept();
+
+	int delta =0;
+	switch(event->source()){
+
+	case Qt::MouseEventNotSynthesized:
+	{
+		delta =event->angleDelta().y();
+		break;
+	}
+
+	case Qt::MouseEventSynthesizedBySystem:
+	{
+		QPoint numPixels = event->pixelDelta();
+		QPoint numDegrees = event->angleDelta() / 8;
+		if (!numPixels.isNull()) {
+			delta =event->pixelDelta().y();
+		} else if (!numDegrees.isNull()) {
+			QPoint numSteps = numDegrees / 15;
+			delta =numSteps.y();
+		}
+		break;
+	}
+
+	default: //Qt::MouseEventSynthesizedByQt, Qt::MouseEventSynthesizedByApplication
+	{
+		std::cout << "not supported event: Qt::MouseEventSynthesizedByQt, Qt::MouseEventSynthesizedByApplication" << std::endl;
+		break;
+	}
+
+	}// end switch
+
+	if(abs(delta) >0){
+		zoomQt(event->pos(), exp(0.001 * delta));
+	}
+	event->accept();
 }
 
 //-----------------------------------------------------------------------------
