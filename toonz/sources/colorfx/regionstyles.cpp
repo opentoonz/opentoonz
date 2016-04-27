@@ -353,7 +353,7 @@ void ShadowStyle::setParamValue(int index, double value)
 
 //------------------------------------------------------------
 
-void ShadowStyle::drawPolyline(const TColorFunction *cf, vector<T3DPointD> &polyline, TPointD shadowDirection) const
+void ShadowStyle::drawPolyline(const TColorFunction *cf, std::vector<T3DPointD> &polyline, TPointD shadowDirection) const
 {
 	int i;
 	int stepNumber;
@@ -476,7 +476,7 @@ void ShadowStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing,
 //------------------------------------------------------------
 
 /*
-int ShadowStyle::drawPolyline(TFlash& flash, vector<T3DPointD> &polyline,
+int ShadowStyle::drawPolyline(TFlash& flash, std::vector<T3DPointD> &polyline,
 							   TPointD shadowDirection, const bool isDraw) const
 {
   int i;
@@ -492,7 +492,7 @@ int ShadowStyle::drawPolyline(TFlash& flash, vector<T3DPointD> &polyline,
   TRegionOutline::PointVector::iterator it_e = polyline.end();            
   
  
-  vector<TSegment> segmentArray;
+  std::vector<TSegment> segmentArray;
 
   v1.x = polyline.back().x;
   v1.y = polyline.back().y;
@@ -518,7 +518,7 @@ int ShadowStyle::drawPolyline(TFlash& flash, vector<T3DPointD> &polyline,
 
       for(i=0; i<stepNumber;i++ )
       {	  
-		  vector<TSegment> sa;
+		  std::vector<TSegment> sa;
 
 		  TPointD p0=midPoint;
 		  TPointD p1=midPoint+(shadowDirection*len*m_len*0.5);
@@ -713,9 +713,9 @@ double ShadowStyle2::getParamValue(TColorStyle::double_tag, int index) const
 
 //-----------------------------------------------------------------------------
 
-int nbDiffVerts(const vector<TPointD> &pv)
+int nbDiffVerts(const std::vector<TPointD> &pv)
 {
-	vector<TPointD> lpv;
+	std::vector<TPointD> lpv;
 	bool isMissing[4] = {true, true, true, true};
 	if (pv.size() == 0)
 		return 0;
@@ -818,7 +818,7 @@ int drawShadowLine(TFlash &flash, TPixel32 shadowColor, TPixel32 color,
 			vv1 = (v1 + t * diff1);
 			vv2 = (v2 + t * diff2);
 
-			vector<TPointD> pv;
+			std::vector<TPointD> pv;
 			pv.push_back(ovv1);
 			pv.push_back(ovv2);
 			pv.push_back(vv2);
@@ -842,7 +842,7 @@ int drawShadowLine(TFlash &flash, TPixel32 shadowColor, TPixel32 color,
 
 //------------------------------------------------------------
 
-void ShadowStyle2::drawPolyline(const TColorFunction *cf, const vector<T3DPointD> &polyline, TPointD shadowDirection) const
+void ShadowStyle2::drawPolyline(const TColorFunction *cf, const std::vector<T3DPointD> &polyline, TPointD shadowDirection) const
 {
 	if (polyline.empty())
 		return;
@@ -871,7 +871,7 @@ void ShadowStyle2::drawPolyline(const TColorFunction *cf, const vector<T3DPointD
 	TRegionOutline::PointVector::const_iterator it_e = polyline.end();
 
 	int size = polyline.size();
-	vector<double> lens(size);
+	std::vector<double> lens(size);
 	v0.x = polyline.back().x;
 	v0.y = polyline.back().y;
 	int count = 0;
@@ -973,7 +973,7 @@ void ShadowStyle2::drawRegion(const TColorFunction *cf, const bool antiAliasing,
 
 //------------------------------------------------------------
 
-int ShadowStyle2::drawPolyline(TFlash &flash, vector<T3DPointD> &polyline,
+int ShadowStyle2::drawPolyline(TFlash &flash, std::vector<T3DPointD> &polyline,
 							   TPointD shadowDirection, const bool isDraw) const
 {
 	int nbDraw = 0;
@@ -989,7 +989,7 @@ int ShadowStyle2::drawPolyline(TFlash &flash, vector<T3DPointD> &polyline,
 	TRegionOutline::PointVector::iterator it_e = polyline.end();
 
 	int size = polyline.size();
-	vector<double> lens(size);
+	std::vector<double> lens(size);
 	v0.x = polyline.back().x;
 	v0.y = polyline.back().y;
 	int count = 0;
@@ -1504,7 +1504,7 @@ int TPointShadowFillStyle::shadowOnEdge_parallel(TFlash &flash,
 //------------------------------------------------------------
 
 void TPointShadowFillStyle::deleteSameVerts(TRegionOutline::Boundary::iterator &rit,
-											vector<T3DPointD> &pv) const
+											std::vector<T3DPointD> &pv) const
 {
 	pv.clear();
 	if (rit->size() <= 0)
@@ -1570,14 +1570,14 @@ void TPointShadowFillStyle::drawRegion(const TColorFunction *cf, const bool anti
 	TRandom rnd;
 
 	for (regions_it = regions_it_b; regions_it != regions_it_e; ++regions_it) {
-		vector<T3DPointD> pv;
+		std::vector<T3DPointD> pv;
 		deleteSameVerts(regions_it, pv);
 		if (pv.size() < 3)
 			continue;
-		vector<T3DPointD>::iterator it_beg = pv.begin();
-		vector<T3DPointD>::iterator it_end = pv.end();
-		vector<T3DPointD>::iterator it_last = it_end - 1;
-		vector<T3DPointD>::iterator it0, it1, it2;
+		std::vector<T3DPointD>::iterator it_beg = pv.begin();
+		std::vector<T3DPointD>::iterator it_end = pv.end();
+		std::vector<T3DPointD>::iterator it_last = it_end - 1;
+		std::vector<T3DPointD>::iterator it0, it1, it2;
 		glBegin(GL_POINTS);
 		for (it1 = it_beg; it1 != it_end; it1++) {
 			it0 = it1 == it_beg ? it_last : it1 - 1;
@@ -1613,14 +1613,14 @@ void TPointShadowFillStyle::drawRegion(TFlash &flash, const TRegion *r) const
 
 	int nbDraw = 0;
 	for (regions_it = regions_it_b; regions_it != regions_it_e; ++regions_it) {
-		vector<T3DPointD> pv;
+		std::vector<T3DPointD> pv;
 		deleteSameVerts(regions_it, pv);
 		if (pv.size() < 3)
 			continue;
-		vector<T3DPointD>::iterator it_beg = pv.begin();
-		vector<T3DPointD>::iterator it_end = pv.end();
-		vector<T3DPointD>::iterator it_last = it_end - 1;
-		vector<T3DPointD>::iterator it0, it1, it2;
+		std::vector<T3DPointD>::iterator it_beg = pv.begin();
+		std::vector<T3DPointD>::iterator it_end = pv.end();
+		std::vector<T3DPointD>::iterator it_last = it_end - 1;
+		std::vector<T3DPointD>::iterator it0, it1, it2;
 		for (it1 = it_beg; it1 != it_end; it1++) {
 			it0 = it1 == it_beg ? it_last : it1 - 1;
 			it2 = it1 == it_last ? it_beg : it1 + 1;
@@ -1636,14 +1636,14 @@ void TPointShadowFillStyle::drawRegion(TFlash &flash, const TRegion *r) const
 
 	flash.setThickness(0.0);
 	for (regions_it = regions_it_b; regions_it != regions_it_e; ++regions_it) {
-		vector<T3DPointD> pv;
+		std::vector<T3DPointD> pv;
 		deleteSameVerts(regions_it, pv);
 		if (pv.size() < 3)
 			continue;
-		vector<T3DPointD>::iterator it_beg = pv.begin();
-		vector<T3DPointD>::iterator it_end = pv.end();
-		vector<T3DPointD>::iterator it_last = it_end - 1;
-		vector<T3DPointD>::iterator it0, it1, it2;
+		std::vector<T3DPointD>::iterator it_beg = pv.begin();
+		std::vector<T3DPointD>::iterator it_end = pv.end();
+		std::vector<T3DPointD>::iterator it_last = it_end - 1;
+		std::vector<T3DPointD>::iterator it0, it1, it2;
 		for (it1 = it_beg; it1 != it_end; it1++) {
 			it0 = it1 == it_beg ? it_last : it1 - 1;
 			it2 = it1 == it_last ? it_beg : it1 + 1;
@@ -2227,7 +2227,7 @@ void TCheckedFillStyle::drawRegion(TFlash &flash, const TRegion *r) const
 	for (double y = beg; y <= end; y += dist) {
 		TPointD p0, p1, p2, p3;
 		getHThickline(TPointD(bbox.x0, y), lx, p0, p1, p2, p3);
-		vector<TPointD> v;
+		std::vector<TPointD> v;
 		v.push_back(p0);
 		v.push_back(p1);
 		v.push_back(p2);
@@ -2244,7 +2244,7 @@ void TCheckedFillStyle::drawRegion(TFlash &flash, const TRegion *r) const
 	for (double x = beg; x <= end; x += dist) {
 		TPointD p0, p1, p2, p3;
 		getVThickline(TPointD(x, bbox.y0), ly, p0, p1, p2, p3);
-		vector<TPointD> v;
+		std::vector<TPointD> v;
 		v.push_back(p0);
 		v.push_back(p1);
 		v.push_back(p2);
@@ -2927,7 +2927,7 @@ void TChessFillStyle::setColorParamValue(int index, const TPixel32 &color)
 
 //------------------------------------------------------------
 
-void TChessFillStyle::makeGrid(TRectD &bbox, TRotation &rotM, vector<TPointD> &grid,
+void TChessFillStyle::makeGrid(TRectD &bbox, TRotation &rotM, std::vector<TPointD> &grid,
 							   int &nbClip) const
 {
 	double lx = bbox.x1 - bbox.x0;
@@ -3005,11 +3005,11 @@ void TChessFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasi
 	glEndList();
 
 	int nbClip = 1;
-	vector<TPointD> grid;
+	std::vector<TPointD> grid;
 	makeGrid(boundary.m_bbox, rotM, grid, nbClip);
 
-	vector<TPointD>::const_iterator it = grid.begin();
-	vector<TPointD>::const_iterator ite = grid.end();
+	std::vector<TPointD>::const_iterator it = grid.begin();
+	std::vector<TPointD>::const_iterator ite = grid.end();
 	for (; it != ite; it++) {
 		glPushMatrix();
 		glTranslated(it->x, it->y, 0.0);
@@ -3043,7 +3043,7 @@ void TChessFillStyle::drawRegion(TFlash &flash, const TRegion *r) const
 		vert[i] = rotM * scaleM * vert[i];
 
 	int nbClip = 1; // just for the getMainColor() rectangle
-	vector<TPointD> grid;
+	std::vector<TPointD> grid;
 	makeGrid(bbox, rotM, grid, nbClip);
 
 	//	flash.drawRegion(*r,true);
@@ -3054,11 +3054,11 @@ void TChessFillStyle::drawRegion(TFlash &flash, const TRegion *r) const
 
 	flash.setFillColor(m_pointColor);
 
-	vector<TPointD>::const_iterator it = grid.begin();
-	vector<TPointD>::const_iterator ite = grid.end();
+	std::vector<TPointD>::const_iterator it = grid.begin();
+	std::vector<TPointD>::const_iterator ite = grid.end();
 	for (; it != ite; it++) {
 		TTranslation trM(it->x, it->y);
-		vector<TPointD> lvert;
+		std::vector<TPointD> lvert;
 		lvert.push_back(trM * vert[0]);
 		lvert.push_back(trM * vert[1]);
 		lvert.push_back(trM * vert[2]);
@@ -3439,7 +3439,7 @@ void TStripeFillStyle::drawRegion(TFlash &flash, const TRegion *r) const
 		for (double y = beg; y <= end; y += dist) {
 			TPointD p0, p1, p2, p3;
 			getThickline(TPointD(bbox.x0, y), lx, p0, p1, p2, p3);
-			vector<TPointD> v;
+			std::vector<TPointD> v;
 			v.push_back(p0);
 			v.push_back(p1);
 			v.push_back(p2);
@@ -3456,7 +3456,7 @@ void TStripeFillStyle::drawRegion(TFlash &flash, const TRegion *r) const
 			TPointD p1(x + m_Thickness, y0);
 			TPointD p2(x, y1);
 			TPointD p3(x + m_Thickness, y1);
-			vector<TPointD> v;
+			std::vector<TPointD> v;
 			v.push_back(p0);
 			v.push_back(p1);
 			v.push_back(p3);
@@ -3662,9 +3662,9 @@ void TLinGradFillStyle::setColorParamValue(int index, const TPixel32 &color)
 //------------------------------------------------------------
 
 void TLinGradFillStyle::getRects(const TRectD &bbox,
-								 vector<TPointD> &r0,
-								 vector<TPointD> &r1,
-								 vector<TPointD> &r2) const
+								 std::vector<TPointD> &r0,
+								 std::vector<TPointD> &r1,
+								 std::vector<TPointD> &r2) const
 {
 	r0.clear();
 	r1.clear();
@@ -3726,7 +3726,7 @@ void TLinGradFillStyle::drawRegion(const TColorFunction *cf, const bool antiAlia
 
 	//compute points
 	TRectD bbox(boundary.m_bbox);
-	vector<TPointD> r0, r1, r2;
+	std::vector<TPointD> r0, r1, r2;
 	getRects(bbox, r0, r1, r2);
 	assert(r0.size() == 4);
 	assert(r1.size() == 4);
@@ -3764,7 +3764,7 @@ void TLinGradFillStyle::drawRegion(const TColorFunction *cf, const bool antiAlia
 void TLinGradFillStyle::drawRegion(TFlash &flash, const TRegion *r) const
 {
 	TRectD bbox(r->getBBox());
-	vector<TPointD> rect;
+	std::vector<TPointD> rect;
 
 	TPointD center((bbox.x1 + bbox.x0) / 2.0, (bbox.y1 + bbox.y0) / 2.0);
 	center = center + TPointD(m_XPos * 0.01 * (bbox.x1 - bbox.x0) * 0.5, m_YPos * 0.01 * (bbox.y1 - bbox.y0) * 0.5);
@@ -3794,7 +3794,7 @@ void TLinGradFillStyle::drawRegion(TFlash& flash, const TRegion* r) const
   p1=TPointD(bbox.x0,bbox.y1);
   p2=TPointD(bbox.x1,bbox.y0);
   p3=TPointD(bbox.x1,bbox.y1);
-  vector<TPointD> pv;
+  std::vector<TPointD> pv;
   if ( fabs(m_Angle)!=90 ) {
 		double tga=tan(degree2rad(fabs(m_Angle)));
 		double lx=bbox.x1-bbox.x0;
@@ -4044,7 +4044,7 @@ void TRadGradFillStyle::drawRegion(const TColorFunction *cf, const bool antiAlia
 	center = center + TPointD(m_XPos * 0.01 * lx * 0.5, m_YPos * 0.01 * ly * 0.5);
 
 	const double dAngle = 5.0;
-	vector<TPointD> sincos;
+	std::vector<TPointD> sincos;
 	for (double angle = 0.0; angle <= 360.0; angle += dAngle)
 		sincos.push_back(TPointD(sin(degree2rad(angle)), cos(degree2rad(angle))));
 
@@ -4281,7 +4281,7 @@ void TCircleStripeFillStyle::setColorParamValue(int index, const TPixel32 &color
 
 void TCircleStripeFillStyle::getCircleStripeQuads(const TPointD &center,
 												  const double r1, const double r2,
-												  vector<TPointD> &pv) const
+												  std::vector<TPointD> &pv) const
 {
 	pv.clear();
 	const double dAng = 10.0;
@@ -4297,7 +4297,7 @@ void TCircleStripeFillStyle::drawCircleStripe(const TPointD &center,
 											  const double r1, const double r2,
 											  const TPixel32 &col) const
 {
-	vector<TPointD> pv;
+	std::vector<TPointD> pv;
 	getCircleStripeQuads(center, r1, r2, pv);
 
 	TStencilControl *stencil = TStencilControl::instance();
@@ -4621,7 +4621,7 @@ void TMosaicFillStyle::setColorParamValue(int index, const TPixel32 &color)
 
 //------------------------------------------------------------
 
-void TMosaicFillStyle::preaprePos(const TRectD &box, vector<TPointD> &v,
+void TMosaicFillStyle::preaprePos(const TRectD &box, std::vector<TPointD> &v,
 								  int &lX, int &lY, TRandom &rand) const
 {
 	double dist = 5.0 + (60.0 - 5.0) * tcrop(m_size, 0.0, 100.0) * 0.01;
@@ -4642,7 +4642,7 @@ void TMosaicFillStyle::preaprePos(const TRectD &box, vector<TPointD> &v,
 
 bool TMosaicFillStyle::getQuad(const int ix, const int iy,
 							   const int lX, const int lY,
-							   vector<TPointD> &v,
+							   std::vector<TPointD> &v,
 							   TPointD *pquad, TRandom &rand) const
 {
 	if (ix < 0 || iy < 0 || ix >= (lX - 1) || iy >= (lY - 1))
@@ -4703,7 +4703,7 @@ void TMosaicFillStyle::drawRegion(const TColorFunction *cf, const bool antiAlias
 	}
 	TPixel32 currentColor;
 
-	vector<TPointD> pos;
+	std::vector<TPointD> pos;
 	int posLX, posLY;
 	TRandom rand;
 	TPointD quad[4];
@@ -4746,7 +4746,7 @@ void TMosaicFillStyle::drawRegion(TFlash &flash, const TRegion *r) const
 
 	TRectD bbox(r->getBBox());
 
-	vector<TPointD> pos;
+	std::vector<TPointD> pos;
 	int posLX, posLY;
 	TRandom rand;
 	TPointD quad[4];
@@ -4765,7 +4765,7 @@ void TMosaicFillStyle::drawRegion(TFlash &flash, const TRegion *r) const
 	for (int y = 0; y < (posLY - 1); y++)
 		for (int x = 0; x < (posLX - 1); x++)
 			if (getQuad(x, y, posLX, posLY, pos, quad, rand)) {
-				vector<TPointD> lvert;
+				std::vector<TPointD> lvert;
 				lvert.push_back(quad[0]);
 				lvert.push_back(quad[1]);
 				lvert.push_back(quad[2]);
@@ -4946,7 +4946,7 @@ void TPatchFillStyle::setColorParamValue(int index, const TPixel32 &color)
 
 //------------------------------------------------------------
 
-void TPatchFillStyle::preaprePos(const TRectD &box, vector<TPointD> &v,
+void TPatchFillStyle::preaprePos(const TRectD &box, std::vector<TPointD> &v,
 								 int &lX, int &lY, TRandom &rand) const
 {
 	double q = tcrop(m_size, 0.0, 100.0) * 0.01;
@@ -5040,7 +5040,7 @@ void TPatchFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasi
 
 	TPixel32 currentColor;
 
-	vector<TPointD> pos;
+	std::vector<TPointD> pos;
 	int posLX, posLY;
 	TRandom rand;
 	TPointD quad[4];
@@ -5114,7 +5114,7 @@ void TPatchFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasi
 
 //------------------------------------------------------------
 
-int TPatchFillStyle::nbClip(const int lX, const int lY, const vector<TPointD> &v) const
+int TPatchFillStyle::nbClip(const int lX, const int lY, const std::vector<TPointD> &v) const
 {
 	TPointD quad[4];
 	double thickn = tcrop(m_thickness, 0.0, 100.0) * 0.01 * 5.0;
@@ -5144,7 +5144,7 @@ int TPatchFillStyle::nbClip(const int lX, const int lY, const vector<TPointD> &v
 
 void TPatchFillStyle::drawFlashQuad(TFlash &flash, const TPointD *quad) const
 {
-	vector<TPointD> lvert;
+	std::vector<TPointD> lvert;
 	lvert.push_back(quad[0]);
 	lvert.push_back(quad[1]);
 	lvert.push_back(quad[2]);
@@ -5163,7 +5163,7 @@ void TPatchFillStyle::drawFlashTriangle(TFlash &flash,
 										const TPointD &p2,
 										const TPointD &p3) const
 {
-	vector<TPointD> lvert;
+	std::vector<TPointD> lvert;
 	lvert.push_back(p1);
 	lvert.push_back(p2);
 	lvert.push_back(p3);
@@ -5177,7 +5177,7 @@ void TPatchFillStyle::drawRegion(TFlash &flash, const TRegion *r) const
 
 	TRectD bbox(r->getBBox());
 
-	vector<TPointD> pos;
+	std::vector<TPointD> pos;
 	int posLX, posLY;
 	TRandom rand;
 	TPointD quad[4];
@@ -5191,7 +5191,7 @@ void TPatchFillStyle::drawRegion(TFlash &flash, const TRegion *r) const
 	int x;
 	for (x = 2; x < (posLX - 2); x += 2)
 		for (int y = 1; y < posLY; y++) {
-			vector<TPointD> lvert;
+			std::vector<TPointD> lvert;
 			if ((x % 4) == 2) {
 				lvert.push_back(pos[(x - 1) * posLY + y]);
 				lvert.push_back(pos[(x)*posLY + y]);

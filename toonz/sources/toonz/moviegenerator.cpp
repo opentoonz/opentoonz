@@ -156,7 +156,7 @@ public:
 		m_bgColor = TPixel32(255, 255, 255, 0);
 		TPointD center(0.5 * cameraSize.lx, 0.5 * cameraSize.ly);
 		m_viewAff = TTranslation(center);
-		string ext = fp.getType();
+		std::string ext = fp.getType();
 		m_isFrames = ext != "avi" && ext != "mov" && ext != "3gp";
 		m_fileOptions = properties.getFileFormatProperties(ext);
 	}

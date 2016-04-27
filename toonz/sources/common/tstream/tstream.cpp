@@ -38,7 +38,7 @@ string escape(string v)
 
 //===============================================================
 
-void writeCompressedFile(TFilePath dst, const string &str)
+void writeCompressedFile(TFilePath dst, const std::string &str)
 {
 }
 
@@ -128,7 +128,7 @@ class StreamTag
 {
 public:
 	string m_name;
-	std::map<string, string> m_attributes;
+	std::map<std::string, string> m_attributes;
 	enum Type { BeginTag,
 				EndTag,
 				BeginEndTag };
@@ -156,7 +156,7 @@ public:
 			break;
 		}
 		cout << endl;
-		std::map<string, string>::iterator it;
+		std::map<std::string, string>::iterator it;
 		for (it = m_attributes.begin(); it != m_attributes.end(); ++it) {
 			cout << " '" << it->first << "' = '" << it->second << "'" << endl;
 		}
@@ -167,7 +167,7 @@ public:
 
 class TPersistFactory
 {
-	typedef std::map<string, TPersistDeclaration *> Table;
+	typedef std::map<std::string, TPersistDeclaration *> Table;
 	static TPersistFactory *m_factory;
 	Table m_table;
 	TPersistFactory() {}
@@ -201,7 +201,7 @@ TPersistFactory *TPersistFactory::m_factory = 0;
 
 //--------------------------------
 
-TPersistDeclaration::TPersistDeclaration(const string &id)
+TPersistDeclaration::TPersistDeclaration(const std::string &id)
 	: m_id(id)
 {
 	TPersistFactory::instance()->add(id, this);
@@ -209,7 +209,7 @@ TPersistDeclaration::TPersistDeclaration(const string &id)
 
 //===============================================================
 
-TPersist *TPersist::create(const string &name)
+TPersist *TPersist::create(const std::string &name)
 {
 	return TPersistFactory::instance()->create(name);
 }
@@ -224,7 +224,7 @@ public:
 	bool m_compressed;
 	ostrstream m_ostrstream;
 
-	vector<string> m_tagStack;
+	vector<std::string> m_tagStack;
 	int m_tab;
 	bool m_justStarted;
 	typedef map<TPersist *, int> PersistTable;
@@ -426,7 +426,7 @@ TOStream &TOStream::operator<<(QString _v)
 
 //---------------------------------------------------------------
 
-TOStream &TOStream::operator<<(wstring v)
+TOStream &TOStream::operator<<(std::wstring v)
 {
 	return operator<<(toString(v));
 	/*
@@ -536,14 +536,14 @@ void TOStream::openChild(string tagName)
 
 //---------------------------------------------------------------
 
-void TOStream::openChild(string tagName, const map<string, string> &attributes)
+void TOStream::openChild(string tagName, const map<std::string, string> &attributes)
 {
 	assert(tagName != "");
 	m_imp->m_tagStack.push_back(tagName);
 	if (m_imp->m_justStarted == false)
 		cr();
 	*(m_imp->m_os) << "<" << m_imp->m_tagStack.back();
-	for (std::map<string, string>::const_iterator it = attributes.begin();
+	for (std::map<std::string, string>::const_iterator it = attributes.begin();
 		 it != attributes.end(); ++it) {
 		*(m_imp->m_os) << " " << it->first
 					   << "=\"" << escape(it->second) << "\"";
@@ -573,14 +573,14 @@ void TOStream::closeChild()
 
 //---------------------------------------------------------------
 
-void TOStream::openCloseChild(string tagName, const map<string, string> &attributes)
+void TOStream::openCloseChild(string tagName, const map<std::string, string> &attributes)
 {
 	assert(tagName != "");
 	// m_imp->m_tagStack.push_back(tagName);
 	if (m_imp->m_justStarted == false)
 		cr();
 	*(m_imp->m_os) << "<" << tagName;
-	for (std::map<string, string>::const_iterator it = attributes.begin();
+	for (std::map<std::string, string>::const_iterator it = attributes.begin();
 		 it != attributes.end(); ++it) {
 		*(m_imp->m_os) << " " << it->first
 					   << "=\"" << escape(it->second) << "\"";
@@ -647,7 +647,7 @@ public:
 	string m_strbuffer;
 	bool m_compressed;
 
-	vector<string> m_tagStack;
+	vector<std::string> m_tagStack;
 
 	typedef map<int, TPersist *> PersistTable;
 	PersistTable m_table;
@@ -1015,7 +1015,7 @@ TIStream &TIStream::operator>>(double &v)
 }
 //---------------------------------------------------------------
 
-TIStream &TIStream::operator>>(wstring &v)
+TIStream &TIStream::operator>>(std::wstring &v)
 {
 	string s;
 	operator>>(s);
@@ -1236,7 +1236,7 @@ TIStream &TIStream::operator>>(TPersist *&v)
 	StreamTag tag = m_imp->m_currentTag;
 	m_imp->m_currentTag = StreamTag();
 	string tagName = tag.m_name;
-	std::map<string, string>::iterator it;
+	std::map<std::string, string>::iterator it;
 	int id = -1;
 	it = tag.m_attributes.find("id");
 	if (it != tag.m_attributes.end())
@@ -1316,7 +1316,7 @@ bool TIStream::matchTag(string &tagName)
 string TIStream::getTagAttribute(string name) const
 {
 	StreamTag &tag = m_imp->m_currentTag;
-	std::map<string, string>::const_iterator it = tag.m_attributes.find(name);
+	std::map<std::string, string>::const_iterator it = tag.m_attributes.find(name);
 	if (it == tag.m_attributes.end())
 		return "";
 	else
@@ -1330,7 +1330,7 @@ bool TIStream::getTagParam(string paramName, string &value)
 	if (m_imp->m_tagStack.empty())
 		return false;
 	StreamTag &tag = m_imp->m_currentTag;
-	std::map<string, string>::const_iterator it = tag.m_attributes.find(paramName);
+	std::map<std::string, string>::const_iterator it = tag.m_attributes.find(paramName);
 	if (it == tag.m_attributes.end())
 		return false;
 	value = it->second;

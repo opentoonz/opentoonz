@@ -138,7 +138,7 @@ protected:
 	void saveData(TOutputStreamInterface &os) const;
 
 private:
-	void drawPolyline(const TColorFunction *cf, vector<T3DPointD> &polyline, TPointD shadowDirection) const;
+	void drawPolyline(const TColorFunction *cf, std::vector<T3DPointD> &polyline, TPointD shadowDirection) const;
 };
 
 //============================================================
@@ -187,8 +187,8 @@ protected:
 	void saveData(TOutputStreamInterface &os) const;
 
 private:
-	void drawPolyline(const TColorFunction *cf, const vector<T3DPointD> &polyline, TPointD shadowDirection) const;
-	int drawPolyline(TFlash &flash, vector<T3DPointD> &polyline,
+	void drawPolyline(const TColorFunction *cf, const std::vector<T3DPointD> &polyline, TPointD shadowDirection) const;
+	int drawPolyline(TFlash &flash, std::vector<T3DPointD> &polyline,
 					 TPointD shadowDirection, const bool isDraw = true) const;
 };
 
@@ -223,8 +223,8 @@ public:
 
 class DVAPI TRubberFillStyle : public TSolidColorStyle
 {
-	typedef vector<TQuadratic> QuadraticVector;
-	typedef vector<TQuadratic *> QuadraticPVector;
+	typedef std::vector<TQuadratic> QuadraticVector;
+	typedef std::vector<TQuadratic *> QuadraticPVector;
 
 public:
 	TRubberFillStyle(const TPixel32 &color, double deform);
@@ -319,7 +319,7 @@ private:
 							  const bool isDraw) const;
 
 	void deleteSameVerts(TRegionOutline::Boundary::iterator &rit,
-						 vector<T3DPointD> &pv) const;
+						 std::vector<T3DPointD> &pv) const;
 };
 
 //============================================================
@@ -532,7 +532,7 @@ public:
 
 	QString getDescription() const { return QCoreApplication::translate("TChalkFillStyle", "Chalk"); }
 	void loadData(int oldId, TInputStreamInterface &);
-	void getObsoleteTagIds(vector<int> &ids) const { ids.push_back(1133); }
+	void getObsoleteTagIds(std::vector<int> &ids) const { ids.push_back(1133); }
 	int getTagId() const { return 1143; };
 
 protected:
@@ -586,7 +586,7 @@ protected:
 
 private:
 	void makeGrid(TRectD &bbox, TRotation &rotM,
-				  vector<TPointD> &grid, int &nbClip) const;
+				  std::vector<TPointD> &grid, int &nbClip) const;
 };
 
 //============================================================
@@ -689,10 +689,10 @@ protected:
 	void saveData(TOutputStreamInterface &os) const;
 
 private:
-	void getRects(const TRectD &bbox, vector<TPointD> &r0,
-				  vector<TPointD> &r1, vector<TPointD> &r2) const;
+	void getRects(const TRectD &bbox, std::vector<TPointD> &r0,
+				  std::vector<TPointD> &r1, std::vector<TPointD> &r2) const;
 
-	void getRect(const TRectD &bbox, vector<TPointD> &r) const;
+	void getRect(const TRectD &bbox, std::vector<TPointD> &r) const;
 };
 
 //============================================================
@@ -790,7 +790,7 @@ protected:
 private:
 	void getCircleStripeQuads(const TPointD &center,
 							  const double r1, const double r2,
-							  vector<TPointD> &pv) const;
+								std::vector<TPointD> &pv) const;
 	void drawCircleStripe(const TPointD &center,
 						  const double r1, const double r2,
 						  const TPixel32 &col) const;
@@ -848,11 +848,11 @@ protected:
 	void saveData(TOutputStreamInterface &os) const;
 
 private:
-	void preaprePos(const TRectD &box, vector<TPointD> &v,
+	void preaprePos(const TRectD &box, std::vector<TPointD> &v,
 					int &lX, int &lY, TRandom &rand) const;
 	bool getQuad(const int ix, const int iy,
 				 const int lX, const int lY,
-				 vector<TPointD> &v, TPointD *pquad, TRandom &rand) const;
+				 std::vector<TPointD> &v, TPointD *pquad, TRandom &rand) const;
 };
 
 //============================================================
@@ -896,12 +896,12 @@ public:
 	QString getDescription() const { return QCoreApplication::translate("TPatchFillStyle", "Beehive"); }
 
 private:
-	void preaprePos(const TRectD &box, vector<TPointD> &v,
+	void preaprePos(const TRectD &box, std::vector<TPointD> &v,
 					int &lX, int &lY, TRandom &rand) const;
 	bool getQuadLine(const TPointD &a, const TPointD &b,
 					 const double thickn, TPointD *quad) const;
 	void drawGLQuad(const TPointD *quad) const;
-	int nbClip(const int lX, const int lY, const vector<TPointD> &v) const;
+	int nbClip(const int lX, const int lY, const std::vector<TPointD> &v) const;
 	void drawFlashQuad(TFlash &flash, const TPointD *quad) const;
 	void drawFlashTriangle(TFlash &flash, const TPointD &p1,
 						   const TPointD &p2, const TPointD &p3) const;

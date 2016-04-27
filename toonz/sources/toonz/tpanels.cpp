@@ -306,7 +306,7 @@ FunctionViewerPanel::FunctionViewerPanel(QWidget *parent)
 
 	attachHandles();
 
-	bool ret = connect(m_functionViewer, SIGNAL(curveIo(int, TDoubleParam *, const string &)), this, SLOT(onIoCurve(int, TDoubleParam *, const string &)));
+	bool ret = connect(m_functionViewer, SIGNAL(curveIo(int, TDoubleParam *, const std::string &)), this, SLOT(onIoCurve(int, TDoubleParam *, const std::string &)));
 	ret &&connect(m_functionViewer, SIGNAL(editObject()), this, SLOT(onEditObject()));
 
 	assert(ret);
@@ -364,7 +364,7 @@ bool FunctionViewerPanel::widgetInThisPanelIsFocused()
 
 //------------------------------------------
 
-void FunctionViewerPanel::onIoCurve(int type, TDoubleParam *curve, const string &name)
+void FunctionViewerPanel::onIoCurve(int type, TDoubleParam *curve, const std::string &name)
 {
 	switch ((FunctionViewer::IoType)type) {
 	case FunctionViewer::eSaveCurve:
@@ -652,7 +652,7 @@ ColorFieldEditorController::ColorFieldEditorController()
 	m_colorFieldHandle = new TPaletteHandle();
 	m_palette = new TPalette();
 	TColorStyle *style = m_palette->getStyle(1);
-	wstring name = L"EmptyColorFieldPalette";
+	std::wstring name = L"EmptyColorFieldPalette";
 	m_palette->setPaletteName(name);
 	m_colorFieldHandle->setPalette(m_palette.getPointer(), 1);
 	DVGui::ColorField::setEditorController(this);
@@ -721,7 +721,7 @@ ColorFieldEditorController colorFieldEditorController;
 CleanupColorFieldEditorController::CleanupColorFieldEditorController()
 	: m_currentColorField(0), m_colorFieldHandle(new TPaletteHandle), m_palette(new TPalette)
 {
-	wstring name = L"EmptyColorFieldPalette";
+	std::wstring name = L"EmptyColorFieldPalette";
 	m_palette->setPaletteName(name);
 	m_colorFieldHandle->setPalette(m_palette.getPointer(), 1);
 	DVGui::CleanupColorField::setEditorController(this);

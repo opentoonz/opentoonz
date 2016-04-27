@@ -24,7 +24,6 @@
 
 #ifdef _WIN32
 #include <iostream>
-using namespace std;
 #else
 #include <sys/param.h>
 #include <unistd.h>
@@ -85,7 +84,7 @@ TFilePath getGlobalRoot()
 			while (*t)
 				t++;
 
-			string pathName(s, t - 1);
+			std::string pathName(s, t - 1);
 
 			rootDir = TFilePath(pathName);
 		}
@@ -118,7 +117,7 @@ TFilePath getLocalRoot()
 			while (*t)
 				t++;
 
-			string pathName(s, t - 1);
+			std::string pathName(s, t - 1);
 
 			lroot = TFilePath(pathName);
 		}
@@ -223,8 +222,8 @@ public:
 	void mountDisks();
 	void unmountDisks();
 
-	std::map<string, string> m_disks;
-	vector<string> m_disksMounted;
+	std::map<std::string, std::string> m_disks;
+	vector<std::string> m_disksMounted;
 #endif
 
 	int m_port;
@@ -517,11 +516,11 @@ FarmServer::~FarmServer()
 
 //------------------------------------------------------------------------------
 
-inline string toString(unsigned long value)
+inline std::string toString(unsigned long value)
 {
-	ostrstream ss;
+	std::ostrstream ss;
 	ss << value << '\0';
-	string s = ss.str();
+	std::string s = ss.str();
 	ss.freeze(false);
 	return s;
 }
@@ -756,9 +755,9 @@ void FarmServer::removeTask(const QString &id)
 namespace
 {
 
-string getLine(std::istream &is)
+std::string getLine(std::istream &is)
 {
-	string out;
+	std::string out;
 	char c;
 
 	while (!is.eof()) {
@@ -805,8 +804,8 @@ bool loadServerData(const QString &hostname, QString &addr, int &port)
     char line[256];
     is.getline(line, 256);
     */
-		string line = getLine(is);
-		istrstream iss(line.c_str());
+		std::string line = getLine(is);
+		std::istrstream iss(line.c_str());
 
 		char name[80];
 		char ipAddress[80];
@@ -843,7 +842,7 @@ void FarmServerService::onStart(int argc, char *argv[])
 	bool lRootDirExists = fs.isDirectory();
 
 	if (!lRootDirExists) {
-		string errMsg("Unable to start the Server");
+		std::string errMsg("Unable to start the Server");
 		errMsg += "\n";
 		errMsg += "The directory specified as Local Root does not exist";
 		errMsg += "\n";
@@ -861,7 +860,7 @@ void FarmServerService::onStart(int argc, char *argv[])
 
 	TFilePath gRootDir = getGlobalRoot();
 	if (toString(gRootDir.getWideString()) == "") {
-		string errMsg("Unable to get TFARMGLOBALROOT environment variable");
+		std::string errMsg("Unable to get TFARMGLOBALROOT environment variable");
 		addToMessageLog(errMsg);
 
 // DEBUG MAC SERVIZIO (DA TOGLIERE)
@@ -876,7 +875,7 @@ void FarmServerService::onStart(int argc, char *argv[])
 	bool gRootDirExists = dirExists(gRootDir);
 	;
 	if (!gRootDirExists) {
-		string errMsg("Unable to start the Server");
+		std::string errMsg("Unable to start the Server");
 		errMsg += "\n";
 		errMsg += "The directory " + toString(gRootDir.getWideString()) + " specified as Global Root does not exist";
 		;
@@ -901,7 +900,7 @@ void FarmServerService::onStart(int argc, char *argv[])
 	try {
 		::loadControllerData(fp, controllerData);
 	} catch (TException &e) {
-		string errMsg("Unable to start the Server");
+		std::string errMsg("Unable to start the Server");
 		errMsg += "\n";
 		errMsg += toString(e.getMessage());
 		addToMessageLog(errMsg);
@@ -976,7 +975,7 @@ void FarmServerService::onStart(int argc, char *argv[])
     std::cout << "Error: " << appsCfgFile << endl;
   while (!isAppCfgFile.eof())
   {
-    string line = getLine(isAppCfgFile);
+    std::string line = getLine(isAppCfgFile);
     istrstream iss(line.c_str());
     TFilePath appPath = TFilePath(line);
     appPaths.push_back(appPath);
@@ -1005,7 +1004,7 @@ void FarmServerService::onStart(int argc, char *argv[])
 #endif
 
 	if (rc != 0) {
-		string msg("An error occurred starting the ToonzFarm Server");
+		std::string msg("An error occurred starting the ToonzFarm Server");
 		msg += "\n";
 
 #ifdef _WIN32
@@ -1021,7 +1020,7 @@ void FarmServerService::onStart(int argc, char *argv[])
 			0,
 			NULL);
 
-		msg += string((char *)lpMsgBuf);
+		msg += std::string((char *)lpMsgBuf);
 
 		// Free the buffer.
 		LocalFree(lpMsgBuf);
@@ -1033,7 +1032,7 @@ void FarmServerService::onStart(int argc, char *argv[])
 		setStatus(TService::Stopped, NO_ERROR, 0);
 	}
 
-	string msg("Exiting with code ");
+	std::string msg("Exiting with code ");
 	msg += toString(ret);
 	msg += "\n";
 	m_userLog->info(QString::fromStdString(msg));
@@ -1072,7 +1071,7 @@ void FarmServerService::loadDiskMountingPoints(const TFilePath &fp)
 {
 	Tifstream is(fp);
 	if (!is)
-		throw string("File " + toString(fp.getWideString()) + " not found");
+		throw std::string("File " + toString(fp.getWideString()) + " not found");
 	char buffer[1024];
 	while (is.getline(buffer, sizeof(buffer))) {
 		char *s = buffer;
@@ -1092,7 +1091,7 @@ void FarmServerService::loadDiskMountingPoints(const TFilePath &fp)
 			q--;
 		if (q == s)
 			continue; // non dovrebbe succedere mai: prima di '=' tutti blanks
-		string from(s, q - s);
+		std::string from(s, q - s);
 		s = t + 1;
 		while (isBlank(*s))
 			s++;
@@ -1114,10 +1113,10 @@ void FarmServerService::loadDiskMountingPoints(const TFilePath &fp)
 
 void FarmServerService::mountDisks()
 {
-	std::map<string, string>::iterator it = m_disks.begin();
+	std::map<std::string, std::string>::iterator it = m_disks.begin();
 	for (; it != m_disks.end(); ++it) {
-		string drive = it->first;
-		string remoteName = it->second;
+		std::string drive = it->first;
+		std::string remoteName = it->second;
 
 		NETRESOURCE NetResource;
 		NetResource.dwType = RESOURCETYPE_DISK;
@@ -1152,7 +1151,7 @@ void FarmServerService::mountDisks()
 				nameBuf,		  // buffer for provider name
 				sizeof(nameBuf)); // size of provider name buffer
 
-			string errorMessage("Unable to map ");
+			std::string errorMessage("Unable to map ");
 			errorMessage += NetResource.lpRemoteName;
 			errorMessage += " to logic volume ";
 			errorMessage += NetResource.lpLocalName;
@@ -1166,9 +1165,9 @@ void FarmServerService::mountDisks()
 
 void FarmServerService::unmountDisks()
 {
-	vector<string>::iterator it = m_disksMounted.begin();
+	vector<std::string>::iterator it = m_disksMounted.begin();
 	for (; it != m_disksMounted.end(); ++it) {
-		string drive = *it;
+		std::string drive = *it;
 
 		DWORD res = WNetCancelConnection2(
 			drive.c_str(),			// resource name
@@ -1176,7 +1175,7 @@ void FarmServerService::unmountDisks()
 			TRUE);					// unconditional disconnect option
 
 		if (res != NO_ERROR && res != ERROR_NOT_CONNECTED) {
-			string errorMessage("Unable to unmap ");
+			std::string errorMessage("Unable to unmap ");
 			errorMessage += drive.c_str();
 			addToMessageLog(errorMessage);
 		}
@@ -1198,8 +1197,8 @@ int main(int argc, char **argv)
 	bool console = false;
 
 	if (argc > 1) {
-		string serviceName("ToonzFarmServer"); //Must be the same of the installer's
-		string serviceDisplayName = serviceName;
+		std::string serviceName("ToonzFarmServer"); //Must be the same of the installer's
+		std::string serviceDisplayName = serviceName;
 
 		TCli::SimpleQualifier consoleQualifier("-console", "Run as console app");
 		TCli::StringQualifier installQualifier("-install name", "Install service as 'name'");

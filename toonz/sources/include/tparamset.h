@@ -26,11 +26,11 @@ class TParamSetImp;
 class TParamSetChange : public TParamChange
 {
 public:
-	vector<TParamChange *> m_paramChanges;
+	std::vector<TParamChange *> m_paramChanges;
 
 public:
 	TParamSetChange(TParam *param, double firstAffectedFrame, double lastAffectedFrame,
-					const vector<TParamChange *> &paramChanges)
+		const std::vector<TParamChange *> &paramChanges)
 		: TParamChange(param, firstAffectedFrame, lastAffectedFrame, true, false, false), m_paramChanges(paramChanges)
 	{
 	}
@@ -51,21 +51,21 @@ class DVAPI TParamSet : public TParam
 {
 	PERSIST_DECLARATION(TParamSet)
 public:
-	TParamSet(string name = "");
+	TParamSet(std::string name = "");
 	TParamSet(const TParamSet &src);
 	~TParamSet();
 
-	void addParam(const TParamP &param, const string &name);
-	void insertParam(const TParamP &param, const string &name, int index);
+	void addParam(const TParamP &param, const std::string &name);
+	void insertParam(const TParamP &param, const std::string &name, int index);
 	void removeParam(const TParamP &param);
 	void removeAllParam();
 
 	int getParamCount() const;
 	TParamP getParam(int index) const;
-	string getParamName(int index) const;
-	int getParamIdx(const string &name) const;
+	std::string getParamName(int index) const;
+	int getParamIdx(const std::string &name) const;
 
-	void getAnimatableParams(vector<TParamP> &params, bool recursive = true);
+	void getAnimatableParams(std::vector<TParamP> &params, bool recursive = true);
 
 	void addObserver(TParamObserver *observer);
 	void removeObserver(TParamObserver *observer);
@@ -101,7 +101,7 @@ public:
 
 	bool hasKeyframes() const;
 
-	string getValueAlias(double frame, int precision);
+	std::string getValueAlias(double frame, int precision);
 
 private:
 	TParamSetImp *m_imp;

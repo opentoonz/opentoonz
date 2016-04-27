@@ -113,7 +113,7 @@ public:
 private:
 	void updateLevel() const
 	{
-		vector<TFrameId> fids;
+		std::vector<TFrameId> fids;
 		if (!m_level)
 			return;
 		m_level->getFids(fids);
@@ -177,7 +177,7 @@ void setCurrentColorWithUndo(const TPixel32 &color)
 	setCurrentColor(color);
 
 	if (level) {
-		vector<TFrameId> fids;
+		std::vector<TFrameId> fids;
 		level->getFids(fids);
 		invalidateIcons(level, fids);
 	}
@@ -239,7 +239,7 @@ void RGBPickerTool::onImageChanged()
 			TUndoManager::manager()->add(new UndoPickRGBM(palette, styleId, m_currentValue, level));
 		setCurrentColor(m_currentValue);
 		if (level) {
-			vector<TFrameId> fids;
+			std::vector<TFrameId> fids;
 			level->getFids(fids);
 			invalidateIcons(level, fids);
 		}
@@ -361,7 +361,7 @@ void RGBPickerTool::leftButtonDoubleClick(const TPointD &pos, const TMouseEvent 
 		return;
 	if (m_pickType.getValue() == POLYLINE_PICK) {
 		closePolyline(pos, convert(e.m_pos));
-		vector<TThickPoint> strokePoints;
+		std::vector<TThickPoint> strokePoints;
 		for (UINT i = 0; i < m_workingPolyline.size() - 1; i++) {
 			strokePoints.push_back(TThickPoint(m_workingPolyline[i], 1));
 			strokePoints.push_back(TThickPoint(0.5 * (m_workingPolyline[i] + m_workingPolyline[i + 1]), 1));
@@ -522,7 +522,7 @@ void RGBPickerTool::pickStroke()
 		TUndoManager::manager()->add(new UndoPickRGBM(palette, styleId, m_currentValue, level));
 		setCurrentColor(m_currentValue);
 		if (level) {
-			vector<TFrameId> fids;
+			std::vector<TFrameId> fids;
 			level->getFids(fids);
 			invalidateIcons(level, fids);
 		}
@@ -531,7 +531,7 @@ void RGBPickerTool::pickStroke()
 
 //---------------------------------------------------------
 
-bool RGBPickerTool::onPropertyChanged(string propertyName)
+bool RGBPickerTool::onPropertyChanged(std::string propertyName)
 {
 	if (propertyName == m_pickType.getName())
 		PickVectorType = toString(m_pickType.getValue());

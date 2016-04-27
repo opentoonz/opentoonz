@@ -55,7 +55,7 @@ private:
 	// Current scan type
 	ScanType m_scanType;
 
-	string m_paperFormat; // e.g. "A4 paper"
+	std::string m_paperFormat; // e.g. "A4 paper"
 	TRectD m_scanArea;	// in mm /* TWAIN preferirebbe gli inch, ma uso i mm per seguire tnz4.x*/
 	TRectD m_cropBox;	 // in mm /* TWAIN preferirebbe gli inch, ma uso i mm per seguire tnz4.x*/
 	bool m_isPreview;
@@ -77,11 +77,11 @@ public:
 
 private:
 	// other useful info ?!
-	string m_twainVersion;
-	string m_manufacturer;
-	string m_prodFamily;
-	string m_productName;
-	string m_version;
+	std::string m_twainVersion;
+	std::string m_manufacturer;
+	std::string m_prodFamily;
+	std::string m_productName;
+	std::string m_version;
 
 	bool m_reverseOrder; // if true then scan levels starting from last frame
 
@@ -96,8 +96,8 @@ public:
 
 	void setMaxPaperSize(double maxWidth, double maxHeight); // note: possibly update m_scanArea
 
-	string getPaperFormat() const { return m_paperFormat; }
-	void setPaperFormat(string paperFormat);
+	std::string getPaperFormat() const { return m_paperFormat; }
+	void setPaperFormat(std::string paperFormat);
 	// assert(TPaperFormatManager::instance()->isValidFormat(paperFormat));
 	// updates scanArea (cropping with maxPaperSize)
 
@@ -211,7 +211,7 @@ public:
 	};
 
 private:
-	typedef std::map<string, Format> FormatTable;
+	typedef std::map<std::string, Format> FormatTable;
 	FormatTable m_formats;
 
 	TPaperFormatManager();
@@ -222,13 +222,13 @@ public:
 	static TPaperFormatManager *instance();
 
 	// resitutisce la lista dei formati
-	void getFormats(std::vector<string> &names) const;
+	void getFormats(std::vector<std::string> &names) const;
 
-	bool isValidFormat(string name) const;
-	string getDefaultFormat() const;
+	bool isValidFormat(std::string name) const;
+	std::string getDefaultFormat() const;
 
 	// nome formato --> dimensione
-	TDimensionD getSize(string name) const;
+	TDimensionD getSize(std::string name) const;
 };
 
 #endif

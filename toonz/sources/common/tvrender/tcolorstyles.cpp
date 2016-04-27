@@ -206,7 +206,7 @@ void TColorStyle::makeIcon(const TDimension &d)
 	img->setPalette(tmpPalette.getPointer());
 	checkErrorsByGL;
 
-	vector<TThickPoint> points(3);
+	std::vector<TThickPoint> points(3);
 
 	if (isRegionStyle() && !isStrokeStyle()) {
 		points[0] = TThickPoint(-55, -50, 1);
@@ -401,7 +401,7 @@ public:
 			throw TException("Duplicate color style declaration. id = " + toString(id));
 		}
 		m_table.insert(std::make_pair(id, Item(style)));
-		vector<int> ids;
+		std::vector<int> ids;
 		style->getObsoleteTagIds(ids);
 		for (std::vector<int>::iterator it = ids.begin(); it != ids.end(); ++it) {
 			if (m_table.find(*it) != m_table.end()) {
@@ -422,7 +422,7 @@ public:
 		return it->second.m_style->clone();
 	}
 
-	void getAllTags(vector<int> &tags)
+	void getAllTags(std::vector<int> &tags)
 	{
 		tags.clear();
 		tags.reserve(m_table.size());
@@ -487,7 +487,7 @@ void TColorStyle::drawStroke(TFlash &flash, const TStroke *s) const
 {
 	bool isCenterline = false;
 	double minThickness, maxThickness = 0;
-	wstring quality = flash.getLineQuality();
+	std::wstring quality = flash.getLineQuality();
 	double thickness = computeAverageThickness(s, minThickness, maxThickness);
 	if (minThickness == maxThickness && minThickness == 0)
 		return;
@@ -530,13 +530,13 @@ void TColorStyle::drawStroke(TFlash &flash, const TStroke *s) const
 // (*): In such case, the flag is mandatory.
 void TColorStyle::save(TOutputStreamInterface &os) const
 {
-	wstring name = getName();
+	std::wstring name = getName();
 	bool numberedName = !name.empty() && ('0' <= name[0] && name[0] <= '9' || name[0] == '_');
 
 	if (m_flags > 0 || (name.length() == 1 && numberedName))
 		os << ("_" + QString::number(m_flags)).toStdString();
-	wstring gname = getGlobalName();
-	wstring origName = getOriginalName();
+	std::wstring gname = getGlobalName();
+	std::wstring origName = getOriginalName();
 
 	if (gname != L"") {
 		os << toString(L"|" + gname);
@@ -559,9 +559,9 @@ void TColorStyle::save(TOutputStreamInterface &os) const
 
 TColorStyle *TColorStyle::load(TInputStreamInterface &is)
 {
-	string name;
-	wstring gname;
-	wstring origName;
+	std::string name;
+	std::wstring gname;
+	std::wstring origName;
 	bool isEdited = false;
 
 	is >> name;
@@ -620,7 +620,7 @@ TColorStyle *TColorStyle::create(int tagId)
 
 //-------------------------------------------------------------------
 
-void TColorStyle::getAllTags(vector<int> &tags)
+void TColorStyle::getAllTags(std::vector<int> &tags)
 {
 	ColorStyleList::instance()->getAllTags(tags);
 }

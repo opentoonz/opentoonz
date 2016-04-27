@@ -96,9 +96,9 @@ void drawCachedFxFlap(QPainter *painter, const QPointF &pos)
 
 //-----------------------------------------------------
 
-int getIndex(TFxPort *port, const vector<TFxPort *> &ports)
+int getIndex(TFxPort *port, const std::vector<TFxPort *> &ports)
 {
-	vector<TFxPort *>::const_iterator it = std::find(ports.begin(), ports.end(), port);
+	std::vector<TFxPort *>::const_iterator it = std::find(ports.begin(), ports.end(), port);
 	if (it == ports.end())
 		return -1;
 	return std::distance(ports.begin(), it);
@@ -589,7 +589,7 @@ void FxPalettePainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme)
 //*****************************************************
 
 FxPainter::FxPainter(FxSchematicNode *parent, double width, double height,
-					 const QString &name, eFxType type, string fxType)
+					 const QString &name, eFxType type, std::string fxType)
 	: QGraphicsItem(parent), m_parent(parent), m_name(name), m_width(width), m_height(height), m_type(type), m_fxType(fxType)
 {
 	setFlag(QGraphicsItem::ItemIsMovable, false);
@@ -1600,7 +1600,7 @@ SchematicPort *FxSchematicPort::searchPort(const QPointF &scenePos)
 }
 //-----------------------------------------------------
 
-void FxSchematicPort::handleSnappedLinksOnDynamicPortFx(const vector<TFxPort *> &groupedPorts, int targetIndex, int startIndex)
+void FxSchematicPort::handleSnappedLinksOnDynamicPortFx(const std::vector<TFxPort *> &groupedPorts, int targetIndex, int startIndex)
 {
 	FxSchematicNode *node = dynamic_cast<FxSchematicNode *>(getNode());
 	if (!m_ownerFx->hasDynamicPortGroups() || !node)
@@ -1806,7 +1806,7 @@ void FxSchematicPort::mouseReleaseEvent(QGraphicsSceneMouseEvent *me)
 		return;
 	}
 
-	vector<TFxPort *> groupedPorts = targetOwnerFx->dynamicPortGroup(targetGroupId)->ports();
+	std::vector<TFxPort *> groupedPorts = targetOwnerFx->dynamicPortGroup(targetGroupId)->ports();
 	int groupedPortCount = groupedPorts.size();
 	if (targetOwnerFx != m_ownerFx && me->modifiers() == Qt::ControlModifier && linkTo(targetPort, true)) {
 		//trying to link different fxs insertin the new link and shifting the others
@@ -1907,7 +1907,7 @@ FxSchematicDock::FxSchematicDock(FxSchematicNode *parent, const QString &name, d
 					QGraphicsScene *graphicScene = scene();
 					FxSchematicScene *schematicScene = dynamic_cast<FxSchematicScene *>(graphicScene);
 					if (schematicScene) {
-						string colName = schematicScene->getXsheet()->getStageObject(objId)->getName();
+						std::string colName = schematicScene->getXsheet()->getStageObject(objId)->getName();
 						setToolTip(QString::fromStdString(colName));
 					}
 				} else {
@@ -1997,7 +1997,7 @@ void FxSchematicNode::setSchematicNodePos(const QPointF &pos) const
 		TMacroFx *macro = dynamic_cast<TMacroFx *>(m_fx.getPointer());
 		if (macro) {
 			TPointD delta = p - macro->getRoot()->getAttributes()->getDagNodePos();
-			vector<TFxP> fxs = macro->getFxs();
+			std::vector<TFxP> fxs = macro->getFxs();
 			int i;
 			for (i = 0; i < (int)fxs.size(); i++) {
 				TPointD oldPos = fxs[i]->getAttributes()->getDagNodePos();
@@ -2428,7 +2428,7 @@ void FxSchematicXSheetNode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *me)
 //TODO: Fxの分類、各Fxに自己申告させるべき 2016/1/8 shun_iwasawa
 namespace
 {
-bool isImageAdjustFx(string id)
+bool isImageAdjustFx(std::string id)
 {
 	if (id == "STD_toneCurveFx" ||
 		id == "STD_inoChannelSelectorFx" ||
@@ -2454,7 +2454,7 @@ bool isImageAdjustFx(string id)
 		return false;
 }
 
-bool isLayerBlendingFx(string id)
+bool isLayerBlendingFx(std::string id)
 {
 	if (id == "STD_inoOverFx" ||
 		id == "STD_inoCrossDissolveFx" ||
@@ -2483,7 +2483,7 @@ bool isLayerBlendingFx(string id)
 		return false;
 }
 
-bool isMatteFx(string id)
+bool isMatteFx(std::string id)
 {
 	if (id == "STD_hsvKeyFx" ||
 		id == "inFx" ||
@@ -2510,7 +2510,7 @@ FxSchematicNormalFxNode::FxSchematicNormalFxNode(FxSchematicScene *scene, TFx *f
 	TMacroFx *macroFx = dynamic_cast<TMacroFx *>(fx);
 	if (macroFx) {
 		m_type = eMacroFx;
-		vector<TFxP> fxs = macroFx->getFxs();
+		std::vector<TFxP> fxs = macroFx->getFxs();
 		bool enable = false;
 		int i;
 		for (i = 0; i < (int)fxs.size(); i++)
@@ -2521,7 +2521,7 @@ FxSchematicNormalFxNode::FxSchematicNormalFxNode(FxSchematicScene *scene, TFx *f
 	m_linkedNode = 0;
 
 	//set fx type
-	string id = fx->getFxType();
+	std::string id = fx->getFxType();
 	if (isImageAdjustFx(id))
 		m_type = eNormalImageAdjustFx;
 	else if (isLayerBlendingFx(id))
@@ -2574,7 +2574,7 @@ FxSchematicNormalFxNode::FxSchematicNormalFxNode(FxSchematicScene *scene, TFx *f
 	int i, inputPorts = fx->getInputPortCount();
 	double lastPosY = (m_isLargeScaled) ? m_height : 0;
 	for (i = 0; i < inputPorts; i++) {
-		string portName = fx->getInputPortName(i);
+		std::string portName = fx->getInputPortName(i);
 		QString qPortName = QString::fromStdString(portName);
 		QString toolTip = "";
 		if (isA(eMacroFx)) {
@@ -2587,7 +2587,7 @@ FxSchematicNormalFxNode::FxSchematicNormalFxNode(FxSchematicScene *scene, TFx *f
 			toolTip.append(")");
 			QString qInMacroFxId = qPortName;
 			qInMacroFxId.remove(0, qInMacroFxId.indexOf("_") + 1);
-			vector<TFxP> macroFxs = macroFx->getFxs();
+			std::vector<TFxP> macroFxs = macroFx->getFxs();
 			int j;
 			for (j = 0; j < (int)macroFxs.size(); j++) {
 				TFx *inMacroFx = macroFxs[j].getPointer();
@@ -2668,7 +2668,7 @@ void FxSchematicNormalFxNode::onRenderToggleClicked(bool value)
 	m_fx->getAttributes()->enable(value);
 	TMacroFx *macro = dynamic_cast<TMacroFx *>(m_fx.getPointer());
 	if (macro) {
-		vector<TFxP> fxs = macro->getFxs();
+		std::vector<TFxP> fxs = macro->getFxs();
 		int i;
 		for (i = 0; i < (int)fxs.size(); i++)
 			fxs[i]->getAttributes()->enable(value);
@@ -2722,7 +2722,7 @@ FxSchematicZeraryNode::FxSchematicZeraryNode(FxSchematicScene *scene, TZeraryCol
 
 	TFx *zeraryFx = fx->getZeraryFx();
 	TStageObjectId id = TStageObjectId::ColumnId(m_columnIndex);
-	string name = scene->getXsheet()->getStageObject(id)->getName();
+	std::string name = scene->getXsheet()->getStageObject(id)->getName();
 	m_name = QString::fromStdString(name);
 
 	m_nameItem = new SchematicName(this, 72, 20); //for rename
@@ -2896,7 +2896,7 @@ FxSchematicColumnNode::FxSchematicColumnNode(FxSchematicScene *scene, TLevelColu
 	}
 	m_columnIndex = fx->getColumnIndex();
 	TStageObjectId id = TStageObjectId::ColumnId(m_columnIndex);
-	string name = scene->getXsheet()->getStageObject(id)->getName();
+	std::string name = scene->getXsheet()->getStageObject(id)->getName();
 	m_name = QString::fromStdString(name);
 
 	m_resizeItem = new SchematicThumbnailToggle(this, fx->getAttributes()->isOpened()); //サムネイル矢印
@@ -3122,7 +3122,7 @@ void FxSchematicColumnNode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *me)
 
 //-----------------------------------------------------
 
-void FxSchematicColumnNode::renameObject(const TStageObjectId &id, string name)
+void FxSchematicColumnNode::renameObject(const TStageObjectId &id, std::string name)
 {
 	FxSchematicScene *fxScene = dynamic_cast<FxSchematicScene *>(scene());
 	if (!fxScene)
@@ -3145,7 +3145,7 @@ FxSchematicPaletteNode::FxSchematicPaletteNode(FxSchematicScene *scene, TPalette
 	}
 	m_columnIndex = fx->getColumnIndex();
 	TStageObjectId id = TStageObjectId::ColumnId(m_columnIndex);
-	string name = scene->getXsheet()->getStageObject(id)->getFullName();
+	std::string name = scene->getXsheet()->getStageObject(id)->getFullName();
 	m_name = QString::fromStdString(name);
 
 	m_linkedNode = 0;
@@ -3297,7 +3297,7 @@ void FxSchematicPaletteNode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *me)
 
 //-----------------------------------------------------
 
-void FxSchematicPaletteNode::renameObject(const TStageObjectId &id, string name)
+void FxSchematicPaletteNode::renameObject(const TStageObjectId &id, std::string name)
 {
 	FxSchematicScene *fxScene = dynamic_cast<FxSchematicScene *>(scene());
 	if (!fxScene)
@@ -3311,7 +3311,7 @@ void FxSchematicPaletteNode::renameObject(const TStageObjectId &id, string name)
 //
 //*****************************************************
 
-FxGroupNode::FxGroupNode(FxSchematicScene *scene, const QList<TFxP> &groupedFx, const QList<TFxP> &roots, int groupId, const wstring &groupName)
+FxGroupNode::FxGroupNode(FxSchematicScene *scene, const QList<TFxP> &groupedFx, const QList<TFxP> &roots, int groupId, const std::wstring &groupName)
 	: FxSchematicNode(scene, roots[0].getPointer(), 90, 32, eGroupedFx), m_groupId(groupId), m_groupedFxs(groupedFx)
 {
 	if (!m_isLargeScaled) {
@@ -3402,7 +3402,7 @@ void FxGroupNode::updateFxsDagPosition(const TPointD &pos) const
 		m_groupedFxs[i]->getAttributes()->setDagNodePos(m_groupedFxs[i]->getAttributes()->getDagNodePos() + delta);
 		TMacroFx *macro = dynamic_cast<TMacroFx *>(m_groupedFxs[i].getPointer());
 		if (macro) {
-			vector<TFxP> fxs = macro->getFxs();
+			std::vector<TFxP> fxs = macro->getFxs();
 			int i;
 			for (i = 0; i < (int)fxs.size(); i++) {
 				TPointD oldP = fxs[i]->getAttributes()->getDagNodePos();

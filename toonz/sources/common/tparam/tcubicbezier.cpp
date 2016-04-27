@@ -90,7 +90,7 @@ DVAPI std::pair<TPointD, TPointD> getMinMaxCubicBezierY(const TPointD &a,
 			return std::pair<TPointD, TPointD>(TPointD(a.x, a.y),
 											   TPointD(b.x, b.y));
 		else
-			return pair<TPointD, TPointD>(TPointD(b.x, b.y),
+			return std::pair<TPointD, TPointD>(TPointD(b.x, b.y),
 										  TPointD(a.x, a.y));
 	} else {
 		double discr = bbY * bbY - 4 * aaY * ccY;
@@ -99,7 +99,7 @@ DVAPI std::pair<TPointD, TPointD> getMinMaxCubicBezierY(const TPointD &a,
 				return std::pair<TPointD, TPointD>(TPointD(a.x, a.y),
 												   TPointD(b.x, b.y));
 			else
-				return pair<TPointD, TPointD>(TPointD(b.x, b.y),
+				return std::pair<TPointD, TPointD>(TPointD(b.x, b.y),
 											  TPointD(a.x, a.y));
 		} else {
 			double sqrt_discr = sqrt(discr);
@@ -119,9 +119,9 @@ DVAPI std::pair<TPointD, TPointD> getMinMaxCubicBezierY(const TPointD &a,
 			double x_0 = aX * u0 * u0 * u0 + bX * u0 * u0 + cX * u0 + dX;
 			double x_1 = aX * u1 * u1 * u1 + bX * u1 * u1 + cX * u1 + dX;
 			if (y_0 < y_1)
-				return pair<TPointD, TPointD>(TPointD(x_0, y_0), TPointD(x_1, y_1));
+				return std::pair<TPointD, TPointD>(TPointD(x_0, y_0), TPointD(x_1, y_1));
 			else
-				return pair<TPointD, TPointD>(TPointD(x_1, y_1), TPointD(x_0, y_0));
+				return std::pair<TPointD, TPointD>(TPointD(x_1, y_1), TPointD(x_0, y_0));
 		}
 	}
 }

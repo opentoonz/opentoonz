@@ -33,13 +33,13 @@ DVAPI TRectD convertRasterToWorld(const TRect &area, const TRasterImageP ri);
 
 DVAPI TRasterImageP vectorToFullColorImage(const TVectorImageP &vi, const TAffine &aff, TPalette *palette,
 										   const TPointD &outputPos, const TDimension &outputSize,
-										   const vector<TRasterFxRenderDataP> *fxs = 0,
+											 const std::vector<TRasterFxRenderDataP> *fxs = 0,
 										   bool transformThickness = false);
 DVAPI TRect eraseRect(const TRasterImageP &ri, const TRectD &area);
-DVAPI vector<TRect> paste(const TRasterImageP &ti, const TTileSetFullColor *tileSet);
+DVAPI std::vector<TRect> paste(const TRasterImageP &ti, const TTileSetFullColor *tileSet);
 DVAPI void addSceneNumbering(const TRasterImageP &ri, int globalIndex,
-							 const wstring &sceneName, int sceneIndex);
-DVAPI void addGlobalNumbering(const TRasterImageP &ri, const wstring &sceneName, int globalIndex);
+							 const std::wstring &sceneName, int sceneIndex);
+DVAPI void addGlobalNumbering(const TRasterImageP &ri, const std::wstring &sceneName, int globalIndex);
 } //namespace
 
-#endif; //TRASTERIMAGE_UTILS_INCLUDED
+#endif //TRASTERIMAGE_UTILS_INCLUDED

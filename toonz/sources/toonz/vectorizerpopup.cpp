@@ -249,7 +249,7 @@ void Vectorizer::setLevel(const TXshSimpleLevelP &level)
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 
 	// Build the new level name
-	wstring levelName = sl->getName() + L"v";
+	std::wstring levelName = sl->getName() + L"v";
 	{
 		std::auto_ptr<NameBuilder> nameBuilder(NameBuilder::getBuilder(levelName));
 

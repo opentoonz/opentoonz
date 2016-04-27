@@ -431,7 +431,7 @@ public:
 };
 
 //==============================================================================
-#ifdef MACOSX
+#if defined(MACOSX) || defined(LINUX)
 template <class T>
 DVAPI TSoundTrackP TSoundTrackT<T>::apply(TSoundTransform *transform)
 {

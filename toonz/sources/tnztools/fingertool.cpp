@@ -60,13 +60,13 @@ namespace
 
 class FingerUndo : public TRasterUndo
 {
-	vector<TThickPoint> m_points;
+	std::vector<TThickPoint> m_points;
 	int m_styleId;
 	bool m_invert;
 
 public:
 	FingerUndo(TTileSetCM32 *tileSet,
-			   const vector<TThickPoint> &points,
+			   const std::vector<TThickPoint> &points,
 			   int styleId, bool invert,
 			   TXshSimpleLevel *level,
 			   const TFrameId &frameId)
@@ -248,7 +248,7 @@ public:
 	void onLeave();
 	void onActivate();
 	void onDeactivate();
-	bool onPropertyChanged(string propertyName);
+	bool onPropertyChanged(std::string propertyName);
 
 	TPropertyGroup *getProperties(int targetType) { return &m_prop; }
 	ToolType getToolType() const { return TTool::LevelWriteTool; }
@@ -316,7 +316,7 @@ const UINT pointCount = 20;
 
 //-----------------------------------------------------------------------------
 
-bool FingerTool::onPropertyChanged(string propertyName)
+bool FingerTool::onPropertyChanged(std::string propertyName)
 {
 	/*-- サイズ --*/
 	if (propertyName == m_toolSize.getName()) {

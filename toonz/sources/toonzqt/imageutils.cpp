@@ -52,7 +52,7 @@
 namespace
 {
 
-void addOverlappedRegions(TRegion *reg, vector<TFilledRegionInf> &regInf)
+void addOverlappedRegions(TRegion *reg, std::vector<TFilledRegionInf> &regInf)
 {
 	regInf.push_back(TFilledRegionInf(reg->getId(), reg->getStyle()));
 	UINT regNum = reg->getSubregionCount();
@@ -62,7 +62,7 @@ void addOverlappedRegions(TRegion *reg, vector<TFilledRegionInf> &regInf)
 
 //--------------------------------------------------------------------
 
-void addRegionsInArea(TRegion *reg, vector<TFilledRegionInf> &regs, const TRectD &area)
+void addRegionsInArea(TRegion *reg, std::vector<TFilledRegionInf> &regs, const TRectD &area)
 {
 	if (area.contains(reg->getBBox()))
 		regs.push_back(TFilledRegionInf(reg->getId(), reg->getStyle()));
@@ -148,7 +148,7 @@ TFilePath duplicate(const TFilePath &levelPath)
 	}
 
 	NameBuilder *nameBuilder = NameBuilder::getBuilder(toWideString(levelPath.getName()));
-	wstring levelNameOut;
+	std::wstring levelNameOut;
 	do
 		levelNameOut = nameBuilder->getNext();
 	while (TSystem::doesExistFileOrLevel(levelPath.withName(levelNameOut)));
@@ -281,7 +281,7 @@ void premultiply(const TFilePath &levelPath)
 
 void getFillingInformationOverlappingArea(
 	const TVectorImageP &vi,
-	vector<TFilledRegionInf> &regInf,
+	std::vector<TFilledRegionInf> &regInf,
 	const TRectD &area1,
 	const TRectD &area2)
 {
@@ -305,7 +305,7 @@ void getFillingInformationOverlappingArea(
 
 void getFillingInformationInArea(
 	const TVectorImageP &vi,
-	vector<TFilledRegionInf> &regs,
+	std::vector<TFilledRegionInf> &regs,
 	const TRectD &area)
 {
 	if (!vi->isComputedRegionAlmostOnce())
@@ -338,7 +338,7 @@ void assignFillingInformation(
 
 void getStrokeStyleInformationInArea(
 	const TVectorImageP &vi,
-	vector<pair<int, int>> &strokesInfo,
+	std::vector<std::pair<int, int>> &strokesInfo,
 	const TRectD &area)
 {
 	if (!vi->isComputedRegionAlmostOnce())
@@ -350,12 +350,12 @@ void getStrokeStyleInformationInArea(
 		if (!vi->inCurrentGroup(i))
 			continue;
 		if (area.contains(vi->getStroke(i)->getBBox()))
-			strokesInfo.push_back(pair<int, int>(i, vi->getStroke(i)->getStyle()));
+			strokesInfo.push_back(std::pair<int, int>(i, vi->getStroke(i)->getStyle()));
 	}
 }
 
 //--------------------------------------------------------------------
-void convertFromCM(const TLevelReaderP &lr, const TPaletteP &plt, const TLevelWriterP &lw, const vector<TFrameId> &frames,
+void convertFromCM(const TLevelReaderP &lr, const TPaletteP &plt, const TLevelWriterP &lw, const std::vector<TFrameId> &frames,
 				   const TAffine &aff, const TRop::ResampleFilterType &resType, FrameTaskNotifier *frameNotifier, const TPixel &bgColor, bool removeDotBeforeFrameNumber = false)
 {
 	for (int i = 0; i < (int)frames.size(); i++) {
@@ -390,7 +390,7 @@ void convertFromCM(const TLevelReaderP &lr, const TPaletteP &plt, const TLevelWr
 					TFilePath outPath = lw->getFilePath().withFrame(frames[i]);
 					/*--- フレーム番号と拡張子の文字数の合計。大抵8 ---*/
 					int index = 4 + 1 + outPath.getType().length();
-					wstring renamedStr = outPath.getWideString();
+					std::wstring renamedStr = outPath.getWideString();
 					if (renamedStr[renamedStr.length() - index - 1] == L'.')
 						renamedStr = renamedStr.substr(0, renamedStr.length() - index - 1) + renamedStr.substr(renamedStr.length() - index, index);
 
@@ -414,12 +414,12 @@ void convertFromCM(const TLevelReaderP &lr, const TPaletteP &plt, const TLevelWr
 
 //--------------------------------------------------------------------
 
-void convertFromVI(const TLevelReaderP &lr, const TPaletteP &plt, const TLevelWriterP &lw, const vector<TFrameId> &frames,
+void convertFromVI(const TLevelReaderP &lr, const TPaletteP &plt, const TLevelWriterP &lw, const std::vector<TFrameId> &frames,
 				   const TRop::ResampleFilterType &resType, int width, FrameTaskNotifier *frameNotifier)
 {
 	QString msg;
 	int i;
-	vector<TVectorImageP> images;
+	std::vector<TVectorImageP> images;
 	TRectD maxBbox;
 	for (i = 0; i < (int)frames.size(); i++) { //trovo la bbox che possa contenere tutte le immagini
 		try {
@@ -465,11 +465,11 @@ void convertFromVI(const TLevelReaderP &lr, const TPaletteP &plt, const TLevelWr
 
 //-----------------------------------------------------------------------
 
-void convertFromFullRaster(const TLevelReaderP &lr, const TLevelWriterP &lw, const vector<TFrameId> &_frames,
+void convertFromFullRaster(const TLevelReaderP &lr, const TLevelWriterP &lw, const std::vector<TFrameId> &_frames,
 						   const TAffine &aff, const TRop::ResampleFilterType &resType, FrameTaskNotifier *frameNotifier,
 						   const TPixel &bgColor, bool removeDotBeforeFrameNumber = false)
 {
-	vector<TFrameId> frames = _frames;
+	std::vector<TFrameId> frames = _frames;
 	if (frames.empty() && lr->loadInfo()->getFrameCount() == 1) //e' una immagine singola, non un livello
 		frames.push_back(TFrameId());
 
@@ -519,7 +519,7 @@ void convertFromFullRaster(const TLevelReaderP &lr, const TLevelWriterP &lw, con
 					TFilePath outPath = lw->getFilePath().withFrame(frames[i]);
 					/*--- フレーム番号と拡張子の文字数の合計。大抵8 ---*/
 					int index = 4 + 1 + outPath.getType().length();
-					wstring renamedStr = outPath.getWideString();
+					std::wstring renamedStr = outPath.getWideString();
 					if (renamedStr[renamedStr.length() - index - 1] == L'.')
 						renamedStr = renamedStr.substr(0, renamedStr.length() - index - 1) + renamedStr.substr(renamedStr.length() - index, index);
 					const TFilePath fp(renamedStr);
@@ -542,10 +542,10 @@ void convertFromFullRaster(const TLevelReaderP &lr, const TLevelWriterP &lw, con
 
 //-----------------------------------------------------------------------
 
-void convertFromVector(const TLevelReaderP &lr, const TLevelWriterP &lw, const vector<TFrameId> &_frames,
+void convertFromVector(const TLevelReaderP &lr, const TLevelWriterP &lw, const std::vector<TFrameId> &_frames,
 					   FrameTaskNotifier *frameNotifier)
 {
-	vector<TFrameId> frames = _frames;
+	std::vector<TFrameId> frames = _frames;
 	TLevelP lv = lr->loadInfo();
 	if (frames.empty() && lv->getFrameCount() == 1) //e' una immagine singola, non un livello
 		frames.push_back(TFrameId());
@@ -609,14 +609,14 @@ void convert(const TFilePath &source, const TFilePath &dest,
 		res.lx = info->m_lx;
 		res.ly = info->m_ly;
 
-		string codecName = prop->getProperty(0)->getValueAsString();
+		std::string codecName = prop->getProperty(0)->getValueAsString();
 		if (!AviCodecRestrictions::canWriteMovie(toWideString(codecName), res)) {
 			return;
 			//QString msg=QObject::tr("The image resolution does not fit the chosen output file format.");
 			//DVGui::MsgBox(DVGui::WARNING,msg);
 		}
 	}
-#endif;
+#endif
 
 	// Get the frames available in level inside the [from, to] range
 	std::vector<TFrameId> frames;
@@ -651,7 +651,7 @@ void convertNaa2Tlv(
 	TLevelP level = lr->loadInfo();
 
 	// Get the frames available in level inside the [from, to] range
-	vector<TFrameId> frames;
+	std::vector<TFrameId> frames;
 	getFrameIds(from, to, level, frames);
 
 	if (frames.empty())

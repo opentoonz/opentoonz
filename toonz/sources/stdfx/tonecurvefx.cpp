@@ -39,7 +39,7 @@ int getLinearYfromX(TSegment t, int x, double &s0, double &s1)
 }
 
 template <typename PIXEL, typename T>
-void fill_lut(QList<TPointD> points, vector<T> &lut, bool isLinear)
+void fill_lut(QList<TPointD> points, std::vector<T> &lut, bool isLinear)
 {
 	int i;
 	TPointD p0 = points.at(0);
@@ -181,12 +181,12 @@ void doToneCurveFx(TRasterPT<PIXEL> ras, double frame, const TToneCurveParam *to
 		}
 	}
 
-	vector<CHANNEL_TYPE> rgbaLut(PIXEL::maxChannelValue + 1);
-	vector<CHANNEL_TYPE> rgbLut(PIXEL::maxChannelValue + 1);
-	vector<CHANNEL_TYPE> rLut(PIXEL::maxChannelValue + 1);
-	vector<CHANNEL_TYPE> gLut(PIXEL::maxChannelValue + 1);
-	vector<CHANNEL_TYPE> bLut(PIXEL::maxChannelValue + 1);
-	vector<CHANNEL_TYPE> aLut(PIXEL::maxChannelValue + 1);
+	std::vector<CHANNEL_TYPE> rgbaLut(PIXEL::maxChannelValue + 1);
+	std::vector<CHANNEL_TYPE> rgbLut(PIXEL::maxChannelValue + 1);
+	std::vector<CHANNEL_TYPE> rLut(PIXEL::maxChannelValue + 1);
+	std::vector<CHANNEL_TYPE> gLut(PIXEL::maxChannelValue + 1);
+	std::vector<CHANNEL_TYPE> bLut(PIXEL::maxChannelValue + 1);
+	std::vector<CHANNEL_TYPE> aLut(PIXEL::maxChannelValue + 1);
 
 	fill_lut<PIXEL, CHANNEL_TYPE>(pointsList[0], rgbaLut, isLinear);
 	fill_lut<PIXEL, CHANNEL_TYPE>(pointsList[1], rgbLut, isLinear);

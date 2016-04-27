@@ -27,20 +27,20 @@ class DVAPI TMacroFx : public TRasterFx
 	FX_DECLARATION(TMacroFx)
 
 	TRasterFxP m_root;
-	vector<TFxP> m_fxs;
+	std::vector<TFxP> m_fxs;
 	bool m_isEditing;
 
 	bool isaLeaf(TFx *fx) const;
 
 public:
-	static bool analyze(const vector<TFxP> &fxs,
+	static bool analyze(const std::vector<TFxP> &fxs,
 						TFxP &root,
-						vector<TFxP> &roots,
-						vector<TFxP> &leafs);
+						std::vector<TFxP> &roots,
+						std::vector<TFxP> &leafs);
 
-	static bool analyze(const vector<TFxP> &fxs);
+	static bool analyze(const std::vector<TFxP> &fxs);
 
-	static TMacroFx *create(const vector<TFxP> &fxs);
+	static TMacroFx *create(const std::vector<TFxP> &fxs);
 
 	TMacroFx();
 	~TMacroFx();
@@ -55,22 +55,22 @@ public:
 
 	TFxTimeRegion getTimeRegion() const;
 
-	string getPluginId() const;
+	std::string getPluginId() const;
 
 	void setRoot(TFx *root);
 	TFx *getRoot() const;
 	//!Returns the Fx identified by \b id.
 	//!Returns 0 if the macro does not contains an Fx with fxId equals ti \b id.
-	TFx *getFxById(const wstring &id) const;
+	TFx *getFxById(const std::wstring &id) const;
 
 	// restituisce un riferimento al vettore contenente gli effetti contenuti nel macroFx
-	const vector<TFxP> &getFxs() const;
+	const std::vector<TFxP> &getFxs() const;
 
-	string getMacroFxType() const;
+	std::string getMacroFxType() const;
 
 	bool canHandle(const TRenderSettings &info, double frame);
 
-	string getAlias(double frame, const TRenderSettings &info) const;
+	std::string getAlias(double frame, const TRenderSettings &info) const;
 
 	void loadData(TIStream &is);
 	void saveData(TOStream &os);

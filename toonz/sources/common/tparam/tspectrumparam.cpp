@@ -13,7 +13,7 @@
 
 #include "tspectrumparam.h"
 
-typedef pair<TDoubleParamP, TPixelParamP> ColorKeyParam;
+typedef std::pair<TDoubleParamP, TPixelParamP> ColorKeyParam;
 
 //=========================================================
 
@@ -400,7 +400,7 @@ void TSpectrumParam::loadData(TIStream &is)
 {
 	assert(m_imp);
 	m_imp->clearKeys();
-	string tagName;
+	std::string tagName;
 	is.openChild(tagName);
 	assert(tagName == "spectrum");
 	while (!is.eos()) {
@@ -463,9 +463,9 @@ bool TSpectrumParam::isNotificationEnabled() const
 namespace
 {
 
-inline string toString(const TPixel32 &color)
+inline std::string toString(const TPixel32 &color)
 {
-	string alias = "(";
+	std::string alias = "(";
 	alias += ::toString(color.r) + ",";
 	alias += ::toString(color.g) + ",";
 	alias += ::toString(color.b) + ",";
@@ -474,9 +474,9 @@ inline string toString(const TPixel32 &color)
 	return alias;
 }
 
-inline string toString(const TSpectrum::ColorKey &key, int precision)
+inline std::string toString(const TSpectrum::ColorKey &key, int precision)
 {
-	string alias = "(";
+	std::string alias = "(";
 	alias += ::toString(key.first, precision) + ",";
 	alias += toString(key.second);
 	alias += ")";
@@ -485,7 +485,7 @@ inline string toString(const TSpectrum::ColorKey &key, int precision)
 
 } // namespace
 
-string TSpectrumParam::getValueAlias(double frame, int precision)
+std::string TSpectrumParam::getValueAlias(double frame, int precision)
 {
 	std::vector<TSpectrum::ColorKey> keys;
 	int keyCount = m_imp->getKeyCount();
@@ -497,7 +497,7 @@ string TSpectrumParam::getValueAlias(double frame, int precision)
 		keys.push_back(key);
 	}
 
-	string alias = "(";
+	std::string alias = "(";
 
 	if (!keys.empty()) {
 		std::vector<TSpectrum::ColorKey>::iterator it = keys.begin();

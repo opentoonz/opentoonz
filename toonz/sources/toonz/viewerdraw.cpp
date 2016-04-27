@@ -59,7 +59,7 @@ void getSafeAreaSizeList(QList<QList<double>> &_sizeList)
 		projectPath = fp;
 		safeAreaName = currentSafeAreaName;
 
-		string safeAreaFileName = "safeArea.ini";
+		std::string safeAreaFileName = "safeArea.ini";
 
 		while (!TFileStatus(fp + safeAreaFileName).doesExist() && !fp.isRoot() && fp.getParentDir() != TFilePath())
 			fp = fp.getParentDir();
@@ -626,7 +626,7 @@ void ViewerDraw::drawCamera(unsigned long flags, double pixelSize)
 	// nome della camera
 	if (!camera3d) {
 		TPointD pos = rect.getP01() + TPointD(0, 4);
-		string name;
+		std::string name;
 		if (CleanupPreviewCheck::instance()->isEnabled())
 			name = "Cleanup Camera";
 		else
@@ -738,7 +738,7 @@ void ViewerDraw::drawFieldGuide()
 	glEnd();
 	for (i = 1; i <= n; i++) {
 		TPointD delta = 0.03 * TPointD(ux, uy);
-		string s = toString(i);
+		std::string s = toString(i);
 		tglDrawText(TPointD(0, i * uy) + delta, s);
 		tglDrawText(TPointD(0, -i * uy) + delta, s);
 		tglDrawText(TPointD(-i * ux, 0) + delta, s);

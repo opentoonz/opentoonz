@@ -193,7 +193,7 @@ class DVAPI ParamViewer : public QFrame
 	TFxP m_fx;
 
 	QStackedWidget *m_tablePageSet;
-	QMap<string, int> m_tableFxIndex;
+	QMap<std::string, int> m_tableFxIndex;
 
 public:
 #if QT_VERSION >= 0x050500

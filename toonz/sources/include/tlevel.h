@@ -28,7 +28,7 @@ public:
 	typedef Table::iterator Iterator;
 
 private:
-	string m_name;
+	std::string m_name;
 	Table *m_table;
 	TPalette *m_palette;
 
@@ -43,8 +43,8 @@ private:
 
 public:
 	// nome
-	string getName() const;
-	void setName(string name);
+	std::string getName() const;
+	void setName(std::string name);
 
 	// frames
 	int getFrameCount() const { return (int)m_table->size(); };

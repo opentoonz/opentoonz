@@ -182,11 +182,11 @@ public:
 		if (m_outputImage)
 			m_outputImage->setImg(img);
 		else if (m_outputLevel) {
-			std::vector<string> ids;
+			std::vector<std::string> ids;
 			for (int i = 0; i < (int)renderData.m_frames.size(); i++) {
 				TFrameId fid((int)(renderData.m_frames[i]) + 1);
 				m_outputLevel->setFrame(fid, img);
-				string id = m_outputLevel->getSimpleLevel()->getImageId(fid);
+				std::string id = m_outputLevel->getSimpleLevel()->getImageId(fid);
 				ids.push_back(id);
 			}
 			img = TImageP();

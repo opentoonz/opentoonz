@@ -123,13 +123,13 @@ class FxPainter : public QObject, public QGraphicsItem
 	eFxType m_type;
 
 	//to obtain the fx icons for zoom out view of the schematic
-	string m_fxType;
+	std::string m_fxType;
 
 	QLinearGradient getGradientByLevelType(eFxType);
 	void paint_small(QPainter *painter);
 
 public:
-	FxPainter(FxSchematicNode *parent, double width, double height, const QString &name, eFxType type, string fxType);
+	FxPainter(FxSchematicNode *parent, double width, double height, const QString &name, eFxType type, std::string fxType);
 	~FxPainter();
 
 	QRectF boundingRect() const;
@@ -238,7 +238,7 @@ private:
 	//!Handles hiding of existing link and showing of ghost links for snapping after creation link only for fx having
 	//!dynamic ports.
 	//!If \b secondIndex is -1 consider the last port in the groupedPorts of the node.
-	void handleSnappedLinksOnDynamicPortFx(const vector<TFxPort *> &groupedPorts, int targetIndex, int startIndex = -1);
+	void handleSnappedLinksOnDynamicPortFx(const std::vector<TFxPort *> &groupedPorts, int targetIndex, int startIndex = -1);
 
 	void resetSnappedLinksOnDynamicPortFx();
 
@@ -547,7 +547,7 @@ class FxGroupNode : public FxSchematicNode
 
 public:
 	FxGroupNode(FxSchematicScene *scene, const QList<TFxP> &groupedFx, const QList<TFxP> &roots,
-				int groupId, const wstring &groupName);
+				int groupId, const std::wstring &groupName);
 	~FxGroupNode();
 
 	QRectF boundingRect() const;

@@ -671,7 +671,7 @@ void FilmstripFrames::mousePressEvent(QMouseEvent *event)
 		} else {
 			//move current frame when clicked without modifier
 			TApp *tapp = TApp::instance();
-			vector<TFrameId> fids;
+			std::vector<TFrameId> fids;
 			TXshLevel *level = tapp->getCurrentLevel()->getLevel();
 			level->getFids(fids);
 
@@ -1108,7 +1108,7 @@ void Filmstrip::onChooseLevelComboChanged(int index)
 	if (index == m_chooseLevelCombo->findText(tr("- No Current Level -")))
 		tapp->getCurrentLevel()->setLevel(0);
 	else {
-		vector<TFrameId> fids;
+		std::vector<TFrameId> fids;
 		m_levels[index]->getFids(fids);
 		tapp->getCurrentFrame()->setFrameIds(fids);
 
@@ -1345,7 +1345,7 @@ void Filmstrip::onLevelSwitched(TXshLevel *oldLevel)
 		TXshLevel *sl = TApp::instance()->getCurrentLevel()->getLevel();
 		if (!sl)
 			return;
-		vector<TFrameId> fids;
+		std::vector<TFrameId> fids;
 		sl->getFids(fids);
 		removeIcons(sl, fids, true);
 	}

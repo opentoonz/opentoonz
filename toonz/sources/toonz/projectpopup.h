@@ -35,11 +35,11 @@ public:
 class ProjectDvDirModelFileFolderNode : public DvDirModelFileFolderNode
 {
 public:
-	ProjectDvDirModelFileFolderNode(DvDirModelNode *parent, wstring name, const TFilePath &path)
+	ProjectDvDirModelFileFolderNode(DvDirModelNode *parent, std::wstring name, const TFilePath &path)
 		: DvDirModelFileFolderNode(parent, name, path) {}
 	ProjectDvDirModelFileFolderNode(DvDirModelNode *parent, const TFilePath &path)
 		: DvDirModelFileFolderNode(parent, path) {}
-	DvDirModelNode *makeChild(wstring name);
+	DvDirModelNode *makeChild(std::wstring name);
 	DvDirModelFileFolderNode *createNode(DvDirModelNode *parent, const TFilePath &path);
 };
 
@@ -51,7 +51,7 @@ class ProjectDvDirModelSpecialFileFolderNode : public ProjectDvDirModelFileFolde
 	QPixmap m_pixmap;
 
 public:
-	ProjectDvDirModelSpecialFileFolderNode(DvDirModelNode *parent, wstring name, const TFilePath &path)
+	ProjectDvDirModelSpecialFileFolderNode(DvDirModelNode *parent, std::wstring name, const TFilePath &path)
 		: ProjectDvDirModelFileFolderNode(parent, name, path) {}
 	QPixmap getPixmap(bool isOpen) const { return m_pixmap; }
 	void setPixmap(const QPixmap &pixmap) { m_pixmap = pixmap; }
@@ -83,7 +83,7 @@ public:
 	DvDirModelNode *getNode(const QModelIndex &index) const;
 	QModelIndex index(int row, int column, const QModelIndex &parent) const;
 	QModelIndex parent(const QModelIndex &index) const;
-	QModelIndex childByName(const QModelIndex &parent, const wstring &name) const;
+	QModelIndex childByName(const QModelIndex &parent, const std::wstring &name) const;
 	int columnCount(const QModelIndex &parent) const { return 1; }
 	QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 	Qt::ItemFlags flags(const QModelIndex &index) const;

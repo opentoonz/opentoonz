@@ -50,8 +50,8 @@ class DVAPI TXshLevel : public QObject, public TSmartObject, public TPersist
 {
 	Q_OBJECT
 protected:
-	wstring m_name;
-	wstring m_shortName;
+	std::wstring m_name;
+	std::wstring m_shortName;
 
 	/*!
     Identify level types defined in \b txshleveltypes.h
@@ -67,14 +67,14 @@ public:
 	/*!
     Constructs a TXshLevel with \b TXshLevel name \b name
   */
-	TXshLevel(ClassCode classCode, wstring name);
+	TXshLevel(ClassCode classCode, std::wstring name);
 
 	/*!
     Destroys the TXshLevel object.
   */
 	virtual ~TXshLevel();
 
-	void setName(wstring name);
+	void setName(std::wstring name);
 
 	//! return the level type (types are defined in \b txshleveltypes.h); \sa setType()
 	int getType() const { return m_type; }
@@ -109,10 +109,10 @@ public:
 	virtual TXshSoundTextLevel *getSoundTextLevel() { return 0; }
 
 	//! Return level name. \sa getShortName()
-	wstring getName() const { return m_name; }
+	std::wstring getName() const { return m_name; }
 
 	//! Return level short name. \sa getName()
-	wstring getShortName() const { return m_shortName; }
+	std::wstring getShortName() const { return m_shortName; }
 
 	//! Return the file path associated with the level
 	virtual TFilePath getPath() const { return TFilePath(); }

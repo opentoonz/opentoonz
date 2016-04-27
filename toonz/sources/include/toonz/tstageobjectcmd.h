@@ -28,15 +28,15 @@ class TStageObject;
 namespace TStageObjectCmd
 {
 
-DVAPI void rename(const TStageObjectId &id, string name, TXsheetHandle *xshHandle);
+DVAPI void rename(const TStageObjectId &id, std::string name, TXsheetHandle *xshHandle);
 DVAPI void resetOffset(const TStageObjectId &id, TXsheetHandle *xshHandle);
 DVAPI void resetCenterAndOffset(const TStageObjectId &id, TXsheetHandle *xshHandle);
 DVAPI void resetPosition(const TStageObjectId &id, TXsheetHandle *xshHandle);
-DVAPI void setHandle(const TStageObjectId &id, string handle, TXsheetHandle *xshHandle);
-DVAPI void setParentHandle(const std::vector<TStageObjectId> &ids, string handle, TXsheetHandle *xshHandle);
+DVAPI void setHandle(const TStageObjectId &id, std::string handle, TXsheetHandle *xshHandle);
+DVAPI void setParentHandle(const std::vector<TStageObjectId> &ids, std::string handle, TXsheetHandle *xshHandle);
 DVAPI void setParent(const TStageObjectId &id,
 					 TStageObjectId parentId,
-					 string parentHandle,
+					 std::string parentHandle,
 					 TXsheetHandle *xshHandle, bool doUndo = true);
 DVAPI void setSplineParent(TStageObjectSpline *spline, TStageObject *parentObj, TXsheetHandle *xshHandle);
 
@@ -52,7 +52,7 @@ DVAPI void deleteSelection(const std::vector<TStageObjectId> &objIds,
 						   TFxHandle *fxHandle, bool doUndo = true);
 DVAPI void group(const QList<TStageObjectId> ids, TXsheetHandle *xshHandle);
 DVAPI void ungroup(int groupId, TXsheetHandle *xshHandle);
-DVAPI void renameGroup(const QList<TStageObject *> objs, const wstring &name, bool fromEditor, TXsheetHandle *xshHandle);
+DVAPI void renameGroup(const QList<TStageObject *> objs, const std::wstring &name, bool fromEditor, TXsheetHandle *xshHandle);
 DVAPI void duplicateObject(const QList<TStageObjectId> ids, TXsheetHandle *xshHandle);
 DVAPI void enableSplineAim(TStageObject *obj, int state, TXsheetHandle *xshHandle);
 DVAPI void enableSplineUppk(TStageObject *obj, bool toggled, TXsheetHandle *xshHandle);

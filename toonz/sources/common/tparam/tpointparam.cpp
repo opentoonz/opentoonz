@@ -99,7 +99,7 @@ void TPointParam::setDefaultValue(const TPointD &p)
 
 void TPointParam::loadData(TIStream &is)
 {
-	string childName;
+	std::string childName;
 	while (is.openChild(childName)) {
 		if (childName == "x")
 			m_data->m_x->loadData(is);

@@ -94,8 +94,8 @@ public:
 
 	void setRange(const QString &str);
 
-	vector<int> getInkIndexes();
-	vector<TFrameId> getFrames();
+	std::vector<int> getInkIndexes();
+	std::vector<TFrameId> getFrames();
 };
 
 //==========================================================================
@@ -106,4 +106,4 @@ void mergeColumns(int dstColumn, int srcColumn, bool isRedo);
 void mergeColumns(const std::set<int> &columns);
 void doMatchlines(int column, int mColumn, int index, int inkPrevalence, int MatchlineSessionId = 0);
 void mergeCmapped(int dstColumn, int srcColumn, const QString &fullpath, bool isRedo);
-vector<int> string2Indexes(const QString &values);
+std::vector<int> string2Indexes(const QString &values);

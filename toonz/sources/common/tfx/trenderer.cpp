@@ -109,7 +109,7 @@ inline void interlace(TRasterP f0, const TRasterP &f1, int field)
 
 class RasterItem
 {
-	string m_rasterId;
+	std::string m_rasterId;
 
 public:
 	int m_bpp;
@@ -1296,7 +1296,7 @@ std::vector<const TFx *> calculateSortedFxs(TRasterFxP rootFx)
 
 //---------------------------------------------------------
 
-void TRendererImp::startRendering(unsigned long renderId, const vector<TRenderer::RenderData> &renderDatas)
+void TRendererImp::startRendering(unsigned long renderId, const std::vector<TRenderer::RenderData> &renderDatas)
 {
 	rootFx = renderDatas.front().m_fxRoot.m_frameA;
 	int T = renderDatas.size();
@@ -1483,7 +1483,7 @@ void TRendererImp::startRendering(unsigned long renderId, const vector<TRenderer
 
 		double frame = renderData.m_frame;
 
-		string alias = fx->getAlias(frame, renderData.m_info);
+		std::string alias = fx->getAlias(frame, renderData.m_info);
 		if (renderData.m_fxRoot.m_frameB)
 			alias = alias + renderData.m_fxRoot.m_frameB->getAlias(frame, renderData.m_info);
 

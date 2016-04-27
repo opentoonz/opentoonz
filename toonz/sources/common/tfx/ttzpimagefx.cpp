@@ -9,7 +9,7 @@
 //    Global  functions
 //**********************************************************************************************
 
-void parseIndexes(string indexes, vector<string> &items)
+void parseIndexes(std::string indexes, std::vector<std::string> &items)
 {
 #ifdef _WIN32
 	char seps[] = " ,;";
@@ -37,13 +37,13 @@ void parseIndexes(string indexes, vector<string> &items)
 
 //-------------------------------------------------------------------
 
-void insertIndexes(vector<string> items, PaletteFilterFxRenderData *t)
+void insertIndexes(std::vector<std::string> items, PaletteFilterFxRenderData *t)
 {
 #ifdef _WIN32
 	for (int i = 0; i < (int)items.size(); i++) {
 		char *starttoken, *endtoken;
 		char subseps[] = "-";
-		string tmp = items[i];
+		std::string tmp = items[i];
 		char *context = 0;
 		starttoken = strtok_s((char *)tmp.c_str(), subseps, &context);
 		endtoken = strtok_s(NULL, subseps, &context);
@@ -65,7 +65,7 @@ void insertIndexes(vector<string> items, PaletteFilterFxRenderData *t)
 	for (int i = 0; i < (int)items.size(); i++) {
 		char *starttoken, *endtoken;
 		char subseps[] = "-";
-		string tmp = items[i];
+		std::string tmp = items[i];
 		starttoken = strtok((char *)tmp.c_str(), subseps);
 		endtoken = strtok(NULL, subseps);
 		if (!endtoken && isInt(starttoken)) {
@@ -89,7 +89,7 @@ void insertIndexes(vector<string> items, PaletteFilterFxRenderData *t)
 //    ExternalPaletteFxRenderData  implementation
 //**********************************************************************************************
 
-ExternalPaletteFxRenderData::ExternalPaletteFxRenderData(TPaletteP palette, const string &name)
+ExternalPaletteFxRenderData::ExternalPaletteFxRenderData(TPaletteP palette, const std::string &name)
 	: m_palette(palette), m_name(name)
 {
 }
@@ -103,7 +103,7 @@ bool ExternalPaletteFxRenderData::operator==(const TRasterFxRenderData &data) co
 
 //------------------------------------------------------------------------------
 
-string ExternalPaletteFxRenderData::toString() const
+std::string ExternalPaletteFxRenderData::toString() const
 {
 	return m_name;
 }
@@ -131,9 +131,9 @@ bool PaletteFilterFxRenderData::operator==(const TRasterFxRenderData &data) cons
 
 //------------------------------------------------------------------------------
 
-string PaletteFilterFxRenderData::toString() const
+std::string PaletteFilterFxRenderData::toString() const
 {
-	string alias;
+	std::string alias;
 	std::set<int>::const_iterator it = m_colors.begin();
 	for (; it != m_colors.end(); ++it)
 		alias += ::toString(*it);
@@ -198,9 +198,9 @@ bool SandorFxRenderData::operator==(const TRasterFxRenderData &data) const
 
 //------------------------------------------------------------------------------
 
-string SandorFxRenderData::toString() const
+std::string SandorFxRenderData::toString() const
 {
-	string alias;
+	std::string alias;
 	if (m_type == BlendTz) {
 		alias += ::toString(m_blendParams.m_colorIndex) + " ";
 		alias += ::toString(m_blendParams.m_smoothness) + " ";
@@ -249,8 +249,8 @@ TRectD SandorFxRenderData::getBBoxEnlargement(const TRectD &bbox)
 	case BlendTz: {
 		//Nothing happen, unless we have color 0 among the blended ones. In such case,
 		//we have to enlarge the bbox proportionally to the amount param.
-		vector<string> items;
-		string indexes = std::string(m_argv[0]);
+		std::vector<std::string> items;
+		std::string indexes = std::string(m_argv[0]);
 		parseIndexes(indexes, items);
 		PaletteFilterFxRenderData paletteFilterData;
 		insertIndexes(items, &paletteFilterData);

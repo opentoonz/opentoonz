@@ -15,7 +15,7 @@
 
 #ifdef _WIN32
 #include "avicodecrestrictions.h"
-#endif;
+#endif
 
 // TnzCore includes
 #include "tlevel_io.h"
@@ -78,7 +78,7 @@ FormatSettingsPopup::FormatSettingsPopup(
 		m_mainLayout->addWidget(m_configureCodec, m_mainLayout->rowCount(), 0, 1, 2);
 		connect(m_configureCodec, SIGNAL(released()), this, SLOT(onAviCodecConfigure()));
 	}
-#endif;
+#endif
 
 	m_topLayout->addLayout(m_mainLayout, 1);
 }
@@ -110,10 +110,10 @@ void FormatSettingsPopup::buildPropertyComboBox(int index, TPropertyGroup *props
 	connect(comboBox, SIGNAL(currentIndexChanged(const QString)), this, SLOT(onComboBoxIndexChanged(const QString)));
 	TEnumProperty::Range range = prop->getRange();
 	int currIndex = -1;
-	wstring defaultVal = prop->getValue();
+	std::wstring defaultVal = prop->getValue();
 
 	for (int i = 0; i < (int)range.size(); i++) {
-		wstring nameProp = range[i];
+		std::wstring nameProp = range[i];
 
 		if (nameProp.find(L"16(GREYTONES)") != -1) //pezza per il tif: il 16 lo scrive male, e il 48 lo legge male...
 			continue;
@@ -134,7 +134,7 @@ void FormatSettingsPopup::buildPropertyComboBox(int index, TPropertyGroup *props
 #ifdef _WIN32
 	if (m_format == "avi")
 		m_codecComboBox = comboBox;
-#endif;
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -203,7 +203,7 @@ void FormatSettingsPopup::onComboBoxIndexChanged(const QString codecName)
 void FormatSettingsPopup::onAviCodecConfigure()
 {
 	QString codecName = m_codecComboBox->currentText();
-	wstring wCodecName = codecName.toStdWString();
+	std::wstring wCodecName = codecName.toStdWString();
 	if (AviCodecRestrictions::canBeConfigured(wCodecName))
 		AviCodecRestrictions::openConfiguration(wCodecName, (HWND)winId());
 }
@@ -236,11 +236,11 @@ void FormatSettingsPopup::showEvent(QShowEvent *se)
 
 		TEnumProperty::Range range = eProps->getRange();
 		int currIndex = -1;
-		wstring defaultVal = eProps->getValue();
+		std::wstring defaultVal = eProps->getValue();
 
-		QMap<wstring, bool> usableCodecs = AviCodecRestrictions::getUsableCodecs(res);
+		QMap<std::wstring, bool> usableCodecs = AviCodecRestrictions::getUsableCodecs(res);
 		for (int i = 0; i < (int)range.size(); i++) {
-			wstring nameProp = range[i];
+			std::wstring nameProp = range[i];
 			if (nameProp == L"Uncompressed" || (usableCodecs.contains(nameProp) && usableCodecs[nameProp])) {
 				if (nameProp == defaultVal)
 					currIndex = m_codecComboBox->count();

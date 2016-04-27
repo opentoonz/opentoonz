@@ -145,7 +145,7 @@ class RasterTapeTool : public TTool
 	double m_thick;
 	TStroke *m_stroke;
 	TStroke *m_firstStroke;
-	vector<TPointD> m_polyline;
+	std::vector<TPointD> m_polyline;
 	bool m_firstTime;
 
 public:
@@ -221,7 +221,7 @@ public:
 		params.m_closingDistance = (int)(m_distance.getValue());
 		params.m_spotAngle = (int)(m_angle.getValue());
 		params.m_opacity = m_opacity.getValue();
-		string inkString = toString(m_inkIndex.getValue());
+		std::string inkString = toString(m_inkIndex.getValue());
 		int inkIndex = TTool::getApplication()->getCurrentLevelStyleIndex(); //TApp::instance()->getCurrentPalette()->getStyleIndex();
 		if (isInt(inkString))
 			inkIndex = toInt(inkString);
@@ -255,14 +255,14 @@ public:
 
 		TAutocloser ac(ras, params.m_closingDistance, params.m_spotAngle, params.m_inkIndex, params.m_opacity);
 
-		vector<TAutocloser::Segment> segments;
+		std::vector<TAutocloser::Segment> segments;
 		ac.compute(segments);
 
 		if ((m_closeType.getValue() == FREEHAND_CLOSE || m_closeType.getValue() == POLYLINE_CLOSE) &&
 			stroke)
 			checkSegments(segments, stroke, raux, delta);
 
-		vector<TAutocloser::Segment> segments2(segments);
+		std::vector<TAutocloser::Segment> segments2(segments);
 
 		/*-- segmentが取得できなければfalseを返す --*/
 		if (segments2.empty())
@@ -310,7 +310,7 @@ public:
 			backward = true;
 		}
 		assert(firstFid <= lastFid);
-		vector<TFrameId> allFids;
+		std::vector<TFrameId> allFids;
 		m_level->getFids(allFids);
 
 		std::vector<TFrameId>::iterator i0 = allFids.begin();
@@ -322,7 +322,7 @@ public:
 		while (i1 != allFids.end() && *i1 <= lastFid)
 			i1++;
 		assert(i0 < i1);
-		vector<TFrameId> fids(i0, i1);
+		std::vector<TFrameId> fids(i0, i1);
 		int m = fids.size();
 		assert(m > 0);
 
@@ -490,7 +490,7 @@ public:
 
 	//------------------------------------------------------------
 
-	bool onPropertyChanged(string propertyName)
+	bool onPropertyChanged(std::string propertyName)
 	{
 		if (propertyName == m_closeType.getName()) {
 			AutocloseVectorType = toString(m_closeType.getValue());
@@ -618,7 +618,7 @@ public:
 		if (m_closeType.getValue() == POLYLINE_CLOSE && ti) {
 			closePolyline(pos);
 
-			vector<TThickPoint> strokePoints;
+			std::vector<TThickPoint> strokePoints;
 			for (UINT i = 0; i < m_polyline.size() - 1; i++) {
 				strokePoints.push_back(TThickPoint(m_polyline[i], 1));
 				strokePoints.push_back(TThickPoint(0.5 * (m_polyline[i] + m_polyline[i + 1]), 1));
@@ -806,7 +806,7 @@ public:
 	//-------------------------------------------------------------------
 
 	//! Elimina i segmenti che non sono contenuti all'interno dello stroke!!!
-	void checkSegments(vector<TAutocloser::Segment> &segments, TStroke *stroke,
+	void checkSegments(std::vector<TAutocloser::Segment> &segments, TStroke *stroke,
 					   const TRasterCM32P &ras, const TPoint &delta)
 	{
 		TVectorImage vi;
@@ -815,7 +815,7 @@ public:
 		app->transform(TTranslation(convert(ras->getCenter())));
 		vi.addStroke(app);
 		vi.findRegions();
-		vector<TAutocloser::Segment>::iterator it = segments.begin();
+		std::vector<TAutocloser::Segment>::iterator it = segments.begin();
 		for (; it < segments.end(); it++) {
 			if (it == segments.end())
 				break;

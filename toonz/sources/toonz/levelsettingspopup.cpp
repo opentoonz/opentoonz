@@ -759,7 +759,7 @@ void LevelSettingsPopup::onScanPathChanged()
 	if (TSystem::doesExistFileOrLevel(settingsPath)) {
 		TIStream is(settingsPath);
 		TFilePath cleanupLevelPath;
-		string tagName;
+		std::string tagName;
 		while (is.matchTag(tagName)) {
 			if (tagName == "cleanupPalette" || tagName == "cleanupCamera" || tagName == "autoCenter" || tagName == "transform" || tagName == "lineProcessing" || tagName == "closestField" || tagName == "fdg") {
 				is.skipCurrentTag();
@@ -819,7 +819,7 @@ void LevelSettingsPopup::onDpiFieldChanged()
 	if (!m_sl || m_sl->getType() == PLI_XSHLEVEL)
 		return;
 
-	string s = w.toStdString();
+	std::string s = w.toStdString();
 	TPointD dpi;
 
 	int i = 0, len = s.length();

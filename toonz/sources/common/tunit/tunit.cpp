@@ -97,7 +97,7 @@ public:
 
 //===================================================================
 
-TUnit::TUnit(wstring ext, TUnitConverter *converter)
+TUnit::TUnit(std::wstring ext, TUnitConverter *converter)
 	: m_defaultExtension(ext), m_converter(converter)
 {
 	m_extensions.push_back(ext);
@@ -121,7 +121,7 @@ TUnit::~TUnit()
 
 //-------------------------------------------------------------------
 
-void TUnit::addExtension(wstring ext)
+void TUnit::addExtension(std::wstring ext)
 {
 	if (std::find(
 			m_extensions.begin(), m_extensions.end(), ext) == m_extensions.end())
@@ -132,7 +132,7 @@ void TUnit::addExtension(wstring ext)
 
 //-------------------------------------------------------------------
 
-bool TUnit::isExtension(wstring ext) const
+bool TUnit::isExtension(std::wstring ext) const
 {
 	return std::find(
 			   m_extensions.begin(), m_extensions.end(), ext) != m_extensions.end();
@@ -140,7 +140,7 @@ bool TUnit::isExtension(wstring ext) const
 
 //-------------------------------------------------------------------
 
-void TUnit::setDefaultExtension(wstring ext)
+void TUnit::setDefaultExtension(std::wstring ext)
 {
 	if (!ext.empty() && std::find(m_extensions.begin(), m_extensions.end(), ext) == m_extensions.end())
 		m_extensions.push_back(ext);
@@ -149,7 +149,7 @@ void TUnit::setDefaultExtension(wstring ext)
 
 //===================================================================
 
-TMeasure::TMeasure(string name, TUnit *mainUnit)
+TMeasure::TMeasure(std::string name, TUnit *mainUnit)
 	: m_name(name), m_mainUnit(0), m_standardUnit(0), m_currentUnit(0), m_defaultValue(0)
 {
 	add(mainUnit);
@@ -161,12 +161,12 @@ TMeasure::TMeasure(string name, TUnit *mainUnit)
 TMeasure::TMeasure(const TMeasure &src)
 	: m_name(src.m_name), m_mainUnit(src.m_mainUnit), m_currentUnit(src.m_currentUnit), m_standardUnit(src.m_standardUnit), m_defaultValue(src.m_defaultValue)
 {
-	std::map<wstring, TUnit *>::const_iterator it;
+	std::map<std::wstring, TUnit *>::const_iterator it;
 	for (it = src.m_extensions.begin();
 		 it != src.m_extensions.end(); ++it) {
 		TUnit *u = it->second;
 		assert(u);
-		const std::vector<wstring> &e = u->getExtensions();
+		const std::vector<std::wstring> &e = u->getExtensions();
 		assert(std::find(e.begin(), e.end(), it->first) != e.end());
 		m_extensions[it->first] = u;
 	}
@@ -182,9 +182,9 @@ TMeasure::~TMeasure()
 
 void TMeasure::add(TUnit *unit)
 {
-	const std::vector<wstring> &e = unit->getExtensions();
+	const std::vector<std::wstring> &e = unit->getExtensions();
 	for (int i = 0; i < (int)e.size(); i++) {
-		wstring ext = e[i];
+		std::wstring ext = e[i];
 		assert(m_extensions.count(ext) == 0);
 		m_extensions[ext] = unit;
 	}
@@ -192,9 +192,9 @@ void TMeasure::add(TUnit *unit)
 
 //-------------------------------------------------------------------
 
-TUnit *TMeasure::getUnit(wstring ext) const
+TUnit *TMeasure::getUnit(std::wstring ext) const
 {
-	std::map<wstring, TUnit *>::const_iterator it;
+	std::map<std::wstring, TUnit *>::const_iterator it;
 	it = m_extensions.find(ext);
 	return it == m_extensions.end() ? 0 : it->second;
 }
@@ -415,9 +415,9 @@ void TMeasureManager::add(TMeasure *m)
 
 //-------------------------------------------------------------------
 
-TMeasure *TMeasureManager::get(string name) const
+TMeasure *TMeasureManager::get(std::string name) const
 {
-	std::map<string, TMeasure *>::const_iterator it;
+	std::map<std::string, TMeasure *>::const_iterator it;
 	it = m_measures.find(name);
 	if (it == m_measures.end())
 		return 0;
@@ -427,7 +427,7 @@ TMeasure *TMeasureManager::get(string name) const
 
 //===================================================================
 
-TMeasuredValue::TMeasuredValue(string measureName)
+TMeasuredValue::TMeasuredValue(std::string measureName)
 	: m_measure(0), m_value(0)
 {
 	setMeasure(measureName);
@@ -452,14 +452,14 @@ void TMeasuredValue::setMeasure(const TMeasure *measure)
 
 //-------------------------------------------------------------------
 
-void TMeasuredValue::setMeasure(string measureName)
+void TMeasuredValue::setMeasure(std::string measureName)
 {
 	setMeasure(TMeasureManager::instance()->get(measureName));
 }
 
 //-------------------------------------------------------------------
 
-bool TMeasuredValue::setValue(wstring s, int *pErr)
+bool TMeasuredValue::setValue(std::wstring s, int *pErr)
 {
 	if (s == ::toWideString("")) {
 		if (pErr)
@@ -472,7 +472,7 @@ bool TMeasuredValue::setValue(wstring s, int *pErr)
 	int i = 0, len = s.length();
 	// skip blanks
 	i = s.find_first_not_of(::toWideString(" \t"));
-	assert(i != (int)wstring::npos);
+	assert(i != (int)std::wstring::npos);
 	int j = i;
 	// match number
 	if (i < len && (s[i] == L'-' || s[i] == L'+'))
@@ -496,7 +496,7 @@ bool TMeasuredValue::setValue(wstring s, int *pErr)
 		valueFlag = true;
 		// skip blanks
 		i = s.find_first_not_of(::toWideString(" \t"), i);
-		if (i == (int)wstring::npos)
+		if (i == (int)std::wstring::npos)
 			i = s.length();
 	}
 
@@ -504,10 +504,10 @@ bool TMeasuredValue::setValue(wstring s, int *pErr)
 	if (i < (int)s.length()) {
 		j = i;
 		i = s.find_last_not_of(::toWideString(" \t"));
-		if (i == (int)wstring::npos)
+		if (i == (int)std::wstring::npos)
 			i = len - 1;
 		if (j <= i) {
-			wstring unitExt = s.substr(j, i + 1 - j);
+			std::wstring unitExt = s.substr(j, i + 1 - j);
 			unit = m_measure->getUnit(unitExt);
 			if (!unit) {
 				if (pErr)
@@ -533,11 +533,11 @@ bool TMeasuredValue::setValue(wstring s, int *pErr)
 
 //-------------------------------------------------------------------
 
-wstring TMeasuredValue::toWideString(int decimals) const
+std::wstring TMeasuredValue::toWideString(int decimals) const
 {
 	double v = getValue(CurrentUnit);
-	string s = toString(v, decimals);
-	if (s.find('.') != string::npos) {
+	std::string s = toString(v, decimals);
+	if (s.find('.') != std::string::npos) {
 		int i = s.length();
 		while (i > 0 && s[i - 1] == '0')
 			i--;
@@ -546,7 +546,7 @@ wstring TMeasuredValue::toWideString(int decimals) const
 		if (i < (int)s.length())
 			s = s.substr(0, i);
 	}
-	wstring measure = m_measure->getCurrentUnit()->getDefaultExtension();
+	std::wstring measure = m_measure->getCurrentUnit()->getDefaultExtension();
 	if (measure.empty())
 		return ::toWideString(s);
 	return ::toWideString(s) + ::toWideString(" ") + measure;

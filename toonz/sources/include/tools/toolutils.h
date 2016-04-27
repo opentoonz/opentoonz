@@ -155,7 +155,7 @@ protected:
 	bool m_animationSheetEnabled;
 	std::vector<int> m_cellsData; // represent original frame range when m_animationSheetEnabled, m_createdFrame and !m_isEditingLevel; see tool.cpp
 	TPaletteP m_oldPalette;
-	string m_imageId;
+	std::string m_imageId;
 	static int m_idCount;
 
 	void insertLevelAndFrameIfNeeded() const;
@@ -224,14 +224,14 @@ public:
 	void undo() const;
 
 private:
-	vector<TRect> paste(const TRasterImageP &ti, const TTileSetFullColor *tileSet) const;
+	std::vector<TRect> paste(const TRasterImageP &ti, const TTileSetFullColor *tileSet) const;
 };
 
 //-----------------------------------------------------------------------------
 
 class UndoModifyStroke : public TToolUndo
 {
-	vector<TThickPoint> m_before, m_after;
+	std::vector<TThickPoint> m_before, m_after;
 	bool m_selfLoopBefore, m_selfLoopAfter;
 
 	int m_row;
@@ -254,7 +254,7 @@ public:
 
 class UndoModifyStrokeAndPaint : public UndoModifyStroke
 {
-	vector<TFilledRegionInf> *m_fillInformation;
+	std::vector<TFilledRegionInf> *m_fillInformation;
 	TRectD m_oldBBox;
 
 public:
@@ -276,10 +276,10 @@ public:
 
 class UndoModifyListStroke : public TToolUndo
 {
-	list<UndoModifyStroke *> m_strokeList;
-	list<UndoModifyStroke *>::iterator m_beginIt, m_endIt;
+	std::list<UndoModifyStroke *> m_strokeList;
+	std::list<UndoModifyStroke *>::iterator m_beginIt, m_endIt;
 
-	vector<TFilledRegionInf> *m_fillInformation;
+	std::vector<TFilledRegionInf> *m_fillInformation;
 	TRectD m_oldBBox;
 
 public:
@@ -304,13 +304,13 @@ class UndoPencil : public TToolUndo
 {
 	int m_strokeId;
 	TStroke *m_stroke;
-	vector<TFilledRegionInf> *m_fillInformation;
+	std::vector<TFilledRegionInf> *m_fillInformation;
 
 	bool m_autogroup;
 	bool m_autofill;
 
 public:
-	UndoPencil(TStroke *stroke, vector<TFilledRegionInf> *fillInformation, TXshSimpleLevel *level,
+	UndoPencil(TStroke *stroke, std::vector<TFilledRegionInf> *fillInformation, TXshSimpleLevel *level,
 			   const TFrameId &frameId, bool m_createdFrame, bool m_createdLevel,
 			   bool autogroup = false, bool autofill = false);
 	~UndoPencil();
@@ -337,12 +337,12 @@ protected:
 	bool m_selective, m_filled, m_doAntialias;
 
 	/*-- HistoryにPrimitive名を表示するため --*/
-	string m_primitiveName;
+	std::string m_primitiveName;
 
 public:
 	UndoRasterPencil(TXshSimpleLevel *level, const TFrameId &frameId, TStroke *stroke,
 					 bool selective, bool filled, bool doAntialias, bool createdFrame, bool createdLevel,
-					 string primitiveName);
+					 std::string primitiveName);
 	~UndoRasterPencil();
 	virtual void redo() const;
 	int getSize() const;
@@ -390,7 +390,7 @@ class UndoPath : public TUndo
 {
 
 	TStageObjectSpline *m_spline;
-	vector<TThickPoint> m_before, m_after;
+	std::vector<TThickPoint> m_before, m_after;
 	bool m_selfLoopBefore;
 	//TStroke *m_before;
 	//TStroke *m_after;
@@ -518,7 +518,7 @@ TRectD DVAPI interpolateRect(const TRectD &rect1, const TRectD &rect2, double t)
 
 //!Returns a TRectD that contains all points in \b points
 //!If \b maxThickness is not zero, the TRectD is computed using this value.
-TRectD DVAPI getBounds(const vector<TThickPoint> &points, double maxThickness = 0);
+TRectD DVAPI getBounds(const std::vector<TThickPoint> &points, double maxThickness = 0);
 
 //!Ritorna un raster uguale a quello dato ma ruotato di 90 gradi
 //!Il parametro toRight indica se si sta ruotando a destra o a sinistra!

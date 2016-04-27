@@ -528,12 +528,12 @@ void RenderCommand::rasterRender(bool isPreview)
 		return;
 	}
 
-	string ext = m_fp.getType();
+	std::string ext = m_fp.getType();
 
 #ifdef _WIN32
 	if (ext == "avi" && !isPreview) {
 		TPropertyGroup *props = scene->getProperties()->getOutputProperties()->getFileFormatProperties(ext);
-		string codecName = props->getProperty(0)->getValueAsString();
+		std::string codecName = props->getProperty(0)->getValueAsString();
 		TDimension res = scene->getCurrentCamera()->getRes();
 		if (!AviCodecRestrictions::canWriteMovie(toWideString(codecName), res)) {
 			QString msg(QObject::tr("The resolution of the output camera does not fit with the options chosen for the output file format."));
@@ -541,7 +541,7 @@ void RenderCommand::rasterRender(bool isPreview)
 			return;
 		}
 	}
-#endif;
+#endif
 
 	//Extract output properties
 	TOutputProperties *prop = isPreview ? scene->getProperties()->getPreviewProperties() : scene->getProperties()->getOutputProperties();
@@ -738,12 +738,12 @@ public:
 void RenderCommand::multimediaRender()
 {
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
-	string ext = m_fp.getType();
+	std::string ext = m_fp.getType();
 
 #ifdef _WIN32
 	if (ext == "avi") {
 		TPropertyGroup *props = scene->getProperties()->getOutputProperties()->getFileFormatProperties(ext);
-		string codecName = props->getProperty(0)->getValueAsString();
+		std::string codecName = props->getProperty(0)->getValueAsString();
 		TDimension res = scene->getCurrentCamera()->getRes();
 		if (!AviCodecRestrictions::canWriteMovie(toWideString(codecName), res)) {
 			QString msg(QObject::tr("The resolution of the output camera does not fit with the options chosen for the output file format."));
@@ -751,7 +751,7 @@ void RenderCommand::multimediaRender()
 			return;
 		}
 	}
-#endif;
+#endif
 
 	TOutputProperties *prop = scene->getProperties()->getOutputProperties();
 
@@ -844,7 +844,7 @@ void RenderCommand::doRender(bool isPreview)
 		}
 	}
 	if (!isWritable) {
-		string str = "It is not possible to write the output:  the file";
+		std::string str = "It is not possible to write the output:  the file";
 		str += isMultiFrame ? "s are read only." : " is read only.";
 		DVGui::warning(QString::fromStdString(str));
 		return;

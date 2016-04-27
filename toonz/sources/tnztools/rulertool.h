@@ -27,7 +27,7 @@ class RulerTool : public TTool
 
 	bool m_justClicked;
 
-	vector<RulerToolOptionsBox *> m_toolOptionsBox;
+	std::vector<RulerToolOptionsBox *> m_toolOptionsBox;
 
 public:
 	RulerTool();

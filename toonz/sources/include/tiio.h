@@ -73,7 +73,7 @@ public:
 
 	virtual void enable16BitRead(bool) {}
 
-	virtual void getTzpPaletteColorNames(map<int, pair<string, string>> &pltColorNames) const { assert(false); }
+	virtual void getTzpPaletteColorNames(std::map<int, std::pair<std::string, std::string>> &pltColorNames) const { assert(false); }
 
 private:
 	// not implemented

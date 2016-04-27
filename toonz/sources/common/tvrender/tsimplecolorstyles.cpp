@@ -133,10 +133,10 @@ public:
 	//----------------------------------------------
 
 	struct Key {
-		string m_name;
+		std::string m_name;
 		TFrameId m_fid;
 		T_hGlContext m_glContext;
-		Key(string name, TFrameId fid, T_hGlContext glContext)
+		Key(std::string name, TFrameId fid, T_hGlContext glContext)
 			: m_name(name), m_fid(fid), m_glContext(glContext) {}
 	};
 
@@ -234,7 +234,7 @@ public:
 	}
 	//--------------------------------------------
 
-	GLuint getDisplayListId(TVectorImage *image, string name, TFrameId fid, const TVectorRenderData &rd)
+	GLuint getDisplayListId(TVectorImage *image, std::string name, TFrameId fid, const TVectorRenderData &rd)
 	{
 		QMutexLocker sl(&m_mutex);
 		TColorFunction::Parameters parameters;
@@ -649,7 +649,7 @@ void TCenterLineStrokeStyle::drawStroke(const TColorFunction *cf, const TStroke 
 		double s = 0;
 		double length = stroke->getLength();
 		TPointD pos1, pos4;
-		vector<TPointD> pv;
+		std::vector<TPointD> pv;
 		width = width / 2.;
 		while (s <= length) {
 			double step = 1.0;
@@ -811,7 +811,7 @@ TRasterImagePatternStrokeStyle::TRasterImagePatternStrokeStyle()
 
 //-----------------------------------------------------------------------------
 
-TRasterImagePatternStrokeStyle::TRasterImagePatternStrokeStyle(const string &patternName)
+TRasterImagePatternStrokeStyle::TRasterImagePatternStrokeStyle(const std::string &patternName)
 	: m_level(), m_name(patternName), m_space(20), m_rotation(0)
 {
 	if (m_name != "")
@@ -935,7 +935,7 @@ void TRasterImagePatternStrokeStyle::setParamValue(int index, double value)
 //
 // carico il pattern 'patternName' dalla directory dei custom styles
 //
-void TRasterImagePatternStrokeStyle::loadLevel(const string &patternName)
+void TRasterImagePatternStrokeStyle::loadLevel(const std::string &patternName)
 {
 	struct locals {
 		static TAffine getAffine(const TDimension &srcSize, const TDimension &dstSize)
@@ -1027,7 +1027,7 @@ void TRasterImagePatternStrokeStyle::loadLevel(const string &patternName)
 
 //--------------------------------------------------------------------------------------------------
 
-void TRasterImagePatternStrokeStyle::computeTransformations(vector<TAffine> &transformations, const TStroke *stroke) const
+void TRasterImagePatternStrokeStyle::computeTransformations(std::vector<TAffine> &transformations, const TStroke *stroke) const
 {
 	const int frameCount = m_level->getFrameCount();
 	if (frameCount == 0)
@@ -1070,7 +1070,7 @@ void TRasterImagePatternStrokeStyle::computeTransformations(vector<TAffine> &tra
 
 void TRasterImagePatternStrokeStyle::drawStroke(
 	const TVectorRenderData &rd,
-	const vector<TAffine> &transformations,
+	const std::vector<TAffine> &transformations,
 	const TStroke *stroke) const
 {
 	TStopWatch sw;
@@ -1175,7 +1175,7 @@ void TRasterImagePatternStrokeStyle::drawStroke(TFlash &flash, const TStroke *st
 		return;
 	}
 
-	vector<TAffine> transformations;
+	std::vector<TAffine> transformations;
 	computeTransformations(transformations, stroke);
 	assert(m_level->begin() != m_level->end());
 	TLevel::Iterator lit = m_level->begin();
@@ -1198,7 +1198,7 @@ void TRasterImagePatternStrokeStyle::loadData(TInputStreamInterface &is)
 {
 	m_level = TLevelP();
 	m_name = "";
-	string name;
+	std::string name;
 	is >> name >> m_space >> m_rotation;
 	if (name != "") {
 		try {
@@ -1217,7 +1217,7 @@ void TRasterImagePatternStrokeStyle::loadData(int ids, TInputStreamInterface &is
 
 	m_level = TLevelP();
 	m_name = "";
-	string name;
+	std::string name;
 	is >> name;
 	if (name != "") {
 		try {
@@ -1250,7 +1250,7 @@ TStrokeProp *TRasterImagePatternStrokeStyle::makeStrokeProp(const TStroke *strok
 
 //-----------------------------------------------------------------------------
 
-void TRasterImagePatternStrokeStyle::getObsoleteTagIds(vector<int> &ids) const
+void TRasterImagePatternStrokeStyle::getObsoleteTagIds(std::vector<int> &ids) const
 {
 	ids.push_back(100);
 }
@@ -1266,7 +1266,7 @@ TVectorImagePatternStrokeStyle::TVectorImagePatternStrokeStyle()
 
 //-----------------------------------------------------------------------------
 
-TVectorImagePatternStrokeStyle::TVectorImagePatternStrokeStyle(const string &patternName)
+TVectorImagePatternStrokeStyle::TVectorImagePatternStrokeStyle(const std::string &patternName)
 	: m_level(), m_name(patternName), m_space(20), m_rotation(0)
 {
 	loadLevel(patternName);
@@ -1398,7 +1398,7 @@ void TVectorImagePatternStrokeStyle::setParamValue(int index, double value)
 
 //-----------------------------------------------------------------------------
 
-void TVectorImagePatternStrokeStyle::loadLevel(const string &patternName)
+void TVectorImagePatternStrokeStyle::loadLevel(const std::string &patternName)
 {
 	m_level = TLevelP();
 	m_name = patternName;
@@ -1407,7 +1407,7 @@ void TVectorImagePatternStrokeStyle::loadLevel(const string &patternName)
 	TLevelReaderP lr(fp);
 	m_level = lr->loadInfo();
 	TLevel::Iterator frameIt;
-	map<TPixel32, int> colors;
+	std::map<TPixel32, int> colors;
 	for (frameIt = m_level->begin(); frameIt != m_level->end(); ++frameIt) {
 		TVectorImageP img = lr->getFrameReader(frameIt->first)->load();
 		if (img)
@@ -1417,7 +1417,7 @@ void TVectorImagePatternStrokeStyle::loadLevel(const string &patternName)
 
 //--------------------------------------------------------------------------------------------------
 
-void TVectorImagePatternStrokeStyle::computeTransformations(vector<TAffine> &transformations, const TStroke *stroke) const
+void TVectorImagePatternStrokeStyle::computeTransformations(std::vector<TAffine> &transformations, const TStroke *stroke) const
 {
 	const int frameCount = m_level->getFrameCount();
 	if (frameCount == 0)
@@ -1469,7 +1469,7 @@ void TVectorImagePatternStrokeStyle::clearGlDisplayLists()
 
 //--------------------------------------------------------------------------------------------------
 
-void TVectorImagePatternStrokeStyle::drawStroke(const TVectorRenderData &rd, const vector<TAffine> &transformations, const TStroke *stroke) const
+void TVectorImagePatternStrokeStyle::drawStroke(const TVectorRenderData &rd, const std::vector<TAffine> &transformations, const TStroke *stroke) const
 {
 	const int frameCount = m_level->getFrameCount();
 	if (frameCount == 0)
@@ -1700,7 +1700,7 @@ void TVectorImagePatternStrokeStyle::loadData(TInputStreamInterface &is)
 {
 	m_level = TLevelP();
 	m_name = "";
-	string name;
+	std::string name;
 	is >> name >> m_space >> m_rotation;
 	if (name != "") {
 		try {
@@ -1719,7 +1719,7 @@ void TVectorImagePatternStrokeStyle::loadData(int ids, TInputStreamInterface &is
 
 	m_level = TLevelP();
 	m_name = "";
-	string name;
+	std::string name;
 	is >> name;
 	if (name != "") {
 		try {
@@ -1752,7 +1752,7 @@ TStrokeProp *TVectorImagePatternStrokeStyle::makeStrokeProp(const TStroke *strok
 
 //-----------------------------------------------------------------------------
 
-void TVectorImagePatternStrokeStyle::getObsoleteTagIds(vector<int> &ids) const
+void TVectorImagePatternStrokeStyle::getObsoleteTagIds(std::vector<int> &ids) const
 {
 	//ids.push_back(100);
 }

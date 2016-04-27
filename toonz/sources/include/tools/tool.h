@@ -240,7 +240,7 @@ public:
 	};
 
 public:
-	static TTool *getTool(string toolName, ToolTargetType targetType);
+	static TTool *getTool(std::string toolName, ToolTargetType targetType);
 
 	static TApplication *getApplication();
 	static void setApplication(TApplication *application)
@@ -275,7 +275,7 @@ public:
 													//!  every tool (invoking updateTranslation() for each).
 
 public:
-	TTool(string toolName);
+	TTool(std::string toolName);
 	virtual ~TTool() {}
 
 	virtual ToolType getToolType() const = 0;
@@ -284,7 +284,7 @@ public:
 		return (ToolTargetType)m_targetType;
 	}
 
-	string getName() const { return m_name; }
+	std::string getName() const { return m_name; }
 
 	/*! \details  The default returns a generic box containing the options
                 for property group 0).
@@ -331,7 +331,7 @@ public:
 
 	//! For keycodes list, \see keycodes.h.
 	virtual bool keyDown(int, TUINT32, const TPoint &) { return false; }
-	virtual bool keyDown(int, wstring, TUINT32, const TPoint &) { return false; }
+	virtual bool keyDown(int, std::wstring, TUINT32, const TPoint &) { return false; }
 
 	virtual void onInputText(std::wstring, std::wstring, int, int){};
 
@@ -363,7 +363,7 @@ public:
 	/*!
 		Does the tasks associated to changes in \p propertyName and returns \p true;
 	*/
-	virtual bool onPropertyChanged(string propertyName)
+	virtual bool onPropertyChanged(std::string propertyName)
 	{
 		return false;
 	}												 //!< Does the tasks associated to changes in \p propertyName and
@@ -445,7 +445,7 @@ public:
 	static bool m_isFrameCreated;		 //!< \deprecated  Shouldn't expose global static variables.
 
 protected:
-	string m_name; //!< The tool's name.
+	std::string m_name; //!< The tool's name.
 
 	Viewer *m_viewer; //!< Tool's current viewer.
 	TAffine m_matrix; //!< World-to-window reference change affine.
@@ -504,7 +504,7 @@ public:
 	//! return the column index of the drawing intersecting point \b p
 	//! (window coordinate, pixels, bottom-left origin)
 	virtual int posToColumnIndex(const TPoint &p, double distance, bool includeInvisible = true) const = 0;
-	virtual void posToColumnIndexes(const TPoint &p, vector<int> &indexes, double distance, bool includeInvisible = true) const = 0;
+	virtual void posToColumnIndexes(const TPoint &p, std::vector<int> &indexes, double distance, bool includeInvisible = true) const = 0;
 
 	//! return the row of the drawing intersecting point \b p (used with onionskins)
 	//! (window coordinate, pixels, bottom-left origin)

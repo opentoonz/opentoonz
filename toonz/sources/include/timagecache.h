@@ -60,7 +60,7 @@ class DVAPI TImageCache
 public:
 	static TImageCache *instance();
 
-	string getUniqueId();
+	std::string getUniqueId();
 
 	//! Enables or disables the image cache on current thread.
 	//! When the cache is disabled, images can't be added to the cache.
@@ -74,17 +74,17 @@ public:
 
 	//! Adds the passed image to the cache, under the specified id. The optional \b overwrite parameter
 	//! may be specified in case an image with the same id has already been cached.
-	void add(const string &id, const TImageP &img, bool overwrite = true);
+	void add(const std::string &id, const TImageP &img, bool overwrite = true);
 
 	//! Removes from the image cache the image associated to passed id.
-	void remove(const string &id);
+	void remove(const std::string &id);
 
 	//! Rebinds the association between a previously cached image and its id.
-	void remap(const string &dstId, const string &srcId);
+	void remap(const std::string &dstId, const std::string &srcId);
 
 	// provvisorio? Bisogna ripensarci
 	// l'idea e' rimappare tutte gli id della forma srcId:xxxxx
-	void remapIcons(const string &dstId, const string &srcId);
+	void remapIcons(const std::string &dstId, const std::string &srcId);
 
 	//! Clears the image cache. After calling this method, every image in the cache
 	//! is released - and optionally the cache swap folder is deleted.
@@ -97,13 +97,13 @@ public:
 	void clearSceneImages();
 
 	//! Returns true or false whether an image under the passed id is found in the cache.
-	bool isCached(const string &id) const;
+	bool isCached(const std::string &id) const;
 
 	//! Returns the subsampling level of the image under the specified id.
-	bool getSubsampling(const string &id, int &subs) const;
+	bool getSubsampling(const std::string &id, int &subs) const;
 
 	//! Retrieves the image associated to input \b id. Returns an empty pointer if no image was found.
-	TImageP get(const string &id, bool toBeModified) const;
+	TImageP get(const std::string &id, bool toBeModified) const;
 
 	//! Returns the RAM memory size (KB) occupied by the image cache.
 	UINT getMemUsage() const;
@@ -111,20 +111,20 @@ public:
 	//! \n \n \b{NOTE:} This function is not implemented yet!
 	UINT getDiskUsage() const;
 
-	UINT getUncompressedMemUsage(const string &id) const;
+	UINT getUncompressedMemUsage(const std::string &id) const;
 
 	//! Returns the RAM memory size (KB) of the image associated to passed id.
-	UINT getMemUsage(const string &id) const;
-	UINT getDiskUsage(const string &id) const;
+	UINT getMemUsage(const std::string &id) const;
+	UINT getDiskUsage(const std::string &id) const;
 
-	void dump(ostream &os) const; // per debug
+	void dump(std::ostream &os) const; // per debug
 
 	UCHAR *compressAndMalloc(TUINT32 requestedSize); // compress in the cache till it can allocate the requested memory
 
 	//for debug
-	void outputMap(UINT chunkRequested, string filename);
+	void outputMap(UINT chunkRequested, std::string filename);
 
-	bool hasBeenModified(const string &id, bool reset) const;
+	bool hasBeenModified(const std::string &id, bool reset) const;
 
 #ifndef TNZCORE_LIGHT
 	void add(const QString &id, const TImageP &img, bool overwrite = true);
@@ -133,7 +133,7 @@ public:
 #endif
 
 	// compress id (in memory)
-	void compress(const string &id);
+	void compress(const std::string &id);
 
 private:
 	TImageCache();

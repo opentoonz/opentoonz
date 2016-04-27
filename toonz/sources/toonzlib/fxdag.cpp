@@ -164,12 +164,12 @@ void FxDag::assignUniqueId(TFx *fx)
 		}
 	}; // locals
 
-	string type = fx->getFxType();
+	std::string type = fx->getFxType();
 	int count = ++m_typeTable[type];
 
 	fx->getAttributes()->setId(count);
 
-	wstring name = TStringTable::translate(type);
+	std::wstring name = TStringTable::translate(type);
 	locals::eraseNonAlnums(name); // fx ids are used as XML tag names - thus, we'll restrict
 								  // the char set to alnums. Specifically, '/' must be ruled out.
 								  // E.g.: "Erode/Dilate 1" must become "ErodeDilate1"
@@ -183,9 +183,9 @@ void FxDag::assignUniqueId(TFx *fx)
 
 //-------------------------------------------------------------------
 
-TFx *FxDag::getFxById(wstring id) const
+TFx *FxDag::getFxById(std::wstring id) const
 {
-	std::map<wstring, TFx *>::const_iterator it = m_idTable.find(id);
+	std::map<std::wstring, TFx *>::const_iterator it = m_idTable.find(id);
 	if (it == m_idTable.end())
 		return 0;
 	else
@@ -195,7 +195,7 @@ TFx *FxDag::getFxById(wstring id) const
 
 void FxDag::updateFxTypeTable(TFx *fx, int value)
 {
-	string type = fx->getFxType();
+	std::string type = fx->getFxType();
 	m_typeTable[type] = value;
 }
 
@@ -210,8 +210,8 @@ void FxDag::updateFxIdTable(TFx *fx)
 
 int FxDag::getFxTypeCount(TFx *fx)
 {
-	string type = fx->getFxType();
-	std::map<string, int>::iterator it = m_typeTable.find(type);
+	std::string type = fx->getFxType();
+	std::map<std::string, int>::iterator it = m_typeTable.find(type);
 	if (it == m_typeTable.end())
 		return 0;
 	return it->second;
@@ -219,7 +219,7 @@ int FxDag::getFxTypeCount(TFx *fx)
 
 //-------------------------------------------------------------------
 
-void FxDag::getFxs(vector<TFx *> &fxs) const
+void FxDag::getFxs(std::vector<TFx *> &fxs) const
 {
 	std::set<TFx *> fxSet;
 	getInternalFxs()->getFxs(fxSet);
@@ -306,7 +306,7 @@ void FxDag::loadData(TIStream &is)
 	for (k = 0; k < (int)m_outputFxs.size(); k++)
 		m_outputFxs[k]->release();
 	m_outputFxs.clear();
-	string tagName;
+	std::string tagName;
 	while (is.openChild(tagName)) {
 		if (tagName == "terminal") {
 			TFxSet *fxSet = getTerminalFxs();
@@ -319,7 +319,7 @@ void FxDag::loadData(TIStream &is)
 				if (TZeraryColumnFx *zfx = dynamic_cast<TZeraryColumnFx *>(fx))
 					fx = zfx->getZeraryFx();
 				if (tnzVersion < VersionNumber(1, 16)) {
-					wstring app = fx->getName();
+					std::wstring app = fx->getName();
 					assignUniqueId(fx);
 					fx->setName(app);
 					continue;
@@ -329,7 +329,7 @@ void FxDag::loadData(TIStream &is)
 				updateFxTypeTable(fx, maxFxTypeId);
 				TMacroFx *macroFx = dynamic_cast<TMacroFx *>(fx);
 				if (macroFx) {
-					vector<TFxP> fxs = macroFx->getFxs();
+					std::vector<TFxP> fxs = macroFx->getFxs();
 					int j;
 					for (j = 0; j < (int)fxs.size(); j++) {
 						TFxP inMacroFx = fxs[j];
@@ -351,7 +351,7 @@ void FxDag::loadData(TIStream &is)
 				if (TZeraryColumnFx *zfx = dynamic_cast<TZeraryColumnFx *>(fx))
 					fx = zfx->getZeraryFx();
 				if (tnzVersion < VersionNumber(1, 16)) {
-					wstring app = fx->getName();
+					std::wstring app = fx->getName();
 					assignUniqueId(fx);
 					fx->setName(app);
 					continue;

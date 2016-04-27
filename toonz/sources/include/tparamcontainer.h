@@ -24,16 +24,16 @@ class TParam;
 
 class DVAPI TParamVar
 {
-	string m_name;
+	std::string m_name;
 	bool m_isHidden;
 	TParamObserver *m_paramObserver;
 
 public:
-	TParamVar(string name, bool hidden = false)
+	TParamVar(std::string name, bool hidden = false)
 		: m_name(name), m_isHidden(hidden), m_paramObserver(0) {}
 	virtual ~TParamVar() {}
 	virtual TParamVar *clone() const = 0;
-	string getName() const { return m_name; }
+	std::string getName() const { return m_name; }
 	bool isHidden() const { return m_isHidden; }
 	void setIsHidden(bool hidden) { m_isHidden = hidden; }
 	virtual void setParam(TParam *param) = 0;
@@ -47,11 +47,11 @@ class TParamVarT : public TParamVar
 	TParamP m_var;
 
 public:
-	TParamVarT(string name, TParamP var, bool hidden = false)
+	TParamVarT(std::string name, TParamP var, bool hidden = false)
 		: TParamVar(name, hidden), m_var(var)
 	{
 	}
-	TParamVarT(string name, T *var, bool hidden = false)
+	TParamVarT(std::string name, T *var, bool hidden = false)
 		: TParamVar(name, hidden), m_var(var)
 	{
 	}
@@ -82,8 +82,8 @@ public:
 	bool isParamHidden(int index) const;
 
 	TParam *getParam(int index) const;
-	string getParamName(int index) const;
-	TParam *getParam(string name) const;
+	std::string getParamName(int index) const;
+	TParam *getParam(std::string name) const;
 	const TParamVar *getParamVar(int index) const;
 
 	void unlink();

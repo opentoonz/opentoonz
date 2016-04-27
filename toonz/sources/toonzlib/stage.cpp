@@ -138,8 +138,8 @@ class StackingOrder
 public:
 	StackingOrder() {}
 	inline bool operator()(
-		const pair<double, int> &a,
-		const pair<double, int> &b) const
+		const std::pair<double, int> &a,
+		const std::pair<double, int> &b) const
 	{
 		return a.first < b.first;
 	}
@@ -193,7 +193,7 @@ public:
 	int m_currentXsheetLevel;  // level of the current xsheet, see: editInPlace
 	int m_xsheetLevel;		   // xsheet-level of the column being processed
 
-	vector<TXshColumn *> m_ancestors;
+	std::vector<TXshColumn *> m_ancestors;
 
 	const ImagePainter::VisualSettings *m_vs;
 
@@ -234,8 +234,8 @@ public:
 
 // debug!
 #ifdef _DEBUG
-	void dumpPlayerSet(PlayerSet &players, ostream &out);
-	void dumpAll(ostream &out);
+	void dumpPlayerSet(PlayerSet &players, std::ostream &out);
+	void dumpAll(std::ostream &out);
 #endif
 };
 
@@ -257,7 +257,7 @@ StageBuilder::~StageBuilder()
 //-----------------------------------------------------------------------------
 
 #ifdef _DEBUG
-void StageBuilder::dumpPlayerSet(PlayerSet &players, ostream &out)
+void StageBuilder::dumpPlayerSet(PlayerSet &players, std::ostream &out)
 {
 	out << "[";
 	int m = players.size();
@@ -278,7 +278,7 @@ void StageBuilder::dumpPlayerSet(PlayerSet &players, ostream &out)
 
 //-----------------------------------------------------------------------------
 
-void StageBuilder::dumpAll(ostream &out)
+void StageBuilder::dumpAll(std::ostream &out)
 {
 	dumpPlayerSet(m_players, out);
 	for (unsigned int i = 0; i < m_maskPool.size(); i++) {
@@ -418,7 +418,7 @@ void StageBuilder::addCell(
 		TAffine childCameraAff = childCamera->getPlacement(childRow);
 		double childCameraZ = childCamera->getZ(childRow);
 
-		vector<UCHAR> originalOpacity(childXsheet->getColumnCount());
+		std::vector<UCHAR> originalOpacity(childXsheet->getColumnCount());
 
 		for (int c = 0; c < childXsheet->getColumnCount(); c++) {
 			originalOpacity[c] = childXsheet->getColumn(c)->getOpacity();
@@ -458,7 +458,7 @@ void StageBuilder::addCell(
 
 //-----------------------------------------------------------------------------
 
-bool alreadyAdded(TXsheet *xsh, int row, int index, const vector<int> &rows, int col)
+bool alreadyAdded(TXsheet *xsh, int row, int index, const std::vector<int> &rows, int col)
 {
 	int i;
 	for (i = 0; i < index; i++)
@@ -529,9 +529,9 @@ void StageBuilder::addCellWithOnionSkin(
 			m_shiftTraceGhostId = NO_GHOST;
 		}
 	} else if (locals::doStandardOnionSkin(this, xsh, level, col)) {
-		vector<int> rows;
+		std::vector<int> rows;
 		m_onionSkinMask.getAll(row, rows);
-		vector<int>::iterator it = rows.begin();
+		std::vector<int>::iterator it = rows.begin();
 		while (it != rows.end() && *it < row)
 			it++;
 		std::sort(rows.begin(), it, descending);
@@ -719,7 +719,7 @@ void StageBuilder::visit(PlayerSet &players, Visitor &visitor, bool isPlaying)
 // debug
 class DummyVisitor : public Visitor
 {
-	ostrstream m_ss;
+	std::ostrstream m_ss;
 
 public:
 	void onImage(const Stage::Player &data) { m_ss << "img "; }
@@ -727,10 +727,10 @@ public:
 	void endMask() { m_ss << "endMask "; }
 	void enableMask() { m_ss << "enableMask "; }
 	void disableMask() { m_ss << "disableMask "; }
-	string getLog()
+	std::string getLog()
 	{
 		m_ss << '\0';
-		string log = m_ss.str();
+		std::string log = m_ss.str();
 		m_ss.freeze(0);
 		return log;
 	}

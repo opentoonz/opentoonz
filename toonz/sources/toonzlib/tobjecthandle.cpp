@@ -34,7 +34,7 @@ void setSpline(TVectorImage *srcImg, TStageObjectId objId, TStageObjectSpline *c
 		return;
 	if (srcImg->getStrokeCount() == 0) {
 		double d = 30;
-		vector<TThickPoint> points;
+		std::vector<TThickPoint> points;
 		points.push_back(TPointD(-d, 0));
 		points.push_back(TPointD(0, 0));
 		points.push_back(TPointD(d, 0));

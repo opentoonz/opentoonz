@@ -70,12 +70,12 @@ protected:
 	virtual bool download(TCacheResourceP &resource) = 0;
 
 public:
-	ResourceBuilder(const string &resourceName,
+	ResourceBuilder(const std::string &resourceName,
 					const TFxP &fx, double frame, const TRenderSettings &rs);
 	virtual ~ResourceBuilder() {}
 
 	static void declareResource(
-		const string &alias, const TFxP &fx,
+		const std::string &alias, const TFxP &fx,
 		const TRectD &rect, double frame, const TRenderSettings &rs,
 		bool subtileable = true);
 
@@ -203,11 +203,11 @@ private:
 	friend class ResourceBuilder;
 
 	void declareResource(
-		const string &alias, const TFxP &fx,
+		const std::string &alias, const TFxP &fx,
 		const TRectD &rect, double frame, const TRenderSettings &rs,
 		bool subtileable);
 
-	ResourceData getResource(const string &resourceName,
+	ResourceData getResource(const std::string &resourceName,
 							 const TFxP &fx, double frame, const TRenderSettings &rs);
 
 	/*void notifyResourceUpload(const TCacheResourceP& resource, const TRect& rect);
@@ -247,7 +247,7 @@ public:
 	TFxCacheManagerDelegate() {}
 
 	virtual void getResource(
-		TCacheResourceP &resource, const string &alias,
+		TCacheResourceP &resource, const std::string &alias,
 		const TFxP &fx, double frame, const TRenderSettings &rs,
 		ResourceDeclaration *resData) = 0;
 

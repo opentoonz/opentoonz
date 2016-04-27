@@ -115,7 +115,7 @@ void ColorModelViewer::dragEnterEvent(QDragEnterEvent *event)
 
 	foreach (QUrl url, mimeData->urls()) {
 		TFilePath fp(url.toLocalFile().toStdWString());
-		string type = fp.getType();
+		std::string type = fp.getType();
 		if (type == "scr" || type == "tpl")
 			return;
 	}

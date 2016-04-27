@@ -164,7 +164,7 @@ bool checkColumnValidity(int column)
 
 	if (start > end)
 		return false;
-	vector<TXshCell> cell(end - start + 1);
+	std::vector<TXshCell> cell(end - start + 1);
 
 	xsh->getCells(start, column, cell.size(), &(cell[0]));
 
@@ -381,9 +381,9 @@ void doCloneLevelNoSave(const TCellSelection::Range &range, const QString &newLe
 
 void cloneColumn(const TCellSelection::Range &cells, const TFilePath &newLevelPath)
 {
-	std::set<pair<int, int>> positions;
+	std::set<std::pair<int, int>> positions;
 	for (int i = cells.m_r0; i <= cells.m_r1; i++)
-		positions.insert(pair<int, int>(i, cells.m_c0));
+		positions.insert(std::pair<int, int>(i, cells.m_c0));
 
 	TKeyframeSelection ks(positions);
 	ks.copyKeyframes();

@@ -100,13 +100,13 @@ const double cBorderSize = 15;
 
 class UndoTypeTool : public ToolUtils::TToolUndo
 {
-	vector<TStroke *> m_strokes;
-	vector<TFilledRegionInf> *m_fillInformationBefore, *m_fillInformationAfter;
+	std::vector<TStroke *> m_strokes;
+	std::vector<TFilledRegionInf> *m_fillInformationBefore, *m_fillInformationAfter;
 	TVectorImageP m_image;
 
 public:
-	UndoTypeTool(vector<TFilledRegionInf> *fillInformationBefore,
-				 vector<TFilledRegionInf> *fillInformationAfter,
+	UndoTypeTool(std::vector<TFilledRegionInf> *fillInformationBefore,
+				 std::vector<TFilledRegionInf> *fillInformationAfter,
 				 TXshSimpleLevel *level, const TFrameId &frameId,
 				 bool isFrameCreated, bool isLevelCreated)
 		: ToolUtils::TToolUndo(level, frameId, isFrameCreated, isLevelCreated), m_fillInformationBefore(fillInformationBefore), m_fillInformationAfter(fillInformationAfter)
@@ -333,8 +333,8 @@ class TypeTool : public TTool
 
 	// valori correnti di alcune Properties,
 	// duplicati per permettere controlli sulla validita' o per ottimizzazione
-	wstring m_fontFamily;
-	wstring m_typeface;
+	std::wstring m_fontFamily;
+	std::wstring m_typeface;
 	double m_dimension;
 
 	bool m_validFonts; //false iff there are problems with font loading
@@ -344,7 +344,7 @@ class TypeTool : public TTool
 	int m_styleId;
 	double m_pixelSize;
 
-	vector<StrokeChar> m_string;
+	std::vector<StrokeChar> m_string;
 
 	int m_cursorIndex; // indice del carattere successivo al cursore
 	std::pair<int, int> m_preeditRange;
@@ -371,9 +371,9 @@ public:
 	void initTypeFaces();
 
 	void loadFonts();
-	void setFont(wstring fontFamily);
-	void setTypeface(wstring typeface);
-	void setSize(wstring size);
+	void setFont(std::wstring fontFamily);
+	void setTypeface(std::wstring typeface);
+	void setSize(std::wstring size);
 	void setVertical(bool vertical);
 	void draw();
 
@@ -388,14 +388,14 @@ public:
 	void mouseMove(const TPointD &pos, const TMouseEvent &);
 	void leftButtonDown(const TPointD &pos, const TMouseEvent &);
 	void rightButtonDown(const TPointD &pos, const TMouseEvent &);
-	bool keyDown(int key, wstring unicodeChar, TUINT32 flags, const TPoint &pos);
+	bool keyDown(int key, std::wstring unicodeChar, TUINT32 flags, const TPoint &pos);
 	void onInputText(std::wstring preedit, std::wstring commit, int replacementStart, int replacementLen);
 
 	// cancella gli StrokeChar fra from e to-1 e inserisce nuovi StrokeChar
 	// corrispondenti a text a partire da from
-	void replaceText(wstring text, int from, int to);
+	void replaceText(std::wstring text, int from, int to);
 
-	void addBaseChar(wstring text);
+	void addBaseChar(std::wstring text);
 	void addReturn();
 	void cursorUp();
 	void cursorDown();
@@ -418,7 +418,7 @@ public:
 		return m_cursorId;
 	}
 
-	bool onPropertyChanged(string propertyName);
+	bool onPropertyChanged(std::string propertyName);
 
 	TPropertyGroup *getProperties(int targetType)
 	{
@@ -480,7 +480,7 @@ void TypeTool::updateTranslation()
 
 //---------------------------------------------------------
 
-bool TypeTool::onPropertyChanged(string propertyName)
+bool TypeTool::onPropertyChanged(std::string propertyName)
 {
 	if (!m_validFonts)
 		return false;
@@ -539,14 +539,14 @@ void TypeTool::loadFonts()
 	if (!m_validFonts)
 		return;
 
-	vector<wstring> names;
+	std::vector<std::wstring> names;
 	instance->getAllFamilies(names);
 
-	for (vector<wstring>::iterator it = names.begin(); it != names.end(); ++it)
+	for (std::vector<std::wstring>::iterator it = names.begin(); it != names.end(); ++it)
 		m_fontFamilyMenu.addValue(*it);
 
-	string favFontApp = EnvCurrentFont;
-	wstring favouriteFont = toWideString(favFontApp);
+	std::string favFontApp = EnvCurrentFont;
+	std::wstring favouriteFont = toWideString(favFontApp);
 	if (m_fontFamilyMenu.isValue(favouriteFont)) {
 		m_fontFamilyMenu.setValue(favouriteFont);
 		setFont(favouriteFont);
@@ -562,11 +562,11 @@ void TypeTool::loadFonts()
 void TypeTool::initTypeFaces()
 {
 	TFontManager *instance = TFontManager::instance();
-	vector<wstring> typefaces;
+	std::vector<std::wstring> typefaces;
 	instance->getAllTypefaces(typefaces);
-	wstring oldTypeface = m_typeFaceMenu.getValue();
+	std::wstring oldTypeface = m_typeFaceMenu.getValue();
 	m_typeFaceMenu.deleteAllValues();
-	for (vector<wstring>::iterator it = typefaces.begin(); it != typefaces.end(); ++it)
+	for (std::vector<std::wstring>::iterator it = typefaces.begin(); it != typefaces.end(); ++it)
 		m_typeFaceMenu.addValue(*it);
 	if (m_typeFaceMenu.isValue(oldTypeface))
 		m_typeFaceMenu.setValue(oldTypeface);
@@ -574,7 +574,7 @@ void TypeTool::initTypeFaces()
 
 //---------------------------------------------------------
 
-void TypeTool::setFont(wstring family)
+void TypeTool::setFont(std::wstring family)
 {
 	if (m_fontFamily == family)
 		return;
@@ -583,7 +583,7 @@ void TypeTool::setFont(wstring family)
 		instance->setFamily(family);
 
 		m_fontFamily = family;
-		wstring oldTypeface = m_typeFaceMenu.getValue();
+		std::wstring oldTypeface = m_typeFaceMenu.getValue();
 		initTypeFaces();
 		if (oldTypeface != m_typeFaceMenu.getValue()) {
 			if (m_typeFaceMenu.isValue(L"Regular")) {
@@ -613,7 +613,7 @@ void TypeTool::setFont(wstring family)
 
 //---------------------------------------------------------
 
-void TypeTool::setTypeface(wstring typeface)
+void TypeTool::setTypeface(std::wstring typeface)
 {
 	if (m_typeface == typeface)
 		return;
@@ -632,7 +632,7 @@ void TypeTool::setTypeface(wstring typeface)
 
 //---------------------------------------------------------
 
-void TypeTool::setSize(wstring strSize)
+void TypeTool::setSize(std::wstring strSize)
 {
 	// font e tool fields update
 
@@ -976,12 +976,12 @@ void TypeTool::addTextToVectorImage(const TVectorImageP &currentImage, std::vect
 {
 	UINT oldSize = currentImage->getStrokeCount();
 
-	vector<TFilledRegionInf> *fillInformationBefore = new vector<TFilledRegionInf>;
+	std::vector<TFilledRegionInf> *fillInformationBefore = new std::vector<TFilledRegionInf>;
 	ImageUtils::getFillingInformationOverlappingArea(currentImage, *fillInformationBefore, m_textBox);
 
 	currentImage->mergeImage(images);
 
-	vector<TFilledRegionInf> *fillInformationAfter = new vector<TFilledRegionInf>;
+	std::vector<TFilledRegionInf> *fillInformationAfter = new std::vector<TFilledRegionInf>;
 	ImageUtils::getFillingInformationOverlappingArea(currentImage, *fillInformationAfter, m_textBox);
 
 	UINT newSize = currentImage->getStrokeCount();
@@ -1273,7 +1273,7 @@ void TypeTool::rightButtonDown(const TPointD &pos, const TMouseEvent &)
 
 // cancella [from,to[ da m_string e lo rimpiazza con text
 // n.b. NON fa updateCharPositions()
-void TypeTool::replaceText(wstring text, int from, int to)
+void TypeTool::replaceText(std::wstring text, int from, int to)
 {
 	int stringLength = m_string.size();
 	from = tcrop(from, 0, stringLength);
@@ -1362,7 +1362,7 @@ void TypeTool::addReturn()
 
 //---------------------------------------------------------
 
-void TypeTool::addBaseChar(wstring text)
+void TypeTool::addBaseChar(std::wstring text)
 {
 	TFontManager *instance = TFontManager::instance();
 
@@ -1496,7 +1496,7 @@ void TypeTool::deleteKey()
 
 //---------------------------------------------------------
 
-bool TypeTool::keyDown(int key, wstring unicodeChar, TUINT32 flags, const TPoint &pos)
+bool TypeTool::keyDown(int key, std::wstring unicodeChar, TUINT32 flags, const TPoint &pos)
 {
 	// per sicurezza
 	m_preeditRange = std::make_pair(0, 0);

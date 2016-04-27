@@ -118,7 +118,7 @@ public:
 	/*! 
       \finds all points on stroke which are "enough" close to point p. return the number of such points.
      */
-	int getNearChunks(const TThickPoint &p, vector<TThickPoint> &pointsOnStroke, bool checkBBox = true) const;
+	int getNearChunks(const TThickPoint &p, std::vector<TThickPoint> &pointsOnStroke, bool checkBBox = true) const;
 
 	//! \return number of chunks in the stroke
 	int getChunkCount() const;
@@ -131,7 +131,7 @@ public:
      */
 	int getControlPointCount() const;
 
-	void getControlPoints(vector<TThickPoint> &v) const;
+	void getControlPoints(std::vector<TThickPoint> &v) const;
 
 	/*!
        Return the n-th control point 
@@ -224,7 +224,7 @@ public:
 
 	//! Reduce the number of control point according to \b maxError parameter.
 	//! The vector corners contain the corner of the stroke.
-	void reduceControlPoints(double maxError, vector<int> corners);
+	void reduceControlPoints(double maxError, std::vector<int> corners);
 
 	/*!
       Return a thickpoint at w (parameter (0<=w<=1))
@@ -327,7 +327,7 @@ public:
 	// void deleteStyle(int);
 
 	//! Only for debug
-	void print(ostream &os = std::cout) const;
+	void print(std::ostream &os = std::cout) const;
 
 	//! change tangent versus in the stroke
 	/*!
@@ -363,13 +363,13 @@ public:
       Create a \b T3DPointD vector froma a \b TThickPoint vector. The \b T3DPointD vector is used to
       find a \b TCubicStroke; than find the quadratic stroke.
     */
-	static TStroke *interpolate(const vector<TThickPoint> &points, double error, bool findCorners = true);
+	static TStroke *interpolate(const std::vector<TThickPoint> &points, double error, bool findCorners = true);
 
 	//! Get a stroke from a \b TThickQuadratic vector
 	/*!
       Take from \b curves the control points used to create the stroke
     */
-	static TStroke *create(const vector<TThickQuadratic *> &curves);
+	static TStroke *create(const std::vector<TThickQuadratic *> &curves);
 
 	int getId() const;
 	void setId(int id);
@@ -512,7 +512,7 @@ DVAPI int intersect(const TStroke &stroke,
   and a specialyzed function.
  */
 DVAPI void splitStroke(const TStroke &tq,
-					   const vector<double> &pars,
+					   const std::vector<double> &pars,
 					   std::vector<TStroke *> &v);
 
 /* !puts in corners the indexes of quadric junctions of the stroke that create angles greater 
@@ -537,6 +537,6 @@ DVAPI void computeQuadraticsFromCubic(const TThickPoint &p0,
 									  const TThickPoint &p2,
 									  const TThickPoint &p3,
 									  double error,
-									  vector<TThickQuadratic *> &chunkArray);
+										std::vector<TThickQuadratic *> &chunkArray);
 
 #endif // TSTROKE_H

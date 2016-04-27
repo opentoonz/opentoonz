@@ -738,7 +738,7 @@ void ParamField::setFxHandle(TFxHandle *fxHandle)
 // ParamFieldKeyToggle
 //-----------------------------------------------------------------------------
 
-ParamFieldKeyToggle::ParamFieldKeyToggle(QWidget *parent, string name)
+ParamFieldKeyToggle::ParamFieldKeyToggle(QWidget *parent, std::string name)
 	: QWidget(parent), m_status(NOT_ANIMATED), m_highlighted(false)
 {
 	setFixedSize(15, 15);
@@ -1344,7 +1344,7 @@ EnumParamField::EnumParamField(QWidget *parent, QString name, const TIntEnumPara
 
 	for (int i = 0; i < param->getItemCount(); i++) {
 		int value = 0;
-		string caption;
+		std::string caption;
 		param->getItem(i, value, caption);
 		QString str;
 		m_om->addItem(str.fromStdString(caption));
@@ -1413,7 +1413,7 @@ void EnumParamField::update(int frame)
 	TIntEnumParamP param = m_actualParam;
 	for (int i = 0; i < param->getItemCount(); i++) {
 		int value = 0;
-		string caption;
+		std::string caption;
 		param->getItem(i, value, caption);
 		if (value != param->getValue())
 			continue;

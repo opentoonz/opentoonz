@@ -235,7 +235,7 @@ namespace
 class TFarmTaskDeclaration : public TPersistDeclaration
 {
 public:
-	TFarmTaskDeclaration(const string &id)
+	TFarmTaskDeclaration(const std::string &id)
 		: TPersistDeclaration(id) {}
 
 	TPersist *create() const
@@ -1728,10 +1728,10 @@ void FarmController::getTasks(const QString &parentId, vector<TaskShortInfo> &ta
   if (it != m_tasks.end())
   {
     CtrlFarmTask *task = it->second;
-    vector<string>::iterator itSubTakId = task->m_subTasks.begin();
+    vector<std::string>::iterator itSubTakId = task->m_subTasks.begin();
     for ( ; itSubTakId != task->m_subTasks.end(); ++itSubTakId)
     {
-      map<string, CtrlFarmTask*>::iterator itSubTask = m_tasks.find(*itSubTakId);
+      map<std::string, CtrlFarmTask*>::iterator itSubTask = m_tasks.find(*itSubTakId);
       if (itSubTask != m_tasks.end())
       {
         CtrlFarmTask *subTask = itSubTask->second;
@@ -2263,7 +2263,7 @@ void FarmController::save(const TFilePath &fp) const
 {
 	TOStream os(fp);
 
-	map<string, string> attributes;
+	map<std::string, string> attributes;
 	attributes.insert(make_pair("ver", "1.0"));
 	os.openChild("tfarmdata", attributes);
 	os.openChild("tfarmtasks");

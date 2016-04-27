@@ -75,7 +75,7 @@ TextTag::TextTag(const TextTag &textTag)
 
 /*=====================================================================*/
 
-TextTag::TextTag(const string &text)
+TextTag::TextTag(const std::string &text)
 	: PliObjectTag(PliTag::TEXT), m_text(text)
 {
 }

@@ -42,7 +42,7 @@ private:
 	void doSettings(const TScannerParameters &params, bool isFirstSheet);
 	void collectInformation(char *lev0, char *lev1, unsigned short *lowRes, unsigned short *hiRes, unsigned short *hMax, unsigned short *vMax);
 	bool resetScanner();
-	void reportError(string errMsg); // debug only
+	void reportError(std::string errMsg); // debug only
 
 	char *ESCI_inquiry(char cmd); /* returns 0 if failed */
 	bool ESCI_command(char cmd, bool checkACK);

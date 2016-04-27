@@ -34,9 +34,9 @@ class RasterImageData : public DvMimeData
 {
 protected:
 	double m_dpiX, m_dpiY;
-	vector<TRectD> m_rects;
-	vector<TStroke> m_strokes;
-	vector<TStroke> m_originalStrokes;
+	std::vector<TRectD> m_rects;
+	std::vector<TStroke> m_strokes;
+	std::vector<TStroke> m_originalStrokes;
 	TAffine m_transformation;
 	TDimension m_dim;
 
@@ -45,11 +45,11 @@ public:
 	~RasterImageData();
 
 	virtual void setData(const TRasterP &copiedRaster, const TPaletteP &palette, double dpiX, double dpiY, const TDimension &dim,
-						 const vector<TRectD> &rects, const vector<TStroke> &strokes, const vector<TStroke> &originalStrokes,
+						 const std::vector<TRectD> &rects, const std::vector<TStroke> &strokes, const std::vector<TStroke> &originalStrokes,
 						 const TAffine &transformation) = 0;
 
 	virtual void getData(TRasterP &copiedRaster, double &dpiX, double &dpiY,
-						 vector<TRectD> &rects, vector<TStroke> &strokes, vector<TStroke> &originalStrokes,
+						 std::vector<TRectD> &rects, std::vector<TStroke> &strokes, std::vector<TStroke> &originalStrokes,
 						 TAffine &transformation, TPalette *targetPalette) const = 0;
 
 	virtual StrokesData *toStrokesData(ToonzScene *scene) const = 0;
@@ -78,12 +78,12 @@ public:
 	~ToonzImageData();
 	// data <- floating ti;
 	void setData(const TRasterP &copiedRaster, const TPaletteP &palette, double dpiX, double dpiY, const TDimension &dim,
-				 const vector<TRectD> &rects, const vector<TStroke> &strokes, const vector<TStroke> &originalStrokes,
+				 const std::vector<TRectD> &rects, const std::vector<TStroke> &strokes, const std::vector<TStroke> &originalStrokes,
 				 const TAffine &transformation);
 
 	// floating ti <- data;
 	void getData(TRasterP &copiedRaster, double &dpiX, double &dpiY,
-				 vector<TRectD> &rects, vector<TStroke> &strokes, vector<TStroke> &originalStrokes,
+				 std::vector<TRectD> &rects, std::vector<TStroke> &strokes, std::vector<TStroke> &originalStrokes,
 				 TAffine &transformation, TPalette *targetPalette) const;
 
 	StrokesData *toStrokesData(ToonzScene *scene) const;
@@ -109,12 +109,12 @@ public:
 
 	// data <- floating ti;
 	void setData(const TRasterP &copiedRaster, const TPaletteP &palette, double dpiX, double dpiY, const TDimension &dim,
-				 const vector<TRectD> &rects, const vector<TStroke> &strokes, const vector<TStroke> &originalStrokes,
+				 const std::vector<TRectD> &rects, const std::vector<TStroke> &strokes, const std::vector<TStroke> &originalStrokes,
 				 const TAffine &transformation);
 
 	// floating ti <- data;
 	void getData(TRasterP &copiedRaster, double &dpiX, double &dpiY,
-				 vector<TRectD> &rects, vector<TStroke> &strokes, vector<TStroke> &originalStrokes,
+				 std::vector<TRectD> &rects, std::vector<TStroke> &strokes, std::vector<TStroke> &originalStrokes,
 				 TAffine &transformation, TPalette *targetPalette) const;
 
 	StrokesData *toStrokesData(ToonzScene *scene) const;

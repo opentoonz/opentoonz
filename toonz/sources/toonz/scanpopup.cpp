@@ -259,7 +259,7 @@ ScanSettingsPopup::ScanSettingsPopup()
 
 	m_paperFormatOm = new QComboBox();
 	m_paperFormatOm->setFixedSize(150, WidgetHeight);
-	std::vector<string> formats;
+	std::vector<std::string> formats;
 	TPaperFormatManager::instance()->getFormats(formats);
 	int i;
 	for (i = 0; i < (int)formats.size(); i++)
@@ -527,7 +527,7 @@ AutocenterPopup::AutocenterPopup()
 	m_fieldGuide = new QComboBox(this);
 	m_fieldGuide->setFixedHeight(WidgetHeight);
 	m_fieldGuide->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
-	std::vector<string> fdgNames;
+	std::vector<std::string> fdgNames;
 	CleanupParameters::getFdgNames(fdgNames);
 	int i;
 	for (i = 0; i < (int)fdgNames.size(); i++)
@@ -654,7 +654,7 @@ void MyScannerListener::onImage(const TRasterImageP &rasImg)
 		return;
 	}
 	if (m_isPreview) {
-		TImageCache::instance()->add((string) "setScanCropboxId", rasImg.getPointer());
+		TImageCache::instance()->add((std::string) "setScanCropboxId", rasImg.getPointer());
 	} else {
 #ifdef LINETEST
 		//Autocenter
@@ -926,7 +926,7 @@ public:
 
 class SetScanCropboxTool : public TTool
 {
-	const string m_imgId;
+	const std::string m_imgId;
 	TScannerParameters *m_parameters;
 	int m_scaling;
 	TPointD m_lastPos;

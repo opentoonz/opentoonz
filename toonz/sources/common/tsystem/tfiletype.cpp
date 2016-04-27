@@ -10,7 +10,7 @@ namespace
 class FileTypeData
 {
 public:
-	map<string, int> m_table;
+	std::map<std::string, int> m_table;
 
 public:
 	FileTypeData()
@@ -34,7 +34,7 @@ public:
 TFileType::Type TFileType::getInfo(const TFilePath &fp)
 {
 	FileTypeData *data = FileTypeData::instance();
-	std::map<string, int>::iterator it = data->m_table.find(fp.getType());
+	std::map<std::string, int>::iterator it = data->m_table.find(fp.getType());
 
 	int type = (it == data->m_table.end()) ? TFileType::UNKNOW_FILE : it->second;
 	if ((type & TFileType::LEVEL) == 0 && (fp.getDots() == ".."))
@@ -45,10 +45,10 @@ TFileType::Type TFileType::getInfo(const TFilePath &fp)
 
 //--------------------------------------------------------------------------------
 
-TFileType::Type TFileType::getInfoFromExtension(const string &extension)
+TFileType::Type TFileType::getInfoFromExtension(const std::string &extension)
 {
 	FileTypeData *data = FileTypeData::instance();
-	std::map<string, int>::iterator it = data->m_table.find(extension);
+	std::map<std::string, int>::iterator it = data->m_table.find(extension);
 	int type = (it == data->m_table.end()) ? TFileType::UNKNOW_FILE : it->second;
 	return (TFileType::Type)type;
 }
@@ -60,7 +60,7 @@ TFileType::Type TFileType::getInfoFromExtension(const QString &type)
 
 //--------------------------------------------------------------------------------
 
-void TFileType::declare(string extension, Type type)
+void TFileType::declare(std::string extension, Type type)
 {
 	FileTypeData *data = FileTypeData::instance();
 	data->m_table[extension] = type;

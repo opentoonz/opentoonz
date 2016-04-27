@@ -24,7 +24,7 @@ namespace TFarmStuff
 class TFarmPage : public TWidget
 {
 public:
-	TFarmPage(TWidget *parent, const string &name) : TWidget(parent, name) {}
+	TFarmPage(TWidget *parent, const std::string &name) : TWidget(parent, name) {}
 	virtual ~TFarmPage() {}
 
 	virtual void onActivate() {}
@@ -48,7 +48,7 @@ public:
 	void onDeactivate();
 	void update();
 
-	void showTaskInfo(const string &id);
+	void showTaskInfo(const std::string &id);
 
 private:
 	class Data;
@@ -63,43 +63,43 @@ public:
 	virtual ~SubmitPageTask() {}
 
 	/*
-  virtual void setFileArg(const string &fp) = 0;
-  virtual void setCommandLine(const string &cmdLine) = 0;
+  virtual void setFileArg(const std::string &fp) = 0;
+  virtual void setCommandLine(const std::string &cmdLine) = 0;
   virtual void setDefaultValue() = 0;
 */
 
-	virtual string getCommandLine() const = 0;
+	virtual std::string getCommandLine() const = 0;
 
-	virtual string getFilePath()
+	virtual std::string getFilePath()
 	{
 		return m_filePath;
 	}
 
-	virtual void setFilePath(const string &filePath)
+	virtual void setFilePath(const std::string &filePath)
 	{
 		m_filePath = filePath;
 	}
 
-	virtual string getName()
+	virtual std::string getName()
 	{
 		return m_name;
 	}
 
-	virtual void setName(const string &name)
+	virtual void setName(const std::string &name)
 	{
 		m_name = name;
 	}
 
 	/*
-  virtual map<string, string> getDependencies();
-  virtual void setDependencies(const map<string, string> &tasks);
+  virtual map<std::string, string> getDependencies();
+  virtual void setDependencies(const map<std::string, string> &tasks);
 */
-	static SubmitPageTask *create(const string &type);
+	static SubmitPageTask *create(const std::string &type);
 
 protected:
-	string m_filePath;
-	string m_name;
-	map<string, string> m_depTasks;
+	std::string m_filePath;
+	std::string m_name;
+	std::map<std::string, std::string> m_depTasks;
 };
 
 //------------------------------------------------------------------------------
@@ -117,7 +117,7 @@ public:
 
 	SubmitPageTask *getTask() const;
 	void setTask(SubmitPageTask *task);
-	void onTextField(const string &name, bool isName);
+	void onTextField(const std::string &name, bool isName);
 
 	class Data;
 	Data *m_data;
@@ -139,7 +139,7 @@ public:
 class SubmitRenderPopup : public TModalPopup
 {
 public:
-	SubmitRenderPopup(TWidget *parent, string name);
+	SubmitRenderPopup(TWidget *parent, std::string name);
 	~SubmitRenderPopup();
 
 	void onOk();
@@ -163,7 +163,7 @@ private:
 class SubmitCleanupPopup : public TModalPopup
 {
 public:
-	SubmitCleanupPopup(TWidget *parent, string name);
+	SubmitCleanupPopup(TWidget *parent, std::string name);
 	~SubmitCleanupPopup();
 
 	void onOk();
@@ -187,7 +187,7 @@ private:
 class GRootEnvVarPopup : public TModalPopup
 {
 public:
-	GRootEnvVarPopup(TWidget *parent, string name);
+	GRootEnvVarPopup(TWidget *parent, std::string name);
 	~GRootEnvVarPopup();
 
 	void onOk();

@@ -148,7 +148,7 @@ QMutex levelFileMutex;
 
 } // namespace
 
-inline bool isMultipleFrameType(string type)
+inline bool isMultipleFrameType(std::string type)
 {
 	return (type == "tlv" || type == "tzl" || type == "pli" || type == "mov" || type == "avi" ||
 			type == "3gp");
@@ -742,7 +742,7 @@ void FileBrowser::setUnregisteredFolder(const TFilePath &fp)
 
 //-----------------------------------------------------------------------------
 
-void FileBrowser::setHistoryDay(string dayDateString)
+void FileBrowser::setHistoryDay(std::string dayDateString)
 {
 	m_folder = TFilePath();
 	m_dayDateString = dayDateString;
@@ -805,7 +805,7 @@ void FileBrowser::readInfo(Item &item)
 	{
 		try {
 			//Find this level's item
-			map<TFilePath, Item>::iterator it = m_multiFileItemMap.find(TFilePath(item.m_path.getLevelName()));
+			std::map<TFilePath, Item>::iterator it = m_multiFileItemMap.find(TFilePath(item.m_path.getLevelName()));
 			if (it == m_multiFileItemMap.end())
 				throw "";
 
@@ -920,7 +920,7 @@ QVariant FileBrowser::getItemData(int index, DataType dataType, bool isSelected)
 			readFrameCount(item);
 		return item.m_frameCount;
 	} else if (dataType == PlayAvailable) {
-		string type = item.m_path.getType();
+		std::string type = item.m_path.getType();
 		if (item.m_frameCount > 1 && type != "tzp" && type != "tzu")
 			return true;
 		return false;
@@ -1492,7 +1492,7 @@ bool FileBrowser::drop(const QMimeData *mimeData)
 		if (!sl)
 			return false;
 
-		wstring levelName = sl->getName();
+		std::wstring levelName = sl->getName();
 		folderPath += TFilePath(levelName + toWideString(sl->getPath().getDottedType()));
 		if (TSystem::doesExistFileOrLevel(folderPath)) {
 			QString question = "Level " + toQString(folderPath) + " already exists\nDo you want to duplicate it?";
@@ -1727,7 +1727,7 @@ void renameSingleFileOrToonzLevel(const QString &fullpath)
 	if (popup.exec() != QDialog::Accepted)
 		return;
 
-	string name = popup.getName().toStdString();
+	std::string name = popup.getName().toStdString();
 
 	if (name == fpin.getName()) {
 		DVGui::error(QString(QObject::tr("The specified name is already assigned to the %1 file.").arg(fullpath)));
@@ -1843,7 +1843,7 @@ void FileBrowser::convertToUnpaintedTlv()
 	QApplication::setOverrideCursor(Qt::WaitCursor);
 
 	int i, totFrames = 0;
-	vector<Convert2Tlv *> converters;
+	std::vector<Convert2Tlv *> converters;
 	for (i = 0; i < filePaths.size(); i++) {
 		Convert2Tlv *converter = new Convert2Tlv(filePaths[i], TFilePath(), TFilePath(), -1, -1, autoclose == sl.at(0), TFilePath(), 0, 0, 0);
 
@@ -1870,7 +1870,7 @@ void FileBrowser::convertToUnpaintedTlv()
 	ProgressDialog pb("", "Cancel", 0, totFrames);
 	int j, l, k = 0;
 	for (i = 0; i < converters.size(); i++) {
-		string errorMessage;
+		std::string errorMessage;
 		if (!converters[i]->init(errorMessage)) {
 			converters[i]->abort();
 			DVGui::error(QString::fromStdString(errorMessage));
@@ -1885,7 +1885,7 @@ void FileBrowser::convertToUnpaintedTlv()
 		pb.show();
 
 		for (j = 0; j < count; j++) {
-			string errorMessage = "";
+			std::string errorMessage = "";
 			if (!converters[i]->convertNext(errorMessage) || pb.wasCanceled()) {
 				for (l = i; l < converters.size(); l++) {
 					converters[l]->abort();
@@ -1950,7 +1950,7 @@ void FileBrowser::convertToPaintedTlv()
 		TSystem::removeFileOrLevel(converter->m_levelOut);
 	}
 
-	string errorMessage;
+	std::string errorMessage;
 	if (!converter->init(errorMessage)) {
 		converter->abort();
 		delete converter;
@@ -2115,7 +2115,7 @@ void FileBrowser::newFolder()
 	if (parentFolder == TFilePath() || !TFileStatus(parentFolder).isDirectory())
 		return;
 	QString tempName(tr("New Folder"));
-	wstring folderName = tempName.toStdWString();
+	std::wstring folderName = tempName.toStdWString();
 	TFilePath folderPath = parentFolder + folderName;
 	int i = 1;
 	while (TFileStatus(folderPath).doesExist())
@@ -2135,7 +2135,7 @@ void FileBrowser::newFolder()
 	model->refresh(parentFolderIndex);
 	m_folderTreeView->expand(parentFolderIndex);
 
-	wstring newFolderName = folderPath.getWideName();
+	std::wstring newFolderName = folderPath.getWideName();
 	QModelIndex newFolderIndex = model->childByName(parentFolderIndex, newFolderName);
 	if (newFolderIndex.isValid()) {
 		m_folderTreeView->setCurrentIndex(newFolderIndex);

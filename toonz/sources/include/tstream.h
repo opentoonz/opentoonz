@@ -63,8 +63,8 @@ public:
 
 	TIStream &operator>>(int &v);		//!< Reads an integer from the stream
 	TIStream &operator>>(double &v);	//!< Reads a double from the stream
-	TIStream &operator>>(string &v);	//!< Reads a string from the stream
-	TIStream &operator>>(wstring &v);   //!< Reads a wstring from the stream
+	TIStream &operator>>(std::string &v);	//!< Reads a string from the stream
+	TIStream &operator>>(std::wstring &v);   //!< Reads a wstring from the stream
 	TIStream &operator>>(TFilePath &v); //!< Reads a TFilePath from the stream
 	TIStream &operator>>(TPixel32 &v);  //!< Reads a TPixel32 from the stream
 	TIStream &operator>>(TPixel64 &v);  //!< Reads a TPixel64 from the stream
@@ -85,7 +85,7 @@ public:
 										//!  \sa operator>>(TPersist&)
 
 	//!  \deprecated
-	string getString(); //!< Returns the stream content as a string, up to the next tag.
+	std::string getString(); //!< Returns the stream content as a string, up to the next tag.
 
 	//!  \deprecated
 	bool eos(); //!< \brief Returns \e true in case of end of string (a StreamTag::EndTag
@@ -95,7 +95,7 @@ public:
     \param      tagName Output name of a matched tag.
     \return     Whether a tag was found.
   */
-	bool matchTag(string &tagName); //!< Attempts matching a tag and returns its name.
+	bool matchTag(std::string &tagName); //!< Attempts matching a tag and returns its name.
 
 	//! \return   Whether an end tag was found.
 	bool matchEndTag(); //!< Attempts matching a StreamTag::EndTag.
@@ -108,18 +108,18 @@ public:
     \param value      Output value of the attribute.
     \return           Whether the tag attribute was found.
   */
-	bool getTagParam(string paramName, string &value);
-	bool getTagParam(string paramName, int &value); //!< \sa getTagParam(string, string&)
+	bool getTagParam(std::string paramName, std::string &value);
+	bool getTagParam(std::string paramName, int &value); //!< \sa getTagParam(string, string&)
 
 	bool isBeginEndTag(); //!< Returns whether current tag is of type StreamTag::BeginEndTag.
 
-	bool openChild(string &tagName); //!< \deprecated Use matchTag(string&) instead.
+	bool openChild(std::string &tagName); //!< \deprecated Use matchTag(string&) instead.
 	void closeChild();				 //!< \deprecated Use matchEndTag() instead.
 
 	bool match(char c) const; //! \deprecated
 
-	string getTagAttribute(string name) const; //!< \sa getTagParam(string, string&),
-											   //!  TOStream::openChild(string, const map<string, string>&).
+	std::string getTagAttribute(std::string name) const; //!< \sa getTagParam(string, string&),
+											   //!  TOStream::openChild(string, const map<std::string, string>&).
 
 	TFilePath getFilePath();	   //!< Returns the stream's path (i.e. the opened filename associated to the input stream).
 	TFilePath getRepositoryPath(); //!< \deprecated
@@ -196,8 +196,8 @@ public:
 
 	TOStream &operator<<(int v);			  //!< Writes an int to the stream.
 	TOStream &operator<<(double v);			  //!< Writes a double to the stream.
-	TOStream &operator<<(string v);			  //!< Writes a string to the stream.
-	TOStream &operator<<(wstring v);		  //!< Writes a wstring to the stream.
+	TOStream &operator<<(std::string v);			  //!< Writes a string to the stream.
+	TOStream &operator<<(std::wstring v);		  //!< Writes a wstring to the stream.
 	TOStream &operator<<(const TFilePath &v); //!< Writes a TFilePath to the stream.
 	TOStream &operator<<(const TPixel32 &v);  //!< Writes a TPixel32 to the stream.
 	TOStream &operator<<(const TPixel64 &v);  //!< Writes a TPixel64 to the stream.
@@ -211,14 +211,14 @@ public:
 									   //!  to the reimplemented TPersist::saveData.
 
 	//! \deprecated Use openChild(string) instead
-	TOStream child(string tagName);
+	TOStream child(std::string tagName);
 
-	void openChild(string tagName); //!< Writes a <tagName> to the stream, opening a tag.
-	void openChild(string tagName,
-				   const map<string, string> &attributes); //!< \brief Writes a <tagName attribute1="value1" ..>
+	void openChild(std::string tagName); //!< Writes a <tagName> to the stream, opening a tag.
+	void openChild(std::string tagName,
+				   const std::map<std::string, std::string> &attributes); //!< \brief Writes a <tagName attribute1="value1" ..>
 														   //!  to the stream, opening a tag with embedded attributes.
-	void openCloseChild(string tagName,
-						const map<string, string> &attributes); //!< \brief Writes a tag <tagName attribute1="value1" ../>
+	void openCloseChild(std::string tagName,
+						const std::map<std::string, std::string> &attributes); //!< \brief Writes a tag <tagName attribute1="value1" ../>
 																//!  to the stream, opening a tag with embedded attributes
 																//!  which is immediately closed.
 

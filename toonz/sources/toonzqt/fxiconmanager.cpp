@@ -12,9 +12,9 @@ FxIconPixmapManager *FxIconPixmapManager::instance()
 	return &_instance;
 }
 
-const QPixmap &FxIconPixmapManager::getFxIconPm(string type)
+const QPixmap &FxIconPixmapManager::getFxIconPm(std::string type)
 {
-	std::map<string, QPixmap>::iterator it;
+	std::map<std::string, QPixmap>::iterator it;
 	it = m_pms.find(type);
 	if (it != m_pms.end())
 		return it->second;

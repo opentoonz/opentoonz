@@ -95,7 +95,7 @@
 
 #ifdef _WIN32
 #include "avicodecrestrictions.h"
-#endif;
+#endif
 
 #include "flipbook.h"
 
@@ -599,7 +599,7 @@ bool FlipBook::doSaveImages(TFilePath fp)
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 	TOutputProperties *outputSettings = scene->getProperties()->getOutputProperties();
 
-	string ext = fp.getType();
+	std::string ext = fp.getType();
 
 	// Open a notice that the previewFx is rendered in 8bpc regardless of the output settings.
 	if (m_isPreviewFx && outputSettings->getRenderSettings().m_bpp == 64) {
@@ -612,7 +612,7 @@ bool FlipBook::doSaveImages(TFilePath fp)
 #ifdef _WIN32
 	if (ext == "avi") {
 		TPropertyGroup *props = outputSettings->getFileFormatProperties(ext);
-		string codecName = props->getProperty(0)->getValueAsString();
+		std::string codecName = props->getProperty(0)->getValueAsString();
 		TDimension res = scene->getCurrentCamera()->getRes();
 		if (!AviCodecRestrictions::canWriteMovie(toWideString(codecName), res)) {
 			QString msg(QObject::tr("The resolution of the output camera does not fit with the options chosen for the output file format."));
@@ -620,7 +620,7 @@ bool FlipBook::doSaveImages(TFilePath fp)
 			return false;
 		}
 	}
-#endif;
+#endif
 
 	if (ext == "") {
 		ext = outputSettings->getPath().getType();
@@ -891,7 +891,7 @@ void FlipBookPool::save() const
 
 	history.beginGroup("flipbooks");
 
-	map<int, FlipBook *>::const_iterator it;
+	std::map<int, FlipBook *>::const_iterator it;
 	for (it = m_pool.begin(); it != m_pool.end(); ++it) {
 		history.beginGroup(QString::number(it->first));
 		TPanel *panel = static_cast<TPanel *>(it->second->parent());
@@ -899,7 +899,7 @@ void FlipBookPool::save() const
 		history.endGroup();
 	}
 
-	map<int, QRect>::const_iterator jt;
+	std::map<int, QRect>::const_iterator jt;
 	for (jt = m_geometryPool.begin(); jt != m_geometryPool.end(); ++jt) {
 		history.beginGroup(QString::number(jt->first));
 		history.setValue("geometry", jt->second);
@@ -1465,7 +1465,7 @@ void FlipBook::playAudioFrame(int frame)
 		try {
 			m_player->play(m_snd, firstSample, lastSample, false, false);
 		} catch (TSoundDeviceException &e) {
-			string msg;
+			std::string msg;
 			if (e.getType() == TSoundDeviceException::UnsupportedFormat) {
 				try {
 					TSoundTrackFormat fmt = m_player->getPreferredFormat(m_snd->getFormat());
@@ -1483,7 +1483,7 @@ void FlipBook::playAudioFrame(int frame)
 
 TImageP FlipBook::getCurrentImage(int frame)
 {
-	string id = "";
+	std::string id = "";
 	TFrameId fid;
 	TFilePath fp;
 
@@ -1543,7 +1543,7 @@ TImageP FlipBook::getCurrentImage(int frame)
 
 	if (TImageCache::instance()->isCached(id)) {
 		TRect loadbox;
-		map<string, TRect>::const_iterator it = m_loadboxes.find(id);
+		std::map<std::string, TRect>::const_iterator it = m_loadboxes.find(id);
 		if (it != m_loadboxes.end())
 			loadbox = it->second;
 
@@ -1752,7 +1752,7 @@ void FlipBook::dragEnterEvent(QDragEnterEvent *e)
 
 	foreach (QUrl url, mimeData->urls()) {
 		TFilePath fp(url.toLocalFile().toStdWString());
-		string type = fp.getType();
+		std::string type = fp.getType();
 		if (type == "tzp" || type == "tzu" || type == "tnz" || type == "scr" || type == "mesh")
 			return;
 	}

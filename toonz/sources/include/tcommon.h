@@ -30,54 +30,11 @@
 #include <algorithm>
 #include <limits>
 
-using std::string;
-/*
-#if defined(MACOSX)
-#warning "using dummy wstring class"
-class wstring {
-  string m_str;
- public:
-  typedef int size_type;
-  typedef wchar_t* iterator;
-  static const size_type 	npos = static_cast<size_type>(-1);
-
-  wstring() {}
-  wstring(const wchar_t*wstr) { m_str=reinterpret_cast<const char*>(wstr); }
-  wstring(const wchar_t*wstr, int len) { m_str.assign(reinterpret_cast<const char*>(wstr), len*sizeof(wchar_t)); }
-  //wstring(const char*str) { m_str = str; }
-  int length() const {return m_str.length()/sizeof(wchar_t); }
-  int size() const {return m_str.size()/sizeof(wchar_t); }
-  wstring substr(size_type pos, size_type n = npos) { 
-    size_type _n = (n==npos)? npos : n*sizeof(wchar_t);
-    wstring ret;
-    ret.m_str = m_str.substr(pos*sizeof(wchar_t), _n);
-    return ret;
-  }
-  //iterator begin() { return }
-  const wchar_t* c_str() { return reinterpret_cast<const wchar_t*>(m_str.c_str()); }
-  wstring& operator=(const wstring& w) { m_str = w.m_str; return *this; }
-  bool operator !=(const wchar_t* wstr) const { const char* str = reinterpret_cast<const char*>(wstr); return m_str != str; }
-  bool operator ==(const wchar_t* wstr) const { const char* str = reinterpret_cast<const char*>(wstr); return m_str == str; }
-  bool operator ==(const wstring& wstr) const { return m_str == wstr.m_str; }
-};
-#endif
-#else
-*/
-using std::wstring;
-//#endif
-using std::ostream;
-using std::istream;
-using std::iostream;
-using std::ostrstream;
-using std::istrstream;
-using std::fstream;
-
 #if 0 && defined(__GNUC__)
 // typedef seems strong on GCC and breaks code with TException..
-#define TString wstring
+#define TString std::wstring
 #else
-typedef wstring TString;
-//typedef string TString;
+typedef std::wstring TString;
 #endif
 
 // STL
@@ -106,14 +63,6 @@ int nanosleep(struct timespec *, int);
 #include <vector>
 #include <map>
 // .. and so on
-
-// idem
-
-using std::list;
-using std::vector;
-using std::string;
-using std::map;
-using std::pair;
 
 /* the value of pi defined in IRIX-math.h is not defined neither in WIN32-math.h nor elsewhere */
 namespace TConsts
@@ -284,6 +233,6 @@ inline std::ostream &operator<<(std::ostream &out, const std::string &s)
 
 #define tArrayCount(ARRAY) (sizeof(ARRAY) / sizeof(ARRAY[0]))
 
-const string mySettingsFileName = "mysettings.ini";
+const std::string mySettingsFileName = "mysettings.ini";
 
 #endif //__T_COMMON_INCLUDED

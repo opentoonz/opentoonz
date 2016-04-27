@@ -137,13 +137,13 @@ class MagnetTool : public TTool
 		ArrayOfStroke m_splittedToMove;
 	} strokeCollection;
 
-	vector<strokeCollection> m_strokeToModify;
+	std::vector<strokeCollection> m_strokeToModify;
 	//vector<StrokeInfo>  m_info;
-	vector<TStroke *> m_strokeHit, m_oldStrokesArray;
+	std::vector<TStroke *> m_strokeHit, m_oldStrokesArray;
 
-	vector<int> m_changedStrokes;
+	std::vector<int> m_changedStrokes;
 
-	vector<vector<int> *> m_hitStrokeCorners, m_strokeToModifyCorners;
+	std::vector<std::vector<int> *> m_hitStrokeCorners, m_strokeToModifyCorners;
 
 	TDoubleProperty m_toolSize;
 	TPropertyGroup m_prop;
@@ -206,7 +206,7 @@ public:
 		m_changedStrokes.clear();
 		m_strokeToModify.clear();
 
-		vector<TStroke *> strokeUndo;
+		std::vector<TStroke *> strokeUndo;
 
 		TStroke *ref;
 
@@ -221,7 +221,7 @@ public:
 			TStroke *stroke = vi->getStroke(i);
 			ref = stroke;
 			//  calcola le intersezioni
-			vector<double> intersections;
+			std::vector<double> intersections;
 			intersect(*ref, p, m_pointSize, intersections);
 
 			if (intersections.empty()) {
@@ -230,7 +230,7 @@ public:
 					m_changedStrokes.push_back(i);
 					m_strokeHit.push_back(ref);
 
-					vector<int> *corners = new vector<int>;
+					std::vector<int> *corners = new std::vector<int>;
 					corners->push_back(0);
 					detectCorners(ref, 20, *corners);
 					corners->push_back(ref->getChunkCount());
@@ -258,7 +258,7 @@ public:
 					bool test = increaseControlPoints(*temp, TStrokePointDeformation(p, m_pointSize));
 					assert(test);
 
-					vector<int> *corners = new vector<int>;
+					std::vector<int> *corners = new std::vector<int>;
 					corners->push_back(0);
 					detectCorners(temp, 20, *corners);
 					corners->push_back(temp->getChunkCount());

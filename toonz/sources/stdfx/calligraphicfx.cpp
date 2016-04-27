@@ -120,7 +120,7 @@ private:
 
 	void convertParam(double param[], const char *cParam[], int cParamLen)
 	{
-		string app;
+		std::string app;
 		for (int i = 1; i < cParamLen; i++) {
 			app = toString(param[i]);
 			cParam[i] = strsave(app.c_str());
@@ -280,7 +280,7 @@ private:
 
 	void convertParam(double param[], const char *cParam[], int cParamLen)
 	{
-		string app;
+		std::string app;
 		for (int i = 1; i < cParamLen; i++) {
 			app = toString(param[i]);
 			cParam[i] = strsave(app.c_str());

@@ -40,7 +40,7 @@ public:
 	}
 
 	void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
-	string getAlias(double frame, const TRenderSettings &info) const;
+	std::string getAlias(double frame, const TRenderSettings &info) const;
 
 	bool canHandle(const TRenderSettings &info, double frame) { return true; }
 };
@@ -99,9 +99,9 @@ void SaltPepperNoiseFx::doCompute(TTile &tile, double frame, const TRenderSettin
 }
 //------------------------------------------------------------------
 
-string SaltPepperNoiseFx::getAlias(double frame, const TRenderSettings &info) const
+std::string SaltPepperNoiseFx::getAlias(double frame, const TRenderSettings &info) const
 {
-	string alias = getFxType();
+	std::string alias = getFxType();
 	alias += "[";
 
 	// alias degli effetti connessi alle porte di input separati da virgole
@@ -119,7 +119,7 @@ string SaltPepperNoiseFx::getAlias(double frame, const TRenderSettings &info) co
 	}
 
 	bool addframe = 0;
-	string paramalias("");
+	std::string paramalias("");
 	for (i = 0; i < getParams()->getParamCount(); i++) {
 		TParam *param = getParams()->getParam(i);
 		paramalias += param->getName() + "=" + param->getValueAlias(frame, 3);

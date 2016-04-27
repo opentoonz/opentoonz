@@ -7,7 +7,7 @@
 #include "tproperty.h"
 #include "tiio.h"
 
-#if !(defined(x64) || defined(__LP64__))
+#if !(defined(x64) || defined(__LP64__) || defined(LINUX))
 
 //*******************************************************************************
 //    32-bit version

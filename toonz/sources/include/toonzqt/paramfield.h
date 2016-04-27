@@ -119,7 +119,7 @@ private:
 	bool m_highlighted;
 
 public:
-	ParamFieldKeyToggle(QWidget *parent, string name = "ParamFieldKeyToggle");
+	ParamFieldKeyToggle(QWidget *parent, std::string name = "ParamFieldKeyToggle");
 
 	void setStatus(Status status);
 	Status getStatus() const;

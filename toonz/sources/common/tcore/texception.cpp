@@ -3,7 +3,7 @@
 #include "texception.h"
 #include "tconvert.h"
 
-TException::TException(const string &msg)
+TException::TException(const std::string &msg)
 {
 	m_msg = toWideString(msg);
 }

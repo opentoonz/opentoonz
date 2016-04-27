@@ -743,7 +743,7 @@ public:
 
 	void onActivate();
 	void onDeactivate();
-	bool onPropertyChanged(string propertyName);
+	bool onPropertyChanged(std::string propertyName);
 
 	void computeBBox();
 
@@ -759,7 +759,7 @@ public:
 		setMatrix(getCurrentObjectParentMatrix2()); // getCurrentObjectParentMatrix());
 	}
 
-	void drawText(const TPointD &p, double unit, string text);
+	void drawText(const TPointD &p, double unit, std::string text);
 };
 
 //-----------------------------------------------------------------------------
@@ -1139,7 +1139,7 @@ void drawZArrow()
 
 //-----------------------------------------------------------------------------
 
-void EditTool::drawText(const TPointD &p, double unit, string text)
+void EditTool::drawText(const TPointD &p, double unit, std::string text)
 {
 	glPushMatrix();
 	glTranslated(p.x, p.y, 0.0);
@@ -1273,7 +1273,7 @@ void EditTool::draw()
 
 	/*-- Object名を表示 --*/
 	TStageObject *pegbar = xsh->getStageObject(objId);
-	string name = pegbar->getFullName();
+	std::string name = pegbar->getFullName();
 	if (objId.isColumn() || objId.isPegbar() || objId.isTable()) {
 		glScaled(unit * 2, unit * 1.5, 1);
 		tglDrawText(TPointD(0, 0), name);
@@ -1366,7 +1366,7 @@ void EditTool::onDeactivate()
 
 //-----------------------------------------------------------------------------
 
-bool EditTool::onPropertyChanged(string propertyName)
+bool EditTool::onPropertyChanged(std::string propertyName)
 {
 	if (propertyName == m_lockCenterX.getName())
 		LockCenterX = (int)m_lockCenterX.getValue();

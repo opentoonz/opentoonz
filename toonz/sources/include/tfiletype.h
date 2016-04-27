@@ -61,10 +61,10 @@ DVAPI Type getInfo(const TFilePath &fp);
    * e.g. 'tif' => RASTER_IMAGE, 'mov' => RASTER_LEVEL, 'tlv' => CMAPPED_LEVEL, etc.
    */
 //!
-DVAPI Type getInfoFromExtension(const string &ext);
+DVAPI Type getInfoFromExtension(const std::string &ext);
 DVAPI Type getInfoFromExtension(const QString &ext);
 
-DVAPI void declare(string extension, Type type);
+DVAPI void declare(std::string extension, Type type);
 
 inline bool isResource(Type type) { return (type != UNKNOW_FILE); }
 inline bool isViewable(Type type) { return (type & VIEWABLE) != 0; }
@@ -73,7 +73,7 @@ inline bool isScene(Type type) { return (type & SCENE) != 0; }
 inline bool isFullColor(Type type) { return (type & RASTER_IMAGE) != 0; }
 inline bool isVector(Type type) { return (type & VECTOR_IMAGE) != 0; }
 
-inline bool isLevelExtension(const string &fileExtension) { return (getInfoFromExtension(fileExtension) & LEVEL) != 0; }
+inline bool isLevelExtension(const std::string &fileExtension) { return (getInfoFromExtension(fileExtension) & LEVEL) != 0; }
 inline bool isLevelExtension(const QString &fileExtension) { return (getInfoFromExtension(fileExtension) & LEVEL) != 0; }
 
 inline bool isLevelFilePath(const TFilePath &fp) { return (getInfo(fp) & LEVEL) != 0; }

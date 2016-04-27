@@ -96,7 +96,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-DVAPI ostream &operator<<(ostream &out, const TSegment &segment);
+DVAPI std::ostream &operator<<(std::ostream &out, const TSegment &segment);
 
 //-----------------------------------------------------------------------------
 
@@ -246,11 +246,11 @@ inline TQuadratic operator*(const TAffine &aff, const TQuadratic &curve)
 
 //-----------------------------------------------------------------------------
 
-DVAPI ostream &operator<<(ostream &out, const TQuadratic &curve);
+DVAPI std::ostream &operator<<(std::ostream &out, const TQuadratic &curve);
 
 //-----------------------------------------------------------------------------
 
-inline ostream &operator<<(ostream &out, const TQuadratic *curve)
+inline std::ostream &operator<<(std::ostream &out, const TQuadratic *curve)
 {
 	assert(curve);
 	return out << *curve;
@@ -371,11 +371,11 @@ inline TCubic operator*(const TAffine &aff, const TCubic &curve)
 
 //-----------------------------------------------------------------------------
 
-DVAPI ostream &operator<<(ostream &out, const TCubic &curve);
+DVAPI std::ostream &operator<<(std::ostream &out, const TCubic &curve);
 
 //-----------------------------------------------------------------------------
 
-inline ostream &operator<<(ostream &out, const TCubic *curve)
+inline std::ostream &operator<<(std::ostream &out, const TCubic *curve)
 {
 	assert(curve);
 	return out << *curve;
@@ -461,11 +461,11 @@ inline TThickSegment operator*(const TAffine &aff, const TThickSegment &ts)
 
 //-----------------------------------------------------------------------------
 
-DVAPI ostream &operator<<(ostream &out, const TThickSegment &segment);
+DVAPI std::ostream &operator<<(std::ostream &out, const TThickSegment &segment);
 
 //-----------------------------------------------------------------------------
 
-inline ostream &operator<<(ostream &out, const TThickSegment *segment)
+inline std::ostream &operator<<(std::ostream &out, const TThickSegment *segment)
 {
 	assert(segment);
 	return out << *segment;
@@ -553,11 +553,11 @@ inline TThickQuadratic transformQuad(const TAffine &aff, const TThickQuadratic &
 
 //---------------------------------------------------------------------
 
-DVAPI ostream &operator<<(ostream &out, const TThickQuadratic &tq);
+DVAPI std::ostream &operator<<(std::ostream &out, const TThickQuadratic &tq);
 
 //---------------------------------------------------------------------
 
-inline ostream &operator<<(ostream &out, const TThickQuadratic *tq)
+inline std::ostream &operator<<(std::ostream &out, const TThickQuadratic *tq)
 {
 	assert(tq);
 	return out << *tq;
@@ -641,11 +641,11 @@ inline TThickCubic operator*(const TAffine &aff, const TThickCubic &tc)
 
 //---------------------------------------------------------------------
 
-DVAPI ostream &operator<<(ostream &out, const TThickCubic &tc);
+DVAPI std::ostream &operator<<(std::ostream &out, const TThickCubic &tc);
 
 //---------------------------------------------------------------------
 
-inline ostream &operator<<(ostream &out, const TThickCubic *tc)
+inline std::ostream &operator<<(std::ostream &out, const TThickCubic *tc)
 {
 	assert(tc);
 	return out << *tc;

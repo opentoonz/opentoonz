@@ -122,7 +122,7 @@ bool pasteStylesDataWithoutUndo(TPalette *palette, TPaletteHandle *pltHandle, co
 			}
 			// 2. If pasting normal style to studio palette, add a new link and make it linkable
 			else {
-				wstring gname = L"-" + palette->getGlobalName() + L"-" + toWideString(styleId);
+				std::wstring gname = L"-" + palette->getGlobalName() + L"-" + toWideString(styleId);
 				style->setGlobalName(gname);
 			}
 		}
@@ -768,7 +768,7 @@ void TStyleSelection::eraseUnsedStyle()
 	std::set<TXshSimpleLevel *>::const_iterator it = levels.begin();
 	for (it; it != levels.end(); it++) {
 		TXshSimpleLevel *level = *it;
-		vector<TFrameId> fids;
+		std::vector<TFrameId> fids;
 		level->getFids(fids);
 		int m, i, j;
 		for (m = 0; m < (int)fids.size(); m++) {
@@ -904,7 +904,7 @@ public:
 	void pasteValue(int styleId, const TColorStyle *newStyle) const
 	{
 		// preserva il vecchio nome se m_pasteOnlyColor e' falso
-		wstring str = newStyle->getName();
+		std::wstring str = newStyle->getName();
 		if (m_pasteColor) {
 			getPalette()->setStyle(styleId, newStyle->clone());
 			if (!m_pasteName)
@@ -952,7 +952,7 @@ public:
 		int i;
 		int indexInPage = 0;
 		for (i = 0; i < (int)m_items.size(); i++) {
-			wstring oldName = m_items[i]->m_oldStyle->getName();
+			std::wstring oldName = m_items[i]->m_oldStyle->getName();
 			TColorStyle *style = m_items[i]->m_newStyle;
 			indexInPage = m_items[i]->m_index;
 			int styleId = page->getStyleId(indexInPage);
@@ -1108,7 +1108,7 @@ void TStyleSelection::pasteStylesValues(bool pasteName, bool pasteColor)
 		int styleId = page->getStyleId(indexInPage);
 		undo->addItem(indexInPage, palette->getStyle(styleId), data->getStyle(i));
 		TColorStyle *colorStyle = page->getStyle(indexInPage);
-		wstring styleName = colorStyle->getName();
+		std::wstring styleName = colorStyle->getName();
 		unsigned int flags = colorStyle->getFlags();
 
 		if (pasteColor) {
@@ -1402,7 +1402,7 @@ class UndoLinkToStudioPalette : public TUndo
 	struct ColorStyleData {
 		int m_indexInPage;
 		TColorStyle *m_oldStyle;
-		wstring m_newName;
+		std::wstring m_newName;
 	};
 	std::vector<ColorStyleData> m_styles;
 	bool m_updateLinkedColors;
@@ -1423,7 +1423,7 @@ public:
 		m_updateLinkedColors = updateLinkedColors;
 	}
 
-	void setColorStyle(int indexInPage, TColorStyle *oldStyle, wstring newName)
+	void setColorStyle(int indexInPage, TColorStyle *oldStyle, std::wstring newName)
 	{
 		ColorStyleData data;
 		data.m_indexInPage = indexInPage;
@@ -1493,8 +1493,8 @@ void TStyleSelection::toggleLink()
 	if (n <= 0)
 		return;
 
-	std::vector<std::pair<int, wstring>> oldColorStylesLinked;
-	std::vector<std::pair<int, wstring>> newColorStylesLinked;
+	std::vector<std::pair<int, std::wstring>> oldColorStylesLinked;
+	std::vector<std::pair<int, std::wstring>> newColorStylesLinked;
 
 	bool somethingHasBeenLinked = false;
 
@@ -1510,7 +1510,7 @@ void TStyleSelection::toggleLink()
 		int index = *it;
 		TColorStyle *cs = page->getStyle(index);
 		assert(cs);
-		wstring name = cs->getGlobalName();
+		std::wstring name = cs->getGlobalName();
 		TColorStyle *oldCs = cs->clone();
 		if (name != L"" && (name[0] == L'-' || name[0] == L'+')) {
 			name[0] = name[0] == L'-' ? L'+' : L'-';
@@ -1553,8 +1553,8 @@ void TStyleSelection::eraseToggleLink()
 	TPalette::Page *page = palette->getPage(m_pageIndex);
 	assert(page);
 
-	std::vector<std::pair<int, wstring>> oldColorStylesLinked;
-	std::vector<std::pair<int, wstring>> newColorStylesLinked;
+	std::vector<std::pair<int, std::wstring>> oldColorStylesLinked;
+	std::vector<std::pair<int, std::wstring>> newColorStylesLinked;
 
 	UndoLinkToStudioPalette *undo = new UndoLinkToStudioPalette(m_paletteHandle, m_pageIndex);
 
@@ -1563,7 +1563,7 @@ void TStyleSelection::eraseToggleLink()
 		TColorStyle *cs = page->getStyle(index);
 		assert(cs);
 		TColorStyle *oldCs = cs->clone();
-		wstring name = cs->getGlobalName();
+		std::wstring name = cs->getGlobalName();
 		if (name != L"" && (name[0] == L'-' || name[0] == L'+'))
 			cs->setGlobalName(L"");
 		undo->setColorStyle(index, oldCs, L"");
@@ -1606,8 +1606,8 @@ class UndoRemoveLink : public TUndo
 	int m_pageIndex;
 	struct ColorStyleData {
 		int m_indexInPage;
-		wstring m_oldGlobalName;
-		wstring m_oldOriginalName;
+		std::wstring m_oldGlobalName;
+		std::wstring m_oldOriginalName;
 		bool m_oldEdittedFlag;
 	};
 	std::vector<ColorStyleData> m_styles;
@@ -1836,7 +1836,7 @@ void TStyleSelection::getBackOriginalStyle()
 
 	bool somethingChanged = false;
 
-	std::map<wstring, TPaletteP> table;
+	std::map<std::wstring, TPaletteP> table;
 
 	TUndo *undo = new getBackOriginalStyleUndo(this);
 
@@ -1845,7 +1845,7 @@ void TStyleSelection::getBackOriginalStyle()
 		 it != m_styleIndicesInPage.end(); ++it) {
 		TColorStyle *cs = page->getStyle(*it);
 		assert(cs);
-		wstring gname = cs->getGlobalName();
+		std::wstring gname = cs->getGlobalName();
 
 		// if the style has no link
 		if (gname == L"")
@@ -1853,12 +1853,12 @@ void TStyleSelection::getBackOriginalStyle()
 
 		//Find the palette from the table
 		int k = gname.find_first_of(L'-', 1);
-		if (k == (int)wstring::npos)
+		if (k == (int)std::wstring::npos)
 			continue;
 
-		wstring paletteId = gname.substr(1, k - 1);
+		std::wstring paletteId = gname.substr(1, k - 1);
 
-		std::map<wstring, TPaletteP>::iterator palIt;
+		std::map<std::wstring, TPaletteP>::iterator palIt;
 		palIt = table.find(paletteId);
 
 		TPalette *spPalette = 0;

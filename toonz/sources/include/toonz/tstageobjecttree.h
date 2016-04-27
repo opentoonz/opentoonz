@@ -168,7 +168,7 @@ public:
 		If an Handle Manager has not been implemented this method returns a point of coordinates (0,0). 
 		\sa setHandleManager().
 	*/
-	TPointD getHandlePos(const TStageObjectId &id, string handle, int row) const;
+	TPointD getHandlePos(const TStageObjectId &id, std::string handle, int row) const;
 	/*!
 		Returns the number of the spline's objects in the tree.
 	*/

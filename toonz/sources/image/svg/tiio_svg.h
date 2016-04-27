@@ -55,7 +55,7 @@ class TLevelWriterSvg : public TLevelWriter
 	//  UINT  m_frameNumber;
 
 	//  vettore da utilizzare per il calcolo della palette
-	// vector<TPixel> m_colorArray;
+	// std::vector<TPixel> m_colorArray;
 
 public:
 	TLevelWriterSvg(const TFilePath &path, TPropertyGroup *winfo);

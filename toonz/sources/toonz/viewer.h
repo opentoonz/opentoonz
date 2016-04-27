@@ -15,7 +15,7 @@ class Viewer : public QGLWidget
 	TRaster32P m_raster;
 	Q_OBJECT;
 	//! String used to display "loading" text while the movie is being loaded
-	string m_message;
+	std::string m_message;
 	//! Pointer to a Processor to process the frame drawing OpenGL primitive over it.
 	Processor *m_processor;
 
@@ -35,7 +35,7 @@ public:
 	//! Set the Processor to draw over the current frame
 	void setProcessor(Processor *processor) { m_processor = processor; }
 	//! Set the message. This message is displayed for every frame (if is a non-empty string).
-	void setMessage(string msg);
+	void setMessage(std::string msg);
 
 protected:
 	void initializeGL();

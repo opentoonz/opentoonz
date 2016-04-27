@@ -75,8 +75,8 @@ class FlipBook;
 
 class FlipBookPool
 {
-	map<int, FlipBook *> m_pool;
-	map<int, QRect> m_geometryPool;
+	std::map<int, FlipBook *> m_pool;
+	std::map<int, QRect> m_geometryPool;
 	int m_overallFlipCount;
 
 	TFilePath m_historyPath;
@@ -124,7 +124,7 @@ protected:
 	int m_framesCount;
 	TRect m_loadbox;
 	TDimension m_dim;
-	map<string, TRect> m_loadboxes; //id in the cash, rect loaded actually
+	std::map<std::string, TRect> m_loadboxes; //id in the cash, rect loaded actually
 	class Level
 	{
 	public:
@@ -142,12 +142,12 @@ protected:
 		int getIndexesCount();
 	};
 
-	vector<Level> m_levels;
-	vector<QString> m_levelNames;
+	std::vector<Level> m_levels;
+	std::vector<QString> m_levelNames;
 	TPalette *m_palette;
 
 	bool m_playSound;
-	vector<string> m_addedInCache;
+	std::vector<std::string> m_addedInCache;
 	TSoundOutputDevice *m_player;
 	TSoundTrack *m_snd;
 

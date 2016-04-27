@@ -16,7 +16,7 @@ class TWriterInfoPli : public TWriterInfo {
 
 public:
  ~TWriterInfoPli() {}
-  static TWriterInfo *create(const string &ext) { return new TWriterInfoPli(); }
+  static TWriterInfo *create(const std::string &ext) { return new TWriterInfoPli(); }
   TWriterInfo *clone() const {
   return new TWriterInfoPli(*this); }
 
@@ -39,7 +39,7 @@ class TLevelWriterPli : public TLevelWriter
 	UINT m_frameNumber;
 
 	//  vettore da utilizzare per il calcolo della palette
-	vector<TPixel> m_colorArray;
+	std::vector<TPixel> m_colorArray;
 
 public:
 	TLevelWriterPli(const TFilePath &path, TPropertyGroup *winfo);

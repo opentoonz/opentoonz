@@ -50,7 +50,7 @@ public:
 		Returns the string identifier of the object. For example a TXsheet object is identified by "xsheet", 
 		a TStageObjectTree is identified by PegbarTree.
 	*/
-	inline string getStreamTag() const;
+	inline std::string getStreamTag() const;
 
 	/*!
 		This pure virtual method is used to define a global pointer to the object.
@@ -74,7 +74,7 @@ public:
 		this method creates it through TPersistDeclarationT class template.
 		\sa getDeclaration()
 	*/
-	static TPersist *create(const string &name);
+	static TPersist *create(const std::string &name);
 };
 
 //===================================================================
@@ -85,18 +85,18 @@ public:
 	*/
 class DVAPI TPersistDeclaration
 {
-	string m_id;
+	std::string m_id;
 
 public:
-	TPersistDeclaration(const string &id);
+	TPersistDeclaration(const std::string &id);
 	virtual ~TPersistDeclaration() {}
-	string getId() const { return m_id; };
+	std::string getId() const { return m_id; };
 	virtual TPersist *create() const = 0;
 };
 
 //-------------------------------------------------------------------
 
-inline string TPersist::getStreamTag() const { return getDeclaration()->getId(); }
+inline std::string TPersist::getStreamTag() const { return getDeclaration()->getId(); }
 
 //-------------------------------------------------------------------
 /*!
@@ -110,7 +110,7 @@ public:
 		This is the constructor. Its argument is the id of the object.
 		\sa TPersist::getStreamTag()
 	*/
-	TPersistDeclarationT(const string &id) : TPersistDeclaration(id) {}
+	TPersistDeclarationT(const std::string &id) : TPersistDeclaration(id) {}
 	/*!
 		Returns a pointer to a newly created object of type TPersist.
 		This template class is called by the macro PERSIST_DECLARATION(T).

@@ -85,7 +85,7 @@ public:
 	void enableMatte(bool on);
 
 	bool isMatteEnabled() const;
-	string getValueAlias(double frame, int precision);
+	std::string getValueAlias(double frame, int precision);
 	bool hasKeyframes() const;
 	void getKeyframes(std::set<double> &frames) const;
 	int getNextKeyframe(double frame) const;

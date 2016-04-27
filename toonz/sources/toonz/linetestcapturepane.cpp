@@ -757,7 +757,7 @@ FileSettingsPopup::FileSettingsPopup()
 
 	m_fileFormat->addItems(formats);
 	m_fileFormat->setMaximumHeight(WidgetHeight);
-	string ext = parameters->getFileFormat();
+	std::string ext = parameters->getFileFormat();
 	m_fileFormat->setCurrentIndex(m_fileFormat->findText(QString::fromStdString(ext)));
 	ret = ret && connect(m_fileFormat, SIGNAL(currentIndexChanged(const QString &)), SLOT(onFormatChanged(const QString &)));
 	fileFormatLayout->addWidget(m_fileFormat);
@@ -782,7 +782,7 @@ void FileSettingsPopup::updateWidgets()
 
 	m_pathField->setPath(toQString(parameters->getFilePath()));
 
-	string ext = parameters->getFileFormat();
+	std::string ext = parameters->getFileFormat();
 	m_fileFormat->setCurrentIndex(m_fileFormat->findText(QString::fromStdString(ext)));
 }
 
@@ -816,7 +816,7 @@ void FileSettingsPopup::onFormatChanged(const QString &str)
 void FileSettingsPopup::openSettingsPopup()
 {
 	CaptureParameters *parameters = getCaptureParameters();
-	string ext = parameters->getFileFormat();
+	std::string ext = parameters->getFileFormat();
 	openFormatSettingsPopup(this, ext, parameters->getFileFormatProperties(ext));
 }
 
@@ -1188,7 +1188,7 @@ void LineTestCapturePane::onConnectCheckboxStateChanged(int state)
 	if (state) {
 		TSceneProperties *sceneProperties = TApp::instance()->getCurrentScene()->getScene()->getProperties();
 		Q_ASSERT(sceneProperties);
-		wstring deviceName = sceneProperties->getCaptureParameters()->getDeviceName();
+		std::wstring deviceName = sceneProperties->getCaptureParameters()->getDeviceName();
 
 		if (deviceName.empty()) {
 			DVGui::warning(tr("No Device Defined."));
@@ -1308,7 +1308,7 @@ void LineTestCapturePane::updateFileField()
 		} else {
 			ToonzScene *scene = xsheet->getScene();
 			TLevelSet *levelSet = scene->getLevelSet();
-			wstring levelName;
+			std::wstring levelName;
 			NameBuilder *nameBuilder = NameBuilder::getBuilder(levelName);
 			TFilePath fp;
 			for (;;) {

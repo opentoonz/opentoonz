@@ -48,7 +48,7 @@ using namespace DVGui;
 namespace
 {
 
-TFxP getCurrentFx(const TFxP &currentFx, wstring actualId)
+TFxP getCurrentFx(const TFxP &currentFx, std::wstring actualId)
 {
 	if (currentFx->getFxId() == actualId)
 		return currentFx;
@@ -146,24 +146,24 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical)
 	bool isFirstParamInRow = true;
 
 	while (!is.matchEndTag()) {
-		string tagName;
+		std::string tagName;
 		if (!is.matchTag(tagName))
 			throw TException("expected tag");
 		if (tagName == "control") {
 			/*--- 設定ファイルからインタフェースの桁数を決める (PairSliderのみ実装。) ---*/
 			int decimals = 0;
-			string decimalsStr = is.getTagAttribute("decimals");
+			std::string decimalsStr = is.getTagAttribute("decimals");
 			if (decimalsStr != "") {
 				decimals = QString::fromStdString(decimalsStr).toInt();
 			}
 
-			string name;
+			std::string name;
 			is >> name;
 			is.matchEndTag();
 			/*-- Layout設定名とFxParameterの名前が一致するものを取得 --*/
 			TParamP param = fx->getParams()->getParam(name);
 			if (param) {
-				string paramName = fx->getFxType() + "." + name;
+				std::string paramName = fx->getFxType() + "." + name;
 				QString str = QString::fromStdWString(TStringTable::translate(paramName));
 				ParamField *field = ParamField::create(this, str, param);
 				if (field) {
@@ -196,7 +196,7 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical)
 				}
 			}
 		} else if (tagName == "label") {
-			string name;
+			std::string name;
 			is >> name;
 			is.matchEndTag();
 			QString str;
@@ -209,7 +209,7 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical)
 			}
 		} else if (tagName == "separator") {
 			// <separator/> o <separator label="xxx"/>
-			string label = is.getTagAttribute("label");
+			std::string label = is.getTagAttribute("label");
 			QString str;
 			Separator *sep = new Separator(str.fromStdString(label), this);
 			int currentRow = m_mainLayout->rowCount();
@@ -239,10 +239,10 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical)
 			m_mainLayout->addWidget(tmpWidget, currentRow, 1, 1, 2);
 		} else if (tagName == "vbox") {
 			int shrink = 0;
-			string shrinkStr = is.getTagAttribute("shrink");
+			std::string shrinkStr = is.getTagAttribute("shrink");
 			if (shrinkStr != "") {
 				shrink = QString::fromStdString(shrinkStr).toInt();
-				string label = is.getTagAttribute("label");
+				std::string label = is.getTagAttribute("label");
 				QCheckBox *checkBox = new QCheckBox(this);
 				QHBoxLayout *sepLay = new QHBoxLayout();
 				sepLay->setMargin(0);
@@ -277,7 +277,7 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical)
 		/*-- PixelParamFieldが２つあるとき、一方のRGB値を他方にコピーするボタン --*/
 		else if (tagName == "rgb_link_button") {
 			/*-- リンクさせたいパラメータを２つ得る --*/
-			string name1, name2;
+			std::string name1, name2;
 			is >> name1;
 			is >> name2;
 			is.matchEndTag();
@@ -309,8 +309,8 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical)
 				continue;
 
 			/*-- ボタンのラベルのため 翻訳する --*/
-			string paramName1 = fx->getFxType() + "." + name1;
-			string paramName2 = fx->getFxType() + "." + name2;
+			std::string paramName1 = fx->getFxType() + "." + name1;
+			std::string paramName2 = fx->getFxType() + "." + name2;
 			QString str1 = QString::fromStdWString(TStringTable::translate(paramName1));
 			QString str2 = QString::fromStdWString(TStringTable::translate(paramName2));
 			QString buttonStr = QString("Copy RGB : %1 > %2").arg(str1).arg(str2);
@@ -328,7 +328,7 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical)
 			QList<QWidget *> on_items;
 			QList<QWidget *> off_items;
 			while (!is.matchEndTag()) {
-				string tagName;
+				std::string tagName;
 				if (!is.matchTag(tagName))
 					throw TException("expected tag");
 
@@ -336,7 +336,7 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical)
 					tagName == "on" ||		   /*-- ONのとき表示されるインタフェース --*/
 					tagName == "off")		   /*-- OFFのとき表示されるインタフェース --*/
 				{
-					string name;
+					std::string name;
 					is >> name;
 					is.matchEndTag();
 					for (int r = 0; r < m_mainLayout->rowCount(); r++) {
@@ -838,14 +838,14 @@ void ParamsPageSet::addParamsPage(ParamsPage *page, const char *name)
 void ParamsPageSet::createControls(const TFxP &fx, int index)
 {
 	if (TMacroFx *macroFx = dynamic_cast<TMacroFx *>(fx.getPointer())) {
-		const vector<TFxP> &fxs = macroFx->getFxs();
+		const std::vector<TFxP> &fxs = macroFx->getFxs();
 		for (int i = 0; i < (int)fxs.size(); i++)
 			createControls(fxs[i], i);
 		return;
 	}
 	if (RasterFxPluginHost *plugin = dynamic_cast<RasterFxPluginHost *>(fx.getPointer())) {
 		plugin->build(this);
-		string url = plugin->getUrl();
+		std::string url = plugin->getUrl();
 		if (!url.empty()) {
 			connect(m_helpButton, SIGNAL(pressed()), this, SLOT(openHelpUrl()));
 			m_helpButton->show();
@@ -861,7 +861,7 @@ void ParamsPageSet::createControls(const TFxP &fx, int index)
 
 	if (fx->getParams()->getParamCount()) {
 		try {
-			string tagName;
+			std::string tagName;
 			if (!is.matchTag(tagName) || tagName != "fxlayout")
 				throw TException("expected <fxlayout>");
 
@@ -905,10 +905,10 @@ ParamsPage *ParamsPageSet::getParamsPage(int index) const
 
 void ParamsPageSet::createPage(TIStream &is, const TFxP &fx, int index)
 {
-	string tagName;
+	std::string tagName;
 	if (!is.matchTag(tagName) || tagName != "page")
 		throw TException("expected <page>");
-	string pageName = is.getTagAttribute("name");
+	std::string pageName = is.getTagAttribute("name");
 	if (pageName == "")
 		pageName = "page";
 
@@ -1017,7 +1017,7 @@ void ParamViewer::setFx(const TFxP &currentFx, const TFxP &actualFx, int frame, 
 		m_tablePageSet->setCurrentIndex(0);
 		return;
 	}
-	string name = actualFx->getFxType();
+	std::string name = actualFx->getFxType();
 	if (name == "macroFx") {
 		TMacroFx *macroFx = dynamic_cast<TMacroFx *>(currentFx.getPointer());
 		if (macroFx)
@@ -1026,7 +1026,7 @@ void ParamViewer::setFx(const TFxP &currentFx, const TFxP &actualFx, int frame, 
 
 	int currentIndex = -1;
 
-	QMap<string, int>::iterator it;
+	QMap<std::string, int>::iterator it;
 	it = m_tableFxIndex.find(name);
 	if (it == m_tableFxIndex.end()) {
 		ParamsPageSet *pageSet = new ParamsPageSet(this);

@@ -151,23 +151,26 @@ void CommandManager::define(
 	QSettings settings(toQString(fp), QSettings::IniFormat);
 	settings.beginGroup("shortcuts");
 	QString defaultShortcutQString = QString::fromStdString(defaultShortcutString);
-	QString shortcutString = settings.value(id).toString();
+	/*- 
+		Some shortcuts may just removed from the default settings. 
+		So you need to distinguish between "shortcut is not defined by user" and "shortcut is removed (i.e. defined as "") by user".
+	-*/
+	QString shortcutString = settings.value(id,"undefined").toString();
 	settings.endGroup();
 
-	if (shortcutString != "") {
-		// shortcut definito dall'utente. potrebbe essere stato assegnato come shortcut di default
-		// a qualche altro comando
+	if (shortcutString != "" && shortcutString != "undefined") {
+		// User-defined shortcuts. It may have been assigned as a shortcut by default to some other command
 		QAction *other = getActionFromShortcut(shortcutString.toStdString());
 		if (other)
 			other->setShortcut(QKeySequence());
-	} else if (defaultShortcutQString != "") {
-		// shortcut di default. se e' gia' stato assegnato non lo assegno
+	} else if (defaultShortcutQString != "" && shortcutString == "undefined") {
+		// Shortcut key set by default. Check if the key already been assigned to another action 
 		QAction *other = getActionFromShortcut(defaultShortcutQString.toStdString());
 		if (!other)
 			shortcutString = defaultShortcutQString;
 	}
 
-	if (shortcutString != "") {
+	if (shortcutString != ""  && shortcutString != "undefined") {
 		qaction->setShortcut(QKeySequence(shortcutString));
 		m_shortcutTable[shortcutString.toStdString()] = node;
 	}

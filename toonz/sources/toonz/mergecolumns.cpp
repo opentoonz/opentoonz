@@ -53,7 +53,7 @@ public:
 
 //-----------------------------------------------------------------------------------
 
-void mergeRasterColumns(const vector<MatchlinePair> &matchingLevels)
+void mergeRasterColumns(const std::vector<MatchlinePair> &matchingLevels)
 {
 	if (matchingLevels.empty())
 		return;
@@ -149,7 +149,7 @@ bool needTobeGrouped(const TVectorImageP &vimg)
 
 //---------------------------------------------------------------------------------------
 
-void mergeVectorColumns(const vector<MatchlinePair> &matchingLevels)
+void mergeVectorColumns(const std::vector<MatchlinePair> &matchingLevels)
 {
 	if (matchingLevels.empty())
 		return;
@@ -206,7 +206,7 @@ public:
 
 		std::map<TFrameId, QString>::const_iterator it = m_images.begin();
 
-		vector<TFrameId> fids;
+		std::vector<TFrameId> fids;
 		m_level->setPalette(m_palette);
 		for (; it != m_images.end(); ++it) //, ++mit)
 		{
@@ -292,8 +292,8 @@ void mergeColumns(int column, int mColumn, bool isRedo)
 
 	if (start > end)
 		return;
-	vector<TXshCell> cell(end - start + 1);
-	vector<TXshCell> mCell(end - start + 1);
+	std::vector<TXshCell> cell(end - start + 1);
+	std::vector<TXshCell> mCell(end - start + 1);
 
 	xsh->getCells(start, column, cell.size(), &(cell[0]));
 
@@ -302,7 +302,7 @@ void mergeColumns(int column, int mColumn, bool isRedo)
 	TXshColumn *col = xsh->getColumn(column);
 	TXshColumn *mcol = xsh->getColumn(mColumn);
 
-	vector<MatchlinePair> matchingLevels;
+	std::vector<MatchlinePair> matchingLevels;
 
 	std::set<TFrameId> alreadyDoneSet;
 
@@ -403,7 +403,7 @@ void mergeColumns(int column, int mColumn, bool isRedo)
 		mergeVectorColumns(matchingLevels);
 
 	TXshLevel *sl = TApp::instance()->getCurrentScene()->getScene()->getLevelSet()->getLevel(column);
-	vector<TFrameId> fidsss;
+	std::vector<TFrameId> fidsss;
 	sl->getFids(fidsss);
 	invalidateIcons(sl, fidsss);
 	sl->setDirtyFlag(true);
@@ -424,7 +424,7 @@ const TXshCell *findCell(int column, const TFrameId &fid)
 	return 0;
 }
 
-bool contains(const vector<TFrameId> &v, const TFrameId &val)
+bool contains(const std::vector<TFrameId> &v, const TFrameId &val)
 {
 	int i;
 	for (i = 0; i < (int)v.size(); i++)

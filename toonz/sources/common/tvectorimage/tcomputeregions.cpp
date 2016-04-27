@@ -2919,7 +2919,7 @@ class Intersection
 
 #ifdef _DEBUG
 
-void TVectorImage::Imp::checkRegions(const vector<TRegion *> &regions)
+void TVectorImage::Imp::checkRegions(const std::vector<TRegion *> &regions)
 {
 	for (UINT i = 0; i < regions.size(); i++) {
 		TRegion *r = regions[i];
@@ -2937,7 +2937,7 @@ void TVectorImage::Imp::checkRegions(const vector<TRegion *> &regions)
 			//  assert(!e->m_s->isSelfLoop());
 		}
 		if (r->getSubregionCount() > 0) {
-			vector<TRegion *> aux(r->getSubregionCount());
+			std::vector<TRegion *> aux(r->getSubregionCount());
 			for (j = 0; j < r->getSubregionCount(); j++)
 				aux[j] = r->getSubregion(j);
 			checkRegions(aux);
@@ -2950,7 +2950,7 @@ void TVectorImage::Imp::checkRegions(const vector<TRegion *> &regions)
 namespace
 {
 
-inline TGroupId getGroupId(TRegion *r, const vector<VIStroke *> &strokes)
+inline TGroupId getGroupId(TRegion *r, const std::vector<VIStroke *> &strokes)
 {
 	for (UINT i = 0; i < r->getEdgeCount(); i++)
 		if (r->getEdge(i)->m_index >= 0)
@@ -2965,7 +2965,7 @@ TRegion *TVectorImage::findRegion(const TRegion &region) const
 {
 	TRegion *ret = 0;
 
-	for (vector<TRegion *>::iterator it = m_imp->m_regions.begin(); it != m_imp->m_regions.end(); ++it)
+	for (std::vector<TRegion *>::iterator it = m_imp->m_regions.begin(); it != m_imp->m_regions.end(); ++it)
 		if ((ret = (*it)->findRegion(region)) != 0)
 			return ret;
 
@@ -2976,7 +2976,7 @@ TRegion *TVectorImage::findRegion(const TRegion &region) const
 
 void TVectorImage::Imp::addRegion(TRegion *region)
 {
-	for (vector<TRegion *>::iterator it = m_regions.begin(); it != m_regions.end(); ++it) {
+	for (std::vector<TRegion *>::iterator it = m_regions.begin(); it != m_regions.end(); ++it) {
 		if (getGroupId(region, m_strokes) != getGroupId(*it, m_strokes))
 			continue;
 
@@ -3040,7 +3040,7 @@ void TVectorImage::Imp::moveStroke(int fromIndex, int moveBefore)
 
 	m_strokes.erase(m_strokes.begin() + fromIndex);
 
-	vector<VIStroke *>::iterator it = m_strokes.begin();
+	std::vector<VIStroke *>::iterator it = m_strokes.begin();
 	if (fromIndex < moveBefore)
 		advance(it, moveBefore - 1);
 	else

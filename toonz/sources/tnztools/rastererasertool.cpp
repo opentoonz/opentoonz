@@ -88,14 +88,14 @@ class RectRasterUndo : public TRasterUndo
 	TRectD m_modifyArea;
 	TStroke *m_stroke;
 	int m_styleId;
-	wstring m_colorType;
-	wstring m_eraseType;
+	std::wstring m_colorType;
+	std::wstring m_eraseType;
 	bool m_selective;
 	bool m_invert;
 
 public:
 	RectRasterUndo(TTileSetCM32 *tileSet, const TRectD &modifyArea, TStroke stroke,
-				   int styleId, wstring eraseType, wstring colorType,
+				   int styleId, std::wstring eraseType, std::wstring colorType,
 				   TXshSimpleLevel *level, bool selective, bool invert,
 				   const TFrameId &frameId)
 		: TRasterUndo(tileSet, level, frameId, false, false, 0), m_modifyArea(modifyArea), m_styleId(styleId), m_eraseType(eraseType), m_colorType(colorType), m_selective(selective), m_invert(invert)
@@ -159,7 +159,7 @@ public:
 */
 class RasterEraserUndo : public TRasterUndo
 {
-	vector<TThickPoint> m_points;
+	std::vector<TThickPoint> m_points;
 	int m_styleId;
 	bool m_selective;
 	bool m_isPencil;
@@ -167,7 +167,7 @@ class RasterEraserUndo : public TRasterUndo
 	int m_colorSelected;
 
 public:
-	RasterEraserUndo(TTileSetCM32 *tileSet, const vector<TThickPoint> &points,
+	RasterEraserUndo(TTileSetCM32 *tileSet, const std::vector<TThickPoint> &points,
 					 ColorType colorType, int styleId, bool selective,
 					 int colorSelected, TXshSimpleLevel *level,
 					 const TFrameId &frameId, bool isPencil)
@@ -207,19 +207,19 @@ public:
 
 class RasterBluredEraserUndo : public TRasterUndo
 {
-	vector<TThickPoint> m_points;
+	std::vector<TThickPoint> m_points;
 	int m_styleId;
 	bool m_selective;
 	int m_size;
 	double m_hardness;
-	wstring m_mode;
+	std::wstring m_mode;
 
 public:
 	RasterBluredEraserUndo(TTileSetCM32 *tileSet,
-						   const vector<TThickPoint> &points,
+						   const std::vector<TThickPoint> &points,
 						   int styleId, bool selective,
 						   TXshSimpleLevel *level, const TFrameId &frameId,
-						   int size, double hardness, const wstring &mode)
+						   int size, double hardness, const std::wstring &mode)
 		: TRasterUndo(tileSet, level, frameId, false, false, 0), m_points(points), m_styleId(styleId), m_selective(selective), m_size(size), m_hardness(hardness), m_mode(mode)
 	{
 	}
@@ -235,7 +235,7 @@ public:
 		QRadialGradient brushPad = ToolUtils::getBrushPad(m_size, m_hardness);
 		workRaster->clear();
 		BluredBrush brush(workRaster, m_size, brushPad, false);
-		vector<TThickPoint> points;
+		std::vector<TThickPoint> points;
 		points.push_back(m_points[0]);
 		TRect bbox = brush.getBoundFromPoints(points);
 		brush.addPoint(m_points[0], 1);
@@ -278,8 +278,8 @@ public:
 	}
 };
 
-void eraseStroke(const TToonzImageP &ti, TStroke *stroke, wstring eraseType,
-				 wstring colorType, bool invert, bool selective,
+void eraseStroke(const TToonzImageP &ti, TStroke *stroke, std::wstring eraseType,
+				 std::wstring colorType, bool invert, bool selective,
 				 int styleId, const TXshSimpleLevelP &level, const TFrameId &frameId)
 {
 	assert(stroke);
@@ -413,7 +413,7 @@ class EraserTool : public TTool
 	Q_DECLARE_TR_FUNCTIONS(EraserTool)
 
 public:
-	EraserTool(string name);
+	EraserTool(std::string name);
 	~EraserTool()
 	{
 		if (m_firstStroke)
@@ -446,7 +446,7 @@ public:
 	void onEnter();
 	void onLeave();
 	void onActivate();
-	bool onPropertyChanged(string propertyName);
+	bool onPropertyChanged(std::string propertyName);
 	void onImageChanged();
 
 	void multiUpdate(const TXshSimpleLevelP &level, TFrameId firstFrameId, TFrameId lastFrameId, TRectD firstRect, TRectD lastRect);
@@ -510,13 +510,13 @@ private:
 		m_brushPos,
 		m_firstPos;
 
-	vector<TPointD> m_polyline;
+	std::vector<TPointD> m_polyline;
 
 	//gestione cancellino blurato
 	TRasterCM32P m_backupRas;
 	TRaster32P m_workRas;
 	QRadialGradient m_brushPad;
-	vector<TThickPoint> m_points;
+	std::vector<TThickPoint> m_points;
 	BluredBrush *m_bluredBrush;
 
 	double m_pointSize,
@@ -549,7 +549,7 @@ EraserTool inkPaintEraserTool("T_Eraser");
 //
 //------------------------------------------------------------------------
 
-EraserTool::EraserTool(string name)
+EraserTool::EraserTool(std::string name)
 	: TTool(name), m_toolSize("Size:", 1, 100, 10, false) //W_ToolOptions_EraserToolSize
 	  ,
 	  m_hardness("Hardness:", 0, 100, 100), m_eraseType("Type:") //W_ToolOptions_Erasetype
@@ -703,7 +703,7 @@ void EraserTool::multiUpdate(const TXshSimpleLevelP &level, TFrameId firstFid, T
 		backward = true;
 	}
 	assert(firstFid <= lastFid);
-	vector<TFrameId> allFids;
+	std::vector<TFrameId> allFids;
 	level->getFids(allFids);
 
 	/*-- フレーム範囲に対応するFIdを取得 --*/
@@ -716,11 +716,11 @@ void EraserTool::multiUpdate(const TXshSimpleLevelP &level, TFrameId firstFid, T
 	while (i1 != allFids.end() && *i1 <= lastFid)
 		i1++;
 	assert(i0 < i1);
-	vector<TFrameId> fids(i0, i1);
+	std::vector<TFrameId> fids(i0, i1);
 	int m = fids.size();
 	assert(m > 0);
 
-	wstring levelName = level->getName();
+	std::wstring levelName = level->getName();
 
 	/*-- FrameRangeの各フレームについて --*/
 	TUndoManager::manager()->beginBlock();
@@ -779,7 +779,7 @@ void EraserTool::update(const TToonzImageP &ti, TRectD selArea, const TXshSimple
 	tileSet->add(raster, ToonzImageUtils::convertWorldToRaster(selArea, ti));
 	TUndo *undo;
 
-	wstring inkPaint = m_colorType.getValue();
+	std::wstring inkPaint = m_colorType.getValue();
 	undo = new RectRasterUndo(tileSet, selArea, TStroke(), selective ? styleId : -1, m_eraseType.getValue(), inkPaint,
 							  level.getPointer(), selective, m_invertOption.getValue(), frameId);
 
@@ -950,9 +950,9 @@ void EraserTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e)
 				if (ti && isAdded) {
 					m_tileSaver->save(m_normalEraser->getLastRect());
 					m_normalEraser->generateLastPieceOfStroke(m_pencil.getValue() || m_colorType.getValue() == AREAS);
-					vector<TThickPoint> brushPoints = m_normalEraser->getPointsSequence();
+					std::vector<TThickPoint> brushPoints = m_normalEraser->getPointsSequence();
 					int m = (int)brushPoints.size();
-					vector<TThickPoint> points;
+					std::vector<TThickPoint> points;
 					if (m == 3) {
 						points.push_back(brushPoints[0]);
 						points.push_back(brushPoints[1]);
@@ -985,14 +985,14 @@ void EraserTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e)
 				if (m == 3) {
 					// ho appena cominciato. devo disegnare un segmento
 					TThickPoint pa = m_points.front();
-					vector<TThickPoint> points;
+					std::vector<TThickPoint> points;
 					points.push_back(pa);
 					points.push_back(mid);
 					invalidateRect = ToolUtils::getBounds(points, thickness);
 					bbox = m_bluredBrush->getBoundFromPoints(points);
 					m_bluredBrush->addArc(pa, (mid + pa) * 0.5, mid, 1, 1);
 				} else {
-					vector<TThickPoint> points;
+					std::vector<TThickPoint> points;
 					points.push_back(m_points[m - 4]);
 					points.push_back(old);
 					points.push_back(mid);
@@ -1150,7 +1150,7 @@ void EraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e)
 					TThickPoint point(pos + rasCenter, m_toolSize.getValue());
 					m_points.push_back(point);
 					int m = m_points.size();
-					vector<TThickPoint> points;
+					std::vector<TThickPoint> points;
 					points.push_back(m_points[m - 3]);
 					points.push_back(m_points[m - 2]);
 					points.push_back(m_points[m - 1]);
@@ -1266,7 +1266,7 @@ void EraserTool::leftButtonDoubleClick(const TPointD &pos, const TMouseEvent &e)
 		m_polyline.push_back(pos);
 	if (m_polyline.back() != m_polyline.front())
 		m_polyline.push_back(m_polyline.front());
-	vector<TThickPoint> strokePoints;
+	std::vector<TThickPoint> strokePoints;
 	for (UINT i = 0; i < m_polyline.size() - 1; i++) {
 		strokePoints.push_back(TThickPoint(m_polyline[i], 1));
 		strokePoints.push_back(TThickPoint(0.5 * (m_polyline[i] + m_polyline[i + 1]), 1));
@@ -1327,7 +1327,7 @@ void EraserTool::leftButtonDoubleClick(const TPointD &pos, const TMouseEvent &e)
 
 //----------------------------------------------------------------------
 
-bool EraserTool::onPropertyChanged(string propertyName)
+bool EraserTool::onPropertyChanged(std::string propertyName)
 {
 	/*--- 変更されたPropertyに合わせて処理を分ける ---*/
 	if (propertyName == m_eraseType.getName()) {
@@ -1507,7 +1507,7 @@ void EraserTool::multiAreaEraser(const TXshSimpleLevelP &sl, TFrameId &firstFid,
 		backward = true;
 	}
 	assert(firstFid <= lastFid);
-	vector<TFrameId> allFids;
+	std::vector<TFrameId> allFids;
 	sl->getFids(allFids);
 
 	std::vector<TFrameId>::iterator i0 = allFids.begin();
@@ -1519,7 +1519,7 @@ void EraserTool::multiAreaEraser(const TXshSimpleLevelP &sl, TFrameId &firstFid,
 	while (i1 != allFids.end() && *i1 <= lastFid)
 		i1++;
 	assert(i0 < i1);
-	vector<TFrameId> fids(i0, i1);
+	std::vector<TFrameId> fids(i0, i1);
 	int m = fids.size();
 	assert(m > 0);
 	TUndoManager::manager()->beginBlock();

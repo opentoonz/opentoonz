@@ -975,7 +975,7 @@ void SgiReader::readLine(short *buffer, int x0, int x1, int shrink)
 
 	{ // 64 -> 32
 		TPixel64 *pix = (TPixel64 *)buffer;
-		vector<USHORT> rbuf(m_info.m_lx), gbuf(m_info.m_lx), bbuf(m_info.m_lx), mbuf(m_info.m_lx);
+		std::vector<USHORT> rbuf(m_info.m_lx), gbuf(m_info.m_lx), bbuf(m_info.m_lx), mbuf(m_info.m_lx);
 		if (m_header->zsize == 4) {
 			new_getrow(m_header, &rbuf[0], m_currentY, 0);
 			new_getrow(m_header, &gbuf[0], m_currentY, 1);
@@ -1020,7 +1020,7 @@ void SgiReader::readLine(char *buffer, int x0, int x1, int shrink)
 	if (BPP(m_header->type) == 1) //32 -> 32
 	{
 		TPixel32 *pix = (TPixel32 *)buffer;
-		vector<UCHAR> rbuf(m_info.m_lx), gbuf(m_info.m_lx), bbuf(m_info.m_lx), mbuf(m_info.m_lx);
+		std::vector<UCHAR> rbuf(m_info.m_lx), gbuf(m_info.m_lx), bbuf(m_info.m_lx), mbuf(m_info.m_lx);
 		if (m_header->zsize == 4) {
 			new_getrow(m_header, &rbuf[0], m_currentY, 0);
 			new_getrow(m_header, &gbuf[0], m_currentY, 1);
@@ -1057,7 +1057,7 @@ void SgiReader::readLine(char *buffer, int x0, int x1, int shrink)
 		}
 	} else { // 64 -> 32
 		TPixel32 *pix = (TPixel32 *)buffer;
-		vector<USHORT> rbuf(m_info.m_lx), gbuf(m_info.m_lx), bbuf(m_info.m_lx), mbuf(m_info.m_lx);
+		std::vector<USHORT> rbuf(m_info.m_lx), gbuf(m_info.m_lx), bbuf(m_info.m_lx), mbuf(m_info.m_lx);
 		if (m_header->zsize == 4) {
 			new_getrow(m_header, &rbuf[0], m_currentY, 0);
 			new_getrow(m_header, &gbuf[0], m_currentY, 1);
@@ -1212,7 +1212,7 @@ void SgiWriter::writeLine(char *buffer)
 		{
 			new_putrow(m_header, buffer, m_currentY, 0);
 		} else {
-			vector<UCHAR> rbuf(m_info.m_lx), gbuf(m_info.m_lx), bbuf(m_info.m_lx), mbuf(m_info.m_lx);
+			std::vector<UCHAR> rbuf(m_info.m_lx), gbuf(m_info.m_lx), bbuf(m_info.m_lx), mbuf(m_info.m_lx);
 			TPixelRGBM32 *pix = (TPixelRGBM32 *)buffer;
 			for (int i = 0; i < m_info.m_lx; ++i) {
 				rbuf[i] = pix->r;
@@ -1239,7 +1239,7 @@ void SgiWriter::writeLine(short *buffer)
 
 	{
 		if (m_header->dim < 3) {
-			vector<USHORT> tmp(m_info.m_lx);
+			std::vector<USHORT> tmp(m_info.m_lx);
 			TPixelRGBM64 *pix = (TPixelRGBM64 *)buffer;
 			for (int i = 0; i < m_info.m_lx; ++i) {
 				tmp[i] = TPixelGR16::from(*pix).value;
@@ -1247,7 +1247,7 @@ void SgiWriter::writeLine(short *buffer)
 			}
 			new_putrow(m_header, &tmp[0], m_currentY, 0);
 		} else {
-			vector<USHORT> rbuf(m_info.m_lx), gbuf(m_info.m_lx), bbuf(m_info.m_lx), mbuf(m_info.m_lx);
+			std::vector<USHORT> rbuf(m_info.m_lx), gbuf(m_info.m_lx), bbuf(m_info.m_lx), mbuf(m_info.m_lx);
 			TPixelRGBM64 *pix = (TPixelRGBM64 *)buffer;
 			for (int i = 0; i < m_info.m_lx; ++i) {
 				rbuf[i] = pix->r;

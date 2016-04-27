@@ -170,17 +170,17 @@ public:
 
 	// General functions
 
-	void setName(wstring name) { m_name = name; } //!< Sets the style's user-defined name.
-	wstring getName() const { return m_name; }	//!< Returns the style's user-defined name.
+	void setName(std::wstring name) { m_name = name; } //!< Sets the style's user-defined name.
+	std::wstring getName() const { return m_name; }	//!< Returns the style's user-defined name.
 
 	/*! \detail
     The \a global name contains information about palette id.
   */
-	void setGlobalName(wstring name) { m_globalName = name; } //!< Sets the global name of the style.
-	wstring getGlobalName() const { return m_globalName; }	//!< Returns the global name of the style.
+	void setGlobalName(std::wstring name) { m_globalName = name; } //!< Sets the global name of the style.
+	std::wstring getGlobalName() const { return m_globalName; }	//!< Returns the global name of the style.
 
-	void setOriginalName(wstring name) { m_originalName = name; } //!< If the style is originally copied from studio palette, set this.
-	wstring getOriginalName() const { return m_originalName; }	//!< Returns the original name of the style.
+	void setOriginalName(std::wstring name) { m_originalName = name; } //!< If the style is originally copied from studio palette, set this.
+	std::wstring getOriginalName() const { return m_originalName; }	//!< Returns the original name of the style.
 
 	void setIsEditedFlag(bool edited) { m_isEditedFromOriginal = edited; } //<! If the style is copied from studio palette, This flag will be set when the
 																		   //!  style is edited from the original one.
@@ -323,7 +323,7 @@ public:
 	// I/O-related  functions
 
 	virtual int getTagId() const = 0;						//!< Returns an unique number representing the style.
-	virtual void getObsoleteTagIds(vector<int> &) const {}; //!< \deprecated
+	virtual void getObsoleteTagIds(std::vector<int> &) const {}; //!< \deprecated
 
 	void save(TOutputStreamInterface &) const;		   //!< Calls the local implementation of saveData() passing it also the name and the tagId of the style.
 	static TColorStyle *load(TInputStreamInterface &); //!< Loads the style from disk. Calls the local implementation of loadData().
@@ -331,7 +331,7 @@ public:
 	static TColorStyle *create(int tagId); //!< Creates a new style with identifier equal to \a tagId.
 
 	static void declare(TColorStyle *style); //!< Puts the style in the table of actual styles.
-	static void getAllTags(vector<int> &tags);
+	static void getAllTags(std::vector<int> &tags);
 
 	// Misc functions
 

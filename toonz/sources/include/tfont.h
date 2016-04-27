@@ -78,8 +78,8 @@ public:
 	int getLineAscender() const;
 	int getLineDescender() const;
 	bool hasVertical() const;
-	wstring getFamily() const;
-	wstring getTypeface() const;
+	std::wstring getFamily() const;
+	std::wstring getTypeface() const;
 	//bool isValidCode( wchar_t code ) const;
 
 private:
@@ -132,15 +132,15 @@ public:
 	void loadFontNames();
 
 	//! if can not create font, throws TFontCreationError and leave as current the old one
-	void setFamily(const wstring family);
+	void setFamily(const std::wstring family);
 
 	//!if can not create font, throws TFontCreationError and leave as current the old one
-	void setTypeface(const wstring typeface);
+	void setTypeface(const std::wstring typeface);
 
-	wstring getCurrentFamily() const;
-	wstring getCurrentTypeface() const;
-	void getAllFamilies(vector<wstring> &families) const;
-	void getAllTypefaces(vector<wstring> &typefaces) const;
+	std::wstring getCurrentFamily() const;
+	std::wstring getCurrentTypeface() const;
+	void getAllFamilies(std::vector<std::wstring> &families) const;
+	void getAllTypefaces(std::vector<std::wstring> &typefaces) const;
 	void setVertical(bool vertical);
 	void setSize(int size);
 

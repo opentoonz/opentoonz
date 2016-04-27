@@ -40,8 +40,8 @@ class UndoCutter : public ToolUtils::TToolUndo
 
 	VIStroke *m_oldStroke;
 
-	vector<TFilledRegionInf> *m_fillInformation;
-	vector<DoublePair> *m_sortedWRanges;
+	std::vector<TFilledRegionInf> *m_fillInformation;
+	std::vector<DoublePair> *m_sortedWRanges;
 
 	int m_row;
 	int m_column;
@@ -53,8 +53,8 @@ public:
 			   int pos,
 			   int newStrokeId1,
 			   int newStrokeId2,
-			   vector<TFilledRegionInf> *fillInformation,
-			   vector<DoublePair> *sortedWRanges)
+			   std::vector<TFilledRegionInf> *fillInformation,
+			   std::vector<DoublePair> *sortedWRanges)
 		: TToolUndo(level, frameId), m_oldStroke(oldStroke), m_newStrokeId1(newStrokeId1), m_newStrokeId2(newStrokeId2), m_pos(pos), m_fillInformation(fillInformation), m_sortedWRanges(sortedWRanges)
 	{
 		TTool::Application *app = TTool::getApplication();

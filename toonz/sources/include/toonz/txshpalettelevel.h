@@ -46,7 +46,7 @@ public:
 	/*!
     Constructs a TXshPaletteLevel with \b name
   */
-	TXshPaletteLevel(wstring name = L"");
+	TXshPaletteLevel(std::wstring name = L"");
 
 	/*!
     Destroys the TXshPaletteLevel object.

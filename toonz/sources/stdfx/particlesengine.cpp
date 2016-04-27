@@ -33,9 +33,9 @@ Particles_Engine::Particles_Engine(ParticlesFx *parent, double frame)
 {
 }
 
-void printTime(TStopWatch &sw, string name)
+void printTime(TStopWatch &sw, std::string name)
 {
-	ostrstream ss;
+	std::ostrstream ss;
 	ss << name << " : ";
 	sw.print(ss);
 	ss << '\n' << '\0';
@@ -181,7 +181,7 @@ void Particles_Engine::roll_particles(
 	TTile *tile, std::map<int, TTile *> porttiles,
 	const TRenderSettings &ri, std::list<Particle> &myParticles, struct particles_values &values,
 	float cx, float cy, int frame, int curr_frame, int level_n, bool *random_level,
-	float dpi, vector<int> lastframe, int &totalparticles)
+	float dpi, std::vector<int> lastframe, int &totalparticles)
 {
 	particles_ranges ranges;
 	int i, newparticles;
@@ -194,12 +194,12 @@ void Particles_Engine::roll_particles(
 
 	fill_range_struct(values, ranges);
 
-	vector<vector<TPointD>> myregions;
+	std::vector<std::vector<TPointD>> myregions;
 
 	/*-- [1〜255] そのIndexに対応するアルファ値を持つピクセルのインデックス値を保存。 [0] 使用せず --*/
-	vector<vector<int>> myHistogram;
+	std::vector<std::vector<int>> myHistogram;
 	/*-- アルファ値255から下がっていき、ピクセル数×重み又はアルファ値を次々足した値を格納 --*/
-	vector<float> myWeight;
+	std::vector<float> myWeight;
 
 	std::map<int, TTile *>::iterator it = porttiles.find(values.source_ctrl_val);
 	/*-- Perspective DistributionがONのとき、Sizeに刺さったControlImageが粒子の発生分布を決める --*/
@@ -385,10 +385,10 @@ void Particles_Engine::render_particles(
 	const TRenderSettings &ri, TDimension &p_size,
 	TPointD &p_offset,
 	std::map<int, TRasterFxPort *> ctrl_ports,
-	vector<TLevelP> partLevel,
+	std::vector<TLevelP> partLevel,
 	float dpi,
 	int curr_frame, int shrink, double startx, double starty,
-	double endx, double endy, vector<int> last_frame,
+	double endx, double endy, std::vector<int> last_frame,
 	unsigned long fxId)
 {
 	int frame, startframe, intpart = 0, level_n = 0;
@@ -455,7 +455,7 @@ void Particles_Engine::render_particles(
 			fractpart = fractpart - (int)fractpart;
 		}
 
-		map<int, TTile *> porttiles;
+		std::map<int, TTile *> porttiles;
 
 		// Perform the roll
 		/*- RenderSettingsを複製して現在のフレームの計算用にする -*/
@@ -491,7 +491,7 @@ void Particles_Engine::render_particles(
 						if (isPrecomputingEnabled)
 							(*it->second)->allocateAndCompute(*tmp, bbox.getP00(), convert(bbox).getSize(), 0, r_frame, riAux);
 						else {
-							string alias = "CTRL: " + (*(it->second))->getAlias(r_frame, riAux);
+							std::string alias = "CTRL: " + (*(it->second))->getAlias(r_frame, riAux);
 							TRasterImageP rimg = TImageCache::instance()->get(alias, false);
 
 							if (rimg) {
@@ -582,7 +582,7 @@ void Particles_Engine::do_render(TFlash *flash, Particle *part, TTile *tile,
 								 std::vector<TRasterFxPort *> part_ports,
 								 std::map<int, TTile *> porttiles,
 								 const TRenderSettings &ri,
-								 TDimension &p_size, TPointD &p_offset, int lastframe, vector<TLevelP> partLevel,
+								 TDimension &p_size, TPointD &p_offset, int lastframe, std::vector<TLevelP> partLevel,
 								 struct particles_values &values, double opacity_range, int dist_frame,
 								 std::map<std::pair<int, int>, double> &partScales)
 {
@@ -592,7 +592,7 @@ void Particles_Engine::do_render(TFlash *flash, Particle *part, TTile *tile,
 
 	TRasterP tileRas(tile->getRaster());
 
-	string levelid;
+	std::string levelid;
 	double aim_angle = 0;
 	if (values.pathaim_val) {
 		double arctan = atan2(part->vy, part->vx);
@@ -664,7 +664,7 @@ void Particles_Engine::do_render(TFlash *flash, Particle *part, TTile *tile,
 	} else {
 		TRasterP ras;
 
-		string alias;
+		std::string alias;
 		TRasterImageP rimg;
 		if (rimg = partLevel[part->level]->frame(ndx)) {
 			ras = rimg->getRaster();
@@ -751,7 +751,7 @@ void Particles_Engine::do_render(TFlash *flash, Particle *part, TTile *tile,
 /*-----------------------------------------------------------------*/
 
 void Particles_Engine::fill_array(TTile *ctrl1, int &regioncount,
-								  vector<int> &myarray, vector<int> &lista, vector<int> &listb, int threshold)
+								  std::vector<int> &myarray, std::vector<int> &lista, std::vector<int> &listb, int threshold)
 {
 
 	int pr = 0;
@@ -782,7 +782,7 @@ void Particles_Engine::fill_array(TTile *ctrl1, int &regioncount,
 		for (i = 0, pix = raster32->pixels(j); i < lx; i++, pix++) {
 			/*TMSG_INFO("j=%d i=%d\n", j, i);*/
 			if (pix->m > threshold) {
-				vector<int> mask(4);
+				std::vector<int> mask(4);
 				pr++;
 				/* l,ul,u,ur;*/
 				if (i) {
@@ -821,13 +821,12 @@ void Particles_Engine::fill_array(TTile *ctrl1, int &regioncount,
 
 /*-----------------------------------------------------------------*/
 
-void Particles_Engine::normalize_array(vector<vector<TPointD>> &myregions, TPointD pos, int lx, int ly, int
-																											regioncounter,
-									   vector<int> &myarray, vector<int> &lista, vector<int> &listb, vector<int> &final)
+void Particles_Engine::normalize_array(std::vector<std::vector<TPointD>> &myregions, TPointD pos, int lx, int ly, int regioncounter,
+																			 std::vector<int> &myarray, std::vector<int> &lista, std::vector<int> &listb, std::vector<int> &final)
 {
 	int i, j, k, l;
 
-	vector<int> tmp;
+	std::vector<int> tmp;
 	int maxregioncounter = 0;
 	int listsize = (int)lista.size();
 	//TMSG_INFO("regioncounter %d, eqcount=%d\n", regioncounter, eqcount);
@@ -893,7 +892,7 @@ void Particles_Engine::normalize_array(vector<vector<TPointD>> &myregions, TPoin
 
 /*-----------------------------------------------------------------*/
 /*- multiがONのときのSource画像（ctrl1）の領域を分析 -*/
-void Particles_Engine::fill_subregions(int cont_index, vector<vector<TPointD>> &myregions, TTile *ctrl1, int thres)
+void Particles_Engine::fill_subregions(int cont_index, std::vector<std::vector<TPointD>> &myregions, TTile *ctrl1, int thres)
 {
 
 	int regioncounter = 0;
@@ -901,22 +900,22 @@ void Particles_Engine::fill_subregions(int cont_index, vector<vector<TPointD>> &
 	int lx = ctrl1->getRaster()->getLx();
 	int ly = ctrl1->getRaster()->getLy();
 
-	vector<int> myarray(lx * ly);
-	vector<int> lista;
-	vector<int> listb;
+	std::vector<int> myarray(lx * ly);
+	std::vector<int> lista;
+	std::vector<int> listb;
 
 	fill_array(ctrl1, regioncounter, myarray, lista, listb, thres);
 
 	if (regioncounter) {
-		vector<int> final(regioncounter + 1);
+		std::vector<int> final(regioncounter + 1);
 		normalize_array(myregions, ctrl1->m_pos, lx, ly, regioncounter, myarray, lista, listb, final);
 	}
 }
 
 /*-----------------------------------------------------------------*/
 /*- 入力画像のアルファ値に比例して発生濃度を変える。各Pointにウェイトを持たせる -*/
-void Particles_Engine::fill_single_region(vector<vector<TPointD>> &myregions, TTile *ctrl1, int threshold,
-										  bool do_source_gradation, vector<vector<int>> &myHistogram)
+void Particles_Engine::fill_single_region(std::vector<std::vector<TPointD>> &myregions, TTile *ctrl1, int threshold,
+										  bool do_source_gradation, std::vector<std::vector<int>> &myHistogram)
 {
 
 	TRaster32P raster32 = ctrl1->getRaster();
@@ -957,7 +956,7 @@ void Particles_Engine::fill_single_region(vector<vector<TPointD>> &myregions, TT
 		}
 	} else {
 		for (int i = 0; i < 256; i++)
-			myHistogram.push_back(vector<int>());
+			myHistogram.push_back(std::vector<int>());
 
 		TRandom rand = TRandom(1);
 		for (j = 0; j < raster32->getLy(); j++) {
@@ -995,8 +994,8 @@ void Particles_Engine::fill_single_region(vector<vector<TPointD>> &myregions, TT
 
 /*-----------------------------------------------------------------*/
 /*- 入力画像のアルファ値に比例して発生濃度を変える。Histogramを格納しながら領域を登録 -*/
-void Particles_Engine::fill_regions(int frame, vector<vector<TPointD>> &myregions, TTile *ctrl1, bool multi, int thres,
-									bool do_source_gradation, vector<vector<int>> &myHistogram)
+void Particles_Engine::fill_regions(int frame, std::vector<std::vector<TPointD>> &myregions, TTile *ctrl1, bool multi, int thres,
+									bool do_source_gradation, std::vector<std::vector<int>> &myHistogram)
 {
 	TRaster32P ctrl1ras = ctrl1->getRaster();
 	if (!ctrl1ras)
@@ -1019,8 +1018,8 @@ void Particles_Engine::fill_regions(int frame, vector<vector<TPointD>> &myregion
 	そのとき、SourceのControlが刺さっている場合は、マスクとして用いられる
 --*/
 
-void Particles_Engine::fill_regions_with_size_map(vector<vector<TPointD>> &myregions,
-												  vector<vector<int>> &myHistogram,
+void Particles_Engine::fill_regions_with_size_map(std::vector<std::vector<TPointD>> &myregions,
+												  std::vector<std::vector<int>> &myHistogram,
 												  TTile *sizeTile,
 												  TTile *sourceTile,
 												  int thres)
@@ -1040,7 +1039,7 @@ void Particles_Engine::fill_regions_with_size_map(vector<vector<TPointD>> &myreg
 	myregions.resize(1);
 	myregions[0].clear();
 	for (int i = 0; i < 256; i++)
-		myHistogram.push_back(vector<int>());
+		myHistogram.push_back(std::vector<int>());
 
 	for (int j = 0; j < sizeRas->getLy(); j++) {
 

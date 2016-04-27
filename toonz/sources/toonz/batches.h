@@ -51,7 +51,7 @@ public:
 	TaskState getTaskStatus(const QString &id) const;
 	void loadTask(bool isRenderTask);
 
-	void getTasks(const QString &parentId, vector<QString> &tasks) const;
+	void getTasks(const QString &parentId, std::vector<QString> &tasks) const;
 	void setTasksTree(TaskTreeModel *tree);
 
 	TaskTreeModel *getTasksTree() { return m_tasksTree; }
@@ -96,11 +96,11 @@ protected:
 private:
 	bool m_dirtyFlag;
 	TFilePath m_filepath;
-	map<QString, TFarmTask *> m_tasks;
+	std::map<QString, TFarmTask *> m_tasks;
 	set<Observer *> m_observers;
 	int m_localControllerPortNumber;
 	TFarmController *m_controller;
-	map<QString, QString> m_farmIdsTable;
+	std::map<QString, QString> m_farmIdsTable;
 	TaskTreeModel *m_tasksTree;
 	TThread::Executor m_localExecutor;
 

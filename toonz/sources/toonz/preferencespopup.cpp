@@ -637,6 +637,13 @@ void PreferencesPopup::onPaletteTypeForRasterColorModelChanged(int index)
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onShowKeyframesOnCellAreaChanged(int index)
+{
+	m_pref->enableShowKeyframesOnXsheetCellArea(index == Qt::Checked);
+}
+
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::onStyleSheetTypeChanged(int index)
 {
 	m_pref->setCurrentStyleSheet(index);
@@ -943,6 +950,7 @@ PreferencesPopup::PreferencesPopup()
 	m_xsheetStep = new DVGui::IntLineEdit(this, Preferences::instance()->getXsheetStep(), 0);
 	m_cellsDragBehaviour = new QComboBox();
 	CheckBox *ignoreAlphaonColumn1CB = new CheckBox(tr("Ignore Alpha Channel on Levels in Column 1"), this);
+	CheckBox *showKeyframesOnCellAreaCB = new CheckBox(tr("Show Keyframes on Cell Area"), this);
 
 	//--- Animation ------------------------------
 	categoryList->addItem(tr("Animation"));
@@ -1129,6 +1137,7 @@ PreferencesPopup::PreferencesPopup()
 	m_cellsDragBehaviour->addItem(tr("Cells and Column Data"));
 	m_cellsDragBehaviour->setCurrentIndex(m_pref->getDragCellsBehaviour());
 	ignoreAlphaonColumn1CB->setChecked(m_pref->isIgnoreAlphaonColumn1Enabled());
+	showKeyframesOnCellAreaCB->setChecked(m_pref->isShowKeyframesOnXsheetCellAreaEnabled());
 
 	//--- Animation ------------------------------
 	QStringList list;
@@ -1416,11 +1425,12 @@ PreferencesPopup::PreferencesPopup()
 			xsheetFrameLay->addWidget(m_cellsDragBehaviour, 2, 1);
 
 			xsheetFrameLay->addWidget(ignoreAlphaonColumn1CB, 3, 0, 1, 2);
+			xsheetFrameLay->addWidget(showKeyframesOnCellAreaCB, 4, 0, 1, 2);
 		}
 		xsheetFrameLay->setColumnStretch(0, 0);
 		xsheetFrameLay->setColumnStretch(1, 0);
 		xsheetFrameLay->setColumnStretch(2, 1);
-		xsheetFrameLay->setRowStretch(4, 1);
+		xsheetFrameLay->setRowStretch(5, 1);
 		xsheetBox->setLayout(xsheetFrameLay);
 		stackedWidget->addWidget(xsheetBox);
 
@@ -1628,6 +1638,7 @@ PreferencesPopup::PreferencesPopup()
 	ret = ret && connect(ignoreAlphaonColumn1CB, SIGNAL(stateChanged(int)), this, SLOT(onIgnoreAlphaonColumn1Changed(int)));
 	ret = ret && connect(m_xsheetStep, SIGNAL(editingFinished()), SLOT(onXsheetStepChanged()));
 	ret = ret && connect(m_cellsDragBehaviour, SIGNAL(currentIndexChanged(int)), SLOT(onDragCellsBehaviourChanged(int)));
+	ret = ret && connect(showKeyframesOnCellAreaCB, SIGNAL(stateChanged(int)), this, SLOT(onShowKeyframesOnCellAreaChanged(int)));
 
 	//--- Animation ----------------------
 	ret = ret && connect(m_keyframeType, SIGNAL(currentIndexChanged(int)), SLOT(onKeyframeTypeChanged(int)));

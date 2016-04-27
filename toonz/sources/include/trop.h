@@ -34,10 +34,10 @@ struct _RASTER;
 
 class DVAPI TRopException : public TException
 {
-	string message;
+	std::string message;
 
 public:
-	TRopException(const string &s) : message(s) {}
+	TRopException(const std::string &s) : message(s) {}
 	~TRopException() {}
 
 	TString getMessage() const;

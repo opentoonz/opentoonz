@@ -1391,7 +1391,7 @@ bool SaveLevelAsPopup::execute()
 			dynamic_cast<TXshSimpleLevel *>(TApp::instance()->getCurrentLevel()->getLevel());
 		if (!sl)
 			return false;
-		string ext = sl->getPath().getType();
+		std::string ext = sl->getPath().getType();
 		if (fp.getType() == "")
 			fp = fp.withType(ext);
 

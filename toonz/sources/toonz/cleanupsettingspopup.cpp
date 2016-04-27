@@ -98,7 +98,7 @@ CleanupTab::CleanupTab()
 	m_fieldGuideOm->setFixedHeight(DVGui::WidgetHeight);
 	m_fieldGuideOm->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
 
-	std::vector<string> fdgNames;
+	std::vector<std::string> fdgNames;
 	CleanupParameters::getFdgNames(fdgNames);
 
 	for (int i = 0; i < (int)fdgNames.size(); i++)

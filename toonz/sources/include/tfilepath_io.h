@@ -57,7 +57,7 @@
 
 =========================================================*/
 
-DVAPI FILE *fopen(const TFilePath &fp, string mode);
+DVAPI FILE *fopen(const TFilePath &fp, std::string mode);
 
 class DVAPI Tifstream : public std::ifstream
 {

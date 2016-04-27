@@ -1447,13 +1447,13 @@ inline void Event::processVertexEvent()
 	// as impossible opposite edges the adjacent of the other node.
 	if (newLeftNode->m_concave) {
 		newLeftNode->m_notOpposites = m_generator->m_notOpposites;
-		append<vector<ContourEdge *>, vector<ContourEdge *>::reverse_iterator>(newLeftNode->m_notOpposites, m_coGenerator->m_notOpposites);
+		append<std::vector<ContourEdge *>, std::vector<ContourEdge *>::reverse_iterator>(newLeftNode->m_notOpposites, m_coGenerator->m_notOpposites);
 
 		newLeftNode->m_notOpposites.push_back(newRightNode->m_edge);
 		newLeftNode->m_notOpposites.push_back(newRightNode->m_prev->m_edge);
 	} else if (newLeftNode->m_concave) {
 		newRightNode->m_notOpposites = m_generator->m_notOpposites;
-		append<vector<ContourEdge *>, vector<ContourEdge *>::reverse_iterator>(newRightNode->m_notOpposites, m_coGenerator->m_notOpposites);
+		append<std::vector<ContourEdge *>, std::vector<ContourEdge *>::reverse_iterator>(newRightNode->m_notOpposites, m_coGenerator->m_notOpposites);
 
 		newRightNode->m_notOpposites.push_back(newLeftNode->m_edge);
 		newRightNode->m_notOpposites.push_back(newLeftNode->m_prev->m_edge);

@@ -103,7 +103,7 @@ int TTcpIpClient::connect(const QString &hostName, const QString &addrStr, int p
 }
 
 /*
-int TTcpIpClient::connect(const string &hostName, const string &addrStr, int port, int &sock)
+int TTcpIpClient::connect(const std::string &hostName, const std::string &addrStr, int port, int &sock)
 {
   struct hostent *he = gethostbyname (hostName.c_str());
   if (!he)
@@ -165,13 +165,13 @@ int TTcpIpClient::disconnect(int sock)
 
 int TTcpIpClient::send(int sock, const QString &data)
 {
-	string dataUtf8 = data.toStdString();
+	std::string dataUtf8 = data.toStdString();
 
 	QString header("#$#THS01.00");
 	header += QString::number((int)dataUtf8.size());
 	header += "#$#THE";
 
-	string packet = header.toStdString() + dataUtf8;
+	std::string packet = header.toStdString() + dataUtf8;
 
 	//  string packet = data;;
 
@@ -226,12 +226,12 @@ int readData(int sock, QString &data)
 	if (cnt == 0)
 		return 0;
 
-	string aa(buff);
+	std::string aa(buff);
 	int x1 = aa.find("#$#THS01.00");
 	x1 += sizeof("#$#THS01.00") - 1;
 	int x2 = aa.find("#$#THE");
 
-	string ssize;
+	std::string ssize;
 	for (int i = x1; i < x2; ++i)
 		ssize.push_back(buff[i]);
 
@@ -371,7 +371,7 @@ int TTcpIpClient::send(int sock, const QString &data, QString &reply)
 }
 
 /*
-int TTcpIpClient::send(int sock, const string &data, string &reply)
+int TTcpIpClient::send(int sock, const std::string &data, string &reply)
 {
   int ret = send(sock, data);
   if (ret == 0)

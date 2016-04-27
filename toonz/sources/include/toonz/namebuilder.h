@@ -23,9 +23,9 @@ class DVAPI NameBuilder
 {
 public:
 	virtual ~NameBuilder() {}
-	virtual wstring getNext() = 0;
+	virtual std::wstring getNext() = 0;
 
-	static NameBuilder *getBuilder(wstring levelName = L"");
+	static NameBuilder *getBuilder(std::wstring levelName = L"");
 
 	// NameBuilder::getBuilder() restituisce un NameCreator
 	// NameBuilder::getBuilder("pippo") restituisce un NameModifier
@@ -40,19 +40,19 @@ class DVAPI NameCreator : public NameBuilder
 
 public:
 	NameCreator() {}
-	wstring getNext();
+	std::wstring getNext();
 };
 
 //-------------------------------------------------------------------
 
 class DVAPI NameModifier : public NameBuilder
 {
-	wstring m_nameBase;
+	std::wstring m_nameBase;
 	int m_index;
 
 public:
-	NameModifier(wstring name);
-	wstring getNext();
+	NameModifier(std::wstring name);
+	std::wstring getNext();
 };
 
 //-------------------------------------------------------------------

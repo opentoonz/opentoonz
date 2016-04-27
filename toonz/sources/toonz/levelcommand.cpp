@@ -178,7 +178,7 @@ TFilePath getUnpaintedLevelPath(TXshSimpleLevel *simpleLevel)
 	TFilePath levelPath = scene->decodeFilePath(simpleLevel->getPath());
 	if (levelPath.isEmpty())
 		return TFilePath();
-	string name = levelPath.getName() + "_np." + levelPath.getType();
+	std::string name = levelPath.getName() + "_np." + levelPath.getType();
 	return levelPath.getParentDir() + "nopaint\\" + TFilePath(name);
 }
 
@@ -386,7 +386,7 @@ void revertTo(bool isCleanedUp)
 				TXshSimpleLevel *level = (!cell.isEmpty()) ? cell.getSimpleLevel() : 0;
 				if (!level)
 					continue;
-				string ext = level->getPath().getType();
+				std::string ext = level->getPath().getType();
 				int type = level->getType();
 				/*-- Revert可能なLevelタイプの条件 --*/
 				if ((isCleanedUp && type == TZP_XSHLEVEL) ||

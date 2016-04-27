@@ -26,7 +26,7 @@ class DVAPI TFxAttributes
 	TPointD m_speed;
 	//A stack is used to manage subgroups.
 	QStack<int> m_groupId;
-	QStack<wstring> m_groupName;
+	QStack<std::wstring> m_groupName;
 	int m_passiveCacheDataIdx;
 
 	int m_groupSelector;
@@ -78,9 +78,9 @@ public:
 	bool isGrouped();
 	bool isContainedInGroup(int groupId);
 
-	void setGroupName(const wstring &name, int position = -1);
-	wstring getGroupName(bool fromEditor);
-	QStack<wstring> getGroupNameStack();
+	void setGroupName(const std::wstring &name, int position = -1);
+	std::wstring getGroupName(bool fromEditor);
+	QStack<std::wstring> getGroupNameStack();
 	int removeGroupName(bool fromEditor);
 	void removeGroupName(int position = -1);
 
@@ -88,7 +88,7 @@ public:
 	bool isGroupEditing();
 	void closeEditingGroup(int groupId);
 	int getEditingGroupId();
-	wstring getEditingGroupName();
+	std::wstring getEditingGroupName();
 	void closeAllGroups();
 };
 

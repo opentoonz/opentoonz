@@ -998,7 +998,7 @@ TSystemException::TSystemException(const TFilePath &fname, int err)
 
 //--------------------------------------------------------------
 
-TSystemException::TSystemException(const TFilePath &fname, const string &msg)
+TSystemException::TSystemException(const TFilePath &fname, const std::string &msg)
 	: m_fname(fname), m_err(-1), m_msg(toWideString(msg))
 {
 }
@@ -1011,7 +1011,7 @@ TSystemException::TSystemException(const TFilePath &fname, const wstring &msg)
 
 //--------------------------------------------------------------
 
-TSystemException::TSystemException(const string &msg)
+TSystemException::TSystemException(const std::string &msg)
 	: m_fname(""), m_err(-1), m_msg(toWideString(msg))
 {
 }

@@ -116,7 +116,7 @@ public:
 	bool m_cantCompress;
 	ImageBuilder *m_builder;
 	ImageInfo *m_imageInfo;
-	string m_id;
+	std::string m_id;
 	TUINT32 m_historyCount;
 	bool m_modified;
 };
@@ -165,7 +165,7 @@ public:
 	ImageInfo *clone();
 
 	double m_dpix, m_dpiy;
-	string m_name;
+	std::string m_name;
 	TRect m_savebox;
 	bool m_isOpaque;
 	TPoint m_offset;
@@ -226,7 +226,7 @@ public:
 	void setInfo(const TToonzImageP &ti);
 
 	double m_dpix, m_dpiy;
-	string m_name;
+	std::string m_name;
 	TRect m_savebox;
 	TPoint m_offset;
 	int m_subs;
@@ -718,7 +718,7 @@ TImageP UncompressedOnDiskCacheItem::getImage() const
 
 //------------------------------------------------------------------------------
 
-string TImageCache::getUniqueId(void)
+std::string TImageCache::getUniqueId(void)
 {
 	static TAtomicVar count;
 	std::stringstream ss;
@@ -757,13 +757,13 @@ public:
 	}
 
 	void doCompress();
-	void doCompress(string id);
+	void doCompress(std::string id);
 	UCHAR *compressAndMalloc(TUINT32 requestedSize); // compress in the cache till it can nallocate the requested memory
-	void outputMap(UINT chunkRequested, string filename);
-	void remove(const string &id);
-	void remap(const string &dstId, const string &srcId);
-	TImageP get(const string &id, bool toBeModified);
-	void add(const string &id, const TImageP &img, bool overwrite);
+	void outputMap(UINT chunkRequested, std::string filename);
+	void remove(const std::string &id);
+	void remap(const std::string &dstId, const std::string &srcId);
+	TImageP get(const std::string &id, bool toBeModified);
+	void add(const std::string &id, const TImageP &img, bool overwrite);
 	TFilePath m_rootDir;
 
 #ifndef TNZCORE_LIGHT
@@ -772,11 +772,11 @@ public:
 	bool m_isEnabled;
 #endif
 
-	map<string, CacheItemP> m_uncompressedItems;
-	map<TUINT32, string> m_itemHistory;
-	map<string, CacheItemP> m_compressedItems;
-	map<void *, string> m_itemsByImagePointer; //items ordered by ImageP.getPointer()
-	map<string, string> m_duplicatedItems;	 //for duplicated items (when id1!=id2 but image1==image2) in the map: key is dup id, value is main id
+	std::map<std::string, CacheItemP> m_uncompressedItems;
+	std::map<TUINT32, std::string> m_itemHistory;
+	std::map<std::string, CacheItemP> m_compressedItems;
+	std::map<void *, std::string> m_itemsByImagePointer; //items ordered by ImageP.getPointer()
+	std::map<std::string, std::string> m_duplicatedItems;	 //for duplicated items (when id1!=id2 but image1==image2) in the map: key is dup id, value is main id
 											   //memoria fisica totale della macchina che non puo' essere utilizzata;
 	TINT64 m_reservedMemory;
 	TThread::Mutex m_mutex;
@@ -839,10 +839,10 @@ void TImageCache::Imp::doCompress()
 
 	TThread::MutexLocker sl(&m_mutex);
 
-	std::map<TUINT32, string>::iterator itu = m_itemHistory.begin();
+	std::map<TUINT32, std::string>::iterator itu = m_itemHistory.begin();
 
 	for (; itu != m_itemHistory.end() && notEnoughMemory();) {
-		std::map<string, CacheItemP>::iterator it = m_uncompressedItems.find(itu->second);
+		std::map<std::string, CacheItemP>::iterator it = m_uncompressedItems.find(itu->second);
 		assert(it != m_uncompressedItems.end());
 		CacheItemP item = it->second;
 
@@ -852,7 +852,7 @@ void TImageCache::Imp::doCompress()
 			++itu;
 			continue;
 		}
-		string id = it->first;
+		std::string id = it->first;
 
 #ifdef _WIN32
 		assert(itu->first == it->second->m_historyCount);
@@ -860,7 +860,7 @@ void TImageCache::Imp::doCompress()
 		m_itemsByImagePointer.erase(getPointer(item->getImage()));
 		m_uncompressedItems.erase(it);
 #else
-		std::map<TUINT32, string>::iterator itu2 = itu;
+		std::map<TUINT32, std::string>::iterator itu2 = itu;
 		itu++;
 		m_itemHistory.erase(itu2);
 		m_itemsByImagePointer.erase(item->getImage().getPointer());
@@ -893,7 +893,7 @@ void TImageCache::Imp::doCompress()
 	if (itu != m_itemHistory.end()) //memory is enough!
 		return;
 
-	std::map<string, CacheItemP>::iterator itc = m_compressedItems.begin();
+	std::map<std::string, CacheItemP>::iterator itc = m_compressedItems.begin();
 	for (; itc != m_compressedItems.end() && notEnoughMemory(); ++itc) {
 		CacheItemP item = itc->second;
 		if (item->m_cantCompress)
@@ -915,12 +915,12 @@ void TImageCache::Imp::doCompress()
 
 //------------------------------------------------------------------------------
 
-void TImageCache::Imp::doCompress(string id)
+void TImageCache::Imp::doCompress(std::string id)
 {
 	TThread::MutexLocker sl(&m_mutex);
 
 	// search id in m_uncompressedItems
-	std::map<string, CacheItemP>::iterator it = m_uncompressedItems.find(id);
+	std::map<std::string, CacheItemP>::iterator it = m_uncompressedItems.find(id);
 	if (it == m_uncompressedItems.end())
 		return; // id not found: return
 
@@ -932,7 +932,7 @@ void TImageCache::Imp::doCompress(string id)
 		return;
 
 	// search id in m_itemHistory
-	std::map<TUINT32, string>::iterator itu = m_itemHistory.begin();
+	std::map<TUINT32, std::string>::iterator itu = m_itemHistory.begin();
 	while (itu != m_itemHistory.end() && itu->second != id)
 		++itu;
 	if (itu == m_itemHistory.end())
@@ -944,7 +944,7 @@ void TImageCache::Imp::doCompress(string id)
 	itu = m_itemHistory.erase(itu);
 	m_itemsByImagePointer.erase(getPointer(item->getImage()));
 #else
-	std::map<TUINT32, string>::iterator itu2 = itu;
+	std::map<TUINT32, std::string>::iterator itu2 = itu;
 	itu++;
 	m_itemHistory.erase(itu2);
 	m_itemsByImagePointer.erase(item->getImage().getPointer());
@@ -979,7 +979,7 @@ void TImageCache::Imp::doCompress(string id)
   if (itu != m_itemHistory.end()) //memory is enough!
     return;
     
-  std::map<string, CacheItemP>::iterator itc = m_compressedItems.begin();
+  std::map<std::string, CacheItemP>::iterator itc = m_compressedItems.begin();
   for ( ; itc != m_compressedItems.end() && notEnoughMemory(); ++itc)
 	{
 	  CacheItemP item = itc->second;
@@ -1016,11 +1016,11 @@ UCHAR *TImageCache::Imp::compressAndMalloc(TUINT32 size)
 
 	//assert(size==0 || TBigMemoryManager::instance()->isActive());
 
-	std::map<TUINT32, string>::iterator itu = m_itemHistory.begin();
+	std::map<TUINT32, std::string>::iterator itu = m_itemHistory.begin();
 	while ((buf = TBigMemoryManager::instance()->getBuffer(size)) == 0 &&
 		   itu != m_itemHistory.end()) //>TBigMemoryManager::instance()->getAvailableMemoryinKb()))
 	{
-		std::map<string, CacheItemP>::iterator it = m_uncompressedItems.find(itu->second);
+		std::map<std::string, CacheItemP>::iterator it = m_uncompressedItems.find(itu->second);
 		assert(it != m_uncompressedItems.end());
 		CacheItemP item = it->second;
 
@@ -1050,7 +1050,7 @@ UCHAR *TImageCache::Imp::compressAndMalloc(TUINT32 size)
 		m_itemsByImagePointer.erase(getPointer(item->getImage()));
 		m_uncompressedItems.erase(it);
 #else
-		std::map<TUINT32, string>::iterator itu2 = itu;
+		std::map<TUINT32, std::string>::iterator itu2 = itu;
 		itu++;
 		m_itemHistory.erase(itu2);
 		m_itemsByImagePointer.erase(item->getImage().getPointer());
@@ -1061,7 +1061,7 @@ UCHAR *TImageCache::Imp::compressAndMalloc(TUINT32 size)
 	if (buf != 0)
 		return buf;
 
-	std::map<string, CacheItemP>::iterator itc = m_compressedItems.begin();
+	std::map<std::string, CacheItemP>::iterator itc = m_compressedItems.begin();
 	for (; itc != m_compressedItems.end() &&
 		   (buf = TBigMemoryManager::instance()->getBuffer(size)) == 0;
 		 ++itc) {
@@ -1197,7 +1197,7 @@ UCHAR *TImageCache::compressAndMalloc(TUINT32 requestedSize)
 
 //------------------------------------------------------------------------------
 
-void TImageCache::add(const string &id, const TImageP &img, bool overwrite)
+void TImageCache::add(const std::string &id, const TImageP &img, bool overwrite)
 {
 	if (!isEnabled())
 		return;
@@ -1206,13 +1206,13 @@ void TImageCache::add(const string &id, const TImageP &img, bool overwrite)
 
 //------------------------------------------------------------------------------
 
-void TImageCache::Imp::add(const string &id, const TImageP &img, bool overwrite)
+void TImageCache::Imp::add(const std::string &id, const TImageP &img, bool overwrite)
 {
 
 	TThread::MutexLocker sl(&m_mutex);
 
 #ifdef LEVO
-	std::map<string, CacheItemP>::iterator it1 = m_uncompressedItems.begin();
+	std::map<std::string, CacheItemP>::iterator it1 = m_uncompressedItems.begin();
 
 	for (; it1 != m_uncompressedItems.end(); ++it1) {
 		UncompressedOnMemoryCacheItemP item = (UncompressedOnMemoryCacheItemP)it1->second;
@@ -1224,8 +1224,8 @@ void TImageCache::Imp::add(const string &id, const TImageP &img, bool overwrite)
 	}
 #endif
 
-	std::map<string, CacheItemP>::iterator itUncompr = m_uncompressedItems.find(id);
-	std::map<string, CacheItemP>::iterator itCompr = m_compressedItems.find(id);
+	std::map<std::string, CacheItemP>::iterator itUncompr = m_uncompressedItems.find(id);
+	std::map<std::string, CacheItemP>::iterator itCompr = m_compressedItems.find(id);
 
 #ifdef _DEBUGTOONZ
 	TRasterImageP rimg = (TRasterImageP)img;
@@ -1242,7 +1242,7 @@ void TImageCache::Imp::add(const string &id, const TImageP &img, bool overwrite)
 			else if (timg)
 				timg->getRaster()->m_cashed = true;
 #endif
-			std::map<string, CacheItemP>::iterator it;
+			std::map<std::string, CacheItemP>::iterator it;
 
 			if (itUncompr != m_uncompressedItems.end()) {
 				assert(m_itemHistory.find(itUncompr->second->m_historyCount) != m_itemHistory.end());
@@ -1255,11 +1255,11 @@ void TImageCache::Imp::add(const string &id, const TImageP &img, bool overwrite)
 		} else
 			return;
 	} else {
-		std::map<string, string>::iterator dt = m_duplicatedItems.find(id);
+		std::map<std::string, std::string>::iterator dt = m_duplicatedItems.find(id);
 		if ((dt != m_duplicatedItems.end()) && !overwrite)
 			return;
 
-		std::map<void *, string>::iterator it;
+		std::map<void *, std::string>::iterator it;
 		if ((it = m_itemsByImagePointer.find(getPointer(img))) != m_itemsByImagePointer.end()) //already present in cache with another id...
 		{
 			m_duplicatedItems[id] = it->second;
@@ -1300,14 +1300,14 @@ void TImageCache::Imp::add(const string &id, const TImageP &img, bool overwrite)
 #endif
 }
 
-void TImageCache::remove(const string &id)
+void TImageCache::remove(const std::string &id)
 {
 	m_imp->remove(id);
 }
 
 //------------------------------------------------------------------------------
 
-void TImageCache::Imp::remove(const string &id)
+void TImageCache::Imp::remove(const std::string &id)
 {
 	if (CacheInstance == 0)
 		return; //the remove can be called when exiting from toonz...after the imagecache was already freed!
@@ -1315,7 +1315,7 @@ void TImageCache::Imp::remove(const string &id)
 	assert(check == magic);
 	TThread::MutexLocker sl(&m_mutex);
 
-	std::map<string, string>::iterator it1;
+	std::map<std::string, std::string>::iterator it1;
 	if ((it1 = m_duplicatedItems.find(id)) != m_duplicatedItems.end()) //it's a duplicated id...
 	{
 		m_duplicatedItems.erase(it1);
@@ -1328,14 +1328,14 @@ void TImageCache::Imp::remove(const string &id)
 
 	if (it1 != m_duplicatedItems.end()) //it has duplicated, so cannot erase it; I erase the duplicate, and assign its id has the main id
 	{
-		string sonId = it1->first;
+		std::string sonId = it1->first;
 		m_duplicatedItems.erase(it1);
 		remap(sonId, id);
 		return;
 	}
 
-	std::map<string, CacheItemP>::iterator it = m_uncompressedItems.find(id);
-	std::map<string, CacheItemP>::iterator itc = m_compressedItems.find(id);
+	std::map<std::string, CacheItemP>::iterator it = m_uncompressedItems.find(id);
+	std::map<std::string, CacheItemP>::iterator itc = m_compressedItems.find(id);
 	if (it != m_uncompressedItems.end()) {
 		const CacheItemP &item = it->second;
 		assert((UncompressedOnMemoryCacheItemP)item);
@@ -1358,16 +1358,16 @@ void TImageCache::Imp::remove(const string &id)
 
 //------------------------------------------------------------------------------
 
-void TImageCache::remap(const string &dstId, const string &srcId)
+void TImageCache::remap(const std::string &dstId, const std::string &srcId)
 {
 	m_imp->remap(dstId, srcId);
 }
 
-void TImageCache::Imp::remap(const string &dstId, const string &srcId)
+void TImageCache::Imp::remap(const std::string &dstId, const std::string &srcId)
 {
 
 	TThread::MutexLocker sl(&m_mutex);
-	std::map<string, CacheItemP>::iterator it = m_uncompressedItems.find(srcId);
+	std::map<std::string, CacheItemP>::iterator it = m_uncompressedItems.find(srcId);
 	if (it != m_uncompressedItems.end()) {
 		CacheItemP citem = it->second;
 		assert(m_itemHistory.find(citem->m_historyCount) != m_itemHistory.end());
@@ -1385,9 +1385,9 @@ void TImageCache::Imp::remap(const string &dstId, const string &srcId)
 		m_compressedItems.erase(it);
 		m_compressedItems[dstId] = citem;
 	}
-	std::map<string, string>::iterator it2 = m_duplicatedItems.find(srcId);
+	std::map<std::string, std::string>::iterator it2 = m_duplicatedItems.find(srcId);
 	if (it2 != m_duplicatedItems.end()) {
-		string id = it2->second;
+		std::string id = it2->second;
 		m_duplicatedItems.erase(it2);
 		m_duplicatedItems[dstId] = id;
 	}
@@ -1398,18 +1398,18 @@ void TImageCache::Imp::remap(const string &dstId, const string &srcId)
 
 //------------------------------------------------------------------------------
 
-void TImageCache::remapIcons(const string &dstId, const string &srcId)
+void TImageCache::remapIcons(const std::string &dstId, const std::string &srcId)
 {
-	std::map<string, CacheItemP>::iterator it;
-	std::map<string, string> table;
-	string prefix = srcId + ":";
+	std::map<std::string, CacheItemP>::iterator it;
+	std::map<std::string, std::string> table;
+	std::string prefix = srcId + ":";
 	int j = (int)prefix.length();
 	for (it = m_imp->m_uncompressedItems.begin(); it != m_imp->m_uncompressedItems.end(); ++it) {
-		string id = it->first;
+		std::string id = it->first;
 		if (id.find(prefix) == 0)
 			table[id] = dstId + ":" + id.substr(j);
 	}
-	for (std::map<string, string>::iterator it2 = table.begin();
+	for (std::map<std::string, std::string>::iterator it2 = table.begin();
 		 it2 != table.end(); ++it2) {
 		remap(it2->second, it2->first);
 	}
@@ -1474,7 +1474,7 @@ void TImageCache::clearSceneImages()
 
 //------------------------------------------------------------------------------
 
-bool TImageCache::isCached(const string &id) const
+bool TImageCache::isCached(const std::string &id) const
 {
 	TThread::MutexLocker sl(&m_imp->m_mutex);
 	return (m_imp->m_uncompressedItems.find(id) != m_imp->m_uncompressedItems.end() ||
@@ -1485,11 +1485,11 @@ bool TImageCache::isCached(const string &id) const
 //------------------------------------------------------------------------------
 #ifdef LEVO
 
-bool TImageCache::getSize(const string &id, TDimension &size) const
+bool TImageCache::getSize(const std::string &id, TDimension &size) const
 {
 	QMutexLocker sl(&m_imp->m_mutex);
 
-	std::map<string, CacheItemP>::iterator it = m_imp->m_uncompressedItems.find(id);
+	std::map<std::string, CacheItemP>::iterator it = m_imp->m_uncompressedItems.find(id);
 	if (it != m_imp->m_uncompressedItems.end()) {
 
 		UncompressedOnMemoryCacheItemP uncompressed = it->second;
@@ -1507,7 +1507,7 @@ bool TImageCache::getSize(const string &id, TDimension &size) const
 		}
 		return false;
 	}
-	std::map<string, CacheItemP>::iterator itc = m_imp->m_compressedItems.find(id);
+	std::map<std::string, CacheItemP>::iterator itc = m_imp->m_compressedItems.find(id);
 	if (itc == m_imp->m_compressedItems.end())
 		return false;
 	CacheItemP cacheItem = itc->second;
@@ -1530,11 +1530,11 @@ bool TImageCache::getSize(const string &id, TDimension &size) const
 
 //------------------------------------------------------------------------------
 
-bool TImageCache::getSavebox(const string &id, TRect &savebox) const
+bool TImageCache::getSavebox(const std::string &id, TRect &savebox) const
 {
 	QMutexLocker sl(&m_imp->m_mutex);
 
-	std::map<string, CacheItemP>::iterator it = m_imp->m_uncompressedItems.find(id);
+	std::map<std::string, CacheItemP>::iterator it = m_imp->m_uncompressedItems.find(id);
 	if (it != m_imp->m_uncompressedItems.end()) {
 
 		UncompressedOnMemoryCacheItemP uncompressed = it->second;
@@ -1552,7 +1552,7 @@ bool TImageCache::getSavebox(const string &id, TRect &savebox) const
 		}
 		return false;
 	}
-	std::map<string, CacheItemP>::iterator itc = m_imp->m_compressedItems.find(id);
+	std::map<std::string, CacheItemP>::iterator itc = m_imp->m_compressedItems.find(id);
 	if (itc == m_imp->m_compressedItems.end())
 		return false;
 
@@ -1577,11 +1577,11 @@ bool TImageCache::getSavebox(const string &id, TRect &savebox) const
 
 //------------------------------------------------------------------------------
 
-bool TImageCache::getDpi(const string &id, double &dpiX, double &dpiY) const
+bool TImageCache::getDpi(const std::string &id, double &dpiX, double &dpiY) const
 {
 	QMutexLocker sl(&m_imp->m_mutex);
 
-	std::map<string, CacheItemP>::iterator it = m_imp->m_uncompressedItems.find(id);
+	std::map<std::string, CacheItemP>::iterator it = m_imp->m_uncompressedItems.find(id);
 	if (it != m_imp->m_uncompressedItems.end()) {
 
 		UncompressedOnMemoryCacheItemP uncompressed = it->second;
@@ -1598,7 +1598,7 @@ bool TImageCache::getDpi(const string &id, double &dpiX, double &dpiY) const
 		}
 		return false;
 	}
-	std::map<string, CacheItemP>::iterator itc = m_imp->m_compressedItems.find(id);
+	std::map<std::string, CacheItemP>::iterator itc = m_imp->m_compressedItems.find(id);
 	if (itc == m_imp->m_compressedItems.end())
 		return false;
 	CacheItemP cacheItem = itc->second;
@@ -1624,18 +1624,18 @@ bool TImageCache::getDpi(const string &id, double &dpiX, double &dpiY) const
 //------------------------------------------------------------------------------
 #endif
 
-bool TImageCache::getSubsampling(const string &id, int &subs) const
+bool TImageCache::getSubsampling(const std::string &id, int &subs) const
 {
 
 	TThread::MutexLocker sl(&m_imp->m_mutex);
 
-	std::map<string, string>::iterator it1;
+	std::map<std::string, std::string>::iterator it1;
 	if ((it1 = m_imp->m_duplicatedItems.find(id)) != m_imp->m_duplicatedItems.end()) {
 		assert(m_imp->m_duplicatedItems.find(it1->second) == m_imp->m_duplicatedItems.end());
 		return getSubsampling(it1->second, subs);
 	}
 
-	std::map<string, CacheItemP>::iterator it = m_imp->m_uncompressedItems.find(id);
+	std::map<std::string, CacheItemP>::iterator it = m_imp->m_uncompressedItems.find(id);
 	if (it != m_imp->m_uncompressedItems.end()) {
 		UncompressedOnMemoryCacheItemP uncompressed = it->second;
 		assert(uncompressed);
@@ -1653,7 +1653,7 @@ bool TImageCache::getSubsampling(const string &id, int &subs) const
 		} else
 			return false;
 	}
-	std::map<string, CacheItemP>::iterator itc = m_imp->m_compressedItems.find(id);
+	std::map<std::string, CacheItemP>::iterator itc = m_imp->m_compressedItems.find(id);
 	if (itc == m_imp->m_compressedItems.end())
 		return false;
 	CacheItemP cacheItem = itc->second;
@@ -1674,11 +1674,11 @@ bool TImageCache::getSubsampling(const string &id, int &subs) const
 
 //------------------------------------------------------------------------------
 
-bool TImageCache::hasBeenModified(const string &id, bool reset) const
+bool TImageCache::hasBeenModified(const std::string &id, bool reset) const
 {
 	TThread::MutexLocker sl(&m_imp->m_mutex);
 
-	std::map<string, string>::iterator it;
+	std::map<std::string, std::string>::iterator it;
 	if ((it = m_imp->m_duplicatedItems.find(id)) != m_imp->m_duplicatedItems.end()) {
 		assert(m_imp->m_duplicatedItems.find(it->second) == m_imp->m_duplicatedItems.end());
 		return hasBeenModified(it->second, reset);
@@ -1686,7 +1686,7 @@ bool TImageCache::hasBeenModified(const string &id, bool reset) const
 
 	TImageP img;
 
-	std::map<string, CacheItemP>::iterator itu = m_imp->m_uncompressedItems.find(id);
+	std::map<std::string, CacheItemP>::iterator itu = m_imp->m_uncompressedItems.find(id);
 	if (itu != m_imp->m_uncompressedItems.end()) {
 		if (reset && itu->second->m_modified) {
 			itu->second->m_modified = false;
@@ -1699,18 +1699,18 @@ bool TImageCache::hasBeenModified(const string &id, bool reset) const
 
 //------------------------------------------------------------------------------
 
-TImageP TImageCache::get(const string &id, bool toBeModified) const
+TImageP TImageCache::get(const std::string &id, bool toBeModified) const
 {
 	return m_imp->get(id, toBeModified);
 }
 
 //------------------------------------------------------------------------------
 
-TImageP TImageCache::Imp::get(const string &id, bool toBeModified)
+TImageP TImageCache::Imp::get(const std::string &id, bool toBeModified)
 {
 	TThread::MutexLocker sl(&m_mutex);
 
-	std::map<string, string>::const_iterator it;
+	std::map<std::string, std::string>::const_iterator it;
 	if ((it = m_duplicatedItems.find(id)) != m_duplicatedItems.end()) {
 		assert(m_duplicatedItems.find(it->second) == m_duplicatedItems.end());
 		return get(it->second, toBeModified);
@@ -1718,7 +1718,7 @@ TImageP TImageCache::Imp::get(const string &id, bool toBeModified)
 
 	TImageP img;
 
-	std::map<string, CacheItemP>::iterator itu = m_uncompressedItems.find(id);
+	std::map<std::string, CacheItemP>::iterator itu = m_uncompressedItems.find(id);
 	if (itu != m_uncompressedItems.end()) {
 		img = itu->second->getImage();
 		if (itu->second->m_historyCount != HistoryCount - 1) //significa che l'ultimo get non era sulla stessa immagine, quindi  serve aggiornare l'history!
@@ -1731,14 +1731,14 @@ TImageP TImageCache::Imp::get(const string &id, bool toBeModified)
 		}
 		if (toBeModified) {
 			itu->second->m_modified = true;
-			std::map<string, CacheItemP>::iterator itc = m_compressedItems.find(id);
+			std::map<std::string, CacheItemP>::iterator itc = m_compressedItems.find(id);
 			if (itc != m_compressedItems.end())
 				m_compressedItems.erase(itc);
 		}
 		return img;
 	}
 
-	std::map<string, CacheItemP>::iterator itc = m_compressedItems.find(id);
+	std::map<std::string, CacheItemP>::iterator itc = m_compressedItems.find(id);
 	if (itc == m_compressedItems.end())
 		return 0;
 
@@ -1793,7 +1793,7 @@ namespace
 class AccumulateMemUsage
 {
 public:
-	int operator()(int oldValue, std::pair<string, CacheItemP> item)
+	int operator()(int oldValue, std::pair<std::string, CacheItemP> item)
 	{
 		return oldValue + item.second->getSize();
 	}
@@ -1826,9 +1826,9 @@ UINT TImageCache::getDiskUsage() const
 
 //------------------------------------------------------------------------------
 
-UINT TImageCache::getMemUsage(const string &id) const
+UINT TImageCache::getMemUsage(const std::string &id) const
 {
-	std::map<string, CacheItemP>::iterator it = m_imp->m_uncompressedItems.find(id);
+	std::map<std::string, CacheItemP>::iterator it = m_imp->m_uncompressedItems.find(id);
 	if (it != m_imp->m_uncompressedItems.end())
 		return it->second->getSize();
 
@@ -1842,9 +1842,9 @@ UINT TImageCache::getMemUsage(const string &id) const
 
 //! Returns the uncompressed image size (in KB) of the image associated with
 //! passd id, or 0 if none was found.
-UINT TImageCache::getUncompressedMemUsage(const string &id) const
+UINT TImageCache::getUncompressedMemUsage(const std::string &id) const
 {
-	std::map<string, CacheItemP>::iterator it = m_imp->m_uncompressedItems.find(id);
+	std::map<std::string, CacheItemP>::iterator it = m_imp->m_uncompressedItems.find(id);
 	if (it != m_imp->m_uncompressedItems.end())
 		return it->second->getSize();
 
@@ -1865,17 +1865,17 @@ int TImageCache::getItemCount() const
 */
 //------------------------------------------------------------------------------
 
-UINT TImageCache::getDiskUsage(const string &id) const
+UINT TImageCache::getDiskUsage(const std::string &id) const
 {
 	return 0;
 }
 
 //------------------------------------------------------------------------------
 
-void TImageCache::dump(ostream &os) const
+void TImageCache::dump(std::ostream &os) const
 {
 	os << "mem: " << getMemUsage() << std::endl;
-	std::map<string, CacheItemP>::iterator it = m_imp->m_uncompressedItems.begin();
+	std::map<std::string, CacheItemP>::iterator it = m_imp->m_uncompressedItems.begin();
 	for (; it != m_imp->m_uncompressedItems.end(); ++it) {
 		os << it->first << std::endl;
 	}
@@ -1883,14 +1883,14 @@ void TImageCache::dump(ostream &os) const
 
 //------------------------------------------------------------------------------
 
-void TImageCache::outputMap(UINT chunkRequested, string filename)
+void TImageCache::outputMap(UINT chunkRequested, std::string filename)
 {
 	m_imp->outputMap(chunkRequested, filename);
 }
 
 //------------------------------------------------------------------------------
 
-void TImageCache::Imp::outputMap(UINT chunkRequested, string filename)
+void TImageCache::Imp::outputMap(UINT chunkRequested, std::string filename)
 {
 	TThread::MutexLocker sl(&m_mutex);
 	//#ifdef _DEBUG
@@ -1916,7 +1916,7 @@ void TImageCache::Imp::outputMap(UINT chunkRequested, string filename)
 	TUINT64 umsize = 0;
 	TUINT64 udsize = 0;
 
-	std::map<string, CacheItemP>::iterator itu = m_uncompressedItems.begin();
+	std::map<std::string, CacheItemP>::iterator itu = m_uncompressedItems.begin();
 
 	for (; itu != m_uncompressedItems.end(); ++itu) {
 		UncompressedOnMemoryCacheItemP uitem = itu->second;
@@ -1931,7 +1931,7 @@ void TImageCache::Imp::outputMap(UINT chunkRequested, string filename)
 			umsize3 += (TUINT64)(itu->second->getSize() / 1024.0);
 		}
 	}
-	std::map<string, CacheItemP>::iterator itc = m_compressedItems.begin();
+	std::map<std::string, CacheItemP>::iterator itc = m_compressedItems.begin();
 	for (; itc != m_compressedItems.end(); ++itc) {
 		CacheItemP boh = itc->second;
 		CompressedOnMemoryCacheItemP cmitem = itc->second;
@@ -1974,7 +1974,7 @@ void TImageCache::Imp::outputMap(UINT chunkRequested, string filename)
 
 //------------------------------------------------------------------------------
 
-void TImageCache::compress(const string &id)
+void TImageCache::compress(const std::string &id)
 {
 	m_imp->doCompress(id);
 }

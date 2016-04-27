@@ -85,7 +85,7 @@ class HookTool : public TTool
 	TBoolProperty m_snappedActive;
 
 	TPointD m_snappedPos;
-	string m_snappedReason;
+	std::string m_snappedReason;
 	TRectD m_shapeBBox;
 	bool m_snapped, m_hookSetChanged;
 
@@ -347,7 +347,7 @@ void HookTool::draw()
 		}
 		TPixel32 balloonColor(200, 220, 205, 200);
 		TPoint balloonOffset(20, 20);
-		string hookName = toString(i + 1);
+		std::string hookName = toString(i + 1);
 		drawBalloon(p0, hookName, balloonColor, balloonOffset, false, &balloons);
 		if (!linked)
 			drawBalloon(p1, hookName, balloonColor, balloonOffset, false, &balloons);
@@ -751,7 +751,7 @@ bool HookTool::snap(TPointD &pos, double &range2)
 
 void HookTool::mouseMove(const TPointD &pos, const TMouseEvent &e)
 {
-	string oldReason = m_snappedReason;
+	std::string oldReason = m_snappedReason;
 	TPointD oldPos = m_snappedPos;
 
 	m_snappedPos = TPointD();

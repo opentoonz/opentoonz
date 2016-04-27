@@ -35,7 +35,7 @@ class DVAPI TMathException : public TException
 	TString m_msg;
 
 public:
-	TMathException(string msg);
+	TMathException(std::string msg);
 	virtual ~TMathException() {}
 	virtual TString getMessage() const { return m_msg; }
 };
@@ -125,8 +125,7 @@ DVAPI double tdet(double *LUa, int n, double d);
   \par poly is a vector with coeff of polynomious in crescent order.
   \ret sol is the vector of solution and contain real found solution.
  */
-DVAPI int rootFinding(const vector<double> &poly,
-					  vector<double> &sol);
+DVAPI int rootFinding(const std::vector<double> &poly, std::vector<double> &sol);
 
 //-----------------------------------------------------------------------------
 

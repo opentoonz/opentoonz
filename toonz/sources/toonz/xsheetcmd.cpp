@@ -1299,24 +1299,24 @@ namespace
 {
 int columnsPerPage = 10000;
 int rowsPerPage = 10000;
-std::vector<std::pair<string, string>> infos;
+std::vector<std::pair<std::string, string>> infos;
 
 void readParameters()
 {
 	infos.clear();
-	const string name("xsheet_html.xml");
+	const std::string name("xsheet_html.xml");
 	TFilePath fp = ToonzFolder::getModuleFile(name);
 	if (!TFileStatus(fp).doesExist())
 		return;
 	try {
 		TIStream is(fp);
-		string tagName;
+		std::string tagName;
 		if (!is.matchTag(tagName) || tagName != "xsheet_html")
 			return;
 
 		while (is.matchTag(tagName)) {
 			if (tagName == "page") {
-				string s;
+				std::string s;
 				s = is.getTagAttribute("rows");
 				if (s != "" && isInt(s))
 					rowsPerPage = toInt(s);
@@ -1324,8 +1324,8 @@ void readParameters()
 				if (s != "" && isInt(s))
 					columnsPerPage = toInt(s);
 			} else if (tagName == "info") {
-				string name = is.getTagAttribute("name");
-				string value = is.getTagAttribute("value");
+				std::string name = is.getTagAttribute("name");
+				std::string value = is.getTagAttribute("value");
 				infos.push_back(std::make_pair(name, value));
 			} else
 				return;
@@ -1336,7 +1336,7 @@ void readParameters()
 
 void copyCss(TFilePath fp)
 {
-	const string name("xsheet.css");
+	const std::string name("xsheet.css");
 	TFilePath cssFp = fp.getParentDir() + name;
 	if (TFileStatus(cssFp).doesExist())
 		return;
@@ -1481,8 +1481,8 @@ void XsheetWriter::columnHeader(ostream &os, int c)
 
 void XsheetWriter::numericColumnHeader(ostream &os, int c)
 {
-	string pegbarName = m_numericColumns[c].m_pegbar->getName();
-	string curveName = m_numericColumns[c].m_curve->getName(); //toString(TStringTable::translate(m_numericColumns[c].m_curve->getName()));
+	std::string pegbarName = m_numericColumns[c].m_pegbar->getName();
+	std::string curveName = m_numericColumns[c].m_curve->getName(); //toString(TStringTable::translate(m_numericColumns[c].m_curve->getName()));
 	os << "  <th class='" << (c > 0 ? "numeric" : "first_numeric") << "'>";
 	os << pegbarName
 	   << "<br>"
@@ -1500,7 +1500,7 @@ void XsheetWriter::cell(ostream &os, int r, int c)
 		os << "<td class='emptycell'>&nbsp;</td>";
 	else {
 		TXshLevel *level = cell.m_level.getPointer();
-		string type = "levelcell";
+		std::string type = "levelcell";
 		if (level->getChildLevel())
 			type = "subxsheetcell";
 		else if (level->getZeraryFxLevel())
@@ -1520,7 +1520,7 @@ void XsheetWriter::cell(ostream &os, int r, int c)
 		} else {
 			// livello diverso
 
-			string levelName;
+			std::string levelName;
 			if (level->getChildLevel()) {
 				int index = getChildLevelIndex(level->getChildLevel());
 				levelName = index >= 0 ? "Sub" + toString(index + 1) : "";
@@ -1609,8 +1609,8 @@ void makeHtml(TFilePath fp)
 	TApp *app = TApp::instance();
 	ToonzScene *scene = app->getCurrentScene()->getScene();
 
-	string sceneName = scene->getScenePath().getName();
-	string projectName = toString(scene->getProject()->getName());
+	std::string sceneName = scene->getScenePath().getName();
+	std::string projectName = toString(scene->getProject()->getName());
 
 	Tofstream os(fp);
 
@@ -1637,7 +1637,7 @@ void makeHtml(TFilePath fp)
 	XsheetWriter writer(scene);
 	writer.write(os);
 
-	vector<TXsheet *> subXsheets;
+	std::vector<TXsheet *> subXsheets;
 	writer.getSubXsheets(subXsheets);
 	int i;
 	for (i = 0; i < (int)subXsheets.size(); i++) {

@@ -90,7 +90,7 @@ void drawQuadraticCenterline(const TQuadratic &inQuad,
 
 //-----------------------------------------------------------------------------
 
-void stroke2polyline(vector<TPointD> &pnts, const TStroke &stroke,
+void stroke2polyline(std::vector<TPointD> &pnts, const TStroke &stroke,
 					 double pixelSize, double w0, double w1, bool lastRepeatable)
 {
 	TPointD p;
@@ -413,7 +413,7 @@ void drawStrokeCenterline(const TStroke &stroke,
 DVAPI TStroke *makeEllipticStroke(double thick, TPointD center, double radiusX, double radiusY)
 {
 
-	vector<TThickPoint> points(17);
+	std::vector<TThickPoint> points(17);
 
 	double xmin = center.x - radiusX; // x coordinate of the upper left corner of the bounding rectangle
 	double ymin = center.y - radiusY; // y coordinate of the upper left corner of the bounding rectangle

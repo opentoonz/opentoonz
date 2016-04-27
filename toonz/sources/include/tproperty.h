@@ -73,7 +73,7 @@ public:
 	{
 	};
 
-	TProperty(string name)
+	TProperty(std::string name)
 		: m_name(name)
 	{
 		m_qstringName = QString::fromStdString(name);
@@ -87,8 +87,8 @@ public:
 	QString getQStringName() const { return m_qstringName; }
 	void setQStringName(const QString &str) { m_qstringName = str; }
 
-	string getName() const { return m_name; }
-	virtual string getValueAsString() = 0;
+	std::string getName() const { return m_name; }
+	virtual std::string getValueAsString() = 0;
 
 	virtual void accept(Visitor &v) = 0;
 
@@ -96,13 +96,13 @@ public:
 	void removeListener(Listener *listener);
 	void notifyListeners() const;
 
-	string getId() const { return m_id; }
-	void setId(string id) { m_id = id; }
+	std::string getId() const { return m_id; }
+	void setId(std::string id) { m_id = id; }
 
 private:
-	string m_name;
+	std::string m_name;
 	QString m_qstringName;
-	string m_id;
+	std::string m_id;
 	std::vector<Listener *> m_listeners;
 };
 
@@ -116,7 +116,7 @@ public:
 	typedef std::pair<T, T> Range;
 
 	TRangeProperty(
-		string name,
+		std::string name,
 		T minValue, T maxValue,
 		T value, bool isMaxRangeLimited = true)
 		: TProperty(name), m_range(minValue, maxValue), m_value(minValue), m_isMaxRangeLimited(isMaxRangeLimited)
@@ -147,7 +147,7 @@ public:
 		return m_value;
 	}
 
-	string getValueAsString()
+	std::string getValueAsString()
 	{
 		return toString(m_value);
 	}
@@ -177,7 +177,7 @@ public:
 	typedef std::pair<double, double> Value;
 
 	TDoublePairProperty(
-		string name,
+		std::string name,
 		double minValue, double maxValue,
 		double v0, double v1,
 		bool isMaxRangeLimited = true)
@@ -206,7 +206,7 @@ public:
 	{
 		return m_value;
 	}
-	string getValueAsString()
+	std::string getValueAsString()
 	{
 		return toString(m_value.first) + "," + toString(m_value.second);
 	}
@@ -228,7 +228,7 @@ public:
 	typedef std::pair<int, int> Value;
 
 	TIntPairProperty(
-		string name,
+		std::string name,
 		int minValue, int maxValue,
 		int v0, int v1,
 		bool isMaxRangeLimited = true)
@@ -257,7 +257,7 @@ public:
 	{
 		return m_value;
 	}
-	string getValueAsString()
+	std::string getValueAsString()
 	{
 		return toString(m_value.first) + "," + toString(m_value.second);
 	}
@@ -274,7 +274,7 @@ private:
 class DVAPI TBoolProperty : public TProperty
 {
 public:
-	TBoolProperty(string name, bool value)
+	TBoolProperty(std::string name, bool value)
 		: TProperty(name), m_value(value)
 	{
 	}
@@ -283,7 +283,7 @@ public:
 
 	void setValue(bool v) { m_value = v; }
 	bool getValue() const { return m_value; }
-	string getValueAsString()
+	std::string getValueAsString()
 	{
 		return toString(m_value);
 	}
@@ -298,23 +298,23 @@ private:
 class DVAPI TStringProperty : public TProperty
 {
 public:
-	TStringProperty(string name, wstring value)
+	TStringProperty(std::string name, std::wstring value)
 		: TProperty(name), m_value(value)
 	{
 	}
 
 	TProperty *clone() const { return new TStringProperty(*this); }
 
-	void setValue(wstring v) { m_value = v; }
-	wstring getValue() const { return m_value; }
-	string getValueAsString()
+	void setValue(std::wstring v) { m_value = v; }
+	std::wstring getValue() const { return m_value; }
+	std::string getValueAsString()
 	{
 		return toString(m_value);
 	}
 	void accept(Visitor &v) { v.visit(this); };
 
 private:
-	wstring m_value;
+	std::wstring m_value;
 };
 
 //---------------------------------------------------------
@@ -322,17 +322,17 @@ private:
 class DVAPI TStyleIndexProperty : public TProperty
 {
 public:
-	TStyleIndexProperty(string name, wstring value)
+	TStyleIndexProperty(std::string name, std::wstring value)
 		: TProperty(name), m_value(value)
 	{
 	}
 
 	TProperty *clone() const { return new TStyleIndexProperty(*this); }
 
-	void setValue(wstring v) { m_value = v; }
-	wstring getValue() const { return m_value; }
+	void setValue(std::wstring v) { m_value = v; }
+	std::wstring getValue() const { return m_value; }
 
-	string getValueAsString()
+	std::string getValueAsString()
 	{
 		return toString(m_value);
 	}
@@ -340,7 +340,7 @@ public:
 	void accept(Visitor &v) { v.visit(this); };
 
 private:
-	wstring m_value;
+	std::wstring m_value;
 };
 
 //------------------------------------------------------------------
@@ -348,7 +348,7 @@ private:
 class DVAPI TPointerProperty : public TProperty
 {
 public:
-	TPointerProperty(string name, void *value)
+	TPointerProperty(std::string name, void *value)
 		: TProperty(name), m_value(value)
 	{
 	}
@@ -358,7 +358,7 @@ public:
 	void setValue(void *v) { m_value = v; }
 	void *getValue() const { return m_value; }
 
-	string getValueAsString()
+	std::string getValueAsString()
 	{
 		return toString((unsigned long long)m_value);
 	}
@@ -374,21 +374,21 @@ private:
 class DVAPI TEnumProperty : public TProperty
 {
 public:
-	typedef std::vector<wstring> Range;
+	typedef std::vector<std::wstring> Range;
 
-	TEnumProperty(const string &name)
+	TEnumProperty(const std::string &name)
 		: TProperty(name), m_index(-1) {}
 
-	TEnumProperty(const string &name, const Range &range, const wstring &v)
+	TEnumProperty(const std::string &name, const Range &range, const std::wstring &v)
 		: TProperty(name), m_range(range), m_index(indexOf(v))
 	{
 		if (m_index < 0)
 			throw RangeError();
 	}
 
-	TEnumProperty(const string &name,
+	TEnumProperty(const std::string &name,
 				  Range::const_iterator i0, Range::const_iterator i1,
-				  const wstring &v)
+					const std::wstring &v)
 		: TProperty(name), m_range(i0, i1), m_index(indexOf(v))
 	{
 		if (m_index < 0)
@@ -397,19 +397,19 @@ public:
 
 	TProperty *clone() const { return new TEnumProperty(*this); }
 
-	int indexOf(const wstring &value)
+	int indexOf(const std::wstring &value)
 	{
 		Range::const_iterator it = std::find(m_range.begin(), m_range.end(), value);
 		return (it == m_range.end()) ? -1 : it - m_range.begin();
 	}
 
-	bool isValue(const wstring &value)
+	bool isValue(const std::wstring &value)
 	{
 		bool ret = std::find(m_range.begin(), m_range.end(), value) != m_range.end();
 		return ret;
 	}
 
-	void addValue(wstring value)
+	void addValue(std::wstring value)
 	{
 		if (m_index == -1)
 			m_index = 0;
@@ -429,7 +429,7 @@ public:
 		m_index = index;
 	}
 
-	void setValue(const wstring &value)
+	void setValue(const std::wstring &value)
 	{
 		int idx = indexOf(value);
 		if (idx < 0)
@@ -438,8 +438,8 @@ public:
 	}
 
 	const Range &getRange() const { return m_range; }
-	wstring getValue() const { return (m_index < 0) ? L"" : m_range[m_index]; }
-	string getValueAsString() { return toString(m_range[m_index]); }
+	std::wstring getValue() const { return (m_index < 0) ? L"" : m_range[m_index]; }
+	std::string getValueAsString() { return toString(m_range[m_index]); }
 	int getIndex() const { return m_index; }
 
 	void accept(Visitor &v) { v.visit(this); }
@@ -458,7 +458,7 @@ class DVAPI TPropertyGroup
 {
 public:
 	typedef std::vector<std::pair<TProperty *, bool>> PropertyVector;
-	typedef std::map<string, TProperty *> PropertyTable;
+	typedef std::map<std::string, TProperty *> PropertyTable;
 
 	// exception
 	class PropertyNotFoundError
@@ -477,7 +477,7 @@ public:
 	void bind(TProperty &p);
 
 	//! returns 0 if the property doesn't exist
-	TProperty *getProperty(string name);
+	TProperty *getProperty(std::string name);
 	TProperty *getProperty(int i) { return (i >= (int)m_properties.size()) ? 0 : m_properties[i].first; }
 
 	void setProperties(TPropertyGroup *g);

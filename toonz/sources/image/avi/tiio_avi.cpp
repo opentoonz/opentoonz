@@ -36,7 +36,7 @@ void WideChar2Char(LPCWSTR wideCharStr, char *str, int strBuffSize)
 
 //------------------------------------------------------------------------------
 
-string buildAVIExceptionString(int rc)
+std::string buildAVIExceptionString(int rc)
 {
 	switch (rc) {
 		CASE AVIERR_BADFORMAT : return "The file couldn't be read, indicating a corrupt file or an unrecognized format.";
@@ -56,9 +56,9 @@ string buildAVIExceptionString(int rc)
 
 //------------------------------------------------------------------------------
 
-string SplitFourCC(DWORD fcc)
+std::string SplitFourCC(DWORD fcc)
 {
-	string s;
+	std::string s;
 	s += (char((fcc & 0x000000ff) >> 0));
 	s += (char((fcc & 0x0000ff00) >> 8));
 	s += (char((fcc & 0x00ff0000) >> 16));
@@ -246,7 +246,7 @@ void TLevelWriterAvi::searchForCodec()
 
 	TEnumProperty *p = (TEnumProperty *)m_properties->getProperty("Codec");
 	assert(p);
-	wstring codecName = p->getValue();
+	std::wstring codecName = p->getValue();
 
 	//--------  // cerco compressorName fra i codec
 
@@ -276,8 +276,8 @@ void TLevelWriterAvi::searchForCodec()
 				WideChar2Char(icinfo.szDescription, descr, sizeof(descr));
 				WideChar2Char(icinfo.szName, name, sizeof(name));
 
-				string compressorName;
-				compressorName = string(name) + " '" + toString(bpp) + "' " + string(descr);
+				std::string compressorName;
+				compressorName = std::string(name) + " '" + toString(bpp) + "' " + std::string(descr);
 
 				if (hic) {
 					if (ICCompressQuery(hic, &inFmt, NULL) != ICERR_OK) {
@@ -746,8 +746,8 @@ TLevelReaderAvi::TLevelReaderAvi(const TFilePath &path)
 		ICGetInfo(m_hic, &icinfo, sizeof(ICINFO)); // Find out the compressor name
 		WideChar2Char(icinfo.szDescription, descr, sizeof(descr));
 		WideChar2Char(icinfo.szName, name, sizeof(name));
-		string compressorName;
-		compressorName = string(name) + " '" + toString(m_dstBitmapInfo->bmiHeader.biBitCount) + "' " + string(descr);
+		std::string compressorName;
+		compressorName = std::string(name) + " '" + toString(m_dstBitmapInfo->bmiHeader.biBitCount) + "' " + std::string(descr);
 		TEnumProperty *p = (TEnumProperty *)m_info->m_properties->getProperty("Codec");
 		p->setValue(toWideString(compressorName));
 		m_decompressedBuffer = _aligned_malloc(m_dstBitmapInfo->bmiHeader.biSizeImage, 128);
@@ -1087,10 +1087,10 @@ Tiio::AviWriterProperties::AviWriterProperties()
 						continue;
 					}
 
-					string compressorName;
-					compressorName = string(name) + " '" + toString(bpp) + "' " + string(descr);
+					std::string compressorName;
+					compressorName = std::string(name) + " '" + toString(bpp) + "' " + std::string(descr);
 
-					if (string(compressorName).find("Indeo") != -1) // per il momento togliamo i codec indeo
+					if (std::string(compressorName).find("Indeo") != -1) // per il momento togliamo i codec indeo
 					{
 						ICClose(hic);
 						continue;

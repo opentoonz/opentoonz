@@ -169,7 +169,7 @@ public:
 		const TSmartPointerT<TParam> &, double,
 		bool) {}
 
-	string getValueAlias(double, int)
+	std::string getValueAlias(double, int)
 	{
 		return toString(getValue());
 	}
@@ -285,14 +285,14 @@ class DVAPI TStringParam : public TNotAnimatableParam<std::wstring>
 	PERSIST_DECLARATION(TStringParam);
 
 public:
-	TStringParam(wstring v = L"") : TNotAnimatableParam<std::wstring>(v) {}
-	TStringParam(const TStringParam &src) : TNotAnimatableParam<wstring>(src) {}
+	TStringParam(std::wstring v = L"") : TNotAnimatableParam<std::wstring>(v) {}
+	TStringParam(const TStringParam &src) : TNotAnimatableParam<std::wstring>(src) {}
 	TParam *clone() const { return new TStringParam(*this); }
 	void loadData(TIStream &is);
 	void saveData(TOStream &os);
 };
 
-DEFINE_PARAM_SMARTPOINTER(TStringParam, wstring)
+DEFINE_PARAM_SMARTPOINTER(TStringParam, std::wstring)
 
 //=========================================================
 //
@@ -308,7 +308,7 @@ class DVAPI TEnumParam : public TNotAnimatableParam<int>
 	PERSIST_DECLARATION(TEnumParam)
 
 public:
-	TEnumParam(const int &v, const string &caption);
+	TEnumParam(const int &v, const std::string &caption);
 
 	TEnumParam();
 
@@ -319,12 +319,12 @@ public:
 	void copy(TParam *src);
 
 	void setValue(int v, bool undoing = false);
-	void setValue(const string &caption, bool undoing = false);
+	void setValue(const std::string &caption, bool undoing = false);
 
-	void addItem(const int &item, const string &caption);
+	void addItem(const int &item, const std::string &caption);
 
 	int getItemCount() const;
-	void getItem(int i, int &item, string &caption) const;
+	void getItem(int i, int &item, std::string &caption) const;
 
 	// TPersist methods
 	void loadData(TIStream &is);
@@ -344,7 +344,7 @@ class DVAPI TIntEnumParamP : public TDerivedSmartPointerT<TIntEnumParam, TParam>
 {
 public:
 	TIntEnumParamP(TIntEnumParam *p = 0) : DerivedSmartPointer(p) {}
-	TIntEnumParamP(int v, const string &caption) : DerivedSmartPointer(new TEnumParam(v, caption)) {}
+	TIntEnumParamP(int v, const std::string &caption) : DerivedSmartPointer(new TEnumParam(v, caption)) {}
 	TIntEnumParamP(TParamP &p) : DerivedSmartPointer(p) {}
 	TIntEnumParamP(const TParamP &p) : DerivedSmartPointer(p) {}
 	operator TParamP() const { return TParamP(m_pointer); }

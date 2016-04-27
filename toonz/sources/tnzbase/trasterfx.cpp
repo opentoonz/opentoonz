@@ -235,11 +235,11 @@ public:
 
 	//-----------------------------------------------------------
 
-	string getAlias(double frame, const TRenderSettings &info) const
+	std::string getAlias(double frame, const TRenderSettings &info) const
 	{
 		//NOTE: TrFx are not present at this recursive level. Affines dealing is currently handled by inserting the
 		//rendering affine AFTER a getAlias call. Ever.
-		string alias = getFxType();
+		std::string alias = getFxType();
 		return alias + "[" + m_fx->getAlias(frame, info) + "]";
 	}
 
@@ -363,7 +363,7 @@ class FxResourceBuilder : public ResourceBuilder
 	TRectD m_outRect;
 
 public:
-	FxResourceBuilder(const string &resourceName,
+	FxResourceBuilder(const std::string &resourceName,
 					  const TRasterFxP &fx, const TRenderSettings &rs, double frame)
 		: ResourceBuilder(resourceName, fx.getPointer(), frame, rs), m_rfx(fx), m_frame(frame), m_rs(&rs), m_currTile(0) {}
 
@@ -481,7 +481,7 @@ public:
 	bool m_isEnabled;
 
 	TRenderSettings m_info;
-	string m_interactiveCacheId;
+	std::string m_interactiveCacheId;
 	mutable TThread::Mutex m_mutex; //brutto
 
 	TRasterFxImp() : m_cacheEnabled(false), m_isEnabled(true), m_cachedTile(0)
@@ -603,9 +603,9 @@ int TRasterFx::getMemoryRequirement(const TRectD &rect, double frame, const TRen
 
 //--------------------------------------------------
 
-string TRasterFx::getAlias(double frame, const TRenderSettings &info) const
+std::string TRasterFx::getAlias(double frame, const TRenderSettings &info) const
 {
-	string alias = getFxType();
+	std::string alias = getFxType();
 	alias += "[";
 
 	// alias degli effetti connessi alle porte di input separati da virgole
@@ -685,7 +685,7 @@ void TRasterFx::dryCompute(TRectD &rect,
 		return;
 	}
 
-	string alias = getAlias(frame, info) + "[" + ::traduce(info.m_affine) + "][" + ::toString(info.m_bpp) + "]";
+	std::string alias = getAlias(frame, info) + "[" + ::traduce(info.m_affine) + "][" + ::toString(info.m_bpp) + "]";
 
 	int renderStatus = TRenderer::instance().getRenderStatus(TRenderer::renderId());
 	TFxCacheManager *cacheManager = TFxCacheManager::instance();
@@ -870,7 +870,7 @@ void TRasterFx::compute(TTile &tile, double frame,
 	TRectD tilePlacement = myConvert(tile.getRaster()->getBounds()) + tile.m_pos;
 
 	//Build the fx result alias (in other words, its name)
-	string alias = getAlias(frame, info) + "[" + ::traduce(info.m_affine) + "][" + ::toString(info.m_bpp) + "]"; //To be moved below
+	std::string alias = getAlias(frame, info) + "[" + ::traduce(info.m_affine) + "][" + ::toString(info.m_bpp) + "]"; //To be moved below
 
 	TRectD bbox;
 	getBBox(frame, bbox, info);
@@ -1054,9 +1054,9 @@ TRenderSettings::~TRenderSettings()
 
 //------------------------------------------------------------------------------
 
-string TRenderSettings::toString() const
+std::string TRenderSettings::toString() const
 {
-	string ss =
+	std::string ss =
 		::toString(m_bpp) + ";" +
 		::toString(m_quality) + ";" +
 		::toString(m_gamma) + ";" +

@@ -1139,8 +1139,8 @@ public:
 #ifndef TNZCORE_LIGHT
 	TThread::Executor m_executor;
 #endif
-	vector<WAVEHDR> m_whdr;
-	vector<char *> m_recordedBlocks;
+	std::vector<WAVEHDR> m_whdr;
+	std::vector<char *> m_recordedBlocks;
 	std::set<int> m_supportedRate;
 
 	HANDLE m_hLastBlockDone;
@@ -2062,7 +2062,7 @@ MMRESULT getControlDetails(HMIXEROBJ hMixer,
 //------------------------------------------------------------------------------
 
 // restituiscei l nome della linea identificata da lineID
-string getMixerLineName(DWORD lineID)
+std::string getMixerLineName(DWORD lineID)
 {
 	MIXERLINE mxl;
 	MMRESULT ret;
@@ -2072,7 +2072,7 @@ string getMixerLineName(DWORD lineID)
 	assert(false);
 	return "";
 #else
-	return string(mxl.szName);
+	return std::string(mxl.szName);
 #endif
 }
 
@@ -2080,9 +2080,9 @@ string getMixerLineName(DWORD lineID)
 
 // restituisce la lista degli identificativi delle linee sorgente associate
 // alla destinazione di tipo dstComponentType
-list<DWORD> getMixerSrcLines(DWORD dstComponentType)
+std::list<DWORD> getMixerSrcLines(DWORD dstComponentType)
 {
-	list<DWORD> srcList;
+	std::list<DWORD> srcList;
 	MMRESULT ret;
 	MIXERLINE mxl;
 
@@ -2106,9 +2106,9 @@ list<DWORD> getMixerSrcLines(DWORD dstComponentType)
 
 // restituisce la lista degli identificativi delle linee sorgente di tipo
 // srcComponentType associate alla destinazione di tipo dstComponentType
-list<DWORD> getMixerSrcLines(DWORD dstComponentType, DWORD srcComponentType)
+std::list<DWORD> getMixerSrcLines(DWORD dstComponentType, DWORD srcComponentType)
 {
-	list<DWORD> srcList;
+	std::list<DWORD> srcList;
 	MMRESULT ret;
 	MIXERLINE mxl;
 

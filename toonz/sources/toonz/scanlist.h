@@ -22,8 +22,8 @@ public:
 	ScanListFrame(const ScanListFrame &);
 	ScanListFrame &operator=(const ScanListFrame &);
 
-	wstring getName() const;
-	wstring getLevelName() const;
+	std::wstring getName() const;
+	std::wstring getLevelName() const;
 	TFrameId getFrameId() const;
 
 	TXshSimpleLevel *getLevel() const { return m_xl; }

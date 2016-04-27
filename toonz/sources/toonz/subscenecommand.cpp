@@ -60,10 +60,10 @@ namespace
 struct GroupData {
 public:
 	QStack<int> m_groupIds;
-	QStack<wstring> m_groupNames;
+	QStack<std::wstring> m_groupNames;
 	int m_editingGroup;
 
-	GroupData(const QStack<int> &groupIds, const QStack<wstring> &groupNames, int editingGroup)
+	GroupData(const QStack<int> &groupIds, const QStack<std::wstring> &groupNames, int editingGroup)
 		: m_groupIds(groupIds), m_groupNames(groupNames), m_editingGroup(editingGroup)
 	{
 	}
@@ -105,16 +105,16 @@ void setFxParamToCurrentScene(TFx *fx, TXsheet *xsh)
 
 //-----------------------------------------------------------------------------
 
-vector<TStageObjectId> getRoots(const QList<TStageObjectId> &objIds, TXsheetHandle *xshHandle)
+std::vector<TStageObjectId> getRoots(const QList<TStageObjectId> &objIds, TXsheetHandle *xshHandle)
 {
-	vector<TStageObjectId> roots;
-	map<TStageObjectId, string> parentHandles;
+	std::vector<TStageObjectId> roots;
+	std::map<TStageObjectId, std::string> parentHandles;
 	TStageObjectTree *pegTree = xshHandle->getXsheet()->getStageObjectTree();
 	for (int i = 0; i < objIds.size(); i++) {
 		TStageObject *obj = pegTree->getStageObject(objIds.at(i), false);
 		TStageObjectId parentId = obj->getParent();
 		bool parentIsColumn = parentId.isColumn() && !objIds.contains(parentId);
-		string parentHandle = obj->getParentHandle();
+		std::string parentHandle = obj->getParentHandle();
 		if (!parentIsColumn && !objIds.contains(parentId) &&
 			(parentHandles.count(parentId) == 0 || parentHandles[parentId] != parentHandle)) {
 			parentHandles[parentId] = parentHandle;
@@ -126,18 +126,18 @@ vector<TStageObjectId> getRoots(const QList<TStageObjectId> &objIds, TXsheetHand
 
 //-----------------------------------------------------------------------------
 
-vector<TStageObjectId> isConnected(const std::set<int> &indices,
+std::vector<TStageObjectId> isConnected(const std::set<int> &indices,
 								   const std::set<TStageObjectId> &pegbarIds, TXsheetHandle *xshHandle)
 {
-	vector<TStageObjectId> roots;
-	map<TStageObjectId, string> parentHandles;
+	std::vector<TStageObjectId> roots;
+	std::map<TStageObjectId, std::string> parentHandles;
 	TStageObjectTree *pegTree = xshHandle->getXsheet()->getStageObjectTree();
 	std::set<int>::const_iterator it;
 	for (it = indices.begin(); it != indices.end(); it++) {
 		TStageObjectId id = TStageObjectId::ColumnId(*it);
 		TStageObject *obj = pegTree->getStageObject(id, false);
 		TStageObjectId parentId = obj->getParent();
-		string parentHandle = obj->getParentHandle();
+		std::string parentHandle = obj->getParentHandle();
 		bool parentIsColumn = parentId.isColumn() && indices.find(parentId.getIndex()) != indices.end();
 		if (!parentIsColumn && pegbarIds.find(parentId) == pegbarIds.end() &&
 			(parentHandles.count(parentId) == 0 || parentHandles[parentId] != parentHandle)) {
@@ -150,7 +150,7 @@ vector<TStageObjectId> isConnected(const std::set<int> &indices,
 		TStageObject *obj = pegTree->getStageObject(*it2, false);
 		TStageObjectId parentId = obj->getParent();
 		bool parentIsColumn = parentId.isColumn() && indices.find(parentId.getIndex()) != indices.end();
-		string parentHandle = obj->getParentHandle();
+		std::string parentHandle = obj->getParentHandle();
 		if (!parentIsColumn && pegbarIds.find(parentId) == pegbarIds.end() &&
 			(parentHandles.count(parentId) == 0 || parentHandles[parentId] != parentHandle)) {
 			parentHandles[parentId] = parentHandle;
@@ -162,12 +162,12 @@ vector<TStageObjectId> isConnected(const std::set<int> &indices,
 
 //-----------------------------------------------------------------------------
 
-map<TFx *, vector<TFxPort *>> isConnected(const std::set<int> &indices,
+std::map<TFx *, std::vector<TFxPort *>> isConnected(const std::set<int> &indices,
 										  const std::set<TFx *> &internalFxs, TXsheetHandle *xshHandle)
 {
 	TXsheet *xsh = xshHandle->getXsheet();
 	std::set<int>::const_iterator it;
-	map<TFx *, vector<TFxPort *>> roots;
+	std::map<TFx *, std::vector<TFxPort *>> roots;
 	for (it = indices.begin(); it != indices.end(); it++) {
 		TFx *fx = xsh->getColumn(*it)->getFx();
 		int i, outputCount = fx->getOutputConnectionCount();
@@ -320,8 +320,8 @@ void getChildren(const std::set<int> &indices, QMap<TStageObjectId, QList<TStage
 		TStageObject *obj = xsh->getStageObjectTree()->getStageObject(id, false);
 		assert(obj);
 		if (obj && !obj->getChildren().empty()) {
-			list<TStageObject *> childrenObj = obj->getChildren();
-			list<TStageObject *>::iterator it2;
+			std::list<TStageObject *> childrenObj = obj->getChildren();
+			std::list<TStageObject *>::iterator it2;
 			for (it2 = childrenObj.begin(); it2 != childrenObj.end(); it2++) {
 				TStageObjectId childId = (*it2)->getId();
 				children[id].append(childId);
@@ -478,7 +478,7 @@ void bringFxOut(TFx *fx, QMap<TFx *, QPair<TFx *, int>> &fxs, FxDag *outerDag,
 //-----------------------------------------------------------------------------
 
 TFx *explodeFxSubTree(TFx *innerFx, QMap<TFx *, QPair<TFx *, int>> &fxs, FxDag *outerDag, TXsheet *outerXsheet,
-					  FxDag *innerDag, const GroupData &fxGroupData, const vector<TFxPort *> &outPorts)
+	FxDag *innerDag, const GroupData &fxGroupData, const std::vector<TFxPort *> &outPorts)
 {
 	TXsheetFx *xsheetFx = dynamic_cast<TXsheetFx *>(innerFx);
 	if (!xsheetFx) {
@@ -540,8 +540,8 @@ void bringObjectOut(TStageObject *obj, TXsheet *xsh,
 {
 	if (!obj->hasChildren())
 		return;
-	list<TStageObject *> children = obj->getChildren();
-	list<TStageObject *>::iterator it;
+	std::list<TStageObject *> children = obj->getChildren();
+	std::list<TStageObject *>::iterator it;
 	for (it = children.begin(); it != children.end(); it++) {
 		TStageObjectId id = (*it)->getId();
 		if (id.isColumn())
@@ -774,7 +774,7 @@ set<int> explodeStageObjects(TXsheet *xsh, TXsheet *subXsh, int index, const TSt
 void explodeFxs(TXsheet *xsh, TXsheet *subXsh,
 				const GroupData &fxGroupData,
 				QMap<TFx *, QPair<TFx *, int>> &fxs, const TPointD &subPos,
-				const vector<TFxPort *> &outPorts, bool linkToXsheet)
+				const std::vector<TFxPort *> &outPorts, bool linkToXsheet)
 {
 	FxDag *innerDag = subXsh->getFxDag();
 	FxDag *outerDag = xsh->getFxDag();
@@ -871,7 +871,7 @@ set<int> explode(TXsheet *xsh, TXsheet *subXsh, int index, const TStageObjectId 
 				 const GroupData &objGroupData, const TPointD &stageSubPos,
 				 const GroupData &fxGroupData, const TPointD &fxSubPos,
 				 QList<TStageObject *> &pegObjects, QMap<TStageObjectSpline *, TStageObjectSpline *> &splines,
-				 const vector<TFxPort *> &outPorts, bool onlyColumn,
+				 const std::vector<TFxPort *> &outPorts, bool onlyColumn,
 				 bool linkToXsheet)
 {
 	//innerFx->outerFxs
@@ -932,10 +932,10 @@ public:
 
 class CloseChildUndo : public TUndo
 {
-	vector<std::pair<int, int>> m_cells;
+	std::vector<std::pair<int, int>> m_cells;
 
 public:
-	CloseChildUndo(const vector<std::pair<int, int>> &cells)
+	CloseChildUndo(const std::vector<std::pair<int, int>> &cells)
 		: m_cells(cells)
 	{
 	}
@@ -1071,7 +1071,7 @@ void closeSubXsheet(int dlevel)
 		return;
 	if (dlevel > ancestorCount)
 		dlevel = ancestorCount;
-	vector<std::pair<int, int>> cells;
+	std::vector<std::pair<int, int>> cells;
 	for (int i = 0; i < dlevel; i++) {
 		std::pair<int, int> rowCol;
 		scene->getChildStack()->closeChild(rowCol.first, rowCol.second);
@@ -1186,7 +1186,7 @@ TXsheet *collapseColumns(std::set<int> indices)
 	TXsheet *childXsh = childLevel->getXsheet();
 
 	std::set<int> newIndices;
-	list<int> restoredSplineIds;
+	std::list<int> restoredSplineIds;
 	/*- 先ほどのColumnDataをSubXsheetの中に格納 -*/
 	data->restoreObjects(newIndices, restoredSplineIds, childXsh, 0);
 	childXsh->updateFrameCount();
@@ -1268,7 +1268,7 @@ void collapseColumns(std::set<int> indices,
 
 	int index = *indices.begin();
 
-	vector<TStageObjectId> roots = getRoots(objIds, app->getCurrentXsheet());
+	std::vector<TStageObjectId> roots = getRoots(objIds, app->getCurrentXsheet());
 	TStageObject *rootObj = 0;
 	if (roots.size() == 1) {
 		rootObj = xsh->getStageObjectTree()->getStageObject(roots[0], false);
@@ -1297,7 +1297,7 @@ void collapseColumns(std::set<int> indices,
 	TXsheet *childXsh = childLevel->getXsheet();
 
 	std::set<int> newIndices;
-	list<int> restoredSplineIds;
+	std::list<int> restoredSplineIds;
 	data->restoreObjects(newIndices, restoredSplineIds, childXsh, 0);
 	childXsh->updateFrameCount();
 
@@ -1334,7 +1334,7 @@ void collapseColumns(std::set<int> indices,
 	data->storeColumns(indices, xsh, StageObjectsData::eDoClone);
 	data->storeFxs(fxs, xsh, StageObjectsData::eDoClone);
 
-	map<TFx *, vector<TFxPort *>> roots = isConnected(indices, fxs, app->getCurrentXsheet());
+	std::map<TFx *, std::vector<TFxPort *>> roots = isConnected(indices, fxs, app->getCurrentXsheet());
 	app->getCurrentXsheet()->blockSignals(true);
 	app->getCurrentObject()->blockSignals(true);
 	ColumnCmd::deleteColumns(indices, true, true);
@@ -1357,7 +1357,7 @@ void collapseColumns(std::set<int> indices,
 	TXsheet *childXsh = childLevel->getXsheet();
 
 	std::set<int> newIndices;
-	list<int> restoredSplineIds;
+	std::list<int> restoredSplineIds;
 	data->restoreObjects(newIndices, restoredSplineIds, childXsh, 0);
 	childXsh->updateFrameCount();
 
@@ -1378,7 +1378,7 @@ void collapseColumns(std::set<int> indices,
 	xsh->getStageObject(TStageObjectId::ColumnId(index))->setParent(TStageObjectId::TableId);
 	if (roots.size() == 1) {
 		TFx *fx = xsh->getColumn(index)->getFx();
-		vector<TFxPort *> rootPorts = roots.begin()->second;
+		std::vector<TFxPort *> rootPorts = roots.begin()->second;
 		int i;
 		for (i = 0; i < rootPorts.size(); i++)
 			rootPorts[i]->setFx(fx);
@@ -1468,7 +1468,7 @@ protected:
 		TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
 		xsh->removeColumn(m_columnIndex);
 		std::set<int> indices = m_indices;
-		list<int> restoredSplineIds;
+		std::list<int> restoredSplineIds;
 		m_data->restoreObjects(indices, restoredSplineIds, xsh, 0);
 		setColumnOutputConnections(m_columnOutputConnections);
 		setChildren(m_children);
@@ -1499,7 +1499,7 @@ protected:
 		setColumnOutputConnections(columnOutputConnections);
 		std::set<int> indices;
 		indices.insert(m_columnIndex);
-		list<int> restoredSplineIds;
+		std::list<int> restoredSplineIds;
 		m_newData->restoreObjects(indices, restoredSplineIds, xsh, 0);
 		TColumnSelection *selection = dynamic_cast<TColumnSelection *>(app->getCurrentSelection()->getSelection());
 		if (selection) {
@@ -1631,14 +1631,14 @@ public:
 	{
 		TApp *app = TApp::instance();
 		TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
-		map<TFx *, vector<TFxPort *>> roots = isConnected(m_indices, m_fxs, app->getCurrentXsheet());
+		std::map<TFx *, std::vector<TFxPort *>> roots = isConnected(m_indices, m_fxs, app->getCurrentXsheet());
 		doRedo(true);
 		std::set<TFx *>::const_iterator it2;
 		for (it2 = m_fxs.begin(); it2 != m_fxs.end(); it2++)
 			removeFx(xsh, *it2);
 		if (roots.size() == 1) {
 			TFx *fx = xsh->getColumn(m_columnIndex)->getFx();
-			vector<TFxPort *> rootPorts = roots.begin()->second;
+			std::vector<TFxPort *> rootPorts = roots.begin()->second;
 			int i;
 			for (i = 0; i < rootPorts.size(); i++)
 				rootPorts[i]->setFx(fx);
@@ -1683,7 +1683,7 @@ class ExplodeChildUndoRemovingColumn : public TUndo
 
 	//to handle grouping for the subxsheet
 	QStack<int> m_objGroupIds;
-	QStack<wstring> m_objGroupNames;
+	QStack<std::wstring> m_objGroupNames;
 
 public:
 	ExplodeChildUndoRemovingColumn(const std::set<int> &newIndexs, int index,
@@ -1694,7 +1694,7 @@ public:
 								   const QMap<TStageObjectSpline *, TStageObjectSpline *> &splines,
 								   const std::set<TFx *> &oldInternalFxs,
 								   const std::set<TOutputFx *> oldOutFxs, TFx *root,
-								   const QStack<int> &objGroupIds, const QStack<wstring> &objGroupNames)
+									 const QStack<int> &objGroupIds, const QStack<std::wstring> &objGroupNames)
 		: m_newIndexs(newIndexs), m_index(index), m_oldData(oldData), m_newData(newData), m_oldColumnOutputConnections(columnOutputConnections), m_pegObjects(pegObjects), m_splines(splines), m_root(root), m_oldInternalFxs(oldInternalFxs), m_oldOutFxs(oldOutFxs), m_objGroupIds(objGroupIds), m_objGroupNames(objGroupNames)
 	{
 		TApp *app = TApp::instance();
@@ -1768,8 +1768,8 @@ public:
 		obj->closeEditingGroup(objGroupIds.top());
 		while (obj->getEditingGroupId() != editingGroup)
 			obj->editGroup();
-		list<TStageObject *> children = obj->getChildren();
-		list<TStageObject *>::iterator it;
+		std::list<TStageObject *> children = obj->getChildren();
+		std::list<TStageObject *>::iterator it;
 		for (it = children.begin(); it != children.end(); it++) {
 			TStageObject *childeObj = *it;
 			if (childeObj)
@@ -1786,7 +1786,7 @@ public:
 		if (m_root && m_root->getOutputConnectionCount() > 0)
 			editingGroup = m_root->getOutputConnection(0)->getOwnerFx()->getAttributes()->getEditingGroupId();
 
-		set<int> indexesToRemove = m_newIndexs;
+		std::set<int> indexesToRemove = m_newIndexs;
 		app->getCurrentXsheet()->blockSignals(true);
 		app->getCurrentObject()->blockSignals(true);
 		ColumnCmd::deleteColumns(indexesToRemove, false, true);
@@ -1807,9 +1807,9 @@ public:
 			TStageObjectSpline *spline = it.value();
 			xsh->getStageObjectTree()->removeSpline(spline);
 		}
-		set<int> indexes;
+		std::set<int> indexes;
 		indexes.insert(m_index);
-		list<int> restoredSplineIds;
+		std::list<int> restoredSplineIds;
 		m_oldData->restoreObjects(indexes, restoredSplineIds, xsh, 0);
 		setColumnOutputConnections(m_oldColumnOutputConnections);
 		TFxSet *internals = xsh->getFxDag()->getInternalFxs();
@@ -1875,7 +1875,7 @@ public:
 		TFx *columnFx = column->getFx();
 		assert(columnFx);
 		int i;
-		vector<TFxPort *> outPorts;
+		std::vector<TFxPort *> outPorts;
 		for (i = 0; i < columnFx->getOutputConnectionCount(); i++)
 			outPorts.push_back(columnFx->getOutputConnection(i));
 		xsh->removeColumn(m_index);
@@ -1885,7 +1885,7 @@ public:
 		QMap<TStageObjectSpline *, TStageObjectSpline *>::const_iterator it3;
 		for (it3 = m_splines.begin(); it3 != m_splines.end(); it3++)
 			xsh->getStageObjectTree()->insertSpline(it3.value());
-		list<int> restoredSplineIds;
+		std::list<int> restoredSplineIds;
 		m_newData->restoreObjects(indexes, restoredSplineIds, xsh, 0);
 		for (i = 0; i < m_pegObjects.size(); i++)
 			xsh->setStageObjectParent(m_pegObjects[i]->getId(), m_parentIds[m_pegObjects[i]->getId()]);
@@ -1898,7 +1898,7 @@ public:
 			TStageObject *parentObj = xsh->getStageObject(parentId);
 			if (parentObj->isGrouped()) {
 				QStack<int> idStack = parentObj->getGroupIdStack();
-				QStack<wstring> groupstack = parentObj->getGroupNameStack();
+				QStack<std::wstring> groupstack = parentObj->getGroupNameStack();
 				for (int i = 0; i < idStack.size(); i++) {
 					obj->setGroupId(idStack[i]);
 					obj->setGroupName(groupstack[i]);
@@ -1972,7 +1972,7 @@ class ExplodeChildUndoWithoutRemovingColumn : public TUndo
 
 	//to handle grouping for the subxsheet
 	QStack<int> m_objGroupIds;
-	QStack<wstring> m_objGroupNames;
+	QStack<std::wstring> m_objGroupNames;
 
 public:
 	ExplodeChildUndoWithoutRemovingColumn(const std::set<int> &newIndexs, int index, int from, int to,
@@ -1981,7 +1981,7 @@ public:
 										  const QMap<TStageObjectSpline *, TStageObjectSpline *> &splines,
 										  const std::set<TFx *> &oldInternalFxs,
 										  const std::set<TOutputFx *> oldOutFxs,
-										  const QStack<int> &objGroupIds, const QStack<wstring> &objGroupNames)
+											const QStack<int> &objGroupIds, const QStack<std::wstring> &objGroupNames)
 		: m_newIndexs(newIndexs), m_index(index), m_from(from), m_to(to), m_cellData(cellData), m_newData(newData), m_pegObjects(pegObjects), m_splines(splines), m_oldInternalFxs(oldInternalFxs), m_oldOutFxs(oldOutFxs), m_objGroupIds(objGroupIds), m_objGroupNames(objGroupNames)
 	{
 		TApp *app = TApp::instance();
@@ -2081,7 +2081,7 @@ public:
 		int i;
 		for (i = m_pegObjects.size() - 1; i >= 0; i--)
 			xsh->getStageObjectTree()->insertStageObject(m_pegObjects[i]);
-		list<int> restoredSplineIds;
+		std::list<int> restoredSplineIds;
 		m_newData->restoreObjects(indexes, restoredSplineIds, xsh, 0);
 		setColumnOutputConnections(m_newColumnOutputConnections);
 		std::set<TOutputFx *>::const_iterator it;
@@ -2367,7 +2367,7 @@ void SubsceneCmd::explode(int index)
 
 	// Collect StageObjects group informations
 	QStack<int> objGroupIds;
-	QStack<wstring> objGroupNames;
+	QStack<std::wstring> objGroupNames;
 	int objEditingGroup = obj->getEditingGroupId();
 	if (obj->isGrouped()) {
 		int i = 0;
@@ -2390,7 +2390,7 @@ void SubsceneCmd::explode(int index)
 
 	// Collect Fx group informations
 	QStack<int> fxGroupIds;
-	QStack<wstring> fxGroupNames;
+	QStack<std::wstring> fxGroupNames;
 	int fxEditingGroup = attr->getEditingGroupId();
 	if (attr->isGrouped()) {
 		int i = 0;
@@ -2412,7 +2412,7 @@ void SubsceneCmd::explode(int index)
 		oldOutFxs.insert(xsh->getFxDag()->getOutputFx(i));
 
 	/*- SubXsheetカラムノードから繋がっているFxPortのリストを取得 (outPorts) -*/
-	vector<TFxPort *> outPorts;
+	std::vector<TFxPort *> outPorts;
 	for (i = 0; i < columnFx->getOutputConnectionCount(); i++)
 		outPorts.push_back(columnFx->getOutputConnection(i));
 

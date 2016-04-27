@@ -119,7 +119,7 @@ public:
 	ToolOptionControl *control(const std::string &controlName) const;
 
 	QLabel *addLabel(QString name);
-	void addLabel(string propName, QLabel *label);
+	void addLabel(std::string propName, QLabel *label);
 	void addSeparator();
 };
 

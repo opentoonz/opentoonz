@@ -5,7 +5,7 @@
 
 DEFINE_CLASS_CODE(TData, 16)
 
-TTextData::TTextData(string text)
+TTextData::TTextData(std::string text)
 	: m_text(toWideString(text))
 {
 }

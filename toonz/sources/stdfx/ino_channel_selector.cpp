@@ -67,7 +67,7 @@ public:
 		double frame, TRectD &bBox, const TRenderSettings &info)
 	{
 		for (int ii = 0; ii < this->getInputPortCount(); ++ii) {
-			string nm = this->getInputPortName(ii);
+			std::string nm = this->getInputPortName(ii);
 			TRasterFxPort *
 				tmp_port = (TRasterFxPort *)this->getInputPort(nm);
 			if (tmp_port->isConnected()) {
@@ -201,7 +201,7 @@ void ino_channel_selector::doCompute(
 
 	/* ------ 画像生成 ---------------------------------------- */
 	for (int ii = 0; ii < this->getInputPortCount(); ++ii) {
-		string nm = this->getInputPortName(ii);
+		std::string nm = this->getInputPortName(ii);
 		TRasterFxPort *
 			tmp_port = (TRasterFxPort *)this->getInputPort(nm);
 		if (tmp_port->isConnected() && ((ii == red_source) || (ii == gre_source) ||

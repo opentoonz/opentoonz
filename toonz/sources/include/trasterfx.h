@@ -236,7 +236,7 @@ public:
 
 	// resituisce una stringa che identifica univocamente il sottoalbero
 	// avente come radice l'effetto
-	virtual string getAlias(double frame, const TRenderSettings &info) const;
+	virtual std::string getAlias(double frame, const TRenderSettings &info) const;
 
 	virtual void dryCompute(TRectD &rect,
 							double frame,
@@ -309,7 +309,7 @@ public:
 
 	virtual bool checkTimeRegion() const { return false; }
 
-	string getAlias(double frame, const TRenderSettings &info) const;
+	std::string getAlias(double frame, const TRenderSettings &info) const;
 
 	void transform(double frame,
 				   int port,
@@ -386,7 +386,7 @@ public:
 		m_aff = aff;
 	}
 	bool isDpiAffine() const { return m_isDpiAffine; }
-	string getPluginId() const { return string(); }
+	std::string getPluginId() const { return std::string(); }
 
 protected:
 	TRasterFxPort m_port;

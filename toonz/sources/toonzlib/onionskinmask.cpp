@@ -73,7 +73,7 @@ void OnionSkinMask::clear()
 
 //-------------------------------------------------------------------
 
-void OnionSkinMask::getAll(int currentRow, vector<int> &output) const
+void OnionSkinMask::getAll(int currentRow, std::vector<int> &output) const
 {
 	output.clear();
 	output.reserve(m_fos.size() + m_mos.size());

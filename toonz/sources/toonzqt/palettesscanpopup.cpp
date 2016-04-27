@@ -66,7 +66,7 @@ void PalettesScanPopup::onOkBtnClicked()
 {
 	m_timerId = startTimer(3);
 	TFilePathSet fps;
-	wstring s = m_field->getPath().toStdWString();
+	std::wstring s = m_field->getPath().toStdWString();
 	int i = 0, len = s.length();
 	while (i < len) {
 		while (i < len && (s[i] == ' ' || s[i] == '\t'))
@@ -79,7 +79,7 @@ void PalettesScanPopup::onOkBtnClicked()
 		int k = j;
 		while (k > i && (s[k - 1] == ' ' || s[k - 1] == '\t'))
 			k--;
-		wstring token = s.substr(i, k - i);
+		std::wstring token = s.substr(i, k - i);
 		fps.push_back(TFilePath(token));
 		i = j + 1;
 	}
@@ -173,7 +173,7 @@ bool PalettesScanPopup::step()
 			push(fp);
 		else {
 			setLabel(fp);
-			string ext = fp.getType();
+			std::string ext = fp.getType();
 			if (ext == "plt" || ext == "tpl" || ext == "pli")
 				onPlt(fp);
 		}

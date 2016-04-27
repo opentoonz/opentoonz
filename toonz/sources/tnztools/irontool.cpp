@@ -369,21 +369,21 @@ public:
       senza lasciare ingrati compiti alla reuceControlPoints
       Altrimenti non si fa altro che aumentarli i punti di controllo
       */
-			vector<int> corners;
+			std::vector<int> corners;
 			corners.push_back(0);
 			detectCorners(m_strokeRef, 45, corners);
 			corners.push_back(m_strokeRef->getChunkCount());
 			m_strokeRef->reduceControlPoints(2.0 * getPixelSize(), corners);
 		} else {
 			if (m_cpIndexMin < m_cpIndexMax) {
-				vector<TThickPoint> hitPoints(m_cpIndexMax - m_cpIndexMin + 1);
+				std::vector<TThickPoint> hitPoints(m_cpIndexMax - m_cpIndexMin + 1);
 				count = 0;
 				for (i = m_cpIndexMin; i <= m_cpIndexMax; i++) {
 					hitPoints[count++] = m_strokeRef->getControlPoint(i);
 				}
 				TStroke *newStroke = new TStroke(hitPoints);
 
-				vector<int> corners;
+				std::vector<int> corners;
 				corners.push_back(0);
 				detectCorners(newStroke, 45, corners);
 				corners.push_back(newStroke->getChunkCount());
@@ -410,14 +410,14 @@ public:
 			} else {
 				assert(m_cpIndexMin != m_cpIndexMax);
 
-				vector<TThickPoint> hitPoints(cpCount - m_cpIndexMin);
+				std::vector<TThickPoint> hitPoints(cpCount - m_cpIndexMin);
 				count = 0;
 				for (i = m_cpIndexMin; i < (int)cpCount; i++) {
 					hitPoints[count++] = m_strokeRef->getControlPoint(i);
 				}
 				TStroke *newStroke1 = new TStroke(hitPoints);
 
-				vector<int> corners;
+				std::vector<int> corners;
 				corners.push_back(0);
 				detectCorners(newStroke1, 45, corners);
 				corners.push_back(newStroke1->getChunkCount());

@@ -177,7 +177,7 @@ public:
 		return 0;
 	}
 
-	int makeSelectionRGB(const vector<I_PIXEL> &col,
+	int makeSelectionRGB(const std::vector<I_PIXEL> &col,
 						 const double dA, const double dAB)
 	{
 		int nbCol;
@@ -254,7 +254,7 @@ public:
 		dp.m = (int)sp->m;
 	}
 
-	int makeSelectionRGB1(const vector<I_PIXEL> &col, const double dA)
+	int makeSelectionRGB1(const std::vector<I_PIXEL> &col, const double dA)
 	{
 		P *pPic = CSTPic<P>::m_pic;
 		UCHAR *pSel = m_sel;
@@ -337,7 +337,7 @@ public:
 */
 	}
 
-	int makeSelectionRGB2(const vector<I_PIXEL> &col,
+	int makeSelectionRGB2(const std::vector<I_PIXEL> &col,
 						  const double dA, const double dAB)
 	{
 		P *pPic;
@@ -370,7 +370,7 @@ public:
 		return nbPixel;
 	}
 
-	int makeSelectionRGB3(const vector<I_PIXEL> &col,
+	int makeSelectionRGB3(const std::vector<I_PIXEL> &col,
 						  const double dA, const double dAB)
 	{
 		P *pPic = CSTPic<P>::m_pic;
@@ -407,7 +407,7 @@ public:
 		return nbPixel;
 	}
 
-	int makeSelectionRGBMore(const vector<I_PIXEL> &col,
+	int makeSelectionRGBMore(const std::vector<I_PIXEL> &col,
 							 const double dA, const double dAB)
 	{
 		int nbPixel = 0, i, j, k;
@@ -420,7 +420,7 @@ public:
 		return nbPixel;
 	}
 
-	int makeSelectionRGBMore(const vector<I_PIXEL> &col,
+	int makeSelectionRGBMore(const std::vector<I_PIXEL> &col,
 							 const double dA, const double dAB,
 							 const int i, const int j, const int k)
 	{

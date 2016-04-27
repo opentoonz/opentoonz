@@ -42,10 +42,10 @@ AlgorithmPointI operator-(const AlgorithmPointI &op1, const AlgorithmPointI &op2
 //======================================================================
 
 //! Definisce point_container come un vettore di AlgorithmPointI
-typedef vector<AlgorithmPointI> point_container;
+typedef std::vector<AlgorithmPointI> point_container;
 
 //! Definisce corner_container come un vettore di interi
-typedef vector<int> corner_container;
+typedef std::vector<int> corner_container;
 
 int gMinSampleNum;
 int gMinDist;
@@ -67,7 +67,7 @@ point_container gPoints;
 
 	\param points Vettore di T3DPoints
 */
-bool interpolate(const vector<T3DPointD> &points)
+bool interpolate(const std::vector<T3DPointD> &points)
 {
 
 	unsigned int curr, next;
@@ -232,7 +232,7 @@ void findCornerCandidates()
 //----------------------------------------------------------------------
 
 //! Trova gli angoli tra i punti di gPoints
-void findCorners(int neighborLimit, vector<int> &cornerIndexes)
+void findCorners(int neighborLimit, std::vector<int> &cornerIndexes)
 {
 	unsigned int curr, prec, next;
 	curr = gMaxDist;
@@ -262,9 +262,9 @@ void findCorners(int neighborLimit, vector<int> &cornerIndexes)
 //----------------------------------------------------------------------
 
 //! Individua gli eventuali angoli presenti nella curva da calcolare
-void detectCorners(const vector<T3DPointD> &inputPoints,
+void detectCorners(const std::vector<T3DPointD> &inputPoints,
 				   int minSampleNum, int minDist, int maxDist, double maxAngle,
-				   vector<int> &cornerIndexes)
+					 std::vector<int> &cornerIndexes)
 {
 	gMinSampleNum = minSampleNum;
 	gMinDist = minDist;

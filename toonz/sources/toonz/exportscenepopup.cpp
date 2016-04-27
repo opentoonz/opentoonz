@@ -86,7 +86,7 @@ int collectAssets(TFilePath scenePath)
 //=============================================================================
 // MyDvDirModelFileFolderNode [File folder]
 
-DvDirModelNode *ExportSceneDvDirModelFileFolderNode::makeChild(wstring name)
+DvDirModelNode *ExportSceneDvDirModelFileFolderNode::makeChild(std::wstring name)
 {
 	return createExposeSceneNode(this, m_path + name);
 }
@@ -102,7 +102,7 @@ DvDirModelFileFolderNode *ExportSceneDvDirModelFileFolderNode::createExposeScene
 		node = new ExportSceneDvDirModelProjectNode(parent, path);
 	else
 		node = new ExportSceneDvDirModelFileFolderNode(parent, path);
-	if (path.getName().find("_files") == string::npos)
+	if (path.getName().find("_files") == std::string::npos)
 		node->enableRename(true);
 	return node;
 }
@@ -128,7 +128,7 @@ ExportSceneDvDirModelRootNode::ExportSceneDvDirModelRootNode()
 
 //-----------------------------------------------------------------------------
 
-void ExportSceneDvDirModelRootNode::add(wstring name, const TFilePath &path)
+void ExportSceneDvDirModelRootNode::add(std::wstring name, const TFilePath &path)
 {
 	DvDirModelNode *child = new ExportSceneDvDirModelFileFolderNode(this, name, path);
 	child->setRow((int)m_children.size());
@@ -260,7 +260,7 @@ QModelIndex ExportSceneDvDirModel::parent(const QModelIndex &index) const
 
 //-----------------------------------------------------------------------------
 
-QModelIndex ExportSceneDvDirModel::childByName(const QModelIndex &parent, const wstring &name) const
+QModelIndex ExportSceneDvDirModel::childByName(const QModelIndex &parent, const std::wstring &name) const
 {
 	if (!parent.isValid())
 		return QModelIndex();

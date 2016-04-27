@@ -23,13 +23,13 @@ TFilePath getExternFxPath()
 //=========================================================
 
 // not implemented yet
-void TExternFx::getNames(vector<string> &names)
+void TExternFx::getNames(std::vector<std::string> &names)
 {
 }
 
 //=========================================================
 
-TExternFx *TExternFx::create(string name)
+TExternFx *TExternFx::create(std::string name)
 {
 	TExternalProgramFx *fx = new TExternalProgramFx(name);
 	return fx;
@@ -37,7 +37,7 @@ TExternFx *TExternFx::create(string name)
 
 //=========================================================
 
-TExternalProgramFx::TExternalProgramFx(string name)
+TExternalProgramFx::TExternalProgramFx(std::string name)
 	: m_externFxName(name)
 {
 	initialize(name);
@@ -62,14 +62,14 @@ TExternalProgramFx::~TExternalProgramFx()
 
 //------------------------------------------------------------------
 
-void TExternalProgramFx::initialize(string name)
+void TExternalProgramFx::initialize(std::string name)
 {
 	TFilePath fp = getExternFxPath() + (name + ".xml");
 	TIStream is(fp);
 	if (!is)
 		return;
 
-	string tagName;
+	std::string tagName;
 	if (!is.matchTag(tagName) || tagName != "externFx")
 		return;
 
@@ -77,25 +77,25 @@ void TExternalProgramFx::initialize(string name)
 		while (is.matchTag(tagName)) {
 			if (tagName == "executable") {
 				TFilePath executable = TFilePath(is.getTagAttribute("path"));
-				string args = is.getTagAttribute("args");
+				std::string args = is.getTagAttribute("args");
 				if (executable == TFilePath())
 					throw TException("missing executable path");
 				if (args == "")
 					throw TException("missing args string");
 				setExecutable(executable, args);
 			} else if (tagName == "inport" || tagName == "outport") {
-				string portName = is.getTagAttribute("name");
-				string ext = is.getTagAttribute("ext");
+				std::string portName = is.getTagAttribute("name");
+				std::string ext = is.getTagAttribute("ext");
 				if (portName == "")
 					throw TException("missing port name");
 				if (ext == "")
 					throw TException("missing port ext");
 				addPort(portName, ext, tagName == "inport");
 			} else if (tagName == "param") {
-				string paramName = is.getTagAttribute("name");
+				std::string paramName = is.getTagAttribute("name");
 				if (paramName == "")
 					throw TException("missing param name");
-				string type = is.getTagAttribute("type");
+				std::string type = is.getTagAttribute("type");
 				if (type == "")
 					throw TException("missing param type");
 				if (type != "double")
@@ -117,7 +117,7 @@ void TExternalProgramFx::initialize(string name)
 
 //------------------------------------------------------------------
 
-void TExternalProgramFx::addPort(string portName, string ext, bool isInput)
+void TExternalProgramFx::addPort(std::string portName, std::string ext, bool isInput)
 {
 	if (isInput) {
 		TRasterFxPort *port = new TRasterFxPort();
@@ -153,7 +153,7 @@ TFx *TExternalProgramFx::clone(bool recursive) const
 
 	assert(getInputPortCount() == fx->getInputPortCount());
 
-	//std::map<string, Port>::const_iterator j;
+	//std::map<std::string, Port>::const_iterator j;
 	//for(j=m_ports.begin(); j!=m_ports.end(); ++j)
 	//  fx->addPort(j->first, j->second.m_ext, j->second.m_port != 0);
 
@@ -166,7 +166,7 @@ TFx *TExternalProgramFx::clone(bool recursive) const
 		}
 	}
 
-	//std::map<string, TParamP>::const_iterator j;
+	//std::map<std::string, TParamP>::const_iterator j;
 	//for(j=m_params.begin(); j!=m_params.end(); ++j)
 	//  fx->addParam(j->first, j->second->clone());
 
@@ -180,7 +180,7 @@ bool TExternalProgramFx::doGetBBox(double frame, TRectD &bBox, const TRenderSett
 	// bBox = TRectD(-30,-30,30,30);
 	//  return true;
 
-	std::map<string, Port>::const_iterator portIt;
+	std::map<std::string, Port>::const_iterator portIt;
 	for (portIt = m_ports.begin(); portIt != m_ports.end(); ++portIt) {
 		if (portIt->second.m_port != 0) {
 			TRasterFxPort *tmp;
@@ -219,12 +219,12 @@ void TExternalProgramFx::doCompute(TTile &tile, double frame, const TRenderSetti
 	TRaster32P ras = tile.getRaster();
 	if (!ras)
 		return;
-	string args = m_args;
-	string executablePath = toString(m_executablePath.getWideString());
-	std::map<string, TFilePath> tmpFiles; // portname --> file
+	std::string args = m_args;
+	std::string executablePath = toString(m_executablePath.getWideString());
+	std::map<std::string, TFilePath> tmpFiles; // portname --> file
 	TFilePath outputTmpFile;
 
-	std::map<string, Port>::const_iterator portIt;
+	std::map<std::string, Port>::const_iterator portIt;
 	for (portIt = m_ports.begin(); portIt != m_ports.end(); ++portIt) {
 		TFilePath fp = TSystem::getUniqueFile("externfx");
 		fp = fp.withType(portIt->second.m_ext);
@@ -246,7 +246,7 @@ void TExternalProgramFx::doCompute(TTile &tile, double frame, const TRenderSetti
 	int i = 0;
 	for (;;) {
 		i = args.find('$', i);
-		if (i == (int)string::npos)
+		if (i == (int)std::string::npos)
 			break;
 		int j = i + 1;
 		int len = args.length();
@@ -262,11 +262,11 @@ void TExternalProgramFx::doCompute(TTile &tile, double frame, const TRenderSetti
 		}
 		// ho trovato una variabile
 		int m = j - i - 1;
-		string name = args.substr(i + 1, m);
+		std::string name = args.substr(i + 1, m);
 		// calcolo il valore.
-		string value;
+		std::string value;
 
-		std::map<string, TFilePath>::const_iterator it;
+		std::map<std::string, TFilePath>::const_iterator it;
 		it = tmpFiles.find(name);
 		if (it != tmpFiles.end()) {
 			// e' una porta. il valore e' il nome del
@@ -291,7 +291,7 @@ void TExternalProgramFx::doCompute(TTile &tile, double frame, const TRenderSetti
 	// chiamare "m_executablePath args"
 	// e leggere l'immagine scritta in outputTmpFile
 	// poi cancellare tutto
-	string expandedargs;
+	std::string expandedargs;
 	char buffer[1024];
 #ifdef _WIN32
 	ExpandEnvironmentStrings(args.c_str(), buffer, 1024);
@@ -326,7 +326,7 @@ void TExternalProgramFx::doCompute(TTile &tile, double frame, const TRenderSetti
 		&exitCode);		// termination status
 
 #else
-	string cmdline = executablePath + buffer;
+	std::string cmdline = executablePath + buffer;
 	//    int exitCode =
 	system(cmdline.c_str());
 #endif
@@ -359,7 +359,7 @@ void TExternalProgramFx::doCompute(TTile &tile, double frame, const TRenderSetti
 	}
 
 	//butto i file temporanei creati
-	std::map<string, TFilePath>::const_iterator fileIt;
+	std::map<std::string, TFilePath>::const_iterator fileIt;
 	for (fileIt = tmpFiles.begin(); fileIt != tmpFiles.end(); ++fileIt) {
 		if (TFileStatus(fileIt->second).doesExist() == true)
 			try {
@@ -378,7 +378,7 @@ void TExternalProgramFx::doCompute(TTile &tile, double frame, const TRenderSetti
 
 void TExternalProgramFx::loadData(TIStream &is)
 {
-	string tagName;
+	std::string tagName;
 	while (is.openChild(tagName)) {
 		if (tagName == "path") {
 			is >> m_executablePath;
@@ -391,7 +391,7 @@ void TExternalProgramFx::loadData(TIStream &is)
 			while (is.matchTag(tagName)) {
 				if (tagName == "param") {
 					// assert(0);
-					string paramName = is.getTagAttribute("name");
+					std::string paramName = is.getTagAttribute("name");
 					TDoubleParamP param = new TDoubleParam();
 					param->setName(paramName);
 					m_params.push_back(param);
@@ -403,12 +403,12 @@ void TExternalProgramFx::loadData(TIStream &is)
 		} else if (tagName == "ports") {
 			while (is.matchTag(tagName)) {
 				if (tagName == "port") {
-					string name = is.getTagAttribute("name");
-					string ext = is.getTagAttribute("ext");
+					std::string name = is.getTagAttribute("name");
+					std::string ext = is.getTagAttribute("ext");
 					addPort(name, ext, true);
 				} else if (tagName == "outport") {
-					string name = is.getTagAttribute("name");
-					string ext = is.getTagAttribute("ext");
+					std::string name = is.getTagAttribute("name");
+					std::string ext = is.getTagAttribute("ext");
 					addPort(name, ext, false);
 				} else
 					throw TException("unexpected tag " + tagName);
@@ -428,19 +428,19 @@ void TExternalProgramFx::saveData(TOStream &os)
 	os.child("args") << m_args;
 	os.openChild("params");
 	for (int i = 0; i < getParams()->getParamCount(); i++) {
-		std::map<string, string> attr;
+		std::map<std::string, std::string> attr;
 		attr["name"] = getParams()->getParamName(i);
 		attr["type"] = "double";
 		os.openCloseChild("param", attr);
 	}
 	os.closeChild();
 	os.openChild("ports");
-	std::map<string, Port>::iterator portIt;
+	std::map<std::string, Port>::iterator portIt;
 	for (portIt = m_ports.begin(); portIt != m_ports.end(); ++portIt) {
-		std::map<string, string> attr;
+		std::map<std::string, std::string> attr;
 		attr["name"] = portIt->second.m_name;
 		attr["ext"] = portIt->second.m_ext;
-		string tagName = portIt->second.m_port == 0 ? "outport" : "port";
+		std::string tagName = portIt->second.m_port == 0 ? "outport" : "port";
 		os.openCloseChild(tagName, attr);
 	}
 	os.closeChild();
@@ -460,18 +460,18 @@ void ExternalProgramFx::doCompute(TTile &tile, double frame, const TRenderSettin
 		tile.getRaster()->clear();
 		return;
 	}
-	string name1("C:\\temp\\uno..tif");
-	string name2("C:\\temp\\due..tif");
-	string outname("C:\\temp\\outfile.0001.jpg");
-	string program("C:\\temp\\xdissolve.exe");
-	string extension(".jpg");
+	std::string name1("C:\\temp\\uno..tif");
+	std::string name2("C:\\temp\\due..tif");
+	std::string outname("C:\\temp\\outfile.0001.jpg");
+	std::string program("C:\\temp\\xdissolve.exe");
+	std::string extension(".jpg");
 	TFilePath programpath(program);
 
 	m_input1->compute(tile, frame, ri);
 	TFilePath fname1(name1);
 	TFilePath fname2(name2);
-	string tmp1 = fname1.getName() + extension;
-	string tmp2 = fname2.getName() + extension;
+	std::string tmp1 = fname1.getName() + extension;
+	std::string tmp2 = fname2.getName() + extension;
 
 	TFilePath tmpname1(fname1.getParentDir() + tmp1);
 	TFilePath tmpname2(fname2.getParentDir() + tmp2);
@@ -480,11 +480,11 @@ void ExternalProgramFx::doCompute(TTile &tile, double frame, const TRenderSettin
 	m_input2->compute(tile, frame, ri);
 	TImageWriter::save(tmpname2, tile.getRaster());
 
-	string arglist = " -range1 1 1 -start2 1 -startout 1 ";
+	std::string arglist = " -range1 1 1 -start2 1 -startout 1 ";
 	arglist += toString(tmpname1.getWideString());
 	arglist += " " + toString(tmpname2.getWideString());
 	arglist += " " + outname;
-	string cmdline = program + arglist;
+	std::string cmdline = program + arglist;
 
 #ifdef _WIN32
 	STARTUPINFO si;

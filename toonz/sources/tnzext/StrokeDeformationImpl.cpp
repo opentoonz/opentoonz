@@ -392,7 +392,7 @@ bool StrokeDeformationImpl::activate_impl(const ContextStatus *status)
 		return false;
 	}
 
-	vector<double>
+	std::vector<double>
 		splitParameter;
 	splitParameter.push_back(extremes.first);
 	splitParameter.push_back(extremes.second);
@@ -606,7 +606,7 @@ StrokeDeformationImpl::deactivate_impl()
 	//stroke2manipulate_->reduceControlPoints (reductionFactor);
 	const int
 		size = stroke2manipulate_->getControlPointCount();
-	vector<TThickPoint>
+	std::vector<TThickPoint>
 		pnt(size);
 	for (int i = 0;
 		 i < size;

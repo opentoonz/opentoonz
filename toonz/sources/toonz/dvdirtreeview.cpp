@@ -381,7 +381,7 @@ void DvDirTreeView::dropEvent(QDropEvent *e)
 
 		TFilePath path = dstFp + TFilePath(srcFp.getLevelNameW());
 		NameBuilder *nameBuilder = NameBuilder::getBuilder(toWideString(path.getName()));
-		wstring levelNameOut;
+		std::wstring levelNameOut;
 		do
 			levelNameOut = nameBuilder->getNext();
 		while (TSystem::doesExistFileOrLevel(path.withName(levelNameOut)));
@@ -482,8 +482,8 @@ void DvDirTreeView::createMenuAction(QMenu &menu, QString name, const char *slot
 {
 	QAction *act = menu.addAction(name);
 	act->setEnabled(enable);
-	string slotName(slot);
-	slotName = string("1") + slotName;
+	std::string slotName(slot);
+	slotName = std::string("1") + slotName;
 	connect(act, SIGNAL(triggered()), slotName.c_str());
 }
 

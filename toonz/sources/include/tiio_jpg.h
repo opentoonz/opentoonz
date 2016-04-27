@@ -56,7 +56,7 @@ public:
 	TIntProperty m_quality;
 	TIntProperty m_smoothing;
 
-	static const string QUALITY;
+	static const std::string QUALITY;
 
 	JpgWriterProperties()
 		: m_quality(QUALITY, 0, 100, 90), m_smoothing("Smoothing", 0, 100, 0)

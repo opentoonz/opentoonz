@@ -259,7 +259,7 @@ typedef TSmartPointerT<TXshColumn> TXshColumnP;
 class DVAPI TXshCellColumn : public TXshColumn
 {
 protected:
-	vector<TXshCell> m_cells;
+	std::vector<TXshCell> m_cells;
 	int m_first;
 
 public:

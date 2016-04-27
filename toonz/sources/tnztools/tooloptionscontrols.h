@@ -335,7 +335,7 @@ public:
 	MeasuredValueField(QWidget *parent, QString name = "numfield");
 	~MeasuredValueField();
 
-	void setMeasure(string name);
+	void setMeasure(std::string name);
 
 	void enableGlobalKeyframe(bool isGlobalKeyframe) { m_isGlobalKeyframe = isGlobalKeyframe; }
 

@@ -38,7 +38,7 @@ protected:
 	TPointD m_originalP00;
 	TPointD m_originalP11;
 
-	vector<TPointD> m_newPoints;
+	std::vector<TPointD> m_newPoints;
 
 public:
 	FreeDeformer() {}
@@ -319,7 +319,7 @@ protected:
 	DragSelectionTool::DragTool *m_dragTool;
 
 	StrokeGenerator m_track;
-	vector<TPointD> m_polyline;
+	std::vector<TPointD> m_polyline;
 	TPointD m_mousePosition;
 	TStroke *m_stroke;
 
@@ -442,7 +442,7 @@ public:
 
 	TPropertyGroup *getProperties(int targetType) { return &m_prop; }
 
-	bool onPropertyChanged(string propertyName);
+	bool onPropertyChanged(std::string propertyName);
 };
 
 #endif //SELECTIONTOOL_INCLUDED

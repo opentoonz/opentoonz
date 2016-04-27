@@ -112,7 +112,7 @@ HooksData *HooksData::clone() const
 
 //---------------------------------------------------------------------------
 
-void HooksData::storeHookPositions(const vector<int> &ids)
+void HooksData::storeHookPositions(const std::vector<int> &ids)
 {
 	if (ids.empty())
 		return;
@@ -299,7 +299,7 @@ void HookSelection::copySelectedHooks()
 {
 	if (isEmpty())
 		return;
-	vector<int> ids;
+	std::vector<int> ids;
 	std::set<std::pair<int, int>>::iterator it;
 	for (it = m_hooks.begin(); it != m_hooks.end(); it++) {
 		if (std::find(ids.begin(), ids.end(), it->first) == ids.end())

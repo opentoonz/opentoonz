@@ -180,7 +180,7 @@ public:
 	TRect getRegion() { return m_region; }
 
 private:
-	map<int, TRect> m_layersSavebox;
+	std::map<int, TRect> m_layersSavebox;
 
 	bool doInfo();
 	bool doHeaderInfo();
@@ -211,16 +211,16 @@ class DVAPI TPSDParser
 	class Level
 	{
 	public:
-		Level(string nm = "Unknown", int lid = 0, bool is_folder = false) : name(nm),
+		Level(std::string nm = "Unknown", int lid = 0, bool is_folder = false) : name(nm),
 																			layerId(lid),
 																			folder(is_folder)
 		{
 		}
 		void addFrame(int layerId, bool isFolder = false) { framesId.push_back(Frame(layerId, isFolder)); }
 		int getFrameCount() { return (int)framesId.size(); }
-		string getName() { return name; }
+		std::string getName() { return name; }
 		int getLayerId() { return layerId; }
-		void setName(string nname) { name = nname; }
+		void setName(std::string nname) { name = nname; }
 		void setLayerId(int nlayerId) { layerId = nlayerId; }
 		int getFrameId(int index)
 		{
@@ -244,7 +244,7 @@ class DVAPI TPSDParser
 			}
 		};
 
-		string name;				 // psd name
+		std::string name;				 // psd name
 		int layerId;				 // psd layer id
 		std::vector<Frame> framesId; // array of layer ID as frame
 		bool folder;
@@ -283,7 +283,7 @@ public:
 	}
 	int getLevelIndexById(int levelId);
 	// Returns layerID by name. Note that the layer name is not unique, so it return the first layer id found.
-	int getLevelIdByName(string levelName);
+	int getLevelIdByName(std::string levelName);
 	int getFrameId(int layerId, int frameIndex) { return m_levels[getLevelIndexById(layerId)].getFrameId(frameIndex); }
 	int getFramesCount(int levelId);
 	bool isSubFolder(int levelIndex, int frameIndex)
@@ -291,11 +291,11 @@ public:
 		assert(levelIndex >= 0 && levelIndex < (int)m_levels.size());
 		return m_levels[levelIndex].isSubFolder(frameIndex);
 	}
-	string getLevelName(int levelId);
+	std::string getLevelName(int levelId);
 	// Returns level name.
 	// If there are 2 or more level with the same name then
 	// returns levelname, levelname__2, etc
-	string getLevelNameWithCounter(int levelId);
+	std::string getLevelNameWithCounter(int levelId);
 
 private:
 	void doLevels(); // do m_levels

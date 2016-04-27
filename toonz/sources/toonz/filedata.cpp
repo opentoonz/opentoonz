@@ -56,7 +56,7 @@ void FileData::getFiles(TFilePath folder, std::vector<TFilePath> &newFiles) cons
 		}
 
 		NameBuilder *nameBuilder = NameBuilder::getBuilder(toWideString(path.getName()));
-		wstring levelNameOut;
+		std::wstring levelNameOut;
 		do
 			levelNameOut = nameBuilder->getNext();
 		while (TSystem::doesExistFileOrLevel(path.withName(levelNameOut)));

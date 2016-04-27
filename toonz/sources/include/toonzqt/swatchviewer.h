@@ -32,12 +32,12 @@ using namespace TThread;
 
 class DVAPI BgPainter
 {
-	string m_name;
+	std::string m_name;
 
 public:
-	BgPainter(string name) : m_name(name) {}
+	BgPainter(std::string name) : m_name(name) {}
 	virtual ~BgPainter() {}
-	string getName() const { return m_name; }
+	std::string getName() const { return m_name; }
 	virtual void paint(const TRaster32P &ras) = 0;
 };
 
@@ -48,7 +48,7 @@ class DVAPI SolidColorBgPainter : public BgPainter
 	TPixel32 m_color;
 
 public:
-	SolidColorBgPainter(string name, TPixel32 color)
+	SolidColorBgPainter(std::string name, TPixel32 color)
 		: BgPainter(name), m_color(color) {}
 
 	void paint(const TRaster32P &ras)
@@ -64,7 +64,7 @@ class DVAPI CheckboardBgPainter : public BgPainter
 	TPixel32 m_c0, m_c1;
 
 public:
-	CheckboardBgPainter(string name, TPixel32 c0, TPixel32 c1)
+	CheckboardBgPainter(std::string name, TPixel32 c0, TPixel32 c1)
 		: BgPainter(name), m_c0(c0), m_c1(c1) {}
 
 	void paint(const TRaster32P &ras)

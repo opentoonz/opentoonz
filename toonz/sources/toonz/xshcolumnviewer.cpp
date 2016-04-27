@@ -442,7 +442,7 @@ void ChangeObjectHandle::refresh()
 	for (i = 0; i < 26; i++)
 		addItem(QString(char('A' + i)));
 
-	string handle = stageObject->getParentHandle();
+	std::string handle = stageObject->getParentHandle();
 	if (handle[0] == 'H' && handle.length() > 1)
 		handle = handle.substr(1);
 
@@ -490,7 +490,7 @@ void RenameColumnField::show(QPoint pos, int col)
 	m_col = col;
 
 	TXsheet *xsh = m_xsheetHandle->getXsheet();
-	string name = xsh->getStageObject(TStageObjectId::ColumnId(col))->getName();
+	std::string name = xsh->getStageObject(TStageObjectId::ColumnId(col))->getName();
 	TXshColumn *column = xsh->getColumn(col);
 	TXshZeraryFxColumn *zColumn = dynamic_cast<TXshZeraryFxColumn *>(column);
 	if (zColumn)
@@ -507,7 +507,7 @@ void RenameColumnField::show(QPoint pos, int col)
 
 void RenameColumnField::renameColumn()
 {
-	string newName = text().toStdString();
+	std::string newName = text().toStdString();
 	TStageObjectId columnId = TStageObjectId::ColumnId(m_col);
 	TXshColumn *column = m_xsheetHandle->getXsheet()->getColumn(columnId.getIndex());
 	TXshZeraryFxColumn *zColumn = dynamic_cast<TXshZeraryFxColumn *>(column);
@@ -525,7 +525,7 @@ void RenameColumnField::renameColumn()
 
 void RenameColumnField::focusOutEvent(QFocusEvent *e)
 {
-	wstring newName = text().toStdWString();
+	std::wstring newName = text().toStdWString();
 	if (!newName.empty())
 		renameColumn();
 	else
@@ -624,7 +624,7 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col)
 	std::string name(columnObject->getName());
 
 	if (col < 0)
-		name = string("Camera");
+		name = std::string("Camera");
 
 	// Retrieve column properties
 	bool isEmpty = false;
@@ -753,7 +753,7 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col)
 		// pegbar name
 		p.drawText(pegbarNamePos, QString(parentId.toString().c_str()));
 
-		string handle = xsh->getStageObject(columnId)->getParentHandle();
+		std::string handle = xsh->getStageObject(columnId)->getParentHandle();
 		if (handle[0] == 'H' && handle.length() > 1)
 			handle = handle.substr(1);
 		if (parentId != TStageObjectId::TableId)
@@ -962,7 +962,7 @@ void ColumnArea::drawPaletteColumnHead(QPainter &p, int col)
 	TStageObjectId currentColumnId = app->getCurrentObject()->getObjectId();
 	TStageObjectId parentId = xsh->getStageObjectParent(columnId);
 
-	string name = xsh->getStageObject(columnId)->getName();
+	std::string name = xsh->getStageObject(columnId)->getName();
 
 	bool isEmpty = false;
 	if (col >= 0) // Verifico se la colonna e' vuota
@@ -1091,7 +1091,7 @@ void ColumnArea::drawSoundTextColumnHead(QPainter &p, int col)
 	TXsheet *xsh = m_viewer->getXsheet();
 
 	TStageObjectId columnId = m_viewer->getObjectId(col);
-	string name = xsh->getStageObject(columnId)->getName();
+	std::string name = xsh->getStageObject(columnId)->getName();
 
 	bool isEditingSpline = app->getCurrentObject()->isSpline();
 

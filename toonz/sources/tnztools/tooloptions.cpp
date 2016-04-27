@@ -121,7 +121,7 @@ QLabel *ToolOptionsBox::addLabel(QString name)
 
 //-----------------------------------------------------------------------------
 
-void ToolOptionsBox::addLabel(string propName, QLabel *label)
+void ToolOptionsBox::addLabel(std::string propName, QLabel *label)
 {
 	m_labels[propName] = label;
 }
@@ -157,7 +157,7 @@ ToolOptionControl *ToolOptionsBox::control(const std::string &controlName) const
 
 void ToolOptionsBox::updateStatus()
 {
-	QMap<string, ToolOptionControl *>::iterator it;
+	QMap<std::string, ToolOptionControl *>::iterator it;
 	for (it = m_controls.begin(); it != m_controls.end(); it++)
 		it.value()->updateStatus();
 }
@@ -311,7 +311,7 @@ void ToolOptionControlBuilder::visit(TBoolProperty *p)
 	m_panel->addControl(control);
 
 	if (p->getId() != "") {
-		string actionName = "A_ToolOption_" + p->getId();
+		std::string actionName = "A_ToolOption_" + p->getId();
 		QAction *a = CommandManager::instance()->getAction(actionName.c_str());
 		if (a) {
 			control->addAction(a);
@@ -367,7 +367,7 @@ void ToolOptionControlBuilder::visit(TEnumProperty *p)
 	hLayout()->addSpacing(5);
 
 	if (p->getId() != "") {
-		string actionName = "A_ToolOption_" + p->getId();
+		std::string actionName = "A_ToolOption_" + p->getId();
 		QAction *a = CommandManager::instance()->getAction(actionName.c_str());
 
 		if (a) {
@@ -380,8 +380,8 @@ void ToolOptionControlBuilder::visit(TEnumProperty *p)
 		QSignalMapper *signalMapper = 0;
 		int index = 0;
 		for (it = range.begin(); it != range.end(); ++it, ++index) {
-			string item = toString(*it);
-			string itemActionName = actionName + ":" + item;
+			std::string item = toString(*it);
+			std::string itemActionName = actionName + ":" + item;
 			a = CommandManager::instance()->getAction(itemActionName.c_str());
 			if (a) {
 				widget->addAction(a);
@@ -776,7 +776,7 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(QWidget *parent, TTool *tool, TProperty
 
 	/* --- Assigning shortcut keys --- */
 	if (activeAxisProp->getId() != "") {
-		string actionName = "A_ToolOption_" + activeAxisProp->getId();
+		std::string actionName = "A_ToolOption_" + activeAxisProp->getId();
 		QAction *a = CommandManager::instance()->getAction(actionName.c_str());
 
 		if (a) {
@@ -789,8 +789,8 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(QWidget *parent, TTool *tool, TProperty
 		QSignalMapper *signalMapper = 0;
 		int index = 0;
 		for (it = range.begin(); it != range.end(); ++it, ++index) {
-			string item = toString(*it);
-			string itemActionName = actionName + ":" + item;
+			std::string item = toString(*it);
+			std::string itemActionName = actionName + ":" + item;
 			a = CommandManager::instance()->getAction(itemActionName.c_str());
 			if (a) {
 				m_chooseActiveAxisCombo->addAction(a);
@@ -1094,7 +1094,7 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool, T
 
 void SelectionToolOptionsBox::updateStatus()
 {
-	QMap<string, ToolOptionControl *>::iterator it;
+	QMap<std::string, ToolOptionControl *>::iterator it;
 	for (it = m_controls.begin(); it != m_controls.end(); it++)
 		it.value()->updateStatus();
 
@@ -1242,7 +1242,7 @@ GeometricToolOptionsBox::GeometricToolOptionsBox(QWidget *parent, TTool *tool, T
 
 void GeometricToolOptionsBox::updateStatus()
 {
-	QMap<string, ToolOptionControl *>::iterator it;
+	QMap<std::string, ToolOptionControl *>::iterator it;
 	for (it = m_controls.begin(); it != m_controls.end(); it++)
 		it.value()->updateStatus();
 }
@@ -1312,7 +1312,7 @@ TypeToolOptionsBox::TypeToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHan
 
 void TypeToolOptionsBox::updateStatus()
 {
-	QMap<string, ToolOptionControl *>::iterator it;
+	QMap<std::string, ToolOptionControl *>::iterator it;
 	for (it = m_controls.begin(); it != m_controls.end(); it++)
 		it.value()->updateStatus();
 }
@@ -1356,7 +1356,7 @@ PaintbrushToolOptionsBox::PaintbrushToolOptionsBox(QWidget *parent, TTool *tool,
 
 void PaintbrushToolOptionsBox::updateStatus()
 {
-	QMap<string, ToolOptionControl *>::iterator it;
+	QMap<std::string, ToolOptionControl *>::iterator it;
 	for (it = m_controls.begin(); it != m_controls.end(); it++)
 		it.value()->updateStatus();
 }
@@ -1428,7 +1428,7 @@ FillToolOptionsBox::FillToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHan
 
 void FillToolOptionsBox::updateStatus()
 {
-	QMap<string, ToolOptionControl *>::iterator it;
+	QMap<std::string, ToolOptionControl *>::iterator it;
 	for (it = m_controls.begin(); it != m_controls.end(); it++)
 		it.value()->updateStatus();
 }
@@ -1574,7 +1574,7 @@ BrushToolOptionsBox::BrushToolOptionsBox(QWidget *parent, TTool *tool, TPaletteH
 
 void BrushToolOptionsBox::updateStatus()
 {
-	QMap<string, ToolOptionControl *>::iterator it;
+	QMap<std::string, ToolOptionControl *>::iterator it;
 	for (it = m_controls.begin(); it != m_controls.end(); it++)
 		it.value()->updateStatus();
 
@@ -1702,7 +1702,7 @@ EraserToolOptionsBox::EraserToolOptionsBox(QWidget *parent, TTool *tool, TPalett
 
 void EraserToolOptionsBox::updateStatus()
 {
-	QMap<string, ToolOptionControl *>::iterator it;
+	QMap<std::string, ToolOptionControl *>::iterator it;
 	for (it = m_controls.begin(); it != m_controls.end(); it++)
 		it.value()->updateStatus();
 }
@@ -1949,7 +1949,7 @@ TapeToolOptionsBox::TapeToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHan
 
 void TapeToolOptionsBox::updateStatus()
 {
-	QMap<string, ToolOptionControl *>::iterator it;
+	QMap<std::string, ToolOptionControl *>::iterator it;
 	for (it = m_controls.begin(); it != m_controls.end(); it++)
 		it.value()->updateStatus();
 }
@@ -2091,7 +2091,7 @@ RGBPickerToolOptionsBox::RGBPickerToolOptionsBox(QWidget *parent, TTool *tool, T
 
 void RGBPickerToolOptionsBox::updateStatus()
 {
-	QMap<string, ToolOptionControl *>::iterator it;
+	QMap<std::string, ToolOptionControl *>::iterator it;
 	for (it = m_controls.begin(); it != m_controls.end(); it++)
 		it.value()->updateStatus();
 }
@@ -2148,7 +2148,7 @@ StylePickerToolOptionsBox::StylePickerToolOptionsBox(QWidget *parent, TTool *too
 
 void StylePickerToolOptionsBox::updateStatus()
 {
-	QMap<string, ToolOptionControl *>::iterator it;
+	QMap<std::string, ToolOptionControl *>::iterator it;
 	for (it = m_controls.begin(); it != m_controls.end(); it++)
 		it.value()->updateStatus();
 }

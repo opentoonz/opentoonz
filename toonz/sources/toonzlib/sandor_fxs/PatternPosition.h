@@ -31,12 +31,12 @@ class CPatternPosition
 	bool findEmptyPos(const int lX, const int lY, const UCHAR *lSel,
 					  int &xPos, int &yPos, SRECT &bb);
 	void eraseCurrentArea(const int lX, const int lY, UCHAR *lSel,
-						  vector<SPOINT> &ddc, const int xx, const int yy);
+						  std::vector<SPOINT> &ddc, const int xx, const int yy);
 	void sel0255To01(const int lX, const int lY, UCHAR *sel, SRECT &bb);
-	void prepareCircle(vector<SPOINT> &v, const double r);
+	void prepareCircle(std::vector<SPOINT> &v, const double r);
 
 public:
-	vector<SPOINT> m_pos;
+	std::vector<SPOINT> m_pos;
 
 	CPatternPosition() : m_pos(0){};
 	virtual ~CPatternPosition();
@@ -66,7 +66,7 @@ public:
 	template <class P>
 	void drawTest(CSTColSelPic<P> &pic)
 	{
-		for (vector<SPOINT>::iterator pv = m_pos.begin();
+		for (std::vector<SPOINT>::iterator pv = m_pos.begin();
 			 pv != m_pos.end();
 			 pv++) {
 			int xx = pv->x;

@@ -397,8 +397,8 @@ BorderList *extractBorders(const TRasterP &ras, int threshold, int despeckling)
 	Signaturemap byteImage(ras, threshold);
 
 	BorderList *borderHierarchy = new BorderList;
-	vector<RawBorder *> outerBorders;
-	list<RawBorder *> innerBorders;
+	std::vector<RawBorder *> outerBorders;
+	std::list<RawBorder *> innerBorders;
 	RawBorder *foundPath;
 
 	int x, y;
@@ -442,7 +442,7 @@ BorderList *extractBorders(const TRasterP &ras, int threshold, int despeckling)
 	//Now, we have all borders found, but no hierarchy between them.
 
 	unsigned int i;
-	list<RawBorder *>::iterator l;
+	std::list<RawBorder *>::iterator l;
 
 	//Build hierarchy
 

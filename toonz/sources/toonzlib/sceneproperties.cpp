@@ -176,7 +176,7 @@ void TSceneProperties::saveData(TOStream &os) const
 	for (i = 0; i < (int)outputs.size(); i++) {
 		TOutputProperties &out = *outputs[i];
 		const TRenderSettings &rs = out.getRenderSettings();
-		std::map<string, string> attr;
+		std::map<std::string, std::string> attr;
 		attr["name"] = i == 0 ? "main" : "preview";
 		os.openChild("output", attr);
 
@@ -272,13 +272,13 @@ void TSceneProperties::saveData(TOStream &os) const
 			os.child("offset") << out.getOffset();
 
 		os.openChild("formatsProperties");
-		std::vector<string> fileExtensions;
+		std::vector<std::string> fileExtensions;
 		out.getFileFormatPropertiesExtensions(fileExtensions);
 		for (int i = 0; i < (int)fileExtensions.size(); i++) {
-			string ext = fileExtensions[i];
+			std::string ext = fileExtensions[i];
 			TPropertyGroup *pg = out.getFileFormatProperties(ext);
 			assert(pg);
-			std::map<string, string> attr;
+			std::map<std::string, std::string> attr;
 			attr["ext"] = ext;
 			os.openChild("formatProperties", attr);
 			pg->saveData(os);
@@ -320,7 +320,7 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject)
 
 	int globFrom = -1, globTo = 0, globStep = 1;
 	double globFrameRate = -1;
-	string tagName;
+	std::string tagName;
 	*m_outputProp = *m_previewProp = TOutputProperties();
 	while (is.matchTag(tagName)) {
 		if (tagName == "projectPath") {
@@ -355,7 +355,7 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject)
 		}								 //back compatibility
 		else if (tagName == "playrange") //back compatibility
 		{
-			string dummy;
+			std::string dummy;
 			is >> globFrom >> globTo >> dummy;
 		} else if (tagName == "camera") //back compatibility with tab 2.2
 		{
@@ -397,7 +397,7 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject)
 				if (tagName == "output" || tagName == "outputStream") {
 					TOutputProperties dummyOut;
 					TOutputProperties *outPtr = &dummyOut;
-					string name = is.getTagAttribute("name");
+					std::string name = is.getTagAttribute("name");
 					if (name == "preview")
 						outPtr = m_previewProp;
 					else if (name == "main")
@@ -433,7 +433,7 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject)
 						} else if (tagName == "path") {
 							TFilePath fp;
 							is >> fp;
-							string ext = fp.getUndottedType();
+							std::string ext = fp.getUndottedType();
 							TPropertyGroup *pg = out.getFileFormatProperties(ext);
 							if (ext == "avi" && pg->getPropertyCount() != 1)
 								fp = fp.withType("tif");
@@ -543,13 +543,13 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject)
 							TDimension d(0, 0);
 							is >> d.lx >> d.ly;
 							if (!is.eos()) {
-								string s;
+								std::string s;
 								is >> s;
 							}
 						} else if (tagName == "formatsProperties") {
 							while (is.matchTag(tagName)) {
 								if (tagName == "formatProperties") {
-									string ext = is.getTagAttribute("ext");
+									std::string ext = is.getTagAttribute("ext");
 									TPropertyGroup *pg =
 										out.getFileFormatProperties(ext);
 									if (ext == "avi") {

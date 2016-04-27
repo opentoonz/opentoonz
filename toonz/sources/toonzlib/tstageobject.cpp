@@ -1697,7 +1697,7 @@ void TStageObject::updateKeyframes()
 void TStageObject::saveData(TOStream &os)
 {
 	TStageObjectId parentId = getParent();
-	std::map<string, string> attr;
+	std::map<std::string, string> attr;
 	attr["id"] = parentId.toString();
 	attr["handle"] = m_handle;
 	attr["parentHandle"] = m_parentHandle;

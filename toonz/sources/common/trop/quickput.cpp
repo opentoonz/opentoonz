@@ -3061,7 +3061,7 @@ void doQuickPutCmapped(
 	int dnWrap = dn->getWrap();
 	int upWrap = up->getWrap();
 
-	vector<TPixel32> colors(palette->getStyleCount());
+	std::vector<TPixel32> colors(palette->getStyleCount());
 	//vector<TPixel32> inks(palette->getStyleCount());
 
 	if (globalColorScale != TPixel::Black)
@@ -3303,8 +3303,8 @@ void doQuickPutCmapped(
 	int lyPred = up->getLy() * (1 << PADN) - 1;
 	int dnWrap = dn->getWrap();
 	int upWrap = up->getWrap();
-	vector<TPixel32> paints(palette->getStyleCount());
-	vector<TPixel32> inks(palette->getStyleCount());
+	std::vector<TPixel32> paints(palette->getStyleCount());
+	std::vector<TPixel32> inks(palette->getStyleCount());
 
 	if (s.m_transparencyCheck)
 		for (int i = 0; i < palette->getStyleCount(); i++) {
@@ -3622,8 +3622,8 @@ void doQuickPutCmapped(
 
 	int count = tmax(palette->getStyleCount(), TPixelCM32::getMaxInk(), TPixelCM32::getMaxPaint());
 
-	vector<TPixel32> paints(count, TPixel32::Red);
-	vector<TPixel32> inks(count, TPixel32::Red);
+	std::vector<TPixel32> paints(count, TPixel32::Red);
+	std::vector<TPixel32> inks(count, TPixel32::Red);
 	if (globalColorScale != TPixel::Black)
 		for (int i = 0; i < palette->getStyleCount(); i++)
 			paints[i] = inks[i] = applyColorScaleCMapped(palette->getStyle(i)->getAverageColor(), globalColorScale);
@@ -3721,8 +3721,8 @@ void doQuickResampleColorFilter(
 		return;
 	const int PADN = 16;
 
-	vector<TPixel32> paints(plt->getStyleCount());
-	vector<TPixel32> inks(plt->getStyleCount());
+	std::vector<TPixel32> paints(plt->getStyleCount());
+	std::vector<TPixel32> inks(plt->getStyleCount());
 
 	for (int i = 0; i < plt->getStyleCount(); i++)
 		paints[i] = inks[i] = ::premultiply(plt->getStyle(i)->getAverageColor());

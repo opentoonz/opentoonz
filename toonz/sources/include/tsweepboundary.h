@@ -21,7 +21,7 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-bool DVAPI computeSweepBoundary(const vector<TStroke *> &strokes,
-								vector<vector<TQuadratic *>> &outlines);
+bool DVAPI computeSweepBoundary(const std::vector<TStroke *> &strokes,
+								std::vector<std::vector<TQuadratic *>> &outlines);
 
 #endif //TSWEEPBOUNDARY_INCLUDED

@@ -26,8 +26,8 @@ namespace
 
 class TTestTable
 {
-	typedef map<string, TTest *> Table;
-	typedef set<string> SkipTable;
+	typedef map<std::string, TTest *> Table;
+	typedef set<std::string> SkipTable;
 	Table m_table;
 	SkipTable m_skipTable;
 	TTestTable(){};
@@ -41,7 +41,7 @@ public:
 		return theTable;
 	}
 
-	void add(const string &str, TTest *test)
+	void add(const std::string &str, TTest *test)
 	{
 		assert(test);
 		if (m_table.find(str) != m_table.end()) {
@@ -52,12 +52,12 @@ public:
 		m_table[str] = test;
 	}
 
-	void skip(const string &str)
+	void skip(const std::string &str)
 	{
 		m_skipTable.insert(str);
 	}
 
-	void run(const string &str)
+	void run(const std::string &str)
 	{
 		if (m_skipTable.find(str) != m_skipTable.end())
 			return;
@@ -107,7 +107,7 @@ public:
 
 //------------------------------------------------------------
 
-TTest::TTest(const string &testName)
+TTest::TTest(const std::string &testName)
 {
 	TTestTable::table()->add(testName, this);
 }
@@ -159,7 +159,7 @@ void TTest::runTests(string name)
 {
 	TFilePath testFile = getTestFile(name);
 
-	std::vector<string> testType;
+	std::vector<std::string> testType;
 	if (name == "verif_image") {
 		testType.push_back("write");
 		testType.push_back("read");

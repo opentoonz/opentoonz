@@ -107,7 +107,7 @@ public:
 	bool contains(const TStroke &s, bool mayIntersect) const;
 	bool isSubRegionOf(const TRegion::Imp &r) const;
 	bool getInternalPoint(TPointD &p, double left, double right, double y);
-	void computeScanlineIntersections(double y, vector<double> &intersections) const;
+	void computeScanlineIntersections(double y, std::vector<double> &intersections) const;
 	bool thereAreintersections(const TStroke &s) const;
 
 	int leftScanlineIntersections(const TPointD &p,
@@ -313,7 +313,7 @@ if((q.getPoint(t0).y-p.y)*(q.getPoint(t1).y-p.y)<0)
 
 //-----------------------------------------------------------------------------
 
-void addIntersection(const TQuadratic &q, double t, double t0, double t1, vector<double> &intersections, double intersection, vector<int> &sides)
+void addIntersection(const TQuadratic &q, double t, double t0, double t1, std::vector<double> &intersections, double intersection, std::vector<int> &sides)
 {
 	int side = 0;
 
@@ -338,8 +338,8 @@ void addIntersection(const TQuadratic &q, double t, double t0, double t1, vector
 
 //-----------------------------------------------------------------------------
 
-void findIntersections(double y, const TQuadratic &q, double t0, double t1, vector<double> &intersections,
-					   vector<int> &sides)
+void findIntersections(double y, const TQuadratic &q, double t0, double t1, std::vector<double> &intersections,
+					   std::vector<int> &sides)
 {
 
 	TRectD bbox = q.getBBox();
@@ -519,7 +519,7 @@ void TRegion::draw(const TVectorRenderData &rd)
 
 //-----------------------------------------------------------------------------
 
-void checkPolyline(const vector<T3DPointD> &p)
+void checkPolyline(const std::vector<T3DPointD> &p)
 {
 	int ret;
 
@@ -533,7 +533,7 @@ void checkPolyline(const vector<T3DPointD> &p)
 
 	for (int i = 0; i < pointSize; i++) {
 		for (int j = i + 1; j < pointSize; j++) {
-			vector<DoublePair> res;
+			std::vector<DoublePair> res;
 
 			p1 = TPointD(p[i].x, p[i].y);
 			p2 = TPointD(p[i + 1].x, p[i + 1].y);
@@ -562,7 +562,7 @@ void checkPolyline(const vector<T3DPointD> &p)
 	TSegment s0(p1, p2);
 
 	for (int j = 0; j < pointSize; j++) {
-		vector<DoublePair> res;
+		std::vector<DoublePair> res;
 
 		p1 = TPointD(p[j].x, p[j].y);
 		p2 = TPointD(p[j + 1].x, p[j + 1].y);
@@ -617,14 +617,14 @@ bool TRegion::Imp::noSubregionContains(const TPointD &p) const
 
 //-----------------------------------------------------------------------------
 
-void TRegion::computeScanlineIntersections(double y, vector<double> &intersections) const
+void TRegion::computeScanlineIntersections(double y, std::vector<double> &intersections) const
 {
 	m_imp->computeScanlineIntersections(y, intersections);
 }
 
 //-----------------------------------------------------------------------------
 
-void TRegion::Imp::computeScanlineIntersections(double y, vector<double> &intersections) const
+void TRegion::Imp::computeScanlineIntersections(double y, std::vector<double> &intersections) const
 {
 	TRectD bbox = getBBox();
 	if (y <= bbox.y0 || y >= bbox.y1)
@@ -633,7 +633,7 @@ void TRegion::Imp::computeScanlineIntersections(double y, vector<double> &inters
 	assert(intersections.empty());
 
 	UINT i, firstSide = 0;
-	vector<int> sides;
+	std::vector<int> sides;
 
 	for (i = 0; i < m_edge.size(); i++) {
 		TEdge *e = m_edge[i];
@@ -1414,7 +1414,7 @@ void TRegion::addSubregion(TRegion *region)
 
 void TRegion::Imp::addSubregion(TRegion *region)
 {
-	for (vector<TRegion *>::iterator it = m_includedRegionArray.begin(); it != m_includedRegionArray.end(); ++it) {
+	for (std::vector<TRegion *>::iterator it = m_includedRegionArray.begin(); it != m_includedRegionArray.end(); ++it) {
 		if (region->contains(**it)) {
 			//region->addSubregion(*it);
 			region->addSubregion(*it);

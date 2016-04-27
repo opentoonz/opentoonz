@@ -362,7 +362,7 @@ void SpeedInOutSegmentPage::getGuiValues(TPointD &speedIn, TPointD &speedOut)
 EaseInOutSegmentPage::EaseInOutSegmentPage(bool isPercentage, FunctionSegmentViewer *parent)
 	: FunctionSegmentPage(parent), m_fieldScale(isPercentage ? 100.0 : 1.0), m_isPercentage(isPercentage)
 {
-	string measureName = isPercentage ? "percentage" : "";
+	std::string measureName = isPercentage ? "percentage" : "";
 
 	m_ease0Fld = new DVGui::MeasuredDoubleLineEdit();
 	m_ease0Fld->setMeasure(measureName);
@@ -534,13 +534,13 @@ void FunctionExpressionSegmentPage::refresh()
 	}
 
 	TDoubleKeyframe kf0 = curve->getKeyframeAt(getR0());
-	string expression = kf0.m_expressionText;
+	std::string expression = kf0.m_expressionText;
 	bool oldBlockSignalsStatus = m_expressionFld->blockSignals(true);
 	m_expressionFld->setGrammar(curve->getGrammar());
 	m_expressionFld->setExpression(expression);
 	m_expressionFld->blockSignals(oldBlockSignalsStatus);
 
-	wstring unitName = toWideString(kf0.m_unitName);
+	std::wstring unitName = toWideString(kf0.m_unitName);
 	if (unitName == L"" && curve->getMeasure())
 		unitName = curve->getMeasure()->getCurrentUnit()->getDefaultExtension();
 
@@ -583,7 +583,7 @@ void FunctionExpressionSegmentPage::init(int segmentLength)
 	} else {
 		m_expressionFld->setExpression("0");
 
-		wstring unitName = L"inch";
+		std::wstring unitName = L"inch";
 		if (curve->getMeasure())
 			unitName = curve->getMeasure()->getCurrentUnit()->getDefaultExtension();
 		m_unitFld->setText(QString::fromStdWString(unitName));
@@ -611,7 +611,7 @@ void FunctionExpressionSegmentPage::apply()
 		return;
 	}
 
-	string unitName = m_unitFld->text().toStdString();
+	std::string unitName = m_unitFld->text().toStdString();
 
 	KeyframeSetter setter(curve, kIndex);
 	setter.setExpression(m_expressionFld->getExpression());
@@ -725,7 +725,7 @@ public:
 		if (curve && kf.m_isKeyframe) {
 			TFilePath path;
 			int fieldIndex = 0;
-			string unitName = "";
+			std::string unitName = "";
 			if (kf.m_type == TDoubleKeyframe::File) {
 				path = kf.m_fileParams.m_path;
 				fieldIndex = kf.m_fileParams.m_fieldIndex;
@@ -754,7 +754,7 @@ public:
 			return;
 
 		TMeasure *measure = curve->getMeasure();
-		string unitName = "";
+		std::string unitName = "";
 		if (measure) {
 			const TUnit *unit = measure->getCurrentUnit();
 			if (unit)
@@ -784,7 +784,7 @@ public:
 
 		fileParams.m_path = TFilePath(stringPath.toStdWString());
 		fileParams.m_fieldIndex = qMax(0, m_fieldIndexFld->text().toInt() - 1);
-		string unitName = m_measureFld->text().toStdString();
+		std::string unitName = m_measureFld->text().toStdString();
 
 		KeyframeSetter setter(curve, kIndex);
 		setter.setFile(fileParams);
@@ -840,7 +840,7 @@ void SimilarShapeSegmentPage::refresh()
 	}
 
 	TDoubleKeyframe kf0 = curve->getKeyframeAt(getR0());
-	string expression = kf0.m_expressionText;
+	std::string expression = kf0.m_expressionText;
 	bool oldBlockSignalsStatus = m_expressionFld->blockSignals(true);
 	m_expressionFld->setGrammar(curve->getGrammar());
 	m_expressionFld->setExpression(expression);
@@ -860,7 +860,7 @@ void SimilarShapeSegmentPage::init(int segmentLength)
 
 	m_expressionFld->setEnabled(true);
 	TDoubleKeyframe kf0 = curve->getKeyframeAt(getR0());
-	string expression = kf0.m_expressionText;
+	std::string expression = kf0.m_expressionText;
 	bool oldBlockSignalsStatus = m_expressionFld->blockSignals(true);
 	m_expressionFld->setGrammar(curve->getGrammar());
 	m_expressionFld->setExpression(expression);

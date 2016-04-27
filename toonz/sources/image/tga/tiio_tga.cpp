@@ -600,7 +600,7 @@ public:
 		m_header.Width = m_info.m_lx;
 		m_header.Height = m_info.m_ly;
 
-		wstring pixelSizeW = ((TEnumProperty *)(m_properties->getProperty("Bits Per Pixel")))->getValue().substr(0, 2);
+		std::wstring pixelSizeW = ((TEnumProperty *)(m_properties->getProperty("Bits Per Pixel")))->getValue().substr(0, 2);
 		if (pixelSizeW == L"16") {
 			m_header.ImagePixelSize = 16;
 			m_writeLineProc = compressed

@@ -38,7 +38,7 @@ class PumpTool : public TTool
 
 	int m_strokeStyleId, m_strokeIndex; //!< Edited stroke indices
 	TStroke *m_inStroke, *m_outStroke;  //!< Input/Output strokes
-	vector<TStroke *> m_splitStrokes;   //!< Merging these, m_inStroke is reformed
+	std::vector<TStroke *> m_splitStrokes;   //!< Merging these, m_inStroke is reformed
 	int m_stroke1Idx, m_stroke2Idx;		//!< Indices of deformed strokes among split ones
 
 	TUndo *m_undo; //!< Undo to be added upon non-trivial button up
@@ -47,8 +47,8 @@ class PumpTool : public TTool
 	double m_actionS1, m_actionS2; //!< Action center length in m_stroke
 	double m_actionRadius;		   //!< Tool action radius in curve length
 
-	vector<double> m_splitPars;				   //!< Split parameters for action localization
-	vector<double> m_cpLenDiff1, m_cpLenDiff2; //!< Distorted CPs' length distances from action center
+	std::vector<double> m_splitPars;				   //!< Split parameters for action localization
+	std::vector<double> m_cpLenDiff1, m_cpLenDiff2; //!< Distorted CPs' length distances from action center
 
 	bool m_active;		  //!< Whether a stroke is currently being edited
 	bool m_enabled;		  //!< Tells whether the image allows editing

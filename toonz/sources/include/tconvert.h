@@ -25,7 +25,7 @@ DVAPI std::string toString(int v);
 DVAPI std::string toString(unsigned long v);
 DVAPI std::string toString(unsigned long long v);
 DVAPI std::string toString(double v, int prec = -1);
-DVAPI std::string toString(wstring s);
+DVAPI std::string toString(std::wstring s);
 DVAPI std::string toString(const TFilePath &fp);
 DVAPI std::string toString(void *p);
 

@@ -289,7 +289,7 @@ public:
 
 protected:
 	static TXshZeraryFxColumn *createZeraryFxColumn(TXsheet *xsh, TFx *zfx, int row = 0);
-	static void cloneGroupStack(const QStack<int> &groupIds, const QStack<wstring> &groupNames, TFx *toFx);
+	static void cloneGroupStack(const QStack<int> &groupIds, const QStack<std::wstring> &groupNames, TFx *toFx);
 	static void cloneGroupStack(TFx *fromFx, TFx *toFx);
 	static void copyGroupEditLevel(int editGroupId, TFx *toFx);
 	static void copyGroupEditLevel(TFx *fromFx, TFx *toFx);
@@ -329,7 +329,7 @@ TXshZeraryFxColumn *FxCommandUndo::createZeraryFxColumn(TXsheet *xsh, TFx *zfx, 
 //------------------------------------------------------
 
 void FxCommandUndo::cloneGroupStack(
-	const QStack<int> &groupIds, const QStack<wstring> &groupNames, TFx *toFx)
+	const QStack<int> &groupIds, const QStack<std::wstring> &groupNames, TFx *toFx)
 {
 	toFx->getAttributes()->removeFromAllGroup();
 
@@ -1483,7 +1483,7 @@ void MakeMacroUndo::redo() const
 		rootFx->getOutputConnection(p)->setFx(macroFx);
 
 	// Remove the macro's internal fxs from the scene
-	const vector<TFxP> &fxs = macroFx->getFxs();
+	const std::vector<TFxP> &fxs = macroFx->getFxs();
 
 	size_t f, fCount = fxs.size();
 	for (f = 0; f != fCount; ++f)
@@ -1522,7 +1522,7 @@ void MakeMacroUndo::undo() const
 	::removeFxFromCurrentScene(macroFx, xsh);
 
 	// Re-insert the macro's internal fxs and restore ports ownership
-	const vector<TFxP> &fxs = macroFx->getFxs();
+	const std::vector<TFxP> &fxs = macroFx->getFxs();
 
 	size_t f, fCount = fxs.size();
 	for (f = 0; f != fCount; ++f) {
@@ -2978,7 +2978,7 @@ class UndoReplacePasteFxs : public UndoAddPasteFxs
 	TFx *m_fx, *m_rightmostFx;
 
 public:
-	UndoReplacePasteFxs(TFx *fx, const std::list<TFxP> &fxs, const map<TFx *, int> &zeraryFxColumnSize,
+	UndoReplacePasteFxs(TFx *fx, const std::list<TFxP> &fxs, const std::map<TFx *, int> &zeraryFxColumnSize,
 						const std::list<TXshColumnP> &columns, TXsheetHandle *xshHandle, TFxHandle *fxHandle)
 		: UndoAddPasteFxs(inFx(fx), fxs, zeraryFxColumnSize, columns, xshHandle, fxHandle), m_deleteFxUndo(new DeleteFxOrColumnUndo(fx, xshHandle, fxHandle)), m_fx(fx), m_rightmostFx()
 	{
@@ -3075,7 +3075,7 @@ void UndoReplacePasteFxs::undo() const
 
 //=============================================================
 
-void TFxCommand::replacePasteFxs(TFx *inFx, const std::list<TFxP> &fxs, const map<TFx *, int> &zeraryFxColumnSize,
+void TFxCommand::replacePasteFxs(TFx *inFx, const std::list<TFxP> &fxs, const std::map<TFx *, int> &zeraryFxColumnSize,
 								 const std::list<TXshColumnP> &columns, TXsheetHandle *xshHandle, TFxHandle *fxHandle)
 {
 	std::auto_ptr<FxCommandUndo> undo(new UndoReplacePasteFxs(inFx, fxs, zeraryFxColumnSize, columns, xshHandle, fxHandle));
@@ -3293,7 +3293,7 @@ private:
 struct UndoConnectFxs::GroupData {
 	TFx *m_fx;
 	QStack<int> m_groupIds;
-	QStack<wstring> m_groupNames;
+	QStack<std::wstring> m_groupNames;
 	int m_editingGroup;
 
 public:

@@ -59,9 +59,9 @@ public:
 	TPointD m_speedIn, m_speedOut;
 
 	bool m_linkedHandles;
-	string m_expressionText;
+	std::string m_expressionText;
 	FileParams m_fileParams;
-	string m_unitName; // file/expression only
+	std::string m_unitName; // file/expression only
 	double m_similarShapeOffset;
 
 	void saveData(TOStream &os) const;

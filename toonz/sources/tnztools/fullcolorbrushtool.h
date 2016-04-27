@@ -25,7 +25,7 @@ class FullColorBrushTool : public TTool
 	Q_DECLARE_TR_FUNCTIONS(FullColorBrushTool)
 
 public:
-	FullColorBrushTool(string name);
+	FullColorBrushTool(std::string name);
 
 	ToolType getToolType() const { return TTool::LevelWriteTool; }
 
@@ -50,7 +50,7 @@ public:
 	int getCursorId() const { return ToolCursor::PenCursor; }
 
 	TPropertyGroup *getProperties(int targetType);
-	bool onPropertyChanged(string propertyName);
+	bool onPropertyChanged(std::string propertyName);
 
 	void onImageChanged();
 	void setWorkAndBackupImages();
@@ -91,7 +91,7 @@ protected:
 
 	QRadialGradient m_brushPad;
 
-	vector<TThickPoint> m_points;
+	std::vector<TThickPoint> m_points;
 	BluredBrush *m_brush;
 
 	TTileSetFullColor *m_tileSet;

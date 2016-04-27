@@ -26,8 +26,8 @@ public:
 		setName(L"ExternFx");
 	}
 
-	static TExternFx *create(string name);
-	void getNames(vector<string> &names);
+	static TExternFx *create(std::string name);
+	void getNames(std::vector<std::string> &names);
 };
 
 //---------------------------------------------------------
@@ -40,29 +40,29 @@ class DVAPI TExternalProgramFx : public TExternFx
 	class Port
 	{
 	public:
-		string m_name;
+		std::string m_name;
 		TRasterFxPort *m_port; // n.b. la porta di output ha m_port=0
-		string m_ext;		   // estensione del file in cui si legge/scrive l'immagine
+		std::string m_ext;		   // estensione del file in cui si legge/scrive l'immagine
 		Port()
 			: m_name(), m_port(0), m_ext() {}
-		Port(string name, string ext, TRasterFxPort *port)
+		Port(std::string name, std::string ext, TRasterFxPort *port)
 			: m_name(name), m_port(port), m_ext(ext) {}
 	};
 
-	std::map<string, Port> m_ports;
-	// std::map<string, TParamP> m_params;
+	std::map<std::string, Port> m_ports;
+	// std::map<std::string, TParamP> m_params;
 	std::vector<TParamP> m_params;
 
 	TFilePath m_executablePath;
-	string m_args;
-	string m_externFxName;
+	std::string m_args;
+	std::string m_externFxName;
 
 public:
-	TExternalProgramFx(string name);
+	TExternalProgramFx(std::string name);
 	TExternalProgramFx();
 	~TExternalProgramFx();
 
-	void initialize(string name);
+	void initialize(std::string name);
 
 	virtual TFx *clone(bool recursive = true) const;
 
@@ -71,20 +71,20 @@ public:
 
 	bool canHandle(const TRenderSettings &info, double frame) { return false; }
 
-	void setExecutable(TFilePath fp, string args)
+	void setExecutable(TFilePath fp, std::string args)
 	{
 		m_executablePath = fp;
 		m_args = args;
 	}
 
-	void addPort(string portName, string ext, bool isInput);
+	void addPort(std::string portName, std::string ext, bool isInput);
 	// void addParam(string paramName, const TParamP &param);
 
 	void loadData(TIStream &is);
 	void saveData(TOStream &os);
 
-	void setExternFxName(string name) { m_externFxName = name; }
-	string getExternFxName() const { return m_externFxName; };
+	void setExternFxName(std::string name) { m_externFxName = name; }
+	std::string getExternFxName() const { return m_externFxName; };
 
 private:
 	// not implemented

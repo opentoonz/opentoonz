@@ -82,8 +82,8 @@ void doConvolve_row_9_i(PIXOUT *pixout, int n, PIXIN *pixarr[], long w[])
 template <class PIXOUT>
 void doConvolve_cm32_row_9_i(PIXOUT *pixout, int n,
 							 TPixelCM32 *pixarr[], long w[],
-							 const vector<TPixel32> &paints,
-							 const vector<TPixel32> &inks)
+							 const std::vector<TPixel32> &paints,
+							 const std::vector<TPixel32> &inks)
 {
 	long w1, w2, w3, w4, w5, w6, w7, w8, w9;
 	TPixelCM32 *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9;
@@ -183,8 +183,8 @@ void doConvolve_row_i(PIXOUT *pixout, int n,
 template <class PIXOUT>
 void doConvolve_cm32_row_i(PIXOUT *pixout, int n,
 						   TPixelCM32 *pixarr[], long w[], int pixn,
-						   const vector<TPixel32> &paints,
-						   const vector<TPixel32> &inks)
+						   const std::vector<TPixel32> &paints,
+						   const std::vector<TPixel32> &inks)
 {
 	long ar, ag, ab, am;
 	int i;

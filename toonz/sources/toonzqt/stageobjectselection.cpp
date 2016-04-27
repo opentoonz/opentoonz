@@ -27,7 +27,7 @@ class TPasteSelectionUndo : public TUndo
 	StageObjectsData *m_objData;
 	int m_index;
 	std::vector<TStageObjectId> m_pastedId;
-	list<int> m_pastedSplineIds;
+	std::list<int> m_pastedSplineIds;
 	QMap<TStageObjectId, QList<TFxPort *>> m_columnFxConnections;
 	TXsheetHandle *m_xshHandle;
 	TObjectHandle *m_objHandle;
@@ -36,7 +36,7 @@ class TPasteSelectionUndo : public TUndo
 
 public:
 	TPasteSelectionUndo(StageObjectsData *objData, int index, const std::vector<TStageObjectId> &pastedId,
-						const list<int> pastedSplineIds, const TPointD &pastedPos, TXsheetHandle *xshHandle,
+						const std::list<int> pastedSplineIds, const TPointD &pastedPos, TXsheetHandle *xshHandle,
 						TObjectHandle *objHandle, TFxHandle *fxHandle)
 		: TUndo(), m_objData(objData), m_index(index), m_pastedSplineIds(pastedSplineIds), m_pastedId(pastedId), m_xshHandle(xshHandle), m_objHandle(objHandle), m_fxHandle(fxHandle), m_pastedPos(pastedPos)
 	{
@@ -71,7 +71,7 @@ public:
 	{
 		std::set<int> indexes;
 		indexes.insert(m_index);
-		list<int> splineIds;
+		std::list<int> splineIds;
 		m_objData->restoreObjects(indexes, splineIds, m_xshHandle->getXsheet(), 0, m_pastedPos);
 		QMap<TStageObjectId, QList<TFxPort *>>::const_iterator it;
 		TXsheet *xsh = m_xshHandle->getXsheet();
@@ -374,8 +374,8 @@ void StageObjectSelection::pasteSelection()
 		return;
 	std::set<int> indexes;
 	indexes.insert(index);
-	list<int> restoredSplineIds;
-	vector<TStageObjectId> ids = objData->restoreObjects(indexes, restoredSplineIds, m_xshHandle->getXsheet(), StageObjectsData::eDoClone, m_pastePosition);
+	std::list<int> restoredSplineIds;
+	std::vector<TStageObjectId> ids = objData->restoreObjects(indexes, restoredSplineIds, m_xshHandle->getXsheet(), StageObjectsData::eDoClone, m_pastePosition);
 	StageObjectsData *undoData = new StageObjectsData();
 	undoData->storeObjects(ids, m_xshHandle->getXsheet(), 0);
 	undoData->storeColumnFxs(indexes, m_xshHandle->getXsheet(), 0);

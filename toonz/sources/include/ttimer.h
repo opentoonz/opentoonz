@@ -59,7 +59,7 @@ public:
 		Creates a timer with name \p name, resolution \p timerRes and type \p type.
 		Resolution is expressed in milliseconds.
 	*/
-	TTimer(const string &name, UINT timerRes, Type type);
+	TTimer(const std::string &name, UINT timerRes, Type type);
 	/*!
 		Deletes the timer.
 	*/
@@ -81,7 +81,7 @@ public:
 	/*!
 		Returns the name of the timer.
 	*/
-	string getName() const;
+	std::string getName() const;
 	/*!
 		Asks the timer for number of events so far.
 	*/

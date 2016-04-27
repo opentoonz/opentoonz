@@ -19,7 +19,7 @@
 void makeScreenSaver(
 	TFilePath scrFn,
 	TFilePath swfFn,
-	string screenSaverName)
+	std::string screenSaverName)
 {
 	struct _stat results;
 	if (_wstat(swfFn.getWideString().c_str(), &results) != 0)
@@ -36,7 +36,7 @@ void makeScreenSaver(
 	TFilePath svscrn = TSystem::getBinDir() + "screensaver.dat";
 	if (!TFileStatus(svscrn).doesExist()) {
 		throw TException(
-			wstring(L"Screensaver template not found: ") +
+			std::wstring(L"Screensaver template not found: ") +
 			svscrn.getWideString());
 	}
 	TSystem::copyFile(scrFn, svscrn);
@@ -81,7 +81,7 @@ void previewScreenSaver(TFilePath scr)
 
 void installScreenSaver(TFilePath scr)
 {
-	wstring cmd = wstring(L"desk.cpl,InstallScreenSaver ") + scr.getWideString();
+	std::wstring cmd = L"desk.cpl,InstallScreenSaver " + scr.getWideString();
 	int ret = (int)
 		ShellExecuteW(0, L"open", L"rundll32.exe", cmd.c_str(), 0, SW_SHOWNORMAL);
 	if (ret <= 32)
@@ -93,7 +93,7 @@ void installScreenSaver(TFilePath scr)
 void makeScreenSaver(
 	TFilePath scrFn,
 	TFilePath swfFn,
-	string screenSaverName)
+	std::string screenSaverName)
 {
 }
 /*

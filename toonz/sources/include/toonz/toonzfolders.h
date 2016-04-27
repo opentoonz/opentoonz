@@ -27,7 +27,7 @@ DVAPI TFilePath getMyModuleDir();
 // restituisce getMyModuleDir() + filename
 // o getTemplateModuleDir() + filename
 DVAPI TFilePath getModuleFile(TFilePath filename);
-DVAPI TFilePath getModuleFile(string fn);
+DVAPI TFilePath getModuleFile(std::string fn);
 
 DVAPI TFilePathSet getProjectsFolders();
 DVAPI TFilePath getFirstProjectsFolder();

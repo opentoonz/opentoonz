@@ -14,7 +14,7 @@ inline TFilePath getHistoryFile()
 	return TEnv::getConfigDir() + (TSystem::getUserName().toStdString() + "_history.txt");
 }
 
-string History::Day::getDate() const
+std::string History::Day::getDate() const
 {
 	QDate today = QDate::currentDate();
 	QDate yesterday = today.addDays(-1);
@@ -95,7 +95,7 @@ const History::Day *History::getDay(const QDate &time) const
 	return 0;
 }
 
-const History::Day *History::getDay(string dateString) const
+const History::Day *History::getDay(std::string dateString) const
 {
 	for (int i = 0; i < (int)m_days.size(); i++)
 		if (m_days[i]->getDate() == dateString)
@@ -128,7 +128,7 @@ void History::load()
 	Tifstream is(fp);
 	if (!is)
 		return;
-	map<int, Day *> table;
+	std::map<int, Day *> table;
 	std::map<int, Day *>::iterator it;
 	for (;;) {
 		char buffer[2048];

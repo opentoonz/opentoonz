@@ -32,11 +32,11 @@ public:
 	double m_dSample;
 	int m_nbSample;
 	double m_dA, m_dAB;
-	string m_name;
+	std::string m_name;
 
 	bool m_isCM;
 	// for RGBM color groups
-	vector<I_PIXEL> m_color;
+	std::vector<I_PIXEL> m_color;
 	// for CMAP color indides
 	COLOR_INDEX_LIST m_ink, m_paint;
 
@@ -88,7 +88,7 @@ public:
 	//	void blurPixel(CSTColSelPic<UC_PIXEL>& pic, const int xx, const int yy,
 	//				   const CBlurMatrix& bm, UC_PIXEL& col,const UCHAR osel);
 	//	bool isContourOnPath(const int xx, const int yy,
-	//						 vector<BLURSECTION>::const_iterator pBS,
+	//						 std::vector<BLURSECTION>::const_iterator pBS,
 	//						 CSTColSelPic<UC_PIXEL>& pic);
 	//	void addPixel(I_PIXEL& p, const UC_PIXEL* pic);
 	//	void addPixel(I_PIXEL& p, const CSTColSelPic<UC_PIXEL>& pic,
@@ -109,10 +109,10 @@ public:
 	// Checks the path from blurred pixel to the sample pixel.
 	template <class P>
 	bool isContourOnPath(const int xx, const int yy,
-						 vector<BLURSECTION>::const_iterator pBS,
+						 std::vector<BLURSECTION>::const_iterator pBS,
 						 CSTColSelPic<P> &pic)
 	{
-		for (vector<SXYD>::const_iterator p = pBS->begin();
+		for (std::vector<SXYD>::const_iterator p = pBS->begin();
 			 p != pBS->end();
 			 ++p) {
 			int x = xx + p->x;
@@ -162,7 +162,7 @@ public:
 		int nb = 0;
 
 		int xxyy = yy * pic.m_lX + xx;
-		for (vector<BLURSECTION>::const_iterator pBS = bm.m_m[iBm].begin();
+		for (std::vector<BLURSECTION>::const_iterator pBS = bm.m_m[iBm].begin();
 			 pBS != bm.m_m[iBm].end();
 			 ++pBS) {
 
@@ -208,7 +208,7 @@ public:
 	bool isRealMixture(CSTColSelPic<P> &pic, const int xx, const int yy,
 					   const CBlurMatrix &bm, const int iBm, const UCHAR osel) const
 	{
-		for (vector<BLURSECTION>::const_iterator pBS = bm.m_m[iBm].begin();
+		for (std::vector<BLURSECTION>::const_iterator pBS = bm.m_m[iBm].begin();
 			 pBS != bm.m_m[iBm].end();
 			 ++pBS) {
 			//		const SXYD* xyd= pBS->begin();

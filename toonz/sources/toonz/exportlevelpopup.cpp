@@ -441,7 +441,7 @@ void ExportLevelPopup::hideEvent(QHideEvent *he)
 
 //-------------------------------------------------------------------
 
-TPropertyGroup *ExportLevelPopup::getFormatProperties(const string &ext)
+TPropertyGroup *ExportLevelPopup::getFormatProperties(const std::string &ext)
 {
 	if (m_formatProperties.find(ext) != m_formatProperties.end())
 		return m_formatProperties[ext];
@@ -453,7 +453,7 @@ TPropertyGroup *ExportLevelPopup::getFormatProperties(const string &ext)
 
 //-------------------------------------------------------------------
 
-IoCmd::ExportLevelOptions ExportLevelPopup::getOptions(const string &ext)
+IoCmd::ExportLevelOptions ExportLevelPopup::getOptions(const std::string &ext)
 {
 	IoCmd::ExportLevelOptions opts = m_exportOptions->getOptions();
 
@@ -508,7 +508,7 @@ void ExportLevelPopup::checkAlpha()
 
 void ExportLevelPopup::onOptionsClicked()
 {
-	string ext = m_format->currentText().toStdString();
+	std::string ext = m_format->currentText().toStdString();
 	TPropertyGroup *props = getFormatProperties(ext);
 	setModal(false);
 

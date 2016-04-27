@@ -107,34 +107,34 @@ TFx *createMacroFxByPath(TFilePath path)
 	FxDag *fxDag = xsh->getFxDag();
 	if (!fxDag)
 		return fx;
-	vector<TFxP> fxs;
+	std::vector<TFxP> fxs;
 	fxs = fx->getFxs();
-	QMap<wstring, wstring> oldNewId;
+	QMap<std::wstring, std::wstring> oldNewId;
 	int i;
 	for (i = 0; i < fxs.size(); i++) {
-		wstring oldId = fxs[i]->getFxId();
+		std::wstring oldId = fxs[i]->getFxId();
 		fxDag->assignUniqueId(fxs[i].getPointer());
 		oldNewId[oldId] = fxs[i]->getFxId();
 	}
 
-	QStack<QPair<string, TFxPort *>> newPortNames;
+	QStack<QPair<std::string, TFxPort *>> newPortNames;
 
 	//Devo cambiare il nome alle porte: contengono l'id dei vecchi effetti
 	for (i = fx->getInputPortCount() - 1; i >= 0; i--) {
-		string oldPortName = fx->getInputPortName(i);
-		string inFxOldId = oldPortName;
+		std::string oldPortName = fx->getInputPortName(i);
+		std::string inFxOldId = oldPortName;
 		inFxOldId.erase(0, inFxOldId.find_last_of("_") + 1);
 		assert(oldNewId.contains(toWideString(inFxOldId)));
-		string inFxNewId = toString(oldNewId[toWideString(inFxOldId)]);
-		string newPortName = oldPortName;
+		std::string inFxNewId = toString(oldNewId[toWideString(inFxOldId)]);
+		std::string newPortName = oldPortName;
 		newPortName.erase(newPortName.find_last_of("_") + 1, newPortName.size() - 1);
 		newPortName.append(inFxNewId);
 		TFxPort *fxPort = fx->getInputPort(i);
-		newPortNames.append(QPair<string, TFxPort *>(newPortName, fxPort));
+		newPortNames.append(QPair<std::string, TFxPort *>(newPortName, fxPort));
 		fx->removeInputPort(oldPortName);
 	}
 	while (!newPortNames.isEmpty()) {
-		QPair<string, TFxPort *> newPort = newPortNames.pop();
+		QPair<std::string, TFxPort *> newPort = newPortNames.pop();
 		fx->addInputPort(newPort.first, *newPort.second);
 	}
 	return fx;
@@ -281,7 +281,7 @@ bool InsertFxPopup::loadFx(TFilePath fp)
 		return false;
 	m_is = &is;
 	try {
-		string tagName;
+		std::string tagName;
 		if (m_is->matchTag(tagName) && tagName == "fxs") {
 			loadFolder(0);
 			m_is->closeChild();
@@ -436,7 +436,7 @@ TFx *InsertFxPopup::createFx()
 	TFilePath path = TFilePath(text.toStdWString());
 
 	if (TFileStatus(path).doesExist() && TFileStatus(path.getParentDir()).isDirectory()) {
-		string folder = path.getParentDir().getName();
+		std::string folder = path.getParentDir().getName();
 		if (folder == "macroFx") //Devo caricare una macro
 			fx = createMacroFxByPath(path);
 		else //Verifico se devo caricare un preset
@@ -480,7 +480,7 @@ void InsertFxPopup::contextMenuEvent(QContextMenuEvent *event)
 	TFilePath path = TFilePath(itemRole.toStdWString());
 	if (TFileStatus(path).doesExist() && TFileStatus(path.getParentDir()).isDirectory()) {
 		QMenu *menu = new QMenu(this);
-		string folder = path.getParentDir().getName();
+		std::string folder = path.getParentDir().getName();
 		if (folder == "macroFx") //Menu' macro
 		{
 			QAction *remove = new QAction(tr("Remove Macro FX"), menu);

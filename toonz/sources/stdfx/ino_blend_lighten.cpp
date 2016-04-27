@@ -49,7 +49,7 @@ public:
 		}
 	}
 	//TRect getInvalidRect(const TRect &max) {return max;}
-	//void doSetParam(const string &name, const TParamP &param) {}
+	//void doSetParam(const std::string &name, const TParamP &param) {}
 	int getMemoryRequirement(
 		const TRectD &rect, double frame, const TRenderSettings &rs)
 	{

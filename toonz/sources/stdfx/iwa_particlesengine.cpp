@@ -31,9 +31,9 @@ namespace
 {
 QMutex mutex;
 
-void printTime(TStopWatch &sw, string name)
+void printTime(TStopWatch &sw, std::string name)
 {
-	ostrstream ss;
+	std::ostrstream ss;
 	ss << name << " : ";
 	sw.print(ss);
 	ss << '\n' << '\0';
@@ -208,7 +208,7 @@ void Iwa_Particles_Engine::roll_particles(TTile *tile,							/*-結果を格納�
 										  int level_n,							/*-テクスチャ素材画像の数-*/
 										  bool *random_level,					/*-ループの最初にfalseで入ってくる-*/
 										  float dpi,							/*- 1 で入ってくる-*/
-										  vector<int> lastframe,				/*-テクスチャ素材のそれぞれのカラム長-*/
+											std::vector<int> lastframe,				/*-テクスチャ素材のそれぞれのカラム長-*/
 										  int &totalparticles,
 										  QList<ParticleOrigin> &particleOrigins,
 										  int genPartNum /*- 実際に生成したい粒子数 -*/
@@ -226,7 +226,7 @@ void Iwa_Particles_Engine::roll_particles(TTile *tile,							/*-結果を格納�
 
 	fill_range_struct(values, ranges);
 
-	vector<TPointD> myregions;
+	std::vector<TPointD> myregions;
 	QList<QList<int>> myHistogram;
 
 	std::map<int, TTile *>::iterator it = porttiles.find(values.source_ctrl_val);
@@ -537,7 +537,7 @@ void Iwa_Particles_Engine::render_particles(TFlash *flash,							 /*-  0 が入�
 											TDimension &p_size,						   /*- テクスチャ素材のバウンディングボックスの足し合わさったもの -*/
 											TPointD &p_offset,						   /*- バウンディングボックス左下の座標 -*/
 											std::map<int, TRasterFxPort *> ctrl_ports, /*- コントロール画像のポート番号／ポート -*/
-											vector<TLevelP> partLevel,				   /*- テクスチャ素材のリスト -*/
+											std::vector<TLevelP> partLevel,				   /*- テクスチャ素材のリスト -*/
 											float dpi,								   /*- 1 が入ってくる -*/
 											int curr_frame,
 											int shrink,				/*- 1 が入ってくる -*/
@@ -545,7 +545,7 @@ void Iwa_Particles_Engine::render_particles(TFlash *flash,							 /*-  0 が入�
 											double starty,			/*- 0 が入ってくる -*/
 											double endx,			/*- 0 が入ってくる -*/
 											double endy,			/*- 0 が入ってくる -*/
-											vector<int> last_frame, /*- テクスチャ素材のそれぞれのカラム長 -*/
+											std::vector<int> last_frame, /*- テクスチャ素材のそれぞれのカラム長 -*/
 											unsigned long fxId)
 {
 	/*- 各種パーティクルのパラメータ -*/
@@ -680,7 +680,7 @@ void Iwa_Particles_Engine::render_particles(TFlash *flash,							 /*-  0 が入�
 			fractpart = fractpart - (int)fractpart;
 		}
 
-		map<int, TTile *> porttiles;
+		std::map<int, TTile *> porttiles;
 
 		// Perform the roll
 		/*- RenderSettingsを複製して現在のフレームの計算用にする -*/
@@ -714,7 +714,7 @@ void Iwa_Particles_Engine::render_particles(TFlash *flash,							 /*-  0 が入�
 						if (isPrecomputingEnabled) {
 							(*it->second)->allocateAndCompute(*tmp, bbox.getP00(), convert(bbox).getSize(), 0, r_frame, riAux);
 						} else {
-							string alias = "CTRL: " + (*(it->second))->getAlias(r_frame, riAux);
+							std::string alias = "CTRL: " + (*(it->second))->getAlias(r_frame, riAux);
 							TRasterImageP rimg = TImageCache::instance()->get(alias, false);
 
 							if (rimg) {
@@ -737,7 +737,7 @@ void Iwa_Particles_Engine::render_particles(TFlash *flash,							 /*-  0 が入�
 			port_is_used(values.base_ctrl_val, values) &&
 			values.iw_rendermode_val != Iwa_TiledParticlesFx::REND_ILLUMINATED) /*- 照明モードなら、BG素材は要らない -*/
 		{
-			string alias = "BG_CTRL: " + (*ctrl_ports.at(values.base_ctrl_val))->getAlias(r_frame, ri);
+			std::string alias = "BG_CTRL: " + (*ctrl_ports.at(values.base_ctrl_val))->getAlias(r_frame, ri);
 			TRasterImageP rimg = TImageCache::instance()->get(alias, false);
 			if (rimg) {
 				baseImgTile.m_pos = tile->m_pos;
@@ -935,7 +935,7 @@ void Iwa_Particles_Engine::do_render(TFlash *flash,
 									 TDimension &p_size,
 									 TPointD &p_offset,
 									 int lastframe,
-									 vector<TLevelP> partLevel,
+									 std::vector<TLevelP> partLevel,
 									 struct particles_values &values,
 									 float opacity_range,
 									 int dist_frame,
@@ -952,7 +952,7 @@ void Iwa_Particles_Engine::do_render(TFlash *flash,
 
 	TRasterP tileRas(tile->getRaster());
 
-	string levelid;
+	std::string levelid;
 	double aim_angle = 0;
 	if (values.pathaim_val) {
 		float arctan = atan2f(part->vy, part->vx);
@@ -1049,7 +1049,7 @@ void Iwa_Particles_Engine::do_render(TFlash *flash,
 	} else {
 		TRasterP ras;
 
-		string alias;
+		std::string alias;
 		TRasterImageP rimg;
 		if (rimg = partLevel[part->level]->frame(ndx)) {
 			ras = rimg->getRaster();
@@ -1147,9 +1147,9 @@ void Iwa_Particles_Engine::do_render(TFlash *flash,
 
 void Iwa_Particles_Engine::fill_array(TTile *ctrl1,			/*- ソース画像のTile -*/
 									  int &regioncount,		/*- 領域数を返す -*/
-									  vector<int> &myarray, /*- インデックスを返すと思われる。サイズはソースTileの縦横 -*/
-									  vector<int> &lista,
-									  vector<int> &listb,
+									  std::vector<int> &myarray, /*- インデックスを返すと思われる。サイズはソースTileの縦横 -*/
+									  std::vector<int> &lista,
+									  std::vector<int> &listb,
 									  int threshold)
 {
 
@@ -1181,7 +1181,7 @@ void Iwa_Particles_Engine::fill_array(TTile *ctrl1,			/*- ソース画像のTile
 		for (i = 0, pix = raster32->pixels(j); i < lx; i++, pix++) {
 			/*TMSG_INFO("j=%d i=%d\n", j, i);*/
 			if (pix->m > threshold) {
-				vector<int> mask(4);
+				std::vector<int> mask(4);
 				pr++;
 				/* l,ul,u,ur;*/
 				if (i) {
@@ -1220,13 +1220,13 @@ void Iwa_Particles_Engine::fill_array(TTile *ctrl1,			/*- ソース画像のTile
 
 /*-----------------------------------------------------------------*/
 
-void Iwa_Particles_Engine::normalize_array(vector<vector<TPointD>> &myregions, TPointD pos, int lx, int ly, int
+void Iwa_Particles_Engine::normalize_array(std::vector<std::vector<TPointD>> &myregions, TPointD pos, int lx, int ly, int
 																												regioncounter,
-										   vector<int> &myarray, vector<int> &lista, vector<int> &listb, vector<int> &final)
+																												std::vector<int> &myarray, std::vector<int> &lista, std::vector<int> &listb, std::vector<int> &final)
 {
 	int i, j, k, l;
 
-	vector<int> tmp;
+	std::vector<int> tmp;
 	int maxregioncounter = 0;
 	int listsize = (int)lista.size();
 	//TMSG_INFO("regioncounter %d, eqcount=%d\n", regioncounter, eqcount);
@@ -1293,7 +1293,7 @@ void Iwa_Particles_Engine::normalize_array(vector<vector<TPointD>> &myregions, T
 /*-----------------------------------------------------------------*/
 
 /*- multiがONのときのSource画像（ctrl1）の領域を分析 -*/
-void Iwa_Particles_Engine::fill_subregions(int cont_index, vector<vector<TPointD>> &myregions, TTile *ctrl1, int thres)
+void Iwa_Particles_Engine::fill_subregions(int cont_index, std::vector<std::vector<TPointD>> &myregions, TTile *ctrl1, int thres)
 {
 
 	int regioncounter = 0;
@@ -1301,14 +1301,14 @@ void Iwa_Particles_Engine::fill_subregions(int cont_index, vector<vector<TPointD
 	int lx = ctrl1->getRaster()->getLx();
 	int ly = ctrl1->getRaster()->getLy();
 
-	vector<int> myarray(lx * ly);
-	vector<int> lista;
-	vector<int> listb;
+	std::vector<int> myarray(lx * ly);
+	std::vector<int> lista;
+	std::vector<int> listb;
 
 	fill_array(ctrl1, regioncounter, myarray, lista, listb, thres);
 
 	if (regioncounter) {
-		vector<int> final(regioncounter + 1);
+		std::vector<int> final(regioncounter + 1);
 		normalize_array(myregions, ctrl1->m_pos, lx, ly, regioncounter, myarray, lista, listb, final);
 	}
 }
@@ -1316,7 +1316,7 @@ void Iwa_Particles_Engine::fill_subregions(int cont_index, vector<vector<TPointD
 /*-----------------------------------------------------------------*/
 
 /*- 入力画像のアルファ値に比例して発生濃度を変える 各Pointにウェイトを持たせる -*/
-void Iwa_Particles_Engine::fill_single_region(vector<TPointD> &myregions,
+void Iwa_Particles_Engine::fill_single_region(std::vector<TPointD> &myregions,
 											  TTile *ctrl1, int threshold,
 											  bool do_source_gradation,
 											  QList<QList<int>> &myHistogram,
@@ -1405,7 +1405,7 @@ void Iwa_Particles_Engine::initParticleOrigins(TRectD &resourceTileBBox,
 											   const double frame, const TAffine affine,
 											   struct particles_values &values,
 											   int level_n,
-											   vector<int> &lastframe, /*- 素材カラムのフレーム長 -*/
+												 std::vector<int> &lastframe, /*- 素材カラムのフレーム長 -*/
 											   double pixelMargin)
 {
 	/*- 敷き詰め三角形の一辺の長さをピクセル単位に換算する -*/
@@ -1524,7 +1524,7 @@ void Iwa_Particles_Engine::renderBackground(TTile *tile,
 											QList<ParticleOrigin> &origins,
 											std::vector<TRasterFxPort *> part_ports,
 											const TRenderSettings &ri,
-											vector<TLevelP> partLevel,
+											std::vector<TLevelP> partLevel,
 											std::map<std::pair<int, int>, float> &partScales,
 											TTile *baseImgTile)
 {
@@ -1566,7 +1566,7 @@ void Iwa_Particles_Engine::renderBackground(TTile *tile,
 
 		TRasterP ras;
 
-		string alias;
+		std::string alias;
 		TRasterImageP rimg;
 		if (rimg = partLevel[origin.level]->frame(ndx)) {
 			ras = rimg->getRaster();

@@ -119,7 +119,7 @@ void TreeStageNode::sortChildren(int startIndex, int lastIndex)
 {
 	if (startIndex == lastIndex)
 		return;
-	vector<TreeStageNode *>::iterator begin, end;
+	std::vector<TreeStageNode *>::iterator begin, end;
 	begin = m_cildren.begin() + startIndex;
 	end = m_cildren.begin() + lastIndex;
 	std::sort(begin, end, CompareNodes());
@@ -670,7 +670,7 @@ void StageSchematicScene::reorderScene()
 void StageSchematicScene::placeNodes()
 {
 	// search all possible roots
-	vector<TreeStageNode *> roots;
+	std::vector<TreeStageNode *> roots;
 	findRoots(roots);
 
 	//sorts the roots container. Sortijg rules are specified by CompareNodes class
@@ -720,7 +720,7 @@ void StageSchematicScene::placeNodes()
 
 //------------------------------------------------------------------
 
-void StageSchematicScene::findRoots(vector<TreeStageNode *> &roots)
+void StageSchematicScene::findRoots(std::vector<TreeStageNode *> &roots)
 {
 	TStageObjectTree *pegTree = m_xshHandle->getXsheet()->getStageObjectTree();
 	int i;

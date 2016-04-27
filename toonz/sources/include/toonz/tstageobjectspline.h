@@ -41,8 +41,8 @@ class DVAPI TStageObjectSpline : public TSmartObject, public TPersist
 	TPointD m_dagNodePos;
 
 	int m_id;
-	string m_idBase;
-	string m_name;
+	std::string m_idBase;
+	std::string m_name;
 	bool m_isOpened;
 	std::vector<TDoubleParam *> m_posPathParams;
 
@@ -68,8 +68,8 @@ public:
 
 	int getId() const;
 	void setId(int id);
-	string getName() const;
-	void setName(const string &name) { m_name = name; }
+	std::string getName() const;
+	void setName(const std::string &name) { m_name = name; }
 
 	bool isOpened() const { return m_isOpened; }
 	void setIsOpened(bool value) { m_isOpened = value; }
@@ -77,7 +77,7 @@ public:
 	void loadData(TIStream &is);
 	void saveData(TOStream &os);
 
-	string getIconId();
+	std::string getIconId();
 
 	//! add the PosPath param if you want to update keyframes values
 	//! when the stroke changes. addParam() calls param->addRef()

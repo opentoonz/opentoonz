@@ -16,7 +16,9 @@ Please refer to the OpenToonz site at <https://opentoonz.github.io/e/index.html>
 
 ## Installation
 
-Please download and install OpenToonz from the installers at <https://opentoonz.github.io/e/index.html>.
+Please download and install OpenToonz from the latest installer at <https://opentoonz.github.io/e/index.html>.
+
+Older versions and unstable nightly build are also available at <https://github.com/opentoonz/opentoonz/releases>.
 
 ## How to Build Locally
 

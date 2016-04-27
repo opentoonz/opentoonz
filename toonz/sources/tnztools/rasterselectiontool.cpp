@@ -853,7 +853,7 @@ void RasterSelectionTool::computeBBox()
 	m_centers.clear();
 
 	{
-		vector<TStroke> strokes = m_rasterSelection.getStrokes();
+		std::vector<TStroke> strokes = m_rasterSelection.getStrokes();
 		TRectD strokesRect = m_rasterSelection.getStrokesBound(strokes);
 		DragSelectionTool::FourPoints p;
 		p = strokesRect;
@@ -970,7 +970,7 @@ void RasterSelectionTool::onActivate()
 
 //-----------------------------------------------------------------------------
 
-bool RasterSelectionTool::onPropertyChanged(string propertyName)
+bool RasterSelectionTool::onPropertyChanged(std::string propertyName)
 {
 	if (!SelectionTool::onPropertyChanged(propertyName))
 		return false;

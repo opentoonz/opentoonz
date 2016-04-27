@@ -108,7 +108,7 @@ public:
 	Type m_type;
 	double m_numericVal;
 	TRaster32P m_r;
-	string m_string;
+	std::string m_string;
 
 	TStyleParam()
 		: m_type(SP_NONE), m_numericVal(0), m_r(), m_string()
@@ -142,7 +142,7 @@ public:
 	{
 	}
 
-	TStyleParam(const string &x)
+	TStyleParam(const std::string &x)
 		: m_type(SP_STRING), m_numericVal(0), m_r(), m_string(x)
 	{
 	}
@@ -180,11 +180,11 @@ the description in the PLI specific document
 class TextTag : public PliObjectTag
 {
 public:
-	string m_text;
+	std::string m_text;
 
 	TextTag();
 	TextTag(const TextTag &textTag);
-	TextTag(const string &text);
+	TextTag(const std::string &text);
 };
 
 //=====================================================================
@@ -506,7 +506,7 @@ public:
 	//aggiuti questi 2 membri per salvare la paletta globale
 
 	//vector<bool> m_idWrittenColorsArray;
-	vector<PliObjectTag *> m_palette_tags;
+	std::vector<PliObjectTag *> m_palette_tags;
 	// these two functions are used to browse the tag list,
 	// code example:   for (PliTag *tag = getFirstTag(); tag; tag = getNextTag()) {}
 

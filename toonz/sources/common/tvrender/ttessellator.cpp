@@ -307,7 +307,7 @@ void TglTessellator::tessellate(const TColorFunction *cf, const bool antiAliasin
 		tglEnableLineSmooth();
 
 		for (TRegionOutline::Boundary::iterator poly_it = outline.m_exterior.begin(); poly_it != outline.m_exterior.end(); ++poly_it) {
-			vector<GLdouble> v;
+			std::vector<GLdouble> v;
 			if (poly_it->size() == 0)
 				continue;
 			v.resize(poly_it->size() * 2);
@@ -326,7 +326,7 @@ void TglTessellator::tessellate(const TColorFunction *cf, const bool antiAliasin
 		}
 
 		for (TRegionOutline::Boundary::iterator poly_it = outline.m_interior.begin(); poly_it != outline.m_interior.end(); ++poly_it) {
-			vector<GLdouble> v;
+			std::vector<GLdouble> v;
 			v.resize(poly_it->size() * 2);
 			int i = 0;
 			for (TRegionOutline::PointVector::iterator it = poly_it->begin(); it != poly_it->end(); ++it) {

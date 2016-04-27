@@ -53,7 +53,7 @@ public:
 		: m_cell(&cell), m_imgAff(imgAff), m_mcell(&mcell), m_matchAff(matchAff){};
 };
 
-void mergeCmapped(const vector<MergeCmappedPair> &matchingLevels)
+void mergeCmapped(const std::vector<MergeCmappedPair> &matchingLevels)
 {
 	if (matchingLevels.empty())
 		return;
@@ -139,7 +139,7 @@ void mergeCmapped(const vector<MergeCmappedPair> &matchingLevels)
 	if (it == usedColors.end()) //this means that the merged palette does not differ from source palette.(all usedColors are not new color )
 		return;
 
-	wstring pageName = L"merged palettes";
+	std::wstring pageName = L"merged palettes";
 
 	for (i = 0; i < palette->getPageCount(); i++)
 		if (palette->getPage(i)->getName() == pageName) {
@@ -165,11 +165,11 @@ void mergeCmapped(const vector<MergeCmappedPair> &matchingLevels)
 
 /*------------------------------------------------------------------------*/
 
-void applyDeleteMatchline(TXshSimpleLevel *sl, const vector<TFrameId> &fids, const vector<int> &_inkIndexes)
+void applyDeleteMatchline(TXshSimpleLevel *sl, const std::vector<TFrameId> &fids, const std::vector<int> &_inkIndexes)
 {
 	TPalette::Page *page = 0;
 	int i, j, pageIndex = 0;
-	vector<int> inkIndexes = _inkIndexes;
+	std::vector<int> inkIndexes = _inkIndexes;
 
 	if (fids.empty())
 		return;
@@ -226,11 +226,11 @@ class DeleteMatchlineUndo : public TUndo
 public:
 	TXshLevel *m_xl;
 	TXshSimpleLevel *m_sl;
-	vector<TFrameId> m_fids;
-	vector<int> m_indexes;
+	std::vector<TFrameId> m_fids;
+	std::vector<int> m_indexes;
 	TPaletteP m_matchlinePalette;
 
-	DeleteMatchlineUndo(TXshLevel *xl, TXshSimpleLevel *sl, const vector<TFrameId> &fids, const vector<int> &indexes) //, TPalette*matchPalette)
+	DeleteMatchlineUndo(TXshLevel *xl, TXshSimpleLevel *sl, const std::vector<TFrameId> &fids, const std::vector<int> &indexes) //, TPalette*matchPalette)
 		: TUndo(),
 		  m_xl(xl),
 		  m_sl(sl),
@@ -351,7 +351,7 @@ class MergeCmappedUndo : public TUndo
 	TXshSimpleLevel *m_level;
 	TPalette *m_palette;
 	int m_column, m_mColumn;
-	wstring m_fullpath;
+	std::wstring m_fullpath;
 
 public:
 	MergeCmappedUndo(TXshLevel *xl, int mergeCmappedSessionId,
@@ -369,7 +369,7 @@ public:
 		std::map<TFrameId, QString>::const_iterator it = m_images.begin();
 		TPalette *palette = m_palette->clone();
 		m_level->setPalette(palette);
-		vector<TFrameId> fids;
+		std::vector<TFrameId> fids;
 		for (; it != m_images.end(); ++it) //, ++mit)
 		{
 			QString id = "MergeCmappedUndo" + QString::number(m_mergeCmappedSessionId) + "-" + QString::number(it->first.getNumber());
@@ -457,8 +457,8 @@ void mergeCmapped(int column, int mColumn, const QString &fullpath, bool isRedo)
 
 	if (start > end)
 		return;
-	vector<TXshCell> cell(std::max(end, mEnd) - std::min(start, mStart) + 1);
-	vector<TXshCell> mCell(cell.size());
+	std::vector<TXshCell> cell(std::max(end, mEnd) - std::min(start, mStart) + 1);
+	std::vector<TXshCell> mCell(cell.size());
 
 	xsh->getCells(std::min(start, mStart), column, cell.size(), &(cell[0]));
 
@@ -468,7 +468,7 @@ void mergeCmapped(int column, int mColumn, const QString &fullpath, bool isRedo)
 	TXshColumn *col = xsh->getColumn(column);
 	TXshColumn *mcol = xsh->getColumn(mColumn);
 
-	vector<MergeCmappedPair> matchingLevels;
+	std::vector<MergeCmappedPair> matchingLevels;
 
 	std::map<MergedPair, TFrameId> computedMergedMap;
 
@@ -618,7 +618,7 @@ const TXshCell *findCell(int column, const TFrameId &fid)
 	return 0;
 }
 
-bool contains(const vector<TFrameId> &v, const TFrameId &val)
+bool contains(const std::vector<TFrameId> &v, const TFrameId &val)
 {
 	int i;
 	for (i = 0; i < (int)v.size(); i++)
@@ -665,9 +665,9 @@ QString indexes2string(const std::set<TFrameId> fids)
 
 //-----------------------------------------------------------------------------
 
-vector<int> string2Indexes(const QString &values)
+std::vector<int> string2Indexes(const QString &values)
 {
-	vector<int> ret;
+	std::vector<int> ret;
 	int i, j;
 	bool ok;
 	QStringList vals = values.split(',', QString::SkipEmptyParts);
@@ -675,20 +675,20 @@ vector<int> string2Indexes(const QString &values)
 		if (vals.at(i).contains('-')) {
 			QStringList vals1 = vals.at(i).split('-', QString::SkipEmptyParts);
 			if (vals1.size() != 2)
-				return vector<int>();
+				return std::vector<int>();
 			int from = vals1.at(0).toInt(&ok);
 			if (!ok)
-				return vector<int>();
+				return std::vector<int>();
 			int to = vals1.at(1).toInt(&ok);
 			if (!ok)
-				return vector<int>();
+				return std::vector<int>();
 
 			for (j = tmin(from, to); j <= tmax(from, to); j++)
 				ret.push_back(j);
 		} else {
 			int val = vals.at(i).toInt(&ok);
 			if (!ok)
-				return vector<int>();
+				return std::vector<int>();
 			ret.push_back(val);
 		}
 	}

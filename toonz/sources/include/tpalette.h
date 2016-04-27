@@ -86,16 +86,16 @@ public:
 		friend class TPalette;
 
 	private:
-		wstring m_name;			//!< Name of the page to be displayed.
+		std::wstring m_name;			//!< Name of the page to be displayed.
 		int m_index;			//!< Index of the page in the palette's pages collection.
 		TPalette *m_palette;	//!< (\p not \p owned)  Palette the page refers to.
-		vector<int> m_styleIds; //!< Palette style ids contained in the page.
+		std::vector<int> m_styleIds; //!< Palette style ids contained in the page.
 
 	public:
-		Page(wstring name);
+		Page(std::wstring name);
 
-		wstring getName() const { return m_name; }	//!< Returns the name of the page.
-		void setName(wstring name) { m_name = name; } //!< Sets the name of the page.
+		std::wstring getName() const { return m_name; }	//!< Returns the name of the page.
+		void setName(std::wstring name) { m_name = name; } //!< Sets the name of the page.
 
 		TPalette *getPalette() const { return m_palette; } //!< Returns a pointer to the palette that contains this page.
 
@@ -177,7 +177,7 @@ public:
 	static TFilePath getRootDir();
 
 	std::wstring getGlobalName() const { return m_globalName; } //!< Returns the name of the palette object.
-	void setGlobalName(wstring name) { m_globalName = name; }   //!< Assigns the name of the palette.
+	void setGlobalName(std::wstring name) { m_globalName = name; }   //!< Assigns the name of the palette.
 
 	void setDirtyFlag(bool dirtyFlag) //!< Declares the palette \a changed with respect to the last <I>saved state</I>.
 	{
@@ -216,7 +216,7 @@ public:
 	/*!
     \return  A pointer to the newly created page.
   */
-	Page *addPage(wstring name); //!< Creates a new page with the specified name.
+	Page *addPage(std::wstring name); //!< Creates a new page with the specified name.
 	void erasePage(int index);   //!< Deletes the \a index-th page.
 
 	void movePage(Page *page, int dstPageIndex); //!< Moves the specified page to a different page index.
@@ -287,8 +287,8 @@ public:
 												 //!  or \p -1 if it couldn't be found.
 	void setShortcutValue(int key, int styleId); //!< Associates the specified key to a styleId.
 
-	void setPaletteName(wstring name) { m_paletteName = name; } //!< Sets the name of the palette.
-	wstring getPaletteName() const { return m_paletteName; }	//!< Returns the name of the palette.
+	void setPaletteName(std::wstring name) { m_paletteName = name; } //!< Sets the name of the palette.
+	std::wstring getPaletteName() const { return m_paletteName; }	//!< Returns the name of the palette.
 
 	QMutex *mutex() { return &m_mutex; } //!< Returns the palette's mutex
 

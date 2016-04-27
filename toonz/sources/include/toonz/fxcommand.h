@@ -83,18 +83,18 @@ DVAPI void connectNodesToXsheet(const std::list<TFxP> &fxs, TXsheetHandle *xshHa
 DVAPI void deleteSelection(const std::list<TFxP> &fxs, const std::list<Link> &links,
 						   const std::list<int> &columnIndexes,
 						   TXsheetHandle *xshHandle, TFxHandle *fxHandle);
-DVAPI void pasteFxs(const std::list<TFxP> &fxs, const map<TFx *, int> &zeraryFxColumnSize, const std::list<TXshColumnP> &columns,
+DVAPI void pasteFxs(const std::list<TFxP> &fxs, const std::map<TFx *, int> &zeraryFxColumnSize, const std::list<TXshColumnP> &columns,
 					const TPointD &pos, TXsheetHandle *xshHandle, TFxHandle *fxHandle);
-DVAPI void insertPasteFxs(const Link &link, const std::list<TFxP> &fxs, const map<TFx *, int> &zeraryFxColumnSize,
+DVAPI void insertPasteFxs(const Link &link, const std::list<TFxP> &fxs, const std::map<TFx *, int> &zeraryFxColumnSize,
 						  const std::list<TXshColumnP> &columns, TXsheetHandle *xshHandle, TFxHandle *fxHandle);
-DVAPI void addPasteFxs(TFx *inFx, const std::list<TFxP> &fxs, const map<TFx *, int> &zeraryFxColumnSize,
+DVAPI void addPasteFxs(TFx *inFx, const std::list<TFxP> &fxs, const std::map<TFx *, int> &zeraryFxColumnSize,
 					   const std::list<TXshColumnP> &columns, TXsheetHandle *xshHandle, TFxHandle *fxHandle);
-DVAPI void replacePasteFxs(TFx *inFx, const std::list<TFxP> &fxs, const map<TFx *, int> &zeraryFxColumnSize,
+DVAPI void replacePasteFxs(TFx *inFx, const std::list<TFxP> &fxs, const std::map<TFx *, int> &zeraryFxColumnSize,
 						   const std::list<TXshColumnP> &columns, TXsheetHandle *xshHandle, TFxHandle *fxHandle);
-DVAPI void renameFx(TFx *fx, const wstring &newName, TXsheetHandle *xshHandle);
+DVAPI void renameFx(TFx *fx, const std::wstring &newName, TXsheetHandle *xshHandle);
 DVAPI void groupFxs(const std::list<TFxP> &fxs, TXsheetHandle *xshHandle);
 DVAPI void ungroupFxs(int groupId, TXsheetHandle *xshHandle);
-DVAPI void renameGroup(const std::list<TFxP> &fxs, const wstring &name, bool fromEditor, TXsheetHandle *xshHandle);
+DVAPI void renameGroup(const std::list<TFxP> &fxs, const std::wstring &name, bool fromEditor, TXsheetHandle *xshHandle);
 
 } // namespace TFxCommand
 

@@ -60,7 +60,7 @@ bool TXshPaletteColumn::canSetCell(const TXshCell &cell) const
 
 void TXshPaletteColumn::loadData(TIStream &is)
 {
-	string tagName;
+	std::string tagName;
 	while (is.openChild(tagName)) {
 		if (tagName == "cells") {
 			while (is.openChild(tagName)) {

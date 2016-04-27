@@ -606,7 +606,7 @@ void TApp::onLevelColorStyleSwitched()
 			if (!sl)
 				return;
 
-			vector<TFrameId> fids;
+			std::vector<TFrameId> fids;
 			sl->getFids(fids);
 
 			for (int i = 0; i < (int)fids.size(); i++)

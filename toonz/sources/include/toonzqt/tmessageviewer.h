@@ -48,7 +48,7 @@ class DVAPI TMessageViewer : public QFrame
 	Q_OBJECT
 
 protected:
-	static vector<TMessageViewer *> m_tmsgViewers;
+	static std::vector<TMessageViewer *> m_tmsgViewers;
 	MySortFilterProxyModel *m_proxyModel;
 	void rowsInserted(const QModelIndex &parent, int start, int end);
 

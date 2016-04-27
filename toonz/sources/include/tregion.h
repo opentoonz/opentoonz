@@ -221,7 +221,7 @@ public:
 	void print();
 
 	//friend void addRegion(vector<TRegion*>& regionArray, TRegion *region);
-	void computeScanlineIntersections(double y, vector<double> &intersections) const;
+	void computeScanlineIntersections(double y, std::vector<double> &intersections) const;
 
 	int scanlineIntersectionsBefore(double x, double y, bool horiz) const;
 	int leftScanlineIntersections(double x, double y) const

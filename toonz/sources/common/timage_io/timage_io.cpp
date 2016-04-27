@@ -92,7 +92,7 @@ void TImageReader::close()
 /*!
   Opens for reading using \b fopen().
 */
-void TImageReader::getTzpPaletteColorNames(map<int, pair<string, string>> &pltColorNames)
+void TImageReader::getTzpPaletteColorNames(std::map<int, std::pair<std::string, std::string>> &pltColorNames)
 {
 	if (!m_file)
 		open();
@@ -110,7 +110,7 @@ void TImageReader::open()
 {
 	assert(m_file == NULL);
 
-	string type = toLower(m_path.getType());
+	std::string type = toLower(m_path.getType());
 	m_file = fopen(m_path, "rb"); //Opens for reading. If the file does not exist or cannot be found, the fopen_s call fails
 
 	if (m_file == NULL) //Non dovrebbe mai andarci!
@@ -132,7 +132,7 @@ void TImageReader::open()
 			QString msg = QString::fromStdWString(e.getMessage());
 			if (msg == QString("Old 4.1 Palette"))
 				throw e;
-		} catch (string str) {
+		} catch (std::string str) {
 			if (str == "Tiff file closed")
 				m_file = NULL;
 		}
@@ -818,7 +818,7 @@ const TImageInfo *TImageReader::getImageInfo() const
 //
 //===========================================================
 
-TImageException::TImageException(const TFilePath &fp, const string &msg)
+TImageException::TImageException(const TFilePath &fp, const std::string &msg)
 	: TException(msg), m_fp(fp)
 {
 }

@@ -380,10 +380,10 @@ public:
 	TFx();
 	virtual ~TFx();
 
-	virtual wstring getName() const;
-	void setName(wstring name);
-	wstring getFxId() const;
-	void setFxId(wstring id);
+	virtual std::wstring getName() const;
+	void setName(std::wstring name);
+	std::wstring getFxId() const;
+	void setFxId(std::wstring id);
 
 	TParamContainer *getParams();
 	const TParamContainer *getParams() const;
@@ -404,7 +404,7 @@ public:
 												   //!  returns false on duplicate names. Ownership is transferred to the group.
 	bool removeInputPort(const std::string &name); //!< Removes the port with given name, returns false if not found.
 
-	bool renamePort(const string &oldName, const string &newName);
+	bool renamePort(const std::string &oldName, const std::string &newName);
 
 	bool connect(const std::string &name, TFx *other); //!< Equivalent to getInputPort(name)->setFx(other).
 	bool disconnect(const std::string &name);		   //!< Equivalent to getInputPort(name)->setFx(0).
@@ -457,10 +457,10 @@ public:
 		params = 0, length = 0;
 	}
 
-	inline string getFxType() const;
-	virtual string getPluginId() const = 0;
+	inline std::string getFxType() const;
+	virtual std::string getPluginId() const = 0;
 
-	static TFx *create(string name);
+	static TFx *create(std::string name);
 
 	// TParamObserver-related methods
 	void onChange(const TParamChange &c);
@@ -481,7 +481,7 @@ public:
 
 	TFxAttributes *getAttributes() const;
 
-	virtual string getAlias(double frame, const TRenderSettings &info) const { return ""; }
+	virtual std::string getAlias(double frame, const TRenderSettings &info) const { return ""; }
 
 	//! Compatibility function - used to translate a port name from older Toonz
 	//! versions into its current form.
@@ -533,7 +533,7 @@ public:
 
 //-------------------------------------------------------------------
 
-inline string TFx::getFxType() const
+inline std::string TFx::getFxType() const
 {
 	return getDeclaration()->getId();
 }

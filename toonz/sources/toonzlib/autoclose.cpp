@@ -81,17 +81,17 @@ public:
 	}
 
 	//.......................
-	void compute(vector<Segment> &closingSegmentArray);
-	void draw(const vector<Segment> &closingSegmentArray);
-	void skeletonize(vector<TPoint> &endpoints);
-	void findSeeds(vector<Seed> &seeds, vector<TPoint> &endpoints);
-	void erase(vector<Seed> &seeds, vector<TPoint> &endpoints);
+	void compute(std::vector<Segment> &closingSegmentArray);
+	void draw(const std::vector<Segment> &closingSegmentArray);
+	void skeletonize(std::vector<TPoint> &endpoints);
+	void findSeeds(std::vector<Seed> &seeds, std::vector<TPoint> &endpoints);
+	void erase(std::vector<Seed> &seeds, std::vector<TPoint> &endpoints);
 	void circuitAndMark(UCHAR *seed, UCHAR preseed);
-	bool circuitAndCancel(UCHAR *seed, UCHAR preseed, vector<TPoint> &endpoints);
-	void findMeetingPoints(vector<TPoint> &endpoints, vector<Segment> &closingSegments);
-	void calculateWeightAndDirection(vector<Segment> &orientedEndpoints);
-	bool spotResearchTwoPoints(vector<Segment> &endpoints, vector<Segment> &closingSegments);
-	bool spotResearchOnePoint(vector<Segment> &endpoints, vector<Segment> &closingSegments);
+	bool circuitAndCancel(UCHAR *seed, UCHAR preseed, std::vector<TPoint> &endpoints);
+	void findMeetingPoints(std::vector<TPoint> &endpoints, std::vector<Segment> &closingSegments);
+	void calculateWeightAndDirection(std::vector<Segment> &orientedEndpoints);
+	bool spotResearchTwoPoints(std::vector<Segment> &endpoints, std::vector<Segment> &closingSegments);
+	bool spotResearchOnePoint(std::vector<Segment> &endpoints, std::vector<Segment> &closingSegments);
 
 	void copy(const TRasterGR8P &braux, TRaster32P &raux);
 	int exploreTwoSpots(const TAutocloser::Segment &s0, const TAutocloser::Segment &s1);
@@ -102,7 +102,7 @@ public:
 	bool exploreRay(UCHAR *br, Segment s, TPoint &p);
 	void visitPix(UCHAR *br, int toVisit, const TPoint &dis);
 	void cancelMarks(UCHAR *br);
-	void cancelFromArray(vector<Segment> &array, TPoint p, int &count);
+	void cancelFromArray(std::vector<Segment> &array, TPoint p, int &count);
 };
 
 /*------------------------------------------------------------------------*/
@@ -251,9 +251,9 @@ return;
 } //namespace
 /*------------------------------------------------------------------------*/
 
-void TAutocloser::Imp::compute(vector<Segment> &closingSegmentArray)
+void TAutocloser::Imp::compute(std::vector<Segment> &closingSegmentArray)
 {
-	vector<TPoint> endpoints;
+	std::vector<TPoint> endpoints;
 	try {
 
 		assert(closingSegmentArray.empty());
@@ -302,7 +302,7 @@ void TAutocloser::Imp::compute(vector<Segment> &closingSegmentArray)
 
 /*------------------------------------------------------------------------*/
 
-void TAutocloser::Imp::draw(const vector<Segment> &closingSegmentArray)
+void TAutocloser::Imp::draw(const std::vector<Segment> &closingSegmentArray)
 {
 	TRasterCM32P raux;
 
@@ -368,7 +368,7 @@ inline int distance2(const TPoint p0, const TPoint p1)
 
 /*=============================================================================*/
 
-int closerPoint(const vector<TAutocloser::Segment> &points, vector<bool> &marks, int index)
+int closerPoint(const std::vector<TAutocloser::Segment> &points, std::vector<bool> &marks, int index)
 {
 	assert(points.size() == marks.size());
 
@@ -531,8 +531,7 @@ int TAutocloser::Imp::exploreTwoSpots(const TAutocloser::Segment &s0, const TAut
 
 /*------------------------------------------------------------------------*/
 
-void TAutocloser::Imp::findMeetingPoints(vector<TPoint> &endpoints,
-										 vector<Segment> &closingSegments)
+void TAutocloser::Imp::findMeetingPoints(std::vector<TPoint> &endpoints, std::vector<Segment> &closingSegments)
 {
 	int i;
 	double alfa;
@@ -546,7 +545,7 @@ void TAutocloser::Imp::findMeetingPoints(vector<TPoint> &endpoints,
 	m_csb = cos(-alfa);
 	m_snb = sin(-alfa);
 
-	vector<Segment> orientedEndpoints(endpoints.size());
+	std::vector<Segment> orientedEndpoints(endpoints.size());
 	for (i = 0; i < (int)endpoints.size(); i++)
 		orientedEndpoints[i].first = endpoints[i];
 
@@ -566,7 +565,7 @@ void TAutocloser::Imp::findMeetingPoints(vector<TPoint> &endpoints,
 
 /*------------------------------------------------------------------------*/
 
-bool allMarked(const vector<bool> &marks, int index)
+bool allMarked(const std::vector<bool> &marks, int index)
 {
 	int i;
 
@@ -578,12 +577,12 @@ bool allMarked(const vector<bool> &marks, int index)
 
 /*------------------------------------------------------------------------*/
 
-bool TAutocloser::Imp::spotResearchTwoPoints(vector<Segment> &endpoints, vector<Segment> &closingSegments)
+bool TAutocloser::Imp::spotResearchTwoPoints(std::vector<Segment> &endpoints, std::vector<Segment> &closingSegments)
 {
 	int i, distance, current = 0, closerIndex;
 	int sqrDistance = m_closingDistance * m_closingDistance;
 	bool found = 0;
-	vector<bool> marks(endpoints.size());
+	std::vector<bool> marks(endpoints.size());
 
 	while (current < (int)endpoints.size() - 1) {
 		found = 0;
@@ -648,7 +647,7 @@ return 0;
 
 /*------------------------------------------------------------------------*/
 
-void TAutocloser::Imp::calculateWeightAndDirection(vector<Segment> &orientedEndpoints)
+void TAutocloser::Imp::calculateWeightAndDirection(std::vector<Segment> &orientedEndpoints)
 {
 	//UCHAR *br;
 	int lx = m_raster->getLx();
@@ -694,7 +693,7 @@ void TAutocloser::Imp::calculateWeightAndDirection(vector<Segment> &orientedEndp
 
 /*------------------------------------------------------------------------*/
 
-bool TAutocloser::Imp::spotResearchOnePoint(vector<Segment> &endpoints, vector<Segment> &closingSegments)
+bool TAutocloser::Imp::spotResearchOnePoint(std::vector<Segment> &endpoints, std::vector<Segment> &closingSegments)
 {
 	int count = 0;
 	bool ret = false;
@@ -704,7 +703,7 @@ bool TAutocloser::Imp::spotResearchOnePoint(vector<Segment> &endpoints, vector<S
 
 		if (exploreSpot(endpoints[count], p)) {
 			Segment segment(endpoints[count].first, p);
-			vector<Segment>::iterator it = std::find(closingSegments.begin(), closingSegments.end(), segment);
+			std::vector<Segment>::iterator it = std::find(closingSegments.begin(), closingSegments.end(), segment);
 			if (it == closingSegments.end()) {
 				ret = true;
 				drawInByteRaster(endpoints[count].first, p);
@@ -945,9 +944,9 @@ void TAutocloser::Imp::cancelMarks(UCHAR *br)
 
 /*=============================================================================*/
 
-void TAutocloser::Imp::skeletonize(vector<TPoint> &endpoints)
+void TAutocloser::Imp::skeletonize(std::vector<TPoint> &endpoints)
 {
-	vector<Seed> seeds;
+	std::vector<Seed> seeds;
 
 	findSeeds(seeds, endpoints);
 
@@ -956,7 +955,7 @@ void TAutocloser::Imp::skeletonize(vector<TPoint> &endpoints)
 
 /*------------------------------------------------------------------------*/
 
-void TAutocloser::Imp::findSeeds(vector<Seed> &seeds, vector<TPoint> &endpoints)
+void TAutocloser::Imp::findSeeds(std::vector<Seed> &seeds, std::vector<TPoint> &endpoints)
 {
 	int i, j;
 	UCHAR preseed;
@@ -1011,7 +1010,7 @@ void TAutocloser::Imp::circuitAndMark(UCHAR *seed, UCHAR preseed)
 
 /*------------------------------------------------------------------------*/
 
-void TAutocloser::Imp::erase(vector<Seed> &seeds, vector<TPoint> &endpoints)
+void TAutocloser::Imp::erase(std::vector<Seed> &seeds, std::vector<TPoint> &endpoints)
 {
 	int i, size = 0, oldSize;
 	UCHAR *seed, preseed, code, displ;
@@ -1050,7 +1049,7 @@ void TAutocloser::Imp::erase(vector<Seed> &seeds, vector<TPoint> &endpoints)
 
 /*------------------------------------------------------------------------*/
 
-bool TAutocloser::Imp::circuitAndCancel(UCHAR *seed, UCHAR preseed, vector<TPoint> &endpoints)
+bool TAutocloser::Imp::circuitAndCancel(UCHAR *seed, UCHAR preseed, std::vector<TPoint> &endpoints)
 {
 	UCHAR *walker, *previous;
 	UCHAR displ, prewalker;
@@ -1108,7 +1107,7 @@ bool TAutocloser::Imp::circuitAndCancel(UCHAR *seed, UCHAR preseed, vector<TPoin
 
 /*=============================================================================*/
 
-void TAutocloser::Imp::cancelFromArray(vector<Segment> &array, TPoint p, int &count)
+void TAutocloser::Imp::cancelFromArray(std::vector<Segment> &array, TPoint p, int &count)
 {
 	std::vector<Segment>::iterator it = array.begin();
 	int i = 0;
@@ -1152,7 +1151,7 @@ TAutocloser::TAutocloser(const TRasterP &r, int distance, double angle, int inde
 
 void TAutocloser::exec()
 {
-	vector<TAutocloser::Segment> segments;
+	std::vector<TAutocloser::Segment> segments;
 	compute(segments);
 	draw(segments);
 }
@@ -1165,13 +1164,13 @@ TAutocloser::~TAutocloser()
 
 //-------------------------------------------------
 
-void TAutocloser::compute(vector<Segment> &closingSegmentArray)
+void TAutocloser::compute(std::vector<Segment> &closingSegmentArray)
 {
 	m_imp->compute(closingSegmentArray);
 }
 //-------------------------------------------------
 
-void TAutocloser::draw(const vector<Segment> &closingSegmentArray)
+void TAutocloser::draw(const std::vector<Segment> &closingSegmentArray)
 {
 	m_imp->draw(closingSegmentArray);
 }

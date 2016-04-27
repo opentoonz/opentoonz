@@ -25,7 +25,7 @@
 
 //=========================================================
 
-const string Tiio::JpgWriterProperties::QUALITY("Quality");
+const std::string Tiio::JpgWriterProperties::QUALITY("Quality");
 
 //=========================================================
 

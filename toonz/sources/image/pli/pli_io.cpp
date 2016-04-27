@@ -125,7 +125,7 @@ public:
 		return *this;
 	}
 	MyOfstream &operator<<(const TRaster32P &r);
-	MyOfstream &operator<<(const string &r);
+	MyOfstream &operator<<(const std::string &r);
 	MyOfstream &writeBuf(void *un, UINT s)
 	{
 		write((char *)un, s);
@@ -150,7 +150,7 @@ MyOfstream &MyOfstream::operator<<(const TRaster32P &r)
 
 /*=====================================================================*/
 
-MyOfstream &MyOfstream::operator<<(const string &s)
+MyOfstream &MyOfstream::operator<<(const std::string &s)
 {
 
 	(*this) << (USHORT)s.size();
@@ -1282,7 +1282,7 @@ PliTag *ParsedPliImp::readColorTag()
 
 PliTag *ParsedPliImp::readStyleTag()
 {
-	vector<TStyleParam> paramArray;
+	std::vector<TStyleParam> paramArray;
 	TUINT32 bufOffs = 0;
 	int lenght = m_tagLength;
 	UINT i;
@@ -2006,7 +2006,7 @@ TUINT32 ParsedPliImp::writeGroupTag(GroupTag *tag)
 
 	TUINT32 offset, tagLength;
 	int maxval = 0, minval = 100000;
-	vector<TUINT32> objectOffset(tag->m_numObjects);
+	std::vector<TUINT32> objectOffset(tag->m_numObjects);
 
 	unsigned int i;
 

@@ -428,139 +428,57 @@ bool CameraSettingsWidget::parsePresetString(const QString &str,
 											 double &ar,
 											 bool forCleanup)
 {
-	int len = str.length();
-	int i = len - 1;
-	while (i >= 0 && str[i] == ' ')
-		i--;
-	int j = i;
+	/*
+	parsing preset string with QString::split().
+	!NOTE! fx/fy (camera size in inch) and xoffset/yoffset (camera offset used in cleanup camera) are optional,
+	in order to keep compatibility with default (Harlequin's) reslist.txt
+	*/
+	
+	QStringList tokens = str.split(",", QString::SkipEmptyParts);
 
-	//--- A/R
-	while (i >= 0 && '0' <= str[i] && str[i] <= '9')
-		i--;
-	if (i == len - 1 || i < 0)
+	if (!(tokens.count() == 3 ||
+		(!forCleanup && tokens.count() == 4) || /*- with "fx x fy" token -*/
+		(forCleanup && tokens.count() == 6)))	/*- with "fx x fy", xoffset and yoffset tokens -*/
 		return false;
-	if (str[i] == '/' || str[i] == '.') {
-		i--;
-		int ii = i;
-		while (i >= 0 && '0' <= str[i] && str[i] <= '9')
-			i--;
-		if (i == ii)
-			return false;
-	}
-	ar = aspectRatioStringToValue(str.mid(i + 1, j - i));
+	/*- name -*/
+	name = tokens[0];
 
-	//--- cleanup camera offsets
-	if (forCleanup) {
-		// yoffset
-		while (i >= 0 && str[i] == ' ')
-			i--;
-		if (i < 0 || str[i] != ',')
-			return false;
-		i--;
-		while (i >= 0 && str[i] == ' ')
-			i--;
-		j = i;
-		while (i >= 0 && str[i] != ',')
-			i--;
-		if (i < 0)
-			return false;
-		i++;
+	/*- xres, yres  (like:  1024x768) -*/
+	QStringList values = tokens[1].split("x");
+	if (values.count() != 2)
+		return false;
+	bool ok;
+	xres = values[0].toInt(&ok);
+	if (!ok) return false;
+	yres = values[1].toInt(&ok);
+	if (!ok) return false;
 
-		yoffset = str.mid(i + 1, j - i);
+	if (tokens.count() >= 4)
+	{
+		/*- fx, fy -*/
+		values = tokens[2].split("x");
+		if (values.count() != 2)
+			return false;
+		fx = values[0].toDouble(&ok);
+		if (!ok) return false;
+		fy = values[1].toDouble(&ok);
+		if (!ok) return false;
 
-		// xoffset
-		while (i >= 0 && str[i] == ' ')
-			i--;
-		if (i < 0 || str[i] != ',')
-			return false;
-		i--;
-		while (i >= 0 && str[i] == ' ')
-			i--;
-		j = i;
-		while (i >= 0 && str[i] != ',')
-			i--;
-		if (i < 0)
-			return false;
-		i++;
-		xoffset = str.mid(i + 1, j - i);
+		/*- xoffset, yoffset -*/
+		if (forCleanup)
+		{
+			xoffset = tokens[3];
+			yoffset = tokens[4];
+			/*- remove single space -*/
+			if (xoffset.startsWith(' '))
+				xoffset.remove(0, 1);
+			if (yoffset.startsWith(' '))
+				yoffset.remove(0, 1);
+		}
 	}
 
-	//--- camera size
-	// fy
-	while (i >= 0 && str[i] == ' ')
-		i--;
-	if (i < 0 || str[i] != ',')
-		return false;
-	i--;
-	while (i >= 0 && str[i] == ' ')
-		i--;
-	j = i;
-	while (i >= 0 && (('0' <= str[i] && str[i] <= '9') || str[i] == '.'))
-		i--;
-	if (j == i || i < 0)
-		return false;
-	fy = str.mid(i + 1, j - i).toDouble();
-	// fx
-	while (i >= 0 && str[i] == ' ')
-		i--;
-	if (i < 0 || str[i] != 'x')
-		return false;
-	i--;
-	while (i >= 0 && str[i] == ' ')
-		i--;
-	j = i;
-	while (i >= 0 && (('0' <= str[i] && str[i] <= '9') || str[i] == '.'))
-		i--;
-	if (j == i || i < 0)
-		return false;
-	fx = str.mid(i + 1, j - i).toDouble();
-
-	// yres
-	while (i >= 0 && str[i] == ' ')
-		i--;
-	if (i < 0 || str[i] != ',')
-		return false;
-	i--;
-	while (i >= 0 && str[i] == ' ')
-		i--;
-	j = i;
-	while (i >= 0 && '0' <= str[i] && str[i] <= '9')
-		i--;
-	if (j == i || i < 0)
-		return false;
-	yres = str.mid(i + 1, j - i).toInt();
-	// xres
-	while (i >= 0 && str[i] == ' ')
-		i--;
-	if (i < 0 || str[i] != 'x')
-		return false;
-	i--;
-	while (i >= 0 && str[i] == ' ')
-		i--;
-	j = i;
-	while (i >= 0 && '0' <= str[i] && str[i] <= '9')
-		i--;
-	if (j == i || i < 0)
-		return false;
-	xres = str.mid(i + 1, j - i).toInt();
-
-	// name
-	while (i >= 0 && str[i] == ' ')
-		i--;
-	if (i >= 0 && str[i] == ',')
-		i--;
-	if (i < 0)
-		return false;
-
-	i++;
-
-	int k = 0;
-	while (k < i && str[k] == ' ')
-		k++;
-	if (k == i)
-		return false;
-	/*--- 1文字のカメラ名にも対応するため ---*/
-	name = str.mid(k, i - k);
+	/*- AR -*/
+	ar = aspectRatioStringToValue(tokens.last());
 
 	return true;
 }
@@ -697,15 +615,15 @@ void CameraSettingsWidget::updatePresetListOm()
 		if (m_forCleanup && m_offsX && m_offsY) {
 			match = xres == m_xResFld->getValue() &&
 					yres == m_yResFld->getValue() &&
-					fx == m_lxFld->getValue() &&
-					fy == m_lyFld->getValue() &&
-					xoffset == m_offsX->text() &&
-					yoffset == m_offsY->text();
+					(fx<0.0 || fx == m_lxFld->getValue()) &&
+					(fy<0.0 || fy == m_lyFld->getValue()) &&
+					(xoffset.isEmpty() || xoffset == m_offsX->text()) &&
+					(yoffset.isEmpty() || yoffset == m_offsY->text());
 		} else {
 			match = xres == m_xResFld->getValue() &&
 					yres == m_yResFld->getValue() &&
-					fx == m_lxFld->getValue() &&
-					fy == m_lyFld->getValue();
+					(fx<0.0 || fx == m_lxFld->getValue()) &&
+					(fy<0.0 || fy == m_lyFld->getValue());
 		}
 	}
 	if (!match)
@@ -930,8 +848,8 @@ void CameraSettingsWidget::onPresetSelected(const QString &str)
 		return;
 	QString name, arStr;
 	int xres = 0, yres = 0;
-	double fx, fy;
-	QString xoffset, yoffset;
+	double fx = -1.0, fy = -1.0;
+	QString xoffset = "", yoffset = "";
 	double ar;
 
 	if (parsePresetString(str,
@@ -946,13 +864,24 @@ void CameraSettingsWidget::onPresetSelected(const QString &str)
 						  m_forCleanup)) {
 		m_xResFld->setValue(xres);
 		m_yResFld->setValue(yres);
-
-		m_lxFld->setValue(fx);
-		m_lyFld->setValue(fy);
 		m_arFld->setValue(ar, tround(xres), tround(yres));
 		m_arValue = ar;
 
-		if (m_forCleanup && m_offsX && m_offsY) {
+		if (fx > 0.0 && fy > 0.0)
+		{
+			m_lxFld->setValue(fx);
+			m_lyFld->setValue(fy);
+		}
+		else
+		{
+			if (m_xPrev->isChecked())
+				hComputeLy();
+			else
+				hComputeLx();
+		}
+
+		if (m_forCleanup && m_offsX && m_offsY && !xoffset.isEmpty() && !yoffset.isEmpty())
+		{
 			m_offsX->setText(xoffset);
 			m_offsY->setText(yoffset);
 			m_offsX->postSetText(); //calls onEditingFinished()
@@ -963,7 +892,7 @@ void CameraSettingsWidget::onPresetSelected(const QString &str)
 		computeXDpi();
 		computeYDpi();
 
-		if (!areAlmostEqual(fx, m_arValue * fy) && m_fspChk->isChecked())
+		if (!areAlmostEqual((double)xres, m_arValue * (double)yres) && m_fspChk->isChecked())
 			m_fspChk->setChecked(false);
 		emit changed();
 	} else {
@@ -999,13 +928,22 @@ void CameraSettingsWidget::addPreset()
 	}
 
 	bool ok;
-	QString qs = DVGui::getText(
-		tr("Preset name"),
-		tr("Enter the name for %1").arg(presetString),
-		"", &ok);
+	QString qs;
+	while (1)
+	{
+		qs = DVGui::getText(
+			tr("Preset name"),
+			tr("Enter the name for %1").arg(presetString),
+			"", &ok);
 
-	if (!ok)
-		return;
+		if (!ok)
+			return;
+
+		if (qs.indexOf(",") != -1)
+			QMessageBox::warning(this, tr("Error : Preset Name is Invalid"), tr("The preset name must not use ','(comma)."));
+		else
+			break;
+	}
 
 	int oldn = m_presetListOm->count();
 	m_presetListOm->addItem(qs + "," + presetString);

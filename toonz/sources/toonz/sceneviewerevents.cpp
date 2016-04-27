@@ -845,7 +845,7 @@ void SceneViewer::keyPressEvent(QKeyEvent *event)
 		QString text = event->text();
 		if ((event->modifiers() & Qt::ShiftModifier))
 			text.toUpper();
-		wstring unicodeChar = text.toStdWString();
+		std::wstring unicodeChar = text.toStdWString();
 		ret = tool->keyDown(key, unicodeChar, flags, pos); // per il textTool
 		if (ret) {
 			update();
@@ -971,7 +971,7 @@ void SceneViewer::contextMenuEvent(QContextMenuEvent *e)
 		return;
 
 	TPoint winPos(e->pos().x(), height() - e->pos().y());
-	vector<int> columnIndices;
+	std::vector<int> columnIndices;
 	// enable to select all the columns regardless of the click position
 	for (int i = 0; i < TApp::instance()->getCurrentXsheet()->getXsheet()->getColumnCount(); i++)
 		columnIndices.push_back(i);

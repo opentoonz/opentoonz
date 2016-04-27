@@ -390,17 +390,17 @@ public:
 
 class ConstantPattern : public Pattern
 {
-	string m_constantName;
+	std::string m_constantName;
 	double m_value;
 
 public:
-	ConstantPattern(string constantName, double value, string description = "")
+	ConstantPattern(std::string constantName, double value, std::string description = "")
 		: m_constantName(constantName), m_value(value)
 	{
 		setDescription(description);
 	}
 
-	string getFirstKeyword() const { return m_constantName; }
+	std::string getFirstKeyword() const { return m_constantName; }
 	bool matchToken(const std::vector<Token> &previousTokens, const Token &token) const
 	{
 		return previousTokens.empty() && token.getText() == m_constantName;
@@ -428,17 +428,17 @@ public:
 
 class VariablePattern : public Pattern
 {
-	string m_variableName;
+	std::string m_variableName;
 	int m_varIdx;
 
 public:
-	VariablePattern(string variableName, int varIdx, string description = "")
+	VariablePattern(std::string variableName, int varIdx, std::string description = "")
 		: m_variableName(variableName), m_varIdx(varIdx)
 	{
 		setDescription(description);
 	}
 
-	string getFirstKeyword() const { return m_variableName; }
+	std::string getFirstKeyword() const { return m_variableName; }
 	bool matchToken(const std::vector<Token> &previousTokens, const Token &token) const
 	{
 		return previousTokens.empty() && token.getText() == m_variableName;
@@ -468,14 +468,14 @@ public:
 template <class Op>
 class Op2Pattern : public Pattern
 {
-	string m_opName;
+	std::string m_opName;
 	int m_priority;
 
 public:
-	Op2Pattern(string opName, int priority)
+	Op2Pattern(std::string opName, int priority)
 		: m_opName(opName), m_priority(priority) {}
 	int getPriority() const { return m_priority; }
-	string getFirstKeyword() const { return m_opName; }
+	std::string getFirstKeyword() const { return m_opName; }
 	bool expressionExpected(const std::vector<Token> &previousTokens) const
 	{
 		return previousTokens.empty() || previousTokens.size() == 2;
@@ -512,7 +512,7 @@ class UnaryMinusPattern : public Pattern
 public:
 	UnaryMinusPattern() {}
 	int getPriority() const { return 50; }
-	string getFirstKeyword() const { return "-"; }
+	std::string getFirstKeyword() const { return "-"; }
 
 	bool expressionExpected(const std::vector<Token> &previousTokens) const
 	{
@@ -546,15 +546,15 @@ public:
 
 class NotPattern : public Pattern
 {
-	string m_prefix;
+	std::string m_prefix;
 
 public:
-	NotPattern(string prefix, string description) : m_prefix(prefix)
+	NotPattern(std::string prefix, std::string description) : m_prefix(prefix)
 	{
 		setDescription(description);
 	}
 	int getPriority() const { return 5; }
-	string getFirstKeyword() const { return m_prefix; }
+	std::string getFirstKeyword() const { return m_prefix; }
 
 	bool expressionExpected(const std::vector<Token> &previousTokens) const
 	{
@@ -590,7 +590,7 @@ class QuestionTernaryPattern : public Pattern
 public:
 	QuestionTernaryPattern() {}
 	int getPriority() const { return 5; }
-	string getFirstKeyword() const { return "?"; }
+	std::string getFirstKeyword() const { return "?"; }
 
 	bool expressionExpected(const std::vector<Token> &previousTokens) const
 	{
@@ -629,7 +629,7 @@ class BraketPattern : public Pattern
 public:
 	BraketPattern() {}
 	int getPriority() const { return 5; }
-	string getFirstKeyword() const { return "("; }
+	std::string getFirstKeyword() const { return "("; }
 
 	bool expressionExpected(const std::vector<Token> &previousTokens) const
 	{
@@ -664,7 +664,7 @@ public:
 class FunctionPattern : public Pattern
 {
 protected:
-	string m_functionName;
+	std::string m_functionName;
 	bool m_implicitArgAllowed;
 	// if m_implicitArgAllowed == true then the first argument is the frame number
 	// e.g. f(5) means f(frame,5)
@@ -674,7 +674,7 @@ protected:
 	std::vector<double> m_optionalArgDefaults;
 
 public:
-	FunctionPattern(string functionName, int minArgCount)
+	FunctionPattern(std::string functionName, int minArgCount)
 		: m_functionName(functionName), m_implicitArgAllowed(false), m_minArgCount(minArgCount)
 	{
 	}
@@ -682,7 +682,7 @@ public:
 	void allowImplicitArg(bool allowed) { m_implicitArgAllowed = allowed; }
 	void addOptionalArg(double value) { m_optionalArgDefaults.push_back(value); }
 
-	string getFirstKeyword() const { return m_functionName; }
+	std::string getFirstKeyword() const { return m_functionName; }
 	bool expressionExpected(const std::vector<Token> &previousTokens) const
 	{
 		int n = (int)previousTokens.size();
@@ -692,7 +692,7 @@ public:
 	bool matchToken(const std::vector<Token> &previousTokens, const Token &token) const
 	{
 		int i = (int)previousTokens.size();
-		string s = toLower(token.getText());
+		std::string s = toLower(token.getText());
 		if (i == 0)
 			return s == toLower(m_functionName);
 		else if (i == 1)
@@ -781,7 +781,7 @@ template <class Function>
 class F0Pattern : public FunctionPattern
 {
 public:
-	F0Pattern(string functionName) : FunctionPattern(functionName, 0) {}
+	F0Pattern(std::string functionName) : FunctionPattern(functionName, 0) {}
 	void createNode(Calculator *calc, std::vector<CalculatorNode *> &stack,
 					const std::vector<Token> &tokens) const
 	{
@@ -795,7 +795,7 @@ template <class Function>
 class F1Pattern : public FunctionPattern
 {
 public:
-	F1Pattern(string functionName, string descr = "") : FunctionPattern(functionName, 1) { setDescription(descr); }
+	F1Pattern(std::string functionName, std::string descr = "") : FunctionPattern(functionName, 1) { setDescription(descr); }
 	void createNode(Calculator *calc, std::vector<CalculatorNode *> &stack,
 					const std::vector<Token> &tokens) const
 	{
@@ -809,7 +809,7 @@ template <class Function>
 class F2Pattern : public FunctionPattern
 {
 public:
-	F2Pattern(string functionName, string descr = "") : FunctionPattern(functionName, 2) { setDescription(descr); }
+	F2Pattern(std::string functionName, std::string descr = "") : FunctionPattern(functionName, 2) { setDescription(descr); }
 	void createNode(Calculator *calc, std::vector<CalculatorNode *> &stack,
 					const std::vector<Token> &tokens) const
 	{
@@ -825,7 +825,7 @@ template <class Function>
 class F3Pattern : public FunctionPattern
 {
 public:
-	F3Pattern(string functionName, string descr = "") : FunctionPattern(functionName, 3) { setDescription(descr); }
+	F3Pattern(std::string functionName, std::string descr = "") : FunctionPattern(functionName, 3) { setDescription(descr); }
 	void createNode(Calculator *calc, std::vector<CalculatorNode *> &stack,
 					const std::vector<Token> &tokens) const
 	{
@@ -842,7 +842,7 @@ template <class Function>
 class Fs2Pattern : public FunctionPattern
 {
 public:
-	Fs2Pattern(string functionName, string description)
+	Fs2Pattern(std::string functionName, std::string description)
 		: FunctionPattern(functionName, 1)
 	{
 		allowImplicitArg(true);
@@ -864,7 +864,7 @@ template <class Function>
 class Fs3Pattern : public FunctionPattern
 {
 public:
-	Fs3Pattern(string functionName, double defVal, string descr)
+	Fs3Pattern(std::string functionName, double defVal, std::string descr)
 		: FunctionPattern(functionName, 1)
 	{
 		allowImplicitArg(true);
@@ -886,7 +886,7 @@ public:
 class CyclePattern : public FunctionPattern
 {
 public:
-	CyclePattern(string functionName) : FunctionPattern(functionName, 1)
+	CyclePattern(std::string functionName) : FunctionPattern(functionName, 1)
 	{
 		setDescription("cycle(period)\nCycles the transitions of the period previous frames to the selected range");
 	}
@@ -905,7 +905,7 @@ class RandomPattern : public FunctionPattern
 	bool m_seed;
 
 public:
-	RandomPattern(string functionName, bool seed, string description)
+	RandomPattern(std::string functionName, bool seed, std::string description)
 		: FunctionPattern(functionName, seed ? 1 : 0), m_seed(seed)
 	{
 		allowImplicitArg(true);
@@ -935,7 +935,7 @@ public:
 
 class PatternTable
 {
-	std::map<string, Pattern *> m_kTable;
+	std::map<std::string, Pattern *> m_kTable;
 	std::vector<Pattern *> m_uTable;
 	Grammar::Position m_position;
 
@@ -944,7 +944,7 @@ public:
 
 	~PatternTable()
 	{
-		for (std::map<string, Pattern *>::iterator
+		for (std::map<std::string, Pattern *>::iterator
 				 it = m_kTable.begin();
 			 it != m_kTable.end(); ++it)
 			delete it->second;
@@ -956,7 +956,7 @@ public:
 
 	void addPattern(Pattern *pattern)
 	{
-		string keyword = pattern->getFirstKeyword();
+		std::string keyword = pattern->getFirstKeyword();
 		if (keyword != "") {
 			// first keyword should be unique
 			assert(m_kTable.count(keyword) == 0);
@@ -971,8 +971,8 @@ public:
 		if (m_position == Grammar::ExpressionEnd)
 			tokens.push_back(Token());
 		if (token.getType() == Token::Punct || token.getType() == Token::Ident) {
-			string keyword = token.getText();
-			std::map<string, Pattern *>::const_iterator it = m_kTable.find(keyword);
+			std::string keyword = token.getText();
+			std::map<std::string, Pattern *>::const_iterator it = m_kTable.find(keyword);
 			if (it != m_kTable.end()) {
 				Pattern *pattern = it->second;
 				if (pattern->matchToken(tokens, token)) {
@@ -991,7 +991,7 @@ public:
 
 	void getSuggestions(Grammar::Suggestions &suggestions) const
 	{
-		std::map<string, Pattern *>::const_iterator it;
+		std::map<std::string, Pattern *>::const_iterator it;
 		for (it = m_kTable.begin(); it != m_kTable.end(); ++it) {
 			suggestions.push_back(std::make_pair(it->first, it->second->getDescription()));
 		}
@@ -1248,10 +1248,10 @@ Grammar::Grammar()
 	addPattern(new NumberPattern());
 	addPattern(new ConstantPattern("pi", PI, "3.14159265..."));
 	addPattern(new VariablePattern("t", CalculatorNode::T, "ranges from 0.0 to 1.0 along the transition"));
-	const string f_desc = "the current frame number";
+	const std::string f_desc = "the current frame number";
 	addPattern(new VariablePattern("f", CalculatorNode::FRAME, f_desc));
 	addPattern(new VariablePattern("frame", CalculatorNode::FRAME, f_desc));
-	const string r_desc = "the current frame number, relative to the transition";
+	const std::string r_desc = "the current frame number, relative to the transition";
 	addPattern(new VariablePattern("r", CalculatorNode::RFRAME, r_desc));
 	addPattern(new VariablePattern("rframe", CalculatorNode::RFRAME, r_desc));
 	addPattern(new Op2Pattern<std::plus<double>>("+", 10));
@@ -1286,13 +1286,13 @@ Grammar::Grammar()
 	addPattern(new F1Pattern<Log>("log", "log(x)\nThe natural logarithm of x (base e)"));
 	addPattern(new F1Pattern<Exp>("exp", "exp(x)\nThe base-e exponential of x"));
 	addPattern(new F1Pattern<Floor>("floor", "floor(x)\nThe greatest integer <= x"));
-	const string ceil_desc = "The smallest integer >= x";
+	const std::string ceil_desc = "The smallest integer >= x";
 	addPattern(new F1Pattern<Ceil>("ceil", "ceil(x)\n" + ceil_desc));
 	addPattern(new F1Pattern<Ceil>("ceiling", "ceiling(x)\n" + ceil_desc));
 	addPattern(new F1Pattern<Round>("round", "round(x)\nThe integer nearest to x"));
 	addPattern(new F1Pattern<Abs>("abs", "abs(x)\nThe absolute value of x"));
 	addPattern(new F1Pattern<Sign>("sign", "sign(x)\n-1 if x<0, 1 if x>0 and 0 if x=0"));
-	const string sqrt_desc = "Square root of x";
+	const std::string sqrt_desc = "Square root of x";
 	addPattern(new F1Pattern<Sqrt>("sqrt", "sqrt(x)\n" + sqrt_desc));
 	addPattern(new F1Pattern<Sqr>("sqr", "sqr(x)\n" + sqrt_desc));
 	addPattern(new F3Pattern<Crop>("crop", "crop(x,a,b)\na if x<a, b if x>b, x if x in [a,b]"));
@@ -1301,17 +1301,17 @@ Grammar::Grammar()
 	addPattern(new F2Pattern<Max>("max", "max(a,b)"));
 	addPattern(new F2Pattern<Step>("step", "min(x,x0)\n0 if x<x0, 1 if x>=x0"));
 	addPattern(new F3Pattern<Smoothstep>("smoothstep", "smoothstep(x,x0)\n0 if x<x0, 1 if x>=x0\nas step, but with smooth transition"));
-	const string pulse_desc = "Generates a bump ranging from 0.0 to 1.0 set at position pos";
+	const std::string pulse_desc = "Generates a bump ranging from 0.0 to 1.0 set at position pos";
 	addPattern(new Fs3Pattern<Pulse>("pulse", 0.5, "pulse(pos)\npulse(pos,length)\npulse(arg; pos)\npulse(arg;pos,length)\n" + pulse_desc));
 	addPattern(new Fs3Pattern<Pulse>("bump", 0.5, "bump(pos)\nbump(pos,length)\nbump(arg; pos)\nbump(arg;pos,length)\n" + pulse_desc));
-	const string saw_desc = "Generates a periodic sawtooth shaped curve";
+	const std::string saw_desc = "Generates a periodic sawtooth shaped curve";
 	addPattern(new Fs3Pattern<Saw>("sawtooth", 0.0, "sawtooth(length)\nsawtooth(length, height)\nsawtooth(arg; length)\nsawtooth(arg; length, height)\n" + saw_desc));
 	addPattern(new Fs3Pattern<Saw>("saw", 0.0, "saw(length)\nsaw(length, height)\nsaw(arg; length)\nsaw(arg; length, height)\n" + saw_desc));
 	addPattern(new Fs2Pattern<Wave>("wave", "wave(_length)\nwave(_arg;_length)\nsame as sin(f*180/length)"));
-	const string rnd_desc = "Generates random number between min and max";
+	const std::string rnd_desc = "Generates random number between min and max";
 	addPattern(new RandomPattern("random", false, "random = random(0,1)\nrandom(max) = random(0,max)\nrandom(min,max)\n" + rnd_desc));
 	addPattern(new RandomPattern("rnd", false, "rnd = rnd(0,1)\nrnd(max) = rnd(0,max)\nrnd(min,max)\n" + rnd_desc));
-	const string rnd_s_desc = rnd_desc + "; seed select different random sequences";
+	const std::string rnd_s_desc = rnd_desc + "; seed select different random sequences";
 	addPattern(new RandomPattern("random_s", true, "random_s(seed) = random_s(seed, 0,1)\nrandom_s(seed,max) = random_s(seed, 0,max)\nrandom_s(seed,min,max)\n" + rnd_s_desc));
 	addPattern(new RandomPattern("rnd_s", true, "rnd_s(seed) = rnd_s(seed, 0,1)\nrnd_s(seed,max) = rnd_s(seed, 0,max)\nrnd_s(seed,min,max)\n" + rnd_s_desc));
 

@@ -125,7 +125,7 @@ public:
 	//All useful infos about a frame under Previewer's management
 	struct FrameInfo {
 	public:
-		string m_alias;			  //The alias of m_fx
+		std::string m_alias;			  //The alias of m_fx
 		unsigned long m_renderId; //The render process Id - passed by TRenderer
 		QRegion m_renderedRegion; //The plane region already rendered for m_fx
 		TRect m_rectUnderRender;  //Plane region currently under render
@@ -175,7 +175,7 @@ public:
 	void updateRenderSettings();
 
 	void updateAliases();
-	void updateAliasKeyword(const string &keyword);
+	void updateAliasKeyword(const std::string &keyword);
 
 	//There are dependencies among the following updaters. Invoke them in the specified order.
 	void updateFrameRange();
@@ -435,7 +435,7 @@ void Previewer::Imp::updateAliases()
 	for (it = m_frames.begin(); it != m_frames.end(); ++it) {
 		TFxPair fxPair = buildSceneFx(it->first);
 
-		string newAlias = fxPair.m_frameA ? fxPair.m_frameA->getAlias(it->first, m_renderSettings) : "";
+		std::string newAlias = fxPair.m_frameA ? fxPair.m_frameA->getAlias(it->first, m_renderSettings) : "";
 		newAlias = newAlias + (fxPair.m_frameB ? fxPair.m_frameB->getAlias(it->first, m_renderSettings) : "");
 
 		if (newAlias != it->second.m_alias) {
@@ -447,11 +447,11 @@ void Previewer::Imp::updateAliases()
 
 //-----------------------------------------------------------------------------
 
-void Previewer::Imp::updateAliasKeyword(const string &keyword)
+void Previewer::Imp::updateAliasKeyword(const std::string &keyword)
 {
 	std::map<int, FrameInfo>::iterator it;
 	for (it = m_frames.begin(); it != m_frames.end(); ++it) {
-		if (it->second.m_alias.find(keyword) != string::npos) {
+		if (it->second.m_alias.find(keyword) != std::string::npos) {
 			TFxPair fxPair = buildSceneFx(it->first);
 			it->second.m_alias = fxPair.m_frameA ? fxPair.m_frameA->getAlias(it->first, m_renderSettings) : "";
 			it->second.m_alias = it->second.m_alias + (fxPair.m_frameB ? fxPair.m_frameB->getAlias(it->first, m_renderSettings) : "");
@@ -666,7 +666,7 @@ void Previewer::Imp::doOnRenderRasterCompleted(const RenderData &renderData)
 
 	//Store the rendered image in the cache - this is done in the MAIN thread due
 	//to the necessity of accessing it->second.m_rectUnderRender for raster extraction.
-	string str = m_cachePrefix + toString(frame);
+	std::string str = m_cachePrefix + toString(frame);
 
 	TRasterImageP ri(TImageCache::instance()->get(str, true));
 	TRasterP cachedRas(ri ? ri->getRaster() : TRasterP());
@@ -831,7 +831,7 @@ bool Previewer::Imp::doSaveRenderedFrames(TFilePath fp)
 	TLevelWriter::getSupportedFormats(formats, true);
 	Tiio::Writer::getSupportedFormats(formats, true);
 
-	string ext = fp.getType();
+	std::string ext = fp.getType();
 	if (ext == "") {
 		ext = outputSettings->getPath().getType();
 		fp = fp.withType(ext);
@@ -1110,7 +1110,7 @@ TRasterP Previewer::getRaster(int frame, bool renderIfNeeded) const
 	if (it != m_imp->m_frames.end()) {
 		if (frame < m_imp->m_pbStatus.size()) {
 			if (m_imp->m_pbStatus[frame] == FlipSlider::PBFrameFinished || !renderIfNeeded) {
-				string str = m_imp->m_cachePrefix + toString(frame);
+				std::string str = m_imp->m_cachePrefix + toString(frame);
 				TRasterImageP rimg = (TRasterImageP)TImageCache::instance()->get(str, false);
 				if (rimg) {
 					TRasterP ras = rimg->getRaster();
@@ -1127,7 +1127,7 @@ TRasterP Previewer::getRaster(int frame, bool renderIfNeeded) const
 		}
 
 		//Retrieve the cached image, if any
-		string str = m_imp->m_cachePrefix + toString(frame);
+		std::string str = m_imp->m_cachePrefix + toString(frame);
 		TRasterImageP rimg = (TRasterImageP)TImageCache::instance()->get(str, false);
 		if (rimg) {
 			TRasterP ras = rimg->getRaster();
@@ -1174,7 +1174,7 @@ bool Previewer::isBusy() const
 void Previewer::onImageChange(TXshLevel *xl, const TFrameId &fid)
 {
 	TFilePath fp = xl->getPath().withFrame(fid);
-	string levelKeyword = toString(fp.getWideString());
+	std::string levelKeyword = toString(fp.getWideString());
 
 	//Inform the cache managers of level invalidation
 	if (!m_imp->m_subcamera)
@@ -1252,7 +1252,7 @@ void Previewer::updateView()
 void Previewer::onLevelChange(TXshLevel *xl)
 {
 	TFilePath fp = xl->getPath();
-	string levelKeyword = toString(fp.getWideString());
+	std::string levelKeyword = toString(fp.getWideString());
 
 	//Inform the cache managers of level invalidation
 	if (!m_imp->m_subcamera)
@@ -1272,7 +1272,7 @@ void Previewer::onLevelChanged()
 	if (!xl)
 		return;
 
-	string levelKeyword;
+	std::string levelKeyword;
 	TFilePath fp = xl->getPath();
 	levelKeyword = toString(fp.withType("").getWideString());
 

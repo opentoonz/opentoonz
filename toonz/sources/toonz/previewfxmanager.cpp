@@ -229,7 +229,7 @@ public:
 	void updatePreviewRect();
 
 	void updateAliases();
-	void updateAliasKeyword(const string &keyword);
+	void updateAliasKeyword(const std::string &keyword);
 
 	void updateProgressBarStatus();
 
@@ -444,7 +444,7 @@ void PreviewFxInstance::addFlipbook(FlipBook *&flipbook)
 	/*-- タイトルの設定。Previewコマンドから呼ばれた場合はisFullPreviewがON --*/
 
 	//Build the fx string description - Should really be moved in a better function...
-	wstring fxId;
+	std::wstring fxId;
 	TLevelColumnFx *columnFx = dynamic_cast<TLevelColumnFx *>(m_fx.getPointer());
 	TZeraryColumnFx *sfx = dynamic_cast<TZeraryColumnFx *>(m_fx.getPointer());
 	if (columnFx)
@@ -560,7 +560,7 @@ void PreviewFxInstance::updateFrameRange()
 			if (m_frameInfos.find(i) == m_frameInfos.end()) {
 				//Clear the overall rendered region and build the frame info
 				m_overallRenderedRegion = QRegion();
-				m_frameInfos.insert(make_pair(i, string()));
+				m_frameInfos.insert(std::make_pair(i, std::string()));
 			}
 
 		//Resize the progress bar
@@ -620,7 +620,7 @@ void PreviewFxInstance::updateAliases()
 	if (m_start > m_end)
 		return;
 
-	string newAlias;
+	std::string newAlias;
 
 	//Build and compare the new aliases with the stored ones
 	std::map<int, FrameInfo>::iterator it;
@@ -639,7 +639,7 @@ void PreviewFxInstance::updateAliases()
 
 //----------------------------------------------------------------------------------------
 
-void PreviewFxInstance::updateAliasKeyword(const string &keyword)
+void PreviewFxInstance::updateAliasKeyword(const std::string &keyword)
 {
 	if (m_start > m_end)
 		return;
@@ -647,7 +647,7 @@ void PreviewFxInstance::updateAliasKeyword(const string &keyword)
 	//Remove the rendered image whose alias contains keyword
 	std::map<int, FrameInfo>::iterator it;
 	for (it = m_frameInfos.begin(); it != m_frameInfos.end(); ++it) {
-		if (it->second.m_alias.find(keyword) != string::npos) {
+		if (it->second.m_alias.find(keyword) != std::string::npos) {
 			//Clear the overall and frame-specific rendered regions
 			m_overallRenderedRegion = QRegion();
 			it->second.m_renderedRegion = QRegion();
@@ -1400,7 +1400,7 @@ void PreviewFxManager::onLevelChanged()
 		//Build the level name as an alias keyword. All cache images associated
 		//with an alias containing the level name will be updated.
 		TXshLevel *xl = TApp::instance()->getCurrentLevel()->getLevel();
-		string aliasKeyword;
+		std::string aliasKeyword;
 		TFilePath fp = xl->getPath();
 		aliasKeyword = toString(fp.withType("").getWideString());
 

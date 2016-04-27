@@ -80,7 +80,7 @@ public:
 	//  virtual void enableNotification(bool on) {}
 	//  virtual bool isNotificationEnabled() const { return true;}
 
-	string getValueAlias(double frame, int precision);
+	std::string getValueAlias(double frame, int precision);
 
 	bool isAnimatable() const { return true; };
 	bool isKeyframe(double frame) const;

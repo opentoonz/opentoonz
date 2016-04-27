@@ -262,7 +262,7 @@ void loadCurve(TDoubleParam *curve)
 
 //------------------------------------------
 
-void exportCurve(TDoubleParam *curve, const string &name)
+void exportCurve(TDoubleParam *curve, const std::string &name)
 {
 #ifdef BRAVODEMO
 	DVGui::featureNotAvelaible();

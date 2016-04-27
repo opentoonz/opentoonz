@@ -689,7 +689,7 @@ class PngWriter : public Tiio::Writer
 	png_infop m_info_ptr;
 	FILE *m_chan;
 	bool m_matte;
-	vector<TPixel> *m_colormap;
+	std::vector<TPixel> *m_colormap;
 
 public:
 	PngWriter();

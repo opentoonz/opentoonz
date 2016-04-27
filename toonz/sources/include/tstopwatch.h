@@ -49,7 +49,7 @@
 
 class DVAPI TStopWatch
 {
-	string m_name; //stopwatch name
+	std::string m_name; //stopwatch name
 
 	TM_TOTAL m_tm;				//elapsed total time (in milliseconds)
 	TM_USER m_tmUser;			//elapsed user time (time associated to the process calling stop watch)(unit=100-nanosecond)
@@ -69,7 +69,7 @@ class DVAPI TStopWatch
 	void getElapsedTime(TM_TOTAL &tm, TM_USER &user, TM_SYSTEM &system);
 
 public:
-	TStopWatch(string name = "");
+	TStopWatch(std::string name = "");
 	~TStopWatch();
 
 	void reset();
@@ -88,14 +88,14 @@ public:
 	/*!Returns the amount of time that the process has spent executing operating system code. see getTotalTime() */
 	TUINT32 getSystemTime();
 
-	const string &getName() { return m_name; };
-	void setName(string name) { m_name = name; };
+	const std::string &getName() { return m_name; };
+	void setName(std::string name) { m_name = name; };
 
 	/*!Returns a string containing the recorded times.*/
-	operator string();
+	operator std::string();
 
 	/*!Print (to cout) the name and the relative total,user and system times of the stop watch. see getTotalTime()*/
-	void print(ostream &out);
+	void print(std::ostream &out);
 	void print();
 
 private:
@@ -115,7 +115,7 @@ public:
 Allows you to print the name and the relative total,
   user and system times of all the active stop watches.
 */
-	static void printGlobals(ostream &out);
+	static void printGlobals(std::ostream &out);
 	static void printGlobals();
 };
 

@@ -201,11 +201,11 @@ void TVectorImage::Imp::moveStrokes(int fromIndex, int count, int moveBefore, bo
 		else
 			moveStroke(fromIndex + i, moveBefore + i);
 
-	vector<int> changedStrokes;
+	std::vector<int> changedStrokes;
 	if (regroup)
 		regroupGhosts(changedStrokes);
 	if (!changedStrokes.empty())
-		notifyChangedStrokes(changedStrokes, vector<TStroke *>(), false);
+		notifyChangedStrokes(changedStrokes, std::vector<TStroke *>(), false);
 }
 
 //-----------------------------------------------------------------------------
@@ -230,7 +230,7 @@ m_imp->insertStrokeAt(vs, strokeIndex);
 //-----------------------------------------------------------------------------
 
 /*
-TRectD TVectorImage::addStroke(const vector<TThickPoint> &points)
+TRectD TVectorImage::addStroke(const std::vector<TThickPoint> &points)
 {
 //  era:  TStroke *stroke = makeTStroke(points);
   TStroke *stroke = TStroke::interpolate(points, 5.0);
@@ -298,14 +298,14 @@ TStroke *TVectorImage::Imp::removeStroke(int index, bool doComputeRegions)
 
 //-----------------------------------------------------------------------------
 
-void TVectorImage::removeStrokes(const vector<int> &toBeRemoved, bool deleteThem, bool recomputeRegions)
+void TVectorImage::removeStrokes(const std::vector<int> &toBeRemoved, bool deleteThem, bool recomputeRegions)
 {
 	m_imp->removeStrokes(toBeRemoved, deleteThem, recomputeRegions);
 }
 
 //-----------------------------------------------------------------------------
 
-void TVectorImage::Imp::removeStrokes(const vector<int> &toBeRemoved, bool deleteThem, bool recomputeRegions)
+void TVectorImage::Imp::removeStrokes(const std::vector<int> &toBeRemoved, bool deleteThem, bool recomputeRegions)
 {
 	QMutexLocker sl(m_mutex);
 
@@ -445,12 +445,12 @@ TRegion *TVectorImage::Imp::getRegion(TRegionId regId, int index) const
 	if (index >= (int)m_strokes.size())
 		return 0;
 
-	list<TEdge *> &edgeList = m_strokes[index]->m_edgeList;
+	std::list<TEdge *> &edgeList = m_strokes[index]->m_edgeList;
 
-	list<TEdge *>::iterator endList = edgeList.end();
+	std::list<TEdge *>::iterator endList = edgeList.end();
 	double w0;
 	double w1;
-	for (list<TEdge *>::iterator it = edgeList.begin(); it != endList; ++it) {
+	for (std::list<TEdge *>::iterator it = edgeList.begin(); it != endList; ++it) {
 		w0 = (*it)->m_w0;
 		w1 = (*it)->m_w1;
 
@@ -483,9 +483,9 @@ TRegion* TVectorImage::getRegion(TRegionId regId) const
   if( index >= (int)m_imp->m_strokes.size() )
     return 0;
 
-  list<TEdge*> &edgeList = m_imp->m_strokes[index]->m_edgeList;
+  std::list<TEdge*> &edgeList = m_imp->m_strokes[index]->m_edgeList;
 
-  list<TEdge*>::iterator endList = edgeList.end();
+  std::list<TEdge*>::iterator endList = edgeList.end();
   double w0;
   double w1;
   for(list<TEdge*>::iterator it= edgeList.begin(); it!=endList; ++it)
@@ -512,10 +512,10 @@ TRegion* TVectorImage::getRegion(TRegionId regId) const
 
 void TVectorImage::setEdgeColors(int strokeIndex, int leftColorIndex, int rightColorIndex)
 {
-	list<TEdge *> &ll = m_imp->m_strokes[strokeIndex]->m_edgeList;
+	std::list<TEdge *> &ll = m_imp->m_strokes[strokeIndex]->m_edgeList;
 
-	list<TEdge *>::const_iterator l = ll.begin();
-	list<TEdge *>::const_iterator l_e = ll.end();
+	std::list<TEdge *>::const_iterator l = ll.begin();
+	std::list<TEdge *>::const_iterator l_e = ll.end();
 	for (; l != l_e; ++l) {
 		//double w0 = (*l)->m_w0, w1 = (*l)->m_w1;
 		if ((*l)->m_w0 > (*l)->m_w1) {
@@ -932,9 +932,9 @@ void  TVectorImage::seedFill()
 */
 //-----------------------------------------------------------------------------
 
-void TVectorImage::notifyChangedStrokes(const vector<int> &strokeIndexArray, const vector<TStroke *> &oldStrokeArray, bool areFlipped)
+void TVectorImage::notifyChangedStrokes(const std::vector<int> &strokeIndexArray, const std::vector<TStroke *> &oldStrokeArray, bool areFlipped)
 {
-	vector<TStroke *> aux;
+	std::vector<TStroke *> aux;
 
 	/*
 if (oldStrokeArray.empty())
@@ -954,10 +954,10 @@ else*/
 
 void TVectorImage::notifyChangedStrokes(int strokeIndexArray, TStroke *oldStroke, bool isFlipped)
 {
-	vector<int> app(1);
+	std::vector<int> app(1);
 	app[0] = strokeIndexArray;
 
-	vector<TStroke *> oldStrokeArray(1);
+	std::vector<TStroke *> oldStrokeArray(1);
 	oldStrokeArray[0] = oldStroke ? oldStroke : getStroke(strokeIndexArray);
 	m_imp->notifyChangedStrokes(app, oldStrokeArray, isFlipped);
 }
@@ -966,12 +966,12 @@ void TVectorImage::notifyChangedStrokes(int strokeIndexArray, TStroke *oldStroke
 
 //ofstream of("C:\\temp\\butta.txt");
 
-void transferColors(const list<TEdge *> &oldList, const list<TEdge *> &newList, bool isStrokeChanged, bool isFlipped, bool overwriteColor)
+void transferColors(const std::list<TEdge *> &oldList, const std::list<TEdge *> &newList, bool isStrokeChanged, bool isFlipped, bool overwriteColor)
 {
 	if (newList.empty() || oldList.empty())
 		return;
 
-	list<TEdge *>::const_iterator it;
+	std::list<TEdge *>::const_iterator it;
 // unused variable
 #if 0 
 list<TEdge*>::const_iterator it1;
@@ -1012,7 +1012,7 @@ list<TEdge*>::const_iterator it1;
 			//w1 = (*it)->m_w1;
 		}
 
-		list<TEdge *>::const_iterator it1 = oldList.begin();
+		std::list<TEdge *>::const_iterator it1 = oldList.begin();
 		for (; it1 != oldList.end(); ++it1) {
 // unused variable
 #if 0
@@ -1055,14 +1055,14 @@ void TVectorImage::transferStrokeColors(TVectorImageP sourceImage,
 										TVectorImageP destinationImage,
 										int destinationStroke)
 {
-	list<TEdge *> *sourceList = &(sourceImage->m_imp->m_strokes[sourceStroke]->m_edgeList);
-	list<TEdge *> *destinationList = &(destinationImage->m_imp->m_strokes[destinationStroke]->m_edgeList);
+	std::list<TEdge *> *sourceList = &(sourceImage->m_imp->m_strokes[sourceStroke]->m_edgeList);
+	std::list<TEdge *> *destinationList = &(destinationImage->m_imp->m_strokes[destinationStroke]->m_edgeList);
 	transferColors(*sourceList, *destinationList, true, false, false);
 }
 
 //-----------------------------------------------------------------------------
 
-bool TVectorImage::Imp::areWholeGroups(const vector<int> &indexes) const
+bool TVectorImage::Imp::areWholeGroups(const std::vector<int> &indexes) const
 {
 	UINT i, j;
 	for (i = 0; i < indexes.size(); i++) {
@@ -1084,7 +1084,7 @@ bool TVectorImage::Imp::areWholeGroups(const vector<int> &indexes) const
 //-------------------------------------------------------------------
 void invalidateRegionPropAndBBox(TRegion *reg);
 
-void TVectorImage::Imp::notifyChangedStrokes(const vector<int> &strokeIndexArray, const vector<TStroke *> &oldStrokeArray, bool areFlipped)
+void TVectorImage::Imp::notifyChangedStrokes(const std::vector<int> &strokeIndexArray, const std::vector<TStroke *> &oldStrokeArray, bool areFlipped)
 {
 
 #ifdef _DEBUG
@@ -1096,8 +1096,8 @@ void TVectorImage::Imp::notifyChangedStrokes(const vector<int> &strokeIndexArray
 	if (!m_computedAlmostOnce && !m_notIntersectingStrokes)
 		return;
 
-	typedef list<TEdge *> EdgeList;
-	vector<EdgeList> oldEdgeListArray(strokeIndexArray.size());
+	typedef std::list<TEdge *> EdgeList;
+	std::vector<EdgeList> oldEdgeListArray(strokeIndexArray.size());
 	int i;
 
 	//se si sono trasformati  interi gruppi (senza deformare le stroke) non c'e' bisogno di ricalcolare le regioni!
@@ -1115,7 +1115,7 @@ void TVectorImage::Imp::notifyChangedStrokes(const vector<int> &strokeIndexArray
 		//if (s->m_s->isSelfLoop())
 		//  assert(s->m_edgeList.size()<=1);
 
-		list<TEdge *>::iterator it = s->m_edgeList.begin();
+		std::list<TEdge *>::iterator it = s->m_edgeList.begin();
 		for (; it != s->m_edgeList.end(); it++) {
 			TEdge *e = new TEdge(**it, false);
 			if (!oldStrokeArray.empty())
@@ -1219,8 +1219,8 @@ TVectorImageP mergeAndClear(TVectorImageP v1, TVectorImageP v2 )
 {
   TVectorImageP out = new TVectorImage;
   
-  vector<VIStroke*>::iterator it_b =  v1->m_imp->m_strokes.begin();
-  vector<VIStroke*>::iterator it_e =  v1->m_imp->m_strokes.end();
+  std::vector<VIStroke*>::iterator it_b =  v1->m_imp->m_strokes.begin();
+  std::vector<VIStroke*>::iterator it_e =  v1->m_imp->m_strokes.end();
   
   std::copy( it_b, it_e, std::back_inserter( out->m_imp->m_strokes ) );
   
@@ -1245,7 +1245,7 @@ VIStroke::VIStroke(const VIStroke &s, bool sameId)
 	: m_isPoint(s.m_isPoint), m_isNewForFill(s.m_isNewForFill), m_groupId(s.m_groupId)
 {
 	m_s = new TStroke(*s.m_s);
-	list<TEdge *>::const_iterator it = s.m_edgeList.begin(), it_e = s.m_edgeList.end();
+	std::list<TEdge *>::const_iterator it = s.m_edgeList.begin(), it_e = s.m_edgeList.end();
 	for (; it != it_e; ++it) {
 		m_edgeList.push_back(new TEdge(**it, true));
 		m_edgeList.back()->m_s = m_s;
@@ -1295,7 +1295,7 @@ void TVectorImage::mergeImage(const TVectorImageP &img, const TAffine &affine, c
 
 	m_imp->m_computedAlmostOnce |= img->m_imp->m_computedAlmostOnce;
 
-	vector<int> changedStrokeArray(imageSize);
+	std::vector<int> changedStrokeArray(imageSize);
 
 	img->m_imp->reindexGroups(*m_imp);
 
@@ -1338,7 +1338,7 @@ void TVectorImage::mergeImage(const TVectorImageP &img, const TAffine &affine, c
 
 		int styleId;
 		// cambio i colori delle regioni
-		list<TEdge *>::const_iterator it = tarStroke->m_edgeList.begin(), it_e = tarStroke->m_edgeList.end();
+		std::list<TEdge *>::const_iterator it = tarStroke->m_edgeList.begin(), it_e = tarStroke->m_edgeList.end();
 		for (; it != it_e; ++it) {
 			int styleId = (*it)->m_styleId;
 			styleTableIt = styleTable.find(styleId);
@@ -1362,7 +1362,7 @@ void TVectorImage::mergeImage(const TVectorImageP &img, const TAffine &affine, c
 			m_imp->m_strokes.push_back(tarStroke);
 			changedStrokeArray[i] = oldSize + i;
 		} else {
-			vector<VIStroke *>::iterator it = m_imp->m_strokes.begin();
+			std::vector<VIStroke *>::iterator it = m_imp->m_strokes.begin();
 			advance(it, insertAt + i);
 			m_imp->m_strokes.insert(it, tarStroke);
 			changedStrokeArray[i] = insertAt + i;
@@ -1374,7 +1374,7 @@ void TVectorImage::mergeImage(const TVectorImageP &img, const TAffine &affine, c
 		m_imp->reindexEdges(changedStrokeArray, true);
 	}
 
-	notifyChangedStrokes(changedStrokeArray, vector<TStroke *>(), false);
+	notifyChangedStrokes(changedStrokeArray, std::vector<TStroke *>(), false);
 
 #ifdef _DEBUG
 	checkIntersections();
@@ -1412,7 +1412,7 @@ void TVectorImage::Imp::reindexGroups(TVectorImage::Imp &img)
 void TVectorImage::mergeImage(const std::vector<const TVectorImage *> &images)
 {
 	UINT oldSize = getStrokeCount();
-	vector<int> changedStrokeArray;
+	std::vector<int> changedStrokeArray;
 	const TVectorImage *img;
 	int index;
 
@@ -1463,7 +1463,7 @@ void TVectorImage::mergeImage(const std::vector<const TVectorImage *> &images)
 		}
 	}
 
-	notifyChangedStrokes(changedStrokeArray, vector<TStroke *>(), false);
+	notifyChangedStrokes(changedStrokeArray, std::vector<TStroke *>(), false);
 }
 //-------------------------------------------------------------------
 
@@ -1474,17 +1474,17 @@ void TVectorImage::recomputeRegionsIfNeeded()
 
 	m_imp->m_justLoaded = false;
 
-	vector<int> v(m_imp->m_strokes.size());
+	std::vector<int> v(m_imp->m_strokes.size());
 	int i;
 	for (i = 0; i < (int)m_imp->m_strokes.size(); i++)
 		v[i] = i;
 
-	m_imp->notifyChangedStrokes(v, vector<TStroke *>(), false);
+	m_imp->notifyChangedStrokes(v, std::vector<TStroke *>(), false);
 }
 
 //-----------------------------------------------------------------------------
 
-void TVectorImage::eraseStyleIds(const vector<int> styleIds)
+void TVectorImage::eraseStyleIds(const std::vector<int> styleIds)
 {
 	int j;
 	for (j = 0; j < (int)styleIds.size(); j++) {
@@ -1511,16 +1511,16 @@ void TVectorImage::eraseStyleIds(const vector<int> styleIds)
 
 //-------------------------------------------------------------------
 
-void TVectorImage::insertImage(const TVectorImageP &img, const vector<int> &dstIndices)
+void TVectorImage::insertImage(const TVectorImageP &img, const std::vector<int> &dstIndices)
 {
 	UINT i;
 	UINT imageSize = img->getStrokeCount();
 	assert(dstIndices.size() == imageSize);
 
 	//img->m_imp->reindexGroups(*m_imp);
-	vector<int> changedStrokeArray(imageSize);
+	std::vector<int> changedStrokeArray(imageSize);
 
-	vector<VIStroke *>::iterator it = m_imp->m_strokes.begin();
+	std::vector<VIStroke *>::iterator it = m_imp->m_strokes.begin();
 
 	for (i = 0; i < imageSize; i++) {
 		assert(i == 0 || dstIndices[i] > dstIndices[i - 1]);
@@ -1538,7 +1538,7 @@ void TVectorImage::insertImage(const TVectorImageP &img, const vector<int> &dstI
 	}
 	m_imp->reindexEdges(changedStrokeArray, true);
 
-	notifyChangedStrokes(changedStrokeArray, vector<TStroke *>(), false);
+	notifyChangedStrokes(changedStrokeArray, std::vector<TStroke *>(), false);
 	//m_imp->computeRegions();
 }
 
@@ -1559,13 +1559,13 @@ void TVectorImage::enableMinimizeEdges(bool enabled)
 
 //-----------------------------------------------------------------------------
 
-TVectorImageP TVectorImage::splitImage(const vector<int> &indices, bool removeFlag)
+TVectorImageP TVectorImage::splitImage(const std::vector<int> &indices, bool removeFlag)
 {
 	TVectorImageP out = new TVectorImage;
 	out->m_imp->m_maxGroupId = m_imp->m_maxGroupId;
 	out->m_imp->m_maxGhostGroupId = m_imp->m_maxGhostGroupId;
 
-	vector<int> toBeRemoved;
+	std::vector<int> toBeRemoved;
 
 	TPalette *vp = getPalette();
 	if (vp)
@@ -1591,7 +1591,7 @@ TVectorImageP TVectorImage::splitImage(const vector<int> &indices, bool removeFl
 TVectorImageP TVectorImage::splitSelected(bool removeFlag)
 {
 	TVectorImageP out = new TVectorImage;
-	vector<int> toBeRemoved;
+	std::vector<int> toBeRemoved;
 
 	for (UINT i = 0; i < getStrokeCount(); ++i) {
 		VIStroke *ref = m_imp->m_strokes[i];
@@ -1671,7 +1671,7 @@ void TVectorImage::getUsedStyles(std::set<int> &styles) const
 		int styleId = srcStroke->m_s->getStyle();
 		if (styleId != 0)
 			styles.insert(styleId);
-		list<TEdge *>::const_iterator it = srcStroke->m_edgeList.begin();
+		std::list<TEdge *>::const_iterator it = srcStroke->m_edgeList.begin();
 		for (; it != srcStroke->m_edgeList.end(); ++it) {
 			styleId = (*it)->m_styleId;
 			if (styleId != 0)
@@ -1787,12 +1787,12 @@ bool TVectorImage::isComputedRegionAlmostOnce() const
 
 //-----------------------------------------------------------------------------
 
-void TVectorImage::splitStroke(int strokeIndex, const vector<DoublePair> &sortedWRanges)
+void TVectorImage::splitStroke(int strokeIndex, const std::vector<DoublePair> &sortedWRanges)
 {
 	m_imp->splitStroke(strokeIndex, sortedWRanges);
 }
 
-void TVectorImage::Imp::splitStroke(int strokeIndex, const vector<DoublePair> &sortedWRanges)
+void TVectorImage::Imp::splitStroke(int strokeIndex, const std::vector<DoublePair> &sortedWRanges)
 {
 	int i;
 	VIStroke *subV = 0;
@@ -1839,14 +1839,14 @@ if (vs->m_s->isSelfLoop())
 
 	m_regions.clear();
 
-	list<TEdge *> origEdgeList; //metto al pizzo la edge list della stroke, perche' la erase intersection ne fara' scempio
-	list<TEdge *>::iterator it = vs->m_edgeList.begin(), it_e = vs->m_edgeList.end();
+	std::list<TEdge *> origEdgeList; //metto al pizzo la edge std::list della stroke, perche' la erase intersection ne fara' scempio
+	std::list<TEdge *>::iterator it = vs->m_edgeList.begin(), it_e = vs->m_edgeList.end();
 	for (; it != it_e; ++it)
 		origEdgeList.push_back(new TEdge(**it, false));
 
 	removeStroke(strokeIndex, false);
 
-	vector<list<TEdge *>> edgeList(sortedWRanges.size());
+	std::vector<std::list<TEdge *>> edgeList(sortedWRanges.size());
 	strokeIndex--;
 
 	int wSize = (int)sortedWRanges.size();
@@ -1879,7 +1879,7 @@ if (vs->m_s->isSelfLoop())
 		/*assert(m_strokes[strokeIndex]->m_edgeList.empty());
   assert(m_strokes[strokeIndex-wSize+1]->m_edgeList.empty());*/
 
-		list<TEdge *>::const_iterator it = origEdgeList.begin(), it_e = origEdgeList.end();
+		std::list<TEdge *>::const_iterator it = origEdgeList.begin(), it_e = origEdgeList.end();
 		for (; it != it_e; ++it) {
 			double wMin = tmin((*it)->m_w0, (*it)->m_w1);
 			double wMax = tmax((*it)->m_w0, (*it)->m_w1);
@@ -1919,8 +1919,8 @@ if (vs->m_s->isSelfLoop())
 	{
 		VIStroke *s0 = m_strokes[strokeIndex];
 		VIStroke *s1 = m_strokes[strokeIndex - wSize + 1];
-		list<TEdge *> &l0 = edgeList.back();
-		list<TEdge *> &l1 = edgeList.front();
+		std::list<TEdge *> &l0 = edgeList.back();
+		std::list<TEdge *> &l1 = edgeList.front();
 
 		//assert(s0->m_edgeList.empty());
 		//assert(s1->m_edgeList.empty());
@@ -1932,7 +1932,7 @@ if (vs->m_s->isSelfLoop())
 		VIStroke *s = new VIStroke(joinStrokes(s0->m_s, s1->m_s), groupId);
 		insertStrokeAt(s, strokeIndex);
 
-		list<TEdge *>::iterator it = l0.begin(), it_e = l0.end();
+		std::list<TEdge *>::iterator it = l0.begin(), it_e = l0.end();
 		for (; it != it_e; ++it) {
 			(*it)->m_s = s->m_s;
 			(*it)->m_index = strokeIndex;
@@ -1952,7 +1952,7 @@ if (vs->m_s->isSelfLoop())
 		assert(l1.empty());
 		edgeList.erase(edgeList.begin());
 
-		vector<DoublePair> appSortedWRanges;
+		std::vector<DoublePair> appSortedWRanges;
 
 		wSize--;
 
@@ -1982,10 +1982,10 @@ if (vs->m_s->isSelfLoop())
 
 //-----------------------------------------------------------------------------
 
-void computeEdgeList(TStroke *newS, const list<TEdge *> &edgeList1, bool join1AtBegin,
-					 const list<TEdge *> &edgeList2, bool join2AtBegin, list<TEdge *> &edgeList)
+void computeEdgeList(TStroke *newS, const std::list<TEdge *> &edgeList1, bool join1AtBegin,
+					 const std::list<TEdge *> &edgeList2, bool join2AtBegin, std::list<TEdge *> &edgeList)
 {
-	list<TEdge *>::const_iterator it;
+	std::list<TEdge *>::const_iterator it;
 
 	if (!edgeList1.empty()) {
 		TStroke *s1 = edgeList1.front()->m_s;
@@ -2035,21 +2035,21 @@ void computeEdgeList(TStroke *newS, const list<TEdge *> &edgeList1, bool join1At
 //#include "tpalette.h"
 #include "tcolorstyles.h"
 
-void printEdges(ofstream &os, char *str, TPalette *plt, const list<TEdge *> &edges)
+void printEdges(std::ofstream &os, char *str, TPalette *plt, const std::list<TEdge *> &edges)
 {
-	list<TEdge *>::const_iterator it;
+	std::list<TEdge *>::const_iterator it;
 
-	os << str << endl;
+	os << str << std::endl;
 
 	for (it = edges.begin(); it != edges.end(); ++it) {
 		TColorStyle *style = plt->getStyle((*it)->m_styleId);
 		TPixel32 color = style->getMainColor();
-		os << "w0-w1:(" << (*it)->m_w0 << "-->" << (*it)->m_w1 << ")" << endl;
-		os << "color=(" << color.r << "," << color.g << "," << color.b << ")" << endl;
+		os << "w0-w1:(" << (*it)->m_w0 << "-->" << (*it)->m_w1 << ")" << std::endl;
+		os << "color=(" << color.r << "," << color.g << "," << color.b << ")" << std::endl;
 	}
-	os << endl
-	   << endl
-	   << endl;
+	os << std::endl
+	   << std::endl
+	   << std::endl;
 }
 #else
 #define printEdges
@@ -2058,7 +2058,7 @@ void printEdges(ofstream &os, char *str, TPalette *plt, const list<TEdge *> &edg
 //-----------------------------------------------------------------------------
 
 #ifdef _DEBUG
-void TVectorImage::Imp::printStrokes(ofstream &os)
+void TVectorImage::Imp::printStrokes(std::ofstream &os)
 {
 	for (int i = 0; i < (int)m_strokes.size(); i++) {
 		os << "*****stroke #" << i << " *****";
@@ -2110,7 +2110,7 @@ VIStroke *TVectorImage::Imp::extendStrokeSmoothly(int index, const TThickPoint &
 			stroke->setControlPoint(cpCount - 2, middleP * 0.1 + stroke->getControlPoint(cpCount - 3) * 0.9);
 	}
 
-	vector<TThickPoint> points(cpCount);
+	std::vector<TThickPoint> points(cpCount);
 	for (int i = 0; i < cpCount - 1; i++)
 		points[i] = stroke->getControlPoint((cpIndex == 0) ? cpCount - i - 1 : i);
 	points[cpCount - 1] = pos;
@@ -2118,11 +2118,11 @@ VIStroke *TVectorImage::Imp::extendStrokeSmoothly(int index, const TThickPoint &
 	TStroke *newStroke = new TStroke(points);
 	newStroke->setStyle(styleId);
 	newStroke->outlineOptions() = stroke->outlineOptions();
-	list<TEdge *> oldEdgeList, emptyList;
+	std::list<TEdge *> oldEdgeList, emptyList;
 	computeEdgeList(newStroke, m_strokes[index]->m_edgeList, cpIndex == 0,
 					emptyList, 0, oldEdgeList);
 
-	vector<int> toBeDeleted;
+	std::vector<int> toBeDeleted;
 	toBeDeleted.push_back(index);
 	removeStrokes(toBeDeleted, true, false);
 
@@ -2144,7 +2144,7 @@ VIStroke *TVectorImage::Imp::extendStroke(int index, const TThickPoint &p, int c
 	TStroke *ret;
 	int cpCount = stroke->getControlPointCount();
 	int count = 0;
-	vector<TThickPoint> points(cpCount + 2);
+	std::vector<TThickPoint> points(cpCount + 2);
 	int i, incr = (cpIndex == 0) ? -1 : 1;
 	for (i = ((cpIndex == 0) ? cpCount - 1 : 0); i != cpIndex + incr; i += incr)
 		points[count++] = stroke->getControlPoint(i);
@@ -2156,12 +2156,12 @@ VIStroke *TVectorImage::Imp::extendStroke(int index, const TThickPoint &p, int c
 	newStroke->setStyle(stroke->getStyle());
 	newStroke->outlineOptions() = stroke->outlineOptions();
 	ret = newStroke;
-	list<TEdge *> oldEdgeList, emptyList;
+	std::list<TEdge *> oldEdgeList, emptyList;
 
 	if (m_computedAlmostOnce)
 		computeEdgeList(newStroke, m_strokes[index]->m_edgeList, cpIndex == 0, emptyList, false, oldEdgeList);
 
-	vector<int> toBeDeleted;
+	std::vector<int> toBeDeleted;
 	toBeDeleted.push_back(index);
 	removeStrokes(toBeDeleted, true, false);
 
@@ -2192,7 +2192,7 @@ VIStroke *TVectorImage::Imp::joinStroke(int index1, int index2, int cpIndex1, in
 	int styleId = stroke1->getStyle();
 
 	int count = 0;
-	vector<TThickPoint> points(cpCount1 + ((index1 != index2) ? cpCount2 : 1) + 1);
+	std::vector<TThickPoint> points(cpCount1 + ((index1 != index2) ? cpCount2 : 1) + 1);
 	int i, incr = (cpIndex1 == 0) ? -1 : 1;
 	for (i = ((cpIndex1 == 0) ? cpCount1 - 1 : 0); i != cpIndex1 + incr; i += incr)
 		points[count++] = stroke1->getControlPoint(i);
@@ -2210,13 +2210,13 @@ VIStroke *TVectorImage::Imp::joinStroke(int index1, int index2, int cpIndex1, in
 	//ret = newStroke;
 	if (index1 == index2)
 		newStroke->setSelfLoop();
-	list<TEdge *> oldEdgeList, emptyList;
+	std::list<TEdge *> oldEdgeList, emptyList;
 
 	computeEdgeList(newStroke, m_strokes[index1]->m_edgeList, cpIndex1 == 0,
 					(index1 != index2) ? m_strokes[index2]->m_edgeList : emptyList,
 					cpIndex2 == 0, oldEdgeList);
 
-	vector<int> toBeDeleted;
+	std::vector<int> toBeDeleted;
 	toBeDeleted.push_back(index1);
 	if (index1 != index2)
 		toBeDeleted.push_back(index2);
@@ -2292,7 +2292,7 @@ VIStroke *TVectorImage::Imp::joinStrokeSmoothly(int index1, int index2, int cpIn
 	}
 
 	if (stroke1 == stroke2) {
-		list<TEdge *> oldEdgeList, emptyList;
+		std::list<TEdge *> oldEdgeList, emptyList;
 		computeEdgeList(stroke1, m_strokes[index1]->m_edgeList, cpIndex1 == 0,
 						emptyList, false, oldEdgeList);
 		eraseIntersection(index1);
@@ -2305,7 +2305,7 @@ VIStroke *TVectorImage::Imp::joinStrokeSmoothly(int index1, int index2, int cpIn
 		//nundo->m_newStrokeId=stroke1->getId();
 	}
 
-	vector<TThickPoint> points;
+	std::vector<TThickPoint> points;
 	points.reserve(cpCount1 + cpCount2 - 1);
 
 	int incr = (cpIndex1) ? 1 : -1;
@@ -2329,7 +2329,7 @@ VIStroke *TVectorImage::Imp::joinStrokeSmoothly(int index1, int index2, int cpIn
 	ret = newStroke;
 	//nundo->m_newStroke=new TStroke(*newStroke);
 	//nundo->m_newStrokeId=newStroke->getId();
-	list<TEdge *> oldEdgeList;
+	std::list<TEdge *> oldEdgeList;
 	//ofstream os("c:\\temp\\edges.txt");
 
 	//printEdges(os, "****edgelist1", getPalette(), m_imp->m_strokes[index1]->m_edgeList);
@@ -2339,7 +2339,7 @@ VIStroke *TVectorImage::Imp::joinStrokeSmoothly(int index1, int index2, int cpIn
 					m_strokes[index2]->m_edgeList, cpIndex2 == 0, oldEdgeList);
 	//printEdges(os, "****edgelist", getPalette(), oldEdgeList);
 
-	vector<int> toBeDeleted;
+	std::vector<int> toBeDeleted;
 	toBeDeleted.push_back(index1);
 	toBeDeleted.push_back(index2);
 	removeStrokes(toBeDeleted, true, false);
@@ -2493,7 +2493,7 @@ int TVectorImage::ungroup(int fromIndex)
 	m_imp->m_insideGroup = TGroupId();
 
 	assert(m_imp->m_strokes[fromIndex]->m_groupId.isGrouped() != 0);
-	vector<int> changedStrokes;
+	std::vector<int> changedStrokes;
 
 	int toIndex = fromIndex + 1;
 
@@ -2516,7 +2516,7 @@ int TVectorImage::ungroup(int fromIndex)
 		changedStrokes.push_back(i);
 	}
 
-	notifyChangedStrokes(changedStrokes, vector<TStroke *>(), false);
+	notifyChangedStrokes(changedStrokes, std::vector<TStroke *>(), false);
 
 	return toIndex - fromIndex + 1;
 }
@@ -2578,7 +2578,7 @@ void TVectorImage::group(int fromIndex, int count)
 {
 	int i;
 	assert(count >= 0);
-	vector<int> changedStroke;
+	std::vector<int> changedStroke;
 
 	TGroupId parent = TGroupId(this, false);
 
@@ -2591,7 +2591,7 @@ void TVectorImage::group(int fromIndex, int count)
 
 	m_imp->regroupGhosts(changedStroke);
 
-	notifyChangedStrokes(changedStroke, vector<TStroke *>(), false);
+	notifyChangedStrokes(changedStroke, std::vector<TStroke *>(), false);
 
 #ifdef _DEBUG
 	m_imp->checkGroups();
@@ -2814,8 +2814,8 @@ TGroupId::TGroupId(TVectorImage *vi, bool isGhost)
 void TVectorImage::Imp::checkGroups()
 {
 	TGroupId currGroupId;
-	set<TGroupId> groupSet;
-	set<TGroupId>::iterator it;
+	std::set<TGroupId> groupSet;
+	std::set<TGroupId>::iterator it;
 	UINT i = 0;
 
 	while (i < m_strokes.size()) {

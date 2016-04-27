@@ -39,7 +39,7 @@ const int maxStyleIndex = 32765;
 //
 //-------------------------------------------------------------------
 
-TPalette::Page::Page(wstring name)
+TPalette::Page::Page(std::wstring name)
 	: m_name(name), m_index(-1), m_palette(0)
 {
 }
@@ -189,7 +189,7 @@ TPalette::TPalette()
 	: m_version(0), m_isCleanupPalette(false), m_currentFrame(-1), m_dirtyFlag(false), m_mutex(QMutex::Recursive), m_isLocked(false), m_askOverwriteFlag(false)
 {
 	QString tempName(QObject::tr("colors"));
-	wstring pageName = tempName.toStdWString();
+	std::wstring pageName = tempName.toStdWString();
 	Page *page = addPage(pageName);
 	page->addStyle(TPixel32(255, 255, 255, 0));
 	page->addStyle(TPixel32(0, 0, 0, 255));
@@ -353,7 +353,7 @@ const TPalette::Page *TPalette::getPage(int pageIndex) const
 
 //-------------------------------------------------------------------
 
-TPalette::Page *TPalette::addPage(wstring name)
+TPalette::Page *TPalette::addPage(std::wstring name)
 {
 	Page *page = new Page(name);
 	page->m_index = getPageCount();
@@ -486,7 +486,7 @@ public:
 		m_os << x;
 		return *this;
 	};
-	TOutputStreamInterface &operator<<(string x)
+	TOutputStreamInterface &operator<<(std::string x)
 	{
 		m_os << x;
 		return *this;
@@ -510,7 +510,7 @@ public:
 	{
 		assert(m_rootDir != TFilePath());
 
-		string name = "texture_" + toString(m_index);
+		std::string name = "texture_" + toString(m_index);
 		m_os << name;
 		TFilePath filename =
 			((m_rootDir + "textures") + name).withType("bmp");
@@ -552,7 +552,7 @@ public:
 		m_is >> x;
 		return *this;
 	}
-	virtual TInputStreamInterface &operator>>(string &x)
+	virtual TInputStreamInterface &operator>>(std::string &x)
 	{
 		m_is >> x;
 		return *this;
@@ -574,7 +574,7 @@ public:
 	virtual TInputStreamInterface &operator>>(TRaster32P &x)
 	{
 		assert(m_rootDir != TFilePath());
-		string name;
+		std::string name;
 		m_is >> name;
 		TFilePath filename =
 			((m_rootDir + "textures") + name).withType("bmp");
@@ -666,7 +666,7 @@ void TPalette::saveData(TOStream &os)
 				int styleId = sat->first;
 				StyleAnimation &animation = sat->second;
 
-				std::map<string, string> attributes;
+				std::map<std::string, std::string> attributes;
 				attributes["id"] = toString(styleId);
 
 				os.openChild("style", attributes);
@@ -729,7 +729,7 @@ void TPalette::loadData(TIStream &is)
 
 	VersionNumber version = is.getVersion();
 
-	string tagName;
+	std::string tagName;
 	while (is.openChild(tagName)) {
 		if (tagName == "version") {
 			is >> version.first >> version.second;
@@ -754,7 +754,7 @@ void TPalette::loadData(TIStream &is)
 				if (!is.openChild(tagName) || tagName != "page")
 					throw TException("palette, expected tag <stylepage>");
 				{
-					wstring pageName;
+					std::wstring pageName;
 
 					if (!is.openChild(tagName) || tagName != "name")
 						throw TException("palette, expected tag <name>");
@@ -947,7 +947,7 @@ void TPalette::merge(const TPalette *src, bool isFromStudioPalette)
 	int pageCount = src->getPageCount();
 	for (i = 0; i < pageCount; i++) {
 		const Page *srcPage = src->getPage(i);
-		wstring pageName = srcPage->getName();
+		std::wstring pageName = srcPage->getName();
 		if (pageName == L"colors" && src->getPaletteName() != L"")
 			pageName = src->getPaletteName();
 		Page *dstPage = addPage(pageName); //;

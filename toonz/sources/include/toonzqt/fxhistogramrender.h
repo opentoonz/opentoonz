@@ -69,7 +69,7 @@ private:
 			: m_frame(-1), m_renderId((UINT)-1) {}
 
 		TFxP m_fx;
-		string m_fxAlias;
+		std::string m_fxAlias;
 		int m_frame;
 		//! renderId given from renderer
 		UINT m_renderId;

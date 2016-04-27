@@ -96,10 +96,10 @@ public:
 	// (e.g. UNC path in Windows)
 	void setUnregisteredFolder(const TFilePath &fp);
 
-	void setHistoryDay(string dayDateString);
+	void setHistoryDay(std::string dayDateString);
 
 	TFilePath getFolder() const { return m_folder; }
-	string getDayDateString() const { return m_dayDateString; }
+	std::string getDayDateString() const { return m_dayDateString; }
 
 	static void refreshFolder(const TFilePath &folder);
 
@@ -226,7 +226,7 @@ private:
 	TFilePath m_folder;
 	std::string m_dayDateString;
 	QStringList m_filter;
-	map<TFilePath, Item> m_multiFileItemMap;
+	std::map<TFilePath, Item> m_multiFileItemMap;
 
 private:
 	void readFrameCount(Item &item);
@@ -250,7 +250,7 @@ public:
 	QString getName() { return m_name->text(); }
 
 private:
-	//TPropertyGroup* getFormatProperties(const string &ext);
+	//TPropertyGroup* getFormatProperties(const std::string &ext);
 
 public slots:
 	//! Starts the convertion.

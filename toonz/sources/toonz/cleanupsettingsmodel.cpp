@@ -640,7 +640,7 @@ bool CleanupSettingsModel::loadSettings(CleanupParameters *params, const TFilePa
 	CleanupParameters defaultParameters;
 	params->assign(&defaultParameters);
 
-	string tagName;
+	std::string tagName;
 	is->matchTag(tagName);
 	if (tagName == "version") {
 		int minor, major;

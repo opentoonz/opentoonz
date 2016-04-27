@@ -167,8 +167,8 @@ bool pasteAreasWithoutUndo(const QMimeData *data, TXshSimpleLevel *sl, std::set<
 
 				TRasterP ras;
 				double dpiX, dpiY;
-				vector<TRectD> rects;
-				vector<TStroke> strokes;
+				std::vector<TRectD> rects;
+				std::vector<TStroke> strokes;
 				std::vector<TStroke> originalStrokes;
 				TAffine affine;
 
@@ -218,8 +218,8 @@ bool pasteAreasWithoutUndo(const QMimeData *data, TXshSimpleLevel *sl, std::set<
 				TRasterP ras;
 				double dpiX = 0, dpiY = 0;
 				double imgDpiX = 0, imgDpiY = 0;
-				vector<TRectD> rects;
-				vector<TStroke> strokes;
+				std::vector<TRectD> rects;
+				std::vector<TStroke> strokes;
 				std::vector<TStroke> originalStrokes;
 				TAffine affine;
 
@@ -311,7 +311,7 @@ bool pasteFramesWithoutUndo(const DrawingData *data, TXshSimpleLevel *sl,
 	if (keepOriginalPalette)
 		invalidateIcons(sl, frames);
 	else {
-		vector<TFrameId> sl_fids;
+		std::vector<TFrameId> sl_fids;
 		sl->getFids(sl_fids);
 		invalidateIcons(sl, sl_fids);
 	}
@@ -326,10 +326,10 @@ bool pasteFramesWithoutUndo(const DrawingData *data, TXshSimpleLevel *sl,
 
 // "Svuota" i frames: i frames vengono buttati e al loro posto
 // vengono inseriti frames vuoti.
-map<TFrameId, QString> clearFramesWithoutUndo(const TXshSimpleLevelP &sl,
+std::map<TFrameId, QString> clearFramesWithoutUndo(const TXshSimpleLevelP &sl,
 											  const std::set<TFrameId> &frames)
 {
-	map<TFrameId, QString> clearedFrames;
+	std::map<TFrameId, QString> clearedFrames;
 	if (!sl || frames.empty())
 		return clearedFrames;
 
@@ -539,8 +539,8 @@ public:
 			if (ti) {
 				TRasterP ras;
 				double dpiX, dpiY;
-				vector<TRectD> rects;
-				vector<TStroke> strokes;
+				std::vector<TRectD> rects;
+				std::vector<TStroke> strokes;
 				std::vector<TStroke> originalStrokes;
 				TAffine affine;
 				m_data->getData(ras, dpiX, dpiY, rects, strokes, originalStrokes, affine, ti->getPalette());
@@ -568,8 +568,8 @@ public:
 			} else if (ri) {
 				TRasterP ras;
 				double dpiX, dpiY;
-				vector<TRectD> rects;
-				vector<TStroke> strokes;
+				std::vector<TRectD> rects;
+				std::vector<TStroke> strokes;
 				std::vector<TStroke> originalStrokes;
 				TAffine affine;
 				m_data->getData(ras, dpiX, dpiY, rects, strokes, originalStrokes, affine, ri->getPalette());
@@ -968,7 +968,7 @@ public:
 		}
 
 		//update all icons
-		vector<TFrameId> sl_fids;
+		std::vector<TFrameId> sl_fids;
 		m_sl.getPointer()->getFids(sl_fids);
 		invalidateIcons(m_sl.getPointer(), sl_fids);
 
@@ -1687,7 +1687,7 @@ void FilmstripCmd::clear(TXshSimpleLevel *sl, std::set<TFrameId> &frames)
 
 	HookSet *levelHooks = sl->getHookSet();
 	std::set<TFrameId> oldFrames = frames;
-	map<TFrameId, QString> clearedFrames = clearFramesWithoutUndo(sl, frames);
+	std::map<TFrameId, QString> clearedFrames = clearFramesWithoutUndo(sl, frames);
 	DrawingData *oldData = new DrawingData();
 	oldData->setFrames(clearedFrames, sl, *levelHooks);
 	DrawingData *newData = new DrawingData();
@@ -2359,12 +2359,12 @@ void moveToSceneFrames(TXshLevel *level, const std::set<TFrameId> &frames)
 
 class MoveLevelToSceneUndo : public TUndo
 {
-	wstring m_levelName;
+	std::wstring m_levelName;
 	int m_col;
 	std::set<TFrameId> m_fids;
 
 public:
-	MoveLevelToSceneUndo(wstring levelName, int col,
+	MoveLevelToSceneUndo(std::wstring levelName, int col,
 						 std::set<TFrameId> fids)
 		: m_levelName(levelName), m_col(col), m_fids(fids)
 	{
@@ -2486,8 +2486,8 @@ namespace
 class UndoInbetween : public TUndo
 {
 	TXshSimpleLevelP m_level;
-	vector<TFrameId> m_fids;
-	vector<TVectorImageP> m_images;
+	std::vector<TFrameId> m_fids;
+	std::vector<TVectorImageP> m_images;
 	FilmstripCmd::InbetweenInterpolation m_interpolation;
 
 public:

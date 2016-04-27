@@ -1201,7 +1201,7 @@ bool isStyleIdInPalette(int styleId, const TPalette *palette)
 int DVGui::eraseStylesInDemand(TPalette *palette, const TXsheetHandle *xsheetHandle, TPalette *newPalette)
 {
 	//Verifico se gli stili della paletta sono usati : eraseStylesInDemand()
-	vector<int> styleIds;
+	std::vector<int> styleIds;
 	int h;
 	for (h = 0; h < palette->getPageCount(); h++) {
 		TPalette::Page *page = palette->getPage(h);

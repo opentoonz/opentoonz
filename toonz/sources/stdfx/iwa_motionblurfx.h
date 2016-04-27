@@ -155,7 +155,7 @@ public:
 				   double frame);
 	/*- 参考にしているオブジェクトが動いている可能性があるので、
 		エイリアスは毎フレーム変える -*/
-	string getAlias(double frame, const TRenderSettings &info) const;
+	std::string getAlias(double frame, const TRenderSettings &info) const;
 };
 
 #endif

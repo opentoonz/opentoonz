@@ -37,18 +37,18 @@ namespace
 
 //------------------------------------------------------------------------------
 
-typedef pair<string, TFxPort *> NamePort;
-typedef map<string, TFxPort *> PortTable;
-typedef vector<NamePort> PortArray;
+typedef std::pair<std::string, TFxPort *> NamePort;
+typedef std::map<std::string, TFxPort *> PortTable;
+typedef std::vector<NamePort> PortArray;
 
 //------------------------------------------------------------------------------
 
 class PortNameEq
 {
-	string m_name;
+	std::string m_name;
 
 public:
-	PortNameEq(const string &name) : m_name(name) {}
+	PortNameEq(const std::string &name) : m_name(name) {}
 	~PortNameEq() {}
 	bool operator()(const NamePort &np) { return np.first == m_name; }
 };
@@ -58,8 +58,8 @@ public:
 void skipChild(TIStream &is)
 {
 	while (!is.eos()) {
-		string dummy = is.getString();
-		string tagName;
+		std::string dummy = is.getString();
+		std::string tagName;
 		while (is.openChild(tagName)) {
 			skipChild(is);
 			if (is.isBeginEndTag())
@@ -160,8 +160,8 @@ public:
 	TFx *m_fx;				 //!< Fx back-pointer
 	TFxImp *m_prev, *m_next; //!< Linked fxs
 
-	wstring m_name;
-	wstring m_fxId;
+	std::wstring m_name;
+	std::wstring m_fxId;
 
 	PortTable m_portTable; //!< Name -> port  map
 	PortArray m_portArray; //!< Ports container
@@ -223,7 +223,7 @@ class TFxFactory // singleton
 					 std::pair<TFxInfo, TFxDeclaration *>> Table;
 
 	Table m_table;
-	std::vector<string> m_map;
+	std::vector<std::string> m_map;
 
 	TFxFactory() {}
 
@@ -311,28 +311,28 @@ TFx::~TFx()
 
 //--------------------------------------------------
 
-wstring TFx::getName() const
+std::wstring TFx::getName() const
 {
 	return m_imp->m_name;
 }
 
 //--------------------------------------------------
 
-void TFx::setName(wstring name)
+void TFx::setName(std::wstring name)
 {
 	m_imp->m_name = name;
 }
 
 //--------------------------------------------------
 
-wstring TFx::getFxId() const
+std::wstring TFx::getFxId() const
 {
 	return m_imp->m_fxId;
 }
 
 //--------------------------------------------------
 
-void TFx::setFxId(wstring id)
+void TFx::setFxId(std::wstring id)
 {
 	m_imp->m_fxId = id;
 }
@@ -627,7 +627,7 @@ TFxPort *TFx::getInputPort(int index) const
 
 //--------------------------------------------------
 
-string TFx::getInputPortName(int index) const
+std::string TFx::getInputPortName(int index) const
 {
 	assert(0 <= index && index < (int)(m_imp->m_portArray.size()));
 	return m_imp->m_portArray[index].first;
@@ -635,7 +635,7 @@ string TFx::getInputPortName(int index) const
 
 //--------------------------------------------------
 
-bool TFx::renamePort(const string &oldName, const string &newName)
+bool TFx::renamePort(const std::string &oldName, const std::string &newName)
 {
 	PortTable::iterator it = m_imp->m_portTable.find(oldName);
 	if (it == m_imp->m_portTable.end())
@@ -808,15 +808,15 @@ void TFx::setNewIdentifier()
 
 void TFx::loadData(TIStream &is)
 {
-	string tagName;
+	std::string tagName;
 	VersionNumber tnzVersion = is.getVersion();
 
 	QList<int> groupIds;
-	QList<wstring> groupNames;
+	QList<std::wstring> groupNames;
 	while (is.openChild(tagName)) {
 		if (tagName == "params") {
 			while (!is.eos()) {
-				string paramName;
+				std::string paramName;
 				while (is.openChild(paramName)) {
 					TParamP param = getParams()->getParam(paramName);
 					if (param)
@@ -835,7 +835,7 @@ void TFx::loadData(TIStream &is)
 				throw TException("Missing linkedSetRoot");
 			linkParams(fx);
 		} else if (tagName == "ports") {
-			string portName;
+			std::string portName;
 			while (!is.eos()) {
 				while (is.openChild(portName)) {
 					VersionNumber version = is.getVersion();
@@ -858,7 +858,7 @@ void TFx::loadData(TIStream &is)
 
 					// Could not find (or add) a port with the corresponding name - throw
 					if (!port)
-						throw TException(string("port '") + portName + "' is not present");
+						throw TException(std::string("port '") + portName + "' is not present");
 
 					if (!is.eos()) {
 						TPersist *p = 0;
@@ -910,7 +910,7 @@ void TFx::loadData(TIStream &is)
 				groupIds.append(groupId);
 			}
 		} else if (tagName == "groupNames") {
-			wstring groupName;
+			std::wstring groupName;
 			while (!is.eos()) {
 				is >> groupName;
 				groupNames.append(groupName);
@@ -949,7 +949,7 @@ void TFx::saveData(TOStream &os)
 	if (linkedSetRoot == this) {
 		os.openChild("params");
 		for (int i = 0; i < getParams()->getParamCount(); i++) {
-			string paramName = getParams()->getParamName(i);
+			std::string paramName = getParams()->getParamName(i);
 			TParam *param = getParams()->getParam(i);
 			os.openChild(paramName);
 			param->saveData(os);
@@ -980,10 +980,10 @@ void TFx::saveData(TOStream &os)
 	bool cacheEnabled = TPassiveCacheManager::instance()->cacheEnabled(this);
 	if (cacheEnabled)
 		os.child("passiveCacheId") << TPassiveCacheManager::instance()->getPassiveCacheId(this);
-	wstring name = getName();
+	std::wstring name = getName();
 	if (name != L"")
 		os.child("name") << TFilePath(name);
-	wstring fxId = getFxId();
+	std::wstring fxId = getFxId();
 	os.child("fxId") << fxId;
 	if (!m_imp->m_attributes.isEnabled())
 		os.child("enabled") << 0;
@@ -996,7 +996,7 @@ void TFx::saveData(TOStream &os)
 			os << groupIdStack[i];
 		os.closeChild();
 		os.openChild("groupNames");
-		QStack<wstring> groupNameStack = m_imp->m_attributes.getGroupNameStack();
+		QStack<std::wstring> groupNameStack = m_imp->m_attributes.getGroupNameStack();
 		for (i = 0; i < groupNameStack.size(); i++)
 			os << groupNameStack[i];
 		os.closeChild();
@@ -1007,15 +1007,15 @@ void TFx::saveData(TOStream &os)
 
 void TFx::loadPreset(TIStream &is)
 {
-	string tagName;
+	std::string tagName;
 	while (is.openChild(tagName)) {
 		if (tagName == "dvpreset") {
-			string fxId = is.getTagAttribute("fxId");
+			std::string fxId = is.getTagAttribute("fxId");
 			if (fxId != getFxType())
 				throw TException("Preset doesn't match the fx type");
 		} else if (tagName == "params") {
 			while (!is.eos()) {
-				string paramName;
+				std::string paramName;
 				while (is.openChild(paramName)) {
 					try {
 						TParamP param = getParams()->getParam(paramName);
@@ -1035,15 +1035,15 @@ void TFx::loadPreset(TIStream &is)
 
 void TFx::savePreset(TOStream &os)
 {
-	map<string, string> attributes;
-	attributes.insert(std::make_pair(string("ver"), string("1.0")));
-	attributes.insert(std::make_pair(string("fxId"), getFxType()));
+	std::map<std::string, std::string> attributes;
+	attributes.insert(std::make_pair(std::string("ver"), std::string("1.0")));
+	attributes.insert(std::make_pair(std::string("fxId"), getFxType()));
 
 	os.openChild("dvpreset", attributes);
 
 	os.openChild("params");
 	for (int i = 0; i < getParams()->getParamCount(); i++) {
-		string paramName = getParams()->getParamName(i);
+		std::string paramName = getParams()->getParamName(i);
 		TParam *param = getParams()->getParam(i);
 		os.openChild(paramName);
 		param->saveData(os);
@@ -1065,7 +1065,7 @@ void TFx::disconnectAll()
 
 //--------------------------------------------------
 
-TFx *TFx::create(string name)
+TFx *TFx::create(std::string name)
 {
 	return TFxFactory::instance()->create(name);
 }

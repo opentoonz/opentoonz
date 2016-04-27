@@ -433,10 +433,10 @@ int DragSelectionTool::UndoChangeStrokes::getSize() const
 
 class UndoChangeOutlineStyle : public ToolUtils::TToolUndo
 {
-	vector<TStroke::OutlineOptions> m_oldOptions, m_newOptions;
+	std::vector<TStroke::OutlineOptions> m_oldOptions, m_newOptions;
 	FourPoints m_oldBBox, m_newBBox;
 	VectorSelectionTool *m_tool;
-	vector<int> m_indexes;
+	std::vector<int> m_indexes;
 	int m_selectionCount;
 
 public:
@@ -1953,7 +1953,7 @@ TPropertyGroup *VectorSelectionTool::getProperties(int idx)
 
 //-----------------------------------------------------------------------------
 
-bool VectorSelectionTool::onPropertyChanged(string propertyName)
+bool VectorSelectionTool::onPropertyChanged(std::string propertyName)
 {
 	if (SelectionTool::onPropertyChanged(propertyName))
 		return true;

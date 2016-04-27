@@ -44,14 +44,14 @@ public:
 	{
 	}
 
-	Token(string text, Type type, int pos)
+	Token(std::string text, Type type, int pos)
 		: m_text(text), m_type(type), m_pos(pos)
 	{
 	}
 
 	Type getType() const { return m_type; }
 
-	string getText() const { return m_text; }
+	std::string getText() const { return m_text; }
 	int getIntValue() const;
 	double getDoubleValue() const;
 
@@ -59,7 +59,7 @@ public:
 	int getPos1() const { return m_pos + m_text.length() - 1; }
 
 private:
-	string m_text;
+	std::string m_text;
 	int m_pos;
 	Type m_type;
 };
@@ -69,17 +69,17 @@ private:
 class DVAPI Tokenizer
 {
 
-	string m_buffer;
+	std::string m_buffer;
 	std::vector<Token> m_tokens;
 	int m_index;
 
 public:
 	Tokenizer();
-	Tokenizer(string buffer);
+	Tokenizer(std::string buffer);
 	~Tokenizer();
 
-	void setBuffer(string buffer);
-	string getBuffer() const { return m_buffer; }
+	void setBuffer(std::string buffer);
+	std::string getBuffer() const { return m_buffer; }
 
 	int getTokenCount() const;
 	const Token &getToken(int index) const;

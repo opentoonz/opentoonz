@@ -29,7 +29,7 @@ namespace TCli
 
 //=========================================================
 
-inline bool fromStr(int &value, string s)
+inline bool fromStr(int &value, std::string s)
 {
 	if (isInt(s)) {
 		value = toInt(s);
@@ -37,7 +37,7 @@ inline bool fromStr(int &value, string s)
 	} else
 		return false;
 }
-inline bool fromStr(double &value, string s)
+inline bool fromStr(double &value, std::string s)
 {
 	if (isDouble(s)) {
 		value = toDouble(s);
@@ -45,12 +45,12 @@ inline bool fromStr(double &value, string s)
 	} else
 		return false;
 }
-inline bool fromStr(string &value, string s)
+inline bool fromStr(std::string &value, std::string s)
 {
 	value = s;
 	return true;
 }
-inline bool fromStr(TFilePath &value, string s)
+inline bool fromStr(TFilePath &value, std::string s)
 {
 	value = TFilePath(s);
 	return true;
@@ -60,12 +60,12 @@ inline bool fromStr(TFilePath &value, string s)
 
 class UsageError
 {
-	string m_msg;
+	std::string m_msg;
 
 public:
-	UsageError(string msg) : m_msg(msg){};
+	UsageError(std::string msg) : m_msg(msg){};
 	~UsageError(){};
-	string getError() const { return m_msg; };
+	std::string getError() const { return m_msg; };
 };
 
 //=========================================================
@@ -73,13 +73,13 @@ public:
 class DVAPI UsageElement
 {
 protected:
-	string m_name, m_help;
+	std::string m_name, m_help;
 	bool m_selected;
 
 public:
-	UsageElement(string name, string help);
+	UsageElement(std::string name, std::string help);
 	virtual ~UsageElement(){};
-	string getName() const { return m_name; };
+	std::string getName() const { return m_name; };
 	bool isSelected() const { return m_selected; };
 	void select() { m_selected = true; };
 
@@ -87,11 +87,11 @@ public:
 	virtual bool isSwitcher() const { return false; };
 	virtual bool isArgument() const { return false; };
 	virtual bool isMultiArgument() const { return false; };
-	void setHelp(string help) { m_help = help; };
+	void setHelp(std::string help) { m_help = help; };
 
-	virtual void print(ostream &out) const;
-	virtual void printHelpLine(ostream &out) const;
-	virtual void dumpValue(ostream &out) const = 0;
+	virtual void print(std::ostream &out) const;
+	virtual void printHelpLine(std::ostream &out) const;
+	virtual void dumpValue(std::ostream &out) const = 0;
 	virtual void resetValue() = 0;
 
 private:
@@ -108,7 +108,7 @@ protected:
 	bool m_switcher;
 
 public:
-	Qualifier(string name, string help)
+	Qualifier(std::string name, std::string help)
 		: UsageElement(name, help), m_switcher(false){};
 	~Qualifier(){};
 
@@ -117,7 +117,7 @@ public:
 
 	operator bool() const { return isSelected(); };
 	virtual void fetch(int index, int &argc, char *argv[]) = 0;
-	virtual void print(ostream &out) const;
+	virtual void print(std::ostream &out) const;
 };
 
 //---------------------------------------------------------
@@ -125,11 +125,11 @@ public:
 class DVAPI SimpleQualifier : public Qualifier
 {
 public:
-	SimpleQualifier(string name, string help)
+	SimpleQualifier(std::string name, std::string help)
 		: Qualifier(name, help){};
 	~SimpleQualifier(){};
 	void fetch(int index, int &argc, char *argv[]);
-	void dumpValue(ostream &out) const;
+	void dumpValue(std::ostream &out) const;
 	void resetValue();
 };
 
@@ -138,7 +138,7 @@ public:
 class DVAPI Switcher : public SimpleQualifier
 {
 public:
-	Switcher(string name, string help)
+	Switcher(std::string name, std::string help)
 		: SimpleQualifier(name, help) { m_switcher = true; };
 	~Switcher(){};
 };
@@ -151,7 +151,7 @@ class QualifierT : public Qualifier
 	T m_value;
 
 public:
-	QualifierT<T>(string name, string help)
+	QualifierT<T>(std::string name, std::string help)
 		: Qualifier(name, help), m_value(){};
 	~QualifierT<T>(){};
 
@@ -163,13 +163,13 @@ public:
 			throw UsageError("missing argument");
 		if (!fromStr(m_value, argv[index + 1]))
 			throw UsageError(
-				m_name + ": bad argument type /" + string(argv[index + 1]) + "/");
+				m_name + ": bad argument type /" + std::string(argv[index + 1]) + "/");
 		for (int i = index; i < argc - 1; i++)
 			argv[i] = argv[i + 2];
 		argc -= 2;
 	};
 
-	void dumpValue(ostream &out) const
+	void dumpValue(std::ostream &out) const
 	{
 		out << m_name << " = " << (isSelected() ? "on" : "off") << " : "
 			<< m_value << "\n";
@@ -187,7 +187,7 @@ public:
 class DVAPI Argument : public UsageElement
 {
 public:
-	Argument(string name, string help)
+	Argument(std::string name, std::string help)
 		: UsageElement(name, help){};
 	~Argument(){};
 	virtual void fetch(int index, int &argc, char *argv[]);
@@ -203,13 +203,13 @@ class ArgumentT : public Argument
 	T m_value;
 
 public:
-	ArgumentT<T>(string name, string help) : Argument(name, help){};
+	ArgumentT<T>(std::string name, std::string help) : Argument(name, help){};
 	~ArgumentT<T>(){};
 	operator T() const { return m_value; };
 	T getValue() const { return m_value; };
 
 	bool assign(char *src) { return fromStr(m_value, src); };
-	void dumpValue(ostream &out) const
+	void dumpValue(std::ostream &out) const
 	{
 		out << m_name << " = " << m_value << "\n";
 	};
@@ -228,7 +228,7 @@ protected:
 	int m_count, m_index;
 
 public:
-	MultiArgument(string name, string help)
+	MultiArgument(std::string name, std::string help)
 		: Argument(name, help), m_count(0), m_index(0){};
 	~MultiArgument(){};
 	int getCount() const { return m_count; };
@@ -245,7 +245,7 @@ class MultiArgumentT : public MultiArgument
 	std::unique_ptr<T[]> m_values;
 
 public:
-	MultiArgumentT(string name, string help)
+	MultiArgumentT(std::string name, std::string help)
 		: MultiArgument(name, help) {}
 	T operator[](int index)
 	{
@@ -258,7 +258,7 @@ public:
 		return fromStr(m_values[m_index], src);
 	};
 
-	void dumpValue(ostream &out) const
+	void dumpValue(std::ostream &out) const
 	{
 		out << m_name << " = {";
 		for (int i = 0; i < m_count; i++)
@@ -336,15 +336,15 @@ class DVAPI Usage
 	std::unique_ptr<UsageImp> m_imp;
 
 public:
-	Usage(string progName);
+	Usage(std::string progName);
 	~Usage();
 	void add(const UsageLine &);
 
-	void print(ostream &out) const;
-	void dumpValues(ostream &out) const; // per debug
+	void print(std::ostream &out) const;
+	void dumpValues(std::ostream &out) const; // per debug
 
-	bool parse(int argc, char *argv[], ostream &err = std::cerr);
-	bool parse(const char *argvString, ostream &err = std::cerr);
+	bool parse(int argc, char *argv[], std::ostream &err = std::cerr);
+	bool parse(const char *argvString, std::ostream &err = std::cerr);
 	void clear(); // per debug
 
 private:
@@ -357,16 +357,16 @@ private:
 
 typedef QualifierT<int> IntQualifier;
 typedef QualifierT<double> DoubleQualifier;
-typedef QualifierT<string> StringQualifier;
+typedef QualifierT<std::string> StringQualifier;
 
 typedef ArgumentT<int> IntArgument;
 typedef ArgumentT<double> DoubleArgument;
-typedef ArgumentT<string> StringArgument;
+typedef ArgumentT<std::string> StringArgument;
 typedef ArgumentT<TFilePath> FilePathArgument;
 
 typedef MultiArgumentT<int> IntMultiArgument;
 typedef MultiArgumentT<double> DoubleMultiArgument;
-typedef MultiArgumentT<string> StringMultiArgument;
+typedef MultiArgumentT<std::string> StringMultiArgument;
 typedef MultiArgumentT<TFilePath> FilePathMultiArgument;
 
 //=========================================================
@@ -386,7 +386,7 @@ public:
 		return m_from <= frame && frame <= m_to;
 	};
 	void fetch(int index, int &argc, char *argv[]);
-	void dumpValue(ostream &out) const;
+	void dumpValue(std::ostream &out) const;
 	void resetValue();
 };
 

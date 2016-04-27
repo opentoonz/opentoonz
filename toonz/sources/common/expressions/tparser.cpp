@@ -54,7 +54,7 @@ class Parser::Imp
 public:
 	const Grammar *m_grammar;
 	Tokenizer m_tokenizer;
-	string m_errorString;
+	std::string m_errorString;
 	bool m_isValid;
 	Calculator *m_calculator;
 	std::vector<RunningPattern> m_patternStack;
@@ -240,7 +240,7 @@ bool Parser::Imp::parseExpression(bool checkOnly)
 
 //-------------------------------------------------------------------
 
-Calculator *Parser::parse(string text)
+Calculator *Parser::parse(std::string text)
 {
 	m_imp->m_tokenizer.setBuffer(text);
 	clearPointerContainer(m_imp->m_nodeStack);
@@ -264,7 +264,7 @@ Calculator *Parser::parse(string text)
 
 //-------------------------------------------------------------------
 
-Parser::SyntaxStatus Parser::checkSyntax(std::vector<SyntaxToken> &tokens, string text)
+Parser::SyntaxStatus Parser::checkSyntax(std::vector<SyntaxToken> &tokens, std::string text)
 {
 	m_imp->m_tokenizer.setBuffer(text);
 	if (m_imp->m_tokenizer.eos())
@@ -298,7 +298,7 @@ Parser::SyntaxStatus Parser::checkSyntax(std::vector<SyntaxToken> &tokens, strin
 
 //-------------------------------------------------------------------
 
-void Parser::getSuggestions(Grammar::Suggestions &suggestions, string text)
+void Parser::getSuggestions(Grammar::Suggestions &suggestions, std::string text)
 {
 	std::vector<SyntaxToken> tokens;
 	Parser::SyntaxStatus status = checkSyntax(tokens, text);
@@ -309,7 +309,7 @@ void Parser::getSuggestions(Grammar::Suggestions &suggestions, string text)
 
 //-------------------------------------------------------------------
 
-string Parser::getCurrentPatternString(string text)
+std::string Parser::getCurrentPatternString(std::string text)
 {
 	return "ohime";
 }
@@ -323,14 +323,14 @@ bool Parser::isValid() const
 
 //-------------------------------------------------------------------
 
-string Parser::getText() const
+std::string Parser::getText() const
 {
 	return m_imp->m_tokenizer.getBuffer();
 }
 
 //-------------------------------------------------------------------
 
-string Parser::getError() const
+std::string Parser::getError() const
 {
 	return m_imp->m_errorString;
 }

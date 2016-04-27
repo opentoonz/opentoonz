@@ -62,12 +62,12 @@ namespace
 class MoveLevelToFolderUndo : public TUndo
 {
 	TLevelSet *m_levelSet;
-	wstring m_levelName;
+	std::wstring m_levelName;
 	TFilePath m_oldFolder;
 	TFilePath m_newFolder;
 
 public:
-	MoveLevelToFolderUndo(TLevelSet *levelSet, wstring levelName, TFilePath newFolder)
+	MoveLevelToFolderUndo(TLevelSet *levelSet, std::wstring levelName, TFilePath newFolder)
 		: m_levelSet(levelSet), m_levelName(levelName), m_newFolder(newFolder)
 	{
 		TXshLevel *level = m_levelSet->getLevel(m_levelName);
@@ -221,7 +221,7 @@ void CastTreeViewer::onSceneNameChanged()
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 	QString rootName = QString("Root");
 	if (scene) {
-		wstring name = (scene->isUntitled()) ? L"Untitled" : scene->getSceneName();
+		std::wstring name = (scene->isUntitled()) ? L"Untitled" : scene->getSceneName();
 		rootName = rootName.fromStdWString(name);
 	}
 	root->setText(0, rootName);
@@ -249,7 +249,7 @@ void CastTreeViewer::rebuildCastTree()
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 	QString rootName = QString("Root");
 	if (scene) {
-		wstring name = (scene->isUntitled()) ? L"Untitled" : scene->getSceneName();
+		std::wstring name = (scene->isUntitled()) ? L"Untitled" : scene->getSceneName();
 		rootName = rootName.fromStdWString(name);
 	}
 
@@ -315,7 +315,7 @@ void CastTreeViewer::dragMoveEvent(QDragMoveEvent *event)
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 	QString rootName = QString("Root");
 	if (scene) {
-		wstring name = (scene->isUntitled()) ? L"Untitled" : scene->getSceneName();
+		std::wstring name = (scene->isUntitled()) ? L"Untitled" : scene->getSceneName();
 		rootName = rootName.fromStdWString(name);
 	}
 	if (m_dropTargetItem && m_dropTargetItem->data(0, Qt::DisplayRole).toString() == AudioFolderName ||
@@ -369,7 +369,7 @@ void CastTreeViewer::dropEvent(QDropEvent *event)
 		CastItem *item = castItems->getItem(i);
 		if (LevelCastItem *li = dynamic_cast<LevelCastItem *>(item)) {
 			TXshLevel *level = li->getLevel();
-			wstring levelName = level->getName();
+			std::wstring levelName = level->getName();
 			MoveLevelToFolderUndo *undo = new MoveLevelToFolderUndo(levelSet, levelName, folderPath);
 			levelSet->moveLevelToFolder(folderPath, level);
 			TUndoManager::manager()->add(undo);

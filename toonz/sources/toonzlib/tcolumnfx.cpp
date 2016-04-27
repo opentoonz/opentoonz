@@ -190,7 +190,7 @@ std::string getAlias(TXsheet *xsh, double frame, const TRenderSettings &info)
 //    Local namespace  -  Colormap (Sandor) Fxs stuff
 //****************************************************************************************
 
-bool vectorMustApplyCmappedFx(const vector<TRasterFxRenderDataP> &fxs)
+bool vectorMustApplyCmappedFx(const std::vector<TRasterFxRenderDataP> &fxs)
 {
 	std::vector<TRasterFxRenderDataP>::const_iterator ft, fEnd(fxs.end());
 	for (ft = fxs.begin(); ft != fEnd; ++ft) {
@@ -220,7 +220,7 @@ bool vectorMustApplyCmappedFx(const vector<TRasterFxRenderDataP> &fxs)
 
 //-------------------------------------------------------------------
 
-bool mustApplySandorFx(const vector<TRasterFxRenderDataP> &fxs)
+bool mustApplySandorFx(const std::vector<TRasterFxRenderDataP> &fxs)
 {
 	std::vector<TRasterFxRenderDataP>::const_iterator ft, fEnd(fxs.end());
 	for (ft = fxs.begin(); ft != fEnd; ++ft) {
@@ -234,7 +234,7 @@ bool mustApplySandorFx(const vector<TRasterFxRenderDataP> &fxs)
 
 //-------------------------------------------------------------------
 
-int getEnlargement(const vector<TRasterFxRenderDataP> &fxs, double scale)
+int getEnlargement(const std::vector<TRasterFxRenderDataP> &fxs, double scale)
 {
 	int enlargement = 1;
 
@@ -247,8 +247,8 @@ int getEnlargement(const vector<TRasterFxRenderDataP> &fxs, double scale)
 			case BlendTz: {
 				//Nothing happen, unless we have color 0 among the blended ones. In such case,
 				//we have to enlarge the bbox proportionally to the amount param.
-				vector<string> items;
-				string indexes = std::string(sandorData->m_argv[0]);
+				std::vector<std::string> items;
+				std::string indexes = std::string(sandorData->m_argv[0]);
 				parseIndexes(indexes, items);
 				PaletteFilterFxRenderData paletteFilterData;
 				insertIndexes(items, &paletteFilterData);
@@ -340,18 +340,18 @@ inline bool fxLess(TRasterFxRenderDataP a, TRasterFxRenderDataP b)
 
 //-------------------------------------------------------------------
 
-inline void sortCmappedFxs(vector<TRasterFxRenderDataP> &fxs)
+inline void sortCmappedFxs(std::vector<TRasterFxRenderDataP> &fxs)
 {
 	std::stable_sort(fxs.begin(), fxs.end(), fxLess);
 }
 
 //-------------------------------------------------------------------
 
-vector<int> getAllBut(vector<int> &colorIds)
+std::vector<int> getAllBut(std::vector<int> &colorIds)
 {
 	assert(TPixelCM32::getMaxInk() == TPixelCM32::getMaxPaint());
 
-	vector<int> curColorIds;
+	std::vector<int> curColorIds;
 	std::sort(colorIds.begin(), colorIds.end());
 
 	// Taking all colors EXCEPT those in colorIds
@@ -375,14 +375,14 @@ vector<int> getAllBut(vector<int> &colorIds)
 //! necessary informations before calling it - however, since the intent was that of
 //! optimizing memory usage, please avoid copying the entire image buffer...
 
-TImageP applyCmappedFx(TToonzImageP &ti, const vector<TRasterFxRenderDataP> &fxs, int frame, double scale)
+TImageP applyCmappedFx(TToonzImageP &ti, const std::vector<TRasterFxRenderDataP> &fxs, int frame, double scale)
 {
 	TImageP result = ti;
 	TTile resultTile; //Just a quick wrapper to the ImageCache
 	TPalette *inPalette, *tempPlt;
 	TPaletteP filteredPalette;
 	TRasterCM32P copyRas;
-	string cmRasCacheId;
+	std::string cmRasCacheId;
 
 	//Retrieve the image dpi
 	double dpiX, dpiY;
@@ -436,7 +436,7 @@ TImageP applyCmappedFx(TToonzImageP &ti, const vector<TRasterFxRenderDataP> &fxs
 	for (it = fxsCopy.rbegin(); it != fxsCopy.rend(); ++it) {
 		PaletteFilterFxRenderData *PaletteFilterData = dynamic_cast<PaletteFilterFxRenderData *>(it->getPointer());
 		if (PaletteFilterData && PaletteFilterData->m_type != eApplyToInksAndPaints) {
-			vector<int> indexes;
+			std::vector<int> indexes;
 			indexes.resize(PaletteFilterData->m_colors.size());
 
 			set<int>::const_iterator jt = PaletteFilterData->m_colors.begin();
@@ -482,8 +482,8 @@ TImageP applyCmappedFx(TToonzImageP &ti, const vector<TRasterFxRenderDataP> &fxs
 			param.superSampling = sandorData->m_blendParams.m_superSampling;
 
 			//Build the color indexes
-			vector<string> items;
-			string indexes = std::string(sandorData->m_argv[0]);
+			std::vector<std::string> items;
+			std::string indexes = std::string(sandorData->m_argv[0]);
 			parseIndexes(indexes, items);
 			PaletteFilterFxRenderData paletteFilterData;
 			insertIndexes(items, &paletteFilterData);
@@ -513,8 +513,8 @@ TImageP applyCmappedFx(TToonzImageP &ti, const vector<TRasterFxRenderDataP> &fxs
 				cmRas = TToonzImageP(TImageCache::instance()->get(cmRasCacheId, true))->getRaster();
 
 				//Apply a palette filter in order to keep only the colors specified in the sandor argv
-				vector<string> items;
-				string indexes = std::string(sandorData->m_argv[0]);
+				std::vector<std::string> items;
+				std::string indexes = std::string(sandorData->m_argv[0]);
 				parseIndexes(indexes, items);
 				PaletteFilterFxRenderData paletteFilterData;
 				insertIndexes(items, &paletteFilterData);
@@ -620,7 +620,7 @@ TImageP applyCmappedFx(TToonzImageP &ti, const vector<TRasterFxRenderDataP> &fxs
 
 //-------------------------------------------------------------------
 
-void applyCmappedFx(TVectorImageP &vi, const vector<TRasterFxRenderDataP> &fxs, int frame)
+void applyCmappedFx(TVectorImageP &vi, const std::vector<TRasterFxRenderDataP> &fxs, int frame)
 {
 	TRasterP ras;
 	bool keep = false;
@@ -670,7 +670,7 @@ class LevelFxBuilder : public ResourceBuilder
 	TRect m_rasBounds;
 
 public:
-	LevelFxBuilder(const string &resourceName, double frame, const TRenderSettings &rs,
+	LevelFxBuilder(const std::string &resourceName, double frame, const TRenderSettings &rs,
 				   TXshSimpleLevel *sl, TFrameId fid)
 		: ResourceBuilder(resourceName, 0, frame, rs), m_loadedRas(), m_palette(), m_sl(sl), m_fid(fid), m_64bit(rs.m_bpp == 64) {}
 
@@ -895,7 +895,7 @@ void TLevelColumnFx::doDryCompute(TRectD &rect, double frame, const TRenderSetti
 
 	int renderStatus = TRenderer::instance().getRenderStatus(TRenderer::renderId());
 
-	string alias = getAlias(frame, TRenderSettings()) + "_image";
+	std::string alias = getAlias(frame, TRenderSettings()) + "_image";
 
 	TImageInfo imageInfo;
 	getImageInfo(imageInfo, sl, cell.m_frameId);
@@ -1304,7 +1304,7 @@ void TLevelColumnFx::getImageInfo(TImageInfo &info, TXshSimpleLevel *sl, TFrameI
 	if (type == PLI_XSHLEVEL)
 		return;
 
-	string imageId = sl->getImageId(frameId);
+	std::string imageId = sl->getImageId(frameId);
 
 	const TImageInfo *storedInfo = ImageManager::instance()->getInfo(imageId, ImageManager::none, 0);
 
@@ -1394,7 +1394,7 @@ const TPersistDeclaration *TLevelColumnFx::getDeclaration() const
 
 //-------------------------------------------------------------------
 
-string TLevelColumnFx::getPluginId() const
+std::string TLevelColumnFx::getPluginId() const
 {
 	return "Toonz_";
 }
@@ -1421,7 +1421,7 @@ void TLevelColumnFx::setColumn(TXshLevelColumn *column)
 
 //-------------------------------------------------------------------
 
-wstring TLevelColumnFx::getColumnId() const
+std::wstring TLevelColumnFx::getColumnId() const
 {
 	if (!m_levelColumn)
 		return L"Col?";
@@ -1430,7 +1430,7 @@ wstring TLevelColumnFx::getColumnId() const
 
 //-------------------------------------------------------------------
 
-wstring TLevelColumnFx::getColumnName() const
+std::wstring TLevelColumnFx::getColumnName() const
 {
 	if (!m_levelColumn)
 		return L"";
@@ -1440,10 +1440,10 @@ wstring TLevelColumnFx::getColumnName() const
 
 //-------------------------------------------------------------------
 
-string TLevelColumnFx::getAlias(double frame, const TRenderSettings &info) const
+std::string TLevelColumnFx::getAlias(double frame, const TRenderSettings &info) const
 {
 	if (!m_levelColumn || m_levelColumn->getCell((int)frame).isEmpty())
-		return string();
+		return std::string();
 
 	const TXshCell &cell = m_levelColumn->getCell((int)frame);
 
@@ -1456,7 +1456,7 @@ string TLevelColumnFx::getAlias(double frame, const TRenderSettings &info) const
 		if (childLevel)
 			return ::getAlias(childLevel->getXsheet(), frame, info);
 
-		return string();
+		return std::string();
 	}
 
 	TFilePath path = sl->getPath();
@@ -1465,7 +1465,7 @@ string TLevelColumnFx::getAlias(double frame, const TRenderSettings &info) const
 	else
 		fp = path;
 
-	string rdata;
+	std::string rdata;
 	std::vector<TRasterFxRenderDataP>::const_iterator it = info.m_data.begin();
 	for (; it != info.m_data.end(); ++it) {
 		TRasterFxRenderDataP data = *it;
@@ -1650,7 +1650,7 @@ const TPersistDeclaration *TPaletteColumnFx::getDeclaration() const
 
 //-------------------------------------------------------------------
 
-string TPaletteColumnFx::getPluginId() const
+std::string TPaletteColumnFx::getPluginId() const
 {
 	return "Toonz_";
 }
@@ -1666,7 +1666,7 @@ TFxTimeRegion TPaletteColumnFx::getTimeRegion() const
 
 //-------------------------------------------------------------------
 
-wstring TPaletteColumnFx::getColumnName() const
+std::wstring TPaletteColumnFx::getColumnName() const
 {
 	if (!m_paletteColumn)
 		return L"Col?";
@@ -1675,7 +1675,7 @@ wstring TPaletteColumnFx::getColumnName() const
 
 //-------------------------------------------------------------------
 
-wstring TPaletteColumnFx::getColumnId() const
+std::wstring TPaletteColumnFx::getColumnId() const
 {
 	if (!m_paletteColumn)
 		return L"Col?";
@@ -1684,7 +1684,7 @@ wstring TPaletteColumnFx::getColumnId() const
 
 //-------------------------------------------------------------------
 
-string TPaletteColumnFx::getAlias(double frame, const TRenderSettings &info) const
+std::string TPaletteColumnFx::getAlias(double frame, const TRenderSettings &info) const
 {
 	TFilePath palettePath = getPalettePath(frame);
 	return "TPaletteColumnFx[" + toString(palettePath.getWideString()) + "]";
@@ -1765,7 +1765,7 @@ const TPersistDeclaration *TZeraryColumnFx::getDeclaration() const
 
 //-------------------------------------------------------------------
 
-string TZeraryColumnFx::getPluginId() const
+std::string TZeraryColumnFx::getPluginId() const
 {
 	return "Toonz_";
 }
@@ -1786,14 +1786,14 @@ void TZeraryColumnFx::setColumn(TXshZeraryFxColumn *column)
 
 //-------------------------------------------------------------------
 
-wstring TZeraryColumnFx::getColumnName() const
+std::wstring TZeraryColumnFx::getColumnName() const
 {
 	return getZeraryFx()->getName();
 }
 
 //-------------------------------------------------------------------
 
-wstring TZeraryColumnFx::getColumnId() const
+std::wstring TZeraryColumnFx::getColumnId() const
 {
 	return getZeraryFx()->getFxId();
 }
@@ -1823,7 +1823,7 @@ void TZeraryColumnFx::setZeraryFx(TFx *fx)
 
 //-------------------------------------------------------------------
 
-string TZeraryColumnFx::getAlias(double frame, const TRenderSettings &info) const
+std::string TZeraryColumnFx::getAlias(double frame, const TRenderSettings &info) const
 {
 	return "TZeraryColumnFx[" + m_fx->getAlias(frame, info) + "]";
 }
@@ -1905,16 +1905,16 @@ bool TXsheetFx::doGetBBox(double frame, TRectD &bBox, const TRenderSettings &inf
 
 //-------------------------------------------------------------------
 
-string TXsheetFx::getPluginId() const
+std::string TXsheetFx::getPluginId() const
 {
 	return "Toonz_";
 }
 
 //-------------------------------------------------------------------
 
-string TXsheetFx::getAlias(double frame, const TRenderSettings &info) const
+std::string TXsheetFx::getAlias(double frame, const TRenderSettings &info) const
 {
-	string alias = getFxType();
+	std::string alias = getFxType();
 	alias += "[";
 
 	//Add each terminal fx's alias
@@ -1966,7 +1966,7 @@ bool TOutputFx::doGetBBox(double frame, TRectD &bBox, const TRenderSettings &inf
 
 //-------------------------------------------------------------------
 
-string TOutputFx::getPluginId() const
+std::string TOutputFx::getPluginId() const
 {
 	return "Toonz_";
 }

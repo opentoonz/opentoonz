@@ -376,7 +376,7 @@ void findBestSolution(const TStroke *stroke1, const TStroke *stroke2,
 	if (r == partialAngles1Size) {
 
 		UINT j;
-		vector<std::pair<int, double>> angles1;
+		std::vector<std::pair<int, double>> angles1;
 
 		std::list<std::pair<int, double>>::iterator it = partialSolution.begin();
 
@@ -388,8 +388,8 @@ void findBestSolution(const TStroke *stroke1, const TStroke *stroke2,
 		}
 
 		UINT angles1Size = angles1.size();
-		vector<double> rationAngles(angles1Size), ratioLength(angles1Size + 1);
-		vector<double> ratioX, ratioY;
+		std::vector<double> rationAngles(angles1Size), ratioLength(angles1Size + 1);
+		std::vector<double> ratioX, ratioY;
 
 		for (j = 0; j < angles1Size; j++) {
 			rationAngles[j] = fabs(angles1[j].second - angles2[j].second) / (angles1[j].second + angles2[j].second);
@@ -533,7 +533,7 @@ void findBestSolution(const TStroke *stroke1, const TStroke *stroke2,
 {
 	assert(angles1.size() > angles2.size());
 
-	list<std::pair<int, double>> partialSolution;
+	std::list<std::pair<int, double>> partialSolution;
 
 	findBestSolution(stroke1, stroke2,
 					 &(angles1[0]), angles1.size(),
@@ -625,7 +625,7 @@ TStroke *extract(const TStroke *source, UINT firstQuad, UINT lastQuad)
 	UINT cpIndex0 = firstQuad * 2;
 	UINT cpIndex1 = lastQuad * 2 + 2;
 
-	vector<TThickPoint> points(cpIndex1 - cpIndex0 + 1);
+	std::vector<TThickPoint> points(cpIndex1 - cpIndex0 + 1);
 	UINT count = 0;
 	for (UINT j = cpIndex0; j <= cpIndex1; j++) {
 		points[count++] = source->getControlPoint(j);
@@ -636,7 +636,7 @@ TStroke *extract(const TStroke *source, UINT firstQuad, UINT lastQuad)
 
 //--------------------------------------------------------------------------------------
 
-void sample(const TStroke *stroke, int samplingSize, vector<TPointD> &sampledPoint)
+void sample(const TStroke *stroke, int samplingSize, std::vector<TPointD> &sampledPoint)
 {
 	double samplingFrequency = 1.0 / (double)samplingSize;
 	sampledPoint.resize(samplingSize);
@@ -676,8 +676,8 @@ public:
 		//saved for optimization
 		TAffine m_inverse;
 
-		vector<int> m_firstStrokeCornerIndexes;
-		vector<int> m_secondStrokeCornerIndexes;
+		std::vector<int> m_firstStrokeCornerIndexes;
+		std::vector<int> m_secondStrokeCornerIndexes;
 	};
 
 	//----------------------
@@ -722,9 +722,9 @@ void TInbetween::Imp::computeTransformation()
 	double cs, sn, totalLen1, totalLen2, constK, constQ, constB, constD, constA;
 	UINT cpCount1, cpCount2;
 	TPointD stroke1Centroid, stroke2Centroid, stroke1Begin, stroke2Begin, stroke1End, stroke2End, versor1, versor2;
-	vector<TPointD> samplingPoint1(samplingPointNumber), samplingPoint2(samplingPointNumber);
+	std::vector<TPointD> samplingPoint1(samplingPointNumber), samplingPoint2(samplingPointNumber);
 	TStroke *stroke1, *stroke2;
-	vector<double> ratioSampling, weigths, subStrokeXScaling, subStrokeYScaling;
+	std::vector<double> ratioSampling, weigths, subStrokeXScaling, subStrokeYScaling;
 
 	UINT strokeCount1 = m_firstImage->getStrokeCount();
 	UINT strokeCount2 = m_lastImage->getStrokeCount();
@@ -784,7 +784,7 @@ void TInbetween::Imp::computeTransformation()
 			} else {
 
 				const double startMinAngle = 30.0;
-				vector<pair<int, double>> angles1, angles2;
+				std::vector<std::pair<int, double>> angles1, angles2;
 
 				transform.m_type = StrokeTransform::GENERAL;
 
@@ -834,7 +834,7 @@ void TInbetween::Imp::computeTransformation()
 
 						if ((int)(angles1.size() + angles2.size()) < lastAngle - firstAngle + 1) {
 							double tempAngle;
-							vector<double> sortedAngles1, sortedAngles2;
+							std::vector<double> sortedAngles1, sortedAngles2;
 							sortedAngles1.reserve(angles1.size());
 							sortedAngles2.reserve(angles2.size());
 							for (j = 0; j < angles1.size(); j++) {
@@ -847,7 +847,7 @@ void TInbetween::Imp::computeTransformation()
 								if (tempAngle >= firstAngle && tempAngle <= lastAngle)
 									sortedAngles2.push_back(tempAngle);
 							}
-							vector<double> sortedAngles(sortedAngles1.size() + sortedAngles2.size());
+							std::vector<double> sortedAngles(sortedAngles1.size() + sortedAngles2.size());
 
 							std::sort(sortedAngles1.begin(), sortedAngles1.end());
 							std::sort(sortedAngles2.begin(), sortedAngles2.end());
@@ -1235,7 +1235,7 @@ void TInbetween::Imp::computeTransformation()
 
 				///////////////////////////////////////// compute centre of Rotation and Scaling
 
-				vector<TPointD> vpOld(cornerSize), vpNew(cornerSize);
+				std::vector<TPointD> vpOld(cornerSize), vpNew(cornerSize);
 				TPointD pOld, pNew;
 
 				for (j = 0; j < cornerSize - 1; j++) {
@@ -1356,7 +1356,7 @@ TVectorImageP TInbetween::Imp::tween(double t) const
 	assert(m_transformation.size() == strokeCount1);
 
 	double totalLen1, totalLen2, len1, len2, step1, step2;
-	vector<TThickPoint> points;
+	std::vector<TThickPoint> points;
 	TStroke *stroke1, *stroke2, *subStroke1, *subStroke2, *stroke;
 
 	TAffine mt, invMatrix;

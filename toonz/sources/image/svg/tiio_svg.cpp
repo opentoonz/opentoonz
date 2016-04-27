@@ -1972,7 +1972,7 @@ void writeRegion(TRegion *r, TPalette *plt, QTextStream &out, double ly)
 {
 	if (r->getEdgeCount() == 0)
 		return;
-	vector<const TQuadratic *> quadsOutline;
+	std::vector<const TQuadratic *> quadsOutline;
 
 	for (int i = 0; i < (int)r->getEdgeCount(); i++) {
 		TEdge *e = r->getEdge(i);
@@ -2038,7 +2038,7 @@ void writeOutlineStroke(TStroke *s, TPalette *plt, QTextStream &out, double ly, 
 	if (s->getMaxThickness() == 0)
 		return;
 
-	vector<TQuadratic *> quadsOutline;
+	std::vector<TQuadratic *> quadsOutline;
 	computeOutlines(s, 0, s->getChunkCount() - 1, quadsOutline, quality);
 	if (quadsOutline.empty())
 		return;
@@ -2192,12 +2192,12 @@ TStroke *buildStroke(NSVGpath *path, float width)
 	assert((path->npts - 1) % 3 == 0);
 
 	TThickPoint p0 = TThickPoint(path->pts[0], -path->pts[1], width);
-	vector<TThickPoint> points;
+	std::vector<TThickPoint> points;
 
 	points.push_back(p0);
 
 	for (int i = 1; i < path->npts; i += 3) {
-		vector<TThickQuadratic *> chunkArray;
+		std::vector<TThickQuadratic *> chunkArray;
 
 		computeQuadraticsFromCubic(p0,
 								   TThickPoint(path->pts[2 * i], -path->pts[2 * i + 1], width),
@@ -2289,7 +2289,7 @@ TImageP TImageReaderSvg::load()
   if (paintIndex!=-1)
     for (int i=0; i<(int)vapp->getRegionCount(); i++)
       vapp->getRegion(i)->setStyle(paintIndex);
-  vector<int> indexes(vapp->getStrokeCount());
+  std::vector<int> indexes(vapp->getStrokeCount());
   for (int i=0; i<(int)vapp->getStrokeCount() ;i++)
     indexes[i] = vimage->getStrokeCount()+i;
   vimage->insertImage(vapp, indexes);*/

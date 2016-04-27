@@ -61,7 +61,7 @@ TLogger *TLogger::instance()
 	return &_instance;
 }
 
-TLogger::Message::Message(MessageType type, string text)
+TLogger::Message::Message(MessageType type, std::string text)
 	: m_type(type), m_text(text)
 {
 	QTime t = QTime::currentTime();
@@ -119,7 +119,7 @@ TLogger::Stream::~Stream()
 	}
 }
 
-TLogger::Stream &TLogger::Stream::operator<<(string v)
+TLogger::Stream &TLogger::Stream::operator<<(std::string v)
 {
 	m_text += v;
 	return *this;

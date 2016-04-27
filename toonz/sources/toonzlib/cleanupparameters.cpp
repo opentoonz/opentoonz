@@ -32,7 +32,7 @@ namespace
 class FdgManager
 { // singleton
 
-	std::map<string, FDG_INFO> m_infos;
+	std::map<std::string, FDG_INFO> m_infos;
 
 	void loadFieldGuideInfo();
 	FdgManager() { loadFieldGuideInfo(); }
@@ -43,9 +43,9 @@ public:
 		return &_instance;
 	}
 
-	const FDG_INFO *getFdg(string name) const
+	const FDG_INFO *getFdg(std::string name) const
 	{
-		std::map<string, FDG_INFO>::const_iterator it;
+		std::map<std::string, FDG_INFO>::const_iterator it;
 		it = m_infos.find(name);
 		if (it == m_infos.end())
 			return 0;
@@ -53,9 +53,9 @@ public:
 			return &it->second;
 	}
 
-	void getFdgNames(vector<string> &names) const
+	void getFdgNames(std::vector<std::string> &names) const
 	{
-		std::map<string, FDG_INFO>::const_iterator it;
+		std::map<std::string, FDG_INFO>::const_iterator it;
 		for (it = m_infos.begin(); it != m_infos.end(); ++it)
 			names.push_back(it->first);
 	}
@@ -194,7 +194,7 @@ CleanupParameters::CleanupParameters()
 
 //---------------------------------------------------------
 
-bool CleanupParameters::setFdgByName(string name)
+bool CleanupParameters::setFdgByName(std::string name)
 {
 	const FDG_INFO *info = FdgManager::instance()->getFdg(name);
 	if (info) {
@@ -208,7 +208,7 @@ bool CleanupParameters::setFdgByName(string name)
 
 //---------------------------------------------------------
 
-void CleanupParameters::getFdgNames(vector<string> &names)
+void CleanupParameters::getFdgNames(std::vector<std::string> &names)
 {
 	FdgManager::instance()->getFdgNames(names);
 }
@@ -318,7 +318,7 @@ void CleanupParameters::saveData(TOStream &os) const
 	m_cleanupPalette->saveData(os);
 	os.closeChild();
 
-	std::map<string, string> attr;
+	std::map<std::string, std::string> attr;
 	if (m_autocenterType != AUTOCENTER_NONE) {
 		attr.clear();
 		attr["type"] = toString((int)m_autocenterType);
@@ -330,7 +330,7 @@ void CleanupParameters::saveData(TOStream &os) const
 	if (m_flipx || m_flipy || m_rotate != 0 //|| m_scale!=1
 		|| m_offx != 0 || m_offy != 0) {
 		attr.clear();
-		string flip = string(m_flipx ? "x" : "") + string(m_flipy ? "y" : "");
+		std::string flip = std::string(m_flipx ? "x" : "") + std::string(m_flipy ? "y" : "");
 		if (flip != "")
 			attr["flip"] = flip;
 		if (m_rotate != 0)
@@ -392,7 +392,7 @@ void CleanupParameters::loadData(TIStream &is, bool globalParams)
 		assign(&cp);
 	}
 
-	string tagName;
+	std::string tagName;
 	m_lineProcessingMode = lpNone;
 	m_noAntialias = false;
 	m_postAntialias = false;
@@ -407,16 +407,16 @@ void CleanupParameters::loadData(TIStream &is, bool globalParams)
 			is.closeChild();
 		} else if (tagName == "autoCenter") {
 			m_autocenterType = AUTOCENTER_FDG;
-			string s = is.getTagAttribute("type");
+			std::string s = is.getTagAttribute("type");
 			if (s != "" && isInt(s))
 				m_autocenterType = (AUTOCENTER_TYPE)toInt(s);
 			s = is.getTagAttribute("pegHoles");
 			if (s != "" && isInt(s))
 				m_pegSide = (PEGS_SIDE)toInt(s);
 		} else if (tagName == "transform") {
-			string s = is.getTagAttribute("flip");
-			m_flipx = (s.find("x") != string::npos);
-			m_flipy = (s.find("y") != string::npos);
+			std::string s = is.getTagAttribute("flip");
+			m_flipx = (s.find("x") != std::string::npos);
+			m_flipy = (s.find("y") != std::string::npos);
 			s = is.getTagAttribute("rotate");
 			if (s != "" && isInt(s))
 				m_rotate = toInt(s);
@@ -428,7 +428,7 @@ void CleanupParameters::loadData(TIStream &is, bool globalParams)
 				m_offy = toDouble(s);
 		} else if (tagName == "lineProcessing") {
 			m_lineProcessingMode = lpGrey;
-			string s = is.getTagAttribute("sharpness");
+			std::string s = is.getTagAttribute("sharpness");
 			if (s != "" && isDouble(s))
 				m_sharpness = toDouble(s);
 			s = is.getTagAttribute("autoAdjust");
@@ -438,11 +438,11 @@ void CleanupParameters::loadData(TIStream &is, bool globalParams)
 			if (s != "" && s == "color")
 				m_lineProcessingMode = lpColor;
 		} else if (tagName == "despeckling") {
-			string s = is.getTagAttribute("value");
+			std::string s = is.getTagAttribute("value");
 			if (s != "" && isInt(s))
 				m_despeckling = toInt(s);
 		} else if (tagName == "aaValue") {
-			string s = is.getTagAttribute("value");
+			std::string s = is.getTagAttribute("value");
 			if (s != "" && isInt(s))
 				m_aaValue = toInt(s);
 		} else if (tagName == "noAntialias")
@@ -450,11 +450,11 @@ void CleanupParameters::loadData(TIStream &is, bool globalParams)
 		else if (tagName == "MLAA")
 			m_postAntialias = true;
 		else if (tagName == "closestField") {
-			string s = is.getTagAttribute("value");
+			std::string s = is.getTagAttribute("value");
 			if (s != "" && isDouble(s))
 				m_closestField = toDouble(s);
 		} else if (tagName == "fdg") {
-			string s = is.getTagAttribute("name");
+			std::string s = is.getTagAttribute("name");
 			if (s != "")
 				setFdgByName(s);
 		} else if (tagName == "path") {
@@ -474,7 +474,7 @@ void CleanupParameters::loadData(TIStream &is, bool globalParams)
 const CleanupTypes::FDG_INFO &CleanupParameters::getFdgInfo()
 {
 	if (m_fdgInfo.m_name == "") {
-		std::vector<string> names;
+		std::vector<std::string> names;
 		FdgManager::instance()->getFdgNames(names);
 		if (names.size() > 1) {
 			const CleanupTypes::FDG_INFO *info =

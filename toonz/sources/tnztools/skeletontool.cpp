@@ -255,7 +255,7 @@ SkeletonTool::~SkeletonTool()
 
 //-------------------------------------------------------------------
 
-bool SkeletonTool::onPropertyChanged(string propertyName)
+bool SkeletonTool::onPropertyChanged(std::string propertyName)
 {
 	SkeletonGlobalKeyFrame = (int)(m_globalKeyframes.getValue());
 	// SkeletonInverseKinematics=(int)(m_ikEnabled.getValue());
@@ -724,7 +724,7 @@ void SkeletonTool::drawSkeleton(const Skeleton &skeleton, int row)
 
 	bool changingParent = dynamic_cast<ParentChangeTool *>(m_dragTool) != 0;
 	TStageObjectId currentObjectId = TTool::getApplication()->getCurrentObject()->getObjectId();
-	string currentHandle = xsh->getStageObject(currentObjectId)->getHandle();
+	std::string currentHandle = xsh->getStageObject(currentObjectId)->getHandle();
 
 	for (i = 0; i < (int)showBoneIndex.size(); i++) {
 		Skeleton::Bone *bone = skeleton.getBone(showBoneIndex[i]);
@@ -1226,7 +1226,7 @@ void SkeletonTool::drawDrawingBrowser(const TXshCell &cell, const TPointD &cente
 		return;
 	double pixelSize = getPixelSize();
 
-	string name = toString(cell.m_level->getName()) + "." + toString(cell.m_frameId.getNumber());
+	std::string name = toString(cell.m_level->getName()) + "." + toString(cell.m_frameId.getNumber());
 
 	QString qText = QString::fromStdString(name);
 	QFont font("Arial", 10); // ,QFont::Bold);

@@ -29,16 +29,16 @@ class DVAPI TParam : public TSmartObject, public TPersist
 {
 
 	DECLARE_CLASS_CODE
-	string m_name;
-	string m_description;
-	string m_label;
+	std::string m_name;
+	std::string m_description;
+	std::string m_label;
 
 public:
 	/*!
 		The contructor store the name of the parameter and initialize his 
 		interface with I/O through the class TPersist.
 	*/
-	TParam(string name = "", string description = "", string label = "")
+	TParam(std::string name = "", std::string description = "", std::string label = "")
 		: TSmartObject(m_classCode), TPersist(), m_name(name), m_description(description),
 		  m_label(label) {}
 
@@ -46,20 +46,20 @@ public:
 	/*!
 		Returns the name of the parameter.
 	*/
-	string getName() const { return m_name; };
+	std::string getName() const { return m_name; };
 	/*!
 		This method sets the name of the parameter to \e name.
 	*/
-	void setName(const string &name) { m_name = name; };
+	void setName(const std::string &name) { m_name = name; };
 
 	/*!
 		Return the description.
 	*/
-	string getDescription() const { return m_description; }
+	std::string getDescription() const { return m_description; }
 	/*!
 		Set the description.
 	*/
-	void setDescription(const string &description) { m_description = description; }
+	void setDescription(const std::string &description) { m_description = description; }
 
 	bool hasUILabel() const { return m_label != "" ? true : false; }
 	void setUILabel(const std::string &l) { m_label = l; };
@@ -98,7 +98,7 @@ public:
 		This pure virtual method must return a string with the value of the parameter 
 		and the precision needed.
 	*/
-	virtual string getValueAlias(double frame, int precision) = 0;
+	virtual std::string getValueAlias(double frame, int precision) = 0;
 
 	virtual bool isAnimatable() const = 0;
 	/*!

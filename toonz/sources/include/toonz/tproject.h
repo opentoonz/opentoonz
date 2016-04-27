@@ -24,20 +24,20 @@ class DVAPI TProject : public TSmartObject
 {
 
 	TFilePath m_name, m_path;
-	std::vector<string> m_folderNames;
-	std::map<string, TFilePath> m_folders;
-	std::map<string, bool> m_useScenePathFlags;
+	std::vector<std::string> m_folderNames;
+	std::map<std::string, TFilePath> m_folders;
+	std::map<std::string, bool> m_useScenePathFlags;
 	TSceneProperties *m_sprop;
 
 public:
 	// default folders names
-	static const string Inputs;
-	static const string Drawings;
-	static const string Scenes;
-	static const string Extras;
-	static const string Outputs;
-	static const string Scripts;
-	static const string Palettes;
+	static const std::string Inputs;
+	static const std::string Drawings;
+	static const std::string Scenes;
+	static const std::string Extras;
+	static const std::string Outputs;
+	static const std::string Scripts;
+	static const std::string Palettes;
 
 	static const TFilePath SandboxProjectName;
 
@@ -49,17 +49,17 @@ public:
 	TFilePath getProjectPath() const { return m_path; }
 	TFilePath getProjectFolder() const { return m_path.getParentDir(); }
 
-	void setFolder(string name, TFilePath path);
-	void setFolder(string name);
+	void setFolder(std::string name, TFilePath path);
+	void setFolder(std::string name);
 
 	int getFolderCount() const;
-	string getFolderName(int index) const;
-	int getFolderIndex(string folderName) const;
+	std::string getFolderName(int index) const;
+	int getFolderIndex(std::string folderName) const;
 
 	bool isConstantFolder(int index) const;
 
 	TFilePath getFolder(int index) const;
-	TFilePath getFolder(string name) const;
+	TFilePath getFolder(std::string name) const;
 
 	TFilePath getScenesPath() const;
 
@@ -74,14 +74,14 @@ public:
 	}
 
 	//?????????????????????????????????????????????
-	void setUseScenePath(string folderName, bool on);
+	void setUseScenePath(std::string folderName, bool on);
 	//?????????????????????????????????????????????
-	bool getUseScenePath(string folderName) const;
+	bool getUseScenePath(std::string folderName) const;
 
 	// nei due metodi seguenti fp e' un path assoluto (possibilmente con $scenepath)
 	//????????????????????????????????????????????????
 	int getFolderIndexFromPath(const TFilePath &fp);
-	wstring getFolderNameFromPath(const TFilePath &fp);
+	std::wstring getFolderNameFromPath(const TFilePath &fp);
 
 	bool save(const TFilePath &projectPath);
 	bool save();
@@ -153,7 +153,7 @@ public:
 	TFilePath getProjectPathByName(const TFilePath &projectName);
 
 	TProjectP loadSceneProject(const TFilePath &scenePath);
-	void getFolderNames(std::vector<string> &names);
+	void getFolderNames(std::vector<std::string> &names);
 
 	void addListener(Listener *listener);
 	void removeListener(Listener *listener);

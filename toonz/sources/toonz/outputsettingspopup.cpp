@@ -707,7 +707,7 @@ void OutputSettingsPopup::updateField()
 			continue;
 		}
 
-		string name = tree->getStageObject(TStageObjectId::CameraId(tmpCameraId))->getName();
+		std::string name = tree->getStageObject(TStageObjectId::CameraId(tmpCameraId))->getName();
 		cameras.append(QString::fromStdString(name));
 		if (name == tree->getStageObject(cameraId)->getName())
 			index = i;
@@ -946,7 +946,7 @@ void OutputSettingsPopup::onFormatChanged(const QString &str)
 void OutputSettingsPopup::openSettingsPopup()
 {
 	TOutputProperties *prop = getProperties();
-	string ext = prop->getPath().getType();
+	std::string ext = prop->getPath().getType();
 	openFormatSettingsPopup(this, ext, prop->getFileFormatProperties(ext));
 
 	if (m_presetCombo)
@@ -973,7 +973,7 @@ void OutputSettingsPopup::onCameraChanged(const QString &str)
 			tmpCameraId++;
 			continue;
 		}
-		string name = tree->getStageObject(TStageObjectId::CameraId(tmpCameraId))->getName();
+		std::string name = tree->getStageObject(TStageObjectId::CameraId(tmpCameraId))->getName();
 		if (name == str.toStdString())
 			break;
 		tmpCameraId++;
@@ -1324,13 +1324,13 @@ void OutputSettingsPopup::onAddPresetButtonPressed()
 
 	/*-- ファイルオプション --*/
 	os.openChild("formatsProperties");
-	std::vector<string> fileExtensions;
+	std::vector<std::string> fileExtensions;
 	prop->getFileFormatPropertiesExtensions(fileExtensions);
 	for (int i = 0; i < (int)fileExtensions.size(); i++) {
-		string ext = fileExtensions[i];
+		std::string ext = fileExtensions[i];
 		TPropertyGroup *pg = prop->getFileFormatProperties(ext);
 		assert(pg);
-		std::map<string, string> attr;
+		std::map<std::string, std::string> attr;
 		attr["ext"] = ext;
 		os.openChild("formatProperties", attr);
 		pg->saveData(os);
@@ -1433,7 +1433,7 @@ void OutputSettingsPopup::onPresetSelected(const QString &str)
 		return;
 	}
 
-	string tagName = "";
+	std::string tagName = "";
 	if (!is.matchTag(tagName) ||
 		tagName != "outputsettingspreset") {
 		QMessageBox::warning(this, tr("Warning"),
@@ -1481,7 +1481,7 @@ void OutputSettingsPopup::onPresetSelected(const QString &str)
 		else if (tagName == "formatsProperties") {
 			while (is.matchTag(tagName)) {
 				if (tagName == "formatProperties") {
-					string ext = is.getTagAttribute("ext");
+					std::string ext = is.getTagAttribute("ext");
 					TPropertyGroup *pg =
 						prop->getFileFormatProperties(ext);
 					if (ext == "avi") {

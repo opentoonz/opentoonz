@@ -144,11 +144,11 @@ void TXshNoteSet::setNotePos(int noteIndex, TPointD pos)
 void TXshNoteSet::loadData(TIStream &is)
 {
 	while (!is.eos()) {
-		string tagName;
+		std::string tagName;
 		if (is.matchTag(tagName)) {
 			if (tagName == "notes") {
 				while (!is.eos()) {
-					string tagName;
+					std::string tagName;
 					if (is.matchTag(tagName)) {
 						if (tagName == "note") {
 							Note note;

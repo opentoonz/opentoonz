@@ -32,21 +32,21 @@ public:
 	Imp *m_imp;
 
 public:
-	Variable(string name, string defaultValue);
-	Variable(string name);
+	Variable(std::string name, std::string defaultValue);
+	Variable(std::string name);
 	virtual ~Variable();
 
-	string getName() const;
-	string getValue() const;
+	std::string getName() const;
+	std::string getValue() const;
 
-	void assignValue(string str);
+	void assignValue(std::string str);
 };
 
 class DVAPI IntVar : public Variable
 {
 public:
-	IntVar(string name, int defValue);
-	IntVar(string name);
+	IntVar(std::string name, int defValue);
+	IntVar(std::string name);
 	operator int() const;
 	void operator=(int v);
 };
@@ -54,8 +54,8 @@ public:
 class DVAPI DoubleVar : public Variable
 {
 public:
-	DoubleVar(string name, double defValue);
-	DoubleVar(string name);
+	DoubleVar(std::string name, double defValue);
+	DoubleVar(std::string name);
 	operator double() const;
 	void operator=(double v);
 };
@@ -63,17 +63,17 @@ public:
 class DVAPI StringVar : public Variable
 {
 public:
-	StringVar(string name, const string &defValue);
-	StringVar(string name);
-	operator string() const;
-	void operator=(const string &v);
+	StringVar(std::string name, const std::string &defValue);
+	StringVar(std::string name);
+	operator std::string() const;
+	void operator=(const std::string &v);
 };
 
 class DVAPI FilePathVar : public Variable
 {
 public:
-	FilePathVar(string name, const TFilePath &defValue);
-	FilePathVar(string name);
+	FilePathVar(std::string name, const TFilePath &defValue);
+	FilePathVar(std::string name);
 	operator TFilePath() const;
 	void operator=(const TFilePath &v);
 };
@@ -81,8 +81,8 @@ public:
 class DVAPI RectVar : public Variable
 {
 public:
-	RectVar(string name, const TRect &defValue);
-	RectVar(string name);
+	RectVar(std::string name, const TRect &defValue);
+	RectVar(std::string name);
 	operator TRect() const;
 	void operator=(const TRect &v);
 };
@@ -95,30 +95,30 @@ public:
 //
 // es.:  TEnv::setApplication("Toonz","5.0");
 //
-DVAPI void setApplication(string applicationName, string applicationVersion);
+DVAPI void setApplication(std::string applicationName, std::string applicationVersion);
 
-DVAPI string getApplicationName();
-DVAPI string getApplicationVersion();
+DVAPI std::string getApplicationName();
+DVAPI std::string getApplicationVersion();
 
 // es.: TEnv::setModuleFullName("Toonz 5.0.1 Harlequin");
 // (default: "<applicationName> <applicationVersion>")
-DVAPI void setApplicationFullName(string applicationFullName);
-DVAPI string getApplicationFullName();
+DVAPI void setApplicationFullName(std::string applicationFullName);
+DVAPI std::string getApplicationFullName();
 
 // es.: TEnv::setModuleName("inknpaint")
 // (default: "<applicationName>")
-DVAPI void setModuleName(string moduleName);
-DVAPI string getModuleName();
+DVAPI void setModuleName(std::string moduleName);
+DVAPI std::string getModuleName();
 
 // es.: TEnv::setRootVarName("TABROOT");
 // (default: toUpper(<applicationName> + "ROOT"))
-DVAPI string getRootVarName();
-DVAPI void setRootVarName(string varName);
+DVAPI std::string getRootVarName();
+DVAPI void setRootVarName(std::string varName);
 
 // es.: TEnv::setRootVarName("Toonz");
 // (default: <programName>)
-DVAPI void setSystemVarPrefix(string prefix);
-DVAPI string getSystemVarPrefix();
+DVAPI void setSystemVarPrefix(std::string prefix);
+DVAPI std::string getSystemVarPrefix();
 
 // su Windows ritorna
 //   'SOFTWARE\Digital Video\<applicationName>\<applicationVersion>\<rootvar>'
@@ -128,9 +128,9 @@ DVAPI TFilePath getRootVarPath();
 
 // restituisce il valore della variabile di sistema varName
 // (su window aggiunge "SOFTWARE\Digital Video\....." all'inizio)
-DVAPI string getSystemVarStringValue(string varName);
-DVAPI TFilePath getSystemVarPathValue(string varName);
-DVAPI TFilePathSet getSystemVarPathSetValue(string varName);
+DVAPI std::string getSystemVarStringValue(std::string varName);
+DVAPI TFilePath getSystemVarPathValue(std::string varName);
+DVAPI TFilePathSet getSystemVarPathSetValue(std::string varName);
 
 DVAPI TFilePath getStuffDir();
 DVAPI TFilePath getConfigDir();

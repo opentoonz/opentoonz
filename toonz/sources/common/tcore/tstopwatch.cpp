@@ -52,7 +52,7 @@ using namespace std;
 
 //-----------------------------------------------------------
 
-TStopWatch::TStopWatch(string name)
+TStopWatch::TStopWatch(std::string name)
 	: m_name(name), m_active(false), m_isRunning(false)
 {
 	if (timerToUse == TTUUnknown)

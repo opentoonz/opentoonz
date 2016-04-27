@@ -191,7 +191,7 @@ bool TXshSimpleLevel::m_fillFullColorRaster = false;
 
 //-----------------------------------------------------------------------------
 
-TXshSimpleLevel::TXshSimpleLevel(const wstring &name)
+TXshSimpleLevel::TXshSimpleLevel(const std::wstring &name)
 	: TXshLevel(m_classCode, name), m_properties(new LevelProperties), m_palette(0), m_idBase(toString(idBaseCode++)), m_editableRangeUserInfo(L""), m_isSubsequence(false), m_16BitChannelLevel(false), m_isReadOnly(false), m_temporaryHookMerged(false)
 {
 }
@@ -208,7 +208,7 @@ TXshSimpleLevel::~TXshSimpleLevel()
 
 //-----------------------------------------------------------------------------
 
-void TXshSimpleLevel::setEditableRange(unsigned int from, unsigned int to, const wstring &userName)
+void TXshSimpleLevel::setEditableRange(unsigned int from, unsigned int to, const std::wstring &userName)
 {
 	assert(from <= to && to < (unsigned int)getFrameCount());
 	unsigned int i;
@@ -218,7 +218,7 @@ void TXshSimpleLevel::setEditableRange(unsigned int from, unsigned int to, const
 	QString hostName = TSystem::getHostName();
 	m_editableRangeUserInfo = userName + L"_" + hostName.toStdWString();
 
-	wstring fileName = getEditableFileName();
+	std::wstring fileName = getEditableFileName();
 	TFilePath dstPath = getScene()->decodeFilePath(m_path);
 	dstPath = dstPath.withName(fileName).withType(dstPath.getType());
 
@@ -247,7 +247,7 @@ void TXshSimpleLevel::mergeTemporaryHookFile(unsigned int from, unsigned int to,
 
 	HookSet *tempHookSet = new HookSet;
 	TIStream is(hookFile);
-	string tagName;
+	std::string tagName;
 	try {
 		if (is.matchTag(tagName) && tagName == "hooks")
 			tempHookSet->loadData(is);
@@ -290,12 +290,12 @@ void TXshSimpleLevel::clearEditableRange()
 
 //-----------------------------------------------------------------------------
 
-wstring TXshSimpleLevel::getEditableFileName()
+std::wstring TXshSimpleLevel::getEditableFileName()
 {
 #ifdef MACOSX
-	wstring fileName = L"." + m_path.getWideName();
+	std::wstring fileName = L"." + m_path.getWideName();
 #else
-	wstring fileName = m_path.getWideName();
+	std::wstring fileName = m_path.getWideName();
 #endif
 	fileName += L"_" + m_editableRangeUserInfo;
 	int from, to;
@@ -351,11 +351,11 @@ void TXshSimpleLevel::touchFrame(const TFrameId &fid)
 	ch->frameModifiedNow(fid);
 
 	if (getType() == PLI_XSHLEVEL) {
-		string id = rasterized(getImageId(fid));
+		std::string id = rasterized(getImageId(fid));
 		ImageManager::instance()->invalidate(id);
 	}
 	if (getType() & FULLCOLOR_TYPE) {
-		string id = filled(getImageId(fid));
+		std::string id = filled(getImageId(fid));
 		ImageManager::instance()->invalidate(id);
 	}
 }
@@ -369,11 +369,11 @@ void TXshSimpleLevel::onPaletteChanged()
 		const TFrameId &fid = *ft;
 
 		if (getType() == PLI_XSHLEVEL) {
-			string id = rasterized(getImageId(fid));
+			std::string id = rasterized(getImageId(fid));
 			ImageManager::instance()->invalidate(id);
 		}
 		if (getType() & FULLCOLOR_TYPE) {
-			string id = filled(getImageId(fid));
+			std::string id = filled(getImageId(fid));
 			ImageManager::instance()->invalidate(id);
 		}
 
@@ -404,7 +404,7 @@ void TXshSimpleLevel::setPath(const TFilePath &fp, bool keepFrames)
 
 	if (getType() != PLI_XSHLEVEL) {
 		if (!m_frames.empty()) {
-			string imageId = getImageId(getFirstFid());
+			std::string imageId = getImageId(getFirstFid());
 			const TImageInfo *imageInfo = ImageManager::instance()->getInfo(imageId, ImageManager::none, 0);
 			if (imageInfo) {
 				TDimension imageRes(0, 0);
@@ -604,7 +604,7 @@ TImageP TXshSimpleLevel::getFrame(const TFrameId &fid, UCHAR imFlags, int subsam
 	if (m_frames.count(fid) == 0)
 		return TImageP();
 
-	const string &imgId = getImageId(fid);
+	const std::string &imgId = getImageId(fid);
 
 	ImageLoader::BuildExtData extData(this, fid, subsampling);
 	TImageP img = ImageManager::instance()->getImage(
@@ -628,7 +628,7 @@ TImageInfo *TXshSimpleLevel::getFrameInfo(const TFrameId &fid, bool toBeModified
 	if (m_frames.count(fid) == 0)
 		return 0;
 
-	const string &imgId = getImageId(fid);
+	const std::string &imgId = getImageId(fid);
 
 	TImageInfo *info = ImageManager::instance()->getInfo(
 		imgId, toBeModified ? ImageManager::toBeModified : ImageManager::none, 0);
@@ -691,7 +691,7 @@ TRasterImageP TXshSimpleLevel::getFrameToCleanup(const TFrameId &fid) const
 		return TImageP();
 
 	bool flag = (m_scannedPath != TFilePath());
-	string imageId = getImageId(fid, flag ? Scanned : 0);
+	std::string imageId = getImageId(fid, flag ? Scanned : 0);
 
 	ImageLoader::BuildExtData extData(this, fid, 1);
 	TRasterImageP img = ImageManager::instance()->getImage(imageId, ImageManager::dontPutInCache, &extData);
@@ -718,7 +718,7 @@ TImageP TXshSimpleLevel::getFullsampledFrame(const TFrameId &fid, UCHAR imFlags)
 	if (it == m_frames.end())
 		return TRasterImageP();
 
-	string imageId = getImageId(fid);
+	std::string imageId = getImageId(fid);
 
 	ImageLoader::BuildExtData extData(this, fid, 1);
 	TImageP img = ImageManager::instance()->getImage(imageId, imFlags, &extData);
@@ -733,14 +733,14 @@ TImageP TXshSimpleLevel::getFullsampledFrame(const TFrameId &fid, UCHAR imFlags)
 
 //-----------------------------------------------------------------------------
 
-string TXshSimpleLevel::getIconId(const TFrameId &fid, int frameStatus) const
+std::string TXshSimpleLevel::getIconId(const TFrameId &fid, int frameStatus) const
 {
 	return "icon:" + getImageId(fid, frameStatus);
 }
 
 //-----------------------------------------------------------------------------
 
-string TXshSimpleLevel::getIconId(const TFrameId &fid, const TDimension &size) const
+std::string TXshSimpleLevel::getIconId(const TFrameId &fid, const TDimension &size) const
 {
 	return getImageId(fid) + ":" + toString(size.lx) + "x" + toString(size.ly);
 }
@@ -844,7 +844,7 @@ void TXshSimpleLevel::setFrame(const TFrameId &fid, const TImageP &img)
 
 	// Deal with the ImageManger: ensure the identifiers are bound, and the
 	// associated image is either modified to img or (if !img) invalidated.
-	const string &imageId = getImageId(fid);
+	const std::string &imageId = getImageId(fid);
 
 	if (!ImageManager::instance()->isBound(imageId)) {
 		const TFilePath &decodedPath = getScene()->decodeFilePath(path);
@@ -859,7 +859,7 @@ void TXshSimpleLevel::setFrame(const TFrameId &fid, const TImageP &img)
 		//  b) The latter is used only in LineTest - which does not have Cleanup
 
 		if (m_type == PLI_XSHLEVEL) {
-			const string &imageId2 = rasterized(imageId);
+			const std::string &imageId2 = rasterized(imageId);
 			if (!ImageManager::instance()->isBound(imageId2))
 				ImageManager::instance()->bind(imageId2, new ImageRasterizer);
 			else
@@ -867,7 +867,7 @@ void TXshSimpleLevel::setFrame(const TFrameId &fid, const TImageP &img)
 		}
 
 		if (m_type == OVL_XSHLEVEL || m_type == TZI_XSHLEVEL) {
-			const string &imageId2 = filled(imageId);
+			const std::string &imageId2 = filled(imageId);
 			if (!ImageManager::instance()->isBound(imageId2))
 				ImageManager::instance()->bind(imageId2, new ImageFiller);
 			else
@@ -946,7 +946,7 @@ void TXshSimpleLevel::clearFrames()
 
 void TXshSimpleLevel::loadData(TIStream &is)
 {
-	string tagName;
+	std::string tagName;
 	bool flag = false;
 
 	int type = UNKNOWN_XSHLEVEL;
@@ -960,7 +960,7 @@ void TXshSimpleLevel::loadData(TIStream &is)
 				is >> m_scannedPath;
 				is.matchEndTag();
 			} else if (tagName == "info") {
-				string v;
+				std::string v;
 				double xdpi = 0, ydpi = 0;
 				int subsampling = 1;
 				int doPremultiply = 0;
@@ -973,7 +973,7 @@ void TXshSimpleLevel::loadData(TIStream &is)
 					ydpi = toDouble(v);
 				if (xdpi != 0 && ydpi != 0)
 					dpiPolicy = LevelProperties::DP_CustomDpi;
-				string dpiType = is.getTagAttribute("dpiType");
+				std::string dpiType = is.getTagAttribute("dpiType");
 				if (dpiType == "image")
 					dpiPolicy = LevelProperties::DP_ImageDpi;
 				if (is.getTagParam("type", v) && v == "s")
@@ -999,7 +999,7 @@ void TXshSimpleLevel::loadData(TIStream &is)
 			if (flag)
 				break; // ci puo' essere un solo nome
 			flag = true;
-			wstring token;
+			std::wstring token;
 			is >> token;
 			if (token == L"__empty") {
 				// empty = true;
@@ -1018,7 +1018,7 @@ void TXshSimpleLevel::loadData(TIStream &is)
 			} else if (token == L"__raster") // obsoleto (Tab2.2)
 			{
 				double xdpi = 1, ydpi = 1;
-				string extension;
+				std::string extension;
 				is >> xdpi >> ydpi >> m_name >> extension;
 				setName(m_name);
 				type = OVL_XSHLEVEL;
@@ -1032,7 +1032,7 @@ void TXshSimpleLevel::loadData(TIStream &is)
 		}
 	}
 	if (type == UNKNOWN_XSHLEVEL) {
-		string ext = m_path.getType();
+		std::string ext = m_path.getType();
 		if (ext == "pli" || ext == "svg")
 			type = PLI_XSHLEVEL;
 		else if (ext == "tlv" || ext == "tzu" || ext == "tzp" || ext == "tzl")
@@ -1137,7 +1137,7 @@ void TXshSimpleLevel::load()
 	m_isSubsequence = loadingLevelRange.isEnabled();
 
 	TFilePath checkpath = getScene()->decodeFilePath(m_path);
-	string type = checkpath.getType();
+	std::string type = checkpath.getType();
 
 	if (m_scannedPath != TFilePath()) {
 		getProperties()->setDirtyFlag(false); // Level is now supposedly loaded from disk
@@ -1234,7 +1234,7 @@ void TXshSimpleLevel::load()
 			TPointD imageDpi;
 
 			const TFrameId &firstFid = getFirstFid();
-			string imageId = getImageId(firstFid);
+			std::string imageId = getImageId(firstFid);
 
 			const TImageInfo *imageInfo = ImageManager::instance()->getInfo(imageId, ImageManager::none, 0);
 			if (imageInfo) {
@@ -1286,7 +1286,7 @@ void TXshSimpleLevel::load()
 
 	if (!hookFile.isEmpty()) {
 		TIStream is(hookFile);
-		string tagName;
+		std::string tagName;
 		try {
 			if (is.matchTag(tagName) && tagName == "hooks")
 				hookSet->loadData(is);
@@ -1345,7 +1345,7 @@ void TXshSimpleLevel::load(const std::vector<TFrameId> &fIds)
 		if (m_properties->getImageDpi() == TPointD() && !m_frames.empty()) {
 			TDimension imageRes(0, 0);
 			TPointD imageDpi;
-			string imageId = getImageId(getFirstFid());
+			std::string imageId = getImageId(getFirstFid());
 			const TImageInfo *imageInfo = ImageManager::instance()->getInfo(imageId, ImageManager::none, 0);
 			if (imageInfo) {
 				imageRes.lx = imageInfo->m_lx;
@@ -1374,7 +1374,7 @@ void TXshSimpleLevel::saveData(TOStream &os)
 {
 	os << m_name;
 
-	map<string, string> attr;
+	std::map<std::string, std::string> attr;
 	if (getProperties()->getDpiPolicy() == LevelProperties::DP_CustomDpi) {
 		TPointD dpi = getProperties()->getDpi();
 		if (dpi.x != 0 && dpi.y != 0) {
@@ -1462,7 +1462,7 @@ void TXshSimpleLevel::save(const TFilePath &fp, const TFilePath &oldFp, bool ove
 			throw TSystemException(dDstPath, "The level cannot be saved: it is a read only level.");
 		else if (getType() != OVL_XSHLEVEL) {
 			//file partially unlocked
-			wstring fileName = getEditableFileName();
+			std::wstring fileName = getEditableFileName();
 			assert(!fileName.empty());
 
 			TFilePath app = dDstPath.withName(fileName).withType(dDstPath.getType());
@@ -1650,7 +1650,7 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp, bool overwrite
 				ImageLoader::BuildExtData extData(this, TFrameId());
 
 				for (it = fids.begin(); it != fids.end(); ++it) {
-					string imageId = getImageId(*it, Normal); // Retrieve the actual level frames ("L_whatever")
+					std::string imageId = getImageId(*it, Normal); // Retrieve the actual level frames ("L_whatever")
 					if (!ImageManager::instance()->isModified(imageId))
 						continue;
 
@@ -1704,12 +1704,12 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp, bool overwrite
 				updater.getLevelWriter()->renumberFids(m_renumberTable);
 
 				if (!m_editableRange.empty())
-					fids = vector<TFrameId>(m_editableRange.begin(), m_editableRange.end());
+					fids = std::vector<TFrameId>(m_editableRange.begin(), m_editableRange.end());
 
 				ImageLoader::BuildExtData extData(this, TFrameId());
 
 				for (it = fids.begin(); it != fids.end(); ++it) {
-					string imageId = getImageId(*it, Normal); // Retrieve the actual level frames ("L_whatever")
+					std::string imageId = getImageId(*it, Normal); // Retrieve the actual level frames ("L_whatever")
 					if (!ImageManager::instance()->isModified(imageId))
 						continue;
 
@@ -1756,7 +1756,7 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp, bool overwrite
 		}
 
 		//file partially unlocked
-		wstring fileName = getEditableFileName();
+		std::wstring fileName = getEditableFileName();
 		assert(!fileName.empty());
 		TFilePath app = decodedFp.withName(fileName).withType(decodedFp.getType());
 		hookFile = getHookPath(app);
@@ -1808,12 +1808,12 @@ std::string TXshSimpleLevel::getImageId(const TFrameId &fid, int frameStatus) co
 {
 	if (frameStatus < 0)
 		frameStatus = getFrameStatus(fid);
-	string prefix = "L";
+	std::string prefix = "L";
 	if (frameStatus & CleanupPreview)
 		prefix = "P";
 	else if ((frameStatus & (Scanned | Cleanupped)) == Scanned)
 		prefix = "S";
-	string imageId = m_idBase + "_" + prefix + fid.expand();
+	std::string imageId = m_idBase + "_" + prefix + fid.expand();
 	return imageId;
 }
 
@@ -1873,7 +1873,7 @@ void TXshSimpleLevel::invalidateFrames()
 /*- 指定したFIdのみInvalidateする -*/
 void TXshSimpleLevel::invalidateFrame(const TFrameId &fid)
 {
-	string id = getImageId(fid);
+	std::string id = getImageId(fid);
 	ImageManager::instance()->invalidate(id);
 }
 
@@ -1946,7 +1946,7 @@ TPointD TXshSimpleLevel::getImageDpi(const TFrameId &fid, int frameStatus)
 		return TPointD();
 
 	const TFrameId &theFid = (fid == TFrameId::NO_FRAME || !isFid(fid)) ? getFirstFid() : fid;
-	const string &imageId = getImageId(theFid, frameStatus);
+	const std::string &imageId = getImageId(theFid, frameStatus);
 
 	const TImageInfo *imageInfo = ImageManager::instance()->getInfo(imageId, ImageManager::none, 0);
 

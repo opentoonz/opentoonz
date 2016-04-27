@@ -445,7 +445,7 @@ public:
 	{
 	}
 
-	string getAlias(double frame, const TRenderSettings &info) const
+	std::string getAlias(double frame, const TRenderSettings &info) const
 	{
 		unsigned long id = getIdentifier();
 		double value = m_intensity->getValue(frame);

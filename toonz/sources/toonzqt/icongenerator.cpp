@@ -988,7 +988,7 @@ std::string FileIconRenderer::getId(const TFilePath &path, const TFrameId &fid)
 
 	if (type == "tab" || type == "tnz" || type == "mesh" || // meshes are not currently viewable
 		TFileType::isViewable(TFileType::getInfo(path))) {
-		string fidNumber;
+		std::string fidNumber;
 		if (fid != TFrameId::NO_FRAME)
 			fidNumber = "frame:" + fid.expand(TFrameId::NO_PAD);
 		return "$:" + toString(path) + fidNumber;
@@ -1594,7 +1594,7 @@ QPixmap IconGenerator::getIcon(TStageObjectSpline *spline)
 {
 	if (!spline)
 		return QPixmap();
-	string iconName = spline->getIconId();
+	std::string iconName = spline->getIconId();
 
 	QPixmap pix;
 	if (::getIcon(iconName, pix))
@@ -1612,7 +1612,7 @@ void IconGenerator::invalidate(TStageObjectSpline *spline)
 {
 	if (!spline)
 		return;
-	string iconName = spline->getIconId();
+	std::string iconName = spline->getIconId();
 	removeIcon(iconName);
 
 	addTask(iconName, new SplineIconRenderer(iconName, getIconSize(), spline));
@@ -1624,7 +1624,7 @@ void IconGenerator::remove(TStageObjectSpline *spline)
 {
 	if (!spline)
 		return;
-	string iconName = spline->getIconId();
+	std::string iconName = spline->getIconId();
 	removeIcon(iconName);
 }
 
@@ -1684,7 +1684,7 @@ void IconGenerator::invalidateSceneIcon()
 
 //-----------------------------------------------------------------------------
 
-void IconGenerator::remap(const string &newIconId, const string &oldIconId)
+void IconGenerator::remap(const std::string &newIconId, const std::string &oldIconId)
 {
 	IconIterator it = iconsMap.find(oldIconId);
 	if (it == iconsMap.end())

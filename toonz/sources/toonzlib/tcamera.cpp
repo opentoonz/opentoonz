@@ -167,7 +167,7 @@ void TCamera::saveData(TOStream &os) const
 
 void TCamera::loadData(TIStream &is)
 {
-	string tagName;
+	std::string tagName;
 	while (is.matchTag(tagName)) {
 		if (tagName == "cameraSize" || tagName == "size")
 			is >> m_size.lx >> m_size.ly;

@@ -34,7 +34,7 @@ class DVAPI TXshLevelColumn : public TXshCellColumn
 {
 	PERSIST_DECLARATION(TXshLevelColumn)
 	TLevelColumnFx *m_fx;
-	string m_iconId;
+	std::string m_iconId;
 
 	bool m_iconVisible;
 

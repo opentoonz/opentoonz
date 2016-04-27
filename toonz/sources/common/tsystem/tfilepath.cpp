@@ -44,14 +44,14 @@ bool isNumbers(std::wstring str, int fromSeg, int toSeg)
 };
 
 //TFrameId::operator string() const
-string TFrameId::expand(FrameFormat format) const
+std::string TFrameId::expand(FrameFormat format) const
 {
 	if (m_frame == EMPTY_FRAME)
 		return "";
 	else if (m_frame == NO_FRAME)
 		return "-";
 	char buffer[80];
-	ostrstream o_buff(buffer, sizeof(buffer));
+	std::ostrstream o_buff(buffer, sizeof(buffer));
 	if (format == FOUR_ZEROS || format == UNDERSCORE_FOUR_ZEROS) {
 		o_buff.fill('0');
 		o_buff.width(4);
@@ -63,7 +63,7 @@ string TFrameId::expand(FrameFormat format) const
 	if (m_letter != '\0')
 		o_buff << m_letter;
 	int len = o_buff.pcount();
-	return string(buffer, len);
+	return std::string(buffer, len);
 }
 
 //-------------------------------------------------------------------
@@ -104,7 +104,7 @@ inline bool isSlash(wchar_t c)
 
 // cerca l'ultimo '/' o '\'. Se non c'e' ritorna -1
 // di modo che la sottostringa che parte da getLastSlash() + 1 e' nome.frame.tipo
-inline int getLastSlash(const wstring &path)
+inline int getLastSlash(const std::wstring &path)
 {
 	int i;
 	for (i = path.length() - 1; i >= 0 && !isSlash(path[i]); i--) {
@@ -264,7 +264,7 @@ TFilePath::TFilePath(const char *path)
 
 //-----------------------------------------------------------------------------
 
-TFilePath::TFilePath(const string &path)
+TFilePath::TFilePath(const std::string &path)
 {
 	setPath(toWideString(path));
 }
@@ -298,8 +298,8 @@ bool TFilePath::operator==(const TFilePath &fp) const
 
 bool TFilePath::operator<(const TFilePath &fp) const
 {
-	wstring iName = m_path;
-	wstring jName = fp.m_path;
+	std::wstring iName = m_path;
+	std::wstring jName = fp.m_path;
 	int i1 = 0, j1 = 0;
 	int i2 = m_path.find(L"\\");
 	int j2 = fp.m_path.find(L"\\");
@@ -412,7 +412,7 @@ TFilePath &TFilePath::operator+=(const std::wstring &s)
 
 //-----------------------------------------------------------------------------
 
-const wstring TFilePath::getWideString() const
+const std::wstring TFilePath::getWideString() const
 {
 	return m_path;
 	/*
@@ -468,9 +468,9 @@ QString TFilePath::getQString() const
 
 //-----------------------------------------------------------------------------
 
-ostream &operator<<(ostream &out, const TFilePath &path)
+std::ostream &operator<<(std::ostream &out, const TFilePath &path)
 {
-	wstring w = path.getWideString();
+	std::wstring w = path.getWideString();
 	return out << toString(w) << " ";
 	//  string w = path.getString();
 	//  return out << w << " ";
@@ -504,27 +504,27 @@ bool TFilePath::isRoot() const
 {
 	return m_path.length() == 1 && m_path[0] == slash ||
 		   m_path.length() == 3 && iswalpha(m_path[0]) && m_path[1] == ':' && m_path[2] == slash ||
-		   m_path.length() > 2 && m_path[0] == slash && m_path[1] == slash && (string::npos == m_path.find(slash, 2) || m_path.find(slash, 2) == m_path.size() - 1);
+			 m_path.length() > 2 && m_path[0] == slash && m_path[1] == slash && (std::string::npos == m_path.find(slash, 2) || m_path.find(slash, 2) == m_path.size() - 1);
 }
 
 //-----------------------------------------------------------------------------
 
 // ritorna ""(niente tipo, niente punto), "." (file con tipo) o ".." (file con tipo e frame)
-string TFilePath::getDots() const
+std::string TFilePath::getDots() const
 {
 	int i = getLastSlash(m_path);
-	wstring str = m_path.substr(i + 1);
+	std::wstring str = m_path.substr(i + 1);
 	// potrei anche avere a.b.c.d dove d e' l'estensione
 	i = str.rfind(L".");
-	if (i == (int)wstring::npos || str == L"..")
+	if (i == (int)std::wstring::npos || str == L"..")
 		return "";
 
-	if (str.substr(0, i).rfind(L".") != wstring::npos)
+	if (str.substr(0, i).rfind(L".") != std::wstring::npos)
 		return "..";
 	else if (m_underscoreFormatAllowed) {
 		int j = str.substr(0, i).rfind(L"_");
 		/*-- j == i-1は、フレーム番号を抜いて"A_.tga"のような場合の条件 --*/
-		return (j != (int)wstring::npos &&
+		return (j != (int)std::wstring::npos &&
 				(j == i - 1 || isNumbers(str, j, i)))
 				   ? ".."
 				   : ".";
@@ -534,12 +534,12 @@ string TFilePath::getDots() const
 
 //-----------------------------------------------------------------------------
 
-string TFilePath::getDottedType() const // ritorna l'estensione con PUNTO (se c'e')
+std::string TFilePath::getDottedType() const // ritorna l'estensione con PUNTO (se c'e')
 {
 	int i = getLastSlash(m_path);
-	wstring str = m_path.substr(i + 1);
+	std::wstring str = m_path.substr(i + 1);
 	i = str.rfind(L".");
-	if (i == (int)wstring::npos)
+	if (i == (int)std::wstring::npos)
 		return "";
 
 	return toLower(toString(str.substr(i)));
@@ -547,31 +547,31 @@ string TFilePath::getDottedType() const // ritorna l'estensione con PUNTO (se c'
 
 //-----------------------------------------------------------------------------
 
-string TFilePath::getUndottedType() const // ritorna l'estensione senza PUNTO
+std::string TFilePath::getUndottedType() const // ritorna l'estensione senza PUNTO
 {
 	size_t i = getLastSlash(m_path);
-	wstring str = m_path.substr(i + 1);
+	std::wstring str = m_path.substr(i + 1);
 	i = str.rfind(L".");
-	if (i == wstring::npos || i == str.length() - 1)
+	if (i == std::wstring::npos || i == str.length() - 1)
 		return "";
 	return toLower(toString(str.substr(i + 1)));
 }
 
 //-----------------------------------------------------------------------------
 
-wstring TFilePath::getWideName() const // noDot! noSlash!
+std::wstring TFilePath::getWideName() const // noDot! noSlash!
 {
 	int i = getLastSlash(m_path); //cerco l'ultimo slash
-	wstring str = m_path.substr(i + 1);
+	std::wstring str = m_path.substr(i + 1);
 	i = str.rfind(L".");
-	if (i == (int)wstring::npos)
+	if (i == (int)std::wstring::npos)
 		return str;
 	int j = str.substr(0, i).rfind(L".");
-	if (j != (int)wstring::npos)
+	if (j != (int)std::wstring::npos)
 		i = j;
 	else if (m_underscoreFormatAllowed) {
 		j = str.substr(0, i).rfind(L"_");
-		if (j != (int)wstring::npos && isNumbers(str, j, i))
+		if (j != (int)std::wstring::npos && isNumbers(str, j, i))
 			i = j;
 	}
 	return str.substr(0, i);
@@ -579,14 +579,14 @@ wstring TFilePath::getWideName() const // noDot! noSlash!
 
 //-----------------------------------------------------------------------------
 
-string TFilePath::getName() const // noDot! noSlash!
+std::string TFilePath::getName() const // noDot! noSlash!
 {
 	return toString(getWideName());
 }
 
 //-----------------------------------------------------------------------------
 // es. TFilePath("/pippo/pluto.0001.gif").getLevelName() == "pluto..gif"
-string TFilePath::getLevelName() const
+std::string TFilePath::getLevelName() const
 {
 	return toString(getLevelNameW());
 }
@@ -597,13 +597,13 @@ string TFilePath::getLevelName() const
 std::wstring TFilePath::getLevelNameW() const
 {
 	int i = getLastSlash(m_path);		//cerco l'ultimo slash
-	wstring str = m_path.substr(i + 1); // str e' m_path senza directory
+	std::wstring str = m_path.substr(i + 1); // str e' m_path senza directory
 
 	int j = str.rfind(L"."); // str[j..] = ".type"
-	if (j == (int)wstring::npos)
+	if (j == (int)std::wstring::npos)
 		return str; // no frame; no type
 	i = str.substr(0, j).rfind(L'.');
-	if (i == (int)wstring::npos && m_underscoreFormatAllowed)
+	if (i == (int)std::wstring::npos && m_underscoreFormatAllowed)
 		i = str.substr(0, j).rfind(L'_');
 
 	if (j == i || j - i == 1) //prova.tif o prova..tif
@@ -647,17 +647,17 @@ bool TFilePath::isLevelName() const
 TFrameId TFilePath::getFrame() const
 {
 	int i = getLastSlash(m_path);		//cerco l'ultimo slash
-	wstring str = m_path.substr(i + 1); // str e' il path senza parentdir
+	std::wstring str = m_path.substr(i + 1); // str e' il path senza parentdir
 	i = str.rfind(L'.');
-	if (i == (int)wstring::npos || str == L"." || str == L"..")
+	if (i == (int)std::wstring::npos || str == L"." || str == L"..")
 		return TFrameId(TFrameId::NO_FRAME);
 	int j;
 
 	j = str.substr(0, i).rfind(L'.');
-	if (j == (int)wstring::npos && m_underscoreFormatAllowed)
+	if (j == (int)std::wstring::npos && m_underscoreFormatAllowed)
 		j = str.substr(0, i).rfind(L'_');
 
-	if (j == (int)wstring::npos)
+	if (j == (int)std::wstring::npos)
 		return TFrameId(TFrameId::NO_FRAME);
 	if (i == j + 1)
 		return TFrameId(TFrameId::EMPTY_FRAME);
@@ -680,13 +680,13 @@ TFrameId TFilePath::getFrame() const
 
 //-----------------------------------------------------------------------------
 
-TFilePath TFilePath::withType(const string &type) const
+TFilePath TFilePath::withType(const std::string &type) const
 {
 	assert(type.length() < 2 || type.substr(0, 2) != "..");
 	int i = getLastSlash(m_path);		//cerco l'ultimo slash
-	wstring str = m_path.substr(i + 1); // str e' il path senza parentdir
+	std::wstring str = m_path.substr(i + 1); // str e' il path senza parentdir
 	int j = str.rfind(L'.');
-	if (j == (int)wstring::npos || str == L"..")
+	if (j == (int)std::wstring::npos || str == L"..")
 	// il path originale non ha tipo
 	{
 		if (type == "")
@@ -709,7 +709,7 @@ TFilePath TFilePath::withType(const string &type) const
 
 //-----------------------------------------------------------------------------
 
-TFilePath TFilePath::withName(const string &name) const
+TFilePath TFilePath::withName(const std::string &name) const
 {
 	return withName(toWideString(name));
 }
@@ -719,14 +719,14 @@ TFilePath TFilePath::withName(const string &name) const
 TFilePath TFilePath::withName(const std::wstring &name) const
 {
 	int i = getLastSlash(m_path);		//cerco l'ultimo slash
-	wstring str = m_path.substr(i + 1); // str e' il path senza parentdir
+	std::wstring str = m_path.substr(i + 1); // str e' il path senza parentdir
 	int j;
 	j = str.rfind(L'.');
 
-	if (j == (int)wstring::npos) {
+	if (j == (int)std::wstring::npos) {
 		if (m_underscoreFormatAllowed) {
 			j = str.rfind(L'_');
-			if (j != (int)wstring::npos)
+			if (j != (int)std::wstring::npos)
 				return TFilePath(m_path.substr(0, i + 1) + name + str.substr(j));
 		}
 		return TFilePath(m_path.substr(0, i + 1) + name);
@@ -734,10 +734,10 @@ TFilePath TFilePath::withName(const std::wstring &name) const
 	int k;
 
 	k = str.substr(0, j).rfind(L".");
-	if (k == (int)wstring::npos && m_underscoreFormatAllowed)
+	if (k == (int)std::wstring::npos && m_underscoreFormatAllowed)
 		k = str.substr(0, j).rfind(L"_");
 
-	if (k == (int)(wstring::npos))
+	if (k == (int)(std::wstring::npos))
 		k = j;
 	else if (k != j - 1 && !isNumbers(str, k, j))
 		k = j;
@@ -757,23 +757,23 @@ TFilePath TFilePath::withParentDir(const TFilePath &dir) const
 
 TFilePath TFilePath::withFrame(const TFrameId &frame, TFrameId::FrameFormat format) const
 {
-	const wstring dot = L".", dotDot = L"..";
+	const std::wstring dot = L".", dotDot = L"..";
 	int i = getLastSlash(m_path);		//cerco l'ultimo slash
-	wstring str = m_path.substr(i + 1); // str e' il path senza parentdir
+	std::wstring str = m_path.substr(i + 1); // str e' il path senza parentdir
 	assert(str != dot && str != dotDot);
 	int j = str.rfind(L'.');
 	char *ch = ".";
 	if (m_underscoreFormatAllowed &&
 		(format == TFrameId::UNDERSCORE_FOUR_ZEROS || format == TFrameId::UNDERSCORE_NO_PAD))
 		ch = "_";
-	if (j == (int)wstring::npos) {
+	if (j == (int)std::wstring::npos) {
 		if (frame.isEmptyFrame() || frame.isNoFrame())
 			return *this;
 		else
 			return TFilePath(m_path + toWideString(ch + frame.expand(format)));
 	}
 
-	string frameString;
+	std::string frameString;
 	if (frame.isNoFrame())
 		frameString = "";
 	else
@@ -781,11 +781,11 @@ TFilePath TFilePath::withFrame(const TFrameId &frame, TFrameId::FrameFormat form
 
 	int k = str.substr(0, j).rfind(L'.');
 
-	if (k != (int)wstring::npos)
+	if (k != (int)std::wstring::npos)
 		return TFilePath(m_path.substr(0, k + i + 1) + toWideString(frameString) + str.substr(j));
 	else if (m_underscoreFormatAllowed) {
 		k = str.substr(0, j).rfind(L'_');
-		if (k != (int)wstring::npos &&
+		if (k != (int)std::wstring::npos &&
 			(k == j - 1 || isNumbers(str, k, j))) /*-- "_." の並びか、"_[数字]."の並びのとき --*/
 			return TFilePath(m_path.substr(0, k + i + 1) + ((frame.isNoFrame()) ? L"" : toWideString("_" + frame.expand(format))) + str.substr(j));
 	}
@@ -847,7 +847,7 @@ bool TFilePath::match(const TFilePath &fp) const
 
 //-----------------------------------------------------------------------------
 
-void TFilePath::split(wstring &head, TFilePath &tail) const
+void TFilePath::split(std::wstring &head, TFilePath &tail) const
 {
 	TFilePath ancestor = getParentDir();
 	if (ancestor == TFilePath()) {

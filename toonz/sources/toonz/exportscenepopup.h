@@ -22,12 +22,12 @@ class QRadioButton;
 class ExportSceneDvDirModelFileFolderNode : public DvDirModelFileFolderNode
 {
 public:
-	ExportSceneDvDirModelFileFolderNode(DvDirModelNode *parent, wstring name, const TFilePath &path)
+	ExportSceneDvDirModelFileFolderNode(DvDirModelNode *parent, std::wstring name, const TFilePath &path)
 		: DvDirModelFileFolderNode(parent, name, path) {}
 	ExportSceneDvDirModelFileFolderNode(DvDirModelNode *parent, const TFilePath &path)
 		: DvDirModelFileFolderNode(parent, path) {}
 
-	DvDirModelNode *makeChild(wstring name);
+	DvDirModelNode *makeChild(std::wstring name);
 	DvDirModelFileFolderNode *createExposeSceneNode(DvDirModelNode *parent, const TFilePath &path);
 };
 
@@ -39,7 +39,7 @@ class ExportSceneDvDirModelSpecialFileFolderNode : public ExportSceneDvDirModelF
 	QPixmap m_pixmap;
 
 public:
-	ExportSceneDvDirModelSpecialFileFolderNode(DvDirModelNode *parent, wstring name, const TFilePath &path)
+	ExportSceneDvDirModelSpecialFileFolderNode(DvDirModelNode *parent, std::wstring name, const TFilePath &path)
 		: ExportSceneDvDirModelFileFolderNode(parent, name, path) {}
 	QPixmap getPixmap(bool isOpen) const { return m_pixmap; }
 	void setPixmap(const QPixmap &pixmap) { m_pixmap = pixmap; }
@@ -64,7 +64,7 @@ class ExportSceneDvDirModelRootNode : public DvDirModelNode
 {
 	std::vector<ExportSceneDvDirModelFileFolderNode *> m_projectRootNodes;
 	ExportSceneDvDirModelFileFolderNode *m_sandboxProjectNode;
-	void add(wstring name, const TFilePath &path);
+	void add(std::wstring name, const TFilePath &path);
 
 public:
 	ExportSceneDvDirModelRootNode();
@@ -87,7 +87,7 @@ public:
 	DvDirModelNode *getNode(const QModelIndex &index) const;
 	QModelIndex index(int row, int column, const QModelIndex &parent) const;
 	QModelIndex parent(const QModelIndex &index) const;
-	QModelIndex childByName(const QModelIndex &parent, const wstring &name) const;
+	QModelIndex childByName(const QModelIndex &parent, const std::wstring &name) const;
 	int columnCount(const QModelIndex &parent) const { return 1; }
 	QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 	Qt::ItemFlags flags(const QModelIndex &index) const;

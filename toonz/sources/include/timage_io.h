@@ -40,7 +40,7 @@ class DVAPI TImageException : public TException
 	TFilePath m_fp;
 
 public:
-	TImageException(const TFilePath &fp, const string &msg);
+	TImageException(const TFilePath &fp, const std::string &msg);
 	~TImageException() {}
 
 	TString getMessage() const;
@@ -176,7 +176,7 @@ public:
 */
 	TRect getRegion() const { return m_region; }
 
-	void getTzpPaletteColorNames(map<int, pair<string, string>> &pltColorNames); //colorindex(<256: paint), pagename, colorname
+	void getTzpPaletteColorNames(std::map<int, std::pair<std::string, std::string>> &pltColorNames); //colorindex(<256: paint), pagename, colorname
 };
 
 //-----------------------------------------------------------

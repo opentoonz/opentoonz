@@ -41,8 +41,8 @@ bool computeOutline(const TRegion *region,
 	bool doAntialiasing = false;
 	polyline.clear();
 
-	vector<TPointD> polyline2d;
-	vector<int> indices;
+	std::vector<TPointD> polyline2d;
+	std::vector<int> indices;
 
 	int i, edgeSize = region->getEdgeCount(), oldSize = 0;
 	for (i = 0; i < edgeSize; i++) {

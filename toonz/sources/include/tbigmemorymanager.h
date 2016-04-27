@@ -23,11 +23,11 @@ class DVAPI TBigMemoryManager
 {
 	TThread::Mutex m_mutex;
 	UCHAR *m_theMemory;
-	map<UCHAR *, Chunkinfo> m_chunks;
+	std::map<UCHAR *, Chunkinfo> m_chunks;
 	UCHAR *allocate(UINT &size);
 
 	TUINT32 m_availableMemory, m_allocatedMemory;
-	map<UCHAR *, Chunkinfo>::iterator shiftBlock(const map<UCHAR *, Chunkinfo>::iterator &it, TUINT32 offset);
+	std::map<UCHAR *, Chunkinfo>::iterator shiftBlock(const std::map<UCHAR *, Chunkinfo>::iterator &it, TUINT32 offset);
 	TRaster *findRaster(TRaster *ras);
 	void checkConsistency();
 	UCHAR *remap(TUINT32 RequestedSize);

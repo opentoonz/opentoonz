@@ -92,7 +92,7 @@ inline int intersect(const TSegment &s,
 
 template <class T>
 void split(const T &tq,
-		   const vector<double> &pars,
+		   const std::vector<double> &pars,
 		   std::vector<T *> &v)
 {
 	if (pars.empty())

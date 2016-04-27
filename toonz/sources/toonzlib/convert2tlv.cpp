@@ -55,9 +55,9 @@ inline int distance(const TPixel &c1, const TPixel &c2)
 
 //----------------------------------------------
 
-int findClosest(const map<TPixel, int> &colorMap, TPixel &curPixColor)
+int findClosest(const std::map<TPixel, int> &colorMap, TPixel &curPixColor)
 {
-	map<TPixel, int>::const_iterator it = colorMap.begin();
+	std::map<TPixel, int>::const_iterator it = colorMap.begin();
 	int minDistance = 1000000000;
 	int index = -1;
 	for (; it != colorMap.end(); ++it) {
@@ -195,11 +195,11 @@ int getFramesCount(const TLevelP &l, int from, int to)
 }
 //namespace
 
-map<TPixel, int>::const_iterator Convert2Tlv::findNearestColor(const TPixel &color)
+std::map<TPixel, int>::const_iterator Convert2Tlv::findNearestColor(const TPixel &color)
 {
 	//assert((int)colorMap.size()>toIndex);
 	//assert((int)colorMap.size()>fromIndex);
-	map<TPixel, int>::const_iterator ret = m_colorMap.end(), it = m_colorMap.begin();
+	std::map<TPixel, int>::const_iterator ret = m_colorMap.end(), it = m_colorMap.begin();
 	//std::advance(it, fromIndex);
 
 	int mindist = 1000;
@@ -227,7 +227,7 @@ map<TPixel, int>::const_iterator Convert2Tlv::findNearestColor(const TPixel &col
 
 void Convert2Tlv::buildInks(TRasterCM32P &rout, const TRaster32P &rin)
 {
-	map<TPixel, int>::const_iterator it;
+	std::map<TPixel, int>::const_iterator it;
 	TPixel curColor = TPixel::Transparent;
 	int i, j;
 	int curIndex;
@@ -332,7 +332,7 @@ void Convert2Tlv::buildInksFromGrayTones(TRasterCM32P &rout, const TRasterP &rin
 
 void Convert2Tlv::buildInksForNAAImage(TRasterCM32P &rout, const TRaster32P &rin)
 {
-	map<TPixel, int>::iterator it;
+	std::map<TPixel, int>::iterator it;
 	TPixel curColor = TPixel::Transparent;
 	int i, j;
 	int curIndex;
@@ -379,7 +379,7 @@ void Convert2Tlv::doFill(TRasterCM32P &rout, const TRaster32P &rin)
 			if (!(pixout->getTone() == 255 && pixout->getPaint() == 0 && pixin->m == 255))
 				continue;
 
-			map<TPixel, int>::const_iterator it;
+			std::map<TPixel, int>::const_iterator it;
 			int paintIndex;
 			if ((it = m_colorMap.find(*pixin)) == m_colorMap.end()) {
 				if (m_colorTolerance > 0)
@@ -551,7 +551,7 @@ void Convert2Tlv::buildToonzRaster(TRasterCM32P &rout, const TRasterP &rin1, con
 
 TPalette *Convert2Tlv::buildPalette()
 {
-	map<TPixel, int>::const_iterator it = m_colorMap.begin();
+	std::map<TPixel, int>::const_iterator it = m_colorMap.begin();
 	TPalette::Page *page = m_palette->getPage(0);
 
 	QList<int> stylesToBeAddedToPage;
@@ -590,11 +590,11 @@ TPalette *Convert2Tlv::buildPalette()
 	if (!is)
 		return m_palette;
 
-	string tagName;
+	std::string tagName;
 	if (!is.matchTag(tagName) || tagName != "palette")
 		return m_palette;
 
-	string gname;
+	std::string gname;
 	is.getTagParam("name", gname);
 	TPalette *defaultPalette = new TPalette();
 	defaultPalette->loadData(is);
@@ -678,7 +678,7 @@ int Convert2Tlv::getFramesToConvertCount()
 
 //---------------------------------------------
 
-bool Convert2Tlv::init(string &errorMessage)
+bool Convert2Tlv::init(std::string &errorMessage)
 {
 	m_lastIndex = m_maxPaletteIndex = 0;
 	m_colorMap.clear();
@@ -803,7 +803,7 @@ bool Convert2Tlv::init(string &errorMessage)
 
 //----------------------------------------------------------------------------------------
 
-bool Convert2Tlv::convertNext(string &errorMessage)
+bool Convert2Tlv::convertNext(std::string &errorMessage)
 {
 
 	if (m_count == 0 && m_from != -1)

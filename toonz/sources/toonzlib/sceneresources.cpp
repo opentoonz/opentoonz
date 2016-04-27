@@ -30,7 +30,7 @@ bool changeSavePath(TFilePath &path, TFilePath oldSavePath, TFilePath newSavePat
 	if (oldSavePath == newSavePath)
 		return false;
 	TFilePath fp = path.getParentDir();
-	wstring head;
+	std::wstring head;
 	TFilePath tail;
 	fp.split(head, tail);
 	if (head != L"" && tail == oldSavePath) {
@@ -58,7 +58,7 @@ TFilePath restorePsdPath(const TFilePath &fp)
 
 bool makePathUnique(ToonzScene *scene, TFilePath &path)
 {
-	wstring name = path.getWideName();
+	std::wstring name = path.getWideName();
 	int id = 2;
 	int i = name.length() - 1;
 	int num = 0, p = 1;
@@ -145,7 +145,7 @@ TFilePath ResourceImportStrategy::process(ToonzScene *scene, ToonzScene *srcScen
 		std::wstring levelName = srcPath.getWideName();
 		TLevelSet *parentLevelSet = scene->getLevelSet();
 		NameModifier nm(levelName);
-		wstring newName;
+		std::wstring newName;
 		for (;;) {
 			newName = nm.getNext();
 			if (!parentLevelSet->hasLevel(newName))
@@ -256,13 +256,13 @@ void SceneLevel::save()
 			//Questo controllo viene fatto qui e non nella copia o nel salvataggio del livello perche' in generale
 			//non si vuole che il livello unpainted venga copiato con il livello.
 			if (actualFp.getType() == "tlv") {
-				TFilePath oldUnpaintedLevelPath = oldActualPath.getParentDir() + TFilePath(oldActualPath.getName() + "-unpainted." + oldActualPath.getType());
-				TFilePath unpaintedLevelPath = actualFp.getParentDir() + TFilePath(actualFp.getName() + "-unpainted." + actualFp.getType());
-				if (TSystem::doesExistFileOrLevel(oldUnpaintedLevelPath) && !TSystem::doesExistFileOrLevel(unpaintedLevelPath))
+				TFilePath oldUnpaintedLevelPath = oldActualPath.getParentDir() + "nopaint\\" + TFilePath(oldActualPath.getName() + "_np." + oldActualPath.getType());
+				TFilePath unpaintedLevelPath = actualFp.getParentDir() + "nopaint\\" + TFilePath(actualFp.getName() + "_np." + actualFp.getType());
+				if (TSystem::doesExistFileOrLevel(oldUnpaintedLevelPath) && !TSystem::doesExistFileOrLevel(unpaintedLevelPath) && TSystem::touchParentDir(unpaintedLevelPath))
 					TSystem::copyFile(unpaintedLevelPath, oldUnpaintedLevelPath);
 				TFilePath oldUnpaintedPalettePath = oldUnpaintedLevelPath.withType("tpl");
 				TFilePath unpaintedPalettePath = unpaintedLevelPath.withType("tpl");
-				if (TSystem::doesExistFileOrLevel(oldUnpaintedPalettePath) && !TSystem::doesExistFileOrLevel(unpaintedPalettePath))
+				if (TSystem::doesExistFileOrLevel(oldUnpaintedPalettePath) && !TSystem::doesExistFileOrLevel(unpaintedPalettePath) && TSystem::touchParentDir(unpaintedPalettePath))
 					TSystem::copyFile(unpaintedPalettePath, oldUnpaintedPalettePath);
 			}
 		} catch (...) {
@@ -589,22 +589,22 @@ TFilePath ResourceImporter::codePath(const TFilePath &oldPath, const TFilePath &
 
 //-----------------------------------------------------------------------------
 
-string ResourceImporter::extractPsdSuffix(TFilePath &path)
+std::string ResourceImporter::extractPsdSuffix(TFilePath &path)
 {
 	if (path.getType() != "psd")
 		return "";
-	string name = path.getName();
+	std::string name = path.getName();
 	int i = name.find("#");
-	if (i == string::npos)
+	if (i == std::string::npos)
 		return "";
-	string suffix = name.substr(i);
+	std::string suffix = name.substr(i);
 	path = path.withName(name.substr(0, i));
 	return suffix;
 }
 
 //-----------------------------------------------------------------------------
 
-TFilePath ResourceImporter::buildPsd(const TFilePath &basePath, const string &suffix)
+TFilePath ResourceImporter::buildPsd(const TFilePath &basePath, const std::string &suffix)
 {
 	return basePath.withName(basePath.getName() + suffix);
 }
@@ -618,7 +618,7 @@ void ResourceImporter::process(TXshSimpleLevel *sl)
 	TFilePath newPath;
 
 	TFilePath slPath = sl->getPath();
-	string suffix = extractPsdSuffix(slPath);
+	std::string suffix = extractPsdSuffix(slPath);
 
 	TFilePath imgRefPath;
 	if (sl->getPalette())

@@ -100,7 +100,7 @@ void TRangeParam::setDefaultValue(const DoublePair &v)
 
 void TRangeParam::loadData(TIStream &is)
 {
-	string childName;
+	std::string childName;
 	while (is.openChild(childName)) {
 		if (childName == "min")
 			m_data->m_min->loadData(is);

@@ -189,10 +189,10 @@ void MagpieFileImportPopup::onLevelPathChanged()
 	}
 	m_levelPath = levelPath;
 
-	string format = m_levelPath.getType();
+	std::string format = m_levelPath.getType();
 	if (format == "tzp" || format == "tzu") {
 
-		wstring name = m_levelPath.getWideName();
+		std::wstring name = m_levelPath.getWideName();
 		IoCmd::ConvertingPopup *convertingPopup = new IoCmd::ConvertingPopup(
 			TApp::instance()->getMainWindow(),
 			QString::fromStdWString(name) + QString::fromStdString(m_levelPath.getDottedType()));

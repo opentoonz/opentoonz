@@ -31,12 +31,12 @@ class PltReader : public Tiio::Reader
 	UCHAR *m_stripBuffer;
 	int m_x, m_y, m_lx, m_ly;
 	bool m_isCmap24;
-	string m_history;
+	std::string m_history;
 	int m_pltType; //[1..4]
 	int m_nColor;
 	int m_nPencil;
 	std::vector<TPixel32> m_infoRow;
-	map<int, pair<string, string>> m_pltNames; // colorIndex(<256: paint) , pageName, colorName
+	std::map<int, std::pair<std::string, std::string>> m_pltNames; // colorIndex(<256: paint) , pageName, colorName
 public:
 	PltReader();
 	~PltReader();
@@ -51,7 +51,7 @@ public:
 	int skipLines(int lineCount);
 	void readLine(char *buffer, int x0, int x1, int shrink);
 
-	void getTzpPaletteColorNames(map<int, pair<string, string>> &pltColorNames) const;
+	void getTzpPaletteColorNames(std::map<int, std::pair<std::string, std::string>> &pltColorNames) const;
 };
 
 //------------------------------------------------------------
@@ -96,7 +96,7 @@ int decode_group_name(
 	return 1;
 }
 
-void PltReader::getTzpPaletteColorNames(map<int, pair<string, string>> &pltColorNames) const
+void PltReader::getTzpPaletteColorNames(std::map<int, std::pair<std::string, std::string>> &pltColorNames) const
 {
 	pltColorNames = m_pltNames;
 }
@@ -104,7 +104,7 @@ void PltReader::getTzpPaletteColorNames(map<int, pair<string, string>> &pltColor
 //--------------------------------------------------------------------------------------
 namespace
 {
-bool isDefaultName(const string &_name)
+	bool isDefaultName(const std::string &_name)
 {
 	int i;
 	QString name = QString::fromStdString(_name);
@@ -216,7 +216,7 @@ void PltReader::open(FILE *file)
 	m_nColor = palette[10];
 	m_nPencil = palette[11];
 
-	string colorNames;
+	std::string colorNames;
 	if (TIFFGetField(m_tiff, TIFFTAG_TOONZCOLORNAMES, &count, &data))
 		colorNames = data;
 
@@ -246,17 +246,17 @@ void PltReader::open(FILE *file)
 		while (isdigit(item->name[0])) //in toonz colors cannot begin with digits
 			item->name++;
 
-		map<int, pair<string, string>>::iterator it;
+		std::map<int, std::pair<std::string, std::string>>::iterator it;
 		if ((it = m_pltNames.find(i)) == m_pltNames.end() || isDefaultName(it->second.second))
-			m_pltNames[i] = pair<string, string>(pageName, item->name);
+			m_pltNames[i] = std::pair<std::string, std::string>(pageName, item->name);
 
 		if (sisterIndex != -1) {
 			int comboindex = (i < 256) ? (sisterIndex >> 16) + 256 : sisterIndex >> 8;
 			if (i >= 256)
 				ComboInkIndex[i - 256] = comboindex;
-			map<int, pair<string, string>>::iterator it;
+			std::map<int, std::pair<std::string, std::string>>::iterator it;
 			if ((it = m_pltNames.find(comboindex)) == m_pltNames.end() || isDefaultName(it->second.second)) {
-				m_pltNames[comboindex] = pair<string, string>(pageName, item->name);
+				m_pltNames[comboindex] = std::pair<std::string, std::string>(pageName, item->name);
 				if (comboindex < m_nColor)
 					m_infoRow[comboindex].r = m_infoRow[comboindex].g = 255;
 			}

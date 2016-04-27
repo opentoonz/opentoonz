@@ -201,7 +201,7 @@ void showCorners(const TStroke *s,
 		offset(20, 20);
 
 	// show corners
-	vector<double>
+	std::vector<double>
 		corners;
 
 	ToonzExt::cornersDetector(s,

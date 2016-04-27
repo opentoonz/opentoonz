@@ -58,7 +58,7 @@ TEnv::IntVar ConvertPopupSaveToNopaint("ConvertPopupSaveToNopaint", 1);
 // convertPopup
 //-----------------------------------------------------------------------------
 
-QMap<string, TPropertyGroup *> ConvertPopup::m_formatProperties;
+QMap<std::string, TPropertyGroup *> ConvertPopup::m_formatProperties;
 
 /*
  TRANSLATOR namespace::ConvertPopup
@@ -210,7 +210,7 @@ void ConvertPopup::Converter::convertLevelWithConvert2Tlv(const TFilePath &sourc
 		tlvConverter->m_levelOut = unpaintedLevelPath;
 	}
 
-	string errorMessage;
+	std::string errorMessage;
 	if (!tlvConverter->init(errorMessage)) {
 		DVGui::warning(QString::fromStdString(errorMessage));
 		tlvConverter->abort();
@@ -584,7 +584,7 @@ void ConvertPopup::onAntialiasSelected(int index)
 void ConvertPopup::onFileInChanged()
 {
 	assert(m_convertFileFld);
-	vector<TFilePath> fps;
+	std::vector<TFilePath> fps;
 	TProject *project = TProjectManager::instance()->getCurrentProject().getPointer();
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 	fps.push_back(scene->decodeFilePath(TFilePath(m_convertFileFld->getPath().toStdString())));
@@ -637,7 +637,7 @@ void ConvertPopup::onFormatSelected(const QString &format)
 
 //------------------------------------------------------------------
 
-void ConvertPopup::setFiles(const vector<TFilePath> &fps)
+void ConvertPopup::setFiles(const std::vector<TFilePath> &fps)
 {
 	m_okBtn->setEnabled(true);
 	m_fileFormat->setEnabled(true);
@@ -749,7 +749,7 @@ Convert2Tlv *ConvertPopup::makeTlvConverter(const TFilePath &sourceFilePath)
 		else
 			unpaintedFolder = TFilePath(m_unpaintedFolder->getPath().toStdString());
 
-		string basename = sourceFilePath.getName() + suffixString.toStdString();
+		std::string basename = sourceFilePath.getName() + suffixString.toStdString();
 		unpaintedfilePath = sc->decodeFilePath(sourceFilePath.withParentDir(unpaintedFolder).withName(basename));
 	}
 	int from = -1, to = -1;
@@ -790,7 +790,7 @@ void ConvertPopup::convertToTlv(bool toPainted)
 
 	TFilePath::setUnderscoreFormatAllowed(!m_unpaintedSuffix->text().contains('_'));
 
-	vector<Convert2Tlv *> converters;
+	std::vector<Convert2Tlv *> converters;
 	for (i = 0; i < m_srcFilePaths.size(); i++) {
 		Convert2Tlv *converter = makeTlvConverter(m_srcFilePaths[i]);
 		if (TSystem::doesExistFileOrLevel(converter->m_levelOut)) {
@@ -815,7 +815,7 @@ void ConvertPopup::convertToTlv(bool toPainted)
 	ProgressDialog pb("", tr("Cancel"), 0, totFrames);
 	int j, l, k = 0;
 	for (i = 0; i < converters.size(); i++) {
-		string errorMessage;
+		std::string errorMessage;
 		if (!converters[i]->init(errorMessage)) {
 			converters[i]->abort();
 			DVGui::error(QString::fromStdString(errorMessage));
@@ -831,7 +831,7 @@ void ConvertPopup::convertToTlv(bool toPainted)
 		pb.show();
 
 		for (j = 0; j < count; j++) {
-			string errorMessage = "";
+			std::string errorMessage = "";
 			if (!converters[i]->convertNext(errorMessage) || pb.wasCanceled()) {
 				for (l = i; l < converters.size(); l++) {
 					converters[l]->abort();
@@ -1080,7 +1080,7 @@ void ConvertPopup::onLevelConverted(const TFilePath &fullPath)
 
 //-------------------------------------------------------------------
 
-TPropertyGroup *ConvertPopup::getFormatProperties(const string &ext)
+TPropertyGroup *ConvertPopup::getFormatProperties(const std::string &ext)
 {
 	if (m_formatProperties.contains(ext))
 		return m_formatProperties[ext];
@@ -1093,7 +1093,7 @@ TPropertyGroup *ConvertPopup::getFormatProperties(const string &ext)
 
 void ConvertPopup::onOptionsClicked()
 {
-	string ext = m_fileFormat->currentText().toStdString();
+	std::string ext = m_fileFormat->currentText().toStdString();
 	TPropertyGroup *props = getFormatProperties(ext);
 
 	openFormatSettingsPopup(this, ext, props, m_srcFilePaths.size() == 1 ? m_srcFilePaths[0] : TFilePath());

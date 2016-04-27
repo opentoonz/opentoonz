@@ -48,7 +48,7 @@ public:
 
 	virtual int addTask(const QString &taskid, const QString &cmdline) = 0;
 	virtual int terminateTask(const QString &taskid) = 0;
-	virtual int getTasks(vector<QString> &tasks) = 0;
+	virtual int getTasks(std::vector<QString> &tasks) = 0;
 
 	virtual void queryHwInfo(HwInfo &hwInfo) = 0;
 

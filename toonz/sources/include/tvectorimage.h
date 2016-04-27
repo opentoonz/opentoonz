@@ -215,7 +215,7 @@ public:
 	//! Remove the strokes identified by indexes in the vector \b toBeRemoved
 	/*! If \b deleteThem is true strokes are really delete; 
         if \b doComputeRegions is true recompute the regions*/
-	void removeStrokes(const vector<int> &tobeRemoved, bool deleteThem, bool recomputeRegions);
+	void removeStrokes(const std::vector<int> &tobeRemoved, bool deleteThem, bool recomputeRegions);
 
 	//! Delete the \b TStroke stroke of index \b index
 	void deleteStroke(int index);
@@ -267,7 +267,7 @@ public:
 
 	//! Call the following method after stroke modification
 	//! \note you must specify, using the second argument, whether the modification was a reflection
-	void notifyChangedStrokes(const vector<int> &strokeIndexArray, const vector<TStroke *> &oldStrokeArray, bool areFlipped = false);
+	void notifyChangedStrokes(const std::vector<int> &strokeIndexArray, const std::vector<TStroke *> &oldStrokeArray, bool areFlipped = false);
 
 	//! Call the following method after stroke modification
 	void notifyChangedStrokes(int strokeIndex, TStroke *oldStroke = 0, bool isFlipped = false);
@@ -300,8 +300,8 @@ public:
 	void mergeImage(const std::vector<const TVectorImage *> &images);
 
 	//! Insert the \b TVectorImageP \b img
-	void insertImage(const TVectorImageP &img, const vector<int> &dstIndices);
-	TVectorImageP splitImage(const vector<int> &indices, bool removeFlag);
+	void insertImage(const TVectorImageP &img, const std::vector<int> &dstIndices);
+	TVectorImageP splitImage(const std::vector<int> &indices, bool removeFlag);
 
 	//! Return the used styles in the image
 	void getUsedStyles(std::set<int> &styles) const;
@@ -320,7 +320,7 @@ public:
 	    cutting it in points w specified in sortedW. SortedW must be sorted in ascending order.
 		Resulting strokes are put in VectorImage in position strokeIndex,strokeIndex+1, ... strokeIndex+n.
 		Information on fill colors are maintened, as much as possible. */
-	void splitStroke(int strokeIndex, const vector<DoublePair> &sortedWRanges);
+	void splitStroke(int strokeIndex, const std::vector<DoublePair> &sortedWRanges);
 	VIStroke *joinStroke(int index1, int index2, int cpIndex1, int cpIndex2, bool isSmooth);
 	VIStroke *extendStroke(int index, const TThickPoint &p, int cpIndex, bool isSmooth);
 	/*! this method removes the parts  of the stroke that are not bounds of regions. only ending parts are removed. 
@@ -341,7 +341,7 @@ public:
 	void recomputeRegionsIfNeeded();
 
 	/*! Remove all image strokes and all image regions with style index contained in \b styleIds vector.*/
-	void eraseStyleIds(const vector<int> styleIds);
+	void eraseStyleIds(const std::vector<int> styleIds);
 
 	TThread::Mutex *getMutex() const;
 
@@ -364,7 +364,8 @@ DVAPI VIStroke *cloneVIStroke(VIStroke *vs);
 DVAPI void deleteVIStroke(VIStroke *vs);
 
 DVAPI void getClosingPoints(const TRectD &rect, double fac, const TVectorImageP &vi,
-							vector<pair<int, double>> &startPoints, vector<pair<int, double>> &endPoints);
+							std::vector<std::pair<int, double>> &startPoints,
+							std::vector<std::pair<int, double>> &endPoints);
 
 //-----------------------------------------------------------------------------
 
@@ -410,7 +411,7 @@ public:
 
 	virtual TInputStreamInterface &operator>>(double &) = 0;
 	virtual TInputStreamInterface &operator>>(int &) = 0;
-	virtual TInputStreamInterface &operator>>(string &) = 0;
+	virtual TInputStreamInterface &operator>>(std::string &) = 0;
 	virtual TInputStreamInterface &operator>>(UCHAR &) = 0;
 	virtual TInputStreamInterface &operator>>(USHORT &) = 0;
 	virtual TInputStreamInterface &operator>>(TRaster32P &) = 0;
@@ -429,7 +430,7 @@ public:
 
 	virtual TOutputStreamInterface &operator<<(double) = 0;
 	virtual TOutputStreamInterface &operator<<(int) = 0;
-	virtual TOutputStreamInterface &operator<<(string) = 0;
+	virtual TOutputStreamInterface &operator<<(std::string) = 0;
 	virtual TOutputStreamInterface &operator<<(UCHAR) = 0;
 	virtual TOutputStreamInterface &operator<<(USHORT) = 0;
 	virtual TOutputStreamInterface &operator<<(const TRaster32P &) = 0;

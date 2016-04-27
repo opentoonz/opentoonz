@@ -214,13 +214,13 @@ void addCleanupDefaultPalette(TXshSimpleLevelP sl)
 		return;
 	}
 
-	string tagName;
+	std::string tagName;
 	if (!is.matchTag(tagName) || tagName != "palette") {
 		DVGui::warning(QString("CleanupDefaultPalette file: This is not palette file"));
 		return;
 	}
 
-	string gname;
+	std::string gname;
 	is.getTagParam("name", gname);
 	TPalette *defaultPalette = new TPalette();
 	defaultPalette->loadData(is);
@@ -917,8 +917,8 @@ QString CleanupPopup::setupLevel()
 					sl->getImageId(fid, 0),
 					sl->getImageId(fid, TXshSimpleLevel::Scanned));
 
-				const string &oldIconId = sl->getIconId(fid, 0);
-				const string &newIconId = sl->getIconId(fid, TXshSimpleLevel::Scanned);
+				const std::string &oldIconId = sl->getIconId(fid, 0);
+				const std::string &newIconId = sl->getIconId(fid, TXshSimpleLevel::Scanned);
 
 				IconGenerator::instance()->remap(newIconId, oldIconId);
 			}
@@ -944,7 +944,7 @@ QString CleanupPopup::setupLevel()
 				TFileStatus pfs(targetPalettePath);
 				if (pfs.doesExist() && pfs.isReadable()) {
 					TIStream is(targetPalettePath);
-					string tagName;
+					std::string tagName;
 					if (!is.matchTag(tagName) || tagName != "palette") {
 						DVGui::warning(QString("CleanupDefaultPalette file: This is not palette file"));
 						return NULL;
@@ -1111,7 +1111,7 @@ void CleanupPopup::closeLevel()
 		ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 		TFilePath decodedPath(scene->decodeFilePath(outputPath));
 
-		if (outputPath.getLevelNameW().find(L"-np.") == wstring::npos &&
+		if (outputPath.getLevelNameW().find(L"-np.") == std::wstring::npos &&
 			TFileStatus(decodedPath).doesExist()) {
 			saveUnpaintedLevel(decodedPath, sl, m_cleanuppedLevelFrames, (m_keepOriginalPalette && m_originalPalette));
 		}

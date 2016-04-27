@@ -30,7 +30,7 @@
 
 #include <QDateTime>
 
-DVAPI ostream &operator<<(ostream &out, const QDateTime &t);
+DVAPI std::ostream &operator<<(std::ostream &out, const QDateTime &t);
 
 #include <QFileInfo>
 class DVAPI TFileStatus
@@ -71,10 +71,10 @@ class DVAPI TSystemException : public TException
 public:
 	TSystemException() {}
 	TSystemException(const TFilePath &, int);
-	TSystemException(const TFilePath &, const string &);
-	TSystemException(const TFilePath &, const wstring &);
-	TSystemException(const string &);
-	TSystemException(const wstring &msg);
+	TSystemException(const TFilePath &, const std::string &);
+	TSystemException(const TFilePath &, const std::wstring &);
+	TSystemException(const std::string &);
+	TSystemException(const std::wstring &msg);
 	~TSystemException() {}
 	TString getMessage() const;
 };
@@ -121,7 +121,7 @@ DVAPI TFilePathSet packLevelNames(const TFilePathSet &);
 
 DVAPI TFilePath getHomeDirectory();
 DVAPI TFilePath getTempDir();
-DVAPI TFilePath getTestDir(string name = "verify_tnzcore");
+DVAPI TFilePath getTestDir(std::string name = "verify_tnzcore");
 DVAPI TFilePath getBinDir();
 DVAPI TFilePath getDllDir();
 
@@ -207,14 +207,14 @@ DVAPI long getCPUExtensions();
 // un po' di studio sui file memory mapped
 
 // indagare
-DVAPI iostream openTemporaryFile();
+DVAPI std::iostream openTemporaryFile();
 // un'altra idea e' avere un TQualcosaP che ritorna un UniqueFileName
 // e che sul distruttore cancella il file
 
 // pensare a:
 //  DVAPI void setFileProtection(const TFilePath &path, ???);
 
-void DVAPI outputDebug(string s);
+void DVAPI outputDebug(std::string s);
 
 DVAPI bool isUNC(const TFilePath &fp);
 

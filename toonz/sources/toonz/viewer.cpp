@@ -76,7 +76,7 @@ void Viewer::setRaster(TRaster32P raster)
 
 //-----------------------------------------------------------------------------
 
-void Viewer::setMessage(string msg)
+void Viewer::setMessage(std::string msg)
 {
 	m_message = msg;
 	update();

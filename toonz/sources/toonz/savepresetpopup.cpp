@@ -67,7 +67,7 @@ bool SavePresetPopup::apply()
 
 	TMacroFx *macroFx = dynamic_cast<TMacroFx *>(fx);
 	bool isMacro = macroFx != 0;
-	wstring name = m_nameFld->text().toStdWString();
+	std::wstring name = m_nameFld->text().toStdWString();
 	if (name.empty())
 		return 0;
 	TFilePath fp = ToonzFolder::getFxPresetFolder() + "presets" + fx->getFxType() + (name + (isMacro ? L".macrofx" : L".fx"));

@@ -55,7 +55,7 @@ TDimensionI TextureManager::getMaxSize(bool isRGBM)
 			glGetTexLevelParameteriv(GL_PROXY_TEXTURE_2D, 0, GL_TEXTURE_COMPONENTS, &cmpt);
 
 			if (outX && outY) {
-				ostrstream os;
+				std::ostrstream os;
 				os << "texture size = " << outX << "x" << outY << " fmt " << intFmt << " cmpt# " << cmpt << " " << rSize << "," << gSize << "," << bSize << "," << aSize << '\n' << '\0';
 				TSystem::outputDebug(os.str());
 				os.freeze(false);

@@ -473,7 +473,7 @@ std::pair<int, int> generateMovie(ToonzScene *scene,
 			exit(1);
 		}
 	}
-#endif;
+#endif
 
 	double cameraXDpi, cameraYDpi;
 	TPointD camDpi = scene->getCurrentCamera()->getDpi();

@@ -248,7 +248,7 @@ public:
 class VectorChangeThicknessTool : public DragTool
 {
 	TPointD m_curPos, m_firstPos;
-	std::map<int, vector<double>> m_strokesThickness;
+	std::map<int, std::vector<double>> m_strokesThickness;
 	double m_thicknessChange;
 
 	tcg::unique_ptr<UndoChangeStrokes> m_undo;
@@ -340,7 +340,7 @@ protected:
 	void updateAction(TPointD pos, const TMouseEvent &e);
 	void onSelectedFramesChanged();
 
-	bool onPropertyChanged(string propertyName);
+	bool onPropertyChanged(std::string propertyName);
 	void onImageChanged();
 
 private:

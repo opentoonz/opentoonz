@@ -183,7 +183,7 @@ public:
 	void update();
 
 	void setSelected(TFarmTask *task);
-	const vector<QAction *> &getActions() const;
+	const std::vector<QAction *> &getActions() const;
 
 	void startTimer();
 	void stopTimer();
@@ -193,7 +193,7 @@ public slots:
 
 protected:
 	QWidget *createToolBar();
-	vector<QAction *> m_actions;
+	std::vector<QAction *> m_actions;
 	void add(const QString &iconName, QString text, QToolBar *toolBar, const char *slot,
 			 QString iconText);
 

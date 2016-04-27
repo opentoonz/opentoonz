@@ -53,8 +53,8 @@ public:
 	ExpressionField(QWidget *parent = 0);
 	~ExpressionField();
 
-	void setExpression(string expression);
-	string getExpression() const;
+	void setExpression(std::string expression);
+	std::string getExpression() const;
 
 	void setGrammar(const TSyntax::Grammar *grammar);
 	const TSyntax::Grammar *getGrammar() const { return m_grammar; }

@@ -131,7 +131,7 @@ void TMessageRepository::messageReceived(int type, const QString &message)
 
 //---------------------------------------------------------------------------------
 
-vector<TMessageViewer *> TMessageViewer::m_tmsgViewers;
+std::vector<TMessageViewer *> TMessageViewer::m_tmsgViewers;
 
 bool TMessageViewer::isTMsgVisible()
 {

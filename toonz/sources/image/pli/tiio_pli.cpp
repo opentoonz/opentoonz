@@ -30,10 +30,10 @@ namespace
 
 class PliOuputStream : public TOutputStreamInterface
 {
-	vector<TStyleParam> *m_stream;
+	std::vector<TStyleParam> *m_stream;
 
 public:
-	PliOuputStream(vector<TStyleParam> *stream) : m_stream(stream) {}
+	PliOuputStream(std::vector<TStyleParam> *stream) : m_stream(stream) {}
 	TOutputStreamInterface &operator<<(double x)
 	{
 		m_stream->push_back(TStyleParam(x));
@@ -44,7 +44,7 @@ public:
 		m_stream->push_back(TStyleParam(x));
 		return *this;
 	}
-	TOutputStreamInterface &operator<<(string x)
+	TOutputStreamInterface &operator<<(std::string x)
 	{
 		m_stream->push_back(TStyleParam(x));
 		return *this;
@@ -70,12 +70,12 @@ public:
 
 class PliInputStream : public TInputStreamInterface
 {
-	vector<TStyleParam> *m_stream;
+	std::vector<TStyleParam> *m_stream;
 	VersionNumber m_version;
 	int m_count;
 
 public:
-	PliInputStream(vector<TStyleParam> *stream,
+	PliInputStream(std::vector<TStyleParam> *stream,
 				   int majorVersion, int minorVersion)
 		: m_stream(stream), m_version(majorVersion, minorVersion), m_count(0) {}
 
@@ -91,7 +91,7 @@ public:
 		x = (int)(*m_stream)[m_count++].m_numericVal;
 		return *this;
 	}
-	TInputStreamInterface &operator>>(string &x)
+	TInputStreamInterface &operator>>(std::string &x)
 	{
 		if ((*m_stream)[m_count].m_type == TStyleParam::SP_INT)
 			x = toString((int)(*m_stream)[m_count++].m_numericVal);
@@ -141,7 +141,7 @@ TPixel32 getColor(const TStroke *stroke)
   Crea la palette dei colori, in funzione di quelli 
   trovati dalla funzione findColor
   */
-UINT findColor(const TPixel32 &color, const vector<TPixel> &colorArray)
+UINT findColor(const TPixel32 &color, const std::vector<TPixel> &colorArray)
 {
 	for (UINT i = 0; i < colorArray.size(); i++)
 		if (colorArray[i] == color)
@@ -177,7 +177,7 @@ void buildPalette(ParsedPli *pli, const TImageP img)
 	//ilcampo m_id viene usato anche per mettere il frameIndex(per multi palette)
 	assert(vPalette->getPageCount());
 
-	vector<TStyleParam> pageNames(vPalette->getPageCount());
+	std::vector<TStyleParam> pageNames(vPalette->getPageCount());
 	for (i = 0; i < pageNames.size(); i++)
 		pageNames[i] = TStyleParam(toString(vPalette->getPage(i)->getName()));
 	StyleTag *pageNamesTag = new StyleTag(0, 0, pageNames.size(), pageNames.data());
@@ -200,7 +200,7 @@ void buildPalette(ParsedPli *pli, const TImageP img)
 		pageIndex = page->getIndex();
 
 		// TColorStyle*style = tempVecImg->getPalette()->getStyle(styleId);
-		vector<TStyleParam> stream;
+		std::vector<TStyleParam> stream;
 		PliOuputStream chan(&stream);
 		style->save(chan); //viene riempito lo stream;
 
@@ -232,7 +232,7 @@ void buildPalette(ParsedPli *pli, const TImageP img)
 					pageIndex = page->getIndex();
 
 					// TColorStyle*style = tempVecImg->getPalette()->getStyle(styleId);
-					vector<TStyleParam> stream;
+					std::vector<TStyleParam> stream;
 					PliOuputStream chan(&stream);
 					style->save(chan); //viene riempito lo stream;
 
@@ -314,7 +314,7 @@ struct CreateStrokeData {
 
 void createStroke(ThickQuadraticChainTag *quadTag, TVectorImage *outVectImage, const CreateStrokeData &data)
 {
-	vector<TThickQuadratic *> chunks(quadTag->m_numCurves);
+	std::vector<TThickQuadratic *> chunks(quadTag->m_numCurves);
 
 	for (UINT k = 0; k < quadTag->m_numCurves; k++)
 		chunks[k] = &quadTag->m_curve[k];
@@ -457,13 +457,13 @@ TImageWriterPli::TImageWriterPli(
 
 //-----------------------------------------------------------------------------
 
-void putStroke(TStroke *stroke, int &currStyleId, vector<PliObjectTag *> &tags)
+void putStroke(TStroke *stroke, int &currStyleId, std::vector<PliObjectTag *> &tags)
 {
 	double maxThickness = 0;
 	assert(stroke);
 
 	int chunkCount = stroke->getChunkCount();
-	vector<TThickQuadratic> strokeChain(chunkCount);
+	std::vector<TThickQuadratic> strokeChain(chunkCount);
 
 	int styleId = stroke->getStyle();
 	assert(styleId >= 0);
@@ -535,8 +535,8 @@ void TImageWriterPli::save(const TImageP &img)
 	pli->setFrameCount(m_lwp->m_frameNumber);
 
 	// alloco la struttura che conterra' i tag per la vector image corrente
-	vector<PliObjectTag *> tags;
-	//tags = new   vector<PliObjectTag *>;
+	std::vector<PliObjectTag *> tags;
+	//tags = new   std::vector<PliObjectTag *>;
 
 	//Store the precision scale to be used in saving the quadratics
 	{
@@ -704,7 +704,7 @@ TPalette *readPalette(GroupTag *paletteTag, int majorVersion, int minorVersion)
 		} else
 			continue; // i pli prima salvavano pure i colori non usati...evito di caricarli!
 
-		vector<TStyleParam> params(styleTag->m_numParams);
+		std::vector<TStyleParam> params(styleTag->m_numParams);
 		for (int j = 0; j < styleTag->m_numParams; j++)
 			params[j] = styleTag->m_param[j];
 
@@ -807,7 +807,7 @@ TImageReaderPli::TImageReaderPli(
 
 GroupTag *makeGroup(TVectorImageP &vi, int &currStyleId, int &index, int currDepth)
 {
-	vector<PliObjectTag *> tags;
+	std::vector<PliObjectTag *> tags;
 	int i = index;
 	while (i < (UINT)vi->getStrokeCount() && vi->getCommonGroupDepth(i, index) >= currDepth) {
 		int strokeDepth = vi->getGroupDepth(i);

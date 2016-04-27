@@ -90,7 +90,7 @@ public:
 		VectorLevel
 	};
 
-	static FormatType getFormatType(string extension);
+	static FormatType getFormatType(std::string extension);
 
 	static void define(
 		QString extension,
@@ -133,7 +133,7 @@ class TPropertyGroup;
 
 typedef TLevelWriter *TLevelWriterCreateProc(const TFilePath &path, TPropertyGroup *);
 
-typedef TPropertyGroup *TWriterInfoCreateProc(const string &ext);
+typedef TPropertyGroup *TWriterInfoCreateProc(const std::string &ext);
 
 //-----------------------------------------------------------
 
@@ -238,7 +238,7 @@ public:
 
 //  Some useful utility inlines
 
-inline bool isMovieType(string type)
+inline bool isMovieType(std::string type)
 {
 	return (type == "mov" || type == "avi" || type == "3gp");
 }
@@ -247,7 +247,7 @@ inline bool isMovieType(string type)
 
 inline bool isMovieType(const TFilePath &fp)
 {
-	string type(fp.getType());
+	std::string type(fp.getType());
 	return isMovieType(type);
 }
 

@@ -107,7 +107,7 @@ private:
 	short m_resId;
 	Track m_track;
 	long m_depth;
-	vector<TimeValue> currentTimes;
+	std::vector<TimeValue> currentTimes;
 	int m_lx, m_ly;
 
 public:

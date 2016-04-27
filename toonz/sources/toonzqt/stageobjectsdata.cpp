@@ -911,7 +911,7 @@ std::vector<TStageObjectId> StageObjectsData::restoreObjects(std::set<int> &colu
 	bool resetFxDagPositions = (fxFlags & eResetFxDagPositions);
 
 	QMap<TStageObjectId, TStageObjectId> idTable; // Trace stored/restored id pairings
-	map<TFx *, TFx *> fxTable;					  // Same for fxs here
+	std::map<TFx *, TFx *> fxTable;					  // Same for fxs here
 	std::vector<TStageObjectId> restoredIds;
 
 	std::set<int>::iterator idxt = columnIndices.begin();
@@ -964,7 +964,7 @@ std::vector<TStageObjectId> StageObjectsData::restoreObjects(std::set<int> &colu
 				TZeraryColumnFx *zfx = zc->getZeraryColumnFx();
 				TFx *zeraryFx = zfx->getZeraryFx();
 				if (zeraryFx && doClone) {
-					wstring app = zeraryFx->getName();
+					std::wstring app = zeraryFx->getName();
 					fxDag->assignUniqueId(zeraryFx);
 					zeraryFx->setName(app);
 				}
@@ -1094,7 +1094,7 @@ std::vector<TStageObjectId> StageObjectsData::restoreObjects(std::set<int> &colu
 		updateFxLinks(fxTable);
 
 	// Paste any associated spline (not stored im m_splines)
-	map<TStageObjectSpline *, TStageObjectSpline *> splines;
+	std::map<TStageObjectSpline *, TStageObjectSpline *> splines;
 	for (i = 0; i < (int)restoredIds.size(); ++i) {
 		TStageObjectId id = restoredIds[i];
 		TStageObject *obj = xsh->getStageObject(id);
@@ -1107,7 +1107,7 @@ std::vector<TStageObjectId> StageObjectsData::restoreObjects(std::set<int> &colu
 		if (objTree->containsSpline(spline)) // No need to add it if it's already there
 			continue;
 
-		map<TStageObjectSpline *, TStageObjectSpline *>::iterator it = splines.find(spline);
+		std::map<TStageObjectSpline *, TStageObjectSpline *>::iterator it = splines.find(spline);
 		if (it != splines.end()) {
 			// Seems that multiple objects can have the same spline...
 			// BTW, shouldn't this case stop at the continue before ?

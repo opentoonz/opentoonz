@@ -69,7 +69,7 @@ public:
 		: m_cell(&cell), m_imgAff(imgAff), m_mcell(&mcell), m_matchAff(matchAff){};
 };
 
-void doMatchlines(const vector<MergeCmappedPair> &matchingLevels, int inkIndex, int inkPrevalence)
+void doMatchlines(const std::vector<MergeCmappedPair> &matchingLevels, int inkIndex, int inkPrevalence)
 {
 	if (matchingLevels.empty())
 		return;
@@ -152,7 +152,7 @@ void doMatchlines(const vector<MergeCmappedPair> &matchingLevels, int inkIndex, 
 	if (inkIndex != -1)
 		return;
 
-	wstring pageName = L"match lines";
+	std::wstring pageName = L"match lines";
 
 	for (i = 0; i < palette->getPageCount(); i++)
 		if (palette->getPage(i)->getName() == pageName) {
@@ -178,11 +178,11 @@ void doMatchlines(const vector<MergeCmappedPair> &matchingLevels, int inkIndex, 
 
 /*------------------------------------------------------------------------*/
 
-void applyDeleteMatchline(TXshSimpleLevel *sl, const vector<TFrameId> &fids, const vector<int> &_inkIndexes)
+void applyDeleteMatchline(TXshSimpleLevel *sl, const std::vector<TFrameId> &fids, const std::vector<int> &_inkIndexes)
 {
 	TPalette::Page *page = 0;
 	int i, j, pageIndex = 0;
-	vector<int> inkIndexes = _inkIndexes;
+	std::vector<int> inkIndexes = _inkIndexes;
 
 	if (fids.empty())
 		return;
@@ -489,11 +489,11 @@ class DeleteMatchlineUndo : public TUndo
 public:
 	TXshLevel *m_xl;
 	TXshSimpleLevel *m_sl;
-	vector<TFrameId> m_fids;
-	vector<int> m_indexes;
+	std::vector<TFrameId> m_fids;
+	std::vector<int> m_indexes;
 	TPaletteP m_matchlinePalette;
 
-	DeleteMatchlineUndo(TXshLevel *xl, TXshSimpleLevel *sl, const vector<TFrameId> &fids, const vector<int> &indexes) //, TPalette*matchPalette)
+	DeleteMatchlineUndo(TXshLevel *xl, TXshSimpleLevel *sl, const std::vector<TFrameId> &fids, const std::vector<int> &indexes) //, TPalette*matchPalette)
 		: TUndo(),
 		  m_xl(xl),
 		  m_sl(sl),
@@ -592,7 +592,7 @@ public:
 
 		m_level->getPalette()->assign(m_palette);
 
-		vector<TFrameId> fids;
+		std::vector<TFrameId> fids;
 		for (; it != m_images.end(); ++it) //, ++mit)
 		{
 			QString id = "MatchlinesUndo" + QString::number(m_mergeCmappedSessionId) + "-" + QString::number(it->first.getNumber());
@@ -664,8 +664,8 @@ void doMatchlines(int column, int mColumn, int index, int inkPrevalence, int Mer
 
 	if (start > end)
 		return;
-	vector<TXshCell> cell(end - start + 1);
-	vector<TXshCell> mCell(end - start + 1);
+	std::vector<TXshCell> cell(end - start + 1);
+	std::vector<TXshCell> mCell(end - start + 1);
 
 	xsh->getCells(start, column, cell.size(), &(cell[0]));
 
@@ -675,7 +675,7 @@ void doMatchlines(int column, int mColumn, int index, int inkPrevalence, int Mer
 	TXshColumn *col = xsh->getColumn(column);
 	TXshColumn *mcol = xsh->getColumn(mColumn);
 
-	vector<MergeCmappedPair> matchingLevels;
+	std::vector<MergeCmappedPair> matchingLevels;
 
 	std::map<TFrameId, TFrameId> table;
 
@@ -864,7 +864,7 @@ const TXshCell *findCell(int column, const TFrameId &fid)
 	return 0;
 }
 
-bool contains(const vector<TFrameId> &v, const TFrameId &val)
+bool contains(const std::vector<TFrameId> &v, const TFrameId &val)
 {
 	int i;
 	for (i = 0; i < (int)v.size(); i++)
@@ -913,9 +913,9 @@ QString indexes2string(const std::set<TFrameId> fids)
 
 //-----------------------------------------------------------------------------
 
-vector<int> string2Indexes(const QString &values)
+std::vector<int> string2Indexes(const QString &values)
 {
-	vector<int> ret;
+	std::vector<int> ret;
 	int i, j;
 	bool ok;
 	QStringList vals = values.split(',', QString::SkipEmptyParts);
@@ -923,20 +923,20 @@ vector<int> string2Indexes(const QString &values)
 		if (vals.at(i).contains('-')) {
 			QStringList vals1 = vals.at(i).split('-', QString::SkipEmptyParts);
 			if (vals1.size() != 2)
-				return vector<int>();
+				return std::vector<int>();
 			int from = vals1.at(0).toInt(&ok);
 			if (!ok)
-				return vector<int>();
+				return std::vector<int>();
 			int to = vals1.at(1).toInt(&ok);
 			if (!ok)
-				return vector<int>();
+				return std::vector<int>();
 
 			for (j = tmin(from, to); j <= tmax(from, to); j++)
 				ret.push_back(j);
 		} else {
 			int val = vals.at(i).toInt(&ok);
 			if (!ok)
-				return vector<int>();
+				return std::vector<int>();
 			ret.push_back(val);
 		}
 	}
@@ -946,15 +946,15 @@ vector<int> string2Indexes(const QString &values)
 
 //-----------------------------------------------------------------------------
 
-vector<int> DeleteInkDialog::getInkIndexes()
+std::vector<int> DeleteInkDialog::getInkIndexes()
 {
 	return string2Indexes(m_inkIndex->text());
 }
 
-vector<TFrameId> DeleteInkDialog::getFrames()
+std::vector<TFrameId> DeleteInkDialog::getFrames()
 {
-	vector<TFrameId> ret;
-	vector<int> ret1 = string2Indexes(m_frames->text());
+	std::vector<TFrameId> ret;
+	std::vector<int> ret1 = string2Indexes(m_frames->text());
 	int i;
 	for (i = 0; i < (int)ret1.size(); i++)
 		ret.push_back(ret1[i]);
@@ -1079,7 +1079,7 @@ void doDeleteMatchlines(TXshSimpleLevel *sl, const std::set<TFrameId> &fids, boo
 	for (int i = 0; i < fidsToProcess.size(); i++) //the saveboxes must be updated
 		ToolUtils::updateSaveBox(sl, fidsToProcess[i]);
 
-	vector<TFrameId> fidsss;
+	std::vector<TFrameId> fidsss;
 	xl->getFids(fidsss);
 	invalidateIcons(xl, fidsss);
 	TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();

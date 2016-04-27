@@ -100,7 +100,7 @@ void StyleNameEditor::onStyleSwitched()
 	if (!m_paletteHandle || !m_paletteHandle->getStyle())
 		return;
 
-	wstring styleName = m_paletteHandle->getStyle()->getName();
+	std::wstring styleName = m_paletteHandle->getStyle()->getName();
 	m_styleName->setText(QString::fromStdWString(styleName));
 	m_styleName->selectAll();
 
@@ -120,7 +120,7 @@ void StyleNameEditor::onApplyPressed()
 	if (m_styleName->text() == "")
 		return;
 
-	wstring newName = m_styleName->text().toStdWString();
+	std::wstring newName = m_styleName->text().toStdWString();
 
 	PaletteCmd::renamePaletteStyle(m_paletteHandle, newName);
 }

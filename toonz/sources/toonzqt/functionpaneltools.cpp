@@ -338,7 +338,7 @@ void MoveHandleDragTool::click(QMouseEvent *e)
 
 	if (m_keyframe.m_linkedHandles) {
 		if (m_handle == FunctionPanel::SpeedIn && m_kIndex + 1 < m_curve->getKeyframeCount() && (m_keyframe.m_type != TDoubleKeyframe::SpeedInOut && (m_keyframe.m_type != TDoubleKeyframe::Expression ||
-																																					  m_keyframe.m_expressionText.find("cycle") == string::npos)))
+																																					  m_keyframe.m_expressionText.find("cycle") == std::string::npos)))
 			speed = m_curve->getSpeedIn(m_kIndex);
 		else if (m_handle == FunctionPanel::SpeedOut && m_keyframe.m_prevType != TDoubleKeyframe::SpeedInOut && m_kIndex > 0)
 			speed = m_curve->getSpeedOut(m_kIndex);

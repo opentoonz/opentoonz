@@ -143,7 +143,7 @@ int Header::getRasterSize() const
 //	TRasterCodecSnappy
 //------------------------------------------------------------------------------
 
-/*TRasterCodecSnappy::TRasterCodecSnappy(const string &name, bool useCache)
+/*TRasterCodecSnappy::TRasterCodecSnappy(const std::string &name, bool useCache)
   : TRasterCodec(name)
   , m_raster()
   , m_useCache(useCache)
@@ -380,7 +380,7 @@ bool lz4decompress(LZ4F_decompressionContext_t lz4dctx,
 }
 } // namespace
 
-TRasterCodecLz4::TRasterCodecLz4(const string &name, bool useCache)
+TRasterCodecLz4::TRasterCodecLz4(const std::string &name, bool useCache)
 	: TRasterCodec(name), m_raster(), m_useCache(useCache), m_cacheId("")
 {
 }
@@ -616,7 +616,7 @@ bool lzoDecompress(const QByteArray src, int dstSize, QByteArray &dst)
 
 //------------------------------------------------------------------------------
 
-TRasterCodecLZO::TRasterCodecLZO(const string &name, bool useCache)
+TRasterCodecLZO::TRasterCodecLZO(const std::string &name, bool useCache)
 	: TRasterCodec(name), m_raster(), m_useCache(useCache), m_cacheId("")
 {
 }

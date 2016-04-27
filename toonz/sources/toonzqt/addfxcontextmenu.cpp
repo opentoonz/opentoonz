@@ -40,7 +40,7 @@ std::map<std::string, PluginInformation *> plugin_dict_;
 namespace
 {
 
-TFx *createFxByName(string fxId)
+TFx *createFxByName(std::string fxId)
 {
 	if (fxId.find("_ext_") == 0)
 		return TExternFx::create(fxId.substr(5));
@@ -62,7 +62,7 @@ TFx *createFxByName(string fxId)
 
 TFx *createPresetFxByName(TFilePath path)
 {
-	string id = path.getParentDir().getName();
+	std::string id = path.getParentDir().getName();
 	TFx *fx = createFxByName(id);
 	if (fx) {
 		TIStream is(path);
@@ -90,14 +90,14 @@ TFx *createMacroFxByPath(TFilePath path, TXsheet *xsheet)
 		FxDag *fxDag = xsheet->getFxDag();
 		if (!fxDag)
 			return fx;
-		vector<TFxP> fxs;
+		std::vector<TFxP> fxs;
 		fxs = fx->getFxs();
-		QMap<wstring, wstring> oldNewId;
+		QMap<std::wstring, std::wstring> oldNewId;
 		int i;
 		for (i = 0; i < (int)fxs.size(); i++) {
-			wstring oldId = fxs[i]->getFxId();
+			std::wstring oldId = fxs[i]->getFxId();
 			fxDag->assignUniqueId(fxs[i].getPointer());
-			wstring newId = fxs[i]->getFxId();
+			std::wstring newId = fxs[i]->getFxId();
 			oldNewId[oldId] = newId;
 
 			//cambiando l'id degli effetti interni di una macro si rompono i legami tra il nome della porta
@@ -112,7 +112,7 @@ TFx *createMacroFxByPath(TFilePath path, TXsheet *xsheet)
 				}
 			}
 		}
-		/* QStack<QPair<string, TFxPort*> > newPortNames;
+		/* QStack<QPair<std::string, TFxPort*> > newPortNames;
 
       //Devo cambiare il nome alle porte: contengono l'id dei vecchi effetti
       for(i=fx->getInputPortCount()-1; i>=0; i--)
@@ -126,12 +126,12 @@ TFx *createMacroFxByPath(TFilePath path, TXsheet *xsheet)
         newPortName.erase(newPortName.find_last_of("_")+1,newPortName.size()-1);
         newPortName.append(inFxNewId);
         TFxPort* fxPort = fx->getInputPort(i);
-        newPortNames.append(QPair<string, TFxPort*>(newPortName,fxPort));
+        newPortNames.append(QPair<std::string, TFxPort*>(newPortName,fxPort));
         fx->removeInputPort(oldPortName);
       }
       while(!newPortNames.isEmpty())
       {
-        QPair<string, TFxPort*> newPort = newPortNames.pop();
+        QPair<std::string, TFxPort*> newPort = newPortNames.pop();
         fx->addInputPort(newPort.first,*newPort.second);
       }*/
 
@@ -156,7 +156,7 @@ TFx *createFx(QAction *action, TXsheetHandle *xshHandle)
 	TFilePath path = TFilePath(text.toStdWString());
 
 	if (TFileStatus(path).doesExist() && TFileStatus(path.getParentDir()).isDirectory()) {
-		string folder = path.getParentDir().getName();
+		std::string folder = path.getParentDir().getName();
 		if (folder == "macroFx") //have to load a Macro
 			fx = createMacroFxByPath(path, xsh);
 		else {
@@ -262,7 +262,7 @@ void AddFxContextMenu::loadFxs()
 	TIStream is(m_fxListPath);
 
 	try {
-		string tagName;
+		std::string tagName;
 		if (is.matchTag(tagName) && tagName == "fxs") {
 			loadFxGroup(&is);
 			is.closeChild();
@@ -296,7 +296,7 @@ void AddFxContextMenu::loadFxPluginGroup()
 void AddFxContextMenu::loadFxGroup(TIStream *is)
 {
 	while (!is->eos()) {
-		string tagName;
+		std::string tagName;
 		if (is->matchTag(tagName)) {
 			QString groupName = QString::fromStdString(tagName);
 
@@ -395,7 +395,7 @@ void AddFxContextMenu::loadFxPlugins(QMenu *insertFxGroup, QMenu *addFxGroup, QM
 void AddFxContextMenu::loadFx(TIStream *is, QMenu *insertFxGroup, QMenu *addFxGroup, QMenu *replaceFxGroup)
 {
 	while (!is->eos()) {
-		string fxName;
+		std::string fxName;
 		*is >> fxName;
 
 		if (!fxName.empty()) {
@@ -424,7 +424,7 @@ void AddFxContextMenu::loadFx(TIStream *is, QMenu *insertFxGroup, QMenu *addFxGr
 
 //---------------------------------------------------
 
-bool AddFxContextMenu::loadPreset(const string &name,
+bool AddFxContextMenu::loadPreset(const std::string &name,
 								  QMenu *insertFxGroup, QMenu *addFxGroup, QMenu *replaceFxGroup)
 {
 	TFilePath presetsFilepath(m_presetPath + name);

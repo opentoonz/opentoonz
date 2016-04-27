@@ -47,9 +47,9 @@ void FarmServerListView::update()
 
 		TFarmController *controller = getTFarmController();
 
-		vector<ServerIdentity> servers;
+		std::vector<ServerIdentity> servers;
 		controller->getServers(servers);
-		vector<ServerIdentity>::iterator it = servers.begin();
+		std::vector<ServerIdentity>::iterator it = servers.begin();
 		for (; it != servers.end(); ++it) {
 			ServerIdentity sid = *it;
 			new MyListItem(sid.m_id, sid.m_name, this);

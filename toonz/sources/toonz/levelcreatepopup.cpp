@@ -395,15 +395,15 @@ bool LevelCreatePopup::apply()
 	int xres = tround(w * dpi), yres = tround(h * dpi);
 	int lType = getLevelType();
 
-	wstring levelName = m_nameFld->text().toStdWString();
+	std::wstring levelName = m_nameFld->text().toStdWString();
 	// tolgo i blanks prima e dopo
 
 	i = levelName.find_first_not_of(L' ');
-	if (i == (int)wstring::npos)
+	if (i == (int)std::wstring::npos)
 		levelName = L"";
 	else {
 		int j = levelName.find_last_not_of(L' ');
-		assert(j != (int)wstring::npos);
+		assert(j != (int)std::wstring::npos);
 		levelName = levelName.substr(i, j - i + 1);
 	}
 	if (levelName.empty()) {

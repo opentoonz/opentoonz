@@ -32,7 +32,7 @@ public:
 	Data() : m_tasks() {}
 	~Data() {}
 
-	vector<TFarmTask::Id> m_tasks;
+	std::vector<TFarmTask::Id> m_tasks;
 };
 
 //------------------------------------------------------------------------------
@@ -243,7 +243,7 @@ bool TFarmTask::operator==(const TFarmTask &task)
 
 void TFarmTask::loadData(TIStream &is)
 {
-	string tagName;
+	std::string tagName;
 	while (is.matchTag(tagName)) {
 		if (tagName == "taskId") {
 			is >> m_id;
@@ -524,7 +524,7 @@ namespace
 class TFarmTaskDeclaration : public TPersistDeclaration
 {
 public:
-	TFarmTaskDeclaration(const string &id)
+	TFarmTaskDeclaration(const std::string &id)
 		: TPersistDeclaration(id) {}
 
 	TPersist *create() const
@@ -562,7 +562,7 @@ public:
 			delete *it;
 	}
 
-	vector<TFarmTask *> m_tasks;
+	std::vector<TFarmTask *> m_tasks;
 };
 
 //------------------------------------------------------------------------------
@@ -736,7 +736,7 @@ TFarmTask *TFarmTaskGroup::getTask(int index)
 
 void TFarmTaskGroup::loadData(TIStream &is)
 {
-	string tagName;
+	std::string tagName;
 	while (is.matchTag(tagName)) {
 		if (tagName == "info") {
 			TFarmTask::loadData(is);
@@ -780,7 +780,7 @@ namespace
 class TFarmTaskGroupDeclaration : public TPersistDeclaration
 {
 public:
-	TFarmTaskGroupDeclaration(const string &id)
+	TFarmTaskGroupDeclaration(const std::string &id)
 		: TPersistDeclaration(id) {}
 
 	TPersist *create() const

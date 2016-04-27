@@ -4,6 +4,7 @@
     <command>MI_LoadFolder</command>
     <command>MI_SaveLevel</command>
     <command>MI_SaveLevelAs</command>
+    <command>MI_SaveAll</command>
     <command>MI_OpenRecentLevel</command>
     <command>MI_ExportLevel</command>
     <command>MI_LevelSettings</command>

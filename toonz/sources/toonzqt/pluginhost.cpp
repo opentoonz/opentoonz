@@ -10,7 +10,7 @@
 #else
 #include <dlfcn.h>
 #endif
-#include <string.h>
+#include <string>
 #include <map>
 #include <type_traits>
 #include <functional>

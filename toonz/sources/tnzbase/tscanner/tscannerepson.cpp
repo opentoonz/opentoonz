@@ -78,13 +78,13 @@ class TScannerExpection : public TException
 	TString m_scannerMsg;
 
 public:
-	TScannerExpection(const vector<string> &notFatal, const string &fatal)
+	TScannerExpection(const std::vector<std::string> &notFatal, const std::string &fatal)
 		: TException("Scanner Expection")
 	{
 		m_scannerMsg = toWideString(fatal);
 		for (int i = notFatal.size(); i; i--)
 			m_scannerMsg += toWideString("\n") + toWideString(notFatal[i - 1]);
-		log(string("Exception created: ") + toString(m_scannerMsg));
+		log(std::string("Exception created: ") + toString(m_scannerMsg));
 	}
 	TString getMessage() const { return m_scannerMsg; }
 };
@@ -133,7 +133,7 @@ TScannerEpson::~TScannerEpson()
 
 void TScannerEpson::selectDevice()
 {
-	log(string("selectDevice; isOpened=") + (m_isOpened ? "true" : "false"));
+	log(std::string("selectDevice; isOpened=") + (m_isOpened ? "true" : "false"));
 	if (!m_scannerIO->open()) {
 		log("open() failed");
 		throw TException("unable to get handle to scanner");
@@ -322,7 +322,7 @@ void TScannerEpson::acquire(const TScannerParameters &params, int paperCount)
 
 			bytes_to_read = lines * counter;
 			if (stx != 0x02) {
-				ostrstream os;
+				std::ostrstream os;
 				os << "header corrupted (" << std::hex << stx << ")" << '\0';
 				throw TException(os.str());
 			}
@@ -421,7 +421,7 @@ void TScannerEpson::acquire(const TScannerParameters &params, int paperCount)
 
 	if ((m_settingsMode == NEW_STYLE) && params.m_paperFeeder.m_supported && (params.m_paperFeeder.m_value == 1.)) {
 		if (!ESCI_command_1b('e', 1, true)) {
-			vector<string> notFatal;
+			std::vector<std::string> notFatal;
 			throw TScannerExpection(notFatal, "Scanner error (un)loading paper");
 		}
 		unsigned char p = 0x0C;
@@ -451,7 +451,7 @@ void TScannerEpson::doSettings(const TScannerParameters &params, bool firstSheet
 {
 	log("doSettings");
 	int retryCount = 3;
-	vector<string> notFatal;
+	std::vector<std::string> notFatal;
 
 	while (retryCount--) {
 		if (m_settingsMode == NEW_STYLE) {
@@ -649,7 +649,7 @@ if (!resetScanner())
 
 #ifdef _DEBUG
 	memcpy(&status, &(buffer2[1]), 1);
-	ostrstream os;
+	std::ostrstream os;
 	os.freeze(false);
 	os << "stx = " << stx << " status = " << status << " counter=" << counter << '\n' << '\0';
 #endif
@@ -738,7 +738,7 @@ bool TScannerEpson::resetScanner()
 {
 	log("resetScanner");
 	bool ret = ESCI_command('@', true);
-	log(string("resetScanner: ") + (ret ? "OK" : "FAILED"));
+	log(std::string("resetScanner: ") + (ret ? "OK" : "FAILED"));
 	return ret;
 }
 
@@ -767,13 +767,13 @@ bool TScannerEpson::expectACK()
 
 #ifdef _DEBUG
 	if (ack != ACK) {
-		ostrstream os;
+		std::ostrstream os;
 		os.freeze(false);
 		os << "ack fails ret = 0x" << std::hex << (int)ack << '\n' << '\0';
 		TSystem::outputDebug(os.str());
 	}
 #endif
-	log(string("expectACK: ") + (ack == ACK ? "ACK" : "FAILED"));
+	log(std::string("expectACK: ") + (ack == ACK ? "ACK" : "FAILED"));
 
 	return (ack == ACK);
 }
@@ -953,7 +953,7 @@ void TScannerEpson::ESCI_readLineData(unsigned char &stx, unsigned char &status,
 	status = buffer[1];
 
 #ifdef _DEBUG
-	ostrstream os;
+	std::ostrstream os;
 	os.freeze(false);
 
 	os << "fatal=" << fatalError;
@@ -987,7 +987,7 @@ void TScannerEpson::ESCI_readLineData2(unsigned char &stx, unsigned char &status
 	status = buffer[1];
 
 #ifdef _DEBUG
-	ostrstream os;
+	std::ostrstream os;
 	os.freeze(false);
 
 	os << "fatal=" << fatalError;

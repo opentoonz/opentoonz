@@ -260,9 +260,9 @@ public:
 						   // un play od una registrazione
 	};
 
-	TSoundDeviceException(Type type, const string &msg)
+	TSoundDeviceException(Type type, const std::string &msg)
 		: TException(msg), m_type(type) {}
-	TSoundDeviceException(Type type, const wstring &msg)
+	TSoundDeviceException(Type type, const std::wstring &msg)
 		: TException(msg), m_type(type) {}
 
 	Type getType()

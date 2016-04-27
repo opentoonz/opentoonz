@@ -4,7 +4,7 @@
 #define T_GEOMETRY_INCLUDED
 
 #include "tutil.h"
-#include <math.h>
+#include <cmath>
 
 #undef DVAPI
 #undef DVVAR
@@ -95,7 +95,7 @@ inline T operator*(const TPointT<T> &a, const TPointT<T> &b)
 //-----------------------------------------------------------------------------
 
 template <class T>
-inline ostream &operator<<(ostream &out, const TPointT<T> &p)
+inline std::ostream &operator<<(std::ostream &out, const TPointT<T> &p)
 {
 	return out << "(" << p.x << ", " << p.y << ")";
 }
@@ -168,7 +168,7 @@ This helper function returns the absolute value of the specified point
 */
 inline double norm(const TPointD &p)
 {
-	return sqrt(norm2(p));
+	return std::sqrt(norm2(p));
 }
 
 /*!
@@ -322,7 +322,7 @@ public:
 //=============================================================================
 
 template <class T>
-inline ostream &operator<<(ostream &out, const T3DPointT<T> &p)
+inline std::ostream &operator<<(std::ostream &out, const T3DPointT<T> &p)
 {
 	return out << "(" << p.x << ", " << p.y << ", " << p.z << ")";
 }
@@ -367,7 +367,7 @@ inline T norm2(const T3DPointT<T> &p)
 template <class T>
 inline T norm(const T3DPointT<T> &p)
 {
-	return sqrt(norm2(p));
+	return std::sqrt(norm2(p));
 }
 
 /*!
@@ -533,7 +533,7 @@ inline double tdistance(const TThickPoint &p1, const TThickPoint &p2)
 	return norm(convert(p2 - p1));
 }
 
-inline ostream &operator<<(ostream &out, const TThickPoint &p)
+inline std::ostream &operator<<(std::ostream &out, const TThickPoint &p)
 {
 	return out << "(" << p.x << ", " << p.y << ", " << p.thick << ")";
 }
@@ -613,7 +613,7 @@ typedef TDimensionT<double> TDimensionD;
 //=============================================================================
 
 template <class T>
-inline ostream &operator<<(ostream &out, const TDimensionT<T> &p)
+inline std::ostream &operator<<(std::ostream &out, const TDimensionT<T> &p)
 {
 	return out << "(" << p.lx << ", " << p.ly << ")";
 }
@@ -932,7 +932,7 @@ inline TRectD operator/(const TRectD &rect, double factor)
 //-----------------------------------------------------------------------------
 
 template <class T>
-inline ostream &operator<<(ostream &out, const TRectT<T> &r)
+inline std::ostream &operator<<(std::ostream &out, const TRectT<T> &r)
 {
 	return out << "(" << r.x0 << "," << r.y0
 			   << ";" << r.x1 << "," << r.y1 << ")";
@@ -1316,7 +1316,7 @@ inline TAffine inv(const TAffine &a)
 
 //-----------------------------------------------------------------------------
 
-inline ostream &operator<<(ostream &out, const TAffine &a)
+inline std::ostream &operator<<(std::ostream &out, const TAffine &a)
 {
 	return out << "(" << a.a11 << ", " << a.a12 << ", " << a.a13
 			   << ";" << a.a21 << ", " << a.a22 << ", " << a.a23 << ")";

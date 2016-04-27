@@ -47,7 +47,7 @@ void printLibRelease(ostream &out)
 class SpecialUsageElement : public UsageElement
 {
 public:
-	SpecialUsageElement(string name) : UsageElement(name, " "){};
+	SpecialUsageElement(std::string name) : UsageElement(name, " "){};
 	void dumpValue(ostream &) const {};
 	void resetValue(){};
 };
@@ -322,11 +322,11 @@ class TCli::UsageImp
 {
 	string m_progName;
 	vector<UsageLine> m_usageLines;
-	std::map<string, Qualifier *> m_qtable;
+	std::map<std::string, Qualifier *> m_qtable;
 	vector<Qualifier *> m_qlist;
 	vector<Argument *> m_args;
-	typedef std::map<string, Qualifier *>::iterator qiterator;
-	typedef std::map<string, Qualifier *>::const_iterator const_qiterator;
+	typedef std::map<std::string, Qualifier *>::iterator qiterator;
+	typedef std::map<std::string, Qualifier *>::const_iterator const_qiterator;
 
 	UsageLine *m_selectedUsageLine;
 
@@ -439,7 +439,7 @@ void UsageImp::registerQualifier(Qualifier *q)
 		if (s == s0 + 1) {
 			assert(!"Empty qualifier name");
 		}
-		string name(s0, s - s0);
+		std::string name(s0, s - s0);
 		registerQualifier(name, q);
 		while (*s == ' ')
 			s++;
@@ -492,7 +492,7 @@ void UsageImp::printUsageLine(ostream &out, const UsageLine &ul) const
 
 //---------------------------------------------------------
 
-void UsageImp::printUsageLines(ostream &out) const
+void UsageImp::printUsageLines(std::ostream &out) const
 {
 	bool first = true;
 	for (unsigned int i = 0; i < m_usageLines.size(); i++) {
@@ -512,7 +512,7 @@ void UsageImp::printUsageLines(ostream &out) const
 
 //---------------------------------------------------------
 
-void UsageImp::print(ostream &out) const
+void UsageImp::print(std::ostream &out) const
 {
 	printUsageLines(out);
 	out << endl;
@@ -748,7 +748,7 @@ void UsageImp::getArgCountRange(const UsageLine &ul, int a, int b,
 
 //---------------------------------------------------------
 
-void UsageImp::dumpValues(ostream &out) const
+void UsageImp::dumpValues(std::ostream &out) const
 {
 	if (m_selectedUsageLine == 0)
 		return;
@@ -794,12 +794,12 @@ void Usage::add(const UsageLine &ul)
 	m_imp->add(ul);
 }
 
-void Usage::print(ostream &out) const
+void Usage::print(std::ostream &out) const
 {
 	m_imp->print(out);
 }
 
-void Usage::dumpValues(ostream &out) const
+void Usage::dumpValues(std::ostream &out) const
 {
 	m_imp->dumpValues(out);
 }
@@ -809,7 +809,7 @@ void Usage::clear()
 	m_imp->clear();
 }
 
-bool Usage::parse(const char *argvString, ostream &err)
+bool Usage::parse(const char *argvString, std::ostream &err)
 {
 	string s = string(argvString);
 	std::vector<char *> argv;
@@ -827,7 +827,7 @@ bool Usage::parse(const char *argvString, ostream &err)
 	return parse(argv.size(), &argv[0], err);
 }
 
-bool Usage::parse(int argc, char *argv[], ostream &err)
+bool Usage::parse(int argc, char *argv[], std::ostream &err)
 {
 	try {
 		m_imp->parse(argc, argv);
@@ -882,14 +882,14 @@ void RangeQualifier::fetch(int index, int &argc, char *argv[])
 	}
 }
 
-ostream &operator<<(ostream &out, const RangeQualifier &range)
+std::ostream &operator<<(std::ostream &out, const RangeQualifier &range)
 {
 	return out << "[" << range.getFrom() << ", " << range.getTo() << "]";
 }
 
 //---------------------------------------------------------
 
-void RangeQualifier::dumpValue(ostream &out) const
+void RangeQualifier::dumpValue(std::ostream &out) const
 {
 	out << m_name << " = ";
 	if (m_from <= m_to)

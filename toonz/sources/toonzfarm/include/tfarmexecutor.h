@@ -36,7 +36,7 @@ public:
 	void onReceive(int socket, const QString &data);
 
 protected:
-	virtual QString execute(const vector<QString> &argv) = 0;
+	virtual QString execute(const std::vector<QString> &argv) = 0;
 
 private:
 	TTcpIpServer *m_tcpipServer;

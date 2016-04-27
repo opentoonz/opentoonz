@@ -139,13 +139,13 @@ bool pasteStrokesWithoutUndo(TVectorImageP image, std::set<int> &outIndexes,
 void deleteStrokesWithoutUndo(TVectorImageP image, std::set<int> &indexes)
 {
 	QMutexLocker lock(image->getMutex());
-	vector<int> indexesV(indexes.begin(), indexes.end());
+	std::vector<int> indexesV(indexes.begin(), indexes.end());
 	TRectD bbox;
 	UINT i = 0;
 	for (; i < indexesV.size(); i++)
 		bbox += image->getStroke(indexesV[i])->getBBox();
 
-	vector<TFilledRegionInf> regions;
+	std::vector<TFilledRegionInf> regions;
 	ImageUtils::getFillingInformationOverlappingArea(image, regions, bbox);
 
 	TVectorImageP other = image->splitImage(indexesV, true);
@@ -272,12 +272,12 @@ class RemoveEndpointsUndo : public TUndo
 {
 	TXshSimpleLevelP m_level;
 	TFrameId m_frameId;
-	vector<pair<int, TStroke *>> m_strokes;
+	std::vector<std::pair<int, TStroke *>> m_strokes;
 
 public:
 	RemoveEndpointsUndo(TXshSimpleLevel *level,
 						const TFrameId &frameId,
-						vector<pair<int, TStroke *>> strokes)
+						std::vector<std::pair<int, TStroke *>> strokes)
 		: m_level(level), m_frameId(frameId), m_strokes(strokes)
 
 	{
@@ -479,14 +479,14 @@ void StrokeSelection::removeEndpoints()
 	if (m_indexes.empty())
 		return;
 
-	vector<pair<int, TStroke *>> undoData;
+	std::vector<std::pair<int, TStroke *>> undoData;
 
 	m_vi->findRegions();
 	set<int>::iterator it = m_indexes.begin();
 	for (; it != m_indexes.end(); ++it) {
 		TStroke *s = m_vi->removeEndpoints(*it);
 		if (s)
-			undoData.push_back(pair<int, TStroke *>(*it, s));
+			undoData.push_back(std::pair<int, TStroke *>(*it, s));
 	}
 	TTool *tool = TTool::getApplication()->getCurrentTool()->getTool();
 	TXshSimpleLevel *level = TTool::getApplication()->getCurrentLevel()->getSimpleLevel();
@@ -670,8 +670,8 @@ namespace
 class UndoSetStrokeStyle : public TUndo
 {
 	TVectorImageP m_image;
-	vector<int> m_strokeIndexes;
-	vector<int> m_oldStyles;
+	std::vector<int> m_strokeIndexes;
+	std::vector<int> m_oldStyles;
 	int m_newStyle;
 
 public:

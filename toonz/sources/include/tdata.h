@@ -46,7 +46,7 @@ class DVAPI TTextData : public TData
 
 public:
 	TTextData(TString text) : m_text(text) {}
-	TTextData(string text);
+	TTextData(std::string text);
 
 	TDataP clone() const;
 
@@ -62,10 +62,10 @@ public:
 
 class DVAPI TFilePathListData : public TData
 {
-	vector<TFilePath> m_filePaths;
+	std::vector<TFilePath> m_filePaths;
 
 public:
-	TFilePathListData(const vector<TFilePath> &filePaths) : m_filePaths(filePaths) {}
+	TFilePathListData(const std::vector<TFilePath> &filePaths) : m_filePaths(filePaths) {}
 	TDataP clone() const;
 
 	int getFilePathCount() const { return m_filePaths.size(); }

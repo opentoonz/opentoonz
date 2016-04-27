@@ -74,7 +74,7 @@ void onShowHideSelectObject(QAction *action)
 	}
 }
 
-int addShowHideStageObjectCmds(const vector<int> &columnIndexes, QMenu *menu, bool isShow)
+int addShowHideStageObjectCmds(const std::vector<int> &columnIndexes, QMenu *menu, bool isShow)
 {
 	int ii, columnIndex = -1;
 	bool flag = true;

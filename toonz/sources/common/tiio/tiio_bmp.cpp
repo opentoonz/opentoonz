@@ -697,16 +697,16 @@ void BmpWriter::open(FILE *file, const TImageInfo &info)
 
 	TEnumProperty *p = (TEnumProperty *)(m_properties->getProperty("Bits Per Pixel"));
 	assert(p);
-	string str = toString(p->getValue());
+	std::string str = toString(p->getValue());
 	m_bitPerPixel = atoi(str.c_str());
 
 	int cmapSize = 0;
-	vector<TPixel> *colormap = 0;
+	std::vector<TPixel> *colormap = 0;
 
 	if (m_bitPerPixel == 8) {
 		TPointerProperty *colormapProp = (TPointerProperty *)(m_properties->getProperty("Colormap"));
 		if (colormapProp) {
-			colormap = (vector<TPixel> *)colormapProp->getValue();
+			colormap = (std::vector<TPixel> *)colormapProp->getValue();
 			cmapSize = colormap->size();
 		} else
 			cmapSize = 256;

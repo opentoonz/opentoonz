@@ -217,7 +217,7 @@ public:
 	void setRange(double minValue, double maxValue);
 	void getRange(double &minValue, double &maxValue);
 
-	void setMeasure(string measureName);
+	void setMeasure(std::string measureName);
 
 	void setDecimals(int decimals);
 	int getDecimals();
@@ -251,7 +251,7 @@ public:
 	MeasuredDoubleField(QWidget *parent = 0, bool isRollerHide = true);
 	~MeasuredDoubleField() {}
 
-	void setMeasure(string measureName);
+	void setMeasure(std::string measureName);
 
 	void setDecimals(int decimals);
 };

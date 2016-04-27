@@ -8,7 +8,7 @@
 namespace
 {
 template <typename T, typename PIXEL>
-void prepare_lut(double max, int edge, vector<T> &lut)
+void prepare_lut(double max, int edge, std::vector<T> &lut)
 {
 	double aux = (double)PIXEL::maxChannelValue;
 	int i = 0;
@@ -81,7 +81,7 @@ void update_param(T &param, TRaster64P ras)
 template <typename PIXEL, typename CHANNEL_TYPE>
 void doSolarize(TRasterPT<PIXEL> ras, double max, int edge)
 {
-	vector<CHANNEL_TYPE> solarize_lut(PIXEL::maxChannelValue + 1);
+	std::vector<CHANNEL_TYPE> solarize_lut(PIXEL::maxChannelValue + 1);
 
 	update_param(max, ras);
 	update_param(edge, ras);

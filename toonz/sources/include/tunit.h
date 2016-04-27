@@ -49,23 +49,23 @@ public:
 
 class DVAPI TUnit
 {
-	wstring m_defaultExtension;
-	std::vector<wstring> m_extensions;
+	std::wstring m_defaultExtension;
+	std::vector<std::wstring> m_extensions;
 	TUnitConverter *m_converter;
 
 public:
-	TUnit(wstring ext, TUnitConverter *converter = 0);
+	TUnit(std::wstring ext, TUnitConverter *converter = 0);
 	TUnit(const TUnit &);
 	~TUnit();
 
 	TUnit *clone() const { return new TUnit(*this); }
 
-	const std::vector<wstring> &getExtensions() const { return m_extensions; }
-	void addExtension(wstring ext);
-	bool isExtension(wstring ext) const;
+	const std::vector<std::wstring> &getExtensions() const { return m_extensions; }
+	void addExtension(std::wstring ext);
+	bool isExtension(std::wstring ext) const;
 
-	wstring getDefaultExtension() const { return m_defaultExtension; }
-	void setDefaultExtension(wstring ext);
+	std::wstring getDefaultExtension() const { return m_defaultExtension; }
+	void setDefaultExtension(std::wstring ext);
 
 	double convertTo(double v) const { return m_converter->convertTo(v); }
 	double convertFrom(double v) const { return m_converter->convertFrom(v); }
@@ -79,18 +79,18 @@ private:
 
 class DVAPI TMeasure
 {
-	string m_name;
+	std::string m_name;
 	TUnit *m_mainUnit, *m_currentUnit, *m_standardUnit;
-	std::map<wstring, TUnit *> m_extensions;
+	std::map<std::wstring, TUnit *> m_extensions;
 	double m_defaultValue;
 
 public:
-	TMeasure(string name, TUnit *mainUnit);
+	TMeasure(std::string name, TUnit *mainUnit);
 	TMeasure(const TMeasure &);
 	~TMeasure();
 
-	string getName() const { return m_name; }
-	void setName(string name) { m_name = name; }
+	std::string getName() const { return m_name; }
+	void setName(std::string name) { m_name = name; }
 
 	void add(TUnit *unit);
 
@@ -105,7 +105,7 @@ public:
 	const TUnit *getStandardUnit() const { return m_standardUnit; }
 	void setStandardUnit(TUnit *unit);
 
-	TUnit *getUnit(wstring ext) const;
+	TUnit *getUnit(std::wstring ext) const;
 
 	// defaultValue e' espresso in main unit
 	double getDefaultValue() const { return m_defaultValue; }
@@ -120,7 +120,7 @@ private:
 
 class DVAPI TMeasureManager
 { // singleton
-	std::map<string, TMeasure *> m_measures;
+	std::map<std::string, TMeasure *> m_measures;
 	TMeasureManager();
 
 public:
@@ -131,7 +131,7 @@ public:
 	}
 
 	void add(TMeasure *m);
-	TMeasure *get(string name) const;
+	TMeasure *get(std::string name) const;
 
 	typedef double CameraSizeProvider();
 	void addCameraMeasures(CameraSizeProvider *cameraSizeProvider);
@@ -145,12 +145,12 @@ class DVAPI TMeasuredValue
 	double m_value;
 
 public:
-	TMeasuredValue(string measureName);
+	TMeasuredValue(std::string measureName);
 	~TMeasuredValue();
 
 	const TMeasure *getMeasure() const { return m_measure; }
 	void setMeasure(const TMeasure *measure);
-	void setMeasure(string measureName);
+	void setMeasure(std::string measureName);
 
 	enum UnitType { MainUnit,
 					CurrentUnit };
@@ -164,8 +164,8 @@ public:
 		m_value = uType == MainUnit ? value : m_measure->getCurrentUnit()->convertFrom(value);
 	}
 
-	bool setValue(wstring s, int *pErr = 0); // if pErr != then *pErr contains error code. *pErr == 0 means OK
-	wstring toWideString(int decimals = 7) const;
+	bool setValue(std::wstring s, int *pErr = 0); // if pErr != then *pErr contains error code. *pErr == 0 means OK
+	std::wstring toWideString(int decimals = 7) const;
 
 private:
 	// not implemented

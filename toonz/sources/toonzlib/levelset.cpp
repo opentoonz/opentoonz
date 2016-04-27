@@ -106,7 +106,7 @@ TXshLevel *TLevelSet::getLevel(int index) const
 
 TXshLevel *TLevelSet::getLevel(const std::wstring &levelName) const
 {
-	std::map<wstring, TXshLevel *>::const_iterator it;
+	std::map<std::wstring, TXshLevel *>::const_iterator it;
 	it = m_levelTable.find(levelName);
 	if (it == m_levelTable.end())
 		return 0;
@@ -132,7 +132,7 @@ TXshLevel *TLevelSet::getLevel(const ToonzScene &scene, const TFilePath &levelPa
 
 //-----------------------------------------------------------------------------
 
-bool TLevelSet::hasLevel(const wstring &levelName) const
+bool TLevelSet::hasLevel(const std::wstring &levelName) const
 {
 	std::vector<TXshLevel *>::const_iterator it = m_levels.begin();
 	for (it; it != m_levels.end(); it++) {
@@ -161,7 +161,7 @@ void TLevelSet::listLevels(std::vector<TXshLevel *> &levels) const
 
 bool TLevelSet::insertLevel(TXshLevel *xl)
 {
-	std::map<wstring, TXshLevel *>::const_iterator it;
+	std::map<std::wstring, TXshLevel *>::const_iterator it;
 	it = m_levelTable.find(xl->getName());
 	if (it != m_levelTable.end() && it->second == xl)
 		return it->second == xl;
@@ -295,7 +295,7 @@ void TLevelSet::moveLevelToFolder(const TFilePath &fp, TXshLevel *level)
 
 void TLevelSet::saveFolder(TOStream &os, TFilePath folder)
 {
-	std::map<string, string> attr;
+	std::map<std::string, std::string> attr;
 	attr["name"] = folder.getName();
 	if (folder == getDefaultFolder())
 		attr["type"] = "default";
@@ -322,12 +322,12 @@ void TLevelSet::saveFolder(TOStream &os, TFilePath folder)
 
 void TLevelSet::loadFolder(TIStream &is, TFilePath folder)
 {
-	string s;
+	std::string s;
 	is.getTagParam("type", s);
 	if (s == "default")
 		setDefaultFolder(folder);
 	while (!is.eos()) {
-		string tagName;
+		std::string tagName;
 		is.matchTag(tagName);
 		if (tagName == "levels") {
 			while (!is.eos()) {
@@ -338,7 +338,6 @@ void TLevelSet::loadFolder(TIStream &is, TFilePath folder)
 					moveLevelToFolder(folder, xshLevel);
 			}
 		} else if (tagName == "folder") {
-			string s;
 			is.getTagParam("name", s);
 			TFilePath child = createFolder(folder, toWideString(s));
 			loadFolder(is, child);
@@ -354,7 +353,7 @@ void TLevelSet::loadData(TIStream &is)
 {
 	int folderCount = 1;
 	while (!is.eos()) {
-		string tagName;
+		std::string tagName;
 		if (is.matchTag(tagName)) {
 			if (tagName == "levels") {
 				while (!is.eos()) {
@@ -366,7 +365,7 @@ void TLevelSet::loadData(TIStream &is)
 					}
 				}
 			} else if (tagName == "folder") {
-				string name = toString(defaultRootFolder.getWideString());
+				std::string name = toString(defaultRootFolder.getWideString());
 				is.getTagParam("name", name);
 				TFilePath folder(name);
 				if (folderCount == 1)

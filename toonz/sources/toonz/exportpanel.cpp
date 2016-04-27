@@ -777,7 +777,7 @@ ExportPanel::ExportPanel(QWidget *parent, Qt::WFlags flags)
 	settingsLayout->setAlignment(Qt::AlignTop);
 
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
-	wstring sceneName = scene->getSceneName();
+	std::wstring sceneName = scene->getSceneName();
 	TFilePath scenePath = scene->getProperties()->getOutputProperties()->getPath().getParentDir();
 
 	//Label + saveInFileFld
@@ -886,7 +886,7 @@ void ExportPanel::loadExportSettings()
 	if (!TSystem::doesExistFileOrLevel(exportPath))
 		return;
 	TIStream is(exportPath);
-	string tagName;
+	std::string tagName;
 	try {
 		while (is.matchTag(tagName)) {
 			if (tagName == "ExportDir") {
@@ -894,13 +894,13 @@ void ExportPanel::loadExportSettings()
 				is >> outPath;
 				m_saveInFileFld->setPath(QString::fromStdWString(outPath.getWideString()));
 			} else if (tagName == "ExportFormat") {
-				string ext;
+				std::string ext;
 				is >> ext;
 				int index = m_fileFormat->findText(QString::fromStdString(ext));
 				m_fileFormat->setCurrentIndex(index);
 			} else if (tagName == "FormatSettings") {
 				TOutputProperties *outProp = RenderController::instance()->getOutputPropertites();
-				string ext = m_fileFormat->currentText().toStdString();
+				std::string ext = m_fileFormat->currentText().toStdString();
 				TPropertyGroup *props = outProp->getFileFormatProperties(ext);
 				props->loadData(is);
 			} else if (tagName == "UseMarkers") {
@@ -924,7 +924,7 @@ void ExportPanel::saveExportSettings()
 	TFilePath exportPath = TEnv::getConfigDir() + "exportsettings.txt";
 	TOStream os(exportPath);
 	os.child("ExportDir") << outPath;
-	string ext = m_fileFormat->currentText().toStdString();
+	std::string ext = m_fileFormat->currentText().toStdString();
 	os.child("ExportFormat") << ext;
 
 	os.openChild("FormatSettings");
@@ -941,7 +941,7 @@ void ExportPanel::saveExportSettings()
 void ExportPanel::generateMovie()
 {
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
-	string ext = RenderController::instance()->getMovieExt();
+	std::string ext = RenderController::instance()->getMovieExt();
 	QString path = m_saveInFileFld->getPath();
 	TFilePath outPath(path.toStdWString());
 	outPath = (outPath + m_fileNameFld->text().toStdWString()).withType(ext);
@@ -987,7 +987,7 @@ void ExportPanel::openSettingsPopup()
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 	if (!scene)
 		return;
-	string ext = RenderController::instance()->getMovieExt();
+	std::string ext = RenderController::instance()->getMovieExt();
 
 	TOutputProperties *outProps = RenderController::instance()->getOutputPropertites();
 	if (!outProps) {

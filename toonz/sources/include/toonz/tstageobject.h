@@ -137,7 +137,7 @@ public:
 	 Define a map of int and keyframe necessary to know object keyframe; 
 	 Its purpose is the indexing of the object's keyframes.	
   */
-	typedef map<int, Keyframe> KeyframeMap;
+	typedef std::map<int, Keyframe> KeyframeMap;
 
 public:
 	/*! Initializes a stage object in his \e tree with an unique id.
@@ -164,7 +164,7 @@ public:
 	std::string getName() const;
 
 	//! Returns the id's full name, ie the name of the object with its id appended.
-	string getFullName() const;
+	std::string getFullName() const;
 
 	//! Returns whether this object is already in use.
 	bool isOpened() const { return m_isOpened; }
@@ -359,7 +359,7 @@ public:
 
 	//! Returns whether the object has children.
 	bool hasChildren() const { return !m_children.empty(); }
-	const list<TStageObject *> &getChildren() const { return m_children; }
+	const std::list<TStageObject *> &getChildren() const { return m_children; }
 
 	/*!
     Returns \e true if the objects cycle is enabled, 
@@ -439,9 +439,9 @@ public:
 	bool isGrouped();
 	bool isContainedInGroup(int groupId);
 
-	void setGroupName(const wstring &name, int position = -1);
-	wstring getGroupName(bool fromEditor);
-	QStack<wstring> getGroupNameStack();
+	void setGroupName(const std::wstring &name, int position = -1);
+	std::wstring getGroupName(bool fromEditor);
+	QStack<std::wstring> getGroupNameStack();
 	int removeGroupName(bool fromEditor);
 	void removeGroupName(int position = -1);
 
@@ -451,7 +451,7 @@ public:
 	bool isGroupEditing();
 	void closeEditingGroup(int groupId);
 	int getEditingGroupId();
-	wstring getEditingGroupName();
+	std::wstring getEditingGroupName();
 
 	void updateKeyframes(); //!< Rebuilds the internal keyframes table.
 
@@ -474,7 +474,7 @@ private:
 	TStageObjectId m_id;
 	TStageObjectTree *m_tree;
 	TStageObject *m_parent;
-	list<TStageObject *> m_children;
+	std::list<TStageObject *> m_children;
 
 	bool m_cycleEnabled;
 
@@ -510,13 +510,13 @@ private:
 
 	double m_noScaleZ;
 
-	string m_name;
+	std::string m_name;
 	TPointD m_dagNodePos;
 	bool m_isOpened;
-	string m_handle, m_parentHandle;
+	std::string m_handle, m_parentHandle;
 	TCamera *m_camera;
 	QStack<int> m_groupId;
-	QStack<wstring> m_groupName;
+	QStack<std::wstring> m_groupName;
 	int m_groupSelector;
 
 	bool m_locked;
@@ -526,7 +526,7 @@ private:
 	TStageObject(const TStageObject &);
 	TStageObject &operator=(const TStageObject &);
 
-	TPointD getHandlePos(string handle, int row) const;
+	TPointD getHandlePos(std::string handle, int row) const;
 	TAffine computeLocalPlacement(double frame);
 	TStageObject *findRoot(double frame) const;
 	TStageObject *getPinnedDescendant(int frame);
@@ -569,12 +569,12 @@ class DVAPI TStageObjectParams
 {
 public:
 	TStageObjectId m_id, m_parentId;
-	vector<TStageObjectId> m_children;
+	std::vector<TStageObjectId> m_children;
 	std::map<int, TStageObject::Keyframe> m_keyframes;
 	bool m_cycleEnabled, m_isOpened;
 	TStageObjectSpline *m_spline;
 	TStageObject::Status m_status;
-	string m_handle, m_parentHandle;
+	std::string m_handle, m_parentHandle;
 	TPinnedRangeSet *m_pinnedRangeSet;
 	TDoubleParamP m_x,
 		m_y,
@@ -591,7 +591,7 @@ public:
 	double m_noScaleZ;
 	TPointD m_center,
 		m_offset;
-	string m_name;
+	std::string m_name;
 
 	TStageObjectParams();
 	TStageObjectParams(TStageObjectParams *data);

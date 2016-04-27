@@ -48,7 +48,7 @@ class CaptureParameters;
 class DVAPI TSceneProperties
 {
 public:
-	typedef vector<double> Guides;
+	typedef std::vector<double> Guides;
 
 private:
 	Guides m_hGuides, m_vGuides;

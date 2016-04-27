@@ -1159,7 +1159,7 @@ bool CObjectTracker::GetInit()
 	return m_initialized;
 }
 
-string CObjectTracker::GetVisibility()
+std::string CObjectTracker::GetVisibility()
 {
 	return m_visible;
 }

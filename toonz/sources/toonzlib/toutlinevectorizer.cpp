@@ -189,12 +189,12 @@ public:
 
 	OutlineConfiguration m_configuration;
 	DataRasterP m_dataRaster;
-	vector<pair<int, DataRasterP>> m_dataRasterArray;
+	std::vector<std::pair<int, DataRasterP>> m_dataRasterArray;
 	TVectorImageP m_vimage;
-	vector<Node *> m_nodes;
-	list<vector<TThickPoint>> m_protoOutlines;
+	std::vector<Node *> m_nodes;
+	std::list<std::vector<TThickPoint>> m_protoOutlines;
 
-	vector<Junction *> m_junctions;
+	std::vector<Junction *> m_junctions;
 
 	OutlineVectorizer(const OutlineConfiguration &configuration, TPalette *palette)
 		: m_configuration(configuration), m_palette(palette) {}
@@ -636,7 +636,7 @@ void OutlineVectorizer::makeDataRaster(const TRasterP &src)
 		}
 		assert(inkId);
 
-		m_dataRasterArray.push_back(pair<int, DataRasterP>(inkId, dataRaster));
+		m_dataRasterArray.push_back(std::pair<int, DataRasterP>(inkId, dataRaster));
 		int maxDistance2 = m_configuration.m_threshold * m_configuration.m_threshold;
 
 		for (y = 0; y < m_src->getLy(); y++) {
@@ -672,7 +672,7 @@ void OutlineVectorizer::makeDataRaster(const TRasterP &src)
 		}
 		assert(inkId);
 
-		m_dataRasterArray.push_back(pair<int, DataRasterP>(inkId, dataRaster));
+		m_dataRasterArray.push_back(std::pair<int, DataRasterP>(inkId, dataRaster));
 		int threshold = m_configuration.m_threshold;
 
 		for (y = 0; y < m_src->getLy(); y++) {
@@ -712,7 +712,7 @@ void OutlineVectorizer::makeDataRaster(const TRasterP &src)
 			}
 			assert(inkId);
 
-			m_dataRasterArray.push_back(pair<int, DataRasterP>(inkId, dataRaster));
+			m_dataRasterArray.push_back(std::pair<int, DataRasterP>(inkId, dataRaster));
 
 			// inizializza la parte centrale
 			for (y = 0; y < m_src->getLy(); y++) {
@@ -770,7 +770,7 @@ void OutlineVectorizer::makeDataRaster(const TRasterP &src)
 				int threshold = m_configuration.m_threshold; //tolerance: 1->MAX thresh: 1-255
 				currInk = nextInk;
 				nextInk = 0;
-				m_dataRasterArray.push_back(pair<int, DataRasterP>(currInk, dataRaster));
+				m_dataRasterArray.push_back(std::pair<int, DataRasterP>(currInk, dataRaster));
 
 				// inizializza la parte centrale
 				for (y = 0; y < m_src->getLy(); y++) {

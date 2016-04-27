@@ -62,6 +62,6 @@ enum {
 
 } // namespace
 
-DVAPI string getKeyName(int key, unsigned long flags);
+DVAPI std::string getKeyName(int key, unsigned long flags);
 
 #endif

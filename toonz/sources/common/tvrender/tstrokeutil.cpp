@@ -26,8 +26,8 @@
 namespace
 {
 
-typedef vector<TThickCubic *> TThickCubicArray;
-typedef vector<TThickQuadratic *> QuadStrokeChunkArray;
+typedef std::vector<TThickCubic *> TThickCubicArray;
+typedef std::vector<TThickQuadratic *> QuadStrokeChunkArray;
 
 //---------------------------------------------------------------------------
 
@@ -166,7 +166,7 @@ computeIncrement(double strokeLength,
 
 //-----------------------------------------------------------------------------
 
-void detectEdges(const vector<TPointD> &pointArray, vector<UINT> &edgeIndexArray)
+void detectEdges(const std::vector<TPointD> &pointArray, std::vector<UINT> &edgeIndexArray)
 {
 	// ASSUNZIONE: sharpPointArray non contiene punti coincidenti adiacenti
 
@@ -187,7 +187,7 @@ void detectEdges(const vector<TPointD> &pointArray, vector<UINT> &edgeIndexArray
 	const double alphaMax = 2.4; // ( 137.5°)
 	const double dMin2 = dMin * dMin;
 	const double dMax2 = dMax * dMax;
-	vector<double> sharpnessArray;
+	std::vector<double> sharpnessArray;
 	sharpnessArray.push_back(TConsts::pi); //  il primo punto e' un corner
 	int nodeCount;
 	for (nodeCount = 1; nodeCount < size - 1; ++nodeCount) { //  scorre la sharpPointArray escludendo gli estremi
@@ -380,7 +380,7 @@ void modifyControlPoints(TStroke &stroke,
 //-----------------------------------------------------------------------------
 
 void modifyControlPoints(TStroke &stroke,
-						 const TStrokeDeformation &deformer, vector<double> &controlPointLen)
+						 const TStrokeDeformation &deformer, std::vector<double> &controlPointLen)
 {
 	UINT cpCount = stroke.getControlPointCount();
 
@@ -402,7 +402,7 @@ void modifyControlPoints(TStroke &stroke,
 //-----------------------------------------------------------------------------
 
 void modifyThickness(TStroke &stroke, const TStrokeDeformation &deformer,
-					 vector<double> &controlPointLen, bool exponentially)
+					 std::vector<double> &controlPointLen, bool exponentially)
 {
 	UINT cpCount = stroke.getControlPointCount();
 	assert(controlPointLen.size() == cpCount);

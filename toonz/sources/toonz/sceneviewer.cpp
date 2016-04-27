@@ -429,14 +429,14 @@ public:
 		CommandManager *cm = CommandManager::instance();
 		QAction *action = cm->getAction(m_cmdId);
 		bool checked = action->isChecked();
-		if (string(m_cmdId) == MI_ShiftTrace) {
+		if (std::string(m_cmdId) == MI_ShiftTrace) {
 			cm->enable(MI_EditShift, checked);
 			cm->enable(MI_NoShift, checked);
 			if (!checked) {
 				cm->setChecked(MI_EditShift, false);
 			}
 			//     cm->getAction(MI_NoShift)->setChecked(false);
-		} else if (string(m_cmdId) == MI_EditShift) {
+		} else if (std::string(m_cmdId) == MI_EditShift) {
 			if (checked) {
 				QAction *noShiftAction = CommandManager::instance()->getAction(MI_NoShift);
 				if (noShiftAction)
@@ -446,7 +446,7 @@ public:
 				TApp::instance()->getCurrentTool()->unsetPseudoTool();
 			}
 			CommandManager::instance()->enable(MI_NoShift, !checked);
-		} else if (string(m_cmdId) == MI_NoShift) {
+		} else if (std::string(m_cmdId) == MI_NoShift) {
 		}
 		updateShiftTraceStatus();
 	}
@@ -1422,7 +1422,7 @@ void SceneViewer::paintGL()
 		/* QGLWidget の widget 生成/削除のタイミングで(platform によって?) GL_FRAMEBUFFER_UNDEFINED の状態で paintGL() が呼ばれてしまうようだ */
 		return;
 	}
-#ifndef MACOSX
+#ifdef WIN32
 	//following line is necessary to solve a problem Windows 7
 	SetWindowRgn((HWND)winId(), 0, FALSE);
 #else
@@ -2297,14 +2297,14 @@ int SceneViewer::pick(const TPoint &point)
 
 int SceneViewer::posToColumnIndex(const TPoint &p, double distance, bool includeInvisible) const
 {
-	vector<int> ret;
+	std::vector<int> ret;
 	posToColumnIndexes(p, ret, distance, includeInvisible);
 	return ret.empty() ? -1 : ret.back();
 }
 
 //-----------------------------------------------------------------------------
 
-void SceneViewer::posToColumnIndexes(const TPoint &p, vector<int> &indexes, double distance, bool includeInvisible) const
+void SceneViewer::posToColumnIndexes(const TPoint &p, std::vector<int> &indexes, double distance, bool includeInvisible) const
 {
 	int oldRasterizePli = TXshSimpleLevel::m_rasterizePli;
 	TApp *app = TApp::instance();

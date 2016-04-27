@@ -58,7 +58,7 @@ public:
 	//----------------------------------------------------------------------------
 
 	SandorFxRenderData *buildRenderData(double frame, int shrink, const TRectD &controlBox,
-										const string &controllerAlias)
+										const std::string &controllerAlias)
 	{
 		int argc = 12;
 		const char *argv[12];
@@ -165,7 +165,7 @@ private:
 
 	void convertParam(double param[], const char *cParam[], int cParamLen)
 	{
-		string app;
+		std::string app;
 		for (int i = 1; i <= 11; i++) {
 			app = toString(param[i]);
 			cParam[i] = strsave(app.c_str());
@@ -198,7 +198,7 @@ void ArtContourFx::doDryCompute(TRectD &rect, double frame, const TRenderSetting
 	TRenderSettings ri3(ri);
 
 	int shrink = tround((ri.m_shrinkX + ri.m_shrinkY) / 2.0);
-	string controlAlias = m_controller->getAlias(frame, ri2);
+	std::string controlAlias = m_controller->getAlias(frame, ri2);
 	SandorFxRenderData *artContourData = buildRenderData(frame, shrink, controlBox, controlAlias);
 	ri3.m_data.push_back(artContourData);
 	ri3.m_userCachable = false;
@@ -233,7 +233,7 @@ void ArtContourFx::doCompute(TTile &tile, double frame, const TRenderSettings &r
 
 	//Build the render data
 	int shrink = tround((ri.m_shrinkX + ri.m_shrinkY) / 2.0);
-	string controlAlias = m_controller->getAlias(frame, ri2);
+	std::string controlAlias = m_controller->getAlias(frame, ri2);
 	SandorFxRenderData *artContourData = buildRenderData(frame, shrink, controlBox, controlAlias);
 
 	//Add the controller raster

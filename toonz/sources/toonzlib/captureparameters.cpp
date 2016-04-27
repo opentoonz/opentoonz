@@ -15,9 +15,9 @@ CaptureParameters::CaptureParameters()
 
 //-----------------------------------------------------------------------------
 
-TPropertyGroup *CaptureParameters::getFileFormatProperties(string ext)
+TPropertyGroup *CaptureParameters::getFileFormatProperties(std::string ext)
 {
-	std::map<string, TPropertyGroup *>::const_iterator it;
+	std::map<std::string, TPropertyGroup *>::const_iterator it;
 	it = m_formatProperties.find(ext);
 	if (it == m_formatProperties.end()) {
 		TPropertyGroup *ret = Tiio::makeWriterProperties(ext);
@@ -42,7 +42,7 @@ void CaptureParameters::assign(const CaptureParameters *params)
 	m_step = params->getStep();
 	m_format = params->getFileFormat();
 
-	std::map<string, TPropertyGroup *>::const_iterator it = params->m_formatProperties.begin();
+	std::map<std::string, TPropertyGroup *>::const_iterator it = params->m_formatProperties.begin();
 	while (it != params->m_formatProperties.end()) {
 		m_formatProperties[it->first] = it->second;
 		++it;
@@ -65,13 +65,13 @@ void CaptureParameters::saveData(TOStream &os)
 	os.child("format") << m_format;
 
 	os.openChild("formatsProperties");
-	std::vector<string> fileExtensions;
+	std::vector<std::string> fileExtensions;
 	getFileFormatPropertiesExtensions(fileExtensions);
 	for (int i = 0; i < (int)fileExtensions.size(); i++) {
-		string ext = fileExtensions[i];
+		std::string ext = fileExtensions[i];
 		TPropertyGroup *pg = getFileFormatProperties(ext);
 		assert(pg);
-		std::map<string, string> attr;
+		std::map<std::string, std::string> attr;
 		attr["ext"] = ext;
 		os.openChild("formatProperties", attr);
 		pg->saveData(os);
@@ -84,7 +84,7 @@ void CaptureParameters::saveData(TOStream &os)
 
 void CaptureParameters::loadData(TIStream &is)
 {
-	string tagName;
+	std::string tagName;
 	while (is.matchTag(tagName)) {
 		if (tagName == "deviceName")
 			is >> m_deviceName;
@@ -103,7 +103,7 @@ void CaptureParameters::loadData(TIStream &is)
 			is >> value;
 			m_upsideDown = value != 0;
 		} else if (tagName == "filePath") {
-			wstring str;
+			std::wstring str;
 			is >> str;
 			m_filePath = TFilePath(str);
 		}
@@ -116,7 +116,7 @@ void CaptureParameters::loadData(TIStream &is)
 		else if (tagName == "formatsProperties") {
 			while (is.matchTag(tagName)) {
 				if (tagName == "formatProperties") {
-					string ext = is.getTagAttribute("ext");
+					std::string ext = is.getTagAttribute("ext");
 					TPropertyGroup *pg = getFileFormatProperties(ext);
 					if (ext == "avi") {
 						TPropertyGroup appProperties;
@@ -150,10 +150,10 @@ void CaptureParameters::loadData(TIStream &is)
 
 //-------------------------------------------------------------------
 
-void CaptureParameters::getFileFormatPropertiesExtensions(std::vector<string> &v) const
+void CaptureParameters::getFileFormatPropertiesExtensions(std::vector<std::string> &v) const
 {
 	v.reserve(m_formatProperties.size());
-	std::map<string, TPropertyGroup *>::const_iterator it;
+	std::map<std::string, TPropertyGroup *>::const_iterator it;
 	for (it = m_formatProperties.begin(); it != m_formatProperties.end(); ++it)
 		v.push_back(it->first);
 }

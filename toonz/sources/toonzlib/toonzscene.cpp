@@ -59,7 +59,7 @@ const VersionNumber l_currentVersion(71, 0);
 
 //-----------------------------------------------------------------------------
 
-string getFolderName(int levelType)
+std::string getFolderName(int levelType)
 {
 	switch (levelType) {
 	case TZI_XSHLEVEL:
@@ -344,7 +344,7 @@ ToonzScene::~ToonzScene()
 
 //-----------------------------------------------------------------------------
 
-void ToonzScene::setSceneName(wstring name)
+void ToonzScene::setSceneName(std::wstring name)
 {
 	m_scenePath = m_scenePath.withName(name);
 }
@@ -423,7 +423,7 @@ int ToonzScene::loadFrameCount(const TFilePath &fp)
 		throw TException(fp.getWideString() + L": Can't open file");
 	try {
 		//Leggo il primo tag (<tnz/tab>) ed estraggo il framecount (se c'e')
-		string tagName = "";
+		std::string tagName = "";
 		if (!is.matchTag(tagName))
 			throw TException("Bad file format");
 
@@ -501,16 +501,16 @@ void ToonzScene::loadTnzFile(const TFilePath &fp)
 	if (!is)
 		throw TException(fp.getWideString() + L": Can't open file");
 	try {
-		string tagName = "";
+		std::string tagName = "";
 		if (!is.matchTag(tagName))
 			throw TException("Bad file format");
 
 		if (tagName == "tab" || tagName == "tnz") {
-			string rootTagName = tagName;
-			string v = is.getTagAttribute("version");
+			std::string rootTagName = tagName;
+			std::string v = is.getTagAttribute("version");
 			VersionNumber versionNumber(0, 0);
 			int k = v.find(".");
-			if (k != (int)string::npos && 0 < k && k < (int)v.length()) {
+			if (k != (int)std::string::npos && 0 < k && k < (int)v.length()) {
 				versionNumber.first = toInt(v.substr(0, k));
 				versionNumber.second = toInt(v.substr(k + 1));
 			}
@@ -520,8 +520,8 @@ void ToonzScene::loadTnzFile(const TFilePath &fp)
 			is.setVersion(versionNumber);
 			while (is.matchTag(tagName)) {
 				if (tagName == "generator") {
-					string program = is.getString();
-					reading22 = program.find("2.2") != string::npos;
+					std::string program = is.getString();
+					reading22 = program.find("2.2") != std::string::npos;
 				} else if (tagName == "properties")
 					m_properties->loadData(is, false);
 				else if (tagName == "palette") // per compatibilita' beta1
@@ -594,7 +594,7 @@ void ToonzScene::loadTnzFile(const TFilePath &fp)
 void ToonzScene::setUntitled()
 {
 	m_isUntitled = true;
-	const string baseName = "untitled";
+	const std::string baseName = "untitled";
 	TFilePath tempDir = getUntitledScenesDir();
 	if (TFileStatus(tempDir).doesExist() == false) {
 		try {
@@ -603,7 +603,7 @@ void ToonzScene::setUntitled()
 		}
 	}
 
-	string name = baseName;
+	std::string name = baseName;
 	if (TFileStatus(tempDir + name).doesExist()) {
 		int count = 2;
 		do {
@@ -678,7 +678,7 @@ void ToonzScene::save(const TFilePath &fp, TXsheet *subxsh)
 	if (xsh == 0)
 		xsh = m_childStack->getTopXsheet();
 
-	std::map<string, string> attr;
+	std::map<std::string, std::string> attr;
 	attr["version"] = (QString::number(l_currentVersion.first) + "." // From now on, version numbers in saved files will have
 					   + QString::number(l_currentVersion.second))   // the signature "MAJOR.MINOR", where:
 						  .toStdString();							 //
@@ -712,7 +712,7 @@ void ToonzScene::save(const TFilePath &fp, TXsheet *subxsh)
 		os.openChild("history");
 		QString data = getContentHistory()->serialize();
 		int i = 0, j;
-		// non scrivo tutta la string di seguito per evitare problemi se diventa
+		// non scrivo tutta la std::string di seguito per evitare problemi se diventa
 		// troppo lunga. Cerco di spezzarla in modo che sia "bella da leggere" nel tnz
 		while ((j = data.indexOf("||", i)) >= i) {
 			os << data.mid(i, j - i + 1).toStdWString();
@@ -838,7 +838,7 @@ void ToonzScene::renderFrame(const TRaster32P &ras, int row, const TXsheet *xsh,
 
 //-----------------------------------------------------------------------------
 
-TXshLevel *ToonzScene::createNewLevel(int type, wstring levelName, const TDimension &dim, double dpi, TFilePath fp)
+TXshLevel *ToonzScene::createNewLevel(int type, std::wstring levelName, const TDimension &dim, double dpi, TFilePath fp)
 {
 	TLevelSet *levelSet = getLevelSet();
 
@@ -1244,12 +1244,12 @@ TFilePath ToonzScene::decodeFilePath(const TFilePath &path) const
 	bool projectIsEmpty = false;
 	TFilePath fp = path;
 
-	wstring head;
+	std::wstring head;
 	TFilePath tail;
 	path.split(head, tail);
 
-	string h;
-	wstring s;
+	std::string h;
+	std::wstring s;
 	if (head != L"" && head[0] == L'+') {
 		if (TProjectManager::instance()->isTabModeEnabled()) {
 			return m_scenePath.getParentDir() +
@@ -1278,13 +1278,13 @@ TFilePath ToonzScene::decodeFilePath(const TFilePath &path) const
 		}
 	}
 	if (s != L"") {
-		map<wstring, wstring> table;
+		std::map<std::wstring, std::wstring> table;
 
 		// se la scena e' untitled e l'espansione del path
 		// dipende dalla scena (o perche' l'espansione contiene
 		// $scenename, $scenepath o perche' si usa il savepath)
 		if (m_isUntitled &&
-			(s.find(L"$scene") != wstring::npos ||
+			(s.find(L"$scene") != std::wstring::npos ||
 			 project->getUseScenePath(h) ||
 			 fp.getParentDir().getName() == getScenePath().getName())) {
 			TFilePath parentDir = getScenePath().getParentDir();
@@ -1309,13 +1309,13 @@ TFilePath ToonzScene::decodeFilePath(const TFilePath &path) const
 			table[L"$scenepath"] = scenePath.withType("").getWideString();
 			table[L"$scenename"] = scenePath.withType("").getWideString();
 
-			std::map<wstring, wstring>::reverse_iterator it;
+			std::map<std::wstring, std::wstring>::reverse_iterator it;
 			for (it = table.rbegin(); it != table.rend(); ++it) {
-				wstring keyword = it->first;
+				std::wstring keyword = it->first;
 				int i = 0;
 				for (;;) {
 					int j = s.find(keyword, i);
-					if (j == (int)wstring::npos)
+					if (j == (int)std::wstring::npos)
 						break;
 					s.replace(j, keyword.length(), it->second);
 					i = j;
@@ -1351,7 +1351,7 @@ TFilePath ToonzScene::codeFilePath(const TFilePath &path) const
 
 //-----------------------------------------------------------------------------
 
-TFilePath ToonzScene::getDefaultLevelPath(int levelType, wstring levelName) const
+TFilePath ToonzScene::getDefaultLevelPath(int levelType, std::wstring levelName) const
 {
 	TProject *project = getProject();
 	assert(project);
@@ -1374,7 +1374,7 @@ TFilePath ToonzScene::getDefaultLevelPath(int levelType, wstring levelName) cons
 	default:
 		levelPath = TFilePath(levelName + L"..png");
 	}
-	string folderName = getFolderName(levelType);
+	std::string folderName = getFolderName(levelType);
 	if (project->getUseScenePath(folderName))
 		return TFilePath("+" + folderName) + getSavePath() + levelPath;
 	else
@@ -1383,7 +1383,7 @@ TFilePath ToonzScene::getDefaultLevelPath(int levelType, wstring levelName) cons
 
 //-----------------------------------------------------------------------------
 
-const wstring savePathString(L"$savepath");
+const std::wstring savePathString(L"$savepath");
 
 //-----------------------------------------------------------------------------
 
@@ -1412,7 +1412,7 @@ TFilePath ToonzScene::codeSavePath(TFilePath path) const
 		head == TFilePath() ||
 		head.getWideString()[0] != L'+')
 		return originalPath;
-	string folderName = toString(head.getWideString().substr(1));
+	std::string folderName = toString(head.getWideString().substr(1));
 	if (!getProject()->getUseScenePath(folderName))
 		return originalPath;
 	return head + savePathString + filename;
@@ -1422,9 +1422,9 @@ TFilePath ToonzScene::codeSavePath(TFilePath path) const
 
 TFilePath ToonzScene::decodeSavePath(TFilePath path) const
 {
-	wstring s = path.getWideString();
+	std::wstring s = path.getWideString();
 	int i = s.find(savePathString);
-	if (i != (int)wstring::npos) {
+	if (i != (int)std::wstring::npos) {
 		TFilePath savePath = getSavePath();
 		s.replace(i, savePathString.length(), savePath.getWideString());
 		return TFilePath(s);
@@ -1547,7 +1547,7 @@ TFilePath ToonzScene::getIconPath(const TFilePath &scenePath)
 
 TFilePath ToonzScene::getSavePath() const
 {
-	string sceneName = getScenePath().getName();
+	std::string sceneName = getScenePath().getName();
 	if (isUntitled())
 		return TFilePath(sceneName);
 	TFilePath sceneRoot = decodeFilePath(TFilePath("+" + TProject::Scenes));

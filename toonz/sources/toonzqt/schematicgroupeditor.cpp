@@ -231,7 +231,7 @@ void FxSchematicGroupEditor::closeEditor()
 				fxs[j]->getAttributes()->closeEditingGroup(m_groupId);
 				TMacroFx *macro = dynamic_cast<TMacroFx *>(fxs[j].getPointer());
 				if (macro) {
-					vector<TFxP> macroFxs = macro->getFxs();
+					std::vector<TFxP> macroFxs = macro->getFxs();
 					int j;
 					for (j = 0; j < (int)macroFxs.size(); j++)
 						macroFxs[j]->getAttributes()->closeEditingGroup(m_groupId);
@@ -243,7 +243,7 @@ void FxSchematicGroupEditor::closeEditor()
 			fx->getAttributes()->closeEditingGroup(m_groupId);
 			TMacroFx *macro = dynamic_cast<TMacroFx *>(fx);
 			if (macro) {
-				vector<TFxP> macroFxs = macro->getFxs();
+				std::vector<TFxP> macroFxs = macro->getFxs();
 				int j;
 				for (j = 0; j < (int)macroFxs.size(); j++)
 					macroFxs[j]->getAttributes()->closeEditingGroup(m_groupId);
