@@ -136,7 +136,7 @@ struct TPSDHeaderInfo {
 
 struct dictentry {
 	int id;
-	char *key, *tag, *desc;
+	const char *key, *tag, *desc;
 	void (*func)(FILE *f, struct dictentry *dict, TPSDLayerInfo *li);
 };
 
@@ -256,12 +256,12 @@ class DVAPI TPSDParser
 public:
 	// path define levels construction method
 	// if path = :
-	//  filename.psd										flat image so LevelsCount = 1;
-	//	filename#LAYERID.psd						each psd layer as a tlevel
-	//  filename#LAYERID#frames.psd			each psd layer as a frame so there is only one tlevel with 1 or more frames;
-	//  filename#LAYERID#folder.psd			each psd layer is a tlevel and	\
-		//																	each folder is a tlevel such as the psd layers \
-		//																	contained into folder are frames of tlevel
+	//  filename.psd                    flat image so LevelsCount = 1;
+	//  filename#LAYERID.psd            each psd layer as a tlevel
+	//  filename#LAYERID#frames.psd     each psd layer as a frame so there is only one tlevel with 1 or more frames;
+	//  filename#LAYERID#folder.psd     each psd layer is a tlevel and
+	//                                  each folder is a tlevel such as the psd layers
+	//                                  contained into folder are frames of tlevel
 	// LAYERID(Integer) is psd layerId
 	TPSDParser(const TFilePath &path);
 	~TPSDParser();

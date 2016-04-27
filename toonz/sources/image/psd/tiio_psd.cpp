@@ -8,11 +8,11 @@
 //class TImageReaderLayerPsd;
 
 // if path = :
-//  filename.psd									to load float image. TLevel frames number is 1
-//	filename#layerId.psd					to load only one psd layer from layerId. TLevel frames number is 1
-//  filename#layerId#frames.psd	  to load only one psd layer from layerId. TLevel frames number is psd layers number
-//  filename#layerId#group.psd		to load only one psd layer from layerId. TLevel frames number is psd layers folder number \
-//																where fodler is the folder belongs psd layer.
+//  filename.psd                to load float image. TLevel frames number is 1
+//  filename#layerId.psd        to load only one psd layer from layerId. TLevel frames number is 1
+//  filename#layerId#frames.psd to load only one psd layer from layerId. TLevel frames number is psd layers number
+//  filename#layerId#group.psd  to load only one psd layer from layerId. TLevel frames number is psd layers folder number
+//                              where fodler is the folder belongs psd layer.
 
 TLevelReaderPsd::TLevelReaderPsd(const TFilePath &path)
 	: TLevelReader(path), m_path(path), m_layerId(0)
