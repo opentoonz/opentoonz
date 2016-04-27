@@ -9,6 +9,7 @@
     <command>MI_LoadScene</command>
     <command>MI_SaveScene</command>
     <command>MI_SaveSceneAs</command>
+    <command>MI_SaveAll</command>
     <command>MI_OpenRecentScene</command>
     <command>MI_RevertScene</command>
     <separator/>

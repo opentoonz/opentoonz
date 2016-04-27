@@ -1002,7 +1002,6 @@ void PageViewer::contextMenuEvent(QContextMenuEvent *event)
 	menu.addAction(cutAct);
 
 	menu.addSeparator();
-	//iwasawa lockの時は無効化するため
 	QAction *clearAct = cmd->getAction(MI_Clear);
 	menu.addAction(clearAct);
 
@@ -1074,10 +1073,13 @@ void PageViewer::contextMenuEvent(QContextMenuEvent *event)
 		menu.addAction(cmd->getAction(MI_EraseUnusedStyles));
 	}
 	*/
-	QAction *newStyle = menu.addAction(tr("New Style"));
-	connect(newStyle, SIGNAL(triggered()), SLOT(addNewColor()));
-	QAction *newPage = menu.addAction(tr("New Page"));
-	connect(newPage, SIGNAL(triggered()), SLOT(addNewPage()));
+	if (m_page)
+	{
+		QAction *newStyle = menu.addAction(tr("New Style"));
+		connect(newStyle, SIGNAL(triggered()), SLOT(addNewColor()));
+		QAction *newPage = menu.addAction(tr("New Page"));
+		connect(newPage, SIGNAL(triggered()), SLOT(addNewPage()));
+	}
 	menu.exec(event->globalPos());
 }
 

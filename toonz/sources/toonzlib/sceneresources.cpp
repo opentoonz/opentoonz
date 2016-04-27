@@ -256,13 +256,13 @@ void SceneLevel::save()
 			//Questo controllo viene fatto qui e non nella copia o nel salvataggio del livello perche' in generale
 			//non si vuole che il livello unpainted venga copiato con il livello.
 			if (actualFp.getType() == "tlv") {
-				TFilePath oldUnpaintedLevelPath = oldActualPath.getParentDir() + TFilePath(oldActualPath.getName() + "-unpainted." + oldActualPath.getType());
-				TFilePath unpaintedLevelPath = actualFp.getParentDir() + TFilePath(actualFp.getName() + "-unpainted." + actualFp.getType());
-				if (TSystem::doesExistFileOrLevel(oldUnpaintedLevelPath) && !TSystem::doesExistFileOrLevel(unpaintedLevelPath))
+				TFilePath oldUnpaintedLevelPath = oldActualPath.getParentDir() + "nopaint\\" + TFilePath(oldActualPath.getName() + "_np." + oldActualPath.getType());
+				TFilePath unpaintedLevelPath = actualFp.getParentDir() + "nopaint\\" + TFilePath(actualFp.getName() + "_np." + actualFp.getType());
+				if (TSystem::doesExistFileOrLevel(oldUnpaintedLevelPath) && !TSystem::doesExistFileOrLevel(unpaintedLevelPath) && TSystem::touchParentDir(unpaintedLevelPath))
 					TSystem::copyFile(unpaintedLevelPath, oldUnpaintedLevelPath);
 				TFilePath oldUnpaintedPalettePath = oldUnpaintedLevelPath.withType("tpl");
 				TFilePath unpaintedPalettePath = unpaintedLevelPath.withType("tpl");
-				if (TSystem::doesExistFileOrLevel(oldUnpaintedPalettePath) && !TSystem::doesExistFileOrLevel(unpaintedPalettePath))
+				if (TSystem::doesExistFileOrLevel(oldUnpaintedPalettePath) && !TSystem::doesExistFileOrLevel(unpaintedPalettePath) && TSystem::touchParentDir(unpaintedPalettePath))
 					TSystem::copyFile(unpaintedPalettePath, oldUnpaintedPalettePath);
 			}
 		} catch (...) {
