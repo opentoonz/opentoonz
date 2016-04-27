@@ -255,6 +255,7 @@ void do_over(TRasterGR8P rout, const TRaster32P &rup)
 			TPixel32 out32_pix = overPix(*temp_pix, *up_pix);
 			*out_pix = out_pix->from(out32_pix);
 		}
+		delete temp_pix;
 	}
 }
 

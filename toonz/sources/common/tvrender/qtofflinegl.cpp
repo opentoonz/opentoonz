@@ -377,7 +377,7 @@ void QtOfflineGLPBuffer::getRaster(TRaster32P raster)
 			pix->r = qRed(*inpPix);
 			pix->g = qGreen(*inpPix);
 			pix->b = qBlue(*inpPix);
-			*inpPix++;
+			inpPix++;
 		}
 	}
 	raster->unlock();

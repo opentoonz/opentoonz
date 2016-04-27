@@ -562,16 +562,20 @@ void TPSDReader::readImageData(TRasterP &rasP, TPSDLayerInfo *li, TPSDChannelInf
 	if (!m_region.isEmpty()) {
 		x0 = m_region.getP00().x;
 		// se x0 è fuori dalle dimensioni dell'immagine ritorna un'immagine vuota
-		if (x0 >= m_headerInfo.cols)
+		if (x0 >= m_headerInfo.cols) {
+			free(rledata);
 			return;
+		}
 		x1 = x0 + m_region.getLx() - 1;
 		// controllo che x1 rimanga all'interno dell'immagine
 		if (x1 >= m_headerInfo.cols)
 			x1 = m_headerInfo.cols - 1;
 		y0 = m_region.getP00().y;
 		// se y0 è fuori dalle dimensioni dell'immagine ritorna un'immagine vuota
-		if (y0 >= m_headerInfo.rows)
+		if (y0 >= m_headerInfo.rows) {
+			free(rledata);
 			return;
+		}
 		y1 = y0 + m_region.getLy() - 1;
 		// controllo che y1 rimanga all'interno dell'immagine
 		if (y1 >= m_headerInfo.rows)
@@ -624,6 +628,7 @@ void TPSDReader::readImageData(TRasterP &rasP, TPSDLayerInfo *li, TPSDChannelInf
 	layerSaveBox *= imageRect;
 
 	if (layerSaveBox == TRect() || layerSaveBox.isEmpty()) {
+		free(rledata);
 		return;
 	}
 	// Estraggo da rasP solo il rettangolo che si interseca con il livello corrente

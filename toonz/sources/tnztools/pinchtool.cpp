@@ -549,7 +549,8 @@ bool PinchTool::keyDown(int key,
 						TUINT32 flags,
 						const TPoint &pos)
 {
-	m_deformation->reset();
+	if (!m_active)
+		m_deformation->reset();
 
 #if 0
   char c = (char)key;

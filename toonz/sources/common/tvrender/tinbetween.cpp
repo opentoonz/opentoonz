@@ -1290,7 +1290,7 @@ void TInbetween::Imp::computeTransformation()
 					}
 
 				} else {
-					assert(transform.m_scaleX = transform.m_scaleY);
+					assert(transform.m_scaleX == transform.m_scaleY);
 
 					cs = transform.m_scaleX * cos(totalRadRotation);
 					sn = transform.m_scaleX * sin(totalRadRotation);

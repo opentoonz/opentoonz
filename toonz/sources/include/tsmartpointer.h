@@ -1,8 +1,6 @@
 #ifndef TSMARTPOINTER_INCLUDED
 #define TSMARTPOINTER_INCLUDED
 
-#include <memory>
-
 #include "tutil.h"
 #include "tatomicvar.h"
 

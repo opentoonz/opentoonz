@@ -20,12 +20,16 @@
 #ifdef _WIN32
 
 #ifndef x64
+
 #define float_t Float_t
 #define GetProcessInformation GetProcessInformation_
+
 #include "QuickTimeComponents.h"
 #include "tquicktime.h"
+
 #undef float_t
 #undef GetProcessInformation
+
 #endif
 
 #include "./mov/tiio_mov.h"

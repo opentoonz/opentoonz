@@ -1029,6 +1029,7 @@ void MainWindow::onAbout()
 	dialog->setWindowTitle(tr("About OpenToonz"));
 	dialog->setTopMargin(0);
 	dialog->addWidget(label);
+	dialog->addWidget(new QLabel("OpenToonz (built " __DATE__ " " __TIME__ ")"));
 
 	QPushButton *button = new QPushButton(tr("Close"), dialog);
 	button->setDefault(true);

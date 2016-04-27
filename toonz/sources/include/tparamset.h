@@ -104,7 +104,7 @@ public:
 	std::string getValueAlias(double frame, int precision);
 
 private:
-	TParamSetImp *m_imp;
+	TParamSetImp *m_imp = nullptr;
 };
 
 #ifdef _WIN32

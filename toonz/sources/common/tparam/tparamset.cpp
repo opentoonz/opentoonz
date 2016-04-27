@@ -119,6 +119,7 @@ TParamSet::TParamSet(const TParamSet &src)
 
 TParamSet::~TParamSet()
 {
+	delete m_imp;
 }
 
 //---------------------------------------------------------
