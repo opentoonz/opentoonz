@@ -301,6 +301,7 @@ elseif(APPLE)
         ${AUDIOTB_LIB}
         ${CARBON_LIB})
 elseif(UNIX)
+    set(QT_LIB)  # avoid warning
     include_directories(${FREETYPE_INCLUDE_DIRS})
     set(EXTRA_LIBS
         ${GLU_LIB})
