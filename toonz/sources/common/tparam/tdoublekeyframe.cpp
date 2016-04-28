@@ -48,6 +48,9 @@ void TDoubleKeyframe::saveData(TOStream &os) const
 		break;
 	}
 	std::string unitName = m_unitName != "" ? m_unitName : "default";
+	// Dirty resolution. Because the degree sign is converted to unexpected string...
+	if (QString::fromStdWString(L"\u00b0").toStdString() == unitName)
+		unitName = "\\u00b0";
 	switch (m_type) {
 	case Constant:
 	case Exponential:
