@@ -25,7 +25,13 @@ class RowArea : public QWidget
 	XsheetViewer *m_viewer;
 	int m_xa;
 	int m_row;
-	bool m_showOnionToSet;
+
+	enum ShowOnionToSetFlag
+	{
+		None = 0,
+		Fos,
+		Mos
+	}m_showOnionToSet;//TODO:明日はこれをFos,Mosどちらをハイライトしているのか判定させる！！！！
 
 	// Play ranges
 	int m_r0;
@@ -62,6 +68,7 @@ protected:
 	void mouseMoveEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *event);
 	void contextMenuEvent(QContextMenuEvent *event);
+	void mouseDoubleClickEvent(QMouseEvent* event);
 	bool event(QEvent *event);
 
 	void setMarker(int index);

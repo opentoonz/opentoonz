@@ -28,6 +28,7 @@
 #include "toonz/txshcolumn.h"
 #include "toonz/tstageobjectspline.h"
 #include "toonz/tstageobjectid.h"
+#include "toonz/preferences.h"
 
 // TnzCore includes
 #include "tvectorimage.h"
@@ -163,7 +164,7 @@ SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
 
 // onion skin
 #ifndef STUDENT
-	if (!parent->isPreviewEnabled())
+	if (Preferences::instance()->isOnionSkinEnabled() && !parent->isPreviewEnabled())
 		OnioniSkinMaskGUI::addOnionSkinCommand(this);
 #endif
 
