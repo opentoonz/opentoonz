@@ -29,6 +29,7 @@
 #include <io.h>
 #include <stdlib.h>
 #include <direct.h>
+#include <shellapi.h>
 // gmt: sulla mia macchina cosi' non compila!!!
 // #include "winsock2.h"
 // #include "lmcons.h"

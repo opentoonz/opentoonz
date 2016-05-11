@@ -9,6 +9,8 @@
 #include <set>
 #include "tsystem.h"
 
+#include <mmsystem.h>
+
 //=========================================================
 
 //forward declarations

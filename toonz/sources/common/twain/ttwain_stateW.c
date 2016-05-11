@@ -3,6 +3,7 @@
 #pragma warning(disable : 4996)
 
 #include <windows.h>
+#include <stdlib.h>
 
 #include "ttwain_state.h"
 #include "ttwainP.h"

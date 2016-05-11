@@ -27,6 +27,8 @@ using namespace std;
 #include <qdesktopservices>
 #include <qhostinfo>
 #include <shlobj.h>
+#include <shellapi.h>
+#include <winnt.h>
 #else
 #include <QDesktopServices>
 #include <QHostInfo>
