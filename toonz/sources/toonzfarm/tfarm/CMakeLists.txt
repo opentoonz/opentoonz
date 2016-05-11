@@ -22,9 +22,9 @@ set(SOURCES
 
 add_library(tfarm SHARED ${HEADERS} ${SOURCES})
 add_definitions(-DTFARM_EXPORTS)
-if (APPLE)
+if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtfarm.dylib")
-endif (APPLE)
+endif()
 
 message("subdir: tfarm")
 message("Bin: " ${CMAKE_CURRENT_BINARY_DIR})

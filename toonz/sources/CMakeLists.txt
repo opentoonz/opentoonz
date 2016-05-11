@@ -12,7 +12,7 @@ endif()
 
 message("Thirdpary Library Search path:" ${THIRDPARTY_LIBS_HINTS})
 
-if (WIN32)
+if(WIN32)
     message("Windows System")
     if(CMAKE_SIZEOF_VOID_P EQUAL 4)
         set(QT_PATH "C:/Qt/Qt5.6.0_32/5.6/msvc2013" CACHE PATH "Qt instlattion directory")
@@ -26,13 +26,13 @@ if (WIN32)
     set(QT_LIB_PATH ${QT_PATH})
     set(CMAKE_PREFIX_PATH "${QT_PATH}/lib/cmake/")
     add_definitions(-DVC_EXTRALEAN -DNOMINMAX -D_USE_MATH_DEFINES)
-elseif (APPLE)
+elseif(APPLE)
     message("Apple System")
-    if (NOT PLATFORM)
+    if(NOT PLATFORM)
         set(PLATFORM 64)
     endif()
     message("PLATFORM:" ${PLATFORM})
-    if (PLATFORM EQUAL 64)
+    if(PLATFORM EQUAL 64)
         set(QT_PATH "~/Qt/5.6/clang_64/lib" CACHE PATH "Qt instlattion directory")
         set(QT_LIB_PATH "${QT_PATH}/")
         set(CMAKE_PREFIX_PATH "${QT_LIB_PATH}cmake/")
@@ -53,9 +53,9 @@ elseif (APPLE)
     else()
         message(FATAL_ERROR "Invalid PLATFORM:" ${PLATFORM} ". 'PLATFORM' must be 32 or 64.")
     endif()
-else ()
+else()
     message("Unknown System")
-endif ()
+endif()
 
 add_definitions(-DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED)
 
@@ -120,7 +120,7 @@ set(TNZSTDFX_Location)
 set(TFARM_Location)
 
 if(WIN32)
-    if (CMAKE_SIZEOF_VOID_P EQUAL 4)
+    if(CMAKE_SIZEOF_VOID_P EQUAL 4)
         set(PLATFORM 32)
         set(PLATFORM2)
     else()
@@ -146,7 +146,7 @@ if(WIN32)
     set(SUPERLU_LIB ${SDKROOT}/superlu/SuperLU_${PLATFORM}.lib)
     set(OPENBLAS_LIB ${SDKROOT}/openblas/libopenblas_${PLATFORM}.lib)
     set(USB_LIB)  # unused
-    if (PLATFORM EQUAL 32)
+    if(PLATFORM EQUAL 32)
         set(QT_LIB ${SDKROOT}/quicktime/QT73SDK/Libraries/QTMLClient.lib)
     endif()
 else()
@@ -186,7 +186,7 @@ else()
 
     pkg_check_modules(USB_LIB REQUIRED libusb-1.0)
     set(OPENBLAS_LIB) # unused?
-    if (PLATFORM EQUAL 32)
+    if(PLATFORM EQUAL 32)
         find_library(QT_LIB QuickTime)
     endif()
 
@@ -216,14 +216,14 @@ if(WIN32)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
 endif()
 
-if (MSVC AND MSVC_VERSION EQUAL 1800)
+if(MSVC AND MSVC_VERSION EQUAL 1800)
     # Visual C++ 2013 cannot handle UTF-8 without BOM
     # Non-ascii characters in comments would not be a problem
     add_compile_options("/wd4819")
 endif()
 
 # generate Qt translations and messages
-set(LANGUAGES japanese italian french spanish)
+set(LANGUAGES japanese italian french spanish chinese)
 
 function(add_translation module)
     set(translation)
@@ -264,9 +264,9 @@ if(PLATFORM EQUAL 32)
     add_subdirectory(t32bitsrv)
 endif()
 
-if (APPLE)
+if(APPLE)
     add_custom_command(TARGET executable
         POST_BUILD COMMAND
         ${CMAKE_INSTALL_NAME_TOOL} -add_rpath ${CMAKE_INSTALL_RPATH}
         $<TARGET_FILE:executable>)
-endif (APPLE)
+endif()

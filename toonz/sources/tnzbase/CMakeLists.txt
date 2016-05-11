@@ -114,13 +114,13 @@ set(SOURCES
     tscanner/tscannerutil.cpp
     tscanner/tscannerepson.cpp)
 
-if (WIN32)
+if(WIN32)
     set(SOURCES ${SOURCES}
         tscanner/TScannerIO/TUSBScannerIO_W.cpp)
-else ()
+else()
     set(SOURCES ${SOURCES}
         tscanner/TScannerIO/TUSBScannerIO_M.cpp)
-endif ()
+endif()
 
 set(OBJCSOURCES
     ../common/twain/ttwain_capability.c
@@ -132,17 +132,17 @@ set(OBJCSOURCES
     tscanner/tscanner.cpp
     tscanner/tscannertwain.cpp)
 
-if (WIN32)
+if(WIN32)
     set(OBJCSOURCES ${OBJCSOURCES}
         ../common/twain/ttwain_stateW.c
         ../common/twain/ttwain_utilW.c
         ../common/twain/ttwain_winW.c)
-else ()
+else()
     set(OBJCSOURCES ${OBJCSOURCES}
         ../common/twain/ttwain_stateM.c
         ../common/twain/ttwain_utilM.c
         ../common/twain/ttwain_winM.c)
-endif ()
+endif()
 
 if(APPLE)
     #set_source_files_properties(${OBJCSOURCES} PROPERTIES LANGUAGE OBJCXX)
@@ -153,9 +153,9 @@ qt5_wrap_cpp(SOURCES ${MOC_HEADERS})
 
 add_library(tnzbase SHARED ${HEADERS} ${SOURCES} ${OBJCSOURCES})
 
-if (APPLE)
+if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnzbase.dylib")
-endif (APPLE)
+endif()
 
 add_definitions(-DTNZBASE_EXPORTS -DTPARAM_EXPORTS -DTXSHEET_EXPORTS -DTFX_EXPORTS -DTAPPTOOLS_EXPORTS -DTTEST_EXPORTS)
 
