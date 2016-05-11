@@ -223,39 +223,55 @@ void copy90BWBufferToRasGR8(unsigned char *bwBuffer, int bwLx, int bwLy, int bwW
 	dvdy = 0;
 
 	switch ((mirror << 2) + ninety) {
-		CASE(0 << 2) + 0 : u00 = u1;
+	case (0 << 2) + 0:
+		u00 = u1;
 		v00 = v1;
 		dudx = 1;
 		dvdy = 1;
-		CASE(0 << 2) + 1 : u00 = u1;
+		break;
+	case (0 << 2) + 1:
+		u00 = u1;
 		v00 = v1 + sv;
 		dudy = 1;
 		dvdx = -1;
-		CASE(0 << 2) + 2 : u00 = u1 + su;
+		break;
+	case (0 << 2) + 2:
+		u00 = u1 + su;
 		v00 = v1 + sv;
 		dudx = -1;
 		dvdy = -1;
-		CASE(0 << 2) + 3 : u00 = u1 + su;
+		break;
+	case (0 << 2) + 3:
+		u00 = u1 + su;
 		v00 = v1;
 		dudy = -1;
 		dvdx = 1;
-		CASE(1 << 2) + 0 : u00 = u1 + su;
+		break;
+	case (1 << 2) + 0:
+		u00 = u1 + su;
 		v00 = v1;
 		dudx = -1;
 		dvdy = 1;
-		CASE(1 << 2) + 1 : u00 = u1 + su;
+		break;
+	case (1 << 2) + 1:
+		u00 = u1 + su;
 		v00 = v1 + sv;
 		dudy = -1;
 		dvdx = -1;
-		CASE(1 << 2) + 2 : u00 = u1;
+		break;
+	case (1 << 2) + 2:
+		u00 = u1;
 		v00 = v1 + sv;
 		dudx = 1;
 		dvdy = -1;
-		CASE(1 << 2) + 3 : u00 = u1;
+		break;
+	case (1 << 2) + 3:
+		u00 = u1;
 		v00 = v1;
 		dudy = 1;
 		dvdx = 1;
-	DEFAULT:
+		break;
+	default:
 		abort();
 		u00 = v00 = dudy = dvdx = 0;
 	}

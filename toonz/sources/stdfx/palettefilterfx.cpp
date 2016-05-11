@@ -71,14 +71,13 @@ void PaletteFilterFx::doDryCompute(TRectD &rect, double frame,
 	insertIndexes(items, PaletteFilterData);
 	PaletteFilterData->m_keep = (bool)(m_keep->getValue() == 1);
 	switch (m_type->getValue()) {
-	case 0:
-		PaletteFilterData->m_type = eApplyToInksAndPaints;
-		CASE 1 : PaletteFilterData->m_type = eApplyToInksKeepingAllPaints;
-		CASE 2 : PaletteFilterData->m_type = eApplyToPaintsKeepingAllInks;
-		CASE 3 : PaletteFilterData->m_type = eApplyToInksAndPaints_NoGap;
-		CASE 4 : PaletteFilterData->m_type = eApplyToInksDeletingAllPaints;
-		CASE 5 : PaletteFilterData->m_type = eApplyToPaintsDeletingAllInks;
-	DEFAULT:
+	case 0: PaletteFilterData->m_type = eApplyToInksAndPaints        ; break;
+	case 1: PaletteFilterData->m_type = eApplyToInksKeepingAllPaints ; break;
+	case 2: PaletteFilterData->m_type = eApplyToPaintsKeepingAllInks ; break;
+	case 3: PaletteFilterData->m_type = eApplyToInksAndPaints_NoGap  ; break;
+	case 4: PaletteFilterData->m_type = eApplyToInksDeletingAllPaints; break;
+	case 5: PaletteFilterData->m_type = eApplyToPaintsDeletingAllInks; break;
+	default:
 		assert(false);
 	}
 
@@ -102,14 +101,13 @@ void PaletteFilterFx::doCompute(TTile &tile, double frame, const TRenderSettings
 	insertIndexes(items, PaletteFilterData);
 	PaletteFilterData->m_keep = (bool)(m_keep->getValue() == 1);
 	switch (m_type->getValue()) {
-	case 0:
-		PaletteFilterData->m_type = eApplyToInksAndPaints;
-		CASE 1 : PaletteFilterData->m_type = eApplyToInksKeepingAllPaints;
-		CASE 2 : PaletteFilterData->m_type = eApplyToPaintsKeepingAllInks;
-		CASE 3 : PaletteFilterData->m_type = eApplyToInksAndPaints_NoGap;
-		CASE 4 : PaletteFilterData->m_type = eApplyToInksDeletingAllPaints;
-		CASE 5 : PaletteFilterData->m_type = eApplyToPaintsDeletingAllInks;
-	DEFAULT:
+	case 0: PaletteFilterData->m_type = eApplyToInksAndPaints        ; break;
+	case 1: PaletteFilterData->m_type = eApplyToInksKeepingAllPaints ; break;
+	case 2: PaletteFilterData->m_type = eApplyToPaintsKeepingAllInks ; break;
+	case 3: PaletteFilterData->m_type = eApplyToInksAndPaints_NoGap  ; break;
+	case 4: PaletteFilterData->m_type = eApplyToInksDeletingAllPaints; break;
+	case 5: PaletteFilterData->m_type = eApplyToPaintsDeletingAllInks; break;
+	default:
 		assert(false);
 	}
 

@@ -850,7 +850,7 @@ void CameraTestTool::leftButtonUp(const TPointD &pos, const TMouseEvent &)
 int CameraTestTool::getCursorId() const
 {
 	switch (m_scaling) {
-		CASE eNoScale:
+		case eNoScale:
 		{
 			CleanupParameters *cp = CleanupSettingsModel::instance()->getCurrentParameters();
 			if (cp->m_offx_lock && cp->m_offy_lock)
@@ -862,11 +862,11 @@ int CameraTestTool::getCursorId() const
 			else
 				return ToolCursor::MoveCursor;
 		}
-		CASE e11 : __OR e00 : return ToolCursor::ScaleCursor;
-		CASE e10 : __OR e01 : return ToolCursor::ScaleInvCursor;
-		CASE e1M : __OR e0M : return ToolCursor::ScaleHCursor;
-		CASE eM1 : __OR eM0 : return ToolCursor::ScaleVCursor;
-	DEFAULT:
+		case e11 : case e00 : return ToolCursor::ScaleCursor;
+		case e10 : case e01 : return ToolCursor::ScaleInvCursor;
+		case e1M : case e0M : return ToolCursor::ScaleHCursor;
+		case eM1 : case eM0 : return ToolCursor::ScaleVCursor;
+	default:
 		assert(false);
 		return 0;
 	}

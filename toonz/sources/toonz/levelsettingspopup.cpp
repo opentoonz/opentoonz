@@ -475,17 +475,22 @@ void LevelSettingsPopup::updateLevelSettings()
 		switch (m_sl->getType()) {
 		case TZI_XSHLEVEL:
 			levelTypeString = "Scan level";
-
-			CASE PLI_XSHLEVEL : levelTypeString = "Vector level";
-
-			CASE TZP_XSHLEVEL : levelTypeString = "Ink&Paint level";
-
-			CASE OVL_XSHLEVEL : levelTypeString = "Raster level";
-
-			CASE MESH_XSHLEVEL : levelTypeString = "Mesh level";
-
-		DEFAULT:
+			break;
+		case PLI_XSHLEVEL:
+			levelTypeString = "Vector level";
+			break;
+		case TZP_XSHLEVEL:
+			levelTypeString = "Ink&Paint level";
+			break;
+		case OVL_XSHLEVEL:
+			levelTypeString = "Raster level";
+			break;
+		case MESH_XSHLEVEL:
+			levelTypeString = "Mesh level";
+			break;
+		default:
 			levelTypeString = "?";
+			break;
 		}
 	} else if (m_pl)
 		levelTypeString = "Palette level";

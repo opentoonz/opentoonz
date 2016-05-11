@@ -135,29 +135,33 @@ TRasterGR8P thresholdRaster(const TRasterP &ras, const MeshBuilderOptions &opts)
 		case 1: {
 			TRasterGR8P rasGR8(ras);
 			thresholdRasterGr(rasGR8, binaryRas, TPixelGR8::from(toPixel32(opts.m_transparentColor)));
+			break;
 		}
 
-			CASE 2:
-			{
-				TRasterGR16P rasGR16(ras);
-				thresholdRasterGr(rasGR16, binaryRas, TPixelGR16::from(opts.m_transparentColor));
-			}
+		case 2:
+		{
+			TRasterGR16P rasGR16(ras);
+			thresholdRasterGr(rasGR16, binaryRas, TPixelGR16::from(opts.m_transparentColor));
+			break;
+		}
 
-			CASE 4:
-			{
-				TRaster32P ras32(ras);
-				thresholdRaster(ras32, binaryRas, toPixel32(opts.m_transparentColor));
-			}
+		case 4:
+		{
+			TRaster32P ras32(ras);
+			thresholdRaster(ras32, binaryRas, toPixel32(opts.m_transparentColor));
+			break;
+		}
 
-			CASE 8:
-			{
-				TRaster64P ras64(ras);
-				thresholdRaster(ras64, binaryRas, opts.m_transparentColor);
-			}
+		case 8:
+		{
+			TRaster64P ras64(ras);
+			thresholdRaster(ras64, binaryRas, opts.m_transparentColor);
+			break;
+		}
 
-		DEFAULT:
+		default:
 			assert(false);
-		}
+	}
 
 	// Build an enlarged ras to preserve borders. 5 pixels should be fine.
 	TRasterGR8P result(ras->getLx(), ras->getLy());

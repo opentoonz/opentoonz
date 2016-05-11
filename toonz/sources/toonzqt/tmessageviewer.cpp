@@ -120,9 +120,13 @@ void TMessageRepository::messageReceived(int type, const QString &message)
 	switch (type) {
 	case DVGui::INFORMATION:
 		m_sim->appendRow(new QStandardItem(gGreenIcon, message));
-		CASE DVGui::WARNING : m_sim->appendRow(new QStandardItem(gYellowIcon, message));
-		CASE DVGui::CRITICAL : m_sim->appendRow(new QStandardItem(gRedIcon, message));
-	DEFAULT:;
+		break;
+	case DVGui::WARNING:
+		m_sim->appendRow(new QStandardItem(gYellowIcon, message));
+		break;
+	case DVGui::CRITICAL:
+		m_sim->appendRow(new QStandardItem(gRedIcon, message));
+		break;
 	}
 
 	if (type == DVGui::CRITICAL || (type == DVGui::WARNING && !TMessageViewer::isTMsgVisible()))

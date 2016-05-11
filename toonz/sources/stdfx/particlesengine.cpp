@@ -277,7 +277,7 @@ void Particles_Engine::roll_particles(
 
 		int oldparticles = myParticles.size();
 		switch (values.toplayer_val) {
-		case ParticlesFx::TOP_YOUNGER: {
+		case ParticlesFx::TOP_YOUNGER:
 			for (i = 0; i < newparticles; i++) {
 				int seed = (int)((std::numeric_limits<int>::max)() * values.random_val->getFloat());
 				int level = (int)(values.random_val->getFloat() * level_n);
@@ -293,31 +293,32 @@ void Particles_Engine::roll_particles(
 
 				totalparticles++;
 			}
-		}
-			CASE ParticlesFx::TOP_RANDOM:
-			{
-				for (i = 0; i < newparticles; i++) {
-					double tmp = values.random_val->getFloat() * myParticles.size();
-					std::list<Particle>::iterator it = myParticles.begin();
-					for (int j = 0; j < tmp; j++, it++)
-						;
-					{
-						int seed = (int)((std::numeric_limits<int>::max)() * values.random_val->getFloat());
-						int level = (int)(values.random_val->getFloat() * level_n);
-						int lifetime = 0;
+			break;
 
-						if (values.column_lifetime_val)
-							lifetime = lastframe[level];
-						else
-							lifetime = (int)(values.lifetime_val.first + ranges.lifetime_range * values.random_val->getFloat());
-						if (lifetime > curr_frame - frame)
-							myParticles.insert(it, Particle(lifetime, seed, porttiles, values, ranges, myregions, totalparticles, 0, level, lastframe[level], myHistogram, myWeight));
+		case ParticlesFx::TOP_RANDOM:
+			for (i = 0; i < newparticles; i++) {
+				double tmp = values.random_val->getFloat() * myParticles.size();
+				std::list<Particle>::iterator it = myParticles.begin();
+				for (int j = 0; j < tmp; j++, it++)
+					;
+				{
+					int seed = (int)((std::numeric_limits<int>::max)() * values.random_val->getFloat());
+					int level = (int)(values.random_val->getFloat() * level_n);
+					int lifetime = 0;
 
-						totalparticles++;
-					}
+					if (values.column_lifetime_val)
+						lifetime = lastframe[level];
+					else
+						lifetime = (int)(values.lifetime_val.first + ranges.lifetime_range * values.random_val->getFloat());
+					if (lifetime > curr_frame - frame)
+						myParticles.insert(it, Particle(lifetime, seed, porttiles, values, ranges, myregions, totalparticles, 0, level, lastframe[level], myHistogram, myWeight));
+
+					totalparticles++;
 				}
 			}
-		DEFAULT : {
+			break;
+
+		default:
 			for (i = 0; i < newparticles; i++) {
 				int seed = (int)((std::numeric_limits<int>::max)() * values.random_val->getFloat());
 				int level = (int)(values.random_val->getFloat() * level_n);
@@ -332,7 +333,7 @@ void Particles_Engine::roll_particles(
 
 				totalparticles++;
 			}
-		}
+			break;
 		}
 	}
 }

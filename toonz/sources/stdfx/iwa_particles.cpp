@@ -18,9 +18,11 @@ void Iwa_Particle::create_Animation(const particles_values &values,
 {
 	switch (values.animation_val) {
 	case Iwa_TiledParticlesFx::ANIM_CYCLE:
-		__OR Iwa_TiledParticlesFx::ANIM_S_CYCLE : animswing = 0; /*frame <0 perche' c'e' il preroll dialmeno un frame*/
-		CASE Iwa_TiledParticlesFx::ANIM_SR_CYCLE : animswing = random.getFloat() > 0.5 ? 1 : 0;
-	DEFAULT:
+	case Iwa_TiledParticlesFx::ANIM_S_CYCLE:
+		animswing = 0; /*frame <0 perche' c'e' il preroll dialmeno un frame*/
+		break;
+	case Iwa_TiledParticlesFx::ANIM_SR_CYCLE:
+		animswing = random.getFloat() > 0.5 ? 1 : 0;
 		break;
 	}
 }
@@ -354,23 +356,27 @@ void Iwa_Particle::update_Animation(const particles_values &values,
 	switch (values.animation_val) {
 	case Iwa_TiledParticlesFx::ANIM_RANDOM:
 		frame = (int)(first + random.getFloat() * (last - first));
-		CASE Iwa_TiledParticlesFx::ANIM_R_CYCLE : __OR Iwa_TiledParticlesFx::ANIM_CYCLE : if (!keep || frame != keep - 1)
-																							  frame = first + (frame + 1) % (last - first);
-		CASE Iwa_TiledParticlesFx::ANIM_S_CYCLE : __OR Iwa_TiledParticlesFx::ANIM_SR_CYCLE:
-		{
-			if (!keep || frame != keep - 1) {
-				if (!animswing && frame < last - 1) {
-					frame = (frame + 1);
-					if (frame == last - 1)
-						animswing = 1;
-				} else
-					frame = (frame - 1);
-				if (frame <= first) {
-					animswing = 0;
-					frame = first;
-				}
+		break;
+	case Iwa_TiledParticlesFx::ANIM_R_CYCLE:
+	case Iwa_TiledParticlesFx::ANIM_CYCLE:
+		if (!keep || frame != keep - 1)
+			frame = first + (frame + 1) % (last - first);
+		break;
+	case Iwa_TiledParticlesFx::ANIM_S_CYCLE:
+	case Iwa_TiledParticlesFx::ANIM_SR_CYCLE:
+		if (!keep || frame != keep - 1) {
+			if (!animswing && frame < last - 1) {
+				frame = (frame + 1);
+				if (frame == last - 1)
+					animswing = 1;
+			} else
+				frame = (frame - 1);
+			if (frame <= first) {
+				animswing = 0;
+				frame = first;
 			}
 		}
+		break;
 	}
 }
 
@@ -505,10 +511,11 @@ void Iwa_Particle::get_image_reference(TTile *ctrl, const particles_values &valu
 			TPixel64 pix = raster64->pixels(troundp(tmp.y))[(int)tmp.x];
 			imagereference = TPixelGR16::from(pix).value / (float)TPixelGR16::maxChannelValue;
 		}
-
-		CASE Iwa_TiledParticlesFx::H_REF : if (raster32 &&
-											   tmp.x >= 0 && tmp.x < raster32->getLx() &&
-											   tmp.y >= 0 && tround(tmp.y) < raster32->getLy())
+		break;
+	case Iwa_TiledParticlesFx::H_REF:
+		if (raster32 &&
+			tmp.x >= 0 && tmp.x < raster32->getLx() &&
+			tmp.y >= 0 && tround(tmp.y) < raster32->getLy())
 		{
 			float aux = (float)TPixel32::maxChannelValue;
 			double h, s, v;
@@ -526,6 +533,7 @@ void Iwa_Particle::get_image_reference(TTile *ctrl, const particles_values &valu
 			OLDRGB2HSV(pix.r / aux, pix.g / aux, pix.b / aux, &h, &s, &v);
 			imagereference = (float)h / 360.0f;
 		}
+		break;
 	}
 
 	if (raster32)

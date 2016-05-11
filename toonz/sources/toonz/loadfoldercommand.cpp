@@ -420,8 +420,9 @@ struct import_Locals {
 			switch (m_overwriteDialog->execute(&obj)) {
 			case OverwriteDialog::OVERWRITE:
 				overwrite = true;
-
-				CASE OverwriteDialog::SKIP : return;
+				break;
+			case OverwriteDialog::SKIP:
+				return;
 			}
 
 			// Perform resource copy

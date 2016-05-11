@@ -5783,18 +5783,10 @@ void OutlineViewerStyle::getParamRange(int index, double &min, double &max) cons
 {
 	assert(0 <= index && index < 4);
 	switch (index) {
-	case 0:
-		min = 0.0;
-		max = 2.99;
-
-		CASE 1 : min = 0.0;
-		max = 1.99;
-
-		CASE 2 : min = 0.0;
-		max = 3.99;
-
-		CASE 3 : min = 3.0;
-		max = 100.0;
+	case 0: min = 0.0; max = 2.99; break;
+	case 1: min = 0.0; max = 1.99; break;
+	case 2: min = 0.0; max = 3.99; break;
+	case 3: min = 3.0; max = 100.0; break;
 	}
 }
 
@@ -5804,10 +5796,8 @@ void OutlineViewerStyle::getParamRange(int index, int &min, int &max) const
 {
 	assert(5 <= index && index < 7);
 	switch (index) {
-	case 5:
-		min = 0, max = 10;
-
-		CASE 6 : min = 0, max = 4;
+	case 5: min = 0, max = 10; break;
+	case 6: min = 0, max = 4; break;
 	}
 }
 

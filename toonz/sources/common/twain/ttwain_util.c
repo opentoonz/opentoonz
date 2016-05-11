@@ -90,13 +90,6 @@ l'immagine)
 
 #define FLAVOR_UNUSED (0xffff)
 
-#define CASE \
-	break;   \
-	case
-#define __OR case
-#define DEFAULT \
-	break;      \
-	default
 	struct TTWAIN_PIXELTYPEP {
 		TW_UINT16 type;
 		TW_UINT16 flavor;
@@ -985,24 +978,26 @@ if (TTwainData.transferInfo.usageMode == TTWAIN_MODE_UNLEASHED)
 	{
 		switch (range.ItemType) {
 		case TWTY_INT8:
-			__OR TWTY_INT16 : __OR TWTY_INT32 : __OR TWTY_UINT8 : __OR TWTY_UINT16 : return (float)range.MinValue;
+		case TWTY_INT16:
+		case TWTY_INT32:
+		case TWTY_UINT8:
+		case TWTY_UINT16:
+			return (float)range.MinValue;
 
-			CASE TWTY_FIX32:
+		case TWTY_FIX32:
 			{
 				TW_FIX32 *fix32 = (TW_FIX32 *)&range.MinValue;
 				return (float)TTWAIN_Fix32ToFloat(*fix32);
 			}
 
-		DEFAULT:
-			/*
-  TWTY_UINT32  
-  TWTY_BOOL    
-  TWTY_FRAME   
-  TWTY_STR32   
-  TWTY_STR64   
-  TWTY_STR128  
-  TWTY_STR255  
-  */
+		default:
+			// TWTY_UINT32
+			// TWTY_BOOL
+			// TWTY_FRAME
+			// TWTY_STR32
+			// TWTY_STR64
+			// TWTY_STR128
+			// TWTY_STR255
 			assert(!"Invalid type!!!");
 			return 0;
 		}
@@ -1013,24 +1008,26 @@ if (TTwainData.transferInfo.usageMode == TTWAIN_MODE_UNLEASHED)
 	{
 		switch (range.ItemType) {
 		case TWTY_INT8:
-			__OR TWTY_INT16 : __OR TWTY_INT32 : __OR TWTY_UINT8 : __OR TWTY_UINT16 : return (float)range.MaxValue;
+		case TWTY_INT16:
+		case TWTY_INT32:
+		case TWTY_UINT8:
+		case TWTY_UINT16:
+			return (float)range.MaxValue;
 
-			CASE TWTY_FIX32:
+		case TWTY_FIX32:
 			{
 				TW_FIX32 *fix32 = (TW_FIX32 *)&range.MaxValue;
 				return (float)TTWAIN_Fix32ToFloat(*fix32);
 			}
 
-		DEFAULT:
-			/*
-  TWTY_UINT32  
-  TWTY_BOOL    
-  TWTY_FRAME   
-  TWTY_STR32   
-  TWTY_STR64   
-  TWTY_STR128  
-  TWTY_STR255  
-  */
+		default:
+			// TWTY_UINT32
+			// TWTY_BOOL
+			// TWTY_FRAME
+			// TWTY_STR32
+			// TWTY_STR64
+			// TWTY_STR128
+			// TWTY_STR255
 			assert(!"Invalid type!!");
 			return 0;
 		}
@@ -1041,24 +1038,26 @@ if (TTwainData.transferInfo.usageMode == TTWAIN_MODE_UNLEASHED)
 	{
 		switch (range.ItemType) {
 		case TWTY_INT8:
-			__OR TWTY_INT16 : __OR TWTY_INT32 : __OR TWTY_UINT8 : __OR TWTY_UINT16 : return (float)range.DefaultValue;
+		case TWTY_INT16:
+		case TWTY_INT32:
+		case TWTY_UINT8:
+		case TWTY_UINT16:
+			return (float)range.DefaultValue;
 
-			CASE TWTY_FIX32:
+		case TWTY_FIX32:
 			{
 				TW_FIX32 *fix32 = (TW_FIX32 *)&range.DefaultValue;
 				return (float)TTWAIN_Fix32ToFloat(*fix32);
 			}
 
-		DEFAULT:
-			/*
-  TWTY_UINT32  
-  TWTY_BOOL    
-  TWTY_FRAME   
-  TWTY_STR32   
-  TWTY_STR64   
-  TWTY_STR128  
-  TWTY_STR255  
-  */
+		default:
+			// TWTY_UINT32
+			// TWTY_BOOL
+			// TWTY_FRAME
+			// TWTY_STR32
+			// TWTY_STR64
+			// TWTY_STR128
+			// TWTY_STR255
 			assert(!"Invalid type!!");
 			return 0;
 		}
@@ -1069,24 +1068,26 @@ if (TTwainData.transferInfo.usageMode == TTWAIN_MODE_UNLEASHED)
 	{
 		switch (range.ItemType) {
 		case TWTY_INT8:
-			__OR TWTY_INT16 : __OR TWTY_INT32 : __OR TWTY_UINT8 : __OR TWTY_UINT16 : return (float)range.StepSize;
+		case TWTY_INT16:
+		case TWTY_INT32:
+		case TWTY_UINT8:
+		case TWTY_UINT16:
+			return (float)range.StepSize;
 
-			CASE TWTY_FIX32:
+		case TWTY_FIX32:
 			{
 				TW_FIX32 *fix32 = (TW_FIX32 *)&range.StepSize;
 				return (float)TTWAIN_Fix32ToFloat(*fix32);
 			}
 
-		DEFAULT:
-			/*
-  TWTY_UINT32  
-  TWTY_BOOL    
-  TWTY_FRAME   
-  TWTY_STR32   
-  TWTY_STR64   
-  TWTY_STR128  
-  TWTY_STR255  
-  */
+		default:
+			// TWTY_UINT32  
+			// TWTY_BOOL
+			// TWTY_FRAME
+			// TWTY_STR32
+			// TWTY_STR64
+			// TWTY_STR128
+			// TWTY_STR255
 			assert(!"Invalid type!!");
 			return 0;
 		}

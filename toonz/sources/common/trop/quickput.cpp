@@ -3233,18 +3233,26 @@ void doQuickPutCmapped(
 					switch (t) {
 					case 0:
 						colorUp = colors[i];
-						CASE 255 : colorUp = TPixel::Transparent;
-					DEFAULT:
+						break;
+					case 255:
+						colorUp = TPixel::Transparent;
+						break;
+					default:
 						colorUp = antialias(colors[i], 255 - t);
+						break;
 					}
 				else
 					switch (t) {
 					case 0:
 						colorUp = colors[i];
-						CASE 255 : colorUp = colors[p];
-					DEFAULT:
+						break;
+					case 255:
+						colorUp = colors[p];
+						break;
+					default:
 						colorUp = blend(colors[i], colors[p], t, TPixelCM32::getMaxTone());
-					}
+						break;
+				}
 
 				if (colorUp.m == 255)
 					*dnPix = colorUp;
@@ -3391,26 +3399,34 @@ void doQuickPutCmapped(
 					switch (t) {
 					case 0:
 						colorUp = (i == s.m_inkIndex) ? TPixel::Red : inks[i];
-						CASE 255 : colorUp = TPixel::Transparent;
-					DEFAULT:
+						break;
+					case 255:
+						colorUp = TPixel::Transparent;
+						break;
+					default: {
 						TPixel inkColor;
 						if (i == s.m_inkIndex) {
 							inkColor = TPixel::Red;
 							if (p == 0) {
-								t = t / 2; //transparency check(for a bug!) darken semitrasparent pixels; ghibli likes it, and wants it also for ink checks...
-										   //otherwise, ramps goes always from reds towards grey...
+								t = t / 2; // transparency check(for a bug!) darken semitrasparent pixels; ghibli likes it, and wants it also for ink checks...
+								           // otherwise, ramps goes always from reds towards grey...
 							}
 						} else
 							inkColor = inks[i];
 
 						colorUp = antialias(inkColor, 255 - t);
+						break;
+					}
 					}
 				else
 					switch (t) {
 					case 0:
 						colorUp = (i == s.m_inkIndex) ? TPixel::Red : inks[i];
-						CASE 255 : colorUp = (p == s.m_paintIndex) ? TPixel::Red : paints[p];
-					DEFAULT:
+						break;
+					case 255:
+						colorUp = (p == s.m_paintIndex) ? TPixel::Red : paints[p];
+						break;
+					default: {
 						TPixel paintColor = (p == s.m_paintIndex) ? TPixel::Red : paints[p];
 						TPixel inkColor;
 						if (i == s.m_inkIndex) {
@@ -3425,7 +3441,10 @@ void doQuickPutCmapped(
 							t = t / 2;
 
 						colorUp = blend(inkColor, paintColor, t, TPixelCM32::getMaxTone());
+						break;
 					}
+					}
+
 				if (colorUp.m == 255)
 					*dnPix = colorUp;
 				else if (colorUp.m != 0)
@@ -3681,18 +3700,25 @@ void doQuickPutCmapped(
 					switch (t) {
 					case 0:
 						colorUp = inks[i];
-						CASE 255 : colorUp = TPixel::Transparent;
-					DEFAULT:
+						break;
+					case 255:
+						colorUp = TPixel::Transparent;
+						break;
+					default:
 						colorUp = antialias(inks[i], 255 - t);
+						break;
 					}
 				else
 					switch (t) {
 					case 0:
 						colorUp = inks[i];
-						CASE 255 : colorUp = paints[p];
-
-					DEFAULT:
+						break;
+					case 255:
+						colorUp = paints[p];
+						break;
+					default:
 						colorUp = blend(inks[i], paints[p], t, TPixelCM32::getMaxTone());
+						break;
 					}
 
 				if (colorUp.m == 255)
@@ -3826,9 +3852,13 @@ void doQuickResampleColorFilter(
 			switch (t) {
 			case 0:
 				colorUp = inks[i];
-				CASE 255 : colorUp = paints[p];
-			DEFAULT:
+				break;
+			case 255:
+				colorUp = paints[p];
+				break;
+			default:
 				colorUp = blend(inks[i], paints[p], t, TPixelCM32::getMaxTone());
+				break;
 			}
 
 			if (colorMask == TRop::MChan)

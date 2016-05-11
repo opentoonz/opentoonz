@@ -786,20 +786,21 @@ void BmpWriter::writeLine(char *buffer)
 			putc(0, m_chan);
 			bytes++;
 		}
+		break;
 	}
-		CASE 8:
-		{
-			TPixelGR8 *pix = (TPixelGR8 *)buffer;
-			for (j = 0; j < lx; j++) {
-				putc(pix->value, m_chan);
-				++pix;
-			}
-			while (lx & 3) {
-				putc(0, m_chan);
-				lx++;
-			}
+	case 8: {
+		TPixelGR8 *pix = (TPixelGR8 *)buffer;
+		for (j = 0; j < lx; j++) {
+			putc(pix->value, m_chan);
+			++pix;
 		}
-	DEFAULT:
+		while (lx & 3) {
+			putc(0, m_chan);
+			lx++;
+		}
+		break;
+	}
+	default:
 		assert(false);
 	}
 	ftell(m_chan);

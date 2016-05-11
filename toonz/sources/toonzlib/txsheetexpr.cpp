@@ -507,17 +507,17 @@ public:
 		case COLUMN_NUMBER:
 			return (token.getType() == Token::Number && locals.skdp(token));
 
-			CASE VERTEX_NAME:
-			{
-				if (const SkD *skdp = locals.skdp(previousTokens[COLUMN_NUMBER])) {
-					const QString &vertexName = QString::fromStdString(text);
-					return (skdp->vertexDeformation(vertexName) != 0);
-				}
+		case VERTEX_NAME:
+			if (const SkD *skdp = locals.skdp(previousTokens[COLUMN_NUMBER])) {
+				const QString &vertexName = QString::fromStdString(text);
+				return (skdp->vertexDeformation(vertexName) != 0);
 			}
+			break;
 
-			CASE COMPONENT : return std::count(
-								 m_components, m_components + sizeof(m_components) / sizeof(Component),
-								 text) > 0;
+		case COMPONENT:
+			return std::count(
+				m_components, m_components + sizeof(m_components) / sizeof(Component),
+				text) > 0;
 		}
 
 		return false;

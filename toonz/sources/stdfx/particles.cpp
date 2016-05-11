@@ -16,12 +16,19 @@ void Particle::create_Animation(const particles_values &values,
 {
 	switch (values.animation_val) {
 	case ParticlesFx::ANIM_CYCLE:
-		__OR ParticlesFx::ANIM_S_CYCLE : frame = first;
+	case ParticlesFx::ANIM_S_CYCLE:
+		frame = first;
 		animswing = 0; /*frame <0 perche' c'e' il preroll dialmeno un frame*/
-		CASE ParticlesFx::ANIM_SR_CYCLE : frame = (int)(first + (random.getFloat()) * (last - first));
-		animswing = random.getFloat() > 0.5 ? 1 : 0;
-	DEFAULT:
+		break;
+
+	case ParticlesFx::ANIM_SR_CYCLE:
 		frame = (int)(first + (random.getFloat()) * (last - first));
+		animswing = random.getFloat() > 0.5 ? 1 : 0;
+		break;
+
+	default:
+		frame = (int)(first + (random.getFloat()) * (last - first));
+		break;
 	}
 }
 
@@ -357,23 +364,29 @@ void Particle::update_Animation(const particles_values &values,
 	switch (values.animation_val) {
 	case ParticlesFx::ANIM_RANDOM:
 		frame = (int)(first + random.getFloat() * (last - first));
-		CASE ParticlesFx::ANIM_R_CYCLE : __OR ParticlesFx::ANIM_CYCLE : if (!keep || frame != keep - 1)
-																			frame = first + (frame + 1) % (last - first);
-		CASE ParticlesFx::ANIM_S_CYCLE : __OR ParticlesFx::ANIM_SR_CYCLE:
-		{
-			if (!keep || frame != keep - 1) {
-				if (!animswing && frame < last - 1) {
-					frame = (frame + 1);
-					if (frame == last - 1)
-						animswing = 1;
-				} else
-					frame = (frame - 1);
-				if (frame <= first) {
-					animswing = 0;
-					frame = first;
-				}
+		break;
+
+	case ParticlesFx::ANIM_R_CYCLE:
+	case ParticlesFx::ANIM_CYCLE:
+		if (!keep || frame != keep - 1)
+			frame = first + (frame + 1) % (last - first);
+		break;
+
+	case ParticlesFx::ANIM_S_CYCLE:
+	case ParticlesFx::ANIM_SR_CYCLE:
+		if (!keep || frame != keep - 1) {
+			if (!animswing && frame < last - 1) {
+				frame = (frame + 1);
+				if (frame == last - 1)
+					animswing = 1;
+			} else
+				frame = (frame - 1);
+			if (frame <= first) {
+				animswing = 0;
+				frame = first;
 			}
 		}
+		break;
 	}
 }
 
@@ -494,14 +507,17 @@ void Particle::get_image_reference(TTile *ctrl, const particles_values &values,
 			TPixel32 pix = raster32->pixels(troundp(tmp.y))[(int)tmp.x];
 			imagereference = TPixelGR8::from(pix).value / (double)TPixelGR8::maxChannelValue;
 		}
-		CASE ParticlesFx::H_REF : if (raster32 && tmp.x >= 0 && tmp.x < raster32->getLx() && tmp.y >= 0 && tround(tmp.y) < raster32->getLy())
-		{
+		break;
+
+	case ParticlesFx::H_REF:
+		if (raster32 && tmp.x >= 0 && tmp.x < raster32->getLx() && tmp.y >= 0 && tround(tmp.y) < raster32->getLy()) {
 			double aux = (double)TPixel32::maxChannelValue;
 			double h, s, v;
 			TPixel32 pix = raster32->pixels(troundp(tmp.y))[(int)tmp.x];
 			OLDRGB2HSV(pix.r / aux, pix.g / aux, pix.b / aux, &h, &s, &v);
 			imagereference = h / 360.0;
 		}
+		break;
 	}
 	raster32->unlock();
 }

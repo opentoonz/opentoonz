@@ -272,19 +272,19 @@ void Vectorizer::setLevel(const TXshSimpleLevelP &level)
 			return;
 
 		switch (m_dialog->getChoice()) {
-		case OverwriteDialog::KEEP_OLD: {
+		case OverwriteDialog::KEEP_OLD:
 			xl = scene->getLevelSet()->getLevel(levelName);
 			if (!xl)
 				xl = scene->loadLevel(dstPath);
 
 			m_vLevel = xl->getSimpleLevel();
 			return;
-		}
-
-			CASE OverwriteDialog::OVERWRITE : overWrite = true;
-
-		DEFAULT:
+		case OverwriteDialog::OVERWRITE:
+			overWrite = true;
+			break;
+		default:
 			levelName = name;
+			break;
 		}
 	}
 

@@ -1110,75 +1110,88 @@ FxGadget *FxGadgetController::allocateGadget(const TParamUIConcept &uiConcept)
 
 		TPointParamP center((uiConcept.m_params.size() >= 2) ? (TPointParamP)uiConcept.m_params[1] : TPointParamP());
 		gadget = new RadiusFxGadget(this, uiConcept.m_params[0], center);
+
+		break;
 	}
 
-		CASE TParamUIConcept::WIDTH:
+	case TParamUIConcept::WIDTH:
 		{
 			assert(uiConcept.m_params.size() >= 1 && uiConcept.m_params.size() <= 2);
 
 			TDoubleParamP angle((uiConcept.m_params.size() >= 2) ? (TDoubleParamP)uiConcept.m_params[1] : TDoubleParamP());
 			gadget = new DistanceFxGadget(this, uiConcept.m_params[0], angle);
+			break;
 		}
 
-		CASE TParamUIConcept::ANGLE:
+	case TParamUIConcept::ANGLE:
 		{
 			assert(uiConcept.m_params.size() == 1);
 			gadget = new AngleFxGadget(this, uiConcept.m_params[0], TPointD());
+			break;
 		}
 
-		CASE TParamUIConcept::POINT:
+	case TParamUIConcept::POINT:
 		{
 			assert(uiConcept.m_params.size() == 1);
 			gadget = new PointFxGadget(this, uiConcept.m_params[0]);
+			break;
 		}
 
-		CASE TParamUIConcept::POINT_2:
+	case TParamUIConcept::POINT_2:
 		{
 			assert(uiConcept.m_params.size() == 2);
 			gadget = new PointFxGadget(this, uiConcept.m_params[0], uiConcept.m_params[1]);
+			break;
 		}
 
-		CASE TParamUIConcept::VECTOR:
+	case TParamUIConcept::VECTOR:
 		{
 			assert(uiConcept.m_params.size() == 2);
 			gadget = new VectorFxGadget(this, uiConcept.m_params[0], uiConcept.m_params[1]);
+			break;
 		}
 
-		CASE TParamUIConcept::POLAR:
+	case TParamUIConcept::POLAR:
 		{
 			assert(uiConcept.m_params.size() == 2);
 			gadget = new PolarFxGadget(this, TPointD(), uiConcept.m_params[0], uiConcept.m_params[1]);
+			break;
 		}
 
-		CASE TParamUIConcept::SIZE:
+	case TParamUIConcept::SIZE:
 		{
 			assert(uiConcept.m_params.size() >= 1 && uiConcept.m_params.size() <= 2);
 
 			TDoubleParamP y((uiConcept.m_params.size() >= 2) ? (TDoubleParamP)uiConcept.m_params[1] : TDoubleParamP());
 			gadget = new SizeFxGadget(this, uiConcept.m_params[0], y);
+			break;
 		}
 
-		CASE TParamUIConcept::QUAD:
+	case TParamUIConcept::QUAD:
 		{
 			assert(uiConcept.m_params.size() == 4);
 			gadget = new QuadFxGadget(this,
 									  uiConcept.m_params[0], uiConcept.m_params[1], uiConcept.m_params[2], uiConcept.m_params[3]);
+			break;
 		}
 
-		CASE TParamUIConcept::RECT:
+	case TParamUIConcept::RECT:
 		{
 			assert(uiConcept.m_params.size() >= 2 && uiConcept.m_params.size() <= 3);
 
 			TPointParamP center((uiConcept.m_params.size() >= 3) ? (TPointParamP)uiConcept.m_params[2] : TPointParamP());
 			gadget = new RectFxGadget(this, uiConcept.m_params[0], uiConcept.m_params[1], center);
+
+			break;
 		}
 
-		CASE TParamUIConcept::DIAMOND:
+	case TParamUIConcept::DIAMOND:
 		{
 			assert(uiConcept.m_params.size() == 1);
 			gadget = new DiamondFxGadget(this, uiConcept.m_params[0]);
+			break;
 		}
-	};
+	}
 
 	if (gadget)
 		gadget->setLabel(uiConcept.m_label);

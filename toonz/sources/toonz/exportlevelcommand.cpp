@@ -371,27 +371,27 @@ TImageP ImageExporter::exportedImage(const TFrameId &fid, TXshLevelType outImgTy
 	switch (m_sl.getType()) {
 	case OVL_XSHLEVEL:
 		img = exportedImage(TRasterImageP(img));
+		break;
+	case TZP_XSHLEVEL:
+		img = exportedImage(TToonzImageP(img));
+		break;
+	case PLI_XSHLEVEL: {
+		TVectorImageP vi(img);
 
-		CASE TZP_XSHLEVEL : img = exportedImage(TToonzImageP(img));
+		// Apply temporary thickness modification
+		int fCount = m_sl.getFrameCount();
+		double param = (fCount == 1) ? 0.0 : m_sl.fid2index(fid) / double(fCount - 1);
 
-		CASE PLI_XSHLEVEL:
-		{
-			TVectorImageP vi(img);
+		VectorThicknessTransformer transformer(
+			vi, m_opts.m_thicknessTransform, param);
 
-			// Apply temporary thickness modification
-			int fCount = m_sl.getFrameCount();
-			double param = (fCount == 1) ? 0.0 : m_sl.fid2index(fid) / double(fCount - 1);
-
-			VectorThicknessTransformer transformer(
-				vi, m_opts.m_thicknessTransform, param);
-
-			img = (outImgType == TZP_TYPE) ? TImageP(exportedToonzImage(vi)) : TImageP(exportedRasterImage(vi));
-		}
-
-	DEFAULT : {
+		img = (outImgType == TZP_TYPE) ? TImageP(exportedToonzImage(vi)) : TImageP(exportedRasterImage(vi));
+		break;
+	}
+	default:
 		assert(!"Wrong level type");
 		img = TImageP();
-	}
+		break;
 	}
 
 	return img;

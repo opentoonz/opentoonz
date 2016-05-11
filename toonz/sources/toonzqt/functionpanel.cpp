@@ -716,20 +716,21 @@ void FunctionPanel::updateGadgets(TDoubleParam *curve)
 					QPointF q = getWinPos(curve, currentPointLeft + speedIn);
 					m_gadgets.push_back(Gadget(SpeedIn, i, q, handleHitRadius, handleHitRadius, pLeft));
 				}
+				break;
 			}
 
-				CASE TDoubleKeyframe::EaseInOut:
-				{
-					QPointF q = getWinPos(curve, kf.m_frame + kf.m_speedIn.x);
-					m_gadgets.push_back(Gadget(EaseIn, i, q, 6, 15));
-				}
+			case TDoubleKeyframe::EaseInOut: {
+				QPointF q = getWinPos(curve, kf.m_frame + kf.m_speedIn.x);
+				m_gadgets.push_back(Gadget(EaseIn, i, q, 6, 15));
+				break;
+			}
 
-				CASE TDoubleKeyframe::EaseInOutPercentage:
-				{
-					double easeIn = kf.m_speedIn.x * (kf.m_frame - oldKf.m_frame) * 0.01;
-					QPointF q = getWinPos(curve, kf.m_frame + easeIn);
-					m_gadgets.push_back(Gadget(EaseInPercentage, i, q, 6, 15));
-				}
+			case TDoubleKeyframe::EaseInOutPercentage: {
+				double easeIn = kf.m_speedIn.x * (kf.m_frame - oldKf.m_frame) * 0.01;
+				QPointF q = getWinPos(curve, kf.m_frame + easeIn);
+				m_gadgets.push_back(Gadget(EaseInPercentage, i, q, 6, 15));
+				break;
+			}
 			}
 
 			// Right handle
@@ -741,22 +742,23 @@ void FunctionPanel::updateGadgets(TDoubleParam *curve)
 						QPointF q = getWinPos(curve, currentPointRight + speedOut);
 						m_gadgets.push_back(Gadget(SpeedOut, i, q, handleHitRadius, handleHitRadius, p));
 					}
+					break;
 				}
 
-					CASE TDoubleKeyframe::EaseInOut:
-					{
-						QPointF q = getWinPos(curve, kf.m_frame + kf.m_speedOut.x);
-						m_gadgets.push_back(Gadget(EaseOut, i, q, 6, 15));
-					}
+				case TDoubleKeyframe::EaseInOut: {
+					QPointF q = getWinPos(curve, kf.m_frame + kf.m_speedOut.x);
+					m_gadgets.push_back(Gadget(EaseOut, i, q, 6, 15));
+					break;
+				}
 
-					CASE TDoubleKeyframe::EaseInOutPercentage:
-					{
-						double segmentWidth = curve->keyframeIndexToFrame(i + 1) - kf.m_frame;
-						double easeOut = segmentWidth * kf.m_speedOut.x * 0.01;
+				case TDoubleKeyframe::EaseInOutPercentage: {
+					double segmentWidth = curve->keyframeIndexToFrame(i + 1) - kf.m_frame;
+					double easeOut = segmentWidth * kf.m_speedOut.x * 0.01;
 
-						QPointF q = getWinPos(curve, kf.m_frame + easeOut);
-						m_gadgets.push_back(Gadget(EaseOutPercentage, i, q, 6, 15));
-					}
+					QPointF q = getWinPos(curve, kf.m_frame + easeOut);
+					m_gadgets.push_back(Gadget(EaseOutPercentage, i, q, 6, 15));
+					break;
+				}
 				}
 			}
 		}

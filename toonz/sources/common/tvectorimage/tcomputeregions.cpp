@@ -1179,57 +1179,67 @@ bool makeEdgeIntersection(Intersection &interList, IntersectedStroke &item1, Int
 	int fac = (angle1 < angle2) | ((angle1 < angle3) << 1) | ((angle2 < angle3) << 2);
 
 	switch (fac) {
-		CASE 0 : //p1a p2b p2a p1b
-				 insertBranch(interList, item1, true);
+	case 0: //p1a p2b p2a p1b
+		insertBranch(interList, item1, true);
 		if (!eraseP2b)
 			insertBranch(interList, item2, false);
 		if (!eraseP2a)
 			insertBranch(interList, item2, true);
 		if (!eraseP1b)
 			insertBranch(interList, item1, false);
-		CASE 1 : //p1a p2b p1b p2a
-				 insertBranch(interList, item1, true);
+		break;
+	case 1: //p1a p2b p1b p2a
+		insertBranch(interList, item1, true);
 		if (!eraseP2b)
 			insertBranch(interList, item2, false);
 		if (!eraseP1b)
 			insertBranch(interList, item1, false);
 		if (!eraseP2a)
 			insertBranch(interList, item2, true);
-		CASE 2 : assert(false);
-		CASE 3 : //p1a p1b p2b p2a
-				 insertBranch(interList, item1, true);
+		break;
+	case 2:
+		assert(false);
+		break;
+	case 3: //p1a p1b p2b p2a
+		insertBranch(interList, item1, true);
 		if (!eraseP1b)
 			insertBranch(interList, item1, false);
 		if (!eraseP2b)
 			insertBranch(interList, item2, false);
 		if (!eraseP2a)
 			insertBranch(interList, item2, true);
-		CASE 4 : //p1a p2a p2b p1b
-				 insertBranch(interList, item1, true);
+		break;
+	case 4: //p1a p2a p2b p1b
+		insertBranch(interList, item1, true);
 		if (!eraseP2a)
 			insertBranch(interList, item2, true);
 		if (!eraseP2b)
 			insertBranch(interList, item2, false);
 		if (!eraseP1b)
 			insertBranch(interList, item1, false);
-		CASE 5 : assert(false);
-		CASE 6 : //p1a p2a p1b p2b
-				 insertBranch(interList, item1, true);
+		break;
+	case 5:
+		assert(false);
+		break;
+	case 6: //p1a p2a p1b p2b
+		insertBranch(interList, item1, true);
 		if (!eraseP2a)
 			insertBranch(interList, item2, true);
 		if (!eraseP1b)
 			insertBranch(interList, item1, false);
 		if (!eraseP2b)
 			insertBranch(interList, item2, false);
-		CASE 7 : //p1a p1b p2a p2b
-				 insertBranch(interList, item1, true);
+		break;
+	case 7: //p1a p1b p2a p2b
+		insertBranch(interList, item1, true);
 		if (!eraseP1b)
 			insertBranch(interList, item1, false);
 		if (!eraseP2a)
 			insertBranch(interList, item2, true);
 		if (!eraseP2b)
 			insertBranch(interList, item2, false);
-	DEFAULT:
+		break;
+	default:
 		assert(false);
 	}
 

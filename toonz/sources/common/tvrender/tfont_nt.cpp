@@ -295,8 +295,10 @@ TPoint TFont::drawChar(TRasterGR8P &outImage, TPoint &glyphOrigin, wchar_t charc
 			switch (srcPix->value) {
 			case 0:
 				tarPix->value = 0;
-			DEFAULT:
+				break;
+			default:
 				tarPix->value = (srcPix->value << 2) - 1;
+				break;
 			}
 			++srcPix;
 			++tarPix;

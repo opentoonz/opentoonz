@@ -459,17 +459,25 @@ void TRop::erodilate(const TRasterP &src, const TRasterP &dst,
 		switch (type) {
 		case ED_rectangular:
 			::rect_erodilate<TPixel32>(src, dst, radius);
-			CASE ED_circular : ::circular_erodilate<TPixel32>(src, dst, radius);
-		DEFAULT:
+			break;
+		case ED_circular:
+			::circular_erodilate<TPixel32>(src, dst, radius);
+			break;
+		default:
 			assert(!"Unknown mask type");
+			break;
 		}
 	else if ((TRaster64P)src && (TRaster64P)dst)
 		switch (type) {
 		case ED_rectangular:
 			::rect_erodilate<TPixel64>(src, dst, radius);
-			CASE ED_circular : ::circular_erodilate<TPixel64>(src, dst, radius);
-		DEFAULT:
+			break;
+		case ED_circular:
+			::circular_erodilate<TPixel64>(src, dst, radius);
+			break;
+		default:
 			assert(!"Unknown mask type");
+			break;
 		}
 	else
 		assert(!"Unsupported raster type!");

@@ -302,7 +302,7 @@ TXshSimpleLevel *createMeshLevel(TXshLevel *texturesLevel)
 		case CANCEL:
 			return result;
 
-		case DELETE_OLD: {
+		case DELETE_OLD:
 			// Remove the level on disk
 			TSystem::removeFileOrLevel(origPath);
 			if (origSl) {
@@ -315,18 +315,17 @@ TXshSimpleLevel *createMeshLevel(TXshLevel *texturesLevel)
 
 			codedDstPath = codedOrigPath;
 			dstPath = origPath;
-		}
+			break;
 
-			CASE OVERWRITE_OLD:
-			{
-				if (origSl) {
-					removeIcons(origSl, origSl->getFids()); // Invalidate the levels' icons
-					origSl->setDirtyFlag(true);
-				}
-
-				codedDstPath = codedOrigPath;
-				dstPath = origPath;
+		case OVERWRITE_OLD:
+			if (origSl) {
+				removeIcons(origSl, origSl->getFids()); // Invalidate the levels' icons
+				origSl->setDirtyFlag(true);
 			}
+
+			codedDstPath = codedOrigPath;
+			dstPath = origPath;
+			break;
 		}
 	}
 
@@ -1266,24 +1265,19 @@ bool meshifySelection(const MeshifyOptions &options)
 
 	switch (cTypes) {
 	case HAS_LEVEL_COLUMNS:
-
 		// Create new mesh columns corresponding to specified selection
 		meshifySelection(&createMeshifiedColumns, selection, options);
-
-		CASE HAS_MESH_COLUMNS :
-
-			// Check parental relationship - if specified columns have level column children,
-			// update related meshes
-			meshifySelection(&updateMeshifiedColumns, selection, options);
-
-		CASE HAS_LEVEL_COLUMNS | HAS_MESH_COLUMNS :
-
-			// Error message
-			DVGui::error(MeshifyPopup::tr("Current selection contains mixed image and mesh level types"));
+		break;
+	case HAS_MESH_COLUMNS:
+		// Check parental relationship - if specified columns have level column children,
+		// update related meshes
+		meshifySelection(&updateMeshifiedColumns, selection, options);
+		break;
+	case HAS_LEVEL_COLUMNS | HAS_MESH_COLUMNS:
+		// Error message
+		DVGui::error(MeshifyPopup::tr("Current selection contains mixed image and mesh level types"));
 		return false;
-
-	DEFAULT:
-
+	default:
 		// Error message
 		DVGui::error(MeshifyPopup::tr("Current selection contains no image or mesh level types"));
 		return false;

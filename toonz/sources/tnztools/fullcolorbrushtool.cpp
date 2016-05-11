@@ -470,10 +470,13 @@ void FullColorBrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e)
 		double add = (fabs(diff.x) > fabs(diff.y)) ? diff.x : diff.y;
 
 		locals.addMinMax(m_thickness, int(add));
+
+		break;
 	}
 
-	DEFAULT:
+	default:
 		m_brushPos = pos;
+		break;
 	}
 
 	m_mousePos = pos;

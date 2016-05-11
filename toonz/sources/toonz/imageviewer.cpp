@@ -676,12 +676,26 @@ void ImageViewer::updateCursor(const TPoint &curPos)
 	switch (dragType) {
 	case eMoveRect:
 		setCursor(Qt::SizeAllCursor);
-		CASE eMoveLeft : __OR eMoveRight : setCursor(Qt::SizeHorCursor);
-		CASE eMoveDown : __OR eMoveUp : setCursor(Qt::SizeVerCursor);
-		CASE eMoveLeft | eMoveUp : __OR eMoveRight | eMoveDown : setCursor(Qt::SizeBDiagCursor);
-		CASE eMoveLeft | eMoveDown : __OR eMoveRight | eMoveUp : setCursor(Qt::SizeFDiagCursor);
-	DEFAULT:
+		break;
+	case eMoveLeft:
+	case eMoveRight:
+		setCursor(Qt::SizeHorCursor);
+		break;
+	case eMoveDown:
+	case eMoveUp:
+		setCursor(Qt::SizeVerCursor);
+		break;
+	case eMoveLeft | eMoveUp:
+	case eMoveRight | eMoveDown:
+		setCursor(Qt::SizeBDiagCursor);
+		break;
+	case eMoveLeft | eMoveDown:
+	case eMoveRight | eMoveUp:
+		setCursor(Qt::SizeFDiagCursor);
+		break;
+	default:
 		setCursor(Qt::ArrowCursor);
+		break;
 	}
 }
 

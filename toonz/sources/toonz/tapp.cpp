@@ -315,12 +315,13 @@ int TApp::getCurrentImageType()
 		switch (sl->getType()) {
 		case TZP_XSHLEVEL:
 			return TImage::TOONZ_RASTER;
-
-			CASE OVL_XSHLEVEL : return TImage::RASTER;
-
-			CASE PLI_XSHLEVEL : default : return TImage::VECTOR;
-
-			CASE MESH_XSHLEVEL : return TImage::MESH;
+		case OVL_XSHLEVEL:
+			return TImage::RASTER;
+		case PLI_XSHLEVEL:
+		default:
+			return TImage::VECTOR;
+		case MESH_XSHLEVEL:
+			return TImage::MESH;
 		}
 	}
 

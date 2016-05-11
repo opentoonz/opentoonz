@@ -782,31 +782,40 @@ void XsheetViewer::keyPressEvent(QKeyEvent *event)
 	switch (int key = event->key()) {
 	case Qt::Key_Up:
 		setCurrentRow(tmax(row - 1, 0));
-
-		CASE Qt::Key_Down : setCurrentRow(row + 1);
-
-		CASE Qt::Key_Left : setCurrentColumn(tmax(col - 1, 0));
-
-		CASE Qt::Key_Right : setCurrentColumn(col + 1);
-
+		break;
+	case Qt::Key_Down:
+		setCurrentRow(row + 1);
+		break;
+	case Qt::Key_Left:
+		setCurrentColumn(tmax(col - 1, 0));
+		break;
+	case Qt::Key_Right:
+		setCurrentColumn(col + 1);
+		break;
+	case Qt::Key_Control:
 		// display the upper-directional smart tab only when the ctrl key is pressed
-		CASE Qt::Key_Control : m_cellArea->onControlPressed(true);
+		m_cellArea->onControlPressed(true);
+		break;
 
-	DEFAULT : {
+	default: {
 		QRect visibleRect = m_cellArea->visibleRegion().boundingRect();
 		int visibleRowCount = visibleRect.height() / XsheetGUI::RowHeight;
 
 		switch (key) {
-			CASE Qt::Key_PageUp : locals.scrollTo(visibleRect.top() - visibleRowCount * XsheetGUI::RowHeight,
-												  visibleRect);
-
-			CASE Qt::Key_PageDown : locals.scrollTo(visibleRect.bottom() + visibleRowCount * XsheetGUI::RowHeight,
-													visibleRect);
-
-			CASE Qt::Key_Home : locals.scrollTo(0, visibleRect);
-
-			CASE Qt::Key_End : locals.scrollTo((frameCount + 1) * XsheetGUI::RowHeight, visibleRect);
+		case Qt::Key_PageUp:
+			locals.scrollTo(visibleRect.top() - visibleRowCount * XsheetGUI::RowHeight, visibleRect);
+			break;
+		case Qt::Key_PageDown:
+			locals.scrollTo(visibleRect.bottom() + visibleRowCount * XsheetGUI::RowHeight, visibleRect);
+			break;
+		case Qt::Key_Home:
+			locals.scrollTo(0, visibleRect);
+			break;
+		case Qt::Key_End:
+			locals.scrollTo((frameCount + 1) * XsheetGUI::RowHeight, visibleRect);
+			break;
 		}
+		break;
 	}
 	}
 }

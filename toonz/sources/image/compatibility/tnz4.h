@@ -74,18 +74,6 @@ typedef struct IMAGE {
 #define TOONZRGB (1234)
 #define TOONZRGB64 (4567)
 
-#define CASE \
-	break;   \
-	case
-#ifndef __OR
-#define __OR \
-	;        \
-	case
-#endif
-#define DEFAULT \
-	break;      \
-	default
-
 #define TMALLOC(ptr, elem) \
 	(ptr) = (void *)malloc((elem) * sizeof(*(ptr)));
 #define TCALLOC(ptr, elem) \

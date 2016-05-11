@@ -212,11 +212,22 @@ bool PreviewSubCameraManager::mouseMoveEvent(SceneViewer *viewer, QMouseEvent *e
 			case DRAG_LEFT:
 			case DRAG_RIGHT:
 				viewer->setCursor(Qt::SizeHorCursor);
-				CASE DRAG_TOP : case DRAG_BOTTOM : viewer->setCursor(Qt::SizeVerCursor);
-				CASE DRAG_LEFT | DRAG_TOP : case DRAG_RIGHT | DRAG_BOTTOM : viewer->setCursor(Qt::SizeFDiagCursor);
-				CASE DRAG_LEFT | DRAG_BOTTOM : case DRAG_RIGHT | DRAG_TOP : viewer->setCursor(Qt::SizeBDiagCursor);
-			DEFAULT:
+				break;
+			case DRAG_TOP:
+			case DRAG_BOTTOM:
+				viewer->setCursor(Qt::SizeVerCursor);
+				break;
+			case DRAG_LEFT | DRAG_TOP:
+			case DRAG_RIGHT | DRAG_BOTTOM:
+				viewer->setCursor(Qt::SizeFDiagCursor);
+				break;
+			case DRAG_LEFT | DRAG_BOTTOM:
+			case DRAG_RIGHT | DRAG_TOP:
+				viewer->setCursor(Qt::SizeBDiagCursor);
+				break;
+			default:
 				viewer->setCursor(Qt::ArrowCursor);
+				break;
 			}
 	}
 

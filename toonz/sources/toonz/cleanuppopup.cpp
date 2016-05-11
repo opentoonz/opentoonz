@@ -1454,7 +1454,7 @@ QString CleanupPopup::OverwriteDialog::acceptResolution(
 	QString error;
 
 	switch (resolution) {
-	case NO_RESOLUTION: {
+	case NO_RESOLUTION:
 		// fp was already found to be invalid
 		assert(::exists(fp));
 		error = locals::existsStr(fp);
@@ -1464,23 +1464,23 @@ QString CleanupPopup::OverwriteDialog::acceptResolution(
 			assert(!m_suffixText.isEmpty());
 			m_suffix->setText(m_suffixText);
 		}
-	}
+		break;
 
-		CASE ADD_SUFFIX:
-		{
-			// Save resolution options if necessary
-			if (applyToAll)
-				m_suffixText = m_suffix->text();
+	case ADD_SUFFIX:
+		// Save resolution options if necessary
+		if (applyToAll)
+			m_suffixText = m_suffix->text();
 
-			// Test produced file path
-			const TFilePath &fp_suf = fp.withName(
-				fp.getWideName() + m_suffix->text().toStdWString());
+		// Test produced file path
+		const TFilePath &fp_suf = fp.withName(
+			fp.getWideName() + m_suffix->text().toStdWString());
 
-			if (::exists(fp_suf))
-				error = locals::existsStr(fp_suf);
-			else
-				fp = fp_suf;
-		}
+		if (::exists(fp_suf))
+			error = locals::existsStr(fp_suf);
+		else
+			fp = fp_suf;
+
+		break;
 	}
 
 	return error;

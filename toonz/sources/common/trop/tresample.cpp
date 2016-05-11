@@ -589,36 +589,20 @@ static inline void get_flt_fun_rad(TRop::ResampleFilterType flt_type,
 	double rad;
 
 	switch (flt_type) {
-	case TRop::Triangle:
-		fun = flt_triangle;
-		rad = fltradTriangle;
-		CASE TRop::Mitchell : fun = flt_mitchell;
-		rad = fltradMitchell;
-		CASE TRop::Cubic5 : fun = flt_cubic_5;
-		rad = fltradCubic5;
-		CASE TRop::Cubic75 : fun = flt_cubic_75;
-		rad = fltradCubic75;
-		CASE TRop::Cubic1 : fun = flt_cubic_1;
-		rad = fltradCubic1;
-		CASE TRop::Hann2 : fun = flt_hann2;
-		rad = fltradHann2;
-		CASE TRop::Hann3 : fun = flt_hann3;
-		rad = fltradHann3;
-		CASE TRop::Hamming2 : fun = flt_hamming2;
-		rad = fltradHamming2;
-		CASE TRop::Hamming3 : fun = flt_hamming3;
-		rad = fltradHamming3;
-		CASE TRop::Lanczos2 : fun = flt_lanczos2;
-		rad = fltradLanczos2;
-		CASE TRop::Lanczos3 : fun = flt_lanczos3;
-		rad = fltradLanczos3;
-		CASE TRop::Gauss : fun = flt_gauss;
-		rad = fltradGauss;
-		CASE 101 : fun = flt_w_1;
-		rad = fltradW1;
-	DEFAULT:
-		fun = flt_triangle;
-		rad = fltradTriangle;
+	case TRop::Triangle: fun = flt_triangle; rad = fltradTriangle; break;
+	case TRop::Mitchell: fun = flt_mitchell; rad = fltradMitchell; break;
+	case TRop::Cubic5  : fun = flt_cubic_5 ; rad = fltradCubic5  ; break;
+	case TRop::Cubic75 : fun = flt_cubic_75; rad = fltradCubic75 ; break;
+	case TRop::Cubic1  : fun = flt_cubic_1 ; rad = fltradCubic1  ; break;
+	case TRop::Hann2   : fun = flt_hann2   ; rad = fltradHann2   ; break;
+	case TRop::Hann3   : fun = flt_hann3   ; rad = fltradHann3   ; break;
+	case TRop::Hamming2: fun = flt_hamming2; rad = fltradHamming2; break;
+	case TRop::Hamming3: fun = flt_hamming3; rad = fltradHamming3; break;
+	case TRop::Lanczos2: fun = flt_lanczos2; rad = fltradLanczos2; break;
+	case TRop::Lanczos3: fun = flt_lanczos3; rad = fltradLanczos3; break;
+	case TRop::Gauss   : fun = flt_gauss   ; rad = fltradGauss   ; break;
+	case 101           : fun = flt_w_1     ; rad = fltradW1      ; break;
+	default            : fun = flt_triangle; rad = fltradTriangle; break;
 	}
 	if (flt_fun)
 		*flt_fun = fun;
@@ -1037,86 +1021,6 @@ void create_calc(const TRasterPT<T> &rin,
 	// INIZIO GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
 	/////////////////////////////////////////////////////////
 
-	/*
-switch (rin->type)
-  {
-  case RAS_CM16:
-    {
-    USHORT *buffer_in;
-    USHORT *prev_line_in;
-    USHORT *last_line_in;
-    USHORT prev_value;
-    USHORT left_value;
-    USHORT last_value;
-
-    buffer_in = rin->buffer;
-
-#undef  PIXVAL_EQ
-#define PIXVAL_EQ  PIXVAL_EQ_EQUAL
-
-    RESAMPLE_CALC_ALGO
-
-    }
-
-  CASE RAS_CM24:
-    {
-    ULONG *buffer_in;
-    ULONG *prev_line_in;
-    ULONG *last_line_in;
-    ULONG prev_value;
-    ULONG left_value;
-    ULONG last_value;
-
-    buffer_in = rin->buffer;
-
-#undef  PIXVAL_EQ
-#define PIXVAL_EQ  PIXVAL_EQ_24_EQUAL
-
-    RESAMPLE_CALC_ALGO
-
-    }
-
-  CASE RAS_RGB_:  // si potrebbe ignorare M 
-  __OR RAS_RGBM:
-    {
-    LPIXEL *buffer_in;
-    LPIXEL *prev_line_in;
-    LPIXEL *last_line_in;
-    LPIXEL prev_value;
-    LPIXEL left_value;
-    LPIXEL last_value;
-
-    buffer_in = rin->buffer;
-
-#undef  PIXVAL_EQ
-#define PIXVAL_EQ  PIXVAL_EQ_LONG_EQUAL
-
-    RESAMPLE_CALC_ALGO
-
-    }
-
-  CASE RAS_RGBM64:
-    {
-    SPIXEL *buffer_in;
-    SPIXEL *prev_line_in;
-    SPIXEL *last_line_in;
-    SPIXEL prev_value;
-    SPIXEL left_value;
-    SPIXEL last_value;
-
-    buffer_in = rin->buffer;
-
-#undef  PIXVAL_EQ
-#define PIXVAL_EQ  PIXVAL_EQ_2_LONG_EQUAL
-
-    RESAMPLE_CALC_ALGO
-
-    }
-
-  DEFAULT:
-    assert ( !"invalid raster type");
-  }
-*/
 	/////////////////////////////////////////////////////////
 	// FINE GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
 	/////////////////////////////////////////////////////////
@@ -1194,57 +1098,78 @@ inline double get_filter_value(TRop::ResampleFilterType flt_type, double x)
 			return (p0 + x * x * (p2 + x * p3));
 		if (x < 2.0)
 			return (q0 + x * (q1 + x * (q2 + x * q3)));
+
+		break;
 	}
 
-		CASE TRop::Cubic5 : if (x < 0.0) x = -x;
+	case TRop::Cubic5:
+		if (x < 0.0) x = -x;
 		if (x < 1.0)
 			return 2.5 * x * x * x - 3.5 * x * x + 1;
 		if (x < 2.0)
 			return 0.5 * x * x * x - 2.5 * x * x + 4 * x - 2;
+		break;
 
-		CASE TRop::Cubic75 : if (x < 0.0) x = -x;
+	case TRop::Cubic75:
+		if (x < 0.0) x = -x;
 		if (x < 1.0)
 			return 2.75 * x * x * x - 3.75 * x * x + 1;
 		if (x < 2.0)
 			return 0.75 * x * x * x - 3.75 * x * x + 6 * x - 3;
+		break;
 
-		CASE TRop::Cubic1 : if (x < 0.0) x = -x;
+	case TRop::Cubic1:
+		if (x < 0.0) x = -x;
 		if (x < 1.0)
 			return 3 * x * x * x - 4 * x * x + 1;
 		if (x < 2.0)
 			return x * x * x - 5 * x * x + 8 * x - 4;
+		break;
 
-		CASE TRop::Hann2 : if (x <= -2.0) return 0.0;
+	case TRop::Hann2:
+		if (x <= -2.0) return 0.0;
 		if (x < 2.0)
 			return sinc0(x, 1) * (0.5 + 0.5 * cos((pi / 2) * x));
+		break;
 
-		CASE TRop::Hann3 : if (x <= -3.0) return 0.0;
+	case TRop::Hann3:
+		if (x <= -3.0) return 0.0;
 		if (x < 3.0)
 			return sinc0(x, 1) * (0.5 + 0.5 * cos((pi / 3) * x));
+		break;
 
-		CASE TRop::Hamming2 : if (x <= -2.0) return 0.0;
+	case TRop::Hamming2:
+		if (x <= -2.0) return 0.0;
 		if (x < 2.0)
 			return sinc0(x, 1) * (0.54 + 0.46 * cos((pi / 2) * x));
+		break;
 
-		CASE TRop::Hamming3 : if (x <= -3.0) return 0.0;
+	case TRop::Hamming3:
+		if (x <= -3.0) return 0.0;
 		if (x < 3.0)
 			return sinc0(x, 1) * (0.54 + 0.46 * cos((pi / 3) * x));
+		break;
 
-		CASE TRop::Lanczos2 : if (x <= -2.0) return 0.0;
+	case TRop::Lanczos2:
+		if (x <= -2.0) return 0.0;
 		if (x < 2.0)
 			return sinc0(x, 1) * sinc0(x, 2);
+		break;
 
-		CASE TRop::Lanczos3 : if (x <= -3.0) return 0.0;
+	case TRop::Lanczos3:
+		if (x <= -3.0) return 0.0;
 		if (x < 3.0)
 			return sinc0(x, 1) * sinc0(x, 3);
+		break;
 
-		CASE TRop::Gauss : if (x <= -2.0) return 0.0;
+	case TRop::Gauss:
+		if (x <= -2.0) return 0.0;
 		if (x < 2.0)
-			return exp((-pi) * x * x);
-	/* exp(-M_PI*2*2)~=3.5*10^-6 */
-
-	DEFAULT:
+			return exp((-pi) * x * x); /* exp(-M_PI*2*2)~=3.5*10^-6 */
+		break;
+	default:
 		assert(!"bad filter type");
+		break;
 	}
 	return 0.0;
 }
@@ -2758,92 +2683,6 @@ void rop_resample_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin,
 	// INIZIO GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
 	/////////////////////////////////////////////////////////
 
-	/*
-switch (RASRAS (rin->type, rout->type))
-  {
-  case RASRAS (RAS_RGB_, RAS_RGB_):
-  __OR RASRAS (RAS_RGBM, RAS_RGB_):
-  __OR RASRAS (RAS_RGBM, RAS_RGBM):
-    resample_main_rgbm (rin, rout,
-			aff_xy2uv,
-			aff0_uv2fg,
-			min_pix_ref_u, min_pix_ref_v,
-			max_pix_ref_u, max_pix_ref_v,
-			n_pix,
-			pix_ref_u, pix_ref_v,
-			pix_ref_f, pix_ref_g,
-			filter);
-
-  CASE RASRAS (RAS_RGBM, RAS_RGBM64):
-    resample_main_rgbm_rgbm64 (rin, rout,
-			       aff_xy2uv,
-			       aff0_uv2fg,
-			       min_pix_ref_u, min_pix_ref_v,
-			       max_pix_ref_u, max_pix_ref_v,
-			       n_pix,
-			       pix_ref_u, pix_ref_v,
-			       pix_ref_f, pix_ref_g,
-			       filter);
-
-  CASE RASRAS (RAS_RGBM64, RAS_RGBM64):
-    resample_main_rgbm64 (rin, rout,
-			  aff_xy2uv,
-			  aff0_uv2fg,
-			  min_pix_ref_u, min_pix_ref_v,
-			  max_pix_ref_u, max_pix_ref_v,
-			  n_pix,
-			  pix_ref_u, pix_ref_v,
-			  pix_ref_f, pix_ref_g,
-			  filter);
-
-  CASE RASRAS (RAS_CM16, RAS_RGBM):
-    resample_main_cm16_rgbm (rin, rout,
-			     aff_xy2uv,
-			     aff0_uv2fg,
-			     min_pix_ref_u, min_pix_ref_v,
-			     max_pix_ref_u, max_pix_ref_v,
-			     n_pix,
-			     pix_ref_u, pix_ref_v,
-			     pix_ref_f, pix_ref_g,
-			     filter);
-
-  CASE RASRAS (RAS_CM24, RAS_RGBM):
-    resample_main_cm24_rgbm (rin, rout,
-			     aff_xy2uv,
-			     aff0_uv2fg,
-			     min_pix_ref_u, min_pix_ref_v,
-			     max_pix_ref_u, max_pix_ref_v,
-			     n_pix,
-			     pix_ref_u, pix_ref_v,
-			     pix_ref_f, pix_ref_g,
-			     filter);
-
-  CASE RASRAS (RAS_CM16, RAS_RGBM64):
-    resample_main_cm16_rgbm64 (rin, rout,
-			       aff_xy2uv,
-			       aff0_uv2fg,
-			       min_pix_ref_u, min_pix_ref_v,
-			       max_pix_ref_u, max_pix_ref_v,
-			       n_pix,
-			       pix_ref_u, pix_ref_v,
-			       pix_ref_f, pix_ref_g,
-			       filter);
-
-  CASE RASRAS (RAS_CM24, RAS_RGBM64):
-    resample_main_cm24_rgbm64 (rin, rout,
-			       aff_xy2uv,
-			       aff0_uv2fg,
-			       min_pix_ref_u, min_pix_ref_v,
-			       max_pix_ref_u, max_pix_ref_v,
-			       n_pix,
-			       pix_ref_u, pix_ref_v,
-			       pix_ref_f, pix_ref_g,
-			       filter);
-
-  DEFAULT:
-    assert ( !"bad raster type combination");
-  }
-*/
 	/////////////////////////////////////////////////////////
 	// FINE GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
 	/////////////////////////////////////////////////////////
@@ -3098,26 +2937,6 @@ TAffine aff_0, inv_0;
 		// INIZIO GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
 		/////////////////////////////////////////////////////////
 
-		/*   switch (rout->type)
-    {
-    
-    case RAS_GR8:
-      for (y = 0; y < rout->ly; y++)
-        for (x = 0; x < rout->lx; x++)
-          ((UCHAR*)rout->buffer)[x + y * rout->wrap] = BLACK_GR8;  
-    CASE RAS_RGB_:
-    __OR RAS_RGBM:
-      for (y = 0; y < rout->ly; y++)
-        for (x = 0; x < rout->lx; x++)
-          ((LPIXEL*)rout->buffer)[x + y * rout->wrap] = Black_rgbm;  
-    CASE RAS_RGBM64:
-      for (y = 0; y < rout->ly; y++)
-        for (x = 0; x < rout->lx; x++)
-          ((SPIXEL*)rout->buffer)[x + y * rout->wrap] = Black_rgbm64;  
-    DEFAULT:
-      abort();
-    }
-	*/
 		//---- NON GESTIAMO ANCORA EXTRA BUFFER
 		//ZERO_EXTRA_OF (rout)
 
@@ -3139,44 +2958,7 @@ TAffine aff_0, inv_0;
 	/////////////////////////////////////////////////////////
 	// INIZIO GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
 	/////////////////////////////////////////////////////////
-	/*
-  switch (RASRAS (rin->type, rout->type))
-  {
-  case RASRAS (RAS_CM16,   RAS_RGB_):
-  __OR RASRAS (RAS_CM24,   RAS_RGB_):
-  __OR RASRAS (RAS_CM16,   RAS_RGBM):
-  __OR RASRAS (RAS_CM24,   RAS_RGBM):
-  __OR RASRAS (RAS_CM16,   RAS_RGBM64):
-  __OR RASRAS (RAS_CM24,   RAS_RGBM64):
-  __OR RASRAS (RAS_RGB_,   RAS_RGB_):
-  __OR RASRAS (RAS_RGBM,   RAS_RGB_):
-  __OR RASRAS (RAS_RGBM,   RAS_RGBM):
-  __OR RASRAS (RAS_RGBM,   RAS_RGBM64):
-  __OR RASRAS (RAS_RGBM64, RAS_RGBM64):
 
-    rop_resample_rgbm (rin, rout, aff, flt_type, 1.0);  
-
-  #ifdef CHECK_IF_PREMULTIPLIED
-    {
-    int x, y;
-    LPIXEL *buf, pix;
-    
-    buf = rout->buffer;
-    for (y = 0; y < rout->getLy(); y++)
-      for (x = 0; x < rout->getLx(); x++)
-	{
-	pix = buf[x + y * rout->wrap];
-	if (pix.m < pix.b || pix.m < pix.g || pix.m < pix.r)
-	  printf ("(%d,%d): 0x%02x 0x%02x 0x%02x 0x%02x\n",
-		  x, y, pix.m, pix.b, pix.g, pix.r);
-	}
-    }
-  #endif
-//----NON GESTIAMO ANCORA EXTRA BUFFER
-    rop_resample_extra (rin, rout, aff);
-    return;
-  }
-*/
 	/////////////////////////////////////////////////////////
 	// FINE GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
 	/////////////////////////////////////////////////////////
@@ -3225,37 +3007,6 @@ TAffine aff_0, inv_0;
 	/////////////////////////////////////////////////////////
 	// INIZIO GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
 	/////////////////////////////////////////////////////////
-	/*
-double flatradx_ = posradx_;
-double flatrady_ = posrady_;
-int flatradu = CEIL (posradu_) - 1;
-int flatradv = CEIL (posradv_) - 1;
-
-switch (RASRAS (rin->type, rout->type))
-  {
-  case RASRAS (RAS_RGB, RAS_RGB):
-    rop_resample_rgb (rin, rout, aff, invrot,
-                      rowf, pmin, pmax, colf, qmin, qmax, nrows,
-                      flatradu, flatradv, flatradx_, flatrady_,
-                      rown, nocdiamx, coln, nocdiamy);
-
-  CASE RASRAS (RAS_GR8, RAS_GR8):
-    rop_resample_gr8 (rin, rout, aff, invrot,
-                      rowf, pmin, pmax, colf, qmin, qmax, nrows,
-                      flatradu, flatradv, flatradx_, flatrady_,
-                      rown, nocdiamx, coln, nocdiamy);
-
-  CASE RASRAS (RAS_WB, RAS_GR8):
-    rop_resample_wb (rin, rout, aff, invrot,
-                     rowf, pmin, pmax, colf, qmin, qmax, nrows,
-                     flatradu, flatradv, flatradx_, flatrady_,
-                     rown, nocdiamx, coln, nocdiamy);
-
-  DEFAULT:
-    msg (MSG_IE, "rop_resample: unsupported raster combination");
-    return;
-  }
-  */
 
 	/////////////////////////////////////////////////////////
 	// FINE GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
@@ -5058,92 +4809,6 @@ void rop_resample_rgbm_2(TRasterPT<T> rout, const TRasterCM32P &rin,
 	// INIZIO GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
 	/////////////////////////////////////////////////////////
 
-	/*
-switch (RASRAS (rin->type, rout->type))
-  {
-  case RASRAS (RAS_RGB_, RAS_RGB_):
-  __OR RASRAS (RAS_RGBM, RAS_RGB_):
-  __OR RASRAS (RAS_RGBM, RAS_RGBM):
-    resample_main_rgbm (rin, rout,
-			aff_xy2uv,
-			aff0_uv2fg,
-			min_pix_ref_u, min_pix_ref_v,
-			max_pix_ref_u, max_pix_ref_v,
-			n_pix,
-			pix_ref_u, pix_ref_v,
-			pix_ref_f, pix_ref_g,
-			filter);
-
-  CASE RASRAS (RAS_RGBM, RAS_RGBM64):
-    resample_main_rgbm_rgbm64 (rin, rout,
-			       aff_xy2uv,
-			       aff0_uv2fg,
-			       min_pix_ref_u, min_pix_ref_v,
-			       max_pix_ref_u, max_pix_ref_v,
-			       n_pix,
-			       pix_ref_u, pix_ref_v,
-			       pix_ref_f, pix_ref_g,
-			       filter);
-
-  CASE RASRAS (RAS_RGBM64, RAS_RGBM64):
-    resample_main_rgbm64 (rin, rout,
-			  aff_xy2uv,
-			  aff0_uv2fg,
-			  min_pix_ref_u, min_pix_ref_v,
-			  max_pix_ref_u, max_pix_ref_v,
-			  n_pix,
-			  pix_ref_u, pix_ref_v,
-			  pix_ref_f, pix_ref_g,
-			  filter);
-
-  CASE RASRAS (RAS_CM16, RAS_RGBM):
-    resample_main_cm16_rgbm (rin, rout,
-			     aff_xy2uv,
-			     aff0_uv2fg,
-			     min_pix_ref_u, min_pix_ref_v,
-			     max_pix_ref_u, max_pix_ref_v,
-			     n_pix,
-			     pix_ref_u, pix_ref_v,
-			     pix_ref_f, pix_ref_g,
-			     filter);
-
-  CASE RASRAS (RAS_CM24, RAS_RGBM):
-    resample_main_cm24_rgbm (rin, rout,
-			     aff_xy2uv,
-			     aff0_uv2fg,
-			     min_pix_ref_u, min_pix_ref_v,
-			     max_pix_ref_u, max_pix_ref_v,
-			     n_pix,
-			     pix_ref_u, pix_ref_v,
-			     pix_ref_f, pix_ref_g,
-			     filter);
-
-  CASE RASRAS (RAS_CM16, RAS_RGBM64):
-    resample_main_cm16_rgbm64 (rin, rout,
-			       aff_xy2uv,
-			       aff0_uv2fg,
-			       min_pix_ref_u, min_pix_ref_v,
-			       max_pix_ref_u, max_pix_ref_v,
-			       n_pix,
-			       pix_ref_u, pix_ref_v,
-			       pix_ref_f, pix_ref_g,
-			       filter);
-
-  CASE RASRAS (RAS_CM24, RAS_RGBM64):
-    resample_main_cm24_rgbm64 (rin, rout,
-			       aff_xy2uv,
-			       aff0_uv2fg,
-			       min_pix_ref_u, min_pix_ref_v,
-			       max_pix_ref_u, max_pix_ref_v,
-			       n_pix,
-			       pix_ref_u, pix_ref_v,
-			       pix_ref_f, pix_ref_g,
-			       filter);
-
-  DEFAULT:
-    assert ( !"bad raster type combination");
-  }
-*/
 	/////////////////////////////////////////////////////////
 	// FINE GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
 	/////////////////////////////////////////////////////////
