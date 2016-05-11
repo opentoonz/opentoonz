@@ -1,7 +1,7 @@
-add_executable(tconverter
+add_executable(tconverter.bin
     tconverter.cpp)
 
-target_link_libraries(tconverter
+target_link_libraries(tconverter.bin
     Qt5::Core
     toonzlib
     image)

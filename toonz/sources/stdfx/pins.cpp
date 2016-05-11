@@ -10,7 +10,9 @@
 #ifdef _WIN32
 #define ISNAN _isnan
 #else
+#  ifdef MACOSX
 extern "C" int isnan(double);
+#  endif
 #define ISNAN isnan
 #endif
 
