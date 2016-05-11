@@ -102,7 +102,7 @@ add_library(tnztools SHARED ${HEADERS} ${SOURCES} ${RESOURCES})
 add_definitions(-DTNZTOOLS_EXPORTS)
 
 if (APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnztools.dylib")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnztools${CMAKE_SHARED_LIBRARY_SUFFIX}")
 endif (APPLE)
 
 message("subdir: tnztools")

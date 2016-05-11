@@ -246,10 +246,20 @@ if(WIN32)
     set(SOURCES ${SOURCES}
         ../common/tsound/tsound_nt.cpp
         ../common/tvrender/tfont_nt.cpp)
-else()
+elseif(APPLE)
     set(SOURCES ${SOURCES}
         ../common/tsound/tsound_mac.cpp
         ../common/tvrender/tfont_mac.cpp)
+elseif(UNIX)
+    set(SOURCES ${SOURCES}
+        ../common/tvrender/tfont_qt.cpp)
+    if(SDL_LIB_FOUND)
+        set(SOURCES ${SOURCES}
+            ../common/tsound/tsound_sdl.cpp)
+    else()
+        set(SOURCES ${SOURCES}
+            ../common/tsound/tsound_x.cpp)
+    endif()
 endif()
 
 add_translation(tnzcore ${HEADERS} ${SOURCES})
@@ -259,7 +269,7 @@ qt5_wrap_cpp(SOURCES ${MOC_HEADERS})
 add_library(tnzcore SHARED ${HEADERS} ${SOURCES})
 
 if (APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnzcore.dylib")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnzcore${CMAKE_SHARED_LIBRARY_SUFFIX}")
 endif (APPLE)
 
 add_definitions(-DTNZCORE_EXPORTS -DTCOLOR_EXPORTS -DTGEOMETRY_EXPORTS -DTRASTER_EXPORTS -DTIMAGE_EXPORTS -DTSYSTEM_EXPORTS -DTVECTORIMAGE_EXPORTS -DTGL_EXPORTS -DTSOUND_EXPORTS -DTIMAGE_IO_EXPORTS -DTRASTERIMAGE_EXPORTS -DTVRENDER_EXPORTS -DTFLASH_EXPORTS -DTROP_EXPORTS -DTSTREAM_EXPORTS)
@@ -281,7 +291,7 @@ if(WIN32)
         winmm.lib
         opengl32.lib
         glu32.lib)
-else()
+elseif(APPLE)
     find_library(AUDIOUNIT_LIB AudioUnit)
     find_library(AUDIOTB_LIB AudioToolbox)
     find_library(CARBON_LIB Carbon)
@@ -290,6 +300,11 @@ else()
         ${AUDIOUNIT_LIB}
         ${AUDIOTB_LIB}
         ${CARBON_LIB})
+elseif(UNIX)
+    set(QT_LIB)  # avoid warning
+    include_directories(${FREETYPE_INCLUDE_DIRS})
+    set(EXTRA_LIBS
+        ${GLU_LIB})
 endif()
 
 target_link_libraries(tnzcore
