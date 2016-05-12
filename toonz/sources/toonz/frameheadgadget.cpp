@@ -184,11 +184,7 @@ bool FrameHeadGadget::eventFilter(QObject *obj, QEvent *e)
 		if (x > 24 || x > 12 && frame != currentFrame)
 			return false;
 		if (y < 12) {
-#ifdef STUDENT
-			bool isMosArea = false;
-#else
 			bool isMosArea = x < 6;
-#endif
 			// click nel quadratino bianco.
 			if (isMosArea) {
 				// Mos
@@ -220,12 +216,10 @@ bool FrameHeadGadget::eventFilter(QObject *obj, QEvent *e)
 			return false;
 		if (mouseEvent->button() == Qt::RightButton)
 			return false;
-#ifndef STUDENT
 		if (x < 12 && y < 12 && frame == currentFrame && m_buttonPressCellIndex == frame) {
 			enableOnionSkin(!isOnionSkinEnabled());
 			viewer->update();
 		}
-#endif
 	} else if (e->type() == QEvent::MouseMove) {
 		QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent *>(e);
 		int frame = y2index(mouseEvent->pos().y());
@@ -241,11 +235,7 @@ bool FrameHeadGadget::eventFilter(QObject *obj, QEvent *e)
 			if (getCurrentFrame() == frame)
 				viewer->setToolTip(tr("Current Frame"));
 			else if (x < 7) {
-#ifdef STUDENT
-				viewer->setToolTip(tr("Relative Onion Skin Toggle"));
-#else
 				viewer->setToolTip("");
-#endif
 			} else if (x < 13)
 				viewer->setToolTip(tr("Fixed Onion Skin Toggle"));
 			else
@@ -256,11 +246,9 @@ bool FrameHeadGadget::eventFilter(QObject *obj, QEvent *e)
 			case MoveHead:
 				setCurrentFrame(frame);
 				break;
-#ifndef STUDENT
 			case ActivateMos:
 				setMos(frame, true);
 				break;
-#endif
 			case DeactivateMos:
 				setMos(frame, false);
 				break;
@@ -690,8 +678,6 @@ public:
 		if (!action)
 			return;
 		bool checked = action->isChecked();
-#ifndef STUDENT
 		enableOnionSkin(checked);
-#endif
 	}
 } onionSkinToggle;

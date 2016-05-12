@@ -1223,7 +1223,6 @@ bool IoCmd::saveSceneIfNeeded(QString msg)
 	bool isLevelOrSceneIsDirty = false;
 
 	if (app->getCurrentScene()->getDirtyFlag()) {
-#ifndef BRAVODEMO
 		QString question;
 		question = QObject::tr("%1: the current scene has been modified.\n"
 							   "Do you want to save your changes?")
@@ -1237,7 +1236,6 @@ bool IoCmd::saveSceneIfNeeded(QString msg)
 			if (!IoCmd::saveScene())
 				return false;
 		} else if (ret == 2)
-#endif
 		{
 		}
 
@@ -1329,11 +1327,7 @@ void IoCmd::newScene()
 	TDimension res(768, 576);
 	camera->setRes(res);
 	camera->setSize(TDimensionD((double)res.lx / cameraDpi, (double)res.ly / cameraDpi));
-#ifndef STUDENT
 	scene->getProperties()->setBgColor(TPixel32::White);
-#else
-	scene->getProperties()->setBgColor(TPixel32(255, 255, 255, 0));
-#endif
 	TProjectManager::instance()->initializeScene(scene);
 	//Must set current scene after initializeScene!!
 	app->getCurrentScene()->setScene(scene);
@@ -1393,10 +1387,6 @@ bool IoCmd::saveScene(const TFilePath &path, int flags)
 	bool overwrite = (flags & SILENTLY_OVERWRITE) != 0;
 	bool saveSubxsheet = (flags & SAVE_SUBXSHEET) != 0;
 	TApp *app = TApp::instance();
-
-#ifdef STUDENT
-	CommandManager::instance()->execute("MI_RemoveUnused");
-#endif
 
 	assert(!path.isEmpty());
 	TFilePath scenePath = path;
@@ -1486,9 +1476,6 @@ bool IoCmd::saveScene(const TFilePath &path, int flags)
 
 bool IoCmd::saveScene()
 {
-#ifdef BRAVODEMO
-	return false;
-#else
 	TSelection *oldSelection = TApp::instance()->getCurrentSelection()->getSelection();
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 	if (scene->isUntitled()) {
@@ -1508,7 +1495,6 @@ bool IoCmd::saveScene()
 		// salva la scena con il nome fp. se fp esiste gia' lo sovrascrive
 		return saveScene(fp, SILENTLY_OVERWRITE);
 	}
-#endif
 }
 
 //===========================================================================
@@ -1517,9 +1503,6 @@ bool IoCmd::saveScene()
 
 bool IoCmd::saveLevel(const TFilePath &path)
 {
-#ifdef BRAVODEMO
-	return false;
-#else
 	assert(!path.isEmpty());
 
 	TApp *app = TApp::instance();
@@ -1538,7 +1521,6 @@ bool IoCmd::saveLevel(const TFilePath &path)
 
 	TApp::instance()->getPaletteController()->getCurrentLevelPalette()->notifyPaletteSwitched();
 	return true;
-#endif
 }
 
 //===========================================================================
@@ -1547,9 +1529,6 @@ bool IoCmd::saveLevel(const TFilePath &path)
 
 bool IoCmd::saveLevel()
 {
-#ifdef BRAVODEMO
-	return false;
-#else
 	TApp *app = TApp::instance();
 	TXshSimpleLevel *sl =
 		dynamic_cast<TXshSimpleLevel *>(app->getCurrentLevel()->getLevel());
@@ -1572,7 +1551,6 @@ bool IoCmd::saveLevel()
 	//for update title bar
 	app->getCurrentLevel()->notifyLevelChange();
 	return true;
-#endif
 }
 
 //===========================================================================
@@ -1581,9 +1559,6 @@ bool IoCmd::saveLevel()
 
 bool IoCmd::saveLevel(const TFilePath &fp, TXshSimpleLevel *sl, bool overwrite)
 {
-#ifdef BRAVODEMO
-	return false;
-#else
 	assert(sl);
 	bool fileDoesExist = TSystem::doesExistFileOrLevel(fp);
 	if (!overwrite && fileDoesExist) {
@@ -1645,7 +1620,6 @@ bool IoCmd::saveLevel(const TFilePath &fp, TXshSimpleLevel *sl, bool overwrite)
 	TApp::instance()->getCurrentLevel()->notifyLevelTitleChange();
 	TApp::instance()->getPaletteController()->getCurrentLevelPalette()->notifyPaletteTitleChanged();
 	return true;
-#endif
 }
 
 //===========================================================================
@@ -1654,11 +1628,7 @@ bool IoCmd::saveLevel(const TFilePath &fp, TXshSimpleLevel *sl, bool overwrite)
 
 bool IoCmd::saveLevel(TXshSimpleLevel *sl)
 {
-#ifdef BRAVODEMO
-	return false;
-#else
 	return saveLevel(sl->getPath(), sl, true);
-#endif
 }
 
 //===========================================================================
@@ -1905,17 +1875,6 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile, bool checkSa
 		}
 		VersionControlManager::instance()->setFrameRange(scene->getLevelSet());
 	}
-#ifdef LINETEST
-	catch (TException &e) {
-		printf("%s:%s Exception:\n", __FILE__, __FUNCTION__);
-		QString msg;
-		if (e.getMessage() == L"File: " + scenePath.getWideString() + L":1\nCannot Load Toonz Scene in LineTest")
-			msg = QObject::tr("The scene %1 was created with Toonz and cannot be loaded in LineTest.").arg(QString::fromStdWString(scenePath.getWideString()));
-		else
-			msg = QObject::tr("There were problems loading the scene %1.\n Some files may be missing.").arg(QString::fromStdWString(scenePath.getWideString()));
-		DVGui::warning(msg);
-	}
-#endif
 	catch (...) {
 		printf("%s:%s Exception ...:\n", __FILE__, __FUNCTION__);
 		QString msg;
@@ -2360,7 +2319,6 @@ int IoCmd::loadResources(LoadResourceArguments &args,
 		// for the scene file
 		TXshLevel *xl = 0;
 		if (isScene) {
-#ifndef STUDENT
 			TFilePath oldDstFolder = importDialog.getDstFolder();
 			TFilePath dstFolder = (Preferences::instance()->isSubsceneFolderEnabled())
 									  ? TFilePath(path.getName())
@@ -2389,7 +2347,6 @@ int IoCmd::loadResources(LoadResourceArguments &args,
 
 			app->getCurrentColumn()->setColumnIndex(col0);
 
-#endif
 			continue;
 		}
 		// for other level files
@@ -2607,11 +2564,7 @@ public:
 	SaveSceneCommandHandler() : MenuItemHandler(MI_SaveScene) {}
 	void execute()
 	{
-#ifdef BRAVODEMO
-		DVGui::featureNotAvelaible();
-#else
 		IoCmd::saveScene();
-#endif
 	}
 } saveSceneCommandHandler;
 
@@ -2623,9 +2576,6 @@ public:
 	SaveLevelCommandHandler() : MenuItemHandler(MI_SaveLevel) {}
 	void execute()
 	{
-#ifdef BRAVODEMO
-		DVGui::featureNotAvelaible();
-#else
 		TXshSimpleLevel *sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
 		if (!sl) {
 			DVGui::warning(QObject::tr("No Current Level"));
@@ -2651,7 +2601,6 @@ public:
 
 		if (!IoCmd::saveLevel())
 			error(QObject::tr("Save level Failed"));
-#endif
 	}
 } saveLevelCommandHandler;
 

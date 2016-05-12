@@ -521,22 +521,10 @@ int main(int argc, char *argv[])
 //TThread::init();  //For the ImageManager construction
 // controllo se la xxxroot e' definita e corrisponde ad un file esistente
 #ifdef MACOSX
-
 	// StuffDir
-
 	QFileInfo infoStuff(QString("Toonz 7.1 stuff"));
 	TFilePath stuffDirPath(infoStuff.absoluteFilePath().toStdString());
 	TEnv::setStuffDir(stuffDirPath);
-
-/*
-  #ifdef BRAVO
-    TFilePath stuffDir("/Applications/Toonz 7.1 Bravo/Toonz 7.1 Bravo stuff");
-  #else
-    TFilePath  stuffDir("/Applications/Toonz 7.1/Toonz 7.1 stuff");
-  #endif
-	
-  TEnv::setStuffDir(stuffDir);
-*/
 #endif
 
 	TFilePath fproot = TEnv::getStuffDir();
@@ -838,15 +826,7 @@ int main(int argc, char *argv[])
 
 namespace
 {
-#ifdef BRAVO
-#ifdef BRAVODEMO
-const char *toonzVersion = "Bravo 7.1 (demo)";
-#else
-const char *toonzVersion = "Bravo 7.1";
-#endif
-#else
 const char *toonzVersion = "Toonz 7.1";
-#endif
 } // namespace
 
 string getToonzVersion()

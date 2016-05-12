@@ -577,14 +577,6 @@ void SaveSceneAsPopup::initFolder()
 		setFolder(TProjectManager::instance()->getCurrentProject()->getScenesPath());
 }
 
-#ifdef BRAVODEMO
-void SaveSceneAsPopup::show()
-{
-	DVGui::featureNotAvelaible();
-	return;
-}
-#endif
-
 //=============================================================================
 // SaveSubSceneAsPopup
 
@@ -609,13 +601,6 @@ void SaveSubSceneAsPopup::initFolder()
 	else
 		setFolder(TProjectManager::instance()->getCurrentProject()->getScenesPath());
 }
-#ifdef BRAVODEMO
-void SaveSubSceneAsPopup::show()
-{
-	DVGui::featureNotAvelaible();
-	return;
-}
-#endif
 
 //=============================================================================
 // LoadLevelPopup
@@ -1487,13 +1472,6 @@ void SaveLevelAsPopup::initFolder()
 		fp = scene->decodeFilePath(project->getFolder(TProject::Drawings));
 	setFolder(fp);
 }
-#ifdef BRAVODEMO
-void SaveLevelAsPopup::show()
-{
-	DVGui::featureNotAvelaible();
-	return;
-}
-#endif
 //=============================================================================
 // ReplaceLevelPopup
 
@@ -1664,14 +1642,6 @@ bool SavePaletteAsPopup::execute()
 	return true;
 }
 
-#ifdef BRAVODEMO
-void SavePaletteAsPopup::show()
-{
-	DVGui::featureNotAvelaible();
-	return;
-}
-#endif
-
 void SavePaletteAsPopup::initFolder()
 {
 	setFolder(TProjectManager::instance()->getCurrentProjectPath().getParentDir());
@@ -1710,16 +1680,8 @@ LoadColorModelPopup::LoadColorModelPopup()
 	addFilterType("tga");
 	addFilterType("tif");
 	addFilterType("tiff");
-#ifndef BRAVO
-#ifndef BRAVODEMO
-#ifndef LINETEST
 	addFilterType("tlv");
-#endif
-#endif
-#endif
-#ifndef LINETEST
 	addFilterType("pli");
-#endif
 	addFilterType("psd");
 }
 

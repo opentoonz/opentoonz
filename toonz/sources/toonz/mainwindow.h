@@ -20,9 +20,6 @@
 class QStackedWidget;
 class TPanel;
 class UpdateChecker;
-#ifdef LINETEST
-class LicenseChecker;
-#endif
 class ComboViewerPanel;
 class TopBar;
 //-----------------------------------------------------------------------------
@@ -75,9 +72,6 @@ class MainWindow : public QMainWindow
 	bool m_saveSettingsOnQuit;
 	int m_oldRoomIndex;
 	UpdateChecker *m_updateChecker;
-#ifdef LINETEST
-	LicenseChecker *m_licenseChecker;
-#endif
 
 	TopBar *m_topBar;
 
@@ -109,9 +103,6 @@ public:
 	void onUpgradeTabPro();
 	void onAbout();
 	void checkForUpdates();
-#ifdef LINETEST
-	void checkForLicense();
-#endif
 	int getRoomCount() const;
 	Room *getRoom(int index) const;
 	Room *getRoomByName(QString &roomName);
@@ -135,17 +126,7 @@ protected:
 private:
 	/*!Must be call before readSettings().*/
 	void defineActions();
-	/*
-#ifdef LINETEST
-Room *createLinetestRoom();
-#else
-  Room *createPaintRoom();
-#endif
-  Room *createAnimationRoom();
-  Room *createBrowserRoom(); 
-	Room *createPltEditRoom();
-	Room *createFarmRoom();
-	*/
+
 	Room *createCleanupRoom();
 	Room *createPltEditRoom();
 	Room *createInknPaintRoom();
@@ -187,9 +168,6 @@ protected slots:
 	void onInk1CheckTriggered(bool on);
 
 	void onUpdateCheckerDone(bool);
-#ifdef LINETEST
-	void onLicenseCheckerDone(bool);
-#endif
 
 public slots:
 	/*--- タイトルにシーン名を入れる ---*/

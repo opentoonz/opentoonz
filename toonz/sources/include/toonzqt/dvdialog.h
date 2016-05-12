@@ -315,10 +315,6 @@ int eraseStylesInDemand(TPalette *palette, std::vector<int> styleIds, const TXsh
 
 //-----------------------------------------------------------------------------
 
-void DVAPI featureNotAvelaible(QString applicationName = QString("Toonz Bravo Web"), QString url = QString("http://www.bravo.toonz.com"));
-
-void DVAPI requestTrialLicense(QString url = QString("http://www.toonz.com"), QString mail = QString("license@toonz.com"));
-
 //-----------------------------------------------------------------------------
 } //namespace DVGui
 //-----------------------------------------------------------------------------

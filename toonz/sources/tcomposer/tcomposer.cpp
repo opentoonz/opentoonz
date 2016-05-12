@@ -108,39 +108,11 @@ namespace
 //   (es <systemVarPrefix>PROJECTS etc.)
 //
 
-#if defined TAB
-
-const char *applicationName = "The Tab";
-const char *applicationVersion = "3.0";
-const char *applicationFullName = "the Tab 3.0";
-const char *rootVarName = "TABROOT";
-const char *systemVarPrefix = "TAB";
-
-#elif defined BRAVODEMO
-
-const char *applicationName = "Toonz Bravo";
-const char *applicationVersion = "7.1";
-const char *applicationFullName = "Bravo 7.1 (demo)";
-const char *rootVarName = "BRAVOROOT";
-const char *systemVarPrefix = "BRAVO";
-
-#elif defined BRAVO
-
-const char *applicationName = "Toonz Bravo";
-const char *applicationVersion = "7.1";
-const char *applicationFullName = "Bravo 7.1";
-const char *rootVarName = "BRAVOROOT";
-const char *systemVarPrefix = "BRAVO";
-
-#else
-
 const char *applicationName = "OpenToonz";
 const char *applicationVersion = "1.0";
 const char *applicationFullName = "OpenToonz 1.0";
 const char *rootVarName = "TOONZROOT";
 const char *systemVarPrefix = "TOONZ";
-
-#endif
 
 // TODO: forse anche questo andrebbe in tnzbase
 // ci possono essere altri programmi offline oltre al tcomposer
@@ -650,24 +622,10 @@ int main(int argc, char *argv[])
 // TODO: non va qui. Bisognerebbe semmai modificare l'implementazione
 // delle TEnv:: precedenti. Discutiamone
 #ifdef MACOSX
-// StuffDir
-#ifdef BRAVO
-	QFileInfo infoStuff(QString("Toonz 7.1 Bravo stuff"));
-#else
+	// StuffDir
 	QFileInfo infoStuff(QString("Toonz 7.1 stuff"));
-#endif
 	TFilePath stuffDirPath(infoStuff.absoluteFilePath().toStdString());
 	TEnv::setStuffDir(stuffDirPath);
-
-/*
-    #ifdef BRAVO
-      TFilePath stuffDir("/Applications/Toonz 7.1 Bravo/Toonz 7.1 Bravo stuff");
-    #else
-      TFilePath stuffDir("/Applications/Toonz 7.1/Toonz 7.1 stuff");
-    #endif	
-	  TEnv::setStuffDir(stuffDir);
-*/
-
 #endif
 
 	// controllo se la xxxroot e' definita e corrisponde ad un file esistente
@@ -681,65 +639,6 @@ int main(int argc, char *argv[])
 	TFilePath logFilePath = lRootDir + "tcomposer.log";
 	m_userLog = new TUserLogAppend(logFilePath);
 	string msg;
-
-	/*
-
-  #ifdef MACOSX
-    // Library and cacheRoot Folders
-	
-	TFilePath libraryFolder = 
-      setToonzFolder(
-        TEnv::getStuffDir() + "toonzenv.txt",
-        TEnv::getSystemVarPrefix() +"LIBRARY");
-	  if(libraryFolder == TFilePath())
-	  {
-	    cout << "Cannot set " << TEnv::getSystemVarPrefix() << "LIBRARY folder" << endl;
-	    m_userLog->error("Cannot set " +TEnv::getSystemVarPrefix()+"LIBRARY folder");
-		  return -1;
-	  }
-	  TFilePath cacheRoot = 
-      setToonzFolder(
-        TEnv::getStuffDir() + "toonzenv.txt",
-        TEnv::getSystemVarPrefix()+"CACHEROOT");
-	  if(cacheRoot == TFilePath())
-	  {
-	    cout << "Cannot set " + TEnv::getSystemVarPrefix() +"CACHEROOT folder" << endl;
-	    m_userLog->error("Cannot set " + TEnv::getSystemVarPrefix() + "CACHEROOT folder");
-		  return -1;
-	  }
-*/
-	/*
-    #ifdef BRAVO
-    TFilePath libraryFolder("/Applications/Toonz 5.0 Bravo/Toonz 5.0 Bravo stuff/projects/library");
-    TFilePath cacheRoot("/Applications/Toonz 5.0 Bravo/Toonz 5.0 Bravo stuff/cache");
-    #else
-    TFilePath libraryFolder("/Applications/Toonz 5.0/Toonz 5.0 stuff/projects/library");
-    TFilePath cacheRoot("/Applications/Toonz 5.0/Toonz 5.0 stuff/cache");
-    #endif
-*/
-	/*
-	TRasterImagePatternStrokeStyle::setRootDir(libraryFolder);
-	  TVectorImagePatternStrokeStyle::setRootDir(libraryFolder);
-	  TPalette::setRootDir(libraryFolder);
-    cacheRoot += TFilePath(toString(TSystem::getProcessId()));
-    TFileStatus fs(cacheRoot);
-    if (!fs.doesExist())
-      TSystem::mkDir(cacheRoot);
-    TImageCache::instance()->setRootDir(cacheRoot);
-  
-  	// ProjectFolder
-    TFilePath projectFolder = setToonzFolder(TEnv::getStuffDir() + "toonzenv.txt", TEnv::getSystemVarPrefix()+"PROJECTS");
-		
-	  if(projectFolder == TFilePath()) 
-	  {
-	    cout << "Cannot set TOONZPROJECTS folder" << endl;
-	    m_userLog->error("Cannot set TOONZPROJECTS folder");
-		  return -1;
-	  }
-	
-	  TProjectManager::instance()->addProjectsRoot(projectFolder);
-  #else
-*/
 
 	// Initialize measure units
 	Preferences::instance();					 // Loads standard (linear) units
@@ -808,9 +707,6 @@ int main(int argc, char *argv[])
 
 	try {
 		Tiio::defineStd();
-#ifdef BRAVO
-		TPluginManager::instance()->setIgnored("tnzimage");
-#endif
 
 		//#ifdef MACOSX
 		// LoadStandardPlugins ha bisogno di BINROOT definita
