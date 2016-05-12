@@ -370,10 +370,10 @@ void Particles_Engine::normalize_values(struct particles_values &values,
 	(values.trailopacity_val.second) = (values.trailopacity_val.second) * 0.01;
 	(values.mblur_val) = (values.mblur_val) * 0.01;
 	(values.friction_val) = -(values.friction_val) * 0.01;
-	(values.windangle_val) = (values.windangle_val) * (TConsts::pi / 180);
-	(values.g_angle_val) = (values.g_angle_val + 180) * (TConsts::pi / 180);
-	(values.speeda_val.first) = (values.speeda_val.first) * (TConsts::pi / 180);
-	(values.speeda_val.second) = (values.speeda_val.second) * (TConsts::pi / 180);
+	(values.windangle_val) = (values.windangle_val) * M_PI_180;
+	(values.g_angle_val) = (values.g_angle_val + 180) * M_PI_180;
+	(values.speeda_val.first) = (values.speeda_val.first) * M_PI_180;
+	(values.speeda_val.second) = (values.speeda_val.second) * M_PI_180;
 	if (values.step_val < 1)
 		values.step_val = 1;
 	values.genfadecol_val = (values.genfadecol_val) * 0.01;
@@ -599,7 +599,7 @@ void Particles_Engine::do_render(TFlash *flash, Particle *part, TTile *tile,
 	double aim_angle = 0;
 	if (values.pathaim_val) {
 		double arctan = atan2(part->vy, part->vx);
-		aim_angle = (180 / TConsts::pi) * arctan;
+		aim_angle = arctan * M_180_PI;
 	}
 
 	// Calculate the rotational and scale components we have to apply on the particle

@@ -522,7 +522,7 @@ void SwatchViewer::updateRaster()
 		int len = tround(sqrt((double)(delta * delta)));
 		double phi = 0;
 		if (len > 0)
-			phi = 180 * atan2((double)delta.y, (double)delta.x) / TConsts::pi;
+			phi = atan2((double)delta.y, (double)delta.x) * M_180_PI;
 
 		if (len > 500) {
 			// puo' succedere per zoom molto grandi.

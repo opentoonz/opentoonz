@@ -465,7 +465,7 @@ bool DirectionalBlurBaseFx::doGetBBox(double frame, TRectD &bBox, const TRenderS
 			if (m_isMotionBlur)
 				blur = getBlurVector(frame);
 			else {
-				double angle = m_angle->getValue(frame) * (TConsts::pi / 180);
+				double angle = m_angle->getValue(frame) * M_PI_180;
 				blur.x = m_intensity->getValue(frame) * cos(angle);
 				blur.y = m_intensity->getValue(frame) * sin(angle);
 			}
@@ -490,7 +490,7 @@ void DirectionalBlurBaseFx::doCompute(TTile &tile, double frame, const TRenderSe
 	if (m_isMotionBlur) {
 		blurVector = getBlurVector(frame);
 	} else {
-		double angle = m_angle->getValue(frame) * (TConsts::pi / 180);
+		double angle = m_angle->getValue(frame) * M_PI_180;
 		blurVector.x = m_intensity->getValue(frame) * cos(angle);
 		blurVector.y = m_intensity->getValue(frame) * sin(angle);
 	}
@@ -556,7 +556,7 @@ int DirectionalBlurBaseFx::getMemoryRequirement(const TRectD &rect, double frame
 	if (m_isMotionBlur) {
 		blurVector = getBlurVector(frame);
 	} else {
-		double angle = m_angle->getValue(frame) * (TConsts::pi / 180);
+		double angle = m_angle->getValue(frame) * M_PI_180;
 		blurVector.x = m_intensity->getValue(frame) * cos(angle);
 		blurVector.y = m_intensity->getValue(frame) * sin(angle);
 	}

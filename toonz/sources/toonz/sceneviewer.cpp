@@ -749,8 +749,8 @@ TPointD SceneViewer::winToWorld(const QPoint &pos) const
 
 		TPointD p(pp.x - m_pan3D.x, pp.y - m_pan3D.y);
 		p = p * (1 / m_zoomScale3D);
-		double theta = TConsts::pi * m_theta3D / 180.0;
-		double phi = TConsts::pi * m_phi3D / 180.0;
+		double theta = m_theta3D * M_PI_180;
+		double phi = m_phi3D * M_PI_180;
 		double cs_phi = cos(phi);
 		double sn_phi = sin(phi);
 		double cs_theta = cos(theta);

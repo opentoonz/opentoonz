@@ -65,8 +65,8 @@ typedef struct
 
 //---------------------------------------------------------
 
-#define M_PIF ((float)TConsts::pi)
-#define SINC0(x, a) (sin((TConsts::pi / (a)) * (x)) / ((TConsts::pi / (a)) * (x)))
+#define M_PIF float(M_PI)
+#define SINC0(x, a) (sin((M_PI / (a)) * (x)) / ((M_PI / (a)) * (x)))
 #define SINC0F(x, a) (sinf((M_PIF / (a)) * (x)) / ((M_PIF / (a)) * (x)))
 #define SINC(x, a) ((x) == 0.0 ? 1.0 : SINC0(x, a))
 #define SINCF(x, a) ((x) == 0.0F ? 1.0F : SINC0F(x, a))
@@ -190,22 +190,22 @@ double filterValue(FLT_TYPE flt_type, double x)
 
 	case FLT_HANN2:
 		if (x <= -2.0) result = 0.0;
-		else if (x < 2.0) result = SINC0(x, 1) * (0.5 + 0.5 * cos((TConsts::pi_2)*x));
+		else if (x < 2.0) result = SINC0(x, 1) * (0.5 + 0.5 * cos(M_PI_2 * x));
 		break;
 
 	case FLT_HANN3:
 		if (x <= -3.0) result = 0.0;
-		else if (x < 3.0) result = SINC0(x, 1) * (0.5 + 0.5 * cos((TConsts::pi / 3) * x));
+		else if (x < 3.0) result = SINC0(x, 1) * (0.5 + 0.5 * cos((M_PI / 3) * x));
 		break;
 
 	case FLT_HAMMING2:
 		if (x <= -2.0) result = 0.0;
-		else if (x < 2.0) result = SINC0(x, 1) * (0.54 + 0.46 * cos((TConsts::pi_2)*x));
+		else if (x < 2.0) result = SINC0(x, 1) * (0.54 + 0.46 * cos(M_PI_2 * x));
 		break;
 
 	case FLT_HAMMING3:
 		if (x <= -3.0) result = 0.0;
-		else if (x < 3.0) result = SINC0(x, 1) * (0.54 + 0.46 * cos((TConsts::pi / 3) * x));
+		else if (x < 3.0) result = SINC0(x, 1) * (0.54 + 0.46 * cos((M_PI / 3) * x));
 		break;
 
 	case FLT_LANCZOS2:
@@ -220,7 +220,7 @@ double filterValue(FLT_TYPE flt_type, double x)
 
 	case FLT_GAUSS:
 		if (x <= -2.0) result = 0.0;
-		else if (x < 2.0) result = exp((-TConsts::pi) * x * x);
+		else if (x < 2.0) result = exp((-M_PI) * x * x);
 		/* exp(-M_PI*2*2)~=3.5*10^-6 */
 		break;
 

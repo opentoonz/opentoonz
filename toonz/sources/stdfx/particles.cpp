@@ -399,11 +399,11 @@ void Particle::update_Swing(const particles_values &values,
 
 	if (values.swingmode_val == ParticlesFx::SWING_SMOOTH) {
 		if (smperiodx)
-			dummy.x = smswingx * randomxreference * sin((TConsts::pi * changesignx) / smperiodx);
+			dummy.x = smswingx * randomxreference * sin((M_PI * changesignx) / smperiodx);
 		else
 			dummy.x = 0;
 		if (smperiody)
-			dummy.y = smswingy * randomyreference * sin((TConsts::pi * changesigny) / smperiody);
+			dummy.y = smswingy * randomyreference * sin((M_PI * changesigny) / smperiody);
 		else
 			dummy.y = 0;
 	} else {
@@ -419,7 +419,7 @@ void Particle::update_Swing(const particles_values &values,
 
 	if (values.rotswingmode_val == ParticlesFx::SWING_SMOOTH) {
 		if (smperioda)
-			dummy.a = smswinga * sin((TConsts::pi * changesigna) / smperioda);
+			dummy.a = smswinga * sin((M_PI * changesigna) / smperioda);
 		else
 			dummy.a = 0;
 	} else

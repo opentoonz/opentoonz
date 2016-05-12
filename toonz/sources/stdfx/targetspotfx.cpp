@@ -70,7 +70,7 @@ void doTargetSpot(const TRasterPT<PIXEL> &ras, TPixel32 m_color0, double sizex, 
 	double normx = 1 / sizex;
 	double normy = 1 / sizey;
 	double reference = 5 * z;
-	angle = (TConsts::pi * angle) / 180;
+	angle = angle * M_PI_180;
 	double ttan;
 	ttan = tan(angle);
 

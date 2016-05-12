@@ -20,17 +20,6 @@
 #include "tstencilcontrol.h"
 
 //***************************************************************************
-//    Local namesapce  stuff
-//***************************************************************************
-
-namespace
-{
-
-const double pi2 = TConsts::pi * 2.0;
-
-} // namespace
-
-//***************************************************************************
 //    MovingModifier  implementation
 //***************************************************************************
 
@@ -311,10 +300,10 @@ double ShadowStyle::getParamValue(TColorStyle::double_tag, int index) const
 	case 0:
 		degree = asin(m_shadowDirection.y);
 		if (m_shadowDirection.x < 0)
-			degree = TConsts::pi - degree;
+			degree = M_PI - degree;
 		if (degree < 0)
-			degree += pi2;
-		return degree * TConsts::invOf_pi_180;
+			degree += M_2PI;
+		return degree * M_180_PI;
 
 	case 1:
 		return m_density;
@@ -336,7 +325,7 @@ void ShadowStyle::setParamValue(int index, double value)
 
 	switch (index) {
 	case 0:
-		degree = value * TConsts::pi_180;
+		degree = value * M_PI_180;
 		m_shadowDirection.x = cos(degree);
 		m_shadowDirection.y = sin(degree);
 		break;
@@ -703,12 +692,12 @@ double ShadowStyle2::getParamValue(TColorStyle::double_tag, int index) const
 
 	double degree = asin(m_shadowDirection.y);
 	if (m_shadowDirection.x < 0)
-		degree = TConsts::pi - degree;
+		degree = M_PI - degree;
 
 	if (degree < 0)
-		degree += pi2;
+		degree += M_2PI;
 
-	return degree * TConsts::invOf_pi_180;
+	return degree * M_180_PI;
 }
 
 //-----------------------------------------------------------------------------
@@ -740,7 +729,7 @@ void ShadowStyle2::setParamValue(int index, double value)
 	if (index == 1) {
 		m_shadowLength = value;
 	} else {
-		double degree = value * TConsts::pi_180;
+		double degree = value * M_PI_180;
 		m_shadowDirection.x = cos(degree);
 		m_shadowDirection.y = sin(degree);
 	}
@@ -1323,10 +1312,10 @@ double TPointShadowFillStyle::getParamValue(TColorStyle::double_tag, int index) 
 	case 0:
 		degree = asin(m_shadowDirection.y);
 		if (m_shadowDirection.x < 0)
-			degree = TConsts::pi - degree;
+			degree = M_PI - degree;
 		if (degree < 0)
-			degree += pi2;
-		return degree * TConsts::invOf_pi_180;
+			degree += M_2PI;
+		return degree * M_180_PI;
 
 	case 1:
 		return m_density;
@@ -1352,7 +1341,7 @@ void TPointShadowFillStyle::setParamValue(int index, double value)
 
 	switch (index) {
 	case 0:
-		degree = value * TConsts::pi_180;
+		degree = value * M_PI_180;
 		m_shadowDirection.x = cos(degree);
 		m_shadowDirection.y = sin(degree);
 
@@ -2284,7 +2273,7 @@ void ArtisticModifier::modify(TRegionOutline &outline) const
 			}
 			double wave = 1;
 			if (maxcounter)
-				wave = sin(pi2 * counter / maxcounter);
+				wave = sin(M_2PI * counter / maxcounter);
 
 			pIt->x += m_move.x * wave;
 			pIt->y += m_move.y * wave;

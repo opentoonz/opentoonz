@@ -25,7 +25,7 @@ bool inside_polygon_(
 	if (polygon_number < 3) { /* equal less than 2  is circle */
 		return true;
 	}
-	double radian = roll_degree * M_PI / 180.0, add_radian = 2.0 * M_PI / polygon_number;
+	double radian = roll_degree * (M_PI / 180), add_radian = 2.0 * M_PI / polygon_number;
 	double x1 = radius * cos(radian), y1 = radius * sin(radian), x2 = 0, y2 = 0, xa = odd_diameter, xb = odd_diameter;
 	radian += add_radian;
 
@@ -114,7 +114,7 @@ double length_to_polygon_(
 	/* 多角形の辺の2点 */
 	double x1 = 0.0, y1 = 0.0, x2 = 0.0, y2 = 0.0;
 	const double add_radian = 2.0 * M_PI / polygon_number;
-	double radian1 = roll_degree * M_PI / 180.0;
+	double radian1 = roll_degree * (M_PI / 180);
 	/* rad1だとMS-VC++_v10でエラー!!! */
 	while (radian1 < 0.0) {
 		radian1 += add_radian;

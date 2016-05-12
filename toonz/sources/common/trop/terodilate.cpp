@@ -286,7 +286,7 @@ void erodilate_quarters(int lx, int ly,
 						double radius, double shift, Func func)
 {
 	double sqRadius = sq(radius);
-	double squareHeight = radius / tcg::consts::sqrt2;
+	double squareHeight = radius * M_SQRT1_2;
 	int squareHeightI = tfloor(squareHeight);
 
 	// For every arc point
@@ -378,7 +378,7 @@ void circular_erodilate(const TRasterPT<Pix> &src, const TRasterPT<Pix> &dst, do
 	bool dilate = (radius >= 0.0);
 	radius = fabs(radius);
 
-	double inner_square_diameter = radius * tcg::consts::sqrt2;
+	double inner_square_diameter = radius * M_SQRT2;
 
 	double shift = 0.25 * inner_square_diameter; // Shift of the bent square SE needed to avoid
 												 // touching the circumference on the other side

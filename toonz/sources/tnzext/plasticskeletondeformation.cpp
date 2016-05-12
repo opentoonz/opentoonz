@@ -101,7 +101,7 @@ double buildAngle(const PlasticSkeleton &skeleton, int v)
 		dir = vxParent.P() - vxGrandParent.P();
 	}
 
-	return tcg::consts::rad_to_deg * tcg::point_ops::angle(dir, vx.P() - vxParent.P());
+	return tcg::point_ops::angle(dir, vx.P() - vxParent.P()) * M_180_PI;
 }
 
 } // namespace
@@ -595,7 +595,7 @@ void PlasticSkeletonDeformation::Imp::updateBranchPositions(
 		// Now, rebuild vx's position
 		const SkVD &vd = m_vds.find(dvx.name())->m_vd;
 
-		double a = tcg::consts::rad_to_deg * tcg::point_ops::angle(oDir, ovxPos - ovxParentPos);
+		double a = tcg::point_ops::angle(oDir, ovxPos - ovxParentPos) * M_180_PI;
 		double d = tcg::point_ops::dist(ovxParentPos, ovxPos);
 
 		double aDelta = vd.m_params[SkVD::ANGLE]->getValue(frame);
@@ -1022,7 +1022,7 @@ void PlasticSkeletonDeformation::updatePosition(
 	// NOTE: The following aDelta calculation should be done as a true difference - this is still ok and spares
 	// access to v's grandParent...
 
-	double aDelta = tcg::consts::rad_to_deg * tcg::point_ops::angle(vPos - vParentPos, pos - vParentPos),
+	double aDelta = tcg::point_ops::angle(vPos - vParentPos, pos - vParentPos) * M_180_PI,
 		   dDelta = tcg::point_ops::dist(vParentPos, pos) - tcg::point_ops::dist(vParentPos, vPos),
 
 		   a = tcrop(vd.m_params[SkVD::ANGLE]->getValue(frame) + aDelta, vx.m_minAngle, vx.m_maxAngle),
@@ -1049,7 +1049,7 @@ void PlasticSkeletonDeformation::updateAngle(
 
 	SkVD &vd = m_imp->m_vds.find(vx.name())->m_vd;
 
-	double aDelta = tcg::consts::rad_to_deg * tcg::point_ops::angle(vx.P() - vParentPos, pos - vParentPos),
+	double aDelta = tcg::point_ops::angle(vx.P() - vParentPos, pos - vParentPos) * M_180_PI,
 		   a = tcrop(vd.m_params[SkVD::ANGLE]->getValue(frame) + aDelta, vx.m_minAngle, vx.m_maxAngle);
 
 	vd.m_params[SkVD::ANGLE]->setValue(frame, a);
@@ -1277,7 +1277,7 @@ void PlasticSkeletonDeformation::loadData_prerelease(TIStream &is)
 				// Now, rebuild vx's position
 				SkVD &vd = sd.m_imp->m_vds.find(vx.name())->m_vd;
 
-				double a = tcg::consts::rad_to_deg * tcg::point_ops::angle(dir, vxPos - vxParentPos);
+				double a = tcg::point_ops::angle(dir, vxPos - vxParentPos) * M_180_PI;
 				double d = tcg::point_ops::dist(vxParentPos, vxPos);
 
 				{

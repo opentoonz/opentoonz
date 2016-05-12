@@ -174,9 +174,9 @@ void ColorEmbossFx::doCompute(TTile &tile, double frame, const TRenderSettings &
 	double scale = sqrt(fabs(ri.m_affine.det()));
 	double radius = m_radius->getValue(frame) * scale;
 	double direction = m_direction->getValue(frame);
-	double elevation = (m_elevation->getValue(frame)) * TConsts::pi / 180;
+	double elevation = (m_elevation->getValue(frame)) * M_PI_180;
 	double intensity = m_intensity->getValue(frame);
-	double azimuth = direction * TConsts::pi / 180;
+	double azimuth = direction * M_PI_180;
 
 	int border = radius + 1;
 	TRasterP srcRas = tile.getRaster()->create(tile.getRaster()->getLx() + border * 2, tile.getRaster()->getLy() + border * 2);

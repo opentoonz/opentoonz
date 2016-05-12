@@ -357,7 +357,7 @@ void LinearGradientFx::doCompute(TTile &tile, double frame, const TRenderSetting
 	double w_amplitude = m_wave_amplitude->getValue(frame) / ri.m_shrinkX;
 	double w_freq = m_wave_freq->getValue(frame) * ri.m_shrinkX;
 	double w_phase = m_wave_phase->getValue(frame);
-	w_freq = (w_freq * 0.01 * TConsts::pi) / 180;
+	w_freq *= 0.01 * M_PI_180;
 
 	TSpectrum::ColorKey colors[] = {
 		TSpectrum::ColorKey(0, m_color1->getValue(frame)),
@@ -395,7 +395,7 @@ void MultiLinearGradientFx::doCompute(TTile &tile, double frame, const TRenderSe
 	double w_amplitude = m_wave_amplitude->getValue(frame) / ri.m_shrinkX;
 	double w_freq = m_wave_freq->getValue(frame) * ri.m_shrinkX;
 	double w_phase = m_wave_phase->getValue(frame);
-	w_freq = (w_freq * 0.01 * TConsts::pi) / 180;
+	w_freq *= 0.01 * M_PI_180;
 
 	TAffine aff = ri.m_affine.inv();
 	TPointD posTrasf = aff * tile.m_pos;

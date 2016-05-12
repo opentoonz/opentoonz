@@ -535,7 +535,7 @@ void EraserTool::erase(TVectorImageP vi, const TPointD &pos)
 	std::vector<DoublePair> sortedWRanges;
 
 	std::vector<TStroke *> splitStrokes;
-	double rectEdge_2 = m_pointSize * TConsts::sqrt2_2;
+	double rectEdge_2 = m_pointSize * M_SQRT1_2;
 
 	//quadrato iscritto nella circonferenza
 	TRectD enrolledSquare(pos.x - rectEdge_2, pos.y - rectEdge_2, pos.x + rectEdge_2, pos.y + rectEdge_2);

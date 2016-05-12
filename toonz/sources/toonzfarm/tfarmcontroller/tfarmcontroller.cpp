@@ -119,11 +119,6 @@ TFilePath getLocalRoot()
 			lroot = TFilePath(pathName);
 		}
 	}
-
-//TFilePath name = TFilePath("TFARMLOCALROOT");
-//char *s = getenv(toString(name.getWideString()).c_str());
-//lroot = TFilePath(s?s:"");
-
 #endif
 	return lroot;
 }
@@ -179,15 +174,6 @@ bool loadControllerData(QString &hostName, QString &addr, int &port)
 bool isAScript(TFarmTask *task)
 {
 	return false; //todo per gli script
-				  /*
-#ifdef _WIN32
-   return task->m_cmdline.contains(".bat");
-#else
-  return (task->m_cmdline.contains(".csh")|| 
-          task->m_cmdline.contains(".sh")|| 
-          task->m_cmdline.contains(".tcsh"))
-#endif   
-*/
 }
 
 } // anonymous namespace
@@ -1117,10 +1103,7 @@ CtrlFarmTask *FarmController::doAddTask(
 
 	if (suspended)
 		task->m_status = Suspended;
-	/*
-  else
-    tryToStartTask(task);
-*/
+
 	return task;
 }
 
@@ -1723,24 +1706,6 @@ void FarmController::getTasks(const QString &parentId, vector<TaskShortInfo> &ta
 		if (task->m_parentId == parentId)
 			tasks.push_back(TaskShortInfo(task->m_id, task->m_name, task->m_status));
 	}
-
-	/*
-  map<TaskId, CtrlFarmTask*>::iterator it = m_tasks.find(parentId);
-  if (it != m_tasks.end())
-  {
-    CtrlFarmTask *task = it->second;
-    vector<std::string>::iterator itSubTakId = task->m_subTasks.begin();
-    for ( ; itSubTakId != task->m_subTasks.end(); ++itSubTakId)
-    {
-      map<std::string, CtrlFarmTask*>::iterator itSubTask = m_tasks.find(*itSubTakId);
-      if (itSubTask != m_tasks.end())
-      {
-        CtrlFarmTask *subTask = itSubTask->second;
-        tasks.push_back(TaskShortInfo(*itSubTakId, subTask->m_name, subTask->m_status));
-      }
-    }
-  }
-*/
 }
 
 //------------------------------------------------------------------------------
@@ -1868,21 +1833,9 @@ void FarmController::taskSubmissionError(const QString &taskId, int errCode)
 			server = itServer->second;
 
 		if (server) {
-			/*
-      string msg = "Task " + taskId + " completed on ";
-      msg += server->getHostName().c_str();
-      msg += "\n\n";
-      m_userLog->info(msg);
-      */
 			server->removeTask(taskId);
 		}
 
-		/*
-    if (parentTask && parentTask->m_status == Completed)
-    {
-      m_userLog->info("Task " + parentTask->m_id + " completed\n\n");
-    }
-*/
 		if (task->m_toBeDeleted)
 			delete task;
 		if (parentTask && parentTask->m_toBeDeleted)
@@ -2007,14 +1960,6 @@ void FarmController::taskCompleted(const QString &taskId, int exitCode)
 								break;
 							} else if (subTask->m_status == Aborted)
 								aSubTaskFailed = true;
-
-							/*
-              if (subTask->m_status == Running || subTask->m_status == Waiting)
-                parentTaskState = Running;
-              else
-              if (subTask->m_status == Aborted)
-                aSubTaskFailed = true;
-              */
 						}
 					}
 				} else
@@ -2354,11 +2299,6 @@ void ControllerService::onStart(int argc, char *argv[])
 	// Initialize thread components
 	TThread::init();
 
-	/*
-#ifdef _DEBUG
-  DebugBreak();
-#endif
-*/
 	if (isRunningAsConsoleApp()) {
 		// i messaggi verranno ridiretti sullo standard output
 		m_userLog = new TUserLog();

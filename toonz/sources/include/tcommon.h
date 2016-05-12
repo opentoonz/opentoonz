@@ -63,17 +63,16 @@ int nanosleep(struct timespec *, int);
 #include <map>
 // .. and so on
 
-/* the value of pi defined in IRIX-math.h is not defined neither in WIN32-math.h nor elsewhere */
 namespace TConsts
 {
-const double pi = 3.1415926535897932384626433832795;
-const double pi_2 = 1.5707963267948966192313216916398;
 const double epsilon = 1e-8;
-const double sqrt2 = 1.4142135623730950488016887242097;
-const double sqrt2_2 = 0.7071067811865475244008443621048;
-const double pi_180 = pi / 180.0;
-const double invOf_pi_180 = 180.0 / pi;
 }
+
+// use macros insted of constexprs, because MSVC2013 does not support `constexpr`.
+#define M_PI_3 (M_PI / 3)
+#define M_PI_180 (M_PI_4 / 45)
+#define M_180_PI (90 * M_2_PI)
+#define M_2PI (2 * M_PI)
 
 // typedef's
 

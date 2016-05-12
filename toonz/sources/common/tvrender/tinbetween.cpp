@@ -193,7 +193,7 @@ void eraseSmallAngles(std::vector<std::pair<int, double>> &corners, double angle
 void detectCorners(const TStroke *stroke, double minDegree,
 				   std::vector<std::pair<int, double>> &corners, double &min, double &max)
 {
-	const double minSin = fabs(sin(minDegree * TConsts::pi_180));
+	const double minSin = fabs(sin(minDegree * M_PI_180));
 	double angle, vectorialProduct, metaCornerLen, partialLen;
 
 	UINT quadCount1 = stroke->getChunkCount();
@@ -213,7 +213,7 @@ void detectCorners(const TStroke *stroke, double minDegree,
 			vectorialProduct = fabs(cross(tan1, tan2));
 
 			if (tan1 * tan2 < 0) {
-				angle = 180 - asin(tcrop(vectorialProduct, -1.0, 1.0)) * TConsts::invOf_pi_180;
+				angle = 180 - asin(tcrop(vectorialProduct, -1.0, 1.0)) * M_180_PI;
 				corners.push_back(std::make_pair(j, angle));
 
 				//------------------------------------------
@@ -226,7 +226,7 @@ void detectCorners(const TStroke *stroke, double minDegree,
 				if (max < angle)
 					max = angle;
 			} else if (vectorialProduct >= minSin) {
-				angle = asin(tcrop(vectorialProduct, -1.0, 1.0)) * TConsts::invOf_pi_180;
+				angle = asin(tcrop(vectorialProduct, -1.0, 1.0)) * M_180_PI;
 				corners.push_back(std::make_pair(j, angle));
 
 				//------------------------------------------
@@ -262,7 +262,7 @@ void detectCorners(const TStroke *stroke, double minDegree,
 				vectorialProduct = fabs(cross(tan1, tan2));
 
 				if (tan1 * tan2 < 0) {
-					angle = 180 - asin(tcrop(vectorialProduct, -1.0, 1.0)) * TConsts::invOf_pi_180;
+					angle = 180 - asin(tcrop(vectorialProduct, -1.0, 1.0)) * M_180_PI;
 
 					metaCornerLen = ratioLen * (stroke->getChunk(j - 1)->getLength() + stroke->getChunk(j)->getLength());
 					partialLen = 0;
@@ -280,7 +280,7 @@ void detectCorners(const TStroke *stroke, double minDegree,
 						tan2 = normalize(tan2);
 
 						vectorialProduct = fabs(cross(tan1, tan2));
-						double nearAngle = asin(tcrop(vectorialProduct, -1.0, 1.0)) * TConsts::invOf_pi_180;
+						double nearAngle = asin(tcrop(vectorialProduct, -1.0, 1.0)) * M_180_PI;
 						if (tan1 * tan2 < 0)
 							nearAngle = 180 - nearAngle;
 
@@ -307,7 +307,7 @@ void detectCorners(const TStroke *stroke, double minDegree,
 							tan2 = normalize(tan2);
 
 							vectorialProduct = fabs(cross(tan1, tan2));
-							double nearAngle = asin(tcrop(vectorialProduct, -1.0, 1.0)) * TConsts::invOf_pi_180;
+							double nearAngle = asin(tcrop(vectorialProduct, -1.0, 1.0)) * M_180_PI;
 							if (tan1 * tan2 < 0)
 								nearAngle = 180 - nearAngle;
 
@@ -1031,7 +1031,7 @@ void TInbetween::Imp::computeTransformation()
 					totalRadRotation += radRotation;
 				}
 				totalRadRotation /= (cornerSize - 1);
-				transform.m_rotation = TConsts::invOf_pi_180 * totalRadRotation;
+				transform.m_rotation = totalRadRotation * M_180_PI;
 
 				if (isAlmostZero(transform.m_rotation, 2)) {
 					transform.m_rotation = 0.0;

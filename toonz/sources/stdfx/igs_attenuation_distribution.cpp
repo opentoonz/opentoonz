@@ -4,13 +4,10 @@
 
 namespace
 {
-#ifndef M_PI /* for vc2005 */
-#define M_PI 3.14159265358979323846
-#endif
 bool inside_polygon_(
 	double radius, int odd_diameter, double xp, double yp, int polygon_num, double degree)
 {
-	double radian = degree * M_PI / 180.0,
+	double radian = degree * (M_PI / 180),
 		   add_radian = 2.0 * M_PI / polygon_num,
 		   x1 = 0, y1 = 0, x2, y2,
 		   xa = -odd_diameter,

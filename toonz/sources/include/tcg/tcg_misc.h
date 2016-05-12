@@ -11,7 +11,6 @@
 */
 
 // tcg includes
-#include "consts.h"
 #include "numeric_ops.h"
 #include "poly_ops.h"
 #include "point_ops.h"

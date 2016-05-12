@@ -11,7 +11,7 @@ namespace
 
 inline double gauss(double x, double y, double x0, double y0, double s)
 {
-	return exp(-((x - x0) * (x - x0) + (y - y0) * (y - y0)) / s) / (s * TConsts::pi);
+	return exp(-((x - x0) * (x - x0) + (y - y0) * (y - y0)) / s) / (s * M_PI);
 }
 
 //------------------------------------------------------------------------------

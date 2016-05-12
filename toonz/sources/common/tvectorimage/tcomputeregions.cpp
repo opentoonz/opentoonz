@@ -1082,8 +1082,8 @@ inline void insertBranch(Intersection &in, IntersectedStroke &item, bool getting
 
 double getAngle(const TPointD &p0, const TPointD &p1)
 {
-	double angle1 = 180 * atan2(p0.x, p0.y) / TConsts::pi;
-	double angle2 = 180 * atan2(p1.x, p1.y) / TConsts::pi;
+	double angle1 = atan2(p0.x, p0.y) * M_180_PI;
+	double angle2 = atan2(p1.x, p1.y) * M_180_PI;
 
 	if (angle1 < 0)
 		angle1 = 360 + angle1;

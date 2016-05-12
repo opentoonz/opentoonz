@@ -679,7 +679,7 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated)
 	if (!cellSelection->isEmpty())
 		cellSelection->getSelectedCells(rS0, cS0, rS1, cS1);
 
-	int r0, r1, c0, c1; // range di righe e colonne visibili
+	int r0, r1, c0, c1; // range of visible rows and columns
 	r0 = m_viewer->yToRow(toBeUpdated.top());
 	r1 = m_viewer->yToRow(toBeUpdated.bottom());
 	c0 = m_viewer->xToColumn(toBeUpdated.left());
@@ -1419,7 +1419,7 @@ void CellArea::drawKeyframe(QPainter &p, const QRect toBeUpdated)
 
 void CellArea::drawNotes(QPainter &p, const QRect toBeUpdated)
 {
-	int r0, r1, c0, c1; // range di righe e colonne visibili
+	int r0, r1, c0, c1; // range of visible rows and columns
 	r0 = m_viewer->yToRow(toBeUpdated.top());
 	r1 = m_viewer->yToRow(toBeUpdated.bottom());
 	c0 = m_viewer->xToColumn(toBeUpdated.left());

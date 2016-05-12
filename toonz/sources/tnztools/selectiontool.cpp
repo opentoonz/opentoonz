@@ -502,7 +502,7 @@ void DragSelectionTool::Rotation::leftButtonDrag(const TPointD &pos, const TMous
 	double scale = 1;
 	if (a2 <= epsilon || b2 <= epsilon)
 		return;
-	dang = -180 * asin(cross(a, b) / sqrt(a2 * b2)) / TConsts::pi;
+	dang = asin(cross(a, b) / sqrt(a2 * b2)) * -M_180_PI;
 	if (e.isShiftPressed()) {
 		m_dstAng += dang;
 		double ang = tfloor((int)(m_dstAng + 22.5), 45);

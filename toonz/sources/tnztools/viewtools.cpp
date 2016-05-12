@@ -215,7 +215,7 @@ public:
 			TPointD a = p - m_center;
 			TPointD b = m_oldPos - m_center;
 			if (norm2(a) > 0 && norm2(b) > 0) {
-				double ang = 180 * asin(cross(b, a) / (norm(a) * norm(b))) / TConsts::pi;
+				double ang = asin(cross(b, a) / (norm(a) * norm(b))) * M_180_PI;
 				m_angle = m_angle + ang;
 				m_viewer->rotate(m_center, m_angle);
 			}

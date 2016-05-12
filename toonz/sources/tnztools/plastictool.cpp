@@ -2013,14 +2013,13 @@ void PlasticTool::drawAngleLimits(const SkDP &sd, int skelId, int v, double pixe
 
 			// Retrieve angular data
 			double angleShift = sd->vertexDeformation(skelId, v)->m_params[SkVD::ANGLE]->getValue(::frame());
-			double defaultAngleValue = tcg::consts::rad_to_deg * tcg::point_ops::angle(
-																	 dirFromGrandParent, dirFromParent);
+			double defaultAngleValue = tcg::point_ops::angle(dirFromGrandParent, dirFromParent) * M_180_PI;
 
 			// Convert to radians
 			double currentBranchAngle_rad = tcg::point_ops::rad(dirFromDeformedGrandParent);
 
-			double currentAngle_rad = currentBranchAngle_rad + tcg::consts::deg_to_rad * (angleShift + defaultAngleValue);
-			double limitDirection_rad = currentBranchAngle_rad + tcg::consts::deg_to_rad * (angleLimit + defaultAngleValue);
+			double currentAngle_rad = currentBranchAngle_rad + (angleShift + defaultAngleValue) * M_PI_180;
+			double limitDirection_rad = currentBranchAngle_rad + (angleLimit + defaultAngleValue) * M_PI_180;
 
 			glColor4ub(0, 0, 255, 128);
 
@@ -2038,7 +2037,7 @@ void PlasticTool::drawAngleLimits(const SkDP &sd, int skelId, int v, double pixe
 
 			// Draw limit annulus arc
 			angleLimit = tcrop(angleLimit, angleShift - 180.0, angleShift + 180.0);
-			limitDirection_rad = currentBranchAngle_rad + tcg::consts::deg_to_rad * (angleLimit + defaultAngleValue);
+			limitDirection_rad = currentBranchAngle_rad + (angleLimit + defaultAngleValue) * M_PI_180;
 
 			double radius = tcg::point_ops::dist(defVx.P(), defVxParent.P()) * 0.25;
 

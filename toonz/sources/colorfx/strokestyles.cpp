@@ -132,7 +132,7 @@ inline void tglVertex(const T3DPointD &p)
 TFurStrokeStyle::TFurStrokeStyle()
 	: m_color(TPixel32::Black), m_angle(120.0), m_length(1.0), m_cs(0.0), m_sn(0.0)
 {
-	double rad = TConsts::pi_180 * m_angle;
+	double rad = m_angle * M_PI_180;
 	m_cs = cos(rad);
 	m_sn = sin(rad);
 }
@@ -196,7 +196,7 @@ void TFurStrokeStyle::setParamValue(int index, double value)
 	assert(0 <= index && index < getParamCount());
 	if (index == 0) {
 		m_angle = value;
-		double rad = TConsts::pi_180 * m_angle;
+		double rad = m_angle * M_PI_180;
 		m_cs = cos(rad);
 		m_sn = sin(rad);
 	} else
@@ -209,7 +209,6 @@ void TFurStrokeStyle::setParamValue(int index, double value)
 
 void TFurStrokeStyle::drawStroke(TFlash &flash, const TStroke *stroke) const
 {
-	using TConsts::pi;
 	//TStroke *stroke = getStroke();
 	double length = stroke->getLength();
 
@@ -249,7 +248,6 @@ void TFurStrokeStyle::computeData(Points &positions,
 								  const TStroke *stroke,
 								  const TColorFunction *cf) const
 {
-	using TConsts::pi;
 	double length = stroke->getLength();
 
 	double s = 0.0;
@@ -2114,7 +2112,7 @@ void TBraidStrokeStyle::drawStroke(const TColorFunction *cf, const TStroke *stro
 	const double stripethickness = 0.3;
 	int period = (int)(101 - m_period) * 20;
 	double step = period / (double)ntick;
-	double freq = 2 * TConsts::pi / ntick;
+	double freq = M_2PI / ntick;
 	int swapcount = 0;
 	int count = 0;
 	bool firstRing = true;
@@ -2201,7 +2199,7 @@ void TBraidStrokeStyle::drawStroke(TFlash &flash, const TStroke *stroke) const
 	const double stripethickness = 0.3;
 	int period = (int)(101 - m_period) * 20;
 	double step = period / (double)ntick;
-	double freq = 2 * TConsts::pi / ntick;
+	double freq = M_2PI / ntick;
 	int swapcount = 0;
 	int count = 0;
 	bool firstRing = true;
@@ -3936,7 +3934,7 @@ void TTwirlStrokeStyle::computeData(Doubles &data, const TStroke *stroke, const 
 		} // non dovrebbe succedere mai, ma per prudenza....
 		u = normalize(u);
 		TPointD v = rotate90(u) * (pos.thick);
-		double shift = sin((TConsts::pi / hperiod) * s);
+		double shift = sin((M_PI / hperiod) * s);
 
 		app = pos + v * shift;
 		data.push_back(app.x);
@@ -4035,7 +4033,7 @@ void TTwirlStrokeStyle::drawStroke(TFlash &flash, const TStroke *stroke) const
 		} // non dovrebbe succedere mai, ma per prudenza....
 		u = normalize(u);
 		TPointD v = rotate90(u) * (pos.thick);
-		double shift = sin((TConsts::pi / hperiod) * s);
+		double shift = sin((M_PI / hperiod) * s);
 		points1.push_back(pos + v * shift);
 		points2.push_back(pos - v * shift);
 		blendval = get_inout_intensityslope(m_blend, 1.0 - m_blend, (s - ((int)(s / hperiod) * hperiod)) / hperiod);
@@ -5156,7 +5154,6 @@ void TFriezeStrokeStyle2::computeData(Points &positions,
 									  const TStroke *stroke,
 									  const TColorFunction *cf) const
 {
-	using TConsts::pi;
 	//TStroke *stroke = getStroke();
 	double length = stroke->getLength();
 
@@ -5185,10 +5182,10 @@ void TFriezeStrokeStyle2::computeData(Points &positions,
 		double thickness = pos.thick; // 5; //(1-t)*40 + t * 10;
 
 		if (thickness > 0) {
-			double omega = pi * 2 / (thickness * 2);
+			double omega = M_PI / thickness;
 
 			double q = 0.5 * (1 - cos(phi));
-			double theta = pi * 0.5 - pi * m_parameter * q;
+			double theta = M_PI_2 - M_PI * m_parameter * q;
 			double r = thickness * sin(phi);
 			double r1 = r * thick;
 			double costheta = cos(theta);
@@ -5241,7 +5238,6 @@ void TFriezeStrokeStyle2::drawStroke(const TColorFunction *cf, Points &positions
 
 void TFriezeStrokeStyle2::drawStroke(TFlash &flash, const TStroke *stroke) const
 {
-	using TConsts::pi;
 	//TStroke *stroke = getStroke();
 	double length = stroke->getLength();
 
@@ -5265,10 +5261,10 @@ void TFriezeStrokeStyle2::drawStroke(TFlash &flash, const TStroke *stroke) const
 		double thickness = pos.thick; // 5; //(1-t)*40 + t * 10;
 
 		if (thickness > 0) {
-			double omega = pi * 2 / (thickness * 2);
+			double omega = M_PI / thickness;
 
 			double q = 0.5 * (1 - cos(phi));
-			double theta = pi * 0.5 - pi * m_parameter * q;
+			double theta = M_PI_2 - M_PI * m_parameter * q;
 			double r = thickness * sin(phi);
 			double r1 = r * thick;
 			double costheta = cos(theta);

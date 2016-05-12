@@ -745,7 +745,7 @@ degree2cos(int degree)
 		degree == 270)
 		return 0.0;
 
-	return cos(degree * TConsts::pi_180);
+	return cos(degree * M_PI_180);
 }
 
 //-----------------------------------------------------------------------------

@@ -159,9 +159,9 @@ void EmbossFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 	double scale = sqrt(fabs(ri.m_affine.det()));
 	double radius = tcrop(m_radius->getValue(frame), min, max) * scale;
 	double direction = (m_direction->getValue(frame));
-	double elevation = (m_elevation->getValue(frame)) * TConsts::pi / 180;
+	double elevation = (m_elevation->getValue(frame)) * M_PI_180;
 	double intensity = m_intensity->getValue(frame);
-	double azimuth = direction * TConsts::pi / 180;
+	double azimuth = direction * M_PI_180;
 
 	//NOTE: This enlargement is perhaps needed in the calculation of the fx - but no output will
 	//be generated for it - so there is no trace of it in the doGetBBox function...

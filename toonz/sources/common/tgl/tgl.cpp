@@ -52,11 +52,11 @@ int computeSlices(double radius, double pixelSize = 1.0)
 	if (fabs(1.0 - temp) <= 1)
 		thetaStep = acos(1.0 - temp);
 	else
-		thetaStep = TConsts::pi_2 * 0.5;
+		thetaStep = M_PI_4;
 
 	assert(thetaStep != 0.0);
 
-	int numberOfSlices = (int)(2.0 * TConsts::pi / thetaStep);
+	int numberOfSlices = (int)(M_2PI / thetaStep);
 
 	return numberOfSlices != 0 ? numberOfSlices : 2;
 }
@@ -146,7 +146,7 @@ void tglDrawCircle(const TPointD &center, double radius)
 	if (slices <= 0)
 		slices = computeSlices(radius, pixelSize) >> 1;
 
-	double step = TConsts::pi / slices;
+	double step = M_PI / slices;
 	double step2 = 2.0 * step;
 
 	double
@@ -160,7 +160,7 @@ void tglDrawCircle(const TPointD &center, double radius)
 
 	cos_t = radius /* *1.0*/;
 	sin_t = 0.0;
-	for (t = 0; t + step < TConsts::pi_2; t += step2) {
+	for (t = 0; t + step < M_PI_2; t += step2) {
 		cos_ts = radius * cos(t + step);
 		sin_ts = radius * sin(t + step);
 

@@ -552,8 +552,8 @@ int rootForCubicEquation(const std::vector<double> &p, std::vector<double> &sol)
 		double Q_sqrt = sqrt(Q);
 		double theta = acos(R / (Q * Q_sqrt));
 		sol.push_back(-2 * Q_sqrt * cos(theta * inv_3) - a * inv_3);
-		sol.push_back(-2 * Q_sqrt * cos((theta - TConsts::pi * 2.0) * inv_3) - a * inv_3);
-		sol.push_back(-2 * Q_sqrt * cos((theta + TConsts::pi * 2.0) * inv_3) - a * inv_3);
+		sol.push_back(-2 * Q_sqrt * cos((theta - M_2PI) * inv_3) - a * inv_3);
+		sol.push_back(-2 * Q_sqrt * cos((theta + M_2PI) * inv_3) - a * inv_3);
 		std::sort(sol.begin(), sol.end());
 		return 3;
 	}
@@ -893,8 +893,8 @@ double cubicRoot(double a, double b, double c, double d)
 		double root[3];
 		root[0] = root[1] = root[2] = -2.0 * sqrt(Q);
 		root[0] *= cos(theta / 3.0);
-		root[1] *= cos((theta + 2 * TConsts::pi) / 3.0);
-		root[2] *= cos((theta - 2 * TConsts::pi) / 3.0);
+		root[1] *= cos((theta + M_2PI) / 3.0);
+		root[2] *= cos((theta - M_2PI) / 3.0);
 		root[0] -= b / 3.0;
 		root[1] -= b / 3.0;
 		root[2] -= b / 3.0;

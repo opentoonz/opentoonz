@@ -159,12 +159,12 @@ inline TINT32 Double2Int(double val)
 
 inline double sinc0(double x, int a)
 {
-	return sin((pi / (a)) * (x)) / ((pi / (a)) * (x));
+	return sin((M_PI / (a)) * (x)) / ((M_PI / (a)) * (x));
 }
 
 inline double sinc(double x, int a)
 {
-	return (x) == 0.0 ? 1.0 : sin((pi / (a)) * (x)) / ((pi / (a)) * (x));
+	return (x) == 0.0 ? 1.0 : sin((M_PI / (a)) * (x)) / ((M_PI / (a)) * (x));
 }
 
 inline UCHAR TO8BIT(float X)
@@ -486,7 +486,7 @@ static inline double flt_hann2(double x)
 	if (x <= -2.0)
 		return 0.0;
 	if (x < 2.0)
-		return sinc(x, 1) * (0.5 + 0.5 * cos((pi / 2) * x));
+		return sinc(x, 1) * (0.5 + 0.5 * cos(M_PI_2 * x));
 	return 0.0;
 }
 
@@ -498,7 +498,7 @@ static inline double flt_hann3(double x)
 	if (x <= -3.0)
 		return 0.0;
 	if (x < 3.0)
-		return sinc(x, 1) * (0.5 + 0.5 * cos((pi / 3) * x));
+		return sinc(x, 1) * (0.5 + 0.5 * cos(M_PI_3 * x));
 	return 0.0;
 }
 
@@ -510,7 +510,7 @@ static inline double flt_hamming2(double x)
 	if (x <= -2.0)
 		return 0.0;
 	if (x < 2.0)
-		return sinc(x, 1) * (0.54 + 0.46 * cos((pi / 2) * x));
+		return sinc(x, 1) * (0.54 + 0.46 * cos(M_PI_2 * x));
 	return 0.0;
 }
 
@@ -522,7 +522,7 @@ static inline double flt_hamming3(double x)
 	if (x <= -3.0)
 		return 0.0;
 	if (x < 3.0)
-		return sinc(x, 1) * (0.54 + 0.46 * cos((pi / 3) * x));
+		return sinc(x, 1) * (0.54 + 0.46 * cos(M_PI_3 * x));
 	return 0.0;
 }
 
@@ -558,7 +558,7 @@ static inline double flt_gauss(double x)
 	if (x <= -2.0)
 		return 0.0;
 	if (x < 2.0)
-		return exp((-pi) * x * x);
+		return exp(-M_PI * x * x);
 	return 0.0; /* exp(-M_PI*2*2)~=3.5*10^-6 */
 }
 
@@ -1100,25 +1100,25 @@ inline double get_filter_value(TRop::ResampleFilterType flt_type, double x)
 	case TRop::Hann2:
 		if (x <= -2.0) return 0.0;
 		if (x < 2.0)
-			return sinc0(x, 1) * (0.5 + 0.5 * cos((pi / 2) * x));
+			return sinc0(x, 1) * (0.5 + 0.5 * cos(M_PI_2 * x));
 		break;
 
 	case TRop::Hann3:
 		if (x <= -3.0) return 0.0;
 		if (x < 3.0)
-			return sinc0(x, 1) * (0.5 + 0.5 * cos((pi / 3) * x));
+			return sinc0(x, 1) * (0.5 + 0.5 * cos(M_PI_3 * x));
 		break;
 
 	case TRop::Hamming2:
 		if (x <= -2.0) return 0.0;
 		if (x < 2.0)
-			return sinc0(x, 1) * (0.54 + 0.46 * cos((pi / 2) * x));
+			return sinc0(x, 1) * (0.54 + 0.46 * cos(M_PI_2 * x));
 		break;
 
 	case TRop::Hamming3:
 		if (x <= -3.0) return 0.0;
 		if (x < 3.0)
-			return sinc0(x, 1) * (0.54 + 0.46 * cos((pi / 3) * x));
+			return sinc0(x, 1) * (0.54 + 0.46 * cos(M_PI_3 * x));
 		break;
 
 	case TRop::Lanczos2:
@@ -1136,7 +1136,7 @@ inline double get_filter_value(TRop::ResampleFilterType flt_type, double x)
 	case TRop::Gauss:
 		if (x <= -2.0) return 0.0;
 		if (x < 2.0)
-			return exp((-pi) * x * x); /* exp(-M_PI*2*2)~=3.5*10^-6 */
+			return exp(-M_PI * x * x); /* exp(-M_PI*2*2)~=3.5*10^-6 */
 		break;
 	default:
 		assert(!"bad filter type");

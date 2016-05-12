@@ -14,7 +14,7 @@
 
 #include <string>
 #include <map>
-#include <strstream>
+#include <sstream>
 
 #include <QString>
 #include <QProcess>
@@ -129,14 +129,6 @@ TFilePath getLocalRoot()
 }
 
 //--------------------------------------------------------------------
-/*
-TFilePath getAppsCfgFilePath()
-{
-  TFilePath appsRoot = getLocalRoot();
-  return appsRoot + "config" + "apppath.cfg";
-}
-*/
-//--------------------------------------------------------------------
 
 TFilePath getBinRoot()
 {
@@ -147,19 +139,6 @@ TFilePath getBinRoot()
 #endif
 }
 
-//--------------------------------------------------------------------
-/*
-string myGetHostName()
-{
-#ifdef _WIN32
-  return TSystem::getHostName();
-#else
-  char hostName[MAXHOSTNAMELEN];
-  gethostname((char*)&hostName, MAXHOSTNAMELEN);
-  return hostName;
-#endif
-}
-*/
 //--------------------------------------------------------------------
 
 bool dirExists(const TFilePath &dirFp)
@@ -516,39 +495,9 @@ FarmServer::~FarmServer()
 }
 
 //------------------------------------------------------------------------------
-
-inline std::string toString(unsigned long value)
-{
-	std::ostrstream ss;
-	ss << value << '\0';
-	std::string s = ss.str();
-	ss.freeze(false);
-	return s;
-}
-
-//------------------------------------------------------------------------------
-/*
-void FarmServer::setAppPaths(const vector<TFilePath> &appPaths)
-{
-  m_appPaths = appPaths;
-}
-*/
-//------------------------------------------------------------------------------
 QString FarmServer::execute(const vector<QString> &argv)
 {
-	/*
-#ifdef _DEBUG
-  std::cout << endl << "executing " << argv[0].c_str() << endl << endl;
-#endif
-*/
-
 	if (argv.size() > 0) {
-		/*
-#ifdef _DEBUG
-    for (int i=0; i<argv.size(); ++i)
-      std::cout << argv[i] << " ";
-#endif
-*/
 		if (argv[0] == "addTask" && argv.size() == 3) {
 			//assert(!"Da fare");
 			int ret = addTask(argv[1], argv[2]);
@@ -801,26 +750,22 @@ bool loadServerData(const QString &hostname, QString &addr, int &port)
 	if (!is.good())
 		return false;
 	while (!is.eof()) {
-		/*
-    char line[256];
-    is.getline(line, 256);
-    */
 		std::string line = getLine(is);
-		std::istrstream iss(line.c_str());
+		std::istringstream iss(line);
 
-		char name[80];
-		char ipAddress[80];
+		std::string name;
+		std::string ipAddress;
 
 		iss >> name >> ipAddress >> port;
 		if (name[0] == '#')
 			continue;
 #if QT_VERSION >= 0x050500
-		if (STRICMP(hostname.toUtf8(), name) == 0)
+		if (STRICMP(hostname.toUtf8(), name.c_str()) == 0)
 #else
-		if (STRICMP(hostname.toAscii(), name) == 0)
+		if (STRICMP(hostname.toAscii(), name.c_str()) == 0)
 #endif
 		{
-			addr = QString(ipAddress);
+			addr = QString(ipAddress.c_str());
 			return true;
 		}
 	}
@@ -947,7 +892,7 @@ void FarmServerService::onStart(int argc, char *argv[])
 
 	try {
 		m_farmServer->getController()->attachServer(TSystem::getHostName(), m_addr, m_port);
-	} catch (TException & /*e*/) {
+	} catch (TException const&) {
 	}
 
 #ifdef _WIN32
@@ -966,24 +911,6 @@ void FarmServerService::onStart(int argc, char *argv[])
 	// Per tutti i programmi il cui path non e' contenuto nel file di configurazione
 	// si assume che il path del folder del programma sia specificato
 	// nella variabile di sistema PATH
-
-	/*
-  vector<TFilePath> appPaths;
-  TFilePath appsCfgFile = getAppsCfgFilePath();
-
-  Tifstream isAppCfgFile(appsCfgFile);
-  if (!isAppCfgFile.good())
-    std::cout << "Error: " << appsCfgFile << endl;
-  while (!isAppCfgFile.eof())
-  {
-    std::string line = getLine(isAppCfgFile);
-    istrstream iss(line.c_str());
-    TFilePath appPath = TFilePath(line);
-    appPaths.push_back(appPath);
-  }
-
-  m_farmServer->setAppPaths(appPaths);
-  */
 
 	QEventLoop eventLoop;
 
@@ -1034,7 +961,7 @@ void FarmServerService::onStart(int argc, char *argv[])
 	}
 
 	std::string msg("Exiting with code ");
-	msg += toString(ret);
+	msg += std::to_string(ret);
 	msg += "\n";
 	m_userLog->info(QString::fromStdString(msg));
 }

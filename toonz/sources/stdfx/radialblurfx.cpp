@@ -38,7 +38,7 @@ public:
 		double radius = m_radius->getValue(frame) * scale;
 		double blur = m_blur->getValue(frame);
 
-		double intensity = blur * (TConsts::pi / 180);
+		double intensity = blur * M_PI_180;
 
 		TPointD p1 = bBox.getP00() - point;
 		TPointD p2 = bBox.getP01() - point;
@@ -121,7 +121,7 @@ void doRadialBlur(const TRasterPT<PIXEL> rout, const TRasterPT<PIXEL> rin, doubl
 	double CROP_VAL = (double)MAX_CHANNEL_VALUE;
 	CHANNEL_TYPE U_CROP_VAL = MAX_CHANNEL_VALUE;
 
-	double intensity = blur * (TConsts::pi / 180);
+	double intensity = blur * M_PI_180;
 
 	/*-出力サイズの画面の中の、ブラーのセンター位置-*/
 	int cx = lx / 2 + dx;

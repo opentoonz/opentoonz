@@ -240,7 +240,7 @@ void DragRotationTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &)
 	if (a2 < eps || b2 < eps)
 		return;
 
-	double dang = 180 * asin(cross(a, b) / sqrt(a2 * b2)) / TConsts::pi;
+	double dang = asin(cross(a, b) / sqrt(a2 * b2)) * M_180_PI;
 
 	if (m_snapped) {
 		if (fabs(dang) < 2)
@@ -923,7 +923,7 @@ void IKTool::setAngleOffsets()
 	int frame = TTool::getApplication()->getCurrentFrame()->getFrame();
 	for (int i = 0; i < (int)m_joints.size(); i++) {
 		double angle = m_joints[i].m_bone->getStageObject()->getParam(TStageObject::T_Angle, frame);
-		double theta0 = TConsts::pi_180 * angle;
+		double theta0 = angle * M_PI_180;
 		double theta1 = m_joints[i].m_sign * m_engine.getJointAngle(i);
 		m_joints[i].m_angleOffset = theta1 - theta0;
 	}
@@ -978,7 +978,7 @@ void IKTool::apply()
 		TStageObject *obj = m_joints[i].m_bone->getStageObject();
 		TDoubleParam *param = obj->getParam(TStageObject::T_Angle);
 		double theta = m_joints[i].m_sign * m_engine.getJointAngle(i) - m_joints[i].m_angleOffset;
-		theta *= TConsts::invOf_pi_180;
+		theta *= M_180_PI;
 		double oldTheta = param->getValue(frame);
 		double delta = theta - oldTheta;
 		if (fabs(delta) > 180)

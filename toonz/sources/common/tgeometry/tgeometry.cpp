@@ -192,7 +192,7 @@ TRotation::TRotation(double degrees)
 			break;
 		}
 	} else {
-		rad = degrees * (TConsts::pi_180);
+		rad = degrees * M_PI_180;
 		sn = sin(rad);
 		cs = cos(rad);
 		if (sn == 1 || sn == -1)

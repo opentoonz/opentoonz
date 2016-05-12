@@ -1505,10 +1505,10 @@ int get_image_rotation_and_center(const TRasterP &img, int strip_width,
 		switch (pegs_side) {
 		case PEGS_LEFT:
 		case PEGS_RIGHT:
-			angle += dy == 0.0 ? TConsts::pi_2 : atan(dx / dy);
+			angle += dy == 0.0 ? M_PI_2 : atan(dx / dy);
 			break;
 		default:
-			angle -= dx == 0.0 ? TConsts::pi_2 : atan(dy / dx);
+			angle -= dx == 0.0 ? M_PI_2 : atan(dy / dx);
 			break;
 		}
 	}

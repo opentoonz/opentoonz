@@ -71,8 +71,8 @@ class TangentConverter : public TUnitConverter
 public:
 	TangentConverter() {}
 	TUnitConverter *clone() const { return new TangentConverter(*this); }
-	double convertTo(double v) const { return 180.0 * atan(v) / TConsts::pi; }
-	double convertFrom(double v) const { return tan(TConsts::pi * v / 180.0); }
+	double convertTo(double v) const { return atan(v) * (M_1_PI * 180.0); }
+	double convertFrom(double v) const { return tan(v * M_PI_180); }
 };
 
 //===================================================================

@@ -3150,7 +3150,7 @@ void splitStroke(const TStroke &tq,
 
 void detectCorners(const TStroke *stroke, double minDegree, std::vector<int> &corners)
 {
-	const double minSin = fabs(sin(minDegree * TConsts::pi_180));
+	const double minSin = fabs(sin(minDegree * M_PI_180));
 
 	const TThickQuadratic *quad1 = 0;
 	const TThickQuadratic *quad2 = 0;
@@ -3575,11 +3575,11 @@ void computeQuadraticsFromCubic(const TThickCubic &cubic,
 					double cs2 = sq(tmp) / (4 * norm2_side0p * norm2_side3p);
 					//assert (0 <= cs2 && cs2 <= 1 + TConsts::epsilon);
 					assert(areAlmostEqual(tsign(cs_sign) * sqrt(cs2), tmp / (2 * sqrt(norm2_side0p) * sqrt(norm2_side3p))));
-					assert(!(cs_sign < 0) || acos(-sqrt(cs2)) > 10 * TConsts::pi_180); //  cs_sign < 0 => acos(-sqrt(cs2)) > 10°
+					assert(!(cs_sign < 0) || acos(-sqrt(cs2)) > 10 * M_PI_180); //  cs_sign < 0 => acos(-sqrt(cs2)) > 10°
 					if (cs_sign < 0 || cs2 < 0.969846)								   //  cos(10°)^2 = 0.969846
 					{																   //  limita distanza di intersection: elimina quadratiche "cappio" (con p1 "lontano")
-						//assert (acos(tsign(cs_sign)*sqrt(cs2)) > 10*TConsts::pi_180);
-						assert(tsign(cs_sign) * sqrt(cs2) < cos(10 * TConsts::pi_180));
+						//assert (acos(tsign(cs_sign)*sqrt(cs2)) > 10*M_PI_180);
+						assert(tsign(cs_sign) * sqrt(cs2) < cos(10 * M_PI_180));
 						TPointD intersection = p0 + t01 * (p1 - p0);																//  = p2 + t32*(p2 - p3)
 						TThickPoint p(intersection.x, intersection.y, 0.5 * (cubic.getThickP1().thick + cubic.getThickP2().thick)); //  compatibilita' precedente funzione
 						chunkArray.push_back(new TThickQuadratic(cubic.getThickP0(), p, cubic.getThickP3()));

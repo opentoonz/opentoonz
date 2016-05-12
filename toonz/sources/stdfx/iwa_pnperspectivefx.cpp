@@ -138,7 +138,7 @@ void Iwa_PNPerspectiveFx::getPNParameters(TTile &tile, double frame,
 					 (double)camHeight * aff_pn.a22);
 	params.fy_2 = sqrtf(vec_p0p1.x * vec_p0p1.x + vec_p0p1.y * vec_p0p1.y) / 2.0f;
 
-	float fov_radian_2 = (fov / 2.0f) * M_PI / 180.0f;
+	float fov_radian_2 = (fov / 2.0f) * float(M_PI_180);
 
 	/* カメラから投影面への距離 */
 	float D = params.fy_2 / tanf(fov_radian_2);

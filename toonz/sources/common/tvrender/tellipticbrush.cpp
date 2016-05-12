@@ -903,14 +903,12 @@ void tellipticbrush::OutlineBuilder::addRoundSideCaps(
 
 		//The only dangerous case is when the directions are near-opposed
 		if (prevD * nextD < 0) {
-			const double twice_pi = 2 * TConsts::pi;
-
 			//Here, we must make one angle its (sign-opposite) 2*pi complement.
 			//Keep the angle with the least fabs (smallest 'butterfly intersection')
 			if (fabs(totAngleL) < fabs(totAngleR))
-				totAngleR = (totAngleR > 0) ? totAngleR - twice_pi : totAngleR + twice_pi;
+				totAngleR = (totAngleR > 0) ? totAngleR - M_2PI : totAngleR + M_2PI;
 			else
-				totAngleL = (totAngleL > 0) ? totAngleL - twice_pi : totAngleL + twice_pi;
+				totAngleL = (totAngleL > 0) ? totAngleL - M_2PI : totAngleL + M_2PI;
 		}
 	}
 

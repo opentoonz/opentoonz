@@ -516,10 +516,10 @@ void Iwa_Particles_Engine::normalize_values(struct particles_values &values,
 	(values.trailopacity_val.second) = (values.trailopacity_val.second) * 0.01;
 	(values.mblur_val) = (values.mblur_val) * 0.01;
 	(values.friction_val) = -(values.friction_val) * 0.01;
-	(values.windangle_val) = (values.windangle_val) * (TConsts::pi / 180);
-	(values.g_angle_val) = (values.g_angle_val + 180) * (TConsts::pi / 180);
-	(values.speeda_val.first) = (values.speeda_val.first) * (TConsts::pi / 180);
-	(values.speeda_val.second) = (values.speeda_val.second) * (TConsts::pi / 180);
+	(values.windangle_val) = (values.windangle_val) * M_PI_180;
+	(values.g_angle_val) = (values.g_angle_val + 180) * M_PI_180;
+	(values.speeda_val.first) = (values.speeda_val.first) * M_PI_180;
+	(values.speeda_val.second) = (values.speeda_val.second) * M_PI_180;
 	if (values.step_val < 1)
 		values.step_val = 1;
 	values.genfadecol_val = (values.genfadecol_val) * 0.01;
@@ -527,8 +527,8 @@ void Iwa_Particles_Engine::normalize_values(struct particles_values &values,
 	values.foutfadecol_val = (values.foutfadecol_val) * 0.01;
 	(values.curl_val) = (values.curl_val) * dpicorr * 0.1;
 	/*- ひらひら粒子に照明を当てる normalize_values()内で Degree → Radian 化する -*/
-	(values.iw_light_theta_val) = (values.iw_light_theta_val) * (TConsts::pi / 180);
-	(values.iw_light_phi_val) = (values.iw_light_phi_val) * (TConsts::pi / 180);
+	(values.iw_light_theta_val) = (values.iw_light_theta_val) * M_PI_180;
+	(values.iw_light_phi_val) = (values.iw_light_phi_val) * M_PI_180;
 	/*- 読み込みマージン -*/
 	(values.margin_val) = (values.margin_val) * dpicorr;
 }
@@ -961,7 +961,7 @@ void Iwa_Particles_Engine::do_render(TFlash *flash,
 	double aim_angle = 0;
 	if (values.pathaim_val) {
 		float arctan = atan2f(part->vy, part->vx);
-		aim_angle = (180 / TConsts::pi) * arctan;
+		aim_angle = arctan * M_180_PI;
 	}
 
 	/*- 粒子の回転、スケールをアフィン行列に入れる -*/
