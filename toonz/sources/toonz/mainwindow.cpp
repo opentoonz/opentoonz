@@ -215,6 +215,42 @@ void makePrivate(std::vector<Room *> &rooms)
 		makePrivate(rooms[i]);
 }
 
+
+// major version  :  7 bits
+// minor version  :  8 bits
+// revision number: 16 bits
+int get_version_code_from(std::string ver)
+{
+	int version = 0;
+
+	// major version: assume that the major version is less than 127.
+	std::string::size_type const a = ver.find('.');
+	std::string const major
+		= (a == std::string::npos)
+		? ver
+		: ver.substr(0, a);
+	version += std::stoi(major) << 24;
+	if ((a == std::string::npos) || (a + 1 == ver.length())) {
+		return version;
+	}
+
+	// minor version: assume that the minor version is less than 255.
+	std::string::size_type const b = ver.find('.', a + 1);
+	std::string const minor
+		= (b == std::string::npos)
+		? ver.substr(a + 1)
+		: ver.substr(a + 1, b - a - 1);
+	version += std::stoi(minor) << 16;
+	if ((b == std::string::npos) || (b + 1 == ver.length())) {
+		return version;
+	}
+
+	// revision number: assume that the revision number is less than 32767.
+	version += std::stoi(ver.substr(b + 1));
+
+	return version;
+}
+
 } // namespace
 //=============================================================================
 
@@ -1029,7 +1065,10 @@ void MainWindow::onAbout()
 	dialog->setWindowTitle(tr("About OpenToonz"));
 	dialog->setTopMargin(0);
 	dialog->addWidget(label);
-	dialog->addWidget(new QLabel("OpenToonz (built " __DATE__ " " __TIME__ ")"));
+
+	QString name = QString::fromStdString(TEnv::getApplicationFullName());
+	name += " (built " __DATE__ " " __TIME__ ")";
+	dialog->addWidget(new QLabel(name));
 
 	QPushButton *button = new QPushButton(tr("Close"), dialog);
 	button->setDefault(true);
@@ -1244,10 +1283,11 @@ extern const char *applicationVersion;
 void MainWindow::checkForUpdates()
 {
 	// Since there is only a single version of Opentoonz, we can do a simple check against a string
-	QUrl updateUrl = "http://ss23.geek.nz/opentoonz-version.txt";
+	QUrl updateUrl = "http://opentoonz.github.io/opentoonz-version.txt";
 
 	m_updateChecker = new UpdateChecker(updateUrl);
-	connect(m_updateChecker, &UpdateChecker::done, this, &MainWindow::onUpdateCheckerDone);
+	connect(m_updateChecker, SIGNAL(done(bool)),
+		this, SLOT(onUpdateCheckerDone(bool)));
 }
 //-----------------------------------------------------------------------------
 #ifdef LINETEST
@@ -1272,15 +1312,17 @@ void MainWindow::onUpdateCheckerDone(bool error)
 		return;
 	}
 
-	// TODO: Change this so that it is a proper >= comparison instead of just ==, to deal with beta releases
-	if (m_updateChecker->getLatestVersion() != QString::fromStdString(TEnv::getApplicationVersion())) {
+	int const software_version = get_version_code_from(TEnv::getApplicationVersion());
+	int const latest_version = get_version_code_from(m_updateChecker->getLatestVersion().toStdString());
+	if (software_version < latest_version) {
 		std::vector<QString> buttons;
-		buttons.push_back(QString(tr("Visit Web Site")));
-		buttons.push_back(QString(tr("Cancel")));
+		buttons.push_back(QObject::tr("Visit Web Site"));
+		buttons.push_back(QObject::tr("Cancel"));
 		int ret = MsgBox(INFORMATION, QObject::tr("An update is available for this software.\nVisit the Web site for more information."), buttons);
-		if (ret == 1)
+		if (ret == 1) {
 			// This URL can be "translated" to give a localised version to non-English users
 			QDesktopServices::openUrl(QObject::tr("https://opentoonz.github.io/e/"));
+		}
 	}
 
 	disconnect(m_updateChecker);

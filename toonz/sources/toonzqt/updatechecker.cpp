@@ -1,17 +1,19 @@
 #include "./toonzqt/updatechecker.h"
 #include <QNetworkReply>
 
-UpdateChecker::UpdateChecker(const QUrl &updateUrl)
+UpdateChecker::UpdateChecker(QUrl const& updateUrl)
+	: manager_(new QNetworkAccessManager(this), &QNetworkAccessManager::deleteLater)
 {
-	// TODO: Determine if *manager will be deleted at the appropriate time
-	QNetworkAccessManager *manager = new QNetworkAccessManager(this);
-	QNetworkReply *reply = manager->get(QNetworkRequest(updateUrl));
+	connect(manager_.data(), SIGNAL(finished(QNetworkReply*)),
+		this, SLOT(httpRequestFinished(QNetworkReply*)));
 
-	connect(manager, &QNetworkAccessManager::finished, this, &UpdateChecker::httpRequestFinished);
+	manager_->get(QNetworkRequest(updateUrl));
 }
 
-void UpdateChecker::httpRequestFinished(QNetworkReply *reply)
+void UpdateChecker::httpRequestFinished(QNetworkReply *pReply)
 {
+	QSharedPointer<QNetworkReply> reply(pReply, &QNetworkReply::deleteLater);
+
 	// If there was an error, don't bother doing the check
 	if (reply->error() != QNetworkReply::NoError) {
 		emit done(true);

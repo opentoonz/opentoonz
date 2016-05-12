@@ -22,10 +22,13 @@
 class DVAPI UpdateChecker : public QObject
 {
 	Q_OBJECT
+
+	QSharedPointer<QNetworkAccessManager> manager_;
+
 	QString m_latestVersion;
 
 public:
-	UpdateChecker(const QUrl &updateUrl);
+	UpdateChecker(QUrl const& updateUrl);
 
 	QString getLatestVersion() const { return m_latestVersion; }
 

@@ -130,6 +130,7 @@ const char *systemVarPrefix = "XPRESS";
 
 const char *applicationName = "OpenToonz";
 const char *applicationVersion = "1.0";
+const char *applicationRevision = "2";
 const char *dllRelativePath = "./toonz6.app/Contents/Frameworks";
 
 #ifdef _WIN32
@@ -140,7 +141,7 @@ TEnv::StringVar EnvSoftwareCurrentFont("SoftwareCurrentFont", "Hervetica");
 TEnv::IntVar EnvSoftwareCurrentFontSize("SoftwareCurrentFontSize", 12);
 TEnv::StringVar EnvSoftwareCurrentFontWeight("SoftwareCurrentFontWeightIsBold", "Yes");
 
-const char *applicationFullName = "OpenToonz 1.0";
+const char *applicationFullName = "OpenToonz 1.0.2";
 const char *rootVarName = "TOONZROOT";
 const char *systemVarPrefix = "TOONZ";
 #endif
@@ -252,7 +253,7 @@ void initToonzEnv()
 
 #endif
 
-	TEnv::setApplication(applicationName, applicationVersion);
+	TEnv::setApplication(applicationName, applicationVersion, applicationRevision);
 	TEnv::setRootVarName(rootVarName);
 	TEnv::setSystemVarPrefix(systemVarPrefix);
 	TEnv::setDllRelativeDir(TFilePath(dllRelativePath));
