@@ -1283,7 +1283,7 @@ extern const char *applicationVersion;
 void MainWindow::checkForUpdates()
 {
 	// Since there is only a single version of Opentoonz, we can do a simple check against a string
-	QUrl updateUrl = "http://opentoonz.github.io/opentoonz-version.txt";
+	QString updateUrl("http://opentoonz.github.io/opentoonz-version.txt");
 
 	m_updateChecker = new UpdateChecker(updateUrl);
 	connect(m_updateChecker, SIGNAL(done(bool)),
